@@ -17,7 +17,7 @@ import {
   RippledPathsResponse,
   PathFindRequest
 } from './pathfind-types'
-import {RippleAPI} from '..'
+import {XrplClient} from '..'
 const NotFoundError = errors.NotFoundError
 const ValidationError = errors.ValidationError
 
@@ -185,7 +185,7 @@ function formatResponse(pathfind: PathFind, paths: RippledPathsResponse) {
   }
 }
 
-function getPaths(this: RippleAPI, pathfind: PathFind): Promise<GetPaths> {
+function getPaths(this: XrplClient, pathfind: PathFind): Promise<GetPaths> {
   validate.getPaths({pathfind})
 
   const address = pathfind.source.address

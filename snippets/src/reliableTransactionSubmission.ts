@@ -1,5 +1,5 @@
 import {
-  RippleAPI,
+  XrplClient,
   AccountInfoResponse,
   LedgerClosedEvent
 } from '../../dist/npm'
@@ -27,7 +27,7 @@ import https = require('https')
  * - https://xrpl.org/reliable-transaction-submission.html
  * - https://xrpl.org/send-xrp.html
  * - https://xrpl.org/look-up-transaction-results.html
- * - https://xrpl.org/get-started-with-rippleapi-for-javascript.html
+ * - https://xrpl.org/get-started-with-XrplClient-for-javascript.html
  * - https://xrpl.org/monitor-incoming-payments-with-websocket.html
  *
  * For the implementation in this example, we have made the following decisions:
@@ -68,16 +68,16 @@ async function reliableTransactionSubmissionExample() {
 async function performPayments(payments) {
   const finalResults = []
   const txFinalizedPromises = []
-  const api = new RippleAPI({server: 'wss://s.altnet.rippletest.net:51233'})
-  await api.connect()
+  const client = new XrplClient({server: 'wss://s.altnet.rippletest.net:51233'})
+  await client.connect()
 
   for (let i = 0; i < payments.length; i++) {
     const payment = payments[i]
-    const account_info: AccountInfoResponse = await api.request('account_info', {
+    const account_info: AccountInfoResponse = await client.request({command: 'account_info',
       account: payment.source.classicAddress,
       ledger_index: 'current'})
-    const sequence = account_info.account_data.Sequence
-    const preparedPayment = await api.preparePayment(payment.source.classicAddress, {
+    const sequence = account_info.result.account_data.Sequence
+    const preparedPayment = await client.preparePayment(payment.source.classicAddress, {
       source: {
         address: payment.source.classicAddress,
         amount: {
@@ -95,11 +95,11 @@ async function performPayments(payments) {
     }, {
       sequence
     })
-    const signed = api.sign(preparedPayment.txJSON, payment.source.secret)
+    const signed = client.sign(preparedPayment.txJSON, payment.source.secret)
     finalResults.push({
       id: signed.id
     })
-    const result = await api.submit(signed.signedTransaction)
+    const result = await client.submit(signed.signedTransaction)
 
     // Most of the time we'll get 'tesSUCCESS' or (after many submissions) 'terQUEUED'
     console.log(`tx ${i} - tentative: ${result.resultCode}`)
@@ -108,7 +108,7 @@ async function performPayments(payments) {
       const ledgerClosedCallback = async (event: LedgerClosedEvent) => {
         let status
         try {
-          status = await api.getTransaction(signed.id)
+          status = await client.getTransaction(signed.id)
         } catch (e) {
           // Typical error when the tx hasn't been validated yet:
           if (e.name !== 'MissingLedgerHistoryError') {
@@ -125,7 +125,7 @@ async function performPayments(payments) {
             }
           } else {
             // Check again later:
-            api.connection.once('ledgerClosed', ledgerClosedCallback)
+            client.connection.once('ledgerClosed', ledgerClosedCallback)
             return
           }
         }
@@ -145,7 +145,7 @@ async function performPayments(payments) {
           }
         }
       }
-      api.connection.once('ledgerClosed', ledgerClosedCallback)
+      client.connection.once('ledgerClosed', ledgerClosedCallback)
     })
     txFinalizedPromises.push(txFinalizedPromise)
   }

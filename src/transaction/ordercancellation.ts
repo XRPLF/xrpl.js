@@ -1,7 +1,7 @@
 import * as utils from './utils'
 const validate = utils.common.validate
 import {Instructions, Prepare, TransactionJSON} from './types'
-import {RippleAPI} from '..'
+import {XrplClient} from '..'
 
 function createOrderCancellationTransaction(
   account: string,
@@ -19,7 +19,7 @@ function createOrderCancellationTransaction(
 }
 
 function prepareOrderCancellation(
-  this: RippleAPI,
+  this: XrplClient,
   address: string,
   orderCancellation: object,
   instructions: Instructions = {}

@@ -1,12 +1,12 @@
 import {removeUndefined} from '../common'
-import {RippleAPI} from '..'
+import {XrplClient} from '..'
 import {
   GetAccountObjectsOptions,
   AccountObjectsResponse
 } from '../common/types/commands/account_objects'
 
 export default async function getAccountObjects(
-  this: RippleAPI,
+  this: XrplClient,
   address: string,
   options: GetAccountObjectsOptions = {}
 ): Promise<AccountObjectsResponse> {

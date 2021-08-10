@@ -4,7 +4,7 @@ const validate = utils.common.validate
 const trustlineFlags = utils.common.txFlags.TrustSet
 import {Instructions, Prepare, TransactionJSON} from './types'
 import {FormattedTrustlineSpecification} from '../common/types/objects/trustlines'
-import {RippleAPI} from '..'
+import {XrplClient} from '..'
 
 function convertQuality(quality) {
   return new BigNumber(quality)
@@ -55,7 +55,7 @@ function createTrustlineTransaction(
 }
 
 function prepareTrustline(
-  this: RippleAPI,
+  this: XrplClient,
   address: string,
   trustline: FormattedTrustlineSpecification,
   instructions: Instructions = {}

@@ -167,7 +167,7 @@ type MarkerResponse = AccountChannelsResponse
                     | AccountOffersResponse
                     | AccountTxResponse
 
-class RippleAPI extends EventEmitter {
+class XrplClient extends EventEmitter {
   _feeCushion: number
   _maxFeeXRP: string
 
@@ -403,7 +403,7 @@ class RippleAPI extends EventEmitter {
 
   static deriveXAddress = deriveXAddress
 
-  // RippleAPI.deriveClassicAddress (static) is a new name for api.deriveAddress
+  // XrplClient.deriveClassicAddress (static) is a new name for api.deriveAddress
   static deriveClassicAddress = deriveAddress
 
   /**
@@ -472,7 +472,7 @@ class RippleAPI extends EventEmitter {
 }
 
 export {
-  RippleAPI
+  XrplClient
 }
 
 export type {
