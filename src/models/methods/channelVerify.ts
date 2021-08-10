@@ -4,7 +4,7 @@ export interface ChannelVerifyRequest extends BaseRequest {
   command: 'channel_verify'
   channel_id: string
   amount: string
-  public_key?: string
+  public_key: string
   signature: string
 }
 
