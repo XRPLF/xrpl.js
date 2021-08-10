@@ -17,7 +17,7 @@ export enum FaucetNetwork {
 }
 
 const INTERVAL_SECONDS = 1 // Interval to check an account balance
-const MAX_ATTEMPS = 20 // Maximum attempts to retrieve a balance
+const MAX_ATTEMPTS = 20 // Maximum attempts to retrieve a balance
 
 /**
  * Generates a random wallet with some amount of XRP (usually 1000 XRP).
@@ -94,7 +94,7 @@ async function generateFaucetWallet(
                 reject(
                   new errors.XRPLFaucetError(
                     `Unable to fund address with faucet after waiting ${
-                      INTERVAL_SECONDS * MAX_ATTEMPS
+                      INTERVAL_SECONDS * MAX_ATTEMPTS
                     } seconds`
                   )
                 )
@@ -168,7 +168,7 @@ async function hasAddressBalanceIncreased(
   originalBalance: number
 ): Promise<boolean> {
   return new Promise((resolve, reject) => {
-    let attempts = MAX_ATTEMPS
+    let attempts = MAX_ATTEMPTS
     const interval = setInterval(async () => {
       if (attempts < 0) {
         clearInterval(interval)
