@@ -4,9 +4,9 @@ import {assertResultMatch, TestSuite} from '../../utils'
 // import {ValidationError} from 'ripple-api/common/errors'
 // import binary from 'ripple-binary-codec'
 // import assert from 'assert-diff'
-// import {RippleAPI} from 'ripple-api'
+// import {XrplClient} from 'ripple-api'
 
-// const {schemaValidator} = RippleAPI._PRIVATE
+// const {schemaValidator} = XrplClient._PRIVATE
 // const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 // const {preparePayment: REQUEST_FIXTURES} = requests
 // const {preparePayment: RESPONSE_FIXTURES} = responses

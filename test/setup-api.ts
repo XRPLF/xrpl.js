@@ -1,4 +1,4 @@
-import {RippleAPI, RippleAPIBroadcast} from 'ripple-api'
+import {XrplClient, XrplClientBroadcast} from 'ripple-api'
 import ledgerClosed from './fixtures/rippled/ledger-close.json'
 import {createMockRippled} from './mock-rippled'
 import {getFreePort} from './utils'
@@ -7,7 +7,7 @@ function setupMockRippledConnection(testcase, port) {
   return new Promise<void>((resolve, reject) => {
     testcase.mockRippled = createMockRippled(port)
     testcase._mockedServerPort = port
-    testcase.api = new RippleAPI({server: 'ws://localhost:' + port})
+    testcase.api = new XrplClient({server: 'ws://localhost:' + port})
     testcase.api
       .connect()
       .then(() => {
@@ -25,7 +25,7 @@ function setupMockRippledConnectionForBroadcast(testcase, ports) {
   return new Promise<void>((resolve, reject) => {
     const servers = ports.map((port) => 'ws://localhost:' + port)
     testcase.mocks = ports.map((port) => createMockRippled(port))
-    testcase.api = new RippleAPIBroadcast(servers)
+    testcase.api = new XrplClientBroadcast(servers)
     testcase.api
       .connect()
       .then(() => {

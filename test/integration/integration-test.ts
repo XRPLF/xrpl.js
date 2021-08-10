@@ -2,7 +2,7 @@ import _ from 'lodash'
 import assert from 'assert'
 import wallet from './wallet'
 import requests from '../fixtures/requests'
-import {RippleAPI} from 'ripple-api'
+import {XrplClient} from 'ripple-api'
 import {isValidClassicAddress} from 'ripple-address-codec'
 import {payTo, ledgerAccept} from './utils'
 import {errors} from 'ripple-api/common'
@@ -106,7 +106,7 @@ function testTransaction(
 }
 
 function setup(this: any, server = serverUrl) {
-  this.api = new RippleAPI({server})
+  this.api = new XrplClient({server})
   console.log('CONNECTING...')
   return this.api.connect().then(
     () => {

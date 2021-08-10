@@ -1,6 +1,6 @@
 import assert from 'assert'
-import {RippleAPI} from 'ripple-api'
-const RangeSet = RippleAPI._PRIVATE.RangeSet
+import {XrplClient} from 'ripple-api'
+const RangeSet = XrplClient._PRIVATE.RangeSet
 
 describe('RangeSet', function () {
   it('addRange()/addValue()', function () {

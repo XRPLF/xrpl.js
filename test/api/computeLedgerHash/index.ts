@@ -156,7 +156,7 @@ export default <TestSuite>{
   },
 
   'computeLedgerHash': async (api, address) => {
-    // const api = new RippleAPI()
+    // const api = new XrplClient()
     const header = REQUEST_FIXTURES.header
     const ledgerHash = api.computeLedgerHash(header)
     assert.strictEqual(
@@ -166,7 +166,7 @@ export default <TestSuite>{
   },
 
   'computeLedgerHash - with transactions': async (api, address) => {
-    // const api = new RippleAPI()
+    // const api = new XrplClient()
     const header = {
       ...REQUEST_FIXTURES.header,
       transactionHash: undefined,
@@ -180,7 +180,7 @@ export default <TestSuite>{
   },
 
   'computeLedgerHash - incorrent transaction_hash': async (api, address) => {
-    // const api = new RippleAPI()
+    // const api = new XrplClient()
     const header = Object.assign({}, REQUEST_FIXTURES.header, {
       transactionHash:
         '325EACC5271322539EEEC2D6A5292471EF1B3E72AE7180533EFC3B8F0AD435C9'

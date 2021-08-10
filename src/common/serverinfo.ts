@@ -2,6 +2,7 @@ import * as _ from 'lodash'
 import {convertKeysFromSnakeCaseToCamelCase} from './utils'
 import BigNumber from 'bignumber.js'
 import {XrplClient} from '..'
+import { ServerInfoResponse } from './types/commands'
 
 export type GetServerInfoResponse = {
   buildVersion: string
@@ -41,9 +42,9 @@ function renameKeys(object: Record<string, any>, mapping: Record<string, any>) {
   })
 }
 
-function getServerInfo(this: XrplClient): Promise<GetServerInfoResponse> {
-  return this.request('server_info').then((response) => {
-    const info = convertKeysFromSnakeCaseToCamelCase(response.info)
+function getServerInfo(this: XrplClient): Promise<ServerInfoResponse> {
+  return this.request({command: 'server_info'}).then((response) => {
+    const info = convertKeysFromSnakeCaseToCamelCase(response.result.info)
     renameKeys(info, {hostid: 'hostID'})
     if (info.validatedLedger) {
       renameKeys(info.validatedLedger, {
@@ -70,7 +71,7 @@ async function getFee(this: XrplClient, cushion?: number): Promise<string> {
     cushion = 1.2
   }
 
-  const serverInfo = (await this.request('server_info')).info
+  const serverInfo = (await this.request({command: 'server_info'})).result.info
   const baseFeeXrp = new BigNumber(serverInfo.validated_ledger.base_fee_xrp)
   if (serverInfo.load_factor == null) {
     // https://github.com/ripple/rippled/issues/3812#issuecomment-816871100
