@@ -203,7 +203,7 @@ async function hasAddressBalanceIncreased(
 export function getFaucetUrl(api: RippleAPI) {
   const connectionUrl = api.connection.getUrl()
 
-  // 'altnet' for Ripple Tesnet server and 'testnet' for XRPL Labs Testnet server
+  // 'altnet' for Ripple Testnet server and 'testnet' for XRPL Labs Testnet server
   if (connectionUrl.includes('altnet') || connectionUrl.includes('testnet')) {
     return FaucetNetwork.Testnet
   }
