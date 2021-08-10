@@ -30,9 +30,7 @@ type Request = // account methods
              | NoRippleCheckRequest
                // payment channel methods
              | ChannelAuthorizeRequest
-             | ChannelAuthorizeResponse
              | ChannelVerifyRequest
-             | ChannelVerifyResponse
                // path and order book methods
              | BookOffersRequest
              | DepositAuthorizedRequest
@@ -55,6 +53,9 @@ type Response = // account methods
               | AccountTxResponse
               | GatewayBalancesResponse
               | NoRippleCheckResponse
+                // payment channel methods
+              | ChannelAuthorizeResponse
+              | ChannelVerifyResponse
                 // path and order book methods
               | BookOffersResponse
               | DepositAuthorizedResponse
