@@ -23,6 +23,8 @@
     "@types/lodash": "^4.14.136",
     "@types/ws": "^7.2.0",
     "bignumber.js": "^9.0.0",
+    "bip32": "^2.0.6",
+    "bip39": "^3.0.4",
     "https-proxy-agent": "^5.0.0",
     "jsonschema": "1.2.2",
     "lodash": "^4.17.4",
