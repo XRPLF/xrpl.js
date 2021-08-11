@@ -12,7 +12,7 @@ import {
   ConnectionError,
   RippledNotInitializedError,
   RippleError
-} from './errors'
+} from '../common/errors'
 import {ExponentialBackoff} from './backoff'
 import { LedgerStream, Request, Response } from '../models/methods'
 
