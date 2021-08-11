@@ -35,8 +35,6 @@ type Request = // account methods
              | AccountTxRequest
              | GatewayBalancesRequest
              | NoRippleCheckRequest
-               // payment channel methods
-             | ChannelVerifyRequest
                // transaction methods
              | SubmitRequest
              | SubmitMultisignedRequest
@@ -47,6 +45,8 @@ type Request = // account methods
              | DepositAuthorizedRequest
              | PathFindRequest
              | RipplePathFindRequest
+               // payment channel methods
+             | ChannelVerifyRequest
                // subscription methods
              | SubscribeRequest
              | UnsubscribeRequest
@@ -69,8 +69,6 @@ type Response = // account methods
               | AccountTxResponse
               | GatewayBalancesResponse
               | NoRippleCheckResponse
-                // payment channel methods
-              | ChannelVerifyResponse
                 // transaction methods
               | SubmitResponse
               | SubmitMultisignedResponse
@@ -81,6 +79,8 @@ type Response = // account methods
               | DepositAuthorizedResponse
               | PathFindResponse
               | RipplePathFindResponse
+                // payment channel methods
+              | ChannelVerifyResponse
                 // subscription methods
               | SubscribeResponse
               | UnsubscribeResponse
