@@ -1,6 +1,5 @@
 import * as common from '../common'
 
-
 function formatLedgerClose(ledgerClose: any): object {
   return {
     baseFeeXRP: common.dropsToXrp(ledgerClose.fee_base),

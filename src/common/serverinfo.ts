@@ -2,7 +2,7 @@ import * as _ from 'lodash'
 import {convertKeysFromSnakeCaseToCamelCase} from './utils'
 import BigNumber from 'bignumber.js'
 import {XrplClient} from '..'
-import { ServerInfoResponse } from './types/commands'
+import { ServerInfoResponse } from '../models/methods'
 
 export type GetServerInfoResponse = {
   buildVersion: string
