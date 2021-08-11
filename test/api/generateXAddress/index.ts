@@ -1,7 +1,7 @@
 import assert from 'assert-diff'
 import responses from '../../fixtures/responses'
 import {TestSuite} from '../../utils'
-import ECDSA from '../../../src/common/types/enums/ecdsa'
+import ECDSA from '../../../src/common/ecdsa'
 import {GenerateAddressOptions} from '../../../src/offline/generate-address'
 
 /**

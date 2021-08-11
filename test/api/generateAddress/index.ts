@@ -2,7 +2,7 @@ import assert from 'assert-diff'
 import responses from '../../fixtures/responses'
 import {TestSuite} from '../../utils'
 import {GenerateAddressOptions} from '../../../src/offline/generate-address'
-import ECDSA from '../../../src/common/types/enums/ecdsa'
+import ECDSA from '../../../src/common/ecdsa'
 const {generateAddress: RESPONSE_FIXTURES} = responses
 
 /**

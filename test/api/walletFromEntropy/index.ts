@@ -1,6 +1,6 @@
 import assert from 'assert-diff'
 import {TestSuite} from '../../utils'
-import ECDSA from '../../../src/common/types/enums/ecdsa'
+import ECDSA from '../../../src/common/ecdsa'
 import Wallet from '../../../src/Wallet'
 
 const entropy: number[] = new Array(16).fill(0)

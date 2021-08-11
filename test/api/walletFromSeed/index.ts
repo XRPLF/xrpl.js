@@ -1,6 +1,6 @@
 import assert from 'assert-diff'
 import {TestSuite} from '../../utils'
-import ECDSA from '../../../src/common/types/enums/ecdsa'
+import ECDSA from '../../../src/common/ecdsa'
 import Wallet from '../../../src/Wallet'
 
 const seed = 'ssL9dv2W5RK8L3tuzQxYY6EaZhSxW'

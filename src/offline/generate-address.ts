@@ -1,7 +1,7 @@
 import {classicAddressToXAddress} from 'ripple-address-codec'
 import keypairs from 'ripple-keypairs'
 import {errors, validate} from '../common'
-import ECDSA from '../common/types/enums/ecdsa'
+import ECDSA from '../common/ecdsa'
 
 export type GeneratedAddress = {
   xAddress: string
