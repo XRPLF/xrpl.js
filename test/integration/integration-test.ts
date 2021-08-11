@@ -24,7 +24,7 @@ function acceptLedger(client) {
 
 function verifyTransaction(testcase, hash, type, options, txData, address) {
   console.log('VERIFY...')
-  return testcase.api
+  return testcase.client
     .getTransaction(hash, options)
     .then((data) => {
       assert(data && data.outcome)
@@ -73,11 +73,11 @@ function testTransaction(
   assert.strictEqual(txData.Account, address)
   const signedData = testcase.client.sign(txJSON, secret)
   console.log('PREPARED...')
-  return testcase.api
+  return testcase.client
     .submit(signedData.signedTransaction)
     .then((data) =>
       testcase.test.title.indexOf('multisign') !== -1
-        ? acceptLedger(testcase.api).then(() => data)
+        ? acceptLedger(testcase.client).then(() => data)
         : data
     )
     .then((data) => {
@@ -87,7 +87,7 @@ function testTransaction(
         minLedgerVersion: lastClosedLedgerVersion,
         maxLedgerVersion: txData.LastLedgerSequence
       }
-      ledgerAccept(testcase.api)
+      ledgerAccept(testcase.client)
       return new Promise((resolve, reject) => {
         setTimeout(
           () =>
@@ -106,7 +106,7 @@ function testTransaction(
 }
 
 function setup(this: any, server = serverUrl) {
-  this.api = new XrplClient({server})
+  this.client = new XrplClient({server})
   console.log('CONNECTING...')
   return this.client.connect().then(
     () => {
@@ -123,14 +123,14 @@ const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
 
 function makeTrustLine(testcase, address, secret) {
-  const api = testcase.api
+  const client = testcase.client
   const specification = {
     currency: 'USD',
     counterparty: masterAccount,
     limit: '1341.1',
     ripplingDisabled: true
   }
-  const trust = api
+  const trust = client
     .prepareTrustline(address, specification, {})
     .then((data) => {
       const signed = client.sign(data.txJSON, secret)
@@ -144,7 +144,7 @@ function makeTrustLine(testcase, address, secret) {
 }
 
 function makeOrder(client, address, specification, secret) {
-  return api
+  return client
     .prepareOrder(address, specification)
     .then((data) => client.sign(data.txJSON, secret))
     .then((signed) => client.submit(signed.signedTransaction))
@@ -152,7 +152,7 @@ function makeOrder(client, address, specification, secret) {
 }
 
 function setupAccounts(testcase) {
-  const api = testcase.api
+  const client = testcase.client
 
   const promise = payTo(client, 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM')
     .then(() => payTo(client, wallet.getAddress()))
@@ -160,7 +160,7 @@ function setupAccounts(testcase) {
     .then(() => payTo(client, 'rKmBGxocj9Abgy25J51Mk1iqFzW9aVF9Tc'))
     .then(() => payTo(client, 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q'))
     .then(() => {
-      return api
+      return client
         .prepareSettings(masterAccount, {defaultRipple: true})
         .then((data) => client.sign(data.txJSON, masterSecret))
         .then((signed) => client.submit(signed.signedTransaction))
@@ -231,11 +231,11 @@ function suiteSetup(this: any) {
   return (
     setup
       .bind(this)(serverUrl)
-      .then(() => ledgerAccept(this.api))
+      .then(() => ledgerAccept(this.client))
       .then(() => (this.newWallet = this.client.generateAddress()))
       // two times to give time to server to send `ledgerClosed` event
       // so getLedgerVersion will return right value
-      .then(() => ledgerAccept(this.api))
+      .then(() => ledgerAccept(this.client))
       .then(() => this.client.getLedgerVersion())
       .then((ledgerVersion) => {
         this.startLedgerVersion = ledgerVersion
@@ -256,7 +256,7 @@ describe('integration tests', function () {
 
   it('settings', function () {
     return this.client.getLedgerVersion().then((ledgerVersion) => {
-      return this.api
+      return this.client
         .prepareSettings(address, requests.prepareSettings.domain, instructions)
         .then((prepared) =>
           testTransaction(this, 'settings', ledgerVersion, prepared)
@@ -266,7 +266,7 @@ describe('integration tests', function () {
 
   it('trustline', function () {
     return this.client.getLedgerVersion().then((ledgerVersion) => {
-      return this.api
+      return this.client
         .prepareTrustline(
           address,
           requests.prepareTrustline.simple,
@@ -291,7 +291,7 @@ describe('integration tests', function () {
       }
     }
     return this.client.getLedgerVersion().then((ledgerVersion) => {
-      return this.api
+      return this.client
         .preparePayment(address, paymentSpecification, instructions)
         .then((prepared) =>
           testTransaction(this, 'payment', ledgerVersion, prepared)
@@ -313,7 +313,7 @@ describe('integration tests', function () {
       }
     }
     return this.client.getLedgerVersion().then((ledgerVersion) => {
-      return this.api
+      return this.client
         .prepareOrder(address, orderSpecification, instructions)
         .then((prepared) =>
           testTransaction(this, 'order', ledgerVersion, prepared)
@@ -334,7 +334,7 @@ describe('integration tests', function () {
           })
         })
         .then((txData) =>
-          this.api
+          this.client
             .prepareOrderCancellation(
               address,
               {orderSequence: txData.Sequence},
@@ -382,7 +382,7 @@ describe('integration tests', function () {
       initiated: true,
       minLedgerVersion: this.startLedgerVersion
     }
-    return this.api
+    return this.client
       .getTransactions(address, options)
       .then((transactionsData) => {
         assert(transactionsData)
@@ -540,7 +540,7 @@ describe('integration tests - standalone rippled', function () {
       .then(() => {
         return this.client.getLedgerVersion().then((ledgerVersion) => {
           minLedgerVersion = ledgerVersion
-          return this.api
+          return this.client
             .prepareSettings(address, {signers}, instructions)
             .then((prepared) => {
               return testTransaction(
@@ -558,7 +558,7 @@ describe('integration tests - standalone rippled', function () {
         const multisignInstructions = Object.assign({}, instructions, {
           signersCount: 2
         })
-        return this.api
+        return this.client
           .prepareSettings(
             address,
             {domain: 'example.com'},
@@ -575,9 +575,9 @@ describe('integration tests - standalone rippled', function () {
               signed1.signedTransaction,
               signed2.signedTransaction
             ])
-            return this.api
+            return this.client
               .submit(combined.signedTransaction)
-              .then((response) => acceptLedger(this.api).then(() => response))
+              .then((response) => acceptLedger(this.client).then(() => response))
               .then((response) => {
                 assert.strictEqual(response.resultCode, 'tesSUCCESS')
                 const options = {minLedgerVersion}
