@@ -1,4 +1,4 @@
-import { Metadata } from "../common/metadata";
+import Metadata from "../common/metadata";
 import { OfferCreate } from "./offerCreate";
 
 
@@ -26,9 +26,4 @@ export type Transaction =
 export interface TransactionAndMetadata {
     transaction: Transaction;
     metadata: Metadata
-}
-
-export interface SignedTransaction extends Transaction {
-    SigningPublicKey: string;
-    TxnSignature: string;
 }
