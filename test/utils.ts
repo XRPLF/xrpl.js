@@ -4,7 +4,6 @@ import fs from 'fs'
 import path from 'path'
 import {Client} from 'xrpl-local'
 import assert from 'assert-diff'
-const {schemaValidator} = Client._PRIVATE
 
 /**
  * The test function. It takes a Client object and then some other data to
@@ -67,9 +66,6 @@ export function assertResultMatch(
     _.omit(response, ['txJSON', 'tx_json']),
     _.omit(expected, ['txJSON', 'tx_json'])
   )
-  if (schemaName) {
-    schemaValidator.schemaValidate(schemaName, response)
-  }
 }
 
 /**

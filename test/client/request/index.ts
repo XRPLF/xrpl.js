@@ -1,5 +1,5 @@
-import responses from '../../fixtures/responses'
-import {assertResultMatch, TestSuite} from '../../utils'
+// import responses from '../../fixtures/responses'
+import {TestSuite} from '../../utils'
 
 /**
  * Every test suite exports their tests in the default object.
@@ -7,29 +7,29 @@ import {assertResultMatch, TestSuite} from '../../utils'
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'request account_objects': async (client, address) => {
-    const result = await client.request({command: 'account_objects',
-      account: address
-    })
+  // 'request account_objects': async (client, address) => {
+  //   const result = await client.request({command: 'account_objects',
+  //     account: address
+  //   })
 
-    assertResultMatch(
-      result,
-      responses.getAccountObjects,
-      'AccountObjectsResponse'
-    )
-  },
+  //   assertResultMatch(
+  //     result,
+  //     responses.getAccountObjects,
+  //     'AccountObjectsResponse'
+  //   )
+  // },
 
-  'request account_objects - invalid options': async (client, address) => {
-    // @ts-ignore Intentionally no local validation of these options
-    const result = await client.request({command: 'account_objects',
-      account: address,
-      invalid: 'options'
-    })
+  // 'request account_objects - invalid options': async (client, address) => {
+  //   // @ts-ignore Intentionally no local validation of these options
+  //   const result = await client.request({command: 'account_objects',
+  //     account: address,
+  //     invalid: 'options'
+  //   })
 
-    assertResultMatch(
-      result,
-      responses.getAccountObjects,
-      'AccountObjectsResponse'
-    )
-  }
+  //   assertResultMatch(
+  //     result,
+  //     responses.getAccountObjects,
+  //     'AccountObjectsResponse'
+  //   )
+  // }
 }
