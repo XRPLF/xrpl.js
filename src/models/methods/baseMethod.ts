@@ -1,4 +1,4 @@
-import { Response } from ".";
+import { Request } from './../methods'
 
 export interface BaseRequest {
     id: number | string
@@ -21,6 +21,6 @@ export interface BaseResponse {
     warnings?: Warning[]
     forwarded?: boolean
     error?: string
-    request?: Response
+    request?: Request
     api_version?: number
 }
