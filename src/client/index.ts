@@ -39,7 +39,7 @@ import prepareCheckCancel from '../transaction/check-cancel'
 import prepareCheckCash from '../transaction/check-cash'
 import prepareSettings from '../transaction/settings'
 import prepareTicketCreate from '../transaction/ticket'
-import sign from '../transaction/sign'
+import {sign} from '../transaction/sign'
 import combine from '../transaction/combine'
 import submit from '../transaction/submit'
 import { generateAddress, generateXAddress } from '../offline/utils'
@@ -48,7 +48,6 @@ import computeLedgerHash from '../offline/ledgerhash'
 import signPaymentChannelClaim from '../offline/sign-payment-channel-claim'
 import verifyPaymentChannelClaim from '../offline/verify-payment-channel-claim'
 import getLedger from '../ledger/ledger'
-
 import {
   Request,
   Response,
