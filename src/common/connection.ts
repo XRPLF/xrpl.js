@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
 import {EventEmitter} from 'events'
-import {URL} from 'url'
+import {parse as parseURL} from 'url'
 import WebSocket from 'ws'
 import RangeSet from './rangeset'
 import {
@@ -53,8 +53,9 @@ const INTENTIONAL_DISCONNECT_CODE = 4000
 function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
   const options: WebSocket.ClientOptions = {}
   if (config.proxy != null) {
-    const parsedURL = new URL(url)
-    const parsedProxyURL = new URL(config.proxy)
+    // TODO: replace deprecated method
+    const parsedURL = parseURL(url)
+    const parsedProxyURL = parseURL(config.proxy)
     const proxyOverrides = _.omitBy(
       {
         secureEndpoint: parsedURL.protocol === 'wss:',
