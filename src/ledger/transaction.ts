@@ -11,6 +11,7 @@ export type TransactionOptions = {
   maxLedgerVersion?: number
   includeRawTransaction?: boolean
 }
+
 type TransactionResponse = FormattedTransactionType & {
   hash: string
   ledger_index: number
