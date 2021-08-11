@@ -17,6 +17,11 @@ import { PathFindRequest, PathFindResponse } from "./pathFind";
 import { PingRequest, PingResponse } from "./ping";
 import { RandomRequest, RandomResponse } from "./random";
 import { RipplePathFindRequest, RipplePathFindResponse } from "./ripplePathFind";
+import { LedgerRequest, LedgerResponse } from "./ledger";
+import { LedgerClosedRequest, LedgerClosedResponse } from "./ledgerClosed";
+import { LedgerDataRequest, LedgerDataResponse } from "./ledgerData";
+import { LedgerEntryRequest, LedgerEntryResponse } from "./ledgerEntry";
+import { LedgerCurrentRequest, LedgerCurrentResponse } from "./ledgerCurrent";
 import { ServerInfoRequest, ServerInfoResponse } from "./serverInfo";
 import { ServerStateRequest, ServerStateResponse } from "./serverState";
 import { SubmitRequest, SubmitResponse } from "./submit";
@@ -34,6 +39,12 @@ type Request = // account methods
              | AccountTxRequest
              | GatewayBalancesRequest
              | NoRippleCheckRequest
+               // ledger methods
+             | LedgerRequest
+             | LedgerClosedRequest
+             | LedgerCurrentRequest
+             | LedgerDataRequest
+             | LedgerEntryRequest
                // transaction methods
              | SubmitRequest
              | SubmitMultisignedRequest
@@ -56,6 +67,7 @@ type Request = // account methods
              | PingRequest
              | RandomRequest
 
+
 type Response = // account methods
                 AccountChannelsResponse 
               | AccountCurrenciesResponse
@@ -66,6 +78,12 @@ type Response = // account methods
               | AccountTxResponse
               | GatewayBalancesResponse
               | NoRippleCheckResponse
+                // ledger methods
+              | LedgerResponse
+              | LedgerClosedResponse
+              | LedgerCurrentResponse
+              | LedgerDataResponse
+              | LedgerEntryResponse
                 // transaction methods
               | SubmitResponse
               | SubmitMultisignedResponse
@@ -87,6 +105,7 @@ type Response = // account methods
                 // utility methods
               | PingResponse
               | RandomResponse
+
 
 export {
     Request,
@@ -110,6 +129,17 @@ export {
     GatewayBalancesResponse,
     NoRippleCheckRequest,
     NoRippleCheckResponse,
+    // ledger methods
+    LedgerRequest,
+    LedgerResponse,
+    LedgerClosedRequest,
+    LedgerClosedResponse,
+    LedgerCurrentRequest,
+    LedgerCurrentResponse,
+    LedgerDataRequest,
+    LedgerDataResponse,
+    LedgerEntryRequest,
+    LedgerEntryResponse,
     // transaction methods
     SubmitRequest,
     SubmitResponse,
