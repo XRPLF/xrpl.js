@@ -1,5 +1,4 @@
 import assert from 'assert-diff'
-import {LedgerData} from 'ripple-client/common/types/objects'
 import {assertRejects, TestSuite} from '../../utils'
 
 /**
@@ -10,13 +9,12 @@ import {assertRejects, TestSuite} from '../../utils'
 export default <TestSuite>{
   'requests the next page': async (client, address) => {
     const response = await client.request({command: 'ledger_data'})
-    const responseNextPage = await client.requestNextPage<LedgerData>(
-      'ledger_data',
-      {},
+    const responseNextPage = await client.requestNextPage(
+      {command: 'ledger_data'},
       response
     )
     assert.equal(
-      responseNextPage.state[0].index,
+      responseNextPage.result.state[0].index,
       '000B714B790C3C79FEE00D17C4DEB436B375466F29679447BA64F265FD63D731'
     )
   },
@@ -24,13 +22,12 @@ export default <TestSuite>{
   'rejects when there are no more pages': async (client, address) => {
     const response = await client.request({command: 'ledger_data'})
     const responseNextPage = await client.requestNextPage(
-      'ledger_data',
-      {},
+      {command: 'ledger_data'},
       response
     )
     assert(!client.hasNextPage(responseNextPage))
     await assertRejects(
-      client.requestNextPage('ledger_data', {}, responseNextPage),
+      client.requestNextPage({command: 'ledger_data'}, responseNextPage),
       Error,
       'response does not have a next page'
     )

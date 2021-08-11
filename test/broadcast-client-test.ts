@@ -3,21 +3,16 @@ import assert from 'assert-diff'
 import setupClient from './setup-client'
 import responses from './fixtures/responses'
 import ledgerClosed from './fixtures/rippled/ledger-close.json'
-import {XrplClient} from 'ripple-client'
 import {ignoreWebSocketDisconnect} from './utils'
-const schemaValidator = XrplClient._PRIVATE.schemaValidator
 
 const TIMEOUT = 20000
 
-function checkResult(expected, schemaName, response) {
+function checkResult(expected, response) {
   if (expected.txJSON) {
     assert(response.txJSON)
     assert.deepEqual(JSON.parse(response.txJSON), JSON.parse(expected.txJSON))
   }
   assert.deepEqual(_.omit(response, 'txJSON'), _.omit(expected, 'txJSON'))
-  if (schemaName) {
-    schemaValidator.schemaValidate(schemaName, response)
-  }
   return response
 }
 
@@ -32,7 +27,9 @@ describe('XrplClientBroadcast', function () {
     assert(this.client.isConnected())
     return this.client
       .getServerInfo()
-      .then(_.partial(checkResult, responses.getServerInfo, 'getServerInfo'))
+      .then(response => {
+        return checkResult(responses.getServerInfo, response.result.info)
+      })
   })
 
   it('ledger', function (done) {
@@ -40,7 +37,7 @@ describe('XrplClientBroadcast', function () {
     this.client.on('ledger', () => {
       gotLedger++
     })
-    const ledgerNext = Object.assign({}, ledgerClosed)
+    const ledgerNext = {...ledgerClosed}
     ledgerNext.ledger_index++
 
     this.client._clients.forEach((client) =>

@@ -15,8 +15,7 @@ export default <TestSuite>{
   'returns false when there are no more pages': async (client, address) => {
     const response = await client.request({command: 'ledger_data'})
     const responseNextPage = await client.requestNextPage(
-      'ledger_data',
-      {},
+      {command: 'ledger_data'},
       response
     )
     assert(!client.hasNextPage(responseNextPage))

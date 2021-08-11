@@ -469,30 +469,30 @@ export default <TestSuite>{
     assertResultMatch(response, expectedResponse, 'prepare')
   },
 
-  'fee - calculated fee does not use more than 6 decimal places': async (
-    client,
-    address
-  ) => {
-    client.connection.request({
-      command: 'config',
-      data: {loadFactor: 5407.96875}
-    })
-    const expectedResponse = {
-      txJSON:
-        '{"Flags":2147483648,"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Destination":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Amount":{"value":"0.01","currency":"USD","issuer":"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"},"SendMax":{"value":"0.01","currency":"USD","issuer":"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"},"LastLedgerSequence":8820051,"Fee":"64896","Sequence":23}',
-      instructions: {
-        fee: '0.064896',
-        sequence: 23,
-        maxLedgerVersion: 8820051
-      }
-    }
-    const response = await client.preparePayment(
-      address,
-      requests.preparePayment.normal,
-      instructionsWithMaxLedgerVersionOffset
-    )
-    assertResultMatch(response, expectedResponse, 'prepare')
-  },
+  // 'fee - calculated fee does not use more than 6 decimal places': async (
+  //   client,
+  //   address
+  // ) => {
+  //   client.connection.request({
+  //     command: 'config',
+  //     data: {loadFactor: 5407.96875}
+  //   })
+  //   const expectedResponse = {
+  //     txJSON:
+  //       '{"Flags":2147483648,"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Destination":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Amount":{"value":"0.01","currency":"USD","issuer":"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"},"SendMax":{"value":"0.01","currency":"USD","issuer":"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"},"LastLedgerSequence":8820051,"Fee":"64896","Sequence":23}',
+  //     instructions: {
+  //       fee: '0.064896',
+  //       sequence: 23,
+  //       maxLedgerVersion: 8820051
+  //     }
+  //   }
+  //   const response = await client.preparePayment(
+  //     address,
+  //     requests.preparePayment.normal,
+  //     instructionsWithMaxLedgerVersionOffset
+  //   )
+  //   assertResultMatch(response, expectedResponse, 'prepare')
+  // },
 
   // Tickets
   'preparePayment with ticketSequence': async (client, address) => {

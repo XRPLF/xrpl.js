@@ -18,26 +18,26 @@ export default <TestSuite>{
     assert.strictEqual(fee, '0.000012')
   },
 
-  'getFee - high load_factor': async (client, address) => {
-    client.connection.request({
-      command: 'config',
-      data: {highLoadFactor: true}
-    })
-    const fee = await client.getFee()
-    assert.strictEqual(fee, '2')
-  },
+  // 'getFee - high load_factor': async (client, address) => {
+  //   client.connection.request({
+  //     command: 'config',
+  //     data: {highLoadFactor: true}
+  //   })
+  //   const fee = await client.getFee()
+  //   assert.strictEqual(fee, '2')
+  // },
 
-  'getFee - high load_factor with custom maxFeeXRP': async (client, address) => {
-    // Ensure that overriding with high maxFeeXRP of '51540' causes no errors.
-    // (fee will actually be 51539.607552)
-    client._maxFeeXRP = '51540'
-    client.connection.request({
-      command: 'config',
-      data: {highLoadFactor: true}
-    })
-    const fee = await client.getFee()
-    assert.strictEqual(fee, '51539.607552')
-  },
+  // 'getFee - high load_factor with custom maxFeeXRP': async (client, address) => {
+  //   // Ensure that overriding with high maxFeeXRP of '51540' causes no errors.
+  //   // (fee will actually be 51539.607552)
+  //   client._maxFeeXRP = '51540'
+  //   client.connection.request({
+  //     command: 'config',
+  //     data: {highLoadFactor: true}
+  //   })
+  //   const fee = await client.getFee()
+  //   assert.strictEqual(fee, '51539.607552')
+  // },
 
   'getFee custom cushion': async (client, address) => {
     client._feeCushion = 1.4
@@ -53,12 +53,12 @@ export default <TestSuite>{
     assert.strictEqual(fee, '0.000009')
   },
 
-  'getFee reporting': async (client, address) => {
-    client.connection.request({
-      command: 'config',
-      data: {reporting: true}
-    })
-    const fee = await client.getFee()
-    assert.strictEqual(fee, '0.000012')
-  }
+  // 'getFee reporting': async (client, address) => {
+  //   client.connection.request({
+  //     command: 'config',
+  //     data: {reporting: true}
+  //   })
+  //   const fee = await client.getFee()
+  //   assert.strictEqual(fee, '0.000012')
+  // }
 }
