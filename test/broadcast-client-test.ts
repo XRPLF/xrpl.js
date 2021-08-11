@@ -3,7 +3,7 @@ import assert from 'assert-diff'
 import setupClient from './setup-client'
 import responses from './fixtures/responses'
 import ledgerClosed from './fixtures/rippled/ledger-close.json'
-import {XrplClient} from 'ripple-client'
+import {XrplClient} from 'xrpl-client'
 import {ignoreWebSocketDisconnect} from './utils'
 const schemaValidator = XrplClient._PRIVATE.schemaValidator
 

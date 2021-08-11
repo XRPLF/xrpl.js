@@ -2,7 +2,7 @@ import _ from 'lodash'
 import net from 'net'
 import assert from 'assert-diff'
 import setupClient from './setup-client'
-import {XrplClient} from 'ripple-client'
+import {XrplClient} from 'xrpl-client'
 import ledgerClose from './fixtures/rippled/ledger-close.json'
 import {ignoreWebSocketDisconnect} from './utils'
 const utils = XrplClient._PRIVATE.ledgerUtils

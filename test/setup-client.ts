@@ -1,4 +1,4 @@
-import {XrplClient, XrplClientBroadcast} from 'ripple-client'
+import {XrplClient, XrplClientBroadcast} from 'xrpl-client'
 import ledgerClosed from './fixtures/rippled/ledger-close.json'
 import {createMockRippled} from './mock-rippled'
 import {getFreePort} from './utils'

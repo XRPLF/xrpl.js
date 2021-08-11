@@ -1,4 +1,4 @@
-import {XrplClient} from 'ripple-client'
+import {XrplClient} from 'xrpl-client'
 import {TestSuite} from '../../utils'
 import Wallet from '../../../src/Wallet'
 

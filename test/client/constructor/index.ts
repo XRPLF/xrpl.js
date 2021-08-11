@@ -1,6 +1,6 @@
 import assert from 'assert-diff'
 import {TestSuite} from '../../utils'
-import {XrplClient} from 'ripple-client'
+import {XrplClient} from 'xrpl-client'
 
 /**
  * Every test suite exports their tests in the default object.

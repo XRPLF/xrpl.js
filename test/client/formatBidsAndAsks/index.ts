@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import assert from 'assert-diff'
-import {XrplClient} from 'ripple-client'
+import {XrplClient} from 'xrpl-client'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
 import {TestSuite} from '../../utils'

@@ -1,5 +1,5 @@
 import assert from 'assert-diff'
-import {LedgerData} from 'ripple-client/common/types/objects'
+import {LedgerData} from 'xrpl-client/common/types/objects'
 import {assertRejects, TestSuite} from '../../utils'
 
 /**

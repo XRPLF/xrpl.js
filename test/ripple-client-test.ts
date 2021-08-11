@@ -1,5 +1,5 @@
 import setupClient from './setup-client'
-import {XrplClient} from 'ripple-client'
+import {XrplClient} from 'xrpl-client'
 import addresses from './fixtures/addresses.json'
 import {getAllPublicMethods, loadTestSuites} from './utils'
 
