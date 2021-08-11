@@ -1,6 +1,5 @@
 import {EventEmitter} from 'events'
 import {
-  Connection,
   errors,
   validate,
   xrpToDrops,
@@ -9,6 +8,7 @@ import {
   iso8601ToRippleTime,
   txFlags
 } from '../common'
+import { Connection, ConnectionUserOptions } from './connection'
 import {
   formatLedgerClose
 } from '../client/utils'
@@ -100,6 +100,9 @@ import {
   PathFindResponse,
   RipplePathFindRequest,
   RipplePathFindResponse,
+  // payment channel methods
+  ChannelVerifyRequest,
+  ChannelVerifyResponse,
   // Subscribe methods/streams
   LedgerStream,
   // server info methods
@@ -118,14 +121,13 @@ import {
   RandomResponse
 } from '../models/methods'
 
-import RangeSet from '../common/rangeset'
+import RangeSet from './rangeset'
 import * as ledgerUtils from '../ledger/utils'
 import * as transactionUtils from '../transaction/utils'
 import * as schemaValidator from '../common/schema-validator'
 import {getServerInfo, getFee} from '../common/serverinfo'
 import {clamp} from '../ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from '../transaction/types'
-import {ConnectionUserOptions} from '../common/connection'
 import {
   classicAddressToXAddress,
   xAddressToClassicAddress,
@@ -211,7 +213,6 @@ class XrplClient extends EventEmitter {
     ledgerUtils,
     schemaValidator
   }
-  static formatBidsAndAsks = formatBidsAndAsks
 
   constructor(options: ClientOptions = {}) {
     super()
@@ -259,6 +260,7 @@ class XrplClient extends EventEmitter {
   public request(r: AccountOffersRequest): Promise<AccountOffersResponse>
   public request(r: AccountTxRequest): Promise<AccountTxResponse>
   public request(r: BookOffersRequest): Promise<BookOffersResponse>
+  public request(r: ChannelVerifyRequest): Promise<ChannelVerifyResponse>
   public request(r: DepositAuthorizedRequest): Promise<DepositAuthorizedResponse>
   public request(r: FeeRequest): Promise<FeeResponse>
   public request(r: GatewayBalancesRequest): Promise<GatewayBalancesResponse>
@@ -465,6 +467,8 @@ class XrplClient extends EventEmitter {
 
   // XrplClient.deriveClassicAddress (static) is a new name for client.deriveAddress
   static deriveClassicAddress = deriveAddress
+
+  static formatBidsAndAsks = formatBidsAndAsks
 
   /**
    * Static methods to expose ripple-address-codec methods
