@@ -1,6 +1,7 @@
 import * as common from '../common'
+import { LedgerStream } from '../models/methods'
 
-function formatLedgerClose(ledgerClose: any): object {
+function formatLedgerClose(ledgerClose: LedgerStream): object {
   return {
     baseFeeXRP: common.dropsToXrp(ledgerClose.fee_base),
     ledgerHash: ledgerClose.ledger_hash,

@@ -102,7 +102,8 @@ import {
   PingRequest,
   PingResponse,
   RandomRequest,
-  RandomResponse
+  RandomResponse,
+  LedgerStream
 } from '../models/methods'
 
 import RangeSet from '../common/rangeset'
@@ -206,7 +207,7 @@ class XrplClient extends EventEmitter {
     const serverURL = options.server
     if (serverURL != null) {
       this.connection = new Connection(serverURL, options)
-      this.connection.on('ledgerClosed', (message) => {
+      this.connection.on('ledgerClosed', (message: LedgerStream) => {
         this.emit('ledger', formatLedgerClose(message))
       })
       this.connection.on('error', (errorCode, errorMessage, data) => {
