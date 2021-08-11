@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
 import {removeUndefined, rippleTimeToISO8601} from '../../common'
 import parseTransaction from './transaction'
-import {Ledger} from '../../common/types/objects'
+import {Ledger} from '../../models/ledger'
 
 export type FormattedLedger = {
   // TODO: properties in type don't match response object. Fix!

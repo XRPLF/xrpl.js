@@ -72,6 +72,17 @@ import {
   GatewayBalancesResponse,
   NoRippleCheckRequest,
   NoRippleCheckResponse,
+  // ledger methods
+  LedgerRequest,
+  LedgerResponse,
+  LedgerClosedRequest,
+  LedgerClosedResponse,
+  LedgerCurrentRequest,
+  LedgerCurrentResponse,
+  LedgerDataRequest,
+  LedgerDataResponse,
+  LedgerEntryRequest,
+  LedgerEntryResponse,
   // transaction methods
   SubmitRequest,
   SubmitResponse,
@@ -90,6 +101,8 @@ import {
   PathFindResponse,
   RipplePathFindRequest,
   RipplePathFindResponse,
+  // Subscribe methods/streams
+  LedgerStream,
   // server info methods
   FeeRequest,
   FeeResponse,
@@ -103,8 +116,7 @@ import {
   PingRequest,
   PingResponse,
   RandomRequest,
-  RandomResponse,
-  LedgerStream
+  RandomResponse
 } from '../models/methods'
 
 import RangeSet from '../common/rangeset'
@@ -177,12 +189,14 @@ type MarkerRequest = AccountChannelsRequest
                    | AccountObjectsRequest 
                    | AccountOffersRequest
                    | AccountTxRequest
+                   | LedgerDataRequest
 
 type MarkerResponse = AccountChannelsResponse 
                     | AccountLinesResponse 
                     | AccountObjectsResponse 
                     | AccountOffersResponse
                     | AccountTxResponse
+                    | LedgerDataResponse
 
 class Client extends EventEmitter {
   _feeCushion: number
@@ -250,6 +264,11 @@ class Client extends EventEmitter {
   public request(r: DepositAuthorizedRequest): Promise<DepositAuthorizedResponse>
   public request(r: FeeRequest): Promise<FeeResponse>
   public request(r: GatewayBalancesRequest): Promise<GatewayBalancesResponse>
+  public request(r: LedgerRequest): Promise<LedgerResponse>
+  public request(r: LedgerClosedRequest): Promise<LedgerClosedResponse>
+  public request(r: LedgerCurrentRequest): Promise<LedgerCurrentResponse>
+  public request(r: LedgerDataRequest): Promise<LedgerDataResponse>
+  public request(r: LedgerEntryRequest): Promise<LedgerEntryResponse>
   public request(r: ManifestRequest): Promise<ManifestResponse>
   public request(r: NoRippleCheckRequest): Promise<NoRippleCheckResponse>
   public request(r: PathFindRequest): Promise<PathFindResponse>
@@ -285,6 +304,7 @@ class Client extends EventEmitter {
   async requestNextPage(req: AccountObjectsRequest, resp: AccountObjectsResponse): Promise<AccountObjectsResponse>
   async requestNextPage(req: AccountOffersRequest, resp: AccountOffersResponse): Promise<AccountOffersResponse>
   async requestNextPage(req: AccountTxRequest, resp: AccountTxResponse): Promise<AccountTxResponse>
+  async requestNextPage(req: LedgerDataRequest, resp: LedgerDataResponse): Promise<LedgerDataResponse>
   async requestNextPage<T extends MarkerRequest, U extends MarkerResponse>(req: T, resp: U): Promise<U> {
     if (!resp.result.marker) {
       return Promise.reject(
@@ -332,9 +352,13 @@ class Client extends EventEmitter {
    * requests as needed.
    */
   // TODO: add all requests here once they're done
-  async _requestAll(request: AccountOffersRequest): Promise<AccountOffersResponse[]>
-  async _requestAll(request: BookOffersRequest): Promise<BookOffersResponse[]>
-  async _requestAll(request: AccountLinesRequest): Promise<AccountLinesResponse[]>
+  async _requestAll(req: AccountChannelsRequest): Promise<AccountChannelsResponse[]>
+  async _requestAll(req: AccountLinesRequest): Promise<AccountLinesResponse[]>
+  async _requestAll(req: AccountObjectsRequest): Promise<AccountObjectsResponse[]>
+  async _requestAll(req: AccountOffersRequest): Promise<AccountOffersResponse[]>
+  async _requestAll(req: AccountTxRequest): Promise<AccountTxResponse[]>
+  async _requestAll(req: BookOffersRequest): Promise<BookOffersResponse[]>
+  async _requestAll(req: LedgerDataRequest): Promise<LedgerDataResponse[]>
   async _requestAll<T extends MarkerRequest, U extends MarkerResponse>(request: T, options: {collect?: string} = {}): Promise<U[]> {
     // The data under collection is keyed based on the command. Fail if command
     // not recognized and collection key not provided.

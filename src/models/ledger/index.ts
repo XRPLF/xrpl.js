@@ -5,6 +5,7 @@ import { DepositPreauth } from "./depositPreauth";
 import { DirectoryNode } from "./directoryNode";
 import { Escrow } from "./escrow";
 import { FeeSettings } from "./feeSettings";
+import { Ledger } from "./ledger";
 import { LedgerHashes } from "./ledgerHashes";
 import { NegativeUNL } from "./negativeUNL";
 import { Offer } from "./offer";
@@ -42,5 +43,6 @@ export {
     PayChannel,
     RippleState,
     SignerList,
-    Ticket
+    Ticket,
+    Ledger
 }

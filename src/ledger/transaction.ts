@@ -5,6 +5,7 @@ import {Connection} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
 import {RippledError} from '../common/errors'
 import {Client} from '..'
+import { LedgerRequest } from '../models/methods'
 
 export type TransactionOptions = {
   minLedgerVersion?: number
@@ -41,7 +42,7 @@ function attachTransactionDate(
     })
   }
 
-  const request = {
+  const request: LedgerRequest = {
     command: 'ledger',
     ledger_index: ledgerVersion
   }
@@ -49,8 +50,9 @@ function attachTransactionDate(
   return connection
     .request(request)
     .then((data) => {
-      if (typeof data.ledger.close_time === 'number') {
-        return Object.assign({date: data.ledger.close_time}, tx)
+      const close_time = data.result.ledger.close_time
+      if (typeof close_time === 'number') {
+        return Object.assign({date: close_time}, tx)
       }
       throw new errors.UnexpectedError('Ledger missing close_time')
     })

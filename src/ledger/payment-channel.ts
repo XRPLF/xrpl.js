@@ -4,19 +4,19 @@ import {
 } from './parse/payment-channel'
 import {validate, errors} from '../common'
 import {Client} from '..'
-import {LedgerEntryResponse} from '../common/types/commands'
+import {LedgerEntryResponse} from '../models/methods'
 const NotFoundError = errors.NotFoundError
 
 function formatResponse(
   response: LedgerEntryResponse
 ): FormattedPaymentChannel {
   if (
-    response.node == null ||
-    response.node.LedgerEntryType !== 'PayChannel'
+    response.result.node == null ||
+    response.result.node.LedgerEntryType !== 'PayChannel'
   ) {
     throw new NotFoundError('Payment channel ledger entry not found')
   }
-  return parsePaymentChannel(response.node)
+  return parsePaymentChannel(response.result.node)
 }
 
 async function getPaymentChannel(

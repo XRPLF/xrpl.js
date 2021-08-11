@@ -1,4 +1,4 @@
-import * as _ from 'lodash'
+import _ from 'lodash'
 import BigNumber from 'bignumber.js'
 import {Client} from '..'
 import { ServerInfoResponse } from '../models/methods'
