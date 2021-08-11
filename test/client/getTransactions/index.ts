@@ -1,4 +1,4 @@
-// import {XrplClient} from 'ripple-client'
+// import {XrplClient} from 'xrpl-client'
 // import assert from 'assert-diff'
 import { TestSuite, assertRejects} from '../../utils'
 // import responses from '../../fixtures/responses'

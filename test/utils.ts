@@ -2,7 +2,7 @@ import net from 'net'
 import _ from 'lodash'
 import fs from 'fs'
 import path from 'path'
-import {XrplClient} from 'ripple-client'
+import {XrplClient} from 'xrpl-client'
 import assert from 'assert-diff'
 
 /**

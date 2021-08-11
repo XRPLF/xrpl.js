@@ -51,7 +51,7 @@ function webpackForTest(testFileName) {
     cache: true,
     externals: [{
       'lodash': '_',
-      'ripple-api': 'ripple',
+      'xrpl-client': 'ripple',
       'net': 'null'
     }],
     entry: testFileName,

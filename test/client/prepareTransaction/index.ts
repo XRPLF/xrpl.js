@@ -1,4 +1,4 @@
-import {RippledError, ValidationError} from 'ripple-client/common/errors'
+import {RippledError, ValidationError} from 'xrpl-client/common/errors'
 // import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
 import {assertRejects, assertResultMatch, TestSuite} from '../../utils'
