@@ -115,9 +115,6 @@ export {
     GatewayBalancesResponse,
     NoRippleCheckRequest,
     NoRippleCheckResponse,
-    // payment channel methods
-    ChannelVerifyRequest,
-    ChannelVerifyResponse,
     // transaction methods
     SubmitRequest,
     SubmitResponse,
@@ -136,6 +133,9 @@ export {
     PathFindResponse,
     RipplePathFindRequest,
     RipplePathFindResponse,
+    // payment channel methods
+    ChannelVerifyRequest,
+    ChannelVerifyResponse,
     // Subscribe methods/streams
     SubscribeRequest,
     SubscribeResponse,
