@@ -9,15 +9,6 @@ export type GetAccountInfoOptions = {
   ledgerVersion?: number
 }
 
-export type FormattedGetAccountInfoResponse = {
-  sequence: number
-  xrpBalance: string
-  ownerCount: number
-  previousInitiatedTransactionID: string
-  previousAffectingTransactionID: string
-  previousAffectingTransactionLedgerVersion: number
-}
-
 export default async function getAccountInfo(
   this: Client,
   address: string,
