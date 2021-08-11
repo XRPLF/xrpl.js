@@ -246,6 +246,7 @@ function sign(
   }
 }
 
+// TODO: move this to Wallet class
 function signOffline(
   wallet: Wallet,
   txJSON: string,
