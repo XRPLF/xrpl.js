@@ -1,5 +1,4 @@
 import {inspect} from 'util'
-import * as browserHacks from './browser-hacks'
 
 class RippleError extends Error {
   name: string
@@ -9,7 +8,7 @@ class RippleError extends Error {
   constructor(message = '', data?: any) {
     super(message)
 
-    this.name = browserHacks.getConstructorName(this)
+    this.name = this.constructor.name
     this.message = message
     this.data = data
     if (Error.captureStackTrace) {
