@@ -184,7 +184,6 @@ function getCollectKeyFromCommand(command: string): string | null {
   }
 }
 
-// TODO: add other request types
 type MarkerRequest = AccountChannelsRequest 
                    | AccountLinesRequest 
                    | AccountObjectsRequest 
@@ -252,7 +251,6 @@ class Client extends EventEmitter {
    * Makes a request to the client with the given command and
    * additional request body parameters.
    */
-  // TODO: add the rest of the request types when they're done
   public request(r: AccountChannelsRequest): Promise<AccountChannelsResponse>
   public request(r: AccountCurrenciesRequest): Promise<AccountCurrenciesResponse>
   public request(r: AccountInfoRequest): Promise<AccountInfoResponse>
@@ -299,7 +297,6 @@ class Client extends EventEmitter {
     return !!response.result.marker
   }
 
-  // TODO: add the rest of the request types when they're done
   async requestNextPage(req: AccountChannelsRequest, resp: AccountChannelsResponse): Promise<AccountChannelsResponse>
   async requestNextPage(req: AccountLinesRequest, resp: AccountLinesResponse): Promise<AccountLinesResponse>
   async requestNextPage(req: AccountObjectsRequest, resp: AccountObjectsResponse): Promise<AccountObjectsResponse>
@@ -352,7 +349,6 @@ class Client extends EventEmitter {
    * general use. Instead, use rippled's built-in pagination and make multiple
    * requests as needed.
    */
-  // TODO: add all requests here once they're done
   async _requestAll(req: AccountChannelsRequest): Promise<AccountChannelsResponse[]>
   async _requestAll(req: AccountLinesRequest): Promise<AccountLinesResponse[]>
   async _requestAll(req: AccountObjectsRequest): Promise<AccountObjectsResponse[]>
