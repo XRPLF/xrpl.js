@@ -1,5 +1,5 @@
 import assert from 'assert'
-import {XrplClient} from 'ripple-api'
+import {XrplClient} from 'ripple-client'
 const RangeSet = XrplClient._PRIVATE.RangeSet
 
 describe('RangeSet', function () {

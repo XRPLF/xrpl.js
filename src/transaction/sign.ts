@@ -17,7 +17,7 @@ function computeSignature(tx: object, privateKey: string, signAs?: string) {
 }
 
 function signWithKeypair(
-  api: XrplClient,
+  client: XrplClient,
   txJSON: string,
   keypair: KeyPair,
   options: SignOptions = {
@@ -33,7 +33,7 @@ function signWithKeypair(
     )
   }
 
-  checkFee(api, tx.Fee)
+  checkFee(client, tx.Fee)
 
   const txToSignAndEncode = Object.assign({}, tx)
 
@@ -195,16 +195,16 @@ function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
 /**
  *  Check that a given transaction fee does not exceed maxFeeXRP (in drops).
  *
- *  See https://xrpl.org/XrplClient-reference.html#parameters
+ *  See https://xrpl.org/rippleapi-reference.html#parameters
  *
- *  @param {XrplClient} api A XrplClient instance.
+ *  @param {XrplClient} client A XrplClient instance.
  *  @param {string} txFee The transaction fee in drops, encoded as a string.
  *
  *  @returns {void} This method does not return a value, but throws an error if the check fails.
  */
-function checkFee(api: XrplClient, txFee: string): void {
+function checkFee(client: XrplClient, txFee: string): void {
   const fee = new BigNumber(txFee)
-  const maxFeeDrops = xrpToDrops(api._maxFeeXRP)
+  const maxFeeDrops = xrpToDrops(client._maxFeeXRP)
   if (fee.isGreaterThan(maxFeeDrops)) {
     throw new utils.common.errors.ValidationError(
       `"Fee" should not exceed "${maxFeeDrops}". ` +

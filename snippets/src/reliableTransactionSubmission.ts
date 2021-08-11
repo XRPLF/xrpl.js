@@ -27,7 +27,7 @@ import https = require('https')
  * - https://xrpl.org/reliable-transaction-submission.html
  * - https://xrpl.org/send-xrp.html
  * - https://xrpl.org/look-up-transaction-results.html
- * - https://xrpl.org/get-started-with-XrplClient-for-javascript.html
+ * - https://xrpl.org/get-started-with-rippleapi-for-javascript.html
  * - https://xrpl.org/monitor-incoming-payments-with-websocket.html
  *
  * For the implementation in this example, we have made the following decisions:

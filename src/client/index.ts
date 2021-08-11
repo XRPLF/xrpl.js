@@ -143,7 +143,7 @@ import {
   computePaymentChannelHash
 } from '../common/hashes'
 
-export interface APIOptions extends ConnectionUserOptions {
+export interface ClientOptions extends ConnectionUserOptions {
   server?: string
   feeCushion?: number
   maxFeeXRP?: string
@@ -189,7 +189,7 @@ class XrplClient extends EventEmitter {
   // non-validated ledger versions are allowed, and passed to rippled as-is.
   connection: Connection
 
-  // these are exposed only for use by unit tests; they are not part of the API.
+  // these are exposed only for use by unit tests; they are not part of the client.
   static _PRIVATE = {
     validate,
     RangeSet,
@@ -198,7 +198,7 @@ class XrplClient extends EventEmitter {
   }
   static formatBidsAndAsks = formatBidsAndAsks
 
-  constructor(options: APIOptions = {}) {
+  constructor(options: ClientOptions = {}) {
     super()
     validate.apiOptions(options)
     this._feeCushion = options.feeCushion || 1.2
@@ -232,7 +232,7 @@ class XrplClient extends EventEmitter {
   }
 
   /**
-   * Makes a request to the API with the given command and
+   * Makes a request to the client with the given command and
    * additional request body parameters.
    */
   // TODO: add the rest of the request types when they're done
@@ -316,7 +316,7 @@ class XrplClient extends EventEmitter {
   }
 
   /**
-   * Makes multiple paged requests to the API to return a given number of
+   * Makes multiple paged requests to the client to return a given number of
    * resources. _requestAll() will make multiple requests until the `limit`
    * number of resources is reached (if no `limit` is provided, a single request
    * will be made).
@@ -427,7 +427,7 @@ class XrplClient extends EventEmitter {
   sign = sign
   combine = combine
 
-  submit = submit // @deprecated Use api.request({command: 'submit', tx_blob: signedTransaction }) instead
+  submit = submit // @deprecated Use client.request({command: 'submit', tx_blob: signedTransaction }) instead
 
   deriveKeypair = deriveKeypair // @deprecated Invoke from top-level package instead
   deriveAddress = deriveAddress // @deprecated Invoke from top-level package instead
@@ -438,7 +438,7 @@ class XrplClient extends EventEmitter {
 
   static deriveXAddress = deriveXAddress
 
-  // XrplClient.deriveClassicAddress (static) is a new name for api.deriveAddress
+  // XrplClient.deriveClassicAddress (static) is a new name for client.deriveAddress
   static deriveClassicAddress = deriveAddress
 
   /**

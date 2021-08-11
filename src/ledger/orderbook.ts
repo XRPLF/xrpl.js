@@ -71,7 +71,7 @@ export function formatBidsAndAsks(
 // account is to specify a "perspective", which affects which unfunded offers
 // are returned
 async function makeRequest(
-  api: XrplClient,
+  client: XrplClient,
   taker: string,
   options: GetOrderbookOptions,
   takerGets: Issue,
@@ -81,7 +81,7 @@ async function makeRequest(
     taker_gets: takerGets,
     taker_pays: takerPays
   })
-  return api._requestAll({command: 'book_offers',
+  return client._requestAll({command: 'book_offers',
     taker_gets: orderData.taker_gets,
     taker_pays: orderData.taker_pays,
     ledger_index: options.ledgerVersion || 'validated',

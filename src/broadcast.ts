@@ -1,47 +1,47 @@
-import {XrplClient, APIOptions} from './api'
+import {XrplClient, ClientOptions} from './client'
 
 class XrplClientBroadcast extends XrplClient {
   ledgerVersion: number | undefined = undefined
-  private _apis: XrplClient[]
+  private _clients: XrplClient[]
 
-  constructor(servers, options: APIOptions = {}) {
+  constructor(servers, options: ClientOptions = {}) {
     super(options)
 
-    const apis: XrplClient[] = servers.map(
+    const clients: XrplClient[] = servers.map(
       (server) => new XrplClient(Object.assign({}, options, {server}))
     )
 
     // exposed for testing
-    this._apis = apis
+    this._clients = clients
 
     this.getMethodNames().forEach((name) => {
       this[name] = function () {
         // eslint-disable-line no-loop-func
-        return Promise.race(apis.map((api) => api[name](...arguments)))
+        return Promise.race(clients.map((client) => client[name](...arguments)))
       }
     })
 
-    // connection methods must be overridden to apply to all api instances
+    // connection methods must be overridden to apply to all client instances
     this.connect = async function () {
-      await Promise.all(apis.map((api) => api.connect()))
+      await Promise.all(clients.map((client) => client.connect()))
     }
     this.disconnect = async function () {
-      await Promise.all(apis.map((api) => api.disconnect()))
+      await Promise.all(clients.map((client) => client.disconnect()))
     }
     this.isConnected = function () {
-      return apis.map((api) => api.isConnected()).every(Boolean)
+      return clients.map((client) => client.isConnected()).every(Boolean)
     }
 
-    // synchronous methods are all passed directly to the first api instance
-    const defaultAPI = apis[0]
+    // synchronous methods are all passed directly to the first client instance
+    const defaultClient = clients[0]
     const syncMethods = ['sign', 'generateAddress', 'computeLedgerHash']
     syncMethods.forEach((name) => {
-      this[name] = defaultAPI[name].bind(defaultAPI)
+      this[name] = defaultClient[name].bind(defaultClient)
     })
 
-    apis.forEach((api) => {
-      api.on('ledger', this.onLedgerEvent.bind(this))
-      api.on('error', (errorCode, errorMessage, data) =>
+    clients.forEach((client) => {
+      client.on('ledger', this.onLedgerEvent.bind(this))
+      client.on('error', (errorCode, errorMessage, data) =>
         this.emit('error', errorCode, errorMessage, data)
       )
     })
@@ -59,7 +59,7 @@ class XrplClientBroadcast extends XrplClient {
 
   getMethodNames() {
     const methodNames: string[] = []
-    const XrplClient = this._apis[0]
+    const XrplClient = this._clients[0]
     for (const name of Object.getOwnPropertyNames(XrplClient)) {
       if (typeof XrplClient[name] === 'function') {
         methodNames.push(name)
