@@ -6,6 +6,7 @@ import { AccountObjectsRequest, AccountObjectsResponse } from "./accountObjects"
 import { AccountOffersRequest, AccountOffersResponse } from "./accountOffers";
 import { AccountTxRequest, AccountTxResponse } from "./accountTx";
 import { BookOffersRequest, BookOffersResponse } from "./bookOffers";
+import { ChannelVerifyRequest, ChannelVerifyResponse } from "./channelVerify";
 import { DepositAuthorizedRequest, DepositAuthorizedResponse } from "./depositAuthorized";
 import { FeeRequest, FeeResponse } from "./fee";
 import { GatewayBalancesRequest, GatewayBalancesResponse } from "./gatewayBalances";
@@ -55,6 +56,8 @@ type Request = // account methods
              | DepositAuthorizedRequest
              | PathFindRequest
              | RipplePathFindRequest
+               // payment channel methods
+             | ChannelVerifyRequest
                // subscription methods
              | SubscribeRequest
              | UnsubscribeRequest
@@ -94,6 +97,8 @@ type Response = // account methods
               | DepositAuthorizedResponse
               | PathFindResponse
               | RipplePathFindResponse
+                // payment channel methods
+              | ChannelVerifyResponse
                 // subscription methods
               | SubscribeResponse
               | UnsubscribeResponse
@@ -158,6 +163,9 @@ export {
     PathFindResponse,
     RipplePathFindRequest,
     RipplePathFindResponse,
+    // payment channel methods
+    ChannelVerifyRequest,
+    ChannelVerifyResponse,
     // Subscribe methods/streams
     SubscribeRequest,
     SubscribeResponse,
