@@ -6,7 +6,6 @@ import { AccountObjectsRequest, AccountObjectsResponse } from "./accountObjects"
 import { AccountOffersRequest, AccountOffersResponse } from "./accountOffers";
 import { AccountTxRequest, AccountTxResponse } from "./accountTx";
 import { BookOffersRequest, BookOffersResponse } from "./bookOffers";
-import { ChannelAuthorizeRequest, ChannelAuthorizeResponse } from "./channelAuthorize";
 import { ChannelVerifyRequest, ChannelVerifyResponse } from "./channelVerify";
 import { DepositAuthorizedRequest, DepositAuthorizedResponse } from "./depositAuthorized";
 import { FeeRequest, FeeResponse } from "./fee";
@@ -37,7 +36,6 @@ type Request = // account methods
              | GatewayBalancesRequest
              | NoRippleCheckRequest
                // payment channel methods
-             | ChannelAuthorizeRequest
              | ChannelVerifyRequest
                // transaction methods
              | SubmitRequest
@@ -72,7 +70,6 @@ type Response = // account methods
               | GatewayBalancesResponse
               | NoRippleCheckResponse
                 // payment channel methods
-              | ChannelAuthorizeResponse
               | ChannelVerifyResponse
                 // transaction methods
               | SubmitResponse
@@ -119,8 +116,6 @@ export {
     NoRippleCheckRequest,
     NoRippleCheckResponse,
     // payment channel methods
-    ChannelAuthorizeRequest,
-    ChannelAuthorizeResponse,
     ChannelVerifyRequest,
     ChannelVerifyResponse,
     // transaction methods
