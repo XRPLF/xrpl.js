@@ -25,7 +25,7 @@ export default <TestSuite>{
     assert.equal(wallet.privateKey, privateKey)
   },
 
-  'Wallet.fromMnemonic with empty options object': async (api) => {
+  'Wallet.fromMnemonic using an input derivation path': async (api) => {
     // GIVEN a derivation path
     const derivationPath = "m/44'/144'/0'/0/0"
 

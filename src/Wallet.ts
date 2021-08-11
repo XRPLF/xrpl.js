@@ -6,6 +6,7 @@ import ECDSA from './common/ecdsa'
 import {SignedTransaction} from './common/types/objects'
 import {signOffline} from './transaction/sign'
 import {SignOptions} from './transaction/types'
+import {ValidationError} from './common/errors'
 
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
@@ -47,7 +48,7 @@ class Wallet {
     const masterNode = fromSeed(seed)
     const node = masterNode.derivePath(derivationPath)
     if (node.privateKey === undefined) {
-      return undefined
+      throw new ValidationError('Unable to derive privateKey from mnemonic input')
     }
 
     const publicKey = Wallet.hexFromBuffer(node.publicKey)
