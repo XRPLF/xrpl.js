@@ -85,15 +85,15 @@ class Wallet {
 
   /**
    * Signs a transaction offline.
-   * @param {object} txJSON A transaction to be signed offline.
+   * @param {object} transaction A transaction to be signed offline.
    * @param {SignOptions} options Options to include for signing.
    * @returns {SignedTransaction} A signed transaction.
    */
   signTransaction(
-    txJSON: any, // TODO: txJSON should be typed with a transaction type.
+    transaction: any, // TODO: transaction should be typed with Transaction type.
     options: SignOptions = {signAs: ''}
   ): SignedTransaction {
-    return signOffline(this, JSON.stringify(txJSON), options)
+    return signOffline(this, JSON.stringify(transaction), options)
   }
 
   /**
@@ -102,9 +102,9 @@ class Wallet {
    * @returns {boolean} Returns true if a signedTransaction is valid.
    */
   verifyTransaction(signedTransaction: string): boolean {
-    const txJSON = decode(signedTransaction)
-    const messageHex: string = encodeForSigning(txJSON)
-    const signature = txJSON.TxnSignature
+    const tx = decode(signedTransaction)
+    const messageHex: string = encodeForSigning(tx)
+    const signature = tx.TxnSignature
     return verify(messageHex, signature, this.publicKey)
   }
 }
