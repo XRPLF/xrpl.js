@@ -139,7 +139,9 @@ type MarkerResponse = AccountChannelsResponse
 
 class Client extends EventEmitter {
   // _feeCushion: number
-  // _maxFeeXRP: string
+  // the maximum fee that should be allowed on a transaction
+  // prevents surge pricing from being too bad, as well as mistakes
+  _maxFeeXRP: string
 
   // New in > 0.21.0
   // non-validated ledger versions are allowed, and passed to rippled as-is.
@@ -157,7 +159,7 @@ class Client extends EventEmitter {
     super()
     // validate.apiOptions(options)
     // this._feeCushion = options.feeCushion || 1.2
-    // this._maxFeeXRP = options.maxFeeXRP || '2'
+    this._maxFeeXRP = options.maxFeeXRP || '2'
     const serverURL = options.server
     if (serverURL != null) {
       this.connection = new Connection(serverURL, options)
