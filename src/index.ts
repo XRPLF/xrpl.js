@@ -1,4 +1,4 @@
-export * from './client'
+export {XrplClient} from './client'
 
 export * from './transaction/types'
 

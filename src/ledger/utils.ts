@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
 import * as assert from 'assert'
 import * as common from '../common'
-import {Connection} from '../common'
+import {Connection} from '../client'
 import {FormattedTransactionType} from '../transaction/types'
 import {Issue} from '../common/types/objects'
 import {XrplClient} from '..'
@@ -145,5 +145,6 @@ export {
   hasCompleteLedgerRange,
   isPendingLedgerVersion,
   clamp,
-  common
+  common,
+  Connection
 }

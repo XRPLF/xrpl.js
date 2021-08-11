@@ -8,7 +8,7 @@ import {
   xrpToDrops,
   dropsToXrp
 } from '../common'
-import {Connection} from '../common'
+import {Connection} from '../client'
 import parsePathfind from './parse/pathfind'
 import {RippledAmount, Amount} from '../common/types/objects'
 import {

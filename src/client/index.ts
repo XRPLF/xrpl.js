@@ -536,7 +536,8 @@ class XrplClient extends EventEmitter {
 }
 
 export {
-  XrplClient
+  XrplClient,
+  Connection
 }
 
 export type {
