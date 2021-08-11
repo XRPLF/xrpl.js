@@ -48,13 +48,17 @@ const isSigner = (signer: Signer): boolean => {
         && typeof signer.SigningPubKey === 'string'
 }
 
+export interface GlobalFlags {
+    tfFullyCanonicalSig: boolean,
+}
+
 export interface BaseTransaction {
   Account: string;
   TransactionType: string;
   Fee?: string;
   Sequence?: number;
   AccountTxnID?: string;
-  Flags?: number | Array<number>;
+  Flags?: number | GlobalFlags;
   LastLedgerSequence?: number;
   Memos?: Array<{ Memo: Memo }>;
   Signers?: Array<Signer>;
