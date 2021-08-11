@@ -10,7 +10,7 @@ import {assertResultMatch, TestSuite, assertRejects} from '../../utils'
 export default <TestSuite>{
   'default': async (client, address) => {
     const serverInfo = await client.getServerInfo()
-    assertResultMatch(serverInfo, responses.getServerInfo, 'getServerInfo')
+    assertResultMatch(serverInfo.result.info, responses.getServerInfo, 'getServerInfo')
   },
 
   // 'error': async (client, address) => {

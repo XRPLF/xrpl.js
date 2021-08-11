@@ -4,7 +4,6 @@ import fs from 'fs'
 import path from 'path'
 import {XrplClient} from 'ripple-client'
 import assert from 'assert-diff'
-const {schemaValidator} = XrplClient._PRIVATE
 
 /**
  * The test function. It takes a XrplClient object and then some other data to
@@ -67,9 +66,6 @@ export function assertResultMatch(
     _.omit(response, ['txJSON', 'tx_json']),
     _.omit(expected, ['txJSON', 'tx_json'])
   )
-  if (schemaName) {
-    schemaValidator.schemaValidate(schemaName, response)
-  }
 }
 
 /**

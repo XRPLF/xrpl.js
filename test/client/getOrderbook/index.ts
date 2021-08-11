@@ -2,41 +2,41 @@ import assert from 'assert-diff'
 import responses from '../../fixtures/responses'
 import requests from '../../fixtures/requests'
 import {TestSuite, assertResultMatch, assertRejects} from '../../utils'
-import BigNumber from 'bignumber.js'
+// import BigNumber from 'bignumber.js'
 
-function checkSortingOfOrders(orders) {
-  let previousRate = '0'
-  for (var i = 0; i < orders.length; i++) {
-    const order = orders[i]
-    let rate
+// function checkSortingOfOrders(orders) {
+//   let previousRate = '0'
+//   for (var i = 0; i < orders.length; i++) {
+//     const order = orders[i]
+//     let rate
 
-    // We calculate the quality of output/input here as a test.
-    // This won't hold in general because when output and input amounts get tiny,
-    // the quality can differ significantly. However, the offer stays in the
-    // order book where it was originally placed. It would be more consistent
-    // to check the quality from the offer book, but for the test data set,
-    // this calculation holds.
+//     // We calculate the quality of output/input here as a test.
+//     // This won't hold in general because when output and input amounts get tiny,
+//     // the quality can differ significantly. However, the offer stays in the
+//     // order book where it was originally placed. It would be more consistent
+//     // to check the quality from the offer book, but for the test data set,
+//     // this calculation holds.
 
-    if (order.specification.direction === 'buy') {
-      rate = new BigNumber(order.specification.quantity.value)
-        .dividedBy(order.specification.totalPrice.value)
-        .toString()
-    } else {
-      rate = new BigNumber(order.specification.totalPrice.value)
-        .dividedBy(order.specification.quantity.value)
-        .toString()
-    }
-    assert(
-      new BigNumber(rate).isGreaterThanOrEqualTo(previousRate),
-      'Rates must be sorted from least to greatest: ' +
-        rate +
-        ' should be >= ' +
-        previousRate
-    )
-    previousRate = rate
-  }
-  return true
-}
+//     if (order.specification.direction === 'buy') {
+//       rate = new BigNumber(order.specification.quantity.value)
+//         .dividedBy(order.specification.totalPrice.value)
+//         .toString()
+//     } else {
+//       rate = new BigNumber(order.specification.totalPrice.value)
+//         .dividedBy(order.specification.quantity.value)
+//         .toString()
+//     }
+//     assert(
+//       new BigNumber(rate).isGreaterThanOrEqualTo(previousRate),
+//       'Rates must be sorted from least to greatest: ' +
+//         rate +
+//         ' should be >= ' +
+//         previousRate
+//     )
+//     previousRate = rate
+//   }
+//   return true
+// }
 
 /**
  * Every test suite exports their tests in the default object.
@@ -71,36 +71,36 @@ export default <TestSuite>{
     assertResultMatch(response, responses.getOrderbook.withXRP, 'getOrderbook')
   },
 
-  'sample XRP/JPY book has orders sorted correctly': async (client, address) => {
-    const orderbookInfo = {
-      base: {
-        // the first currency in pair
-        currency: 'XRP'
-      },
-      counter: {
-        currency: 'JPY',
-        counterparty: 'rB3gZey7VWHYRqJHLoHDEJXJ2pEPNieKiS'
-      }
-    }
-    const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR'
-    const response = await client.getOrderbook(myAddress, orderbookInfo)
-    assert.deepStrictEqual([], response.bids)
-    checkSortingOfOrders(response.asks)
-  },
+  // 'sample XRP/JPY book has orders sorted correctly': async (client, address) => {
+  //   const orderbookInfo = {
+  //     base: {
+  //       // the first currency in pair
+  //       currency: 'XRP'
+  //     },
+  //     counter: {
+  //       currency: 'JPY',
+  //       counterparty: 'rB3gZey7VWHYRqJHLoHDEJXJ2pEPNieKiS'
+  //     }
+  //   }
+  //   const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR'
+  //   const response = await client.getOrderbook(myAddress, orderbookInfo)
+  //   assert.deepStrictEqual([], response.bids)
+  //   checkSortingOfOrders(response.asks)
+  // },
 
-  'sample USD/XRP book has orders sorted correctly': async (client, address) => {
-    const orderbookInfo = {
-      counter: {currency: 'XRP'},
-      base: {
-        currency: 'USD',
-        counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-      }
-    }
-    const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR'
-    const response = await client.getOrderbook(myAddress, orderbookInfo)
-    checkSortingOfOrders(response.bids)
-    checkSortingOfOrders(response.asks)
-  },
+  // 'sample USD/XRP book has orders sorted correctly': async (client, address) => {
+  //   const orderbookInfo = {
+  //     counter: {currency: 'XRP'},
+  //     base: {
+  //       currency: 'USD',
+  //       counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+  //     }
+  //   }
+  //   const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR'
+  //   const response = await client.getOrderbook(myAddress, orderbookInfo)
+  //   checkSortingOfOrders(response.bids)
+  //   checkSortingOfOrders(response.asks)
+  // },
 
   // WARNING: This test fails to catch the sorting bug, issue #766
   'sorted so that best deals come first [bad test]': async (client, address) => {
