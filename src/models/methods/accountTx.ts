@@ -1,5 +1,5 @@
 import { LedgerIndex } from "../common";
-import { Metadata } from "../common/metadata";
+import Metadata from "../common/metadata";
 import { BaseRequest, BaseResponse } from "./baseMethod";
 
 export interface AccountTxRequest extends BaseRequest {
