@@ -101,6 +101,7 @@
   - [iso8601ToRippleTime](#iso8601torippletime)
   - [rippleTimeToISO8601](#rippletimetoiso8601)
   - [txFlags](#txflags)
+  - [txFlagIndices](#txflagindices)
   - [schemaValidator](#schemavalidator)
   - [schemaValidate](#schemavalidate)
 - [API Events](#api-events)
@@ -5746,7 +5747,7 @@ const multiSignPaymentTransaction = {
 };
 
 const multiSignPaymentInstruction = {
-    signersCount: 2
+  signersCount: 2
 };
 
 const api = new RippleAPI({
@@ -6397,6 +6398,19 @@ The remaining transaction types do not have any flags at this time.
 * PaymentChannelCreate
 * PaymentChannelFund
 
+## txFlagIndices
+
+The following are integer (as opposed to bit) flags that can be set for particular transactions in the AccountSet SetFlag or ClearFlag field
+
+`txFlagIndices.AccountSet.asfRequireDest`: Require a destination tag to send transactions to this account.
+`txFlagIndices.AccountSet.asfRequireAuth`: Require authorization for users to hold balances issued by this address. Can only be enabled if the address has no trust lines connected to it.
+`txFlagIndices.AccountSet.asfDisallowXRP`: XRP should not be sent to this account. (Enforced by client applications, not by rippled)
+`txFlagIndices.AccountSet.asfDisableMaster`: Disallow use of the master key pair. Can only be enabled if the account has configured another way to sign transactions.
+`txFlagIndices.AccountSet.asfAccountTxnID`: Track the ID of this account's most recent transaction.
+`txFlagIndices.AccountSet.asfNoFreeze`: Permanently give up the ability to freeze individual trust lines or disable Global Freeze. This flag can never be disabled after being enabled.
+`txFlagIndices.AccountSet.asfGlobalFreeze`:	Freeze all assets issued by this account.
+`txFlagIndices.AccountSet.asfDefaultRipple`: Enable [rippling](https://xrpl.org/rippling.html) on this account's trust lines by default.
+`txFlagIndices.AccountSet.asfDepositAuth`:Enable Deposit Authorization on this account.
 ## schemaValidator
 
 Unlike the rest of the ripple-lib API, schemaValidator is a static object on RippleAPI. It provides utility methods that do not use a server.
