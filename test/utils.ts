@@ -2,7 +2,7 @@ import net from 'net'
 import _ from 'lodash'
 import fs from 'fs'
 import path from 'path'
-import {XrplClient} from 'ripple-api'
+import {XrplClient} from 'ripple-client'
 import assert from 'assert-diff'
 const {schemaValidator} = XrplClient._PRIVATE
 
@@ -12,7 +12,7 @@ const {schemaValidator} = XrplClient._PRIVATE
  * arguments, to test different types of data.
  */
 export type TestFn = (
-  api: XrplClient,
+  client: XrplClient,
   address: string
 ) => void | PromiseLike<void>
 
@@ -112,17 +112,17 @@ export function getFreePort() {
   })
 }
 
-export function getAllPublicMethods(api: XrplClient) {
+export function getAllPublicMethods(client: XrplClient) {
   return Array.from(
     new Set([
-      ...Object.getOwnPropertyNames(api),
+      ...Object.getOwnPropertyNames(client),
       ...Object.getOwnPropertyNames(XrplClient.prototype)
     ])
   ).filter((key) => !key.startsWith('_'))
 }
 
 export function loadTestSuites(): LoadedTestSuite[] {
-  const allTests = fs.readdirSync(path.join(__dirname, 'api'), {
+  const allTests = fs.readdirSync(path.join(__dirname, 'client'), {
     encoding: 'utf8'
   })
   return allTests
@@ -130,7 +130,7 @@ export function loadTestSuites(): LoadedTestSuite[] {
       if (methodName.startsWith('.DS_Store')) {
         return null
       }
-      const testSuite = require(`./api/${methodName}`)
+      const testSuite = require(`./client/${methodName}`)
       return {
         name: methodName,
         config: testSuite.config || {},

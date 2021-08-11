@@ -110,7 +110,7 @@ function getClassicAccountAndTag(
 
 function prepareTransaction(
   txJSON: TransactionJSON,
-  api: XrplClient,
+  client: XrplClient,
   instructions: Instructions
 ): Promise<Prepare> {
   common.validate.instructions(instructions)
@@ -269,7 +269,7 @@ function prepareTransaction(
       instructions.maxLedgerVersionOffset != null
         ? instructions.maxLedgerVersionOffset
         : 3
-    return api.connection.getLedgerVersion().then((ledgerVersion) => {
+    return client.connection.getLedgerVersion().then((ledgerVersion) => {
       newTxJSON.LastLedgerSequence = ledgerVersion + offset
       return
     })
@@ -298,11 +298,11 @@ function prepareTransaction(
         : instructions.signersCount + 1
     if (instructions.fee != null) {
       const fee = new BigNumber(instructions.fee)
-      if (fee.isGreaterThan(api._maxFeeXRP)) {
+      if (fee.isGreaterThan(client._maxFeeXRP)) {
         return Promise.reject(
           new ValidationError(
             `Fee of ${fee.toString(10)} XRP exceeds ` +
-              `max of ${api._maxFeeXRP} XRP. To use this fee, increase ` +
+              `max of ${client._maxFeeXRP} XRP. To use this fee, increase ` +
               '`maxFeeXRP` in the XrplClient constructor.'
           )
         )
@@ -313,9 +313,9 @@ function prepareTransaction(
       )
       return Promise.resolve()
     }
-    const cushion = api._feeCushion
-    return api.getFee(cushion).then((fee) => {
-      return api.connection.getFeeRef().then((feeRef) => {
+    const cushion = client._feeCushion
+    return client.getFee(cushion).then((fee) => {
+      return client.connection.getFeeRef().then((feeRef) => {
         // feeRef is the reference transaction cost in "fee units"
         const extraFee =
           newTxJSON.TransactionType !== 'EscrowFinish' ||
@@ -329,8 +329,8 @@ function prepareTransaction(
                 ))
         const feeDrops = common.xrpToDrops(fee)
         const maxFeeXRP = instructions.maxFee
-          ? BigNumber.min(api._maxFeeXRP, instructions.maxFee)
-          : api._maxFeeXRP
+          ? BigNumber.min(client._maxFeeXRP, instructions.maxFee)
+          : client._maxFeeXRP
         const maxFeeDrops = common.xrpToDrops(maxFeeXRP)
         const normalFee = scaleValue(feeDrops, multiplier, extraFee)
         newTxJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString(10)
@@ -370,7 +370,7 @@ function prepareTransaction(
     }
 
     try {
-      const response = await api.request('account_info', {
+      const response = await client.request('account_info', {
         account: classicAccount,
         ledger_index: 'current' // Fix #999
       })
