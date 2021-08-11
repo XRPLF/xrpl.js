@@ -9,7 +9,7 @@ import {assertRejects, TestSuite} from '../../utils'
  */
 export default <TestSuite>{
   'requests the next page': async (client, address) => {
-    const response = await client.request('ledger_data')
+    const response = await client.request({command: 'ledger_data'})
     const responseNextPage = await client.requestNextPage<LedgerData>(
       'ledger_data',
       {},
@@ -22,7 +22,7 @@ export default <TestSuite>{
   },
 
   'rejects when there are no more pages': async (client, address) => {
-    const response = await client.request('ledger_data')
+    const response = await client.request({command: 'ledger_data'})
     const responseNextPage = await client.requestNextPage(
       'ledger_data',
       {},
