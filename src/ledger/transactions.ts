@@ -4,9 +4,10 @@ import {computeTransactionHash} from '../common/hashes'
 import * as utils from './utils'
 import parseTransaction from './parse/transaction'
 import getTransaction from './transaction'
-import {validate, errors, Connection, ensureClassicAddress} from '../common'
+import {validate, errors, ensureClassicAddress} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
 import {Client} from '..'
+import {Connection} from '../client'
 import { AccountTxRequest } from '../models/methods'
 
 export type TransactionsOptions = {

@@ -542,7 +542,8 @@ class Client extends EventEmitter {
 }
 
 export {
-  Client
+  Client,
+  Connection
 }
 
 export type {

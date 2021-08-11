@@ -1,7 +1,7 @@
 import * as utils from './utils'
 import parseTransaction from './parse/transaction'
 import {validate, errors} from '../common'
-import {Connection} from '../common'
+import {Connection} from '../client'
 import {FormattedTransactionType} from '../transaction/types'
 import {RippledError} from '../common/errors'
 import {Client} from '..'

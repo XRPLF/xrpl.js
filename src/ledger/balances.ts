@@ -1,6 +1,6 @@
 import * as utils from './utils'
 import {validate, ensureClassicAddress} from '../common'
-import {Connection} from '../common'
+import {Connection} from '../client'
 import {GetTrustlinesOptions} from './trustlines'
 import {FormattedTrustline} from '../common/types/objects/trustlines'
 import {Client} from '..'

@@ -1,4 +1,4 @@
-export * from './client'
+export {Client} from './client'
 
 export * from './transaction/types'
 
