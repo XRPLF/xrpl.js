@@ -1,64 +1,10 @@
 import * as _ from 'lodash'
-import {convertKeysFromSnakeCaseToCamelCase} from './utils'
 import BigNumber from 'bignumber.js'
 import {XrplClient} from '..'
 import { ServerInfoResponse } from '../models/methods'
 
-export type GetServerInfoResponse = {
-  buildVersion: string
-  completeLedgers: string
-  hostID: string
-  ioLatencyMs: number
-  load?: {
-    jobTypes: Array<object>
-    threads: number
-  }
-  lastClose: {
-    convergeTimeS: number
-    proposers: number
-  }
-  loadFactor: number
-  peers: number
-  pubkeyNode: string
-  pubkeyValidator?: string
-  serverState: string
-  validatedLedger: {
-    age: number
-    baseFeeXRP: string
-    hash: string
-    reserveBaseXRP: string
-    reserveIncrementXRP: string
-    ledgerVersion: number
-  }
-  validationQuorum: number
-  networkLedger?: string
-}
-
-function renameKeys(object: Record<string, any>, mapping: Record<string, any>) {
-  Object.entries(mapping).forEach(entry => {
-    const [from, to] = entry;
-    object[to] = object[from]
-    delete object[from]
-  })
-}
-
 function getServerInfo(this: XrplClient): Promise<ServerInfoResponse> {
-  return this.request({command: 'server_info'}).then((response) => {
-    const info = convertKeysFromSnakeCaseToCamelCase(response.result.info)
-    renameKeys(info, {hostid: 'hostID'})
-    if (info.validatedLedger) {
-      renameKeys(info.validatedLedger, {
-        baseFeeXrp: 'baseFeeXRP',
-        reserveBaseXrp: 'reserveBaseXRP',
-        reserveIncXrp: 'reserveIncrementXRP',
-        seq: 'ledgerVersion'
-      })
-      info.validatedLedger.baseFeeXRP = info.validatedLedger.baseFeeXRP.toString()
-      info.validatedLedger.reserveBaseXRP = info.validatedLedger.reserveBaseXRP.toString()
-      info.validatedLedger.reserveIncrementXRP = info.validatedLedger.reserveIncrementXRP.toString()
-    }
-    return info
-  })
+  return this.request({command: 'server_info'})
 }
 
 // This is a public API that can be called directly.
