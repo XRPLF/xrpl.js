@@ -7,7 +7,9 @@ import { AccountOffersRequest, AccountOffersResponse } from "./accountOffers";
 import { AccountTxRequest, AccountTxResponse } from "./accountTx";
 import { BookOffersRequest, BookOffersResponse } from "./bookOffers";
 import { DepositAuthorizedRequest, DepositAuthorizedResponse } from "./depositAuthorized";
+import { FeeRequest, FeeResponse } from "./fee";
 import { GatewayBalancesRequest, GatewayBalancesResponse } from "./gatewayBalances";
+import { ManifestRequest, ManifestResponse } from "./manifest";
 import { NoRippleCheckRequest, NoRippleCheckResponse } from "./norippleCheck";
 import { ConsensusStream, LedgerStream, OrderBookStream, PeerStatusStream, Stream, SubscribeRequest, SubscribeResponse, TransactionStream, ValidationStream } from "./subscribe";
 import { UnsubscribeRequest, UnsubscribeResponse } from "./unsubscribe";
@@ -20,6 +22,12 @@ import { LedgerClosedRequest, LedgerClosedResponse } from "./ledgerClosed";
 import { LedgerDataRequest, LedgerDataResponse } from "./ledgerData";
 import { LedgerEntryRequest, LedgerEntryResponse } from "./ledgerEntry";
 import { LedgerCurrentRequest, LedgerCurrentResponse } from "./ledgerCurrent";
+import { ServerInfoRequest, ServerInfoResponse } from "./serverInfo";
+import { ServerStateRequest, ServerStateResponse } from "./serverState";
+import { SubmitRequest, SubmitResponse } from "./submit";
+import { SubmitMultisignedRequest, SubmitMultisignedResponse } from "./submitMultisigned";
+import { TransactionEntryRequest, TransactionEntryResponse } from "./transactionEntry";
+import { TxRequest, TxResponse } from "./tx";
 
 type Request = // account methods
                AccountChannelsRequest 
@@ -37,6 +45,11 @@ type Request = // account methods
              | LedgerCurrentRequest
              | LedgerDataRequest
              | LedgerEntryRequest
+               // transaction methods
+             | SubmitRequest
+             | SubmitMultisignedRequest
+             | TransactionEntryRequest
+             | TxRequest
                // path and order book methods
              | BookOffersRequest
              | DepositAuthorizedRequest
@@ -45,6 +58,11 @@ type Request = // account methods
                // subscription methods
              | SubscribeRequest
              | UnsubscribeRequest
+               // server info methods
+             | FeeRequest
+             | ManifestRequest
+             | ServerInfoRequest
+             | ServerStateRequest
                // utility methods
              | PingRequest
              | RandomRequest
@@ -66,6 +84,11 @@ type Response = // account methods
               | LedgerCurrentResponse
               | LedgerDataResponse
               | LedgerEntryResponse
+                // transaction methods
+              | SubmitResponse
+              | SubmitMultisignedResponse
+              | TransactionEntryResponse
+              | TxResponse
                 // path and order book methods
               | BookOffersResponse
               | DepositAuthorizedResponse
@@ -74,6 +97,11 @@ type Response = // account methods
                 // subscription methods
               | SubscribeResponse
               | UnsubscribeResponse
+                // server info methods
+              | FeeResponse
+              | ManifestResponse
+              | ServerInfoResponse
+              | ServerStateResponse
                 // utility methods
               | PingResponse
               | RandomResponse
@@ -112,6 +140,15 @@ export {
     LedgerDataResponse,
     LedgerEntryRequest,
     LedgerEntryResponse,
+    // transaction methods
+    SubmitRequest,
+    SubmitResponse,
+    SubmitMultisignedRequest,
+    SubmitMultisignedResponse,
+    TransactionEntryRequest,
+    TransactionEntryResponse,
+    TxRequest,
+    TxResponse,
     // path and order book methods
     BookOffersRequest,
     BookOffersResponse,
@@ -133,6 +170,15 @@ export {
     ConsensusStream,
     UnsubscribeRequest,
     UnsubscribeResponse,
+    // server info methods
+    FeeRequest,
+    FeeResponse,
+    ManifestRequest,
+    ManifestResponse,
+    ServerInfoRequest,
+    ServerInfoResponse,
+    ServerStateRequest,
+    ServerStateResponse,
     // utility methods
     PingRequest,
     PingResponse,
