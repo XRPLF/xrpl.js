@@ -1,4 +1,4 @@
-import { Request } from './../methods'
+import { Request } from ".";
 
 export interface BaseRequest {
     id: number | string
