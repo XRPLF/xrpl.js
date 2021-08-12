@@ -1,8 +1,8 @@
 import { ValidationError } from "../../common/errors";
 import { Amount, IssuedCurrencyAmount } from "../common";
-import { CommonFields, verifyCommonFields } from "./common";
+import { BaseTransaction, verifyBaseTransaction } from "./common";
 
-export interface CheckCreate extends CommonFields {
+export interface CheckCreate extends BaseTransaction {
     TransactionType: "CheckCreate";
     Destination: string;
     SendMax:	Amount;
@@ -19,7 +19,7 @@ export interface CheckCreate extends CommonFields {
  * @throws - When the CheckCreate is Malformed.
  */
  export function verifyCheckCreate(tx: CheckCreate): void {
-    verifyCommonFields(tx)
+    verifyBaseTransaction(tx)
 
     if (tx.SendMax === undefined)
         throw new ValidationError("CheckCreate: missing field SendMax")

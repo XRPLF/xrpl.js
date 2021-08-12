@@ -1,6 +1,7 @@
 import assert from 'assert-diff'
 import responses from '../../fixtures/responses'
 import {TestSuite} from '../../utils'
+import ECDSA from '../../../src/common/ecdsa'
 import {GenerateAddressOptions} from '../../../src/offline/generate-address'
 
 /**
@@ -70,7 +71,7 @@ export default <TestSuite>{
 
   'generateXAddress with algorithm `ecdsa-secp256k1`': async (api) => {
     // GIVEN we want to use 'ecdsa-secp256k1'
-    const options: GenerateAddressOptions = {algorithm: 'ecdsa-secp256k1'}
+    const options: GenerateAddressOptions = {algorithm: ECDSA.secp256k1}
 
     // WHEN generating an X-address
     const account = api.generateXAddress(options)
@@ -94,7 +95,7 @@ export default <TestSuite>{
 
   'generateXAddress with algorithm `ed25519`': async (api) => {
     // GIVEN we want to use 'ed25519'
-    const options: GenerateAddressOptions = {algorithm: 'ed25519'}
+    const options: GenerateAddressOptions = {algorithm: ECDSA.ed25519}
 
     // WHEN generating an X-address
     const account = api.generateXAddress(options)
@@ -116,7 +117,7 @@ export default <TestSuite>{
   ) => {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
     const options: GenerateAddressOptions = {
-      algorithm: 'ecdsa-secp256k1',
+      algorithm: ECDSA.secp256k1,
       entropy: new Array(16).fill(0)
     }
 
@@ -132,7 +133,7 @@ export default <TestSuite>{
   ) => {
     // GIVEN we want to use 'ed25519' with entropy of zero
     const options: GenerateAddressOptions = {
-      algorithm: 'ed25519',
+      algorithm: ECDSA.ed25519,
       entropy: new Array(16).fill(0)
     }
 
@@ -151,7 +152,7 @@ export default <TestSuite>{
   ) => {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
     const options: GenerateAddressOptions = {
-      algorithm: 'ecdsa-secp256k1',
+      algorithm: ECDSA.secp256k1,
       entropy: new Array(16).fill(0),
       includeClassicAddress: true
     }
@@ -168,7 +169,7 @@ export default <TestSuite>{
   ) => {
     // GIVEN we want to use 'ed25519' with entropy of zero
     const options: GenerateAddressOptions = {
-      algorithm: 'ed25519',
+      algorithm: ECDSA.ed25519,
       entropy: new Array(16).fill(0),
       includeClassicAddress: true
     }
@@ -190,7 +191,7 @@ export default <TestSuite>{
   ) => {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
     const options: GenerateAddressOptions = {
-      algorithm: 'ecdsa-secp256k1',
+      algorithm: ECDSA.secp256k1,
       entropy: new Array(16).fill(0),
       includeClassicAddress: true,
       test: true
@@ -211,7 +212,7 @@ export default <TestSuite>{
   ) => {
     // GIVEN we want to use 'ed25519' with entropy of zero
     const options: GenerateAddressOptions = {
-      algorithm: 'ed25519',
+      algorithm: ECDSA.ed25519,
       entropy: new Array(16).fill(0),
       includeClassicAddress: true,
       test: true

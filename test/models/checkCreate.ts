@@ -3,7 +3,7 @@ import { verifyCheckCreate } from './../../src/models/transactions/checkCreate'
 import { assert } from 'chai'
 
 /**
- * Transaction Verification Testing
+ * CheckCreate Transaction Verification Testing
  *
  * Providing runtime verification testing for each specific transaction type
  */
