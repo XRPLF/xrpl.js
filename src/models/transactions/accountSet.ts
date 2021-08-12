@@ -1,5 +1,5 @@
 import { ValidationError } from "../../common/errors";
-import { CommonFields, verifyCommonFields } from "./common";
+import { BaseTransaction, verifyBaseTransaction } from "./common";
 
 enum AccountSetFlagEnum {
     asfRequireDest = 1,
@@ -13,7 +13,7 @@ enum AccountSetFlagEnum {
     asfDepositAuth = 9,
 }
 
-export interface AccountSet extends CommonFields {
+export interface AccountSet extends BaseTransaction {
     TransactionType: "AccountSet";
     ClearFlag?: number;
     Domain?: string;
@@ -34,7 +34,7 @@ export interface AccountSet extends CommonFields {
  * @throws - When the AccountSet is Malformed.
  */
  export function verifyAccountSet(tx: AccountSet): void {
-    verifyCommonFields(tx)
+    verifyBaseTransaction(tx)
 
     if (tx.ClearFlag !== undefined){
         if (typeof tx.ClearFlag !== 'number')

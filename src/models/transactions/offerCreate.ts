@@ -1,9 +1,17 @@
 import { ValidationError } from "../../common/errors";
 import { Amount, IssuedCurrencyAmount } from "../common";
-import { CommonFields, verifyCommonFields } from "./common";
+import { BaseTransaction, GlobalFlags, verifyBaseTransaction } from "./common";
 
-export interface OfferCreate extends CommonFields {
+export interface OfferCreateFlags extends GlobalFlags {
+    tfPassive?: boolean;
+    tfImmediateOrCancel?: boolean;
+    tfFillOrKill?: boolean;
+    tfSell?: boolean;
+}
+
+export interface OfferCreate extends BaseTransaction {
     TransactionType: "OfferCreate";
+    Flags?: number | OfferCreateFlags
     Expiration?: number;
     OfferSequence?: number;
     TakerGets: Amount;
@@ -18,7 +26,7 @@ export interface OfferCreate extends CommonFields {
  * @throws - When the OfferCreate is Malformed.
  */
  export function verifyOfferCreate(tx: OfferCreate): void {
-    verifyCommonFields(tx)
+    verifyBaseTransaction(tx)
 
     if (tx.TakerGets === undefined)
         throw new ValidationError("OfferCreate: missing field TakerGets")
