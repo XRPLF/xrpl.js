@@ -101,6 +101,7 @@
   - [iso8601ToRippleTime](#iso8601torippletime)
   - [rippleTimeToISO8601](#rippletimetoiso8601)
   - [txFlags](#txflags)
+  - [accountSetFlags](#accountsetflags)
   - [schemaValidator](#schemavalidator)
   - [schemaValidate](#schemavalidate)
 - [API Events](#api-events)
@@ -6410,6 +6411,21 @@ The remaining transaction types do not have any flags at this time.
 * PaymentChannelCreate
 * PaymentChannelFund
 
+## accountSetFlags
+
+To modify account flags, you can use an AccountSet transaction and its `SetFlag` or `ClearFlag` fields.
+	
+The flags are called [AccountSet flags (asf*)](https://xrpl.org/accountset.html#accountset-flags):
+
+`RippleAPI.accountSetFlags.requireDestinationTag`: Require a destination tag to send transactions to this account.
+`RippleAPI.accountSetFlags.requireAuthorization`: Require authorization for users to hold balances issued by this address. Can only be enabled if the address has no trust lines connected to it.
+`RippleAPI.accountSetFlags.disallowIncomingXRP`: XRP should not be sent to this account. (Enforced by client applications, not by rippled)
+`RippleAPI.accountSetFlags.disableMasterKey`: Disallow use of the master key pair. Can only be enabled if the account has configured another way to sign transactions.
+`RippleAPI.accountSetFlags.enableTransactionIDTracking`: Track the ID of this account's most recent transaction.
+`RippleAPI.accountSetFlags.noFreeze`: Permanently give up the ability to freeze individual trust lines or disable Global Freeze. This flag can never be disabled after being enabled.
+`RippleAPI.accountSetFlags.globalFreeze`:	Freeze all assets issued by this account.
+`RippleAPI.accountSetFlags.defaultRipple`: Enable [rippling](https://xrpl.org/rippling.html) on this account's trust lines by default.
+`RippleAPI.accountSetFlags.depositAuth`:Enable Deposit Authorization on this account.
 ## schemaValidator
 
 Unlike the rest of the ripple-lib API, schemaValidator is a static object on RippleAPI. It provides utility methods that do not use a server.
