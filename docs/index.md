@@ -6410,10 +6410,9 @@ The flags are called [AccountSet flags (asf*)](https://xrpl.org/accountset.html#
 `RippleAPI.accountSetFlags.disableMasterKey`: Disallow use of the master key pair. Can only be enabled if the account has configured another way to sign transactions.
 `RippleAPI.accountSetFlags.enableTransactionIDTracking`: Track the ID of this account's most recent transaction.
 `RippleAPI.accountSetFlags.noFreeze`: Permanently give up the ability to freeze individual trust lines or disable Global Freeze. This flag can never be disabled after being enabled.
-`RippleAPI.accountSetFlags.globalFreeze`: Freeze all assets issued by this account.
+`RippleAPI.accountSetFlags.globalFreeze`:	Freeze all assets issued by this account.
 `RippleAPI.accountSetFlags.defaultRipple`: Enable [rippling](https://xrpl.org/rippling.html) on this account's trust lines by default.
 `RippleAPI.accountSetFlags.depositAuth`:Enable Deposit Authorization on this account.
-
 ## schemaValidator
 
 Unlike the rest of the ripple-lib API, schemaValidator is a static object on RippleAPI. It provides utility methods that do not use a server.
