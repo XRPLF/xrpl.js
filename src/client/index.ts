@@ -43,7 +43,6 @@ import prepareTicketCreate from '../transaction/ticket'
 import {sign} from '../transaction/sign'
 import combine from '../transaction/combine'
 import submit from '../transaction/submit'
-import { generateXAddress } from '../offline/utils'
 import {deriveKeypair, deriveAddress, deriveXAddress} from '../offline/derive'
 import computeLedgerHash from '../offline/ledgerhash'
 import signPaymentChannelClaim from '../offline/sign-payment-channel-claim'
@@ -406,8 +405,6 @@ class Client extends EventEmitter {
     } while (!!marker && count < countTo && lastBatchLength !== 0)
     return results
   }
-
-  generateXAddress = generateXAddress // @deprecated Invoke from top-level package instead
 
   isConnected(): boolean {
     return this.connection.isConnected()
