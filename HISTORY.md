@@ -4,12 +4,12 @@ Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.co
 
 ## 1.10.0 (2021-08-12)
 
-* Documentation Updates
-  * Export and document AccountSetFlags (#1525).
-  * Add links to example keypair derivation (#1523).
-* Include lodash in webpack build (#1500).
-* Add address generation from Devnet/Testnet faucets (#1497).
-* Fix bug with `getBalances()` ledgerVersion (#1505).
+* Add address generation from Devnet/Testnet faucets (#1497)
+* Fix bug with `getBalances()` ledgerVersion (#1505)
+* Include lodash in webpack build (#1500)
+* Documentation Updates:
+  * Export and document AccountSetFlags (#1525)
+  * Add links to example keypair derivation (#1523)
 
 ## 1.9.8 (2021-07-30)
 
