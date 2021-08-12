@@ -55,3 +55,27 @@ jobs:
       env:
         HOST: localhost
         PORT: ${{ job.services.rippled.ports['6006'] }}
+
+  browser:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x] # This just needs to be compatible w/ puppeteer
+
+    services:
+      rippled:
+        image: natenichols/rippled-standalone:latest
+        ports:
+        - 6006:6006
+        options:
+          --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s 
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: yarn install
+    - run: yarn test:browser

@@ -68,3 +68,6 @@ scripts/cache
 
 # nyc (istanbul)
 .nyc_output
+
+# browser tests
+test-compiled-for-web 
