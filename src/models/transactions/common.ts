@@ -48,13 +48,17 @@ const isSigner = (signer: Signer): boolean => {
         && typeof signer.SigningPubKey === 'string'
 }
 
-export interface CommonFields {
+export interface GlobalFlags {
+    tfFullyCanonicalSig: boolean,
+}
+
+export interface BaseTransaction {
   Account: string;
   TransactionType: string;
   Fee?: string;
   Sequence?: number;
   AccountTxnID?: string;
-  Flags?: number;
+  Flags?: number | GlobalFlags;
   LastLedgerSequence?: number;
   Memos?: Array<{ Memo: Memo }>;
   Signers?: Array<Signer>;
@@ -73,59 +77,59 @@ export interface CommonFields {
  * @returns - Void
  * @throws - When the common param is malformed. 
  */
-export function verifyCommonFields(common: CommonFields): void {
+export function verifyBaseTransaction(common: BaseTransaction): void {
     if (common.Account === undefined)
-        throw new ValidationError("CommonFields: missing field Account")
+        throw new ValidationError("BaseTransaction: missing field Account")
     
     if (typeof common.Account !== 'string')
-        throw new ValidationError("CommonFields: Account not string")
+        throw new ValidationError("BaseTransaction: Account not string")
 
     if (common.TransactionType === undefined)
-        throw new ValidationError("CommonFields: missing field TransactionType")
+        throw new ValidationError("BaseTransaction: missing field TransactionType")
 
     if (typeof common.TransactionType !== 'string')
-        throw new ValidationError("CommonFields: TransactionType not string")
+        throw new ValidationError("BaseTransaction: TransactionType not string")
 
     if (!transactionTypes.includes(common.TransactionType))
-        throw new ValidationError("CommonFields: Unknown TransactionType")
+        throw new ValidationError("BaseTransaction: Unknown TransactionType")
 
     if (common.Fee !== undefined && typeof common.Fee !== 'string')
-        throw new ValidationError("CommonFields: invalid Fee")
+        throw new ValidationError("BaseTransaction: invalid Fee")
 
     if (common.Sequence !== undefined && typeof common.Sequence !== 'number')
-        throw new ValidationError("CommonFields: invalid Sequence")
+        throw new ValidationError("BaseTransaction: invalid Sequence")
 
     if (common.Flags !== undefined && typeof common.Flags !== 'number')
-        throw new ValidationError("CommonFields: invalid Flags")
+        throw new ValidationError("BaseTransaction: invalid Flags")
 
     if (common.AccountTxnID !== undefined 
         && typeof common.AccountTxnID !== 'string')
-        throw new ValidationError("CommonFields: invalid AccountTxnID")
+        throw new ValidationError("BaseTransaction: invalid AccountTxnID")
 
     if (common.LastLedgerSequence !== undefined 
         && typeof common.LastLedgerSequence !== 'number')
-        throw new ValidationError("CommonFields: invalid LastLedgerSequence")
+        throw new ValidationError("BaseTransaction: invalid LastLedgerSequence")
 
     if (common.Memos !== undefined 
         && (common.Memos.length === 0 || !common.Memos.every(isMemo)))
-        throw new ValidationError("CommonFields: invalid Memos")
+        throw new ValidationError("BaseTransaction: invalid Memos")
 
     if (common.Signers !== undefined
         && (common.Signers.length === 0 || !common.Signers.every(isSigner)))
-        throw new ValidationError("CommonFields: invalid Signers")
+        throw new ValidationError("BaseTransaction: invalid Signers")
 
     if (common.SourceTag !== undefined && typeof common.SourceTag !== 'number')
-        throw new ValidationError("CommonFields: invalid SourceTag")
+        throw new ValidationError("BaseTransaction: invalid SourceTag")
 
     if (common.SigningPubKey !== undefined 
         && typeof common.SigningPubKey !== 'string')
-        throw new ValidationError("CommonFields: invalid SigningPubKey")
+        throw new ValidationError("BaseTransaction: invalid SigningPubKey")
 
     if (common.TicketSequence !== undefined 
         && typeof common.TicketSequence !== 'number')
-        throw new ValidationError("CommonFields: invalid TicketSequence")
+        throw new ValidationError("BaseTransaction: invalid TicketSequence")
 
     if (common.TxnSignature !== undefined 
         && typeof common.TxnSignature !== 'string')
-        throw new ValidationError("CommonFields: invalid TxnSignature")
+        throw new ValidationError("BaseTransaction: invalid TxnSignature")
 }
