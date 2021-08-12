@@ -43,7 +43,7 @@ import prepareTicketCreate from '../transaction/ticket'
 import {sign} from '../transaction/sign'
 import combine from '../transaction/combine'
 import submit from '../transaction/submit'
-import { generateAddress, generateXAddress } from '../offline/utils'
+import { generateXAddress } from '../offline/utils'
 import {deriveKeypair, deriveAddress, deriveXAddress} from '../offline/derive'
 import computeLedgerHash from '../offline/ledgerhash'
 import signPaymentChannelClaim from '../offline/sign-payment-channel-claim'
@@ -146,7 +146,6 @@ import {
   decodeXAddress
 } from 'ripple-address-codec'
 import {
-  computeBinaryTransactionHash,
   computeTransactionHash,
   computeBinaryTransactionSigningHash,
   computeAccountLedgerObjectID,
@@ -408,8 +407,6 @@ class Client extends EventEmitter {
     return results
   }
 
-  // @deprecated Use X-addresses instead & Invoke from top-level package instead
-  generateAddress = generateAddress
   generateXAddress = generateXAddress // @deprecated Invoke from top-level package instead
 
   isConnected(): boolean {
@@ -508,7 +505,7 @@ class Client extends EventEmitter {
    */
   // Compute the hash of a binary transaction blob.
   // @deprecated Invoke from top-level package instead
-  static computeBinaryTransactionHash = computeBinaryTransactionHash // (txBlobHex: string): string
+//  static computeBinaryTransactionHash = computeBinaryTransactionHash // (txBlobHex: string): string
   // Compute the hash of a transaction in txJSON format.
   // @deprecated Invoke from top-level package instead
   static computeTransactionHash = computeTransactionHash // (txJSON: any): string
