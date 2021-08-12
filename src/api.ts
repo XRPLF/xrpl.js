@@ -44,10 +44,10 @@ import prepareCheckCancel from './transaction/check-cancel'
 import prepareCheckCash from './transaction/check-cash'
 import prepareSettings from './transaction/settings'
 import prepareTicketCreate from './transaction/ticket'
-import sign from './transaction/sign'
+import {sign} from './transaction/sign'
 import combine from './transaction/combine'
 import submit from './transaction/submit'
-import { generateAddress, generateXAddress } from './offline/utils'
+import {generateAddress, generateXAddress} from './offline/utils'
 import {deriveKeypair, deriveAddress, deriveXAddress} from './offline/derive'
 import computeLedgerHash from './offline/ledgerhash'
 import signPaymentChannelClaim from './offline/sign-payment-channel-claim'
@@ -163,11 +163,10 @@ class RippleAPI extends EventEmitter {
       })
       this.connection.on('disconnected', (code) => {
         let finalCode = code
-        // 1005: This is a backwards-compatible fix for this change in the ws library: https://github.com/websockets/ws/issues/1257
         // 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
-        // TODO: Remove in next major, breaking version
-        if (finalCode === 1005 || finalCode === 4000) {
-          finalCode = 1000
+        // Since 4000 is a normal disconnect reason, we convert this to the standard exit code 1000
+        if (finalCode === 4000) {
+          finalCode = 1000 
         }
         this.emit('disconnected', finalCode)
       })

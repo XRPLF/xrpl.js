@@ -1,7 +1,7 @@
 import { ValidationError } from "../../common/errors";
-import { CommonFields, verifyCommonFields } from "./common";
+import { BaseTransaction, verifyBaseTransaction } from "./common";
 
-export interface OfferCancel extends CommonFields {
+export interface OfferCancel extends BaseTransaction {
     TransactionType: "OfferCancel";
     OfferSequence: number;
 }
@@ -14,7 +14,7 @@ export interface OfferCancel extends CommonFields {
  * @throws - When the OfferCancel is Malformed.
  */
  export function verifyOfferCancel(tx: OfferCancel): void {
-    verifyCommonFields(tx)
+    verifyBaseTransaction(tx)
 
     if (tx.OfferSequence !== undefined && typeof tx.OfferSequence !== 'number')
         throw new ValidationError("OfferCancel: invalid OfferSequence")

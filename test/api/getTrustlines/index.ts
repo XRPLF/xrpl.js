@@ -37,4 +37,13 @@ export default <TestSuite>{
       'getTrustlines'
     )
   },
+
+  'getTrustlines - ledger version option': async (api, address) => {
+    const result = await api.getTrustlines(addresses.FOURTH_ACCOUNT, {ledgerVersion: 5})
+    assertResultMatch(
+      result,
+      RESPONSE_FIXTURES.moreThan400Items,
+      'getTrustlines'
+    )
+  },
 }
