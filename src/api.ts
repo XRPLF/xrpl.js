@@ -487,7 +487,7 @@ class RippleAPI extends EventEmitter {
   dropsToXrp = dropsToXrp // @deprecated Invoke from top-level package instead
   rippleTimeToISO8601 = rippleTimeToISO8601 // @deprecated Invoke from top-level package instead
   iso8601ToRippleTime = iso8601ToRippleTime // @deprecated Invoke from top-level package instead
-  static txFlags = txFlags
+  txFlags = txFlags
   static accountSetFlags = constants.AccountSetFlags
 
   isValidAddress = schemaValidator.isValidAddress
