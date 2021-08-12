@@ -1,19 +1,19 @@
-import { Metadata } from "../common/metadata";
+import Metadata from "../common/metadata";
 import { OfferCreate } from "./offerCreate";
-
+import { CheckCash } from "./checkCash";
 
 export type Transaction =
 //     AccountSet
 //   | AccountDelete
 //   | CheckCancel
-//   | CheckCash
+       CheckCash
 //   | CheckCreate
 //   | DepositPreauth
 //   | EscrowCancel
 //   | EscrowCreate
 //   | EscrowFinish
 //   | OfferCancel
-      OfferCreate
+     | OfferCreate
 //   | PaymentTransaction
 //   | PaymentChannelClaim
 //   | PaymentChannelCreate
@@ -26,9 +26,4 @@ export type Transaction =
 export interface TransactionAndMetadata {
     transaction: Transaction;
     metadata: Metadata
-}
-
-export interface SignedTransaction extends Transaction {
-    SigningPublicKey: string;
-    TxnSignature: string;
 }

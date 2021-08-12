@@ -1,8 +1,8 @@
 import { ValidationError } from "../../common/errors";
 import { Amount, IssuedCurrencyAmount } from "../common";
-import { CommonFields, verifyCommonFields } from "./common";
+import { BaseTransaction, verifyBaseTransaction } from "./common";
 
-export interface CheckCash extends CommonFields {
+export interface CheckCash extends BaseTransaction {
     TransactionType: "CheckCash";
     CheckID: string;
     Amount?:	Amount;
@@ -17,7 +17,7 @@ export interface CheckCash extends CommonFields {
  * @throws - When the CheckCash is Malformed.
  */
  export function verifyCheckCash(tx: CheckCash): void {
-    verifyCommonFields(tx)
+    verifyBaseTransaction(tx)
 
     const isIssuedCurrency = (obj: IssuedCurrencyAmount): boolean => {
         return Object.keys(obj).length === 3 
