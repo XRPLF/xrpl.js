@@ -234,7 +234,7 @@ describe('Transaction Verification', function () {
         assert.throws(
             () => verifyBaseTransaction(invalidMemo),
             ValidationError,
-            "CommonFields: invalid Memos"
+            "BaseTransaction: invalid Memos"
         )
     })
 })
