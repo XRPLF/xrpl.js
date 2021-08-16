@@ -3,9 +3,7 @@ import {
   constants,
   errors,
   validate,
-  rippleTimeToISO8601,
-  iso8601ToRippleTime,
-  txFlags
+  txFlags,
 } from '../common'
 import { Connection, ConnectionUserOptions } from './connection'
 import {
@@ -474,8 +472,6 @@ class Client extends EventEmitter {
   static encodeXAddress = encodeXAddress
   static decodeXAddress = decodeXAddress
 
-  rippleTimeToISO8601 = rippleTimeToISO8601 // @deprecated Invoke from top-level package instead
-  iso8601ToRippleTime = iso8601ToRippleTime // @deprecated Invoke from top-level package instead
   txFlags = txFlags
   static accountSetFlags = constants.AccountSetFlags
 
