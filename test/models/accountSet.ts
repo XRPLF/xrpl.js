@@ -23,7 +23,7 @@ describe('AccountSet Transaction Verification', function () {
         assert.doesNotThrow(() => verifyAccountSet(account))
     })
 
-    it (`throws w/ invalid SetFlag`, () => {
+    it (`throws w/ invalid SetFlag (out of range)`, () => {
         const offer = {
             TransactionType : "AccountSet",
             Account : "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
@@ -41,7 +41,7 @@ describe('AccountSet Transaction Verification', function () {
         )
     })
 
-    it (`throws w/ invalid SetFlag`, () => {
+    it (`throws w/ invalid SetFlag (incorrect type)`, () => {
         const offer = {
             TransactionType : "AccountSet",
             Account : "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",

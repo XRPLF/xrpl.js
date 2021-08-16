@@ -22,8 +22,6 @@ export interface AccountSet extends BaseTransaction {
     SetFlag?: AccountSetFlagEnum;
     TransferRate?: number;
     TickSize?: number;
-    WalletLocator?: string;
-    WalletSize?: number;
 }
 
 /**
@@ -39,7 +37,7 @@ export interface AccountSet extends BaseTransaction {
     if (tx.ClearFlag !== undefined){
         if (typeof tx.ClearFlag !== 'number')
             throw new ValidationError("AccountSet: invalid ClearFlag")
-        if (0 > tx.ClearFlag || tx.ClearFlag > 9)
+        if (!Object.values(AccountSetFlagEnum).includes(tx.ClearFlag))
             throw new ValidationError("AccountSet: invalid ClearFlag")
     }
 
@@ -55,7 +53,7 @@ export interface AccountSet extends BaseTransaction {
     if (tx.SetFlag !== undefined){
         if (typeof tx.SetFlag !== 'number')
             throw new ValidationError("AccountSet: invalid SetFlag")
-        if (0 > tx.SetFlag || tx.SetFlag > 9)
+        if (!Object.values(AccountSetFlagEnum).includes(tx.SetFlag))
             throw new ValidationError("AccountSet: invalid SetFlag")
     }
 
