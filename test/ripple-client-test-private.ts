@@ -3,15 +3,15 @@ import _ from 'lodash'
 import {Client} from 'xrpl-local'
 import {RecursiveData} from 'xrpl-local/ledger/utils'
 import {assertRejects, assertResultMatch} from './utils'
-import addresses from './fixtures/addresses.json'
+// import addresses from './fixtures/addresses.json'
 import responses from './fixtures/responses'
 import ledgerClosed from './fixtures/rippled/ledger-close-newer.json'
 import setupClient from './setup-client'
-import * as schemaValidator from '../src/common/schema-validator'
-import {validate} from '../src/common'
+// import * as schemaValidator from '../src/common/schema-validator'
+// import {validate} from '../src/common'
 import * as ledgerUtils from '../src/ledger/utils'
 
-const address = addresses.ACCOUNT
+// const address = addresses.ACCOUNT
 assert.options.strict = true
 
 // how long before each test case times out
@@ -52,85 +52,6 @@ describe('Client', function () {
       done()
     })
     this.client.connection._ws.emit('message', JSON.stringify(ledgerClosed))
-  })
-
-  describe('[private] schema-validator', function () {
-    it('valid', function () {
-      assert.doesNotThrow(function () {
-        schemaValidator.schemaValidate(
-          'hash256',
-          '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A0F'
-        )
-      })
-    })
-
-    it('invalid', function () {
-      assert.throws(function () {
-        schemaValidator.schemaValidate('hash256', 'invalid')
-      }, this.client.errors.ValidationError)
-    })
-
-    it('invalid - empty value', function () {
-      assert.throws(function () {
-        schemaValidator.schemaValidate('hash256', '')
-      }, this.client.errors.ValidationError)
-    })
-
-    it('schema not found error', function () {
-      assert.throws(function () {
-        schemaValidator.schemaValidate('unexisting', 'anything')
-      }, /no schema/)
-    })
-  })
-
-  describe('[private] validator', function () {
-    it('validateLedgerRange', function () {
-      const options = {
-        minLedgerVersion: 20000,
-        maxLedgerVersion: 10000
-      }
-      const thunk = _.partial(validate.getTransactions, {address, options})
-      assert.throws(thunk, this.client.errors.ValidationError)
-      assert.throws(
-        thunk,
-        /minLedgerVersion must not be greater than maxLedgerVersion/
-      )
-    })
-
-    it('secret', function () {
-      function validateSecret(secret) {
-        validate.sign({txJSON: '', secret})
-      }
-      assert.doesNotThrow(
-        _.partial(validateSecret, 'shzjfakiK79YQdMjy4h8cGGfQSV6u')
-      )
-      assert.throws(
-        _.partial(validateSecret, 'shzjfakiK79YQdMjy4h8cGGfQSV6v'),
-        this.client.errors.ValidationError
-      )
-      assert.throws(
-        _.partial(validateSecret, 1),
-        this.client.errors.ValidationError
-      )
-      assert.throws(
-        _.partial(validateSecret, ''),
-        this.client.errors.ValidationError
-      )
-      assert.throws(
-        _.partial(validateSecret, 's!!!'),
-        this.client.errors.ValidationError
-      )
-      assert.throws(
-        _.partial(validateSecret, 'passphrase'),
-        this.client.errors.ValidationError
-      )
-      // 32 0s is a valid hex repr of seed bytes
-      const hex = new Array(33).join('0')
-      assert.throws(
-        _.partial(validateSecret, hex),
-        this.client.errors.ValidationError
-      )
-    })
   })
 
   it('common utils - toRippledAmount', async () => {

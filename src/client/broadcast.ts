@@ -1,4 +1,4 @@
-import {Client, ClientOptions} from './'
+import Client, {ClientOptions} from './client'
 
 class BroadcastClient extends Client {
   ledgerVersion: number | undefined = undefined
@@ -33,11 +33,11 @@ class BroadcastClient extends Client {
     }
 
     // synchronous methods are all passed directly to the first client instance
-    const defaultClient = clients[0]
-    const syncMethods = ['sign', 'generateAddress', 'computeLedgerHash']
-    syncMethods.forEach((name) => {
-      this[name] = defaultClient[name].bind(defaultClient)
-    })
+    // const defaultClient = clients[0]
+    // const syncMethods = ['sign', 'generateAddress', 'computeLedgerHash']
+    // syncMethods.forEach((name) => {
+    //   this[name] = defaultClient[name].bind(defaultClient)
+    // })
 
     clients.forEach((client) => {
       client.on('error', (errorCode, errorMessage, data) =>
