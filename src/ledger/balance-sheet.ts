@@ -55,7 +55,7 @@ async function getBalanceSheet(
 ): Promise<GetBalanceSheet> {
   // 1. Validate
   validate.getBalanceSheet({address, options})
-  options = await ensureLedgerVersion.call(this, options)
+  options = await ensureLedgerVersion(this, options)
   // 2. Make Request
   const response = await this.request({command: 'gateway_balances',
     account: address,

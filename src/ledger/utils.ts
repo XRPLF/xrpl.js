@@ -102,27 +102,34 @@ function compareTransactions(
 }
 
 function hasCompleteLedgerRange(
-  connection: Connection,
+  client: Client,
   minLedgerVersion?: number,
   maxLedgerVersion?: number
 ): Promise<boolean> {
   const firstLedgerVersion = 32570 // earlier versions have been lost
-  return connection.hasLedgerVersions(
-    minLedgerVersion || firstLedgerVersion,
-    maxLedgerVersion
-  )
+  minLedgerVersion = minLedgerVersion || firstLedgerVersion
+
+  return client.request({command: 'server_info'}).then((response) => {
+    const serverRange = response.result.info.complete_ledgers
+    const [minServerVersionStr, maxServerVersionStr] = serverRange.split('-')
+    const minServerVersion = Number(minServerVersionStr)
+    const maxServerVersion = Number(maxServerVersionStr)
+    return minServerVersion <= minLedgerVersion || maxServerVersion >= maxLedgerVersion
+  })
 }
 
 function isPendingLedgerVersion(
-  connection: Connection,
+  client: Client,
   maxLedgerVersion?: number
 ): Promise<boolean> {
-  return connection
-    .getLedgerVersion()
+  return client.request({command: 'ledger', ledger_index: 'validated'})
+    .then((response) => {
+      return response.result.ledger_index
+    })
     .then((ledgerVersion) => ledgerVersion < (maxLedgerVersion || 0))
 }
 
-function ensureLedgerVersion(this: Client, options: any): Promise<object> {
+function ensureLedgerVersion(client: Client, options: any): Promise<object> {
   if (
     Boolean(options) &&
     options.ledgerVersion != null &&
@@ -130,7 +137,10 @@ function ensureLedgerVersion(this: Client, options: any): Promise<object> {
   ) {
     return Promise.resolve(options)
   }
-  return this.getLedgerVersion().then((ledgerVersion) =>
+  return client.request({command: 'ledger', ledger_index: 'validated'})
+  .then((response) => {
+    return response.result.ledger_index
+  }).then((ledgerVersion) =>
     Object.assign({}, options, {ledgerVersion})
   )
 }

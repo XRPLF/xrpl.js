@@ -7,8 +7,10 @@ import addresses from './fixtures/addresses.json'
 import responses from './fixtures/responses'
 import ledgerClosed from './fixtures/rippled/ledger-close-newer.json'
 import setupClient from './setup-client'
+import * as schemaValidator from '../src/common/schema-validator'
+import {validate} from '../src/common'
+import * as ledgerUtils from '../src/ledger/utils'
 
-const {validate, schemaValidator, ledgerUtils} = Client._PRIVATE
 const address = addresses.ACCOUNT
 assert.options.strict = true
 

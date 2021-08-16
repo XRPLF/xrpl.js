@@ -16,7 +16,7 @@ function currencyFilter(currency: string, trustline: FormattedTrustline) {
 }
 
 async function getTrustlines(
-  this: Client,
+  client: Client,
   address: string,
   options: GetTrustlinesOptions = {}
 ): Promise<FormattedTrustline[]> {
@@ -29,9 +29,9 @@ async function getTrustlines(
   address = ensureClassicAddress(address)
 
   // 2. Make Request
-  const responses = await this._requestAll({command: 'account_lines',
+  const responses = await client._requestAll({command: 'account_lines',
     account: address,
-    ledger_index: options.ledgerVersion ?? await this.getLedgerVersion(),
+    ledger_index: options.ledgerVersion ?? 'validated',
     limit: options.limit,
     peer: options.counterparty
   })

@@ -88,7 +88,13 @@ import {
   RandomResponse
 } from '../models/methods'
 import {ensureClassicAddress} from '../common'
-import {clamp} from '../ledger/utils'
+import assert from 'assert'
+import { BroadcastClient } from './broadcast'
+
+function clamp(value: number, min: number, max: number): number {
+  assert.ok(min <= max, 'Illegal clamp bounds')
+  return Math.min(Math.max(value, min), max)
+}
 
 export interface ClientOptions extends ConnectionUserOptions {
   server?: string
@@ -333,5 +339,6 @@ class Client extends EventEmitter {
 
 export {
   Client,
-  Connection
+  Connection,
+  BroadcastClient
 }

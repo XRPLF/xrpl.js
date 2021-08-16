@@ -33,7 +33,7 @@ export default async function getOrders(
   // 2. Make Request
   const responses = await this._requestAll({command: 'account_offers',
     account: address,
-    ledger_index: options.ledgerVersion || (await this.getLedgerVersion()),
+    ledger_index: options.ledgerVersion || 'validated',
     limit: options.limit
   })
   // 3. Return Formatted Response, from the perspective of `address`

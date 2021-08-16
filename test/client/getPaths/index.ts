@@ -1,9 +1,9 @@
-import assert from 'assert-diff'
-import {assertRejects, TestSuite} from '../../utils'
-import requests from '../../fixtures/requests'
+// import assert from 'assert-diff'
+import {TestSuite} from '../../utils'
+// import requests from '../../fixtures/requests'
 // import responses from '../../fixtures/responses'
-import addresses from '../../fixtures/addresses.json'
-const {getPaths: REQUEST_FIXTURES} = requests
+// import addresses from '../../fixtures/addresses.json'
+// const {getPaths: REQUEST_FIXTURES} = requests
 // const {getPaths: RESPONSE_FIXTURES} = responses
 
 /**
@@ -38,56 +38,56 @@ export default <TestSuite>{
   //   const response = await client.getPaths(REQUEST_FIXTURES.XrpToXrp)
   //   assertResultMatch(response, RESPONSE_FIXTURES.XrpToXrp, 'getPaths')
   // },
-  'source with issuer': async (client) => {
-    return assertRejects(
-      client.getPaths(REQUEST_FIXTURES.issuer),
-      client.errors.NotFoundError
-    )
-  },
+  // 'source with issuer': async (client) => {
+  //   return assertRejects(
+  //     client.getPaths(REQUEST_FIXTURES.issuer),
+  //     client.errors.NotFoundError
+  //   )
+  // },
   // 'XRP 2 XRP - not enough': async (client) => {
   //   return assertRejects(
   //     client.getPaths(REQUEST_FIXTURES.XrpToXrpNotEnough),
   //     client.errors.NotFoundError
   //   )
   // },
-  'invalid PathFind': async (client) => {
-    assert.throws(() => {
-      client.getPaths(REQUEST_FIXTURES.invalid)
-    }, /Cannot specify both source.amount/)
-  },
-  'does not accept currency': async (client) => {
-    return assertRejects(
-      client.getPaths(REQUEST_FIXTURES.NotAcceptCurrency),
-      client.errors.NotFoundError
-    )
-  },
-  'no paths': async (client) => {
-    return assertRejects(
-      client.getPaths(REQUEST_FIXTURES.NoPaths),
-      client.errors.NotFoundError
-    )
-  },
-  'no paths source amount': async (client) => {
-    return assertRejects(
-      client.getPaths(REQUEST_FIXTURES.NoPathsSource),
-      client.errors.NotFoundError
-    )
-  },
-  'no paths with source currencies': async (client) => {
-    return assertRejects(
-      client.getPaths(REQUEST_FIXTURES.NoPathsWithCurrencies),
-      client.errors.NotFoundError
-    )
-  },
-  'error: srcActNotFound': async (client) => {
-    return assertRejects(
-      client.getPaths({
-        ...REQUEST_FIXTURES.normal,
-        source: {address: addresses.NOTFOUND}
-      }),
-      client.errors.RippleError
-    )
-  },
+  // 'invalid PathFind': async (client) => {
+  //   assert.throws(() => {
+  //     client.getPaths(REQUEST_FIXTURES.invalid)
+  //   }, /Cannot specify both source.amount/)
+  // },
+  // 'does not accept currency': async (client) => {
+  //   return assertRejects(
+  //     client.getPaths(REQUEST_FIXTURES.NotAcceptCurrency),
+  //     client.errors.NotFoundError
+  //   )
+  // },
+  // 'no paths': async (client) => {
+  //   return assertRejects(
+  //     client.getPaths(REQUEST_FIXTURES.NoPaths),
+  //     client.errors.NotFoundError
+  //   )
+  // },
+  // 'no paths source amount': async (client) => {
+  //   return assertRejects(
+  //     client.getPaths(REQUEST_FIXTURES.NoPathsSource),
+  //     client.errors.NotFoundError
+  //   )
+  // },
+  // 'no paths with source currencies': async (client) => {
+  //   return assertRejects(
+  //     client.getPaths(REQUEST_FIXTURES.NoPathsWithCurrencies),
+  //     client.errors.NotFoundError
+  //   )
+  // },
+  // 'error: srcActNotFound': async (client) => {
+  //   return assertRejects(
+  //     client.getPaths({
+  //       ...REQUEST_FIXTURES.normal,
+  //       source: {address: addresses.NOTFOUND}
+  //     }),
+  //     client.errors.RippleError
+  //   )
+  // },
   // 'send all': async (client) => {
   //   const response = await client.getPaths(REQUEST_FIXTURES.sendAll)
   //   assertResultMatch(response, RESPONSE_FIXTURES.sendAll, 'getPaths')

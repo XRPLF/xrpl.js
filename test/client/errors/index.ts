@@ -1,4 +1,4 @@
-import assert from 'assert-diff'
+// import assert from 'assert-diff'
 import {TestSuite} from '../../utils'
 
 /**
@@ -7,13 +7,13 @@ import {TestSuite} from '../../utils'
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'RippleError with data': async (client, address) => {
-    const error = new client.errors.RippleError('_message_', '_data_')
-    assert.strictEqual(error.toString(), "[RippleError(_message_, '_data_')]")
-  },
+  // 'RippleError with data': async (client, address) => {
+  //   const error = new client.errors.RippleError('_message_', '_data_')
+  //   assert.strictEqual(error.toString(), "[RippleError(_message_, '_data_')]")
+  // },
 
-  'NotFoundError default message': async (client, address) => {
-    const error = new client.errors.NotFoundError()
-    assert.strictEqual(error.toString(), '[NotFoundError(Not found)]')
-  }
+  // 'NotFoundError default message': async (client, address) => {
+  //   const error = new client.errors.NotFoundError()
+  //   assert.strictEqual(error.toString(), '[NotFoundError(Not found)]')
+  // }
 }

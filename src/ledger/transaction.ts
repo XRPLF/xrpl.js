@@ -73,7 +73,7 @@ function isTransactionInRange(tx: any, options: TransactionOptions) {
 }
 
 function convertError(
-  connection: Connection,
+  client: Client,
   options: TransactionOptions,
   error: RippledError
 ): Promise<Error> {
@@ -93,14 +93,14 @@ function convertError(
   if (_error instanceof errors.NotFoundError) {
     return utils
       .hasCompleteLedgerRange(
-        connection,
+        client,
         options.minLedgerVersion,
         options.maxLedgerVersion
       )
       .then((hasCompleteLedgerRange) => {
         if (!hasCompleteLedgerRange) {
           return utils
-            .isPendingLedgerVersion(connection, options.maxLedgerVersion)
+            .isPendingLedgerVersion(client, options.maxLedgerVersion)
             .then((isPendingLedgerVersion) => {
               return isPendingLedgerVersion
                 ? new errors.PendingLedgerVersionError()
@@ -129,7 +129,7 @@ async function getTransaction(
   options: TransactionOptions = {}
 ): Promise<FormattedTransactionType> {
   validate.getTransaction({id, options})
-  const _options = await utils.ensureLedgerVersion.call(this, options)
+  const _options = await utils.ensureLedgerVersion(this, options)
   try {
     const tx = await this.request({command: 'tx',
       transaction: id,
@@ -138,7 +138,7 @@ async function getTransaction(
     const txWithDate = await attachTransactionDate(this, tx)
     return formatResponse(_options, txWithDate)
   } catch (error) {
-    throw await convertError(this.connection, _options, error)
+    throw await convertError(this, _options, error)
   }
 }
 

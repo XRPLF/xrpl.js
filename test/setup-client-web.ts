@@ -1,4 +1,4 @@
-import {Client, ClientBroadcast} from 'xrpl-local'
+import {Client, BroadcastClient} from 'xrpl-local'
 import ledgerClosed from './fixtures/rippled/ledger-close.json'
 
 const port = 34371
@@ -40,7 +40,7 @@ function setup(this: any, port_ = port) {
 
 function setupBroadcast(this: any) {
   const servers = [port, port + 1].map((port_) => baseUrl + port_)
-  this.client = new ClientBroadcast(servers)
+  this.client = new BroadcastClient(servers)
   return new Promise<void>((resolve, reject) => {
     this.client
       .connect()

@@ -1,7 +1,7 @@
-import requests from '../../fixtures/requests'
-import responses from '../../fixtures/responses'
-import {assertResultMatch, TestSuite} from '../../utils'
-const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
+// import requests from '../../fixtures/requests'
+// import responses from '../../fixtures/responses'
+import {TestSuite} from '../../utils'
+// const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
 /**
  * Every test suite exports their tests in the default object.
@@ -9,38 +9,38 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'prepareCheckCreate': async (client, address) => {
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
-    }
-    const result = await client.prepareCheckCreate(
-      address,
-      requests.prepareCheckCreate.normal,
-      localInstructions
-    )
-    assertResultMatch(result, responses.prepareCheckCreate.normal, 'prepare')
-  },
+  // 'prepareCheckCreate': async (client, address) => {
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxFee: '0.000012'
+  //   }
+  //   const result = await client.prepareCheckCreate(
+  //     address,
+  //     requests.prepareCheckCreate.normal,
+  //     localInstructions
+  //   )
+  //   assertResultMatch(result, responses.prepareCheckCreate.normal, 'prepare')
+  // },
 
-  'prepareCheckCreate full': async (client, address) => {
-    const result = await client.prepareCheckCreate(
-      address,
-      requests.prepareCheckCreate.full
-    )
-    assertResultMatch(result, responses.prepareCheckCreate.full, 'prepare')
-  },
+  // 'prepareCheckCreate full': async (client, address) => {
+  //   const result = await client.prepareCheckCreate(
+  //     address,
+  //     requests.prepareCheckCreate.full
+  //   )
+  //   assertResultMatch(result, responses.prepareCheckCreate.full, 'prepare')
+  // },
 
-  'prepareCheckCreate with ticket': async (client, address) => {
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012',
-      ticketSequence: 23
-    }
-    const result = await client.prepareCheckCreate(
-      address,
-      requests.prepareCheckCreate.normal,
-      localInstructions
-    )
-    assertResultMatch(result, responses.prepareCheckCreate.ticket, 'prepare')
-  }
+  // 'prepareCheckCreate with ticket': async (client, address) => {
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxFee: '0.000012',
+  //     ticketSequence: 23
+  //   }
+  //   const result = await client.prepareCheckCreate(
+  //     address,
+  //     requests.prepareCheckCreate.normal,
+  //     localInstructions
+  //   )
+  //   assertResultMatch(result, responses.prepareCheckCreate.ticket, 'prepare')
+  // }
 }

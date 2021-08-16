@@ -6,7 +6,6 @@ import parseTransaction from './parse/transaction'
 import getTransaction from './transaction'
 import {validate, errors, ensureClassicAddress} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
-import {Connection} from '../client'
 import {Client} from '..'
 import { AccountTxRequest } from '../models/methods'
 
@@ -116,7 +115,7 @@ function formatPartialResponse(
 }
 
 function getAccountTx(
-  connection: Connection,
+  client: Client,
   address: string,
   options: TransactionsOptions,
   marker: string,
@@ -135,13 +134,13 @@ function getAccountTx(
     marker: marker
   }
 
-  return connection
+  return client
     .request(request)
     .then((response) => formatPartialResponse(address, options, response))
 }
 
 function checkForLedgerGaps(
-  connection: Connection,
+  client: Client,
   options: TransactionsOptions,
   transactions: GetTransactionsResponse
 ) {
@@ -159,7 +158,7 @@ function checkForLedgerGaps(
   }
 
   return utils
-    .hasCompleteLedgerRange(connection, minLedgerVersion, maxLedgerVersion)
+    .hasCompleteLedgerRange(client, minLedgerVersion, maxLedgerVersion)
     .then((hasCompleteLedgerRange) => {
       if (!hasCompleteLedgerRange) {
         throw new errors.MissingLedgerHistoryError()
@@ -168,25 +167,25 @@ function checkForLedgerGaps(
 }
 
 function formatResponse(
-  connection: Connection,
+  client: Client,
   options: TransactionsOptions,
   transactions: GetTransactionsResponse
 ) {
   const sortedTransactions = options.earliestFirst
     ? transactions.sort(utils.compareTransactions)
     : transactions.sort(utils.compareTransactions).reverse()
-  return checkForLedgerGaps(connection, options, sortedTransactions).then(
+  return checkForLedgerGaps(client, options, sortedTransactions).then(
     () => sortedTransactions
   )
 }
 
 function getTransactionsInternal(
-  connection: Connection,
+  client: Client,
   address: string,
   options: TransactionsOptions
 ): Promise<GetTransactionsResponse> {
-  const getter = _.partial(getAccountTx, connection, address, options)
-  const format = _.partial(formatResponse, connection, options)
+  const getter = _.partial(getAccountTx, client, address, options)
+  const format = _.partial(formatResponse, client, options)
   return utils.getRecursive(getter, options.limit).then(format)
 }
 
@@ -211,11 +210,11 @@ function getTransactions(
         ? {minLedgerVersion: ledgerVersion}
         : {maxLedgerVersion: ledgerVersion}
       const startOptions = Object.assign({}, defaults, options, {startTx: tx}, bound)
-      return getTransactionsInternal(this.connection, address, startOptions)
+      return getTransactionsInternal(this, address, startOptions)
     })
   }
   const newOptions = Object.assign({}, defaults, options)
-  return getTransactionsInternal(this.connection, address, newOptions)
+  return getTransactionsInternal(this, address, newOptions)
 }
 
 export default getTransactions

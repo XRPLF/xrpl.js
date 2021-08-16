@@ -1,7 +1,7 @@
-import requests from '../../fixtures/requests'
-import responses from '../../fixtures/responses'
-import {assertResultMatch, TestSuite} from '../../utils'
-const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
+// import requests from '../../fixtures/requests'
+// import responses from '../../fixtures/responses'
+import {TestSuite} from '../../utils'
+// const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
 export const config = {
   // TODO: The mock server right now returns a hard-coded string, no matter
@@ -16,50 +16,50 @@ export const config = {
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'preparePaymentChannelCreate': async (client, address) => {
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
-    }
-    const result = await client.preparePaymentChannelCreate(
-      address,
-      requests.preparePaymentChannelCreate.normal,
-      localInstructions
-    )
-    assertResultMatch(
-      result,
-      responses.preparePaymentChannelCreate.normal,
-      'prepare'
-    )
-  },
+  // 'preparePaymentChannelCreate': async (client, address) => {
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxFee: '0.000012'
+  //   }
+  //   const result = await client.preparePaymentChannelCreate(
+  //     address,
+  //     requests.preparePaymentChannelCreate.normal,
+  //     localInstructions
+  //   )
+  //   assertResultMatch(
+  //     result,
+  //     responses.preparePaymentChannelCreate.normal,
+  //     'prepare'
+  //   )
+  // },
 
-  'preparePaymentChannelCreate full': async (client, address) => {
-    const result = await client.preparePaymentChannelCreate(
-      address,
-      requests.preparePaymentChannelCreate.full
-    )
-    assertResultMatch(
-      result,
-      responses.preparePaymentChannelCreate.full,
-      'prepare'
-    )
-  },
+  // 'preparePaymentChannelCreate full': async (client, address) => {
+  //   const result = await client.preparePaymentChannelCreate(
+  //     address,
+  //     requests.preparePaymentChannelCreate.full
+  //   )
+  //   assertResultMatch(
+  //     result,
+  //     responses.preparePaymentChannelCreate.full,
+  //     'prepare'
+  //   )
+  // },
 
-  'preparePaymentChannelCreate with ticket': async (client, address) => {
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012',
-      ticketSequence: 23
-    }
-    const result = await client.preparePaymentChannelCreate(
-      address,
-      requests.preparePaymentChannelCreate.normal,
-      localInstructions
-    )
-    assertResultMatch(
-      result,
-      responses.preparePaymentChannelCreate.ticket,
-      'prepare'
-    )
-  }
+  // 'preparePaymentChannelCreate with ticket': async (client, address) => {
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxFee: '0.000012',
+  //     ticketSequence: 23
+  //   }
+  //   const result = await client.preparePaymentChannelCreate(
+  //     address,
+  //     requests.preparePaymentChannelCreate.normal,
+  //     localInstructions
+  //   )
+  //   assertResultMatch(
+  //     result,
+  //     responses.preparePaymentChannelCreate.ticket,
+  //     'prepare'
+  //   )
+  // }
 }

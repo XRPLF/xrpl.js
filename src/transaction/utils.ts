@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js'
+// import BigNumber from 'bignumber.js'
 import * as common from '../common'
 import {Memo} from '../common/types/objects'
 import {Instructions, Prepare, TransactionJSON} from './types'
@@ -56,9 +56,9 @@ function setCanonicalFlag(txJSON: TransactionJSON): void {
   txJSON.Flags = txJSON.Flags >>> 0
 }
 
-function scaleValue(value, multiplier, extra = 0) {
-  return new BigNumber(value).times(multiplier).plus(extra).toString()
-}
+// function scaleValue(value, multiplier, extra = 0) {
+//   return new BigNumber(value).times(multiplier).plus(extra).toString()
+// }
 
 /**
  * @typedef {Object} ClassicAccountAndTag
@@ -269,76 +269,78 @@ function prepareTransaction(
       instructions.maxLedgerVersionOffset != null
         ? instructions.maxLedgerVersionOffset
         : 3
-    return client.connection.getLedgerVersion().then((ledgerVersion) => {
+    return client.request({command: 'ledger', ledger_index: 'validated'}).then((response) => {
+      const ledgerVersion = response.result.ledger_index
       newTxJSON.LastLedgerSequence = ledgerVersion + offset
       return
     })
   }
 
-  function prepareFee(): Promise<void> {
-    // instructions.fee is scaled (for multi-signed transactions) while txJSON.Fee is not.
-    // Due to this difference, we do NOT allow both to be set, as the behavior would be complex and
-    // potentially ambiguous.
-    // Furthermore, txJSON.Fee is in drops while instructions.fee is in XRP, which would just add to
-    // the confusion. It is simpler to require that only one is used.
-    if (newTxJSON.Fee && instructions.fee) {
-      return Promise.reject(
-        new ValidationError(
-          '`Fee` in txJSON and `fee` in `instructions` cannot both be set'
-        )
-      )
-    }
-    if (newTxJSON.Fee) {
-      // txJSON.Fee is set. Use this value and do not scale it.
-      return Promise.resolve()
-    }
-    const multiplier =
-      instructions.signersCount == null
-        ? 1
-        : instructions.signersCount + 1
-    if (instructions.fee != null) {
-      const fee = new BigNumber(instructions.fee)
-      if (fee.isGreaterThan(client._maxFeeXRP)) {
-        return Promise.reject(
-          new ValidationError(
-            `Fee of ${fee.toString(10)} XRP exceeds ` +
-              `max of ${client._maxFeeXRP} XRP. To use this fee, increase ` +
-              '`maxFeeXRP` in the Client constructor.'
-          )
-        )
-      }
-      newTxJSON.Fee = scaleValue(
-        common.xrpToDrops(instructions.fee),
-        multiplier
-      )
-      return Promise.resolve()
-    }
-    const cushion = client._feeCushion
-    return client.getFee(cushion).then((fee) => {
-      return client.connection.getFeeRef().then((feeRef) => {
-        // feeRef is the reference transaction cost in "fee units"
-        const extraFee =
-          newTxJSON.TransactionType !== 'EscrowFinish' ||
-          newTxJSON.Fulfillment == null
-            ? 0
-            : cushion *
-              feeRef *
-              (32 +
-                Math.floor(
-                  Buffer.from(newTxJSON.Fulfillment, 'hex').length / 16
-                ))
-        const feeDrops = common.xrpToDrops(fee)
-        const maxFeeXRP = instructions.maxFee
-          ? BigNumber.min(client._maxFeeXRP, instructions.maxFee)
-          : client._maxFeeXRP
-        const maxFeeDrops = common.xrpToDrops(maxFeeXRP)
-        const normalFee = scaleValue(feeDrops, multiplier, extraFee)
-        newTxJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString(10)
+  // function prepareFee(): Promise<void> {
+  //   // instructions.fee is scaled (for multi-signed transactions) while txJSON.Fee is not.
+  //   // Due to this difference, we do NOT allow both to be set, as the behavior would be complex and
+  //   // potentially ambiguous.
+  //   // Furthermore, txJSON.Fee is in drops while instructions.fee is in XRP, which would just add to
+  //   // the confusion. It is simpler to require that only one is used.
+  //   if (newTxJSON.Fee && instructions.fee) {
+  //     return Promise.reject(
+  //       new ValidationError(
+  //         '`Fee` in txJSON and `fee` in `instructions` cannot both be set'
+  //       )
+  //     )
+  //   }
+  //   if (newTxJSON.Fee) {
+  //     // txJSON.Fee is set. Use this value and do not scale it.
+  //     return Promise.resolve()
+  //   }
+  //   const multiplier =
+  //     instructions.signersCount == null
+  //       ? 1
+  //       : instructions.signersCount + 1
+  //   if (instructions.fee != null) {
+  //     const fee = new BigNumber(instructions.fee)
+  //     if (fee.isGreaterThan(client._maxFeeXRP)) {
+  //       return Promise.reject(
+  //         new ValidationError(
+  //           `Fee of ${fee.toString(10)} XRP exceeds ` +
+  //             `max of ${client._maxFeeXRP} XRP. To use this fee, increase ` +
+  //             '`maxFeeXRP` in the Client constructor.'
+  //         )
+  //       )
+  //     }
+  //     newTxJSON.Fee = scaleValue(
+  //       common.xrpToDrops(instructions.fee),
+  //       multiplier
+  //     )
+  //     return Promise.resolve()
+  //   }
+  //   const cushion = client._feeCushion
 
-        return
-      })
-    })
-  }
+  //   return client.getFee(cushion).then((fee) => {
+  //     return client.connection.getFeeRef().then((feeRef) => {
+  //       // feeRef is the reference transaction cost in "fee units"
+  //       const extraFee =
+  //         newTxJSON.TransactionType !== 'EscrowFinish' ||
+  //         newTxJSON.Fulfillment == null
+  //           ? 0
+  //           : cushion *
+  //             feeRef *
+  //             (32 +
+  //               Math.floor(
+  //                 Buffer.from(newTxJSON.Fulfillment, 'hex').length / 16
+  //               ))
+  //       const feeDrops = common.xrpToDrops(fee)
+  //       const maxFeeXRP = instructions.maxFee
+  //         ? BigNumber.min(client._maxFeeXRP, instructions.maxFee)
+  //         : client._maxFeeXRP
+  //       const maxFeeDrops = common.xrpToDrops(maxFeeXRP)
+  //       const normalFee = scaleValue(feeDrops, multiplier, extraFee)
+  //       newTxJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString(10)
+
+  //       return
+  //     })
+  //   })
+  // }
 
   async function prepareSequence(): Promise<void> {
     if (instructions.sequence != null) {
@@ -384,7 +386,7 @@ function prepareTransaction(
 
   return Promise.all([
     prepareMaxLedgerVersion(),
-    prepareFee(),
+    // prepareFee(),
     prepareSequence()
   ]).then(() => formatPrepareResponse(newTxJSON))
 }
