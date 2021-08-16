@@ -3,9 +3,9 @@ import assert from 'assert-diff'
 import setupClient from './setup-client'
 import responses from './fixtures/responses'
 import ledgerClosed from './fixtures/rippled/ledger-close.json'
-import {XrplClient} from 'xrpl-client'
+import {Client} from 'xrpl-client'
 import {ignoreWebSocketDisconnect} from './utils'
-const schemaValidator = XrplClient._PRIVATE.schemaValidator
+const schemaValidator = Client._PRIVATE.schemaValidator
 
 const TIMEOUT = 20000
 
@@ -21,7 +21,7 @@ function checkResult(expected, schemaName, response) {
   return response
 }
 
-describe('XrplClientBroadcast', function () {
+describe('ClientBroadcast', function () {
   this.timeout(TIMEOUT)
   beforeEach(setupClient.setupBroadcast)
   afterEach(setupClient.teardown)

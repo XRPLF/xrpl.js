@@ -6,7 +6,7 @@
 
 import * as utils from './utils'
 import {validate} from '../common'
-import {XrplClient} from '..'
+import {Client} from '..'
 
 export interface FormattedSubmitResponse {
   resultCode: string
@@ -43,7 +43,7 @@ function formatSubmitResponse(response): FormattedSubmitResponse {
 
 // @deprecated Use client.request('submit', { tx_blob: signedTransaction }) instead
 async function submit(
-  this: XrplClient,
+  this: Client,
   signedTransaction: string,
   failHard?: boolean
 ): Promise<FormattedSubmitResponse> {

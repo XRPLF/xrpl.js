@@ -1,6 +1,6 @@
 import assert from 'assert-diff'
 import {TestSuite} from '../../utils'
-import {XrplClient} from '../../../src'
+import {Client} from '../../../src'
 
 /**
  * Every test suite exports their tests in the default object.
@@ -10,7 +10,7 @@ import {XrplClient} from '../../../src'
 export default <TestSuite>{
   'returns address for public key': async (client, address) => {
     assert.equal(
-      XrplClient.deriveXAddress({
+      Client.deriveXAddress({
         publicKey:
           '035332FBA71D705BD5D97014A833BE2BBB25BEFCD3506198E14AFEA241B98C2D06',
         tag: false,
@@ -19,7 +19,7 @@ export default <TestSuite>{
       'XVZVpQj8YSVpNyiwXYSqvQoQqgBttTxAZwMcuJd4xteQHyt'
     )
     assert.equal(
-      XrplClient.deriveXAddress({
+      Client.deriveXAddress({
         publicKey:
           '035332FBA71D705BD5D97014A833BE2BBB25BEFCD3506198E14AFEA241B98C2D06',
         tag: false,

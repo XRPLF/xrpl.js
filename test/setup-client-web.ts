@@ -1,11 +1,11 @@
-import {XrplClient, XrplClientBroadcast} from 'xrpl-client'
+import {Client, ClientBroadcast} from 'xrpl-client'
 import ledgerClosed from './fixtures/rippled/ledger-close.json'
 
 const port = 34371
 const baseUrl = 'ws://testripple.circleci.com:'
 
 function setup(this: any, port_ = port) {
-  const tclient = new XrplClient({server: baseUrl + port_})
+  const tclient = new Client({server: baseUrl + port_})
   return tclient
     .connect()
     .then(() => {
@@ -16,7 +16,7 @@ function setup(this: any, port_ = port) {
     })
     .then((got) => {
       return new Promise<void>((resolve, reject) => {
-        this.client = new XrplClient({server: baseUrl + got.port})
+        this.client = new Client({server: baseUrl + got.port})
         this.client
           .connect()
           .then(() => {
@@ -36,7 +36,7 @@ function setup(this: any, port_ = port) {
 
 function setupBroadcast(this: any) {
   const servers = [port, port + 1].map((port_) => baseUrl + port_)
-  this.client = new XrplClientBroadcast(servers)
+  this.client = new ClientBroadcast(servers)
   return new Promise<void>((resolve, reject) => {
     this.client
       .connect()

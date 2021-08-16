@@ -1,11 +1,11 @@
 import assert from 'assert-diff'
-import {XrplClient} from 'xrpl-client'
+import {Client} from 'xrpl-client'
 import binary from 'ripple-binary-codec'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
 import {TestSuite} from '../../utils'
 
-const {schemaValidator} = XrplClient._PRIVATE
+const {schemaValidator} = Client._PRIVATE
 const {sign: REQUEST_FIXTURES} = requests
 const {sign: RESPONSE_FIXTURES} = responses
 
@@ -348,7 +348,7 @@ export default <TestSuite>{
 
     assert.throws(() => {
       client.sign(request.txJSON, secret)
-    }, /Fee" should not exceed "2000000"\. To use a higher fee, set `maxFeeXRP` in the XrplClient constructor\./)
+    }, /Fee" should not exceed "2000000"\. To use a higher fee, set `maxFeeXRP` in the Client constructor\./)
   },
 
   'throws when Fee exceeds maxFeeXRP (in drops) - custom maxFeeXRP': async (
@@ -368,7 +368,7 @@ export default <TestSuite>{
 
     assert.throws(() => {
       client.sign(request.txJSON, secret)
-    }, /Fee" should not exceed "1900000"\. To use a higher fee, set `maxFeeXRP` in the XrplClient constructor\./)
+    }, /Fee" should not exceed "1900000"\. To use a higher fee, set `maxFeeXRP` in the Client constructor\./)
   },
 
   'permits fee exceeding 2000000 drops when maxFeeXRP is higher than 2 XRP': async (

@@ -236,7 +236,7 @@ export default <TestSuite>{
     }
   },
   'offline': async (client, address) => {
-    // const client = new XrplClient()
+    // const client = new Client()
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
 
     const settings = requests.prepareSettings.domain

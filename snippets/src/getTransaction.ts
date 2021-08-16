@@ -1,6 +1,6 @@
-import {XrplClient} from '../../dist/npm'
+import {Client} from '../../dist/npm'
 
-const client = new XrplClient({
+const client = new Client({
   server: 'wss://s.altnet.rippletest.net:51233'
 })
 

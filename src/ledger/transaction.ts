@@ -4,7 +4,7 @@ import {validate, errors} from '../common'
 import {Connection} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
 import {RippledError} from '../common/errors'
-import {XrplClient} from '..'
+import {Client} from '..'
 
 export type TransactionOptions = {
   minLedgerVersion?: number
@@ -121,7 +121,7 @@ function formatResponse(
 }
 
 async function getTransaction(
-  this: XrplClient,
+  this: Client,
   id: string,
   options: TransactionOptions = {}
 ): Promise<FormattedTransactionType> {

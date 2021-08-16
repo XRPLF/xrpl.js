@@ -1,6 +1,6 @@
 import assert from 'assert'
-import {XrplClient} from 'xrpl-client'
-const RangeSet = XrplClient._PRIVATE.RangeSet
+import {Client} from 'xrpl-client'
+const RangeSet = Client._PRIVATE.RangeSet
 
 describe('RangeSet', function () {
   it('addRange()/addValue()', function () {

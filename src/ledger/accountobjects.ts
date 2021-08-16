@@ -1,12 +1,12 @@
 import {removeUndefined} from '../common'
-import {XrplClient} from '..'
+import {Client} from '..'
 import {
   GetAccountObjectsOptions,
   AccountObjectsResponse
 } from '../common/types/commands/account_objects'
 
 export default async function getAccountObjects(
-  this: XrplClient,
+  this: Client,
   address: string,
   options: GetAccountObjectsOptions = {}
 ): Promise<AccountObjectsResponse> {

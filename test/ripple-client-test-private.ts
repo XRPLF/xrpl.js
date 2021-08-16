@@ -1,6 +1,6 @@
 import assert from 'assert-diff'
 import _ from 'lodash'
-import {XrplClient} from 'xrpl-client'
+import {Client} from 'xrpl-client'
 import {RecursiveData} from 'xrpl-client/ledger/utils'
 import {assertRejects, assertResultMatch} from './utils'
 import addresses from './fixtures/addresses.json'
@@ -8,38 +8,38 @@ import responses from './fixtures/responses'
 import ledgerClosed from './fixtures/rippled/ledger-close-newer.json'
 import setupClient from './setup-client'
 
-const {validate, schemaValidator, ledgerUtils} = XrplClient._PRIVATE
+const {validate, schemaValidator, ledgerUtils} = Client._PRIVATE
 const address = addresses.ACCOUNT
 assert.options.strict = true
 
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('XrplClient', function () {
+describe('Client', function () {
   this.timeout(TIMEOUT)
   beforeEach(setupClient.setup)
   afterEach(setupClient.teardown)
 
-  it('XrplClient - implicit server port', function () {
-    new XrplClient({server: 'wss://s1.ripple.com'})
+  it('Client - implicit server port', function () {
+    new Client({server: 'wss://s1.ripple.com'})
   })
 
-  it('XrplClient invalid options', function () {
+  it('Client invalid options', function () {
     // @ts-ignore - This is intentionally invalid
-    assert.throws(() => new XrplClient({invalid: true}))
+    assert.throws(() => new Client({invalid: true}))
   })
 
-  it('XrplClient valid options', function () {
-    const client = new XrplClient({server: 'wss://s:1'})
+  it('Client valid options', function () {
+    const client = new Client({server: 'wss://s:1'})
     const privateConnectionUrl = (client.connection as any)._url
     assert.deepEqual(privateConnectionUrl, 'wss://s:1')
   })
 
-  it('XrplClient invalid server uri', function () {
-    assert.throws(() => new XrplClient({server: 'wss//s:1'}))
+  it('Client invalid server uri', function () {
+    assert.throws(() => new Client({server: 'wss//s:1'}))
   })
 
-  xit('XrplClient connect() times out after 2 seconds', function () {
+  xit('Client connect() times out after 2 seconds', function () {
     // TODO: Use a timer mock like https://jestjs.io/docs/en/timer-mocks
     //       to test that connect() times out after 2 seconds.
   })

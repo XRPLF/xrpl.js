@@ -1,10 +1,10 @@
-import {XrplClient} from 'xrpl-client'
+import {Client} from 'xrpl-client'
 import assert from 'assert-diff'
 import {assertResultMatch, TestSuite, assertRejects} from '../../utils'
 import responses from '../../fixtures/responses'
 import hashes from '../../fixtures/hashes.json'
 import addresses from '../../fixtures/addresses.json'
-const utils = XrplClient._PRIVATE.ledgerUtils
+const utils = Client._PRIVATE.ledgerUtils
 const {getTransactions: RESPONSE_FIXTURES} = responses
 
 /**

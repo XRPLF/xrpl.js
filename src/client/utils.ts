@@ -1,7 +1,7 @@
 import * as common from '../common'
-import {XrplClient} from '..'
+import {Client} from '..'
 
-function getLedgerVersion(this: XrplClient): Promise<number> {
+function getLedgerVersion(this: Client): Promise<number> {
   return this.connection.getLedgerVersion()
 }
 
