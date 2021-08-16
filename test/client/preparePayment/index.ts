@@ -4,9 +4,9 @@ import requests from '../../fixtures/requests'
 import {ValidationError} from 'xrpl-client/common/errors'
 import binary from 'ripple-binary-codec'
 import assert from 'assert-diff'
-import {XrplClient} from 'xrpl-client'
+import {Client} from 'xrpl-client'
 
-const {schemaValidator} = XrplClient._PRIVATE
+const {schemaValidator} = Client._PRIVATE
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 const {preparePayment: REQUEST_FIXTURES} = requests
 const {preparePayment: RESPONSE_FIXTURES} = responses
@@ -226,7 +226,7 @@ export default <TestSuite>{
     return assertRejects(
       client.preparePayment(address, payment, {fee: '3'}),
       ValidationError,
-      'Fee of 3 XRP exceeds max of 2 XRP. To use this fee, increase `maxFeeXRP` in the XrplClient constructor.'
+      'Fee of 3 XRP exceeds max of 2 XRP. To use this fee, increase `maxFeeXRP` in the Client constructor.'
     )
   },
 
@@ -262,7 +262,7 @@ export default <TestSuite>{
     return assertRejects(
       client.preparePayment(address, REQUEST_FIXTURES.normal, localInstructions),
       ValidationError,
-      'Fee of 2.1 XRP exceeds max of 2 XRP. To use this fee, increase `maxFeeXRP` in the XrplClient constructor.'
+      'Fee of 2.1 XRP exceeds max of 2 XRP. To use this fee, increase `maxFeeXRP` in the Client constructor.'
     )
   },
 

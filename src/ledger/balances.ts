@@ -3,7 +3,7 @@ import {validate, ensureClassicAddress} from '../common'
 import {Connection} from '../client'
 import {GetTrustlinesOptions} from './trustlines'
 import {FormattedTrustline} from '../common/types/objects/trustlines'
-import {XrplClient} from '..'
+import {Client} from '..'
 
 export type Balance = {
   value: string
@@ -50,7 +50,7 @@ function getLedgerVersionHelper(
 }
 
 function getBalances(
-  this: XrplClient,
+  this: Client,
   address: string,
   options: GetTrustlinesOptions = {}
 ): Promise<GetBalances> {

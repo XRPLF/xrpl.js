@@ -2,16 +2,16 @@ import net from 'net'
 import _ from 'lodash'
 import fs from 'fs'
 import path from 'path'
-import {XrplClient} from 'xrpl-client'
+import {Client} from 'xrpl-client'
 import assert from 'assert-diff'
 
 /**
- * The test function. It takes a XrplClient object and then some other data to
+ * The test function. It takes a Client object and then some other data to
  * test (currently: an address). May be called multiple times with different
  * arguments, to test different types of data.
  */
 export type TestFn = (
-  client: XrplClient,
+  client: Client,
   address: string
 ) => void | PromiseLike<void>
 
@@ -108,11 +108,11 @@ export function getFreePort() {
   })
 }
 
-export function getAllPublicMethods(client: XrplClient) {
+export function getAllPublicMethods(client: Client) {
   return Array.from(
     new Set([
       ...Object.getOwnPropertyNames(client),
-      ...Object.getOwnPropertyNames(XrplClient.prototype)
+      ...Object.getOwnPropertyNames(Client.prototype)
     ])
   ).filter((key) => !key.startsWith('_'))
 }

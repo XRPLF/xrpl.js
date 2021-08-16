@@ -3,7 +3,7 @@ import {
   FormattedPaymentChannel
 } from './parse/payment-channel'
 import {validate, errors} from '../common'
-import {XrplClient} from '..'
+import {Client} from '..'
 import {LedgerEntryResponse} from '../models/methods'
 const NotFoundError = errors.NotFoundError
 
@@ -20,7 +20,7 @@ function formatResponse(
 }
 
 async function getPaymentChannel(
-  this: XrplClient,
+  this: Client,
   id: string
 ): Promise<FormattedPaymentChannel> {
   // 1. Validate

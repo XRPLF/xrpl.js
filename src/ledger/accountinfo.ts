@@ -2,7 +2,7 @@ import {
   validate,
   ensureClassicAddress
 } from '../common'
-import {XrplClient} from '..'
+import {Client} from '..'
 import { AccountInfoResponse } from '../models/methods'
 
 export type GetAccountInfoOptions = {
@@ -10,7 +10,7 @@ export type GetAccountInfoOptions = {
 }
 
 export default async function getAccountInfo(
-  this: XrplClient,
+  this: Client,
   address: string,
   options: GetAccountInfoOptions = {}
 ): Promise<AccountInfoResponse> {

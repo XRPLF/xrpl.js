@@ -3,7 +3,7 @@ const validate = utils.common.validate
 const ValidationError = utils.common.errors.ValidationError
 import {Instructions, Prepare, TransactionJSON} from './types'
 import {Memo} from '../common/types/objects'
-import {XrplClient} from '..'
+import {Client} from '..'
 
 export type EscrowExecution = {
   owner: string
@@ -44,7 +44,7 @@ function createEscrowExecutionTransaction(
 }
 
 function prepareEscrowExecution(
-  this: XrplClient,
+  this: Client,
   address: string,
   escrowExecution: EscrowExecution,
   instructions: Instructions = {}

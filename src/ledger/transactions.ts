@@ -7,7 +7,7 @@ import getTransaction from './transaction'
 import {validate, errors, ensureClassicAddress} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
 import {Connection} from '../client'
-import {XrplClient} from '..'
+import {Client} from '..'
 import { AccountTxRequest } from '../models/methods'
 
 export type TransactionsOptions = {
@@ -191,7 +191,7 @@ function getTransactionsInternal(
 }
 
 function getTransactions(
-  this: XrplClient,
+  this: Client,
   address: string,
   options: TransactionsOptions = {}
 ): Promise<GetTransactionsResponse> {

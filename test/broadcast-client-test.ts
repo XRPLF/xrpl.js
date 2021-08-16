@@ -16,7 +16,7 @@ function checkResult(expected, response) {
   return response
 }
 
-describe('XrplClientBroadcast', function () {
+describe('ClientBroadcast', function () {
   this.timeout(TIMEOUT)
   beforeEach(setupClient.setupBroadcast)
   afterEach(setupClient.teardown)

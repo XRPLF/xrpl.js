@@ -1,6 +1,6 @@
 import {validate} from '../common'
 import {FormattedLedger, parseLedger} from './parse/ledger'
-import {XrplClient} from '..'
+import {Client} from '..'
 
 export type GetLedgerOptions = {
   ledgerHash?: string
@@ -11,7 +11,7 @@ export type GetLedgerOptions = {
 }
 
 async function getLedger(
-  this: XrplClient,
+  this: Client,
   options: GetLedgerOptions = {}
 ): Promise<FormattedLedger> {
   // 1. Validate

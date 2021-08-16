@@ -2,7 +2,7 @@ import * as _ from 'lodash'
 import {validate} from '../common'
 import {Amount} from '../common/types/objects'
 import {ensureLedgerVersion} from './utils'
-import {XrplClient} from '..'
+import {Client} from '..'
 import { GatewayBalancesResponse } from '../models/methods'
 
 export type BalanceSheetOptions = {
@@ -49,7 +49,7 @@ function formatBalanceSheet(balanceSheet: GatewayBalancesResponse): GetBalanceSh
 }
 
 async function getBalanceSheet(
-  this: XrplClient,
+  this: Client,
   address: string,
   options: BalanceSheetOptions = {}
 ): Promise<GetBalanceSheet> {

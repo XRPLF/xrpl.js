@@ -1,6 +1,6 @@
 // import BigNumber from 'bignumber.js'
 // import assert from 'assert-diff'
-// import {XrplClient} from 'xrpl-client'
+// import {Client} from 'xrpl-client'
 // import requests from '../../fixtures/requests'
 // import responses from '../../fixtures/responses'
 import {TestSuite} from '../../utils'
@@ -81,7 +81,7 @@ export default <TestSuite>{
   //       ? reverseOfferResults.result.offers
   //       : []
   //     ).reduce((acc, res) => acc.concat(res), [])
-  //     const orderbook = XrplClient.formatBidsAndAsks(orderbookInfo, [
+  //     const orderbook = Client.formatBidsAndAsks(orderbookInfo, [
   //       ...directOffers,
   //       ...reverseOffers
   //     ])
@@ -124,7 +124,7 @@ export default <TestSuite>{
   //       ? reverseOfferResults.result.offers
   //       : []
   //     ).reduce((acc, res) => acc.concat(res), [])
-  //     const orderbook = XrplClient.formatBidsAndAsks(orderbookInfo, [
+  //     const orderbook = Client.formatBidsAndAsks(orderbookInfo, [
   //       ...directOffers,
   //       ...reverseOffers
   //     ])
@@ -170,7 +170,7 @@ export default <TestSuite>{
   //       ? reverseOfferResults.result.offers
   //       : []
   //     ).reduce((acc, res) => acc.concat(res), [])
-  //     const orderbook = XrplClient.formatBidsAndAsks(orderbookInfo, [
+  //     const orderbook = Client.formatBidsAndAsks(orderbookInfo, [
   //       ...directOffers,
   //       ...reverseOffers
   //     ])
@@ -214,7 +214,7 @@ export default <TestSuite>{
   //       ? reverseOfferResults.result.offers
   //       : []
   //     ).reduce((acc, res) => acc.concat(res), [])
-  //     const orderbook = XrplClient.formatBidsAndAsks(orderbookInfo, [
+  //     const orderbook = Client.formatBidsAndAsks(orderbookInfo, [
   //       ...directOffers,
   //       ...reverseOffers
   //     ])
@@ -261,7 +261,7 @@ export default <TestSuite>{
   //       ? reverseOfferResults.result.offers
   //       : []
   //     ).reduce((acc, res) => acc.concat(res), [])
-  //     const orderbook = XrplClient.formatBidsAndAsks(orderbookInfo, [
+  //     const orderbook = Client.formatBidsAndAsks(orderbookInfo, [
   //       ...directOffers,
   //       ...reverseOffers
   //     ])
@@ -316,7 +316,7 @@ export default <TestSuite>{
   //       ? reverseOfferResults.result.offers
   //       : []
   //     ).reduce((acc, res) => acc.concat(res), [])
-  //     const orderbook = XrplClient.formatBidsAndAsks(orderbookInfo, [
+  //     const orderbook = Client.formatBidsAndAsks(orderbookInfo, [
   //       ...directOffers,
   //       ...reverseOffers
   //     ])
@@ -370,7 +370,7 @@ export default <TestSuite>{
   //       ? reverseOfferResults.result.offers
   //       : []
   //     ).reduce((acc, res) => acc.concat(res), [])
-  //     const orderbook = XrplClient.formatBidsAndAsks(orderbookInfo, [
+  //     const orderbook = Client.formatBidsAndAsks(orderbookInfo, [
   //       ...directOffers,
   //       ...reverseOffers
   //     ])

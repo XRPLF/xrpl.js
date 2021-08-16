@@ -1,7 +1,7 @@
 import * as utils from './utils'
 import {validate, iso8601ToRippleTime, xrpToDrops} from '../common'
 import {Instructions, Prepare, TransactionJSON} from './types'
-import {XrplClient} from '..'
+import {Client} from '..'
 
 export type PaymentChannelFund = {
   channel: string
@@ -28,7 +28,7 @@ function createPaymentChannelFundTransaction(
 }
 
 function preparePaymentChannelFund(
-  this: XrplClient,
+  this: Client,
   address: string,
   paymentChannelFund: PaymentChannelFund,
   instructions: Instructions = {}

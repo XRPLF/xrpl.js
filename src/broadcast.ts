@@ -1,14 +1,14 @@
-import {XrplClient, ClientOptions} from './client'
+import {Client, ClientOptions} from './client'
 
-class XrplClientBroadcast extends XrplClient {
+class ClientBroadcast extends Client {
   ledgerVersion: number | undefined = undefined
-  private _clients: XrplClient[]
+  private _clients: Client[]
 
   constructor(servers, options: ClientOptions = {}) {
     super(options)
 
-    const clients: XrplClient[] = servers.map(
-      (server) => new XrplClient(Object.assign({}, options, {server}))
+    const clients: Client[] = servers.map(
+      (server) => new Client(Object.assign({}, options, {server}))
     )
 
     // exposed for testing
@@ -59,9 +59,9 @@ class XrplClientBroadcast extends XrplClient {
 
   getMethodNames() {
     const methodNames: string[] = []
-    const XrplClient = this._clients[0]
-    for (const name of Object.getOwnPropertyNames(XrplClient)) {
-      if (typeof XrplClient[name] === 'function') {
+    const Client = this._clients[0]
+    for (const name of Object.getOwnPropertyNames(Client)) {
+      if (typeof Client[name] === 'function') {
         methodNames.push(name)
       }
     }
@@ -69,4 +69,4 @@ class XrplClientBroadcast extends XrplClient {
   }
 }
 
-export {XrplClientBroadcast}
+export {ClientBroadcast}

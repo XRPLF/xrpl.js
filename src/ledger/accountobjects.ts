@@ -1,11 +1,11 @@
-import {XrplClient} from '..'
+import {Client} from '..'
 import {
   GetAccountObjectsOptions
 } from '../common/types/commands/account_objects'
 import {AccountObjectsResponse} from '../models/methods'
 
 export default async function getAccountObjects(
-  this: XrplClient,
+  this: Client,
   address: string,
   options: GetAccountObjectsOptions = {}
 ): Promise<AccountObjectsResponse> {

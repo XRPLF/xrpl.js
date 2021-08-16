@@ -4,7 +4,7 @@ import * as common from '../common'
 import {Connection} from '../client'
 import {FormattedTransactionType} from '../transaction/types'
 import {Issue} from '../common/types/objects'
-import {XrplClient} from '..'
+import {Client} from '..'
 import { AccountInfoRequest } from '../models/methods'
 
 export type RecursiveData = {
@@ -122,7 +122,7 @@ function isPendingLedgerVersion(
     .then((ledgerVersion) => ledgerVersion < (maxLedgerVersion || 0))
 }
 
-function ensureLedgerVersion(this: XrplClient, options: any): Promise<object> {
+function ensureLedgerVersion(this: Client, options: any): Promise<object> {
   if (
     Boolean(options) &&
     options.ledgerVersion != null &&

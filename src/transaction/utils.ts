@@ -3,7 +3,7 @@ import * as common from '../common'
 import {Memo} from '../common/types/objects'
 import {Instructions, Prepare, TransactionJSON} from './types'
 import {toRippledAmount} from '../common'
-import {XrplClient} from '..'
+import {Client} from '..'
 import {ValidationError} from '../common/errors'
 import {xAddressToClassicAddress, isValidXAddress} from 'ripple-address-codec'
 
@@ -110,7 +110,7 @@ function getClassicAccountAndTag(
 
 function prepareTransaction(
   txJSON: TransactionJSON,
-  client: XrplClient,
+  client: Client,
   instructions: Instructions
 ): Promise<Prepare> {
   common.validate.instructions(instructions)
@@ -303,7 +303,7 @@ function prepareTransaction(
           new ValidationError(
             `Fee of ${fee.toString(10)} XRP exceeds ` +
               `max of ${client._maxFeeXRP} XRP. To use this fee, increase ` +
-              '`maxFeeXRP` in the XrplClient constructor.'
+              '`maxFeeXRP` in the Client constructor.'
           )
         )
       }

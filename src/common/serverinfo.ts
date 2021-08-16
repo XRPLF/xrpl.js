@@ -1,15 +1,15 @@
 import _ from 'lodash'
 import BigNumber from 'bignumber.js'
-import {XrplClient} from '..'
+import {Client} from '..'
 import { ServerInfoResponse } from '../models/methods'
 
-function getServerInfo(this: XrplClient): Promise<ServerInfoResponse> {
+function getServerInfo(this: Client): Promise<ServerInfoResponse> {
   return this.request({command: 'server_info'})
 }
 
 // This is a public API that can be called directly.
 // This is not used by the `prepare*` methods. See `src/transaction/utils.ts`
-async function getFee(this: XrplClient, cushion?: number): Promise<string> {
+async function getFee(this: Client, cushion?: number): Promise<string> {
   if (cushion == null) {
     cushion = this._feeCushion
   }

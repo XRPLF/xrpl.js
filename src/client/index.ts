@@ -196,7 +196,7 @@ type MarkerResponse = AccountChannelsResponse
                     | AccountTxResponse
                     | LedgerDataResponse
 
-class XrplClient extends EventEmitter {
+class Client extends EventEmitter {
   _feeCushion: number
   _maxFeeXRP: string
 
@@ -460,7 +460,7 @@ class XrplClient extends EventEmitter {
 
   static deriveXAddress = deriveXAddress
 
-  // XrplClient.deriveClassicAddress (static) is a new name for client.deriveAddress
+  // Client.deriveClassicAddress (static) is a new name for client.deriveAddress
   static deriveClassicAddress = deriveAddress
 
   static formatBidsAndAsks = formatBidsAndAsks
@@ -531,7 +531,7 @@ class XrplClient extends EventEmitter {
 }
 
 export {
-  XrplClient,
+  Client,
   Connection
 }
 

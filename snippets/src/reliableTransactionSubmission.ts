@@ -1,5 +1,5 @@
 import {
-  XrplClient,
+  Client,
   AccountInfoResponse,
   LedgerClosedEvent
 } from '../../dist/npm'
@@ -68,7 +68,7 @@ async function reliableTransactionSubmissionExample() {
 async function performPayments(payments) {
   const finalResults = []
   const txFinalizedPromises = []
-  const client = new XrplClient({server: 'wss://s.altnet.rippletest.net:51233'})
+  const client = new Client({server: 'wss://s.altnet.rippletest.net:51233'})
   await client.connect()
 
   for (let i = 0; i < payments.length; i++) {

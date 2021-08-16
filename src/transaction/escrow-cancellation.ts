@@ -2,7 +2,7 @@ import * as utils from './utils'
 const validate = utils.common.validate
 import {Instructions, Prepare, TransactionJSON} from './types'
 import {Memo} from '../common/types/objects'
-import {XrplClient} from '..'
+import {Client} from '..'
 
 export type EscrowCancellation = {
   owner: string
@@ -30,7 +30,7 @@ function createEscrowCancellationTransaction(
 }
 
 function prepareEscrowCancellation(
-  this: XrplClient,
+  this: Client,
   address: string,
   escrowCancellation: EscrowCancellation,
   instructions: Instructions = {}

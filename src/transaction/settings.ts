@@ -11,7 +11,7 @@ import {
   TransactionJSON
 } from './types'
 import {FormattedSettings, WeightedSigner} from '../common/types/objects'
-import {XrplClient} from '..'
+import {Client} from '..'
 
 function setTransactionFlags(
   txJSON: TransactionJSON,
@@ -149,7 +149,7 @@ function createSettingsTransaction(
 }
 
 function prepareSettings(
-  this: XrplClient,
+  this: Client,
   address: string,
   settings: FormattedSettings,
   instructions: Instructions = {}

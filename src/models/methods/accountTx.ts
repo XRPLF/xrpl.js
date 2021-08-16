@@ -1,5 +1,5 @@
 import { LedgerIndex } from "../common";
-import { TransactionMetadata } from "../common/transaction";
+import Metadata from "../common/metadata";
 import { BaseRequest, BaseResponse } from "./baseMethod";
 
 export interface AccountTxRequest extends BaseRequest {
@@ -17,7 +17,7 @@ export interface AccountTxRequest extends BaseRequest {
 
 interface AccountTransaction {
   ledger_index: number
-  meta: string | TransactionMetadata
+  meta: string | Metadata
   tx?: any // TODO: replace when transaction objects are done
   tx_blob?: string
   validated: boolean

@@ -1,8 +1,8 @@
-import {XrplClient} from 'xrpl-client'
+import {Client} from 'xrpl-client'
 import {TestSuite} from '../../utils'
 import Wallet from '../../../src/Wallet'
 
-const {schemaValidator} = XrplClient._PRIVATE
+const {schemaValidator} = Client._PRIVATE
 const publicKey =
   '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
 const privateKey =

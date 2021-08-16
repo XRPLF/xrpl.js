@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
 import {validate} from '../common'
 import {FormattedAccountOrder, parseAccountOrder} from './parse/account-order'
-import {XrplClient} from '..'
+import {Client} from '..'
 import {AccountOffersResponse} from '../models/methods'
 
 export type GetOrdersOptions = {
@@ -24,7 +24,7 @@ function formatResponse(
 }
 
 export default async function getOrders(
-  this: XrplClient,
+  this: Client,
   address: string,
   options: GetOrdersOptions = {}
 ): Promise<FormattedAccountOrder[]> {
