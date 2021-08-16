@@ -6096,7 +6096,7 @@ var address = api.deriveAddress(public_key);
 
 `generateFaucetWallet(onTestnet = true)`
 
-Generates a random wallet with some amount of XRP (usually 1000 XRP).
+Calls the Testnet or Devnet faucet API in order to generate a new, random wallet with some amount of test XRP. This is for testing purposes only.
 
 ### Example
 

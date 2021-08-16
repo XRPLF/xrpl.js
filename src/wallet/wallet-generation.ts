@@ -4,7 +4,7 @@ import {RippleAPI} from '..'
 import {errors} from '../common'
 import {GeneratedAddress} from '../offline/generate-address'
 import {isValidAddress} from '../common/schema-validator'
-import { RippledError } from '../common/errors'
+import {RippledError} from '../common/errors'
 
 export interface FaucetWallet {
   account: GeneratedAddress
