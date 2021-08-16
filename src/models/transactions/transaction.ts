@@ -7,10 +7,8 @@ import { CheckCreate } from "./checkCreate";
 export type Transaction =
 //     AccountSet
 //   | AccountDelete
-//   | CheckCancel
-       CheckCash
-     | CheckCancel
-//   | CheckCash
+       CheckCancel
+     | CheckCash
      | CheckCreate
 //   | DepositPreauth
 //   | EscrowCancel
