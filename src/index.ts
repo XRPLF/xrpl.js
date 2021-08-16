@@ -1,8 +1,8 @@
-export {XrplClient} from './client'
+export {Client} from './client'
 
 export * from './transaction/types'
 
-export * from './common/types/objects/ledger'
+export * from './models'
 
 export * from './offline/utils'
 

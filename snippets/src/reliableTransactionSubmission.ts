@@ -1,7 +1,7 @@
 import {
   Client,
   AccountInfoResponse,
-  LedgerClosedEvent
+  LedgerStream
 } from '../../dist/npm'
 import https = require('https')
 
@@ -105,7 +105,7 @@ async function performPayments(payments) {
     console.log(`tx ${i} - tentative: ${result.resultCode}`)
 
     const txFinalizedPromise = new Promise<void>((resolve) => {
-      const ledgerClosedCallback = async (event: LedgerClosedEvent) => {
+      const ledgerClosedCallback = async (event: LedgerStream) => {
         let status
         try {
           status = await client.getTransaction(signed.id)
