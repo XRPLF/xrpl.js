@@ -32,29 +32,6 @@ describe('BroadcastClient', function () {
   //     })
   // })
 
-  // it('ledger', function (done) {
-  //   let gotLedger = 0
-  //   this.client.on('ledger', () => {
-  //     gotLedger++
-  //   })
-  //   const ledgerNext = {...ledgerClosed}
-  //   ledgerNext.ledger_index++
-
-  //   this.client._clients.forEach((client) =>
-  //     client.connection
-  //       .request({
-  //         command: 'echo',
-  //         data: ledgerNext
-  //       })
-  //       .catch(ignoreWebSocketDisconnect)
-  //   )
-
-  //   setTimeout(() => {
-  //     assert.strictEqual(gotLedger, 1)
-  //     done()
-  //   }, 1250)
-  // })
-
   // it('error propagation', function (done) {
   //   this.client.once('error', (type, info) => {
   //     assert.strictEqual(type, 'type')

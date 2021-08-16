@@ -3,9 +3,6 @@ import {
   errors,
 } from '../common'
 import { Connection, ConnectionUserOptions } from './connection'
-import {
-  formatLedgerClose
-} from '../client/utils'
 // import {sign} from '../transaction/sign'
 // import combine from '../transaction/combine'
 // import submit from '../transaction/submit'
@@ -70,8 +67,6 @@ import {
   // payment channel methods
   ChannelVerifyRequest,
   ChannelVerifyResponse,
-  // Subscribe methods/streams
-  LedgerStream,
   // server info methods
   FeeRequest,
   FeeResponse,
@@ -167,9 +162,6 @@ class Client extends EventEmitter {
     const serverURL = options.server
     if (serverURL != null) {
       this.connection = new Connection(serverURL, options)
-      this.connection.on('ledgerClosed', (message: LedgerStream) => {
-        this.emit('ledger', formatLedgerClose(message))
-      })
       this.connection.on('error', (errorCode, errorMessage, data) => {
         this.emit('error', errorCode, errorMessage, data)
       })

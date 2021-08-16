@@ -46,16 +46,6 @@ class BroadcastClient extends Client {
     })
   }
 
-  onLedgerEvent(ledger) {
-    if (
-      ledger.ledgerVersion > this.ledgerVersion ||
-      this.ledgerVersion == null
-    ) {
-      this.ledgerVersion = ledger.ledgerVersion
-      this.emit('ledger', ledger)
-    }
-  }
-
   getMethodNames() {
     const methodNames: string[] = []
     const Client = this._clients[0]
