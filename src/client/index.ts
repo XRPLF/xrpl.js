@@ -45,7 +45,6 @@ import combine from '../transaction/combine'
 import submit from '../transaction/submit'
 import {deriveAddress, deriveXAddress} from '../offline/derive'
 import computeLedgerHash from '../offline/ledgerhash'
-import verifyPaymentChannelClaim from '../offline/verify-payment-channel-claim'
 import getLedger from '../ledger/ledger'
 import {
   Request,
@@ -460,7 +459,6 @@ class Client extends EventEmitter {
   combine = combine
 
   submit = submit // @deprecated Use client.request({command: 'submit', tx_blob: signedTransaction }) instead
-  verifyPaymentChannelClaim = verifyPaymentChannelClaim // @deprecated Invoke from top-level package instead
 
   generateFaucetWallet = generateFaucetWallet
 
