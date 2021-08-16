@@ -1,4 +1,4 @@
-import assert from 'assert-diff'
+// import assert from 'assert-diff'
 import {TestSuite} from '../../utils'
 
 /**
@@ -7,17 +7,17 @@ import {TestSuite} from '../../utils'
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'returns true when there is another page': async (client, address) => {
-    const response = await client.request({command: 'ledger_data'})
-    assert(client.hasNextPage(response))
-  },
+  // 'returns true when there is another page': async (client, address) => {
+  //   const response = await client.request({command: 'ledger_data'})
+  //   assert(client.hasNextPage(response))
+  // },
 
-  'returns false when there are no more pages': async (client, address) => {
-    const response = await client.request({command: 'ledger_data'})
-    const responseNextPage = await client.requestNextPage(
-      {command: 'ledger_data'},
-      response
-    )
-    assert(!client.hasNextPage(responseNextPage))
-  }
+  // 'returns false when there are no more pages': async (client, address) => {
+  //   const response = await client.request({command: 'ledger_data'})
+  //   const responseNextPage = await client.requestNextPage(
+  //     {command: 'ledger_data'},
+  //     response
+  //   )
+  //   assert(!client.hasNextPage(responseNextPage))
+  // }
 }

@@ -1,4 +1,4 @@
-import assert from 'assert-diff'
+// import assert from 'assert-diff'
 import {TestSuite} from '../../utils'
 
 /**
@@ -7,9 +7,9 @@ import {TestSuite} from '../../utils'
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'disconnect & isConnected': async (client, address) => {
-    assert.strictEqual(client.isConnected(), true)
-    await client.disconnect()
-    assert.strictEqual(client.isConnected(), false)
-  }
+  // 'disconnect & isConnected': async (client, address) => {
+  //   assert.strictEqual(client.isConnected(), true)
+  //   await client.disconnect()
+  //   assert.strictEqual(client.isConnected(), false)
+  // }
 }

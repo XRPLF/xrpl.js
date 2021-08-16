@@ -2,11 +2,10 @@ import assert from 'assert-diff'
 import _ from 'lodash'
 import {Client} from 'xrpl-local'
 import {RecursiveData} from 'xrpl-local/ledger/utils'
-import {assertRejects, assertResultMatch} from './utils'
+import {assertRejects} from './utils'
 // import addresses from './fixtures/addresses.json'
-import responses from './fixtures/responses'
-import ledgerClosed from './fixtures/rippled/ledger-close-newer.json'
-import setupClient from './setup-client'
+// import responses from './fixtures/responses'
+// import setupClient from './setup-client'
 // import * as schemaValidator from '../src/common/schema-validator'
 // import {validate} from '../src/common'
 import * as ledgerUtils from '../src/ledger/utils'
@@ -19,8 +18,8 @@ const TIMEOUT = 20000
 
 describe('Client', function () {
   this.timeout(TIMEOUT)
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  // beforeEach(setupClient.setup)
+  // afterEach(setupClient.teardown)
 
   it('Client - implicit server port', function () {
     new Client({server: 'wss://s1.ripple.com'})
@@ -44,14 +43,6 @@ describe('Client', function () {
   xit('Client connect() times out after 2 seconds', function () {
     // TODO: Use a timer mock like https://jestjs.io/docs/en/timer-mocks
     //       to test that connect() times out after 2 seconds.
-  })
-
-  it('ledger closed event', function (done) {
-    this.client.on('ledger', (message) => {
-      assertResultMatch(message, responses.ledgerEvent, 'ledgerEvent')
-      done()
-    })
-    this.client.connection._ws.emit('message', JSON.stringify(ledgerClosed))
   })
 
   it('common utils - toRippledAmount', async () => {
