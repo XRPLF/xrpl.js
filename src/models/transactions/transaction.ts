@@ -1,6 +1,7 @@
 import Metadata from "../common/metadata";
 import { OfferCreate } from "./offerCreate";
 import { CheckCash } from "./checkCash";
+import { CheckCancel } from "./checkCancel";
 import { CheckCreate } from "./checkCreate";
 
 export type Transaction =
@@ -8,6 +9,8 @@ export type Transaction =
 //   | AccountDelete
 //   | CheckCancel
        CheckCash
+     | CheckCancel
+//   | CheckCash
      | CheckCreate
 //   | DepositPreauth
 //   | EscrowCancel
