@@ -1,7 +1,7 @@
-import { deriveKeypair, deriveAddress, deriveXAddress } from './derive'
-import computeLedgerHeaderHash from './ledgerhash'
-import signPaymentChannelClaim from './sign-payment-channel-claim'
-import verifyPaymentChannelClaim from './verify-payment-channel-claim'
+import { deriveKeypair, deriveAddress, deriveXAddress } from '../offline/derive'
+import computeLedgerHeaderHash from '../offline/ledgerhash'
+import signPaymentChannelClaim from '../offline/sign-payment-channel-claim'
+import verifyPaymentChannelClaim from '../offline/verify-payment-channel-claim'
 import { dropsToXrp,
     xrpToDrops,
     toRippledAmount,

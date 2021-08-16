@@ -1,7 +1,7 @@
 import assert from 'assert-diff'
 import BigNumber from 'bignumber.js'
 import {TestSuite} from '../../utils'
-import {xrpToDrops} from '../../../src/offline/utils'
+import {xrpToDrops} from '../../../src/utils/utils'
 
 /**
  * Every test suite exports their tests in the default object.
