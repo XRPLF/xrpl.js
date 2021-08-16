@@ -1,6 +1,7 @@
 import Metadata from "../common/metadata";
 import { OfferCreate } from "./offerCreate";
 import { CheckCreate } from "./checkCreate";
+import { PaymentChannelCreate } from "./paymentChannelCreate"
 
 
 export type Transaction =
@@ -14,10 +15,10 @@ export type Transaction =
 //   | EscrowCreate
 //   | EscrowFinish
 //   | OfferCancel
-    |  OfferCreate
+     |  OfferCreate
 //   | PaymentTransaction
 //   | PaymentChannelClaim
-//   | PaymentChannelCreate
+     | PaymentChannelCreate
 //   | PaymentChannelFund
 //   | SetRegularKey
 //   | SignerListSet
