@@ -1,0 +1,19 @@
+## generateFaucetWallet
+
+`generateFaucetWallet(onTestnet = true)`
+
+Generates a random wallet with some amount of XRP (usually 1000 XRP).
+
+### Example
+
+**Request**
+
+Create a new wallet on the Tesnet:
+
+```
+const wallet = await api.generateFaucetWallet()
+```
+
+**Response**
+
+<%- renderFixture('responses/generate-faucet-wallet.json') %>
