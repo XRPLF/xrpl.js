@@ -1,4 +1,5 @@
 import assert from 'assert-diff'
+import { deriveKeypair } from 'ripple-keypairs/dist'
 import {TestSuite} from '../../utils'
 
 /**
@@ -7,8 +8,8 @@ import {TestSuite} from '../../utils'
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'returns keypair for secret': async (client, address) => {
-    var keypair = client.deriveKeypair('snsakdSrZSLkYpCXxfRkS4Sh96PMK')
+  'returns keypair for secret': async (api, address) => {
+    var keypair = deriveKeypair('snsakdSrZSLkYpCXxfRkS4Sh96PMK')
     assert.equal(
       keypair.privateKey,
       '008850736302221AFD59FF9CA1A29D4975F491D726249302EE48A3078A8934D335'
@@ -19,8 +20,8 @@ export default <TestSuite>{
     )
   },
 
-  'returns keypair for ed25519 secret': async (client, address) => {
-    var keypair = client.deriveKeypair('sEdV9eHWbibBnTj7b1H5kHfPfv7gudx')
+  'returns keypair for ed25519 secret': async (api, address) => {
+    var keypair = deriveKeypair('sEdV9eHWbibBnTj7b1H5kHfPfv7gudx')
     assert.equal(
       keypair.privateKey,
       'ED5C2EF6C2E3200DFA6B72F47935C7F64D35453646EA34919192538F458C7BC30F'
@@ -33,7 +34,7 @@ export default <TestSuite>{
 
   'throws with an invalid secret': async (client, address) => {
     assert.throws(() => {
-      client.deriveKeypair('...')
+      deriveKeypair('...')
     }, /^Error: Non-base58 character$/)
   }
 }
