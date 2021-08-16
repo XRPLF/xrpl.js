@@ -2,7 +2,7 @@ import {RippledError, ValidationError} from 'xrpl-local/common/errors'
 // import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
 import {assertRejects, assertResultMatch, TestSuite} from '../../utils'
-import {xrpToDrops, iso8601ToRippleTime} from '../../../src/offline/utils'
+import {xrpToDrops, iso8601ToRippleTime} from '../../../src/utils/utils'
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
 export const config = {
