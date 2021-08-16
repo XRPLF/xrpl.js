@@ -23,6 +23,10 @@ describe('OfferCancel Transaction Verification', function () {
         } as any
         
         assert.doesNotThrow(() => verifyOfferCancel(offer))
+        
+    })
+
+    it (`verifies valid OfferCancel with flags`, () => {
 
         const offer2 = {
             Account: "rnfQBGzgJb2x26U2Tfe1GaYw4fNB87Dc6J",
