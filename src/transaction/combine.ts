@@ -1,4 +1,4 @@
-import * as _ from 'lodash'
+import _ from 'lodash'
 import binary from 'ripple-binary-codec'
 import BigNumber from 'bignumber.js'
 import {ValidationError} from '../common/errors'
