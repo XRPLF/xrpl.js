@@ -1,7 +1,7 @@
 import { ValidationError } from "../../common/errors";
-import { CommonFields, verifyCommonFields } from "./common";
+import { BaseTransaction, verifyBaseTransaction } from "./common";
 
-export interface EscrowCancel extends CommonFields {
+export interface EscrowCancel extends BaseTransaction {
     TransactionType: "EscrowCancel"
     Owner: string;
     OfferSequence: number;
@@ -15,7 +15,7 @@ export interface EscrowCancel extends CommonFields {
  * @throws - When the EscrowCancel is Malformed.
  */
  export function verifyEscrowCancel(tx: EscrowCancel): void {
-    verifyCommonFields(tx)
+    verifyBaseTransaction(tx)
 
     if (tx.Owner === undefined)
         throw new ValidationError('EscrowCancel: missing Owner')

@@ -1,16 +1,16 @@
-import { Metadata } from "../common/metadata";
+import Metadata from "../common/metadata";
+import { CheckCreate } from "./checkCreate";
+import { EscrowCancel } from './escrowCancel';
 import { OfferCreate } from "./offerCreate";
-import { EscrowCancel } from './escrowCancel'
-
 
 export type Transaction =
 //     AccountSet
 //   | AccountDelete
 //   | CheckCancel
 //   | CheckCash
-//   | CheckCreate
+       CheckCreate
 //   | DepositPreauth
-        EscrowCancel
+     | EscrowCancel
 //   | EscrowCreate
 //   | EscrowFinish
 //   | OfferCancel
