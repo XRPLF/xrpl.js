@@ -26,10 +26,16 @@ export interface CheckCash extends BaseTransaction {
             && typeof obj.currency === 'string'
     }
 
-    if (tx.Amount !== undefined && typeof tx.Amount !== 'string' && !isIssuedCurrency(tx.Amount))
+    if (tx.hasOwnProperty('Amount') && tx.hasOwnProperty('DeliverMin'))
+        throw new ValidationError("CheckCash: cannot have both Amount and DeliverMin")
+    
+    if (!tx.hasOwnProperty('Amount') && !tx.hasOwnProperty('DeliverMin'))
+        throw new ValidationError("CheckCash: must have either Amount or DeliverMin")
+
+    if (tx.hasOwnProperty('Amount') && tx.Amount !== undefined && typeof tx.Amount !== 'string' && !isIssuedCurrency(tx.Amount))
         throw new ValidationError("CheckCash: invalid Amount")
 
-    if (tx.DeliverMin !== undefined && typeof tx.DeliverMin !== 'string' && !isIssuedCurrency(tx.DeliverMin))
+    if (tx.hasOwnProperty('DeliverMin') && tx.DeliverMin !== undefined && typeof tx.DeliverMin !== 'string' && !isIssuedCurrency(tx.DeliverMin))
         throw new ValidationError("CheckCash: invalid DeliverMin")
 
     if (tx.CheckID !== undefined && typeof tx.CheckID !== 'string')
