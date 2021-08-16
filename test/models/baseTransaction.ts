@@ -1,4 +1,4 @@
-import { ValidationError } from 'ripple-api/common/errors'
+import { ValidationError } from 'xrpl-client/common/errors'
 import { verifyBaseTransaction } from './../../src/models/transactions/common'
 import { assert } from 'chai'
 
