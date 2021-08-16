@@ -1,6 +1,7 @@
 import assert from 'assert-diff'
 import {assertResultMatch, TestSuite} from '../../utils'
 import responses from '../../fixtures/responses'
+import { computeLedgerHeaderHash } from '../../../src'
 const {getLedger: RESPONSE_FIXTURES} = responses
 
 /**
@@ -82,7 +83,7 @@ export default <TestSuite>{
       ...response,
       parentCloseTime: response.closeTime
     }
-    const hash = client.computeLedgerHash(ledger, {computeTreeHashes: true})
+    const hash = computeLedgerHeaderHash(ledger, {computeTreeHashes: true})
     assert.strictEqual(
       hash,
       'E6DB7365949BF9814D76BCC730B01818EB9136A89DB224F3F9F5AAE4569D758E'

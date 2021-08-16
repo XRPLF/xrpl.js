@@ -461,8 +461,6 @@ class Client extends EventEmitter {
   combine = combine
 
   submit = submit // @deprecated Use client.request({command: 'submit', tx_blob: signedTransaction }) instead
-
-  computeLedgerHash = computeLedgerHash // @deprecated Invoke from top-level package instead
   signPaymentChannelClaim = signPaymentChannelClaim // @deprecated Invoke from top-level package instead
   verifyPaymentChannelClaim = verifyPaymentChannelClaim // @deprecated Invoke from top-level package instead
 

@@ -1,4 +1,5 @@
 import assert from 'assert-diff'
+import { computeLedgerHeaderHash } from '../../../src'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
 import {assertResultMatch, TestSuite} from '../../utils'
@@ -29,7 +30,7 @@ export default <TestSuite>{
     ledger.parentCloseTime = ledger.closeTime
     let hash
     try {
-      hash = client.computeLedgerHash(ledger, {computeTreeHashes: true})
+      hash = computeLedgerHeaderHash(ledger, {computeTreeHashes: true})
     } catch (error) {
       assert(error instanceof client.errors.ValidationError)
       assert.strictEqual(
@@ -72,7 +73,7 @@ export default <TestSuite>{
     ledger.parentCloseTime = ledger.closeTime
     let hash
     try {
-      hash = client.computeLedgerHash(ledger, {computeTreeHashes: true})
+      hash = computeLedgerHeaderHash(ledger, {computeTreeHashes: true})
     } catch (error) {
       assert(error instanceof client.errors.ValidationError)
       assert.strictEqual(
@@ -104,7 +105,7 @@ export default <TestSuite>{
       '{"Account":"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV","Amount":"10000000000","Destination":"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj","Fee":"10","Flags":0,"Sequence":62,"SigningPubKey":"034AADB09CFF4A4804073701EC53C3510CDC95917C2BB0150FB742D0C66E6CEE9E","TransactionType":"Payment","TxnSignature":"3045022022EB32AECEF7C644C891C19F87966DF9C62B1F34BABA6BE774325E4BB8E2DD62022100A51437898C28C2B297112DF8131F2BB39EA5FE613487DDD611525F1796264639","hash":"3B1A4E1C9BB6A7208EB146BCDB86ECEA6068ED01466D933528CA2B4C64F753EF","meta":{"AffectedNodes":[{"CreatedNode":{"LedgerEntryType":"AccountRoot","LedgerIndex":"4C6ACBD635B0F07101F7FA25871B0925F8836155462152172755845CE691C49E","NewFields":{"Account":"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj","Balance":"10000000000","Sequence":1}}},{"ModifiedNode":{"FinalFields":{"Account":"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV","Balance":"981481999380","Flags":0,"OwnerCount":0,"Sequence":63},"LedgerEntryType":"AccountRoot","LedgerIndex":"B33FDD5CF3445E1A7F2BE9B06336BEBD73A5E3EE885D3EF93F7E3E2992E46F1A","PreviousFields":{"Balance":"991481999390","Sequence":62},"PreviousTxnID":"2485FDC606352F1B0785DA5DE96FB9DBAF43EB60ECBB01B7F6FA970F512CDA5F","PreviousTxnLgrSeq":31317}}],"TransactionIndex":0,"TransactionResult":"tesSUCCESS"},"ledger_index":38129}'
     )
     ledger.parentCloseTime = ledger.closeTime
-    const computeLedgerHash = client.computeLedgerHash
+    const computeLedgerHash = computeLedgerHeaderHash
     const ValidationError = client.errors.ValidationError
     function testCompute(ledger, expectedError) {
       let hash = computeLedgerHash(ledger)
@@ -151,13 +152,13 @@ export default <TestSuite>{
         'D9ABF622DA26EEEE48203085D4BC23B0F77DC6F8724AC33D975DA3CA492D2E44'
     }
     assert.throws(() => {
-      client.computeLedgerHash(newLedger)
+      computeLedgerHeaderHash(newLedger)
     }, /does not match computed hash of state/)
   },
 
   'computeLedgerHash': async (client, address) => {
     const header = REQUEST_FIXTURES.header
-    const ledgerHash = client.computeLedgerHash(header)
+    const ledgerHash = computeLedgerHeaderHash(header)
     assert.strictEqual(
       ledgerHash,
       'F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349'
@@ -170,7 +171,7 @@ export default <TestSuite>{
       transactionHash: undefined,
       rawTransactions: JSON.stringify(REQUEST_FIXTURES.transactions)
     }
-    const ledgerHash = client.computeLedgerHash(header)
+    const ledgerHash = computeLedgerHeaderHash(header)
     assert.strictEqual(
       ledgerHash,
       'F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349'
@@ -183,6 +184,6 @@ export default <TestSuite>{
         '325EACC5271322539EEEC2D6A5292471EF1B3E72AE7180533EFC3B8F0AD435C9'
     })
     header.rawTransactions = JSON.stringify(REQUEST_FIXTURES.transactions)
-    assert.throws(() => client.computeLedgerHash(header))
+    assert.throws(() => computeLedgerHeaderHash(header))
   }
 }
