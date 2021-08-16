@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 import * as utils from './utils'
 import {Prepare, TransactionJSON, Instructions} from './types'
 import {Client} from '..'

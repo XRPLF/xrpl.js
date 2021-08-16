@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 import binary from 'ripple-binary-codec'
 import {computeTransactionHash} from '../common/hashes'
 import * as utils from './utils'

@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 import {validate} from '../common'
 import {FormattedAccountOrder, parseAccountOrder} from './parse/account-order'
 import {Client} from '..'

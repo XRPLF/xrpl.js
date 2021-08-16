@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 import * as assert from 'assert'
 import * as utils from './utils'
 import {txFlags, removeUndefined} from '../../common'

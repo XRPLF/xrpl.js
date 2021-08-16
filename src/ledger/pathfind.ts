@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 import BigNumber from 'bignumber.js'
 import {getXRPBalance, renameCounterpartyToIssuer} from './utils'
 import {

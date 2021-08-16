@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 import {EventEmitter} from 'events'
 import {parse as parseURL} from 'url'
 import WebSocket from 'ws'

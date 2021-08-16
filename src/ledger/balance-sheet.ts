@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 import {validate} from '../common'
 import {Amount} from '../common/types/objects'
 import {ensureLedgerVersion} from './utils'

@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 import * as utils from './utils'
 const validate = utils.common.validate
 const paymentFlags = utils.common.txFlags.Payment

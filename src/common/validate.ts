@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 import {ValidationError} from './errors'
 import {schemaValidate} from './schema-validator'
 
