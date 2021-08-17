@@ -4,7 +4,7 @@ import * as common from '../common'
 import {Connection} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
 import {Issue} from '../common/types/objects'
-import {RippleAPI} from '..'
+import {Client} from '..'
 
 export type RecursiveData = {
   marker: string
@@ -121,7 +121,7 @@ function isPendingLedgerVersion(
     .then((ledgerVersion) => ledgerVersion < (maxLedgerVersion || 0))
 }
 
-function ensureLedgerVersion(this: RippleAPI, options: any): Promise<object> {
+function ensureLedgerVersion(this: Client, options: any): Promise<object> {
   if (
     Boolean(options) &&
     options.ledgerVersion != null &&

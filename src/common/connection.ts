@@ -489,7 +489,7 @@ export class Connection extends EventEmitter {
         new ConnectionError(
           `Error: connect() timed out after ${this._config.connectionTimeout} ms. ` +
             `If your internet connection is working, the rippled server may be blocked or inaccessible. ` +
-            `You can also try setting the 'connectionTimeout' option in the RippleAPI constructor.`
+            `You can also try setting the 'connectionTimeout' option in the Client constructor.`
         )
       )
     }, this._config.connectionTimeout)

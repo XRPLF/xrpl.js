@@ -7,7 +7,7 @@ import {
 import {validate} from '../common'
 import {Issue} from '../common/types/objects'
 import {BookOffer} from '../common/types/commands'
-import {RippleAPI} from '..'
+import {Client} from '..'
 import BigNumber from 'bignumber.js'
 
 export type FormattedOrderbook = {
@@ -71,7 +71,7 @@ export function formatBidsAndAsks(
 // account is to specify a "perspective", which affects which unfunded offers
 // are returned
 async function makeRequest(
-  api: RippleAPI,
+  client: Client,
   taker: string,
   options: GetOrderbookOptions,
   takerGets: Issue,
@@ -81,7 +81,7 @@ async function makeRequest(
     taker_gets: takerGets,
     taker_pays: takerPays
   })
-  return api._requestAll('book_offers', {
+  return client._requestAll('book_offers', {
     taker_gets: orderData.taker_gets,
     taker_pays: orderData.taker_pays,
     ledger_index: options.ledgerVersion || 'validated',
@@ -101,7 +101,7 @@ export type OrderbookInfo = {
 }
 
 export async function getOrderbook(
-  this: RippleAPI,
+  this: Client,
   address: string,
   orderbook: OrderbookInfo,
   options: GetOrderbookOptions = {}
