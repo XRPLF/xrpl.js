@@ -1,5 +1,5 @@
 import { ValidationError } from "../../common/errors"
-import { Memo, Signer } from "../common"
+import { Amount, Memo, Signer, IssuedCurrencyAmount } from "../common"
 import { onlyHasFields } from "../utils"
 
 const transactionTypes = [
@@ -46,6 +46,17 @@ const isSigner = (signer: Signer): boolean => {
         && typeof signer.Account === 'string'
         && typeof signer.TxnSignature === 'string'
         && typeof signer.SigningPubKey === 'string'
+}
+
+export function isIssuedCurrency (obj: IssuedCurrencyAmount): boolean {
+    return Object.keys(obj).length === 3 
+        && typeof obj.value === 'string'
+        && typeof obj.issuer === 'string'
+        && typeof obj.currency === 'string'
+}
+
+export function isAmount(amount: Amount): boolean {
+    return typeof amount === 'string' || isIssuedCurrency(amount);
 }
 
 export interface GlobalFlags {

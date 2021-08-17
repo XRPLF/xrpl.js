@@ -1,4 +1,4 @@
-import { ValidationError } from 'ripple-api/common/errors'
+import { ValidationError } from 'xrpl-local/common/errors'
 import { verifyAccountSet } from './../../src/models/transactions/accountSet'
 import { assert } from 'chai'
 
@@ -9,8 +9,10 @@ import { assert } from 'chai'
  */
 describe('AccountSet Transaction Verification', function () {
 
-    it (`verifies valid AccountSet`, () => {
-        const account = {
+    let account 
+
+    beforeEach(() => {
+        account = {
             TransactionType : "AccountSet",
             Account : "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
             Fee : "12",
@@ -19,140 +21,87 @@ describe('AccountSet Transaction Verification', function () {
             SetFlag : 5,
             MessageKey : "03AB40A0490F9B7ED8DF29D246BF2D6269820A0EE7742ACDD457BEA7C7D0931EDB"
         } as any
-            
+    })
+
+    it (`verifies valid AccountSet`, () => {
         assert.doesNotThrow(() => verifyAccountSet(account))
     })
 
     it (`throws w/ invalid SetFlag (out of range)`, () => {
-        const offer = {
-            TransactionType : "AccountSet",
-            Account : "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            Fee : "12",
-            Sequence : 5,
-            Domain : "6578616D706C652E636F6D",
-            SetFlag : 12,
-            MessageKey : "03AB40A0490F9B7ED8DF29D246BF2D6269820A0EE7742ACDD457BEA7C7D0931EDB"
-        } as any
+        account.SetFlag = 12
 
         assert.throws(
-            () => verifyAccountSet(offer),
+            () => verifyAccountSet(account),
             ValidationError,
             "AccountSet: invalid SetFlag"
         )
     })
 
     it (`throws w/ invalid SetFlag (incorrect type)`, () => {
-        const offer = {
-            TransactionType : "AccountSet",
-            Account : "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            Fee : "12",
-            Sequence : 5,
-            Domain : "6578616D706C652E636F6D",
-            SetFlag : 'abc',
-            MessageKey : "03AB40A0490F9B7ED8DF29D246BF2D6269820A0EE7742ACDD457BEA7C7D0931EDB"
-        } as any
-
+        account.SetFlag = 'abc'
+        
         assert.throws(
-            () => verifyAccountSet(offer),
+            () => verifyAccountSet(account),
             ValidationError,
             "AccountSet: invalid SetFlag"
         )
     })
 
     it (`throws w/ invalid ClearFlag`, () => {
-        const offer = {
-            TransactionType : "AccountSet",
-            Account : "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            Fee : "12",
-            Sequence : 5,
-            Domain : "6578616D706C652E636F6D",
-            ClearFlag : 12,
-            MessageKey : "03AB40A0490F9B7ED8DF29D246BF2D6269820A0EE7742ACDD457BEA7C7D0931EDB"
-        } as any
+        account.ClearFlag = 12
 
         assert.throws(
-            () => verifyAccountSet(offer),
+            () => verifyAccountSet(account),
             ValidationError,
             "AccountSet: invalid ClearFlag"
         )
     })
 
     it (`throws w/ invalid Domain`, () => {
-        const offer = {
-            TransactionType : "AccountSet",
-            Account : "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            Fee : "12",
-            Sequence : 5,
-            Domain : 6578616,
-            MessageKey : "03AB40A0490F9B7ED8DF29D246BF2D6269820A0EE7742ACDD457BEA7C7D0931EDB"
-        } as any
+        account.Domain = 6578616
 
         assert.throws(
-            () => verifyAccountSet(offer),
+            () => verifyAccountSet(account),
             ValidationError,
             "AccountSet: invalid Domain"
         )
     })
 
     it (`throws w/ invalid EmailHash`, () => {
-        const offer = {
-            TransactionType : "AccountSet",
-            Account : "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            Fee : "12",
-            Sequence : 5,
-            EmailHash : 657861645678909876543456789876543
-        } as any
+        account.EmailHash = 657861645678909876543456789876543
 
         assert.throws(
-            () => verifyAccountSet(offer),
+            () => verifyAccountSet(account),
             ValidationError,
             "AccountSet: invalid EmailHash"
         )
     })
 
     it (`throws w/ invalid MessageKey`, () => {
-        const offer = {
-            TransactionType : "AccountSet",
-            Account : "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            Fee : "12",
-            Sequence : 5,
-            MessageKey : 65786165678908765456789567890678
-        } as any
+        account.MessageKey = 65786165678908765456789567890678
 
         assert.throws(
-            () => verifyAccountSet(offer),
+            () => verifyAccountSet(account),
             ValidationError,
             "AccountSet: invalid MessageKey"
         )
     })
 
     it (`throws w/ invalid TransferRate`, () => {
-        const offer = {
-            TransactionType : "AccountSet",
-            Account : "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            Fee : "12",
-            Sequence : 5,
-            TransferRate : "1000000001"
-        } as any
+        account.TransferRate = "1000000001"
 
         assert.throws(
-            () => verifyAccountSet(offer),
+            () => verifyAccountSet(account),
             ValidationError,
             "AccountSet: invalid TransferRate"
         )
     })
 
     it (`throws w/ invalid TickSize`, () => {
-        const offer = {
-            TransactionType : "AccountSet",
-            Account : "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            Fee : "12",
-            Sequence : 5,
-            TickSize : 20
-        } as any
+        account.TickSize = 20
 
         assert.throws(
-            () => verifyAccountSet(offer),
+            () => verifyAccountSet(account),
             ValidationError,
             "AccountSet: invalid TickSize"
         )
