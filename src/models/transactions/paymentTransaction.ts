@@ -1,6 +1,6 @@
-import { ValidationError } from "../../common/errors";
-import { Amount, IssuedCurrencyAmount, Path } from '../common';
-import { BaseTransaction, GlobalFlags, verifyBaseTransaction } from './common';
+import { ValidationError } from '../../common/errors'
+import { Amount, Path } from '../common'
+import { BaseTransaction, isIssuedCurrency, GlobalFlags, verifyBaseTransaction } from './common'
 
 interface PaymentTransactionFlags extends GlobalFlags {
     tfNoDirectRipple?: boolean
@@ -78,11 +78,4 @@ function isPaths(paths: Path[]): boolean {
     }
 
     return true;
-}
-
-function isIssuedCurrency(obj: IssuedCurrencyAmount): boolean {
-    return Object.keys(obj).length === 3 
-        && typeof obj.value === 'string'
-        && typeof obj.issuer === 'string'
-        && typeof obj.currency === 'string'
 }
