@@ -30,20 +30,8 @@ describe('OfferCancel Transaction Verification', function () {
 
     it (`verifies valid OfferCancel with flags`, () => {
 
-        const offer2 = {
-            Account: "rnfQBGzgJb2x26U2Tfe1GaYw4fNB87Dc6J",
-            Fee: "12",
-            Flags: 2147483648,
-            LastLedgerSequence: 65477763,
-            OfferSequence: 219792,
-            Sequence: 219793,
-            SigningPubKey: "02775208415B30A20F98C36AAB9A905A7BAC5889CFE7E55D968E7B9D28B93F342...",
-            TransactionType: "OfferCancel",
-            TxnSignature: "30440220043C67CCDFC513E4D8E9E427AB6E41047B322097EB5E44DE1AE8F58F3...",
-            date: "2021-08-06T21:31:12Z",
-        } as any
-
-        assert.doesNotThrow(() => verifyOfferCancel(offer2))
+        offer.Flags = 2147483648
+        assert.doesNotThrow(() => verifyOfferCancel(offer))
         
     })
 
