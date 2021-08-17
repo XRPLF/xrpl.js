@@ -1,5 +1,5 @@
 import { ValidationError } from 'ripple-api/common/errors'
-import { verifyPaymentTransaction } from './../../src/models/transactions/paymentTransaction'
+import { PaymentTransactionFlagsEnum, verifyPaymentTransaction } from './../../src/models/transactions/paymentTransaction'
 import { assert } from 'chai'
 
 /**
@@ -21,7 +21,7 @@ describe('Payment Transaction Verification', () => {
             Paths: [[{ account: 'aw0efji', currency: 'XRP', issuer: 'apsoeijf90wp34fh'}]],
             SendMax: '100000000',
             DeliverMin: '10000',
-            Flags: 15,
+            Flags: PaymentTransactionFlagsEnum.tfPartialPayment,
         } as any
     })
 
@@ -107,6 +107,15 @@ describe('Payment Transaction Verification', () => {
             () => verifyPaymentTransaction(paymentTransaction),
             ValidationError,
             'PaymentTransaction: invalid DeliverMin'
+        )
+    })
+
+    it (`throws w/ tfPartialPayment flag missing with DeliverMin`, () => {
+        paymentTransaction.Flags -= PaymentTransactionFlagsEnum.tfPartialPayment
+        assert.throws(
+            () => verifyPaymentTransaction(paymentTransaction),
+            ValidationError,
+            'PaymentTransaction: tfPartialPayment flag missing with DeliverMin'
         )
     })
 })

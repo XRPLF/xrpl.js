@@ -2,12 +2,17 @@ import { ValidationError } from '../../common/errors'
 import { Amount, Path } from '../common'
 import { BaseTransaction, isIssuedCurrency, GlobalFlags, verifyBaseTransaction } from './common'
 
+export enum PaymentTransactionFlagsEnum {
+    tfNoDirectRipple = 0x00010000,
+    tfPartialPayment = 0x00020000,
+    tfLimitQuality = 0x00040000,
+}
+
 interface PaymentTransactionFlags extends GlobalFlags {
     tfNoDirectRipple?: boolean
     tfPartialPayment?: boolean
     tfLimitQuality?: boolean
 }
-
 export interface PaymentTransaction extends BaseTransaction {
     TransactionType: 'Payment'
     Amount: Amount
@@ -28,42 +33,66 @@ export interface PaymentTransaction extends BaseTransaction {
 export function verifyPaymentTransaction(tx: PaymentTransaction): void {
     verifyBaseTransaction(tx)
     
-    if (tx.Amount === undefined)
+    if (tx.Amount === undefined) {
         throw new ValidationError('PaymentTransaction: missing field Amount')
+    }
     
-    if (typeof tx.Amount !== 'string' && !isIssuedCurrency(tx.Amount))
+    if (typeof tx.Amount !== 'string' && !isIssuedCurrency(tx.Amount)) {
         throw new ValidationError('PaymentTransaction: invalid Amount')
+    }
     
-    if (tx.Destination === undefined)
+    if (tx.Destination === undefined) {
         throw new ValidationError('PaymentTransaction: missing field Destination')
+    }
 
-    if (typeof tx.Destination !== 'string' && !isIssuedCurrency(tx.Destination))
+    if (typeof tx.Destination !== 'string' && !isIssuedCurrency(tx.Destination)) {
         throw new ValidationError('PaymentTransaction: invalid Destination')
+    }
 
-    if (tx.DestinationTag !== undefined && typeof tx.DestinationTag !== 'number')
+    if (tx.DestinationTag !== undefined && typeof tx.DestinationTag !== 'number') {
         throw new ValidationError('PaymentTransaction: invalid DestinationTag')
+    }
     
-    if (tx.InvoiceID !== undefined && typeof tx.InvoiceID !== 'string')
+    if (tx.InvoiceID !== undefined && typeof tx.InvoiceID !== 'string') {
         throw new ValidationError('PaymentTransaction: invalid InvoiceID')
+    }
     
-    if (tx.Paths !== undefined && !isPaths(tx.Paths))
+    if (tx.Paths !== undefined && !isPaths(tx.Paths)) {
         throw new ValidationError('PaymentTransaction: invalid Paths')
+    }
     
-    if (tx.SendMax !== undefined && typeof tx.SendMax !== 'string' && !isIssuedCurrency(tx.SendMax))
+    if (tx.SendMax !== undefined && typeof tx.SendMax !== 'string' && !isIssuedCurrency(tx.SendMax)) {
         throw new ValidationError('PaymentTransaction: invalid SendMax')
+    }
     
-    if (tx.DeliverMin !== undefined && typeof tx.DeliverMin !== 'string' && !isIssuedCurrency(tx.DeliverMin))
-        throw new ValidationError('PaymentTransaction: invalid DeliverMin')
+    if (tx.DeliverMin !== undefined) {
+        let isTfPartialPayment
+        if (typeof tx.Flags === 'number') {
+            isTfPartialPayment = (PaymentTransactionFlagsEnum.tfPartialPayment & tx.Flags) === PaymentTransactionFlagsEnum.tfPartialPayment
+        } else {
+            isTfPartialPayment = tx.Flags.tfPartialPayment
+        }
+
+        if (!isTfPartialPayment) {
+            throw new ValidationError('PaymentTransaction: tfPartialPayment flag missing with DeliverMin')
+        }
+
+        if (typeof tx.DeliverMin !== 'string' && !isIssuedCurrency(tx.DeliverMin)) {
+            throw new ValidationError('PaymentTransaction: invalid DeliverMin')
+        }
+    }
 }
 
 function isPaths(paths: Path[]): boolean {
-    if (!Array.isArray(paths))
+    if (!Array.isArray(paths)) {
         return false
+    }
     
     for (const i in paths) {
         const path = paths[i]
-        if (!Array.isArray(path))
+        if (!Array.isArray(path)) {
             return false
+        }
         
         for (const j in path) {
             const pathStep = path[j]
@@ -72,8 +101,9 @@ function isPaths(paths: Path[]): boolean {
                 (account !== undefined && typeof account !== 'string') ||
                 (currency !== undefined && typeof currency !== 'string') ||
                 (issuer !== undefined && typeof issuer !== 'string')
-            )
+            ) {
                 return false
+            }
         }
     }
 
