@@ -93,6 +93,7 @@
   - [isValidSecret](#isvalidsecret)
   - [deriveKeypair](#derivekeypair)
   - [deriveAddress](#deriveaddress)
+  - [generateFaucetWallet](#generatefaucetwallet)
   - [signPaymentChannelClaim](#signpaymentchannelclaim)
   - [verifyPaymentChannelClaim](#verifypaymentchannelclaim)
   - [computeLedgerHash](#computeledgerhash)
@@ -6091,6 +6092,38 @@ This method returns a string corresponding to the address derived from the publi
 var address = api.deriveAddress(public_key);
 ```
 
+## generateFaucetWallet
+
+`generateFaucetWallet(onTestnet = true)`
+
+Calls the Testnet or Devnet faucet API in order to generate a new, random wallet with some amount of test XRP. This is for testing purposes only.
+
+### Example
+
+**Request**
+
+Create a new wallet on the Testnet:
+
+```javascript
+const wallet = await api.generateFaucetWallet()
+```
+
+**Response**
+
+
+```json
+{
+    "account": {
+        "xAddress": "T7i2Q8yGcMcCQa2n6d9EvSEptT4CE6ap7Q1r1fmjstkLfsK",
+        "secret": "ssKCsaRqWh669atvv83bdYRaiHomY",
+        "classicAddress": "r9SYfmVxrb7iuCVfNhW2gqqzapfE2r6juG",
+        "address": "r9SYfmVxrb7iuCVfNhW2gqqzapfE2r6juG"
+    },
+    "amount": 1000,
+    "balance": 1000
+}
+```
+
 ## signPaymentChannelClaim
 
 `signPaymentChannelClaim(channel: string, amount: string, privateKey: string): string`
@@ -6426,6 +6459,7 @@ The flags are called [AccountSet flags (asf*)](https://xrpl.org/accountset.html#
 `RippleAPI.accountSetFlags.globalFreeze`:	Freeze all assets issued by this account.
 `RippleAPI.accountSetFlags.defaultRipple`: Enable [rippling](https://xrpl.org/rippling.html) on this account's trust lines by default.
 `RippleAPI.accountSetFlags.depositAuth`:Enable Deposit Authorization on this account.
+
 ## schemaValidator
 
 Unlike the rest of the ripple-lib API, schemaValidator is a static object on RippleAPI. It provides utility methods that do not use a server.

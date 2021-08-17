@@ -4,6 +4,7 @@ import {RippleAPI} from '..'
 import {errors} from '../common'
 import {GeneratedAddress} from '../offline/generate-address'
 import {isValidAddress} from '../common/schema-validator'
+import {RippledError} from '../common/errors'
 
 export interface FaucetWallet {
   account: GeneratedAddress
@@ -29,6 +30,9 @@ async function generateFaucetWallet(
   this: RippleAPI,
   address?: string
 ): Promise<FaucetWallet | void> {
+  if(!this.isConnected())
+    throw new RippledError("RippleAPI not connected, cannot call faucet")
+
   // Initialize some variables
   let body: Uint8Array
   let startingBalance = 0
