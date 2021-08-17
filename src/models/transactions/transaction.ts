@@ -3,11 +3,12 @@ import { OfferCreate } from "./offerCreate";
 import { CheckCash } from "./checkCash";
 import { CheckCancel } from "./checkCancel";
 import { CheckCreate } from "./checkCreate";
+import { AccountDelete } from "./accountDelete";
 
 export type Transaction =
 //     AccountSet
-//   | AccountDelete
-       CheckCancel
+       AccountDelete
+     | CheckCancel
      | CheckCash
      | CheckCreate
 //   | DepositPreauth
