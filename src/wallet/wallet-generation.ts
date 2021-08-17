@@ -1,6 +1,6 @@
 import https = require('https')
 
-import {RippleAPI} from '..'
+import {Client} from '..'
 import {errors} from '../common'
 import {GeneratedAddress} from '../offline/generate-address'
 import {isValidAddress} from '../common/schema-validator'
@@ -27,11 +27,11 @@ const MAX_ATTEMPTS = 20 // Maximum attempts to retrieve a balance
  * @returns - A Wallet on the Testnet or Devnet that contains some amount of XRP.
  */
 async function generateFaucetWallet(
-  this: RippleAPI,
+  this: Client,
   address?: string
 ): Promise<FaucetWallet | void> {
   if(!this.isConnected())
-    throw new RippledError("RippleAPI not connected, cannot call faucet")
+    throw new RippledError("Client not connected, cannot call faucet")
 
   // Initialize some variables
   let body: Uint8Array
@@ -136,17 +136,17 @@ async function generateFaucetWallet(
 /**
  * Retrieves an XRPL address XRP balance
  *
- * @param api - RippleAPI
+ * @param client - Client
  * @param address - XRPL address.
  * @returns
  */
 async function getAddressXrpBalance(
-  api: RippleAPI,
+  client: Client,
   address: string
 ): Promise<string> {
   // Get all the account balances
   try {
-    const balances = await api.getBalances(address)
+    const balances = await client.getBalances(address)
 
     // Retrieve the XRP balance
     const xrpBalance = balances.filter(
@@ -161,13 +161,13 @@ async function getAddressXrpBalance(
 /**
  * Check at regular interval if the address is enabled on the XRPL and funded
  *
- * @param api - RippleAPI
+ * @param client - Client
  * @param address - the account address to check
  * @param originalBalance - the initial balance before the funding
  * @returns A Promise boolean
  */
 async function hasAddressBalanceIncreased(
-  api: RippleAPI,
+  client: Client,
   address: string,
   originalBalance: number
 ): Promise<boolean> {
@@ -182,7 +182,7 @@ async function hasAddressBalanceIncreased(
       }
 
       try {
-        const newBalance = +(await getAddressXrpBalance(api, address))
+        const newBalance = +(await getAddressXrpBalance(client, address))
         if (newBalance > originalBalance) {
           clearInterval(interval)
           resolve(true)
@@ -200,12 +200,12 @@ async function hasAddressBalanceIncreased(
 }
 
 /**
- * Get the faucet URL based on the RippleAPI connection
- * @param api - RippleAPI
+ * Get the faucet URL based on the Client connection
+ * @param client - Client
  * @returns A {@link FaucetNetwork}
  */
-export function getFaucetUrl(api: RippleAPI) {
-  const connectionUrl = api.connection.getUrl()
+export function getFaucetUrl(client: Client) {
+  const connectionUrl = client.connection.getUrl()
 
   // 'altnet' for Ripple Testnet server and 'testnet' for XRPL Labs Testnet server
   if (connectionUrl.includes('altnet') || connectionUrl.includes('testnet')) {

@@ -3,7 +3,7 @@ import {
   FormattedPaymentChannel
 } from './parse/payment-channel'
 import {validate, errors} from '../common'
-import {RippleAPI} from '..'
+import {Client} from '..'
 import {LedgerEntryResponse} from '../common/types/commands'
 const NotFoundError = errors.NotFoundError
 
@@ -20,7 +20,7 @@ function formatResponse(
 }
 
 async function getPaymentChannel(
-  this: RippleAPI,
+  this: Client,
   id: string
 ): Promise<FormattedPaymentChannel> {
   // 1. Validate

@@ -3,12 +3,12 @@
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh';
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
 
-function ledgerAccept(api) {
+function ledgerAccept(client) {
   const request = {command: 'ledger_accept'};
-  return api.connection.request(request);
+  return client.connection.request(request);
 }
 
-function pay(api, from, to, amount, secret, currency = 'XRP', counterparty) {
+function pay(client, from, to, amount, secret, currency = 'XRP', counterparty) {
   const paymentSpecification = {
     source: {
       address: from,
@@ -32,19 +32,19 @@ function pay(api, from, to, amount, secret, currency = 'XRP', counterparty) {
   }
 
   let id = null;
-  return api.preparePayment(from, paymentSpecification, {})
-    .then(data => api.sign(data.txJSON, secret))
+  return client.preparePayment(from, paymentSpecification, {})
+    .then(data => client.sign(data.txJSON, secret))
     .then(signed => {
       id = signed.id;
-      return api.submit(signed.signedTransaction);
+      return client.submit(signed.signedTransaction);
     })
-    .then(() => ledgerAccept(api))
+    .then(() => ledgerAccept(client))
     .then(() => id);
 }
 
 
-function payTo(api, to, amount = '4003218', currency = 'XRP', counterparty) {
-  return pay(api, masterAccount, to, amount, masterSecret, currency,
+function payTo(client, to, amount = '4003218', currency = 'XRP', counterparty) {
+  return pay(client, masterAccount, to, amount, masterSecret, currency,
     counterparty);
 }
 
