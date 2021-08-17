@@ -1,7 +1,7 @@
 import setupClient from './setup-client'
-import {Client} from 'xrpl-local'
+// import {Client} from 'xrpl-local'
 import addresses from './fixtures/addresses.json'
-import {getAllPublicMethods, loadTestSuites} from './utils'
+import {loadTestSuites} from './utils'
 
 /**
  * Client Test Runner
@@ -26,7 +26,7 @@ describe('Client [Test Runner]', function () {
   afterEach(setupClient.teardown)
 
   // Collect all the tests:
-  const allPublicMethods = getAllPublicMethods(new Client())
+  // const allPublicMethods = getAllPublicMethods(new Client())
   const allTestSuites = loadTestSuites()
 
   // Run all the tests:
@@ -66,15 +66,15 @@ describe('Client [Test Runner]', function () {
   }
 
   // Report any missing tests.
-  const allTestedMethods = new Set(allTestSuites.map((s) => s.name))
-  for (const methodName of allPublicMethods) {
-    if (!allTestedMethods.has(methodName)) {
-      // TODO: Once migration is complete, remove `.skip()` so that missing tests are reported as failures.
-      it.skip(`${methodName} - no test suite found`, () => {
-        throw new Error(
-          `Test file not found! Create file "test/client/${methodName}/index.ts".`
-        )
-      })
-    }
-  }
+  // const allTestedMethods = new Set(allTestSuites.map((s) => s.name))
+  // for (const methodName of allPublicMethods) {
+  //   if (!allTestedMethods.has(methodName)) {
+  //     // TODO: Once migration is complete, remove `.skip()` so that missing tests are reported as failures.
+  //     it.skip(`${methodName} - no test suite found`, () => {
+  //       throw new Error(
+  //         `Test file not found! Create file "test/client/${methodName}/index.ts".`
+  //       )
+  //     })
+  //   }
+  // }
 })

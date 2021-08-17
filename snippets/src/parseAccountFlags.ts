@@ -1,6 +1,6 @@
 import {Client} from '../../dist/npm'
 
-const client = new Client({server: 'wss://s.altnet.rippletest.net:51233'})
+const client = new Client('wss://s.altnet.rippletest.net:51233')
 
 parseAccountFlags()
 

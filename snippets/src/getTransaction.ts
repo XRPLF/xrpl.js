@@ -1,9 +1,7 @@
 import {Client} from '../../dist/npm'
 import Metadata from '../../src/models/common/metadata'
 
-const client = new Client({
-  server: 'wss://s.altnet.rippletest.net:51233'
-})
+const client = new Client('wss://s.altnet.rippletest.net:51233')
 
 getTransaction()
 

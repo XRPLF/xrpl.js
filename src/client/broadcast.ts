@@ -4,11 +4,11 @@ class BroadcastClient extends Client {
   ledgerVersion: number | undefined = undefined
   private _clients: Client[]
 
-  constructor(servers, options: ClientOptions = {}) {
-    super(options)
+  constructor(servers: string[], options: ClientOptions = {}) {
+    super(servers[0], options)
 
     const clients: Client[] = servers.map(
-      (server) => new Client(Object.assign({}, options, {server}))
+      (server) => new Client(server, options)
     )
 
     // exposed for testing
@@ -32,13 +32,6 @@ class BroadcastClient extends Client {
       return clients.map((client) => client.isConnected()).every(Boolean)
     }
 
-    // synchronous methods are all passed directly to the first client instance
-    // const defaultClient = clients[0]
-    // const syncMethods = ['sign', 'generateAddress', 'computeLedgerHash']
-    // syncMethods.forEach((name) => {
-    //   this[name] = defaultClient[name].bind(defaultClient)
-    // })
-
     clients.forEach((client) => {
       client.on('error', (errorCode, errorMessage, data) =>
         this.emit('error', errorCode, errorMessage, data)
@@ -48,9 +41,9 @@ class BroadcastClient extends Client {
 
   getMethodNames() {
     const methodNames: string[] = []
-    const Client = this._clients[0]
-    for (const name of Object.getOwnPropertyNames(Client)) {
-      if (typeof Client[name] === 'function') {
+    const client = this._clients[0]
+    for (const name of Object.getOwnPropertyNames(client)) {
+      if (typeof client[name] === 'function') {
         methodNames.push(name)
       }
     }

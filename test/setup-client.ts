@@ -7,7 +7,7 @@ function setupMockRippledConnection(testcase, port) {
   return new Promise<void>((resolve, reject) => {
     testcase.mockRippled = createMockRippled(port)
     testcase._mockedServerPort = port
-    testcase.client = new Client({server: 'ws://localhost:' + port})
+    testcase.client = new Client('ws://localhost:' + port)
     testcase.client
       .connect()
       .then(() => {

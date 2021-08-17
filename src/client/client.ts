@@ -86,19 +86,18 @@ import assert from 'assert'
 import { onlyHasFields } from '../models/utils'
 import { ValidationError } from '../common/errors'
 
-function clamp(value: number, min: number, max: number): number {
+function checkBounds(value: number, min: number, max: number): number {
   assert.ok(min <= max, 'Illegal clamp bounds')
   return Math.min(Math.max(value, min), max)
 }
 
 export interface ClientOptions extends ConnectionUserOptions {
-  server?: string
   feeCushion?: number
   maxFeeXRP?: string
   proxy?: string
   timeout?: number
 }
-const clientOptionsKeys = ["server", "feeCushion", "maxFeeXRP", "proxy", "timeout"]
+const clientOptionsKeys = ["server", "feeCushion", "maxFeeXRP", "proxy", "timeout", "trace", "proxy", "proxyAuthorization", "authorization", "trustedCertificates", "key", "passphrase", "certificate", "timeout", "connectionTimeout"]
 
 /**
  * Get the response key / property name that contains the listed data for a
@@ -107,11 +106,19 @@ const clientOptionsKeys = ["server", "feeCushion", "maxFeeXRP", "proxy", "timeou
  */
 function getCollectKeyFromCommand(command: string): string | null {
   switch (command) {
+    case 'account_channels':
+      return 'channels'
+    case 'account_lines':
+      return 'lines'
+    case 'account_objects':
+      return 'account_objects'
+    case 'account_tx':
+      return 'transactions'
     case 'account_offers':
     case 'book_offers':
       return 'offers'
-    case 'account_lines':
-      return 'lines'
+    case 'ledger_data':
+      return 'state'
     default:
       return null
   }
@@ -133,6 +140,7 @@ type MarkerResponse = AccountChannelsResponse
 
 class Client extends EventEmitter {
   // _feeCushion: number
+
   // the maximum fee that should be allowed on a transaction
   // prevents surge pricing from being too bad, as well as mistakes
   _maxFeeXRP: string
@@ -141,47 +149,50 @@ class Client extends EventEmitter {
   // non-validated ledger versions are allowed, and passed to rippled as-is.
   connection: Connection
 
-  // // these are exposed only for use by unit tests; they are not part of the client.
-  // static _PRIVATE = {
-  //   validate,
-  //   RangeSet,
-  //   ledgerUtils,
-  //   schemaValidator
-  // }
-
-  constructor(options: ClientOptions = {}) {
+  constructor(url: string, options: ClientOptions = {}) {
     super()
     if (!onlyHasFields(options, clientOptionsKeys)) {
       throw new ValidationError("Passed an incorrect param in, expecting only", clientOptionsKeys)
     }
-    if (options.server && !options.server.match("^(wss?|wss?\\+unix)://")) {
-      throw new ValidationError("Server is not of correct URI format")
+    if (!url.match("^(wss?|wss?\\+unix)://")) {
+      throw new ValidationError("Server is not of correct URI format. Must be a wss link.")
     }
     // this._feeCushion = options.feeCushion || 1.2
     this._maxFeeXRP = options.maxFeeXRP || '2'
-    const serverURL = options.server
-    if (serverURL != null) {
-      this.connection = new Connection(serverURL, options)
-      this.connection.on('error', (errorCode, errorMessage, data) => {
-        this.emit('error', errorCode, errorMessage, data)
-      })
-      this.connection.on('connected', () => {
-        this.emit('connected')
-      })
-      this.connection.on('disconnected', (code) => {
-        let finalCode = code
-        // 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
-        // Since 4000 is a normal disconnect reason, we convert this to the standard exit code 1000
-        if (finalCode === 4000) {
-          finalCode = 1000 
-        }
-        this.emit('disconnected', finalCode)
-      })
-    } else {
-      // use null object pattern to provide better error message if user
-      // tries to call a method that requires a connection
-      this.connection = new Connection(null, options)
-    }
+
+    this.connection = new Connection(url, options)
+
+    this.connection.on('error', (errorCode, errorMessage, data) => {
+      this.emit('error', errorCode, errorMessage, data)
+    })
+
+    this.connection.on('connected', () => {
+      this.emit('connected')
+    })
+
+    this.connection.on('disconnected', (code) => {
+      let finalCode = code
+      // 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
+      // Since 4000 is a normal disconnect reason, we convert this to the standard exit code 1000
+      if (finalCode === 4000) {
+        finalCode = 1000 
+      }
+      this.emit('disconnected', finalCode)
+    })
+  }
+
+  isConnected(): boolean {
+    return this.connection.isConnected()
+  }
+  
+  async connect(): Promise<void> {
+    return this.connection.connect()
+  }
+  
+  async disconnect(): Promise<void> {
+    // backwards compatibility: connection.disconnect() can return a number, but
+    // this method returns nothing. SO we await but don't return any result.
+    await this.connection.disconnect()
   }
 
   /**
@@ -274,51 +285,37 @@ class Client extends EventEmitter {
     // The data under collection is keyed based on the command. Fail if command
     // not recognized and collection key not provided.
     const collectKey = options.collect || getCollectKeyFromCommand(request.command)
-    if (!collectKey) {
+    if (collectKey == null) {
       throw new errors.ValidationError(`no collect key for command ${request.command}`)
     }
     // If limit is not provided, fetches all data over multiple requests.
     // NOTE: This may return much more than needed. Set limit when possible.
-    const countTo: number = request.limit != null ? request.limit : Infinity
-    let count: number = 0
-    let marker: string = request.marker
-    let lastBatchLength: number
+    const limit: number = request.limit != null ? request.limit : Infinity
+    let responseCount: number = 0
+    let currentMarker: string = request.marker
+    let prevBatchLength: number
     const results = []
     do {
-      const countRemaining = clamp(countTo - count, 10, 400)
-      const repeatProps = {
+      const countRemaining = checkBounds(limit - responseCount, 10, 400)
+      const currentRequest = {
         ...request,
         limit: countRemaining,
-        marker
+        marker: currentMarker
       }
-      const singleResult = await this.connection.request(repeatProps)
+      const singleResult = await this.connection.request(currentRequest)
       const collectedData = singleResult[collectKey]
-      marker = singleResult['marker']
+      currentMarker = singleResult['marker']
       results.push(singleResult)
       // Make sure we handle when no data (not even an empty array) is returned.
       const isExpectedFormat = Array.isArray(collectedData)
       if (isExpectedFormat) {
-        count += collectedData.length
-        lastBatchLength = collectedData.length
+        responseCount += collectedData.length
+        prevBatchLength = collectedData.length
       } else {
-        lastBatchLength = 0
+        prevBatchLength = 0
       }
-    } while (!!marker && count < countTo && lastBatchLength !== 0)
+    } while (!!currentMarker && responseCount < limit && prevBatchLength !== 0)
     return results
-  }
-
-  isConnected(): boolean {
-    return this.connection.isConnected()
-  }
-  
-  async connect(): Promise<void> {
-    return this.connection.connect()
-  }
-  
-  async disconnect(): Promise<void> {
-    // backwards compatibility: connection.disconnect() can return a number, but
-    // this method returns nothing. SO we await but don't return any result.
-    await this.connection.disconnect()
   }
 }
 

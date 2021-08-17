@@ -5,7 +5,7 @@ const port = 34371
 const baseUrl = 'ws://testripple.circleci.com:'
 
 function setup(this: any, port_ = port) {
-  const tclient = new Client({server: baseUrl + port_})
+  const tclient = new Client(baseUrl + port_)
   return tclient
     .connect()
     .then(() => {
@@ -20,7 +20,7 @@ function setup(this: any, port_ = port) {
       return new Promise<void>((resolve, reject) => {
         // TODO: resolve when we redo the testing framework
         // @ts-ignore
-        this.client = new Client({server: baseUrl + got.port})
+        this.client = new Client(baseUrl + got.port)
         this.client
           .connect()
           .then(() => {
