@@ -1,9 +1,9 @@
-import { ValidationError } from "../../common/errors";
-import { BaseTransaction, verifyBaseTransaction } from "./common";
+import { ValidationError } from "../../common/errors"
+import { BaseTransaction, verifyBaseTransaction } from "./common"
 
 export interface OfferCancel extends BaseTransaction {
-    TransactionType: "OfferCancel";
-    OfferSequence: number;
+    TransactionType: "OfferCancel"
+    OfferSequence: number
 }
 
 /**
