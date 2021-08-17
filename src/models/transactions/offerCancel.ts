@@ -16,6 +16,9 @@ export interface OfferCancel extends BaseTransaction {
  export function verifyOfferCancel(tx: OfferCancel): void {
     verifyBaseTransaction(tx)
 
-    if (tx.OfferSequence !== undefined && typeof tx.OfferSequence !== 'number')
+    if (tx.OfferSequence === undefined)
+        throw new ValidationError("OfferCancel: missing field OfferSequence")
+
+    if (typeof tx.OfferSequence !== 'number')
         throw new ValidationError("OfferCancel: invalid OfferSequence")
 }
