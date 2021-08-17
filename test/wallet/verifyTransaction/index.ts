@@ -1,6 +1,6 @@
 import assert from 'assert-diff'
 import {TestSuite} from '../../utils'
-import Wallet from 'ripple-api/Wallet'
+import Wallet from 'xrpl-local/Wallet'
 
 const publicKey =
   '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'

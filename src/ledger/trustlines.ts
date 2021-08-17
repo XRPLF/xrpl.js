@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
 import {validate, ensureClassicAddress} from '../common'
 import parseAccountTrustline from './parse/account-trustline'
-import {RippleAPI} from '..'
+import {Client} from '..'
 import {FormattedTrustline} from '../common/types/objects/trustlines'
 
 export type GetTrustlinesOptions = {
@@ -16,7 +16,7 @@ function currencyFilter(currency: string, trustline: FormattedTrustline) {
 }
 
 async function getTrustlines(
-  this: RippleAPI,
+  this: Client,
   address: string,
   options: GetTrustlinesOptions = {}
 ): Promise<FormattedTrustline[]> {
