@@ -17,7 +17,7 @@ export interface PaymentTransaction extends BaseTransaction {
     Paths?: Path[]
     SendMax?: Amount
     DeliverMin?: Amount
-    Flags?: PaymentTransactionFlags
+    Flags?: number | PaymentTransactionFlags
 }
 
 /**
@@ -54,16 +54,6 @@ export function verifyPaymentTransaction(tx: PaymentTransaction): void {
     
     if (tx.DeliverMin !== undefined && typeof tx.DeliverMin !== 'string' && !isIssuedCurrency(tx.DeliverMin))
         throw new ValidationError('PaymentTransaction: invalid DeliverMin')
-    
-    if (tx.Flags !== undefined) {
-        const { tfNoDirectRipple, tfPartialPayment, tfLimitQuality } = tx.Flags
-        if (
-            (tfNoDirectRipple !== undefined && typeof tfNoDirectRipple !== 'boolean') ||
-            (tfPartialPayment !== undefined && typeof tfPartialPayment !== 'boolean') ||
-            (tfLimitQuality !== undefined && typeof tfLimitQuality !== 'boolean')
-        )
-            throw new ValidationError('PaymentTransaction: invalid Flags')
-    }
 }
 
 function isPaths(paths: Path[]): boolean {
