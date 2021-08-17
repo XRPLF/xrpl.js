@@ -2,11 +2,11 @@ import _ from 'lodash'
 import assert from 'assert'
 import wallet from './wallet'
 import requests from '../fixtures/requests'
-import {Client} from 'xrpl-client'
+import {Client} from 'xrpl-local'
 import {isValidClassicAddress} from 'ripple-address-codec'
 import {payTo, ledgerAccept} from './utils'
-import {errors} from 'xrpl-client/common'
-import {isValidSecret} from 'xrpl-client/common/utils'
+import {errors} from 'xrpl-local/common'
+import {isValidSecret} from 'xrpl-local/common/utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000

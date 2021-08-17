@@ -1,4 +1,4 @@
-import {Client} from 'xrpl-client'
+import {Client} from 'xrpl-local'
 import assert from 'assert-diff'
 import {assertResultMatch, TestSuite, assertRejects} from '../../utils'
 import responses from '../../fixtures/responses'

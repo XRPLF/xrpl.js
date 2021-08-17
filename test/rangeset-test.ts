@@ -1,5 +1,5 @@
 import assert from 'assert'
-import {Client} from 'xrpl-client'
+import {Client} from 'xrpl-local'
 const RangeSet = Client._PRIVATE.RangeSet
 
 describe('RangeSet', function () {

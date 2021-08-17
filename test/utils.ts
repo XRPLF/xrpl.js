@@ -2,7 +2,7 @@ import net from 'net'
 import _ from 'lodash'
 import fs from 'fs'
 import path from 'path'
-import {Client} from 'xrpl-client'
+import {Client} from 'xrpl-local'
 import assert from 'assert-diff'
 const {schemaValidator} = Client._PRIVATE
 
