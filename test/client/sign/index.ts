@@ -1,5 +1,5 @@
 import assert from 'assert-diff'
-import {Client} from 'xrpl-client'
+import {Client} from 'xrpl-local'
 import binary from 'ripple-binary-codec'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'

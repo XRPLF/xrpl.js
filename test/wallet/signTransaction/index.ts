@@ -1,4 +1,4 @@
-import {Client} from 'xrpl-client'
+import {Client} from 'xrpl-local'
 import {TestSuite} from '../../utils'
 import Wallet from '../../../src/Wallet'
 

@@ -1,10 +1,10 @@
 import {assertResultMatch, TestSuite, assertRejects} from '../../utils'
 import responses from '../../fixtures/responses'
 import requests from '../../fixtures/requests'
-import {ValidationError} from 'xrpl-client/common/errors'
+import {ValidationError} from 'xrpl-local/common/errors'
 import binary from 'ripple-binary-codec'
 import assert from 'assert-diff'
-import {Client} from 'xrpl-client'
+import {Client} from 'xrpl-local'
 
 const {schemaValidator} = Client._PRIVATE
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}

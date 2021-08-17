@@ -1,6 +1,6 @@
 // import BigNumber from 'bignumber.js'
 // import assert from 'assert-diff'
-// import {Client} from 'xrpl-client'
+// import {Client} from 'xrpl-local'
 // import requests from '../../fixtures/requests'
 // import responses from '../../fixtures/responses'
 import {TestSuite} from '../../utils'

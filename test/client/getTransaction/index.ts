@@ -3,7 +3,7 @@ import {
   MissingLedgerHistoryError,
   NotFoundError,
   // UnexpectedError
-} from 'xrpl-client/common/errors'
+} from 'xrpl-local/common/errors'
 import {PendingLedgerVersionError} from '../../../src/common/errors'
 import hashes from '../../fixtures/hashes.json'
 // import responses from '../../fixtures/responses'
