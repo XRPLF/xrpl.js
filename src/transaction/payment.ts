@@ -12,7 +12,7 @@ import {
   Memo
 } from '../common/types/objects'
 import {toRippledAmount, xrpToDrops} from '../common'
-import {RippleAPI} from '..'
+import {Client} from '..'
 import {getClassicAccountAndTag, ClassicAccountAndTag} from './utils'
 
 export interface Payment {
@@ -244,7 +244,7 @@ function createPaymentTransaction(
 }
 
 function preparePayment(
-  this: RippleAPI,
+  this: Client,
   address: string,
   payment: Payment,
   instructions: Instructions = {}

@@ -1,11 +1,11 @@
 import _ from 'lodash'
 import net from 'net'
 import assert from 'assert-diff'
-import setupAPI from './setup-api'
-import {RippleAPI} from 'ripple-api'
+import setupClient from './setup-client'
+import {Client} from 'xrpl-local'
 import ledgerClose from './fixtures/rippled/ledger-close.json'
 import {ignoreWebSocketDisconnect} from './utils'
-const utils = RippleAPI._PRIVATE.ledgerUtils
+const utils = Client._PRIVATE.ledgerUtils
 
 const TIMEOUT = 200000 // how long before each test case times out
 const isBrowser = (process as any).browser
@@ -25,8 +25,8 @@ function createServer() {
 
 describe('Connection', function () {
   this.timeout(TIMEOUT)
-  beforeEach(setupAPI.setup)
-  afterEach(setupAPI.teardown)
+  beforeEach(setupClient.setup)
+  afterEach(setupClient.teardown)
 
   it('default options', function () {
     const connection: any = new utils.common.Connection('url')
@@ -82,23 +82,23 @@ describe('Connection', function () {
   })
 
   it('ledger methods work as expected', async function () {
-    assert.strictEqual(await this.api.connection.getLedgerVersion(), 8819951)
+    assert.strictEqual(await this.client.connection.getLedgerVersion(), 8819951)
     assert.strictEqual(
-      await this.api.connection.hasLedgerVersion(8819951),
+      await this.client.connection.hasLedgerVersion(8819951),
       true
     )
     assert.strictEqual(
-      await this.api.connection.hasLedgerVersions(8819951, undefined),
+      await this.client.connection.hasLedgerVersions(8819951, undefined),
       true
     )
     // It would be nice to test a better range, but the mocked ledger only supports this single number
     assert.strictEqual(
-      await this.api.connection.hasLedgerVersions(8819951, 8819951),
+      await this.client.connection.hasLedgerVersions(8819951, 8819951),
       true
     )
-    assert.strictEqual(await this.api.connection.getFeeBase(), 10)
-    assert.strictEqual(await this.api.connection.getFeeRef(), 10)
-    assert.strictEqual(await this.api.connection.getReserveBase(), 20000000) // 20 XRP
+    assert.strictEqual(await this.client.connection.getFeeBase(), 10)
+    assert.strictEqual(await this.client.connection.getFeeRef(), 10)
+    assert.strictEqual(await this.client.connection.getReserveBase(), 20000000) // 20 XRP
   })
 
   it('with proxy', function (done) {
@@ -125,22 +125,22 @@ describe('Connection', function () {
         trustedCertificates: ['path/to/pem']
       }
       const connection = new utils.common.Connection(
-        this.api.connection._url,
+        this.client.connection._url,
         options
       )
       connection.connect().catch((err) => {
-        assert(err instanceof this.api.errors.NotConnectedError)
+        assert(err instanceof this.client.errors.NotConnectedError)
       })
     }, done)
   })
 
   it('Multiply disconnect calls', function () {
-    this.api.disconnect()
-    return this.api.disconnect()
+    this.client.disconnect()
+    return this.client.disconnect()
   })
 
   it('reconnect', function () {
-    return this.api.connection.reconnect()
+    return this.client.connection.reconnect()
   })
 
   it('NotConnectedError', function () {
@@ -151,7 +151,7 @@ describe('Connection', function () {
         assert(false, 'Should throw NotConnectedError')
       })
       .catch((error) => {
-        assert(error instanceof this.api.errors.NotConnectedError)
+        assert(error instanceof this.client.errors.NotConnectedError)
       })
   })
 
@@ -171,76 +171,76 @@ describe('Connection', function () {
     )
     connection.on('error', done)
     connection.connect().catch((error) => {
-      assert(error instanceof this.api.errors.NotConnectedError)
+      assert(error instanceof this.client.errors.NotConnectedError)
       done()
     })
   })
 
   it('DisconnectedError', async function () {
-    await this.api.connection.request({
+    await this.client.connection.request({
       command: 'config',
       data: {disconnectOnServerInfo: true}
     })
-    return this.api
+    return this.client
       .getServerInfo()
       .then(() => {
         assert(false, 'Should throw DisconnectedError')
       })
       .catch((error) => {
-        assert(error instanceof this.api.errors.DisconnectedError)
+        assert(error instanceof this.client.errors.DisconnectedError)
       })
   })
 
   it('TimeoutError', function () {
-    this.api.connection._ws.send = function (message, options, callback) {
+    this.client.connection._ws.send = function (message, options, callback) {
       callback(null)
     }
     const request = {command: 'server_info'}
-    return this.api.connection
+    return this.client.connection
       .request(request, 10)
       .then(() => {
         assert(false, 'Should throw TimeoutError')
       })
       .catch((error) => {
-        assert(error instanceof this.api.errors.TimeoutError)
+        assert(error instanceof this.client.errors.TimeoutError)
       })
   })
 
   it('DisconnectedError on send', function () {
-    this.api.connection._ws.send = function (message, options, callback) {
+    this.client.connection._ws.send = function (message, options, callback) {
       callback({message: 'not connected'})
     }
-    return this.api
+    return this.client
       .getServerInfo()
       .then(() => {
         assert(false, 'Should throw DisconnectedError')
       })
       .catch((error) => {
-        assert(error instanceof this.api.errors.DisconnectedError)
+        assert(error instanceof this.client.errors.DisconnectedError)
         assert.strictEqual(error.message, 'not connected')
       })
   })
 
   it('DisconnectedError on initial _onOpen send', async function () {
     // _onOpen previously could throw PromiseRejectionHandledWarning: Promise rejection was handled asynchronously
-    // do not rely on the api.setup hook to test this as it bypasses the case, disconnect api connection first
-    await this.api.disconnect()
+    // do not rely on the client.setup hook to test this as it bypasses the case, disconnect client connection first
+    await this.client.disconnect()
 
     // stub _onOpen to only run logic relevant to test case
-    this.api.connection._onOpen = () => {
+    this.client.connection._onOpen = () => {
       // overload websocket send on open when _ws exists
-      this.api.connection._ws.send = function (data, options, cb) {
+      this.client.connection._ws.send = function (data, options, cb) {
         // recent ws throws this error instead of calling back
         throw new Error('WebSocket is not open: readyState 0 (CONNECTING)')
       }
       const request = {command: 'subscribe', streams: ['ledger']}
-      return this.api.connection.request(request)
+      return this.client.connection.request(request)
     }
 
     try {
-      await this.api.connect()
+      await this.client.connect()
     } catch (error) {
-      assert(error instanceof this.api.errors.DisconnectedError)
+      assert(error instanceof this.client.errors.DisconnectedError)
       assert.strictEqual(
         error.message,
         'WebSocket is not open: readyState 0 (CONNECTING)'
@@ -249,22 +249,22 @@ describe('Connection', function () {
   })
 
   it('ResponseFormatError', function () {
-    return this.api
+    return this.client
       .request('test_command', {data: {unrecognizedResponse: true}})
       .then(() => {
         assert(false, 'Should throw ResponseFormatError')
       })
       .catch((error) => {
-        assert(error instanceof this.api.errors.ResponseFormatError)
+        assert(error instanceof this.client.errors.ResponseFormatError)
       })
   })
 
   it('reconnect on unexpected close', function (done) {
-    this.api.connection.on('connected', () => {
+    this.client.connection.on('connected', () => {
       done()
     })
     setTimeout(() => {
-      this.api.connection._ws.close()
+      this.client.connection._ws.close()
     }, 1)
   })
 
@@ -281,7 +281,7 @@ describe('Connection', function () {
       this.timeout(70001)
       const self = this
       function breakConnection() {
-        self.api.connection
+        self.client.connection
           .request({
             command: 'test_command',
             data: {disconnectIn: 10}
@@ -293,15 +293,15 @@ describe('Connection', function () {
       let disconnectsCount = 0
       let reconnectsCount = 0
       let code = 0
-      this.api.connection.on('reconnecting', () => {
+      this.client.connection.on('reconnecting', () => {
         reconnectsCount += 1
       })
-      this.api.connection.on('disconnected', (_code) => {
+      this.client.connection.on('disconnected', (_code) => {
         code = _code
         disconnectsCount += 1
       })
       const num = 3
-      this.api.connection.on('connected', () => {
+      this.client.connection.on('connected', () => {
         connectsCount += 1
         if (connectsCount < num) {
           breakConnection()
@@ -353,13 +353,13 @@ describe('Connection', function () {
       }
     }
     // Set the heartbeat to less than the 1 second ping response
-    this.api.connection._config.timeout = 500
+    this.client.connection._config.timeout = 500
     // Drop the test runner timeout, since this should be a quick test
     this.timeout(5000)
     // Hook up a listener for the reconnect event
-    this.api.connection.on('reconnect', () => done())
+    this.client.connection.on('reconnect', () => done())
     // Trigger a heartbeat
-    this.api.connection._heartbeat().catch((error) => {
+    this.client.connection._heartbeat().catch((error) => {
       /* ignore - test expects heartbeat failure */
     })
   })
@@ -374,41 +374,41 @@ describe('Connection', function () {
       }
     }
     // Set the heartbeat to less than the 1 second ping response
-    this.api.connection._config.timeout = 500
+    this.client.connection._config.timeout = 500
     // Drop the test runner timeout, since this should be a quick test
     this.timeout(5000)
     // fail on reconnect/connection
-    this.api.connection.reconnect = async () => {
+    this.client.connection.reconnect = async () => {
       throw new Error('error on reconnect')
     }
     // Hook up a listener for the reconnect error event
-    this.api.on('error', (error, message) => {
+    this.client.on('error', (error, message) => {
       if (error === 'reconnect' && message === 'error on reconnect') {
         return done()
       }
       return done(new Error('Expected error on reconnect'))
     })
     // Trigger a heartbeat
-    this.api.connection._heartbeat()
+    this.client.connection._heartbeat()
   })
 
   it('should emit disconnected event with code 1000 (CLOSE_NORMAL)', function (done) {
-    this.api.once('disconnected', (code) => {
+    this.client.once('disconnected', (code) => {
       assert.strictEqual(code, 1000)
       done()
     })
-    this.api.disconnect()
+    this.client.disconnect()
   })
 
   it('should emit disconnected event with code 1006 (CLOSE_ABNORMAL)', function (done) {
-    this.api.connection.once('error', (error) => {
+    this.client.connection.once('error', (error) => {
       done(new Error('should not throw error, got ' + String(error)))
     })
-    this.api.connection.once('disconnected', (code) => {
+    this.client.connection.once('disconnected', (code) => {
       assert.strictEqual(code, 1006)
       done()
     })
-    this.api.connection
+    this.client.connection
       .request({
         command: 'test_command',
         data: {disconnectIn: 10}
@@ -417,18 +417,18 @@ describe('Connection', function () {
   })
 
   it('should emit connected event on after reconnect', function (done) {
-    this.api.once('connected', done)
-    this.api.connection._ws.close()
+    this.client.once('connected', done)
+    this.client.connection._ws.close()
   })
 
   it('Multiply connect calls', function () {
-    return this.api.connect().then(() => {
-      return this.api.connect()
+    return this.client.connect().then(() => {
+      return this.client.connect()
     })
   })
 
   it('hasLedgerVersion', function () {
-    return this.api.connection.hasLedgerVersion(8819951).then((result) => {
+    return this.client.connection.hasLedgerVersion(8819951).then((result) => {
       assert(result)
     })
   })
@@ -442,7 +442,7 @@ describe('Connection', function () {
       })
       .catch((error) => {
         assert(
-          error instanceof this.api.errors.ConnectionError,
+          error instanceof this.client.errors.ConnectionError,
           'Should throw ConnectionError'
         )
       })
@@ -450,48 +450,48 @@ describe('Connection', function () {
 
   it('connect multiserver error', function () {
     assert.throws(function () {
-      new RippleAPI({
+      new Client({
         servers: ['wss://server1.com', 'wss://server2.com']
       } as any)
-    }, this.api.errors.RippleError)
+    }, this.client.errors.RippleError)
   })
 
   it('connect throws error', function (done) {
-    this.api.once('error', (type, info) => {
+    this.client.once('error', (type, info) => {
       assert.strictEqual(type, 'type')
       assert.strictEqual(info, 'info')
       done()
     })
-    this.api.connection.emit('error', 'type', 'info')
+    this.client.connection.emit('error', 'type', 'info')
   })
 
   it('emit stream messages', function (done) {
     let transactionCount = 0
     let pathFindCount = 0
-    this.api.connection.on('transaction', () => {
+    this.client.connection.on('transaction', () => {
       transactionCount++
     })
-    this.api.connection.on('path_find', () => {
+    this.client.connection.on('path_find', () => {
       pathFindCount++
     })
-    this.api.connection.on('response', (message) => {
+    this.client.connection.on('response', (message) => {
       assert.strictEqual(message.id, 1)
       assert.strictEqual(transactionCount, 1)
       assert.strictEqual(pathFindCount, 1)
       done()
     })
 
-    this.api.connection._onMessage(
+    this.client.connection._onMessage(
       JSON.stringify({
         type: 'transaction'
       })
     )
-    this.api.connection._onMessage(
+    this.client.connection._onMessage(
       JSON.stringify({
         type: 'path_find'
       })
     )
-    this.api.connection._onMessage(
+    this.client.connection._onMessage(
       JSON.stringify({
         type: 'response',
         id: 1
@@ -500,13 +500,13 @@ describe('Connection', function () {
   })
 
   it('invalid message id', function (done) {
-    this.api.on('error', (errorCode, errorMessage, message) => {
+    this.client.on('error', (errorCode, errorMessage, message) => {
       assert.strictEqual(errorCode, 'badMessage')
       assert.strictEqual(errorMessage, 'valid id not found in response')
       assert.strictEqual(message, '{"type":"response","id":"must be integer"}')
       done()
     })
-    this.api.connection._onMessage(
+    this.client.connection._onMessage(
       JSON.stringify({
         type: 'response',
         id: 'must be integer'
@@ -515,13 +515,13 @@ describe('Connection', function () {
   })
 
   it('propagates error message', function (done) {
-    this.api.on('error', (errorCode, errorMessage, data) => {
+    this.client.on('error', (errorCode, errorMessage, data) => {
       assert.strictEqual(errorCode, 'slowDown')
       assert.strictEqual(errorMessage, 'slow down')
       assert.deepEqual(data, {error: 'slowDown', error_message: 'slow down'})
       done()
     })
-    this.api.connection._onMessage(
+    this.client.connection._onMessage(
       JSON.stringify({
         error: 'slowDown',
         error_message: 'slow down'
@@ -530,7 +530,7 @@ describe('Connection', function () {
   })
 
   it('propagates RippledError data', function (done) {
-    this.api.request('subscribe', {streams: 'validations'}).catch((error) => {
+    this.client.request('subscribe', {streams: 'validations'}).catch((error) => {
       assert.strictEqual(error.name, 'RippledError')
       assert.strictEqual(error.data.error, 'invalidParams')
       assert.strictEqual(error.message, 'Invalid parameters.')
@@ -550,21 +550,21 @@ describe('Connection', function () {
   it('unrecognized message type', function (done) {
     // This enables us to automatically support any
     // new messages added by rippled in the future.
-    this.api.connection.on('unknown', (event) => {
+    this.client.connection.on('unknown', (event) => {
       assert.deepEqual(event, {type: 'unknown'})
       done()
     })
 
-    this.api.connection._onMessage(JSON.stringify({type: 'unknown'}))
+    this.client.connection._onMessage(JSON.stringify({type: 'unknown'}))
   })
 
   it('ledger close without validated_ledgers', function (done) {
     const message = _.omit(ledgerClose, 'validated_ledgers')
-    this.api.on('ledger', function (ledger) {
+    this.client.on('ledger', function (ledger) {
       assert.strictEqual(ledger.ledgerVersion, 8819951)
       done()
     })
-    this.api.connection._ws.emit('message', JSON.stringify(message))
+    this.client.connection._ws.emit('message', JSON.stringify(message))
   })
 
   it(
@@ -573,19 +573,19 @@ describe('Connection', function () {
     async function () {
       this.timeout(3000)
 
-      await this.api.connection.request({
+      await this.client.connection.request({
         command: 'global_config',
         data: {returnEmptySubscribeRequest: 1}
       })
 
-      const api = new RippleAPI({server: this.api.connection._url})
-      return api.connect().then(
+      const client = new Client({server: this.client.connection._url})
+      return client.connect().then(
         () => {
           assert(false, 'Must have thrown!')
         },
         (error) => {
           assert(
-            error instanceof this.api.errors.RippledNotInitializedError,
+            error instanceof this.client.errors.RippledNotInitializedError,
             'Must throw RippledNotInitializedError, got instead ' +
               String(error)
           )
@@ -595,40 +595,40 @@ describe('Connection', function () {
   )
 
   it('should clean up websocket connection if error after websocket is opened', async function () {
-    await this.api.disconnect()
+    await this.client.disconnect()
     // fail on connection
-    this.api.connection._subscribeToLedger = async () => {
+    this.client.connection._subscribeToLedger = async () => {
       throw new Error('error on _subscribeToLedger')
     }
     try {
-      await this.api.connect()
+      await this.client.connect()
       throw new Error('expected connect() to reject, but it resolved')
     } catch (err) {
       assert(err.message === 'error on _subscribeToLedger')
       // _ws.close event listener should have cleaned up the socket when disconnect _ws.close is run on connection error
       // do not fail on connection anymore
-      this.api.connection._subscribeToLedger = async () => {}
-      await this.api.connection.reconnect()
+      this.client.connection._subscribeToLedger = async () => {}
+      await this.client.connection.reconnect()
     }
   })
 
   it('should try to reconnect on empty subscribe response on reconnect', function (done) {
     this.timeout(23000)
-    this.api.on('error', (error) => {
+    this.client.on('error', (error) => {
       done(error || new Error('Should not emit error.'))
     })
     let disconnectedCount = 0
-    this.api.on('connected', () => {
+    this.client.on('connected', () => {
       done(
         disconnectedCount !== 1
           ? new Error('Wrong number of disconnects')
           : undefined
       )
     })
-    this.api.on('disconnected', () => {
+    this.client.on('disconnected', () => {
       disconnectedCount++
     })
-    this.api.connection.request({
+    this.client.connection.request({
       command: 'test_command',
       data: {disconnectIn: 5}
     })

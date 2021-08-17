@@ -1,4 +1,4 @@
-import { ValidationError } from 'ripple-api/common/errors'
+import { ValidationError } from 'xrpl-local/common/errors'
 import { verifyAccountDelete } from './../../src/models/transactions/accountDelete'
 import { assert } from 'chai'
 
@@ -89,7 +89,7 @@ describe('AccountDelete Transaction Verification', function () {
         assert.throws(
             () => verifyAccountDelete(insufficientFees),
             ValidationError,
-            "AccountDelete: Tx requires 5 XRP"
+            "AccountDelete: requires 5 XRP"
         )
     })
 
