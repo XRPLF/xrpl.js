@@ -3,6 +3,7 @@ import { OfferCreate } from "./offerCreate";
 import { CheckCash } from "./checkCash";
 import { CheckCancel } from "./checkCancel";
 import { CheckCreate } from "./checkCreate";
+import { PaymentChannelClaim } from "./paymentChannelClaim";
 
 export type Transaction =
 //     AccountSet
@@ -17,7 +18,7 @@ export type Transaction =
 //   | OfferCancel
      | OfferCreate
 //   | PaymentTransaction
-//   | PaymentChannelClaim
+     | PaymentChannelClaim
 //   | PaymentChannelCreate
 //   | PaymentChannelFund
 //   | SetRegularKey
