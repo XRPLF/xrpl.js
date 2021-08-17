@@ -71,7 +71,7 @@ export function verifyPaymentTransaction(tx: PaymentTransaction): void {
             tx.Flags?.tfPartialPayment ?? false
 
         if (!isTfPartialPayment) {
-            throw new ValidationError('PaymentTransaction: missing tfPartialPayment flag with DeliverMin')
+            throw new ValidationError('PaymentTransaction: tfPartialPayment flag required with DeliverMin')
         }
 
         if (typeof tx.DeliverMin !== 'string' && !isIssuedCurrency(tx.DeliverMin)) {

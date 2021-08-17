@@ -27,7 +27,7 @@ describe('Payment Transaction Verification', () => {
         assert.doesNotThrow(() => verifyPaymentTransaction(paymentTransaction))
     })
 
-    it (`throws w/ missing Amount`, () => {
+    it (`throws when Amount is missing`, () => {
         delete paymentTransaction.Amount
         assert.throws(
             () => verifyPaymentTransaction(paymentTransaction),
@@ -36,7 +36,7 @@ describe('Payment Transaction Verification', () => {
         )
     })
 
-    it (`throws w/ invalid Amount`, () => {
+    it (`throws when Amount is invalid`, () => {
         paymentTransaction.Amount = 1234
         assert.throws(
             () => verifyPaymentTransaction(paymentTransaction),
@@ -45,7 +45,7 @@ describe('Payment Transaction Verification', () => {
         )
     })
 
-    it (`throws w/ missing Destination`, () => {
+    it (`throws when Destination is missing`, () => {
         delete paymentTransaction.Destination
         assert.throws(
             () => verifyPaymentTransaction(paymentTransaction),
@@ -54,7 +54,7 @@ describe('Payment Transaction Verification', () => {
         )
     })
 
-    it (`throws w/ invalid Destination`, () => {
+    it (`throws when Destination is invalid`, () => {
         paymentTransaction.Destination = 7896214
         assert.throws(
             () => verifyPaymentTransaction(paymentTransaction),
@@ -63,7 +63,7 @@ describe('Payment Transaction Verification', () => {
         )
     })
 
-    it (`throws w/ invalid DestinationTag`, () => {
+    it (`throws when DestinationTag is invalid`, () => {
         paymentTransaction.DestinationTag = '1'
         assert.throws(
             () => verifyPaymentTransaction(paymentTransaction),
@@ -72,7 +72,7 @@ describe('Payment Transaction Verification', () => {
         )
     })
 
-    it (`throws w/ invalid InvoiceID`, () => {
+    it (`throws when InvoiceID is invalid`, () => {
         paymentTransaction.InvoiceID = 19832
         assert.throws(
             () => verifyPaymentTransaction(paymentTransaction),
@@ -81,7 +81,7 @@ describe('Payment Transaction Verification', () => {
         )
     })
 
-    it (`throws w/ invalid Paths`, () => {
+    it (`throws when Paths is invalid`, () => {
         paymentTransaction.Paths = [[{ account: 123 }]]
         assert.throws(
             () => verifyPaymentTransaction(paymentTransaction),
@@ -90,7 +90,7 @@ describe('Payment Transaction Verification', () => {
         )
     })
 
-    it (`throws w/ invalid SendMax`, () => {
+    it (`throws when SendMax is invalid`, () => {
         paymentTransaction.SendMax = 100000000
         assert.throws(
             () => verifyPaymentTransaction(paymentTransaction),
@@ -111,7 +111,7 @@ describe('Payment Transaction Verification', () => {
         assert.doesNotThrow(() => verifyPaymentTransaction(paymentTransaction))
     })
 
-    it (`throws w/ invalid DeliverMin`, () => {
+    it (`throws when DeliverMin is invalid`, () => {
         paymentTransaction.DeliverMin = 10000
         paymentTransaction.Flags = { tfPartialPayment: true }
         assert.throws(
@@ -121,12 +121,12 @@ describe('Payment Transaction Verification', () => {
         )
     })
 
-    it (`throws w/ tfPartialPayment flag missing with DeliverMin`, () => {
+    it (`throws when tfPartialPayment flag is missing with valid DeliverMin`, () => {
         paymentTransaction.DeliverMin = '10000'
         assert.throws(
             () => verifyPaymentTransaction(paymentTransaction),
             ValidationError,
-            'PaymentTransaction: missing tfPartialPayment flag with DeliverMin'
+            'PaymentTransaction: tfPartialPayment flag required with DeliverMin'
         )
     })
 })
