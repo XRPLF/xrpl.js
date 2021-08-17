@@ -6,7 +6,7 @@ import {computeBinaryTransactionHash} from '../common/hashes'
 import {SignOptions, KeyPair, TransactionJSON} from './types'
 import BigNumber from 'bignumber.js'
 import {xrpToDrops} from '../common'
-import {RippleAPI} from '..'
+import {Client} from '..'
 import Wallet from '../Wallet'
 import {SignedTransaction} from '../common/types/objects'
 const validate = utils.common.validate
@@ -19,7 +19,7 @@ function computeSignature(tx: object, privateKey: string, signAs?: string) {
 }
 
 function signWithKeypair(
-  api: RippleAPI,
+  client: Client,
   txJSON: string,
   keypair: KeyPair,
   options: SignOptions = {
@@ -27,7 +27,7 @@ function signWithKeypair(
   }
 ): SignedTransaction {
   validate.sign({txJSON, keypair})
-  const isOnline = !!api;
+  const isOnline = !!client;
 
   const tx = JSON.parse(txJSON)
   if (tx.TxnSignature || tx.Signers) {
@@ -37,7 +37,7 @@ function signWithKeypair(
   }
 
   if (isOnline) {
-    checkFee(api, tx.Fee)
+    checkFee(client, tx.Fee)
   }
 
   const txToSignAndEncode = Object.assign({}, tx)
@@ -202,24 +202,24 @@ function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
  *
  *  See https://xrpl.org/rippleapi-reference.html#parameters
  *
- *  @param {RippleAPI} api A RippleAPI instance.
+ *  @param {Client} client A Client instance.
  *  @param {string} txFee The transaction fee in drops, encoded as a string.
  *
  *  @returns {void} This method does not return a value, but throws an error if the check fails.
  */
-function checkFee(api: RippleAPI, txFee: string): void {
+function checkFee(client: Client, txFee: string): void {
   const fee = new BigNumber(txFee)
-  const maxFeeDrops = xrpToDrops(api._maxFeeXRP)
+  const maxFeeDrops = xrpToDrops(client._maxFeeXRP)
   if (fee.isGreaterThan(maxFeeDrops)) {
     throw new utils.common.errors.ValidationError(
       `"Fee" should not exceed "${maxFeeDrops}". ` +
-        'To use a higher fee, set `maxFeeXRP` in the RippleAPI constructor.'
+        'To use a higher fee, set `maxFeeXRP` in the Client constructor.'
     )
   }
 }
 
 function sign(
-  this: RippleAPI,
+  this: Client,
   txJSON: string,
   secret?: any,
   options?: SignOptions,
