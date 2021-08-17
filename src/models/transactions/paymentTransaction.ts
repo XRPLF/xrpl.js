@@ -66,15 +66,12 @@ export function verifyPaymentTransaction(tx: PaymentTransaction): void {
     }
     
     if (tx.DeliverMin !== undefined) {
-        let isTfPartialPayment
-        if (typeof tx.Flags === 'number') {
-            isTfPartialPayment = (PaymentTransactionFlagsEnum.tfPartialPayment & tx.Flags) === PaymentTransactionFlagsEnum.tfPartialPayment
-        } else {
-            isTfPartialPayment = tx.Flags.tfPartialPayment
-        }
+        const isTfPartialPayment = typeof tx.Flags === 'number' ?
+            (PaymentTransactionFlagsEnum.tfPartialPayment & tx.Flags) === PaymentTransactionFlagsEnum.tfPartialPayment :
+            tx.Flags?.tfPartialPayment ?? false
 
         if (!isTfPartialPayment) {
-            throw new ValidationError('PaymentTransaction: tfPartialPayment flag missing with DeliverMin')
+            throw new ValidationError('PaymentTransaction: missing tfPartialPayment flag with DeliverMin')
         }
 
         if (typeof tx.DeliverMin !== 'string' && !isIssuedCurrency(tx.DeliverMin)) {
@@ -84,13 +81,13 @@ export function verifyPaymentTransaction(tx: PaymentTransaction): void {
 }
 
 function isPaths(paths: Path[]): boolean {
-    if (!Array.isArray(paths)) {
+    if (!Array.isArray(paths) || paths.length === 0) {
         return false
     }
     
     for (const i in paths) {
         const path = paths[i]
-        if (!Array.isArray(path)) {
+        if (!Array.isArray(path) || path.length === 0) {
             return false
         }
         

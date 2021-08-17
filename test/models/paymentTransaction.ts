@@ -1,4 +1,4 @@
-import { ValidationError } from 'ripple-api/common/errors'
+import { ValidationError } from 'xrpl-local/common/errors'
 import { PaymentTransactionFlagsEnum, verifyPaymentTransaction } from './../../src/models/transactions/paymentTransaction'
 import { assert } from 'chai'
 
@@ -20,8 +20,6 @@ describe('Payment Transaction Verification', () => {
             InvoiceID: '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
             Paths: [[{ account: 'aw0efji', currency: 'XRP', issuer: 'apsoeijf90wp34fh'}]],
             SendMax: '100000000',
-            DeliverMin: '10000',
-            Flags: PaymentTransactionFlagsEnum.tfPartialPayment,
         } as any
     })
 
@@ -101,8 +99,21 @@ describe('Payment Transaction Verification', () => {
         )
     })
 
+    it (`verifies valid DeliverMin with tfPartialPayment flag set as a number`, () => {
+        paymentTransaction.DeliverMin = '10000'
+        paymentTransaction.Flags = PaymentTransactionFlagsEnum.tfPartialPayment,
+        assert.doesNotThrow(() => verifyPaymentTransaction(paymentTransaction))
+    })
+
+    it (`verifies valid DeliverMin with tfPartialPayment flag set as a boolean`, () => {
+        paymentTransaction.DeliverMin = '10000'
+        paymentTransaction.Flags = { tfPartialPayment: true }
+        assert.doesNotThrow(() => verifyPaymentTransaction(paymentTransaction))
+    })
+
     it (`throws w/ invalid DeliverMin`, () => {
         paymentTransaction.DeliverMin = 10000
+        paymentTransaction.Flags = { tfPartialPayment: true }
         assert.throws(
             () => verifyPaymentTransaction(paymentTransaction),
             ValidationError,
@@ -111,11 +122,11 @@ describe('Payment Transaction Verification', () => {
     })
 
     it (`throws w/ tfPartialPayment flag missing with DeliverMin`, () => {
-        paymentTransaction.Flags -= PaymentTransactionFlagsEnum.tfPartialPayment
+        paymentTransaction.DeliverMin = '10000'
         assert.throws(
             () => verifyPaymentTransaction(paymentTransaction),
             ValidationError,
-            'PaymentTransaction: tfPartialPayment flag missing with DeliverMin'
+            'PaymentTransaction: missing tfPartialPayment flag with DeliverMin'
         )
     })
 })

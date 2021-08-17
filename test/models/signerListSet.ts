@@ -1,4 +1,4 @@
-import { ValidationError } from 'ripple-api/common/errors'
+import { ValidationError } from 'xrpl-local/common/errors'
 import { verifySignerListSet } from './../../src/models/transactions/signerListSet'
 import { assert } from 'chai'
 
