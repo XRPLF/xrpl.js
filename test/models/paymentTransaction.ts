@@ -3,7 +3,7 @@ import { PaymentTransactionFlagsEnum, verifyPaymentTransaction } from './../../s
 import { assert } from 'chai'
 
 /**
- * Payment Transaction Verification Testing
+ * PaymentTransaction Verification Testing
  *
  * Providing runtime verification testing for each specific transaction type
  */
