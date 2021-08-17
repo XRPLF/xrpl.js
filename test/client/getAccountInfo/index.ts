@@ -1,4 +1,6 @@
-// import responses from '../../fixtures/responses'
+import assert from 'assert'
+import _ from 'lodash'
+import responses from '../../fixtures/rippled'
 import {assertRejects, TestSuite} from '../../utils'
 
 /**
@@ -7,15 +9,21 @@ import {assertRejects, TestSuite} from '../../utils'
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  // 'getAccountInfo': async (client, address) => {
-  //   const result = await client.getAccountInfo(address)
-  //   assertResultMatch(result, responses.getAccountInfo, 'getAccountInfo')
-  // },
+  'getAccountInfo': async (client, address) => {
+    const response = await client.getAccountInfo(address)
+    assert.deepEqual(
+      _.omit(response, 'id'),
+      _.omit(responses.account_info.normal, 'id'),
+    )
+  },
 
-  // 'getAccountInfo - options undefined': async (client, address) => {
-  //   const result = await client.getAccountInfo(address, undefined)
-  //   assertResultMatch(result, responses.getAccountInfo, 'getAccountInfo')
-  // },
+  'getAccountInfo - options undefined': async (client, address) => {
+    const response = await client.getAccountInfo(address, undefined)
+    assert.deepEqual(
+      _.omit(response, 'id'),
+      _.omit(responses.account_info.normal, 'id'),
+    )
+  },
 
   'getAccountInfo - invalid options': async (client, address) => {
     await assertRejects(

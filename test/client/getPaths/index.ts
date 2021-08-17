@@ -1,5 +1,5 @@
 import assert from 'assert-diff'
-import { assertRejects, TestSuite} from '../../utils'
+import { assertRejects, TestSuite } from '../../utils'
 import requests from '../../fixtures/requests'
 // import responses from '../../fixtures/responses'
 import addresses from '../../fixtures/addresses.json'
@@ -26,10 +26,10 @@ export default <TestSuite>{
   //   assertResultMatch(usdOnlyResult, RESPONSE_FIXTURES.UsdToUsd, 'getPaths')
   //   assertResultMatch(xrpOnlyResult, RESPONSE_FIXTURES.XrpToXrp, 'getPaths')
   // },
-  // @TODO
-  // need decide what to do with currencies/XRP:
-  // if add 'XRP' in currencies, then there will be exception in
-  // xrpToDrops function (called from toRippledAmount)
+  // // @TODO
+  // // need decide what to do with currencies/XRP:
+  // // if add 'XRP' in currencies, then there will be exception in
+  // // xrpToDrops function (called from toRippledAmount)
   // 'getPaths USD 2 USD': async (client) => {
   //   const response = await client.getPaths(REQUEST_FIXTURES.UsdToUsd)
   //   assertResultMatch(response, RESPONSE_FIXTURES.UsdToUsd, 'getPaths')

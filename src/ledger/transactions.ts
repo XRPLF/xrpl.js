@@ -106,8 +106,8 @@ function formatPartialResponse(
   const parse = (tx) =>
     parseAccountTxTransaction(tx, options.includeRawTransactions)
   return {
-    marker: data.marker,
-    results: data.transactions
+    marker: data.result.marker,
+    results: data.result.transactions
       .filter((tx) => tx.validated)
       .map(parse)
       .filter(_.partial(transactionFilter, address, options))

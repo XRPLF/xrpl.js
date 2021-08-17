@@ -56,7 +56,7 @@ async function submit(
     ...(failHard ? {fail_hard: failHard} : {})
   })
   // 3. Return Formatted Response
-  return formatSubmitResponse(response)
+  return formatSubmitResponse(response.result)
 }
 
 export default submit
