@@ -7,7 +7,7 @@ import { assert } from 'chai'
  *
  * Providing runtime verification testing for each specific transaction type
  */
-describe('Transaction Verification', function () {
+describe('CheckCancel Transaction Verification', function () {
 
     it (`verifies valid CheckCancel`, () => {
         const validCheckCancel = {
