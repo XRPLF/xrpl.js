@@ -1,6 +1,6 @@
-import {RippleAPI} from '../../dist/npm'
+import {Client} from '../../dist/npm'
 
-const api = new RippleAPI({
+const client = new Client({
   // server: 'wss://s.altnet.rippletest.net:51233'
   // server: 'ws://35.158.96.209:51233'
   server: 'ws://34.210.87.206:51233'
@@ -9,7 +9,7 @@ const api = new RippleAPI({
 sign()
 
 async function sign() {
-  await api.connect()
+  await client.connect()
   const pathfind: any = {
     source: {
       address: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -27,14 +27,14 @@ async function sign() {
     }
   }
 
-  await api.getPaths(pathfind).then(async (data) => {
+  await client.getPaths(pathfind).then(async (data) => {
     console.log('paths:', JSON.stringify(data))
     const fakeSecret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
 
     pathfind.paths = data[0].paths
     pathfind.destination = data[0].destination
-    await api.preparePayment('r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59', pathfind).then(ret => {
-      const signed = api.sign(ret.txJSON, fakeSecret)
+    await client.preparePayment('r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59', pathfind).then(ret => {
+      const signed = client.sign(ret.txJSON, fakeSecret)
       console.log('signed:', signed)
     }).catch(err => {
         console.log('ERR 1:', JSON.stringify(err))
@@ -43,5 +43,5 @@ async function sign() {
       console.log('ERR 2:', err)
   })
 
-  api.disconnect()
+  client.disconnect()
 }

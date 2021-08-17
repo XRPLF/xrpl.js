@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
 import * as utils from './utils'
 import {Prepare, TransactionJSON, Instructions} from './types'
-import {RippleAPI} from '..'
+import {Client} from '..'
 
 const validate = utils.common.validate
 const ValidationError = utils.common.errors.ValidationError
@@ -28,7 +28,7 @@ function createTicketTransaction(
 }
 
 function prepareTicketCreate(
-  this: RippleAPI,
+  this: Client,
   address: string,
   ticketCount: number,
   instructions: Instructions = {}

@@ -1,8 +1,8 @@
-import {RippleAPI} from 'ripple-api'
+import {Client} from 'xrpl-local'
 import {TestSuite} from '../../utils'
 import Wallet from '../../../src/Wallet'
 
-const {schemaValidator} = RippleAPI._PRIVATE
+const {schemaValidator} = Client._PRIVATE
 const publicKey =
   '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
 const privateKey =
