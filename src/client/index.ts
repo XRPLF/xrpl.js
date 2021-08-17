@@ -125,6 +125,7 @@ import * as ledgerUtils from '../ledger/utils'
 import * as transactionUtils from '../transaction/utils'
 import * as schemaValidator from '../common/schema-validator'
 import {getServerInfo, getFee} from '../common/serverinfo'
+import {ensureClassicAddress} from '../common'
 import {clamp} from '../ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from '../transaction/types'
 import {
@@ -172,11 +173,19 @@ export interface ClientOptions extends ConnectionUserOptions {
  */
 function getCollectKeyFromCommand(command: string): string | null {
   switch (command) {
+    case 'account_channels':
+      return 'channels'
+    case 'account_lines':
+      return 'lines'
+    case 'account_objects':
+      return 'account_objects'
+    case 'account_tx':
+      return 'transactions'
     case 'account_offers':
     case 'book_offers':
       return 'offers'
-    case 'account_lines':
-      return 'lines'
+    case 'ledger_data':
+      return 'state'
     default:
       return null
   }
@@ -280,7 +289,11 @@ class Client extends EventEmitter {
   public request(r: TxRequest): Promise<TxResponse>
   public request<R extends Request, T extends Response>(r: R): Promise<T> {
     // TODO: should this be typed with `extends BaseRequest/BaseResponse`?
-    return this.connection.request(r)
+    return this.connection.request({
+      ...r,
+      // @ts-ignore
+      account: r.account ? ensureClassicAddress(r.account) : undefined,
+    })
   }
 
   /**
@@ -375,10 +388,11 @@ class Client extends EventEmitter {
         limit: countRemaining,
         marker
       }
-      const singleResult = await this.connection.request(repeatProps)
+      const singleResponse = await this.connection.request(repeatProps)
+      const singleResult = singleResponse.result
       const collectedData = singleResult[collectKey]
       marker = singleResult['marker']
-      results.push(singleResult)
+      results.push(singleResponse)
       // Make sure we handle when no data (not even an empty array) is returned.
       const isExpectedFormat = Array.isArray(collectedData)
       if (isExpectedFormat) {
