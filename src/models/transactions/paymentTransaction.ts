@@ -67,7 +67,7 @@ export function verifyPaymentTransaction(tx: PaymentTransaction): void {
     
     if (tx.DeliverMin !== undefined) {
         const isTfPartialPayment = typeof tx.Flags === 'number' ?
-            (PaymentTransactionFlagsEnum.tfPartialPayment & tx.Flags) === PaymentTransactionFlagsEnum.tfPartialPayment :
+            isFlagEnabled(tx.Flags, PaymentTransactionFlagsEnum.tfPartialPayment) :
             tx.Flags?.tfPartialPayment ?? false
 
         if (!isTfPartialPayment) {
@@ -105,4 +105,9 @@ function isPaths(paths: Path[]): boolean {
     }
 
     return true;
+}
+
+function isFlagEnabled(Flags: number, checkFlag: number) {
+    // Perform bitwise AND (&) to check if a flag is enabled within Flags (as a number)
+    return (checkFlag & Flags) === checkFlag
 }
