@@ -1,6 +1,6 @@
-import { ValidationError } from 'ripple-api/common/errors'
 import { EscrowCancel, verifyEscrowCancel } from './../../src/models/transactions/escrowCancel'
 import { assert } from 'chai'
+import { ValidationError } from '../../src/common/errors'
 
 /**
  * Transaction Verification Testing

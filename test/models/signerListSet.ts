@@ -1,6 +1,6 @@
-import { ValidationError } from 'ripple-api/common/errors'
 import { verifySignerListSet } from './../../src/models/transactions/signerListSet'
 import { assert } from 'chai'
+import { ValidationError } from '../../src/common/errors'
 
 /**
  * SignerListSet Transaction Verification Testing
