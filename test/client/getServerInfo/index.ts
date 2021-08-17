@@ -1,4 +1,4 @@
-// import assert from 'assert-diff'
+import assert from 'assert-diff'
 import responses from '../../fixtures/responses'
 import {assertResultMatch, TestSuite, assertRejects} from '../../utils'
 
@@ -10,32 +10,32 @@ import {assertResultMatch, TestSuite, assertRejects} from '../../utils'
 export default <TestSuite>{
   'default': async (client, address) => {
     const serverInfo = await client.getServerInfo()
-    assertResultMatch(serverInfo.result.info, responses.getServerInfo, 'getServerInfo')
+    assertResultMatch(serverInfo, responses.getServerInfo, 'getServerInfo')
   },
 
-  // 'error': async (client, address) => {
-  //   client.connection.request({
-  //     command: 'config',
-  //     data: {returnErrorOnServerInfo: true}
-  //   })
-  //   try {
-  //     await client.getServerInfo()
-  //     throw new Error('Should throw NetworkError')
-  //   } catch (err) {
-  //     assert(err instanceof client.errors.RippledError)
-  //     assert.equal(err.message, 'You are placing too much load on the server.')
-  //     assert.equal(err.data.error, 'slowDown')
-  //   }
-  // },
+  'error': async (client, address) => {
+    client.connection.request({
+      command: 'config',
+      data: {returnErrorOnServerInfo: true}
+    })
+    try {
+      await client.getServerInfo()
+      throw new Error('Should throw NetworkError')
+    } catch (err) {
+      assert(err instanceof client.errors.RippledError)
+      assert.equal(err.message, 'You are placing too much load on the server.')
+      assert.equal(err.data.error, 'slowDown')
+    }
+  },
 
-  // 'no validated ledger': async (client, address) => {
-  //   client.connection.request({
-  //     command: 'config',
-  //     data: {serverInfoWithoutValidated: true}
-  //   })
-  //   const serverInfo = await client.getServerInfo()
-  //   assert.strictEqual(serverInfo.networkLedger, 'waiting')
-  // },
+  'no validated ledger': async (client, address) => {
+    client.connection.request({
+      command: 'config',
+      data: {serverInfoWithoutValidated: true}
+    })
+    const serverInfo = await client.getServerInfo()
+    assert.strictEqual(serverInfo.networkLedger, 'waiting')
+  },
 
   'getServerInfo - offline': async (client, address) => {
     await client.disconnect()

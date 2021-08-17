@@ -18,6 +18,8 @@ function setup(this: any, port_ = port) {
     })
     .then((got) => {
       return new Promise<void>((resolve, reject) => {
+        // TODO: resolve when we redo the testing framework
+        // @ts-ignore
         this.client = new Client({server: baseUrl + got.port})
         this.client
           .connect()
