@@ -32,7 +32,7 @@ describe('Client [Test Runner]', function () {
 
   runTests(utilTestSuites)
 
-  runTests(apiTestSuites)
+  runTests(apiTestSuites, "api.")
 
   // Report any missing tests for api functions.
   const allTestedMethods = new Set(apiTestSuites.map((s) => s.name))
@@ -48,9 +48,9 @@ describe('Client [Test Runner]', function () {
   }
 }) 
 
-function runTests(testSuites: LoadedTestSuite[]) {
+function runTests(testSuites: LoadedTestSuite[], descriptionPrefix: string = "") {
   for (const { name: methodName, tests, config } of testSuites) {
-    describe(`api.${methodName}`, () => {
+    describe(descriptionPrefix.concat(methodName), () => {
       // Run each test that does not use an address.
       for (const [testName, fn] of tests) {
         if (fn.length === 1) {
