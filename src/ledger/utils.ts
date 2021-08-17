@@ -6,6 +6,7 @@ import {FormattedTransactionType} from '../transaction/types'
 import {Issue} from '../common/types/objects'
 import {Client} from '..'
 import { AccountInfoRequest } from '../models/methods'
+import RangeSet from '../client/rangeset'
 
 export type RecursiveData = {
   marker: string
@@ -101,13 +102,28 @@ function compareTransactions(
   return first.outcome.ledgerVersion < second.outcome.ledgerVersion ? -1 : 1
 }
 
+function hasLedgerVersions(connection: Connection, min: number, max: number | undefined): Promise<boolean> {
+  return connection.request({
+    command: 'server_info'
+  })
+  .then((response) => response.result.info.complete_ledgers)
+  .then((ledgerRange) => {
+    const rangeset = new RangeSet()
+    rangeset.parseAndAddRanges(ledgerRange)
+    if (!max) {
+      return rangeset.containsValue(min)
+    }
+    return rangeset.containsRange(min, max)
+  })
+}
+
 function hasCompleteLedgerRange(
   connection: Connection,
   minLedgerVersion?: number,
   maxLedgerVersion?: number
 ): Promise<boolean> {
   const firstLedgerVersion = 32570 // earlier versions have been lost
-  return connection.hasLedgerVersions(
+  return hasLedgerVersions(connection,
     minLedgerVersion || firstLedgerVersion,
     maxLedgerVersion
   )
@@ -117,8 +133,11 @@ function isPendingLedgerVersion(
   connection: Connection,
   maxLedgerVersion?: number
 ): Promise<boolean> {
-  return connection
-    .getLedgerVersion()
+  return connection.request({
+      command: 'ledger',
+      ledger_index: 'validated'
+    })
+    .then((response) => response.result.ledger_index)
     .then((ledgerVersion) => ledgerVersion < (maxLedgerVersion || 0))
 }
 
@@ -130,7 +149,12 @@ function ensureLedgerVersion(this: Client, options: any): Promise<object> {
   ) {
     return Promise.resolve(options)
   }
-  return this.getLedgerVersion().then((ledgerVersion) =>
+  return this.request({
+      command: 'ledger',
+      ledger_index: 'validated'
+    })
+    .then((response) => response.result.ledger_index)
+    .then((ledgerVersion) =>
     Object.assign({}, options, {ledgerVersion})
   )
 }
