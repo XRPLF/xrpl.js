@@ -358,7 +358,7 @@ describe('integration tests', function () {
 
   it('getServerInfo', function () {
     return this.client.getServerInfo().then((data) => {
-      assert(data && data.pubkeyNode)
+      assert(data && data.result.info.pubkey_node)
     })
   })
 
@@ -449,62 +449,62 @@ describe('integration tests', function () {
     })
   })
 
-  it('getPaths', function () {
-    const pathfind = {
-      source: {
-        address: address
-      },
-      destination: {
-        address: this.newWallet.address,
-        amount: {
-          value: '1',
-          currency: 'USD',
-          counterparty: masterAccount
-        }
-      }
-    }
-    return this.client.getPaths(pathfind).then((data) => {
-      assert(data && data.length > 0)
-      const path = data[0]
-      assert(path && path.source)
-      assert.strictEqual(path.source.address, address)
-      assert(path.paths && path.paths.length > 0)
-    })
-  })
+  // it('getPaths', function () {
+  //   const pathfind = {
+  //     source: {
+  //       address: address
+  //     },
+  //     destination: {
+  //       address: this.newWallet.address,
+  //       amount: {
+  //         value: '1',
+  //         currency: 'USD',
+  //         counterparty: masterAccount
+  //       }
+  //     }
+  //   }
+  //   return this.client.getPaths(pathfind).then((data) => {
+  //     assert(data && data.length > 0)
+  //     const path = data[0]
+  //     assert(path && path.source)
+  //     assert.strictEqual(path.source.address, address)
+  //     assert(path.paths && path.paths.length > 0)
+  //   })
+  // })
 
-  it('getPaths - send all', function () {
-    const pathfind = {
-      source: {
-        address: address,
-        amount: {
-          currency: 'USD',
-          value: '0.005'
-        }
-      },
-      destination: {
-        address: this.newWallet.address,
-        amount: {
-          currency: 'USD'
-        }
-      }
-    }
+  // it('getPaths - send all', function () {
+  //   const pathfind = {
+  //     source: {
+  //       address: address,
+  //       amount: {
+  //         currency: 'USD',
+  //         value: '0.005'
+  //       }
+  //     },
+  //     destination: {
+  //       address: this.newWallet.address,
+  //       amount: {
+  //         currency: 'USD'
+  //       }
+  //     }
+  //   }
 
-    return this.client.getPaths(pathfind).then((data) => {
-      assert(data && data.length > 0)
-      assert(
-        data.every((path) => {
-          return (
-            parseFloat(path.source.amount.value) <=
-            parseFloat(pathfind.source.amount.value)
-          )
-        })
-      )
-      const path = data[0]
-      assert(path && path.source)
-      assert.strictEqual(path.source.address, pathfind.source.address)
-      assert(path.paths && path.paths.length > 0)
-    })
-  })
+  //   return this.client.getPaths(pathfind).then((data) => {
+  //     assert(data && data.length > 0)
+  //     assert(
+  //       data.every((path) => {
+  //         return (
+  //           parseFloat(path.source.amount.value) <=
+  //           parseFloat(pathfind.source.amount.value)
+  //         )
+  //       })
+  //     )
+  //     const path = data[0]
+  //     assert(path && path.source)
+  //     assert.strictEqual(path.source.address, pathfind.source.address)
+  //     assert(path.paths && path.paths.length > 0)
+  //   })
+  // })
 
   it('generateWallet', function () {
     const newWallet = this.client.generateAddress()
