@@ -29,15 +29,12 @@ describe('OfferCancel Transaction Verification', function () {
     })
 
     it (`verifies valid OfferCancel with flags`, () => {
-
         offer.Flags = 2147483648
         assert.doesNotThrow(() => verifyOfferCancel(offer))
-        
     })
 
     it (`throws w/ invalid OfferSequence`, () => {
         offer.OfferSequence = '99'
-
         assert.throws(
             () => verifyOfferCancel(offer),
             ValidationError,
@@ -47,7 +44,6 @@ describe('OfferCancel Transaction Verification', function () {
 
     it (`throws w/ missing OfferSequence`, () => {
         delete offer.OfferSequence
-
         assert.throws(
             () => verifyOfferCancel(offer),
             ValidationError,
