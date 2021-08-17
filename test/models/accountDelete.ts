@@ -75,4 +75,22 @@ describe('AccountDelete Transaction Verification', function () {
         )
     })
 
+    it (`throws w/ insufficient Fees`, () => {
+        const insufficientFees = {
+            TransactionType: "AccountDelete",
+            Account: "rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm",
+            Destination: "rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe",
+            DestinationTag: 13,
+            Fee: "1000000",
+            Sequence: 2470665,
+            Flags: 2147483648
+        } as any
+
+        assert.throws(
+            () => verifyAccountDelete(insufficientFees),
+            ValidationError,
+            "AccountDelete: Tx requires 5 XRP"
+        )
+    })
+
 })
