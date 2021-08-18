@@ -4,6 +4,7 @@ import { AccountSet } from "./accountSet"
 import { CheckCancel } from "./checkCancel"
 import { CheckCash } from "./checkCash"
 import { CheckCreate } from "./checkCreate"
+import { DepositPreauth } from "./depositPreauth"
 import { OfferCancel } from "./offerCancel"
 import { OfferCreate } from "./offerCreate"
 import { PaymentTransaction } from "./paymentTransaction"
@@ -15,7 +16,7 @@ export type Transaction =
      | CheckCancel
      | CheckCash
      | CheckCreate
-//   | DepositPreauth
+     | DepositPreauth
 //   | EscrowCancel
 //   | EscrowCreate
 //   | EscrowFinish
