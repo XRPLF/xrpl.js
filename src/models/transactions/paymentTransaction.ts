@@ -1,5 +1,6 @@
 import { ValidationError } from '../../common/errors'
 import { Amount, Path } from '../common'
+import { isFlagEnabled } from '../utils'
 import { BaseTransaction, isAmount, GlobalFlags, verifyBaseTransaction } from './common'
 
 export enum PaymentTransactionFlagsEnum {
@@ -8,7 +9,7 @@ export enum PaymentTransactionFlagsEnum {
     tfLimitQuality = 0x00040000,
 }
 
-interface PaymentTransactionFlags extends GlobalFlags {
+export interface PaymentTransactionFlags extends GlobalFlags {
     tfNoDirectRipple?: boolean
     tfPartialPayment?: boolean
     tfLimitQuality?: boolean
@@ -105,9 +106,4 @@ function isPaths(paths: Path[]): boolean {
     }
 
     return true;
-}
-
-function isFlagEnabled(Flags: number, checkFlag: number): boolean {
-    // Perform bitwise AND (&) to check if a flag is enabled within Flags (as a number)
-    return (checkFlag & Flags) === checkFlag
 }
