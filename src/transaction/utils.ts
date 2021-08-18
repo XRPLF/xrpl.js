@@ -269,8 +269,8 @@ function prepareTransaction(
       instructions.maxLedgerVersionOffset != null
         ? instructions.maxLedgerVersionOffset
         : 3
-    return client.connection.request({command: 'ledger', ledger_index: 'validated'})
-    .then(response => response.result.ledger_index)
+    return client.request({command: 'ledger_current'})
+    .then(response => response.result.ledger_current_index)
     .then((ledgerVersion) => {
       newTxJSON.LastLedgerSequence = ledgerVersion + offset
       return

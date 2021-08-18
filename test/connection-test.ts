@@ -3,7 +3,6 @@ import net from 'net'
 import assert from 'assert-diff'
 import setupClient from './setup-client'
 import {Client} from 'xrpl-local'
-import ledgerClose from './fixtures/rippled/ledger-close.json'
 import {ignoreWebSocketDisconnect} from './utils'
 const utils = Client._PRIVATE.ledgerUtils
 
@@ -81,26 +80,6 @@ describe('Connection', function () {
     })
   })
 
-  it('ledger methods work as expected', async function () {
-    assert.strictEqual(await this.client.connection.getLedgerVersion(), 8819951)
-    assert.strictEqual(
-      await this.client.connection.hasLedgerVersion(8819951),
-      true
-    )
-    assert.strictEqual(
-      await this.client.connection.hasLedgerVersions(8819951, undefined),
-      true
-    )
-    // It would be nice to test a better range, but the mocked ledger only supports this single number
-    assert.strictEqual(
-      await this.client.connection.hasLedgerVersions(8819951, 8819951),
-      true
-    )
-    assert.strictEqual(await this.client.connection.getFeeBase(), 10)
-    assert.strictEqual(await this.client.connection.getFeeRef(), 10)
-    assert.strictEqual(await this.client.connection.getReserveBase(), 20000000) // 20 XRP
-  })
-
   it('with proxy', function (done) {
     if (isBrowser) {
       done()
@@ -145,8 +124,10 @@ describe('Connection', function () {
 
   it('NotConnectedError', function () {
     const connection = new utils.Connection('url')
-    return connection
-      .getLedgerVersion()
+    return connection.request({
+        command: 'ledger', 
+        ledger_index: 'validated'
+      })
       .then(() => {
         assert(false, 'Should throw NotConnectedError')
       })
@@ -427,12 +408,6 @@ describe('Connection', function () {
     })
   })
 
-  it('hasLedgerVersion', function () {
-    return this.client.connection.hasLedgerVersion(8819951).then((result) => {
-      assert(result)
-    })
-  })
-
   it('Cannot connect because no server', function () {
     const connection = new utils.Connection(undefined as string)
     return connection
@@ -558,59 +533,23 @@ describe('Connection', function () {
     this.client.connection._onMessage(JSON.stringify({type: 'unknown'}))
   })
 
-  it('ledger close without validated_ledgers', function (done) {
-    const message = _.omit(ledgerClose, 'validated_ledgers')
-    this.client.on('ledger', function (ledger) {
-      assert.strictEqual(ledger.ledgerVersion, 8819951)
-      done()
-    })
-    this.client.connection._ws.emit('message', JSON.stringify(message))
-  })
-
-  it(
-    'should throw RippledNotInitializedError if server does not have ' +
-      'validated ledgers',
-    async function () {
-      this.timeout(3000)
-
-      await this.client.connection.request({
-        command: 'global_config',
-        data: {returnEmptySubscribeRequest: 1}
-      })
-
-      const client = new Client(this.client.connection._url)
-      return client.connect().then(
-        () => {
-          assert(false, 'Must have thrown!')
-        },
-        (error) => {
-          assert(
-            error instanceof this.client.errors.RippledNotInitializedError,
-            'Must throw RippledNotInitializedError, got instead ' +
-              String(error)
-          )
-        }
-      )
-    }
-  )
-
-  it('should clean up websocket connection if error after websocket is opened', async function () {
-    await this.client.disconnect()
-    // fail on connection
-    this.client.connection._subscribeToLedger = async () => {
-      throw new Error('error on _subscribeToLedger')
-    }
-    try {
-      await this.client.connect()
-      throw new Error('expected connect() to reject, but it resolved')
-    } catch (err) {
-      assert(err.message === 'error on _subscribeToLedger')
-      // _ws.close event listener should have cleaned up the socket when disconnect _ws.close is run on connection error
-      // do not fail on connection anymore
-      this.client.connection._subscribeToLedger = async () => {}
-      await this.client.connection.reconnect()
-    }
-  })
+  // it('should clean up websocket connection if error after websocket is opened', async function () {
+  //   await this.client.disconnect()
+  //   // fail on connection
+  //   this.client.connection._subscribeToLedger = async () => {
+  //     throw new Error('error on _subscribeToLedger')
+  //   }
+  //   try {
+  //     await this.client.connect()
+  //     throw new Error('expected connect() to reject, but it resolved')
+  //   } catch (err) {
+  //     assert(err.message === 'error on _subscribeToLedger')
+  //     // _ws.close event listener should have cleaned up the socket when disconnect _ws.close is run on connection error
+  //     // do not fail on connection anymore
+  //     this.client.connection._subscribeToLedger = async () => {}
+  //     await this.client.connection.reconnect()
+  //   }
+  // })
 
   it('should try to reconnect on empty subscribe response on reconnect', function (done) {
     this.timeout(23000)
