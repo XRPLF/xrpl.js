@@ -1,10 +1,10 @@
-import Metadata from "../common/metadata";
-import { OfferCreate } from "./offerCreate";
-import { CheckCash } from "./checkCash";
-import { CheckCancel } from "./checkCancel";
-import { CheckCreate } from "./checkCreate";
-import { SignerListSet } from "./signerListSet";
-import { PaymentTransaction } from "./paymentTransaction";
+import Metadata from "../common/metadata"
+import { OfferCreate } from "./offerCreate"
+import { CheckCash } from "./checkCash"
+import { CheckCancel } from "./checkCancel"
+import { CheckCreate } from "./checkCreate"
+import { SignerListSet } from "./signerListSet"
+import { PaymentTransaction } from "./paymentTransaction"
 
 export type Transaction =
 //     AccountSet
@@ -28,6 +28,6 @@ export type Transaction =
 //   | TrustSet
 
 export interface TransactionAndMetadata {
-    transaction: Transaction;
+    transaction: Transaction
     metadata: Metadata
 }

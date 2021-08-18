@@ -107,7 +107,7 @@ function isPaths(paths: Path[]): boolean {
     return true;
 }
 
-function isFlagEnabled(Flags: number, checkFlag: number) {
+function isFlagEnabled(Flags: number, checkFlag: number): boolean {
     // Perform bitwise AND (&) to check if a flag is enabled within Flags (as a number)
     return (checkFlag & Flags) === checkFlag
 }
