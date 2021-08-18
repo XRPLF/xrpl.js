@@ -5,11 +5,12 @@ import { CheckCancel } from "./checkCancel";
 import { CheckCreate } from "./checkCreate";
 import { EscrowCancel } from './escrowCancel'
 import { SignerListSet } from "./signerListSet";
+import { AccountSet } from "./accountSet";
 
 export type Transaction =
-//     AccountSet
+       AccountSet
 //   | AccountDelete
-       CheckCancel
+     | CheckCancel
      | CheckCash
      | CheckCreate
 //   | DepositPreauth
