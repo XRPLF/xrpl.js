@@ -1,4 +1,4 @@
-import { ValidationError } from 'ripple-api/common/errors'
+import { ValidationError } from 'xrpl-local/common/errors'
 import { verifyPaymentChannelClaim } from './../../src/models/transactions/paymentChannelClaim'
 import { assert } from 'chai'
 
