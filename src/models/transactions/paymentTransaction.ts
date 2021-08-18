@@ -1,6 +1,6 @@
 import { ValidationError } from '../../common/errors'
 import { Amount, Path } from '../common'
-import { BaseTransaction, isIssuedCurrency, GlobalFlags, verifyBaseTransaction } from './common'
+import { BaseTransaction, isAmount, GlobalFlags, verifyBaseTransaction } from './common'
 
 export enum PaymentTransactionFlagsEnum {
     tfNoDirectRipple = 0x00010000,
@@ -37,7 +37,7 @@ export function verifyPaymentTransaction(tx: PaymentTransaction): void {
         throw new ValidationError('PaymentTransaction: missing field Amount')
     }
     
-    if (typeof tx.Amount !== 'string' && !isIssuedCurrency(tx.Amount)) {
+    if (!isAmount(tx.Amount)) {
         throw new ValidationError('PaymentTransaction: invalid Amount')
     }
     
@@ -45,23 +45,23 @@ export function verifyPaymentTransaction(tx: PaymentTransaction): void {
         throw new ValidationError('PaymentTransaction: missing field Destination')
     }
 
-    if (typeof tx.Destination !== 'string' && !isIssuedCurrency(tx.Destination)) {
+    if (!isAmount(tx.Destination)) {
         throw new ValidationError('PaymentTransaction: invalid Destination')
     }
 
     if (tx.DestinationTag !== undefined && typeof tx.DestinationTag !== 'number') {
-        throw new ValidationError('PaymentTransaction: invalid DestinationTag')
+        throw new ValidationError('PaymentTransaction: DestinationTag must be a number')
     }
     
     if (tx.InvoiceID !== undefined && typeof tx.InvoiceID !== 'string') {
-        throw new ValidationError('PaymentTransaction: invalid InvoiceID')
+        throw new ValidationError('PaymentTransaction: InvoiceID must be a string')
     }
     
     if (tx.Paths !== undefined && !isPaths(tx.Paths)) {
         throw new ValidationError('PaymentTransaction: invalid Paths')
     }
     
-    if (tx.SendMax !== undefined && typeof tx.SendMax !== 'string' && !isIssuedCurrency(tx.SendMax)) {
+    if (tx.SendMax !== undefined && !isAmount(tx.SendMax)) {
         throw new ValidationError('PaymentTransaction: invalid SendMax')
     }
     
@@ -74,7 +74,7 @@ export function verifyPaymentTransaction(tx: PaymentTransaction): void {
             throw new ValidationError('PaymentTransaction: tfPartialPayment flag required with DeliverMin')
         }
 
-        if (typeof tx.DeliverMin !== 'string' && !isIssuedCurrency(tx.DeliverMin)) {
+        if (!isAmount(tx.DeliverMin)) {
             throw new ValidationError('PaymentTransaction: invalid DeliverMin')
         }
     }

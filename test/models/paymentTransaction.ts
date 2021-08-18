@@ -63,21 +63,21 @@ describe('Payment Transaction Verification', () => {
         )
     })
 
-    it (`throws when DestinationTag is invalid`, () => {
+    it (`throws when DestinationTag is not a number`, () => {
         paymentTransaction.DestinationTag = '1'
         assert.throws(
             () => verifyPaymentTransaction(paymentTransaction),
             ValidationError,
-            'PaymentTransaction: invalid DestinationTag'
+            'PaymentTransaction: DestinationTag must be a number'
         )
     })
 
-    it (`throws when InvoiceID is invalid`, () => {
+    it (`throws when InvoiceID is not a string`, () => {
         paymentTransaction.InvoiceID = 19832
         assert.throws(
             () => verifyPaymentTransaction(paymentTransaction),
             ValidationError,
-            'PaymentTransaction: invalid InvoiceID'
+            'PaymentTransaction: InvoiceID must be a string'
         )
     })
 
