@@ -26,7 +26,7 @@ describe('Client [Test Runner]', function () {
   afterEach(setupClient.teardown)
 
   // Collect all the tests:
-  const allPublicMethods = getAllPublicMethods(new Client())
+  const allPublicMethods = getAllPublicMethods(new Client("wss://"))
   const allTestSuites = loadTestSuites()
 
   // Run all the tests:

@@ -159,6 +159,7 @@ import {
   computePaymentChannelHash
 } from '../common/hashes'
 import generateFaucetWallet from '../wallet/wallet-generation'
+import { ValidationError } from '../common/errors'
 
 export interface ClientOptions extends ConnectionUserOptions {
   feeCushion?: number
@@ -225,7 +226,11 @@ class Client extends EventEmitter {
   constructor(server: string, options: ClientOptions = {}) {
     super()
     validate.apiOptions(options)
-    this._feeCushion = options.feeCushion || 1
+    if (typeof server !== 'string' || !server.match("^(wss?|wss?\\+unix)://")) {
+      throw new ValidationError("server URI must start with `wss://`, `ws://`, `wss+unix://`, or `ws+unix://`.")
+    }
+
+    this._feeCushion = options.feeCushion || 1.2
     this._maxFeeXRP = options.maxFeeXRP || '2'
 
     this.connection = new Connection(server, options)
