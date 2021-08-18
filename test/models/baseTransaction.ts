@@ -103,21 +103,6 @@ describe('Transaction Verification', function () {
         )
     })
 
-    it (`Handles invalid Flags`, () => {
-        const invalidFlags = {
-            Account: "r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe",
-            TransactionType: "Payment",
-            Flags: "1000"
-        } as any
-
-
-        assert.throws(
-            () => verifyBaseTransaction(invalidFlags),
-            ValidationError,
-            "BaseTransaction: invalid Flags"
-        )
-    })
-
     it (`Handles invalid LastLedgerSequence`, () => {
         const invalidLastLedgerSequence = {
             Account: "r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe",
