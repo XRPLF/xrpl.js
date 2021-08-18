@@ -25,7 +25,4 @@ export interface AccountDelete extends BaseTransaction {
 
     if (tx.DestinationTag !== undefined && typeof tx.DestinationTag !== 'number')
         throw new ValidationError("AccountDelete: invalid DestinationTag")
-
-    if (tx.Fee !== "5000000")
-        throw new ValidationError("AccountDelete: requires 5 XRP")
 }
