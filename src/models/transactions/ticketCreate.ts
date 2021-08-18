@@ -19,7 +19,11 @@ export interface TicketCreate extends BaseTransaction {
         throw new ValidationError('TicketCreate: missing field TicketCount')
     }
 
-    if (typeof tx.TicketCount !== 'number' || tx.TicketCount < 1 || tx.TicketCount > 250) {
+    if (typeof tx.TicketCount !== 'number') {
+        throw new ValidationError('TicketCreate: TicketCount must be a number')
+    }
+
+    if (!Number.isInteger(tx.TicketCount) || tx.TicketCount < 1 || tx.TicketCount > 250) {
         throw new ValidationError('TicketCreate: TicketCount must be an integer from 1 to 250')
     }
 }
