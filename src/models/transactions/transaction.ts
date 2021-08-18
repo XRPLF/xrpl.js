@@ -1,27 +1,33 @@
 import Metadata from "../common/metadata";
-import { OfferCreate } from "./offerCreate";
+import { AccountDelete } from "./accountDelete";
+import { AccountSet } from "./accountSet";
+import { CheckCancel } from "./checkCancel";
+import { CheckCash } from "./checkCash";
 import { CheckCreate } from "./checkCreate";
 import { PaymentChannelFund } from "../../transaction/payment-channel-fund";
-
+import { OfferCancel } from "./offerCancel"
+import { OfferCreate } from "./offerCreate";
+import { SignerListSet } from "./signerListSet";
 
 export type Transaction =
-//     AccountSet
-//   | AccountDelete
-//   | CheckCancel
-//   | CheckCash
-      CheckCreate
+       AccountSet
+     | AccountDelete
+     | CheckCancel
+     | CheckCash
+     | CheckCreate
 //   | DepositPreauth
 //   | EscrowCancel
 //   | EscrowCreate
 //   | EscrowFinish
+     | OfferCancel
 //   | OfferCancel
-     |  OfferCreate
+     | OfferCreate
 //   | PaymentTransaction
 //   | PaymentChannelClaim
 //   | PaymentChannelCreate
      | PaymentChannelFund
 //   | SetRegularKey
-//   | SignerListSet
+     | SignerListSet
 //   | TicketCreate
 //   | TrustSet
 

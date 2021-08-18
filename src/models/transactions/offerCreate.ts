@@ -1,6 +1,6 @@
 import { ValidationError } from "../../common/errors";
-import { Amount, IssuedCurrencyAmount } from "../common";
-import { BaseTransaction, GlobalFlags, verifyBaseTransaction } from "./common";
+import { Amount } from "../common";
+import { BaseTransaction, GlobalFlags, verifyBaseTransaction, isAmount } from "./common";
 
 export interface OfferCreateFlags extends GlobalFlags {
     tfPassive?: boolean;
@@ -34,17 +34,10 @@ export interface OfferCreate extends BaseTransaction {
     if (tx.TakerPays === undefined)
         throw new ValidationError("OfferCreate: missing field TakerPays")
 
-    const isIssuedCurrency = (obj: IssuedCurrencyAmount): boolean => {
-        return Object.keys(obj).length === 3 
-            && typeof obj.value === 'string'
-            && typeof obj.issuer === 'string'
-            && typeof obj.currency === 'string'
-    }
-
-    if (typeof tx.TakerGets !== 'string' && !isIssuedCurrency(tx.TakerGets))
+    if (typeof tx.TakerGets !== 'string' && !isAmount(tx.TakerGets))
         throw new ValidationError("OfferCreate: invalid TakerGets")
 
-    if (typeof tx.TakerPays !== 'string' && !isIssuedCurrency(tx.TakerPays))
+    if (typeof tx.TakerPays !== 'string' && !isAmount(tx.TakerPays))
         throw new ValidationError("OfferCreate: invalid TakerPays")
 
     if (tx.Expiration !== undefined && typeof tx.Expiration !== 'number')
