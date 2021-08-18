@@ -20,5 +20,5 @@ export interface OfferCancel extends BaseTransaction {
         throw new ValidationError("OfferCancel: missing field OfferSequence")
 
     if (typeof tx.OfferSequence !== 'number')
-        throw new ValidationError("OfferCancel: invalid OfferSequence")
+        throw new ValidationError("OfferCancel: OfferSequence must be a number")
 }
