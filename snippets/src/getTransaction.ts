@@ -1,16 +1,16 @@
-import {RippleAPI} from '../../dist/npm'
+import {Client} from '../../dist/npm'
 
-const api = new RippleAPI({
+const client = new Client({
   server: 'wss://s.altnet.rippletest.net:51233'
 })
 
 getTransaction()
 
 async function getTransaction() {
-  await api.connect()
-  const ledger = await api.getLedger({includeTransactions: true})
+  await client.connect()
+  const ledger = await client.getLedger({includeTransactions: true})
   console.log(ledger)
-  const tx = await api.getTransaction(ledger.transactionHashes[0])
+  const tx = await client.getTransaction(ledger.transactionHashes[0])
   console.log(tx)
   console.log('deliveredAmount:', tx.outcome.deliveredAmount)
   process.exit(0)

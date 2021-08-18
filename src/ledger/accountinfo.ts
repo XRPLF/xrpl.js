@@ -4,7 +4,7 @@ import {
   dropsToXrp,
   ensureClassicAddress
 } from '../common'
-import {RippleAPI} from '..'
+import {Client} from '..'
 import {AccountInfoResponse} from '../common/types/commands/account_info'
 
 export type GetAccountInfoOptions = {
@@ -35,7 +35,7 @@ function formatAccountInfo(
 }
 
 export default async function getAccountInfo(
-  this: RippleAPI,
+  this: Client,
   address: string,
   options: GetAccountInfoOptions = {}
 ): Promise<FormattedGetAccountInfoResponse> {
