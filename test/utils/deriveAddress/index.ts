@@ -8,8 +8,4 @@ describe('Derive Address', function () {
     )
     assert.equal(derivedAddress, 'rLczgQHxPhWtjkaQqn3Q6UM8AbRbbRvs5K')
   })
-
-  it('Jackson'), () => {
-    assert.equal(1, 1)
-  }
 })
