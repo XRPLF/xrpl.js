@@ -225,7 +225,6 @@ class Client extends EventEmitter {
 
   constructor(server: string, options: ClientOptions = {}) {
     super()
-    validate.apiOptions(options)
     if (typeof server !== 'string' || !server.match("^(wss?|wss?\\+unix)://")) {
       throw new ValidationError("server URI must start with `wss://`, `ws://`, `wss+unix://`, or `ws+unix://`.")
     }

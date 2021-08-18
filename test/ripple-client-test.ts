@@ -27,6 +27,8 @@ describe('Client [Test Runner]', function () {
 
   // Collect all the tests:
   const allPublicMethods = getAllPublicMethods(new Client("wss://"))
+  // doesn't need the client, just needs to instantiate to get public methods
+
   const allTestSuites = loadTestSuites()
 
   // Run all the tests:
