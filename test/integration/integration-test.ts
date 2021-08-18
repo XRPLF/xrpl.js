@@ -3,11 +3,11 @@ import assert from 'assert'
 import wallet from './wallet'
 import requests from '../fixtures/requests'
 import {Client} from 'xrpl-local'
-import {isValidClassicAddress} from 'ripple-address-codec'
 import {payTo, ledgerAccept} from './utils'
 import {errors} from 'xrpl-local/common'
 import {isValidSecret} from 'xrpl-local/common/utils'
 import { generateAddressAPI } from '../../src/offline/generate-address'
+import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -74,7 +74,8 @@ function testTransaction(
   assert.strictEqual(txData.Account, address)
   const signedData = testcase.client.sign(txJSON, secret)
   console.log('PREPARED...')
-  return testcase.client.request('submit', { tx_blob: signedData.signedTransaction })
+  return testcase.client
+    .request("submit", {tx_blob: signedData.signedTransaction})
     .then((data) =>
       testcase.test.title.indexOf('multisign') !== -1
         ? acceptLedger(testcase.client).then(() => data)
@@ -82,7 +83,7 @@ function testTransaction(
     )
     .then((data) => {
       console.log('SUBMITTED...')
-      assert.strictEqual(data.resultCode, 'tesSUCCESS')
+      assert.strictEqual(data.engine_result, 'tesSUCCESS')
       const options = {
         minLedgerVersion: lastClosedLedgerVersion,
         maxLedgerVersion: txData.LastLedgerSequence
@@ -156,7 +157,7 @@ function setupAccounts(testcase) {
 
   const promise = payTo(client, 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM')
     .then(() => payTo(client, wallet.getAddress()))
-    .then(() => payTo(client, testcase.newWallet.address))
+    .then(() => payTo(client, testcase.newWallet.xAddress))
     .then(() => payTo(client, 'rKmBGxocj9Abgy25J51Mk1iqFzW9aVF9Tc'))
     .then(() => payTo(client, 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q'))
     .then(() => {
@@ -172,7 +173,7 @@ function setupAccounts(testcase) {
     .then(() =>
       makeTrustLine(
         testcase,
-        testcase.newWallet.address,
+        testcase.newWallet.xAddress,
         testcase.newWallet.secret
       )
     )
@@ -193,7 +194,7 @@ function setupAccounts(testcase) {
       }
       return makeOrder(
         testcase.client,
-        testcase.newWallet.address,
+        testcase.newWallet.xAddress,
         orderSpecification,
         testcase.newWallet.secret
       )
@@ -508,8 +509,8 @@ describe('integration tests', function () {
 
   it('generateWallet', function () {
     const newWallet = generateAddressAPI()
-    assert(newWallet && newWallet.address && newWallet.secret)
-    assert(isValidClassicAddress(newWallet.address))
+    assert(newWallet && newWallet.xAddress && newWallet.secret)
+    assert(isValidXAddress(newWallet.xAddress))
     assert(isValidSecret(newWallet.secret))
   })
 })
@@ -575,11 +576,11 @@ describe('integration tests - standalone rippled', function () {
               signed1.signedTransaction,
               signed2.signedTransaction
             ])
-            console.log(combined)
-            return this.client.request('submit', { tx_blob: combined.signedTransaction })
+            return this.client
+              .request({command: "submit", tx_blob: combined.signedTransaction})
               .then((response) => acceptLedger(this.client).then(() => response))
               .then((response) => {
-                assert.strictEqual(response.resultCode, 'tesSUCCESS')
+                assert.strictEqual(response.engine_result, 'tesSUCCESS')
                 const options = {minLedgerVersion}
                 return verifyTransaction(
                   this,
