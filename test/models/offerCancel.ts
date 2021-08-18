@@ -33,7 +33,7 @@ describe('OfferCancel Transaction Verification', function () {
         assert.doesNotThrow(() => verifyOfferCancel(offer))
     })
 
-    it (`throws w/ invalid OfferSequence`, () => {
+    it (`throws w/ OfferSequence must be a number`, () => {
         offer.OfferSequence = '99'
         assert.throws(
             () => verifyOfferCancel(offer),
