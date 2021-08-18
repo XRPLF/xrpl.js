@@ -1,6 +1,6 @@
-import {Client, ClientOptions} from './client'
+import {Client, ClientOptions} from './'
 
-class ClientBroadcast extends Client {
+class BroadcastClient extends Client {
   ledgerVersion: number | undefined = undefined
   private _clients: Client[]
 
@@ -69,4 +69,4 @@ class ClientBroadcast extends Client {
   }
 }
 
-export {ClientBroadcast}
+export {BroadcastClient}
