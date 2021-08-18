@@ -7,10 +7,11 @@ import { CheckCreate } from "./checkCreate";
 import { OfferCancel } from "./offerCancel"
 import { OfferCreate } from "./offerCreate";
 import { SignerListSet } from "./signerListSet";
+import { TrustSet } from "./trustSet"
 
 export type Transaction =
-       AccountSet
-     | AccountDelete
+       AccountDelete
+     | AccountSet
      | CheckCancel
      | CheckCash
      | CheckCreate
@@ -28,7 +29,7 @@ export type Transaction =
 //   | SetRegularKey
      | SignerListSet
 //   | TicketCreate
-//   | TrustSet
+     | TrustSet
 
 export interface TransactionAndMetadata {
     transaction: Transaction;
