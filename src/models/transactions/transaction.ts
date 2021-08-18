@@ -5,6 +5,7 @@ import { CheckCancel } from "./checkCancel";
 import { CheckCreate } from "./checkCreate";
 import { SignerListSet } from "./signerListSet";
 import { AccountSet } from "./accountSet";
+import { SetRegularKey } from "./setRegularKey";
 
 export type Transaction =
        AccountSet
@@ -22,7 +23,7 @@ export type Transaction =
 //   | PaymentChannelClaim
 //   | PaymentChannelCreate
 //   | PaymentChannelFund
-//   | SetRegularKey
+     | SetRegularKey
      | SignerListSet
 //   | TicketCreate
 //   | TrustSet
