@@ -1,4 +1,4 @@
-import { ValidationError } from 'ripple-api/common/errors'
+import { ValidationError } from 'xrpl-local/common/errors'
 import { EscrowFinish, verifyEscrowFinish } from './../../src/models/transactions/escrowFinish'
 import { assert } from 'chai'
 
