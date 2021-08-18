@@ -110,9 +110,6 @@ export function verifyBaseTransaction(common: BaseTransaction): void {
     if (common.Sequence !== undefined && typeof common.Sequence !== 'number')
         throw new ValidationError("BaseTransaction: invalid Sequence")
 
-    if (common.Flags !== undefined && typeof common.Flags !== 'number')
-        throw new ValidationError("BaseTransaction: invalid Flags")
-
     if (common.AccountTxnID !== undefined 
         && typeof common.AccountTxnID !== 'string')
         throw new ValidationError("BaseTransaction: invalid AccountTxnID")
