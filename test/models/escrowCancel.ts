@@ -1,4 +1,4 @@
-import { EscrowCancel, verifyEscrowCancel } from './../../src/models/transactions/escrowCancel'
+import { verifyEscrowCancel } from './../../src/models/transactions/escrowCancel'
 import { assert } from 'chai'
 import { ValidationError } from '../../src/common/errors'
 
@@ -8,73 +8,58 @@ import { ValidationError } from '../../src/common/errors'
  * Providing runtime verification testing for each specific transaction type
  */
 describe('Transaction Verification', function () {
-    it (`Valid EscrowCancel`, () => {
-        const cancel: EscrowCancel = {
+    let cancel
+
+    beforeEach(() => {
+        cancel = {
             TransactionType: "EscrowCancel",
             Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
             Owner: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
             OfferSequence: 7,
         }
+    })
 
+    it (`Valid EscrowCancel`, () => {
         assert.doesNotThrow(() => verifyEscrowCancel(cancel))
     })
 
     it (`Invalid EscrowCancel missing owner`, () => {
-        const missingOwner = {
-            Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            TransactionType: "EscrowCancel",
-            OfferSequence: 7,
-        } as any
+       delete cancel.Owner
 
         assert.throws(
-            () => verifyEscrowCancel(missingOwner),
+            () => verifyEscrowCancel(cancel),
             ValidationError,
             'EscrowCancel: missing Owner'
         )
     })
     
     it (`Invalid EscrowCancel missing offerSequence`, () => {
-
-        const missingOfferSequence = {
-            Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            TransactionType: "EscrowCancel",
-            Owner: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-        } as any
+        delete cancel.OfferSequence
 
         assert.throws(
-            () => verifyEscrowCancel(missingOfferSequence),
+            () => verifyEscrowCancel(cancel),
             ValidationError,
             'EscrowCancel: missing OfferSequence'
         )
     })
 
     it (`Invalid OfferSequence`, () => {
-        const invalidOfferSequence = {
-            Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            TransactionType: "EscrowCancel",
-            OfferSequence: "7",
-            Owner: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-        } as any
+        cancel.Owner = 10
 
         assert.throws(
-            () => verifyEscrowCancel(invalidOfferSequence),
+            () => verifyEscrowCancel(cancel),
             ValidationError,
-            'EscrowCancel: invalid OfferSequence'
+            'EscrowCancel: Owner must be a string'
         )
     })
 
     it (`Invalid owner`, () => {
-        const invalidOwner = {
-            Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            TransactionType: "EscrowCancel",
-            OfferSequence: 7,
-            Owner: 10,
-        } as any
+       cancel.OfferSequence = "10"
 
         assert.throws(
-            () => verifyEscrowCancel(invalidOwner),
+            () => verifyEscrowCancel(cancel),
             ValidationError,
-            'EscrowCancel: invalid Owner'
+            'EscrowCancel: OfferSequence must be a number'
         )
     })
 })
