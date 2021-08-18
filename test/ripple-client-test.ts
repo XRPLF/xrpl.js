@@ -27,12 +27,9 @@ describe('Client [Test Runner]', function () {
 
   // Collect all the tests:
   const allPublicMethods = getAllPublicMethods(new Client("wss://"))
-  const utilTestSuites = loadTestSuitesFromFolder("utils")
-  const apiTestSuites = loadTestSuitesFromFolder("api")
+  const apiTestSuites = loadTestSuitesFromFolder("client")
 
-  runTests(utilTestSuites)
-
-  runTests(apiTestSuites, "api.")
+  runTests(apiTestSuites, "client.")
 
   // Report any missing tests for api functions.
   const allTestedMethods = new Set(apiTestSuites.map((s) => s.name))
