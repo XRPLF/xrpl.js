@@ -1,5 +1,5 @@
-import { ValidationError } from '../../common/errors';
-import { BaseTransaction, verifyBaseTransaction } from './common';
+import { ValidationError } from '../../common/errors'
+import { BaseTransaction, verifyBaseTransaction } from './common'
 
 export interface DepositPreauth extends BaseTransaction {
     TransactionType: 'DepositPreauth'

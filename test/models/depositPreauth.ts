@@ -17,17 +17,17 @@ describe('DepositPreauth Transaction Verification', () => {
         } as any
     })
 
-    it (`verifies valid DepositPreauth when only Authorize is provided`, () => {
+    it ('verifies valid DepositPreauth when only Authorize is provided', () => {
         depositPreauth.Authorize = 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW'
         assert.doesNotThrow(() => verifyDepositPreauth(depositPreauth))
     })
 
-    it (`verifies valid DepositPreauth when only Unauthorize is provided`, () => {
+    it ('verifies valid DepositPreauth when only Unauthorize is provided', () => {
         depositPreauth.Unauthorize = 'raKEEVSGnKSD9Zyvxu4z6Pqpm4ABH8FS6n'
         assert.doesNotThrow(() => verifyDepositPreauth(depositPreauth))
     })
 
-    it (`throws when both Authorize and Unauthorize are provided`, () => {
+    it ('throws when both Authorize and Unauthorize are provided', () => {
         depositPreauth.Authorize = 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW'
         depositPreauth.Unauthorize = 'raKEEVSGnKSD9Zyvxu4z6Pqpm4ABH8FS6n'
         assert.throws(
@@ -37,7 +37,7 @@ describe('DepositPreauth Transaction Verification', () => {
         )
     })
 
-    it (`throws when neither Authorize nor Unauthorize are provided`, () => {
+    it ('throws when neither Authorize nor Unauthorize are provided', () => {
         assert.throws(
             () => verifyDepositPreauth(depositPreauth),
             ValidationError,
@@ -45,7 +45,7 @@ describe('DepositPreauth Transaction Verification', () => {
         )
     })
 
-    it (`throws when an account attempts to preauthorize its own address`, () => {
+    it ('throws when an Account attempts to preauthorize its own address', () => {
         depositPreauth.Authorize = depositPreauth.Account
         assert.throws(
             () => verifyDepositPreauth(depositPreauth),
@@ -54,7 +54,7 @@ describe('DepositPreauth Transaction Verification', () => {
         )
     })
 
-    it (`throws when an account attempts to unauthorize its own address`, () => {
+    it ('throws when an Account attempts to unauthorize its own address', () => {
         depositPreauth.Unauthorize = depositPreauth.Account
         assert.throws(
             () => verifyDepositPreauth(depositPreauth),
