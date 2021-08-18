@@ -14,16 +14,17 @@ export interface TicketCreate extends BaseTransaction {
  */
  export function verifyTicketCreate(tx: TicketCreate): void {
     verifyBaseTransaction(tx)
+    const { TicketCount } = tx
 
-    if (tx.TicketCount === undefined) {
+    if (TicketCount === undefined) {
         throw new ValidationError('TicketCreate: missing field TicketCount')
     }
 
-    if (typeof tx.TicketCount !== 'number') {
+    if (typeof TicketCount !== 'number') {
         throw new ValidationError('TicketCreate: TicketCount must be a number')
     }
 
-    if (!Number.isInteger(tx.TicketCount) || tx.TicketCount < 1 || tx.TicketCount > 250) {
+    if (!Number.isInteger(TicketCount) || TicketCount < 1 || TicketCount > 250) {
         throw new ValidationError('TicketCreate: TicketCount must be an integer from 1 to 250')
     }
 }
