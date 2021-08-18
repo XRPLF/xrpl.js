@@ -1,15 +1,17 @@
 import Metadata from "../common/metadata";
-import { OfferCreate } from "./offerCreate";
-import { CheckCash } from "./checkCash";
+import { AccountDelete } from "./accountDelete";
+import { AccountSet } from "./accountSet";
 import { CheckCancel } from "./checkCancel";
+import { CheckCash } from "./checkCash";
 import { CheckCreate } from "./checkCreate";
 import { EscrowCreate } from "./escrowCreate";
+import { OfferCancel } from "./offerCancel"
+import { OfferCreate } from "./offerCreate";
 import { SignerListSet } from "./signerListSet";
-import { AccountSet } from "./accountSet";
 
 export type Transaction =
        AccountSet
-//   | AccountDelete
+     | AccountDelete
      | CheckCancel
      | CheckCash
      | CheckCreate
@@ -17,6 +19,7 @@ export type Transaction =
 //   | EscrowCancel
      | EscrowCreate
 //   | EscrowFinish
+     | OfferCancel
 //   | OfferCancel
      | OfferCreate
 //   | PaymentTransaction
