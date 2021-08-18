@@ -3,7 +3,7 @@ const offerFlags = utils.common.txFlags.OfferCreate
 import {validate, iso8601ToRippleTime, toRippledAmount} from '../common'
 import {Instructions, Prepare, OfferCreateTransaction} from './types'
 import {FormattedOrderSpecification} from '../common/types/objects/index'
-import {RippleAPI} from '..'
+import {Client} from '..'
 
 function createOrderTransaction(
   account: string,
@@ -48,7 +48,7 @@ function createOrderTransaction(
 }
 
 function prepareOrder(
-  this: RippleAPI,
+  this: Client,
   address: string,
   order: FormattedOrderSpecification,
   instructions: Instructions = {}
