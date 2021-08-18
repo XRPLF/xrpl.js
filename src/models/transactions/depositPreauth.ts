@@ -1,8 +1,8 @@
-import { ValidationError } from "../../common/errors";
-import { BaseTransaction, verifyBaseTransaction } from "./common";
+import { ValidationError } from '../../common/errors';
+import { BaseTransaction, verifyBaseTransaction } from './common';
 
 export interface DepositPreauth extends BaseTransaction {
-    TransactionType: "DepositPreauth"
+    TransactionType: 'DepositPreauth'
     Authorize?: string
     Unauthorize?: string
 }
@@ -21,6 +21,14 @@ export function verifyDepositPreauth(tx: DepositPreauth): void {
     }
 
     if (tx.Authorize === undefined && tx.Unauthorize === undefined) {
-        throw new ValidationError("DepositPreauth: must provide either Authorize or Unauthorize field")
+        throw new ValidationError('DepositPreauth: must provide either Authorize or Unauthorize field')
+    }
+
+    if (tx.Authorize !== undefined && tx.Account === tx.Authorize) {
+        throw new ValidationError("DepositPreauth: Account can't preauthorize its own address")
+    }
+
+    if (tx.Unauthorize !== undefined && tx.Account === tx.Unauthorize) {
+        throw new ValidationError("DepositPreauth: Account can't unauthorize its own address")
     }
 }
