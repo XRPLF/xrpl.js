@@ -45,12 +45,30 @@ describe('DepositPreauth Transaction Verification', () => {
         )
     })
 
+    it ('throws when Authorize is not a string', () => {
+        depositPreauth.Authorize = 1234
+        assert.throws(
+            () => verifyDepositPreauth(depositPreauth),
+            ValidationError,
+            'DepositPreauth: Authorize must be a string'
+        )
+    })
+
     it ('throws when an Account attempts to preauthorize its own address', () => {
         depositPreauth.Authorize = depositPreauth.Account
         assert.throws(
             () => verifyDepositPreauth(depositPreauth),
             ValidationError,
             "DepositPreauth: Account can't preauthorize its own address"
+        )
+    })
+
+    it ('throws when Unauthorize is not a string', () => {
+        depositPreauth.Unauthorize = 1234
+        assert.throws(
+            () => verifyDepositPreauth(depositPreauth),
+            ValidationError,
+            'DepositPreauth: Unauthorize must be a string'
         )
     })
 

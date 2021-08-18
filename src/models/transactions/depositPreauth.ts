@@ -24,11 +24,23 @@ export function verifyDepositPreauth(tx: DepositPreauth): void {
         throw new ValidationError('DepositPreauth: must provide either Authorize or Unauthorize field')
     }
 
-    if (tx.Authorize !== undefined && tx.Account === tx.Authorize) {
-        throw new ValidationError("DepositPreauth: Account can't preauthorize its own address")
+    if (tx.Authorize !== undefined) {
+        if (typeof tx.Authorize !== 'string') {
+            throw new ValidationError('DepositPreauth: Authorize must be a string')
+        }
+
+        if (tx.Account === tx.Authorize) {
+            throw new ValidationError("DepositPreauth: Account can't preauthorize its own address")
+        }
     }
 
-    if (tx.Unauthorize !== undefined && tx.Account === tx.Unauthorize) {
-        throw new ValidationError("DepositPreauth: Account can't unauthorize its own address")
+    if (tx.Unauthorize !== undefined) {
+        if (typeof tx.Unauthorize !== 'string') {
+            throw new ValidationError("DepositPreauth: Unauthorize must be a string")
+        }
+
+        if (tx.Account === tx.Unauthorize) {
+            throw new ValidationError("DepositPreauth: Account can't unauthorize its own address")
+        }
     }
 }
