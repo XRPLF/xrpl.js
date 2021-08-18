@@ -1,5 +1,5 @@
-import { ValidationError } from "../../common/errors";
-import { BaseTransaction, verifyBaseTransaction } from "./common";
+import { ValidationError } from "../../common/errors"
+import { BaseTransaction, verifyBaseTransaction } from "./common"
 
 enum AccountSetFlagEnum {
     asfRequireDest = 1,
@@ -14,14 +14,14 @@ enum AccountSetFlagEnum {
 }
 
 export interface AccountSet extends BaseTransaction {
-    TransactionType: "AccountSet";
-    ClearFlag?: number;
-    Domain?: string;
-    EmailHash?: string;
-    MessageKey?: string;
-    SetFlag?: AccountSetFlagEnum;
-    TransferRate?: number;
-    TickSize?: number;
+    TransactionType: "AccountSet"
+    ClearFlag?: number
+    Domain?: string
+    EmailHash?: string
+    MessageKey?: string
+    SetFlag?: AccountSetFlagEnum
+    TransferRate?: number
+    TickSize?: number
 }
 
 /**
