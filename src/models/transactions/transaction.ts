@@ -4,7 +4,7 @@ import { OfferCancel } from "./offerCancel"
 import { CheckCash } from "./checkCash"
 import { CheckCancel } from "./checkCancel"
 import { CheckCreate } from "./checkCreate"
-import { SignerListSet } from "./signerListSet";
+import { SignerListSet } from "./signerListSet"
 
 export type Transaction =
 //     AccountSet
