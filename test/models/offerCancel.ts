@@ -38,7 +38,7 @@ describe('OfferCancel Transaction Verification', function () {
         assert.throws(
             () => verifyOfferCancel(offer),
             ValidationError,
-            "OfferCancel: invalid OfferSequence"
+            "OfferCancel: OfferSequence must be a number"
         )
     })
 
