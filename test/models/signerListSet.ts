@@ -8,9 +8,10 @@ import { assert } from 'chai'
  * Providing runtime verification testing for each specific transaction type
  */
 describe('SignerListSet Transaction Verification', function () {
-    
-    it (`verifies valid SignerListSet`, () => {
-        const validSignerListSet = {
+    let SignerListSetTx
+
+    beforeEach(() => {
+        SignerListSetTx = {
             Flags: 0,
             TransactionType: "SignerListSet",
             Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
@@ -37,72 +38,38 @@ describe('SignerListSet Transaction Verification', function () {
                 }
             ]
         } as any
-        
-        assert.doesNotThrow(() => verifySignerListSet(validSignerListSet))
+    })
+    
+    it (`verifies valid SignerListSet`, () => {
+        assert.doesNotThrow(() => verifySignerListSet(SignerListSetTx))
     })
 
 
     it (`throws w/ missing SignerQuorum`, () => {
-        const invalidSignerQuorum = {
-            Flags: 0,
-            TransactionType: "SignerListSet",
-            Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            SignerEntries: [
-                {
-                    SignerEntry: {
-                        Account: "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-                        SignerWeight: 2
-                    }
-                },
-                {
-                    SignerEntry: {
-                        Account: "rUpy3eEg8rqjqfUoLeBnZkscbKbFsKXC3v",
-                        SignerWeight: 1
-                    }
-                },
-                {
-                    SignerEntry: {
-                        Account: "raKEEVSGnKSD9Zyvxu4z6Pqpm4ABH8FS6n",
-                        SignerWeight: 1
-                    }
-                }
-            ]
-        } as any
+        SignerListSetTx.SignerQuorum = undefined
 
         assert.throws(
-            () => verifySignerListSet(invalidSignerQuorum),
+            () => verifySignerListSet(SignerListSetTx),
             ValidationError,
             "SignerListSet: missing field SignerQuorum"
         )
     })
 
     it (`throws w/ empty SignerEntries`, () => {
-        const emptySignerEntries = {
-            Flags: 0,
-            TransactionType: "SignerListSet",
-            Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            SignerQuorum: 3,
-            SignerEntries: []
-        } as any
+        SignerListSetTx.SignerEntries = []
 
         assert.throws(
-            () => verifySignerListSet(emptySignerEntries),
+            () => verifySignerListSet(SignerListSetTx),
             ValidationError,
             "SignerListSet: need atleast 1 member in SignerEntries"
         )
     })
 
     it (`throws w/ invalid SignerEntries`, () => {
-        const invalidSignerEntries = {
-            Flags: 0,
-            TransactionType: "SignerListSet",
-            Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            SignerQuorum: 3,
-            SignerEntries: "khgfgyhujk"
-        } as any
-
+        SignerListSetTx.SignerEntries = "khgfgyhujk"
+        
         assert.throws(
-            () => verifySignerListSet(invalidSignerEntries),
+            () => verifySignerListSet(SignerListSetTx),
             ValidationError,
             "SignerListSet: invalid SignerEntries"
         )
