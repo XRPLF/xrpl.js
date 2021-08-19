@@ -30,17 +30,17 @@ export interface PaymentChannelClaim extends BaseTransaction {
         throw new ValidationError("PaymentChannelClaim: missing Channel")
 
     if (typeof tx.Channel !== 'string')
-        throw new ValidationError("PaymentChannelClaim: invalid Channel")
+        throw new ValidationError("PaymentChannelClaim: Channel must be a string")
 
     if (tx.Balance !== undefined && typeof tx.Balance !== 'string')
-        throw new ValidationError("PaymentChannelClaim: invalid Balance")
+        throw new ValidationError("PaymentChannelClaim: Balance must be a string")
 
     if (tx.Amount !== undefined && typeof tx.Amount !== 'string')
-        throw new ValidationError("PaymentChannelClaim: invalid Amount")
+        throw new ValidationError("PaymentChannelClaim: Amount must be a string")
 
     if (tx.Signature !== undefined && typeof tx.Signature !== 'string')
-        throw new ValidationError("PaymentChannelClaim: invalid Signature")
+        throw new ValidationError("PaymentChannelClaim: Signature must be a string")
 
     if (tx.PublicKey !== undefined && typeof tx.PublicKey !== 'string')
-        throw new ValidationError("PaymentChannelClaim: invalid PublicKey")
+        throw new ValidationError("PaymentChannelClaim: PublicKey must be a string")
 }

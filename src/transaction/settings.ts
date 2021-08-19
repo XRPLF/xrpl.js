@@ -2,7 +2,7 @@ import * as assert from 'assert'
 import BigNumber from 'bignumber.js'
 import * as utils from './utils'
 const validate = utils.common.validate
-const AccountFlagIndices = utils.common.constants.AccountFlagIndices
+const AccountSetFlags = utils.common.constants.AccountSetFlags
 const AccountFields = utils.common.constants.AccountFields
 import {
   Instructions,
@@ -17,14 +17,14 @@ function setTransactionFlags(
   txJSON: TransactionJSON,
   values: FormattedSettings
 ) {
-  const keys = Object.keys(values).filter((key) => AccountFlagIndices[key] != null)
+  const keys = Object.keys(values).filter((key) => AccountSetFlags[key] != null)
   assert.ok(
     keys.length <= 1,
     'ERROR: can only set one setting per transaction'
   )
   const flagName = keys[0]
   const value = values[flagName]
-  const index = AccountFlagIndices[flagName]
+  const index = AccountSetFlags[flagName]
   if (index != null) {
     if (value) {
       txJSON.SetFlag = index
