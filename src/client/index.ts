@@ -22,7 +22,6 @@ import getPaths from '../ledger/pathfind'
 import getOrders from '../ledger/orders'
 import {getOrderbook, formatBidsAndAsks} from '../ledger/orderbook'
 import {getSettings, parseAccountFlags} from '../ledger/settings'
-import getAccountInfo from '../ledger/accountinfo'
 import getAccountObjects from '../ledger/accountobjects'
 import getPaymentChannel from '../ledger/payment-channel'
 import preparePayment from '../transaction/payment'
@@ -442,7 +441,6 @@ class Client extends EventEmitter {
   getOrderbook = getOrderbook
   getOrders = getOrders
   getSettings = getSettings
-  getAccountInfo = getAccountInfo
   getAccountObjects = getAccountObjects
   getPaymentChannel = getPaymentChannel
   getLedger = getLedger
