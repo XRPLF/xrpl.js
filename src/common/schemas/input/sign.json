@@ -17,11 +17,11 @@
       "properties": {
         "privateKey": {
           "type": "privateKey",
-          "description": "The uppercase hexadecimal representation of the secp256k1 or Ed25519 private key."
+          "description": "The uppercase hexadecimal representation of the secp256k1 or Ed25519 private key. Ed25519 keys are prefixed with 0xED. You can read about how keys are derived [here](https://xrpl.org/cryptographic-keys.html)."
         },
         "publicKey": {
           "type": "publicKey",
-          "description": "The uppercase hexadecimal representation of the secp256k1 or Ed25519 public key."
+          "description": "The uppercase hexadecimal representation of the secp256k1 or Ed25519 public key. Ed25519 keys are prefixed with 0xED. You can read about how keys are derived [here](https://xrpl.org/cryptographic-keys.html)."
         }
       },
       "description": "The private and public key of the account that is initiating the transaction. (This field cannot be used with secret).",
