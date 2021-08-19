@@ -1,6 +1,7 @@
 import {EventEmitter} from 'events'
 import {
   Connection,
+  constants,
   errors,
   validate,
   xrpToDrops,
@@ -8,7 +9,7 @@ import {
   rippleTimeToISO8601,
   iso8601ToRippleTime,
   txFlags,
-  ensureClassicAddress
+  ensureClassicAddress,
 } from '../common'
 import {
   getLedgerVersion,
@@ -81,7 +82,22 @@ import {getServerInfo, getFee} from '../common/serverinfo'
 import {clamp, renameCounterpartyToIssuer} from '../ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from '../transaction/types'
 import {ConnectionUserOptions} from '../common/connection'
-import {classicAddressToXAddress, xAddressToClassicAddress, isValidXAddress, isValidClassicAddress, encodeSeed, decodeSeed, encodeAccountID, decodeAccountID, encodeNodePublic, decodeNodePublic, encodeAccountPublic, decodeAccountPublic, encodeXAddress, decodeXAddress} from 'ripple-address-codec'
+import {
+  classicAddressToXAddress,
+  xAddressToClassicAddress,
+  isValidXAddress,
+  isValidClassicAddress,
+  encodeSeed,
+  decodeSeed,
+  encodeAccountID,
+  decodeAccountID,
+  encodeNodePublic,
+  decodeNodePublic,
+  encodeAccountPublic,
+  decodeAccountPublic,
+  encodeXAddress,
+  decodeXAddress
+} from 'ripple-address-codec'
 import {
   computeBinaryTransactionHash,
   computeTransactionHash,
@@ -95,6 +111,8 @@ import {
   computeEscrowHash,
   computePaymentChannelHash
 } from '../common/hashes'
+
+import generateFaucetWallet from '../wallet/wallet-generation'
 
 export interface ClientOptions extends ConnectionUserOptions {
   server?: string
@@ -405,6 +423,9 @@ class Client extends EventEmitter {
   computeLedgerHash = computeLedgerHash // @deprecated Invoke from top-level package instead
   signPaymentChannelClaim = signPaymentChannelClaim // @deprecated Invoke from top-level package instead
   verifyPaymentChannelClaim = verifyPaymentChannelClaim // @deprecated Invoke from top-level package instead
+
+  generateFaucetWallet = generateFaucetWallet
+
   errors = errors
 
   static deriveXAddress = deriveXAddress
@@ -415,20 +436,20 @@ class Client extends EventEmitter {
   /**
    * Static methods to expose ripple-address-codec methods
    */
-   static classicAddressToXAddress = classicAddressToXAddress
-   static xAddressToClassicAddress = xAddressToClassicAddress
-   static isValidXAddress = isValidXAddress
-   static isValidClassicAddress = isValidClassicAddress
-   static encodeSeed = encodeSeed
-   static decodeSeed = decodeSeed
-   static encodeAccountID = encodeAccountID
-   static decodeAccountID = decodeAccountID
-   static encodeNodePublic = encodeNodePublic
-   static decodeNodePublic = decodeNodePublic
-   static encodeAccountPublic = encodeAccountPublic
-   static decodeAccountPublic = decodeAccountPublic
-   static encodeXAddress = encodeXAddress
-   static decodeXAddress = decodeXAddress
+  static classicAddressToXAddress = classicAddressToXAddress
+  static xAddressToClassicAddress = xAddressToClassicAddress
+  static isValidXAddress = isValidXAddress
+  static isValidClassicAddress = isValidClassicAddress
+  static encodeSeed = encodeSeed
+  static decodeSeed = decodeSeed
+  static encodeAccountID = encodeAccountID
+  static decodeAccountID = decodeAccountID
+  static encodeNodePublic = encodeNodePublic
+  static decodeNodePublic = decodeNodePublic
+  static encodeAccountPublic = encodeAccountPublic
+  static decodeAccountPublic = decodeAccountPublic
+  static encodeXAddress = encodeXAddress
+  static decodeXAddress = decodeXAddress
 
   /**
    * Static methods that replace functionality from the now-deprecated ripple-hashes library
@@ -440,7 +461,8 @@ class Client extends EventEmitter {
   // @deprecated Invoke from top-level package instead
   static computeTransactionHash = computeTransactionHash // (txJSON: any): string
   // @deprecated Invoke from top-level package instead
-  static computeBinaryTransactionSigningHash = computeBinaryTransactionSigningHash // (txBlobHex: string): string
+  static computeBinaryTransactionSigningHash =
+    computeBinaryTransactionSigningHash // (txBlobHex: string): string
   // Compute the hash of an account, given the account's classic address (starting with `r`).
   // @deprecated Invoke from top-level package instead
   static computeAccountLedgerObjectID = computeAccountLedgerObjectID // (address: string): string
@@ -472,6 +494,7 @@ class Client extends EventEmitter {
   rippleTimeToISO8601 = rippleTimeToISO8601 // @deprecated Invoke from top-level package instead
   iso8601ToRippleTime = iso8601ToRippleTime // @deprecated Invoke from top-level package instead
   txFlags = txFlags
+  static accountSetFlags = constants.AccountSetFlags
 
   isValidAddress = schemaValidator.isValidAddress
   isValidSecret = schemaValidator.isValidSecret

@@ -54,6 +54,8 @@ class ResponseFormatError extends ConnectionError {}
 
 class ValidationError extends RippleError {}
 
+class XRPLFaucetError extends RippleError {}
+
 class NotFoundError extends RippleError {
   constructor(message = 'Not found') {
     super(message)
@@ -90,5 +92,6 @@ export {
   NotFoundError,
   PendingLedgerVersionError,
   MissingLedgerHistoryError,
-  LedgerVersionError
+  LedgerVersionError,
+  XRPLFaucetError
 }
