@@ -109,7 +109,7 @@ async function performPayments(payments) {
       const ledgerClosedCallback = async (event: LedgerClosedEvent) => {
         let status
         try {
-          status = await client.getTransaction(signed.id)
+          status = await client.request({command: 'tx', transaction: signed.id})
         } catch (e) {
           // Typical error when the tx hasn't been validated yet:
           if (e.name !== 'MissingLedgerHistoryError') {

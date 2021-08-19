@@ -13,8 +13,6 @@ import { Connection, ConnectionUserOptions } from './connection'
 import {
   formatLedgerClose
 } from './utils'
-import getTransaction from '../ledger/transaction'
-import getTransactions from '../ledger/transactions'
 import getTrustlines from '../ledger/trustlines'
 import getBalances from '../ledger/balances'
 import getPaths from '../ledger/pathfind'
@@ -427,8 +425,6 @@ class Client extends EventEmitter {
     return this.connection.getLedgerVersion()
   }
 
-  getTransaction = getTransaction
-  getTransactions = getTransactions
   getTrustlines = getTrustlines
   getBalances = getBalances
   getPaths = getPaths
