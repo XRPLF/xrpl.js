@@ -17,7 +17,6 @@ import getTransaction from '../ledger/transaction'
 import getTransactions from '../ledger/transactions'
 import getTrustlines from '../ledger/trustlines'
 import getBalances from '../ledger/balances'
-import getBalanceSheet from '../ledger/balance-sheet'
 import getPaths from '../ledger/pathfind'
 import getOrders from '../ledger/orders'
 import {getOrderbook, formatBidsAndAsks} from '../ledger/orderbook'
@@ -435,7 +434,6 @@ class Client extends EventEmitter {
   getTransactions = getTransactions
   getTrustlines = getTrustlines
   getBalances = getBalances
-  getBalanceSheet = getBalanceSheet
   getPaths = getPaths
   getOrderbook = getOrderbook
   getOrders = getOrders
