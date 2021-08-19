@@ -7,10 +7,12 @@ import { CheckCreate } from "./checkCreate";
 import { DepositPreauth } from "./depositPreauth"
 import { EscrowCreate } from "./escrowCreate"
 import { EscrowCancel } from './escrowCancel'
+import { EscrowFinish } from "./escrowFinish"
 import { OfferCancel } from "./offerCancel"
 import { OfferCreate } from "./offerCreate"
 import { PaymentTransaction } from "./paymentTransaction"
 import { SignerListSet } from "./signerListSet"
+import { TicketCreate } from "./ticketCreate"
 import { TrustSet } from "./trustSet"
 
 export type Transaction =
@@ -22,8 +24,7 @@ export type Transaction =
      | DepositPreauth
      | EscrowCancel
      | EscrowCreate
-//   | EscrowFinish
-     | OfferCancel
+     | EscrowFinish
      | OfferCancel
      | OfferCreate
      | PaymentTransaction
@@ -32,7 +33,7 @@ export type Transaction =
 //   | PaymentChannelFund
 //   | SetRegularKey
      | SignerListSet
-//   | TicketCreate
+     | TicketCreate
      | TrustSet
 
 export interface TransactionAndMetadata {
