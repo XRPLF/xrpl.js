@@ -1,5 +1,5 @@
 import { ValidationError } from 'xrpl-local/common/errors'
-import { PaymentChannelCreate, verifyPaymentChannelCreate } from './../../src/models/transactions/paymentChannelCreate'
+import { verifyPaymentChannelCreate } from './../../src/models/transactions/paymentChannelCreate'
 import { assert } from 'chai'
 
 /**
@@ -8,9 +8,10 @@ import { assert } from 'chai'
  * Providing runtime verification testing for each specific transaction type
  */
 describe('PaymentChannelCreate Transaction Verification', function () {
-    
-    it (`verifies valid PaymentChannelCreate`, () => {
-        const validPaymentChannel: PaymentChannelCreate = {
+    let channel
+
+    beforeEach(() => {
+        channel = {
             "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
             "TransactionType": "PaymentChannelCreate",
             "Amount": "10000",
@@ -21,34 +22,25 @@ describe('PaymentChannelCreate Transaction Verification', function () {
             "DestinationTag": 23480,
             "SourceTag": 11747
         }        
-        
-        assert.doesNotThrow(() => verifyPaymentChannelCreate(validPaymentChannel))
+    })
+    
+    it (`verifies valid PaymentChannelCreate`, () => {        
+        assert.doesNotThrow(() => verifyPaymentChannelCreate(channel))
     })
 
-    it (`verifies valid PaymentChannelCreate`, () => {
-        const validPaymentChannel: PaymentChannelCreate = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelCreate",
-            "Amount": "10000",
-            "Destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-            "SettleDelay": 86400,
-            "PublicKey": "32D2471DB72B27E3310F355BB33E339BF26F8392D5A93D3BC0FC3B566612DA0F0A",
-        }        
-        
-        assert.doesNotThrow(() => verifyPaymentChannelCreate(validPaymentChannel))
+    it (`verifies valid PaymentChannelCreate w/o optional`, () => {
+        delete channel.CancelAfter
+        delete channel.DestinationTag
+        delete channel.SourceTag
+
+        assert.doesNotThrow(() => verifyPaymentChannelCreate(channel))
     })
 
     it (`missing Amount`, () => {
-        const missingAmt = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelCreate",
-            "Destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-            "SettleDelay": 86400,
-            "PublicKey": "32D2471DB72B27E3310F355BB33E339BF26F8392D5A93D3BC0FC3B566612DA0F0A",
-        } as any
+        delete channel.Amount
         
         assert.throws(
-            () => verifyPaymentChannelCreate(missingAmt),
+            () => verifyPaymentChannelCreate(channel),
             ValidationError,
             "PaymentChannelCreate: missing Amount"
         )
@@ -56,155 +48,93 @@ describe('PaymentChannelCreate Transaction Verification', function () {
 
 
     it (`missing Destination`, () => {
-        const missingDest = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelCreate",
-            "Amount": "10000",
-            "SettleDelay": 86400,
-            "PublicKey": "32D2471DB72B27E3310F355BB33E339BF26F8392D5A93D3BC0FC3B566612DA0F0A",
-        } as any       
+        delete channel.Destination  
         
         assert.throws(
-            () => verifyPaymentChannelCreate(missingDest),
+            () => verifyPaymentChannelCreate(channel),
             ValidationError,
             "PaymentChannelCreate: missing Destination"
         )
     })
 
     it (`missing SettleDelay`, () => {
-        const missingSettleDelay = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelCreate",
-            "Amount": "10000",
-            "Destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-            "PublicKey": "32D2471DB72B27E3310F355BB33E339BF26F8392D5A93D3BC0FC3B566612DA0F0A",
-        } as any       
+        delete channel.SettleDelay    
         
         assert.throws(
-            () => verifyPaymentChannelCreate(missingSettleDelay),
+            () => verifyPaymentChannelCreate(channel),
             ValidationError,
             "PaymentChannelCreate: missing SettleDelay"
         )
     })
 
     it (`missing PublicKey`, () => {
-        const missingKey = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelCreate",
-            "Amount": "10000",
-            "Destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-            "SettleDelay": 86400
-        } as any       
+        delete channel.PublicKey   
         
         assert.throws(
-            () => verifyPaymentChannelCreate(missingKey),
+            () => verifyPaymentChannelCreate(channel),
             ValidationError,
             "PaymentChannelCreate: missing PublicKey"
         )
     })
 
     it (`invalid Amount`, () => {
-        const missingAmt = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelCreate",
-            "Amount": 10,
-            "Destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-            "SettleDelay": 86400,
-            "PublicKey": "32D2471DB72B27E3310F355BB33E339BF26F8392D5A93D3BC0FC3B566612DA0F0A",
-        } as any
+        channel.Amount = 1000
         
         assert.throws(
-            () => verifyPaymentChannelCreate(missingAmt),
+            () => verifyPaymentChannelCreate(channel),
             ValidationError,
-            "PaymentChannelCreate: invalid Amount"
+            "PaymentChannelCreate: Amount must be a string"
         )
     })
 
 
     it (`invalid Destination`, () => {
-        const missingDest = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelCreate",
-            "Amount": "10000",
-            "Destination": 10,
-            "SettleDelay": 86400,
-            "PublicKey": "32D2471DB72B27E3310F355BB33E339BF26F8392D5A93D3BC0FC3B566612DA0F0A",
-        } as any       
+        channel.Destination = 10;   
         
         assert.throws(
-            () => verifyPaymentChannelCreate(missingDest),
+            () => verifyPaymentChannelCreate(channel),
             ValidationError,
-            "PaymentChannelCreate: invalid Destination"
+            "PaymentChannelCreate: Destination must be a string"
         )
     })
 
     it (`invalid SettleDelay`, () => {
-        const missingSettleDelay = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelCreate",
-            "Amount": "10000",
-            "Destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-            "SettleDelay": "8048",
-            "PublicKey": "32D2471DB72B27E3310F355BB33E339BF26F8392D5A93D3BC0FC3B566612DA0F0A",
-        } as any       
+        channel.SettleDelay = "10"    
         
         assert.throws(
-            () => verifyPaymentChannelCreate(missingSettleDelay),
+            () => verifyPaymentChannelCreate(channel),
             ValidationError,
-            "PaymentChannelCreate: invalid SettleDelay"
+            "PaymentChannelCreate: SettleDelay must be a number"
         )
     })
 
     it (`invalid PublicKey`, () => {
-        const missingKey = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelCreate",
-            "Amount": "10000",
-            "Destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-            "SettleDelay": 86400,
-            "PublicKey": 1000
-        } as any       
+        channel.PublicKey = 10       
         
         assert.throws(
-            () => verifyPaymentChannelCreate(missingKey),
+            () => verifyPaymentChannelCreate(channel),
             ValidationError,
-            "PaymentChannelCreate: invalid PublicKey"
+            "PaymentChannelCreate: PublicKey must be a string"
         )
     })
 
     it (`invalid DestinationTag`, () => {
-        const invalidDestTag = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelCreate",
-            "Amount": "10000",
-            "Destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-            "SettleDelay": 86400,
-            "PublicKey": "1000",
-            "DestinationTag": "120023"
-        } as any       
-        
+        channel.DestinationTag = "10"
+
         assert.throws(
-            () => verifyPaymentChannelCreate(invalidDestTag),
+            () => verifyPaymentChannelCreate(channel),
             ValidationError,
-            "PaymentChannelCreate: invalid DestinationTag"
+            "PaymentChannelCreate: DestinationTag must be a number"
         )
     })
 
     it (`invalid CancelAfter`, () => {
-        const invalidCancelAfter = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelCreate",
-            "Amount": "10000",
-            "Destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-            "SettleDelay": 86400,
-            "PublicKey": "1000",
-            "CancelAfter": "120023"
-        } as any       
+        channel.CancelAfter = "100"
         
         assert.throws(
-            () => verifyPaymentChannelCreate(invalidCancelAfter),
+            () => verifyPaymentChannelCreate(channel),
             ValidationError,
-            "PaymentChannelCreate: invalid CancelAfter"
+            "PaymentChannelCreate: CancelAfter must be a number"
         )
     })
 })
