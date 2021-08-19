@@ -1,11 +1,11 @@
-import Metadata from "../common/metadata";
-import { AccountDelete } from "./accountDelete";
-import { AccountSet } from "./accountSet";
-import { CheckCancel } from "./checkCancel";
-import { CheckCash } from "./checkCash";
-import { CheckCreate } from "./checkCreate";
+import Metadata from "../common/metadata"
+import { AccountDelete } from "./accountDelete"
+import { AccountSet } from "./accountSet"
+import { CheckCancel } from "./checkCancel"
+import { CheckCash } from "./checkCash"
+import { CheckCreate } from "./checkCreate"
 import { DepositPreauth } from "./depositPreauth"
-import { EscrowCreate } from "./escrowCreate";
+import { EscrowCreate } from "./escrowCreate"
 import { OfferCancel } from "./offerCancel"
 import { OfferCreate } from "./offerCreate"
 import { PaymentTransaction } from "./paymentTransaction"
