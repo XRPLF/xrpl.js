@@ -60,7 +60,7 @@ describe('PaymentChannelFund Transaction Verification', function () {
         )
     })
 
-    it (`throws w/ missing Channel`, () => {
+    it (`throws w/ invalid Channel`, () => {
         channel.Channel = 1000
 
         assert.throws(
