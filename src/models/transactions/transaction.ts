@@ -11,8 +11,9 @@ import { EscrowFinish } from "./escrowFinish"
 import { OfferCancel } from "./offerCancel"
 import { OfferCreate } from "./offerCreate"
 import { PaymentTransaction } from "./paymentTransaction"
-import { PaymentChannelCreate } from "./paymentChannelCreate"
 import { PaymentChannelClaim } from './paymentChannelClaim'
+import { PaymentChannelCreate } from "./paymentChannelCreate"
+import { PaymentChannelFund } from "./paymentChannelFund"
 import { SignerListSet } from "./signerListSet"
 import { TicketCreate } from "./ticketCreate"
 import { TrustSet } from "./trustSet"
@@ -32,7 +33,7 @@ export type Transaction =
      | PaymentTransaction
      | PaymentChannelClaim
      | PaymentChannelCreate
-//   | PaymentChannelFund
+     | PaymentChannelFund
 //   | SetRegularKey
      | SignerListSet
      | TicketCreate
