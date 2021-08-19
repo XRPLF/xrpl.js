@@ -17,7 +17,6 @@ import getTrustlines from '../ledger/trustlines'
 import getBalances from '../ledger/balances'
 import getPaths from '../ledger/pathfind'
 import {getOrderbook, formatBidsAndAsks} from '../ledger/orderbook'
-import {getSettings, parseAccountFlags} from '../ledger/settings'
 import preparePayment from '../transaction/payment'
 import prepareTrustline from '../transaction/trustline'
 import prepareOrder from '../transaction/order'
@@ -429,8 +428,6 @@ class Client extends EventEmitter {
   getBalances = getBalances
   getPaths = getPaths
   getOrderbook = getOrderbook
-  getSettings = getSettings
-  parseAccountFlags = parseAccountFlags
 
   preparePayment = preparePayment
   prepareTrustline = prepareTrustline
