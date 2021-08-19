@@ -9,6 +9,7 @@ import { OfferCancel } from "./offerCancel"
 import { OfferCreate } from "./offerCreate"
 import { PaymentTransaction } from "./paymentTransaction"
 import { SignerListSet } from "./signerListSet"
+import { TrustSet } from "./trustSet"
 
 export type Transaction =
        AccountDelete
@@ -30,7 +31,7 @@ export type Transaction =
 //   | SetRegularKey
      | SignerListSet
 //   | TicketCreate
-//   | TrustSet
+     | TrustSet
 
 export interface TransactionAndMetadata {
     transaction: Transaction
