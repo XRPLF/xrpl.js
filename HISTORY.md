@@ -2,6 +2,15 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
+## 1.10.0 (2021-08-12)
+
+* Add address generation from Devnet/Testnet faucets (#1497)
+* Fix bug with `getBalances()` ledgerVersion (#1505)
+* Include lodash in webpack build (#1500)
+* Documentation Updates:
+  * Export and document AccountSetFlags (#1525)
+  * Add links to example keypair derivation (#1523)
+
 ## 1.9.8 (2021-07-30)
 
 * Export offline methods to top level of package (#1479)
