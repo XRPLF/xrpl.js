@@ -93,6 +93,7 @@
   - [isValidSecret](#isvalidsecret)
   - [deriveKeypair](#derivekeypair)
   - [deriveAddress](#deriveaddress)
+  - [generateFaucetWallet](#generatefaucetwallet)
   - [signPaymentChannelClaim](#signpaymentchannelclaim)
   - [verifyPaymentChannelClaim](#verifypaymentchannelclaim)
   - [computeLedgerHash](#computeledgerhash)
@@ -101,6 +102,7 @@
   - [iso8601ToRippleTime](#iso8601torippletime)
   - [rippleTimeToISO8601](#rippletimetoiso8601)
   - [txFlags](#txflags)
+  - [accountSetFlags](#accountsetflags)
   - [schemaValidator](#schemavalidator)
   - [schemaValidate](#schemavalidate)
 - [API Events](#api-events)
@@ -5659,8 +5661,8 @@ Name | Type | Description
 ---- | ---- | -----------
 txJSON | string | Transaction represented as a JSON string in rippled format.
 keypair | object | *Optional* The private and public key of the account that is initiating the transaction. (This field cannot be used with secret).
-*keypair.* privateKey | privateKey | The uppercase hexadecimal representation of the secp256k1 or Ed25519 private key.
-*keypair.* publicKey | publicKey | The uppercase hexadecimal representation of the secp256k1 or Ed25519 public key.
+*keypair.* privateKey | privateKey | The uppercase hexadecimal representation of the secp256k1 or Ed25519 private key. Ed25519 keys are prefixed with 0xED. You can read about how keys are derived [here](https://xrpl.org/cryptographic-keys.html).
+*keypair.* publicKey | publicKey | The uppercase hexadecimal representation of the secp256k1 or Ed25519 public key. Ed25519 keys are prefixed with 0xED. You can read about how keys are derived [here](https://xrpl.org/cryptographic-keys.html).
 options | object | *Optional* Options that control the type of signature to create.
 *options.* signAs | [address](#address) | *Optional* The account that the signature should count for in multisigning.
 secret | secret string | *Optional* The secret of the account that is initiating the transaction. (This field cannot be used with keypair).
@@ -5694,6 +5696,19 @@ return api.sign(txJSON, secret); // or: api.sign(txJSON, keypair);
 }
 ```
 
+
+### Example Keypairs
+
+To learn how keypairs are derived read [here](https://xrpl.org/cryptographic-keys.html#generating-keys).
+```javascript
+// secp25519 (33 bytes)
+const privateKey = "002512BBDFDBB77510883B7DCCBEF270B86DEAC8B64AC762873D75A1BEE6298665"
+const publicKey = "0390A196799EE412284A5D80BF78C3E84CBB80E1437A0AECD9ADF94D7FEAAFA284"
+
+// ed25519 (Note the 0xED prefixes a 32 byte value for a total of 33 bytes)
+const privateKey = "ED0B6CBAC838DFE7F47EA1BD0DF00EC282FDF45510C92161072CCFB84035390C4D"
+const publicKey = "ED1A7C082846CFF58FF9A892BA4BA2593151CCF1DBA59F37714CC9ED39824AF85F"
+```
 
 ### Example (multi-signing)
 
@@ -5746,7 +5761,7 @@ const multiSignPaymentTransaction = {
 };
 
 const multiSignPaymentInstruction = {
-    signersCount: 2
+  signersCount: 2
 };
 
 const api = new RippleAPI({
@@ -6077,6 +6092,38 @@ This method returns a string corresponding to the address derived from the publi
 var address = api.deriveAddress(public_key);
 ```
 
+## generateFaucetWallet
+
+`generateFaucetWallet(onTestnet = true)`
+
+Calls the Testnet or Devnet faucet API in order to generate a new, random wallet with some amount of test XRP. This is for testing purposes only.
+
+### Example
+
+**Request**
+
+Create a new wallet on the Testnet:
+
+```javascript
+const wallet = await api.generateFaucetWallet()
+```
+
+**Response**
+
+
+```json
+{
+    "account": {
+        "xAddress": "T7i2Q8yGcMcCQa2n6d9EvSEptT4CE6ap7Q1r1fmjstkLfsK",
+        "secret": "ssKCsaRqWh669atvv83bdYRaiHomY",
+        "classicAddress": "r9SYfmVxrb7iuCVfNhW2gqqzapfE2r6juG",
+        "address": "r9SYfmVxrb7iuCVfNhW2gqqzapfE2r6juG"
+    },
+    "amount": 1000,
+    "balance": 1000
+}
+```
+
 ## signPaymentChannelClaim
 
 `signPaymentChannelClaim(channel: string, amount: string, privateKey: string): string`
@@ -6396,6 +6443,22 @@ The remaining transaction types do not have any flags at this time.
 * EscrowCancel
 * PaymentChannelCreate
 * PaymentChannelFund
+
+## accountSetFlags
+
+To modify account flags, you can use an AccountSet transaction and its `SetFlag` or `ClearFlag` fields.
+	
+The flags are called [AccountSet flags (asf*)](https://xrpl.org/accountset.html#accountset-flags):
+
+`RippleAPI.accountSetFlags.requireDestinationTag`: Require a destination tag to send transactions to this account.
+`RippleAPI.accountSetFlags.requireAuthorization`: Require authorization for users to hold balances issued by this address. Can only be enabled if the address has no trust lines connected to it.
+`RippleAPI.accountSetFlags.disallowIncomingXRP`: XRP should not be sent to this account. (Enforced by client applications, not by rippled)
+`RippleAPI.accountSetFlags.disableMasterKey`: Disallow use of the master key pair. Can only be enabled if the account has configured another way to sign transactions.
+`RippleAPI.accountSetFlags.enableTransactionIDTracking`: Track the ID of this account's most recent transaction.
+`RippleAPI.accountSetFlags.noFreeze`: Permanently give up the ability to freeze individual trust lines or disable Global Freeze. This flag can never be disabled after being enabled.
+`RippleAPI.accountSetFlags.globalFreeze`:	Freeze all assets issued by this account.
+`RippleAPI.accountSetFlags.defaultRipple`: Enable [rippling](https://xrpl.org/rippling.html) on this account's trust lines by default.
+`RippleAPI.accountSetFlags.depositAuth`:Enable Deposit Authorization on this account.
 
 ## schemaValidator
 
