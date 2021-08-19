@@ -26,7 +26,7 @@ describe('BroadcastClient', function () {
     this.mocks.forEach((mock) => mock.expect(Object.assign({}, expected)))
     assert(this.client.isConnected())
     return this.client
-      .getServerInfo()
+      .request({command: "server_info"})
       .then(response => {
         return checkResult(responses.getServerInfo, response.result.info)
       })

@@ -356,8 +356,8 @@ describe('integration tests', function () {
     assert(this.client.isConnected())
   })
 
-  it('getServerInfo', function () {
-    return this.client.getServerInfo().then((data) => {
+  it('server_info', function () {
+    return this.client.request({command: "server_info"}).then((data) => {
       assert(data && data.result.info.pubkey_node)
     })
   })

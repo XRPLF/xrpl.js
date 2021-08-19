@@ -116,7 +116,7 @@ import RangeSet from './rangeset'
 import * as ledgerUtils from '../ledger/utils'
 import * as transactionUtils from '../transaction/utils'
 import * as schemaValidator from '../common/schema-validator'
-import {getServerInfo, getFee} from '../common/serverinfo'
+import {getFee} from '../common/fee'
 import {ensureClassicAddress} from '../common'
 import {clamp} from '../ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from '../transaction/types'
@@ -417,7 +417,6 @@ class Client extends EventEmitter {
     await this.connection.disconnect()
   }
 
-  getServerInfo = getServerInfo
   getFee = getFee
 
   async getLedgerVersion(): Promise<number> {
