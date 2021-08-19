@@ -1,12 +1,5 @@
 import { ValidationError } from "../../common/errors"
-import { BaseTransaction, GlobalFlags, verifyBaseTransaction } from "./common"
-
-export interface EscrowCreateFlags extends GlobalFlags {
-    tfPassive?: boolean
-    tfImmediateOrCancel?: boolean
-    tfFillOrKill?: boolean
-    tfSell?: boolean
-}
+import { BaseTransaction, verifyBaseTransaction } from "./common"
 
 export interface EscrowCreate extends BaseTransaction {
     TransactionType: "EscrowCreate"
