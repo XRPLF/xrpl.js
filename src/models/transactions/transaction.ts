@@ -14,6 +14,7 @@ import { PaymentTransaction } from "./paymentTransaction"
 import { PaymentChannelClaim } from './paymentChannelClaim'
 import { PaymentChannelCreate } from "./paymentChannelCreate"
 import { PaymentChannelFund } from "./paymentChannelFund"
+import { SetRegularKey } from "./setRegularKey";
 import { SignerListSet } from "./signerListSet"
 import { TicketCreate } from "./ticketCreate"
 import { TrustSet } from "./trustSet"
@@ -34,7 +35,7 @@ export type Transaction =
      | PaymentChannelClaim
      | PaymentChannelCreate
      | PaymentChannelFund
-//   | SetRegularKey
+     | SetRegularKey
      | SignerListSet
      | TicketCreate
      | TrustSet
