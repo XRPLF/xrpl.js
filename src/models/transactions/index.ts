@@ -12,7 +12,7 @@ export * from './escrowFinish'
 export * from './offerCancel'
 export * from './offerCreate'
 export * from './paymentTransaction'
+export * from './paymentChannelClaim'
 export * from './paymentChannelCreate'
 export * from './signerListSet'
 export * from './trustSet'
-
