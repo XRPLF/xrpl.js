@@ -462,7 +462,7 @@ class Client extends EventEmitter {
   static computeTransactionHash = computeTransactionHash // (txJSON: any): string
   // @deprecated Invoke from top-level package instead
   static computeBinaryTransactionSigningHash =
-    computeBinaryTransactionSigningHash // (txBlobHex: string): strin
+    computeBinaryTransactionSigningHash // (txBlobHex: string): string
   // Compute the hash of an account, given the account's classic address (starting with `r`).
   // @deprecated Invoke from top-level package instead
   static computeAccountLedgerObjectID = computeAccountLedgerObjectID // (address: string): string
