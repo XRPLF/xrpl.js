@@ -45,7 +45,6 @@ import {deriveKeypair, deriveAddress, deriveXAddress} from '../offline/derive'
 import computeLedgerHash from '../offline/ledgerhash'
 import signPaymentChannelClaim from '../offline/sign-payment-channel-claim'
 import verifyPaymentChannelClaim from '../offline/verify-payment-channel-claim'
-import getLedger from '../ledger/ledger'
 import {
   Request,
   Response,
@@ -439,7 +438,6 @@ class Client extends EventEmitter {
   getOrders = getOrders
   getSettings = getSettings
   getPaymentChannel = getPaymentChannel
-  getLedger = getLedger
   parseAccountFlags = parseAccountFlags
 
   preparePayment = preparePayment

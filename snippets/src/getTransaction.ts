@@ -6,9 +6,9 @@ getTransaction()
 
 async function getTransaction() {
   await client.connect()
-  const ledger = await client.getLedger({includeTransactions: true})
+  const ledger = await client.request({command: 'ledger', transactions: true})
   console.log(ledger)
-  const tx = await client.getTransaction(ledger.transactionHashes[0])
+  const tx = await client.getTransaction(ledger.result.ledger.transactions[0] as string)
   console.log(tx)
   console.log('deliveredAmount:', tx.outcome.deliveredAmount)
   process.exit(0)
