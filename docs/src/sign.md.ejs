@@ -35,6 +35,19 @@ return api.sign(txJSON, secret); // or: api.sign(txJSON, keypair);
 
 <%- renderFixture("responses/sign.json") %>
 
+### Example Keypairs
+
+To learn how keypairs are derived read [here](https://xrpl.org/cryptographic-keys.html#generating-keys).
+```javascript
+// secp25519 (33 bytes)
+const privateKey = "002512BBDFDBB77510883B7DCCBEF270B86DEAC8B64AC762873D75A1BEE6298665"
+const publicKey = "0390A196799EE412284A5D80BF78C3E84CBB80E1437A0AECD9ADF94D7FEAAFA284"
+
+// ed25519 (Note the 0xED prefixes a 32 byte value for a total of 33 bytes)
+const privateKey = "ED0B6CBAC838DFE7F47EA1BD0DF00EC282FDF45510C92161072CCFB84035390C4D"
+const publicKey = "ED1A7C082846CFF58FF9A892BA4BA2593151CCF1DBA59F37714CC9ED39824AF85F"
+```
+
 ### Example (multi-signing)
 
 ```javascript

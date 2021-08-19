@@ -70,7 +70,7 @@ export interface Settings {
   defaultRipple?: boolean
 }
 
-const AccountFlagIndices = {
+const AccountSetFlags = {
   requireDestinationTag: txFlagIndices.AccountSet.asfRequireDest,
   requireAuthorization: txFlagIndices.AccountSet.asfRequireAuth,
   depositAuth: txFlagIndices.AccountSet.asfDepositAuth,
@@ -96,4 +96,4 @@ const AccountFields = {
   TickSize: {name: 'tickSize', defaults: 0}
 }
 
-export {AccountFields, AccountFlagIndices, AccountFlags}
+export {AccountFields, AccountSetFlags, AccountFlags}
