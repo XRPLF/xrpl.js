@@ -1,5 +1,5 @@
 import { ValidationError } from 'xrpl-local/common/errors'
-import { EscrowFinish, verifyEscrowFinish } from './../../src/models/transactions/escrowFinish'
+import { verifyEscrowFinish } from './../../src/models/transactions/escrowFinish'
 import { assert } from 'chai'
 
 /**
@@ -7,9 +7,11 @@ import { assert } from 'chai'
  *
  * Providing runtime verification testing for each specific transaction type
  */
-describe('EscrowFinish Transaction Verification', function () {   
-    it (`verifies valid EscrowFinish`, () => {
-        const validCheck: EscrowFinish = {
+describe('EscrowFinish Transaction Verification', function () {
+    let escrow 
+
+    beforeEach(() => {
+        escrow =  {
             Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
             TransactionType: "EscrowFinish",
             Owner: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
@@ -17,81 +19,57 @@ describe('EscrowFinish Transaction Verification', function () {
             Condition: "A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100",
             Fulfillment: "A0028000"
         }
-                    
-        assert.doesNotThrow(() => verifyEscrowFinish(validCheck))
+    })
+    it (`verifies valid EscrowFinish`, () => {                    
+        assert.doesNotThrow(() => verifyEscrowFinish(escrow))
     })
 
     it (`verifies valid EscrowFinish w/o optional`, () => {
-        const validCheck: EscrowFinish = {
-            Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            TransactionType: "EscrowFinish",
-            Owner: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            OfferSequence: 7,
-        }
+        delete escrow.Condition
+        delete escrow.Fulfillment
                     
-        assert.doesNotThrow(() => verifyEscrowFinish(validCheck))
+        assert.doesNotThrow(() => verifyEscrowFinish(escrow))
     })
 
 
     it (`throws w/ invalid Owner`, () => {
-        const invalidOwner = {
-            Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            TransactionType: "EscrowFinish",
-            Owner: 0x15415253,
-            OfferSequence: "10",
-        } as any
+        escrow.Owner = 0x15415253
+ 
 
         assert.throws(
-            () => verifyEscrowFinish(invalidOwner),
+            () => verifyEscrowFinish(escrow),
             ValidationError,
-            "EscrowFinish: invalid Owner"
+            "EscrowFinish: Owner must be a string"
         )
     })
 
     it (`throws w/ invalid OfferSequence`, () => {
-        const invalidSeq = {
-            Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            TransactionType: "EscrowFinish",
-            Owner: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            OfferSequence: "10",
-        } as any
+        escrow.OfferSequence = "10"
 
         assert.throws(
-            () => verifyEscrowFinish(invalidSeq),
+            () => verifyEscrowFinish(escrow),
             ValidationError,
-            "EscrowFinish: invalid OfferSequence"
+            "EscrowFinish: OfferSequence must be a number"
         )
     })
 
     it (`throws w/ invalid Condition`, () => {
-        const invalidCondition = {
-            Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            TransactionType: "EscrowFinish",
-            Owner: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            OfferSequence: 7,
-            Condition: 10
-        } as any
+        escrow.Condition = 10
 
         assert.throws(
-            () => verifyEscrowFinish(invalidCondition),
+            () => verifyEscrowFinish(escrow),
             ValidationError,
-            "EscrowFinish: invalid Condition"
+            "EscrowFinish: Condition must be a string"
         )
     })
 
     it (`throws w/ invalid Fulfillment`, () => {
-        const invalidFulfillment = {
-            Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            TransactionType: "EscrowFinish",
-            Owner: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            OfferSequence: 7,
-            Fulfillment: 10
-        } as any
+        escrow.Fulfillment = 0x142341
 
         assert.throws(
-            () => verifyEscrowFinish(invalidFulfillment),
+            () => verifyEscrowFinish(escrow),
             ValidationError,
-            "EscrowFinish: invalid Fulfillment"
+            "EscrowFinish: Fulfillment must be a string"
         )
     })
 })

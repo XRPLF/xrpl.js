@@ -1,12 +1,12 @@
-import { ValidationError } from "../../common/errors";
-import { BaseTransaction, verifyBaseTransaction } from "./common";
+import { ValidationError } from "../../common/errors"
+import { BaseTransaction, verifyBaseTransaction } from "./common"
 
 export interface EscrowFinish extends BaseTransaction {
-    TransactionType: "EscrowFinish";
-    Owner: string;
-    OfferSequence: number;
-    Condition?: string;
-    Fulfillment?: string;
+    TransactionType: "EscrowFinish"
+    Owner: string
+    OfferSequence: number
+    Condition?: string
+    Fulfillment?: string
 }
 
 /**
@@ -23,17 +23,17 @@ export interface EscrowFinish extends BaseTransaction {
         throw new ValidationError("EscrowFinish: missing field Owner")
 
     if (typeof tx.Owner !== 'string')
-        throw new ValidationError("EscrowFinish: invalid Owner")
+        throw new ValidationError("EscrowFinish: Owner must be a string")
 
     if (tx.OfferSequence === undefined)
         throw new ValidationError("EscrowFinish: missing field OfferSequence")
 
     if (typeof tx.OfferSequence !== 'number')
-        throw new ValidationError("EscrowFinish: invalid OfferSequence")
+        throw new ValidationError("EscrowFinish: OfferSequence must be a number")
 
     if (tx.Condition !== undefined && typeof tx.Condition !== 'string')
-        throw new ValidationError("EscrowFinish: invalid Condition")
+        throw new ValidationError("EscrowFinish: Condition must be a string")
 
     if (tx.Fulfillment !== undefined && typeof tx.Fulfillment !== 'string')
-        throw new ValidationError("EscrowFinish: invalid Fulfillment")
+        throw new ValidationError("EscrowFinish: Fulfillment must be a string")
 }  
