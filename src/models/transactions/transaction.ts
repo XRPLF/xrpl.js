@@ -1,15 +1,19 @@
-import Metadata from "../common/metadata"
-import { AccountDelete } from "./accountDelete"
-import { AccountSet } from "./accountSet"
-import { CheckCancel } from "./checkCancel"
-import { CheckCash } from "./checkCash"
-import { CheckCreate } from "./checkCreate"
+import Metadata from "../common/metadata";
+import { AccountDelete } from "./accountDelete";
+import { AccountSet } from "./accountSet";
+import { CheckCancel } from "./checkCancel";
+import { CheckCash } from "./checkCash";
+import { CheckCreate } from "./checkCreate";
 import { DepositPreauth } from "./depositPreauth"
+import { EscrowCancel } from './escrowCancel'
+import { EscrowFinish } from "./escrowFinish"
 import { OfferCancel } from "./offerCancel"
 import { OfferCreate } from "./offerCreate"
 import { PaymentTransaction } from "./paymentTransaction"
 import { PaymentChannelCreate } from "./paymentChannelCreate"
 import { SignerListSet } from "./signerListSet"
+import { TicketCreate } from "./ticketCreate"
+import { TrustSet } from "./trustSet"
 
 export type Transaction =
        AccountDelete
@@ -18,11 +22,10 @@ export type Transaction =
      | CheckCash
      | CheckCreate
      | DepositPreauth
-//   | EscrowCancel
+     | EscrowCancel
 //   | EscrowCreate
-//   | EscrowFinish
+     | EscrowFinish
      | OfferCancel
-//   | OfferCancel
      | OfferCreate
      | PaymentTransaction
 //   | PaymentChannelClaim
@@ -30,8 +33,8 @@ export type Transaction =
 //   | PaymentChannelFund
 //   | SetRegularKey
      | SignerListSet
-//   | TicketCreate
-//   | TrustSet
+     | TicketCreate
+     | TrustSet
 
 export interface TransactionAndMetadata {
     transaction: Transaction
