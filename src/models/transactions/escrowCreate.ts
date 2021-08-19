@@ -1,21 +1,21 @@
-import { ValidationError } from "../../common/errors";
-import { BaseTransaction, GlobalFlags, verifyBaseTransaction } from "./common";
+import { ValidationError } from "../../common/errors"
+import { BaseTransaction, GlobalFlags, verifyBaseTransaction } from "./common"
 
 export interface EscrowCreateFlags extends GlobalFlags {
-    tfPassive?: boolean;
-    tfImmediateOrCancel?: boolean;
-    tfFillOrKill?: boolean;
-    tfSell?: boolean;
+    tfPassive?: boolean
+    tfImmediateOrCancel?: boolean
+    tfFillOrKill?: boolean
+    tfSell?: boolean
 }
 
 export interface EscrowCreate extends BaseTransaction {
-    TransactionType: "EscrowCreate";
+    TransactionType: "EscrowCreate"
     Amount: string
-    Destination: string;
-    CancelAfter?: number;
-    FinishAfter?: number;
-    Condition?: string;
-    DestinationTag?: number;
+    Destination: string
+    CancelAfter?: number
+    FinishAfter?: number
+    Condition?: string
+    DestinationTag?: number
 }
 
 /**
@@ -32,23 +32,29 @@ export interface EscrowCreate extends BaseTransaction {
         throw new ValidationError("EscrowCreate: missing field Amount")
 
     if (typeof tx.Amount !== 'string')
-        throw new ValidationError("EscrowCreate: invalid Amount")
+        throw new ValidationError("EscrowCreate: Amount must be a string")
 
     if (tx.Destination === undefined)
         throw new ValidationError("EscrowCreate: missing field Destination")
 
     if (typeof tx.Destination !== 'string')
-        throw new ValidationError("EscrowCreate: invalid Destination")
+        throw new ValidationError("EscrowCreate: Destination must be a string")
+
+    if (tx.CancelAfter === undefined && tx.FinishAfter === undefined)
+        throw new ValidationError("EscrowCreate: Either CancelAfter or FinishAfter must be specified")
+
+    if (tx.FinishAfter === undefined && tx.Condition === undefined)
+        throw new ValidationError("EscrowCreate: Either Condition or FinishAfter must be specified")
 
     if (tx.CancelAfter !== undefined && typeof tx.CancelAfter !== 'number')
-        throw new ValidationError("EscrowCreate: invalid CancelAfter")
+        throw new ValidationError("EscrowCreate: CancelAfter must be a number")
 
     if (tx.FinishAfter !== undefined && typeof tx.FinishAfter !== 'number')
-        throw new ValidationError("EscrowCreate: invalid FinishAfter")
+        throw new ValidationError("EscrowCreate: FinishAfter must be a number")
 
     if (tx.Condition !== undefined && typeof tx.Condition !== 'string')
-        throw new ValidationError("EscrowCreate: invalid Condition")
+        throw new ValidationError("EscrowCreate: Condition must be a string")
 
     if (tx.DestinationTag !== undefined && typeof tx.DestinationTag !== 'number')
-        throw new ValidationError("EscrowCreate: invalid DestinationTag")
+        throw new ValidationError("EscrowCreate: DestinationTag must be a number")
 }
