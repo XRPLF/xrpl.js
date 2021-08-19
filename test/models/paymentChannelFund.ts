@@ -8,101 +8,75 @@ import { assert } from 'chai'
  * Providing runtime verification testing for each specific transaction type
  */
 describe('PaymentChannelFund Transaction Verification', function () {
-    
-    it (`verifies valid PaymentChannelFund`, () => {
-        const valid = {
+    let channel
+
+    beforeEach(() => {
+        channel = {
             "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
             "TransactionType": "PaymentChannelFund",
             "Channel": "C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198",
             "Amount": "200000",
             "Expiration": 543171558
-        } as any
-        
-        assert.doesNotThrow(() => verifyPaymentChannelFund(valid))
+        }
+    })
+    
+    it (`verifies valid PaymentChannelFund`, () => {
+        assert.doesNotThrow(() => verifyPaymentChannelFund(channel))
     })
 
     it (`verifies valid PaymentChannelFund w/o optional`, () => {
-        const valid = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelFund",
-            "Channel": "C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198",
-            "Amount": "200000",
-        } as any
+        delete channel.Expiration
         
-        assert.doesNotThrow(() => verifyPaymentChannelFund(valid))
+        assert.doesNotThrow(() => verifyPaymentChannelFund(channel))
     })
 
     it (`throws w/ missing Amount`, () => {
-        const missingAmt = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelFund",
-            "Channel": "C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198",
-        } as any
+        delete channel.Amount
 
         assert.throws(
-            () => verifyPaymentChannelFund(missingAmt),
+            () => verifyPaymentChannelFund(channel),
             ValidationError,
             "PaymentChannelFund: missing Amount"
         )
     })
 
     it (`throws w/ missing Channel`, () => {
-        const missingChannel = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelFund",
-            "Amount": "1000",
-        } as any
+        delete channel.Channel
 
         assert.throws(
-            () => verifyPaymentChannelFund(missingChannel),
+            () => verifyPaymentChannelFund(channel),
             ValidationError,
             "PaymentChannelFund: missing Channel"
         )
     })
 
     it (`throws w/ invalid Amount`, () => {
-        const invalidAmt = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelFund",
-            "Amount": 100,
-            "Channel": "C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198",
-        } as any
+        channel.Amount = 100
 
         assert.throws(
-            () => verifyPaymentChannelFund(invalidAmt),
+            () => verifyPaymentChannelFund(channel),
             ValidationError,
-            "PaymentChannelFund: invalid Amount"
+            "PaymentChannelFund: Amount must be a string"
         )
     })
 
     it (`throws w/ missing Channel`, () => {
-        const invalidChannel = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelFund",
-            "Amount": "1000",
-            "Channel": 1000
-        } as any
+        channel.Channel = 1000
 
         assert.throws(
-            () => verifyPaymentChannelFund(invalidChannel),
+            () => verifyPaymentChannelFund(channel),
             ValidationError,
-            "PaymentChannelFund: invalid Channel"
+            "PaymentChannelFund: Channel must be a string"
         )
     })
 
     it (`throws w/ invalid Expiration`, () => {
-        const invalidExpiration = {
-            "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            "TransactionType": "PaymentChannelFund",
-            "Channel": "C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198",
-            "Amount": "200000",
-            "Expiration": "543171558"
-        } as any
+        channel.Expiration = "1000"
         
         assert.throws(
-            () => verifyPaymentChannelFund(invalidExpiration),
+            () => verifyPaymentChannelFund(channel),
             ValidationError,
-            "PaymentChannelFund: invalid Expiration"
+            "PaymentChannelFund: Expiration must be a number"
         )
     })
 
