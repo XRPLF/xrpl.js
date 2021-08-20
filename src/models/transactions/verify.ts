@@ -1,4 +1,7 @@
-import { Transaction } from ".";
+import { ValidationError } from '../../common/errors'
+import { Transaction } from '.'
+import { isEqual } from 'lodash';
+import { encode, decode } from 'ripple-binary-codec'
 import { verifyAccountDelete,
          verifyAccountSet, 
          verifyCheckCancel, 
@@ -20,6 +23,9 @@ import { verifyAccountDelete,
          verifyTrustSet } from ".";
 
 export function verify(tx: Transaction) {
+    
+    if(!isEqual(decode(encode(tx)),tx))
+        throw new ValidationError(`Invalid Transaction: ${tx.TransactionType}`)
 
     if (tx.TransactionType === 'AccountDelete')
         verifyAccountDelete(tx)
