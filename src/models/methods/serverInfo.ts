@@ -51,6 +51,7 @@ export interface ServerInfoResponse extends BaseResponse {
             load_factor_fee_escalation?: number
             load_factor_fee_queue?: number
             load_factor_server?: number
+            network_ledger?: "waiting"
             peers: number
             pubkey_node: string
             pubkey_validator?: string

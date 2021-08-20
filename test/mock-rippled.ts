@@ -731,9 +731,8 @@ export function createMockRippled(port) {
         const file = requestsCache[i]
         const json = fs.readFileSync(rippledDir + '/requests/' + file, 'utf8')
         const r = JSON.parse(json)
-        const requestWithoutId = Object.assign({}, request)
-        delete requestWithoutId.id
-        if (JSON.stringify(requestWithoutId) === JSON.stringify(r)) {
+        const requestWithoutId = _.omit(Object.assign({}, request), 'id')
+        if (_.isEqual(requestWithoutId, r)) {
           const responseFile =
             rippledDir + '/responses/' + file.split('.')[0] + '-res.json'
           const res = fs.readFileSync(responseFile, 'utf8')

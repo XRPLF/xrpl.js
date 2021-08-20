@@ -34,5 +34,4 @@ export {
   iso8601ToRippleTime,
   rippleTimeToISO8601
 } from './utils'
-export {Connection} from './connection'
 export {txFlags} from './txflags'

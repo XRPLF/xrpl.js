@@ -1,11 +1,7 @@
 import * as common from '../common'
-import {Client} from '..'
+import { LedgerStream } from '../models/methods'
 
-function getLedgerVersion(this: Client): Promise<number> {
-  return this.connection.getLedgerVersion()
-}
-
-function formatLedgerClose(ledgerClose: any): object {
+function formatLedgerClose(ledgerClose: LedgerStream): object {
   return {
     baseFeeXRP: common.dropsToXrp(ledgerClose.fee_base),
     ledgerHash: ledgerClose.ledger_hash,
@@ -18,4 +14,4 @@ function formatLedgerClose(ledgerClose: any): object {
   }
 }
 
-export {getLedgerVersion, formatLedgerClose}
+export {formatLedgerClose}

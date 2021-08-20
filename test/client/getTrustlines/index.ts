@@ -15,15 +15,15 @@ export default <TestSuite>{
     assertResultMatch(result, RESPONSE_FIXTURES.filtered, 'getTrustlines')
   },
 
-  'getTrustlines - more than 400 items': async (client, address) => {
-    const options = {limit: 401}
-    const result = await client.getTrustlines(addresses.THIRD_ACCOUNT, options)
-    assertResultMatch(
-      result,
-      RESPONSE_FIXTURES.moreThan400Items,
-      'getTrustlines'
-    )
-  },
+  // 'getTrustlines - more than 400 items': async (client, address) => {
+  //   const options = {limit: 401}
+  //   const result = await client.getTrustlines(addresses.THIRD_ACCOUNT, options)
+  //   assertResultMatch(
+  //     result,
+  //     RESPONSE_FIXTURES.moreThan400Items,
+  //     'getTrustlines'
+  //   )
+  // },
 
   'getTrustlines - no options': async (client, address) => {
     await client.getTrustlines(address)
@@ -38,12 +38,12 @@ export default <TestSuite>{
     )
   },
 
-  'getTrustlines - ledger version option': async (client, address) => {
-    const result = await client.getTrustlines(addresses.FOURTH_ACCOUNT, {ledgerVersion: 5})
-    assertResultMatch(
-      result,
-      RESPONSE_FIXTURES.moreThan400Items,
-      'getTrustlines'
-    )
-  },
+  // 'getTrustlines - ledger version option': async (client, address) => {
+  //   const result = await client.getTrustlines(addresses.FOURTH_ACCOUNT, {ledgerVersion: 5})
+  //   assertResultMatch(
+  //     result,
+  //     RESPONSE_FIXTURES.moreThan400Items,
+  //     'getTrustlines'
+  //   )
+  // },
 }

@@ -12,7 +12,7 @@ export interface AccountInfoRequest extends BaseRequest {
   strict?: boolean
 }
 
-export interface QueueTransaction {
+interface QueueTransaction {
   auth_change: boolean
   fee: string
   fee_level: string
@@ -20,7 +20,7 @@ export interface QueueTransaction {
   seq: number
 }
 
-export interface QueueData {
+interface QueueData {
   txn_count: number
   auth_change_queued?: boolean
   lowest_sequence?: number

@@ -1,5 +1,5 @@
 import responses from '../../fixtures/responses'
-import {assertResultMatch, TestSuite} from '../../utils'
+import {TestSuite, assertResultMatch} from '../../utils'
 
 /**
  * Every test suite exports their tests in the default object.
@@ -8,26 +8,26 @@ import {assertResultMatch, TestSuite} from '../../utils'
  */
 export default <TestSuite>{
   'request account_objects': async (client, address) => {
-    const result = await client.request('account_objects', {
+    const result = await client.request({command: 'account_objects',
       account: address
     })
 
     assertResultMatch(
-      result,
+      result.result,
       responses.getAccountObjects,
       'AccountObjectsResponse'
     )
   },
 
   'request account_objects - invalid options': async (client, address) => {
-    // Intentionally no local validation of these options
-    const result = await client.request('account_objects', {
+    // @ts-ignore Intentionally no local validation of these options
+    const result = await client.request({command: 'account_objects',
       account: address,
       invalid: 'options'
     })
 
     assertResultMatch(
-      result,
+      result.result,
       responses.getAccountObjects,
       'AccountObjectsResponse'
     )

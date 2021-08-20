@@ -10,11 +10,12 @@ import {assertResultMatch, TestSuite, assertRejects} from '../../utils'
 export default <TestSuite>{
   'default': async (client, address) => {
     const serverInfo = await client.getServerInfo()
-    assertResultMatch(serverInfo, responses.getServerInfo, 'getServerInfo')
+    assertResultMatch(serverInfo.result.info, responses.getServerInfo, 'getServerInfo')
   },
 
   'error': async (client, address) => {
     client.connection.request({
+      // @ts-ignore TODO: resolve
       command: 'config',
       data: {returnErrorOnServerInfo: true}
     })
@@ -30,11 +31,12 @@ export default <TestSuite>{
 
   'no validated ledger': async (client, address) => {
     client.connection.request({
+      // @ts-ignore TODO: resolve
       command: 'config',
       data: {serverInfoWithoutValidated: true}
     })
     const serverInfo = await client.getServerInfo()
-    assert.strictEqual(serverInfo.networkLedger, 'waiting')
+    assert.strictEqual(serverInfo.result.info.network_ledger, 'waiting')
   },
 
   'getServerInfo - offline': async (client, address) => {
