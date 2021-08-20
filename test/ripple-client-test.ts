@@ -1,7 +1,7 @@
 import setupClient from './setup-client'
 import {Client} from 'xrpl-local'
 import addresses from './fixtures/addresses.json'
-import {getAllPublicMethods, LoadedTestSuite, loadTestSuitesFromFolder} from './utils'
+import {getAllPublicMethods, loadTestSuites} from './utils'
 
 /**
  * Client Test Runner
@@ -27,27 +27,13 @@ describe('Client [Test Runner]', function () {
 
   // Collect all the tests:
   const allPublicMethods = getAllPublicMethods(new Client("wss://"))
-  const apiTestSuites = loadTestSuitesFromFolder("client")
+  // doesn't need the client, just needs to instantiate to get public methods
 
-  runTests(apiTestSuites, "client.")
+  const allTestSuites = loadTestSuites()
 
-  // Report any missing tests for api functions.
-  const allTestedMethods = new Set(apiTestSuites.map((s) => s.name))
-  for (const methodName of allPublicMethods) {
-    if (!allTestedMethods.has(methodName)) {
-      // TODO: Once migration is complete, remove `.skip()` so that missing tests are reported as failures.
-      it.skip(`${methodName} - no test suite found`, () => {
-        throw new Error(
-          `Test file not found! Create file "test/api/${methodName}/index.ts".`
-        )
-      })
-    }
-  }
-}) 
-
-function runTests(testSuites: LoadedTestSuite[], descriptionPrefix: string = "") {
-  for (const { name: methodName, tests, config } of testSuites) {
-    describe(descriptionPrefix.concat(methodName), () => {
+  // Run all the tests:
+  for (const {name: methodName, tests, config} of allTestSuites) {
+    describe(`client.${methodName}`, () => {
       // Run each test that does not use an address.
       for (const [testName, fn] of tests) {
         if (fn.length === 1) {
@@ -80,5 +66,17 @@ function runTests(testSuites: LoadedTestSuite[], descriptionPrefix: string = "")
       }
     })
   }
-}
 
+  // Report any missing tests.
+  const allTestedMethods = new Set(allTestSuites.map((s) => s.name))
+  for (const methodName of allPublicMethods) {
+    if (!allTestedMethods.has(methodName)) {
+      // TODO: Once migration is complete, remove `.skip()` so that missing tests are reported as failures.
+      it.skip(`${methodName} - no test suite found`, () => {
+        throw new Error(
+          `Test file not found! Create file "test/client/${methodName}/index.ts".`
+        )
+      })
+    }
+  }
+})
