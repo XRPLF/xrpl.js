@@ -7,6 +7,7 @@ import addresses from './fixtures/addresses.json'
 import responses from './fixtures/responses'
 import ledgerClosed from './fixtures/rippled/ledger-close-newer.json'
 import setupClient from './setup-client'
+import {toRippledAmount} from '../src'
 
 const {validate, schemaValidator, ledgerUtils} = Client._PRIVATE
 const address = addresses.ACCOUNT
@@ -133,7 +134,7 @@ describe('Client', function () {
 
   it('common utils - toRippledAmount', async () => {
     const amount = {issuer: 'is', currency: 'c', value: 'v'}
-    assert.deepEqual(ledgerUtils.common.toRippledAmount(amount), {
+    assert.deepEqual(toRippledAmount(amount), {
       issuer: 'is',
       currency: 'c',
       value: 'v'

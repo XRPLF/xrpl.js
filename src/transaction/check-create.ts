@@ -1,6 +1,6 @@
 import * as utils from './utils'
-const toRippledAmount = utils.common.toRippledAmount
-import {validate, iso8601ToRippleTime} from '../common'
+import {validate} from '../common'
+import {iso8601ToRippleTime, toRippledAmount} from '../utils'
 import {Instructions, Prepare, TransactionJSON} from './types'
 import {Amount} from '../common/types/objects'
 import {Client} from '..'

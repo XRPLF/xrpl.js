@@ -1,6 +1,7 @@
 import * as utils from './utils'
 const offerFlags = utils.common.txFlags.OfferCreate
-import {validate, iso8601ToRippleTime, toRippledAmount} from '../common'
+import {validate} from '../common'
+import {iso8601ToRippleTime, toRippledAmount} from '../utils'
 import {Instructions, Prepare, OfferCreateTransaction} from './types'
 import {FormattedOrderSpecification} from '../common/types/objects/index'
 import {Client} from '..'

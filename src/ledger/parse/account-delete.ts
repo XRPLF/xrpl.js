@@ -1,5 +1,5 @@
 import * as assert from 'assert'
-import {removeUndefined} from '../../common'
+import {removeUndefined} from '../../utils'
 import {classicAddressToXAddress} from 'ripple-address-codec'
 import {parseMemos} from './utils'
 

@@ -5,7 +5,8 @@ import {Connection} from '../client'
 import {FormattedTransactionType} from '../transaction/types'
 import {Issue} from '../common/types/objects'
 import {Client} from '..'
-import { AccountInfoRequest } from '../models/methods'
+import {AccountInfoRequest} from '../models/methods'
+import {dropsToXrp} from '..'
 
 export type RecursiveData = {
   marker: string
@@ -31,7 +32,7 @@ function getXRPBalance(
   }
   return connection
     .request(request)
-    .then((data) => common.dropsToXrp(data.result.account_data.Balance))
+    .then((data) => dropsToXrp(data.result.account_data.Balance))
 }
 
 // If the marker is omitted from a response, you have reached the end

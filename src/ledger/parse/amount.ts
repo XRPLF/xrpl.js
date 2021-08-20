@@ -1,11 +1,11 @@
-import * as common from '../../common'
 import {Amount, RippledAmount} from '../../common/types/objects'
+import {dropsToXrp} from '../../utils'
 
 function parseAmount(amount: RippledAmount): Amount {
   if (typeof amount === 'string') {
     return {
       currency: 'XRP',
-      value: common.dropsToXrp(amount)
+      value: dropsToXrp(amount)
     }
   }
   return {

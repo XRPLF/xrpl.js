@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import {removeUndefined, rippleTimeToISO8601} from '../../common'
+import {removeUndefined, rippleTimeToISO8601} from '../../utils'
 import parseTransaction from './transaction'
 import {Ledger} from '../../models/ledger'
 

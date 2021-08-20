@@ -1,5 +1,6 @@
 import * as utils from './utils'
-import {validate, iso8601ToRippleTime, xrpToDrops} from '../common'
+import {validate} from '../common'
+import {iso8601ToRippleTime, xrpToDrops} from '../utils'
 import {Instructions, Prepare, TransactionJSON} from './types'
 import {Client} from '..'
 
