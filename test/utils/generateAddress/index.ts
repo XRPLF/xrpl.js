@@ -1,6 +1,6 @@
 import assert from 'assert-diff'
 import responses from '../../fixtures/responses'
-import {generateAddressAPI, GenerateAddressOptions} from '../../../src/utils/generate-address'
+import {generateXAddress, GenerateAddressOptions} from '../../../src/utils/generate-address'
 import xAddressResponse from '../../fixtures/responses/generate-x-address.json'
 import ECDSA from '../../../src/common/ecdsa'
 import {UnexpectedError} from '../../../src/common/errors'
@@ -14,7 +14,7 @@ describe('Generate Address', function () {
 
     assert.deepEqual(
       // WHEN generating an address
-      generateAddressAPI({entropy: random()}),
+      generateXAddress({entropy: random()}),
 
       // THEN we get the expected return value
       xAddressResponse
@@ -29,7 +29,7 @@ describe('Generate Address', function () {
       }
 
       // WHEN generating an address
-      generateAddressAPI({entropy: random()})
+      generateXAddress({entropy: random()})
 
       // THEN an UnexpectedError is thrown
       // because 16 bytes of entropy are required
@@ -40,7 +40,7 @@ describe('Generate Address', function () {
     // GIVEN no options
 
     // WHEN generating an address
-    const account = generateAddressAPI()
+    const account = generateXAddress()
 
     // THEN we get an object with an xAddress starting with 'x' and a secret starting with 's'
     assert(account.xAddress.startsWith('X'), 'Address must start with `X`')
@@ -52,7 +52,7 @@ describe('Generate Address', function () {
     const options = {}
 
     // WHEN generating an address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get an object with an xAddress starting with 'x' and a secret starting with 's'
     assert(account.xAddress.startsWith('X'), 'Address must start with `X`')
@@ -64,7 +64,7 @@ describe('Generate Address', function () {
     const options: GenerateAddressOptions = {algorithm: ECDSA.secp256k1, includeClassicAddress: true}
 
     // WHEN generating an address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get an object with an address starting with 'r' and a secret starting with 's' (not 'sEd')
     assert(account.classicAddress.startsWith('r'), 'Address must start with `r`')
@@ -85,7 +85,7 @@ describe('Generate Address', function () {
     const options: GenerateAddressOptions = {algorithm: ECDSA.ed25519, includeClassicAddress: true}
 
     // WHEN generating an address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get an object with an address starting with 'r' and a secret starting with 'sEd'
     assert(account.classicAddress.startsWith('r'), 'Address must start with `r`')
@@ -104,7 +104,7 @@ describe('Generate Address', function () {
     }
 
     // WHEN generating an address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, responses.generateXAddress)
@@ -118,7 +118,7 @@ describe('Generate Address', function () {
     }
 
     // WHEN generating an address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, {
@@ -137,7 +137,7 @@ describe('Generate Address', function () {
     }
 
     // WHEN generating an address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, responses.generateAddress)
@@ -152,7 +152,7 @@ describe('Generate Address', function () {
     }
 
     // WHEN generating an address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, {
@@ -175,7 +175,7 @@ describe('Generate Address', function () {
     }
 
     // WHEN generating an address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     const response = Object.assign({}, responses.generateAddress, {
@@ -195,7 +195,7 @@ describe('Generate Address', function () {
     }
 
     // WHEN generating an address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, {
@@ -212,7 +212,7 @@ describe('Generate Address', function () {
     const options: GenerateAddressOptions = {test: true}
 
     // WHEN generating an address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get an object with xAddress starting with 'T' and a secret starting with 's'
 

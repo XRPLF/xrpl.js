@@ -6,7 +6,7 @@ import {Client} from 'xrpl-local'
 import {payTo, ledgerAccept} from './utils'
 import {errors} from 'xrpl-local/common'
 import {isValidSecret} from 'xrpl-local/common/utils'
-import { generateAddressAPI } from '../../src/utils/generate-address'
+import { generateXAddress } from '../../src/utils/generate-address'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 // how long before each test case times out
@@ -233,7 +233,7 @@ function suiteSetup(this: any) {
     setup
       .bind(this)(serverUrl)
       .then(() => ledgerAccept(this.client))
-      .then(() => (this.newWallet = generateAddressAPI()))
+      .then(() => (this.newWallet = generateXAddress()))
       // two times to give time to server to send `ledgerClosed` event
       // so getLedgerVersion will return right value
       .then(() => ledgerAccept(this.client))
@@ -508,7 +508,7 @@ describe('integration tests', function () {
   // })
 
   it('generateWallet', function () {
-    const newWallet = generateAddressAPI()
+    const newWallet = generateXAddress()
     assert(newWallet && newWallet.xAddress && newWallet.secret)
     assert(isValidXAddress(newWallet.xAddress))
     assert(isValidSecret(newWallet.secret))

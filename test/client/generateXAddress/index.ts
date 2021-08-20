@@ -2,7 +2,7 @@ import assert from 'assert-diff'
 import responses from '../../fixtures/responses'
 import {TestSuite} from '../../utils'
 import ECDSA from '../../../src/common/ecdsa'
-import {generateAddressAPI, GenerateAddressOptions} from '../../../src/utils/generate-address'
+import {generateXAddress, GenerateAddressOptions} from '../../../src/utils/generate-address'
 
 /**
  * Every test suite exports their tests in the default object.
@@ -18,7 +18,7 @@ export default <TestSuite>{
 
     assert.deepEqual(
       // WHEN generating an X-address
-      generateAddressAPI({entropy: random()}),
+      generateXAddress({entropy: random()}),
 
       // THEN we get the expected return value
       responses.generateXAddress
@@ -33,7 +33,7 @@ export default <TestSuite>{
       }
 
       // WHEN generating an X-address
-      generateAddressAPI({entropy: random()})
+      generateXAddress({entropy: random()})
 
       // THEN an UnexpectedError is thrown
       // because 16 bytes of entropy are required
@@ -44,7 +44,7 @@ export default <TestSuite>{
     // GIVEN no options
 
     // WHEN generating an X-address
-    const account = generateAddressAPI()
+    const account = generateXAddress()
 
     // THEN we get an object with an xAddress starting with 'X' and a secret starting with 's'
     assert(
@@ -59,7 +59,7 @@ export default <TestSuite>{
     const options = {}
 
     // WHEN generating an X-address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get an object with an xAddress starting with 'X' and a secret starting with 's'
     assert(
@@ -74,7 +74,7 @@ export default <TestSuite>{
     const options: GenerateAddressOptions = {algorithm: ECDSA.secp256k1}
 
     // WHEN generating an X-address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get an object with an xAddress starting with 'X' and a secret starting with 's'
     assert(
@@ -98,7 +98,7 @@ export default <TestSuite>{
     const options: GenerateAddressOptions = {algorithm: ECDSA.ed25519}
 
     // WHEN generating an X-address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get an object with an xAddress starting with 'X' and a secret starting with 'sEd'
     assert(
@@ -122,7 +122,7 @@ export default <TestSuite>{
     }
 
     // WHEN generating an X-address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, responses.generateXAddress)
@@ -138,7 +138,7 @@ export default <TestSuite>{
     }
 
     // WHEN generating an X-address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, {
@@ -158,7 +158,7 @@ export default <TestSuite>{
     }
 
     // WHEN generating an X-address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, responses.generateAddress)
@@ -175,7 +175,7 @@ export default <TestSuite>{
     }
 
     // WHEN generating an X-address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, {
@@ -198,7 +198,7 @@ export default <TestSuite>{
     }
 
     // WHEN generating an X-address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     const response = Object.assign({}, responses.generateAddress, {
@@ -219,7 +219,7 @@ export default <TestSuite>{
     }
 
     // WHEN generating an X-address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, {
@@ -235,7 +235,7 @@ export default <TestSuite>{
     const options: GenerateAddressOptions = {test: true}
 
     // WHEN generating an X-address
-    const account = generateAddressAPI(options)
+    const account = generateXAddress(options)
 
     // THEN we get an object with xAddress starting with 'T' and a secret starting with 's'
     assert.deepEqual(

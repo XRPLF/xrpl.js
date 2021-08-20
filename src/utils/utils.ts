@@ -25,7 +25,7 @@ import {
     computeEscrowHash,
     computePaymentChannelHash,
 } from '../common/hashes'
-import { generateAddressAPI } from './generate-address'
+import { generateXAddress } from './generate-address'
 
 export {
     computeLedgerHeaderHash,
@@ -49,7 +49,7 @@ export {
     computeLedgerHash,
     computeEscrowHash,
     computePaymentChannelHash,
-    generateAddressAPI as generateXAddress,
+    generateXAddress,
     deriveKeypair,
     deriveAddress,
     deriveXAddress,
