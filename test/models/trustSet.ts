@@ -1,6 +1,7 @@
 import { ValidationError } from 'xrpl-local/common/errors'
 import { verifyTrustSet } from './../../src/models/transactions/trustSet'
 import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * TrustSet Transaction Verification Testing
@@ -25,13 +26,18 @@ describe('TrustSet Transaction Verification', () => {
     })
 
     it ('verifies valid TrustSet', () => {
-        assert.doesNotThrow(() => verifyTrustSet(trustSet))
+        assert.doesNotThrow(() => {
+           verifyTrustSet(trustSet)
+            verify(trustSet)
+        })
     })
 
     it ('throws when LimitAmount is missing', () => {
         delete trustSet.LimitAmount
-        assert.throws(
-            () => verifyTrustSet(trustSet),
+        assert.throws(() => {
+           verifyTrustSet(trustSet)
+            verify(trustSet)
+        },
             ValidationError,
             'TrustSet: missing field LimitAmount'
         )
@@ -40,7 +46,10 @@ describe('TrustSet Transaction Verification', () => {
     it ('throws when LimitAmount is invalid', () => {
         trustSet.LimitAmount = 1234
         assert.throws(
-            () => verifyTrustSet(trustSet),
+            () => {
+           verifyTrustSet(trustSet)
+            verify(trustSet)
+        },
             ValidationError,
             'TrustSet: invalid LimitAmount'
         )
@@ -48,8 +57,10 @@ describe('TrustSet Transaction Verification', () => {
 
     it ('throws when QualityIn is not a number', () => {
         trustSet.QualityIn = '1234'
-        assert.throws(
-            () => verifyTrustSet(trustSet),
+        assert.throws(() => {
+           verifyTrustSet(trustSet)
+            verify(trustSet)
+        },
             ValidationError,
             'TrustSet: QualityIn must be a number'
         )
@@ -57,8 +68,10 @@ describe('TrustSet Transaction Verification', () => {
 
     it ('throws when QualityOut is not a number', () => {
         trustSet.QualityOut = '4321'
-        assert.throws(
-            () => verifyTrustSet(trustSet),
+        assert.throws(() => {
+           verifyTrustSet(trustSet)
+            verify(trustSet)
+        },
             ValidationError,
             'TrustSet: QualityOut must be a number'
         )

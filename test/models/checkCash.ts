@@ -1,6 +1,7 @@
 import { ValidationError } from 'xrpl-local/common/errors'
 import { verifyCheckCash } from './../../src/models/transactions/checkCash'
 import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * CheckCash Transaction Verification Testing
@@ -18,7 +19,10 @@ describe('CheckCash Transaction Verification', function () {
             Fee : "12"
         } as any
         
-        assert.doesNotThrow(() => verifyCheckCash(validCheckCash))
+        assert.doesNotThrow(() => {
+            verifyCheckCash(validCheckCash)
+            verify(validCheckCash)
+        })
     })
 
     it (`throws w/ invalid CheckID`, () => {
@@ -30,7 +34,10 @@ describe('CheckCash Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyCheckCash(invalidCheckID),
+            () => {
+                verifyCheckCash(invalidCheckID)
+                verify(invalidCheckID)
+            },
             ValidationError,
             "CheckCash: invalid CheckID"
         )
@@ -45,7 +52,10 @@ describe('CheckCash Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyCheckCash(invalidAmount),
+            () => {
+                verifyCheckCash(invalidAmount)
+                verify(invalidAmount)
+            },
             ValidationError,
             "CheckCash: invalid Amount"
         )
@@ -61,7 +71,10 @@ describe('CheckCash Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyCheckCash(invalidDeliverMin),
+            () => {
+                verifyCheckCash(invalidDeliverMin)
+                verify(invalidDeliverMin)
+            },
             ValidationError,
             "CheckCash: cannot have both Amount and DeliverMin"
         )
@@ -76,7 +89,10 @@ describe('CheckCash Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyCheckCash(invalidDeliverMin),
+            () => {
+                verifyCheckCash(invalidDeliverMin)
+                verify(invalidDeliverMin)
+            },
             ValidationError,
             "CheckCash: invalid DeliverMin"
         )

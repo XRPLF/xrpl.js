@@ -1,6 +1,8 @@
 import { ValidationError } from 'xrpl-local/common/errors'
 import { verifyAccountSet } from './../../src/models/transactions/accountSet'
+import { verify } from '../../src/models/transactions'
 import { assert } from 'chai'
+
 
 /**
  * AccountSet Transaction Verification Testing
@@ -24,14 +26,20 @@ describe('AccountSet Transaction Verification', function () {
     })
 
     it (`verifies valid AccountSet`, () => {
-        assert.doesNotThrow(() => verifyAccountSet(account))
+        assert.doesNotThrow(() => {
+            verifyAccountSet(account)
+            verify(account)
+        })
     })
 
     it (`throws w/ invalid SetFlag (out of range)`, () => {
         account.SetFlag = 12
 
         assert.throws(
-            () => verifyAccountSet(account),
+            () => {
+                verifyAccountSet(account)
+                verify(account)
+            },
             ValidationError,
             "AccountSet: invalid SetFlag"
         )
@@ -41,7 +49,10 @@ describe('AccountSet Transaction Verification', function () {
         account.SetFlag = 'abc'
         
         assert.throws(
-            () => verifyAccountSet(account),
+            () => {
+                verifyAccountSet(account)
+                verify(account)
+            },
             ValidationError,
             "AccountSet: invalid SetFlag"
         )
@@ -51,7 +62,10 @@ describe('AccountSet Transaction Verification', function () {
         account.ClearFlag = 12
 
         assert.throws(
-            () => verifyAccountSet(account),
+            () => {
+                verifyAccountSet(account)
+                verify(account)
+            },
             ValidationError,
             "AccountSet: invalid ClearFlag"
         )
@@ -61,7 +75,10 @@ describe('AccountSet Transaction Verification', function () {
         account.Domain = 6578616
 
         assert.throws(
-            () => verifyAccountSet(account),
+            () => {
+                verifyAccountSet(account)
+                verify(account)
+            },
             ValidationError,
             "AccountSet: invalid Domain"
         )
@@ -71,7 +88,10 @@ describe('AccountSet Transaction Verification', function () {
         account.EmailHash = 657861645678909876543456789876543
 
         assert.throws(
-            () => verifyAccountSet(account),
+            () => {
+                verifyAccountSet(account)
+                verify(account)
+            },
             ValidationError,
             "AccountSet: invalid EmailHash"
         )
@@ -81,7 +101,10 @@ describe('AccountSet Transaction Verification', function () {
         account.MessageKey = 65786165678908765456789567890678
 
         assert.throws(
-            () => verifyAccountSet(account),
+            () => {
+                verifyAccountSet(account)
+                verify(account)
+            },
             ValidationError,
             "AccountSet: invalid MessageKey"
         )
@@ -91,7 +114,10 @@ describe('AccountSet Transaction Verification', function () {
         account.TransferRate = "1000000001"
 
         assert.throws(
-            () => verifyAccountSet(account),
+            () => {
+                verifyAccountSet(account)
+                verify(account)
+            },
             ValidationError,
             "AccountSet: invalid TransferRate"
         )
@@ -101,7 +127,10 @@ describe('AccountSet Transaction Verification', function () {
         account.TickSize = 20
 
         assert.throws(
-            () => verifyAccountSet(account),
+            () => {
+                verifyAccountSet(account)
+                verify(account)
+            },
             ValidationError,
             "AccountSet: invalid TickSize"
         )

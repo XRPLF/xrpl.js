@@ -1,6 +1,7 @@
 import { ValidationError } from 'xrpl-local/common/errors'
 import { verifyEscrowFinish } from './../../src/models/transactions/escrowFinish'
 import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * EscrowFinish Transaction Verification Testing
@@ -21,14 +22,20 @@ describe('EscrowFinish Transaction Verification', function () {
         }
     })
     it (`verifies valid EscrowFinish`, () => {                    
-        assert.doesNotThrow(() => verifyEscrowFinish(escrow))
+        assert.doesNotThrow(() => {
+            verifyEscrowFinish(escrow)
+            verify(escrow)
+        })
     })
 
     it (`verifies valid EscrowFinish w/o optional`, () => {
         delete escrow.Condition
         delete escrow.Fulfillment
                     
-        assert.doesNotThrow(() => verifyEscrowFinish(escrow))
+        assert.doesNotThrow(() => {
+            verifyEscrowFinish(escrow)
+            verify(escrow)
+        })
     })
 
 
@@ -37,7 +44,10 @@ describe('EscrowFinish Transaction Verification', function () {
  
 
         assert.throws(
-            () => verifyEscrowFinish(escrow),
+            () => {
+                verifyEscrowFinish(escrow)
+                verify(escrow)
+            },
             ValidationError,
             "EscrowFinish: Owner must be a string"
         )
@@ -47,7 +57,10 @@ describe('EscrowFinish Transaction Verification', function () {
         escrow.OfferSequence = "10"
 
         assert.throws(
-            () => verifyEscrowFinish(escrow),
+            () => {
+                verifyEscrowFinish(escrow)
+                verify(escrow)
+            },
             ValidationError,
             "EscrowFinish: OfferSequence must be a number"
         )
@@ -57,7 +70,10 @@ describe('EscrowFinish Transaction Verification', function () {
         escrow.Condition = 10
 
         assert.throws(
-            () => verifyEscrowFinish(escrow),
+            () => {
+                verifyEscrowFinish(escrow)
+                verify(escrow)
+            },
             ValidationError,
             "EscrowFinish: Condition must be a string"
         )
@@ -67,7 +83,10 @@ describe('EscrowFinish Transaction Verification', function () {
         escrow.Fulfillment = 0x142341
 
         assert.throws(
-            () => verifyEscrowFinish(escrow),
+            () => {
+                verifyEscrowFinish(escrow)
+                verify(escrow)
+            },
             ValidationError,
             "EscrowFinish: Fulfillment must be a string"
         )

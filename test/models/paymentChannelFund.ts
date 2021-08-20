@@ -1,6 +1,7 @@
 import { ValidationError } from 'xrpl-local/common/errors'
 import { verifyPaymentChannelFund } from './../../src/models/transactions/paymentChannelFund'
 import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * PaymentChannelFund Transaction Verification Testing
@@ -21,20 +22,29 @@ describe('PaymentChannelFund Transaction Verification', function () {
     })
     
     it (`verifies valid PaymentChannelFund`, () => {
-        assert.doesNotThrow(() => verifyPaymentChannelFund(channel))
+        assert.doesNotThrow(() => {
+            verifyPaymentChannelFund(channel)
+            verify(channel)
+        })
     })
 
     it (`verifies valid PaymentChannelFund w/o optional`, () => {
         delete channel.Expiration
         
-        assert.doesNotThrow(() => verifyPaymentChannelFund(channel))
+        assert.doesNotThrow(() => {
+            verifyPaymentChannelFund(channel)
+            verify(channel)
+        })
     })
 
     it (`throws w/ missing Amount`, () => {
         delete channel.Amount
 
         assert.throws(
-            () => verifyPaymentChannelFund(channel),
+            () => {
+                verifyPaymentChannelFund(channel)
+                verify(channel)
+            },
             ValidationError,
             "PaymentChannelFund: missing Amount"
         )
@@ -44,7 +54,10 @@ describe('PaymentChannelFund Transaction Verification', function () {
         delete channel.Channel
 
         assert.throws(
-            () => verifyPaymentChannelFund(channel),
+            () => {
+                verifyPaymentChannelFund(channel)
+                verify(channel)
+            },
             ValidationError,
             "PaymentChannelFund: missing Channel"
         )
@@ -54,7 +67,10 @@ describe('PaymentChannelFund Transaction Verification', function () {
         channel.Amount = 100
 
         assert.throws(
-            () => verifyPaymentChannelFund(channel),
+            () => {
+                verifyPaymentChannelFund(channel)
+                verify(channel)
+            },
             ValidationError,
             "PaymentChannelFund: Amount must be a string"
         )
@@ -64,7 +80,10 @@ describe('PaymentChannelFund Transaction Verification', function () {
         channel.Channel = 1000
 
         assert.throws(
-            () => verifyPaymentChannelFund(channel),
+            () => {
+                verifyPaymentChannelFund(channel)
+                verify(channel)
+            },
             ValidationError,
             "PaymentChannelFund: Channel must be a string"
         )
@@ -74,7 +93,10 @@ describe('PaymentChannelFund Transaction Verification', function () {
         channel.Expiration = "1000"
         
         assert.throws(
-            () => verifyPaymentChannelFund(channel),
+            () => {
+                verifyPaymentChannelFund(channel)
+                verify(channel)
+            },
             ValidationError,
             "PaymentChannelFund: Expiration must be a number"
         )

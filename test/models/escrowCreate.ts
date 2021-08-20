@@ -1,6 +1,7 @@
 import { ValidationError } from 'xrpl-local/common/errors'
 import { verifyEscrowCreate } from './../../src/models/transactions/escrowCreate'
 import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * EscrowCreate Transaction Verification Testing
@@ -25,14 +26,20 @@ describe('EscrowCreate Transaction Verification', function () {
     })
     
     it (`verifies valid EscrowCreate`, () => {        
-        assert.doesNotThrow(() => verifyEscrowCreate(escrow))
+        assert.doesNotThrow(() => {
+            verifyEscrowCreate(escrow)
+            verify(escrow)
+        })
     })
 
     it (`Missing amount`, () => {
         delete escrow.Amount
         
         assert.throws(
-            () => verifyEscrowCreate(escrow),
+            () => {
+                verifyEscrowCreate(escrow)
+                verify(escrow)
+            },
             ValidationError,
             "EscrowCreate: missing field Amount"
         )
@@ -42,7 +49,10 @@ describe('EscrowCreate Transaction Verification', function () {
         delete escrow.Destination
         
         assert.throws(
-            () => verifyEscrowCreate(escrow),
+            () => {
+                verifyEscrowCreate(escrow)
+                verify(escrow)
+            },
             ValidationError,
             "EscrowCreate: missing field Destination"
         )
@@ -52,7 +62,10 @@ describe('EscrowCreate Transaction Verification', function () {
         escrow.Destination = 10
 
         assert.throws(
-            () => verifyEscrowCreate(escrow),
+            () => {
+                verifyEscrowCreate(escrow)
+                verify(escrow)
+            },
             ValidationError,
             "EscrowCreate: Destination must be a string"
         )
@@ -62,7 +75,10 @@ describe('EscrowCreate Transaction Verification', function () {
         escrow.Amount = 1000
 
         assert.throws(
-            () => verifyEscrowCreate(escrow),
+            () => {
+                verifyEscrowCreate(escrow)
+                verify(escrow)
+            },
             ValidationError,
             "EscrowCreate: Amount must be a string"
         )
@@ -72,7 +88,10 @@ describe('EscrowCreate Transaction Verification', function () {
         escrow.CancelAfter = "100"
         
         assert.throws(
-            () => verifyEscrowCreate(escrow),
+            () => {
+                verifyEscrowCreate(escrow)
+                verify(escrow)
+            },
             ValidationError,
             "EscrowCreate: CancelAfter must be a number"
         )    
@@ -82,7 +101,10 @@ describe('EscrowCreate Transaction Verification', function () {
         escrow.FinishAfter = "1000"
 
         assert.throws(
-            () => verifyEscrowCreate(escrow),
+            () => {
+                verifyEscrowCreate(escrow)
+                verify(escrow)
+            },
             ValidationError,
             "EscrowCreate: FinishAfter must be a number"
         )    
@@ -92,7 +114,10 @@ describe('EscrowCreate Transaction Verification', function () {
         escrow.Condition = 0x141243
         
         assert.throws(
-            () => verifyEscrowCreate(escrow),
+            () => {
+                verifyEscrowCreate(escrow)
+                verify(escrow)
+            },
             ValidationError,
             "EscrowCreate: Condition must be a string"
         )    
@@ -102,7 +127,10 @@ describe('EscrowCreate Transaction Verification', function () {
         escrow.DestinationTag = "100"
         
         assert.throws(
-            () => verifyEscrowCreate(escrow),
+            () => {
+                verifyEscrowCreate(escrow)
+                verify(escrow)
+            },
             ValidationError,
             "EscrowCreate: DestinationTag must be a number"
         )    
@@ -113,7 +141,10 @@ describe('EscrowCreate Transaction Verification', function () {
         delete escrow.FinishAfter
         
         assert.throws(
-            () => verifyEscrowCreate(escrow),
+            () => {
+                verifyEscrowCreate(escrow)
+                verify(escrow)
+            },
             ValidationError,
             "EscrowCreate: Either CancelAfter or FinishAfter must be specified"
         )    
@@ -124,7 +155,10 @@ describe('EscrowCreate Transaction Verification', function () {
         delete escrow.FinishAfter
         
         assert.throws(
-            () => verifyEscrowCreate(escrow),
+            () => {
+                verifyEscrowCreate(escrow)
+                verify(escrow)
+            },
             ValidationError,
             "EscrowCreate: Either Condition or FinishAfter must be specified"
         )   

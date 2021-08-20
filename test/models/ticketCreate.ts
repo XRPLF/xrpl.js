@@ -1,6 +1,7 @@
 import { ValidationError } from 'xrpl-local/common/errors'
 import { verifyTicketCreate } from './../../src/models/transactions/ticketCreate'
 import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * TicketCreate Transaction Verification Testing
@@ -19,13 +20,18 @@ describe('TicketCreate Transaction Verification', () => {
     })
 
     it ('verifies valid TicketCreate', () => {
-        assert.doesNotThrow(() => verifyTicketCreate(ticketCreate))
+        assert.doesNotThrow(() => {
+           verifyTicketCreate(ticketCreate)
+            verify(ticketCreate)
+        })
     })
 
     it ('throws when TicketCount is missing', () => {
         delete ticketCreate.TicketCount
-        assert.throws(
-            () => verifyTicketCreate(ticketCreate),
+        assert.throws(() => {
+           verifyTicketCreate(ticketCreate)
+            verify(ticketCreate)
+        },
             ValidationError,
             'TicketCreate: missing field TicketCount'
         )
@@ -33,8 +39,10 @@ describe('TicketCreate Transaction Verification', () => {
 
     it ('throws when TicketCount is not a number', () => {
         ticketCreate.TicketCount = '150'
-        assert.throws(
-            () => verifyTicketCreate(ticketCreate),
+        assert.throws(() => {
+           verifyTicketCreate(ticketCreate)
+            verify(ticketCreate)
+        },
             ValidationError,
             'TicketCreate: TicketCount must be a number'
         )
@@ -42,8 +50,10 @@ describe('TicketCreate Transaction Verification', () => {
 
     it ('throws when TicketCount is not an integer', () => {
         ticketCreate.TicketCount = 12.5
-        assert.throws(
-            () => verifyTicketCreate(ticketCreate),
+        assert.throws(() => {
+           verifyTicketCreate(ticketCreate)
+            verify(ticketCreate)
+        },
             ValidationError,
             'TicketCreate: TicketCount must be an integer from 1 to 250'
         )
@@ -51,8 +61,10 @@ describe('TicketCreate Transaction Verification', () => {
 
     it ('throws when TicketCount is < 1', () => {
         ticketCreate.TicketCount = 0
-        assert.throws(
-            () => verifyTicketCreate(ticketCreate),
+        assert.throws(() => {
+           verifyTicketCreate(ticketCreate)
+            verify(ticketCreate)
+        },
             ValidationError,
             'TicketCreate: TicketCount must be an integer from 1 to 250'
         )
@@ -60,8 +72,10 @@ describe('TicketCreate Transaction Verification', () => {
 
     it ('throws when TicketCount is > 250', () => {
         ticketCreate.TicketCount = 251
-        assert.throws(
-            () => verifyTicketCreate(ticketCreate),
+        assert.throws(() => {
+           verifyTicketCreate(ticketCreate)
+            verify(ticketCreate)
+        },
             ValidationError,
             'TicketCreate: TicketCount must be an integer from 1 to 250'
         )

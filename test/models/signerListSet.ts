@@ -1,6 +1,7 @@
 import { ValidationError } from 'xrpl-local/common/errors'
 import { verifySignerListSet } from './../../src/models/transactions/signerListSet'
 import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * SignerListSet Transaction Verification Testing
@@ -41,15 +42,20 @@ describe('SignerListSet Transaction Verification', function () {
     })
     
     it (`verifies valid SignerListSet`, () => {
-        assert.doesNotThrow(() => verifySignerListSet(SignerListSetTx))
+        assert.doesNotThrow(() => {
+           verifySignerListSet(SignerListSetTx)
+            verify(SignerListSetTx)
+        })
     })
 
 
     it (`throws w/ missing SignerQuorum`, () => {
         SignerListSetTx.SignerQuorum = undefined
 
-        assert.throws(
-            () => verifySignerListSet(SignerListSetTx),
+        assert.throws(() => {
+           verifySignerListSet(SignerListSetTx)
+            verify(SignerListSetTx)
+        },
             ValidationError,
             "SignerListSet: missing field SignerQuorum"
         )
@@ -58,8 +64,10 @@ describe('SignerListSet Transaction Verification', function () {
     it (`throws w/ empty SignerEntries`, () => {
         SignerListSetTx.SignerEntries = []
 
-        assert.throws(
-            () => verifySignerListSet(SignerListSetTx),
+        assert.throws(() => {
+           verifySignerListSet(SignerListSetTx)
+            verify(SignerListSetTx)
+        },
             ValidationError,
             "SignerListSet: need atleast 1 member in SignerEntries"
         )
@@ -68,8 +76,10 @@ describe('SignerListSet Transaction Verification', function () {
     it (`throws w/ invalid SignerEntries`, () => {
         SignerListSetTx.SignerEntries = "khgfgyhujk"
         
-        assert.throws(
-            () => verifySignerListSet(SignerListSetTx),
+        assert.throws(() => {
+           verifySignerListSet(SignerListSetTx)
+            verify(SignerListSetTx)
+        },
             ValidationError,
             "SignerListSet: invalid SignerEntries"
         )

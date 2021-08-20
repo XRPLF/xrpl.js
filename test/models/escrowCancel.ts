@@ -1,6 +1,7 @@
 import { verifyEscrowCancel } from './../../src/models/transactions/escrowCancel'
 import { assert } from 'chai'
 import { ValidationError } from '../../src/common/errors'
+import { verify } from '../../src/models/transactions'
 
 /**
  * Transaction Verification Testing
@@ -20,14 +21,20 @@ describe('Transaction Verification', function () {
     })
 
     it (`Valid EscrowCancel`, () => {
-        assert.doesNotThrow(() => verifyEscrowCancel(cancel))
+        assert.doesNotThrow(() => {
+            verifyEscrowCancel(cancel)
+            verify(cancel)
+        })
     })
 
     it (`Invalid EscrowCancel missing owner`, () => {
        delete cancel.Owner
 
         assert.throws(
-            () => verifyEscrowCancel(cancel),
+            () => {
+                verifyEscrowCancel(cancel)
+                verify(cancel)
+            },
             ValidationError,
             'EscrowCancel: missing Owner'
         )
@@ -37,7 +44,10 @@ describe('Transaction Verification', function () {
         delete cancel.OfferSequence
 
         assert.throws(
-            () => verifyEscrowCancel(cancel),
+            () => {
+                verifyEscrowCancel(cancel)
+                verify(cancel)
+            },
             ValidationError,
             'EscrowCancel: missing OfferSequence'
         )
@@ -47,7 +57,10 @@ describe('Transaction Verification', function () {
         cancel.Owner = 10
 
         assert.throws(
-            () => verifyEscrowCancel(cancel),
+            () => {
+                verifyEscrowCancel(cancel)
+                verify(cancel)
+            },
             ValidationError,
             'EscrowCancel: Owner must be a string'
         )
@@ -57,7 +70,10 @@ describe('Transaction Verification', function () {
        cancel.OfferSequence = "10"
 
         assert.throws(
-            () => verifyEscrowCancel(cancel),
+            () => {
+                verifyEscrowCancel(cancel)
+                verify(cancel)
+            },
             ValidationError,
             'EscrowCancel: OfferSequence must be a number'
         )

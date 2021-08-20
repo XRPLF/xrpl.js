@@ -1,6 +1,7 @@
 import { ValidationError } from 'xrpl-local/common/errors'
 import { verifyOfferCreate } from './../../src/models/transactions/offerCreate'
 import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 
 /**
@@ -29,7 +30,10 @@ describe('OfferCreate Transaction Verification', function () {
             TxnSignature: "3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91",
         } as any
         
-        assert.doesNotThrow(() => verifyOfferCreate(offer))
+        assert.doesNotThrow(() => {
+            verifyOfferCreate(offer)
+            verify(offer)
+        })
 
         const offer2 = {
             Account: "r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W",
@@ -48,7 +52,10 @@ describe('OfferCreate Transaction Verification', function () {
             TxnSignature: "3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91",
         } as any
 
-        assert.doesNotThrow(() => verifyOfferCreate(offer2))
+        assert.doesNotThrow(() => {
+            verifyOfferCreate(offer2)
+            verify(offer2)
+        })
 
 
         const offer3 = {
@@ -72,7 +79,10 @@ describe('OfferCreate Transaction Verification', function () {
             TxnSignature: "3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91",
         } as any
 
-        assert.doesNotThrow(() => verifyOfferCreate(offer3))
+        assert.doesNotThrow(() => {
+            verifyOfferCreate(offer3)
+            verify(offer3)
+        })
     })
 
     it (`throws w/ invalid Expiration`, () => {
@@ -95,7 +105,10 @@ describe('OfferCreate Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyOfferCreate(offer),
+            () => {
+                verifyOfferCreate(offer)
+                verify(offer)
+            },
             ValidationError,
             "OfferCreate: invalid Expiration"
         )
@@ -121,7 +134,10 @@ describe('OfferCreate Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyOfferCreate(offer),
+            () => {
+                verifyOfferCreate(offer)
+                verify(offer)
+            },
             ValidationError,
             "OfferCreate: invalid OfferSequence"
         )
@@ -143,7 +159,10 @@ describe('OfferCreate Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyOfferCreate(offer),
+            () => {
+                verifyOfferCreate(offer)
+                verify(offer)
+            },
             ValidationError,
             "OfferCreate: invalid TakerPays"
         )
@@ -169,7 +188,10 @@ describe('OfferCreate Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyOfferCreate(offer),
+            () => {
+                verifyOfferCreate(offer)
+                verify(offer)
+            },
             ValidationError,
             "OfferCreate: invalid TakerGets"
         )

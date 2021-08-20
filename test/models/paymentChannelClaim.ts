@@ -1,6 +1,7 @@
 import { ValidationError } from 'xrpl-local/common/errors'
 import { verifyPaymentChannelClaim } from './../../src/models/transactions/paymentChannelClaim'
 import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 
 /**
@@ -13,7 +14,7 @@ describe('PaymentChannelClaim Transaction Verification', function () {
 
     beforeEach(() => {
         channel = {
-            "Account": "r...",
+            "Account": "rnKiczmiQkZFiDES8THYyLA2pQohC5C6EF",
             "TransactionType": "PaymentChannelClaim",
             "Channel": "C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198",
             "Balance": "1000000",
@@ -24,7 +25,10 @@ describe('PaymentChannelClaim Transaction Verification', function () {
     })
 
     it (`verifies valid PaymentChannelClaim`, () => {
-        assert.doesNotThrow(() => verifyPaymentChannelClaim(channel))
+        assert.doesNotThrow(() => {
+            verifyPaymentChannelClaim(channel)
+            verify(channel)
+        })
     })
 
     it (`verifies valid PaymentChannelClaim w/o optional`, () => {
@@ -33,14 +37,20 @@ describe('PaymentChannelClaim Transaction Verification', function () {
         delete channel.Signature
         delete channel.PublicKey
         
-        assert.doesNotThrow(() => verifyPaymentChannelClaim(channel))
+        assert.doesNotThrow(() => {
+            verifyPaymentChannelClaim(channel)
+            verify(channel)
+        })
     })
 
     it (`throws w/ missing Channel`, () => {
         delete channel.Channel
         
         assert.throws(
-            () => verifyPaymentChannelClaim(channel),
+            () => {
+                verifyPaymentChannelClaim(channel)
+                verify(channel)
+            },
             ValidationError,
             "PaymentChannelClaim: missing Channel"
         )
@@ -50,7 +60,10 @@ describe('PaymentChannelClaim Transaction Verification', function () {
         channel.Channel = 100
         
         assert.throws(
-            () => verifyPaymentChannelClaim(channel),
+            () => {
+                verifyPaymentChannelClaim(channel)
+                verify(channel)
+            },
             ValidationError,
             "PaymentChannelClaim: Channel must be a string"
         )
@@ -60,7 +73,10 @@ describe('PaymentChannelClaim Transaction Verification', function () {
         channel.Balance = 100
         
         assert.throws(
-            () => verifyPaymentChannelClaim(channel),
+            () => {
+                verifyPaymentChannelClaim(channel)
+                verify(channel)
+            },
             ValidationError,
             "PaymentChannelClaim: Balance must be a string"
         )
@@ -80,7 +96,10 @@ describe('PaymentChannelClaim Transaction Verification', function () {
         channel.Signature = 1000
         
         assert.throws(
-            () => verifyPaymentChannelClaim(channel),
+            () => {
+                verifyPaymentChannelClaim(channel)
+                verify(channel)
+            },
             ValidationError,
             "PaymentChannelClaim: Signature must be a string"
         )
@@ -90,7 +109,10 @@ describe('PaymentChannelClaim Transaction Verification', function () {
         channel.PublicKey = ["100000"]
         
         assert.throws(
-            () => verifyPaymentChannelClaim(channel),
+            () => {
+                verifyPaymentChannelClaim(channel)
+                verify(channel)
+            },
             ValidationError,
             "PaymentChannelClaim: PublicKey must be a string"
         )

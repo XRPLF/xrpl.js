@@ -1,6 +1,7 @@
 import { ValidationError } from 'xrpl-local/common/errors'
 import { verifyDepositPreauth } from './../../src/models/transactions/depositPreauth'
 import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * DepositPreauth Transaction Verification Testing
@@ -19,19 +20,28 @@ describe('DepositPreauth Transaction Verification', () => {
 
     it ('verifies valid DepositPreauth when only Authorize is provided', () => {
         depositPreauth.Authorize = 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW'
-        assert.doesNotThrow(() => verifyDepositPreauth(depositPreauth))
+        assert.doesNotThrow(() => {
+            verifyDepositPreauth(depositPreauth)
+            verify(depositPreauth)
+        })
     })
 
     it ('verifies valid DepositPreauth when only Unauthorize is provided', () => {
         depositPreauth.Unauthorize = 'raKEEVSGnKSD9Zyvxu4z6Pqpm4ABH8FS6n'
-        assert.doesNotThrow(() => verifyDepositPreauth(depositPreauth))
+        assert.doesNotThrow(() => {
+            verifyDepositPreauth(depositPreauth)
+            verify(depositPreauth)
+        })
     })
 
     it ('throws when both Authorize and Unauthorize are provided', () => {
         depositPreauth.Authorize = 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW'
         depositPreauth.Unauthorize = 'raKEEVSGnKSD9Zyvxu4z6Pqpm4ABH8FS6n'
         assert.throws(
-            () => verifyDepositPreauth(depositPreauth),
+            () => {
+                verifyDepositPreauth(depositPreauth)
+                verify(depositPreauth)
+            },
             ValidationError,
             "DepositPreauth: can't provide both Authorize and Unauthorize fields"
         )
@@ -39,7 +49,10 @@ describe('DepositPreauth Transaction Verification', () => {
 
     it ('throws when neither Authorize nor Unauthorize are provided', () => {
         assert.throws(
-            () => verifyDepositPreauth(depositPreauth),
+            () => {
+                verifyDepositPreauth(depositPreauth)
+                verify(depositPreauth)
+            },
             ValidationError,
             'DepositPreauth: must provide either Authorize or Unauthorize field'
         )
@@ -48,7 +61,10 @@ describe('DepositPreauth Transaction Verification', () => {
     it ('throws when Authorize is not a string', () => {
         depositPreauth.Authorize = 1234
         assert.throws(
-            () => verifyDepositPreauth(depositPreauth),
+            () => {
+                verifyDepositPreauth(depositPreauth)
+                verify(depositPreauth)
+            },
             ValidationError,
             'DepositPreauth: Authorize must be a string'
         )
@@ -57,7 +73,10 @@ describe('DepositPreauth Transaction Verification', () => {
     it ('throws when an Account attempts to preauthorize its own address', () => {
         depositPreauth.Authorize = depositPreauth.Account
         assert.throws(
-            () => verifyDepositPreauth(depositPreauth),
+            () => {
+                verifyDepositPreauth(depositPreauth)
+                verify(depositPreauth)
+            },
             ValidationError,
             "DepositPreauth: Account can't preauthorize its own address"
         )
@@ -66,7 +85,10 @@ describe('DepositPreauth Transaction Verification', () => {
     it ('throws when Unauthorize is not a string', () => {
         depositPreauth.Unauthorize = 1234
         assert.throws(
-            () => verifyDepositPreauth(depositPreauth),
+            () => {
+                verifyDepositPreauth(depositPreauth)
+                verify(depositPreauth)
+            },
             ValidationError,
             'DepositPreauth: Unauthorize must be a string'
         )
@@ -75,7 +97,10 @@ describe('DepositPreauth Transaction Verification', () => {
     it ('throws when an Account attempts to unauthorize its own address', () => {
         depositPreauth.Unauthorize = depositPreauth.Account
         assert.throws(
-            () => verifyDepositPreauth(depositPreauth),
+            () => {
+                verifyDepositPreauth(depositPreauth)
+                verify(depositPreauth)
+            },
             ValidationError,
             "DepositPreauth: Account can't unauthorize its own address"
         )

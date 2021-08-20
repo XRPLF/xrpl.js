@@ -1,6 +1,7 @@
 import { ValidationError } from 'xrpl-local/common/errors'
 import { verifySetRegularKey } from './../../src/models/transactions/setRegularKey'
 import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * SetRegularKey Transaction Verification Testing
@@ -21,7 +22,10 @@ describe('SetRegularKey Transaction Verification', function () {
     })
 
     it (`verifies valid SetRegularKey`, () => {
-        assert.doesNotThrow(() => verifySetRegularKey(account))
+        assert.doesNotThrow(() => {
+            verifySetRegularKey(account)
+            verify(account)
+        })
     })
 
     it (`verifies w/o SetRegularKey`, () => {
@@ -33,7 +37,10 @@ describe('SetRegularKey Transaction Verification', function () {
         account.RegularKey = 12369846963
 
         assert.throws(
-            () => verifySetRegularKey(account),
+            () => {
+                verifySetRegularKey(account)
+                verify(account)
+            },
             ValidationError,
             "SetRegularKey: RegularKey must be a string"
         )
