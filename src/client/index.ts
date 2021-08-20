@@ -34,7 +34,6 @@ import prepareSettings from '../transaction/settings'
 import prepareTicketCreate from '../transaction/ticket'
 import {sign} from '../transaction/sign'
 import combine from '../transaction/combine'
-import submit from '../transaction/submit'
 import { generateAddress, generateXAddress } from '../offline/utils'
 import {deriveKeypair, deriveAddress, deriveXAddress} from '../offline/derive'
 import computeLedgerHash from '../offline/ledgerhash'
@@ -445,8 +444,6 @@ class Client extends EventEmitter {
   prepareSettings = prepareSettings
   sign = sign
   combine = combine
-
-  submit = submit // @deprecated Use client.request({command: 'submit', tx_blob: signedTransaction }) instead
 
   deriveKeypair = deriveKeypair // @deprecated Invoke from top-level package instead
   deriveAddress = deriveAddress // @deprecated Invoke from top-level package instead

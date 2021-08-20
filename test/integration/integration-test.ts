@@ -78,15 +78,15 @@ function testTransaction(
   const signedData = testcase.client.sign(txJSON, secret)
   console.log('PREPARED...')
   return testcase.client
-    .submit(signedData.signedTransaction)
-    .then((data) =>
+    .request({command: 'submit', tx_blob: signedData.signedTransaction})
+    .then((response) =>
       testcase.test.title.indexOf('multisign') !== -1
-        ? acceptLedger(testcase.client).then(() => data)
-        : data
+        ? acceptLedger(testcase.client).then(() => response)
+        : response
     )
-    .then((data) => {
+    .then((response) => {
       console.log('SUBMITTED...')
-      assert.strictEqual(data.resultCode, 'tesSUCCESS')
+      assert.strictEqual(response.result.engine_result, 'tesSUCCESS')
       const options = {
         minLedgerVersion: lastClosedLedgerVersion,
         maxLedgerVersion: txData.LastLedgerSequence
@@ -141,7 +141,7 @@ function makeTrustLine(testcase, address, secret) {
       if (address === wallet.getAddress()) {
         testcase.transactions.push(signed.id)
       }
-      return client.submit(signed.signedTransaction)
+      return client.request({command: 'submit', tx_blob: signed.signedTransaction})
     })
     .then(() => ledgerAccept(client))
   return trust
@@ -151,7 +151,7 @@ function makeOrder(client, address, specification, secret) {
   return client
     .prepareOrder(address, specification)
     .then((data) => client.sign(data.txJSON, secret))
-    .then((signed) => client.submit(signed.signedTransaction))
+    .then((signed) => client.request({command: 'submit', tx_blob: signed.signedTransaction}))
     .then(() => ledgerAccept(client))
 }
 
@@ -167,7 +167,7 @@ function setupAccounts(testcase) {
       return client
         .prepareSettings(masterAccount, {defaultRipple: true})
         .then((data) => client.sign(data.txJSON, masterSecret))
-        .then((signed) => client.submit(signed.signedTransaction))
+        .then((signed) => client.request({command: 'submit', tx_blob: signed.signedTransaction}))
         .then(() => ledgerAccept(client))
     })
     .then(() =>
@@ -558,10 +558,10 @@ describe('integration tests - standalone rippled', function () {
               signed2.signedTransaction
             ])
             return this.client
-              .submit(combined.signedTransaction)
+              .request({command: 'submit', tx_blob: combined.signedTransaction})
               .then((response) => acceptLedger(this.client).then(() => response))
               .then((response) => {
-                assert.strictEqual(response.resultCode, 'tesSUCCESS')
+                assert.strictEqual(response.result.engine_result, 'tesSUCCESS')
                 const options = {minLedgerVersion}
                 return verifyTransaction(
                   this,
