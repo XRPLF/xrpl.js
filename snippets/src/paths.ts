@@ -1,10 +1,10 @@
 import {Client} from '../../dist/npm'
 
-const client = new Client({
-  // server: 'wss://s.altnet.rippletest.net:51233'
-  // server: 'ws://35.158.96.209:51233'
-  server: 'ws://34.210.87.206:51233'
-})
+const client = new Client(
+  // 'wss://s.altnet.rippletest.net:51233'
+  // 'ws://35.158.96.209:51233'
+  'ws://34.210.87.206:51233'
+)
 
 sign()
 

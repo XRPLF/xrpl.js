@@ -9,6 +9,6 @@ export * from './models/methods'
 export * from './offline/utils'
 
 // Broadcast client is experimental
-export {ClientBroadcast} from './broadcast'
+export {BroadcastClient} from './client/broadcast'
 
 export * from './Wallet'

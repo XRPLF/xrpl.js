@@ -159,9 +159,9 @@ import {
   computePaymentChannelHash
 } from '../common/hashes'
 import generateFaucetWallet from '../wallet/wallet-generation'
+import { ValidationError } from '../common/errors'
 
 export interface ClientOptions extends ConnectionUserOptions {
-  server?: string
   feeCushion?: number
   maxFeeXRP?: string
   proxy?: string
@@ -223,37 +223,38 @@ class Client extends EventEmitter {
     schemaValidator
   }
 
-  constructor(options: ClientOptions = {}) {
+  constructor(server: string, options: ClientOptions = {}) {
     super()
-    validate.apiOptions(options)
+    if (typeof server !== 'string' || !server.match("^(wss?|wss?\\+unix)://")) {
+      throw new ValidationError("server URI must start with `wss://`, `ws://`, `wss+unix://`, or `ws+unix://`.")
+    }
+
     this._feeCushion = options.feeCushion || 1.2
     this._maxFeeXRP = options.maxFeeXRP || '2'
-    const serverURL = options.server
-    if (serverURL != null) {
-      this.connection = new Connection(serverURL, options)
-      this.connection.on('ledgerClosed', (message: LedgerStream) => {
-        this.emit('ledger', formatLedgerClose(message))
-      })
-      this.connection.on('error', (errorCode, errorMessage, data) => {
-        this.emit('error', errorCode, errorMessage, data)
-      })
-      this.connection.on('connected', () => {
-        this.emit('connected')
-      })
-      this.connection.on('disconnected', (code) => {
-        let finalCode = code
-        // 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
-        // Since 4000 is a normal disconnect reason, we convert this to the standard exit code 1000
-        if (finalCode === 4000) {
-          finalCode = 1000 
-        }
-        this.emit('disconnected', finalCode)
-      })
-    } else {
-      // use null object pattern to provide better error message if user
-      // tries to call a method that requires a connection
-      this.connection = new Connection(null, options)
-    }
+
+    this.connection = new Connection(server, options)
+
+    this.connection.on('ledgerClosed', (message: LedgerStream) => {
+      this.emit('ledger', formatLedgerClose(message))
+    })
+
+    this.connection.on('error', (errorCode, errorMessage, data) => {
+      this.emit('error', errorCode, errorMessage, data)
+    })
+
+    this.connection.on('connected', () => {
+      this.emit('connected')
+    })
+    
+    this.connection.on('disconnected', (code) => {
+      let finalCode = code
+      // 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
+      // Since 4000 is a normal disconnect reason, we convert this to the standard exit code 1000
+      if (finalCode === 4000) {
+        finalCode = 1000 
+      }
+      this.emit('disconnected', finalCode)
+    })
   }
 
   /**

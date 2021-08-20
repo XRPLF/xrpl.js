@@ -9,7 +9,7 @@ import {Client} from 'xrpl-local'
  */
 export default <TestSuite>{
   'Client - implicit server port': () => {
-    new Client({server: 'wss://s1.ripple.com'})
+    new Client('wss://s1.ripple.com')
   },
 
   'Client invalid options': () => {
@@ -18,12 +18,12 @@ export default <TestSuite>{
   },
 
   'Client valid options': () => {
-    const client = new Client({server: 'wss://s:1'})
+    const client = new Client('wss://s:1')
     const privateConnectionUrl = (client.connection as any)._url
     assert.deepEqual(privateConnectionUrl, 'wss://s:1')
   },
 
   'Client invalid server uri': () => {
-    assert.throws(() => new Client({server: 'wss//s:1'}))
+    assert.throws(() => new Client('wss//s:1'))
   }
 }
