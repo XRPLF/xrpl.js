@@ -16,7 +16,7 @@ function checkResult(expected, response) {
   return response
 }
 
-describe('ClientBroadcast', function () {
+describe('BroadcastClient', function () {
   this.timeout(TIMEOUT)
   beforeEach(setupClient.setupBroadcast)
   afterEach(setupClient.teardown)
