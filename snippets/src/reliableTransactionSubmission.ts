@@ -68,7 +68,7 @@ async function reliableTransactionSubmissionExample() {
 async function performPayments(payments) {
   const finalResults = []
   const txFinalizedPromises = []
-  const client = new Client({server: 'wss://s.altnet.rippletest.net:51233'})
+  const client = new Client('wss://s.altnet.rippletest.net:51233')
   await client.connect()
 
   for (let i = 0; i < payments.length; i++) {

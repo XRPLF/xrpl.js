@@ -578,7 +578,7 @@ describe('Connection', function () {
         data: {returnEmptySubscribeRequest: 1}
       })
 
-      const client = new Client({server: this.client.connection._url})
+      const client = new Client(this.client.connection._url)
       return client.connect().then(
         () => {
           assert(false, 'Must have thrown!')

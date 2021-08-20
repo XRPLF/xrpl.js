@@ -106,7 +106,7 @@ function testTransaction(
 }
 
 function setup(this: any, server = serverUrl) {
-  this.client = new Client({server})
+  this.client = new Client(server)
   console.log('CONNECTING...')
   return this.client.connect().then(
     () => {

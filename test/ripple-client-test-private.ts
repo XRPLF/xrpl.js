@@ -21,7 +21,7 @@ describe('Client', function () {
   afterEach(setupClient.teardown)
 
   it('Client - implicit server port', function () {
-    new Client({server: 'wss://s1.ripple.com'})
+    new Client('wss://s1.ripple.com')
   })
 
   it('Client invalid options', function () {
@@ -30,16 +30,16 @@ describe('Client', function () {
   })
 
   it('Client valid options', function () {
-    const client = new Client({server: 'wss://s:1'})
+    const client = new Client('wss://s:1')
     const privateConnectionUrl = (client.connection as any)._url
     assert.deepEqual(privateConnectionUrl, 'wss://s:1')
   })
 
   it('Client invalid server uri', function () {
-    assert.throws(() => new Client({server: 'wss//s:1'}))
+    assert.throws(() => new Client('wss//s:1'))
   })
 
-  xit('Client connect() times out after 2 seconds', function () {
+  it('Client connect() times out after 2 seconds', function () {
     // TODO: Use a timer mock like https://jestjs.io/docs/en/timer-mocks
     //       to test that connect() times out after 2 seconds.
   })
