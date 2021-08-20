@@ -1,4 +1,4 @@
-import {RippledError, ValidationError} from 'xrpl-local/common/errors'
+import {ValidationError} from 'xrpl-local/common/errors'
 // import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
 import {assertRejects, assertResultMatch, TestSuite} from '../../utils'
@@ -569,24 +569,24 @@ export default <TestSuite>{
     )
   },
 
-  'rejects Promise when Account is valid but non-existent on the ledger': async (
-    client
-  ) => {
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
-    }
-    const txJSON = {
-      Account: 'rogvkYnY8SWjxkJNgU4ZRVfLeRyt5DR9i',
-      TransactionType: 'DepositPreauth',
-      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
-    }
-    await assertRejects(
-      client.prepareTransaction(txJSON, localInstructions),
-      RippledError,
-      'Account not found.'
-    )
-  },
+  // 'rejects Promise when Account is valid but non-existent on the ledger': async (
+  //   client
+  // ) => {
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxFee: '0.000012'
+  //   }
+  //   const txJSON = {
+  //     Account: 'rogvkYnY8SWjxkJNgU4ZRVfLeRyt5DR9i',
+  //     TransactionType: 'DepositPreauth',
+  //     Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+  //   }
+  //   await assertRejects(
+  //     client.prepareTransaction(txJSON, localInstructions),
+  //     RippledError,
+  //     'Account not found.'
+  //   )
+  // },
 
   'rejects Promise when TransactionType is missing': async (client, address) => {
     const localInstructions = {

@@ -29,6 +29,12 @@ function createResponse(request, response, overrides = {}) {
   return JSON.stringify(Object.assign({}, response, change))
 }
 
+export function addRippledResponse(mock: MockedWebSocketServer, command: string, response) {
+  mock.on('request_account_info', function (request, conn) {
+    conn.send(createResponse(request, response))
+  })
+}
+
 function createLedgerResponse(request, response) {
   const newResponse = JSON.parse(createResponse(request, response))
   if (newResponse.result && newResponse.result.ledger) {
@@ -270,63 +276,17 @@ export function createMockRippled(port) {
     conn.send(createResponse(request, fixtures.unsubscribe))
   })
 
+  mock.on('request_account_info', function (request, conn) {
+    assert.strictEqual(request.command, 'account_info')
+    conn.send(createResponse(request, fixtures.account_info.normal))
+  })
+
   mock.on('request_account_objects', function (request, conn) {
     assert.strictEqual(request.command, 'account_objects')
     if (request.account === addresses.ACCOUNT) {
       conn.send(accountObjectsResponse(request))
     } else {
       assert(false, 'Unrecognized account address: ' + request.account)
-    }
-  })
-
-  mock.on('request_account_info', function (request, conn) {
-    assert.strictEqual(request.command, 'account_info')
-    if (request.account === addresses.ACCOUNT) {
-      conn.send(createResponse(request, fixtures.account_info.normal))
-    } else if (request.account === addresses.NOTFOUND) {
-      conn.send(createResponse(request, fixtures.account_info.notfound))
-    } else if (request.account === addresses.THIRD_ACCOUNT) {
-      const response = Object.assign({}, fixtures.account_info.normal)
-      response.Account = addresses.THIRD_ACCOUNT
-      conn.send(createResponse(request, response))
-    } else if (request.account == null) {
-      const response = Object.assign(
-        {},
-        {
-          error: 'invalidParams',
-          error_code: 31,
-          error_message: "Missing field 'account'.",
-          id: 2,
-          request: {command: 'account_info', id: 2},
-          status: 'error',
-          type: 'response'
-        }
-      )
-      conn.send(createResponse(request, response))
-    } else {
-      const response = Object.assign(
-        {},
-        {
-          account: request.account,
-          error: 'actNotFound',
-          error_code: 19,
-          error_message: 'Account not found.',
-          id: 2,
-          ledger_current_index: 17714714,
-          request:
-            // This will be inaccurate, but that's OK because this is just a mock rippled
-            {
-              account: 'rogvkYnY8SWjxkJNgU4ZRVfLeRyt5DR9i',
-              command: 'account_info',
-              id: 2
-            },
-
-          status: 'error',
-          type: 'response',
-          validated: false
-        }
-      )
-      conn.send(createResponse(request, response))
     }
   })
 
