@@ -38,6 +38,7 @@ function pay(client, from, to, amount, secret, currency = 'XRP', counterparty) {
       id = signed.id;
       return client.request({command: 'submit', tx_blob: signed.signedTransaction});
     })
+    // TODO: add better error handling here
     .then(() => ledgerAccept(client))
     .then(() => id);
 }
