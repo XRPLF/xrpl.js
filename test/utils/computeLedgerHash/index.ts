@@ -1,24 +1,18 @@
 import assert from 'assert-diff'
-import { computeLedgerHeaderHash } from '../../../src'
+import {computeLedgerHeaderHash} from '../../../src'
+import {ValidationError} from '../../../src/common/errors'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
-import {assertResultMatch, TestSuite} from '../../utils'
+import getLedgerFull from '../../fixtures/responses/get-ledger-full.json'
+import {assertResultMatch} from '../../utils'
 const {computeLedgerHash: REQUEST_FIXTURES} = requests
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-export default <TestSuite>{
-  'given corrupt data - should fail': async (client, address) => {
-    const request = {
-      includeTransactions: true,
-      includeState: true,
-      includeAllData: true,
-      ledgerVersion: 38129
-    }
-    const ledger = await client.getLedger(request)
+function getNewLedger() {
+  return JSON.parse(JSON.stringify(getLedgerFull))
+}
+describe('Compute Ledger Hash', function () {
+  it('given corrupt data - should fail', () => {
+    const ledger = getNewLedger()
     assert.strictEqual(
       // @ts-ignore
       ledger.transactions[0].rawTransaction,
@@ -32,7 +26,7 @@ export default <TestSuite>{
     try {
       hash = computeLedgerHeaderHash(ledger, {computeTreeHashes: true})
     } catch (error) {
-      assert(error instanceof client.errors.ValidationError)
+      assert(error instanceof ValidationError)
       assert.strictEqual(
         error.message,
         'transactionHash in header does not match computed hash of transactions'
@@ -49,19 +43,10 @@ export default <TestSuite>{
       false,
       'Should throw ValidationError instead of producing hash: ' + hash
     )
-  },
+  })
 
-  'given ledger without raw transactions - should throw': async (
-    client,
-    address
-  ) => {
-    const request = {
-      includeTransactions: true,
-      includeState: true,
-      includeAllData: true,
-      ledgerVersion: 38129
-    }
-    const ledger = await client.getLedger(request)
+  it('given ledger without raw transactions - should throw', () => {
+    const ledger = getNewLedger()
     assert.strictEqual(
       // @ts-ignore
       ledger.transactions[0].rawTransaction,
@@ -75,7 +60,7 @@ export default <TestSuite>{
     try {
       hash = computeLedgerHeaderHash(ledger, {computeTreeHashes: true})
     } catch (error) {
-      assert(error instanceof client.errors.ValidationError)
+      assert(error instanceof ValidationError)
       assert.strictEqual(
         error.message,
         'ledger' + ' is missing raw transactions'
@@ -86,19 +71,10 @@ export default <TestSuite>{
       false,
       'Should throw ValidationError instead of producing hash: ' + hash
     )
-  },
+  })
 
-  'given ledger without state or transactions - only compute ledger hash': async (
-    client,
-    address
-  ) => {
-    const request = {
-      includeTransactions: true,
-      includeState: true,
-      includeAllData: true,
-      ledgerVersion: 38129
-    }
-    const ledger = await client.getLedger(request)
+  it('given ledger without state or transactions - only compute ledger hash', () => {
+    const ledger = getNewLedger()
     assert.strictEqual(
       // @ts-ignore
       ledger.transactions[0].rawTransaction,
@@ -106,7 +82,6 @@ export default <TestSuite>{
     )
     ledger.parentCloseTime = ledger.closeTime
     const computeLedgerHash = computeLedgerHeaderHash
-    const ValidationError = client.errors.ValidationError
     function testCompute(ledger, expectedError) {
       let hash = computeLedgerHash(ledger)
       assert.strictEqual(
@@ -134,16 +109,10 @@ export default <TestSuite>{
     testCompute(ledger, 'transactions property is missing from the ledger')
     ledger.transactions = transactions
     testCompute(ledger, 'rawState property is missing from the ledger')
-  },
+  })
 
-  'wrong hash': async (client, address) => {
-    const request = {
-      includeTransactions: true,
-      includeState: true,
-      includeAllData: true,
-      ledgerVersion: 38129
-    }
-    const ledger = await client.getLedger(request)
+  it('wrong hash', ()  => {
+    const ledger = getNewLedger()
     assertResultMatch(ledger, responses.getLedger.full, 'getLedger')
     const newLedger = {
       ...ledger,
@@ -154,18 +123,18 @@ export default <TestSuite>{
     assert.throws(() => {
       computeLedgerHeaderHash(newLedger)
     }, /does not match computed hash of state/)
-  },
+  })
 
-  'computeLedgerHash': async (client, address) => {
+  it('computeLedgerHash', ()  => {
     const header = REQUEST_FIXTURES.header
     const ledgerHash = computeLedgerHeaderHash(header)
     assert.strictEqual(
       ledgerHash,
       'F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349'
     )
-  },
+  })
 
-  'computeLedgerHash - with transactions': async (client, address) => {
+  it('computeLedgerHash - with transactions', () => {
     const header = {
       ...REQUEST_FIXTURES.header,
       transactionHash: undefined,
@@ -176,14 +145,14 @@ export default <TestSuite>{
       ledgerHash,
       'F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349'
     )
-  },
+  })
 
-  'computeLedgerHash - incorrent transaction_hash': async (client, address) => {
+  it('computeLedgerHash - incorrent transaction_hash', () => {
     const header = Object.assign({}, REQUEST_FIXTURES.header, {
       transactionHash:
         '325EACC5271322539EEEC2D6A5292471EF1B3E72AE7180533EFC3B8F0AD435C9'
     })
     header.rawTransactions = JSON.stringify(REQUEST_FIXTURES.transactions)
     assert.throws(() => computeLedgerHeaderHash(header))
-  }
-}
+  })
+})
