@@ -1,5 +1,7 @@
 import {assertResultMatch, TestSuite, assertRejects} from '../../utils'
 import responses from '../../fixtures/responses'
+import rippled from '../../fixtures/rippled'
+import { addRippledResponse } from '../../mock-rippled'
 import requests from '../../fixtures/requests'
 import {ValidationError} from 'xrpl-local/common/errors'
 import binary from 'ripple-binary-codec'
@@ -18,7 +20,8 @@ const RECIPIENT_ADDRESS = 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'normal': async (client, address) => {
+  'normal': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -31,7 +34,8 @@ export default <TestSuite>{
     assertResultMatch(response, RESPONSE_FIXTURES.normal, 'prepare')
   },
 
-  'min amount xrp': async (client, address) => {
+  'min amount xrp': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -44,7 +48,8 @@ export default <TestSuite>{
     assertResultMatch(response, RESPONSE_FIXTURES.minAmountXRP, 'prepare')
   },
 
-  'min amount xrp2xrp': async (client, address) => {
+  'min amount xrp2xrp': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const response = await client.preparePayment(
       address,
       REQUEST_FIXTURES.minAmount,
@@ -53,7 +58,8 @@ export default <TestSuite>{
     assertResultMatch(response, RESPONSE_FIXTURES.minAmountXRPXRP, 'prepare')
   },
 
-  'XRP to XRP': async (client, address) => {
+  'XRP to XRP': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const payment = {
       source: {
         address: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -81,7 +87,8 @@ export default <TestSuite>{
     assertResultMatch(response, expected, 'prepare')
   },
 
-  'XRP drops to XRP drops': async (client, address) => {
+  'XRP drops to XRP drops': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const payment = {
       source: {
         address: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -109,7 +116,8 @@ export default <TestSuite>{
     assertResultMatch(response, expected, 'prepare')
   },
 
-  'XRP drops to XRP': async (client, address) => {
+  'XRP drops to XRP': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const payment = {
       source: {
         address: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -137,7 +145,8 @@ export default <TestSuite>{
     assertResultMatch(response, expected, 'prepare')
   },
 
-  'XRP to XRP drops': async (client, address) => {
+  'XRP to XRP drops': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const payment = {
       source: {
         address: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -168,8 +177,10 @@ export default <TestSuite>{
   // Errors
   'rejects promise and does not throw when payment object is invalid': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const payment = {
       source: {
         address: address,
@@ -191,8 +202,10 @@ export default <TestSuite>{
 
   'rejects promise and does not throw when field is missing': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     // Marking as "any" to get around the fact that TS won't allow this.
     const payment: any = {
       source: {address: address},
@@ -211,8 +224,10 @@ export default <TestSuite>{
 
   'rejects promise and does not throw when fee exceeds maxFeeXRP': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const payment = {
       source: {
         address: address,
@@ -230,7 +245,8 @@ export default <TestSuite>{
     )
   },
 
-  'XRP to XRP no partial': async (client, address) => {
+  'XRP to XRP no partial': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     return assertRejects(
       client.preparePayment(address, REQUEST_FIXTURES.wrongPartial),
       ValidationError,
@@ -238,7 +254,8 @@ export default <TestSuite>{
     )
   },
 
-  'address must match payment.source.address': async (client, address) => {
+  'address must match payment.source.address': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     return assertRejects(
       client.preparePayment(address, REQUEST_FIXTURES.wrongAddress),
       ValidationError,
@@ -246,7 +263,8 @@ export default <TestSuite>{
     )
   },
 
-  'wrong amount': async (client, address) => {
+  'wrong amount': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     return assertRejects(
       client.preparePayment(address, REQUEST_FIXTURES.wrongAmount),
       ValidationError,
@@ -254,7 +272,8 @@ export default <TestSuite>{
     )
   },
 
-  'throws when fee exceeds 2 XRP': async (client, address) => {
+  'throws when fee exceeds 2 XRP': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       fee: '2.1'
@@ -281,7 +300,8 @@ export default <TestSuite>{
   //   assertResultMatch(response, RESPONSE_FIXTURES.allOptions, 'prepare')
   // },
 
-  'preparePayment without counterparty set': async (client, address) => {
+  'preparePayment without counterparty set': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       sequence: 23
@@ -296,8 +316,10 @@ export default <TestSuite>{
 
   'preparePayment with source.amount/destination.minAmount can be signed': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     // See also: 'sign succeeds with source.amount/destination.minAmount'
 
     const localInstructions = {
@@ -346,7 +368,8 @@ export default <TestSuite>{
     schemaValidator.schemaValidate('sign', result)
   },
 
-  'destination.minAmount': async (client, address) => {
+  'destination.minAmount': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const response = await client.preparePayment(
       address,
       responses.getPaths.sendAll[0],
@@ -355,7 +378,8 @@ export default <TestSuite>{
     assertResultMatch(response, RESPONSE_FIXTURES.minAmount, 'prepare')
   },
 
-  'caps fee at 2 XRP by default': async (client, address) => {
+  'caps fee at 2 XRP by default': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     client._feeCushion = 1000000
     const expectedResponse = {
       txJSON:
@@ -376,8 +400,10 @@ export default <TestSuite>{
 
   'allows fee exceeding 2 XRP when maxFeeXRP is higher': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     client._maxFeeXRP = '2.2'
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
@@ -400,7 +426,8 @@ export default <TestSuite>{
     assertResultMatch(response, expectedResponse, 'prepare')
   },
 
-  'fee - default maxFee of 2 XRP': async (client, address) => {
+  'fee - default maxFee of 2 XRP': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     client._feeCushion = 1000000
     const expectedResponse = {
       txJSON:
@@ -421,8 +448,10 @@ export default <TestSuite>{
 
   'fee - capped to maxFeeXRP when maxFee exceeds maxFeeXRP': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     client._feeCushion = 1000000
     client._maxFeeXRP = '3'
     const localInstructions = {
@@ -446,7 +475,8 @@ export default <TestSuite>{
     assertResultMatch(response, expectedResponse, 'prepare')
   },
 
-  'fee - capped to maxFee': async (client, address) => {
+  'fee - capped to maxFee': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     client._feeCushion = 1000000
     client._maxFeeXRP = '5'
     const localInstructions = {

@@ -1,6 +1,8 @@
 import assert from 'assert-diff'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
+import rippled from '../../fixtures/rippled'
+import { addRippledResponse } from '../../mock-rippled'
 import {assertResultMatch, TestSuite} from '../../utils'
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 const {preparePaymentChannelClaim: REQUEST_FIXTURES} = requests
@@ -12,7 +14,8 @@ const {preparePaymentChannelClaim: RESPONSE_FIXTURES} = responses
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'default': async (client, address) => {
+  'default': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -25,7 +28,8 @@ export default <TestSuite>{
     assertResultMatch(response, RESPONSE_FIXTURES.normal, 'prepare')
   },
 
-  'with renew': async (client, address) => {
+  'with renew': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -38,7 +42,8 @@ export default <TestSuite>{
     assertResultMatch(response, RESPONSE_FIXTURES.renew, 'prepare')
   },
 
-  'with close': async (client, address) => {
+  'with close': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -51,7 +56,8 @@ export default <TestSuite>{
     assertResultMatch(response, RESPONSE_FIXTURES.close, 'prepare')
   },
 
-  'with ticket': async (client, address) => {
+  'with ticket': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
@@ -67,8 +73,10 @@ export default <TestSuite>{
 
   'rejects Promise on preparePaymentChannelClaim with renew and close': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     try {
       const prepared = await client.preparePaymentChannelClaim(
         address,
@@ -89,8 +97,10 @@ export default <TestSuite>{
 
   'rejects Promise on preparePaymentChannelClaim with no signature': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     try {
       const prepared = await client.preparePaymentChannelClaim(
         address,

@@ -1,6 +1,8 @@
 import {TestSuite, assertRejects, assertResultMatch} from '../../utils'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
+import rippled from '../../fixtures/rippled'
+import { addRippledResponse } from '../../mock-rippled'
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
 /**
@@ -9,7 +11,8 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'prepareEscrowExecution': async (client, address) => {
+  'prepareEscrowExecution': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const result = await client.prepareEscrowExecution(
       address,
       requests.prepareEscrowExecution.normal,
@@ -22,7 +25,8 @@ export default <TestSuite>{
     )
   },
 
-  'prepareEscrowExecution - simple': async (client, address) => {
+  'prepareEscrowExecution - simple': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const result = await client.prepareEscrowExecution(
       address,
       requests.prepareEscrowExecution.simple
@@ -34,7 +38,8 @@ export default <TestSuite>{
     )
   },
 
-  'prepareEscrowExecution - no condition': async (client, address) => {
+  'prepareEscrowExecution - no condition': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     await assertRejects(
       client.prepareEscrowExecution(
         address,
@@ -46,7 +51,8 @@ export default <TestSuite>{
     )
   },
 
-  'prepareEscrowExecution - no fulfillment': async (client, address) => {
+  'prepareEscrowExecution - no fulfillment': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     await assertRejects(
       client.prepareEscrowExecution(
         address,
@@ -58,7 +64,8 @@ export default <TestSuite>{
     )
   },
 
-  'with ticket': async (client, address) => {
+  'with ticket': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000396',

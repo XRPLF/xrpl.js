@@ -196,63 +196,6 @@ export function createMockRippled(port) {
     conn.send(JSON.stringify(request.data))
   })
 
-  mock.on('request_fee', function (request, conn) {
-    assert.strictEqual(request.command, 'fee')
-    conn.send(createResponse(request, fixtures.fee))
-  })
-
-
-  mock.on('request_server_info', function (request, conn) {
-    assert.strictEqual(request.command, 'server_info')
-    if (conn.config.highLoadFactor || conn.config.loadFactor) {
-      const response = {
-        id: 0,
-        status: 'success',
-        type: 'response',
-        result: {
-          info: {
-            build_version: '0.24.0-rc1',
-            complete_ledgers: '32570-6595042',
-            hostid: 'ARTS',
-            io_latency_ms: 1,
-            last_close: {
-              converge_time_s: 2.007,
-              proposers: 4
-            },
-            load_factor: conn.config.loadFactor || 4294967296,
-            peers: 53,
-            pubkey_node: 'n94wWvFUmaKGYrKUGgpv1DyYgDeXRGdACkNQaSe7zJiy5Znio7UC',
-            server_state: 'full',
-            validated_ledger: {
-              age: 5,
-              base_fee_xrp: 0.00001,
-              hash:
-                '4482DEE5362332F54A4036ED57EE1767C9F33CF7CE5A6670355C16CECE381D46',
-              reserve_base_xrp: 20,
-              reserve_inc_xrp: 5,
-              seq: 6595042
-            },
-            validation_quorum: 3
-          }
-        }
-      }
-      conn.send(createResponse(request, response))
-    } else if (conn.config.reporting) {
-      conn.send(createResponse(request, fixtures.server_info.reporting))
-    } else if (conn.config.returnErrorOnServerInfo) {
-      conn.send(createResponse(request, fixtures.server_info.error))
-    } else if (conn.config.disconnectOnServerInfo) {
-      conn.close()
-    } else if (conn.config.serverInfoWithoutValidated) {
-      conn.send(createResponse(request, fixtures.server_info.noValidated))
-    } else if (mock.config.returnSyncingServerInfo) {
-      mock.config.returnSyncingServerInfo--
-      conn.send(createResponse(request, fixtures.server_info.syncing))
-    } else {
-      conn.send(createResponse(request, fixtures.server_info.normal))
-    }
-  })
-
   mock.on('request_subscribe', function (request, conn) {
     assert.strictEqual(request.command, 'subscribe')
     if (request && request.streams === 'validations') {

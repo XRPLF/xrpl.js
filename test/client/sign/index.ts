@@ -3,7 +3,9 @@ import {Client} from 'xrpl-local'
 import binary from 'ripple-binary-codec'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
+import rippled from '../../fixtures/rippled'
 import {TestSuite} from '../../utils'
+import { addRippledResponse } from '../../mock-rippled'
 
 const {schemaValidator} = Client._PRIVATE
 const {sign: REQUEST_FIXTURES} = requests
@@ -55,8 +57,10 @@ export default <TestSuite>{
 
   'sign with paths': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const payment = {
       source: {
@@ -163,7 +167,8 @@ export default <TestSuite>{
     assert.deepEqual(signature, RESPONSE_FIXTURES.signAs)
   },
 
-  'succeeds - prepared payment': async (client, address) => {
+  'succeeds - prepared payment': async (client, address, mockRippled) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const payment = await client.preparePayment(address, {
       source: {
         address: address,
@@ -236,8 +241,10 @@ export default <TestSuite>{
 
   'throws when encoded tx does not match decoded tx - prepared payment': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const payment = await client.preparePayment(address, {
       source: {
         address: address,
@@ -262,8 +269,10 @@ export default <TestSuite>{
 
   'throws when encoded tx does not match decoded tx - prepared order': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
     const order = {
       direction: 'sell',
       quantity: {

@@ -52,7 +52,8 @@ module.exports = {
     noValidated: require('./server-info-no-validated'),
     syncing: require('./server-info-syncing'),
     error: require('./server-info-error'),
-    reporting: require('./server-info-reporting')
+    reporting: require('./server-info-reporting'),
+    highLoadFactor: require('./server-info-high-load-factor')
   },
   path_find: {
     generate: require('./path-find'),
