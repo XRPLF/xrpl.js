@@ -3,6 +3,7 @@ import { LedgerEntry } from "../ledger";
 import { LedgerIndex } from "../common";
 
 export interface LedgerEntryRequest extends BaseRequest {
+    command: "ledger_entry"
     binary?: boolean
     ledger_hash?: string
     ledger_index?: LedgerIndex

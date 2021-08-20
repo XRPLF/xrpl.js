@@ -1,3 +1,4 @@
+import { AccountObjectType } from '../../../models/common';
 import {
   CheckLedgerEntry,
   RippleStateLedgerEntry,
@@ -9,16 +10,7 @@ import {
 } from '../objects'
 
 export interface GetAccountObjectsOptions {
-  type?:
-    | string
-    | (
-        | 'check'
-        | 'escrow'
-        | 'offer'
-        | 'payment_channel'
-        | 'signer_list'
-        | 'state'
-      )
+  type?: AccountObjectType
   ledgerHash?: string
   ledgerIndex?: number | ('validated' | 'closed' | 'current')
   limit?: number

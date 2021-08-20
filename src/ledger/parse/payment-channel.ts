@@ -1,6 +1,6 @@
 import {parseTimestamp, parseMemos} from './utils'
 import {removeUndefined, dropsToXrp} from '../../common'
-import {PayChannelLedgerEntry} from '../../common/types/objects'
+import { PayChannel } from '../../models/ledger'
 
 export type FormattedPaymentChannel = {
   account: string
@@ -18,7 +18,7 @@ export type FormattedPaymentChannel = {
 }
 
 export function parsePaymentChannel(
-  data: PayChannelLedgerEntry
+  data: PayChannel
 ): FormattedPaymentChannel {
   return removeUndefined({
     memos: parseMemos(data),

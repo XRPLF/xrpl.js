@@ -1,8 +1,8 @@
 import parseFields from './parse/fields'
 import {validate, constants, ensureClassicAddress} from '../common'
 import {FormattedSettings} from '../common/types/objects'
-import {AccountInfoResponse} from '../common/types/commands'
 import {Client} from '..'
+import {AccountInfoResponse} from '../models/methods'
 import {Settings} from '../common/constants'
 
 const AccountFlags = constants.AccountFlags
@@ -29,7 +29,7 @@ export function parseAccountFlags(
 }
 
 function formatSettings(response: AccountInfoResponse) {
-  const data = response.account_data
+  const data = response.result.account_data
   const parsedFlags = parseAccountFlags(data.Flags, {excludeFalse: true})
   const parsedFields = parseFields(data)
   return Object.assign({}, parsedFlags, parsedFields)
@@ -48,7 +48,7 @@ export async function getSettings(
   address = ensureClassicAddress(address)
 
   // 2. Make Request
-  const response = await this.request('account_info', {
+  const response = await this.request({command: 'account_info',
     account: address,
     ledger_index: options.ledgerVersion || 'validated',
     signer_lists: true

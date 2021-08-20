@@ -1,16 +1,18 @@
 import * as utils from './utils'
 import parseTransaction from './parse/transaction'
 import {validate, errors} from '../common'
-import {Connection} from '../common'
+import {Connection} from '../client'
 import {FormattedTransactionType} from '../transaction/types'
 import {RippledError} from '../common/errors'
 import {Client} from '..'
+import { LedgerRequest } from '../models/methods'
 
 export type TransactionOptions = {
   minLedgerVersion?: number
   maxLedgerVersion?: number
   includeRawTransaction?: boolean
 }
+
 type TransactionResponse = FormattedTransactionType & {
   hash: string
   ledger_index: number
@@ -19,14 +21,14 @@ type TransactionResponse = FormattedTransactionType & {
 }
 
 function attachTransactionDate(
-  connection: Connection,
+  client: Client,
   tx: any
 ): Promise<TransactionResponse> {
-  if (tx.date) {
+  if (tx.result.date) {
     return Promise.resolve(tx)
   }
 
-  const ledgerVersion = tx.ledger_index || tx.LedgerSequence
+  const ledgerVersion = tx.result.ledger_index || tx.result.LedgerSequence
 
   if (!ledgerVersion) {
     return new Promise(() => {
@@ -40,16 +42,17 @@ function attachTransactionDate(
     })
   }
 
-  const request = {
+  const request: LedgerRequest = {
     command: 'ledger',
     ledger_index: ledgerVersion
   }
 
-  return connection
+  return client
     .request(request)
     .then((data) => {
-      if (typeof data.ledger.close_time === 'number') {
-        return Object.assign({date: data.ledger.close_time}, tx)
+      const close_time = data.result.ledger.close_time
+      if (typeof close_time === 'number') {
+        return {...tx, result: {...tx.result, date: close_time}}
       }
       throw new errors.UnexpectedError('Ledger missing close_time')
     })
@@ -64,8 +67,8 @@ function attachTransactionDate(
 function isTransactionInRange(tx: any, options: TransactionOptions) {
   return (
     (!options.minLedgerVersion ||
-      tx.ledger_index >= options.minLedgerVersion) &&
-    (!options.maxLedgerVersion || tx.ledger_index <= options.maxLedgerVersion)
+      tx.result.ledger_index >= options.minLedgerVersion) &&
+    (!options.maxLedgerVersion || tx.result.ledger_index <= options.maxLedgerVersion)
   )
 }
 
@@ -112,12 +115,12 @@ function convertError(
 
 function formatResponse(
   options: TransactionOptions,
-  tx: TransactionResponse
+  tx: any
 ): FormattedTransactionType {
-  if (tx.validated !== true || !isTransactionInRange(tx, options)) {
+  if (tx.result.validated !== true || !isTransactionInRange(tx, options)) {
     throw new errors.NotFoundError('Transaction not found')
   }
-  return parseTransaction(tx, options.includeRawTransaction)
+  return parseTransaction(tx.result, options.includeRawTransaction)
 }
 
 async function getTransaction(
@@ -128,11 +131,11 @@ async function getTransaction(
   validate.getTransaction({id, options})
   const _options = await utils.ensureLedgerVersion.call(this, options)
   try {
-    const tx = await this.request('tx', {
+    const tx = await this.request({command: 'tx',
       transaction: id,
       binary: false
     })
-    const txWithDate = await attachTransactionDate(this.connection, tx)
+    const txWithDate = await attachTransactionDate(this, tx)
     return formatResponse(_options, txWithDate)
   } catch (error) {
     throw await convertError(this.connection, _options, error)

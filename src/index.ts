@@ -1,8 +1,10 @@
-export * from './client'
+export {Client} from './client'
 
 export * from './transaction/types'
 
 export * from './common/types/objects/ledger'
+
+export * from './models/methods'
 
 export * from './offline/utils'
 

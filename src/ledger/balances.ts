@@ -1,6 +1,6 @@
 import * as utils from './utils'
 import {validate, ensureClassicAddress} from '../common'
-import {Connection} from '../common'
+import {Connection} from '../client'
 import {GetTrustlinesOptions} from './trustlines'
 import {FormattedTrustline} from '../common/types/objects/trustlines'
 import {Client} from '..'
@@ -13,7 +13,7 @@ export type Balance = {
 
 export type GetBalances = Array<Balance>
 
-function getTrustlineBalanceAmount(trustline: FormattedTrustline) {
+function getTrustlineBalanceAmount(trustline: FormattedTrustline): Balance {
   return {
     currency: trustline.specification.currency,
     counterparty: trustline.specification.counterparty,
@@ -21,7 +21,7 @@ function getTrustlineBalanceAmount(trustline: FormattedTrustline) {
   }
 }
 
-function formatBalances(options, balances) {
+function formatBalances(options: GetTrustlinesOptions, balances: {xrp: string, trustlines: FormattedTrustline[]}) {
   const result = balances.trustlines.map(getTrustlineBalanceAmount)
   if (
     !(options.counterparty || (options.currency && options.currency !== 'XRP'))

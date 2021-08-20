@@ -8,7 +8,7 @@ import {
   xrpToDrops,
   dropsToXrp
 } from '../common'
-import {Connection} from '../common'
+import {Connection} from '../client'
 import parsePathfind from './parse/pathfind'
 import {RippledAmount, Amount} from '../common/types/objects'
 import {
@@ -18,6 +18,7 @@ import {
   PathFindRequest
 } from './pathfind-types'
 import {Client} from '..'
+import { RipplePathFindRequest } from '../models/methods'
 const NotFoundError = errors.NotFoundError
 const ValidationError = errors.ValidationError
 
@@ -46,11 +47,12 @@ function requestPathFind(
     },
     pathfind.destination.amount
   )
-  const request: PathFindRequest = {
+  const request: RipplePathFindRequest = {
     command: 'ripple_path_find',
     source_account: pathfind.source.address,
     destination_account: pathfind.destination.address,
-    destination_amount: toRippledAmount(destinationAmount)
+    // @ts-ignore
+    destination_amount: destinationAmount
   }
   if (
     typeof request.destination_amount === 'object' &&
@@ -62,6 +64,7 @@ function requestPathFind(
     request.destination_amount.issuer = request.destination_account
   }
   if (pathfind.source.currencies && pathfind.source.currencies.length > 0) {
+    // @ts-ignore
     request.source_currencies = pathfind.source.currencies.map((amount) =>
       renameCounterpartyToIssuer(amount)
     )
@@ -73,12 +76,13 @@ function requestPathFind(
           ' and destination.amount.value in getPaths'
       )
     }
+    // @ts-ignore
     request.send_max = toRippledAmount(pathfind.source.amount)
     if (typeof request.send_max !== 'string' && !request.send_max.issuer) {
       request.send_max.issuer = pathfind.source.address
     }
   }
-
+  // @ts-ignore
   return connection.request(request).then((paths) => addParams(request, paths))
 }
 
