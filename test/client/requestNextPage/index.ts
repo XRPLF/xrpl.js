@@ -1,5 +1,4 @@
 import assert from 'assert-diff'
-import {LedgerData} from 'xrpl-local/common/types/objects'
 import {assertRejects, TestSuite} from '../../utils'
 
 /**
@@ -9,28 +8,32 @@ import {assertRejects, TestSuite} from '../../utils'
  */
 export default <TestSuite>{
   'requests the next page': async (client, address) => {
-    const response = await client.request('ledger_data')
-    const responseNextPage = await client.requestNextPage<LedgerData>(
-      'ledger_data',
-      {},
+    // @ts-ignore
+    const response = await client.request({command: 'ledger_data'})
+    const responseNextPage = await client.requestNextPage(
+      // @ts-ignore
+      {command: 'ledger_data'},
       response
     )
     assert.equal(
-      responseNextPage.state[0].index,
+      // @ts-ignore
+      responseNextPage.result.state[0].index,
       '000B714B790C3C79FEE00D17C4DEB436B375466F29679447BA64F265FD63D731'
     )
   },
 
   'rejects when there are no more pages': async (client, address) => {
-    const response = await client.request('ledger_data')
+    // @ts-ignore
+    const response = await client.request({command: 'ledger_data'})
     const responseNextPage = await client.requestNextPage(
-      'ledger_data',
-      {},
+      // @ts-ignore
+      {command: 'ledger_data'},
       response
     )
     assert(!client.hasNextPage(responseNextPage))
     await assertRejects(
-      client.requestNextPage('ledger_data', {}, responseNextPage),
+      // @ts-ignore
+      client.requestNextPage({command: 'ledger_data'}, responseNextPage),
       Error,
       'response does not have a next page'
     )

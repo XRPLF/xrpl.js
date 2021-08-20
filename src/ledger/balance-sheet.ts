@@ -3,6 +3,7 @@ import {validate} from '../common'
 import {Amount} from '../common/types/objects'
 import {ensureLedgerVersion} from './utils'
 import {Client} from '..'
+import { GatewayBalancesResponse } from '../models/methods'
 
 export type BalanceSheetOptions = {
   excludeAddresses?: Array<string>
@@ -18,37 +19,28 @@ export type GetBalanceSheet = {
   }>
 }
 
-type BalanceSheet = {
-  account: string,
-  assets?: Record<string, any>,
-  balances?: Record<string, any>,
-  obligations?: Record<string, string>,
-  ledger_current_index?: number,
-  validated?: boolean
-}
-
-function formatBalanceSheet(balanceSheet: BalanceSheet): GetBalanceSheet {
+function formatBalanceSheet(balanceSheet: GatewayBalancesResponse): GetBalanceSheet {
   const result: GetBalanceSheet = {}
 
-  if (balanceSheet.balances != null) {
+  if (balanceSheet.result.balances != null) {
     result.balances = []
-    Object.entries(balanceSheet.balances).forEach(entry => {
+    Object.entries(balanceSheet.result.balances).forEach(entry => {
       const [counterparty, balances] = entry;
       balances.forEach((balance) => {
         result.balances.push(Object.assign({counterparty}, balance))
       })
     })
   }
-  if (balanceSheet.assets != null) {
+  if (balanceSheet.result.assets != null) {
     result.assets = []
-    Object.entries(balanceSheet.assets).forEach(([counterparty, assets]) => {
+    Object.entries(balanceSheet.result.assets).forEach(([counterparty, assets]) => {
       assets.forEach((balance) => {
         result.assets.push(Object.assign({counterparty}, balance))
       })
     })
   }
-  if (balanceSheet.obligations != null) {
-    result.obligations = Object.entries(balanceSheet.obligations as {[key: string]: string}).map(
+  if (balanceSheet.result.obligations != null) {
+    result.obligations = Object.entries(balanceSheet.result.obligations as {[key: string]: string}).map(
       ([currency, value]) => ({currency, value})
     )
   }
@@ -65,7 +57,7 @@ async function getBalanceSheet(
   validate.getBalanceSheet({address, options})
   options = await ensureLedgerVersion.call(this, options)
   // 2. Make Request
-  const response = await this.request('gateway_balances', {
+  const response = await this.request({command: 'gateway_balances',
     account: address,
     strict: true,
     hotwallet: options.excludeAddresses,

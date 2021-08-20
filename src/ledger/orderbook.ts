@@ -81,7 +81,7 @@ async function makeRequest(
     taker_gets: takerGets,
     taker_pays: takerPays
   })
-  return client._requestAll('book_offers', {
+  return client._requestAll({command: 'book_offers',
     taker_gets: orderData.taker_gets,
     taker_pays: orderData.taker_pays,
     ledger_index: options.ledgerVersion || 'validated',
@@ -116,11 +116,11 @@ export async function getOrderbook(
   // 3. Return Formatted Response
   const directOffers = _.flatMap(
     directOfferResults,
-    (directOfferResult) => directOfferResult.offers
+    (directOfferResult) => directOfferResult.result.offers
   )
   const reverseOffers = _.flatMap(
     reverseOfferResults,
-    (reverseOfferResult) => reverseOfferResult.offers
+    (reverseOfferResult) => reverseOfferResult.result.offers
   )
   return formatBidsAndAsks(orderbook, [...directOffers, ...reverseOffers])
 }

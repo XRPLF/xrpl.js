@@ -29,14 +29,14 @@ async function getTrustlines(
   address = ensureClassicAddress(address)
 
   // 2. Make Request
-  const responses = await this._requestAll('account_lines', {
+  const responses = await this._requestAll({command: 'account_lines',
     account: address,
     ledger_index: options.ledgerVersion ?? await this.getLedgerVersion(),
     limit: options.limit,
     peer: options.counterparty
   })
   // 3. Return Formatted Response
-  const trustlines = _.flatMap(responses, (response) => response.lines)
+  const trustlines = _.flatMap(responses, (response) => response.result.lines)
   return trustlines.map(parseAccountTrustline).filter((trustline) => {
     return currencyFilter(options.currency || null, trustline)
   })

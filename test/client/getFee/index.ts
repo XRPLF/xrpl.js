@@ -20,6 +20,7 @@ export default <TestSuite>{
 
   'getFee - high load_factor': async (client, address) => {
     client.connection.request({
+      // @ts-ignore TODO: resolve
       command: 'config',
       data: {highLoadFactor: true}
     })
@@ -32,6 +33,7 @@ export default <TestSuite>{
     // (fee will actually be 51539.607552)
     client._maxFeeXRP = '51540'
     client.connection.request({
+      // @ts-ignore TODO: resolve
       command: 'config',
       data: {highLoadFactor: true}
     })
@@ -55,6 +57,7 @@ export default <TestSuite>{
 
   'getFee reporting': async (client, address) => {
     client.connection.request({
+      // @ts-ignore TODO: resolve
       command: 'config',
       data: {reporting: true}
     })

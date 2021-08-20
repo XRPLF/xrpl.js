@@ -1,5 +1,7 @@
-import responses from '../../fixtures/responses'
-import {assertRejects, assertResultMatch, TestSuite} from '../../utils'
+import assert from 'assert'
+import _ from 'lodash'
+import responses from '../../fixtures/rippled'
+import {assertRejects, TestSuite} from '../../utils'
 
 /**
  * Every test suite exports their tests in the default object.
@@ -8,13 +10,19 @@ import {assertRejects, assertResultMatch, TestSuite} from '../../utils'
  */
 export default <TestSuite>{
   'getAccountInfo': async (client, address) => {
-    const result = await client.getAccountInfo(address)
-    assertResultMatch(result, responses.getAccountInfo, 'getAccountInfo')
+    const response = await client.getAccountInfo(address)
+    assert.deepEqual(
+      _.omit(response, 'id'),
+      _.omit(responses.account_info.normal, 'id'),
+    )
   },
 
   'getAccountInfo - options undefined': async (client, address) => {
-    const result = await client.getAccountInfo(address, undefined)
-    assertResultMatch(result, responses.getAccountInfo, 'getAccountInfo')
+    const response = await client.getAccountInfo(address, undefined)
+    assert.deepEqual(
+      _.omit(response, 'id'),
+      _.omit(responses.account_info.normal, 'id'),
+    )
   },
 
   'getAccountInfo - invalid options': async (client, address) => {

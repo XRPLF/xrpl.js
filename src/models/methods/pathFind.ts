@@ -6,7 +6,7 @@ interface BasePathFindRequest extends BaseRequest {
     subcommand: string
 }
 
-interface PathFindCreateRequest extends BasePathFindRequest {
+export interface PathFindCreateRequest extends BasePathFindRequest {
     subcommand: "create"
     source_account: string
     destination_account: string

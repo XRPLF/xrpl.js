@@ -8,15 +8,17 @@ import {TestSuite} from '../../utils'
  */
 export default <TestSuite>{
   'returns true when there is another page': async (client, address) => {
-    const response = await client.request('ledger_data')
+    // @ts-ignore
+    const response = await client.request({command: 'ledger_data'})
     assert(client.hasNextPage(response))
   },
 
   'returns false when there are no more pages': async (client, address) => {
-    const response = await client.request('ledger_data')
+    // @ts-ignore
+    const response = await client.request({command: 'ledger_data'})
     const responseNextPage = await client.requestNextPage(
-      'ledger_data',
-      {},
+      // @ts-ignore
+      {command: 'ledger_data'},
       response
     )
     assert(!client.hasNextPage(responseNextPage))

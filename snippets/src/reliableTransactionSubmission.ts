@@ -73,10 +73,11 @@ async function performPayments(payments) {
 
   for (let i = 0; i < payments.length; i++) {
     const payment = payments[i]
-    const account_info: AccountInfoResponse = await client.request('account_info', {
+    const account_info: AccountInfoResponse = await client.request({
+      command: 'account_info',
       account: payment.source.classicAddress,
       ledger_index: 'current'})
-    const sequence = account_info.account_data.Sequence
+    const sequence = account_info.result.account_data.Sequence
     const preparedPayment = await client.preparePayment(payment.source.classicAddress, {
       source: {
         address: payment.source.classicAddress,

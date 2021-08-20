@@ -4,9 +4,11 @@ import {computeTransactionHash} from '../common/hashes'
 import * as utils from './utils'
 import parseTransaction from './parse/transaction'
 import getTransaction from './transaction'
-import {validate, errors, Connection, ensureClassicAddress} from '../common'
+import {validate, errors, ensureClassicAddress} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
 import {Client} from '..'
+import {Connection} from '../client'
+import { AccountTxRequest } from '../models/methods'
 
 export type TransactionsOptions = {
   start?: string
@@ -104,8 +106,8 @@ function formatPartialResponse(
   const parse = (tx) =>
     parseAccountTxTransaction(tx, options.includeRawTransactions)
   return {
-    marker: data.marker,
-    results: data.transactions
+    marker: data.result.marker,
+    results: data.result.transactions
       .filter((tx) => tx.validated)
       .map(parse)
       .filter(_.partial(transactionFilter, address, options))
@@ -120,7 +122,7 @@ function getAccountTx(
   marker: string,
   limit: number
 ) {
-  const request = {
+  const request: AccountTxRequest = {
     command: 'account_tx',
     account: address,
     // -1 is equivalent to earliest available validated ledger
