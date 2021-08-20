@@ -75,7 +75,7 @@ function testTransaction(
   const signedData = testcase.client.sign(txJSON, secret)
   console.log('PREPARED...')
   return testcase.client
-    .request("submit", {tx_blob: signedData.signedTransaction})
+    .request({command: "submit", tx_blob: signedData.signedTransaction})
     .then((data) =>
       testcase.test.title.indexOf('multisign') !== -1
         ? acceptLedger(testcase.client).then(() => data)
@@ -138,7 +138,7 @@ function makeTrustLine(testcase, address, secret) {
       if (address === wallet.getAddress()) {
         testcase.transactions.push(signed.id)
       }
-      return client.submit(signed.signedTransaction)
+      return client.request({command: "submit", tx_blob: signed.signedTransaction})
     })
     .then(() => ledgerAccept(client))
   return trust
@@ -148,7 +148,7 @@ function makeOrder(client, address, specification, secret) {
   return client
     .prepareOrder(address, specification)
     .then((data) => client.sign(data.txJSON, secret))
-    .then((signed) => client.submit(signed.signedTransaction))
+    .then((signed) => client.request({command: "submit", tx_blob: signed.signedTransaction}))
     .then(() => ledgerAccept(client))
 }
 
@@ -164,7 +164,7 @@ function setupAccounts(testcase) {
       return client
         .prepareSettings(masterAccount, {defaultRipple: true})
         .then((data) => client.sign(data.txJSON, masterSecret))
-        .then((signed) => client.submit(signed.signedTransaction))
+        .then((signed) => client.request({command: "submit", tx_blob: signed.signedTransaction}))
         .then(() => ledgerAccept(client))
     })
     .then(() =>
