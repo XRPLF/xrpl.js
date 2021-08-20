@@ -1,6 +1,5 @@
 import {Client, BroadcastClient} from 'xrpl-local'
 import {createMockRippled} from './mock-rippled'
-import ledgerClosed from './fixtures/rippled/ledger-close.json'
 import {getFreePort} from './utils'
 
 function setupMockRippledConnection(testcase, port) {
@@ -22,10 +21,7 @@ function setupMockRippledConnectionForBroadcast(testcase, ports) {
     testcase.client = new BroadcastClient(servers)
     testcase.client
       .connect()
-      .then(() => {
-        testcase.client.once('connected', () => resolve())
-        testcase.mocks[0].socket.send(JSON.stringify(ledgerClosed))
-      })
+      .then(() => resolve())
       .catch(reject)
   })
 }
