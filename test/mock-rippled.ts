@@ -8,7 +8,6 @@ import addresses from './fixtures/addresses.json'
 import hashes from './fixtures/hashes.json'
 import transactionsResponse from './fixtures/rippled/account-tx'
 import accountLinesResponse from './fixtures/rippled/account-lines'
-import accountObjectsResponse from './fixtures/rippled/account-objects'
 import fullLedger from './fixtures/rippled/ledger-full-38129.json'
 import {getFreePort} from './utils'
 
@@ -30,7 +29,8 @@ function createResponse(request, response, overrides = {}) {
 }
 
 export function addRippledResponse(mock: MockedWebSocketServer, command: string, response) {
-  mock.on('request_account_info', function (request, conn) {
+  mock.on(`request_${command}`, function (request, conn) {
+    assert.strictEqual(request.command, command)
     conn.send(createResponse(request, response))
   })
 }
@@ -276,18 +276,10 @@ export function createMockRippled(port) {
     conn.send(createResponse(request, fixtures.unsubscribe))
   })
 
+  // TODO: remove this and move fixtures closer when the prepare functions are gone
   mock.on('request_account_info', function (request, conn) {
     assert.strictEqual(request.command, 'account_info')
     conn.send(createResponse(request, fixtures.account_info.normal))
-  })
-
-  mock.on('request_account_objects', function (request, conn) {
-    assert.strictEqual(request.command, 'account_objects')
-    if (request.account === addresses.ACCOUNT) {
-      conn.send(accountObjectsResponse(request))
-    } else {
-      assert(false, 'Unrecognized account address: ' + request.account)
-    }
   })
 
   mock.on('request_ledger', function (request, conn) {
