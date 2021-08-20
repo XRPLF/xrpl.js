@@ -1,8 +1,27 @@
+import { deriveKeypair, deriveAddress, deriveXAddress } from './derive'
+import computeLedgerHeaderHash from './ledgerhash'
+import signPaymentChannelClaim from './sign-payment-channel-claim'
+import verifyPaymentChannelClaim from './verify-payment-channel-claim'
+import {
+    computeBinaryTransactionHash,
+    computeTransactionHash,
+    computeBinaryTransactionSigningHash,
+    computeAccountLedgerObjectID,
+    computeSignerListLedgerObjectID,
+    computeOrderID,
+    computeTrustlineHash,
+    computeTransactionTreeHash,
+    computeStateTreeHash,
+    computeLedgerHash,
+    computeEscrowHash,
+    computePaymentChannelHash,
+} from '../common/hashes'
+import { generateXAddress } from './generate-address'
+
 import * as _ from 'lodash'
 import BigNumber from 'bignumber.js'
-import {deriveKeypair} from 'ripple-keypairs'
-import {RippledAmount} from './types/objects'
-import {ValidationError} from './errors'
+import {RippledAmount} from '../common/types/objects'
+import {ValidationError} from '../common/errors'
 import {xAddressToClassicAddress} from 'ripple-address-codec'
 
 function isValidSecret(secret: string): boolean {
@@ -189,12 +208,31 @@ function iso8601ToRippleTime(iso8601: string): number {
 }
 
 export {
-  dropsToXrp,
-  xrpToDrops,
-  toRippledAmount,
-  convertKeysFromSnakeCaseToCamelCase,
-  removeUndefined,
-  rippleTimeToISO8601,
-  iso8601ToRippleTime,
-  isValidSecret
+    computeLedgerHeaderHash,
+    dropsToXrp,
+    xrpToDrops,
+    toRippledAmount,
+    convertKeysFromSnakeCaseToCamelCase,
+    removeUndefined,
+    rippleTimeToISO8601,
+    iso8601ToRippleTime,
+    isValidSecret,
+    computeBinaryTransactionHash,
+    computeTransactionHash,
+    computeBinaryTransactionSigningHash,
+    computeAccountLedgerObjectID,
+    computeSignerListLedgerObjectID,
+    computeOrderID,
+    computeTrustlineHash,
+    computeTransactionTreeHash,
+    computeStateTreeHash,
+    computeLedgerHash,
+    computeEscrowHash,
+    computePaymentChannelHash,
+    generateXAddress,
+    deriveKeypair,
+    deriveAddress,
+    deriveXAddress,
+    signPaymentChannelClaim,
+    verifyPaymentChannelClaim,
 }
