@@ -1,7 +1,7 @@
-import { deriveKeypair, deriveAddress, deriveXAddress } from './offline/derive'
-import computeLedgerHeaderHash from './offline/ledgerhash'
-import signPaymentChannelClaim from './offline/sign-payment-channel-claim'
-import verifyPaymentChannelClaim from './offline/verify-payment-channel-claim'
+import { deriveKeypair, deriveAddress, deriveXAddress } from './derive'
+import computeLedgerHeaderHash from './ledgerhash'
+import signPaymentChannelClaim from './sign-payment-channel-claim'
+import verifyPaymentChannelClaim from './verify-payment-channel-claim'
 import { dropsToXrp,
     xrpToDrops,
     toRippledAmount,
@@ -10,7 +10,7 @@ import { dropsToXrp,
     rippleTimeToISO8601,
     iso8601ToRippleTime,
     isValidSecret,
-} from './common/utils'
+} from '../common/utils'
 import {
     computeBinaryTransactionHash,
     computeTransactionHash,
@@ -24,8 +24,8 @@ import {
     computeLedgerHash,
     computeEscrowHash,
     computePaymentChannelHash,
-} from './common/hashes'
-import { generateAddressAPI } from './offline/generate-address'
+} from '../common/hashes'
+import { generateAddressAPI } from './generate-address'
 
 export {
     computeLedgerHeaderHash,

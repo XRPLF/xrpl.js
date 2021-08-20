@@ -1,6 +1,6 @@
 import assert from 'assert-diff'
 import BigNumber from 'bignumber.js'
-import {dropsToXrp} from '../../../src/utils'
+import {dropsToXrp} from '../../../src/utils/utils'
 
 describe('Drops To XRP', function () {
   it('works with a typical amount', () => {

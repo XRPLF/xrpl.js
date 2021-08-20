@@ -39,7 +39,7 @@ import prepareTicketCreate from '../transaction/ticket'
 import {sign} from '../transaction/sign'
 import combine from '../transaction/combine'
 import submit from '../transaction/submit'
-import {deriveAddress, deriveXAddress} from '../offline/derive'
+import {deriveAddress, deriveXAddress} from '../utils/derive'
 import getLedger from '../ledger/ledger'
 import {
   Request,

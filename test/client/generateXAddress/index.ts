@@ -2,7 +2,7 @@ import assert from 'assert-diff'
 import responses from '../../fixtures/responses'
 import {TestSuite} from '../../utils'
 import ECDSA from '../../../src/common/ecdsa'
-import {generateAddressAPI, GenerateAddressOptions} from '../../../src/offline/generate-address'
+import {generateAddressAPI, GenerateAddressOptions} from '../../../src/utils/generate-address'
 
 /**
  * Every test suite exports their tests in the default object.
