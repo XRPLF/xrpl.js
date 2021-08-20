@@ -83,7 +83,7 @@ function testTransaction(
     )
     .then((data) => {
       console.log('SUBMITTED...')
-      assert.strictEqual(data.engine_result, 'tesSUCCESS')
+      assert.strictEqual(data.result.engine_result, 'tesSUCCESS')
       const options = {
         minLedgerVersion: lastClosedLedgerVersion,
         maxLedgerVersion: txData.LastLedgerSequence
@@ -580,7 +580,7 @@ describe('integration tests - standalone rippled', function () {
               .request({command: "submit", tx_blob: combined.signedTransaction})
               .then((response) => acceptLedger(this.client).then(() => response))
               .then((response) => {
-                assert.strictEqual(response.engine_result, 'tesSUCCESS')
+                assert.strictEqual(response.result.engine_result, 'tesSUCCESS')
                 const options = {minLedgerVersion}
                 return verifyTransaction(
                   this,
