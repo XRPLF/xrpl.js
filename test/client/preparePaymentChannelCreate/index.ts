@@ -1,7 +1,6 @@
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
 import rippled from '../../fixtures/rippled'
-import { addRippledResponse } from '../../mock-rippled'
 import {assertResultMatch, TestSuite} from '../../utils'
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
@@ -19,7 +18,7 @@ export const config = {
  */
 export default <TestSuite>{
   'preparePaymentChannelCreate': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -37,7 +36,7 @@ export default <TestSuite>{
   },
 
   'preparePaymentChannelCreate full': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const result = await client.preparePaymentChannelCreate(
       address,
       requests.preparePaymentChannelCreate.full
@@ -50,7 +49,7 @@ export default <TestSuite>{
   },
 
   'preparePaymentChannelCreate with ticket': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',

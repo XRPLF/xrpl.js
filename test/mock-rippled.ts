@@ -29,11 +29,6 @@ function createResponse(request, response, overrides = {}) {
   return JSON.stringify(Object.assign({}, response, change))
 }
 
-export function addRippledResponse(mock: MockedWebSocketServer, request: Request, response) {
-  const command = request.command
-  mock.responses[command] = response
-}
-
 function createLedgerResponse(request, response) {
   const newResponse = JSON.parse(createResponse(request, response))
   if (newResponse.result && newResponse.result.ledger) {
@@ -65,6 +60,11 @@ export function createMockRippled(port) {
   Object.assign(mock, EventEmitter2.prototype)
 
   mock.responses = {}
+
+  mock.addResponse = (request: Request, response: object) => {
+    const command = request.command
+    mock.responses[command] = response
+  }
 
   const close = mock.close
   mock.close = function () {
