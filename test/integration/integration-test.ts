@@ -5,7 +5,7 @@ import requests from '../fixtures/requests'
 import {Client} from 'xrpl-local'
 import {payTo, ledgerAccept} from './utils'
 import {errors} from 'xrpl-local/common'
-import {isValidSecret} from 'xrpl-local/utils/index'
+import {isValidSecret} from 'xrpl-local/utils'
 import { generateXAddress } from '../../src/utils/generate-address'
 import { isValidXAddress } from 'ripple-address-codec'
 
