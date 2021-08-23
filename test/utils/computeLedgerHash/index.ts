@@ -3,24 +3,16 @@ import {computeLedgerHeaderHash} from '../../../src'
 import {ValidationError} from '../../../src/common/errors'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
-import getLedgerFull from '../../fixtures/responses/get-ledger-full.json'
 import {assertResultMatch} from '../../utils'
 const {computeLedgerHash: REQUEST_FIXTURES} = requests
 
 function getNewLedger() {
-  return JSON.parse(JSON.stringify(getLedgerFull))
+  return JSON.parse(JSON.stringify(responses.getLedger.full))
 }
 
 describe('Compute Ledger Hash', function () {
   it('given corrupt data - should fail', () => {
     const ledger = getNewLedger()
-    /*
-    assert.strictEqual(
-      // @ts-ignore
-      ledger.transactions[0].rawTransaction,
-      '{"Account":"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV","Amount":"10000000000","Destination":"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj","Fee":"10","Flags":0,"Sequence":62,"SigningPubKey":"034AADB09CFF4A4804073701EC53C3510CDC95917C2BB0150FB742D0C66E6CEE9E","TransactionType":"Payment","TxnSignature":"3045022022EB32AECEF7C644C891C19F87966DF9C62B1F34BABA6BE774325E4BB8E2DD62022100A51437898C28C2B297112DF8131F2BB39EA5FE613487DDD611525F1796264639","hash":"3B1A4E1C9BB6A7208EB146BCDB86ECEA6068ED01466D933528CA2B4C64F753EF","meta":{"AffectedNodes":[{"CreatedNode":{"LedgerEntryType":"AccountRoot","LedgerIndex":"4C6ACBD635B0F07101F7FA25871B0925F8836155462152172755845CE691C49E","NewFields":{"Account":"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj","Balance":"10000000000","Sequence":1}}},{"ModifiedNode":{"FinalFields":{"Account":"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV","Balance":"981481999380","Flags":0,"OwnerCount":0,"Sequence":63},"LedgerEntryType":"AccountRoot","LedgerIndex":"B33FDD5CF3445E1A7F2BE9B06336BEBD73A5E3EE885D3EF93F7E3E2992E46F1A","PreviousFields":{"Balance":"991481999390","Sequence":62},"PreviousTxnID":"2485FDC606352F1B0785DA5DE96FB9DBAF43EB60ECBB01B7F6FA970F512CDA5F","PreviousTxnLgrSeq":31317}}],"TransactionIndex":0,"TransactionResult":"tesSUCCESS"},"ledger_index":38129}'
-    ) 
-    */
     // @ts-ignore - Change Amount to 12000000000
     ledger.transactions[0].rawTransaction =
       '{"Account":"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV","Amount":"12000000000","Destination":"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj","Fee":"10","Flags":0,"Sequence":62,"SigningPubKey":"034AADB09CFF4A4804073701EC53C3510CDC95917C2BB0150FB742D0C66E6CEE9E","TransactionType":"Payment","TxnSignature":"3045022022EB32AECEF7C644C891C19F87966DF9C62B1F34BABA6BE774325E4BB8E2DD62022100A51437898C28C2B297112DF8131F2BB39EA5FE613487DDD611525F1796264639","hash":"3B1A4E1C9BB6A7208EB146BCDB86ECEA6068ED01466D933528CA2B4C64F753EF","meta":{"AffectedNodes":[{"CreatedNode":{"LedgerEntryType":"AccountRoot","LedgerIndex":"4C6ACBD635B0F07101F7FA25871B0925F8836155462152172755845CE691C49E","NewFields":{"Account":"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj","Balance":"10000000000","Sequence":1}}},{"ModifiedNode":{"FinalFields":{"Account":"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV","Balance":"981481999380","Flags":0,"OwnerCount":0,"Sequence":63},"LedgerEntryType":"AccountRoot","LedgerIndex":"B33FDD5CF3445E1A7F2BE9B06336BEBD73A5E3EE885D3EF93F7E3E2992E46F1A","PreviousFields":{"Balance":"991481999390","Sequence":62},"PreviousTxnID":"2485FDC606352F1B0785DA5DE96FB9DBAF43EB60ECBB01B7F6FA970F512CDA5F","PreviousTxnLgrSeq":31317}}],"TransactionIndex":0,"TransactionResult":"tesSUCCESS"},"ledger_index":38129}'
@@ -50,14 +42,6 @@ describe('Compute Ledger Hash', function () {
 
   it('given ledger without raw transactions - should throw', () => {
     const ledger = getNewLedger()
-    /*
-    assert.strictEqual(
-      // @ts-ignore
-      ledger.transactions[0].rawTransaction,
-      '{"Account":"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV","Amount":"10000000000","Destination":"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj","Fee":"10","Flags":0,"Sequence":62,"SigningPubKey":"034AADB09CFF4A4804073701EC53C3510CDC95917C2BB0150FB742D0C66E6CEE9E","TransactionType":"Payment","TxnSignature":"3045022022EB32AECEF7C644C891C19F87966DF9C62B1F34BABA6BE774325E4BB8E2DD62022100A51437898C28C2B297112DF8131F2BB39EA5FE613487DDD611525F1796264639","hash":"3B1A4E1C9BB6A7208EB146BCDB86ECEA6068ED01466D933528CA2B4C64F753EF","meta":{"AffectedNodes":[{"CreatedNode":{"LedgerEntryType":"AccountRoot","LedgerIndex":"4C6ACBD635B0F07101F7FA25871B0925F8836155462152172755845CE691C49E","NewFields":{"Account":"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj","Balance":"10000000000","Sequence":1}}},{"ModifiedNode":{"FinalFields":{"Account":"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV","Balance":"981481999380","Flags":0,"OwnerCount":0,"Sequence":63},"LedgerEntryType":"AccountRoot","LedgerIndex":"B33FDD5CF3445E1A7F2BE9B06336BEBD73A5E3EE885D3EF93F7E3E2992E46F1A","PreviousFields":{"Balance":"991481999390","Sequence":62},"PreviousTxnID":"2485FDC606352F1B0785DA5DE96FB9DBAF43EB60ECBB01B7F6FA970F512CDA5F","PreviousTxnLgrSeq":31317}}],"TransactionIndex":0,"TransactionResult":"tesSUCCESS"},"ledger_index":38129}'
-    )
-    */
-    // Delete rawTransaction
     // @ts-ignore - Delete rawTransaction
     delete ledger.transactions[0].rawTransaction
     ledger.parentCloseTime = ledger.closeTime
