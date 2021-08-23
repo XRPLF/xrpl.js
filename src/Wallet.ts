@@ -1,7 +1,8 @@
 import {fromSeed} from 'bip32'
 import {mnemonicToSeedSync} from 'bip39'
+import { classicAddressToXAddress } from 'ripple-address-codec'
 import {decode, encodeForSigning} from 'ripple-binary-codec'
-import {deriveKeypair, generateSeed, verify} from 'ripple-keypairs'
+import {deriveAddress, deriveKeypair, generateSeed, verify} from 'ripple-keypairs'
 import ECDSA from './common/ecdsa'
 import {SignedTransaction} from './common/types/objects'
 import {signOffline} from './transaction/sign'
@@ -106,6 +107,21 @@ class Wallet {
     const messageHex: string = encodeForSigning(tx)
     const signature = tx.TxnSignature
     return verify(messageHex, signature, this.publicKey)
+  }
+
+  /**
+   * Gets an XAddress in testnet/mainnet format.
+   * @param {number} tag A tag to be included within the XAddress.
+   * @param {boolean} test A boolean to indicate if XAddress should be in testnet (true) or mainnet (false) format.
+   * @returns {string} An XAddress
+   */
+  getXAddress(tag: number, test: boolean): string {
+    const classicAddress = deriveAddress(this.publicKey)
+    return classicAddressToXAddress(
+      classicAddress,
+      tag,
+      test,
+    )
   }
 }
 
