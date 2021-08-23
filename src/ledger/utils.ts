@@ -20,7 +20,7 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max)
 }
 
-function getXRPBalance(
+async function getXRPBalance(
   connection: Connection,
   address: string,
   ledgerVersion?: number
@@ -30,26 +30,24 @@ function getXRPBalance(
     account: address,
     ledger_index: ledgerVersion
   }
-  return connection
+  const data = await connection
     .request(request)
-    .then((data) => common.dropsToXrp(data.result.account_data.Balance))
+  return common.dropsToXrp(data.result.account_data.Balance)
 }
 
 // If the marker is omitted from a response, you have reached the end
-function getRecursiveRecur(
+async function getRecursiveRecur(
   getter: Getter,
   marker: string | undefined,
   limit: number
 ): Promise<Array<any>> {
-  return getter(marker, limit).then((data) => {
-    const remaining = limit - data.results.length
-    if (remaining > 0 && data.marker != null) {
-      return getRecursiveRecur(getter, data.marker, remaining).then((results) =>
-        data.results.concat(results)
-      )
-    }
-    return data.results.slice(0, limit)
-  })
+  const data = await getter(marker, limit)
+  const remaining = limit - data.results.length
+  if (remaining > 0 && data.marker != null) {
+    return getRecursiveRecur(getter, data.marker, remaining).then((results) => data.results.concat(results)
+    )
+  }
+  return data.results.slice(0, limit)
 }
 
 function getRecursive(getter: Getter, limit?: number): Promise<Array<any>> {
@@ -102,22 +100,20 @@ function compareTransactions(
   return first.outcome.ledgerVersion < second.outcome.ledgerVersion ? -1 : 1
 }
 
-function hasLedgerVersions(connection: Connection, min: number, max: number | undefined): Promise<boolean> {
-  return connection.request({
+async function hasLedgerVersions(connection: Connection, min: number, max: number | undefined): Promise<boolean> {
+  const response = await connection.request({
     command: 'server_info'
   })
-  .then((response) => response.result.info.complete_ledgers)
-  .then((ledgerRange) => {
-    const rangeset = new RangeSet()
-    rangeset.parseAndAddRanges(ledgerRange)
-    if (!max) {
-      return rangeset.containsValue(min)
-    }
-    return rangeset.containsRange(min, max)
-  })
+  const ledgerRange = response.result.info.complete_ledgers
+  const rangeset = new RangeSet()
+  rangeset.parseAndAddRanges(ledgerRange)
+  if (!max) {
+    return rangeset.containsValue(min)
+  }
+  return rangeset.containsRange(min, max)
 }
 
-function hasCompleteLedgerRange(
+async function hasCompleteLedgerRange(
   connection: Connection,
   minLedgerVersion?: number,
   maxLedgerVersion?: number
@@ -129,19 +125,19 @@ function hasCompleteLedgerRange(
   )
 }
 
-function isPendingLedgerVersion(
+async function isPendingLedgerVersion(
   connection: Connection,
   maxLedgerVersion?: number
 ): Promise<boolean> {
-  return connection.request({
-      command: 'ledger',
-      ledger_index: 'validated'
-    })
-    .then((response) => response.result.ledger_index)
-    .then((ledgerVersion) => ledgerVersion < (maxLedgerVersion || 0))
+  const response = await connection.request({
+    command: 'ledger',
+    ledger_index: 'validated'
+  })
+  const ledgerVersion = response.result.ledger_index
+  return ledgerVersion < (maxLedgerVersion || 0)
 }
 
-function ensureLedgerVersion(this: Client, options: any): Promise<object> {
+async function ensureLedgerVersion(this: Client, options: any): Promise<object> {
   if (
     Boolean(options) &&
     options.ledgerVersion != null &&
@@ -149,14 +145,12 @@ function ensureLedgerVersion(this: Client, options: any): Promise<object> {
   ) {
     return Promise.resolve(options)
   }
-  return this.request({
-      command: 'ledger',
-      ledger_index: 'validated'
-    })
-    .then((response) => response.result.ledger_index)
-    .then((ledgerVersion) =>
-    Object.assign({}, options, {ledgerVersion})
-  )
+  const response = await this.request({
+    command: 'ledger',
+    ledger_index: 'validated'
+  })
+  const ledgerVersion = response.result.ledger_index
+  return Object.assign({}, options, { ledgerVersion })
 }
 
 export {
