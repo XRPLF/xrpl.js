@@ -182,7 +182,7 @@ describe('Connection', function () {
       data: {disconnectOnServerInfo: true}
     })
     return this.client
-      .getServerInfo()
+      .request({command: "server_info"})
       .then(() => {
         assert(false, 'Should throw DisconnectedError')
       })
@@ -211,7 +211,7 @@ describe('Connection', function () {
       callback({message: 'not connected'})
     }
     return this.client
-      .getServerInfo()
+      .request({command: "server_info"})
       .then(() => {
         assert(false, 'Should throw DisconnectedError')
       })

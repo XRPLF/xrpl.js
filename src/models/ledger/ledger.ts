@@ -1,4 +1,5 @@
 import { LedgerEntry } from ".";
+import { Transaction } from "../transactions";
 
 export interface Ledger {
     account_hash: string
@@ -14,5 +15,5 @@ export interface Ledger {
     parent_hash: string
     total_coins: string
     transaction_hash: string 
-    transactions?: any[] // TODO: Retype this once we have transaction types
+    transactions?: Transaction[]
   }

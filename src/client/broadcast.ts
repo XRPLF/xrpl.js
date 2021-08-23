@@ -13,7 +13,6 @@ class BroadcastClient extends Client {
 
     // exposed for testing
     this._clients = clients
-
     this.getMethodNames().forEach((name) => {
       this[name] = function () {
         // eslint-disable-line no-loop-func
@@ -59,9 +58,11 @@ class BroadcastClient extends Client {
 
   getMethodNames() {
     const methodNames: string[] = []
-    const Client = this._clients[0]
-    for (const name of Object.getOwnPropertyNames(Client)) {
-      if (typeof Client[name] === 'function') {
+    const firstClient = this._clients[0]
+    const methods = Object.getOwnPropertyNames(firstClient)
+    methods.push(...Object.getOwnPropertyNames(Object.getPrototypeOf(firstClient)))
+    for (const name of methods) {
+      if (typeof firstClient[name] === 'function' && name !== 'constructor') {
         methodNames.push(name)
       }
     }
