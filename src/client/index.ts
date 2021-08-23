@@ -9,18 +9,10 @@ import { Connection, ConnectionUserOptions } from './connection'
 import {
   formatLedgerClose
 } from './utils'
-import getTransaction from '../ledger/transaction'
-import getTransactions from '../ledger/transactions'
 import getTrustlines from '../ledger/trustlines'
 import getBalances from '../ledger/balances'
-import getBalanceSheet from '../ledger/balance-sheet'
 import getPaths from '../ledger/pathfind'
-import getOrders from '../ledger/orders'
 import {getOrderbook, formatBidsAndAsks} from '../ledger/orderbook'
-import {getSettings, parseAccountFlags} from '../ledger/settings'
-import getAccountInfo from '../ledger/accountinfo'
-import getAccountObjects from '../ledger/accountobjects'
-import getPaymentChannel from '../ledger/payment-channel'
 import preparePayment from '../transaction/payment'
 import prepareTrustline from '../transaction/trustline'
 import prepareOrder from '../transaction/order'
@@ -38,9 +30,7 @@ import prepareSettings from '../transaction/settings'
 import prepareTicketCreate from '../transaction/ticket'
 import {sign} from '../transaction/sign'
 import combine from '../transaction/combine'
-import submit from '../transaction/submit'
 import {deriveAddress, deriveXAddress} from '../utils/derive'
-import getLedger from '../ledger/ledger'
 import {
   Request,
   Response,
@@ -117,7 +107,7 @@ import RangeSet from './rangeset'
 import * as ledgerUtils from '../ledger/utils'
 import * as transactionUtils from '../transaction/utils'
 import * as schemaValidator from '../common/schema-validator'
-import {getServerInfo, getFee} from '../common/serverinfo'
+import {getFee} from '../common/fee'
 import {ensureClassicAddress} from '../common'
 import {clamp} from '../ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from '../transaction/types'
@@ -401,27 +391,16 @@ class Client extends EventEmitter {
     await this.connection.disconnect()
   }
 
-  getServerInfo = getServerInfo
   getFee = getFee
 
   async getLedgerVersion(): Promise<number> {
     return this.connection.getLedgerVersion()
   }
 
-  getTransaction = getTransaction
-  getTransactions = getTransactions
   getTrustlines = getTrustlines
   getBalances = getBalances
-  getBalanceSheet = getBalanceSheet
   getPaths = getPaths
   getOrderbook = getOrderbook
-  getOrders = getOrders
-  getSettings = getSettings
-  getAccountInfo = getAccountInfo
-  getAccountObjects = getAccountObjects
-  getPaymentChannel = getPaymentChannel
-  getLedger = getLedger
-  parseAccountFlags = parseAccountFlags
 
   preparePayment = preparePayment
   prepareTrustline = prepareTrustline
@@ -440,8 +419,6 @@ class Client extends EventEmitter {
   prepareSettings = prepareSettings
   sign = sign
   combine = combine
-
-  submit = submit // @deprecated Use client.request({command: 'submit', tx_blob: signedTransaction }) instead
 
   generateFaucetWallet = generateFaucetWallet
 

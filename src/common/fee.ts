@@ -1,11 +1,6 @@
 import _ from 'lodash'
 import BigNumber from 'bignumber.js'
 import {Client} from '..'
-import { ServerInfoResponse } from '../models/methods'
-
-function getServerInfo(this: Client): Promise<ServerInfoResponse> {
-  return this.request({command: 'server_info'})
-}
 
 // This is a public API that can be called directly.
 // This is not used by the `prepare*` methods. See `src/transaction/utils.ts`
@@ -17,7 +12,7 @@ async function getFee(this: Client, cushion?: number): Promise<string> {
     cushion = 1.2
   }
 
-  const serverInfo = (await this.getServerInfo()).result.info
+  const serverInfo = (await this.request({command: "server_info"})).result.info
   const baseFeeXrp = new BigNumber(serverInfo.validated_ledger.base_fee_xrp)
   if (serverInfo.load_factor == null) {
     // https://github.com/ripple/rippled/issues/3812#issuecomment-816871100
@@ -31,4 +26,4 @@ async function getFee(this: Client, cushion?: number): Promise<string> {
   return new BigNumber(fee.toFixed(6)).toString(10)
 }
 
-export {getServerInfo, getFee}
+export {getFee}
