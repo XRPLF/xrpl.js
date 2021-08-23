@@ -100,16 +100,16 @@ async function performPayments(payments) {
     finalResults.push({
       id: signed.id
     })
-    const result = await client.submit(signed.signedTransaction)
+    const response = await client.request({command: 'submit', tx_blob: signed.signedTransaction})
 
     // Most of the time we'll get 'tesSUCCESS' or (after many submissions) 'terQUEUED'
-    console.log(`tx ${i} - tentative: ${result.resultCode}`)
+    console.log(`tx ${i} - tentative: ${response.result.engine_result}`)
 
     const txFinalizedPromise = new Promise<void>((resolve) => {
       const ledgerClosedCallback = async (event: LedgerClosedEvent) => {
         let status
         try {
-          status = await client.getTransaction(signed.id)
+          status = await client.request({command: 'tx', transaction: signed.id})
         } catch (e) {
           // Typical error when the tx hasn't been validated yet:
           if (e.name !== 'MissingLedgerHistoryError') {

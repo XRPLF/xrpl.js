@@ -22,15 +22,19 @@ function acceptLedger(client) {
   return client.connection.request({command: 'ledger_accept'})
 }
 
-function verifyTransaction(testcase, hash, type, options, txData, address) {
+function verifyTransaction(testcase, hash, type, options, txData, account) {
   console.log('VERIFY...')
   return testcase.client
-    .getTransaction(hash, options)
-    .then((data) => {
-      assert(data && data.outcome)
-      assert.strictEqual(data.type, type)
-      assert.strictEqual(data.address, address)
-      assert.strictEqual(data.outcome.result, 'tesSUCCESS')
+    .request({
+      command: 'tx',
+      transaction: hash,
+      min_ledger: options.minLedgerVersion,
+      max_ledger: options.maxLedgerVersion
+    }).then((data) => {
+      assert(data && data.result)
+      assert.strictEqual(data.result.TransactionType, type)
+      assert.strictEqual(data.result.Account, account)
+      assert.strictEqual(data.result.meta.TransactionResult, 'tesSUCCESS')
       if (testcase.transactions != null) {
         testcase.transactions.push(hash)
       }
@@ -48,7 +52,7 @@ function verifyTransaction(testcase, hash, type, options, txData, address) {
                 type,
                 options,
                 txData,
-                address
+                account
               ).then(resolve, reject),
             INTERVAL
           )
@@ -74,15 +78,15 @@ function testTransaction(
   const signedData = testcase.client.sign(txJSON, secret)
   console.log('PREPARED...')
   return testcase.client
-    .submit(signedData.signedTransaction)
-    .then((data) =>
+    .request({command: 'submit', tx_blob: signedData.signedTransaction})
+    .then((response) =>
       testcase.test.title.indexOf('multisign') !== -1
-        ? acceptLedger(testcase.client).then(() => data)
-        : data
+        ? acceptLedger(testcase.client).then(() => response)
+        : response
     )
-    .then((data) => {
+    .then((response) => {
       console.log('SUBMITTED...')
-      assert.strictEqual(data.resultCode, 'tesSUCCESS')
+      assert.strictEqual(response.result.engine_result, 'tesSUCCESS')
       const options = {
         minLedgerVersion: lastClosedLedgerVersion,
         maxLedgerVersion: txData.LastLedgerSequence
@@ -137,7 +141,7 @@ function makeTrustLine(testcase, address, secret) {
       if (address === wallet.getAddress()) {
         testcase.transactions.push(signed.id)
       }
-      return client.submit(signed.signedTransaction)
+      return client.request({command: 'submit', tx_blob: signed.signedTransaction})
     })
     .then(() => ledgerAccept(client))
   return trust
@@ -147,7 +151,7 @@ function makeOrder(client, address, specification, secret) {
   return client
     .prepareOrder(address, specification)
     .then((data) => client.sign(data.txJSON, secret))
-    .then((signed) => client.submit(signed.signedTransaction))
+    .then((signed) => client.request({command: 'submit', tx_blob: signed.signedTransaction}))
     .then(() => ledgerAccept(client))
 }
 
@@ -163,7 +167,7 @@ function setupAccounts(testcase) {
       return client
         .prepareSettings(masterAccount, {defaultRipple: true})
         .then((data) => client.sign(data.txJSON, masterSecret))
-        .then((signed) => client.submit(signed.signedTransaction))
+        .then((signed) => client.request({command: 'submit', tx_blob: signed.signedTransaction}))
         .then(() => ledgerAccept(client))
     })
     .then(() =>
@@ -254,16 +258,6 @@ describe('integration tests', function () {
   beforeEach(_.partial(setup, serverUrl))
   afterEach(teardown)
 
-  it('settings', function () {
-    return this.client.getLedgerVersion().then((ledgerVersion) => {
-      return this.client
-        .prepareSettings(address, requests.prepareSettings.domain, instructions)
-        .then((prepared) =>
-          testTransaction(this, 'settings', ledgerVersion, prepared)
-        )
-    })
-  })
-
   it('trustline', function () {
     return this.client.getLedgerVersion().then((ledgerVersion) => {
       return this.client
@@ -273,7 +267,7 @@ describe('integration tests', function () {
           instructions
         )
         .then((prepared) =>
-          testTransaction(this, 'trustline', ledgerVersion, prepared)
+          testTransaction(this, 'TrustSet', ledgerVersion, prepared)
         )
     })
   })
@@ -294,7 +288,7 @@ describe('integration tests', function () {
       return this.client
         .preparePayment(address, paymentSpecification, instructions)
         .then((prepared) =>
-          testTransaction(this, 'payment', ledgerVersion, prepared)
+          testTransaction(this, 'Payment', ledgerVersion, prepared)
         )
     })
   })
@@ -312,24 +306,38 @@ describe('integration tests', function () {
         value: '0.0002'
       }
     }
+    const expectedOrder = {
+      flags: 0,
+      quality: "1.185",
+      taker_gets: '200',
+      taker_pays: {
+        currency: 'USD',
+        value: '237',
+        issuer: 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q'
+      }
+    }
     return this.client.getLedgerVersion().then((ledgerVersion) => {
       return this.client
         .prepareOrder(address, orderSpecification, instructions)
         .then((prepared) =>
-          testTransaction(this, 'order', ledgerVersion, prepared)
+          testTransaction(this, 'OfferCreate', ledgerVersion, prepared)
         )
         .then((result) => {
           const txData = JSON.parse(result.txJSON)
-          return this.client.getOrders(address).then((orders) => {
+          return this.client.request({
+            command: 'account_offers',
+            account: address
+            }).then(response => response.result.offers)
+            .then((orders) => {
             assert(orders && orders.length > 0)
             const createdOrder = (
               orders.filter((order) => {
-                return order.properties.sequence === txData.Sequence
+                return order.seq === txData.Sequence
               })
             )[0]
             assert(createdOrder)
-            assert.strictEqual(createdOrder.properties.maker, address)
-            assert.deepEqual(createdOrder.specification, orderSpecification)
+            delete createdOrder.seq
+            assert.deepEqual(createdOrder, expectedOrder)
             return txData
           })
         })
@@ -343,7 +351,7 @@ describe('integration tests', function () {
             .then((prepared) =>
               testTransaction(
                 this,
-                'orderCancellation',
+                'OfferCancel',
                 ledgerVersion,
                 prepared
               )
@@ -354,12 +362,6 @@ describe('integration tests', function () {
 
   it('isConnected', function () {
     assert(this.client.isConnected())
-  })
-
-  it('getServerInfo', function () {
-    return this.client.getServerInfo().then((data) => {
-      assert(data && data.result.info.pubkey_node)
-    })
   })
 
   it('getFee', function () {
@@ -375,19 +377,6 @@ describe('integration tests', function () {
       assert.strictEqual(typeof ledgerVersion, 'number')
       assert(ledgerVersion >= this.startLedgerVersion)
     })
-  })
-
-  it('getTransactions', function () {
-    const options = {
-      initiated: true,
-      minLedgerVersion: this.startLedgerVersion
-    }
-    return this.client
-      .getTransactions(address, options)
-      .then((transactionsData) => {
-        assert(transactionsData)
-        assert.strictEqual(transactionsData.length, this.transactions.length)
-      })
   })
 
   it('getTrustlines', function () {
@@ -411,13 +400,6 @@ describe('integration tests', function () {
       assert(data && data.length > 0 && data[0])
       assert.strictEqual(data[0].currency, fixture.currency)
       assert.strictEqual(data[0].counterparty, fixture.counterparty)
-    })
-  })
-
-  it('getSettings', function () {
-    return this.client.getSettings(address).then((data) => {
-      assert(data)
-      assert.strictEqual(data.domain, requests.prepareSettings.domain.domain)
     })
   })
 
@@ -545,7 +527,7 @@ describe('integration tests - standalone rippled', function () {
             .then((prepared) => {
               return testTransaction(
                 this,
-                'settings',
+                'SignerListSet',
                 ledgerVersion,
                 prepared,
                 address,
@@ -576,15 +558,15 @@ describe('integration tests - standalone rippled', function () {
               signed2.signedTransaction
             ])
             return this.client
-              .submit(combined.signedTransaction)
+              .request({command: 'submit', tx_blob: combined.signedTransaction})
               .then((response) => acceptLedger(this.client).then(() => response))
               .then((response) => {
-                assert.strictEqual(response.resultCode, 'tesSUCCESS')
+                assert.strictEqual(response.result.engine_result, 'tesSUCCESS')
                 const options = {minLedgerVersion}
                 return verifyTransaction(
                   this,
                   combined.id,
-                  'settings',
+                  'AccountSet',
                   options,
                   {},
                   address

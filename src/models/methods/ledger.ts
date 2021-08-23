@@ -30,9 +30,14 @@ interface LedgerQueueData {
     max_spend_drops?: string
 }
 
+interface BinaryLedger extends Omit<Omit<Ledger, 'transactions'>, 'accountState'> {
+    accountState?: string[]
+    transactions?: string[]
+}
+
 export interface LedgerResponse extends BaseResponse {
     result: {
-        ledger: Ledger
+        ledger: Ledger | BinaryLedger
         ledger_hash: string
         ledger_index: number
         queue_data?: (LedgerQueueData | string)[]

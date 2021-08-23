@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
 import {removeUndefined, rippleTimeToISO8601} from '../../common'
 import parseTransaction from './transaction'
-import {Ledger} from '../../models/ledger'
+import { TransactionAndMetadata } from '../../models/transactions'
 
 export type FormattedLedger = {
   // TODO: properties in type don't match response object. Fix!
@@ -22,10 +22,10 @@ export type FormattedLedger = {
   stateHashes?: Array<string>
 }
 
-function parseTransactionWrapper(ledgerVersion, tx) {
+function parseTransactionWrapper(ledgerVersion: number, tx: TransactionAndMetadata) {
   // renames metaData to meta and adds ledger_index
-  const transaction = Object.assign({}, _.omit(tx, 'metaData'), {
-    meta: tx.metaData,
+  const transaction = Object.assign({}, _.omit(tx, 'metadata'), {
+    meta: tx.metadata,
     ledger_index: ledgerVersion
   })
   const result = parseTransaction(transaction, true)
@@ -35,15 +35,15 @@ function parseTransactionWrapper(ledgerVersion, tx) {
   return result
 }
 
-function parseTransactions(transactions, ledgerVersion) {
+function parseTransactions(transactions: string[] | TransactionAndMetadata[], ledgerVersion: number) {
   if (_.isEmpty(transactions)) {
     return {}
   }
   if (typeof transactions[0] === 'string') {
-    return {transactionHashes: transactions}
+    return {transactionHashes: transactions as unknown as string[]}
   }
   return {
-    transactions: transactions.map(
+    transactions: (transactions as unknown as TransactionAndMetadata[]).map(
       _.partial(parseTransactionWrapper, ledgerVersion)
     )
   }
@@ -64,7 +64,7 @@ function parseState(state) {
  * @returns {FormattedLedger} formatted ledger
  * @throws RangeError: Invalid time value (rippleTimeToISO8601)
  */
-export function parseLedger(ledger: Ledger): FormattedLedger {
+export function parseLedger(ledger): FormattedLedger {
   const ledgerVersion = parseInt(ledger.ledger_index, 10)
   return removeUndefined(
     Object.assign(
