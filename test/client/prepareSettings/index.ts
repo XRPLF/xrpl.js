@@ -13,7 +13,7 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  */
 export default <TestSuite>{
   'simple test': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const response = await client.prepareSettings(
       address,
       requests.prepareSettings.domain,
@@ -22,7 +22,7 @@ export default <TestSuite>{
     assertResultMatch(response, responses.prepareSettings.flags, 'prepare')
   },
   'no maxLedgerVersion': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const response = await client.prepareSettings(
       address,
       requests.prepareSettings.domain,
@@ -37,7 +37,7 @@ export default <TestSuite>{
     )
   },
   'no instructions': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const response = await client.prepareSettings(
       address,
       requests.prepareSettings.domain
@@ -49,7 +49,7 @@ export default <TestSuite>{
     )
   },
   'regularKey': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const regularKey = {regularKey: 'rAR8rR8sUkBoCZFawhkWzY4Y5YoyuznwD'}
     const response = await client.prepareSettings(
       address,
@@ -59,7 +59,7 @@ export default <TestSuite>{
     assertResultMatch(response, responses.prepareSettings.regularKey, 'prepare')
   },
   'remove regularKey': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const regularKey = {regularKey: null}
     const response = await client.prepareSettings(
       address,
@@ -73,7 +73,7 @@ export default <TestSuite>{
     )
   },
   'flag set': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const settings = {requireDestinationTag: true}
     const response = await client.prepareSettings(
       address,
@@ -83,7 +83,7 @@ export default <TestSuite>{
     assertResultMatch(response, responses.prepareSettings.flagSet, 'prepare')
   },
   'flag clear': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const settings = {requireDestinationTag: false}
     const response = await client.prepareSettings(
       address,
@@ -93,7 +93,7 @@ export default <TestSuite>{
     assertResultMatch(response, responses.prepareSettings.flagClear, 'prepare')
   },
   'set depositAuth flag': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const settings = {depositAuth: true}
     const response = await client.prepareSettings(
       address,
@@ -107,7 +107,7 @@ export default <TestSuite>{
     )
   },
   'clear depositAuth flag': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const settings = {depositAuth: false}
     const response = await client.prepareSettings(
       address,
@@ -121,7 +121,7 @@ export default <TestSuite>{
     )
   },
   'integer field clear': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const settings = {transferRate: null}
     const response = await client.prepareSettings(
       address,
@@ -132,7 +132,7 @@ export default <TestSuite>{
     assert.strictEqual(JSON.parse(response.txJSON).TransferRate, 0)
   },
   'set transferRate': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const settings = {transferRate: 1}
     const response = await client.prepareSettings(
       address,
@@ -146,7 +146,7 @@ export default <TestSuite>{
     )
   },
   'set signers': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const settings = requests.prepareSettings.signers.normal
     const response = await client.prepareSettings(
       address,
@@ -156,7 +156,7 @@ export default <TestSuite>{
     assertResultMatch(response, responses.prepareSettings.signers, 'prepare')
   },
   'signers no threshold': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const settings = requests.prepareSettings.signers.noThreshold
     try {
       const response = await client.prepareSettings(
@@ -177,7 +177,7 @@ export default <TestSuite>{
     }
   },
   'signers no weights': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const settings = requests.prepareSettings.signers.noWeights
     const localInstructions = {
       signersCount: 1,
@@ -191,7 +191,7 @@ export default <TestSuite>{
     assertResultMatch(response, responses.prepareSettings.noWeights, 'prepare')
   },
   'fee for multisign': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       signersCount: 4,
       ...instructionsWithMaxLedgerVersionOffset
@@ -208,7 +208,7 @@ export default <TestSuite>{
     )
   },
   'no signer list': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const settings = requests.prepareSettings.noSignerEntries
     const localInstructions = {
       signersCount: 1,
@@ -226,7 +226,7 @@ export default <TestSuite>{
     )
   },
   'invalid': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     // domain must be a string
     const settings = Object.assign({}, requests.prepareSettings.domain, {
       domain: 123
@@ -255,7 +255,7 @@ export default <TestSuite>{
     }
   },
   'offline': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
 
     const settings = requests.prepareSettings.domain
@@ -272,7 +272,7 @@ export default <TestSuite>{
     )
   },
   'prepare settings with ticket': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const instructions = {
       ticketSequence: 23,
       maxLedgerVersion: 8820051,

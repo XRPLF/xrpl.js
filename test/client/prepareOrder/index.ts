@@ -12,14 +12,14 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  */
 export default <TestSuite>{
   'buy order': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const request = requests.prepareOrder.buy
     const result = await client.prepareOrder(address, request)
     assertResultMatch(result, responses.prepareOrder.buy, 'prepare')
   },
 
   'buy order with expiration': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const request = requests.prepareOrder.expiration
     const response = responses.prepareOrder.expiration
     const result = await client.prepareOrder(
@@ -31,7 +31,7 @@ export default <TestSuite>{
   },
 
   'sell order': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const request = requests.prepareOrder.sell
     const result = await client.prepareOrder(
       address,
@@ -42,7 +42,7 @@ export default <TestSuite>{
   },
 
   'invalid': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const request = Object.assign({}, requests.prepareOrder.sell)
     delete request.direction // Make invalid
     await assertRejects(
@@ -57,7 +57,7 @@ export default <TestSuite>{
   },
 
   'with ticket': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const request = requests.prepareOrder.sell
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,

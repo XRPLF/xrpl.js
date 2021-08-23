@@ -60,7 +60,7 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const payment = {
       source: {
@@ -168,7 +168,7 @@ export default <TestSuite>{
   },
 
   'succeeds - prepared payment': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const payment = await client.preparePayment(address, {
       source: {
         address: address,
@@ -244,7 +244,7 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const payment = await client.preparePayment(address, {
       source: {
         address: address,
@@ -272,7 +272,7 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const order = {
       direction: 'sell',
       quantity: {

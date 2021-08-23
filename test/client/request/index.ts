@@ -10,7 +10,7 @@ import {TestSuite, assertResultMatch} from '../../utils'
  */
 export default <TestSuite>{
   'request account_objects': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'account_objects', rippled.account_objects.normal)
+    addRippledResponse(mockRippled, {command: 'account_objects', account: address}, rippled.account_objects.normal)
     const result = await client.request({command: 'account_objects',
       account: address
     })
@@ -23,7 +23,7 @@ export default <TestSuite>{
   },
 
   'request account_objects - invalid options': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'account_objects', rippled.account_objects.normal)
+    addRippledResponse(mockRippled, {command: 'account_objects', account: address}, rippled.account_objects.normal)
     // @ts-ignore Intentionally no local validation of these options
     const result = await client.request({command: 'account_objects',
       account: address,

@@ -12,7 +12,7 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  */
 export default <TestSuite>{
   'prepareCheckCash amount': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const result = await client.prepareCheckCash(
       address,
       requests.prepareCheckCash.amount
@@ -21,7 +21,7 @@ export default <TestSuite>{
   },
 
   'prepareCheckCash deliverMin': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const result = await client.prepareCheckCash(
       address,
       requests.prepareCheckCash.deliverMin
@@ -30,7 +30,7 @@ export default <TestSuite>{
   },
 
   'with ticket': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',

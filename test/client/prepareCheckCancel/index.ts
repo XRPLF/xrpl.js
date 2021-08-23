@@ -12,7 +12,7 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  */
 export default <TestSuite>{
   'prepareCheckCancel': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const result = await client.prepareCheckCancel(
       address,
       requests.prepareCheckCancel.normal
@@ -21,7 +21,7 @@ export default <TestSuite>{
   },
 
   'with ticket': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',

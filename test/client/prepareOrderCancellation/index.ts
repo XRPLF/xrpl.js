@@ -12,7 +12,7 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  */
 export default <TestSuite>{
   'prepareOrderCancellation': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const request = requests.prepareOrderCancellation.simple
     const result = await client.prepareOrderCancellation(
       address,
@@ -27,7 +27,7 @@ export default <TestSuite>{
   },
 
   'no instructions': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const request = requests.prepareOrderCancellation.simple
     const result = await client.prepareOrderCancellation(address, request)
     assertResultMatch(
@@ -38,7 +38,7 @@ export default <TestSuite>{
   },
 
   'with memos': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const request = requests.prepareOrderCancellation.withMemos
     const result = await client.prepareOrderCancellation(address, request)
     assertResultMatch(
@@ -49,7 +49,7 @@ export default <TestSuite>{
   },
 
   'invalid': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const request = Object.assign(
       {},
       requests.prepareOrderCancellation.withMemos
@@ -64,7 +64,7 @@ export default <TestSuite>{
   },
 
   'with ticket': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const request = requests.prepareOrderCancellation.simple
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,

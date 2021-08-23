@@ -24,7 +24,7 @@ describe('BroadcastClient', function () {
 
   it('base', function () {
     this.mocks.forEach((mock) => {
-      addRippledResponse(mock, 'server_info', rippled.server_info.normal)
+      addRippledResponse(mock, {command: 'server_info'}, rippled.server_info.normal)
     })
     const expected = {request_server_info: 1}
     this.mocks.forEach((mock) => mock.expect(Object.assign({}, expected)))

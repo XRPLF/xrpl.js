@@ -10,6 +10,7 @@ import transactionsResponse from './fixtures/rippled/account-tx'
 import accountLinesResponse from './fixtures/rippled/account-lines'
 import fullLedger from './fixtures/rippled/ledger-full-38129.json'
 import {getFreePort} from './utils'
+import { Request } from '../src'
 
 function isUSD(json) {
   return json === 'USD' || json === '0000000000000000000000005553440000000000'
@@ -28,11 +29,9 @@ function createResponse(request, response, overrides = {}) {
   return JSON.stringify(Object.assign({}, response, change))
 }
 
-export function addRippledResponse(mock: MockedWebSocketServer, command: string, response) {
-  mock.on(`request_${command}`, function (request, conn) {
-    assert.strictEqual(request.command, command)
-    conn.send(createResponse(request, response))
-  })
+export function addRippledResponse(mock: MockedWebSocketServer, request: Request, response) {
+  const command = request.command
+  mock.responses[command] = response
 }
 
 function createLedgerResponse(request, response) {
@@ -64,6 +63,8 @@ type MockedWebSocketServer = any
 export function createMockRippled(port) {
   const mock = new WebSocketServer({port: port}) as MockedWebSocketServer
   Object.assign(mock, EventEmitter2.prototype)
+
+  mock.responses = {}
 
   const close = mock.close
   mock.close = function () {
@@ -98,7 +99,12 @@ export function createMockRippled(port) {
     conn.on('message', function (requestJSON) {
       try {
         const request = JSON.parse(requestJSON)
-        mock.emit('request_' + request.command, request, conn)
+        if (request.command in mock.responses) {
+          conn.send(createResponse(request, mock.responses[request.command]))
+        } else {
+          // TODO: remove this block once all the handlers have been removed
+          mock.emit('request_' + request.command, request, conn)
+        }
       } catch (err) {
         console.error('Error: ' + err.message)
         assert(false, err.message)

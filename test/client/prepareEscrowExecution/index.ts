@@ -12,7 +12,7 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  */
 export default <TestSuite>{
   'prepareEscrowExecution': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const result = await client.prepareEscrowExecution(
       address,
       requests.prepareEscrowExecution.normal,
@@ -26,7 +26,7 @@ export default <TestSuite>{
   },
 
   'prepareEscrowExecution - simple': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const result = await client.prepareEscrowExecution(
       address,
       requests.prepareEscrowExecution.simple
@@ -39,7 +39,7 @@ export default <TestSuite>{
   },
 
   'prepareEscrowExecution - no condition': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     await assertRejects(
       client.prepareEscrowExecution(
         address,
@@ -52,7 +52,7 @@ export default <TestSuite>{
   },
 
   'prepareEscrowExecution - no fulfillment': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     await assertRejects(
       client.prepareEscrowExecution(
         address,
@@ -65,7 +65,7 @@ export default <TestSuite>{
   },
 
   'with ticket': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
+    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000396',
