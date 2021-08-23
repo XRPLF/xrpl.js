@@ -81,7 +81,7 @@ async function makeRequest(
     taker_gets: takerGets,
     taker_pays: takerPays
   })
-  return client._requestAll({command: 'book_offers',
+  return client.requestAll({command: 'book_offers',
     taker_gets: orderData.taker_gets,
     taker_pays: orderData.taker_pays,
     ledger_index: options.ledgerVersion || 'validated',

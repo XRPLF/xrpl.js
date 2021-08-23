@@ -301,7 +301,7 @@ class Client extends EventEmitter {
 
   /**
    * Makes multiple paged requests to the client to return a given number of
-   * resources. _requestAll() will make multiple requests until the `limit`
+   * resources. requestAll() will make multiple requests until the `limit`
    * number of resources is reached (if no `limit` is provided, a single request
    * will be made).
    *
@@ -312,14 +312,14 @@ class Client extends EventEmitter {
    * general use. Instead, use rippled's built-in pagination and make multiple
    * requests as needed.
    */
-  async _requestAll(req: AccountChannelsRequest): Promise<AccountChannelsResponse[]>
-  async _requestAll(req: AccountLinesRequest): Promise<AccountLinesResponse[]>
-  async _requestAll(req: AccountObjectsRequest): Promise<AccountObjectsResponse[]>
-  async _requestAll(req: AccountOffersRequest): Promise<AccountOffersResponse[]>
-  async _requestAll(req: AccountTxRequest): Promise<AccountTxResponse[]>
-  async _requestAll(req: BookOffersRequest): Promise<BookOffersResponse[]>
-  async _requestAll(req: LedgerDataRequest): Promise<LedgerDataResponse[]>
-  async _requestAll<T extends MarkerRequest, U extends MarkerResponse>(request: T, options: {collect?: string} = {}): Promise<U[]> {
+  async requestAll(req: AccountChannelsRequest): Promise<AccountChannelsResponse[]>
+  async requestAll(req: AccountLinesRequest): Promise<AccountLinesResponse[]>
+  async requestAll(req: AccountObjectsRequest): Promise<AccountObjectsResponse[]>
+  async requestAll(req: AccountOffersRequest): Promise<AccountOffersResponse[]>
+  async requestAll(req: AccountTxRequest): Promise<AccountTxResponse[]>
+  async requestAll(req: BookOffersRequest): Promise<BookOffersResponse[]>
+  async requestAll(req: LedgerDataRequest): Promise<LedgerDataResponse[]>
+  async requestAll<T extends MarkerRequest, U extends MarkerResponse>(request: T, options: {collect?: string} = {}): Promise<U[]> {
     // The data under collection is keyed based on the command. Fail if command
     // not recognized and collection key not provided.
     const collectKey = options.collect || getCollectKeyFromCommand(request.command)
