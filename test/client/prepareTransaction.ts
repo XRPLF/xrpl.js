@@ -180,7 +180,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -190,9 +190,9 @@ export default <TestSuite>{
     }
     const response = await client.prepareTransaction(txJSON, localInstructions)
     const expected = {
-      txJSON: `{"TransactionType":"DepositPreauth","Account":"${address}","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":100}`,
+      txJSON: `{"TransactionType":"DepositPreauth","Account":"${address}","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"10","Sequence":100}`,
       instructions: {
-        fee: '0.000012',
+        fee: '0.00001',
         sequence: 100,
         maxLedgerVersion: 8820051
       }
@@ -207,7 +207,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012',
+      maxFee: '0.00001',
       sequence: 100
     }
     const txJSON = {
@@ -217,9 +217,9 @@ export default <TestSuite>{
     }
     const response = await client.prepareTransaction(txJSON, localInstructions)
     const expected = {
-      txJSON: `{"TransactionType":"DepositPreauth","Account":"${address}","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":100}`,
+      txJSON: `{"TransactionType":"DepositPreauth","Account":"${address}","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"10","Sequence":100}`,
       instructions: {
-        fee: '0.000012',
+        fee: '0.00001',
         sequence: 100,
         maxLedgerVersion: 8820051
       }
@@ -238,7 +238,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012',
+      maxFee: '0.00001',
       sequence: 100
     }
     const txJSON = {
@@ -249,9 +249,9 @@ export default <TestSuite>{
     }
     const response = await client.prepareTransaction(txJSON, localInstructions)
     const expected = {
-      txJSON: `{"TransactionType":"DepositPreauth","Account":"${address}","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":100}`,
+      txJSON: `{"TransactionType":"DepositPreauth","Account":"${address}","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"10","Sequence":100}`,
       instructions: {
-        fee: '0.000012',
+        fee: '0.00001',
         sequence: 100,
         maxLedgerVersion: 8820051
       }
@@ -270,7 +270,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012',
+      maxFee: '0.00001',
       sequence: 100
     }
     const txJSON = {
@@ -297,7 +297,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012',
+      maxFee: '0.00001',
       Sequence: 100 // Intentionally capitalized in this test, but the correct field would be `sequence`
     }
     const txJSON = {
@@ -358,9 +358,9 @@ export default <TestSuite>{
     }
     const response = await client.prepareTransaction(txJSON, localInstructions)
     const expected = {
-      txJSON: `{"TransactionType":"DepositPreauth","Account":"${address}","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8890000,"Fee":"12","Sequence":23}`,
+      txJSON: `{"TransactionType":"DepositPreauth","Account":"${address}","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8890000,"Fee":"10","Sequence":23}`,
       instructions: {
-        fee: '0.000012',
+        fee: '0.00001',
         sequence: 23,
         maxLedgerVersion: 8890000
       }
@@ -388,9 +388,9 @@ export default <TestSuite>{
     }
     const response = await client.prepareTransaction(txJSON, localInstructions)
     const expected = {
-      txJSON: `{"TransactionType":"DepositPreauth","Account":"${address}","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820075,"Fee":"12","Sequence":23}`,
+      txJSON: `{"TransactionType":"DepositPreauth","Account":"${address}","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820075,"Fee":"10","Sequence":23}`,
       instructions: {
-        fee: '0.000012',
+        fee: '0.00001',
         sequence: 23,
         maxLedgerVersion: 8820075
       }
@@ -615,7 +615,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012',
+      maxFee: '0.00001',
       foo: 'bar'
     }
     const txJSON = {
@@ -637,7 +637,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
     // Marking as "any" to get around the fact that TS won't allow this.
     const txJSON: any = {
@@ -658,7 +658,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
     // Marking as "any" to get around the fact that TS won't allow this.
     const txJSON: any = {
@@ -680,7 +680,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
     const txJSON = {
       Account: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xkXXXX', // Invalid checksum
@@ -720,7 +720,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
     // Marking as "any" to get around the fact that TS won't allow this.
     const txJSON: any = {
@@ -746,7 +746,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
     const txJSON = {
       Account: address,
@@ -755,9 +755,9 @@ export default <TestSuite>{
     }
     const response = await client.prepareTransaction(txJSON, localInstructions)
     const expected = {
-      txJSON: `{"TransactionType":"DepositPreXXXX","Account":"${address}","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}`,
+      txJSON: `{"TransactionType":"DepositPreXXXX","Account":"${address}","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"10","Sequence":23}`,
       instructions: {
-        fee: '0.000012',
+        fee: '0.00001',
         sequence: 23,
         maxLedgerVersion: 8820051
       }
@@ -776,7 +776,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
     // Marking as "any" to get around the fact that TS won't allow this.
     const txJSON: any = {
@@ -818,7 +818,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
     const txJSON = {
       Account: address,
@@ -827,9 +827,9 @@ export default <TestSuite>{
     }
     const response = await client.prepareTransaction(txJSON, localInstructions)
     const expected = {
-      txJSON: `{"TransactionType":"DepositPreauth","Account":"${address}","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}`,
+      txJSON: `{"TransactionType":"DepositPreauth","Account":"${address}","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"10","Sequence":23}`,
       instructions: {
-        fee: '0.000012',
+        fee: '0.00001',
         sequence: 23,
         maxLedgerVersion: 8820051
       }
@@ -844,7 +844,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -855,9 +855,9 @@ export default <TestSuite>{
       txJSON:
         '{"TransactionType":"DepositPreauth","Account":"' +
         address +
-        '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}',
+        '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"10","Sequence":23}',
       instructions: {
-        fee: '0.000012',
+        fee: '0.00001',
         sequence: 23,
         maxLedgerVersion: 8820051
       }
@@ -873,7 +873,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
 
     const txJSON = {
@@ -887,9 +887,9 @@ export default <TestSuite>{
       txJSON:
         '{"TransactionType":"DepositPreauth","Account":"' +
         address +
-        '","Unauthorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}',
+        '","Unauthorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"10","Sequence":23}',
       instructions: {
-        fee: '0.000012',
+        fee: '0.00001',
         sequence: 23,
         maxLedgerVersion: 8820051
       }
@@ -918,9 +918,9 @@ export default <TestSuite>{
       txJSON:
         '{"TransactionType":"AccountDelete","Account":"' +
         address +
-        '","Destination":"rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}',
+        '","Destination":"rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"10","Sequence":23}',
       instructions: {
-        fee: '0.000012',
+        fee: '0.00001',
         sequence: 23,
         maxLedgerVersion: 8820051
       }
@@ -936,7 +936,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
 
     const txJSON = {
@@ -967,7 +967,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
 
     const txJSON = {
@@ -1028,7 +1028,7 @@ export default <TestSuite>{
   //   const version = ledgerResponse.result.ledger_index
   //   const localInstructions = {
   //     maxLedgerVersion: version + 100,
-  //     fee: '0.000012'
+  //     fee: '0.00001'
   //   }
   //   const txJSON = {
   //     TransactionType: 'Payment',
@@ -1272,7 +1272,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
 
     const txJSON = {
@@ -1303,7 +1303,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
     const response = await client.prepareTransaction(
       {
@@ -1362,7 +1362,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
     const txJSON = {
       Account: address,
@@ -1408,7 +1408,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
 
     const txJSON = {
@@ -1434,7 +1434,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
 
     const txJSON = {
@@ -1467,7 +1467,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
+      maxFee: '0.00001'
     }
 
     const txJSON = {
@@ -1526,7 +1526,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012',
+      maxFee: '0.00001',
       ticketSequence: 23
     }
 
@@ -1562,7 +1562,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012',
+      maxFee: '0.00001',
       sequence: 0
     }
 

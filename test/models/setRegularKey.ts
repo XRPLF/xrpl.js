@@ -14,7 +14,7 @@ describe('SetRegularKey Transaction Verification', function () {
         account = {
             TransactionType : "SetRegularKey",
             Account : "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            Fee : "12",
+            Fee : "10",
             Flags : 0,
             RegularKey : "rAR8rR8sUkBoCZFawhkWzY4Y5YoyuznwD"
         } as any

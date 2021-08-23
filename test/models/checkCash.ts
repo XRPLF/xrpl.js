@@ -15,7 +15,7 @@ describe('CheckCash Transaction Verification', function () {
             TransactionType : "CheckCash",
             Amount : "100000000",
             CheckID : "838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334",
-            Fee : "12"
+            Fee : "10"
         } as any
         
         assert.doesNotThrow(() => verifyCheckCash(validCheckCash))

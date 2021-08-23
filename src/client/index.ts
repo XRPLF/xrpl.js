@@ -182,7 +182,7 @@ class Client extends EventEmitter {
       throw new ValidationError("server URI must start with `wss://`, `ws://`, `wss+unix://`, or `ws+unix://`.")
     }
 
-    this._feeCushion = options.feeCushion || 1.2
+    this._feeCushion = options.feeCushion || 1
     this._maxFeeXRP = options.maxFeeXRP || '2'
 
     this.connection = new Connection(server, options)

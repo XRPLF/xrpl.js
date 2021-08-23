@@ -315,7 +315,7 @@ export default <TestSuite>{
     const instructions = {
       sequence: 23,
       maxLedgerVersion: 8820051,
-      fee: '0.000012'
+      fee: '0.00001'
     }
     const result = await client.prepareSettings(address, settings, instructions)
     assertResultMatch(result, responses.prepareSettings.flags, 'prepare')
@@ -332,7 +332,7 @@ export default <TestSuite>{
     const instructions = {
       ticketSequence: 23,
       maxLedgerVersion: 8820051,
-      fee: '0.000012'
+      fee: '0.00001'
     }
     const response = await client.prepareSettings(
       address,

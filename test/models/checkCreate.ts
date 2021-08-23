@@ -18,7 +18,7 @@ describe('CheckCreate Transaction Verification', function () {
             Expiration : 570113521,
             InvoiceID : "6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B",
             DestinationTag : 1,
-            Fee : "12"
+            Fee : "10"
           } as any
         
         assert.doesNotThrow(() => verifyCheckCreate(validCheck))
@@ -34,7 +34,7 @@ describe('CheckCreate Transaction Verification', function () {
             Expiration : 570113521,
             InvoiceID : "6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B",
             DestinationTag : 1,
-            Fee : "12"
+            Fee : "10"
           } as any
 
         assert.throws(
@@ -53,7 +53,7 @@ describe('CheckCreate Transaction Verification', function () {
             Expiration : 570113521,
             InvoiceID : "6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B",
             DestinationTag : 1,
-            Fee : "12"
+            Fee : "10"
           } as any
 
         assert.throws(
@@ -72,7 +72,7 @@ describe('CheckCreate Transaction Verification', function () {
             Expiration : 570113521,
             InvoiceID : "6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B",
             DestinationTag : "1",
-            Fee : "12"
+            Fee : "10"
           } as any
 
         assert.throws(
@@ -91,7 +91,7 @@ describe('CheckCreate Transaction Verification', function () {
             Expiration : "570113521",
             InvoiceID : "6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B",
             DestinationTag : 1,
-            Fee : "12"
+            Fee : "10"
           } as any
 
         assert.throws(
@@ -110,7 +110,7 @@ describe('CheckCreate Transaction Verification', function () {
             Expiration : 570113521,
             InvoiceID : 7896545655285446963258531,
             DestinationTag : 1,
-            Fee : "12"
+            Fee : "10"
           } as any
 
         assert.throws(

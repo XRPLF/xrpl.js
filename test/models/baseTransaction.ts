@@ -12,7 +12,7 @@ describe('Transaction Verification', function () {
         const txJson = {
             Account: "r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe",
             TransactionType: "Payment",
-            Fee: "12",
+            Fee: "10",
             Sequence: 100,
             AccountTxnID: "DEADBEEF",
             Flags: 15,
