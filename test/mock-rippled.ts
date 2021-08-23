@@ -95,7 +95,7 @@ export function createMockRippled(port) {
         mock.emit('request_' + request.command, request, conn)
       } catch (err) {
         console.error('Error: ' + err.message)
-        assert(false, err.message)
+        conn.close(4000, err.message)
       }
     })
   })
