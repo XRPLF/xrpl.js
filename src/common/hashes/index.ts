@@ -84,10 +84,10 @@ export const computeBinaryTransactionSigningHash = (
 }
 
 /**
- * Compute Account Ledger Object index
+ * Compute Account Root Index
  *
  * All objects in a ledger's state tree have a unique index.
- * The Account Ledger Object index is derived by hashing the
+ * The Account Root index is derived by hashing the
  * address with a namespace identifier. This ensures every
  * index is unique.
  *
@@ -96,7 +96,7 @@ export const computeBinaryTransactionSigningHash = (
  * @param address The classic account address
  * @returns {string} The Ledger Object Index for the account
  */
-export const computeAccountLedgerObjectIndex = (address: string): string => {
+export const computeAccountRootIndex = (address: string): string => {
   return sha512Half(ledgerSpaceHex('account') + addressToHex(address))
 }
 

@@ -47,7 +47,7 @@ describe('Ledger', function () {
       var account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
       var expectedEntryHash =
         '2B6AC232AA4C4BE41BF49D2459FA4A0347E1B543A4C92FCEE0821C0201E2E9A8'
-      var actualEntryHash = hashes.computeAccountLedgerObjectIndex(account)
+      var actualEntryHash = hashes.computeAccountRootIndex(account)
 
       assert.equal(actualEntryHash, expectedEntryHash)
     })
