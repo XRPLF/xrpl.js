@@ -16,7 +16,7 @@ import {
     computeEscrowHash,
     computePaymentChannelHash,
 } from '../common/hashes'
-import { generateXAddress } from './generate-address'
+import { generateXAddress } from './generateAddress'
 
 import _ from 'lodash'
 import BigNumber from 'bignumber.js'

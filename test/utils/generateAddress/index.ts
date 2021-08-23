@@ -1,6 +1,6 @@
 import assert from 'assert-diff'
 import responses from '../../fixtures/responses'
-import {generateXAddress, GenerateAddressOptions} from '../../../src/utils/generate-address'
+import {generateXAddress, GenerateAddressOptions} from '../../../src/utils/generateAddress'
 import xAddressResponse from '../../fixtures/responses/generate-x-address.json'
 import ECDSA from '../../../src/common/ecdsa'
 import {UnexpectedError} from '../../../src/common/errors'

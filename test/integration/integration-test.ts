@@ -6,7 +6,7 @@ import {Client} from 'xrpl-local'
 import {payTo, ledgerAccept} from './utils'
 import {errors} from 'xrpl-local/common'
 import {isValidSecret} from 'xrpl-local/utils'
-import { generateXAddress } from '../../src/utils/generate-address'
+import { generateXAddress } from '../../src/utils/generateAddress'
 import { isValidXAddress } from 'ripple-address-codec'
 
 // how long before each test case times out

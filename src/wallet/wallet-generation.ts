@@ -2,7 +2,7 @@ import https = require('https')
 
 import {Client} from '..'
 import {errors} from '../common'
-import {GeneratedAddress} from '../utils/generate-address'
+import {GeneratedAddress} from '../utils/generateAddress'
 import {isValidAddress} from '../common/schema-validator'
 import {RippledError} from '../common/errors'
 
