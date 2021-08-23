@@ -12,7 +12,7 @@
       "description": "The three-character code or hexadecimal string used to denote currencies, or \"drops\" for the smallest unit of XRP.",
       "$ref": "currency"
     },
-    "counterparty": {
+    "issuer": {
       "description": "The XRP Ledger address of the account that owes or is owed the funds (omitted if `currency` is \"XRP\" or \"drops\")",
       "$ref": "address"
     }
@@ -28,7 +28,7 @@
           }
         }
       },
-      "required": ["counterparty"]
+      "required": ["issuer"]
     },
     {
       "properties": {
@@ -37,7 +37,7 @@
         }
       },
       "not": {
-        "required": ["counterparty"]
+        "required": ["issuer"]
       }
     }
   ]

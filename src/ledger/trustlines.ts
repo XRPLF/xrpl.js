@@ -5,7 +5,7 @@ import {Client} from '..'
 import {FormattedTrustline} from '../common/types/objects/trustlines'
 
 export type GetTrustlinesOptions = {
-  counterparty?: string
+  issuer?: string
   currency?: string
   limit?: number
   ledgerVersion?: number
@@ -33,7 +33,7 @@ async function getTrustlines(
     account: address,
     ledger_index: options.ledgerVersion ?? 'validated',
     limit: options.limit,
-    peer: options.counterparty
+    peer: options.issuer
   })
   // 3. Return Formatted Response
   const trustlines = _.flatMap(responses, (response) => response.result.lines)

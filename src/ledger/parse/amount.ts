@@ -11,7 +11,7 @@ function parseAmount(amount: RippledAmount): Amount {
   return {
     currency: amount.currency,
     value: amount.value,
-    counterparty: amount.issuer
+    issuer: amount.issuer
   }
 }
 

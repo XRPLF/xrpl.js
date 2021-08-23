@@ -18,7 +18,7 @@ export interface Trustline {
 
 export type FormattedTrustlineSpecification = {
   currency: string
-  counterparty: string
+  issuer: string
   limit: string
   qualityIn?: number
   qualityOut?: number
@@ -30,7 +30,7 @@ export type FormattedTrustlineSpecification = {
 
 export type FormattedTrustline = {
   specification: FormattedTrustlineSpecification
-  counterparty: {
+  issuer: {
     limit: string
     ripplingDisabled?: boolean
     frozen?: boolean

@@ -11,15 +11,15 @@ function parseAccountTrustline(trustline: Trustline): FormattedTrustline {
   const specification = removeUndefined({
     limit: trustline.limit,
     currency: trustline.currency,
-    counterparty: trustline.account,
+    issuer: trustline.account,
     qualityIn: parseQuality(trustline.quality_in) || undefined,
     qualityOut: parseQuality(trustline.quality_out) || undefined,
     ripplingDisabled: trustline.no_ripple,
     frozen: trustline.freeze,
     authorized: trustline.authorized
   })
-  // rippled doesn't provide the counterparty's qualities
-  const counterparty = removeUndefined({
+  // rippled doesn't provide the issuer's qualities
+  const issuer = removeUndefined({
     limit: trustline.limit_peer,
     ripplingDisabled: trustline.no_ripple_peer,
     frozen: trustline.freeze_peer,
@@ -28,7 +28,7 @@ function parseAccountTrustline(trustline: Trustline): FormattedTrustline {
   const state = {
     balance: trustline.balance
   }
-  return {specification, counterparty, state}
+  return {specification, issuer, state}
 }
 
 export default parseAccountTrustline

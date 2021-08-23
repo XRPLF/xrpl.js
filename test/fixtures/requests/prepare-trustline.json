@@ -1,6 +1,6 @@
 {
   "currency": "USD",
-  "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
+  "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
   "limit": "10000",
   "qualityIn": 0.91,
   "qualityOut": 0.87,

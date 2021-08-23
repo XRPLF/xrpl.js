@@ -21,7 +21,7 @@
           "maxAmount": {
             "currency": "USD",
             "value": "10",
-            "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+            "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           }
         },
         "destination": {
@@ -39,26 +39,26 @@
               "value": "-0.01"
             },
             {
-              "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+              "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
               "currency": "USD",
               "value": "-10"
             }
           ],
           "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B": [
             {
-              "counterparty": "rNNuQMuExCiEjeZ4h9JJnj5PSWypdMXDj4",
+              "issuer": "rNNuQMuExCiEjeZ4h9JJnj5PSWypdMXDj4",
               "currency": "USD",
               "value": "-9.980039920159681"
             },
             {
-              "counterparty": "rGFuMiw48HdbnrUbkRYuitXTmfrDBNTCnX",
+              "issuer": "rGFuMiw48HdbnrUbkRYuitXTmfrDBNTCnX",
               "currency": "USD",
               "value": "10"
             }
           ],
           "rNNuQMuExCiEjeZ4h9JJnj5PSWypdMXDj4": [
             {
-              "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+              "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
               "currency": "USD",
               "value": "9.980039920159681"
             }

@@ -11,9 +11,9 @@
     "options": {
       "description": "Options to filter and determine which balances to return.",
       "properties": {
-        "counterparty": {
+        "issuer": {
           "$ref": "address",
-          "description": "Only return balances with this counterparty."
+          "description": "Only return balances with this issuer."
         },
         "currency": {
           "$ref": "currency",

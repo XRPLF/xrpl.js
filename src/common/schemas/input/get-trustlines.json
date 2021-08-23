@@ -11,9 +11,9 @@
     "options": {
       "description": "Options to filter and determine which trustlines to return.",
       "properties": {
-        "counterparty": {
+        "issuer": {
           "$ref": "address",
-          "description": "Only return trustlines with this counterparty."
+          "description": "Only return trustlines with this issuer."
         },
         "currency": {
           "$ref": "currency",

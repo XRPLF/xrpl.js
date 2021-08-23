@@ -79,7 +79,7 @@ export default <TestSuite>{
   //     },
   //     counter: {
   //       currency: 'JPY',
-  //       counterparty: 'rB3gZey7VWHYRqJHLoHDEJXJ2pEPNieKiS'
+  //       issuer: 'rB3gZey7VWHYRqJHLoHDEJXJ2pEPNieKiS'
   //     }
   //   }
   //   const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR'
@@ -93,7 +93,7 @@ export default <TestSuite>{
   //     counter: {currency: 'XRP'},
   //     base: {
   //       currency: 'USD',
-  //       counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+  //       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
   //     }
   //   }
   //   const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR'
@@ -127,7 +127,7 @@ export default <TestSuite>{
     )
   },
 
-  'currency & counterparty are correct': async (client, address) => {
+  'currency & issuer are correct': async (client, address) => {
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.normal
@@ -137,9 +137,9 @@ export default <TestSuite>{
       const totalPrice = order.specification.totalPrice
       const {base, counter} = requests.getOrderbook.normal
       assert.strictEqual(quantity.currency, base.currency)
-      assert.strictEqual(quantity.counterparty, base.counterparty)
+      assert.strictEqual(quantity.issuer, base.issuer)
       assert.strictEqual(totalPrice.currency, counter.currency)
-      assert.strictEqual(totalPrice.counterparty, counter.counterparty)
+      assert.strictEqual(totalPrice.issuer, counter.issuer)
     })
   },
 

@@ -1,12 +1,12 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "laxAmount",
-  "description": "Amount where counterparty is optional",
+  "description": "Amount where issuer is optional",
   "link": "amount",
   "type": "object",
   "properties": {
     "currency": {"$ref": "currency"},
-    "counterparty": {"$ref": "address"},
+    "issuer": {"$ref": "address"},
     "value": {"$ref": "value"}
   },
   "required": ["currency", "value"],

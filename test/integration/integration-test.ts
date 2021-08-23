@@ -130,7 +130,7 @@ function makeTrustLine(testcase, address, secret) {
   const client = testcase.client
   const specification = {
     currency: 'USD',
-    counterparty: masterAccount,
+    issuer: masterAccount,
     limit: '1341.1',
     ripplingDisabled: true
   }
@@ -188,7 +188,7 @@ function setupAccounts(testcase) {
         quantity: {
           currency: 'USD',
           value: '432',
-          counterparty: masterAccount
+          issuer: masterAccount
         },
         totalPrice: {
           currency: 'XRP',
@@ -212,7 +212,7 @@ function setupAccounts(testcase) {
         totalPrice: {
           currency: 'USD',
           value: '171',
-          counterparty: masterAccount
+          issuer: masterAccount
         }
       }
       return makeOrder(
@@ -313,7 +313,7 @@ describe('integration tests', function () {
       quantity: {
         currency: 'USD',
         value: '237',
-        counterparty: 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q'
+        issuer: 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q'
       },
       totalPrice: {
         currency: 'XRP',
@@ -393,25 +393,25 @@ describe('integration tests', function () {
 
   it('getTrustlines', function () {
     const fixture = requests.prepareTrustline.simple
-    const { currency, counterparty } = fixture
-    const options = { currency, counterparty }
+    const { currency, issuer } = fixture
+    const options = { currency, issuer }
     return this.client.getTrustlines(address, options).then((data) => {
       assert(data && data.length > 0 && data[0] && data[0].specification)
       const specification = data[0].specification
       assert.strictEqual(Number(specification.limit), Number(fixture.limit))
       assert.strictEqual(specification.currency, fixture.currency)
-      assert.strictEqual(specification.counterparty, fixture.counterparty)
+      assert.strictEqual(specification.issuer, fixture.issuer)
     })
   })
 
   it('getBalances', function () {
     const fixture = requests.prepareTrustline.simple
-    const { currency, counterparty } = fixture
-    const options = { currency, counterparty }
+    const { currency, issuer } = fixture
+    const options = { currency, issuer }
     return this.client.getBalances(address, options).then((data) => {
       assert(data && data.length > 0 && data[0])
       assert.strictEqual(data[0].currency, fixture.currency)
-      assert.strictEqual(data[0].counterparty, fixture.counterparty)
+      assert.strictEqual(data[0].issuer, fixture.issuer)
     })
   })
 
@@ -422,7 +422,7 @@ describe('integration tests', function () {
       },
       counter: {
         currency: 'USD',
-        counterparty: masterAccount
+        issuer: masterAccount
       }
     }
     return this.client.getOrderbook(address, orderbook).then((book) => {
@@ -453,7 +453,7 @@ describe('integration tests', function () {
   //       amount: {
   //         value: '1',
   //         currency: 'USD',
-  //         counterparty: masterAccount
+  //         issuer: masterAccount
   //       }
   //     }
   //   }

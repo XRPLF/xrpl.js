@@ -19,7 +19,7 @@ function parseTrustline(tx: any): object {
   return removeUndefined({
     limit: tx.LimitAmount.value,
     currency: tx.LimitAmount.currency,
-    counterparty: tx.LimitAmount.issuer,
+    issuer: tx.LimitAmount.issuer,
     memos: parseMemos(tx),
     qualityIn: parseQuality(tx.QualityIn),
     qualityOut: parseQuality(tx.QualityOut),

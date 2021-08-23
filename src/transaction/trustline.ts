@@ -19,7 +19,7 @@ function createTrustlineTransaction(
 ): TransactionJSON {
   const limit = {
     currency: trustline.currency,
-    issuer: trustline.counterparty,
+    issuer: trustline.issuer,
     value: trustline.limit
   }
 

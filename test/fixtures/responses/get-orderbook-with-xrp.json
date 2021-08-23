@@ -6,7 +6,7 @@
         "quantity": {
           "currency": "USD",
           "value": "10.1",
-          "counterparty": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw"
+          "issuer": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw"
         },
         "totalPrice": {
           "currency": "XRP",
@@ -47,7 +47,7 @@
         "quantity": {
           "currency": "USD",
           "value": "10453252347.1",
-          "counterparty": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw"
+          "issuer": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw"
         },
         "totalPrice": {
           "currency": "XRP",

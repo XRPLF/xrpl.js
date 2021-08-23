@@ -74,7 +74,7 @@ export default <TestSuite>{
         minAmount: {
           currency: 'USD',
           value: '0.00004579644712312366',
-          counterparty: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc'
+          issuer: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc'
         }
       },
       // eslint-disable-next-line no-useless-escape
@@ -276,7 +276,7 @@ export default <TestSuite>{
       direction: 'sell',
       quantity: {
         currency: 'USD',
-        counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+        issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
         value: '3.140000'
       },
       totalPrice: {
