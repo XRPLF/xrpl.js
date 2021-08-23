@@ -31,7 +31,7 @@ async function getTrustlines(
   // 2. Make Request
   const responses = await this._requestAll({command: 'account_lines',
     account: address,
-    ledger_index: options.ledgerVersion ?? await this.getLedgerVersion(),
+    ledger_index: options.ledgerVersion ?? 'validated',
     limit: options.limit,
     peer: options.counterparty
   })

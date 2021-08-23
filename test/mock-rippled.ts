@@ -46,6 +46,7 @@ function createLedgerResponse(request, response) {
       newResponse.result.ledger.parent_close_time =
         newResponse.result.ledger.close_time - 10
     }
+    newResponse.result.ledger_index = newResponse.result.ledger.ledger_index
   }
   return JSON.stringify(newResponse)
 }
@@ -106,7 +107,7 @@ export function createMockRippled(port) {
       return
     }
     if (mock.listeners(this.event).length === 0) {
-      throw new Error('No event handler registered for ' + this.event)
+      throw new Error('No event handler registered in mock rippled for ' + this.event)
     }
     if (mock.expectedRequests == null) {
       return // TODO: fail here to require expectedRequests
@@ -188,6 +189,12 @@ export function createMockRippled(port) {
     assert.strictEqual(request.command, 'echo')
     conn.send(JSON.stringify(request.data))
   })
+
+  mock.on('request_fee', function (request, conn) {
+    assert.strictEqual(request.command, 'fee')
+    conn.send(createResponse(request, fixtures.fee))
+  })
+
 
   mock.on('request_server_info', function (request, conn) {
     assert.strictEqual(request.command, 'server_info')
@@ -364,6 +371,19 @@ export function createMockRippled(port) {
     } else {
       assert(false, 'Unrecognized ledger request: ' + JSON.stringify(request))
     }
+  })
+
+  mock.on('request_ledger_current', function (request, conn) {
+    assert.strictEqual(request.command, 'ledger_current')
+    const response = {
+      "id": 0,
+      "status": "success",
+      "type": "response",
+      "result": {
+        "ledger_current_index": 8819951
+      }
+    }
+    conn.send(createResponse(request, response))
   })
 
   mock.on('request_ledger_data', function (request, conn) {

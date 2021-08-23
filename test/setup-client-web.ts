@@ -1,5 +1,4 @@
 import {Client, BroadcastClient} from 'xrpl-local'
-import ledgerClosed from './fixtures/rippled/ledger-close.json'
 
 const port = 34371
 const baseUrl = 'ws://testripple.circleci.com:'
@@ -22,13 +21,7 @@ function setup(this: any, port_ = port) {
         this.client = new Client(baseUrl + got.port)
         this.client
           .connect()
-          .then(() => {
-            this.client.once('ledger', () => resolve())
-            this.client.connection._ws.emit(
-              'message',
-              JSON.stringify(ledgerClosed)
-            )
-          })
+          .then(resolve)
           .catch(reject)
       })
     })
@@ -43,13 +36,7 @@ function setupBroadcast(this: any) {
   return new Promise<void>((resolve, reject) => {
     this.client
       .connect()
-      .then(() => {
-        this.client.once('ledger', () => resolve())
-        this.client._clients[0].connection._ws.emit(
-          'message',
-          JSON.stringify(ledgerClosed)
-        )
-      })
+      .then(resolve)
       .catch(reject)
   })
 }

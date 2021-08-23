@@ -39,21 +39,10 @@ class BroadcastClient extends Client {
     })
 
     clients.forEach((client) => {
-      client.on('ledger', this.onLedgerEvent.bind(this))
       client.on('error', (errorCode, errorMessage, data) =>
         this.emit('error', errorCode, errorMessage, data)
       )
     })
-  }
-
-  onLedgerEvent(ledger) {
-    if (
-      ledger.ledgerVersion > this.ledgerVersion ||
-      this.ledgerVersion == null
-    ) {
-      this.ledgerVersion = ledger.ledgerVersion
-      this.emit('ledger', ledger)
-    }
   }
 
   getMethodNames() {
