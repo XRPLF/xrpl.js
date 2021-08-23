@@ -108,12 +108,12 @@ export const computeAccountRootIndex = (address: string): string => {
  *   * The AccountID of the owner of the SignerList
  *   * The SignerListID (currently always 0)
  *
- * This method computes a SignerList Ledger Object index.
+ * This method computes a SignerList index.
  *
  * @param address The classic account address of the SignerList owner (starting with r)
  * @return {string} The ID of the account's SignerList object
  */
-export const computeSignerListLedgerObjectIndex = (address: string): string => {
+export const computeSignerListIndex = (address: string): string => {
   return sha512Half(
     ledgerSpaceHex('signerList') + addressToHex(address) + '00000000'
   ) // uint32(0) signer list index
@@ -132,7 +132,7 @@ export const computeSignerListLedgerObjectIndex = (address: string): string => {
  * @param address The classic account address of the SignerList owner (starting with r)
  * @returns {string} The index of the account's Offer object
  */
-export const computeOrderIndex = (address: string, sequence: number): string => {
+export const computeOfferIndex = (address: string, sequence: number): string => {
   const prefix = '00' + intToHex(ledgerspaces.offer.charCodeAt(0), 1)
   return sha512Half(prefix + addressToHex(address) + intToHex(sequence, 4))
 }
