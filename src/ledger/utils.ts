@@ -6,7 +6,6 @@ import {FormattedTransactionType} from '../transaction/types'
 import {Issue} from '../common/types/objects'
 import {Client} from '..'
 import { AccountInfoRequest } from '../models/methods'
-import RangeSet from '../client/rangeset'
 
 export type RecursiveData = {
   marker: string
@@ -21,7 +20,7 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 async function getXRPBalance(
-  connection: Connection,
+  client: Client,
   address: string,
   ledgerVersion?: number
 ): Promise<string> {
@@ -30,7 +29,7 @@ async function getXRPBalance(
     account: address,
     ledger_index: ledgerVersion
   }
-  const data = await connection
+  const data = await client
     .request(request)
   return common.dropsToXrp(data.result.account_data.Balance)
 }
@@ -100,36 +99,11 @@ function compareTransactions(
   return first.outcome.ledgerVersion < second.outcome.ledgerVersion ? -1 : 1
 }
 
-async function hasLedgerVersions(connection: Connection, min: number, max: number | undefined): Promise<boolean> {
-  const response = await connection.request({
-    command: 'server_info'
-  })
-  const ledgerRange = response.result.info.complete_ledgers
-  const rangeset = new RangeSet()
-  rangeset.parseAndAddRanges(ledgerRange)
-  if (!max) {
-    return rangeset.containsValue(min)
-  }
-  return rangeset.containsRange(min, max)
-}
-
-async function hasCompleteLedgerRange(
-  connection: Connection,
-  minLedgerVersion?: number,
-  maxLedgerVersion?: number
-): Promise<boolean> {
-  const firstLedgerVersion = 32570 // earlier versions have been lost
-  return hasLedgerVersions(connection,
-    minLedgerVersion || firstLedgerVersion,
-    maxLedgerVersion
-  )
-}
-
 async function isPendingLedgerVersion(
-  connection: Connection,
+  client: Client,
   maxLedgerVersion?: number
 ): Promise<boolean> {
-  const response = await connection.request({
+  const response = await client.request({
     command: 'ledger',
     ledger_index: 'validated'
   })
@@ -160,7 +134,6 @@ export {
   renameCounterpartyToIssuer,
   renameCounterpartyToIssuerInOrder,
   getRecursive,
-  hasCompleteLedgerRange,
   isPendingLedgerVersion,
   clamp,
   common,

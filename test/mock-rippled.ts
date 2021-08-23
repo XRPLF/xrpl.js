@@ -47,7 +47,6 @@ function createLedgerResponse(request, response) {
         newResponse.result.ledger.close_time - 10
     }
     newResponse.result.ledger_index = newResponse.result.ledger.ledger_index
-    newResponse.result.ledger_index = newResponse.result.ledger.ledger_index
   }
   return JSON.stringify(newResponse)
 }

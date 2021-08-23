@@ -71,7 +71,7 @@ function getBalances(
       this.connection,
       options.ledgerVersion
     ).then((ledgerVersion) =>
-      utils.getXRPBalance(this.connection, address, ledgerVersion)
+      utils.getXRPBalance(this, address, ledgerVersion)
     ),
     this.getTrustlines(address, options)
   ]).then((results) =>

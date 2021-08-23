@@ -324,22 +324,6 @@ export class Connection extends EventEmitter {
     })
   }
 
-  // /**
-  //  * Wait for a valid connection before resolving. Useful for deferring methods
-  //  * until a connection has been established.
-  //  */
-  // private _waitForReady(): Promise<void> {
-  //   return new Promise((resolve, reject) => {
-  //     if (!this._shouldBeConnected) {
-  //       reject(new NotConnectedError())
-  //     } else if (this._state === WebSocket.OPEN) {
-  //       resolve()
-  //     } else {
-  //       this.once('connected', () => resolve())
-  //     }
-  //   })
-  // }
-
   private _onConnectionFailed = (errorOrCode: Error | number | null) => {
     if (this._ws) {
       this._ws.removeAllListeners()
