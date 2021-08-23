@@ -1,4 +1,4 @@
-import * as _ from 'lodash'
+import _ from 'lodash'
 import {validate, ensureClassicAddress} from '../common'
 import parseAccountTrustline from './parse/account-trustline'
 import {Client} from '..'
