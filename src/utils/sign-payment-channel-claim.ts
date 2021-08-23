@@ -8,9 +8,7 @@ function signPaymentChannelClaim(
   amount: string,
   privateKey: string
 ): string {
-  console.log("Entered method")
   validate.signPaymentChannelClaim({channel, amount, privateKey})
-  console.log("Validated")
   const signingData = binary.encodeForSigningClaim({
     channel: channel,
     amount: xrpToDrops(amount)

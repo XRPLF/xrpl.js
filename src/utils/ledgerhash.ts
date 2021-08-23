@@ -6,7 +6,6 @@ import {
   computeTransactionTreeHash,
   computeStateTreeHash
 } from '../common/hashes'
-//import * as common from '../common'
 
 function convertLedgerHeader(header): any {
   return {
