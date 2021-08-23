@@ -269,7 +269,9 @@ function prepareTransaction(
       instructions.maxLedgerVersionOffset != null
         ? instructions.maxLedgerVersionOffset
         : 3
-    return client.connection.getLedgerVersion().then((ledgerVersion) => {
+    return client.request({command: 'ledger_current'})
+    .then(response => response.result.ledger_current_index)
+    .then((ledgerVersion) => {
       newTxJSON.LastLedgerSequence = ledgerVersion + offset
       return
     })
@@ -315,7 +317,9 @@ function prepareTransaction(
     }
     const cushion = client._feeCushion
     return client.getFee(cushion).then((fee) => {
-      return client.connection.getFeeRef().then((feeRef) => {
+      return client.request({command: 'fee'})
+      .then(response => Number(response.result.drops.minimum_fee))
+      .then((feeRef) => {
         // feeRef is the reference transaction cost in "fee units"
         const extraFee =
           newTxJSON.TransactionType !== 'EscrowFinish' ||

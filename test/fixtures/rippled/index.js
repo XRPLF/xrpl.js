@@ -15,6 +15,7 @@ module.exports = {
     withPartialPayment: require('./ledger-with-partial-payment'),
     pre2014withPartial: require('./ledger-pre2014-with-partial')
   },
+  fee: require('./fee'),
   empty: require('./empty'),
   subscribe: require('./subscribe'),
   subscribe_error: require('./subscribe_error'),

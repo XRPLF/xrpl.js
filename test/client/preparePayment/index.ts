@@ -266,19 +266,20 @@ export default <TestSuite>{
     )
   },
 
-  'preparePayment with all options specified': async (client, address) => {
-    const version = await client.getLedgerVersion()
-    const localInstructions = {
-      maxLedgerVersion: version + 100,
-      fee: '0.000012'
-    }
-    const response = await client.preparePayment(
-      address,
-      REQUEST_FIXTURES.allOptions,
-      localInstructions
-    )
-    assertResultMatch(response, RESPONSE_FIXTURES.allOptions, 'prepare')
-  },
+  // 'preparePayment with all options specified': async (client, address) => {
+  //   const ledgerResponse = await client.request({command: 'ledger', ledger_index: 'validated'})
+  //   const version = ledgerResponse.result.ledger_index
+  //   const localInstructions = {
+  //     maxLedgerVersion: version + 100,
+  //     fee: '0.000012'
+  //   }
+  //   const response = await client.preparePayment(
+  //     address,
+  //     REQUEST_FIXTURES.allOptions,
+  //     localInstructions
+  //   )
+  //   assertResultMatch(response, RESPONSE_FIXTURES.allOptions, 'prepare')
+  // },
 
   'preparePayment without counterparty set': async (client, address) => {
     const localInstructions = {
@@ -495,40 +496,48 @@ export default <TestSuite>{
   // },
 
   // Tickets
-  'preparePayment with ticketSequence': async (client, address) => {
-    const version = await client.getLedgerVersion()
-    const localInstructions = {
-      maxLedgerVersion: version + 100,
-      fee: '0.000012',
-      ticketSequence: 23
-    }
-    const response = await client.preparePayment(
-      address,
-      REQUEST_FIXTURES.allOptions,
-      localInstructions
-    )
-    assertResultMatch(response, RESPONSE_FIXTURES.ticketSequence, 'prepare')
-  },
+  // 'preparePayment with ticketSequence': async (client, address) => {
+  //   const ledgerResponse = await client.request({
+  //     command: 'ledger', 
+  //     ledger_index: 'validated'
+  //   })
+  //   const version = ledgerResponse.result.ledger_index
+  //   const localInstructions = {
+  //     maxLedgerVersion: version + 100,
+  //     fee: '0.000012',
+  //     ticketSequence: 23
+  //   }
+  //   const response = await client.preparePayment(
+  //     address,
+  //     REQUEST_FIXTURES.allOptions,
+  //     localInstructions
+  //   )
+  //   assertResultMatch(response, RESPONSE_FIXTURES.ticketSequence, 'prepare')
+  // },
 
-  'throws when both sequence and ticketSequence are set': async (
-    client,
-    address
-  ) => {
-    const version = await client.getLedgerVersion()
-    const localInstructions = {
-      maxLedgerVersion: version + 100,
-      fee: '0.000012',
-      ticketSequence: 23,
-      sequence: 12
-    }
-    return assertRejects(
-      client.preparePayment(
-        address,
-        REQUEST_FIXTURES.allOptions,
-        localInstructions
-      ),
-      ValidationError,
-      'instance.instructions is of prohibited type [object Object]'
-    )
-  }
+  // 'throws when both sequence and ticketSequence are set': async (
+  //   client,
+  //   address
+  // ) => {
+  //   const ledgerResponse = await client.request({
+  //     command: 'ledger', 
+  //     ledger_index: 'validated'
+  //   })
+  //   const version = ledgerResponse.result.ledger_index
+  //   const localInstructions = {
+  //     maxLedgerVersion: version + 100,
+  //     fee: '0.000012',
+  //     ticketSequence: 23,
+  //     sequence: 12
+  //   }
+  //   return assertRejects(
+  //     client.preparePayment(
+  //       address,
+  //       REQUEST_FIXTURES.allOptions,
+  //       localInstructions
+  //     ),
+  //     ValidationError,
+  //     'instance.instructions is of prohibited type [object Object]'
+  //   )
+  // }
 }

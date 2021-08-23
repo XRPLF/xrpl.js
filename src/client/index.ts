@@ -6,9 +6,6 @@ import {
   txFlags,
 } from '../common'
 import { Connection, ConnectionUserOptions } from './connection'
-import {
-  formatLedgerClose
-} from './utils'
 import getTrustlines from '../ledger/trustlines'
 import getBalances from '../ledger/balances'
 import getPaths from '../ledger/pathfind'
@@ -85,8 +82,6 @@ import {
   // payment channel methods
   ChannelVerifyRequest,
   ChannelVerifyResponse,
-  // Subscribe methods/streams
-  LedgerStream,
   // server info methods
   FeeRequest,
   FeeResponse,
@@ -202,10 +197,6 @@ class Client extends EventEmitter {
     this._maxFeeXRP = options.maxFeeXRP || '2'
 
     this.connection = new Connection(server, options)
-
-    this.connection.on('ledgerClosed', (message: LedgerStream) => {
-      this.emit('ledger', formatLedgerClose(message))
-    })
 
     this.connection.on('error', (errorCode, errorMessage, data) => {
       this.emit('error', errorCode, errorMessage, data)
@@ -392,10 +383,6 @@ class Client extends EventEmitter {
   }
 
   getFee = getFee
-
-  async getLedgerVersion(): Promise<number> {
-    return this.connection.getLedgerVersion()
-  }
 
   getTrustlines = getTrustlines
   getBalances = getBalances

@@ -2,10 +2,8 @@ import assert from 'assert-diff'
 import _ from 'lodash'
 import {Client} from 'xrpl-local'
 import {RecursiveData} from 'xrpl-local/ledger/utils'
-import {assertRejects, assertResultMatch} from './utils'
+import {assertRejects} from './utils'
 import addresses from './fixtures/addresses.json'
-import responses from './fixtures/responses'
-import ledgerClosed from './fixtures/rippled/ledger-close-newer.json'
 import setupClient from './setup-client'
 import {toRippledAmount} from '../src'
 
@@ -43,14 +41,6 @@ describe('Client', function () {
   it('Client connect() times out after 2 seconds', function () {
     // TODO: Use a timer mock like https://jestjs.io/docs/en/timer-mocks
     //       to test that connect() times out after 2 seconds.
-  })
-
-  it('ledger closed event', function (done) {
-    this.client.on('ledger', (message) => {
-      assertResultMatch(message, responses.ledgerEvent, 'ledgerEvent')
-      done()
-    })
-    this.client.connection._ws.emit('message', JSON.stringify(ledgerClosed))
   })
 
   describe('[private] schema-validator', function () {
