@@ -125,18 +125,6 @@ export function createMockRippled(port) {
     mock.expectedRequests[this.event] -= 1
   })
 
-  mock.on('request_config', function (request, conn) {
-    assert.strictEqual(request.command, 'config')
-    conn.config = Object.assign(conn.config, request.data)
-    conn.send(
-      createResponse(request, {
-        status: 'success',
-        type: 'response',
-        result: {}
-      })
-    )
-  })
-
   mock.on('request_test_command', function (request, conn) {
     assert.strictEqual(request.command, 'test_command')
     if (request.data.disconnectIn) {

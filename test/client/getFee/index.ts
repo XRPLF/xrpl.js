@@ -56,11 +56,6 @@ export default <TestSuite>{
 
   'getFee reporting': async (client, address, mockRippled) => {
     addRippledResponse(mockRippled, 'server_info', rippled.server_info.normal)
-    client.connection.request({
-      // @ts-ignore TODO: resolve
-      command: 'config',
-      data: {reporting: true}
-    })
     const fee = await client.getFee()
     assert.strictEqual(fee, '0.000012')
   }
