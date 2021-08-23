@@ -2,7 +2,7 @@ import {RippledError, ValidationError} from 'xrpl-local/common/errors'
 // import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
 import {assertRejects, assertResultMatch, TestSuite} from '../../utils'
-import {xrpToDrops, isoTimeToRippleTime} from '../../../src/utils'
+import {xrpToDrops, ISOTimeToRippleTime} from '../../../src/utils'
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
 export const config = {
@@ -1119,7 +1119,7 @@ export default <TestSuite>{
         PublicKey:
           '32D2471DB72B27E3310F355BB33E339BF26F8392D5A93D3BC0FC3B566612DA0F0A'
         // If cancelAfter is used, you must use RippleTime.
-        // You can use `isoTimeToRippleTime()` to convert to RippleTime.
+        // You can use `ISOTimeToRippleTime()` to convert to RippleTime.
 
         // Other fields are available (but not used in this test),
         // including `sourceTag` and `destinationTag`.
@@ -1142,7 +1142,7 @@ export default <TestSuite>{
       SettleDelay: 86400,
       // Ensure this is in upper case if it is not already
       PublicKey: '32D2471DB72B27E3310F355BB33E339BF26F8392D5A93D3BC0FC3B566612DA0F0A'.toUpperCase(),
-      CancelAfter: isoTimeToRippleTime('2017-02-17T15:04:57Z'),
+      CancelAfter: ISOTimeToRippleTime('2017-02-17T15:04:57Z'),
       SourceTag: 11747,
       DestinationTag: 23480
     }
@@ -1182,7 +1182,7 @@ export default <TestSuite>{
       Channel:
         'C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198',
       Amount: xrpToDrops('1'), // or '1000000'
-      Expiration: isoTimeToRippleTime('2017-02-17T15:04:57Z')
+      Expiration: ISOTimeToRippleTime('2017-02-17T15:04:57Z')
     }
 
     const response = await client.prepareTransaction(txJSON)

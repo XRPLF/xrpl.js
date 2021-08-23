@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { isoTimeToRippleTime } from '.'
+import { ISOTimeToRippleTime } from '.'
 import { ValidationError } from '../common/errors'
 import {
   computeLedgerHash,
@@ -10,14 +10,14 @@ import {
 function convertLedgerHeader(header): any {
   return {
     account_hash: header.stateHash,
-    close_time: isoTimeToRippleTime(header.closeTime),
+    close_time: ISOTimeToRippleTime(header.closeTime),
     close_time_resolution: header.closeTimeResolution,
     close_flags: header.closeFlags,
     hash: header.ledgerHash,
     ledger_hash: header.ledgerHash,
     ledger_index: header.ledgerVersion.toString(),
     parent_hash: header.parentLedgerHash,
-    parent_close_time: isoTimeToRippleTime(header.parentCloseTime),
+    parent_close_time: ISOTimeToRippleTime(header.parentCloseTime),
     total_coins: header.totalDrops,
     transaction_hash: header.transactionHash
   }
