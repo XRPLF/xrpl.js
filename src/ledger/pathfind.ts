@@ -110,7 +110,7 @@ function isRippledIOUAmount(amount: RippledAmount) {
 }
 
 function conditionallyAddDirectXRPPath(
-  connection: Connection,
+  client: Client,
   address: string,
   paths: RippledPathsResponse
 ): Promise<RippledPathsResponse> {
@@ -120,7 +120,7 @@ function conditionallyAddDirectXRPPath(
   ) {
     return Promise.resolve(paths)
   }
-  return getXRPBalance(connection, address, undefined).then((xrpBalance) =>
+  return getXRPBalance(client, address, undefined).then((xrpBalance) =>
     addDirectXrpPath(paths, xrpBalance)
   )
 }
@@ -195,7 +195,7 @@ function getPaths(this: Client, pathfind: PathFind): Promise<GetPaths> {
   const address = pathfind.source.address
   return requestPathFind(this.connection, pathfind)
     .then((paths) =>
-      conditionallyAddDirectXRPPath(this.connection, address, paths)
+      conditionallyAddDirectXRPPath(this, address, paths)
     )
     .then((paths) => filterSourceFundsLowPaths(pathfind, paths))
     .then((paths) => formatResponse(pathfind, paths))
