@@ -169,7 +169,11 @@ type MarkerResponse = AccountChannelsResponse
                     | LedgerDataResponse
 
 class Client extends EventEmitter {
+  // Factor to multiply estimated fee by to provide a cushion in case the
+  // required fee rises during submission of a transaction. Defaults to 1.
   _feeCushion: number
+  // Maximum fee to use with transactions, in XRP. Must be a string-encoded
+  // number. Defaults to '2'.
   _maxFeeXRP: string
 
   // New in > 0.21.0
