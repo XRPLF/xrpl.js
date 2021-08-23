@@ -1,6 +1,5 @@
 import * as utils from './utils'
 import {validate, ensureClassicAddress} from '../common'
-import {Connection} from '../client'
 import {GetTrustlinesOptions} from './trustlines'
 import {FormattedTrustline} from '../common/types/objects/trustlines'
 import {Client} from '..'
@@ -40,13 +39,13 @@ function formatBalances(options: GetTrustlinesOptions, balances: {xrp: string, t
 }
 
 function getLedgerVersionHelper(
-  connection: Connection,
+  client: Client,
   optionValue?: number
 ): Promise<number> {
   if (optionValue != null && optionValue !== null) {
     return Promise.resolve(optionValue)
   }
-  return connection.request({
+  return client.request({
     command: 'ledger', 
     ledger_index: 'validated'
   }).then(response => response.result.ledger_index);
@@ -68,7 +67,7 @@ function getBalances(
 
   return Promise.all([
     getLedgerVersionHelper(
-      this.connection,
+      this,
       options.ledgerVersion
     ).then((ledgerVersion) =>
       utils.getXRPBalance(this, address, ledgerVersion)
