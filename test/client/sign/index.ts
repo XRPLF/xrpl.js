@@ -5,7 +5,6 @@ import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
 import rippled from '../../fixtures/rippled'
 import {TestSuite} from '../../utils'
-import { addRippledResponse } from '../../mock-rippled'
 
 const {schemaValidator} = Client._PRIVATE
 const {sign: REQUEST_FIXTURES} = requests
@@ -60,7 +59,7 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const payment = {
       source: {
@@ -168,7 +167,7 @@ export default <TestSuite>{
   },
 
   'succeeds - prepared payment': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const payment = await client.preparePayment(address, {
       source: {
         address: address,
@@ -244,7 +243,7 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const payment = await client.preparePayment(address, {
       source: {
         address: address,
@@ -272,7 +271,7 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const order = {
       direction: 'sell',
       quantity: {

@@ -1,7 +1,6 @@
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
 import rippled from '../../fixtures/rippled'
-import { addRippledResponse } from '../../mock-rippled'
 import {assertRejects, assertResultMatch, TestSuite} from '../../utils'
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
@@ -19,7 +18,7 @@ export const config = {
  */
 export default <TestSuite>{
   'prepareEscrowCreation': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -33,7 +32,7 @@ export default <TestSuite>{
   },
 
   'prepareEscrowCreation full': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const result = await client.prepareEscrowCreation(
       address,
       requests.prepareEscrowCreation.full
@@ -42,7 +41,7 @@ export default <TestSuite>{
   },
 
   'prepareEscrowCreation - invalid': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const escrow = Object.assign({}, requests.prepareEscrowCreation.full)
     delete escrow.amount // Make invalid
     await assertRejects(
@@ -53,7 +52,7 @@ export default <TestSuite>{
   },
 
   'with ticket': async (client, address, mockRippled) => {
-    addRippledResponse(mockRippled, {command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000396',
