@@ -26,6 +26,7 @@ export interface GenerateAddressOptions {
   includeClassicAddress?: boolean
 }
 
+// TODO: move this function to be a static function of the Wallet class (Along with its helper data types)
 function generateXAddress(options: GenerateAddressOptions = {}): GeneratedAddress {
   validate.generateAddress({options})
   try {
