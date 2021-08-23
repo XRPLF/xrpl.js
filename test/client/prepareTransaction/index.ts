@@ -854,38 +854,42 @@ export default <TestSuite>{
     )
   },
 
-  'with all options specified': async (client, address) => {
-    const ver = await client.getLedgerVersion()
-    const localInstructions = {
-      maxLedgerVersion: ver + 100,
-      fee: '0.000012'
-    }
-    const txJSON = {
-      TransactionType: 'Payment',
-      Account: address,
-      Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
-      Amount: '10000',
-      InvoiceID:
-        'A98FD36C17BE2B8511AD36DC335478E7E89F06262949F36EB88E2D683BBCC50A',
-      SourceTag: 14,
-      DestinationTag: 58,
-      Memos: [
-        {
-          Memo: {
-            MemoType: client.convertStringToHex('test'),
-            MemoFormat: client.convertStringToHex('text/plain'),
-            MemoData: client.convertStringToHex('texted data')
-          }
-        }
-      ],
-      Flags:
-        0 |
-        client.txFlags.Payment.NoRippleDirect |
-        client.txFlags.Payment.LimitQuality
-    }
-    const response = await client.prepareTransaction(txJSON, localInstructions)
-    assertResultMatch(response, responses.preparePayment.allOptions, 'prepare')
-  },
+  // 'with all options specified': async (client, address) => {
+  //   const ledgerResponse = await client.request({
+  //     command: 'ledger', 
+  //     ledger_index: 'validated'
+  //   })
+  //   const version = ledgerResponse.result.ledger_index
+  //   const localInstructions = {
+  //     maxLedgerVersion: version + 100,
+  //     fee: '0.000012'
+  //   }
+  //   const txJSON = {
+  //     TransactionType: 'Payment',
+  //     Account: address,
+  //     Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+  //     Amount: '10000',
+  //     InvoiceID:
+  //       'A98FD36C17BE2B8511AD36DC335478E7E89F06262949F36EB88E2D683BBCC50A',
+  //     SourceTag: 14,
+  //     DestinationTag: 58,
+  //     Memos: [
+  //       {
+  //         Memo: {
+  //           MemoType: client.convertStringToHex('test'),
+  //           MemoFormat: client.convertStringToHex('text/plain'),
+  //           MemoData: client.convertStringToHex('texted data')
+  //         }
+  //       }
+  //     ],
+  //     Flags:
+  //       0 |
+  //       client.txFlags.Payment.NoRippleDirect |
+  //       client.txFlags.Payment.LimitQuality
+  //   }
+  //   const response = await client.prepareTransaction(txJSON, localInstructions)
+  //   assertResultMatch(response, responses.preparePayment.allOptions, 'prepare')
+  // },
 
   'fee is capped at default maxFee of 2 XRP (using txJSON.LastLedgerSequence)': async (
     client,

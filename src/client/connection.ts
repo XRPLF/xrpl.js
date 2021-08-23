@@ -2,7 +2,6 @@ import * as _ from 'lodash'
 import {EventEmitter} from 'events'
 import {parse as parseURL} from 'url'
 import WebSocket from 'ws'
-import RangeSet from './rangeset'
 import {
   RippledError,
   DisconnectedError,
@@ -10,11 +9,10 @@ import {
   TimeoutError,
   ResponseFormatError,
   ConnectionError,
-  RippledNotInitializedError,
   RippleError
 } from '../common/errors'
 import {ExponentialBackoff} from './backoff'
-import { LedgerStream, Request, Response } from '../models/methods'
+import { Request, Response } from '../models/methods'
 
 /**
  * ConnectionOptions is the configuration for the Connection class.
@@ -113,56 +111,6 @@ function websocketSendAsync(ws: WebSocket, message: string) {
       }
     })
   })
-}
-
-/**
- * LedgerHistory is used to store and reference ledger information that has been
- * captured by the Connection class over time.
- */
-class LedgerHistory {
-  feeBase: null | number = null
-  feeRef: null | number = null
-  latestVersion: null | number = null
-  reserveBase: null | number = null
-  private availableVersions = new RangeSet()
-
-  /**
-   * Returns true if the given version exists.
-   */
-  hasVersion(version: number): boolean {
-    return this.availableVersions.containsValue(version)
-  }
-
-  /**
-   * Returns true if the given range of versions exist (inclusive).
-   */
-  hasVersions(lowVersion: number, highVersion: number): boolean {
-    return this.availableVersions.containsRange(lowVersion, highVersion)
-  }
-
-  /**
-   * Update LedgerHistory with a new ledger response object. The "responseData"
-   * format lets you pass in any valid rippled ledger response data, regardless
-   * of whether ledger history data exists or not. If relevant ledger data
-   * is found, we'll update our history (ex: from a "ledgerClosed" event).
-   */
-  update(ledgerMessage: LedgerStream) {
-    // type: ignored
-    this.feeBase = ledgerMessage.fee_base
-    this.feeRef = ledgerMessage.fee_ref
-    // ledger_hash: ignored
-    this.latestVersion = ledgerMessage.ledger_index
-    // ledger_time: ignored
-    this.reserveBase = ledgerMessage.reserve_base
-    // reserve_inc: ignored (may be useful for advanced use cases)
-    // txn_count: ignored
-    if (ledgerMessage.validated_ledgers) {
-      this.availableVersions.reset()
-      this.availableVersions.parseAndAddRanges(ledgerMessage.validated_ledgers)
-    } else {
-      this.availableVersions.addValue(this.latestVersion)
-    }
-  }
 }
 
 /**
@@ -300,7 +248,6 @@ export class Connection extends EventEmitter {
 
   private _trace: (id: string, message: string) => void = () => {}
   private _config: ConnectionOptions
-  private _ledger: LedgerHistory = new LedgerHistory()
   private _requestManager = new RequestManager()
   private _connectionManager = new ConnectionManager()
 
@@ -335,9 +282,6 @@ export class Connection extends EventEmitter {
     }
     if (data.type) {
       this.emit(data.type, data)
-    }
-    if (data.type === 'ledgerClosed') {
-      this._ledger.update(data)
     }
     if (data.type === 'response') {
       try {
@@ -378,42 +322,6 @@ export class Connection extends EventEmitter {
         this.emit('error', 'reconnect', error.message, error)
       })
     })
-  }
-
-  /**
-   * Wait for a valid connection before resolving. Useful for deferring methods
-   * until a connection has been established.
-   */
-  private _waitForReady(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      if (!this._shouldBeConnected) {
-        reject(new NotConnectedError())
-      } else if (this._state === WebSocket.OPEN) {
-        resolve()
-      } else {
-        this.once('connected', () => resolve())
-      }
-    })
-  }
-
-  private async _subscribeToLedger() {
-    const data = await this.request({
-      command: 'subscribe',
-      streams: ['ledger']
-    })
-    // If rippled instance doesn't have validated ledgers, disconnect and then reject.
-    if (_.isEmpty(data) || !data.result.ledger_index) {
-      try {
-        await this.disconnect()
-      } catch (error) {
-        // Ignore this error, propagate the root cause.
-      } finally {
-        // Throw the root error (takes precedence over try/catch).
-        // eslint-disable-next-line no-unsafe-finally
-        throw new RippledNotInitializedError('Rippled not initialized')
-      }
-    }
-    this._ledger.update(data.result)
   }
 
   private _onConnectionFailed = (errorOrCode: Error | number | null) => {
@@ -518,7 +426,6 @@ export class Connection extends EventEmitter {
       // Finalize the connection and resolve all awaiting connect() requests
       try {
         this._retryConnectionBackoff.reset()
-        await this._subscribeToLedger()
         this._startHeartbeatInterval()
         this._connectionManager.resolveAllAwaiting()
         this.emit('connected')
@@ -564,51 +471,6 @@ export class Connection extends EventEmitter {
     this.emit('reconnect')
     await this.disconnect()
     await this.connect()
-  }
-
-  async getFeeBase(): Promise<number> {
-    await this._waitForReady()
-    return this._ledger.feeBase!
-  }
-
-  async getFeeRef(): Promise<number> {
-    await this._waitForReady()
-    return this._ledger.feeRef!
-  }
-
-  async getLedgerVersion(): Promise<number> {
-    await this._waitForReady()
-    return this._ledger.latestVersion!
-  }
-
-  async getReserveBase(): Promise<number> {
-    await this._waitForReady()
-    return this._ledger.reserveBase!
-  }
-
-  /**
-   * Returns true if the given range of ledger versions exist in history
-   * (inclusive).
-   */
-  async hasLedgerVersions(
-    lowLedgerVersion: number,
-    highLedgerVersion: number | undefined
-  ): Promise<boolean> {
-    // You can call hasVersions with a potentially unknown upper limit, which
-    // will just act as a check on the lower limit.
-    if (!highLedgerVersion) {
-      return this.hasLedgerVersion(lowLedgerVersion)
-    }
-    await this._waitForReady()
-    return this._ledger.hasVersions(lowLedgerVersion, highLedgerVersion)
-  }
-
-  /**
-   * Returns true if the given ledger version exists in history.
-   */
-  async hasLedgerVersion(ledgerVersion: number): Promise<boolean> {
-    await this._waitForReady()
-    return this._ledger.hasVersion(ledgerVersion)
   }
 
   async request<T extends Request, U extends Response>(request: T, timeout?: number): Promise<U> {

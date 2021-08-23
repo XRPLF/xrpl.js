@@ -46,7 +46,10 @@ function getLedgerVersionHelper(
   if (optionValue != null && optionValue !== null) {
     return Promise.resolve(optionValue)
   }
-  return connection.getLedgerVersion()
+  return connection.request({
+    command: 'ledger', 
+    ledger_index: 'validated'
+  }).then(response => response.result.ledger_index);
 }
 
 function getBalances(
@@ -68,7 +71,7 @@ function getBalances(
       this.connection,
       options.ledgerVersion
     ).then((ledgerVersion) =>
-      utils.getXRPBalance(this.connection, address, ledgerVersion)
+      utils.getXRPBalance(this, address, ledgerVersion)
     ),
     this.getTrustlines(address, options)
   ]).then((results) =>
