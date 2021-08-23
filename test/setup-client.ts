@@ -21,7 +21,7 @@ function setupMockRippledConnectionForBroadcast(testcase, ports) {
     testcase.client = new BroadcastClient(servers)
     testcase.client
       .connect()
-      .then(() => resolve())
+      .then(resolve)
       .catch(reject)
   })
 }
