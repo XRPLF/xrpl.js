@@ -2,7 +2,6 @@ import {EventEmitter} from 'events'
 import {
   constants,
   errors,
-  validate,
   txFlags,
 } from '../common'
 import { Connection, ConnectionUserOptions } from './connection'
@@ -98,8 +97,6 @@ import {
   RandomResponse
 } from '../models/methods'
 
-import RangeSet from './rangeset'
-import * as ledgerUtils from '../ledger/utils'
 import * as transactionUtils from '../transaction/utils'
 import * as schemaValidator from '../common/schema-validator'
 import {getFee} from '../common/fee'
@@ -178,14 +175,6 @@ class Client extends EventEmitter {
   // New in > 0.21.0
   // non-validated ledger versions are allowed, and passed to rippled as-is.
   connection: Connection
-
-  // these are exposed only for use by unit tests; they are not part of the client.
-  static _PRIVATE = {
-    validate,
-    RangeSet,
-    ledgerUtils,
-    schemaValidator
-  }
 
   constructor(server: string, options: ClientOptions = {}) {
     super()

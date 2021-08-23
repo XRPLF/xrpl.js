@@ -6,8 +6,14 @@ import {assertRejects} from './testUtils'
 import addresses from './fixtures/addresses.json'
 import setupClient from './setupClient'
 import {toRippledAmount} from '../src'
+import * as schemaValidator from 'xrpl-local/common/schema-validator'
+import {validate} from 'xrpl-local/common'
+import {
+  renameCounterpartyToIssuerInOrder,
+  compareTransactions,
+  getRecursive
+} from 'xrpl-local/ledger/utils'
 
-const {validate, schemaValidator, ledgerUtils} = Client._PRIVATE
 const address = addresses.ACCOUNT
 assert.options.strict = true
 
@@ -141,23 +147,23 @@ describe('Client', function () {
       taker_pays: {issuer: '1', currency: 'XRP'}
     }
     assert.deepEqual(
-      ledgerUtils.renameCounterpartyToIssuerInOrder(order),
+      renameCounterpartyToIssuerInOrder(order),
       expected
     )
   })
 
   it('ledger utils - compareTransactions', async () => {
     // @ts-ignore
-    assert.strictEqual(ledgerUtils.compareTransactions({}, {}), 0)
+    assert.strictEqual(compareTransactions({}, {}), 0)
     let first: any = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
     let second: any = {outcome: {ledgerVersion: 1, indexInLedger: 200}}
-    assert.strictEqual(ledgerUtils.compareTransactions(first, second), -1)
+    assert.strictEqual(compareTransactions(first, second), -1)
     first = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
     second = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
-    assert.strictEqual(ledgerUtils.compareTransactions(first, second), 0)
+    assert.strictEqual(compareTransactions(first, second), 0)
     first = {outcome: {ledgerVersion: 1, indexInLedger: 200}}
     second = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
-    assert.strictEqual(ledgerUtils.compareTransactions(first, second), 1)
+    assert.strictEqual(compareTransactions(first, second), 1)
   })
 
   it('ledger utils - getRecursive', async () => {
@@ -170,6 +176,6 @@ describe('Client', function () {
         resolve({marker: 'A', results: [1]})
       })
     }
-    await assertRejects(ledgerUtils.getRecursive(getter, 10), Error)
+    await assertRejects(getRecursive(getter, 10), Error)
   })
 })
