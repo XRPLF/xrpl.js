@@ -33,33 +33,14 @@ export function isFlagEnabled(Flags: number, checkFlag: number): boolean {
  * @throws {ValidationError} if the Transaction is unsigned
  */
 
+// TODO: Investigate 0x53545800 if single-signing, or 0x534D5400 if multisigning - https://xrpl.org/serialization.html#blob-fields 
+// Could be a bug in the xrpl-py method!
+
 export function toHash(tx: Transaction): string {
     if(tx.TxnSignature === undefined) {
         throw new ValidationError("The transaction must be signed to hash it.")
     }
-    const _TRANSACTION_HASH_PREFIX = 0x54584E00
-    //prefix = hex(_TRANSACTION_HASH_PREFIX)[2:].upper()
-    //encoded_str = bytes.fromhex(prefix + encode(self.to_xrpl()))
-    const prefix = _TRANSACTION_HASH_PREFIX//[2:1].upper()
-    const encodedStr = prefix + encode(tx) //TODO: Maybe Buffer.fromHex?
+    const _TRANSACTION_HASH_PREFIX = "54584E00"
+    const encodedStr = _TRANSACTION_HASH_PREFIX.concat(encode(tx))
     return sha512Half(encodedStr)
-
 }
-/*
-    def get_hash(self: Transaction) -> str:
-        """
-        Hashes the Transaction object as the ledger does. Only valid for signed
-        Transaction objects.
-        Returns:
-            The hash of the Transaction object.
-        Raises:
-            XRPLModelException: if the Transaction is unsigned.
-        """
-        if self.txn_signature is None:
-            raise XRPLModelException(
-                "Cannot get the hash from an unsigned Transaction."
-            )
-        prefix = hex(_TRANSACTION_HASH_PREFIX)[2:].upper()
-        encoded_str = bytes.fromhex(prefix + encode(self.to_xrpl()))
-        return sha512(encoded_str).digest().hex().upper()[:64]
-*/
