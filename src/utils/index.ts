@@ -1,7 +1,7 @@
 import { deriveKeypair, deriveAddress, deriveXAddress } from './derive'
 import computeLedgerHeaderHash from './ledgerHash'
 import signPaymentChannelClaim from './signPaymentChannelClaim'
-import verifyPaymentChannelClaim from './verify-payment-channel-claim'
+import verifyPaymentChannelClaim from './verifyPaymentChannelClaim'
 import {
     computeBinaryTransactionHash,
     computeTransactionHash,
