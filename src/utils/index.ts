@@ -18,7 +18,7 @@ import {
 } from '../common/hashes'
 import { generateXAddress } from './generate-address'
 
-import * as _ from 'lodash'
+import _ from 'lodash'
 import BigNumber from 'bignumber.js'
 import {RippledAmount} from '../common/types/objects'
 import {ValidationError} from '../common/errors'
