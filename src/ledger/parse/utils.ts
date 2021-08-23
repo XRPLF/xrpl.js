@@ -4,7 +4,7 @@ import parseAmount from './amount'
 
 import {Amount, Memo} from '../../common/types/objects'
 import {txFlags} from '../../common'
-import {removeUndefined, dropsToXrp, rippleTimeToISO8601} from '../../utils'
+import {removeUndefined, dropsToXrp, rippleTimeToISOTime} from '../../utils'
 
 type OfferDescription = {
   direction: string,
@@ -55,7 +55,7 @@ function parseTimestamp(rippleTime?: number | null): string | undefined {
   if (typeof rippleTime !== 'number') {
     return undefined
   }
-  return rippleTimeToISO8601(rippleTime)
+  return rippleTimeToISOTime(rippleTime)
 }
 
 function removeEmptyCounterparty(amount) {

@@ -1,6 +1,6 @@
 import * as utils from './utils'
 import {validate} from '../common'
-import {iso8601ToRippleTime, xrpToDrops} from '../utils'
+import {isoTimeToRippleTime, xrpToDrops} from '../utils'
 import {Instructions, Prepare, TransactionJSON} from './types'
 import {Client} from '..'
 
@@ -22,7 +22,7 @@ function createPaymentChannelFundTransaction(
   }
 
   if (fund.expiration != null) {
-    txJSON.Expiration = iso8601ToRippleTime(fund.expiration)
+    txJSON.Expiration = isoTimeToRippleTime(fund.expiration)
   }
 
   return txJSON

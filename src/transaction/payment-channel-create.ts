@@ -1,6 +1,6 @@
 import * as utils from './utils'
 import {validate} from '../common'
-import {iso8601ToRippleTime, xrpToDrops} from '../utils'
+import {isoTimeToRippleTime, xrpToDrops} from '../utils'
 import {Instructions, Prepare, TransactionJSON} from './types'
 import {Client} from '..'
 
@@ -28,7 +28,7 @@ function createPaymentChannelCreateTransaction(
   }
 
   if (paymentChannel.cancelAfter != null) {
-    txJSON.CancelAfter = iso8601ToRippleTime(paymentChannel.cancelAfter)
+    txJSON.CancelAfter = isoTimeToRippleTime(paymentChannel.cancelAfter)
   }
   if (paymentChannel.sourceTag != null) {
     txJSON.SourceTag = paymentChannel.sourceTag

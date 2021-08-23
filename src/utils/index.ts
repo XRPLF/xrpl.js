@@ -195,7 +195,11 @@ function unixToRippleTimestamp(timestamp: number): number {
   return Math.round(timestamp / 1000) - 0x386d4380
 }
 
-function rippleTimeToISO8601(rippleTime: number): string {
+/**
+ * @param {number} rippleTime is the number of seconds since ripple epoch (1/1/2000 GMT)
+ * @return {string} iso8601 international standard date format
+ */
+function rippleTimeToISOTime(rippleTime: number): string {
   return new Date(rippleToUnixTimestamp(rippleTime)).toISOString()
 }
 
@@ -203,7 +207,7 @@ function rippleTimeToISO8601(rippleTime: number): string {
  * @param {string} iso8601 international standard date format
  * @return {number} seconds since ripple epoch (1/1/2000 GMT)
  */
-function iso8601ToRippleTime(iso8601: string): number {
+function isoTimeToRippleTime(iso8601: string): number {
   return unixToRippleTimestamp(Date.parse(iso8601))
 }
 
@@ -214,8 +218,8 @@ export {
     toRippledAmount,
     convertKeysFromSnakeCaseToCamelCase,
     removeUndefined,
-    rippleTimeToISO8601,
-    iso8601ToRippleTime,
+    rippleTimeToISOTime,
+    isoTimeToRippleTime,
     isValidSecret,
     computeBinaryTransactionHash,
     computeTransactionHash,
