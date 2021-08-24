@@ -15,6 +15,7 @@ const {preparePaymentChannelClaim: RESPONSE_FIXTURES} = responses
 export default <TestSuite>{
   'default': async (client, address, mockRippled) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -29,6 +30,7 @@ export default <TestSuite>{
 
   'with renew': async (client, address, mockRippled) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -43,6 +45,7 @@ export default <TestSuite>{
 
   'with close': async (client, address, mockRippled) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -57,6 +60,7 @@ export default <TestSuite>{
 
   'with ticket': async (client, address, mockRippled) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
@@ -76,6 +80,7 @@ export default <TestSuite>{
     mockRippled
   ) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
     try {
       const prepared = await client.preparePaymentChannelClaim(
         address,
@@ -100,6 +105,7 @@ export default <TestSuite>{
     mockRippled
   ) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
     try {
       const prepared = await client.preparePaymentChannelClaim(
         address,

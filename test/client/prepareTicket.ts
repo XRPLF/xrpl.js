@@ -25,6 +25,7 @@ export default <TestSuite>{
     mockRippled
   ) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
     const expected = {
       txJSON:
         '{"TransactionType":"TicketCreate", "TicketCount": 2, "Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Flags":2147483648,"LastLedgerSequence":8819954,"Sequence":23,"Fee":"12"}',
@@ -40,6 +41,7 @@ export default <TestSuite>{
 
   'creates a ticket successfully with another ticket': async (client, address, mockRippled) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
     const expected = {
       txJSON:
         '{"TransactionType":"TicketCreate", "TicketCount": 1, "Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Flags":2147483648,"LastLedgerSequence":8819954,"Sequence": 0,"TicketSequence":23,"Fee":"12"}',

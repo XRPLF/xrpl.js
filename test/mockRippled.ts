@@ -201,11 +201,6 @@ export function createMockRippled(port) {
     conn.send(createResponse(request, fixtures.subscribe.success))
   })
 
-  mock.on('request_fee', function (request, conn) {
-    assert.strictEqual(request.command, 'fee')
-    conn.send(createResponse(request, fixtures.fee))
-  })
-
   mock.on('request_unsubscribe', function (request, conn) {
     assert.strictEqual(request.command, 'unsubscribe')
     if (request.accounts) {

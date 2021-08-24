@@ -12,6 +12,7 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 export default <TestSuite>{
   'prepareEscrowCancellation': async (client, address, mockRippled) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
     const result = await client.prepareEscrowCancellation(
       address,
       requests.prepareEscrowCancellation.normal,
@@ -26,6 +27,7 @@ export default <TestSuite>{
 
   'prepareEscrowCancellation with memos': async (client, address, mockRippled) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
     const result = await client.prepareEscrowCancellation(
       address,
       requests.prepareEscrowCancellation.memos
@@ -39,6 +41,7 @@ export default <TestSuite>{
 
   'with ticket': async (client, address, mockRippled) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
