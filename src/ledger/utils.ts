@@ -1,11 +1,11 @@
 import * as _ from 'lodash'
 import * as assert from 'assert'
 import * as common from '../common'
-import {Connection} from '../client'
 import {FormattedTransactionType} from '../transaction/types'
 import {Issue} from '../common/types/objects'
 import {Client} from '..'
 import { AccountInfoRequest } from '../models/methods'
+import { Connection } from '../client'
 
 export type RecursiveData = {
   marker: string
@@ -137,5 +137,5 @@ export {
   isPendingLedgerVersion,
   clamp,
   common,
-  Connection
+  // Connection
 }

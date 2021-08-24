@@ -8,7 +8,6 @@ import {
   xrpToDrops,
   dropsToXrp
 } from '../common'
-import {Connection} from '../client'
 import parsePathfind from './parse/pathfind'
 import {RippledAmount, Amount} from '../common/types/objects'
 import {
@@ -36,7 +35,7 @@ function addParams(
 }
 
 function requestPathFind(
-  connection: Connection,
+  client: Client,
   pathfind: PathFind
 ): Promise<RippledPathsResponse> {
   const destinationAmount: Amount = Object.assign(
@@ -83,7 +82,7 @@ function requestPathFind(
     }
   }
   // @ts-ignore
-  return connection.request(request).then((paths) => addParams(request, paths))
+  return client.request(request).then((paths) => addParams(request, paths))
 }
 
 function addDirectXrpPath(
@@ -193,7 +192,7 @@ function getPaths(this: Client, pathfind: PathFind): Promise<GetPaths> {
   validate.getPaths({pathfind})
 
   const address = pathfind.source.address
-  return requestPathFind(this.connection, pathfind)
+  return requestPathFind(this, pathfind)
     .then((paths) =>
       conditionallyAddDirectXRPPath(this, address, paths)
     )
