@@ -3,7 +3,7 @@ import {computeLedgerHeaderHash} from '../../../src'
 import {ValidationError} from '../../../src/common/errors'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
-import {assertResultMatch} from '../../utils'
+import {assertResultMatch} from '../../testUtils'
 const {computeLedgerHash: REQUEST_FIXTURES} = requests
 
 function getNewLedger() {

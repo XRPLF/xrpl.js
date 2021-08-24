@@ -2,7 +2,7 @@ import _ from 'lodash'
 import assert from 'assert-diff'
 import setupClient from './setup-client'
 import responses from './fixtures/responses'
-import {ignoreWebSocketDisconnect} from './utils'
+import {ignoreWebSocketDisconnect} from './testUtils'
 
 const TIMEOUT = 20000
 

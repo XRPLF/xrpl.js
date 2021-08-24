@@ -1,4 +1,4 @@
-import {assertResultMatch, TestSuite} from '../../utils'
+import {assertResultMatch, TestSuite} from '../../testUtils'
 // import responses from '../../fixtures/responses'
 // import requests from '../../fixtures/requests'
 // import {ValidationError} from 'xrpl-local/common/errors'

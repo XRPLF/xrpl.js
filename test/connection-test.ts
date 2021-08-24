@@ -3,7 +3,7 @@ import net from 'net'
 import assert from 'assert-diff'
 import setupClient from './setup-client'
 import {Client} from 'xrpl-local'
-import {ignoreWebSocketDisconnect} from './utils'
+import {ignoreWebSocketDisconnect} from './testUtils'
 const utils = Client._PRIVATE.ledgerUtils
 
 const TIMEOUT = 200000 // how long before each test case times out

@@ -3,7 +3,7 @@
 // import {Client} from 'xrpl-local'
 // import requests from '../../fixtures/requests'
 // import responses from '../../fixtures/responses'
-import {TestSuite} from '../../utils'
+import {TestSuite} from '../../testUtils'
 
 // function checkSortingOfOrders(orders) {
 //   let previousRate = '0'

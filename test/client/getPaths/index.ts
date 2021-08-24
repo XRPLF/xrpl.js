@@ -1,5 +1,5 @@
 import assert from 'assert-diff'
-import { assertRejects, TestSuite } from '../../utils'
+import { assertRejects, TestSuite } from '../../testUtils'
 import requests from '../../fixtures/requests'
 // import responses from '../../fixtures/responses'
 import addresses from '../../fixtures/addresses.json'
