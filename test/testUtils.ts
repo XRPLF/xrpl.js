@@ -12,7 +12,8 @@ import assert from 'assert-diff'
  */
 export type TestFn = (
   client: Client,
-  address: string
+  address: string,
+  mockRippled?: any
 ) => void | PromiseLike<void>
 
 /**

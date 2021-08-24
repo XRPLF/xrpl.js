@@ -1,8 +1,9 @@
-import {RippledError, ValidationError} from 'xrpl-local/common/errors'
+import {ValidationError} from 'xrpl-local/common/errors'
 // import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
-import {assertRejects, assertResultMatch, TestSuite} from '../../testUtils'
 import {xrpToDrops, ISOTimeToRippleTime} from '../../../src/utils'
+import rippled from '../../fixtures/rippled'
+import {assertRejects, assertResultMatch, TestSuite} from '../../testUtils'
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
 export const config = {
@@ -20,8 +21,10 @@ export const config = {
 export default <TestSuite>{
   'auto-fillable fields - does not overwrite Fee in txJSON': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = instructionsWithMaxLedgerVersionOffset
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -41,7 +44,8 @@ export default <TestSuite>{
     return assertResultMatch(response, expected, 'prepare')
   },
 
-  'does not overwrite Fee in Instructions': async (client, address) => {
+  'does not overwrite Fee in Instructions': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       fee: '0.000014' // CAUTION: This `fee` is specified in XRP, not drops.
@@ -65,8 +69,10 @@ export default <TestSuite>{
 
   'rejects Promise if both are set, even when txJSON.Fee matches instructions.fee': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       fee: '0.000016'
@@ -86,8 +92,10 @@ export default <TestSuite>{
 
   'rejects Promise if both are set, when txJSON.Fee does not match instructions.fee': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       fee: '0.000018'
@@ -107,8 +115,10 @@ export default <TestSuite>{
 
   'rejects Promise when the Fee is capitalized in Instructions': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       Fee: '0.000022' // Intentionally capitalized in this test, but the correct field would be `fee`
@@ -127,8 +137,10 @@ export default <TestSuite>{
 
   'rejects Promise when the fee is specified in txJSON': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = instructionsWithMaxLedgerVersionOffset
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -143,7 +155,8 @@ export default <TestSuite>{
     )
   },
 
-  'does not overwrite Sequence in txJSON': async (client, address) => {
+  'does not overwrite Sequence in txJSON': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -166,7 +179,8 @@ export default <TestSuite>{
     return assertResultMatch(response, expected, 'prepare')
   },
 
-  'does not overwrite Sequence in Instructions': async (client, address) => {
+  'does not overwrite Sequence in Instructions': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
@@ -191,8 +205,10 @@ export default <TestSuite>{
 
   'does not overwrite Sequence when same sequence is provided in both txJSON and Instructions': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
@@ -218,8 +234,10 @@ export default <TestSuite>{
 
   'rejects Promise when Sequence in txJSON does not match sequence in Instructions': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
@@ -240,8 +258,10 @@ export default <TestSuite>{
 
   'rejects Promise when the Sequence is capitalized in Instructions': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
@@ -261,7 +281,8 @@ export default <TestSuite>{
 
   // LastLedgerSequence aka maxLedgerVersion/maxLedgerVersionOffset:
 
-  'does not overwrite LastLedgerSequence in txJSON': async (client, address) => {
+  'does not overwrite LastLedgerSequence in txJSON': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {}
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -284,8 +305,10 @@ export default <TestSuite>{
 
   'does not overwrite maxLedgerVersion in Instructions': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       maxLedgerVersion: 8890000
     }
@@ -308,8 +331,10 @@ export default <TestSuite>{
 
   'does not overwrite maxLedgerVersionOffset in Instructions': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxLedgerVersionOffset: 124
@@ -333,8 +358,10 @@ export default <TestSuite>{
 
   'rejects Promise if txJSON.LastLedgerSequence and instructions.maxLedgerVersion both are set': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       maxLedgerVersion: 8900000
     }
@@ -354,8 +381,10 @@ export default <TestSuite>{
 
   'rejects Promise if txJSON.LastLedgerSequence and instructions.maxLedgerVersionOffset both are set': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxLedgerVersionOffset: 123
@@ -376,8 +405,10 @@ export default <TestSuite>{
 
   'rejects Promise if instructions.maxLedgerVersion and instructions.maxLedgerVersionOffset both are set': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxLedgerVersion: 8900000,
@@ -398,8 +429,10 @@ export default <TestSuite>{
 
   'rejects Promise if txJSON.LastLedgerSequence and instructions.maxLedgerVersion and instructions.maxLedgerVersionOffset all are set': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxLedgerVersion: 8900000,
@@ -421,8 +454,10 @@ export default <TestSuite>{
 
   'rejects Promise when the maxLedgerVersion is capitalized in Instructions': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       MaxLedgerVersion: 8900000 // Intentionally capitalized in this test, but the correct field would be `maxLedgerVersion`
@@ -441,8 +476,10 @@ export default <TestSuite>{
 
   'rejects Promise when the maxLedgerVersion is specified in txJSON': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = instructionsWithMaxLedgerVersionOffset
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -459,8 +496,10 @@ export default <TestSuite>{
 
   'rejects Promise when the maxLedgerVersionOffset is specified in txJSON': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = instructionsWithMaxLedgerVersionOffset
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -477,8 +516,10 @@ export default <TestSuite>{
 
   'rejects Promise when the sequence is specified in txJSON': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = instructionsWithMaxLedgerVersionOffset
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -499,8 +540,10 @@ export default <TestSuite>{
 
   'rejects Promise when an unrecognized field is in Instructions': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
@@ -518,7 +561,8 @@ export default <TestSuite>{
     )
   },
 
-  'rejects Promise when Account is missing': async (client, address) => {
+  'rejects Promise when Account is missing': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -535,7 +579,8 @@ export default <TestSuite>{
     )
   },
 
-  'rejects Promise when Account is not a string': async (client, address) => {
+  'rejects Promise when Account is not a string': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -553,7 +598,8 @@ export default <TestSuite>{
     )
   },
 
-  'rejects Promise when Account is invalid': async (client, address) => {
+  'rejects Promise when Account is invalid': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -570,26 +616,27 @@ export default <TestSuite>{
     )
   },
 
-  'rejects Promise when Account is valid but non-existent on the ledger': async (
-    client
-  ) => {
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
-    }
-    const txJSON = {
-      Account: 'rogvkYnY8SWjxkJNgU4ZRVfLeRyt5DR9i',
-      TransactionType: 'DepositPreauth',
-      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
-    }
-    await assertRejects(
-      client.prepareTransaction(txJSON, localInstructions),
-      RippledError,
-      'Account not found.'
-    )
-  },
+  // 'rejects Promise when Account is valid but non-existent on the ledger': async (
+  //   client
+  // ) => {
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxFee: '0.000012'
+  //   }
+  //   const txJSON = {
+  //     Account: 'rogvkYnY8SWjxkJNgU4ZRVfLeRyt5DR9i',
+  //     TransactionType: 'DepositPreauth',
+  //     Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+  //   }
+  //   await assertRejects(
+  //     client.prepareTransaction(txJSON, localInstructions),
+  //     RippledError,
+  //     'Account not found.'
+  //   )
+  // },
 
-  'rejects Promise when TransactionType is missing': async (client, address) => {
+  'rejects Promise when TransactionType is missing': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -611,7 +658,8 @@ export default <TestSuite>{
   //   Error: DepositPreXXXX is not a valid name or ordinal for TransactionType
   //
   // at Function.from (ripple-binary-codec/distrib/npm/enums/index.js:43:15)
-  'prepares tx when TransactionType is invalid': async (client, address) => {
+  'prepares tx when TransactionType is invalid': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -635,8 +683,10 @@ export default <TestSuite>{
 
   'rejects Promise when TransactionType is not a string': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -674,7 +724,8 @@ export default <TestSuite>{
   //     '304402201F0EF6A2DE7F96966F7082294D14F3EC1EF59C21E29443E5858A0120079357A302203CDB7FEBDEAAD93FF39CB589B55778CB80DC3979F96F27E828D5E659BEB26B7A',
   //    hash:
   //     'C181D470684311658852713DA81F8201062535C8DE2FF853F7DD9981BB85312F' } })]
-  'prepares tx when a required field is missing': async (client, address) => {
+  'prepares tx when a required field is missing': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -696,7 +747,8 @@ export default <TestSuite>{
     return assertResultMatch(response, expected, 'prepare')
   },
 
-  'DepositPreauth - Authorize': async (client, address) => {
+  'DepositPreauth - Authorize': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -721,7 +773,8 @@ export default <TestSuite>{
     return assertResultMatch(response, expected, 'prepare')
   },
 
-  'DepositPreauth - Unauthorize': async (client, address) => {
+  'DepositPreauth - Unauthorize': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -748,7 +801,8 @@ export default <TestSuite>{
     return assertResultMatch(response, expected, 'prepare')
   },
 
-  'AccountDelete': async (client, address) => {
+  'AccountDelete': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '5.0' // 5 XRP fee for AccountDelete
@@ -776,7 +830,8 @@ export default <TestSuite>{
   },
 
   // prepareTransaction - Payment
-  'Payment - normal': async (client, address) => {
+  'Payment - normal': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -803,7 +858,8 @@ export default <TestSuite>{
     assertResultMatch(response, responses.preparePayment.normal, 'prepare')
   },
 
-  'min amount xrp': async (client, address) => {
+  'min amount xrp': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -835,7 +891,8 @@ export default <TestSuite>{
     )
   },
 
-  'min amount xrp2xrp': async (client, address) => {
+  'min amount xrp2xrp': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const txJSON = {
       TransactionType: 'Payment',
       Account: address,
@@ -894,8 +951,10 @@ export default <TestSuite>{
 
   'fee is capped at default maxFee of 2 XRP (using txJSON.LastLedgerSequence)': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     client._feeCushion = 1000000
 
     const txJSON = {
@@ -931,8 +990,10 @@ export default <TestSuite>{
 
   'fee is capped at default maxFee of 2 XRP (using instructions.maxLedgerVersion)': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     client._feeCushion = 1000000
 
     const txJSON = {
@@ -973,8 +1034,10 @@ export default <TestSuite>{
   // prepareTransaction - Payment
   'fee is capped to custom maxFeeXRP when maxFee exceeds maxFeeXRP': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     client._feeCushion = 1000000
     client._maxFeeXRP = '3'
     const localInstructions = {
@@ -1014,7 +1077,8 @@ export default <TestSuite>{
   },
 
   // prepareTransaction - Payment
-  'fee is capped to maxFee': async (client, address) => {
+  'fee is capped to maxFee': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     client._feeCushion = 1000000
     client._maxFeeXRP = '5'
     const localInstructions = {
@@ -1081,7 +1145,8 @@ export default <TestSuite>{
   // },
 
 
-  'xaddress-issuer': async (client, address) => {
+  'xaddress-issuer': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -1108,7 +1173,8 @@ export default <TestSuite>{
     assertResultMatch(response, responses.preparePayment.normal, 'prepare')
   },
 
-  'PaymentChannelCreate': async (client, address) => {
+  'PaymentChannelCreate': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -1137,7 +1203,8 @@ export default <TestSuite>{
     )
   },
 
-  'PaymentChannelCreate full': async (client, address) => {
+  'PaymentChannelCreate full': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const txJSON = {
       Account: address,
       TransactionType: 'PaymentChannelCreate',
@@ -1159,7 +1226,8 @@ export default <TestSuite>{
     )
   },
 
-  'PaymentChannelFund': async (client, address) => {
+  'PaymentChannelFund': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -1179,7 +1247,8 @@ export default <TestSuite>{
     )
   },
 
-  'PaymentChannelFund full': async (client, address) => {
+  'PaymentChannelFund full': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const txJSON = {
       Account: address,
       TransactionType: 'PaymentChannelFund',
@@ -1197,7 +1266,8 @@ export default <TestSuite>{
     )
   },
 
-  'PaymentChannelClaim': async (client, address) => {
+  'PaymentChannelClaim': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -1219,7 +1289,8 @@ export default <TestSuite>{
     )
   },
 
-  'PaymentChannelClaim with renew': async (client, address) => {
+  'PaymentChannelClaim with renew': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -1248,7 +1319,8 @@ export default <TestSuite>{
     )
   },
 
-  'PaymentChannelClaim with close': async (client, address) => {
+  'PaymentChannelClaim with close': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -1279,8 +1351,10 @@ export default <TestSuite>{
 
   'rejects Promise if both sequence and ticketSecuence are set': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ticketSequence: 23,
       sequence: 23
@@ -1298,7 +1372,8 @@ export default <TestSuite>{
     )
   },
 
-  'sets sequence to 0 if a ticketSequence is passed': async (client, address) => {
+  'sets sequence to 0 if a ticketSequence is passed': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
@@ -1328,8 +1403,10 @@ export default <TestSuite>{
 
   'rejects Promise if a sequence with value 0 is passed': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',

@@ -158,9 +158,9 @@ describe('Connection', function () {
   })
 
   it('DisconnectedError', async function () {
-    await this.client.connection.request({
-      command: 'config',
-      data: {disconnectOnServerInfo: true}
+    this.mockRippled.on(`request_server_info`, function (request, conn) {
+      assert.strictEqual(request.command, 'server_info')
+      conn.close()
     })
     return this.client
       .request({command: "server_info"})
@@ -571,5 +571,14 @@ describe('Connection', function () {
       command: 'test_command',
       data: {disconnectIn: 5}
     })
+  })
+
+  it('should not crash on error', async function (done) {
+    this.mockRippled.suppressOutput = true
+    this.client.connection.request({
+      command: 'test_garbage'
+    })
+    .then(() => new Error('Should not have succeeded'))
+    .catch(done())
   })
 })
