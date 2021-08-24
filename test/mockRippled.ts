@@ -188,29 +188,6 @@ export function createMockRippled(port) {
     )
   })
 
-  mock.on('request_subscribe', function (request, conn) {
-    assert.strictEqual(request.command, 'subscribe')
-    if (request && request.streams === 'validations') {
-      conn.send(createResponse(request, fixtures.subscribe.error))
-    } else if (mock.config.returnEmptySubscribeRequest) {
-      mock.config.returnEmptySubscribeRequest--
-      conn.send(createResponse(request, fixtures.empty))
-    } else if (request.accounts) {
-      assert(Object.values(addresses).indexOf(request.accounts[0]) !== -1)
-    }
-    conn.send(createResponse(request, fixtures.subscribe.success))
-  })
-
-  mock.on('request_unsubscribe', function (request, conn) {
-    assert.strictEqual(request.command, 'unsubscribe')
-    if (request.accounts) {
-      assert(Object.values(addresses).indexOf(request.accounts[0]) !== -1)
-    } else {
-      assert.deepEqual(request.streams, ['ledger', 'server'])
-    }
-    conn.send(createResponse(request, fixtures.unsubscribe))
-  })
-
   // TODO: remove this and move fixtures closer when the prepare functions are gone
   mock.on('request_account_info', function (request, conn) {
     assert.strictEqual(request.command, 'account_info')
