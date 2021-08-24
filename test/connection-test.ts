@@ -572,4 +572,13 @@ describe('Connection', function () {
       data: {disconnectIn: 5}
     })
   })
+
+  it('should not crash on error', async function (done) {
+    this.mockRippled.suppressOutput = true
+    this.client.connection.request({
+      command: 'test_garbage'
+    })
+    .then(() => new Error('Should not have succeeded'))
+    .catch(done())
+  })
 })

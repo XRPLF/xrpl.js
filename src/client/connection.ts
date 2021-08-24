@@ -401,10 +401,10 @@ export class Connection extends EventEmitter {
         this.emit('error', 'websocket', error.message, error)
       )
       // Handle a closed connection: reconnect if it was unexpected
-      this._ws.once('close', (code) => {
+      this._ws.once('close', (code, reason) => {
         this._clearHeartbeatInterval()
         this._requestManager.rejectAll(
-          new DisconnectedError('websocket was closed')
+          new DisconnectedError(`websocket was closed, ${reason}`)
         )
         this._ws.removeAllListeners()
         this._ws = null

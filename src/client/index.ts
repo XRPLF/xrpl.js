@@ -232,7 +232,7 @@ class Client extends EventEmitter {
       // 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
       // Since 4000 is a normal disconnect reason, we convert this to the standard exit code 1000
       if (finalCode === 4000) {
-        finalCode = 1000 
+        finalCode = 1000
       }
       this.emit('disconnected', finalCode)
     })
