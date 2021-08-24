@@ -1,6 +1,6 @@
 import {assertResultMatch} from '../../utils'
 import {channel, amount} from '../../fixtures/requests/sign-payment-channel-claim.json'
-import signedPaymentChannelClaim from '../../fixtures/responses/sign-payment-channel-claim.json'
+import responses from '../../fixtures/responses'
 import signPaymentChannelClaim from '../../../src/utils/signPaymentChannelClaim'
 
 describe('signPaymentChannelClaim', function () {
@@ -14,7 +14,7 @@ describe('signPaymentChannelClaim', function () {
     )
     assertResultMatch(
       result,
-      signedPaymentChannelClaim,
+      responses.signPaymentChannelClaim,
       'signPaymentChannelClaim'
     )
   })
