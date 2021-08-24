@@ -1,19 +1,10 @@
 import _ from 'lodash'
-import fs from 'fs'
 import assert from 'assert'
 import {Server as WebSocketServer} from 'ws'
 import {EventEmitter2} from 'eventemitter2'
-import fixtures from './fixtures/rippled'
 import {getFreePort} from './testUtils'
 import { Request } from '../src'
 
-function isUSD(json) {
-  return json === 'USD' || json === '0000000000000000000000005553440000000000'
-}
-
-function isBTC(json) {
-  return json === 'BTC' || json === '0000000000000000000000004254430000000000'
-}
 
 function createResponse(request, response, overrides = {}) {
   const result = Object.assign({}, response.result, overrides)
@@ -185,58 +176,6 @@ export function createMockRippled(port) {
         })
       )
     }, 1000 * 2)
-  })
-
-  let requestsCache = undefined
-
-  mock.on('request_book_offers', function (request, conn) {
-    if (request.taker_pays.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
-      conn.send(createResponse(request, fixtures.book_offers.xrp_usd))
-    } else if (
-      request.taker_gets.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw'
-    ) {
-      conn.send(createResponse(request, fixtures.book_offers.usd_xrp))
-    } else if (
-      isBTC(request.taker_gets.currency) &&
-      isUSD(request.taker_pays.currency)
-    ) {
-      conn.send(
-        fixtures.book_offers.fabric.requestBookOffersBidsResponse(request)
-      )
-    } else if (
-      isUSD(request.taker_gets.currency) &&
-      isBTC(request.taker_pays.currency)
-    ) {
-      conn.send(
-        fixtures.book_offers.fabric.requestBookOffersAsksResponse(request)
-      )
-    } else {
-      const rippledDir = 'test/fixtures/rippled'
-      if (!requestsCache) {
-        requestsCache = fs.readdirSync(rippledDir + '/requests')
-      }
-      for (var i = 0; i < requestsCache.length; i++) {
-        const file = requestsCache[i]
-        const json = fs.readFileSync(rippledDir + '/requests/' + file, 'utf8')
-        const r = JSON.parse(json)
-        const requestWithoutId = _.omit(Object.assign({}, request), 'id')
-        if (_.isEqual(requestWithoutId, r)) {
-          const responseFile =
-            rippledDir + '/responses/' + file.split('.')[0] + '-res.json'
-          const res = fs.readFileSync(responseFile, 'utf8')
-          const response = createResponse(request, {
-            id: 0,
-            type: 'response',
-            status: 'success',
-            result: JSON.parse(res)
-          })
-          conn.send(response)
-          return
-        }
-      }
-
-      assert(false, 'Unrecognized order book: ' + JSON.stringify(request))
-    }
   })
 
   return mock
