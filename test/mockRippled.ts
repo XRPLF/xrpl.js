@@ -61,9 +61,20 @@ export function createMockRippled(port) {
 
   mock.responses = {}
 
-  mock.addResponse = (request: Request, response: object) => {
+  mock.addResponse = (request: Request, response: object | ((r: Request) => object)) => {
     const command = request.command
     mock.responses[command] = response
+  }
+
+  mock.getResponse = (request: Request) : object => {
+    if (!(request.command in mock.responses)) {
+      throw new Error(`No handler for ${request.command}`)
+    }
+    const functionOrObject = mock.responses[request.command]
+    if (typeof functionOrObject === 'function') {
+      return functionOrObject(request)
+    }
+    return functionOrObject
   }
 
   const close = mock.close
@@ -102,7 +113,7 @@ export function createMockRippled(port) {
       try {
         const request = JSON.parse(requestJSON)
         if (request.command in mock.responses) {
-          conn.send(createResponse(request, mock.responses[request.command]))
+          conn.send(createResponse(request, mock.getResponse(request)))
         } else {
           // TODO: remove this block once all the handlers have been removed
           mock.emit('request_' + request.command, request, conn)
@@ -234,15 +245,6 @@ export function createMockRippled(port) {
       conn.send(createLedgerResponse(request, fixtures.ledger.normal))
     } else {
       assert(false, 'Unrecognized ledger request: ' + JSON.stringify(request))
-    }
-  })
-
-  mock.on('request_ledger_data', function (request, conn) {
-    assert.strictEqual(request.command, 'ledger_data')
-    if (request.marker) {
-      conn.send(createResponse(request, fixtures.ledger_data.last_page))
-    } else {
-      conn.send(createResponse(request, fixtures.ledger_data.first_page))
     }
   })
 
