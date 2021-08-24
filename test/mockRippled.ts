@@ -4,7 +4,6 @@ import assert from 'assert'
 import {Server as WebSocketServer} from 'ws'
 import {EventEmitter2} from 'eventemitter2'
 import fixtures from './fixtures/rippled'
-import addresses from './fixtures/addresses.json'
 import fullLedger from './fixtures/rippled/ledgerFull38129.json'
 import {getFreePort} from './testUtils'
 import { Request } from '../src'
@@ -304,94 +303,6 @@ export function createMockRippled(port) {
 
       assert(false, 'Unrecognized order book: ' + JSON.stringify(request))
     }
-  })
-
-  mock.on('request_ripple_path_find', function (request, conn) {
-    let response = null
-    if (request.subcommand === 'close') {
-      // for path_find command
-      return
-    }
-    if (request.source_account === 'rB2NTuTTS3eNCsWxZYzJ4wqRqxNLZqA9Vx') {
-      // getPaths - result path has source_amount in drops
-      response = createResponse(request, {
-        id: 0,
-        type: 'response',
-        status: 'success',
-        result: {
-          alternatives: [
-            {
-              destination_amount: {
-                currency: 'EUR',
-                issuer: 'rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u',
-                value: '1'
-              },
-              paths_canonical: [],
-              paths_computed: [
-                [
-                  {
-                    currency: 'USD',
-                    issuer: 'rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u',
-                    type: 48,
-                    type_hex: '0000000000000030'
-                  },
-                  {
-                    currency: 'EUR',
-                    issuer: 'rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u',
-                    type: 48,
-                    type_hex: '0000000000000030'
-                  }
-                ]
-              ],
-              source_amount: '1000000'
-            }
-          ],
-          destination_account: 'rhpJkBfZGQyT1xeDbwtKEuSrSXw3QZSAy5',
-          destination_amount: {
-            currency: 'EUR',
-            issuer: 'rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u',
-            value: '-1'
-          },
-          destination_currencies: ['EUR', 'XRP'],
-          full_reply: true,
-          id: 2,
-          source_account: 'rB2NTuTTS3eNCsWxZYzJ4wqRqxNLZqA9Vx',
-          status: 'success'
-        }
-      })
-    } else if (request.source_account === addresses.NOTFOUND) {
-      response = createResponse(request, fixtures.path_find.srcActNotFound)
-    } else if (request.source_account === addresses.SOURCE_LOW_FUNDS) {
-      response = createResponse(request, fixtures.path_find.sourceAmountLow)
-    } else if (request.source_account === addresses.OTHER_ACCOUNT) {
-      response = createResponse(request, fixtures.path_find.sendUSD)
-    } else if (request.source_account === addresses.THIRD_ACCOUNT) {
-      response = createResponse(request, fixtures.path_find.XrpToXrp, {
-        destination_amount: request.destination_amount,
-        destination_address: request.destination_address
-      })
-    } else if (request.source_account === addresses.ACCOUNT) {
-      if (
-        request.destination_account === 'ra5nK24KXen9AHvsdFTKHSANinZseWnPcX' &&
-        // Important: Ensure that destination_amount.value is correct
-        request.destination_amount.value === '-1'
-      ) {
-        response = createResponse(request, fixtures.path_find.sendAll)
-      } else {
-        response = fixtures.path_find.generate.generateIOUPaymentPaths(
-          request.id,
-          request.source_account,
-          request.destination_account,
-          request.destination_amount
-        )
-      }
-    } else {
-      assert(
-        false,
-        'Unrecognized path find request: ' + JSON.stringify(request)
-      )
-    }
-    conn.send(response)
   })
 
   return mock
