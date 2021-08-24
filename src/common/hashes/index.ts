@@ -5,8 +5,8 @@ import HashPrefix from './hash-prefix'
 import {SHAMap, NodeType} from './shamap'
 import {encode} from 'ripple-binary-codec'
 import ledgerspaces from './ledgerspaces'
-import { Transaction } from '../../models/transactions'
-import { ValidationError } from '../errors'
+import {Transaction} from '../../models/transactions'
+import {ValidationError} from '../errors'
 
 const padLeftZero = (string: string, length: number): string => {
   return Array(length - string.length + 1).join('0') + string
