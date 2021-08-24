@@ -1,5 +1,6 @@
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
+import rippled from '../../fixtures/rippled'
 import {assertResultMatch, TestSuite} from '../../utils'
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
@@ -9,7 +10,8 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'prepareCheckCreate': async (client, address) => {
+  'prepareCheckCreate': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -22,7 +24,8 @@ export default <TestSuite>{
     assertResultMatch(result, responses.prepareCheckCreate.normal, 'prepare')
   },
 
-  'prepareCheckCreate full': async (client, address) => {
+  'prepareCheckCreate full': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const result = await client.prepareCheckCreate(
       address,
       requests.prepareCheckCreate.full
@@ -30,7 +33,8 @@ export default <TestSuite>{
     assertResultMatch(result, responses.prepareCheckCreate.full, 'prepare')
   },
 
-  'prepareCheckCreate with ticket': async (client, address) => {
+  'prepareCheckCreate with ticket': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',

@@ -1,5 +1,6 @@
 import {assertResultMatch, TestSuite} from '../../utils'
 // import responses from '../../fixtures/responses'
+import rippled from '../../fixtures/rippled'
 // import requests from '../../fixtures/requests'
 // import {ValidationError} from 'xrpl-local/common/errors'
 // import binary from 'ripple-binary-codec'
@@ -20,8 +21,10 @@ import {assertResultMatch, TestSuite} from '../../utils'
 export default <TestSuite>{
   'creates a ticket successfully with a sequence number': async (
     client,
-    address
+    address,
+    mockRippled
   ) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const expected = {
       txJSON:
         '{"TransactionType":"TicketCreate", "TicketCount": 2, "Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Flags":2147483648,"LastLedgerSequence":8819954,"Sequence":23,"Fee":"12"}',
@@ -35,7 +38,8 @@ export default <TestSuite>{
     assertResultMatch(response, expected, 'prepare')
   },
 
-  'creates a ticket successfully with another ticket': async (client, address) => {
+  'creates a ticket successfully with another ticket': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const expected = {
       txJSON:
         '{"TransactionType":"TicketCreate", "TicketCount": 1, "Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Flags":2147483648,"LastLedgerSequence":8819954,"Sequence": 0,"TicketSequence":23,"Fee":"12"}',

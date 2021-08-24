@@ -1,5 +1,6 @@
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
+import rippled from '../../fixtures/rippled'
 import {assertResultMatch, TestSuite} from '../../utils'
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
@@ -16,7 +17,8 @@ export const config = {
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'preparePaymentChannelCreate': async (client, address) => {
+  'preparePaymentChannelCreate': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -33,7 +35,8 @@ export default <TestSuite>{
     )
   },
 
-  'preparePaymentChannelCreate full': async (client, address) => {
+  'preparePaymentChannelCreate full': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const result = await client.preparePaymentChannelCreate(
       address,
       requests.preparePaymentChannelCreate.full
@@ -45,7 +48,8 @@ export default <TestSuite>{
     )
   },
 
-  'preparePaymentChannelCreate with ticket': async (client, address) => {
+  'preparePaymentChannelCreate with ticket': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
