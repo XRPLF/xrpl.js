@@ -2,7 +2,7 @@ import _ from 'lodash'
 import * as utils from './utils'
 import keypairs from 'ripple-keypairs'
 import binaryCodec from 'ripple-binary-codec'
-import {computeBinaryTransactionHash} from '../common/hashes'
+import {computeSignedTransactionHash} from '../common/hashes'
 import {SignOptions, KeyPair, TransactionJSON} from './types'
 import BigNumber from 'bignumber.js'
 import {xrpToDrops} from '../common'
@@ -65,7 +65,7 @@ function signWithKeypair(
   checkTxSerialization(serialized, tx)
   return {
     signedTransaction: serialized,
-    id: computeBinaryTransactionHash(serialized)
+    id: computeSignedTransactionHash(serialized)
   }
 }
 

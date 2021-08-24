@@ -62,21 +62,9 @@ const addLengthPrefix = (hex: string): string => {
 }
 
 /**
- * Hashes the Transaction blob as the ledger does. Only valid for signed Transaction blobs.
- * 
- * @param {Transaction} tx A blob of a signed Transaction to hash.
- * @returns {string} The hash of tx
- */
-
-export const computeBinaryTransactionHash = (txBlobHex: string): string => {
-  const prefix = HashPrefix.TRANSACTION_ID.toString(16).toUpperCase()
-  return sha512Half(prefix.concat(txBlobHex))
-}
-
-/**
  * Hashes the Transaction object as the ledger does. Throws if the transaction is unsigned.
  * 
- * @param {Transaction} tx A transaction to hash. Tx must be signed.
+ * @param {Transaction | string} tx A transaction to hash. Tx may be in binary blob form. Tx must be signed.
  * @returns {string} A hash of tx
  * @throws {ValidationError} if the Transaction is unsigned
  */
@@ -92,7 +80,8 @@ export const computeSignedTransactionHash = (tx: Transaction | string): string =
     txObject = tx
   }
 
-  if(txObject.TxnSignature === undefined) {
+  if(txObject.TxnSignature === undefined 
+    && (txObject.Signers === undefined || txObject.Signers[0].Signer.TxnSignature === undefined)) {
     throw new ValidationError("The transaction must be signed to hash it.")
   }
     
@@ -195,7 +184,7 @@ export const computeTransactionTreeHash = (transactions: any[]): string => {
   transactions.forEach((txJSON) => {
     const txBlobHex = encode(txJSON)
     const metaHex = encode(txJSON.metaData)
-    const txHash = computeBinaryTransactionHash(txBlobHex)
+    const txHash = computeSignedTransactionHash(txBlobHex)
     const data = addLengthPrefix(txBlobHex) + addLengthPrefix(metaHex)
     shamap.addItem(txHash, data, NodeType.TRANSACTION_METADATA)
   })
