@@ -188,11 +188,6 @@ export function createMockRippled(port) {
     )
   })
 
-  mock.on('request_echo', function (request, conn) {
-    assert.strictEqual(request.command, 'echo')
-    conn.send(JSON.stringify(request.data))
-  })
-
   mock.on('request_subscribe', function (request, conn) {
     assert.strictEqual(request.command, 'subscribe')
     if (request && request.streams === 'validations') {

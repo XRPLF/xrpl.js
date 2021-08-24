@@ -36,6 +36,10 @@ describe('BroadcastClient', function () {
   })
 
   it('error propagation', function (done) {
+    const data = {error: 'type', error_message: 'info'}
+    this.mocks.forEach((mock) => {
+      mock.addResponse({command: 'echo'}, data)
+    })
     this.client.once('error', (type, info) => {
       assert.strictEqual(type, 'type')
       assert.strictEqual(info, 'info')
@@ -44,7 +48,7 @@ describe('BroadcastClient', function () {
     this.client._clients[1].connection
       .request({
         command: 'echo',
-        data: {error: 'type', error_message: 'info'}
+        data
       })
       .catch(ignoreWebSocketDisconnect)
   })
