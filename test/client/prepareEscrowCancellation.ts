@@ -14,6 +14,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const result = await client.prepareEscrowCancellation(
       address,
       requests.prepareEscrowCancellation.normal,
@@ -30,6 +31,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const result = await client.prepareEscrowCancellation(
       address,
       requests.prepareEscrowCancellation.memos
@@ -45,6 +47,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',

@@ -27,6 +27,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = instructionsWithMaxLedgerVersionOffset
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -50,6 +51,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       fee: '0.000014' // CAUTION: This `fee` is specified in XRP, not drops.
@@ -79,6 +81,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       fee: '0.000016'
@@ -104,6 +107,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       fee: '0.000018'
@@ -129,6 +133,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       Fee: '0.000022' // Intentionally capitalized in this test, but the correct field would be `fee`
@@ -153,6 +158,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = instructionsWithMaxLedgerVersionOffset
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -171,6 +177,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -197,6 +204,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
@@ -227,6 +235,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
@@ -258,6 +267,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
@@ -284,6 +294,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
@@ -307,6 +318,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {}
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -335,6 +347,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       maxLedgerVersion: 8890000
     }
@@ -363,6 +376,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxLedgerVersionOffset: 124
@@ -392,6 +406,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       maxLedgerVersion: 8900000
     }
@@ -417,6 +432,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxLedgerVersionOffset: 123
@@ -443,6 +459,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxLedgerVersion: 8900000,
@@ -469,6 +486,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxLedgerVersion: 8900000,
@@ -496,6 +514,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       MaxLedgerVersion: 8900000 // Intentionally capitalized in this test, but the correct field would be `maxLedgerVersion`
@@ -520,6 +539,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = instructionsWithMaxLedgerVersionOffset
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -542,6 +562,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = instructionsWithMaxLedgerVersionOffset
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -564,6 +585,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = instructionsWithMaxLedgerVersionOffset
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -590,6 +612,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
@@ -611,6 +634,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -631,6 +655,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -652,6 +677,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -691,6 +717,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -716,6 +743,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -745,6 +773,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -786,6 +815,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -811,6 +841,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -839,6 +870,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -869,6 +901,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '5.0' // 5 XRP fee for AccountDelete
@@ -900,6 +933,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -930,6 +964,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -965,6 +1000,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const txJSON = {
       TransactionType: 'Payment',
       Account: address,
@@ -1029,6 +1065,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     client._feeCushion = 1000000
 
     const txJSON = {
@@ -1070,6 +1107,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     client._feeCushion = 1000000
 
     const txJSON = {
@@ -1116,6 +1154,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     client._feeCushion = 1000000
     client._maxFeeXRP = '3'
     const localInstructions = {
@@ -1159,6 +1198,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     client._feeCushion = 1000000
     client._maxFeeXRP = '5'
     const localInstructions = {
@@ -1229,6 +1269,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -1259,6 +1300,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -1291,6 +1333,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const txJSON = {
       Account: address,
       TransactionType: 'PaymentChannelCreate',
@@ -1316,6 +1359,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -1339,6 +1383,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const txJSON = {
       Account: address,
       TransactionType: 'PaymentChannelFund',
@@ -1360,6 +1405,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -1385,6 +1431,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -1417,6 +1464,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -1453,6 +1501,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ticketSequence: 23,
       sequence: 23
@@ -1474,6 +1523,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
@@ -1509,6 +1559,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',

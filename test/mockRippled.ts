@@ -198,12 +198,6 @@ export function createMockRippled(port) {
     )
   })
 
-  // TODO: remove this and move fixtures closer when the prepare functions are gone
-  mock.on('request_account_info', function (request, conn) {
-    assert.strictEqual(request.command, 'account_info')
-    conn.send(createResponse(request, fixtures.account_info.normal))
-  })
-
   mock.on('request_ledger', function (request, conn) {
     assert.strictEqual(request.command, 'ledger')
     if (request.ledger_index === 34) {

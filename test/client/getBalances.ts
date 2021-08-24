@@ -1,4 +1,5 @@
 import responses from '../fixtures/responses'
+import rippled from '../fixtures/rippled'
 import {assertResultMatch, TestSuite} from '../testUtils'
 
 /**
@@ -7,19 +8,22 @@ import {assertResultMatch, TestSuite} from '../testUtils'
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'getBalances': async (client, address) => {
+  'getBalances': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const result = await client.getBalances(address)
     assertResultMatch(result, responses.getBalances, 'getBalances')
   },
 
-  'getBalances - limit': async (client, address) => {
+  'getBalances - limit': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const options = {limit: 3, ledgerVersion: 123456}
     const expectedResponse = responses.getBalances.slice(0, 3)
     const result = await client.getBalances(address, options)
     assertResultMatch(result, expectedResponse, 'getBalances')
   },
 
-  'getBalances - limit & currency': async (client, address) => {
+  'getBalances - limit & currency': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const options = {currency: 'USD', limit: 3}
     const expectedResponse = responses.getBalances
       .filter((item) => item.currency === 'USD')
@@ -28,7 +32,8 @@ export default <TestSuite>{
     assertResultMatch(result, expectedResponse, 'getBalances')
   },
 
-  'getBalances - limit & currency & issuer': async (client, address) => {
+  'getBalances - limit & currency & issuer': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const options = {
       currency: 'USD',
       counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',

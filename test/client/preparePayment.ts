@@ -23,6 +23,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -39,6 +40,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -55,6 +57,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const response = await client.preparePayment(
       address,
       REQUEST_FIXTURES.minAmount,
@@ -67,6 +70,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const payment = {
       source: {
         address: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -98,6 +102,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const payment = {
       source: {
         address: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -129,6 +134,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const payment = {
       source: {
         address: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -160,6 +166,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const payment = {
       source: {
         address: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -196,6 +203,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const payment = {
       source: {
         address: address,
@@ -223,6 +231,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     // Marking as "any" to get around the fact that TS won't allow this.
     const payment: any = {
       source: {address: address},
@@ -247,6 +256,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const payment = {
       source: {
         address: address,
@@ -268,6 +278,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     return assertRejects(
       client.preparePayment(address, REQUEST_FIXTURES.wrongPartial),
       ValidationError,
@@ -279,6 +290,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     return assertRejects(
       client.preparePayment(address, REQUEST_FIXTURES.wrongAddress),
       ValidationError,
@@ -290,6 +302,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     return assertRejects(
       client.preparePayment(address, REQUEST_FIXTURES.wrongAmount),
       ValidationError,
@@ -301,6 +314,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       fee: '2.1'
@@ -331,6 +345,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       sequence: 23
@@ -351,6 +366,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     // See also: 'sign succeeds with source.amount/destination.minAmount'
 
     const localInstructions = {
@@ -403,6 +419,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const response = await client.preparePayment(
       address,
       responses.getPaths.sendAll[0],
@@ -415,6 +432,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     client._feeCushion = 1000000
     const expectedResponse = {
       txJSON:
@@ -441,6 +459,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     client._maxFeeXRP = '2.2'
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
@@ -467,6 +486,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     client._feeCushion = 1000000
     const expectedResponse = {
       txJSON:
@@ -493,6 +513,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     client._feeCushion = 1000000
     client._maxFeeXRP = '3'
     const localInstructions = {
@@ -520,6 +541,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     client._feeCushion = 1000000
     client._maxFeeXRP = '5'
     const localInstructions = {
