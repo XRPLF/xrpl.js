@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import {decodeAccountID} from 'ripple-address-codec'
 import sha512Half from './sha512Half'
-import HashPrefix from './hash-prefix'
+import HashPrefix from './hashPrefix'
 import {SHAMap, NodeType} from './shamap'
 import {encode} from 'ripple-binary-codec'
 import ledgerspaces from './ledgerspaces'
