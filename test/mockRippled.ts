@@ -241,28 +241,6 @@ export function createMockRippled(port) {
     }
   })
 
-  mock.on('request_ledger_entry', function (request, conn) {
-    assert.strictEqual(request.command, 'ledger_entry')
-    if (
-      request.index ===
-      'E30E709CF009A1F26E0E5C48F7AA1BFB79393764F15FB108BDC6E06D3CBD8415'
-    ) {
-      conn.send(createResponse(request, fixtures.payment_channel.normal))
-    } else if (
-      request.index ===
-      'D77CD4713AA08195E6B6D0E5BC023DA11B052EBFF0B5B22EDA8AE85345BCF661'
-    ) {
-      conn.send(createResponse(request, fixtures.payment_channel.full))
-    } else if (
-      request.index ===
-      '8EF9CCB9D85458C8D020B3452848BBB42EAFDDDB69A93DD9D1223741A4CA562B'
-    ) {
-      conn.send(createResponse(request, fixtures.escrow))
-    } else {
-      conn.send(createResponse(request, fixtures.ledger_entry.error))
-    }
-  })
-
   mock.on('request_ping', function (request, conn) {
     // NOTE: We give the response a timeout of 2 second, so that tests can
     // set their timeout threshold to greater than or less than this number
