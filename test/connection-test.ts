@@ -158,9 +158,9 @@ describe('Connection', function () {
   })
 
   it('DisconnectedError', async function () {
-    await this.client.connection.request({
-      command: 'config',
-      data: {disconnectOnServerInfo: true}
+    this.mockRippled.on(`request_server_info`, function (request, conn) {
+      assert.strictEqual(request.command, 'server_info')
+      conn.close()
     })
     return this.client
       .request({command: "server_info"})
