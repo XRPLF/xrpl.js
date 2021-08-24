@@ -166,12 +166,12 @@ describe('Wallet', () => {
         const mainnetXAddress = 'X7gJ5YK8abHf2eTPWPFHAAot8Knck11QGqmQ7a6a3Z8PJvk'
         const testnetXAddress = 'T7bq3e7kxYq9pwDz8UZhqAZoEkcRGTXSNr5immvcj3DYRaV'
     
-        it('returns a testnet XAddress when test is true', () => {
+        it('returns a testnet X-address when test is true', () => {
           const result = wallet.getXAddress(tag, true)
           assert.equal(result, testnetXAddress)
         })
     
-        it('returns a mainnet XAddress when test is false', () => {
+        it('returns a mainnet X-address when test is false', () => {
           const result = wallet.getXAddress(tag, false)
           assert.equal(result, mainnetXAddress)
         })

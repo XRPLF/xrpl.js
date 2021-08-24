@@ -110,10 +110,10 @@ class Wallet {
   }
 
   /**
-   * Gets an XAddress in testnet/mainnet format.
+   * Gets an X-address in testnet/mainnet format.
    * @param {number} tag A tag to be included within the XAddress.
    * @param {boolean} test A boolean to indicate if XAddress should be in testnet (true) or mainnet (false) format.
-   * @returns {string} An XAddress
+   * @returns {string} An X-address
    */
   getXAddress(tag: number, test: boolean): string {
     const classicAddress = deriveAddress(this.publicKey)
