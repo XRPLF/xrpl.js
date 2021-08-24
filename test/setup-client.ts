@@ -1,5 +1,4 @@
-import {Client, ClientBroadcast} from 'xrpl-local'
-import ledgerClosed from './fixtures/rippled/ledger-close.json'
+import {Client, BroadcastClient} from 'xrpl-local'
 import {createMockRippled} from './mock-rippled'
 import {getFreePort} from './utils'
 
@@ -7,16 +6,10 @@ function setupMockRippledConnection(testcase, port) {
   return new Promise<void>((resolve, reject) => {
     testcase.mockRippled = createMockRippled(port)
     testcase._mockedServerPort = port
-    testcase.client = new Client({server: 'ws://localhost:' + port})
+    testcase.client = new Client('ws://localhost:' + port)
     testcase.client
       .connect()
-      .then(() => {
-        testcase.client.once('ledger', () => resolve())
-        testcase.client.connection._ws.emit(
-          'message',
-          JSON.stringify(ledgerClosed)
-        )
-      })
+      .then(resolve)
       .catch(reject)
   })
 }
@@ -25,13 +18,10 @@ function setupMockRippledConnectionForBroadcast(testcase, ports) {
   return new Promise<void>((resolve, reject) => {
     const servers = ports.map((port) => 'ws://localhost:' + port)
     testcase.mocks = ports.map((port) => createMockRippled(port))
-    testcase.client = new ClientBroadcast(servers)
+    testcase.client = new BroadcastClient(servers)
     testcase.client
       .connect()
-      .then(() => {
-        testcase.client.once('ledger', () => resolve())
-        testcase.mocks[0].socket.send(JSON.stringify(ledgerClosed))
-      })
+      .then(resolve)
       .catch(reject)
   })
 }

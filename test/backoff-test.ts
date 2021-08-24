@@ -1,5 +1,5 @@
 import assert from 'assert-diff'
-import {ExponentialBackoff} from '../src/common/backoff'
+import {ExponentialBackoff} from '../src/client/backoff'
 
 describe('ExponentialBackoff', function () {
   it('duration() return value starts with the min value', function () {

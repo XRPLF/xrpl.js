@@ -3,7 +3,6 @@ import net from 'net'
 import assert from 'assert-diff'
 import setupClient from './setup-client'
 import {Client} from 'xrpl-local'
-import ledgerClose from './fixtures/rippled/ledger-close.json'
 import {ignoreWebSocketDisconnect} from './utils'
 const utils = Client._PRIVATE.ledgerUtils
 
@@ -29,7 +28,7 @@ describe('Connection', function () {
   afterEach(setupClient.teardown)
 
   it('default options', function () {
-    const connection: any = new utils.common.Connection('url')
+    const connection: any = new utils.Connection('url')
     assert.strictEqual(connection._url, 'url')
     assert(connection._config.proxy == null)
     assert(connection._config.authorization == null)
@@ -52,7 +51,7 @@ describe('Connection', function () {
     it('as false', function () {
       const messages = []
       console.log = (id, message) => messages.push([id, message])
-      const connection: any = new utils.common.Connection('url', {trace: false})
+      const connection: any = new utils.Connection('url', {trace: false})
       connection._ws = {send: function () {}}
       connection.request(mockedRequestData)
       connection._onMessage(mockedResponse)
@@ -62,7 +61,7 @@ describe('Connection', function () {
     it('as true', function () {
       const messages = []
       console.log = (id, message) => messages.push([id, message])
-      const connection: any = new utils.common.Connection('url', {trace: true})
+      const connection: any = new utils.Connection('url', {trace: true})
       connection._ws = {send: function () {}}
       connection.request(mockedRequestData)
       connection._onMessage(mockedResponse)
@@ -71,7 +70,7 @@ describe('Connection', function () {
 
     it('as a function', function () {
       const messages = []
-      const connection: any = new utils.common.Connection('url', {
+      const connection: any = new utils.Connection('url', {
         trace: (id, message) => messages.push([id, message])
       })
       connection._ws = {send: function () {}}
@@ -79,26 +78,6 @@ describe('Connection', function () {
       connection._onMessage(mockedResponse)
       assert.deepEqual(messages, expectedMessages)
     })
-  })
-
-  it('ledger methods work as expected', async function () {
-    assert.strictEqual(await this.client.connection.getLedgerVersion(), 8819951)
-    assert.strictEqual(
-      await this.client.connection.hasLedgerVersion(8819951),
-      true
-    )
-    assert.strictEqual(
-      await this.client.connection.hasLedgerVersions(8819951, undefined),
-      true
-    )
-    // It would be nice to test a better range, but the mocked ledger only supports this single number
-    assert.strictEqual(
-      await this.client.connection.hasLedgerVersions(8819951, 8819951),
-      true
-    )
-    assert.strictEqual(await this.client.connection.getFeeBase(), 10)
-    assert.strictEqual(await this.client.connection.getFeeRef(), 10)
-    assert.strictEqual(await this.client.connection.getReserveBase(), 20000000) // 20 XRP
   })
 
   it('with proxy', function (done) {
@@ -124,7 +103,7 @@ describe('Connection', function () {
         authorization: 'authorization',
         trustedCertificates: ['path/to/pem']
       }
-      const connection = new utils.common.Connection(
+      const connection = new utils.Connection(
         this.client.connection._url,
         options
       )
@@ -144,9 +123,11 @@ describe('Connection', function () {
   })
 
   it('NotConnectedError', function () {
-    const connection = new utils.common.Connection('url')
-    return connection
-      .getLedgerVersion()
+    const connection = new utils.Connection('url')
+    return connection.request({
+        command: 'ledger', 
+        ledger_index: 'validated'
+      })
       .then(() => {
         assert(false, 'Should throw NotConnectedError')
       })
@@ -166,7 +147,7 @@ describe('Connection', function () {
     }
 
     // Address where no one listens
-    const connection = new utils.common.Connection(
+    const connection = new utils.Connection(
       'ws://testripple.circleci.com:129'
     )
     connection.on('error', done)
@@ -177,12 +158,12 @@ describe('Connection', function () {
   })
 
   it('DisconnectedError', async function () {
-    await this.client.connection.request({
-      command: 'config',
-      data: {disconnectOnServerInfo: true}
+    this.mockRippled.on(`request_server_info`, function (request, conn) {
+      assert.strictEqual(request.command, 'server_info')
+      conn.close()
     })
     return this.client
-      .getServerInfo()
+      .request({command: "server_info"})
       .then(() => {
         assert(false, 'Should throw DisconnectedError')
       })
@@ -211,7 +192,7 @@ describe('Connection', function () {
       callback({message: 'not connected'})
     }
     return this.client
-      .getServerInfo()
+      .request({command: "server_info"})
       .then(() => {
         assert(false, 'Should throw DisconnectedError')
       })
@@ -250,7 +231,7 @@ describe('Connection', function () {
 
   it('ResponseFormatError', function () {
     return this.client
-      .request('test_command', {data: {unrecognizedResponse: true}})
+      .request({command: 'test_command', data: {unrecognizedResponse: true}})
       .then(() => {
         assert(false, 'Should throw ResponseFormatError')
       })
@@ -427,14 +408,8 @@ describe('Connection', function () {
     })
   })
 
-  it('hasLedgerVersion', function () {
-    return this.client.connection.hasLedgerVersion(8819951).then((result) => {
-      assert(result)
-    })
-  })
-
   it('Cannot connect because no server', function () {
-    const connection = new utils.common.Connection(undefined as string)
+    const connection = new utils.Connection(undefined as string)
     return connection
       .connect()
       .then(() => {
@@ -530,7 +505,7 @@ describe('Connection', function () {
   })
 
   it('propagates RippledError data', function (done) {
-    this.client.request('subscribe', {streams: 'validations'}).catch((error) => {
+    this.client.request({command: 'subscribe', streams: 'validations'}).catch((error) => {
       assert.strictEqual(error.name, 'RippledError')
       assert.strictEqual(error.data.error, 'invalidParams')
       assert.strictEqual(error.message, 'Invalid parameters.')
@@ -558,59 +533,23 @@ describe('Connection', function () {
     this.client.connection._onMessage(JSON.stringify({type: 'unknown'}))
   })
 
-  it('ledger close without validated_ledgers', function (done) {
-    const message = _.omit(ledgerClose, 'validated_ledgers')
-    this.client.on('ledger', function (ledger) {
-      assert.strictEqual(ledger.ledgerVersion, 8819951)
-      done()
-    })
-    this.client.connection._ws.emit('message', JSON.stringify(message))
-  })
-
-  it(
-    'should throw RippledNotInitializedError if server does not have ' +
-      'validated ledgers',
-    async function () {
-      this.timeout(3000)
-
-      await this.client.connection.request({
-        command: 'global_config',
-        data: {returnEmptySubscribeRequest: 1}
-      })
-
-      const client = new Client({server: this.client.connection._url})
-      return client.connect().then(
-        () => {
-          assert(false, 'Must have thrown!')
-        },
-        (error) => {
-          assert(
-            error instanceof this.client.errors.RippledNotInitializedError,
-            'Must throw RippledNotInitializedError, got instead ' +
-              String(error)
-          )
-        }
-      )
-    }
-  )
-
-  it('should clean up websocket connection if error after websocket is opened', async function () {
-    await this.client.disconnect()
-    // fail on connection
-    this.client.connection._subscribeToLedger = async () => {
-      throw new Error('error on _subscribeToLedger')
-    }
-    try {
-      await this.client.connect()
-      throw new Error('expected connect() to reject, but it resolved')
-    } catch (err) {
-      assert(err.message === 'error on _subscribeToLedger')
-      // _ws.close event listener should have cleaned up the socket when disconnect _ws.close is run on connection error
-      // do not fail on connection anymore
-      this.client.connection._subscribeToLedger = async () => {}
-      await this.client.connection.reconnect()
-    }
-  })
+  // it('should clean up websocket connection if error after websocket is opened', async function () {
+  //   await this.client.disconnect()
+  //   // fail on connection
+  //   this.client.connection._subscribeToLedger = async () => {
+  //     throw new Error('error on _subscribeToLedger')
+  //   }
+  //   try {
+  //     await this.client.connect()
+  //     throw new Error('expected connect() to reject, but it resolved')
+  //   } catch (err) {
+  //     assert(err.message === 'error on _subscribeToLedger')
+  //     // _ws.close event listener should have cleaned up the socket when disconnect _ws.close is run on connection error
+  //     // do not fail on connection anymore
+  //     this.client.connection._subscribeToLedger = async () => {}
+  //     await this.client.connection.reconnect()
+  //   }
+  // })
 
   it('should try to reconnect on empty subscribe response on reconnect', function (done) {
     this.timeout(23000)
@@ -632,5 +571,14 @@ describe('Connection', function () {
       command: 'test_command',
       data: {disconnectIn: 5}
     })
+  })
+
+  it('should not crash on error', async function (done) {
+    this.mockRippled.suppressOutput = true
+    this.client.connection.request({
+      command: 'test_garbage'
+    })
+    .then(() => new Error('Should not have succeeded'))
+    .catch(done())
   })
 })

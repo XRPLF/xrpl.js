@@ -1,10 +1,11 @@
 import * as _ from 'lodash'
 import * as assert from 'assert'
 import * as common from '../common'
-import {Connection} from '../common'
+import {Connection} from '../client'
 import {FormattedTransactionType} from '../transaction/types'
 import {Issue} from '../common/types/objects'
 import {Client} from '..'
+import { AccountInfoRequest } from '../models/methods'
 
 export type RecursiveData = {
   marker: string
@@ -18,36 +19,34 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max)
 }
 
-function getXRPBalance(
-  connection: Connection,
+async function getXRPBalance(
+  client: Client,
   address: string,
   ledgerVersion?: number
 ): Promise<string> {
-  const request = {
+  const request: AccountInfoRequest = {
     command: 'account_info',
     account: address,
     ledger_index: ledgerVersion
   }
-  return connection
+  const data = await client
     .request(request)
-    .then((data) => common.dropsToXrp(data.account_data.Balance))
+  return common.dropsToXrp(data.result.account_data.Balance)
 }
 
 // If the marker is omitted from a response, you have reached the end
-function getRecursiveRecur(
+async function getRecursiveRecur(
   getter: Getter,
   marker: string | undefined,
   limit: number
 ): Promise<Array<any>> {
-  return getter(marker, limit).then((data) => {
-    const remaining = limit - data.results.length
-    if (remaining > 0 && data.marker != null) {
-      return getRecursiveRecur(getter, data.marker, remaining).then((results) =>
-        data.results.concat(results)
-      )
-    }
-    return data.results.slice(0, limit)
-  })
+  const data = await getter(marker, limit)
+  const remaining = limit - data.results.length
+  if (remaining > 0 && data.marker != null) {
+    return getRecursiveRecur(getter, data.marker, remaining).then((results) => data.results.concat(results)
+    )
+  }
+  return data.results.slice(0, limit)
 }
 
 function getRecursive(getter: Getter, limit?: number): Promise<Array<any>> {
@@ -100,28 +99,19 @@ function compareTransactions(
   return first.outcome.ledgerVersion < second.outcome.ledgerVersion ? -1 : 1
 }
 
-function hasCompleteLedgerRange(
-  connection: Connection,
-  minLedgerVersion?: number,
+async function isPendingLedgerVersion(
+  client: Client,
   maxLedgerVersion?: number
 ): Promise<boolean> {
-  const firstLedgerVersion = 32570 // earlier versions have been lost
-  return connection.hasLedgerVersions(
-    minLedgerVersion || firstLedgerVersion,
-    maxLedgerVersion
-  )
+  const response = await client.request({
+    command: 'ledger',
+    ledger_index: 'validated'
+  })
+  const ledgerVersion = response.result.ledger_index
+  return ledgerVersion < (maxLedgerVersion || 0)
 }
 
-function isPendingLedgerVersion(
-  connection: Connection,
-  maxLedgerVersion?: number
-): Promise<boolean> {
-  return connection
-    .getLedgerVersion()
-    .then((ledgerVersion) => ledgerVersion < (maxLedgerVersion || 0))
-}
-
-function ensureLedgerVersion(this: Client, options: any): Promise<object> {
+async function ensureLedgerVersion(this: Client, options: any): Promise<object> {
   if (
     Boolean(options) &&
     options.ledgerVersion != null &&
@@ -129,9 +119,12 @@ function ensureLedgerVersion(this: Client, options: any): Promise<object> {
   ) {
     return Promise.resolve(options)
   }
-  return this.getLedgerVersion().then((ledgerVersion) =>
-    Object.assign({}, options, {ledgerVersion})
-  )
+  const response = await this.request({
+    command: 'ledger',
+    ledger_index: 'validated'
+  })
+  const ledgerVersion = response.result.ledger_index
+  return Object.assign({}, options, { ledgerVersion })
 }
 
 export {
@@ -141,8 +134,8 @@ export {
   renameCounterpartyToIssuer,
   renameCounterpartyToIssuerInOrder,
   getRecursive,
-  hasCompleteLedgerRange,
   isPendingLedgerVersion,
   clamp,
-  common
+  common,
+  Connection
 }

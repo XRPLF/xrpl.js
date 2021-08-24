@@ -1,8 +1,7 @@
 import * as _ from 'lodash'
 import {EventEmitter} from 'events'
-import {parse as parseUrl} from 'url'
+import {parse as parseURL} from 'url'
 import WebSocket from 'ws'
-import RangeSet from './rangeset'
 import {
   RippledError,
   DisconnectedError,
@@ -10,10 +9,10 @@ import {
   TimeoutError,
   ResponseFormatError,
   ConnectionError,
-  RippledNotInitializedError,
   RippleError
-} from './errors'
+} from '../common/errors'
 import {ExponentialBackoff} from './backoff'
+import { Request, Response } from '../models/methods'
 
 /**
  * ConnectionOptions is the configuration for the Connection class.
@@ -39,23 +38,6 @@ export interface ConnectionOptions {
 export type ConnectionUserOptions = Partial<ConnectionOptions>
 
 /**
- * Ledger Stream Message
- * https://xrpl.org/subscribe.html#ledger-stream
- */
-interface LedgerStreamMessage {
-  type?: 'ledgerClosed' // not present in initial `subscribe` response
-  fee_base: number
-  fee_ref: number
-  ledger_hash: string
-  ledger_index: number
-  ledger_time: number
-  reserve_base: number
-  reserve_inc: number
-  txn_count?: number // not present in initial `subscribe` response
-  validated_ledgers?: string
-}
-
-/**
  * Represents an intentionally triggered web-socket disconnect code.
  * WebSocket spec allows 4xxx codes for app/library specific codes.
  * See: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
@@ -69,8 +51,9 @@ const INTENTIONAL_DISCONNECT_CODE = 4000
 function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
   const options: WebSocket.ClientOptions = {}
   if (config.proxy != null) {
-    const parsedURL = parseUrl(url)
-    const parsedProxyURL = parseUrl(config.proxy)
+    // TODO: replace deprecated method
+    const parsedURL = parseURL(url)
+    const parsedProxyURL = parseURL(config.proxy)
     const proxyOverrides = _.omitBy(
       {
         secureEndpoint: parsedURL.protocol === 'wss:',
@@ -83,7 +66,7 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
       },
       (value) => value == null
     )
-    const proxyOptions = Object.assign({}, parsedProxyURL, proxyOverrides)
+    const proxyOptions = {...parsedProxyURL, ...proxyOverrides}
     let HttpsProxyAgent
     try {
       HttpsProxyAgent = require('https-proxy-agent')
@@ -105,7 +88,7 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
     },
     (value) => value == null
   )
-  const websocketOptions = Object.assign({}, options, optionsOverrides)
+  const websocketOptions = {...options, ...optionsOverrides}
   const websocket = new WebSocket(url, null, websocketOptions)
   // we will have a listener for each outstanding request,
   // so we have to raise the limit (the default is 10)
@@ -128,56 +111,6 @@ function websocketSendAsync(ws: WebSocket, message: string) {
       }
     })
   })
-}
-
-/**
- * LedgerHistory is used to store and reference ledger information that has been
- * captured by the Connection class over time.
- */
-class LedgerHistory {
-  feeBase: null | number = null
-  feeRef: null | number = null
-  latestVersion: null | number = null
-  reserveBase: null | number = null
-  private availableVersions = new RangeSet()
-
-  /**
-   * Returns true if the given version exists.
-   */
-  hasVersion(version: number): boolean {
-    return this.availableVersions.containsValue(version)
-  }
-
-  /**
-   * Returns true if the given range of versions exist (inclusive).
-   */
-  hasVersions(lowVersion: number, highVersion: number): boolean {
-    return this.availableVersions.containsRange(lowVersion, highVersion)
-  }
-
-  /**
-   * Update LedgerHistory with a new ledger response object. The "responseData"
-   * format lets you pass in any valid rippled ledger response data, regardless
-   * of whether ledger history data exists or not. If relevant ledger data
-   * is found, we'll update our history (ex: from a "ledgerClosed" event).
-   */
-  update(ledgerMessage: LedgerStreamMessage) {
-    // type: ignored
-    this.feeBase = ledgerMessage.fee_base
-    this.feeRef = ledgerMessage.fee_ref
-    // ledger_hash: ignored
-    this.latestVersion = ledgerMessage.ledger_index
-    // ledger_time: ignored
-    this.reserveBase = ledgerMessage.reserve_base
-    // reserve_inc: ignored (may be useful for advanced use cases)
-    // txn_count: ignored
-    if (ledgerMessage.validated_ledgers) {
-      this.availableVersions.reset()
-      this.availableVersions.parseAndAddRanges(ledgerMessage.validated_ledgers)
-    } else {
-      this.availableVersions.addValue(this.latestVersion)
-    }
-  }
 }
 
 /**
@@ -228,14 +161,14 @@ class RequestManager {
     delete this.promisesAwaitingResponse[id]
   }
 
-  resolve(id: number, data: any) {
+  resolve(id: string | number, data: Response) {
     const {timer, resolve} = this.promisesAwaitingResponse[id]
     clearTimeout(timer)
     resolve(data)
     delete this.promisesAwaitingResponse[id]
   }
 
-  reject(id: number, error: Error) {
+  reject(id: string | number, error: Error) {
     const {timer, reject} = this.promisesAwaitingResponse[id]
     clearTimeout(timer)
     reject(error)
@@ -253,8 +186,8 @@ class RequestManager {
    * hung responses, and a promise that will resolve with the response once
    * the response is seen & handled.
    */
-  createRequest(data: any, timeout: number): [number, string, Promise<any>] {
-    const newId = this.nextId++
+  createRequest(data: Request, timeout: number): [string | number, string, Promise<Response>] {
+    const newId = data.id ? data.id : this.nextId++
     const newData = JSON.stringify({...data, id: newId})
     const timer = setTimeout(
       () => this.reject(newId, new TimeoutError()),
@@ -265,18 +198,17 @@ class RequestManager {
     if (timer.unref) {
       timer.unref()
     }
-    const newPromise = new Promise((resolve, reject) => {
+    const newPromise = new Promise((resolve: (data: Response) => void, reject) => {
       this.promisesAwaitingResponse[newId] = {resolve, reject, timer}
     })
     return [newId, newData, newPromise]
   }
 
   /**
-   * Handle a "response" (any message with `{type: "response"}`). Responses
-   * match to the earlier request handlers, and resolve/reject based on the
-   * data received.
+   * Handle a "response". Responses match to the earlier request handlers, 
+   * and resolve/reject based on the data received.
    */
-  handleResponse(data: any) {
+  handleResponse(data: Response) {
     if (!Number.isInteger(data.id) || data.id < 0) {
       throw new ResponseFormatError('valid id not found in response', data)
     }
@@ -296,7 +228,7 @@ class RequestManager {
       this.reject(data.id, error)
       return
     }
-    this.resolve(data.id, data.result)
+    this.resolve(data.id, data)
   }
 }
 
@@ -316,7 +248,6 @@ export class Connection extends EventEmitter {
 
   private _trace: (id: string, message: string) => void = () => {}
   private _config: ConnectionOptions
-  private _ledger: LedgerHistory = new LedgerHistory()
   private _requestManager = new RequestManager()
   private _connectionManager = new ConnectionManager()
 
@@ -351,9 +282,6 @@ export class Connection extends EventEmitter {
     }
     if (data.type) {
       this.emit(data.type, data)
-    }
-    if (data.type === 'ledgerClosed') {
-      this._ledger.update(data)
     }
     if (data.type === 'response') {
       try {
@@ -396,43 +324,7 @@ export class Connection extends EventEmitter {
     })
   }
 
-  /**
-   * Wait for a valid connection before resolving. Useful for deferring methods
-   * until a connection has been established.
-   */
-  private _waitForReady(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      if (!this._shouldBeConnected) {
-        reject(new NotConnectedError())
-      } else if (this._state === WebSocket.OPEN) {
-        resolve()
-      } else {
-        this.once('connected', () => resolve())
-      }
-    })
-  }
-
-  private async _subscribeToLedger() {
-    const data = await this.request({
-      command: 'subscribe',
-      streams: ['ledger']
-    })
-    // If rippled instance doesn't have validated ledgers, disconnect and then reject.
-    if (_.isEmpty(data) || !data.ledger_index) {
-      try {
-        await this.disconnect()
-      } catch (error) {
-        // Ignore this error, propagate the root cause.
-      } finally {
-        // Throw the root error (takes precedence over try/catch).
-        // eslint-disable-next-line no-unsafe-finally
-        throw new RippledNotInitializedError('Rippled not initialized')
-      }
-    }
-    this._ledger.update(data)
-  }
-
-  private _onConnectionFailed = (errorOrCode: Error | number | undefined) => {
+  private _onConnectionFailed = (errorOrCode: Error | number | null) => {
     if (this._ws) {
       this._ws.removeAllListeners()
       this._ws.on('error', () => {
@@ -509,10 +401,10 @@ export class Connection extends EventEmitter {
         this.emit('error', 'websocket', error.message, error)
       )
       // Handle a closed connection: reconnect if it was unexpected
-      this._ws.once('close', (code) => {
+      this._ws.once('close', (code, reason) => {
         this._clearHeartbeatInterval()
         this._requestManager.rejectAll(
-          new DisconnectedError('websocket was closed')
+          new DisconnectedError(`websocket was closed, ${reason}`)
         )
         this._ws.removeAllListeners()
         this._ws = null
@@ -534,7 +426,6 @@ export class Connection extends EventEmitter {
       // Finalize the connection and resolve all awaiting connect() requests
       try {
         this._retryConnectionBackoff.reset()
-        await this._subscribeToLedger()
         this._startHeartbeatInterval()
         this._connectionManager.resolveAllAwaiting()
         this.emit('connected')
@@ -582,52 +473,7 @@ export class Connection extends EventEmitter {
     await this.connect()
   }
 
-  async getFeeBase(): Promise<number> {
-    await this._waitForReady()
-    return this._ledger.feeBase!
-  }
-
-  async getFeeRef(): Promise<number> {
-    await this._waitForReady()
-    return this._ledger.feeRef!
-  }
-
-  async getLedgerVersion(): Promise<number> {
-    await this._waitForReady()
-    return this._ledger.latestVersion!
-  }
-
-  async getReserveBase(): Promise<number> {
-    await this._waitForReady()
-    return this._ledger.reserveBase!
-  }
-
-  /**
-   * Returns true if the given range of ledger versions exist in history
-   * (inclusive).
-   */
-  async hasLedgerVersions(
-    lowLedgerVersion: number,
-    highLedgerVersion: number | undefined
-  ): Promise<boolean> {
-    // You can call hasVersions with a potentially unknown upper limit, which
-    // will just act as a check on the lower limit.
-    if (!highLedgerVersion) {
-      return this.hasLedgerVersion(lowLedgerVersion)
-    }
-    await this._waitForReady()
-    return this._ledger.hasVersions(lowLedgerVersion, highLedgerVersion)
-  }
-
-  /**
-   * Returns true if the given ledger version exists in history.
-   */
-  async hasLedgerVersion(ledgerVersion: number): Promise<boolean> {
-    await this._waitForReady()
-    return this._ledger.hasVersion(ledgerVersion)
-  }
-
-  async request(request, timeout?: number): Promise<any> {
+  async request<T extends Request, U extends Response>(request: T, timeout?: number): Promise<U> {
     if (!this._shouldBeConnected) {
       throw new NotConnectedError()
     }
@@ -640,7 +486,7 @@ export class Connection extends EventEmitter {
       this._requestManager.reject(id, error)
     })
 
-    return responsePromise
+    return responsePromise as any
   }
 
   /**

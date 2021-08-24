@@ -8,9 +8,9 @@ import addresses from './fixtures/addresses.json'
 import hashes from './fixtures/hashes.json'
 import transactionsResponse from './fixtures/rippled/account-tx'
 import accountLinesResponse from './fixtures/rippled/account-lines'
-import accountObjectsResponse from './fixtures/rippled/account-objects'
 import fullLedger from './fixtures/rippled/ledger-full-38129.json'
 import {getFreePort} from './utils'
+import { Request } from '../src'
 
 function isUSD(json) {
   return json === 'USD' || json === '0000000000000000000000005553440000000000'
@@ -46,6 +46,7 @@ function createLedgerResponse(request, response) {
       newResponse.result.ledger.parent_close_time =
         newResponse.result.ledger.close_time - 10
     }
+    newResponse.result.ledger_index = newResponse.result.ledger.ledger_index
   }
   return JSON.stringify(newResponse)
 }
@@ -57,6 +58,13 @@ type MockedWebSocketServer = any
 export function createMockRippled(port) {
   const mock = new WebSocketServer({port: port}) as MockedWebSocketServer
   Object.assign(mock, EventEmitter2.prototype)
+
+  mock.responses = {}
+
+  mock.addResponse = (request: Request, response: object) => {
+    const command = request.command
+    mock.responses[command] = response
+  }
 
   const close = mock.close
   mock.close = function () {
@@ -80,6 +88,8 @@ export function createMockRippled(port) {
     mock.expectedRequests = expectedRequests
   }
 
+  mock.suppressOutput = false
+
   mock.on('connection', function (this: MockedWebSocketServer, conn: any) {
     if (mock.config.breakNextConnection) {
       mock.config.breakNextConnection = false
@@ -91,10 +101,16 @@ export function createMockRippled(port) {
     conn.on('message', function (requestJSON) {
       try {
         const request = JSON.parse(requestJSON)
-        mock.emit('request_' + request.command, request, conn)
+        if (request.command in mock.responses) {
+          conn.send(createResponse(request, mock.responses[request.command]))
+        } else {
+          // TODO: remove this block once all the handlers have been removed
+          mock.emit('request_' + request.command, request, conn)
+        }
       } catch (err) {
-        console.error('Error: ' + err.message)
-        assert(false, err.message)
+        if (!mock.suppressOutput)
+          console.error('Error: ' + err.message)
+        conn.close(4000, err.message)
       }
     })
   })
@@ -106,7 +122,7 @@ export function createMockRippled(port) {
       return
     }
     if (mock.listeners(this.event).length === 0) {
-      throw new Error('No event handler registered for ' + this.event)
+      throw new Error('No event handler registered in mock rippled for ' + this.event)
     }
     if (mock.expectedRequests == null) {
       return // TODO: fail here to require expectedRequests
@@ -116,18 +132,6 @@ export function createMockRippled(port) {
       throw new Error('Unexpected request: ' + this.event)
     }
     mock.expectedRequests[this.event] -= 1
-  })
-
-  mock.on('request_config', function (request, conn) {
-    assert.strictEqual(request.command, 'config')
-    conn.config = Object.assign(conn.config, request.data)
-    conn.send(
-      createResponse(request, {
-        status: 'success',
-        type: 'response',
-        result: {}
-      })
-    )
   })
 
   mock.on('request_test_command', function (request, conn) {
@@ -189,57 +193,6 @@ export function createMockRippled(port) {
     conn.send(JSON.stringify(request.data))
   })
 
-  mock.on('request_server_info', function (request, conn) {
-    assert.strictEqual(request.command, 'server_info')
-    if (conn.config.highLoadFactor || conn.config.loadFactor) {
-      const response = {
-        id: 0,
-        status: 'success',
-        type: 'response',
-        result: {
-          info: {
-            build_version: '0.24.0-rc1',
-            complete_ledgers: '32570-6595042',
-            hostid: 'ARTS',
-            io_latency_ms: 1,
-            last_close: {
-              converge_time_s: 2.007,
-              proposers: 4
-            },
-            load_factor: conn.config.loadFactor || 4294967296,
-            peers: 53,
-            pubkey_node: 'n94wWvFUmaKGYrKUGgpv1DyYgDeXRGdACkNQaSe7zJiy5Znio7UC',
-            server_state: 'full',
-            validated_ledger: {
-              age: 5,
-              base_fee_xrp: 0.00001,
-              hash:
-                '4482DEE5362332F54A4036ED57EE1767C9F33CF7CE5A6670355C16CECE381D46',
-              reserve_base_xrp: 20,
-              reserve_inc_xrp: 5,
-              seq: 6595042
-            },
-            validation_quorum: 3
-          }
-        }
-      }
-      conn.send(createResponse(request, response))
-    } else if (conn.config.reporting) {
-      conn.send(createResponse(request, fixtures.server_info.reporting))
-    } else if (conn.config.returnErrorOnServerInfo) {
-      conn.send(createResponse(request, fixtures.server_info.error))
-    } else if (conn.config.disconnectOnServerInfo) {
-      conn.close()
-    } else if (conn.config.serverInfoWithoutValidated) {
-      conn.send(createResponse(request, fixtures.server_info.noValidated))
-    } else if (mock.config.returnSyncingServerInfo) {
-      mock.config.returnSyncingServerInfo--
-      conn.send(createResponse(request, fixtures.server_info.syncing))
-    } else {
-      conn.send(createResponse(request, fixtures.server_info.normal))
-    }
-  })
-
   mock.on('request_subscribe', function (request, conn) {
     assert.strictEqual(request.command, 'subscribe')
     if (request && request.streams === 'validations') {
@@ -253,6 +206,11 @@ export function createMockRippled(port) {
     conn.send(createResponse(request, fixtures.subscribe))
   })
 
+  mock.on('request_fee', function (request, conn) {
+    assert.strictEqual(request.command, 'fee')
+    conn.send(createResponse(request, fixtures.fee))
+  })
+
   mock.on('request_unsubscribe', function (request, conn) {
     assert.strictEqual(request.command, 'unsubscribe')
     if (request.accounts) {
@@ -263,64 +221,10 @@ export function createMockRippled(port) {
     conn.send(createResponse(request, fixtures.unsubscribe))
   })
 
-  mock.on('request_account_objects', function (request, conn) {
-    assert.strictEqual(request.command, 'account_objects')
-    if (request.account === addresses.ACCOUNT) {
-      conn.send(accountObjectsResponse(request))
-    } else {
-      assert(false, 'Unrecognized account address: ' + request.account)
-    }
-  })
-
+  // TODO: remove this and move fixtures closer when the prepare functions are gone
   mock.on('request_account_info', function (request, conn) {
     assert.strictEqual(request.command, 'account_info')
-    if (request.account === addresses.ACCOUNT) {
-      conn.send(createResponse(request, fixtures.account_info.normal))
-    } else if (request.account === addresses.NOTFOUND) {
-      conn.send(createResponse(request, fixtures.account_info.notfound))
-    } else if (request.account === addresses.THIRD_ACCOUNT) {
-      const response = Object.assign({}, fixtures.account_info.normal)
-      response.Account = addresses.THIRD_ACCOUNT
-      conn.send(createResponse(request, response))
-    } else if (request.account == null) {
-      const response = Object.assign(
-        {},
-        {
-          error: 'invalidParams',
-          error_code: 31,
-          error_message: "Missing field 'account'.",
-          id: 2,
-          request: {command: 'account_info', id: 2},
-          status: 'error',
-          type: 'response'
-        }
-      )
-      conn.send(createResponse(request, response))
-    } else {
-      const response = Object.assign(
-        {},
-        {
-          account: request.account,
-          error: 'actNotFound',
-          error_code: 19,
-          error_message: 'Account not found.',
-          id: 2,
-          ledger_current_index: 17714714,
-          request:
-            // This will be inaccurate, but that's OK because this is just a mock rippled
-            {
-              account: 'rogvkYnY8SWjxkJNgU4ZRVfLeRyt5DR9i',
-              command: 'account_info',
-              id: 2
-            },
-
-          status: 'error',
-          type: 'response',
-          validated: false
-        }
-      )
-      conn.send(createResponse(request, response))
-    }
+    conn.send(createResponse(request, fixtures.account_info.normal))
   })
 
   mock.on('request_ledger', function (request, conn) {
@@ -364,6 +268,19 @@ export function createMockRippled(port) {
     } else {
       assert(false, 'Unrecognized ledger request: ' + JSON.stringify(request))
     }
+  })
+
+  mock.on('request_ledger_current', function (request, conn) {
+    assert.strictEqual(request.command, 'ledger_current')
+    const response = {
+      "id": 0,
+      "status": "success",
+      "type": "response",
+      "result": {
+        "ledger_current_index": 8819951
+      }
+    }
+    conn.send(createResponse(request, response))
   })
 
   mock.on('request_ledger_data', function (request, conn) {
@@ -731,9 +648,8 @@ export function createMockRippled(port) {
         const file = requestsCache[i]
         const json = fs.readFileSync(rippledDir + '/requests/' + file, 'utf8')
         const r = JSON.parse(json)
-        const requestWithoutId = Object.assign({}, request)
-        delete requestWithoutId.id
-        if (JSON.stringify(requestWithoutId) === JSON.stringify(r)) {
+        const requestWithoutId = _.omit(Object.assign({}, request), 'id')
+        if (_.isEqual(requestWithoutId, r)) {
           const responseFile =
             rippledDir + '/responses/' + file.split('.')[0] + '-res.json'
           const res = fs.readFileSync(responseFile, 'utf8')

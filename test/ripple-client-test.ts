@@ -26,7 +26,9 @@ describe('Client [Test Runner]', function () {
   afterEach(setupClient.teardown)
 
   // Collect all the tests:
-  const allPublicMethods = getAllPublicMethods(new Client())
+  const allPublicMethods = getAllPublicMethods(new Client("wss://"))
+  // doesn't need the client, just needs to instantiate to get public methods
+
   const allTestSuites = loadTestSuites()
 
   // Run all the tests:
@@ -36,16 +38,16 @@ describe('Client [Test Runner]', function () {
       for (const [testName, fn] of tests) {
         if (fn.length === 1) {
           it(testName, function () {
-            return fn(this.client, addresses.ACCOUNT)
+            return fn(this.client, addresses.ACCOUNT, this.mockRippled)
           })
         }
       }
       // Run each test with a classic address.
       describe(`[Classic Address]`, () => {
         for (const [testName, fn] of tests) {
-          if (fn.length === 2) {
+          if (fn.length >= 2) {
             it(testName, function () {
-              return fn(this.client, addresses.ACCOUNT)
+              return fn(this.client, addresses.ACCOUNT, this.mockRippled)
             })
           }
         }
@@ -54,9 +56,9 @@ describe('Client [Test Runner]', function () {
       if (!config.skipXAddress) {
         describe(`[X-address]`, () => {
           for (const [testName, fn] of tests) {
-            if (fn.length === 2) {
+            if (fn.length >= 2) {
               it(testName, function () {
-                return fn(this.client, addresses.ACCOUNT_X)
+                return fn(this.client, addresses.ACCOUNT_X, this.mockRippled)
               })
             }
           }

@@ -1,6 +1,6 @@
 import * as utils from './utils'
 import {validate, ensureClassicAddress} from '../common'
-import {Connection} from '../common'
+import {Connection} from '../client'
 import {GetTrustlinesOptions} from './trustlines'
 import {FormattedTrustline} from '../common/types/objects/trustlines'
 import {Client} from '..'
@@ -13,7 +13,7 @@ export type Balance = {
 
 export type GetBalances = Array<Balance>
 
-function getTrustlineBalanceAmount(trustline: FormattedTrustline) {
+function getTrustlineBalanceAmount(trustline: FormattedTrustline): Balance {
   return {
     currency: trustline.specification.currency,
     counterparty: trustline.specification.counterparty,
@@ -21,7 +21,7 @@ function getTrustlineBalanceAmount(trustline: FormattedTrustline) {
   }
 }
 
-function formatBalances(options, balances) {
+function formatBalances(options: GetTrustlinesOptions, balances: {xrp: string, trustlines: FormattedTrustline[]}) {
   const result = balances.trustlines.map(getTrustlineBalanceAmount)
   if (
     !(options.counterparty || (options.currency && options.currency !== 'XRP'))
@@ -46,7 +46,10 @@ function getLedgerVersionHelper(
   if (optionValue != null && optionValue !== null) {
     return Promise.resolve(optionValue)
   }
-  return connection.getLedgerVersion()
+  return connection.request({
+    command: 'ledger', 
+    ledger_index: 'validated'
+  }).then(response => response.result.ledger_index);
 }
 
 function getBalances(
@@ -68,7 +71,7 @@ function getBalances(
       this.connection,
       options.ledgerVersion
     ).then((ledgerVersion) =>
-      utils.getXRPBalance(this.connection, address, ledgerVersion)
+      utils.getXRPBalance(this, address, ledgerVersion)
     ),
     this.getTrustlines(address, options)
   ]).then((results) =>

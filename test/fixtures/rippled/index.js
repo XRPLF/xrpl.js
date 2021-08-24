@@ -15,12 +15,13 @@ module.exports = {
     withPartialPayment: require('./ledger-with-partial-payment'),
     pre2014withPartial: require('./ledger-pre2014-with-partial')
   },
+  fee: require('./fee'),
   empty: require('./empty'),
   subscribe: require('./subscribe'),
   subscribe_error: require('./subscribe_error'),
   unsubscribe: require('./unsubscribe'),
   account_objects: {
-    normal: require('./account-objects'),
+    normal: require('./account-objects-normal'),
     // notfound: require('./account-objects-not-found')
   },
   account_info: {
@@ -51,7 +52,8 @@ module.exports = {
     noValidated: require('./server-info-no-validated'),
     syncing: require('./server-info-syncing'),
     error: require('./server-info-error'),
-    reporting: require('./server-info-reporting')
+    reporting: require('./server-info-reporting'),
+    highLoadFactor: require('./server-info-high-load-factor')
   },
   path_find: {
     generate: require('./path-find'),

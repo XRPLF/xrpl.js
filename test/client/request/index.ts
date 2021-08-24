@@ -1,5 +1,6 @@
 import responses from '../../fixtures/responses'
-import {assertResultMatch, TestSuite} from '../../utils'
+import rippled from '../../fixtures/rippled'
+import {TestSuite, assertResultMatch} from '../../utils'
 
 /**
  * Every test suite exports their tests in the default object.
@@ -7,27 +8,29 @@ import {assertResultMatch, TestSuite} from '../../utils'
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'request account_objects': async (client, address) => {
-    const result = await client.request('account_objects', {
+  'request account_objects': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'account_objects', account: address}, rippled.account_objects.normal)
+    const result = await client.request({command: 'account_objects',
       account: address
     })
 
     assertResultMatch(
-      result,
+      result.result,
       responses.getAccountObjects,
       'AccountObjectsResponse'
     )
   },
 
-  'request account_objects - invalid options': async (client, address) => {
-    // Intentionally no local validation of these options
-    const result = await client.request('account_objects', {
+  'request account_objects - invalid options': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'account_objects', account: address}, rippled.account_objects.normal)
+    // @ts-ignore Intentionally no local validation of these options
+    const result = await client.request({command: 'account_objects',
       account: address,
       invalid: 'options'
     })
 
     assertResultMatch(
-      result,
+      result.result,
       responses.getAccountObjects,
       'AccountObjectsResponse'
     )

@@ -2,60 +2,37 @@ import _ from 'lodash'
 import assert from 'assert-diff'
 import setupClient from './setup-client'
 import responses from './fixtures/responses'
-import ledgerClosed from './fixtures/rippled/ledger-close.json'
-import {Client} from 'xrpl-local'
+import rippled from './fixtures/rippled'
 import {ignoreWebSocketDisconnect} from './utils'
-const schemaValidator = Client._PRIVATE.schemaValidator
 
 const TIMEOUT = 20000
 
-function checkResult(expected, schemaName, response) {
+function checkResult(expected, response) {
   if (expected.txJSON) {
     assert(response.txJSON)
     assert.deepEqual(JSON.parse(response.txJSON), JSON.parse(expected.txJSON))
   }
   assert.deepEqual(_.omit(response, 'txJSON'), _.omit(expected, 'txJSON'))
-  if (schemaName) {
-    schemaValidator.schemaValidate(schemaName, response)
-  }
   return response
 }
 
-describe('ClientBroadcast', function () {
+describe('BroadcastClient', function () {
   this.timeout(TIMEOUT)
   beforeEach(setupClient.setupBroadcast)
   afterEach(setupClient.teardown)
 
   it('base', function () {
+    this.mocks.forEach((mock) => {
+      mock.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    })
     const expected = {request_server_info: 1}
     this.mocks.forEach((mock) => mock.expect(Object.assign({}, expected)))
     assert(this.client.isConnected())
     return this.client
-      .getServerInfo()
-      .then(_.partial(checkResult, responses.getServerInfo, 'getServerInfo'))
-  })
-
-  it('ledger', function (done) {
-    let gotLedger = 0
-    this.client.on('ledger', () => {
-      gotLedger++
-    })
-    const ledgerNext = Object.assign({}, ledgerClosed)
-    ledgerNext.ledger_index++
-
-    this.client._clients.forEach((client) =>
-      client.connection
-        .request({
-          command: 'echo',
-          data: ledgerNext
-        })
-        .catch(ignoreWebSocketDisconnect)
-    )
-
-    setTimeout(() => {
-      assert.strictEqual(gotLedger, 1)
-      done()
-    }, 1250)
+      .request({command: "server_info"})
+      .then(response => {
+        return checkResult(responses.getServerInfo, response.result.info)
+      })
   })
 
   it('error propagation', function (done) {

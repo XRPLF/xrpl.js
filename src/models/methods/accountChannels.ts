@@ -23,7 +23,7 @@ export interface AccountChannelsRequest extends BaseRequest {
     ledger_hash?: string
     ledger_index?: LedgerIndex
     limit: number
-    marker: any
+    marker?: any
 }
 
 export interface AccountChannelsResponse extends BaseResponse {

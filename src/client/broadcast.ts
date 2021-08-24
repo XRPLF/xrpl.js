@@ -1,19 +1,18 @@
-import {Client, ClientOptions} from './client'
+import {Client, ClientOptions} from './'
 
-class ClientBroadcast extends Client {
+class BroadcastClient extends Client {
   ledgerVersion: number | undefined = undefined
   private _clients: Client[]
 
   constructor(servers, options: ClientOptions = {}) {
-    super(options)
+    super(servers[0], options)
 
     const clients: Client[] = servers.map(
-      (server) => new Client(Object.assign({}, options, {server}))
+      (server) => new Client(server, options)
     )
 
     // exposed for testing
     this._clients = clients
-
     this.getMethodNames().forEach((name) => {
       this[name] = function () {
         // eslint-disable-line no-loop-func
@@ -40,28 +39,19 @@ class ClientBroadcast extends Client {
     })
 
     clients.forEach((client) => {
-      client.on('ledger', this.onLedgerEvent.bind(this))
       client.on('error', (errorCode, errorMessage, data) =>
         this.emit('error', errorCode, errorMessage, data)
       )
     })
   }
 
-  onLedgerEvent(ledger) {
-    if (
-      ledger.ledgerVersion > this.ledgerVersion ||
-      this.ledgerVersion == null
-    ) {
-      this.ledgerVersion = ledger.ledgerVersion
-      this.emit('ledger', ledger)
-    }
-  }
-
   getMethodNames() {
     const methodNames: string[] = []
-    const Client = this._clients[0]
-    for (const name of Object.getOwnPropertyNames(Client)) {
-      if (typeof Client[name] === 'function') {
+    const firstClient = this._clients[0]
+    const methods = Object.getOwnPropertyNames(firstClient)
+    methods.push(...Object.getOwnPropertyNames(Object.getPrototypeOf(firstClient)))
+    for (const name of methods) {
+      if (typeof firstClient[name] === 'function' && name !== 'constructor') {
         methodNames.push(name)
       }
     }
@@ -69,4 +59,4 @@ class ClientBroadcast extends Client {
   }
 }
 
-export {ClientBroadcast}
+export {BroadcastClient}

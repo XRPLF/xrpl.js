@@ -68,15 +68,16 @@ async function reliableTransactionSubmissionExample() {
 async function performPayments(payments) {
   const finalResults = []
   const txFinalizedPromises = []
-  const client = new Client({server: 'wss://s.altnet.rippletest.net:51233'})
+  const client = new Client('wss://s.altnet.rippletest.net:51233')
   await client.connect()
 
   for (let i = 0; i < payments.length; i++) {
     const payment = payments[i]
-    const account_info: AccountInfoResponse = await client.request('account_info', {
+    const account_info: AccountInfoResponse = await client.request({
+      command: 'account_info',
       account: payment.source.classicAddress,
       ledger_index: 'current'})
-    const sequence = account_info.account_data.Sequence
+    const sequence = account_info.result.account_data.Sequence
     const preparedPayment = await client.preparePayment(payment.source.classicAddress, {
       source: {
         address: payment.source.classicAddress,
@@ -99,16 +100,16 @@ async function performPayments(payments) {
     finalResults.push({
       id: signed.id
     })
-    const result = await client.submit(signed.signedTransaction)
+    const response = await client.request({command: 'submit', tx_blob: signed.signedTransaction})
 
     // Most of the time we'll get 'tesSUCCESS' or (after many submissions) 'terQUEUED'
-    console.log(`tx ${i} - tentative: ${result.resultCode}`)
+    console.log(`tx ${i} - tentative: ${response.result.engine_result}`)
 
     const txFinalizedPromise = new Promise<void>((resolve) => {
       const ledgerClosedCallback = async (event: LedgerClosedEvent) => {
         let status
         try {
-          status = await client.getTransaction(signed.id)
+          status = await client.request({command: 'tx', transaction: signed.id})
         } catch (e) {
           // Typical error when the tx hasn't been validated yet:
           if (e.name !== 'MissingLedgerHistoryError') {
