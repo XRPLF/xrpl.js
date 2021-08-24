@@ -1,9 +1,6 @@
 import {assert} from 'chai'
-import {Client} from 'xrpl-local'
 import ECDSA from '../../src/common/ecdsa'
 import Wallet from '../../src/Wallet'
-
-const {schemaValidator} = Client._PRIVATE
 
 /**
  * Wallet testing
@@ -121,8 +118,10 @@ describe('Wallet', () => {
             const wallet = new Wallet(publicKey, privateKey)
             const signedTx: {signedTransaction: string; id: string} =
                 wallet.signTransaction(txJSON)
-        
-            schemaValidator.schemaValidate('sign', signedTx)
+
+            assert.hasAllKeys(signedTx, ['id', 'signedTransaction'])
+            assert.isString(signedTx.id)
+            assert.isString(signedTx.signedTransaction)
         })
     })
 
