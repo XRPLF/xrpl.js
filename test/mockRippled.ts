@@ -15,6 +15,18 @@ function createResponse(request, response, overrides = {}) {
   return JSON.stringify(Object.assign({}, response, change))
 }
 
+function ping(conn, request) {
+  setTimeout(() => {
+    conn.send(
+      createResponse(request, {
+        result: {},
+        status: 'success',
+        type: 'response'
+      })
+    )
+  }, 1000 * 2)
+}
+
 // We mock out WebSocketServer in these tests and add a lot of custom
 // properties not defined on the normal WebSocketServer object.
 type MockedWebSocketServer = any
@@ -76,7 +88,9 @@ export function createMockRippled(port) {
     conn.on('message', function (requestJSON) {
       try {
         const request = JSON.parse(requestJSON)
-        if (request.command in mock.responses) {
+        if (request.command === 'ping') {
+          ping(conn, request)
+        } else if (request.command in mock.responses) {
           conn.send(createResponse(request, mock.getResponse(request)))
         } else {
           // TODO: remove this block once all the handlers have been removed
@@ -161,21 +175,6 @@ export function createMockRippled(port) {
         result: {}
       })
     )
-  })
-
-  mock.on('request_ping', function (request, conn) {
-    // NOTE: We give the response a timeout of 2 second, so that tests can
-    // set their timeout threshold to greater than or less than this number
-    // to test timeouts.
-    setTimeout(() => {
-      conn.send(
-        createResponse(request, {
-          result: {},
-          status: 'success',
-          type: 'response'
-        })
-      )
-    }, 1000 * 2)
   })
 
   return mock
