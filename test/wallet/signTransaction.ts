@@ -1,6 +1,6 @@
 import {Client} from 'xrpl-local'
-import {TestSuite} from '../../testUtils'
-import Wallet from '../../../src/Wallet'
+import {TestSuite} from '../testUtils'
+import Wallet from '../../src/Wallet'
 
 const {schemaValidator} = Client._PRIVATE
 const publicKey =

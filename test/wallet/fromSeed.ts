@@ -1,7 +1,7 @@
 import assert from 'assert-diff'
-import {TestSuite} from '../../testUtils'
-import ECDSA from '../../../src/common/ecdsa'
-import Wallet from '../../../src/Wallet'
+import {TestSuite} from '../testUtils'
+import ECDSA from '../../src/common/ecdsa'
+import Wallet from '../../src/Wallet'
 
 const seed = 'ssL9dv2W5RK8L3tuzQxYY6EaZhSxW'
 const publicKey =

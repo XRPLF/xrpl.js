@@ -1,5 +1,5 @@
 import assert from 'assert-diff'
-import {TestSuite} from '../../testUtils'
+import {TestSuite} from '../testUtils'
 import {Client} from 'xrpl-local'
 
 /**

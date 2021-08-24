@@ -1,9 +1,9 @@
 // import BigNumber from 'bignumber.js'
 // import assert from 'assert-diff'
 // import {Client} from 'xrpl-local'
-// import requests from '../../fixtures/requests'
-// import responses from '../../fixtures/responses'
-import {TestSuite} from '../../testUtils'
+// import requests from '../fixtures/requests'
+// import responses from '../fixtures/responses'
+import {TestSuite} from '../testUtils'
 
 // function checkSortingOfOrders(orders) {
 //   let previousRate = '0'

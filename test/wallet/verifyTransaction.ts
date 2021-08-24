@@ -1,5 +1,5 @@
 import assert from 'assert-diff'
-import {TestSuite} from '../../testUtils'
+import {TestSuite} from '../testUtils'
 import Wallet from 'xrpl-local/Wallet'
 
 const publicKey =

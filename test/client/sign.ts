@@ -1,10 +1,10 @@
 import assert from 'assert-diff'
 import {Client} from 'xrpl-local'
 import binary from 'ripple-binary-codec'
-import requests from '../../fixtures/requests'
-import responses from '../../fixtures/responses'
-import rippled from '../../fixtures/rippled'
-import {TestSuite} from '../../testUtils'
+import requests from '../fixtures/requests'
+import responses from '../fixtures/responses'
+import rippled from '../fixtures/rippled'
+import {TestSuite} from '../testUtils'
 
 const {schemaValidator} = Client._PRIVATE
 const {sign: REQUEST_FIXTURES} = requests

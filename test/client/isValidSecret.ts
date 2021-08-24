@@ -1,5 +1,5 @@
 import assert from 'assert-diff'
-import {TestSuite} from '../../testUtils'
+import {TestSuite} from '../testUtils'
 
 export default <TestSuite>{
   'returns true for valid secret': async (client, address) => {

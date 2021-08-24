@@ -1,6 +1,6 @@
 import assert from 'assert-diff'
-import {TestSuite} from '../../testUtils'
-import Wallet from '../../../src/Wallet'
+import {TestSuite} from '../testUtils'
+import Wallet from '../../src/Wallet'
 
 const mnemonic =
   'try milk link drift aware pass obtain again music stick pluck fold'

@@ -1,7 +1,7 @@
 import assert from 'assert-diff'
-import {TestSuite} from '../../testUtils'
-import ECDSA from '../../../src/common/ecdsa'
-import Wallet from '../../../src/Wallet'
+import {TestSuite} from '../testUtils'
+import ECDSA from '../../src/common/ecdsa'
+import Wallet from '../../src/Wallet'
 
 const entropy: number[] = new Array(16).fill(0)
 const publicKey: string =
