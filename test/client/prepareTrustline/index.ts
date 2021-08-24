@@ -1,5 +1,6 @@
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
+import rippled from '../../fixtures/rippled'
 import {assertRejects, assertResultMatch, TestSuite} from '../../utils'
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
@@ -9,7 +10,8 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'simple': async (client, address) => {
+  'simple': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.simple,
@@ -18,7 +20,8 @@ export default <TestSuite>{
     assertResultMatch(result, responses.prepareTrustline.simple, 'prepare')
   },
 
-  'frozen': async (client, address) => {
+  'frozen': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.frozen
@@ -26,7 +29,8 @@ export default <TestSuite>{
     assertResultMatch(result, responses.prepareTrustline.frozen, 'prepare')
   },
 
-  'complex': async (client, address) => {
+  'complex': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.complex,
@@ -35,7 +39,8 @@ export default <TestSuite>{
     assertResultMatch(result, responses.prepareTrustline.complex, 'prepare')
   },
 
-  'invalid': async (client, address) => {
+  'invalid': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const trustline = Object.assign({}, requests.prepareTrustline.complex)
     delete trustline.limit // Make invalid
 
@@ -50,7 +55,8 @@ export default <TestSuite>{
     )
   },
 
-  'xaddress-issuer': async (client, address) => {
+  'xaddress-issuer': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.issuedXAddress,
@@ -59,7 +65,8 @@ export default <TestSuite>{
     assertResultMatch(result, responses.prepareTrustline.issuedXAddress, 'prepare')
   },
 
-  'with ticket': async (client, address) => {
+  'with ticket': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',

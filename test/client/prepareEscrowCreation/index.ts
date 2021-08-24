@@ -1,5 +1,6 @@
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
+import rippled from '../../fixtures/rippled'
 import {assertRejects, assertResultMatch, TestSuite} from '../../utils'
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
@@ -16,7 +17,8 @@ export const config = {
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'prepareEscrowCreation': async (client, address) => {
+  'prepareEscrowCreation': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -29,7 +31,8 @@ export default <TestSuite>{
     assertResultMatch(result, responses.prepareEscrowCreation.normal, 'prepare')
   },
 
-  'prepareEscrowCreation full': async (client, address) => {
+  'prepareEscrowCreation full': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const result = await client.prepareEscrowCreation(
       address,
       requests.prepareEscrowCreation.full
@@ -37,7 +40,8 @@ export default <TestSuite>{
     assertResultMatch(result, responses.prepareEscrowCreation.full, 'prepare')
   },
 
-  'prepareEscrowCreation - invalid': async (client, address) => {
+  'prepareEscrowCreation - invalid': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const escrow = Object.assign({}, requests.prepareEscrowCreation.full)
     delete escrow.amount // Make invalid
     await assertRejects(
@@ -47,7 +51,8 @@ export default <TestSuite>{
     )
   },
 
-  'with ticket': async (client, address) => {
+  'with ticket': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000396',
