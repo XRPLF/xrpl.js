@@ -13,7 +13,7 @@
       "description": "The three-character code or hexadecimal string used to denote currencies",
       "$ref": "currency"
     },
-    "issuer": {
+    "counterparty": {
       "description": "The XRP Ledger address of the account that owes or is owed the funds.",
       "$ref": "address"
     }
@@ -29,7 +29,7 @@
           }
         }
       },
-      "required": ["issuer"]
+      "required": ["counterparty"]
     },
     {
       "properties": {
@@ -38,7 +38,7 @@
         }
       },
       "not": {
-        "required": ["issuer"]
+        "required": ["counterparty"]
       }
     }
   ]

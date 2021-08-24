@@ -24,7 +24,7 @@
           "direction": "buy",
           "quantity": {
             "currency": "CNY",
-            "issuer": "rnuF96W4SZoCJmbHYBFoJZpR8eCaxNvekK",
+            "counterparty": "rnuF96W4SZoCJmbHYBFoJZpR8eCaxNvekK",
             "value": "3200"
           },
           "totalPrice": {

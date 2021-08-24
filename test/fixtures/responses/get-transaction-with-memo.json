@@ -14,7 +14,7 @@
     "quantity": {
       "currency": "NRD",
       "value": "0.1",
-      "issuer": "rGaZKAxMDhsSHvB51toY3YxGoPLhaX6Y5R"
+      "counterparty": "rGaZKAxMDhsSHvB51toY3YxGoPLhaX6Y5R"
     },
     "totalPrice": {
       "currency": "XRP",
@@ -32,14 +32,14 @@
                 "value": "0.01"
               },
               {
-                "issuer": "rfrCsX1gzVLvXzmgDxTYUWp96Ri6m61qtH",
+                "counterparty": "rfrCsX1gzVLvXzmgDxTYUWp96Ri6m61qtH",
                 "currency": "NRD",
                 "value": "-0.1"
               }
             ],
             "rfrCsX1gzVLvXzmgDxTYUWp96Ri6m61qtH": [
               {
-                "issuer": "rGaZKAxMDhsSHvB51toY3YxGoPLhaX6Y5R",
+                "counterparty": "rGaZKAxMDhsSHvB51toY3YxGoPLhaX6Y5R",
                 "currency": "NRD",
                 "value": "0.1"
               },
@@ -55,7 +55,7 @@
                 "direction": "sell",
                 "quantity": {
                   "currency": "NRD",
-                  "issuer": "rGaZKAxMDhsSHvB51toY3YxGoPLhaX6Y5R",
+                  "counterparty": "rGaZKAxMDhsSHvB51toY3YxGoPLhaX6Y5R",
                   "value": "0.1"
                 },
                 "totalPrice": {

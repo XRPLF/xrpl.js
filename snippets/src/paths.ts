@@ -22,7 +22,7 @@ async function sign() {
       address: 'rKT4JX4cCof6LcDYRz8o3rGRu7qxzZ2Zwj',
       amount: {
         currency: 'USD',
-        issuer: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc'
+        counterparty: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc'
       }
     }
   }

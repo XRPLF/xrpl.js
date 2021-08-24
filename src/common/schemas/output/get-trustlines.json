@@ -8,11 +8,11 @@
         "$ref": "trustline",
         "description": "A trust line specification that would produce this trust line in its current state."
       },
-      "issuer": {
+      "counterparty": {
         "properties": {
           "limit": {
             "$ref": "value",
-            "description": "The maximum amount that the issuer can be owed through the trust line."
+            "description": "The maximum amount that the counterparty can be owed through the trust line."
           },
           "ripplingDisabled": {
             "type": "boolean",
@@ -20,14 +20,14 @@
           },
           "frozen": {
             "type": "boolean",
-            "description": "If true, the trust line is frozen, which means that funds can only be sent directly to the issuer."
+            "description": "If true, the trust line is frozen, which means that funds can only be sent directly to the counterparty."
           },
           "authorized": {
             "type": "boolean",
-            "description": "If true, the issuer authorizes this party to hold issuances from the issuer."
+            "description": "If true, the counterparty authorizes this party to hold issuances from the counterparty."
           }
         },
-        "description": "Properties of the trustline from the perspective of the issuer.",
+        "description": "Properties of the trustline from the perspective of the counterparty.",
         "required": ["limit"],
         "additionalProperties": false
       },
@@ -43,7 +43,7 @@
         "additionalProperties": false
       }
     },
-    "required": ["specification", "issuer", "state"],
+    "required": ["specification", "counterparty", "state"],
     "additionalProperties": false
   }
 }

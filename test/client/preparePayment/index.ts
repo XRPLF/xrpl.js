@@ -332,7 +332,7 @@ export default <TestSuite>{
           amount: {
             currency: 'GBP',
             value: '0.1',
-            issuer: 'rpat5TmYjDsnFSStmgTumFgXCM9eqsWPro'
+            counterparty: 'rpat5TmYjDsnFSStmgTumFgXCM9eqsWPro'
           }
         },
         destination: {
@@ -340,7 +340,7 @@ export default <TestSuite>{
           minAmount: {
             currency: 'USD',
             value: '0.1248548562296331',
-            issuer: 'rMaa8VLBTjwTJWA2kSme4Sqgphhr6Lr6FH'
+            counterparty: 'rMaa8VLBTjwTJWA2kSme4Sqgphhr6Lr6FH'
           }
         }
       },

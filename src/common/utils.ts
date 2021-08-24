@@ -117,7 +117,7 @@ function toRippledAmount(amount: RippledAmount): RippledAmount {
     return amount.value
   }
 
-  let issuer = amount.issuer || amount.issuer
+  let issuer = amount.counterparty || amount.issuer
   let tag: number | false = false;
 
   try {

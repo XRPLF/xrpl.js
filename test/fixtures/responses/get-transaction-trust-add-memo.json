@@ -6,7 +6,7 @@
   "specification": {
     "limit": "2000",
     "currency": "USD",
-    "issuer": "rkrbFLphJzLvyLE1obALNARQAnoVypoNX",
+    "counterparty": "rkrbFLphJzLvyLE1obALNARQAnoVypoNX",
     "memos": [
       {
         "type": "test",

@@ -31,11 +31,11 @@ For details, see the `rippled` [book_offers method](https://xrpl.org/book_offers
 const orderbookInfo = {
   "base": {
     "currency": "USD",
-    "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+    "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
   },
   "counter": {
     "currency": "BTC",
-    "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+    "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
   }
 };
 
@@ -44,15 +44,15 @@ const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
 return Promise.all(
   [
     this.api.request('book_offers', {
-      taker_gets: RippleAPI.renameissuerToIssuer(orderbookInfo.base),
-      taker_pays: RippleAPI.renameissuerToIssuer(orderbookInfo.counter),
+      taker_gets: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base),
+      taker_pays: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter),
       ledger_index: 'validated',
       limit: 20,
       taker: address
     }),
     this.api.request('book_offers', {
-      taker_gets: RippleAPI.renameissuerToIssuer(orderbookInfo.counter),
-      taker_pays: RippleAPI.renameissuerToIssuer(orderbookInfo.base),
+      taker_gets: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter),
+      taker_pays: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base),
       ledger_index: 'validated',
       limit: 20,
       taker: address
@@ -75,12 +75,12 @@ return Promise.all(
         "quantity": {
           "currency": "USD",
           "value": "0.71800168",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.00016708342",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {
@@ -119,12 +119,12 @@ return Promise.all(
         "quantity": {
           "currency": "USD",
           "value": "1.6770875",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.00038681218",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {
@@ -166,12 +166,12 @@ return Promise.all(
         "quantity": {
           "currency": "USD",
           "value": "0.71085738",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.00016876265",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {
@@ -210,12 +210,12 @@ return Promise.all(
         "quantity": {
           "currency": "USD",
           "value": "1.6438778",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.00039462656",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {

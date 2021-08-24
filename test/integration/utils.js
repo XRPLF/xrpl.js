@@ -8,7 +8,7 @@ function ledgerAccept(client) {
   return client.connection.request(request);
 }
 
-function pay(client, from, to, amount, secret, currency = 'XRP', issuer) {
+function pay(client, from, to, amount, secret, currency = 'XRP', counterparty) {
   const paymentSpecification = {
     source: {
       address: from,
@@ -26,9 +26,9 @@ function pay(client, from, to, amount, secret, currency = 'XRP', issuer) {
     }
   };
 
-  if (issuer != null) {
-    paymentSpecification.source.maxAmount.issuer = issuer;
-    paymentSpecification.destination.amount.issuer = issuer;
+  if (counterparty != null) {
+    paymentSpecification.source.maxAmount.counterparty = counterparty;
+    paymentSpecification.destination.amount.counterparty = counterparty;
   }
 
   let id = null;
@@ -44,9 +44,9 @@ function pay(client, from, to, amount, secret, currency = 'XRP', issuer) {
 }
 
 
-function payTo(client, to, amount = '4003218', currency = 'XRP', issuer) {
+function payTo(client, to, amount = '4003218', currency = 'XRP', counterparty) {
   return pay(client, masterAccount, to, amount, masterSecret, currency,
-    issuer);
+    counterparty);
 }
 
 

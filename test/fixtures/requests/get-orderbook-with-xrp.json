@@ -1,7 +1,7 @@
 {
   "base": {
     "currency": "USD",
-    "issuer": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw"
+    "counterparty": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw"
   },
   "counter": {
     "currency": "XRP"

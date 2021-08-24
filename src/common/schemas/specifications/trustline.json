@@ -8,7 +8,7 @@
       "$ref": "currency",
       "description": "The currency this trustline applies to."
     },
-    "issuer": {
+    "counterparty": {
       "$ref": "address",
       "description": "The address of the account this trustline extends trust to."
     },
@@ -30,7 +30,7 @@
     },
     "authorized": {
       "type": "boolean",
-      "description": "If true, authorize the issuer to hold issuances from this account."
+      "description": "If true, authorize the counterparty to hold issuances from this account."
     },
     "frozen": {
       "type": "boolean",
@@ -38,6 +38,6 @@
     },
     "memos": {"$ref": "memos"}
   },
-  "required": ["currency", "issuer", "limit"],
+  "required": ["currency", "counterparty", "limit"],
   "additionalProperties": false
 }

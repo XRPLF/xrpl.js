@@ -82,14 +82,14 @@ export type Outcome = {
   balanceChanges: {
     [key: string]: {
       currency: string
-      issuer?: string
+      counterparty?: string
       value: string
     }[]
   }
   orderbookChanges: object
   deliveredAmount?: {
     currency: string
-    issuer?: string
+    counterparty?: string
     value: string
   }
   timestamp?: string

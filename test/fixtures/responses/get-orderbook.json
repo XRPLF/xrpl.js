@@ -6,12 +6,12 @@
         "quantity": {
           "currency": "USD",
           "value": "93.030522464522",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.2849323720855092",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {
@@ -50,12 +50,12 @@
         "quantity": {
           "currency": "USD",
           "value": "1",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.00302447007930511",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {
@@ -94,12 +94,12 @@
         "quantity": {
           "currency": "USD",
           "value": "99.34014894048333",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.3",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "expirationTime": "2014-12-25T01:14:43.000Z"
       },
@@ -140,12 +140,12 @@
         "quantity": {
           "currency": "USD",
           "value": "268.754",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.8095",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {
@@ -157,12 +157,12 @@
         "fundedAmount": {
           "currency": "BTC",
           "value": "0.8078974385735969",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "priceOfFundedAmount": {
           "currency": "USD",
           "value": "268.2219496064341",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "data": {
@@ -206,12 +206,12 @@
         "quantity": {
           "currency": "USD",
           "value": "152.0098333185607",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.4499999999999999",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "expirationTime": "2014-12-25T01:14:44.000Z"
       },
@@ -251,12 +251,12 @@
         "quantity": {
           "currency": "USD",
           "value": "1.308365894430151",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.003768001830745216",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {
@@ -295,12 +295,12 @@
         "quantity": {
           "currency": "USD",
           "value": "176.3546101589987",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.5",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "expirationTime": "2014-12-25T00:41:38.000Z"
       },
@@ -341,12 +341,12 @@
         "quantity": {
           "currency": "USD",
           "value": "179.48",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.5",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {
@@ -358,12 +358,12 @@
         "fundedAmount": {
           "currency": "BTC",
           "value": "0.499001996007984",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "priceOfFundedAmount": {
           "currency": "USD",
           "value": "179.1217564870259",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "data": {
@@ -407,12 +407,12 @@
         "quantity": {
           "currency": "USD",
           "value": "288.7710263794967",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.8",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "expirationTime": "2014-12-25T00:41:39.000Z"
       },
@@ -452,12 +452,12 @@
         "quantity": {
           "currency": "USD",
           "value": "182.9814890090516",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.5",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {
@@ -469,12 +469,12 @@
         "fundedAmount": {
           "currency": "BTC",
           "value": "0.2254411038203033",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "priceOfFundedAmount": {
           "currency": "USD",
           "value": "82.50309772176658",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "data": {
@@ -520,12 +520,12 @@
         "quantity": {
           "currency": "USD",
           "value": "3205.1",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "10",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {
@@ -564,12 +564,12 @@
         "quantity": {
           "currency": "USD",
           "value": "1599.063669386278",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "4.99707396683212",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {
@@ -608,12 +608,12 @@
         "quantity": {
           "currency": "USD",
           "value": "143.1050962074379",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.4499999999999999",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "expirationTime": "2014-12-25T01:14:44.000Z"
       },
@@ -626,12 +626,12 @@
         "fundedAmount": {
           "currency": "USD",
           "value": "0",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "priceOfFundedAmount": {
           "currency": "BTC",
           "value": "0",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "data": {
@@ -676,12 +676,12 @@
         "quantity": {
           "currency": "USD",
           "value": "254.329207354604",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.8",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "expirationTime": "2014-12-24T21:44:11.000Z"
       },
@@ -694,12 +694,12 @@
         "fundedAmount": {
           "currency": "USD",
           "value": "0",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "priceOfFundedAmount": {
           "currency": "BTC",
           "value": "0",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "data": {
@@ -744,12 +744,12 @@
         "quantity": {
           "currency": "USD",
           "value": "390.4979",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "1.23231134568807",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {
@@ -788,12 +788,12 @@
         "quantity": {
           "currency": "USD",
           "value": "1",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.003160328237957649",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {
@@ -832,12 +832,12 @@
         "quantity": {
           "currency": "USD",
           "value": "4725",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "15",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {
@@ -875,12 +875,12 @@
         "quantity": {
           "currency": "USD",
           "value": "1.24252537879871",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "0.003967400879423823",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {
@@ -919,12 +919,12 @@
         "quantity": {
           "currency": "USD",
           "value": "496.5429474010489",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "1.6",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "expirationTime": "2014-12-24T21:44:12.000Z"
       },
@@ -937,12 +937,12 @@
         "fundedAmount": {
           "currency": "USD",
           "value": "0",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "priceOfFundedAmount": {
           "currency": "BTC",
           "value": "0",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "data": {
@@ -986,12 +986,12 @@
         "quantity": {
           "currency": "USD",
           "value": "3103",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
         "totalPrice": {
           "currency": "BTC",
           "value": "10",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
       "properties": {

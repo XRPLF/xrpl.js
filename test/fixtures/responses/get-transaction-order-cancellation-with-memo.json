@@ -31,7 +31,7 @@
           "direction": "buy",
           "quantity": {
             "currency": "USD",
-            "issuer": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
+            "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
             "value": "237"
           },
           "totalPrice": {

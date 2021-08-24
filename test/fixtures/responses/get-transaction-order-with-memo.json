@@ -8,7 +8,7 @@
     "quantity": {
       "currency": "USD",
       "value": "237",
-      "issuer": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+      "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
     },
     "totalPrice": {
       "currency": "XRP",
@@ -40,7 +40,7 @@
           "direction": "buy",
           "quantity": {
             "currency": "USD",
-            "issuer": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
+            "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
             "value": "237"
           },
           "totalPrice": {

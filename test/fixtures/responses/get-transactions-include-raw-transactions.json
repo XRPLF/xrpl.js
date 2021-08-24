@@ -29,24 +29,24 @@
       "deliveredAmount": {
         "currency": "USD",
         "value": "0.001",
-        "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+        "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
       },
       "balanceChanges": {
         "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo": [
           {
-            "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
+            "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
             "currency": "USD",
             "value": "-0.001"
           },
           {
-            "issuer": "r9tGqzZgKxVFvzKFdUqXAqTzazWBUia8Qr",
+            "counterparty": "r9tGqzZgKxVFvzKFdUqXAqTzazWBUia8Qr",
             "currency": "USD",
             "value": "0.001002"
           }
         ],
         "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM": [
           {
-            "issuer": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+            "counterparty": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
             "currency": "USD",
             "value": "0.001"
           }
@@ -63,7 +63,7 @@
             "value": "1.101198"
           },
           {
-            "issuer": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+            "counterparty": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
             "currency": "USD",
             "value": "-0.001002"
           }
@@ -79,7 +79,7 @@
             },
             "totalPrice": {
               "currency": "USD",
-              "issuer": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+              "counterparty": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
               "value": "0.001002"
             },
             "makerExchangeRate": "1099",
@@ -123,24 +123,24 @@
       "deliveredAmount": {
         "currency": "USD",
         "value": "0.001",
-        "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+        "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
       },
       "balanceChanges": {
         "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo": [
           {
-            "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
+            "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
             "currency": "USD",
             "value": "-0.001"
           },
           {
-            "issuer": "r9tGqzZgKxVFvzKFdUqXAqTzazWBUia8Qr",
+            "counterparty": "r9tGqzZgKxVFvzKFdUqXAqTzazWBUia8Qr",
             "currency": "USD",
             "value": "0.001002"
           }
         ],
         "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM": [
           {
-            "issuer": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+            "counterparty": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
             "currency": "USD",
             "value": "0.001"
           }
@@ -157,7 +157,7 @@
             "value": "1.101198"
           },
           {
-            "issuer": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+            "counterparty": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
             "currency": "USD",
             "value": "-0.001002"
           }
@@ -173,7 +173,7 @@
             },
             "totalPrice": {
               "currency": "USD",
-              "issuer": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+              "counterparty": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
               "value": "0.001002"
             },
             "makerExchangeRate": "1099",

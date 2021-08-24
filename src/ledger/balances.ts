@@ -7,7 +7,7 @@ import {Client} from '..'
 export type Balance = {
   value: string
   currency: string
-  issuer?: string
+  counterparty?: string
 }
 
 export type GetBalances = Array<Balance>
@@ -15,7 +15,7 @@ export type GetBalances = Array<Balance>
 function getTrustlineBalanceAmount(trustline: FormattedTrustline): Balance {
   return {
     currency: trustline.specification.currency,
-    issuer: trustline.specification.issuer,
+    counterparty: trustline.specification.counterparty,
     value: trustline.state.balance
   }
 }
@@ -23,7 +23,7 @@ function getTrustlineBalanceAmount(trustline: FormattedTrustline): Balance {
 function formatBalances(options: GetTrustlinesOptions, balances: {xrp: string, trustlines: FormattedTrustline[]}) {
   const result = balances.trustlines.map(getTrustlineBalanceAmount)
   if (
-    !(options.issuer || (options.currency && options.currency !== 'XRP'))
+    !(options.counterparty || (options.currency && options.currency !== 'XRP'))
   ) {
     const xrpBalance = {
       currency: 'XRP',

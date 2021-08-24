@@ -2,7 +2,7 @@
   "direction": "sell",
   "quantity": {
     "currency": "USD",
-    "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
+    "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
     "value": "10.1"
   },
   "totalPrice": {

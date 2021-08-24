@@ -284,7 +284,7 @@ module.exports.normal = function(request, options = {}) {
   });
 };
 
-module.exports.issuer = function(request, options = {}) {
+module.exports.counterparty = function(request, options = {}) {
   _.defaults(options, {
     ledger: BASE_LEDGER_INDEX
   });

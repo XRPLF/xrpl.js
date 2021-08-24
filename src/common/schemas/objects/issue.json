@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "issue",
-  "description": "The currency code, and the issuer if it's not XRP.",
+  "description": "The currency code, and the counterparty if it's not XRP.",
   "allOf": [
     {"$ref": "amountbase"},
     {"not": {"required": ["value"]}}

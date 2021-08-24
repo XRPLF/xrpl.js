@@ -4,7 +4,7 @@
     "maxAmount": {
       "value": "0.01",
       "currency": "USD",
-      "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+      "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
     }
   },
   "destination": {
@@ -12,7 +12,7 @@
     "amount": {
       "value": "0.01",
       "currency": "USD",
-      "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+      "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
     }
   }
 }

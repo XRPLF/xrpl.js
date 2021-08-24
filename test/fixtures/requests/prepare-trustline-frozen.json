@@ -1,6 +1,6 @@
 {
   "currency": "BTC",
-  "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
+  "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
   "limit": "0.1",
   "authorized": true,
   "ripplingDisabled": false,

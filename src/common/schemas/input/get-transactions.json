@@ -40,9 +40,9 @@
           "type": "boolean",
           "description": "If true, return only transactions initiated by the account specified by `address`. If false, return only transactions not initiated by the account specified by `address`."
         },
-        "issuer": {
+        "counterparty": {
           "$ref": "address",
-          "description": "If provided, only return transactions with this account as a issuer to the transaction."
+          "description": "If provided, only return transactions with this account as a counterparty to the transaction."
         },
         "types": {
           "type": "array",

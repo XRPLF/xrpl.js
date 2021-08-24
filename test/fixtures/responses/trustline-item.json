@@ -2,9 +2,9 @@
   "specification": {
     "limit": "0",
     "currency": "CHF",
-    "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+    "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
   },
-  "issuer": {
+  "counterparty": {
     "limit": "0"
   },
   "state": {

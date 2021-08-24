@@ -3,11 +3,11 @@
     "specification": {
       "limit": "5",
       "currency": "USD",
-      "issuer": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
+      "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
       "ripplingDisabled": true,
       "frozen": true
     },
-    "issuer": {
+    "counterparty": {
       "limit": "0"
     },
     "state": {
@@ -18,9 +18,9 @@
     "specification": {
       "limit": "5000",
       "currency": "USD",
-      "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+      "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
     },
-    "issuer": {
+    "counterparty": {
       "limit": "0"
     },
     "state": {
@@ -31,9 +31,9 @@
     "specification": {
       "limit": "1",
       "currency": "USD",
-      "issuer": "rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun"
+      "counterparty": "rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun"
     },
-    "issuer": {
+    "counterparty": {
       "limit": "0"
     },
     "state": {
@@ -44,10 +44,10 @@
     "specification": {
       "limit": "1",
       "currency": "USD",
-      "issuer": "r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X",
+      "counterparty": "r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X",
       "ripplingDisabled": true
     },
-    "issuer": {
+    "counterparty": {
       "limit": "0"
     },
     "state": {
@@ -58,10 +58,10 @@
     "specification": {
       "limit": "500",
       "currency": "USD",
-      "issuer": "rfF3PNkwkq1DygW2wum2HK3RGfgkJjdPVD",
+      "counterparty": "rfF3PNkwkq1DygW2wum2HK3RGfgkJjdPVD",
       "ripplingDisabled": true
     },
-    "issuer": {
+    "counterparty": {
       "limit": "0"
     },
     "state": {
@@ -72,9 +72,9 @@
     "specification": {
       "limit": "0",
       "currency": "USD",
-      "issuer": "rE6R3DWF9fBD7CyiQciePF9SqK58Ubp8o2"
+      "counterparty": "rE6R3DWF9fBD7CyiQciePF9SqK58Ubp8o2"
     },
-    "issuer": {
+    "counterparty": {
       "limit": "100",
       "ripplingDisabled": true
     },
@@ -86,10 +86,10 @@
     "specification": {
       "limit": "0",
       "currency": "USD",
-      "issuer": "rEhDDUUNxpXgEHVJtC2cjXAgyx5VCFxdMF",
+      "counterparty": "rEhDDUUNxpXgEHVJtC2cjXAgyx5VCFxdMF",
       "frozen": true
     },
-    "issuer": {
+    "counterparty": {
       "limit": "1"
     },
     "state": {

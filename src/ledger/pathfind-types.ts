@@ -26,7 +26,7 @@ export type PathFind = {
   source: {
     address: string
     amount?: Amount
-    currencies?: Array<{currency: string; issuer?: string}>
+    currencies?: Array<{currency: string; counterparty?: string}>
   }
   destination: {
     address: string
