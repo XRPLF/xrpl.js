@@ -165,17 +165,5 @@ export function createMockRippled(port) {
     }
   })
 
-  mock.on('request_global_config', function (request, conn) {
-    assert.strictEqual(request.command, 'global_config')
-    mock.config = Object.assign(conn.config, request.data)
-    conn.send(
-      createResponse(request, {
-        status: 'success',
-        type: 'response',
-        result: {}
-      })
-    )
-  })
-
   return mock
 }
