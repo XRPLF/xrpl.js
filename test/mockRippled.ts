@@ -6,7 +6,6 @@ import {EventEmitter2} from 'eventemitter2'
 import fixtures from './fixtures/rippled'
 import addresses from './fixtures/addresses.json'
 import hashes from './fixtures/hashes.json'
-import transactionsResponse from './fixtures/rippled/accountTx'
 import accountLinesResponse from './fixtures/rippled/accountLines'
 import fullLedger from './fixtures/rippled/ledgerFull38129.json'
 import {getFreePort} from './testUtils'
@@ -540,24 +539,6 @@ export function createMockRippled(port) {
     }
   })
 
-  mock.on('request_account_tx', function (request, conn) {
-    if (request.account === addresses.ACCOUNT) {
-      conn.send(transactionsResponse(request))
-    } else if (request.account === addresses.OTHER_ACCOUNT) {
-      conn.send(createResponse(request, fixtures.account_tx.one))
-    } else {
-      assert(false, 'Unrecognized account address: ' + request.account)
-    }
-  })
-
-  mock.on('request_account_offers', function (request, conn) {
-    if (request.account === addresses.ACCOUNT) {
-      conn.send(fixtures.account_offers(request))
-    } else {
-      assert(false, 'Unrecognized account address: ' + request.account)
-    }
-  })
-
   let requestsCache = undefined
 
   mock.on('request_book_offers', function (request, conn) {
@@ -696,14 +677,6 @@ export function createMockRippled(port) {
       )
     }
     conn.send(response)
-  })
-
-  mock.on('request_gateway_balances', function (request, conn) {
-    if (request.ledger_index === 123456) {
-      conn.send(createResponse(request, fixtures.unsubscribe))
-    } else {
-      conn.send(createResponse(request, fixtures.gateway_balances))
-    }
   })
 
   return mock
