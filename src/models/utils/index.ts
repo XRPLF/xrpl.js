@@ -1,9 +1,3 @@
-import { encode } from "ripple-binary-codec/dist"
-import { ValidationError } from "../../common/errors"
-import HashPrefix from "../../common/hashes/hash-prefix"
-import sha512Half from "../../common/hashes/sha512Half"
-import { Transaction } from "../transactions"
-
 /**
  * Verify that all fields of an object are in fields
  * 
@@ -24,21 +18,4 @@ export function onlyHasFields(obj: object, fields: Array<string>): boolean {
  */
 export function isFlagEnabled(Flags: number, checkFlag: number): boolean {
     return (checkFlag & Flags) === checkFlag
-}
-
-/**
- * Hashes the Transaction object as the ledger does. Only valid for signed Transactions.
- * 
- * @param {Transaction} tx A transaction to hash. Tx must be signed.
- * @returns {string} A hash of tx
- * @throws {ValidationError} if the Transaction is unsigned
- */
-
-export function toHash(tx: Transaction): string {
-    if(tx.TxnSignature === undefined) {
-        throw new ValidationError("The transaction must be signed to hash it.")
-    }
-    const prefix = HashPrefix.TRANSACTION_ID.toString(16)
-    const encodedStr = prefix.concat(encode(tx))
-    return sha512Half(encodedStr)
 }
