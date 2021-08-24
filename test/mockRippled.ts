@@ -27,6 +27,8 @@ function ping(conn, request) {
   }, 1000 * 2)
 }
 
+
+
 // We mock out WebSocketServer in these tests and add a lot of custom
 // properties not defined on the normal WebSocketServer object.
 type MockedWebSocketServer = any
@@ -51,6 +53,47 @@ export function createMockRippled(port) {
       return functionOrObject(request)
     }
     return functionOrObject
+  }
+
+  mock.testCommand = function testCommand(conn, request) {
+    if (request.data.disconnectIn) {
+      setTimeout(conn.terminate.bind(conn), request.data.disconnectIn)
+      conn.send(
+        createResponse(request, {
+          status: 'success',
+          type: 'response',
+          result: {}
+        })
+      )
+    } else if (request.data.openOnOtherPort) {
+      getFreePort().then((newPort) => {
+        createMockRippled(newPort)
+        conn.send(
+          createResponse(request, {
+            status: 'success',
+            type: 'response',
+            result: {port: newPort}
+          })
+        )
+      })
+    } else if (request.data.closeServerAndReopen) {
+      setTimeout(() => {
+        conn.terminate()
+        close.call(mock, () => {
+          setTimeout(() => {
+            createMockRippled(port)
+          }, request.data.closeServerAndReopen)
+        })
+      }, 10)
+    } else if (request.data.unrecognizedResponse) {
+      conn.send(
+        createResponse(request, {
+          status: 'unrecognized',
+          type: 'response',
+          result: {}
+        })
+      )
+    }
   }
 
   const close = mock.close
@@ -90,11 +133,12 @@ export function createMockRippled(port) {
         const request = JSON.parse(requestJSON)
         if (request.command === 'ping') {
           ping(conn, request)
-        } else if (request.command in mock.responses) {
+        } else if (request.command === 'test_command') {
+          mock.testCommand(conn, request)
+        }else if (request.command in mock.responses) {
           conn.send(createResponse(request, mock.getResponse(request)))
         } else {
-          // TODO: remove this block once all the handlers have been removed
-          mock.emit('request_' + request.command, request, conn)
+          throw new Error(`No event handler registered in mock rippled for ${request.command}`)
         }
       } catch (err) {
         if (!mock.suppressOutput)
@@ -121,48 +165,6 @@ export function createMockRippled(port) {
       throw new Error('Unexpected request: ' + this.event)
     }
     mock.expectedRequests[this.event] -= 1
-  })
-
-  mock.on('request_test_command', function (request, conn) {
-    assert.strictEqual(request.command, 'test_command')
-    if (request.data.disconnectIn) {
-      setTimeout(conn.terminate.bind(conn), request.data.disconnectIn)
-      conn.send(
-        createResponse(request, {
-          status: 'success',
-          type: 'response',
-          result: {}
-        })
-      )
-    } else if (request.data.openOnOtherPort) {
-      getFreePort().then((newPort) => {
-        createMockRippled(newPort)
-        conn.send(
-          createResponse(request, {
-            status: 'success',
-            type: 'response',
-            result: {port: newPort}
-          })
-        )
-      })
-    } else if (request.data.closeServerAndReopen) {
-      setTimeout(() => {
-        conn.terminate()
-        close.call(mock, () => {
-          setTimeout(() => {
-            createMockRippled(port)
-          }, request.data.closeServerAndReopen)
-        })
-      }, 10)
-    } else if (request.data.unrecognizedResponse) {
-      conn.send(
-        createResponse(request, {
-          status: 'unrecognized',
-          type: 'response',
-          result: {}
-        })
-      )
-    }
   })
 
   return mock
