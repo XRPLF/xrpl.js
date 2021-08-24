@@ -81,6 +81,8 @@ export function createMockRippled(port) {
     mock.expectedRequests = expectedRequests
   }
 
+  mock.suppressOutput = false
+
   mock.on('connection', function (this: MockedWebSocketServer, conn: any) {
     if (mock.config.breakNextConnection) {
       mock.config.breakNextConnection = false
@@ -94,7 +96,8 @@ export function createMockRippled(port) {
         const request = JSON.parse(requestJSON)
         mock.emit('request_' + request.command, request, conn)
       } catch (err) {
-        console.error('Error: ' + err.message)
+        if (!mock.suppressOutput)
+          console.error('Error: ' + err.message)
         conn.close(4000, err.message)
       }
     })
