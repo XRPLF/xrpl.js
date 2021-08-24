@@ -5,7 +5,6 @@ import {FormattedTransactionType} from '../transaction/types'
 import {Issue} from '../common/types/objects'
 import {Client} from '..'
 import { AccountInfoRequest } from '../models/methods'
-import { Connection } from '../client'
 
 export type RecursiveData = {
   marker: string
@@ -136,6 +135,5 @@ export {
   getRecursive,
   isPendingLedgerVersion,
   clamp,
-  common,
-  // Connection
+  common
 }

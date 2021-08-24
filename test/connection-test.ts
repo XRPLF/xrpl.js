@@ -4,7 +4,7 @@ import assert from 'assert-diff'
 import setupClient from './setup-client'
 import {Client} from 'xrpl-local'
 import {ignoreWebSocketDisconnect} from './utils'
-const utils = Client._PRIVATE.ledgerUtils
+import { Connection } from 'xrpl-local/client'
 
 const TIMEOUT = 200000 // how long before each test case times out
 const isBrowser = (process as any).browser
@@ -28,7 +28,7 @@ describe('Connection', function () {
   afterEach(setupClient.teardown)
 
   it('default options', function () {
-    const connection: any = new utils.Connection('url')
+    const connection: any = new Connection('url')
     assert.strictEqual(connection._url, 'url')
     assert(connection._config.proxy == null)
     assert(connection._config.authorization == null)
@@ -51,7 +51,7 @@ describe('Connection', function () {
     it('as false', function () {
       const messages = []
       console.log = (id, message) => messages.push([id, message])
-      const connection: any = new utils.Connection('url', {trace: false})
+      const connection: any = new Connection('url', {trace: false})
       connection._ws = {send: function () {}}
       connection.request(mockedRequestData)
       connection._onMessage(mockedResponse)
@@ -61,7 +61,7 @@ describe('Connection', function () {
     it('as true', function () {
       const messages = []
       console.log = (id, message) => messages.push([id, message])
-      const connection: any = new utils.Connection('url', {trace: true})
+      const connection: any = new Connection('url', {trace: true})
       connection._ws = {send: function () {}}
       connection.request(mockedRequestData)
       connection._onMessage(mockedResponse)
@@ -70,7 +70,7 @@ describe('Connection', function () {
 
     it('as a function', function () {
       const messages = []
-      const connection: any = new utils.Connection('url', {
+      const connection: any = new Connection('url', {
         trace: (id, message) => messages.push([id, message])
       })
       connection._ws = {send: function () {}}
@@ -103,7 +103,7 @@ describe('Connection', function () {
         authorization: 'authorization',
         trustedCertificates: ['path/to/pem']
       }
-      const connection = new utils.Connection(
+      const connection = new Connection(
         this.client.connection._url,
         options
       )
@@ -123,7 +123,7 @@ describe('Connection', function () {
   })
 
   it('NotConnectedError', function () {
-    const connection = new utils.Connection('url')
+    const connection = new Connection('url')
     return connection.request({
         command: 'ledger', 
         ledger_index: 'validated'
@@ -147,7 +147,7 @@ describe('Connection', function () {
     }
 
     // Address where no one listens
-    const connection = new utils.Connection(
+    const connection = new Connection(
       'ws://testripple.circleci.com:129'
     )
     connection.on('error', done)
@@ -409,7 +409,7 @@ describe('Connection', function () {
   })
 
   it('Cannot connect because no server', function () {
-    const connection = new utils.Connection(undefined as string)
+    const connection = new Connection(undefined as string)
     return connection
       .connect()
       .then(() => {

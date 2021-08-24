@@ -5,9 +5,8 @@ import requests from '../../fixtures/requests'
 import {ValidationError} from 'xrpl-local/common/errors'
 import binary from 'ripple-binary-codec'
 import assert from 'assert-diff'
-import {Client} from 'xrpl-local'
+import { schemaValidate } from '../../../src/common/schema-validator'
 
-const {schemaValidator} = Client._PRIVATE
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 const {preparePayment: REQUEST_FIXTURES} = requests
 const {preparePayment: RESPONSE_FIXTURES} = responses
@@ -364,7 +363,7 @@ export default <TestSuite>{
       `Flags = ${decoded.Flags}, should be 2147614720`
     )
     assert.deepEqual(result, expectedResult)
-    schemaValidator.schemaValidate('sign', result)
+    schemaValidate('sign', result)
   },
 
   'destination.minAmount': async (client, address, mockRippled) => {

@@ -5,8 +5,11 @@ import {RecursiveData} from 'xrpl-local/ledger/utils'
 import {assertRejects} from './utils'
 import addresses from './fixtures/addresses.json'
 import setupClient from './setup-client'
+import {schemaValidate} from '../src/common/schema-validator'
+import { sign, getTransactions } from '../src/common/validate'
+import { renameCounterpartyToIssuerInOrder, compareTransactions, getRecursive } from '../src/ledger/utils'
+import {toRippledAmount} from '../src/common/index'
 
-const {validate, schemaValidator, ledgerUtils} = Client._PRIVATE
 const address = addresses.ACCOUNT
 assert.options.strict = true
 
@@ -45,7 +48,7 @@ describe('Client', function () {
   describe('[private] schema-validator', function () {
     it('valid', function () {
       assert.doesNotThrow(function () {
-        schemaValidator.schemaValidate(
+        schemaValidate(
           'hash256',
           '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A0F'
         )
@@ -54,19 +57,19 @@ describe('Client', function () {
 
     it('invalid', function () {
       assert.throws(function () {
-        schemaValidator.schemaValidate('hash256', 'invalid')
+        schemaValidate('hash256', 'invalid')
       }, this.client.errors.ValidationError)
     })
 
     it('invalid - empty value', function () {
       assert.throws(function () {
-        schemaValidator.schemaValidate('hash256', '')
+        schemaValidate('hash256', '')
       }, this.client.errors.ValidationError)
     })
 
     it('schema not found error', function () {
       assert.throws(function () {
-        schemaValidator.schemaValidate('unexisting', 'anything')
+        schemaValidate('unexisting', 'anything')
       }, /no schema/)
     })
   })
@@ -77,7 +80,7 @@ describe('Client', function () {
         minLedgerVersion: 20000,
         maxLedgerVersion: 10000
       }
-      const thunk = _.partial(validate.getTransactions, {address, options})
+      const thunk = _.partial(getTransactions, {address, options})
       assert.throws(thunk, this.client.errors.ValidationError)
       assert.throws(
         thunk,
@@ -87,7 +90,7 @@ describe('Client', function () {
 
     it('secret', function () {
       function validateSecret(secret) {
-        validate.sign({txJSON: '', secret})
+        sign({txJSON: '', secret})
       }
       assert.doesNotThrow(
         _.partial(validateSecret, 'shzjfakiK79YQdMjy4h8cGGfQSV6u')
@@ -123,7 +126,7 @@ describe('Client', function () {
 
   it('common utils - toRippledAmount', async () => {
     const amount = {issuer: 'is', currency: 'c', value: 'v'}
-    assert.deepEqual(ledgerUtils.common.toRippledAmount(amount), {
+    assert.deepEqual(toRippledAmount(amount), {
       issuer: 'is',
       currency: 'c',
       value: 'v'
@@ -140,23 +143,23 @@ describe('Client', function () {
       taker_pays: {issuer: '1', currency: 'XRP'}
     }
     assert.deepEqual(
-      ledgerUtils.renameCounterpartyToIssuerInOrder(order),
+      renameCounterpartyToIssuerInOrder(order),
       expected
     )
   })
 
   it('ledger utils - compareTransactions', async () => {
     // @ts-ignore
-    assert.strictEqual(ledgerUtils.compareTransactions({}, {}), 0)
+    assert.strictEqual(compareTransactions({}, {}), 0)
     let first: any = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
     let second: any = {outcome: {ledgerVersion: 1, indexInLedger: 200}}
-    assert.strictEqual(ledgerUtils.compareTransactions(first, second), -1)
+    assert.strictEqual(compareTransactions(first, second), -1)
     first = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
     second = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
-    assert.strictEqual(ledgerUtils.compareTransactions(first, second), 0)
+    assert.strictEqual(compareTransactions(first, second), 0)
     first = {outcome: {ledgerVersion: 1, indexInLedger: 200}}
     second = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
-    assert.strictEqual(ledgerUtils.compareTransactions(first, second), 1)
+    assert.strictEqual(compareTransactions(first, second), 1)
   })
 
   it('ledger utils - getRecursive', async () => {
@@ -169,6 +172,6 @@ describe('Client', function () {
         resolve({marker: 'A', results: [1]})
       })
     }
-    await assertRejects(ledgerUtils.getRecursive(getter, 10), Error)
+    await assertRejects(getRecursive(getter, 10), Error)
   })
 })
