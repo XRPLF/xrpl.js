@@ -1,5 +1,6 @@
 import { encode } from "ripple-binary-codec/dist"
 import { ValidationError } from "../../common/errors"
+import HashPrefix from "../../common/hashes/hash-prefix"
 import sha512Half from "../../common/hashes/sha512Half"
 import { Transaction } from "../transactions"
 
@@ -33,14 +34,11 @@ export function isFlagEnabled(Flags: number, checkFlag: number): boolean {
  * @throws {ValidationError} if the Transaction is unsigned
  */
 
-// TODO: Investigate 0x53545800 if single-signing, or 0x534D5400 if multisigning - https://xrpl.org/serialization.html#blob-fields 
-// Could be a bug in the xrpl-py method!
-
 export function toHash(tx: Transaction): string {
     if(tx.TxnSignature === undefined) {
         throw new ValidationError("The transaction must be signed to hash it.")
     }
-    const _TRANSACTION_HASH_PREFIX = "54584E00"
-    const encodedStr = _TRANSACTION_HASH_PREFIX.concat(encode(tx))
+    const prefix = HashPrefix.TRANSACTION_ID.toString(16)
+    const encodedStr = prefix.concat(encode(tx))
     return sha512Half(encodedStr)
 }

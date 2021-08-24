@@ -5,6 +5,8 @@ import HashPrefix from './hash-prefix'
 import {SHAMap, NodeType} from './shamap'
 import {encode} from 'ripple-binary-codec'
 import ledgerspaces from './ledgerspaces'
+import { Transaction } from '../../models/transactions'
+import { ValidationError } from '../errors'
 
 const padLeftZero = (string: string, length: number): string => {
   return Array(length - string.length + 1).join('0') + string
@@ -59,13 +61,31 @@ const addLengthPrefix = (hex: string): string => {
   throw new Error('Variable integer overflow.')
 }
 
+/**
+ * Hashes the Transaction blob as the ledger does. Only valid for signed Transaction blobs.
+ * 
+ * @param {Transaction} tx A blob of a signed Transaction to hash.
+ * @returns {string} The hash of tx
+ */
+
 export const computeBinaryTransactionHash = (txBlobHex: string): string => {
   const prefix = HashPrefix.TRANSACTION_ID.toString(16).toUpperCase()
-  return sha512Half(prefix + txBlobHex)
+  return sha512Half(prefix.concat(txBlobHex))
 }
 
-export const computeTransactionHash = (txJSON: any): string => {
-  return computeBinaryTransactionHash(encode(txJSON))
+/**
+ * Hashes the Transaction object as the ledger does. Throws if the transaction is unsigned.
+ * 
+ * @param {Transaction} tx A transaction to hash. Tx must be signed.
+ * @returns {string} A hash of tx
+ * @throws {ValidationError} if the Transaction is unsigned
+ */
+
+export const computeSignedTransactionHash = (tx: Transaction): string => {
+  if(tx.TxnSignature === undefined) {
+    throw new ValidationError("The transaction must be signed to hash it.")
+  }
+  return computeBinaryTransactionHash(encode(tx))
 }
 
 /**

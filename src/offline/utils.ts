@@ -13,7 +13,7 @@ import { dropsToXrp,
 } from '../common/utils'
 import {
     computeBinaryTransactionHash,
-    computeTransactionHash,
+    computeSignedTransactionHash,
     computeBinaryTransactionSigningHash,
     computeAccountLedgerObjectID,
     computeSignerListLedgerObjectID,
@@ -43,7 +43,7 @@ export {
     iso8601ToRippleTime,
     isValidSecret,
     computeBinaryTransactionHash,
-    computeTransactionHash,
+    computeSignedTransactionHash,
     computeBinaryTransactionSigningHash,
     computeAccountLedgerObjectID,
     computeSignerListLedgerObjectID,
