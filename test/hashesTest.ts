@@ -15,6 +15,7 @@ import {
   computePaymentChannelHash,
   computeSignedTransactionHash
 } from "../src/common/hashes"
+import { encode } from 'ripple-binary-codec/dist'
 
 /**
  * Expects a corresponding ledger dump in $repo/test/fixtures/rippled folder
@@ -174,6 +175,17 @@ describe('Ledger', function () {
         assertResultMatch(computeSignedTransactionHash(fixtures.tx.OfferCreateSell.result), expected_hash)
     })
 
+    it('hashes signed transaction blob correctly', () => {
+      const expected_hash = (
+          "458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2"
+      )
+
+      assertResultMatch(computeSignedTransactionHash(
+        encode(fixtures.tx.OfferCreateSell.result))
+        , expected_hash
+      )
+  })
+
     it('throws when hashing unsigned transaction', () => {
         const offerCreateWithNoSignature: OfferCreate = {
           ...fixtures.tx.OfferCreateSell.result, 
@@ -182,5 +194,14 @@ describe('Ledger', function () {
         
         assert.throws(() => computeSignedTransactionHash(offerCreateWithNoSignature), ValidationError)
     })
+
+    it('throws when hashing unsigned transaction blob', () => {
+      const encodedOfferCreateWithNoSignature: string = encode({
+        ...fixtures.tx.OfferCreateSell.result, 
+        TxnSignature: undefined
+      })
+
+      assert.throws(() => computeSignedTransactionHash(encodedOfferCreateWithNoSignature), ValidationError)
+  })
 })
 })

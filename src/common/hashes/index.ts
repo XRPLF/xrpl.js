@@ -3,7 +3,7 @@ import {decodeAccountID} from 'ripple-address-codec'
 import sha512Half from './sha512Half'
 import HashPrefix from './hash-prefix'
 import {SHAMap, NodeType} from './shamap'
-import {encode} from 'ripple-binary-codec'
+import {decode, encode} from 'ripple-binary-codec'
 import ledgerspaces from './ledgerspaces'
 import {Transaction} from '../../models/transactions'
 import {ValidationError} from '../errors'
@@ -81,11 +81,23 @@ export const computeBinaryTransactionHash = (txBlobHex: string): string => {
  * @throws {ValidationError} if the Transaction is unsigned
  */
 
-export const computeSignedTransactionHash = (tx: Transaction): string => {
-  if(tx.TxnSignature === undefined) {
+export const computeSignedTransactionHash = (tx: Transaction | string): string => {
+  let txBlob;
+  let txObject;
+  if(typeof tx === "string") {
+    txBlob = tx
+    txObject = decode(tx)
+  } else {
+    txBlob = encode(tx)
+    txObject = tx
+  }
+
+  if(txObject.TxnSignature === undefined) {
     throw new ValidationError("The transaction must be signed to hash it.")
   }
-  return computeBinaryTransactionHash(encode(tx))
+    
+  const prefix = HashPrefix.TRANSACTION_ID.toString(16).toUpperCase()
+  return sha512Half(prefix.concat(txBlob))
 }
 
 /**
