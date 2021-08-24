@@ -1,4 +1,4 @@
-import setupClient from './setup-client'
+import setupClient from './setupClient'
 import {Client} from 'xrpl-local'
 import addresses from './fixtures/addresses.json'
 import {getAllPublicMethods, loadTestSuites} from './testUtils'

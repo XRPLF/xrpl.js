@@ -1,5 +1,5 @@
 const port = 34371
-import {createMockRippled} from './mock-rippled'
+import {createMockRippled} from './mockRippled'
 
 function main() {
   if (global.describe) {

@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import assert from 'assert-diff'
-import setupClient from './setup-client'
+import setupClient from './setupClient'
 import responses from './fixtures/responses'
 import rippled from './fixtures/rippled'
 import {ignoreWebSocketDisconnect} from './testUtils'

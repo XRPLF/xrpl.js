@@ -4,7 +4,7 @@ import {Client} from 'xrpl-local'
 import {RecursiveData} from 'xrpl-local/ledger/utils'
 import {assertRejects} from './testUtils'
 import addresses from './fixtures/addresses.json'
-import setupClient from './setup-client'
+import setupClient from './setupClient'
 import {toRippledAmount} from '../src'
 
 const {validate, schemaValidator, ledgerUtils} = Client._PRIVATE
