@@ -15,7 +15,7 @@ import {
     computeLedgerHash,
     computeEscrowHash,
     computePaymentChannelHash,
-} from '../common/hashes'
+} from '../utils/hashes'
 import { generateXAddress } from './generateAddress'
 
 import _ from 'lodash'

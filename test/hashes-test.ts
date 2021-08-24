@@ -9,7 +9,7 @@ import {
   computeSignerListIndex,
   computeEscrowHash,
   computePaymentChannelHash
-} from '../src/common/hashes'
+} from '../src/utils/hashes'
 
 /**
  * Expects a corresponding ledger dump in $repo/test/fixtures/rippled folder

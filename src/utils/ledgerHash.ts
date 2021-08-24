@@ -5,7 +5,7 @@ import {
   computeLedgerHash,
   computeTransactionTreeHash,
   computeStateTreeHash
-} from '../common/hashes'
+} from '../utils/hashes'
 
 function convertLedgerHeader(header): any {
   return {
