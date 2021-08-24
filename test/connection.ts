@@ -159,6 +159,7 @@ describe('Connection', function () {
   })
 
   it('DisconnectedError', async function () {
+    this.mockRippled.suppressOutput = true
     this.mockRippled.on(`request_server_info`, function (request, conn) {
       assert.strictEqual(request.command, 'server_info')
       conn.close()

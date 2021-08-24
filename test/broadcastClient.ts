@@ -25,8 +25,6 @@ describe('BroadcastClient', function () {
     this.mocks.forEach((mock) => {
       mock.addResponse({command: 'server_info'}, rippled.server_info.normal)
     })
-    const expected = {request_server_info: 1}
-    this.mocks.forEach((mock) => mock.expect(Object.assign({}, expected)))
     assert(this.client.isConnected())
     return this.client
       .request({command: "server_info"})

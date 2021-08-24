@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import assert from 'assert'
 import {Server as WebSocketServer} from 'ws'
 import {EventEmitter2} from 'eventemitter2'
 import {getFreePort} from './testUtils'
@@ -27,8 +26,6 @@ function ping(conn, request) {
   }, 1000 * 2)
 }
 
-
-
 // We mock out WebSocketServer in these tests and add a lot of custom
 // properties not defined on the normal WebSocketServer object.
 type MockedWebSocketServer = any
@@ -38,6 +35,29 @@ export function createMockRippled(port) {
   Object.assign(mock, EventEmitter2.prototype)
 
   mock.responses = {}
+  mock.suppressOutput = false
+
+  mock.on('connection', function (this: MockedWebSocketServer, conn: any) {
+    this.socket = conn
+    conn.on('message', function (requestJSON) {
+      try {
+        const request = JSON.parse(requestJSON)
+        if (request.command === 'ping') {
+          ping(conn, request)
+        } else if (request.command === 'test_command') {
+          mock.testCommand(conn, request)
+        }else if (request.command in mock.responses) {
+          conn.send(createResponse(request, mock.getResponse(request)))
+        } else {
+          throw new Error(`No event handler registered in mock rippled for ${request.command}`)
+        }
+      } catch (err) {
+        if (!mock.suppressOutput)
+          console.error('Error: ' + err.message)
+        conn.close(4000, err.message)
+      }
+    })
+  })
 
   mock.addResponse = (request: Request, response: object | ((r: Request) => object)) => {
     const command = request.command
@@ -79,7 +99,7 @@ export function createMockRippled(port) {
     } else if (request.data.closeServerAndReopen) {
       setTimeout(() => {
         conn.terminate()
-        close.call(mock, () => {
+        mock.close.call(mock, () => {
           setTimeout(() => {
             createMockRippled(port)
           }, request.data.closeServerAndReopen)
@@ -95,77 +115,6 @@ export function createMockRippled(port) {
       )
     }
   }
-
-  const close = mock.close
-  mock.close = function () {
-    if (mock.expectedRequests != null) {
-      const allRequestsMade = Object.entries(mock.expectedRequests).every(function (
-        _, counter
-      ) {
-        return counter === 0
-      })
-      if (!allRequestsMade) {
-        const json = JSON.stringify(mock.expectedRequests, null, 2)
-        const indent = '      '
-        const indented = indent + json.replace(/\n/g, '\n' + indent)
-        assert(false, 'Not all expected requests were made:\n' + indented)
-      }
-    }
-    close.call(mock)
-  }
-
-  mock.expect = function (expectedRequests) {
-    mock.expectedRequests = expectedRequests
-  }
-
-  mock.suppressOutput = false
-
-  mock.on('connection', function (this: MockedWebSocketServer, conn: any) {
-    if (mock.config.breakNextConnection) {
-      mock.config.breakNextConnection = false
-      conn.terminate()
-      return
-    }
-    this.socket = conn
-    conn.config = {}
-    conn.on('message', function (requestJSON) {
-      try {
-        const request = JSON.parse(requestJSON)
-        if (request.command === 'ping') {
-          ping(conn, request)
-        } else if (request.command === 'test_command') {
-          mock.testCommand(conn, request)
-        }else if (request.command in mock.responses) {
-          conn.send(createResponse(request, mock.getResponse(request)))
-        } else {
-          throw new Error(`No event handler registered in mock rippled for ${request.command}`)
-        }
-      } catch (err) {
-        if (!mock.suppressOutput)
-          console.error('Error: ' + err.message)
-        conn.close(4000, err.message)
-      }
-    })
-  })
-
-  mock.config = {}
-
-  mock.onAny(function (this: MockedWebSocketServer) {
-    if (this.event.indexOf('request_') !== 0) {
-      return
-    }
-    if (mock.listeners(this.event).length === 0) {
-      throw new Error('No event handler registered in mock rippled for ' + this.event)
-    }
-    if (mock.expectedRequests == null) {
-      return // TODO: fail here to require expectedRequests
-    }
-    const expectedCount = mock.expectedRequests[this.event]
-    if (expectedCount == null || expectedCount === 0) {
-      throw new Error('Unexpected request: ' + this.event)
-    }
-    mock.expectedRequests[this.event] -= 1
-  })
 
   return mock
 }
