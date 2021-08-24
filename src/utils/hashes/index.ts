@@ -4,7 +4,7 @@ import sha512Half from './sha512Half'
 import HashPrefix from './hashPrefix'
 import {SHAMap, NodeType} from './shamap'
 import {encode} from 'ripple-binary-codec'
-import ledgerspaces from './ledgerspaces'
+import ledgerSpaces from './ledgerSpaces'
 
 const padLeftZero = (string: string, length: number): string => {
   return Array(length - string.length + 1).join('0') + string
@@ -27,7 +27,7 @@ const bigintToHex = (
 }
 
 const ledgerSpaceHex = (name: string): string => {
-  return intToHex(ledgerspaces[name].charCodeAt(0), 2)
+  return intToHex(ledgerSpaces[name].charCodeAt(0), 2)
 }
 
 const addressToHex = (address: string): string => {
@@ -133,7 +133,7 @@ export const computeSignerListIndex = (address: string): string => {
  * @returns {string} The index of the account's Offer object
  */
 export const computeOfferIndex = (address: string, sequence: number): string => {
-  const prefix = '00' + intToHex(ledgerspaces.offer.charCodeAt(0), 1)
+  const prefix = '00' + intToHex(ledgerSpaces.offer.charCodeAt(0), 1)
   return sha512Half(prefix + addressToHex(address) + intToHex(sequence, 4))
 }
 
