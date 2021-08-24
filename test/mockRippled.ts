@@ -5,7 +5,6 @@ import {Server as WebSocketServer} from 'ws'
 import {EventEmitter2} from 'eventemitter2'
 import fixtures from './fixtures/rippled'
 import addresses from './fixtures/addresses.json'
-import accountLinesResponse from './fixtures/rippled/accountLines'
 import fullLedger from './fixtures/rippled/ledgerFull38129.json'
 import {getFreePort} from './testUtils'
 import { Request } from '../src'
@@ -253,26 +252,6 @@ export function createMockRippled(port) {
         })
       )
     }, 1000 * 2)
-  })
-
-  mock.on('request_account_lines', function (request, conn) {
-    if (request.account === addresses.ACCOUNT) {
-      conn.send(accountLinesResponse.normal(request))
-    } else if (request.account === addresses.OTHER_ACCOUNT) {
-      conn.send(accountLinesResponse.counterparty(request))
-    } else if (request.account === addresses.THIRD_ACCOUNT) {
-      conn.send(accountLinesResponse.manyItems(request))
-    } else if (request.account === addresses.FOURTH_ACCOUNT) {
-      if (request.ledger_index === 5) {
-        conn.send(accountLinesResponse.manyItems(request))
-      } else {
-        conn.send(accountLinesResponse.ripplingDisabled(request))
-      }
-    } else if (request.account === addresses.NOTFOUND) {
-      conn.send(createResponse(request, fixtures.account_info.notfound))
-    } else {
-      assert(false, 'Unrecognized account address: ' + request.account)
-    }
   })
 
   let requestsCache = undefined
