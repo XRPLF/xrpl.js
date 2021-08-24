@@ -6,7 +6,7 @@ describe("Browser Tests", () => {
         const browser = await puppeteer.launch({"headless": true});
         try {
             const page = await browser.newPage().catch();    
-            await page.goto(`file:///${__dirname}/../localintegrationrunner.html`);    
+            await page.goto(`file:///${__dirname}/../localIntegrationRunner.html`);    
 
             await page.waitForFunction('document.querySelector("body").innerText.includes("submit multisigned transaction")');
 
