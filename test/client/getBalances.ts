@@ -12,6 +12,7 @@ export default <TestSuite>{
   'getBalances': async (client, address, mockRippled) => {
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     mockRippled.addResponse({command: 'account_lines'}, rippledAccountLines.normal)
+    mockRippled.addResponse({command: 'ledger'}, rippled.ledger.normal)
     const result = await client.getBalances(address)
     assertResultMatch(result, responses.getBalances, 'getBalances')
   },
@@ -20,6 +21,7 @@ export default <TestSuite>{
     const options = {limit: 3, ledgerVersion: 123456}
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     mockRippled.addResponse({command: 'account_lines'}, rippledAccountLines.normal)
+    mockRippled.addResponse({command: 'ledger'}, rippled.ledger.normal)
     const expectedResponse = responses.getBalances.slice(0, 3)
     const result = await client.getBalances(address, options)
     assertResultMatch(result, expectedResponse, 'getBalances')
@@ -29,6 +31,7 @@ export default <TestSuite>{
     const options = {currency: 'USD', limit: 3}
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     mockRippled.addResponse({command: 'account_lines'}, rippledAccountLines.normal)
+    mockRippled.addResponse({command: 'ledger'}, rippled.ledger.normal)
     const expectedResponse = responses.getBalances
       .filter((item) => item.currency === 'USD')
       .slice(0, 3)
@@ -44,6 +47,7 @@ export default <TestSuite>{
     }
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     mockRippled.addResponse({command: 'account_lines'}, rippledAccountLines.normal)
+    mockRippled.addResponse({command: 'ledger'}, rippled.ledger.normal)
     
     const expectedResponse = responses.getBalances
       .filter(

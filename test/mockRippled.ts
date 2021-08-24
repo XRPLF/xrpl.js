@@ -4,7 +4,6 @@ import assert from 'assert'
 import {Server as WebSocketServer} from 'ws'
 import {EventEmitter2} from 'eventemitter2'
 import fixtures from './fixtures/rippled'
-import fullLedger from './fixtures/rippled/ledgerFull38129.json'
 import {getFreePort} from './testUtils'
 import { Request } from '../src'
 
@@ -23,28 +22,6 @@ function createResponse(request, response, overrides = {}) {
       ? {id: request.id, result: result}
       : {id: request.id}
   return JSON.stringify(Object.assign({}, response, change))
-}
-
-function createLedgerResponse(request, response) {
-  const newResponse = JSON.parse(createResponse(request, response))
-  if (newResponse.result && newResponse.result.ledger) {
-    if (!request.transactions) {
-      delete newResponse.result.ledger.transactions
-    }
-    if (!request.accounts) {
-      delete newResponse.result.ledger.accountState
-    }
-    // the following fields were not in the ledger response in the past
-    if (newResponse.result.ledger.close_flags == null) {
-      newResponse.result.ledger.close_flags = 0
-    }
-    if (newResponse.result.ledger.parent_close_time == null) {
-      newResponse.result.ledger.parent_close_time =
-        newResponse.result.ledger.close_time - 10
-    }
-    newResponse.result.ledger_index = newResponse.result.ledger.ledger_index
-  }
-  return JSON.stringify(newResponse)
 }
 
 // We mock out WebSocketServer in these tests and add a lot of custom
@@ -193,49 +170,6 @@ export function createMockRippled(port) {
         result: {}
       })
     )
-  })
-
-  mock.on('request_ledger', function (request, conn) {
-    assert.strictEqual(request.command, 'ledger')
-    if (request.ledger_index === 34) {
-      conn.send(createLedgerResponse(request, fixtures.ledger.notFound))
-    } else if (request.ledger_index === 6) {
-      conn.send(createResponse(request, fixtures.ledger.withStateAsHashes))
-    } else if (request.ledger_index === 9038215) {
-      conn.send(createLedgerResponse(request, fixtures.ledger.withoutCloseTime))
-    } else if (request.ledger_index === 4181996) {
-      conn.send(createLedgerResponse(request, fixtures.ledger.withSettingsTx))
-    } else if (
-      request.ledger_index === 22420574 &&
-      request.expand === true &&
-      request.transactions === true
-    ) {
-      conn.send(
-        createLedgerResponse(request, fixtures.ledger.withPartialPayment)
-      )
-    } else if (request.ledger_index === 100001) {
-      conn.send(
-        createLedgerResponse(request, fixtures.ledger.pre2014withPartial)
-      )
-    } else if (request.ledger_index === 38129) {
-      const response = Object.assign({}, fixtures.ledger.normal, {
-        result: {ledger: fullLedger}
-      })
-      conn.send(createLedgerResponse(request, response))
-    } else if (
-      request.ledger_hash ===
-      '15F20E5FA6EA9770BBFFDBD62787400960B04BE32803B20C41F117F41C13830D'
-    ) {
-      conn.send(createLedgerResponse(request, fixtures.ledger.normalByHash))
-    } else if (
-      request.ledger_index === 'validated' ||
-      request.ledger_index === 14661789 ||
-      request.ledger_index === 14661788 /* getTransaction - order */
-    ) {
-      conn.send(createLedgerResponse(request, fixtures.ledger.normal))
-    } else {
-      assert(false, 'Unrecognized ledger request: ' + JSON.stringify(request))
-    }
   })
 
   mock.on('request_ping', function (request, conn) {
