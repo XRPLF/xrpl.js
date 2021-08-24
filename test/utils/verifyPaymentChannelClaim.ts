@@ -1,7 +1,7 @@
-import {verifyPaymentChannelClaim} from '../../../src'
-import requests from '../../fixtures/requests'
-import responses from '../../fixtures/responses'
-import {assertResultMatch} from '../../testUtils'
+import {verifyPaymentChannelClaim} from '../../src'
+import requests from '../fixtures/requests'
+import responses from '../fixtures/responses'
+import {assertResultMatch} from '../testUtils'
 
 describe('Verify Payment Channel Claim', function () {
   it('basic verification works', () => {

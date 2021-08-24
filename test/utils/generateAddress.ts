@@ -1,8 +1,8 @@
 import assert from 'assert-diff'
-import responses from '../../fixtures/responses'
-import {generateXAddress, GenerateAddressOptions} from '../../../src/utils/generateAddress'
-import ECDSA from '../../../src/common/ecdsa'
-import {UnexpectedError} from '../../../src/common/errors'
+import responses from '../fixtures/responses'
+import {generateXAddress, GenerateAddressOptions} from '../../src/utils/generateAddress'
+import ECDSA from '../../src/common/ecdsa'
+import {UnexpectedError} from '../../src/common/errors'
 
 describe('Generate Address', function () {
   it('generateAddress', () => {

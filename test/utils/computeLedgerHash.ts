@@ -1,9 +1,9 @@
 import assert from 'assert-diff'
-import {computeLedgerHeaderHash} from '../../../src'
-import {ValidationError} from '../../../src/common/errors'
-import requests from '../../fixtures/requests'
-import responses from '../../fixtures/responses'
-import {assertResultMatch} from '../../testUtils'
+import {computeLedgerHeaderHash} from '../../src/utils'
+import {ValidationError} from '../../src/common/errors'
+import requests from '../fixtures/requests'
+import responses from '../fixtures/responses'
+import {assertResultMatch} from '../testUtils'
 const {computeLedgerHash: REQUEST_FIXTURES} = requests
 
 function getNewLedger() {

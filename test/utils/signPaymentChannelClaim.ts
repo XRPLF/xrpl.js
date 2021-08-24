@@ -1,6 +1,6 @@
-import {assertResultMatch} from '../../testUtils'
-import responses from '../../fixtures/responses'
-import signPaymentChannelClaim from '../../../src/utils/signPaymentChannelClaim'
+import {assertResultMatch} from '../testUtils'
+import responses from '../fixtures/responses'
+import signPaymentChannelClaim from '../../src/utils/signPaymentChannelClaim'
 
 
 
