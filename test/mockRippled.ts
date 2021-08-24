@@ -237,19 +237,6 @@ export function createMockRippled(port) {
     }
   })
 
-  mock.on('request_ledger_current', function (request, conn) {
-    assert.strictEqual(request.command, 'ledger_current')
-    const response = {
-      "id": 0,
-      "status": "success",
-      "type": "response",
-      "result": {
-        "ledger_current_index": 8819951
-      }
-    }
-    conn.send(createResponse(request, response))
-  })
-
   mock.on('request_ledger_data', function (request, conn) {
     assert.strictEqual(request.command, 'ledger_data')
     if (request.marker) {
