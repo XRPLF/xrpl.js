@@ -47,7 +47,7 @@ unittest() {
 }
 
 integrationtest() {
-  mocha test/integration/integration-test.js
+  mocha test/integration/integration.js
 
   # run integration tests in PhantomJS
   #gulp build-tests build-min

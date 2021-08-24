@@ -17,8 +17,10 @@ module.exports = {
   },
   fee: require('./fee'),
   empty: require('./empty'),
-  subscribe: require('./subscribe'),
-  subscribe_error: require('./subscribe_error'),
+  subscribe: {
+    success: require('./subscribe'),
+    error: require('./subscribeError')
+  },
   unsubscribe: require('./unsubscribe'),
   account_objects: {
     normal: require('./accountObjectsNormal'),

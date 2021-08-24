@@ -6,7 +6,7 @@ import {getAllPublicMethods, loadTestSuites} from './testUtils'
 /**
  * Client Test Runner
  *
- * Background: "test/client-test.ts" had hit 4000+ lines of test code and 300+
+ * Background: "test/api-test.ts" had hit 4000+ lines of test code and 300+
  * individual tests. Additionally, a new address format was added which
  * forced us to copy-paste duplicate the test file to test both the old forms
  * of address. This added a significant maintenance burden.
@@ -33,7 +33,7 @@ describe('Client [Test Runner]', function () {
 
   // Run all the tests:
   for (const {name: methodName, tests, config} of allTestSuites) {
-    describe(`client.${methodName}`, () => {
+    describe(`${methodName}`, () => {
       // Run each test that does not use an address.
       for (const [testName, fn] of tests) {
         if (fn.length === 1) {
