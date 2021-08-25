@@ -5,219 +5,219 @@ function buildList(options) {
 }
 
 module.exports = {
-  generateXAddress: require('./generate-x-address.json'),
-  generateAddress: require('./generate-address.json'),
-  getAccountInfo: require('./get-account-info.json'),
-  getAccountObjects: require('./get-account-objects.json'),
-  getBalances: require('./get-balances.json'),
-  getBalanceSheet: require('./get-balance-sheet.json'),
+  generateXAddress: require('./generateXAddress.json'),
+  generateAddress: require('./generateAddress.json'),
+  getAccountInfo: require('./getAccountInfo.json'),
+  getAccountObjects: require('./getAccountObjects.json'),
+  getBalances: require('./getBalances.json'),
+  getBalanceSheet: require('./getBalanceSheet.json'),
   getOrderbook: {
-    normal: require('./get-orderbook.json'),
-    withXRP: require('./get-orderbook-with-xrp.json')
+    normal: require('./getOrderbook.json'),
+    withXRP: require('./getOrderbookWithXrp.json')
   },
-  getOrders: require('./get-orders.json'),
+  getOrders: require('./getOrders.json'),
   getPaths: {
-    XrpToUsd: require('./get-paths.json'),
-    UsdToUsd: require('./get-paths-send-usd.json'),
-    XrpToXrp: require('./get-paths-xrp-to-xrp.json'),
-    sendAll: require('./get-paths-send-all.json')
+    XrpToUsd: require('./getPaths.json'),
+    UsdToUsd: require('./getPathsSendUsd.json'),
+    XrpToXrp: require('./getPathsXrpToXrp.json'),
+    sendAll: require('./getPathsSendAll.json')
   },
   getPaymentChannel: {
-    normal: require('./get-payment-channel.json'),
-    full: require('./get-payment-channel-full.json')
+    normal: require('./getPaymentChannel.json'),
+    full: require('./getPaymentChannelFull.json')
   },
-  getServerInfo: require('./get-server-info.json'),
-  getSettings: require('./get-settings.json'),
+  getServerInfo: require('./getServerInfo.json'),
+  getSettings: require('./getSettings.json'),
   getTransaction: {
-    orderCancellation: require('./get-transaction-order-cancellation.json'),
-    orderCancellationWithMemo: require('./get-transaction-order-cancellation-with-memo.json'),
+    orderCancellation: require('./getTransactionOrderCancellation.json'),
+    orderCancellationWithMemo: require('./getTransactionOrderCancellationWithMemo.json'),
     orderWithExpirationCancellation:
-      require('./get-transaction-order-with-expiration-cancellation.json'),
-    order: require('./get-transaction-order.json'),
-    orderWithMemo: require('./get-transaction-order-with-memo.json'),
-    orderSell: require('./get-transaction-order-sell.json'),
-    noMeta: require('./get-transaction-no-meta.json'),
-    payment: require('./get-transaction-payment.json'),
-    paymentIncludeRawTransaction: require('./get-transaction-payment-include-raw-transaction.json'),
-    settings: require('./get-transaction-settings.json'),
-    trustline: require('./get-transaction-trustline-set.json'),
-    trackingOn: require('./get-transaction-settings-tracking-on.json'),
-    trackingOff: require('./get-transaction-settings-tracking-off.json'),
-    setRegularKey: require('./get-transaction-settings-set-regular-key.json'),
-    trustlineFrozenOff: require('./get-transaction-trust-set-frozen-off.json'),
-    trustlineNoQuality: require('./get-transaction-trust-no-quality.json'),
-    trustlineAddMemo: require('./get-transaction-trust-add-memo.json'),
-    notValidated: require('./get-transaction-not-validated.json'),
+      require('./getTransactionOrderWithExpirationCancellation.json'),
+    order: require('./getTransactionOrder.json'),
+    orderWithMemo: require('./getTransactionOrderWithMemo.json'),
+    orderSell: require('./getTransactionOrderSell.json'),
+    noMeta: require('./getTransactionNoMeta.json'),
+    payment: require('./getTransactionPayment.json'),
+    paymentIncludeRawTransaction: require('./getTransactionPaymentIncludeRawTransaction.json'),
+    settings: require('./getTransactionSettings.json'),
+    trustline: require('./getTransactionTrustlineSet.json'),
+    trackingOn: require('./getTransactionSettingsTrackingOn.json'),
+    trackingOff: require('./getTransactionSettingsTrackingOff.json'),
+    setRegularKey: require('./getTransactionSettingsSetRegularKey.json'),
+    trustlineFrozenOff: require('./getTransactionTrustSetFrozenOff.json'),
+    trustlineNoQuality: require('./getTransactionTrustNoQuality.json'),
+    trustlineAddMemo: require('./getTransactionTrustAddMemo.json'),
+    notValidated: require('./getTransactionNotValidated.json'),
     checkCreate:
-      require('./get-transaction-check-create.json'),
+      require('./getTransactionCheckCreate.json'),
     checkCreateWithMemo:
-      require('./get-transaction-check-create-with-memo.json'),
+      require('./getTransactionCheckCreateWithMemo.json'),
     checkCancel:
-      require('./get-transaction-check-cancel.json'),
+      require('./getTransactionCheckCancel.json'),
     checkCancelWithMemo:
-      require('./get-transaction-check-cancel-with-memo.json'),
+      require('./getTransactionCheckCancelWithMemo.json'),
     checkCash:
-      require('./get-transaction-check-cash.json'),
+      require('./getTransactionCheckCash.json'),
     checkCashWithMemo:
-      require('./get-transaction-check-cash-with-memo.json'),
+      require('./getTransactionCheckCashWithMemo.json'),
     depositPreauthWithMemo:
-      require('./get-transaction-deposit-preauth-with-memo.json'),
+      require('./getTransactionDepositPreauthWithMemo.json'),
     escrowCreation:
-      require('./get-transaction-escrow-creation.json'),
+      require('./getTransactionEscrowCreation.json'),
     escrowCancellation:
-      require('./get-transaction-escrow-cancellation.json'),
+      require('./getTransactionEscrowCancellation.json'),
     escrowExecution:
-      require('./get-transaction-escrow-execution.json'),
+      require('./getTransactionEscrowExecution.json'),
     escrowExecutionSimple:
-      require('./get-transaction-escrow-execution-simple.json'),
+      require('./getTransactionEscrowExecutionSimple.json'),
     paymentChannelCreate:
-      require('./get-transaction-payment-channel-create.json'),
+      require('./getTransactionPaymentChannelCreate.json'),
     paymentChannelCreateWithMemo:
-      require('./get-transaction-payment-channel-create-with-memo.json'),
+      require('./getTransactionPaymentChannelCreateWithMemo.json'),
     paymentChannelFund:
-      require('./get-transaction-payment-channel-fund.json'),
+      require('./getTransactionPaymentChannelFund.json'),
     paymentChannelFundWithMemo:
-      require('./get-transaction-payment-channel-fund-with-memo.json'),
+      require('./getTransactionPaymentChannelFundWithMemo.json'),
     paymentChannelClaim:
-      require('./get-transaction-payment-channel-claim.json'),
+      require('./getTransactionPaymentChannelClaim.json'),
     paymentChannelClaimWithMemo:
-      require('./get-transaction-payment-channel-claim-with-memo.json'),
-    amendment: require('./get-transaction-amendment.json'),
-    feeUpdate: require('./get-transaction-fee-update.json'),
-    feeUpdateWithMemo: require('./get-transaction-fee-update-with-memo.json'),
-    accountDelete: require('./get-transaction-account-delete.json'),
-    accountDeleteWithMemo: require('./get-transaction-account-delete-with-memo.json'),
-    ticketCreateWithMemo: require('./get-transaction-ticket-create-with-memo.json'),
-    withMemo: require('./get-transaction-with-memo.json'),
-    withMemos: require('./get-transaction-with-memos.json')
+      require('./getTransactionPaymentChannelClaimWithMemo.json'),
+    amendment: require('./getTransactionAmendment.json'),
+    feeUpdate: require('./getTransactionFeeUpdate.json'),
+    feeUpdateWithMemo: require('./getTransactionFeeUpdateWithMemo.json'),
+    accountDelete: require('./getTransactionAccountDelete.json'),
+    accountDeleteWithMemo: require('./getTransactionAccountDeleteWithMemo.json'),
+    ticketCreateWithMemo: require('./getTransactionTicketCreateWithMemo.json'),
+    withMemo: require('./getTransactionWithMemo.json'),
+    withMemos: require('./getTransactionWithMemos.json')
   },
   getTransactions: {
-    normal: require('./get-transactions.json'),
-    includeRawTransactions: require('./get-transactions-include-raw-transactions.json'),
-    one: require('./get-transactions-one.json')
+    normal: require('./getTransactions.json'),
+    includeRawTransactions: require('./getTransactionsIncludeRawTransactions.json'),
+    one: require('./getTransactionsOne.json')
   },
   getTrustlines: {
-    filtered: require('./get-trustlines.json'),
+    filtered: require('./getTrustlines.json'),
     moreThan400Items: buildList({
-      item: require('./trustline-item.json'),
+      item: require('./trustlineItem.json'),
       count: 401
     }),
-    all: require('./get-trustlines-all.json'),
-    ripplingDisabled: require('./get-trustlines-rippling-disabled.json')
+    all: require('./getTrustlinesAll.json'),
+    ripplingDisabled: require('./getTrustlinesRipplingDisabled.json')
   },
   getLedger: {
-    header: require('./get-ledger'),
-    headerByHash: require('./get-ledger-by-hash'),
-    full: require('./get-ledger-full'),
-    withSettingsTx: require('./get-ledger-with-settings-tx'),
-    withStateAsHashes: require('./get-ledger-with-state-as-hashes'),
-    withPartial: require('./get-ledger-with-partial-payment'),
-    pre2014withPartial: require('./get-ledger-pre2014-with-partial')
+    header: require('./getLedger'),
+    headerByHash: require('./getLedgerByHash'),
+    full: require('./getLedgerFull'),
+    withSettingsTx: require('./getLedgerWithSettingsTx'),
+    withStateAsHashes: require('./getLedgerWithStateAsHashes'),
+    withPartial: require('./getLedgerWithPartialPayment'),
+    pre2014withPartial: require('./getLedgerPre2014WithPartial')
   },
   prepareOrder: {
-    buy: require('./prepare-order.json'),
-    ticket: require('./prepare-order-ticket.json'),
-    sell: require('./prepare-order-sell.json'),
-    expiration: require('./prepare-order-expiration')
+    buy: require('./prepareOrder.json'),
+    ticket: require('./prepareOrderTicket.json'),
+    sell: require('./prepareOrderSell.json'),
+    expiration: require('./prepareOrderExpiration')
   },
   prepareOrderCancellation: {
-    normal: require('./prepare-order-cancellation.json'),
-    ticket: require('./prepare-order-cancellation-ticket.json'),
-    withMemos: require('./prepare-order-cancellation-memos.json'),
-    noInstructions: require('./prepare-order-cancellation-no-instructions.json')
+    normal: require('./prepareOrderCancellation.json'),
+    ticket: require('./prepareOrderCancellationTicket.json'),
+    withMemos: require('./prepareOrderCancellationMemos.json'),
+    noInstructions: require('./prepareOrderCancellationNoInstructions.json')
   },
   preparePayment: {
-    normal: require('./prepare-payment.json'),
-    ticket: require('./prepare-payment-ticket'),
-    minAmountXRP: require('./prepare-payment-min-amount-xrp.json'),
-    minAmountXRPXRP: require('./prepare-payment-min-amount-xrp-xrp.json'),
-    allOptions: require('./prepare-payment-all-options.json'),
-    noCounterparty: require('./prepare-payment-no-counterparty.json'),
-    minAmount: require('./prepare-payment-min-amount.json'),
-    ticketSequence: require('./prepare-payment-ticket-sequence.json')
+    normal: require('./preparePayment.json'),
+    ticket: require('./preparePaymentTicket'),
+    minAmountXRP: require('./preparePaymentMinAmountXrp.json'),
+    minAmountXRPXRP: require('./preparePaymentMinAmountXrpXrp.json'),
+    allOptions: require('./preparePaymentAllOptions.json'),
+    noCounterparty: require('./preparePaymentNoCounterparty.json'),
+    minAmount: require('./preparePaymentMinAmount.json'),
+    ticketSequence: require('./preparePaymentTicketSequence.json')
   },
   prepareSettings: {
-    regularKey: require('./prepare-settings-regular-key.json'),
-    removeRegularKey: require('./prepare-settings-remove-regular-key.json'),
-    flags: require('./prepare-settings.json'),
-    ticket: require('./prepare-settings-ticket.json'),
-    flagsMultisign: require('./prepare-settings-multisign.json'),
-    flagSet: require('./prepare-settings-flag-set.json'),
-    flagClear: require('./prepare-settings-flag-clear.json'),
-    flagSetDepositAuth: require('./prepare-settings-flag-set-deposit-auth.json'),
-    flagClearDepositAuth: require('./prepare-settings-flag-clear-deposit-auth.json'),
-    setTransferRate: require('./prepare-settings-set-transfer-rate.json'),
-    fieldClear: require('./prepare-settings-field-clear.json'),
-    noInstructions: require('./prepare-settings-no-instructions.json'),
-    signed: require('./prepare-settings-signed.json'),
-    noMaxLedgerVersion: require('./prepare-settings-no-maxledgerversion.json'),
-    signers: require('./prepare-settings-signers.json'),
-    noSignerList: require('./prepare-settings-no-signer-list.json'),
-    noWeights: require('./prepare-settings-no-weight.json')
+    regularKey: require('./prepareSettingsRegularKey.json'),
+    removeRegularKey: require('./prepareSettingsRemoveRegularKey.json'),
+    flags: require('./prepareSettings.json'),
+    ticket: require('./prepareSettingsTicket.json'),
+    flagsMultisign: require('./prepareSettingsMultisign.json'),
+    flagSet: require('./prepareSettingsFlagSet.json'),
+    flagClear: require('./prepareSettingsFlagClear.json'),
+    flagSetDepositAuth: require('./prepareSettingsFlagSetDepositAuth.json'),
+    flagClearDepositAuth: require('./prepareSettingsFlagClearDepositAuth.json'),
+    setTransferRate: require('./prepareSettingsSetTransferRate.json'),
+    fieldClear: require('./prepareSettingsFieldClear.json'),
+    noInstructions: require('./prepareSettingsNoInstructions.json'),
+    signed: require('./prepareSettingsSigned.json'),
+    noMaxLedgerVersion: require('./prepareSettingsNoMaxledgerversion.json'),
+    signers: require('./prepareSettingsSigners.json'),
+    noSignerList: require('./prepareSettingsNoSignerList.json'),
+    noWeights: require('./prepareSettingsNoWeight.json')
   },
   prepareCheckCreate: {
-    normal: require('./prepare-check-create'),
-    ticket: require('./prepare-check-create-ticket'),
-    full: require('./prepare-check-create-full')
+    normal: require('./prepareCheckCreate'),
+    ticket: require('./prepareCheckCreateTicket'),
+    full: require('./prepareCheckCreateFull')
   },
   prepareCheckCash: {
-    amount: require('./prepare-check-cash-amount'),
-    ticket: require('./prepare-check-cash-ticket'),
-    deliverMin: require('./prepare-check-cash-delivermin')
+    amount: require('./prepareCheckCashAmount'),
+    ticket: require('./prepareCheckCashTicket'),
+    deliverMin: require('./prepareCheckCashDelivermin')
   },
   prepareCheckCancel: {
-    normal: require('./prepare-check-cancel'),
-    ticket: require('./prepare-check-cancel-ticket')
+    normal: require('./prepareCheckCancel'),
+    ticket: require('./prepareCheckCancelTicket')
   },
   prepareEscrowCreation: {
-    normal: require('./prepare-escrow-creation'),
-    ticket: require('./prepare-escrow-creation-ticket'),
-    full: require('./prepare-escrow-creation-full')
+    normal: require('./prepareEscrowCreation'),
+    ticket: require('./prepareEscrowCreationTicket'),
+    full: require('./prepareEscrowCreationFull')
   },
   prepareEscrowExecution: {
-    normal: require('./prepare-escrow-execution'),
-    ticket: require('./prepare-escrow-execution-ticket'),
-    simple: require('./prepare-escrow-execution-simple')
+    normal: require('./prepareEscrowExecution'),
+    ticket: require('./prepareEscrowExecutionTicket'),
+    simple: require('./prepareEscrowExecutionSimple')
   },
   prepareEscrowCancellation: {
-    normal: require('./prepare-escrow-cancellation'),
-    ticket: require('./prepare-escrow-cancellation-ticket'),
-    memos: require('./prepare-escrow-cancellation-memos')
+    normal: require('./prepareEscrowCancellation'),
+    ticket: require('./prepareEscrowCancellationTicket'),
+    memos: require('./prepareEscrowCancellationMemos')
   },
   preparePaymentChannelCreate: {
-    normal: require('./prepare-payment-channel-create'),
-    ticket: require('./prepare-payment-channel-create-ticket'),
-    full: require('./prepare-payment-channel-create-full')
+    normal: require('./preparePaymentChannelCreate'),
+    ticket: require('./preparePaymentChannelCreateTicket'),
+    full: require('./preparePaymentChannelCreateFull')
   },
   preparePaymentChannelFund: {
-    normal: require('./prepare-payment-channel-fund'),
-    ticket: require('./prepare-payment-channel-fund-ticket'),
-    full: require('./prepare-payment-channel-fund-full')
+    normal: require('./preparePaymentChannelFund'),
+    ticket: require('./preparePaymentChannelFundTicket'),
+    full: require('./preparePaymentChannelFundFull')
   },
   preparePaymentChannelClaim: {
-    normal: require('./prepare-payment-channel-claim'),
-    ticket: require('./prepare-payment-channel-claim-ticket'),
-    renew: require('./prepare-payment-channel-claim-renew'),
-    close: require('./prepare-payment-channel-claim-close')
+    normal: require('./preparePaymentChannelClaim'),
+    ticket: require('./preparePaymentChannelClaimTicket'),
+    renew: require('./preparePaymentChannelClaimRenew'),
+    close: require('./preparePaymentChannelClaimClose')
   },
   prepareTrustline: {
-    simple: require('./prepare-trustline-simple'),
-    ticket: require('./prepare-trustline-ticket'),
-    frozen: require('./prepare-trustline-frozen'),
-    issuedXAddress: require('./prepare-trustline-issuer-xaddress.json'),
-    complex: require('./prepare-trustline')
+    simple: require('./prepareTrustlineSimple'),
+    ticket: require('./prepareTrustlineTicket'),
+    frozen: require('./prepareTrustlineFrozen'),
+    issuedXAddress: require('./prepareTrustlineIssuerXaddress.json'),
+    complex: require('./prepareTrustline')
   },
   sign: {
     normal: require('./sign'),
-    ticket: require('./sign-ticket'),
-    escrow: require('./sign-escrow'),
-    signAs: require('./sign-as')
+    ticket: require('./signTicket'),
+    escrow: require('./signEscrow'),
+    signAs: require('./signAs')
   },
-  signPaymentChannelClaim: require('./sign-payment-channel-claim'),
+  signPaymentChannelClaim: require('./signPaymentChannelClaim'),
   combine: {
     single: require('./combine')
   },
   submit: require('./submit'),
-  ledgerEvent: require('./ledger-event'),
-  generateFaucetWallet: require('./generate-faucet-wallet.json')
+  ledgerEvent: require('./ledgerEvent'),
+  generateFaucetWallet: require('./generateFaucetWallet.json')
 };
