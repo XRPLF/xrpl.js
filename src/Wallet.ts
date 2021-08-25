@@ -1,7 +1,7 @@
 import {fromSeed} from 'bip32'
 import {mnemonicToSeedSync} from 'bip39'
 import {decode, encodeForSigning} from 'ripple-binary-codec'
-import {deriveKeypair, generateSeed, verify} from 'ripple-keypairs'
+import {deriveAddress, deriveKeypair, generateSeed, verify} from 'ripple-keypairs'
 import ECDSA from './common/ecdsa'
 import {SignedTransaction} from './common/types/objects'
 import {signOffline} from './transaction/sign'
@@ -16,12 +16,26 @@ import {ValidationError} from './common/errors'
 class Wallet {
   readonly publicKey: string
   readonly privateKey: string
+  readonly classicAddress: string
+  readonly seed?: string
   private static readonly defaultAlgorithm: ECDSA = ECDSA.ed25519
   private static readonly defaultDerivationPath: string = "m/44'/144'/0'/0/0"
 
-  constructor(publicKey: string, privateKey: string) {
+  constructor(publicKey: string, privateKey: string, seed: string = null) {
     this.publicKey = publicKey
     this.privateKey = privateKey
+    this.classicAddress = deriveAddress(publicKey)
+    this.seed = seed
+  }
+
+  /**
+   * Creates a new Wallet using a generated seed
+   * @param {ECDSA} algorithm The digital signature algorithm to generate an address for.
+   * @returns {Wallet} A new Wallet derived from a generated seed.
+   */
+  static create(algorithm: ECDSA = Wallet.defaultAlgorithm): Wallet {
+    const seed = generateSeed({algorithm})
+    return Wallet.fromSeed(seed)
   }
 
   /**
@@ -80,7 +94,7 @@ class Wallet {
 
   private static deriveWallet(seed: string, algorithm: ECDSA = Wallet.defaultAlgorithm): Wallet {
     const {publicKey, privateKey} = deriveKeypair(seed, {algorithm})
-    return new Wallet(publicKey, privateKey)
+    return new Wallet(publicKey, privateKey, seed)
   }
 
   /**
