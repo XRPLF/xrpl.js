@@ -2,14 +2,16 @@ import { BigNumber } from "bignumber.js";
 import { decodeAccountID } from "ripple-address-codec";
 import { ValidationError } from "../common/errors";
 import { Amount } from "../models/common";
-import {encode, decode} from 'ripple-binary-codec'
-import {Transaction} from "../models/transactions";
+import { encode, decode } from 'ripple-binary-codec'
+import { Transaction } from "../models/transactions";
 import Wallet from "../Wallet";
 import { computeBinaryTransactionHash } from "../offline/utils";
 import { flatMap } from "lodash";
 import { SignedTransaction } from "../common/types/objects";
+import { verifyBaseTransaction } from "../models/transactions/common";
 
 export function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
+    verifyBaseTransaction(tx)
     return wallet.signTransaction(tx, { signAs: '' })
 }
 
@@ -59,7 +61,7 @@ function getTransactionWithAllSigners(transactions: Transaction[]): Transaction 
 function combine(signedTransactions: string[]): SignedTransaction {
   const transactions: Transaction[] = signedTransactions.map(decode) as unknown as Transaction[];
   
-  transactions.forEach(tx => verify(tx))
+  transactions.forEach(tx => verifyForMultisigning(tx))
   validateTransactionEquivalence(transactions)
 
   const signedTransaction = encode(getTransactionWithAllSigners(transactions))
@@ -69,17 +71,23 @@ function combine(signedTransactions: string[]): SignedTransaction {
   }
 }
 
-// TODO: Implement multi-sign
 export function multisign(transactions: Transaction[] | string[]): SignedTransaction {
-
-    // TODO: Check for errors 
-    // - No trust line between them (Both sides)
-    // - Account isn't set up for multi-signing
-    // 
     
     if(transactions.length == 0) {
         throw new ValidationError("There were 0 transactions given to multisign")
     }
+
+    transactions.forEach(tx => {
+        verifyBaseTransaction(tx)
+
+        if(tx.SigningPubKey !== "") {
+            throw new ValidationError("For multisigning the transaction must include the SigningPubKey field as an empty string.")
+        }
+    
+        if(tx.Signers === undefined) {
+            throw new ValidationError("For multisigning the transaction must include a Signers field containing an array of signatures.")
+        }
+    })
 
     let encodedTransactions: string[];
     if(typeof transactions[0] === "object") {
@@ -99,6 +107,6 @@ export function authorizeChannel(wallet: Wallet, channelId: number, amount: Amou
 }
 
 // TODO: Implement verify
-export function verify(tx: Transaction): void {
-
+export function verifyForMultisigning(tx: Transaction): void {
+    return null
 }
