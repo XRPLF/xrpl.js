@@ -5,6 +5,7 @@ import {errors} from '../common'
 import {GeneratedAddress} from '../offline/generate-address'
 import {isValidAddress} from '../common/schema-validator'
 import {RippledError} from '../common/errors'
+import Wallet from '../Wallet'
 
 export interface FaucetWallet {
   account: GeneratedAddress
@@ -23,13 +24,13 @@ const MAX_ATTEMPTS = 20 // Maximum attempts to retrieve a balance
 /**
  * Generates a random wallet with some amount of XRP (usually 1000 XRP).
  *
- * @param address - An existing XRPL address to fund, if undefined, a new wallet will be created.
+ * @param wallet - An existing XRPL Wallet to fund, if undefined, a new Wallet will be created.
  * @returns - A Wallet on the Testnet or Devnet that contains some amount of XRP.
  */
 async function generateFaucetWallet(
   this: Client,
-  address?: string
-): Promise<FaucetWallet | void> {
+  wallet?: Wallet
+): Promise<Wallet | void> {
   if(!this.isConnected())
     throw new RippledError("Client not connected, cannot call faucet")
 
@@ -38,23 +39,25 @@ async function generateFaucetWallet(
   let startingBalance = 0
   let faucetUrl = getFaucetUrl(this)
 
-  // If the user provides an existing wallet to fund
-  if (address && isValidAddress(address)) {
-    // Create the POST request body
-    body = new TextEncoder().encode(
-      JSON.stringify({
-        destination: address
-      })
-    )
-    // Retrieve the existing account balance
-    const addressToFundBalance = await getAddressXrpBalance(this, address)
+  // If no existing Wallet is provided or its address is invalid to fund
+  if (!wallet || !isValidAddress(wallet.classicAddress)) {
+    wallet = Wallet.create()
+  }
 
-    // Check the address balance is not undefined and is a number
-    if (addressToFundBalance && !isNaN(+addressToFundBalance)) {
-      startingBalance = +addressToFundBalance
-    } else {
-      startingBalance = 0
-    }
+  // Create the POST request body
+  body = new TextEncoder().encode(
+    JSON.stringify({
+      destination: wallet.classicAddress
+    })
+  )
+  // Retrieve the existing account balance
+  const addressToFundBalance = await getAddressXrpBalance(this, wallet.classicAddress)
+
+  // Check the address balance is not undefined and is a number
+  if (addressToFundBalance && !isNaN(+addressToFundBalance)) {
+    startingBalance = +addressToFundBalance
+  } else {
+    startingBalance = 0
   }
 
   // Options to pass to https.request
@@ -80,8 +83,8 @@ async function generateFaucetWallet(
 
         // "application/json; charset=utf-8"
         if (response.headers['content-type'].startsWith('application/json')) {
-          const wallet: FaucetWallet = JSON.parse(body)
-          const classicAddress = wallet.account.classicAddress
+          const faucetWallet: FaucetWallet = JSON.parse(body)
+          const classicAddress = faucetWallet.account.classicAddress
 
           if (classicAddress) {
             try {
