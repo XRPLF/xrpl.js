@@ -41,7 +41,7 @@ function getDefaultConfiguration() {
 }
 
 function webpackForTest(testFileName) {
-  const match = testFileName.match(/\/?([^\/]*)-test.ts$/);
+  const match = testFileName.match(/\/?([^\/]*).ts$/);
   if (!match) {
     assert(false, 'wrong filename:' + testFileName);
   }
@@ -56,8 +56,8 @@ function webpackForTest(testFileName) {
     entry: testFileName,
     output: {
       library: match[1].replace(/-/g, '_'),
-      path: path.join(__dirname, './test-compiled-for-web/'),
-      filename: match[1] + '-test.js'
+      path: path.join(__dirname, './testCompiledForWeb/'),
+      filename: match[1] + '.js'
     },
     plugins: [
       new webpack.ProvidePlugin({ process: 'process/browser' }),
@@ -119,5 +119,5 @@ module.exports = [
     }
     return config;
   },
-  (env, argv) => webpackForTest('./test/integration/integration-test.ts'),
+  (env, argv) => webpackForTest('./test/integration/integration.ts'),
 ];

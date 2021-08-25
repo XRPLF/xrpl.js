@@ -70,4 +70,4 @@ scripts/cache
 .nyc_output
 
 # browser tests
-test-compiled-for-web 
+testCompiledForWeb 

@@ -86,7 +86,7 @@
     "test:browser": "TS_NODE_PROJECT=src/tsconfig.json nyc mocha ./test/browser/*.ts",
     "test:watch": "TS_NODE_PROJECT=src/tsconfig.json mocha --config=test/.mocharc.json --watch --reporter dot",
     "format": "prettier --write '{src,test}/**/*.ts'",
-    "lint": "eslint 'src/**/*.ts' 'test/*-test.{ts,js}'",
+    "lint": "eslint 'src/**/*.ts' 'test/*.{ts,js}'",
     "perf": "./scripts/perf_test.sh",
     "compile:snippets": "tsc -p snippets/tsconfig.json",
     "start:snippet": "npm run compile:snippets && node ./snippets/dist/start.js",
