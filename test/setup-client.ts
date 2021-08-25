@@ -1,6 +1,6 @@
 import {Client, BroadcastClient} from 'xrpl-local'
 import {createMockRippled} from './mock-rippled'
-import {getFreePort} from './utils'
+import {getFreePort} from './testUtils'
 
 function setupMockRippledConnection(testcase, port) {
   return new Promise<void>((resolve, reject) => {

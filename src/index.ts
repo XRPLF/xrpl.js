@@ -6,7 +6,7 @@ export * from './common/types/objects/ledger'
 
 export * from './models/methods'
 
-export * from './offline/utils'
+export * from './utils'
 
 // Broadcast client is experimental
 export {BroadcastClient} from './client/broadcast'

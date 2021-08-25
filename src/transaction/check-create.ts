@@ -1,6 +1,6 @@
 import * as utils from './utils'
-const toRippledAmount = utils.common.toRippledAmount
-import {validate, iso8601ToRippleTime} from '../common'
+import {validate} from '../common'
+import {ISOTimeToRippleTime, toRippledAmount} from '../utils'
 import {Instructions, Prepare, TransactionJSON} from './types'
 import {Amount} from '../common/types/objects'
 import {Client} from '..'
@@ -29,7 +29,7 @@ function createCheckCreateTransaction(
   }
 
   if (check.expiration != null) {
-    txJSON.Expiration = iso8601ToRippleTime(check.expiration)
+    txJSON.Expiration = ISOTimeToRippleTime(check.expiration)
   }
 
   if (check.invoiceID != null) {

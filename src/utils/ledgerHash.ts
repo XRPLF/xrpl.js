@@ -1,22 +1,23 @@
-import * as _ from 'lodash'
+import _ from 'lodash'
+import { ISOTimeToRippleTime } from '.'
+import { ValidationError } from '../common/errors'
 import {
   computeLedgerHash,
   computeTransactionTreeHash,
   computeStateTreeHash
-} from '../common/hashes'
-import * as common from '../common'
+} from '../utils/hashes'
 
 function convertLedgerHeader(header): any {
   return {
     account_hash: header.stateHash,
-    close_time: common.iso8601ToRippleTime(header.closeTime),
+    close_time: ISOTimeToRippleTime(header.closeTime),
     close_time_resolution: header.closeTimeResolution,
     close_flags: header.closeFlags,
     hash: header.ledgerHash,
     ledger_hash: header.ledgerHash,
     ledger_index: header.ledgerVersion.toString(),
     parent_hash: header.parentLedgerHash,
-    parent_close_time: common.iso8601ToRippleTime(header.parentCloseTime),
+    parent_close_time: ISOTimeToRippleTime(header.parentCloseTime),
     total_coins: header.totalDrops,
     transaction_hash: header.transactionHash
   }
@@ -45,14 +46,14 @@ function computeTransactionHash(
         'SyntaxError: Unexpected' + ' token u in JSON at position 0'
       ) {
         // one or more of the `tx.rawTransaction`s is undefined
-        throw new common.errors.ValidationError(
+        throw new ValidationError(
           'ledger' + ' is missing raw transactions'
         )
       }
     }
   } else {
     if (options.computeTreeHashes) {
-      throw new common.errors.ValidationError(
+      throw new ValidationError(
         'transactions' + ' property is missing from the ledger'
       )
     }
@@ -73,7 +74,7 @@ function computeTransactionHash(
     ledger.transactionHash != null &&
     ledger.transactionHash !== transactionHash
   ) {
-    throw new common.errors.ValidationError(
+    throw new ValidationError(
       'transactionHash in header' +
         ' does not match computed hash of transactions',
       {
@@ -88,7 +89,7 @@ function computeTransactionHash(
 function computeStateHash(ledger, options: ComputeLedgerHeaderHashOptions) {
   if (ledger.rawState == null) {
     if (options.computeTreeHashes) {
-      throw new common.errors.ValidationError(
+      throw new ValidationError(
         'rawState' + ' property is missing from the ledger'
       )
     }
@@ -97,7 +98,7 @@ function computeStateHash(ledger, options: ComputeLedgerHeaderHashOptions) {
   const state = JSON.parse(ledger.rawState)
   const stateHash = computeStateTreeHash(state)
   if (ledger.stateHash != null && ledger.stateHash !== stateHash) {
-    throw new common.errors.ValidationError(
+    throw new ValidationError(
       'stateHash in header' + ' does not match computed hash of state'
     )
   }

@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import * as common from '../common'
 import {Memo} from '../common/types/objects'
 import {Instructions, Prepare, TransactionJSON} from './types'
-import {toRippledAmount} from '../common'
+import {toRippledAmount, dropsToXrp, removeUndefined, xrpToDrops} from '../utils'
 import {Client} from '..'
 import {ValidationError} from '../common/errors'
 import {xAddressToClassicAddress, isValidXAddress} from 'ripple-address-codec'
@@ -23,7 +23,7 @@ export type ApiMemo = {
 
 function formatPrepareResponse(txJSON: any): Prepare {
   const instructions = {
-    fee: common.dropsToXrp(txJSON.Fee),
+    fee: dropsToXrp(txJSON.Fee),
     maxLedgerVersion:
       txJSON.LastLedgerSequence == null ? null : txJSON.LastLedgerSequence
   }
@@ -310,7 +310,7 @@ function prepareTransaction(
         )
       }
       newTxJSON.Fee = scaleValue(
-        common.xrpToDrops(instructions.fee),
+        xrpToDrops(instructions.fee),
         multiplier
       )
       return Promise.resolve()
@@ -331,11 +331,11 @@ function prepareTransaction(
                 Math.floor(
                   Buffer.from(newTxJSON.Fulfillment, 'hex').length / 16
                 ))
-        const feeDrops = common.xrpToDrops(fee)
+        const feeDrops = xrpToDrops(fee)
         const maxFeeXRP = instructions.maxFee
           ? BigNumber.min(client._maxFeeXRP, instructions.maxFee)
           : client._maxFeeXRP
-        const maxFeeDrops = common.xrpToDrops(maxFeeXRP)
+        const maxFeeDrops = xrpToDrops(maxFeeXRP)
         const normalFee = scaleValue(feeDrops, multiplier, extraFee)
         newTxJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString(10)
 
@@ -398,7 +398,7 @@ function convertStringToHex(string: string): string {
 
 function convertMemo(memo: Memo): {Memo: ApiMemo} {
   return {
-    Memo: common.removeUndefined({
+    Memo: removeUndefined({
       MemoData: memo.data ? convertStringToHex(memo.data) : undefined,
       MemoType: memo.type ? convertStringToHex(memo.type) : undefined,
       MemoFormat: memo.format ? convertStringToHex(memo.format) : undefined

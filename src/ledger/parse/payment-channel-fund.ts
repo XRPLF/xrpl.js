@@ -1,6 +1,6 @@
 import * as assert from 'assert'
 import {parseTimestamp,parseMemos} from './utils'
-import {removeUndefined} from '../../common'
+import {removeUndefined} from '../../utils'
 import parseAmount from './amount'
 
 function parsePaymentChannelFund(tx: any): object {

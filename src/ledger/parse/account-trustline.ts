@@ -1,5 +1,5 @@
 import {parseQuality} from './utils'
-import {removeUndefined} from '../../common'
+import {removeUndefined} from '../../utils'
 import {
   Trustline,
   FormattedTrustline
