@@ -127,6 +127,9 @@ export function loadTestSuites(): LoadedTestSuite[] {
       if (methodName.startsWith('.DS_Store')) {
         return null
       }
+      if (methodName.endsWith('.ts')) {
+        methodName = methodName.slice(0, -3)
+      }
       const testSuite = require(`./client/${methodName}`)
       return {
         name: methodName,
