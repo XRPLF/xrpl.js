@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js'
 import {ValidationError} from '../common/errors'
 import {decodeAccountID} from 'ripple-address-codec'
 import {validate} from '../common'
-import {computeBinaryTransactionHash} from '../common/hashes'
+import {computeBinaryTransactionHash} from '../utils/hashes'
 import {JsonObject} from 'ripple-binary-codec/dist/types/serialized-type'
 
 /**

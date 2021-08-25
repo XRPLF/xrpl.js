@@ -1,5 +1,5 @@
 import {parseTimestamp, parseMemos} from './utils'
-import {removeUndefined, dropsToXrp} from '../../common'
+import {removeUndefined, dropsToXrp} from '../../utils'
 import { PayChannel } from '../../models/ledger'
 
 export type FormattedPaymentChannel = {

@@ -1,8 +1,27 @@
-import * as _ from 'lodash'
+import { deriveKeypair, deriveAddress, deriveXAddress } from './derive'
+import computeLedgerHeaderHash from './ledgerHash'
+import signPaymentChannelClaim from './signPaymentChannelClaim'
+import verifyPaymentChannelClaim from './verifyPaymentChannelClaim'
+import {
+    computeBinaryTransactionHash,
+    computeTransactionHash,
+    computeBinaryTransactionSigningHash,
+    computeAccountRootIndex,
+    computeSignerListIndex,
+    computeOfferIndex,
+    computeTrustlineHash,
+    computeTransactionTreeHash,
+    computeStateTreeHash,
+    computeLedgerHash,
+    computeEscrowHash,
+    computePaymentChannelHash,
+} from './hashes'
+import { generateXAddress } from './generateAddress'
+
+import _ from 'lodash'
 import BigNumber from 'bignumber.js'
-import {deriveKeypair} from 'ripple-keypairs'
-import {RippledAmount} from './types/objects'
-import {ValidationError} from './errors'
+import {RippledAmount} from '../common/types/objects'
+import {ValidationError} from '../common/errors'
 import {xAddressToClassicAddress} from 'ripple-address-codec'
 
 function isValidSecret(secret: string): boolean {
@@ -170,13 +189,17 @@ function rippleToUnixTimestamp(rpepoch: number): number {
 
 /**
  * @param {Number|Date} timestamp (ms since unix epoch)
- * @return {Number} seconds since ripple epoch (1/1/2000 GMT)
+ * @return {Number} seconds since Ripple Epoch (1/1/2000 GMT)
  */
 function unixToRippleTimestamp(timestamp: number): number {
   return Math.round(timestamp / 1000) - 0x386d4380
 }
 
-function rippleTimeToISO8601(rippleTime: number): string {
+/**
+ * @param {number} rippleTime is the number of seconds since Ripple Epoch (1/1/2000 GMT)
+ * @return {string} iso8601 international standard date format
+ */
+function rippleTimeToISOTime(rippleTime: number): string {
   return new Date(rippleToUnixTimestamp(rippleTime)).toISOString()
 }
 
@@ -184,17 +207,36 @@ function rippleTimeToISO8601(rippleTime: number): string {
  * @param {string} iso8601 international standard date format
  * @return {number} seconds since ripple epoch (1/1/2000 GMT)
  */
-function iso8601ToRippleTime(iso8601: string): number {
+function ISOTimeToRippleTime(iso8601: string): number {
   return unixToRippleTimestamp(Date.parse(iso8601))
 }
 
 export {
-  dropsToXrp,
-  xrpToDrops,
-  toRippledAmount,
-  convertKeysFromSnakeCaseToCamelCase,
-  removeUndefined,
-  rippleTimeToISO8601,
-  iso8601ToRippleTime,
-  isValidSecret
+    computeLedgerHeaderHash,
+    dropsToXrp,
+    xrpToDrops,
+    toRippledAmount,
+    convertKeysFromSnakeCaseToCamelCase,
+    removeUndefined,
+    rippleTimeToISOTime,
+    ISOTimeToRippleTime,
+    isValidSecret,
+    computeBinaryTransactionHash,
+    computeTransactionHash,
+    computeBinaryTransactionSigningHash,
+    computeAccountRootIndex,
+    computeSignerListIndex,
+    computeOfferIndex,
+    computeTrustlineHash,
+    computeTransactionTreeHash,
+    computeStateTreeHash,
+    computeLedgerHash,
+    computeEscrowHash,
+    computePaymentChannelHash,
+    generateXAddress,
+    deriveKeypair,
+    deriveAddress,
+    deriveXAddress,
+    signPaymentChannelClaim,
+    verifyPaymentChannelClaim,
 }

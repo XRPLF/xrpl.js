@@ -1,6 +1,6 @@
 import assert from 'assert-diff'
 import rippled from '../../fixtures/rippled'
-import {TestSuite} from '../../utils'
+import {TestSuite} from '../../../test/testUtils'
 
 /**
  * Every test suite exports their tests in the default object.

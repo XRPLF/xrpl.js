@@ -2,7 +2,7 @@ import assert from 'assert-diff'
 import binary from 'ripple-binary-codec'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
-import {assertResultMatch, TestSuite} from '../../utils'
+import {assertResultMatch, TestSuite} from '../../testUtils'
 const {combine: REQUEST_FIXTURES} = requests
 const {combine: RESPONSE_FIXTURES} = responses
 

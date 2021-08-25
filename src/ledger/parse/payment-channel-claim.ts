@@ -1,5 +1,6 @@
 import * as assert from 'assert'
-import {removeUndefined, txFlags} from '../../common'
+import {removeUndefined} from '../../utils'
+import {txFlags} from '../../common'
 import parseAmount from './amount'
 import {parseMemos} from './utils'
 const claimFlags = txFlags.PaymentChannelClaim

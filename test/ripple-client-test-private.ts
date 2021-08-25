@@ -2,9 +2,10 @@ import assert from 'assert-diff'
 import _ from 'lodash'
 import {Client} from 'xrpl-local'
 import {RecursiveData} from 'xrpl-local/ledger/utils'
-import {assertRejects} from './utils'
+import {assertRejects} from './testUtils'
 import addresses from './fixtures/addresses.json'
 import setupClient from './setup-client'
+import {toRippledAmount} from '../src'
 
 const {validate, schemaValidator, ledgerUtils} = Client._PRIVATE
 const address = addresses.ACCOUNT
@@ -123,7 +124,7 @@ describe('Client', function () {
 
   it('common utils - toRippledAmount', async () => {
     const amount = {issuer: 'is', currency: 'c', value: 'v'}
-    assert.deepEqual(ledgerUtils.common.toRippledAmount(amount), {
+    assert.deepEqual(toRippledAmount(amount), {
       issuer: 'is',
       currency: 'c',
       value: 'v'
