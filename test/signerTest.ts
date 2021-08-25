@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 
 function notImplemented() {
-    assert.fail("Not implemented yet") 
+    assert.fail("This test is not implemented yet") 
 }
 
 describe('Signer tests', function () {
