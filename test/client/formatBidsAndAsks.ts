@@ -3,7 +3,6 @@
 // import {Client} from 'xrpl-local'
 // import requests from '../fixtures/requests'
 // import responses from '../fixtures/responses'
-import { TestSuite } from "../testUtils";
 
 // function checkSortingOfOrders(orders) {
 //   let previousRate = '0'
@@ -44,7 +43,7 @@ import { TestSuite } from "../testUtils";
  * - Check out the "TestSuite" type for documentation on the interface.
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
-export default <TestSuite>{
+describe("client.formatBidsAndAsks", () => {
   // 'normal': async (client, address) => {
   //   const orderbookInfo = {
   //     base: {
@@ -365,4 +364,4 @@ export default <TestSuite>{
   //     )
   //   })
   // }
-};
+});

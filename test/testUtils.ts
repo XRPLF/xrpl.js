@@ -6,6 +6,7 @@ import { assert } from "chai";
 import _ from "lodash";
 
 import { Client } from "xrpl-local";
+import addresses from "./fixtures/addresses.json";
 
 /**
  * The test function. It takes a Client object and then some other data to
@@ -163,3 +164,8 @@ export function ignoreWebSocketDisconnect(error: Error): void {
   }
   throw error;
 }
+
+export const addressTests = [
+  { type: "Classic Address", address: addresses.ACCOUNT },
+  { type: "X-Address", address: addresses.ACCOUNT_X },
+];
