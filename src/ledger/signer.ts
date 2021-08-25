@@ -1,39 +1,111 @@
+import { BigNumber } from "bignumber.js";
+import { decodeAccountID } from "ripple-address-codec";
+import { ValidationError } from "../common/errors";
 import { Amount } from "../models/common";
+import {encode, decode} from 'ripple-binary-codec'
 import {Transaction} from "../models/transactions";
-//import combine from "../transaction/combine";
 import Wallet from "../Wallet";
+import { computeBinaryTransactionHash } from "../offline/utils";
+import { flatMap } from "lodash";
 
 export interface Signed {
     signedTransaction: string, 
     id: string
 }
 
-export class Signer {
+// TODO: Implement sign
+export function sign(wallet: Wallet, tx: Transaction): Signed {
+    return wallet.signTransaction(tx, { signAs: '' })
+}
+
+
+/**
+ * The transactions should all be equal except for the 'Signers' field. 
+ */
+ function validateTransactionEquivalence(transactions: Transaction[]) {
+  const exampleTransaction = JSON.stringify({...transactions[0], Signers: null})
+  if (transactions.slice(1).some(tx => JSON.stringify({...tx, Signers: null}) !== exampleTransaction)) {
+    throw new ValidationError('txJSON is not the same for all signedTransactions')
+  }
+}
+
+function addressToBigNumber(address) {
+  const hex = Buffer.from(decodeAccountID(address)).toString('hex')
+  return new BigNumber(hex, 16)
+}
+
+/**
+ * If presented in binary form, the Signers array must be sorted based on 
+ * the numeric value of the signer addresses, with the lowest value first. 
+ * (If submitted as JSON, the submit_multisigned method handles this automatically.)
+ * https://xrpl.org/multi-signing.html
+ */
+function compareSigners(a, b) {
+  return addressToBigNumber(a.Signer.Account).comparedTo(
+    addressToBigNumber(b.Signer.Account)
+  )
+}
+
+function getTransactionWithAllSigners(transactions: Transaction[]): Transaction {
+  // Signers must be sorted - see compareSigners for more details
+  const sortedSigners = flatMap(transactions, tx => tx.Signers)
+    .filter(signer => signer)
+    .sort(compareSigners)
+
+  return {...transactions[0], Signers: sortedSigners}
+}
+
+/**
+ * 
+ * @param signedTransactions A collection of the same transaction signed by different signers. The only difference
+ * between the elements of signedTransactions should be the Signers field.
+ * @returns An object with the combined transaction (now having a sorted list of all signers) which is encoded, along
+ * with a transaction id based on the combined transaction.
+ */
+function combine(signedTransactions: string[]): Signed {
+// TODO: Replicate validate.combine({signedTransactions})
+
+  const transactions: Transaction[] = signedTransactions.map(decode)as unknown as Transaction[];
+  validateTransactionEquivalence(transactions)
+
+  const signedTransaction = encode(getTransactionWithAllSigners(transactions))
+  return {
+    signedTransaction: signedTransaction, 
+    id: computeBinaryTransactionHash(signedTransaction)
+  }
+}
+
+// TODO: Implement multi-sign
+// TODO: Handle both byte input and array of transaction input
+export function multisign(transactions: Transaction[] | string[]): Signed {
+
+    // TODO: Check for errors 
+    // - No trust line between them (Both sides)
+    // - Account isn't set up for multi-signing
+    // 
     
-    // TODO: Implement sign
-    static sign(wallet: Wallet, tx: Transaction): Signed {
-        return wallet.signTransaction(tx, { signAs: '' })
+    if(transactions.length == 0) {
+        throw new ValidationError("There were 0 transactions given to multisign")
     }
 
-    // TODO: Implement multi-sign
-    // TODO: Handle both byte input and array of transaction input
-    static multisign(transactions: Transaction[] | string[]): Signed {
- 
-        //Check for errors 
-        // - No trust line between them (Both sides)
-        // - Account isn't set up for multi-signing
-        // 
-        //combine
-        return null
+    let encodedTransactions: string[];
+    if(typeof transactions[0] === "object") {
+        encodedTransactions = transactions.map( tx => {
+            return encode(JSON.parse(JSON.stringify(tx)))
+        })
+    } else {
+        encodedTransactions = transactions as string[]
     }
+    
+    return combine(encodedTransactions)
+}
 
-    // TODO: Implement authorize channel
-    static authorizeChannel(wallet: Wallet, channelId: number, amount: Amount): Signed {
-        return null
-    }
+// TODO: Implement authorize channel
+export function authorizeChannel(wallet: Wallet, channelId: number, amount: Amount): Signed {
+    return null
+}
 
-    // TODO: Implement verify
-    static verify(tx: Transaction): void {
+// TODO: Implement verify
+export function verify(tx: Transaction): void {
 
-    }
 }
