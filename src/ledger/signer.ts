@@ -7,17 +7,11 @@ import {Transaction} from "../models/transactions";
 import Wallet from "../Wallet";
 import { computeBinaryTransactionHash } from "../offline/utils";
 import { flatMap } from "lodash";
+import { SignedTransaction } from "../common/types/objects";
 
-export interface Signed {
-    signedTransaction: string, 
-    id: string
-}
-
-// TODO: Implement sign
-export function sign(wallet: Wallet, tx: Transaction): Signed {
+export function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
     return wallet.signTransaction(tx, { signAs: '' })
 }
-
 
 /**
  * The transactions should all be equal except for the 'Signers' field. 
@@ -62,10 +56,10 @@ function getTransactionWithAllSigners(transactions: Transaction[]): Transaction 
  * @returns An object with the combined transaction (now having a sorted list of all signers) which is encoded, along
  * with a transaction id based on the combined transaction.
  */
-function combine(signedTransactions: string[]): Signed {
-// TODO: Replicate validate.combine({signedTransactions})
-
-  const transactions: Transaction[] = signedTransactions.map(decode)as unknown as Transaction[];
+function combine(signedTransactions: string[]): SignedTransaction {
+  const transactions: Transaction[] = signedTransactions.map(decode) as unknown as Transaction[];
+  
+  transactions.forEach(tx => verify(tx))
   validateTransactionEquivalence(transactions)
 
   const signedTransaction = encode(getTransactionWithAllSigners(transactions))
@@ -76,8 +70,7 @@ function combine(signedTransactions: string[]): Signed {
 }
 
 // TODO: Implement multi-sign
-// TODO: Handle both byte input and array of transaction input
-export function multisign(transactions: Transaction[] | string[]): Signed {
+export function multisign(transactions: Transaction[] | string[]): SignedTransaction {
 
     // TODO: Check for errors 
     // - No trust line between them (Both sides)
@@ -101,7 +94,7 @@ export function multisign(transactions: Transaction[] | string[]): Signed {
 }
 
 // TODO: Implement authorize channel
-export function authorizeChannel(wallet: Wallet, channelId: number, amount: Amount): Signed {
+export function authorizeChannel(wallet: Wallet, channelId: number, amount: Amount): SignedTransaction {
     return null
 }
 
