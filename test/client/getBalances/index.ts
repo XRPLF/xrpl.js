@@ -31,14 +31,14 @@ export default <TestSuite>{
   'getBalances - limit & currency & issuer': async (client, address) => {
     const options = {
       currency: 'USD',
-      counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
       limit: 3
     }
     const expectedResponse = responses.getBalances
       .filter(
         (item) =>
           item.currency === 'USD' &&
-          item.counterparty === 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+          item.issuer === 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
       )
       .slice(0, 3)
     const result = await client.getBalances(address, options)

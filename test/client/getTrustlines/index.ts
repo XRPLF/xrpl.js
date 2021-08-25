@@ -12,6 +12,8 @@ export default <TestSuite>{
   'getTrustlines - filtered': async (client, address) => {
     const options = {currency: 'USD'}
     const result = await client.getTrustlines(address, options)
+    // console.log('suite',address, options, result)
+    // console.log('expected', RESPONSE_FIXTURES.filtered)
     assertResultMatch(result, RESPONSE_FIXTURES.filtered, 'getTrustlines')
   },
 
@@ -31,6 +33,8 @@ export default <TestSuite>{
 
   'getTrustlines - ripplingDisabled works properly': async (client, address) => {
     const result = await client.getTrustlines(addresses.FOURTH_ACCOUNT)
+    // console.log('suite',address, result)
+    // console.log('expected', RESPONSE_FIXTURES.ripplingDisabled)
     assertResultMatch(
       result,
       RESPONSE_FIXTURES.ripplingDisabled,

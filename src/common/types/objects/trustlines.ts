@@ -29,7 +29,7 @@ export type FormattedTrustlineSpecification = {
 }
 
 export type FormattedTrustline = {
-  specification: FormattedTrustlineSpecification
+  /*specification: FormattedTrustlineSpecification
   counterparty: {
     limit: string
     ripplingDisabled?: boolean
@@ -38,5 +38,8 @@ export type FormattedTrustline = {
   }
   state: {
     balance: string
-  }
+  }*/
+  issuer: string
+  currency: string
+  value: string
 }

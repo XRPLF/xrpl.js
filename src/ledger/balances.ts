@@ -1,29 +1,30 @@
 import * as utils from './utils'
 import {validate, ensureClassicAddress} from '../common'
 import {GetTrustlinesOptions} from './trustlines'
-import {FormattedTrustline} from '../common/types/objects/trustlines'
+// import {FormattedTrustline} from '../common/types/objects/trustlines'
 import {Client} from '..'
 
 export type Balance = {
   value: string
   currency: string
-  counterparty?: string
+  issuer?: string
 }
 
 export type GetBalances = Array<Balance>
 
-function getTrustlineBalanceAmount(trustline: FormattedTrustline): Balance {
-  return {
-    currency: trustline.specification.currency,
-    counterparty: trustline.specification.counterparty,
-    value: trustline.state.balance
-  }
-}
+// function getTrustlineBalanceAmount(trustline: FormattedTrustline): Balance {
+//   return {
+//     currency: trustline.specification.currency,
+//     counterparty: trustline.specification.counterparty,
+//     value: trustline.state.balance
+//   }
+// }
 
-function formatBalances(options: GetTrustlinesOptions, balances: {xrp: string, trustlines: FormattedTrustline[]}) {
-  const result = balances.trustlines.map(getTrustlineBalanceAmount)
+function formatBalances(options: GetTrustlinesOptions, balances: {xrp: string, trustlines/*: FormattedTrustline[]*/}) {
+  console.log('format',balances.xrp, balances.trustlines)
+  const result = balances.trustlines//.map(getTrustlineBalanceAmount)
   if (
-    !(options.counterparty || (options.currency && options.currency !== 'XRP'))
+    !(options.issuer || (options.currency && options.currency !== 'XRP'))
   ) {
     const xrpBalance = {
       currency: 'XRP',
@@ -73,8 +74,14 @@ function getBalances(
       utils.getXRPBalance(this, address, ledgerVersion)
     ),
     this.getTrustlines(address, options)
-  ]).then((results) =>
-    formatBalances(options, {xrp: results[0], trustlines: results[1]})
+  ]).then((results) =>{
+    // console.log(results)
+    // return formatBalances(options, {xrp: results[0], trustlines: results[1]})
+    const x = formatBalances(options, {xrp: results[0], trustlines: results[1]})
+    console.log('exxx',JSON.stringify(x))
+    return x
+  }
+    
   )
 }
 
