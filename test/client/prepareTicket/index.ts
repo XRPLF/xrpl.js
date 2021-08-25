@@ -1,4 +1,4 @@
-import {assertResultMatch, TestSuite} from '../../utils'
+import {assertResultMatch, TestSuite} from '../../testUtils'
 // import responses from '../../fixtures/responses'
 import rippled from '../../fixtures/rippled'
 // import requests from '../../fixtures/requests'

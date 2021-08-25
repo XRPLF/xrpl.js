@@ -1,7 +1,7 @@
 import assert from 'assert-diff'
 import responses from '../../fixtures/responses'
 import requests from '../../fixtures/requests'
-import {TestSuite, assertResultMatch, assertRejects} from '../../utils'
+import {TestSuite, assertResultMatch, assertRejects} from '../../testUtils'
 // import BigNumber from 'bignumber.js'
 
 // function checkSortingOfOrders(orders) {

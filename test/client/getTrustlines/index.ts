@@ -1,6 +1,6 @@
 import addresses from '../../fixtures/addresses.json'
 import responses from '../../fixtures/responses'
-import {assertResultMatch, TestSuite} from '../../utils'
+import {assertResultMatch, TestSuite} from '../../testUtils'
 const {getTrustlines: RESPONSE_FIXTURES} = responses
 
 /**

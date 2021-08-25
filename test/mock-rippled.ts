@@ -9,7 +9,7 @@ import hashes from './fixtures/hashes.json'
 import transactionsResponse from './fixtures/rippled/account-tx'
 import accountLinesResponse from './fixtures/rippled/account-lines'
 import fullLedger from './fixtures/rippled/ledger-full-38129.json'
-import {getFreePort} from './utils'
+import {getFreePort} from './testUtils'
 import { Request } from '../src'
 
 function isUSD(json) {

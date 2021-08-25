@@ -1,5 +1,5 @@
 import {parseOutcome} from './utils'
-import {removeUndefined} from '../../common'
+import {removeUndefined} from '../../utils'
 
 import parseSettings from './settings'
 import parseAccountDelete from './account-delete'

@@ -1,4 +1,4 @@
-import hashPrefix from './hash-prefix'
+import hashPrefix from './hashPrefix'
 import sha512Half from './sha512Half'
 const HEX_ZERO =
   '0000000000000000000000000000000000000000000000000000000000000000'

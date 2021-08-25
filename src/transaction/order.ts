@@ -1,6 +1,7 @@
 import * as utils from './utils'
 const offerFlags = utils.common.txFlags.OfferCreate
-import {validate, iso8601ToRippleTime, toRippledAmount} from '../common'
+import {validate} from '../common'
+import {ISOTimeToRippleTime, toRippledAmount} from '../utils'
 import {Instructions, Prepare, OfferCreateTransaction} from './types'
 import {FormattedOrderSpecification} from '../common/types/objects/index'
 import {Client} from '..'
@@ -36,7 +37,7 @@ function createOrderTransaction(
     txJSON.Flags |= offerFlags.FillOrKill
   }
   if (order.expirationTime != null) {
-    txJSON.Expiration = iso8601ToRippleTime(order.expirationTime)
+    txJSON.Expiration = ISOTimeToRippleTime(order.expirationTime)
   }
   if (order.orderToReplace != null) {
     txJSON.OfferSequence = order.orderToReplace

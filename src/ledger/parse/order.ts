@@ -2,7 +2,8 @@ import * as assert from 'assert'
 import {parseTimestamp} from './utils'
 import {parseMemos} from './utils'
 import parseAmount from './amount'
-import {removeUndefined, txFlags} from '../../common'
+import {removeUndefined} from '../../utils'
+import {txFlags} from '../../common'
 import {
   FormattedOrderSpecification,
   OfferCreateTransaction

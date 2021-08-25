@@ -1,5 +1,5 @@
 import assert from 'assert-diff'
-import {TestSuite} from '../../utils'
+import {TestSuite} from '../../testUtils'
 import {Client} from '../../../src'
 
 /**

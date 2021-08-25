@@ -1,17 +1,11 @@
 import assert from 'assert-diff'
-import responses from '../../fixtures/responses'
-import {TestSuite} from '../../utils'
-import {GenerateAddressOptions} from '../../../src/offline/generate-address'
-import ECDSA from '../../../src/common/ecdsa'
-const {generateAddress: RESPONSE_FIXTURES} = responses
+import responses from '../fixtures/responses'
+import {generateXAddress, GenerateAddressOptions} from '../../src/utils/generateAddress'
+import ECDSA from '../../src/common/ecdsa'
+import {UnexpectedError} from '../../src/common/errors'
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-export default <TestSuite>{
-  'generateAddress': async (client) => {
+describe('Generate Address', function () {
+  it('generateAddress', () => {
     // GIVEN entropy of all zeros
     function random() {
       return new Array(16).fill(0)
@@ -19,14 +13,14 @@ export default <TestSuite>{
 
     assert.deepEqual(
       // WHEN generating an address
-      client.generateAddress({entropy: random()}),
+      generateXAddress({entropy: random()}),
 
       // THEN we get the expected return value
-      RESPONSE_FIXTURES
+      responses.generateXAddress
     )
-  },
+  })
 
-  'generateAddress invalid entropy': async (client) => {
+  it('generateAddress invalid entropy', () => {
     assert.throws(() => {
       // GIVEN entropy of 1 byte
       function random() {
@@ -34,45 +28,45 @@ export default <TestSuite>{
       }
 
       // WHEN generating an address
-      client.generateAddress({entropy: random()})
+      generateXAddress({entropy: random()})
 
       // THEN an UnexpectedError is thrown
       // because 16 bytes of entropy are required
-    }, client.errors.UnexpectedError)
-  },
+    }, UnexpectedError)
+  })
 
-  'generateAddress with no options object': async (client) => {
+  it('generateAddress with no options object', () => {
     // GIVEN no options
 
     // WHEN generating an address
-    const account = client.generateAddress()
+    const account = generateXAddress()
 
-    // THEN we get an object with an address starting with 'r' and a secret starting with 's'
-    assert(account.address.startsWith('r'), 'Address must start with `r`')
+    // THEN we get an object with an xAddress starting with 'x' and a secret starting with 's'
+    assert(account.xAddress.startsWith('X'), 'Address must start with `X`')
     assert(account.secret.startsWith('s'), 'Secret must start with `s`')
-  },
+  })
 
-  'generateAddress with empty options object': async (client) => {
+  it('generateAddress with empty options object', () => {
     // GIVEN an empty options object
     const options = {}
 
     // WHEN generating an address
-    const account = client.generateAddress(options)
+    const account = generateXAddress(options)
 
-    // THEN we get an object with an address starting with 'r' and a secret starting with 's'
-    assert(account.address.startsWith('r'), 'Address must start with `r`')
+    // THEN we get an object with an xAddress starting with 'x' and a secret starting with 's'
+    assert(account.xAddress.startsWith('X'), 'Address must start with `X`')
     assert(account.secret.startsWith('s'), 'Secret must start with `s`')
-  },
+  })
 
-  'generateAddress with algorithm `ecdsa-secp256k1`': async (client) => {
+  it('generateAddress with algorithm `ecdsa-secp256k1`', () => {
     // GIVEN we want to use 'ecdsa-secp256k1'
-    const options: GenerateAddressOptions = {algorithm: ECDSA.secp256k1}
+    const options: GenerateAddressOptions = {algorithm: ECDSA.secp256k1, includeClassicAddress: true}
 
     // WHEN generating an address
-    const account = client.generateAddress(options)
+    const account = generateXAddress(options)
 
     // THEN we get an object with an address starting with 'r' and a secret starting with 's' (not 'sEd')
-    assert(account.address.startsWith('r'), 'Address must start with `r`')
+    assert(account.classicAddress.startsWith('r'), 'Address must start with `r`')
     assert.deepEqual(
       account.secret.slice(0, 1),
       's',
@@ -83,27 +77,25 @@ export default <TestSuite>{
       'sEd',
       `secp256k1 secret ${account.secret} must not start with 'sEd'`
     )
-  },
+  })
 
-  'generateAddress with algorithm `ed25519`': async (client) => {
+  it('generateAddress with algorithm `ed25519`', () => {
     // GIVEN we want to use 'ed25519'
-    const options: GenerateAddressOptions = {algorithm: ECDSA.ed25519}
+    const options: GenerateAddressOptions = {algorithm: ECDSA.ed25519, includeClassicAddress: true}
 
     // WHEN generating an address
-    const account = client.generateAddress(options)
+    const account = generateXAddress(options)
 
     // THEN we get an object with an address starting with 'r' and a secret starting with 'sEd'
-    assert(account.address.startsWith('r'), 'Address must start with `r`')
+    assert(account.classicAddress.startsWith('r'), 'Address must start with `r`')
     assert.deepEqual(
       account.secret.slice(0, 3),
       'sEd',
       `Ed25519 secret ${account.secret} must start with 'sEd'`
     )
-  },
+  })
 
-  'generateAddress with algorithm `ecdsa-secp256k1` and given entropy': async (
-    client
-  ) => {
+  it('generateAddress with algorithm `ecdsa-secp256k1` and given entropy', () => {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: ECDSA.secp256k1,
@@ -111,13 +103,13 @@ export default <TestSuite>{
     }
 
     // WHEN generating an address
-    const account = client.generateAddress(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
-    assert.deepEqual(account, responses.generateAddress)
-  },
+    assert.deepEqual(account, responses.generateXAddress)
+  })
 
-  'generateAddress with algorithm `ed25519` and given entropy': async (client) => {
+  it('generateAddress with algorithm `ed25519` and given entropy', () => {
     // GIVEN we want to use 'ed25519' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: ECDSA.ed25519,
@@ -125,22 +117,17 @@ export default <TestSuite>{
     }
 
     // WHEN generating an address
-    const account = client.generateAddress(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, {
       // generateAddress return value always includes xAddress to encourage X-address adoption
       xAddress: 'X7xq1YJ4xmLSGGLhuakFQB9CebWYthQkgsvFC4LGFH871HB',
-
-      classicAddress: 'r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7',
-      address: 'r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7',
       secret: 'sEdSJHS4oiAdz7w2X2ni1gFiqtbJHqE'
     })
-  },
+  })
 
-  'generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address': async (
-    client
-  ) => {
+  it('generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address', () => {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: ECDSA.secp256k1,
@@ -149,15 +136,13 @@ export default <TestSuite>{
     }
 
     // WHEN generating an address
-    const account = client.generateAddress(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, responses.generateAddress)
-  },
+  })
 
-  'generateAddress with algorithm `ed25519` and given entropy; include classic address': async (
-    client
-  ) => {
+  it('generateAddress with algorithm `ed25519` and given entropy; include classic address', () => {
     // GIVEN we want to use 'ed25519' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: ECDSA.ed25519,
@@ -166,7 +151,7 @@ export default <TestSuite>{
     }
 
     // WHEN generating an address
-    const account = client.generateAddress(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, {
@@ -177,11 +162,9 @@ export default <TestSuite>{
       classicAddress: 'r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7',
       address: 'r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7'
     })
-  },
+  })
 
-  'generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address; for test network use': async (
-    client
-  ) => {
+  it('generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address; for test network use', () => {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: ECDSA.secp256k1,
@@ -191,7 +174,7 @@ export default <TestSuite>{
     }
 
     // WHEN generating an address
-    const account = client.generateAddress(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     const response = Object.assign({}, responses.generateAddress, {
@@ -199,11 +182,9 @@ export default <TestSuite>{
       xAddress: 'TVG3TcCD58BD6MZqsNuTihdrhZwR8SzvYS8U87zvHsAcNw4'
     })
     assert.deepEqual(account, response)
-  },
+  })
 
-  'generateAddress with algorithm `ed25519` and given entropy; include classic address; for test network use': async (
-    client
-  ) => {
+  it('generateAddress with algorithm `ed25519` and given entropy; include classic address; for test network use', () => {
     // GIVEN we want to use 'ed25519' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: ECDSA.ed25519,
@@ -213,25 +194,24 @@ export default <TestSuite>{
     }
 
     // WHEN generating an address
-    const account = client.generateAddress(options)
+    const account = generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, {
       // generateAddress return value always includes xAddress to encourage X-address adoption
       xAddress: 'T7t4HeTMF5tT68agwuVbJwu23ssMPeh8dDtGysZoQiij1oo',
-
       secret: 'sEdSJHS4oiAdz7w2X2ni1gFiqtbJHqE',
       classicAddress: 'r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7',
       address: 'r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7'
     })
-  },
+  })
 
-  'generateAddress for test network use': async (client) => {
+  it('generateAddress for test network use', () => {
     // GIVEN we want an address for test network use
     const options: GenerateAddressOptions = {test: true}
 
     // WHEN generating an address
-    const account = client.generateAddress(options)
+    const account = generateXAddress(options)
 
     // THEN we get an object with xAddress starting with 'T' and a secret starting with 's'
 
@@ -247,5 +227,5 @@ export default <TestSuite>{
       's',
       `Secret ${account.secret} must start with 's'`
     )
-  }
-}
+  })
+})
