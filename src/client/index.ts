@@ -131,7 +131,6 @@ import {
   decodeXAddress
 } from 'ripple-address-codec'
 import {
-  computeSignedTransactionHash,
   computeBinaryTransactionSigningHash,
   computeAccountLedgerObjectID,
   computeSignerListLedgerObjectID,
@@ -469,9 +468,6 @@ class Client extends EventEmitter {
   /**
    * Static methods that replace functionality from the now-deprecated ripple-hashes library
    */
-  // Compute the hash of a binary transaction blob.
-  // @deprecated Invoke from top-level package instead
-  static computeSignedTransactionHash = computeSignedTransactionHash // (txBlobHex: string): string
   // @deprecated Invoke from top-level package instead
   static computeBinaryTransactionSigningHash =
     computeBinaryTransactionSigningHash // (txBlobHex: string): string
