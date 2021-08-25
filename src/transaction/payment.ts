@@ -11,7 +11,7 @@ import {
   MinAdjustment,
   Memo
 } from '../common/types/objects'
-import {toRippledAmount, xrpToDrops} from '../common'
+import {toRippledAmount, xrpToDrops} from '../utils'
 import {Client} from '..'
 import {getClassicAccountAndTag, ClassicAccountAndTag} from './utils'
 

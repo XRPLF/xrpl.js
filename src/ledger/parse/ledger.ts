@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import {removeUndefined, rippleTimeToISO8601} from '../../common'
+import {removeUndefined, rippleTimeToISOTime} from '../../utils'
 import parseTransaction from './transaction'
 import { TransactionAndMetadata } from '../../models/transactions'
 
@@ -62,7 +62,7 @@ function parseState(state) {
 /**
  * @param {Ledger} ledger must be a *closed* ledger with valid `close_time` and `parent_close_time`
  * @returns {FormattedLedger} formatted ledger
- * @throws RangeError: Invalid time value (rippleTimeToISO8601)
+ * @throws RangeError: Invalid time value (rippleTimeToISOTime)
  */
 export function parseLedger(ledger): FormattedLedger {
   const ledgerVersion = parseInt(ledger.ledger_index, 10)
@@ -70,13 +70,13 @@ export function parseLedger(ledger): FormattedLedger {
     Object.assign(
       {
         stateHash: ledger.account_hash,
-        closeTime: rippleTimeToISO8601(ledger.close_time),
+        closeTime: rippleTimeToISOTime(ledger.close_time),
         closeTimeResolution: ledger.close_time_resolution,
         closeFlags: ledger.close_flags,
         ledgerHash: ledger.ledger_hash,
         ledgerVersion: ledgerVersion,
         parentLedgerHash: ledger.parent_hash,
-        parentCloseTime: rippleTimeToISO8601(ledger.parent_close_time),
+        parentCloseTime: rippleTimeToISOTime(ledger.parent_close_time),
         totalDrops: ledger.total_coins,
         transactionHash: ledger.transaction_hash
       },

@@ -1,5 +1,5 @@
 import assert from 'assert-diff'
-import {TestSuite} from '../../utils'
+import {TestSuite} from '../../testUtils'
 import Wallet from '../../../src/Wallet'
 
 const mnemonic =

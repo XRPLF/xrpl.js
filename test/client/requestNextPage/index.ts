@@ -1,5 +1,5 @@
 import assert from 'assert-diff'
-import {assertRejects, TestSuite} from '../../utils'
+import {assertRejects, TestSuite} from '../../testUtils'
 
 /**
  * Every test suite exports their tests in the default object.

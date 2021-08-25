@@ -1,6 +1,6 @@
 import responses from '../../fixtures/responses'
 import rippled from '../../fixtures/rippled'
-import {TestSuite, assertResultMatch} from '../../utils'
+import {TestSuite, assertResultMatch} from '../../testUtils'
 
 /**
  * Every test suite exports their tests in the default object.

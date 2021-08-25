@@ -3,10 +3,11 @@ import assert from 'assert'
 import wallet from './wallet'
 import requests from '../fixtures/requests'
 import {Client} from 'xrpl-local'
-import {isValidClassicAddress} from 'ripple-address-codec'
 import {payTo, ledgerAccept} from './utils'
 import {errors} from 'xrpl-local/common'
-import {isValidSecret} from 'xrpl-local/common/utils'
+import {isValidSecret} from 'xrpl-local/utils'
+import { generateXAddress } from '../../src/utils/generateAddress'
+import { isValidXAddress } from 'ripple-address-codec'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -160,7 +161,7 @@ function setupAccounts(testcase) {
 
   const promise = payTo(client, 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM')
     .then(() => payTo(client, wallet.getAddress()))
-    .then(() => payTo(client, testcase.newWallet.address))
+    .then(() => payTo(client, testcase.newWallet.xAddress))
     .then(() => payTo(client, 'rKmBGxocj9Abgy25J51Mk1iqFzW9aVF9Tc'))
     .then(() => payTo(client, 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q'))
     .then(() => {
@@ -176,7 +177,7 @@ function setupAccounts(testcase) {
     .then(() =>
       makeTrustLine(
         testcase,
-        testcase.newWallet.address,
+        testcase.newWallet.xAddress,
         testcase.newWallet.secret
       )
     )
@@ -197,7 +198,7 @@ function setupAccounts(testcase) {
       }
       return makeOrder(
         testcase.client,
-        testcase.newWallet.address,
+        testcase.newWallet.xAddress,
         orderSpecification,
         testcase.newWallet.secret
       )
@@ -236,7 +237,7 @@ function suiteSetup(this: any) {
     setup
       .bind(this)(serverUrl)
       .then(() => ledgerAccept(this.client))
-      .then(() => (this.newWallet = this.client.generateAddress()))
+      .then(() => (this.newWallet = generateXAddress()))
       // two times to give time to server to send `ledgerClosed` event
       // so getLedgerVersion will return right value
       .then(() => ledgerAccept(this.client))
@@ -501,9 +502,9 @@ describe('integration tests', function () {
   // })
 
   it('generateWallet', function () {
-    const newWallet = this.client.generateAddress()
-    assert(newWallet && newWallet.address && newWallet.secret)
-    assert(isValidClassicAddress(newWallet.address))
+    const newWallet = generateXAddress()
+    assert(newWallet && newWallet.xAddress && newWallet.secret)
+    assert(isValidXAddress(newWallet.xAddress))
     assert(isValidSecret(newWallet.secret))
   })
 })

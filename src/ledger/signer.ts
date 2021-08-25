@@ -5,7 +5,7 @@ import { Amount } from "../models/common";
 import { encode, decode } from 'ripple-binary-codec'
 import { Transaction } from "../models/transactions";
 import Wallet from "../Wallet";
-import { computeBinaryTransactionHash } from "../offline/utils";
+import { computeBinaryTransactionHash } from "../utils";
 import { flatMap } from "lodash";
 import { SignedTransaction } from "../common/types/objects";
 import { verifyBaseTransaction } from "../models/transactions/common";

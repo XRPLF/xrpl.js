@@ -3,7 +3,7 @@ import assert from 'assert-diff'
 import setupClient from './setup-client'
 import responses from './fixtures/responses'
 import rippled from './fixtures/rippled'
-import {ignoreWebSocketDisconnect} from './utils'
+import {ignoreWebSocketDisconnect} from './testUtils'
 
 const TIMEOUT = 20000
 

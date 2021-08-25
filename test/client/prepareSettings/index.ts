@@ -2,7 +2,7 @@ import assert from 'assert-diff'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
 import rippled from '../../fixtures/rippled'
-import {assertResultMatch, TestSuite} from '../../utils'
+import {assertResultMatch, TestSuite} from '../../testUtils'
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
 /**
