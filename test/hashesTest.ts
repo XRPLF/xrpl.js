@@ -167,7 +167,7 @@ describe('Ledger', function () {
 
   describe('Transaction Hash Verification', function () {
     
-    it('hashes signed transaction correctly', () => {
+    it('will try to hash a signed transaction correctly', () => {
         const expected_hash = (
             "458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2"
         )
@@ -175,7 +175,7 @@ describe('Ledger', function () {
         assertResultMatch(computeSignedTransactionHash(fixtures.tx.OfferCreateSell.result), expected_hash)
     })
 
-    it('hashes signed transaction blob correctly', () => {
+    it('will try to hash a signed transaction blob correctly', () => {
       const expected_hash = (
           "458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2"
       )
@@ -186,7 +186,7 @@ describe('Ledger', function () {
       )
   })
 
-    it('throws when hashing unsigned transaction', () => {
+    it('will throw when hashing an unsigned transaction', () => {
         const offerCreateWithNoSignature: OfferCreate = {
           ...fixtures.tx.OfferCreateSell.result, 
           TxnSignature: undefined
@@ -195,7 +195,7 @@ describe('Ledger', function () {
         assert.throws(() => computeSignedTransactionHash(offerCreateWithNoSignature), ValidationError)
     })
 
-    it('throws when hashing unsigned transaction blob', () => {
+    it('will throw when hashing an unsigned transaction blob', () => {
       const encodedOfferCreateWithNoSignature: string = encode({
         ...fixtures.tx.OfferCreateSell.result, 
         TxnSignature: undefined
