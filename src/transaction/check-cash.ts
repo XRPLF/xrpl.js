@@ -1,10 +1,10 @@
 import * as utils from './utils'
-const ValidationError = utils.common.errors.ValidationError
-const toRippledAmount = utils.common.toRippledAmount
 import {validate} from '../common'
 import {Instructions, Prepare, TransactionJSON} from './types'
 import {Amount} from '../common/types/objects'
 import {Client} from '..'
+import {toRippledAmount} from '../utils'
+import {ValidationError} from '../common/errors'
 
 export type CheckCashParameters = {
   checkID: string

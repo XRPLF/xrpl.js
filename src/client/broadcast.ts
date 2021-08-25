@@ -33,7 +33,7 @@ class BroadcastClient extends Client {
 
     // synchronous methods are all passed directly to the first client instance
     const defaultClient = clients[0]
-    const syncMethods = ['sign', 'generateAddress', 'computeLedgerHash']
+    const syncMethods = ['sign']
     syncMethods.forEach((name) => {
       this[name] = defaultClient[name].bind(defaultClient)
     })

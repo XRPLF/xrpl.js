@@ -1,7 +1,8 @@
-import * as _ from 'lodash'
+import _ from 'lodash'
 import * as assert from 'assert'
 import * as utils from './utils'
-import {txFlags, removeUndefined} from '../../common'
+import {txFlags} from '../../common'
+import {removeUndefined} from '../../utils'
 import parseAmount from './amount'
 
 function isNoDirectRipple(tx) {

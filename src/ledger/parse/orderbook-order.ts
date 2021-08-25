@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
 import {parseTimestamp, adjustQualityForXRP} from './utils'
-import {removeUndefined} from '../../common'
+import {removeUndefined} from '../../utils'
 
 import {orderFlags} from './flags'
 import parseAmount from './amount'
