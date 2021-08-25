@@ -27,7 +27,7 @@ function hashLedgerHeader(ledgerHeader) {
   return computeLedgerHash(header)
 }
 
-function computeSignedTransactionHash(
+function computeTransactionHashFromLedger(
   ledger,
   options: ComputeLedgerHeaderHashOptions
 ) {
@@ -113,7 +113,7 @@ function computeLedgerHeaderHash(
   options: ComputeLedgerHeaderHashOptions = {}
 ): string {
   const subhashes = {
-    transactionHash: computeSignedTransactionHash(ledger, options),
+    transactionHash: computeTransactionHashFromLedger(ledger, options),
     stateHash: computeStateHash(ledger, options)
   }
   return hashLedgerHeader(Object.assign({}, ledger, subhashes))
