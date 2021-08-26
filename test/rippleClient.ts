@@ -1,6 +1,5 @@
 import { Client } from "xrpl-local";
 
-import addresses from "./fixtures/addresses.json";
 import setupClient from "./setupClient";
 import { getAllPublicMethods, loadTestSuites } from "./testUtils";
 
@@ -31,42 +30,6 @@ describe("Client [Test Runner]", function () {
   // doesn't need the client, just needs to instantiate to get public methods
 
   const allTestSuites = loadTestSuites();
-
-  // Run all the tests:
-  for (const { name: methodName, tests, config } of allTestSuites) {
-    describe(`${methodName}`, function () {
-      // Run each test that does not use an address.
-      for (const [testName, fn] of tests) {
-        if (fn.length === 1) {
-          it(testName, function () {
-            return fn(this.client, addresses.ACCOUNT, this.mockRippled);
-          });
-        }
-      }
-      // Run each test with a classic address.
-      describe(`[Classic Address]`, function () {
-        for (const [testName, fn] of tests) {
-          if (fn.length >= 2) {
-            it(testName, function () {
-              return fn(this.client, addresses.ACCOUNT, this.mockRippled);
-            });
-          }
-        }
-      });
-      // Run each test with an X-address.
-      if (!config.skipXAddress) {
-        describe(`[X-address]`, function () {
-          for (const [testName, fn] of tests) {
-            if (fn.length >= 2) {
-              it(testName, function () {
-                return fn(this.client, addresses.ACCOUNT_X, this.mockRippled);
-              });
-            }
-          }
-        });
-      }
-    });
-  }
 
   // Report any missing tests.
   const allTestedMethods = new Set(allTestSuites.map((s) => s.name));
