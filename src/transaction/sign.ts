@@ -171,7 +171,7 @@ function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
 
   // - Memos have exclusively hex data which should ignore case.
   //   Since decode goes to upper case, we set all tx memos to be uppercase for the comparison.
-  tx.Memos.map((memo) => {
+  tx.Memos?.map((memo) => {
     if (memo.Memo.MemoData) {
       memo.Memo.MemoData = memo.Memo.MemoData.toUpperCase()
     }
