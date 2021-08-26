@@ -3,11 +3,9 @@ import BigNumber from 'bignumber.js'
 import {getXRPBalance, renameCounterpartyToIssuer} from './utils'
 import {
   validate,
-  toRippledAmount,
-  errors,
-  xrpToDrops,
-  dropsToXrp
+  errors
 } from '../common'
+import {toRippledAmount, xrpToDrops, dropsToXrp} from '../utils'
 import {Connection} from '../client'
 import parsePathfind from './parse/pathfind'
 import {RippledAmount, Amount} from '../common/types/objects'

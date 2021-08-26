@@ -1,5 +1,6 @@
 import * as utils from './utils'
-import {validate, iso8601ToRippleTime, xrpToDrops} from '../common'
+import {validate} from '../common'
+import {ISOTimeToRippleTime, xrpToDrops} from '../utils'
 const ValidationError = utils.common.errors.ValidationError
 import {Instructions, Prepare, TransactionJSON} from './types'
 import {Memo} from '../common/types/objects'
@@ -31,10 +32,10 @@ function createEscrowCreationTransaction(
     txJSON.Condition = payment.condition
   }
   if (payment.allowCancelAfter != null) {
-    txJSON.CancelAfter = iso8601ToRippleTime(payment.allowCancelAfter)
+    txJSON.CancelAfter = ISOTimeToRippleTime(payment.allowCancelAfter)
   }
   if (payment.allowExecuteAfter != null) {
-    txJSON.FinishAfter = iso8601ToRippleTime(payment.allowExecuteAfter)
+    txJSON.FinishAfter = ISOTimeToRippleTime(payment.allowExecuteAfter)
   }
   if (payment.sourceTag != null) {
     txJSON.SourceTag = payment.sourceTag

@@ -2,106 +2,106 @@
 
 module.exports = {
   prepareOrder: {
-    buy: require('./prepare-order'),
-    sell: require('./prepare-order-sell'),
-    expiration: require('./prepare-order-expiration')
+    buy: require('./prepareOrder'),
+    sell: require('./prepareOrderSell'),
+    expiration: require('./prepareOrderExpiration')
   },
   prepareOrderCancellation: {
-    simple: require('./prepare-order-cancellation'),
-    withMemos: require('./prepare-order-cancellation-memos')
+    simple: require('./prepareOrderCancellation'),
+    withMemos: require('./prepareOrderCancellationMemos')
   },
   preparePayment: {
-    normal: require('./prepare-payment'),
-    minAmountXRP: require('./prepare-payment-min-xrp'),
-    minAmount: require('./prepare-payment-min'),
-    wrongAddress: require('./prepare-payment-wrong-address'),
-    wrongAmount: require('./prepare-payment-wrong-amount'),
-    wrongPartial: require('./prepare-payment-wrong-partial'),
-    allOptions: require('./prepare-payment-all-options'),
-    noCounterparty: require('./prepare-payment-no-counterparty')
+    normal: require('./preparePayment'),
+    minAmountXRP: require('./preparePaymentMinXrp'),
+    minAmount: require('./preparePaymentMin'),
+    wrongAddress: require('./preparePaymentWrongAddress'),
+    wrongAmount: require('./preparePaymentWrongAmount'),
+    wrongPartial: require('./preparePaymentWrongPartial'),
+    allOptions: require('./preparePaymentAllOptions'),
+    noCounterparty: require('./preparePaymentNoCounterparty')
   },
   prepareSettings: {
-    domain: require('./prepare-settings'),
-    noSignerEntries: require('./prepare-settings-no-signer-entries'),
+    domain: require('./prepareSettings'),
+    noSignerEntries: require('./prepareSettingsNoSignerEntries'),
     signers: {
-      normal: require('./prepare-settings-signers'),
-      noThreshold: require('./prepare-settings-signers-no-threshold'),
-      noWeights: require('./prepare-settings-signers-no-weights')
+      normal: require('./prepareSettingsSigners'),
+      noThreshold: require('./prepareSettingsSignersNoThreshold'),
+      noWeights: require('./prepareSettingsSignersNoWeights')
     }
   },
   prepareEscrowCreation: {
-    normal: require('./prepare-escrow-creation'),
-    full: require('./prepare-escrow-creation-full')
+    normal: require('./prepareEscrowCreation'),
+    full: require('./prepareEscrowCreationFull')
   },
   prepareEscrowExecution: {
-    normal: require('./prepare-escrow-execution'),
-    simple: require('./prepare-escrow-execution-simple'),
-    noCondition: require('./prepare-escrow-execution-no-condition'),
-    noFulfillment: require('./prepare-escrow-execution-no-fulfillment')
+    normal: require('./prepareEscrowExecution'),
+    simple: require('./prepareEscrowExecutionSimple'),
+    noCondition: require('./prepareEscrowExecutionNoCondition'),
+    noFulfillment: require('./prepareEscrowExecutionNoFulfillment')
   },
   prepareEscrowCancellation: {
-    normal: require('./prepare-escrow-cancellation'),
-    memos: require('./prepare-escrow-cancellation-memos')
+    normal: require('./prepareEscrowCancellation'),
+    memos: require('./prepareEscrowCancellationMemos')
   },
   prepareCheckCreate: {
-    normal: require('./prepare-check-create'),
-    full: require('./prepare-check-create-full')
+    normal: require('./prepareCheckCreate'),
+    full: require('./prepareCheckCreateFull')
   },
   prepareCheckCash: {
-    amount: require('./prepare-check-cash-amount'),
-    deliverMin: require('./prepare-check-cash-delivermin')
+    amount: require('./prepareCheckCashAmount'),
+    deliverMin: require('./prepareCheckCashDelivermin')
   },
   prepareCheckCancel: {
-    normal: require('./prepare-check-cancel')
+    normal: require('./prepareCheckCancel')
   },
   preparePaymentChannelCreate: {
-    normal: require('./prepare-payment-channel-create'),
-    full: require('./prepare-payment-channel-create-full')
+    normal: require('./preparePaymentChannelCreate'),
+    full: require('./preparePaymentChannelCreateFull')
   },
   preparePaymentChannelFund: {
-    normal: require('./prepare-payment-channel-fund'),
-    full: require('./prepare-payment-channel-fund-full')
+    normal: require('./preparePaymentChannelFund'),
+    full: require('./preparePaymentChannelFundFull')
   },
   preparePaymentChannelClaim: {
-    normal: require('./prepare-payment-channel-claim'),
-    full: require('./prepare-payment-channel-claim-full'),
-    close: require('./prepare-payment-channel-claim-close'),
-    renew: require('./prepare-payment-channel-claim-renew'),
-    noSignature: require('./prepare-payment-channel-claim-no-signature')
+    normal: require('./preparePaymentChannelClaim'),
+    full: require('./preparePaymentChannelClaimFull'),
+    close: require('./preparePaymentChannelClaimClose'),
+    renew: require('./preparePaymentChannelClaimRenew'),
+    noSignature: require('./preparePaymentChannelClaimNoSignature')
   },
   prepareTrustline: {
-    simple: require('./prepare-trustline-simple'),
-    complex: require('./prepare-trustline'),
-    frozen: require('./prepare-trustline-frozen.json'),
-    issuedXAddress: require('./prepare-trustline-issuer-xaddress.json')
+    simple: require('./prepareTrustlineSimple'),
+    complex: require('./prepareTrustline'),
+    frozen: require('./prepareTrustlineFrozen.json'),
+    issuedXAddress: require('./prepareTrustlineIssuerXaddress.json')
   },
   sign: {
     normal: require('./sign'),
-    ticket: require('./sign-ticket'),
-    escrow: require('./sign-escrow.json'),
-    signAs: require('./sign-as')
+    ticket: require('./signTicket'),
+    escrow: require('./signEscrow.json'),
+    signAs: require('./signAs')
   },
-  signPaymentChannelClaim: require('./sign-payment-channel-claim'),
+  signPaymentChannelClaim: require('./signPaymentChannelClaim'),
   getPaths: {
     normal: require('./getpaths/normal'),
     UsdToUsd: require('./getpaths/usd2usd'),
     XrpToXrp: require('./getpaths/xrp2xrp'),
-    XrpToXrpNotEnough: require('./getpaths/xrp2xrp-not-enough'),
-    NotAcceptCurrency: require('./getpaths/not-accept-currency'),
-    NoPaths: require('./getpaths/no-paths'),
-    NoPathsSource: require('./getpaths/no-paths-source-amount'),
-    NoPathsWithCurrencies: require('./getpaths/no-paths-with-currencies'),
-    sendAll: require('./getpaths/send-all'),
+    XrpToXrpNotEnough: require('./getpaths/xrp2xrpNotEnough'),
+    NotAcceptCurrency: require('./getpaths/notAcceptCurrency'),
+    NoPaths: require('./getpaths/noPaths'),
+    NoPathsSource: require('./getpaths/noPathsSourceAmount'),
+    NoPathsWithCurrencies: require('./getpaths/noPathsWithCurrencies'),
+    sendAll: require('./getpaths/sendAll'),
     invalid: require('./getpaths/invalid'),
     issuer: require('./getpaths/issuer')
   },
   getOrderbook: {
-    normal: require('./get-orderbook'),
-    withXRP: require('./get-orderbook-with-xrp')
+    normal: require('./getOrderbook'),
+    withXRP: require('./getOrderbookWithXrp')
   },
   computeLedgerHash: {
-    header: require('./compute-ledger-hash'),
-    transactions: require('./compute-ledger-hash-transactions')
+    header: require('./computeLedgerHash'),
+    transactions: require('./computeLedgerHashTransactions')
   },
   combine: {
     setDomain: require('./combine.json')
