@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import BigNumber from 'bignumber.js'
-import * as _ from 'lodash'
 
 import {Client} from '..'
 import {Connection} from '../client'

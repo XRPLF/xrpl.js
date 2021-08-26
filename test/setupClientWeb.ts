@@ -9,15 +9,12 @@ function setup(this: any, port_ = port) {
     .connect()
     .then(() => {
       return tclient.connection.request({
-        // TODO: resolve when we redo the testing framework
-        // @ts-expect-error
         command: 'test_command',
         data: {openOnOtherPort: true}
       })
     })
     .then((got) => {
       return new Promise<void>((resolve, reject) => {
-        // @ts-expect-error
         this.client = new Client(baseUrl + got.port)
         this.client.connect().then(resolve).catch(reject)
       })

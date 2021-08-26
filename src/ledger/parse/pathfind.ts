@@ -3,8 +3,6 @@ import parseAmount from './amount'
 import {Amount, RippledAmount} from '../../common/types/objects'
 import {Path, GetPaths, RippledPathsResponse} from '../pathfind-types'
 
-import parseAmount from './amount'
-
 function parsePaths(paths) {
   return paths.map((steps) =>
     steps.map((step) => _.omit(step, ['type', 'type_hex']))

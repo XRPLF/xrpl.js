@@ -4,11 +4,11 @@ import assert from 'assert-diff'
 import _ from 'lodash'
 
 import {Client} from 'xrpl-local'
+import {Connection} from 'xrpl-local/client'
 
+import rippled from './fixtures/rippled'
 import setupClient from './setupClient'
 import {ignoreWebSocketDisconnect} from './testUtils'
-import {Connection} from 'xrpl-local/client'
-import rippled from './fixtures/rippled'
 
 const TIMEOUT = 200000 // how long before each test case times out
 const isBrowser = (process as any).browser
@@ -56,7 +56,7 @@ describe('Connection', function () {
       const messages = []
       console.log = (id, message) => messages.push([id, message])
       const connection: any = new Connection('url', {trace: false})
-      connection._ws = {send: function () {}}
+      connection._ws = {send() {}}
       connection.request(mockedRequestData)
       connection._onMessage(mockedResponse)
       assert.deepEqual(messages, [])
@@ -66,7 +66,7 @@ describe('Connection', function () {
       const messages = []
       console.log = (id, message) => messages.push([id, message])
       const connection: any = new Connection('url', {trace: true})
-      connection._ws = {send: function () {}}
+      connection._ws = {send() {}}
       connection.request(mockedRequestData)
       connection._onMessage(mockedResponse)
       assert.deepEqual(messages, expectedMessages)
@@ -107,10 +107,7 @@ describe('Connection', function () {
         authorization: 'authorization',
         trustedCertificates: ['path/to/pem']
       }
-      const connection = new Connection(
-        this.client.connection._url,
-        options
-      )
+      const connection = new Connection(this.client.connection._url, options)
       connection.connect().catch((err) => {
         assert(err instanceof this.client.errors.NotConnectedError)
       })
@@ -128,8 +125,9 @@ describe('Connection', function () {
 
   it('NotConnectedError', function () {
     const connection = new Connection('url')
-    return connection.request({
-        command: 'ledger', 
+    return connection
+      .request({
+        command: 'ledger',
         ledger_index: 'validated'
       })
       .then(() => {
@@ -150,9 +148,7 @@ describe('Connection', function () {
     }
 
     // Address where no one listens
-    const connection = new Connection(
-      'ws://testripple.circleci.com:129'
-    )
+    const connection = new Connection('ws://testripple.circleci.com:129')
     connection.on('error', done)
     connection.connect().catch((error) => {
       assert(error instanceof this.client.errors.NotConnectedError)
@@ -509,6 +505,7 @@ describe('Connection', function () {
         id: 0,
         streams: 'validations'
       })
+    })
   })
 
   it('unrecognized message type', function (done) {

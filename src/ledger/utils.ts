@@ -1,8 +1,6 @@
 import _ from 'lodash'
 import * as assert from 'assert'
 
-import * as _ from 'lodash'
-
 import {Client, dropsToXrp} from '..'
 import {Connection} from '../client'
 import * as common from '../common'

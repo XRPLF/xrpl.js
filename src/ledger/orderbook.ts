@@ -4,8 +4,10 @@ import {
   parseOrderbookOrder,
   FormattedOrderbookOrder
 } from './parse/orderbook-order'
-import * as utils from './utils'
-
+import type {Issue} from '../common/types/objects'
+import type {Client} from '../client'
+import BigNumber from 'bignumber.js'
+import type {BookOffer} from '../common/types/commands'
 export interface FormattedOrderbook {
   bids: FormattedOrderbookOrder[]
   asks: FormattedOrderbookOrder[]
@@ -77,7 +79,8 @@ async function makeRequest(
     taker_gets: takerGets,
     taker_pays: takerPays
   })
-  return client.requestAll({command: 'book_offers',
+  return client.requestAll({
+    command: 'book_offers',
     taker_gets: orderData.taker_gets,
     taker_pays: orderData.taker_pays,
     ledger_index: options.ledgerVersion || 'validated',
@@ -102,8 +105,6 @@ export async function getOrderbook(
   orderbook: OrderbookInfo,
   options: GetOrderbookOptions = {}
 ): Promise<FormattedOrderbook> {
-  // 1. Validate
-  validate.getOrderbook({address, orderbook, options})
   // 2. Make Request
   const [directOfferResults, reverseOfferResults] = await Promise.all([
     makeRequest(this, address, options, orderbook.base, orderbook.counter),

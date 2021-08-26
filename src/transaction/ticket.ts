@@ -1,10 +1,7 @@
 import _ from 'lodash'
 import * as utils from './utils'
 import {Prepare, TransactionJSON, Instructions} from './types'
-import {Client} from '..'
-
-import {Prepare, TransactionJSON, Instructions} from './types'
-import * as utils from './utils'
+import type {Client} from '..'
 
 const validate = utils.common.validate
 const ValidationError = utils.common.errors.ValidationError

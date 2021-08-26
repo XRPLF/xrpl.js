@@ -12,10 +12,16 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  */
 export default <TestSuite>{
   'prepareOrderCancellation': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
-    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
+    mockRippled.addResponse(
+      {command: 'account_info'},
+      rippled.account_info.normal
+    )
     const request = requests.prepareOrderCancellation.simple
     const result = await client.prepareOrderCancellation(
       address,
@@ -30,10 +36,16 @@ export default <TestSuite>{
   },
 
   'no instructions': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
-    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
+    mockRippled.addResponse(
+      {command: 'account_info'},
+      rippled.account_info.normal
+    )
     const request = requests.prepareOrderCancellation.simple
     const result = await client.prepareOrderCancellation(address, request)
     assertResultMatch(
@@ -44,10 +56,16 @@ export default <TestSuite>{
   },
 
   'with memos': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
-    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
+    mockRippled.addResponse(
+      {command: 'account_info'},
+      rippled.account_info.normal
+    )
     const request = requests.prepareOrderCancellation.withMemos
     const result = await client.prepareOrderCancellation(address, request)
     assertResultMatch(
@@ -58,13 +76,15 @@ export default <TestSuite>{
   },
 
   'invalid': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
-    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
-    const request = Object.assign(
-      {},
-      requests.prepareOrderCancellation.withMemos
+    mockRippled.addResponse(
+      {command: 'account_info'},
+      rippled.account_info.normal
     )
     const request = {
       ...requests.prepareOrderCancellation.withMemos
@@ -79,10 +99,16 @@ export default <TestSuite>{
   },
 
   'with ticket': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     mockRippled.addResponse({command: 'fee'}, rippled.fee)
     mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
-    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
+    mockRippled.addResponse(
+      {command: 'account_info'},
+      rippled.account_info.normal
+    )
     const request = requests.prepareOrderCancellation.simple
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,

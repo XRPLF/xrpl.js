@@ -1,9 +1,5 @@
 import _ from 'lodash'
 import * as utils from './utils'
-const validate = utils.common.validate
-const paymentFlags = utils.common.txFlags.Payment
-const ValidationError = utils.common.errors.ValidationError
-import {Instructions, Prepare, TransactionJSON} from './types'
 import {
   Amount,
   Adjustment,
@@ -14,8 +10,8 @@ import {
 import {toRippledAmount, xrpToDrops} from '../utils'
 
 import {Instructions, Prepare, TransactionJSON} from './types'
-import * as utils from './utils'
 import {getClassicAccountAndTag, ClassicAccountAndTag} from './utils'
+import type {Client} from '../client'
 
 const validate = utils.common.validate
 const paymentFlags = utils.common.txFlags.Payment

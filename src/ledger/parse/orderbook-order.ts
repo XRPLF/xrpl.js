@@ -4,11 +4,9 @@ import {removeUndefined} from '../../utils'
 
 import {BookOffer} from '../../common/types/commands'
 import {Amount, FormattedOrderSpecification} from '../../common/types/objects'
-import {removeUndefined} from '../../utils'
 
 import parseAmount from './amount'
 import {orderFlags} from './flags'
-import {parseTimestamp, adjustQualityForXRP} from './utils'
 
 export interface FormattedOrderbookOrder {
   specification: FormattedOrderSpecification

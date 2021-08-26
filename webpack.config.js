@@ -6,35 +6,43 @@ const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer')
 
 function getDefaultConfiguration() {
   return {
-  cache: true,
-  performance: { hints: false },
-  stats: 'errors-only',
-  entry: './dist/npm/index.js',
-  output: {
-    library: 'ripple',
-    path: path.join(__dirname, 'build/'),
-    filename: `ripple-lib.default.js`,
-  },
-  plugins: [
-    new webpack.NormalModuleReplacementPlugin(/^ws$/, './wsWrapper'),
-    new webpack.NormalModuleReplacementPlugin(/^\.\/wallet$/, './wallet-web'),
-    new webpack.NormalModuleReplacementPlugin(/^.*setup-api$/, './setup-api-web'),
-    new webpack.ProvidePlugin({ process: 'process/browser' }),
-    new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] })
-  ],
-  module: {
-    rules: []
-  },
-  resolve: {
-    extensions: ['.js', '.json'],
-    fallback: { 
-      "buffer": require.resolve("buffer/"),
-      "assert": require.resolve("assert/"),
-      "url": require.resolve("url/"),
-      "stream": require.resolve("stream-browserify"),
-      "crypto": require.resolve("crypto-browserify"),
-      "https": require.resolve("https-browserify"),
-      "http": require.resolve('stream-http')
+    cache: true,
+    performance: {hints: false},
+    stats: 'errors-only',
+    entry: './dist/npm/index.js',
+    output: {
+      library: 'ripple',
+      path: path.join(__dirname, 'build/'),
+      filename: `ripple-lib.default.js`
+    },
+    plugins: [
+      new webpack.NormalModuleReplacementPlugin(/^ws$/, './wswrapper'),
+      new webpack.NormalModuleReplacementPlugin(/^\.\/wallet$/, './wallet-web'),
+      new webpack.NormalModuleReplacementPlugin(
+        /^.*setup-api$/,
+        './setup-api-web'
+      ),
+      new webpack.ProvidePlugin({process: 'process/browser'}),
+      new webpack.ProvidePlugin({Buffer: ['buffer', 'Buffer']})
+    ],
+    module: {
+      rules: []
+    },
+    resolve: {
+      alias: {
+        'ws': './dist/npm/client/wswrapper.js',
+        'https-proxy-agent': false
+      },
+      extensions: ['.js', '.json'],
+      fallback: {
+        buffer: require.resolve('buffer/'),
+        assert: require.resolve('assert/'),
+        url: require.resolve('url/'),
+        stream: require.resolve('stream-browserify'),
+        crypto: require.resolve('crypto-browserify'),
+        https: require.resolve('https-browserify'),
+        http: require.resolve('stream-http')
+      }
     }
   }
 }

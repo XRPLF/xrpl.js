@@ -1,21 +1,20 @@
-import assert from 'assert-diff'
+import assert, {assertRejects} from 'assert-diff'
 import _ from 'lodash'
 
 import {Client} from 'xrpl-local'
-import {RecursiveData} from 'xrpl-local/ledger/utils'
+import {validate} from 'xrpl-local/common'
+import * as schemaValidator from 'xrpl-local/common/schema-validator'
+import {
+  RecursiveData,
+  renameCounterpartyToIssuerInOrder,
+  compareTransactions,
+  getRecursive
+} from 'xrpl-local/ledger/utils'
 
 import {toRippledAmount} from '../src'
 
 import addresses from './fixtures/addresses.json'
 import setupClient from './setupClient'
-import {toRippledAmount} from '../src'
-import * as schemaValidator from 'xrpl-local/common/schema-validator'
-import {validate} from 'xrpl-local/common'
-import {
-  renameCounterpartyToIssuerInOrder,
-  compareTransactions,
-  getRecursive
-} from 'xrpl-local/ledger/utils'
 
 const address = addresses.ACCOUNT
 assert.options.strict = true
@@ -149,14 +148,11 @@ describe('Client', function () {
       taker_gets: {issuer: '1', currency: 'XRP'},
       taker_pays: {issuer: '1', currency: 'XRP'}
     }
-    assert.deepEqual(
-      renameCounterpartyToIssuerInOrder(order),
-      expected
-    )
+    assert.deepEqual(renameCounterpartyToIssuerInOrder(order), expected)
   })
 
-  it('ledger utils - compareTransactions', async () => {
-    // @ts-ignore
+  it('ledger utils - compareTransactions', async function () {
+    // @ts-expect-error
     assert.strictEqual(compareTransactions({}, {}), 0)
     let first: any = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
     let second: any = {outcome: {ledgerVersion: 1, indexInLedger: 200}}

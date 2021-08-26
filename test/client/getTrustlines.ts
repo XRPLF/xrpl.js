@@ -18,7 +18,11 @@ export default <TestSuite>{
     assertResultMatch(result, RESPONSE_FIXTURES.filtered, 'getTrustlines')
   },
 
-  'getTrustlines - more than 400 items': async (client, address, mockRippled) => {
+  'getTrustlines - more than 400 items': async (
+    client,
+    address,
+    mockRippled
+  ) => {
     mockRippled.addResponse({command: 'account_lines'}, rippled.manyItems)
     const options = {limit: 401}
     const result = await client.getTrustlines(address, options)
@@ -34,23 +38,36 @@ export default <TestSuite>{
     await client.getTrustlines(address)
   },
 
-  'getTrustlines - ripplingDisabled works properly': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'account_lines'}, rippled.ripplingDisabled)
+  'getTrustlines - ripplingDisabled works properly': async (
+    client,
+    address,
+    mockRippled
+  ) => {
+    mockRippled.addResponse(
+      {command: 'account_lines'},
+      rippled.ripplingDisabled
+    )
     const result = await client.getTrustlines(address)
     assertResultMatch(
       result,
       RESPONSE_FIXTURES.ripplingDisabled,
       'getTrustlines'
     )
-  }
+  },
 
-  'getTrustlines - ledger version option': async (client, address, mockRippled) => {
+  'getTrustlines - ledger version option': async (
+    client,
+    address,
+    mockRippled
+  ) => {
     mockRippled.addResponse({command: 'account_lines'}, rippled.manyItems)
-    const result = await client.getTrustlines(addresses.FOURTH_ACCOUNT, {ledgerVersion: 5})
+    const result = await client.getTrustlines(addresses.FOURTH_ACCOUNT, {
+      ledgerVersion: 5
+    })
     assertResultMatch(
       result,
       RESPONSE_FIXTURES.moreThan400Items,
       'getTrustlines'
     )
-  },
+  }
 }

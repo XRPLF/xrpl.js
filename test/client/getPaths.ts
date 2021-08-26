@@ -2,10 +2,9 @@ import assert from 'assert-diff'
 
 import addresses from '../fixtures/addresses.json'
 import requests from '../fixtures/requests'
+import rippled from '../fixtures/rippled'
 import {assertRejects, TestSuite} from '../testUtils'
 // import responses from '../fixtures/responses'
-import rippled from '../fixtures/rippled'
-import addresses from '../fixtures/addresses.json'
 const {getPaths: REQUEST_FIXTURES} = requests
 // const {getPaths: RESPONSE_FIXTURES} = responses
 

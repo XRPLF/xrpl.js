@@ -1,8 +1,10 @@
+import {EventEmitter2} from 'eventemitter2'
 import _ from 'lodash'
 import {Server as WebSocketServer} from 'ws'
-import {EventEmitter2} from 'eventemitter2'
-import {getFreePort} from './testUtils'
 
+import type {Request} from '../src'
+
+import {getFreePort} from './testUtils'
 
 function createResponse(request, response, overrides = {}) {
   const result = {...response.result, ...overrides}
@@ -45,10 +47,12 @@ export function createMockRippled(port) {
           ping(conn, request)
         } else if (request.command === 'test_command') {
           mock.testCommand(conn, request)
-        }else if (request.command in mock.responses) {
+        } else if (request.command in mock.responses) {
           conn.send(createResponse(request, mock.getResponse(request)))
         } else {
-          throw new Error(`No event handler registered in mock rippled for ${request.command}`)
+          throw new Error(
+            `No event handler registered in mock rippled for ${request.command}`
+          )
         }
       } catch (err) {
         if (!mock.suppressOutput) {
@@ -62,12 +66,15 @@ export function createMockRippled(port) {
   // Adds a mocked response
   // If an object is passed in for `response`, then the response is static for the command
   // If a function is passed in for `response`, then the response can be determined by the exact request shape
-  mock.addResponse = (request: Request, response: object | ((r: Request) => object)) => {
+  mock.addResponse = (
+    request: Request,
+    response: object | ((r: Request) => object)
+  ) => {
     const command = request.command
     mock.responses[command] = response
   }
 
-  mock.getResponse = (request: Request) : object => {
+  mock.getResponse = (request: Request): object => {
     if (!(request.command in mock.responses)) {
       throw new Error(`No handler for ${request.command}`)
     }
