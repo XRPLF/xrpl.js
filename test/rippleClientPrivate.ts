@@ -1,4 +1,4 @@
-import assert, {assertRejects} from 'assert-diff'
+import assert from 'assert-diff'
 import _ from 'lodash'
 
 import {Client} from 'xrpl-local'
@@ -15,6 +15,7 @@ import {toRippledAmount} from '../src'
 
 import addresses from './fixtures/addresses.json'
 import setupClient from './setupClient'
+import {assertRejects} from './testUtils'
 
 const address = addresses.ACCOUNT
 assert.options.strict = true
