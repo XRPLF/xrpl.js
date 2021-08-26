@@ -3,8 +3,7 @@ import computeLedgerHeaderHash from './ledgerHash'
 import signPaymentChannelClaim from './signPaymentChannelClaim'
 import verifyPaymentChannelClaim from './verifyPaymentChannelClaim'
 import {
-    computeBinaryTransactionHash,
-    computeTransactionHash,
+    computeSignedTransactionHash,
     computeBinaryTransactionSigningHash,
     computeAccountRootIndex,
     computeSignerListIndex,
@@ -221,8 +220,7 @@ export {
     rippleTimeToISOTime,
     ISOTimeToRippleTime,
     isValidSecret,
-    computeBinaryTransactionHash,
-    computeTransactionHash,
+    computeSignedTransactionHash,
     computeBinaryTransactionSigningHash,
     computeAccountRootIndex,
     computeSignerListIndex,

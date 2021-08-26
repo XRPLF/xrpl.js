@@ -23,7 +23,7 @@ import { encode } from 'ripple-binary-codec/dist'
 function createLedgerTest(ledgerIndex: number) {
   describe(String(ledgerIndex), function () {
     var path =
-      __dirname + '/../fixtures/rippled/ledgerFull' + ledgerIndex + '.json'
+      __dirname + '/fixtures/rippled/ledgerFull' + ledgerIndex + '.json'
 
     var ledgerRaw = fs.readFileSync(path, {encoding: 'utf8'})
     var ledgerJSON = JSON.parse(ledgerRaw)
