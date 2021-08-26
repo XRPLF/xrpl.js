@@ -1,22 +1,22 @@
-import * as _ from 'lodash'
 import BigNumber from 'bignumber.js'
-import {getXRPBalance, renameCounterpartyToIssuer} from './utils'
-import {
-  validate,
-  errors
-} from '../common'
-import {toRippledAmount, xrpToDrops, dropsToXrp} from '../utils'
+import * as _ from 'lodash'
+
+import {Client} from '..'
 import {Connection} from '../client'
-import parsePathfind from './parse/pathfind'
+import {validate, errors} from '../common'
 import {RippledAmount, Amount} from '../common/types/objects'
+import {RipplePathFindRequest} from '../models/methods'
+import {toRippledAmount, xrpToDrops, dropsToXrp} from '../utils'
+
+import parsePathfind from './parse/pathfind'
 import {
   GetPaths,
   PathFind,
   RippledPathsResponse,
   PathFindRequest
 } from './pathfind-types'
-import {Client} from '..'
-import { RipplePathFindRequest } from '../models/methods'
+import {getXRPBalance, renameCounterpartyToIssuer} from './utils'
+
 const NotFoundError = errors.NotFoundError
 const ValidationError = errors.ValidationError
 
@@ -25,10 +25,11 @@ function addParams(
   result: RippledPathsResponse
 ): RippledPathsResponse {
   return _.defaults(
-    Object.assign({}, result, {
+    {
+      ...result,
       source_account: request.source_account,
       source_currencies: request.source_currencies
-    }),
+    },
     {destination_amount: request.destination_amount}
   )
 }
@@ -37,19 +38,17 @@ function requestPathFind(
   connection: Connection,
   pathfind: PathFind
 ): Promise<RippledPathsResponse> {
-  const destinationAmount: Amount = Object.assign(
-    {
-      // This is converted back to drops by toRippledAmount()
-      value:
-        pathfind.destination.amount.currency === 'XRP' ? dropsToXrp('-1') : '-1'
-    },
-    pathfind.destination.amount
-  )
+  const destinationAmount: Amount = {
+    // This is converted back to drops by toRippledAmount()
+    value:
+      pathfind.destination.amount.currency === 'XRP' ? dropsToXrp('-1') : '-1',
+    ...pathfind.destination.amount
+  }
   const request: RipplePathFindRequest = {
     command: 'ripple_path_find',
     source_account: pathfind.source.address,
     destination_account: pathfind.destination.address,
-    // @ts-ignore
+    // @ts-expect-error
     destination_amount: destinationAmount
   }
   if (
@@ -62,7 +61,7 @@ function requestPathFind(
     request.destination_amount.issuer = request.destination_account
   }
   if (pathfind.source.currencies && pathfind.source.currencies.length > 0) {
-    // @ts-ignore
+    // @ts-expect-error
     request.source_currencies = pathfind.source.currencies.map((amount) =>
       renameCounterpartyToIssuer(amount)
     )
@@ -74,13 +73,13 @@ function requestPathFind(
           ' and destination.amount.value in getPaths'
       )
     }
-    // @ts-ignore
+    // @ts-expect-error
     request.send_max = toRippledAmount(pathfind.source.amount)
     if (typeof request.send_max !== 'string' && !request.send_max.issuer) {
       request.send_max.issuer = pathfind.source.address
     }
   }
-  // @ts-ignore
+  // @ts-expect-error
   return connection.request(request).then((paths) => addParams(request, paths))
 }
 
@@ -90,7 +89,7 @@ function addDirectXrpPath(
 ): RippledPathsResponse {
   // Add XRP "path" only if the source acct has enough XRP to make the payment
   const destinationAmount = paths.destination_amount
-  // @ts-ignore: destinationAmount can be a currency amount object! Fix!
+  // @ts-expect-error: destinationAmount can be a currency amount object! Fix!
   if (new BigNumber(xrpBalance).isGreaterThanOrEqualTo(destinationAmount)) {
     paths.alternatives.unshift({
       paths_computed: [],
@@ -158,16 +157,12 @@ function formatResponse(pathfind: PathFind, paths: RippledPathsResponse) {
   }
   if (
     paths.destination_currencies != null &&
-    !paths.destination_currencies.includes(
-      pathfind.destination.amount.currency
-    )
+    !paths.destination_currencies.includes(pathfind.destination.amount.currency)
   ) {
     throw new NotFoundError(
-      'No paths found. ' +
-        'The destination_account does not accept ' +
-        pathfind.destination.amount.currency +
-        ', they only accept: ' +
-        paths.destination_currencies.join(', ')
+      `${'No paths found. ' + 'The destination_account does not accept '}${
+        pathfind.destination.amount.currency
+      }, they only accept: ${paths.destination_currencies.join(', ')}`
     )
   } else if (paths.source_currencies && paths.source_currencies.length > 0) {
     throw new NotFoundError(
@@ -192,9 +187,7 @@ function getPaths(this: Client, pathfind: PathFind): Promise<GetPaths> {
 
   const address = pathfind.source.address
   return requestPathFind(this.connection, pathfind)
-    .then((paths) =>
-      conditionallyAddDirectXRPPath(this, address, paths)
-    )
+    .then((paths) => conditionallyAddDirectXRPPath(this, address, paths))
     .then((paths) => filterSourceFundsLowPaths(pathfind, paths))
     .then((paths) => formatResponse(pathfind, paths))
 }

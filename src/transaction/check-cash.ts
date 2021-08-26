@@ -1,12 +1,13 @@
-import * as utils from './utils'
-import {validate} from '../common'
-import {Instructions, Prepare, TransactionJSON} from './types'
-import {Amount} from '../common/types/objects'
 import {Client} from '..'
-import {toRippledAmount} from '../utils'
+import {validate} from '../common'
 import {ValidationError} from '../common/errors'
+import {Amount} from '../common/types/objects'
+import {toRippledAmount} from '../utils'
 
-export type CheckCashParameters = {
+import {Instructions, Prepare, TransactionJSON} from './types'
+import * as utils from './utils'
+
+export interface CheckCashParameters {
   checkID: string
   amount?: Amount
   deliverMin?: Amount

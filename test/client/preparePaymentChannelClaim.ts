@@ -1,8 +1,10 @@
 import assert from 'assert-diff'
+
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
 import {assertResultMatch, TestSuite} from '../testUtils'
+
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 const {preparePaymentChannelClaim: REQUEST_FIXTURES} = requests
 const {preparePaymentChannelClaim: RESPONSE_FIXTURES} = responses
@@ -14,7 +16,10 @@ const {preparePaymentChannelClaim: RESPONSE_FIXTURES} = responses
  */
 export default <TestSuite>{
   'default': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -28,7 +33,10 @@ export default <TestSuite>{
   },
 
   'with renew': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -42,7 +50,10 @@ export default <TestSuite>{
   },
 
   'with close': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -56,7 +67,10 @@ export default <TestSuite>{
   },
 
   'with ticket': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
@@ -75,15 +89,19 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     try {
       const prepared = await client.preparePaymentChannelClaim(
         address,
         REQUEST_FIXTURES.full
       )
       throw new Error(
-        'Expected method to reject. Prepared transaction: ' +
-          JSON.stringify(prepared)
+        `Expected method to reject. Prepared transaction: ${JSON.stringify(
+          prepared
+        )}`
       )
     } catch (err) {
       assert.strictEqual(err.name, 'ValidationError')
@@ -99,15 +117,19 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     try {
       const prepared = await client.preparePaymentChannelClaim(
         address,
         REQUEST_FIXTURES.noSignature
       )
       throw new Error(
-        'Expected method to reject. Prepared transaction: ' +
-          JSON.stringify(prepared)
+        `Expected method to reject. Prepared transaction: ${JSON.stringify(
+          prepared
+        )}`
       )
     } catch (err) {
       assert.strictEqual(err.name, 'ValidationError')

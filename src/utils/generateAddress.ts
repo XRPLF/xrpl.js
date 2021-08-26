@@ -1,9 +1,10 @@
 import {classicAddressToXAddress} from 'ripple-address-codec'
 import keypairs from 'ripple-keypairs'
+
 import {errors, validate} from '../common'
 import ECDSA from '../common/ecdsa'
 
-export type GeneratedAddress = {
+export interface GeneratedAddress {
   xAddress: string
   classicAddress?: string
   address?: string // @deprecated Use `classicAddress` instead.
@@ -27,7 +28,9 @@ export interface GenerateAddressOptions {
 }
 
 // TODO: move this function to be a static function of the Wallet class (Along with its helper data types)
-function generateXAddress(options: GenerateAddressOptions = {}): GeneratedAddress {
+function generateXAddress(
+  options: GenerateAddressOptions = {}
+): GeneratedAddress {
   validate.generateAddress({options})
   try {
     const generateSeedOptions: {

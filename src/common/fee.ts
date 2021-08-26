@@ -1,5 +1,6 @@
-import _ from 'lodash'
 import BigNumber from 'bignumber.js'
+import _ from 'lodash'
+
 import {Client} from '..'
 
 // This is a public API that can be called directly.
@@ -12,7 +13,7 @@ async function getFee(this: Client, cushion?: number): Promise<string> {
     cushion = 1.2
   }
 
-  const serverInfo = (await this.request({command: "server_info"})).result.info
+  const serverInfo = (await this.request({command: 'server_info'})).result.info
   const baseFeeXrp = new BigNumber(serverInfo.validated_ledger.base_fee_xrp)
   if (serverInfo.load_factor == null) {
     // https://github.com/ripple/rippled/issues/3812#issuecomment-816871100

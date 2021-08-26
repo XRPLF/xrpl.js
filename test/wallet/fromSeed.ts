@@ -1,7 +1,8 @@
 import assert from 'assert-diff'
-import {TestSuite} from '../testUtils'
+
 import ECDSA from '../../src/common/ecdsa'
 import Wallet from '../../src/Wallet'
+import {TestSuite} from '../testUtils'
 
 const seed = 'ssL9dv2W5RK8L3tuzQxYY6EaZhSxW'
 const publicKey =
@@ -46,5 +47,5 @@ export default <TestSuite>{
     // THEN we get a wallet with a keypair (publicKey/privateKey)
     assert.equal(wallet.publicKey, publicKey)
     assert.equal(wallet.privateKey, privateKey)
-  },
+  }
 }

@@ -1,31 +1,32 @@
-import transactionParser from 'ripple-lib-transactionparser'
 import BigNumber from 'bignumber.js'
-import parseAmount from './amount'
+import transactionParser from 'ripple-lib-transactionparser'
 
-import {Amount, Memo} from '../../common/types/objects'
 import {txFlags} from '../../common'
+import {Amount, Memo} from '../../common/types/objects'
 import {removeUndefined, dropsToXrp, rippleTimeToISOTime} from '../../utils'
 
-type OfferDescription = {
-  direction: string,
-  quantity: any,
-  totalPrice: any,
-  sequence: number,
-  status: string,
+import parseAmount from './amount'
+
+interface OfferDescription {
+  direction: string
+  quantity: any
+  totalPrice: any
+  sequence: number
+  status: string
   makerExchangeRate: string
 }
 
-type Orderbook = {
+interface Orderbook {
   [key: string]: OfferDescription[]
 }
 
-type BalanceSheetItem = {
-  counterparty: string,
-  currency: string,
+interface BalanceSheetItem {
+  counterparty: string
+  currency: string
   value: string
 }
 
-type BalanceSheet = {
+interface BalanceSheet {
   [key: string]: BalanceSheetItem[]
 }
 
@@ -70,7 +71,9 @@ function removeEmptyCounterpartyInBalanceChanges(balanceChanges: BalanceSheet) {
   })
 }
 
-function removeEmptyCounterpartyInOrderbookChanges(orderbookChanges: Orderbook) {
+function removeEmptyCounterpartyInOrderbookChanges(
+  orderbookChanges: Orderbook
+) {
   Object.entries(orderbookChanges).forEach(([_, changes]) => {
     changes.forEach((change) => {
       Object.entries(change).forEach(removeEmptyCounterparty)
@@ -138,9 +141,9 @@ function parseOutcome(tx: any): any | undefined {
     result: tx.meta.TransactionResult,
     timestamp: parseTimestamp(tx.date),
     fee: dropsToXrp(tx.Fee),
-    balanceChanges: balanceChanges,
-    orderbookChanges: orderbookChanges,
-    channelChanges: channelChanges,
+    balanceChanges,
+    orderbookChanges,
+    channelChanges,
     ledgerVersion: tx.ledger_index,
     indexInLedger: tx.meta.TransactionIndex,
     deliveredAmount: parseDeliveredAmount(tx)
@@ -151,7 +154,7 @@ function hexToString(hex: string): string | undefined {
   return hex ? Buffer.from(hex, 'hex').toString('utf-8') : undefined
 }
 
-function parseMemos(tx: any): Array<Memo> | undefined {
+function parseMemos(tx: any): Memo[] | undefined {
   if (!Array.isArray(tx.Memos) || tx.Memos.length === 0) {
     return undefined
   }

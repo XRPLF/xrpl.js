@@ -2,11 +2,12 @@ import {fromSeed} from 'bip32'
 import {mnemonicToSeedSync} from 'bip39'
 import {decode, encodeForSigning} from 'ripple-binary-codec'
 import {deriveKeypair, generateSeed, verify} from 'ripple-keypairs'
+
 import ECDSA from './common/ecdsa'
+import {ValidationError} from './common/errors'
 import {SignedTransaction} from './common/types/objects'
 import {signOffline} from './transaction/sign'
 import {SignOptions} from './transaction/types'
-import {ValidationError} from './common/errors'
 
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
@@ -26,19 +27,24 @@ class Wallet {
 
   /**
    * Derives a wallet from a seed.
-   * @param {string} seed A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
-   * @param {ECDSA} algorithm The digital signature algorithm to generate an address for.
-   * @returns {Wallet} A Wallet derived from a seed.
+   *
+   * @param seed - A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
+   * @param algorithm - The digital signature algorithm to generate an address for.
+   * @returns A Wallet derived from a seed.
    */
-  static fromSeed(seed: string, algorithm: ECDSA = Wallet.defaultAlgorithm): Wallet {
+  static fromSeed(
+    seed: string,
+    algorithm: ECDSA = Wallet.defaultAlgorithm
+  ): Wallet {
     return Wallet.deriveWallet(seed, algorithm)
   }
 
   /**
    * Derives a wallet from a mnemonic.
-   * @param {string} mnemonic A string consisting of words (whitespace delimited) used to derive a wallet.
-   * @param {string} derivationPath The path to derive a keypair (publicKey/privateKey) from a seed (that was converted from a mnemonic).
-   * @returns {Wallet} A Wallet derived from a mnemonic.
+   *
+   * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
+   * @param derivationPath - The path to derive a keypair (publicKey/privateKey) from a seed (that was converted from a mnemonic).
+   * @returns A Wallet derived from a mnemonic.
    */
   static fromMnemonic(
     mnemonic: string,
@@ -48,7 +54,9 @@ class Wallet {
     const masterNode = fromSeed(seed)
     const node = masterNode.derivePath(derivationPath)
     if (node.privateKey === undefined) {
-      throw new ValidationError('Unable to derive privateKey from mnemonic input')
+      throw new ValidationError(
+        'Unable to derive privateKey from mnemonic input'
+      )
     }
 
     const publicKey = Wallet.hexFromBuffer(node.publicKey)
@@ -58,9 +66,10 @@ class Wallet {
 
   /**
    * Derives a wallet from an entropy (array of random numbers).
-   * @param {Uint8Array | number[]} entropy An array of random numbers to generate a seed used to derive a wallet.
-   * @param {ECDSA} algorithm The digital signature algorithm to generate an address for.
-   * @returns {Wallet} A Wallet derived from an entropy.
+   *
+   * @param entropy - An array of random numbers to generate a seed used to derive a wallet.
+   * @param algorithm - The digital signature algorithm to generate an address for.
+   * @returns A Wallet derived from an entropy.
    */
   static fromEntropy(
     entropy: Uint8Array | number[],
@@ -78,16 +87,20 @@ class Wallet {
     return buffer.toString('hex').toUpperCase()
   }
 
-  private static deriveWallet(seed: string, algorithm: ECDSA = Wallet.defaultAlgorithm): Wallet {
+  private static deriveWallet(
+    seed: string,
+    algorithm: ECDSA = Wallet.defaultAlgorithm
+  ): Wallet {
     const {publicKey, privateKey} = deriveKeypair(seed, {algorithm})
     return new Wallet(publicKey, privateKey)
   }
 
   /**
    * Signs a transaction offline.
-   * @param {object} transaction A transaction to be signed offline.
-   * @param {SignOptions} options Options to include for signing.
-   * @returns {SignedTransaction} A signed transaction.
+   *
+   * @param transaction - A transaction to be signed offline.
+   * @param options - Options to include for signing.
+   * @returns A signed transaction.
    */
   signTransaction(
     transaction: any, // TODO: transaction should be typed with Transaction type.
@@ -98,8 +111,9 @@ class Wallet {
 
   /**
    * Verifies a signed transaction offline.
-   * @param {string} signedTransaction A signed transaction (hex string of signTransaction result) to be verified offline.
-   * @returns {boolean} Returns true if a signedTransaction is valid.
+   *
+   * @param signedTransaction - A signed transaction (hex string of signTransaction result) to be verified offline.
+   * @returns Returns true if a signedTransaction is valid.
    */
   verifyTransaction(signedTransaction: string): boolean {
     const tx = decode(signedTransaction)

@@ -1,5 +1,6 @@
-import { BaseLedgerEntry } from "./baseLedgerEntry";
-import { IssuedCurrencyAmount } from "../common";
+import {IssuedCurrencyAmount} from '../common'
+
+import {BaseLedgerEntry} from './baseLedgerEntry'
 
 export interface RippleState extends BaseLedgerEntry {
   LedgerEntryType: 'RippleState'

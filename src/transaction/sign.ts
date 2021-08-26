@@ -1,14 +1,17 @@
-import _ from 'lodash'
-import * as utils from './utils'
-import keypairs from 'ripple-keypairs'
-import binaryCodec from 'ripple-binary-codec'
-import {computeBinaryTransactionHash} from '../utils/hashes'
-import {SignOptions, KeyPair, TransactionJSON} from './types'
 import BigNumber from 'bignumber.js'
-import {xrpToDrops} from '../utils'
+import _ from 'lodash'
+import binaryCodec from 'ripple-binary-codec'
+import keypairs from 'ripple-keypairs'
+
 import {Client} from '..'
-import Wallet from '../Wallet'
 import {SignedTransaction} from '../common/types/objects'
+import {xrpToDrops} from '../utils'
+import {computeBinaryTransactionHash} from '../utils/hashes'
+import Wallet from '../Wallet'
+
+import {SignOptions, KeyPair, TransactionJSON} from './types'
+import * as utils from './utils'
+
 const validate = utils.common.validate
 
 function computeSignature(tx: object, privateKey: string, signAs?: string) {
@@ -27,7 +30,7 @@ function signWithKeypair(
   }
 ): SignedTransaction {
   validate.sign({txJSON, keypair})
-  const isOnline = !!client;
+  const isOnline = Boolean(client)
 
   const tx = JSON.parse(txJSON)
   if (tx.TxnSignature || tx.Signers) {
@@ -40,7 +43,7 @@ function signWithKeypair(
     checkFee(client, tx.Fee)
   }
 
-  const txToSignAndEncode = Object.assign({}, tx)
+  const txToSignAndEncode = {...tx}
 
   txToSignAndEncode.SigningPubKey = options.signAs ? '' : keypair.publicKey
 
@@ -72,8 +75,8 @@ function signWithKeypair(
 /**
  * Compares two objects and creates a diff.
  *
- * @param a An object to compare.
- * @param b The other object to compare with.
+ * @param a - An object to compare.
+ * @param b - The other object to compare with.
  *
  * @returns An object containing the differences between the two objects.
  */
@@ -139,10 +142,10 @@ function objectDiff(a: object, b: object): object {
  *  Decode a serialized transaction, remove the fields that are added during the signing process,
  *  and verify that it matches the transaction prior to signing.
  *
- *  @param {string} serialized A signed and serialized transaction.
- *  @param {TransactionJSON} tx The transaction prior to signing.
+ * @param serialized - A signed and serialized transaction.
+ * @param tx - The transaction prior to signing.
  *
- *  @returns {void} This method does not return a value, but throws an error if the check fails.
+ * @returns This method does not return a value, but throws an error if the check fails.
  */
 function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
   // Decode the serialized transaction:
@@ -166,19 +169,19 @@ function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
     delete decoded.SigningPubKey
   }
 
-  // - Memos have exclusively hex data which should ignore case. 
+  // - Memos have exclusively hex data which should ignore case.
   //   Since decode goes to upper case, we set all tx memos to be uppercase for the comparison.
-  tx.Memos?.map(memo => {
-    if(memo?.Memo?.MemoData) {
-      memo.Memo.MemoData = memo.Memo.MemoData.toUpperCase();
+  tx.Memos.map((memo) => {
+    if (memo.Memo.MemoData) {
+      memo.Memo.MemoData = memo.Memo.MemoData.toUpperCase()
     }
 
-    if(memo?.Memo?.MemoType) {
-      memo.Memo.MemoType = memo.Memo.MemoType.toUpperCase();
+    if (memo.Memo.MemoType) {
+      memo.Memo.MemoType = memo.Memo.MemoType.toUpperCase()
     }
-    
-    if(memo?.Memo?.MemoFormat) {
-      memo.Memo.MemoFormat = memo.Memo.MemoFormat.toUpperCase();
+
+    if (memo.Memo.MemoFormat) {
+      memo.Memo.MemoFormat = memo.Memo.MemoFormat.toUpperCase()
     }
 
     return memo
@@ -200,12 +203,12 @@ function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
 /**
  *  Check that a given transaction fee does not exceed maxFeeXRP (in drops).
  *
- *  See https://xrpl.org/rippleapi-reference.html#parameters
+ *  See https://xrpl.org/rippleapi-reference.html#parameters.
  *
- *  @param {Client} client A Client instance.
- *  @param {string} txFee The transaction fee in drops, encoded as a string.
+ * @param client - A Client instance.
+ * @param txFee - The transaction fee in drops, encoded as a string.
  *
- *  @returns {void} This method does not return a value, but throws an error if the check fails.
+ * @returns This method does not return a value, but throws an error if the check fails.
  */
 function checkFee(client: Client, txFee: string): void {
   const fee = new BigNumber(txFee)
@@ -235,30 +238,24 @@ function sign(
       keypairs.deriveKeypair(secret),
       options
     )
-  } else {
-    if (!keypair && !secret) {
-      // Clearer message than 'ValidationError: instance is not exactly one from [subschema 0],[subschema 1]'
-      throw new utils.common.errors.ValidationError(
-        'sign: Missing secret or keypair.'
-      )
-    }
-    return signWithKeypair(this, txJSON, keypair ? keypair : secret, options)
   }
+  if (!keypair && !secret) {
+    // Clearer message than 'ValidationError: instance is not exactly one from [subschema 0],[subschema 1]'
+    throw new utils.common.errors.ValidationError(
+      'sign: Missing secret or keypair.'
+    )
+  }
+  return signWithKeypair(this, txJSON, keypair || secret, options)
 }
 
 // TODO: move this to Wallet class
 function signOffline(
   wallet: Wallet,
   txJSON: string,
-  options?: SignOptions,
+  options?: SignOptions
 ): SignedTransaction {
   const {publicKey, privateKey} = wallet
-  return signWithKeypair(
-    null,
-    txJSON,
-    {publicKey, privateKey},
-    options,
-  )
+  return signWithKeypair(null, txJSON, {publicKey, privateKey}, options)
 }
 
 export {sign, signOffline}

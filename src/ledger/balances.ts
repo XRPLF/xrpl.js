@@ -1,17 +1,18 @@
-import * as utils from './utils'
-import {validate, ensureClassicAddress} from '../common'
-import {Connection} from '../client'
-import {GetTrustlinesOptions} from './trustlines'
-import {FormattedTrustline} from '../common/types/objects/trustlines'
 import {Client} from '..'
+import {Connection} from '../client'
+import {validate, ensureClassicAddress} from '../common'
+import {FormattedTrustline} from '../common/types/objects/trustlines'
 
-export type Balance = {
+import {GetTrustlinesOptions} from './trustlines'
+import * as utils from './utils'
+
+export interface Balance {
   value: string
   currency: string
   counterparty?: string
 }
 
-export type GetBalances = Array<Balance>
+export type GetBalances = Balance[]
 
 function getTrustlineBalanceAmount(trustline: FormattedTrustline): Balance {
   return {
@@ -21,7 +22,10 @@ function getTrustlineBalanceAmount(trustline: FormattedTrustline): Balance {
   }
 }
 
-function formatBalances(options: GetTrustlinesOptions, balances: {xrp: string, trustlines: FormattedTrustline[]}) {
+function formatBalances(
+  options: GetTrustlinesOptions,
+  balances: {xrp: string; trustlines: FormattedTrustline[]}
+) {
   const result = balances.trustlines.map(getTrustlineBalanceAmount)
   if (
     !(options.counterparty || (options.currency && options.currency !== 'XRP'))
@@ -46,10 +50,12 @@ function getLedgerVersionHelper(
   if (optionValue != null && optionValue !== null) {
     return Promise.resolve(optionValue)
   }
-  return connection.request({
-    command: 'ledger', 
-    ledger_index: 'validated'
-  }).then(response => response.result.ledger_index);
+  return connection
+    .request({
+      command: 'ledger',
+      ledger_index: 'validated'
+    })
+    .then((response) => response.result.ledger_index)
 }
 
 function getBalances(
@@ -67,11 +73,8 @@ function getBalances(
   address = ensureClassicAddress(address)
 
   return Promise.all([
-    getLedgerVersionHelper(
-      this.connection,
-      options.ledgerVersion
-    ).then((ledgerVersion) =>
-      utils.getXRPBalance(this, address, ledgerVersion)
+    getLedgerVersionHelper(this.connection, options.ledgerVersion).then(
+      (ledgerVersion) => utils.getXRPBalance(this, address, ledgerVersion)
     ),
     this.getTrustlines(address, options)
   ]).then((results) =>

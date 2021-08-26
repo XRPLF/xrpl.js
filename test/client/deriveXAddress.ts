@@ -1,6 +1,7 @@
 import assert from 'assert-diff'
-import {TestSuite} from '../testUtils'
+
 import {Client} from '../../src'
+import {TestSuite} from '../testUtils'
 
 /**
  * Every test suite exports their tests in the default object.

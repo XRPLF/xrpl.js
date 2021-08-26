@@ -1,6 +1,7 @@
 import assert from 'assert-diff'
-import responses from '../fixtures/responses'
+
 import requests from '../fixtures/requests'
+import responses from '../fixtures/responses'
 import {TestSuite, assertResultMatch, assertRejects} from '../testUtils'
 // import BigNumber from 'bignumber.js'
 
@@ -56,7 +57,7 @@ export default <TestSuite>{
   'invalid options': async (client, address) => {
     assertRejects(
       client.getOrderbook(address, requests.getOrderbook.normal, {
-        // @ts-ignore
+        // @ts-expect-error
         invalid: 'options'
       }),
       client.errors.ValidationError
@@ -103,7 +104,10 @@ export default <TestSuite>{
   // },
 
   // WARNING: This test fails to catch the sorting bug, issue #766
-  'sorted so that best deals come first [bad test]': async (client, address) => {
+  'sorted so that best deals come first [bad test]': async (
+    client,
+    address
+  ) => {
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.normal

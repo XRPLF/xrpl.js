@@ -1,8 +1,9 @@
-import { Amount, LedgerIndex } from "../common";
-import { BaseRequest, BaseResponse } from "./baseMethod";
+import {Amount, LedgerIndex} from '../common'
+
+import {BaseRequest, BaseResponse} from './baseMethod'
 
 export interface AccountOffersRequest extends BaseRequest {
-  command: "account_offers"
+  command: 'account_offers'
   account: string
   ledger_hash?: string
   ledger_index?: LedgerIndex

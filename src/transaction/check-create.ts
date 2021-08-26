@@ -1,11 +1,12 @@
-import * as utils from './utils'
-import {validate} from '../common'
-import {ISOTimeToRippleTime, toRippledAmount} from '../utils'
-import {Instructions, Prepare, TransactionJSON} from './types'
-import {Amount} from '../common/types/objects'
 import {Client} from '..'
+import {validate} from '../common'
+import {Amount} from '../common/types/objects'
+import {ISOTimeToRippleTime, toRippledAmount} from '../utils'
 
-export type CheckCreateParameters = {
+import {Instructions, Prepare, TransactionJSON} from './types'
+import * as utils from './utils'
+
+export interface CheckCreateParameters {
   destination: string
   sendMax: Amount
   destinationTag?: number

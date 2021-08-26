@@ -17,17 +17,17 @@ class RippleError extends Error {
   }
 
   toString() {
-    let result = '[' + this.name + '(' + this.message
+    let result = `[${this.name}(${this.message}`
     if (this.data) {
-      result += ', ' + inspect(this.data)
+      result += `, ${inspect(this.data)}`
     }
     result += ')]'
     return result
   }
 
-  /* console.log in node uses util.inspect on object, and util.inspect allows
-  us to customize its output:
-  https://nodejs.org/api/util.html#util_custom_inspect_function_on_objects */
+  // console.log in node uses util.inspect on object, and util.inspect allows
+  // us to customize its output:
+  // https://nodejs.org/api/util.html#util_custom_inspect_function_on_objects
   inspect() {
     return this.toString()
   }

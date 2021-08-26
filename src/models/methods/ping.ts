@@ -1,7 +1,7 @@
-import { BaseRequest, BaseResponse } from "./baseMethod";
+import {BaseRequest, BaseResponse} from './baseMethod'
 
 export interface PingRequest extends BaseRequest {
-  command: "ping"
+  command: 'ping'
 }
 
 export interface PingResponse extends BaseResponse {

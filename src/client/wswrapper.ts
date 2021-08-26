@@ -17,7 +17,7 @@ declare class WebSocket {
  * same, as `ws` package provides.
  */
 export default class WSWrapper extends EventEmitter {
-  private _ws: WebSocket
+  private readonly _ws: WebSocket
   static CONNECTING = 0
   static OPEN = 1
   static CLOSING = 2

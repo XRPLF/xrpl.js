@@ -1,16 +1,17 @@
 import assert from 'assert-diff'
-import {TestSuite} from '../testUtils'
+
 import ECDSA from '../../src/common/ecdsa'
 import Wallet from '../../src/Wallet'
+import {TestSuite} from '../testUtils'
 
 const entropy: number[] = new Array(16).fill(0)
-const publicKey: string =
+const publicKey =
   '0390A196799EE412284A5D80BF78C3E84CBB80E1437A0AECD9ADF94D7FEAAFA284'
-const privateKey: string =
+const privateKey =
   '002512BBDFDBB77510883B7DCCBEF270B86DEAC8B64AC762873D75A1BEE6298665'
-const publicKeyED25519: string =
+const publicKeyED25519 =
   'ED1A7C082846CFF58FF9A892BA4BA2593151CCF1DBA59F37714CC9ED39824AF85F'
-const privateKeyED25519: string =
+const privateKeyED25519 =
   'ED0B6CBAC838DFE7F47EA1BD0DF00EC282FDF45510C92161072CCFB84035390C4D'
 
 /**
@@ -50,5 +51,5 @@ export default <TestSuite>{
     // THEN we get a wallet with a keypair (publicKey/privateKey)
     assert.equal(wallet.publicKey, publicKeyED25519)
     assert.equal(wallet.privateKey, privateKeyED25519)
-  },
+  }
 }

@@ -1,16 +1,17 @@
-import * as _ from 'lodash'
 import * as assert from 'assert'
-import * as common from '../common'
-import {Connection} from '../client'
-import {FormattedTransactionType} from '../transaction/types'
-import {Issue} from '../common/types/objects'
-import {Client} from '..'
-import {AccountInfoRequest} from '../models/methods'
-import {dropsToXrp} from '..'
 
-export type RecursiveData = {
+import * as _ from 'lodash'
+
+import {Client, dropsToXrp} from '..'
+import {Connection} from '../client'
+import * as common from '../common'
+import {Issue} from '../common/types/objects'
+import {AccountInfoRequest} from '../models/methods'
+import {FormattedTransactionType} from '../transaction/types'
+
+export interface RecursiveData {
   marker: string
-  results: Array<any>
+  results: any[]
 }
 
 export type Getter = (marker?: string, limit?: number) => Promise<RecursiveData>
@@ -30,8 +31,7 @@ async function getXRPBalance(
     account: address,
     ledger_index: ledgerVersion
   }
-  const data = await client
-    .request(request)
+  const data = await client.request(request)
   return dropsToXrp(data.result.account_data.Balance)
 }
 
@@ -40,17 +40,18 @@ async function getRecursiveRecur(
   getter: Getter,
   marker: string | undefined,
   limit: number
-): Promise<Array<any>> {
+): Promise<any[]> {
   const data = await getter(marker, limit)
   const remaining = limit - data.results.length
   if (remaining > 0 && data.marker != null) {
-    return getRecursiveRecur(getter, data.marker, remaining).then((results) => data.results.concat(results)
+    return getRecursiveRecur(getter, data.marker, remaining).then((results) =>
+      data.results.concat(results)
     )
   }
   return data.results.slice(0, limit)
 }
 
-function getRecursive(getter: Getter, limit?: number): Promise<Array<any>> {
+function getRecursive(getter: Getter, limit?: number): Promise<any[]> {
   return getRecursiveRecur(getter, undefined, limit || Infinity)
 }
 
@@ -63,18 +64,21 @@ function renameCounterpartyToIssuer<T>(
       : obj.issuer != null
       ? obj.issuer
       : undefined
-  const withIssuer = Object.assign({}, obj, {issuer})
+  const withIssuer = {...obj, issuer}
   delete withIssuer.counterparty
   return withIssuer
 }
 
-export type RequestBookOffersArgs = {taker_gets: Issue; taker_pays: Issue}
+export interface RequestBookOffersArgs {
+  taker_gets: Issue
+  taker_pays: Issue
+}
 
 function renameCounterpartyToIssuerInOrder(order: RequestBookOffersArgs) {
   const taker_gets = renameCounterpartyToIssuer(order.taker_gets)
   const taker_pays = renameCounterpartyToIssuer(order.taker_pays)
   const changes = {taker_gets, taker_pays}
-  return Object.assign({}, order, _.omitBy(changes, value => value == null))
+  return {...order, ..._.omitBy(changes, (value) => value == null)}
 }
 
 function signum(num) {
@@ -82,10 +86,13 @@ function signum(num) {
 }
 
 /**
- *  Order two rippled transactions based on their ledger_index.
- *  If two transactions took place in the same ledger, sort
- *  them based on TransactionIndex
- *  See: https://developers.ripple.com/transaction-metadata.html
+ * Order two rippled transactions based on their ledger_index.
+ * If two transactions took place in the same ledger, sort
+ * them based on TransactionIndex
+ * See: https://developers.ripple.com/transaction-metadata.html.
+ *
+ * @param first
+ * @param second
  */
 function compareTransactions(
   first: FormattedTransactionType,
@@ -112,7 +119,10 @@ async function isPendingLedgerVersion(
   return ledgerVersion < (maxLedgerVersion || 0)
 }
 
-async function ensureLedgerVersion(this: Client, options: any): Promise<object> {
+async function ensureLedgerVersion(
+  this: Client,
+  options: any
+): Promise<object> {
   if (
     Boolean(options) &&
     options.ledgerVersion != null &&
@@ -125,7 +135,7 @@ async function ensureLedgerVersion(this: Client, options: any): Promise<object> 
     ledger_index: 'validated'
   })
   const ledgerVersion = response.result.ledger_index
-  return Object.assign({}, options, { ledgerVersion })
+  return {...options, ledgerVersion}
 }
 
 export {

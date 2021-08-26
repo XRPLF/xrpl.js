@@ -1,10 +1,12 @@
 import * as assert from 'assert'
-import {removeUndefined} from '../../utils'
-import parseAmount from './amount'
+
 import {Amount} from '../../common/types/objects'
+import {removeUndefined} from '../../utils'
+
+import parseAmount from './amount'
 import {parseMemos} from './utils'
 
-export type FormattedCheckCash = {
+export interface FormattedCheckCash {
   // ID of the Check ledger object to cash.
   checkID: string
 

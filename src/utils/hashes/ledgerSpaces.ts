@@ -6,7 +6,7 @@
  *
  * Each namespace is just a single character prefix.
  *
- * See [LedgerNameSpace enum](https://github.com/ripple/rippled/blob/master/src/ripple/protocol/LedgerFormats.h#L100)
+ * See [LedgerNameSpace enum](https://github.com/ripple/rippled/blob/master/src/ripple/protocol/LedgerFormats.h#L100).
  */
 export default {
   account: 'a',

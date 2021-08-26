@@ -1,4 +1,4 @@
-import { AccountObjectType } from '../../../models/common';
+import {AccountObjectType} from '../../../models/common'
 import {
   CheckLedgerEntry,
   RippleStateLedgerEntry,

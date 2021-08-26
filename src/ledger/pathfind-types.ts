@@ -7,22 +7,22 @@ import {
 } from '../common/types/objects'
 
 // Amount where counterparty and value are optional
-export type LaxLaxAmount = {
+export interface LaxLaxAmount {
   currency: string
   value?: string
   issuer?: string
   counterparty?: string
 }
 
-export type Path = {
+export interface Path {
   source: Adjustment | MaxAdjustment
   destination: Adjustment | MinAdjustment
   paths: string
 }
 
-export type GetPaths = Array<Path>
+export type GetPaths = Path[]
 
-export type PathFind = {
+export interface PathFind {
   source: {
     address: string
     amount?: Amount
@@ -34,16 +34,16 @@ export type PathFind = {
   }
 }
 
-export type PathFindRequest = {
+export interface PathFindRequest {
   command: string
   source_account: string
   destination_amount: RippledAmount
   destination_account: string
-  source_currencies?: {currency: string; issuer?: string}[]
+  source_currencies?: Array<{currency: string; issuer?: string}>
   send_max?: RippledAmount
 }
 
-export type RippledPathsResponse = {
+export interface RippledPathsResponse {
   alternatives: Array<{
     paths_computed: Array<
       Array<{
@@ -59,7 +59,7 @@ export type RippledPathsResponse = {
   type: string
   destination_account: string
   destination_amount: RippledAmount
-  destination_currencies?: Array<string>
+  destination_currencies?: string[]
   source_account: string
   source_currencies?: Array<{currency: string}>
   full_reply?: boolean

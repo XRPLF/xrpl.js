@@ -1,9 +1,10 @@
-import { BaseRequest, BaseResponse } from './baseMethod'
-import { LedgerIndex } from "../common"
-import { AccountRoot, SignerList } from "../ledger"
-  
+import {LedgerIndex} from '../common'
+import {AccountRoot, SignerList} from '../ledger'
+
+import {BaseRequest, BaseResponse} from './baseMethod'
+
 export interface AccountInfoRequest extends BaseRequest {
-  command: "account_info"
+  command: 'account_info'
   account: string
   ledger_hash?: string
   ledger_index?: LedgerIndex

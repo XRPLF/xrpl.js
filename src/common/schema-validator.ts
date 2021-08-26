@@ -1,9 +1,13 @@
-import * as _ from 'lodash'
 import * as assert from 'assert'
-const {Validator} = require('jsonschema')
-import {ValidationError} from './errors'
+
+import * as _ from 'lodash'
 import {isValidClassicAddress, isValidXAddress} from 'ripple-address-codec'
+
 import {isValidSecret} from '../utils'
+
+import {ValidationError} from './errors'
+
+const {Validator} = require('jsonschema')
 
 function loadSchemas() {
   // listed explicitly for webpack (instead of scanning schemas directory)
@@ -126,8 +130,10 @@ function loadSchemas() {
     require('./schemas/input/combine.json')
   ]
   const titles = schemas.map((schema) => schema.title)
-  const duplicates = Object.keys(_.pickBy(_.countBy(titles), (count) => count > 1))
-  assert.ok(duplicates.length === 0, 'Duplicate schemas for: ' + duplicates)
+  const duplicates = Object.keys(
+    _.pickBy(_.countBy(titles), (count) => count > 1)
+  )
+  assert.ok(duplicates.length === 0, `Duplicate schemas for: ${duplicates}`)
   const validator = new Validator()
   // Register custom format validators that ignore undefined instances
   // since jsonschema will still call the format validator on a missing
@@ -157,9 +163,7 @@ function loadSchemas() {
   }
 
   // Register under the root URI '/'
-  schemas.forEach((schema) =>
-    validator.addSchema(schema, '/' + schema.title)
-  )
+  schemas.forEach((schema) => validator.addSchema(schema, `/${schema.title}`))
   return validator
 }
 
@@ -167,9 +171,9 @@ const schemaValidator = loadSchemas()
 
 function schemaValidate(schemaName: string, object: any): void {
   // Lookup under the root URI '/'
-  const schema = schemaValidator.getSchema('/' + schemaName)
+  const schema = schemaValidator.getSchema(`/${schemaName}`)
   if (schema == null) {
-    throw new ValidationError('no schema for ' + schemaName)
+    throw new ValidationError(`no schema for ${schemaName}`)
   }
   const result = schemaValidator.validate(object, schema)
   if (!result.valid) {

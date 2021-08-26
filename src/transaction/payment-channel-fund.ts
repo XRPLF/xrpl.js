@@ -1,10 +1,11 @@
-import * as utils from './utils'
+import {Client} from '..'
 import {validate} from '../common'
 import {ISOTimeToRippleTime, xrpToDrops} from '../utils'
-import {Instructions, Prepare, TransactionJSON} from './types'
-import {Client} from '..'
 
-export type PaymentChannelFund = {
+import {Instructions, Prepare, TransactionJSON} from './types'
+import * as utils from './utils'
+
+export interface PaymentChannelFund {
   channel: string
   amount: string
   expiration?: string

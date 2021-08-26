@@ -1,9 +1,10 @@
-import {prepareTransaction} from './utils'
-import {validate} from '../common'
-import {Instructions, Prepare, TransactionJSON} from './types'
 import {Client} from '..'
+import {validate} from '../common'
 
-export type CheckCancelParameters = {
+import {Instructions, Prepare, TransactionJSON} from './types'
+import {prepareTransaction} from './utils'
+
+export interface CheckCancelParameters {
   checkID: string
 }
 

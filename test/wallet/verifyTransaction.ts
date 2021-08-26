@@ -1,6 +1,8 @@
 import assert from 'assert-diff'
-import {TestSuite} from '../testUtils'
+
 import Wallet from 'xrpl-local/Wallet'
+
+import {TestSuite} from '../testUtils'
 
 const publicKey =
   '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
@@ -18,18 +20,24 @@ const prepared = {
  * - Check out "test/api/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'verify transaction offline when a signed transaction is valid': async (api) => {
+  'verify transaction offline when a signed transaction is valid': async (
+    api
+  ) => {
     // GIVEN a transaction that has been signed by the same wallet
     const wallet = new Wallet(publicKey, privateKey)
 
     // WHEN verifying a signed transaction
-    const isVerified: boolean = wallet.verifyTransaction(prepared.signedTransaction)
+    const isVerified: boolean = wallet.verifyTransaction(
+      prepared.signedTransaction
+    )
 
     // THEN we get a valid response
     assert.equal(isVerified, true)
   },
 
-  "verify transaction offline when signed transaction isn't valid": async (api) => {
+  "verify transaction offline when signed transaction isn't valid": async (
+    api
+  ) => {
     // GIVEN a transaction that has been signed by a different wallet
     const diffPublicKey =
       '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8'
@@ -38,9 +46,11 @@ export default <TestSuite>{
     const wallet = new Wallet(diffPublicKey, diffPrivateKey)
 
     // WHEN verifying a signed transaction
-    const isVerified: boolean = wallet.verifyTransaction(prepared.signedTransaction)
+    const isVerified: boolean = wallet.verifyTransaction(
+      prepared.signedTransaction
+    )
 
     // THEN we get an invalid response
     assert.equal(isVerified, false)
-  },
+  }
 }

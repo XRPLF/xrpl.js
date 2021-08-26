@@ -17,7 +17,7 @@ export interface Ledger {
 }
 
 // https://xrpl.org/subscribe.html#ledger-stream
-export type LedgerClosedEvent = {
+export interface LedgerClosedEvent {
   type: 'ledgerClosed'
   fee_base: number
   fee_ref: number

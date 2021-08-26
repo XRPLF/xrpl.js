@@ -1,16 +1,16 @@
 import {Memo} from './memos'
 
-export type WeightedSigner = {
+export interface WeightedSigner {
   address: string
   weight: number
 }
 
-export type Signers = {
+export interface Signers {
   threshold?: number
   weights: WeightedSigner[]
 }
 
-export type FormattedSettings = {
+export interface FormattedSettings {
   defaultRipple?: boolean
   depositAuth?: boolean
   disableMasterKey?: boolean

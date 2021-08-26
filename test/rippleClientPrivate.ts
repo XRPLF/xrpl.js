@@ -1,11 +1,14 @@
 import assert from 'assert-diff'
 import _ from 'lodash'
+
 import {Client} from 'xrpl-local'
 import {RecursiveData} from 'xrpl-local/ledger/utils'
-import {assertRejects} from './testUtils'
+
+import {toRippledAmount} from '../src'
+
 import addresses from './fixtures/addresses.json'
 import setupClient from './setupClient'
-import {toRippledAmount} from '../src'
+import {assertRejects} from './testUtils'
 
 const {validate, schemaValidator, ledgerUtils} = Client._PRIVATE
 const address = addresses.ACCOUNT
@@ -24,7 +27,7 @@ describe('Client', function () {
   })
 
   it('Client invalid options', function () {
-    // @ts-ignore - This is intentionally invalid
+    // @ts-expect-error - This is intentionally invalid
     assert.throws(() => new Client({invalid: true}))
   })
 
@@ -122,7 +125,7 @@ describe('Client', function () {
     })
   })
 
-  it('common utils - toRippledAmount', async () => {
+  it('common utils - toRippledAmount', async function () {
     const amount = {issuer: 'is', currency: 'c', value: 'v'}
     assert.deepEqual(toRippledAmount(amount), {
       issuer: 'is',
@@ -131,7 +134,7 @@ describe('Client', function () {
     })
   })
 
-  it('ledger utils - renameCounterpartyToIssuerInOrder', async () => {
+  it('ledger utils - renameCounterpartyToIssuerInOrder', async function () {
     const order = {
       taker_gets: {counterparty: '1', currency: 'XRP'},
       taker_pays: {counterparty: '1', currency: 'XRP'}
@@ -146,8 +149,8 @@ describe('Client', function () {
     )
   })
 
-  it('ledger utils - compareTransactions', async () => {
-    // @ts-ignore
+  it('ledger utils - compareTransactions', async function () {
+    // @ts-expect-error
     assert.strictEqual(ledgerUtils.compareTransactions({}, {}), 0)
     let first: any = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
     let second: any = {outcome: {ledgerVersion: 1, indexInLedger: 200}}
@@ -160,7 +163,7 @@ describe('Client', function () {
     assert.strictEqual(ledgerUtils.compareTransactions(first, second), 1)
   })
 
-  it('ledger utils - getRecursive', async () => {
+  it('ledger utils - getRecursive', async function () {
     function getter(marker) {
       return new Promise<RecursiveData>((resolve, reject) => {
         if (marker != null) {

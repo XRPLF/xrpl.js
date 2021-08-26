@@ -1,16 +1,18 @@
-import * as utils from './utils'
-const validate = utils.common.validate
-import {Instructions, Prepare, TransactionJSON} from './types'
-import {Memo} from '../common/types/objects'
 import {Client} from '..'
+import {Memo} from '../common/types/objects'
 
-export type EscrowCancellation = {
+import {Instructions, Prepare, TransactionJSON} from './types'
+import * as utils from './utils'
+
+const validate = utils.common.validate
+
+export interface EscrowCancellation {
   owner: string
   escrowSequence: number
 
   // TODO: This ripple-lib memo format should be deprecated in favor of rippled's format.
   // If necessary, expose a public method for converting between the two formats.
-  memos?: Array<Memo>
+  memos?: Memo[]
 }
 
 function createEscrowCancellationTransaction(

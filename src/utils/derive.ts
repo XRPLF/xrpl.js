@@ -1,5 +1,5 @@
-import {deriveKeypair, deriveAddress} from 'ripple-keypairs'
 import {classicAddressToXAddress} from 'ripple-address-codec'
+import {deriveKeypair, deriveAddress} from 'ripple-keypairs'
 
 function deriveXAddress(options: {
   publicKey: string

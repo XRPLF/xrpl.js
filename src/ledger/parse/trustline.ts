@@ -1,7 +1,10 @@
 import * as assert from 'assert'
-import {parseQuality, parseMemos} from './utils'
+
 import {txFlags} from '../../common'
 import {removeUndefined} from '../../utils'
+
+import {parseQuality, parseMemos} from './utils'
+
 const flags = txFlags.TrustSet
 
 function parseFlag(flagsValue, trueValue, falseValue) {

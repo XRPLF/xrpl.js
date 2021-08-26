@@ -6,18 +6,19 @@ import {
   Memo,
   FormattedSettings
 } from '../common/types/objects'
+
 import {ApiMemo} from './utils'
 
-export type TransactionJSON = {
+export interface TransactionJSON {
   Account: string
   TransactionType: string
-  Memos?: {Memo: ApiMemo}[]
+  Memos?: Array<{Memo: ApiMemo}>
   Flags?: number
   Fulfillment?: string
-  [Field: string]: string | number | Array<any> | RippledAmount | undefined
+  [Field: string]: string | number | any[] | RippledAmount | undefined
 }
 
-export type Instructions = {
+export interface Instructions {
   sequence?: number
   ticketSequence?: number
   fee?: string
@@ -28,7 +29,7 @@ export type Instructions = {
   signersCount?: number
 }
 
-export type Prepare = {
+export interface Prepare {
   txJSON: string
   instructions: {
     fee: string
@@ -38,7 +39,7 @@ export type Prepare = {
   }
 }
 
-export type Submit = {
+export interface Submit {
   success: boolean
   engineResult: string
   engineResultCode: number
@@ -58,33 +59,33 @@ export interface OfferCreateTransaction extends TransactionJSON {
   TakerPays: RippledAmount
   Expiration?: number
   OfferSequence?: number
-  Memos?: {Memo: ApiMemo}[]
+  Memos?: Array<{Memo: ApiMemo}>
 }
 
 export interface SettingsTransaction extends TransactionJSON {
   TransferRate?: number
 }
 
-export type KeyPair = {
+export interface KeyPair {
   publicKey: string
   privateKey: string
 }
 
-export type SignOptions = {
+export interface SignOptions {
   signAs: string
 }
 
-export type Outcome = {
+export interface Outcome {
   result: string
   ledgerVersion: number
   indexInLedger: number
   fee: string
   balanceChanges: {
-    [key: string]: {
+    [key: string]: Array<{
       currency: string
       counterparty?: string
       value: string
-    }[]
+    }>
   }
   orderbookChanges: object
   deliveredAmount?: {
@@ -95,22 +96,22 @@ export type Outcome = {
   timestamp?: string
 }
 
-export type FormattedOrderCancellation = {
+export interface FormattedOrderCancellation {
   orderSequence: number
 }
 
-export type FormattedPayment = {
+export interface FormattedPayment {
   source: Adjustment
   destination: Adjustment
   paths?: string
-  memos?: Array<Memo>
+  memos?: Memo[]
   invoiceID?: string
   allowPartialPayment?: boolean
   noDirectRipple?: boolean
   limitQuality?: boolean
 }
 
-export type FormattedPaymentTransaction = {
+export interface FormattedPaymentTransaction {
   type: string
   specification: FormattedPayment
   outcome: Outcome
@@ -119,7 +120,7 @@ export type FormattedPaymentTransaction = {
   sequence: number
 }
 
-export type FormattedOrderTransaction = {
+export interface FormattedOrderTransaction {
   type: string
   specification: FormattedOrderSpecification
   outcome: Outcome
@@ -128,7 +129,7 @@ export type FormattedOrderTransaction = {
   sequence: number
 }
 
-export type FormattedOrderCancellationTransaction = {
+export interface FormattedOrderCancellationTransaction {
   type: string
   specification: FormattedOrderCancellation
   outcome: Outcome
@@ -137,7 +138,7 @@ export type FormattedOrderCancellationTransaction = {
   sequence: number
 }
 
-export type FormattedTrustlineTransaction = {
+export interface FormattedTrustlineTransaction {
   type: string
   specification: FormattedTrustlineSpecification
   outcome: Outcome
@@ -146,7 +147,7 @@ export type FormattedTrustlineTransaction = {
   sequence: number
 }
 
-export type FormattedSettingsTransaction = {
+export interface FormattedSettingsTransaction {
   type: string
   specification: FormattedSettings
   outcome: Outcome

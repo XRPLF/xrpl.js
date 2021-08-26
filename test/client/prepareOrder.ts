@@ -2,6 +2,7 @@ import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
 import {assertRejects, assertResultMatch, TestSuite} from '../testUtils'
+
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
 /**
@@ -11,14 +12,20 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  */
 export default <TestSuite>{
   'buy order': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     const request = requests.prepareOrder.buy
     const result = await client.prepareOrder(address, request)
     assertResultMatch(result, responses.prepareOrder.buy, 'prepare')
   },
 
   'buy order with expiration': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     const request = requests.prepareOrder.expiration
     const response = responses.prepareOrder.expiration
     const result = await client.prepareOrder(
@@ -30,7 +37,10 @@ export default <TestSuite>{
   },
 
   'sell order': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     const request = requests.prepareOrder.sell
     const result = await client.prepareOrder(
       address,
@@ -41,8 +51,11 @@ export default <TestSuite>{
   },
 
   'invalid': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
-    const request = Object.assign({}, requests.prepareOrder.sell)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
+    const request = {...requests.prepareOrder.sell}
     delete request.direction // Make invalid
     await assertRejects(
       client.prepareOrder(
@@ -56,14 +69,21 @@ export default <TestSuite>{
   },
 
   'with ticket': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     const request = requests.prepareOrder.sell
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
       ticketSequence: 23
     }
-    const result = await client.prepareOrder(address, request, localInstructions)
+    const result = await client.prepareOrder(
+      address,
+      request,
+      localInstructions
+    )
     assertResultMatch(result, responses.prepareOrder.ticket, 'prepare')
   }
 }

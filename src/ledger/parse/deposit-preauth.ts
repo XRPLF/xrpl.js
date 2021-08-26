@@ -1,8 +1,10 @@
 import * as assert from 'assert'
+
 import {removeUndefined} from '../../utils'
+
 import {parseMemos} from './utils'
 
-export type FormattedDepositPreauth = {
+export interface FormattedDepositPreauth {
   // account (address) of the sender to preauthorize
   authorize: string
 

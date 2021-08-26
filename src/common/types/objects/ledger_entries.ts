@@ -1,5 +1,6 @@
-import {SignerEntry} from './index'
 import {Amount, RippledAmount} from './amounts'
+
+import {SignerEntry} from './index'
 
 export interface AccountRootLedgerEntry {
   LedgerEntryType: 'AccountRoot'

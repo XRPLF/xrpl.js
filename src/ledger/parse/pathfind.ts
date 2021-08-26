@@ -1,7 +1,9 @@
 import * as _ from 'lodash'
-import parseAmount from './amount'
+
 import {Amount, RippledAmount} from '../../common/types/objects'
 import {Path, GetPaths, RippledPathsResponse} from '../pathfind-types'
+
+import parseAmount from './amount'
 
 function parsePaths(paths) {
   return paths.map((steps) =>
@@ -22,7 +24,7 @@ function createAdjustment(
   const amountKey = Object.keys(adjustmentWithoutAddress)[0]
   const amount = adjustmentWithoutAddress[amountKey]
   return _.set(
-    {address: address},
+    {address},
     amountKey,
     removeAnyCounterpartyEncoding(address, amount)
   )

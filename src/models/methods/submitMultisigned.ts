@@ -1,7 +1,7 @@
-import { BaseRequest, BaseResponse } from "./baseMethod";
+import {BaseRequest, BaseResponse} from './baseMethod'
 
 export interface SubmitMultisignedRequest extends BaseRequest {
-  command: "submit_multisigned"
+  command: 'submit_multisigned'
   tx_json: any // TODO: type this properly when we have Transaction types
   fail_hard?: boolean
 }

@@ -1,5 +1,6 @@
 import hashPrefix from './hashPrefix'
 import sha512Half from './sha512Half'
+
 const HEX_ZERO =
   '0000000000000000000000000000000000000000000000000000000000000000'
 
@@ -14,7 +15,8 @@ export abstract class Node {
   /**
    * Abstract constructor representing a node in a SHAMap tree.
    * Can be either InnerNode or Leaf.
-   * @constructor
+   *
+   * @class
    */
   public constructor() {}
 
@@ -23,6 +25,7 @@ export abstract class Node {
       'Called unimplemented virtual method SHAMapTreeNode#addItem.'
     )
   }
+
   public get hash(): string | void {
     throw new Error('Called unimplemented virtual method SHAMapTreeNode#hash.')
   }
@@ -36,10 +39,11 @@ export class InnerNode extends Node {
 
   /**
    * Define an Inner (non-leaf) node in a SHAMap tree.
-   * @param {number} depth i.e. how many parent inner nodes
-   * @constructor
+   *
+   * @param depth - I.e. How many parent inner nodes.
+   * @class
    */
-  public constructor(depth: number = 0) {
+  public constructor(depth = 0) {
     super()
     this.leaves = {}
     this.type = NodeType.INNER
@@ -48,9 +52,9 @@ export class InnerNode extends Node {
   }
 
   /**
-   * @param {string} tag equates to a ledger entry `index`
-   * @param {Node} node to add
-   * @return {void}
+   * @param {string} tag - Equates to a ledger entry `index`.
+   * @param {Node} node - To add.
+   * @returns {void}
    */
 
   public addItem(tag: string, node: Node): void {
@@ -86,9 +90,10 @@ export class InnerNode extends Node {
 
   /**
    * Overwrite the node that is currently in a given slot.
-   * @param {number} slot a number 0-15
-   * @param {Node} node to place
-   * @return {void}
+   *
+   * @param slot - A number 0-15.
+   * @param node - To place.
+   * @returns
    */
   public setNode(slot: number, node: Node): void {
     if (slot < 0 || slot > 15) {
@@ -100,8 +105,9 @@ export class InnerNode extends Node {
 
   /**
    * Get the node that is currently in a given slot.
-   * @param {number} slot a number 0-15
-   * @return {Node}
+   *
+   * @param slot - A number 0-15.
+   * @returns
    */
   public getNode(slot: number): Node {
     if (slot < 0 || slot > 15) {
@@ -111,7 +117,9 @@ export class InnerNode extends Node {
   }
 
   public get hash(): string {
-    if (this.empty) return HEX_ZERO
+    if (this.empty) {
+      return HEX_ZERO
+    }
     let hex = ''
     for (let i = 0; i < 16; i++) {
       hex += this.leaves[i] ? this.leaves[i].hash : HEX_ZERO
@@ -128,10 +136,11 @@ export class Leaf extends Node {
 
   /**
    * Leaf node in a SHAMap tree.
-   * @param {string} tag equates to a ledger entry `index`
-   * @param {string} data hex of account state, transaction etc
-   * @param {number} type one of TYPE_ACCOUNT_STATE, TYPE_TRANSACTION_MD etc
-   * @constructor
+   *
+   * @param tag - Equates to a ledger entry `index`.
+   * @param data - Hex of account state, transaction etc.
+   * @param type - One of TYPE_ACCOUNT_STATE, TYPE_TRANSACTION_MD etc.
+   * @class
    */
   public constructor(tag: string, data: string, type: NodeType) {
     super()
@@ -165,7 +174,8 @@ export class SHAMap {
 
   /**
    * SHAMap tree.
-   * @constructor
+   *
+   * @class
    */
   public constructor() {
     this.root = new InnerNode(0)

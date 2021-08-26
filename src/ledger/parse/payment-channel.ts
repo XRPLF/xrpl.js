@@ -1,8 +1,9 @@
-import {parseTimestamp, parseMemos} from './utils'
+import {PayChannel} from '../../models/ledger'
 import {removeUndefined, dropsToXrp} from '../../utils'
-import { PayChannel } from '../../models/ledger'
 
-export type FormattedPaymentChannel = {
+import {parseTimestamp, parseMemos} from './utils'
+
+export interface FormattedPaymentChannel {
   account: string
   amount: string
   balance: string
@@ -17,9 +18,7 @@ export type FormattedPaymentChannel = {
   previousAffectingTransactionLedgerVersion: number
 }
 
-export function parsePaymentChannel(
-  data: PayChannel
-): FormattedPaymentChannel {
+export function parsePaymentChannel(data: PayChannel): FormattedPaymentChannel {
   return removeUndefined({
     memos: parseMemos(data),
     account: data.Account,

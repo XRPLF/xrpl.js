@@ -1,13 +1,14 @@
 import * as _ from 'lodash'
-import {parseTimestamp, adjustQualityForXRP} from './utils'
-import {removeUndefined} from '../../utils'
 
-import {orderFlags} from './flags'
-import parseAmount from './amount'
 import {BookOffer} from '../../common/types/commands'
 import {Amount, FormattedOrderSpecification} from '../../common/types/objects'
+import {removeUndefined} from '../../utils'
 
-export type FormattedOrderbookOrder = {
+import parseAmount from './amount'
+import {orderFlags} from './flags'
+import {parseTimestamp, adjustQualityForXRP} from './utils'
+
+export interface FormattedOrderbookOrder {
   specification: FormattedOrderSpecification
   properties: {
     maker: string
@@ -31,9 +32,9 @@ export function parseOrderbookOrder(data: BookOffer): FormattedOrderbookOrder {
   // note: immediateOrCancel and fillOrKill orders cannot enter the order book
   // so we can omit those flags here
   const specification: FormattedOrderSpecification = removeUndefined({
-    direction: direction,
-    quantity: quantity,
-    totalPrice: totalPrice,
+    direction,
+    quantity,
+    totalPrice,
     passive: (data.Flags & orderFlags.Passive) !== 0 || undefined,
     expirationTime: parseTimestamp(data.Expiration)
   })

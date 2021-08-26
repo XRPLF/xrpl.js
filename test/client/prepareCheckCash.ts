@@ -2,6 +2,7 @@ import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
 import {assertResultMatch, TestSuite} from '../testUtils'
+
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
 /**
@@ -11,7 +12,10 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  */
 export default <TestSuite>{
   'prepareCheckCash amount': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     const result = await client.prepareCheckCash(
       address,
       requests.prepareCheckCash.amount
@@ -20,7 +24,10 @@ export default <TestSuite>{
   },
 
   'prepareCheckCash deliverMin': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     const result = await client.prepareCheckCash(
       address,
       requests.prepareCheckCash.deliverMin
@@ -29,7 +36,10 @@ export default <TestSuite>{
   },
 
   'with ticket': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',

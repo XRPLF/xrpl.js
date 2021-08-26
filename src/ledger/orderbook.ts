@@ -1,16 +1,18 @@
+import BigNumber from 'bignumber.js'
 import * as _ from 'lodash'
-import * as utils from './utils'
+
+import {Client} from '..'
+import {validate} from '../common'
+import {BookOffer} from '../common/types/commands'
+import {Issue} from '../common/types/objects'
+
 import {
   parseOrderbookOrder,
   FormattedOrderbookOrder
 } from './parse/orderbook-order'
-import {validate} from '../common'
-import {Issue} from '../common/types/objects'
-import {BookOffer} from '../common/types/commands'
-import {Client} from '..'
-import BigNumber from 'bignumber.js'
+import * as utils from './utils'
 
-export type FormattedOrderbook = {
+export interface FormattedOrderbook {
   bids: FormattedOrderbookOrder[]
   asks: FormattedOrderbookOrder[]
 }
@@ -81,7 +83,8 @@ async function makeRequest(
     taker_gets: takerGets,
     taker_pays: takerPays
   })
-  return client._requestAll({command: 'book_offers',
+  return client._requestAll({
+    command: 'book_offers',
     taker_gets: orderData.taker_gets,
     taker_pays: orderData.taker_pays,
     ledger_index: options.ledgerVersion || 'validated',
@@ -90,12 +93,12 @@ async function makeRequest(
   })
 }
 
-export type GetOrderbookOptions = {
+export interface GetOrderbookOptions {
   limit?: number
   ledgerVersion?: number
 }
 
-export type OrderbookInfo = {
+export interface OrderbookInfo {
   base: Issue
   counter: Issue
 }

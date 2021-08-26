@@ -1,9 +1,11 @@
 import assert from 'assert-diff'
-import {computeLedgerHeaderHash} from '../../src/utils'
+
 import {ValidationError} from '../../src/common/errors'
+import {computeLedgerHeaderHash} from '../../src/utils'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import {assertResultMatch} from '../testUtils'
+
 const {computeLedgerHash: REQUEST_FIXTURES} = requests
 
 function getNewLedger() {
@@ -11,9 +13,9 @@ function getNewLedger() {
 }
 
 describe('Compute Ledger Hash', function () {
-  it('given corrupt data - should fail', () => {
+  it('given corrupt data - should fail', function () {
     const ledger = getNewLedger()
-    // @ts-ignore - Change Amount to 12000000000
+    // @ts-expect-error - Change Amount to 12000000000
     ledger.transactions[0].rawTransaction =
       '{"Account":"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV","Amount":"12000000000","Destination":"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj","Fee":"10","Flags":0,"Sequence":62,"SigningPubKey":"034AADB09CFF4A4804073701EC53C3510CDC95917C2BB0150FB742D0C66E6CEE9E","TransactionType":"Payment","TxnSignature":"3045022022EB32AECEF7C644C891C19F87966DF9C62B1F34BABA6BE774325E4BB8E2DD62022100A51437898C28C2B297112DF8131F2BB39EA5FE613487DDD611525F1796264639","hash":"3B1A4E1C9BB6A7208EB146BCDB86ECEA6068ED01466D933528CA2B4C64F753EF","meta":{"AffectedNodes":[{"CreatedNode":{"LedgerEntryType":"AccountRoot","LedgerIndex":"4C6ACBD635B0F07101F7FA25871B0925F8836155462152172755845CE691C49E","NewFields":{"Account":"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj","Balance":"10000000000","Sequence":1}}},{"ModifiedNode":{"FinalFields":{"Account":"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV","Balance":"981481999380","Flags":0,"OwnerCount":0,"Sequence":63},"LedgerEntryType":"AccountRoot","LedgerIndex":"B33FDD5CF3445E1A7F2BE9B06336BEBD73A5E3EE885D3EF93F7E3E2992E46F1A","PreviousFields":{"Balance":"991481999390","Sequence":62},"PreviousTxnID":"2485FDC606352F1B0785DA5DE96FB9DBAF43EB60ECBB01B7F6FA970F512CDA5F","PreviousTxnLgrSeq":31317}}],"TransactionIndex":0,"TransactionResult":"tesSUCCESS"},"ledger_index":38129}'
     ledger.parentCloseTime = ledger.closeTime
@@ -36,13 +38,13 @@ describe('Compute Ledger Hash', function () {
     }
     assert(
       false,
-      'Should throw ValidationError instead of producing hash: ' + hash
+      `Should throw ValidationError instead of producing hash: ${hash}`
     )
   })
 
-  it('given ledger without raw transactions - should throw', () => {
+  it('given ledger without raw transactions - should throw', function () {
     const ledger = getNewLedger()
-    // @ts-ignore - Delete rawTransaction
+    // @ts-expect-error - Delete rawTransaction
     delete ledger.transactions[0].rawTransaction
     ledger.parentCloseTime = ledger.closeTime
     let hash
@@ -58,14 +60,14 @@ describe('Compute Ledger Hash', function () {
     }
     assert(
       false,
-      'Should throw ValidationError instead of producing hash: ' + hash
+      `Should throw ValidationError instead of producing hash: ${hash}`
     )
   })
 
-  it('given ledger without state or transactions - only compute ledger hash', () => {
+  it('given ledger without state or transactions - only compute ledger hash', function () {
     const ledger = getNewLedger()
     assert.strictEqual(
-      // @ts-ignore
+      // @ts-expect-error
       ledger.transactions[0].rawTransaction,
       '{"Account":"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV","Amount":"10000000000","Destination":"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj","Fee":"10","Flags":0,"Sequence":62,"SigningPubKey":"034AADB09CFF4A4804073701EC53C3510CDC95917C2BB0150FB742D0C66E6CEE9E","TransactionType":"Payment","TxnSignature":"3045022022EB32AECEF7C644C891C19F87966DF9C62B1F34BABA6BE774325E4BB8E2DD62022100A51437898C28C2B297112DF8131F2BB39EA5FE613487DDD611525F1796264639","hash":"3B1A4E1C9BB6A7208EB146BCDB86ECEA6068ED01466D933528CA2B4C64F753EF","meta":{"AffectedNodes":[{"CreatedNode":{"LedgerEntryType":"AccountRoot","LedgerIndex":"4C6ACBD635B0F07101F7FA25871B0925F8836155462152172755845CE691C49E","NewFields":{"Account":"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj","Balance":"10000000000","Sequence":1}}},{"ModifiedNode":{"FinalFields":{"Account":"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV","Balance":"981481999380","Flags":0,"OwnerCount":0,"Sequence":63},"LedgerEntryType":"AccountRoot","LedgerIndex":"B33FDD5CF3445E1A7F2BE9B06336BEBD73A5E3EE885D3EF93F7E3E2992E46F1A","PreviousFields":{"Balance":"991481999390","Sequence":62},"PreviousTxnID":"2485FDC606352F1B0785DA5DE96FB9DBAF43EB60ECBB01B7F6FA970F512CDA5F","PreviousTxnLgrSeq":31317}}],"TransactionIndex":0,"TransactionResult":"tesSUCCESS"},"ledger_index":38129}'
     )
@@ -87,7 +89,7 @@ describe('Compute Ledger Hash', function () {
       }
       assert(
         false,
-        'Should throw ValidationError instead of producing hash: ' + hash
+        `Should throw ValidationError instead of producing hash: ${hash}`
       )
     }
 
@@ -100,7 +102,7 @@ describe('Compute Ledger Hash', function () {
     testCompute(ledger, 'rawState property is missing from the ledger')
   })
 
-  it('wrong hash', ()  => {
+  it('wrong hash', function () {
     const ledger = getNewLedger()
     assertResultMatch(ledger, responses.getLedger.full, 'getLedger')
     const newLedger = {
@@ -114,7 +116,7 @@ describe('Compute Ledger Hash', function () {
     }, /does not match computed hash of state/)
   })
 
-  it('computeLedgerHash', ()  => {
+  it('computeLedgerHash', function () {
     const header = REQUEST_FIXTURES.header
     const ledgerHash = computeLedgerHeaderHash(header)
     assert.strictEqual(
@@ -123,7 +125,7 @@ describe('Compute Ledger Hash', function () {
     )
   })
 
-  it('computeLedgerHash - with transactions', () => {
+  it('computeLedgerHash - with transactions', function () {
     const header = {
       ...REQUEST_FIXTURES.header,
       transactionHash: undefined,
@@ -136,11 +138,12 @@ describe('Compute Ledger Hash', function () {
     )
   })
 
-  it('computeLedgerHash - incorrent transaction_hash', () => {
-    const header = Object.assign({}, REQUEST_FIXTURES.header, {
+  it('computeLedgerHash - incorrent transaction_hash', function () {
+    const header = {
+      ...REQUEST_FIXTURES.header,
       transactionHash:
         '325EACC5271322539EEEC2D6A5292471EF1B3E72AE7180533EFC3B8F0AD435C9'
-    })
+    }
     header.rawTransactions = JSON.stringify(REQUEST_FIXTURES.transactions)
     assert.throws(() => computeLedgerHeaderHash(header))
   })

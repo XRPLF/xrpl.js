@@ -1,4 +1,4 @@
-import { BaseLedgerEntry } from "./baseLedgerEntry";
+import {BaseLedgerEntry} from './baseLedgerEntry'
 
 export interface PayChannel extends BaseLedgerEntry {
   LedgerEntryType: 'PayChannel'

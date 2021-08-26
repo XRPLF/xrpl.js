@@ -1,8 +1,9 @@
-import { LedgerIndex } from '../common';
-import { BaseRequest, BaseResponse } from './baseMethod';
+import {LedgerIndex} from '../common'
+
+import {BaseRequest, BaseResponse} from './baseMethod'
 
 export interface DepositAuthorizedRequest extends BaseRequest {
-  command: "deposit_authorized"
+  command: 'deposit_authorized'
   source_account: string
   destination_account: string
   ledger_hash?: string

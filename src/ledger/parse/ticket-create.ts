@@ -1,5 +1,7 @@
 import * as assert from 'assert'
+
 import {removeUndefined} from '../../utils'
+
 import {parseMemos} from './utils'
 
 function parseTicketCreate(tx: any): object {

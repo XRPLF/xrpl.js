@@ -15,11 +15,11 @@ export interface ServerInfoResponse {
       proposers: number
     }
     load?: {
-      job_types: {
+      job_types: Array<{
         job_type: string
         per_second: number
         in_progress: number
-      }[]
+      }>
       threads: number
     }
     load_factor: number

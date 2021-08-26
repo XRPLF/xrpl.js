@@ -1,27 +1,28 @@
 import * as assert from 'assert'
+
 import BigNumber from 'bignumber.js'
-import * as utils from './utils'
-const validate = utils.common.validate
-const AccountSetFlags = utils.common.constants.AccountSetFlags
-const AccountFields = utils.common.constants.AccountFields
+
+import {Client} from '..'
+import {FormattedSettings, WeightedSigner} from '../common/types/objects'
+
 import {
   Instructions,
   Prepare,
   SettingsTransaction,
   TransactionJSON
 } from './types'
-import {FormattedSettings, WeightedSigner} from '../common/types/objects'
-import {Client} from '..'
+import * as utils from './utils'
+
+const validate = utils.common.validate
+const AccountSetFlags = utils.common.constants.AccountSetFlags
+const AccountFields = utils.common.constants.AccountFields
 
 function setTransactionFlags(
   txJSON: TransactionJSON,
   values: FormattedSettings
 ) {
   const keys = Object.keys(values).filter((key) => AccountSetFlags[key] != null)
-  assert.ok(
-    keys.length <= 1,
-    'ERROR: can only set one setting per transaction'
-  )
+  assert.ok(keys.length <= 1, 'ERROR: can only set one setting per transaction')
   const flagName = keys[0]
   const value = values[flagName]
   const index = AccountSetFlags[flagName]
@@ -67,12 +68,12 @@ function setTransactionFields(
  *        destination to receive 100%.
  *  The transfer rate is specified as the input amount as fraction of 1.
  *  To specify the default rate of 0%, a 100% input amount, specify 1.
- *  To specify a rate of 1%, a 101% input amount, specify 1.01
+ *  To specify a rate of 1%, a 101% input amount, specify 1.01.
  *
  *  @param {Number|String} transferRate
  *
- *  @returns {Number|String} numbers will be converted while strings
- *                           are returned
+ *  @returns {Number|String} Numbers will be converted while strings
+ *                           are returned.
  */
 
 function convertTransferRate(transferRate: number): number {
@@ -100,9 +101,7 @@ function createSettingsTransactionWithoutMemos(
     if (settings.regularKey === null) {
       return removeRegularKey
     }
-    return Object.assign({}, removeRegularKey, {
-      RegularKey: settings.regularKey
-    })
+    return {...removeRegularKey, RegularKey: settings.regularKey}
   }
 
   if (settings.signers != null) {
@@ -114,9 +113,8 @@ function createSettingsTransactionWithoutMemos(
     }
 
     if (settings.signers.weights != null) {
-      setSignerList.SignerEntries = settings.signers.weights.map(
-        formatSignerEntry
-      )
+      setSignerList.SignerEntries =
+        settings.signers.weights.map(formatSignerEntry)
     }
     return setSignerList
   }
@@ -126,7 +124,7 @@ function createSettingsTransactionWithoutMemos(
     Account: account
   }
 
-  const settingsWithoutMemos = Object.assign({}, settings)
+  const settingsWithoutMemos = {...settings}
   delete settingsWithoutMemos.memos
   setTransactionFlags(txJSON, settingsWithoutMemos)
   setTransactionFields(txJSON, settings) // Sets `null` fields to their `default`.

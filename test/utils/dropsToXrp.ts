@@ -1,14 +1,15 @@
 import assert from 'assert-diff'
 import BigNumber from 'bignumber.js'
+
 import {dropsToXrp} from '../../src/utils'
 
 describe('Drops To XRP', function () {
-  it('works with a typical amount', () => {
+  it('works with a typical amount', function () {
     const xrp = dropsToXrp('2000000')
     assert.strictEqual(xrp, '2', '2 million drops equals 2 XRP')
   })
 
-  it('works with fractions', () => {
+  it('works with fractions', function () {
     let xrp = dropsToXrp('3456789')
     assert.strictEqual(xrp, '3.456789', '3,456,789 drops equals 3.456789 XRP')
 
@@ -25,7 +26,7 @@ describe('Drops To XRP', function () {
     assert.strictEqual(xrp, '0.000001', '1.00 drops equals 0.000001 XRP')
   })
 
-  it('works with zero', () => {
+  it('works with zero', function () {
     let xrp = dropsToXrp('0')
     assert.strictEqual(xrp, '0', '0 drops equals 0 XRP')
 
@@ -40,12 +41,12 @@ describe('Drops To XRP', function () {
     assert.strictEqual(xrp, '0', '000000000 drops equals 0 XRP')
   })
 
-  it('works with a negative value', () => {
+  it('works with a negative value', function () {
     const xrp = dropsToXrp('-2000000')
     assert.strictEqual(xrp, '-2', '-2 million drops equals -2 XRP')
   })
 
-  it('works with a value ending with a decimal point', () => {
+  it('works with a value ending with a decimal point', function () {
     let xrp = dropsToXrp('2000000.')
     assert.strictEqual(xrp, '2', '2000000. drops equals 2 XRP')
 
@@ -53,7 +54,7 @@ describe('Drops To XRP', function () {
     assert.strictEqual(xrp, '-2', '-2000000. drops equals -2 XRP')
   })
 
-  it('works with BigNumber objects', () => {
+  it('works with BigNumber objects', function () {
     let xrp = dropsToXrp(new BigNumber(2000000))
     assert.strictEqual(xrp, '2', '(BigNumber) 2 million drops equals 2 XRP')
 
@@ -75,7 +76,7 @@ describe('Drops To XRP', function () {
     )
   })
 
-  it('works with a number', () => {
+  it('works with a number', function () {
     // This is not recommended. Use strings or BigNumber objects to avoid precision errors.
     let xrp = dropsToXrp(2000000)
     assert.strictEqual(xrp, '2', '(number) 2 million drops equals 2 XRP')
@@ -83,7 +84,7 @@ describe('Drops To XRP', function () {
     assert.strictEqual(xrp, '-2', '(number) -2 million drops equals -2 XRP')
   })
 
-  it('throws with an amount with too many decimal places', () => {
+  it('throws with an amount with too many decimal places', function () {
     assert.throws(() => {
       dropsToXrp('1.2')
     }, /has too many decimal places/)
@@ -93,7 +94,7 @@ describe('Drops To XRP', function () {
     }, /has too many decimal places/)
   })
 
-  it('throws with an invalid value', () => {
+  it('throws with an invalid value', function () {
     assert.throws(() => {
       dropsToXrp('FOO')
     }, /invalid value/)
@@ -111,7 +112,7 @@ describe('Drops To XRP', function () {
     }, /dropsToXrp: invalid value '\.', should be a BigNumber or string-encoded number\./)
   })
 
-  it('throws with an amount more than one decimal point', () => {
+  it('throws with an amount more than one decimal point', function () {
     assert.throws(() => {
       dropsToXrp('1.0.0')
     }, /dropsToXrp: invalid value '1\.0\.0'/)

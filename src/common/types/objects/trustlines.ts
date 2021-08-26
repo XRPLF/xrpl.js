@@ -16,7 +16,7 @@ export interface Trustline {
   peer_authorized?: boolean
 }
 
-export type FormattedTrustlineSpecification = {
+export interface FormattedTrustlineSpecification {
   currency: string
   counterparty: string
   limit: string
@@ -28,7 +28,7 @@ export type FormattedTrustlineSpecification = {
   memos?: Memo[]
 }
 
-export type FormattedTrustline = {
+export interface FormattedTrustline {
   specification: FormattedTrustlineSpecification
   counterparty: {
     limit: string

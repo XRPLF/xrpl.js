@@ -1,9 +1,10 @@
-import { LedgerIndex } from "../common";
-import { TransactionMetadata } from "../common/transaction";
-import { BaseRequest, BaseResponse } from "./baseMethod";
+import {LedgerIndex} from '../common'
+import {TransactionMetadata} from '../common/transaction'
+
+import {BaseRequest, BaseResponse} from './baseMethod'
 
 export interface TransactionEntryRequest extends BaseRequest {
-  command: "transaction_entry"
+  command: 'transaction_entry'
   ledger_hash?: string
   ledger_index?: LedgerIndex
   tx_hash: string

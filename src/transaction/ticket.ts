@@ -1,7 +1,9 @@
 import * as _ from 'lodash'
-import * as utils from './utils'
-import {Prepare, TransactionJSON, Instructions} from './types'
+
 import {Client} from '..'
+
+import {Prepare, TransactionJSON, Instructions} from './types'
+import * as utils from './utils'
 
 const validate = utils.common.validate
 const ValidationError = utils.common.errors.ValidationError
@@ -15,8 +17,9 @@ function createTicketTransaction(
   account: string,
   ticketCount: number
 ): TransactionJSON {
-  if (!ticketCount || ticketCount === 0)
+  if (!ticketCount || ticketCount === 0) {
     throw new ValidationError('Ticket count must be greater than 0.')
+  }
 
   const txJSON: any = {
     TransactionType: 'TicketCreate',

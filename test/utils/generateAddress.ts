@@ -1,11 +1,15 @@
 import assert from 'assert-diff'
-import responses from '../fixtures/responses'
-import {generateXAddress, GenerateAddressOptions} from '../../src/utils/generateAddress'
+
 import ECDSA from '../../src/common/ecdsa'
 import {UnexpectedError} from '../../src/common/errors'
+import {
+  generateXAddress,
+  GenerateAddressOptions
+} from '../../src/utils/generateAddress'
+import responses from '../fixtures/responses'
 
 describe('Generate Address', function () {
-  it('generateAddress', () => {
+  it('generateAddress', function () {
     // GIVEN entropy of all zeros
     function random() {
       return new Array(16).fill(0)
@@ -20,7 +24,7 @@ describe('Generate Address', function () {
     )
   })
 
-  it('generateAddress invalid entropy', () => {
+  it('generateAddress invalid entropy', function () {
     assert.throws(() => {
       // GIVEN entropy of 1 byte
       function random() {
@@ -35,7 +39,7 @@ describe('Generate Address', function () {
     }, UnexpectedError)
   })
 
-  it('generateAddress with no options object', () => {
+  it('generateAddress with no options object', function () {
     // GIVEN no options
 
     // WHEN generating an address
@@ -46,7 +50,7 @@ describe('Generate Address', function () {
     assert(account.secret.startsWith('s'), 'Secret must start with `s`')
   })
 
-  it('generateAddress with empty options object', () => {
+  it('generateAddress with empty options object', function () {
     // GIVEN an empty options object
     const options = {}
 
@@ -58,15 +62,21 @@ describe('Generate Address', function () {
     assert(account.secret.startsWith('s'), 'Secret must start with `s`')
   })
 
-  it('generateAddress with algorithm `ecdsa-secp256k1`', () => {
+  it('generateAddress with algorithm `ecdsa-secp256k1`', function () {
     // GIVEN we want to use 'ecdsa-secp256k1'
-    const options: GenerateAddressOptions = {algorithm: ECDSA.secp256k1, includeClassicAddress: true}
+    const options: GenerateAddressOptions = {
+      algorithm: ECDSA.secp256k1,
+      includeClassicAddress: true
+    }
 
     // WHEN generating an address
     const account = generateXAddress(options)
 
     // THEN we get an object with an address starting with 'r' and a secret starting with 's' (not 'sEd')
-    assert(account.classicAddress.startsWith('r'), 'Address must start with `r`')
+    assert(
+      account.classicAddress.startsWith('r'),
+      'Address must start with `r`'
+    )
     assert.deepEqual(
       account.secret.slice(0, 1),
       's',
@@ -79,15 +89,21 @@ describe('Generate Address', function () {
     )
   })
 
-  it('generateAddress with algorithm `ed25519`', () => {
+  it('generateAddress with algorithm `ed25519`', function () {
     // GIVEN we want to use 'ed25519'
-    const options: GenerateAddressOptions = {algorithm: ECDSA.ed25519, includeClassicAddress: true}
+    const options: GenerateAddressOptions = {
+      algorithm: ECDSA.ed25519,
+      includeClassicAddress: true
+    }
 
     // WHEN generating an address
     const account = generateXAddress(options)
 
     // THEN we get an object with an address starting with 'r' and a secret starting with 'sEd'
-    assert(account.classicAddress.startsWith('r'), 'Address must start with `r`')
+    assert(
+      account.classicAddress.startsWith('r'),
+      'Address must start with `r`'
+    )
     assert.deepEqual(
       account.secret.slice(0, 3),
       'sEd',
@@ -95,7 +111,7 @@ describe('Generate Address', function () {
     )
   })
 
-  it('generateAddress with algorithm `ecdsa-secp256k1` and given entropy', () => {
+  it('generateAddress with algorithm `ecdsa-secp256k1` and given entropy', function () {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: ECDSA.secp256k1,
@@ -109,7 +125,7 @@ describe('Generate Address', function () {
     assert.deepEqual(account, responses.generateXAddress)
   })
 
-  it('generateAddress with algorithm `ed25519` and given entropy', () => {
+  it('generateAddress with algorithm `ed25519` and given entropy', function () {
     // GIVEN we want to use 'ed25519' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: ECDSA.ed25519,
@@ -127,7 +143,7 @@ describe('Generate Address', function () {
     })
   })
 
-  it('generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address', () => {
+  it('generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address', function () {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: ECDSA.secp256k1,
@@ -142,7 +158,7 @@ describe('Generate Address', function () {
     assert.deepEqual(account, responses.generateAddress)
   })
 
-  it('generateAddress with algorithm `ed25519` and given entropy; include classic address', () => {
+  it('generateAddress with algorithm `ed25519` and given entropy; include classic address', function () {
     // GIVEN we want to use 'ed25519' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: ECDSA.ed25519,
@@ -164,7 +180,7 @@ describe('Generate Address', function () {
     })
   })
 
-  it('generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address; for test network use', () => {
+  it('generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address; for test network use', function () {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: ECDSA.secp256k1,
@@ -177,14 +193,14 @@ describe('Generate Address', function () {
     const account = generateXAddress(options)
 
     // THEN we get the expected return value
-    const response = Object.assign({}, responses.generateAddress, {
-      // generateAddress return value always includes xAddress to encourage X-address adoption
+    const response = {
+      ...responses.generateAddress, // generateAddress return value always includes xAddress to encourage X-address adoption
       xAddress: 'TVG3TcCD58BD6MZqsNuTihdrhZwR8SzvYS8U87zvHsAcNw4'
-    })
+    }
     assert.deepEqual(account, response)
   })
 
-  it('generateAddress with algorithm `ed25519` and given entropy; include classic address; for test network use', () => {
+  it('generateAddress with algorithm `ed25519` and given entropy; include classic address; for test network use', function () {
     // GIVEN we want to use 'ed25519' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: ECDSA.ed25519,
@@ -206,7 +222,7 @@ describe('Generate Address', function () {
     })
   })
 
-  it('generateAddress for test network use', () => {
+  it('generateAddress for test network use', function () {
     // GIVEN we want an address for test network use
     const options: GenerateAddressOptions = {test: true}
 

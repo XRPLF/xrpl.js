@@ -10,19 +10,16 @@ function setup(this: any, port_ = port) {
     .then(() => {
       return tclient.connection.request({
         // TODO: resolve when we redo the testing framework
-        // @ts-ignore
+        // @ts-expect-error
         command: 'test_command',
         data: {openOnOtherPort: true}
       })
     })
     .then((got) => {
       return new Promise<void>((resolve, reject) => {
-        // @ts-ignore
+        // @ts-expect-error
         this.client = new Client(baseUrl + got.port)
-        this.client
-          .connect()
-          .then(resolve)
-          .catch(reject)
+        this.client.connect().then(resolve).catch(reject)
       })
     })
     .then(() => {
@@ -34,10 +31,7 @@ function setupBroadcast(this: any) {
   const servers = [port, port + 1].map((port_) => baseUrl + port_)
   this.client = new BroadcastClient(servers)
   return new Promise<void>((resolve, reject) => {
-    this.client
-      .connect()
-      .then(resolve)
-      .catch(reject)
+    this.client.connect().then(resolve).catch(reject)
   })
 }
 
@@ -49,7 +43,7 @@ function teardown(this: any) {
 }
 
 export default {
-  setup: setup,
-  teardown: teardown,
-  setupBroadcast: setupBroadcast
+  setup,
+  teardown,
+  setupBroadcast
 }

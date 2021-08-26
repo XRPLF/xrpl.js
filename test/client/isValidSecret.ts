@@ -1,4 +1,5 @@
 import assert from 'assert-diff'
+
 import {TestSuite} from '../testUtils'
 
 export default <TestSuite>{

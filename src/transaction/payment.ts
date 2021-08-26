@@ -1,9 +1,6 @@
 import * as _ from 'lodash'
-import * as utils from './utils'
-const validate = utils.common.validate
-const paymentFlags = utils.common.txFlags.Payment
-const ValidationError = utils.common.errors.ValidationError
-import {Instructions, Prepare, TransactionJSON} from './types'
+
+import {Client} from '..'
 import {
   Amount,
   Adjustment,
@@ -12,14 +9,20 @@ import {
   Memo
 } from '../common/types/objects'
 import {toRippledAmount, xrpToDrops} from '../utils'
-import {Client} from '..'
+
+import {Instructions, Prepare, TransactionJSON} from './types'
+import * as utils from './utils'
 import {getClassicAccountAndTag, ClassicAccountAndTag} from './utils'
+
+const validate = utils.common.validate
+const paymentFlags = utils.common.txFlags.Payment
+const ValidationError = utils.common.errors.ValidationError
 
 export interface Payment {
   source: Adjustment | MaxAdjustment
   destination: Adjustment | MinAdjustment
   paths?: string
-  memos?: Array<Memo>
+  memos?: Memo[]
   // A 256-bit hash that can be used to identify a particular payment
   invoiceID?: string
   // A boolean that, if set to true, indicates that this payment should go
@@ -75,8 +78,8 @@ function applyAnyCounterpartyEncoding(payment: Payment): void {
   // Convert blank counterparty to sender or receiver's address
   //   (Ripple convention for 'any counterparty')
   // https://developers.ripple.com/payment.html#special-issuer-values-for-sendmax-and-amount
-  [payment.source, payment.destination].forEach((adjustment) => {
-    ['amount', 'minAmount', 'maxAmount'].forEach((key) => {
+  ;[payment.source, payment.destination].forEach((adjustment) => {
+    ;['amount', 'minAmount', 'maxAmount'].forEach((key) => {
       if (isIOUWithoutCounterparty(adjustment[key])) {
         adjustment[key].counterparty = adjustment.address
       }
@@ -101,7 +104,7 @@ function createMaximalAmount(amount: Amount): Amount {
   } else {
     maxValue = maxIOUValue
   }
-  return Object.assign({}, amount, {value: maxValue})
+  return {...amount, value: maxValue}
 }
 
 /**
@@ -113,11 +116,11 @@ function createMaximalAmount(amount: Amount): Amount {
  * 3. If we do not want to use a tag in this case,
  *    set the tag in the return value to `undefined`.
  *
- * @param address The address to parse.
- * @param expectedTag If provided, and the `Account` is an X-address,
+ * @param address - The address to parse.
+ * @param expectedTag - If provided, and the `Account` is an X-address,
  *                    this method throws an error if `expectedTag`
  *                    does not match the tag of the X-address.
- * @returns {ClassicAccountAndTag}
+ * @returns
  *          The classic account and tag.
  */
 function validateAndNormalizeAddress(
@@ -212,10 +215,10 @@ function createPaymentTransaction(
   if (payment.memos != null) {
     txJSON.Memos = payment.memos.map(utils.convertMemo)
   }
-  if (payment.noDirectRipple === true) {
+  if (payment.noDirectRipple) {
     txJSON.Flags |= paymentFlags.NoRippleDirect
   }
-  if (payment.limitQuality === true) {
+  if (payment.limitQuality) {
     txJSON.Flags |= paymentFlags.LimitQuality
   }
   if (!isXRPToXRPPayment(payment)) {
@@ -236,7 +239,7 @@ function createPaymentTransaction(
     if (payment.paths != null) {
       txJSON.Paths = JSON.parse(payment.paths)
     }
-  } else if (payment.allowPartialPayment === true) {
+  } else if (payment.allowPartialPayment) {
     throw new ValidationError('XRP to XRP payments cannot be partial payments')
   }
 

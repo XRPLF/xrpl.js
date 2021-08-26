@@ -1,10 +1,12 @@
-import * as utils from './utils'
-const offerFlags = utils.common.txFlags.OfferCreate
-import {validate} from '../common'
-import {ISOTimeToRippleTime, toRippledAmount} from '../utils'
-import {Instructions, Prepare, OfferCreateTransaction} from './types'
-import {FormattedOrderSpecification} from '../common/types/objects/index'
 import {Client} from '..'
+import {validate} from '../common'
+import {FormattedOrderSpecification} from '../common/types/objects/index'
+import {ISOTimeToRippleTime, toRippledAmount} from '../utils'
+
+import {Instructions, Prepare, OfferCreateTransaction} from './types'
+import * as utils from './utils'
+
+const offerFlags = utils.common.txFlags.OfferCreate
 
 function createOrderTransaction(
   account: string,
@@ -27,13 +29,13 @@ function createOrderTransaction(
   if (order.direction === 'sell') {
     txJSON.Flags |= offerFlags.Sell
   }
-  if (order.passive === true) {
+  if (order.passive) {
     txJSON.Flags |= offerFlags.Passive
   }
-  if (order.immediateOrCancel === true) {
+  if (order.immediateOrCancel) {
     txJSON.Flags |= offerFlags.ImmediateOrCancel
   }
-  if (order.fillOrKill === true) {
+  if (order.fillOrKill) {
     txJSON.Flags |= offerFlags.FillOrKill
   }
   if (order.expirationTime != null) {

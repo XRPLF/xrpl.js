@@ -1,6 +1,8 @@
 import assert from 'assert-diff'
-import {Client} from 'xrpl-local'
 import binary from 'ripple-binary-codec'
+
+import {Client} from 'xrpl-local'
+
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
@@ -23,47 +25,49 @@ export default <TestSuite>{
     schemaValidator.schemaValidate('sign', result)
   },
 
-  'sign with lowercase hex data in memo (hex should be case insensitive)': async (client, address) => {
-    const secret = 'shd2nxpFD6iBRKWsRss2P4tKMWyy9';
-    const lowercaseMemoTxJson = {
-      "TransactionType"   : "Payment",
-      "Flags"             : 2147483648,
-      "Account"           : "rwiZ3q3D3QuG4Ga2HyGdq3kPKJRGctVG8a",
-      "Amount"            : "10000000",
-      "LastLedgerSequence": 14000999,
-      "Destination"       : "rUeEBYXHo8vF86Rqir3zWGRQ84W9efdAQd",
-      "Fee"               : "12",
-      "Sequence"          : 12,
-      "SourceTag"         : 8888,
-      "DestinationTag"    : 9999,
-      "Memos"             : [
-       {
-           "Memo": {
-               "MemoType" :"687474703a2f2f6578616d706c652e636f6d2f6d656d6f2f67656e65726963",
-               "MemoData" :"72656e74"
-           }
-       }
-      ]
-    }
+  'sign with lowercase hex data in memo (hex should be case insensitive)':
+    async (client, address) => {
+      const secret = 'shd2nxpFD6iBRKWsRss2P4tKMWyy9'
+      const lowercaseMemoTxJson = {
+        TransactionType: 'Payment',
+        Flags: 2147483648,
+        Account: 'rwiZ3q3D3QuG4Ga2HyGdq3kPKJRGctVG8a',
+        Amount: '10000000',
+        LastLedgerSequence: 14000999,
+        Destination: 'rUeEBYXHo8vF86Rqir3zWGRQ84W9efdAQd',
+        Fee: '12',
+        Sequence: 12,
+        SourceTag: 8888,
+        DestinationTag: 9999,
+        Memos: [
+          {
+            Memo: {
+              MemoType:
+                '687474703a2f2f6578616d706c652e636f6d2f6d656d6f2f67656e65726963',
+              MemoData: '72656e74'
+            }
+          }
+        ]
+      }
 
-    const txParams = JSON.stringify(lowercaseMemoTxJson);
-    const result = client.sign(txParams, secret);
-    assert.deepEqual(result, {
-      signedTransaction: '120000228000000023000022B8240000000C2E0000270F201B00D5A36761400000000098968068400000000000000C73210305E09ED602D40AB1AF65646A4007C2DAC17CB6CDACDE301E74FB2D728EA057CF744730450221009C00E8439E017CA622A5A1EE7643E26B4DE9C808DE2ABE45D33479D49A4CEC66022062175BE8733442FA2A4D9A35F85A57D58252AE7B19A66401FE238B36FA28E5A081146C1856D0E36019EA75C56D7E8CBA6E35F9B3F71583147FB49CD110A1C46838788CD12764E3B0F837E0DDF9EA7C1F687474703A2F2F6578616D706C652E636F6D2F6D656D6F2F67656E657269637D0472656E74E1F1',
-      id: '41B9CB78D8E18A796CDD4B0BC6FB0EA19F64C4F25FDE23049197852CAB71D10D'
-    })
-  },
+      const txParams = JSON.stringify(lowercaseMemoTxJson)
+      const result = client.sign(txParams, secret)
+      assert.deepEqual(result, {
+        signedTransaction:
+          '120000228000000023000022B8240000000C2E0000270F201B00D5A36761400000000098968068400000000000000C73210305E09ED602D40AB1AF65646A4007C2DAC17CB6CDACDE301E74FB2D728EA057CF744730450221009C00E8439E017CA622A5A1EE7643E26B4DE9C808DE2ABE45D33479D49A4CEC66022062175BE8733442FA2A4D9A35F85A57D58252AE7B19A66401FE238B36FA28E5A081146C1856D0E36019EA75C56D7E8CBA6E35F9B3F71583147FB49CD110A1C46838788CD12764E3B0F837E0DDF9EA7C1F687474703A2F2F6578616D706C652E636F6D2F6D656D6F2F67656E657269637D0472656E74E1F1',
+        id: '41B9CB78D8E18A796CDD4B0BC6FB0EA19F64C4F25FDE23049197852CAB71D10D'
+      })
+    },
 
-  'sign with paths': async (
-    client,
-    address,
-    mockRippled
-  ) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+  'sign with paths': async (client, address, mockRippled) => {
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const payment = {
       source: {
-        address: address,
+        address,
         amount: {
           currency: 'drops',
           value: '100'
@@ -78,12 +82,17 @@ export default <TestSuite>{
         }
       },
       // eslint-disable-next-line no-useless-escape
-      paths: '[[{\"currency\":\"USD\",\"issuer\":\"rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc\"}]]'
+      paths:
+        '[[{"currency":"USD","issuer":"rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc"}]]'
     }
-    const ret = await client.preparePayment(address, payment, {sequence: 1, maxLedgerVersion: 15696358})
+    const ret = await client.preparePayment(address, payment, {
+      sequence: 1,
+      maxLedgerVersion: 15696358
+    })
     const result = client.sign(ret.txJSON, secret)
     assert.deepEqual(result, {
-      signedTransaction: '12000022800200002400000001201B00EF81E661EC6386F26FC0FFFF0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461968400000000000000C6940000000000000646AD3504529A0465E2E0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D1664619732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D87446304402200A693FB5CA6B21250EBDFD8CFF526EE0DF7C9E4E31EB0660692E75E6A93BF5F802203CC39463DDA21386898CA31E18AD1A6828647D65741DD637BAD71BC83E29DB9481145E7B112523F68D2F5E879DB4EAC51C6698A693048314CA6EDC7A28252DAEA6F2045B24F4D7C333E146170112300000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461900',
+      signedTransaction:
+        '12000022800200002400000001201B00EF81E661EC6386F26FC0FFFF0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461968400000000000000C6940000000000000646AD3504529A0465E2E0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D1664619732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D87446304402200A693FB5CA6B21250EBDFD8CFF526EE0DF7C9E4E31EB0660692E75E6A93BF5F802203CC39463DDA21386898CA31E18AD1A6828647D65741DD637BAD71BC83E29DB9481145E7B112523F68D2F5E879DB4EAC51C6698A693048314CA6EDC7A28252DAEA6F2045B24F4D7C333E146170112300000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461900',
       id: '78874FE5F5299FEE3EA85D3CF6C1FB1F1D46BB08F716662A3E3D1F0ADE4EF796'
     })
     schemaValidator.schemaValidate('sign', result)
@@ -167,10 +176,13 @@ export default <TestSuite>{
   },
 
   'succeeds - prepared payment': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     const payment = await client.preparePayment(address, {
       source: {
-        address: address,
+        address,
         maxAmount: {
           value: '1',
           currency: 'drops'
@@ -243,10 +255,13 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     const payment = await client.preparePayment(address, {
       source: {
-        address: address,
+        address,
         maxAmount: {
           value: '1.1234567',
           currency: 'drops'
@@ -271,7 +286,10 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse(
+      {command: 'server_info'},
+      rippled.server_info.normal
+    )
     const order = {
       direction: 'sell',
       quantity: {
@@ -288,7 +306,7 @@ export default <TestSuite>{
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     try {
       client.sign(prepared.txJSON, secret)
-      return Promise.reject(new Error('client.sign should have thrown'))
+      return await Promise.reject(new Error('client.sign should have thrown'))
     } catch (error) {
       assert.equal(error.name, 'ValidationError')
       assert.equal(
@@ -379,33 +397,31 @@ export default <TestSuite>{
     }, /Fee" should not exceed "1900000"\. To use a higher fee, set `maxFeeXRP` in the Client constructor\./)
   },
 
-  'permits fee exceeding 2000000 drops when maxFeeXRP is higher than 2 XRP': async (
-    client,
-    address
-  ) => {
-    client._maxFeeXRP = '2.1'
-    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
-    const request = {
-      // TODO: This fails when address is X-address
-      txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","LastLedgerSequence":8820051,"Fee":"2010000","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
-      instructions: {
-        fee: '2.01',
-        sequence: 23,
-        maxLedgerVersion: 8820051
+  'permits fee exceeding 2000000 drops when maxFeeXRP is higher than 2 XRP':
+    async (client, address) => {
+      client._maxFeeXRP = '2.1'
+      const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
+      const request = {
+        // TODO: This fails when address is X-address
+        txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","LastLedgerSequence":8820051,"Fee":"2010000","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
+        instructions: {
+          fee: '2.01',
+          sequence: 23,
+          maxLedgerVersion: 8820051
+        }
       }
-    }
 
-    const result = client.sign(request.txJSON, secret)
+      const result = client.sign(request.txJSON, secret)
 
-    const expectedResponse = {
-      signedTransaction:
-        '12000322800000002400000017201B008695536840000000001EAB90732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D87446304402200203F219F5371D2C6506888B1B02B27E74998F7A42D412C32FE319AC1A5B8DEF02205959A1B02253ACCCE542759E9886466C56D16B04676FA492AD34AA0E877E91F381145E7B112523F68D2F5E879DB4EAC51C6698A69304',
-      id: '061D5593E0A117F389826419CAC049A73C7CFCA65A20B788781D41240143D864'
-    }
+      const expectedResponse = {
+        signedTransaction:
+          '12000322800000002400000017201B008695536840000000001EAB90732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D87446304402200203F219F5371D2C6506888B1B02B27E74998F7A42D412C32FE319AC1A5B8DEF02205959A1B02253ACCCE542759E9886466C56D16B04676FA492AD34AA0E877E91F381145E7B112523F68D2F5E879DB4EAC51C6698A69304',
+        id: '061D5593E0A117F389826419CAC049A73C7CFCA65A20B788781D41240143D864'
+      }
 
-    assert.deepEqual(result, expectedResponse)
-    schemaValidator.schemaValidate('sign', result)
-  },
+      assert.deepEqual(result, expectedResponse)
+      schemaValidator.schemaValidate('sign', result)
+    },
 
   'sign with ticket': async (client, address) => {
     const secret = 'sn7n5R1cR5Y3fRFkuWXA94Ts1frVJ'

@@ -1,4 +1,5 @@
 import {Client, BroadcastClient} from 'xrpl-local'
+
 import {createMockRippled} from './mockRippled'
 import {getFreePort} from './testUtils'
 
@@ -6,23 +7,17 @@ function setupMockRippledConnection(testcase, port) {
   return new Promise<void>((resolve, reject) => {
     testcase.mockRippled = createMockRippled(port)
     testcase._mockedServerPort = port
-    testcase.client = new Client('ws://localhost:' + port)
-    testcase.client
-      .connect()
-      .then(resolve)
-      .catch(reject)
+    testcase.client = new Client(`ws://localhost:${port}`)
+    testcase.client.connect().then(resolve).catch(reject)
   })
 }
 
 function setupMockRippledConnectionForBroadcast(testcase, ports) {
   return new Promise<void>((resolve, reject) => {
-    const servers = ports.map((port) => 'ws://localhost:' + port)
+    const servers = ports.map((port) => `ws://localhost:${port}`)
     testcase.mocks = ports.map((port) => createMockRippled(port))
     testcase.client = new BroadcastClient(servers)
-    testcase.client
-      .connect()
-      .then(resolve)
-      .catch(reject)
+    testcase.client.connect().then(resolve).catch(reject)
   })
 }
 
@@ -53,8 +48,8 @@ function teardown(this: any, done) {
 }
 
 export default {
-  setup: setup,
-  teardown: teardown,
-  setupBroadcast: setupBroadcast,
-  createMockRippled: createMockRippled
+  setup,
+  teardown,
+  setupBroadcast,
+  createMockRippled
 }

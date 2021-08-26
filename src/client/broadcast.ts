@@ -1,8 +1,8 @@
-import {Client, ClientOptions} from './'
+import {Client, ClientOptions} from '.'
 
 class BroadcastClient extends Client {
   ledgerVersion: number | undefined = undefined
-  private _clients: Client[]
+  private readonly _clients: Client[]
 
   constructor(servers, options: ClientOptions = {}) {
     super(servers[0], options)
@@ -49,7 +49,9 @@ class BroadcastClient extends Client {
     const methodNames: string[] = []
     const firstClient = this._clients[0]
     const methods = Object.getOwnPropertyNames(firstClient)
-    methods.push(...Object.getOwnPropertyNames(Object.getPrototypeOf(firstClient)))
+    methods.push(
+      ...Object.getOwnPropertyNames(Object.getPrototypeOf(firstClient))
+    )
     for (const name of methods) {
       if (typeof firstClient[name] === 'function' && name !== 'constructor') {
         methodNames.push(name)

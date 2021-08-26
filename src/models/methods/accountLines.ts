@@ -1,5 +1,6 @@
-import { BaseRequest, BaseResponse } from './baseMethod'
-import { LedgerIndex } from "../common"
+import {LedgerIndex} from '../common'
+
+import {BaseRequest, BaseResponse} from './baseMethod'
 
 interface Trustline {
   account: string
@@ -18,7 +19,7 @@ interface Trustline {
 }
 
 export interface AccountLinesRequest extends BaseRequest {
-  command: "account_lines"
+  command: 'account_lines'
   account: string
   ledger_hash?: string
   ledger_index?: LedgerIndex

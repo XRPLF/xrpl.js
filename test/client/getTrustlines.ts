@@ -1,6 +1,7 @@
 import addresses from '../fixtures/addresses.json'
 import responses from '../fixtures/responses'
 import {assertResultMatch, TestSuite} from '../testUtils'
+
 const {getTrustlines: RESPONSE_FIXTURES} = responses
 
 /**
@@ -29,14 +30,17 @@ export default <TestSuite>{
     await client.getTrustlines(address)
   },
 
-  'getTrustlines - ripplingDisabled works properly': async (client, address) => {
+  'getTrustlines - ripplingDisabled works properly': async (
+    client,
+    address
+  ) => {
     const result = await client.getTrustlines(addresses.FOURTH_ACCOUNT)
     assertResultMatch(
       result,
       RESPONSE_FIXTURES.ripplingDisabled,
       'getTrustlines'
     )
-  },
+  }
 
   // 'getTrustlines - ledger version option': async (client, address) => {
   //   const result = await client.getTrustlines(addresses.FOURTH_ACCOUNT, {ledgerVersion: 5})

@@ -1,4 +1,5 @@
 import assert from 'assert-diff'
+
 import {assertRejects, TestSuite} from '../testUtils'
 
 /**
@@ -8,31 +9,31 @@ import {assertRejects, TestSuite} from '../testUtils'
  */
 export default <TestSuite>{
   'requests the next page': async (client, address) => {
-    // @ts-ignore
+    // @ts-expect-error
     const response = await client.request({command: 'ledger_data'})
     const responseNextPage = await client.requestNextPage(
-      // @ts-ignore
+      // @ts-expect-error
       {command: 'ledger_data'},
       response
     )
     assert.equal(
-      // @ts-ignore
+      // @ts-expect-error
       responseNextPage.result.state[0].index,
       '000B714B790C3C79FEE00D17C4DEB436B375466F29679447BA64F265FD63D731'
     )
   },
 
   'rejects when there are no more pages': async (client, address) => {
-    // @ts-ignore
+    // @ts-expect-error
     const response = await client.request({command: 'ledger_data'})
     const responseNextPage = await client.requestNextPage(
-      // @ts-ignore
+      // @ts-expect-error
       {command: 'ledger_data'},
       response
     )
     assert(!client.hasNextPage(responseNextPage))
     await assertRejects(
-      // @ts-ignore
+      // @ts-expect-error
       client.requestNextPage({command: 'ledger_data'}, responseNextPage),
       Error,
       'response does not have a next page'

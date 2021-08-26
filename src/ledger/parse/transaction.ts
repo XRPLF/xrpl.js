@@ -1,8 +1,8 @@
-import {parseOutcome} from './utils'
 import {removeUndefined} from '../../utils'
 
-import parseSettings from './settings'
 import parseAccountDelete from './account-delete'
+import parseAmendment from './amendment' // pseudo-transaction
+import parseOrderCancellation from './cancellation'
 import parseCheckCancel from './check-cancel'
 import parseCheckCash from './check-cash'
 import parseCheckCreate from './check-create'
@@ -10,17 +10,16 @@ import parseDepositPreauth from './deposit-preauth'
 import parseEscrowCancellation from './escrow-cancellation'
 import parseEscrowCreation from './escrow-creation'
 import parseEscrowExecution from './escrow-execution'
-import parseOrderCancellation from './cancellation'
+import parseFeeUpdate from './fee-update' // pseudo-transaction
 import parseOrder from './order'
 import parsePayment from './payment'
 import parsePaymentChannelClaim from './payment-channel-claim'
 import parsePaymentChannelCreate from './payment-channel-create'
 import parsePaymentChannelFund from './payment-channel-fund'
+import parseSettings from './settings'
 import parseTicketCreate from './ticket-create'
 import parseTrustline from './trustline'
-
-import parseAmendment from './amendment' // pseudo-transaction
-import parseFeeUpdate from './fee-update' // pseudo-transaction
+import {parseOutcome} from './utils'
 
 function parseTransactionType(type) {
   // Ordering matches https://developers.ripple.com/transaction-types.html
@@ -91,7 +90,7 @@ function parseTransaction(tx: any, includeRawTransaction: boolean): any {
 
   const outcome = parseOutcome(tx)
   return removeUndefined({
-    type: type,
+    type,
     address: tx.Account,
     sequence: tx.Sequence,
     id: tx.hash,

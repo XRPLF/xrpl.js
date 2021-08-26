@@ -1,6 +1,7 @@
-import { Amount, LedgerIndex } from '../common';
-import { Offer } from '../ledger';
-import { BaseRequest, BaseResponse } from './baseMethod';
+import {Amount, LedgerIndex} from '../common'
+import {Offer} from '../ledger'
+
+import {BaseRequest, BaseResponse} from './baseMethod'
 
 interface TakerAmount {
   currency: string
@@ -8,7 +9,7 @@ interface TakerAmount {
 }
 
 export interface BookOffersRequest extends BaseRequest {
-  command: "book_offers"
+  command: 'book_offers'
   ledger_hash?: string
   ledger_index?: LedgerIndex
   limit?: number

@@ -1,9 +1,10 @@
-import { LedgerIndex } from "../common";
-import Metadata from "../common/metadata";
-import { BaseRequest, BaseResponse } from "./baseMethod";
+import {LedgerIndex} from '../common'
+import Metadata from '../common/metadata'
+
+import {BaseRequest, BaseResponse} from './baseMethod'
 
 export interface AccountTxRequest extends BaseRequest {
-  command: "account_tx"
+  command: 'account_tx'
   account: string
   ledger_index_min?: number
   ledger_index_max?: number

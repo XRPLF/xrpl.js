@@ -1,10 +1,13 @@
 import BigNumber from 'bignumber.js'
+
+import {Client} from '..'
+import {FormattedTrustlineSpecification} from '../common/types/objects/trustlines'
+
+import {Instructions, Prepare, TransactionJSON} from './types'
 import * as utils from './utils'
+
 const validate = utils.common.validate
 const trustlineFlags = utils.common.txFlags.TrustSet
-import {Instructions, Prepare, TransactionJSON} from './types'
-import {FormattedTrustlineSpecification} from '../common/types/objects/trustlines'
-import {Client} from '..'
 
 function convertQuality(quality) {
   return new BigNumber(quality)
@@ -35,7 +38,7 @@ function createTrustlineTransaction(
   if (trustline.qualityOut != null) {
     txJSON.QualityOut = convertQuality(trustline.qualityOut)
   }
-  if (trustline.authorized === true) {
+  if (trustline.authorized) {
     txJSON.Flags |= trustlineFlags.SetAuth
   }
   if (trustline.ripplingDisabled != null) {

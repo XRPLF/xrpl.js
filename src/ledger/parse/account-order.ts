@@ -1,11 +1,13 @@
 import BigNumber from 'bignumber.js'
-import parseAmount from './amount'
-import {parseTimestamp, adjustQualityForXRP} from './utils'
-import {removeUndefined} from '../../utils'
-import {orderFlags} from './flags'
-import {FormattedOrderSpecification} from '../../common/types/objects'
 
-export type FormattedAccountOrder = {
+import {FormattedOrderSpecification} from '../../common/types/objects'
+import {removeUndefined} from '../../utils'
+
+import parseAmount from './amount'
+import {orderFlags} from './flags'
+import {parseTimestamp, adjustQualityForXRP} from './utils'
+
+export interface FormattedAccountOrder {
   specification: FormattedOrderSpecification
   properties: {
     maker: string
@@ -35,9 +37,9 @@ export function parseAccountOrder(
   // note: immediateOrCancel and fillOrKill orders cannot enter the order book
   // so we can omit those flags here
   const specification = removeUndefined({
-    direction: direction,
-    quantity: quantity,
-    totalPrice: totalPrice,
+    direction,
+    quantity,
+    totalPrice,
     passive: (order.flags & orderFlags.Passive) !== 0 || undefined,
     // rippled currently does not provide "expiration" in account_offers
     expirationTime: parseTimestamp(order.expiration)
@@ -53,7 +55,7 @@ export function parseAccountOrder(
   const properties = {
     maker: address,
     sequence: order.seq,
-    makerExchangeRate: makerExchangeRate
+    makerExchangeRate
   }
 
   return {specification, properties}

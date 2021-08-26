@@ -1,7 +1,8 @@
 import assert from 'assert-diff'
 
-import setupClient from './setupClient'
 import {getFaucetUrl, FaucetNetwork} from '../src/wallet/wallet-generation'
+
+import setupClient from './setupClient'
 
 describe('Get Faucet URL', function () {
   beforeEach(setupClient.setup)

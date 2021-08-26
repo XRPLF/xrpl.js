@@ -1,8 +1,10 @@
 import assert from 'assert-diff'
-import { assertRejects, TestSuite } from '../testUtils'
-import requests from '../fixtures/requests'
-// import responses from '../fixtures/responses'
+
 import addresses from '../fixtures/addresses.json'
+import requests from '../fixtures/requests'
+import {assertRejects, TestSuite} from '../testUtils'
+// import responses from '../fixtures/responses'
+
 const {getPaths: REQUEST_FIXTURES} = requests
 // const {getPaths: RESPONSE_FIXTURES} = responses
 
@@ -87,7 +89,7 @@ export default <TestSuite>{
       }),
       client.errors.RippleError
     )
-  },
+  }
   // 'send all': async (client) => {
   //   const response = await client.getPaths(REQUEST_FIXTURES.sendAll)
   //   assertResultMatch(response, RESPONSE_FIXTURES.sendAll, 'getPaths')

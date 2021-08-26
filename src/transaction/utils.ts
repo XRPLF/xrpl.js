@@ -1,11 +1,18 @@
 import BigNumber from 'bignumber.js'
-import * as common from '../common'
-import {Memo} from '../common/types/objects'
-import {Instructions, Prepare, TransactionJSON} from './types'
-import {toRippledAmount, dropsToXrp, removeUndefined, xrpToDrops} from '../utils'
-import {Client} from '..'
-import {ValidationError} from '../common/errors'
 import {xAddressToClassicAddress, isValidXAddress} from 'ripple-address-codec'
+
+import {Client} from '..'
+import * as common from '../common'
+import {ValidationError} from '../common/errors'
+import {Memo} from '../common/types/objects'
+import {
+  toRippledAmount,
+  dropsToXrp,
+  removeUndefined,
+  xrpToDrops
+} from '../utils'
+
+import {Instructions, Prepare, TransactionJSON} from './types'
 
 const txFlags = common.txFlags
 const TRANSACTION_TYPES_WITH_DESTINATION_TAG_FIELD = [
@@ -15,22 +22,22 @@ const TRANSACTION_TYPES_WITH_DESTINATION_TAG_FIELD = [
   'PaymentChannelCreate'
 ]
 
-export type ApiMemo = {
+export interface ApiMemo {
   MemoData?: string
   MemoType?: string
   MemoFormat?: string
 }
 
 function formatPrepareResponse(txJSON: any): Prepare {
-  const instructions = {
+  const instructions: any = {
     fee: dropsToXrp(txJSON.Fee),
     maxLedgerVersion:
       txJSON.LastLedgerSequence == null ? null : txJSON.LastLedgerSequence
   }
   if (txJSON.TicketSequence != null) {
-    instructions['ticketSequence'] = txJSON.TicketSequence
+    instructions.ticketSequence = txJSON.TicketSequence
   } else {
-    instructions['sequence'] = txJSON.Sequence
+    instructions.sequence = txJSON.Sequence
   }
   return {
     txJSON: JSON.stringify(txJSON),
@@ -41,19 +48,19 @@ function formatPrepareResponse(txJSON: any): Prepare {
 /**
  *  Set the `tfFullyCanonicalSig` flag on a transaction.
  *
- *  See https://xrpl.org/transaction-malleability.html
+ *  See https://xrpl.org/transaction-malleability.html.
  *
- *  @param {TransactionJSON} txJSON The transaction object to modify.
+ * @param txJSON - The transaction object to modify.
  *    This method will modify object's `Flags` property, or add it if it does not exist.
  *
- *  @returns {void} This method mutates the original txJSON and does not return a value.
+ * @returns This method mutates the original txJSON and does not return a value.
  */
 function setCanonicalFlag(txJSON: TransactionJSON): void {
   txJSON.Flags |= txFlags.Universal.FullyCanonicalSig
 
   // JavaScript converts operands to 32-bit signed ints before doing bitwise
   // operations. We need to convert it back to an unsigned int.
-  txJSON.Flags = txJSON.Flags >>> 0
+  txJSON.Flags >>>= 0
 }
 
 function scaleValue(value, multiplier, extra = 0) {
@@ -78,11 +85,11 @@ export interface ClassicAccountAndTag {
  * 1. If the `Account` is an X-address, validate that the tags match.
  * 2. If the `Account` is a classic address, return `expectedTag` as the tag.
  *
- * @param Account The address to parse.
- * @param expectedTag If provided, and the `Account` is an X-address,
+ * @param Account - The address to parse.
+ * @param expectedTag - If provided, and the `Account` is an X-address,
  *                    this method throws an error if `expectedTag`
  *                    does not match the tag of the X-address.
- * @returns {ClassicAccountAndTag}
+ * @returns
  *          The classic account and tag.
  */
 function getClassicAccountAndTag(
@@ -100,11 +107,10 @@ function getClassicAccountAndTag(
       classicAccount: classic.classicAddress,
       tag: classic.tag
     }
-  } else {
-    return {
-      classicAccount: Account,
-      tag: expectedTag
-    }
+  }
+  return {
+    classicAccount: Account,
+    tag: expectedTag
   }
 }
 
@@ -134,17 +140,15 @@ function prepareTransaction(
   if (badFields.length) {
     return Promise.reject(
       new ValidationError(
-        'txJSON additionalProperty "' +
-          badFields[0] +
-          '" exists in instance when not allowed'
+        `txJSON additionalProperty "${badFields[0]}" exists in instance when not allowed`
       )
     )
   }
 
-  const newTxJSON = Object.assign({}, txJSON)
+  const newTxJSON = {...txJSON}
 
   // To remove the signer list, `SignerEntries` field should be omitted.
-  if (txJSON['SignerQuorum'] === 0) {
+  if (txJSON.SignerQuorum === 0) {
     delete newTxJSON.SignerEntries
   }
 
@@ -168,10 +172,8 @@ function prepareTransaction(
 
   // Destination:
   if (typeof txJSON.Destination === 'string') {
-    const {
-      classicAccount: destinationAccount,
-      tag: destinationTag
-    } = getClassicAccountAndTag(txJSON.Destination)
+    const {classicAccount: destinationAccount, tag: destinationTag} =
+      getClassicAccountAndTag(txJSON.Destination)
     newTxJSON.Destination = destinationAccount
     if (destinationTag != null) {
       if (
@@ -203,10 +205,13 @@ function prepareTransaction(
 
   function convertIssuedCurrencyToAccountIfPresent(fieldName: string): void {
     const amount = txJSON[fieldName]
-    if (typeof amount  === 'number'
-     || amount instanceof Array
-     || amount == null)
+    if (
+      typeof amount === 'number' ||
+      amount instanceof Array ||
+      amount == null
+    ) {
       return
+    }
 
     newTxJSON[fieldName] = toRippledAmount(amount)
   }
@@ -269,12 +274,12 @@ function prepareTransaction(
       instructions.maxLedgerVersionOffset != null
         ? instructions.maxLedgerVersionOffset
         : 3
-    return client.request({command: 'ledger_current'})
-    .then(response => response.result.ledger_current_index)
-    .then((ledgerVersion) => {
-      newTxJSON.LastLedgerSequence = ledgerVersion + offset
-      return
-    })
+    return client
+      .request({command: 'ledger_current'})
+      .then((response) => response.result.ledger_current_index)
+      .then((ledgerVersion) => {
+        newTxJSON.LastLedgerSequence = ledgerVersion + offset
+      })
   }
 
   function prepareFee(): Promise<void> {
@@ -295,9 +300,7 @@ function prepareTransaction(
       return Promise.resolve()
     }
     const multiplier =
-      instructions.signersCount == null
-        ? 1
-        : instructions.signersCount + 1
+      instructions.signersCount == null ? 1 : instructions.signersCount + 1
     if (instructions.fee != null) {
       const fee = new BigNumber(instructions.fee)
       if (fee.isGreaterThan(client._maxFeeXRP)) {
@@ -309,38 +312,34 @@ function prepareTransaction(
           )
         )
       }
-      newTxJSON.Fee = scaleValue(
-        xrpToDrops(instructions.fee),
-        multiplier
-      )
+      newTxJSON.Fee = scaleValue(xrpToDrops(instructions.fee), multiplier)
       return Promise.resolve()
     }
     const cushion = client._feeCushion
     return client.getFee(cushion).then((fee) => {
-      return client.request({command: 'fee'})
-      .then(response => Number(response.result.drops.minimum_fee))
-      .then((feeRef) => {
-        // feeRef is the reference transaction cost in "fee units"
-        const extraFee =
-          newTxJSON.TransactionType !== 'EscrowFinish' ||
-          newTxJSON.Fulfillment == null
-            ? 0
-            : cushion *
-              feeRef *
-              (32 +
-                Math.floor(
-                  Buffer.from(newTxJSON.Fulfillment, 'hex').length / 16
-                ))
-        const feeDrops = xrpToDrops(fee)
-        const maxFeeXRP = instructions.maxFee
-          ? BigNumber.min(client._maxFeeXRP, instructions.maxFee)
-          : client._maxFeeXRP
-        const maxFeeDrops = xrpToDrops(maxFeeXRP)
-        const normalFee = scaleValue(feeDrops, multiplier, extraFee)
-        newTxJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString(10)
-
-        return
-      })
+      return client
+        .request({command: 'fee'})
+        .then((response) => Number(response.result.drops.minimum_fee))
+        .then((feeRef) => {
+          // feeRef is the reference transaction cost in "fee units"
+          const extraFee =
+            newTxJSON.TransactionType !== 'EscrowFinish' ||
+            newTxJSON.Fulfillment == null
+              ? 0
+              : cushion *
+                feeRef *
+                (32 +
+                  Math.floor(
+                    Buffer.from(newTxJSON.Fulfillment, 'hex').length / 16
+                  ))
+          const feeDrops = xrpToDrops(fee)
+          const maxFeeXRP = instructions.maxFee
+            ? BigNumber.min(client._maxFeeXRP, instructions.maxFee)
+            : client._maxFeeXRP
+          const maxFeeDrops = xrpToDrops(maxFeeXRP)
+          const normalFee = scaleValue(feeDrops, multiplier, extraFee)
+          newTxJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString(10)
+        })
     })
   }
 
@@ -352,14 +351,13 @@ function prepareTransaction(
       ) {
         newTxJSON.Sequence = instructions.sequence
         return Promise.resolve()
-      } else {
-        // Both txJSON.Sequence and instructions.sequence are defined, and they are NOT equal
-        return Promise.reject(
-          new ValidationError(
-            '`Sequence` in txJSON must match `sequence` in `instructions`'
-          )
-        )
       }
+      // Both txJSON.Sequence and instructions.sequence are defined, and they are NOT equal
+      return Promise.reject(
+        new ValidationError(
+          '`Sequence` in txJSON must match `sequence` in `instructions`'
+        )
+      )
     }
 
     if (newTxJSON.Sequence != null) {
@@ -374,14 +372,15 @@ function prepareTransaction(
     }
 
     try {
-      const response = await client.request({command: 'account_info',
+      const response = await client.request({
+        command: 'account_info',
         account: classicAccount,
         ledger_index: 'current' // Fix #999
       })
       newTxJSON.Sequence = response.result.account_data.Sequence
-      return Promise.resolve()
+      return await Promise.resolve()
     } catch (e) {
-      return Promise.reject(e)
+      return await Promise.reject(e)
     }
   }
 

@@ -1,14 +1,16 @@
+import {Client} from '..'
+import {Memo} from '../common/types/objects'
+
+import {Instructions, Prepare, TransactionJSON} from './types'
 import * as utils from './utils'
+
 const validate = utils.common.validate
 const ValidationError = utils.common.errors.ValidationError
-import {Instructions, Prepare, TransactionJSON} from './types'
-import {Memo} from '../common/types/objects'
-import {Client} from '..'
 
-export type EscrowExecution = {
+export interface EscrowExecution {
   owner: string
   escrowSequence: number
-  memos?: Array<Memo>
+  memos?: Memo[]
   condition?: string
   fulfillment?: string
 }

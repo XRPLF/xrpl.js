@@ -1,8 +1,12 @@
-import * as _ from 'lodash'
 import * as assert from 'assert'
+
+import * as _ from 'lodash'
+
 import {constants} from '../../common'
-const AccountFlags = constants.AccountFlags
+
 import parseFields from './fields'
+
+const AccountFlags = constants.AccountFlags
 
 function getAccountRootModifiedNode(tx: any) {
   const modifiedNodes = tx.meta.AffectedNodes.filter(
@@ -26,8 +30,8 @@ function parseFlags(tx: any): any {
     const changedFlags = oldFlags ^ newFlags
     const setFlags = newFlags & changedFlags
     const clearedFlags = oldFlags & changedFlags
-    Object.entries(AccountFlags).forEach(entry => {
-      const [flagName, flagValue] = entry;
+    Object.entries(AccountFlags).forEach((entry) => {
+      const [flagName, flagValue] = entry
       if (setFlags & flagValue) {
         settings[flagName] = true
       } else if (clearedFlags & flagValue) {
@@ -59,7 +63,7 @@ function parseSettings(tx: any) {
       txType === 'SignerListSet'
   )
 
-  return Object.assign({}, parseFlags(tx), parseFields(tx))
+  return {...parseFlags(tx), ...parseFields(tx)}
 }
 
 export default parseSettings

@@ -1,7 +1,9 @@
-import * as _ from 'lodash'
 import {EventEmitter} from 'events'
 import {parse as parseURL} from 'url'
+
+import * as _ from 'lodash'
 import WebSocket from 'ws'
+
 import {
   RippledError,
   DisconnectedError,
@@ -11,8 +13,9 @@ import {
   ConnectionError,
   RippleError
 } from '../common/errors'
+import {Request, Response} from '../models/methods'
+
 import {ExponentialBackoff} from './backoff'
-import { Request, Response } from '../models/methods'
 
 /**
  * ConnectionOptions is the configuration for the Connection class.
@@ -37,16 +40,19 @@ export interface ConnectionOptions {
  */
 export type ConnectionUserOptions = Partial<ConnectionOptions>
 
-/**
- * Represents an intentionally triggered web-socket disconnect code.
- * WebSocket spec allows 4xxx codes for app/library specific codes.
- * See: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
- **/
+//
+// Represents an intentionally triggered web-socket disconnect code.
+// WebSocket spec allows 4xxx codes for app/library specific codes.
+// See: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
+//
 const INTENTIONAL_DISCONNECT_CODE = 4000
 
 /**
  * Create a new websocket given your URL and optional proxy/certificate
  * configuration.
+ *
+ * @param url
+ * @param config
  */
 function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
   const options: WebSocket.ClientOptions = {}
@@ -99,7 +105,10 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
 }
 
 /**
- * ws.send(), but promisified.
+ * Ws.send(), but promisified.
+ *
+ * @param ws
+ * @param message
  */
 function websocketSendAsync(ws: WebSocket, message: string) {
   return new Promise<void>((resolve, reject) => {
@@ -119,10 +128,10 @@ function websocketSendAsync(ws: WebSocket, message: string) {
  * after-the-fact.
  */
 class ConnectionManager {
-  private promisesAwaitingConnection: {
+  private promisesAwaitingConnection: Array<{
     resolve: Function
     reject: Function
-  }[] = []
+  }> = []
 
   resolveAllAwaiting() {
     this.promisesAwaitingConnection.map(({resolve}) => resolve())
@@ -149,11 +158,11 @@ class ConnectionManager {
  */
 class RequestManager {
   private nextId = 0
-  private promisesAwaitingResponse: {
+  private promisesAwaitingResponse: Array<{
     resolve: Function
     reject: Function
     timer: NodeJS.Timeout
-  }[] = []
+  }> = []
 
   cancel(id: number) {
     const {timer} = this.promisesAwaitingResponse[id]
@@ -185,8 +194,14 @@ class RequestManager {
    * Creates a new WebSocket request. This sets up a timeout timer to catch
    * hung responses, and a promise that will resolve with the response once
    * the response is seen & handled.
+   *
+   * @param data
+   * @param timeout
    */
-  createRequest(data: Request, timeout: number): [string | number, string, Promise<Response>] {
+  createRequest(
+    data: Request,
+    timeout: number
+  ): [string | number, string, Promise<Response>] {
     const newId = data.id ? data.id : this.nextId++
     const newData = JSON.stringify({...data, id: newId})
     const timer = setTimeout(
@@ -198,15 +213,19 @@ class RequestManager {
     if (timer.unref) {
       timer.unref()
     }
-    const newPromise = new Promise((resolve: (data: Response) => void, reject) => {
-      this.promisesAwaitingResponse[newId] = {resolve, reject, timer}
-    })
+    const newPromise = new Promise(
+      (resolve: (data: Response) => void, reject) => {
+        this.promisesAwaitingResponse[newId] = {resolve, reject, timer}
+      }
+    )
     return [newId, newData, newPromise]
   }
 
   /**
-   * Handle a "response". Responses match to the earlier request handlers, 
+   * Handle a "response". Responses match to the earlier request handlers,
    * and resolve/reject based on the data received.
+   *
+   * @param data
    */
   handleResponse(data: Response) {
     if (!Number.isInteger(data.id) || data.id < 0) {
@@ -235,21 +254,23 @@ class RequestManager {
 /**
  * The main Connection class. Responsible for connecting to & managing
  * an active WebSocket connection to a XRPL node.
+ *
+ * @param errorOrCode
  */
 export class Connection extends EventEmitter {
-  private _url: string
+  private readonly _url: string
   private _ws: null | WebSocket = null
   private _reconnectTimeoutID: null | NodeJS.Timeout = null
   private _heartbeatIntervalID: null | NodeJS.Timeout = null
-  private _retryConnectionBackoff = new ExponentialBackoff({
+  private readonly _retryConnectionBackoff = new ExponentialBackoff({
     min: 100,
     max: 60 * 1000
   })
 
-  private _trace: (id: string, message: string) => void = () => {}
-  private _config: ConnectionOptions
-  private _requestManager = new RequestManager()
-  private _connectionManager = new ConnectionManager()
+  private readonly _trace: (id: string, message: string) => void = () => {}
+  private readonly _config: ConnectionOptions
+  private readonly _requestManager = new RequestManager()
+  private readonly _connectionManager = new ConnectionManager()
 
   constructor(url?: string, options: ConnectionUserOptions = {}) {
     super()
@@ -262,7 +283,7 @@ export class Connection extends EventEmitter {
     }
     if (typeof options.trace === 'function') {
       this._trace = options.trace
-    } else if (options.trace === true) {
+    } else if (options.trace) {
       this._trace = console.log
     }
   }
@@ -300,11 +321,11 @@ export class Connection extends EventEmitter {
     return this._ws !== null
   }
 
-  private _clearHeartbeatInterval = () => {
+  private readonly _clearHeartbeatInterval = () => {
     clearInterval(this._heartbeatIntervalID)
   }
 
-  private _startHeartbeatInterval = () => {
+  private readonly _startHeartbeatInterval = () => {
     this._clearHeartbeatInterval()
     this._heartbeatIntervalID = setInterval(
       () => this._heartbeat(),
@@ -316,7 +337,7 @@ export class Connection extends EventEmitter {
    * A heartbeat is just a "ping" command, sent on an interval.
    * If this succeeds, we're good. If it fails, disconnect so that the consumer can reconnect, if desired.
    */
-  private _heartbeat = () => {
+  private readonly _heartbeat = () => {
     return this.request({command: 'ping'}).catch(() => {
       return this.reconnect().catch((error) => {
         this.emit('error', 'reconnect', error.message, error)
@@ -324,7 +345,9 @@ export class Connection extends EventEmitter {
     })
   }
 
-  private _onConnectionFailed = (errorOrCode: Error | number | null) => {
+  private readonly _onConnectionFailed = (
+    errorOrCode: Error | number | null
+  ) => {
     if (this._ws) {
       this._ws.removeAllListeners()
       this._ws.on('error', () => {
@@ -473,7 +496,10 @@ export class Connection extends EventEmitter {
     await this.connect()
   }
 
-  async request<T extends Request, U extends Response>(request: T, timeout?: number): Promise<U> {
+  async request<T extends Request, U extends Response>(
+    request: T,
+    timeout?: number
+  ): Promise<U> {
     if (!this._shouldBeConnected) {
       throw new NotConnectedError()
     }
@@ -490,9 +516,9 @@ export class Connection extends EventEmitter {
   }
 
   /**
-   * Get the Websocket connection URL
+   * Get the Websocket connection URL.
    *
-   * @returns The Websocket connection URL
+   * @returns The Websocket connection URL.
    */
   getUrl(): string {
     return this._url

@@ -1,5 +1,6 @@
-import * as _ from 'lodash'
 import * as assert from 'assert'
+
+import * as _ from 'lodash'
 
 type Interval = [number, number]
 
@@ -30,7 +31,7 @@ class RangeSet {
 
   serialize() {
     return this.ranges
-      .map((range) => range[0].toString() + '-' + range[1].toString())
+      .map((range) => `${range[0].toString()}-${range[1].toString()}`)
       .join(',')
   }
 

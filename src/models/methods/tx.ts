@@ -1,8 +1,9 @@
-import { TransactionMetadata } from "../common/transaction";
-import { BaseRequest, BaseResponse } from "./baseMethod";
+import {TransactionMetadata} from '../common/transaction'
+
+import {BaseRequest, BaseResponse} from './baseMethod'
 
 export interface TxRequest extends BaseRequest {
-  command: "tx"
+  command: 'tx'
   transaction: string
   binary?: boolean
   min_ledger?: number

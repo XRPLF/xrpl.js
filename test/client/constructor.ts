@@ -1,6 +1,8 @@
 import assert from 'assert-diff'
-import {TestSuite} from '../testUtils'
+
 import {Client} from 'xrpl-local'
+
+import {TestSuite} from '../testUtils'
 
 /**
  * Every test suite exports their tests in the default object.
@@ -13,7 +15,7 @@ export default <TestSuite>{
   },
 
   'Client invalid options': () => {
-    // @ts-ignore - This is intentionally invalid
+    // @ts-expect-error - This is intentionally invalid
     assert.throws(() => new Client({invalid: true}))
   },
 

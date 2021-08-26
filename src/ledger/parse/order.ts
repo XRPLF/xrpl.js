@@ -1,13 +1,14 @@
 import * as assert from 'assert'
-import {parseTimestamp} from './utils'
-import {parseMemos} from './utils'
-import parseAmount from './amount'
-import {removeUndefined} from '../../utils'
+
 import {txFlags} from '../../common'
 import {
   FormattedOrderSpecification,
   OfferCreateTransaction
 } from '../../common/types/objects/index'
+import {removeUndefined} from '../../utils'
+
+import parseAmount from './amount'
+import {parseTimestamp, parseMemos} from './utils'
 
 const flags = txFlags.OfferCreate
 
@@ -22,9 +23,9 @@ function parseOrder(tx: OfferCreateTransaction): FormattedOrderSpecification {
 
   return removeUndefined({
     memos: parseMemos(tx),
-    direction: direction,
-    quantity: quantity,
-    totalPrice: totalPrice,
+    direction,
+    quantity,
+    totalPrice,
     passive: (tx.Flags & flags.Passive) !== 0 || undefined,
     immediateOrCancel: (tx.Flags & flags.ImmediateOrCancel) !== 0 || undefined,
     fillOrKill: (tx.Flags & flags.FillOrKill) !== 0 || undefined,

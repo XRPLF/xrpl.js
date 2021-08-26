@@ -1,9 +1,19 @@
-import { BaseRequest, BaseResponse } from './baseMethod'
-import { AccountObjectType, LedgerIndex } from "../common"
-import { Check, DepositPreauth, Escrow, Offer, PayChannel, RippleState, SignerList, Ticket } from "../ledger"
-  
+import {AccountObjectType, LedgerIndex} from '../common'
+import {
+  Check,
+  DepositPreauth,
+  Escrow,
+  Offer,
+  PayChannel,
+  RippleState,
+  SignerList,
+  Ticket
+} from '../ledger'
+
+import {BaseRequest, BaseResponse} from './baseMethod'
+
 export interface AccountObjectsRequest extends BaseRequest {
-  command: "account_objects"
+  command: 'account_objects'
   account: string
   type?: AccountObjectType
   deletion_blockers_only?: boolean
@@ -13,7 +23,15 @@ export interface AccountObjectsRequest extends BaseRequest {
   marker?: any
 }
 
-type AccountObject = Check | DepositPreauth | Escrow | Offer | PayChannel | SignerList | Ticket | RippleState
+type AccountObject =
+  | Check
+  | DepositPreauth
+  | Escrow
+  | Offer
+  | PayChannel
+  | SignerList
+  | Ticket
+  | RippleState
 
 export interface AccountObjectsResponse extends BaseResponse {
   result: {

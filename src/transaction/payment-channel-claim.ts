@@ -1,12 +1,14 @@
-import * as utils from './utils'
-const ValidationError = utils.common.errors.ValidationError
-const claimFlags = utils.common.txFlags.PaymentChannelClaim
+import {Client} from '..'
 import {validate} from '../common'
 import {xrpToDrops} from '../utils'
-import {Instructions, Prepare, TransactionJSON} from './types'
-import {Client} from '..'
 
-export type PaymentChannelClaim = {
+import {Instructions, Prepare, TransactionJSON} from './types'
+import * as utils from './utils'
+
+const ValidationError = utils.common.errors.ValidationError
+const claimFlags = utils.common.txFlags.PaymentChannelClaim
+
+export interface PaymentChannelClaim {
   channel: string
   balance?: string
   amount?: string
@@ -48,17 +50,17 @@ function createPaymentChannelClaimTransaction(
     txJSON.PublicKey = claim.publicKey
   }
 
-  if (claim.renew === true && claim.close === true) {
+  if (claim.renew && claim.close) {
     throw new ValidationError(
       '"renew" and "close" flags on PaymentChannelClaim' +
         ' are mutually exclusive'
     )
   }
 
-  if (claim.renew === true) {
+  if (claim.renew) {
     txJSON.Flags |= claimFlags.Renew
   }
-  if (claim.close === true) {
+  if (claim.close) {
     txJSON.Flags |= claimFlags.Close
   }
 

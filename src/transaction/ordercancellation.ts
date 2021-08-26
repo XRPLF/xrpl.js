@@ -1,7 +1,9 @@
-import * as utils from './utils'
-const validate = utils.common.validate
-import {Instructions, Prepare, TransactionJSON} from './types'
 import {Client} from '..'
+
+import {Instructions, Prepare, TransactionJSON} from './types'
+import * as utils from './utils'
+
+const validate = utils.common.validate
 
 function createOrderCancellationTransaction(
   account: string,

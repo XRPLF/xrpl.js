@@ -1,18 +1,18 @@
 import {Amount} from './amounts'
 
-export type Adjustment = {
+export interface Adjustment {
   address: string
   amount: Amount
   tag?: number
 }
 
-export type MaxAdjustment = {
+export interface MaxAdjustment {
   address: string
   maxAmount: Amount
   tag?: number
 }
 
-export type MinAdjustment = {
+export interface MinAdjustment {
   address: string
   minAmount: Amount
   tag?: number

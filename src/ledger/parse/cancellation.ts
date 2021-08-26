@@ -1,4 +1,5 @@
 import * as assert from 'assert'
+
 import {parseMemos} from './utils'
 
 function parseOrderCancellation(tx: any): object {

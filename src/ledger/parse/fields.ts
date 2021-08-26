@@ -1,6 +1,8 @@
-import * as _ from 'lodash'
 import BigNumber from 'bignumber.js'
+import * as _ from 'lodash'
+
 import {constants} from '../../common'
+
 const AccountFields = constants.AccountFields
 
 function parseField(info, value) {

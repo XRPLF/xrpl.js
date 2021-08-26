@@ -1,4 +1,5 @@
 import assert from 'assert-diff'
+
 import {TestSuite} from '../testUtils'
 
 /**
@@ -8,16 +9,16 @@ import {TestSuite} from '../testUtils'
  */
 export default <TestSuite>{
   'returns true when there is another page': async (client, address) => {
-    // @ts-ignore
+    // @ts-expect-error
     const response = await client.request({command: 'ledger_data'})
     assert(client.hasNextPage(response))
   },
 
   'returns false when there are no more pages': async (client, address) => {
-    // @ts-ignore
+    // @ts-expect-error
     const response = await client.request({command: 'ledger_data'})
     const responseNextPage = await client.requestNextPage(
-      // @ts-ignore
+      // @ts-expect-error
       {command: 'ledger_data'},
       response
     )

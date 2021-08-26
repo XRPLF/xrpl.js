@@ -1,6 +1,7 @@
 import {Client} from 'xrpl-local'
-import {TestSuite} from '../testUtils'
+
 import Wallet from '../../src/Wallet'
+import {TestSuite} from '../testUtils'
 
 const {schemaValidator} = Client._PRIVATE
 const publicKey =
@@ -34,5 +35,5 @@ export default <TestSuite>{
 
     // THEN we get a signedTransaction
     schemaValidator.schemaValidate('sign', signedTx)
-  },
+  }
 }

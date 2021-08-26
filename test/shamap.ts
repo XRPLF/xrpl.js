@@ -1,17 +1,21 @@
 import assert from 'assert'
+
 import {SHAMap, NodeType} from '../src/utils/hashes/shamap'
+
 const TYPE_TRANSACTION_NO_METADATA = NodeType.TRANSACTION_NO_METADATA
 
-var HEX_ZERO =
+const HEX_ZERO =
   '00000000000000000000000000000000' + '00000000000000000000000000000000'
 
 /**
- * Generates data to hash for testing
+ * Generates data to hash for testing.
+ *
+ * @param v
  */
 function intToVuc(v: number): string {
-  var ret = ''
+  let ret = ''
 
-  for (var i = 0; i < 32; i++) {
+  for (let i = 0; i < 32; i++) {
     ret += '0'
     ret += v.toString(16).toUpperCase()
   }
@@ -19,8 +23,8 @@ function intToVuc(v: number): string {
 }
 
 function fillShamapTest(shamap: any, keys: string[], hashes: string[]) {
-  for (var i = 0; i < keys.length; i++) {
-    var data = intToVuc(i)
+  for (let i = 0; i < keys.length; i++) {
+    const data = intToVuc(i)
     shamap.addItem(keys[i].toUpperCase(), data, TYPE_TRANSACTION_NO_METADATA)
     assert.equal(shamap.hash, hashes[i])
   }
@@ -29,7 +33,7 @@ function fillShamapTest(shamap: any, keys: string[], hashes: string[]) {
 describe('SHAMap', function () {
   describe('#addItem', function () {
     it('will add new nodes to v1', function () {
-      var keys = [
+      const keys = [
         'b92891fe4ef6cee585fdc6fda1e09eb4d386363158ec3321b8123e5a772c6ca8',
         'b92881fe4ef6cee585fdc6fda1e09eb4d386363158ec3321b8123e5a772c6ca8',
         'b92691fe4ef6cee585fdc6fda1e09eb4d386363158ec3321b8123e5a772c6ca8',
@@ -40,7 +44,7 @@ describe('SHAMap', function () {
         '292891fe4ef6cee585fdc6fda1e09eb4d386363158ec3321b8123e5a772c6ca8'
       ]
 
-      var hashesv1 = [
+      const hashesv1 = [
         'B7387CFEA0465759ADC718E8C42B52D2309D179B326E239EB5075C64B6281F7F',
         'FBC195A9592A54AB44010274163CB6BA95F497EC5BA0A8831845467FB2ECE266',
         '4E7D2684B65DFD48937FFB775E20175C43AF0C94066F7D5679F51AE756795B75',
@@ -51,7 +55,7 @@ describe('SHAMap', function () {
         'DF4220E93ADC6F5569063A01B4DC79F8DB9553B6A3222ADE23DEA02BBE7230E5'
       ]
 
-      var shamapv1 = new SHAMap()
+      const shamapv1 = new SHAMap()
       assert.equal(shamapv1.hash, HEX_ZERO)
       fillShamapTest(shamapv1, keys, hashesv1)
     })

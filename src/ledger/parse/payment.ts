@@ -1,9 +1,12 @@
-import _ from 'lodash'
 import * as assert from 'assert'
-import * as utils from './utils'
+
+import _ from 'lodash'
+
 import {txFlags} from '../../common'
 import {removeUndefined} from '../../utils'
+
 import parseAmount from './amount'
+import * as utils from './utils'
 
 function isNoDirectRipple(tx) {
   return (tx.Flags & txFlags.Payment.NoRippleDirect) !== 0

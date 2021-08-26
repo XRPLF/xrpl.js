@@ -1,8 +1,9 @@
-import { LedgerIndex } from '../common'
-import { BaseRequest, BaseResponse } from './baseMethod';
+import {LedgerIndex} from '../common'
+
+import {BaseRequest, BaseResponse} from './baseMethod'
 
 export interface GatewayBalancesRequest extends BaseRequest {
-  command: "gateway_balances"
+  command: 'gateway_balances'
   account: string
   strict?: boolean
   hotwallet: string | string[]

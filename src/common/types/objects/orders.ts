@@ -1,7 +1,7 @@
 import {Amount} from './amounts'
 import {Memo} from './memos'
 
-export type FormattedOrderSpecification = {
+export interface FormattedOrderSpecification {
   direction: string
   quantity: Amount
   totalPrice: Amount

@@ -1,9 +1,11 @@
-import net from 'net'
-import _ from 'lodash'
 import fs from 'fs'
+import net from 'net'
 import path from 'path'
-import {Client} from 'xrpl-local'
+
 import assert from 'assert-diff'
+import _ from 'lodash'
+
+import {Client} from 'xrpl-local'
 
 /**
  * The test function. It takes a Client object and then some other data to
@@ -31,7 +33,7 @@ export interface TestSuite {
  */
 interface LoadedTestSuite {
   name: string
-  tests: [string, TestFn][]
+  tests: Array<[string, TestFn]>
   config: {
     /** Set to true to skip re-running tests with an X-address. */
     skipXAddress?: boolean
@@ -41,6 +43,10 @@ interface LoadedTestSuite {
 /**
  * Check the response against the expected result. Optionally validate
  * that response against a given schema as well.
+ *
+ * @param response
+ * @param expected
+ * @param schemaName
  */
 export function assertResultMatch(
   response: any,
@@ -71,6 +77,10 @@ export function assertResultMatch(
 
 /**
  * Check that the promise rejects with an expected error.
+ *
+ * @param promise
+ * @param instanceOf
+ * @param message
  */
 export async function assertRejects(
   promise: PromiseLike<any>,
@@ -144,6 +154,8 @@ export function loadTestSuites(): LoadedTestSuite[] {
  * Ignore WebSocket DisconnectErrors. Useful for making requests where we don't
  * care about the response and plan to teardown the test before the response
  * has come back.
+ *
+ * @param error
  */
 export function ignoreWebSocketDisconnect(error: Error): void {
   if (error.message === 'websocket was closed') {

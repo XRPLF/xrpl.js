@@ -1,8 +1,9 @@
-import _ from 'lodash'
 import assert from 'assert-diff'
-import setupClient from './setupClient'
+import _ from 'lodash'
+
 import responses from './fixtures/responses'
 import rippled from './fixtures/rippled'
+import setupClient from './setupClient'
 import {ignoreWebSocketDisconnect} from './testUtils'
 
 const TIMEOUT = 20000
@@ -26,13 +27,11 @@ describe('BroadcastClient', function () {
       mock.addResponse({command: 'server_info'}, rippled.server_info.normal)
     })
     const expected = {request_server_info: 1}
-    this.mocks.forEach((mock) => mock.expect(Object.assign({}, expected)))
+    this.mocks.forEach((mock) => mock.expect({...expected}))
     assert(this.client.isConnected())
-    return this.client
-      .request({command: "server_info"})
-      .then(response => {
-        return checkResult(responses.getServerInfo, response.result.info)
-      })
+    return this.client.request({command: 'server_info'}).then((response) => {
+      return checkResult(responses.getServerInfo, response.result.info)
+    })
   })
 
   it('error propagation', function (done) {

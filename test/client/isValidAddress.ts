@@ -1,6 +1,7 @@
 import assert from 'assert-diff'
-import {TestSuite} from '../testUtils'
+
 import addresses from '../fixtures/addresses.json'
+import {TestSuite} from '../testUtils'
 
 export default <TestSuite>{
   'returns true for valid address': async (client, address) => {

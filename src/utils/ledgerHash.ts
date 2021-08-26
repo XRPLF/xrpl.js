@@ -1,11 +1,14 @@
 import _ from 'lodash'
-import { ISOTimeToRippleTime } from '.'
-import { ValidationError } from '../common/errors'
+
+import {ValidationError} from '../common/errors'
+
 import {
   computeLedgerHash,
   computeTransactionTreeHash,
   computeStateTreeHash
-} from '../utils/hashes'
+} from './hashes'
+
+import {ISOTimeToRippleTime} from '.'
 
 function convertLedgerHeader(header): any {
   return {
@@ -46,9 +49,7 @@ function computeTransactionHash(
         'SyntaxError: Unexpected' + ' token u in JSON at position 0'
       ) {
         // one or more of the `tx.rawTransaction`s is undefined
-        throw new ValidationError(
-          'ledger' + ' is missing raw transactions'
-        )
+        throw new ValidationError('ledger' + ' is missing raw transactions')
       }
     }
   } else {
@@ -60,13 +61,12 @@ function computeTransactionHash(
     return ledger.transactionHash
   }
   const txs = transactions.map((tx) => {
-    const mergeTx = Object.assign({}, _.omit(tx, 'tx'), tx.tx || {})
+    const mergeTx = {..._.omit(tx, 'tx'), ...(tx.tx || {})}
     // rename `meta` back to `metaData`
-    const renameMeta = Object.assign(
-      {},
-      _.omit(mergeTx, 'meta'),
-      tx.meta ? {metaData: tx.meta} : {}
-    )
+    const renameMeta = {
+      ..._.omit(mergeTx, 'meta'),
+      ...(tx.meta ? {metaData: tx.meta} : {})
+    }
     return renameMeta
   })
   const transactionHash = computeTransactionTreeHash(txs)
@@ -105,7 +105,7 @@ function computeStateHash(ledger, options: ComputeLedgerHeaderHashOptions) {
   return stateHash
 }
 
-export type ComputeLedgerHeaderHashOptions = {
+export interface ComputeLedgerHeaderHashOptions {
   computeTreeHashes?: boolean
 }
 
@@ -117,7 +117,7 @@ function computeLedgerHeaderHash(
     transactionHash: computeTransactionHash(ledger, options),
     stateHash: computeStateHash(ledger, options)
   }
-  return hashLedgerHeader(Object.assign({}, ledger, subhashes))
+  return hashLedgerHeader({...ledger, ...subhashes})
 }
 
 export default computeLedgerHeaderHash

@@ -1,33 +1,38 @@
 import {EventEmitter} from 'events'
+
+import {
+  classicAddressToXAddress,
+  xAddressToClassicAddress,
+  isValidXAddress,
+  isValidClassicAddress,
+  encodeSeed,
+  decodeSeed,
+  encodeAccountID,
+  decodeAccountID,
+  encodeNodePublic,
+  decodeNodePublic,
+  encodeAccountPublic,
+  decodeAccountPublic,
+  encodeXAddress,
+  decodeXAddress
+} from 'ripple-address-codec'
+
 import {
   constants,
   errors,
   validate,
   txFlags,
+  ensureClassicAddress
 } from '../common'
-import { Connection, ConnectionUserOptions } from './connection'
-import getTrustlines from '../ledger/trustlines'
+import {ValidationError} from '../common/errors'
+import {getFee} from '../common/fee'
+import * as schemaValidator from '../common/schema-validator'
 import getBalances from '../ledger/balances'
-import getPaths from '../ledger/pathfind'
 import {getOrderbook, formatBidsAndAsks} from '../ledger/orderbook'
-import preparePayment from '../transaction/payment'
-import prepareTrustline from '../transaction/trustline'
-import prepareOrder from '../transaction/order'
-import prepareOrderCancellation from '../transaction/ordercancellation'
-import prepareEscrowCreation from '../transaction/escrow-creation'
-import prepareEscrowExecution from '../transaction/escrow-execution'
-import prepareEscrowCancellation from '../transaction/escrow-cancellation'
-import preparePaymentChannelCreate from '../transaction/payment-channel-create'
-import preparePaymentChannelFund from '../transaction/payment-channel-fund'
-import preparePaymentChannelClaim from '../transaction/payment-channel-claim'
-import prepareCheckCreate from '../transaction/check-create'
-import prepareCheckCancel from '../transaction/check-cancel'
-import prepareCheckCash from '../transaction/check-cash'
-import prepareSettings from '../transaction/settings'
-import prepareTicketCreate from '../transaction/ticket'
-import {sign} from '../transaction/sign'
-import combine from '../transaction/combine'
-import {deriveAddress, deriveXAddress} from '../utils/derive'
+import getPaths from '../ledger/pathfind'
+import getTrustlines from '../ledger/trustlines'
+import * as ledgerUtils from '../ledger/utils'
+import {clamp} from '../ledger/utils'
 import {
   Request,
   Response,
@@ -97,33 +102,30 @@ import {
   RandomRequest,
   RandomResponse
 } from '../models/methods'
-
-import RangeSet from './rangeset'
-import * as ledgerUtils from '../ledger/utils'
-import * as transactionUtils from '../transaction/utils'
-import * as schemaValidator from '../common/schema-validator'
-import {getFee} from '../common/fee'
-import {ensureClassicAddress} from '../common'
-import {clamp} from '../ledger/utils'
+import prepareCheckCancel from '../transaction/check-cancel'
+import prepareCheckCash from '../transaction/check-cash'
+import prepareCheckCreate from '../transaction/check-create'
+import combine from '../transaction/combine'
+import prepareEscrowCancellation from '../transaction/escrow-cancellation'
+import prepareEscrowCreation from '../transaction/escrow-creation'
+import prepareEscrowExecution from '../transaction/escrow-execution'
+import prepareOrder from '../transaction/order'
+import prepareOrderCancellation from '../transaction/ordercancellation'
+import preparePayment from '../transaction/payment'
+import preparePaymentChannelClaim from '../transaction/payment-channel-claim'
+import preparePaymentChannelCreate from '../transaction/payment-channel-create'
+import preparePaymentChannelFund from '../transaction/payment-channel-fund'
+import prepareSettings from '../transaction/settings'
+import {sign} from '../transaction/sign'
+import prepareTicketCreate from '../transaction/ticket'
+import prepareTrustline from '../transaction/trustline'
 import {TransactionJSON, Instructions, Prepare} from '../transaction/types'
-import {
-  classicAddressToXAddress,
-  xAddressToClassicAddress,
-  isValidXAddress,
-  isValidClassicAddress,
-  encodeSeed,
-  decodeSeed,
-  encodeAccountID,
-  decodeAccountID,
-  encodeNodePublic,
-  decodeNodePublic,
-  encodeAccountPublic,
-  decodeAccountPublic,
-  encodeXAddress,
-  decodeXAddress
-} from 'ripple-address-codec'
+import * as transactionUtils from '../transaction/utils'
+import {deriveAddress, deriveXAddress} from '../utils/derive'
 import generateFaucetWallet from '../wallet/wallet-generation'
-import { ValidationError } from '../common/errors'
+
+import {Connection, ConnectionUserOptions} from './connection'
+import RangeSet from './rangeset'
 
 export interface ClientOptions extends ConnectionUserOptions {
   feeCushion?: number
@@ -136,6 +138,8 @@ export interface ClientOptions extends ConnectionUserOptions {
  * Get the response key / property name that contains the listed data for a
  * command. This varies from command to command, but we need to know it to
  * properly count across many requests.
+ *
+ * @param command
  */
 function getCollectKeyFromCommand(command: string): string | null {
   switch (command) {
@@ -157,19 +161,21 @@ function getCollectKeyFromCommand(command: string): string | null {
   }
 }
 
-type MarkerRequest = AccountChannelsRequest 
-                   | AccountLinesRequest 
-                   | AccountObjectsRequest 
-                   | AccountOffersRequest
-                   | AccountTxRequest
-                   | LedgerDataRequest
+type MarkerRequest =
+  | AccountChannelsRequest
+  | AccountLinesRequest
+  | AccountObjectsRequest
+  | AccountOffersRequest
+  | AccountTxRequest
+  | LedgerDataRequest
 
-type MarkerResponse = AccountChannelsResponse 
-                    | AccountLinesResponse 
-                    | AccountObjectsResponse 
-                    | AccountOffersResponse
-                    | AccountTxResponse
-                    | LedgerDataResponse
+type MarkerResponse =
+  | AccountChannelsResponse
+  | AccountLinesResponse
+  | AccountObjectsResponse
+  | AccountOffersResponse
+  | AccountTxResponse
+  | LedgerDataResponse
 
 class Client extends EventEmitter {
   _feeCushion: number
@@ -189,8 +195,10 @@ class Client extends EventEmitter {
 
   constructor(server: string, options: ClientOptions = {}) {
     super()
-    if (typeof server !== 'string' || !server.match("^(wss?|wss?\\+unix)://")) {
-      throw new ValidationError("server URI must start with `wss://`, `ws://`, `wss+unix://`, or `ws+unix://`.")
+    if (typeof server !== 'string' || !server.match('^(wss?|wss?\\+unix)://')) {
+      throw new ValidationError(
+        'server URI must start with `wss://`, `ws://`, `wss+unix://`, or `ws+unix://`.'
+      )
     }
 
     this._feeCushion = options.feeCushion || 1.2
@@ -205,7 +213,7 @@ class Client extends EventEmitter {
     this.connection.on('connected', () => {
       this.emit('connected')
     })
-    
+
     this.connection.on('disconnected', (code) => {
       let finalCode = code
       // 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
@@ -222,7 +230,9 @@ class Client extends EventEmitter {
    * additional request body parameters.
    */
   public request(r: AccountChannelsRequest): Promise<AccountChannelsResponse>
-  public request(r: AccountCurrenciesRequest): Promise<AccountCurrenciesResponse>
+  public request(
+    r: AccountCurrenciesRequest
+  ): Promise<AccountCurrenciesResponse>
   public request(r: AccountInfoRequest): Promise<AccountInfoResponse>
   public request(r: AccountLinesRequest): Promise<AccountLinesResponse>
   public request(r: AccountObjectsRequest): Promise<AccountObjectsResponse>
@@ -230,7 +240,9 @@ class Client extends EventEmitter {
   public request(r: AccountTxRequest): Promise<AccountTxResponse>
   public request(r: BookOffersRequest): Promise<BookOffersResponse>
   public request(r: ChannelVerifyRequest): Promise<ChannelVerifyResponse>
-  public request(r: DepositAuthorizedRequest): Promise<DepositAuthorizedResponse>
+  public request(
+    r: DepositAuthorizedRequest
+  ): Promise<DepositAuthorizedResponse>
   public request(r: FeeRequest): Promise<FeeResponse>
   public request(r: GatewayBalancesRequest): Promise<GatewayBalancesResponse>
   public request(r: LedgerRequest): Promise<LedgerResponse>
@@ -247,15 +259,17 @@ class Client extends EventEmitter {
   public request(r: ServerInfoRequest): Promise<ServerInfoResponse>
   public request(r: ServerStateRequest): Promise<ServerStateResponse>
   public request(r: SubmitRequest): Promise<SubmitResponse>
-  public request(r: SubmitMultisignedRequest): Promise<SubmitMultisignedResponse>
+  public request(
+    r: SubmitMultisignedRequest
+  ): Promise<SubmitMultisignedResponse>
   public request(r: TransactionEntryRequest): Promise<TransactionEntryResponse>
   public request(r: TxRequest): Promise<TxResponse>
   public request<R extends Request, T extends Response>(r: R): Promise<T> {
     // TODO: should this be typed with `extends BaseRequest/BaseResponse`?
     return this.connection.request({
       ...r,
-      // @ts-ignore
-      account: r.account ? ensureClassicAddress(r.account) : undefined,
+      // @ts-expect-error
+      account: r.account ? ensureClassicAddress(r.account) : undefined
     })
   }
 
@@ -265,19 +279,42 @@ class Client extends EventEmitter {
    * When there are more results than contained in the response, the response
    * includes a `marker` field.
    *
-   * See https://ripple.com/build/rippled-apis/#markers-and-pagination
+   * See https://ripple.com/build/rippled-apis/#markers-and-pagination.
+   *
+   * @param response
    */
   hasNextPage(response: MarkerResponse): boolean {
-    return !!response.result.marker
+    return Boolean(response.result.marker)
   }
 
-  async requestNextPage(req: AccountChannelsRequest, resp: AccountChannelsResponse): Promise<AccountChannelsResponse>
-  async requestNextPage(req: AccountLinesRequest, resp: AccountLinesResponse): Promise<AccountLinesResponse>
-  async requestNextPage(req: AccountObjectsRequest, resp: AccountObjectsResponse): Promise<AccountObjectsResponse>
-  async requestNextPage(req: AccountOffersRequest, resp: AccountOffersResponse): Promise<AccountOffersResponse>
-  async requestNextPage(req: AccountTxRequest, resp: AccountTxResponse): Promise<AccountTxResponse>
-  async requestNextPage(req: LedgerDataRequest, resp: LedgerDataResponse): Promise<LedgerDataResponse>
-  async requestNextPage<T extends MarkerRequest, U extends MarkerResponse>(req: T, resp: U): Promise<U> {
+  async requestNextPage(
+    req: AccountChannelsRequest,
+    resp: AccountChannelsResponse
+  ): Promise<AccountChannelsResponse>
+  async requestNextPage(
+    req: AccountLinesRequest,
+    resp: AccountLinesResponse
+  ): Promise<AccountLinesResponse>
+  async requestNextPage(
+    req: AccountObjectsRequest,
+    resp: AccountObjectsResponse
+  ): Promise<AccountObjectsResponse>
+  async requestNextPage(
+    req: AccountOffersRequest,
+    resp: AccountOffersResponse
+  ): Promise<AccountOffersResponse>
+  async requestNextPage(
+    req: AccountTxRequest,
+    resp: AccountTxResponse
+  ): Promise<AccountTxResponse>
+  async requestNextPage(
+    req: LedgerDataRequest,
+    resp: LedgerDataResponse
+  ): Promise<LedgerDataResponse>
+  async requestNextPage<T extends MarkerRequest, U extends MarkerResponse>(
+    req: T,
+    resp: U
+  ): Promise<U> {
     if (!resp.result.marker) {
       return Promise.reject(
         new errors.NotFoundError('response does not have a next page')
@@ -291,6 +328,9 @@ class Client extends EventEmitter {
    * Prepare a transaction.
    *
    * You can later submit the transaction with a `submit` request.
+   *
+   * @param txJSON
+   * @param instructions
    */
   async prepareTransaction(
     txJSON: TransactionJSON,
@@ -304,7 +344,7 @@ class Client extends EventEmitter {
    *
    * This can be used to generate `MemoData`, `MemoType`, and `MemoFormat`.
    *
-   * @param string string to convert to hex
+   * @param string - String to convert to hex.
    */
   convertStringToHex(string: string): string {
     return transactionUtils.convertStringToHex(string)
@@ -323,24 +363,34 @@ class Client extends EventEmitter {
    * general use. Instead, use rippled's built-in pagination and make multiple
    * requests as needed.
    */
-  async _requestAll(req: AccountChannelsRequest): Promise<AccountChannelsResponse[]>
+  async _requestAll(
+    req: AccountChannelsRequest
+  ): Promise<AccountChannelsResponse[]>
   async _requestAll(req: AccountLinesRequest): Promise<AccountLinesResponse[]>
-  async _requestAll(req: AccountObjectsRequest): Promise<AccountObjectsResponse[]>
+  async _requestAll(
+    req: AccountObjectsRequest
+  ): Promise<AccountObjectsResponse[]>
   async _requestAll(req: AccountOffersRequest): Promise<AccountOffersResponse[]>
   async _requestAll(req: AccountTxRequest): Promise<AccountTxResponse[]>
   async _requestAll(req: BookOffersRequest): Promise<BookOffersResponse[]>
   async _requestAll(req: LedgerDataRequest): Promise<LedgerDataResponse[]>
-  async _requestAll<T extends MarkerRequest, U extends MarkerResponse>(request: T, options: {collect?: string} = {}): Promise<U[]> {
+  async _requestAll<T extends MarkerRequest, U extends MarkerResponse>(
+    request: T,
+    options: {collect?: string} = {}
+  ): Promise<U[]> {
     // The data under collection is keyed based on the command. Fail if command
     // not recognized and collection key not provided.
-    const collectKey = options.collect || getCollectKeyFromCommand(request.command)
+    const collectKey =
+      options.collect || getCollectKeyFromCommand(request.command)
     if (!collectKey) {
-      throw new errors.ValidationError(`no collect key for command ${request.command}`)
+      throw new errors.ValidationError(
+        `no collect key for command ${request.command}`
+      )
     }
     // If limit is not provided, fetches all data over multiple requests.
     // NOTE: This may return much more than needed. Set limit when possible.
     const countTo: number = request.limit != null ? request.limit : Infinity
-    let count: number = 0
+    let count = 0
     let marker: string = request.marker
     let lastBatchLength: number
     const results = []
@@ -354,7 +404,7 @@ class Client extends EventEmitter {
       const singleResponse = await this.connection.request(repeatProps)
       const singleResult = singleResponse.result
       const collectedData = singleResult[collectKey]
-      marker = singleResult['marker']
+      marker = singleResult.marker
       results.push(singleResponse)
       // Make sure we handle when no data (not even an empty array) is returned.
       const isExpectedFormat = Array.isArray(collectedData)
@@ -364,18 +414,18 @@ class Client extends EventEmitter {
       } else {
         lastBatchLength = 0
       }
-    } while (!!marker && count < countTo && lastBatchLength !== 0)
+    } while (Boolean(marker) && count < countTo && lastBatchLength !== 0)
     return results
   }
 
   isConnected(): boolean {
     return this.connection.isConnected()
   }
-  
+
   async connect(): Promise<void> {
     return this.connection.connect()
   }
-  
+
   async disconnect(): Promise<void> {
     // backwards compatibility: connection.disconnect() can return a number, but
     // this method returns nothing. SO we await but don't return any result.
@@ -419,7 +469,7 @@ class Client extends EventEmitter {
   static formatBidsAndAsks = formatBidsAndAsks
 
   /**
-   * Static methods to expose ripple-address-codec methods
+   * Static methods to expose ripple-address-codec methods.
    */
   static classicAddressToXAddress = classicAddressToXAddress
   static xAddressToClassicAddress = xAddressToClassicAddress
@@ -443,7 +493,4 @@ class Client extends EventEmitter {
   isValidSecret = schemaValidator.isValidSecret
 }
 
-export {
-  Client,
-  Connection
-}
+export {Client, Connection}
