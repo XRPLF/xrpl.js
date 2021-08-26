@@ -15,7 +15,7 @@ import {
   computeOfferIndex,
   computeSignerListIndex
 } from "../src/utils/hashes"
-import { encode } from 'ripple-binary-codec/dist'
+import { encode } from 'ripple-binary-codec'
 
 /**
  * Expects a corresponding ledger dump in $repo/test/fixtures/rippled folder

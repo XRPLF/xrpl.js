@@ -28,7 +28,7 @@ function hashLedgerHeader(ledgerHeader) {
   return computeLedgerHash(header)
 }
 
-function computeTransactionHashFromLedger(
+function computeLedgerTransactionHash(
   ledger,
   options: ComputeLedgerHeaderHashOptions
 ) {
@@ -86,7 +86,7 @@ function computeTransactionHashFromLedger(
   return transactionHash
 }
 
-function computeStateHash(ledger, options: ComputeLedgerHeaderHashOptions) {
+function computeLedgerStateHash(ledger, options: ComputeLedgerHeaderHashOptions) {
   if (ledger.rawState == null) {
     if (options.computeTreeHashes) {
       throw new ValidationError(
@@ -114,8 +114,8 @@ function computeLedgerHeaderHash(
   options: ComputeLedgerHeaderHashOptions = {}
 ): string {
   const subhashes = {
-    transactionHash: computeTransactionHashFromLedger(ledger, options),
-    stateHash: computeStateHash(ledger, options)
+    transactionHash: computeLedgerTransactionHash(ledger, options),
+    stateHash: computeLedgerStateHash(ledger, options)
   }
   return hashLedgerHeader(Object.assign({}, ledger, subhashes))
 }
