@@ -1,7 +1,9 @@
 import assert from 'assert-diff'
 import responses from '../fixtures/responses'
 import requests from '../fixtures/requests'
+import rippled from '../fixtures/rippled'
 import {TestSuite, assertResultMatch, assertRejects} from '../testUtils'
+import { BookOffersRequest } from '../../src'
 // import BigNumber from 'bignumber.js'
 
 // function checkSortingOfOrders(orders) {
@@ -38,13 +40,46 @@ import {TestSuite, assertResultMatch, assertRejects} from '../testUtils'
 //   return true
 // }
 
+function isUSD(currency: string) {
+  return currency === 'USD' || currency === '0000000000000000000000005553440000000000'
+}
+
+function isBTC(currency: string) {
+  return currency === 'BTC' || currency === '0000000000000000000000004254430000000000'
+}
+
+function normalRippledResponse(request: BookOffersRequest): object {
+  if (
+    isBTC(request.taker_gets.currency) &&
+    isUSD(request.taker_pays.currency)
+  ) {
+    return rippled.book_offers.fabric.requestBookOffersBidsResponse(request)
+  } else if (
+    isUSD(request.taker_gets.currency) &&
+    isBTC(request.taker_pays.currency)
+  ) {
+    return rippled.book_offers.fabric.requestBookOffersAsksResponse(request)
+  }
+}
+
+function xrpRippledResponse(request: BookOffersRequest): object {
+  if (request.taker_pays.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
+    return rippled.book_offers.xrp_usd
+  } else if (
+    request.taker_gets.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw'
+  ) {
+    return rippled.book_offers.usd_xrp
+  }
+}
+
 /**
  * Every test suite exports their tests in the default object.
  * - Check out the "TestSuite" type for documentation on the interface.
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'normal': async (client, address) => {
+  'normal': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'book_offers'}, normalRippledResponse)
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.normal,
@@ -53,7 +88,8 @@ export default <TestSuite>{
     assertResultMatch(response, responses.getOrderbook.normal, 'getOrderbook')
   },
 
-  'invalid options': async (client, address) => {
+  'invalid options': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'book_offers'}, normalRippledResponse)
     assertRejects(
       client.getOrderbook(address, requests.getOrderbook.normal, {
         // @ts-ignore
@@ -63,7 +99,8 @@ export default <TestSuite>{
     )
   },
 
-  'with XRP': async (client, address) => {
+  'with XRP': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'book_offers'}, xrpRippledResponse)
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.withXRP
@@ -71,7 +108,7 @@ export default <TestSuite>{
     assertResultMatch(response, responses.getOrderbook.withXRP, 'getOrderbook')
   },
 
-  // 'sample XRP/JPY book has orders sorted correctly': async (client, address) => {
+  // 'sample XRP/JPY book has orders sorted correctly': async (client, address, mockRippled) => {
   //   const orderbookInfo = {
   //     base: {
   //       // the first currency in pair
@@ -88,7 +125,7 @@ export default <TestSuite>{
   //   checkSortingOfOrders(response.asks)
   // },
 
-  // 'sample USD/XRP book has orders sorted correctly': async (client, address) => {
+  // 'sample USD/XRP book has orders sorted correctly': async (client, address, mockRippled) => {
   //   const orderbookInfo = {
   //     counter: {currency: 'XRP'},
   //     base: {
@@ -103,7 +140,8 @@ export default <TestSuite>{
   // },
 
   // WARNING: This test fails to catch the sorting bug, issue #766
-  'sorted so that best deals come first [bad test]': async (client, address) => {
+  'sorted so that best deals come first [bad test]': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'book_offers'}, normalRippledResponse)
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.normal
@@ -127,7 +165,8 @@ export default <TestSuite>{
     )
   },
 
-  'currency & counterparty are correct': async (client, address) => {
+  'currency & counterparty are correct': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'book_offers'}, normalRippledResponse)
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.normal
@@ -143,7 +182,8 @@ export default <TestSuite>{
     })
   },
 
-  'direction is correct for bids and asks': async (client, address) => {
+  'direction is correct for bids and asks': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'book_offers'}, normalRippledResponse)
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.normal

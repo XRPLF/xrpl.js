@@ -4,6 +4,7 @@ import assert from 'assert-diff'
 import setupClient from './setupClient'
 import {Client} from 'xrpl-local'
 import {ignoreWebSocketDisconnect} from './testUtils'
+import rippled from './fixtures/rippled'
 const utils = Client._PRIVATE.ledgerUtils
 
 const TIMEOUT = 200000 // how long before each test case times out
@@ -158,6 +159,7 @@ describe('Connection', function () {
   })
 
   it('DisconnectedError', async function () {
+    this.mockRippled.suppressOutput = true
     this.mockRippled.on(`request_server_info`, function (request, conn) {
       assert.strictEqual(request.command, 'server_info')
       conn.close()
@@ -505,7 +507,9 @@ describe('Connection', function () {
   })
 
   it('propagates RippledError data', function (done) {
-    this.client.request({command: 'subscribe', streams: 'validations'}).catch((error) => {
+    const request = {command: 'subscribe', streams: 'validations'}
+    this.mockRippled.addResponse(request, rippled.subscribe.error)
+    this.client.request(request).catch((error) => {
       assert.strictEqual(error.name, 'RippledError')
       assert.strictEqual(error.data.error, 'invalidParams')
       assert.strictEqual(error.message, 'Invalid parameters.')
