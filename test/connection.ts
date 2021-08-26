@@ -143,7 +143,6 @@ describe('Connection', function () {
 
   it('should throw NotConnectedError if server not responding ', function (done) {
     if (isBrowser) {
-      const phantomTest = /PhantomJS/
       if (navigator.userAgent.includes('PhantomJS')) {
         // inside PhantomJS this one just hangs, so skip as not very relevant
         done()
@@ -255,7 +254,6 @@ describe('Connection', function () {
   describe('reconnection test', function () {
     it('reconnect on several unexpected close', function (done) {
       if (isBrowser) {
-        const phantomTest = /PhantomJS/
         if (navigator.userAgent.includes('PhantomJS')) {
           // inside PhantomJS this one just hangs, so skip as not very relevant
           done()
@@ -319,7 +317,6 @@ describe('Connection', function () {
 
   it('reconnect event on heartbeat failure', function (done) {
     if (isBrowser) {
-      const phantomTest = /PhantomJS/
       if (navigator.userAgent.includes('PhantomJS')) {
         // inside PhantomJS this one just hangs, so skip as not very relevant
         done()
@@ -340,7 +337,6 @@ describe('Connection', function () {
 
   it('heartbeat failure and reconnect failure', function (done) {
     if (isBrowser) {
-      const phantomTest = /PhantomJS/
       if (navigator.userAgent.includes('PhantomJS')) {
         // inside PhantomJS this one just hangs, so skip as not very relevant
         done()

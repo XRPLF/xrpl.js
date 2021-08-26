@@ -34,11 +34,9 @@ export default <TestSuite>{
       {command: 'account_objects', account: address},
       rippled.account_objects.normal
     )
-    // @ts-expect-error Intentionally no local validation of these options
     const result = await client.request({
       command: 'account_objects',
-      account: address,
-      invalid: 'options'
+      account: address
     })
 
     assertResultMatch(
