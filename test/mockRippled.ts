@@ -6,13 +6,14 @@ import type { Request } from "../src";
 
 import { getFreePort } from "./testUtils";
 
-function createResponse(request, response, overrides = {}) {
-  const result = { ...response.result, ...overrides };
-  const change =
-    response.result && !_.isEmpty(overrides)
-      ? { id: request.id, result }
-      : { id: request.id };
-  return JSON.stringify({ ...response, ...change });
+function createResponse(request: { id: number | string }, response: object) {
+  if (!("type" in response) && !("error" in response)) {
+    throw new Error(
+      "Bad response format. Must contain `type` or `error`. " +
+        JSON.stringify(response)
+    );
+  }
+  return JSON.stringify(Object.assign({}, response, { id: request.id }));
 }
 
 function ping(conn, request) {
@@ -41,8 +42,12 @@ export function createMockRippled(port) {
   mock.on("connection", function (this: MockedWebSocketServer, conn: any) {
     this.socket = conn;
     conn.on("message", function (requestJSON) {
+      let request;
       try {
-        const request = JSON.parse(requestJSON);
+        request = JSON.parse(requestJSON);
+        if (request.id == null) {
+          throw new Error("Request has no id");
+        }
         if (request.command === "ping") {
           ping(conn, request);
         } else if (request.command === "test_command") {
@@ -55,10 +60,15 @@ export function createMockRippled(port) {
           );
         }
       } catch (err) {
-        if (!mock.suppressOutput) {
-          console.error(`Error: ${err.message}`);
-        }
-        conn.close(4000, err.message);
+        if (!mock.suppressOutput) console.error("Error: " + err.message);
+        if (request != null)
+          conn.send(
+            createResponse(request, {
+              type: "response",
+              status: "error",
+              error: err.message,
+            })
+          );
       }
     });
   });
@@ -71,6 +81,17 @@ export function createMockRippled(port) {
     response: object | ((r: Request) => object)
   ) => {
     const command = request.command;
+    if (
+      typeof response === "object" &&
+      !("type" in response) &&
+      !("error" in response)
+    ) {
+      console.log(new Error("") instanceof Error);
+      throw new Error(
+        "Bad response format. Must contain `type` or `error`. " +
+          JSON.stringify(response)
+      );
+    }
     mock.responses[command] = response;
   };
 
