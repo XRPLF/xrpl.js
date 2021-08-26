@@ -1,29 +1,28 @@
-import BigNumber from 'bignumber.js'
 import _ from 'lodash'
+import BigNumber from 'bignumber.js'
+import {RippledAmount} from '../common/types/objects'
+import {ValidationError} from '../common/errors'
 import {xAddressToClassicAddress} from 'ripple-address-codec'
 
-import {ValidationError} from '../common/errors'
-import {RippledAmount} from '../common/types/objects'
-
-import {deriveKeypair, deriveAddress, deriveXAddress} from './derive'
-import {generateXAddress} from './generateAddress'
-import {
-  computeBinaryTransactionHash,
-  computeTransactionHash,
-  computeBinaryTransactionSigningHash,
-  computeAccountRootIndex,
-  computeSignerListIndex,
-  computeOfferIndex,
-  computeTrustlineHash,
-  computeTransactionTreeHash,
-  computeStateTreeHash,
-  computeLedgerHash,
-  computeEscrowHash,
-  computePaymentChannelHash
-} from './hashes'
+import { deriveKeypair, deriveAddress, deriveXAddress } from './derive'
 import computeLedgerHeaderHash from './ledgerHash'
 import signPaymentChannelClaim from './signPaymentChannelClaim'
 import verifyPaymentChannelClaim from './verifyPaymentChannelClaim'
+import {
+    computeBinaryTransactionHash,
+    computeTransactionHash,
+    computeBinaryTransactionSigningHash,
+    computeAccountRootIndex,
+    computeSignerListIndex,
+    computeOfferIndex,
+    computeTrustlineHash,
+    computeTransactionTreeHash,
+    computeStateTreeHash,
+    computeLedgerHash,
+    computeEscrowHash,
+    computePaymentChannelHash,
+} from './hashes'
+import { generateXAddress } from './generateAddress'
 
 function isValidSecret(secret: string): boolean {
   try {

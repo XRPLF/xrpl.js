@@ -1,6 +1,4 @@
-import * as _ from 'lodash'
-
-import {TransactionAndMetadata} from '../../models/transactions'
+import _ from 'lodash'
 import {removeUndefined, rippleTimeToISOTime} from '../../utils'
 
 import parseTransaction from './transaction'

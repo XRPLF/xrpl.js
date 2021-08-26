@@ -26,8 +26,6 @@ describe('BroadcastClient', function () {
     this.mocks.forEach((mock) => {
       mock.addResponse({command: 'server_info'}, rippled.server_info.normal)
     })
-    const expected = {request_server_info: 1}
-    this.mocks.forEach((mock) => mock.expect({...expected}))
     assert(this.client.isConnected())
     return this.client.request({command: 'server_info'}).then((response) => {
       return checkResult(responses.getServerInfo, response.result.info)
@@ -35,6 +33,10 @@ describe('BroadcastClient', function () {
   })
 
   it('error propagation', function (done) {
+    const data = {error: 'type', error_message: 'info'}
+    this.mocks.forEach((mock) => {
+      mock.addResponse({command: 'echo'}, data)
+    })
     this.client.once('error', (type, info) => {
       assert.strictEqual(type, 'type')
       assert.strictEqual(info, 'info')
@@ -43,7 +45,7 @@ describe('BroadcastClient', function () {
     this.client._clients[1].connection
       .request({
         command: 'echo',
-        data: {error: 'type', error_message: 'info'}
+        data
       })
       .catch(ignoreWebSocketDisconnect)
   })

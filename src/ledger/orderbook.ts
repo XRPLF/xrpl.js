@@ -1,11 +1,5 @@
-import BigNumber from 'bignumber.js'
-import * as _ from 'lodash'
-
-import {Client} from '..'
-import {validate} from '../common'
-import {BookOffer} from '../common/types/commands'
-import {Issue} from '../common/types/objects'
-
+import _ from 'lodash'
+import * as utils from './utils'
 import {
   parseOrderbookOrder,
   FormattedOrderbookOrder
@@ -83,8 +77,7 @@ async function makeRequest(
     taker_gets: takerGets,
     taker_pays: takerPays
   })
-  return client._requestAll({
-    command: 'book_offers',
+  return client.requestAll({command: 'book_offers',
     taker_gets: orderData.taker_gets,
     taker_pays: orderData.taker_pays,
     ledger_index: options.ledgerVersion || 'validated',

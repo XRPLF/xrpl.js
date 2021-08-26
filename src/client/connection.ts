@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import {EventEmitter} from 'events'
 import {parse as parseURL} from 'url'
 
@@ -16,6 +17,7 @@ import {
 import {Request, Response} from '../models/methods'
 
 import {ExponentialBackoff} from './backoff'
+import { Response } from '../models/methods'
 
 /**
  * ConnectionOptions is the configuration for the Connection class.
@@ -198,10 +200,7 @@ class RequestManager {
    * @param data
    * @param timeout
    */
-  createRequest(
-    data: Request,
-    timeout: number
-  ): [string | number, string, Promise<Response>] {
+  createRequest(data: any, timeout: number): [string | number, string, Promise<any>] {
     const newId = data.id ? data.id : this.nextId++
     const newData = JSON.stringify({...data, id: newId})
     const timer = setTimeout(
@@ -496,10 +495,7 @@ export class Connection extends EventEmitter {
     await this.connect()
   }
 
-  async request<T extends Request, U extends Response>(
-    request: T,
-    timeout?: number
-  ): Promise<U> {
+  async request<T extends {command: string}>(request: T, timeout?: number): Promise<any> {
     if (!this._shouldBeConnected) {
       throw new NotConnectedError()
     }
@@ -512,7 +508,7 @@ export class Connection extends EventEmitter {
       this._requestManager.reject(id, error)
     })
 
-    return responsePromise as any
+    return responsePromise
   }
 
   /**

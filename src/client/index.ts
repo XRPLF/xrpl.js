@@ -20,7 +20,6 @@ import {
 import {
   constants,
   errors,
-  validate,
   txFlags,
   ensureClassicAddress
 } from '../common'
@@ -102,23 +101,12 @@ import {
   RandomRequest,
   RandomResponse
 } from '../models/methods'
-import prepareCheckCancel from '../transaction/check-cancel'
-import prepareCheckCash from '../transaction/check-cash'
-import prepareCheckCreate from '../transaction/check-create'
-import combine from '../transaction/combine'
-import prepareEscrowCancellation from '../transaction/escrow-cancellation'
-import prepareEscrowCreation from '../transaction/escrow-creation'
-import prepareEscrowExecution from '../transaction/escrow-execution'
-import prepareOrder from '../transaction/order'
-import prepareOrderCancellation from '../transaction/ordercancellation'
-import preparePayment from '../transaction/payment'
-import preparePaymentChannelClaim from '../transaction/payment-channel-claim'
-import preparePaymentChannelCreate from '../transaction/payment-channel-create'
-import preparePaymentChannelFund from '../transaction/payment-channel-fund'
-import prepareSettings from '../transaction/settings'
-import {sign} from '../transaction/sign'
-import prepareTicketCreate from '../transaction/ticket'
-import prepareTrustline from '../transaction/trustline'
+
+import * as transactionUtils from '../transaction/utils'
+import * as schemaValidator from '../common/schema-validator'
+import {getFee} from '../common/fee'
+import {ensureClassicAddress} from '../common'
+import {clamp} from '../ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from '../transaction/types'
 import * as transactionUtils from '../transaction/utils'
 import {deriveAddress, deriveXAddress} from '../utils/derive'
@@ -178,20 +166,16 @@ type MarkerResponse =
   | LedgerDataResponse
 
 class Client extends EventEmitter {
+  // Factor to multiply estimated fee by to provide a cushion in case the
+  // required fee rises during submission of a transaction. Defaults to 1.2.
   _feeCushion: number
+  // Maximum fee to use with transactions, in XRP. Must be a string-encoded
+  // number. Defaults to '2'.
   _maxFeeXRP: string
 
   // New in > 0.21.0
   // non-validated ledger versions are allowed, and passed to rippled as-is.
   connection: Connection
-
-  // these are exposed only for use by unit tests; they are not part of the client.
-  static _PRIVATE = {
-    validate,
-    RangeSet,
-    ledgerUtils,
-    schemaValidator
-  }
 
   constructor(server: string, options: ClientOptions = {}) {
     super()
@@ -352,7 +336,7 @@ class Client extends EventEmitter {
 
   /**
    * Makes multiple paged requests to the client to return a given number of
-   * resources. _requestAll() will make multiple requests until the `limit`
+   * resources. requestAll() will make multiple requests until the `limit`
    * number of resources is reached (if no `limit` is provided, a single request
    * will be made).
    *
@@ -363,21 +347,14 @@ class Client extends EventEmitter {
    * general use. Instead, use rippled's built-in pagination and make multiple
    * requests as needed.
    */
-  async _requestAll(
-    req: AccountChannelsRequest
-  ): Promise<AccountChannelsResponse[]>
-  async _requestAll(req: AccountLinesRequest): Promise<AccountLinesResponse[]>
-  async _requestAll(
-    req: AccountObjectsRequest
-  ): Promise<AccountObjectsResponse[]>
-  async _requestAll(req: AccountOffersRequest): Promise<AccountOffersResponse[]>
-  async _requestAll(req: AccountTxRequest): Promise<AccountTxResponse[]>
-  async _requestAll(req: BookOffersRequest): Promise<BookOffersResponse[]>
-  async _requestAll(req: LedgerDataRequest): Promise<LedgerDataResponse[]>
-  async _requestAll<T extends MarkerRequest, U extends MarkerResponse>(
-    request: T,
-    options: {collect?: string} = {}
-  ): Promise<U[]> {
+  async requestAll(req: AccountChannelsRequest): Promise<AccountChannelsResponse[]>
+  async requestAll(req: AccountLinesRequest): Promise<AccountLinesResponse[]>
+  async requestAll(req: AccountObjectsRequest): Promise<AccountObjectsResponse[]>
+  async requestAll(req: AccountOffersRequest): Promise<AccountOffersResponse[]>
+  async requestAll(req: AccountTxRequest): Promise<AccountTxResponse[]>
+  async requestAll(req: BookOffersRequest): Promise<BookOffersResponse[]>
+  async requestAll(req: LedgerDataRequest): Promise<LedgerDataResponse[]>
+  async requestAll<T extends MarkerRequest, U extends MarkerResponse>(request: T, options: {collect?: string} = {}): Promise<U[]> {
     // The data under collection is keyed based on the command. Fail if command
     // not recognized and collection key not provided.
     const collectKey =

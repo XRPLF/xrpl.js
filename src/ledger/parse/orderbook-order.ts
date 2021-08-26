@@ -1,4 +1,6 @@
-import * as _ from 'lodash'
+import _ from 'lodash'
+import {parseTimestamp, adjustQualityForXRP} from './utils'
+import {removeUndefined} from '../../utils'
 
 import {BookOffer} from '../../common/types/commands'
 import {Amount, FormattedOrderSpecification} from '../../common/types/objects'

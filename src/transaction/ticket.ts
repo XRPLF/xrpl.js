@@ -1,5 +1,6 @@
-import * as _ from 'lodash'
-
+import _ from 'lodash'
+import * as utils from './utils'
+import {Prepare, TransactionJSON, Instructions} from './types'
 import {Client} from '..'
 
 import {Prepare, TransactionJSON, Instructions} from './types'

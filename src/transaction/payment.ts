@@ -1,6 +1,9 @@
-import * as _ from 'lodash'
-
-import {Client} from '..'
+import _ from 'lodash'
+import * as utils from './utils'
+const validate = utils.common.validate
+const paymentFlags = utils.common.txFlags.Payment
+const ValidationError = utils.common.errors.ValidationError
+import {Instructions, Prepare, TransactionJSON} from './types'
 import {
   Amount,
   Adjustment,

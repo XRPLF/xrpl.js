@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import * as assert from 'assert'
 
 import * as _ from 'lodash'

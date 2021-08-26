@@ -12,10 +12,10 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  */
 export default <TestSuite>{
   'simple': async (client, address, mockRippled) => {
-    mockRippled.addResponse(
-      {command: 'server_info'},
-      rippled.server_info.normal
-    )
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
+    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.simple,
@@ -25,10 +25,10 @@ export default <TestSuite>{
   },
 
   'frozen': async (client, address, mockRippled) => {
-    mockRippled.addResponse(
-      {command: 'server_info'},
-      rippled.server_info.normal
-    )
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
+    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.frozen
@@ -37,10 +37,10 @@ export default <TestSuite>{
   },
 
   'complex': async (client, address, mockRippled) => {
-    mockRippled.addResponse(
-      {command: 'server_info'},
-      rippled.server_info.normal
-    )
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
+    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.complex,
@@ -50,11 +50,11 @@ export default <TestSuite>{
   },
 
   'invalid': async (client, address, mockRippled) => {
-    mockRippled.addResponse(
-      {command: 'server_info'},
-      rippled.server_info.normal
-    )
-    const trustline = {...requests.prepareTrustline.complex}
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
+    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
+    const trustline = Object.assign({}, requests.prepareTrustline.complex)
     delete trustline.limit // Make invalid
 
     await assertRejects(
@@ -69,10 +69,10 @@ export default <TestSuite>{
   },
 
   'xaddress-issuer': async (client, address, mockRippled) => {
-    mockRippled.addResponse(
-      {command: 'server_info'},
-      rippled.server_info.normal
-    )
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
+    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.issuedXAddress,
@@ -86,10 +86,10 @@ export default <TestSuite>{
   },
 
   'with ticket': async (client, address, mockRippled) => {
-    mockRippled.addResponse(
-      {command: 'server_info'},
-      rippled.server_info.normal
-    )
+    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
+    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',

@@ -1,5 +1,5 @@
-import * as _ from 'lodash'
-
+import _ from 'lodash'
+import parseAmount from './amount'
 import {Amount, RippledAmount} from '../../common/types/objects'
 import {Path, GetPaths, RippledPathsResponse} from '../pathfind-types'
 

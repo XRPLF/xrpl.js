@@ -12,6 +12,10 @@
   "unpkg": "build/ripple-latest-min.js",
   "jsdelivr": "build/ripple-latest-min.js",
   "types": "dist/npm/index.d.ts",
+  "browser": {
+    "ws": "./dist/npm/client/wsWrapper.js",
+    "https-proxy-agent": false
+  },
   "directories": {
     "test": "test"
   },

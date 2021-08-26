@@ -7,8 +7,8 @@ import {Client} from 'xrpl-local'
 
 import setupClient from './setupClient'
 import {ignoreWebSocketDisconnect} from './testUtils'
-
-const utils = Client._PRIVATE.ledgerUtils
+import {Connection} from 'xrpl-local/client'
+import rippled from './fixtures/rippled'
 
 const TIMEOUT = 200000 // how long before each test case times out
 const isBrowser = (process as any).browser
@@ -32,7 +32,7 @@ describe('Connection', function () {
   afterEach(setupClient.teardown)
 
   it('default options', function () {
-    const connection: any = new utils.Connection('url')
+    const connection: any = new Connection('url')
     assert.strictEqual(connection._url, 'url')
     assert(connection._config.proxy == null)
     assert(connection._config.authorization == null)
@@ -55,8 +55,8 @@ describe('Connection', function () {
     it('as false', function () {
       const messages = []
       console.log = (id, message) => messages.push([id, message])
-      const connection: any = new utils.Connection('url', {trace: false})
-      connection._ws = {send() {}}
+      const connection: any = new Connection('url', {trace: false})
+      connection._ws = {send: function () {}}
       connection.request(mockedRequestData)
       connection._onMessage(mockedResponse)
       assert.deepEqual(messages, [])
@@ -65,8 +65,8 @@ describe('Connection', function () {
     it('as true', function () {
       const messages = []
       console.log = (id, message) => messages.push([id, message])
-      const connection: any = new utils.Connection('url', {trace: true})
-      connection._ws = {send() {}}
+      const connection: any = new Connection('url', {trace: true})
+      connection._ws = {send: function () {}}
       connection.request(mockedRequestData)
       connection._onMessage(mockedResponse)
       assert.deepEqual(messages, expectedMessages)
@@ -74,7 +74,7 @@ describe('Connection', function () {
 
     it('as a function', function () {
       const messages = []
-      const connection: any = new utils.Connection('url', {
+      const connection: any = new Connection('url', {
         trace: (id, message) => messages.push([id, message])
       })
       connection._ws = {send() {}}
@@ -107,7 +107,7 @@ describe('Connection', function () {
         authorization: 'authorization',
         trustedCertificates: ['path/to/pem']
       }
-      const connection = new utils.Connection(
+      const connection = new Connection(
         this.client.connection._url,
         options
       )
@@ -127,10 +127,9 @@ describe('Connection', function () {
   })
 
   it('NotConnectedError', function () {
-    const connection = new utils.Connection('url')
-    return connection
-      .request({
-        command: 'ledger',
+    const connection = new Connection('url')
+    return connection.request({
+        command: 'ledger', 
         ledger_index: 'validated'
       })
       .then(() => {
@@ -151,7 +150,9 @@ describe('Connection', function () {
     }
 
     // Address where no one listens
-    const connection = new utils.Connection('ws://testripple.circleci.com:129')
+    const connection = new Connection(
+      'ws://testripple.circleci.com:129'
+    )
     connection.on('error', done)
     connection.connect().catch((error) => {
       assert(error instanceof this.client.errors.NotConnectedError)
@@ -160,6 +161,7 @@ describe('Connection', function () {
   })
 
   it('DisconnectedError', async function () {
+    this.mockRippled.suppressOutput = true
     this.mockRippled.on(`request_server_info`, function (request, conn) {
       assert.strictEqual(request.command, 'server_info')
       conn.close()
@@ -398,7 +400,7 @@ describe('Connection', function () {
   })
 
   it('Cannot connect because no server', function () {
-    const connection = new utils.Connection(undefined as string)
+    const connection = new Connection(undefined as string)
     return connection
       .connect()
       .then(() => {
@@ -494,22 +496,18 @@ describe('Connection', function () {
   })
 
   it('propagates RippledError data', function (done) {
-    this.client
-      .request({command: 'subscribe', streams: 'validations'})
-      .catch((error) => {
-        assert.strictEqual(error.name, 'RippledError')
-        assert.strictEqual(error.data.error, 'invalidParams')
-        assert.strictEqual(error.message, 'Invalid parameters.')
-        assert.strictEqual(error.data.error_code, 31)
-        assert.strictEqual(error.data.error_message, 'Invalid parameters.')
-        assert.deepEqual(error.data.request, {
-          command: 'subscribe',
-          id: 0,
-          streams: 'validations'
-        })
-        assert.strictEqual(error.data.status, 'error')
-        assert.strictEqual(error.data.type, 'response')
-        done()
+    const request = {command: 'subscribe', streams: 'validations'}
+    this.mockRippled.addResponse(request, rippled.subscribe.error)
+    this.client.request(request).catch((error) => {
+      assert.strictEqual(error.name, 'RippledError')
+      assert.strictEqual(error.data.error, 'invalidParams')
+      assert.strictEqual(error.message, 'Invalid parameters.')
+      assert.strictEqual(error.data.error_code, 31)
+      assert.strictEqual(error.data.error_message, 'Invalid parameters.')
+      assert.deepEqual(error.data.request, {
+        command: 'subscribe',
+        id: 0,
+        streams: 'validations'
       })
   })
 
