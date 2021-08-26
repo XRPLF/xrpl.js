@@ -12,12 +12,7 @@ describe('mock rippled tests', () => {
   })
 
   it('provide bad response shape', async function () {
-    try {
-      this.mockRippled.addResponse('account_info', {data: {}})
-      assert.fail('Expected an error to be thrown')
-    } catch (error) {
-      assert(error instanceof Error, error.message)
-    }
+    assert.throws( () => this.mockRippled.addResponse('account_info', {data: {}}), Error)
   })
 
   it('provide bad response shape in function', async function () {
