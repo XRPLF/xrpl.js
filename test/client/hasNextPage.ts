@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
 import rippled from "../fixtures/rippled";
 import { TestSuite } from "../testUtils";
@@ -18,6 +18,7 @@ export default <TestSuite>{
       { command: "ledger_data" },
       rippled.ledger_data.first_page
     );
+    // @ts-expect-error
     const response = await client.request({ command: "ledger_data" });
     assert(client.hasNextPage(response));
   },
@@ -34,8 +35,10 @@ export default <TestSuite>{
       return rippled.ledger_data.first_page;
     };
     mockRippled.addResponse({ command: "ledger_data" }, rippledResponse);
+    // @ts-expect-error
     const response = await client.request({ command: "ledger_data" });
     const responseNextPage = await client.requestNextPage(
+      // @ts-expect-error
       { command: "ledger_data" },
       response
     );

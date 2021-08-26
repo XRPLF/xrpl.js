@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
 import rippled from "../fixtures/rippled";
 import { TestSuite } from "../testUtils";
@@ -23,7 +23,8 @@ export default <TestSuite>{
       { command: "server_info" },
       rippled.server_info.normal
     );
-    client._feeCushion = undefined as unknown as number;
+    // @ts-expect-error
+    client._feeCushion = undefined;
     const fee = await client.getFee();
     assert.strictEqual(fee, "0.000012");
   },

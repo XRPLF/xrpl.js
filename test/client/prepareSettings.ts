@@ -1,6 +1,5 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
-import { FormattedSettings } from "../../src/common/types/objects";
 import requests from "../fixtures/requests";
 import responses from "../fixtures/responses";
 import rippled from "../fixtures/rippled";
@@ -53,7 +52,7 @@ export default <TestSuite>{
       address,
       requests.prepareSettings.domain,
       {
-        maxLedgerVersion: null as unknown as undefined,
+        maxLedgerVersion: undefined,
       }
     );
     assertResultMatch(
@@ -129,7 +128,8 @@ export default <TestSuite>{
     const regularKey = { regularKey: null };
     const response = await client.prepareSettings(
       address,
-      regularKey as unknown as FormattedSettings,
+      // @ts-expect-error
+      regularKey,
       instructionsWithMaxLedgerVersionOffset
     );
     assertResultMatch(

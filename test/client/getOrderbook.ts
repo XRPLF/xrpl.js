@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
 import { BookOffersRequest } from "../../src";
 import requests from "../fixtures/requests";
@@ -68,8 +68,7 @@ function normalRippledResponse(request: BookOffersRequest): object {
   ) {
     return rippled.book_offers.fabric.requestBookOffersAsksResponse(request);
   }
-
-  return {};
+  throw new Error("unexpected end");
 }
 
 function xrpRippledResponse(request: BookOffersRequest): object {
@@ -79,8 +78,7 @@ function xrpRippledResponse(request: BookOffersRequest): object {
   if (request.taker_gets.issuer === "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw") {
     return rippled.book_offers.usd_xrp;
   }
-
-  return {};
+  throw new Error("unexpected end");
 }
 
 /**

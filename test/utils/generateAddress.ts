@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
 import ECDSA from "../../src/common/ecdsa";
 import { UnexpectedError } from "../../src/common/errors";
@@ -74,7 +74,7 @@ describe("Generate Address", function () {
 
     // THEN we get an object with an address starting with 'r' and a secret starting with 's' (not 'sEd')
     assert(
-      account.classicAddress?.startsWith("r"),
+      account.classicAddress && account.classicAddress.startsWith("r"),
       "Address must start with `r`"
     );
     assert.deepEqual(
@@ -101,7 +101,7 @@ describe("Generate Address", function () {
 
     // THEN we get an object with an address starting with 'r' and a secret starting with 'sEd'
     assert(
-      account.classicAddress?.startsWith("r"),
+      account.classicAddress.startsWith("r"),
       "Address must start with `r`"
     );
     assert.deepEqual(

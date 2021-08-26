@@ -1,13 +1,13 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
 import { ExponentialBackoff } from "../src/client/backoff";
 
 describe("ExponentialBackoff", function () {
   it("duration() return value starts with the min value", function () {
     // default: 100ms
-    assert(new ExponentialBackoff().duration(), 100);
-    assert(new ExponentialBackoff({ min: 100 }).duration(), 100);
-    assert(new ExponentialBackoff({ min: 123 }).duration(), 123);
+    assert.equal(new ExponentialBackoff().duration(), 100);
+    assert.equal(new ExponentialBackoff({ min: 100 }).duration(), 100);
+    assert.equal(new ExponentialBackoff({ min: 123 }).duration(), 123);
   });
 
   it("duration() return value increases when called multiple times", function () {

@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
 import rippled from "../fixtures/rippled";
 import { assertRejects, TestSuite } from "../testUtils";
@@ -18,12 +18,15 @@ const rippledResponse = function (request: Request): object {
 export default <TestSuite>{
   "requests the next page": async (client, address, mockRippled) => {
     mockRippled.addResponse({ command: "ledger_data" }, rippledResponse);
+    // @ts-expect-error
     const response = await client.request({ command: "ledger_data" });
     const responseNextPage = await client.requestNextPage(
+      // @ts-expect-error
       { command: "ledger_data" },
       response
     );
     assert.equal(
+      // @ts-expect-error
       responseNextPage.result.state[0].index,
       "000B714B790C3C79FEE00D17C4DEB436B375466F29679447BA64F265FD63D731"
     );
@@ -35,13 +38,16 @@ export default <TestSuite>{
     mockRippled
   ) => {
     mockRippled.addResponse({ command: "ledger_data" }, rippledResponse);
+    // @ts-expect-error
     const response = await client.request({ command: "ledger_data" });
     const responseNextPage = await client.requestNextPage(
+      // @ts-expect-error
       { command: "ledger_data" },
       response
     );
     assert(!client.hasNextPage(responseNextPage));
     await assertRejects(
+      // @ts-expect-error
       client.requestNextPage({ command: "ledger_data" }, responseNextPage),
       Error,
       "response does not have a next page"
