@@ -35,7 +35,7 @@ module.exports.normal = function(request, options = {}) {
     ledger: BASE_LEDGER_INDEX
   });
 
-  return JSON.stringify({
+  return {
     id: request.id,
     status: 'success',
     type: 'response',
@@ -281,7 +281,7 @@ module.exports.normal = function(request, options = {}) {
       }
       ].filter(item => !request.peer || item.account === request.peer)
     }
-  });
+  };
 };
 
 module.exports.counterparty = function(request, options = {}) {
@@ -289,7 +289,7 @@ module.exports.counterparty = function(request, options = {}) {
     ledger: BASE_LEDGER_INDEX
   });
 
-  return JSON.stringify({
+  return {
     id: request.id,
     status: 'success',
     type: 'response',
@@ -347,7 +347,7 @@ module.exports.counterparty = function(request, options = {}) {
       }
       ]
     }
-  });
+  };
 };
 
 module.exports.manyItems = function(request, options = {}) {
@@ -357,7 +357,7 @@ module.exports.manyItems = function(request, options = {}) {
 
   const {marker, lines} = getMarkerAndLinesFromRequest(request);
 
-  return JSON.stringify({
+  return {
     id: request.id,
     status: 'success',
     type: 'response',
@@ -368,7 +368,7 @@ module.exports.manyItems = function(request, options = {}) {
       ledger_index: options.ledger,
       lines
     }
-  });
+  };
 };
 
 
@@ -377,7 +377,7 @@ module.exports.ripplingDisabled = function(request, options = {}) {
     ledger: BASE_LEDGER_INDEX
   });
 
-  return JSON.stringify({
+  return {
     id: request.id,
     status: 'success',
     type: 'response',
@@ -405,5 +405,5 @@ module.exports.ripplingDisabled = function(request, options = {}) {
             'quality_in': 0,
             'quality_out': 0}]
     }
-  });
+  };
 };
