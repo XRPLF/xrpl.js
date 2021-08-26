@@ -12,12 +12,7 @@ import { addressTests } from "../testUtils";
 const { sign: REQUEST_FIXTURES } = requests;
 const { sign: RESPONSE_FIXTURES } = responses;
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-describe("sign", () => {
+describe("client.sign", function () {
   beforeEach(setupClient.setup);
   afterEach(setupClient.teardown);
   it("sign", async function () {
@@ -60,14 +55,14 @@ describe("sign", () => {
     });
   });
 
-  it(" EscrowExecution", async function () {
+  it("EscrowExecution", async function () {
     const secret = "snoPBrXtMeMyMHUVTgbuqAfg1SUTb";
     const result = this.client.sign(REQUEST_FIXTURES.escrow.txJSON, secret);
     assert.deepEqual(result, RESPONSE_FIXTURES.escrow);
     schemaValidator.schemaValidate("sign", result);
   });
 
-  it(" signAs", async function () {
+  it("signAs", async function () {
     const txJSON = REQUEST_FIXTURES.signAs;
     const secret = "snoPBrXtMeMyMHUVTgbuqAfg1SUTb";
     const signature = this.client.sign(JSON.stringify(txJSON), secret, {
@@ -76,7 +71,7 @@ describe("sign", () => {
     assert.deepEqual(signature, RESPONSE_FIXTURES.signAs);
   });
 
-  it(" withKeypair", async function () {
+  it("withKeypair", async function () {
     const keypair = {
       privateKey:
         "00ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A",
@@ -244,7 +239,7 @@ describe("sign", () => {
   });
 
   addressTests.forEach(function (test) {
-    describe(test.type, () => {
+    describe(test.type, function () {
       it("throws when Fee exceeds maxFeeXRP (in drops)", async function () {
         const secret = "shsWGZcmZz6YsWWmcnpfr6fLTdtFV";
         const request = {

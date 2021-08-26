@@ -11,17 +11,12 @@ const { preparePayment: REQUEST_FIXTURES } = requests;
 const { preparePayment: RESPONSE_FIXTURES } = responses;
 const RECIPIENT_ADDRESS = "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo";
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-describe("preparePayment", () => {
+describe("client.preparePayment", function () {
   beforeEach(setupClient.setup);
   afterEach(setupClient.teardown);
 
   addressTests.forEach(function (test) {
-    describe(test.type, () => {
+    describe(test.type, function () {
       it("normal", async function () {
         this.mockRippled.addResponse("server_info", rippled.server_info.normal);
         this.mockRippled.addResponse("fee", rippled.fee);

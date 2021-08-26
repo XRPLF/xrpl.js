@@ -2,9 +2,9 @@ import { ValidationError } from "xrpl-local/common/errors";
 
 // import requests from '../fixtures/requests'
 import { xrpToDrops, ISOTimeToRippleTime } from "../../src/utils";
+import addresses from "../fixtures/addresses.json";
 import responses from "../fixtures/responses";
 import rippled from "../fixtures/rippled";
-import addresses from "../fixtures/addresses.json";
 import setupClient from "../setupClient";
 import { assertRejects, assertResultMatch } from "../testUtils";
 
@@ -17,12 +17,7 @@ export const config = {
   skipXAddress: true,
 };
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-describe("prepareTransaction", () => {
+describe("client.prepareTransaction", function () {
   beforeEach(setupClient.setup);
   afterEach(setupClient.teardown);
 

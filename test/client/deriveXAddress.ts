@@ -2,12 +2,7 @@ import { assert } from "chai";
 
 import { Client } from "../../src";
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-describe("client.deriveXAddress", () => {
+describe("client.deriveXAddress", function () {
   it("returns address for public key", function () {
     assert.equal(
       Client.deriveXAddress({

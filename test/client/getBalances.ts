@@ -1,7 +1,7 @@
 import responses from "../fixtures/responses";
 import rippled from "../fixtures/rippled";
-import setupClient from "../setupClient";
 import rippledAccountLines from "../fixtures/rippled/accountLines";
+import setupClient from "../setupClient";
 import { assertResultMatch, addressTests } from "../testUtils";
 
 /**
@@ -9,12 +9,12 @@ import { assertResultMatch, addressTests } from "../testUtils";
  * - Check out the "TestSuite" type for documentation on the interface.
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
-describe("getBalances", () => {
+describe("getBalances", function () {
   beforeEach(setupClient.setup);
   afterEach(setupClient.teardown);
 
   addressTests.forEach(function (test) {
-    describe(test.type, () => {
+    describe(test.type, function () {
       it("getBalances", async function () {
         this.mockRippled.addResponse(
           "account_info",

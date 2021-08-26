@@ -14,17 +14,12 @@ import { assertResultMatch, addressTests } from "../testUtils";
 // const {preparePayment: RESPONSE_FIXTURES} = responses
 // const ADDRESS = 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-describe("prepareTicket", () => {
+describe("client.prepareTicket", function () {
   beforeEach(setupClient.setup);
   afterEach(setupClient.teardown);
 
   addressTests.forEach(function (test) {
-    describe(test.type, () => {
+    describe(test.type, function () {
       it("creates a ticket successfully with a sequence number", async function () {
         this.mockRippled.addResponse("server_info", rippled.server_info.normal);
         this.mockRippled.addResponse("fee", rippled.fee);

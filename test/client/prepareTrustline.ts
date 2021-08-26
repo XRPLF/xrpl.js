@@ -6,17 +6,12 @@ import { assertRejects, assertResultMatch, addressTests } from "../testUtils";
 
 const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-describe("prepareTrustline", () => {
+describe("client.prepareTrustline", function () {
   beforeEach(setupClient.setup);
   afterEach(setupClient.teardown);
 
   addressTests.forEach(function (test) {
-    describe(test.type, () => {
+    describe(test.type, function () {
       it("simple", async function () {
         this.mockRippled.addResponse("server_info", rippled.server_info.normal);
         this.mockRippled.addResponse("fee", rippled.fee);

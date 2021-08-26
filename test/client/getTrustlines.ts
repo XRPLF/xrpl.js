@@ -5,17 +5,12 @@ import { assertResultMatch, addressTests } from "../testUtils";
 
 const { getTrustlines: RESPONSE_FIXTURES } = responses;
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-describe("getTrustlines", () => {
+describe("client.getTrustlines", function () {
   beforeEach(setupClient.setup);
   afterEach(setupClient.teardown);
 
   addressTests.forEach(function (test) {
-    describe(test.type, () => {
+    describe(test.type, function () {
       it("getTrustlines - filtered", async function () {
         this.mockRippled.addResponse("account_lines", rippled.normal);
         const options = { currency: "USD" };

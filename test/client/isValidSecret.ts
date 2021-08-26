@@ -2,7 +2,7 @@ import { assert } from "chai";
 
 import setupClient from "../setupClient";
 
-describe("isValidSecret", () => {
+describe("isValidSecret", function () {
   beforeEach(setupClient.setup);
   afterEach(setupClient.teardown);
 

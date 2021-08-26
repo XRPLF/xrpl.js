@@ -3,7 +3,7 @@ import { assert } from "chai";
 import addresses from "../fixtures/addresses.json";
 import setupClient from "../setupClient";
 
-describe("isValidAddress", () => {
+describe("isValidAddress", function () {
   beforeEach(setupClient.setup);
   afterEach(setupClient.teardown);
 

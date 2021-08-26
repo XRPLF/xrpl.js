@@ -82,18 +82,13 @@ function xrpRippledResponse(request: BookOffersRequest): object {
   throw new Error("unexpected end");
 }
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-describe("getOrderbook", () => {
+describe("client.getOrderbook", function () {
   beforeEach(setupClient.setup);
   afterEach(setupClient.teardown);
 
   addressTests.forEach(function (test) {
-    describe(test.type, () => {
-      it(" normal", async function () {
+    describe(test.type, function () {
+      it("normal", async function () {
         this.mockRippled.addResponse("book_offers", normalRippledResponse);
         const response = await this.client.getOrderbook(
           test.address,

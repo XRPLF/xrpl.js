@@ -1,8 +1,8 @@
 import { assert } from "chai";
 
-import { assertRejects } from "../testUtils";
 import rippled from "../fixtures/rippled";
 import setupClient from "../setupClient";
+import { assertRejects } from "../testUtils";
 
 const rippledResponse = function (request: Request): object {
   if ("marker" in request) {
@@ -11,12 +11,7 @@ const rippledResponse = function (request: Request): object {
   return rippled.ledger_data.first_page;
 };
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-describe("requestNextPage", () => {
+describe("client.requestNextPage", function () {
   beforeEach(setupClient.setup);
   afterEach(setupClient.teardown);
   it("requests the next page", async function () {

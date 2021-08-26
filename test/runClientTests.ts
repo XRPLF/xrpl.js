@@ -1,33 +1,18 @@
-import { Client } from "xrpl-local";
+import fs from "fs";
+import path from "path";
 
-import setupClient from "./setupClient";
-import { getAllPublicMethods, loadTestSuites } from "./testUtils";
+import { Client } from "xrpl-local";
 
 /**
  * Client Test Runner.
  *
- * Background: "test/api-test.ts" had hit 4000+ lines of test code and 300+
- * individual tests. Additionally, a new address format was added which
- * forced us to copy-paste duplicate the test file to test both the old forms
- * of address. This added a significant maintenance burden.
- *
- * This test runner allows us to split our tests by Client method, and
- * automatically load, validate, and run them. Each tests accepts arguments to
- * test with, which allows us to re-run tests across different data
- * (ex: different address styles).
- *
- * Additional benefits:
- *   - Throw errors when we detect the absence of tests.
- *   - Type the Client object under test and catch typing issues (currently untyped).
- *   - Sets the stage for more cleanup, like moving test-specific fixtures closer to their tests.
+ * Throws errors when we detect the absence of tests.
+ * Puts all the client methods under one "describe" umbrella.
  */
 describe("Client [Test Runner]", function () {
-  beforeEach(setupClient.setup);
-  afterEach(setupClient.teardown);
-
-  // Collect all the tests:
+  // doesn't need a functional client, just needs to instantiate to get a list of public methods
+  // (to determine what methods are missing from )
   const allPublicMethods = getAllPublicMethods(new Client("wss://"));
-  // doesn't need the client, just needs to instantiate to get public methods
 
   const allTestSuites = loadTestSuites();
 
@@ -38,9 +23,51 @@ describe("Client [Test Runner]", function () {
       // TODO: Once migration is complete, remove `.skip()` so that missing tests are reported as failures.
       it.skip(`${methodName} - no test suite found`, function () {
         throw new Error(
-          `Test file not found! Create file "test/client/${methodName}/index.ts".`
+          `Test file not found! Create file "test/client/${methodName}.ts".`
         );
       });
     }
   }
 });
+
+function getAllPublicMethods(client: Client) {
+  return Array.from(
+    new Set([
+      ...Object.getOwnPropertyNames(client),
+      ...Object.getOwnPropertyNames(Client.prototype),
+    ])
+  ).filter((key) => !key.startsWith("_")); // removes private methods
+}
+
+/**
+ * When the test suite is loaded, we represent it with the following
+ * data structure containing tests and metadata about the suite.
+ * If no test suite exists, we return this object with `isMissing: true`
+ * so that we can report it.
+ */
+interface LoadedTestSuite {
+  name: string;
+  tests: Array<[string, () => void | PromiseLike<void>]>;
+}
+
+function loadTestSuites(): LoadedTestSuite[] {
+  const allTests: any[] = fs.readdirSync(path.join(__dirname, "client"), {
+    encoding: "utf8",
+  });
+  return allTests
+    .map((methodName) => {
+      if (methodName.startsWith(".DS_Store")) {
+        return null;
+      }
+      if (methodName.endsWith(".ts")) {
+        methodName = methodName.slice(0, -3);
+      }
+      const testSuite = require(`./client/${methodName}`);
+      return {
+        name: methodName,
+        config: testSuite.config || {},
+        tests: Object.entries(testSuite.default || {}),
+      } as LoadedTestSuite;
+    })
+    .filter(Boolean) as LoadedTestSuite[];
+}
