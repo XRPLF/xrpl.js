@@ -24,7 +24,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.00001'
+      maxFee: '0.000012'
     }
     const result = await client.preparePaymentChannelCreate(
       address,
@@ -61,7 +61,7 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.00001',
+      maxFee: '0.000012',
       ticketSequence: 23
     }
     const result = await client.preparePaymentChannelCreate(

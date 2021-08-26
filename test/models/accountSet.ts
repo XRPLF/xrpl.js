@@ -15,7 +15,7 @@ describe('AccountSet Transaction Verification', function () {
         account = {
             TransactionType : "AccountSet",
             Account : "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            Fee : "10",
+            Fee : "12",
             Sequence : 5,
             Domain : "6578616D706C652E636F6D",
             SetFlag : 5,

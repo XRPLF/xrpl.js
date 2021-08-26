@@ -30,11 +30,11 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const expected = {
       txJSON:
-        '{"TransactionType":"TicketCreate", "TicketCount": 2, "Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Flags":2147483648,"LastLedgerSequence":8819954,"Sequence":23,"Fee":"10"}',
+        '{"TransactionType":"TicketCreate", "TicketCount": 2, "Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Flags":2147483648,"LastLedgerSequence":8819954,"Sequence":23,"Fee":"12"}',
       instructions: {
         maxLedgerVersion: 8819954,
         sequence: 23,
-        fee: '0.00001'
+        fee: '0.000012'
       }
     }
     const response = await client.prepareTicketCreate(address, 2)
@@ -48,17 +48,17 @@ export default <TestSuite>{
     mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const expected = {
       txJSON:
-        '{"TransactionType":"TicketCreate", "TicketCount": 1, "Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Flags":2147483648,"LastLedgerSequence":8819954,"Sequence": 0,"TicketSequence":23,"Fee":"10"}',
+        '{"TransactionType":"TicketCreate", "TicketCount": 1, "Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Flags":2147483648,"LastLedgerSequence":8819954,"Sequence": 0,"TicketSequence":23,"Fee":"12"}',
       instructions: {
         maxLedgerVersion: 8819954,
         ticketSequence: 23,
-        fee: '0.00001'
+        fee: '0.000012'
       }
     }
     const instructions = {
       maxLedgerVersion: 8819954,
       ticketSequence: 23,
-      fee: '0.00001'
+      fee: '0.000012'
     }
     const response = await client.prepareTicketCreate(address, 1, instructions)
     assertResultMatch(response, expected, 'prepare')

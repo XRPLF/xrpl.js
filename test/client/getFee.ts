@@ -11,17 +11,18 @@ export default <TestSuite>{
   'getFee': async (client, address, mockRippled) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const fee = await client.getFee()
-    assert.strictEqual(fee, '0.00001')
+    assert.strictEqual(fee, '0.000012')
   },
 
   'getFee default': async (client, address, mockRippled) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     client._feeCushion = undefined
     const fee = await client.getFee()
-    assert.strictEqual(fee, '0.00001')
+    assert.strictEqual(fee, '0.000012')
   },
 
   'getFee - high load_factor': async (client, address, mockRippled) => {
+    
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.highLoadFactor)
     const fee = await client.getFee()
     assert.strictEqual(fee, '2')
@@ -29,11 +30,11 @@ export default <TestSuite>{
 
   'getFee - high load_factor with custom maxFeeXRP': async (client, address, mockRippled) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.highLoadFactor)
-    // Ensure that overriding with high maxFeeXRP of '42950' causes no errors.
-    // (fee will actually be 42949.67296)
-    client._maxFeeXRP = '42950'
+    // Ensure that overriding with high maxFeeXRP of '51540' causes no errors.
+    // (fee will actually be 51539.607552)
+    client._maxFeeXRP = '51540'
     const fee = await client.getFee()
-    assert.strictEqual(fee, '42949.67296')
+    assert.strictEqual(fee, '51539.607552')
   },
 
   'getFee custom cushion': async (client, address, mockRippled) => {
@@ -55,6 +56,6 @@ export default <TestSuite>{
   'getFee reporting': async (client, address, mockRippled) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
     const fee = await client.getFee()
-    assert.strictEqual(fee, '0.00001')
+    assert.strictEqual(fee, '0.000012')
   }
 }

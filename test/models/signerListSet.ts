@@ -15,7 +15,7 @@ describe('SignerListSet Transaction Verification', function () {
             Flags: 0,
             TransactionType: "SignerListSet",
             Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            Fee: "10",
+            Fee: "12",
             SignerQuorum: 3,
             SignerEntries: [
                 {

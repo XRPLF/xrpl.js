@@ -82,7 +82,7 @@ export default <TestSuite>{
     const request = requests.prepareOrderCancellation.simple
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.00001',
+      maxFee: '0.000012',
       ticketSequence: 23
     }
     const result = await client.prepareOrderCancellation(

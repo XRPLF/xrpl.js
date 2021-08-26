@@ -9,7 +9,7 @@ async function getFee(this: Client, cushion?: number): Promise<string> {
     cushion = this._feeCushion
   }
   if (cushion == null) {
-    cushion = 1
+    cushion = 1.2
   }
 
   const serverInfo = (await this.request({command: "server_info"})).result.info

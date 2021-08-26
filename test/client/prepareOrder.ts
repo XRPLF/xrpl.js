@@ -75,7 +75,7 @@ export default <TestSuite>{
     const request = requests.prepareOrder.sell
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.00001',
+      maxFee: '0.000012',
       ticketSequence: 23
     }
     const result = await client.prepareOrder(address, request, localInstructions)

@@ -170,7 +170,7 @@ type MarkerResponse = AccountChannelsResponse
 
 class Client extends EventEmitter {
   // Factor to multiply estimated fee by to provide a cushion in case the
-  // required fee rises during submission of a transaction. Defaults to 1.
+  // required fee rises during submission of a transaction. Defaults to 1.2.
   _feeCushion: number
   // Maximum fee to use with transactions, in XRP. Must be a string-encoded
   // number. Defaults to '2'.
@@ -186,7 +186,7 @@ class Client extends EventEmitter {
       throw new ValidationError("server URI must start with `wss://`, `ws://`, `wss+unix://`, or `ws+unix://`.")
     }
 
-    this._feeCushion = options.feeCushion || 1
+    this._feeCushion = options.feeCushion || 1.2
     this._maxFeeXRP = options.maxFeeXRP || '2'
 
     this.connection = new Connection(server, options)
