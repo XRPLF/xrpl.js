@@ -1,20 +1,20 @@
 import {assert} from 'chai'
 import fs from 'fs'
 import {OfferCreate} from "../src/models/transactions"
-import {assertResultMatch} from "./utils"
+import {assertResultMatch} from './testUtils'
 import fixtures from './fixtures/rippled'
 import {ValidationError} from 'xrpl-local/common/errors'
 import {
   computeStateTreeHash,
   computeTransactionTreeHash,
-  computeAccountLedgerObjectID,
   computeTrustlineHash,
-  computeOrderID,
-  computeSignerListLedgerObjectID,
   computeEscrowHash,
   computePaymentChannelHash,
-  computeSignedTransactionHash
-} from "../src/common/hashes"
+  computeSignedTransactionHash,
+  computeAccountRootIndex,
+  computeOfferIndex,
+  computeSignerListIndex
+} from "../src/utils/hashes"
 import { encode } from 'ripple-binary-codec/dist'
 
 /**
@@ -23,7 +23,7 @@ import { encode } from 'ripple-binary-codec/dist'
 function createLedgerTest(ledgerIndex: number) {
   describe(String(ledgerIndex), function () {
     var path =
-      __dirname + '/fixtures/rippled/ledger-full-' + ledgerIndex + '.json'
+      __dirname + '/../fixtures/rippled/ledgerFull' + ledgerIndex + '.json'
 
     var ledgerRaw = fs.readFileSync(path, {encoding: 'utf8'})
     var ledgerJSON = JSON.parse(ledgerRaw)
@@ -62,7 +62,7 @@ describe('Ledger', function () {
       var account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
       var expectedEntryHash =
         '2B6AC232AA4C4BE41BF49D2459FA4A0347E1B543A4C92FCEE0821C0201E2E9A8'
-      var actualEntryHash = computeAccountLedgerObjectID(account)
+      var actualEntryHash = computeAccountRootIndex(account)
 
       assert.equal(actualEntryHash, expectedEntryHash)
     })
@@ -120,18 +120,18 @@ describe('Ledger', function () {
       var sequence = 137
       var expectedEntryHash =
         '03F0AED09DEEE74CEF85CD57A0429D6113507CF759C597BABB4ADB752F734CE3'
-      var actualEntryHash = computeOrderID(account, sequence)
+      var actualEntryHash = computeOfferIndex(account, sequence)
 
       assert.equal(actualEntryHash, expectedEntryHash)
     })
   })
 
-  describe('computeSignerListLedgerObjectID', function () {
+  describe('computeSignerListIndex', function () {
     it('will calculate the SignerList index for r32UufnaCGL82HubijgJGDmdE5hac7ZvLw', function () {
       var account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
       var expectedEntryHash =
         '778365D5180F5DF3016817D1F318527AD7410D83F8636CF48C43E8AF72AB49BF'
-      var actualEntryHash = computeSignerListLedgerObjectID(account)
+      var actualEntryHash = computeSignerListIndex(account)
       assert.equal(actualEntryHash, expectedEntryHash)
     })
   })

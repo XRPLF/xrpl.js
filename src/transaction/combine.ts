@@ -4,8 +4,8 @@ import BigNumber from 'bignumber.js'
 import {ValidationError} from '../common/errors'
 import {decodeAccountID} from 'ripple-address-codec'
 import {validate} from '../common'
-import {computeSignedTransactionHash} from '../common/hashes'
 import {JsonObject} from 'ripple-binary-codec/dist/types/serialized-type'
+import {computeSignedTransactionHash} from '../utils/hashes'
 
 /**
  * The transactions should all be equal except for the 'Signers' field. 
