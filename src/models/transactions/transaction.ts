@@ -54,11 +54,8 @@ export interface TransactionAndMetadata {
  * @returns {void}
  * @throws {ValidationError} When the Transaction is malformed.
  */
- export function verify(tx: Transaction) {
-    
-  if(!isEqual(decode(encode(tx)),tx))
-      throw new ValidationError(`Invalid Transaction: ${tx.TransactionType}`)
-
+ export function verify(tx: Transaction): void {
+   
   switch(tx.TransactionType){
 
     case 'AccountDelete':
@@ -138,7 +135,10 @@ export interface TransactionAndMetadata {
       break
 
     default:
-      throw new ValidationError(`Invalid TransactionType`)
+      throw new ValidationError(`Invalid field TransactionType`)
   }
+
+  if(!isEqual(decode(encode(tx)),tx))
+    throw new ValidationError(`Invalid Transaction: ${tx.TransactionType}`)
   
 }
