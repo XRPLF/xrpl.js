@@ -37,7 +37,6 @@ export default <TestSuite>{
     const result = await client.request({
       command: "account_objects",
       account: address,
-      invalid: "options",
     });
 
     assertResultMatch(
