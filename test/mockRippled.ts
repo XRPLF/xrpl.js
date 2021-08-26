@@ -59,6 +59,9 @@ export function createMockRippled(port) {
     })
   })
 
+  // Adds a mocked response
+  // If an object is passed in for `response`, then the response is static for the command
+  // If a function is passed in for `response`, then the response can be determined by the exact request shape
   mock.addResponse = (request: Request, response: object | ((r: Request) => object)) => {
     const command = request.command
     mock.responses[command] = response
