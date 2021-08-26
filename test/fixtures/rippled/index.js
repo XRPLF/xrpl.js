@@ -42,6 +42,7 @@ module.exports = {
     usd_xrp: require('./bookOffersUsdXrp'),
     xrp_usd: require('./bookOffersXrpUsd')
   },
+  ledger_current: require('./ledgerCurrent'),
   ledger_data: {
     first_page: require('./ledgerDataFirstPage'),
     last_page: require('./ledgerDataLastPage')

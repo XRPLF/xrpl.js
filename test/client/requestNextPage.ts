@@ -1,5 +1,14 @@
 import assert from 'assert-diff'
 import {assertRejects, TestSuite} from '../testUtils'
+import rippled from '../fixtures/rippled'
+
+const rippledResponse = function(request: Request) : object {
+  if ('marker' in request) {
+    return rippled.ledger_data.last_page
+  } else {
+    return rippled.ledger_data.first_page
+  }
+}
 
 /**
  * Every test suite exports their tests in the default object.
@@ -7,7 +16,8 @@ import {assertRejects, TestSuite} from '../testUtils'
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'requests the next page': async (client, address) => {
+  'requests the next page': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'ledger_data'}, rippledResponse)
     // @ts-ignore
     const response = await client.request({command: 'ledger_data'})
     const responseNextPage = await client.requestNextPage(
@@ -22,7 +32,8 @@ export default <TestSuite>{
     )
   },
 
-  'rejects when there are no more pages': async (client, address) => {
+  'rejects when there are no more pages': async (client, address, mockRippled) => {
+    mockRippled.addResponse({command: 'ledger_data'}, rippledResponse)
     // @ts-ignore
     const response = await client.request({command: 'ledger_data'})
     const responseNextPage = await client.requestNextPage(

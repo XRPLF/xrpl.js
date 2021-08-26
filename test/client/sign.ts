@@ -60,6 +60,9 @@ export default <TestSuite>{
     mockRippled
   ) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
+    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const payment = {
       source: {
@@ -168,6 +171,9 @@ export default <TestSuite>{
 
   'succeeds - prepared payment': async (client, address, mockRippled) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
+    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const payment = await client.preparePayment(address, {
       source: {
         address: address,
@@ -244,6 +250,9 @@ export default <TestSuite>{
     mockRippled
   ) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
+    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const payment = await client.preparePayment(address, {
       source: {
         address: address,
@@ -272,6 +281,9 @@ export default <TestSuite>{
     mockRippled
   ) => {
     mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse({command: 'fee'}, rippled.fee)
+    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
+    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
     const order = {
       direction: 'sell',
       quantity: {
