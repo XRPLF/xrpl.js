@@ -16,7 +16,7 @@ function getDefaultConfiguration() {
     filename: `ripple-lib.default.js`,
   },
   plugins: [
-    new webpack.NormalModuleReplacementPlugin(/^ws$/, './wswrapper'),
+    new webpack.NormalModuleReplacementPlugin(/^ws$/, './wsWrapper'),
     new webpack.NormalModuleReplacementPlugin(/^\.\/wallet$/, './wallet-web'),
     new webpack.NormalModuleReplacementPlugin(/^.*setup-api$/, './setup-api-web'),
     new webpack.ProvidePlugin({ process: 'process/browser' }),

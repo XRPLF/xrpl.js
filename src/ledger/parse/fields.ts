@@ -1,4 +1,4 @@
-import * as _ from 'lodash'
+import _ from 'lodash'
 import BigNumber from 'bignumber.js'
 import {constants} from '../../common'
 const AccountFields = constants.AccountFields
