@@ -20,7 +20,7 @@ describe('Browser Tests', function () {
       })
 
       expect(fails).to.equal('failures: 0')
-      expect(passes).to.equal('passes: 0')
+      expect(passes).to.not.equal('passes: 0')
     } catch (err) {
       console.log(err)
       assert(false)
