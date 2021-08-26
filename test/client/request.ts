@@ -9,10 +9,7 @@ import { TestSuite, assertResultMatch } from "../testUtils";
  */
 export default <TestSuite>{
   "request account_objects": async (client, address, mockRippled) => {
-    mockRippled.addResponse(
-      { command: "account_objects", account: address },
-      rippled.account_objects.normal
-    );
+    mockRippled.addResponse("account_objects", rippled.account_objects.normal);
     const result = await client.request({
       command: "account_objects",
       account: address,
@@ -30,10 +27,8 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse(
-      { command: "account_objects", account: address },
-      rippled.account_objects.normal
-    );
+    mockRippled.addResponse("account_objects", rippled.account_objects.normal);
+    // @ts-ignore Intentionally no local validation of these options
     const result = await client.request({
       command: "account_objects",
       account: address,

@@ -11,20 +11,11 @@ const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  async prepareOrderCancellation(client, address, mockRippled) {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+  prepareOrderCancellation: async (client, address, mockRippled) => {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const request = requests.prepareOrderCancellation.simple;
     const result = await client.prepareOrderCancellation(
       address,
@@ -39,19 +30,10 @@ export default <TestSuite>{
   },
 
   "no instructions": async (client, address, mockRippled) => {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const request = requests.prepareOrderCancellation.simple;
     const result = await client.prepareOrderCancellation(address, request);
     assertResultMatch(
@@ -62,19 +44,10 @@ export default <TestSuite>{
   },
 
   "with memos": async (client, address, mockRippled) => {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const request = requests.prepareOrderCancellation.withMemos;
     const result = await client.prepareOrderCancellation(address, request);
     assertResultMatch(
@@ -84,23 +57,15 @@ export default <TestSuite>{
     );
   },
 
-  async invalid(client, address, mockRippled) {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
+  invalid: async (client, address, mockRippled) => {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
+    const request = Object.assign(
+      {},
+      requests.prepareOrderCancellation.withMemos
     );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
-    const request = {
-      ...requests.prepareOrderCancellation.withMemos,
-    };
     delete request.orderSequence; // Make invalid
 
     await assertRejects(
@@ -111,19 +76,10 @@ export default <TestSuite>{
   },
 
   "with ticket": async (client, address, mockRippled) => {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const request = requests.prepareOrderCancellation.simple;
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,

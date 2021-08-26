@@ -1,6 +1,6 @@
 import _ from "lodash";
 import net from "net";
-import assert from "assert-diff";
+import { assert } from "chai";
 import setupClient from "./setupClient";
 import { Client } from "xrpl-local";
 import { ignoreWebSocketDisconnect } from "./testUtils";
@@ -496,7 +496,7 @@ describe("Connection", function () {
 
   it("propagates RippledError data", function (done) {
     const request = { command: "subscribe", streams: "validations" };
-    this.mockRippled.addResponse(request, rippled.subscribe.error);
+    this.mockRippled.addResponse(request.command, rippled.subscribe.error);
 
     this.client.request(request).catch((error) => {
       assert.strictEqual(error.name, "RippledError");

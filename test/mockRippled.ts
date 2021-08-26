@@ -77,10 +77,12 @@ export function createMockRippled(port) {
   // If an object is passed in for `response`, then the response is static for the command
   // If a function is passed in for `response`, then the response can be determined by the exact request shape
   mock.addResponse = (
-    request: Request,
+    command: string,
     response: object | ((r: Request) => object)
   ) => {
-    const command = request.command;
+    if (typeof command !== "string") {
+      throw new Error("command is not a string");
+    }
     if (
       typeof response === "object" &&
       !("type" in response) &&

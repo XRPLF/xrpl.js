@@ -11,20 +11,11 @@ const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  async prepareEscrowCancellation(client, address, mockRippled) {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+  prepareEscrowCancellation: async (client, address, mockRippled) => {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const result = await client.prepareEscrowCancellation(
       address,
       requests.prepareEscrowCancellation.normal,
@@ -42,19 +33,10 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const result = await client.prepareEscrowCancellation(
       address,
       requests.prepareEscrowCancellation.memos
@@ -67,19 +49,10 @@ export default <TestSuite>{
   },
 
   "with ticket": async (client, address, mockRippled) => {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: "0.000012",

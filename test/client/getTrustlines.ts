@@ -12,7 +12,7 @@ const { getTrustlines: RESPONSE_FIXTURES } = responses;
  */
 export default <TestSuite>{
   "getTrustlines - filtered": async (client, address, mockRippled) => {
-    mockRippled.addResponse({ command: "account_lines" }, rippled.normal);
+    mockRippled.addResponse("account_lines", rippled.normal);
     const options = { currency: "USD" };
     const result = await client.getTrustlines(address, options);
     assertResultMatch(result, RESPONSE_FIXTURES.filtered, "getTrustlines");
@@ -23,7 +23,7 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse({ command: "account_lines" }, rippled.manyItems);
+    mockRippled.addResponse("account_lines", rippled.manyItems);
     const options = { limit: 401 };
     const result = await client.getTrustlines(address, options);
     assertResultMatch(
@@ -34,7 +34,7 @@ export default <TestSuite>{
   },
 
   "getTrustlines - no options": async (client, address, mockRippled) => {
-    mockRippled.addResponse({ command: "account_lines" }, rippled.normal);
+    mockRippled.addResponse("account_lines", rippled.normal);
     await client.getTrustlines(address);
   },
 
@@ -43,10 +43,7 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse(
-      { command: "account_lines" },
-      rippled.ripplingDisabled
-    );
+    mockRippled.addResponse("account_lines", rippled.ripplingDisabled);
     const result = await client.getTrustlines(address);
     assertResultMatch(
       result,
@@ -60,7 +57,7 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse({ command: "account_lines" }, rippled.manyItems);
+    mockRippled.addResponse("account_lines", rippled.manyItems);
     const result = await client.getTrustlines(addresses.FOURTH_ACCOUNT, {
       ledgerVersion: 5,
     });

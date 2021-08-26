@@ -17,7 +17,8 @@ const rippledResponse = function (request: Request): object {
  */
 export default <TestSuite>{
   "requests the next page": async (client, address, mockRippled) => {
-    mockRippled.addResponse({ command: "ledger_data" }, rippledResponse);
+    mockRippled.addResponse("ledger_data", rippledResponse);
+    // @ts-ignore
     const response = await client.request({ command: "ledger_data" });
     const responseNextPage = await client.requestNextPage(
       { command: "ledger_data" },
@@ -34,7 +35,8 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse({ command: "ledger_data" }, rippledResponse);
+    mockRippled.addResponse("ledger_data", rippledResponse);
+    // @ts-ignore
     const response = await client.request({ command: "ledger_data" });
     const responseNextPage = await client.requestNextPage(
       { command: "ledger_data" },
