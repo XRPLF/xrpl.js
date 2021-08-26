@@ -494,6 +494,7 @@ describe('Connection', function () {
   it('propagates RippledError data', function (done) {
     const request = {command: 'subscribe', streams: 'validations'}
     this.mockRippled.addResponse(request, rippled.subscribe.error)
+
     this.client.request(request).catch((error) => {
       assert.strictEqual(error.name, 'RippledError')
       assert.strictEqual(error.data.error, 'invalidParams')
