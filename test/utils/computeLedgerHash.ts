@@ -100,7 +100,7 @@ describe('Compute Ledger Hash', function () {
     testCompute(ledger, 'rawState property is missing from the ledger')
   })
 
-  it('wrong hash', ()  => {
+  it('wrong hash', () => {
     const ledger = getNewLedger()
     assertResultMatch(ledger, responses.getLedger.full, 'getLedger')
     const newLedger = {
@@ -114,7 +114,7 @@ describe('Compute Ledger Hash', function () {
     }, /does not match computed hash of state/)
   })
 
-  it('computeLedgerHash', ()  => {
+  it('computeLedgerHash', () => {
     const header = REQUEST_FIXTURES.header
     const ledgerHash = computeLedgerHeaderHash(header)
     assert.strictEqual(
@@ -141,7 +141,6 @@ describe('Compute Ledger Hash', function () {
       transactionHash:
         '325EACC5271322539EEEC2D6A5292471EF1B3E72AE7180533EFC3B8F0AD435C9'
     })
-    header.rawTransactions = JSON.stringify(REQUEST_FIXTURES.transactions)
     assert.throws(() => computeLedgerHeaderHash(header))
   })
 })
