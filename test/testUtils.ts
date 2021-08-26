@@ -44,9 +44,9 @@ interface LoadedTestSuite {
  * Check the response against the expected result. Optionally validate
  * that response against a given schema as well.
  *
- * @param response
- * @param expected
- * @param schemaName
+ * @param response Response received from the method.
+ * @param expected Expected response from the method.
+ * @param schemaName Name of the schema used to validate the shape of the response.
  */
 export function assertResultMatch(
   response: any,
