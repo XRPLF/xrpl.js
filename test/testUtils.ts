@@ -78,9 +78,9 @@ export function assertResultMatch(
 /**
  * Check that the promise rejects with an expected error.
  *
- * @param promise
- * @param instanceOf
- * @param message
+ * @param promise The promise returned by the method.
+ * @param instanceOf Expected error type that the method will throw.
+ * @param message Expected error message/substring of the error message.
  */
 export async function assertRejects(
   promise: PromiseLike<any>,
