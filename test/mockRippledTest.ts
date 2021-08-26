@@ -1,3 +1,4 @@
+import { assert } from 'chai'
 import { RippledError } from '../src/common/errors'
 import setupClient from './setupClient'
 import { assertRejects } from './testUtils'
@@ -11,13 +12,16 @@ describe('mock rippled tests', () => {
   })
 
   it('provide bad response shape', async function () {
-    await assertRejects(
-      this.mockRippled.addResponse({command: 'account_info'}, {data: {}}),
-      RippledError
-    )
+    try {
+      this.mockRippled.addResponse({command: 'account_info'}, {data: {}})
+      assert.fail('Expected an error to be thrown')
+    } catch (error) {
+      assert(error instanceof Error, error.message)
+    }
   })
 
   it('provide bad response shape in function', async function () {
+    this.mockRippled.suppressOutput = true
     this.mockRippled.addResponse({command: 'account_info'}, request => {return {data: request}})
     await assertRejects(
       this.client.request({command: 'account_info', account: ''}),

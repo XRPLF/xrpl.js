@@ -311,9 +311,6 @@ export class Connection extends EventEmitter {
         this.emit("error", "badMessage", error.message, message);
       }
     }
-    if (data.type == null && data.error == null) {
-      this.emit("error", "badMessage", "bad message format", "");
-    }
   }
 
   private get _state() {

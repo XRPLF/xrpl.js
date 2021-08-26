@@ -1,14 +1,19 @@
-import net from "net";
-
-import { assert } from "chai";
 import _ from "lodash";
-
-import { Client } from "xrpl-local";
-import { Connection } from "xrpl-local/client";
-
-import rippled from "./fixtures/rippled";
+import net from "net";
+import assert from "assert-diff";
 import setupClient from "./setupClient";
+import { Client } from "xrpl-local";
 import { ignoreWebSocketDisconnect } from "./testUtils";
+import { Connection } from "xrpl-local/client";
+import rippled from "./fixtures/rippled";
+import {
+  ConnectionError,
+  DisconnectedError,
+  NotConnectedError,
+  ResponseFormatError,
+  RippleError,
+  TimeoutError,
+} from "../src/common/errors";
 
 const TIMEOUT = 200000; // how long before each test case times out
 const isBrowser = (process as any).browser;
@@ -109,7 +114,7 @@ describe("Connection", function () {
       };
       const connection = new Connection(this.client.connection._url, options);
       connection.connect().catch((err) => {
-        assert(err instanceof this.client.errors.NotConnectedError);
+        assert(err instanceof NotConnectedError);
       });
     }, done);
   });
@@ -134,7 +139,7 @@ describe("Connection", function () {
         assert(false, "Should throw NotConnectedError");
       })
       .catch((error) => {
-        assert(error instanceof this.client.errors.NotConnectedError);
+        assert(error instanceof NotConnectedError);
       });
   });
 
@@ -151,29 +156,24 @@ describe("Connection", function () {
     const connection = new Connection("ws://testripple.circleci.com:129");
     connection.on("error", done);
     connection.connect().catch((error) => {
-      assert(error instanceof this.client.errors.NotConnectedError);
+      assert(error instanceof NotConnectedError);
       done();
     });
   });
 
   it("DisconnectedError", async function () {
-    this.mockRippled.suppressOutput = true;
-    this.mockRippled.on(`request_server_info`, function (request, conn) {
-      assert.strictEqual(request.command, "server_info");
-      conn.close();
-    });
     return this.client
-      .request({ command: "server_info" })
+      .request({ command: "test_command", data: { closeServer: true } })
       .then(() => {
         assert(false, "Should throw DisconnectedError");
       })
       .catch((error) => {
-        assert(error instanceof this.client.errors.DisconnectedError);
+        assert(error instanceof DisconnectedError);
       });
   });
 
   it("TimeoutError", function () {
-    this.client.connection._ws.send = function (message, callback) {
+    this.client.connection._ws.send = function (_0, _1, callback) {
       callback(null);
     };
     const request = { command: "server_info" };
@@ -183,12 +183,12 @@ describe("Connection", function () {
         assert(false, "Should throw TimeoutError");
       })
       .catch((error) => {
-        assert(error instanceof this.client.errors.TimeoutError);
+        assert(error instanceof TimeoutError);
       });
   });
 
   it("DisconnectedError on send", function () {
-    this.client.connection._ws.send = function (message, callback) {
+    this.client.connection._ws.send = function (_0, _1, callback) {
       callback({ message: "not connected" });
     };
     return this.client
@@ -197,7 +197,7 @@ describe("Connection", function () {
         assert(false, "Should throw DisconnectedError");
       })
       .catch((error) => {
-        assert(error instanceof this.client.errors.DisconnectedError);
+        assert(error instanceof DisconnectedError);
         assert.strictEqual(error.message, "not connected");
       });
   });
@@ -210,7 +210,7 @@ describe("Connection", function () {
     // stub _onOpen to only run logic relevant to test case
     this.client.connection._onOpen = () => {
       // overload websocket send on open when _ws exists
-      this.client.connection._ws.send = function (data, options, cb) {
+      this.client.connection._ws.send = function (_0, _1, _2) {
         // recent ws throws this error instead of calling back
         throw new Error("WebSocket is not open: readyState 0 (CONNECTING)");
       };
@@ -221,7 +221,7 @@ describe("Connection", function () {
     try {
       await this.client.connect();
     } catch (error) {
-      assert(error instanceof this.client.errors.DisconnectedError);
+      assert(error instanceof DisconnectedError);
       assert.strictEqual(
         error.message,
         "WebSocket is not open: readyState 0 (CONNECTING)"
@@ -239,7 +239,7 @@ describe("Connection", function () {
         assert(false, "Should throw ResponseFormatError");
       })
       .catch((error) => {
-        assert(error instanceof this.client.errors.ResponseFormatError);
+        assert(error instanceof ResponseFormatError);
       });
   });
 
@@ -407,7 +407,7 @@ describe("Connection", function () {
       })
       .catch((error) => {
         assert(
-          error instanceof this.client.errors.ConnectionError,
+          error instanceof ConnectionError,
           "Should throw ConnectionError"
         );
       });
@@ -418,7 +418,7 @@ describe("Connection", function () {
       new Client({
         servers: ["wss://server1.com", "wss://server2.com"],
       } as any);
-    }, this.client.errors.RippleError);
+    }, RippleError);
   });
 
   it("connect throws error", function (done) {

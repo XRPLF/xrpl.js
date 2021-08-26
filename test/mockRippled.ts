@@ -86,7 +86,6 @@ export function createMockRippled(port) {
       !("type" in response) &&
       !("error" in response)
     ) {
-      console.log(new Error("") instanceof Error);
       throw new Error(
         "Bad response format. Must contain `type` or `error`. " +
           JSON.stringify(response)
@@ -144,6 +143,8 @@ export function createMockRippled(port) {
           result: {},
         })
       );
+    } else if (request.data.closeServer) {
+      conn.close();
     }
   };
 

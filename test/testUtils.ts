@@ -91,7 +91,6 @@ export async function assertRejects(
     await promise;
     assert(false, "Expected an error to be thrown");
   } catch (error) {
-    console.log(error);
     assert(error instanceof instanceOf, error.message);
     if (typeof message === "string") {
       assert.strictEqual(error.message, message);
