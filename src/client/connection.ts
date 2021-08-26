@@ -431,9 +431,9 @@ export class Connection extends EventEmitter {
       clearTimeout(connectionTimeoutID);
       // Add new, long-term connected listeners for messages and errors
       this._ws.on("message", (message: string) => this._onMessage(message));
-      this._ws.on("error", (error) => {
-        this.emit("error", "websocket", error.message, error);
-      });
+      this._ws.on("error", (error) =>
+        this.emit("error", "websocket", error.message, error)
+      );
       // Handle a closed connection: reconnect if it was unexpected
       this._ws.once("close", (code, reason) => {
         if (this._ws == null) {
