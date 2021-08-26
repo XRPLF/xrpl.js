@@ -1,4 +1,4 @@
-import * as _ from 'lodash'
+import _ from 'lodash'
 import * as assert from 'assert'
 import {constants} from '../../common'
 const AccountFlags = constants.AccountFlags

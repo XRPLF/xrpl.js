@@ -13,7 +13,7 @@
   "jsdelivr": "build/ripple-latest-min.js",
   "types": "dist/npm/index.d.ts",
   "browser": {
-    "ws": "./dist/npm/client/wswrapper.js",
+    "ws": "./dist/npm/client/wsWrapper.js",
     "https-proxy-agent": false
   },
   "directories": {

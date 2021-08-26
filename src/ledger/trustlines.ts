@@ -1,4 +1,4 @@
-import * as _ from 'lodash'
+import _ from 'lodash'
 import {validate, ensureClassicAddress} from '../common'
 import parseAccountTrustline from './parse/account-trustline'
 import {Client} from '..'
@@ -29,7 +29,7 @@ async function getTrustlines(
   address = ensureClassicAddress(address)
 
   // 2. Make Request
-  const responses = await this._requestAll({command: 'account_lines',
+  const responses = await this.requestAll({command: 'account_lines',
     account: address,
     ledger_index: options.ledgerVersion ?? 'validated',
     limit: options.limit,

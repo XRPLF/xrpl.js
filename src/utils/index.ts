@@ -1,3 +1,9 @@
+import _ from 'lodash'
+import BigNumber from 'bignumber.js'
+import {RippledAmount} from '../common/types/objects'
+import {ValidationError} from '../common/errors'
+import {xAddressToClassicAddress} from 'ripple-address-codec'
+
 import { deriveKeypair, deriveAddress, deriveXAddress } from './derive'
 import computeLedgerHeaderHash from './ledgerHash'
 import signPaymentChannelClaim from './signPaymentChannelClaim'
@@ -17,12 +23,6 @@ import {
     computePaymentChannelHash,
 } from './hashes'
 import { generateXAddress } from './generateAddress'
-
-import _ from 'lodash'
-import BigNumber from 'bignumber.js'
-import {RippledAmount} from '../common/types/objects'
-import {ValidationError} from '../common/errors'
-import {xAddressToClassicAddress} from 'ripple-address-codec'
 
 function isValidSecret(secret: string): boolean {
   try {
