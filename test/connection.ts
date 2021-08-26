@@ -197,7 +197,6 @@ describe("Connection", function () {
         assert(false, "Should throw DisconnectedError");
       })
       .catch((error) => {
-        console.log(error);
         assert(error instanceof this.client.errors.DisconnectedError);
         assert.strictEqual(error.message, "not connected");
       });

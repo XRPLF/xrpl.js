@@ -52,7 +52,8 @@ export default <TestSuite>{
       address,
       requests.prepareSettings.domain,
       {
-        maxLedgerVersion: undefined,
+        // @ts-expect-error
+        maxLedgerVersion: null,
       }
     );
     assertResultMatch(
