@@ -155,7 +155,7 @@ export function loadTestSuites(): LoadedTestSuite[] {
  * care about the response and plan to teardown the test before the response
  * has come back.
  *
- * @param error
+ * @param error Thrown error.
  */
 export function ignoreWebSocketDisconnect(error: Error): void {
   if (error.message === 'websocket was closed') {
