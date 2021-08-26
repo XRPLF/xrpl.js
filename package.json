@@ -80,7 +80,7 @@
     "build:snippets": "tsc --build ./snippets/tsconfig.json",
     "build:lib": "tsc --build tsconfig.build.json",
     "build:web": "webpack",
-    "build": "yarn build:schemas && yarn build:lib && yarn build:snippets",
+    "build": "yarn build:schemas && yarn build:lib && yarn build:snippets && yarn build:web",
     "analyze": "yarn build:web --analyze",
     "watch": "yarn build:lib --watch",
     "clean": "rm -rf dist",

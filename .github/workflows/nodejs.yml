@@ -10,22 +10,22 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-lint:
-    runs-on: ubuntu-latest
+  # build-and-lint:
+  #   runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [14.x]
+  #   strategy:
+  #     matrix:
+  #       node-version: [14.x]
 
-    steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: yarn install
-    - run: yarn lint
-    - run: yarn build
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Use Node.js ${{ matrix.node-version }}
+  #     uses: actions/setup-node@v1
+  #     with:
+  #       node-version: ${{ matrix.node-version }}
+  #   - run: yarn install
+  #   - run: yarn lint
+  #   - run: yarn build
 
   unit:
     runs-on: ubuntu-latest

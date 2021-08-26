@@ -1,5 +1,4 @@
-import assert from 'assert'
-
+import {expect, assert} from 'chai'
 import puppeteer from 'puppeteer'
 
 describe('Browser Tests', function () {
@@ -20,8 +19,8 @@ describe('Browser Tests', function () {
         return document.querySelector('.passes').textContent
       })
 
-      assert.equal(fails, 'failures: 0')
-      assert.notEqual(passes, 'passes: 0')
+      expect(fails).to.equal('failures: 0')
+      expect(passes).to.equal('passes: 0')
     } catch (err) {
       console.log(err)
       assert(false)
