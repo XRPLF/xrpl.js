@@ -1,10 +1,10 @@
-import {ValidationError} from '../../common/errors'
+import { ValidationError } from "../../common/errors";
 
-import {BaseTransaction, verifyBaseTransaction} from './common'
+import { BaseTransaction, verifyBaseTransaction } from "./common";
 
 export interface SetRegularKey extends BaseTransaction {
-  TransactionType: 'SetRegularKey'
-  RegularKey?: string
+  TransactionType: "SetRegularKey";
+  RegularKey?: string;
 }
 
 /**
@@ -13,9 +13,9 @@ export interface SetRegularKey extends BaseTransaction {
  * @throws {ValidationError} When the SetRegularKey is malformed.
  */
 export function verifySetRegularKey(tx: SetRegularKey): void {
-  verifyBaseTransaction(tx)
+  verifyBaseTransaction(tx);
 
-  if (tx.RegularKey !== undefined && typeof tx.RegularKey !== 'string') {
-    throw new ValidationError('SetRegularKey: RegularKey must be a string')
+  if (tx.RegularKey !== undefined && typeof tx.RegularKey !== "string") {
+    throw new ValidationError("SetRegularKey: RegularKey must be a string");
   }
 }

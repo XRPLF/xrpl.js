@@ -1,23 +1,27 @@
-import _ from 'lodash'
-import * as assert from 'assert'
+import * as assert from "assert";
 
-import {Client, dropsToXrp} from '..'
-import {Connection} from '../client'
-import * as common from '../common'
-import {Issue} from '../common/types/objects'
-import {AccountInfoRequest} from '../models/methods'
-import {FormattedTransactionType} from '../transaction/types'
+import _ from "lodash";
+
+import { Client, dropsToXrp } from "..";
+import { Connection } from "../client";
+import * as common from "../common";
+import { Issue } from "../common/types/objects";
+import { AccountInfoRequest } from "../models/methods";
+import { FormattedTransactionType } from "../transaction/types";
 
 export interface RecursiveData {
-  marker: string
-  results: any[]
+  marker: string;
+  results: any[];
 }
 
-export type Getter = (marker?: string, limit?: number) => Promise<RecursiveData>
+export type Getter = (
+  marker?: string,
+  limit?: number
+) => Promise<RecursiveData>;
 
 function clamp(value: number, min: number, max: number): number {
-  assert.ok(min <= max, 'Illegal clamp bounds')
-  return Math.min(Math.max(value, min), max)
+  assert.ok(min <= max, "Illegal clamp bounds");
+  return Math.min(Math.max(value, min), max);
 }
 
 async function getXRPBalance(
@@ -26,12 +30,12 @@ async function getXRPBalance(
   ledgerVersion?: number
 ): Promise<string> {
   const request: AccountInfoRequest = {
-    command: 'account_info',
+    command: "account_info",
     account: address,
-    ledger_index: ledgerVersion
-  }
-  const data = await client.request(request)
-  return dropsToXrp(data.result.account_data.Balance)
+    ledger_index: ledgerVersion,
+  };
+  const data = await client.request(request);
+  return dropsToXrp(data.result.account_data.Balance);
 }
 
 // If the marker is omitted from a response, you have reached the end
@@ -40,48 +44,48 @@ async function getRecursiveRecur(
   marker: string | undefined,
   limit: number
 ): Promise<any[]> {
-  const data = await getter(marker, limit)
-  const remaining = limit - data.results.length
+  const data = await getter(marker, limit);
+  const remaining = limit - data.results.length;
   if (remaining > 0 && data.marker != null) {
     return getRecursiveRecur(getter, data.marker, remaining).then((results) =>
       data.results.concat(results)
-    )
+    );
   }
-  return data.results.slice(0, limit)
+  return data.results.slice(0, limit);
 }
 
 function getRecursive(getter: Getter, limit?: number): Promise<any[]> {
-  return getRecursiveRecur(getter, undefined, limit || Infinity)
+  return getRecursiveRecur(getter, undefined, limit || Infinity);
 }
 
 function renameCounterpartyToIssuer<T>(
-  obj: T & {counterparty?: string; issuer?: string}
-): T & {issuer?: string} {
+  obj: T & { counterparty?: string; issuer?: string }
+): T & { issuer?: string } {
   const issuer =
     obj.counterparty != null
       ? obj.counterparty
       : obj.issuer != null
       ? obj.issuer
-      : undefined
-  const withIssuer = {...obj, issuer}
-  delete withIssuer.counterparty
-  return withIssuer
+      : undefined;
+  const withIssuer = { ...obj, issuer };
+  delete withIssuer.counterparty;
+  return withIssuer;
 }
 
 export interface RequestBookOffersArgs {
-  taker_gets: Issue
-  taker_pays: Issue
+  taker_gets: Issue;
+  taker_pays: Issue;
 }
 
 function renameCounterpartyToIssuerInOrder(order: RequestBookOffersArgs) {
-  const taker_gets = renameCounterpartyToIssuer(order.taker_gets)
-  const taker_pays = renameCounterpartyToIssuer(order.taker_pays)
-  const changes = {taker_gets, taker_pays}
-  return {...order, ..._.omitBy(changes, (value) => value == null)}
+  const taker_gets = renameCounterpartyToIssuer(order.taker_gets);
+  const taker_pays = renameCounterpartyToIssuer(order.taker_pays);
+  const changes = { taker_gets, taker_pays };
+  return { ...order, ..._.omitBy(changes, (value) => value == null) };
 }
 
 function signum(num) {
-  return num === 0 ? 0 : num > 0 ? 1 : -1
+  return num === 0 ? 0 : num > 0 ? 1 : -1;
 }
 
 /**
@@ -98,12 +102,12 @@ function compareTransactions(
   second: FormattedTransactionType
 ): number {
   if (!first.outcome || !second.outcome) {
-    return 0
+    return 0;
   }
   if (first.outcome.ledgerVersion === second.outcome.ledgerVersion) {
-    return signum(first.outcome.indexInLedger - second.outcome.indexInLedger)
+    return signum(first.outcome.indexInLedger - second.outcome.indexInLedger);
   }
-  return first.outcome.ledgerVersion < second.outcome.ledgerVersion ? -1 : 1
+  return first.outcome.ledgerVersion < second.outcome.ledgerVersion ? -1 : 1;
 }
 
 async function isPendingLedgerVersion(
@@ -111,11 +115,11 @@ async function isPendingLedgerVersion(
   maxLedgerVersion?: number
 ): Promise<boolean> {
   const response = await client.request({
-    command: 'ledger',
-    ledger_index: 'validated'
-  })
-  const ledgerVersion = response.result.ledger_index
-  return ledgerVersion < (maxLedgerVersion || 0)
+    command: "ledger",
+    ledger_index: "validated",
+  });
+  const ledgerVersion = response.result.ledger_index;
+  return ledgerVersion < (maxLedgerVersion || 0);
 }
 
 async function ensureLedgerVersion(
@@ -127,14 +131,14 @@ async function ensureLedgerVersion(
     options.ledgerVersion != null &&
     options.ledgerVersion !== null
   ) {
-    return Promise.resolve(options)
+    return Promise.resolve(options);
   }
   const response = await this.request({
-    command: 'ledger',
-    ledger_index: 'validated'
-  })
-  const ledgerVersion = response.result.ledger_index
-  return {...options, ledgerVersion}
+    command: "ledger",
+    ledger_index: "validated",
+  });
+  const ledgerVersion = response.result.ledger_index;
+  return { ...options, ledgerVersion };
 }
 
 export {
@@ -147,5 +151,5 @@ export {
   isPendingLedgerVersion,
   clamp,
   common,
-  Connection
-}
+  Connection,
+};

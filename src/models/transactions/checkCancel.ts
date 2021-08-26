@@ -1,10 +1,10 @@
-import {ValidationError} from '../../common/errors'
+import { ValidationError } from "../../common/errors";
 
-import {BaseTransaction, verifyBaseTransaction} from './common'
+import { BaseTransaction, verifyBaseTransaction } from "./common";
 
 export interface CheckCancel extends BaseTransaction {
-  TransactionType: 'CheckCancel'
-  CheckID: string
+  TransactionType: "CheckCancel";
+  CheckID: string;
 }
 
 /**
@@ -15,9 +15,9 @@ export interface CheckCancel extends BaseTransaction {
  * @throws When the CheckCancel is Malformed.
  */
 export function verifyCheckCancel(tx: CheckCancel): void {
-  verifyBaseTransaction(tx)
+  verifyBaseTransaction(tx);
 
-  if (tx.CheckID !== undefined && typeof tx.CheckID !== 'string') {
-    throw new ValidationError('CheckCancel: invalid CheckID')
+  if (tx.CheckID !== undefined && typeof tx.CheckID !== "string") {
+    throw new ValidationError("CheckCancel: invalid CheckID");
   }
 }

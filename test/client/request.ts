@@ -1,6 +1,6 @@
-import responses from '../fixtures/responses'
-import rippled from '../fixtures/rippled'
-import {TestSuite, assertResultMatch} from '../testUtils'
+import responses from "../fixtures/responses";
+import rippled from "../fixtures/rippled";
+import { TestSuite, assertResultMatch } from "../testUtils";
 
 /**
  * Every test suite exports their tests in the default object.
@@ -8,42 +8,42 @@ import {TestSuite, assertResultMatch} from '../testUtils'
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'request account_objects': async (client, address, mockRippled) => {
+  "request account_objects": async (client, address, mockRippled) => {
     mockRippled.addResponse(
-      {command: 'account_objects', account: address},
+      { command: "account_objects", account: address },
       rippled.account_objects.normal
-    )
+    );
     const result = await client.request({
-      command: 'account_objects',
-      account: address
-    })
+      command: "account_objects",
+      account: address,
+    });
 
     assertResultMatch(
       result.result,
       responses.getAccountObjects,
-      'AccountObjectsResponse'
-    )
+      "AccountObjectsResponse"
+    );
   },
 
-  'request account_objects - invalid options': async (
+  "request account_objects - invalid options": async (
     client,
     address,
     mockRippled
   ) => {
     mockRippled.addResponse(
-      {command: 'account_objects', account: address},
+      { command: "account_objects", account: address },
       rippled.account_objects.normal
-    )
+    );
     const result = await client.request({
-      command: 'account_objects',
+      command: "account_objects",
       account: address,
-      invalid: 'options'
-    })
+      invalid: "options",
+    });
 
     assertResultMatch(
       result.result,
       responses.getAccountObjects,
-      'AccountObjectsResponse'
-    )
-  }
-}
+      "AccountObjectsResponse"
+    );
+  },
+};

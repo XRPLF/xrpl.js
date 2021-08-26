@@ -1,7 +1,7 @@
 const txFlags = {
   // Universal flags can apply to any transaction type
   Universal: {
-    FullyCanonicalSig: 0x80000000
+    FullyCanonicalSig: 0x80000000,
   },
 
   AccountSet: {
@@ -10,7 +10,7 @@ const txFlags = {
     RequireAuth: 0x00040000,
     OptionalAuth: 0x00080000,
     DisallowXRP: 0x00100000,
-    AllowXRP: 0x00200000
+    AllowXRP: 0x00200000,
   },
 
   TrustSet: {
@@ -19,27 +19,27 @@ const txFlags = {
     SetNoRipple: 0x00020000,
     ClearNoRipple: 0x00040000,
     SetFreeze: 0x00100000,
-    ClearFreeze: 0x00200000
+    ClearFreeze: 0x00200000,
   },
 
   OfferCreate: {
     Passive: 0x00010000,
     ImmediateOrCancel: 0x00020000,
     FillOrKill: 0x00040000,
-    Sell: 0x00080000
+    Sell: 0x00080000,
   },
 
   Payment: {
     NoRippleDirect: 0x00010000,
     PartialPayment: 0x00020000,
-    LimitQuality: 0x00040000
+    LimitQuality: 0x00040000,
   },
 
   PaymentChannelClaim: {
     Renew: 0x00010000,
-    Close: 0x00020000
-  }
-}
+    Close: 0x00020000,
+  },
+};
 
 // The following are integer (as opposed to bit) flags
 // that can be set for particular transactions in the
@@ -54,8 +54,8 @@ const txFlagIndices = {
     asfNoFreeze: 6,
     asfGlobalFreeze: 7,
     asfDefaultRipple: 8,
-    asfDepositAuth: 9
-  }
-}
+    asfDepositAuth: 9,
+  },
+};
 
-export {txFlags, txFlagIndices}
+export { txFlags, txFlagIndices };

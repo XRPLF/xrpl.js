@@ -3,7 +3,7 @@
 // import {Client} from 'xrpl-local'
 // import requests from '../fixtures/requests'
 // import responses from '../fixtures/responses'
-import {TestSuite} from '../testUtils'
+import { TestSuite } from "../testUtils";
 
 // function checkSortingOfOrders(orders) {
 //   let previousRate = '0'
@@ -365,4 +365,4 @@ export default <TestSuite>{
   //     )
   //   })
   // }
-}
+};

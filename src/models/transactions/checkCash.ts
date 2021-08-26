@@ -1,13 +1,13 @@
-import {ValidationError} from '../../common/errors'
-import {Amount} from '../common'
+import { ValidationError } from "../../common/errors";
+import { Amount } from "../common";
 
-import {BaseTransaction, verifyBaseTransaction, isAmount} from './common'
+import { BaseTransaction, verifyBaseTransaction, isAmount } from "./common";
 
 export interface CheckCash extends BaseTransaction {
-  TransactionType: 'CheckCash'
-  CheckID: string
-  Amount?: Amount
-  DeliverMin?: Amount
+  TransactionType: "CheckCash";
+  CheckID: string;
+  Amount?: Amount;
+  DeliverMin?: Amount;
 }
 
 /**
@@ -18,37 +18,31 @@ export interface CheckCash extends BaseTransaction {
  * @throws When the CheckCash is Malformed.
  */
 export function verifyCheckCash(tx: CheckCash): void {
-  verifyBaseTransaction(tx)
+  verifyBaseTransaction(tx);
 
-  if (tx.hasOwnProperty('Amount') && tx.hasOwnProperty('DeliverMin')) {
+  if (!tx.hasOwnProperty("Amount") && !tx.hasOwnProperty("DeliverMin")) {
     throw new ValidationError(
-      'CheckCash: cannot have both Amount and DeliverMin'
-    )
-  }
-
-  if (!tx.hasOwnProperty('Amount') && !tx.hasOwnProperty('DeliverMin')) {
-    throw new ValidationError(
-      'CheckCash: must have either Amount or DeliverMin'
-    )
+      "CheckCash: must have either Amount or DeliverMin"
+    );
   }
 
   if (
-    tx.hasOwnProperty('Amount') &&
+    tx.hasOwnProperty("Amount") &&
     tx.Amount !== undefined &&
     !isAmount(tx.Amount)
   ) {
-    throw new ValidationError('CheckCash: invalid Amount')
+    throw new ValidationError("CheckCash: invalid Amount");
   }
 
   if (
-    tx.hasOwnProperty('DeliverMin') &&
+    tx.hasOwnProperty("DeliverMin") &&
     tx.DeliverMin !== undefined &&
     !isAmount(tx.DeliverMin)
   ) {
-    throw new ValidationError('CheckCash: invalid DeliverMin')
+    throw new ValidationError("CheckCash: invalid DeliverMin");
   }
 
-  if (tx.CheckID !== undefined && typeof tx.CheckID !== 'string') {
-    throw new ValidationError('CheckCash: invalid CheckID')
+  if (tx.CheckID !== undefined && typeof tx.CheckID !== "string") {
+    throw new ValidationError("CheckCash: invalid CheckID");
   }
 }

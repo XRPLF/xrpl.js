@@ -6,7 +6,7 @@
  * @returns True if keys in object are all in fields.
  */
 export function onlyHasFields(obj: object, fields: string[]): boolean {
-  return Object.keys(obj).every((key: string) => fields.includes(key))
+  return Object.keys(obj).every((key: string) => fields.includes(key));
 }
 
 /**
@@ -17,5 +17,5 @@ export function onlyHasFields(obj: object, fields: string[]): boolean {
  * @returns True if checkFlag is enabled within Flags.
  */
 export function isFlagEnabled(Flags: number, checkFlag: number): boolean {
-  return (checkFlag & Flags) === checkFlag
+  return (checkFlag & Flags) === checkFlag;
 }

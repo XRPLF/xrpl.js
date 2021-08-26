@@ -1,13 +1,13 @@
-import {fromSeed} from 'bip32'
-import {mnemonicToSeedSync} from 'bip39'
-import {decode, encodeForSigning} from 'ripple-binary-codec'
-import {deriveKeypair, generateSeed, verify} from 'ripple-keypairs'
+import { fromSeed } from "bip32";
+import { mnemonicToSeedSync } from "bip39";
+import { decode, encodeForSigning } from "ripple-binary-codec";
+import { deriveKeypair, generateSeed, verify } from "ripple-keypairs";
 
-import ECDSA from './common/ecdsa'
-import {ValidationError} from './common/errors'
-import {SignedTransaction} from './common/types/objects'
-import {signOffline} from './transaction/sign'
-import {SignOptions} from './transaction/types'
+import ECDSA from "./common/ecdsa";
+import { ValidationError } from "./common/errors";
+import { SignedTransaction } from "./common/types/objects";
+import { signOffline } from "./transaction/sign";
+import { SignOptions } from "./transaction/types";
 
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
@@ -15,14 +15,14 @@ import {SignOptions} from './transaction/types'
  * It provides functionality to sign/verify transactions offline.
  */
 class Wallet {
-  readonly publicKey: string
-  readonly privateKey: string
-  private static readonly defaultAlgorithm: ECDSA = ECDSA.ed25519
-  private static readonly defaultDerivationPath: string = "m/44'/144'/0'/0/0"
+  readonly publicKey: string;
+  readonly privateKey: string;
+  private static readonly defaultAlgorithm: ECDSA = ECDSA.ed25519;
+  private static readonly defaultDerivationPath: string = "m/44'/144'/0'/0/0";
 
   constructor(publicKey: string, privateKey: string) {
-    this.publicKey = publicKey
-    this.privateKey = privateKey
+    this.publicKey = publicKey;
+    this.privateKey = privateKey;
   }
 
   /**
@@ -36,7 +36,7 @@ class Wallet {
     seed: string,
     algorithm: ECDSA = Wallet.defaultAlgorithm
   ): Wallet {
-    return Wallet.deriveWallet(seed, algorithm)
+    return Wallet.deriveWallet(seed, algorithm);
   }
 
   /**
@@ -50,18 +50,18 @@ class Wallet {
     mnemonic: string,
     derivationPath: string = Wallet.defaultDerivationPath
   ): Wallet {
-    const seed = mnemonicToSeedSync(mnemonic)
-    const masterNode = fromSeed(seed)
-    const node = masterNode.derivePath(derivationPath)
+    const seed = mnemonicToSeedSync(mnemonic);
+    const masterNode = fromSeed(seed);
+    const node = masterNode.derivePath(derivationPath);
     if (node.privateKey === undefined) {
       throw new ValidationError(
-        'Unable to derive privateKey from mnemonic input'
-      )
+        "Unable to derive privateKey from mnemonic input"
+      );
     }
 
-    const publicKey = Wallet.hexFromBuffer(node.publicKey)
-    const privateKey = Wallet.hexFromBuffer(node.privateKey)
-    return new Wallet(publicKey, `00${privateKey}`)
+    const publicKey = Wallet.hexFromBuffer(node.publicKey);
+    const privateKey = Wallet.hexFromBuffer(node.privateKey);
+    return new Wallet(publicKey, `00${privateKey}`);
   }
 
   /**
@@ -77,22 +77,22 @@ class Wallet {
   ): Wallet {
     const options = {
       entropy: Uint8Array.from(entropy),
-      algorithm
-    }
-    const seed = generateSeed(options)
-    return Wallet.deriveWallet(seed, algorithm)
+      algorithm,
+    };
+    const seed = generateSeed(options);
+    return Wallet.deriveWallet(seed, algorithm);
   }
 
   private static hexFromBuffer(buffer: Buffer): string {
-    return buffer.toString('hex').toUpperCase()
+    return buffer.toString("hex").toUpperCase();
   }
 
   private static deriveWallet(
     seed: string,
     algorithm: ECDSA = Wallet.defaultAlgorithm
   ): Wallet {
-    const {publicKey, privateKey} = deriveKeypair(seed, {algorithm})
-    return new Wallet(publicKey, privateKey)
+    const { publicKey, privateKey } = deriveKeypair(seed, { algorithm });
+    return new Wallet(publicKey, privateKey);
   }
 
   /**
@@ -104,9 +104,9 @@ class Wallet {
    */
   signTransaction(
     transaction: any, // TODO: transaction should be typed with Transaction type.
-    options: SignOptions = {signAs: ''}
+    options: SignOptions = { signAs: "" }
   ): SignedTransaction {
-    return signOffline(this, JSON.stringify(transaction), options)
+    return signOffline(this, JSON.stringify(transaction), options);
   }
 
   /**
@@ -116,11 +116,11 @@ class Wallet {
    * @returns Returns true if a signedTransaction is valid.
    */
   verifyTransaction(signedTransaction: string): boolean {
-    const tx = decode(signedTransaction)
-    const messageHex: string = encodeForSigning(tx)
-    const signature = tx.TxnSignature
-    return verify(messageHex, signature, this.publicKey)
+    const tx = decode(signedTransaction);
+    const messageHex: string = encodeForSigning(tx);
+    const signature = tx.TxnSignature;
+    return verify(messageHex, signature, this.publicKey);
   }
 }
 
-export default Wallet
+export default Wallet;

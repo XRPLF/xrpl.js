@@ -1,38 +1,38 @@
-import {ValidationError} from '../../common/errors'
-import {Amount, Memo, Signer, IssuedCurrencyAmount} from '../common'
-import {onlyHasFields} from '../utils'
+import { ValidationError } from "../../common/errors";
+import { Amount, Memo, Signer, IssuedCurrencyAmount } from "../common";
+import { onlyHasFields } from "../utils";
 
 const transactionTypes = [
-  'AccountSet',
-  'AccountDelete',
-  'CheckCancel',
-  'CheckCash',
-  'CheckCreate',
-  'DepositPreauth',
-  'EscrowCancel',
-  'EscrowCreate',
-  'EscrowFinish',
-  'OfferCancel',
-  'OfferCreate',
-  'Payment',
-  'PaymentChannelClaim',
-  'PaymentChannelCreate',
-  'PaymentChannelFund',
-  'SetRegularKey',
-  'SignerListSet',
-  'TicketCreate',
-  'TrustSet'
-]
+  "AccountSet",
+  "AccountDelete",
+  "CheckCancel",
+  "CheckCash",
+  "CheckCreate",
+  "DepositPreauth",
+  "EscrowCancel",
+  "EscrowCreate",
+  "EscrowFinish",
+  "OfferCancel",
+  "OfferCreate",
+  "Payment",
+  "PaymentChannelClaim",
+  "PaymentChannelCreate",
+  "PaymentChannelFund",
+  "SetRegularKey",
+  "SignerListSet",
+  "TicketCreate",
+  "TrustSet",
+];
 
-const isMemo = (obj: {Memo: Memo}): boolean => {
-  const memo = obj.Memo
-  const size = Object.keys(memo).length
+const isMemo = (obj: { Memo: Memo }): boolean => {
+  const memo = obj.Memo;
+  const size = Object.keys(memo).length;
   const validData =
-    memo.MemoData === undefined || typeof memo.MemoData === 'string'
+    memo.MemoData === undefined || typeof memo.MemoData === "string";
   const validFormat =
-    memo.MemoFormat === undefined || typeof memo.MemoData === 'string'
+    memo.MemoFormat === undefined || typeof memo.MemoData === "string";
   const validType =
-    memo.MemoType === undefined || typeof memo.MemoType === 'string'
+    memo.MemoType === undefined || typeof memo.MemoType === "string";
 
   return (
     size >= 1 &&
@@ -40,50 +40,50 @@ const isMemo = (obj: {Memo: Memo}): boolean => {
     validData &&
     validFormat &&
     validType &&
-    onlyHasFields(memo, ['MemoFormat', 'MemoData', 'MemoType'])
-  )
-}
+    onlyHasFields(memo, ["MemoFormat", "MemoData", "MemoType"])
+  );
+};
 
 const isSigner = (signer: Signer): boolean => {
   return (
     Object.keys(signer).length === 3 &&
-    typeof signer.Account === 'string' &&
-    typeof signer.TxnSignature === 'string' &&
-    typeof signer.SigningPubKey === 'string'
-  )
-}
+    typeof signer.Account === "string" &&
+    typeof signer.TxnSignature === "string" &&
+    typeof signer.SigningPubKey === "string"
+  );
+};
 
 export function isIssuedCurrency(obj: IssuedCurrencyAmount): boolean {
   return (
     Object.keys(obj).length === 3 &&
-    typeof obj.value === 'string' &&
-    typeof obj.issuer === 'string' &&
-    typeof obj.currency === 'string'
-  )
+    typeof obj.value === "string" &&
+    typeof obj.issuer === "string" &&
+    typeof obj.currency === "string"
+  );
 }
 
 export function isAmount(amount: Amount): boolean {
-  return typeof amount === 'string' || isIssuedCurrency(amount)
+  return typeof amount === "string" || isIssuedCurrency(amount);
 }
 
 export interface GlobalFlags {
-  tfFullyCanonicalSig: boolean
+  tfFullyCanonicalSig: boolean;
 }
 
 export interface BaseTransaction {
-  Account: string
-  TransactionType: string
-  Fee?: string
-  Sequence?: number
-  AccountTxnID?: string
-  Flags?: number | GlobalFlags
-  LastLedgerSequence?: number
-  Memos?: Array<{Memo: Memo}>
-  Signers?: Signer[]
-  SourceTag?: number
-  SigningPubKey?: string
-  TicketSequence?: number
-  TxnSignature?: string
+  Account: string;
+  TransactionType: string;
+  Fee?: string;
+  Sequence?: number;
+  AccountTxnID?: string;
+  Flags?: number | GlobalFlags;
+  LastLedgerSequence?: number;
+  Memos?: Array<{ Memo: Memo }>;
+  Signers?: Signer[];
+  SourceTag?: number;
+  SigningPubKey?: string;
+  TicketSequence?: number;
+  TxnSignature?: string;
 }
 
 /**
@@ -97,83 +97,83 @@ export interface BaseTransaction {
  */
 export function verifyBaseTransaction(common: BaseTransaction): void {
   if (common.Account === undefined) {
-    throw new ValidationError('BaseTransaction: missing field Account')
+    throw new ValidationError("BaseTransaction: missing field Account");
   }
 
-  if (typeof common.Account !== 'string') {
-    throw new ValidationError('BaseTransaction: Account not string')
+  if (typeof common.Account !== "string") {
+    throw new ValidationError("BaseTransaction: Account not string");
   }
 
   if (common.TransactionType === undefined) {
-    throw new ValidationError('BaseTransaction: missing field TransactionType')
+    throw new ValidationError("BaseTransaction: missing field TransactionType");
   }
 
-  if (typeof common.TransactionType !== 'string') {
-    throw new ValidationError('BaseTransaction: TransactionType not string')
+  if (typeof common.TransactionType !== "string") {
+    throw new ValidationError("BaseTransaction: TransactionType not string");
   }
 
   if (!transactionTypes.includes(common.TransactionType)) {
-    throw new ValidationError('BaseTransaction: Unknown TransactionType')
+    throw new ValidationError("BaseTransaction: Unknown TransactionType");
   }
 
-  if (common.Fee !== undefined && typeof common.Fee !== 'string') {
-    throw new ValidationError('BaseTransaction: invalid Fee')
+  if (common.Fee !== undefined && typeof common.Fee !== "string") {
+    throw new ValidationError("BaseTransaction: invalid Fee");
   }
 
-  if (common.Sequence !== undefined && typeof common.Sequence !== 'number') {
-    throw new ValidationError('BaseTransaction: invalid Sequence')
+  if (common.Sequence !== undefined && typeof common.Sequence !== "number") {
+    throw new ValidationError("BaseTransaction: invalid Sequence");
   }
 
   if (
     common.AccountTxnID !== undefined &&
-    typeof common.AccountTxnID !== 'string'
+    typeof common.AccountTxnID !== "string"
   ) {
-    throw new ValidationError('BaseTransaction: invalid AccountTxnID')
+    throw new ValidationError("BaseTransaction: invalid AccountTxnID");
   }
 
   if (
     common.LastLedgerSequence !== undefined &&
-    typeof common.LastLedgerSequence !== 'number'
+    typeof common.LastLedgerSequence !== "number"
   ) {
-    throw new ValidationError('BaseTransaction: invalid LastLedgerSequence')
+    throw new ValidationError("BaseTransaction: invalid LastLedgerSequence");
   }
 
   if (
     common.Memos !== undefined &&
     (common.Memos.length === 0 || !common.Memos.every(isMemo))
   ) {
-    throw new ValidationError('BaseTransaction: invalid Memos')
+    throw new ValidationError("BaseTransaction: invalid Memos");
   }
 
   if (
     common.Signers !== undefined &&
     (common.Signers.length === 0 || !common.Signers.every(isSigner))
   ) {
-    throw new ValidationError('BaseTransaction: invalid Signers')
+    throw new ValidationError("BaseTransaction: invalid Signers");
   }
 
-  if (common.SourceTag !== undefined && typeof common.SourceTag !== 'number') {
-    throw new ValidationError('BaseTransaction: invalid SourceTag')
+  if (common.SourceTag !== undefined && typeof common.SourceTag !== "number") {
+    throw new ValidationError("BaseTransaction: invalid SourceTag");
   }
 
   if (
     common.SigningPubKey !== undefined &&
-    typeof common.SigningPubKey !== 'string'
+    typeof common.SigningPubKey !== "string"
   ) {
-    throw new ValidationError('BaseTransaction: invalid SigningPubKey')
+    throw new ValidationError("BaseTransaction: invalid SigningPubKey");
   }
 
   if (
     common.TicketSequence !== undefined &&
-    typeof common.TicketSequence !== 'number'
+    typeof common.TicketSequence !== "number"
   ) {
-    throw new ValidationError('BaseTransaction: invalid TicketSequence')
+    throw new ValidationError("BaseTransaction: invalid TicketSequence");
   }
 
   if (
     common.TxnSignature !== undefined &&
-    typeof common.TxnSignature !== 'string'
+    typeof common.TxnSignature !== "string"
   ) {
-    throw new ValidationError('BaseTransaction: invalid TxnSignature')
+    throw new ValidationError("BaseTransaction: invalid TxnSignature");
   }
 }

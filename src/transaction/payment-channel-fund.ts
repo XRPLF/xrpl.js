@@ -1,14 +1,14 @@
-import {Client} from '..'
-import {validate} from '../common'
-import {ISOTimeToRippleTime, xrpToDrops} from '../utils'
+import { Client } from "..";
+import { validate } from "../common";
+import { ISOTimeToRippleTime, xrpToDrops } from "../utils";
 
-import {Instructions, Prepare, TransactionJSON} from './types'
-import * as utils from './utils'
+import { Instructions, Prepare, TransactionJSON } from "./types";
+import * as utils from "./utils";
 
 export interface PaymentChannelFund {
-  channel: string
-  amount: string
-  expiration?: string
+  channel: string;
+  amount: string;
+  expiration?: string;
 }
 
 function createPaymentChannelFundTransaction(
@@ -17,16 +17,16 @@ function createPaymentChannelFundTransaction(
 ): TransactionJSON {
   const txJSON: TransactionJSON = {
     Account: account,
-    TransactionType: 'PaymentChannelFund',
+    TransactionType: "PaymentChannelFund",
     Channel: fund.channel,
-    Amount: xrpToDrops(fund.amount)
-  }
+    Amount: xrpToDrops(fund.amount),
+  };
 
   if (fund.expiration != null) {
-    txJSON.Expiration = ISOTimeToRippleTime(fund.expiration)
+    txJSON.Expiration = ISOTimeToRippleTime(fund.expiration);
   }
 
-  return txJSON
+  return txJSON;
 }
 
 function preparePaymentChannelFund(
@@ -39,16 +39,16 @@ function preparePaymentChannelFund(
     validate.preparePaymentChannelFund({
       address,
       paymentChannelFund,
-      instructions
-    })
+      instructions,
+    });
     const txJSON = createPaymentChannelFundTransaction(
       address,
       paymentChannelFund
-    )
-    return utils.prepareTransaction(txJSON, this, instructions)
+    );
+    return utils.prepareTransaction(txJSON, this, instructions);
   } catch (e) {
-    return Promise.reject(e)
+    return Promise.reject(e);
   }
 }
 
-export default preparePaymentChannelFund
+export default preparePaymentChannelFund;

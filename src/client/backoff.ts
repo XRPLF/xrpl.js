@@ -9,34 +9,34 @@
  * setTimeout calls over a network (where the destination may be down).
  */
 export class ExponentialBackoff {
-  private readonly ms: number
-  private readonly max: number
-  private readonly factor: number = 2
-  private readonly jitter: number = 0
-  attempts = 0
+  private readonly ms: number;
+  private readonly max: number;
+  private readonly factor: number = 2;
+  private readonly jitter: number = 0;
+  attempts = 0;
 
-  constructor(opts: {min?: number; max?: number} = {}) {
-    this.ms = opts.min || 100
-    this.max = opts.max || 10000
+  constructor(opts: { min?: number; max?: number } = {}) {
+    this.ms = opts.min || 100;
+    this.max = opts.max || 10000;
   }
 
   /**
    * Return the backoff duration.
    */
   duration() {
-    let ms = this.ms * this.factor ** this.attempts++
+    let ms = this.ms * this.factor ** this.attempts++;
     if (this.jitter) {
-      const rand = Math.random()
-      const deviation = Math.floor(rand * this.jitter * ms)
-      ms = (Math.floor(rand * 10) & 1) == 0 ? ms - deviation : ms + deviation
+      const rand = Math.random();
+      const deviation = Math.floor(rand * this.jitter * ms);
+      ms = (Math.floor(rand * 10) & 1) == 0 ? ms - deviation : ms + deviation;
     }
-    return Math.min(ms, this.max) | 0
+    return Math.min(ms, this.max) | 0;
   }
 
   /**
    * Reset the number of attempts.
    */
   reset() {
-    this.attempts = 0
+    this.attempts = 0;
   }
 }

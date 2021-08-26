@@ -1,6 +1,6 @@
-import {ValidationError} from '../../common/errors'
+import { ValidationError } from "../../common/errors";
 
-import {BaseTransaction, verifyBaseTransaction} from './common'
+import { BaseTransaction, verifyBaseTransaction } from "./common";
 
 enum AccountSetFlagEnum {
   asfRequireDest = 1,
@@ -11,18 +11,18 @@ enum AccountSetFlagEnum {
   asfNoFreeze = 6,
   asfGlobalFreeze = 7,
   asfDefaultRipple = 8,
-  asfDepositAuth = 9
+  asfDepositAuth = 9,
 }
 
 export interface AccountSet extends BaseTransaction {
-  TransactionType: 'AccountSet'
-  ClearFlag?: number
-  Domain?: string
-  EmailHash?: string
-  MessageKey?: string
-  SetFlag?: AccountSetFlagEnum
-  TransferRate?: number
-  TickSize?: number
+  TransactionType: "AccountSet";
+  ClearFlag?: number;
+  Domain?: string;
+  EmailHash?: string;
+  MessageKey?: string;
+  SetFlag?: AccountSetFlagEnum;
+  TransferRate?: number;
+  TickSize?: number;
 }
 
 /**
@@ -33,48 +33,48 @@ export interface AccountSet extends BaseTransaction {
  * @throws When the AccountSet is Malformed.
  */
 export function verifyAccountSet(tx: AccountSet): void {
-  verifyBaseTransaction(tx)
+  verifyBaseTransaction(tx);
 
   if (tx.ClearFlag !== undefined) {
-    if (typeof tx.ClearFlag !== 'number') {
-      throw new ValidationError('AccountSet: invalid ClearFlag')
+    if (typeof tx.ClearFlag !== "number") {
+      throw new ValidationError("AccountSet: invalid ClearFlag");
     }
     if (!Object.values(AccountSetFlagEnum).includes(tx.ClearFlag)) {
-      throw new ValidationError('AccountSet: invalid ClearFlag')
+      throw new ValidationError("AccountSet: invalid ClearFlag");
     }
   }
 
-  if (tx.Domain !== undefined && typeof tx.Domain !== 'string') {
-    throw new ValidationError('AccountSet: invalid Domain')
+  if (tx.Domain !== undefined && typeof tx.Domain !== "string") {
+    throw new ValidationError("AccountSet: invalid Domain");
   }
 
-  if (tx.EmailHash !== undefined && typeof tx.EmailHash !== 'string') {
-    throw new ValidationError('AccountSet: invalid EmailHash')
+  if (tx.EmailHash !== undefined && typeof tx.EmailHash !== "string") {
+    throw new ValidationError("AccountSet: invalid EmailHash");
   }
 
-  if (tx.MessageKey !== undefined && typeof tx.MessageKey !== 'string') {
-    throw new ValidationError('AccountSet: invalid MessageKey')
+  if (tx.MessageKey !== undefined && typeof tx.MessageKey !== "string") {
+    throw new ValidationError("AccountSet: invalid MessageKey");
   }
 
   if (tx.SetFlag !== undefined) {
-    if (typeof tx.SetFlag !== 'number') {
-      throw new ValidationError('AccountSet: invalid SetFlag')
+    if (typeof tx.SetFlag !== "number") {
+      throw new ValidationError("AccountSet: invalid SetFlag");
     }
     if (!Object.values(AccountSetFlagEnum).includes(tx.SetFlag)) {
-      throw new ValidationError('AccountSet: invalid SetFlag')
+      throw new ValidationError("AccountSet: invalid SetFlag");
     }
   }
 
-  if (tx.TransferRate !== undefined && typeof tx.TransferRate !== 'number') {
-    throw new ValidationError('AccountSet: invalid TransferRate')
+  if (tx.TransferRate !== undefined && typeof tx.TransferRate !== "number") {
+    throw new ValidationError("AccountSet: invalid TransferRate");
   }
 
   if (tx.TickSize !== undefined) {
-    if (typeof tx.TickSize !== 'number') {
-      throw new ValidationError('AccountSet: invalid TickSize')
+    if (typeof tx.TickSize !== "number") {
+      throw new ValidationError("AccountSet: invalid TickSize");
     }
     if (tx.TickSize !== 0 && (tx.TickSize < 3 || tx.TickSize > 15)) {
-      throw new ValidationError('AccountSet: invalid TickSize')
+      throw new ValidationError("AccountSet: invalid TickSize");
     }
   }
 }
