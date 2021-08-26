@@ -30,7 +30,7 @@ function getDefaultConfiguration() {
     },
     resolve: {
       alias: {
-        'ws': './dist/npm/client/wswrapper.js',
+        'ws': './dist/npm/client/wsWrapper.js',
         'https-proxy-agent': false
       },
       extensions: ['.js', '.json'],
@@ -101,7 +101,7 @@ function webpackForTest(testFileName) {
     },
     resolve: {
       alias: {
-        'ws': './dist/npm/client/wswrapper.js',
+        'ws': './dist/npm/client/wsWrapper.js',
         'https-proxy-agent': false
       },
       extensions: ['.ts', '.js', '.json'],
