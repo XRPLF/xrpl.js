@@ -506,6 +506,7 @@ describe('Connection', function () {
         id: 0,
         streams: 'validations'
       })
+      done()
     })
   })
 
