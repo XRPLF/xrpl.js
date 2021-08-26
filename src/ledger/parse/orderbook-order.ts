@@ -1,4 +1,4 @@
-import * as _ from 'lodash'
+import _ from 'lodash'
 import {parseTimestamp, adjustQualityForXRP} from './utils'
 import {removeUndefined} from '../../utils'
 
