@@ -1,10 +1,8 @@
-import assert from 'assert-diff'
-
 import {ValidationError} from '../../src/common/errors'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
-import {TestSuite} from '../testUtils'
+import {assertRejects, assertResultMatch, TestSuite} from '../testUtils'
 
 const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 const {preparePayment: REQUEST_FIXTURES} = requests
@@ -37,7 +35,7 @@ export default <TestSuite>{
       REQUEST_FIXTURES.normal,
       localInstructions
     )
-    assert.assertResultMatch(response, RESPONSE_FIXTURES.normal, 'prepare')
+    assertResultMatch(response, RESPONSE_FIXTURES.normal, 'prepare')
   },
 
   'min amount xrp': async (client, address, mockRippled) => {
@@ -60,11 +58,7 @@ export default <TestSuite>{
       REQUEST_FIXTURES.minAmountXRP,
       localInstructions
     )
-    assert.assertResultMatch(
-      response,
-      RESPONSE_FIXTURES.minAmountXRP,
-      'prepare'
-    )
+    assertResultMatch(response, RESPONSE_FIXTURES.minAmountXRP, 'prepare')
   },
 
   'min amount xrp2xrp': async (client, address, mockRippled) => {
@@ -83,11 +77,7 @@ export default <TestSuite>{
       REQUEST_FIXTURES.minAmount,
       instructionsWithMaxLedgerVersionOffset
     )
-    assert.assertResultMatch(
-      response,
-      RESPONSE_FIXTURES.minAmountXRPXRP,
-      'prepare'
-    )
+    assertResultMatch(response, RESPONSE_FIXTURES.minAmountXRPXRP, 'prepare')
   },
 
   'XRP to XRP': async (client, address, mockRippled) => {
@@ -125,7 +115,7 @@ export default <TestSuite>{
       payment,
       instructionsWithMaxLedgerVersionOffset
     )
-    assert.assertResultMatch(response, expected, 'prepare')
+    assertResultMatch(response, expected, 'prepare')
   },
 
   'XRP drops to XRP drops': async (client, address, mockRippled) => {
@@ -163,7 +153,7 @@ export default <TestSuite>{
       payment,
       instructionsWithMaxLedgerVersionOffset
     )
-    assert.assertResultMatch(response, expected, 'prepare')
+    assertResultMatch(response, expected, 'prepare')
   },
 
   'XRP drops to XRP': async (client, address, mockRippled) => {
@@ -201,7 +191,7 @@ export default <TestSuite>{
       payment,
       instructionsWithMaxLedgerVersionOffset
     )
-    assert.assertResultMatch(response, expected, 'prepare')
+    assertResultMatch(response, expected, 'prepare')
   },
 
   'XRP to XRP drops': async (client, address, mockRippled) => {
@@ -239,7 +229,7 @@ export default <TestSuite>{
       payment,
       instructionsWithMaxLedgerVersionOffset
     )
-    assert.assertResultMatch(response, expected, 'prepare')
+    assertResultMatch(response, expected, 'prepare')
   },
 
   // Errors
@@ -270,7 +260,7 @@ export default <TestSuite>{
       }
     }
 
-    return assert.assertRejects(
+    return assertRejects(
       client.preparePayment(address, payment),
       ValidationError,
       'payment must specify either (source.maxAmount and destination.amount) or (source.amount and destination.minAmount)'
@@ -301,7 +291,7 @@ export default <TestSuite>{
       }
     }
 
-    return assert.assertRejects(
+    return assertRejects(
       client.preparePayment(address, payment),
       ValidationError,
       'instance.payment.source is not exactly one from <sourceExactAdjustment>,<maxAdjustment>'
@@ -333,7 +323,7 @@ export default <TestSuite>{
         amount: {value: '1000', currency: 'drops'}
       }
     }
-    return assert.assertRejects(
+    return assertRejects(
       client.preparePayment(address, payment, {fee: '3'}),
       ValidationError,
       'Fee of 3 XRP exceeds max of 2 XRP. To use this fee, increase `maxFeeXRP` in the Client constructor.'
@@ -351,7 +341,7 @@ export default <TestSuite>{
       {command: 'account_info'},
       rippled.account_info.normal
     )
-    return assert.assertRejects(
+    return assertRejects(
       client.preparePayment(address, REQUEST_FIXTURES.wrongPartial),
       ValidationError,
       'XRP to XRP payments cannot be partial payments'
@@ -373,7 +363,7 @@ export default <TestSuite>{
       {command: 'account_info'},
       rippled.account_info.normal
     )
-    return assert.assertRejects(
+    return assertRejects(
       client.preparePayment(address, REQUEST_FIXTURES.wrongAddress),
       ValidationError,
       'address must match payment.source.address'
@@ -391,7 +381,7 @@ export default <TestSuite>{
       {command: 'account_info'},
       rippled.account_info.normal
     )
-    return assert.assertRejects(
+    return assertRejects(
       client.preparePayment(address, REQUEST_FIXTURES.wrongAmount),
       ValidationError,
       'payment must specify either (source.maxAmount and destination.amount) or (source.amount and destination.minAmount)'
@@ -413,7 +403,7 @@ export default <TestSuite>{
       ...instructionsWithMaxLedgerVersionOffset,
       fee: '2.1'
     }
-    return assert.assertRejects(
+    return assertRejects(
       client.preparePayment(
         address,
         REQUEST_FIXTURES.normal,
@@ -436,7 +426,7 @@ export default <TestSuite>{
   //     REQUEST_FIXTURES.allOptions,
   //     localInstructions
   //   )
-  //   assert.assertResultMatch(response, RESPONSE_FIXTURES.allOptions, 'prepare')
+  //   assertResultMatch(response, RESPONSE_FIXTURES.allOptions, 'prepare')
   // },
 
   'preparePayment without counterparty set': async (
@@ -463,11 +453,7 @@ export default <TestSuite>{
       REQUEST_FIXTURES.noCounterparty,
       localInstructions
     )
-    assert.assertResultMatch(
-      response,
-      RESPONSE_FIXTURES.noCounterparty,
-      'prepare'
-    )
+    assertResultMatch(response, RESPONSE_FIXTURES.noCounterparty, 'prepare')
   },
 
   // 'preparePayment with source.amount/destination.minAmount can be signed':
@@ -539,7 +525,7 @@ export default <TestSuite>{
       responses.getPaths.sendAll[0],
       instructionsWithMaxLedgerVersionOffset
     )
-    assert.assertResultMatch(response, RESPONSE_FIXTURES.minAmount, 'prepare')
+    assertResultMatch(response, RESPONSE_FIXTURES.minAmount, 'prepare')
   },
 
   'caps fee at 2 XRP by default': async (client, address, mockRippled) => {
@@ -568,7 +554,7 @@ export default <TestSuite>{
       REQUEST_FIXTURES.normal,
       instructionsWithMaxLedgerVersionOffset
     )
-    assert.assertResultMatch(response, expectedResponse, 'prepare')
+    assertResultMatch(response, expectedResponse, 'prepare')
   },
 
   'allows fee exceeding 2 XRP when maxFeeXRP is higher': async (
@@ -605,7 +591,7 @@ export default <TestSuite>{
       REQUEST_FIXTURES.normal,
       localInstructions
     )
-    assert.assertResultMatch(response, expectedResponse, 'prepare')
+    assertResultMatch(response, expectedResponse, 'prepare')
   },
 
   'fee - default maxFee of 2 XRP': async (client, address, mockRippled) => {
@@ -634,7 +620,7 @@ export default <TestSuite>{
       requests.preparePayment.normal,
       instructionsWithMaxLedgerVersionOffset
     )
-    assert.assertResultMatch(response, expectedResponse, 'prepare')
+    assertResultMatch(response, expectedResponse, 'prepare')
   },
 
   'fee - capped to maxFeeXRP when maxFee exceeds maxFeeXRP': async (
@@ -672,7 +658,7 @@ export default <TestSuite>{
       requests.preparePayment.normal,
       localInstructions
     )
-    assert.assertResultMatch(response, expectedResponse, 'prepare')
+    assertResultMatch(response, expectedResponse, 'prepare')
   },
 
   'fee - capped to maxFee': async (client, address, mockRippled) => {
@@ -706,7 +692,7 @@ export default <TestSuite>{
       requests.preparePayment.normal,
       localInstructions
     )
-    assert.assertResultMatch(response, expectedResponse, 'prepare')
+    assertResultMatch(response, expectedResponse, 'prepare')
   }
 
   // 'fee - calculated fee does not use more than 6 decimal places': async (
@@ -731,7 +717,7 @@ export default <TestSuite>{
   //     requests.preparePayment.normal,
   //     instructionsWithMaxLedgerVersionOffset
   //   )
-  //   assert.assertResultMatch(response, expectedResponse, 'prepare')
+  //   assertResultMatch(response, expectedResponse, 'prepare')
   // },
 
   // Tickets
@@ -751,7 +737,7 @@ export default <TestSuite>{
   //     REQUEST_FIXTURES.allOptions,
   //     localInstructions
   //   )
-  //   assert.assertResultMatch(response, RESPONSE_FIXTURES.ticketSequence, 'prepare')
+  //   assertResultMatch(response, RESPONSE_FIXTURES.ticketSequence, 'prepare')
   // },
 
   // 'throws when both sequence and ticketSequence are set': async (
@@ -769,7 +755,7 @@ export default <TestSuite>{
   //     ticketSequence: 23,
   //     sequence: 12
   //   }
-  //   return assert.assertRejects(
+  //   return assertRejects(
   //     client.preparePayment(
   //       address,
   //       REQUEST_FIXTURES.allOptions,
