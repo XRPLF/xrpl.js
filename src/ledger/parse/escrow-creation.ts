@@ -1,7 +1,7 @@
 import * as assert from 'assert'
 import parseAmount from './amount'
 import {parseTimestamp, parseMemos} from './utils'
-import {removeUndefined} from '../../common'
+import {removeUndefined} from '../../utils'
 
 function parseEscrowCreation(tx: any): object {
   assert.ok(tx.TransactionType === 'EscrowCreate')

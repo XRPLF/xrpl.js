@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import parseAmount from './amount'
 import {parseTimestamp, adjustQualityForXRP} from './utils'
-import {removeUndefined} from '../../common'
+import {removeUndefined} from '../../utils'
 import {orderFlags} from './flags'
 import {FormattedOrderSpecification} from '../../common/types/objects'
 

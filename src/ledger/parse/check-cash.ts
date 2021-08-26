@@ -1,5 +1,5 @@
 import * as assert from 'assert'
-import {removeUndefined} from '../../common'
+import {removeUndefined} from '../../utils'
 import parseAmount from './amount'
 import {Amount} from '../../common/types/objects'
 import {parseMemos} from './utils'

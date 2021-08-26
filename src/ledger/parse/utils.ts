@@ -1,9 +1,10 @@
 import transactionParser from 'ripple-lib-transactionparser'
 import BigNumber from 'bignumber.js'
-import * as common from '../../common'
 import parseAmount from './amount'
 
 import {Amount, Memo} from '../../common/types/objects'
+import {txFlags} from '../../common'
+import {removeUndefined, dropsToXrp, rippleTimeToISOTime} from '../../utils'
 
 type OfferDescription = {
   direction: string,
@@ -54,7 +55,7 @@ function parseTimestamp(rippleTime?: number | null): string | undefined {
   if (typeof rippleTime !== 'number') {
     return undefined
   }
-  return common.rippleTimeToISO8601(rippleTime)
+  return rippleTimeToISOTime(rippleTime)
 }
 
 function removeEmptyCounterparty(amount) {
@@ -78,7 +79,7 @@ function removeEmptyCounterpartyInOrderbookChanges(orderbookChanges: Orderbook) 
 }
 
 function isPartialPayment(tx: any) {
-  return (tx.Flags & common.txFlags.Payment.PartialPayment) !== 0
+  return (tx.Flags & txFlags.Payment.PartialPayment) !== 0
 }
 
 function parseDeliveredAmount(tx: any): Amount | void {
@@ -133,10 +134,10 @@ function parseOutcome(tx: any): any | undefined {
   removeEmptyCounterpartyInBalanceChanges(balanceChanges)
   removeEmptyCounterpartyInOrderbookChanges(orderbookChanges)
 
-  return common.removeUndefined({
+  return removeUndefined({
     result: tx.meta.TransactionResult,
     timestamp: parseTimestamp(tx.date),
-    fee: common.dropsToXrp(tx.Fee),
+    fee: dropsToXrp(tx.Fee),
     balanceChanges: balanceChanges,
     orderbookChanges: orderbookChanges,
     channelChanges: channelChanges,
@@ -155,7 +156,7 @@ function parseMemos(tx: any): Array<Memo> | undefined {
     return undefined
   }
   return tx.Memos.map((m) => {
-    return common.removeUndefined({
+    return removeUndefined({
       type: m.Memo.parsed_memo_type || hexToString(m.Memo.MemoType),
       format: m.Memo.parsed_memo_format || hexToString(m.Memo.MemoFormat),
       data: m.Memo.parsed_memo_data || hexToString(m.Memo.MemoData)
