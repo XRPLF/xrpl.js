@@ -101,7 +101,7 @@ describe("Generate Address", function () {
 
     // THEN we get an object with an address starting with 'r' and a secret starting with 'sEd'
     assert(
-      account.classicAddress.startsWith("r"),
+      account.classicAddress && account.classicAddress.startsWith("r"),
       "Address must start with `r`"
     );
     assert.deepEqual(
