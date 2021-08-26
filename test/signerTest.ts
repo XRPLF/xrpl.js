@@ -9,8 +9,6 @@ function notImplemented() {
 }
 
 
-
-
 describe('Signer tests', function () {
     
     it('sign transaction offline', () => {
@@ -58,7 +56,7 @@ describe('Signer tests', function () {
         const amount = '1000000'
 
         assert.equal(authorizeChannel(wallet, channelId, amount), 
-        '434C4D005DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB300000000000F4240')
+        '3045022100DB6CF7ADF76F55E4A564C986E58541B5805CA4FD44C338CB8A3CAF2F4FCBB1D50220795C8D3ED550ABA33F9D12BE4FD18899338331C590DB07B1DCB5E0493CC9C5C9')
     })
 
     it ('validate transaction succeeds for valid transaction', () => {

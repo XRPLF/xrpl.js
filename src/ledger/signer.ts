@@ -9,7 +9,7 @@ import { flatMap } from "lodash";
 import { SignedTransaction } from "../common/types/objects";
 import { verifyBaseTransaction } from "../models/transactions/common";
 
-export function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
+function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
     verifyBaseTransaction(tx)
     return wallet.signTransaction(tx, { signAs: '' })
 }
@@ -70,7 +70,7 @@ function combine(signedTransactions: string[]): SignedTransaction {
   }
 }
 
-export function multisign(transactions: Transaction[] | string[]): SignedTransaction {
+function multisign(transactions: Transaction[] | string[]): SignedTransaction {
     
     if(transactions.length == 0) {
         throw new ValidationError("There were 0 transactions given to multisign")
@@ -89,8 +89,8 @@ export function multisign(transactions: Transaction[] | string[]): SignedTransac
     })
 
     let encodedTransactions: string[];
-    if(typeof transactions[0] === "object") {
-        encodedTransactions = transactions.map( tx => {
+    if(typeof (transactions[0]) === "object") {
+        encodedTransactions = (transactions as Transaction[]).map( tx => {
             return encode(JSON.parse(JSON.stringify(tx)))
         })
     } else {
@@ -100,7 +100,15 @@ export function multisign(transactions: Transaction[] | string[]): SignedTransac
     return combine(encodedTransactions)
 }
 
-export function authorizeChannel(wallet: Wallet, channelId: string, amount: string): string {
+function authorizeChannel(wallet: Wallet, channelId: string, amount: string): string {
+
+    //const amount64 = Number(amount).toString(16).padStart(16, '0')
+    //const paymentChannelClaimPrefix = '434c4d00'
+    //const encodedAuthorization = `${paymentChannelClaimPrefix}${channelId}${amount64}`
+    //wallet.signTransaction
+    //encodeAccountPublic(wallet.publicKey)
+    //wallet.signTransaction
+
     return signPaymentChannelClaim(channelId, amount, wallet.privateKey)
 }
 /*
@@ -125,6 +133,8 @@ export function authorizeChannel(wallet: Wallet, channelId: string, amount: stri
 //}
 
 // TODO: Implement verify
-export function verify(tx: Transaction): void {
+function verify(tx: Transaction): void {
     return null
 }
+
+export { sign, multisign, authorizeChannel, verify }
