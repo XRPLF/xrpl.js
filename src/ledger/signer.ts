@@ -1,11 +1,10 @@
 import { BigNumber } from "bignumber.js";
 import { decodeAccountID } from "ripple-address-codec";
 import { ValidationError } from "../common/errors";
-import { Amount } from "../models/common";
 import { encode, decode } from 'ripple-binary-codec'
 import { Transaction } from "../models/transactions";
 import Wallet from "../Wallet";
-import { computeBinaryTransactionHash } from "../utils";
+import { computeBinaryTransactionHash, signPaymentChannelClaim } from "../utils";
 import { flatMap } from "lodash";
 import { SignedTransaction } from "../common/types/objects";
 import { verifyBaseTransaction } from "../models/transactions/common";
@@ -61,7 +60,7 @@ function getTransactionWithAllSigners(transactions: Transaction[]): Transaction 
 function combine(signedTransactions: string[]): SignedTransaction {
   const transactions: Transaction[] = signedTransactions.map(decode) as unknown as Transaction[];
   
-  transactions.forEach(tx => verifyForMultisigning(tx))
+  transactions.forEach(tx => verify(tx))
   validateTransactionEquivalence(transactions)
 
   const signedTransaction = encode(getTransactionWithAllSigners(transactions))
@@ -101,12 +100,31 @@ export function multisign(transactions: Transaction[] | string[]): SignedTransac
     return combine(encodedTransactions)
 }
 
-// TODO: Implement authorize channel
-export function authorizeChannel(wallet: Wallet, channelId: number, amount: Amount): SignedTransaction {
-    return null
+export function authorizeChannel(wallet: Wallet, channelId: string, amount: string): string {
+    return signPaymentChannelClaim(channelId, amount, wallet.privateKey)
 }
+/*
+    //channelId concat with the xrp amount in drops
+
+    let keyType;
+    if(wallet.privateKey.startsWith(0xED.toString())){
+        keyType = "ed25519"
+    } else {
+        keyType = "secp256k1"
+    }
+
+    const amount64 = Number(amount).toString(16).padStart(16, '0')
+    const paymentChannelClaimPrefix = '434c4d00'
+    const encodedAuthorization = `${paymentChannelClaimPrefix}${channelId}${amount64}`
+    //wallet.signTransaction
+    //encodeAccountPublic(wallet.publicKey)
+    wallet.signTransaction
+    
+
+    return null */
+//}
 
 // TODO: Implement verify
-export function verifyForMultisigning(tx: Transaction): void {
+export function verify(tx: Transaction): void {
     return null
 }
