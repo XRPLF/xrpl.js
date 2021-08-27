@@ -1,4 +1,5 @@
 import { LedgerIndex } from "../common";
+import { Transaction } from "../transactions";
 
 import { BaseRequest, BaseResponse } from "./baseMethod";
 
@@ -15,6 +16,6 @@ export interface NoRippleCheckResponse extends BaseResponse {
   result: {
     ledger_current_index: number;
     problems: string[];
-    transactions: any[]; // TODO: fix once transaction objects are implemented
+    transactions: Transaction[];
   };
 }

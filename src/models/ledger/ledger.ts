@@ -1,8 +1,7 @@
+import { LedgerEntry } from "../ledger";
 import { Transaction } from "../transactions";
 
-import { LedgerEntry } from ".";
-
-export interface Ledger {
+export default interface Ledger {
   account_hash: string;
   accountState?: LedgerEntry[];
   close_flags: number;

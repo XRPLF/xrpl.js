@@ -24,7 +24,7 @@ export interface AccountChannelsRequest extends BaseRequest {
   ledger_hash?: string;
   ledger_index?: LedgerIndex;
   limit: number;
-  marker?: any;
+  marker?: unknown;
 }
 
 export interface AccountChannelsResponse extends BaseResponse {
@@ -35,6 +35,6 @@ export interface AccountChannelsResponse extends BaseResponse {
     ledger_index: number;
     validated?: boolean;
     limit?: number;
-    marker?: any;
+    marker?: unknown;
   };
 }

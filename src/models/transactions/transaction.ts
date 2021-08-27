@@ -1,4 +1,4 @@
-import Metadata from "../common/metadata";
+/* eslint-disable import/max-dependencies -- All methods need to be exported */
 
 import { AccountDelete } from "./accountDelete";
 import { AccountSet } from "./accountSet";
@@ -9,6 +9,7 @@ import { DepositPreauth } from "./depositPreauth";
 import { EscrowCancel } from "./escrowCancel";
 import { EscrowCreate } from "./escrowCreate";
 import { EscrowFinish } from "./escrowFinish";
+import Metadata from "./metadata";
 import { OfferCancel } from "./offerCancel";
 import { OfferCreate } from "./offerCreate";
 import { PaymentChannelClaim } from "./paymentChannelClaim";
