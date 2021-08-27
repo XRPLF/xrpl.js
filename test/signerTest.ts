@@ -1,4 +1,5 @@
 import { assert } from 'chai'
+//import { deriveKeypair } from 'ripple-keypairs/dist'
 import { sign, authorizeChannel } from 'xrpl-local/ledger/signer'
 import { SignedTransaction } from '../src/common/types/objects'
 import { Transaction } from '../src/models/transactions'
@@ -49,9 +50,15 @@ describe('Signer tests', function () {
     })
 
     it ('authorizeChannel succeeds', () => {
-        const publicKey = '02DEBD2E84F1FB9FB8A0E565F23B3109B43B5EB83DD615E1C59506C16D2EE5CDEF'
-        const secretKey = '081C78F2789D35A2D501226BD099A71ED7719FDFC9ACA0257EC4246C022F960F'
-        const wallet = new Wallet(publicKey, secretKey)
+        //const keypair = deriveKeypair('snoPBrXtMeMyMHUVTgbuqAfg1SUTb')
+        const keypair = {
+            publicKey: "02DEBD2E84F1FB9FB8A0E565F23B3109B43B5EB83DD615E1C59506C16D2EE5CDEF",
+            privateKey: "081C78F2789D35A2D501226BD099A71ED7719FDFC9ACA0257EC4246C022F960F"
+        }
+        console.log(keypair)
+        //const publicKey = '02DEBD2E84F1FB9FB8A0E565F23B3109B43B5EB83DD615E1C59506C16D2EE5CDEF'
+        //const secretKey = '081C78F2789D35A2D501226BD099A71ED7719FDFC9ACA0257EC4246C022F960F'
+        const wallet = new Wallet(keypair.publicKey, keypair.privateKey)
         const channelId = '5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3'
         const amount = '1000000'
 

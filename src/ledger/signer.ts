@@ -1,13 +1,15 @@
 import { BigNumber } from "bignumber.js";
 import { decodeAccountID } from "ripple-address-codec";
 import { ValidationError } from "../common/errors";
-import { encode, decode } from 'ripple-binary-codec'
+import { encode, decode, encodeForSigningClaim } from 'ripple-binary-codec'
 import { Transaction } from "../models/transactions";
 import Wallet from "../Wallet";
-import { computeBinaryTransactionHash, signPaymentChannelClaim } from "../utils";
+import { computeBinaryTransactionHash } from "../utils";
 import { flatMap } from "lodash";
 import { SignedTransaction } from "../common/types/objects";
 import { verifyBaseTransaction } from "../models/transactions/common";
+//import { encodeForSigningClaim } from 'ripple-binary-codec'
+import { sign as signWithKeypair, verify as verifySignature } from 'ripple-keypairs'
 
 function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
     verifyBaseTransaction(tx)
@@ -108,8 +110,32 @@ function authorizeChannel(wallet: Wallet, channelId: string, amount: string): st
     //wallet.signTransaction
     //encodeAccountPublic(wallet.publicKey)
     //wallet.signTransaction
+    const signingData = encodeForSigningClaim({
+      channel: channelId,
+      amount: amount
+    })
+    console.log("Signing Data:")
+    console.log(signingData)
+/*
+Amount xrpToDrops: 3045022100BA56768853586214099F6708D9A49FA4E4D21EAEBDEA309FDFA1FF5C28DBB3FE02203CA8984A2B562535E4F6263BF8604E5C8B0776D15E0AED51046A6F6ED8B75AE1
+Amount no xrp2Drp: 3045022100BA56768853586214099F6708D9A49FA4E4D21EAEBDEA309FDFA1FF5C28DBB3FE02203CA8984A2B562535E4F6263BF8604E5C8B0776D15E0AED51046A6F6ED8B75AE1    
+(Same!)
 
-    return signPaymentChannelClaim(channelId, amount, wallet.privateKey)
+const num = bigInt(String(claim.amount));
+    const prefix = HashPrefix.paymentChannelClaim;
+    const channel = coreTypes.Hash256.from(claim.channel).toBytes();
+    const amount = coreTypes.UInt64.from(num).toBytes();
+  
+    const bytesList = new BytesList();
+  
+    bytesList.put(prefix);
+    bytesList.put(channel);
+    bytesList.put(amount);*/
+    
+    return signWithKeypair(signingData, wallet.privateKey)
+  
+
+    //return signPaymentChannelClaim(channelId, amount, wallet.privateKey)
 }
 /*
     //channelId concat with the xrp amount in drops
@@ -134,7 +160,9 @@ function authorizeChannel(wallet: Wallet, channelId: string, amount: string): st
 
 // TODO: Implement verify
 function verify(tx: Transaction): void {
-    return null
+  //Verify tx.TxnSignature by using tx.SigningPubKey
+  //TODO: Check whether we need to remove the TxnSignature and SigningPubKey fields before encoding
+  verifySignature(encode(tx), tx.TxnSignature, tx.SigningPubKey)
 }
 
 export { sign, multisign, authorizeChannel, verify }
