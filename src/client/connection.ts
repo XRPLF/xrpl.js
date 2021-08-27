@@ -241,7 +241,7 @@ class RequestManager {
     }
     if (data.status !== "success") {
       const error = new ResponseFormatError(
-        `unrecognized status: ${data.status}`,
+        `unrecognized response.status: ${data.status}`,
         data
       );
       this.reject(data.id, error);

@@ -88,7 +88,7 @@ function xrpRippledResponse(request: BookOffersRequest): object {
  */
 export default <TestSuite>{
   async normal(client, address, mockRippled) {
-    mockRippled.addResponse({ command: "book_offers" }, normalRippledResponse);
+    mockRippled.addResponse("book_offers", normalRippledResponse);
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.normal,
@@ -98,7 +98,7 @@ export default <TestSuite>{
   },
 
   "invalid options": async (client, address, mockRippled) => {
-    mockRippled.addResponse({ command: "book_offers" }, normalRippledResponse);
+    mockRippled.addResponse("book_offers", normalRippledResponse);
     assertRejects(
       client.getOrderbook(address, requests.getOrderbook.normal, {
         // @ts-expect-error
@@ -109,7 +109,7 @@ export default <TestSuite>{
   },
 
   "with XRP": async (client, address, mockRippled) => {
-    mockRippled.addResponse({ command: "book_offers" }, xrpRippledResponse);
+    mockRippled.addResponse("book_offers", xrpRippledResponse);
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.withXRP
@@ -154,7 +154,7 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse({ command: "book_offers" }, normalRippledResponse);
+    mockRippled.addResponse("book_offers", normalRippledResponse);
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.normal
@@ -183,7 +183,7 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse({ command: "book_offers" }, normalRippledResponse);
+    mockRippled.addResponse("book_offers", normalRippledResponse);
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.normal
@@ -204,7 +204,7 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse({ command: "book_offers" }, normalRippledResponse);
+    mockRippled.addResponse("book_offers", normalRippledResponse);
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.normal
