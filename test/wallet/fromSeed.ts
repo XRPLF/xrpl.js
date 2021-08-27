@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
 import ECDSA from "../../src/common/ecdsa";
 import Wallet from "../../src/Wallet";

@@ -1,8 +1,13 @@
-import { ValidationError } from "../../src/common/errors";
+import { assert } from "chai";
+import binary from "ripple-binary-codec";
+
+import { ValidationError } from "xrpl-local/common/errors";
+import * as schemaValidator from "xrpl-local/common/schema-validator";
+
 import requests from "../fixtures/requests";
 import responses from "../fixtures/responses";
 import rippled from "../fixtures/rippled";
-import { assertRejects, assertResultMatch, TestSuite } from "../testUtils";
+import { assertResultMatch, TestSuite, assertRejects } from "../testUtils";
 
 const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
 const { preparePayment: REQUEST_FIXTURES } = requests;
@@ -501,58 +506,68 @@ export default <TestSuite>{
     assertResultMatch(response, RESPONSE_FIXTURES.noCounterparty, "prepare");
   },
 
-  // 'preparePayment with source.amount/destination.minAmount can be signed':
-  //   async (client, address, mockRippled) => {
-  //     mockRippled.addResponse(
-  //       {command: 'server_info'},
-  //       rippled.server_info.normal
-  //     )
-  //     mockRippled.addResponse({command: 'fee'}, rippled.fee)
-  //     mockRippled.addResponse(
-  //       {command: 'ledger_current'},
-  //       rippled.ledger_current
-  //     )
-  //     mockRippled.addResponse(
-  //       {command: 'account_info'},
-  //       rippled.account_info.normal
-  //     )
-  //     // See also: 'sign succeeds with source.amount/destination.minAmount'
+  "preparePayment with source.amount/destination.minAmount can be signed":
+    async (client, address, mockRippled) => {
+      mockRippled.addResponse(
+        { command: "server_info" },
+        rippled.server_info.normal
+      );
+      mockRippled.addResponse({ command: "fee" }, rippled.fee);
+      mockRippled.addResponse(
+        { command: "ledger_current" },
+        rippled.ledger_current
+      );
+      mockRippled.addResponse(
+        { command: "account_info" },
+        rippled.account_info.normal
+      );
+      // See also: 'sign succeeds with source.amount/destination.minAmount'
 
-  //     const localInstructions = {
-  //       ...instructionsWithMaxLedgerVersionOffset,
-  //       sequence: 23
-  //     }
+      const localInstructions = {
+        ...instructionsWithMaxLedgerVersionOffset,
+        sequence: 23,
+      };
+      const response = await client.preparePayment(
+        address,
+        {
+          source: {
+            address,
+            amount: {
+              currency: "GBP",
+              value: "0.1",
+              counterparty: "rpat5TmYjDsnFSStmgTumFgXCM9eqsWPro",
+            },
+          },
+          destination: {
+            address: "rEX4LtGJubaUcMWCJULcy4NVxGT9ZEMVRq",
+            minAmount: {
+              currency: "USD",
+              value: "0.1248548562296331",
+              counterparty: "rMaa8VLBTjwTJWA2kSme4Sqgphhr6Lr6FH",
+            },
+          },
+        },
+        localInstructions
+      );
 
-  //     const response = await client.preparePayment(address, {
-  //       source: {
-  //         address,
-  //         amount: {
-  //           currency: 'GBP',
-  //           value: '0.1',
-  //           counterparty: 'rpat5TmYjDsnFSStmgTumFgXCM9eqsWPro'
-  //         }
-  //       },
-  //       localInstructions
-  //     })
+      // Important: check that the prepared transaction can actually be signed
+      // https://github.com/ripple/ripple-lib/issues/1237#issuecomment-631670946
 
-  //   // Important: check that the prepared transaction can actually be signed
-  //   // https://github.com/ripple/ripple-lib/issues/1237#issuecomment-631670946
-
-  //   const secret = 'shotKgaEotpcYsshSE39vmSnBDRim'
-  //   const result = client.sign(response.txJSON, secret)
-  //   const expectedResult = {
-  //     signedTransaction:
-  //       '12000022800200002400000017201B0086955361EC6386F26FC0FFFF0000000000000000000000005553440000000000DC596C88BCDE4E818D416FCDEEBF2C8656BADC9A68400000000000000C69D4438D7EA4C6800000000000000000000000000047425000000000000C155FFE99C8C91F67083CEFFDB69EBFE76348CA6AD4446F8C5D8A5E0B0000000000000000000000005553440000000000DC596C88BCDE4E818D416FCDEEBF2C8656BADC9A7321022B05847086686F9D0499B13136B94AD4323EE1B67D4C429ECC987AB35ACFA34574473045022100D9634523D8E232D4A7807A71856023D82AC928FA29848571B820867898413B5F022041AC00EC1F81A26A6504EBF844A38CC3204694EF2CC1A97A87632721631F93DA81145E7B112523F68D2F5E879DB4EAC51C6698A6930483149F500E50C2F016CA01945E5A1E5846B61EF2D376',
-  //     id: '1C558AA9B926C24FB6BBD6950B2DB1350A83F9F12E4385208867907019761A2D'
-  //   }
-  //   const decoded = decode(result.signedTransaction)
-  //   assert(
-  //     decoded.Flags === 2147614720,
-  //     `Flags = ${decoded.Flags}, should be 2147614720`
-  //   )
-  //   assert.deepEqual(result, expectedResult)
-  //   schemaValidator.schemaValidate('sign', result)
-  // },
+      const secret = "shotKgaEotpcYsshSE39vmSnBDRim";
+      const result = client.sign(response.txJSON, secret);
+      const expectedResult = {
+        signedTransaction:
+          "12000022800200002400000017201B0086955361EC6386F26FC0FFFF0000000000000000000000005553440000000000DC596C88BCDE4E818D416FCDEEBF2C8656BADC9A68400000000000000C69D4438D7EA4C6800000000000000000000000000047425000000000000C155FFE99C8C91F67083CEFFDB69EBFE76348CA6AD4446F8C5D8A5E0B0000000000000000000000005553440000000000DC596C88BCDE4E818D416FCDEEBF2C8656BADC9A7321022B05847086686F9D0499B13136B94AD4323EE1B67D4C429ECC987AB35ACFA34574473045022100D9634523D8E232D4A7807A71856023D82AC928FA29848571B820867898413B5F022041AC00EC1F81A26A6504EBF844A38CC3204694EF2CC1A97A87632721631F93DA81145E7B112523F68D2F5E879DB4EAC51C6698A6930483149F500E50C2F016CA01945E5A1E5846B61EF2D376",
+        id: "1C558AA9B926C24FB6BBD6950B2DB1350A83F9F12E4385208867907019761A2D",
+      };
+      const decoded = binary.decode(result.signedTransaction);
+      assert(
+        decoded.Flags === 2147614720,
+        `Flags = ${decoded.Flags}, should be 2147614720`
+      );
+      assert.deepEqual(result, expectedResult);
+      schemaValidator.schemaValidate("sign", result);
+    },
 
   "destination.minAmount": async (client, address, mockRippled) => {
     mockRippled.addResponse(

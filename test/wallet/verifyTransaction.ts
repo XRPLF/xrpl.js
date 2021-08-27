@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
 import Wallet from "xrpl-local/Wallet";
 

@@ -42,7 +42,6 @@
     "@typescript-eslint/parser": "^3.7.0",
     "@xrplf/eslint-config": "^1.1.0",
     "assert": "^2.0.0",
-    "assert-diff": "^3.0.0",
     "buffer": "^6.0.2",
     "chai": "^4.3.4",
     "crypto-browserify": "^3.12.0",

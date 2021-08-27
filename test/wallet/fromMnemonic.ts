@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
 import Wallet from "../../src/Wallet";
 import { TestSuite } from "../testUtils";

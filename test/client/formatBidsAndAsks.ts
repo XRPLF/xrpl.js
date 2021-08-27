@@ -1,5 +1,5 @@
 // import BigNumber from 'bignumber.js'
-// import assert from 'assert-diff'
+// import {assert} from 'chai'
 // import {Client} from 'xrpl-local'
 // import requests from '../fixtures/requests'
 // import responses from '../fixtures/responses'

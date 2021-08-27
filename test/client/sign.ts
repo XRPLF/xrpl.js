@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 import binary from "ripple-binary-codec";
 
 import * as schemaValidator from "xrpl-local/common/schema-validator";
@@ -304,7 +304,7 @@ export default <TestSuite>{
     const secret = "shsWGZcmZz6YsWWmcnpfr6fLTdtFV";
     assert.throws(() => {
       client.sign(payment.txJSON, secret);
-    }, /^Error: 1\.1234567 is an illegal amount/);
+    }, /^1.1234567 is an illegal amount/);
   },
 
   "throws when encoded tx does not match decoded tx - prepared order": async (
@@ -375,7 +375,7 @@ export default <TestSuite>{
 
     assert.throws(() => {
       client.sign(request.txJSON, secret);
-    }, /Error: 1\.2 is an illegal amount/);
+    }, /1\.2 is an illegal amount/);
   },
 
   "throws when encoded tx does not match decoded tx - higher fee": async (
@@ -395,7 +395,7 @@ export default <TestSuite>{
 
     assert.throws(() => {
       client.sign(request.txJSON, secret);
-    }, /Error: 1123456\.7 is an illegal amount/);
+    }, /1123456\.7 is an illegal amount/);
   },
 
   "throws when Fee exceeds maxFeeXRP (in drops)": async (client, address) => {
