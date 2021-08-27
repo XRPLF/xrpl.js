@@ -13,23 +13,24 @@ describe("OfferCancel Transaction Verification", function () {
 
   beforeEach(function () {
     offer = {
-      Account: "rnKiczmiQkZFiDES8THYyLA2pQohC5C6EF",
-      Fee: "10",
-      LastLedgerSequence: 65477334,
-      OfferSequence: 60797528,
-      Sequence: 60797535,
+      Account: "rB5Ux4Lv2nRx6eeoAAsZmtctnBQ2LiACnk",
+      Fee: "12",
+      Flags: 2147483648,
+      LastLedgerSequence: 65953204,
+      OfferSequence: 63822840,
+      Sequence: 63822842,
       SigningPubKey:
-        "0361BFD43D1EEA54B77CC152887312949EBF052997FBFFCDAF6F2653164B55B21...",
+        "0369C9BC4D18FAE741898828A1F48E53E53F6F3DB3191441CC85A14D4FC140E031",
       TransactionType: "OfferCancel",
       TxnSignature:
-        "30450221008C43BDCFC68B4793857CA47DF454C07E5B45D3F80E8E6785CAB9292...",
-      date: "2021-08-06T21:04:11Z",
+        "304402203EC848BD6AB42DC8509285245804B15E1652092CC0B189D369E12E563771D049022046DF40C16EA05DC99D01E553EA2E218FCA1C5B38927889A2BDF064D1F44D60F0",
     } as any;
   });
 
   it(`verifies valid OfferCancel`, function () {
     assert.doesNotThrow(() => verifyOfferCancel(offer));
-    assert.doesNotThrow(() => verify(offer));
+    // assert.doesNotThrow(() => verify(offer));
+    verify(offer);
   });
 
   it(`verifies valid OfferCancel with flags`, function () {

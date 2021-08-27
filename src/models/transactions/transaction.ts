@@ -1,24 +1,39 @@
 import Metadata from "../common/metadata";
 
-import { AccountDelete } from "./accountDelete";
-import { AccountSet } from "./accountSet";
-import { CheckCancel } from "./checkCancel";
-import { CheckCash } from "./checkCash";
-import { CheckCreate } from "./checkCreate";
-import { DepositPreauth } from "./depositPreauth";
-import { EscrowCancel } from "./escrowCancel";
-import { EscrowCreate } from "./escrowCreate";
-import { EscrowFinish } from "./escrowFinish";
-import { OfferCancel } from "./offerCancel";
-import { OfferCreate } from "./offerCreate";
-import { PaymentChannelClaim } from "./paymentChannelClaim";
-import { PaymentChannelCreate } from "./paymentChannelCreate";
-import { PaymentChannelFund } from "./paymentChannelFund";
-import { PaymentTransaction } from "./paymentTransaction";
-import { SetRegularKey } from "./setRegularKey";
-import { SignerListSet } from "./signerListSet";
-import { TicketCreate } from "./ticketCreate";
-import { TrustSet } from "./trustSet";
+import { AccountDelete, verifyAccountDelete } from "./accountDelete";
+import { AccountSet, verifyAccountSet } from "./accountSet";
+import { CheckCancel, verifyCheckCancel } from "./checkCancel";
+import { CheckCash, verifyCheckCash } from "./checkCash";
+import { CheckCreate, verifyCheckCreate } from "./checkCreate";
+import { DepositPreauth, verifyDepositPreauth } from "./depositPreauth";
+import { EscrowCreate, verifyEscrowCreate } from "./escrowCreate";
+import { EscrowCancel, verifyEscrowCancel } from "./escrowCancel";
+import { EscrowFinish, verifyEscrowFinish } from "./escrowFinish";
+import { OfferCancel, verifyOfferCancel } from "./offerCancel";
+import { OfferCreate, verifyOfferCreate } from "./offerCreate";
+import {
+  PaymentTransaction,
+  verifyPaymentTransaction,
+} from "./paymentTransaction";
+import {
+  PaymentChannelClaim,
+  verifyPaymentChannelClaim,
+} from "./paymentChannelClaim";
+import {
+  PaymentChannelCreate,
+  verifyPaymentChannelCreate,
+} from "./paymentChannelCreate";
+import {
+  PaymentChannelFund,
+  verifyPaymentChannelFund,
+} from "./paymentChannelFund";
+import { SetRegularKey, verifySetRegularKey } from "./setRegularKey";
+import { SignerListSet, verifySignerListSet } from "./signerListSet";
+import { TicketCreate, verifyTicketCreate } from "./ticketCreate";
+import { TrustSet, verifyTrustSet } from "./trustSet";
+import { ValidationError } from "../../common/errors";
+import { isEqual } from "lodash";
+import { encode, decode } from "ripple-binary-codec";
 
 export type Transaction =
   | AccountDelete
@@ -134,6 +149,11 @@ export function verify(tx: Transaction): void {
       throw new ValidationError(`Invalid field TransactionType`);
   }
 
+  // console.log(tx);
+  // const x = encode(tx);
+  // console.log(x);
+  // console.log(decode(x));
+  // console.log(isEqual(decode(encode(tx)), tx));
   if (!isEqual(decode(encode(tx)), tx))
     throw new ValidationError(`Invalid Transaction: ${tx.TransactionType}`);
 }

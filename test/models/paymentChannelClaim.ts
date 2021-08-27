@@ -13,7 +13,7 @@ describe("PaymentChannelClaim Transaction Verification", function () {
 
   beforeEach(function () {
     channel = {
-      Account: "r...",
+      Account: "rB5Ux4Lv2nRx6eeoAAsZmtctnBQ2LiACnk",
       TransactionType: "PaymentChannelClaim",
       Channel:
         "C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198",
