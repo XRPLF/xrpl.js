@@ -20,7 +20,7 @@ export interface PaymentTransactionFlags extends GlobalFlags {
   tfPartialPayment?: boolean;
   tfLimitQuality?: boolean;
 }
-export interface PaymentTransaction extends BaseTransaction {
+export interface Payment extends BaseTransaction {
   TransactionType: "Payment";
   Amount: Amount;
   Destination: string;
@@ -34,10 +34,9 @@ export interface PaymentTransaction extends BaseTransaction {
 
 /**
  * @param tx - A Payment Transaction.
- * @returns
  * @throws {ValidationError} When the PaymentTransaction is malformed.
  */
-export function verifyPaymentTransaction(tx: PaymentTransaction): void {
+export function verifyPayment(tx: Payment): void {
   verifyBaseTransaction(tx);
 
   if (tx.Amount === undefined) {

@@ -92,7 +92,6 @@ export interface BaseTransaction {
  * any time a transaction will be verified.
  *
  * @param common - An interface w/ common transaction fields.
- * @returns Void.
  * @throws When the common param is malformed.
  */
 export function verifyBaseTransaction(common: BaseTransaction): void {

@@ -14,7 +14,6 @@ export interface CheckCash extends BaseTransaction {
  * Verify the form and type of an CheckCash at runtime.
  *
  * @param tx - An CheckCash Transaction.
- * @returns Void.
  * @throws When the CheckCash is Malformed.
  */
 export function verifyCheckCash(tx: CheckCash): void {

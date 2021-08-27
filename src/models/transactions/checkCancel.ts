@@ -11,7 +11,6 @@ export interface CheckCancel extends BaseTransaction {
  * Verify the form and type of an CheckCancel at runtime.
  *
  * @param tx - An CheckCancel Transaction.
- * @returns Void.
  * @throws When the CheckCancel is Malformed.
  */
 export function verifyCheckCancel(tx: CheckCancel): void {

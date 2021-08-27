@@ -16,7 +16,6 @@ export interface PaymentChannelCreate extends BaseTransaction {
  * Verify the form and type of an PaymentChannelCreate at runtime.
  *
  * @param tx - An PaymentChannelCreate Transaction.
- * @returns Void.
  * @throws When the PaymentChannelCreate is Malformed.
  */
 export function verifyPaymentChannelCreate(tx: PaymentChannelCreate): void {

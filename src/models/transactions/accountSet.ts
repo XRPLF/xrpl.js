@@ -29,7 +29,6 @@ export interface AccountSet extends BaseTransaction {
  * Verify the form and type of an AccountSet at runtime.
  *
  * @param tx - An AccountSet Transaction.
- * @returns Void.
  * @throws When the AccountSet is Malformed.
  */
 export function verifyAccountSet(tx: AccountSet): void {

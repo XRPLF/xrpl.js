@@ -16,7 +16,6 @@ export interface CheckCreate extends BaseTransaction {
  * Verify the form and type of an CheckCreate at runtime.
  *
  * @param tx - An CheckCreate Transaction.
- * @returns Void.
  * @throws When the CheckCreate is Malformed.
  */
 export function verifyCheckCreate(tx: CheckCreate): void {

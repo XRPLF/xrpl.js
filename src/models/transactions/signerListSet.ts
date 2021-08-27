@@ -13,7 +13,6 @@ export interface SignerListSet extends BaseTransaction {
  * Verify the form and type of an SignerListSet at runtime.
  *
  * @param tx - An SignerListSet Transaction.
- * @returns Void.
  * @throws When the SignerListSet is Malformed.
  */
 export function verifySignerListSet(tx: SignerListSet): void {

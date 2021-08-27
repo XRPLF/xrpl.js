@@ -16,7 +16,6 @@ export interface EscrowCreate extends BaseTransaction {
  * Verify the form and type of an EscrowCreate at runtime.
  *
  * @param tx - An EscrowCreate Transaction.
- * @returns Void.
  * @throws When the EscrowCreate is Malformed.
  */
 export function verifyEscrowCreate(tx: EscrowCreate): void {

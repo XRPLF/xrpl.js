@@ -10,7 +10,7 @@ export * from "./escrowCreate";
 export * from "./escrowFinish";
 export * from "./offerCancel";
 export * from "./offerCreate";
-export * from "./paymentTransaction";
+export * from "./payment";
 export * from "./paymentChannelClaim";
 export * from "./paymentChannelCreate";
 export * from "./paymentChannelFund";

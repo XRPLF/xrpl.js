@@ -11,7 +11,6 @@ export interface DepositPreauth extends BaseTransaction {
 /**
  *
  * @param tx - A DepositPreauth Transaction.
- * @returns
  * @throws {ValidationError} When the DepositPreauth is malformed.
  */
 export function verifyDepositPreauth(tx: DepositPreauth): void {
