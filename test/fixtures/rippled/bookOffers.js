@@ -8,7 +8,7 @@ module.exports.requestBookOffersBidsResponse = function(request) {
     pays: request.taker_pays
   }
 
-  return JSON.stringify({
+  return {
     id: request.id,
     status: 'success',
     type: 'response',
@@ -320,7 +320,7 @@ module.exports.requestBookOffersBidsResponse = function(request) {
       ],
       validated: false
     }
-  })
+  }
 }
 
 module.exports.requestBookOffersBidsPartialFundedResponse = function(
@@ -338,7 +338,7 @@ module.exports.requestBookOffersBidsPartialFundedResponse = function(
     }
   })
 
-  return JSON.stringify({
+  return {
     id: request.id,
     status: 'success',
     type: 'response',
@@ -384,7 +384,7 @@ module.exports.requestBookOffersBidsPartialFundedResponse = function(
         }
       ]
     }
-  })
+  }
 }
 
 module.exports.requestBookOffersAsksPartialFundedResponse = function(
@@ -402,7 +402,7 @@ module.exports.requestBookOffersAsksPartialFundedResponse = function(
     }
   })
 
-  return JSON.stringify({
+  return {
     id: request.id,
     status: 'success',
     type: 'response',
@@ -448,7 +448,7 @@ module.exports.requestBookOffersAsksPartialFundedResponse = function(
         }
       ]
     }
-  })
+  }
 }
 
 module.exports.requestBookOffersAsksResponse = function(request) {
@@ -457,7 +457,7 @@ module.exports.requestBookOffersAsksResponse = function(request) {
     pays: request.taker_pays
   }
 
-  return JSON.stringify({
+  return {
     id: request.id,
     result: {
       ledger_index: 10716345,
@@ -767,11 +767,11 @@ module.exports.requestBookOffersAsksResponse = function(request) {
     },
     status: 'success',
     type: 'response'
-  })
+  }
 }
 
 module.exports.requestBookOffersXRPBaseResponse = function(request) {
-  return JSON.stringify({
+  return {
     id: request.id,
     status: 'success',
     type: 'response',
@@ -1039,11 +1039,11 @@ module.exports.requestBookOffersXRPBaseResponse = function(request) {
       ],
       validated: true
     }
-  })
+  }
 }
 
 module.exports.requestBookOffersXRPCounterResponse = function(request) {
-  return JSON.stringify({
+  return {
     id: request.id,
     status: 'success',
     type: 'response',
@@ -1295,5 +1295,5 @@ module.exports.requestBookOffersXRPCounterResponse = function(request) {
       ],
       validated: true
     }
-  })
+  }
 }

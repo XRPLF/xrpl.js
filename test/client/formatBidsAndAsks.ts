@@ -3,7 +3,7 @@
 // import {Client} from 'xrpl-local'
 // import requests from '../fixtures/requests'
 // import responses from '../fixtures/responses'
-import {TestSuite} from '../testUtils'
+import { TestSuite } from "../testUtils";
 
 // function checkSortingOfOrders(orders) {
 //   let previousRate = '0'
@@ -56,7 +56,6 @@ export default <TestSuite>{
   //       counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
   //     }
   //   }
-
   //   await Promise.all([
   //     client.request({command: 'book_offers',
   //       taker_gets: orderbookInfo.base,
@@ -88,7 +87,6 @@ export default <TestSuite>{
   //     assert.deepEqual(orderbook, responses.getOrderbook.normal)
   //   })
   // },
-
   // 'with XRP': async (client, address) => {
   //   const orderbookInfo = {
   //     base: {
@@ -99,7 +97,6 @@ export default <TestSuite>{
   //       currency: 'XRP'
   //     }
   //   }
-
   //   await Promise.all([
   //     client.request({command: 'book_offers',
   //       taker_gets: orderbookInfo.base,
@@ -131,7 +128,6 @@ export default <TestSuite>{
   //     assert.deepEqual(orderbook, responses.getOrderbook.withXRP)
   //   })
   // },
-
   // 'sample XRP/JPY book has orders sorted correctly': async (client, address) => {
   //   const orderbookInfo = {
   //     base: {
@@ -143,9 +139,7 @@ export default <TestSuite>{
   //       issuer: 'rB3gZey7VWHYRqJHLoHDEJXJ2pEPNieKiS'
   //     }
   //   }
-
   //   const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR'
-
   //   await Promise.all([
   //     client.request({command: 'book_offers',
   //       taker_gets: orderbookInfo.base,
@@ -178,7 +172,6 @@ export default <TestSuite>{
   //     return checkSortingOfOrders(orderbook.asks)
   //   })
   // },
-
   // 'sample USD/XRP book has orders sorted correctly': async (client, address) => {
   //   const orderbookInfo = {
   //     counter: {currency: 'XRP'},
@@ -187,9 +180,7 @@ export default <TestSuite>{
   //       counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
   //     }
   //   }
-
   //   const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR'
-
   //   await Promise.all([
   //     client.request({command: 'book_offers',
   //       taker_gets: orderbookInfo.base,
@@ -224,7 +215,6 @@ export default <TestSuite>{
   //     )
   //   })
   // },
-
   // 'sorted so that best deals come first': async (client, address) => {
   //   const orderbookInfo = {
   //     base: {
@@ -236,7 +226,6 @@ export default <TestSuite>{
   //       counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
   //     }
   //   }
-
   //   await Promise.all([
   //     client.request({command: 'book_offers',
   //       taker_gets: orderbookInfo.base,
@@ -265,7 +254,6 @@ export default <TestSuite>{
   //       ...directOffers,
   //       ...reverseOffers
   //     ])
-
   //     const bidRates = orderbook.bids.map(
   //       (bid) => bid.properties.makerExchangeRate
   //     )
@@ -279,7 +267,6 @@ export default <TestSuite>{
   //     assert.deepEqual(askRates.map((x) => Number(x)).sort(), askRates)
   //   })
   // },
-
   // 'currency & counterparty are correct': async (client, address) => {
   //   const orderbookInfo = {
   //     base: {
@@ -291,7 +278,6 @@ export default <TestSuite>{
   //       counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
   //     }
   //   }
-
   //   await Promise.all([
   //     client.request({command: 'book_offers',
   //       taker_gets: orderbookInfo.base,
@@ -320,7 +306,6 @@ export default <TestSuite>{
   //       ...directOffers,
   //       ...reverseOffers
   //     ])
-
   //     const orders = [...orderbook.bids, ...orderbook.asks]
   //     orders.forEach((order) => {
   //       const quantity = order.specification.quantity
@@ -333,7 +318,6 @@ export default <TestSuite>{
   //     })
   //   })
   // },
-
   // 'direction is correct for bids and asks': async (client, address) => {
   //   const orderbookInfo = {
   //     base: {
@@ -345,7 +329,6 @@ export default <TestSuite>{
   //       counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
   //     }
   //   }
-
   //   await Promise.all([
   //     client.request({command: 'book_offers',
   //       taker_gets: orderbookInfo.base,
@@ -374,7 +357,6 @@ export default <TestSuite>{
   //       ...directOffers,
   //       ...reverseOffers
   //     ])
-
   //     assert(
   //       orderbook.bids.every((bid) => bid.specification.direction === 'buy')
   //     )
@@ -383,4 +365,4 @@ export default <TestSuite>{
   //     )
   //   })
   // }
-}
+};

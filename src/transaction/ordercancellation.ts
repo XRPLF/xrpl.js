@@ -1,21 +1,23 @@
-import * as utils from './utils'
-const validate = utils.common.validate
-import {Instructions, Prepare, TransactionJSON} from './types'
-import {Client} from '..'
+import { Client } from "..";
+
+import { Instructions, Prepare, TransactionJSON } from "./types";
+import * as utils from "./utils";
+
+const validate = utils.common.validate;
 
 function createOrderCancellationTransaction(
   account: string,
   orderCancellation: any
 ): TransactionJSON {
   const txJSON: any = {
-    TransactionType: 'OfferCancel',
+    TransactionType: "OfferCancel",
     Account: account,
-    OfferSequence: orderCancellation.orderSequence
-  }
+    OfferSequence: orderCancellation.orderSequence,
+  };
   if (orderCancellation.memos != null) {
-    txJSON.Memos = orderCancellation.memos.map(utils.convertMemo)
+    txJSON.Memos = orderCancellation.memos.map(utils.convertMemo);
   }
-  return txJSON
+  return txJSON;
 }
 
 function prepareOrderCancellation(
@@ -28,16 +30,16 @@ function prepareOrderCancellation(
     validate.prepareOrderCancellation({
       address,
       orderCancellation,
-      instructions
-    })
+      instructions,
+    });
     const txJSON = createOrderCancellationTransaction(
       address,
       orderCancellation
-    )
-    return utils.prepareTransaction(txJSON, this, instructions)
+    );
+    return utils.prepareTransaction(txJSON, this, instructions);
   } catch (e) {
-    return Promise.reject(e)
+    return Promise.reject(e);
   }
 }
 
-export default prepareOrderCancellation
+export default prepareOrderCancellation;
