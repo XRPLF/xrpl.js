@@ -23,8 +23,7 @@ export default <TestSuite>{
       { command: "server_info" },
       rippled.server_info.normal
     );
-    // @ts-expect-error
-    client._feeCushion = undefined;
+    client._feeCushion = undefined as unknown as number;
     const fee = await client.getFee();
     assert.strictEqual(fee, "0.000012");
   },

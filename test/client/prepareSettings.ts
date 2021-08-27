@@ -1,4 +1,5 @@
 import { assert } from "chai";
+import { FormattedSettings } from "../../src/common/types/objects";
 
 import requests from "../fixtures/requests";
 import responses from "../fixtures/responses";
@@ -52,8 +53,7 @@ export default <TestSuite>{
       address,
       requests.prepareSettings.domain,
       {
-        // @ts-expect-error
-        maxLedgerVersion: null,
+        maxLedgerVersion: null as unknown as undefined,
       }
     );
     assertResultMatch(
@@ -129,8 +129,7 @@ export default <TestSuite>{
     const regularKey = { regularKey: null };
     const response = await client.prepareSettings(
       address,
-      // @ts-expect-error
-      regularKey,
+      regularKey as unknown as FormattedSettings,
       instructionsWithMaxLedgerVersionOffset
     );
     assertResultMatch(
