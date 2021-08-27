@@ -1,5 +1,6 @@
-import { LedgerEntry } from "../ledger";
 import { Transaction } from "../transactions";
+
+import LedgerEntry from "./ledgerEntry";
 
 export default interface Ledger {
   account_hash: string;

@@ -1,6 +1,6 @@
-import { BaseLedgerEntry } from "./baseLedgerEntry";
+import BaseLedgerEntry from "./baseLedgerEntry";
 
-export interface DirectoryNode extends BaseLedgerEntry {
+export default interface DirectoryNode extends BaseLedgerEntry {
   LedgerEntryType: "DirectoryNode";
   Flags: number;
   RootIndex: string;

@@ -1,6 +1,6 @@
-import { BaseLedgerEntry } from "./baseLedgerEntry";
+import BaseLedgerEntry from "./baseLedgerEntry";
 
-export interface FeeSettings extends BaseLedgerEntry {
+export default interface FeeSettings extends BaseLedgerEntry {
   LedgerEntryType: "FeeSettings";
   BaseFee: string;
   ReferenceFeeUnits: number;
