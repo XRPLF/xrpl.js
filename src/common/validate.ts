@@ -1,9 +1,10 @@
-import _ from 'lodash'
-import {ValidationError} from './errors'
-import {schemaValidate} from './schema-validator'
+import _ from "lodash";
+
+import { ValidationError } from "./errors";
+import { schemaValidate } from "./schema-validator";
 
 function error(text) {
-  return new ValidationError(text)
+  return new ValidationError(text);
 }
 
 function validateLedgerRange(options) {
@@ -13,158 +14,161 @@ function validateLedgerRange(options) {
     options.maxLedgerVersion != null
   ) {
     if (Number(options.minLedgerVersion) > Number(options.maxLedgerVersion)) {
-      throw error('minLedgerVersion must not be greater than maxLedgerVersion')
+      throw error("minLedgerVersion must not be greater than maxLedgerVersion");
     }
   }
 }
 
 function validateOptions(schema, instance) {
-  schemaValidate(schema, instance)
-  validateLedgerRange(instance.options)
+  schemaValidate(schema, instance);
+  validateLedgerRange(instance.options);
 }
 
-export const getPaths = _.partial(schemaValidate, 'getPathsParameters')
+export const getPaths = _.partial(schemaValidate, "getPathsParameters");
 
 export const getTransactions = _.partial(
   validateOptions,
-  'getTransactionsParameters'
-)
+  "getTransactionsParameters"
+);
 
-export const getSettings = _.partial(validateOptions, 'getSettingsParameters')
+export const getSettings = _.partial(validateOptions, "getSettingsParameters");
 
 export const getAccountInfo = _.partial(
   validateOptions,
-  'getAccountInfoParameters'
-)
+  "getAccountInfoParameters"
+);
 
 export const getTrustlines = _.partial(
   validateOptions,
-  'getTrustlinesParameters'
-)
+  "getTrustlinesParameters"
+);
 
-export const getBalances = _.partial(validateOptions, 'getBalancesParameters')
+export const getBalances = _.partial(validateOptions, "getBalancesParameters");
 
 export const getBalanceSheet = _.partial(
   validateOptions,
-  'getBalanceSheetParameters'
-)
+  "getBalanceSheetParameters"
+);
 
-export const getOrders = _.partial(validateOptions, 'getOrdersParameters')
+export const getOrders = _.partial(validateOptions, "getOrdersParameters");
 
-export const getOrderbook = _.partial(validateOptions, 'getOrderbookParameters')
+export const getOrderbook = _.partial(
+  validateOptions,
+  "getOrderbookParameters"
+);
 
 export const getTransaction = _.partial(
   validateOptions,
-  'getTransactionParameters'
-)
+  "getTransactionParameters"
+);
 
 export const getPaymentChannel = _.partial(
   validateOptions,
-  'getPaymentChannelParameters'
-)
+  "getPaymentChannelParameters"
+);
 
-export const getLedger = _.partial(validateOptions, 'getLedgerParameters')
+export const getLedger = _.partial(validateOptions, "getLedgerParameters");
 
 export const preparePayment = _.partial(
   schemaValidate,
-  'preparePaymentParameters'
-)
+  "preparePaymentParameters"
+);
 
-export const prepareOrder = _.partial(schemaValidate, 'prepareOrderParameters')
+export const prepareOrder = _.partial(schemaValidate, "prepareOrderParameters");
 
 export const prepareOrderCancellation = _.partial(
   schemaValidate,
-  'prepareOrderCancellationParameters'
-)
+  "prepareOrderCancellationParameters"
+);
 
 export const prepareTrustline = _.partial(
   schemaValidate,
-  'prepareTrustlineParameters'
-)
+  "prepareTrustlineParameters"
+);
 
 export const prepareSettings = _.partial(
   schemaValidate,
-  'prepareSettingsParameters'
-)
+  "prepareSettingsParameters"
+);
 
 export const prepareEscrowCreation = _.partial(
   schemaValidate,
-  'prepareEscrowCreationParameters'
-)
+  "prepareEscrowCreationParameters"
+);
 
 export const prepareEscrowCancellation = _.partial(
   schemaValidate,
-  'prepareEscrowCancellationParameters'
-)
+  "prepareEscrowCancellationParameters"
+);
 
 export const prepareEscrowExecution = _.partial(
   schemaValidate,
-  'prepareEscrowExecutionParameters'
-)
+  "prepareEscrowExecutionParameters"
+);
 
 export const preparePaymentChannelCreate = _.partial(
   schemaValidate,
-  'preparePaymentChannelCreateParameters'
-)
+  "preparePaymentChannelCreateParameters"
+);
 
 export const preparePaymentChannelFund = _.partial(
   schemaValidate,
-  'preparePaymentChannelFundParameters'
-)
+  "preparePaymentChannelFundParameters"
+);
 
 export const preparePaymentChannelClaim = _.partial(
   schemaValidate,
-  'preparePaymentChannelClaimParameters'
-)
+  "preparePaymentChannelClaimParameters"
+);
 
 export const prepareCheckCreate = _.partial(
   schemaValidate,
-  'prepareCheckCreateParameters'
-)
+  "prepareCheckCreateParameters"
+);
 
 export const prepareCheckCash = _.partial(
   schemaValidate,
-  'prepareCheckCashParameters'
-)
+  "prepareCheckCashParameters"
+);
 
 export const prepareCheckCancel = _.partial(
   schemaValidate,
-  'prepareCheckCancelParameters'
-)
+  "prepareCheckCancelParameters"
+);
 
 export const prepareTicketCreate = _.partial(
   schemaValidate,
-  'prepareTicketParameters'
-)
+  "prepareTicketParameters"
+);
 
-export const sign = _.partial(schemaValidate, 'signParameters')
+export const sign = _.partial(schemaValidate, "signParameters");
 
-export const combine = _.partial(schemaValidate, 'combineParameters')
+export const combine = _.partial(schemaValidate, "combineParameters");
 
-export const submit = _.partial(schemaValidate, 'submitParameters')
+export const submit = _.partial(schemaValidate, "submitParameters");
 
 export const computeLedgerHash = _.partial(
   schemaValidate,
-  'computeLedgerHashParameters'
-)
+  "computeLedgerHashParameters"
+);
 
 export const generateAddress = _.partial(
   schemaValidate,
-  'generateAddressParameters'
-)
+  "generateAddressParameters"
+);
 
 export const signPaymentChannelClaim = _.partial(
   schemaValidate,
-  'signPaymentChannelClaimParameters'
-)
+  "signPaymentChannelClaimParameters"
+);
 
 export const verifyPaymentChannelClaim = _.partial(
   schemaValidate,
-  'verifyPaymentChannelClaimParameters'
-)
+  "verifyPaymentChannelClaimParameters"
+);
 
-export const apiOptions = _.partial(schemaValidate, 'api-options')
+export const apiOptions = _.partial(schemaValidate, "api-options");
 
-export const instructions = _.partial(schemaValidate, 'instructions')
+export const instructions = _.partial(schemaValidate, "instructions");
 
-export const tx_json = _.partial(schemaValidate, 'tx-json')
+export const tx_json = _.partial(schemaValidate, "tx-json");

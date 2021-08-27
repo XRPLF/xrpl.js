@@ -1,0 +1,11 @@
+
+{
+    "extends": "./tsconfig.json",
+    "include": [
+        "./src/**/*.ts",
+        "./test/**/*.ts",
+        "./snippets/src/**/*.ts",
+        ".prettierrc.js",
+        "jest.config.js"
+    ]
+}

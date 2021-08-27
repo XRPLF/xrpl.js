@@ -1,132 +1,135 @@
-import { ValidationError } from 'xrpl-local/common/errors'
-import { verifyEscrowCreate } from './../../src/models/transactions/escrowCreate'
-import { assert } from 'chai'
+import { assert } from "chai";
+
+import { ValidationError } from "xrpl-local/common/errors";
+
+import { verifyEscrowCreate } from "../../src/models/transactions/escrowCreate";
 
 /**
- * EscrowCreate Transaction Verification Testing
+ * EscrowCreate Transaction Verification Testing.
  *
- * Providing runtime verification testing for each specific transaction type
+ * Providing runtime verification testing for each specific transaction type.
  */
-describe('EscrowCreate Transaction Verification', function () {
-    let escrow
+describe("EscrowCreate Transaction Verification", function () {
+  let escrow;
 
-    beforeEach(() => {
-        escrow = {
-            Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            TransactionType: "EscrowCreate",
-            Amount: "10000",
-            Destination: "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-            CancelAfter: 533257958,
-            FinishAfter: 533171558,
-            Condition: "A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100",
-            DestinationTag: 23480,
-            SourceTag: 11747
-        }
-    })
-    
-    it (`verifies valid EscrowCreate`, () => {        
-        assert.doesNotThrow(() => verifyEscrowCreate(escrow))
-    })
+  beforeEach(function () {
+    escrow = {
+      Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+      TransactionType: "EscrowCreate",
+      Amount: "10000",
+      Destination: "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
+      CancelAfter: 533257958,
+      FinishAfter: 533171558,
+      Condition:
+        "A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100",
+      DestinationTag: 23480,
+      SourceTag: 11747,
+    };
+  });
 
-    it (`Missing amount`, () => {
-        delete escrow.Amount
-        
-        assert.throws(
-            () => verifyEscrowCreate(escrow),
-            ValidationError,
-            "EscrowCreate: missing field Amount"
-        )
-    })
+  it(`verifies valid EscrowCreate`, function () {
+    assert.doesNotThrow(() => verifyEscrowCreate(escrow));
+  });
 
-    it (`Missing destination`, () => {
-        delete escrow.Destination
-        
-        assert.throws(
-            () => verifyEscrowCreate(escrow),
-            ValidationError,
-            "EscrowCreate: missing field Destination"
-        )
-    })
+  it(`Missing amount`, function () {
+    delete escrow.Amount;
 
-    it (`throws w/ invalid Destination`, () => {
-        escrow.Destination = 10
+    assert.throws(
+      () => verifyEscrowCreate(escrow),
+      ValidationError,
+      "EscrowCreate: missing field Amount"
+    );
+  });
 
-        assert.throws(
-            () => verifyEscrowCreate(escrow),
-            ValidationError,
-            "EscrowCreate: Destination must be a string"
-        )
-    })
+  it(`Missing destination`, function () {
+    delete escrow.Destination;
 
-    it (`throws w/ invalid Amount`, () => {
-        escrow.Amount = 1000
+    assert.throws(
+      () => verifyEscrowCreate(escrow),
+      ValidationError,
+      "EscrowCreate: missing field Destination"
+    );
+  });
 
-        assert.throws(
-            () => verifyEscrowCreate(escrow),
-            ValidationError,
-            "EscrowCreate: Amount must be a string"
-        )
-    })
+  it(`throws w/ invalid Destination`, function () {
+    escrow.Destination = 10;
 
-    it (`invalid CancelAfter`, () => {
-        escrow.CancelAfter = "100"
-        
-        assert.throws(
-            () => verifyEscrowCreate(escrow),
-            ValidationError,
-            "EscrowCreate: CancelAfter must be a number"
-        )    
-    })
+    assert.throws(
+      () => verifyEscrowCreate(escrow),
+      ValidationError,
+      "EscrowCreate: Destination must be a string"
+    );
+  });
 
-    it (`invalid FinishAfter`, () => {
-        escrow.FinishAfter = "1000"
+  it(`throws w/ invalid Amount`, function () {
+    escrow.Amount = 1000;
 
-        assert.throws(
-            () => verifyEscrowCreate(escrow),
-            ValidationError,
-            "EscrowCreate: FinishAfter must be a number"
-        )    
-    })
+    assert.throws(
+      () => verifyEscrowCreate(escrow),
+      ValidationError,
+      "EscrowCreate: Amount must be a string"
+    );
+  });
 
-    it (`invalid Condition`, () => {
-        escrow.Condition = 0x141243
-        
-        assert.throws(
-            () => verifyEscrowCreate(escrow),
-            ValidationError,
-            "EscrowCreate: Condition must be a string"
-        )    
-    })
+  it(`invalid CancelAfter`, function () {
+    escrow.CancelAfter = "100";
 
-    it (`invalid DestinationTag`, () => {
-        escrow.DestinationTag = "100"
-        
-        assert.throws(
-            () => verifyEscrowCreate(escrow),
-            ValidationError,
-            "EscrowCreate: DestinationTag must be a number"
-        )    
-    })
+    assert.throws(
+      () => verifyEscrowCreate(escrow),
+      ValidationError,
+      "EscrowCreate: CancelAfter must be a number"
+    );
+  });
 
-    it (`Missing both CancelAfter and FinishAfter`, () => {
-        delete escrow.CancelAfter
-        delete escrow.FinishAfter
-        
-        assert.throws(
-            () => verifyEscrowCreate(escrow),
-            ValidationError,
-            "EscrowCreate: Either CancelAfter or FinishAfter must be specified"
-        )    
-    })
+  it(`invalid FinishAfter`, function () {
+    escrow.FinishAfter = "1000";
 
-    it (`Missing both Condition and FinishAfter`, () => {
-        delete escrow.Condition
-        delete escrow.FinishAfter
-        
-        assert.throws(
-            () => verifyEscrowCreate(escrow),
-            ValidationError,
-            "EscrowCreate: Either Condition or FinishAfter must be specified"
-        )   
-    }) 
-})
+    assert.throws(
+      () => verifyEscrowCreate(escrow),
+      ValidationError,
+      "EscrowCreate: FinishAfter must be a number"
+    );
+  });
+
+  it(`invalid Condition`, function () {
+    escrow.Condition = 0x141243;
+
+    assert.throws(
+      () => verifyEscrowCreate(escrow),
+      ValidationError,
+      "EscrowCreate: Condition must be a string"
+    );
+  });
+
+  it(`invalid DestinationTag`, function () {
+    escrow.DestinationTag = "100";
+
+    assert.throws(
+      () => verifyEscrowCreate(escrow),
+      ValidationError,
+      "EscrowCreate: DestinationTag must be a number"
+    );
+  });
+
+  it(`Missing both CancelAfter and FinishAfter`, function () {
+    delete escrow.CancelAfter;
+    delete escrow.FinishAfter;
+
+    assert.throws(
+      () => verifyEscrowCreate(escrow),
+      ValidationError,
+      "EscrowCreate: Either CancelAfter or FinishAfter must be specified"
+    );
+  });
+
+  it(`Missing both Condition and FinishAfter`, function () {
+    delete escrow.Condition;
+    delete escrow.FinishAfter;
+
+    assert.throws(
+      () => verifyEscrowCreate(escrow),
+      ValidationError,
+      "EscrowCreate: Either Condition or FinishAfter must be specified"
+    );
+  });
+});

@@ -1,27 +1,30 @@
-import _ from 'lodash'
-import * as assert from 'assert'
-import * as utils from './utils'
-import {txFlags} from '../../common'
-import {removeUndefined} from '../../utils'
-import parseAmount from './amount'
+import * as assert from "assert";
+
+import _ from "lodash";
+
+import { txFlags } from "../../common";
+import { removeUndefined } from "../../utils";
+
+import parseAmount from "./amount";
+import * as utils from "./utils";
 
 function isNoDirectRipple(tx) {
-  return (tx.Flags & txFlags.Payment.NoRippleDirect) !== 0
+  return (tx.Flags & txFlags.Payment.NoRippleDirect) !== 0;
 }
 
 function isQualityLimited(tx) {
-  return (tx.Flags & txFlags.Payment.LimitQuality) !== 0
+  return (tx.Flags & txFlags.Payment.LimitQuality) !== 0;
 }
 
 function removeGenericCounterparty(amount, address) {
   return amount.counterparty === address
-    ? _.omit(amount, 'counterparty')
-    : amount
+    ? _.omit(amount, "counterparty")
+    : amount;
 }
 
 // Payment specification
 function parsePayment(tx: any): object {
-  assert.ok(tx.TransactionType === 'Payment')
+  assert.ok(tx.TransactionType === "Payment");
 
   const source = {
     address: tx.Account,
@@ -29,17 +32,17 @@ function parsePayment(tx: any): object {
       parseAmount(tx.SendMax || tx.Amount),
       tx.Account
     ),
-    tag: tx.SourceTag
-  }
+    tag: tx.SourceTag,
+  };
 
   const destination: {
-    address: string
-    tag: number | undefined
+    address: string;
+    tag: number | undefined;
   } = {
     address: tx.Destination,
-    tag: tx.DestinationTag
+    tag: tx.DestinationTag,
     // Notice that `amount` is omitted to prevent misinterpretation
-  }
+  };
 
   return removeUndefined({
     source: removeUndefined(source),
@@ -49,8 +52,8 @@ function parsePayment(tx: any): object {
     paths: tx.Paths ? JSON.stringify(tx.Paths) : undefined,
     allowPartialPayment: utils.isPartialPayment(tx) || undefined,
     noDirectRipple: isNoDirectRipple(tx) || undefined,
-    limitQuality: isQualityLimited(tx) || undefined
-  })
+    limitQuality: isQualityLimited(tx) || undefined,
+  });
 }
 
-export default parsePayment
+export default parsePayment;

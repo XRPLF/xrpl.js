@@ -1,15 +1,16 @@
-import * as utils from './utils'
-import {validate} from '../common'
-import {Instructions, Prepare, TransactionJSON} from './types'
-import {Amount} from '../common/types/objects'
-import {Client} from '..'
-import {toRippledAmount} from '../utils'
-import {ValidationError} from '../common/errors'
+import { Client } from "..";
+import { validate } from "../common";
+import { ValidationError } from "../common/errors";
+import { Amount } from "../common/types/objects";
+import { toRippledAmount } from "../utils";
 
-export type CheckCashParameters = {
-  checkID: string
-  amount?: Amount
-  deliverMin?: Amount
+import { Instructions, Prepare, TransactionJSON } from "./types";
+import * as utils from "./utils";
+
+export interface CheckCashParameters {
+  checkID: string;
+  amount?: Amount;
+  deliverMin?: Amount;
 }
 
 function createCheckCashTransaction(
@@ -19,25 +20,25 @@ function createCheckCashTransaction(
   if (checkCash.amount && checkCash.deliverMin) {
     throw new ValidationError(
       '"amount" and "deliverMin" properties on ' +
-        'CheckCash are mutually exclusive'
-    )
+        "CheckCash are mutually exclusive"
+    );
   }
 
   const txJSON: any = {
     Account: account,
-    TransactionType: 'CheckCash',
-    CheckID: checkCash.checkID
-  }
+    TransactionType: "CheckCash",
+    CheckID: checkCash.checkID,
+  };
 
   if (checkCash.amount != null) {
-    txJSON.Amount = toRippledAmount(checkCash.amount)
+    txJSON.Amount = toRippledAmount(checkCash.amount);
   }
 
   if (checkCash.deliverMin != null) {
-    txJSON.DeliverMin = toRippledAmount(checkCash.deliverMin)
+    txJSON.DeliverMin = toRippledAmount(checkCash.deliverMin);
   }
 
-  return txJSON
+  return txJSON;
 }
 
 function prepareCheckCash(
@@ -47,12 +48,12 @@ function prepareCheckCash(
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareCheckCash({address, checkCash, instructions})
-    const txJSON = createCheckCashTransaction(address, checkCash)
-    return utils.prepareTransaction(txJSON, this, instructions)
+    validate.prepareCheckCash({ address, checkCash, instructions });
+    const txJSON = createCheckCashTransaction(address, checkCash);
+    return utils.prepareTransaction(txJSON, this, instructions);
   } catch (e) {
-    return Promise.reject(e)
+    return Promise.reject(e);
   }
 }
 
-export default prepareCheckCash
+export default prepareCheckCash;

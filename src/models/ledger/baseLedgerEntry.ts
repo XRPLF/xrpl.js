@@ -1,3 +1,3 @@
 export interface BaseLedgerEntry {
-    index: string
+  index: string;
 }
