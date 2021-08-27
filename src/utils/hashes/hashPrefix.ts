@@ -34,7 +34,7 @@ enum HashPrefix {
   TRANSACTION_MULTISIGN = 0x534d5400, // 'SMT'
 
   // ledger
-  LEDGER = 0x4c575200 // 'LWR'
+  LEDGER = 0x4c575200, // 'LWR'
 }
 
-export default HashPrefix
+export default HashPrefix;

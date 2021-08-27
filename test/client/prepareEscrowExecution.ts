@@ -1,8 +1,9 @@
-import {TestSuite, assertRejects, assertResultMatch} from '../testUtils'
-import requests from '../fixtures/requests'
-import responses from '../fixtures/responses'
-import rippled from '../fixtures/rippled'
-const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
+import requests from "../fixtures/requests";
+import responses from "../fixtures/responses";
+import rippled from "../fixtures/rippled";
+import { TestSuite, assertRejects, assertResultMatch } from "../testUtils";
+
+const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
 
 /**
  * Every test suite exports their tests in the default object.
@@ -10,44 +11,75 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'prepareEscrowExecution': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
-    mockRippled.addResponse({command: 'fee'}, rippled.fee)
-    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
-    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
+  async prepareEscrowExecution(client, address, mockRippled) {
+    mockRippled.addResponse(
+      { command: "server_info" },
+      rippled.server_info.normal
+    );
+    mockRippled.addResponse({ command: "fee" }, rippled.fee);
+    mockRippled.addResponse(
+      { command: "ledger_current" },
+      rippled.ledger_current
+    );
+    mockRippled.addResponse(
+      { command: "account_info" },
+      rippled.account_info.normal
+    );
     const result = await client.prepareEscrowExecution(
       address,
       requests.prepareEscrowExecution.normal,
       instructionsWithMaxLedgerVersionOffset
-    )
+    );
     assertResultMatch(
       result,
       responses.prepareEscrowExecution.normal,
-      'prepare'
-    )
+      "prepare"
+    );
   },
 
-  'prepareEscrowExecution - simple': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
-    mockRippled.addResponse({command: 'fee'}, rippled.fee)
-    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
-    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
+  "prepareEscrowExecution - simple": async (client, address, mockRippled) => {
+    mockRippled.addResponse(
+      { command: "server_info" },
+      rippled.server_info.normal
+    );
+    mockRippled.addResponse({ command: "fee" }, rippled.fee);
+    mockRippled.addResponse(
+      { command: "ledger_current" },
+      rippled.ledger_current
+    );
+    mockRippled.addResponse(
+      { command: "account_info" },
+      rippled.account_info.normal
+    );
     const result = await client.prepareEscrowExecution(
       address,
       requests.prepareEscrowExecution.simple
-    )
+    );
     assertResultMatch(
       result,
       responses.prepareEscrowExecution.simple,
-      'prepare'
-    )
+      "prepare"
+    );
   },
 
-  'prepareEscrowExecution - no condition': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
-    mockRippled.addResponse({command: 'fee'}, rippled.fee)
-    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
-    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
+  "prepareEscrowExecution - no condition": async (
+    client,
+    address,
+    mockRippled
+  ) => {
+    mockRippled.addResponse(
+      { command: "server_info" },
+      rippled.server_info.normal
+    );
+    mockRippled.addResponse({ command: "fee" }, rippled.fee);
+    mockRippled.addResponse(
+      { command: "ledger_current" },
+      rippled.ledger_current
+    );
+    mockRippled.addResponse(
+      { command: "account_info" },
+      rippled.account_info.normal
+    );
     await assertRejects(
       client.prepareEscrowExecution(
         address,
@@ -56,14 +88,27 @@ export default <TestSuite>{
       ),
       client.errors.ValidationError,
       '"condition" and "fulfillment" fields on EscrowFinish must only be specified together.'
-    )
+    );
   },
 
-  'prepareEscrowExecution - no fulfillment': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
-    mockRippled.addResponse({command: 'fee'}, rippled.fee)
-    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
-    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
+  "prepareEscrowExecution - no fulfillment": async (
+    client,
+    address,
+    mockRippled
+  ) => {
+    mockRippled.addResponse(
+      { command: "server_info" },
+      rippled.server_info.normal
+    );
+    mockRippled.addResponse({ command: "fee" }, rippled.fee);
+    mockRippled.addResponse(
+      { command: "ledger_current" },
+      rippled.ledger_current
+    );
+    mockRippled.addResponse(
+      { command: "account_info" },
+      rippled.account_info.normal
+    );
     await assertRejects(
       client.prepareEscrowExecution(
         address,
@@ -72,28 +117,37 @@ export default <TestSuite>{
       ),
       client.errors.ValidationError,
       '"condition" and "fulfillment" fields on EscrowFinish must only be specified together.'
-    )
+    );
   },
 
-  'with ticket': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
-    mockRippled.addResponse({command: 'fee'}, rippled.fee)
-    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
-    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
+  "with ticket": async (client, address, mockRippled) => {
+    mockRippled.addResponse(
+      { command: "server_info" },
+      rippled.server_info.normal
+    );
+    mockRippled.addResponse({ command: "fee" }, rippled.fee);
+    mockRippled.addResponse(
+      { command: "ledger_current" },
+      rippled.ledger_current
+    );
+    mockRippled.addResponse(
+      { command: "account_info" },
+      rippled.account_info.normal
+    );
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000396',
-      ticketSequence: 23
-    }
+      maxFee: "0.000396",
+      ticketSequence: 23,
+    };
     const result = await client.prepareEscrowExecution(
       address,
       requests.prepareEscrowExecution.normal,
       localInstructions
-    )
+    );
     assertResultMatch(
       result,
       responses.prepareEscrowExecution.ticket,
-      'prepare'
-    )
-  }
-}
+      "prepare"
+    );
+  },
+};

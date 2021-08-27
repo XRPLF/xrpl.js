@@ -1,10 +1,11 @@
-import assert from 'assert-diff'
-import { assertRejects, TestSuite } from '../testUtils'
-import requests from '../fixtures/requests'
+import assert from "assert-diff";
+
+import addresses from "../fixtures/addresses.json";
+import requests from "../fixtures/requests";
+import rippled from "../fixtures/rippled";
+import { assertRejects, TestSuite } from "../testUtils";
 // import responses from '../fixtures/responses'
-import rippled from '../fixtures/rippled'
-import addresses from '../fixtures/addresses.json'
-const {getPaths: REQUEST_FIXTURES} = requests
+const { getPaths: REQUEST_FIXTURES } = requests;
 // const {getPaths: RESPONSE_FIXTURES} = responses
 
 const rippledResponse = rippled.path_find.generate.generateIOUPaymentPaths(
@@ -12,7 +13,7 @@ const rippledResponse = rippled.path_find.generate.generateIOUPaymentPaths(
   REQUEST_FIXTURES.normal.source.address,
   REQUEST_FIXTURES.normal.destination.address,
   REQUEST_FIXTURES.normal.destination.amount
-)
+);
 
 /**
  * Every test suite exports their tests in the default object.
@@ -46,12 +47,12 @@ export default <TestSuite>{
   //   const response = await client.getPaths(REQUEST_FIXTURES.XrpToXrp)
   //   assertResultMatch(response, RESPONSE_FIXTURES.XrpToXrp, 'getPaths')
   // },
-  'source with issuer': async (client, _, mockRippled) => {
-    mockRippled.addResponse({command: 'ripple_path_find'}, rippledResponse)
+  "source with issuer": async (client, _, mockRippled) => {
+    mockRippled.addResponse({ command: "ripple_path_find" }, rippledResponse);
     return assertRejects(
       client.getPaths(REQUEST_FIXTURES.issuer),
       client.errors.NotFoundError
-    )
+    );
   },
   // 'XRP 2 XRP - not enough': async (client) => {
   //   return assertRejects(
@@ -59,52 +60,52 @@ export default <TestSuite>{
   //     client.errors.NotFoundError
   //   )
   // },
-  'invalid PathFind': async (client, _, mockRippled) => {
-    mockRippled.addResponse({command: 'ripple_path_find'}, rippledResponse)
+  "invalid PathFind": async (client, _, mockRippled) => {
+    mockRippled.addResponse({ command: "ripple_path_find" }, rippledResponse);
     assert.throws(() => {
-      client.getPaths(REQUEST_FIXTURES.invalid)
-    }, /Cannot specify both source.amount/)
+      client.getPaths(REQUEST_FIXTURES.invalid);
+    }, /Cannot specify both source.amount/);
   },
-  'does not accept currency': async (client, _, mockRippled) => {
-    mockRippled.addResponse({command: 'ripple_path_find'}, rippledResponse)
+  "does not accept currency": async (client, _, mockRippled) => {
+    mockRippled.addResponse({ command: "ripple_path_find" }, rippledResponse);
     return assertRejects(
       client.getPaths(REQUEST_FIXTURES.NotAcceptCurrency),
       client.errors.NotFoundError
-    )
+    );
   },
-  'no paths': async (client, _, mockRippled) => {
-    mockRippled.addResponse({command: 'ripple_path_find'}, rippledResponse)
+  "no paths": async (client, _, mockRippled) => {
+    mockRippled.addResponse({ command: "ripple_path_find" }, rippledResponse);
     return assertRejects(
       client.getPaths(REQUEST_FIXTURES.NoPaths),
       client.errors.NotFoundError
-    )
+    );
   },
-  'no paths source amount': async (client, _, mockRippled) => {
-    mockRippled.addResponse({command: 'ripple_path_find'}, rippledResponse)
+  "no paths source amount": async (client, _, mockRippled) => {
+    mockRippled.addResponse({ command: "ripple_path_find" }, rippledResponse);
     return assertRejects(
       client.getPaths(REQUEST_FIXTURES.NoPathsSource),
       client.errors.NotFoundError
-    )
+    );
   },
-  'no paths with source currencies': async (client, _, mockRippled) => {
-    mockRippled.addResponse({command: 'ripple_path_find'}, rippledResponse)
+  "no paths with source currencies": async (client, _, mockRippled) => {
+    mockRippled.addResponse({ command: "ripple_path_find" }, rippledResponse);
     return assertRejects(
       client.getPaths(REQUEST_FIXTURES.NoPathsWithCurrencies),
       client.errors.NotFoundError
-    )
+    );
   },
-  'error: srcActNotFound': async (client, _, mockRippled) => {
-    mockRippled.addResponse({command: 'ripple_path_find'}, rippledResponse)
+  "error: srcActNotFound": async (client, _, mockRippled) => {
+    mockRippled.addResponse({ command: "ripple_path_find" }, rippledResponse);
     return assertRejects(
       client.getPaths({
         ...REQUEST_FIXTURES.normal,
-        source: {address: addresses.NOTFOUND}
+        source: { address: addresses.NOTFOUND },
       }),
       client.errors.RippleError
-    )
+    );
   },
   // 'send all': async (client) => {
   //   const response = await client.getPaths(REQUEST_FIXTURES.sendAll)
   //   assertResultMatch(response, RESPONSE_FIXTURES.sendAll, 'getPaths')
   // }
-}
+};

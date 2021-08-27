@@ -1,8 +1,8 @@
 export interface Amount extends Issue {
-  value: string
+  value: string;
 }
 
-export type RippledAmount = string | Amount
+export type RippledAmount = string | Amount;
 
 /**
  * Specification of which currency the account taking the offer would pay/
@@ -10,15 +10,15 @@ export type RippledAmount = string | Amount
  * Similar to currency amounts.
  */
 export interface TakerRequestAmount {
-  currency: string
-  issuer?: string
+  currency: string;
+  issuer?: string;
 }
 
 /**
  * A currency-counterparty pair, or just currency if it's XRP.
  */
 export interface Issue {
-  currency: string
-  issuer?: string
-  counterparty?: string
+  currency: string;
+  issuer?: string;
+  counterparty?: string;
 }
