@@ -72,7 +72,11 @@ export function verifyPayment(tx: Record<string, unknown>): void {
     throw new ValidationError("PaymentTransaction: InvoiceID must be a string");
   }
 
-  if (tx.Paths !== undefined && !isPaths(tx.Paths)) {
+  if (
+    tx.Paths !== undefined &&
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
+    !isPaths(tx.Paths as Array<Array<Record<string, unknown>>>)
+  ) {
     throw new ValidationError("PaymentTransaction: invalid Paths");
   }
 
@@ -84,7 +88,8 @@ export function verifyPayment(tx: Record<string, unknown>): void {
     const isTfPartialPayment =
       typeof tx.Flags === "number"
         ? isFlagEnabled(tx.Flags, PaymentTransactionFlagsEnum.tfPartialPayment)
-        : tx.Flags?.tfPartialPayment ?? false;
+        : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
+          (tx.Flags as PaymentTransactionFlags).tfPartialPayment ?? false;
 
     if (!isTfPartialPayment) {
       throw new ValidationError(
@@ -98,27 +103,50 @@ export function verifyPayment(tx: Record<string, unknown>): void {
   }
 }
 
-function isPaths(paths: Path[]): boolean {
+function isPathStep(path: Record<string, unknown>): boolean {
+  if (path.account !== undefined && typeof path.account !== "string") {
+    return false;
+  }
+  if (path.currency !== undefined && typeof path.currency !== "string") {
+    return false;
+  }
+  if (path.issuer !== undefined && typeof path.issuer !== "string") {
+    return false;
+  }
+  if (
+    path.account !== undefined &&
+    path.currency === undefined &&
+    path.issuer === undefined
+  ) {
+    return true;
+  }
+  if (path.currency !== undefined || path.issuer !== undefined) {
+    return true;
+  }
+  return false;
+}
+
+function isPath(path: Array<Record<string, unknown>>): boolean {
+  for (const pathStep of path) {
+    if (isPathStep(pathStep)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function isPaths(paths: Array<Array<Record<string, unknown>>>): boolean {
   if (!Array.isArray(paths) || paths.length === 0) {
     return false;
   }
 
-  for (const i in paths) {
-    const path = paths[i];
+  for (const path of paths) {
     if (!Array.isArray(path) || path.length === 0) {
       return false;
     }
 
-    for (const j in path) {
-      const pathStep = path[j];
-      const { account, currency, issuer } = pathStep;
-      if (
-        (account !== undefined && typeof account !== "string") ||
-        (currency !== undefined && typeof currency !== "string") ||
-        (issuer !== undefined && typeof issuer !== "string")
-      ) {
-        return false;
-      }
+    if (!isPath(path)) {
+      return false;
     }
   }
 

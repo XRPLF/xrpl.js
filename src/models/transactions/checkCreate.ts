@@ -36,6 +36,7 @@ export function verifyCheckCreate(tx: Record<string, unknown>): void {
 
   if (
     typeof tx.SendMax !== "string" &&
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
     !isIssuedCurrency(tx.SendMax as Record<string, unknown>)
   ) {
     throw new ValidationError("CheckCreate: invalid SendMax");
