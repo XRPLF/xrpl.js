@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
 import { ValidationError } from "../../src/common/errors";
 import { computeLedgerHeaderHash } from "../../src/utils";

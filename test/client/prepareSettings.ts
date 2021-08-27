@@ -1,6 +1,6 @@
-import assert from "assert-diff";
-
+import { assert } from "chai";
 import { FormattedSettings } from "../../src/common/types/objects";
+
 import requests from "../fixtures/requests";
 import responses from "../fixtures/responses";
 import rippled from "../fixtures/rippled";

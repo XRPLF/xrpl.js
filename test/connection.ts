@@ -1,6 +1,6 @@
 import net from "net";
 
-import assert from "assert-diff";
+import { assert } from "chai";
 import _ from "lodash";
 
 import { Client } from "xrpl-local";
@@ -197,7 +197,6 @@ describe("Connection", function () {
         assert(false, "Should throw DisconnectedError");
       })
       .catch((error) => {
-        console.log(error);
         assert(error instanceof this.client.errors.DisconnectedError);
         assert.strictEqual(error.message, "not connected");
       });
