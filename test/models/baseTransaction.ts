@@ -47,7 +47,7 @@ describe('Transaction Verification', function () {
             SigningPublicKey: "03680DD274EE55594F7244F489CD38CF3A5A1A4657122FB8143E185B2BA043DF36",
             TicketSequence: 10,
             TxnSignature: "3045022100C6708538AE5A697895937C758E99A595B57A16393F370F11B8D4C032E80B532002207776A8E85BB9FAF460A92113B9C60F170CD964196B1F084E0DAB65BAEC368B66"
-        }
+        } as any
 
         assert.doesNotThrow(() => verifyBaseTransaction(txJson))
     })

@@ -8,10 +8,10 @@ import { computeBinaryTransactionHash } from "../utils";
 import { flatMap } from "lodash";
 import { SignedTransaction } from "../common/types/objects";
 import { verifyBaseTransaction } from "../models/transactions/common";
-import { sign as signWithKeypair, verify as verifySignature } from 'ripple-keypairs'
+//import { sign as signWithKeypair, verify as verifySignature } from 'ripple-keypairs'
+import { sign as signWithKeypair } from 'ripple-keypairs'
 
 function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
-    verifyBaseTransaction(tx)
     return wallet.signTransaction(tx, { signAs: '' })
 }
 
@@ -87,7 +87,7 @@ function getEncodedTransaction(txOrBlob: (Transaction | string)): string {
   }
 }
 
-function multisign(transactions: Transaction[] | string[]): SignedTransaction {
+function multisign(transactions: ((Transaction | string)[])): SignedTransaction {
     
     if(transactions.length == 0) {
         throw new ValidationError("There were 0 transactions given to multisign")
@@ -124,7 +124,7 @@ function authorizeChannel(wallet: Wallet, channelId: string, amount: string): st
 function verify(tx: Transaction): void {
   //Verify tx.TxnSignature by using tx.SigningPubKey
   //TODO: Check whether we need to remove the TxnSignature and SigningPubKey fields before encoding
-  verifySignature(encode(tx), tx.TxnSignature, tx.SigningPubKey)
+  //verifySignature(encode(tx), tx.TxnSignature, tx.SigningPubKey)
 }
 
 export { sign, multisign, authorizeChannel, verify }

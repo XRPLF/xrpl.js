@@ -39,8 +39,7 @@ describe('Signer tests', function () {
         signedTx
     })
 
-    it ('multi-signs successfully', () => {
-        // TODO:
+    it ('multisigns successfully', () => {
         const tx1: Transaction = {
             Account: "rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC",
             Fee: "30000",
@@ -95,7 +94,7 @@ describe('Signer tests', function () {
 
     })
 
-    it ('throws a validation error if multi-signing with no transactions', () => {
+    it ('throws a validation error if multisigning with no transactions', () => {
         // TODO:
         notImplemented()
     })
