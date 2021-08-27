@@ -18,7 +18,7 @@ export const config = {
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  prepareEscrowCreation: async (client, address, mockRippled) => {
+  async prepareEscrowCreation(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);
@@ -56,7 +56,7 @@ export default <TestSuite>{
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);
     mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const escrow = Object.assign({}, requests.prepareEscrowCreation.full);
+    const escrow = { ...requests.prepareEscrowCreation.full };
     delete escrow.amount; // Make invalid
     await assertRejects(
       client.prepareEscrowCreation(address, escrow),

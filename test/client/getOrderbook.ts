@@ -87,7 +87,7 @@ function xrpRippledResponse(request: BookOffersRequest): object {
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  normal: async (client, address, mockRippled) => {
+  async normal(client, address, mockRippled) {
     mockRippled.addResponse("book_offers", normalRippledResponse);
     const response = await client.getOrderbook(
       address,

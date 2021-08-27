@@ -9,7 +9,7 @@ import { assertResultMatch, TestSuite } from "../testUtils";
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  getBalances: async (client, address, mockRippled) => {
+  async getBalances(client, address, mockRippled) {
     mockRippled.addResponse("account_info", rippled.account_info.normal);
     mockRippled.addResponse("account_lines", rippledAccountLines.normal);
     mockRippled.addResponse("ledger", rippled.ledger.normal);

@@ -11,7 +11,7 @@ const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  simple: async (client, address, mockRippled) => {
+  async simple(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);
@@ -24,7 +24,7 @@ export default <TestSuite>{
     assertResultMatch(result, responses.prepareTrustline.simple, "prepare");
   },
 
-  frozen: async (client, address, mockRippled) => {
+  async frozen(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);
@@ -36,7 +36,7 @@ export default <TestSuite>{
     assertResultMatch(result, responses.prepareTrustline.frozen, "prepare");
   },
 
-  complex: async (client, address, mockRippled) => {
+  async complex(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);
@@ -49,12 +49,12 @@ export default <TestSuite>{
     assertResultMatch(result, responses.prepareTrustline.complex, "prepare");
   },
 
-  invalid: async (client, address, mockRippled) => {
+  async invalid(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);
     mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const trustline = Object.assign({}, requests.prepareTrustline.complex);
+    const trustline = { ...requests.prepareTrustline.complex };
     delete trustline.limit; // Make invalid
 
     await assertRejects(

@@ -1,6 +1,6 @@
 import { assert } from "chai";
-import { FormattedSettings } from "../../src/common/types/objects";
 
+import { FormattedSettings } from "../../src/common/types/objects";
 import requests from "../fixtures/requests";
 import responses from "../fixtures/responses";
 import rippled from "../fixtures/rippled";
@@ -59,7 +59,7 @@ export default <TestSuite>{
       "prepare"
     );
   },
-  regularKey: async (client, address, mockRippled) => {
+  async regularKey(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);
@@ -280,7 +280,7 @@ export default <TestSuite>{
       "prepare"
     );
   },
-  invalid: async (client, address, mockRippled) => {
+  async invalid(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);
@@ -311,7 +311,7 @@ export default <TestSuite>{
       assert.strictEqual(err.name, "ValidationError");
     }
   },
-  offline: async (client, address, mockRippled) => {
+  async offline(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);

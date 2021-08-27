@@ -50,12 +50,12 @@ export default <TestSuite>{
     assertResultMatch(result, responses.prepareOrder.sell, "prepare");
   },
 
-  invalid: async (client, address, mockRippled) => {
+  async invalid(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);
     mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const request = Object.assign({}, requests.prepareOrder.sell);
+    const request = { ...requests.prepareOrder.sell };
     delete request.direction; // Make invalid
     await assertRejects(
       client.prepareOrder(

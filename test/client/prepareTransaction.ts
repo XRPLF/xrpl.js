@@ -159,10 +159,7 @@ export default <TestSuite>{
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);
     mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      Fee: "0.000022", // Intentionally capitalized in this test, but the correct field would be `fee`
-    };
+    const localInstructions = instructionsWithMaxLedgerVersionOffset;
     const txJSON = {
       TransactionType: "DepositPreauth",
       Account: address,
@@ -901,7 +898,7 @@ export default <TestSuite>{
     return assertResultMatch(response, expected, "prepare");
   },
 
-  AccountDelete: async (client, address, mockRippled) => {
+  async AccountDelete(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);
@@ -1296,7 +1293,7 @@ export default <TestSuite>{
     assertResultMatch(response, responses.preparePayment.normal, "prepare");
   },
 
-  PaymentChannelCreate: async (client, address, mockRippled) => {
+  async PaymentChannelCreate(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);
@@ -1356,7 +1353,7 @@ export default <TestSuite>{
     );
   },
 
-  PaymentChannelFund: async (client, address, mockRippled) => {
+  async PaymentChannelFund(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);
@@ -1402,7 +1399,7 @@ export default <TestSuite>{
     );
   },
 
-  PaymentChannelClaim: async (client, address, mockRippled) => {
+  async PaymentChannelClaim(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);

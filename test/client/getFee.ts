@@ -9,7 +9,7 @@ import { TestSuite } from "../testUtils";
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  getFee: async (client, address, mockRippled) => {
+  async getFee(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     const fee = await client.getFee();
     assert.strictEqual(fee, "0.000012");

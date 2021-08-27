@@ -9,11 +9,12 @@ import { getFreePort } from "./testUtils";
 function createResponse(request: { id: number | string }, response: object) {
   if (!("type" in response) && !("error" in response)) {
     throw new Error(
-      "Bad response format. Must contain `type` or `error`. " +
-        JSON.stringify(response)
+      `Bad response format. Must contain \`type\` or \`error\`. ${JSON.stringify(
+        response
+      )}`
     );
   }
-  return JSON.stringify(Object.assign({}, response, { id: request.id }));
+  return JSON.stringify({ ...response, id: request.id });
 }
 
 function ping(conn, request) {
@@ -60,8 +61,10 @@ export function createMockRippled(port) {
           );
         }
       } catch (err) {
-        if (!mock.suppressOutput) console.error("Error: " + err.message);
-        if (request != null)
+        if (!mock.suppressOutput) {
+          console.error(`Error: ${err.message}`);
+        }
+        if (request != null) {
           conn.send(
             createResponse(request, {
               type: "response",
@@ -69,6 +72,7 @@ export function createMockRippled(port) {
               error: err.message,
             })
           );
+        }
       }
     });
   });
@@ -89,8 +93,9 @@ export function createMockRippled(port) {
       !("error" in response)
     ) {
       throw new Error(
-        "Bad response format. Must contain `type` or `error`. " +
-          JSON.stringify(response)
+        `Bad response format. Must contain \`type\` or \`error\`. ${JSON.stringify(
+          response
+        )}`
       );
     }
     mock.responses[command] = response;

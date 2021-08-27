@@ -16,7 +16,7 @@ const RECIPIENT_ADDRESS = "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo";
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  normal: async (client, address, mockRippled) => {
+  async normal(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);

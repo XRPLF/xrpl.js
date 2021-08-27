@@ -15,7 +15,6 @@ export default <TestSuite>{
     mockRippled
   ) => {
     mockRippled.addResponse("ledger_data", rippled.ledger_data.first_page);
-    // @ts-ignore
     const response = await client.request({ command: "ledger_data" });
     assert(client.hasNextPage(response));
   },
@@ -32,7 +31,6 @@ export default <TestSuite>{
       return rippled.ledger_data.first_page;
     };
     mockRippled.addResponse("ledger_data", rippledResponse);
-    // @ts-ignore
     const response = await client.request({ command: "ledger_data" });
     const responseNextPage = await client.requestNextPage(
       { command: "ledger_data" },

@@ -11,7 +11,7 @@ const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  prepareOrderCancellation: async (client, address, mockRippled) => {
+  async prepareOrderCancellation(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);
@@ -57,15 +57,14 @@ export default <TestSuite>{
     );
   },
 
-  invalid: async (client, address, mockRippled) => {
+  async invalid(client, address, mockRippled) {
     mockRippled.addResponse("server_info", rippled.server_info.normal);
     mockRippled.addResponse("fee", rippled.fee);
     mockRippled.addResponse("ledger_current", rippled.ledger_current);
     mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const request = Object.assign(
-      {},
-      requests.prepareOrderCancellation.withMemos
-    );
+    const request = {
+      ...requests.prepareOrderCancellation.withMemos,
+    };
     delete request.orderSequence; // Make invalid
 
     await assertRejects(

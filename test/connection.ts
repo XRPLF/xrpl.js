@@ -1,11 +1,11 @@
-import _ from "lodash";
 import net from "net";
+
 import { assert } from "chai";
-import setupClient from "./setupClient";
+import _ from "lodash";
+
 import { Client } from "xrpl-local";
-import { ignoreWebSocketDisconnect } from "./testUtils";
 import { Connection } from "xrpl-local/client";
-import rippled from "./fixtures/rippled";
+
 import {
   ConnectionError,
   DisconnectedError,
@@ -14,6 +14,10 @@ import {
   RippleError,
   TimeoutError,
 } from "../src/common/errors";
+
+import rippled from "./fixtures/rippled";
+import setupClient from "./setupClient";
+import { ignoreWebSocketDisconnect } from "./testUtils";
 
 const TIMEOUT = 200000; // how long before each test case times out
 const isBrowser = (process as any).browser;
@@ -136,7 +140,7 @@ describe("Connection", function () {
         ledger_index: "validated",
       })
       .then(() => {
-        assert(false, "Should throw NotConnectedError");
+        assert.fail("Should throw NotConnectedError");
       })
       .catch((error) => {
         assert(error instanceof NotConnectedError);
@@ -165,7 +169,7 @@ describe("Connection", function () {
     return this.client
       .request({ command: "test_command", data: { closeServer: true } })
       .then(() => {
-        assert(false, "Should throw DisconnectedError");
+        assert.fail("Should throw DisconnectedError");
       })
       .catch((error) => {
         assert(error instanceof DisconnectedError);
@@ -173,14 +177,14 @@ describe("Connection", function () {
   });
 
   it("TimeoutError", function () {
-    this.client.connection._ws.send = function (_0, _1, callback) {
+    this.client.connection._ws.send = function (_, callback) {
       callback(null);
     };
     const request = { command: "server_info" };
     return this.client.connection
       .request(request, 10)
       .then(() => {
-        assert(false, "Should throw TimeoutError");
+        assert.fail("Should throw TimeoutError");
       })
       .catch((error) => {
         assert(error instanceof TimeoutError);
@@ -188,13 +192,13 @@ describe("Connection", function () {
   });
 
   it("DisconnectedError on send", function () {
-    this.client.connection._ws.send = function (_0, _1, callback) {
+    this.client.connection._ws.send = function (_, callback) {
       callback({ message: "not connected" });
     };
     return this.client
       .request({ command: "server_info" })
       .then(() => {
-        assert(false, "Should throw DisconnectedError");
+        assert.fail("Should throw DisconnectedError");
       })
       .catch((error) => {
         assert(error instanceof DisconnectedError);
@@ -236,7 +240,7 @@ describe("Connection", function () {
         data: { unrecognizedResponse: true },
       })
       .then(() => {
-        assert(false, "Should throw ResponseFormatError");
+        assert.fail("Should throw ResponseFormatError");
       })
       .catch((error) => {
         assert(error instanceof ResponseFormatError);
@@ -403,7 +407,7 @@ describe("Connection", function () {
     return connection
       .connect()
       .then(() => {
-        assert(false, "Should throw ConnectionError");
+        assert.fail("Should throw ConnectionError");
       })
       .catch((error) => {
         assert(

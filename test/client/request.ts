@@ -28,7 +28,6 @@ export default <TestSuite>{
     mockRippled
   ) => {
     mockRippled.addResponse("account_objects", rippled.account_objects.normal);
-    // @ts-ignore Intentionally no local validation of these options
     const result = await client.request({
       command: "account_objects",
       account: address,
