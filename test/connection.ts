@@ -53,7 +53,7 @@ describe("Connection", function () {
     });
 
     it("as false", function () {
-      const messages = [];
+      const messages: any[] = [];
       console.log = (id, message) => messages.push([id, message]);
       const connection: any = new Connection("url", { trace: false });
       connection._ws = { send() {} };
@@ -63,7 +63,7 @@ describe("Connection", function () {
     });
 
     it("as true", function () {
-      const messages = [];
+      const messages: any[] = [];
       console.log = (id, message) => messages.push([id, message]);
       const connection: any = new Connection("url", { trace: true });
       connection._ws = { send() {} };
@@ -73,7 +73,7 @@ describe("Connection", function () {
     });
 
     it("as a function", function () {
-      const messages = [];
+      const messages: any[] = [];
       const connection: any = new Connection("url", {
         trace: (id, message) => messages.push([id, message]),
       });
@@ -173,7 +173,7 @@ describe("Connection", function () {
   });
 
   it("TimeoutError", function () {
-    this.client.connection._ws.send = function (message, options, callback) {
+    this.client.connection._ws.send = function (message, callback) {
       callback(null);
     };
     const request = { command: "server_info" };
@@ -188,7 +188,7 @@ describe("Connection", function () {
   });
 
   it("DisconnectedError on send", function () {
-    this.client.connection._ws.send = function (message, options, callback) {
+    this.client.connection._ws.send = function (message, callback) {
       callback({ message: "not connected" });
     };
     return this.client
@@ -197,6 +197,7 @@ describe("Connection", function () {
         assert(false, "Should throw DisconnectedError");
       })
       .catch((error) => {
+        console.log(error);
         assert(error instanceof this.client.errors.DisconnectedError);
         assert.strictEqual(error.message, "not connected");
       });
@@ -399,7 +400,7 @@ describe("Connection", function () {
   });
 
   it("Cannot connect because no server", function () {
-    const connection = new Connection(undefined as string);
+    const connection = new Connection(undefined as unknown as string);
     return connection
       .connect()
       .then(() => {

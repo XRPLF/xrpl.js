@@ -11,7 +11,7 @@
     "sourceMap": true,
 
     "strict": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "noImplicitAny": false,
     "noUnusedLocals": true,
     "removeComments": true,
@@ -20,5 +20,5 @@
     "suppressImplicitAnyIndexErrors": false,
     "resolveJsonModule": true,
     "preserveSymlinks": true
-  },
+  }
 }

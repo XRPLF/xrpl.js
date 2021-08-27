@@ -57,6 +57,7 @@ function createPaymentChannelClaimTransaction(
     );
   }
 
+  txJSON.Flags = 0;
   if (claim.renew) {
     txJSON.Flags |= claimFlags.Renew;
   }

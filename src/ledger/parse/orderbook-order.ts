@@ -42,6 +42,10 @@ export function parseOrderbookOrder(data: BookOffer): FormattedOrderbookOrder {
     expirationTime: parseTimestamp(data.Expiration),
   });
 
+  if (data.quality == null) {
+    throw new Error("parseOrderBookOrder: Could not find quality");
+  }
+
   const properties = {
     maker: data.Account,
     sequence: data.Sequence,
@@ -63,5 +67,11 @@ export function parseOrderbookOrder(data: BookOffer): FormattedOrderbookOrder {
     priceOfFundedAmount: takerPaysFunded,
   });
   const state = _.isEmpty(available) ? undefined : available;
-  return removeUndefined({ specification, properties, state, data });
+
+  return removeUndefined({
+    specification,
+    properties,
+    state,
+    data,
+  }) as FormattedOrderbookOrder;
 }

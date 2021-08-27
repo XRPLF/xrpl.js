@@ -24,8 +24,9 @@ function createOrderTransaction(
     Account: account,
     TakerGets: takerGets,
     TakerPays: takerPays,
-    Flags: 0,
   };
+
+  txJSON.Flags = 0;
   if (order.direction === "sell") {
     txJSON.Flags |= offerFlags.Sell;
   }

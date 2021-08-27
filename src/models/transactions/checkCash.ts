@@ -26,6 +26,12 @@ export function verifyCheckCash(tx: CheckCash): void {
     );
   }
 
+  if (tx.hasOwnProperty("Amount") && tx.hasOwnProperty("DeliverMin")) {
+    throw new ValidationError(
+      "CheckCash: cannot have both Amount and DeliverMin"
+    );
+  }
+
   if (
     tx.hasOwnProperty("Amount") &&
     tx.Amount !== undefined &&

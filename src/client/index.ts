@@ -381,7 +381,7 @@ class Client extends EventEmitter {
     let count = 0;
     let marker: string = request.marker;
     let lastBatchLength: number;
-    const results = [];
+    const results: any[] = [];
     do {
       const countRemaining = clamp(countTo - count, 10, 400);
       const repeatProps = {

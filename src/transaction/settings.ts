@@ -110,7 +110,7 @@ function createSettingsTransactionWithoutMemos(
   }
 
   if (settings.signers != null) {
-    const setSignerList = {
+    const setSignerList: SettingsTransaction = {
       TransactionType: "SignerListSet",
       Account: account,
       SignerEntries: [],
@@ -160,6 +160,7 @@ function prepareSettings(
   try {
     validate.prepareSettings({ address, settings, instructions });
     const txJSON = createSettingsTransaction(address, settings);
+
     return utils.prepareTransaction(txJSON, this, instructions);
   } catch (e) {
     return Promise.reject(e);

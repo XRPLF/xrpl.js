@@ -59,6 +59,10 @@ function formatPrepareResponse(txJSON: any): Prepare {
  * @returns This method mutates the original txJSON and does not return a value.
  */
 function setCanonicalFlag(txJSON: TransactionJSON): void {
+  if (txJSON.Flags == null) {
+    txJSON.Flags = 0;
+  }
+
   txJSON.Flags |= txFlags.Universal.FullyCanonicalSig;
 
   // JavaScript converts operands to 32-bit signed ints before doing bitwise

@@ -49,7 +49,7 @@ function generateXAddress(
       xAddress: classicAddressToXAddress(
         classicAddress,
         false,
-        options && options.test
+        options.test ?? false
       ),
       secret,
     };

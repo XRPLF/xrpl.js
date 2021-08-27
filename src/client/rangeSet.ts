@@ -19,7 +19,7 @@ function mergeIntervals(intervals: Interval[]): Interval[] {
 }
 
 class RangeSet {
-  ranges: Array<[number, number]>;
+  ranges: Array<[number, number]> = [];
 
   constructor() {
     this.reset();

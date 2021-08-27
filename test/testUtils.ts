@@ -129,7 +129,7 @@ export function getAllPublicMethods(client: Client) {
 }
 
 export function loadTestSuites(): LoadedTestSuite[] {
-  const allTests = fs.readdirSync(path.join(__dirname, "client"), {
+  const allTests: any[] = fs.readdirSync(path.join(__dirname, "client"), {
     encoding: "utf8",
   });
   return allTests
@@ -147,7 +147,7 @@ export function loadTestSuites(): LoadedTestSuite[] {
         tests: Object.entries(testSuite.default || {}),
       } as LoadedTestSuite;
     })
-    .filter(Boolean);
+    .filter(Boolean) as LoadedTestSuite[];
 }
 
 /**

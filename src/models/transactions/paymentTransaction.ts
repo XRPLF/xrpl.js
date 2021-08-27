@@ -81,7 +81,7 @@ export function verifyPaymentTransaction(tx: PaymentTransaction): void {
     const isTfPartialPayment =
       typeof tx.Flags === "number"
         ? isFlagEnabled(tx.Flags, PaymentTransactionFlagsEnum.tfPartialPayment)
-        : tx.Flags.tfPartialPayment ?? false;
+        : tx.Flags?.tfPartialPayment ?? false;
 
     if (!isTfPartialPayment) {
       throw new ValidationError(

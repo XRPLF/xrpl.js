@@ -37,6 +37,7 @@
     "@types/chai": "^4.2.21",
     "@types/mocha": "^8.2.1",
     "@types/node": "^16.4.3",
+    "@types/puppeteer": "5.4.4",
     "@typescript-eslint/eslint-plugin": "^3.7.0",
     "@typescript-eslint/parser": "^3.7.0",
     "@xrplf/eslint-config": "^1.1.0",

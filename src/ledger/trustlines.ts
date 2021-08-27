@@ -13,7 +13,10 @@ export interface GetTrustlinesOptions {
   ledgerVersion?: number;
 }
 
-function currencyFilter(currency: string, trustline: FormattedTrustline) {
+function currencyFilter(
+  currency: string | null,
+  trustline: FormattedTrustline
+) {
   return currency === null || trustline.specification.currency === currency;
 }
 
@@ -41,7 +44,7 @@ async function getTrustlines(
   // 3. Return Formatted Response
   const trustlines = _.flatMap(responses, (response) => response.result.lines);
   return trustlines.map(parseAccountTrustline).filter((trustline) => {
-    return currencyFilter(options.currency || null, trustline);
+    return currencyFilter(options.currency ?? null, trustline);
   });
 }
 

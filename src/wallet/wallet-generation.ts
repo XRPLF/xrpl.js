@@ -36,7 +36,7 @@ async function generateFaucetWallet(
   }
 
   // Initialize some variables
-  let body: Uint8Array;
+  let body: Uint8Array | undefined;
   let startingBalance = 0;
   const faucetUrl = getFaucetUrl(this);
 
@@ -73,7 +73,7 @@ async function generateFaucetWallet(
 
   return new Promise((resolve, reject) => {
     const request = https.request(options, (response) => {
-      const chunks = [];
+      const chunks: any[] = [];
       response.on("data", (d) => {
         chunks.push(d);
       });
@@ -81,7 +81,7 @@ async function generateFaucetWallet(
         const body = Buffer.concat(chunks).toString();
 
         // "application/json; charset=utf-8"
-        if (response.headers["content-type"].startsWith("application/json")) {
+        if (response.headers["content-type"]?.startsWith("application/json")) {
           const wallet: FaucetWallet = JSON.parse(body);
           const classicAddress = wallet.account.classicAddress;
 

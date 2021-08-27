@@ -15,7 +15,14 @@ async function getFee(this: Client, cushion?: number): Promise<string> {
 
   const serverInfo = (await this.request({ command: "server_info" })).result
     .info;
-  const baseFeeXrp = new BigNumber(serverInfo.validated_ledger.base_fee_xrp);
+
+  const baseFee = serverInfo.validated_ledger?.base_fee_xrp;
+
+  if (baseFee == null) {
+    throw new Error("getFee: Could not get base_fee_xrp from server_info");
+  }
+
+  const baseFeeXrp = new BigNumber(baseFee);
   if (serverInfo.load_factor == null) {
     // https://github.com/ripple/rippled/issues/3812#issuecomment-816871100
     serverInfo.load_factor = 1;

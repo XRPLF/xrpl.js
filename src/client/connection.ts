@@ -95,7 +95,7 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
     (value) => value == null
   );
   const websocketOptions = { ...options, ...optionsOverrides };
-  const websocket = new WebSocket(url, null, websocketOptions);
+  const websocket = new WebSocket(url, websocketOptions);
   // we will have a listener for each outstanding request,
   // so we have to raise the limit (the default is 10)
   if (typeof websocket.setMaxListeners === "function") {
@@ -112,7 +112,7 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
  */
 function websocketSendAsync(ws: WebSocket, message: string) {
   return new Promise<void>((resolve, reject) => {
-    ws.send(message, undefined, (error) => {
+    ws.send(message, (error) => {
       if (error) {
         reject(new DisconnectedError(error.message, error));
       } else {
@@ -258,7 +258,7 @@ class RequestManager {
  * @param errorOrCode
  */
 export class Connection extends EventEmitter {
-  private readonly _url: string;
+  private readonly _url: string | undefined;
   private _ws: null | WebSocket = null;
   private _reconnectTimeoutID: null | NodeJS.Timeout = null;
   private _heartbeatIntervalID: null | NodeJS.Timeout = null;
@@ -322,7 +322,9 @@ export class Connection extends EventEmitter {
   }
 
   private readonly _clearHeartbeatInterval = () => {
-    clearInterval(this._heartbeatIntervalID);
+    if (this._heartbeatIntervalID) {
+      clearInterval(this._heartbeatIntervalID);
+    }
   };
 
   private readonly _startHeartbeatInterval = () => {
@@ -410,11 +412,20 @@ export class Connection extends EventEmitter {
     }, this._config.connectionTimeout);
     // Connection listeners: these stay attached only until a connection is done/open.
     this._ws = createWebSocket(this._url, this._config);
+
+    if (this._ws == null) {
+      throw new Error("Connect: created null websocket");
+    }
+
     this._ws.on("error", this._onConnectionFailed);
     this._ws.on("error", () => clearTimeout(connectionTimeoutID));
     this._ws.on("close", this._onConnectionFailed);
     this._ws.on("close", () => clearTimeout(connectionTimeoutID));
     this._ws.once("open", async () => {
+      if (this._ws == null) {
+        throw new Error("onceOpen: ws is null");
+      }
+
       // Once the connection completes successfully, remove all old listeners
       this._ws.removeAllListeners();
       clearTimeout(connectionTimeoutID);
@@ -425,6 +436,10 @@ export class Connection extends EventEmitter {
       );
       // Handle a closed connection: reconnect if it was unexpected
       this._ws.once("close", (code, reason) => {
+        if (this._ws == null) {
+          throw new Error("onceClose: ws is null");
+        }
+
         this._clearHeartbeatInterval();
         this._requestManager.rejectAll(
           new DisconnectedError(`websocket was closed, ${reason}`)
@@ -468,17 +483,27 @@ export class Connection extends EventEmitter {
    * If no open websocket connection exists, resolve with no code (`undefined`).
    */
   disconnect(): Promise<number | undefined> {
-    clearTimeout(this._reconnectTimeoutID);
-    this._reconnectTimeoutID = null;
-    if (this._state === WebSocket.CLOSED || !this._ws) {
+    if (this._reconnectTimeoutID !== null) {
+      clearTimeout(this._reconnectTimeoutID);
+      this._reconnectTimeoutID = null;
+    }
+    if (this._state === WebSocket.CLOSED) {
       return Promise.resolve(undefined);
     }
+    if (this._ws === null) {
+      return Promise.resolve(undefined);
+    }
+
     return new Promise((resolve) => {
+      if (this._ws === null) {
+        return Promise.resolve(undefined);
+      }
+
       this._ws.once("close", (code) => resolve(code));
       // Connection already has a disconnect handler for the disconnect logic.
       // Just close the websocket manually (with our "intentional" code) to
       // trigger that.
-      if (this._state !== WebSocket.CLOSING) {
+      if (this._ws != null && this._state !== WebSocket.CLOSING) {
         this._ws.close(INTENTIONAL_DISCONNECT_CODE);
       }
     });
@@ -500,7 +525,7 @@ export class Connection extends EventEmitter {
     request: T,
     timeout?: number
   ): Promise<any> {
-    if (!this._shouldBeConnected) {
+    if (!this._shouldBeConnected || this._ws == null) {
       throw new NotConnectedError();
     }
     const [id, message, responsePromise] = this._requestManager.createRequest(
@@ -521,6 +546,6 @@ export class Connection extends EventEmitter {
    * @returns The Websocket connection URL.
    */
   getUrl(): string {
-    return this._url;
+    return this._url ?? "";
   }
 }

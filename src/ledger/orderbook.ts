@@ -59,7 +59,10 @@ export function formatBidsAndAsks(
   // we sort the orders so that earlier orders are closer to mid-market
   const orders = offers
     .sort((a, b) => {
-      return new BigNumber(a.quality).comparedTo(b.quality);
+      const qualityA = a.quality ?? 0;
+      const qualityB = b.quality ?? 0;
+
+      return new BigNumber(qualityA).comparedTo(qualityB);
     })
     .map(parseOrderbookOrder);
 

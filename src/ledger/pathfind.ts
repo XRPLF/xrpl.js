@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import _ from "lodash";
 
-import { Client } from "..";
+import type { Client } from "..";
 import { Connection } from "../client";
 import { validate, errors } from "../common";
 import { RippledAmount, Amount } from "../common/types/objects";
@@ -75,7 +75,11 @@ function requestPathFind(
     }
     // @ts-expect-error
     request.send_max = toRippledAmount(pathfind.source.amount);
-    if (typeof request.send_max !== "string" && !request.send_max.issuer) {
+    if (
+      request.send_max != null &&
+      typeof request.send_max !== "string" &&
+      !request.send_max.issuer
+    ) {
       request.send_max.issuer = pathfind.source.address;
     }
   }
@@ -113,7 +117,8 @@ function conditionallyAddDirectXRPPath(
 ): Promise<RippledPathsResponse> {
   if (
     isRippledIOUAmount(paths.destination_amount) ||
-    !paths.destination_currencies.includes("XRP")
+    (paths.destination_currencies &&
+      !paths.destination_currencies.includes("XRP"))
   ) {
     return Promise.resolve(paths);
   }
@@ -128,13 +133,17 @@ function filterSourceFundsLowPaths(
 ): RippledPathsResponse {
   if (
     pathfind.source.amount &&
-    pathfind.destination.amount.value == null &&
-    paths.alternatives
+    paths.alternatives &&
+    pathfind.destination.amount.value == null
   ) {
     paths.alternatives = paths.alternatives.filter((alt) => {
       if (!alt.source_amount) {
         return false;
       }
+      if (pathfind.source.amount === undefined) {
+        return false;
+      }
+
       const pathfindSourceAmountValue = new BigNumber(
         pathfind.source.amount.currency === "XRP"
           ? xrpToDrops(pathfind.source.amount.value)

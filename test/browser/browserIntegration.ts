@@ -13,10 +13,14 @@ describe("Browser Tests", function () {
       );
 
       const fails = await page.evaluate(() => {
-        return document.querySelector(".failures").textContent;
+        const element = document.querySelector(".failures");
+
+        return element == null ? null : element.textContent;
       });
       const passes = await page.evaluate(() => {
-        return document.querySelector(".passes").textContent;
+        const element = document.querySelector(".passes");
+
+        return element == null ? null : element.textContent;
       });
 
       expect(fails).to.equal("failures: 0");

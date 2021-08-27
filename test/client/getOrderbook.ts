@@ -68,6 +68,8 @@ function normalRippledResponse(request: BookOffersRequest): object {
   ) {
     return rippled.book_offers.fabric.requestBookOffersAsksResponse(request);
   }
+
+  return {};
 }
 
 function xrpRippledResponse(request: BookOffersRequest): object {
@@ -77,6 +79,8 @@ function xrpRippledResponse(request: BookOffersRequest): object {
   if (request.taker_gets.issuer === "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw") {
     return rippled.book_offers.usd_xrp;
   }
+
+  return {};
 }
 
 /**

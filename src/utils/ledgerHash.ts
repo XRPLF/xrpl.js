@@ -35,7 +35,7 @@ function computeTransactionHash(
   ledger,
   options: ComputeLedgerHeaderHashOptions
 ) {
-  let transactions: any[];
+  let transactions: any[] = [];
   if (ledger.rawTransactions) {
     transactions = JSON.parse(ledger.rawTransactions);
   } else if (ledger.transactions) {
