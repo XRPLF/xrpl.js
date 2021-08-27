@@ -1,3 +1,4 @@
+/* eslint-disable complexity -- Necessary for verifyOfferCreate */
 import { ValidationError } from "../../common/errors";
 import { Amount } from "../common";
 

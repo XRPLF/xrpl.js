@@ -27,6 +27,8 @@ const transactionTypes = [
   "TrustSet",
 ];
 
+const MEMO_SIZE = 3;
+
 function isMemo(obj: { Memo?: Record<string, unknown> }): boolean {
   if (obj.Memo == null) {
     return false;
@@ -42,7 +44,7 @@ function isMemo(obj: { Memo?: Record<string, unknown> }): boolean {
 
   return (
     size >= 1 &&
-    size <= 3 &&
+    size <= MEMO_SIZE &&
     validData &&
     validFormat &&
     validType &&
@@ -50,14 +52,18 @@ function isMemo(obj: { Memo?: Record<string, unknown> }): boolean {
   );
 }
 
+const SIGNER_SIZE = 3;
+
 function isSigner(signer: Signer): boolean {
   return (
-    Object.keys(signer).length === 3 &&
+    Object.keys(signer).length === SIGNER_SIZE &&
     typeof signer.Account === "string" &&
     typeof signer.TxnSignature === "string" &&
     typeof signer.SigningPubKey === "string"
   );
 }
+
+const ISSUED_CURRENCY_SIZE = 3;
 
 /**
  * Verify the form and type of an IssuedCurrencyAmount at runtime.
@@ -65,9 +71,9 @@ function isSigner(signer: Signer): boolean {
  * @param obj - The object to check the form and type of.
  * @returns Whether the IssuedCurrencyAmount is malformed.
  */
-function isIssuedCurrency(obj: Record<string, unknown>): boolean {
+export function isIssuedCurrency(obj: Record<string, unknown>): boolean {
   return (
-    Object.keys(obj).length === 3 &&
+    Object.keys(obj).length === ISSUED_CURRENCY_SIZE &&
     typeof obj.value === "string" &&
     typeof obj.issuer === "string" &&
     typeof obj.currency === "string"

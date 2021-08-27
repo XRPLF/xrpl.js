@@ -26,6 +26,9 @@ export interface AccountSet extends BaseTransaction {
   TickSize?: number;
 }
 
+const MIN_TICK_SIZE = 3;
+const MAX_TICK_SIZE = 15;
+
 /**
  * Verify the form and type of an AccountSet at runtime.
  *
@@ -73,7 +76,10 @@ export function verifyAccountSet(tx: Record<string, unknown>): void {
     if (typeof tx.TickSize !== "number") {
       throw new ValidationError("AccountSet: invalid TickSize");
     }
-    if (tx.TickSize !== 0 && (tx.TickSize < 3 || tx.TickSize > 15)) {
+    if (
+      tx.TickSize !== 0 &&
+      (tx.TickSize < MIN_TICK_SIZE || tx.TickSize > MAX_TICK_SIZE)
+    ) {
       throw new ValidationError("AccountSet: invalid TickSize");
     }
   }
