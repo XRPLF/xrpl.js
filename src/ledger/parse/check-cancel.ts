@@ -1,19 +1,21 @@
-import * as assert from 'assert'
-import {removeUndefined} from '../../utils'
-import {parseMemos} from './utils'
+import * as assert from "assert";
 
-export type FormattedCheckCancel = {
+import { removeUndefined } from "../../utils";
+
+import { parseMemos } from "./utils";
+
+export interface FormattedCheckCancel {
   // ID of the Check ledger object to cancel.
-  checkID: string
+  checkID: string;
 }
 
 function parseCheckCancel(tx: any): FormattedCheckCancel {
-  assert.ok(tx.TransactionType === 'CheckCancel')
+  assert.ok(tx.TransactionType === "CheckCancel");
 
   return removeUndefined({
     memos: parseMemos(tx),
-    checkID: tx.CheckID
-  })
+    checkID: tx.CheckID,
+  });
 }
 
-export default parseCheckCancel
+export default parseCheckCancel;

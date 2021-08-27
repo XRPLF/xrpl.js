@@ -1,181 +1,181 @@
-import assert from 'assert-diff'
-import _ from 'lodash'
-import {Client} from 'xrpl-local'
-import {RecursiveData} from 'xrpl-local/ledger/utils'
-import {assertRejects} from './testUtils'
-import addresses from './fixtures/addresses.json'
-import setupClient from './setupClient'
-import {toRippledAmount} from '../src'
-import * as schemaValidator from 'xrpl-local/common/schema-validator'
-import {validate} from 'xrpl-local/common'
+import assert from "assert-diff";
+import _ from "lodash";
+
+import { Client } from "xrpl-local";
+import { validate } from "xrpl-local/common";
+import * as schemaValidator from "xrpl-local/common/schema-validator";
 import {
+  RecursiveData,
   renameCounterpartyToIssuerInOrder,
   compareTransactions,
-  getRecursive
-} from 'xrpl-local/ledger/utils'
+  getRecursive,
+} from "xrpl-local/ledger/utils";
 
-const address = addresses.ACCOUNT
-assert.options.strict = true
+import { toRippledAmount } from "../src";
+
+import addresses from "./fixtures/addresses.json";
+import setupClient from "./setupClient";
+import { assertRejects } from "./testUtils";
+
+const address = addresses.ACCOUNT;
+assert.options.strict = true;
 
 // how long before each test case times out
-const TIMEOUT = 20000
+const TIMEOUT = 20000;
 
-describe('Client', function () {
-  this.timeout(TIMEOUT)
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+describe("Client", function () {
+  this.timeout(TIMEOUT);
+  beforeEach(setupClient.setup);
+  afterEach(setupClient.teardown);
 
-  it('Client - implicit server port', function () {
-    new Client('wss://s1.ripple.com')
-  })
+  it("Client - implicit server port", function () {
+    new Client("wss://s1.ripple.com");
+  });
 
-  it('Client invalid options', function () {
-    // @ts-ignore - This is intentionally invalid
-    assert.throws(() => new Client({invalid: true}))
-  })
+  it("Client invalid options", function () {
+    // @ts-expect-error - This is intentionally invalid
+    assert.throws(() => new Client({ invalid: true }));
+  });
 
-  it('Client valid options', function () {
-    const client = new Client('wss://s:1')
-    const privateConnectionUrl = (client.connection as any)._url
-    assert.deepEqual(privateConnectionUrl, 'wss://s:1')
-  })
+  it("Client valid options", function () {
+    const client = new Client("wss://s:1");
+    const privateConnectionUrl = (client.connection as any)._url;
+    assert.deepEqual(privateConnectionUrl, "wss://s:1");
+  });
 
-  it('Client invalid server uri', function () {
-    assert.throws(() => new Client('wss//s:1'))
-  })
+  it("Client invalid server uri", function () {
+    assert.throws(() => new Client("wss//s:1"));
+  });
 
-  it('Client connect() times out after 2 seconds', function () {
+  it("Client connect() times out after 2 seconds", function () {
     // TODO: Use a timer mock like https://jestjs.io/docs/en/timer-mocks
     //       to test that connect() times out after 2 seconds.
-  })
+  });
 
-  describe('[private] schema-validator', function () {
-    it('valid', function () {
+  describe("[private] schema-validator", function () {
+    it("valid", function () {
       assert.doesNotThrow(function () {
         schemaValidator.schemaValidate(
-          'hash256',
-          '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A0F'
-        )
-      })
-    })
+          "hash256",
+          "0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A0F"
+        );
+      });
+    });
 
-    it('invalid', function () {
+    it("invalid", function () {
       assert.throws(function () {
-        schemaValidator.schemaValidate('hash256', 'invalid')
-      }, this.client.errors.ValidationError)
-    })
+        schemaValidator.schemaValidate("hash256", "invalid");
+      }, this.client.errors.ValidationError);
+    });
 
-    it('invalid - empty value', function () {
+    it("invalid - empty value", function () {
       assert.throws(function () {
-        schemaValidator.schemaValidate('hash256', '')
-      }, this.client.errors.ValidationError)
-    })
+        schemaValidator.schemaValidate("hash256", "");
+      }, this.client.errors.ValidationError);
+    });
 
-    it('schema not found error', function () {
+    it("schema not found error", function () {
       assert.throws(function () {
-        schemaValidator.schemaValidate('unexisting', 'anything')
-      }, /no schema/)
-    })
-  })
+        schemaValidator.schemaValidate("unexisting", "anything");
+      }, /no schema/);
+    });
+  });
 
-  describe('[private] validator', function () {
-    it('validateLedgerRange', function () {
+  describe("[private] validator", function () {
+    it("validateLedgerRange", function () {
       const options = {
         minLedgerVersion: 20000,
-        maxLedgerVersion: 10000
-      }
-      const thunk = _.partial(validate.getTransactions, {address, options})
-      assert.throws(thunk, this.client.errors.ValidationError)
+        maxLedgerVersion: 10000,
+      };
+      const thunk = _.partial(validate.getTransactions, { address, options });
+      assert.throws(thunk, this.client.errors.ValidationError);
       assert.throws(
         thunk,
         /minLedgerVersion must not be greater than maxLedgerVersion/
-      )
-    })
+      );
+    });
 
-    it('secret', function () {
+    it("secret", function () {
       function validateSecret(secret) {
-        validate.sign({txJSON: '', secret})
+        validate.sign({ txJSON: "", secret });
       }
       assert.doesNotThrow(
-        _.partial(validateSecret, 'shzjfakiK79YQdMjy4h8cGGfQSV6u')
-      )
+        _.partial(validateSecret, "shzjfakiK79YQdMjy4h8cGGfQSV6u")
+      );
       assert.throws(
-        _.partial(validateSecret, 'shzjfakiK79YQdMjy4h8cGGfQSV6v'),
+        _.partial(validateSecret, "shzjfakiK79YQdMjy4h8cGGfQSV6v"),
         this.client.errors.ValidationError
-      )
+      );
       assert.throws(
         _.partial(validateSecret, 1),
         this.client.errors.ValidationError
-      )
+      );
       assert.throws(
-        _.partial(validateSecret, ''),
+        _.partial(validateSecret, ""),
         this.client.errors.ValidationError
-      )
+      );
       assert.throws(
-        _.partial(validateSecret, 's!!!'),
+        _.partial(validateSecret, "s!!!"),
         this.client.errors.ValidationError
-      )
+      );
       assert.throws(
-        _.partial(validateSecret, 'passphrase'),
+        _.partial(validateSecret, "passphrase"),
         this.client.errors.ValidationError
-      )
+      );
       // 32 0s is a valid hex repr of seed bytes
-      const hex = new Array(33).join('0')
+      const hex = new Array(33).join("0");
       assert.throws(
         _.partial(validateSecret, hex),
         this.client.errors.ValidationError
-      )
-    })
-  })
+      );
+    });
+  });
 
-  it('common utils - toRippledAmount', async () => {
-    const amount = {issuer: 'is', currency: 'c', value: 'v'}
+  it("common utils - toRippledAmount", async function () {
+    const amount = { issuer: "is", currency: "c", value: "v" };
     assert.deepEqual(toRippledAmount(amount), {
-      issuer: 'is',
-      currency: 'c',
-      value: 'v'
-    })
-  })
+      issuer: "is",
+      currency: "c",
+      value: "v",
+    });
+  });
 
-  it('ledger utils - renameCounterpartyToIssuerInOrder', async () => {
+  it("ledger utils - renameCounterpartyToIssuerInOrder", async function () {
     const order = {
-      taker_gets: {counterparty: '1', currency: 'XRP'},
-      taker_pays: {counterparty: '1', currency: 'XRP'}
-    }
+      taker_gets: { counterparty: "1", currency: "XRP" },
+      taker_pays: { counterparty: "1", currency: "XRP" },
+    };
     const expected = {
-      taker_gets: {issuer: '1', currency: 'XRP'},
-      taker_pays: {issuer: '1', currency: 'XRP'}
-    }
-    assert.deepEqual(
-      renameCounterpartyToIssuerInOrder(order),
-      expected
-    )
-  })
+      taker_gets: { issuer: "1", currency: "XRP" },
+      taker_pays: { issuer: "1", currency: "XRP" },
+    };
+    assert.deepEqual(renameCounterpartyToIssuerInOrder(order), expected);
+  });
 
-  it('ledger utils - compareTransactions', async () => {
-    // @ts-ignore
-    assert.strictEqual(compareTransactions({}, {}), 0)
-    let first: any = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
-    let second: any = {outcome: {ledgerVersion: 1, indexInLedger: 200}}
-    assert.strictEqual(compareTransactions(first, second), -1)
-    first = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
-    second = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
-    assert.strictEqual(compareTransactions(first, second), 0)
-    first = {outcome: {ledgerVersion: 1, indexInLedger: 200}}
-    second = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
-    assert.strictEqual(compareTransactions(first, second), 1)
-  })
+  it("ledger utils - compareTransactions", async function () {
+    // @ts-expect-error
+    assert.strictEqual(compareTransactions({}, {}), 0);
+    let first: any = { outcome: { ledgerVersion: 1, indexInLedger: 100 } };
+    let second: any = { outcome: { ledgerVersion: 1, indexInLedger: 200 } };
+    assert.strictEqual(compareTransactions(first, second), -1);
+    first = { outcome: { ledgerVersion: 1, indexInLedger: 100 } };
+    second = { outcome: { ledgerVersion: 1, indexInLedger: 100 } };
+    assert.strictEqual(compareTransactions(first, second), 0);
+    first = { outcome: { ledgerVersion: 1, indexInLedger: 200 } };
+    second = { outcome: { ledgerVersion: 1, indexInLedger: 100 } };
+    assert.strictEqual(compareTransactions(first, second), 1);
+  });
 
-  it('ledger utils - getRecursive', async () => {
+  it("ledger utils - getRecursive", async function () {
     function getter(marker) {
       return new Promise<RecursiveData>((resolve, reject) => {
         if (marker != null) {
-          reject(new Error())
-          return
+          reject(new Error());
+          return;
         }
-        resolve({marker: 'A', results: [1]})
-      })
+        resolve({ marker: "A", results: [1] });
+      });
     }
-    await assertRejects(getRecursive(getter, 10), Error)
-  })
-})
+    await assertRejects(getRecursive(getter, 10), Error);
+  });
+});

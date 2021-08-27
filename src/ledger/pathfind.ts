@@ -1,87 +1,90 @@
-import _ from 'lodash'
-import BigNumber from 'bignumber.js'
-import {getXRPBalance, renameCounterpartyToIssuer} from './utils'
-import {
-  validate,
-  errors
-} from '../common'
-import {toRippledAmount, xrpToDrops, dropsToXrp} from '../utils'
-import {Connection} from '../client'
-import parsePathfind from './parse/pathfind'
-import {RippledAmount, Amount} from '../common/types/objects'
+import BigNumber from "bignumber.js";
+import _ from "lodash";
+
+import type { Client } from "..";
+import { Connection } from "../client";
+import { validate, errors } from "../common";
+import { RippledAmount, Amount } from "../common/types/objects";
+import { RipplePathFindRequest } from "../models/methods";
+import { toRippledAmount, xrpToDrops, dropsToXrp } from "../utils";
+
+import parsePathfind from "./parse/pathfind";
 import {
   GetPaths,
   PathFind,
   RippledPathsResponse,
-  PathFindRequest
-} from './pathfind-types'
-import {Client} from '..'
-import { RipplePathFindRequest } from '../models/methods'
-const NotFoundError = errors.NotFoundError
-const ValidationError = errors.ValidationError
+  PathFindRequest,
+} from "./pathfind-types";
+import { getXRPBalance, renameCounterpartyToIssuer } from "./utils";
+
+const NotFoundError = errors.NotFoundError;
+const ValidationError = errors.ValidationError;
 
 function addParams(
   request: PathFindRequest,
   result: RippledPathsResponse
 ): RippledPathsResponse {
   return _.defaults(
-    Object.assign({}, result, {
+    {
+      ...result,
       source_account: request.source_account,
-      source_currencies: request.source_currencies
-    }),
-    {destination_amount: request.destination_amount}
-  )
+      source_currencies: request.source_currencies,
+    },
+    { destination_amount: request.destination_amount }
+  );
 }
 
 function requestPathFind(
   connection: Connection,
   pathfind: PathFind
 ): Promise<RippledPathsResponse> {
-  const destinationAmount: Amount = Object.assign(
-    {
-      // This is converted back to drops by toRippledAmount()
-      value:
-        pathfind.destination.amount.currency === 'XRP' ? dropsToXrp('-1') : '-1'
-    },
-    pathfind.destination.amount
-  )
+  const destinationAmount: Amount = {
+    // This is converted back to drops by toRippledAmount()
+    value:
+      pathfind.destination.amount.currency === "XRP" ? dropsToXrp("-1") : "-1",
+    ...pathfind.destination.amount,
+  };
   const request: RipplePathFindRequest = {
-    command: 'ripple_path_find',
+    command: "ripple_path_find",
     source_account: pathfind.source.address,
     destination_account: pathfind.destination.address,
-    // @ts-ignore
-    destination_amount: destinationAmount
-  }
+    // @ts-expect-error
+    destination_amount: destinationAmount,
+  };
   if (
-    typeof request.destination_amount === 'object' &&
+    typeof request.destination_amount === "object" &&
     !request.destination_amount.issuer
   ) {
     // Convert blank issuer to sender's address
     // (Ripple convention for 'any issuer')
     // https://developers.ripple.com/payment.html#special-issuer-values-for-sendmax-and-amount
-    request.destination_amount.issuer = request.destination_account
+    request.destination_amount.issuer = request.destination_account;
   }
   if (pathfind.source.currencies && pathfind.source.currencies.length > 0) {
-    // @ts-ignore
+    // @ts-expect-error
     request.source_currencies = pathfind.source.currencies.map((amount) =>
       renameCounterpartyToIssuer(amount)
-    )
+    );
   }
   if (pathfind.source.amount) {
     if (pathfind.destination.amount.value != null) {
       throw new ValidationError(
-        'Cannot specify both source.amount' +
-          ' and destination.amount.value in getPaths'
-      )
+        "Cannot specify both source.amount" +
+          " and destination.amount.value in getPaths"
+      );
     }
-    // @ts-ignore
-    request.send_max = toRippledAmount(pathfind.source.amount)
-    if (typeof request.send_max !== 'string' && !request.send_max.issuer) {
-      request.send_max.issuer = pathfind.source.address
+    // @ts-expect-error
+    request.send_max = toRippledAmount(pathfind.source.amount);
+    if (
+      request.send_max != null &&
+      typeof request.send_max !== "string" &&
+      !request.send_max.issuer
+    ) {
+      request.send_max.issuer = pathfind.source.address;
     }
   }
-  // @ts-ignore
-  return connection.request(request).then((paths) => addParams(request, paths))
+  // @ts-expect-error
+  return connection.request(request).then((paths) => addParams(request, paths));
 }
 
 function addDirectXrpPath(
@@ -89,22 +92,22 @@ function addDirectXrpPath(
   xrpBalance: string
 ): RippledPathsResponse {
   // Add XRP "path" only if the source acct has enough XRP to make the payment
-  const destinationAmount = paths.destination_amount
-  // @ts-ignore: destinationAmount can be a currency amount object! Fix!
+  const destinationAmount = paths.destination_amount;
+  // @ts-expect-error: destinationAmount can be a currency amount object! Fix!
   if (new BigNumber(xrpBalance).isGreaterThanOrEqualTo(destinationAmount)) {
     paths.alternatives.unshift({
       paths_computed: [],
-      source_amount: paths.destination_amount
-    })
+      source_amount: paths.destination_amount,
+    });
   }
-  return paths
+  return paths;
 }
 
 function isRippledIOUAmount(amount: RippledAmount) {
   // rippled XRP amounts are specified as decimal strings
   return (
-    typeof amount === 'object' && amount.currency && amount.currency !== 'XRP'
-  )
+    typeof amount === "object" && amount.currency && amount.currency !== "XRP"
+  );
 }
 
 function conditionallyAddDirectXRPPath(
@@ -114,13 +117,14 @@ function conditionallyAddDirectXRPPath(
 ): Promise<RippledPathsResponse> {
   if (
     isRippledIOUAmount(paths.destination_amount) ||
-    !paths.destination_currencies.includes('XRP')
+    (paths.destination_currencies &&
+      !paths.destination_currencies.includes("XRP"))
   ) {
-    return Promise.resolve(paths)
+    return Promise.resolve(paths);
   }
   return getXRPBalance(client, address, undefined).then((xrpBalance) =>
     addDirectXrpPath(paths, xrpBalance)
-  )
+  );
 }
 
 function filterSourceFundsLowPaths(
@@ -129,74 +133,72 @@ function filterSourceFundsLowPaths(
 ): RippledPathsResponse {
   if (
     pathfind.source.amount &&
-    pathfind.destination.amount.value == null &&
-    paths.alternatives
+    paths.alternatives &&
+    pathfind.destination.amount.value == null
   ) {
     paths.alternatives = paths.alternatives.filter((alt) => {
       if (!alt.source_amount) {
-        return false
+        return false;
       }
+      if (pathfind.source.amount === undefined) {
+        return false;
+      }
+
       const pathfindSourceAmountValue = new BigNumber(
-        pathfind.source.amount.currency === 'XRP'
+        pathfind.source.amount.currency === "XRP"
           ? xrpToDrops(pathfind.source.amount.value)
           : pathfind.source.amount.value
-      )
+      );
       const altSourceAmountValue = new BigNumber(
-        typeof alt.source_amount === 'string'
+        typeof alt.source_amount === "string"
           ? alt.source_amount
           : alt.source_amount.value
-      )
-      return altSourceAmountValue.eq(pathfindSourceAmountValue)
-    })
+      );
+      return altSourceAmountValue.eq(pathfindSourceAmountValue);
+    });
   }
-  return paths
+  return paths;
 }
 
 function formatResponse(pathfind: PathFind, paths: RippledPathsResponse) {
   if (paths.alternatives && paths.alternatives.length > 0) {
-    return parsePathfind(paths)
+    return parsePathfind(paths);
   }
   if (
     paths.destination_currencies != null &&
-    !paths.destination_currencies.includes(
-      pathfind.destination.amount.currency
-    )
+    !paths.destination_currencies.includes(pathfind.destination.amount.currency)
   ) {
     throw new NotFoundError(
-      'No paths found. ' +
-        'The destination_account does not accept ' +
-        pathfind.destination.amount.currency +
-        ', they only accept: ' +
-        paths.destination_currencies.join(', ')
-    )
+      `${"No paths found. " + "The destination_account does not accept "}${
+        pathfind.destination.amount.currency
+      }, they only accept: ${paths.destination_currencies.join(", ")}`
+    );
   } else if (paths.source_currencies && paths.source_currencies.length > 0) {
     throw new NotFoundError(
-      'No paths found. Please ensure' +
-        ' that the source_account has sufficient funds to execute' +
-        ' the payment in one of the specified source_currencies. If it does' +
-        ' there may be insufficient liquidity in the network to execute' +
-        ' this payment right now'
-    )
+      "No paths found. Please ensure" +
+        " that the source_account has sufficient funds to execute" +
+        " the payment in one of the specified source_currencies. If it does" +
+        " there may be insufficient liquidity in the network to execute" +
+        " this payment right now"
+    );
   } else {
     throw new NotFoundError(
-      'No paths found.' +
-        ' Please ensure that the source_account has sufficient funds to' +
-        ' execute the payment. If it does there may be insufficient liquidity' +
-        ' in the network to execute this payment right now'
-    )
+      "No paths found." +
+        " Please ensure that the source_account has sufficient funds to" +
+        " execute the payment. If it does there may be insufficient liquidity" +
+        " in the network to execute this payment right now"
+    );
   }
 }
 
 function getPaths(this: Client, pathfind: PathFind): Promise<GetPaths> {
-  validate.getPaths({pathfind})
+  validate.getPaths({ pathfind });
 
-  const address = pathfind.source.address
+  const address = pathfind.source.address;
   return requestPathFind(this.connection, pathfind)
-    .then((paths) =>
-      conditionallyAddDirectXRPPath(this, address, paths)
-    )
+    .then((paths) => conditionallyAddDirectXRPPath(this, address, paths))
     .then((paths) => filterSourceFundsLowPaths(pathfind, paths))
-    .then((paths) => formatResponse(pathfind, paths))
+    .then((paths) => formatResponse(pathfind, paths));
 }
 
-export default getPaths
+export default getPaths;

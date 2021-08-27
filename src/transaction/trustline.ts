@@ -1,16 +1,19 @@
-import BigNumber from 'bignumber.js'
-import * as utils from './utils'
-const validate = utils.common.validate
-const trustlineFlags = utils.common.txFlags.TrustSet
-import {Instructions, Prepare, TransactionJSON} from './types'
-import {FormattedTrustlineSpecification} from '../common/types/objects/trustlines'
-import {Client} from '..'
+import BigNumber from "bignumber.js";
+
+import { Client } from "..";
+import { FormattedTrustlineSpecification } from "../common/types/objects/trustlines";
+
+import { Instructions, Prepare, TransactionJSON } from "./types";
+import * as utils from "./utils";
+
+const validate = utils.common.validate;
+const trustlineFlags = utils.common.txFlags.TrustSet;
 
 function convertQuality(quality) {
   return new BigNumber(quality)
     .shiftedBy(9)
     .integerValue(BigNumber.ROUND_DOWN)
-    .toNumber()
+    .toNumber();
 }
 
 function createTrustlineTransaction(
@@ -20,38 +23,38 @@ function createTrustlineTransaction(
   const limit = {
     currency: trustline.currency,
     issuer: trustline.counterparty,
-    value: trustline.limit
-  }
+    value: trustline.limit,
+  };
 
   const txJSON: any = {
-    TransactionType: 'TrustSet',
+    TransactionType: "TrustSet",
     Account: account,
     LimitAmount: limit,
-    Flags: 0
-  }
+    Flags: 0,
+  };
   if (trustline.qualityIn != null) {
-    txJSON.QualityIn = convertQuality(trustline.qualityIn)
+    txJSON.QualityIn = convertQuality(trustline.qualityIn);
   }
   if (trustline.qualityOut != null) {
-    txJSON.QualityOut = convertQuality(trustline.qualityOut)
+    txJSON.QualityOut = convertQuality(trustline.qualityOut);
   }
-  if (trustline.authorized === true) {
-    txJSON.Flags |= trustlineFlags.SetAuth
+  if (trustline.authorized) {
+    txJSON.Flags |= trustlineFlags.SetAuth;
   }
   if (trustline.ripplingDisabled != null) {
     txJSON.Flags |= trustline.ripplingDisabled
       ? trustlineFlags.NoRipple
-      : trustlineFlags.ClearNoRipple
+      : trustlineFlags.ClearNoRipple;
   }
   if (trustline.frozen != null) {
     txJSON.Flags |= trustline.frozen
       ? trustlineFlags.SetFreeze
-      : trustlineFlags.ClearFreeze
+      : trustlineFlags.ClearFreeze;
   }
   if (trustline.memos != null) {
-    txJSON.Memos = trustline.memos.map(utils.convertMemo)
+    txJSON.Memos = trustline.memos.map(utils.convertMemo);
   }
-  return txJSON
+  return txJSON;
 }
 
 function prepareTrustline(
@@ -61,12 +64,12 @@ function prepareTrustline(
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareTrustline({address, trustline, instructions})
-    const txJSON = createTrustlineTransaction(address, trustline)
-    return utils.prepareTransaction(txJSON, this, instructions)
+    validate.prepareTrustline({ address, trustline, instructions });
+    const txJSON = createTrustlineTransaction(address, trustline);
+    return utils.prepareTransaction(txJSON, this, instructions);
   } catch (e) {
-    return Promise.reject(e)
+    return Promise.reject(e);
   }
 }
 
-export default prepareTrustline
+export default prepareTrustline;

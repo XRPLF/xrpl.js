@@ -1,8 +1,24 @@
 {
-  "files": [],
-  "include": [],
-  "references": [
-    { "path": "./src" },
-    { "path": "./snippets" }
-  ]
+  "compilerOptions": {
+    "pretty": true,
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "./dist/npm",
+
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "noUnusedLocals": true,
+    "removeComments": true,
+    "preserveConstEnums": false,
+    "esModuleInterop": true,
+    "suppressImplicitAnyIndexErrors": false,
+    "resolveJsonModule": true,
+    "preserveSymlinks": true
+  }
 }

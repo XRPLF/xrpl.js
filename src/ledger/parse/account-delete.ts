@@ -1,25 +1,28 @@
-import * as assert from 'assert'
-import {removeUndefined} from '../../utils'
-import {classicAddressToXAddress} from 'ripple-address-codec'
-import {parseMemos} from './utils'
+import * as assert from "assert";
 
-export type FormattedAccountDelete = {
+import { classicAddressToXAddress } from "ripple-address-codec";
+
+import { removeUndefined } from "../../utils";
+
+import { parseMemos } from "./utils";
+
+export interface FormattedAccountDelete {
   // account (address) of an account to receive any leftover XRP after deleting the sending account.
   // Must be a funded account in the ledger, and must not be the sending account.
-  destination: string
+  destination: string;
 
   // (Optional) Arbitrary destination tag that identifies a hosted recipient or other information
   // for the recipient of the deleted account's leftover XRP. NB: Ensure that the hosted recipient is
   // able to account for AccountDelete transactions; if not, your balance may not be properly credited.
-  destinationTag?: number
+  destinationTag?: number;
 
   // X-address of an account to receive any leftover XRP after deleting the sending account.
   // Must be a funded account in the ledger, and must not be the sending account.
-  destinationXAddress: string
+  destinationXAddress: string;
 }
 
 function parseAccountDelete(tx: any): FormattedAccountDelete {
-  assert.ok(tx.TransactionType === 'AccountDelete')
+  assert.ok(tx.TransactionType === "AccountDelete");
 
   return removeUndefined({
     memos: parseMemos(tx),
@@ -29,8 +32,8 @@ function parseAccountDelete(tx: any): FormattedAccountDelete {
       tx.Destination,
       tx.DestinationTag == null ? false : tx.DestinationTag,
       false
-    )
-  })
+    ),
+  });
 }
 
-export default parseAccountDelete
+export default parseAccountDelete;

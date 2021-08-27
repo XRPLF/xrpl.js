@@ -1,65 +1,66 @@
-import { verifyEscrowCancel } from './../../src/models/transactions/escrowCancel'
-import { assert } from 'chai'
-import { ValidationError } from '../../src/common/errors'
+import { assert } from "chai";
+
+import { ValidationError } from "../../src/common/errors";
+import { verifyEscrowCancel } from "../../src/models/transactions/escrowCancel";
 
 /**
- * Transaction Verification Testing
+ * Transaction Verification Testing.
  *
- * Providing runtime verification testing for each specific transaction type
+ * Providing runtime verification testing for each specific transaction type.
  */
-describe('Transaction Verification', function () {
-    let cancel
+describe("Transaction Verification", function () {
+  let cancel;
 
-    beforeEach(() => {
-        cancel = {
-            TransactionType: "EscrowCancel",
-            Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            Owner: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-            OfferSequence: 7,
-        }
-    })
+  beforeEach(function () {
+    cancel = {
+      TransactionType: "EscrowCancel",
+      Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+      Owner: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+      OfferSequence: 7,
+    };
+  });
 
-    it (`Valid EscrowCancel`, () => {
-        assert.doesNotThrow(() => verifyEscrowCancel(cancel))
-    })
+  it(`Valid EscrowCancel`, function () {
+    assert.doesNotThrow(() => verifyEscrowCancel(cancel));
+  });
 
-    it (`Invalid EscrowCancel missing owner`, () => {
-       delete cancel.Owner
+  it(`Invalid EscrowCancel missing owner`, function () {
+    delete cancel.Owner;
 
-        assert.throws(
-            () => verifyEscrowCancel(cancel),
-            ValidationError,
-            'EscrowCancel: missing Owner'
-        )
-    })
-    
-    it (`Invalid EscrowCancel missing offerSequence`, () => {
-        delete cancel.OfferSequence
+    assert.throws(
+      () => verifyEscrowCancel(cancel),
+      ValidationError,
+      "EscrowCancel: missing Owner"
+    );
+  });
 
-        assert.throws(
-            () => verifyEscrowCancel(cancel),
-            ValidationError,
-            'EscrowCancel: missing OfferSequence'
-        )
-    })
+  it(`Invalid EscrowCancel missing offerSequence`, function () {
+    delete cancel.OfferSequence;
 
-    it (`Invalid OfferSequence`, () => {
-        cancel.Owner = 10
+    assert.throws(
+      () => verifyEscrowCancel(cancel),
+      ValidationError,
+      "EscrowCancel: missing OfferSequence"
+    );
+  });
 
-        assert.throws(
-            () => verifyEscrowCancel(cancel),
-            ValidationError,
-            'EscrowCancel: Owner must be a string'
-        )
-    })
+  it(`Invalid OfferSequence`, function () {
+    cancel.Owner = 10;
 
-    it (`Invalid owner`, () => {
-       cancel.OfferSequence = "10"
+    assert.throws(
+      () => verifyEscrowCancel(cancel),
+      ValidationError,
+      "EscrowCancel: Owner must be a string"
+    );
+  });
 
-        assert.throws(
-            () => verifyEscrowCancel(cancel),
-            ValidationError,
-            'EscrowCancel: OfferSequence must be a number'
-        )
-    })
-})
+  it(`Invalid owner`, function () {
+    cancel.OfferSequence = "10";
+
+    assert.throws(
+      () => verifyEscrowCancel(cancel),
+      ValidationError,
+      "EscrowCancel: OfferSequence must be a number"
+    );
+  });
+});
