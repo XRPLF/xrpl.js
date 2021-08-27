@@ -14,7 +14,7 @@ export interface AccountDelete extends BaseTransaction {
  * @param tx - An AccountDelete Transaction.
  * @throws When the AccountDelete is Malformed.
  */
-export function verifyAccountDelete(tx: AccountDelete): void {
+export function verifyAccountDelete(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.Destination === undefined) {

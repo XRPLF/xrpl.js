@@ -13,7 +13,7 @@ export interface DepositPreauth extends BaseTransaction {
  * @param tx - A DepositPreauth Transaction.
  * @throws {ValidationError} When the DepositPreauth is malformed.
  */
-export function verifyDepositPreauth(tx: DepositPreauth): void {
+export function verifyDepositPreauth(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.Authorize !== undefined && tx.Unauthorize !== undefined) {

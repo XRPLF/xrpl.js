@@ -11,7 +11,7 @@ export interface SetRegularKey extends BaseTransaction {
  * @param tx - A Payment Transaction.
  * @throws {ValidationError} When the SetRegularKey is malformed.
  */
-export function verifySetRegularKey(tx: SetRegularKey): void {
+export function verifySetRegularKey(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.RegularKey !== undefined && typeof tx.RegularKey !== "string") {

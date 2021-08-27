@@ -16,7 +16,7 @@ export interface CheckCash extends BaseTransaction {
  * @param tx - An CheckCash Transaction.
  * @throws When the CheckCash is Malformed.
  */
-export function verifyCheckCash(tx: CheckCash): void {
+export function verifyCheckCash(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (!tx.hasOwnProperty("Amount") && !tx.hasOwnProperty("DeliverMin")) {

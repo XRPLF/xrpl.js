@@ -15,7 +15,7 @@ export interface PaymentChannelFund extends BaseTransaction {
  * @param tx - An PaymentChannelFund Transaction.
  * @throws When the PaymentChannelFund is Malformed.
  */
-export function verifyPaymentChannelFund(tx: PaymentChannelFund): void {
+export function verifyPaymentChannelFund(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.Channel === undefined) {

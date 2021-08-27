@@ -18,7 +18,7 @@ export interface PaymentChannelCreate extends BaseTransaction {
  * @param tx - An PaymentChannelCreate Transaction.
  * @throws When the PaymentChannelCreate is Malformed.
  */
-export function verifyPaymentChannelCreate(tx: PaymentChannelCreate): void {
+export function verifyPaymentChannelCreate(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.Amount === undefined) {

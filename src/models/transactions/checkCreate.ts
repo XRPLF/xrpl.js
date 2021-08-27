@@ -18,7 +18,7 @@ export interface CheckCreate extends BaseTransaction {
  * @param tx - An CheckCreate Transaction.
  * @throws When the CheckCreate is Malformed.
  */
-export function verifyCheckCreate(tx: CheckCreate): void {
+export function verifyCheckCreate(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.SendMax === undefined) {

@@ -23,7 +23,7 @@ export interface PaymentChannelClaim extends BaseTransaction {
  * @param tx - An PaymentChannelClaim Transaction.
  * @throws When the PaymentChannelClaim is Malformed.
  */
-export function verifyPaymentChannelClaim(tx: PaymentChannelClaim): void {
+export function verifyPaymentChannelClaim(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.Channel === undefined) {

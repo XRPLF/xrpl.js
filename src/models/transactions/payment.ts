@@ -36,7 +36,7 @@ export interface Payment extends BaseTransaction {
  * @param tx - A Payment Transaction.
  * @throws {ValidationError} When the PaymentTransaction is malformed.
  */
-export function verifyPayment(tx: Payment): void {
+export function verifyPayment(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.Amount === undefined) {

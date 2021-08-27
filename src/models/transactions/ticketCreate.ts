@@ -12,7 +12,7 @@ export interface TicketCreate extends BaseTransaction {
  * @param tx - A TicketCreate Transaction.
  * @throws {ValidationError} When the TicketCreate is malformed.
  */
-export function verifyTicketCreate(tx: TicketCreate): void {
+export function verifyTicketCreate(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
   const { TicketCount } = tx;
 

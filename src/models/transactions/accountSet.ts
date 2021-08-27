@@ -31,7 +31,7 @@ export interface AccountSet extends BaseTransaction {
  * @param tx - An AccountSet Transaction.
  * @throws When the AccountSet is Malformed.
  */
-export function verifyAccountSet(tx: AccountSet): void {
+export function verifyAccountSet(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.ClearFlag !== undefined) {

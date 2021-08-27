@@ -18,7 +18,7 @@ export interface EscrowCreate extends BaseTransaction {
  * @param tx - An EscrowCreate Transaction.
  * @throws When the EscrowCreate is Malformed.
  */
-export function verifyEscrowCreate(tx: EscrowCreate): void {
+export function verifyEscrowCreate(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.Amount === undefined) {

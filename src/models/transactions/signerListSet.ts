@@ -15,7 +15,7 @@ export interface SignerListSet extends BaseTransaction {
  * @param tx - An SignerListSet Transaction.
  * @throws When the SignerListSet is Malformed.
  */
-export function verifySignerListSet(tx: SignerListSet): void {
+export function verifySignerListSet(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.SignerQuorum === undefined) {

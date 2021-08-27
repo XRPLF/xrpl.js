@@ -13,7 +13,7 @@ export interface OfferCancel extends BaseTransaction {
  * @param tx - An OfferCancel Transaction.
  * @throws When the OfferCancel is Malformed.
  */
-export function verifyOfferCancel(tx: OfferCancel): void {
+export function verifyOfferCancel(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.OfferSequence === undefined) {

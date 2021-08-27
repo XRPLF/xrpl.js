@@ -30,7 +30,7 @@ export interface OfferCreate extends BaseTransaction {
  * @param tx - An OfferCreate Transaction.
  * @throws When the OfferCreate is Malformed.
  */
-export function verifyOfferCreate(tx: OfferCreate): void {
+export function verifyOfferCreate(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.TakerGets === undefined) {

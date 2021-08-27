@@ -16,7 +16,7 @@ export interface EscrowFinish extends BaseTransaction {
  * @param tx - An EscrowFinish Transaction.
  * @throws When the EscrowFinish is Malformed.
  */
-export function verifyEscrowFinish(tx: EscrowFinish): void {
+export function verifyEscrowFinish(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.Owner === undefined) {

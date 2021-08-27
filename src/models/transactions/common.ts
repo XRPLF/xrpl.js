@@ -1,3 +1,6 @@
+/* eslint-disable max-lines-per-function -- Necessary for verifyBaseTransaction */
+/* eslint-disable complexity -- Necessary for verifyBaseTransaction */
+/* eslint-disable max-statements -- Necessary for verifyBaseTransaction */
 import { ValidationError } from "../../common/errors";
 import { Amount, Memo, Signer, IssuedCurrencyAmount } from "../common";
 import { onlyHasFields } from "../utils";
@@ -24,7 +27,10 @@ const transactionTypes = [
   "TrustSet",
 ];
 
-const isMemo = (obj: { Memo: Memo }): boolean => {
+function isMemo(obj: { Memo?: Record<string, unknown> }): boolean {
+  if (obj.Memo == null) {
+    return false;
+  }
   const memo = obj.Memo;
   const size = Object.keys(memo).length;
   const validData =
@@ -42,18 +48,24 @@ const isMemo = (obj: { Memo: Memo }): boolean => {
     validType &&
     onlyHasFields(memo, ["MemoFormat", "MemoData", "MemoType"])
   );
-};
+}
 
-const isSigner = (signer: Signer): boolean => {
+function isSigner(signer: Signer): boolean {
   return (
     Object.keys(signer).length === 3 &&
     typeof signer.Account === "string" &&
     typeof signer.TxnSignature === "string" &&
     typeof signer.SigningPubKey === "string"
   );
-};
+}
 
-export function isIssuedCurrency(obj: IssuedCurrencyAmount): boolean {
+/**
+ * Verify the form and type of an IssuedCurrencyAmount at runtime.
+ *
+ * @param obj - The object to check the form and type of.
+ * @returns Whether the IssuedCurrencyAmount is malformed.
+ */
+function isIssuedCurrency(obj: IssuedCurrencyAmount): boolean {
   return (
     Object.keys(obj).length === 3 &&
     typeof obj.value === "string" &&
@@ -62,6 +74,12 @@ export function isIssuedCurrency(obj: IssuedCurrencyAmount): boolean {
   );
 }
 
+/**
+ * Verify the form and type of an Amount at runtime.
+ *
+ * @param amount - The object to check the form and type of.
+ * @returns Whether the Amount is malformed.
+ */
 export function isAmount(amount: Amount): boolean {
   return typeof amount === "string" || isIssuedCurrency(amount);
 }
@@ -94,7 +112,7 @@ export interface BaseTransaction {
  * @param common - An interface w/ common transaction fields.
  * @throws When the common param is malformed.
  */
-export function verifyBaseTransaction(common: BaseTransaction): void {
+export function verifyBaseTransaction(common: Record<string, unknown>): void {
   if (common.Account === undefined) {
     throw new ValidationError("BaseTransaction: missing field Account");
   }
@@ -137,10 +155,9 @@ export function verifyBaseTransaction(common: BaseTransaction): void {
     throw new ValidationError("BaseTransaction: invalid LastLedgerSequence");
   }
 
-  if (
-    common.Memos !== undefined &&
-    (common.Memos.length === 0 || !common.Memos.every(isMemo))
-  ) {
+  const memos = common.Memos as Record<string, unknown> | undefined;
+
+  if (memos !== undefined && (memos.length === 0 || !memos.every(isMemo))) {
     throw new ValidationError("BaseTransaction: invalid Memos");
   }
 

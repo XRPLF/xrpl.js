@@ -13,7 +13,7 @@ export interface CheckCancel extends BaseTransaction {
  * @param tx - An CheckCancel Transaction.
  * @throws When the CheckCancel is Malformed.
  */
-export function verifyCheckCancel(tx: CheckCancel): void {
+export function verifyCheckCancel(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.CheckID !== undefined && typeof tx.CheckID !== "string") {
