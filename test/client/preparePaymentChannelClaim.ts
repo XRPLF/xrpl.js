@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
 import requests from "../fixtures/requests";
 import responses from "../fixtures/responses";

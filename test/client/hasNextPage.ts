@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
 import rippled from "../fixtures/rippled";
 import { TestSuite } from "../testUtils";

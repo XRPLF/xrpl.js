@@ -4,7 +4,7 @@ import { assertResultMatch, TestSuite } from "../testUtils";
 // import requests from '../fixtures/requests'
 // import {ValidationError} from 'xrpl-local/common/errors'
 // import binary from 'ripple-binary-codec'
-// import assert from 'assert-diff'
+// import {assert} from 'chai'
 // import {Client} from 'xrpl-local'
 // import * as schemaValidator from 'xrpl-local/common/schema-validator'
 

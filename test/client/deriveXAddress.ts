@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
 import { Client } from "../../src";
 import { TestSuite } from "../testUtils";

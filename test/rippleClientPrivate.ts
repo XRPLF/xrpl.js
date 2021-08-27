@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 import _ from "lodash";
 
 import { Client } from "xrpl-local";
@@ -18,7 +18,6 @@ import setupClient from "./setupClient";
 import { assertRejects } from "./testUtils";
 
 const address = addresses.ACCOUNT;
-assert.options.strict = true;
 
 // how long before each test case times out
 const TIMEOUT = 20000;
