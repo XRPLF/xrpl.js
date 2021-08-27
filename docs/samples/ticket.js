@@ -26,6 +26,6 @@ api.connect().then(() => {
     console.log('Ticket transaction prepared...');
     const {signedTransaction} = api.sign(prepared.txJSON, secret);
     console.log('Ticket transaction signed...');
-    api.submit(signedTransaction).then(quit, fail);
+    api.request({command: 'submit', tx_blob: signedTransaction}).then(quit, fail);
   });
 }).catch(fail);

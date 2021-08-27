@@ -36,8 +36,9 @@ function pay(client, from, to, amount, secret, currency = 'XRP', counterparty) {
     .then(data => client.sign(data.txJSON, secret))
     .then(signed => {
       id = signed.id;
-      return client.submit(signed.signedTransaction);
+      return client.request({command: 'submit', tx_blob: signed.signedTransaction});
     })
+    // TODO: add better error handling here
     .then(() => ledgerAccept(client))
     .then(() => id);
 }

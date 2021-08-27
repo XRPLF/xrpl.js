@@ -17,7 +17,7 @@ function cancelOrder(orderSequence) {
   return api.prepareOrderCancellation(address, {orderSequence}, instructions)
   .then(prepared => {
     const signing = api.sign(prepared.txJSON, secret);
-    return api.submit(signing.signedTransaction);
+    return api.request({command: 'submit', tx_blob: signing.signedTransaction});
   });
 }
 
