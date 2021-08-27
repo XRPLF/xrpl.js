@@ -8,9 +8,10 @@ export interface TicketCreate extends BaseTransaction {
 }
 
 /**
+ * Verify the form and type of a TicketCreate at runtime.
  *
  * @param tx - A TicketCreate Transaction.
- * @throws {ValidationError} When the TicketCreate is malformed.
+ * @throws When the TicketCreate is malformed.
  */
 export function verifyTicketCreate(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);

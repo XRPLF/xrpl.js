@@ -2,7 +2,7 @@
 /* eslint-disable complexity -- Necessary for verifyBaseTransaction */
 /* eslint-disable max-statements -- Necessary for verifyBaseTransaction */
 import { ValidationError } from "../../common/errors";
-import { Amount, Memo, Signer, IssuedCurrencyAmount } from "../common";
+import { Memo, Signer } from "../common";
 import { onlyHasFields } from "../utils";
 
 const transactionTypes = [
@@ -65,7 +65,7 @@ function isSigner(signer: Signer): boolean {
  * @param obj - The object to check the form and type of.
  * @returns Whether the IssuedCurrencyAmount is malformed.
  */
-function isIssuedCurrency(obj: IssuedCurrencyAmount): boolean {
+function isIssuedCurrency(obj: Record<string, unknown>): boolean {
   return (
     Object.keys(obj).length === 3 &&
     typeof obj.value === "string" &&
@@ -80,8 +80,11 @@ function isIssuedCurrency(obj: IssuedCurrencyAmount): boolean {
  * @param amount - The object to check the form and type of.
  * @returns Whether the Amount is malformed.
  */
-export function isAmount(amount: Amount): boolean {
-  return typeof amount === "string" || isIssuedCurrency(amount);
+export function isAmount(amount: unknown): boolean {
+  return (
+    typeof amount === "string" ||
+    isIssuedCurrency(amount as Record<string, unknown>)
+  );
 }
 
 export interface GlobalFlags {

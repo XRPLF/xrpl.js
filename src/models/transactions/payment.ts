@@ -34,8 +34,10 @@ export interface Payment extends BaseTransaction {
 }
 
 /**
+ * Verify the form and type of a Payment at runtime.
+ *
  * @param tx - A Payment Transaction.
- * @throws {ValidationError} When the PaymentTransaction is malformed.
+ * @throws When the Payment is malformed.
  */
 export function verifyPayment(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);

@@ -1,3 +1,4 @@
+/* eslint-disable import/max-dependencies -- Needs to export all types + verify methods */
 export * from "./transaction";
 export * from "./accountSet";
 export * from "./accountDelete";

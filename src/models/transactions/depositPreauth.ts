@@ -10,9 +10,10 @@ export interface DepositPreauth extends BaseTransaction {
 }
 
 /**
+ * Verify the form and type of a DepositPreauth at runtime.
  *
  * @param tx - A DepositPreauth Transaction.
- * @throws {ValidationError} When the DepositPreauth is malformed.
+ * @throws When the DepositPreauth is malformed.
  */
 export function verifyDepositPreauth(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);

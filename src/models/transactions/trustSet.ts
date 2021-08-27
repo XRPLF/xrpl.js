@@ -33,9 +33,10 @@ export interface TrustSet extends BaseTransaction {
 }
 
 /**
+ * Verify the form and type of a TrustSet at runtime.
  *
  * @param tx - A TrustSet Transaction.
- * @throws {ValidationError} When the TrustSet is malformed.
+ * @throws When the TrustSet is malformed.
  */
 export function verifyTrustSet(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
