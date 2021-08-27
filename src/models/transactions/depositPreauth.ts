@@ -1,3 +1,4 @@
+/* eslint-disable complexity -- Necessary for verifyDepositPreauth */
 import { ValidationError } from "../../common/errors";
 
 import { BaseTransaction, verifyBaseTransaction } from "./common";

@@ -1,3 +1,4 @@
+/* eslint-disable complexity -- Necessary for verifyEscrowCreate */
 import { ValidationError } from "../../common/errors";
 
 import { BaseTransaction, verifyBaseTransaction } from "./common";

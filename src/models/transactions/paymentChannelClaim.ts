@@ -1,3 +1,4 @@
+/* eslint-disable complexity -- Necessary for verifyPaymentChannelClaim */
 import { ValidationError } from "../../common/errors";
 
 import { BaseTransaction, GlobalFlags, verifyBaseTransaction } from "./common";

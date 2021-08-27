@@ -1,3 +1,4 @@
+/* eslint-disable complexity -- Necessary for verifyCheckCreate */
 import { ValidationError } from "../../common/errors";
 import { Amount, IssuedCurrencyAmount } from "../common";
 
