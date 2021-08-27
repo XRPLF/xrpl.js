@@ -14,6 +14,8 @@ import {
   removeUndefined,
   xrpToDrops,
 } from "../utils";
+import { Transaction } from '../models/transactions'
+import { AccountInfoRequest, LedgerRequest } from '../models/methods'
 
 import { Instructions, Prepare, TransactionJSON } from "./types";
 
@@ -24,6 +26,8 @@ const TRANSACTION_TYPES_WITH_DESTINATION_TAG_FIELD = [
   "EscrowCreate",
   "PaymentChannelCreate",
 ];
+const LEDGER_OFFSET = 20 // 20 drops
+const ACCOUNT_DELETE_FEE = 5000000 // 5 XRP
 
 export interface ApiMemo {
   MemoData?: string;
@@ -412,7 +416,92 @@ function convertMemo(memo: Memo): { Memo: ApiMemo } {
   };
 }
 
+/**
+ * Autofills missing fields in a transaction
+ *
+ * @param {Transaction} tx A transaction to autofill missing fields
+ * @param {Client} client A client
+ * @returns {Transaction} An autofilled transaction
+ */
+async function autofillTransaction(tx: Transaction, client: Client): Promise<Transaction> {
+  const { classicAccount, tag } = getClassicAccountAndTag(tx.Account, tx.SourceTag)
+  tx.Account = classicAccount
+  if (tx.SourceTag !== tag && typeof tag === 'number') {
+    tx.SourceTag = tag
+  }
+
+  if (tx.Sequence === undefined) {
+    const sequence = await getNextValidSequenceNumber(tx.Account, client)
+    tx.Sequence = sequence
+  }
+
+  if (tx.Fee === undefined) {
+    tx.Fee = await calculateFeePerTransactionType(tx, client)
+  }
+
+  if (tx.LastLedgerSequence === undefined) {
+    const ledgerSequence = await getLatestValidatedLedgerSequence(client)
+    tx.LastLedgerSequence = ledgerSequence + LEDGER_OFFSET
+  }
+
+  return tx
+}
+
+async function getNextValidSequenceNumber(account: string, client: Client): Promise<number> {
+  const request: AccountInfoRequest = {
+    command: 'account_info',
+    account,
+  }
+  const data = await client.request(request)
+  return data.result.account_data.Sequence
+}
+
+async function calculateFeePerTransactionType(transaction: Transaction, client?: Client): Promise<string> {
+  let netFee
+  if (client === undefined) {
+    netFee = 10 // 10 drops
+  } else {
+    netFee = await client.getFee() // Usually 0.00001 XRP (10 drops)
+  }
+
+  let baseFee = netFee
+
+  // EscrowFinish Transaction with Fulfillment
+  // https://xrpl.org/escrowfinish.html#escrowfinish-fields
+  if (transaction.TransactionType === 'EscrowFinish') {
+    if (transaction.Fulfillment !== undefined) {
+      const fulfillmentBytesSize = Math.ceil(transaction.Fulfillment.length / 2)
+      // 10 drops × (33 + (Fulfillment size in bytes / 16))
+      baseFee = Math.ceil(netFee * (33 + (fulfillmentBytesSize / 16)))
+    }
+  }
+
+  // AccountDelete Transaction
+  if (transaction.TransactionType === 'AccountDelete') {
+    baseFee = ACCOUNT_DELETE_FEE
+  }
+
+  // Multi-signed Transaction
+  // 10 drops × (1 + Number of Signatures Provided)
+  if (transaction.Signers !== undefined && transaction.Signers.length > 0) {
+    baseFee = netFee * (1 + transaction.Signers.length) + baseFee
+  }
+
+  // Round up baseFee and return it as a string
+  return Math.ceil(baseFee).toString()
+}
+
+async function getLatestValidatedLedgerSequence(client: Client): Promise<number> {
+  const request: LedgerRequest = {
+    command: 'ledger',
+    ledger_index: 'validated',
+  }
+  const data = await client.request(request)
+  return data.result.ledger_index
+}
+
 export {
+  autofillTransaction,
   convertStringToHex,
   convertMemo,
   prepareTransaction,

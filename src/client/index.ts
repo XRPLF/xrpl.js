@@ -95,6 +95,7 @@ import {
   RandomRequest,
   RandomResponse,
 } from "../models/methods";
+import { Transaction } from "../models/transactions";
 import prepareCheckCancel from "../transaction/check-cancel";
 import prepareCheckCash from "../transaction/check-cash";
 import prepareCheckCreate from "../transaction/check-create";
@@ -336,6 +337,16 @@ class Client extends EventEmitter {
    */
   convertStringToHex(string: string): string {
     return transactionUtils.convertStringToHex(string);
+  }
+
+  /**
+   * Autofills missing fields in a transaction
+   *
+   * @param {Transaction} tx A transaction to autofill missing fields
+   * @returns {Transaction} An autofilled transaction
+   */
+  async autofillTransaction(tx: Transaction): Promise<Transaction> {
+    return transactionUtils.autofillTransaction(tx, this)
   }
 
   /**
