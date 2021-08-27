@@ -12,19 +12,10 @@ const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
  */
 export default <TestSuite>{
   async simple(client, address, mockRippled) {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.simple,
@@ -34,19 +25,10 @@ export default <TestSuite>{
   },
 
   async frozen(client, address, mockRippled) {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.frozen
@@ -55,19 +37,10 @@ export default <TestSuite>{
   },
 
   async complex(client, address, mockRippled) {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.complex,
@@ -77,19 +50,10 @@ export default <TestSuite>{
   },
 
   async invalid(client, address, mockRippled) {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const trustline = { ...requests.prepareTrustline.complex };
     delete trustline.limit; // Make invalid
 
@@ -105,19 +69,10 @@ export default <TestSuite>{
   },
 
   "xaddress-issuer": async (client, address, mockRippled) => {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.issuedXAddress,
@@ -131,19 +86,10 @@ export default <TestSuite>{
   },
 
   "with ticket": async (client, address, mockRippled) => {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: "0.000012",
