@@ -19,19 +19,10 @@ export const config = {
  */
 export default <TestSuite>{
   async prepareEscrowCreation(client, address, mockRippled) {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: "0.000012",
@@ -49,19 +40,10 @@ export default <TestSuite>{
   },
 
   "prepareEscrowCreation full": async (client, address, mockRippled) => {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const result = await client.prepareEscrowCreation(
       address,
       requests.prepareEscrowCreation.full
@@ -70,19 +52,10 @@ export default <TestSuite>{
   },
 
   "prepareEscrowCreation - invalid": async (client, address, mockRippled) => {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const escrow = { ...requests.prepareEscrowCreation.full };
     delete escrow.amount; // Make invalid
     await assertRejects(
@@ -93,19 +66,10 @@ export default <TestSuite>{
   },
 
   "with ticket": async (client, address, mockRippled) => {
-    mockRippled.addResponse(
-      { command: "server_info" },
-      rippled.server_info.normal
-    );
-    mockRippled.addResponse({ command: "fee" }, rippled.fee);
-    mockRippled.addResponse(
-      { command: "ledger_current" },
-      rippled.ledger_current
-    );
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: "0.000396",

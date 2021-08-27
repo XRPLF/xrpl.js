@@ -6,13 +6,15 @@ import type { Request } from "../src";
 
 import { getFreePort } from "./testUtils";
 
-function createResponse(request, response, overrides = {}) {
-  const result = { ...response.result, ...overrides };
-  const change =
-    response.result && !_.isEmpty(overrides)
-      ? { id: request.id, result }
-      : { id: request.id };
-  return JSON.stringify({ ...response, ...change });
+function createResponse(request: { id: number | string }, response: object) {
+  if (!("type" in response) && !("error" in response)) {
+    throw new Error(
+      `Bad response format. Must contain \`type\` or \`error\`. ${JSON.stringify(
+        response
+      )}`
+    );
+  }
+  return JSON.stringify({ ...response, id: request.id });
 }
 
 function ping(conn, request) {
@@ -41,8 +43,12 @@ export function createMockRippled(port) {
   mock.on("connection", function (this: MockedWebSocketServer, conn: any) {
     this.socket = conn;
     conn.on("message", function (requestJSON) {
+      let request;
       try {
-        const request = JSON.parse(requestJSON);
+        request = JSON.parse(requestJSON);
+        if (request.id == null) {
+          throw new Error("Request has no id");
+        }
         if (request.command === "ping") {
           ping(conn, request);
         } else if (request.command === "test_command") {
@@ -58,7 +64,15 @@ export function createMockRippled(port) {
         if (!mock.suppressOutput) {
           console.error(`Error: ${err.message}`);
         }
-        conn.close(4000, err.message);
+        if (request != null) {
+          conn.send(
+            createResponse(request, {
+              type: "response",
+              status: "error",
+              error: err.message,
+            })
+          );
+        }
       }
     });
   });
@@ -67,10 +81,23 @@ export function createMockRippled(port) {
   // If an object is passed in for `response`, then the response is static for the command
   // If a function is passed in for `response`, then the response can be determined by the exact request shape
   mock.addResponse = (
-    request: Request,
+    command: string,
     response: object | ((r: Request) => object)
   ) => {
-    const command = request.command;
+    if (typeof command !== "string") {
+      throw new Error("command is not a string");
+    }
+    if (
+      typeof response === "object" &&
+      !("type" in response) &&
+      !("error" in response)
+    ) {
+      throw new Error(
+        `Bad response format. Must contain \`type\` or \`error\`. ${JSON.stringify(
+          response
+        )}`
+      );
+    }
     mock.responses[command] = response;
   };
 
@@ -123,6 +150,8 @@ export function createMockRippled(port) {
           result: {},
         })
       );
+    } else if (request.data.closeServer) {
+      conn.close();
     }
   };
 

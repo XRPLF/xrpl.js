@@ -24,7 +24,7 @@ describe("BroadcastClient", function () {
 
   it("base", function () {
     this.mocks.forEach((mock) => {
-      mock.addResponse({ command: "server_info" }, rippled.server_info.normal);
+      mock.addResponse("server_info", rippled.server_info.normal);
     });
     assert(this.client.isConnected());
     return this.client.request({ command: "server_info" }).then((response) => {
@@ -35,7 +35,7 @@ describe("BroadcastClient", function () {
   it("error propagation", function (done) {
     const data = { error: "type", error_message: "info" };
     this.mocks.forEach((mock) => {
-      mock.addResponse({ command: "echo" }, data);
+      mock.addResponse("echo", data);
     });
     this.client.once("error", (type, info) => {
       assert.strictEqual(type, "type");
