@@ -12,7 +12,7 @@ function getNewLedger() {
   return JSON.parse(JSON.stringify(responses.getLedger.full));
 }
 
-describe("Compute Ledger Hash", function () {
+describe("computeLedgerHash", function () {
   it("given corrupt data - should fail", function () {
     const ledger = getNewLedger();
     ledger.transactions[0].rawTransaction =

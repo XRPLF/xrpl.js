@@ -3,7 +3,7 @@ import { assert } from "chai";
 
 import { dropsToXrp } from "../../src/utils";
 
-describe("Drops To XRP", function () {
+describe("dropsToXrp", function () {
   it("works with a typical amount", function () {
     const xrp = dropsToXrp("2000000");
     assert.strictEqual(xrp, "2", "2 million drops equals 2 XRP");

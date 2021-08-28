@@ -18,7 +18,8 @@ import {
  * @param ledgerIndex
  */
 function createLedgerTest(ledgerIndex: number) {
-  describe(String(ledgerIndex), function () {
+  const ledgerIndexString = String(ledgerIndex);
+  describe(`ledger hashes ${ledgerIndexString}`, function () {
     const path = `${__dirname}/../fixtures/rippled/ledgerFull${ledgerIndex}.json`;
 
     const ledgerRaw = fs.readFileSync(path, { encoding: "utf8" });
@@ -45,7 +46,7 @@ function createLedgerTest(ledgerIndex: number) {
   });
 }
 
-describe("Ledger", function () {
+describe("Hashes", function () {
   // This is the first recorded ledger with a non empty transaction set
   createLedgerTest(38129);
   // Because, why not.

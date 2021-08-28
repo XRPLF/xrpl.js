@@ -8,7 +8,7 @@ import {
 } from "../../src/utils/generateAddress";
 import responses from "../fixtures/responses";
 
-describe("Generate Address", function () {
+describe("generateAddress", function () {
   it("generateAddress", function () {
     // GIVEN entropy of all zeros
     function random() {
