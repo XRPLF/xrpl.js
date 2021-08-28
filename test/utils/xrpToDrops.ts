@@ -78,33 +78,33 @@ describe("xrpToDrops", function () {
   it("throws with an amount with too many decimal places", function () {
     assert.throws(() => {
       xrpToDrops("1.1234567");
-    }, /has too many decimal places/);
+    }, /has too many decimal places/u);
     assert.throws(() => {
       xrpToDrops("0.0000001");
-    }, /has too many decimal places/);
+    }, /has too many decimal places/u);
   });
 
   it("throws with an invalid value", function () {
     assert.throws(() => {
       xrpToDrops("FOO");
-    }, /invalid value/);
+    }, /invalid value/u);
     assert.throws(() => {
       xrpToDrops("1e-7");
-    }, /invalid value/);
+    }, /invalid value/u);
     assert.throws(() => {
       xrpToDrops("2,0");
-    }, /invalid value/);
+    }, /invalid value/u);
     assert.throws(() => {
       xrpToDrops(".");
-    }, /xrpToDrops: invalid value '\.', should be a BigNumber or string-encoded number\./);
+    }, /xrpToDrops: invalid value '\.', should be a BigNumber or string-encoded number\./u);
   });
 
   it("throws with an amount more than one decimal point", function () {
     assert.throws(() => {
       xrpToDrops("1.0.0");
-    }, /xrpToDrops: invalid value '1\.0\.0'/);
+    }, /xrpToDrops: invalid value '1\.0\.0'/u);
     assert.throws(() => {
       xrpToDrops("...");
-    }, /xrpToDrops: invalid value '\.\.\.'/);
+    }, /xrpToDrops: invalid value '\.\.\.'/u);
   });
 });
