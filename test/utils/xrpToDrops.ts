@@ -23,7 +23,8 @@ describe("xrpToDrops", function () {
   it("works with zero", function () {
     let drops = xrpToDrops("0");
     assert.strictEqual(drops, "0", "0 XRP equals 0 drops");
-    drops = xrpToDrops("-0"); // negative zero is equivalent to zero
+    // negative zero is equivalent to zero
+    drops = xrpToDrops("-0");
     assert.strictEqual(drops, "0", "-0 XRP equals 0 drops");
     drops = xrpToDrops("0.000000");
     assert.strictEqual(drops, "0", "0.000000 XRP equals 0 drops");

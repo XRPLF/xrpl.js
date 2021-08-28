@@ -83,6 +83,7 @@ module.exports = {
 
         // We have lots of magic numbers in tests
         "no-magic-number": "off",
+        "@typescript-eslint/no-magic-numbers": "off",
 
         // We need to test things without type guards sometimes
         "@typescript-eslint/no-unsafe-assignment": "off",
