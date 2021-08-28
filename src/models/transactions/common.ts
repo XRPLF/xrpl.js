@@ -66,6 +66,10 @@ export function isAmount(amount: Amount): boolean {
   return typeof amount === "string" || isIssuedCurrency(amount);
 }
 
+export enum GlobalFlagsEnum {
+  tfFullyCanonicalSig = 0x80000000,
+}
+
 export interface GlobalFlags {
   tfFullyCanonicalSig: boolean;
 }

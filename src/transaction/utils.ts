@@ -8,14 +8,15 @@ import { Client } from "..";
 import * as common from "../common";
 import { ValidationError } from "../common/errors";
 import { Memo } from "../common/types/objects";
+import { AccountInfoRequest, LedgerRequest } from "../models/methods";
+import { Transaction } from "../models/transactions";
+import { setTransactionFlagsToNumber } from "../models/utils";
 import {
   toRippledAmount,
   dropsToXrp,
   removeUndefined,
   xrpToDrops,
 } from "../utils";
-import { Transaction } from '../models/transactions'
-import { AccountInfoRequest, LedgerRequest } from '../models/methods'
 
 import { Instructions, Prepare, TransactionJSON } from "./types";
 
@@ -26,8 +27,8 @@ const TRANSACTION_TYPES_WITH_DESTINATION_TAG_FIELD = [
   "EscrowCreate",
   "PaymentChannelCreate",
 ];
-const LEDGER_OFFSET = 20 // 20 drops
-const ACCOUNT_DELETE_FEE = 5000000 // 5 XRP
+const LEDGER_OFFSET = 20; // 20 drops
+const ACCOUNT_DELETE_FEE = 5000000; // 5 XRP
 
 export interface ApiMemo {
   MemoData?: string;
@@ -417,87 +418,132 @@ function convertMemo(memo: Memo): { Memo: ApiMemo } {
 }
 
 /**
- * Autofills missing fields in a transaction
+ * Autofills fields in a transaction.
  *
- * @param {Transaction} tx A transaction to autofill missing fields
- * @param {Client} client A client
- * @returns {Transaction} An autofilled transaction
+ * @param {Transaction} tx A transaction to autofill fields.
+ * @param {Client} client A client.
+ * @returns {Transaction} An autofilled transaction.
  */
-async function autofillTransaction(tx: Transaction, client: Client): Promise<Transaction> {
-  const { classicAccount, tag } = getClassicAccountAndTag(tx.Account, tx.SourceTag)
-  tx.Account = classicAccount
-  if (tx.SourceTag !== tag && typeof tag === 'number') {
-    tx.SourceTag = tag
+async function autofillTransaction(
+  tx: Transaction,
+  client: Client
+): Promise<Transaction> {
+  validateAccountAddress(tx, 'Account', 'SourceTag');
+  if (tx['Destination']) {
+    validateAccountAddress(tx, 'Destination', 'DestinationTag');
   }
 
+  // DepositPreauth:
+  convertToClassicAddress(tx, 'Authorize');
+  convertToClassicAddress(tx, 'Unauthorize');
+  // EscrowCancel, EscrowFinish:
+  convertToClassicAddress(tx, 'Owner');
+  // SetRegularKey:
+  convertToClassicAddress(tx, 'RegularKey');
+
+  setTransactionFlagsToNumber(tx);
+
   if (tx.Sequence === undefined) {
-    const sequence = await getNextValidSequenceNumber(tx.Account, client)
-    tx.Sequence = sequence
+    const sequence = await getNextValidSequenceNumber(tx.Account, client);
+    tx.Sequence = sequence;
   }
 
   if (tx.Fee === undefined) {
-    tx.Fee = await calculateFeePerTransactionType(tx, client)
+    tx.Fee = await calculateFeePerTransactionType(tx, client);
   }
 
   if (tx.LastLedgerSequence === undefined) {
-    const ledgerSequence = await getLatestValidatedLedgerSequence(client)
-    tx.LastLedgerSequence = ledgerSequence + LEDGER_OFFSET
+    const ledgerSequence = await getLatestValidatedLedgerSequence(client);
+    tx.LastLedgerSequence = ledgerSequence + LEDGER_OFFSET;
   }
 
-  return tx
+  return tx;
 }
 
-async function getNextValidSequenceNumber(account: string, client: Client): Promise<number> {
+function validateAccountAddress(tx: Transaction, accountField: string, tagField: string): void {
+  // if X-address is given, convert it to classic address
+  const { classicAccount, tag } = getClassicAccountAndTag(tx[accountField]);
+  tx[accountField] = classicAccount;
+
+  if (tag !== null) {
+    if (tx[tagField] && tx[tagField] !== tag) {
+      throw new ValidationError(
+        `The ${tagField}, if present, must match the tag of the ${accountField} X-address`
+      );
+    }
+    tx[tagField] = tag;
+  }
+}
+
+function convertToClassicAddress(tx: Transaction, fieldName: string): void {
+  const account = tx[fieldName];
+  if (typeof account === "string") {
+    const { classicAccount } = getClassicAccountAndTag(account);
+    tx[fieldName] = classicAccount;
+  }
+}
+
+async function getNextValidSequenceNumber(
+  account: string,
+  client: Client
+): Promise<number> {
   const request: AccountInfoRequest = {
-    command: 'account_info',
+    command: "account_info",
     account,
-  }
-  const data = await client.request(request)
-  return data.result.account_data.Sequence
+  };
+  const data = await client.request(request);
+  return data.result.account_data.Sequence;
 }
 
-async function calculateFeePerTransactionType(transaction: Transaction, client?: Client): Promise<string> {
-  let netFee
+async function calculateFeePerTransactionType(
+  transaction: Transaction,
+  client?: Client
+): Promise<string> {
+  let netFee;
   if (client === undefined) {
-    netFee = 10 // 10 drops
+    netFee = 10; // 10 drops
   } else {
-    netFee = await client.getFee() // Usually 0.00001 XRP (10 drops)
+    netFee = await client.getFee(); // Usually 0.00001 XRP (10 drops)
   }
 
-  let baseFee = netFee
+  let baseFee = netFee;
 
   // EscrowFinish Transaction with Fulfillment
   // https://xrpl.org/escrowfinish.html#escrowfinish-fields
-  if (transaction.TransactionType === 'EscrowFinish') {
+  if (transaction.TransactionType === "EscrowFinish") {
     if (transaction.Fulfillment !== undefined) {
-      const fulfillmentBytesSize = Math.ceil(transaction.Fulfillment.length / 2)
+      const fulfillmentBytesSize = Math.ceil(
+        transaction.Fulfillment.length / 2
+      );
       // 10 drops × (33 + (Fulfillment size in bytes / 16))
-      baseFee = Math.ceil(netFee * (33 + (fulfillmentBytesSize / 16)))
+      baseFee = Math.ceil(netFee * (33 + fulfillmentBytesSize / 16));
     }
   }
 
   // AccountDelete Transaction
-  if (transaction.TransactionType === 'AccountDelete') {
-    baseFee = ACCOUNT_DELETE_FEE
+  if (transaction.TransactionType === "AccountDelete") {
+    baseFee = ACCOUNT_DELETE_FEE;
   }
 
   // Multi-signed Transaction
   // 10 drops × (1 + Number of Signatures Provided)
   if (transaction.Signers !== undefined && transaction.Signers.length > 0) {
-    baseFee = netFee * (1 + transaction.Signers.length) + baseFee
+    baseFee = netFee * (1 + transaction.Signers.length) + baseFee;
   }
 
   // Round up baseFee and return it as a string
-  return Math.ceil(baseFee).toString()
+  return Math.ceil(baseFee).toString();
 }
 
-async function getLatestValidatedLedgerSequence(client: Client): Promise<number> {
+async function getLatestValidatedLedgerSequence(
+  client: Client
+): Promise<number> {
   const request: LedgerRequest = {
-    command: 'ledger',
-    ledger_index: 'validated',
-  }
-  const data = await client.request(request)
-  return data.result.ledger_index
+    command: "ledger",
+    ledger_index: "validated",
+  };
+  const data = await client.request(request);
+  return data.result.ledger_index;
 }
 
 export {
