@@ -34,11 +34,12 @@ function isMemo(obj: { Memo?: unknown }): boolean {
     return false;
   }
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-  const memo = obj.Memo as Record<string, undefined>;
+  const memo = obj.Memo as Record<string, unknown>;
   const size = Object.keys(memo).length;
-  const validData = typeof memo.MemoData === "string";
-  const validFormat = typeof memo.MemoData === "string";
-  const validType = typeof memo.MemoType === "string";
+  const validData = memo.MemoData == null || typeof memo.MemoData === "string";
+  const validFormat =
+    memo.MemoFormat == null || typeof memo.MemoFormat === "string";
+  const validType = memo.MemoType == null || typeof memo.MemoType === "string";
 
   return (
     size >= 1 &&
@@ -166,8 +167,8 @@ export function verifyBaseTransaction(common: Record<string, unknown>): void {
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-  const memos = common.memos as Array<{ Memo?: unknown }> | undefined;
-  if (memos !== undefined && (memos.length === 0 || !memos.every(isMemo))) {
+  const memos = common.Memos as Array<{ Memo?: unknown }> | undefined;
+  if (memos !== undefined && !memos.every(isMemo)) {
     throw new ValidationError("BaseTransaction: invalid Memos");
   }
 

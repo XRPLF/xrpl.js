@@ -24,9 +24,7 @@ describe("Payment Transaction Verification", function () {
       DestinationTag: 1,
       InvoiceID:
         "6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B",
-      Paths: [
-        [{ account: "aw0efji", currency: "XRP", issuer: "apsoeijf90wp34fh" }],
-      ],
+      Paths: [[{ currency: "BTC", issuer: "apsoeijf90wp34fh" }]],
       SendMax: "100000000",
     } as any;
   });

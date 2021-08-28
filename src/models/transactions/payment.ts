@@ -84,12 +84,23 @@ export function verifyPayment(tx: Record<string, unknown>): void {
     throw new ValidationError("PaymentTransaction: invalid SendMax");
   }
 
-  if (tx.DeliverMin !== undefined) {
+  checkPartialPayment(tx);
+}
+
+function checkPartialPayment(tx: Record<string, unknown>): void {
+  if (tx.DeliverMin != null) {
+    if (tx.Flags == null) {
+      throw new ValidationError(
+        "PaymentTransaction: tfPartialPayment flag required with DeliverMin"
+      );
+    }
+
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
+    const flags = tx.Flags as number | PaymentTransactionFlags;
     const isTfPartialPayment =
-      typeof tx.Flags === "number"
-        ? isFlagEnabled(tx.Flags, PaymentTransactionFlagsEnum.tfPartialPayment)
-        : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-          (tx.Flags as PaymentTransactionFlags).tfPartialPayment ?? false;
+      typeof flags === "number"
+        ? isFlagEnabled(flags, PaymentTransactionFlagsEnum.tfPartialPayment)
+        : flags.tfPartialPayment ?? false;
 
     if (!isTfPartialPayment) {
       throw new ValidationError(
@@ -103,24 +114,27 @@ export function verifyPayment(tx: Record<string, unknown>): void {
   }
 }
 
-function isPathStep(path: Record<string, unknown>): boolean {
-  if (path.account !== undefined && typeof path.account !== "string") {
-    return false;
-  }
-  if (path.currency !== undefined && typeof path.currency !== "string") {
-    return false;
-  }
-  if (path.issuer !== undefined && typeof path.issuer !== "string") {
+function isPathStep(pathStep: Record<string, unknown>): boolean {
+  if (pathStep.account !== undefined && typeof pathStep.account !== "string") {
     return false;
   }
   if (
-    path.account !== undefined &&
-    path.currency === undefined &&
-    path.issuer === undefined
+    pathStep.currency !== undefined &&
+    typeof pathStep.currency !== "string"
+  ) {
+    return false;
+  }
+  if (pathStep.issuer !== undefined && typeof pathStep.issuer !== "string") {
+    return false;
+  }
+  if (
+    pathStep.account !== undefined &&
+    pathStep.currency === undefined &&
+    pathStep.issuer === undefined
   ) {
     return true;
   }
-  if (path.currency !== undefined || path.issuer !== undefined) {
+  if (pathStep.currency !== undefined || pathStep.issuer !== undefined) {
     return true;
   }
   return false;
@@ -128,7 +142,7 @@ function isPathStep(path: Record<string, unknown>): boolean {
 
 function isPath(path: Array<Record<string, unknown>>): boolean {
   for (const pathStep of path) {
-    if (isPathStep(pathStep)) {
+    if (!isPathStep(pathStep)) {
       return false;
     }
   }
