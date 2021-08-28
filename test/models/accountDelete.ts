@@ -9,7 +9,7 @@ import { verifyAccountDelete } from "../../src/models/transactions/accountDelete
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("AccountDelete Transaction Verification", function () {
+describe("AccountDelete", function () {
   it(`verifies valid AccountDelete`, function () {
     const validAccountDelete = {
       TransactionType: "AccountDelete",

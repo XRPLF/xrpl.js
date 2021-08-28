@@ -9,7 +9,7 @@ import { verifyTicketCreate } from "../../src/models/transactions/ticketCreate";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("TicketCreate Transaction Verification", function () {
+describe("TicketCreate", function () {
   let ticketCreate;
 
   beforeEach(function () {

@@ -9,7 +9,7 @@ import { verifyAccountSet } from "../../src/models/transactions/accountSet";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("AccountSet Transaction Verification", function () {
+describe("AccountSet", function () {
   let account;
 
   beforeEach(function () {
