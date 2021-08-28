@@ -488,7 +488,7 @@ async function getNextValidSequenceNumber(
   client: Client
 ): Promise<number> {
   const request: AccountInfoRequest = {
-    command: "account_info",
+    command: 'account_info',
     account,
   };
   const data = await client.request(request);
@@ -509,8 +509,7 @@ async function calculateFeePerTransactionType(
   let baseFee = netFee;
 
   // EscrowFinish Transaction with Fulfillment
-  // https://xrpl.org/escrowfinish.html#escrowfinish-fields
-  if (transaction.TransactionType === "EscrowFinish") {
+  if (transaction.TransactionType === 'EscrowFinish') {
     if (transaction.Fulfillment !== undefined) {
       const fulfillmentBytesSize = Math.ceil(
         transaction.Fulfillment.length / 2
@@ -521,7 +520,7 @@ async function calculateFeePerTransactionType(
   }
 
   // AccountDelete Transaction
-  if (transaction.TransactionType === "AccountDelete") {
+  if (transaction.TransactionType === 'AccountDelete') {
     baseFee = ACCOUNT_DELETE_FEE;
   }
 
@@ -539,8 +538,8 @@ async function getLatestValidatedLedgerSequence(
   client: Client
 ): Promise<number> {
   const request: LedgerRequest = {
-    command: "ledger",
-    ledger_index: "validated",
+    command: 'ledger',
+    ledger_index: 'validated',
   };
   const data = await client.request(request);
   return data.result.ledger_index;
