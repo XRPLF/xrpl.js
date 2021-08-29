@@ -5,7 +5,7 @@ import { errors } from "../common";
 import { RippledError } from "../common/errors";
 import { isValidAddress } from "../common/schema-validator";
 import { GeneratedAddress } from "../utils/generateAddress";
-import { Wallet } from "../Wallet";
+import Wallet from "../wallet";
 
 export interface FaucetWallet {
   account: GeneratedAddress;
