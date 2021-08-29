@@ -1,190 +1,197 @@
-import BigNumber from 'bignumber.js'
-import {decodeAccountID} from 'ripple-address-codec'
-import sha512Half from './sha512Half'
-import HashPrefix from './hashPrefix'
-import {SHAMap, NodeType} from './shamap'
-import {encode} from 'ripple-binary-codec'
-import ledgerSpaces from './ledgerSpaces'
+import BigNumber from "bignumber.js";
+import { decodeAccountID } from "ripple-address-codec";
+import { encode } from "ripple-binary-codec";
+
+import HashPrefix from "./hashPrefix";
+import ledgerSpaces from "./ledgerSpaces";
+import sha512Half from "./sha512Half";
+import { SHAMap, NodeType } from "./shamap";
 
 const padLeftZero = (string: string, length: number): string => {
-  return Array(length - string.length + 1).join('0') + string
-}
+  return Array(length - string.length + 1).join("0") + string;
+};
 
 const intToHex = (integer: number, byteLength: number): string => {
-  return padLeftZero(Number(integer).toString(16), byteLength * 2)
-}
+  return padLeftZero(Number(integer).toString(16), byteLength * 2);
+};
 
 const bytesToHex = (bytes: number[]): string => {
-  return Buffer.from(bytes).toString('hex')
-}
+  return Buffer.from(bytes).toString("hex");
+};
 
 const bigintToHex = (
   integerString: string | number | BigNumber,
   byteLength: number
 ): string => {
-  const hex = new BigNumber(integerString).toString(16)
-  return padLeftZero(hex, byteLength * 2)
-}
+  const hex = new BigNumber(integerString).toString(16);
+  return padLeftZero(hex, byteLength * 2);
+};
 
 const ledgerSpaceHex = (name: string): string => {
-  return intToHex(ledgerSpaces[name].charCodeAt(0), 2)
-}
+  return intToHex(ledgerSpaces[name].charCodeAt(0), 2);
+};
 
 const addressToHex = (address: string): string => {
-  return Buffer.from(decodeAccountID(address)).toString('hex')
-}
+  return Buffer.from(decodeAccountID(address)).toString("hex");
+};
 
 const currencyToHex = (currency: string): string => {
   if (currency.length === 3) {
-    const bytes = new Array(20 + 1).join('0').split('').map(parseFloat)
-    bytes[12] = currency.charCodeAt(0) & 0xff
-    bytes[13] = currency.charCodeAt(1) & 0xff
-    bytes[14] = currency.charCodeAt(2) & 0xff
-    return bytesToHex(bytes)
+    const bytes = new Array(20 + 1).join("0").split("").map(parseFloat);
+    bytes[12] = currency.charCodeAt(0) & 0xff;
+    bytes[13] = currency.charCodeAt(1) & 0xff;
+    bytes[14] = currency.charCodeAt(2) & 0xff;
+    return bytesToHex(bytes);
   }
-  return currency
-}
+  return currency;
+};
 
 const addLengthPrefix = (hex: string): string => {
-  const length = hex.length / 2
+  const length = hex.length / 2;
   if (length <= 192) {
-    return bytesToHex([length]) + hex
-  } else if (length <= 12480) {
-    const x = length - 193
-    return bytesToHex([193 + (x >>> 8), x & 0xff]) + hex
-  } else if (length <= 918744) {
-    const x = length - 12481
-    return bytesToHex([241 + (x >>> 16), (x >>> 8) & 0xff, x & 0xff]) + hex
+    return bytesToHex([length]) + hex;
   }
-  throw new Error('Variable integer overflow.')
-}
+  if (length <= 12480) {
+    const x = length - 193;
+    return bytesToHex([193 + (x >>> 8), x & 0xff]) + hex;
+  }
+  if (length <= 918744) {
+    const x = length - 12481;
+    return bytesToHex([241 + (x >>> 16), (x >>> 8) & 0xff, x & 0xff]) + hex;
+  }
+  throw new Error("Variable integer overflow.");
+};
 
 export const computeBinaryTransactionHash = (txBlobHex: string): string => {
-  const prefix = HashPrefix.TRANSACTION_ID.toString(16).toUpperCase()
-  return sha512Half(prefix + txBlobHex)
-}
+  const prefix = HashPrefix.TRANSACTION_ID.toString(16).toUpperCase();
+  return sha512Half(prefix + txBlobHex);
+};
 
 export const computeTransactionHash = (txJSON: any): string => {
-  return computeBinaryTransactionHash(encode(txJSON))
-}
+  return computeBinaryTransactionHash(encode(txJSON));
+};
 
 /**
  * Hash the given binary transaction data with the single-signing prefix.
  *
- * See [Serialization Format](https://xrpl.org/serialization.html)
+ * See [Serialization Format](https://xrpl.org/serialization.html).
  *
- * @param txBlobHex The binary transaction blob as a hexadecimal string
- * @returns {string} The hash to sign
+ * @param txBlobHex - The binary transaction blob as a hexadecimal string.
+ * @returns The hash to sign.
  */
 export const computeBinaryTransactionSigningHash = (
   txBlobHex: string
 ): string => {
-  const prefix = HashPrefix.TRANSACTION_SIGN.toString(16).toUpperCase()
-  return sha512Half(prefix + txBlobHex)
-}
+  const prefix = HashPrefix.TRANSACTION_SIGN.toString(16).toUpperCase();
+  return sha512Half(prefix + txBlobHex);
+};
 
 /**
- * Compute Account Root Index
+ * Compute Account Root Index.
  *
  * All objects in a ledger's state tree have a unique index.
  * The Account Root index is derived by hashing the
  * address with a namespace identifier. This ensures every
  * index is unique.
  *
- * See [Ledger Object IDs](https://xrpl.org/ledger-object-ids.html)
+ * See [Ledger Object IDs](https://xrpl.org/ledger-object-ids.html).
  *
- * @param address The classic account address
- * @returns {string} The Ledger Object Index for the account
+ * @param address - The classic account address.
+ * @returns The Ledger Object Index for the account.
  */
 export const computeAccountRootIndex = (address: string): string => {
-  return sha512Half(ledgerSpaceHex('account') + addressToHex(address))
-}
+  return sha512Half(ledgerSpaceHex("account") + addressToHex(address));
+};
 
 /**
- * [SignerList ID Format](https://xrpl.org/signerlist.html#signerlist-id-format)
+ * [SignerList ID Format](https://xrpl.org/signerlist.html#signerlist-id-format).
  *
  * The index of a SignerList object is the SHA-512Half of the following values, concatenated in order:
  *   * The RippleState space key (0x0053)
  *   * The AccountID of the owner of the SignerList
- *   * The SignerListID (currently always 0)
+ *   * The SignerListID (currently always 0).
  *
  * This method computes a SignerList index.
  *
- * @param address The classic account address of the SignerList owner (starting with r)
- * @return {string} The ID of the account's SignerList object
+ * @param address - The classic account address of the SignerList owner (starting with r).
+ * @returns The ID of the account's SignerList object.
  */
 export const computeSignerListIndex = (address: string): string => {
   return sha512Half(
-    ledgerSpaceHex('signerList') + addressToHex(address) + '00000000'
-  ) // uint32(0) signer list index
-}
+    `${ledgerSpaceHex("signerList") + addressToHex(address)}00000000`
+  ); // uint32(0) signer list index
+};
 
 /**
- * [Offer ID Format](https://xrpl.org/offer.html#offer-id-format)
+ * [Offer ID Format](https://xrpl.org/offer.html#offer-id-format).
  *
  * The index of a Offer object is the SHA-512Half of the following values, concatenated in order:
- *   * The Offer space key (0x006F)
- *   * The AccountID of the account placing the offer
- *   * The Sequence number of the OfferCreate transaction that created the offer
+ * * The Offer space key (0x006F)
+ * * The AccountID of the account placing the offer
+ * * The Sequence number of the OfferCreate transaction that created the offer.
  *
  * This method computes an Offer Index (aka Order Index).
  *
- * @param address The classic account address of the SignerList owner (starting with r)
- * @returns {string} The index of the account's Offer object
+ * @param address - The classic account address of the SignerList owner (starting with r).
+ * @param sequence
+ * @returns The index of the account's Offer object.
  */
-export const computeOfferIndex = (address: string, sequence: number): string => {
-  const prefix = '00' + intToHex(ledgerSpaces.offer.charCodeAt(0), 1)
-  return sha512Half(prefix + addressToHex(address) + intToHex(sequence, 4))
-}
+export const computeOfferIndex = (
+  address: string,
+  sequence: number
+): string => {
+  const prefix = `00${intToHex(ledgerSpaces.offer.charCodeAt(0), 1)}`;
+  return sha512Half(prefix + addressToHex(address) + intToHex(sequence, 4));
+};
 
 export const computeTrustlineHash = (
   address1: string,
   address2: string,
   currency: string
 ): string => {
-  const address1Hex = addressToHex(address1)
-  const address2Hex = addressToHex(address2)
+  const address1Hex = addressToHex(address1);
+  const address2Hex = addressToHex(address2);
 
   const swap = new BigNumber(address1Hex, 16).isGreaterThan(
     new BigNumber(address2Hex, 16)
-  )
-  const lowAddressHex = swap ? address2Hex : address1Hex
-  const highAddressHex = swap ? address1Hex : address2Hex
+  );
+  const lowAddressHex = swap ? address2Hex : address1Hex;
+  const highAddressHex = swap ? address1Hex : address2Hex;
 
-  const prefix = ledgerSpaceHex('rippleState')
+  const prefix = ledgerSpaceHex("rippleState");
   return sha512Half(
     prefix + lowAddressHex + highAddressHex + currencyToHex(currency)
-  )
-}
+  );
+};
 
 export const computeTransactionTreeHash = (transactions: any[]): string => {
-  const shamap = new SHAMap()
+  const shamap = new SHAMap();
 
   transactions.forEach((txJSON) => {
-    const txBlobHex = encode(txJSON)
-    const metaHex = encode(txJSON.metaData)
-    const txHash = computeBinaryTransactionHash(txBlobHex)
-    const data = addLengthPrefix(txBlobHex) + addLengthPrefix(metaHex)
-    shamap.addItem(txHash, data, NodeType.TRANSACTION_METADATA)
-  })
+    const txBlobHex = encode(txJSON);
+    const metaHex = encode(txJSON.metaData);
+    const txHash = computeBinaryTransactionHash(txBlobHex);
+    const data = addLengthPrefix(txBlobHex) + addLengthPrefix(metaHex);
+    shamap.addItem(txHash, data, NodeType.TRANSACTION_METADATA);
+  });
 
-  return shamap.hash
-}
+  return shamap.hash;
+};
 
 export const computeStateTreeHash = (entries: any[]): string => {
-  const shamap = new SHAMap()
+  const shamap = new SHAMap();
 
   entries.forEach((ledgerEntry) => {
-    const data = encode(ledgerEntry)
-    shamap.addItem(ledgerEntry.index, data, NodeType.ACCOUNT_STATE)
-  })
+    const data = encode(ledgerEntry);
+    shamap.addItem(ledgerEntry.index, data, NodeType.ACCOUNT_STATE);
+  });
 
-  return shamap.hash
-}
+  return shamap.hash;
+};
 
 // see rippled Ledger::updateHash()
 export const computeLedgerHash = (ledgerHeader): string => {
-  const prefix = HashPrefix.LEDGER.toString(16).toUpperCase()
+  const prefix = HashPrefix.LEDGER.toString(16).toUpperCase();
   return sha512Half(
     prefix +
       intToHex(ledgerHeader.ledger_index, 4) +
@@ -196,14 +203,14 @@ export const computeLedgerHash = (ledgerHeader): string => {
       intToHex(ledgerHeader.close_time, 4) +
       intToHex(ledgerHeader.close_time_resolution, 1) +
       intToHex(ledgerHeader.close_flags, 1)
-  )
-}
+  );
+};
 
 export const computeEscrowHash = (address, sequence): string => {
   return sha512Half(
-    ledgerSpaceHex('escrow') + addressToHex(address) + intToHex(sequence, 4)
-  )
-}
+    ledgerSpaceHex("escrow") + addressToHex(address) + intToHex(sequence, 4)
+  );
+};
 
 export const computePaymentChannelHash = (
   address,
@@ -211,9 +218,9 @@ export const computePaymentChannelHash = (
   sequence
 ): string => {
   return sha512Half(
-    ledgerSpaceHex('paychan') +
+    ledgerSpaceHex("paychan") +
       addressToHex(address) +
       addressToHex(dstAddress) +
       intToHex(sequence, 4)
-  )
-}
+  );
+};
