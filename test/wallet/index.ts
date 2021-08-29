@@ -1,6 +1,6 @@
 import {assert} from 'chai'
 import ECDSA from '../../src/common/ecdsa'
-import Wallet from '../../src/wallet/Wallet'
+import Wallet from '../../src/wallet/wallet'
 
 /**
  * Wallet testing
