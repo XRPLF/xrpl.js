@@ -12,10 +12,10 @@ describe('Wallet', () => {
         const classicAddressPrefix = 'r'
         const ed25519KeyPrefix = 'ED'
         const secp256k1PrivateKeyPrefix = '00'
-        
+
         it('creates a new wallet using default algorithm', () => {
             const wallet = Wallet.create()
-        
+
             assert.isString(wallet.publicKey)
             assert.isString(wallet.privateKey)
             assert.isString(wallet.classicAddress)
@@ -28,7 +28,7 @@ describe('Wallet', () => {
         it('creates a new wallet using algorithm ecdsa-secp256k1', () => {
             const algorithm = ECDSA.secp256k1
             const wallet = Wallet.create(algorithm)
-        
+
             assert.isString(wallet.publicKey)
             assert.isString(wallet.privateKey)
             assert.isString(wallet.classicAddress)
@@ -40,7 +40,7 @@ describe('Wallet', () => {
         it('creates a new wallet using algorithm ed25519', () => {
             const algorithm = ECDSA.ed25519
             const wallet = Wallet.create(algorithm)
-        
+
             assert.isString(wallet.publicKey)
             assert.isString(wallet.privateKey)
             assert.isString(wallet.classicAddress)
@@ -57,10 +57,10 @@ describe('Wallet', () => {
             '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
         const privateKey =
             '00141BA006D3363D2FB2785E8DF4E44D3A49908780CB4FB51F6D217C08C021429F'
-        
+
         it('derives a wallet using default algorithm', () => {
             const wallet = Wallet.fromSeed(seed)
-        
+
             assert.equal(wallet.publicKey, publicKey)
             assert.equal(wallet.privateKey, privateKey)
             assert.equal(wallet.seed, seed)
@@ -69,7 +69,7 @@ describe('Wallet', () => {
         it('derives a wallet using algorithm ecdsa-secp256k1', () => {
             const algorithm = ECDSA.secp256k1
             const wallet = Wallet.fromSeed(seed, algorithm)
-        
+
             assert.equal(wallet.publicKey, publicKey)
             assert.equal(wallet.privateKey, privateKey)
             assert.equal(wallet.seed, seed)
@@ -78,7 +78,7 @@ describe('Wallet', () => {
         it('derives a wallet using algorithm ed25519', () => {
             const algorithm = ECDSA.ed25519
             const wallet = Wallet.fromSeed(seed, algorithm)
-        
+
             assert.equal(wallet.publicKey, publicKey)
             assert.equal(wallet.privateKey, privateKey)
             assert.equal(wallet.seed, seed)
@@ -92,10 +92,10 @@ describe('Wallet', () => {
             '0257B550BA2FDCCF0ADDA3DEB2A5411700F3ADFDCC7C68E1DCD1E2B63E6B0C63E6'
         const privateKey =
             '008F942B6E229C0E9CEE47E7A94253DABB6A9855F4BA2D8A741FA31851A1D423C3'
-        
+
         it('derives a wallet using default derivation path', () => {
             const wallet = Wallet.fromMnemonic(mnemonic)
-            
+
             assert.equal(wallet.publicKey, publicKey)
             assert.equal(wallet.privateKey, privateKey)
             assert.equal(wallet.seed, null)
@@ -104,7 +104,7 @@ describe('Wallet', () => {
         it('derives a wallet using an input derivation path', () => {
             const derivationPath = "m/44'/144'/0'/0/0"
             const wallet = Wallet.fromMnemonic(mnemonic, derivationPath)
-        
+
             assert.equal(wallet.publicKey, publicKey)
             assert.equal(wallet.privateKey, privateKey)
             assert.equal(wallet.seed, null)
@@ -126,7 +126,7 @@ describe('Wallet', () => {
 
         it('derives a wallet using entropy', () => {
             const wallet = Wallet.fromEntropy(entropy)
-        
+
             assert.equal(wallet.publicKey, publicKeyED25519)
             assert.equal(wallet.privateKey, privateKeyED25519)
             assert.equal(wallet.seed, seedEd25519)
@@ -135,7 +135,7 @@ describe('Wallet', () => {
         it('derives a wallet using algorithm ecdsa-secp256k1', () => {
             const algorithm = ECDSA.secp256k1
             const wallet = Wallet.fromEntropy(entropy, algorithm)
-        
+
             assert.equal(wallet.publicKey, publicKey)
             assert.equal(wallet.privateKey, privateKey)
             assert.equal(wallet.seed, seedSecp256k1)
@@ -144,7 +144,7 @@ describe('Wallet', () => {
         it('derives a wallet using algorithm ed25519', () => {
             const algorithm = ECDSA.ed25519
             const wallet = Wallet.fromEntropy(entropy, algorithm)
-        
+
             assert.equal(wallet.publicKey, publicKeyED25519)
             assert.equal(wallet.privateKey, privateKeyED25519)
             assert.equal(wallet.seed, seedEd25519)
@@ -157,7 +157,7 @@ describe('Wallet', () => {
         const privateKey =
             '00141BA006D3363D2FB2785E8DF4E44D3A49908780CB4FB51F6D217C08C021429F'
         const address = 'rhvh5SrgBL5V8oeV9EpDuVszeJSSCEkbPc'
-        
+
         it('signs a transaction offline', () => {
             const txJSON = {
                 TransactionType: 'Payment',
@@ -188,11 +188,11 @@ describe('Wallet', () => {
                 '1200002400000001614000000001312D0068400000000000000C7321030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D74473045022100CAF99A63B241F5F62B456C68A593D2835397101533BB5D0C4DC17362AC22046F022016A2CA2CF56E777B10E43B56541A4C2FB553E7E298CDD39F7A8A844DA491E51D81142AF1861DEC1316AEEC995C94FF9E2165B1B784608314FDB08D07AAA0EB711793A3027304D688E10C3648',
             id: '30D9ECA2A7FB568C5A8607E5850D9567572A9E7C6094C26BEFD4DC4C2CF2657A'
         }
-        
+
         it('returns true when verifying a transaction signed by the same wallet', () => {
             const wallet = new Wallet(publicKey, privateKey)
             const isVerified: boolean = wallet.verifyTransaction(prepared.signedTransaction)
-        
+
             assert.equal(isVerified, true)
         })
 
@@ -203,8 +203,34 @@ describe('Wallet', () => {
                 '00ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A'
             const wallet = new Wallet(diffPublicKey, diffPrivateKey)
             const isVerified: boolean = wallet.verifyTransaction(prepared.signedTransaction)
-        
+
             assert.equal(isVerified, false)
+        })
+    })
+
+    describe('getXAddress', () => {
+        const publicKey =
+            '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
+        const privateKey =
+            '00141BA006D3363D2FB2785E8DF4E44D3A49908780CB4FB51F6D217C08C021429F'
+        const wallet = new Wallet(publicKey, privateKey)
+        const tag = 1337
+        const mainnetXAddress = 'X7gJ5YK8abHf2eTPWPFHAAot8Knck11QGqmQ7a6a3Z8PJvk'
+        const testnetXAddress = 'T7bq3e7kxYq9pwDz8UZhqAZoEkcRGTXSNr5immvcj3DYRaV'
+
+        it('returns a Testnet X-address when test is true', () => {
+          const result = wallet.getXAddress(tag, true)
+          assert.equal(result, testnetXAddress)
+        })
+
+        it('returns a Mainnet X-address when test is false', () => {
+          const result = wallet.getXAddress(tag, false)
+          assert.equal(result, mainnetXAddress)
+        })
+
+        it("returns a Mainnet X-address when test isn't provided", () => {
+            const result = wallet.getXAddress(tag)
+            assert.equal(result, mainnetXAddress)
         })
     })
 })

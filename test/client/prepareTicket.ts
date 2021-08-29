@@ -1,13 +1,13 @@
-import {assertResultMatch, TestSuite} from '../testUtils'
+import rippled from "../fixtures/rippled";
+import { assertResultMatch, TestSuite } from "../testUtils";
 // import responses from '../fixtures/responses'
-import rippled from '../fixtures/rippled'
 // import requests from '../fixtures/requests'
 // import {ValidationError} from 'xrpl-local/common/errors'
 // import binary from 'ripple-binary-codec'
-// import assert from 'assert-diff'
+// import {assert} from 'chai'
 // import {Client} from 'xrpl-local'
+// import * as schemaValidator from 'xrpl-local/common/schema-validator'
 
-// const {schemaValidator} = Client._PRIVATE
 // const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 // const {preparePayment: REQUEST_FIXTURES} = requests
 // const {preparePayment: RESPONSE_FIXTURES} = responses
@@ -19,42 +19,52 @@ import rippled from '../fixtures/rippled'
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'creates a ticket successfully with a sequence number': async (
+  "creates a ticket successfully with a sequence number": async (
     client,
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const expected = {
       txJSON:
         '{"TransactionType":"TicketCreate", "TicketCount": 2, "Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Flags":2147483648,"LastLedgerSequence":8819954,"Sequence":23,"Fee":"12"}',
       instructions: {
         maxLedgerVersion: 8819954,
         sequence: 23,
-        fee: '0.000012'
-      }
-    }
-    const response = await client.prepareTicketCreate(address, 2)
-    assertResultMatch(response, expected, 'prepare')
+        fee: "0.000012",
+      },
+    };
+    const response = await client.prepareTicketCreate(address, 2);
+    assertResultMatch(response, expected, "prepare");
   },
 
-  'creates a ticket successfully with another ticket': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+  "creates a ticket successfully with another ticket": async (
+    client,
+    address,
+    mockRippled
+  ) => {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const expected = {
       txJSON:
         '{"TransactionType":"TicketCreate", "TicketCount": 1, "Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Flags":2147483648,"LastLedgerSequence":8819954,"Sequence": 0,"TicketSequence":23,"Fee":"12"}',
       instructions: {
         maxLedgerVersion: 8819954,
         ticketSequence: 23,
-        fee: '0.000012'
-      }
-    }
+        fee: "0.000012",
+      },
+    };
     const instructions = {
       maxLedgerVersion: 8819954,
       ticketSequence: 23,
-      fee: '0.000012'
-    }
-    const response = await client.prepareTicketCreate(address, 1, instructions)
-    assertResultMatch(response, expected, 'prepare')
-  }
-}
+      fee: "0.000012",
+    };
+    const response = await client.prepareTicketCreate(address, 1, instructions);
+    assertResultMatch(response, expected, "prepare");
+  },
+};

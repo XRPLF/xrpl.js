@@ -2,7 +2,7 @@
 
 module.exports.generateIOUPaymentPaths =
 function(request_id, sendingAccount, destinationAccount, destinationAmount) {
-  return JSON.stringify({
+  return {
     'id': request_id,
     'status': 'success',
     'type': 'response',
@@ -301,12 +301,12 @@ function(request_id, sendingAccount, destinationAccount, destinationAmount) {
         'XRP'
       ]
     }
-  });
+  };
 };
 
 module.exports.generateXRPPaymentPaths =
 function(request_id, sendingAccount, destinationAccount) {
-  return JSON.stringify({
+  return {
     'id': request_id,
     'status': 'success',
     'type': 'response',
@@ -410,5 +410,5 @@ function(request_id, sendingAccount, destinationAccount) {
         'XRP'
       ]
     }
-  });
+  };
 };

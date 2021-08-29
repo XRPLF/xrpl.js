@@ -10,9 +10,26 @@ on:
   workflow_dispatch:
 
 jobs:
-  unit:
+  # build-and-lint:
+  #   runs-on: ubuntu-latest
 
+  #   strategy:
+  #     matrix:
+  #       node-version: [14.x]
+
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Use Node.js ${{ matrix.node-version }}
+  #     uses: actions/setup-node@v1
+  #     with:
+  #       node-version: ${{ matrix.node-version }}
+  #   - run: yarn install
+  #   - run: yarn lint
+  #   - run: yarn build
+
+  unit:
     runs-on: ubuntu-latest
+
 
     strategy:
       matrix:
@@ -24,10 +41,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: yarn install
+    - run: yarn install --ignore-engines
     - run: yarn test
-    - run: yarn lint
-    - run: yarn build
 
   integration:
     runs-on: ubuntu-latest
@@ -42,7 +57,7 @@ jobs:
         ports:
         - 6006:6006
         options:
-          --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s 
+          --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
     steps:
     - uses: actions/checkout@v2
@@ -50,7 +65,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: yarn install
+    - run: yarn install --ignore-engines
     - run: yarn test:integration
       env:
         HOST: localhost
@@ -69,7 +84,7 @@ jobs:
         ports:
         - 6006:6006
         options:
-          --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s 
+          --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
     steps:
     - uses: actions/checkout@v2

@@ -1,8 +1,9 @@
-import requests from '../fixtures/requests'
-import responses from '../fixtures/responses'
-import rippled from '../fixtures/rippled'
-import {assertRejects, assertResultMatch, TestSuite} from '../testUtils'
-const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
+import requests from "../fixtures/requests";
+import responses from "../fixtures/responses";
+import rippled from "../fixtures/rippled";
+import { assertRejects, assertResultMatch, TestSuite } from "../testUtils";
+
+const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
 
 /**
  * Every test suite exports their tests in the default object.
@@ -10,39 +11,51 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'simple': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+  async simple(client, address, mockRippled) {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.simple,
       instructionsWithMaxLedgerVersionOffset
-    )
-    assertResultMatch(result, responses.prepareTrustline.simple, 'prepare')
+    );
+    assertResultMatch(result, responses.prepareTrustline.simple, "prepare");
   },
 
-  'frozen': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+  async frozen(client, address, mockRippled) {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.frozen
-    )
-    assertResultMatch(result, responses.prepareTrustline.frozen, 'prepare')
+    );
+    assertResultMatch(result, responses.prepareTrustline.frozen, "prepare");
   },
 
-  'complex': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+  async complex(client, address, mockRippled) {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.complex,
       instructionsWithMaxLedgerVersionOffset
-    )
-    assertResultMatch(result, responses.prepareTrustline.complex, 'prepare')
+    );
+    assertResultMatch(result, responses.prepareTrustline.complex, "prepare");
   },
 
-  'invalid': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
-    const trustline = Object.assign({}, requests.prepareTrustline.complex)
-    delete trustline.limit // Make invalid
+  async invalid(client, address, mockRippled) {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
+    const trustline = { ...requests.prepareTrustline.complex };
+    delete trustline.limit; // Make invalid
 
     await assertRejects(
       client.prepareTrustline(
@@ -52,31 +65,41 @@ export default <TestSuite>{
       ),
       client.errors.ValidationError,
       'instance.trustline requires property "limit"'
-    )
+    );
   },
 
-  'xaddress-issuer': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+  "xaddress-issuer": async (client, address, mockRippled) => {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.issuedXAddress,
       instructionsWithMaxLedgerVersionOffset
-    )
-    assertResultMatch(result, responses.prepareTrustline.issuedXAddress, 'prepare')
+    );
+    assertResultMatch(
+      result,
+      responses.prepareTrustline.issuedXAddress,
+      "prepare"
+    );
   },
 
-  'with ticket': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
+  "with ticket": async (client, address, mockRippled) => {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012',
-      ticketSequence: 23
-    }
+      maxFee: "0.000012",
+      ticketSequence: 23,
+    };
     const result = await client.prepareTrustline(
       address,
       requests.prepareTrustline.simple,
       localInstructions
-    )
-    assertResultMatch(result, responses.prepareTrustline.ticket, 'prepare')
-  }
-}
+    );
+    assertResultMatch(result, responses.prepareTrustline.ticket, "prepare");
+  },
+};
