@@ -8,13 +8,13 @@ import Wallet from '../../src/Wallet'
  * Provides tests for Wallet class
  */
 describe('Wallet', () => {
-    describe('create', () => {
+    describe('generate', () => {
         const classicAddressPrefix = 'r'
         const ed25519KeyPrefix = 'ED'
         const secp256k1PrivateKeyPrefix = '00'
 
-        it('creates a new wallet using default algorithm', () => {
-            const wallet = Wallet.create()
+        it('generates a new wallet using default algorithm', () => {
+            const wallet = Wallet.generate()
 
             assert.isString(wallet.publicKey)
             assert.isString(wallet.privateKey)
@@ -25,9 +25,9 @@ describe('Wallet', () => {
             assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
         })
 
-        it('creates a new wallet using algorithm ecdsa-secp256k1', () => {
+        it('generates a new wallet using algorithm ecdsa-secp256k1', () => {
             const algorithm = ECDSA.secp256k1
-            const wallet = Wallet.create(algorithm)
+            const wallet = Wallet.generate(algorithm)
 
             assert.isString(wallet.publicKey)
             assert.isString(wallet.privateKey)
@@ -37,9 +37,9 @@ describe('Wallet', () => {
             assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
         })
 
-        it('creates a new wallet using algorithm ed25519', () => {
+        it('generates a new wallet using algorithm ed25519', () => {
             const algorithm = ECDSA.ed25519
-            const wallet = Wallet.create(algorithm)
+            const wallet = Wallet.generate(algorithm)
 
             assert.isString(wallet.publicKey)
             assert.isString(wallet.privateKey)

@@ -42,7 +42,7 @@ async function generateFaucetWallet(
 
   // If no existing Wallet is provided or its address is invalid to fund
   if (!wallet || !isValidAddress(wallet.classicAddress)) {
-    wallet = Wallet.create()
+    wallet = Wallet.generate()
   }
 
   // Create the POST request body

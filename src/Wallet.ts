@@ -31,11 +31,11 @@ class Wallet {
   }
 
   /**
-   * Creates a new Wallet using a generated seed
+   * Generates a new Wallet using a generated seed
    * @param {ECDSA} algorithm The digital signature algorithm to generate an address for.
    * @returns {Wallet} A new Wallet derived from a generated seed.
    */
-  static create(algorithm: ECDSA = Wallet.defaultAlgorithm): Wallet {
+  static generate(algorithm: ECDSA = Wallet.defaultAlgorithm): Wallet {
     const seed = generateSeed({algorithm})
     return Wallet.fromSeed(seed)
   }
