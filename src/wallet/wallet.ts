@@ -4,11 +4,11 @@ import { classicAddressToXAddress } from 'ripple-address-codec'
 import { decode, encodeForSigning } from 'ripple-binary-codec';
 import { deriveAddress, deriveKeypair, generateSeed, verify } from 'ripple-keypairs';
 
-import ECDSA from './common/ecdsa';
-import { ValidationError } from './common/errors';
-import { SignedTransaction } from './common/types/objects';
-import { signOffline } from './transaction/sign';
-import { SignOptions } from './transaction/types';
+import ECDSA from '../common/ecdsa';
+import { ValidationError } from '../common/errors';
+import { SignedTransaction } from '../common/types/objects';
+import { signOffline } from '../transaction/sign';
+import { SignOptions } from '../transaction/types';
 
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
