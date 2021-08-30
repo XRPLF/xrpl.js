@@ -1,10 +1,12 @@
-import * as assert from 'assert'
-import parseAmount from './amount'
-import {parseTimestamp, parseMemos} from './utils'
-import {removeUndefined} from '../../utils'
+import * as assert from "assert";
+
+import { removeUndefined } from "../../utils";
+
+import parseAmount from "./amount";
+import { parseTimestamp, parseMemos } from "./utils";
 
 function parseEscrowCreation(tx: any): object {
-  assert.ok(tx.TransactionType === 'EscrowCreate')
+  assert.ok(tx.TransactionType === "EscrowCreate");
 
   return removeUndefined({
     amount: parseAmount(tx.Amount).value,
@@ -14,8 +16,8 @@ function parseEscrowCreation(tx: any): object {
     allowCancelAfter: parseTimestamp(tx.CancelAfter),
     allowExecuteAfter: parseTimestamp(tx.FinishAfter),
     sourceTag: tx.SourceTag,
-    destinationTag: tx.DestinationTag
-  })
+    destinationTag: tx.DestinationTag,
+  });
 }
 
-export default parseEscrowCreation
+export default parseEscrowCreation;

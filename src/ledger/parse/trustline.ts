@@ -1,21 +1,24 @@
-import * as assert from 'assert'
-import {parseQuality, parseMemos} from './utils'
-import {txFlags} from '../../common'
-import {removeUndefined} from '../../utils'
-const flags = txFlags.TrustSet
+import * as assert from "assert";
+
+import { txFlags } from "../../common";
+import { removeUndefined } from "../../utils";
+
+import { parseQuality, parseMemos } from "./utils";
+
+const flags = txFlags.TrustSet;
 
 function parseFlag(flagsValue, trueValue, falseValue) {
   if (flagsValue & trueValue) {
-    return true
+    return true;
   }
   if (flagsValue & falseValue) {
-    return false
+    return false;
   }
-  return undefined
+  return undefined;
 }
 
 function parseTrustline(tx: any): object {
-  assert.ok(tx.TransactionType === 'TrustSet')
+  assert.ok(tx.TransactionType === "TrustSet");
 
   return removeUndefined({
     limit: tx.LimitAmount.value,
@@ -30,8 +33,8 @@ function parseTrustline(tx: any): object {
       flags.ClearNoRipple
     ),
     frozen: parseFlag(tx.Flags, flags.SetFreeze, flags.ClearFreeze),
-    authorized: parseFlag(tx.Flags, flags.SetAuth, 0)
-  })
+    authorized: parseFlag(tx.Flags, flags.SetAuth, 0),
+  });
 }
 
-export default parseTrustline
+export default parseTrustline;
