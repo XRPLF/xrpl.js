@@ -4,10 +4,7 @@ import {
   TimeoutError,
 } from "../common/errors";
 import { Response } from "../models/methods";
-
-interface BasicRequestFormat {
-  id?: string | number;
-}
+import { BaseRequest } from "../models/methods/baseMethod";
 
 /**
  * Manage all the requests made to the websocket, and their async responses
@@ -95,8 +92,8 @@ export default class RequestManager {
    * @param timeout - Timeout length to catch hung responses.
    * @returns Request ID, new request form, and the promise for resolving the request.
    */
-  public createRequest(
-    request: BasicRequestFormat,
+  public createRequest<T extends BaseRequest>(
+    request: T,
     timeout: number
   ): [string | number, string, Promise<Response>] {
     const newId = request.id ? request.id : this.nextId;

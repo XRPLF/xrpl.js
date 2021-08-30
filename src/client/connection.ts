@@ -1,28 +1,32 @@
+/* eslint-disable max-lines -- Connection is a big class */
 import { EventEmitter } from "events";
+import { Agent } from "http";
+// eslint-disable-next-line node/no-deprecated-api -- TODO: resolve this
 import { parse as parseURL } from "url";
 
 import _ from "lodash";
 import WebSocket from "ws";
 
 import {
-  RippledError,
   DisconnectedError,
   NotConnectedError,
-  TimeoutError,
-  ResponseFormatError,
   ConnectionError,
   RippleError,
 } from "../common/errors";
-import { Response } from "../models/methods";
+import { BaseRequest } from "../models/methods/baseMethod";
 
 import ExponentialBackoff from "./backoff";
 import ConnectionManager from "./connectionManager";
 import RequestManager from "./requestManager";
 
+const SECONDS_PER_MINUTE = 60;
+const TIMEOUT = 20;
+const CONNECTION_TIMEOUT = 5;
+
 /**
  * ConnectionOptions is the configuration for the Connection class.
  */
-export interface ConnectionOptions {
+interface ConnectionOptions {
   trace?: boolean | ((id: string, message: string) => void);
   proxy?: string;
   proxyAuthorization?: string;
@@ -31,7 +35,8 @@ export interface ConnectionOptions {
   key?: string;
   passphrase?: string;
   certificate?: string;
-  timeout: number; // request timeout
+  // request timeout
+  timeout: number;
   connectionTimeout: number;
 }
 
@@ -49,17 +54,9 @@ export type ConnectionUserOptions = Partial<ConnectionOptions>;
 //
 const INTENTIONAL_DISCONNECT_CODE = 4000;
 
-/**
- * Create a new websocket given your URL and optional proxy/certificate
- * configuration.
- *
- * @param url
- * @param config
- */
-function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
-  const options: WebSocket.ClientOptions = {};
+function getAgent(url: string, config: ConnectionOptions): Agent | undefined {
+  // TODO: replace deprecated method
   if (config.proxy != null) {
-    // TODO: replace deprecated method
     const parsedURL = parseURL(url);
     const parsedProxyURL = parseURL(config.proxy);
     const proxyOverrides = _.omitBy(
@@ -77,12 +74,28 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
     const proxyOptions = { ...parsedProxyURL, ...proxyOverrides };
     let HttpsProxyAgent;
     try {
+      // eslint-disable-next-line max-len -- Long eslint-disable-next-line
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-require-imports, node/global-require, global-require, -- Necessary for the `require`
       HttpsProxyAgent = require("https-proxy-agent");
-    } catch (error) {
+    } catch (_error) {
       throw new Error('"proxy" option is not supported in the browser');
     }
-    options.agent = new HttpsProxyAgent(proxyOptions);
+    return new HttpsProxyAgent(proxyOptions);
   }
+  return undefined;
+}
+
+/**
+ * Create a new websocket given your URL and optional proxy/certificate
+ * configuration.
+ *
+ * @param url - The URL to connect to.
+ * @param config - THe configuration options for the WebSocket.
+ * @returns A Websocket that fits the given configuration parameters.
+ */
+function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
+  const options: WebSocket.ClientOptions = {};
+  options.agent = getAgent(url, config);
   if (config.authorization != null) {
     const base64 = Buffer.from(config.authorization).toString("base64");
     options.headers = { Authorization: `Basic ${base64}` };
@@ -109,10 +122,14 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
 /**
  * Ws.send(), but promisified.
  *
- * @param ws
- * @param message
+ * @param ws - Websocket to send with.
+ * @param message - Message to send.
+ * @returns When the message has been sent.
  */
-function websocketSendAsync(ws: WebSocket, message: string) {
+async function websocketSendAsync(
+  ws: WebSocket,
+  message: string
+): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     ws.send(message, (error) => {
       if (error) {
@@ -127,43 +144,196 @@ function websocketSendAsync(ws: WebSocket, message: string) {
 /**
  * The main Connection class. Responsible for connecting to & managing
  * an active WebSocket connection to a XRPL node.
- *
- * @param errorOrCode
  */
 export class Connection extends EventEmitter {
-  private readonly _url: string | undefined;
-  private _ws: null | WebSocket = null;
-  private _reconnectTimeoutID: null | NodeJS.Timeout = null;
-  private _heartbeatIntervalID: null | NodeJS.Timeout = null;
-  private readonly _retryConnectionBackoff = new ExponentialBackoff({
+  private readonly url: string | undefined;
+  private ws: WebSocket | null = null;
+  private reconnectTimeoutID: null | NodeJS.Timeout = null;
+  private heartbeatIntervalID: null | NodeJS.Timeout = null;
+  private readonly retryConnectionBackoff = new ExponentialBackoff({
     min: 100,
-    max: 60 * 1000,
+    max: SECONDS_PER_MINUTE * 1000,
   });
 
-  private readonly _trace: (id: string, message: string) => void = () => {};
-  private readonly _config: ConnectionOptions;
-  private readonly _requestManager = new RequestManager();
-  private readonly _connectionManager = new ConnectionManager();
+  private readonly config: ConnectionOptions;
+  private readonly requestManager = new RequestManager();
+  private readonly connectionManager = new ConnectionManager();
 
-  constructor(url?: string, options: ConnectionUserOptions = {}) {
+  /**
+   * Creates a new Connection object.
+   *
+   * @param url - URL to connect to.
+   * @param options - Options for the Connection object.
+   */
+  public constructor(url?: string, options: ConnectionUserOptions = {}) {
     super();
     this.setMaxListeners(Infinity);
-    this._url = url;
-    this._config = {
-      timeout: 20 * 1000,
-      connectionTimeout: 5 * 1000,
+    this.url = url;
+    this.config = {
+      timeout: TIMEOUT * 1000,
+      connectionTimeout: CONNECTION_TIMEOUT * 1000,
       ...options,
     };
     if (typeof options.trace === "function") {
-      this._trace = options.trace;
+      this.trace = options.trace;
     } else if (options.trace) {
-      this._trace = console.log;
+      // eslint-disable-next-line no-console -- Used for tracing only
+      this.trace = console.log;
     }
   }
 
-  private _onMessage(message) {
-    this._trace("receive", message);
-    let data: any;
+  /**
+   * Returns whether the websocket is connected.
+   *
+   * @returns Whether the websocket connection is open.
+   */
+  public isConnected(): boolean {
+    return this.state === WebSocket.OPEN;
+  }
+
+  /**
+   * Connects the websocket to the provided URL.
+   *
+   * @returns When the websocket is connected.
+   * @throws ConnectionError if there is a connection error, RippleError if there is already a WebSocket in existence.
+   */
+  public async connect(): Promise<void> {
+    if (this.isConnected()) {
+      return Promise.resolve();
+    }
+    if (this.state === WebSocket.CONNECTING) {
+      return this.connectionManager.awaitConnection();
+    }
+    if (!this.url) {
+      return Promise.reject(
+        new ConnectionError("Cannot connect because no server was specified")
+      );
+    }
+    if (this.ws) {
+      return Promise.reject(
+        new RippleError("Websocket connection never cleaned up.", {
+          state: this.state,
+        })
+      );
+    }
+
+    // Create the connection timeout, in case the connection hangs longer than expected.
+    const connectionTimeoutID = setTimeout(() => {
+      this.onConnectionFailed(
+        new ConnectionError(
+          `Error: connect() timed out after ${this.config.connectionTimeout} ms. ` +
+            `If your internet connection is working, the rippled server may be blocked or inaccessible. ` +
+            `You can also try setting the 'connectionTimeout' option in the Client constructor.`
+        )
+      );
+    }, this.config.connectionTimeout);
+    // Connection listeners: these stay attached only until a connection is done/open.
+    this.ws = createWebSocket(this.url, this.config);
+
+    if (this.ws == null) {
+      throw new Error("Connect: created null websocket");
+    }
+
+    this.ws.on("error", (error) => this.onConnectionFailed(error));
+    this.ws.on("error", () => clearTimeout(connectionTimeoutID));
+    this.ws.on("close", (reason) => this.onConnectionFailed(reason));
+    this.ws.on("close", () => clearTimeout(connectionTimeoutID));
+    this.ws.once("open", async () => this.onceOpen(connectionTimeoutID));
+    return this.connectionManager.awaitConnection();
+  }
+
+  /**
+   * Disconnect the websocket connection.
+   * We never expect this method to reject. Even on "bad" disconnects, the websocket
+   * should still successfully close with the relevant error code returned.
+   * See https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent for the full list.
+   * If no open websocket connection exists, resolve with no code (`undefined`).
+   *
+   * @returns
+   */
+  public async disconnect(): Promise<number | undefined> {
+    if (this.reconnectTimeoutID !== null) {
+      clearTimeout(this.reconnectTimeoutID);
+      this.reconnectTimeoutID = null;
+    }
+    if (this.state === WebSocket.CLOSED) {
+      return Promise.resolve(undefined);
+    }
+    if (this.ws === null) {
+      return Promise.resolve(undefined);
+    }
+
+    return new Promise((resolve) => {
+      if (this.ws === null) {
+        return Promise.resolve(undefined);
+      }
+
+      this.ws.once("close", (code) => resolve(code));
+      // Connection already has a disconnect handler for the disconnect logic.
+      // Just close the websocket manually (with our "intentional" code) to
+      // trigger that.
+      if (this.ws != null && this.state !== WebSocket.CLOSING) {
+        this.ws.close(INTENTIONAL_DISCONNECT_CODE);
+      }
+      return Promise.resolve(undefined);
+    });
+  }
+
+  /**
+   * Disconnect the websocket, then connect again.
+   */
+  public async reconnect(): Promise<void> {
+    // NOTE: We currently have a "reconnecting" event, but that only triggers
+    // through an unexpected connection retry logic.
+    // See: https://github.com/ripple/ripple-lib/pull/1101#issuecomment-565360423
+    this.emit("reconnect");
+    await this.disconnect();
+    await this.connect();
+  }
+
+  /**
+   *
+   * @param request
+   * @param timeout
+   */
+  public async request<T extends BaseRequest>(
+    request: T,
+    timeout?: number
+  ): Promise<any> {
+    if (!this.shouldBeConnected || this.ws == null) {
+      throw new NotConnectedError();
+    }
+    const [id, message, responsePromise] = this.requestManager.createRequest(
+      request,
+      timeout ?? this.config.timeout
+    );
+    this.trace("send", message);
+    websocketSendAsync(this.ws, message).catch((error) => {
+      this.requestManager.reject(id, error);
+    });
+
+    return responsePromise;
+  }
+
+  /**
+   * Get the Websocket connection URL.
+   *
+   * @returns The Websocket connection URL.
+   */
+  public getUrl(): string {
+    return this.url ?? "";
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function -- Does nothing on default
+  private readonly trace: (id: string, message: string) => void = () => {};
+
+  /**
+   *
+   * @param message
+   */
+  private onMessage(message): void {
+    this.trace("receive", message);
+    let data: Response;
     try {
       data = JSON.parse(message);
     } catch (error) {
@@ -179,246 +349,155 @@ export class Connection extends EventEmitter {
     }
     if (data.type === "response") {
       try {
-        this._requestManager.handleResponse(data);
+        this.requestManager.handleResponse(data);
       } catch (error) {
         this.emit("error", "badMessage", error.message, message);
       }
     }
   }
 
-  private get _state() {
-    return this._ws ? this._ws.readyState : WebSocket.CLOSED;
+  /**
+   *
+   */
+  private get state(): 0 | 1 | 2 | 3 {
+    return this.ws ? this.ws.readyState : WebSocket.CLOSED;
   }
 
-  private get _shouldBeConnected() {
-    return this._ws !== null;
+  /**
+   *
+   */
+  private get shouldBeConnected(): boolean {
+    return this.ws !== null;
   }
 
-  private readonly _clearHeartbeatInterval = () => {
-    if (this._heartbeatIntervalID) {
-      clearInterval(this._heartbeatIntervalID);
+  /**
+   *
+   * @param connectionTimeoutID
+   */
+  private async onceOpen(connectionTimeoutID: NodeJS.Timeout): Promise<void> {
+    if (this.ws == null) {
+      throw new Error("onceOpen: ws is null");
     }
-  };
 
-  private readonly _startHeartbeatInterval = () => {
-    this._clearHeartbeatInterval();
-    this._heartbeatIntervalID = setInterval(
-      () => this._heartbeat(),
-      this._config.timeout
+    // Once the connection completes successfully, remove all old listeners
+    this.ws.removeAllListeners();
+    clearTimeout(connectionTimeoutID);
+    // Add new, long-term connected listeners for messages and errors
+    this.ws.on("message", (message: string) => this.onMessage(message));
+    this.ws.on("error", (error) =>
+      this.emit("error", "websocket", error.message, error)
     );
-  };
+    // Handle a closed connection: reconnect if it was unexpected
+    this.ws.once("close", this.cleanupClose);
+    // Finalize the connection and resolve all awaiting connect() requests
+    try {
+      this.retryConnectionBackoff.reset();
+      this.startHeartbeatInterval();
+      this.connectionManager.resolveAllAwaiting();
+      this.emit("connected");
+    } catch (error) {
+      this.connectionManager.rejectAllAwaiting(error);
+      await this.disconnect().catch(() => {}); // Ignore this error, propagate the root cause.
+    }
+  }
+
+  /**
+   * Sets up closing the connection if a close message is received.
+   *
+   * @param code - Closing code.
+   * @param reason - Reason for closing.
+   * @throws Error if WS doesn't exist, DisconnectedError to all requests that won't get responses because of closure.
+   */
+  private cleanupClose(code: number, reason: string): void {
+    if (this.ws == null) {
+      throw new Error("onceClose: ws is null");
+    }
+
+    this.clearHeartbeatInterval();
+    this.requestManager.rejectAll(
+      new DisconnectedError(`websocket was closed, ${reason}`)
+    );
+    this.ws.removeAllListeners();
+    this.ws = null;
+    this.emit("disconnected", code);
+    // If this wasn't a manual disconnect, then lets reconnect ASAP.
+    if (code !== INTENTIONAL_DISCONNECT_CODE) {
+      const retryTimeout = this.retryConnectionBackoff.duration();
+      this.trace("reconnect", `Retrying connection in ${retryTimeout}ms.`);
+      this.emit("reconnecting", this.retryConnectionBackoff.attempts);
+      // Start the reconnect timeout, but set it to `this._reconnectTimeoutID`
+      // so that we can cancel one in-progress on disconnect.
+      this.reconnectTimeoutID = setTimeout(() => {
+        this.reconnect().catch((error: Error) => {
+          this.emit("error", "reconnect", error.message, error);
+        });
+      }, retryTimeout);
+    }
+  }
+
+  /**
+   *
+   */
+  private clearHeartbeatInterval(): void {
+    if (this.heartbeatIntervalID) {
+      clearInterval(this.heartbeatIntervalID);
+    }
+  }
+
+  /**
+   *
+   */
+  private async startHeartbeatInterval(): Promise<void> {
+    this.clearHeartbeatInterval();
+    this.heartbeatIntervalID = setInterval(
+      () => this.heartbeat(),
+      this.config.timeout
+    );
+  }
 
   /**
    * A heartbeat is just a "ping" command, sent on an interval.
    * If this succeeds, we're good. If it fails, disconnect so that the consumer can reconnect, if desired.
+   *
+   * @returns
    */
-  private readonly _heartbeat = () => {
+  private async heartbeat(): Promise<any> {
     return this.request({ command: "ping" }).catch(() => {
       return this.reconnect().catch((error) => {
         this.emit("error", "reconnect", error.message, error);
       });
     });
-  };
+  }
 
-  private readonly _onConnectionFailed = (
-    errorOrCode: Error | number | null
-  ) => {
-    if (this._ws) {
-      this._ws.removeAllListeners();
-      this._ws.on("error", () => {
+  /**
+   * Process a failed connection.
+   *
+   * @param errorOrCode - (Optional) Error or code for connection failure.
+   */
+  private onConnectionFailed(errorOrCode: Error | number | null): void {
+    if (this.ws) {
+      this.ws.removeAllListeners();
+      this.ws.on("error", () => {
         // Correctly listen for -- but ignore -- any future errors: If you
         // don't have a listener on "error" node would log a warning on error.
       });
-      this._ws.close();
-      this._ws = null;
+      this.ws.close();
+      this.ws = null;
     }
     if (typeof errorOrCode === "number") {
-      this._connectionManager.rejectAllAwaiting(
+      this.connectionManager.rejectAllAwaiting(
         new NotConnectedError(`Connection failed with code ${errorOrCode}.`, {
           code: errorOrCode,
         })
       );
-    } else if (errorOrCode && errorOrCode.message) {
-      this._connectionManager.rejectAllAwaiting(
+    } else if (errorOrCode?.message) {
+      this.connectionManager.rejectAllAwaiting(
         new NotConnectedError(errorOrCode.message, errorOrCode)
       );
     } else {
-      this._connectionManager.rejectAllAwaiting(
+      this.connectionManager.rejectAllAwaiting(
         new NotConnectedError("Connection failed.")
       );
     }
-  };
-
-  isConnected() {
-    return this._state === WebSocket.OPEN;
-  }
-
-  connect(): Promise<void> {
-    if (this.isConnected()) {
-      return Promise.resolve();
-    }
-    if (this._state === WebSocket.CONNECTING) {
-      return this._connectionManager.awaitConnection();
-    }
-    if (!this._url) {
-      return Promise.reject(
-        new ConnectionError("Cannot connect because no server was specified")
-      );
-    }
-    if (this._ws) {
-      return Promise.reject(
-        new RippleError("Websocket connection never cleaned up.", {
-          state: this._state,
-        })
-      );
-    }
-
-    // Create the connection timeout, in case the connection hangs longer than expected.
-    const connectionTimeoutID = setTimeout(() => {
-      this._onConnectionFailed(
-        new ConnectionError(
-          `Error: connect() timed out after ${this._config.connectionTimeout} ms. ` +
-            `If your internet connection is working, the rippled server may be blocked or inaccessible. ` +
-            `You can also try setting the 'connectionTimeout' option in the Client constructor.`
-        )
-      );
-    }, this._config.connectionTimeout);
-    // Connection listeners: these stay attached only until a connection is done/open.
-    this._ws = createWebSocket(this._url, this._config);
-
-    if (this._ws == null) {
-      throw new Error("Connect: created null websocket");
-    }
-
-    this._ws.on("error", this._onConnectionFailed);
-    this._ws.on("error", () => clearTimeout(connectionTimeoutID));
-    this._ws.on("close", this._onConnectionFailed);
-    this._ws.on("close", () => clearTimeout(connectionTimeoutID));
-    this._ws.once("open", async () => {
-      if (this._ws == null) {
-        throw new Error("onceOpen: ws is null");
-      }
-
-      // Once the connection completes successfully, remove all old listeners
-      this._ws.removeAllListeners();
-      clearTimeout(connectionTimeoutID);
-      // Add new, long-term connected listeners for messages and errors
-      this._ws.on("message", (message: string) => this._onMessage(message));
-      this._ws.on("error", (error) =>
-        this.emit("error", "websocket", error.message, error)
-      );
-      // Handle a closed connection: reconnect if it was unexpected
-      this._ws.once("close", (code, reason) => {
-        if (this._ws == null) {
-          throw new Error("onceClose: ws is null");
-        }
-
-        this._clearHeartbeatInterval();
-        this._requestManager.rejectAll(
-          new DisconnectedError(`websocket was closed, ${reason}`)
-        );
-        this._ws.removeAllListeners();
-        this._ws = null;
-        this.emit("disconnected", code);
-        // If this wasn't a manual disconnect, then lets reconnect ASAP.
-        if (code !== INTENTIONAL_DISCONNECT_CODE) {
-          const retryTimeout = this._retryConnectionBackoff.duration();
-          this._trace("reconnect", `Retrying connection in ${retryTimeout}ms.`);
-          this.emit("reconnecting", this._retryConnectionBackoff.attempts);
-          // Start the reconnect timeout, but set it to `this._reconnectTimeoutID`
-          // so that we can cancel one in-progress on disconnect.
-          this._reconnectTimeoutID = setTimeout(() => {
-            this.reconnect().catch((error) => {
-              this.emit("error", "reconnect", error.message, error);
-            });
-          }, retryTimeout);
-        }
-      });
-      // Finalize the connection and resolve all awaiting connect() requests
-      try {
-        this._retryConnectionBackoff.reset();
-        this._startHeartbeatInterval();
-        this._connectionManager.resolveAllAwaiting();
-        this.emit("connected");
-      } catch (error) {
-        this._connectionManager.rejectAllAwaiting(error);
-        await this.disconnect().catch(() => {}); // Ignore this error, propagate the root cause.
-      }
-    });
-    return this._connectionManager.awaitConnection();
-  }
-
-  /**
-   * Disconnect the websocket connection.
-   * We never expect this method to reject. Even on "bad" disconnects, the websocket
-   * should still successfully close with the relevant error code returned.
-   * See https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent for the full list.
-   * If no open websocket connection exists, resolve with no code (`undefined`).
-   */
-  disconnect(): Promise<number | undefined> {
-    if (this._reconnectTimeoutID !== null) {
-      clearTimeout(this._reconnectTimeoutID);
-      this._reconnectTimeoutID = null;
-    }
-    if (this._state === WebSocket.CLOSED) {
-      return Promise.resolve(undefined);
-    }
-    if (this._ws === null) {
-      return Promise.resolve(undefined);
-    }
-
-    return new Promise((resolve) => {
-      if (this._ws === null) {
-        return Promise.resolve(undefined);
-      }
-
-      this._ws.once("close", (code) => resolve(code));
-      // Connection already has a disconnect handler for the disconnect logic.
-      // Just close the websocket manually (with our "intentional" code) to
-      // trigger that.
-      if (this._ws != null && this._state !== WebSocket.CLOSING) {
-        this._ws.close(INTENTIONAL_DISCONNECT_CODE);
-      }
-    });
-  }
-
-  /**
-   * Disconnect the websocket, then connect again.
-   */
-  async reconnect() {
-    // NOTE: We currently have a "reconnecting" event, but that only triggers
-    // through an unexpected connection retry logic.
-    // See: https://github.com/ripple/ripple-lib/pull/1101#issuecomment-565360423
-    this.emit("reconnect");
-    await this.disconnect();
-    await this.connect();
-  }
-
-  async request<T extends { command: string }>(
-    request: T,
-    timeout?: number
-  ): Promise<any> {
-    if (!this._shouldBeConnected || this._ws == null) {
-      throw new NotConnectedError();
-    }
-    const [id, message, responsePromise] = this._requestManager.createRequest(
-      request,
-      timeout || this._config.timeout
-    );
-    this._trace("send", message);
-    websocketSendAsync(this._ws, message).catch((error) => {
-      this._requestManager.reject(id, error);
-    });
-
-    return responsePromise;
-  }
-
-  /**
-   * Get the Websocket connection URL.
-   *
-   * @returns The Websocket connection URL.
-   */
-  getUrl(): string {
-    return this._url ?? "";
   }
 }
