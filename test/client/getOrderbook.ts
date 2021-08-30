@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
 import { BookOffersRequest } from "../../src";
 import requests from "../fixtures/requests";
@@ -68,8 +68,7 @@ function normalRippledResponse(request: BookOffersRequest): object {
   ) {
     return rippled.book_offers.fabric.requestBookOffersAsksResponse(request);
   }
-
-  return {};
+  throw new Error("unexpected end");
 }
 
 function xrpRippledResponse(request: BookOffersRequest): object {
@@ -79,8 +78,7 @@ function xrpRippledResponse(request: BookOffersRequest): object {
   if (request.taker_gets.issuer === "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw") {
     return rippled.book_offers.usd_xrp;
   }
-
-  return {};
+  throw new Error("unexpected end");
 }
 
 /**
@@ -90,7 +88,7 @@ function xrpRippledResponse(request: BookOffersRequest): object {
  */
 export default <TestSuite>{
   async normal(client, address, mockRippled) {
-    mockRippled.addResponse({ command: "book_offers" }, normalRippledResponse);
+    mockRippled.addResponse("book_offers", normalRippledResponse);
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.normal,
@@ -100,7 +98,7 @@ export default <TestSuite>{
   },
 
   "invalid options": async (client, address, mockRippled) => {
-    mockRippled.addResponse({ command: "book_offers" }, normalRippledResponse);
+    mockRippled.addResponse("book_offers", normalRippledResponse);
     assertRejects(
       client.getOrderbook(address, requests.getOrderbook.normal, {
         // @ts-expect-error
@@ -111,7 +109,7 @@ export default <TestSuite>{
   },
 
   "with XRP": async (client, address, mockRippled) => {
-    mockRippled.addResponse({ command: "book_offers" }, xrpRippledResponse);
+    mockRippled.addResponse("book_offers", xrpRippledResponse);
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.withXRP
@@ -156,7 +154,7 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse({ command: "book_offers" }, normalRippledResponse);
+    mockRippled.addResponse("book_offers", normalRippledResponse);
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.normal
@@ -185,7 +183,7 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse({ command: "book_offers" }, normalRippledResponse);
+    mockRippled.addResponse("book_offers", normalRippledResponse);
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.normal
@@ -206,7 +204,7 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse({ command: "book_offers" }, normalRippledResponse);
+    mockRippled.addResponse("book_offers", normalRippledResponse);
     const response = await client.getOrderbook(
       address,
       requests.getOrderbook.normal

@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
 import { getFaucetUrl, FaucetNetwork } from "../src/wallet/wallet-generation";
 

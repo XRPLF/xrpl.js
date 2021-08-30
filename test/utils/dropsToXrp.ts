@@ -1,5 +1,5 @@
-import assert from "assert-diff";
 import BigNumber from "bignumber.js";
+import { assert } from "chai";
 
 import { dropsToXrp } from "../../src/utils";
 

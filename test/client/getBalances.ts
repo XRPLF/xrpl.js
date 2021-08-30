@@ -10,30 +10,18 @@ import { assertResultMatch, TestSuite } from "../testUtils";
  */
 export default <TestSuite>{
   async getBalances(client, address, mockRippled) {
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
-    mockRippled.addResponse(
-      { command: "account_lines" },
-      rippledAccountLines.normal
-    );
-    mockRippled.addResponse({ command: "ledger" }, rippled.ledger.normal);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
+    mockRippled.addResponse("account_lines", rippledAccountLines.normal);
+    mockRippled.addResponse("ledger", rippled.ledger.normal);
     const result = await client.getBalances(address);
     assertResultMatch(result, responses.getBalances, "getBalances");
   },
 
   "getBalances - limit": async (client, address, mockRippled) => {
     const options = { limit: 3, ledgerVersion: 123456 };
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
-    mockRippled.addResponse(
-      { command: "account_lines" },
-      rippledAccountLines.normal
-    );
-    mockRippled.addResponse({ command: "ledger" }, rippled.ledger.normal);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
+    mockRippled.addResponse("account_lines", rippledAccountLines.normal);
+    mockRippled.addResponse("ledger", rippled.ledger.normal);
     const expectedResponse = responses.getBalances.slice(0, 3);
     const result = await client.getBalances(address, options);
     assertResultMatch(result, expectedResponse, "getBalances");
@@ -41,15 +29,9 @@ export default <TestSuite>{
 
   "getBalances - limit & currency": async (client, address, mockRippled) => {
     const options = { currency: "USD", limit: 3 };
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
-    mockRippled.addResponse(
-      { command: "account_lines" },
-      rippledAccountLines.normal
-    );
-    mockRippled.addResponse({ command: "ledger" }, rippled.ledger.normal);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
+    mockRippled.addResponse("account_lines", rippledAccountLines.normal);
+    mockRippled.addResponse("ledger", rippled.ledger.normal);
     const expectedResponse = responses.getBalances
       .filter((item) => item.currency === "USD")
       .slice(0, 3);
@@ -67,15 +49,9 @@ export default <TestSuite>{
       counterparty: "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
       limit: 3,
     };
-    mockRippled.addResponse(
-      { command: "account_info" },
-      rippled.account_info.normal
-    );
-    mockRippled.addResponse(
-      { command: "account_lines" },
-      rippledAccountLines.normal
-    );
-    mockRippled.addResponse({ command: "ledger" }, rippled.ledger.normal);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
+    mockRippled.addResponse("account_lines", rippledAccountLines.normal);
+    mockRippled.addResponse("ledger", rippled.ledger.normal);
 
     const expectedResponse = responses.getBalances
       .filter(

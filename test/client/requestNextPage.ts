@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 
 import rippled from "../fixtures/rippled";
 import { assertRejects, TestSuite } from "../testUtils";
@@ -17,7 +17,7 @@ const rippledResponse = function (request: Request): object {
  */
 export default <TestSuite>{
   "requests the next page": async (client, address, mockRippled) => {
-    mockRippled.addResponse({ command: "ledger_data" }, rippledResponse);
+    mockRippled.addResponse("ledger_data", rippledResponse);
     const response = await client.request({ command: "ledger_data" });
     const responseNextPage = await client.requestNextPage(
       { command: "ledger_data" },
@@ -34,7 +34,7 @@ export default <TestSuite>{
     address,
     mockRippled
   ) => {
-    mockRippled.addResponse({ command: "ledger_data" }, rippledResponse);
+    mockRippled.addResponse("ledger_data", rippledResponse);
     const response = await client.request({ command: "ledger_data" });
     const responseNextPage = await client.requestNextPage(
       { command: "ledger_data" },

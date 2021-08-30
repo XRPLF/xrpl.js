@@ -1,4 +1,4 @@
-import assert from "assert-diff";
+import { assert } from "chai";
 import binary from "ripple-binary-codec";
 
 import requests from "../fixtures/requests";
