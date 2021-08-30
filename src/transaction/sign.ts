@@ -7,7 +7,7 @@ import { Client } from "..";
 import { SignedTransaction } from "../common/types/objects";
 import { xrpToDrops } from "../utils";
 import { computeBinaryTransactionHash } from "../utils/hashes";
-import Wallet from "../wallet/wallet";
+import Wallet from "../wallet/Wallet";
 
 import { SignOptions, KeyPair, TransactionJSON } from "./types";
 import * as utils from "./utils";
