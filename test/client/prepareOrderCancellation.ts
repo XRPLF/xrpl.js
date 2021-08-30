@@ -1,99 +1,123 @@
 import requests from "../fixtures/requests";
 import responses from "../fixtures/responses";
 import rippled from "../fixtures/rippled";
-import { assertRejects, assertResultMatch, TestSuite } from "../testUtils";
+import setupClient from "../setupClient";
+import { assertRejects, assertResultMatch, addressTests } from "../testUtils";
 
 const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-export default <TestSuite>{
-  async prepareOrderCancellation(client, address, mockRippled) {
-    mockRippled.addResponse("server_info", rippled.server_info.normal);
-    mockRippled.addResponse("fee", rippled.fee);
-    mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const request = requests.prepareOrderCancellation.simple;
-    const result = await client.prepareOrderCancellation(
-      address,
-      request,
-      instructionsWithMaxLedgerVersionOffset
-    );
-    assertResultMatch(
-      result,
-      responses.prepareOrderCancellation.normal,
-      "prepare"
-    );
-  },
+describe("client.prepareOrderCancellation", function () {
+  beforeEach(setupClient.setup);
+  afterEach(setupClient.teardown);
 
-  "no instructions": async (client, address, mockRippled) => {
-    mockRippled.addResponse("server_info", rippled.server_info.normal);
-    mockRippled.addResponse("fee", rippled.fee);
-    mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const request = requests.prepareOrderCancellation.simple;
-    const result = await client.prepareOrderCancellation(address, request);
-    assertResultMatch(
-      result,
-      responses.prepareOrderCancellation.noInstructions,
-      "prepare"
-    );
-  },
+  addressTests.forEach(function (test) {
+    describe(test.type, function () {
+      it("prepareOrderCancellation", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const request = requests.prepareOrderCancellation.simple;
+        const result = await this.client.prepareOrderCancellation(
+          test.address,
+          request,
+          instructionsWithMaxLedgerVersionOffset
+        );
+        assertResultMatch(
+          result,
+          responses.prepareOrderCancellation.normal,
+          "prepare"
+        );
+      });
 
-  "with memos": async (client, address, mockRippled) => {
-    mockRippled.addResponse("server_info", rippled.server_info.normal);
-    mockRippled.addResponse("fee", rippled.fee);
-    mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const request = requests.prepareOrderCancellation.withMemos;
-    const result = await client.prepareOrderCancellation(address, request);
-    assertResultMatch(
-      result,
-      responses.prepareOrderCancellation.withMemos,
-      "prepare"
-    );
-  },
+      it("no instructions", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const request = requests.prepareOrderCancellation.simple;
+        const result = await this.client.prepareOrderCancellation(
+          test.address,
+          request
+        );
+        assertResultMatch(
+          result,
+          responses.prepareOrderCancellation.noInstructions,
+          "prepare"
+        );
+      });
 
-  async invalid(client, address, mockRippled) {
-    mockRippled.addResponse("server_info", rippled.server_info.normal);
-    mockRippled.addResponse("fee", rippled.fee);
-    mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const request = {
-      ...requests.prepareOrderCancellation.withMemos,
-    };
-    delete request.orderSequence; // Make invalid
+      it("with memos", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const request = requests.prepareOrderCancellation.withMemos;
+        const result = await this.client.prepareOrderCancellation(
+          test.address,
+          request
+        );
+        assertResultMatch(
+          result,
+          responses.prepareOrderCancellation.withMemos,
+          "prepare"
+        );
+      });
 
-    await assertRejects(
-      client.prepareOrderCancellation(address, request),
-      client.errors.ValidationError,
-      'instance.orderCancellation requires property "orderSequence"'
-    );
-  },
+      it("invalid", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const request = {
+          ...requests.prepareOrderCancellation.withMemos,
+        };
+        delete request.orderSequence; // Make invalid
 
-  "with ticket": async (client, address, mockRippled) => {
-    mockRippled.addResponse("server_info", rippled.server_info.normal);
-    mockRippled.addResponse("fee", rippled.fee);
-    mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const request = requests.prepareOrderCancellation.simple;
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: "0.000012",
-      ticketSequence: 23,
-    };
-    const result = await client.prepareOrderCancellation(
-      address,
-      request,
-      localInstructions
-    );
-    assertResultMatch(
-      result,
-      responses.prepareOrderCancellation.ticket,
-      "prepare"
-    );
-  },
-};
+        await assertRejects(
+          this.client.prepareOrderCancellation(test.address, request),
+          this.client.errors.ValidationError,
+          'instance.orderCancellation requires property "orderSequence"'
+        );
+      });
+
+      it("with ticket", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const request = requests.prepareOrderCancellation.simple;
+        const localInstructions = {
+          ...instructionsWithMaxLedgerVersionOffset,
+          maxFee: "0.000012",
+          ticketSequence: 23,
+        };
+        const result = await this.client.prepareOrderCancellation(
+          test.address,
+          request,
+          localInstructions
+        );
+        assertResultMatch(
+          result,
+          responses.prepareOrderCancellation.ticket,
+          "prepare"
+        );
+      });
+    });
+  });
+});
