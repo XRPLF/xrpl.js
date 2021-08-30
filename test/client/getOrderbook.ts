@@ -4,7 +4,8 @@ import { BookOffersRequest } from "../../src";
 import requests from "../fixtures/requests";
 import responses from "../fixtures/responses";
 import rippled from "../fixtures/rippled";
-import { TestSuite, assertResultMatch, assertRejects } from "../testUtils";
+import setupClient from "../setupClient";
+import { addressTests, assertResultMatch, assertRejects } from "../testUtils";
 // import BigNumber from 'bignumber.js'
 
 // function checkSortingOfOrders(orders) {
@@ -81,137 +82,136 @@ function xrpRippledResponse(request: BookOffersRequest): object {
   throw new Error("unexpected end");
 }
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-export default <TestSuite>{
-  async normal(client, address, mockRippled) {
-    mockRippled.addResponse("book_offers", normalRippledResponse);
-    const response = await client.getOrderbook(
-      address,
-      requests.getOrderbook.normal,
-      { limit: 20 }
-    );
-    assertResultMatch(response, responses.getOrderbook.normal, "getOrderbook");
-  },
+describe("client.getOrderbook", function () {
+  beforeEach(setupClient.setup);
+  afterEach(setupClient.teardown);
 
-  "invalid options": async (client, address, mockRippled) => {
-    mockRippled.addResponse("book_offers", normalRippledResponse);
-    assertRejects(
-      client.getOrderbook(address, requests.getOrderbook.normal, {
-        // @ts-expect-error
-        invalid: "options",
-      }),
-      client.errors.ValidationError
-    );
-  },
+  addressTests.forEach(function (test) {
+    describe(test.type, function () {
+      it("normal", async function () {
+        this.mockRippled.addResponse("book_offers", normalRippledResponse);
+        const response = await this.client.getOrderbook(
+          test.address,
+          requests.getOrderbook.normal,
+          { limit: 20 }
+        );
+        assertResultMatch(
+          response,
+          responses.getOrderbook.normal,
+          "getOrderbook"
+        );
+      });
 
-  "with XRP": async (client, address, mockRippled) => {
-    mockRippled.addResponse("book_offers", xrpRippledResponse);
-    const response = await client.getOrderbook(
-      address,
-      requests.getOrderbook.withXRP
-    );
-    assertResultMatch(response, responses.getOrderbook.withXRP, "getOrderbook");
-  },
+      it("invalid options", async function () {
+        this.mockRippled.addResponse("book_offers", normalRippledResponse);
+        assertRejects(
+          this.client.getOrderbook(test.address, requests.getOrderbook.normal, {
+            invalid: "options",
+          }),
+          this.client.errors.ValidationError
+        );
+      });
 
-  // 'sample XRP/JPY book has orders sorted correctly': async (client, address, mockRippled) => {
-  //   const orderbookInfo = {
-  //     base: {
-  //       // the first currency in pair
-  //       currency: 'XRP'
-  //     },
-  //     counter: {
-  //       currency: 'JPY',
-  //       counterparty: 'rB3gZey7VWHYRqJHLoHDEJXJ2pEPNieKiS'
-  //     }
-  //   }
-  //   const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR'
-  //   const response = await client.getOrderbook(myAddress, orderbookInfo)
-  //   assert.deepStrictEqual([], response.bids)
-  //   checkSortingOfOrders(response.asks)
-  // },
+      it("with XRP", async function () {
+        this.mockRippled.addResponse("book_offers", xrpRippledResponse);
+        const response = await this.client.getOrderbook(
+          test.address,
+          requests.getOrderbook.withXRP
+        );
+        assertResultMatch(
+          response,
+          responses.getOrderbook.withXRP,
+          "getOrderbook"
+        );
+      });
 
-  // 'sample USD/XRP book has orders sorted correctly': async (client, address, mockRippled) => {
-  //   const orderbookInfo = {
-  //     counter: {currency: 'XRP'},
-  //     base: {
-  //       currency: 'USD',
-  //       counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-  //     }
-  //   }
-  //   const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR'
-  //   const response = await client.getOrderbook(myAddress, orderbookInfo)
-  //   checkSortingOfOrders(response.bids)
-  //   checkSortingOfOrders(response.asks)
-  // },
+      // 'sample XRP/JPY book has orders sorted correctly', async function () {
+      //   const orderbookInfo = {
+      //     base: {
+      //       // the first currency in pair
+      //       currency: 'XRP'
+      //     },
+      //     counter: {
+      //       currency: 'JPY',
+      //       counterparty: 'rB3gZey7VWHYRqJHLoHDEJXJ2pEPNieKiS'
+      //     }
+      //   }
+      //   const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR'
+      //   const response = await this.client.getOrderbook(myAddress, orderbookInfo)
+      //   assert.deepStrictEqual([], response.bids)
+      //   checkSortingOfOrders(response.asks)
+      // },
 
-  // WARNING: This test fails to catch the sorting bug, issue #766
-  "sorted so that best deals come first [bad test]": async (
-    client,
-    address,
-    mockRippled
-  ) => {
-    mockRippled.addResponse("book_offers", normalRippledResponse);
-    const response = await client.getOrderbook(
-      address,
-      requests.getOrderbook.normal
-    );
-    const bidRates = response.bids.map(
-      (bid) => bid.properties.makerExchangeRate
-    );
-    const askRates = response.asks.map(
-      (ask) => ask.properties.makerExchangeRate
-    );
-    // makerExchangeRate = quality = takerPays.value/takerGets.value
-    // so the best deal for the taker is the lowest makerExchangeRate
-    // bids and asks should be sorted so that the best deals come first
-    assert.deepEqual(
-      bidRates.sort((x) => Number(x)),
-      bidRates
-    );
-    assert.deepEqual(
-      askRates.sort((x) => Number(x)),
-      askRates
-    );
-  },
+      // 'sample USD/XRP book has orders sorted correctly', async function () {
+      //   const orderbookInfo = {
+      //     counter: {currency: 'XRP'},
+      //     base: {
+      //       currency: 'USD',
+      //       counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      //     }
+      //   }
+      //   const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR'
+      //   const response = await this.client.getOrderbook(myAddress, orderbookInfo)
+      //   checkSortingOfOrders(response.bids)
+      //   checkSortingOfOrders(response.asks)
+      // },
 
-  "currency & counterparty are correct": async (
-    client,
-    address,
-    mockRippled
-  ) => {
-    mockRippled.addResponse("book_offers", normalRippledResponse);
-    const response = await client.getOrderbook(
-      address,
-      requests.getOrderbook.normal
-    );
-    [...response.bids, ...response.asks].forEach((order) => {
-      const quantity = order.specification.quantity;
-      const totalPrice = order.specification.totalPrice;
-      const { base, counter } = requests.getOrderbook.normal;
-      assert.strictEqual(quantity.currency, base.currency);
-      assert.strictEqual(quantity.counterparty, base.counterparty);
-      assert.strictEqual(totalPrice.currency, counter.currency);
-      assert.strictEqual(totalPrice.counterparty, counter.counterparty);
+      // WARNING: This test fails to catch the sorting bug, issue #766
+      it("sorted so that best deals come first [bad test]", async function () {
+        this.mockRippled.addResponse("book_offers", normalRippledResponse);
+        const response = await this.client.getOrderbook(
+          test.address,
+          requests.getOrderbook.normal
+        );
+        const bidRates = response.bids.map(
+          (bid) => bid.properties.makerExchangeRate
+        );
+        const askRates = response.asks.map(
+          (ask) => ask.properties.makerExchangeRate
+        );
+        // makerExchangeRate = quality = takerPays.value/takerGets.value
+        // so the best deal for the taker is the lowest makerExchangeRate
+        // bids and asks should be sorted so that the best deals come first
+        assert.deepEqual(
+          bidRates.sort((x) => Number(x)),
+          bidRates
+        );
+        assert.deepEqual(
+          askRates.sort((x) => Number(x)),
+          askRates
+        );
+      });
+
+      it("currency & counterparty are correct", async function () {
+        this.mockRippled.addResponse("book_offers", normalRippledResponse);
+        const response = await this.client.getOrderbook(
+          test.address,
+          requests.getOrderbook.normal
+        );
+        [...response.bids, ...response.asks].forEach((order) => {
+          const quantity = order.specification.quantity;
+          const totalPrice = order.specification.totalPrice;
+          const { base, counter } = requests.getOrderbook.normal;
+          assert.strictEqual(quantity.currency, base.currency);
+          assert.strictEqual(quantity.counterparty, base.counterparty);
+          assert.strictEqual(totalPrice.currency, counter.currency);
+          assert.strictEqual(totalPrice.counterparty, counter.counterparty);
+        });
+      });
+
+      it("direction is correct for bids and asks", async function () {
+        this.mockRippled.addResponse("book_offers", normalRippledResponse);
+        const response = await this.client.getOrderbook(
+          test.address,
+          requests.getOrderbook.normal
+        );
+        assert(
+          response.bids.every((bid) => bid.specification.direction === "buy")
+        );
+        assert(
+          response.asks.every((ask) => ask.specification.direction === "sell")
+        );
+      });
     });
-  },
-
-  "direction is correct for bids and asks": async (
-    client,
-    address,
-    mockRippled
-  ) => {
-    mockRippled.addResponse("book_offers", normalRippledResponse);
-    const response = await client.getOrderbook(
-      address,
-      requests.getOrderbook.normal
-    );
-    assert(response.bids.every((bid) => bid.specification.direction === "buy"));
-    assert(
-      response.asks.every((ask) => ask.specification.direction === "sell")
-    );
-  },
-};
+  });
+});
