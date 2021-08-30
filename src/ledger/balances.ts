@@ -1,5 +1,5 @@
-import { Client } from "..";
-import { Connection } from "../client";
+import type { Client } from "..";
+import type { Connection } from "../client";
 import { ensureClassicAddress } from "../common";
 import { FormattedTrustline } from "../common/types/objects/trustlines";
 

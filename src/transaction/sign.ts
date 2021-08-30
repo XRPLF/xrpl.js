@@ -206,7 +206,7 @@ function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
  */
 function checkFee(client: Client, txFee: string): void {
   const fee = new BigNumber(txFee);
-  const maxFeeDrops = xrpToDrops(client._maxFeeXRP);
+  const maxFeeDrops = xrpToDrops(client.maxFeeXRP);
   if (fee.isGreaterThan(maxFeeDrops)) {
     throw new utils.common.errors.ValidationError(
       `"Fee" should not exceed "${maxFeeDrops}". ` +

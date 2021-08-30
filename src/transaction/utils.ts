@@ -307,11 +307,11 @@ async function prepareTransaction(
       instructions.signersCount == null ? 1 : instructions.signersCount + 1;
     if (instructions.fee != null) {
       const fee = new BigNumber(instructions.fee);
-      if (fee.isGreaterThan(client._maxFeeXRP)) {
+      if (fee.isGreaterThan(client.maxFeeXRP)) {
         return Promise.reject(
           new ValidationError(
             `Fee of ${fee.toString(10)} XRP exceeds ` +
-              `max of ${client._maxFeeXRP} XRP. To use this fee, increase ` +
+              `max of ${client.maxFeeXRP} XRP. To use this fee, increase ` +
               "`maxFeeXRP` in the Client constructor."
           )
         );
@@ -338,8 +338,8 @@ async function prepareTransaction(
                   ));
           const feeDrops = xrpToDrops(fee);
           const maxFeeXRP = instructions.maxFee
-            ? BigNumber.min(client._maxFeeXRP, instructions.maxFee)
-            : client._maxFeeXRP;
+            ? BigNumber.min(client.maxFeeXRP, instructions.maxFee)
+            : client.maxFeeXRP;
           const maxFeeDrops = xrpToDrops(maxFeeXRP);
           const normalFee = scaleValue(feeDrops, multiplier, extraFee);
           newTxJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString(10);

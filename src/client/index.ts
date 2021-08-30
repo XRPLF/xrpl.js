@@ -1,3 +1,6 @@
+/* eslint-disable import/max-dependencies -- Client needs a lot of dependencies by definition */
+/* eslint-disable @typescript-eslint/member-ordering -- TODO: remove when instance methods aren't members */
+/* eslint-disable max-lines -- This might not be necessary later, but this file needs to be big right now */
 import { EventEmitter } from "events";
 
 import {
@@ -130,7 +133,8 @@ export interface ClientOptions extends ConnectionUserOptions {
  * command. This varies from command to command, but we need to know it to
  * properly count across many requests.
  *
- * @param command
+ * @param command - The rippled request command.
+ * @returns The property key corresponding to the command.
  */
 function getCollectKeyFromCommand(command: string): string | null {
   switch (command) {
@@ -169,18 +173,23 @@ type MarkerResponse =
   | LedgerDataResponse;
 
 class Client extends EventEmitter {
-  // Factor to multiply estimated fee by to provide a cushion in case the
-  // required fee rises during submission of a transaction. Defaults to 1.2.
-  _feeCushion: number;
-  // Maximum fee to use with transactions, in XRP. Must be a string-encoded
-  // number. Defaults to '2'.
-  _maxFeeXRP: string;
-
   // New in > 0.21.0
   // non-validated ledger versions are allowed, and passed to rippled as-is.
-  connection: Connection;
+  public readonly connection: Connection;
 
-  constructor(server: string, options: ClientOptions = {}) {
+  // Factor to multiply estimated fee by to provide a cushion in case the
+  // required fee rises during submission of a transaction. Defaults to 1.2.
+  private readonly feeCushion: number;
+  // Maximum fee to use with transactions, in XRP. Must be a string-encoded
+  // number. Defaults to '2'.
+  private readonly maxFeeXRP: string;
+
+  /**
+   *
+   * @param server
+   * @param options
+   */
+  public constructor(server: string, options: ClientOptions = {}) {
     super();
     if (typeof server !== "string" || !/^(wss?|wss?\+unix):\/\//.exec(server)) {
       throw new ValidationError(
@@ -188,8 +197,8 @@ class Client extends EventEmitter {
       );
     }
 
-    this._feeCushion = options.feeCushion || 1.2;
-    this._maxFeeXRP = options.maxFeeXRP || "2";
+    this.feeCushion = options.feeCushion || 1.2;
+    this.maxFeeXRP = options.maxFeeXRP || "2";
 
     this.connection = new Connection(server, options);
 
@@ -201,7 +210,7 @@ class Client extends EventEmitter {
       this.emit("connected");
     });
 
-    this.connection.on("disconnected", (code) => {
+    this.connection.on("disconnected", (code: number) => {
       let finalCode = code;
       // 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
       // Since 4000 is a normal disconnect reason, we convert this to the standard exit code 1000
@@ -209,56 +218,6 @@ class Client extends EventEmitter {
         finalCode = 1000;
       }
       this.emit("disconnected", finalCode);
-    });
-  }
-
-  /**
-   * Makes a request to the client with the given command and
-   * additional request body parameters.
-   */
-  public request(r: AccountChannelsRequest): Promise<AccountChannelsResponse>;
-  public request(
-    r: AccountCurrenciesRequest
-  ): Promise<AccountCurrenciesResponse>;
-  public request(r: AccountInfoRequest): Promise<AccountInfoResponse>;
-  public request(r: AccountLinesRequest): Promise<AccountLinesResponse>;
-  public request(r: AccountObjectsRequest): Promise<AccountObjectsResponse>;
-  public request(r: AccountOffersRequest): Promise<AccountOffersResponse>;
-  public request(r: AccountTxRequest): Promise<AccountTxResponse>;
-  public request(r: BookOffersRequest): Promise<BookOffersResponse>;
-  public request(r: ChannelVerifyRequest): Promise<ChannelVerifyResponse>;
-  public request(
-    r: DepositAuthorizedRequest
-  ): Promise<DepositAuthorizedResponse>;
-  public request(r: FeeRequest): Promise<FeeResponse>;
-  public request(r: GatewayBalancesRequest): Promise<GatewayBalancesResponse>;
-  public request(r: LedgerRequest): Promise<LedgerResponse>;
-  public request(r: LedgerClosedRequest): Promise<LedgerClosedResponse>;
-  public request(r: LedgerCurrentRequest): Promise<LedgerCurrentResponse>;
-  public request(r: LedgerDataRequest): Promise<LedgerDataResponse>;
-  public request(r: LedgerEntryRequest): Promise<LedgerEntryResponse>;
-  public request(r: ManifestRequest): Promise<ManifestResponse>;
-  public request(r: NoRippleCheckRequest): Promise<NoRippleCheckResponse>;
-  public request(r: PathFindRequest): Promise<PathFindResponse>;
-  public request(r: PingRequest): Promise<PingResponse>;
-  public request(r: RandomRequest): Promise<RandomResponse>;
-  public request(r: RipplePathFindRequest): Promise<RipplePathFindResponse>;
-  public request(r: ServerInfoRequest): Promise<ServerInfoResponse>;
-  public request(r: ServerStateRequest): Promise<ServerStateResponse>;
-  public request(r: SubmitRequest): Promise<SubmitResponse>;
-  public request(
-    r: SubmitMultisignedRequest
-  ): Promise<SubmitMultisignedResponse>;
-  public request(r: TransactionEntryRequest): Promise<TransactionEntryResponse>;
-  public request(r: TxRequest): Promise<TxResponse>;
-  public async request<R extends Request, T extends Response>(
-    r: R
-  ): Promise<T> {
-    // TODO: should this be typed with `extends BaseRequest/BaseResponse`?
-    return this.connection.request({
-      ...r,
-      // @ts-expect-error
-      account: r.account ? ensureClassicAddress(r.account) : undefined,
     });
   }
 
@@ -271,39 +230,100 @@ class Client extends EventEmitter {
    * See https://ripple.com/build/rippled-apis/#markers-and-pagination.
    *
    * @param response
+   * @returns
    */
-  hasNextPage(response: MarkerResponse): boolean {
+  public static hasNextPage(response: MarkerResponse): boolean {
     return Boolean(response.result.marker);
   }
 
-  async requestNextPage(
+  /**
+   * Makes a request to the client with the given command and
+   * additional request body parameters.
+   *
+   * @param req
+   * @returns
+   */
+  public async request(
+    r: AccountChannelsRequest
+  ): Promise<AccountChannelsResponse>;
+  public async request(
+    r: AccountCurrenciesRequest
+  ): Promise<AccountCurrenciesResponse>;
+  public async request(r: AccountInfoRequest): Promise<AccountInfoResponse>;
+  public async request(r: AccountLinesRequest): Promise<AccountLinesResponse>;
+  public async request(
+    r: AccountObjectsRequest
+  ): Promise<AccountObjectsResponse>;
+  public async request(r: AccountOffersRequest): Promise<AccountOffersResponse>;
+  public async request(r: AccountTxRequest): Promise<AccountTxResponse>;
+  public async request(r: BookOffersRequest): Promise<BookOffersResponse>;
+  public async request(r: ChannelVerifyRequest): Promise<ChannelVerifyResponse>;
+  public async request(
+    r: DepositAuthorizedRequest
+  ): Promise<DepositAuthorizedResponse>;
+  public async request(r: FeeRequest): Promise<FeeResponse>;
+  public async request(
+    r: GatewayBalancesRequest
+  ): Promise<GatewayBalancesResponse>;
+  public async request(r: LedgerRequest): Promise<LedgerResponse>;
+  public async request(r: LedgerClosedRequest): Promise<LedgerClosedResponse>;
+  public async request(r: LedgerCurrentRequest): Promise<LedgerCurrentResponse>;
+  public async request(r: LedgerDataRequest): Promise<LedgerDataResponse>;
+  public async request(r: LedgerEntryRequest): Promise<LedgerEntryResponse>;
+  public async request(r: ManifestRequest): Promise<ManifestResponse>;
+  public async request(r: NoRippleCheckRequest): Promise<NoRippleCheckResponse>;
+  public async request(r: PathFindRequest): Promise<PathFindResponse>;
+  public async request(r: PingRequest): Promise<PingResponse>;
+  public async request(r: RandomRequest): Promise<RandomResponse>;
+  public async request(
+    r: RipplePathFindRequest
+  ): Promise<RipplePathFindResponse>;
+  public async request(r: ServerInfoRequest): Promise<ServerInfoResponse>;
+  public async request(r: ServerStateRequest): Promise<ServerStateResponse>;
+  public async request(r: SubmitRequest): Promise<SubmitResponse>;
+  public async request(
+    r: SubmitMultisignedRequest
+  ): Promise<SubmitMultisignedResponse>;
+  public request(r: TransactionEntryRequest): Promise<TransactionEntryResponse>;
+  public request(r: TxRequest): Promise<TxResponse>;
+  public async request<R extends Request, T extends Response>(
+    r: R
+  ): Promise<T> {
+    // TODO: should this be typed with `extends BaseRequest/BaseResponse`?
+    return this.connection.request({
+      ...req,
+      account: req.account ? ensureClassicAddress(req.account) : undefined,
+    });
+  }
+
+  public async requestNextPage(
     req: AccountChannelsRequest,
     resp: AccountChannelsResponse
   ): Promise<AccountChannelsResponse>;
-  async requestNextPage(
+  public async requestNextPage(
     req: AccountLinesRequest,
     resp: AccountLinesResponse
   ): Promise<AccountLinesResponse>;
-  async requestNextPage(
+  public async requestNextPage(
     req: AccountObjectsRequest,
     resp: AccountObjectsResponse
   ): Promise<AccountObjectsResponse>;
-  async requestNextPage(
+  public async requestNextPage(
     req: AccountOffersRequest,
     resp: AccountOffersResponse
   ): Promise<AccountOffersResponse>;
-  async requestNextPage(
+  public async requestNextPage(
     req: AccountTxRequest,
     resp: AccountTxResponse
   ): Promise<AccountTxResponse>;
-  async requestNextPage(
+  public async requestNextPage(
     req: LedgerDataRequest,
     resp: LedgerDataResponse
   ): Promise<LedgerDataResponse>;
-  async requestNextPage<T extends MarkerRequest, U extends MarkerResponse>(
-    req: T,
-    resp: U
-  ): Promise<U> {
+  public async requestNextPage<
+    T extends MarkerRequest,
+    U extends MarkerResponse
+  >(req: T, resp: U): Promise<U> {
     if (!resp.result.marker) {
       return Promise.reject(
         new errors.NotFoundError("response does not have a next page")
@@ -318,10 +338,11 @@ class Client extends EventEmitter {
    *
    * You can later submit the transaction with a `submit` request.
    *
-   * @param txJSON
-   * @param instructions
+   * @param txJSON - TODO: will be deleted.
+   * @param instructions - TODO: will be deleted.
+   * @returns TODO: will be deleted.
    */
-  async prepareTransaction(
+  public async prepareTransaction(
     txJSON: TransactionJSON,
     instructions: Instructions = {}
   ): Promise<Prepare> {
@@ -334,8 +355,9 @@ class Client extends EventEmitter {
    * This can be used to generate `MemoData`, `MemoType`, and `MemoFormat`.
    *
    * @param string - String to convert to hex.
+   * @returns TODO: will be moved to utils.
    */
-  convertStringToHex(string: string): string {
+  public convertStringToHex(string: string): string {
     return transactionUtils.convertStringToHex(string);
   }
 
@@ -352,25 +374,33 @@ class Client extends EventEmitter {
    * general use. Instead, use rippled's built-in pagination and make multiple
    * requests as needed.
    */
-  async requestAll(
+  public async requestAll(
     req: AccountChannelsRequest
   ): Promise<AccountChannelsResponse[]>;
-  async requestAll(req: AccountLinesRequest): Promise<AccountLinesResponse[]>;
-  async requestAll(
+  public async requestAll(
+    req: AccountLinesRequest
+  ): Promise<AccountLinesResponse[]>;
+  public async requestAll(
     req: AccountObjectsRequest
   ): Promise<AccountObjectsResponse[]>;
-  async requestAll(req: AccountOffersRequest): Promise<AccountOffersResponse[]>;
-  async requestAll(req: AccountTxRequest): Promise<AccountTxResponse[]>;
-  async requestAll(req: BookOffersRequest): Promise<BookOffersResponse[]>;
-  async requestAll(req: LedgerDataRequest): Promise<LedgerDataResponse[]>;
-  async requestAll<T extends MarkerRequest, U extends MarkerResponse>(
+  public async requestAll(
+    req: AccountOffersRequest
+  ): Promise<AccountOffersResponse[]>;
+  public async requestAll(req: AccountTxRequest): Promise<AccountTxResponse[]>;
+  public async requestAll(
+    req: BookOffersRequest
+  ): Promise<BookOffersResponse[]>;
+  public async requestAll(
+    req: LedgerDataRequest
+  ): Promise<LedgerDataResponse[]>;
+  public async requestAll<T extends MarkerRequest, U extends MarkerResponse>(
     request: T,
     options: { collect?: string } = {}
   ): Promise<U[]> {
     // The data under collection is keyed based on the command. Fail if command
     // not recognized and collection key not provided.
     const collectKey =
-      options.collect || getCollectKeyFromCommand(request.command);
+      options.collect ?? getCollectKeyFromCommand(request.command);
     if (!collectKey) {
       throw new errors.ValidationError(
         `no collect key for command ${request.command}`
@@ -378,11 +408,11 @@ class Client extends EventEmitter {
     }
     // If limit is not provided, fetches all data over multiple requests.
     // NOTE: This may return much more than needed. Set limit when possible.
-    const countTo: number = request.limit != null ? request.limit : Infinity;
+    const countTo: number = request.limit == null ? Infinity : request.limit;
     let count = 0;
-    let marker = request.marker;
+    let marker: unknown = request.marker;
     let lastBatchLength: number;
-    const results: any[] = [];
+    const results: U[] = [];
     do {
       const countRemaining = clamp(countTo - count, 10, 400);
       const repeatProps = {
@@ -407,76 +437,85 @@ class Client extends EventEmitter {
     return results;
   }
 
-  isConnected(): boolean {
+  /**
+   *
+   */
+  public isConnected(): boolean {
     return this.connection.isConnected();
   }
 
-  async connect(): Promise<void> {
+  /**
+   *
+   */
+  public async connect(): Promise<void> {
     return this.connection.connect();
   }
 
-  async disconnect(): Promise<void> {
+  /**
+   *
+   */
+  public async disconnect(): Promise<void> {
     // backwards compatibility: connection.disconnect() can return a number, but
     // this method returns nothing. SO we await but don't return any result.
     await this.connection.disconnect();
   }
 
-  getFee = getFee;
+  public getFee = getFee;
 
-  getTrustlines = getTrustlines;
-  getBalances = getBalances;
-  getPaths = getPaths;
-  getOrderbook = getOrderbook;
+  public getTrustlines = getTrustlines;
+  public getBalances = getBalances;
+  public getPaths = getPaths;
+  public getOrderbook = getOrderbook;
 
-  preparePayment = preparePayment;
-  prepareTrustline = prepareTrustline;
-  prepareOrder = prepareOrder;
-  prepareOrderCancellation = prepareOrderCancellation;
-  prepareEscrowCreation = prepareEscrowCreation;
-  prepareEscrowExecution = prepareEscrowExecution;
-  prepareEscrowCancellation = prepareEscrowCancellation;
-  preparePaymentChannelCreate = preparePaymentChannelCreate;
-  preparePaymentChannelFund = preparePaymentChannelFund;
-  preparePaymentChannelClaim = preparePaymentChannelClaim;
-  prepareCheckCreate = prepareCheckCreate;
-  prepareCheckCash = prepareCheckCash;
-  prepareCheckCancel = prepareCheckCancel;
-  prepareTicketCreate = prepareTicketCreate;
-  prepareSettings = prepareSettings;
-  sign = sign;
-  combine = combine;
+  public preparePayment = preparePayment;
+  public prepareTrustline = prepareTrustline;
+  public prepareOrder = prepareOrder;
+  public prepareOrderCancellation = prepareOrderCancellation;
+  public prepareEscrowCreation = prepareEscrowCreation;
+  public prepareEscrowExecution = prepareEscrowExecution;
+  public prepareEscrowCancellation = prepareEscrowCancellation;
+  public preparePaymentChannelCreate = preparePaymentChannelCreate;
+  public preparePaymentChannelFund = preparePaymentChannelFund;
+  public preparePaymentChannelClaim = preparePaymentChannelClaim;
+  public prepareCheckCreate = prepareCheckCreate;
+  public prepareCheckCash = prepareCheckCash;
+  public prepareCheckCancel = prepareCheckCancel;
+  public prepareTicketCreate = prepareTicketCreate;
+  public prepareSettings = prepareSettings;
+  public sign = sign;
+  public combine = combine;
 
-  generateFaucetWallet = generateFaucetWallet;
+  public generateFaucetWallet = generateFaucetWallet;
 
-  errors = errors;
+  public errors = errors;
 
-  static deriveXAddress = deriveXAddress;
+  public static deriveXAddress = deriveXAddress;
 
   // Client.deriveClassicAddress (static) is a new name for client.deriveAddress
-  static deriveClassicAddress = deriveAddress;
+  public static deriveClassicAddress = deriveAddress;
 
-  static formatBidsAndAsks = formatBidsAndAsks;
+  public static formatBidsAndAsks = formatBidsAndAsks;
 
   /**
    * Static methods to expose ripple-address-codec methods.
    */
-  static classicAddressToXAddress = classicAddressToXAddress;
-  static xAddressToClassicAddress = xAddressToClassicAddress;
-  static isValidXAddress = isValidXAddress;
-  static isValidClassicAddress = isValidClassicAddress;
-  static encodeSeed = encodeSeed;
-  static decodeSeed = decodeSeed;
-  static encodeAccountID = encodeAccountID;
-  static decodeAccountID = decodeAccountID;
-  static encodeNodePublic = encodeNodePublic;
-  static decodeNodePublic = decodeNodePublic;
-  static encodeAccountPublic = encodeAccountPublic;
-  static decodeAccountPublic = decodeAccountPublic;
-  static encodeXAddress = encodeXAddress;
-  static decodeXAddress = decodeXAddress;
+  public static classicAddressToXAddress = classicAddressToXAddress;
+  public static xAddressToClassicAddress = xAddressToClassicAddress;
+  public static isValidXAddress = isValidXAddress;
+  public static isValidClassicAddress = isValidClassicAddress;
+  public static encodeSeed = encodeSeed;
+  public static decodeSeed = decodeSeed;
+  public static encodeAccountID = encodeAccountID;
+  public static decodeAccountID = decodeAccountID;
+  public static encodeNodePublic = encodeNodePublic;
+  public static decodeNodePublic = decodeNodePublic;
+  public static encodeAccountPublic = encodeAccountPublic;
+  public static decodeAccountPublic = decodeAccountPublic;
+  public static encodeXAddress = encodeXAddress;
+  public static decodeXAddress = decodeXAddress;
 
-  txFlags = txFlags;
-  static accountSetFlags = constants.AccountSetFlags;
+  public txFlags = txFlags;
+  public static accountSetFlags = constants.AccountSetFlags;
 }
 
 export { Client, Connection };

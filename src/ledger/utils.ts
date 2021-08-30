@@ -2,8 +2,8 @@ import * as assert from "assert";
 
 import _ from "lodash";
 
-import { Client, dropsToXrp } from "..";
-import { Connection } from "../client";
+import type { Client, dropsToXrp } from "..";
+import type { Connection } from "../client";
 import * as common from "../common";
 import { Issue } from "../common/types/objects";
 import { AccountInfoRequest } from "../models/methods";

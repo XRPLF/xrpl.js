@@ -63,7 +63,7 @@ module.exports = {
         skipComments: true,
       },
     ],
-    "max-statements": ["warn", 20],
+    "max-statements": ["warn", 25],
   },
   overrides: [
     {
