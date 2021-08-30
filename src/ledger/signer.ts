@@ -19,7 +19,6 @@ import { Transaction } from "../models/transactions";
 import { verifyBaseTransaction } from "../models/transactions/common";
 import { computeBinaryTransactionHash } from "../utils";
 import Wallet from "../Wallet";
-// import { sign as signWithKeypair } from 'ripple-keypairs'
 
 function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
   return wallet.signTransaction(tx, { signAs: "" });
@@ -99,7 +98,6 @@ function getTransactionWithAllSigners(
  */
 function combine(signedTransactions: string[]): SignedTransaction {
   const transactions: Transaction[] = signedTransactions.map((tx: string) => {
-    console.log(tx);
     return decode(tx);
   }) as unknown as Transaction[];
 
@@ -155,9 +153,6 @@ function multisign(
   const encodedTransactions: string[] = transactions.map((txOrBlob) =>
     getEncodedTransaction(txOrBlob)
   );
-
-  console.log("Input");
-  console.log(transactions);
 
   return combine(encodedTransactions);
 }

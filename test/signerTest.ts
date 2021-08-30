@@ -1,7 +1,5 @@
 import { assert } from "chai";
-
 import { sign, authorizeChannel, multisign } from "xrpl-local/ledger/signer";
-
 import { decode } from "../ripple-binary-codec";
 import { ValidationError } from "../src/common/errors";
 import { SignedTransaction } from "../src/common/types/objects";
@@ -27,15 +25,26 @@ const tx: Transaction = {
 
 describe("Signer tests", function () {
   it("sign transaction offline", function () {
-    const wallet = new Wallet(publicKey, privateKey);
+    // Test case data generated using this tutorial - https://xrpl.org/send-xrp.html#send-xrp
+    const seed = "ss1x3KLrSvfg7irFc1D929WXZ7z9H";
+    const tx3: Transaction = {
+      TransactionType: "Payment",
+      Account: "rHLEki8gPUMnF72JnuALvnAMRhRemzhRke",
+      Amount: "22000000",
+      Destination: "rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe",
+      Flags: 2147483648,
+      LastLedgerSequence: 20582339,
+      Fee: "12",
+      Sequence: 20582260,
+    };
+    const signedTxBlob =
+      "120000228000000024013A0F74201B013A0FC36140000000014FB18068400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F544744730450221009ECB5324717E14DD6970126271F05BC2626D2A8FA9F3797555D417F8257C1E6002206BDD74A0F30425F2BA9DB69C90F21B3E27735C190FB4F3A640F066ACBBF06AD98114B3263BD0A9BF9DFDBBBBD07F536355FF477BF0E98314F667B0CA50CC7709A220B0561B85E53A48461FA8";
 
-    // WHEN signing a transaction offline
-    const signedTx: SignedTransaction = sign(wallet, tx);
+    const wallet = Wallet.fromSeed(seed);
 
-    // THEN we get a signedTransaction
-    // schemaValidator.schemaValidate('sign', signedTx)
-    // TODO: Figure out how we validate the return result of sign
-    signedTx;
+    const signedTx: SignedTransaction = sign(wallet, tx3);
+
+    assert.equal(signedTx.signedTransaction, signedTxBlob);
   });
 
   it("multisigns successfully", function () {
