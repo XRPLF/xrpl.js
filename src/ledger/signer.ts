@@ -1,34 +1,49 @@
 import { BigNumber } from "bignumber.js";
 import { decodeAccountID } from "ripple-address-codec";
 import { ValidationError } from "../common/errors";
-import { encode, decode, encodeForSigningClaim } from 'ripple-binary-codec'
+import { encode, decode, encodeForSigningClaim } from "ripple-binary-codec";
 import { Transaction } from "../models/transactions";
 import Wallet from "../Wallet";
 import { computeBinaryTransactionHash } from "../utils";
 import { flatMap } from "lodash";
 import { SignedTransaction } from "../common/types/objects";
 import { verifyBaseTransaction } from "../models/transactions/common";
-//import { sign as signWithKeypair, verify as verifySignature } from 'ripple-keypairs'
-import { sign as signWithKeypair } from 'ripple-keypairs'
-import { Signer } from "../../../../src/models/common";
+import {
+  sign as signWithKeypair,
+  verify as verifySignature,
+} from "ripple-keypairs";
+import { Signer } from "../models/common";
+import { encodeForSigning } from "../../ripple-binary-codec";
+//import { sign as signWithKeypair } from 'ripple-keypairs'
 
 function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
-    return wallet.signTransaction(tx, { signAs: '' })
+  return wallet.signTransaction(tx, { signAs: "" });
 }
 
 /**
  * The transactions should all be equal except for the 'Signers' field.
  */
- function validateTransactionEquivalence(transactions: Transaction[]) {
-  const exampleTransaction = JSON.stringify({...transactions[0], Signers: null})
-  if (transactions.slice(1).some(tx => JSON.stringify({...tx, Signers: null}) !== exampleTransaction)) {
-    throw new ValidationError('txJSON is not the same for all signedTransactions')
+function validateTransactionEquivalence(transactions: Transaction[]) {
+  const exampleTransaction = JSON.stringify({
+    ...transactions[0],
+    Signers: null,
+  });
+  if (
+    transactions
+      .slice(1)
+      .some(
+        (tx) => JSON.stringify({ ...tx, Signers: null }) !== exampleTransaction
+      )
+  ) {
+    throw new ValidationError(
+      "txJSON is not the same for all signedTransactions"
+    );
   }
 }
 
 function addressToBigNumber(address) {
-  const hex = Buffer.from(decodeAccountID(address)).toString('hex')
-  return new BigNumber(hex, 16)
+  const hex = Buffer.from(decodeAccountID(address)).toString("hex");
+  return new BigNumber(hex, 16);
 }
 
 /**
@@ -40,16 +55,18 @@ function addressToBigNumber(address) {
 function compareSigners(a, b) {
   return addressToBigNumber(a.Signer.Account).comparedTo(
     addressToBigNumber(b.Signer.Account)
-  )
+  );
 }
 
-function getTransactionWithAllSigners(transactions: Transaction[]): Transaction {
+function getTransactionWithAllSigners(
+  transactions: Transaction[]
+): Transaction {
   // Signers must be sorted - see compareSigners for more details
-  const sortedSigners = flatMap(transactions, tx => (tx.Signers as Signer[]))
-    .filter(signer => signer)
-    .sort(compareSigners)
+  const sortedSigners = flatMap(transactions, (tx) => tx.Signers as Signer[])
+    .filter((signer) => signer)
+    .sort(compareSigners);
 
-  return {...transactions[0], Signers: sortedSigners}
+  return { ...transactions[0], Signers: sortedSigners };
 }
 
 /**
@@ -60,72 +77,89 @@ function getTransactionWithAllSigners(transactions: Transaction[]): Transaction 
  * with a transaction id based on the combined transaction.
  */
 function combine(signedTransactions: string[]): SignedTransaction {
-  const transactions: Transaction[] = signedTransactions.map(decode) as unknown as Transaction[];
+  const transactions: Transaction[] = signedTransactions.map((tx: string) => {
+    console.log(tx);
+    return decode(tx);
+  }) as unknown as Transaction[];
 
-  transactions.forEach(tx => verify(tx))
-  validateTransactionEquivalence(transactions)
+  transactions.forEach((tx) => verify(tx));
+  validateTransactionEquivalence(transactions);
 
-  const signedTransaction = encode(getTransactionWithAllSigners(transactions))
+  const signedTransaction = encode(getTransactionWithAllSigners(transactions));
   return {
     signedTransaction: signedTransaction,
-    id: computeBinaryTransactionHash(signedTransaction)
-  }
+    id: computeBinaryTransactionHash(signedTransaction),
+  };
 }
 
-function getDecodedTransaction(txOrBlob: (Transaction | string)): Transaction {
-  if(typeof (txOrBlob) === "object") {
-      return txOrBlob as Transaction
+function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
+  if (typeof txOrBlob === "object") {
+    return txOrBlob as Transaction;
   } else {
-      return decode(txOrBlob) as unknown as Transaction
+    return decode(txOrBlob) as unknown as Transaction;
   }
 }
 
-function getEncodedTransaction(txOrBlob: (Transaction | string)): string {
-  if(typeof txOrBlob === "object") {
-      return encode(JSON.parse(JSON.stringify(txOrBlob)))
+function getEncodedTransaction(txOrBlob: Transaction | string): string {
+  if (typeof txOrBlob === "object") {
+    return encode(JSON.parse(JSON.stringify(txOrBlob)));
   } else {
-      return txOrBlob as string
+    return txOrBlob as string;
   }
 }
 
-function multisign(transactions: ((Transaction | string)[])): SignedTransaction {
+function multisign(transactions: (Transaction | string)[]): SignedTransaction {
+  if (transactions.length == 0) {
+    throw new ValidationError("There were 0 transactions given to multisign");
+  }
 
-    if(transactions.length == 0) {
-        throw new ValidationError("There were 0 transactions given to multisign")
+  transactions.forEach((txOrBlob) => {
+    const tx = getDecodedTransaction(txOrBlob);
+    verifyBaseTransaction(tx);
+
+    if (tx.SigningPubKey !== "") {
+      throw new ValidationError(
+        "For multisigning the transaction must include the SigningPubKey field as an empty string."
+      );
     }
 
-    transactions.forEach(txOrBlob => {
-        const tx = getDecodedTransaction(txOrBlob)
-        verifyBaseTransaction(tx)
+    if (tx.Signers === undefined) {
+      throw new ValidationError(
+        "For multisigning the transaction must include a Signers field containing an array of signatures."
+      );
+    }
+  });
 
-        if(tx.SigningPubKey !== "") {
-            throw new ValidationError("For multisigning the transaction must include the SigningPubKey field as an empty string.")
-        }
+  const encodedTransactions: string[] = transactions.map((txOrBlob) =>
+    getEncodedTransaction(txOrBlob)
+  );
 
-        if(tx.Signers === undefined) {
-            throw new ValidationError("For multisigning the transaction must include a Signers field containing an array of signatures.")
-        }
-    })
+  console.log("Input");
+  console.log(transactions);
 
-    const encodedTransactions: string[] = transactions.map(txOrBlob => getEncodedTransaction(txOrBlob))
-
-    return combine(encodedTransactions)
+  return combine(encodedTransactions);
 }
 
-function authorizeChannel(wallet: Wallet, channelId: string, amount: string): string {
-    const signingData = encodeForSigningClaim({
-      channel: channelId,
-      amount: amount
-    })
-    console.log("Signing Data:")
-    console.log(signingData)
-    return signWithKeypair(signingData, wallet.privateKey)
+function authorizeChannel(
+  wallet: Wallet,
+  channelId: string,
+  amount: string
+): string {
+  const signingData = encodeForSigningClaim({
+    channel: channelId,
+    amount: amount,
+  });
+
+  return signWithKeypair(signingData, wallet.privateKey);
 }
 
-function verify(tx: Transaction): void {
-  //Verify tx.TxnSignature by using tx.SigningPubKey
-  //TODO: Check whether we need to remove the TxnSignature and SigningPubKey fields before encoding
-  //verifySignature(encode(tx), tx.TxnSignature, tx.SigningPubKey)
+function verify(tx: Transaction | string): boolean {
+  const encodedTx: Transaction = getDecodedTransaction(tx);
+  return verifySignature(
+    encodeForSigning(encodedTx),
+    encodedTx.TxnSignature,
+    encodedTx.SigningPubKey
+  );
 }
 
-export { sign, multisign, authorizeChannel, verify }
+export { sign, multisign, authorizeChannel, verify };
