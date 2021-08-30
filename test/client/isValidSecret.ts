@@ -1,13 +1,16 @@
 import { assert } from "chai";
 
-import { TestSuite } from "../testUtils";
+import setupClient from "../setupClient";
 
-export default <TestSuite>{
-  "returns true for valid secret": async (client, address) => {
-    assert(client.isValidSecret("snsakdSrZSLkYpCXxfRkS4Sh96PMK"));
-  },
+describe("isValidSecret", function () {
+  beforeEach(setupClient.setup);
+  afterEach(setupClient.teardown);
 
-  "returns false for invalid secret": async (client, address) => {
-    assert(!client.isValidSecret("foobar"));
-  },
-};
+  it("returns true for valid secret", async function () {
+    assert(this.client.isValidSecret("snsakdSrZSLkYpCXxfRkS4Sh96PMK"));
+  });
+
+  it("returns false for invalid secret", async function () {
+    assert(!this.client.isValidSecret("foobar"));
+  });
+});

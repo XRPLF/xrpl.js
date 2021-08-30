@@ -1,20 +1,18 @@
 import { assert } from "chai";
 
-import { TestSuite } from "../testUtils";
+import setupClient from "../setupClient";
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-export default <TestSuite>{
-  "RippleError with data": async (client, address) => {
-    const error = new client.errors.RippleError("_message_", "_data_");
+describe("client errors", function () {
+  beforeEach(setupClient.setup);
+  afterEach(setupClient.teardown);
+
+  it("RippleError with data", async function () {
+    const error = new this.client.errors.RippleError("_message_", "_data_");
     assert.strictEqual(error.toString(), "[RippleError(_message_, '_data_')]");
-  },
+  });
 
-  "NotFoundError default message": async (client, address) => {
-    const error = new client.errors.NotFoundError();
+  it("NotFoundError default message", async function () {
+    const error = new this.client.errors.NotFoundError();
     assert.strictEqual(error.toString(), "[NotFoundError(Not found)]");
-  },
-};
+  });
+});
