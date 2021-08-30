@@ -1,3 +1,14 @@
+import {
+  ResponseFormatError,
+  RippledError,
+  TimeoutError,
+} from "../common/errors";
+import { Response } from "../models/methods";
+
+interface BasicRequestFormat {
+  id?: string | number;
+}
+
 /**
  * Manage all the requests made to the websocket, and their async responses
  * that come in from the WebSocket. Responses come in over the WS connection
@@ -6,34 +17,71 @@
  */
 export default class RequestManager {
   private nextId = 0;
-  private promisesAwaitingResponse: Array<{
-    resolve: Function;
-    reject: Function;
-    timer: NodeJS.Timeout;
-  }> = [];
+  private promisesAwaitingResponse = new Map<
+    string | number,
+    {
+      resolve: (value?: Response | PromiseLike<Response>) => void;
+      reject: (value?: Error) => void;
+      timer: NodeJS.Timeout;
+    }
+  >();
 
-  cancel(id: number) {
-    const { timer } = this.promisesAwaitingResponse[id];
-    clearTimeout(timer);
-    delete this.promisesAwaitingResponse[id];
+  /**
+   * Cancels a request.
+   *
+   * @param id - ID of the request.
+   * @throws Error if no existing promise with the given ID.
+   */
+  public cancel(id: string | number): void {
+    const promise = this.promisesAwaitingResponse.get(id);
+    if (promise == null) {
+      throw new Error(`No existing promise with id ${id}`);
+    }
+    clearTimeout(promise.timer);
+    this.deletePromise(id);
   }
 
-  resolve(id: string | number, data: Response) {
-    const { timer, resolve } = this.promisesAwaitingResponse[id];
-    clearTimeout(timer);
-    resolve(data);
-    delete this.promisesAwaitingResponse[id];
+  /**
+   * Successfully resolves a request.
+   *
+   * @param id - ID of the request.
+   * @param response - Response to return.
+   * @throws Error if no existing promise with the given ID.
+   */
+  public resolve(id: string | number, response: Response): void {
+    const promise = this.promisesAwaitingResponse.get(id);
+    if (promise == null) {
+      throw new Error(`No existing promise with id ${id}`);
+    }
+    clearTimeout(promise.timer);
+    promise.resolve(response);
+    this.deletePromise(id);
   }
 
-  reject(id: string | number, error: Error) {
-    const { timer, reject } = this.promisesAwaitingResponse[id];
-    clearTimeout(timer);
-    reject(error);
-    delete this.promisesAwaitingResponse[id];
+  /**
+   * Rejects a request.
+   *
+   * @param id - ID of the request.
+   * @param error - Error to throw with the reject.
+   * @throws Error if no existing promise with the given ID.
+   */
+  public reject(id: string | number, error: Error): void {
+    const promise = this.promisesAwaitingResponse.get(id);
+    if (promise == null) {
+      throw new Error(`No existing promise with id ${id}`);
+    }
+    clearTimeout(promise.timer);
+    promise.reject(error);
+    this.deletePromise(id);
   }
 
-  rejectAll(error: Error) {
-    this.promisesAwaitingResponse.forEach((_, id) => {
+  /**
+   * Reject all pending requests.
+   *
+   * @param error - Error to throw with the reject.
+   */
+  public rejectAll(error: Error): void {
+    this.promisesAwaitingResponse.forEach((_promise, id, _map) => {
       this.reject(id, error);
     });
   }
@@ -43,21 +91,24 @@ export default class RequestManager {
    * hung responses, and a promise that will resolve with the response once
    * the response is seen & handled.
    *
-   * @param data
-   * @param timeout
+   * @param request - Request to create.
+   * @param timeout - Timeout length to catch hung responses.
+   * @returns Request ID, new request form, and the promise for resolving the request.
    */
-  createRequest(
-    data: any,
+  public createRequest(
+    request: BasicRequestFormat,
     timeout: number
-  ): [string | number, string, Promise<any>] {
-    const newId = data.id ? data.id : this.nextId++;
-    const newData = JSON.stringify({ ...data, id: newId });
+  ): [string | number, string, Promise<Response>] {
+    const newId = request.id ? request.id : this.nextId;
+    this.nextId += 1;
+    const newRequest = JSON.stringify({ ...request, id: newId });
     const timer = setTimeout(
       () => this.reject(newId, new TimeoutError()),
       timeout
     );
     // Node.js won't exit if a timer is still running, so we tell Node to ignore.
     // (Node will still wait for the request to complete).
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Reason above.
     if (timer.unref) {
       timer.unref();
     }
@@ -66,16 +117,17 @@ export default class RequestManager {
         this.promisesAwaitingResponse[newId] = { resolve, reject, timer };
       }
     );
-    return [newId, newData, newPromise];
+    return [newId, newRequest, newPromise];
   }
 
   /**
    * Handle a "response". Responses match to the earlier request handlers,
    * and resolve/reject based on the data received.
    *
-   * @param data
+   * @param data - The response to handle.
+   * @throws ResponseFormatError if the response format is invalid, RippledError if rippled returns an error.
    */
-  handleResponse(data: Response) {
+  public handleResponse(data: Response): void {
     if (!Number.isInteger(data.id) || data.id < 0) {
       throw new ResponseFormatError("valid id not found in response", data);
     }
@@ -83,7 +135,7 @@ export default class RequestManager {
       return;
     }
     if (data.status === "error") {
-      const error = new RippledError(data.error_message || data.error, data);
+      const error = new RippledError(data.error_message ?? data.error, data);
       this.reject(data.id, error);
       return;
     }
@@ -96,5 +148,15 @@ export default class RequestManager {
       return;
     }
     this.resolve(data.id, data);
+  }
+
+  /**
+   * Delete a promise after it has been returned.
+   *
+   * @param id - ID of the request.
+   */
+  private deletePromise(id: string | number): void {
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Needs to delete promise after request has been fulfilled.
+    delete this.promisesAwaitingResponse[id];
   }
 }
