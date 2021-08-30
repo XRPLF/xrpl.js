@@ -15,7 +15,7 @@ import {
 } from "../common/errors";
 import { Response } from "../models/methods";
 
-import { ExponentialBackoff } from "./backoff";
+import ExponentialBackoff from "./backoff";
 
 /**
  * ConnectionOptions is the configuration for the Connection class.
