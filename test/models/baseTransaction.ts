@@ -199,7 +199,9 @@ describe("Transaction Verification", function () {
       TransactionType: "Payment",
       Signers: [
         {
-          Account: "r....",
+          Signer: {
+            Account: "r....",
+          },
         },
       ],
     } as any;
