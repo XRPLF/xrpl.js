@@ -1,5 +1,6 @@
 import assert from "assert";
 import fs from "fs";
+import { join } from "path";
 
 import {
   computeStateTreeHash,
@@ -15,21 +16,27 @@ import {
 /**
  * Expects a corresponding ledger dump in $repo/test/fixtures/rippled folder.
  *
- * @param ledgerIndex
+ * @param ledgerIndex - The ledger index of the desired dump.
  */
-function createLedgerTest(ledgerIndex: number) {
+function createLedgerTest(ledgerIndex: number): void {
   const ledgerIndexString = String(ledgerIndex);
+  const path = join(
+    __dirname,
+    "..",
+    `fixtures/rippled/ledgerFull${ledgerIndex}.json`
+  );
+
+  // eslint-disable-next-line node/no-sync -- must be sync version when not in async method
+  const ledgerRaw = fs.readFileSync(path, { encoding: "utf8" });
+  const ledgerJSON = JSON.parse(ledgerRaw);
+
+  const hasAccounts =
+    Array.isArray(ledgerJSON.accountState) &&
+    ledgerJSON.accountState.length > 0;
+
   describe(`ledger hashes ${ledgerIndexString}`, function () {
-    const path = `${__dirname}/../fixtures/rippled/ledgerFull${ledgerIndex}.json`;
-
-    const ledgerRaw = fs.readFileSync(path, { encoding: "utf8" });
-    const ledgerJSON = JSON.parse(ledgerRaw);
-
-    const hasAccounts =
-      Array.isArray(ledgerJSON.accountState) &&
-      ledgerJSON.accountState.length > 0;
-
     if (hasAccounts) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- known to be a string
       it(`has account_hash of ${ledgerJSON.account_hash}`, function () {
         assert.equal(
           ledgerJSON.account_hash,
@@ -37,6 +44,7 @@ function createLedgerTest(ledgerIndex: number) {
         );
       });
     }
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- known to be a string
     it(`has transaction_hash of ${ledgerJSON.transaction_hash}`, function () {
       assert.equal(
         ledgerJSON.transaction_hash,
@@ -48,10 +56,13 @@ function createLedgerTest(ledgerIndex: number) {
 
 describe("Hashes", function () {
   // This is the first recorded ledger with a non empty transaction set
+  // eslint-disable-next-line mocha/no-setup-in-describe -- runs tests
   createLedgerTest(38129);
   // Because, why not.
+  // eslint-disable-next-line mocha/no-setup-in-describe -- runs tests
   createLedgerTest(40000);
   // 1311 AffectedNodes, no accounts
+  // eslint-disable-next-line mocha/no-setup-in-describe -- runs tests
   createLedgerTest(7501326);
 
   describe("calcAccountRootEntryHash", function () {

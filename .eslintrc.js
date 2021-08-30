@@ -87,6 +87,9 @@ module.exports = {
 
         // We need to test things without type guards sometimes
         "@typescript-eslint/no-unsafe-assignment": "off",
+
+        // We need to mess with internal things to generate certain testing situations
+        "@typescript-eslint/no-unsafe-member-access": "off",
       },
     },
     {
