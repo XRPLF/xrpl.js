@@ -1,44 +1,17 @@
-import fs from "fs";
 import net from "net";
-import path from "path";
 
 import { assert } from "chai";
 import _ from "lodash";
 
-import { Client } from "xrpl-local";
+import addresses from "./fixtures/addresses.json";
 
 /**
- * The test function. It takes a Client object and then some other data to
- * test (currently: an address). May be called multiple times with different
- * arguments, to test different types of data.
+ * Setup to run tests on both classic addresses and X-addresses.
  */
-export type TestFn = (
-  client: Client,
-  address: string,
-  mockRippled?: any
-) => void | PromiseLike<void>;
-
-/**
- * A suite of tests to run. Maps the test name to the test function.
- */
-export interface TestSuite {
-  [testName: string]: TestFn;
-}
-
-/**
- * When the test suite is loaded, we represent it with the following
- * data structure containing tests and metadata about the suite.
- * If no test suite exists, we return this object with `isMissing: true`
- * so that we can report it.
- */
-interface LoadedTestSuite {
-  name: string;
-  tests: Array<[string, TestFn]>;
-  config: {
-    /** Set to true to skip re-running tests with an X-address. */
-    skipXAddress?: boolean;
-  };
-}
+export const addressTests = [
+  { type: "Classic Address", address: addresses.ACCOUNT },
+  { type: "X-Address", address: addresses.ACCOUNT_X },
+];
 
 /**
  * Check the response against the expected result. Optionally validate
@@ -117,37 +90,6 @@ export function getFreePort() {
     });
     server.listen(0);
   });
-}
-
-export function getAllPublicMethods(client: Client) {
-  return Array.from(
-    new Set([
-      ...Object.getOwnPropertyNames(client),
-      ...Object.getOwnPropertyNames(Client.prototype),
-    ])
-  ).filter((key) => !key.startsWith("_"));
-}
-
-export function loadTestSuites(): LoadedTestSuite[] {
-  const allTests: any[] = fs.readdirSync(path.join(__dirname, "client"), {
-    encoding: "utf8",
-  });
-  return allTests
-    .map((methodName) => {
-      if (methodName.startsWith(".DS_Store")) {
-        return null;
-      }
-      if (methodName.endsWith(".ts")) {
-        methodName = methodName.slice(0, -3);
-      }
-      const testSuite = require(`./client/${methodName}`);
-      return {
-        name: methodName,
-        config: testSuite.config || {},
-        tests: Object.entries(testSuite.default || {}),
-      } as LoadedTestSuite;
-    })
-    .filter(Boolean) as LoadedTestSuite[];
 }
 
 /**
