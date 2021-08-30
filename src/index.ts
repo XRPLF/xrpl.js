@@ -11,4 +11,4 @@ export * from "./utils";
 // Broadcast client is experimental
 export { BroadcastClient } from "./client/broadcastClient";
 
-export { default as Wallet } from "./wallet";
+export * from "./wallet/Wallet";
