@@ -1,10 +1,10 @@
+import { assert } from "chai";
 import { ValidationError } from "xrpl-local/common/errors";
+import { verify } from "../../src/models/transactions";
 import {
   PaymentTransactionFlagsEnum,
   verifyPaymentTransaction,
-} from "./../../src/models/transactions/paymentTransaction";
-import { assert } from "chai";
-import { verify } from "../../src/models/transactions";
+} from "../../src/models/transactions/paymentTransaction";
 
 /**
  * PaymentTransaction Verification Testing.
@@ -161,7 +161,7 @@ describe("Payment Transaction Verification", function () {
 
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a boolean`, function () {
     paymentTransaction.DeliverMin = "10000";
-    paymentTransaction.Flags = { tfPartialPayment: true };
+    paymentTransaction.Flags = 0x00020000;
     assert.doesNotThrow(() => verifyPaymentTransaction(paymentTransaction));
     assert.doesNotThrow(() => verify(paymentTransaction));
   });

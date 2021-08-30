@@ -32,7 +32,7 @@ import { SignerListSet, verifySignerListSet } from "./signerListSet";
 import { TicketCreate, verifyTicketCreate } from "./ticketCreate";
 import { TrustSet, verifyTrustSet } from "./trustSet";
 import { ValidationError } from "../../common/errors";
-import { isEqual } from "lodash";
+import { isEqual, omitBy, isUndefined } from "lodash";
 import { encode, decode } from "ripple-binary-codec";
 
 export type Transaction =
@@ -68,6 +68,7 @@ export interface TransactionAndMetadata {
  * @throws {ValidationError} When the Transaction is malformed.
  */
 export function verify(tx: Transaction): void {
+  tx = <Transaction>omitBy(tx, isUndefined);
   switch (tx.TransactionType) {
     case "AccountDelete":
       verifyAccountDelete(tx);
@@ -149,11 +150,6 @@ export function verify(tx: Transaction): void {
       throw new ValidationError(`Invalid field TransactionType`);
   }
 
-  // console.log(tx);
-  // const x = encode(tx);
-  // console.log(x);
-  // console.log(decode(x));
-  // console.log(isEqual(decode(encode(tx)), tx));
   if (!isEqual(decode(encode(tx)), tx))
     throw new ValidationError(`Invalid Transaction: ${tx.TransactionType}`);
 }
