@@ -5,21 +5,34 @@
  */
 export default class ConnectionManager {
   private promisesAwaitingConnection: Array<{
-    resolve: Function;
-    reject: Function;
+    resolve: (value?: void | PromiseLike<void>) => void;
+    reject: (value?: Error) => void;
   }> = [];
 
-  resolveAllAwaiting() {
+  /**
+   * Resolves all awaiting connections.
+   */
+  public resolveAllAwaiting(): void {
     this.promisesAwaitingConnection.map(({ resolve }) => resolve());
     this.promisesAwaitingConnection = [];
   }
 
-  rejectAllAwaiting(error: Error) {
+  /**
+   * Rejects all awaiting connections.
+   *
+   * @param error - Error to throw in the rejection.
+   */
+  public rejectAllAwaiting(error: Error): void {
     this.promisesAwaitingConnection.map(({ reject }) => reject(error));
     this.promisesAwaitingConnection = [];
   }
 
-  awaitConnection(): Promise<void> {
+  /**
+   * Await a new connection.
+   *
+   * @returns A promise for resolving the connection.
+   */
+  public async awaitConnection(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.promisesAwaitingConnection.push({ resolve, reject });
     });
