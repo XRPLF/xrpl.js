@@ -46,10 +46,10 @@ const isMemo = (obj: { Memo: Memo }): boolean => {
 
 const isSigner = (signer: Signer): boolean => {
   return (
-    Object.keys(signer.Signer).length === 3 &&
-    typeof signer.Signer.Account === "string" &&
-    typeof signer.Signer.TxnSignature === "string" &&
-    typeof signer.Signer.SigningPubKey === "string"
+    Object.keys(signer).length === 3 &&
+    typeof signer.Account === "string" &&
+    typeof signer.TxnSignature === "string" &&
+    typeof signer.SigningPubKey === "string"
   );
 };
 

@@ -10,13 +10,14 @@ import { SignedTransaction } from "../common/types/objects";
 import { verifyBaseTransaction } from "../models/transactions/common";
 //import { sign as signWithKeypair, verify as verifySignature } from 'ripple-keypairs'
 import { sign as signWithKeypair } from 'ripple-keypairs'
+import { Signer } from "../../../../src/models/common";
 
 function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
     return wallet.signTransaction(tx, { signAs: '' })
 }
 
 /**
- * The transactions should all be equal except for the 'Signers' field. 
+ * The transactions should all be equal except for the 'Signers' field.
  */
  function validateTransactionEquivalence(transactions: Transaction[]) {
   const exampleTransaction = JSON.stringify({...transactions[0], Signers: null})
@@ -31,8 +32,8 @@ function addressToBigNumber(address) {
 }
 
 /**
- * If presented in binary form, the Signers array must be sorted based on 
- * the numeric value of the signer addresses, with the lowest value first. 
+ * If presented in binary form, the Signers array must be sorted based on
+ * the numeric value of the signer addresses, with the lowest value first.
  * (If submitted as JSON, the submit_multisigned method handles this automatically.)
  * https://xrpl.org/multi-signing.html
  */
@@ -44,7 +45,7 @@ function compareSigners(a, b) {
 
 function getTransactionWithAllSigners(transactions: Transaction[]): Transaction {
   // Signers must be sorted - see compareSigners for more details
-  const sortedSigners = flatMap(transactions, tx => tx.Signers)
+  const sortedSigners = flatMap(transactions, tx => (tx.Signers as Signer[]))
     .filter(signer => signer)
     .sort(compareSigners)
 
@@ -52,7 +53,7 @@ function getTransactionWithAllSigners(transactions: Transaction[]): Transaction 
 }
 
 /**
- * 
+ *
  * @param signedTransactions A collection of the same transaction signed by different signers. The only difference
  * between the elements of signedTransactions should be the Signers field.
  * @returns An object with the combined transaction (now having a sorted list of all signers) which is encoded, along
@@ -60,13 +61,13 @@ function getTransactionWithAllSigners(transactions: Transaction[]): Transaction 
  */
 function combine(signedTransactions: string[]): SignedTransaction {
   const transactions: Transaction[] = signedTransactions.map(decode) as unknown as Transaction[];
-  
+
   transactions.forEach(tx => verify(tx))
   validateTransactionEquivalence(transactions)
 
   const signedTransaction = encode(getTransactionWithAllSigners(transactions))
   return {
-    signedTransaction: signedTransaction, 
+    signedTransaction: signedTransaction,
     id: computeBinaryTransactionHash(signedTransaction)
   }
 }
@@ -88,7 +89,7 @@ function getEncodedTransaction(txOrBlob: (Transaction | string)): string {
 }
 
 function multisign(transactions: ((Transaction | string)[])): SignedTransaction {
-    
+
     if(transactions.length == 0) {
         throw new ValidationError("There were 0 transactions given to multisign")
     }
@@ -100,14 +101,14 @@ function multisign(transactions: ((Transaction | string)[])): SignedTransaction 
         if(tx.SigningPubKey !== "") {
             throw new ValidationError("For multisigning the transaction must include the SigningPubKey field as an empty string.")
         }
-    
+
         if(tx.Signers === undefined) {
             throw new ValidationError("For multisigning the transaction must include a Signers field containing an array of signatures.")
         }
     })
 
     const encodedTransactions: string[] = transactions.map(txOrBlob => getEncodedTransaction(txOrBlob))
-    
+
     return combine(encodedTransactions)
 }
 

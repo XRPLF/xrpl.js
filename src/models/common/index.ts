@@ -26,11 +26,9 @@ export interface IssuedCurrencyAmount extends IssuedCurrency {
 export type Amount = IssuedCurrencyAmount | string;
 
 export interface Signer {
-  Signer: {
-    Account: string;
-    TxnSignature: string;
-    SigningPubKey: string;
-  }
+  Account: string;
+  TxnSignature: string;
+  SigningPubKey: string;
 }
 
 export interface Memo {
