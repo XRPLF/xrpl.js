@@ -429,7 +429,7 @@ async function autofillTransaction(
   client: Client
 ): Promise<Transaction> {
   validateAccountAddress(tx, 'Account', 'SourceTag');
-  if (tx['Destination']) {
+  if (tx['Destination'] != null) {
     validateAccountAddress(tx, 'Destination', 'DestinationTag');
   }
 
@@ -443,16 +443,16 @@ async function autofillTransaction(
 
   setTransactionFlagsToNumber(tx);
 
-  if (tx.Sequence === undefined) {
+  if (tx.Sequence == null) {
     const sequence = await getNextValidSequenceNumber(tx.Account, client);
     tx.Sequence = sequence;
   }
 
-  if (tx.Fee === undefined) {
+  if (tx.Fee == null) {
     tx.Fee = await calculateFeePerTransactionType(tx, client);
   }
 
-  if (tx.LastLedgerSequence === undefined) {
+  if (tx.LastLedgerSequence == null) {
     const ledgerSequence = await getLatestValidatedLedgerSequence(client);
     tx.LastLedgerSequence = ledgerSequence + LEDGER_OFFSET;
   }
@@ -500,7 +500,7 @@ async function calculateFeePerTransactionType(
   client?: Client
 ): Promise<string> {
   let netFee;
-  if (client === undefined) {
+  if (client == null) {
     netFee = 10; // 10 drops
   } else {
     netFee = await client.getFee(); // Usually 0.00001 XRP (10 drops)
@@ -510,7 +510,7 @@ async function calculateFeePerTransactionType(
 
   // EscrowFinish Transaction with Fulfillment
   if (transaction.TransactionType === 'EscrowFinish') {
-    if (transaction.Fulfillment !== undefined) {
+    if (transaction.Fulfillment != null) {
       const fulfillmentBytesSize = Math.ceil(
         transaction.Fulfillment.length / 2
       );
@@ -526,7 +526,7 @@ async function calculateFeePerTransactionType(
 
   // Multi-signed Transaction
   // 10 drops × (1 + Number of Signatures Provided)
-  if (transaction.Signers !== undefined && transaction.Signers.length > 0) {
+  if (transaction.Signers != null && transaction.Signers.length > 0) {
     baseFee = netFee * (1 + transaction.Signers.length) + baseFee;
   }
 

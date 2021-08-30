@@ -56,7 +56,7 @@ function convertGlobalFlagsToNumber(flags: GlobalFlags | number | undefined): nu
 }
 
 function convertOfferCreateFlagsToNumber(flags: OfferCreateFlags): number {
-  if (flags === undefined) {
+  if (flags == null) {
     return 0;
   } else if (typeof flags === 'number') {
     return flags;
@@ -81,7 +81,7 @@ function convertOfferCreateFlagsToNumber(flags: OfferCreateFlags): number {
 }
 
 function convertPaymentChannelClaimFlagsToNumber(flags: PaymentChannelClaimFlags): number {
-  if (flags === undefined) {
+  if (flags == null) {
     return 0;
   } else if (typeof flags === 'number') {
     return flags;
@@ -100,7 +100,7 @@ function convertPaymentChannelClaimFlagsToNumber(flags: PaymentChannelClaimFlags
 }
 
 function convertPaymentTransactionFlagsToNumber(flags: PaymentTransactionFlags): number {
-  if (flags === undefined) {
+  if (flags == null) {
     return 0;
   } else if (typeof flags === 'number') {
     return flags;
@@ -122,7 +122,7 @@ function convertPaymentTransactionFlagsToNumber(flags: PaymentTransactionFlags):
 }
 
 function convertTrustSetFlagsToNumber(flags: TrustSetFlags): number {
-  if (flags === undefined) {
+  if (flags == null) {
     return 0;
   } else if (typeof flags === 'number') {
     return flags;
