@@ -42,9 +42,11 @@ describe("Transaction Verification", function () {
       ],
       Signers: [
         {
-          Account: "r....",
-          TxnSignature: "DEADBEEF",
-          SigningPubKey: "hex-string",
+          Signer: {
+            Account: "r....",
+            TxnSignature: "DEADBEEF",
+            SigningPubKey: "hex-string",
+          },
         },
       ],
       SourceTag: 31,

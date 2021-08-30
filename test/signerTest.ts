@@ -1,5 +1,7 @@
 import { assert } from "chai";
+
 import { sign, authorizeChannel, multisign } from "xrpl-local/ledger/signer";
+
 import { decode } from "../ripple-binary-codec";
 import { ValidationError } from "../src/common/errors";
 import { SignedTransaction } from "../src/common/types/objects";
@@ -24,19 +26,19 @@ const tx: Transaction = {
 };
 
 describe("Signer tests", function () {
-  it("sign transaction offline", () => {
+  it("sign transaction offline", function () {
     const wallet = new Wallet(publicKey, privateKey);
 
     // WHEN signing a transaction offline
     const signedTx: SignedTransaction = sign(wallet, tx);
 
     // THEN we get a signedTransaction
-    //schemaValidator.schemaValidate('sign', signedTx)
+    // schemaValidator.schemaValidate('sign', signedTx)
     // TODO: Figure out how we validate the return result of sign
     signedTx;
   });
 
-  it("multisigns successfully", () => {
+  it("multisigns successfully", function () {
     const tx1: Transaction = {
       Account: "rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC",
       Fee: "30000",
@@ -49,11 +51,13 @@ describe("Signer tests", function () {
       Sequence: 2,
       Signers: [
         {
-          Account: "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-          SigningPubKey:
-            "02B3EC4E5DD96029A647CFA20DA07FE1F85296505552CCAC114087E66B46BD77DF",
-          TxnSignature:
-            "30450221009C195DBBF7967E223D8626CA19CF02073667F2B22E206727BFE848FF42BEAC8A022048C323B0BED19A988BDBEFA974B6DE8AA9DCAE250AA82BBD1221787032A864E5",
+          Signer: {
+            Account: "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
+            SigningPubKey:
+              "02B3EC4E5DD96029A647CFA20DA07FE1F85296505552CCAC114087E66B46BD77DF",
+            TxnSignature:
+              "30450221009C195DBBF7967E223D8626CA19CF02073667F2B22E206727BFE848FF42BEAC8A022048C323B0BED19A988BDBEFA974B6DE8AA9DCAE250AA82BBD1221787032A864E5",
+          },
         },
       ],
       SigningPubKey: "",
@@ -72,28 +76,30 @@ describe("Signer tests", function () {
       Sequence: 2,
       Signers: [
         {
-          Account: "rUpy3eEg8rqjqfUoLeBnZkscbKbFsKXC3v",
-          TxnSignature:
-            "30440220680BBD745004E9CFB6B13A137F505FB92298AD309071D16C7B982825188FD1AE022004200B1F7E4A6A84BB0E4FC09E1E3BA2B66EBD32F0E6D121A34BA3B04AD99BC1",
-          SigningPubKey:
-            "028FFB276505F9AC3F57E8D5242B386A597EF6C40A7999F37F1948636FD484E25B",
+          Signer: {
+            Account: "rUpy3eEg8rqjqfUoLeBnZkscbKbFsKXC3v",
+            TxnSignature:
+              "30440220680BBD745004E9CFB6B13A137F505FB92298AD309071D16C7B982825188FD1AE022004200B1F7E4A6A84BB0E4FC09E1E3BA2B66EBD32F0E6D121A34BA3B04AD99BC1",
+            SigningPubKey:
+              "028FFB276505F9AC3F57E8D5242B386A597EF6C40A7999F37F1948636FD484E25B",
+          },
         },
       ],
       SigningPubKey: "",
       TransactionType: "TrustSet",
     };
 
-    const transactions: Transaction[] = new Array(tx1, tx2);
+    const transactions: Transaction[] = [tx1, tx2];
 
     multisign(transactions);
   });
 
-  it("throws a validation error if multisigning with no transactions", () => {
-    const transactions: Transaction[] = new Array();
+  it("throws a validation error if multisigning with no transactions", function () {
+    const transactions: Transaction[] = [];
     assert.throws(() => multisign(transactions), ValidationError);
   });
 
-  it("authorizeChannel succeeds", () => {
+  it("authorizeChannel succeeds", function () {
     const wallet = Wallet.fromSeed("snGHNrPbHrdUcszeuDEigMdC1Lyyd");
     const channelId =
       "5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3";
@@ -105,16 +111,16 @@ describe("Signer tests", function () {
     );
   });
 
-  /*it('authorizeChannel succeeds with ed25519 seed'), () => {
-        const wallet = Wallet.fromSeed("sEdnGHNrPbHrdUcszeuDEigMdC1Lyyd")
-        const channelId = '5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3'
-        const amount = '1000000'
+  // it('authorizeChannel succeeds with ed25519 seed'), () => {
+  //     const wallet = Wallet.fromSeed("sEdnGHNrPbHrdUcszeuDEigMdC1Lyyd")
+  //     const channelId = '5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3'
+  //     const amount = '1000000'
+  //
+  //     assert.equal(authorizeChannel(wallet, channelId, amount),
+  //     '304402207936D71315E0F2AC349A33F988111A6C6D92CD96347AF42BDB5C34EE61D4EC1F0220684CB495EA93DBF0B5A7EC003A1501BC87B2635AA592E5362D240A43DC1BC801')
+  // }
 
-        assert.equal(authorizeChannel(wallet, channelId, amount),
-        '304402207936D71315E0F2AC349A33F988111A6C6D92CD96347AF42BDB5C34EE61D4EC1F0220684CB495EA93DBF0B5A7EC003A1501BC87B2635AA592E5362D240A43DC1BC801')
-    }*/
-
-  it("verify succeeds for valid signed transaction string", () => {
+  it("verify succeeds for valid signed transaction string", function () {
     const wallet = new Wallet(publicKey, privateKey);
 
     const signedTx: SignedTransaction = sign(wallet, tx);
@@ -133,7 +139,7 @@ describe("Signer tests", function () {
       );
     };
 
-  it("verify throws for invalid signing key", () => {
+  it("verify throws for invalid signing key", function () {
     const wallet = new Wallet(publicKey, privateKey);
     const signedTx: SignedTransaction = sign(wallet, tx);
 

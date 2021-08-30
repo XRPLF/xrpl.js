@@ -79,7 +79,7 @@ export interface BaseTransaction {
   Flags?: number | GlobalFlags;
   LastLedgerSequence?: number;
   Memos?: Array<{ Memo: Memo }>;
-  Signers?: Signer[];
+  Signers?: Array<{ Signer: Signer }>;
   SourceTag?: number;
   SigningPubKey?: string;
   TicketSequence?: number;
@@ -147,7 +147,8 @@ export function verifyBaseTransaction(common: BaseTransaction): void {
 
   if (
     common.Signers !== undefined &&
-    (common.Signers.length === 0 || !common.Signers.every(isSigner))
+    (common.Signers.length === 0 ||
+      !common.Signers.every((signer) => isSigner(signer.Signer)))
   ) {
     throw new ValidationError("BaseTransaction: invalid Signers");
   }

@@ -1,20 +1,25 @@
 import { BigNumber } from "bignumber.js";
-import { decodeAccountID } from "ripple-address-codec";
-import { ValidationError } from "../common/errors";
-import { encode, decode, encodeForSigningClaim } from "ripple-binary-codec";
-import { Transaction } from "../models/transactions";
-import Wallet from "../Wallet";
-import { computeBinaryTransactionHash } from "../utils";
 import { flatMap } from "lodash";
-import { SignedTransaction } from "../common/types/objects";
-import { verifyBaseTransaction } from "../models/transactions/common";
+import { decodeAccountID } from "ripple-address-codec";
+import {
+  encode,
+  decode,
+  encodeForSigning,
+  encodeForSigningClaim,
+} from "ripple-binary-codec";
 import {
   sign as signWithKeypair,
   verify as verifySignature,
 } from "ripple-keypairs";
+
+import { ValidationError } from "../common/errors";
+import { SignedTransaction } from "../common/types/objects";
 import { Signer } from "../models/common";
-import { encodeForSigning } from "../../ripple-binary-codec";
-//import { sign as signWithKeypair } from 'ripple-keypairs'
+import { Transaction } from "../models/transactions";
+import { verifyBaseTransaction } from "../models/transactions/common";
+import { computeBinaryTransactionHash } from "../utils";
+import Wallet from "../Wallet";
+// import { sign as signWithKeypair } from 'ripple-keypairs'
 
 function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
   return wallet.signTransaction(tx, { signAs: "" });
@@ -22,6 +27,8 @@ function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
 
 /**
  * The transactions should all be equal except for the 'Signers' field.
+ *
+ * @param transactions
  */
 function validateTransactionEquivalence(transactions: Transaction[]) {
   const exampleTransaction = JSON.stringify({
@@ -50,28 +57,42 @@ function addressToBigNumber(address) {
  * If presented in binary form, the Signers array must be sorted based on
  * the numeric value of the signer addresses, with the lowest value first.
  * (If submitted as JSON, the submit_multisigned method handles this automatically.)
- * https://xrpl.org/multi-signing.html
+ * https://xrpl.org/multi-signing.html.
+ *
+ * @param a
+ * @param b
+ * @param a
+ * @param b
  */
 function compareSigners(a, b) {
-  return addressToBigNumber(a.Signer.Account).comparedTo(
-    addressToBigNumber(b.Signer.Account)
+  return addressToBigNumber(a.Account).comparedTo(
+    addressToBigNumber(b.Account)
   );
 }
 
 function getTransactionWithAllSigners(
   transactions: Transaction[]
 ): Transaction {
-  // Signers must be sorted - see compareSigners for more details
-  const sortedSigners = flatMap(transactions, (tx) => tx.Signers as Signer[])
+  // flatMap let's us go from Transaction[] with Signer[] to one Signer[]
+  const sortedSigners: { Signer: Signer }[] = flatMap(
+    transactions,
+    (tx) => tx.Signers?.map((signer) => signer.Signer) ?? []
+  )
     .filter((signer) => signer)
-    .sort(compareSigners);
+    // Signers must be sorted - see compareSigners for more details
+    .sort(compareSigners)
+    .map((signer) => {
+      return {
+        Signer: signer,
+      };
+    });
 
   return { ...transactions[0], Signers: sortedSigners };
 }
 
 /**
  *
- * @param signedTransactions A collection of the same transaction signed by different signers. The only difference
+ * @param signedTransactions - A collection of the same transaction signed by different signers. The only difference
  * between the elements of signedTransactions should be the Signers field.
  * @returns An object with the combined transaction (now having a sorted list of all signers) which is encoded, along
  * with a transaction id based on the combined transaction.
@@ -82,34 +103,35 @@ function combine(signedTransactions: string[]): SignedTransaction {
     return decode(tx);
   }) as unknown as Transaction[];
 
-  transactions.forEach((tx) => verify(tx));
+  transactions.forEach((tx) => verifyBaseTransaction(tx));
   validateTransactionEquivalence(transactions);
 
   const signedTransaction = encode(getTransactionWithAllSigners(transactions));
   return {
-    signedTransaction: signedTransaction,
+    signedTransaction,
     id: computeBinaryTransactionHash(signedTransaction),
   };
 }
 
 function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
   if (typeof txOrBlob === "object") {
-    return txOrBlob as Transaction;
-  } else {
-    return decode(txOrBlob) as unknown as Transaction;
+    return txOrBlob;
   }
+
+  return decode(txOrBlob) as unknown as Transaction;
 }
 
 function getEncodedTransaction(txOrBlob: Transaction | string): string {
   if (typeof txOrBlob === "object") {
     return encode(JSON.parse(JSON.stringify(txOrBlob)));
-  } else {
-    return txOrBlob as string;
   }
+  return txOrBlob;
 }
 
-function multisign(transactions: (Transaction | string)[]): SignedTransaction {
-  if (transactions.length == 0) {
+function multisign(
+  transactions: Array<Transaction | string>
+): SignedTransaction {
+  if (transactions.length === 0) {
     throw new ValidationError("There were 0 transactions given to multisign");
   }
 
@@ -147,7 +169,7 @@ function authorizeChannel(
 ): string {
   const signingData = encodeForSigningClaim({
     channel: channelId,
-    amount: amount,
+    amount,
   });
 
   return signWithKeypair(signingData, wallet.privateKey);
