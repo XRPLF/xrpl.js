@@ -154,11 +154,11 @@ function authorizeChannel(
 }
 
 function verify(tx: Transaction | string): boolean {
-  const encodedTx: Transaction = getDecodedTransaction(tx);
+  const decodedTx: Transaction = getDecodedTransaction(tx);
   return verifySignature(
-    encodeForSigning(encodedTx),
-    encodedTx.TxnSignature,
-    encodedTx.SigningPubKey
+    encodeForSigning(decodedTx),
+    decodedTx.TxnSignature,
+    decodedTx.SigningPubKey
   );
 }
 
