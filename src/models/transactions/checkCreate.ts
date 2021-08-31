@@ -1,7 +1,12 @@
+/* eslint-disable complexity -- Necessary for verifyCheckCreate */
 import { ValidationError } from "../../common/errors";
-import { Amount, IssuedCurrencyAmount } from "../common";
+import { Amount } from "../common";
 
-import { BaseTransaction, verifyBaseTransaction } from "./common";
+import {
+  BaseTransaction,
+  verifyBaseTransaction,
+  isIssuedCurrency,
+} from "./common";
 
 export interface CheckCreate extends BaseTransaction {
   TransactionType: "CheckCreate";
@@ -16,10 +21,9 @@ export interface CheckCreate extends BaseTransaction {
  * Verify the form and type of an CheckCreate at runtime.
  *
  * @param tx - An CheckCreate Transaction.
- * @returns Void.
  * @throws When the CheckCreate is Malformed.
  */
-export function verifyCheckCreate(tx: CheckCreate): void {
+export function verifyCheckCreate(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.SendMax === undefined) {
@@ -30,16 +34,11 @@ export function verifyCheckCreate(tx: CheckCreate): void {
     throw new ValidationError("CheckCreate: missing field Destination");
   }
 
-  const isIssuedCurrency = (obj: IssuedCurrencyAmount): boolean => {
-    return (
-      Object.keys(obj).length === 3 &&
-      typeof obj.value === "string" &&
-      typeof obj.issuer === "string" &&
-      typeof obj.currency === "string"
-    );
-  };
-
-  if (typeof tx.SendMax !== "string" && !isIssuedCurrency(tx.SendMax)) {
+  if (
+    typeof tx.SendMax !== "string" &&
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
+    !isIssuedCurrency(tx.SendMax as Record<string, unknown>)
+  ) {
     throw new ValidationError("CheckCreate: invalid SendMax");
   }
 

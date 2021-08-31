@@ -12,10 +12,9 @@ export interface EscrowCancel extends BaseTransaction {
  * Verify the form and type of an EscrowCancel at runtime.
  *
  * @param tx - An EscrowCancel Transaction.
- * @returns Void.
  * @throws When the EscrowCancel is Malformed.
  */
-export function verifyEscrowCancel(tx: EscrowCancel): void {
+export function verifyEscrowCancel(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.Owner === undefined) {

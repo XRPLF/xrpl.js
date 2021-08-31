@@ -1,4 +1,4 @@
-import { BaseLedgerEntry } from "./baseLedgerEntry";
+import BaseLedgerEntry from "./baseLedgerEntry";
 
 interface Majority {
   Majority: {
@@ -7,7 +7,7 @@ interface Majority {
   };
 }
 
-export interface Amendments extends BaseLedgerEntry {
+export default interface Amendments extends BaseLedgerEntry {
   LedgerEntryType: "Amendments";
   Amendments?: string[];
   Majorities?: Majority[];

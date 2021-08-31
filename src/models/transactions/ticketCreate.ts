@@ -7,13 +7,15 @@ export interface TicketCreate extends BaseTransaction {
   TicketCount: number;
 }
 
+const MAX_TICKETS = 250;
+
 /**
+ * Verify the form and type of a TicketCreate at runtime.
  *
  * @param tx - A TicketCreate Transaction.
- * @returns
- * @throws {ValidationError} When the TicketCreate is malformed.
+ * @throws When the TicketCreate is malformed.
  */
-export function verifyTicketCreate(tx: TicketCreate): void {
+export function verifyTicketCreate(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
   const { TicketCount } = tx;
 
@@ -25,7 +27,11 @@ export function verifyTicketCreate(tx: TicketCreate): void {
     throw new ValidationError("TicketCreate: TicketCount must be a number");
   }
 
-  if (!Number.isInteger(TicketCount) || TicketCount < 1 || TicketCount > 250) {
+  if (
+    !Number.isInteger(TicketCount) ||
+    TicketCount < 1 ||
+    TicketCount > MAX_TICKETS
+  ) {
     throw new ValidationError(
       "TicketCreate: TicketCount must be an integer from 1 to 250"
     );

@@ -9,14 +9,15 @@ export interface SignerListSet extends BaseTransaction {
   SignerEntries: SignerEntry[];
 }
 
+const MAX_SIGNERS = 8;
+
 /**
  * Verify the form and type of an SignerListSet at runtime.
  *
  * @param tx - An SignerListSet Transaction.
- * @returns Void.
  * @throws When the SignerListSet is Malformed.
  */
-export function verifySignerListSet(tx: SignerListSet): void {
+export function verifySignerListSet(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.SignerQuorum === undefined) {
@@ -41,7 +42,7 @@ export function verifySignerListSet(tx: SignerListSet): void {
     );
   }
 
-  if (tx.SignerEntries.length > 8) {
+  if (tx.SignerEntries.length > MAX_SIGNERS) {
     throw new ValidationError(
       "SignerListSet: maximum of 8 members allowed in SignerEntries"
     );

@@ -1,3 +1,4 @@
+/* eslint-disable complexity -- Necessary for verifyPaymentChannelClaim */
 import { ValidationError } from "../../common/errors";
 
 import { BaseTransaction, GlobalFlags, verifyBaseTransaction } from "./common";
@@ -21,10 +22,9 @@ export interface PaymentChannelClaim extends BaseTransaction {
  * Verify the form and type of an PaymentChannelClaim at runtime.
  *
  * @param tx - An PaymentChannelClaim Transaction.
- * @returns Void.
  * @throws When the PaymentChannelClaim is Malformed.
  */
-export function verifyPaymentChannelClaim(tx: PaymentChannelClaim): void {
+export function verifyPaymentChannelClaim(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.Channel === undefined) {
