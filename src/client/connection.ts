@@ -266,21 +266,23 @@ export class Connection extends EventEmitter {
     if (this.state === WebSocket.CLOSED) {
       return Promise.resolve(undefined);
     }
-    if (this.ws === null) {
+    if (this.ws == null) {
       return Promise.resolve(undefined);
     }
 
     return new Promise((resolve) => {
+      if (this.ws == null) {
+        resolve(undefined);
+      }
       if (this.ws != null) {
         this.ws.once("close", (code) => resolve(code));
-        // Connection already has a disconnect handler for the disconnect logic.
-        // Just close the websocket manually (with our "intentional" code) to
-        // trigger that.
-        if (this.state !== WebSocket.CLOSING) {
-          this.ws.close(INTENTIONAL_DISCONNECT_CODE);
-        }
       }
-      resolve(undefined);
+      // Connection already has a disconnect handler for the disconnect logic.
+      // Just close the websocket manually (with our "intentional" code) to
+      // trigger that.
+      if (this.ws != null && this.state !== WebSocket.CLOSING) {
+        this.ws.close(INTENTIONAL_DISCONNECT_CODE);
+      }
     });
   }
 
@@ -409,7 +411,23 @@ export class Connection extends EventEmitter {
       this.emit("error", "websocket", error.message, error)
     );
     // Handle a closed connection: reconnect if it was unexpected
-    this.ws.once("close", (code, reason) => this.cleanupClose(code, reason));
+    this.ws.once("close", (code, reason) => {
+      if (this.ws == null) {
+        throw new Error("onceClose: ws is null");
+      }
+
+      this.clearHeartbeatInterval();
+      this.requestManager.rejectAll(
+        new DisconnectedError(`websocket was closed, ${reason}`)
+      );
+      this.ws.removeAllListeners();
+      this.ws = null;
+      this.emit("disconnected", code);
+      // If this wasn't a manual disconnect, then lets reconnect ASAP.
+      if (code !== INTENTIONAL_DISCONNECT_CODE) {
+        this.intentionalDisconnect();
+      }
+    });
     // Finalize the connection and resolve all awaiting connect() requests
     try {
       this.retryConnectionBackoff.reset();
@@ -424,38 +442,17 @@ export class Connection extends EventEmitter {
     }
   }
 
-  /**
-   * Sets up closing the connection if a close message is received.
-   *
-   * @param code - Closing code.
-   * @param reason - Reason for closing.
-   * @throws Error if WS doesn't exist, DisconnectedError to all requests that won't get responses because of closure.
-   */
-  private cleanupClose(code: number, reason?: string): void {
-    if (this.ws == null) {
-      throw new Error("onceClose: ws is null");
-    }
-
-    this.clearHeartbeatInterval();
-    this.requestManager.rejectAll(
-      new DisconnectedError(`websocket was closed, ${reason ?? ""}`)
-    );
-    this.ws.removeAllListeners();
-    this.ws = null;
-    this.emit("disconnected", code);
-    // If this wasn't a manual disconnect, then lets reconnect ASAP.
-    if (code !== INTENTIONAL_DISCONNECT_CODE) {
-      const retryTimeout = this.retryConnectionBackoff.duration();
-      this.trace("reconnect", `Retrying connection in ${retryTimeout}ms.`);
-      this.emit("reconnecting", this.retryConnectionBackoff.attempts);
-      // Start the reconnect timeout, but set it to `this._reconnectTimeoutID`
-      // so that we can cancel one in-progress on disconnect.
-      this.reconnectTimeoutID = setTimeout(() => {
-        this.reconnect().catch((error: Error) => {
-          this.emit("error", "reconnect", error.message, error);
-        });
-      }, retryTimeout);
-    }
+  private intentionalDisconnect(): void {
+    const retryTimeout = this.retryConnectionBackoff.duration();
+    this.trace("reconnect", `Retrying connection in ${retryTimeout}ms.`);
+    this.emit("reconnecting", this.retryConnectionBackoff.attempts);
+    // Start the reconnect timeout, but set it to `this.reconnectTimeoutID`
+    // so that we can cancel one in-progress on disconnect.
+    this.reconnectTimeoutID = setTimeout(() => {
+      this.reconnect().catch((error: Error) => {
+        this.emit("error", "reconnect", error.message, error);
+      });
+    }, retryTimeout);
   }
 
   /**

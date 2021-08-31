@@ -13,21 +13,21 @@ describe("Get Faucet URL", function () {
 
   it("returns the Devnet URL", function () {
     const expectedFaucet = FaucetNetwork.Devnet;
-    this.client.connection._url = FaucetNetwork.Devnet;
+    this.client.connection.url = FaucetNetwork.Devnet;
 
     assert.strictEqual(getFaucetUrl(this.client), expectedFaucet);
   });
 
   it("returns the Testnet URL", function () {
     const expectedFaucet = FaucetNetwork.Testnet;
-    this.client.connection._url = FaucetNetwork.Testnet;
+    this.client.connection.url = FaucetNetwork.Testnet;
 
     assert.strictEqual(getFaucetUrl(this.client), expectedFaucet);
   });
 
   it("returns the Testnet URL with the XRPL Labs server", function () {
     const expectedFaucet = FaucetNetwork.Testnet;
-    this.client.connection._url = "wss://testnet.xrpl-labs.com";
+    this.client.connection.url = "wss://testnet.xrpl-labs.com";
 
     assert.strictEqual(getFaucetUrl(this.client), expectedFaucet);
   });

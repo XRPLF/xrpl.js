@@ -14,7 +14,7 @@ import { BaseRequest } from "../models/methods/baseMethod";
  */
 export default class RequestManager {
   private nextId = 0;
-  private promisesAwaitingResponse = new Map<
+  private readonly promisesAwaitingResponse = new Map<
     string | number,
     {
       resolve: (value?: Response | PromiseLike<Response>) => void;
@@ -110,8 +110,8 @@ export default class RequestManager {
       timer.unref();
     }
     const newPromise = new Promise(
-      (resolve: (data: Response) => void, reject) => {
-        this.promisesAwaitingResponse[newId] = { resolve, reject, timer };
+      (resolve: (value?: Response | PromiseLike<Response>) => void, reject) => {
+        this.promisesAwaitingResponse.set(newId, { resolve, reject, timer });
       }
     );
     return [newId, newRequest, newPromise];
@@ -121,35 +121,42 @@ export default class RequestManager {
    * Handle a "response". Responses match to the earlier request handlers,
    * and resolve/reject based on the data received.
    *
-   * @param data - The response to handle.
+   * @param response - The response to handle.
    * @throws ResponseFormatError if the response format is invalid, RippledError if rippled returns an error.
    */
-  public handleResponse(data: Partial<Response>): void {
-    if (data.id == null || !Number.isInteger(data.id) || data.id < 0) {
-      throw new ResponseFormatError("valid id not found in response", data);
+  public handleResponse(response: Partial<Response>): void {
+    if (
+      response.id == null ||
+      !Number.isInteger(response.id) ||
+      response.id < 0
+    ) {
+      throw new ResponseFormatError("valid id not found in response", response);
     }
-    if (!this.promisesAwaitingResponse[data.id]) {
+    if (!this.promisesAwaitingResponse.has(response.id)) {
       return;
     }
-    if (data.status == null) {
+    if (response.status == null) {
       const error = new ResponseFormatError("Response has no status");
-      this.reject(data.id, error);
+      this.reject(response.id, error);
     }
-    if (data.status === "error") {
-      const error = new RippledError(data.error_message ?? data.error, data);
-      this.reject(data.id, error);
+    if (response.status === "error") {
+      const error = new RippledError(
+        response.error_message ?? response.error,
+        response
+      );
+      this.reject(response.id, error);
       return;
     }
-    if (data.status !== "success") {
+    if (response.status !== "success") {
       const error = new ResponseFormatError(
-        `unrecognized response.status: ${data.status ?? ""}`,
-        data
+        `unrecognized response.status: ${response.status ?? ""}`,
+        response
       );
-      this.reject(data.id, error);
+      this.reject(response.id, error);
       return;
     }
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be a valid Response here
-    this.resolve(data.id, data as unknown as Response);
+    this.resolve(response.id, response as unknown as Response);
   }
 
   /**

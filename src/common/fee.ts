@@ -29,7 +29,7 @@ async function getFee(this: Client, cushion?: number): Promise<string> {
   }
   let fee = baseFeeXrp.times(serverInfo.load_factor).times(cushion);
 
-  // Cap fee to `this._maxFeeXRP`
+  // Cap fee to `this.maxFeeXRP`
   fee = BigNumber.min(fee, this.maxFeeXRP);
   // Round fee to 6 decimal places
   return new BigNumber(fee.toFixed(6)).toString(10);
