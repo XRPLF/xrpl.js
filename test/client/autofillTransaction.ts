@@ -8,7 +8,7 @@ const Fee = "10";
 const Sequence = 1432;
 const LastLedgerSequence = 2908734;
 
-describe("client.autofillTransaction", function () {
+describe("client.autofill", function () {
   beforeEach(setupClient.setup);
   afterEach(setupClient.teardown);
 
@@ -21,7 +21,7 @@ describe("client.autofillTransaction", function () {
       Sequence,
       LastLedgerSequence,
     };
-    const txResult = await this.client.autofillTransaction(tx);
+    const txResult = await this.client.autofill(tx);
 
     assert.strictEqual(txResult.Fee, Fee);
     assert.strictEqual(txResult.Sequence, Sequence);
@@ -39,7 +39,7 @@ describe("client.autofillTransaction", function () {
     this.mockRippled.addResponse("server_info", rippled.server_info.normal);
     this.mockRippled.addResponse("ledger", rippled.ledger.normal);
 
-    const txResult = await this.client.autofillTransaction(tx);
+    const txResult = await this.client.autofill(tx);
 
     assert.strictEqual(txResult.Account, "rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf");
     assert.strictEqual(
@@ -65,7 +65,7 @@ describe("client.autofillTransaction", function () {
         },
       },
     });
-    const txResult = await this.client.autofillTransaction(tx);
+    const txResult = await this.client.autofill(tx);
 
     assert.strictEqual(txResult.Sequence, 23);
   });
@@ -89,7 +89,7 @@ describe("client.autofillTransaction", function () {
         },
       },
     });
-    const txResult = await this.client.autofillTransaction(tx);
+    const txResult = await this.client.autofill(tx);
 
     assert.strictEqual(txResult.Fee, "1");
   });
@@ -109,7 +109,7 @@ describe("client.autofillTransaction", function () {
         ledger_index: 9038214,
       },
     });
-    const txResult = await this.client.autofillTransaction(tx);
+    const txResult = await this.client.autofill(tx);
     assert.strictEqual(txResult.LastLedgerSequence, 9038234);
   });
 });
