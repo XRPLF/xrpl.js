@@ -420,26 +420,23 @@ function convertMemo(memo: Memo): { Memo: ApiMemo } {
 /**
  * Autofills fields in a transaction.
  *
- * @param {Transaction} tx A transaction to autofill fields.
- * @param {Client} client A client.
- * @returns {Transaction} An autofilled transaction.
+ * @param tx - A transaction to autofill fields.
+ * @param client - A client.
+ * @returns An autofilled transaction.
  */
-async function autofillTransaction(
-  tx: Transaction,
-  client: Client
-): Promise<Transaction> {
-  validateAccountAddress(tx, 'Account', 'SourceTag');
-  if (tx['Destination'] != null) {
-    validateAccountAddress(tx, 'Destination', 'DestinationTag');
+async function autofill(tx: Transaction, client: Client): Promise<Transaction> {
+  validateAccountAddress(tx, "Account", "SourceTag");
+  if (tx["Destination"] != null) {
+    validateAccountAddress(tx, "Destination", "DestinationTag");
   }
 
   // DepositPreauth:
-  convertToClassicAddress(tx, 'Authorize');
-  convertToClassicAddress(tx, 'Unauthorize');
+  convertToClassicAddress(tx, "Authorize");
+  convertToClassicAddress(tx, "Unauthorize");
   // EscrowCancel, EscrowFinish:
-  convertToClassicAddress(tx, 'Owner');
+  convertToClassicAddress(tx, "Owner");
   // SetRegularKey:
-  convertToClassicAddress(tx, 'RegularKey');
+  convertToClassicAddress(tx, "RegularKey");
 
   setTransactionFlagsToNumber(tx);
 
@@ -460,7 +457,11 @@ async function autofillTransaction(
   return tx;
 }
 
-function validateAccountAddress(tx: Transaction, accountField: string, tagField: string): void {
+function validateAccountAddress(
+  tx: Transaction,
+  accountField: string,
+  tagField: string
+): void {
   // if X-address is given, convert it to classic address
   const { classicAccount, tag } = getClassicAccountAndTag(tx[accountField]);
   tx[accountField] = classicAccount;
@@ -488,7 +489,7 @@ async function getNextValidSequenceNumber(
   client: Client
 ): Promise<number> {
   const request: AccountInfoRequest = {
-    command: 'account_info',
+    command: "account_info",
     account,
   };
   const data = await client.request(request);
@@ -509,7 +510,7 @@ async function calculateFeePerTransactionType(
   let baseFee = netFee;
 
   // EscrowFinish Transaction with Fulfillment
-  if (transaction.TransactionType === 'EscrowFinish') {
+  if (transaction.TransactionType === "EscrowFinish") {
     if (transaction.Fulfillment != null) {
       const fulfillmentBytesSize = Math.ceil(
         transaction.Fulfillment.length / 2
@@ -520,7 +521,7 @@ async function calculateFeePerTransactionType(
   }
 
   // AccountDelete Transaction
-  if (transaction.TransactionType === 'AccountDelete') {
+  if (transaction.TransactionType === "AccountDelete") {
     baseFee = ACCOUNT_DELETE_FEE;
   }
 
@@ -538,15 +539,15 @@ async function getLatestValidatedLedgerSequence(
   client: Client
 ): Promise<number> {
   const request: LedgerRequest = {
-    command: 'ledger',
-    ledger_index: 'validated',
+    command: "ledger",
+    ledger_index: "validated",
   };
   const data = await client.request(request);
   return data.result.ledger_index;
 }
 
 export {
-  autofillTransaction,
+  autofill,
   convertStringToHex,
   convertMemo,
   prepareTransaction,
