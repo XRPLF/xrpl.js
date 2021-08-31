@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import _ from "lodash";
 
-import { Client } from "..";
+import type { Client } from "..";
 
 // This is a public API that can be called directly.
 // This is not used by the `prepare*` methods. See `src/transaction/utils.ts`

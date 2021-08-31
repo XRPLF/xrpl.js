@@ -4,7 +4,7 @@ import {
   isValidXAddress,
 } from "ripple-address-codec";
 
-import { Client } from "..";
+import type { Client } from "..";
 import * as common from "../common";
 import { ValidationError } from "../common/errors";
 import { Memo } from "../common/types/objects";
