@@ -1,29 +1,30 @@
-import { isFlagEnabled } from '../../src/models/utils'
-import { assert } from 'chai'
+import { assert } from "chai";
+
+import { isFlagEnabled } from "../../src/models/utils";
 
 /**
- * Utils Testing
+ * Utils Testing.
  *
- * Provides tests for utils used in models
+ * Provides tests for utils used in models.
  */
-describe('Models Utils', () => {
-    describe('isFlagEnabled', () => {
-        let flags
-        const flag1 = 0x00010000
-        const flag2 = 0x00020000
+describe("Models Utils", function () {
+  describe("isFlagEnabled", function () {
+    let flags;
+    const flag1 = 0x00010000;
+    const flag2 = 0x00020000;
 
-        beforeEach(() => {
-            flags = 0x00000000
-        })
+    beforeEach(function () {
+      flags = 0x00000000;
+    });
 
-        it('verifies a flag is enabled', () => {
-            flags += flag1 + flag2
-            assert.isTrue(isFlagEnabled(flags, flag1))
-        })
+    it("verifies a flag is enabled", function () {
+      flags += flag1 + flag2;
+      assert.isTrue(isFlagEnabled(flags, flag1));
+    });
 
-        it('verifies a flag is not enabled', () => {
-            flags += flag2
-            assert.isFalse(isFlagEnabled(flags, flag1))
-        })
-    })
-})
+    it("verifies a flag is not enabled", function () {
+      flags += flag2;
+      assert.isFalse(isFlagEnabled(flags, flag1));
+    });
+  });
+});

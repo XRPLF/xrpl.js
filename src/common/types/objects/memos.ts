@@ -1,5 +1,5 @@
-export type Memo = {
-  type?: string
-  format?: string
-  data?: string
+export interface Memo {
+  type?: string;
+  format?: string;
+  data?: string;
 }
