@@ -25,22 +25,22 @@ const MAX_ATTEMPTS = 20; // Maximum attempts to retrieve a balance
 /**
  * Generates a random wallet with some amount of XRP (usually 1000 XRP).
  *
- * @param this
+ * @param client - Client.
  * @param wallet - An existing XRPL Wallet to fund, if undefined, a new Wallet will be created.
  * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP.
  */
 async function generateFaucetWallet(
-  this: Client,
+  client: Client,
   wallet?: Wallet
 ): Promise<Wallet | void> {
-  if (!this.isConnected()) {
+  if (!client.isConnected()) {
     throw new RippledError("Client not connected, cannot call faucet");
   }
 
   // Initialize some variables
   let body: Uint8Array | undefined;
   let startingBalance = 0;
-  const faucetUrl = getFaucetUrl(this);
+  const faucetUrl = getFaucetUrl(client);
 
   // If no existing Wallet is provided or its address is invalid to fund
   if (!wallet || !isValidAddress(wallet.classicAddress)) {
@@ -55,7 +55,7 @@ async function generateFaucetWallet(
   );
   // Retrieve the existing account balance
   const addressToFundBalance = await getAddressXrpBalance(
-    this,
+    client,
     wallet.classicAddress
   );
 
@@ -96,7 +96,7 @@ async function generateFaucetWallet(
             try {
               // Check at regular interval if the address is enabled on the XRPL and funded
               const isFunded = await hasAddressBalanceIncreased(
-                this,
+                client,
                 classicAddress,
                 startingBalance
               );
