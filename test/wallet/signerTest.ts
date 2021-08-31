@@ -125,15 +125,16 @@ describe("Signer tests", function () {
     );
   });
 
-  // it('authorizeChannel succeeds with ed25519 seed'), () => {
-  //     const wallet = Wallet.fromSeed("sEdnGHNrPbHrdUcszeuDEigMdC1Lyyd")
-  //     const channelId = '5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3'
-  //     const amount = '1000000'
-  //
-  //     assert.equal(authorizeChannel(wallet, channelId, amount),
-  // eslint-disable-next-line max-len -- It's cleaner on one line
-  //     '304402207936D71315E0F2AC349A33F988111A6C6D92CD96347AF42BDB5C34EE61D4EC1F0220684CB495EA93DBF0B5A7EC003A1501BC87B2635AA592E5362D240A43DC1BC801')
-  // }
+  it("authorizeChannel succeeds with ed25519 seed", function () {
+    const wallet = Wallet.fromSeed("sEdSuqBPSQaood2DmNYVkwWTn1oQTj2");
+    const channelId =
+      "5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3";
+    const amount = "1000000";
+    assert.equal(
+      authorizeChannel(wallet, channelId, amount),
+      "7E1C217A3E4B3C107B7A356E665088B4FBA6464C48C58267BEF64975E3375EA338AE22E6714E3F5E734AE33E6B97AAD59058E1E196C1F92346FC1498D0674404"
+    );
+  });
 
   it("verify succeeds for valid signed transaction string", function () {
     const wallet = new Wallet(publicKey, privateKey);
