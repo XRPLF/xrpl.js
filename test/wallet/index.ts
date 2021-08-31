@@ -9,48 +9,48 @@ import Wallet from "../../src/wallet";
  * Provides tests for Wallet class.
  */
 describe("Wallet", function () {
-  describe('generate', () => {
-    const classicAddressPrefix = 'r'
-    const ed25519KeyPrefix = 'ED'
-    const secp256k1PrivateKeyPrefix = '00'
+  describe("generate", function () {
+    const classicAddressPrefix = "r";
+    const ed25519KeyPrefix = "ED";
+    const secp256k1PrivateKeyPrefix = "00";
 
-    it('generates a new wallet using default algorithm', () => {
-      const wallet = Wallet.generate()
+    it("generates a new wallet using default algorithm", function () {
+      const wallet = Wallet.generate();
 
-      assert.isString(wallet.publicKey)
-      assert.isString(wallet.privateKey)
-      assert.isString(wallet.classicAddress)
-      assert.isString(wallet.seed)
-      assert.isTrue(wallet.publicKey.startsWith(ed25519KeyPrefix))
-      assert.isTrue(wallet.privateKey.startsWith(ed25519KeyPrefix))
-      assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
-    })
+      assert.isString(wallet.publicKey);
+      assert.isString(wallet.privateKey);
+      assert.isString(wallet.classicAddress);
+      assert.isString(wallet.seed);
+      assert.isTrue(wallet.publicKey.startsWith(ed25519KeyPrefix));
+      assert.isTrue(wallet.privateKey.startsWith(ed25519KeyPrefix));
+      assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix));
+    });
 
-    it('generates a new wallet using algorithm ecdsa-secp256k1', () => {
-      const algorithm = ECDSA.secp256k1
-      const wallet = Wallet.generate(algorithm)
+    it("generates a new wallet using algorithm ecdsa-secp256k1", function () {
+      const algorithm = ECDSA.secp256k1;
+      const wallet = Wallet.generate(algorithm);
 
-      assert.isString(wallet.publicKey)
-      assert.isString(wallet.privateKey)
-      assert.isString(wallet.classicAddress)
-      assert.isString(wallet.seed)
-      assert.isTrue(wallet.privateKey.startsWith(secp256k1PrivateKeyPrefix))
-      assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
-    })
+      assert.isString(wallet.publicKey);
+      assert.isString(wallet.privateKey);
+      assert.isString(wallet.classicAddress);
+      assert.isString(wallet.seed);
+      assert.isTrue(wallet.privateKey.startsWith(secp256k1PrivateKeyPrefix));
+      assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix));
+    });
 
-    it('generates a new wallet using algorithm ed25519', () => {
-      const algorithm = ECDSA.ed25519
-      const wallet = Wallet.generate(algorithm)
+    it("generates a new wallet using algorithm ed25519", function () {
+      const algorithm = ECDSA.ed25519;
+      const wallet = Wallet.generate(algorithm);
 
-      assert.isString(wallet.publicKey)
-      assert.isString(wallet.privateKey)
-      assert.isString(wallet.classicAddress)
-      assert.isString(wallet.seed)
-      assert.isTrue(wallet.publicKey.startsWith(ed25519KeyPrefix))
-      assert.isTrue(wallet.privateKey.startsWith(ed25519KeyPrefix))
-      assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
-    })
-  })
+      assert.isString(wallet.publicKey);
+      assert.isString(wallet.privateKey);
+      assert.isString(wallet.classicAddress);
+      assert.isString(wallet.seed);
+      assert.isTrue(wallet.publicKey.startsWith(ed25519KeyPrefix));
+      assert.isTrue(wallet.privateKey.startsWith(ed25519KeyPrefix));
+      assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix));
+    });
+  });
 
   describe("fromSeed", function () {
     const seed = "ssL9dv2W5RK8L3tuzQxYY6EaZhSxW";

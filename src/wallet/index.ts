@@ -9,11 +9,11 @@ import {
   verify,
 } from "ripple-keypairs";
 
-import ECDSA from '../common/ecdsa';
-import { ValidationError } from '../common/errors';
-import { SignedTransaction } from '../common/types/objects';
-import { signOffline } from '../transaction/sign';
-import { SignOptions } from '../transaction/types';
+import ECDSA from "../common/ecdsa";
+import { ValidationError } from "../common/errors";
+import { SignedTransaction } from "../common/types/objects";
+import { signOffline } from "../transaction/sign";
+import { SignOptions } from "../transaction/types";
 
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
@@ -21,28 +21,29 @@ import { SignOptions } from '../transaction/types';
  * It provides functionality to sign/verify transactions offline.
  */
 class Wallet {
-  readonly publicKey: string
-  readonly privateKey: string
-  readonly classicAddress: string
-  readonly seed?: string
-  private static readonly defaultAlgorithm: ECDSA = ECDSA.ed25519
-  private static readonly defaultDerivationPath: string = "m/44'/144'/0'/0/0"
+  readonly publicKey: string;
+  readonly privateKey: string;
+  readonly classicAddress: string;
+  readonly seed?: string;
+  private static readonly defaultAlgorithm: ECDSA = ECDSA.ed25519;
+  private static readonly defaultDerivationPath: string = "m/44'/144'/0'/0/0";
 
   constructor(publicKey: string, privateKey: string, seed?: string) {
-    this.publicKey = publicKey
-    this.privateKey = privateKey
-    this.classicAddress = deriveAddress(publicKey)
-    this.seed = seed
+    this.publicKey = publicKey;
+    this.privateKey = privateKey;
+    this.classicAddress = deriveAddress(publicKey);
+    this.seed = seed;
   }
 
   /**
-   * Generates a new Wallet using a generated seed
-   * @param {ECDSA} algorithm The digital signature algorithm to generate an address for.
-   * @returns {Wallet} A new Wallet derived from a generated seed.
+   * Generates a new Wallet using a generated seed.
+   *
+   * @param algorithm - The digital signature algorithm to generate an address for.
+   * @returns A new Wallet derived from a generated seed.
    */
   static generate(algorithm: ECDSA = Wallet.defaultAlgorithm): Wallet {
-    const seed = generateSeed({algorithm})
-    return Wallet.fromSeed(seed)
+    const seed = generateSeed({ algorithm });
+    return Wallet.fromSeed(seed);
   }
 
   /**
@@ -149,12 +150,8 @@ class Wallet {
    * @param test - A boolean to indicate if X-address should be in Testnet (true) or Mainnet (false) format.
    * @returns An X-address.
    */
-  getXAddress(tag: number, test: boolean = false): string {
-    return classicAddressToXAddress(
-      this.classicAddress,
-      tag,
-      test,
-    )
+  getXAddress(tag: number, test = false): string {
+    return classicAddressToXAddress(this.classicAddress, tag, test);
   }
 }
 
