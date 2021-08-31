@@ -1,3 +1,4 @@
+/* eslint-disable import/max-dependencies -- These imports are required for Signer */
 import { BigNumber } from "bignumber.js";
 import { flatMap } from "lodash";
 import { decodeAccountID } from "ripple-address-codec";
@@ -20,6 +21,14 @@ import { verifyBaseTransaction } from "../models/transactions/common";
 import { computeBinaryTransactionHash } from "../utils";
 import Wallet from "../Wallet";
 
+/**
+ * Sign uses your wallet to cryptographically sign your transaction which proves
+ * that you are the one issuing this transaction.
+ *
+ * @param wallet - A Wallet that holds your cryptographic keys.
+ * @param tx - The Transaction that is being signed.
+ * @returns A signed Transaction and a Transaction id that corresponds to the pre-signed Transaction.
+ */
 function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
   return wallet.signTransaction(tx, { signAs: "" });
 }
@@ -27,9 +36,10 @@ function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
 /**
  * The transactions should all be equal except for the 'Signers' field.
  *
- * @param transactions
+ * @param transactions - An array of Transactions which are expected to be equal other than 'Signers'.
+ * @throws ValidationError if the transactions are not equal in any field other than 'Signers'.
  */
-function validateTransactionEquivalence(transactions: Transaction[]) {
+function validateTransactionEquivalence(transactions: Transaction[]): void {
   const exampleTransaction = JSON.stringify({
     ...transactions[0],
     Signers: null,
@@ -47,9 +57,10 @@ function validateTransactionEquivalence(transactions: Transaction[]) {
   }
 }
 
-function addressToBigNumber(address) {
+function addressToBigNumber(address: string): BigNumber {
   const hex = Buffer.from(decodeAccountID(address)).toString("hex");
-  return new BigNumber(hex, 16);
+  const numberOfBitsInHex = 16;
+  return new BigNumber(hex, numberOfBitsInHex);
 }
 
 /**
@@ -58,14 +69,13 @@ function addressToBigNumber(address) {
  * (If submitted as JSON, the submit_multisigned method handles this automatically.)
  * https://xrpl.org/multi-signing.html.
  *
- * @param a
- * @param b
- * @param a
- * @param b
+ * @param left - A Signer to compare with.
+ * @param right - A second Signer to compare with.
+ * @returns 1 if left \> right, 0 if left = right, -1 if left \< right, and null if left or right are NaN.
  */
-function compareSigners(a, b) {
-  return addressToBigNumber(a.Account).comparedTo(
-    addressToBigNumber(b.Account)
+function compareSigners(left: Signer, right: Signer): number {
+  return addressToBigNumber(left.Account).comparedTo(
+    addressToBigNumber(right.Account)
   );
 }
 
@@ -73,11 +83,10 @@ function getTransactionWithAllSigners(
   transactions: Transaction[]
 ): Transaction {
   // flatMap let's us go from Transaction[] with Signer[] to one Signer[]
-  const sortedSigners: { Signer: Signer }[] = flatMap(
+  const sortedSigners: Array<{ Signer: Signer }> = flatMap(
     transactions,
     (tx) => tx.Signers?.map((signer) => signer.Signer) ?? []
   )
-    .filter((signer) => signer)
     // Signers must be sorted - see compareSigners for more details
     .sort(compareSigners)
     .map((signer) => {
@@ -90,6 +99,8 @@ function getTransactionWithAllSigners(
 }
 
 /**
+ * Combine takes a collection of signedTransactions with the same underlying transaction and produces a
+ * Transaction with all Signers. It then signs that Transaction and gives an id based on the combined Transaction.
  *
  * @param signedTransactions - A collection of the same transaction signed by different signers. The only difference
  * between the elements of signedTransactions should be the Signers field.
@@ -97,6 +108,7 @@ function getTransactionWithAllSigners(
  * with a transaction id based on the combined transaction.
  */
 function combine(signedTransactions: string[]): SignedTransaction {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Type assertions let us use well-typed transactions
   const transactions: Transaction[] = signedTransactions.map((tx: string) => {
     return decode(tx);
   }) as unknown as Transaction[];
@@ -116,6 +128,7 @@ function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
     return txOrBlob;
   }
 
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Type assertions let us use well-typed transactions
   return decode(txOrBlob) as unknown as Transaction;
 }
 
@@ -126,6 +139,11 @@ function getEncodedTransaction(txOrBlob: Transaction | string): string {
   return txOrBlob;
 }
 
+/**
+ *
+ * @param transactions
+ * @returns
+ */
 function multisign(
   transactions: Array<Transaction | string>
 ): SignedTransaction {
@@ -157,6 +175,13 @@ function multisign(
   return combine(encodedTransactions);
 }
 
+/**
+ *
+ * @param wallet
+ * @param channelId
+ * @param amount
+ * @returns
+ */
 function authorizeChannel(
   wallet: Wallet,
   channelId: string,
@@ -170,6 +195,11 @@ function authorizeChannel(
   return signWithKeypair(signingData, wallet.privateKey);
 }
 
+/**
+ *
+ * @param tx
+ * @returns
+ */
 function verify(tx: Transaction | string): boolean {
   const decodedTx: Transaction = getDecodedTransaction(tx);
   return verifySignature(
@@ -179,4 +209,5 @@ function verify(tx: Transaction | string): boolean {
   );
 }
 
+// eslint-disable-next-line import/no-unused-modules -- It will be used by users of the library
 export { sign, multisign, authorizeChannel, verify };

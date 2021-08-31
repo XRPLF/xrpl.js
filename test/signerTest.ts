@@ -1,9 +1,14 @@
 import { assert } from "chai";
-import { sign, authorizeChannel, multisign } from "xrpl-local/ledger/signer";
-import { decode } from "../ripple-binary-codec";
+import { decode } from "ripple-binary-codec";
+
 import { ValidationError } from "../src/common/errors";
 import { SignedTransaction } from "../src/common/types/objects";
-import { verify } from "../src/ledger/signer";
+import {
+  verify,
+  sign,
+  authorizeChannel,
+  multisign,
+} from "../src/ledger/signer";
 import { Transaction } from "../src/models/transactions";
 import Wallet from "../src/Wallet";
 
@@ -126,6 +131,7 @@ describe("Signer tests", function () {
   //     const amount = '1000000'
   //
   //     assert.equal(authorizeChannel(wallet, channelId, amount),
+  // eslint-disable-next-line max-len -- It's cleaner on one line
   //     '304402207936D71315E0F2AC349A33F988111A6C6D92CD96347AF42BDB5C34EE61D4EC1F0220684CB495EA93DBF0B5A7EC003A1501BC87B2635AA592E5362D240A43DC1BC801')
   // }
 
@@ -137,21 +143,22 @@ describe("Signer tests", function () {
     assert.isTrue(verify(signedTx.signedTransaction));
   });
 
-  it("verify succeeds for valid signed transaction object"),
-    () => {
-      const wallet = new Wallet(publicKey, privateKey);
+  it("verify succeeds for valid signed transaction object", function () {
+    const wallet = new Wallet(publicKey, privateKey);
 
-      const signedTx: SignedTransaction = sign(wallet, tx);
+    const signedTx: SignedTransaction = sign(wallet, tx);
 
-      assert.isTrue(
-        verify(decode(signedTx.signedTransaction) as unknown as Transaction)
-      );
-    };
+    assert.isTrue(
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for interfacing with binary-codec
+      verify(decode(signedTx.signedTransaction) as unknown as Transaction)
+    );
+  });
 
   it("verify throws for invalid signing key", function () {
     const wallet = new Wallet(publicKey, privateKey);
     const signedTx: SignedTransaction = sign(wallet, tx);
 
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for interfacing with binary-codec
     const decodedTx: Transaction = decode(
       signedTx.signedTransaction
     ) as unknown as Transaction;
