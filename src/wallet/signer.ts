@@ -217,5 +217,5 @@ function verify(tx: Transaction | string): boolean {
   );
 }
 
-// eslint-disable-next-line import/no-unused-modules -- It will be used by users of the library
+// eslint-disable-next-line import/no-unused-modules -- These methods will be used by users of the library
 export { sign, multisign, authorizeChannel, verify };

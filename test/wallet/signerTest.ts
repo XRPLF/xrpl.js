@@ -1,16 +1,16 @@
 import { assert } from "chai";
 import { decode } from "ripple-binary-codec";
 
-import { ValidationError } from "../src/common/errors";
-import { SignedTransaction } from "../src/common/types/objects";
+import { ValidationError } from "../../src/common/errors";
+import { SignedTransaction } from "../../src/common/types/objects";
+import { Transaction } from "../../src/models/transactions";
+import Wallet from "../../src/Wallet";
 import {
   verify,
   sign,
   authorizeChannel,
   multisign,
-} from "../src/ledger/signer";
-import { Transaction } from "../src/models/transactions";
-import Wallet from "../src/Wallet";
+} from "../../src/wallet/signer";
 
 const publicKey =
   "030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D";
