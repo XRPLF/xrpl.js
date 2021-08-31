@@ -1,4 +1,4 @@
-import Metadata from "../common/metadata";
+/* eslint-disable import/max-dependencies -- All methods need to be exported */
 
 import { AccountDelete } from "./accountDelete";
 import { AccountSet } from "./accountSet";
@@ -9,12 +9,13 @@ import { DepositPreauth } from "./depositPreauth";
 import { EscrowCancel } from "./escrowCancel";
 import { EscrowCreate } from "./escrowCreate";
 import { EscrowFinish } from "./escrowFinish";
+import Metadata from "./metadata";
 import { OfferCancel } from "./offerCancel";
 import { OfferCreate } from "./offerCreate";
+import { Payment } from "./payment";
 import { PaymentChannelClaim } from "./paymentChannelClaim";
 import { PaymentChannelCreate } from "./paymentChannelCreate";
 import { PaymentChannelFund } from "./paymentChannelFund";
-import { PaymentTransaction } from "./paymentTransaction";
 import { SetRegularKey } from "./setRegularKey";
 import { SignerListSet } from "./signerListSet";
 import { TicketCreate } from "./ticketCreate";
@@ -32,7 +33,7 @@ export type Transaction =
   | EscrowFinish
   | OfferCancel
   | OfferCreate
-  | PaymentTransaction
+  | Payment
   | PaymentChannelClaim
   | PaymentChannelCreate
   | PaymentChannelFund

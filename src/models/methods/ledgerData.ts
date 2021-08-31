@@ -9,7 +9,7 @@ export interface LedgerDataRequest extends BaseRequest {
   ledger_index?: LedgerIndex;
   binary?: boolean;
   limit?: number;
-  marker?: any;
+  marker?: unknown;
 }
 
 type LabeledLedgerEntry = { ledgerEntryType: string } & LedgerEntry;
@@ -25,6 +25,6 @@ export interface LedgerDataResponse extends BaseResponse {
     ledger_index: number;
     ledger_hash: string;
     state: State[];
-    marker?: any;
+    marker?: unknown;
   };
 }

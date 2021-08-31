@@ -6,7 +6,7 @@ export interface AccountLinesRequest {
   ledger_index?: number | ("validated" | "closed" | "current");
   peer?: string;
   limit?: number;
-  marker?: any;
+  marker?: unknown;
 }
 
 export interface AccountLinesResponse {
@@ -15,5 +15,5 @@ export interface AccountLinesResponse {
   ledger_current_index?: number;
   ledger_index?: number;
   ledger_hash?: string;
-  marker?: any;
+  marker?: unknown;
 }

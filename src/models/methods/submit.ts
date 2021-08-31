@@ -1,3 +1,5 @@
+import { Transaction } from "../transactions";
+
 import { BaseRequest, BaseResponse } from "./baseMethod";
 
 export interface SubmitRequest extends BaseRequest {
@@ -12,7 +14,7 @@ export interface SubmitResponse extends BaseResponse {
     engine_result_code: number;
     engine_result_message: string;
     tx_blob: string;
-    tx_json: any; // TODO: type this properly when we have Transaction types
+    tx_json: Transaction;
     accepted: boolean;
     account_sequence_available: number;
     account_sequence_next: number;

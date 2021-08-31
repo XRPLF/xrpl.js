@@ -141,7 +141,6 @@ describe("Compute Ledger Hash", function () {
       transactionHash:
         "325EACC5271322539EEEC2D6A5292471EF1B3E72AE7180533EFC3B8F0AD435C9",
     };
-    header.rawTransactions = JSON.stringify(REQUEST_FIXTURES.transactions);
     assert.throws(() => computeLedgerHeaderHash(header));
   });
 });

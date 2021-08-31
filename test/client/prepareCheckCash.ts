@@ -1,55 +1,71 @@
 import requests from "../fixtures/requests";
 import responses from "../fixtures/responses";
 import rippled from "../fixtures/rippled";
-import { assertResultMatch, TestSuite } from "../testUtils";
+import setupClient from "../setupClient";
+import { assertResultMatch, addressTests } from "../testUtils";
 
 const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-export default <TestSuite>{
-  "prepareCheckCash amount": async (client, address, mockRippled) => {
-    mockRippled.addResponse("server_info", rippled.server_info.normal);
-    mockRippled.addResponse("fee", rippled.fee);
-    mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const result = await client.prepareCheckCash(
-      address,
-      requests.prepareCheckCash.amount
-    );
-    assertResultMatch(result, responses.prepareCheckCash.amount, "prepare");
-  },
+describe("client.prepareCheckCash", function () {
+  beforeEach(setupClient.setup);
+  afterEach(setupClient.teardown);
 
-  "prepareCheckCash deliverMin": async (client, address, mockRippled) => {
-    mockRippled.addResponse("server_info", rippled.server_info.normal);
-    mockRippled.addResponse("fee", rippled.fee);
-    mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const result = await client.prepareCheckCash(
-      address,
-      requests.prepareCheckCash.deliverMin
-    );
-    assertResultMatch(result, responses.prepareCheckCash.deliverMin, "prepare");
-  },
+  addressTests.forEach(function (test) {
+    describe(test.type, function () {
+      it("prepareCheckCash amount", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const result = await this.client.prepareCheckCash(
+          test.address,
+          requests.prepareCheckCash.amount
+        );
+        assertResultMatch(result, responses.prepareCheckCash.amount, "prepare");
+      });
 
-  "with ticket": async (client, address, mockRippled) => {
-    mockRippled.addResponse("server_info", rippled.server_info.normal);
-    mockRippled.addResponse("fee", rippled.fee);
-    mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: "0.000012",
-      ticketSequence: 23,
-    };
-    const result = await client.prepareCheckCash(
-      address,
-      requests.prepareCheckCash.amount,
-      localInstructions
-    );
-    assertResultMatch(result, responses.prepareCheckCash.ticket, "prepare");
-  },
-};
+      it("prepareCheckCash deliverMin", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const result = await this.client.prepareCheckCash(
+          test.address,
+          requests.prepareCheckCash.deliverMin
+        );
+        assertResultMatch(
+          result,
+          responses.prepareCheckCash.deliverMin,
+          "prepare"
+        );
+      });
+
+      it("with ticket", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const localInstructions = {
+          ...instructionsWithMaxLedgerVersionOffset,
+          maxFee: "0.000012",
+          ticketSequence: 23,
+        };
+        const result = await this.client.prepareCheckCash(
+          test.address,
+          requests.prepareCheckCash.amount,
+          localInstructions
+        );
+        assertResultMatch(result, responses.prepareCheckCash.ticket, "prepare");
+      });
+    });
+  });
+});
