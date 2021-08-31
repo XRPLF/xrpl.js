@@ -346,7 +346,7 @@ class Client extends EventEmitter {
    * @returns An autofilled transaction.
    */
   async autofill(tx: Transaction): Promise<Transaction> {
-    return transactionUtils.autofill(tx, this);
+    return transactionUtils.autofill(this, tx);
   }
 
   /**

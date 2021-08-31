@@ -420,11 +420,11 @@ function convertMemo(memo: Memo): { Memo: ApiMemo } {
 /**
  * Autofills fields in a transaction.
  *
- * @param tx - A transaction to autofill fields.
  * @param client - A client.
+ * @param tx - A transaction to autofill fields.
  * @returns An autofilled transaction.
  */
-async function autofill(tx: Transaction, client: Client): Promise<Transaction> {
+async function autofill(client: Client, tx: Transaction): Promise<Transaction> {
   validateAccountAddress(tx, "Account", "SourceTag");
   if (tx["Destination"] != null) {
     validateAccountAddress(tx, "Destination", "DestinationTag");
