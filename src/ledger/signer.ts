@@ -140,9 +140,15 @@ function getEncodedTransaction(txOrBlob: Transaction | string): string {
 }
 
 /**
+ * Multisign takes several transactions (in object or blob form) and creates a single transaction with all Signers
+ * that then gets signed and returned.
  *
- * @param transactions
- * @returns
+ * @param transactions - An array of Transactions (in object or blob form) to combine and sign.
+ * @returns A single signed Transaction which has all Signers from transactions within it.
+ * @throws ValidationError if:
+ * - There were no transactions given to sign
+ * - The SigningPubKey field is not the empty string in any given transaction
+ * - Any transaction is missing a Signers field.
  */
 function multisign(
   transactions: Array<Transaction | string>
@@ -176,11 +182,12 @@ function multisign(
 }
 
 /**
+ * AuthorizeChannel creates a signature that can be used to redeem a specific amount of XRP from a payment channel.
  *
- * @param wallet
- * @param channelId
- * @param amount
- * @returns
+ * @param wallet - The account that will sign for this payment channel.
+ * @param channelId - An id for the payment channel to redeem XRP from.
+ * @param amount - The amount in drops to redeem.
+ * @returns A signature that can be used to redeem a specific amount of XRP from a payment channel.
  */
 function authorizeChannel(
   wallet: Wallet,
@@ -196,9 +203,10 @@ function authorizeChannel(
 }
 
 /**
+ * Verifies that the given transaction has a valid signature based on public-key encryption.
  *
- * @param tx
- * @returns
+ * @param tx - A transaction to verify the signature of. (Can be in object or encoded string format).
+ * @returns Returns true if tx has a valid signature, and returns false otherwise.
  */
 function verify(tx: Transaction | string): boolean {
   const decodedTx: Transaction = getDecodedTransaction(tx);
