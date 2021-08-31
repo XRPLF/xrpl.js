@@ -107,8 +107,8 @@ describe("Payment", function () {
 
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a number`, function () {
     paymentTransaction.DeliverMin = "10000";
-    (paymentTransaction.Flags = PaymentTransactionFlagsEnum.tfPartialPayment),
-      assert.doesNotThrow(() => verifyPayment(paymentTransaction));
+    paymentTransaction.Flags = PaymentTransactionFlagsEnum.tfPartialPayment;
+    assert.doesNotThrow(() => verifyPayment(paymentTransaction));
   });
 
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a boolean`, function () {
