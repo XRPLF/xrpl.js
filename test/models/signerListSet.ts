@@ -1,7 +1,9 @@
-import { ValidationError } from "xrpl-local/common/errors";
-import { verifySignerListSet } from "./../../src/models/transactions/signerListSet";
 import { assert } from "chai";
+
+import { ValidationError } from "xrpl-local/common/errors";
+
 import { verify } from "../../src/models/transactions";
+import { verifySignerListSet } from "../../src/models/transactions/signerListSet";
 
 /**
  * SignerListSet Transaction Verification Testing.
@@ -88,6 +90,15 @@ describe("SignerListSet Transaction Verification", function () {
       () => verify(SignerListSetTx),
       ValidationError,
       "SignerListSet: invalid SignerEntries"
+    );
+  });
+
+  it(`throws w/ extra field`, function () {
+    SignerListSetTx.ExtraField = "garbage";
+    assert.throws(
+      () => verify(SignerListSetTx),
+      ValidationError,
+      "Invalid Transaction: SignerListSet"
     );
   });
 });
