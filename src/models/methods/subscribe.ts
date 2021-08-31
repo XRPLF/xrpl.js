@@ -1,8 +1,7 @@
-import { Amount } from "../../../snippets/dist/src/models/common";
-import { Currency, Path, StreamType } from "../common";
-import { TransactionMetadata } from "../common/transaction";
+import { Amount, Currency, Path, StreamType } from "../common";
+import type { TransactionMetadata } from "../common/transaction";
 
-import { BaseRequest, BaseResponse } from "./baseMethod";
+import type { BaseRequest, BaseResponse } from "./baseMethod";
 
 interface Book {
   taker_gets: Currency;
