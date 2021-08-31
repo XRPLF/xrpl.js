@@ -1,25 +1,24 @@
-import {parseTimestamp, parseMemos} from './utils'
-import {removeUndefined, dropsToXrp} from '../../utils'
-import { PayChannel } from '../../models/ledger'
+import { PayChannel } from "../../models/ledger";
+import { removeUndefined, dropsToXrp } from "../../utils";
 
-export type FormattedPaymentChannel = {
-  account: string
-  amount: string
-  balance: string
-  publicKey: string
-  destination: string
-  settleDelay: number
-  expiration?: string
-  cancelAfter?: string
-  sourceTag?: number
-  destinationTag?: number
-  previousAffectingTransactionID: string
-  previousAffectingTransactionLedgerVersion: number
+import { parseTimestamp, parseMemos } from "./utils";
+
+export interface FormattedPaymentChannel {
+  account: string;
+  amount: string;
+  balance: string;
+  publicKey: string;
+  destination: string;
+  settleDelay: number;
+  expiration?: string;
+  cancelAfter?: string;
+  sourceTag?: number;
+  destinationTag?: number;
+  previousAffectingTransactionID: string;
+  previousAffectingTransactionLedgerVersion: number;
 }
 
-export function parsePaymentChannel(
-  data: PayChannel
-): FormattedPaymentChannel {
+export function parsePaymentChannel(data: PayChannel): FormattedPaymentChannel {
   return removeUndefined({
     memos: parseMemos(data),
     account: data.Account,
@@ -33,6 +32,6 @@ export function parsePaymentChannel(
     sourceTag: data.SourceTag,
     destinationTag: data.DestinationTag,
     previousAffectingTransactionID: data.PreviousTxnID,
-    previousAffectingTransactionLedgerVersion: data.PreviousTxnLgrSeq
-  })
+    previousAffectingTransactionLedgerVersion: data.PreviousTxnLgrSeq,
+  });
 }

@@ -1,4 +1,4 @@
-import {txFlagIndices} from './txflags'
+import { txFlagIndices } from "./txflags";
 
 // Ordering from https://developers.ripple.com/accountroot.html
 const accountRootFlags = {
@@ -43,8 +43,8 @@ const accountRootFlags = {
 
   // lsfRequireDestTag:
   // Require a DestinationTag for incoming payments.
-  RequireDestTag: 0x00020000
-}
+  RequireDestTag: 0x00020000,
+};
 
 const AccountFlags = {
   passwordSpent: accountRootFlags.PasswordSpent,
@@ -55,19 +55,19 @@ const AccountFlags = {
   disableMasterKey: accountRootFlags.DisableMaster,
   noFreeze: accountRootFlags.NoFreeze,
   globalFreeze: accountRootFlags.GlobalFreeze,
-  defaultRipple: accountRootFlags.DefaultRipple
-}
+  defaultRipple: accountRootFlags.DefaultRipple,
+};
 
 export interface Settings {
-  passwordSpent?: boolean
-  requireDestinationTag?: boolean
-  requireAuthorization?: boolean
-  depositAuth?: boolean
-  disallowIncomingXRP?: boolean
-  disableMasterKey?: boolean
-  noFreeze?: boolean
-  globalFreeze?: boolean
-  defaultRipple?: boolean
+  passwordSpent?: boolean;
+  requireDestinationTag?: boolean;
+  requireAuthorization?: boolean;
+  depositAuth?: boolean;
+  disallowIncomingXRP?: boolean;
+  disableMasterKey?: boolean;
+  noFreeze?: boolean;
+  globalFreeze?: boolean;
+  defaultRipple?: boolean;
 }
 
 const AccountSetFlags = {
@@ -79,21 +79,21 @@ const AccountSetFlags = {
   enableTransactionIDTracking: txFlagIndices.AccountSet.asfAccountTxnID,
   noFreeze: txFlagIndices.AccountSet.asfNoFreeze,
   globalFreeze: txFlagIndices.AccountSet.asfGlobalFreeze,
-  defaultRipple: txFlagIndices.AccountSet.asfDefaultRipple
-}
+  defaultRipple: txFlagIndices.AccountSet.asfDefaultRipple,
+};
 
 const AccountFields = {
   EmailHash: {
-    name: 'emailHash',
-    encoding: 'hex',
+    name: "emailHash",
+    encoding: "hex",
     length: 32,
-    defaults: '00000000000000000000000000000000'
+    defaults: "00000000000000000000000000000000",
   },
-  WalletLocator: {name: 'walletLocator'},
-  MessageKey: {name: 'messageKey'},
-  Domain: {name: 'domain', encoding: 'hex'},
-  TransferRate: {name: 'transferRate', defaults: 0, shift: 9},
-  TickSize: {name: 'tickSize', defaults: 0}
-}
+  WalletLocator: { name: "walletLocator" },
+  MessageKey: { name: "messageKey" },
+  Domain: { name: "domain", encoding: "hex" },
+  TransferRate: { name: "transferRate", defaults: 0, shift: 9 },
+  TickSize: { name: "tickSize", defaults: 0 },
+};
 
-export {AccountFields, AccountSetFlags, AccountFlags}
+export { AccountFields, AccountSetFlags, AccountFlags };

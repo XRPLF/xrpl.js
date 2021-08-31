@@ -1,29 +1,24 @@
-import assert from 'assert-diff'
-import {TestSuite} from '../testUtils'
-import {Client} from 'xrpl-local'
+import { assert } from "chai";
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-export default <TestSuite>{
-  'Client - implicit server port': () => {
-    new Client('wss://s1.ripple.com')
-  },
+import { Client } from "xrpl-local";
 
-  'Client invalid options': () => {
-    // @ts-ignore - This is intentionally invalid
-    assert.throws(() => new Client({invalid: true}))
-  },
+describe("client constructor", function () {
+  it("Client - implicit server port", function () {
+    new Client("wss://s1.ripple.com");
+  });
 
-  'Client valid options': () => {
-    const client = new Client('wss://s:1')
-    const privateConnectionUrl = (client.connection as any)._url
-    assert.deepEqual(privateConnectionUrl, 'wss://s:1')
-  },
+  it("Client invalid options", function () {
+    // @ts-expect-error - This is intentionally invalid
+    assert.throws(() => new Client({ invalid: true }));
+  });
 
-  'Client invalid server uri': () => {
-    assert.throws(() => new Client('wss//s:1'))
-  }
-}
+  it("Client valid options", function () {
+    const client = new Client("wss://s:1");
+    const privateConnectionUrl = (client.connection as any)._url;
+    assert.deepEqual(privateConnectionUrl, "wss://s:1");
+  });
+
+  it("Client invalid server uri", function () {
+    assert.throws(() => new Client("wss//s:1"));
+  });
+});

@@ -1,6 +1,6 @@
 {
   "diff": true,
-  "spec": ["./test/*.ts", "./test/models/**/*.ts", "./test/utils/**/*.ts"],
+  "spec": ["./test/*.ts", "./test/models/**/*.ts", "./test/utils/**/*.ts", "./test/wallet/**/*.ts"],
   "extension": ["ts"],
   "package": "../package.json",
   "require": "ts-node/register",

@@ -1,12 +1,16 @@
-import assert from 'assert-diff'
-import {TestSuite} from '../testUtils'
+import { assert } from "chai";
 
-export default <TestSuite>{
-  'returns true for valid secret': async (client, address) => {
-    assert(client.isValidSecret('snsakdSrZSLkYpCXxfRkS4Sh96PMK'))
-  },
+import setupClient from "../setupClient";
 
-  'returns false for invalid secret': async (client, address) => {
-    assert(!client.isValidSecret('foobar'))
-  }
-}
+describe("isValidSecret", function () {
+  beforeEach(setupClient.setup);
+  afterEach(setupClient.teardown);
+
+  it("returns true for valid secret", async function () {
+    assert(this.client.isValidSecret("snsakdSrZSLkYpCXxfRkS4Sh96PMK"));
+  });
+
+  it("returns false for invalid secret", async function () {
+    assert(!this.client.isValidSecret("foobar"));
+  });
+});

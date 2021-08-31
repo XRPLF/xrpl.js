@@ -1,138 +1,155 @@
-import assert from 'assert-diff'
-import requests from '../fixtures/requests'
-import responses from '../fixtures/responses'
-import rippled from '../fixtures/rippled'
-import {assertResultMatch, TestSuite} from '../testUtils'
-const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
-const {preparePaymentChannelClaim: REQUEST_FIXTURES} = requests
-const {preparePaymentChannelClaim: RESPONSE_FIXTURES} = responses
+import { assert } from "chai";
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-export default <TestSuite>{
-  'default': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
-    mockRippled.addResponse({command: 'fee'}, rippled.fee)
-    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
-    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
-    }
-    const response = await client.preparePaymentChannelClaim(
-      address,
-      REQUEST_FIXTURES.normal,
-      localInstructions
-    )
-    assertResultMatch(response, RESPONSE_FIXTURES.normal, 'prepare')
-  },
+import requests from "../fixtures/requests";
+import responses from "../fixtures/responses";
+import rippled from "../fixtures/rippled";
+import setupClient from "../setupClient";
+import { assertResultMatch, addressTests } from "../testUtils";
 
-  'with renew': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
-    mockRippled.addResponse({command: 'fee'}, rippled.fee)
-    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
-    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
-    }
-    const response = await client.preparePaymentChannelClaim(
-      address,
-      REQUEST_FIXTURES.renew,
-      localInstructions
-    )
-    assertResultMatch(response, RESPONSE_FIXTURES.renew, 'prepare')
-  },
+const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
+const { preparePaymentChannelClaim: REQUEST_FIXTURES } = requests;
+const { preparePaymentChannelClaim: RESPONSE_FIXTURES } = responses;
 
-  'with close': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
-    mockRippled.addResponse({command: 'fee'}, rippled.fee)
-    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
-    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012'
-    }
-    const response = await client.preparePaymentChannelClaim(
-      address,
-      REQUEST_FIXTURES.close,
-      localInstructions
-    )
-    assertResultMatch(response, RESPONSE_FIXTURES.close, 'prepare')
-  },
+describe("client.preparePaymentChannelClaim", function () {
+  beforeEach(setupClient.setup);
+  afterEach(setupClient.teardown);
 
-  'with ticket': async (client, address, mockRippled) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
-    mockRippled.addResponse({command: 'fee'}, rippled.fee)
-    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
-    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: '0.000012',
-      ticketSequence: 23
-    }
-    const response = await client.preparePaymentChannelClaim(
-      address,
-      REQUEST_FIXTURES.normal,
-      localInstructions
-    )
-    assertResultMatch(response, RESPONSE_FIXTURES.ticket, 'prepare')
-  },
+  addressTests.forEach(function (test) {
+    describe(test.type, function () {
+      it("default", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const localInstructions = {
+          ...instructionsWithMaxLedgerVersionOffset,
+          maxFee: "0.000012",
+        };
+        const response = await this.client.preparePaymentChannelClaim(
+          test.address,
+          REQUEST_FIXTURES.normal,
+          localInstructions
+        );
+        assertResultMatch(response, RESPONSE_FIXTURES.normal, "prepare");
+      });
 
-  'rejects Promise on preparePaymentChannelClaim with renew and close': async (
-    client,
-    address,
-    mockRippled
-  ) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
-    mockRippled.addResponse({command: 'fee'}, rippled.fee)
-    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
-    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
-    try {
-      const prepared = await client.preparePaymentChannelClaim(
-        address,
-        REQUEST_FIXTURES.full
-      )
-      throw new Error(
-        'Expected method to reject. Prepared transaction: ' +
-          JSON.stringify(prepared)
-      )
-    } catch (err) {
-      assert.strictEqual(err.name, 'ValidationError')
-      assert.strictEqual(
-        err.message,
-        '"renew" and "close" flags on PaymentChannelClaim are mutually exclusive'
-      )
-    }
-  },
+      it("with renew", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const localInstructions = {
+          ...instructionsWithMaxLedgerVersionOffset,
+          maxFee: "0.000012",
+        };
+        const response = await this.client.preparePaymentChannelClaim(
+          test.address,
+          REQUEST_FIXTURES.renew,
+          localInstructions
+        );
+        assertResultMatch(response, RESPONSE_FIXTURES.renew, "prepare");
+      });
 
-  'rejects Promise on preparePaymentChannelClaim with no signature': async (
-    client,
-    address,
-    mockRippled
-  ) => {
-    mockRippled.addResponse({command: 'server_info'}, rippled.server_info.normal)
-    mockRippled.addResponse({command: 'fee'}, rippled.fee)
-    mockRippled.addResponse({command: 'ledger_current'}, rippled.ledger_current)
-    mockRippled.addResponse({command: 'account_info'}, rippled.account_info.normal)
-    try {
-      const prepared = await client.preparePaymentChannelClaim(
-        address,
-        REQUEST_FIXTURES.noSignature
-      )
-      throw new Error(
-        'Expected method to reject. Prepared transaction: ' +
-          JSON.stringify(prepared)
-      )
-    } catch (err) {
-      assert.strictEqual(err.name, 'ValidationError')
-      assert.strictEqual(
-        err.message,
-        '"signature" and "publicKey" fields on PaymentChannelClaim must only be specified together.'
-      )
-    }
-  }
-}
+      it("with close", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const localInstructions = {
+          ...instructionsWithMaxLedgerVersionOffset,
+          maxFee: "0.000012",
+        };
+        const response = await this.client.preparePaymentChannelClaim(
+          test.address,
+          REQUEST_FIXTURES.close,
+          localInstructions
+        );
+        assertResultMatch(response, RESPONSE_FIXTURES.close, "prepare");
+      });
+
+      it("with ticket", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const localInstructions = {
+          ...instructionsWithMaxLedgerVersionOffset,
+          maxFee: "0.000012",
+          ticketSequence: 23,
+        };
+        const response = await this.client.preparePaymentChannelClaim(
+          test.address,
+          REQUEST_FIXTURES.normal,
+          localInstructions
+        );
+        assertResultMatch(response, RESPONSE_FIXTURES.ticket, "prepare");
+      });
+
+      it("rejects Promise on preparePaymentChannelClaim with renew and close", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        try {
+          const prepared = await this.client.preparePaymentChannelClaim(
+            test.address,
+            REQUEST_FIXTURES.full
+          );
+          throw new Error(
+            `Expected method to reject. Prepared transaction: ${JSON.stringify(
+              prepared
+            )}`
+          );
+        } catch (err) {
+          assert.strictEqual(err.name, "ValidationError");
+          assert.strictEqual(
+            err.message,
+            '"renew" and "close" flags on PaymentChannelClaim are mutually exclusive'
+          );
+        }
+      });
+
+      it("rejects Promise on preparePaymentChannelClaim with no signature", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        try {
+          const prepared = await this.client.preparePaymentChannelClaim(
+            test.address,
+            REQUEST_FIXTURES.noSignature
+          );
+          throw new Error(
+            `Expected method to reject. Prepared transaction: ${JSON.stringify(
+              prepared
+            )}`
+          );
+        } catch (err) {
+          assert.strictEqual(err.name, "ValidationError");
+          assert.strictEqual(
+            err.message,
+            '"signature" and "publicKey" fields on PaymentChannelClaim must only be specified together.'
+          );
+        }
+      });
+    });
+  });
+});
