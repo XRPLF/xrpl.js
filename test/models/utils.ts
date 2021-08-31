@@ -1,7 +1,20 @@
 import { assert } from "chai";
-import { DepositPreauth, OfferCreate, OfferCreateFlagsEnum, PaymentChannelClaim, PaymentChannelClaimFlagsEnum, PaymentTransaction, PaymentTransactionFlagsEnum, TrustSet, TrustSetFlagsEnum } from "../../src/models/transactions";
 
-import { isFlagEnabled, setTransactionFlagsToNumber } from "../../src/models/utils";
+import {
+  DepositPreauth,
+  OfferCreate,
+  OfferCreateFlagsEnum,
+  PaymentChannelClaim,
+  PaymentChannelClaimFlagsEnum,
+  Payment,
+  PaymentTransactionFlagsEnum,
+  TrustSet,
+  TrustSetFlagsEnum,
+} from "../../src/models/transactions";
+import {
+  isFlagEnabled,
+  setTransactionFlagsToNumber,
+} from "../../src/models/utils";
 
 /**
  * Utils Testing.
@@ -29,10 +42,10 @@ describe("Models Utils", function () {
     });
   });
 
-  describe('setTransactionFlagsToNumber', () => {
-    const globalFlags = { tfFullyCanonicalSig: false }
+  describe("setTransactionFlagsToNumber", function () {
+    const globalFlags = { tfFullyCanonicalSig: false };
 
-    it('sets OfferCreateFlags to its numeric value', () => {
+    it("sets OfferCreateFlags to its numeric value", function () {
       const tx: OfferCreate = {
         Account: "r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W",
         Fee: "10",
@@ -59,9 +72,9 @@ describe("Models Utils", function () {
 
       setTransactionFlagsToNumber(tx);
       assert.strictEqual(tx.Flags, expected);
-    })
+    });
 
-    it('sets PaymentChannelClaimFlags to its numeric value', () => {
+    it("sets PaymentChannelClaimFlags to its numeric value", function () {
       const tx: PaymentChannelClaim = {
         Account: "r...",
         TransactionType: "PaymentChannelClaim",
@@ -79,10 +92,10 @@ describe("Models Utils", function () {
 
       setTransactionFlagsToNumber(tx);
       assert.strictEqual(tx.Flags, expected);
-    })
+    });
 
-    it('sets PaymentTransactionFlags to its numeric value', () => {
-      const tx: PaymentTransaction = {
+    it("sets PaymentTransactionFlags to its numeric value", function () {
+      const tx: Payment = {
         TransactionType: "Payment",
         Account: "rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo",
         Amount: "1234",
@@ -100,9 +113,9 @@ describe("Models Utils", function () {
 
       setTransactionFlagsToNumber(tx);
       assert.strictEqual(tx.Flags, expected);
-    })
+    });
 
-    it('sets TrustSetFlags to its numeric value', () => {
+    it("sets TrustSetFlags to its numeric value", function () {
       const tx: TrustSet = {
         TransactionType: "TrustSet",
         Account: "rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo",
@@ -128,19 +141,19 @@ describe("Models Utils", function () {
 
       setTransactionFlagsToNumber(tx);
       assert.strictEqual(tx.Flags, expected);
-    })
+    });
 
-    it('sets other transaction types flags to its numeric value', () => {
+    it("sets other transaction types flags to its numeric value", function () {
       const tx: DepositPreauth = {
         TransactionType: "DepositPreauth",
         Account: "rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo",
         Flags: {
           ...globalFlags,
-        }
+        },
       };
 
       setTransactionFlagsToNumber(tx);
       assert.strictEqual(tx.Flags, 0);
-    })
+    });
   });
 });
