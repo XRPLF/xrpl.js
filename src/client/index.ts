@@ -94,6 +94,11 @@ import {
   PingResponse,
   RandomRequest,
   RandomResponse,
+  LedgerStream,
+  ValidationStream,
+  TransactionStream,
+  PeerStatusStream,
+  ConsensusStream,
 } from "../models/methods";
 import prepareCheckCancel from "../transaction/check-cancel";
 import prepareCheckCash from "../transaction/check-cash";
@@ -259,6 +264,25 @@ class Client extends EventEmitter {
       // @ts-expect-error
       account: r.account ? ensureClassicAddress(r.account) : undefined,
     });
+  }
+
+  public on(event: "ledgerClosed", listener: (ledger: LedgerStream) => void);
+  public on(
+    event: "validationReceived",
+    listener: (ledger: ValidationStream) => void
+  );
+  public on(event: "transaction", listener: (tx: TransactionStream) => void);
+  public on(
+    event: "peerStatusChange",
+    listener: (status: PeerStatusStream) => void
+  );
+  public on(
+    event: "consensusPhase",
+    listener: (phase: ConsensusStream) => void
+  );
+  public on(eventName: string, listener: (...args: any[]) => void) {
+    this.connection.on(eventName, listener);
+    return this;
   }
 
   /**
