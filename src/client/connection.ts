@@ -52,7 +52,9 @@ export type ConnectionUserOptions = Partial<ConnectionOptions>;
 // WebSocket spec allows 4xxx codes for app/library specific codes.
 // See: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
 //
-const INTENTIONAL_DISCONNECT_CODE = 4000;
+export const INTENTIONAL_DISCONNECT_CODE = 4000;
+
+type WebsocketState = 0 | 1 | 2 | 3;
 
 function getAgent(url: string, config: ConnectionOptions): Agent | undefined {
   // TODO: replace deprecated method
@@ -348,7 +350,8 @@ export class Connection extends EventEmitter {
       return;
     }
     if (data.type == null && data.error) {
-      this.emit("error", data.error, data.error_message, data); // e.g. slowDown
+      // e.g. slowDown
+      this.emit("error", data.error, data.error_message, data);
       return;
     }
     if (data.type) {
@@ -368,7 +371,7 @@ export class Connection extends EventEmitter {
    *
    * @returns The Websocket's ready state.
    */
-  private get state(): 0 | 1 | 2 | 3 {
+  private get state(): WebsocketState {
     return this.ws ? this.ws.readyState : WebSocket.CLOSED;
   }
 

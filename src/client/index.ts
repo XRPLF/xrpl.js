@@ -118,7 +118,11 @@ import * as transactionUtils from "../transaction/utils";
 import { deriveAddress, deriveXAddress } from "../utils/derive";
 import generateFaucetWallet from "../wallet/generateFaucetWallet";
 
-import { Connection, ConnectionUserOptions } from "./connection";
+import {
+  Connection,
+  ConnectionUserOptions,
+  INTENTIONAL_DISCONNECT_CODE,
+} from "./connection";
 
 export interface ClientOptions extends ConnectionUserOptions {
   feeCushion?: number;
@@ -166,6 +170,12 @@ interface MarkerResponse extends BaseResponse {
   };
 }
 
+const DEFAULT_FEE_CUSHION = 1.2;
+const DEFAULT_MAX_FEE_XRP = "2";
+
+const MIN_LIMIT = 10;
+const MAX_LIMIT = 400;
+
 class Client extends EventEmitter {
   // New in > 0.21.0
   // non-validated ledger versions are allowed, and passed to rippled as-is.
@@ -192,8 +202,8 @@ class Client extends EventEmitter {
       );
     }
 
-    this.feeCushion = options.feeCushion ?? 1.2;
-    this.maxFeeXRP = options.maxFeeXRP ?? "2";
+    this.feeCushion = options.feeCushion ?? DEFAULT_FEE_CUSHION;
+    this.maxFeeXRP = options.maxFeeXRP ?? DEFAULT_MAX_FEE_XRP;
 
     this.connection = new Connection(server, options);
 
@@ -209,7 +219,7 @@ class Client extends EventEmitter {
       let finalCode = code;
       // 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
       // Since 4000 is a normal disconnect reason, we convert this to the standard exit code 1000
-      if (finalCode === 4000) {
+      if (finalCode === INTENTIONAL_DISCONNECT_CODE) {
         finalCode = 1000;
       }
       this.emit("disconnected", finalCode);
@@ -411,7 +421,7 @@ class Client extends EventEmitter {
     let lastBatchLength: number;
     const results: U[] = [];
     do {
-      const countRemaining = clamp(countTo - count, 10, 400);
+      const countRemaining = clamp(countTo - count, MIN_LIMIT, MAX_LIMIT);
       const repeatProps = {
         ...request,
         limit: countRemaining,
