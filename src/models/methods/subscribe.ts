@@ -1,4 +1,4 @@
-import { Amount, Currency, Path, StreamType } from "../common";
+import type { Amount, Currency, Path, StreamType } from "../common";
 import type { TransactionMetadata } from "../common/transaction";
 
 import type { BaseRequest, BaseResponse } from "./baseMethod";

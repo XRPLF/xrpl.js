@@ -97,6 +97,7 @@ import {
   LedgerStream,
   ValidationStream,
   TransactionStream,
+  PathFindStream,
   PeerStatusStream,
   ConsensusStream,
   SubscribeRequest,
@@ -104,7 +105,6 @@ import {
   UnsubscribeRequest,
   UnsubscribeResponse,
 } from "../models/methods";
-import { PathFindStream } from "../models/methods/subscribe";
 import prepareCheckCancel from "../transaction/check-cancel";
 import prepareCheckCash from "../transaction/check-cash";
 import prepareCheckCreate from "../transaction/check-create";
