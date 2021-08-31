@@ -22,8 +22,8 @@ import { computeBinaryTransactionHash } from "../utils";
 import Wallet from "../Wallet";
 
 /**
- * Sign uses your wallet to cryptographically sign your transaction which proves
- * that you are the one issuing this transaction.
+ * Uses a wallet to cryptographically sign a transaction which proves the owner of the wallet
+ * is issuing this transaction.
  *
  * @param wallet - A Wallet that holds your cryptographic keys.
  * @param tx - The Transaction that is being signed.
@@ -34,7 +34,7 @@ function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
 }
 
 /**
- * Multisign takes several transactions (in object or blob form) and creates a single transaction with all Signers
+ * Takes several transactions (in object or blob form) and creates a single transaction with all Signers
  * that then gets signed and returned.
  *
  * @param transactions - An array of Transactions (in object or blob form) to combine and sign.
@@ -78,7 +78,7 @@ function multisign(
 }
 
 /**
- * AuthorizeChannel creates a signature that can be used to redeem a specific amount of XRP from a payment channel.
+ * Creates a signature that can be used to redeem a specific amount of XRP from a payment channel.
  *
  * @param wallet - The account that will sign for this payment channel.
  * @param channelId - An id for the payment channel to redeem XRP from.
@@ -114,7 +114,7 @@ function verify(tx: Transaction | string): boolean {
 }
 
 /**
- * Combine takes a collection of signedTransactions with the same underlying transaction and produces a
+ * Takes a collection of signedTransactions with the same underlying transaction and produces a
  * Transaction with all Signers. It then signs that Transaction and gives an id based on the combined Transaction.
  *
  * @param signedTransactions - A collection of the same transaction signed by different signers. The only difference
@@ -123,7 +123,7 @@ function verify(tx: Transaction | string): boolean {
  * with a transaction id based on the combined transaction.
  */
 function combine(signedTransactions: string[]): SignedTransaction {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- decode gives a JsonObject which we know is a Transaction, so we cast it to get strong-typing in this code and our exported interface
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
   const transactions: Transaction[] = signedTransactions.map((tx: string) => {
     return decode(tx);
   }) as unknown as Transaction[];
@@ -204,7 +204,7 @@ function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
     return txOrBlob;
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- decode gives a JsonObject which we know is a Transaction, so we cast it to get strong-typing in this code and our exported interface
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
   return decode(txOrBlob) as unknown as Transaction;
 }
 
