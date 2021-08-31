@@ -244,6 +244,7 @@ export class Connection extends EventEmitter {
     this.ws.on("error", () => clearTimeout(connectionTimeoutID));
     this.ws.on("close", (reason) => this.onConnectionFailed(reason));
     this.ws.on("close", () => clearTimeout(connectionTimeoutID));
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises -- TODO: resolve this
     this.ws.once("open", async () => this.onceOpen(connectionTimeoutID));
     return this.connectionManager.awaitConnection();
   }
@@ -361,9 +362,7 @@ export class Connection extends EventEmitter {
     }
     if (data.type === "response") {
       try {
-        this.requestManager.handleResponse(
-          data as unknown as Partial<Response>
-        );
+        this.requestManager.handleResponse(data);
       } catch (error) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Errors have messages
         this.emit("error", "badMessage", error.message, message);
@@ -414,7 +413,7 @@ export class Connection extends EventEmitter {
     // Finalize the connection and resolve all awaiting connect() requests
     try {
       this.retryConnectionBackoff.reset();
-      await this.startHeartbeatInterval();
+      this.startHeartbeatInterval();
       this.connectionManager.resolveAllAwaiting();
       this.emit("connected");
     } catch (error) {
@@ -470,12 +469,11 @@ export class Connection extends EventEmitter {
 
   /**
    * Starts a heartbeat to check the connection with the server.
-   *
-   * @returns A Promise that resolves to void when the heartbeat returns successfully.
    */
-  private async startHeartbeatInterval(): Promise<void> {
+  private startHeartbeatInterval(): void {
     this.clearHeartbeatInterval();
     this.heartbeatIntervalID = setInterval(
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises -- TODO: resolve this
       async () => this.heartbeat(),
       this.config.timeout
     );
@@ -487,8 +485,8 @@ export class Connection extends EventEmitter {
    *
    * @returns A Promise that resolves to void when the heartbeat returns successfully.
    */
-  private async heartbeat(): Promise<unknown> {
-    return this.request({ command: "ping" }).catch(async () => {
+  private async heartbeat(): Promise<void> {
+    this.request({ command: "ping" }).catch(async () => {
       return this.reconnect().catch((error: Error) => {
         this.emit("error", "reconnect", error.message, error);
       });
