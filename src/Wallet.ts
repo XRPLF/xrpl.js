@@ -1,14 +1,19 @@
-import { fromSeed } from 'bip32';
-import { mnemonicToSeedSync } from 'bip39';
-import { classicAddressToXAddress } from 'ripple-address-codec'
-import { decode, encodeForSigning } from 'ripple-binary-codec';
-import { deriveAddress, deriveKeypair, generateSeed, verify } from 'ripple-keypairs';
+import { fromSeed } from "bip32";
+import { mnemonicToSeedSync } from "bip39";
+import { classicAddressToXAddress } from "ripple-address-codec";
+import { decode, encodeForSigning } from "ripple-binary-codec";
+import {
+  deriveAddress,
+  deriveKeypair,
+  generateSeed,
+  verify,
+} from "ripple-keypairs";
 
-import ECDSA from './common/ecdsa';
-import { ValidationError } from './common/errors';
-import { SignedTransaction } from './common/types/objects';
-import { signOffline } from './transaction/sign';
-import { SignOptions } from './transaction/types';
+import ECDSA from "./common/ecdsa";
+import { ValidationError } from "./common/errors";
+import { SignedTransaction } from "./common/types/objects";
+import { signOffline } from "./transaction/sign";
+import { SignOptions } from "./transaction/types";
 
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
@@ -125,16 +130,13 @@ class Wallet {
 
   /**
    * Gets an X-address in Testnet/Mainnet format.
-   * @param {number} tag A tag to be included within the X-address.
-   * @param {boolean} test A boolean to indicate if X-address should be in Testnet (true) or Mainnet (false) format.
-   * @returns {string} An X-address.
+   *
+   * @param tag - A tag to be included within the X-address.
+   * @param test - A boolean to indicate if X-address should be in Testnet (true) or Mainnet (false) format.
+   * @returns An X-address.
    */
-  getXAddress(tag: number, test: boolean = false): string {
-    return classicAddressToXAddress(
-      deriveAddress(this.publicKey),
-      tag,
-      test,
-    )
+  getXAddress(tag: number, test = false): string {
+    return classicAddressToXAddress(deriveAddress(this.publicKey), tag, test);
   }
 }
 
