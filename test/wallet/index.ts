@@ -108,7 +108,7 @@ describe("Wallet", function () {
   });
 
   describe("fromEntropy", function () {
-    const entropy: number[] = new Array(16).fill(0);
+    let entropy;
     const publicKey =
       "0390A196799EE412284A5D80BF78C3E84CBB80E1437A0AECD9ADF94D7FEAAFA284";
     const privateKey =
@@ -117,6 +117,11 @@ describe("Wallet", function () {
       "ED1A7C082846CFF58FF9A892BA4BA2593151CCF1DBA59F37714CC9ED39824AF85F";
     const privateKeyED25519 =
       "ED0B6CBAC838DFE7F47EA1BD0DF00EC282FDF45510C92161072CCFB84035390C4D";
+
+    beforeEach(function () {
+      const entropySize = 16;
+      entropy = new Array(entropySize).fill(0);
+    });
 
     it("derives a wallet using entropy", function () {
       const wallet = Wallet.fromEntropy(entropy);

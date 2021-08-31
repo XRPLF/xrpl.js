@@ -1,12 +1,10 @@
 import https = require("https");
 
-import { Client } from "..";
+import { Client, Wallet } from "..";
 import { errors } from "../common";
 import { RippledError } from "../common/errors";
 import { isValidAddress } from "../common/schema-validator";
 import { GeneratedAddress } from "../utils/generateAddress";
-
-import Wallet from ".";
 
 export interface FaucetWallet {
   account: GeneratedAddress;
