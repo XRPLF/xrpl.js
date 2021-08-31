@@ -46,10 +46,10 @@ const isMemo = (obj: { Memo: Memo }): boolean => {
 
 const isSigner = (signer: Signer): boolean => {
   return (
-    Object.keys(signer).length === 3 &&
-    typeof signer.Account === "string" &&
-    typeof signer.TxnSignature === "string" &&
-    typeof signer.SigningPubKey === "string"
+    Object.keys(signer.Signer).length === 3 &&
+    typeof signer.Signer.Account === "string" &&
+    typeof signer.Signer.TxnSignature === "string" &&
+    typeof signer.Signer.SigningPubKey === "string"
   );
 };
 
@@ -79,7 +79,7 @@ export interface BaseTransaction {
   Flags?: number | GlobalFlags;
   LastLedgerSequence?: number;
   Memos?: Array<{ Memo: Memo }>;
-  Signers?: Array<{ Signer: Signer }>;
+  Signers?: Signer[];
   SourceTag?: number;
   SigningPubKey?: string;
   TicketSequence?: number;
@@ -148,7 +148,7 @@ export function verifyBaseTransaction(common: BaseTransaction): void {
   if (
     common.Signers !== undefined &&
     (common.Signers.length === 0 ||
-      !common.Signers.every((signer) => isSigner(signer.Signer)))
+      !common.Signers.every((signer) => isSigner(signer)))
   ) {
     throw new ValidationError("BaseTransaction: invalid Signers");
   }

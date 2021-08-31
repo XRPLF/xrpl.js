@@ -163,18 +163,11 @@ function validateTransactionEquivalence(transactions: Transaction[]): void {
 function getTransactionWithAllSigners(
   transactions: Transaction[]
 ): Transaction {
-  // flatMap let's us go from Transaction[] with Signer[] to one Signer[]
-  const sortedSigners: Array<{ Signer: Signer }> = flatMap(
+  // Signers must be sorted in the combined transaction - See compareSigners' documentation for more details
+  const sortedSigners: Signer[] = flatMap(
     transactions,
-    (tx) => tx.Signers?.map((signer) => signer.Signer) ?? []
-  )
-    // Signers must be sorted - see compareSigners for more details
-    .sort(compareSigners)
-    .map((signer) => {
-      return {
-        Signer: signer,
-      };
-    });
+    (tx) => tx.Signers ?? []
+  ).sort(compareSigners);
 
   return { ...transactions[0], Signers: sortedSigners };
 }
@@ -190,8 +183,8 @@ function getTransactionWithAllSigners(
  * @returns 1 if left \> right, 0 if left = right, -1 if left \< right, and null if left or right are NaN.
  */
 function compareSigners(left: Signer, right: Signer): number {
-  return addressToBigNumber(left.Account).comparedTo(
-    addressToBigNumber(right.Account)
+  return addressToBigNumber(left.Signer.Account).comparedTo(
+    addressToBigNumber(right.Signer.Account)
   );
 }
 
