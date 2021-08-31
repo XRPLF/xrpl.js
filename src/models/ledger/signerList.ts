@@ -1,4 +1,4 @@
-import { BaseLedgerEntry } from "./baseLedgerEntry";
+import BaseLedgerEntry from "./baseLedgerEntry";
 
 interface SignerEntry {
   SignerEntry: {
@@ -7,7 +7,7 @@ interface SignerEntry {
   };
 }
 
-export interface SignerList extends BaseLedgerEntry {
+export default interface SignerList extends BaseLedgerEntry {
   LedgerEntryType: "SignerList";
   Flags: number;
   PreviousTxnID: string;

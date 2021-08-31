@@ -9,7 +9,7 @@ import { isFlagEnabled } from "../../src/models/utils";
  */
 describe("Models Utils", function () {
   describe("isFlagEnabled", function () {
-    let flags;
+    let flags: number;
     const flag1 = 0x00010000;
     const flag2 = 0x00020000;
 

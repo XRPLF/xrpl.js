@@ -1,6 +1,6 @@
-import { BaseLedgerEntry } from "./baseLedgerEntry";
+import BaseLedgerEntry from "./baseLedgerEntry";
 
-export interface DepositPreauth extends BaseLedgerEntry {
+export default interface DepositPreauth extends BaseLedgerEntry {
   LedgerEntryType: "DepositPreauth";
   Account: string;
   Authorize: string;

@@ -8,11 +8,11 @@ export type AccountObjectType =
   | "signer_list"
   | "state";
 
-export interface XRP {
+interface XRP {
   currency: "XRP";
 }
 
-export interface IssuedCurrency {
+interface IssuedCurrency {
   currency: string;
   issuer: string;
 }

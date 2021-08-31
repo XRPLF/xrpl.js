@@ -1,3 +1,4 @@
+/* eslint-disable complexity -- Necessary for verifyOfferCreate */
 import { ValidationError } from "../../common/errors";
 import { Amount } from "../common";
 
@@ -28,10 +29,9 @@ export interface OfferCreate extends BaseTransaction {
  * Verify the form and type of an OfferCreate at runtime.
  *
  * @param tx - An OfferCreate Transaction.
- * @returns Void.
  * @throws When the OfferCreate is Malformed.
  */
-export function verifyOfferCreate(tx: OfferCreate): void {
+export function verifyOfferCreate(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.TakerGets === undefined) {

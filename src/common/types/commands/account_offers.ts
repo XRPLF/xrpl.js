@@ -5,7 +5,7 @@ export interface AccountOffersRequest {
   ledger_hash?: string;
   ledger_index?: number | ("validated" | "closed" | "current");
   limit?: number;
-  marker?: any;
+  marker?: unknown;
 }
 
 export interface AccountOffersResponse {
@@ -13,7 +13,7 @@ export interface AccountOffersResponse {
   ledger_hash?: string;
   ledger_current_index?: number;
   ledger_index?: number;
-  marker?: any;
+  marker?: unknown;
   offers?: AccountOffer[];
 }
 
