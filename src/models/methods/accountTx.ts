@@ -1,5 +1,6 @@
 import { LedgerIndex } from "../common";
-import Metadata from "../common/metadata";
+import { Transaction } from "../transactions";
+import Metadata from "../transactions/metadata";
 
 import { BaseRequest, BaseResponse } from "./baseMethod";
 
@@ -13,13 +14,13 @@ export interface AccountTxRequest extends BaseRequest {
   binary?: boolean;
   forward?: boolean;
   limit?: number;
-  marker?: any;
+  marker?: unknown;
 }
 
 interface AccountTransaction {
   ledger_index: number;
   meta: string | Metadata;
-  tx?: any; // TODO: replace when transaction objects are done
+  tx?: Transaction;
   tx_blob?: string;
   validated: boolean;
 }
@@ -30,7 +31,7 @@ export interface AccountTxResponse extends BaseResponse {
     ledger_index_min: number;
     ledger_index_max: number;
     limit: number;
-    marker?: any;
+    marker?: unknown;
     transactions: AccountTransaction[];
     validated?: boolean;
   };

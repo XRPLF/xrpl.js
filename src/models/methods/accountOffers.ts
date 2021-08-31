@@ -8,7 +8,7 @@ export interface AccountOffersRequest extends BaseRequest {
   ledger_hash?: string;
   ledger_index?: LedgerIndex;
   limit?: number;
-  marker?: any;
+  marker?: unknown;
   strict?: boolean;
 }
 
@@ -28,6 +28,6 @@ export interface AccountOffersResponse extends BaseResponse {
     ledger_current_index?: number;
     ledger_index?: number;
     ledger_hash?: string;
-    marker?: any;
+    marker?: unknown;
   };
 }

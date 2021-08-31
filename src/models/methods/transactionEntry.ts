@@ -1,5 +1,6 @@
 import { LedgerIndex } from "../common";
-import { TransactionMetadata } from "../common/transaction";
+import { Transaction } from "../transactions";
+import TransactionMetadata from "../transactions/metadata";
 
 import { BaseRequest, BaseResponse } from "./baseMethod";
 
@@ -15,6 +16,6 @@ export interface TransactionEntryResponse extends BaseResponse {
     ledger_hash: string;
     ledger_index: number;
     metadata: TransactionMetadata;
-    tx_json: any; // TODO: type this properly when we have Transaction types
+    tx_json: Transaction;
   };
 }

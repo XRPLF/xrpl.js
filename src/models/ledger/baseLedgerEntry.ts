@@ -1,3 +1,3 @@
-export interface BaseLedgerEntry {
+export default interface BaseLedgerEntry {
   index: string;
 }

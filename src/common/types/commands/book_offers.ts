@@ -11,7 +11,7 @@ export interface BookOffersRequest {
   ledger_hash?: string;
   ledger_index?: number | ("validated" | "closed" | "current");
   limit?: number;
-  marker?: any;
+  marker?: unknown;
 }
 
 export interface BookOffersResponse {
@@ -19,7 +19,7 @@ export interface BookOffersResponse {
   ledger_hash?: string;
   ledger_current_index?: number;
   ledger_index?: number;
-  marker?: any;
+  marker?: unknown;
 }
 
 export interface BookOffer extends OfferLedgerEntry {
