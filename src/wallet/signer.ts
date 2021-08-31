@@ -34,112 +34,6 @@ function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
 }
 
 /**
- * The transactions should all be equal except for the 'Signers' field.
- *
- * @param transactions - An array of Transactions which are expected to be equal other than 'Signers'.
- * @throws ValidationError if the transactions are not equal in any field other than 'Signers'.
- */
-function validateTransactionEquivalence(transactions: Transaction[]): void {
-  const exampleTransaction = JSON.stringify({
-    ...transactions[0],
-    Signers: null,
-  });
-  if (
-    transactions
-      .slice(1)
-      .some(
-        (tx) => JSON.stringify({ ...tx, Signers: null }) !== exampleTransaction
-      )
-  ) {
-    throw new ValidationError(
-      "txJSON is not the same for all signedTransactions"
-    );
-  }
-}
-
-function addressToBigNumber(address: string): BigNumber {
-  const hex = Buffer.from(decodeAccountID(address)).toString("hex");
-  const numberOfBitsInHex = 16;
-  return new BigNumber(hex, numberOfBitsInHex);
-}
-
-/**
- * If presented in binary form, the Signers array must be sorted based on
- * the numeric value of the signer addresses, with the lowest value first.
- * (If submitted as JSON, the submit_multisigned method handles this automatically.)
- * https://xrpl.org/multi-signing.html.
- *
- * @param left - A Signer to compare with.
- * @param right - A second Signer to compare with.
- * @returns 1 if left \> right, 0 if left = right, -1 if left \< right, and null if left or right are NaN.
- */
-function compareSigners(left: Signer, right: Signer): number {
-  return addressToBigNumber(left.Account).comparedTo(
-    addressToBigNumber(right.Account)
-  );
-}
-
-function getTransactionWithAllSigners(
-  transactions: Transaction[]
-): Transaction {
-  // flatMap let's us go from Transaction[] with Signer[] to one Signer[]
-  const sortedSigners: Array<{ Signer: Signer }> = flatMap(
-    transactions,
-    (tx) => tx.Signers?.map((signer) => signer.Signer) ?? []
-  )
-    // Signers must be sorted - see compareSigners for more details
-    .sort(compareSigners)
-    .map((signer) => {
-      return {
-        Signer: signer,
-      };
-    });
-
-  return { ...transactions[0], Signers: sortedSigners };
-}
-
-/**
- * Combine takes a collection of signedTransactions with the same underlying transaction and produces a
- * Transaction with all Signers. It then signs that Transaction and gives an id based on the combined Transaction.
- *
- * @param signedTransactions - A collection of the same transaction signed by different signers. The only difference
- * between the elements of signedTransactions should be the Signers field.
- * @returns An object with the combined transaction (now having a sorted list of all signers) which is encoded, along
- * with a transaction id based on the combined transaction.
- */
-function combine(signedTransactions: string[]): SignedTransaction {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Type assertions let us use well-typed transactions
-  const transactions: Transaction[] = signedTransactions.map((tx: string) => {
-    return decode(tx);
-  }) as unknown as Transaction[];
-
-  transactions.forEach((tx) => verifyBaseTransaction(tx));
-  validateTransactionEquivalence(transactions);
-
-  const signedTransaction = encode(getTransactionWithAllSigners(transactions));
-  return {
-    signedTransaction,
-    id: computeBinaryTransactionHash(signedTransaction),
-  };
-}
-
-function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
-  if (typeof txOrBlob === "object") {
-    return txOrBlob;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Type assertions let us use well-typed transactions
-  return decode(txOrBlob) as unknown as Transaction;
-}
-
-function getEncodedTransaction(txOrBlob: Transaction | string): string {
-  if (typeof txOrBlob === "object") {
-    return encode(JSON.parse(JSON.stringify(txOrBlob)));
-  }
-  return txOrBlob;
-}
-
-/**
  * Multisign takes several transactions (in object or blob form) and creates a single transaction with all Signers
  * that then gets signed and returned.
  *
@@ -215,6 +109,112 @@ function verify(tx: Transaction | string): boolean {
     decodedTx.TxnSignature,
     decodedTx.SigningPubKey
   );
+}
+
+/**
+ * Combine takes a collection of signedTransactions with the same underlying transaction and produces a
+ * Transaction with all Signers. It then signs that Transaction and gives an id based on the combined Transaction.
+ *
+ * @param signedTransactions - A collection of the same transaction signed by different signers. The only difference
+ * between the elements of signedTransactions should be the Signers field.
+ * @returns An object with the combined transaction (now having a sorted list of all signers) which is encoded, along
+ * with a transaction id based on the combined transaction.
+ */
+function combine(signedTransactions: string[]): SignedTransaction {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- decode gives a JsonObject which we know is a Transaction, so we cast it to get strong-typing in this code and our exported interface
+  const transactions: Transaction[] = signedTransactions.map((tx: string) => {
+    return decode(tx);
+  }) as unknown as Transaction[];
+
+  transactions.forEach((tx) => verifyBaseTransaction(tx));
+  validateTransactionEquivalence(transactions);
+
+  const signedTransaction = encode(getTransactionWithAllSigners(transactions));
+  return {
+    signedTransaction,
+    id: computeBinaryTransactionHash(signedTransaction),
+  };
+}
+
+/**
+ * The transactions should all be equal except for the 'Signers' field.
+ *
+ * @param transactions - An array of Transactions which are expected to be equal other than 'Signers'.
+ * @throws ValidationError if the transactions are not equal in any field other than 'Signers'.
+ */
+function validateTransactionEquivalence(transactions: Transaction[]): void {
+  const exampleTransaction = JSON.stringify({
+    ...transactions[0],
+    Signers: null,
+  });
+  if (
+    transactions
+      .slice(1)
+      .some(
+        (tx) => JSON.stringify({ ...tx, Signers: null }) !== exampleTransaction
+      )
+  ) {
+    throw new ValidationError(
+      "txJSON is not the same for all signedTransactions"
+    );
+  }
+}
+
+function getTransactionWithAllSigners(
+  transactions: Transaction[]
+): Transaction {
+  // flatMap let's us go from Transaction[] with Signer[] to one Signer[]
+  const sortedSigners: Array<{ Signer: Signer }> = flatMap(
+    transactions,
+    (tx) => tx.Signers?.map((signer) => signer.Signer) ?? []
+  )
+    // Signers must be sorted - see compareSigners for more details
+    .sort(compareSigners)
+    .map((signer) => {
+      return {
+        Signer: signer,
+      };
+    });
+
+  return { ...transactions[0], Signers: sortedSigners };
+}
+
+/**
+ * If presented in binary form, the Signers array must be sorted based on
+ * the numeric value of the signer addresses, with the lowest value first.
+ * (If submitted as JSON, the submit_multisigned method handles this automatically.)
+ * https://xrpl.org/multi-signing.html.
+ *
+ * @param left - A Signer to compare with.
+ * @param right - A second Signer to compare with.
+ * @returns 1 if left \> right, 0 if left = right, -1 if left \< right, and null if left or right are NaN.
+ */
+function compareSigners(left: Signer, right: Signer): number {
+  return addressToBigNumber(left.Account).comparedTo(
+    addressToBigNumber(right.Account)
+  );
+}
+
+function addressToBigNumber(address: string): BigNumber {
+  const hex = Buffer.from(decodeAccountID(address)).toString("hex");
+  const numberOfBitsInHex = 16;
+  return new BigNumber(hex, numberOfBitsInHex);
+}
+
+function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
+  if (typeof txOrBlob === "object") {
+    return txOrBlob;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- decode gives a JsonObject which we know is a Transaction, so we cast it to get strong-typing in this code and our exported interface
+  return decode(txOrBlob) as unknown as Transaction;
+}
+
+function getEncodedTransaction(txOrBlob: Transaction | string): string {
+  if (typeof txOrBlob === "object") {
+    return encode(JSON.parse(JSON.stringify(txOrBlob)));
+  }
+  return txOrBlob;
 }
 
 // eslint-disable-next-line import/no-unused-modules -- These methods will be used by users of the library
