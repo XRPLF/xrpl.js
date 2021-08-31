@@ -31,6 +31,8 @@ export interface ApiMemo {
   MemoFormat?: string;
 }
 
+// TODO: move relevant methods from here to `src/utils` (such as `convertStringToHex`?)
+
 function formatPrepareResponse(txJSON: any): Prepare {
   const instructions: any = {
     fee: dropsToXrp(txJSON.Fee),

@@ -64,6 +64,7 @@ module.exports = {
       },
     ],
     "max-statements": ["warn", 25],
+    "id-length": ["error", { exceptions: ["_"] }], // exception for lodash
   },
   overrides: [
     {

@@ -74,7 +74,7 @@ function getAgent(url: string, config: ConnectionOptions): Agent | undefined {
     const proxyOptions = { ...parsedProxyURL, ...proxyOverrides };
     let HttpsProxyAgent;
     try {
-      // eslint-disable-next-line max-len -- Long eslint-disable-next-line
+      // eslint-disable-next-line max-len -- Long eslint-disable-next-line TODO: figure out how to make this nicer
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-require-imports, node/global-require, global-require, -- Necessary for the `require`
       HttpsProxyAgent = require("https-proxy-agent");
     } catch (_error) {
@@ -93,7 +93,10 @@ function getAgent(url: string, config: ConnectionOptions): Agent | undefined {
  * @param config - THe configuration options for the WebSocket.
  * @returns A Websocket that fits the given configuration parameters.
  */
-function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
+function createWebSocket(
+  url: string,
+  config: ConnectionOptions
+): WebSocket | null {
   const options: WebSocket.ClientOptions = {};
   options.agent = getAgent(url, config);
   if (config.authorization != null) {
@@ -209,7 +212,7 @@ export class Connection extends EventEmitter {
         new ConnectionError("Cannot connect because no server was specified")
       );
     }
-    if (this.ws) {
+    if (this.ws != null) {
       return Promise.reject(
         new RippleError("Websocket connection never cleaned up.", {
           state: this.state,
@@ -249,7 +252,7 @@ export class Connection extends EventEmitter {
    * See https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent for the full list.
    * If no open websocket connection exists, resolve with no code (`undefined`).
    *
-   * @returns
+   * @returns A promise containing either `undefined` or a disconnected code, that resolves when the connection is destroyed.
    */
   public async disconnect(): Promise<number | undefined> {
     if (this.reconnectTimeoutID !== null) {
@@ -264,7 +267,7 @@ export class Connection extends EventEmitter {
     }
 
     return new Promise((resolve) => {
-      if (this.ws === null) {
+      if (this.ws == null) {
         return Promise.resolve(undefined);
       }
 
@@ -292,14 +295,17 @@ export class Connection extends EventEmitter {
   }
 
   /**
+   * Sends a request to the rippled server.
    *
-   * @param request
-   * @param timeout
+   * @param request - The request to send to the server.
+   * @param timeout - How long the Connection instance should wait before assuming that there will not be a response.
+   * @returns The response from the rippled server.
+   * @throws NotConnectedError if the Connection isn't connected to a server.
    */
   public async request<T extends BaseRequest>(
     request: T,
     timeout?: number
-  ): Promise<any> {
+  ): Promise<unknown> {
     if (!this.shouldBeConnected || this.ws == null) {
       throw new NotConnectedError();
     }
@@ -328,8 +334,9 @@ export class Connection extends EventEmitter {
   private readonly trace: (id: string, message: string) => void = () => {};
 
   /**
+   * Handler for when messages are received from the server.
    *
-   * @param message
+   * @param message - The message received from the server.
    */
   private onMessage(message): void {
     this.trace("receive", message);
@@ -357,22 +364,29 @@ export class Connection extends EventEmitter {
   }
 
   /**
+   * Gets the state of the websocket.
    *
+   * @returns The Websocket's ready state.
    */
   private get state(): 0 | 1 | 2 | 3 {
     return this.ws ? this.ws.readyState : WebSocket.CLOSED;
   }
 
   /**
+   * Returns whether the server should be connected.
    *
+   * @returns Whether the server should be connected.
    */
   private get shouldBeConnected(): boolean {
     return this.ws !== null;
   }
 
   /**
+   * Handler for what to do once the connection to the server is open.
    *
-   * @param connectionTimeoutID
+   * @param connectionTimeoutID - Timeout in case the connection hangs longer than expected.
+   * @returns A promise that resolves to void when the connection is fully established.
+   * @throws Error if the websocket initialized is somehow null.
    */
   private async onceOpen(connectionTimeoutID: NodeJS.Timeout): Promise<void> {
     if (this.ws == null) {
@@ -388,16 +402,18 @@ export class Connection extends EventEmitter {
       this.emit("error", "websocket", error.message, error)
     );
     // Handle a closed connection: reconnect if it was unexpected
-    this.ws.once("close", this.cleanupClose);
+    this.ws.once("close", (code, reason) => this.cleanupClose(code, reason));
     // Finalize the connection and resolve all awaiting connect() requests
     try {
       this.retryConnectionBackoff.reset();
-      this.startHeartbeatInterval();
+      await this.startHeartbeatInterval();
       this.connectionManager.resolveAllAwaiting();
       this.emit("connected");
     } catch (error) {
       this.connectionManager.rejectAllAwaiting(error);
-      await this.disconnect().catch(() => {}); // Ignore this error, propagate the root cause.
+      // Ignore this error, propagate the root cause.
+      // eslint-disable-next-line @typescript-eslint/no-empty-function -- Need empty catch
+      await this.disconnect().catch(() => {});
     }
   }
 
@@ -408,14 +424,14 @@ export class Connection extends EventEmitter {
    * @param reason - Reason for closing.
    * @throws Error if WS doesn't exist, DisconnectedError to all requests that won't get responses because of closure.
    */
-  private cleanupClose(code: number, reason: string): void {
+  private cleanupClose(code: number, reason?: string): void {
     if (this.ws == null) {
       throw new Error("onceClose: ws is null");
     }
 
     this.clearHeartbeatInterval();
     this.requestManager.rejectAll(
-      new DisconnectedError(`websocket was closed, ${reason}`)
+      new DisconnectedError(`websocket was closed, ${reason ?? ""}`)
     );
     this.ws.removeAllListeners();
     this.ws = null;
@@ -436,7 +452,7 @@ export class Connection extends EventEmitter {
   }
 
   /**
-   *
+   * Clears the heartbeat connection interval.
    */
   private clearHeartbeatInterval(): void {
     if (this.heartbeatIntervalID) {
@@ -445,12 +461,14 @@ export class Connection extends EventEmitter {
   }
 
   /**
+   * Starts a heartbeat to check the connection with the server.
    *
+   * @returns A Promise that resolves to void when the heartbeat returns successfully.
    */
   private async startHeartbeatInterval(): Promise<void> {
     this.clearHeartbeatInterval();
     this.heartbeatIntervalID = setInterval(
-      () => this.heartbeat(),
+      async () => this.heartbeat(),
       this.config.timeout
     );
   }
@@ -459,11 +477,11 @@ export class Connection extends EventEmitter {
    * A heartbeat is just a "ping" command, sent on an interval.
    * If this succeeds, we're good. If it fails, disconnect so that the consumer can reconnect, if desired.
    *
-   * @returns
+   * @returns A Promise that resolves to void when the heartbeat returns successfully.
    */
-  private async heartbeat(): Promise<any> {
-    return this.request({ command: "ping" }).catch(() => {
-      return this.reconnect().catch((error) => {
+  private async heartbeat(): Promise<unknown> {
+    return this.request({ command: "ping" }).catch(async () => {
+      return this.reconnect().catch((error: Error) => {
         this.emit("error", "reconnect", error.message, error);
       });
     });

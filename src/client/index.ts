@@ -29,8 +29,6 @@ import getPaths from "../ledger/pathfind";
 import getTrustlines from "../ledger/trustlines";
 import { clamp } from "../ledger/utils";
 import {
-  Request,
-  Response,
   // account methods
   AccountChannelsRequest,
   AccountChannelsResponse,
@@ -97,6 +95,7 @@ import {
   RandomRequest,
   RandomResponse,
 } from "../models/methods";
+import { BaseRequest, BaseResponse } from "../models/methods/baseMethod";
 import prepareCheckCancel from "../transaction/check-cancel";
 import prepareCheckCash from "../transaction/check-cash";
 import prepareCheckCreate from "../transaction/check-create";
@@ -156,21 +155,16 @@ function getCollectKeyFromCommand(command: string): string | null {
   }
 }
 
-type MarkerRequest =
-  | AccountChannelsRequest
-  | AccountLinesRequest
-  | AccountObjectsRequest
-  | AccountOffersRequest
-  | AccountTxRequest
-  | LedgerDataRequest;
+interface MarkerRequest extends BaseRequest {
+  limit?: number;
+  marker?: unknown;
+}
 
-type MarkerResponse =
-  | AccountChannelsResponse
-  | AccountLinesResponse
-  | AccountObjectsResponse
-  | AccountOffersResponse
-  | AccountTxResponse
-  | LedgerDataResponse;
+interface MarkerResponse extends BaseResponse {
+  result: {
+    marker?: unknown;
+  };
+}
 
 class Client extends EventEmitter {
   // New in > 0.21.0
@@ -179,15 +173,16 @@ class Client extends EventEmitter {
 
   // Factor to multiply estimated fee by to provide a cushion in case the
   // required fee rises during submission of a transaction. Defaults to 1.2.
-  private readonly feeCushion: number;
+  public readonly feeCushion: number;
   // Maximum fee to use with transactions, in XRP. Must be a string-encoded
   // number. Defaults to '2'.
-  private readonly maxFeeXRP: string;
+  public readonly maxFeeXRP: string;
 
   /**
+   * Creates a new Client with a websocket connection to a rippled server.
    *
-   * @param server
-   * @param options
+   * @param server - URL of the server to connect to.
+   * @param options - Options for client settings.
    */
   public constructor(server: string, options: ClientOptions = {}) {
     super();
@@ -197,8 +192,8 @@ class Client extends EventEmitter {
       );
     }
 
-    this.feeCushion = options.feeCushion || 1.2;
-    this.maxFeeXRP = options.maxFeeXRP || "2";
+    this.feeCushion = options.feeCushion ?? 1.2;
+    this.maxFeeXRP = options.maxFeeXRP ?? "2";
 
     this.connection = new Connection(server, options);
 
@@ -229,20 +224,13 @@ class Client extends EventEmitter {
    *
    * See https://ripple.com/build/rippled-apis/#markers-and-pagination.
    *
-   * @param response
-   * @returns
+   * @param response - Response to check for more pages on.
+   * @returns Whether the response has more pages of data.
    */
   public static hasNextPage(response: MarkerResponse): boolean {
     return Boolean(response.result.marker);
   }
 
-  /**
-   * Makes a request to the client with the given command and
-   * additional request body parameters.
-   *
-   * @param req
-   * @returns
-   */
   public async request(
     r: AccountChannelsRequest
   ): Promise<AccountChannelsResponse>;
@@ -284,16 +272,25 @@ class Client extends EventEmitter {
   public async request(
     r: SubmitMultisignedRequest
   ): Promise<SubmitMultisignedResponse>;
-  public request(r: TransactionEntryRequest): Promise<TransactionEntryResponse>;
-  public request(r: TxRequest): Promise<TxResponse>;
-  public async request<R extends Request, T extends Response>(
-    r: R
+  public async request(
+    r: TransactionEntryRequest
+  ): Promise<TransactionEntryResponse>;
+  public async request(r: TxRequest): Promise<TxResponse>;
+  /**
+   * Makes a request to the client with the given command and
+   * additional request body parameters.
+   *
+   * @param req - Request to send to the server.
+   * @returns The response from the server.
+   */
+  public async request<R extends BaseRequest, T extends BaseResponse>(
+    req: R
   ): Promise<T> {
-    // TODO: should this be typed with `extends BaseRequest/BaseResponse`?
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
     return this.connection.request({
       ...req,
       account: req.account ? ensureClassicAddress(req.account) : undefined,
-    });
+    }) as unknown as T;
   }
 
   public async requestNextPage(
@@ -320,6 +317,13 @@ class Client extends EventEmitter {
     req: LedgerDataRequest,
     resp: LedgerDataResponse
   ): Promise<LedgerDataResponse>;
+  /**
+   * Requests the next page of data.
+   *
+   * @param req - Request to send.
+   * @param resp - Response with the marker to use in the request.
+   * @returns The response with the next page of data.
+   */
   public async requestNextPage<
     T extends MarkerRequest,
     U extends MarkerResponse
@@ -330,7 +334,8 @@ class Client extends EventEmitter {
       );
     }
     const nextPageRequest = { ...req, marker: resp.result.marker };
-    return this.connection.request(nextPageRequest);
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
+    return this.connection.request(nextPageRequest) as unknown as U;
   }
 
   /**
@@ -349,31 +354,6 @@ class Client extends EventEmitter {
     return transactionUtils.prepareTransaction(txJSON, this, instructions);
   }
 
-  /**
-   * Convert a string to hex.
-   *
-   * This can be used to generate `MemoData`, `MemoType`, and `MemoFormat`.
-   *
-   * @param string - String to convert to hex.
-   * @returns TODO: will be moved to utils.
-   */
-  public convertStringToHex(string: string): string {
-    return transactionUtils.convertStringToHex(string);
-  }
-
-  /**
-   * Makes multiple paged requests to the client to return a given number of
-   * resources. Multiple paged requests will be made until the `limit`
-   * number of resources is reached (if no `limit` is provided, a single request
-   * will be made).
-   *
-   * If the command is unknown, an additional `collect` property is required to
-   * know which response key contains the array of resources.
-   *
-   * NOTE: This command is used by existing methods and is not recommended for
-   * general use. Instead, use rippled's built-in pagination and make multiple
-   * requests as needed.
-   */
   public async requestAll(
     req: AccountChannelsRequest
   ): Promise<AccountChannelsResponse[]>;
@@ -393,16 +373,33 @@ class Client extends EventEmitter {
   public async requestAll(
     req: LedgerDataRequest
   ): Promise<LedgerDataResponse[]>;
+  /**
+   * Makes multiple paged requests to the client to return a given number of
+   * resources. Multiple paged requests will be made until the `limit`
+   * number of resources is reached (if no `limit` is provided, a single request
+   * will be made).
+   *
+   * If the command is unknown, an additional `collect` property is required to
+   * know which response key contains the array of resources.
+   *
+   * NOTE: This command is used by existing methods and is not recommended for
+   * general use. Instead, use rippled's built-in pagination and make multiple
+   * requests as needed.
+   *
+   * @param request - The initial request to send to the server.
+   * @param collect - (Optional) the param to use to collect the array of resources (only needed if command is unknown).
+   * @returns The array of all responses.
+   * @throws ValidationError if there is no collection key (either from a known command or for the unknown command).
+   */
   public async requestAll<T extends MarkerRequest, U extends MarkerResponse>(
     request: T,
-    options: { collect?: string } = {}
+    collect?: string
   ): Promise<U[]> {
     // The data under collection is keyed based on the command. Fail if command
     // not recognized and collection key not provided.
-    const collectKey =
-      options.collect ?? getCollectKeyFromCommand(request.command);
+    const collectKey = collect ?? getCollectKeyFromCommand(request.command);
     if (!collectKey) {
-      throw new errors.ValidationError(
+      throw new ValidationError(
         `no collect key for command ${request.command}`
       );
     }
@@ -420,14 +417,14 @@ class Client extends EventEmitter {
         limit: countRemaining,
         marker,
       };
+      // eslint-disable-next-line no-await-in-loop -- Necessary for this, it really has to wait
       const singleResponse = await this.connection.request(repeatProps);
       const singleResult = singleResponse.result;
       const collectedData = singleResult[collectKey];
       marker = singleResult.marker;
       results.push(singleResponse);
       // Make sure we handle when no data (not even an empty array) is returned.
-      const isExpectedFormat = Array.isArray(collectedData);
-      if (isExpectedFormat) {
+      if (Array.isArray(collectedData)) {
         count += collectedData.length;
         lastBatchLength = collectedData.length;
       } else {
@@ -438,26 +435,32 @@ class Client extends EventEmitter {
   }
 
   /**
+   * Tells the Client instance to connect to its rippled server.
    *
-   */
-  public isConnected(): boolean {
-    return this.connection.isConnected();
-  }
-
-  /**
-   *
+   * @returns A promise that resolves with a void value when a connection is established.
    */
   public async connect(): Promise<void> {
     return this.connection.connect();
   }
 
   /**
+   * Tells the Client instance to disconnect from it's rippled server.
    *
+   * @returns A promise that resolves with a void value when a connection is destroyed.
    */
   public async disconnect(): Promise<void> {
     // backwards compatibility: connection.disconnect() can return a number, but
     // this method returns nothing. SO we await but don't return any result.
     await this.connection.disconnect();
+  }
+
+  /**
+   * Checks if the Client instance is connected to its rippled server.
+   *
+   * @returns Whether the client instance is connected.
+   */
+  public isConnected(): boolean {
+    return this.connection.isConnected();
   }
 
   public getFee = getFee;
