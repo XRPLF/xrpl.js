@@ -1,3 +1,4 @@
+import { Amount } from "../../../snippets/dist/src/models/common";
 import { Currency, Path, StreamType } from "../common";
 import { TransactionMetadata } from "../common/transaction";
 

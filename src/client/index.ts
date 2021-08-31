@@ -290,8 +290,7 @@ class Client extends EventEmitter {
   public on(event: "path_find", listener: (path: PathFindStream) => void);
   public on(event: string, listener: (...args: any[]) => void);
   public on(eventName: string, listener: (...args: any[]) => void) {
-    this.connection.on(eventName, listener);
-    return this;
+    return super.on(eventName, listener);
   }
 
   /**
