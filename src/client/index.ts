@@ -280,6 +280,7 @@ class Client extends EventEmitter {
     event: "consensusPhase",
     listener: (phase: ConsensusStream) => void
   );
+  public on(event: string, listener: (...args: any[]) => void);
   public on(eventName: string, listener: (...args: any[]) => void) {
     this.connection.on(eventName, listener);
     return this;
