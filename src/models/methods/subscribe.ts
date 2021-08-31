@@ -1,5 +1,7 @@
+import { OfferCreateTransaction } from "../../common/types/objects";
 import { Currency, StreamType } from "../common";
-import { TransactionMetadata } from "../common/transaction";
+import { Transaction } from "../transactions";
+import TransactionMetadata from "../transactions/metadata";
 
 import { BaseRequest, BaseResponse } from "./baseMethod";
 
@@ -23,7 +25,9 @@ export interface SubscribeRequest extends BaseRequest {
 }
 
 export interface SubscribeResponse extends BaseResponse {
-  result: any;
+  // TODO: figure out if there's a better way to type this
+  // eslint-disable-next-line @typescript-eslint/ban-types -- actually should be an empty object
+  result: {} | Stream;
 }
 
 interface BaseStream {
@@ -70,7 +74,7 @@ export interface TransactionStream extends BaseStream {
   ledger_hash?: string;
   ledger_index?: number;
   meta?: TransactionMetadata;
-  transaction: any; // TODO: replace when we have types for transactions
+  transaction: Transaction;
   validated?: boolean;
 }
 
@@ -88,6 +92,10 @@ export interface PeerStatusStream extends BaseStream {
   ledger_index_min?: number;
 }
 
+interface ModifiedOfferCreateTransaction extends OfferCreateTransaction {
+  owner_funds: string;
+}
+
 export interface OrderBookStream extends BaseStream {
   status: string;
   type: "transaction";
@@ -98,9 +106,7 @@ export interface OrderBookStream extends BaseStream {
   ledger_hash?: string;
   ledger_index?: number;
   meta: TransactionMetadata;
-  transaction: any; // TODO: replace when we have types for transactions
-  // TODO: transactions for this object have a special case for OfferCreate
-  // https://xrpl.org/subscribe.html#order-book-streams
+  transaction: Transaction | ModifiedOfferCreateTransaction;
   validated: boolean;
 }
 

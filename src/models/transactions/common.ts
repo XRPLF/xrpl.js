@@ -1,5 +1,8 @@
+/* eslint-disable max-lines-per-function -- Necessary for verifyBaseTransaction */
+/* eslint-disable complexity -- Necessary for verifyBaseTransaction */
+/* eslint-disable max-statements -- Necessary for verifyBaseTransaction */
 import { ValidationError } from "../../common/errors";
-import { Amount, Memo, Signer, IssuedCurrencyAmount } from "../common";
+import { Memo, Signer } from "../common";
 import { onlyHasFields } from "../utils";
 
 const transactionTypes = [
@@ -24,46 +27,72 @@ const transactionTypes = [
   "TrustSet",
 ];
 
-const isMemo = (obj: { Memo: Memo }): boolean => {
-  const memo = obj.Memo;
+const MEMO_SIZE = 3;
+
+function isMemo(obj: { Memo?: unknown }): boolean {
+  if (obj.Memo == null) {
+    return false;
+  }
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
+  const memo = obj.Memo as Record<string, unknown>;
   const size = Object.keys(memo).length;
-  const validData =
-    memo.MemoData === undefined || typeof memo.MemoData === "string";
+  const validData = memo.MemoData == null || typeof memo.MemoData === "string";
   const validFormat =
-    memo.MemoFormat === undefined || typeof memo.MemoData === "string";
-  const validType =
-    memo.MemoType === undefined || typeof memo.MemoType === "string";
+    memo.MemoFormat == null || typeof memo.MemoFormat === "string";
+  const validType = memo.MemoType == null || typeof memo.MemoType === "string";
 
   return (
     size >= 1 &&
-    size <= 3 &&
+    size <= MEMO_SIZE &&
     validData &&
     validFormat &&
     validType &&
     onlyHasFields(memo, ["MemoFormat", "MemoData", "MemoType"])
   );
-};
+}
 
-const isSigner = (signer: Signer): boolean => {
+const SIGNER_SIZE = 3;
+
+function isSigner(obj: unknown): boolean {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
+  const signer = obj as Record<string, unknown>;
   return (
-    Object.keys(signer).length === 3 &&
+    Object.keys(signer).length === SIGNER_SIZE &&
     typeof signer.Account === "string" &&
     typeof signer.TxnSignature === "string" &&
     typeof signer.SigningPubKey === "string"
   );
-};
+}
 
-export function isIssuedCurrency(obj: IssuedCurrencyAmount): boolean {
+const ISSUED_CURRENCY_SIZE = 3;
+
+/**
+ * Verify the form and type of an IssuedCurrencyAmount at runtime.
+ *
+ * @param obj - The object to check the form and type of.
+ * @returns Whether the IssuedCurrencyAmount is malformed.
+ */
+export function isIssuedCurrency(obj: Record<string, unknown>): boolean {
   return (
-    Object.keys(obj).length === 3 &&
+    Object.keys(obj).length === ISSUED_CURRENCY_SIZE &&
     typeof obj.value === "string" &&
     typeof obj.issuer === "string" &&
     typeof obj.currency === "string"
   );
 }
 
-export function isAmount(amount: Amount): boolean {
-  return typeof amount === "string" || isIssuedCurrency(amount);
+/**
+ * Verify the form and type of an Amount at runtime.
+ *
+ * @param amount - The object to check the form and type of.
+ * @returns Whether the Amount is malformed.
+ */
+export function isAmount(amount: unknown): boolean {
+  return (
+    typeof amount === "string" ||
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
+    isIssuedCurrency(amount as Record<string, unknown>)
+  );
 }
 
 export interface GlobalFlags {
@@ -92,10 +121,9 @@ export interface BaseTransaction {
  * any time a transaction will be verified.
  *
  * @param common - An interface w/ common transaction fields.
- * @returns Void.
  * @throws When the common param is malformed.
  */
-export function verifyBaseTransaction(common: BaseTransaction): void {
+export function verifyBaseTransaction(common: Record<string, unknown>): void {
   if (common.Account === undefined) {
     throw new ValidationError("BaseTransaction: missing field Account");
   }
@@ -138,16 +166,18 @@ export function verifyBaseTransaction(common: BaseTransaction): void {
     throw new ValidationError("BaseTransaction: invalid LastLedgerSequence");
   }
 
-  if (
-    common.Memos !== undefined &&
-    (common.Memos.length === 0 || !common.Memos.every(isMemo))
-  ) {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
+  const memos = common.Memos as Array<{ Memo?: unknown }> | undefined;
+  if (memos !== undefined && !memos.every(isMemo)) {
     throw new ValidationError("BaseTransaction: invalid Memos");
   }
 
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
+  const signers = common.Signers as Array<Record<string, unknown>> | undefined;
+
   if (
-    common.Signers !== undefined &&
-    (common.Signers.length === 0 || !common.Signers.every(isSigner))
+    signers !== undefined &&
+    (signers.length === 0 || !signers.every(isSigner))
   ) {
     throw new ValidationError("BaseTransaction: invalid Signers");
   }

@@ -1,10 +1,10 @@
-import { Amount } from ".";
+import { Amount } from "../common";
 
 interface CreatedNode {
   CreatedNode: {
     LedgerEntryType: string;
     LedgerIndex: string;
-    NewFields: { [field: string]: any };
+    NewFields: { [field: string]: unknown };
   };
 }
 
@@ -12,8 +12,8 @@ interface ModifiedNode {
   ModifiedNode: {
     LedgerEntryType: string;
     LedgerIndex: string;
-    FinalFields: { [field: string]: any };
-    PreviousFields: { [field: string]: any };
+    FinalFields: { [field: string]: unknown };
+    PreviousFields: { [field: string]: unknown };
     PreviousTxnID?: string;
     PreviouTxnLgrSeq?: number;
   };
@@ -23,13 +23,13 @@ interface DeletedNode {
   DeletedNode: {
     LedgerEntryType: string;
     LedgerIndex: string;
-    FinalFields: { [field: string]: any };
+    FinalFields: { [field: string]: unknown };
   };
 }
 
 type Node = CreatedNode | ModifiedNode | DeletedNode;
 
-export default interface Metadata {
+export default interface TransactionMetadata {
   AffectedNodes: Node[];
   DeliveredAmount?: Amount;
   delivered_amount?: Amount;

@@ -1,3 +1,4 @@
+/* eslint-disable complexity -- Necessary for verifyEscrowCreate */
 import { ValidationError } from "../../common/errors";
 
 import { BaseTransaction, verifyBaseTransaction } from "./common";
@@ -16,10 +17,9 @@ export interface EscrowCreate extends BaseTransaction {
  * Verify the form and type of an EscrowCreate at runtime.
  *
  * @param tx - An EscrowCreate Transaction.
- * @returns Void.
  * @throws When the EscrowCreate is Malformed.
  */
-export function verifyEscrowCreate(tx: EscrowCreate): void {
+export function verifyEscrowCreate(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.Amount === undefined) {

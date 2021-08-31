@@ -1,3 +1,5 @@
+/* eslint-disable import/max-dependencies -- All methods need to be exported */
+
 import {
   AccountChannelsRequest,
   AccountChannelsResponse,
@@ -64,7 +66,8 @@ import {
 import { TxRequest, TxResponse } from "./tx";
 import { UnsubscribeRequest, UnsubscribeResponse } from "./unsubscribe";
 
-type Request =  // account methods
+// account methods
+type Request =
   | AccountChannelsRequest
   | AccountCurrenciesRequest
   | AccountInfoRequest
@@ -104,7 +107,8 @@ type Request =  // account methods
   | PingRequest
   | RandomRequest;
 
-type Response =  // account methods
+// account methods
+type Response =
   | AccountChannelsResponse
   | AccountCurrenciesResponse
   | AccountInfoResponse

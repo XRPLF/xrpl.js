@@ -5,7 +5,10 @@
  * @param fields - Fields to verify.
  * @returns True if keys in object are all in fields.
  */
-export function onlyHasFields(obj: object, fields: string[]): boolean {
+export function onlyHasFields(
+  obj: Record<string, unknown>,
+  fields: string[]
+): boolean {
   return Object.keys(obj).every((key: string) => fields.includes(key));
 }
 
@@ -17,5 +20,6 @@ export function onlyHasFields(obj: object, fields: string[]): boolean {
  * @returns True if checkFlag is enabled within Flags.
  */
 export function isFlagEnabled(Flags: number, checkFlag: number): boolean {
+  // eslint-disable-next-line no-bitwise -- Flags require bitwise operations
   return (checkFlag & Flags) === checkFlag;
 }
