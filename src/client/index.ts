@@ -99,6 +99,10 @@ import {
   TransactionStream,
   PeerStatusStream,
   ConsensusStream,
+  SubscribeRequest,
+  SubscribeResponse,
+  UnsubscribeRequest,
+  UnsubscribeResponse,
 } from "../models/methods";
 import prepareCheckCancel from "../transaction/check-cancel";
 import prepareCheckCash from "../transaction/check-cash";
@@ -255,6 +259,8 @@ class Client extends EventEmitter {
   public request(
     r: SubmitMultisignedRequest
   ): Promise<SubmitMultisignedResponse>;
+  public request(r: SubscribeRequest): Promise<SubscribeResponse>;
+  public request(r: UnsubscribeRequest): Promise<UnsubscribeResponse>;
   public request(r: TransactionEntryRequest): Promise<TransactionEntryResponse>;
   public request(r: TxRequest): Promise<TxResponse>;
   public request<R extends Request, T extends Response>(r: R): Promise<T> {
