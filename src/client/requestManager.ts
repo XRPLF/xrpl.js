@@ -124,12 +124,16 @@ export default class RequestManager {
    * @param data - The response to handle.
    * @throws ResponseFormatError if the response format is invalid, RippledError if rippled returns an error.
    */
-  public handleResponse(data: Response): void {
-    if (!Number.isInteger(data.id) || data.id < 0) {
+  public handleResponse(data: Partial<Response>): void {
+    if (data.id == null || !Number.isInteger(data.id) || data.id < 0) {
       throw new ResponseFormatError("valid id not found in response", data);
     }
     if (!this.promisesAwaitingResponse[data.id]) {
       return;
+    }
+    if (data.status == null) {
+      const error = new ResponseFormatError("Response has no status");
+      this.reject(data.id, error);
     }
     if (data.status === "error") {
       const error = new RippledError(data.error_message ?? data.error, data);
@@ -138,13 +142,14 @@ export default class RequestManager {
     }
     if (data.status !== "success") {
       const error = new ResponseFormatError(
-        `unrecognized response.status: ${data.status}`,
+        `unrecognized response.status: ${data.status ?? ""}`,
         data
       );
       this.reject(data.id, error);
       return;
     }
-    this.resolve(data.id, data);
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be a valid Response here
+    this.resolve(data.id, data as unknown as Response);
   }
 
   /**

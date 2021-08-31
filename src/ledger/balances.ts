@@ -44,13 +44,13 @@ function formatBalances(
 }
 
 async function getLedgerVersionHelper(
-  connection: Connection,
+  client: Client,
   optionValue?: number
 ): Promise<number> {
   if (optionValue != null && optionValue !== null) {
     return Promise.resolve(optionValue);
   }
-  return connection
+  return client
     .request({
       command: "ledger",
       ledger_index: "validated",
@@ -71,7 +71,7 @@ async function getBalances(
   address = ensureClassicAddress(address);
 
   return Promise.all([
-    getLedgerVersionHelper(this.connection, options.ledgerVersion).then(
+    getLedgerVersionHelper(this, options.ledgerVersion).then(
       async (ledgerVersion) => utils.getXRPBalance(this, address, ledgerVersion)
     ),
     this.getTrustlines(address, options),

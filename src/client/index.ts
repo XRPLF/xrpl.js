@@ -21,7 +21,7 @@ import {
 } from "ripple-address-codec";
 
 import { constants, errors, txFlags, ensureClassicAddress } from "../common";
-import { ValidationError } from "../common/errors";
+import { RippledError, ValidationError } from "../common/errors";
 import { getFee } from "../common/fee";
 import getBalances from "../ledger/balances";
 import { getOrderbook, formatBidsAndAsks } from "../ledger/orderbook";
@@ -196,7 +196,7 @@ class Client extends EventEmitter {
    */
   public constructor(server: string, options: ClientOptions = {}) {
     super();
-    if (typeof server !== "string" || !/^(wss?|wss?\+unix):\/\//.exec(server)) {
+    if (typeof server !== "string" || !/wss?(?:\+unix)?:\/\//u.exec(server)) {
       throw new ValidationError(
         "server URI must start with `wss://`, `ws://`, `wss+unix://`, or `ws+unix://`."
       );
@@ -299,7 +299,10 @@ class Client extends EventEmitter {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
     return this.connection.request({
       ...req,
-      account: req.account ? ensureClassicAddress(req.account) : undefined,
+      account: req.account
+        ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be string
+          ensureClassicAddress(req.account as string)
+        : undefined,
     }) as unknown as T;
   }
 
@@ -429,10 +432,16 @@ class Client extends EventEmitter {
       };
       // eslint-disable-next-line no-await-in-loop -- Necessary for this, it really has to wait
       const singleResponse = await this.connection.request(repeatProps);
-      const singleResult = singleResponse.result;
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
+      const singleResult = (singleResponse as U).result;
+      if (!(collectKey in singleResult)) {
+        throw new RippledError(`${collectKey} not in result`);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Should be true
       const collectedData = singleResult[collectKey];
       marker = singleResult.marker;
-      results.push(singleResponse);
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
+      results.push(singleResponse as U);
       // Make sure we handle when no data (not even an empty array) is returned.
       if (Array.isArray(collectedData)) {
         count += collectedData.length;

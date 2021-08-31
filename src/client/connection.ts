@@ -77,12 +77,13 @@ function getAgent(url: string, config: ConnectionOptions): Agent | undefined {
     let HttpsProxyAgent;
     try {
       // eslint-disable-next-line max-len -- Long eslint-disable-next-line TODO: figure out how to make this nicer
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-require-imports, node/global-require, global-require, -- Necessary for the `require`
+      // eslint-disable-next-line import/max-dependencies, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-require-imports, node/global-require, global-require, -- Necessary for the `require`
       HttpsProxyAgent = require("https-proxy-agent");
     } catch (_error) {
       throw new Error('"proxy" option is not supported in the browser');
     }
-    return new HttpsProxyAgent(proxyOptions);
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-call -- Necessary
+    return new HttpsProxyAgent(proxyOptions) as unknown as Agent;
   }
   return undefined;
 }
@@ -269,18 +270,16 @@ export class Connection extends EventEmitter {
     }
 
     return new Promise((resolve) => {
-      if (this.ws == null) {
-        return Promise.resolve(undefined);
+      if (this.ws != null) {
+        this.ws.once("close", (code) => resolve(code));
+        // Connection already has a disconnect handler for the disconnect logic.
+        // Just close the websocket manually (with our "intentional" code) to
+        // trigger that.
+        if (this.state !== WebSocket.CLOSING) {
+          this.ws.close(INTENTIONAL_DISCONNECT_CODE);
+        }
       }
-
-      this.ws.once("close", (code) => resolve(code));
-      // Connection already has a disconnect handler for the disconnect logic.
-      // Just close the websocket manually (with our "intentional" code) to
-      // trigger that.
-      if (this.ws != null && this.state !== WebSocket.CLOSING) {
-        this.ws.close(INTENTIONAL_DISCONNECT_CODE);
-      }
-      return Promise.resolve(undefined);
+      resolve(undefined);
     });
   }
 
@@ -342,10 +341,12 @@ export class Connection extends EventEmitter {
    */
   private onMessage(message): void {
     this.trace("receive", message);
-    let data: Response;
+    let data: Record<string, unknown>;
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Must be a JSON dictionary
       data = JSON.parse(message);
     } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Errors have messages
       this.emit("error", "badMessage", error.message, message);
       return;
     }
@@ -355,12 +356,16 @@ export class Connection extends EventEmitter {
       return;
     }
     if (data.type) {
-      this.emit(data.type, data);
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
+      this.emit(data.type as string, data);
     }
     if (data.type === "response") {
       try {
-        this.requestManager.handleResponse(data);
+        this.requestManager.handleResponse(
+          data as unknown as Partial<Response>
+        );
       } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Errors have messages
         this.emit("error", "badMessage", error.message, message);
       }
     }

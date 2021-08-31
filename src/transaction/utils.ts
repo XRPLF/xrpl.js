@@ -321,7 +321,7 @@ async function prepareTransaction(
       newTxJSON.Fee = scaleValue(xrpToDrops(instructions.fee), multiplier);
       return Promise.resolve();
     }
-    const cushion = client._feeCushion;
+    const cushion = client.feeCushion;
     return client.getFee(cushion).then(async (fee) => {
       return client
         .request({ command: "fee" })
