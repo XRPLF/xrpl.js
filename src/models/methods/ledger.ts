@@ -1,5 +1,7 @@
 import { LedgerIndex } from "../common";
 import { Ledger } from "../ledger";
+import { Transaction, TransactionAndMetadata } from "../transactions";
+import TransactionMetadata from "../transactions/metadata";
 
 import { BaseRequest, BaseResponse } from "./baseMethod";
 
@@ -16,12 +18,21 @@ export interface LedgerRequest extends BaseRequest {
   queue?: boolean;
 }
 
+interface ModifiedMetadata extends TransactionMetadata {
+  owner_funds: string;
+}
+
+interface ModifiedOfferCreateTransaction {
+  transaction: Transaction;
+  metadata: ModifiedMetadata;
+}
+
 interface LedgerQueueData {
   account: string;
-  // TODO: Retype tx once we have transaction types
-  // Also include tx_blob as possible type: https://xrpl.org/ledger.html
-  // Also handle the special case where 'owner_funds: string' is a field of OfferCreate sometimes - https://xrpl.org/ledger.html#response-format
-  tx: any;
+  tx:
+    | TransactionAndMetadata
+    | ModifiedOfferCreateTransaction
+    | { tx_blob: string };
   retries_remaining: number;
   preflight_result: string;
   last_result?: string;
@@ -43,6 +54,6 @@ export interface LedgerResponse extends BaseResponse {
     ledger_hash: string;
     ledger_index: number;
     queue_data?: Array<LedgerQueueData | string>;
-    validated: boolean; // TODO: Figure out if the example is correct, or the documentation for this field - https://xrpl.org/ledger.html#response-format
+    validated?: boolean;
   };
 }

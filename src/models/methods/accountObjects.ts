@@ -20,7 +20,7 @@ export interface AccountObjectsRequest extends BaseRequest {
   ledger_hash?: string;
   ledger_index?: LedgerIndex;
   limit?: number;
-  marker?: any;
+  marker?: unknown;
 }
 
 type AccountObject =

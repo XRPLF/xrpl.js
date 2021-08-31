@@ -1,3 +1,4 @@
+/* eslint-disable complexity -- Necessary for verifyDepositPreauth */
 import { ValidationError } from "../../common/errors";
 
 import { BaseTransaction, verifyBaseTransaction } from "./common";
@@ -9,12 +10,12 @@ export interface DepositPreauth extends BaseTransaction {
 }
 
 /**
+ * Verify the form and type of a DepositPreauth at runtime.
  *
  * @param tx - A DepositPreauth Transaction.
- * @returns
- * @throws {ValidationError} When the DepositPreauth is malformed.
+ * @throws When the DepositPreauth is malformed.
  */
-export function verifyDepositPreauth(tx: DepositPreauth): void {
+export function verifyDepositPreauth(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.Authorize !== undefined && tx.Unauthorize !== undefined) {
