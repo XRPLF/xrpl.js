@@ -1,89 +1,107 @@
 import requests from "../fixtures/requests";
 import responses from "../fixtures/responses";
 import rippled from "../fixtures/rippled";
-import { assertRejects, assertResultMatch, TestSuite } from "../testUtils";
+import setupClient from "../setupClient";
+import { assertRejects, assertResultMatch, addressTests } from "../testUtils";
 
 const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-export default <TestSuite>{
-  "buy order": async (client, address, mockRippled) => {
-    mockRippled.addResponse("server_info", rippled.server_info.normal);
-    mockRippled.addResponse("fee", rippled.fee);
-    mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const request = requests.prepareOrder.buy;
-    const result = await client.prepareOrder(address, request);
-    assertResultMatch(result, responses.prepareOrder.buy, "prepare");
-  },
+describe("client.prepareOrder", function () {
+  beforeEach(setupClient.setup);
+  afterEach(setupClient.teardown);
 
-  "buy order with expiration": async (client, address, mockRippled) => {
-    mockRippled.addResponse("server_info", rippled.server_info.normal);
-    mockRippled.addResponse("fee", rippled.fee);
-    mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const request = requests.prepareOrder.expiration;
-    const response = responses.prepareOrder.expiration;
-    const result = await client.prepareOrder(
-      address,
-      request,
-      instructionsWithMaxLedgerVersionOffset
-    );
-    assertResultMatch(result, response, "prepare");
-  },
+  addressTests.forEach(function (test) {
+    describe(test.type, function () {
+      it("buy order", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const request = requests.prepareOrder.buy;
+        const result = await this.client.prepareOrder(test.address, request);
+        assertResultMatch(result, responses.prepareOrder.buy, "prepare");
+      });
 
-  "sell order": async (client, address, mockRippled) => {
-    mockRippled.addResponse("server_info", rippled.server_info.normal);
-    mockRippled.addResponse("fee", rippled.fee);
-    mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const request = requests.prepareOrder.sell;
-    const result = await client.prepareOrder(
-      address,
-      request,
-      instructionsWithMaxLedgerVersionOffset
-    );
-    assertResultMatch(result, responses.prepareOrder.sell, "prepare");
-  },
+      it("buy order with expiration", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const request = requests.prepareOrder.expiration;
+        const response = responses.prepareOrder.expiration;
+        const result = await this.client.prepareOrder(
+          test.address,
+          request,
+          instructionsWithMaxLedgerVersionOffset
+        );
+        assertResultMatch(result, response, "prepare");
+      });
 
-  async invalid(client, address, mockRippled) {
-    mockRippled.addResponse("server_info", rippled.server_info.normal);
-    mockRippled.addResponse("fee", rippled.fee);
-    mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const request = { ...requests.prepareOrder.sell };
-    delete request.direction; // Make invalid
-    await assertRejects(
-      client.prepareOrder(
-        address,
-        request,
-        instructionsWithMaxLedgerVersionOffset
-      ),
-      client.errors.ValidationError,
-      'instance.order requires property "direction"'
-    );
-  },
+      it("sell order", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const request = requests.prepareOrder.sell;
+        const result = await this.client.prepareOrder(
+          test.address,
+          request,
+          instructionsWithMaxLedgerVersionOffset
+        );
+        assertResultMatch(result, responses.prepareOrder.sell, "prepare");
+      });
 
-  "with ticket": async (client, address, mockRippled) => {
-    mockRippled.addResponse("server_info", rippled.server_info.normal);
-    mockRippled.addResponse("fee", rippled.fee);
-    mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const request = requests.prepareOrder.sell;
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: "0.000012",
-      ticketSequence: 23,
-    };
-    const result = await client.prepareOrder(
-      address,
-      request,
-      localInstructions
-    );
-    assertResultMatch(result, responses.prepareOrder.ticket, "prepare");
-  },
-};
+      it("invalid", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const request = { ...requests.prepareOrder.sell };
+        delete request.direction; // Make invalid
+        await assertRejects(
+          this.client.prepareOrder(
+            test.address,
+            request,
+            instructionsWithMaxLedgerVersionOffset
+          ),
+          this.client.errors.ValidationError,
+          'instance.order requires property "direction"'
+        );
+      });
+
+      it("with ticket", async function () {
+        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+        this.mockRippled.addResponse("fee", rippled.fee);
+        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+        this.mockRippled.addResponse(
+          "account_info",
+          rippled.account_info.normal
+        );
+        const request = requests.prepareOrder.sell;
+        const localInstructions = {
+          ...instructionsWithMaxLedgerVersionOffset,
+          maxFee: "0.000012",
+          ticketSequence: 23,
+        };
+        const result = await this.client.prepareOrder(
+          test.address,
+          request,
+          localInstructions
+        );
+        assertResultMatch(result, responses.prepareOrder.ticket, "prepare");
+      });
+    });
+  });
+});
