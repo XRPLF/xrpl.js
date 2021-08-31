@@ -128,13 +128,13 @@ class Wallet {
     return verify(messageHex, signature, this.publicKey);
   }
 
-  //
-  // Gets an X-address in Testnet/Mainnet format.
-  // <<<<<<< HEAD
-  // @param {number} tag A tag to be included within the X-address.
-  // @param {boolean} test A boolean to indicate if X-address should be in Testnet (true) or Mainnet (false) format.
-  // @returns {string} An X-address.
-  //
+  /**
+   * Gets an X-address in Testnet/Mainnet format.
+   *
+   * @param tag - A tag to be included within the X-address.
+   * @param test - A boolean to indicate if X-address should be in Testnet (true) or Mainnet (false) format.
+   * @returns An X-address.
+   */
   getXAddress(tag: number, test = false): string {
     return classicAddressToXAddress(deriveAddress(this.publicKey), tag, test);
   }
