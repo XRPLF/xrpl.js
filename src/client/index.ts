@@ -104,6 +104,7 @@ import {
   UnsubscribeRequest,
   UnsubscribeResponse,
 } from "../models/methods";
+import { PathFindStream } from "../models/methods/subscribe";
 import prepareCheckCancel from "../transaction/check-cancel";
 import prepareCheckCash from "../transaction/check-cash";
 import prepareCheckCreate from "../transaction/check-create";
@@ -286,6 +287,7 @@ class Client extends EventEmitter {
     event: "consensusPhase",
     listener: (phase: ConsensusStream) => void
   );
+  public on(event: "path_find", listener: (path: PathFindStream) => void);
   public on(event: string, listener: (...args: any[]) => void);
   public on(eventName: string, listener: (...args: any[]) => void) {
     this.connection.on(eventName, listener);

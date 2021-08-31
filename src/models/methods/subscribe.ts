@@ -1,4 +1,4 @@
-import { Currency, StreamType } from "../common";
+import { Currency, Path, StreamType } from "../common";
 import { TransactionMetadata } from "../common/transaction";
 
 import { BaseRequest, BaseResponse } from "./baseMethod";
@@ -109,10 +109,25 @@ export interface ConsensusStream extends BaseStream {
   consensus: "open" | "establish" | "accepted";
 }
 
+export interface PathFindStream {
+  type: "path_find";
+  source_account: string;
+  destination_account: string;
+  destination_amount: Amount;
+  full_reply: boolean;
+  id: any;
+  send_max?: Amount;
+  alternatives: {
+    paths_computed: Path[];
+    source_amount: string;
+  };
+}
+
 export type Stream =
   | LedgerStream
   | ValidationStream
   | TransactionStream
+  | PathFindStream
   | PeerStatusStream
   | OrderBookStream
   | ConsensusStream;
