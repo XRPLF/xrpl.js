@@ -1,9 +1,7 @@
-import addresses from "../fixtures/addresses.json";
 import requests from "../fixtures/requests";
 import responses from "../fixtures/responses";
 import rippled from "../fixtures/rippled";
-import setupClient from "../setupClient";
-import { assertRejects, assertResultMatch } from "../testUtils";
+import { assertRejects, assertResultMatch, TestSuite } from "../testUtils";
 
 const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
 
@@ -14,21 +12,23 @@ export const config = {
   skipXAddress: true,
 };
 
-describe("client.prepareEscrowCreation", function () {
-  beforeEach(setupClient.setup);
-  afterEach(setupClient.teardown);
-
-  it("prepareEscrowCreation", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+/**
+ * Every test suite exports their tests in the default object.
+ * - Check out the "TestSuite" type for documentation on the interface.
+ * - Check out "test/client/index.ts" for more information about the test runner.
+ */
+export default <TestSuite>{
+  async prepareEscrowCreation(client, address, mockRippled) {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: "0.000012",
     };
-    const result = await this.client.prepareEscrowCreation(
-      addresses.ACCOUNT,
+    const result = await client.prepareEscrowCreation(
+      address,
       requests.prepareEscrowCreation.normal,
       localInstructions
     );
@@ -37,46 +37,46 @@ describe("client.prepareEscrowCreation", function () {
       responses.prepareEscrowCreation.normal,
       "prepare"
     );
-  });
+  },
 
-  it("prepareEscrowCreation full", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const result = await this.client.prepareEscrowCreation(
-      addresses.ACCOUNT,
+  "prepareEscrowCreation full": async (client, address, mockRippled) => {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
+    const result = await client.prepareEscrowCreation(
+      address,
       requests.prepareEscrowCreation.full
     );
     assertResultMatch(result, responses.prepareEscrowCreation.full, "prepare");
-  });
+  },
 
-  it("prepareEscrowCreation - invalid", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  "prepareEscrowCreation - invalid": async (client, address, mockRippled) => {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const escrow = { ...requests.prepareEscrowCreation.full };
     delete escrow.amount; // Make invalid
     await assertRejects(
-      this.client.prepareEscrowCreation(addresses.ACCOUNT, escrow),
-      this.client.errors.ValidationError,
+      client.prepareEscrowCreation(address, escrow),
+      client.errors.ValidationError,
       'instance.escrowCreation requires property "amount"'
     );
-  });
+  },
 
-  it("with ticket", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  "with ticket": async (client, address, mockRippled) => {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: "0.000396",
       ticketSequence: 23,
     };
-    const result = await this.client.prepareEscrowCreation(
-      addresses.ACCOUNT,
+    const result = await client.prepareEscrowCreation(
+      address,
       requests.prepareEscrowCreation.normal,
       localInstructions
     );
@@ -85,5 +85,5 @@ describe("client.prepareEscrowCreation", function () {
       responses.prepareEscrowCreation.ticket,
       "prepare"
     );
-  });
-});
+  },
+};

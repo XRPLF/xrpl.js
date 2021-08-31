@@ -1,9 +1,15 @@
 import { assert } from "chai";
 
 import { Client } from "../../src";
+import { TestSuite } from "../testUtils";
 
-describe("client.deriveXAddress", function () {
-  it("returns address for public key", function () {
+/**
+ * Every test suite exports their tests in the default object.
+ * - Check out the "TestSuite" type for documentation on the interface.
+ * - Check out "test/client/index.ts" for more information about the test runner.
+ */
+export default <TestSuite>{
+  "returns address for public key": async (client, address) => {
     assert.equal(
       Client.deriveXAddress({
         publicKey:
@@ -22,5 +28,5 @@ describe("client.deriveXAddress", function () {
       }),
       "TVVrSWtmQQssgVcmoMBcFQZKKf56QscyWLKnUyiuZW8ALU4"
     );
-  });
-});
+  },
+};

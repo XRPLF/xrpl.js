@@ -3,6 +3,7 @@
 // import {Client} from 'xrpl-local'
 // import requests from '../fixtures/requests'
 // import responses from '../fixtures/responses'
+import { TestSuite } from "../testUtils";
 
 // function checkSortingOfOrders(orders) {
 //   let previousRate = '0'
@@ -38,7 +39,12 @@
 //   return true
 // }
 
-describe("client.formatBidsAndAsks", function () {
+/**
+ * Every test suite exports their tests in the default object.
+ * - Check out the "TestSuite" type for documentation on the interface.
+ * - Check out "test/client/index.ts" for more information about the test runner.
+ */
+export default <TestSuite>{
   // 'normal': async (client, address) => {
   //   const orderbookInfo = {
   //     base: {
@@ -359,4 +365,4 @@ describe("client.formatBidsAndAsks", function () {
   //     )
   //   })
   // }
-});
+};

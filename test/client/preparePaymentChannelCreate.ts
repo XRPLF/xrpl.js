@@ -1,9 +1,7 @@
-import addresses from "../fixtures/addresses.json";
 import requests from "../fixtures/requests";
 import responses from "../fixtures/responses";
 import rippled from "../fixtures/rippled";
-import setupClient from "../setupClient";
-import { assertResultMatch } from "../testUtils";
+import { assertResultMatch, TestSuite } from "../testUtils";
 
 const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
 
@@ -14,21 +12,23 @@ export const config = {
   skipXAddress: true,
 };
 
-describe("client.preparePaymentChannelCreate", function () {
-  beforeEach(setupClient.setup);
-  afterEach(setupClient.teardown);
-
-  it("preparePaymentChannelCreate", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+/**
+ * Every test suite exports their tests in the default object.
+ * - Check out the "TestSuite" type for documentation on the interface.
+ * - Check out "test/client/index.ts" for more information about the test runner.
+ */
+export default <TestSuite>{
+  async preparePaymentChannelCreate(client, address, mockRippled) {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: "0.000012",
     };
-    const result = await this.client.preparePaymentChannelCreate(
-      addresses.ACCOUNT,
+    const result = await client.preparePaymentChannelCreate(
+      address,
       requests.preparePaymentChannelCreate.normal,
       localInstructions
     );
@@ -37,15 +37,15 @@ describe("client.preparePaymentChannelCreate", function () {
       responses.preparePaymentChannelCreate.normal,
       "prepare"
     );
-  });
+  },
 
-  it("preparePaymentChannelCreate full", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const result = await this.client.preparePaymentChannelCreate(
-      addresses.ACCOUNT,
+  "preparePaymentChannelCreate full": async (client, address, mockRippled) => {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
+    const result = await client.preparePaymentChannelCreate(
+      address,
       requests.preparePaymentChannelCreate.full
     );
     assertResultMatch(
@@ -53,20 +53,24 @@ describe("client.preparePaymentChannelCreate", function () {
       responses.preparePaymentChannelCreate.full,
       "prepare"
     );
-  });
+  },
 
-  it("preparePaymentChannelCreate with ticket", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  "preparePaymentChannelCreate with ticket": async (
+    client,
+    address,
+    mockRippled
+  ) => {
+    mockRippled.addResponse("server_info", rippled.server_info.normal);
+    mockRippled.addResponse("fee", rippled.fee);
+    mockRippled.addResponse("ledger_current", rippled.ledger_current);
+    mockRippled.addResponse("account_info", rippled.account_info.normal);
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: "0.000012",
       ticketSequence: 23,
     };
-    const result = await this.client.preparePaymentChannelCreate(
-      addresses.ACCOUNT,
+    const result = await client.preparePaymentChannelCreate(
+      address,
       requests.preparePaymentChannelCreate.normal,
       localInstructions
     );
@@ -75,5 +79,5 @@ describe("client.preparePaymentChannelCreate", function () {
       responses.preparePaymentChannelCreate.ticket,
       "prepare"
     );
-  });
-});
+  },
+};
