@@ -53,7 +53,9 @@ function multisign(
 
   transactions.forEach((txOrBlob) => {
     const tx = getDecodedTransaction(txOrBlob);
-    verifyBaseTransaction(tx);
+
+    // This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
+    verifyBaseTransaction(tx as unknown as Record<string, unknown>);
 
     if (tx.SigningPubKey !== "") {
       throw new ValidationError(
@@ -126,7 +128,10 @@ function combine(signedTransactions: string[]): SignedTransaction {
     return decode(tx);
   }) as unknown as Transaction[];
 
-  transactions.forEach((tx) => verifyBaseTransaction(tx));
+  // This will throw a more clear error for JS users if there's a problem with any of the transaction's formatting
+  transactions.forEach((tx) =>
+    verifyBaseTransaction(tx as unknown as Record<string, unknown>)
+  );
   validateTransactionEquivalence(transactions);
 
   const signedTransaction = encode(getTransactionWithAllSigners(transactions));
