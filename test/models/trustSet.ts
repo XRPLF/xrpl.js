@@ -9,7 +9,7 @@ import { verifyTrustSet } from "../../src/models/transactions/trustSet";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("TrustSet Transaction Verification", function () {
+describe("TrustSet", function () {
   let trustSet;
 
   beforeEach(function () {
