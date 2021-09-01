@@ -1,5 +1,14 @@
-import { OfferCreateFlags, OfferCreateFlagsEnum, PaymentChannelClaimFlags, PaymentChannelClaimFlagsEnum, PaymentTransactionFlags, PaymentTransactionFlagsEnum, Transaction, TrustSetFlags, TrustSetFlagsEnum } from "../transactions";
-import { GlobalFlags, GlobalFlagsEnum } from "../transactions/common";
+import {
+  OfferCreateFlags,
+  OfferCreateFlagsEnum,
+  PaymentChannelClaimFlags,
+  PaymentChannelClaimFlagsEnum,
+  PaymentTransactionFlags,
+  PaymentTransactionFlagsEnum,
+  Transaction,
+  TrustSetFlags,
+  TrustSetFlagsEnum,
+} from "../transactions";
 
 /**
  * Verify that all fields of an object are in fields.
@@ -28,45 +37,40 @@ export function isFlagEnabled(Flags: number, checkFlag: number): boolean {
 }
 
 /**
- * Sets a transaction's flags to its numeric representation
+ * Sets a transaction's flags to its numeric representation.
  *
- * @param {Transaction} tx A transaction to set its flags to its numeric representation
- * @returns {void}
+ * @param tx - A transaction to set its flags to its numeric representation.
+ * @returns
  */
 export function setTransactionFlagsToNumber(tx: Transaction): void {
-  switch (tx.TransactionType) {
-    case 'OfferCreate':
-      tx.Flags = convertOfferCreateFlagsToNumber(tx.Flags as OfferCreateFlags);
-      break;
-    case 'PaymentChannelClaim':
-      tx.Flags = convertPaymentChannelClaimFlagsToNumber(tx.Flags as PaymentChannelClaimFlags);
-      break;
-    case 'Payment':
-      tx.Flags = convertPaymentTransactionFlagsToNumber(tx.Flags as PaymentTransactionFlags);
-      break;
-    case 'TrustSet':
-      tx.Flags = convertTrustSetFlagsToNumber(tx.Flags as TrustSetFlags);
-      break;
-    default:
-      tx.Flags = convertGlobalFlagsToNumber(tx.Flags);
+  if (tx.Flags == null) {
+    tx.Flags = 0;
+    return;
   }
-}
+  if (typeof tx.Flags === "number") {
+    return;
+  }
 
-function convertGlobalFlagsToNumber(flags: GlobalFlags | number | undefined): number {
-  if (typeof flags === 'number') {
-    return flags;
+  switch (tx.TransactionType) {
+    case "OfferCreate":
+      tx.Flags = convertOfferCreateFlagsToNumber(tx.Flags as OfferCreateFlags);
+      return;
+    case "PaymentChannelClaim":
+      tx.Flags = convertPaymentChannelClaimFlagsToNumber(tx.Flags as PaymentChannelClaimFlags);
+      return;
+    case "Payment":
+      tx.Flags = convertPaymentTransactionFlagsToNumber(tx.Flags as PaymentTransactionFlags);
+      return;
+    case "TrustSet":
+      tx.Flags = convertTrustSetFlagsToNumber(tx.Flags as TrustSetFlags);
+      return;
+    default:
+      tx.Flags = 0;
   }
-  return flags?.tfFullyCanonicalSig ? GlobalFlagsEnum.tfFullyCanonicalSig : 0;
 }
 
 function convertOfferCreateFlagsToNumber(flags: OfferCreateFlags): number {
-  if (flags == null) {
-    return 0;
-  } else if (typeof flags === 'number') {
-    return flags;
-  }
-
-  let resultFlags = convertGlobalFlagsToNumber(flags);
+  let resultFlags = 0;
 
   if (flags.tfPassive) {
     resultFlags |= OfferCreateFlagsEnum.tfPassive;
@@ -85,13 +89,7 @@ function convertOfferCreateFlagsToNumber(flags: OfferCreateFlags): number {
 }
 
 function convertPaymentChannelClaimFlagsToNumber(flags: PaymentChannelClaimFlags): number {
-  if (flags == null) {
-    return 0;
-  } else if (typeof flags === 'number') {
-    return flags;
-  }
-
-  let resultFlags = convertGlobalFlagsToNumber(flags);
+  let resultFlags = 0;
 
   if (flags.tfRenew) {
     resultFlags |= PaymentChannelClaimFlagsEnum.tfRenew;
@@ -104,13 +102,7 @@ function convertPaymentChannelClaimFlagsToNumber(flags: PaymentChannelClaimFlags
 }
 
 function convertPaymentTransactionFlagsToNumber(flags: PaymentTransactionFlags): number {
-  if (flags == null) {
-    return 0;
-  } else if (typeof flags === 'number') {
-    return flags;
-  }
-
-  let resultFlags = convertGlobalFlagsToNumber(flags);
+  let resultFlags = 0;
 
   if (flags.tfNoDirectRipple) {
     resultFlags |= PaymentTransactionFlagsEnum.tfNoDirectRipple;
@@ -126,13 +118,7 @@ function convertPaymentTransactionFlagsToNumber(flags: PaymentTransactionFlags):
 }
 
 function convertTrustSetFlagsToNumber(flags: TrustSetFlags): number {
-  if (flags == null) {
-    return 0;
-  } else if (typeof flags === 'number') {
-    return flags;
-  }
-
-  let resultFlags = convertGlobalFlagsToNumber(flags);
+  let resultFlags = 0;
 
   if (flags.tfSetfAuth) {
     resultFlags |= TrustSetFlagsEnum.tfSetfAuth;

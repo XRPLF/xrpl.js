@@ -95,10 +95,6 @@ export function isAmount(amount: unknown): boolean {
   );
 }
 
-export enum GlobalFlagsEnum {
-  tfFullyCanonicalSig = 0x80000000,
-}
-
 export interface GlobalFlags {
   tfFullyCanonicalSig: boolean;
 }
