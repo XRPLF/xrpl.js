@@ -214,7 +214,7 @@ export function computeStateTreeHash(entries: any[]): string {
   return shamap.hash;
 }
 
-// see rippled Ledger::updateHash()
+// see rippled Ledger::calculateLedgerHash()
 export function computeLedgerHash(ledgerHeader): string {
   const prefix = HashPrefix.LEDGER.toString(16).toUpperCase();
   return sha512Half(
