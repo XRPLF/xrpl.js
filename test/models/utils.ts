@@ -43,8 +43,6 @@ describe("Models Utils", function () {
   });
 
   describe("setTransactionFlagsToNumber", function () {
-    const globalFlags = { tfFullyCanonicalSig: false };
-
     it("sets OfferCreateFlags to its numeric value", function () {
       const tx: OfferCreate = {
         Account: "r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W",
@@ -59,7 +57,6 @@ describe("Models Utils", function () {
         TxnSignature:
           "3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91",
         Flags: {
-          ...globalFlags,
           tfPassive: true,
           tfImmediateOrCancel: false,
           tfFillOrKill: true,
@@ -81,7 +78,6 @@ describe("Models Utils", function () {
         Channel:
           "C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198",
         Flags: {
-          ...globalFlags,
           tfRenew: true,
           tfClose: false,
         },
@@ -101,7 +97,6 @@ describe("Models Utils", function () {
         Amount: "1234",
         Destination: "rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy",
         Flags: {
-          ...globalFlags,
           tfNoDirectRipple: false,
           tfPartialPayment: true,
           tfLimitQuality: true,
@@ -127,7 +122,6 @@ describe("Models Utils", function () {
         QualityIn: 1234,
         QualityOut: 4321,
         Flags: {
-          ...globalFlags,
           tfSetfAuth: true,
           tfSetNoRipple: false,
           tfClearNoRipple: true,
@@ -147,9 +141,7 @@ describe("Models Utils", function () {
       const tx: DepositPreauth = {
         TransactionType: "DepositPreauth",
         Account: "rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo",
-        Flags: {
-          ...globalFlags,
-        },
+        Flags: {},
       };
 
       setTransactionFlagsToNumber(tx);
