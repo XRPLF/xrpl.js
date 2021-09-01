@@ -7,7 +7,7 @@ declare class WebSocket {
   public onclose?: () => void;
   public onopen?: () => void;
   public onerror?: (error: Error) => void;
-  public onmessage?: (message: string) => void;
+  public onmessage?: (message: MessageEvent) => void;
   public readyState: number;
   public constructor(url: string);
   public close(code?: number): void;
@@ -65,8 +65,8 @@ export default class WSWrapper extends EventEmitter {
       this.emit("error", error);
     };
 
-    this.ws.onmessage = (message): void => {
-      this.emit("message", message);
+    this.ws.onmessage = (message: MessageEvent): void => {
+      this.emit("message", message.data);
     };
   }
 
