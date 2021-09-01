@@ -1,6 +1,9 @@
 import { assert } from "chai";
 
-import { getFaucetUrl, FaucetNetwork } from "../src/wallet/wallet-generation";
+import {
+  getFaucetUrl,
+  FaucetNetwork,
+} from "../src/wallet/generateFaucetWallet";
 
 import setupClient from "./setupClient";
 
