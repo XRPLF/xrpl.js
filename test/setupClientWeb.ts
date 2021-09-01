@@ -1,4 +1,6 @@
-import { Client, BroadcastClient, Response } from "xrpl-local";
+import { Client, BroadcastClient } from "xrpl-local";
+
+import { PortResponse } from "./mockRippled";
 
 const port = 34371;
 const baseUrl = "ws://testripple.circleci.com:";
@@ -15,7 +17,7 @@ function setup(this: any, port_ = port) {
     })
     .then((got) => {
       return new Promise<void>((resolve, reject) => {
-        this.client = new Client(baseUrl + (got as Response).result.port);
+        this.client = new Client(baseUrl + (got as PortResponse).result.port);
         this.client.connect().then(resolve).catch(reject);
       });
     })
