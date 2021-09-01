@@ -4,7 +4,7 @@ import { Memo } from "../common/types/objects";
 import { ISOTimeToRippleTime, xrpToDrops } from "../utils";
 
 import { Instructions, Prepare, TransactionJSON } from "./types";
-import * as utils from "./utils";
+import * as utils from "../ledger/autofill";
 
 const ValidationError = utils.common.errors.ValidationError;
 

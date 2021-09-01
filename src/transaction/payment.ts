@@ -11,8 +11,8 @@ import {
 import { toRippledAmount, xrpToDrops } from "../utils";
 
 import { Instructions, Prepare, TransactionJSON } from "./types";
-import * as utils from "./utils";
-import { getClassicAccountAndTag, ClassicAccountAndTag } from "./utils";
+import * as utils from "../ledger/autofill";
+import { getClassicAccountAndTag, ClassicAccountAndTag } from "../ledger/autofill";
 
 const validate = utils.common.validate;
 const paymentFlags = utils.common.txFlags.Payment;

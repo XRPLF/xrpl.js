@@ -10,7 +10,7 @@ import { computeBinaryTransactionHash } from "../utils/hashes";
 import Wallet from "../Wallet";
 
 import { SignOptions, KeyPair, TransactionJSON } from "./types";
-import * as utils from "./utils";
+import * as utils from "../ledger/autofill";
 
 const validate = utils.common.validate;
 

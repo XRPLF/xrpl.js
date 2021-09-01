@@ -11,7 +11,7 @@ import {
   SettingsTransaction,
   TransactionJSON,
 } from "./types";
-import * as utils from "./utils";
+import * as utils from "../ledger/autofill";
 
 const validate = utils.common.validate;
 const AccountSetFlags = utils.common.constants.AccountSetFlags;

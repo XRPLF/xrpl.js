@@ -2,7 +2,7 @@ import { Client } from "..";
 import { validate } from "../common";
 
 import { Instructions, Prepare, TransactionJSON } from "./types";
-import { prepareTransaction } from "./utils";
+import { prepareTransaction } from "../ledger/autofill";
 
 export interface CheckCancelParameters {
   checkID: string;

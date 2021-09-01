@@ -114,7 +114,7 @@ import { sign } from "../transaction/sign";
 import prepareTicketCreate from "../transaction/ticket";
 import prepareTrustline from "../transaction/trustline";
 import { TransactionJSON, Instructions, Prepare } from "../transaction/types";
-import * as transactionUtils from "../transaction/utils";
+import * as transactionUtils from "../ledger/autofill";
 import { deriveAddress, deriveXAddress } from "../utils/derive";
 import generateFaucetWallet from "../wallet/wallet-generation";
 

@@ -18,7 +18,7 @@ import {
   xrpToDrops,
 } from "../utils";
 
-import { Instructions, Prepare, TransactionJSON } from "./types";
+import { Instructions, Prepare, TransactionJSON } from "../transaction/types";
 
 const txFlags = common.txFlags;
 const TRANSACTION_TYPES_WITH_DESTINATION_TAG_FIELD = [

@@ -2,7 +2,7 @@ import { Client } from "..";
 import { Memo } from "../common/types/objects";
 
 import { Instructions, Prepare, TransactionJSON } from "./types";
-import * as utils from "./utils";
+import * as utils from "../ledger/autofill";
 
 const validate = utils.common.validate;
 const ValidationError = utils.common.errors.ValidationError;

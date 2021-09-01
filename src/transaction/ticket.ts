@@ -3,7 +3,7 @@ import _ from "lodash";
 import type { Client } from "..";
 
 import { Prepare, TransactionJSON, Instructions } from "./types";
-import * as utils from "./utils";
+import * as utils from "../ledger/autofill";
 
 const validate = utils.common.validate;
 const ValidationError = utils.common.errors.ValidationError;
