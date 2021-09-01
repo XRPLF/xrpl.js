@@ -52,7 +52,7 @@ function multisign(
   }
 
   transactions.forEach((txOrBlob) => {
-    const tx = getDecodedTransaction(txOrBlob);
+    const tx: Transaction = getDecodedTransaction(txOrBlob);
 
     // This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
     verifyBaseTransaction(tx as unknown as Record<string, unknown>);
@@ -123,10 +123,9 @@ function verify(tx: Transaction | string): boolean {
  * with a transaction id based on the combined transaction.
  */
 function combine(signedTransactions: string[]): SignedTransaction {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
   const transactions: Transaction[] = signedTransactions.map((tx: string) => {
-    return decode(tx);
-  }) as unknown as Transaction[];
+    return getDecodedTransaction(tx);
+  });
 
   // This will throw a more clear error for JS users if there's a problem with any of the transaction's formatting
   transactions.forEach((tx) =>
