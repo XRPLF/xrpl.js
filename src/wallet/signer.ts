@@ -56,6 +56,7 @@ function multisign(
     const tx: Transaction = getDecodedTransaction(txOrBlob);
 
     // This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
+    // TODO: Replace this with verify() (The general validation function for all Transactions)
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- verify does not accept Transaction type
     verifyBaseTransaction(tx as unknown as Record<string, unknown>);
 
