@@ -441,12 +441,12 @@ async function autofill(client: Client, tx: Transaction): Promise<Transaction> {
   setTransactionFlagsToNumber(tx);
 
   if (tx.Sequence == null) {
-    const sequence = await getNextValidSequenceNumber(tx.Account, client);
+    const sequence = await getNextValidSequenceNumber(client, tx.Account);
     tx.Sequence = sequence;
   }
 
   if (tx.Fee == null) {
-    tx.Fee = await calculateFeePerTransactionType(tx, client);
+    tx.Fee = await calculateFeePerTransactionType(client, tx);
   }
 
   if (tx.LastLedgerSequence == null) {
@@ -485,8 +485,8 @@ function convertToClassicAddress(tx: Transaction, fieldName: string): void {
 }
 
 async function getNextValidSequenceNumber(
-  account: string,
-  client: Client
+  client: Client,
+  account: string
 ): Promise<number> {
   const request: AccountInfoRequest = {
     command: "account_info",
@@ -497,16 +497,10 @@ async function getNextValidSequenceNumber(
 }
 
 async function calculateFeePerTransactionType(
-  transaction: Transaction,
-  client?: Client
+  client: Client,
+  transaction: Transaction
 ): Promise<string> {
-  let netFee;
-  if (client == null) {
-    netFee = 10; // 10 drops
-  } else {
-    netFee = await client.getFee(); // Usually 0.00001 XRP (10 drops)
-  }
-
+  const netFee = parseFloat(await client.getFee()); // Usually 0.00001 XRP (10 drops)
   let baseFee = netFee;
 
   // EscrowFinish Transaction with Fulfillment
