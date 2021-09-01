@@ -125,7 +125,7 @@ export interface PathFindStream {
   send_max?: Amount;
   alternatives: {
     paths_computed: Path[];
-    source_amount: string;
+    source_amount: Amount;
   };
 }
 
