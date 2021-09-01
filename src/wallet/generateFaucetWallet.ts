@@ -26,6 +26,7 @@ const MAX_ATTEMPTS = 20; // Maximum attempts to retrieve a balance
  * @param client - Client.
  * @param wallet - An existing XRPL Wallet to fund, if undefined, a new Wallet will be created.
  * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP.
+ * @throws When either Client isn't connected or unable to fund wallet address.
  */
 async function generateFaucetWallet(
   client: Client,
@@ -40,21 +41,22 @@ async function generateFaucetWallet(
   let startingBalance = 0;
   const faucetUrl = getFaucetUrl(client);
 
-  // If no existing Wallet is provided or its address is invalid to fund
-  if (!wallet || !isValidAddress(wallet.classicAddress)) {
-    wallet = Wallet.generate();
-  }
+  // Generate a new Wallet if no existing Wallet is provided or its address is invalid to fund
+  const fundWallet =
+    wallet && isValidAddress(wallet.classicAddress)
+      ? wallet
+      : Wallet.generate();
 
   // Create the POST request body
   body = new TextEncoder().encode(
     JSON.stringify({
-      destination: wallet.classicAddress,
+      destination: fundWallet.classicAddress,
     })
   );
   // Retrieve the existing account balance
   const addressToFundBalance = await getAddressXrpBalance(
     client,
-    wallet.classicAddress
+    fundWallet.classicAddress
   );
 
   // Check the address balance is not undefined and is a number
@@ -100,7 +102,7 @@ async function generateFaucetWallet(
               );
 
               if (isFunded) {
-                resolve(wallet);
+                resolve(fundWallet);
               } else {
                 reject(
                   new errors.XRPLFaucetError(
