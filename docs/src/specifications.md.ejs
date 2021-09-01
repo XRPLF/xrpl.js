@@ -18,7 +18,7 @@ Cancel a Check that has not been redeemed. (Native transaction type: [CheckCance
 
 #### Example
 
-<%- renderFixture('requests/prepare-check-cancel.json') %>
+<%- renderFixture('requests/prepareCheckCancel.json') %>
 
 
 ## Check Cash
@@ -29,7 +29,7 @@ Redeem a Check for up to its stated value. (Native transaction type: [CheckCash]
 
 #### Example
 
-<%- renderFixture('requests/prepare-check-cash-amount.json') %>
+<%- renderFixture('requests/prepareCheckCashAmount.json') %>
 
 
 ## Check Create
@@ -40,7 +40,7 @@ Create a Check, a deferred payment that can be redeemed by the destination. (Nat
 
 #### Example
 
-<%- renderFixture('requests/prepare-check-create.json') %>
+<%- renderFixture('requests/prepareCheckCreate.json') %>
 
 
 ## Deposit Preauth
@@ -60,7 +60,7 @@ Cancel an Escrow that has passed its expiration. (Native transaction type: [Escr
 
 #### Example
 
-<%- renderFixture('requests/prepare-escrow-cancellation.json') %>
+<%- renderFixture('requests/prepareEscrowCancellation.json') %>
 
 
 ## Escrow Creation
@@ -71,7 +71,7 @@ Create an Escrow that locks up XRP until a given time or condition is met. (Nati
 
 #### Example
 
-<%- renderFixture('requests/prepare-escrow-creation.json') %>
+<%- renderFixture('requests/prepareEscrowCreation.json') %>
 
 
 ## Escrow Execution
@@ -82,7 +82,7 @@ Deliver XRP from an Escrow after its conditions have been met. (Native transacti
 
 #### Example
 
-<%- renderFixture('requests/prepare-escrow-execution.json') %>
+<%- renderFixture('requests/prepareEscrowExecution.json') %>
 
 
 ## Order
@@ -95,7 +95,7 @@ The following invalid flag combination causes a `ValidationError`: `immediateOrC
 
 #### Example
 
-<%- renderFixture('requests/prepare-order.json') %>
+<%- renderFixture('requests/prepareOrder.json') %>
 
 
 ## Order Cancellation
@@ -106,7 +106,7 @@ Cancel an order in the decentralized exchange. (Native transaction type: [OfferC
 
 #### Example
 
-<%- renderFixture('requests/prepare-order-cancellation.json') %>
+<%- renderFixture('requests/prepareOrderCancellation.json') %>
 
 
 ## Payment
@@ -117,7 +117,7 @@ Send value from one account to another. (Native transaction type: [Payment](http
 
 #### Example
 
-<%- renderFixture('requests/prepare-payment.json') %>
+<%- renderFixture('requests/preparePayment.json') %>
 
 
 ## Payment Channel Claim
@@ -128,7 +128,7 @@ Redeem XRP from a Payment Channel. (Native transaction type: [PaymentChannelClai
 
 #### Example
 
-<%- renderFixture('requests/prepare-payment-channel-claim.json') %>
+<%- renderFixture('requests/preparePaymentChannelClaim.json') %>
 
 
 ## Payment Channel Create
@@ -139,7 +139,7 @@ Create a Payment Channel with XRP set aside for asynchronous payments. (Native t
 
 #### Example
 
-<%- renderFixture('requests/prepare-payment-channel-create.json') %>
+<%- renderFixture('requests/preparePaymentChannelCreate.json') %>
 
 
 ## Payment Channel Fund
@@ -150,7 +150,7 @@ Add XRP to a Payment Channel. (Native transaction type: [PaymentChannelFund](htt
 
 #### Example
 
-<%- renderFixture('requests/prepare-payment-channel-fund.json') %>
+<%- renderFixture('requests/preparePaymentChannelFund.json') %>
 
 
 
@@ -162,7 +162,7 @@ Change account settings. (Native transaction types: [AccountSet](https://xrpl.or
 
 #### Example
 
-<%- renderFixture('requests/prepare-settings.json') %>
+<%- renderFixture('requests/prepareSettings.json') %>
 
 
 ## Ticket Create
@@ -182,4 +182,4 @@ Create or modify a trust line between two accounts, for an issued currency. (Nat
 
 #### Example
 
-<%- renderFixture('requests/prepare-trustline.json') %>
+<%- renderFixture('requests/prepareTrustline.json') %>
