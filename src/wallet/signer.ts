@@ -13,6 +13,7 @@ import {
   verify as verifySignature,
 } from "ripple-keypairs";
 
+import { JsonObject } from "../../ripple-binary-codec/dist/types/serialized-type";
 import { ValidationError } from "../common/errors";
 import { SignedTransaction } from "../common/types/objects";
 import { Signer } from "../models/common";
@@ -55,6 +56,7 @@ function multisign(
     const tx: Transaction = getDecodedTransaction(txOrBlob);
 
     // This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- verify does not accept Transaction type
     verifyBaseTransaction(tx as unknown as Record<string, unknown>);
 
     if (tx.SigningPubKey !== "") {
@@ -129,6 +131,7 @@ function combine(signedTransactions: string[]): SignedTransaction {
 
   // This will throw a more clear error for JS users if there's a problem with any of the transaction's formatting
   transactions.forEach((tx) =>
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Casting here let's us do type validation for JS
     verifyBaseTransaction(tx as unknown as Record<string, unknown>)
   );
   validateTransactionEquivalence(transactions);
@@ -209,10 +212,10 @@ function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
 
 function getEncodedTransaction(txOrBlob: Transaction | string): string {
   if (typeof txOrBlob === "object") {
-    return encode(JSON.parse(JSON.stringify(txOrBlob)));
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
+    return encode(txOrBlob as unknown as JsonObject);
   }
   return txOrBlob;
 }
 
-// eslint-disable-next-line import/no-unused-modules -- These methods will be used by users of the library
 export { sign, multisign, authorizeChannel, verify };
