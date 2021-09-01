@@ -504,14 +504,13 @@ async function calculateFeePerTransactionType(
   let baseFee = netFee;
 
   // EscrowFinish Transaction with Fulfillment
-  if (transaction.TransactionType === "EscrowFinish") {
-    if (transaction.Fulfillment != null) {
-      const fulfillmentBytesSize = Math.ceil(
-        transaction.Fulfillment.length / 2
-      );
-      // 10 drops × (33 + (Fulfillment size in bytes / 16))
-      baseFee = Math.ceil(netFee * (33 + fulfillmentBytesSize / 16));
-    }
+  if (
+    transaction.TransactionType === "EscrowFinish" &&
+    transaction.Fulfillment != null
+  ) {
+    const fulfillmentBytesSize = Math.ceil(transaction.Fulfillment.length / 2);
+    // 10 drops × (33 + (Fulfillment size in bytes / 16))
+    baseFee = Math.ceil(netFee * (33 + fulfillmentBytesSize / 16));
   }
 
   // AccountDelete Transaction
