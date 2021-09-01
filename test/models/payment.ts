@@ -12,7 +12,7 @@ import {
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("Payment Transaction Verification", function () {
+describe("Payment", function () {
   let paymentTransaction;
 
   beforeEach(function () {

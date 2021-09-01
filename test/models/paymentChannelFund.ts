@@ -9,7 +9,7 @@ import { verifyPaymentChannelFund } from "../../src/models/transactions/paymentC
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("PaymentChannelFund Transaction Verification", function () {
+describe("PaymentChannelFund", function () {
   let channel;
 
   beforeEach(function () {

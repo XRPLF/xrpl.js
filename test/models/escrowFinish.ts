@@ -9,7 +9,7 @@ import { verifyEscrowFinish } from "../../src/models/transactions/escrowFinish";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("EscrowFinish Transaction Verification", function () {
+describe("EscrowFinish", function () {
   let escrow;
 
   beforeEach(function () {
