@@ -9,7 +9,7 @@ import { verifyOfferCancel } from "../../src/models/transactions/offerCancel";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("OfferCancel Transaction Verification", function () {
+describe("OfferCancel", function () {
   let offer;
 
   beforeEach(function () {
