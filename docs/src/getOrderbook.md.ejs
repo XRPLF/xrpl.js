@@ -26,9 +26,9 @@ For details, see the `rippled` [book_offers method](https://xrpl.org/book_offers
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
-const orderbook = <%- importFile('test/fixtures/requests/get-orderbook.json') %>;
+const orderbook = <%- importFile('test/fixtures/requests/getOrderbook.json') %>;
 return api.getOrderbook(address, orderbook)
   .then(orderbook => {/* ... */});
 ```
 
-<%- renderFixture('responses/get-orderbook.json') %>
+<%- renderFixture('responses/getOrderbook.json') %>
