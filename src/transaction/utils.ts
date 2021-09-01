@@ -440,21 +440,18 @@ async function autofill(client: Client, tx: Transaction): Promise<Transaction> {
 
   setTransactionFlagsToNumber(tx);
 
+  const promises: Promise<void>[] = [];
   if (tx.Sequence == null) {
-    const sequence = await getNextValidSequenceNumber(client, tx.Account);
-    tx.Sequence = sequence;
+    promises.push(setNextValidSequenceNumber(client, tx));
   }
-
   if (tx.Fee == null) {
-    tx.Fee = await calculateFeePerTransactionType(client, tx);
+    promises.push(calculateFeePerTransactionType(client, tx));
   }
-
   if (tx.LastLedgerSequence == null) {
-    const ledgerSequence = await getLatestValidatedLedgerSequence(client);
-    tx.LastLedgerSequence = ledgerSequence + LEDGER_OFFSET;
+    promises.push(setLatestValidatedLedgerSequence(client, tx));
   }
 
-  return tx;
+  return Promise.all(promises).then(() => tx);
 }
 
 function validateAccountAddress(
@@ -484,59 +481,61 @@ function convertToClassicAddress(tx: Transaction, fieldName: string): void {
   }
 }
 
-async function getNextValidSequenceNumber(
+async function setNextValidSequenceNumber(
   client: Client,
-  account: string
-): Promise<number> {
+  tx: Transaction
+): Promise<void> {
   const request: AccountInfoRequest = {
     command: "account_info",
-    account,
+    account: tx.Account,
   };
   const data = await client.request(request);
-  return data.result.account_data.Sequence;
+  tx.Sequence = data.result.account_data.Sequence
 }
 
 async function calculateFeePerTransactionType(
   client: Client,
-  transaction: Transaction
-): Promise<string> {
+  tx: Transaction
+): Promise<void> {
   const netFee = parseFloat(await client.getFee()); // Usually 0.00001 XRP (10 drops)
   let baseFee = netFee;
 
   // EscrowFinish Transaction with Fulfillment
   if (
-    transaction.TransactionType === "EscrowFinish" &&
-    transaction.Fulfillment != null
+    tx.TransactionType === "EscrowFinish" &&
+    tx.Fulfillment != null
   ) {
-    const fulfillmentBytesSize = Math.ceil(transaction.Fulfillment.length / 2);
+    const fulfillmentBytesSize = Math.ceil(tx.Fulfillment.length / 2);
     // 10 drops × (33 + (Fulfillment size in bytes / 16))
     baseFee = Math.ceil(netFee * (33 + fulfillmentBytesSize / 16));
   }
 
   // AccountDelete Transaction
-  if (transaction.TransactionType === "AccountDelete") {
+  if (tx.TransactionType === "AccountDelete") {
     baseFee = ACCOUNT_DELETE_FEE;
   }
 
   // Multi-signed Transaction
   // 10 drops × (1 + Number of Signatures Provided)
-  if (transaction.Signers != null && transaction.Signers.length > 0) {
-    baseFee = netFee * (1 + transaction.Signers.length) + baseFee;
+  if (tx.Signers != null && tx.Signers.length > 0) {
+    baseFee = netFee * (1 + tx.Signers.length) + baseFee;
   }
 
   // Round up baseFee and return it as a string
-  return Math.ceil(baseFee).toString();
+  tx.Fee = Math.ceil(baseFee).toString();
 }
 
-async function getLatestValidatedLedgerSequence(
-  client: Client
-): Promise<number> {
+async function setLatestValidatedLedgerSequence(
+  client: Client,
+  tx: Transaction
+): Promise<void> {
   const request: LedgerRequest = {
     command: "ledger",
     ledger_index: "validated",
   };
   const data = await client.request(request);
-  return data.result.ledger_index;
+  const ledgerSequence = data.result.ledger_index;
+  tx.LastLedgerSequence = ledgerSequence + LEDGER_OFFSET;
 }
 
 export {
