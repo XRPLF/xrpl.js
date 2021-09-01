@@ -60,6 +60,7 @@
     "https-browserify": "^1.0.0",
     "json-schema-to-markdown-table": "^0.4.0",
     "mocha": "^9",
+    "npm-run-all": "^4.1.5",
     "nyc": "^15",
     "path-browserify": "1.0.1",
     "prettier": "^2.3.2",
@@ -76,17 +77,17 @@
     "webpack-cli": "^4.2.0"
   },
   "scripts": {
+    "build": "run-s build:schemas build:lib build:snippets build:web",
     "build:schemas": "mkdir -p dist/npm/common && cp -r src/common/schemas dist/npm/common/",
     "build:snippets": "tsc --build ./snippets/tsconfig.json",
     "build:lib": "tsc --build tsconfig.build.json",
     "build:web": "webpack",
-    "build": "yarn build:schemas && yarn build:lib && yarn build:snippets && yarn build:web",
-    "analyze": "yarn build:web --analyze",
-    "watch": "yarn build:lib --watch",
+    "analyze": "run-s build:web --analyze",
+    "watch": "run-s build:lib --watch",
     "clean": "rm -rf dist",
     "doctoc": "doctoc docs/index.md --title '# RippleAPI Reference' --github --maxlevel 2",
     "docgen": "node --harmony scripts/build_docs.js",
-    "prepublish": "yarn clean && yarn build",
+    "prepublish": "run-s clean build",
     "test": "nyc mocha --config=test/.mocharc.json --exit",
     "test:integration": "TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/integration/*.ts",
     "test:browser": "TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/browser/*.ts",
@@ -105,6 +106,6 @@
   "readmeFilename": "README.md",
   "engines": {
     "node": ">=10.13.0",
-    "yarn": "^1.15.2"
+    "npm": ">=7.14.0 <8.0.0"
   }
 }
