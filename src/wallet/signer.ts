@@ -63,7 +63,7 @@ function multisign(
       );
     }
 
-    if (tx.Signers === undefined) {
+    if (tx.Signers == null) {
       throw new ValidationError(
         "For multisigning the transaction must include a Signers field containing an array of signatures."
       );
