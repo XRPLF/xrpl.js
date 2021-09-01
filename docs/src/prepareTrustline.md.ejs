@@ -22,9 +22,9 @@ All "prepare*" methods have the same return type.
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
-const trustline = <%- importFile('test/fixtures/requests/prepare-trustline.json') %>;
+const trustline = <%- importFile('test/fixtures/requests/prepareTrustline.json') %>;
 return api.prepareTrustline(address, trustline).then(prepared =>
   {/* ... */});
 ```
 
-<%- renderFixture("responses/prepare-trustline.json") %>
+<%- renderFixture("responses/prepareTrustline.json") %>

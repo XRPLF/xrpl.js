@@ -116,7 +116,7 @@ import prepareTrustline from "../transaction/trustline";
 import { TransactionJSON, Instructions, Prepare } from "../transaction/types";
 import * as transactionUtils from "../ledger/autofill";
 import { deriveAddress, deriveXAddress } from "../utils/derive";
-import generateFaucetWallet from "../wallet/wallet-generation";
+import generateFaucetWallet from "../wallet/generateFaucetWallet";
 
 import { Connection, ConnectionUserOptions } from "./connection";
 

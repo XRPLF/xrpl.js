@@ -7,12 +7,12 @@ function exit_on_error {
 
 rm -rf build
 
-yarn install
+npm install
 gulp
-yarn test
+npm test
 exit_on_error
 
 echo ""
 echo "publish to npm"
-yarn publish
+npm publish
 exit_on_error

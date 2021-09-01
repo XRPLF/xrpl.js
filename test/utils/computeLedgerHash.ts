@@ -8,17 +8,13 @@ import { assertResultMatch } from "../testUtils";
 
 const { computeLedgerHash: REQUEST_FIXTURES } = requests;
 
-function getNewLedger() {
-  return JSON.parse(JSON.stringify(responses.getLedger.full));
-}
-
-describe("Compute Ledger Hash", function () {
+describe("computeLedgerHash", function () {
   it("given corrupt data - should fail", function () {
-    const ledger = getNewLedger();
+    const ledger = JSON.parse(JSON.stringify(responses.getLedger.full));
     ledger.transactions[0].rawTransaction =
       '{"Account":"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV","Amount":"12000000000","Destination":"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj","Fee":"10","Flags":0,"Sequence":62,"SigningPubKey":"034AADB09CFF4A4804073701EC53C3510CDC95917C2BB0150FB742D0C66E6CEE9E","TransactionType":"Payment","TxnSignature":"3045022022EB32AECEF7C644C891C19F87966DF9C62B1F34BABA6BE774325E4BB8E2DD62022100A51437898C28C2B297112DF8131F2BB39EA5FE613487DDD611525F1796264639","hash":"3B1A4E1C9BB6A7208EB146BCDB86ECEA6068ED01466D933528CA2B4C64F753EF","meta":{"AffectedNodes":[{"CreatedNode":{"LedgerEntryType":"AccountRoot","LedgerIndex":"4C6ACBD635B0F07101F7FA25871B0925F8836155462152172755845CE691C49E","NewFields":{"Account":"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj","Balance":"10000000000","Sequence":1}}},{"ModifiedNode":{"FinalFields":{"Account":"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV","Balance":"981481999380","Flags":0,"OwnerCount":0,"Sequence":63},"LedgerEntryType":"AccountRoot","LedgerIndex":"B33FDD5CF3445E1A7F2BE9B06336BEBD73A5E3EE885D3EF93F7E3E2992E46F1A","PreviousFields":{"Balance":"991481999390","Sequence":62},"PreviousTxnID":"2485FDC606352F1B0785DA5DE96FB9DBAF43EB60ECBB01B7F6FA970F512CDA5F","PreviousTxnLgrSeq":31317}}],"TransactionIndex":0,"TransactionResult":"tesSUCCESS"},"ledger_index":38129}';
     ledger.parentCloseTime = ledger.closeTime;
-    let hash;
+    let hash: string;
     try {
       hash = computeLedgerHeaderHash(ledger, { computeTreeHashes: true });
     } catch (error) {
@@ -42,18 +38,15 @@ describe("Compute Ledger Hash", function () {
   });
 
   it("given ledger without raw transactions - should throw", function () {
-    const ledger = getNewLedger();
+    const ledger = JSON.parse(JSON.stringify(responses.getLedger.full));
     delete ledger.transactions[0].rawTransaction;
     ledger.parentCloseTime = ledger.closeTime;
-    let hash;
+    let hash: string;
     try {
       hash = computeLedgerHeaderHash(ledger, { computeTreeHashes: true });
     } catch (error) {
       assert(error instanceof ValidationError);
-      assert.strictEqual(
-        error.message,
-        "ledger" + " is missing raw transactions"
-      );
+      assert.strictEqual(error.message, "ledger is missing raw transactions");
       return;
     }
     assert(
@@ -63,22 +56,22 @@ describe("Compute Ledger Hash", function () {
   });
 
   it("given ledger without state or transactions - only compute ledger hash", function () {
-    const ledger = getNewLedger();
+    const ledger = JSON.parse(JSON.stringify(responses.getLedger.full));
     assert.strictEqual(
       ledger.transactions[0].rawTransaction,
       '{"Account":"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV","Amount":"10000000000","Destination":"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj","Fee":"10","Flags":0,"Sequence":62,"SigningPubKey":"034AADB09CFF4A4804073701EC53C3510CDC95917C2BB0150FB742D0C66E6CEE9E","TransactionType":"Payment","TxnSignature":"3045022022EB32AECEF7C644C891C19F87966DF9C62B1F34BABA6BE774325E4BB8E2DD62022100A51437898C28C2B297112DF8131F2BB39EA5FE613487DDD611525F1796264639","hash":"3B1A4E1C9BB6A7208EB146BCDB86ECEA6068ED01466D933528CA2B4C64F753EF","meta":{"AffectedNodes":[{"CreatedNode":{"LedgerEntryType":"AccountRoot","LedgerIndex":"4C6ACBD635B0F07101F7FA25871B0925F8836155462152172755845CE691C49E","NewFields":{"Account":"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj","Balance":"10000000000","Sequence":1}}},{"ModifiedNode":{"FinalFields":{"Account":"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV","Balance":"981481999380","Flags":0,"OwnerCount":0,"Sequence":63},"LedgerEntryType":"AccountRoot","LedgerIndex":"B33FDD5CF3445E1A7F2BE9B06336BEBD73A5E3EE885D3EF93F7E3E2992E46F1A","PreviousFields":{"Balance":"991481999390","Sequence":62},"PreviousTxnID":"2485FDC606352F1B0785DA5DE96FB9DBAF43EB60ECBB01B7F6FA970F512CDA5F","PreviousTxnLgrSeq":31317}}],"TransactionIndex":0,"TransactionResult":"tesSUCCESS"},"ledger_index":38129}'
     );
     ledger.parentCloseTime = ledger.closeTime;
     const computeLedgerHash = computeLedgerHeaderHash;
-    function testCompute(ledger, expectedError) {
-      let hash = computeLedgerHash(ledger);
+    function testCompute(ledgerToCompute, expectedError): void {
+      let hash = computeLedgerHash(ledgerToCompute);
       assert.strictEqual(
         hash,
         "E6DB7365949BF9814D76BCC730B01818EB9136A89DB224F3F9F5AAE4569D758E"
       );
       // fail if required to compute tree hashes
       try {
-        hash = computeLedgerHash(ledger, { computeTreeHashes: true });
+        hash = computeLedgerHash(ledgerToCompute, { computeTreeHashes: true });
       } catch (error) {
         assert(error instanceof ValidationError);
         assert.strictEqual(error.message, expectedError);
@@ -100,7 +93,7 @@ describe("Compute Ledger Hash", function () {
   });
 
   it("wrong hash", function () {
-    const ledger = getNewLedger();
+    const ledger = JSON.parse(JSON.stringify(responses.getLedger.full));
     assertResultMatch(ledger, responses.getLedger.full, "getLedger");
     const newLedger = {
       ...ledger,
@@ -110,7 +103,7 @@ describe("Compute Ledger Hash", function () {
     };
     assert.throws(() => {
       computeLedgerHeaderHash(newLedger);
-    }, /does not match computed hash of state/);
+    }, /does not match computed hash of state/u);
   });
 
   it("computeLedgerHash", function () {
