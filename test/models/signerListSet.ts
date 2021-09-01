@@ -9,7 +9,7 @@ import { verifySignerListSet } from "../../src/models/transactions/signerListSet
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("SignerListSet Transaction Verification", function () {
+describe("SignerListSet", function () {
   let SignerListSetTx;
 
   beforeEach(function () {

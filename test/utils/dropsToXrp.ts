@@ -3,7 +3,7 @@ import { assert } from "chai";
 
 import { dropsToXrp } from "../../src/utils";
 
-describe("Drops To XRP", function () {
+describe("dropsToXrp", function () {
   it("works with a typical amount", function () {
     const xrp = dropsToXrp("2000000");
     assert.strictEqual(xrp, "2", "2 million drops equals 2 XRP");
@@ -87,38 +87,38 @@ describe("Drops To XRP", function () {
   it("throws with an amount with too many decimal places", function () {
     assert.throws(() => {
       dropsToXrp("1.2");
-    }, /has too many decimal places/);
+    }, /has too many decimal places/u);
 
     assert.throws(() => {
       dropsToXrp("0.10");
-    }, /has too many decimal places/);
+    }, /has too many decimal places/u);
   });
 
   it("throws with an invalid value", function () {
     assert.throws(() => {
       dropsToXrp("FOO");
-    }, /invalid value/);
+    }, /invalid value/u);
 
     assert.throws(() => {
       dropsToXrp("1e-7");
-    }, /invalid value/);
+    }, /invalid value/u);
 
     assert.throws(() => {
       dropsToXrp("2,0");
-    }, /invalid value/);
+    }, /invalid value/u);
 
     assert.throws(() => {
       dropsToXrp(".");
-    }, /dropsToXrp: invalid value '\.', should be a BigNumber or string-encoded number\./);
+    }, /dropsToXrp: invalid value '\.', should be a BigNumber or string-encoded number\./u);
   });
 
   it("throws with an amount more than one decimal point", function () {
     assert.throws(() => {
       dropsToXrp("1.0.0");
-    }, /dropsToXrp: invalid value '1\.0\.0'/);
+    }, /dropsToXrp: invalid value '1\.0\.0'/u);
 
     assert.throws(() => {
       dropsToXrp("...");
-    }, /dropsToXrp: invalid value '\.\.\.'/);
+    }, /dropsToXrp: invalid value '\.\.\.'/u);
   });
 });

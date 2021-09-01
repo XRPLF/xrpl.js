@@ -9,7 +9,7 @@ import { verifyBaseTransaction } from "../../src/models/transactions/common";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("Transaction Verification", function () {
+describe("BaseTransaction", function () {
   it(`Verifies all optional BaseTransaction`, function () {
     const txJson = {
       Account: "r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe",
