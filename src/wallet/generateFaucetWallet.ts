@@ -36,11 +36,6 @@ async function generateFaucetWallet(
     throw new RippledError("Client not connected, cannot call faucet");
   }
 
-  // Initialize some variables
-  let body: Uint8Array | undefined;
-  let startingBalance = 0;
-  const faucetUrl = getFaucetUrl(client);
-
   // Generate a new Wallet if no existing Wallet is provided or its address is invalid to fund
   const fundWallet =
     wallet && isValidAddress(wallet.classicAddress)
@@ -48,7 +43,7 @@ async function generateFaucetWallet(
       : Wallet.generate();
 
   // Create the POST request body
-  body = new TextEncoder().encode(
+  const body: Uint8Array | undefined = new TextEncoder().encode(
     JSON.stringify({
       destination: fundWallet.classicAddress,
     })
@@ -60,11 +55,12 @@ async function generateFaucetWallet(
   );
 
   // Check the address balance is not undefined and is a number
-  if (addressToFundBalance && !isNaN(Number(addressToFundBalance))) {
-    startingBalance = Number(addressToFundBalance);
-  } else {
-    startingBalance = 0;
-  }
+  const startingBalance =
+    addressToFundBalance && !isNaN(Number(addressToFundBalance))
+      ? Number(addressToFundBalance)
+      : 0;
+
+  const faucetUrl = getFaucetUrl(client);
 
   // Options to pass to https.request
   const options = {
