@@ -8,12 +8,12 @@ import {
   encodeForSigning,
   encodeForSigningClaim,
 } from "ripple-binary-codec";
+import { JsonObject } from "ripple-binary-codec/dist/types/serialized-type";
 import {
   sign as signWithKeypair,
   verify as verifySignature,
 } from "ripple-keypairs";
 
-import { JsonObject } from "../../ripple-binary-codec/dist/types/serialized-type";
 import { ValidationError } from "../common/errors";
 import { SignedTransaction } from "../common/types/objects";
 import { Signer } from "../models/common";
