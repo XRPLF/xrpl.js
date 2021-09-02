@@ -21,8 +21,8 @@ import {
 } from 'ripple-address-codec'
 
 import { constants, errors, txFlags, ensureClassicAddress } from '../common'
-import { RippledError, ValidationError } from '../common/errors'
-import { getFee } from '../common/fee'
+import { ValidationError } from '../common/errors'
+import getFee from '../common/fee'
 import getBalances from '../ledger/balances'
 import { getOrderbook, formatBidsAndAsks } from '../ledger/orderbook'
 import getPaths from '../ledger/pathfind'
