@@ -259,7 +259,7 @@ class Client extends EventEmitter {
     return this.connection.request({
       ...r,
       // @ts-expect-error
-      account: r.account ? ensureClassicAddress(r.account) : undefined,
+      account: r?.account != null ? ensureClassicAddress(r.account) : undefined,
     })
   }
 
