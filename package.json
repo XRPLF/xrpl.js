@@ -75,8 +75,7 @@
     "webpack-cli": "^4.2.0"
   },
   "scripts": {
-    "build": "run-s build:schemas build:lib build:snippets build:web",
-    "build:schemas": "mkdir -p dist/npm/common && cp -r src/common/schemas dist/npm/common/",
+    "build": "run-s build:lib build:snippets build:web",
     "build:snippets": "tsc --build ./snippets/tsconfig.json",
     "build:lib": "tsc --build tsconfig.build.json",
     "build:web": "webpack",
