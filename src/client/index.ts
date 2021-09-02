@@ -22,9 +22,8 @@ import { ValidationError } from "../common/errors";
 import { getFee } from "../common/fee";
 import * as schemaValidator from "../common/schema-validator";
 import getBalances from "../ledger/balances";
-import { getOrderbook, formatBidsAndAsks } from "../ledger/orderbook";
+import getOrderbook from "../ledger/orderbook";
 import getPaths from "../ledger/pathfind";
-import getTrustlines from "../ledger/trustlines";
 import { clamp } from "../ledger/utils";
 import {
   Request,
@@ -421,8 +420,6 @@ class Client extends EventEmitter {
   }
 
   getFee = getFee;
-
-  getTrustlines = getTrustlines;
   getBalances = getBalances;
   getPaths = getPaths;
   getOrderbook = getOrderbook;
@@ -453,8 +450,6 @@ class Client extends EventEmitter {
 
   // Client.deriveClassicAddress (static) is a new name for client.deriveAddress
   static deriveClassicAddress = deriveAddress;
-
-  static formatBidsAndAsks = formatBidsAndAsks;
 
   /**
    * Static methods to expose ripple-address-codec methods.

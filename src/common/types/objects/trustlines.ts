@@ -1,4 +1,4 @@
-// import { Memo } from "./memos";
+import { Memo } from "./memos";
 
 export interface Trustline {
   account: string;
@@ -16,17 +16,17 @@ export interface Trustline {
   peer_authorized?: boolean;
 }
 
-// export interface FormattedTrustlineSpecification {
-//   currency: string;
-//   counterparty: string;
-//   limit: string;
-//   qualityIn?: number;
-//   qualityOut?: number;
-//   ripplingDisabled?: boolean;
-//   authorized?: boolean;
-//   frozen?: boolean;
-//   memos?: Memo[];
-// }
+export interface FormattedTrustlineSpecification {
+  currency: string;
+  counterparty: string;
+  limit: string;
+  qualityIn?: number;
+  qualityOut?: number;
+  ripplingDisabled?: boolean;
+  authorized?: boolean;
+  frozen?: boolean;
+  memos?: Memo[];
+}
 
 // export interface FormattedTrustline {
 //   specification: FormattedTrustlineSpecification;
