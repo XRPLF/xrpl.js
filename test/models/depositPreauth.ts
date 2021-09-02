@@ -1,7 +1,9 @@
-import { ValidationError } from "xrpl-local/common/errors";
-import { verifyDepositPreauth } from "./../../src/models/transactions/depositPreauth";
 import { assert } from "chai";
+
+import { ValidationError } from "xrpl-local/common/errors";
+
 import { verify } from "../../src/models/transactions";
+import { verifyDepositPreauth } from "../../src/models/transactions/depositPreauth";
 
 /**
  * DepositPreauth Transaction Verification Testing.
@@ -24,12 +26,11 @@ describe("DepositPreauth Transaction Verification", function () {
     assert.doesNotThrow(() => verify(depositPreauth));
   });
 
-  // it("verifies valid DepositPreauth when only Unauthorize is provided", function () {
-  //   depositPreauth.Unauthorize = "raKEEVSGnKSDv9Zyvxu4z6Pqpm4ABH8FS6n";
-  //   assert.doesNotThrow(() => verifyDepositPreauth(depositPreauth));
-  //   // assert.doesNotThrow(() => verify(depositPreauth));
-  //   verify(depositPreauth);
-  // });
+  it("verifies valid DepositPreauth when only Unauthorize is provided", function () {
+    depositPreauth.Unauthorize = "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW";
+    assert.doesNotThrow(() => verifyDepositPreauth(depositPreauth));
+    assert.doesNotThrow(() => verify(depositPreauth));
+  });
 
   it("throws when both Authorize and Unauthorize are provided", function () {
     depositPreauth.Authorize = "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW";
