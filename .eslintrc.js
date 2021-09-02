@@ -101,6 +101,14 @@ module.exports = {
             allowModules: ["xrpl-local"],
           },
         ],
+
+        // Tests are already in 2 callbacks, so max 3 is pretty restrictive
+        "max-nested-callbacks": [
+          "error",
+          {
+            max: 4,
+          },
+        ],
       },
     },
     {
