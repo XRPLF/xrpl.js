@@ -19,18 +19,18 @@ export const addressTests = [
  *
  * @param response - Response received from the method.
  * @param expected - Expected response from the method.
- * @param schemaName - Name of the schema used to validate the shape of the response.
+ * @param _schemaName - Name of the schema used to validate the shape of the response.
  */
 export function assertResultMatch(
-  response: any,
-  expected: any,
-  schemaName?: string,
-) {
+  response: Record<string, unknown>,
+  expected: Record<string, unknown>,
+  _schemaName?: string,
+): void {
   if (expected.txJSON) {
     assert(response.txJSON)
     assert.deepEqual(
-      JSON.parse(response.txJSON),
-      JSON.parse(expected.txJSON),
+      JSON.parse(response.txJSON as string),
+      JSON.parse(expected.txJSON as string),
       'checkResult: txJSON must match',
     )
   }
@@ -56,10 +56,12 @@ export function assertResultMatch(
  * @param message - Expected error message/substring of the error message.
  */
 export async function assertRejects(
-  promise: PromiseLike<any>,
+  promise: PromiseLike<Record<string, unknown>>,
+  // eslint-disable-next-line max-len -- Need to disable multiple things
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types -- instanceof needs any
   instanceOf: any,
   message?: string | RegExp,
-) {
+): Promise<void> {
   try {
     await promise
     assert(false, 'Expected an error to be thrown')
@@ -98,6 +100,7 @@ export async function getFreePort(): Promise<number> {
  * has come back.
  *
  * @param error - Thrown error.
+ * @throws If error is not websocket disconnect error.
  */
 export function ignoreWebSocketDisconnect(error: Error): void {
   if (error.message === 'websocket was closed') {
