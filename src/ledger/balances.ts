@@ -32,10 +32,6 @@ async function getBalances(
   limit?: number
 ): Promise<Balance[]> {
   // 1. Get XRP Balance
-  const ledgerVersion = await this.request({
-    command: "ledger",
-    ledger_index: "validated",
-  }).then((response) => response.result.ledger_index);
   const XRPRequest: AccountInfoRequest = {
     command: "account_info",
     account,
