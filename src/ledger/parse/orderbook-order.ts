@@ -11,7 +11,7 @@ import parseAmount from "./amount";
 import { orderFlags } from "./flags";
 import { parseTimestamp, adjustQualityForXRP } from "./utils";
 
-export interface FormattedOrderbookOrder {
+interface FormattedOrderbookOrder {
   specification: FormattedOrderSpecification;
   properties: {
     maker: string;

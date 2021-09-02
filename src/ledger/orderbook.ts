@@ -2,11 +2,12 @@ import BigNumber from "bignumber.js";
 import _ from "lodash";
 
 import { Client } from "../client";
-import { Currency, LedgerIndex } from "../models/common";
+import { LedgerIndex } from "../models/common";
 import {
   BookOffer,
   BookOffersRequest,
   BookOffersResponse,
+  TakerAmount,
 } from "../models/methods/bookOffers";
 
 import { orderFlags } from "./parse/flags";
@@ -18,8 +19,8 @@ interface Orderbook {
 
 async function getOrderbook(
   this: Client,
-  taker_pays: Currency,
-  taker_gets: Currency,
+  taker_pays: TakerAmount,
+  taker_gets: TakerAmount,
   limit?: number,
   ledger_index?: LedgerIndex,
   ledger_hash?: string,

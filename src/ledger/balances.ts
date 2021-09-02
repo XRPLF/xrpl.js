@@ -39,7 +39,7 @@ async function getBalances(
   const XRPRequest: AccountInfoRequest = {
     command: "account_info",
     account,
-    ledger_index: ledger_index ?? ledgerVersion,
+    ledger_index: ledger_index ?? "validated",
     ledger_hash,
   };
   const balance = await this.request(XRPRequest).then(
@@ -50,16 +50,16 @@ async function getBalances(
   const LinesRequest: AccountLinesRequest = {
     command: "account_lines",
     account,
-    ledger_index: ledger_index ?? ledgerVersion,
+    ledger_index: ledger_index ?? "validated",
     ledger_hash,
     peer,
     limit,
   };
   const responses: AccountLinesResponse[] = await this.requestAll(LinesRequest);
-  const AccountLinesBalance: Balance[] = _.flatMap(responses, (response) =>
+  const accountLinesBalance: Balance[] = _.flatMap(responses, (response) =>
     formatBalances(response.result.lines)
   );
-  return [xrpBalance, ...AccountLinesBalance];
+  return [xrpBalance, ...accountLinesBalance];
 }
 
 export default getBalances;

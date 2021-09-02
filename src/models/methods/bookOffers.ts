@@ -1,12 +1,12 @@
-import { Amount, Currency, LedgerIndex } from "../common";
+import { Amount, LedgerIndex } from "../common";
 import { Offer } from "../ledger";
 
 import { BaseRequest, BaseResponse } from "./baseMethod";
 
-// interface TakerAmount {
-//   currency: string;
-//   issuer?: string;
-// }
+export interface TakerAmount {
+  currency: string;
+  issuer?: string;
+}
 
 export interface BookOffersRequest extends BaseRequest {
   command: "book_offers";
@@ -14,8 +14,8 @@ export interface BookOffersRequest extends BaseRequest {
   ledger_index?: LedgerIndex;
   limit?: number;
   taker?: string;
-  taker_gets: Currency;
-  taker_pays: Currency;
+  taker_gets: TakerAmount;
+  taker_pays: TakerAmount;
 }
 
 export interface BookOffer extends Offer {
