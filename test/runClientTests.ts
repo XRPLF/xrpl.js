@@ -75,9 +75,9 @@ function loadTestSuites(): LoadedTestSuite[] {
       }
       // eslint-disable-next-line max-len -- Many errors to disable
       // eslint-disable-next-line @typescript-eslint/no-var-requires, node/global-require, global-require, @typescript-eslint/no-require-imports, import/no-dynamic-require -- Necessary for client tests
-      const testSuite = require(path.join('./client', methodName))
+      const testSuite = require(path.join(__dirname, 'client', filename))
       return {
-        name: filename,
+        name: methodName,
         config: testSuite.config || {},
         tests: Object.entries(testSuite.default || {}),
       } as LoadedTestSuite

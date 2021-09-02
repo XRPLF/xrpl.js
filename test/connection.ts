@@ -198,8 +198,8 @@ describe('Connection', function () {
   })
 
   it('TimeoutError', function () {
-    this.client.connection.ws.send = function (_, callback) {
-      callback(null)
+    this.client.connection.ws.send = function (_ignore, sendCallback): void {
+      sendCallback(null)
     }
     const request = { command: 'server_info' }
     this.client.connection
@@ -213,8 +213,8 @@ describe('Connection', function () {
   })
 
   it('DisconnectedError on send', function () {
-    this.client.connection.ws.send = function (_, callback) {
-      callback({ message: 'not connected' })
+    this.client.connection.ws.send = function (_ignore, sendCallback): void {
+      sendCallback({ message: 'not connected' })
     }
     this.client
       .request({ command: 'server_info' })
@@ -288,6 +288,7 @@ describe('Connection', function () {
         }
       }
       this.timeout(70001)
+      // eslint-disable-next-line @typescript-eslint/no-this-alias -- Avoid shadow alias
       const self = this
       function breakConnection(): void {
         self.client.connection
@@ -328,6 +329,7 @@ describe('Connection', function () {
                 `reconnectsCount must be equal to ${num} (got ${reconnectsCount} instead)`,
               ),
             )
+            // eslint-disable-next-line no-negated-condition -- Necessary
           } else if (code !== 1006) {
             done(
               new Error(`disconnect must send code 1006 (got ${code} instead)`),
