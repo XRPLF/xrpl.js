@@ -74,12 +74,12 @@ export async function assertRejects(
 }
 
 // using a free port instead of a constant port enables parallelization
-export async function getFreePort() {
+export async function getFreePort(): Promise<number> {
   return new Promise((resolve, reject) => {
     const server = net.createServer()
-    let port
+    let port: number
     server.on('listening', function () {
-      port = (server.address() as any).port
+      port = (server.address() as net.AddressInfo).port
       server.close()
     })
     server.on('close', function () {
