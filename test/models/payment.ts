@@ -5,7 +5,7 @@ import { ValidationError } from "xrpl-local/common/errors";
 import {
   verifyPayment,
   verify,
-  // PaymentTransactionFlagsEnum,
+  PaymentTransactionFlagsEnum,
 } from "../../src/models/transactions";
 
 /**
@@ -36,15 +36,12 @@ describe("Payment", function () {
         "3045022100E3FAE0EDEC3D6A8FF6D81BC9CF8288A61B7EEDE8071E90FF9314CB4621058D10022043545CF631706D700CEE65A1DB83EFDD185413808292D9D90F14D87D3DC2D8CB",
       InvoiceID:
         "6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B",
-      Paths: [[{ currency: "BTC", issuer: "apsoeijf90wp34fh" }]],
-      SendMax: "100000000",
     } as any;
   });
 
   it(`verifies valid PaymentTransaction`, function () {
     assert.doesNotThrow(() => verifyPayment(paymentTransaction));
-    // assert.doesNotThrow(() => verify(paymentTransaction));
-    verify(paymentTransaction);
+    assert.doesNotThrow(() => verify(paymentTransaction));
   });
 
   it(`throws when Amount is missing`, function () {
@@ -161,14 +158,15 @@ describe("Payment", function () {
 
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a number`, function () {
     paymentTransaction.DeliverMin = "10000";
-    paymentTransaction.Flags = 0x00020000;
+    paymentTransaction.Flags = PaymentTransactionFlagsEnum.tfPartialPayment;
     assert.doesNotThrow(() => verifyPayment(paymentTransaction));
     assert.doesNotThrow(() => verify(paymentTransaction));
   });
 
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a boolean`, function () {
     paymentTransaction.DeliverMin = "10000";
-    paymentTransaction.Flags = 0x00020000;
+    paymentTransaction.Flags = PaymentTransactionFlagsEnum.tfPartialPayment;
+    // paymentTransaction.Flags = { tfPartialPayment: true };
     assert.doesNotThrow(() => verifyPayment(paymentTransaction));
     assert.doesNotThrow(() => verify(paymentTransaction));
   });
