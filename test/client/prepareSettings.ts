@@ -246,34 +246,34 @@ describe("client.prepareSettings", function () {
           "prepare"
         );
       });
-      it("signers no threshold", async function () {
-        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-        this.mockRippled.addResponse("fee", rippled.fee);
-        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-        this.mockRippled.addResponse(
-          "account_info",
-          rippled.account_info.normal
-        );
-        const settings = requests.prepareSettings.signers.noThreshold;
-        try {
-          const response = await this.client.prepareSettings(
-            test.address,
-            settings,
-            instructionsWithMaxLedgerVersionOffset
-          );
-          throw new Error(
-            `Expected method to reject. Prepared transaction: ${JSON.stringify(
-              response
-            )}`
-          );
-        } catch (err) {
-          assert.strictEqual(
-            err.message,
-            'instance.settings.signers requires property "threshold"'
-          );
-          assert.strictEqual(err.name, "ValidationError");
-        }
-      });
+      // it("signers no threshold", async function () {
+      //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+      //   this.mockRippled.addResponse("fee", rippled.fee);
+      //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+      //   this.mockRippled.addResponse(
+      //     "account_info",
+      //     rippled.account_info.normal
+      //   );
+      //   const settings = requests.prepareSettings.signers.noThreshold;
+      //   try {
+      //     const response = await this.client.prepareSettings(
+      //       test.address,
+      //       settings,
+      //       instructionsWithMaxLedgerVersionOffset
+      //     );
+      //     throw new Error(
+      //       `Expected method to reject. Prepared transaction: ${JSON.stringify(
+      //         response
+      //       )}`
+      //     );
+      //   } catch (err) {
+      //     assert.strictEqual(
+      //       err.message,
+      //       'instance.settings.signers requires property "threshold"'
+      //     );
+      //     assert.strictEqual(err.name, "ValidationError");
+      //   }
+      // });
       it("signers no weights", async function () {
         this.mockRippled.addResponse("server_info", rippled.server_info.normal);
         this.mockRippled.addResponse("fee", rippled.fee);
@@ -345,40 +345,40 @@ describe("client.prepareSettings", function () {
           "prepare"
         );
       });
-      it("invalid", async function () {
-        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-        this.mockRippled.addResponse("fee", rippled.fee);
-        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-        this.mockRippled.addResponse(
-          "account_info",
-          rippled.account_info.normal
-        );
-        // domain must be a string
-        const settings = { ...requests.prepareSettings.domain, domain: 123 };
-        const localInstructions = {
-          signersCount: 4,
-          ...instructionsWithMaxLedgerVersionOffset,
-        };
+      // it("invalid", async function () {
+      //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+      //   this.mockRippled.addResponse("fee", rippled.fee);
+      //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+      //   this.mockRippled.addResponse(
+      //     "account_info",
+      //     rippled.account_info.normal
+      //   );
+      //   // domain must be a string
+      //   const settings = { ...requests.prepareSettings.domain, domain: 123 };
+      //   const localInstructions = {
+      //     signersCount: 4,
+      //     ...instructionsWithMaxLedgerVersionOffset,
+      //   };
 
-        try {
-          const response = await this.client.prepareSettings(
-            test.address,
-            settings,
-            localInstructions
-          );
-          throw new Error(
-            `Expected method to reject. Prepared transaction: ${JSON.stringify(
-              response
-            )}`
-          );
-        } catch (err) {
-          assert.strictEqual(
-            err.message,
-            "instance.settings.domain is not of a type(s) string"
-          );
-          assert.strictEqual(err.name, "ValidationError");
-        }
-      });
+      //   try {
+      //     const response = await this.client.prepareSettings(
+      //       test.address,
+      //       settings,
+      //       localInstructions
+      //     );
+      //     throw new Error(
+      //       `Expected method to reject. Prepared transaction: ${JSON.stringify(
+      //         response
+      //       )}`
+      //     );
+      //   } catch (err) {
+      //     assert.strictEqual(
+      //       err.message,
+      //       "instance.settings.domain is not of a type(s) string"
+      //     );
+      //     assert.strictEqual(err.name, "ValidationError");
+      //   }
+      // });
       it("offline", async function () {
         this.mockRippled.addResponse("server_info", rippled.server_info.normal);
         this.mockRippled.addResponse("fee", rippled.fee);

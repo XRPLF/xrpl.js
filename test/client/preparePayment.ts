@@ -245,29 +245,29 @@ describe("client.preparePayment", function () {
         );
       });
 
-      it("rejects promise and does not throw when field is missing", async function () {
-        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-        this.mockRippled.addResponse("fee", rippled.fee);
-        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-        this.mockRippled.addResponse(
-          "account_info",
-          rippled.account_info.normal
-        );
-        // Marking as "any" to get around the fact that TS won't allow this.
-        const payment: any = {
-          source: { address: test.address },
-          destination: {
-            address: RECIPIENT_ADDRESS,
-            amount: { value: "1000", currency: "drops" },
-          },
-        };
+      // it("rejects promise and does not throw when field is missing", async function () {
+      //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+      //   this.mockRippled.addResponse("fee", rippled.fee);
+      //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+      //   this.mockRippled.addResponse(
+      //     "account_info",
+      //     rippled.account_info.normal
+      //   );
+      //   // Marking as "any" to get around the fact that TS won't allow this.
+      //   const payment: any = {
+      //     source: { address: test.address },
+      //     destination: {
+      //       address: RECIPIENT_ADDRESS,
+      //       amount: { value: "1000", currency: "drops" },
+      //     },
+      //   };
 
-        return assertRejects(
-          this.client.preparePayment(test.address, payment),
-          ValidationError,
-          "instance.payment.source is not exactly one from <sourceExactAdjustment>,<maxAdjustment>"
-        );
-      });
+      //   return assertRejects(
+      //     this.client.preparePayment(test.address, payment),
+      //     ValidationError,
+      //     "instance.payment.source is not exactly one from <sourceExactAdjustment>,<maxAdjustment>"
+      //   );
+      // });
 
       it("rejects promise and does not throw when fee exceeds maxFeeXRP", async function () {
         this.mockRippled.addResponse("server_info", rippled.server_info.normal);
