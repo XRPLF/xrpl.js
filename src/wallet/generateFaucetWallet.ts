@@ -2,11 +2,12 @@ import https = require("https");
 
 import { isValidClassicAddress } from "ripple-address-codec";
 
-import { Wallet } from "..";
 import type { Client } from "..";
 import { errors } from "../common";
 import { RippledError } from "../common/errors";
 import { GeneratedAddress } from "../utils/generateAddress";
+
+import Wallet from ".";
 
 export interface FaucetWallet {
   account: GeneratedAddress;
@@ -21,12 +22,6 @@ export enum FaucetNetwork {
 
 const INTERVAL_SECONDS = 1; // Interval to check an account balance
 const MAX_ATTEMPTS = 20; // Maximum attempts to retrieve a balance
-
-const ADDRESS_LENGTH = 20;
-
-function isValidAddress(address: string): boolean {
-  return address.length === ADDRESS_LENGTH && address.startsWith("r");
-}
 
 //
 // Generates a random wallet with some amount of XRP (usually 1000 XRP).
