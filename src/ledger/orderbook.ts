@@ -35,7 +35,7 @@ async function getOrderbook(
     taker,
   };
   // 2. Make Request
-  const forwardOfferResults: BookOffersResponse[] = await this.requestAll(
+  const directOfferResults: BookOffersResponse[] = await this.requestAll(
     request
   );
   request.taker_gets = taker_pays;
@@ -45,8 +45,8 @@ async function getOrderbook(
   );
   // 3. Return Formatted Response
   const directOffers = _.flatMap(
-    forwardOfferResults,
-    (forwardOfferResult) => forwardOfferResult.result.offers
+    directOfferResults,
+    (directOfferResult) => directOfferResult.result.offers
   );
   const reverseOffers = _.flatMap(
     reverseOfferResults,
