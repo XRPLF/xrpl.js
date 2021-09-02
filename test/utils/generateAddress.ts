@@ -8,16 +8,12 @@ import {
 } from "../../src/utils/generateAddress";
 import responses from "../fixtures/responses";
 
-describe("Generate Address", function () {
+describe("generateAddress", function () {
   it("generateAddress", function () {
-    // GIVEN entropy of all zeros
-    function random() {
-      return new Array(16).fill(0);
-    }
-
     assert.deepEqual(
+      // GIVEN entropy of all zeros
       // WHEN generating an address
-      generateXAddress({ entropy: random() }),
+      generateXAddress({ entropy: new Array(16).fill(0) }),
 
       // THEN we get the expected return value
       responses.generateXAddress
@@ -27,12 +23,8 @@ describe("Generate Address", function () {
   it("generateAddress invalid entropy", function () {
     assert.throws(() => {
       // GIVEN entropy of 1 byte
-      function random() {
-        return new Array(1).fill(0);
-      }
-
       // WHEN generating an address
-      generateXAddress({ entropy: random() });
+      generateXAddress({ entropy: new Array(1).fill(0) });
 
       // THEN an UnexpectedError is thrown
       // because 16 bytes of entropy are required
@@ -194,7 +186,8 @@ describe("Generate Address", function () {
 
     // THEN we get the expected return value
     const response = {
-      ...responses.generateAddress, // generateAddress return value always includes xAddress to encourage X-address adoption
+      // generateAddress return value always includes xAddress to encourage X-address adoption
+      ...responses.generateAddress,
       xAddress: "TVG3TcCD58BD6MZqsNuTihdrhZwR8SzvYS8U87zvHsAcNw4",
     };
     assert.deepEqual(account, response);

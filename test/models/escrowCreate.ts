@@ -8,7 +8,7 @@ import { verify } from "../../src/models/transactions";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("EscrowCreate Transaction Verification", function () {
+describe("EscrowCreate", function () {
   let escrow;
 
   beforeEach(function () {

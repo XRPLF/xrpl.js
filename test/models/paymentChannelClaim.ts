@@ -8,7 +8,7 @@ import { verify } from "../../src/models/transactions";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("PaymentChannelClaim Transaction Verification", function () {
+describe("PaymentChannelClaim", function () {
   let channel;
 
   beforeEach(function () {

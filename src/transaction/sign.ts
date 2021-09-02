@@ -3,11 +3,10 @@ import _ from "lodash";
 import binaryCodec from "ripple-binary-codec";
 import keypairs from "ripple-keypairs";
 
-import { Client } from "..";
+import { Client, Wallet } from "..";
 import { SignedTransaction } from "../common/types/objects";
 import { xrpToDrops } from "../utils";
 import { computeBinaryTransactionHash } from "../utils/hashes";
-import Wallet from "../Wallet";
 
 import { SignOptions, KeyPair, TransactionJSON } from "./types";
 import * as utils from "./utils";

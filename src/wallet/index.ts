@@ -1,13 +1,19 @@
 import { fromSeed } from "bip32";
 import { mnemonicToSeedSync } from "bip39";
+import { classicAddressToXAddress } from "ripple-address-codec";
 import { decode, encodeForSigning } from "ripple-binary-codec";
-import { deriveKeypair, generateSeed, verify } from "ripple-keypairs";
+import {
+  deriveAddress,
+  deriveKeypair,
+  generateSeed,
+  verify,
+} from "ripple-keypairs";
 
-import ECDSA from "./common/ecdsa";
-import { ValidationError } from "./common/errors";
-import { SignedTransaction } from "./common/types/objects";
-import { signOffline } from "./transaction/sign";
-import { SignOptions } from "./transaction/types";
+import ECDSA from "../common/ecdsa";
+import { ValidationError } from "../common/errors";
+import { SignedTransaction } from "../common/types/objects";
+import { signOffline } from "../transaction/sign";
+import { SignOptions } from "../transaction/types";
 
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
@@ -17,12 +23,27 @@ import { SignOptions } from "./transaction/types";
 class Wallet {
   readonly publicKey: string;
   readonly privateKey: string;
+  readonly classicAddress: string;
+  readonly seed?: string;
   private static readonly defaultAlgorithm: ECDSA = ECDSA.ed25519;
   private static readonly defaultDerivationPath: string = "m/44'/144'/0'/0/0";
 
-  constructor(publicKey: string, privateKey: string) {
+  constructor(publicKey: string, privateKey: string, seed?: string) {
     this.publicKey = publicKey;
     this.privateKey = privateKey;
+    this.classicAddress = deriveAddress(publicKey);
+    this.seed = seed;
+  }
+
+  /**
+   * Generates a new Wallet using a generated seed.
+   *
+   * @param algorithm - The digital signature algorithm to generate an address for.
+   * @returns A new Wallet derived from a generated seed.
+   */
+  static generate(algorithm: ECDSA = Wallet.defaultAlgorithm): Wallet {
+    const seed = generateSeed({ algorithm });
+    return Wallet.fromSeed(seed);
   }
 
   /**
@@ -92,7 +113,7 @@ class Wallet {
     algorithm: ECDSA = Wallet.defaultAlgorithm
   ): Wallet {
     const { publicKey, privateKey } = deriveKeypair(seed, { algorithm });
-    return new Wallet(publicKey, privateKey);
+    return new Wallet(publicKey, privateKey, seed);
   }
 
   /**
@@ -120,6 +141,17 @@ class Wallet {
     const messageHex: string = encodeForSigning(tx);
     const signature = tx.TxnSignature;
     return verify(messageHex, signature, this.publicKey);
+  }
+
+  /**
+   * Gets an X-address in Testnet/Mainnet format.
+   *
+   * @param tag - A tag to be included within the X-address.
+   * @param test - A boolean to indicate if X-address should be in Testnet (true) or Mainnet (false) format.
+   * @returns An X-address.
+   */
+  getXAddress(tag: number, test = false): string {
+    return classicAddressToXAddress(this.classicAddress, tag, test);
   }
 }
 

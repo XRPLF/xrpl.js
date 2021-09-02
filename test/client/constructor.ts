@@ -2,30 +2,23 @@ import { assert } from "chai";
 
 import { Client } from "xrpl-local";
 
-import { TestSuite } from "../testUtils";
-
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-export default <TestSuite>{
-  "Client - implicit server port": () => {
+describe("client constructor", function () {
+  it("Client - implicit server port", function () {
     new Client("wss://s1.ripple.com");
-  },
+  });
 
-  "Client invalid options": () => {
+  it("Client invalid options", function () {
     // @ts-expect-error - This is intentionally invalid
     assert.throws(() => new Client({ invalid: true }));
-  },
+  });
 
-  "Client valid options": () => {
+  it("Client valid options", function () {
     const client = new Client("wss://s:1");
     const privateConnectionUrl = (client.connection as any)._url;
     assert.deepEqual(privateConnectionUrl, "wss://s:1");
-  },
+  });
 
-  "Client invalid server uri": () => {
+  it("Client invalid server uri", function () {
     assert.throws(() => new Client("wss//s:1"));
-  },
-};
+  });
+});

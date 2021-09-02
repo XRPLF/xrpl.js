@@ -1,3 +1,5 @@
+/* eslint-disable max-statements -- Necessary for verifyPayment */
+/* eslint-disable complexity -- Necessary for verifyPayment */
 import { ValidationError } from "../../common/errors";
 import { Amount, Path } from "../common";
 import { isFlagEnabled } from "../utils";
@@ -20,7 +22,7 @@ export interface PaymentTransactionFlags extends GlobalFlags {
   tfPartialPayment?: boolean;
   tfLimitQuality?: boolean;
 }
-export interface PaymentTransaction extends BaseTransaction {
+export interface Payment extends BaseTransaction {
   TransactionType: "Payment";
   Amount: Amount;
   Destination: string;
@@ -33,11 +35,12 @@ export interface PaymentTransaction extends BaseTransaction {
 }
 
 /**
+ * Verify the form and type of a Payment at runtime.
+ *
  * @param tx - A Payment Transaction.
- * @returns
- * @throws {ValidationError} When the PaymentTransaction is malformed.
+ * @throws When the Payment is malformed.
  */
-export function verifyPaymentTransaction(tx: PaymentTransaction): void {
+export function verifyPayment(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.Amount === undefined) {
@@ -69,7 +72,11 @@ export function verifyPaymentTransaction(tx: PaymentTransaction): void {
     throw new ValidationError("PaymentTransaction: InvoiceID must be a string");
   }
 
-  if (tx.Paths !== undefined && !isPaths(tx.Paths)) {
+  if (
+    tx.Paths !== undefined &&
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
+    !isPaths(tx.Paths as Array<Array<Record<string, unknown>>>)
+  ) {
     throw new ValidationError("PaymentTransaction: invalid Paths");
   }
 
@@ -77,11 +84,23 @@ export function verifyPaymentTransaction(tx: PaymentTransaction): void {
     throw new ValidationError("PaymentTransaction: invalid SendMax");
   }
 
-  if (tx.DeliverMin !== undefined) {
+  checkPartialPayment(tx);
+}
+
+function checkPartialPayment(tx: Record<string, unknown>): void {
+  if (tx.DeliverMin != null) {
+    if (tx.Flags == null) {
+      throw new ValidationError(
+        "PaymentTransaction: tfPartialPayment flag required with DeliverMin"
+      );
+    }
+
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
+    const flags = tx.Flags as number | PaymentTransactionFlags;
     const isTfPartialPayment =
-      typeof tx.Flags === "number"
-        ? isFlagEnabled(tx.Flags, PaymentTransactionFlagsEnum.tfPartialPayment)
-        : tx.Flags?.tfPartialPayment ?? false;
+      typeof flags === "number"
+        ? isFlagEnabled(flags, PaymentTransactionFlagsEnum.tfPartialPayment)
+        : flags.tfPartialPayment ?? false;
 
     if (!isTfPartialPayment) {
       throw new ValidationError(
@@ -95,27 +114,53 @@ export function verifyPaymentTransaction(tx: PaymentTransaction): void {
   }
 }
 
-function isPaths(paths: Path[]): boolean {
+function isPathStep(pathStep: Record<string, unknown>): boolean {
+  if (pathStep.account !== undefined && typeof pathStep.account !== "string") {
+    return false;
+  }
+  if (
+    pathStep.currency !== undefined &&
+    typeof pathStep.currency !== "string"
+  ) {
+    return false;
+  }
+  if (pathStep.issuer !== undefined && typeof pathStep.issuer !== "string") {
+    return false;
+  }
+  if (
+    pathStep.account !== undefined &&
+    pathStep.currency === undefined &&
+    pathStep.issuer === undefined
+  ) {
+    return true;
+  }
+  if (pathStep.currency !== undefined || pathStep.issuer !== undefined) {
+    return true;
+  }
+  return false;
+}
+
+function isPath(path: Array<Record<string, unknown>>): boolean {
+  for (const pathStep of path) {
+    if (!isPathStep(pathStep)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function isPaths(paths: Array<Array<Record<string, unknown>>>): boolean {
   if (!Array.isArray(paths) || paths.length === 0) {
     return false;
   }
 
-  for (const i in paths) {
-    const path = paths[i];
+  for (const path of paths) {
     if (!Array.isArray(path) || path.length === 0) {
       return false;
     }
 
-    for (const j in path) {
-      const pathStep = path[j];
-      const { account, currency, issuer } = pathStep;
-      if (
-        (account !== undefined && typeof account !== "string") ||
-        (currency !== undefined && typeof currency !== "string") ||
-        (issuer !== undefined && typeof issuer !== "string")
-      ) {
-        return false;
-      }
+    if (!isPath(path)) {
+      return false;
     }
   }
 

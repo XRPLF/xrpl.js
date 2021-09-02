@@ -1,4 +1,5 @@
-import { TransactionMetadata } from "../common/transaction";
+import { Transaction } from "../transactions";
+import TransactionMetadata from "../transactions/metadata";
 
 import { BaseRequest, BaseResponse } from "./baseMethod";
 
@@ -16,6 +17,6 @@ export interface TxResponse extends BaseResponse {
     ledger_index: number;
     meta: TransactionMetadata | string;
     validated?: boolean;
-  }; // TODO: needs to be `& Transaction` once that type is available
+  } & Transaction;
   searched_all?: boolean;
 }

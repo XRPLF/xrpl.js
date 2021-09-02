@@ -10,7 +10,7 @@ import { verifyDepositPreauth } from "../../src/models/transactions/depositPreau
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("DepositPreauth Transaction Verification", function () {
+describe("DepositPreauth", function () {
   let depositPreauth;
 
   beforeEach(function () {

@@ -8,7 +8,7 @@ import { verify } from "../../src/models/transactions";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("OfferCreate Transaction Verification", function () {
+describe("OfferCreate", function () {
   it(`verifies valid OfferCreate`, function () {
     const offer = {
       Account: "r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W",

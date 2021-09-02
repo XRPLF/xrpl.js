@@ -1,70 +1,60 @@
-import addresses from "../fixtures/addresses.json";
 import responses from "../fixtures/responses";
 import rippled from "../fixtures/rippled/accountLines";
-import { assertResultMatch, TestSuite } from "../testUtils";
+import setupClient from "../setupClient";
+import { assertResultMatch, addressTests } from "../testUtils";
 
 const { getTrustlines: RESPONSE_FIXTURES } = responses;
 
-/**
- * Every test suite exports their tests in the default object.
- * - Check out the "TestSuite" type for documentation on the interface.
- * - Check out "test/client/index.ts" for more information about the test runner.
- */
-export default <TestSuite>{
-  "getTrustlines - filtered": async (client, address, mockRippled) => {
-    mockRippled.addResponse("account_lines", rippled.normal);
-    const options = { currency: "USD" };
-    const result = await client.getTrustlines(address, options);
-    assertResultMatch(result, RESPONSE_FIXTURES.filtered, "getTrustlines");
-  },
+describe("client.getTrustlines", function () {
+  beforeEach(setupClient.setup);
+  afterEach(setupClient.teardown);
 
-  "getTrustlines - more than 400 items": async (
-    client,
-    address,
-    mockRippled
-  ) => {
-    mockRippled.addResponse("account_lines", rippled.manyItems);
-    const options = { limit: 401 };
-    const result = await client.getTrustlines(address, options);
-    assertResultMatch(
-      result,
-      RESPONSE_FIXTURES.moreThan400Items,
-      "getTrustlines"
-    );
-  },
+  addressTests.forEach(function (test) {
+    describe(test.type, function () {
+      it("getTrustlines - filtered", async function () {
+        this.mockRippled.addResponse("account_lines", rippled.normal);
+        const options = { currency: "USD" };
+        const result = await this.client.getTrustlines(test.address, options);
+        assertResultMatch(result, RESPONSE_FIXTURES.filtered, "getTrustlines");
+      });
 
-  "getTrustlines - no options": async (client, address, mockRippled) => {
-    mockRippled.addResponse("account_lines", rippled.normal);
-    await client.getTrustlines(address);
-  },
+      it("getTrustlines - more than 400 items", async function () {
+        this.mockRippled.addResponse("account_lines", rippled.manyItems);
+        const options = { limit: 401 };
+        const result = await this.client.getTrustlines(test.address, options);
+        assertResultMatch(
+          result,
+          RESPONSE_FIXTURES.moreThan400Items,
+          "getTrustlines"
+        );
+      });
 
-  "getTrustlines - ripplingDisabled works properly": async (
-    client,
-    address,
-    mockRippled
-  ) => {
-    mockRippled.addResponse("account_lines", rippled.ripplingDisabled);
-    const result = await client.getTrustlines(address);
-    assertResultMatch(
-      result,
-      RESPONSE_FIXTURES.ripplingDisabled,
-      "getTrustlines"
-    );
-  },
+      it("getTrustlines - no options", async function () {
+        this.mockRippled.addResponse("account_lines", rippled.normal);
+        await this.client.getTrustlines(test.address);
+      });
 
-  "getTrustlines - ledger version option": async (
-    client,
-    address,
-    mockRippled
-  ) => {
-    mockRippled.addResponse("account_lines", rippled.manyItems);
-    const result = await client.getTrustlines(addresses.FOURTH_ACCOUNT, {
-      ledgerVersion: 5,
+      it("getTrustlines - ripplingDisabled works properly", async function () {
+        this.mockRippled.addResponse("account_lines", rippled.ripplingDisabled);
+        const result = await this.client.getTrustlines(test.address);
+        assertResultMatch(
+          result,
+          RESPONSE_FIXTURES.ripplingDisabled,
+          "getTrustlines"
+        );
+      });
+
+      it("getTrustlines - ledger version option", async function () {
+        this.mockRippled.addResponse("account_lines", rippled.manyItems);
+        const result = await this.client.getTrustlines(test.address, {
+          ledgerVersion: 5,
+        });
+        assertResultMatch(
+          result,
+          RESPONSE_FIXTURES.moreThan400Items,
+          "getTrustlines"
+        );
+      });
     });
-    assertResultMatch(
-      result,
-      RESPONSE_FIXTURES.moreThan400Items,
-      "getTrustlines"
-    );
-  },
-};
+  });
+});

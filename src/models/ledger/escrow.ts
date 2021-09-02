@@ -1,6 +1,6 @@
-import { BaseLedgerEntry } from "./baseLedgerEntry";
+import BaseLedgerEntry from "./baseLedgerEntry";
 
-export interface Escrow extends BaseLedgerEntry {
+export default interface Escrow extends BaseLedgerEntry {
   LedgerEntryType: "Escrow";
   Account: string;
   Destination: string;

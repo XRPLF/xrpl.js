@@ -1,3 +1,4 @@
+/* eslint-disable complexity -- Necessary for verifyAccountSet */
 import { ValidationError } from "../../common/errors";
 
 import { BaseTransaction, verifyBaseTransaction } from "./common";
@@ -25,14 +26,16 @@ export interface AccountSet extends BaseTransaction {
   TickSize?: number;
 }
 
+const MIN_TICK_SIZE = 3;
+const MAX_TICK_SIZE = 15;
+
 /**
  * Verify the form and type of an AccountSet at runtime.
  *
  * @param tx - An AccountSet Transaction.
- * @returns Void.
  * @throws When the AccountSet is Malformed.
  */
-export function verifyAccountSet(tx: AccountSet): void {
+export function verifyAccountSet(tx: Record<string, unknown>): void {
   verifyBaseTransaction(tx);
 
   if (tx.ClearFlag !== undefined) {
@@ -73,7 +76,10 @@ export function verifyAccountSet(tx: AccountSet): void {
     if (typeof tx.TickSize !== "number") {
       throw new ValidationError("AccountSet: invalid TickSize");
     }
-    if (tx.TickSize !== 0 && (tx.TickSize < 3 || tx.TickSize > 15)) {
+    if (
+      tx.TickSize !== 0 &&
+      (tx.TickSize < MIN_TICK_SIZE || tx.TickSize > MAX_TICK_SIZE)
+    ) {
       throw new ValidationError("AccountSet: invalid TickSize");
     }
   }

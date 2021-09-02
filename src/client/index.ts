@@ -115,7 +115,7 @@ import prepareTrustline from "../transaction/trustline";
 import { TransactionJSON, Instructions, Prepare } from "../transaction/types";
 import * as transactionUtils from "../transaction/utils";
 import { deriveAddress, deriveXAddress } from "../utils/derive";
-import generateFaucetWallet from "../wallet/wallet-generation";
+import generateFaucetWallet from "../wallet/generateFaucetWallet";
 
 import { Connection, ConnectionUserOptions } from "./connection";
 
@@ -379,7 +379,7 @@ class Client extends EventEmitter {
     // NOTE: This may return much more than needed. Set limit when possible.
     const countTo: number = request.limit != null ? request.limit : Infinity;
     let count = 0;
-    let marker: string = request.marker;
+    let marker = request.marker;
     let lastBatchLength: number;
     const results: any[] = [];
     do {

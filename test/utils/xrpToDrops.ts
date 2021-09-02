@@ -3,7 +3,7 @@ import { assert } from "chai";
 
 import { xrpToDrops } from "../../src/utils";
 
-describe("XRP To Drops", function () {
+describe("xrpToDrops", function () {
   it("works with a typical amount", function () {
     const drops = xrpToDrops("2");
     assert.strictEqual(drops, "2000000", "2 XRP equals 2 million drops");
@@ -23,7 +23,8 @@ describe("XRP To Drops", function () {
   it("works with zero", function () {
     let drops = xrpToDrops("0");
     assert.strictEqual(drops, "0", "0 XRP equals 0 drops");
-    drops = xrpToDrops("-0"); // negative zero is equivalent to zero
+    // negative zero is equivalent to zero
+    drops = xrpToDrops("-0");
     assert.strictEqual(drops, "0", "-0 XRP equals 0 drops");
     drops = xrpToDrops("0.000000");
     assert.strictEqual(drops, "0", "0.000000 XRP equals 0 drops");
@@ -77,33 +78,33 @@ describe("XRP To Drops", function () {
   it("throws with an amount with too many decimal places", function () {
     assert.throws(() => {
       xrpToDrops("1.1234567");
-    }, /has too many decimal places/);
+    }, /has too many decimal places/u);
     assert.throws(() => {
       xrpToDrops("0.0000001");
-    }, /has too many decimal places/);
+    }, /has too many decimal places/u);
   });
 
   it("throws with an invalid value", function () {
     assert.throws(() => {
       xrpToDrops("FOO");
-    }, /invalid value/);
+    }, /invalid value/u);
     assert.throws(() => {
       xrpToDrops("1e-7");
-    }, /invalid value/);
+    }, /invalid value/u);
     assert.throws(() => {
       xrpToDrops("2,0");
-    }, /invalid value/);
+    }, /invalid value/u);
     assert.throws(() => {
       xrpToDrops(".");
-    }, /xrpToDrops: invalid value '\.', should be a BigNumber or string-encoded number\./);
+    }, /xrpToDrops: invalid value '\.', should be a BigNumber or string-encoded number\./u);
   });
 
   it("throws with an amount more than one decimal point", function () {
     assert.throws(() => {
       xrpToDrops("1.0.0");
-    }, /xrpToDrops: invalid value '1\.0\.0'/);
+    }, /xrpToDrops: invalid value '1\.0\.0'/u);
     assert.throws(() => {
       xrpToDrops("...");
-    }, /xrpToDrops: invalid value '\.\.\.'/);
+    }, /xrpToDrops: invalid value '\.\.\.'/u);
   });
 });

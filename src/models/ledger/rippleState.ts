@@ -1,8 +1,8 @@
 import { IssuedCurrencyAmount } from "../common";
 
-import { BaseLedgerEntry } from "./baseLedgerEntry";
+import BaseLedgerEntry from "./baseLedgerEntry";
 
-export interface RippleState extends BaseLedgerEntry {
+export default interface RippleState extends BaseLedgerEntry {
   LedgerEntryType: "RippleState";
   Flags: number;
   Balance: IssuedCurrencyAmount;

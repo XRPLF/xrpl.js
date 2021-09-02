@@ -6,7 +6,7 @@ import _ from "lodash";
 import { encode, decode } from "ripple-binary-codec";
 
 import { ValidationError } from "../../common/errors";
-import Metadata from "../common/metadata";
+import TransactionMetadata from "./metadata";
 
 import { AccountDelete, verifyAccountDelete } from "./accountDelete";
 import { AccountSet, verifyAccountSet } from "./accountSet";
@@ -31,10 +31,7 @@ import {
   PaymentChannelFund,
   verifyPaymentChannelFund,
 } from "./paymentChannelFund";
-import {
-  PaymentTransaction,
-  verifyPaymentTransaction,
-} from "./paymentTransaction";
+import { Payment, verifyPayment } from "./payment";
 import { SetRegularKey, verifySetRegularKey } from "./setRegularKey";
 import { SignerListSet, verifySignerListSet } from "./signerListSet";
 import { TicketCreate, verifyTicketCreate } from "./ticketCreate";
@@ -52,7 +49,7 @@ export type Transaction =
   | EscrowFinish
   | OfferCancel
   | OfferCreate
-  | PaymentTransaction
+  | Payment
   | PaymentChannelClaim
   | PaymentChannelCreate
   | PaymentChannelFund
@@ -63,7 +60,7 @@ export type Transaction =
 
 export interface TransactionAndMetadata {
   transaction: Transaction;
-  metadata: Metadata;
+  metadata: TransactionMetadata;
 }
 
 /**
@@ -73,7 +70,7 @@ export interface TransactionAndMetadata {
  * @param tx - A Transaction.
  * @throws ValidationError When the Transaction is malformed.
  */
-export function verify(tx: Transaction): void {
+export function verify(tx: Record<string, unknown>): void {
   switch (tx.TransactionType) {
     case "AccountDelete":
       verifyAccountDelete(tx);
@@ -120,7 +117,7 @@ export function verify(tx: Transaction): void {
       break;
 
     case "Payment":
-      verifyPaymentTransaction(tx);
+      verifyPayment(tx);
       break;
 
     case "PaymentChannelClaim":

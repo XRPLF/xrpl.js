@@ -10,7 +10,7 @@ import { verifySetRegularKey } from "../../src/models/transactions/setRegularKey
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("SetRegularKey Transaction Verification", function () {
+describe("SetRegularKey", function () {
   let account;
 
   beforeEach(function () {

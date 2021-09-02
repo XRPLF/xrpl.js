@@ -8,7 +8,7 @@ import { verify } from "../../src/models/transactions";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("CheckCreate Transaction Verification", function () {
+describe("CheckCreate", function () {
   it(`verifies valid CheckCreate`, function () {
     const validCheck = {
       TransactionType: "CheckCreate",

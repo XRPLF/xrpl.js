@@ -25,7 +25,7 @@ export interface AccountLinesRequest extends BaseRequest {
   ledger_index?: LedgerIndex;
   peer?: string;
   limit?: number;
-  marker?: any;
+  marker?: unknown;
 }
 
 export interface AccountLinesResponse extends BaseResponse {
@@ -35,6 +35,6 @@ export interface AccountLinesResponse extends BaseResponse {
     ledger_current_index?: number;
     ledger_index?: number;
     ledger_hash?: string;
-    marker?: any;
+    marker?: unknown;
   };
 }

@@ -8,7 +8,7 @@ import { verify } from "../../src/models/transactions";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("CheckCancel Transaction Verification", function () {
+describe("CheckCancel", function () {
   it(`verifies valid CheckCancel`, function () {
     const validCheckCancel = {
       Account: "rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo",

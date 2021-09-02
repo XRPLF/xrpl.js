@@ -22,9 +22,9 @@ All "prepare*" methods have the same return type.
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
-const paymentChannelFund = <%- importFile('test/fixtures/requests/prepare-payment-channel-fund.json') %>;
+const paymentChannelFund = <%- importFile('test/fixtures/requests/preparePaymentChannelFund.json') %>;
 return api.preparePaymentChannelFund(address, paymentChannelFund).then(prepared =>
   {/* ... */});
 ```
 
-<%- renderFixture('responses/prepare-payment-channel-fund.json') %>
+<%- renderFixture('responses/preparePaymentChannelFund.json') %>
