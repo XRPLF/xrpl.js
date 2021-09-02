@@ -4,7 +4,6 @@ import _ from 'lodash'
 import { isValidXAddress } from 'ripple-address-codec'
 
 import { Client } from 'xrpl-local'
-import { errors } from 'xrpl-local/common'
 import { isValidSecret } from 'xrpl-local/utils'
 
 import { generateXAddress } from '../../src/utils/generateAddress'
