@@ -1,6 +1,8 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
+import { ServerInfoResponse } from '../src'
+
 import responses from './fixtures/responses'
 import rippled from './fixtures/rippled'
 import setupClient from './setupClient'
@@ -8,10 +10,16 @@ import { ignoreWebSocketDisconnect } from './testUtils'
 
 const TIMEOUT = 20000
 
-function checkResult(expected, response) {
+async function checkResult(
+  expected: Record<string, unknown>,
+  response: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
   if (expected.txJSON) {
     assert(response.txJSON)
-    assert.deepEqual(JSON.parse(response.txJSON), JSON.parse(expected.txJSON))
+    assert.deepEqual(
+      JSON.parse(response.txJSON as string),
+      JSON.parse(expected.txJSON as string),
+    )
   }
   assert.deepEqual(_.omit(response, 'txJSON'), _.omit(expected, 'txJSON'))
   return response
@@ -22,14 +30,16 @@ describe('BroadcastClient', function () {
   beforeEach(setupClient.setupBroadcast)
   afterEach(setupClient.teardown)
 
-  it('base', function () {
+  it('base', async function () {
     this.mocks.forEach((mock) => {
       mock.addResponse('server_info', rippled.server_info.normal)
     })
     assert(this.client.isConnected())
-    return this.client.request({ command: 'server_info' }).then((response) => {
-      return checkResult(responses.getServerInfo, response.result.info)
-    })
+    this.client
+      .request({ command: 'server_info' })
+      .then(async (response: ServerInfoResponse) => {
+        checkResult(responses.getServerInfo, response.result.info)
+      })
   })
 
   it('error propagation', function (done) {
