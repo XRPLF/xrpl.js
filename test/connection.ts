@@ -11,7 +11,7 @@ import {
   DisconnectedError,
   NotConnectedError,
   ResponseFormatError,
-  RippleError,
+  XrplError,
   TimeoutError,
 } from '../src/common/errors'
 
@@ -420,7 +420,7 @@ describe('Connection', function () {
       new Client({
         servers: ['wss://server1.com', 'wss://server2.com'],
       } as any)
-    }, RippleError)
+    }, XrplError)
   })
 
   it('connect throws error', function (done) {
@@ -448,7 +448,7 @@ describe('Connection', function () {
       done()
     })
 
-    this.client.connection.onMessage(
+    this.client.connection._onMessage(
       JSON.stringify({
         type: 'transaction',
       }),

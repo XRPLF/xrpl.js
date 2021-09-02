@@ -97,7 +97,7 @@ describe('client.getPaths', function () {
         ...REQUEST_FIXTURES.normal,
         source: { address: addresses.NOTFOUND },
       }),
-      this.client.errors.RippleError,
+      this.client.errors.XrplError,
     )
   })
   // 'send all', function () {
