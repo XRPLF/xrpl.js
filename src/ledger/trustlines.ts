@@ -1,7 +1,7 @@
 import _ from "lodash";
 
 import type { Client } from "..";
-import { validate, ensureClassicAddress } from "../common";
+import { ensureClassicAddress } from "../common";
 import { FormattedTrustline } from "../common/types/objects";
 
 import parseAccountTrustline from "./parse/account-trustline";
@@ -25,9 +25,6 @@ async function getTrustlines(
   address: string,
   options: GetTrustlinesOptions = {}
 ): Promise<FormattedTrustline[]> {
-  // 1. Validate
-  validate.getTrustlines({ address, options });
-
   // Only support retrieving trustlines without a tag,
   // since it does not make sense to filter trustlines
   // by tag.

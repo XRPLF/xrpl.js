@@ -4,7 +4,6 @@ import { decodeAccountID } from "ripple-address-codec";
 import binary from "ripple-binary-codec";
 import { JsonObject } from "ripple-binary-codec/dist/types/serialized-type";
 
-import { validate } from "../common";
 import { ValidationError } from "../common/errors";
 import { computeBinaryTransactionHash } from "../utils/hashes";
 
@@ -68,8 +67,6 @@ function getTransactionWithAllSigners(transactions: JsonObject[]): JsonObject {
  * with a transaction id based on the combined transaction.
  */
 function combine(signedTransactions: string[]): object {
-  validate.combine({ signedTransactions });
-
   const transactions: JsonObject[] = signedTransactions.map(binary.decode);
   validateTransactionEquivalence(transactions);
 

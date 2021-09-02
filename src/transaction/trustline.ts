@@ -6,7 +6,6 @@ import { FormattedTrustlineSpecification } from "../common/types/objects/trustli
 import { Instructions, Prepare, TransactionJSON } from "./types";
 import * as utils from "./utils";
 
-const validate = utils.common.validate;
 const trustlineFlags = utils.common.txFlags.TrustSet;
 
 function convertQuality(quality) {
@@ -57,16 +56,15 @@ function createTrustlineTransaction(
   return txJSON;
 }
 
-function prepareTrustline(
+async function prepareTrustline(
   this: Client,
   address: string,
   trustline: FormattedTrustlineSpecification,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareTrustline({ address, trustline, instructions });
     const txJSON = createTrustlineTransaction(address, trustline);
-    return utils.prepareTransaction(txJSON, this, instructions);
+    return await utils.prepareTransaction(txJSON, this, instructions);
   } catch (e) {
     return Promise.reject(e);
   }

@@ -1,5 +1,4 @@
 import { Client } from "..";
-import { validate } from "../common";
 import { ISOTimeToRippleTime, xrpToDrops } from "../utils";
 
 import { Instructions, Prepare, TransactionJSON } from "./types";
@@ -41,23 +40,18 @@ function createPaymentChannelCreateTransaction(
   return txJSON;
 }
 
-function preparePaymentChannelCreate(
+async function preparePaymentChannelCreate(
   this: Client,
   address: string,
   paymentChannelCreate: PaymentChannelCreate,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.preparePaymentChannelCreate({
-      address,
-      paymentChannelCreate,
-      instructions,
-    });
     const txJSON = createPaymentChannelCreateTransaction(
       address,
       paymentChannelCreate
     );
-    return utils.prepareTransaction(txJSON, this, instructions);
+    return await utils.prepareTransaction(txJSON, this, instructions);
   } catch (e) {
     return Promise.reject(e);
   }

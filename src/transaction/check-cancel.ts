@@ -1,5 +1,4 @@
 import { Client } from "..";
-import { validate } from "../common";
 
 import { Instructions, Prepare, TransactionJSON } from "./types";
 import { prepareTransaction } from "./utils";
@@ -21,16 +20,15 @@ function createCheckCancelTransaction(
   return txJSON;
 }
 
-function prepareCheckCancel(
+async function prepareCheckCancel(
   this: Client,
   address: string,
   checkCancel: CheckCancelParameters,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareCheckCancel({ address, checkCancel, instructions });
     const txJSON = createCheckCancelTransaction(address, checkCancel);
-    return prepareTransaction(txJSON, this, instructions);
+    return await prepareTransaction(txJSON, this, instructions);
   } catch (e) {
     return Promise.reject(e);
   }

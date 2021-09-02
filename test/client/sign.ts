@@ -1,8 +1,6 @@
 import { assert } from "chai";
 import binary from "ripple-binary-codec";
 
-import * as schemaValidator from "xrpl-local/common/schema-validator";
-
 import requests from "../fixtures/requests";
 import responses from "../fixtures/responses";
 import rippled from "../fixtures/rippled";
@@ -19,7 +17,6 @@ describe("client.sign", function () {
     const secret = "shsWGZcmZz6YsWWmcnpfr6fLTdtFV";
     const result = this.client.sign(REQUEST_FIXTURES.normal.txJSON, secret);
     assert.deepEqual(result, RESPONSE_FIXTURES.normal);
-    schemaValidator.schemaValidate("sign", result);
   });
 
   it("sign with lowercase hex data in memo (hex should be case insensitive)", async function () {
@@ -59,7 +56,6 @@ describe("client.sign", function () {
     const secret = "snoPBrXtMeMyMHUVTgbuqAfg1SUTb";
     const result = this.client.sign(REQUEST_FIXTURES.escrow.txJSON, secret);
     assert.deepEqual(result, RESPONSE_FIXTURES.escrow);
-    schemaValidator.schemaValidate("sign", result);
   });
 
   it("signAs", async function () {
@@ -80,7 +76,6 @@ describe("client.sign", function () {
     };
     const result = this.client.sign(REQUEST_FIXTURES.normal.txJSON, keypair);
     assert.deepEqual(result, RESPONSE_FIXTURES.normal);
-    schemaValidator.schemaValidate("sign", result);
   });
 
   it("withKeypair already signed", async function () {
@@ -106,7 +101,6 @@ describe("client.sign", function () {
     };
     const result = this.client.sign(REQUEST_FIXTURES.escrow.txJSON, keypair);
     assert.deepEqual(result, RESPONSE_FIXTURES.escrow);
-    schemaValidator.schemaValidate("sign", result);
   });
 
   it("withKeypair signAs", async function () {
@@ -148,7 +142,6 @@ describe("client.sign", function () {
       `Flags = ${decoded.Flags}, should be undefined`
     );
     assert.deepEqual(result, expectedResult);
-    schemaValidator.schemaValidate("sign", result);
   });
 
   it("sign succeeds with source.amount/destination.minAmount", async function () {
@@ -169,7 +162,6 @@ describe("client.sign", function () {
       `Flags = ${decoded.Flags}, should be 2147614720`
     );
     assert.deepEqual(result, expectedResult);
-    schemaValidator.schemaValidate("sign", result);
   });
 
   it("throws when encoded tx does not match decoded tx - AccountSet", async function () {
@@ -228,14 +220,12 @@ describe("client.sign", function () {
     };
 
     assert.deepEqual(result, expectedResponse);
-    schemaValidator.schemaValidate("sign", result);
   });
 
   it("sign with ticket", async function () {
     const secret = "sn7n5R1cR5Y3fRFkuWXA94Ts1frVJ";
     const result = this.client.sign(REQUEST_FIXTURES.ticket.txJSON, secret);
     assert.deepEqual(result, RESPONSE_FIXTURES.ticket);
-    schemaValidator.schemaValidate("sign", result);
   });
 
   addressTests.forEach(function (test) {
@@ -312,7 +302,6 @@ describe("client.sign", function () {
             "12000022800200002400000001201B00EF81E661EC6386F26FC0FFFF0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461968400000000000000C6940000000000000646AD3504529A0465E2E0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D1664619732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D87446304402200A693FB5CA6B21250EBDFD8CFF526EE0DF7C9E4E31EB0660692E75E6A93BF5F802203CC39463DDA21386898CA31E18AD1A6828647D65741DD637BAD71BC83E29DB9481145E7B112523F68D2F5E879DB4EAC51C6698A693048314CA6EDC7A28252DAEA6F2045B24F4D7C333E146170112300000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461900",
           id: "78874FE5F5299FEE3EA85D3CF6C1FB1F1D46BB08F716662A3E3D1F0ADE4EF796",
         });
-        schemaValidator.schemaValidate("sign", result);
       });
 
       it("succeeds - prepared payment", async function () {
@@ -347,7 +336,6 @@ describe("client.sign", function () {
           id: "88D6B913C66279EA31ADC25C5806C48B2D4E5680261666790A736E1961217700",
         };
         assert.deepEqual(result, expectedResult);
-        schemaValidator.schemaValidate("sign", result);
       });
 
       it("throws when encoded tx does not match decoded tx - prepared payment", async function () {
