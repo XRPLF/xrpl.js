@@ -19,10 +19,13 @@ import rippled from './fixtures/rippled'
 import setupClient from './setupClient'
 import { ignoreWebSocketDisconnect } from './testUtils'
 
-const TIMEOUT = 200000 // how long before each test case times out
+// how long before each test case times out
+const TIMEOUT = 20000
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Necessary to get browser info
 const isBrowser = (process as any).browser
 
-async function createServer() {
+async function createServer(): Promise<net.Server> {
   return new Promise((resolve, reject) => {
     const server = net.createServer()
     server.on('listening', function () {
@@ -48,22 +51,34 @@ describe('Connection', function () {
   })
 
   describe('trace', function () {
-    const mockedRequestData = { mocked: 'request' }
-    const mockedResponse = JSON.stringify({ mocked: 'response', id: 0 })
-    const expectedMessages = [
-      // We add the ID here, since it's not a part of the user-provided request.
-      ['send', JSON.stringify({ ...mockedRequestData, id: 0 })],
-      ['receive', mockedResponse],
-    ]
-    const originalConsoleLog = console.log
+    let mockedRequestData
+    let mockedResponse
+    let expectedMessages
+    let originalConsoleLog
+
+    beforeEach(function () {
+      mockedRequestData = { mocked: 'request' }
+      mockedResponse = JSON.stringify({ mocked: 'response', id: 0 })
+      expectedMessages = [
+        // We add the ID here, since it's not a part of the user-provided request.
+        ['send', JSON.stringify({ ...mockedRequestData, id: 0 })],
+        ['receive', mockedResponse],
+      ]
+      // eslint-disable-next-line no-console -- Testing trace
+      originalConsoleLog = console.log
+    })
 
     afterEach(function () {
+      // eslint-disable-next-line no-console -- Testing trace
       console.log = originalConsoleLog
     })
 
     it('as false', function () {
       const messages: any[] = []
-      console.log = (id, message) => messages.push([id, message])
+      // eslint-disable-next-line no-console -- Testing trace
+      console.log = function (id: number, message: string): void {
+        messages.push([id, message])
+      }
       const connection: any = new Connection('url', { trace: false })
       connection.ws = { send() {} }
       connection.request(mockedRequestData)
@@ -73,7 +88,10 @@ describe('Connection', function () {
 
     it('as true', function () {
       const messages: any[] = []
-      console.log = (id, message) => messages.push([id, message])
+      // eslint-disable-next-line no-console -- Testing trace
+      console.log = function (id: number, message: string): void {
+        messages.push([id, message])
+      }
       const connection: any = new Connection('url', { trace: true })
       connection.ws = { send() {} }
       connection.request(mockedRequestData)
@@ -84,7 +102,9 @@ describe('Connection', function () {
     it('as a function', function () {
       const messages: any[] = []
       const connection: any = new Connection('url', {
-        trace: (id, message) => messages.push([id, message]),
+        trace(id, message): void {
+          messages.push([id, message])
+        },
       })
       connection.ws = { send() {} }
       connection.request(mockedRequestData)
@@ -98,8 +118,15 @@ describe('Connection', function () {
       done()
       return
     }
-    createServer().then((server: any) => {
-      const port = server.address().port
+    createServer().then((server: net.Server) => {
+      const port = (server.address() as net.AddressInfo).port
+      const options = {
+        proxy: `ws://localhost:${port}`,
+        authorization: 'authorization',
+        trustedCertificates: ['path/to/pem'],
+      }
+
+      const connection = new Connection(this.client.connection._url, options)
       const expect = 'CONNECT localhost'
       server.on('connection', (socket) => {
         socket.on('data', (data) => {
@@ -111,25 +138,19 @@ describe('Connection', function () {
         })
       })
 
-      const options = {
-        proxy: `ws://localhost:${port}`,
-        authorization: 'authorization',
-        trustedCertificates: ['path/to/pem'],
-      }
-      const connection = new Connection(this.client.connection.url, options)
       connection.connect().catch((err) => {
         assert(err instanceof NotConnectedError)
       })
     }, done)
   })
 
-  it('Multiply disconnect calls', function () {
+  it('Multiply disconnect calls', async function () {
     this.client.disconnect()
-    return this.client.disconnect()
+    this.client.disconnect()
   })
 
   it('reconnect', function () {
-    return this.client.connection.reconnect()
+    this.client.connection.reconnect()
   })
 
   it('NotConnectedError', async function () {
@@ -166,7 +187,7 @@ describe('Connection', function () {
   })
 
   it('DisconnectedError', async function () {
-    return this.client
+    this.client
       .request({ command: 'test_command', data: { closeServer: true } })
       .then(() => {
         assert.fail('Should throw DisconnectedError')
@@ -181,7 +202,7 @@ describe('Connection', function () {
       callback(null)
     }
     const request = { command: 'server_info' }
-    return this.client.connection
+    this.client.connection
       .request(request, 10)
       .then(() => {
         assert.fail('Should throw TimeoutError')
@@ -195,7 +216,7 @@ describe('Connection', function () {
     this.client.connection.ws.send = function (_, callback) {
       callback({ message: 'not connected' })
     }
-    return this.client
+    this.client
       .request({ command: 'server_info' })
       .then(() => {
         assert.fail('Should throw DisconnectedError')
@@ -219,7 +240,7 @@ describe('Connection', function () {
         throw new Error('WebSocket is not open: readyState 0 (CONNECTING)')
       }
       const request = { command: 'subscribe', streams: ['ledger'] }
-      return this.client.connection.request(request)
+      this.client.connection.request(request)
     }
 
     try {
@@ -235,7 +256,7 @@ describe('Connection', function () {
   })
 
   it('ResponseFormatError', function () {
-    return this.client
+    this.client
       .request({
         command: 'test_command',
         data: { unrecognizedResponse: true },
@@ -268,7 +289,7 @@ describe('Connection', function () {
       }
       this.timeout(70001)
       const self = this
-      function breakConnection() {
+      function breakConnection(): void {
         self.client.connection
           .request({
             command: 'test_command',
@@ -336,8 +357,8 @@ describe('Connection', function () {
     // Hook up a listener for the reconnect event
     this.client.connection.on('reconnect', () => done())
     // Trigger a heartbeat
-    this.client.connection.heartbeat().catch((error) => {
-      /* ignore - test expects heartbeat failure */
+    this.client.connection.heartbeat().catch((_error) => {
+      /* Ignore error */
     })
   })
 
@@ -398,8 +419,8 @@ describe('Connection', function () {
   })
 
   it('Multiply connect calls', function () {
-    return this.client.connect().then(() => {
-      return this.client.connect()
+    this.client.connect().then(() => {
+      this.client.connect()
     })
   })
 
@@ -417,6 +438,7 @@ describe('Connection', function () {
 
   it('connect multiserver error', function () {
     assert.throws(function () {
+      // eslint-disable-next-line no-new -- Testing constructure
       new Client({
         servers: ['wss://server1.com', 'wss://server2.com'],
       } as any)
@@ -436,10 +458,10 @@ describe('Connection', function () {
     let transactionCount = 0
     let pathFindCount = 0
     this.client.connection.on('transaction', () => {
-      transactionCount++
+      transactionCount += 1
     })
     this.client.connection.on('path_find', () => {
-      pathFindCount++
+      pathFindCount += 1
     })
     this.client.connection.on('response', (message) => {
       assert.strictEqual(message.id, 1)
@@ -552,13 +574,13 @@ describe('Connection', function () {
     let disconnectedCount = 0
     this.client.on('connected', () => {
       done(
-        disconnectedCount !== 1
-          ? new Error('Wrong number of disconnects')
-          : undefined,
+        disconnectedCount === 1
+          ? undefined
+          : new Error('Wrong number of disconnects'),
       )
     })
     this.client.on('disconnected', () => {
-      disconnectedCount++
+      disconnectedCount += 1
     })
     this.client.connection.request({
       command: 'test_command',
