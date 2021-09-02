@@ -52,7 +52,7 @@ export default class ExponentialBackoff {
   /**
    * Return the backoff duration.
    *
-   * @returns The backoff duration.
+   * @returns The backoff duration in milliseconds.
    */
   public duration(): number {
     const ms = this.ms * this.factor ** this.numAttempts;
