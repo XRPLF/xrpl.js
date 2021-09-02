@@ -182,14 +182,15 @@ function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
   })
 
   if (!_.isEqual(decoded, tx)) {
-    const error = new utils.common.errors.ValidationError(
-      'Serialized transaction does not match original txJSON. See `error.data`',
-    )
-    error.data = {
+    const data = {
       decoded,
       tx,
       diff: objectDiff(tx, decoded),
     }
+    const error = new utils.common.errors.ValidationError(
+      'Serialized transaction does not match original txJSON. See `error.data`',
+      data,
+    )
     throw error
   }
 }

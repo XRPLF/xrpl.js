@@ -16,13 +16,6 @@ describe('client.getFee', function () {
         assert.strictEqual(fee, '0.000012')
       })
 
-      it('getFee default', async function () {
-        this.mockRippled.addResponse('server_info', rippled.server_info.normal)
-        this.client.feeCushion = undefined as unknown as number
-        const fee = await this.client.getFee()
-        assert.strictEqual(fee, '0.000012')
-      })
-
       it('getFee - high load_factor', async function () {
         this.mockRippled.addResponse(
           'server_info',
