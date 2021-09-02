@@ -24,7 +24,7 @@
     "ripple-address-codec": "^4.0.0"
   },
   "devDependencies": {
-    "@types/mocha": "^8.0.3",
+    "@types/mocha": "^9.0.0",
     "@types/node": "^16.4.3",
     "@typescript-eslint/eslint-plugin": "^2.19.0",
     "@typescript-eslint/parser": "^2.16.0",
