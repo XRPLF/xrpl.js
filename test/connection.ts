@@ -44,8 +44,9 @@ describe('Connection', function () {
   afterEach(teardownClient)
 
   it('default options', function () {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Need to access private methods
     const connection: any = new Connection('url')
-    assert.strictEqual(connection.url, 'url')
+    assert.strictEqual(connection.getUrl(), 'url')
     assert(connection.config.proxy == null)
     assert(connection.config.authorization == null)
   })
@@ -74,39 +75,54 @@ describe('Connection', function () {
     })
 
     it('as false', function () {
-      const messages: any[] = []
+      const messages: Array<[number | string, string]> = []
       // eslint-disable-next-line no-console -- Testing trace
       console.log = function (id: number, message: string): void {
         messages.push([id, message])
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Need to access private methods
       const connection: any = new Connection('url', { trace: false })
-      connection.ws = { send() {} }
+      connection.ws = {
+        send(): void {
+          /* purposefully empty */
+        },
+      }
       connection.request(mockedRequestData)
       connection.onMessage(mockedResponse)
       assert.deepEqual(messages, [])
     })
 
     it('as true', function () {
-      const messages: any[] = []
+      const messages: Array<[number | string, string]> = []
       // eslint-disable-next-line no-console -- Testing trace
-      console.log = function (id: number, message: string): void {
+      console.log = function (id: number | string, message: string): void {
         messages.push([id, message])
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Need to access private methods
       const connection: any = new Connection('url', { trace: true })
-      connection.ws = { send() {} }
+      connection.ws = {
+        send(): void {
+          /* purposefully empty */
+        },
+      }
       connection.request(mockedRequestData)
       connection.onMessage(mockedResponse)
       assert.deepEqual(messages, expectedMessages)
     })
 
     it('as a function', function () {
-      const messages: any[] = []
+      const messages: Array<[number | string, string]> = []
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Need to access private methods
       const connection: any = new Connection('url', {
-        trace(id, message): void {
+        trace(id: number | string, message: string): void {
           messages.push([id, message])
         },
       })
-      connection.ws = { send() {} }
+      connection.ws = {
+        send(): void {
+          /* purposefully empty */
+        },
+      }
       connection.request(mockedRequestData)
       connection.onMessage(mockedResponse)
       assert.deepEqual(messages, expectedMessages)
@@ -125,9 +141,9 @@ describe('Connection', function () {
         authorization: 'authorization',
         trustedCertificates: ['path/to/pem'],
       }
-
-      const connection = new Connection(this.client.connection._url, options)
+      const connection = new Connection(this.client.connection.url, options)
       const expect = 'CONNECT localhost'
+
       server.on('connection', (socket) => {
         socket.on('data', (data) => {
           const got = data.toString('ascii', 0, expect.length)
@@ -232,10 +248,10 @@ describe('Connection', function () {
     // do not rely on the client.setup hook to test this as it bypasses the case, disconnect client connection first
     await this.client.disconnect()
 
-    // stub onOpen to only run logic relevant to test case
-    this.client.connection.onOpen = () => {
+    // stub _onOpen to only run logic relevant to test case
+    this.client.connection.onOpen = (): void => {
       // overload websocket send on open when _ws exists
-      this.client.connection.ws.send = function (_0, _1, _2) {
+      this.client.connection.ws.send = function (_0, _1, _2): void {
         // recent ws throws this error instead of calling back
         throw new Error('WebSocket is not open: readyState 0 (CONNECTING)')
       }
@@ -246,7 +262,6 @@ describe('Connection', function () {
     try {
       await this.client.connect()
     } catch (error) {
-      console.log(error)
       assert.instanceOf(error, DisconnectedError)
       assert.strictEqual(
         error.message,
@@ -377,7 +392,7 @@ describe('Connection', function () {
     // Drop the test runner timeout, since this should be a quick test
     this.timeout(5000)
     // fail on reconnect/connection
-    this.client.connection.reconnect = async () => {
+    this.client.connection.reconnect = async (): Promise<void> => {
       throw new Error('error on reconnect')
     }
     // Hook up a listener for the reconnect error event
@@ -440,9 +455,10 @@ describe('Connection', function () {
 
   it('connect multiserver error', function () {
     assert.throws(function () {
-      // eslint-disable-next-line no-new -- Testing constructure
+      // eslint-disable-next-line no-new -- Testing constructor
       new Client({
         servers: ['wss://server1.com', 'wss://server2.com'],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Testing invalid constructor
       } as any)
     }, XrplError)
   })
