@@ -17,10 +17,14 @@ describe('mock rippled tests', function () {
   })
 
   it('provide bad response shape', async function () {
-    assert.throws(
-      () => this.mockRippled.addResponse('account_info', { data: {} }),
-      Error,
-    )
+    try {
+      this.mockRippled.addResponse('account_info', { data: {} })
+      assert.fail('Should have errored')
+    } catch (err) {
+      if (!(err instanceof Error)) {
+        assert.fail(`Wrong error type: ${err as string}`)
+      }
+    }
   })
 
   it('provide bad response shape in function', async function () {
