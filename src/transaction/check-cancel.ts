@@ -1,39 +1,39 @@
-import { Client } from "..";
-import { validate } from "../common";
+import { Client } from '..'
+import { validate } from '../common'
 
-import { Instructions, Prepare, TransactionJSON } from "./types";
-import { prepareTransaction } from "./utils";
+import { Instructions, Prepare, TransactionJSON } from './types'
+import { prepareTransaction } from './utils'
 
 export interface CheckCancelParameters {
-  checkID: string;
+  checkID: string
 }
 
 function createCheckCancelTransaction(
   account: string,
-  cancel: CheckCancelParameters
+  cancel: CheckCancelParameters,
 ): TransactionJSON {
   const txJSON = {
     Account: account,
-    TransactionType: "CheckCancel",
+    TransactionType: 'CheckCancel',
     CheckID: cancel.checkID,
-  };
+  }
 
-  return txJSON;
+  return txJSON
 }
 
-function prepareCheckCancel(
+async function prepareCheckCancel(
   this: Client,
   address: string,
   checkCancel: CheckCancelParameters,
-  instructions: Instructions = {}
+  instructions: Instructions = {},
 ): Promise<Prepare> {
   try {
-    validate.prepareCheckCancel({ address, checkCancel, instructions });
-    const txJSON = createCheckCancelTransaction(address, checkCancel);
-    return prepareTransaction(txJSON, this, instructions);
+    validate.prepareCheckCancel({ address, checkCancel, instructions })
+    const txJSON = createCheckCancelTransaction(address, checkCancel)
+    return await prepareTransaction(txJSON, this, instructions)
   } catch (e) {
-    return Promise.reject(e);
+    return Promise.reject(e)
   }
 }
 
-export default prepareCheckCancel;
+export default prepareCheckCancel

@@ -33,6 +33,7 @@
   "resolutions": {
     "elliptic": "^6.5.4"
   },
+  "prettier": "@xrplf/prettier-config",
   "devDependencies": {
     "@types/chai": "^4.2.21",
     "@types/mocha": "^8.2.1",
@@ -41,6 +42,7 @@
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.0.0",
     "@xrplf/eslint-config": "^1.2.2",
+    "@xrplf/prettier-config": "^1.2.0",
     "assert": "^2.0.0",
     "buffer": "^6.0.2",
     "chai": "^4.3.4",

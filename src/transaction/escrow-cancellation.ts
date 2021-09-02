@@ -1,52 +1,52 @@
-import { Client } from "..";
-import { Memo } from "../common/types/objects";
+import { Client } from '..'
+import { Memo } from '../common/types/objects'
 
-import { Instructions, Prepare, TransactionJSON } from "./types";
-import * as utils from "./utils";
+import { Instructions, Prepare, TransactionJSON } from './types'
+import * as utils from './utils'
 
-const validate = utils.common.validate;
+const validate = utils.common.validate
 
 export interface EscrowCancellation {
-  owner: string;
-  escrowSequence: number;
+  owner: string
+  escrowSequence: number
 
   // TODO: This ripple-lib memo format should be deprecated in favor of rippled's format.
   // If necessary, expose a public method for converting between the two formats.
-  memos?: Memo[];
+  memos?: Memo[]
 }
 
 function createEscrowCancellationTransaction(
   account: string,
-  payment: EscrowCancellation
+  payment: EscrowCancellation,
 ): TransactionJSON {
   const txJSON: any = {
-    TransactionType: "EscrowCancel",
+    TransactionType: 'EscrowCancel',
     Account: account,
     Owner: payment.owner,
     OfferSequence: payment.escrowSequence,
-  };
-  if (payment.memos != null) {
-    txJSON.Memos = payment.memos.map(utils.convertMemo);
   }
-  return txJSON;
+  if (payment.memos != null) {
+    txJSON.Memos = payment.memos.map(utils.convertMemo)
+  }
+  return txJSON
 }
 
-function prepareEscrowCancellation(
+async function prepareEscrowCancellation(
   this: Client,
   address: string,
   escrowCancellation: EscrowCancellation,
-  instructions: Instructions = {}
+  instructions: Instructions = {},
 ): Promise<Prepare> {
   validate.prepareEscrowCancellation({
     address,
     escrowCancellation,
     instructions,
-  });
+  })
   const txJSON = createEscrowCancellationTransaction(
     address,
-    escrowCancellation
-  );
-  return utils.prepareTransaction(txJSON, this, instructions);
+    escrowCancellation,
+  )
+  return utils.prepareTransaction(txJSON, this, instructions)
 }
 
-export default prepareEscrowCancellation;
+export default prepareEscrowCancellation

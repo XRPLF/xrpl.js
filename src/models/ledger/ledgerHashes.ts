@@ -1,8 +1,8 @@
-import BaseLedgerEntry from "./baseLedgerEntry";
+import BaseLedgerEntry from './baseLedgerEntry'
 
 export default interface LedgerHashes extends BaseLedgerEntry {
-  LedgerEntryType: "LedgerHashes";
-  LastLedgerSequence?: number;
-  Hashes: string[];
-  Flags: number;
+  LedgerEntryType: 'LedgerHashes'
+  LastLedgerSequence?: number
+  Hashes: string[]
+  Flags: number
 }
