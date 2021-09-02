@@ -6,7 +6,7 @@
     "compile": "tsc",
     "test": "tsc && nyc mocha",
     "lint": "eslint . --ext .ts --fix",
-    "prepublish": "yarn lint && yarn test",
+    "prepublish": "npm run lint && npm test",
     "coverage": "nyc --reporter=lcov mocha && codecov"
   },
   "files": [
@@ -49,6 +49,7 @@
   },
   "license": "ISC",
   "engines": {
-    "node": ">= 10"
+    "node": ">= 10",
+    "npm": ">=7.0.0"
   }
 }

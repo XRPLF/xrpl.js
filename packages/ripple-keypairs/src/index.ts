@@ -64,9 +64,7 @@ const secp256k1 = {
 }
 
 const ed25519 = {
-  deriveKeypair(
-    entropy: Uint8Array,
-  ): {
+  deriveKeypair(entropy: Uint8Array): {
     privateKey: string
     publicKey: string
   } {

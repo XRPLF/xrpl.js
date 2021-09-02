@@ -5,7 +5,7 @@ node_js:
   - 13
   - 14
 script:
-  - yarn compile
-  - yarn lint
-  - yarn test
-  - yarn coverage
+  - npm run compile
+  - npm run lint
+  - npm test
+  - npm run coverage
