@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- Necessary for these methods TODO: further cleanup */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types -- Necessary for these methods TODO: further cleanup */
 import net from 'net'
 
 import { assert } from 'chai'
@@ -22,8 +24,8 @@ export const addressTests = [
  * @param _schemaName - Name of the schema used to validate the shape of the response.
  */
 export function assertResultMatch(
-  response: Record<string, unknown>,
-  expected: Record<string, unknown>,
+  response: any,
+  expected: any,
   _schemaName?: string,
 ): void {
   if (expected.txJSON) {
@@ -57,8 +59,6 @@ export function assertResultMatch(
  */
 export async function assertRejects(
   promise: PromiseLike<Record<string, unknown>>,
-  // eslint-disable-next-line max-len -- Need to disable multiple things
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types -- instanceof needs any
   instanceOf: any,
   message?: string | RegExp,
 ): Promise<void> {

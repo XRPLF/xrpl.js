@@ -61,9 +61,4 @@ async function teardownClient(this: any, done: () => void): Promise<void> {
     .catch(done)
 }
 
-export {
-  setupClient as setup,
-  teardownClient as teardown,
-  setupBroadcast,
-  createMockRippled,
-}
+export { setupClient, teardownClient, setupBroadcast, createMockRippled }

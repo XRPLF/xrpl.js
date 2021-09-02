@@ -16,7 +16,7 @@ import {
 } from '../src/common/errors'
 
 import rippled from './fixtures/rippled'
-import setupClient from './setupClient'
+import { setupClient, teardownClient } from './setupClient'
 import { ignoreWebSocketDisconnect } from './testUtils'
 
 // how long before each test case times out
@@ -40,8 +40,8 @@ async function createServer(): Promise<net.Server> {
 
 describe('Connection', function () {
   this.timeout(TIMEOUT)
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
 
   it('default options', function () {
     const connection: any = new Connection('url')

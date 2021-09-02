@@ -2,12 +2,12 @@ import { assert } from 'chai'
 
 import { RippledError } from '../src/common/errors'
 
-import setupClient from './setupClient'
+import { setupClient, teardownClient } from './setupClient'
 import { assertRejects } from './testUtils'
 
 describe('mock rippled tests', function () {
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
   it('errors if a mock is not provided', async function () {
     this.mockRippled.suppressOutput = true
     await assertRejects(

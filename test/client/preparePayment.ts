@@ -3,7 +3,7 @@ import { ValidationError } from 'xrpl-local/common/errors'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
-import setupClient from '../setupClient'
+import { setupClient, teardownClient } from '../setupClient'
 import { assertResultMatch, addressTests, assertRejects } from '../testUtils'
 
 const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 }
@@ -12,8 +12,8 @@ const { preparePayment: RESPONSE_FIXTURES } = responses
 const RECIPIENT_ADDRESS = 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
 
 describe('client.preparePayment', function () {
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
 
   addressTests.forEach(function (test) {
     describe(test.type, function () {

@@ -5,7 +5,7 @@ import { ServerInfoResponse } from '../src'
 
 import responses from './fixtures/responses'
 import rippled from './fixtures/rippled'
-import setupClient from './setupClient'
+import { setupBroadcast, teardownClient } from './setupClient'
 import { ignoreWebSocketDisconnect } from './testUtils'
 
 const TIMEOUT = 20000
@@ -27,8 +27,8 @@ async function checkResult(
 
 describe('BroadcastClient', function () {
   this.timeout(TIMEOUT)
-  beforeEach(setupClient.setupBroadcast)
-  afterEach(setupClient.teardown)
+  beforeEach(setupBroadcast)
+  afterEach(teardownClient)
 
   it('base', async function () {
     this.mocks.forEach((mock) => {
