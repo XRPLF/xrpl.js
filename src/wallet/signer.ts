@@ -27,16 +27,23 @@ import Wallet from "../Wallet";
  *
  * @param wallet - A Wallet that holds your cryptographic keys.
  * @param tx - The Transaction that is being signed.
- * @returns A signed Transaction and a Transaction id that corresponds to the pre-signed Transaction.
+ * @returns A signed Transaction.
  */
 function sign(wallet: Wallet, tx: Transaction): string {
   return wallet.signTransaction(tx, { signAs: "" });
 }
 
-// TODO: Uncomment and add tests
-//function multisign(wallet: Wallet, tx: Transaction): string {
-//  return wallet.signTransaction(tx, { signAs: wallet.getClassicAddress() });
-//}
+/**
+ * Signs a transaction in praparation for a multisigned request. It does this using a wallet to
+ * cryptographically sign a transaction which proves the owner of the wallet is accepting this transaction.
+ *
+ * @param wallet - A Wallet that holds your cryptographic keys and address.
+ * @param tx - The Transaction being accepted.
+ * @returns A signed Transaction that is ready to be combined with others for multisigning.
+ */
+function multisign(wallet: Wallet, tx: Transaction): string {
+  return wallet.signTransaction(tx, { signAs: wallet.getClassicAddress() });
+}
 
 /**
  * Takes several transactions (in object or blob form) and creates a single transaction with all Signers
@@ -51,7 +58,9 @@ function sign(wallet: Wallet, tx: Transaction): string {
  */
 function combineMultisigned(transactions: Array<Transaction | string>): string {
   if (transactions.length === 0) {
-    throw new ValidationError("There were 0 transactions given to multisign");
+    throw new ValidationError(
+      "There were 0 transactions given to combineMultisign"
+    );
   }
 
   transactions.forEach((txOrBlob) => {
@@ -224,4 +233,4 @@ function getEncodedTransaction(txOrBlob: Transaction | string): string {
   return txOrBlob;
 }
 
-export { sign, authorizeChannel, verify, combineMultisigned };
+export { sign, multisign, authorizeChannel, verify, combineMultisigned };

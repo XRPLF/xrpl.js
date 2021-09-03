@@ -1,5 +1,6 @@
 import { assert } from "chai";
 import { decode } from "ripple-binary-codec";
+import { encode } from "../../ripple-binary-codec/dist";
 
 import { ValidationError } from "../../src/common/errors";
 import { Transaction } from "../../src/models/transactions";
@@ -77,6 +78,9 @@ const multisignTx2: Transaction = {
   TransactionType: "TrustSet",
 };
 
+const expectedCombineMultisigned =
+  "1200142200040000240000000263D5038D7EA4C680000000000000000000000000005553440000000000B5F762798A53D543A014CAF8B297CFF8F2F937E868400000000000753073008114A3780F5CB5A44D366520FC44055E8ED44D9A2270F3E010732102B3EC4E5DD96029A647CFA20DA07FE1F85296505552CCAC114087E66B46BD77DF744730450221009C195DBBF7967E223D8626CA19CF02073667F2B22E206727BFE848FF42BEAC8A022048C323B0BED19A988BDBEFA974B6DE8AA9DCAE250AA82BBD1221787032A864E58114204288D2E47F8EF6C99BCC457966320D12409711E1E0107321028FFB276505F9AC3F57E8D5242B386A597EF6C40A7999F37F1948636FD484E25B744630440220680BBD745004E9CFB6B13A137F505FB92298AD309071D16C7B982825188FD1AE022004200B1F7E4A6A84BB0E4FC09E1E3BA2B66EBD32F0E6D121A34BA3B04AD99BC181147908A7F0EDD48EA896C3580A399F0EE78611C8E3E1F1";
+
 describe("Signer tests", function () {
   it("sign transaction offline", function () {
     // Test case data generated using this tutorial - https://xrpl.org/send-xrp.html#send-xrp
@@ -101,16 +105,36 @@ describe("Signer tests", function () {
     assert.equal(signedTx, signedTxBlob);
   });
 
-  it("combineMultisigned runs successfully", function () {
+  it("multisign correctly signs a transaction", function () {
+    assert.fail("Not implemented yet");
+  });
+
+  it("combineMultisigned runs successfully with Transaction objects", function () {
     const transactions: Transaction[] = [multisignTx1, multisignTx2];
 
     // TODO: Compare this result to something else (Get the results of the existing combine for comparison)
-    combineMultisigned(transactions);
+    assert.equal(combineMultisigned(transactions), expectedCombineMultisigned);
+  });
+
+  it("combineMultisigned runs successfully with tx_blobs", function () {
+    const transactions: Transaction[] = [multisignTx1, multisignTx2];
+
+    const encodedTransactions: string[] = transactions.map(encode);
+
+    // TODO: Compare this result to something else (Get the results of the existing combine for comparison)
+    assert.equal(
+      combineMultisigned(encodedTransactions),
+      expectedCombineMultisigned
+    );
   });
 
   it("throws a validation error if trying to combineMultisigned with no transactions", function () {
     const transactions: Transaction[] = [];
     assert.throws(() => combineMultisigned(transactions), ValidationError);
+  });
+
+  it("Going from unsigned transaction to combinedMultisigned workflow succeeds", function () {
+    assert.fail("Not implemented yet");
   });
 
   it("authorizeChannel succeeds", function () {
