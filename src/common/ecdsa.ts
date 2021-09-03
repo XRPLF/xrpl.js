@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow -- No shadow here
 enum ECDSA {
   ed25519 = 'ed25519',
   secp256k1 = 'ecdsa-secp256k1',

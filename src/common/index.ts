@@ -3,6 +3,13 @@ import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import * as constants from './constants'
 import * as errors from './errors'
 
+/**
+ * If an address is an X-Address, converts it to a classic address.
+ *
+ * @param account - A classic address or X-address.
+ * @returns The account's classic address.
+ * @throws Error if the X-Address has an associated tag.
+ */
 export function ensureClassicAddress(account: string): string {
   if (isValidXAddress(account)) {
     const { classicAddress, tag } = xAddressToClassicAddress(account)

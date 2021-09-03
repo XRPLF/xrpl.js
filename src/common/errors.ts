@@ -1,22 +1,34 @@
+/* eslint-disable max-classes-per-file -- Errors can be defined in the same file */
 import { inspect } from 'util'
 
-class RippleError extends Error {
-  name: string
-  message: string
-  data?: any
+// TODO: replace all `new Error`s with `new XrplError`s
 
-  constructor(message = '', data?: any) {
+class XrplError extends Error {
+  public readonly name: string
+  public readonly message: string
+  public readonly data?: unknown
+
+  /**
+   * Construct an XrplError.
+   *
+   * @param message - The error message.
+   * @param data - The data that caused the error.
+   */
+  public constructor(message = '', data?: unknown) {
     super(message)
 
     this.name = this.constructor.name
     this.message = message
     this.data = data
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, this.constructor)
-    }
+    Error.captureStackTrace(this, this.constructor)
   }
 
-  toString() {
+  /**
+   * Converts the Error to a human-readable String form.
+   *
+   * @returns The String output of the Error.
+   */
+  public toString(): string {
     let result = `[${this.name}(${this.message}`
     if (this.data) {
       result += `, ${inspect(this.data)}`
@@ -25,21 +37,25 @@ class RippleError extends Error {
     return result
   }
 
-  // console.log in node uses util.inspect on object, and util.inspect allows
-  // us to customize its output:
-  // https://nodejs.org/api/util.html#util_custom_inspect_function_on_objects
-  inspect() {
+  /**
+   * Console.log in node uses util.inspect on object, and util.inspect allows
+   * us to customize its output:
+   * https://nodejs.org/api/util.html#util_custom_inspect_function_on_objects.
+   *
+   * @returns The String output of the Error.
+   */
+  public inspect(): string {
     return this.toString()
   }
 }
 
-class RippledError extends RippleError {}
+class RippledError extends XrplError {}
 
-class UnexpectedError extends RippleError {}
+class UnexpectedError extends XrplError {}
 
-class LedgerVersionError extends RippleError {}
+class LedgerVersionError extends XrplError {}
 
-class ConnectionError extends RippleError {}
+class ConnectionError extends XrplError {}
 
 class NotConnectedError extends ConnectionError {}
 
@@ -51,34 +67,23 @@ class TimeoutError extends ConnectionError {}
 
 class ResponseFormatError extends ConnectionError {}
 
-class ValidationError extends RippleError {}
+class ValidationError extends XrplError {}
 
-class XRPLFaucetError extends RippleError {}
+class XRPLFaucetError extends XrplError {}
 
-class NotFoundError extends RippleError {
-  constructor(message = 'Not found') {
+class NotFoundError extends XrplError {
+  /**
+   * Construct an XrplError.
+   *
+   * @param message - The error message. Defaults to "Not found".
+   */
+  public constructor(message = 'Not found') {
     super(message)
   }
 }
 
-class MissingLedgerHistoryError extends RippleError {
-  constructor(message?: string) {
-    super(message || 'Server is missing ledger history in the specified range')
-  }
-}
-
-class PendingLedgerVersionError extends RippleError {
-  constructor(message?: string) {
-    super(
-      message ||
-        "maxLedgerVersion is greater than server's most recent" +
-          ' validated ledger',
-    )
-  }
-}
-
 export {
-  RippleError,
+  XrplError,
   UnexpectedError,
   ConnectionError,
   RippledError,
@@ -89,8 +94,6 @@ export {
   ResponseFormatError,
   ValidationError,
   NotFoundError,
-  PendingLedgerVersionError,
-  MissingLedgerHistoryError,
   LedgerVersionError,
   XRPLFaucetError,
 }
