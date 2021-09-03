@@ -2,12 +2,13 @@ import * as assert from "assert";
 
 import _ from "lodash";
 
-import { Client, dropsToXrp } from "..";
-import { Connection } from "../client";
+import type { Client } from "..";
+import type { Connection } from "../client";
 import * as common from "../common";
 import { Issue } from "../common/types/objects";
 import { AccountInfoRequest } from "../models/methods";
 import { FormattedTransactionType } from "../transaction/types";
+import { dropsToXrp } from "../utils";
 
 export interface RecursiveData {
   marker: string;

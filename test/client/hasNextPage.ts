@@ -1,5 +1,6 @@
 import { assert } from "chai";
 
+import { Client } from "../../src";
 import rippled from "../fixtures/rippled";
 import setupClient from "../setupClient";
 
@@ -10,7 +11,7 @@ describe("client.hasNextPage", function () {
   it("returns true when there is another page", async function () {
     this.mockRippled.addResponse("ledger_data", rippled.ledger_data.first_page);
     const response = await this.client.request({ command: "ledger_data" });
-    assert(this.client.hasNextPage(response));
+    assert(Client.hasNextPage(response));
   });
 
   it("returns false when there are no more pages", async function () {
@@ -26,6 +27,6 @@ describe("client.hasNextPage", function () {
       { command: "ledger_data" },
       response
     );
-    assert(!this.client.hasNextPage(responseNextPage));
+    assert(!Client.hasNextPage(responseNextPage));
   });
 });

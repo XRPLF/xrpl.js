@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 
-import { Client } from "..";
+import type { Client } from "..";
 import { FormattedTrustlineSpecification } from "../common/types/objects/trustlines";
 
 import { Instructions, Prepare, TransactionJSON } from "./types";

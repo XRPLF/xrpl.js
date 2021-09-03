@@ -3,7 +3,7 @@ import _ from "lodash";
 import binaryCodec from "ripple-binary-codec";
 import keypairs from "ripple-keypairs";
 
-import { Client, Wallet } from "..";
+import type { Client, Wallet } from "..";
 import { SignedTransaction } from "../common/types/objects";
 import { xrpToDrops } from "../utils";
 import { computeBinaryTransactionHash } from "../utils/hashes";
@@ -206,7 +206,7 @@ function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
  */
 function checkFee(client: Client, txFee: string): void {
   const fee = new BigNumber(txFee);
-  const maxFeeDrops = xrpToDrops(client._maxFeeXRP);
+  const maxFeeDrops = xrpToDrops(client.maxFeeXRP);
   if (fee.isGreaterThan(maxFeeDrops)) {
     throw new utils.common.errors.ValidationError(
       `"Fee" should not exceed "${maxFeeDrops}". ` +

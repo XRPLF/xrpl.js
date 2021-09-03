@@ -1,4 +1,4 @@
-import { Client } from "..";
+import type { Client } from "..";
 import { ValidationError } from "../common/errors";
 import { Amount } from "../common/types/objects";
 import { toRippledAmount } from "../utils";

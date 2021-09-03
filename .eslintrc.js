@@ -38,12 +38,11 @@ module.exports = {
         format: ["snake_case"],
       },
     ],
-
     // Ignore type imports when counting dependencies.
     "import/max-dependencies": [
       "error",
       {
-        max: 5,
+        max: 10,
         ignoreTypeImports: true,
       },
     ],
@@ -64,6 +63,8 @@ module.exports = {
         skipComments: true,
       },
     ],
+    "max-statements": ["warn", 25],
+    "id-length": ["error", { exceptions: ["_"] }], // exception for lodash
   },
   overrides: [
     {

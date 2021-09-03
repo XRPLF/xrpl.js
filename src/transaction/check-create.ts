@@ -1,4 +1,4 @@
-import { Client } from "..";
+import type { Client } from "..";
 import { Amount } from "../common/types/objects";
 import { ISOTimeToRippleTime, toRippledAmount } from "../utils";
 

@@ -1,4 +1,4 @@
-import { Client } from "..";
+import type { Client } from "..";
 import { xrpToDrops } from "../utils";
 
 import { Instructions, Prepare, TransactionJSON } from "./types";
