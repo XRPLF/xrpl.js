@@ -1,46 +1,46 @@
-import _ from "lodash";
+import _ from 'lodash'
 
-import type { Client } from "..";
+import type { Client } from '..'
 
-import { Prepare, TransactionJSON, Instructions } from "./types";
-import * as utils from "./utils";
+import { Prepare, TransactionJSON, Instructions } from './types'
+import * as utils from './utils'
 
-const ValidationError = utils.common.errors.ValidationError;
+const ValidationError = utils.common.errors.ValidationError
 
 export interface Ticket {
-  account: string;
-  sequence: number;
+  account: string
+  sequence: number
 }
 
 function createTicketTransaction(
   account: string,
-  ticketCount: number
+  ticketCount: number,
 ): TransactionJSON {
   if (!ticketCount || ticketCount === 0) {
-    throw new ValidationError("Ticket count must be greater than 0.");
+    throw new ValidationError('Ticket count must be greater than 0.')
   }
 
   const txJSON: any = {
-    TransactionType: "TicketCreate",
+    TransactionType: 'TicketCreate',
     Account: account,
     TicketCount: ticketCount,
-  };
+  }
 
-  return txJSON;
+  return txJSON
 }
 
-function prepareTicketCreate(
+async function prepareTicketCreate(
   this: Client,
   address: string,
   ticketCount: number,
-  instructions: Instructions = {}
+  instructions: Instructions = {},
 ): Promise<Prepare> {
   try {
-    const txJSON = createTicketTransaction(address, ticketCount);
-    return utils.prepareTransaction(txJSON, this, instructions);
+    const txJSON = createTicketTransaction(address, ticketCount)
+    return await utils.prepareTransaction(txJSON, this, instructions)
   } catch (e) {
-    return Promise.reject(e);
+    return Promise.reject(e)
   }
 }
 
-export default prepareTicketCreate;
+export default prepareTicketCreate

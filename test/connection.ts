@@ -1,10 +1,10 @@
-import net from "net";
+import net from 'net'
 
-import { assert } from "chai";
-import _ from "lodash";
+import { assert } from 'chai'
+import _ from 'lodash'
 
-import { Client } from "xrpl-local";
-import { Connection } from "xrpl-local/client";
+import { Client } from 'xrpl-local'
+import { Connection } from 'xrpl-local/client'
 
 import {
   ConnectionError,
@@ -13,521 +13,518 @@ import {
   ResponseFormatError,
   RippleError,
   TimeoutError,
-} from "../src/common/errors";
+} from '../src/common/errors'
 
-import rippled from "./fixtures/rippled";
-import setupClient from "./setupClient";
-import { ignoreWebSocketDisconnect } from "./testUtils";
+import rippled from './fixtures/rippled'
+import setupClient from './setupClient'
+import { ignoreWebSocketDisconnect } from './testUtils'
 
-const TIMEOUT = 200000; // how long before each test case times out
-const isBrowser = (process as any).browser;
+const TIMEOUT = 200000 // how long before each test case times out
+const isBrowser = (process as any).browser
 
-function createServer() {
+async function createServer() {
   return new Promise((resolve, reject) => {
-    const server = net.createServer();
-    server.on("listening", function () {
-      resolve(server);
-    });
-    server.on("error", function (error) {
-      reject(error);
-    });
-    server.listen(0, "0.0.0.0");
-  });
+    const server = net.createServer()
+    server.on('listening', function () {
+      resolve(server)
+    })
+    server.on('error', function (error) {
+      reject(error)
+    })
+    server.listen(0, '0.0.0.0')
+  })
 }
 
-describe("Connection", function () {
-  this.timeout(TIMEOUT);
-  beforeEach(setupClient.setup);
-  afterEach(setupClient.teardown);
+describe('Connection', function () {
+  this.timeout(TIMEOUT)
+  beforeEach(setupClient.setup)
+  afterEach(setupClient.teardown)
 
-  it("default options", function () {
-    const connection: any = new Connection("url");
-    assert.strictEqual(connection.url, "url");
-    assert(connection.config.proxy == null);
-    assert(connection.config.authorization == null);
-  });
+  it('default options', function () {
+    const connection: any = new Connection('url')
+    assert.strictEqual(connection.url, 'url')
+    assert(connection.config.proxy == null)
+    assert(connection.config.authorization == null)
+  })
 
-  describe("trace", function () {
-    const mockedRequestData = { mocked: "request" };
-    const mockedResponse = JSON.stringify({ mocked: "response", id: 0 });
+  describe('trace', function () {
+    const mockedRequestData = { mocked: 'request' }
+    const mockedResponse = JSON.stringify({ mocked: 'response', id: 0 })
     const expectedMessages = [
       // We add the ID here, since it's not a part of the user-provided request.
-      ["send", JSON.stringify({ ...mockedRequestData, id: 0 })],
-      ["receive", mockedResponse],
-    ];
-    const originalConsoleLog = console.log;
+      ['send', JSON.stringify({ ...mockedRequestData, id: 0 })],
+      ['receive', mockedResponse],
+    ]
+    const originalConsoleLog = console.log
 
     afterEach(function () {
-      console.log = originalConsoleLog;
-    });
+      console.log = originalConsoleLog
+    })
 
-    it("as false", function () {
-      const messages: any[] = [];
-      console.log = (id, message) => messages.push([id, message]);
-      const connection: any = new Connection("url", { trace: false });
-      connection.ws = { send() {} };
-      connection.request(mockedRequestData);
-      connection.onMessage(mockedResponse);
-      assert.deepEqual(messages, []);
-    });
+    it('as false', function () {
+      const messages: any[] = []
+      console.log = (id, message) => messages.push([id, message])
+      const connection: any = new Connection('url', { trace: false })
+      connection.ws = { send() {} }
+      connection.request(mockedRequestData)
+      connection.onMessage(mockedResponse)
+      assert.deepEqual(messages, [])
+    })
 
-    it("as true", function () {
-      const messages: any[] = [];
-      console.log = (id, message) => messages.push([id, message]);
-      const connection: any = new Connection("url", { trace: true });
-      connection.ws = { send() {} };
-      connection.request(mockedRequestData);
-      connection.onMessage(mockedResponse);
-      assert.deepEqual(messages, expectedMessages);
-    });
+    it('as true', function () {
+      const messages: any[] = []
+      console.log = (id, message) => messages.push([id, message])
+      const connection: any = new Connection('url', { trace: true })
+      connection.ws = { send() {} }
+      connection.request(mockedRequestData)
+      connection.onMessage(mockedResponse)
+      assert.deepEqual(messages, expectedMessages)
+    })
 
-    it("as a function", function () {
-      const messages: any[] = [];
-      const connection: any = new Connection("url", {
+    it('as a function', function () {
+      const messages: any[] = []
+      const connection: any = new Connection('url', {
         trace: (id, message) => messages.push([id, message]),
-      });
-      connection.ws = { send() {} };
-      connection.request(mockedRequestData);
-      connection.onMessage(mockedResponse);
-      assert.deepEqual(messages, expectedMessages);
-    });
-  });
+      })
+      connection.ws = { send() {} }
+      connection.request(mockedRequestData)
+      connection.onMessage(mockedResponse)
+      assert.deepEqual(messages, expectedMessages)
+    })
+  })
 
-  it("with proxy", function (done) {
+  it('with proxy', function (done) {
     if (isBrowser) {
-      done();
-      return;
+      done()
+      return
     }
     createServer().then((server: any) => {
-      const port = server.address().port;
-      const expect = "CONNECT localhost";
-      server.on("connection", (socket) => {
-        socket.on("data", (data) => {
-          const got = data.toString("ascii", 0, expect.length);
-          assert.strictEqual(got, expect);
-          server.close();
-          connection.disconnect();
-          done();
-        });
-      });
+      const port = server.address().port
+      const expect = 'CONNECT localhost'
+      server.on('connection', (socket) => {
+        socket.on('data', (data) => {
+          const got = data.toString('ascii', 0, expect.length)
+          assert.strictEqual(got, expect)
+          server.close()
+          connection.disconnect()
+          done()
+        })
+      })
 
       const options = {
         proxy: `ws://localhost:${port}`,
-        authorization: "authorization",
-        trustedCertificates: ["path/to/pem"],
-      };
-      const connection = new Connection(this.client.connection.url, options);
+        authorization: 'authorization',
+        trustedCertificates: ['path/to/pem'],
+      }
+      const connection = new Connection(this.client.connection.url, options)
       connection.connect().catch((err) => {
-        assert(err instanceof NotConnectedError);
-      });
-    }, done);
-  });
+        assert(err instanceof NotConnectedError)
+      })
+    }, done)
+  })
 
-  it("Multiply disconnect calls", function () {
-    this.client.disconnect();
-    return this.client.disconnect();
-  });
+  it('Multiply disconnect calls', function () {
+    this.client.disconnect()
+    return this.client.disconnect()
+  })
 
-  it("reconnect", function () {
-    return this.client.connection.reconnect();
-  });
+  it('reconnect', function () {
+    return this.client.connection.reconnect()
+  })
 
-  it("NotConnectedError", function () {
-    const connection = new Connection("url");
+  it('NotConnectedError', async function () {
+    const connection = new Connection('url')
     return connection
       .request({
-        command: "ledger",
-        ledger_index: "validated",
+        command: 'ledger',
+        ledger_index: 'validated',
       })
       .then(() => {
-        assert.fail("Should throw NotConnectedError");
+        assert.fail('Should throw NotConnectedError')
       })
       .catch((error) => {
-        assert(error instanceof NotConnectedError);
-      });
-  });
+        assert(error instanceof NotConnectedError)
+      })
+  })
 
-  it("should throw NotConnectedError if server not responding ", function (done) {
+  it('should throw NotConnectedError if server not responding ', function (done) {
     if (isBrowser) {
-      if (navigator.userAgent.includes("PhantomJS")) {
+      if (navigator.userAgent.includes('PhantomJS')) {
         // inside PhantomJS this one just hangs, so skip as not very relevant
-        done();
-        return;
+        done()
+        return
       }
     }
 
     // Address where no one listens
-    const connection = new Connection("ws://testripple.circleci.com:129");
-    connection.on("error", done);
+    const connection = new Connection('ws://testripple.circleci.com:129')
+    connection.on('error', done)
     connection.connect().catch((error) => {
-      assert(error instanceof NotConnectedError);
-      done();
-    });
-  });
+      assert(error instanceof NotConnectedError)
+      done()
+    })
+  })
 
-  it("DisconnectedError", async function () {
+  it('DisconnectedError', async function () {
     return this.client
-      .request({ command: "test_command", data: { closeServer: true } })
+      .request({ command: 'test_command', data: { closeServer: true } })
       .then(() => {
-        assert.fail("Should throw DisconnectedError");
+        assert.fail('Should throw DisconnectedError')
       })
       .catch((error) => {
-        assert(error instanceof DisconnectedError);
-      });
-  });
+        assert(error instanceof DisconnectedError)
+      })
+  })
 
-  it("TimeoutError", function () {
+  it('TimeoutError', function () {
     this.client.connection.ws.send = function (_, callback) {
-      callback(null);
-    };
-    const request = { command: "server_info" };
+      callback(null)
+    }
+    const request = { command: 'server_info' }
     return this.client.connection
       .request(request, 10)
       .then(() => {
-        assert.fail("Should throw TimeoutError");
+        assert.fail('Should throw TimeoutError')
       })
       .catch((error) => {
-        assert(error instanceof TimeoutError);
-      });
-  });
+        assert(error instanceof TimeoutError)
+      })
+  })
 
-  it("DisconnectedError on send", function () {
+  it('DisconnectedError on send', function () {
     this.client.connection.ws.send = function (_, callback) {
-      callback({ message: "not connected" });
-    };
+      callback({ message: 'not connected' })
+    }
     return this.client
-      .request({ command: "server_info" })
+      .request({ command: 'server_info' })
       .then(() => {
-        assert.fail("Should throw DisconnectedError");
+        assert.fail('Should throw DisconnectedError')
       })
       .catch((error) => {
-        assert(error instanceof DisconnectedError);
-        assert.strictEqual(error.message, "not connected");
-      });
-  });
+        assert(error instanceof DisconnectedError)
+        assert.strictEqual(error.message, 'not connected')
+      })
+  })
 
-  it("DisconnectedError on initial onOpen send", async function () {
+  it('DisconnectedError on initial onOpen send', async function () {
     // _onOpen previously could throw PromiseRejectionHandledWarning: Promise rejection was handled asynchronously
     // do not rely on the client.setup hook to test this as it bypasses the case, disconnect client connection first
-    await this.client.disconnect();
+    await this.client.disconnect()
 
     // stub _onOpen to only run logic relevant to test case
     this.client.connection.onOpen = () => {
       // overload websocket send on open when _ws exists
       this.client.connection.ws.send = function (_0, _1, _2) {
         // recent ws throws this error instead of calling back
-        throw new Error("WebSocket is not open: readyState 0 (CONNECTING)");
-      };
-      const request = { command: "subscribe", streams: ["ledger"] };
-      return this.client.connection.request(request);
-    };
+        throw new Error('WebSocket is not open: readyState 0 (CONNECTING)')
+      }
+      const request = { command: 'subscribe', streams: ['ledger'] }
+      return this.client.connection.request(request)
+    }
 
     try {
-      await this.client.connect();
+      await this.client.connect()
     } catch (error) {
-      console.log(error);
-      assert.instanceOf(error, DisconnectedError);
+      console.log(error)
+      assert.instanceOf(error, DisconnectedError)
       assert.strictEqual(
         error.message,
-        "WebSocket is not open: readyState 0 (CONNECTING)"
-      );
+        'WebSocket is not open: readyState 0 (CONNECTING)',
+      )
     }
-  });
+  })
 
-  it("ResponseFormatError", function () {
+  it('ResponseFormatError', function () {
     return this.client
       .request({
-        command: "test_command",
+        command: 'test_command',
         data: { unrecognizedResponse: true },
       })
       .then(() => {
-        assert.fail("Should throw ResponseFormatError");
+        assert.fail('Should throw ResponseFormatError')
       })
       .catch((error) => {
-        assert(error instanceof ResponseFormatError);
-      });
-  });
+        assert(error instanceof ResponseFormatError)
+      })
+  })
 
-  it("reconnect on unexpected close", function (done) {
-    this.client.connection.on("connected", () => {
-      done();
-    });
+  it('reconnect on unexpected close', function (done) {
+    this.client.connection.on('connected', () => {
+      done()
+    })
     setTimeout(() => {
-      this.client.connection.ws.close();
-    }, 1);
-  });
+      this.client.connection.ws.close()
+    }, 1)
+  })
 
-  describe("reconnection test", function () {
-    it("reconnect on several unexpected close", function (done) {
+  describe('reconnection test', function () {
+    it('reconnect on several unexpected close', function (done) {
       if (isBrowser) {
-        if (navigator.userAgent.includes("PhantomJS")) {
+        if (navigator.userAgent.includes('PhantomJS')) {
           // inside PhantomJS this one just hangs, so skip as not very relevant
-          done();
-          return;
+          done()
+          return
         }
       }
-      this.timeout(70001);
-      const self = this;
+      this.timeout(70001)
+      const self = this
       function breakConnection() {
         self.client.connection
           .request({
-            command: "test_command",
+            command: 'test_command',
             data: { disconnectIn: 10 },
           })
-          .catch(ignoreWebSocketDisconnect);
+          .catch(ignoreWebSocketDisconnect)
       }
 
-      let connectsCount = 0;
-      let disconnectsCount = 0;
-      let reconnectsCount = 0;
-      let code = 0;
-      this.client.connection.on("reconnecting", () => {
-        reconnectsCount += 1;
-      });
-      this.client.connection.on("disconnected", (_code) => {
-        code = _code;
-        disconnectsCount += 1;
-      });
-      const num = 3;
-      this.client.connection.on("connected", () => {
-        connectsCount += 1;
+      let connectsCount = 0
+      let disconnectsCount = 0
+      let reconnectsCount = 0
+      let code = 0
+      this.client.connection.on('reconnecting', () => {
+        reconnectsCount += 1
+      })
+      this.client.connection.on('disconnected', (_code) => {
+        code = _code
+        disconnectsCount += 1
+      })
+      const num = 3
+      this.client.connection.on('connected', () => {
+        connectsCount += 1
         if (connectsCount < num) {
-          breakConnection();
+          breakConnection()
         }
         if (connectsCount === num) {
           if (disconnectsCount !== num) {
             done(
               new Error(
-                `disconnectsCount must be equal to ${num}(got ${disconnectsCount} instead)`
-              )
-            );
+                `disconnectsCount must be equal to ${num}(got ${disconnectsCount} instead)`,
+              ),
+            )
           } else if (reconnectsCount !== num) {
             done(
               new Error(
-                `reconnectsCount must be equal to ${num} (got ${reconnectsCount} instead)`
-              )
-            );
+                `reconnectsCount must be equal to ${num} (got ${reconnectsCount} instead)`,
+              ),
+            )
           } else if (code !== 1006) {
             done(
-              new Error(`disconnect must send code 1006 (got ${code} instead)`)
-            );
+              new Error(`disconnect must send code 1006 (got ${code} instead)`),
+            )
           } else {
-            done();
+            done()
           }
         }
-      });
+      })
 
-      breakConnection();
-    });
-  });
+      breakConnection()
+    })
+  })
 
-  it("reconnect event on heartbeat failure", function (done) {
+  it('reconnect event on heartbeat failure', function (done) {
     if (isBrowser) {
-      if (navigator.userAgent.includes("PhantomJS")) {
+      if (navigator.userAgent.includes('PhantomJS')) {
         // inside PhantomJS this one just hangs, so skip as not very relevant
-        done();
-        return;
+        done()
+        return
       }
     }
     // Set the heartbeat to less than the 1 second ping response
-    this.client.connection.config.timeout = 500;
+    this.client.connection.config.timeout = 500
     // Drop the test runner timeout, since this should be a quick test
-    this.timeout(5000);
+    this.timeout(5000)
     // Hook up a listener for the reconnect event
-    this.client.connection.on("reconnect", () => done());
+    this.client.connection.on('reconnect', () => done())
     // Trigger a heartbeat
     this.client.connection.heartbeat().catch((error) => {
       /* ignore - test expects heartbeat failure */
-    });
-  });
+    })
+  })
 
-  it("heartbeat failure and reconnect failure", function (done) {
+  it('heartbeat failure and reconnect failure', function (done) {
     if (isBrowser) {
-      if (navigator.userAgent.includes("PhantomJS")) {
+      if (navigator.userAgent.includes('PhantomJS')) {
         // inside PhantomJS this one just hangs, so skip as not very relevant
-        done();
-        return;
+        done()
+        return
       }
     }
     // Set the heartbeat to less than the 1 second ping response
-    this.client.connection.config.timeout = 500;
+    this.client.connection.config.timeout = 500
     // Drop the test runner timeout, since this should be a quick test
-    this.timeout(5000);
+    this.timeout(5000)
     // fail on reconnect/connection
     this.client.connection.reconnect = async () => {
-      throw new Error("error on reconnect");
-    };
+      throw new Error('error on reconnect')
+    }
     // Hook up a listener for the reconnect error event
-    this.client.on("error", (error, message) => {
-      if (error === "reconnect" && message === "error on reconnect") {
-        return done();
+    this.client.on('error', (error, message) => {
+      if (error === 'reconnect' && message === 'error on reconnect') {
+        return done()
       }
-      return done(new Error("Expected error on reconnect"));
-    });
+      return done(new Error('Expected error on reconnect'))
+    })
     // Trigger a heartbeat
-    this.client.connection.heartbeat();
-  });
+    this.client.connection.heartbeat()
+  })
 
-  it("should emit disconnected event with code 1000 (CLOSE_NORMAL)", function (done) {
-    this.client.once("disconnected", (code) => {
-      assert.strictEqual(code, 1000);
-      done();
-    });
-    this.client.disconnect();
-  });
+  it('should emit disconnected event with code 1000 (CLOSE_NORMAL)', function (done) {
+    this.client.once('disconnected', (code) => {
+      assert.strictEqual(code, 1000)
+      done()
+    })
+    this.client.disconnect()
+  })
 
-  it("should emit disconnected event with code 1006 (CLOSE_ABNORMAL)", function (done) {
-    this.client.connection.once("error", (error) => {
-      done(new Error(`should not throw error, got ${String(error)}`));
-    });
-    this.client.connection.once("disconnected", (code) => {
-      assert.strictEqual(code, 1006);
-      done();
-    });
+  it('should emit disconnected event with code 1006 (CLOSE_ABNORMAL)', function (done) {
+    this.client.connection.once('error', (error) => {
+      done(new Error(`should not throw error, got ${String(error)}`))
+    })
+    this.client.connection.once('disconnected', (code) => {
+      assert.strictEqual(code, 1006)
+      done()
+    })
     this.client.connection
       .request({
-        command: "test_command",
+        command: 'test_command',
         data: { disconnectIn: 10 },
       })
-      .catch(ignoreWebSocketDisconnect);
-  });
+      .catch(ignoreWebSocketDisconnect)
+  })
 
-  it("should emit connected event on after reconnect", function (done) {
-    this.client.once("connected", done);
-    this.client.connection.ws.close();
-  });
+  it('should emit connected event on after reconnect', function (done) {
+    this.client.once('connected', done)
+    this.client.connection.ws.close()
+  })
 
-  it("Multiply connect calls", function () {
+  it('Multiply connect calls', function () {
     return this.client.connect().then(() => {
-      return this.client.connect();
-    });
-  });
+      return this.client.connect()
+    })
+  })
 
-  it("Cannot connect because no server", function () {
-    const connection = new Connection(undefined as unknown as string);
+  it('Cannot connect because no server', async function () {
+    const connection = new Connection(undefined as unknown as string)
     return connection
       .connect()
       .then(() => {
-        assert.fail("Should throw ConnectionError");
+        assert.fail('Should throw ConnectionError')
       })
       .catch((error) => {
-        assert(
-          error instanceof ConnectionError,
-          "Should throw ConnectionError"
-        );
-      });
-  });
+        assert(error instanceof ConnectionError, 'Should throw ConnectionError')
+      })
+  })
 
-  it("connect multiserver error", function () {
+  it('connect multiserver error', function () {
     assert.throws(function () {
       new Client({
-        servers: ["wss://server1.com", "wss://server2.com"],
-      } as any);
-    }, RippleError);
-  });
+        servers: ['wss://server1.com', 'wss://server2.com'],
+      } as any)
+    }, RippleError)
+  })
 
-  it("connect throws error", function (done) {
-    this.client.once("error", (type, info) => {
-      assert.strictEqual(type, "type");
-      assert.strictEqual(info, "info");
-      done();
-    });
-    this.client.connection.emit("error", "type", "info");
-  });
+  it('connect throws error', function (done) {
+    this.client.once('error', (type, info) => {
+      assert.strictEqual(type, 'type')
+      assert.strictEqual(info, 'info')
+      done()
+    })
+    this.client.connection.emit('error', 'type', 'info')
+  })
 
-  it("emit stream messages", function (done) {
-    let transactionCount = 0;
-    let pathFindCount = 0;
-    this.client.connection.on("transaction", () => {
-      transactionCount++;
-    });
-    this.client.connection.on("path_find", () => {
-      pathFindCount++;
-    });
-    this.client.connection.on("response", (message) => {
-      assert.strictEqual(message.id, 1);
-      assert.strictEqual(transactionCount, 1);
-      assert.strictEqual(pathFindCount, 1);
-      done();
-    });
+  it('emit stream messages', function (done) {
+    let transactionCount = 0
+    let pathFindCount = 0
+    this.client.connection.on('transaction', () => {
+      transactionCount++
+    })
+    this.client.connection.on('path_find', () => {
+      pathFindCount++
+    })
+    this.client.connection.on('response', (message) => {
+      assert.strictEqual(message.id, 1)
+      assert.strictEqual(transactionCount, 1)
+      assert.strictEqual(pathFindCount, 1)
+      done()
+    })
 
     this.client.connection.onMessage(
       JSON.stringify({
-        type: "transaction",
-      })
-    );
+        type: 'transaction',
+      }),
+    )
     this.client.connection.onMessage(
       JSON.stringify({
-        type: "path_find",
-      })
-    );
+        type: 'path_find',
+      }),
+    )
     this.client.connection.onMessage(
       JSON.stringify({
-        type: "response",
+        type: 'response',
         id: 1,
-      })
-    );
-  });
+      }),
+    )
+  })
 
-  it("invalid message id", function (done) {
-    this.client.on("error", (errorCode, errorMessage, message) => {
-      assert.strictEqual(errorCode, "badMessage");
-      assert.strictEqual(errorMessage, "valid id not found in response");
-      assert.strictEqual(message, '{"type":"response","id":"must be integer"}');
-      done();
-    });
+  it('invalid message id', function (done) {
+    this.client.on('error', (errorCode, errorMessage, message) => {
+      assert.strictEqual(errorCode, 'badMessage')
+      assert.strictEqual(errorMessage, 'valid id not found in response')
+      assert.strictEqual(message, '{"type":"response","id":"must be integer"}')
+      done()
+    })
     this.client.connection.onMessage(
       JSON.stringify({
-        type: "response",
-        id: "must be integer",
-      })
-    );
-  });
+        type: 'response',
+        id: 'must be integer',
+      }),
+    )
+  })
 
-  it("propagates error message", function (done) {
-    this.client.on("error", (errorCode, errorMessage, data) => {
-      assert.strictEqual(errorCode, "slowDown");
-      assert.strictEqual(errorMessage, "slow down");
-      assert.deepEqual(data, { error: "slowDown", error_message: "slow down" });
-      done();
-    });
+  it('propagates error message', function (done) {
+    this.client.on('error', (errorCode, errorMessage, data) => {
+      assert.strictEqual(errorCode, 'slowDown')
+      assert.strictEqual(errorMessage, 'slow down')
+      assert.deepEqual(data, { error: 'slowDown', error_message: 'slow down' })
+      done()
+    })
     this.client.connection.onMessage(
       JSON.stringify({
-        error: "slowDown",
-        error_message: "slow down",
-      })
-    );
-  });
+        error: 'slowDown',
+        error_message: 'slow down',
+      }),
+    )
+  })
 
-  it("propagates RippledError data", function (done) {
-    const request = { command: "subscribe", streams: "validations" };
-    this.mockRippled.addResponse(request.command, rippled.subscribe.error);
+  it('propagates RippledError data', function (done) {
+    const request = { command: 'subscribe', streams: 'validations' }
+    this.mockRippled.addResponse(request.command, rippled.subscribe.error)
 
     this.client.request(request).catch((error) => {
-      assert.strictEqual(error.name, "RippledError");
-      assert.strictEqual(error.data.error, "invalidParams");
-      assert.strictEqual(error.message, "Invalid parameters.");
-      assert.strictEqual(error.data.error_code, 31);
-      assert.strictEqual(error.data.error_message, "Invalid parameters.");
+      assert.strictEqual(error.name, 'RippledError')
+      assert.strictEqual(error.data.error, 'invalidParams')
+      assert.strictEqual(error.message, 'Invalid parameters.')
+      assert.strictEqual(error.data.error_code, 31)
+      assert.strictEqual(error.data.error_message, 'Invalid parameters.')
       assert.deepEqual(error.data.request, {
-        command: "subscribe",
+        command: 'subscribe',
         id: 0,
-        streams: "validations",
-      });
-      done();
-    });
-  });
+        streams: 'validations',
+      })
+      done()
+    })
+  })
 
-  it("unrecognized message type", function (done) {
+  it('unrecognized message type', function (done) {
     // This enables us to automatically support any
     // new messages added by rippled in the future.
-    this.client.connection.on("unknown", (event) => {
-      assert.deepEqual(event, { type: "unknown" });
-      done();
-    });
+    this.client.connection.on('unknown', (event) => {
+      assert.deepEqual(event, { type: 'unknown' })
+      done()
+    })
 
-    this.client.connection.onMessage(JSON.stringify({ type: "unknown" }));
-  });
+    this.client.connection.onMessage(JSON.stringify({ type: 'unknown' }))
+  })
 
   // it('should clean up websocket connection if error after websocket is opened', async function () {
   //   await this.client.disconnect()
@@ -547,35 +544,35 @@ describe("Connection", function () {
   //   }
   // })
 
-  it("should try to reconnect on empty subscribe response on reconnect", function (done) {
-    this.timeout(23000);
-    this.client.on("error", (error) => {
-      done(error || new Error("Should not emit error."));
-    });
-    let disconnectedCount = 0;
-    this.client.on("connected", () => {
+  it('should try to reconnect on empty subscribe response on reconnect', function (done) {
+    this.timeout(23000)
+    this.client.on('error', (error) => {
+      done(error || new Error('Should not emit error.'))
+    })
+    let disconnectedCount = 0
+    this.client.on('connected', () => {
       done(
         disconnectedCount !== 1
-          ? new Error("Wrong number of disconnects")
-          : undefined
-      );
-    });
-    this.client.on("disconnected", () => {
-      disconnectedCount++;
-    });
+          ? new Error('Wrong number of disconnects')
+          : undefined,
+      )
+    })
+    this.client.on('disconnected', () => {
+      disconnectedCount++
+    })
     this.client.connection.request({
-      command: "test_command",
+      command: 'test_command',
       data: { disconnectIn: 5 },
-    });
-  });
+    })
+  })
 
-  it("should not crash on error", async function (done) {
-    this.mockRippled.suppressOutput = true;
+  it('should not crash on error', async function (done) {
+    this.mockRippled.suppressOutput = true
     this.client.connection
       .request({
-        command: "test_garbage",
+        command: 'test_garbage',
       })
-      .then(() => new Error("Should not have succeeded"))
-      .catch(done());
-  });
-});
+      .then(() => new Error('Should not have succeeded'))
+      .catch(done())
+  })
+})

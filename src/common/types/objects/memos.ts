@@ -1,5 +1,5 @@
 export interface Memo {
-  type?: string;
-  format?: string;
-  data?: string;
+  type?: string
+  format?: string
+  data?: string
 }

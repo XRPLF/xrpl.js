@@ -19,9 +19,9 @@ import {
  */
 export function onlyHasFields(
   obj: Record<string, unknown>,
-  fields: string[]
+  fields: string[],
 ): boolean {
-  return Object.keys(obj).every((key: string) => fields.includes(key));
+  return Object.keys(obj).every((key: string) => fields.includes(key))
 }
 
 /**
@@ -33,7 +33,7 @@ export function onlyHasFields(
  */
 export function isFlagEnabled(Flags: number, checkFlag: number): boolean {
   // eslint-disable-next-line no-bitwise -- Flags require bitwise operations
-  return (checkFlag & Flags) === checkFlag;
+  return (checkFlag & Flags) === checkFlag
 }
 
 /**

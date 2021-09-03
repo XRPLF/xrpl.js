@@ -32,6 +32,7 @@ describe("Models Utils", function () {
     });
 
     it("verifies a flag is enabled", function () {
+      // eslint-disable-next-line no-bitwise -- expected use of bitwise
       flags |= flag1 | flag2;
       assert.isTrue(isFlagEnabled(flags, flag1));
     });
@@ -65,6 +66,7 @@ describe("Models Utils", function () {
       };
 
       const { tfPassive, tfFillOrKill } = OfferCreateFlagsEnum;
+      // eslint-disable-next-line no-bitwise -- expected use of bitwise
       const expected: number = tfPassive | tfFillOrKill;
 
       setTransactionFlagsToNumber(tx);
@@ -104,6 +106,7 @@ describe("Models Utils", function () {
       };
 
       const { tfPartialPayment, tfLimitQuality } = PaymentTransactionFlagsEnum;
+      // eslint-disable-next-line no-bitwise -- expected use of bitwise
       const expected: number = tfPartialPayment | tfLimitQuality;
 
       setTransactionFlagsToNumber(tx);
@@ -131,6 +134,7 @@ describe("Models Utils", function () {
       };
 
       const { tfSetfAuth, tfClearNoRipple, tfClearFreeze } = TrustSetFlagsEnum;
+      // eslint-disable-next-line no-bitwise -- expected use of bitwise
       const expected: number = tfSetfAuth | tfClearNoRipple | tfClearFreeze;
 
       setTransactionFlagsToNumber(tx);

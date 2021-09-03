@@ -1,7 +1,7 @@
 /* eslint-disable complexity -- Necessary for verifyPaymentChannelClaim */
-import { ValidationError } from "../../common/errors";
+import { ValidationError } from '../../common/errors'
 
-import { BaseTransaction, GlobalFlags, verifyBaseTransaction } from "./common";
+import { BaseTransaction, GlobalFlags, verifyBaseTransaction } from './common'
 
 export enum PaymentChannelClaimFlagsEnum {
   tfRenew = 0x00010000,
@@ -9,18 +9,18 @@ export enum PaymentChannelClaimFlagsEnum {
 }
 
 export interface PaymentChannelClaimFlags extends GlobalFlags {
-  tfRenew?: boolean;
-  tfClose?: boolean;
+  tfRenew?: boolean
+  tfClose?: boolean
 }
 
 export interface PaymentChannelClaim extends BaseTransaction {
-  TransactionType: "PaymentChannelClaim";
-  Flags?: number | PaymentChannelClaimFlags;
-  Channel: string;
-  Balance?: string;
-  Amount?: string;
-  Signature?: string;
-  PublicKey?: string;
+  TransactionType: 'PaymentChannelClaim'
+  Flags?: number | PaymentChannelClaimFlags
+  Channel: string
+  Balance?: string
+  Amount?: string
+  Signature?: string
+  PublicKey?: string
 }
 
 /**
@@ -30,33 +30,29 @@ export interface PaymentChannelClaim extends BaseTransaction {
  * @throws When the PaymentChannelClaim is Malformed.
  */
 export function verifyPaymentChannelClaim(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx);
+  verifyBaseTransaction(tx)
 
   if (tx.Channel === undefined) {
-    throw new ValidationError("PaymentChannelClaim: missing Channel");
+    throw new ValidationError('PaymentChannelClaim: missing Channel')
   }
 
-  if (typeof tx.Channel !== "string") {
-    throw new ValidationError("PaymentChannelClaim: Channel must be a string");
+  if (typeof tx.Channel !== 'string') {
+    throw new ValidationError('PaymentChannelClaim: Channel must be a string')
   }
 
-  if (tx.Balance !== undefined && typeof tx.Balance !== "string") {
-    throw new ValidationError("PaymentChannelClaim: Balance must be a string");
+  if (tx.Balance !== undefined && typeof tx.Balance !== 'string') {
+    throw new ValidationError('PaymentChannelClaim: Balance must be a string')
   }
 
-  if (tx.Amount !== undefined && typeof tx.Amount !== "string") {
-    throw new ValidationError("PaymentChannelClaim: Amount must be a string");
+  if (tx.Amount !== undefined && typeof tx.Amount !== 'string') {
+    throw new ValidationError('PaymentChannelClaim: Amount must be a string')
   }
 
-  if (tx.Signature !== undefined && typeof tx.Signature !== "string") {
-    throw new ValidationError(
-      "PaymentChannelClaim: Signature must be a string"
-    );
+  if (tx.Signature !== undefined && typeof tx.Signature !== 'string') {
+    throw new ValidationError('PaymentChannelClaim: Signature must be a string')
   }
 
-  if (tx.PublicKey !== undefined && typeof tx.PublicKey !== "string") {
-    throw new ValidationError(
-      "PaymentChannelClaim: PublicKey must be a string"
-    );
+  if (tx.PublicKey !== undefined && typeof tx.PublicKey !== 'string') {
+    throw new ValidationError('PaymentChannelClaim: PublicKey must be a string')
   }
 }
