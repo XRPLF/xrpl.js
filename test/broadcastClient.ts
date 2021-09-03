@@ -6,24 +6,9 @@ import { ServerInfoResponse } from '../src'
 import responses from './fixtures/responses'
 import rippled from './fixtures/rippled'
 import { setupBroadcast, teardownClient } from './setupClient'
-import { ignoreWebSocketDisconnect } from './testUtils'
+import { assertResultMatch, ignoreWebSocketDisconnect } from './testUtils'
 
 const TIMEOUT = 20000
-
-async function checkResult(
-  expected: Record<string, unknown>,
-  response: Record<string, unknown>,
-): Promise<Record<string, unknown>> {
-  if (expected.txJSON) {
-    assert(response.txJSON)
-    assert.deepEqual(
-      JSON.parse(response.txJSON as string),
-      JSON.parse(expected.txJSON as string),
-    )
-  }
-  assert.deepEqual(_.omit(response, 'txJSON'), _.omit(expected, 'txJSON'))
-  return response
-}
 
 describe('BroadcastClient', function () {
   this.timeout(TIMEOUT)
@@ -37,8 +22,8 @@ describe('BroadcastClient', function () {
     assert(this.client.isConnected())
     this.client
       .request({ command: 'server_info' })
-      .then(async (response: ServerInfoResponse) => {
-        checkResult(responses.getServerInfo, response.result.info)
+      .then((response: ServerInfoResponse) => {
+        assertResultMatch(responses.getServerInfo, response.result.info)
       })
   })
 
