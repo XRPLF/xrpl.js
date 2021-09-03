@@ -17,6 +17,7 @@ import {
   decodeXAddress,
 } from "ripple-address-codec";
 
+import { bind } from "..";
 import { constants, errors, txFlags, ensureClassicAddress } from "../common";
 import { ValidationError } from "../common/errors";
 import { getFee } from "../common/fee";
@@ -96,7 +97,6 @@ import {
   RandomRequest,
   RandomResponse,
 } from "../models/methods";
-import { Transaction } from "../models/transactions";
 import prepareCheckCancel from "../transaction/check-cancel";
 import prepareCheckCash from "../transaction/check-cash";
 import prepareCheckCreate from "../transaction/check-create";
@@ -182,6 +182,9 @@ class Client extends EventEmitter {
   // New in > 0.21.0
   // non-validated ledger versions are allowed, and passed to rippled as-is.
   connection: Connection;
+
+  // eslint-disable-next-line @typescript-eslint/no-invalid-this -- this is expected
+  public autofill = bind(autofill, this);
 
   constructor(server: string, options: ClientOptions = {}) {
     super();
@@ -338,17 +341,6 @@ class Client extends EventEmitter {
    */
   convertStringToHex(string: string): string {
     return transactionUtils.convertStringToHex(string);
-  }
-
-  /**
-   * Autofills missing fields in a transaction.
-   *
-   * @param tx - A transaction to autofill missing fields.
-   * @param signersCount - A signers count used for multisign.
-   * @returns An autofilled transaction.
-   */
-  async autofill(tx: Transaction, signersCount?: number): Promise<Transaction> {
-    return autofill(this, tx, signersCount);
   }
 
   /**
