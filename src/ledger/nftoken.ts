@@ -6,8 +6,7 @@ import {RippleAPI} from '..'
 import {ArgumentError, ValidationError} from '../common/errors'
 
 const HTTP_TIMEOUT_MS = 3000
-// Taxon is a UINT32
-const MAX_TAXON = 2 ** 32 - 1
+const DEFAULT_TAXON = 0
 const MAX_ON_LEDGER_STORAGE_BYTES = 512
 
 export enum NFTokenStorageOption {
@@ -22,10 +21,6 @@ export interface NFTokenParameters {
   taxon?: number,
 }
 
-const generateTaxon = (): number => (
-  Math.floor(Math.random() * MAX_TAXON)
-)
-
 const uriToHex = (uri: string): string => (
   uri.split('').map((char) => (
     char.charCodeAt(0).toString(16).padStart(2, '0')
@@ -39,7 +34,7 @@ const validateOnLedger = (
 
   // Confirm that data URI is <= the max recommended byte size
   if (uri.length > MAX_ON_LEDGER_STORAGE_BYTES) {
-    throw new ValidationError(`${uri} is greater than ${MAX_ON_LEDGER_STORAGE_BYTES} bytes. We recommend not storing this payload on the ledger at this size.`)
+    throw new ValidationError(`${uri} is greater than ${MAX_ON_LEDGER_STORAGE_BYTES} bytes`)
   }
 
   // Confirm that URI is a correctly-encoded data URI
@@ -75,6 +70,7 @@ const validateCentralizedOffLedger = async (
 
   // Confirm that domain of `uri` contains an `xrp-ledger.toml` file
   let httpResponse
+  // TODO allow checking against domain if given a subdomain
   const tomlUri = `https://${parsedUri.host}/.well-known/xrp-ledger.toml`
   try {
     httpResponse = await axios({
@@ -141,7 +137,7 @@ export const createNFToken = async (
   const mintTx = {
     TransactionType: 'NFTokenMint',
     Account: params.issuingAccount,
-    TokenTaxon: params.taxon ?? generateTaxon(),
+    TokenTaxon: params.taxon ?? DEFAULT_TAXON,
     URI: uriToHex(params.uri),
   }
   
