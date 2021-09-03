@@ -207,11 +207,11 @@ describe('Connection', function () {
   })
 
   it('DisconnectedError on initial onOpen send', async function () {
-    // _onOpen previously could throw PromiseRejectionHandledWarning: Promise rejection was handled asynchronously
+    // onOpen previously could throw PromiseRejectionHandledWarning: Promise rejection was handled asynchronously
     // do not rely on the client.setup hook to test this as it bypasses the case, disconnect client connection first
     await this.client.disconnect()
 
-    // stub _onOpen to only run logic relevant to test case
+    // stub onOpen to only run logic relevant to test case
     this.client.connection.onOpen = () => {
       // overload websocket send on open when _ws exists
       this.client.connection.ws.send = function (_0, _1, _2) {
@@ -448,7 +448,7 @@ describe('Connection', function () {
       done()
     })
 
-    this.client.connection._onMessage(
+    this.client.connection.onMessage(
       JSON.stringify({
         type: 'transaction',
       }),
