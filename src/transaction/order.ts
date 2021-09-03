@@ -4,7 +4,7 @@ import { FormattedOrderSpecification } from "../common/types/objects/index";
 import { ISOTimeToRippleTime, toRippledAmount } from "../utils";
 
 import { Instructions, Prepare, OfferCreateTransaction } from "./types";
-import * as utils from "../ledger/autofill";
+import * as utils from "./utils";
 
 const offerFlags = utils.common.txFlags.OfferCreate;
 

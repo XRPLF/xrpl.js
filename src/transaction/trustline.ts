@@ -4,7 +4,7 @@ import { Client } from "..";
 import { FormattedTrustlineSpecification } from "../common/types/objects/trustlines";
 
 import { Instructions, Prepare, TransactionJSON } from "./types";
-import * as utils from "../ledger/autofill";
+import * as utils from "./utils";
 
 const validate = utils.common.validate;
 const trustlineFlags = utils.common.txFlags.TrustSet;

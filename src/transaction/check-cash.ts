@@ -5,7 +5,7 @@ import { Amount } from "../common/types/objects";
 import { toRippledAmount } from "../utils";
 
 import { Instructions, Prepare, TransactionJSON } from "./types";
-import * as utils from "../ledger/autofill";
+import * as utils from "./utils";
 
 export interface CheckCashParameters {
   checkID: string;

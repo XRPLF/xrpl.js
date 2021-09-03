@@ -1,7 +1,7 @@
 import { Client } from "..";
 
 import { Instructions, Prepare, TransactionJSON } from "./types";
-import * as utils from "../ledger/autofill";
+import * as utils from "./utils";
 
 const validate = utils.common.validate;
 

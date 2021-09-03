@@ -7,7 +7,7 @@ import {
   FormattedSettings,
 } from "../common/types/objects";
 
-import { ApiMemo } from "../ledger/autofill";
+import { ApiMemo } from "./utils";
 
 export interface TransactionJSON {
   Account: string;

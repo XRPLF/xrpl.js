@@ -3,7 +3,7 @@ import { validate } from "../common";
 import { ISOTimeToRippleTime, xrpToDrops } from "../utils";
 
 import { Instructions, Prepare, TransactionJSON } from "./types";
-import * as utils from "../ledger/autofill";
+import * as utils from "./utils";
 
 export interface PaymentChannelCreate {
   amount: string;

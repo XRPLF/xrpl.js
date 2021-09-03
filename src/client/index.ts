@@ -21,6 +21,7 @@ import { constants, errors, txFlags, ensureClassicAddress } from "../common";
 import { ValidationError } from "../common/errors";
 import { getFee } from "../common/fee";
 import * as schemaValidator from "../common/schema-validator";
+import autofill from "../ledger/autofill";
 import getBalances from "../ledger/balances";
 import { getOrderbook, formatBidsAndAsks } from "../ledger/orderbook";
 import getPaths from "../ledger/pathfind";
@@ -114,7 +115,7 @@ import { sign } from "../transaction/sign";
 import prepareTicketCreate from "../transaction/ticket";
 import prepareTrustline from "../transaction/trustline";
 import { TransactionJSON, Instructions, Prepare } from "../transaction/types";
-import * as transactionUtils from "../ledger/autofill";
+import * as transactionUtils from "../transaction/utils";
 import { deriveAddress, deriveXAddress } from "../utils/derive";
 import generateFaucetWallet from "../wallet/generateFaucetWallet";
 
@@ -343,10 +344,11 @@ class Client extends EventEmitter {
    * Autofills missing fields in a transaction.
    *
    * @param tx - A transaction to autofill missing fields.
+   * @param signersCount - A signers count used for multisign.
    * @returns An autofilled transaction.
    */
   async autofill(tx: Transaction, signersCount?: number): Promise<Transaction> {
-    return transactionUtils.autofill(this, tx, signersCount);
+    return autofill(this, tx, signersCount);
   }
 
   /**

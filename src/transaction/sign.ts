@@ -9,7 +9,7 @@ import { xrpToDrops } from "../utils";
 import { computeBinaryTransactionHash } from "../utils/hashes";
 
 import { SignOptions, KeyPair, TransactionJSON } from "./types";
-import * as utils from "../ledger/autofill";
+import * as utils from "./utils";
 
 const validate = utils.common.validate;
 
