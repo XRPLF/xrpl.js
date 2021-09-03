@@ -117,12 +117,9 @@ describe("Wallet", function () {
         SigningPubKey: publicKey,
       };
       const wallet = new Wallet(publicKey, privateKey);
-      const signedTx: { signedTransaction: string; id: string } =
-        wallet.signTransaction(txJSON);
+      const signedTx: string = wallet.signTransaction(txJSON);
 
-      assert.hasAllKeys(signedTx, ["id", "signedTransaction"]);
-      assert.isString(signedTx.id);
-      assert.isString(signedTx.signedTransaction);
+      assert.isString(signedTx);
     });
   });
 

@@ -4,7 +4,6 @@ import binaryCodec from "ripple-binary-codec";
 import keypairs from "ripple-keypairs";
 
 import { Client } from "..";
-import { SignedTransaction } from "../common/types/objects";
 import { xrpToDrops } from "../utils";
 import { computeBinaryTransactionHash } from "../utils/hashes";
 import Wallet from "../Wallet";
@@ -28,7 +27,7 @@ function signWithKeypair(
   options: SignOptions = {
     signAs: "",
   }
-): string {
+): { signedTransaction: string; id: string } {
   validate.sign({ txJSON, keypair });
 
   const tx = JSON.parse(txJSON);
@@ -226,7 +225,7 @@ function sign(
   secret?: any,
   options?: SignOptions,
   keypair?: KeyPair
-): string {
+): { signedTransaction: string; id: string } {
   if (typeof secret === "string") {
     // we can't validate that the secret matches the account because
     // the secret could correspond to the regular key
@@ -244,8 +243,7 @@ function sign(
       "sign: Missing secret or keypair."
     );
   }
-  return signWithKeypair(this, txJSON, keypair || secret, options)
-    .signedTransaction;
+  return signWithKeypair(this, txJSON, keypair || secret, options);
 }
 
 // TODO: move this to Wallet class
@@ -253,7 +251,7 @@ function signOffline(
   wallet: Wallet,
   txJSON: string,
   options?: SignOptions
-): string {
+): { signedTransaction: string; id: string } {
   const { publicKey, privateKey } = wallet;
   return signWithKeypair(null, txJSON, { publicKey, privateKey }, options);
 }
