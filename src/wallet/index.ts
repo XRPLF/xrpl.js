@@ -1,19 +1,19 @@
-import { fromSeed } from "bip32";
-import { mnemonicToSeedSync } from "bip39";
-import { classicAddressToXAddress } from "ripple-address-codec";
-import { decode, encodeForSigning } from "ripple-binary-codec";
+import { fromSeed } from 'bip32'
+import { mnemonicToSeedSync } from 'bip39'
+import { classicAddressToXAddress } from 'ripple-address-codec'
+import { decode, encodeForSigning } from 'ripple-binary-codec'
 import {
   deriveAddress,
   deriveKeypair,
   generateSeed,
   verify,
-} from "ripple-keypairs";
+} from 'ripple-keypairs'
 
-import ECDSA from "../common/ecdsa";
-import { ValidationError } from "../common/errors";
-import { SignedTransaction } from "../common/types/objects";
-import { signOffline } from "../transaction/sign";
-import { SignOptions } from "../transaction/types";
+import ECDSA from '../common/ecdsa'
+import { ValidationError } from '../common/errors'
+import { SignedTransaction } from '../common/types/objects'
+import { signOffline } from '../transaction/sign'
+import { SignOptions } from '../transaction/types'
 
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
@@ -21,18 +21,18 @@ import { SignOptions } from "../transaction/types";
  * It provides functionality to sign/verify transactions offline.
  */
 class Wallet {
-  readonly publicKey: string;
-  readonly privateKey: string;
-  readonly classicAddress: string;
-  readonly seed?: string;
-  private static readonly defaultAlgorithm: ECDSA = ECDSA.ed25519;
-  private static readonly defaultDerivationPath: string = "m/44'/144'/0'/0/0";
+  readonly publicKey: string
+  readonly privateKey: string
+  readonly classicAddress: string
+  readonly seed?: string
+  private static readonly defaultAlgorithm: ECDSA = ECDSA.ed25519
+  private static readonly defaultDerivationPath: string = "m/44'/144'/0'/0/0"
 
   constructor(publicKey: string, privateKey: string, seed?: string) {
-    this.publicKey = publicKey;
-    this.privateKey = privateKey;
-    this.classicAddress = deriveAddress(publicKey);
-    this.seed = seed;
+    this.publicKey = publicKey
+    this.privateKey = privateKey
+    this.classicAddress = deriveAddress(publicKey)
+    this.seed = seed
   }
 
   /**
@@ -42,8 +42,8 @@ class Wallet {
    * @returns A new Wallet derived from a generated seed.
    */
   static generate(algorithm: ECDSA = Wallet.defaultAlgorithm): Wallet {
-    const seed = generateSeed({ algorithm });
-    return Wallet.fromSeed(seed);
+    const seed = generateSeed({ algorithm })
+    return Wallet.fromSeed(seed)
   }
 
   /**
@@ -55,9 +55,9 @@ class Wallet {
    */
   static fromSeed(
     seed: string,
-    algorithm: ECDSA = Wallet.defaultAlgorithm
+    algorithm: ECDSA = Wallet.defaultAlgorithm,
   ): Wallet {
-    return Wallet.deriveWallet(seed, algorithm);
+    return Wallet.deriveWallet(seed, algorithm)
   }
 
   /**
@@ -69,20 +69,20 @@ class Wallet {
    */
   static fromMnemonic(
     mnemonic: string,
-    derivationPath: string = Wallet.defaultDerivationPath
+    derivationPath: string = Wallet.defaultDerivationPath,
   ): Wallet {
-    const seed = mnemonicToSeedSync(mnemonic);
-    const masterNode = fromSeed(seed);
-    const node = masterNode.derivePath(derivationPath);
+    const seed = mnemonicToSeedSync(mnemonic)
+    const masterNode = fromSeed(seed)
+    const node = masterNode.derivePath(derivationPath)
     if (node.privateKey === undefined) {
       throw new ValidationError(
-        "Unable to derive privateKey from mnemonic input"
-      );
+        'Unable to derive privateKey from mnemonic input',
+      )
     }
 
-    const publicKey = Wallet.hexFromBuffer(node.publicKey);
-    const privateKey = Wallet.hexFromBuffer(node.privateKey);
-    return new Wallet(publicKey, `00${privateKey}`);
+    const publicKey = Wallet.hexFromBuffer(node.publicKey)
+    const privateKey = Wallet.hexFromBuffer(node.privateKey)
+    return new Wallet(publicKey, `00${privateKey}`)
   }
 
   /**
@@ -94,26 +94,26 @@ class Wallet {
    */
   static fromEntropy(
     entropy: Uint8Array | number[],
-    algorithm: ECDSA = Wallet.defaultAlgorithm
+    algorithm: ECDSA = Wallet.defaultAlgorithm,
   ): Wallet {
     const options = {
       entropy: Uint8Array.from(entropy),
       algorithm,
-    };
-    const seed = generateSeed(options);
-    return Wallet.deriveWallet(seed, algorithm);
+    }
+    const seed = generateSeed(options)
+    return Wallet.deriveWallet(seed, algorithm)
   }
 
   private static hexFromBuffer(buffer: Buffer): string {
-    return buffer.toString("hex").toUpperCase();
+    return buffer.toString('hex').toUpperCase()
   }
 
   private static deriveWallet(
     seed: string,
-    algorithm: ECDSA = Wallet.defaultAlgorithm
+    algorithm: ECDSA = Wallet.defaultAlgorithm,
   ): Wallet {
-    const { publicKey, privateKey } = deriveKeypair(seed, { algorithm });
-    return new Wallet(publicKey, privateKey, seed);
+    const { publicKey, privateKey } = deriveKeypair(seed, { algorithm })
+    return new Wallet(publicKey, privateKey, seed)
   }
 
   /**
@@ -125,9 +125,9 @@ class Wallet {
    */
   signTransaction(
     transaction: any, // TODO: transaction should be typed with Transaction type.
-    options: SignOptions = { signAs: "" }
+    options: SignOptions = { signAs: '' },
   ): SignedTransaction {
-    return signOffline(this, JSON.stringify(transaction), options);
+    return signOffline(this, JSON.stringify(transaction), options)
   }
 
   /**
@@ -137,10 +137,10 @@ class Wallet {
    * @returns Returns true if a signedTransaction is valid.
    */
   verifyTransaction(signedTransaction: string): boolean {
-    const tx = decode(signedTransaction);
-    const messageHex: string = encodeForSigning(tx);
-    const signature = tx.TxnSignature;
-    return verify(messageHex, signature, this.publicKey);
+    const tx = decode(signedTransaction)
+    const messageHex: string = encodeForSigning(tx)
+    const signature = tx.TxnSignature
+    return verify(messageHex, signature, this.publicKey)
   }
 
   /**
@@ -151,8 +151,8 @@ class Wallet {
    * @returns An X-address.
    */
   getXAddress(tag: number, test = false): string {
-    return classicAddressToXAddress(this.classicAddress, tag, test);
+    return classicAddressToXAddress(this.classicAddress, tag, test)
   }
 }
 
-export default Wallet;
+export default Wallet

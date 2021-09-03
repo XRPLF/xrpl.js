@@ -1,7 +1,7 @@
-import fs from "fs";
-import path from "path";
+import fs from 'fs'
+import path from 'path'
 
-import { Client } from "xrpl-local";
+import { Client } from 'xrpl-local'
 
 /**
  * Client Test Runner.
@@ -9,34 +9,34 @@ import { Client } from "xrpl-local";
  * Throws errors when we detect the absence of tests.
  * Puts all the client methods under one "describe" umbrella.
  */
-describe("Client [Test Runner]", function () {
+describe('Client [Test Runner]', function () {
   // doesn't need a functional client, just needs to instantiate to get a list of public methods
   // (to determine what methods are missing from )
-  const allPublicMethods = getAllPublicMethods(new Client("wss://"));
+  const allPublicMethods = getAllPublicMethods(new Client('wss://'))
 
-  const allTestSuites = loadTestSuites();
+  const allTestSuites = loadTestSuites()
 
   // Report any missing tests.
-  const allTestedMethods = new Set(allTestSuites.map((s) => s.name));
+  const allTestedMethods = new Set(allTestSuites.map((s) => s.name))
   for (const methodName of allPublicMethods) {
     if (!allTestedMethods.has(methodName)) {
       // TODO: Once migration is complete, remove `.skip()` so that missing tests are reported as failures.
       it.skip(`${methodName} - no test suite found`, function () {
         throw new Error(
-          `Test file not found! Create file "test/client/${methodName}.ts".`
-        );
-      });
+          `Test file not found! Create file "test/client/${methodName}.ts".`,
+        )
+      })
     }
   }
-});
+})
 
 function getAllPublicMethods(client: Client) {
   return Array.from(
     new Set([
       ...Object.getOwnPropertyNames(client),
       ...Object.getOwnPropertyNames(Client.prototype),
-    ])
-  ).filter((key) => !key.startsWith("_")); // removes private methods
+    ]),
+  ).filter((key) => !key.startsWith('_')) // removes private methods
 }
 
 /**
@@ -46,28 +46,28 @@ function getAllPublicMethods(client: Client) {
  * so that we can report it.
  */
 interface LoadedTestSuite {
-  name: string;
-  tests: Array<[string, () => void | PromiseLike<void>]>;
+  name: string
+  tests: Array<[string, () => void | PromiseLike<void>]>
 }
 
 function loadTestSuites(): LoadedTestSuite[] {
-  const allTests: any[] = fs.readdirSync(path.join(__dirname, "client"), {
-    encoding: "utf8",
-  });
+  const allTests: any[] = fs.readdirSync(path.join(__dirname, 'client'), {
+    encoding: 'utf8',
+  })
   return allTests
     .map((methodName) => {
-      if (methodName.startsWith(".DS_Store")) {
-        return null;
+      if (methodName.startsWith('.DS_Store')) {
+        return null
       }
-      if (methodName.endsWith(".ts")) {
-        methodName = methodName.slice(0, -3);
+      if (methodName.endsWith('.ts')) {
+        methodName = methodName.slice(0, -3)
       }
-      const testSuite = require(`./client/${methodName}`);
+      const testSuite = require(`./client/${methodName}`)
       return {
         name: methodName,
         config: testSuite.config || {},
         tests: Object.entries(testSuite.default || {}),
-      } as LoadedTestSuite;
+      } as LoadedTestSuite
     })
-    .filter(Boolean) as LoadedTestSuite[];
+    .filter(Boolean) as LoadedTestSuite[]
 }
