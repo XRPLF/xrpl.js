@@ -15,49 +15,9 @@ import { xrpToDrops } from "../utils";
 const LEDGER_OFFSET = 20;
 // 5 XRP
 const ACCOUNT_DELETE_FEE = 5000000;
-
-function scaleValue(value, multiplier, extra = 0): string {
-  return new BigNumber(value).times(multiplier).plus(extra).toString();
-}
-
 export interface ClassicAccountAndTag {
   classicAccount: string;
   tag: number | false | undefined;
-}
-
-/**
- * Given an address (account), get the classic account and tag.
- * If an `expectedTag` is provided:
- * 1. If the `Account` is an X-address, validate that the tags match.
- * 2. If the `Account` is a classic address, return `expectedTag` as the tag.
- *
- * @param Account - The address to parse.
- * @param expectedTag - If provided, and the `Account` is an X-address,
- *                    this method throws an error if `expectedTag`
- *                    does not match the tag of the X-address.
- * @returns The classic account and tag.
- * @throws ValidationError when an address tag doesn't match the tag specificed in the transaction.
- */
-function getClassicAccountAndTag(
-  Account: string,
-  expectedTag?: number
-): ClassicAccountAndTag {
-  if (isValidXAddress(Account)) {
-    const classic = xAddressToClassicAddress(Account);
-    if (expectedTag != null && classic.tag !== expectedTag) {
-      throw new ValidationError(
-        "address includes a tag that does not match the tag specified in the transaction"
-      );
-    }
-    return {
-      classicAccount: classic.classicAddress,
-      tag: classic.tag,
-    };
-  }
-  return {
-    classicAccount: Account,
-    tag: expectedTag,
-  };
 }
 
 /**
@@ -128,6 +88,28 @@ function validateAccountAddress(
   }
 }
 
+function getClassicAccountAndTag(
+  Account: string,
+  expectedTag?: number
+): ClassicAccountAndTag {
+  if (isValidXAddress(Account)) {
+    const classic = xAddressToClassicAddress(Account);
+    if (expectedTag != null && classic.tag !== expectedTag) {
+      throw new ValidationError(
+        "address includes a tag that does not match the tag specified in the transaction"
+      );
+    }
+    return {
+      classicAccount: classic.classicAddress,
+      tag: classic.tag,
+    };
+  }
+  return {
+    classicAccount: Account,
+    tag: expectedTag,
+  };
+}
+
 function convertToClassicAddress(tx: Transaction, fieldName: string): void {
   const account = tx[fieldName];
   if (typeof account === "string") {
@@ -190,6 +172,10 @@ async function calculateFeePerTransactionType(
   // Round up baseFee and return it as a string
   // eslint-disable-next-line no-param-reassign -- param reassign is safe
   tx.Fee = totalFee.dp(0, BigNumber.ROUND_CEIL).toString(10);
+}
+
+function scaleValue(value, multiplier, extra = 0): string {
+  return new BigNumber(value).times(multiplier).plus(extra).toString();
 }
 
 async function setLatestValidatedLedgerSequence(
