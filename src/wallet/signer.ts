@@ -15,7 +15,6 @@ import {
 } from "ripple-keypairs";
 
 import { ValidationError } from "../common/errors";
-import { SignedTransaction } from "../common/types/objects";
 import { Signer } from "../models/common";
 import { Transaction } from "../models/transactions";
 import { verifyBaseTransaction } from "../models/transactions/common";
@@ -30,7 +29,7 @@ import Wallet from "../Wallet";
  * @param tx - The Transaction that is being signed.
  * @returns A signed Transaction and a Transaction id that corresponds to the pre-signed Transaction.
  */
-function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
+function sign(wallet: Wallet, tx: Transaction): string {
   return wallet.signTransaction(tx, { signAs: "" });
 }
 
@@ -45,9 +44,7 @@ function sign(wallet: Wallet, tx: Transaction): SignedTransaction {
  * - The SigningPubKey field is not the empty string in any given transaction
  * - Any transaction is missing a Signers field.
  */
-function multisign(
-  transactions: Array<Transaction | string>
-): SignedTransaction {
+function multisign(transactions: Array<Transaction | string>): string {
   if (transactions.length === 0) {
     throw new ValidationError("There were 0 transactions given to multisign");
   }
@@ -77,7 +74,7 @@ function multisign(
     getEncodedTransaction(txOrBlob)
   );
 
-  return combine(encodedTransactions);
+  return combine(encodedTransactions).signedTransaction;
 }
 
 /**
@@ -125,7 +122,10 @@ function verify(tx: Transaction | string): boolean {
  * @returns An object with the combined transaction (now having a sorted list of all signers) which is encoded, along
  * with a transaction id based on the combined transaction.
  */
-function combine(signedTransactions: string[]): SignedTransaction {
+function combine(signedTransactions: string[]): {
+  signedTransaction: string;
+  id: string;
+} {
   const transactions: Transaction[] = signedTransactions.map((tx: string) => {
     return getDecodedTransaction(tx);
   });

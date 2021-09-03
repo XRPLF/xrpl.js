@@ -2,7 +2,6 @@ import { assert } from "chai";
 import { decode } from "ripple-binary-codec";
 
 import { ValidationError } from "../../src/common/errors";
-import { SignedTransaction } from "../../src/common/types/objects";
 import { Transaction } from "../../src/models/transactions";
 import Wallet from "../../src/Wallet";
 import {
@@ -47,9 +46,9 @@ describe("Signer tests", function () {
 
     const wallet = Wallet.fromSeed(seed);
 
-    const signedTx: SignedTransaction = sign(wallet, tx3);
+    const signedTx: string = sign(wallet, tx3);
 
-    assert.equal(signedTx.signedTransaction, signedTxBlob);
+    assert.equal(signedTx, signedTxBlob);
   });
 
   it("multisigns successfully", function () {
@@ -139,30 +138,28 @@ describe("Signer tests", function () {
   it("verify succeeds for valid signed transaction string", function () {
     const wallet = new Wallet(publicKey, privateKey);
 
-    const signedTx: SignedTransaction = sign(wallet, tx);
+    const signedTx: string = sign(wallet, tx);
 
-    assert.isTrue(verify(signedTx.signedTransaction));
+    assert.isTrue(verify(signedTx));
   });
 
   it("verify succeeds for valid signed transaction object", function () {
     const wallet = new Wallet(publicKey, privateKey);
 
-    const signedTx: SignedTransaction = sign(wallet, tx);
+    const signedTx: string = sign(wallet, tx);
 
     assert.isTrue(
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for interfacing with binary-codec
-      verify(decode(signedTx.signedTransaction) as unknown as Transaction)
+      verify(decode(signedTx) as unknown as Transaction)
     );
   });
 
   it("verify throws for invalid signing key", function () {
     const wallet = new Wallet(publicKey, privateKey);
-    const signedTx: SignedTransaction = sign(wallet, tx);
+    const signedTx: string = sign(wallet, tx);
 
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for interfacing with binary-codec
-    const decodedTx: Transaction = decode(
-      signedTx.signedTransaction
-    ) as unknown as Transaction;
+    const decodedTx: Transaction = decode(signedTx) as unknown as Transaction;
 
     // Use a different key for validation
     decodedTx.SigningPubKey =

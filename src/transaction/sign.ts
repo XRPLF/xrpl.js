@@ -28,7 +28,7 @@ function signWithKeypair(
   options: SignOptions = {
     signAs: "",
   }
-): SignedTransaction {
+): string {
   validate.sign({ txJSON, keypair });
 
   const tx = JSON.parse(txJSON);
@@ -226,7 +226,7 @@ function sign(
   secret?: any,
   options?: SignOptions,
   keypair?: KeyPair
-): SignedTransaction {
+): string {
   if (typeof secret === "string") {
     // we can't validate that the secret matches the account because
     // the secret could correspond to the regular key
@@ -244,7 +244,8 @@ function sign(
       "sign: Missing secret or keypair."
     );
   }
-  return signWithKeypair(this, txJSON, keypair || secret, options);
+  return signWithKeypair(this, txJSON, keypair || secret, options)
+    .signedTransaction;
 }
 
 // TODO: move this to Wallet class
@@ -252,7 +253,7 @@ function signOffline(
   wallet: Wallet,
   txJSON: string,
   options?: SignOptions
-): SignedTransaction {
+): string {
   const { publicKey, privateKey } = wallet;
   return signWithKeypair(null, txJSON, { publicKey, privateKey }, options);
 }
