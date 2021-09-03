@@ -186,10 +186,6 @@ describe("Signer tests", function () {
     assert.throws(() => combineMultisigned(transactions), ValidationError);
   });
 
-  it("Going from unsigned transaction to combinedMultisigned workflow succeeds", function () {
-    assert.fail("Not implemented yet");
-  });
-
   it("authorizeChannel succeeds", function () {
     const wallet = Wallet.fromSeed("snGHNrPbHrdUcszeuDEigMdC1Lyyd");
     const channelId =
