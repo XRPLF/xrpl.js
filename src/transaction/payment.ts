@@ -14,7 +14,6 @@ import { Instructions, Prepare, TransactionJSON } from "./types";
 import * as utils from "./utils";
 import { getClassicAccountAndTag, ClassicAccountAndTag } from "./utils";
 
-const validate = utils.common.validate;
 const paymentFlags = utils.common.txFlags.Payment;
 const ValidationError = utils.common.errors.ValidationError;
 
@@ -148,7 +147,6 @@ function createPaymentTransaction(
     address,
     undefined
   );
-
   if (
     addressToVerifyAgainst.classicAccount !== sourceAddressAndTag.classicAccount
   ) {
@@ -249,16 +247,15 @@ function createPaymentTransaction(
   return txJSON;
 }
 
-function preparePayment(
+async function preparePayment(
   this: Client,
   address: string,
   payment: Payment,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.preparePayment({ address, payment, instructions });
     const txJSON = createPaymentTransaction(address, payment);
-    return utils.prepareTransaction(txJSON, this, instructions);
+    return await utils.prepareTransaction(txJSON, this, instructions);
   } catch (e) {
     return Promise.reject(e);
   }

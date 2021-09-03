@@ -121,14 +121,11 @@ function getClassicAccountAndTag(
   };
 }
 
-function prepareTransaction(
+async function prepareTransaction(
   txJSON: TransactionJSON,
   client: Client,
   instructions: Instructions
 ): Promise<Prepare> {
-  common.validate.instructions(instructions);
-  common.validate.tx_json(txJSON);
-
   // We allow 0 values in the Sequence schema to support the Tickets feature
   // When a ticketSequence is used, sequence has to be 0
   // We validate that a sequence with value 0 is not passed even if the json schema allows it
@@ -247,7 +244,7 @@ function prepareTransaction(
 
   setCanonicalFlag(newTxJSON);
 
-  function prepareMaxLedgerVersion(): Promise<void> {
+  async function prepareMaxLedgerVersion(): Promise<void> {
     // Up to one of the following is allowed:
     //   txJSON.LastLedgerSequence
     //   instructions.maxLedgerVersion
@@ -289,7 +286,7 @@ function prepareTransaction(
       });
   }
 
-  function prepareFee(): Promise<void> {
+  async function prepareFee(): Promise<void> {
     // instructions.fee is scaled (for multi-signed transactions) while txJSON.Fee is not.
     // Due to this difference, we do NOT allow both to be set, as the behavior would be complex and
     // potentially ambiguous.
@@ -323,7 +320,7 @@ function prepareTransaction(
       return Promise.resolve();
     }
     const cushion = client._feeCushion;
-    return client.getFee(cushion).then((fee) => {
+    return client.getFee(cushion).then(async (fee) => {
       return client
         .request({ command: "fee" })
         .then((response) => Number(response.result.drops.minimum_fee))

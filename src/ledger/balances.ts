@@ -1,6 +1,6 @@
 import { Client } from "..";
 import { Connection } from "../client";
-import { validate, ensureClassicAddress } from "../common";
+import { ensureClassicAddress } from "../common";
 import { FormattedTrustline } from "../common/types/objects/trustlines";
 
 import { GetTrustlinesOptions } from "./trustlines";
@@ -43,7 +43,7 @@ function formatBalances(
   return result;
 }
 
-function getLedgerVersionHelper(
+async function getLedgerVersionHelper(
   connection: Connection,
   optionValue?: number
 ): Promise<number> {
@@ -58,13 +58,11 @@ function getLedgerVersionHelper(
     .then((response) => response.result.ledger_index);
 }
 
-function getBalances(
+async function getBalances(
   this: Client,
   address: string,
   options: GetTrustlinesOptions = {}
 ): Promise<GetBalances> {
-  validate.getTrustlines({ address, options });
-
   // Only support retrieving balances without a tag,
   // since we currently do not calculate balances
   // on a per-tag basis. Apps must interpret and
@@ -74,7 +72,7 @@ function getBalances(
 
   return Promise.all([
     getLedgerVersionHelper(this.connection, options.ledgerVersion).then(
-      (ledgerVersion) => utils.getXRPBalance(this, address, ledgerVersion)
+      async (ledgerVersion) => utils.getXRPBalance(this, address, ledgerVersion)
     ),
     this.getTrustlines(address, options),
   ]).then((results) =>

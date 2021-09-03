@@ -20,7 +20,6 @@ import {
 import { constants, errors, txFlags, ensureClassicAddress } from "../common";
 import { ValidationError } from "../common/errors";
 import { getFee } from "../common/fee";
-import * as schemaValidator from "../common/schema-validator";
 import getBalances from "../ledger/balances";
 import { getOrderbook, formatBidsAndAsks } from "../ledger/orderbook";
 import getPaths from "../ledger/pathfind";
@@ -183,7 +182,7 @@ class Client extends EventEmitter {
 
   constructor(server: string, options: ClientOptions = {}) {
     super();
-    if (typeof server !== "string" || !server.match("^(wss?|wss?\\+unix)://")) {
+    if (typeof server !== "string" || !/^(wss?|wss?\+unix):\/\//.exec(server)) {
       throw new ValidationError(
         "server URI must start with `wss://`, `ws://`, `wss+unix://`, or `ws+unix://`."
       );
@@ -252,7 +251,9 @@ class Client extends EventEmitter {
   ): Promise<SubmitMultisignedResponse>;
   public request(r: TransactionEntryRequest): Promise<TransactionEntryResponse>;
   public request(r: TxRequest): Promise<TxResponse>;
-  public request<R extends Request, T extends Response>(r: R): Promise<T> {
+  public async request<R extends Request, T extends Response>(
+    r: R
+  ): Promise<T> {
     // TODO: should this be typed with `extends BaseRequest/BaseResponse`?
     return this.connection.request({
       ...r,
@@ -478,9 +479,6 @@ class Client extends EventEmitter {
   static txFlags = txFlags;
   accountSetFlags = constants.AccountSetFlags;
   static accountSetFlags = constants.AccountSetFlags;
-
-  isValidAddress = schemaValidator.isValidAddress;
-  isValidSecret = schemaValidator.isValidSecret;
 }
 
 export { Client, Connection };
