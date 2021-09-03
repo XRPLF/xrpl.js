@@ -4,6 +4,7 @@ import binaryCodec from 'ripple-binary-codec'
 import keypairs from 'ripple-keypairs'
 
 import type { Client, Wallet } from '..'
+import { ValidationError } from '../common/errors'
 import { SignedTransaction } from '../common/types/objects'
 import { xrpToDrops } from '../utils'
 import { computeBinaryTransactionHash } from '../utils/hashes'
@@ -28,7 +29,7 @@ function signWithKeypair(
 ): SignedTransaction {
   const tx = JSON.parse(txJSON)
   if (tx.TxnSignature || tx.Signers) {
-    throw new utils.common.errors.ValidationError(
+    throw new ValidationError(
       'txJSON must not contain "TxnSignature" or "Signers" properties',
     )
   }
