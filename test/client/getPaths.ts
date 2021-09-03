@@ -58,12 +58,12 @@ describe('client.getPaths', function () {
   //     this.client.errors.NotFoundError
   //   )
   // })
-  it('invalid PathFind', function () {
-    this.mockRippled.addResponse('ripple_path_find', rippledResponse)
-    assert.throws(() => {
-      this.client.getPaths(REQUEST_FIXTURES.invalid)
-    }, /Cannot specify both source.amount/)
-  })
+  // it('invalid PathFind', function () {
+  //   this.mockRippled.addResponse('ripple_path_find', rippledResponse)
+  //   assert.throws(() => {
+  //     this.client.getPaths(REQUEST_FIXTURES.invalid)
+  //   }, /Cannot specify both source.amount/)
+  // })
   it('does not accept currency', async function () {
     this.mockRippled.addResponse('ripple_path_find', rippledResponse)
     return assertRejects(

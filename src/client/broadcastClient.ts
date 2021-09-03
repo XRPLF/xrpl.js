@@ -14,9 +14,9 @@ class BroadcastClient extends Client {
     // exposed for testing
     this._clients = clients
     this.getMethodNames().forEach((name) => {
-      this[name] = async function () {
+      this[name] = async function (...args) {
         // eslint-disable-line no-loop-func
-        return Promise.race(clients.map((client) => client[name](...arguments)))
+        return Promise.race(clients.map((client) => client[name](...args)))
       }
     })
 
