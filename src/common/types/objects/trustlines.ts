@@ -27,16 +27,3 @@ export interface FormattedTrustlineSpecification {
   frozen?: boolean;
   memos?: Memo[];
 }
-
-// export interface FormattedTrustline {
-//   specification: FormattedTrustlineSpecification;
-//   counterparty: {
-//     limit: string;
-//     ripplingDisabled?: boolean;
-//     frozen?: boolean;
-//     authorized?: boolean;
-//   };
-//   state: {
-//     balance: string;
-//   };
-// }
