@@ -2,7 +2,7 @@ import requests from "../fixtures/requests";
 import responses from "../fixtures/responses";
 import rippled from "../fixtures/rippled";
 import setupClient from "../setupClient";
-import { assertRejects, assertResultMatch, addressTests } from "../testUtils";
+import { assertResultMatch, addressTests } from "../testUtils";
 
 const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
 
@@ -63,27 +63,27 @@ describe("client.prepareTrustline", function () {
         );
       });
 
-      it("invalid", async function () {
-        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-        this.mockRippled.addResponse("fee", rippled.fee);
-        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-        this.mockRippled.addResponse(
-          "account_info",
-          rippled.account_info.normal
-        );
-        const trustline = { ...requests.prepareTrustline.complex };
-        delete trustline.limit; // Make invalid
+      // it("invalid", async function () {
+      //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+      //   this.mockRippled.addResponse("fee", rippled.fee);
+      //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+      //   this.mockRippled.addResponse(
+      //     "account_info",
+      //     rippled.account_info.normal
+      //   );
+      //   const trustline = { ...requests.prepareTrustline.complex };
+      //   delete trustline.limit; // Make invalid
 
-        await assertRejects(
-          this.client.prepareTrustline(
-            test.address,
-            trustline,
-            instructionsWithMaxLedgerVersionOffset
-          ),
-          this.client.errors.ValidationError,
-          'instance.trustline requires property "limit"'
-        );
-      });
+      //   await assertRejects(
+      //     this.client.prepareTrustline(
+      //       test.address,
+      //       trustline,
+      //       instructionsWithMaxLedgerVersionOffset
+      //     ),
+      //     this.client.errors.ValidationError,
+      //     'instance.trustline requires property "limit"'
+      //   );
+      // });
 
       it("xtest.address-issuer", async function () {
         this.mockRippled.addResponse("server_info", rippled.server_info.normal);

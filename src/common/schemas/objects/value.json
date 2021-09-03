@@ -1,8 +1,0 @@
-{
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "value",
-  "link": "value",
-  "description": "A string representation of a non-negative floating point number",
-  "type": "string",
-  "pattern": "^[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?$"
-}

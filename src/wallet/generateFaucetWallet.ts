@@ -1,10 +1,13 @@
 import https = require("https");
 
-import { Client, Wallet } from "..";
+import { isValidClassicAddress } from "ripple-address-codec";
+
+import type { Client } from "..";
 import { errors } from "../common";
 import { RippledError } from "../common/errors";
-import { isValidAddress } from "../common/schema-validator";
 import { GeneratedAddress } from "../utils/generateAddress";
+
+import Wallet from ".";
 
 export interface FaucetWallet {
   account: GeneratedAddress;
@@ -20,14 +23,14 @@ export enum FaucetNetwork {
 const INTERVAL_SECONDS = 1; // Interval to check an account balance
 const MAX_ATTEMPTS = 20; // Maximum attempts to retrieve a balance
 
-/**
- * Generates a random wallet with some amount of XRP (usually 1000 XRP).
- *
- * @param client - Client.
- * @param wallet - An existing XRPL Wallet to fund, if undefined, a new Wallet will be created.
- * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP.
- * @throws When either Client isn't connected or unable to fund wallet address.
- */
+//
+// Generates a random wallet with some amount of XRP (usually 1000 XRP).
+//
+// @param client - Client.
+// @param wallet - An existing XRPL Wallet to fund, if undefined, a new Wallet will be created.
+// @returns A Wallet on the Testnet or Devnet that contains some amount of XRP.
+// @throws When either Client isn't connected or unable to fund wallet address.
+// z
 async function generateFaucetWallet(
   client: Client,
   wallet?: Wallet
@@ -38,7 +41,7 @@ async function generateFaucetWallet(
 
   // Generate a new Wallet if no existing Wallet is provided or its address is invalid to fund
   const fundWallet =
-    wallet && isValidAddress(wallet.classicAddress)
+    wallet && isValidClassicAddress(wallet.classicAddress)
       ? wallet
       : Wallet.generate();
 

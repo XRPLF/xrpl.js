@@ -1,5 +1,3 @@
-import { assert } from "chai";
-
 import addresses from "../fixtures/addresses.json";
 import requests from "../fixtures/requests";
 import rippled from "../fixtures/rippled";
@@ -45,7 +43,7 @@ describe("client.getPaths", function () {
   //   const response = await this.client.getPaths(REQUEST_FIXTURES.XrpToXrp)
   //   assertResultMatch(response, RESPONSE_FIXTURES.XrpToXrp, 'getPaths')
   // })
-  it("source with issuer", function () {
+  it("source with issuer", async function () {
     this.mockRippled.addResponse("ripple_path_find", rippledResponse);
     return assertRejects(
       this.client.getPaths(REQUEST_FIXTURES.issuer),
@@ -58,41 +56,41 @@ describe("client.getPaths", function () {
   //     this.client.errors.NotFoundError
   //   )
   // })
-  it("invalid PathFind", function () {
-    this.mockRippled.addResponse("ripple_path_find", rippledResponse);
-    assert.throws(() => {
-      this.client.getPaths(REQUEST_FIXTURES.invalid);
-    }, /Cannot specify both source.amount/);
-  });
-  it("does not accept currency", function () {
+  // it("invalid PathFind", function () {
+  //   this.mockRippled.addResponse("ripple_path_find", rippledResponse);
+  //   assert.throws(() => {
+  //     this.client.getPaths(REQUEST_FIXTURES.invalid);
+  //   }, /Cannot specify both source.amount/);
+  // });
+  it("does not accept currency", async function () {
     this.mockRippled.addResponse("ripple_path_find", rippledResponse);
     return assertRejects(
       this.client.getPaths(REQUEST_FIXTURES.NotAcceptCurrency),
       this.client.errors.NotFoundError
     );
   });
-  it("no paths", function () {
+  it("no paths", async function () {
     this.mockRippled.addResponse("ripple_path_find", rippledResponse);
     return assertRejects(
       this.client.getPaths(REQUEST_FIXTURES.NoPaths),
       this.client.errors.NotFoundError
     );
   });
-  it("no paths source amount", function () {
+  it("no paths source amount", async function () {
     this.mockRippled.addResponse("ripple_path_find", rippledResponse);
     return assertRejects(
       this.client.getPaths(REQUEST_FIXTURES.NoPathsSource),
       this.client.errors.NotFoundError
     );
   });
-  it("no paths with source currencies", function () {
+  it("no paths with source currencies", async function () {
     this.mockRippled.addResponse("ripple_path_find", rippledResponse);
     return assertRejects(
       this.client.getPaths(REQUEST_FIXTURES.NoPathsWithCurrencies),
       this.client.errors.NotFoundError
     );
   });
-  it("error: srcActNotFound", function () {
+  it("error: srcActNotFound", async function () {
     this.mockRippled.addResponse("ripple_path_find", rippledResponse);
     return assertRejects(
       this.client.getPaths({

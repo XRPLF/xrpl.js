@@ -1,8 +1,6 @@
 import binary from "ripple-binary-codec";
 import keypairs from "ripple-keypairs";
 
-import { validate } from "../common";
-
 import { xrpToDrops } from ".";
 
 function verifyPaymentChannelClaim(
@@ -11,8 +9,6 @@ function verifyPaymentChannelClaim(
   signature: string,
   publicKey: string
 ): boolean {
-  validate.verifyPaymentChannelClaim({ channel, amount, signature, publicKey });
-
   const signingData = binary.encodeForSigningClaim({
     channel,
     amount: xrpToDrops(amount),

@@ -1,5 +1,6 @@
 import { assert } from "chai";
 
+import { Client } from "../../src";
 import rippled from "../fixtures/rippled";
 import setupClient from "../setupClient";
 import { assertRejects } from "../testUtils";
@@ -34,7 +35,7 @@ describe("client.requestNextPage", function () {
       { command: "ledger_data" },
       response
     );
-    assert(!this.client.hasNextPage(responseNextPage));
+    assert(!Client.hasNextPage(responseNextPage));
     await assertRejects(
       this.client.requestNextPage({ command: "ledger_data" }, responseNextPage),
       Error,

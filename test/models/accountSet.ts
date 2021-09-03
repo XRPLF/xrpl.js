@@ -70,7 +70,7 @@ describe("AccountSet", function () {
   });
 
   it(`throws w/ invalid EmailHash`, function () {
-    account.EmailHash = 657861645678909876543456789876543;
+    account.EmailHash = 6578656789876543;
 
     assert.throws(
       () => verifyAccountSet(account),
@@ -80,7 +80,7 @@ describe("AccountSet", function () {
   });
 
   it(`throws w/ invalid MessageKey`, function () {
-    account.MessageKey = 65786165678908765456789567890678;
+    account.MessageKey = 6578656789876543;
 
     assert.throws(
       () => verifyAccountSet(account),

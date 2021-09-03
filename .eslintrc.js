@@ -38,12 +38,11 @@ module.exports = {
         format: ["snake_case"],
       },
     ],
-
     // Ignore type imports when counting dependencies.
     "import/max-dependencies": [
       "error",
       {
-        max: 5,
+        max: 10,
         ignoreTypeImports: true,
       },
     ],
@@ -64,6 +63,8 @@ module.exports = {
         skipComments: true,
       },
     ],
+    "max-statements": ["warn", 25],
+    "id-length": ["error", { exceptions: ["_"] }], // exception for lodash
   },
   overrides: [
     {
@@ -90,6 +91,21 @@ module.exports = {
 
         // We need to mess with internal things to generate certain testing situations
         "@typescript-eslint/no-unsafe-member-access": "off",
+
+        // We need to be able to import xrpl-local
+        "node/no-extraneous-import": [
+          "error",
+          {
+            allowModules: ["xrpl-local"],
+          },
+        ],
+      },
+    },
+    {
+      files: ["test/models/*.ts"],
+      rules: {
+        "@typescript-eslint/consistent-type-assertions": "off",
+        "@typescript-eslint/no-explicit-any": "off",
       },
     },
     {

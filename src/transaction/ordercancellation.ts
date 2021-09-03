@@ -1,9 +1,7 @@
-import { Client } from "..";
+import type { Client } from "..";
 
 import { Instructions, Prepare, TransactionJSON } from "./types";
 import * as utils from "./utils";
-
-const validate = utils.common.validate;
 
 function createOrderCancellationTransaction(
   account: string,
@@ -27,11 +25,6 @@ function prepareOrderCancellation(
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareOrderCancellation({
-      address,
-      orderCancellation,
-      instructions,
-    });
     const txJSON = createOrderCancellationTransaction(
       address,
       orderCancellation

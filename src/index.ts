@@ -1,3 +1,6 @@
+// Broadcast client is experimental
+import BroadcastClient from "./client/broadcastClient";
+
 export { Client } from "./client";
 
 export * from "./transaction/types";
@@ -8,7 +11,6 @@ export * from "./models/methods";
 
 export * from "./utils";
 
-// Broadcast client is experimental
-export { BroadcastClient } from "./client/broadcastClient";
+export { BroadcastClient };
 
 export { default as Wallet } from "./wallet";

@@ -3,15 +3,13 @@ import _ from "lodash";
 import binaryCodec from "ripple-binary-codec";
 import keypairs from "ripple-keypairs";
 
-import { Client, Wallet } from "..";
+import type { Client, Wallet } from "..";
 import { SignedTransaction } from "../common/types/objects";
 import { xrpToDrops } from "../utils";
 import { computeBinaryTransactionHash } from "../utils/hashes";
 
 import { SignOptions, KeyPair, TransactionJSON } from "./types";
 import * as utils from "./utils";
-
-const validate = utils.common.validate;
 
 function computeSignature(tx: object, privateKey: string, signAs?: string) {
   const signingData = signAs
@@ -28,8 +26,6 @@ function signWithKeypair(
     signAs: "",
   }
 ): SignedTransaction {
-  validate.sign({ txJSON, keypair });
-
   const tx = JSON.parse(txJSON);
   if (tx.TxnSignature || tx.Signers) {
     throw new utils.common.errors.ValidationError(
@@ -210,7 +206,7 @@ function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
  */
 function checkFee(client: Client, txFee: string): void {
   const fee = new BigNumber(txFee);
-  const maxFeeDrops = xrpToDrops(client._maxFeeXRP);
+  const maxFeeDrops = xrpToDrops(client.maxFeeXRP);
   if (fee.isGreaterThan(maxFeeDrops)) {
     throw new utils.common.errors.ValidationError(
       `"Fee" should not exceed "${maxFeeDrops}". ` +
@@ -229,7 +225,6 @@ function sign(
   if (typeof secret === "string") {
     // we can't validate that the secret matches the account because
     // the secret could correspond to the regular key
-    validate.sign({ txJSON, secret });
     return signWithKeypair(
       this,
       txJSON,

@@ -1,6 +1,6 @@
 import { assert } from "chai";
 
-import { ExponentialBackoff } from "../src/client/backoff";
+import ExponentialBackoff from "../src/client/backoff";
 
 describe("ExponentialBackoff", function () {
   it("duration() return value starts with the min value", function () {
