@@ -21,7 +21,7 @@ import {
 } from 'ripple-address-codec'
 
 import { constants, errors, txFlags, ensureClassicAddress } from '../common'
-import { ValidationError } from '../common/errors'
+import { ValidationError, XrplError } from '../common/errors'
 import getFee from '../common/fee'
 import getBalances from '../ledger/balances'
 import { getOrderbook, formatBidsAndAsks } from '../ledger/orderbook'
@@ -429,7 +429,7 @@ class Client extends EventEmitter {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
       const singleResult = (singleResponse as U).result
       if (!(collectKey in singleResult)) {
-        throw new RippledError(`${collectKey} not in result`)
+        throw new XrplError(`${collectKey} not in result`)
       }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Should be true
       const collectedData = singleResult[collectKey]
