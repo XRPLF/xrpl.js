@@ -1,5 +1,4 @@
 import { Client } from "..";
-import { validate } from "../common";
 import { FormattedOrderSpecification } from "../common/types/objects/index";
 import { ISOTimeToRippleTime, toRippledAmount } from "../utils";
 
@@ -51,16 +50,15 @@ function createOrderTransaction(
   return txJSON as OfferCreateTransaction;
 }
 
-function prepareOrder(
+async function prepareOrder(
   this: Client,
   address: string,
   order: FormattedOrderSpecification,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareOrder({ address, order, instructions });
     const txJSON = createOrderTransaction(address, order);
-    return utils.prepareTransaction(txJSON, this, instructions);
+    return await utils.prepareTransaction(txJSON, this, instructions);
   } catch (e) {
     return Promise.reject(e);
   }

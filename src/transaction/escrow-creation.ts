@@ -1,5 +1,4 @@
 import { Client } from "..";
-import { validate } from "../common";
 import { Memo } from "../common/types/objects";
 import { ISOTimeToRippleTime, xrpToDrops } from "../utils";
 
@@ -61,16 +60,15 @@ function createEscrowCreationTransaction(
   return txJSON;
 }
 
-function prepareEscrowCreation(
+async function prepareEscrowCreation(
   this: Client,
   address: string,
   escrowCreation: EscrowCreation,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareEscrowCreation({ address, escrowCreation, instructions });
     const txJSON = createEscrowCreationTransaction(address, escrowCreation);
-    return utils.prepareTransaction(txJSON, this, instructions);
+    return await utils.prepareTransaction(txJSON, this, instructions);
   } catch (e) {
     return Promise.reject(e);
   }

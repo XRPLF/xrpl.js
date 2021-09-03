@@ -1,5 +1,4 @@
 import { Client } from "..";
-import { validate } from "../common";
 import { ValidationError } from "../common/errors";
 import { Amount } from "../common/types/objects";
 import { toRippledAmount } from "../utils";
@@ -41,16 +40,15 @@ function createCheckCashTransaction(
   return txJSON;
 }
 
-function prepareCheckCash(
+async function prepareCheckCash(
   this: Client,
   address: string,
   checkCash: CheckCashParameters,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareCheckCash({ address, checkCash, instructions });
     const txJSON = createCheckCashTransaction(address, checkCash);
-    return utils.prepareTransaction(txJSON, this, instructions);
+    return await utils.prepareTransaction(txJSON, this, instructions);
   } catch (e) {
     return Promise.reject(e);
   }

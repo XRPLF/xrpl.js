@@ -13,7 +13,6 @@ import {
 } from "./types";
 import * as utils from "./utils";
 
-const validate = utils.common.validate;
 const AccountSetFlags = utils.common.constants.AccountSetFlags;
 const AccountFields = utils.common.constants.AccountFields;
 
@@ -151,17 +150,16 @@ function createSettingsTransaction(
   return txJSON;
 }
 
-function prepareSettings(
+async function prepareSettings(
   this: Client,
   address: string,
   settings: FormattedSettings,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareSettings({ address, settings, instructions });
     const txJSON = createSettingsTransaction(address, settings);
 
-    return utils.prepareTransaction(txJSON, this, instructions);
+    return await utils.prepareTransaction(txJSON, this, instructions);
   } catch (e) {
     return Promise.reject(e);
   }

@@ -3,7 +3,7 @@ import _ from "lodash";
 
 import type { Client } from "..";
 import { Connection } from "../client";
-import { validate, errors } from "../common";
+import { errors } from "../common";
 import { RippledAmount, Amount } from "../common/types/objects";
 import { RipplePathFindRequest } from "../models/methods";
 import { toRippledAmount, xrpToDrops, dropsToXrp } from "../utils";
@@ -34,7 +34,7 @@ function addParams(
   );
 }
 
-function requestPathFind(
+async function requestPathFind(
   connection: Connection,
   pathfind: PathFind
 ): Promise<RippledPathsResponse> {
@@ -110,7 +110,7 @@ function isRippledIOUAmount(amount: RippledAmount) {
   );
 }
 
-function conditionallyAddDirectXRPPath(
+async function conditionallyAddDirectXRPPath(
   client: Client,
   address: string,
   paths: RippledPathsResponse
@@ -191,12 +191,10 @@ function formatResponse(pathfind: PathFind, paths: RippledPathsResponse) {
   }
 }
 
-function getPaths(this: Client, pathfind: PathFind): Promise<GetPaths> {
-  validate.getPaths({ pathfind });
-
+async function getPaths(this: Client, pathfind: PathFind): Promise<GetPaths> {
   const address = pathfind.source.address;
   return requestPathFind(this.connection, pathfind)
-    .then((paths) => conditionallyAddDirectXRPPath(this, address, paths))
+    .then(async (paths) => conditionallyAddDirectXRPPath(this, address, paths))
     .then((paths) => filterSourceFundsLowPaths(pathfind, paths))
     .then((paths) => formatResponse(pathfind, paths));
 }

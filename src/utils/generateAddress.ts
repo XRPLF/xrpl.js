@@ -1,7 +1,7 @@
 import { classicAddressToXAddress } from "ripple-address-codec";
 import keypairs from "ripple-keypairs";
 
-import { errors, validate } from "../common";
+import { errors } from "../common";
 import ECDSA from "../common/ecdsa";
 
 export interface GeneratedAddress {
@@ -31,7 +31,6 @@ export interface GenerateAddressOptions {
 function generateXAddress(
   options: GenerateAddressOptions = {}
 ): GeneratedAddress {
-  validate.generateAddress({ options });
   try {
     const generateSeedOptions: {
       entropy?: Uint8Array;
