@@ -11,7 +11,7 @@ import {
   DisconnectedError,
   NotConnectedError,
   ResponseFormatError,
-  RippleError,
+  XrplError,
   TimeoutError,
 } from '../src/common/errors'
 
@@ -207,11 +207,11 @@ describe('Connection', function () {
   })
 
   it('DisconnectedError on initial onOpen send', async function () {
-    // _onOpen previously could throw PromiseRejectionHandledWarning: Promise rejection was handled asynchronously
+    // onOpen previously could throw PromiseRejectionHandledWarning: Promise rejection was handled asynchronously
     // do not rely on the client.setup hook to test this as it bypasses the case, disconnect client connection first
     await this.client.disconnect()
 
-    // stub _onOpen to only run logic relevant to test case
+    // stub onOpen to only run logic relevant to test case
     this.client.connection.onOpen = () => {
       // overload websocket send on open when _ws exists
       this.client.connection.ws.send = function (_0, _1, _2) {
@@ -420,7 +420,7 @@ describe('Connection', function () {
       new Client({
         servers: ['wss://server1.com', 'wss://server2.com'],
       } as any)
-    }, RippleError)
+    }, XrplError)
   })
 
   it('connect throws error', function (done) {

@@ -51,7 +51,7 @@ export interface ServerInfoResponse extends BaseResponse {
         job_types: JobType[]
         threads: number
       }
-      load_factor: number
+      load_factor?: number
       load_factor_local?: number
       load_factor_net?: number
       load_factor_cluster?: number

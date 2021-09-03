@@ -11,7 +11,7 @@ import {
   DisconnectedError,
   NotConnectedError,
   ConnectionError,
-  RippleError,
+  XrplError,
 } from '../common/errors'
 import { BaseRequest } from '../models/methods/baseMethod'
 
@@ -217,7 +217,7 @@ export class Connection extends EventEmitter {
     }
     if (this.ws != null) {
       return Promise.reject(
-        new RippleError('Websocket connection never cleaned up.', {
+        new XrplError('Websocket connection never cleaned up.', {
           state: this.state,
         }),
       )

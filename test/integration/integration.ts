@@ -4,7 +4,6 @@ import _ from 'lodash'
 import { isValidXAddress } from 'ripple-address-codec'
 
 import { Client } from 'xrpl-local'
-import { errors } from 'xrpl-local/common'
 import { isValidSecret } from 'xrpl-local/utils'
 
 import { generateXAddress } from '../../src/utils/generateAddress'
@@ -46,24 +45,7 @@ function verifyTransaction(testcase, hash, type, options, txData, account) {
       }
       return { txJSON: JSON.stringify(txData), id: hash, tx: data }
     })
-    .catch(async (error) => {
-      if (error instanceof errors.PendingLedgerVersionError) {
-        console.log('NOT VALIDATED YET...')
-        return new Promise((resolve, reject) => {
-          setTimeout(
-            () =>
-              verifyTransaction(
-                testcase,
-                hash,
-                type,
-                options,
-                txData,
-                account,
-              ).then(resolve, reject),
-            INTERVAL,
-          )
-        })
-      }
+    .catch((error) => {
       console.log(error.stack)
       assert(false, `Transaction not successful: ${error.message}`)
     })
