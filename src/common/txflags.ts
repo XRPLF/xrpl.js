@@ -39,7 +39,7 @@ const txFlags = {
     Renew: 0x00010000,
     Close: 0x00020000,
   },
-};
+}
 
 // The following are integer (as opposed to bit) flags
 // that can be set for particular transactions in the
@@ -56,6 +56,6 @@ const txFlagIndices = {
     asfDefaultRipple: 8,
     asfDepositAuth: 9,
   },
-};
+}
 
-export { txFlags, txFlagIndices };
+export { txFlags, txFlagIndices }

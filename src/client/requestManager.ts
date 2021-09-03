@@ -2,9 +2,9 @@ import {
   ResponseFormatError,
   RippledError,
   TimeoutError,
-} from "../common/errors";
-import { Response } from "../models/methods";
-import { BaseRequest } from "../models/methods/baseMethod";
+} from '../common/errors'
+import { Response } from '../models/methods'
+import { BaseRequest } from '../models/methods/baseMethod'
 
 /**
  * Manage all the requests made to the websocket, and their async responses
@@ -13,15 +13,15 @@ import { BaseRequest } from "../models/methods/baseMethod";
  * original request.
  */
 export default class RequestManager {
-  private nextId = 0;
+  private nextId = 0
   private readonly promisesAwaitingResponse = new Map<
     string | number,
     {
-      resolve: (value?: Response | PromiseLike<Response>) => void;
-      reject: (value?: Error) => void;
-      timer: NodeJS.Timeout;
+      resolve: (value?: Response | PromiseLike<Response>) => void
+      reject: (value?: Error) => void
+      timer: NodeJS.Timeout
     }
-  >();
+  >()
 
   /**
    * Cancels a request.
@@ -30,12 +30,12 @@ export default class RequestManager {
    * @throws Error if no existing promise with the given ID.
    */
   public cancel(id: string | number): void {
-    const promise = this.promisesAwaitingResponse.get(id);
+    const promise = this.promisesAwaitingResponse.get(id)
     if (promise == null) {
-      throw new Error(`No existing promise with id ${id}`);
+      throw new Error(`No existing promise with id ${id}`)
     }
-    clearTimeout(promise.timer);
-    this.deletePromise(id);
+    clearTimeout(promise.timer)
+    this.deletePromise(id)
   }
 
   /**
@@ -46,13 +46,13 @@ export default class RequestManager {
    * @throws Error if no existing promise with the given ID.
    */
   public resolve(id: string | number, response: Response): void {
-    const promise = this.promisesAwaitingResponse.get(id);
+    const promise = this.promisesAwaitingResponse.get(id)
     if (promise == null) {
-      throw new Error(`No existing promise with id ${id}`);
+      throw new Error(`No existing promise with id ${id}`)
     }
-    clearTimeout(promise.timer);
-    promise.resolve(response);
-    this.deletePromise(id);
+    clearTimeout(promise.timer)
+    promise.resolve(response)
+    this.deletePromise(id)
   }
 
   /**
@@ -63,13 +63,13 @@ export default class RequestManager {
    * @throws Error if no existing promise with the given ID.
    */
   public reject(id: string | number, error: Error): void {
-    const promise = this.promisesAwaitingResponse.get(id);
+    const promise = this.promisesAwaitingResponse.get(id)
     if (promise == null) {
-      throw new Error(`No existing promise with id ${id}`);
+      throw new Error(`No existing promise with id ${id}`)
     }
-    clearTimeout(promise.timer);
-    promise.reject(error);
-    this.deletePromise(id);
+    clearTimeout(promise.timer)
+    promise.reject(error)
+    this.deletePromise(id)
   }
 
   /**
@@ -79,8 +79,8 @@ export default class RequestManager {
    */
   public rejectAll(error: Error): void {
     this.promisesAwaitingResponse.forEach((_promise, id, _map) => {
-      this.reject(id, error);
-    });
+      this.reject(id, error)
+    })
   }
 
   /**
@@ -94,27 +94,27 @@ export default class RequestManager {
    */
   public createRequest<T extends BaseRequest>(
     request: T,
-    timeout: number
+    timeout: number,
   ): [string | number, string, Promise<Response>] {
-    const newId = request.id ? request.id : this.nextId;
-    this.nextId += 1;
-    const newRequest = JSON.stringify({ ...request, id: newId });
+    const newId = request.id ? request.id : this.nextId
+    this.nextId += 1
+    const newRequest = JSON.stringify({ ...request, id: newId })
     const timer = setTimeout(
       () => this.reject(newId, new TimeoutError()),
-      timeout
-    );
+      timeout,
+    )
     // Node.js won't exit if a timer is still running, so we tell Node to ignore.
     // (Node will still wait for the request to complete).
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Reason above.
     if (timer.unref) {
-      timer.unref();
+      timer.unref()
     }
     const newPromise = new Promise(
       (resolve: (value?: Response | PromiseLike<Response>) => void, reject) => {
-        this.promisesAwaitingResponse.set(newId, { resolve, reject, timer });
-      }
-    );
-    return [newId, newRequest, newPromise];
+        this.promisesAwaitingResponse.set(newId, { resolve, reject, timer })
+      },
+    )
+    return [newId, newRequest, newPromise]
   }
 
   /**
@@ -130,33 +130,33 @@ export default class RequestManager {
       !Number.isInteger(response.id) ||
       response.id < 0
     ) {
-      throw new ResponseFormatError("valid id not found in response", response);
+      throw new ResponseFormatError('valid id not found in response', response)
     }
     if (!this.promisesAwaitingResponse.has(response.id)) {
-      return;
+      return
     }
     if (response.status == null) {
-      const error = new ResponseFormatError("Response has no status");
-      this.reject(response.id, error);
+      const error = new ResponseFormatError('Response has no status')
+      this.reject(response.id, error)
     }
-    if (response.status === "error") {
+    if (response.status === 'error') {
       const error = new RippledError(
         response.error_message ?? response.error,
-        response
-      );
-      this.reject(response.id, error);
-      return;
+        response,
+      )
+      this.reject(response.id, error)
+      return
     }
-    if (response.status !== "success") {
+    if (response.status !== 'success') {
       const error = new ResponseFormatError(
-        `unrecognized response.status: ${response.status ?? ""}`,
-        response
-      );
-      this.reject(response.id, error);
-      return;
+        `unrecognized response.status: ${response.status ?? ''}`,
+        response,
+      )
+      this.reject(response.id, error)
+      return
     }
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be a valid Response here
-    this.resolve(response.id, response as unknown as Response);
+    this.resolve(response.id, response as unknown as Response)
   }
 
   /**
@@ -166,6 +166,6 @@ export default class RequestManager {
    */
   private deletePromise(id: string | number): void {
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Needs to delete promise after request has been fulfilled.
-    delete this.promisesAwaitingResponse[id];
+    delete this.promisesAwaitingResponse[id]
   }
 }

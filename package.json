@@ -40,6 +40,7 @@
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.0.0",
     "@xrplf/eslint-config": "^1.2.2",
+    "@xrplf/prettier-config": "^1.2.0",
     "assert": "^2.0.0",
     "buffer": "^6.0.2",
     "chai": "^4.3.4",
@@ -96,6 +97,7 @@
     "start:snippet": "npm run compile:snippets && node ./snippets/dist/start.js",
     "inspect:snippet": "npm run compile:snippets && node inspect ./snippets/dist/start.js"
   },
+  "prettier": "@xrplf/prettier-config",
   "repository": {
     "type": "git",
     "url": "git@github.com:XRPLF/xrpl.js.git"

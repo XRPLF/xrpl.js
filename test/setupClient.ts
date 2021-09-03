@@ -1,36 +1,36 @@
-import { Client, BroadcastClient } from "xrpl-local";
+import { Client, BroadcastClient } from 'xrpl-local'
 
-import { createMockRippled } from "./mockRippled";
-import { getFreePort } from "./testUtils";
+import { createMockRippled } from './mockRippled'
+import { getFreePort } from './testUtils'
 
-function setupMockRippledConnection(testcase, port) {
+async function setupMockRippledConnection(testcase, port) {
   return new Promise<void>((resolve, reject) => {
-    testcase.mockRippled = createMockRippled(port);
-    testcase._mockedServerPort = port;
-    testcase.client = new Client(`ws://localhost:${port}`);
-    testcase.client.connect().then(resolve).catch(reject);
-  });
+    testcase.mockRippled = createMockRippled(port)
+    testcase._mockedServerPort = port
+    testcase.client = new Client(`ws://localhost:${port}`)
+    testcase.client.connect().then(resolve).catch(reject)
+  })
 }
 
-function setupMockRippledConnectionForBroadcast(testcase, ports) {
+async function setupMockRippledConnectionForBroadcast(testcase, ports) {
   return new Promise<void>((resolve, reject) => {
-    const servers = ports.map((port) => `ws://localhost:${port}`);
-    testcase.mocks = ports.map((port) => createMockRippled(port));
-    testcase.client = new BroadcastClient(servers);
-    testcase.client.connect().then(resolve).catch(reject);
-  });
+    const servers = ports.map((port) => `ws://localhost:${port}`)
+    testcase.mocks = ports.map((port) => createMockRippled(port))
+    testcase.client = new BroadcastClient(servers)
+    testcase.client.connect().then(resolve).catch(reject)
+  })
 }
 
-function setup(this: any) {
-  return getFreePort().then((port) => {
-    return setupMockRippledConnection(this, port);
-  });
+async function setup(this: any) {
+  return getFreePort().then(async (port) => {
+    return setupMockRippledConnection(this, port)
+  })
 }
 
-function setupBroadcast(this: any) {
-  return Promise.all([getFreePort(), getFreePort()]).then((ports) => {
-    return setupMockRippledConnectionForBroadcast(this, ports);
-  });
+async function setupBroadcast(this: any) {
+  return Promise.all([getFreePort(), getFreePort()]).then(async (ports) => {
+    return setupMockRippledConnectionForBroadcast(this, ports)
+  })
 }
 
 function teardown(this: any, done) {
@@ -38,13 +38,13 @@ function teardown(this: any, done) {
     .disconnect()
     .then(() => {
       if (this.mockRippled != null) {
-        this.mockRippled.close();
+        this.mockRippled.close()
       } else {
-        this.mocks.forEach((mock) => mock.close());
+        this.mocks.forEach((mock) => mock.close())
       }
-      setImmediate(done);
+      setImmediate(done)
     })
-    .catch(done);
+    .catch(done)
 }
 
 export default {
@@ -52,4 +52,4 @@ export default {
   teardown,
   setupBroadcast,
   createMockRippled,
-};
+}

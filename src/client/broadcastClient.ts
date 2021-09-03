@@ -1,10 +1,10 @@
-import { Client, ClientOptions } from ".";
+import { Client, ClientOptions } from '.'
 
 /**
  * Client that can rely on multiple different servers.
  */
 export default class BroadcastClient extends Client {
-  private readonly clients: Client[];
+  private readonly clients: Client[]
 
   /**
    * Creates a new BroadcastClient.
@@ -13,36 +13,36 @@ export default class BroadcastClient extends Client {
    * @param options - Options for the clients.
    */
   public constructor(servers: string[], options: ClientOptions = {}) {
-    super(servers[0], options);
+    super(servers[0], options)
 
     const clients: Client[] = servers.map(
-      (server) => new Client(server, options)
-    );
+      (server) => new Client(server, options),
+    )
 
     // exposed for testing
-    this.clients = clients;
+    this.clients = clients
     this.getMethodNames().forEach((name: string) => {
       this[name] = async (...args): Promise<unknown> =>
         // eslint-disable-next-line max-len -- Need a long comment, TODO: figure out how to avoid this weirdness
         /* eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call -- Types are outlined in Client class */
-        Promise.race(clients.map(async (client) => client[name](...args)));
-    });
+        Promise.race(clients.map(async (client) => client[name](...args)))
+    })
 
     // connection methods must be overridden to apply to all client instances
     this.connect = async (): Promise<void> => {
-      await Promise.all(clients.map(async (client) => client.connect()));
-    };
+      await Promise.all(clients.map(async (client) => client.connect()))
+    }
     this.disconnect = async (): Promise<void> => {
-      await Promise.all(clients.map(async (client) => client.disconnect()));
-    };
+      await Promise.all(clients.map(async (client) => client.disconnect()))
+    }
     this.isConnected = (): boolean =>
-      clients.map((client) => client.isConnected()).every(Boolean);
+      clients.map((client) => client.isConnected()).every(Boolean)
 
     clients.forEach((client) => {
-      client.on("error", (errorCode, errorMessage, data) =>
-        this.emit("error", errorCode, errorMessage, data)
-      );
-    });
+      client.on('error', (errorCode, errorMessage, data) =>
+        this.emit('error', errorCode, errorMessage, data),
+      )
+    })
   }
 
   /**
@@ -51,17 +51,17 @@ export default class BroadcastClient extends Client {
    * @returns A list of the names of all the methods of the client.
    */
   private getMethodNames(): string[] {
-    const methodNames: string[] = [];
-    const firstClient = this.clients[0];
-    const methods = Object.getOwnPropertyNames(firstClient);
+    const methodNames: string[] = []
+    const firstClient = this.clients[0]
+    const methods = Object.getOwnPropertyNames(firstClient)
     methods.push(
-      ...Object.getOwnPropertyNames(Object.getPrototypeOf(firstClient))
-    );
+      ...Object.getOwnPropertyNames(Object.getPrototypeOf(firstClient)),
+    )
     for (const name of methods) {
-      if (typeof firstClient[name] === "function" && name !== "constructor") {
-        methodNames.push(name);
+      if (typeof firstClient[name] === 'function' && name !== 'constructor') {
+        methodNames.push(name)
       }
     }
-    return methodNames;
+    return methodNames
   }
 }
