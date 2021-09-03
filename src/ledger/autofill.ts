@@ -65,7 +65,7 @@ function getClassicAccountAndTag(
  *
  * @param client - A client.
  * @param tx - A transaction to autofill fields.
- * @param signersCount - A signers count used for multisign.
+ * @param signersCount - The expected number of signers for this transaction. Used for multisign.
  * @returns An autofilled transaction.
  */
 async function autofill(
