@@ -38,7 +38,7 @@
 //   return true
 // }
 
-describe("client.formatBidsAndAsks", function () {
+describe('client.formatBidsAndAsks', function () {
   // 'normal': async (client, address) => {
   //   const orderbookInfo = {
   //     base: {
@@ -359,4 +359,4 @@ describe("client.formatBidsAndAsks", function () {
   //     )
   //   })
   // }
-});
+})

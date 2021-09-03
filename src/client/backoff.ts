@@ -12,23 +12,23 @@
 
 interface ExponentialBackoffOptions {
   // The min backoff duration.
-  min?: number;
+  min?: number
   // The max backoff duration.
-  max?: number;
+  max?: number
 }
 
-const DEFAULT_MIN = 100;
-const DEFAULT_MAX = 1000;
+const DEFAULT_MIN = 100
+const DEFAULT_MAX = 1000
 
 /**
  * A Back off strategy that increases exponentially. Useful with repeated
  * setTimeout calls over a network (where the destination may be down).
  */
 export default class ExponentialBackoff {
-  private readonly ms: number;
-  private readonly max: number;
-  private readonly factor: number = 2;
-  private numAttempts = 0;
+  private readonly ms: number
+  private readonly max: number
+  private readonly factor: number = 2
+  private numAttempts = 0
 
   /**
    * Constructs an ExponentialBackoff object.
@@ -36,8 +36,8 @@ export default class ExponentialBackoff {
    * @param opts - The options for the object.
    */
   public constructor(opts: ExponentialBackoffOptions = {}) {
-    this.ms = opts.min ?? DEFAULT_MIN;
-    this.max = opts.max ?? DEFAULT_MAX;
+    this.ms = opts.min ?? DEFAULT_MIN
+    this.max = opts.max ?? DEFAULT_MAX
   }
 
   /**
@@ -46,7 +46,7 @@ export default class ExponentialBackoff {
    * @returns Number of attempts.
    */
   public get attempts(): number {
-    return this.numAttempts;
+    return this.numAttempts
   }
 
   /**
@@ -55,15 +55,15 @@ export default class ExponentialBackoff {
    * @returns The backoff duration in milliseconds.
    */
   public duration(): number {
-    const ms = this.ms * this.factor ** this.numAttempts;
-    this.numAttempts += 1;
-    return Math.floor(Math.min(ms, this.max));
+    const ms = this.ms * this.factor ** this.numAttempts
+    this.numAttempts += 1
+    return Math.floor(Math.min(ms, this.max))
   }
 
   /**
    * Reset the number of attempts.
    */
   public reset(): void {
-    this.numAttempts = 0;
+    this.numAttempts = 0
   }
 }

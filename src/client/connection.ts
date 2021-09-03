@@ -1,43 +1,43 @@
 /* eslint-disable max-lines -- Connection is a big class */
-import { EventEmitter } from "events";
-import { Agent } from "http";
+import { EventEmitter } from 'events'
+import { Agent } from 'http'
 // eslint-disable-next-line node/no-deprecated-api -- TODO: resolve this
-import { parse as parseURL } from "url";
+import { parse as parseURL } from 'url'
 
-import _ from "lodash";
-import WebSocket from "ws";
+import _ from 'lodash'
+import WebSocket from 'ws'
 
 import {
   DisconnectedError,
   NotConnectedError,
   ConnectionError,
   RippleError,
-} from "../common/errors";
-import { BaseRequest } from "../models/methods/baseMethod";
+} from '../common/errors'
+import { BaseRequest } from '../models/methods/baseMethod'
 
-import ExponentialBackoff from "./backoff";
-import ConnectionManager from "./connectionManager";
-import RequestManager from "./requestManager";
+import ExponentialBackoff from './backoff'
+import ConnectionManager from './connectionManager'
+import RequestManager from './requestManager'
 
-const SECONDS_PER_MINUTE = 60;
-const TIMEOUT = 20;
-const CONNECTION_TIMEOUT = 5;
+const SECONDS_PER_MINUTE = 60
+const TIMEOUT = 20
+const CONNECTION_TIMEOUT = 5
 
 /**
  * ConnectionOptions is the configuration for the Connection class.
  */
 interface ConnectionOptions {
-  trace?: boolean | ((id: string, message: string) => void);
-  proxy?: string;
-  proxyAuthorization?: string;
-  authorization?: string;
-  trustedCertificates?: string[];
-  key?: string;
-  passphrase?: string;
-  certificate?: string;
+  trace?: boolean | ((id: string, message: string) => void)
+  proxy?: string
+  proxyAuthorization?: string
+  authorization?: string
+  trustedCertificates?: string[]
+  key?: string
+  passphrase?: string
+  certificate?: string
   // request timeout
-  timeout: number;
-  connectionTimeout: number;
+  timeout: number
+  connectionTimeout: number
 }
 
 /**
@@ -45,47 +45,47 @@ interface ConnectionOptions {
  * is optional, so any ConnectionOptions configuration that has a default value is
  * still optional at the point that the user provides it.
  */
-export type ConnectionUserOptions = Partial<ConnectionOptions>;
+export type ConnectionUserOptions = Partial<ConnectionOptions>
 
 //
 // Represents an intentionally triggered web-socket disconnect code.
 // WebSocket spec allows 4xxx codes for app/library specific codes.
 // See: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
 //
-export const INTENTIONAL_DISCONNECT_CODE = 4000;
+export const INTENTIONAL_DISCONNECT_CODE = 4000
 
-type WebsocketState = 0 | 1 | 2 | 3;
+type WebsocketState = 0 | 1 | 2 | 3
 
 function getAgent(url: string, config: ConnectionOptions): Agent | undefined {
   // TODO: replace deprecated method
   if (config.proxy != null) {
-    const parsedURL = parseURL(url);
-    const parsedProxyURL = parseURL(config.proxy);
+    const parsedURL = parseURL(url)
+    const parsedProxyURL = parseURL(config.proxy)
     const proxyOverrides = _.omitBy(
       {
-        secureEndpoint: parsedURL.protocol === "wss:",
-        secureProxy: parsedProxyURL.protocol === "https:",
+        secureEndpoint: parsedURL.protocol === 'wss:',
+        secureProxy: parsedProxyURL.protocol === 'https:',
         auth: config.proxyAuthorization,
         ca: config.trustedCertificates,
         key: config.key,
         passphrase: config.passphrase,
         cert: config.certificate,
       },
-      (value) => value == null
-    );
-    const proxyOptions = { ...parsedProxyURL, ...proxyOverrides };
-    let HttpsProxyAgent;
+      (value) => value == null,
+    )
+    const proxyOptions = { ...parsedProxyURL, ...proxyOverrides }
+    let HttpsProxyAgent
     try {
       // eslint-disable-next-line max-len -- Long eslint-disable-next-line TODO: figure out how to make this nicer
       // eslint-disable-next-line import/max-dependencies, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-require-imports, node/global-require, global-require, -- Necessary for the `require`
-      HttpsProxyAgent = require("https-proxy-agent");
+      HttpsProxyAgent = require('https-proxy-agent')
     } catch (_error) {
-      throw new Error('"proxy" option is not supported in the browser');
+      throw new Error('"proxy" option is not supported in the browser')
     }
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-call -- Necessary
-    return new HttpsProxyAgent(proxyOptions) as unknown as Agent;
+    return new HttpsProxyAgent(proxyOptions) as unknown as Agent
   }
-  return undefined;
+  return undefined
 }
 
 /**
@@ -98,13 +98,13 @@ function getAgent(url: string, config: ConnectionOptions): Agent | undefined {
  */
 function createWebSocket(
   url: string,
-  config: ConnectionOptions
+  config: ConnectionOptions,
 ): WebSocket | null {
-  const options: WebSocket.ClientOptions = {};
-  options.agent = getAgent(url, config);
+  const options: WebSocket.ClientOptions = {}
+  options.agent = getAgent(url, config)
   if (config.authorization != null) {
-    const base64 = Buffer.from(config.authorization).toString("base64");
-    options.headers = { Authorization: `Basic ${base64}` };
+    const base64 = Buffer.from(config.authorization).toString('base64')
+    options.headers = { Authorization: `Basic ${base64}` }
   }
   const optionsOverrides = _.omitBy(
     {
@@ -113,16 +113,16 @@ function createWebSocket(
       passphrase: config.passphrase,
       cert: config.certificate,
     },
-    (value) => value == null
-  );
-  const websocketOptions = { ...options, ...optionsOverrides };
-  const websocket = new WebSocket(url, websocketOptions);
+    (value) => value == null,
+  )
+  const websocketOptions = { ...options, ...optionsOverrides }
+  const websocket = new WebSocket(url, websocketOptions)
   // we will have a listener for each outstanding request,
   // so we have to raise the limit (the default is 10)
-  if (typeof websocket.setMaxListeners === "function") {
-    websocket.setMaxListeners(Infinity);
+  if (typeof websocket.setMaxListeners === 'function') {
+    websocket.setMaxListeners(Infinity)
   }
-  return websocket;
+  return websocket
 }
 
 /**
@@ -134,17 +134,17 @@ function createWebSocket(
  */
 async function websocketSendAsync(
   ws: WebSocket,
-  message: string
+  message: string,
 ): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     ws.send(message, (error) => {
       if (error) {
-        reject(new DisconnectedError(error.message, error));
+        reject(new DisconnectedError(error.message, error))
       } else {
-        resolve();
+        resolve()
       }
-    });
-  });
+    })
+  })
 }
 
 /**
@@ -152,18 +152,18 @@ async function websocketSendAsync(
  * an active WebSocket connection to a XRPL node.
  */
 export class Connection extends EventEmitter {
-  private readonly url: string | undefined;
-  private ws: WebSocket | null = null;
-  private reconnectTimeoutID: null | NodeJS.Timeout = null;
-  private heartbeatIntervalID: null | NodeJS.Timeout = null;
+  private readonly url: string | undefined
+  private ws: WebSocket | null = null
+  private reconnectTimeoutID: null | NodeJS.Timeout = null
+  private heartbeatIntervalID: null | NodeJS.Timeout = null
   private readonly retryConnectionBackoff = new ExponentialBackoff({
     min: 100,
     max: SECONDS_PER_MINUTE * 1000,
-  });
+  })
 
-  private readonly config: ConnectionOptions;
-  private readonly requestManager = new RequestManager();
-  private readonly connectionManager = new ConnectionManager();
+  private readonly config: ConnectionOptions
+  private readonly requestManager = new RequestManager()
+  private readonly connectionManager = new ConnectionManager()
 
   /**
    * Creates a new Connection object.
@@ -172,19 +172,19 @@ export class Connection extends EventEmitter {
    * @param options - Options for the Connection object.
    */
   public constructor(url?: string, options: ConnectionUserOptions = {}) {
-    super();
-    this.setMaxListeners(Infinity);
-    this.url = url;
+    super()
+    this.setMaxListeners(Infinity)
+    this.url = url
     this.config = {
       timeout: TIMEOUT * 1000,
       connectionTimeout: CONNECTION_TIMEOUT * 1000,
       ...options,
-    };
-    if (typeof options.trace === "function") {
-      this.trace = options.trace;
+    }
+    if (typeof options.trace === 'function') {
+      this.trace = options.trace
     } else if (options.trace) {
       // eslint-disable-next-line no-console -- Used for tracing only
-      this.trace = console.log;
+      this.trace = console.log
     }
   }
 
@@ -194,7 +194,7 @@ export class Connection extends EventEmitter {
    * @returns Whether the websocket connection is open.
    */
   public isConnected(): boolean {
-    return this.state === WebSocket.OPEN;
+    return this.state === WebSocket.OPEN
   }
 
   /**
@@ -205,22 +205,22 @@ export class Connection extends EventEmitter {
    */
   public async connect(): Promise<void> {
     if (this.isConnected()) {
-      return Promise.resolve();
+      return Promise.resolve()
     }
     if (this.state === WebSocket.CONNECTING) {
-      return this.connectionManager.awaitConnection();
+      return this.connectionManager.awaitConnection()
     }
     if (!this.url) {
       return Promise.reject(
-        new ConnectionError("Cannot connect because no server was specified")
-      );
+        new ConnectionError('Cannot connect because no server was specified'),
+      )
     }
     if (this.ws != null) {
       return Promise.reject(
-        new RippleError("Websocket connection never cleaned up.", {
+        new RippleError('Websocket connection never cleaned up.', {
           state: this.state,
-        })
-      );
+        }),
+      )
     }
 
     // Create the connection timeout, in case the connection hangs longer than expected.
@@ -229,24 +229,24 @@ export class Connection extends EventEmitter {
         new ConnectionError(
           `Error: connect() timed out after ${this.config.connectionTimeout} ms. ` +
             `If your internet connection is working, the rippled server may be blocked or inaccessible. ` +
-            `You can also try setting the 'connectionTimeout' option in the Client constructor.`
-        )
-      );
-    }, this.config.connectionTimeout);
+            `You can also try setting the 'connectionTimeout' option in the Client constructor.`,
+        ),
+      )
+    }, this.config.connectionTimeout)
     // Connection listeners: these stay attached only until a connection is done/open.
-    this.ws = createWebSocket(this.url, this.config);
+    this.ws = createWebSocket(this.url, this.config)
 
     if (this.ws == null) {
-      throw new Error("Connect: created null websocket");
+      throw new Error('Connect: created null websocket')
     }
 
-    this.ws.on("error", (error) => this.onConnectionFailed(error));
-    this.ws.on("error", () => clearTimeout(connectionTimeoutID));
-    this.ws.on("close", (reason) => this.onConnectionFailed(reason));
-    this.ws.on("close", () => clearTimeout(connectionTimeoutID));
+    this.ws.on('error', (error) => this.onConnectionFailed(error))
+    this.ws.on('error', () => clearTimeout(connectionTimeoutID))
+    this.ws.on('close', (reason) => this.onConnectionFailed(reason))
+    this.ws.on('close', () => clearTimeout(connectionTimeoutID))
     // eslint-disable-next-line @typescript-eslint/no-misused-promises -- TODO: resolve this
-    this.ws.once("open", async () => this.onceOpen(connectionTimeoutID));
-    return this.connectionManager.awaitConnection();
+    this.ws.once('open', async () => this.onceOpen(connectionTimeoutID))
+    return this.connectionManager.awaitConnection()
   }
 
   /**
@@ -260,30 +260,30 @@ export class Connection extends EventEmitter {
    */
   public async disconnect(): Promise<number | undefined> {
     if (this.reconnectTimeoutID !== null) {
-      clearTimeout(this.reconnectTimeoutID);
-      this.reconnectTimeoutID = null;
+      clearTimeout(this.reconnectTimeoutID)
+      this.reconnectTimeoutID = null
     }
     if (this.state === WebSocket.CLOSED) {
-      return Promise.resolve(undefined);
+      return Promise.resolve(undefined)
     }
     if (this.ws == null) {
-      return Promise.resolve(undefined);
+      return Promise.resolve(undefined)
     }
 
     return new Promise((resolve) => {
       if (this.ws == null) {
-        resolve(undefined);
+        resolve(undefined)
       }
       if (this.ws != null) {
-        this.ws.once("close", (code) => resolve(code));
+        this.ws.once('close', (code) => resolve(code))
       }
       // Connection already has a disconnect handler for the disconnect logic.
       // Just close the websocket manually (with our "intentional" code) to
       // trigger that.
       if (this.ws != null && this.state !== WebSocket.CLOSING) {
-        this.ws.close(INTENTIONAL_DISCONNECT_CODE);
+        this.ws.close(INTENTIONAL_DISCONNECT_CODE)
       }
-    });
+    })
   }
 
   /**
@@ -293,9 +293,9 @@ export class Connection extends EventEmitter {
     // NOTE: We currently have a "reconnecting" event, but that only triggers
     // through an unexpected connection retry logic.
     // See: https://github.com/ripple/ripple-lib/pull/1101#issuecomment-565360423
-    this.emit("reconnect");
-    await this.disconnect();
-    await this.connect();
+    this.emit('reconnect')
+    await this.disconnect()
+    await this.connect()
   }
 
   /**
@@ -308,21 +308,21 @@ export class Connection extends EventEmitter {
    */
   public async request<T extends BaseRequest>(
     request: T,
-    timeout?: number
+    timeout?: number,
   ): Promise<unknown> {
     if (!this.shouldBeConnected || this.ws == null) {
-      throw new NotConnectedError();
+      throw new NotConnectedError()
     }
     const [id, message, responsePromise] = this.requestManager.createRequest(
       request,
-      timeout ?? this.config.timeout
-    );
-    this.trace("send", message);
+      timeout ?? this.config.timeout,
+    )
+    this.trace('send', message)
     websocketSendAsync(this.ws, message).catch((error) => {
-      this.requestManager.reject(id, error);
-    });
+      this.requestManager.reject(id, error)
+    })
 
-    return responsePromise;
+    return responsePromise
   }
 
   /**
@@ -331,11 +331,11 @@ export class Connection extends EventEmitter {
    * @returns The Websocket connection URL.
    */
   public getUrl(): string {
-    return this.url ?? "";
+    return this.url ?? ''
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function -- Does nothing on default
-  private readonly trace: (id: string, message: string) => void = () => {};
+  private readonly trace: (id: string, message: string) => void = () => {}
 
   /**
    * Handler for when messages are received from the server.
@@ -343,31 +343,31 @@ export class Connection extends EventEmitter {
    * @param message - The message received from the server.
    */
   private onMessage(message): void {
-    this.trace("receive", message);
-    let data: Record<string, unknown>;
+    this.trace('receive', message)
+    let data: Record<string, unknown>
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Must be a JSON dictionary
-      data = JSON.parse(message);
+      data = JSON.parse(message)
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Errors have messages
-      this.emit("error", "badMessage", error.message, message);
-      return;
+      this.emit('error', 'badMessage', error.message, message)
+      return
     }
     if (data.type == null && data.error) {
       // e.g. slowDown
-      this.emit("error", data.error, data.error_message, data);
-      return;
+      this.emit('error', data.error, data.error_message, data)
+      return
     }
     if (data.type) {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
-      this.emit(data.type as string, data);
+      this.emit(data.type as string, data)
     }
-    if (data.type === "response") {
+    if (data.type === 'response') {
       try {
-        this.requestManager.handleResponse(data);
+        this.requestManager.handleResponse(data)
       } catch (error) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Errors have messages
-        this.emit("error", "badMessage", error.message, message);
+        this.emit('error', 'badMessage', error.message, message)
       }
     }
   }
@@ -378,7 +378,7 @@ export class Connection extends EventEmitter {
    * @returns The Websocket's ready state.
    */
   private get state(): WebsocketState {
-    return this.ws ? this.ws.readyState : WebSocket.CLOSED;
+    return this.ws ? this.ws.readyState : WebSocket.CLOSED
   }
 
   /**
@@ -387,7 +387,7 @@ export class Connection extends EventEmitter {
    * @returns Whether the server should be connected.
    */
   private get shouldBeConnected(): boolean {
-    return this.ws !== null;
+    return this.ws !== null
   }
 
   /**
@@ -399,60 +399,60 @@ export class Connection extends EventEmitter {
    */
   private async onceOpen(connectionTimeoutID: NodeJS.Timeout): Promise<void> {
     if (this.ws == null) {
-      throw new Error("onceOpen: ws is null");
+      throw new Error('onceOpen: ws is null')
     }
 
     // Once the connection completes successfully, remove all old listeners
-    this.ws.removeAllListeners();
-    clearTimeout(connectionTimeoutID);
+    this.ws.removeAllListeners()
+    clearTimeout(connectionTimeoutID)
     // Add new, long-term connected listeners for messages and errors
-    this.ws.on("message", (message: string) => this.onMessage(message));
-    this.ws.on("error", (error) =>
-      this.emit("error", "websocket", error.message, error)
-    );
+    this.ws.on('message', (message: string) => this.onMessage(message))
+    this.ws.on('error', (error) =>
+      this.emit('error', 'websocket', error.message, error),
+    )
     // Handle a closed connection: reconnect if it was unexpected
-    this.ws.once("close", (code, reason) => {
+    this.ws.once('close', (code, reason) => {
       if (this.ws == null) {
-        throw new Error("onceClose: ws is null");
+        throw new Error('onceClose: ws is null')
       }
 
-      this.clearHeartbeatInterval();
+      this.clearHeartbeatInterval()
       this.requestManager.rejectAll(
-        new DisconnectedError(`websocket was closed, ${reason}`)
-      );
-      this.ws.removeAllListeners();
-      this.ws = null;
-      this.emit("disconnected", code);
+        new DisconnectedError(`websocket was closed, ${reason}`),
+      )
+      this.ws.removeAllListeners()
+      this.ws = null
+      this.emit('disconnected', code)
       // If this wasn't a manual disconnect, then lets reconnect ASAP.
       if (code !== INTENTIONAL_DISCONNECT_CODE) {
-        this.intentionalDisconnect();
+        this.intentionalDisconnect()
       }
-    });
+    })
     // Finalize the connection and resolve all awaiting connect() requests
     try {
-      this.retryConnectionBackoff.reset();
-      this.startHeartbeatInterval();
-      this.connectionManager.resolveAllAwaiting();
-      this.emit("connected");
+      this.retryConnectionBackoff.reset()
+      this.startHeartbeatInterval()
+      this.connectionManager.resolveAllAwaiting()
+      this.emit('connected')
     } catch (error) {
-      this.connectionManager.rejectAllAwaiting(error);
+      this.connectionManager.rejectAllAwaiting(error)
       // Ignore this error, propagate the root cause.
       // eslint-disable-next-line @typescript-eslint/no-empty-function -- Need empty catch
-      await this.disconnect().catch(() => {});
+      await this.disconnect().catch(() => {})
     }
   }
 
   private intentionalDisconnect(): void {
-    const retryTimeout = this.retryConnectionBackoff.duration();
-    this.trace("reconnect", `Retrying connection in ${retryTimeout}ms.`);
-    this.emit("reconnecting", this.retryConnectionBackoff.attempts);
+    const retryTimeout = this.retryConnectionBackoff.duration()
+    this.trace('reconnect', `Retrying connection in ${retryTimeout}ms.`)
+    this.emit('reconnecting', this.retryConnectionBackoff.attempts)
     // Start the reconnect timeout, but set it to `this.reconnectTimeoutID`
     // so that we can cancel one in-progress on disconnect.
     this.reconnectTimeoutID = setTimeout(() => {
       this.reconnect().catch((error: Error) => {
-        this.emit("error", "reconnect", error.message, error);
-      });
-    }, retryTimeout);
+        this.emit('error', 'reconnect', error.message, error)
+      })
+    }, retryTimeout)
   }
 
   /**
@@ -460,7 +460,7 @@ export class Connection extends EventEmitter {
    */
   private clearHeartbeatInterval(): void {
     if (this.heartbeatIntervalID) {
-      clearInterval(this.heartbeatIntervalID);
+      clearInterval(this.heartbeatIntervalID)
     }
   }
 
@@ -468,12 +468,12 @@ export class Connection extends EventEmitter {
    * Starts a heartbeat to check the connection with the server.
    */
   private startHeartbeatInterval(): void {
-    this.clearHeartbeatInterval();
+    this.clearHeartbeatInterval()
     this.heartbeatIntervalID = setInterval(
       // eslint-disable-next-line @typescript-eslint/no-misused-promises -- TODO: resolve this
       async () => this.heartbeat(),
-      this.config.timeout
-    );
+      this.config.timeout,
+    )
   }
 
   /**
@@ -483,11 +483,11 @@ export class Connection extends EventEmitter {
    * @returns A Promise that resolves to void when the heartbeat returns successfully.
    */
   private async heartbeat(): Promise<void> {
-    this.request({ command: "ping" }).catch(async () => {
+    this.request({ command: 'ping' }).catch(async () => {
       return this.reconnect().catch((error: Error) => {
-        this.emit("error", "reconnect", error.message, error);
-      });
-    });
+        this.emit('error', 'reconnect', error.message, error)
+      })
+    })
   }
 
   /**
@@ -497,28 +497,28 @@ export class Connection extends EventEmitter {
    */
   private onConnectionFailed(errorOrCode: Error | number | null): void {
     if (this.ws) {
-      this.ws.removeAllListeners();
-      this.ws.on("error", () => {
+      this.ws.removeAllListeners()
+      this.ws.on('error', () => {
         // Correctly listen for -- but ignore -- any future errors: If you
         // don't have a listener on "error" node would log a warning on error.
-      });
-      this.ws.close();
-      this.ws = null;
+      })
+      this.ws.close()
+      this.ws = null
     }
-    if (typeof errorOrCode === "number") {
+    if (typeof errorOrCode === 'number') {
       this.connectionManager.rejectAllAwaiting(
         new NotConnectedError(`Connection failed with code ${errorOrCode}.`, {
           code: errorOrCode,
-        })
-      );
+        }),
+      )
     } else if (errorOrCode?.message) {
       this.connectionManager.rejectAllAwaiting(
-        new NotConnectedError(errorOrCode.message, errorOrCode)
-      );
+        new NotConnectedError(errorOrCode.message, errorOrCode),
+      )
     } else {
       this.connectionManager.rejectAllAwaiting(
-        new NotConnectedError("Connection failed.")
-      );
+        new NotConnectedError('Connection failed.'),
+      )
     }
   }
 }

@@ -1,10 +1,10 @@
-import { ValidationError } from "../../common/errors";
+import { ValidationError } from '../../common/errors'
 
-import { BaseTransaction, verifyBaseTransaction } from "./common";
+import { BaseTransaction, verifyBaseTransaction } from './common'
 
 export interface OfferCancel extends BaseTransaction {
-  TransactionType: "OfferCancel";
-  OfferSequence: number;
+  TransactionType: 'OfferCancel'
+  OfferSequence: number
 }
 
 /**
@@ -14,13 +14,13 @@ export interface OfferCancel extends BaseTransaction {
  * @throws When the OfferCancel is Malformed.
  */
 export function verifyOfferCancel(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx);
+  verifyBaseTransaction(tx)
 
   if (tx.OfferSequence === undefined) {
-    throw new ValidationError("OfferCancel: missing field OfferSequence");
+    throw new ValidationError('OfferCancel: missing field OfferSequence')
   }
 
-  if (typeof tx.OfferSequence !== "number") {
-    throw new ValidationError("OfferCancel: OfferSequence must be a number");
+  if (typeof tx.OfferSequence !== 'number') {
+    throw new ValidationError('OfferCancel: OfferSequence must be a number')
   }
 }
