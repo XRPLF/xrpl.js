@@ -33,6 +33,11 @@ function sign(wallet: Wallet, tx: Transaction): string {
   return wallet.signTransaction(tx, { signAs: "" });
 }
 
+// TODO: Uncomment and add tests
+//function multisign(wallet: Wallet, tx: Transaction): string {
+//  return wallet.signTransaction(tx, { signAs: wallet.getClassicAddress() });
+//}
+
 /**
  * Takes several transactions (in object or blob form) and creates a single transaction with all Signers
  * that then gets signed and returned.
@@ -44,7 +49,7 @@ function sign(wallet: Wallet, tx: Transaction): string {
  * - The SigningPubKey field is not the empty string in any given transaction
  * - Any transaction is missing a Signers field.
  */
-function multisign(transactions: Array<Transaction | string>): string {
+function combineMultisigned(transactions: Array<Transaction | string>): string {
   if (transactions.length === 0) {
     throw new ValidationError("There were 0 transactions given to multisign");
   }
@@ -219,4 +224,4 @@ function getEncodedTransaction(txOrBlob: Transaction | string): string {
   return txOrBlob;
 }
 
-export { sign, multisign, authorizeChannel, verify };
+export { sign, authorizeChannel, verify, combineMultisigned };

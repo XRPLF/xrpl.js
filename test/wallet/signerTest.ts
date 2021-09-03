@@ -8,7 +8,7 @@ import {
   verify,
   sign,
   authorizeChannel,
-  multisign,
+  combineMultisigned,
 } from "../../src/wallet/signer";
 
 const publicKey =
@@ -25,6 +25,56 @@ const tx: Transaction = {
   Sequence: 1,
   Fee: "12",
   SigningPubKey: publicKey,
+};
+
+const multisignTx1: Transaction = {
+  Account: "rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC",
+  Fee: "30000",
+  Flags: 262144,
+  LimitAmount: {
+    currency: "USD",
+    issuer: "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+    value: "100",
+  },
+  Sequence: 2,
+  Signers: [
+    {
+      Signer: {
+        Account: "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
+        SigningPubKey:
+          "02B3EC4E5DD96029A647CFA20DA07FE1F85296505552CCAC114087E66B46BD77DF",
+        TxnSignature:
+          "30450221009C195DBBF7967E223D8626CA19CF02073667F2B22E206727BFE848FF42BEAC8A022048C323B0BED19A988BDBEFA974B6DE8AA9DCAE250AA82BBD1221787032A864E5",
+      },
+    },
+  ],
+  SigningPubKey: "",
+  TransactionType: "TrustSet",
+};
+
+const multisignTx2: Transaction = {
+  Account: "rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC",
+  Fee: "30000",
+  Flags: 262144,
+  LimitAmount: {
+    currency: "USD",
+    issuer: "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+    value: "100",
+  },
+  Sequence: 2,
+  Signers: [
+    {
+      Signer: {
+        Account: "rUpy3eEg8rqjqfUoLeBnZkscbKbFsKXC3v",
+        TxnSignature:
+          "30440220680BBD745004E9CFB6B13A137F505FB92298AD309071D16C7B982825188FD1AE022004200B1F7E4A6A84BB0E4FC09E1E3BA2B66EBD32F0E6D121A34BA3B04AD99BC1",
+        SigningPubKey:
+          "028FFB276505F9AC3F57E8D5242B386A597EF6C40A7999F37F1948636FD484E25B",
+      },
+    },
+  ],
+  SigningPubKey: "",
+  TransactionType: "TrustSet",
 };
 
 describe("Signer tests", function () {
@@ -51,65 +101,16 @@ describe("Signer tests", function () {
     assert.equal(signedTx, signedTxBlob);
   });
 
-  it("multisigns successfully", function () {
-    const tx1: Transaction = {
-      Account: "rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC",
-      Fee: "30000",
-      Flags: 262144,
-      LimitAmount: {
-        currency: "USD",
-        issuer: "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
-        value: "100",
-      },
-      Sequence: 2,
-      Signers: [
-        {
-          Signer: {
-            Account: "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-            SigningPubKey:
-              "02B3EC4E5DD96029A647CFA20DA07FE1F85296505552CCAC114087E66B46BD77DF",
-            TxnSignature:
-              "30450221009C195DBBF7967E223D8626CA19CF02073667F2B22E206727BFE848FF42BEAC8A022048C323B0BED19A988BDBEFA974B6DE8AA9DCAE250AA82BBD1221787032A864E5",
-          },
-        },
-      ],
-      SigningPubKey: "",
-      TransactionType: "TrustSet",
-    };
+  it("combineMultisigned runs successfully", function () {
+    const transactions: Transaction[] = [multisignTx1, multisignTx2];
 
-    const tx2: Transaction = {
-      Account: "rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC",
-      Fee: "30000",
-      Flags: 262144,
-      LimitAmount: {
-        currency: "USD",
-        issuer: "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
-        value: "100",
-      },
-      Sequence: 2,
-      Signers: [
-        {
-          Signer: {
-            Account: "rUpy3eEg8rqjqfUoLeBnZkscbKbFsKXC3v",
-            TxnSignature:
-              "30440220680BBD745004E9CFB6B13A137F505FB92298AD309071D16C7B982825188FD1AE022004200B1F7E4A6A84BB0E4FC09E1E3BA2B66EBD32F0E6D121A34BA3B04AD99BC1",
-            SigningPubKey:
-              "028FFB276505F9AC3F57E8D5242B386A597EF6C40A7999F37F1948636FD484E25B",
-          },
-        },
-      ],
-      SigningPubKey: "",
-      TransactionType: "TrustSet",
-    };
-
-    const transactions: Transaction[] = [tx1, tx2];
-
-    multisign(transactions);
+    // TODO: Compare this result to something else (Get the results of the existing combine for comparison)
+    combineMultisigned(transactions);
   });
 
-  it("throws a validation error if multisigning with no transactions", function () {
+  it("throws a validation error if trying to combineMultisigned with no transactions", function () {
     const transactions: Transaction[] = [];
-    assert.throws(() => multisign(transactions), ValidationError);
+    assert.throws(() => combineMultisigned(transactions), ValidationError);
   });
 
   it("authorizeChannel succeeds", function () {

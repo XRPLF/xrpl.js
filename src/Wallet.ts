@@ -138,6 +138,10 @@ class Wallet {
   getXAddress(tag: number, test = false): string {
     return classicAddressToXAddress(deriveAddress(this.publicKey), tag, test);
   }
+
+  getClassicAddress(): string {
+    return deriveAddress(this.publicKey);
+  }
 }
 
 export default Wallet;
