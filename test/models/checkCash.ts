@@ -9,7 +9,7 @@ import { verifyCheckCash } from "../../src/models/transactions/checkCash";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("CheckCash Transaction Verification", function () {
+describe("CheckCash", function () {
   it(`verifies valid CheckCash`, function () {
     const validCheckCash = {
       Account: "rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy",
@@ -28,7 +28,7 @@ describe("CheckCash Transaction Verification", function () {
       Account: "rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy",
       TransactionType: "CheckCash",
       Amount: "100000000",
-      CheckID: 83876645678909854567890,
+      CheckID: 83876645678567890,
     } as any;
 
     assert.throws(

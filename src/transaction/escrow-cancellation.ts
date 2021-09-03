@@ -1,10 +1,8 @@
-import { Client } from "..";
+import type { Client } from "..";
 import { Memo } from "../common/types/objects";
 
 import { Instructions, Prepare, TransactionJSON } from "./types";
 import * as utils from "./utils";
-
-const validate = utils.common.validate;
 
 export interface EscrowCancellation {
   owner: string;
@@ -31,17 +29,12 @@ function createEscrowCancellationTransaction(
   return txJSON;
 }
 
-function prepareEscrowCancellation(
+async function prepareEscrowCancellation(
   this: Client,
   address: string,
   escrowCancellation: EscrowCancellation,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareEscrowCancellation({
-    address,
-    escrowCancellation,
-    instructions,
-  });
   const txJSON = createEscrowCancellationTransaction(
     address,
     escrowCancellation

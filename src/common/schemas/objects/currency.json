@@ -1,8 +1,0 @@
-{
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "currency",
-  "description": "The three-character code or hexadecimal string used to denote currencies",
-  "type": "string",
-  "link": "currency",
-  "pattern": "^([a-zA-Z0-9<>(){}[\\]|?!@#$%^&*]{3}|[A-F0-9]{40}|drops)$"
-}

@@ -3,7 +3,7 @@ import requests from "../fixtures/requests";
 import responses from "../fixtures/responses";
 import { assertResultMatch } from "../testUtils";
 
-describe("Verify Payment Channel Claim", function () {
+describe("verifyPaymentChannelClaim", function () {
   it("basic verification works", function () {
     const publicKey =
       "02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8";

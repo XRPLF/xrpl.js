@@ -28,9 +28,9 @@ All "prepare*" methods have the same return type.
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
-const escrowCreation = <%- importFile('test/fixtures/requests/prepare-escrow-creation.json') %>;
+const escrowCreation = <%- importFile('test/fixtures/requests/prepareEscrowCreation.json') %>;
 return api.prepareEscrowCreation(address, escrowCreation).then(prepared =>
   {/* ... */});
 ```
 
-<%- renderFixture('responses/prepare-escrow-creation.json') %>
+<%- renderFixture('responses/prepareEscrowCreation.json') %>

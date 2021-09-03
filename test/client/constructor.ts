@@ -14,7 +14,7 @@ describe("client constructor", function () {
 
   it("Client valid options", function () {
     const client = new Client("wss://s:1");
-    const privateConnectionUrl = (client.connection as any)._url;
+    const privateConnectionUrl = (client.connection as any).url;
     assert.deepEqual(privateConnectionUrl, "wss://s:1");
   });
 

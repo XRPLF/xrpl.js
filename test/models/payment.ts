@@ -12,7 +12,7 @@ import {
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("Payment Transaction Verification", function () {
+describe("Payment", function () {
   let paymentTransaction;
 
   beforeEach(function () {
@@ -107,8 +107,8 @@ describe("Payment Transaction Verification", function () {
 
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a number`, function () {
     paymentTransaction.DeliverMin = "10000";
-    (paymentTransaction.Flags = PaymentTransactionFlagsEnum.tfPartialPayment),
-      assert.doesNotThrow(() => verifyPayment(paymentTransaction));
+    paymentTransaction.Flags = PaymentTransactionFlagsEnum.tfPartialPayment;
+    assert.doesNotThrow(() => verifyPayment(paymentTransaction));
   });
 
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a boolean`, function () {

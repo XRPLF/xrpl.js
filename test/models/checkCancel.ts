@@ -9,7 +9,7 @@ import { verifyCheckCancel } from "../../src/models/transactions/checkCancel";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("CheckCancel Transaction Verification", function () {
+describe("CheckCancel", function () {
   it(`verifies valid CheckCancel`, function () {
     const validCheckCancel = {
       Account: "rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo",
@@ -25,7 +25,7 @@ describe("CheckCancel Transaction Verification", function () {
     const invalidCheckID = {
       Account: "rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo",
       TransactionType: "CheckCancel",
-      CheckID: 496473456789876545678909876545678,
+      CheckID: 4964734566545678,
     } as any;
 
     assert.throws(

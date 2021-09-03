@@ -5,7 +5,6 @@ import type { Client } from "..";
 import { Prepare, TransactionJSON, Instructions } from "./types";
 import * as utils from "./utils";
 
-const validate = utils.common.validate;
 const ValidationError = utils.common.errors.ValidationError;
 
 export interface Ticket {
@@ -37,7 +36,6 @@ function prepareTicketCreate(
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareTicketCreate({ address, ticketCount, instructions });
     const txJSON = createTicketTransaction(address, ticketCount);
     return utils.prepareTransaction(txJSON, this, instructions);
   } catch (e) {

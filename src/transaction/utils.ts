@@ -4,7 +4,7 @@ import {
   isValidXAddress,
 } from "ripple-address-codec";
 
-import { Client } from "..";
+import type { Client } from "..";
 import * as common from "../common";
 import { ValidationError } from "../common/errors";
 import { Memo } from "../common/types/objects";
@@ -30,6 +30,8 @@ export interface ApiMemo {
   MemoType?: string;
   MemoFormat?: string;
 }
+
+// TODO: move relevant methods from here to `src/utils` (such as `convertStringToHex`?)
 
 function formatPrepareResponse(txJSON: any): Prepare {
   const instructions: any = {
@@ -121,14 +123,11 @@ function getClassicAccountAndTag(
   };
 }
 
-function prepareTransaction(
+async function prepareTransaction(
   txJSON: TransactionJSON,
   client: Client,
   instructions: Instructions
 ): Promise<Prepare> {
-  common.validate.instructions(instructions);
-  common.validate.tx_json(txJSON);
-
   // We allow 0 values in the Sequence schema to support the Tickets feature
   // When a ticketSequence is used, sequence has to be 0
   // We validate that a sequence with value 0 is not passed even if the json schema allows it
@@ -247,7 +246,7 @@ function prepareTransaction(
 
   setCanonicalFlag(newTxJSON);
 
-  function prepareMaxLedgerVersion(): Promise<void> {
+  async function prepareMaxLedgerVersion(): Promise<void> {
     // Up to one of the following is allowed:
     //   txJSON.LastLedgerSequence
     //   instructions.maxLedgerVersion
@@ -289,7 +288,7 @@ function prepareTransaction(
       });
   }
 
-  function prepareFee(): Promise<void> {
+  async function prepareFee(): Promise<void> {
     // instructions.fee is scaled (for multi-signed transactions) while txJSON.Fee is not.
     // Due to this difference, we do NOT allow both to be set, as the behavior would be complex and
     // potentially ambiguous.
@@ -310,11 +309,11 @@ function prepareTransaction(
       instructions.signersCount == null ? 1 : instructions.signersCount + 1;
     if (instructions.fee != null) {
       const fee = new BigNumber(instructions.fee);
-      if (fee.isGreaterThan(client._maxFeeXRP)) {
+      if (fee.isGreaterThan(client.maxFeeXRP)) {
         return Promise.reject(
           new ValidationError(
             `Fee of ${fee.toString(10)} XRP exceeds ` +
-              `max of ${client._maxFeeXRP} XRP. To use this fee, increase ` +
+              `max of ${client.maxFeeXRP} XRP. To use this fee, increase ` +
               "`maxFeeXRP` in the Client constructor."
           )
         );
@@ -322,8 +321,8 @@ function prepareTransaction(
       newTxJSON.Fee = scaleValue(xrpToDrops(instructions.fee), multiplier);
       return Promise.resolve();
     }
-    const cushion = client._feeCushion;
-    return client.getFee(cushion).then((fee) => {
+    const cushion = client.feeCushion;
+    return client.getFee(cushion).then(async (fee) => {
       return client
         .request({ command: "fee" })
         .then((response) => Number(response.result.drops.minimum_fee))
@@ -341,8 +340,8 @@ function prepareTransaction(
                   ));
           const feeDrops = xrpToDrops(fee);
           const maxFeeXRP = instructions.maxFee
-            ? BigNumber.min(client._maxFeeXRP, instructions.maxFee)
-            : client._maxFeeXRP;
+            ? BigNumber.min(client.maxFeeXRP, instructions.maxFee)
+            : client.maxFeeXRP;
           const maxFeeDrops = xrpToDrops(maxFeeXRP);
           const normalFee = scaleValue(feeDrops, multiplier, extraFee);
           newTxJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString(10);
