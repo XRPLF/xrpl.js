@@ -1,4 +1,5 @@
 export interface BaseRequest {
+  [x: string]: unknown;
   id?: number | string;
   command: string;
   api_version?: number;

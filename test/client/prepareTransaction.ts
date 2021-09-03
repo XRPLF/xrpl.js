@@ -1005,7 +1005,7 @@ describe("client.prepareTransaction", function () {
     this.mockRippled.addResponse("fee", rippled.fee);
     this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
     this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    this.client._feeCushion = 1000000;
+    this.client.feeCushion = 1000000;
 
     const txJSON = {
       Flags: 2147483648,
@@ -1046,7 +1046,7 @@ describe("client.prepareTransaction", function () {
     this.mockRippled.addResponse("fee", rippled.fee);
     this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
     this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    this.client._feeCushion = 1000000;
+    this.client.feeCushion = 1000000;
 
     const txJSON = {
       Flags: 2147483648,
@@ -1092,8 +1092,8 @@ describe("client.prepareTransaction", function () {
     this.mockRippled.addResponse("fee", rippled.fee);
     this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
     this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    this.client._feeCushion = 1000000;
-    this.client._maxFeeXRP = "3";
+    this.client.feeCushion = 1000000;
+    this.client.maxFeeXRP = "3";
     const localInstructions = {
       maxFee: "4", // We are testing that this does not matter; fee is still capped to maxFeeXRP
     };
@@ -1139,8 +1139,8 @@ describe("client.prepareTransaction", function () {
     this.mockRippled.addResponse("fee", rippled.fee);
     this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
     this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    this.client._feeCushion = 1000000;
-    this.client._maxFeeXRP = "5";
+    this.client.feeCushion = 1000000;
+    this.client.maxFeeXRP = "5";
     const localInstructions = {
       maxFee: "4", // maxFeeXRP does not matter if maxFee is lower than maxFeeXRP
     };

@@ -3,6 +3,7 @@ import _ from "lodash";
 import { Server as WebSocketServer } from "ws";
 
 import type { Request } from "../src";
+import type { BaseResponse } from "../src/models/methods/baseMethod";
 
 import { getFreePort } from "./testUtils";
 
@@ -27,6 +28,12 @@ function ping(conn, request) {
       })
     );
   }, 1000 * 2);
+}
+
+export interface PortResponse extends BaseResponse {
+  result: {
+    port: number;
+  };
 }
 
 // We mock out WebSocketServer in these tests and add a lot of custom

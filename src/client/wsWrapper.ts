@@ -1,15 +1,27 @@
+/* eslint-disable import/no-unused-modules -- This is used by webpack */
+/* eslint-disable max-classes-per-file -- Needs to be a wrapper for ws */
 import { EventEmitter } from "events";
 
 // Define the global WebSocket class found on the native browser
 declare class WebSocket {
-  onclose?: Function;
-  onopen?: Function;
-  onerror?: Function;
-  onmessage?: Function;
-  readyState: number;
-  constructor(url: string);
-  close();
-  send(message: string);
+  public onclose?: () => void;
+  public onopen?: () => void;
+  public onerror?: (error: Error) => void;
+  public onmessage?: (message: MessageEvent) => void;
+  public readyState: number;
+  public constructor(url: string);
+  public close(code?: number): void;
+  public send(message: string): void;
+}
+
+interface WSWrapperOptions {
+  perMessageDeflate: boolean;
+  handshakeTimeout: number;
+  protocolVersion: number;
+  origin: string;
+  maxPayload: number;
+  followRedirects: boolean;
+  maxRedirects: number;
 }
 
 /**
@@ -17,46 +29,71 @@ declare class WebSocket {
  * same, as `ws` package provides.
  */
 export default class WSWrapper extends EventEmitter {
-  private readonly _ws: WebSocket;
-  static CONNECTING = 0;
-  static OPEN = 1;
-  static CLOSING = 2;
-  static CLOSED = 3;
+  public static CONNECTING = 0;
+  public static OPEN = 1;
+  public static CLOSING = 2;
+  // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- magic number is being defined here
+  public static CLOSED = 3;
+  private readonly ws: WebSocket;
 
-  constructor(url, _protocols: any, _websocketOptions: any) {
+  /**
+   * Constructs a browser-safe websocket.
+   *
+   * @param url - URL to connect to.
+   * @param _protocols - Not used.
+   * @param _websocketOptions - Not used.
+   */
+  public constructor(
+    url: string,
+    _protocols: string | string[] | WSWrapperOptions | undefined,
+    _websocketOptions: WSWrapperOptions
+  ) {
     super();
     this.setMaxListeners(Infinity);
 
-    this._ws = new WebSocket(url);
+    this.ws = new WebSocket(url);
 
-    this._ws.onclose = () => {
+    this.ws.onclose = (): void => {
       this.emit("close");
     };
 
-    this._ws.onopen = () => {
+    this.ws.onopen = (): void => {
       this.emit("open");
     };
 
-    this._ws.onerror = (error) => {
+    this.ws.onerror = (error): void => {
       this.emit("error", error);
     };
 
-    this._ws.onmessage = (message) => {
+    this.ws.onmessage = (message: MessageEvent): void => {
       this.emit("message", message.data);
     };
   }
 
-  close() {
+  /**
+   * Closes the websocket.
+   */
+  public close(): void {
     if (this.readyState === 1) {
-      this._ws.close();
+      this.ws.close();
     }
   }
 
-  send(message) {
-    this._ws.send(message);
+  /**
+   * Sends a message over the Websocket connection.
+   *
+   * @param message - Message to send.
+   */
+  public send(message: string): void {
+    this.ws.send(message);
   }
 
-  get readyState() {
-    return this._ws.readyState;
+  /**
+   * Get the ready state of the websocket.
+   *
+   * @returns The Websocket's ready state.
+   */
+  public get readyState(): number {
+    return this.ws.readyState;
   }
 }

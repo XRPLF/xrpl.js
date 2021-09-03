@@ -42,7 +42,7 @@ describe("BroadcastClient", function () {
       assert.strictEqual(info, "info");
       done();
     });
-    this.client._clients[1].connection
+    this.client.clients[1].connection
       .request({
         command: "echo",
         data,

@@ -2,7 +2,7 @@ import * as assert from "assert";
 
 import BigNumber from "bignumber.js";
 
-import { Client } from "..";
+import type { Client } from "..";
 import { FormattedSettings, WeightedSigner } from "../common/types/objects";
 
 import {

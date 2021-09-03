@@ -42,9 +42,9 @@ describe("Connection", function () {
 
   it("default options", function () {
     const connection: any = new Connection("url");
-    assert.strictEqual(connection._url, "url");
-    assert(connection._config.proxy == null);
-    assert(connection._config.authorization == null);
+    assert.strictEqual(connection.url, "url");
+    assert(connection.config.proxy == null);
+    assert(connection.config.authorization == null);
   });
 
   describe("trace", function () {
@@ -65,9 +65,9 @@ describe("Connection", function () {
       const messages: any[] = [];
       console.log = (id, message) => messages.push([id, message]);
       const connection: any = new Connection("url", { trace: false });
-      connection._ws = { send() {} };
+      connection.ws = { send() {} };
       connection.request(mockedRequestData);
-      connection._onMessage(mockedResponse);
+      connection.onMessage(mockedResponse);
       assert.deepEqual(messages, []);
     });
 
@@ -75,9 +75,9 @@ describe("Connection", function () {
       const messages: any[] = [];
       console.log = (id, message) => messages.push([id, message]);
       const connection: any = new Connection("url", { trace: true });
-      connection._ws = { send() {} };
+      connection.ws = { send() {} };
       connection.request(mockedRequestData);
-      connection._onMessage(mockedResponse);
+      connection.onMessage(mockedResponse);
       assert.deepEqual(messages, expectedMessages);
     });
 
@@ -86,9 +86,9 @@ describe("Connection", function () {
       const connection: any = new Connection("url", {
         trace: (id, message) => messages.push([id, message]),
       });
-      connection._ws = { send() {} };
+      connection.ws = { send() {} };
       connection.request(mockedRequestData);
-      connection._onMessage(mockedResponse);
+      connection.onMessage(mockedResponse);
       assert.deepEqual(messages, expectedMessages);
     });
   });
@@ -116,7 +116,7 @@ describe("Connection", function () {
         authorization: "authorization",
         trustedCertificates: ["path/to/pem"],
       };
-      const connection = new Connection(this.client.connection._url, options);
+      const connection = new Connection(this.client.connection.url, options);
       connection.connect().catch((err) => {
         assert(err instanceof NotConnectedError);
       });
@@ -177,7 +177,7 @@ describe("Connection", function () {
   });
 
   it("TimeoutError", function () {
-    this.client.connection._ws.send = function (_, callback) {
+    this.client.connection.ws.send = function (_, callback) {
       callback(null);
     };
     const request = { command: "server_info" };
@@ -192,7 +192,7 @@ describe("Connection", function () {
   });
 
   it("DisconnectedError on send", function () {
-    this.client.connection._ws.send = function (_, callback) {
+    this.client.connection.ws.send = function (_, callback) {
       callback({ message: "not connected" });
     };
     return this.client
@@ -206,15 +206,15 @@ describe("Connection", function () {
       });
   });
 
-  it("DisconnectedError on initial _onOpen send", async function () {
+  it("DisconnectedError on initial onOpen send", async function () {
     // _onOpen previously could throw PromiseRejectionHandledWarning: Promise rejection was handled asynchronously
     // do not rely on the client.setup hook to test this as it bypasses the case, disconnect client connection first
     await this.client.disconnect();
 
     // stub _onOpen to only run logic relevant to test case
-    this.client.connection._onOpen = () => {
+    this.client.connection.onOpen = () => {
       // overload websocket send on open when _ws exists
-      this.client.connection._ws.send = function (_0, _1, _2) {
+      this.client.connection.ws.send = function (_0, _1, _2) {
         // recent ws throws this error instead of calling back
         throw new Error("WebSocket is not open: readyState 0 (CONNECTING)");
       };
@@ -225,7 +225,8 @@ describe("Connection", function () {
     try {
       await this.client.connect();
     } catch (error) {
-      assert(error instanceof DisconnectedError);
+      console.log(error);
+      assert.instanceOf(error, DisconnectedError);
       assert.strictEqual(
         error.message,
         "WebSocket is not open: readyState 0 (CONNECTING)"
@@ -252,7 +253,7 @@ describe("Connection", function () {
       done();
     });
     setTimeout(() => {
-      this.client.connection._ws.close();
+      this.client.connection.ws.close();
     }, 1);
   });
 
@@ -329,13 +330,13 @@ describe("Connection", function () {
       }
     }
     // Set the heartbeat to less than the 1 second ping response
-    this.client.connection._config.timeout = 500;
+    this.client.connection.config.timeout = 500;
     // Drop the test runner timeout, since this should be a quick test
     this.timeout(5000);
     // Hook up a listener for the reconnect event
     this.client.connection.on("reconnect", () => done());
     // Trigger a heartbeat
-    this.client.connection._heartbeat().catch((error) => {
+    this.client.connection.heartbeat().catch((error) => {
       /* ignore - test expects heartbeat failure */
     });
   });
@@ -349,7 +350,7 @@ describe("Connection", function () {
       }
     }
     // Set the heartbeat to less than the 1 second ping response
-    this.client.connection._config.timeout = 500;
+    this.client.connection.config.timeout = 500;
     // Drop the test runner timeout, since this should be a quick test
     this.timeout(5000);
     // fail on reconnect/connection
@@ -364,7 +365,7 @@ describe("Connection", function () {
       return done(new Error("Expected error on reconnect"));
     });
     // Trigger a heartbeat
-    this.client.connection._heartbeat();
+    this.client.connection.heartbeat();
   });
 
   it("should emit disconnected event with code 1000 (CLOSE_NORMAL)", function (done) {
@@ -393,7 +394,7 @@ describe("Connection", function () {
 
   it("should emit connected event on after reconnect", function (done) {
     this.client.once("connected", done);
-    this.client.connection._ws.close();
+    this.client.connection.ws.close();
   });
 
   it("Multiply connect calls", function () {
@@ -450,17 +451,17 @@ describe("Connection", function () {
       done();
     });
 
-    this.client.connection._onMessage(
+    this.client.connection.onMessage(
       JSON.stringify({
         type: "transaction",
       })
     );
-    this.client.connection._onMessage(
+    this.client.connection.onMessage(
       JSON.stringify({
         type: "path_find",
       })
     );
-    this.client.connection._onMessage(
+    this.client.connection.onMessage(
       JSON.stringify({
         type: "response",
         id: 1,
@@ -475,7 +476,7 @@ describe("Connection", function () {
       assert.strictEqual(message, '{"type":"response","id":"must be integer"}');
       done();
     });
-    this.client.connection._onMessage(
+    this.client.connection.onMessage(
       JSON.stringify({
         type: "response",
         id: "must be integer",
@@ -490,7 +491,7 @@ describe("Connection", function () {
       assert.deepEqual(data, { error: "slowDown", error_message: "slow down" });
       done();
     });
-    this.client.connection._onMessage(
+    this.client.connection.onMessage(
       JSON.stringify({
         error: "slowDown",
         error_message: "slow down",
@@ -525,13 +526,13 @@ describe("Connection", function () {
       done();
     });
 
-    this.client.connection._onMessage(JSON.stringify({ type: "unknown" }));
+    this.client.connection.onMessage(JSON.stringify({ type: "unknown" }));
   });
 
   // it('should clean up websocket connection if error after websocket is opened', async function () {
   //   await this.client.disconnect()
   //   // fail on connection
-  //   this.client.connection._subscribeToLedger = async () => {
+  //   this.client.connection.subscribeToLedger = async () => {
   //     throw new Error('error on _subscribeToLedger')
   //   }
   //   try {
@@ -541,7 +542,7 @@ describe("Connection", function () {
   //     assert(err.message === 'error on _subscribeToLedger')
   //     // _ws.close event listener should have cleaned up the socket when disconnect _ws.close is run on connection error
   //     // do not fail on connection anymore
-  //     this.client.connection._subscribeToLedger = async () => {}
+  //     this.client.connection.subscribeToLedger = async () => {}
   //     await this.client.connection.reconnect()
   //   }
   // })
