@@ -11,8 +11,6 @@ import { computeBinaryTransactionHash } from "../utils/hashes";
 import { SignOptions, KeyPair, TransactionJSON } from "./types";
 import * as utils from "./utils";
 
-const validate = utils.common.validate;
-
 function computeSignature(tx: object, privateKey: string, signAs?: string) {
   const signingData = signAs
     ? binaryCodec.encodeForMultisigning(tx, signAs)
@@ -28,8 +26,6 @@ function signWithKeypair(
     signAs: "",
   }
 ): SignedTransaction {
-  validate.sign({ txJSON, keypair });
-
   const tx = JSON.parse(txJSON);
   if (tx.TxnSignature || tx.Signers) {
     throw new utils.common.errors.ValidationError(
@@ -229,7 +225,6 @@ function sign(
   if (typeof secret === "string") {
     // we can't validate that the secret matches the account because
     // the secret could correspond to the regular key
-    validate.sign({ txJSON, secret });
     return signWithKeypair(
       this,
       txJSON,

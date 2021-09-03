@@ -4,7 +4,6 @@ import { Memo } from "../common/types/objects";
 import { Instructions, Prepare, TransactionJSON } from "./types";
 import * as utils from "./utils";
 
-const validate = utils.common.validate;
 const ValidationError = utils.common.errors.ValidationError;
 
 export interface EscrowExecution {
@@ -45,16 +44,15 @@ function createEscrowExecutionTransaction(
   return txJSON;
 }
 
-function prepareEscrowExecution(
+async function prepareEscrowExecution(
   this: Client,
   address: string,
   escrowExecution: EscrowExecution,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareEscrowExecution({ address, escrowExecution, instructions });
     const txJSON = createEscrowExecutionTransaction(address, escrowExecution);
-    return utils.prepareTransaction(txJSON, this, instructions);
+    return await utils.prepareTransaction(txJSON, this, instructions);
   } catch (e) {
     return Promise.reject(e);
   }

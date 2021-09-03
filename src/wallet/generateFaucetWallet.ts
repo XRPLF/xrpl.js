@@ -1,9 +1,10 @@
 import https = require("https");
 
+import { isValidClassicAddress } from "ripple-address-codec";
+
 import { Client, Wallet } from "..";
 import { errors } from "../common";
 import { RippledError } from "../common/errors";
-import { isValidAddress } from "../common/schema-validator";
 import { GeneratedAddress } from "../utils/generateAddress";
 
 export interface FaucetWallet {
@@ -38,7 +39,7 @@ async function generateFaucetWallet(
 
   // Generate a new Wallet if no existing Wallet is provided or its address is invalid to fund
   const fundWallet =
-    wallet && isValidAddress(wallet.classicAddress)
+    wallet && isValidClassicAddress(wallet.classicAddress)
       ? wallet
       : Wallet.generate();
 

@@ -1,5 +1,4 @@
 import { Client } from "..";
-import { validate } from "../common";
 import { Amount } from "../common/types/objects";
 import { ISOTimeToRippleTime, toRippledAmount } from "../utils";
 
@@ -40,16 +39,15 @@ function createCheckCreateTransaction(
   return txJSON;
 }
 
-function prepareCheckCreate(
+async function prepareCheckCreate(
   this: Client,
   address: string,
   checkCreate: CheckCreateParameters,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareCheckCreate({ address, checkCreate, instructions });
     const txJSON = createCheckCreateTransaction(address, checkCreate);
-    return utils.prepareTransaction(txJSON, this, instructions);
+    return await utils.prepareTransaction(txJSON, this, instructions);
   } catch (e) {
     return Promise.reject(e);
   }

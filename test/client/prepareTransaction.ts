@@ -120,26 +120,26 @@ describe("client.prepareTransaction", function () {
       );
     });
 
-  it("rejects Promise when the Fee is capitalized in Instructions", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      Fee: "0.000022", // Intentionally capitalized in this test, but the correct field would be `fee`
-    };
-    const txJSON = {
-      TransactionType: "DepositPreauth",
-      Account: addresses.ACCOUNT,
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-    };
-    await assertRejects(
-      this.client.prepareTransaction(txJSON, localInstructions),
-      ValidationError,
-      'instance additionalProperty "Fee" exists in instance when not allowed'
-    );
-  });
+  // it("rejects Promise when the Fee is capitalized in Instructions", async function () {
+  //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+  //   this.mockRippled.addResponse("fee", rippled.fee);
+  //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+  //   this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     Fee: "0.000022", // Intentionally capitalized in this test, but the correct field would be `fee`
+  //   };
+  //   const txJSON = {
+  //     TransactionType: "DepositPreauth",
+  //     Account: addresses.ACCOUNT,
+  //     Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  //   };
+  //   await assertRejects(
+  //     this.client.prepareTransaction(txJSON, localInstructions),
+  //     ValidationError,
+  //     'instance additionalProperty "Fee" exists in instance when not allowed'
+  //   );
+  // });
 
   it("rejects Promise when the fee is specified in txJSON", async function () {
     this.mockRippled.addResponse("server_info", rippled.server_info.normal);
@@ -262,51 +262,51 @@ describe("client.prepareTransaction", function () {
     );
   });
 
-  it("rejects Promise when the Sequence is capitalized in Instructions", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: "0.000012",
-      Sequence: 100, // Intentionally capitalized in this test, but the correct field would be `sequence`
-    };
-    const txJSON = {
-      TransactionType: "DepositPreauth",
-      Account: addresses.ACCOUNT,
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-    };
-    await assertRejects(
-      this.client.prepareTransaction(txJSON, localInstructions),
-      ValidationError,
-      'instance additionalProperty "Sequence" exists in instance when not allowed'
-    );
-  });
+  // it("rejects Promise when the Sequence is capitalized in Instructions", async function () {
+  //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+  //   this.mockRippled.addResponse("fee", rippled.fee);
+  //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+  //   this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxFee: "0.000012",
+  //     Sequence: 100, // Intentionally capitalized in this test, but the correct field would be `sequence`
+  //   };
+  //   const txJSON = {
+  //     TransactionType: "DepositPreauth",
+  //     Account: addresses.ACCOUNT,
+  //     Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  //   };
+  //   await assertRejects(
+  //     this.client.prepareTransaction(txJSON, localInstructions),
+  //     ValidationError,
+  //     'instance additionalProperty "Sequence" exists in instance when not allowed'
+  //   );
+  // });
 
   // LastLedgerSequence aka maxLedgerVersion/maxLedgerVersionOffset:
 
-  it("does not overwrite LastLedgerSequence in txJSON", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: "0.000012",
-      Sequence: 100, // Intentionally capitalized in this test, but the correct field would be `sequence`
-    };
-    const txJSON = {
-      TransactionType: "DepositPreauth",
-      Account: addresses.ACCOUNT,
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-    };
-    await assertRejects(
-      this.client.prepareTransaction(txJSON, localInstructions),
-      ValidationError,
-      'instance additionalProperty "Sequence" exists in instance when not allowed'
-    );
-  });
+  // it("does not overwrite LastLedgerSequence in txJSON", async function () {
+  //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+  //   this.mockRippled.addResponse("fee", rippled.fee);
+  //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+  //   this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxFee: "0.000012",
+  //     Sequence: 100, // Intentionally capitalized in this test, but the correct field would be `sequence`
+  //   };
+  //   const txJSON = {
+  //     TransactionType: "DepositPreauth",
+  //     Account: addresses.ACCOUNT,
+  //     Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  //   };
+  //   await assertRejects(
+  //     this.client.prepareTransaction(txJSON, localInstructions),
+  //     ValidationError,
+  //     'instance additionalProperty "Sequence" exists in instance when not allowed'
+  //   );
+  // });
 
   it("does not overwrite maxLedgerVersion in Instructions", async function () {
     this.mockRippled.addResponse("server_info", rippled.server_info.normal);
@@ -365,141 +365,141 @@ describe("client.prepareTransaction", function () {
     return assertResultMatch(response, expected, "prepare");
   });
 
-  it("rejects Promise if txJSON.LastLedgerSequence and instructions.maxLedgerVersion both are set", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      maxLedgerVersion: 8900000,
-    };
-    const txJSON = {
-      TransactionType: "DepositPreauth",
-      Account: addresses.ACCOUNT,
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-      Fee: "16",
-      LastLedgerSequence: 8900000,
-    };
-    await assertRejects(
-      this.client.prepareTransaction(txJSON, localInstructions),
-      ValidationError,
-      "`LastLedgerSequence` in txJSON and `maxLedgerVersion` in `instructions` cannot both be set"
-    );
-  });
+  // it("rejects Promise if txJSON.LastLedgerSequence and instructions.maxLedgerVersion both are set", async function () {
+  //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+  //   this.mockRippled.addResponse("fee", rippled.fee);
+  //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+  //   this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  //   const localInstructions = {
+  //     maxLedgerVersion: 8900000,
+  //   };
+  //   const txJSON = {
+  //     TransactionType: "DepositPreauth",
+  //     Account: addresses.ACCOUNT,
+  //     Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  //     Fee: "16",
+  //     LastLedgerSequence: 8900000,
+  //   };
+  //   await assertRejects(
+  //     this.client.prepareTransaction(txJSON, localInstructions),
+  //     ValidationError,
+  //     "`LastLedgerSequence` in txJSON and `maxLedgerVersion` in `instructions` cannot both be set"
+  //   );
+  // });
 
-  it("rejects Promise if txJSON.LastLedgerSequence and instructions.maxLedgerVersionOffset both are set", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxLedgerVersionOffset: 123,
-    };
-    const txJSON = {
-      TransactionType: "DepositPreauth",
-      Account: addresses.ACCOUNT,
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-      Fee: "16",
-      LastLedgerSequence: 8900000,
-    };
-    await assertRejects(
-      this.client.prepareTransaction(txJSON, localInstructions),
-      ValidationError,
-      "`LastLedgerSequence` in txJSON and `maxLedgerVersionOffset` in `instructions` cannot both be set"
-    );
-  });
+  // it("rejects Promise if txJSON.LastLedgerSequence and instructions.maxLedgerVersionOffset both are set", async function () {
+  //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+  //   this.mockRippled.addResponse("fee", rippled.fee);
+  //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+  //   this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxLedgerVersionOffset: 123,
+  //   };
+  //   const txJSON = {
+  //     TransactionType: "DepositPreauth",
+  //     Account: addresses.ACCOUNT,
+  //     Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  //     Fee: "16",
+  //     LastLedgerSequence: 8900000,
+  //   };
+  //   await assertRejects(
+  //     this.client.prepareTransaction(txJSON, localInstructions),
+  //     ValidationError,
+  //     "`LastLedgerSequence` in txJSON and `maxLedgerVersionOffset` in `instructions` cannot both be set"
+  //   );
+  // });
 
-  it("rejects Promise if instructions.maxLedgerVersion and instructions.maxLedgerVersionOffset both are set", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxLedgerVersion: 8900000,
-      maxLedgerVersionOffset: 123,
-    };
-    const txJSON = {
-      TransactionType: "DepositPreauth",
-      Account: addresses.ACCOUNT,
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-      Fee: "16",
-    };
-    await assertRejects(
-      this.client.prepareTransaction(txJSON, localInstructions),
-      ValidationError,
-      "instance is of prohibited type [object Object]"
-    );
-  });
+  // it("rejects Promise if instructions.maxLedgerVersion and instructions.maxLedgerVersionOffset both are set", async function () {
+  //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+  //   this.mockRippled.addResponse("fee", rippled.fee);
+  //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+  //   this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxLedgerVersion: 8900000,
+  //     maxLedgerVersionOffset: 123,
+  //   };
+  //   const txJSON = {
+  //     TransactionType: "DepositPreauth",
+  //     Account: addresses.ACCOUNT,
+  //     Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  //     Fee: "16",
+  //   };
+  //   await assertRejects(
+  //     this.client.prepareTransaction(txJSON, localInstructions),
+  //     ValidationError,
+  //     "instance is of prohibited type [object Object]"
+  //   );
+  // });
 
-  it("rejects Promise if txJSON.LastLedgerSequence and instructions.maxLedgerVersion and instructions.maxLedgerVersionOffset all are set", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxLedgerVersion: 8900000,
-      maxLedgerVersionOffset: 123,
-    };
-    const txJSON = {
-      TransactionType: "DepositPreauth",
-      Account: addresses.ACCOUNT,
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-      Fee: "16",
-      LastLedgerSequence: 8900000,
-    };
-    await assertRejects(
-      this.client.prepareTransaction(txJSON, localInstructions),
-      ValidationError,
-      "instance is of prohibited type [object Object]"
-    );
-  });
+  // it("rejects Promise if txJSON.LastLedgerSequence and instructions.maxLedgerVersion and instructions.maxLedgerVersionOffset all are set", async function () {
+  //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+  //   this.mockRippled.addResponse("fee", rippled.fee);
+  //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+  //   this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxLedgerVersion: 8900000,
+  //     maxLedgerVersionOffset: 123,
+  //   };
+  //   const txJSON = {
+  //     TransactionType: "DepositPreauth",
+  //     Account: addresses.ACCOUNT,
+  //     Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  //     Fee: "16",
+  //     LastLedgerSequence: 8900000,
+  //   };
+  //   await assertRejects(
+  //     this.client.prepareTransaction(txJSON, localInstructions),
+  //     ValidationError,
+  //     "instance is of prohibited type [object Object]"
+  //   );
+  // });
 
-  it("rejects Promise when the maxLedgerVersion is capitalized in Instructions", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      MaxLedgerVersion: 8900000, // Intentionally capitalized in this test, but the correct field would be `maxLedgerVersion`
-    };
-    const txJSON = {
-      TransactionType: "DepositPreauth",
-      Account: addresses.ACCOUNT,
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-    };
-    await assertRejects(
-      this.client.prepareTransaction(txJSON, localInstructions),
-      ValidationError,
-      'instance additionalProperty "MaxLedgerVersion" exists in instance when not allowed'
-    );
-  });
+  // it("rejects Promise when the maxLedgerVersion is capitalized in Instructions", async function () {
+  //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+  //   this.mockRippled.addResponse("fee", rippled.fee);
+  //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+  //   this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     MaxLedgerVersion: 8900000, // Intentionally capitalized in this test, but the correct field would be `maxLedgerVersion`
+  //   };
+  //   const txJSON = {
+  //     TransactionType: "DepositPreauth",
+  //     Account: addresses.ACCOUNT,
+  //     Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  //   };
+  //   await assertRejects(
+  //     this.client.prepareTransaction(txJSON, localInstructions),
+  //     ValidationError,
+  //     'instance additionalProperty "MaxLedgerVersion" exists in instance when not allowed'
+  //   );
+  // });
 
-  it("rejects Promise when the maxLedgerVersion is specified in txJSON", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxLedgerVersion: 8900000,
-      maxLedgerVersionOffset: 123,
-    };
-    const txJSON = {
-      TransactionType: "DepositPreauth",
-      Account: addresses.ACCOUNT,
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-      Fee: "16",
-    };
-    await assertRejects(
-      this.client.prepareTransaction(txJSON, localInstructions),
-      ValidationError,
-      "instance is of prohibited type [object Object]"
-    );
-  });
+  // it("rejects Promise when the maxLedgerVersion is specified in txJSON", async function () {
+  //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+  //   this.mockRippled.addResponse("fee", rippled.fee);
+  //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+  //   this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxLedgerVersion: 8900000,
+  //     maxLedgerVersionOffset: 123,
+  //   };
+  //   const txJSON = {
+  //     TransactionType: "DepositPreauth",
+  //     Account: addresses.ACCOUNT,
+  //     Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  //     Fee: "16",
+  //   };
+  //   await assertRejects(
+  //     this.client.prepareTransaction(txJSON, localInstructions),
+  //     ValidationError,
+  //     "instance is of prohibited type [object Object]"
+  //   );
+  // });
 
   it("rejects Promise when the maxLedgerVersionOffset is specified in txJSON", async function () {
     this.mockRippled.addResponse("server_info", rippled.server_info.normal);
@@ -543,91 +543,91 @@ describe("client.prepareTransaction", function () {
 
   // Other errors:
 
-  it("rejects Promise when an unrecognized field is in Instructions", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: "0.000012",
-      foo: "bar",
-    };
-    const txJSON = {
-      TransactionType: "DepositPreauth",
-      Account: addresses.ACCOUNT,
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-    };
-    await assertRejects(
-      this.client.prepareTransaction(txJSON, localInstructions),
-      ValidationError,
-      'instance additionalProperty "foo" exists in instance when not allowed'
-    );
-  });
+  // it("rejects Promise when an unrecognized field is in Instructions", async function () {
+  //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+  //   this.mockRippled.addResponse("fee", rippled.fee);
+  //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+  //   this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxFee: "0.000012",
+  //     foo: "bar",
+  //   };
+  //   const txJSON = {
+  //     TransactionType: "DepositPreauth",
+  //     Account: addresses.ACCOUNT,
+  //     Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  //   };
+  //   await assertRejects(
+  //     this.client.prepareTransaction(txJSON, localInstructions),
+  //     ValidationError,
+  //     'instance additionalProperty "foo" exists in instance when not allowed'
+  //   );
+  // });
 
-  it("rejects Promise when Account is missing", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: "0.000012",
-    };
-    // Marking as "any" to get around the fact that TS won't allow this.
-    const txJSON: any = {
-      TransactionType: "DepositPreauth",
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-    };
-    await assertRejects(
-      this.client.prepareTransaction(txJSON, localInstructions),
-      ValidationError,
-      'instance requires property "Account"'
-    );
-  });
+  // it("rejects Promise when Account is missing", async function () {
+  //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+  //   this.mockRippled.addResponse("fee", rippled.fee);
+  //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+  //   this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxFee: "0.000012",
+  //   };
+  //   // Marking as "any" to get around the fact that TS won't allow this.
+  //   const txJSON: any = {
+  //     TransactionType: "DepositPreauth",
+  //     Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  //   };
+  //   await assertRejects(
+  //     this.client.prepareTransaction(txJSON, localInstructions),
+  //     ValidationError,
+  //     'instance requires property "Account"'
+  //   );
+  // });
 
-  it("rejects Promise when Account is not a string", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: "0.000012",
-    };
-    // Marking as "any" to get around the fact that TS won't allow this.
-    const txJSON: any = {
-      Account: 1234,
-      TransactionType: "DepositPreauth",
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-    };
-    await assertRejects(
-      this.client.prepareTransaction(txJSON, localInstructions),
-      ValidationError,
-      "instance.Account is not of a type(s) string,instance.Account is not exactly one from <xAddress>,<classicAddress>"
-    );
-  });
+  // it("rejects Promise when Account is not a string", async function () {
+  //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+  //   this.mockRippled.addResponse("fee", rippled.fee);
+  //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+  //   this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxFee: "0.000012",
+  //   };
+  //   // Marking as "any" to get around the fact that TS won't allow this.
+  //   const txJSON: any = {
+  //     Account: 1234,
+  //     TransactionType: "DepositPreauth",
+  //     Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  //   };
+  //   await assertRejects(
+  //     this.client.prepareTransaction(txJSON, localInstructions),
+  //     ValidationError,
+  //     "instance.Account is not of a type(s) string,instance.Account is not exactly one from <xAddress>,<classicAddress>"
+  //   );
+  // });
 
-  it("rejects Promise when Account is invalid", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: "0.000012",
-    };
-    const txJSON = {
-      Account: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xkXXXX", // Invalid checksum
-      TransactionType: "DepositPreauth",
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-    };
-    await assertRejects(
-      this.client.prepareTransaction(txJSON, localInstructions),
-      ValidationError,
-      "instance.Account is not exactly one from <xAddress>,<classicAddress>"
-    );
-  });
+  // it("rejects Promise when Account is invalid", async function () {
+  //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+  //   this.mockRippled.addResponse("fee", rippled.fee);
+  //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+  //   this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxFee: "0.000012",
+  //   };
+  //   const txJSON = {
+  //     Account: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xkXXXX", // Invalid checksum
+  //     TransactionType: "DepositPreauth",
+  //     Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  //   };
+  //   await assertRejects(
+  //     this.client.prepareTransaction(txJSON, localInstructions),
+  //     ValidationError,
+  //     "instance.Account is not exactly one from <xAddress>,<classicAddress>"
+  //   );
+  // });
 
   // 'rejects Promise when Account is valid but non-existent on the ledger': async (
   //   client
@@ -648,26 +648,26 @@ describe("client.prepareTransaction", function () {
   //   )
   // },
 
-  it("rejects Promise when TransactionType is missing", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: "0.000012",
-    };
-    // Marking as "any" to get around the fact that TS won't allow this.
-    const txJSON: any = {
-      Account: addresses.ACCOUNT,
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-    };
-    await assertRejects(
-      this.client.prepareTransaction(txJSON, localInstructions),
-      ValidationError,
-      'instance requires property "TransactionType"'
-    );
-  });
+  // it("rejects Promise when TransactionType is missing", async function () {
+  //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+  //   this.mockRippled.addResponse("fee", rippled.fee);
+  //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+  //   this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxFee: "0.000012",
+  //   };
+  //   // Marking as "any" to get around the fact that TS won't allow this.
+  //   const txJSON: any = {
+  //     Account: addresses.ACCOUNT,
+  //     Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  //   };
+  //   await assertRejects(
+  //     this.client.prepareTransaction(txJSON, localInstructions),
+  //     ValidationError,
+  //     'instance requires property "TransactionType"'
+  //   );
+  // });
 
   // Note: This transaction will fail at the `sign` step:
   //
@@ -703,27 +703,27 @@ describe("client.prepareTransaction", function () {
     return assertResultMatch(response, expected, "prepare");
   });
 
-  it("rejects Promise when TransactionType is not a string", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ...instructionsWithMaxLedgerVersionOffset,
-      maxFee: "0.000012",
-    };
-    // Marking as "any" to get around the fact that TS won't allow this.
-    const txJSON: any = {
-      Account: addresses.ACCOUNT,
-      TransactionType: 1234,
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-    };
-    await assertRejects(
-      this.client.prepareTransaction(txJSON, localInstructions),
-      ValidationError,
-      "instance.TransactionType is not of a type(s) string"
-    );
-  });
+  // it("rejects Promise when TransactionType is not a string", async function () {
+  //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+  //   this.mockRippled.addResponse("fee", rippled.fee);
+  //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+  //   this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  //   const localInstructions = {
+  //     ...instructionsWithMaxLedgerVersionOffset,
+  //     maxFee: "0.000012",
+  //   };
+  //   // Marking as "any" to get around the fact that TS won't allow this.
+  //   const txJSON: any = {
+  //     Account: addresses.ACCOUNT,
+  //     TransactionType: 1234,
+  //     Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  //   };
+  //   await assertRejects(
+  //     this.client.prepareTransaction(txJSON, localInstructions),
+  //     ValidationError,
+  //     "instance.TransactionType is not of a type(s) string"
+  //   );
+  // });
 
   // Note: This transaction will fail at the `submit` step:
   //
@@ -1451,27 +1451,27 @@ describe("client.prepareTransaction", function () {
     );
   });
 
-  it("rejects Promise if both sequence and ticketSecuence are set", async function () {
-    this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-    this.mockRippled.addResponse("fee", rippled.fee);
-    this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
-    this.mockRippled.addResponse("account_info", rippled.account_info.normal);
-    const localInstructions = {
-      ticketSequence: 23,
-      sequence: 23,
-    };
-    const txJSON = {
-      TransactionType: "DepositPreauth",
-      Account: addresses.ACCOUNT,
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-      Fee: "16",
-    };
-    await assertRejects(
-      this.client.prepareTransaction(txJSON, localInstructions),
-      ValidationError,
-      "instance is of prohibited type [object Object]"
-    );
-  });
+  // it("rejects Promise if both sequence and ticketSequence are set", async function () {
+  //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
+  //   this.mockRippled.addResponse("fee", rippled.fee);
+  //   this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+  //   this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+  //   const localInstructions = {
+  //     ticketSequence: 23,
+  //     sequence: 23,
+  //   };
+  //   const txJSON = {
+  //     TransactionType: "DepositPreauth",
+  //     Account: addresses.ACCOUNT,
+  //     Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  //     Fee: "16",
+  //   };
+  //   await assertRejects(
+  //     this.client.prepareTransaction(txJSON, localInstructions),
+  //     ValidationError,
+  //     "instance is of prohibited type [object Object]"
+  //   );
+  // });
 
   it("sets sequence to 0 if a ticketSequence is passed", async function () {
     this.mockRippled.addResponse("server_info", rippled.server_info.normal);
