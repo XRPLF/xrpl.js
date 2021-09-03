@@ -222,13 +222,13 @@ function ISOTimeToRippleTime(iso8601: string): number {
  * @param params - Parameters to prepend to a function.
  * @returns A function bound with params.
  */
-function bind(func: Function, ...params: any[]): Function {
+function partial(func: Function, ...params: any[]): Function {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- safe to return
   return func.bind(null, ...params);
 }
 
 export {
-  bind,
+  partial,
   computeLedgerHeaderHash,
   dropsToXrp,
   xrpToDrops,

@@ -20,7 +20,7 @@ import {
   decodeXAddress,
 } from "ripple-address-codec";
 
-import { bind } from "..";
+import { partial } from "..";
 import { constants, errors, txFlags, ensureClassicAddress } from "../common";
 import { RippledError, ValidationError } from "../common/errors";
 import { getFee } from "../common/fee";
@@ -191,7 +191,7 @@ class Client extends EventEmitter {
   public readonly maxFeeXRP: string;
 
   // eslint-disable-next-line @typescript-eslint/no-invalid-this -- this is expected
-  public autofill = bind(autofill, this);
+  public autofill = partial(autofill, this);
 
   /**
    * Creates a new Client with a websocket connection to a rippled server.

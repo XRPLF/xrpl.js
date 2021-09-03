@@ -181,7 +181,7 @@ async function calculateFeePerTransactionType(
     baseFee = BigNumber.sum(baseFee, scaleValue(netFeeDrops, 1 + signersCount));
   }
 
-  const maxFeeDrops = xrpToDrops(client._maxFeeXRP);
+  const maxFeeDrops = xrpToDrops(client.maxFeeXRP);
   const totalFee =
     tx.TransactionType === "AccountDelete"
       ? baseFee
