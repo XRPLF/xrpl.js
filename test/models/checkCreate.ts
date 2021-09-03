@@ -30,7 +30,7 @@ describe("CheckCreate", function () {
     const invalidDestination = {
       TransactionType: "CheckCreate",
       Account: "rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo",
-      Destination: 7896214563214789632154,
+      Destination: 7896214789632154,
       SendMax: "100000000",
       Expiration: 570113521,
       InvoiceID:
@@ -113,7 +113,7 @@ describe("CheckCreate", function () {
       Destination: "rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy",
       SendMax: "100000000",
       Expiration: 570113521,
-      InvoiceID: 7896545655285446963258531,
+      InvoiceID: 789656963258531,
       DestinationTag: 1,
       Fee: "12",
     } as any;
