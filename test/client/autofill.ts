@@ -1,6 +1,11 @@
 import { assert } from "chai";
 
-import { Payment, Transaction } from "../../src/models/transactions";
+import {
+  AccountDelete,
+  EscrowFinish,
+  Payment,
+  Transaction,
+} from "../../src/models/transactions";
 import rippled from "../fixtures/rippled";
 import setupClient from "../setupClient";
 
@@ -70,28 +75,110 @@ describe("client.autofill", function () {
     assert.strictEqual(txResult.Sequence, 23);
   });
 
-  it("should autofill Fee when it's missing", async function () {
-    const tx: Transaction = {
-      TransactionType: "DepositPreauth",
-      Account: "rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf",
-      Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-      Sequence,
-      LastLedgerSequence,
-    };
-    this.mockRippled.addResponse("server_info", {
-      status: "success",
-      type: "response",
-      result: {
-        info: {
-          validated_ledger: {
-            base_fee_xrp: 0.00001,
+  describe("when autofill Fee is missing", function () {
+    it("should autofill Fee of a Transaction", async function () {
+      const tx: Transaction = {
+        TransactionType: "DepositPreauth",
+        Account: "rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf",
+        Authorize: "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+        Sequence,
+        LastLedgerSequence,
+      };
+      this.mockRippled.addResponse("server_info", {
+        status: "success",
+        type: "response",
+        result: {
+          info: {
+            validated_ledger: {
+              base_fee_xrp: 0.00001,
+            },
           },
         },
-      },
-    });
-    const txResult = await this.client.autofill(tx);
+      });
+      const txResult = await this.client.autofill(tx);
 
-    assert.strictEqual(txResult.Fee, "1");
+      assert.strictEqual(txResult.Fee, "12");
+    });
+
+    it("should autofill Fee of an EscrowFinish transaction", async function () {
+      const tx: EscrowFinish = {
+        Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+        TransactionType: "EscrowFinish",
+        Owner: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+        OfferSequence: 7,
+        Condition:
+          "A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100",
+        Fulfillment: "A0028000",
+      };
+      this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+      this.mockRippled.addResponse("ledger", rippled.ledger.normal);
+      this.mockRippled.addResponse("server_info", {
+        status: "success",
+        type: "response",
+        result: {
+          info: {
+            validated_ledger: {
+              base_fee_xrp: 0.00001,
+            },
+          },
+        },
+      });
+      const txResult = await this.client.autofill(tx);
+
+      assert.strictEqual(txResult.Fee, "399");
+    });
+
+    it("should autofill Fee of an AccountDelete transaction", async function () {
+      const tx: AccountDelete = {
+        Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+        TransactionType: "AccountDelete",
+        Destination: "X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ",
+      };
+      this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+      this.mockRippled.addResponse("ledger", rippled.ledger.normal);
+      this.mockRippled.addResponse("server_info", {
+        status: "success",
+        type: "response",
+        result: {
+          info: {
+            validated_ledger: {
+              base_fee_xrp: 0.00001,
+            },
+          },
+        },
+      });
+      const txResult = await this.client.autofill(tx);
+
+      assert.strictEqual(txResult.Fee, "5000000");
+    });
+
+    it("should autofill Fee of an EscrowFinish transaction with signersCount", async function () {
+      const tx: EscrowFinish = {
+        Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+        TransactionType: "EscrowFinish",
+        Owner: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+        OfferSequence: 7,
+        Condition:
+          "A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100",
+        Fulfillment: "A0028000",
+      };
+      this.mockRippled.addResponse("account_info", rippled.account_info.normal);
+      this.mockRippled.addResponse("ledger", rippled.ledger.normal);
+      this.mockRippled.addResponse("server_info", {
+        status: "success",
+        type: "response",
+        result: {
+          info: {
+            validated_ledger: {
+              base_fee_xrp: 0.00001,
+            },
+          },
+        },
+      });
+      const txResult = await this.client.autofill(tx, 4);
+
+      assert.strictEqual(txResult.Fee, "459");
+    });
   });
 
   it("should autofill LastLedgerSequence when it's missing", async function () {

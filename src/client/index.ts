@@ -345,8 +345,8 @@ class Client extends EventEmitter {
    * @param tx - A transaction to autofill missing fields.
    * @returns An autofilled transaction.
    */
-  async autofill(tx: Transaction): Promise<Transaction> {
-    return transactionUtils.autofill(this, tx);
+  async autofill(tx: Transaction, signersCount?: number): Promise<Transaction> {
+    return transactionUtils.autofill(this, tx, signersCount);
   }
 
   /**

@@ -11,14 +11,13 @@ import { Memo } from "../common/types/objects";
 import { AccountInfoRequest, LedgerRequest } from "../models/methods";
 import { Transaction } from "../models/transactions";
 import { setTransactionFlagsToNumber } from "../models/utils";
+import { Instructions, Prepare, TransactionJSON } from "../transaction/types";
 import {
   toRippledAmount,
   dropsToXrp,
   removeUndefined,
   xrpToDrops,
 } from "../utils";
-
-import { Instructions, Prepare, TransactionJSON } from "../transaction/types";
 
 const txFlags = common.txFlags;
 const TRANSACTION_TYPES_WITH_DESTINATION_TAG_FIELD = [
@@ -422,10 +421,16 @@ function convertMemo(memo: Memo): { Memo: ApiMemo } {
  *
  * @param client - A client.
  * @param tx - A transaction to autofill fields.
+ * @param signersCount - A signers count used for multisign.
  * @returns An autofilled transaction.
  */
-async function autofill(client: Client, tx: Transaction): Promise<Transaction> {
+async function autofill(
+  client: Client,
+  tx: Transaction,
+  signersCount?: number
+): Promise<Transaction> {
   validateAccountAddress(tx, "Account", "SourceTag");
+  // eslint-disable-next-line @typescript-eslint/dot-notation -- Destination can exist on Transaction
   if (tx["Destination"] != null) {
     validateAccountAddress(tx, "Destination", "DestinationTag");
   }
@@ -440,12 +445,12 @@ async function autofill(client: Client, tx: Transaction): Promise<Transaction> {
 
   setTransactionFlagsToNumber(tx);
 
-  const promises: Promise<void>[] = [];
+  const promises: Array<Promise<void>> = [];
   if (tx.Sequence == null) {
     promises.push(setNextValidSequenceNumber(client, tx));
   }
   if (tx.Fee == null) {
-    promises.push(calculateFeePerTransactionType(client, tx));
+    promises.push(calculateFeePerTransactionType(client, tx, signersCount));
   }
   if (tx.LastLedgerSequence == null) {
     promises.push(setLatestValidatedLedgerSequence(client, tx));
@@ -490,39 +495,47 @@ async function setNextValidSequenceNumber(
     account: tx.Account,
   };
   const data = await client.request(request);
-  tx.Sequence = data.result.account_data.Sequence
+  tx.Sequence = data.result.account_data.Sequence;
 }
 
 async function calculateFeePerTransactionType(
   client: Client,
-  tx: Transaction
+  tx: Transaction,
+  signersCount = 0
 ): Promise<void> {
-  const netFee = parseFloat(await client.getFee()); // Usually 0.00001 XRP (10 drops)
-  let baseFee = netFee;
+  const netFeeXRP: string = await client.getFee(); // Usually 0.00001 XRP (10 drops)
+  const netFeeDrops: string = xrpToDrops(netFeeXRP);
+  let baseFee: BigNumber = new BigNumber(netFeeDrops);
 
   // EscrowFinish Transaction with Fulfillment
-  if (
-    tx.TransactionType === "EscrowFinish" &&
-    tx.Fulfillment != null
-  ) {
-    const fulfillmentBytesSize = Math.ceil(tx.Fulfillment.length / 2);
+  if (tx.TransactionType === "EscrowFinish" && tx.Fulfillment != null) {
+    const fulfillmentBytesSize: number = Math.ceil(tx.Fulfillment.length / 2);
     // 10 drops × (33 + (Fulfillment size in bytes / 16))
-    baseFee = Math.ceil(netFee * (33 + fulfillmentBytesSize / 16));
+    const product = new BigNumber(
+      scaleValue(netFeeDrops, 33 + fulfillmentBytesSize / 16)
+    );
+    baseFee = product.dp(0, BigNumber.ROUND_CEIL);
   }
 
   // AccountDelete Transaction
   if (tx.TransactionType === "AccountDelete") {
-    baseFee = ACCOUNT_DELETE_FEE;
+    baseFee = new BigNumber(ACCOUNT_DELETE_FEE);
   }
 
   // Multi-signed Transaction
   // 10 drops × (1 + Number of Signatures Provided)
-  if (tx.Signers != null && tx.Signers.length > 0) {
-    baseFee = netFee * (1 + tx.Signers.length) + baseFee;
+  if (signersCount > 0) {
+    baseFee = BigNumber.sum(baseFee, scaleValue(netFeeDrops, 1 + signersCount));
   }
 
+  const maxFeeDrops = xrpToDrops(client._maxFeeXRP);
+  const totalFee =
+    tx.TransactionType !== "AccountDelete"
+      ? BigNumber.min(baseFee, maxFeeDrops)
+      : baseFee;
+
   // Round up baseFee and return it as a string
-  tx.Fee = Math.ceil(baseFee).toString();
+  tx.Fee = totalFee.dp(0, BigNumber.ROUND_CEIL).toString(10);
 }
 
 async function setLatestValidatedLedgerSequence(
