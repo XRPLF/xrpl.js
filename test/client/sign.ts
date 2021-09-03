@@ -199,7 +199,7 @@ describe("client.sign", function () {
   });
 
   it("permits fee exceeding 2000000 drops when maxFeeXRP is higher than 2 XRP", async function () {
-    this.client._maxFeeXRP = "2.1";
+    this.client.maxFeeXRP = "2.1";
     const secret = "shsWGZcmZz6YsWWmcnpfr6fLTdtFV";
     const request = {
       // TODO: This fails when address is X-address
@@ -247,7 +247,7 @@ describe("client.sign", function () {
       });
 
       it("throws when Fee exceeds maxFeeXRP (in drops) - custom maxFeeXRP", async function () {
-        this.client._maxFeeXRP = "1.9";
+        this.client.maxFeeXRP = "1.9";
         const secret = "shsWGZcmZz6YsWWmcnpfr6fLTdtFV";
         const request = {
           txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"${test.address}","Domain":"6578616D706C652E636F6D","LastLedgerSequence":8820051,"Fee":"2010000","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,

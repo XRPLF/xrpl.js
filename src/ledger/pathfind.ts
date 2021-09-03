@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 import _ from "lodash";
 
 import type { Client } from "..";
-import { Connection } from "../client";
+import type { Connection } from "../client";
 import { errors } from "../common";
 import { RippledAmount, Amount } from "../common/types/objects";
 import { RipplePathFindRequest } from "../models/methods";

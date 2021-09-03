@@ -1,4 +1,4 @@
-import { Client } from "..";
+import type { Client } from "..";
 
 import { Instructions, Prepare, TransactionJSON } from "./types";
 import * as utils from "./utils";

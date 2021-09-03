@@ -1,4 +1,4 @@
-import { Client } from "..";
+import type { Client } from "..";
 import { FormattedOrderSpecification } from "../common/types/objects/index";
 import { ISOTimeToRippleTime, toRippledAmount } from "../utils";
 

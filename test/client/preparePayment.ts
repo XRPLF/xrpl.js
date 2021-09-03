@@ -460,7 +460,7 @@ describe("client.preparePayment", function () {
           "account_info",
           rippled.account_info.normal
         );
-        this.client._feeCushion = 1000000;
+        this.client.feeCushion = 1000000;
         const expectedResponse = {
           txJSON:
             '{"Flags":2147483648,"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Destination":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Amount":{"value":"0.01","currency":"USD","issuer":"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"},"SendMax":{"value":"0.01","currency":"USD","issuer":"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"},"LastLedgerSequence":8820051,"Fee":"2000000","Sequence":23}',
@@ -486,7 +486,7 @@ describe("client.preparePayment", function () {
           "account_info",
           rippled.account_info.normal
         );
-        this.client._maxFeeXRP = "2.2";
+        this.client.maxFeeXRP = "2.2";
         const localInstructions = {
           ...instructionsWithMaxLedgerVersionOffset,
           fee: "2.1",
@@ -516,7 +516,7 @@ describe("client.preparePayment", function () {
           "account_info",
           rippled.account_info.normal
         );
-        this.client._feeCushion = 1000000;
+        this.client.feeCushion = 1000000;
         const expectedResponse = {
           txJSON:
             '{"Flags":2147483648,"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Destination":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Amount":{"value":"0.01","currency":"USD","issuer":"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"},"SendMax":{"value":"0.01","currency":"USD","issuer":"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"},"LastLedgerSequence":8820051,"Fee":"2000000","Sequence":23}',
@@ -542,8 +542,8 @@ describe("client.preparePayment", function () {
           "account_info",
           rippled.account_info.normal
         );
-        this.client._feeCushion = 1000000;
-        this.client._maxFeeXRP = "3";
+        this.client.feeCushion = 1000000;
+        this.client.maxFeeXRP = "3";
         const localInstructions = {
           ...instructionsWithMaxLedgerVersionOffset,
           maxFee: "4",
@@ -573,8 +573,8 @@ describe("client.preparePayment", function () {
           "account_info",
           rippled.account_info.normal
         );
-        this.client._feeCushion = 1000000;
-        this.client._maxFeeXRP = "5";
+        this.client.feeCushion = 1000000;
+        this.client.maxFeeXRP = "5";
         const localInstructions = {
           ...instructionsWithMaxLedgerVersionOffset,
           maxFee: "4",
