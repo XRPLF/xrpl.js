@@ -390,11 +390,11 @@ class Client extends EventEmitter {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
     return this.connection.request(nextPageRequest) as unknown as U;
   }
-  
+
   public on(event: "ledgerClosed", listener: (ledger: LedgerStream) => void);
   public on(
     event: "validationReceived",
-    listener: (ledger: ValidationStream) => void
+    listener: (validation: ValidationStream) => void
   );
   public on(event: "transaction", listener: (tx: TransactionStream) => void);
   public on(

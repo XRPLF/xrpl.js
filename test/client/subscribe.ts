@@ -33,7 +33,7 @@ describe("Subscription", function () {
       done();
     });
 
-    this.client.connection._onMessage(
+    this.client.connection.onMessage(
       JSON.stringify(rippled.streams.transaction)
     );
   });
@@ -44,7 +44,7 @@ describe("Subscription", function () {
       done();
     });
 
-    this.client.connection._onMessage(JSON.stringify(rippled.streams.ledger));
+    this.client.connection.onMessage(JSON.stringify(rippled.streams.ledger));
   });
 
   it("Emits peerStatusChange", async function (done) {
@@ -53,7 +53,7 @@ describe("Subscription", function () {
       done();
     });
 
-    this.client.connection._onMessage(
+    this.client.connection.onMessage(
       JSON.stringify(rippled.streams.peerStatus)
     );
   });
@@ -64,9 +64,7 @@ describe("Subscription", function () {
       done();
     });
 
-    this.client.connection._onMessage(
-      JSON.stringify(rippled.streams.consensus)
-    );
+    this.client.connection.onMessage(JSON.stringify(rippled.streams.consensus));
   });
 
   it("Emits path_find", async function (done) {
@@ -75,7 +73,7 @@ describe("Subscription", function () {
       done();
     });
 
-    this.client.connection._onMessage(JSON.stringify(rippled.streams.pathFind));
+    this.client.connection.onMessage(JSON.stringify(rippled.streams.pathFind));
   });
 
   it("Emits peerStatusChange", async function (done) {
@@ -84,7 +82,7 @@ describe("Subscription", function () {
       done();
     });
 
-    this.client.connection._onMessage(
+    this.client.connection.onMessage(
       JSON.stringify(rippled.streams.peerStatus)
     );
   });
@@ -95,7 +93,7 @@ describe("Subscription", function () {
       done();
     });
 
-    this.client.connection._onMessage(
+    this.client.connection.onMessage(
       JSON.stringify(rippled.streams.validation)
     );
   });
@@ -106,6 +104,6 @@ describe("Subscription", function () {
       done();
     });
 
-    this.client.connection._onMessage(JSON.stringify(rippled.streams.manifest));
+    this.client.connection.onMessage(JSON.stringify(rippled.streams.manifest));
   });
 });
