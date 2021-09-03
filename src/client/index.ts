@@ -191,9 +191,9 @@ class Client extends EventEmitter {
   // non-validated ledger versions are allowed, and passed to rippled as-is.
   connection: Connection;
 
-  constructor(server: string, options: ClientOptions = {}) {
+  public constructor(server: string, options: ClientOptions = {}) {
     super();
-    if (typeof server !== "string" || !server.match("^(wss?|wss?\\+unix)://")) {
+    if (typeof server !== "string" || !/^(wss?|wss?\+unix):\/\//.exec(server)) {
       throw new ValidationError(
         "server URI must start with `wss://`, `ws://`, `wss+unix://`, or `ws+unix://`."
       );
@@ -206,6 +206,34 @@ class Client extends EventEmitter {
 
     this.connection.on("error", (errorCode, errorMessage, data) => {
       this.emit("error", errorCode, errorMessage, data);
+    });
+
+    this.connection.on("ledgerClosed", (ledger) => {
+      this.emit("ledgerClosed", ledger);
+    });
+
+    this.connection.on("transaction", (tx) => {
+      this.emit("transaction", tx);
+    });
+
+    this.connection.on("validationReceived", (validation) => {
+      this.emit("validationReceived", validation);
+    });
+
+    this.connection.on("manifestReceived", (manifest) => {
+      this.emit("manifestReceived", manifest);
+    });
+
+    this.connection.on("peerStatusChange", (status) => {
+      this.emit("peerStatusChange", status);
+    });
+
+    this.connection.on("consensusPhase", (consensus) => {
+      this.emit("consensusPhase", consensus);
+    });
+
+    this.connection.on("path_find", (path) => {
+      this.emit("path_find", path);
     });
 
     this.connection.on("connected", () => {
@@ -264,7 +292,9 @@ class Client extends EventEmitter {
   public request(r: UnsubscribeRequest): Promise<UnsubscribeResponse>;
   public request(r: TransactionEntryRequest): Promise<TransactionEntryResponse>;
   public request(r: TxRequest): Promise<TxResponse>;
-  public request<R extends Request, T extends Response>(r: R): Promise<T> {
+  public async request<R extends Request, T extends Response>(
+    r: R
+  ): Promise<T> {
     // TODO: should this be typed with `extends BaseRequest/BaseResponse`?
     return this.connection.request({
       ...r,
