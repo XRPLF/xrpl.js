@@ -1,11 +1,11 @@
-import { ValidationError } from "../../common/errors";
+import { ValidationError } from '../../common/errors'
 
-import { BaseTransaction, verifyBaseTransaction } from "./common";
+import { BaseTransaction, verifyBaseTransaction } from './common'
 
 export interface AccountDelete extends BaseTransaction {
-  TransactionType: "AccountDelete";
-  Destination: string;
-  DestinationTag?: number;
+  TransactionType: 'AccountDelete'
+  Destination: string
+  DestinationTag?: number
 }
 
 /**
@@ -15,20 +15,20 @@ export interface AccountDelete extends BaseTransaction {
  * @throws When the AccountDelete is Malformed.
  */
 export function verifyAccountDelete(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx);
+  verifyBaseTransaction(tx)
 
   if (tx.Destination === undefined) {
-    throw new ValidationError("AccountDelete: missing field Destination");
+    throw new ValidationError('AccountDelete: missing field Destination')
   }
 
-  if (typeof tx.Destination !== "string") {
-    throw new ValidationError("AccountDelete: invalid Destination");
+  if (typeof tx.Destination !== 'string') {
+    throw new ValidationError('AccountDelete: invalid Destination')
   }
 
   if (
     tx.DestinationTag !== undefined &&
-    typeof tx.DestinationTag !== "number"
+    typeof tx.DestinationTag !== 'number'
   ) {
-    throw new ValidationError("AccountDelete: invalid DestinationTag");
+    throw new ValidationError('AccountDelete: invalid DestinationTag')
   }
 }

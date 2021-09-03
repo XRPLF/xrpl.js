@@ -1,71 +1,71 @@
-import { assert } from "chai";
+import { assert } from 'chai'
 
-import { ValidationError } from "xrpl-local/common/errors";
+import { ValidationError } from 'xrpl-local/common/errors'
 
-import { verifyTicketCreate } from "../../src/models/transactions/ticketCreate";
+import { verifyTicketCreate } from '../../src/models/transactions/ticketCreate'
 
 /**
  * TicketCreate Transaction Verification Testing.
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("TicketCreate", function () {
-  let ticketCreate;
+describe('TicketCreate', function () {
+  let ticketCreate
 
   beforeEach(function () {
     ticketCreate = {
-      TransactionType: "TicketCreate",
-      Account: "rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo",
+      TransactionType: 'TicketCreate',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       TicketCount: 150,
-    } as any;
-  });
+    } as any
+  })
 
-  it("verifies valid TicketCreate", function () {
-    assert.doesNotThrow(() => verifyTicketCreate(ticketCreate));
-  });
+  it('verifies valid TicketCreate', function () {
+    assert.doesNotThrow(() => verifyTicketCreate(ticketCreate))
+  })
 
-  it("throws when TicketCount is missing", function () {
-    delete ticketCreate.TicketCount;
+  it('throws when TicketCount is missing', function () {
+    delete ticketCreate.TicketCount
     assert.throws(
       () => verifyTicketCreate(ticketCreate),
       ValidationError,
-      "TicketCreate: missing field TicketCount"
-    );
-  });
+      'TicketCreate: missing field TicketCount',
+    )
+  })
 
-  it("throws when TicketCount is not a number", function () {
-    ticketCreate.TicketCount = "150";
+  it('throws when TicketCount is not a number', function () {
+    ticketCreate.TicketCount = '150'
     assert.throws(
       () => verifyTicketCreate(ticketCreate),
       ValidationError,
-      "TicketCreate: TicketCount must be a number"
-    );
-  });
+      'TicketCreate: TicketCount must be a number',
+    )
+  })
 
-  it("throws when TicketCount is not an integer", function () {
-    ticketCreate.TicketCount = 12.5;
+  it('throws when TicketCount is not an integer', function () {
+    ticketCreate.TicketCount = 12.5
     assert.throws(
       () => verifyTicketCreate(ticketCreate),
       ValidationError,
-      "TicketCreate: TicketCount must be an integer from 1 to 250"
-    );
-  });
+      'TicketCreate: TicketCount must be an integer from 1 to 250',
+    )
+  })
 
-  it("throws when TicketCount is < 1", function () {
-    ticketCreate.TicketCount = 0;
+  it('throws when TicketCount is < 1', function () {
+    ticketCreate.TicketCount = 0
     assert.throws(
       () => verifyTicketCreate(ticketCreate),
       ValidationError,
-      "TicketCreate: TicketCount must be an integer from 1 to 250"
-    );
-  });
+      'TicketCreate: TicketCount must be an integer from 1 to 250',
+    )
+  })
 
-  it("throws when TicketCount is > 250", function () {
-    ticketCreate.TicketCount = 251;
+  it('throws when TicketCount is > 250', function () {
+    ticketCreate.TicketCount = 251
     assert.throws(
       () => verifyTicketCreate(ticketCreate),
       ValidationError,
-      "TicketCreate: TicketCount must be an integer from 1 to 250"
-    );
-  });
-});
+      'TicketCreate: TicketCount must be an integer from 1 to 250',
+    )
+  })
+})

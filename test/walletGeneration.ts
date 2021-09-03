@@ -1,39 +1,36 @@
-import { assert } from "chai";
+import { assert } from 'chai'
 
-import {
-  getFaucetUrl,
-  FaucetNetwork,
-} from "../src/wallet/generateFaucetWallet";
+import { getFaucetUrl, FaucetNetwork } from '../src/wallet/generateFaucetWallet'
 
-import setupClient from "./setupClient";
+import setupClient from './setupClient'
 
-describe("Get Faucet URL", function () {
-  beforeEach(setupClient.setup);
-  afterEach(setupClient.teardown);
+describe('Get Faucet URL', function () {
+  beforeEach(setupClient.setup)
+  afterEach(setupClient.teardown)
 
-  it("returns the Devnet URL", function () {
-    const expectedFaucet = FaucetNetwork.Devnet;
-    this.client.connection.url = FaucetNetwork.Devnet;
+  it('returns the Devnet URL', function () {
+    const expectedFaucet = FaucetNetwork.Devnet
+    this.client.connection.url = FaucetNetwork.Devnet
 
-    assert.strictEqual(getFaucetUrl(this.client), expectedFaucet);
-  });
+    assert.strictEqual(getFaucetUrl(this.client), expectedFaucet)
+  })
 
-  it("returns the Testnet URL", function () {
-    const expectedFaucet = FaucetNetwork.Testnet;
-    this.client.connection.url = FaucetNetwork.Testnet;
+  it('returns the Testnet URL', function () {
+    const expectedFaucet = FaucetNetwork.Testnet
+    this.client.connection.url = FaucetNetwork.Testnet
 
-    assert.strictEqual(getFaucetUrl(this.client), expectedFaucet);
-  });
+    assert.strictEqual(getFaucetUrl(this.client), expectedFaucet)
+  })
 
-  it("returns the Testnet URL with the XRPL Labs server", function () {
-    const expectedFaucet = FaucetNetwork.Testnet;
-    this.client.connection.url = "wss://testnet.xrpl-labs.com";
+  it('returns the Testnet URL with the XRPL Labs server', function () {
+    const expectedFaucet = FaucetNetwork.Testnet
+    this.client.connection.url = 'wss://testnet.xrpl-labs.com'
 
-    assert.strictEqual(getFaucetUrl(this.client), expectedFaucet);
-  });
+    assert.strictEqual(getFaucetUrl(this.client), expectedFaucet)
+  })
 
-  it("returns undefined if not a Testnet or Devnet server URL", function () {
+  it('returns undefined if not a Testnet or Devnet server URL', function () {
     // Info: setupClient.setup creates a connection to 'localhost'
-    assert.strictEqual(getFaucetUrl(this.client), undefined);
-  });
-});
+    assert.strictEqual(getFaucetUrl(this.client), undefined)
+  })
+})

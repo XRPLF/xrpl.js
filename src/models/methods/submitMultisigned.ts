@@ -1,19 +1,19 @@
-import { Transaction } from "../transactions";
+import { Transaction } from '../transactions'
 
-import { BaseRequest, BaseResponse } from "./baseMethod";
+import { BaseRequest, BaseResponse } from './baseMethod'
 
 export interface SubmitMultisignedRequest extends BaseRequest {
-  command: "submit_multisigned";
-  tx_json: Transaction;
-  fail_hard?: boolean;
+  command: 'submit_multisigned'
+  tx_json: Transaction
+  fail_hard?: boolean
 }
 
 export interface SubmitMultisignedResponse extends BaseResponse {
   result: {
-    engine_result: string;
-    engine_result_code: number;
-    engine_result_message: string;
-    tx_blob: string;
-    tx_json: Transaction;
-  };
+    engine_result: string
+    engine_result_code: number
+    engine_result_message: string
+    tx_blob: string
+    tx_json: Transaction
+  }
 }

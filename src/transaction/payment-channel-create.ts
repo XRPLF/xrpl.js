@@ -1,60 +1,60 @@
-import type { Client } from "..";
-import { ISOTimeToRippleTime, xrpToDrops } from "../utils";
+import type { Client } from '..'
+import { ISOTimeToRippleTime, xrpToDrops } from '../utils'
 
-import { Instructions, Prepare, TransactionJSON } from "./types";
-import * as utils from "./utils";
+import { Instructions, Prepare, TransactionJSON } from './types'
+import * as utils from './utils'
 
 export interface PaymentChannelCreate {
-  amount: string;
-  destination: string;
-  settleDelay: number;
-  publicKey: string;
-  cancelAfter?: string;
-  sourceTag?: number;
-  destinationTag?: number;
+  amount: string
+  destination: string
+  settleDelay: number
+  publicKey: string
+  cancelAfter?: string
+  sourceTag?: number
+  destinationTag?: number
 }
 
 function createPaymentChannelCreateTransaction(
   account: string,
-  paymentChannel: PaymentChannelCreate
+  paymentChannel: PaymentChannelCreate,
 ): TransactionJSON {
   const txJSON: any = {
     Account: account,
-    TransactionType: "PaymentChannelCreate",
+    TransactionType: 'PaymentChannelCreate',
     Amount: xrpToDrops(paymentChannel.amount),
     Destination: paymentChannel.destination,
     SettleDelay: paymentChannel.settleDelay,
     PublicKey: paymentChannel.publicKey.toUpperCase(),
-  };
+  }
 
   if (paymentChannel.cancelAfter != null) {
-    txJSON.CancelAfter = ISOTimeToRippleTime(paymentChannel.cancelAfter);
+    txJSON.CancelAfter = ISOTimeToRippleTime(paymentChannel.cancelAfter)
   }
   if (paymentChannel.sourceTag != null) {
-    txJSON.SourceTag = paymentChannel.sourceTag;
+    txJSON.SourceTag = paymentChannel.sourceTag
   }
   if (paymentChannel.destinationTag != null) {
-    txJSON.DestinationTag = paymentChannel.destinationTag;
+    txJSON.DestinationTag = paymentChannel.destinationTag
   }
 
-  return txJSON;
+  return txJSON
 }
 
 async function preparePaymentChannelCreate(
   this: Client,
   address: string,
   paymentChannelCreate: PaymentChannelCreate,
-  instructions: Instructions = {}
+  instructions: Instructions = {},
 ): Promise<Prepare> {
   try {
     const txJSON = createPaymentChannelCreateTransaction(
       address,
-      paymentChannelCreate
-    );
-    return await utils.prepareTransaction(txJSON, this, instructions);
+      paymentChannelCreate,
+    )
+    return await utils.prepareTransaction(txJSON, this, instructions)
   } catch (e) {
-    return Promise.reject(e);
+    return Promise.reject(e)
   }
 }
 
-export default preparePaymentChannelCreate;
+export default preparePaymentChannelCreate

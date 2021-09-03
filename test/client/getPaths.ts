@@ -1,22 +1,22 @@
-import addresses from "../fixtures/addresses.json";
-import requests from "../fixtures/requests";
-import rippled from "../fixtures/rippled";
-import setupClient from "../setupClient";
-import { assertRejects } from "../testUtils";
+import addresses from '../fixtures/addresses.json'
+import requests from '../fixtures/requests'
+import rippled from '../fixtures/rippled'
+import setupClient from '../setupClient'
+import { assertRejects } from '../testUtils'
 // import responses from '../fixtures/responses'
-const { getPaths: REQUEST_FIXTURES } = requests;
+const { getPaths: REQUEST_FIXTURES } = requests
 // const {getPaths: RESPONSE_FIXTURES} = responses
 
 const rippledResponse = rippled.path_find.generate.generateIOUPaymentPaths(
   0,
   REQUEST_FIXTURES.normal.source.address,
   REQUEST_FIXTURES.normal.destination.address,
-  REQUEST_FIXTURES.normal.destination.amount
-);
+  REQUEST_FIXTURES.normal.destination.amount,
+)
 
-describe("client.getPaths", function () {
-  beforeEach(setupClient.setup);
-  afterEach(setupClient.teardown);
+describe('client.getPaths', function () {
+  beforeEach(setupClient.setup)
+  afterEach(setupClient.teardown)
   // 'simple test', function () {
   //   const response = await this.client.getPaths(REQUEST_FIXTURES.normal)
   //   assertResultMatch(response, RESPONSE_FIXTURES.XrpToUsd, 'getPaths')
@@ -43,13 +43,13 @@ describe("client.getPaths", function () {
   //   const response = await this.client.getPaths(REQUEST_FIXTURES.XrpToXrp)
   //   assertResultMatch(response, RESPONSE_FIXTURES.XrpToXrp, 'getPaths')
   // })
-  it("source with issuer", async function () {
-    this.mockRippled.addResponse("ripple_path_find", rippledResponse);
+  it('source with issuer', async function () {
+    this.mockRippled.addResponse('ripple_path_find', rippledResponse)
     return assertRejects(
       this.client.getPaths(REQUEST_FIXTURES.issuer),
-      this.client.errors.NotFoundError
-    );
-  });
+      this.client.errors.NotFoundError,
+    )
+  })
   // 'XRP 2 XRP - not enough', function () {
   //   return assertRejects(
   //     this.client.getPaths(REQUEST_FIXTURES.XrpToXrpNotEnough),
@@ -62,46 +62,46 @@ describe("client.getPaths", function () {
   //     this.client.getPaths(REQUEST_FIXTURES.invalid);
   //   }, /Cannot specify both source.amount/);
   // });
-  it("does not accept currency", async function () {
-    this.mockRippled.addResponse("ripple_path_find", rippledResponse);
+  it('does not accept currency', async function () {
+    this.mockRippled.addResponse('ripple_path_find', rippledResponse)
     return assertRejects(
       this.client.getPaths(REQUEST_FIXTURES.NotAcceptCurrency),
-      this.client.errors.NotFoundError
-    );
-  });
-  it("no paths", async function () {
-    this.mockRippled.addResponse("ripple_path_find", rippledResponse);
+      this.client.errors.NotFoundError,
+    )
+  })
+  it('no paths', async function () {
+    this.mockRippled.addResponse('ripple_path_find', rippledResponse)
     return assertRejects(
       this.client.getPaths(REQUEST_FIXTURES.NoPaths),
-      this.client.errors.NotFoundError
-    );
-  });
-  it("no paths source amount", async function () {
-    this.mockRippled.addResponse("ripple_path_find", rippledResponse);
+      this.client.errors.NotFoundError,
+    )
+  })
+  it('no paths source amount', async function () {
+    this.mockRippled.addResponse('ripple_path_find', rippledResponse)
     return assertRejects(
       this.client.getPaths(REQUEST_FIXTURES.NoPathsSource),
-      this.client.errors.NotFoundError
-    );
-  });
-  it("no paths with source currencies", async function () {
-    this.mockRippled.addResponse("ripple_path_find", rippledResponse);
+      this.client.errors.NotFoundError,
+    )
+  })
+  it('no paths with source currencies', async function () {
+    this.mockRippled.addResponse('ripple_path_find', rippledResponse)
     return assertRejects(
       this.client.getPaths(REQUEST_FIXTURES.NoPathsWithCurrencies),
-      this.client.errors.NotFoundError
-    );
-  });
-  it("error: srcActNotFound", async function () {
-    this.mockRippled.addResponse("ripple_path_find", rippledResponse);
+      this.client.errors.NotFoundError,
+    )
+  })
+  it('error: srcActNotFound', async function () {
+    this.mockRippled.addResponse('ripple_path_find', rippledResponse)
     return assertRejects(
       this.client.getPaths({
         ...REQUEST_FIXTURES.normal,
         source: { address: addresses.NOTFOUND },
       }),
-      this.client.errors.RippleError
-    );
-  });
+      this.client.errors.RippleError,
+    )
+  })
   // 'send all', function () {
   //   const response = await this.client.getPaths(REQUEST_FIXTURES.sendAll)
   //   assertResultMatch(response, RESPONSE_FIXTURES.sendAll, 'getPaths')
   // })
-});
+})

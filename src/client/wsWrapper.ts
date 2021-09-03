@@ -1,27 +1,27 @@
 /* eslint-disable import/no-unused-modules -- This is used by webpack */
 /* eslint-disable max-classes-per-file -- Needs to be a wrapper for ws */
-import { EventEmitter } from "events";
+import { EventEmitter } from 'events'
 
 // Define the global WebSocket class found on the native browser
 declare class WebSocket {
-  public onclose?: () => void;
-  public onopen?: () => void;
-  public onerror?: (error: Error) => void;
-  public onmessage?: (message: MessageEvent) => void;
-  public readyState: number;
-  public constructor(url: string);
-  public close(code?: number): void;
-  public send(message: string): void;
+  public onclose?: () => void
+  public onopen?: () => void
+  public onerror?: (error: Error) => void
+  public onmessage?: (message: MessageEvent) => void
+  public readyState: number
+  public constructor(url: string)
+  public close(code?: number): void
+  public send(message: string): void
 }
 
 interface WSWrapperOptions {
-  perMessageDeflate: boolean;
-  handshakeTimeout: number;
-  protocolVersion: number;
-  origin: string;
-  maxPayload: number;
-  followRedirects: boolean;
-  maxRedirects: number;
+  perMessageDeflate: boolean
+  handshakeTimeout: number
+  protocolVersion: number
+  origin: string
+  maxPayload: number
+  followRedirects: boolean
+  maxRedirects: number
 }
 
 /**
@@ -29,12 +29,12 @@ interface WSWrapperOptions {
  * same, as `ws` package provides.
  */
 export default class WSWrapper extends EventEmitter {
-  public static CONNECTING = 0;
-  public static OPEN = 1;
-  public static CLOSING = 2;
+  public static CONNECTING = 0
+  public static OPEN = 1
+  public static CLOSING = 2
   // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- magic number is being defined here
-  public static CLOSED = 3;
-  private readonly ws: WebSocket;
+  public static CLOSED = 3
+  private readonly ws: WebSocket
 
   /**
    * Constructs a browser-safe websocket.
@@ -46,28 +46,28 @@ export default class WSWrapper extends EventEmitter {
   public constructor(
     url: string,
     _protocols: string | string[] | WSWrapperOptions | undefined,
-    _websocketOptions: WSWrapperOptions
+    _websocketOptions: WSWrapperOptions,
   ) {
-    super();
-    this.setMaxListeners(Infinity);
+    super()
+    this.setMaxListeners(Infinity)
 
-    this.ws = new WebSocket(url);
+    this.ws = new WebSocket(url)
 
     this.ws.onclose = (): void => {
-      this.emit("close");
-    };
+      this.emit('close')
+    }
 
     this.ws.onopen = (): void => {
-      this.emit("open");
-    };
+      this.emit('open')
+    }
 
     this.ws.onerror = (error): void => {
-      this.emit("error", error);
-    };
+      this.emit('error', error)
+    }
 
     this.ws.onmessage = (message: MessageEvent): void => {
-      this.emit("message", message.data);
-    };
+      this.emit('message', message.data)
+    }
   }
 
   /**
@@ -75,7 +75,7 @@ export default class WSWrapper extends EventEmitter {
    */
   public close(): void {
     if (this.readyState === 1) {
-      this.ws.close();
+      this.ws.close()
     }
   }
 
@@ -85,7 +85,7 @@ export default class WSWrapper extends EventEmitter {
    * @param message - Message to send.
    */
   public send(message: string): void {
-    this.ws.send(message);
+    this.ws.send(message)
   }
 
   /**
@@ -94,6 +94,6 @@ export default class WSWrapper extends EventEmitter {
    * @returns The Websocket's ready state.
    */
   public get readyState(): number {
-    return this.ws.readyState;
+    return this.ws.readyState
   }
 }

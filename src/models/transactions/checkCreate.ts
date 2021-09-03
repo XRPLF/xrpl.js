@@ -1,20 +1,20 @@
 /* eslint-disable complexity -- Necessary for verifyCheckCreate */
-import { ValidationError } from "../../common/errors";
-import { Amount } from "../common";
+import { ValidationError } from '../../common/errors'
+import { Amount } from '../common'
 
 import {
   BaseTransaction,
   verifyBaseTransaction,
   isIssuedCurrency,
-} from "./common";
+} from './common'
 
 export interface CheckCreate extends BaseTransaction {
-  TransactionType: "CheckCreate";
-  Destination: string;
-  SendMax: Amount;
-  DestinationTag?: number;
-  Expiration?: number;
-  InvoiceID?: string;
+  TransactionType: 'CheckCreate'
+  Destination: string
+  SendMax: Amount
+  DestinationTag?: number
+  Expiration?: number
+  InvoiceID?: string
 }
 
 /**
@@ -24,40 +24,40 @@ export interface CheckCreate extends BaseTransaction {
  * @throws When the CheckCreate is Malformed.
  */
 export function verifyCheckCreate(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx);
+  verifyBaseTransaction(tx)
 
   if (tx.SendMax === undefined) {
-    throw new ValidationError("CheckCreate: missing field SendMax");
+    throw new ValidationError('CheckCreate: missing field SendMax')
   }
 
   if (tx.Destination === undefined) {
-    throw new ValidationError("CheckCreate: missing field Destination");
+    throw new ValidationError('CheckCreate: missing field Destination')
   }
 
   if (
-    typeof tx.SendMax !== "string" &&
+    typeof tx.SendMax !== 'string' &&
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
     !isIssuedCurrency(tx.SendMax as Record<string, unknown>)
   ) {
-    throw new ValidationError("CheckCreate: invalid SendMax");
+    throw new ValidationError('CheckCreate: invalid SendMax')
   }
 
-  if (typeof tx.Destination !== "string") {
-    throw new ValidationError("CheckCreate: invalid Destination");
+  if (typeof tx.Destination !== 'string') {
+    throw new ValidationError('CheckCreate: invalid Destination')
   }
 
   if (
     tx.DestinationTag !== undefined &&
-    typeof tx.DestinationTag !== "number"
+    typeof tx.DestinationTag !== 'number'
   ) {
-    throw new ValidationError("CheckCreate: invalid DestinationTag");
+    throw new ValidationError('CheckCreate: invalid DestinationTag')
   }
 
-  if (tx.Expiration !== undefined && typeof tx.Expiration !== "number") {
-    throw new ValidationError("CheckCreate: invalid Expiration");
+  if (tx.Expiration !== undefined && typeof tx.Expiration !== 'number') {
+    throw new ValidationError('CheckCreate: invalid Expiration')
   }
 
-  if (tx.InvoiceID !== undefined && typeof tx.InvoiceID !== "string") {
-    throw new ValidationError("CheckCreate: invalid InvoiceID");
+  if (tx.InvoiceID !== undefined && typeof tx.InvoiceID !== 'string') {
+    throw new ValidationError('CheckCreate: invalid InvoiceID')
   }
 }
