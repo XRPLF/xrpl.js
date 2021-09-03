@@ -8,7 +8,6 @@ import {
   encodeForSigning,
   encodeForSigningClaim,
 } from "ripple-binary-codec";
-import { JsonObject } from "ripple-binary-codec/dist/types/serialized-type";
 import {
   sign as signWithKeypair,
   verify as verifySignature,
@@ -18,7 +17,6 @@ import { ValidationError } from "../common/errors";
 import { Signer } from "../models/common";
 import { Transaction } from "../models/transactions";
 import { verifyBaseTransaction } from "../models/transactions/common";
-import { computeBinaryTransactionHash } from "../utils";
 import Wallet from "../Wallet";
 
 /**
@@ -84,11 +82,15 @@ function combineMultisigned(transactions: Array<Transaction | string>): string {
     }
   });
 
-  const encodedTransactions: string[] = transactions.map((txOrBlob) =>
-    getEncodedTransaction(txOrBlob)
+  const decodedTransactions: Transaction[] = transactions.map(
+    (txOrBlob: string | Transaction) => {
+      return getDecodedTransaction(txOrBlob);
+    }
   );
 
-  return combine(encodedTransactions).signedTransaction;
+  validateTransactionEquivalence(decodedTransactions);
+
+  return encode(getTransactionWithAllSigners(decodedTransactions));
 }
 
 /**
@@ -125,37 +127,6 @@ function verify(tx: Transaction | string): boolean {
     decodedTx.TxnSignature,
     decodedTx.SigningPubKey
   );
-}
-
-/**
- * Takes a collection of signedTransactions with the same underlying transaction and produces a
- * Transaction with all Signers. It then signs that Transaction and gives an id based on the combined Transaction.
- *
- * @param signedTransactions - A collection of the same transaction signed by different signers. The only difference
- * between the elements of signedTransactions should be the Signers field.
- * @returns An object with the combined transaction (now having a sorted list of all signers) which is encoded, along
- * with a transaction id based on the combined transaction.
- */
-function combine(signedTransactions: string[]): {
-  signedTransaction: string;
-  id: string;
-} {
-  const transactions: Transaction[] = signedTransactions.map((tx: string) => {
-    return getDecodedTransaction(tx);
-  });
-
-  // This will throw a more clear error for JS users if there's a problem with any of the transaction's formatting
-  transactions.forEach((tx) =>
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Casting here let's us do type validation for JS
-    verifyBaseTransaction(tx as unknown as Record<string, unknown>)
-  );
-  validateTransactionEquivalence(transactions);
-
-  const signedTransaction = encode(getTransactionWithAllSigners(transactions));
-  return {
-    signedTransaction,
-    id: computeBinaryTransactionHash(signedTransaction),
-  };
 }
 
 /**
@@ -223,14 +194,6 @@ function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
   return decode(txOrBlob) as unknown as Transaction;
-}
-
-function getEncodedTransaction(txOrBlob: Transaction | string): string {
-  if (typeof txOrBlob === "object") {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
-    return encode(txOrBlob as unknown as JsonObject);
-  }
-  return txOrBlob;
 }
 
 export { sign, multisign, authorizeChannel, verify, combineMultisigned };
