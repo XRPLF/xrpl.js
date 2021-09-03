@@ -1,6 +1,7 @@
 import { assert } from "chai";
 import { decode } from "ripple-binary-codec";
 import { encode } from "../../ripple-binary-codec/dist";
+import { JsonObject } from "../../ripple-binary-codec/dist/types/serialized-type";
 
 import { ValidationError } from "../../src/common/errors";
 import { Transaction } from "../../src/models/transactions";
@@ -10,6 +11,7 @@ import {
   sign,
   authorizeChannel,
   combineMultisigned,
+  multisign,
 } from "../../src/wallet/signer";
 
 const publicKey =
@@ -17,6 +19,7 @@ const publicKey =
 const privateKey =
   "00141BA006D3363D2FB2785E8DF4E44D3A49908780CB4FB51F6D217C08C021429F";
 const address = "rhvh5SrgBL5V8oeV9EpDuVszeJSSCEkbPc";
+const seed = "ss1x3KLrSvfg7irFc1D929WXZ7z9H";
 
 const tx: Transaction = {
   TransactionType: "Payment",
@@ -28,7 +31,47 @@ const tx: Transaction = {
   SigningPubKey: publicKey,
 };
 
+const unsignedTx1: Transaction = {
+  TransactionType: "TrustSet",
+  Account: "rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC",
+  Fee: "30000",
+  Flags: 262144,
+  LimitAmount: {
+    currency: "USD",
+    issuer: "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+    value: "100",
+  },
+  Sequence: 2,
+};
+
+const unsignedSecret1 = "spzGHmohX9bAM6gzF4m9FvJmJb1CR";
+
 const multisignTx1: Transaction = {
+  TransactionType: "TrustSet",
+  Account: "rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC",
+  Fee: "30000",
+  Flags: 262144,
+  LimitAmount: {
+    currency: "USD",
+    issuer: "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+    value: "100",
+  },
+  Sequence: 2,
+  Signers: [
+    {
+      Signer: {
+        Account: "rJvuSQhQR37czfxRou4vNWaM97uEhT4ShE",
+        SigningPubKey:
+          "02B78EEA571B2633180834CC6E7B4ED84FBF6811D12ECB59410E0C92D13B7726F5",
+        TxnSignature:
+          "304502210098009CEFA61EE9843BB7FC29B78CFFAACF28352A4A7CF3AAE79EF12D79BA50910220684F116266E5E4519A7A33F7421631EB8494082BE51A8B03FECCB3E59F77154A",
+      },
+    },
+  ],
+  SigningPubKey: "",
+};
+
+const multisignTxToCombine1: Transaction = {
   Account: "rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC",
   Fee: "30000",
   Flags: 262144,
@@ -53,7 +96,7 @@ const multisignTx1: Transaction = {
   TransactionType: "TrustSet",
 };
 
-const multisignTx2: Transaction = {
+const multisignTxToCombine2: Transaction = {
   Account: "rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC",
   Fee: "30000",
   Flags: 262144,
@@ -84,7 +127,6 @@ const expectedCombineMultisigned =
 describe("Signer tests", function () {
   it("sign transaction offline", function () {
     // Test case data generated using this tutorial - https://xrpl.org/send-xrp.html#send-xrp
-    const seed = "ss1x3KLrSvfg7irFc1D929WXZ7z9H";
     const tx3: Transaction = {
       TransactionType: "Payment",
       Account: "rHLEki8gPUMnF72JnuALvnAMRhRemzhRke",
@@ -106,18 +148,29 @@ describe("Signer tests", function () {
   });
 
   it("multisign correctly signs a transaction", function () {
-    assert.fail("Not implemented yet");
+    const wallet = Wallet.fromSeed(unsignedSecret1);
+
+    console.log(multisignTx1);
+    assert.deepEqual(
+      decode(multisign(wallet, unsignedTx1)),
+      multisignTx1 as unknown as JsonObject
+    );
   });
 
   it("combineMultisigned runs successfully with Transaction objects", function () {
-    const transactions: Transaction[] = [multisignTx1, multisignTx2];
+    const transactions: Transaction[] = [
+      multisignTxToCombine1,
+      multisignTxToCombine2,
+    ];
 
-    // TODO: Compare this result to something else (Get the results of the existing combine for comparison)
     assert.equal(combineMultisigned(transactions), expectedCombineMultisigned);
   });
 
   it("combineMultisigned runs successfully with tx_blobs", function () {
-    const transactions: Transaction[] = [multisignTx1, multisignTx2];
+    const transactions: Transaction[] = [
+      multisignTxToCombine1,
+      multisignTxToCombine2,
+    ];
 
     const encodedTransactions: string[] = transactions.map(encode);
 
