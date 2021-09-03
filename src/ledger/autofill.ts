@@ -73,19 +73,7 @@ async function autofill(
   tx: Transaction,
   signersCount?: number
 ): Promise<Transaction> {
-  validateAccountAddress(tx, "Account", "SourceTag");
-  // eslint-disable-next-line @typescript-eslint/dot-notation -- Destination can exist on Transaction
-  if (tx["Destination"] != null) {
-    validateAccountAddress(tx, "Destination", "DestinationTag");
-  }
-
-  // DepositPreauth:
-  convertToClassicAddress(tx, "Authorize");
-  convertToClassicAddress(tx, "Unauthorize");
-  // EscrowCancel, EscrowFinish:
-  convertToClassicAddress(tx, "Owner");
-  // SetRegularKey:
-  convertToClassicAddress(tx, "RegularKey");
+  setValidAddresses(tx);
 
   setTransactionFlagsToNumber(tx);
 
@@ -103,6 +91,22 @@ async function autofill(
   return Promise.all(promises).then(() => tx);
 }
 
+function setValidAddresses(tx: Transaction): void {
+  validateAccountAddress(tx, "Account", "SourceTag");
+  // eslint-disable-next-line @typescript-eslint/dot-notation -- Destination can exist on Transaction
+  if (tx["Destination"] != null) {
+    validateAccountAddress(tx, "Destination", "DestinationTag");
+  }
+
+  // DepositPreauth:
+  convertToClassicAddress(tx, "Authorize");
+  convertToClassicAddress(tx, "Unauthorize");
+  // EscrowCancel, EscrowFinish:
+  convertToClassicAddress(tx, "Owner");
+  // SetRegularKey:
+  convertToClassicAddress(tx, "RegularKey");
+}
+
 function validateAccountAddress(
   tx: Transaction,
   accountField: string,
@@ -110,6 +114,7 @@ function validateAccountAddress(
 ): void {
   // if X-address is given, convert it to classic address
   const { classicAccount, tag } = getClassicAccountAndTag(tx[accountField]);
+  // eslint-disable-next-line no-param-reassign -- param reassign is safe
   tx[accountField] = classicAccount;
 
   if (tag !== null) {
@@ -118,6 +123,7 @@ function validateAccountAddress(
         `The ${tagField}, if present, must match the tag of the ${accountField} X-address`
       );
     }
+    // eslint-disable-next-line no-param-reassign -- param reassign is safe
     tx[tagField] = tag;
   }
 }
@@ -126,6 +132,7 @@ function convertToClassicAddress(tx: Transaction, fieldName: string): void {
   const account = tx[fieldName];
   if (typeof account === "string") {
     const { classicAccount } = getClassicAccountAndTag(account);
+    // eslint-disable-next-line no-param-reassign -- param reassign is safe
     tx[fieldName] = classicAccount;
   }
 }
@@ -139,6 +146,7 @@ async function setNextValidSequenceNumber(
     account: tx.Account,
   };
   const data = await client.request(request);
+  // eslint-disable-next-line no-param-reassign, require-atomic-updates -- param reassign is safe with no race condition
   tx.Sequence = data.result.account_data.Sequence;
 }
 
@@ -180,6 +188,7 @@ async function calculateFeePerTransactionType(
       : BigNumber.min(baseFee, maxFeeDrops);
 
   // Round up baseFee and return it as a string
+  // eslint-disable-next-line no-param-reassign -- param reassign is safe
   tx.Fee = totalFee.dp(0, BigNumber.ROUND_CEIL).toString(10);
 }
 
@@ -193,6 +202,7 @@ async function setLatestValidatedLedgerSequence(
   };
   const data = await client.request(request);
   const ledgerSequence = data.result.ledger_index;
+  // eslint-disable-next-line no-param-reassign -- param reassign is safe
   tx.LastLedgerSequence = ledgerSequence + LEDGER_OFFSET;
 }
 
