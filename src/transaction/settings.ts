@@ -2,7 +2,7 @@ import * as assert from 'assert'
 
 import BigNumber from 'bignumber.js'
 
-import { Client } from '..'
+import type { Client } from '..'
 import { FormattedSettings, WeightedSigner } from '../common/types/objects'
 
 import {
@@ -13,7 +13,6 @@ import {
 } from './types'
 import * as utils from './utils'
 
-const validate = utils.common.validate
 const AccountSetFlags = utils.common.constants.AccountSetFlags
 const AccountFields = utils.common.constants.AccountFields
 
@@ -153,7 +152,6 @@ async function prepareSettings(
   instructions: Instructions = {},
 ): Promise<Prepare> {
   try {
-    validate.prepareSettings({ address, settings, instructions })
     const txJSON = createSettingsTransaction(address, settings)
 
     return await utils.prepareTransaction(txJSON, this, instructions)

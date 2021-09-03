@@ -1,5 +1,4 @@
-import { Client } from '..'
-import { validate } from '../common'
+import type { Client } from '..'
 import { ISOTimeToRippleTime, xrpToDrops } from '../utils'
 
 import { Instructions, Prepare, TransactionJSON } from './types'
@@ -36,11 +35,6 @@ async function preparePaymentChannelFund(
   instructions: Instructions = {},
 ): Promise<Prepare> {
   try {
-    validate.preparePaymentChannelFund({
-      address,
-      paymentChannelFund,
-      instructions,
-    })
     const txJSON = createPaymentChannelFundTransaction(
       address,
       paymentChannelFund,

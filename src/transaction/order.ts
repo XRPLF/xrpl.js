@@ -1,5 +1,4 @@
-import { Client } from '..'
-import { validate } from '../common'
+import type { Client } from '..'
 import { FormattedOrderSpecification } from '../common/types/objects/index'
 import { ISOTimeToRippleTime, toRippledAmount } from '../utils'
 
@@ -58,7 +57,6 @@ async function prepareOrder(
   instructions: Instructions = {},
 ): Promise<Prepare> {
   try {
-    validate.prepareOrder({ address, order, instructions })
     const txJSON = createOrderTransaction(address, order)
     return await utils.prepareTransaction(txJSON, this, instructions)
   } catch (e) {

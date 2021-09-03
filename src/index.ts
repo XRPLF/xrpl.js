@@ -9,6 +9,6 @@ export * from './models/methods'
 export * from './utils'
 
 // Broadcast client is experimental
-export { BroadcastClient } from './client/broadcastClient'
+export { default as BroadcastClient } from './client/broadcastClient'
 
 export { default as Wallet } from './wallet'

@@ -2,7 +2,6 @@ import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 import * as constants from './constants'
 import * as errors from './errors'
-import * as validate from './validate'
 
 export function ensureClassicAddress(account: string): string {
   if (isValidXAddress(account)) {
@@ -23,5 +22,5 @@ export function ensureClassicAddress(account: string): string {
   return account
 }
 
-export { constants, errors, validate }
+export { constants, errors }
 export { txFlags } from './txflags'

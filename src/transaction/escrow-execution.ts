@@ -1,10 +1,9 @@
-import { Client } from '..'
+import type { Client } from '..'
 import { Memo } from '../common/types/objects'
 
 import { Instructions, Prepare, TransactionJSON } from './types'
 import * as utils from './utils'
 
-const validate = utils.common.validate
 const ValidationError = utils.common.errors.ValidationError
 
 export interface EscrowExecution {
@@ -52,7 +51,6 @@ async function prepareEscrowExecution(
   instructions: Instructions = {},
 ): Promise<Prepare> {
   try {
-    validate.prepareEscrowExecution({ address, escrowExecution, instructions })
     const txJSON = createEscrowExecutionTransaction(address, escrowExecution)
     return await utils.prepareTransaction(txJSON, this, instructions)
   } catch (e) {

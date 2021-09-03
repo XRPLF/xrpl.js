@@ -1,5 +1,4 @@
-import { Client } from '..'
-import { validate } from '../common'
+import type { Client } from '..'
 import { Memo } from '../common/types/objects'
 import { ISOTimeToRippleTime, xrpToDrops } from '../utils'
 
@@ -68,7 +67,6 @@ async function prepareEscrowCreation(
   instructions: Instructions = {},
 ): Promise<Prepare> {
   try {
-    validate.prepareEscrowCreation({ address, escrowCreation, instructions })
     const txJSON = createEscrowCreationTransaction(address, escrowCreation)
     return await utils.prepareTransaction(txJSON, this, instructions)
   } catch (e) {

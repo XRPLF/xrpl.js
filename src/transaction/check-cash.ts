@@ -1,5 +1,4 @@
-import { Client } from '..'
-import { validate } from '../common'
+import type { Client } from '..'
 import { ValidationError } from '../common/errors'
 import { Amount } from '../common/types/objects'
 import { toRippledAmount } from '../utils'
@@ -48,7 +47,6 @@ async function prepareCheckCash(
   instructions: Instructions = {},
 ): Promise<Prepare> {
   try {
-    validate.prepareCheckCash({ address, checkCash, instructions })
     const txJSON = createCheckCashTransaction(address, checkCash)
     return await utils.prepareTransaction(txJSON, this, instructions)
   } catch (e) {

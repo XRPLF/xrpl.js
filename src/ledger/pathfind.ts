@@ -2,8 +2,8 @@ import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 
 import type { Client } from '..'
-import { Connection } from '../client'
-import { validate, errors } from '../common'
+import type { Connection } from '../client'
+import { errors } from '../common'
 import { RippledAmount, Amount } from '../common/types/objects'
 import { RipplePathFindRequest } from '../models/methods'
 import { toRippledAmount, xrpToDrops, dropsToXrp } from '../utils'
@@ -192,8 +192,6 @@ function formatResponse(pathfind: PathFind, paths: RippledPathsResponse) {
 }
 
 async function getPaths(this: Client, pathfind: PathFind): Promise<GetPaths> {
-  validate.getPaths({ pathfind })
-
   const address = pathfind.source.address
   return requestPathFind(this.connection, pathfind)
     .then(async (paths) => conditionallyAddDirectXRPPath(this, address, paths))

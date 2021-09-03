@@ -14,7 +14,6 @@ import { Instructions, Prepare, TransactionJSON } from './types'
 import * as utils from './utils'
 import { getClassicAccountAndTag, ClassicAccountAndTag } from './utils'
 
-const validate = utils.common.validate
 const paymentFlags = utils.common.txFlags.Payment
 const ValidationError = utils.common.errors.ValidationError
 
@@ -145,7 +144,6 @@ function createPaymentTransaction(
     payment.source.tag,
   )
   const addressToVerifyAgainst = validateAndNormalizeAddress(address, undefined)
-
   if (
     addressToVerifyAgainst.classicAccount !== sourceAddressAndTag.classicAccount
   ) {
@@ -253,7 +251,6 @@ async function preparePayment(
   instructions: Instructions = {},
 ): Promise<Prepare> {
   try {
-    validate.preparePayment({ address, payment, instructions })
     const txJSON = createPaymentTransaction(address, payment)
     return await utils.prepareTransaction(txJSON, this, instructions)
   } catch (e) {

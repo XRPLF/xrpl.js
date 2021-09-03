@@ -1,12 +1,11 @@
 import BigNumber from 'bignumber.js'
 
-import { Client } from '..'
+import type { Client } from '..'
 import { FormattedTrustlineSpecification } from '../common/types/objects/trustlines'
 
 import { Instructions, Prepare, TransactionJSON } from './types'
 import * as utils from './utils'
 
-const validate = utils.common.validate
 const trustlineFlags = utils.common.txFlags.TrustSet
 
 function convertQuality(quality) {
@@ -64,7 +63,6 @@ async function prepareTrustline(
   instructions: Instructions = {},
 ): Promise<Prepare> {
   try {
-    validate.prepareTrustline({ address, trustline, instructions })
     const txJSON = createTrustlineTransaction(address, trustline)
     return await utils.prepareTransaction(txJSON, this, instructions)
   } catch (e) {

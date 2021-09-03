@@ -1,5 +1,4 @@
-import { Client } from '..'
-import { validate } from '../common'
+import type { Client } from '..'
 
 import { Instructions, Prepare, TransactionJSON } from './types'
 import { prepareTransaction } from './utils'
@@ -28,7 +27,6 @@ async function prepareCheckCancel(
   instructions: Instructions = {},
 ): Promise<Prepare> {
   try {
-    validate.prepareCheckCancel({ address, checkCancel, instructions })
     const txJSON = createCheckCancelTransaction(address, checkCancel)
     return await prepareTransaction(txJSON, this, instructions)
   } catch (e) {
