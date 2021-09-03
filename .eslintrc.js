@@ -90,6 +90,21 @@ module.exports = {
 
         // We need to mess with internal things to generate certain testing situations
         "@typescript-eslint/no-unsafe-member-access": "off",
+
+        // We need to be able to import xrpl-local
+        "node/no-extraneous-import": [
+          "error",
+          {
+            allowModules: ["xrpl-local"],
+          },
+        ],
+      },
+    },
+    {
+      files: ["test/models/*.ts"],
+      rules: {
+        "@typescript-eslint/consistent-type-assertions": "off",
+        "@typescript-eslint/no-explicit-any": "off",
       },
     },
     {

@@ -25,7 +25,7 @@ describe("CheckCancel", function () {
     const invalidCheckID = {
       Account: "rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo",
       TransactionType: "CheckCancel",
-      CheckID: 496473456789876545678909876545678,
+      CheckID: 4964734566545678,
     } as any;
 
     assert.throws(
