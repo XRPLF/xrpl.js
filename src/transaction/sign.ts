@@ -4,12 +4,12 @@ import binaryCodec from 'ripple-binary-codec'
 import keypairs from 'ripple-keypairs'
 
 import type { Client, Wallet } from '..'
+import { ValidationError } from '../common/errors'
 import { SignedTransaction } from '../common/types/objects'
 import { xrpToDrops } from '../utils'
 import { computeBinaryTransactionHash } from '../utils/hashes'
 
 import { SignOptions, KeyPair, TransactionJSON } from './types'
-import * as utils from './utils'
 
 function computeSignature(tx: object, privateKey: string, signAs?: string) {
   const signingData = signAs
@@ -28,7 +28,7 @@ function signWithKeypair(
 ): SignedTransaction {
   const tx = JSON.parse(txJSON)
   if (tx.TxnSignature || tx.Signers) {
-    throw new utils.common.errors.ValidationError(
+    throw new ValidationError(
       'txJSON must not contain "TxnSignature" or "Signers" properties',
     )
   }
@@ -148,7 +148,7 @@ function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
   // ...And ensure it is equal to the original tx, except:
   // - It must have a TxnSignature or Signers (multisign).
   if (!decoded.TxnSignature && !decoded.Signers) {
-    throw new utils.common.errors.ValidationError(
+    throw new ValidationError(
       'Serialized transaction must have a TxnSignature or Signers property',
     )
   }
@@ -182,14 +182,15 @@ function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
   })
 
   if (!_.isEqual(decoded, tx)) {
-    const error = new utils.common.errors.ValidationError(
-      'Serialized transaction does not match original txJSON. See `error.data`',
-    )
-    error.data = {
+    const data = {
       decoded,
       tx,
       diff: objectDiff(tx, decoded),
     }
+    const error = new ValidationError(
+      'Serialized transaction does not match original txJSON. See `error.data`',
+      data,
+    )
     throw error
   }
 }
@@ -208,7 +209,7 @@ function checkFee(client: Client, txFee: string): void {
   const fee = new BigNumber(txFee)
   const maxFeeDrops = xrpToDrops(client.maxFeeXRP)
   if (fee.isGreaterThan(maxFeeDrops)) {
-    throw new utils.common.errors.ValidationError(
+    throw new ValidationError(
       `"Fee" should not exceed "${maxFeeDrops}". ` +
         'To use a higher fee, set `maxFeeXRP` in the Client constructor.',
     )
@@ -234,9 +235,7 @@ function sign(
   }
   if (!keypair && !secret) {
     // Clearer message than 'ValidationError: instance is not exactly one from [subschema 0],[subschema 1]'
-    throw new utils.common.errors.ValidationError(
-      'sign: Missing secret or keypair.',
-    )
+    throw new ValidationError('sign: Missing secret or keypair.')
   }
   return signWithKeypair(this, txJSON, keypair || secret, options)
 }
