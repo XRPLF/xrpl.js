@@ -3,7 +3,6 @@ import { BigNumber } from "bignumber.js";
 import { flatMap } from "lodash";
 import { decodeAccountID } from "ripple-address-codec";
 import {
-  encode,
   decode,
   encodeForSigning,
   encodeForSigningClaim,
@@ -54,7 +53,9 @@ function multisign(wallet: Wallet, tx: Transaction): string {
  * - The SigningPubKey field is not the empty string in any given transaction
  * - Any transaction is missing a Signers field.
  */
-function combineMultisigned(transactions: Array<Transaction | string>): string {
+function combineMultisigned(
+  transactions: Array<Transaction | string>
+): Transaction {
   if (transactions.length === 0) {
     throw new ValidationError(
       "There were 0 transactions given to combineMultisign"
@@ -90,7 +91,7 @@ function combineMultisigned(transactions: Array<Transaction | string>): string {
 
   validateTransactionEquivalence(decodedTransactions);
 
-  return encode(getTransactionWithAllSigners(decodedTransactions));
+  return getTransactionWithAllSigners(decodedTransactions);
 }
 
 /**
