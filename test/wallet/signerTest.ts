@@ -11,7 +11,6 @@ import {
   sign,
   authorizeChannel,
   combineMultisigned,
-  multisign,
 } from "../../src/wallet/signer";
 
 const publicKey =
@@ -178,11 +177,11 @@ describe("Signer tests", function () {
     assert.equal(signedTx, signedTxBlob);
   });
 
-  it("multisign correctly signs a transaction", function () {
+  it("sign correctly encodes a transaction for multisigning", function () {
     const wallet = Wallet.fromSeed(unsignedSecret1);
 
     assert.deepEqual(
-      decode(multisign(wallet, unsignedTx1)),
+      decode(sign(wallet, unsignedTx1, true)),
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Transaction is equivalent to JsonObject
       multisignTx1 as unknown as JsonObject
     );

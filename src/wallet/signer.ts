@@ -24,22 +24,18 @@ import Wallet from "../Wallet";
  *
  * @param wallet - A Wallet that holds your cryptographic keys.
  * @param tx - The Transaction that is being signed.
+ * @param multisign - If true, changes the signature format to encode for multisigning.
  * @returns A signed Transaction.
  */
-function sign(wallet: Wallet, tx: Transaction): string {
-  return wallet.signTransaction(tx, { signAs: "" });
-}
-
-/**
- * Signs a transaction in praparation for a multisigned request. It does this using a wallet to
- * cryptographically sign a transaction which proves the owner of the wallet is accepting this transaction.
- *
- * @param wallet - A Wallet that holds your cryptographic keys and address.
- * @param tx - The Transaction being accepted.
- * @returns A signed Transaction that is ready to be combined with others for multisigning.
- */
-function multisign(wallet: Wallet, tx: Transaction): string {
-  return wallet.signTransaction(tx, { signAs: wallet.getClassicAddress() });
+function sign(
+  wallet: Wallet,
+  tx: Transaction,
+  multisign: boolean = false
+): string {
+  return wallet.signTransaction(
+    tx,
+    multisign ? { signAs: wallet.getClassicAddress() } : { signAs: "" }
+  );
 }
 
 /**
@@ -72,13 +68,13 @@ function combineMultisigned(
 
     if (tx.SigningPubKey !== "") {
       throw new ValidationError(
-        "For multisigning the transaction must include the SigningPubKey field as an empty string."
+        "SigningPubKey must be an empty string for all transactions when multisigning.s"
       );
     }
 
-    if (tx.Signers == null) {
+    if (tx.Signers == null || tx.Signers.length === 0) {
       throw new ValidationError(
-        "For multisigning the transaction must include a Signers field containing an array of signatures."
+        "For multisigning all transactions must include a Signers field containing an array of signatures. You may have forgotten to pass the 'multisign' parameter when signing."
       );
     }
   });
@@ -197,4 +193,4 @@ function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
   return decode(txOrBlob) as unknown as Transaction;
 }
 
-export { sign, multisign, authorizeChannel, verify, combineMultisigned };
+export { sign, authorizeChannel, verify, combineMultisigned };
