@@ -49,13 +49,9 @@ function sign(
  * - The SigningPubKey field is not the empty string in any given transaction
  * - Any transaction is missing a Signers field.
  */
-function combineMultisigned(
-  transactions: Array<Transaction | string>
-): Transaction {
+function multisign(transactions: Array<Transaction | string>): Transaction {
   if (transactions.length === 0) {
-    throw new ValidationError(
-      "There were 0 transactions given to combineMultisign"
-    );
+    throw new ValidationError("There were 0 transactions to multisign");
   }
 
   transactions.forEach((txOrBlob) => {
@@ -193,4 +189,4 @@ function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
   return decode(txOrBlob) as unknown as Transaction;
 }
 
-export { sign, authorizeChannel, verify, combineMultisigned };
+export { sign, authorizeChannel, verify, multisign };

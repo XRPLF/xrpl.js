@@ -10,7 +10,7 @@ import {
   verify,
   sign,
   authorizeChannel,
-  combineMultisigned,
+  multisign,
 } from "../../src/wallet/signer";
 
 const publicKey =
@@ -120,7 +120,7 @@ const multisignTxToCombine2: Transaction = {
   TransactionType: "TrustSet",
 };
 
-const expectedCombineMultisigned: Transaction = {
+const expectedmultisign: Transaction = {
   Account: "rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC",
   Fee: "30000",
   Flags: 262144,
@@ -187,19 +187,16 @@ describe("Signer tests", function () {
     );
   });
 
-  it("combineMultisigned runs successfully with Transaction objects", function () {
+  it("multisign runs successfully with Transaction objects", function () {
     const transactions: Transaction[] = [
       multisignTxToCombine1,
       multisignTxToCombine2,
     ];
 
-    assert.deepEqual(
-      combineMultisigned(transactions),
-      expectedCombineMultisigned
-    );
+    assert.deepEqual(multisign(transactions), expectedmultisign);
   });
 
-  it("combineMultisigned runs successfully with tx_blobs", function () {
+  it("multisign runs successfully with tx_blobs", function () {
     const transactions: Transaction[] = [
       multisignTxToCombine1,
       multisignTxToCombine2,
@@ -207,15 +204,12 @@ describe("Signer tests", function () {
 
     const encodedTransactions: string[] = transactions.map(encode);
 
-    assert.deepEqual(
-      combineMultisigned(encodedTransactions),
-      expectedCombineMultisigned
-    );
+    assert.deepEqual(multisign(encodedTransactions), expectedmultisign);
   });
 
-  it("throws a validation error if trying to combineMultisigned with no transactions", function () {
+  it("throws a validation error if trying to multisign with no transactions", function () {
     const transactions: Transaction[] = [];
-    assert.throws(() => combineMultisigned(transactions), ValidationError);
+    assert.throws(() => multisign(transactions), ValidationError);
   });
 
   it("throws when trying to multisign two different transactions", function () {
@@ -245,7 +239,7 @@ describe("Signer tests", function () {
       differentMultisignedTx,
     ];
 
-    assert.throws(() => combineMultisigned(transactions));
+    assert.throws(() => multisign(transactions));
   });
 
   it("authorizeChannel succeeds", function () {
