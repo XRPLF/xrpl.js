@@ -129,34 +129,34 @@ export function computeBinaryTransactionSigningHash(txBlobHex: string): string {
 }
 
 /**
- * Compute AccountRoot Ledger Object ID.
+ * Compute AccountRoot Ledger Object Index.
  *
- * All objects in a ledger's state tree have a unique ID.
- * The AccountRoot Ledger Object ID is derived by hashing the
+ * All objects in a ledger's state tree have a unique Index.
+ * The AccountRoot Ledger Object Index is derived by hashing the
  * address with a namespace identifier. This ensures every
- * ID is unique.
+ * Index is unique.
  *
- * See [Ledger Object IDs](https://xrpl.org/ledger-object-ids.html).
+ * See [Ledger Object Indexes](https://xrpl.org/ledger-object-ids.html).
  *
  * @param address - The classic account address.
- * @returns The Ledger Object ID for the account.
+ * @returns The Ledger Object Index for the account.
  */
 export function computeAccountRootIndex(address: string): string {
   return sha512Half(ledgerSpaceHex('account') + addressToHex(address))
 }
 
 /**
- * [SignerList ID Format](https://xrpl.org/signerlist.html#signerlist-id-format).
+ * [SignerList Index Format](https://xrpl.org/signerlist.html#signerlist-id-format).
  *
- * The ID of a SignerList object is the SHA-512Half of the following values, concatenated in order:
+ * The Index of a SignerList object is the SHA-512Half of the following values, concatenated in order:
  *   * The RippleState space key (0x0053)
  *   * The AccountID of the owner of the SignerList
  *   * The SignerListID (currently always 0).
  *
- * This method computes a SignerList Ledger Object ID.
+ * This method computes a SignerList Ledger Object Index.
  *
  * @param address - The classic account address of the SignerList owner (starting with r).
- * @returns The ID of the account's SignerList object.
+ * @returns The Index of the account's SignerList object.
  */
 export function computeSignerListIndex(address: string): string {
   return sha512Half(
@@ -165,9 +165,9 @@ export function computeSignerListIndex(address: string): string {
 }
 
 /**
- * [Offer ID Format](https://xrpl.org/offer.html#offer-id-format).
+ * [Offer Index Format](https://xrpl.org/offer.html#offer-id-format).
  *
- * The ID of a Offer object is the SHA-512Half of the following values, concatenated in order:
+ * The Index of a Offer object is the SHA-512Half of the following values, concatenated in order:
  * * The Offer space key (0x006F)
  * * The AccountID of the account placing the offer
  * * The Sequence number of the OfferCreate transaction that created the offer.
@@ -176,7 +176,7 @@ export function computeSignerListIndex(address: string): string {
  *
  * @param address - The classic account address of the SignerList owner (starting with r).
  * @param sequence - Sequence of the Offer.
- * @returns The ID of the account's Offer object.
+ * @returns The Index of the account's Offer object.
  */
 export function computeOfferIndex(address: string, sequence: number): string {
   const prefix = `00${intToHex(ledgerSpaces.offer.charCodeAt(0), 1)}`
