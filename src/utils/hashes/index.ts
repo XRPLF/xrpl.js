@@ -16,7 +16,7 @@ import HashPrefix from './hashPrefix'
 import computeLedgerHeaderHash from './ledgerHash'
 import ledgerSpaces from './ledgerSpaces'
 import sha512Half from './sha512Half'
-import SHAMap, { NodeType } from './SHAMap'
+import SHAMap, { NodeType } from './shaMap'
 
 const BITS_IN_HEX = 16
 const BYTE_LENGTH = 4
