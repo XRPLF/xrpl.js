@@ -280,3 +280,9 @@ function getFaucetUrl(client: Client): FaucetNetwork | undefined {
 }
 
 export default generateFaucetWallet
+
+const _private = {
+  FaucetNetwork,
+  getFaucetUrl,
+}
+export { _private }
