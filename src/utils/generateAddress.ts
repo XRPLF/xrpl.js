@@ -27,6 +27,7 @@ export interface GenerateAddressOptions {
 }
 
 /**
+ * TODO: Move this function to be a static function of the Wallet Class.
  * TODO: Doc this function.
  *
  * @param options - Options for generating X-Address.
