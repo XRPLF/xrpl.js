@@ -113,6 +113,7 @@ export interface BaseTransaction {
   AccountTxnID?: string;
   Flags?: number | GlobalFlags;
   LastLedgerSequence?: number;
+  // TODO: Make Memo match the format of Signer (By including the Memo: wrapper inside the Interface)
   Memos?: Array<{ Memo: Memo }>;
   Signers?: Signer[];
   SourceTag?: number;
