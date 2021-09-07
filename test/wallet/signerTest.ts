@@ -218,6 +218,36 @@ describe("Signer tests", function () {
     assert.throws(() => combineMultisigned(transactions), ValidationError);
   });
 
+  it("throws when trying to multisign two different transactions", function () {
+    const differentMultisignedTx: Transaction = {
+      TransactionType: "Payment",
+      Sequence: 1,
+      Amount: "20000000",
+      Fee: "12",
+      SigningPubKey: "",
+      Account: "rhvh5SrgBL5V8oeV9EpDuVszeJSSCEkbPc",
+      Destination: "rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r",
+      Signers: [
+        {
+          Signer: {
+            SigningPubKey:
+              "02A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F544",
+            TxnSignature:
+              "3044022077BCE143B9A0B51A7716BB93CBC0C99FB41BA339D91A87CB9E47DA80A7EF660802205C81AA49D408771F65A131200CCBFC536ACFE212C1414E05E43B56BE1F9380F2",
+            Account: "rHLEki8gPUMnF72JnuALvnAMRhRemzhRke",
+          },
+        },
+      ],
+    };
+
+    const transactions: Transaction[] = [
+      multisignTxToCombine1,
+      differentMultisignedTx,
+    ];
+
+    assert.throws(() => combineMultisigned(transactions));
+  });
+
   it("authorizeChannel succeeds", function () {
     const wallet = Wallet.fromSeed("snGHNrPbHrdUcszeuDEigMdC1Lyyd");
     const channelId =
