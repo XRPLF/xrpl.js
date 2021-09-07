@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- Necessary for these methods TODO: further cleanup */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types -- Necessary for these methods TODO: further cleanup */
 import net from 'net'
 
 import { assert } from 'chai'
@@ -19,18 +21,18 @@ export const addressTests = [
  *
  * @param response - Response received from the method.
  * @param expected - Expected response from the method.
- * @param schemaName - Name of the schema used to validate the shape of the response.
+ * @param _schemaName - Name of the schema used to validate the shape of the response.
  */
 export function assertResultMatch(
   response: any,
   expected: any,
-  schemaName?: string,
-) {
+  _schemaName?: string,
+): void {
   if (expected.txJSON) {
     assert(response.txJSON)
     assert.deepEqual(
-      JSON.parse(response.txJSON),
-      JSON.parse(expected.txJSON),
+      JSON.parse(response.txJSON as string),
+      JSON.parse(expected.txJSON as string),
       'checkResult: txJSON must match',
     )
   }
@@ -56,10 +58,10 @@ export function assertResultMatch(
  * @param message - Expected error message/substring of the error message.
  */
 export async function assertRejects(
-  promise: PromiseLike<any>,
+  promise: PromiseLike<Record<string, unknown>>,
   instanceOf: any,
   message?: string | RegExp,
-) {
+): Promise<void> {
   try {
     await promise
     assert(false, 'Expected an error to be thrown')
@@ -74,12 +76,12 @@ export async function assertRejects(
 }
 
 // using a free port instead of a constant port enables parallelization
-export async function getFreePort() {
+export async function getFreePort(): Promise<number> {
   return new Promise((resolve, reject) => {
     const server = net.createServer()
-    let port
+    let port: number
     server.on('listening', function () {
-      port = (server.address() as any).port
+      port = (server.address() as net.AddressInfo).port
       server.close()
     })
     server.on('close', function () {
@@ -98,6 +100,7 @@ export async function getFreePort() {
  * has come back.
  *
  * @param error - Thrown error.
+ * @throws If error is not websocket disconnect error.
  */
 export function ignoreWebSocketDisconnect(error: Error): void {
   if (error.message === 'websocket was closed') {
