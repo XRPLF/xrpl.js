@@ -155,7 +155,7 @@ const expectedCombineMultisigned: Transaction = {
 };
 
 describe("Signer tests", function () {
-  it("sign transaction offline", function () {
+  it("sign transaction", function () {
     // Test case data generated using this tutorial - https://xrpl.org/send-xrp.html#send-xrp
     const tx3: Transaction = {
       TransactionType: "Payment",
