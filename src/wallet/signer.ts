@@ -55,16 +55,15 @@ function multisign(transactions: Array<Transaction | string>): Transaction {
     // , also make verify accept '| Transaction' to avoid type casting here.
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- verify does not accept Transaction type
     verifyBaseTransaction(tx as unknown as Record<string, unknown>)
+    if (tx.Signers == null || tx.Signers.length === 0) {
+      throw new ValidationError(
+        "For multisigning all transactions must include a Signers field containing an array of signatures. You may have forgotten to pass the 'forMultisign' parameter when signing.",
+      )
+    }
 
     if (tx.SigningPubKey !== '') {
       throw new ValidationError(
         'SigningPubKey must be an empty string for all transactions when multisigning.',
-      )
-    }
-
-    if (tx.Signers == null || tx.Signers.length === 0) {
-      throw new ValidationError(
-        "For multisigning all transactions must include a Signers field containing an array of signatures. You may have forgotten to pass the 'multisign' parameter when signing.",
       )
     }
   })
