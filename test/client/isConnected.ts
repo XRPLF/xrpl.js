@@ -1,10 +1,10 @@
 import { assert } from 'chai'
 
-import setupClient from '../setupClient'
+import { setupClient, teardownClient } from '../setupClient'
 
 describe('client.isConnected', function () {
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
 
   it('disconnect & isConnected', async function () {
     assert.strictEqual(this.client.isConnected(), true)

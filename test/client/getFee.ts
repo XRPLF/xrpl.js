@@ -1,11 +1,11 @@
 import { assert } from 'chai'
 
 import rippled from '../fixtures/rippled'
-import setupClient from '../setupClient'
+import { setupClient, teardownClient } from '../setupClient'
 
 describe('client.getFee', function () {
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
 
   it('getFee', async function () {
     this.mockRippled.addResponse('server_info', rippled.server_info.normal)

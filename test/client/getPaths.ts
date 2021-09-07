@@ -1,7 +1,7 @@
 import addresses from '../fixtures/addresses.json'
 import requests from '../fixtures/requests'
 import rippled from '../fixtures/rippled'
-import setupClient from '../setupClient'
+import { setupClient, teardownClient } from '../setupClient'
 import { assertRejects } from '../testUtils'
 // import responses from '../fixtures/responses'
 const { getPaths: REQUEST_FIXTURES } = requests
@@ -15,8 +15,8 @@ const rippledResponse = rippled.path_find.generate.generateIOUPaymentPaths(
 )
 
 describe('client.getPaths', function () {
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
   // 'simple test', function () {
   //   const response = await this.client.getPaths(REQUEST_FIXTURES.normal)
   //   assertResultMatch(response, RESPONSE_FIXTURES.XrpToUsd, 'getPaths')

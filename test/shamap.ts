@@ -5,16 +5,19 @@ import { SHAMap, NodeType } from '../src/utils/hashes/shamap'
 const TYPE_TRANSACTION_NO_METADATA = NodeType.TRANSACTION_NO_METADATA
 
 const HEX_ZERO =
-  '00000000000000000000000000000000' + '00000000000000000000000000000000'
+  '0000000000000000000000000000000000000000000000000000000000000000'
 
 /**
  * Generates data to hash for testing.
  *
- * @param v
+ * @param v - TODO: fill in.
+ * @returns TODO: fill in.
  */
+// eslint-disable-next-line id-length -- TODO: figure out what this variable means
 function intToVuc(v: number): string {
   let ret = ''
 
+  // eslint-disable-next-line id-length -- TODO: figure out what this variable means
   for (let i = 0; i < 32; i++) {
     ret += '0'
     ret += v.toString(16).toUpperCase()
@@ -22,11 +25,19 @@ function intToVuc(v: number): string {
   return ret
 }
 
-function fillShamapTest(shamap: any, keys: string[], hashes: string[]) {
-  for (let i = 0; i < keys.length; i++) {
-    const data = intToVuc(i)
-    shamap.addItem(keys[i].toUpperCase(), data, TYPE_TRANSACTION_NO_METADATA)
-    assert.equal(shamap.hash, hashes[i])
+function fillShamapTest(
+  shamap: SHAMap,
+  keys: string[],
+  hashes: string[],
+): void {
+  for (let keyIndex = 0; keyIndex < keys.length; keyIndex++) {
+    const data = intToVuc(keyIndex)
+    shamap.addItem(
+      keys[keyIndex].toUpperCase(),
+      data,
+      TYPE_TRANSACTION_NO_METADATA,
+    )
+    assert.equal(shamap.hash, hashes[keyIndex])
   }
 }
 
