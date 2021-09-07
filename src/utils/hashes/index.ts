@@ -172,7 +172,7 @@ export function computeSignerListIndex(address: string): string {
  * * The AccountID of the account placing the offer
  * * The Sequence number of the OfferCreate transaction that created the offer.
  *
- * This method computes an Offer ID (aka Order ID).
+ * This method computes an Offer Index.
  *
  * @param address - The classic account address of the SignerList owner (starting with r).
  * @param sequence - Sequence of the Offer.
