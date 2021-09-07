@@ -1,78 +1,78 @@
 import setDomain from './combine.json'
-import transactions from './computeLedgerHashTransactions.json'
 import header from './computeLedgerHash.json'
-import withXRPOrderBook from './getOrderbookWithXrp.json'
+import transactions from './computeLedgerHashTransactions.json'
 import normalOrderBook from './getOrderbook.json'
+import withXRPOrderBook from './getOrderbookWithXrp.json'
 import invalid from './getpaths/invalid.json'
 import issuer from './getpaths/issuer.json'
+import NoPaths from './getpaths/noPaths.json'
 import NoPathsSource from './getpaths/noPathsSourceAmount.json'
 import NoPathsWithCurrencies from './getpaths/noPathsWithCurrencies.json'
-import NoPaths from './getpaths/noPaths.json'
 import normalPaths from './getpaths/normal.json'
 import NotAcceptCurrency from './getpaths/notAcceptCurrency.json'
 import sendAll from './getpaths/sendAll.json'
 import UsdToUsd from './getpaths/usd2usd.json'
-import XrpToXrpNotEnough from './getpaths/xrp2xrpNotEnough.json'
 import XrpToXrp from './getpaths/xrp2xrp.json'
+import XrpToXrpNotEnough from './getpaths/xrp2xrpNotEnough.json'
 import normalCheckCancel from './prepareCheckCancel.json'
 import amountCheckCash from './prepareCheckCashAmount.json'
 import deliverMinCheckCash from './prepareCheckCashDelivermin.json'
-import fullCheckCreate from './prepareCheckCreateFull.json'
 import normalCheckCreate from './prepareCheckCreate.json'
-import memosEscrowCancel from './prepareEscrowCancellationMemos.json'
+import fullCheckCreate from './prepareCheckCreateFull.json'
 import normalEscrowCancel from './prepareEscrowCancellation.json'
-import fullEscrowCreate from './prepareEscrowCreationFull.json'
+import memosEscrowCancel from './prepareEscrowCancellationMemos.json'
 import normalEscrowCreate from './prepareEscrowCreation.json'
+import fullEscrowCreate from './prepareEscrowCreationFull.json'
+import normalEscrowExec from './prepareEscrowExecution.json'
 import noConditionEscrowExec from './prepareEscrowExecutionNoCondition.json'
 import noFulfillmentEscrowExec from './prepareEscrowExecutionNoFulfillment.json'
 import simpleEscrowExec from './prepareEscrowExecutionSimple.json'
-import normalEscrowExec from './prepareEscrowExecution.json'
-import withMemosCancel from './prepareOrderCancellationMemos.json'
+import buyOrder from './prepareOrder.json'
 import simpleCancel from './prepareOrderCancellation.json'
+import withMemosCancel from './prepareOrderCancellationMemos.json'
 import expirationOrder from './prepareOrderExpiration.json'
 import sellOrder from './prepareOrderSell.json'
-import buyOrder from './prepareOrder.json'
+import normalPayment from './preparePayment.json'
 import allOptions from './preparePaymentAllOptions.json'
+import normalPayChanClaim from './preparePaymentChannelClaim.json'
 import closePayChanClaim from './preparePaymentChannelClaimClose.json'
 import fullPayChanClaim from './preparePaymentChannelClaimFull.json'
 import noSignaturePayChanClaim from './preparePaymentChannelClaimNoSignature.json'
 import renewPayChanClaim from './preparePaymentChannelClaimRenew.json'
-import normalPayChanClaim from './preparePaymentChannelClaim.json'
-import fullPayChanCreate from './preparePaymentChannelCreateFull.json'
 import normalPayChanCreate from './preparePaymentChannelCreate.json'
-import fullPayChanFund from './preparePaymentChannelFundFull.json'
+import fullPayChanCreate from './preparePaymentChannelCreateFull.json'
 import normalPayChanFund from './preparePaymentChannelFund.json'
-import minAmountXRP from './preparePaymentMinXrp.json'
+import fullPayChanFund from './preparePaymentChannelFundFull.json'
 import minAmount from './preparePaymentMin.json'
+import minAmountXRP from './preparePaymentMinXrp.json'
 import noCounterparty from './preparePaymentNoCounterparty.json'
 import wrongAddress from './preparePaymentWrongAddress.json'
 import wrongAmount from './preparePaymentWrongAmount.json'
 import wrongPartial from './preparePaymentWrongPartial.json'
-import normalPayment from './preparePayment.json'
+import domain from './prepareSettings.json'
 import noSignerEntries from './prepareSettingsNoSignerEntries.json'
+import normalSigners from './prepareSettingsSigners.json'
 import noThresholdSigners from './prepareSettingsSignersNoThreshold.json'
 import noWeightsSigners from './prepareSettingsSignersNoWeights.json'
-import normalSigners from './prepareSettingsSigners.json'
-import domain from './prepareSettings.json'
+import complexTrustline from './prepareTrustline.json'
 import frozenTrustline from './prepareTrustlineFrozen.json'
 import issuedXAddressTrustline from './prepareTrustlineIssuerXaddress.json'
 import simpleTrustline from './prepareTrustlineSimple.json'
-import complexTrustline from './prepareTrustline.json'
+import normalSign from './sign.json'
 import signAsSign from './signAs.json'
 import escrowSign from './signEscrow.json'
 import signPaymentChannelClaim from './signPaymentChannelClaim.json'
 import ticketSign from './signTicket.json'
-import normalSign from './sign.json'
 
 const prepareOrder = {
   buy: buyOrder,
   sell: sellOrder,
-  expiration: expirationOrder
+  expiration: expirationOrder,
 }
 
 const prepareOrderCancellation = {
   simple: simpleCancel,
-  withMemos: withMemosCancel
+  withMemos: withMemosCancel,
 }
 
 const preparePayment = {
@@ -83,7 +83,7 @@ const preparePayment = {
   wrongAmount,
   wrongPartial,
   allOptions,
-  noCounterparty
+  noCounterparty,
 }
 
 const prepareSettings = {
@@ -92,48 +92,48 @@ const prepareSettings = {
   signers: {
     normal: normalSigners,
     noThreshold: noThresholdSigners,
-    noWeights: noWeightsSigners
-  }
+    noWeights: noWeightsSigners,
+  },
 }
 const prepareEscrowCreation = {
   normal: normalEscrowCreate,
-  full: fullEscrowCreate
+  full: fullEscrowCreate,
 }
 
 const prepareEscrowExecution = {
   normal: normalEscrowExec,
   simple: simpleEscrowExec,
   noCondition: noConditionEscrowExec,
-  noFulfillment: noFulfillmentEscrowExec
+  noFulfillment: noFulfillmentEscrowExec,
 }
 
 const prepareEscrowCancellation = {
   normal: normalEscrowCancel,
-  memos: memosEscrowCancel
+  memos: memosEscrowCancel,
 }
 
 const prepareCheckCreate = {
   normal: normalCheckCreate,
-  full: fullCheckCreate
+  full: fullCheckCreate,
 }
 
 const prepareCheckCash = {
   amount: amountCheckCash,
-  deliverMin: deliverMinCheckCash
+  deliverMin: deliverMinCheckCash,
 }
 
 const prepareCheckCancel = {
-  normal: normalCheckCancel
+  normal: normalCheckCancel,
 }
 
 const preparePaymentChannelCreate = {
   normal: normalPayChanCreate,
-  full: fullPayChanCreate
+  full: fullPayChanCreate,
 }
 
 const preparePaymentChannelFund = {
   normal: normalPayChanFund,
-  full: fullPayChanFund
+  full: fullPayChanFund,
 }
 
 const preparePaymentChannelClaim = {
@@ -141,21 +141,21 @@ const preparePaymentChannelClaim = {
   full: fullPayChanClaim,
   close: closePayChanClaim,
   renew: renewPayChanClaim,
-  noSignature: noSignaturePayChanClaim
+  noSignature: noSignaturePayChanClaim,
 }
 
 const prepareTrustline = {
   simple: simpleTrustline,
   complex: complexTrustline,
   frozen: frozenTrustline,
-  issuedXAddress: issuedXAddressTrustline
+  issuedXAddress: issuedXAddressTrustline,
 }
 
 const sign = {
   normal: normalSign,
   ticket: ticketSign,
   escrow: escrowSign,
-  signAs: signAsSign
+  signAs: signAsSign,
 }
 
 const getPaths = {
@@ -169,21 +169,21 @@ const getPaths = {
   NoPathsWithCurrencies,
   sendAll,
   invalid,
-  issuer
+  issuer,
 }
 
 const getOrderbook = {
   normal: normalOrderBook,
-  withXRP: withXRPOrderBook
+  withXRP: withXRPOrderBook,
 }
 
 const computeLedgerHash = {
-  header: {...header, rawTransactions: JSON.stringify(transactions)},
-  transactions
+  header: { ...header, rawTransactions: JSON.stringify(transactions) },
+  transactions,
 }
 
 const combine = {
-  setDomain
+  setDomain,
 }
 
 const requests = {
@@ -206,7 +206,7 @@ const requests = {
   prepareTrustline,
   prepareSettings,
   sign,
-  signPaymentChannelClaim
+  signPaymentChannelClaim,
 }
 
 export default requests

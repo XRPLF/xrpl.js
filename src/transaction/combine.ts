@@ -1,11 +1,11 @@
-import BigNumber from "bignumber.js";
-import _ from "lodash";
-import { decodeAccountID } from "ripple-address-codec";
-import binary from "ripple-binary-codec";
-import { JsonObject } from "ripple-binary-codec/dist/types/serialized-type";
+import BigNumber from 'bignumber.js'
+import _ from 'lodash'
+import { decodeAccountID } from 'ripple-address-codec'
+import binary from 'ripple-binary-codec'
+import { JsonObject } from 'ripple-binary-codec/dist/types/serialized-type'
 
-import { ValidationError } from "../common/errors";
-import { computeBinaryTransactionHash } from "../utils/hashes";
+import { ValidationError } from '../common/errors'
+import { computeBinaryTransactionHash } from '../utils/hashes'
 
 /**
  * The transactions should all be equal except for the 'Signers' field.
@@ -16,23 +16,23 @@ function validateTransactionEquivalence(transactions: JsonObject[]) {
   const exampleTransaction = JSON.stringify({
     ...transactions[0],
     Signers: null,
-  });
+  })
   if (
     transactions
       .slice(1)
       .some(
-        (tx) => JSON.stringify({ ...tx, Signers: null }) !== exampleTransaction
+        (tx) => JSON.stringify({ ...tx, Signers: null }) !== exampleTransaction,
       )
   ) {
     throw new ValidationError(
-      "txJSON is not the same for all signedTransactions"
-    );
+      'txJSON is not the same for all signedTransactions',
+    )
   }
 }
 
 function addressToBigNumber(address) {
-  const hex = Buffer.from(decodeAccountID(address)).toString("hex");
-  return new BigNumber(hex, 16);
+  const hex = Buffer.from(decodeAccountID(address)).toString('hex')
+  return new BigNumber(hex, 16)
 }
 
 /**
@@ -46,17 +46,17 @@ function addressToBigNumber(address) {
  */
 function compareSigners(a, b) {
   return addressToBigNumber(a.Signer.Account).comparedTo(
-    addressToBigNumber(b.Signer.Account)
-  );
+    addressToBigNumber(b.Signer.Account),
+  )
 }
 
 function getTransactionWithAllSigners(transactions: JsonObject[]): JsonObject {
   // Signers must be sorted - see compareSigners for more details
   const sortedSigners = _.flatMap(transactions, (tx) => tx.Signers)
     .filter((signer) => signer)
-    .sort(compareSigners);
+    .sort(compareSigners)
 
-  return { ...transactions[0], Signers: sortedSigners };
+  return { ...transactions[0], Signers: sortedSigners }
 }
 
 /**
@@ -67,16 +67,16 @@ function getTransactionWithAllSigners(transactions: JsonObject[]): JsonObject {
  * with a transaction id based on the combined transaction.
  */
 function combine(signedTransactions: string[]): object {
-  const transactions: JsonObject[] = signedTransactions.map(binary.decode);
-  validateTransactionEquivalence(transactions);
+  const transactions: JsonObject[] = signedTransactions.map(binary.decode)
+  validateTransactionEquivalence(transactions)
 
   const signedTransaction = binary.encode(
-    getTransactionWithAllSigners(transactions)
-  );
+    getTransactionWithAllSigners(transactions),
+  )
   return {
     signedTransaction,
     id: computeBinaryTransactionHash(signedTransaction),
-  };
+  }
 }
 
-export default combine;
+export default combine

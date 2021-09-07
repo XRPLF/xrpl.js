@@ -1,82 +1,83 @@
-import type { Client } from "..";
-import { ensureClassicAddress } from "../common";
-import { FormattedTrustline } from "../common/types/objects/trustlines";
+import type { Client } from '..'
+import { ensureClassicAddress } from '../common'
+import { FormattedTrustline } from '../common/types/objects/trustlines'
 
-import { GetTrustlinesOptions } from "./trustlines";
-import * as utils from "./utils";
+import { GetTrustlinesOptions } from './trustlines'
+import * as utils from './utils'
 
 export interface Balance {
-  value: string;
-  currency: string;
-  counterparty?: string;
+  value: string
+  currency: string
+  counterparty?: string
 }
 
-export type GetBalances = Balance[];
+export type GetBalances = Balance[]
 
 function getTrustlineBalanceAmount(trustline: FormattedTrustline): Balance {
   return {
     currency: trustline.specification.currency,
     counterparty: trustline.specification.counterparty,
     value: trustline.state.balance,
-  };
+  }
 }
 
 function formatBalances(
   options: GetTrustlinesOptions,
-  balances: { xrp: string; trustlines: FormattedTrustline[] }
+  balances: { xrp: string; trustlines: FormattedTrustline[] },
 ) {
-  const result = balances.trustlines.map(getTrustlineBalanceAmount);
+  const result = balances.trustlines.map(getTrustlineBalanceAmount)
   if (
-    !(options.counterparty || (options.currency && options.currency !== "XRP"))
+    !(options.counterparty || (options.currency && options.currency !== 'XRP'))
   ) {
     const xrpBalance = {
-      currency: "XRP",
+      currency: 'XRP',
       value: balances.xrp,
-    };
-    result.unshift(xrpBalance);
+    }
+    result.unshift(xrpBalance)
   }
   if (options.limit && result.length > options.limit) {
-    const toRemove = result.length - options.limit;
-    result.splice(-toRemove, toRemove);
+    const toRemove = result.length - options.limit
+    result.splice(-toRemove, toRemove)
   }
-  return result;
+  return result
 }
 
 async function getLedgerVersionHelper(
   client: Client,
-  optionValue?: number
+  optionValue?: number,
 ): Promise<number> {
   if (optionValue != null && optionValue !== null) {
-    return Promise.resolve(optionValue);
+    return Promise.resolve(optionValue)
   }
   return client
     .request({
-      command: "ledger",
-      ledger_index: "validated",
+      command: 'ledger',
+      ledger_index: 'validated',
     })
-    .then((response) => response.result.ledger_index);
+    .then((response) => response.result.ledger_index)
 }
 
 async function getBalances(
   this: Client,
   address: string,
-  options: GetTrustlinesOptions = {}
+  options: GetTrustlinesOptions = {},
 ): Promise<GetBalances> {
   // Only support retrieving balances without a tag,
   // since we currently do not calculate balances
   // on a per-tag basis. Apps must interpret and
   // use tags independent of the XRP Ledger, comparing
   // with the XRP Ledger's balance as an accounting check.
-  address = ensureClassicAddress(address);
+  address = ensureClassicAddress(address)
 
   return Promise.all([
     getLedgerVersionHelper(this, options.ledgerVersion).then(
-      async (ledgerVersion) => utils.getXRPBalance(this, address, ledgerVersion)
+      async (ledgerVersion) =>
+        utils.getXRPBalance(this, address, ledgerVersion),
     ),
     this.getTrustlines(address, options),
   ]).then((results) =>
-    formatBalances(options, { xrp: results[0], trustlines: results[1] })
-  );
+    formatBalances(options, { xrp: results[0], trustlines: results[1] }),
+  )
 }
 
-export default getBalances;
+export default getBalances

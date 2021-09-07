@@ -1,38 +1,38 @@
-import type { Client } from "..";
+import type { Client } from '..'
 
-import { Instructions, Prepare, TransactionJSON } from "./types";
-import * as utils from "./utils";
+import { Instructions, Prepare, TransactionJSON } from './types'
+import * as utils from './utils'
 
 function createOrderCancellationTransaction(
   account: string,
-  orderCancellation: any
+  orderCancellation: any,
 ): TransactionJSON {
   const txJSON: any = {
-    TransactionType: "OfferCancel",
+    TransactionType: 'OfferCancel',
     Account: account,
     OfferSequence: orderCancellation.orderSequence,
-  };
-  if (orderCancellation.memos != null) {
-    txJSON.Memos = orderCancellation.memos.map(utils.convertMemo);
   }
-  return txJSON;
+  if (orderCancellation.memos != null) {
+    txJSON.Memos = orderCancellation.memos.map(utils.convertMemo)
+  }
+  return txJSON
 }
 
-function prepareOrderCancellation(
+async function prepareOrderCancellation(
   this: Client,
   address: string,
   orderCancellation: object,
-  instructions: Instructions = {}
+  instructions: Instructions = {},
 ): Promise<Prepare> {
   try {
     const txJSON = createOrderCancellationTransaction(
       address,
-      orderCancellation
-    );
-    return utils.prepareTransaction(txJSON, this, instructions);
+      orderCancellation,
+    )
+    return await utils.prepareTransaction(txJSON, this, instructions)
   } catch (e) {
-    return Promise.reject(e);
+    return Promise.reject(e)
   }
 }
 
-export default prepareOrderCancellation;
+export default prepareOrderCancellation

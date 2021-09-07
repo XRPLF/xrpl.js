@@ -102,7 +102,7 @@ import unsubscribe from "./unsubscribe.json";
 const submit = {
   success: successSubmit,
   failure: failureSubmit,
-};
+}
 
 const ledger = {
   normal: normalLedger,
@@ -113,12 +113,12 @@ const ledger = {
   withStateAsHashes,
   withPartialPayment,
   pre2014withPartial,
-};
+}
 
 const subscribe = {
   success: successSubscribe,
   error: errorSubscribe,
-};
+}
 
 const streams = {
   ledger: ledgerStream,
@@ -134,32 +134,32 @@ const streams = {
 const account_objects = {
   normal: normalAccountObjects,
   //   notfound: notfoundAccountObjects
-};
+}
 
 const account_info = {
   normal: normalAccountInfo,
   notfound: notfoundAccountInfo,
-};
+}
 
 const account_tx = {
   normal: normalAccountTx,
   one: oneAccountTx,
-};
+}
 
 const book_offers = {
   fabric,
   usd_xrp,
   xrp_usd,
-};
+}
 
 const ledger_data = {
   first_page,
   last_page,
-};
+}
 
 const ledger_entry = {
   error: errorLedgerEntry,
-};
+}
 
 const server_info = {
   normal: normalServerInfo,
@@ -168,7 +168,7 @@ const server_info = {
   error: errorServerInfo,
   reporting,
   highLoadFactor,
-};
+}
 
 const path_find = {
   generate,
@@ -177,12 +177,12 @@ const path_find = {
   XrpToXrp,
   srcActNotFound,
   sourceAmountLow,
-};
+}
 
 const payment_channel = {
   normal: normalPayChan,
   full: fullPayChan,
-};
+}
 
 const tx = {
   Payment,
@@ -233,7 +233,7 @@ const tx = {
   AccountDeleteWithMemo,
   WithMemo,
   WithMemos,
-};
+}
 
 const rippled = {
   account_info,
@@ -257,6 +257,6 @@ const rippled = {
   subscribe,
   tx,
   unsubscribe,
-};
+}
 
-export default rippled;
+export default rippled

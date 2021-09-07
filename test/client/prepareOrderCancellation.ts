@@ -1,77 +1,77 @@
-import requests from "../fixtures/requests";
-import responses from "../fixtures/responses";
-import rippled from "../fixtures/rippled";
-import setupClient from "../setupClient";
-import { assertResultMatch, addressTests } from "../testUtils";
+import requests from '../fixtures/requests'
+import responses from '../fixtures/responses'
+import rippled from '../fixtures/rippled'
+import setupClient from '../setupClient'
+import { assertResultMatch, addressTests } from '../testUtils'
 
-const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
+const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 }
 
-describe("client.prepareOrderCancellation", function () {
-  beforeEach(setupClient.setup);
-  afterEach(setupClient.teardown);
+describe('client.prepareOrderCancellation', function () {
+  beforeEach(setupClient.setup)
+  afterEach(setupClient.teardown)
 
   addressTests.forEach(function (test) {
     describe(test.type, function () {
-      it("prepareOrderCancellation", async function () {
-        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-        this.mockRippled.addResponse("fee", rippled.fee);
-        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+      it('prepareOrderCancellation', async function () {
+        this.mockRippled.addResponse('server_info', rippled.server_info.normal)
+        this.mockRippled.addResponse('fee', rippled.fee)
+        this.mockRippled.addResponse('ledger_current', rippled.ledger_current)
         this.mockRippled.addResponse(
-          "account_info",
-          rippled.account_info.normal
-        );
-        const request = requests.prepareOrderCancellation.simple;
+          'account_info',
+          rippled.account_info.normal,
+        )
+        const request = requests.prepareOrderCancellation.simple
         const result = await this.client.prepareOrderCancellation(
           test.address,
           request,
-          instructionsWithMaxLedgerVersionOffset
-        );
+          instructionsWithMaxLedgerVersionOffset,
+        )
         assertResultMatch(
           result,
           responses.prepareOrderCancellation.normal,
-          "prepare"
-        );
-      });
+          'prepare',
+        )
+      })
 
-      it("no instructions", async function () {
-        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-        this.mockRippled.addResponse("fee", rippled.fee);
-        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+      it('no instructions', async function () {
+        this.mockRippled.addResponse('server_info', rippled.server_info.normal)
+        this.mockRippled.addResponse('fee', rippled.fee)
+        this.mockRippled.addResponse('ledger_current', rippled.ledger_current)
         this.mockRippled.addResponse(
-          "account_info",
-          rippled.account_info.normal
-        );
-        const request = requests.prepareOrderCancellation.simple;
+          'account_info',
+          rippled.account_info.normal,
+        )
+        const request = requests.prepareOrderCancellation.simple
         const result = await this.client.prepareOrderCancellation(
           test.address,
-          request
-        );
+          request,
+        )
         assertResultMatch(
           result,
           responses.prepareOrderCancellation.noInstructions,
-          "prepare"
-        );
-      });
+          'prepare',
+        )
+      })
 
-      it("with memos", async function () {
-        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-        this.mockRippled.addResponse("fee", rippled.fee);
-        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+      it('with memos', async function () {
+        this.mockRippled.addResponse('server_info', rippled.server_info.normal)
+        this.mockRippled.addResponse('fee', rippled.fee)
+        this.mockRippled.addResponse('ledger_current', rippled.ledger_current)
         this.mockRippled.addResponse(
-          "account_info",
-          rippled.account_info.normal
-        );
-        const request = requests.prepareOrderCancellation.withMemos;
+          'account_info',
+          rippled.account_info.normal,
+        )
+        const request = requests.prepareOrderCancellation.withMemos
         const result = await this.client.prepareOrderCancellation(
           test.address,
-          request
-        );
+          request,
+        )
         assertResultMatch(
           result,
           responses.prepareOrderCancellation.withMemos,
-          "prepare"
-        );
-      });
+          'prepare',
+        )
+      })
 
       // it("invalid", async function () {
       //   this.mockRippled.addResponse("server_info", rippled.server_info.normal);
@@ -93,31 +93,31 @@ describe("client.prepareOrderCancellation", function () {
       //   );
       // });
 
-      it("with ticket", async function () {
-        this.mockRippled.addResponse("server_info", rippled.server_info.normal);
-        this.mockRippled.addResponse("fee", rippled.fee);
-        this.mockRippled.addResponse("ledger_current", rippled.ledger_current);
+      it('with ticket', async function () {
+        this.mockRippled.addResponse('server_info', rippled.server_info.normal)
+        this.mockRippled.addResponse('fee', rippled.fee)
+        this.mockRippled.addResponse('ledger_current', rippled.ledger_current)
         this.mockRippled.addResponse(
-          "account_info",
-          rippled.account_info.normal
-        );
-        const request = requests.prepareOrderCancellation.simple;
+          'account_info',
+          rippled.account_info.normal,
+        )
+        const request = requests.prepareOrderCancellation.simple
         const localInstructions = {
           ...instructionsWithMaxLedgerVersionOffset,
-          maxFee: "0.000012",
+          maxFee: '0.000012',
           ticketSequence: 23,
-        };
+        }
         const result = await this.client.prepareOrderCancellation(
           test.address,
           request,
-          localInstructions
-        );
+          localInstructions,
+        )
         assertResultMatch(
           result,
           responses.prepareOrderCancellation.ticket,
-          "prepare"
-        );
-      });
-    });
-  });
-});
+          'prepare',
+        )
+      })
+    })
+  })
+})
