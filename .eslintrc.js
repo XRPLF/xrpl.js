@@ -88,6 +88,8 @@ module.exports = {
 
         // We need to test things without type guards sometimes
         "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/consistent-type-assertions": "off",
 
         // We need to mess with internal things to generate certain testing situations
         "@typescript-eslint/no-unsafe-member-access": "off",
@@ -99,6 +101,9 @@ module.exports = {
             allowModules: ["xrpl-local"],
           },
         ],
+
+        // Tests are already in 2 callbacks, so max 3 is pretty restrictive
+        "max-nested-callbacks": "off",
       },
     },
     {

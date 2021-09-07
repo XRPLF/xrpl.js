@@ -1,11 +1,11 @@
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
-import setupClient from '../setupClient'
+import { setupClient, teardownClient } from '../setupClient'
 import { addressTests, assertResultMatch } from '../testUtils'
 
 describe('client.request', function () {
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
 
   addressTests.forEach(function (test) {
     describe(test.type, function () {

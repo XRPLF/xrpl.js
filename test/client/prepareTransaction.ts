@@ -5,21 +5,14 @@ import { xrpToDrops, ISOTimeToRippleTime } from '../../src/utils'
 import addresses from '../fixtures/addresses.json'
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
-import setupClient from '../setupClient'
+import { setupClient, teardownClient } from '../setupClient'
 import { assertRejects, assertResultMatch } from '../testUtils'
 
 const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 }
 
-export const config = {
-  // TODO: The mock server right now returns a hard-coded string, no matter
-  // what "Account" value you pass. We'll need it to support more accurate
-  // responses before we can turn these tests on.
-  skipXAddress: true,
-}
-
 describe('client.prepareTransaction', function () {
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
 
   it('auto-fillable fields - does not overwrite Fee in txJSON', async function () {
     this.mockRippled.addResponse('server_info', rippled.server_info.normal)

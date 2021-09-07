@@ -2,11 +2,11 @@ import { assert } from 'chai'
 
 import { getFaucetUrl, FaucetNetwork } from '../src/wallet/generateFaucetWallet'
 
-import setupClient from './setupClient'
+import { setupClient, teardownClient } from './setupClient'
 
 describe('Get Faucet URL', function () {
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
 
   it('returns the Devnet URL', function () {
     const expectedFaucet = FaucetNetwork.Devnet
