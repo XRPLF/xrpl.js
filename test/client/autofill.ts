@@ -7,15 +7,15 @@ import {
   Transaction,
 } from "../../src/models/transactions";
 import rippled from "../fixtures/rippled";
-import setupClient from "../setupClient";
+import { setupClient, teardownClient } from "../setupClient";
 
 const Fee = "10";
 const Sequence = 1432;
 const LastLedgerSequence = 2908734;
 
 describe("client.autofill", function () {
-  beforeEach(setupClient.setup);
-  afterEach(setupClient.teardown);
+  beforeEach(setupClient);
+  afterEach(teardownClient);
 
   it("should not autofill if fields are present", async function () {
     const tx: Transaction = {
