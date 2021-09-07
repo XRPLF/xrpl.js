@@ -40,21 +40,23 @@ import { addressTests } from '../testUtils'
 //   return true;
 // }
 
-function isUSD(currency: string) {
+function isUSD(currency: string): boolean {
   return (
     currency === 'USD' ||
     currency === '0000000000000000000000005553440000000000'
   )
 }
 
-function isBTC(currency: string) {
+function isBTC(currency: string): boolean {
   return (
     currency === 'BTC' ||
     currency === '0000000000000000000000004254430000000000'
   )
 }
 
-function normalRippledResponse(request: BookOffersRequest): object {
+function normalRippledResponse(
+  request: BookOffersRequest,
+): Record<string, unknown> {
   if (
     isBTC(request.taker_gets.currency) &&
     isUSD(request.taker_pays.currency)
@@ -70,56 +72,61 @@ function normalRippledResponse(request: BookOffersRequest): object {
   throw new Error('unexpected end')
 }
 
-// function xrpRippledResponse(request: BookOffersRequest): object {
-//   if (request.taker_pays.issuer === "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw") {
-//     return rippled.book_offers.xrp_usd;
+// function xrpRippledResponse(
+//   request: BookOffersRequest,
+// ): Record<string, unknown> {
+//   if (request.taker_pays.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
+//     return rippled.book_offers.xrp_usd
 //   }
-//   if (request.taker_gets.issuer === "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw") {
-//     return rippled.book_offers.usd_xrp;
+//   if (request.taker_gets.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
+//     return rippled.book_offers.usd_xrp
 //   }
-//   throw new Error("unexpected end");
+//   throw new Error('unexpected end')
 // }
 
 describe('client.getOrderbook', function () {
   beforeEach(setupClient)
   afterEach(teardownClient)
 
-  addressTests.forEach(function (test) {
-    describe(test.type, function () {
+  // eslint-disable-next-line mocha/no-setup-in-describe -- Rule does not work with dynamically generated tests.
+  addressTests.forEach(function (testcase) {
+    describe(testcase.type, function () {
       it('normal', async function () {
         this.mockRippled.addResponse('book_offers', normalRippledResponse)
         const response = await this.client.getOrderbook(
-          requests.getOrderbook.normal.taker_pays,
-          requests.getOrderbook.normal.taker_gets,
-          {
-            limit: 1,
-          },
+          testcase.address,
+          requests.getOrderbook.normal,
+          { limit: 20 },
         )
         assert.deepEqual(response, responses.getOrderbook.normal)
       })
 
-      // it("invalid options", async function () {
-      //   this.mockRippled.addResponse("book_offers", normalRippledResponse);
+      // it('invalid options', async function () {
+      //   this.mockRippled.addResponse('book_offers', normalRippledResponse)
       //   assertRejects(
-      //     this.client.getOrderbook(test.address, requests.getOrderbook.normal, {
-      //       invalid: "options",
-      //     }),
-      //     this.client.errors.ValidationError
-      //   );
-      // });
+      //     this.client.getOrderbook(
+      //       testcase.address,
+      //       requests.getOrderbook.normal,
+      //       {
+      //         invalid: 'options',
+      //       },
+      //     ),
+      //     this.client.errors.ValidationError,
+      //   )
+      // })
 
-      // it("with XRP", async function () {
-      //   this.mockRippled.addResponse("book_offers", xrpRippledResponse);
+      // it('with XRP', async function () {
+      //   this.mockRippled.addResponse('book_offers', xrpRippledResponse)
       //   const response = await this.client.getOrderbook(
-      //     test.address,
-      //     requests.getOrderbook.withXRP
-      //   );
+      //     testcase.address,
+      //     requests.getOrderbook.withXRP,
+      //   )
       //   assertResultMatch(
       //     response,
       //     responses.getOrderbook.withXRP,
-      //     "getOrderbook"
-      //   );
-      // });
+      //     'getOrderbook',
+      //   )
+      // })
 
       // 'sample XRP/JPY book has orders sorted correctly', async function () {
       //   const orderbookInfo = {
