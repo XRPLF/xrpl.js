@@ -2,11 +2,11 @@ import { assert } from 'chai'
 
 import { Client } from '../../src'
 import rippled from '../fixtures/rippled'
-import setupClient from '../setupClient'
+import { setupClient, teardownClient } from '../setupClient'
 
 describe('client.hasNextPage', function () {
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
 
   it('returns true when there is another page', async function () {
     this.mockRippled.addResponse('ledger_data', rippled.ledger_data.first_page)

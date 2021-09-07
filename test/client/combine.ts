@@ -3,15 +3,15 @@ import binary from 'ripple-binary-codec'
 
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
-import setupClient from '../setupClient'
+import { setupClient, teardownClient } from '../setupClient'
 import { assertResultMatch } from '../testUtils'
 
 const { combine: REQUEST_FIXTURES } = requests
 const { combine: RESPONSE_FIXTURES } = responses
 
 describe('client.combine', function () {
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
 
   it('combine', async function () {
     const combined = this.client.combine(REQUEST_FIXTURES.setDomain)

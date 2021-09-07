@@ -2,7 +2,7 @@ import { assert } from 'chai'
 
 import { Client } from '../../src'
 import rippled from '../fixtures/rippled'
-import setupClient from '../setupClient'
+import { setupClient, teardownClient } from '../setupClient'
 import { assertRejects } from '../testUtils'
 
 const rippledResponse = function (request: Request): object {
@@ -13,8 +13,8 @@ const rippledResponse = function (request: Request): object {
 }
 
 describe('client.requestNextPage', function () {
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
   it('requests the next page', async function () {
     this.mockRippled.addResponse('ledger_data', rippledResponse)
     const response = await this.client.request({ command: 'ledger_data' })

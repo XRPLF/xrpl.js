@@ -1,7 +1,7 @@
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
 import rippledAccountLines from '../fixtures/rippled/accountLines'
-import setupClient from '../setupClient'
+import { setupClient, teardownClient } from '../setupClient'
 import { assertResultMatch, addressTests } from '../testUtils'
 
 /**
@@ -10,8 +10,8 @@ import { assertResultMatch, addressTests } from '../testUtils'
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 describe('getBalances', function () {
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
 
   addressTests.forEach(function (test) {
     describe(test.type, function () {

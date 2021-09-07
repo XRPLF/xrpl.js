@@ -16,13 +16,16 @@ import {
 } from '../src/common/errors'
 
 import rippled from './fixtures/rippled'
-import setupClient from './setupClient'
+import { setupClient, teardownClient } from './setupClient'
 import { ignoreWebSocketDisconnect } from './testUtils'
 
-const TIMEOUT = 200000 // how long before each test case times out
+// how long before each test case times out
+const TIMEOUT = 20000
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Necessary to get browser info
 const isBrowser = (process as any).browser
 
-async function createServer() {
+async function createServer(): Promise<net.Server> {
   return new Promise((resolve, reject) => {
     const server = net.createServer()
     server.on('listening', function () {
@@ -37,56 +40,89 @@ async function createServer() {
 
 describe('Connection', function () {
   this.timeout(TIMEOUT)
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
 
   it('default options', function () {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Need to access private methods
     const connection: any = new Connection('url')
-    assert.strictEqual(connection.url, 'url')
+    assert.strictEqual(connection.getUrl(), 'url')
     assert(connection.config.proxy == null)
     assert(connection.config.authorization == null)
   })
 
   describe('trace', function () {
-    const mockedRequestData = { mocked: 'request' }
-    const mockedResponse = JSON.stringify({ mocked: 'response', id: 0 })
-    const expectedMessages = [
-      // We add the ID here, since it's not a part of the user-provided request.
-      ['send', JSON.stringify({ ...mockedRequestData, id: 0 })],
-      ['receive', mockedResponse],
-    ]
-    const originalConsoleLog = console.log
+    let mockedRequestData
+    let mockedResponse
+    let expectedMessages
+    let originalConsoleLog
+
+    beforeEach(function () {
+      mockedRequestData = { mocked: 'request' }
+      mockedResponse = JSON.stringify({ mocked: 'response', id: 0 })
+      expectedMessages = [
+        // We add the ID here, since it's not a part of the user-provided request.
+        ['send', JSON.stringify({ ...mockedRequestData, id: 0 })],
+        ['receive', mockedResponse],
+      ]
+      // eslint-disable-next-line no-console -- Testing trace
+      originalConsoleLog = console.log
+    })
 
     afterEach(function () {
+      // eslint-disable-next-line no-console -- Testing trace
       console.log = originalConsoleLog
     })
 
     it('as false', function () {
-      const messages: any[] = []
-      console.log = (id, message) => messages.push([id, message])
+      const messages: Array<[number | string, string]> = []
+      // eslint-disable-next-line no-console -- Testing trace
+      console.log = function (id: number, message: string): void {
+        messages.push([id, message])
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Need to access private methods
       const connection: any = new Connection('url', { trace: false })
-      connection.ws = { send() {} }
+      connection.ws = {
+        send(): void {
+          /* purposefully empty */
+        },
+      }
       connection.request(mockedRequestData)
       connection.onMessage(mockedResponse)
       assert.deepEqual(messages, [])
     })
 
     it('as true', function () {
-      const messages: any[] = []
-      console.log = (id, message) => messages.push([id, message])
+      const messages: Array<[number | string, string]> = []
+      // eslint-disable-next-line no-console -- Testing trace
+      console.log = function (id: number | string, message: string): void {
+        messages.push([id, message])
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Need to access private methods
       const connection: any = new Connection('url', { trace: true })
-      connection.ws = { send() {} }
+      connection.ws = {
+        send(): void {
+          /* purposefully empty */
+        },
+      }
       connection.request(mockedRequestData)
       connection.onMessage(mockedResponse)
       assert.deepEqual(messages, expectedMessages)
     })
 
     it('as a function', function () {
-      const messages: any[] = []
+      const messages: Array<[number | string, string]> = []
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Need to access private methods
       const connection: any = new Connection('url', {
-        trace: (id, message) => messages.push([id, message]),
+        trace(id: number | string, message: string): void {
+          messages.push([id, message])
+        },
       })
-      connection.ws = { send() {} }
+      connection.ws = {
+        send(): void {
+          /* purposefully empty */
+        },
+      }
       connection.request(mockedRequestData)
       connection.onMessage(mockedResponse)
       assert.deepEqual(messages, expectedMessages)
@@ -98,9 +134,16 @@ describe('Connection', function () {
       done()
       return
     }
-    createServer().then((server: any) => {
-      const port = server.address().port
+    createServer().then((server: net.Server) => {
+      const port = (server.address() as net.AddressInfo).port
+      const options = {
+        proxy: `ws://localhost:${port}`,
+        authorization: 'authorization',
+        trustedCertificates: ['path/to/pem'],
+      }
+      const connection = new Connection(this.client.connection.url, options)
       const expect = 'CONNECT localhost'
+
       server.on('connection', (socket) => {
         socket.on('data', (data) => {
           const got = data.toString('ascii', 0, expect.length)
@@ -111,25 +154,19 @@ describe('Connection', function () {
         })
       })
 
-      const options = {
-        proxy: `ws://localhost:${port}`,
-        authorization: 'authorization',
-        trustedCertificates: ['path/to/pem'],
-      }
-      const connection = new Connection(this.client.connection.url, options)
       connection.connect().catch((err) => {
         assert(err instanceof NotConnectedError)
       })
     }, done)
   })
 
-  it('Multiply disconnect calls', function () {
+  it('Multiply disconnect calls', async function () {
     this.client.disconnect()
-    return this.client.disconnect()
+    this.client.disconnect()
   })
 
   it('reconnect', function () {
-    return this.client.connection.reconnect()
+    this.client.connection.reconnect()
   })
 
   it('NotConnectedError', async function () {
@@ -166,7 +203,7 @@ describe('Connection', function () {
   })
 
   it('DisconnectedError', async function () {
-    return this.client
+    this.client
       .request({ command: 'test_command', data: { closeServer: true } })
       .then(() => {
         assert.fail('Should throw DisconnectedError')
@@ -177,11 +214,11 @@ describe('Connection', function () {
   })
 
   it('TimeoutError', function () {
-    this.client.connection.ws.send = function (_, callback) {
-      callback(null)
+    this.client.connection.ws.send = function (_ignore, sendCallback): void {
+      sendCallback(null)
     }
     const request = { command: 'server_info' }
-    return this.client.connection
+    this.client.connection
       .request(request, 10)
       .then(() => {
         assert.fail('Should throw TimeoutError')
@@ -192,10 +229,10 @@ describe('Connection', function () {
   })
 
   it('DisconnectedError on send', function () {
-    this.client.connection.ws.send = function (_, callback) {
-      callback({ message: 'not connected' })
+    this.client.connection.ws.send = function (_ignore, sendCallback): void {
+      sendCallback({ message: 'not connected' })
     }
-    return this.client
+    this.client
       .request({ command: 'server_info' })
       .then(() => {
         assert.fail('Should throw DisconnectedError')
@@ -211,21 +248,20 @@ describe('Connection', function () {
     // do not rely on the client.setup hook to test this as it bypasses the case, disconnect client connection first
     await this.client.disconnect()
 
-    // stub onOpen to only run logic relevant to test case
-    this.client.connection.onOpen = () => {
+    // stub _onOpen to only run logic relevant to test case
+    this.client.connection.onOpen = (): void => {
       // overload websocket send on open when _ws exists
-      this.client.connection.ws.send = function (_0, _1, _2) {
+      this.client.connection.ws.send = function (_0, _1, _2): void {
         // recent ws throws this error instead of calling back
         throw new Error('WebSocket is not open: readyState 0 (CONNECTING)')
       }
       const request = { command: 'subscribe', streams: ['ledger'] }
-      return this.client.connection.request(request)
+      this.client.connection.request(request)
     }
 
     try {
       await this.client.connect()
     } catch (error) {
-      console.log(error)
       assert.instanceOf(error, DisconnectedError)
       assert.strictEqual(
         error.message,
@@ -235,7 +271,7 @@ describe('Connection', function () {
   })
 
   it('ResponseFormatError', function () {
-    return this.client
+    this.client
       .request({
         command: 'test_command',
         data: { unrecognizedResponse: true },
@@ -267,8 +303,9 @@ describe('Connection', function () {
         }
       }
       this.timeout(70001)
+      // eslint-disable-next-line @typescript-eslint/no-this-alias -- Avoid shadow alias
       const self = this
-      function breakConnection() {
+      function breakConnection(): void {
         self.client.connection
           .request({
             command: 'test_command',
@@ -307,6 +344,7 @@ describe('Connection', function () {
                 `reconnectsCount must be equal to ${num} (got ${reconnectsCount} instead)`,
               ),
             )
+            // eslint-disable-next-line no-negated-condition -- Necessary
           } else if (code !== 1006) {
             done(
               new Error(`disconnect must send code 1006 (got ${code} instead)`),
@@ -336,8 +374,8 @@ describe('Connection', function () {
     // Hook up a listener for the reconnect event
     this.client.connection.on('reconnect', () => done())
     // Trigger a heartbeat
-    this.client.connection.heartbeat().catch((error) => {
-      /* ignore - test expects heartbeat failure */
+    this.client.connection.heartbeat().catch((_error) => {
+      /* Ignore error */
     })
   })
 
@@ -354,7 +392,7 @@ describe('Connection', function () {
     // Drop the test runner timeout, since this should be a quick test
     this.timeout(5000)
     // fail on reconnect/connection
-    this.client.connection.reconnect = async () => {
+    this.client.connection.reconnect = async (): Promise<void> => {
       throw new Error('error on reconnect')
     }
     // Hook up a listener for the reconnect error event
@@ -398,8 +436,8 @@ describe('Connection', function () {
   })
 
   it('Multiply connect calls', function () {
-    return this.client.connect().then(() => {
-      return this.client.connect()
+    this.client.connect().then(() => {
+      this.client.connect()
     })
   })
 
@@ -417,8 +455,10 @@ describe('Connection', function () {
 
   it('connect multiserver error', function () {
     assert.throws(function () {
+      // eslint-disable-next-line no-new -- Testing constructor
       new Client({
         servers: ['wss://server1.com', 'wss://server2.com'],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Testing invalid constructor
       } as any)
     }, XrplError)
   })
@@ -436,10 +476,10 @@ describe('Connection', function () {
     let transactionCount = 0
     let pathFindCount = 0
     this.client.connection.on('transaction', () => {
-      transactionCount++
+      transactionCount += 1
     })
     this.client.connection.on('path_find', () => {
-      pathFindCount++
+      pathFindCount += 1
     })
     this.client.connection.on('response', (message) => {
       assert.strictEqual(message.id, 1)
@@ -552,13 +592,13 @@ describe('Connection', function () {
     let disconnectedCount = 0
     this.client.on('connected', () => {
       done(
-        disconnectedCount !== 1
-          ? new Error('Wrong number of disconnects')
-          : undefined,
+        disconnectedCount === 1
+          ? undefined
+          : new Error('Wrong number of disconnects'),
       )
     })
     this.client.on('disconnected', () => {
-      disconnectedCount++
+      disconnectedCount += 1
     })
     this.client.connection.request({
       command: 'test_command',

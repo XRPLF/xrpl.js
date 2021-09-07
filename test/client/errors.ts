@@ -1,10 +1,10 @@
 import { assert } from 'chai'
 
-import setupClient from '../setupClient'
+import { setupClient, teardownClient } from '../setupClient'
 
 describe('client errors', function () {
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
 
   it('XrplError with data', async function () {
     const error = new this.client.errors.XrplError('_message_', '_data_')
