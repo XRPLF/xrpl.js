@@ -104,29 +104,29 @@ import {
   SubscribeResponse,
   UnsubscribeRequest,
   UnsubscribeResponse,
-} from "../models/methods";
-import { BaseRequest, BaseResponse } from "../models/methods/baseMethod";
-import prepareCheckCancel from "../transaction/check-cancel";
-import prepareCheckCash from "../transaction/check-cash";
-import prepareCheckCreate from "../transaction/check-create";
-import combine from "../transaction/combine";
-import prepareEscrowCancellation from "../transaction/escrow-cancellation";
-import prepareEscrowCreation from "../transaction/escrow-creation";
-import prepareEscrowExecution from "../transaction/escrow-execution";
-import prepareOrder from "../transaction/order";
-import prepareOrderCancellation from "../transaction/ordercancellation";
-import preparePayment from "../transaction/payment";
-import preparePaymentChannelClaim from "../transaction/payment-channel-claim";
-import preparePaymentChannelCreate from "../transaction/payment-channel-create";
-import preparePaymentChannelFund from "../transaction/payment-channel-fund";
-import prepareSettings from "../transaction/settings";
-import { sign } from "../transaction/sign";
-import prepareTicketCreate from "../transaction/ticket";
-import prepareTrustline from "../transaction/trustline";
-import { TransactionJSON, Instructions, Prepare } from "../transaction/types";
-import * as transactionUtils from "../transaction/utils";
-import { deriveAddress, deriveXAddress } from "../utils/derive";
-import generateFaucetWallet from "../wallet/generateFaucetWallet";
+} from '../models/methods'
+import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
+import prepareCheckCancel from '../transaction/check-cancel'
+import prepareCheckCash from '../transaction/check-cash'
+import prepareCheckCreate from '../transaction/check-create'
+import combine from '../transaction/combine'
+import prepareEscrowCancellation from '../transaction/escrow-cancellation'
+import prepareEscrowCreation from '../transaction/escrow-creation'
+import prepareEscrowExecution from '../transaction/escrow-execution'
+import prepareOrder from '../transaction/order'
+import prepareOrderCancellation from '../transaction/ordercancellation'
+import preparePayment from '../transaction/payment'
+import preparePaymentChannelClaim from '../transaction/payment-channel-claim'
+import preparePaymentChannelCreate from '../transaction/payment-channel-create'
+import preparePaymentChannelFund from '../transaction/payment-channel-fund'
+import prepareSettings from '../transaction/settings'
+import { sign } from '../transaction/sign'
+import prepareTicketCreate from '../transaction/ticket'
+import prepareTrustline from '../transaction/trustline'
+import { TransactionJSON, Instructions, Prepare } from '../transaction/types'
+import * as transactionUtils from '../transaction/utils'
+import { deriveAddress, deriveXAddress } from '../utils/derive'
+import generateFaucetWallet from '../wallet/generateFaucetWallet'
 
 import {
   Connection,
@@ -221,37 +221,37 @@ class Client extends EventEmitter {
       this.emit('error', errorCode, errorMessage, data)
     })
 
-    this.connection.on("ledgerClosed", (ledger) => {
-      this.emit("ledgerClosed", ledger);
-    });
+    this.connection.on('ledgerClosed', (ledger) => {
+      this.emit('ledgerClosed', ledger)
+    })
 
-    this.connection.on("transaction", (tx) => {
-      this.emit("transaction", tx);
-    });
+    this.connection.on('transaction', (tx) => {
+      this.emit('transaction', tx)
+    })
 
-    this.connection.on("validationReceived", (validation) => {
-      this.emit("validationReceived", validation);
-    });
+    this.connection.on('validationReceived', (validation) => {
+      this.emit('validationReceived', validation)
+    })
 
-    this.connection.on("manifestReceived", (manifest) => {
-      this.emit("manifestReceived", manifest);
-    });
+    this.connection.on('manifestReceived', (manifest) => {
+      this.emit('manifestReceived', manifest)
+    })
 
-    this.connection.on("peerStatusChange", (status) => {
-      this.emit("peerStatusChange", status);
-    });
+    this.connection.on('peerStatusChange', (status) => {
+      this.emit('peerStatusChange', status)
+    })
 
-    this.connection.on("consensusPhase", (consensus) => {
-      this.emit("consensusPhase", consensus);
-    });
+    this.connection.on('consensusPhase', (consensus) => {
+      this.emit('consensusPhase', consensus)
+    })
 
-    this.connection.on("path_find", (path) => {
-      this.emit("path_find", path);
-    });
+    this.connection.on('path_find', (path) => {
+      this.emit('path_find', path)
+    })
 
-    this.connection.on("connected", () => {
-      this.emit("connected");
-    });
+    this.connection.on('connected', () => {
+      this.emit('connected')
+    })
 
     this.connection.on('disconnected', (code: number) => {
       let finalCode = code
@@ -318,10 +318,10 @@ class Client extends EventEmitter {
   public async request(r: ServerStateRequest): Promise<ServerStateResponse>
   public async request(r: SubmitRequest): Promise<SubmitResponse>
   public async request(
-    r: SubmitMultisignedRequest
-  ): Promise<SubmitMultisignedResponse>;
-  public request(r: SubscribeRequest): Promise<SubscribeResponse>;
-  public request(r: UnsubscribeRequest): Promise<UnsubscribeResponse>;
+    r: SubmitMultisignedRequest,
+  ): Promise<SubmitMultisignedResponse>
+  public request(r: SubscribeRequest): Promise<SubscribeResponse>
+  public request(r: UnsubscribeRequest): Promise<UnsubscribeResponse>
   public async request(
     r: TransactionEntryRequest,
   ): Promise<TransactionEntryResponse>
@@ -391,24 +391,21 @@ class Client extends EventEmitter {
     return this.connection.request(nextPageRequest) as unknown as U
   }
 
-  public on(event: "ledgerClosed", listener: (ledger: LedgerStream) => void);
+  public on(event: 'ledgerClosed', listener: (ledger: LedgerStream) => void)
   public on(
-    event: "validationReceived",
-    listener: (validation: ValidationStream) => void
-  );
-  public on(event: "transaction", listener: (tx: TransactionStream) => void);
+    event: 'validationReceived',
+    listener: (validation: ValidationStream) => void,
+  )
+  public on(event: 'transaction', listener: (tx: TransactionStream) => void)
   public on(
-    event: "peerStatusChange",
-    listener: (status: PeerStatusStream) => void
-  );
-  public on(
-    event: "consensusPhase",
-    listener: (phase: ConsensusStream) => void
-  );
-  public on(event: "path_find", listener: (path: PathFindStream) => void);
-  public on(event: string, listener: (...args: any[]) => void);
+    event: 'peerStatusChange',
+    listener: (status: PeerStatusStream) => void,
+  )
+  public on(event: 'consensusPhase', listener: (phase: ConsensusStream) => void)
+  public on(event: 'path_find', listener: (path: PathFindStream) => void)
+  public on(event: string, listener: (...args: any[]) => void)
   public on(eventName: string, listener: (...args: any[]) => void) {
-    return super.on(eventName, listener);
+    return super.on(eventName, listener)
   }
 
   /**

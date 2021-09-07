@@ -1,9 +1,9 @@
-import { OfferCreateTransaction } from "../../common/types/objects";
-import type { Amount, Currency, Path, StreamType } from "../common";
-import { Transaction } from "../transactions";
-import TransactionMetadata from "../transactions/metadata";
+import { OfferCreateTransaction } from '../../common/types/objects'
+import type { Amount, Currency, Path, StreamType } from '../common'
+import { Transaction } from '../transactions'
+import TransactionMetadata from '../transactions/metadata'
 
-import type { BaseRequest, BaseResponse } from "./baseMethod";
+import type { BaseRequest, BaseResponse } from './baseMethod'
 
 interface Book {
   taker_gets: Currency
@@ -112,17 +112,17 @@ export interface ConsensusStream extends BaseStream {
 }
 
 export interface PathFindStream extends BaseStream {
-  type: "path_find";
-  source_account: string;
-  destination_account: string;
-  destination_amount: Amount;
-  full_reply: boolean;
-  id: number | string;
-  send_max?: Amount;
+  type: 'path_find'
+  source_account: string
+  destination_account: string
+  destination_amount: Amount
+  full_reply: boolean
+  id: number | string
+  send_max?: Amount
   alternatives: {
-    paths_computed: Path[];
-    source_amount: Amount;
-  };
+    paths_computed: Path[]
+    source_amount: Amount
+  }
 }
 
 export type Stream =

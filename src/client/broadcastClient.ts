@@ -59,11 +59,11 @@ export default class BroadcastClient extends Client {
     )
     for (const name of methods) {
       if (
-        typeof firstClient[name] === "function" &&
-        name !== "constructor" &&
-        name !== "on"
+        typeof firstClient[name] === 'function' &&
+        name !== 'constructor' &&
+        name !== 'on'
       ) {
-        methodNames.push(name);
+        methodNames.push(name)
       }
     }
     return methodNames
