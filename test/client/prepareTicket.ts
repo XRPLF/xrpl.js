@@ -1,5 +1,5 @@
 import rippled from '../fixtures/rippled'
-import setupClient from '../setupClient'
+import { setupClient, teardownClient } from '../setupClient'
 import { assertResultMatch, addressTests } from '../testUtils'
 // import responses from '../fixtures/responses'
 // import requests from '../fixtures/requests'
@@ -15,8 +15,8 @@ import { assertResultMatch, addressTests } from '../testUtils'
 // const ADDRESS = 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
 
 describe('client.prepareTicket', function () {
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
 
   addressTests.forEach(function (test) {
     describe(test.type, function () {

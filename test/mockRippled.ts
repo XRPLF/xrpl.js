@@ -7,7 +7,10 @@ import type { BaseResponse } from '../src/models/methods/baseMethod'
 
 import { getFreePort } from './testUtils'
 
-function createResponse(request: { id: number | string }, response: object) {
+function createResponse(
+  request: { id: number | string },
+  response: Record<string, unknown>,
+): string {
   if (!('type' in response) && !('error' in response)) {
     throw new Error(
       `Bad response format. Must contain \`type\` or \`error\`. ${JSON.stringify(
@@ -18,7 +21,7 @@ function createResponse(request: { id: number | string }, response: object) {
   return JSON.stringify({ ...response, id: request.id })
 }
 
-function ping(conn, request) {
+function ping(conn, request): void {
   setTimeout(() => {
     conn.send(
       createResponse(request, {
@@ -38,23 +41,29 @@ export interface PortResponse extends BaseResponse {
 
 // We mock out WebSocketServer in these tests and add a lot of custom
 // properties not defined on the normal WebSocketServer object.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- typing is too complicated otherwise
 type MockedWebSocketServer = any
 
-export function createMockRippled(port) {
+// eslint-disable-next-line @typescript-eslint/promise-function-async -- Not a promise that's returned
+export default function createMockRippled(port: number): MockedWebSocketServer {
   const mock = new WebSocketServer({ port }) as MockedWebSocketServer
   Object.assign(mock, EventEmitter2.prototype)
 
   mock.responses = {}
   mock.suppressOutput = false
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Typing is too complicated otherwise
   mock.on('connection', function (this: MockedWebSocketServer, conn: any) {
     this.socket = conn
-    conn.on('message', function (requestJSON) {
+    conn.on('message', function (requestJSON: string) {
       let request
       try {
         request = JSON.parse(requestJSON)
         if (request.id == null) {
-          throw new Error('Request has no id')
+          throw new Error(`Request has no id: ${requestJSON}`)
+        }
+        if (request.command == null) {
+          throw new Error(`Request has no id: ${requestJSON}`)
         }
         if (request.command === 'ping') {
           ping(conn, request)
@@ -64,11 +73,13 @@ export function createMockRippled(port) {
           conn.send(createResponse(request, mock.getResponse(request)))
         } else {
           throw new Error(
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- We know it's there
             `No event handler registered in mock rippled for ${request.command}`,
           )
         }
       } catch (err) {
         if (!mock.suppressOutput) {
+          // eslint-disable-next-line no-console, @typescript-eslint/restrict-template-expressions -- Error
           console.error(`Error: ${err.message}`)
         }
         if (request != null) {
@@ -87,10 +98,12 @@ export function createMockRippled(port) {
   // Adds a mocked response
   // If an object is passed in for `response`, then the response is static for the command
   // If a function is passed in for `response`, then the response can be determined by the exact request shape
-  mock.addResponse = (
+  mock.addResponse = function (
     command: string,
-    response: object | ((r: Request) => object),
-  ) => {
+    response:
+      | Record<string, unknown>
+      | ((r: Request) => Record<string, unknown>),
+  ): void {
     if (typeof command !== 'string') {
       throw new Error('command is not a string')
     }
@@ -108,18 +121,18 @@ export function createMockRippled(port) {
     mock.responses[command] = response
   }
 
-  mock.getResponse = (request: Request): object => {
+  mock.getResponse = (request: Request): Record<string, unknown> => {
     if (!(request.command in mock.responses)) {
       throw new Error(`No handler for ${request.command}`)
     }
     const functionOrObject = mock.responses[request.command]
     if (typeof functionOrObject === 'function') {
-      return functionOrObject(request)
+      return functionOrObject(request) as Record<string, unknown>
     }
-    return functionOrObject
+    return functionOrObject as Record<string, unknown>
   }
 
-  mock.testCommand = function testCommand(conn, request) {
+  mock.testCommand = function testCommand(conn, request): void {
     if (request.data.disconnectIn) {
       setTimeout(conn.terminate.bind(conn), request.data.disconnectIn)
       conn.send(
@@ -143,7 +156,7 @@ export function createMockRippled(port) {
     } else if (request.data.closeServerAndReopen) {
       setTimeout(() => {
         conn.terminate()
-        mock.close.call(mock, () => {
+        mock.close(() => {
           setTimeout(() => {
             createMockRippled(port)
           }, request.data.closeServerAndReopen)

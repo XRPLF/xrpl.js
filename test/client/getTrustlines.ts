@@ -1,13 +1,13 @@
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled/accountLines'
-import setupClient from '../setupClient'
+import { setupClient, teardownClient } from '../setupClient'
 import { assertResultMatch, addressTests } from '../testUtils'
 
 const { getTrustlines: RESPONSE_FIXTURES } = responses
 
 describe('client.getTrustlines', function () {
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
 
   addressTests.forEach(function (test) {
     describe(test.type, function () {

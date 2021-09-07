@@ -4,15 +4,15 @@ import binary from 'ripple-binary-codec'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
-import setupClient from '../setupClient'
+import { setupClient, teardownClient } from '../setupClient'
 import { addressTests } from '../testUtils'
 
 const { sign: REQUEST_FIXTURES } = requests
 const { sign: RESPONSE_FIXTURES } = responses
 
 describe('client.sign', function () {
-  beforeEach(setupClient.setup)
-  afterEach(setupClient.teardown)
+  beforeEach(setupClient)
+  afterEach(teardownClient)
   it('sign', async function () {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const result = this.client.sign(REQUEST_FIXTURES.normal.txJSON, secret)
