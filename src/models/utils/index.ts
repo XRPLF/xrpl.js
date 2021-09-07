@@ -8,7 +8,7 @@ import {
   Transaction,
   TrustSetFlags,
   TrustSetFlagsEnum,
-} from "../transactions";
+} from '../transactions'
 
 /**
  * Verify that all fields of an object are in fields.
@@ -44,97 +44,105 @@ export function isFlagEnabled(Flags: number, checkFlag: number): boolean {
  */
 export function setTransactionFlagsToNumber(tx: Transaction): void {
   if (tx.Flags == null) {
-    tx.Flags = 0;
-    return;
+    tx.Flags = 0
+    return
   }
-  if (typeof tx.Flags === "number") {
-    return;
+  if (typeof tx.Flags === 'number') {
+    return
   }
 
   switch (tx.TransactionType) {
-    case "OfferCreate":
-      tx.Flags = convertOfferCreateFlagsToNumber(tx.Flags as OfferCreateFlags);
-      return;
-    case "PaymentChannelClaim":
-      tx.Flags = convertPaymentChannelClaimFlagsToNumber(tx.Flags as PaymentChannelClaimFlags);
-      return;
-    case "Payment":
-      tx.Flags = convertPaymentTransactionFlagsToNumber(tx.Flags as PaymentTransactionFlags);
-      return;
-    case "TrustSet":
-      tx.Flags = convertTrustSetFlagsToNumber(tx.Flags as TrustSetFlags);
-      return;
+    case 'OfferCreate':
+      tx.Flags = convertOfferCreateFlagsToNumber(tx.Flags as OfferCreateFlags)
+      return
+    case 'PaymentChannelClaim':
+      tx.Flags = convertPaymentChannelClaimFlagsToNumber(
+        tx.Flags as PaymentChannelClaimFlags,
+      )
+      return
+    case 'Payment':
+      tx.Flags = convertPaymentTransactionFlagsToNumber(
+        tx.Flags as PaymentTransactionFlags,
+      )
+      return
+    case 'TrustSet':
+      tx.Flags = convertTrustSetFlagsToNumber(tx.Flags as TrustSetFlags)
+      return
     default:
-      tx.Flags = 0;
+      tx.Flags = 0
   }
 }
 
 function convertOfferCreateFlagsToNumber(flags: OfferCreateFlags): number {
-  let resultFlags = 0;
+  let resultFlags = 0
 
   if (flags.tfPassive) {
-    resultFlags |= OfferCreateFlagsEnum.tfPassive;
+    resultFlags |= OfferCreateFlagsEnum.tfPassive
   }
   if (flags.tfImmediateOrCancel) {
-    resultFlags |= OfferCreateFlagsEnum.tfImmediateOrCancel;
+    resultFlags |= OfferCreateFlagsEnum.tfImmediateOrCancel
   }
   if (flags.tfFillOrKill) {
-    resultFlags |= OfferCreateFlagsEnum.tfFillOrKill;
+    resultFlags |= OfferCreateFlagsEnum.tfFillOrKill
   }
   if (flags.tfSell) {
-    resultFlags |= OfferCreateFlagsEnum.tfSell;
+    resultFlags |= OfferCreateFlagsEnum.tfSell
   }
 
-  return resultFlags;
+  return resultFlags
 }
 
-function convertPaymentChannelClaimFlagsToNumber(flags: PaymentChannelClaimFlags): number {
-  let resultFlags = 0;
+function convertPaymentChannelClaimFlagsToNumber(
+  flags: PaymentChannelClaimFlags,
+): number {
+  let resultFlags = 0
 
   if (flags.tfRenew) {
-    resultFlags |= PaymentChannelClaimFlagsEnum.tfRenew;
+    resultFlags |= PaymentChannelClaimFlagsEnum.tfRenew
   }
   if (flags.tfClose) {
-    resultFlags |= PaymentChannelClaimFlagsEnum.tfClose;
+    resultFlags |= PaymentChannelClaimFlagsEnum.tfClose
   }
 
-  return resultFlags;
+  return resultFlags
 }
 
-function convertPaymentTransactionFlagsToNumber(flags: PaymentTransactionFlags): number {
-  let resultFlags = 0;
+function convertPaymentTransactionFlagsToNumber(
+  flags: PaymentTransactionFlags,
+): number {
+  let resultFlags = 0
 
   if (flags.tfNoDirectRipple) {
-    resultFlags |= PaymentTransactionFlagsEnum.tfNoDirectRipple;
+    resultFlags |= PaymentTransactionFlagsEnum.tfNoDirectRipple
   }
   if (flags.tfPartialPayment) {
-    resultFlags |= PaymentTransactionFlagsEnum.tfPartialPayment;
+    resultFlags |= PaymentTransactionFlagsEnum.tfPartialPayment
   }
   if (flags.tfLimitQuality) {
-    resultFlags |= PaymentTransactionFlagsEnum.tfLimitQuality;
+    resultFlags |= PaymentTransactionFlagsEnum.tfLimitQuality
   }
 
-  return resultFlags;
+  return resultFlags
 }
 
 function convertTrustSetFlagsToNumber(flags: TrustSetFlags): number {
-  let resultFlags = 0;
+  let resultFlags = 0
 
   if (flags.tfSetfAuth) {
-    resultFlags |= TrustSetFlagsEnum.tfSetfAuth;
+    resultFlags |= TrustSetFlagsEnum.tfSetfAuth
   }
   if (flags.tfSetNoRipple) {
-    resultFlags |= TrustSetFlagsEnum.tfSetNoRipple;
+    resultFlags |= TrustSetFlagsEnum.tfSetNoRipple
   }
   if (flags.tfClearNoRipple) {
-    resultFlags |= TrustSetFlagsEnum.tfClearNoRipple;
+    resultFlags |= TrustSetFlagsEnum.tfClearNoRipple
   }
   if (flags.tfSetFreeze) {
-    resultFlags |= TrustSetFlagsEnum.tfSetFreeze;
+    resultFlags |= TrustSetFlagsEnum.tfSetFreeze
   }
   if (flags.tfClearFreeze) {
-    resultFlags |= TrustSetFlagsEnum.tfClearFreeze;
+    resultFlags |= TrustSetFlagsEnum.tfClearFreeze
   }
 
-  return resultFlags;
+  return resultFlags
 }

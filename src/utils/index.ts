@@ -224,7 +224,7 @@ function ISOTimeToRippleTime(iso8601: string): number {
  */
 function partial(func: Function, ...params: any[]): Function {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- safe to return
-  return func.bind(null, ...params);
+  return func.bind(null, ...params)
 }
 
 export {
