@@ -155,7 +155,7 @@ const expectedmultisign: Transaction = {
 };
 
 describe("Signer tests", function () {
-  it("sign transaction", function () {
+  it("sign", function () {
     // Test case data generated using this tutorial - https://xrpl.org/send-xrp.html#send-xrp
     const tx3: Transaction = {
       TransactionType: "Payment",
@@ -177,7 +177,7 @@ describe("Signer tests", function () {
     assert.equal(signedTx, signedTxBlob);
   });
 
-  it("sign correctly encodes a transaction for multisigning", function () {
+  it("sign in multisign format", function () {
     const wallet = Wallet.fromSeed(unsignedSecret1);
 
     assert.deepEqual(
@@ -207,12 +207,12 @@ describe("Signer tests", function () {
     assert.deepEqual(multisign(encodedTransactions), expectedmultisign);
   });
 
-  it("throws a validation error if trying to multisign with no transactions", function () {
+  it("multisign throws a validation error when there are no transactions", function () {
     const transactions: Transaction[] = [];
     assert.throws(() => multisign(transactions), ValidationError);
   });
 
-  it("throws when trying to multisign two different transactions", function () {
+  it("multisign throws when trying to combine two different transactions", function () {
     const differentMultisignedTx: Transaction = {
       TransactionType: "Payment",
       Sequence: 1,
@@ -242,7 +242,7 @@ describe("Signer tests", function () {
     assert.throws(() => multisign(transactions));
   });
 
-  it("authorizeChannel succeeds", function () {
+  it("authorizeChannel succeeds with secp256k1 seed", function () {
     const wallet = Wallet.fromSeed("snGHNrPbHrdUcszeuDEigMdC1Lyyd");
     const channelId =
       "5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3";
@@ -265,7 +265,7 @@ describe("Signer tests", function () {
     );
   });
 
-  it("verify succeeds for valid signed transaction string", function () {
+  it("verify succeeds for valid signed transaction blob", function () {
     const wallet = new Wallet(publicKey, privateKey);
 
     const signedTx: string = sign(wallet, tx);
