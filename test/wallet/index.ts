@@ -167,6 +167,7 @@ describe('Wallet', function () {
       const wallet = new Wallet(publicKey, privateKey)
       const signedTx: string = wallet.signTransaction(txJSON)
 
+      // TODO: Check the output of the signature against a known result
       assert.isString(signedTx)
     })
   })
