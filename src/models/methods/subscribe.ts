@@ -1,9 +1,9 @@
 import { OfferCreateTransaction } from '../../common/types/objects'
-import { Currency, StreamType } from '../common'
+import type { Amount, Currency, Path, StreamType } from '../common'
 import { Transaction } from '../transactions'
 import TransactionMetadata from '../transactions/metadata'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import type { BaseRequest, BaseResponse } from './baseMethod'
 
 interface Book {
   taker_gets: Currency
@@ -111,10 +111,25 @@ export interface ConsensusStream extends BaseStream {
   consensus: 'open' | 'establish' | 'accepted'
 }
 
+export interface PathFindStream extends BaseStream {
+  type: 'path_find'
+  source_account: string
+  destination_account: string
+  destination_amount: Amount
+  full_reply: boolean
+  id: number | string
+  send_max?: Amount
+  alternatives: {
+    paths_computed: Path[]
+    source_amount: Amount
+  }
+}
+
 export type Stream =
   | LedgerStream
   | ValidationStream
   | TransactionStream
+  | PathFindStream
   | PeerStatusStream
   | OrderBookStream
   | ConsensusStream
