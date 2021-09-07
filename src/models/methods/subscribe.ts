@@ -117,7 +117,7 @@ export interface PathFindStream extends BaseStream {
   destination_account: string;
   destination_amount: Amount;
   full_reply: boolean;
-  id: any;
+  id: number | string;
   send_max?: Amount;
   alternatives: {
     paths_computed: Path[];
