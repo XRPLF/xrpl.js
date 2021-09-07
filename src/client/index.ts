@@ -94,6 +94,16 @@ import {
   PingResponse,
   RandomRequest,
   RandomResponse,
+  LedgerStream,
+  ValidationStream,
+  TransactionStream,
+  PathFindStream,
+  PeerStatusStream,
+  ConsensusStream,
+  SubscribeRequest,
+  SubscribeResponse,
+  UnsubscribeRequest,
+  UnsubscribeResponse,
 } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 import prepareCheckCancel from '../transaction/check-cancel'
@@ -211,6 +221,34 @@ class Client extends EventEmitter {
       this.emit('error', errorCode, errorMessage, data)
     })
 
+    this.connection.on('ledgerClosed', (ledger) => {
+      this.emit('ledgerClosed', ledger)
+    })
+
+    this.connection.on('transaction', (tx) => {
+      this.emit('transaction', tx)
+    })
+
+    this.connection.on('validationReceived', (validation) => {
+      this.emit('validationReceived', validation)
+    })
+
+    this.connection.on('manifestReceived', (manifest) => {
+      this.emit('manifestReceived', manifest)
+    })
+
+    this.connection.on('peerStatusChange', (status) => {
+      this.emit('peerStatusChange', status)
+    })
+
+    this.connection.on('consensusPhase', (consensus) => {
+      this.emit('consensusPhase', consensus)
+    })
+
+    this.connection.on('path_find', (path) => {
+      this.emit('path_find', path)
+    })
+
     this.connection.on('connected', () => {
       this.emit('connected')
     })
@@ -282,6 +320,8 @@ class Client extends EventEmitter {
   public async request(
     r: SubmitMultisignedRequest,
   ): Promise<SubmitMultisignedResponse>
+  public request(r: SubscribeRequest): Promise<SubscribeResponse>
+  public request(r: UnsubscribeRequest): Promise<UnsubscribeResponse>
   public async request(
     r: TransactionEntryRequest,
   ): Promise<TransactionEntryResponse>
@@ -349,6 +389,23 @@ class Client extends EventEmitter {
     const nextPageRequest = { ...req, marker: resp.result.marker }
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
     return this.connection.request(nextPageRequest) as unknown as U
+  }
+
+  public on(event: 'ledgerClosed', listener: (ledger: LedgerStream) => void)
+  public on(
+    event: 'validationReceived',
+    listener: (validation: ValidationStream) => void,
+  )
+  public on(event: 'transaction', listener: (tx: TransactionStream) => void)
+  public on(
+    event: 'peerStatusChange',
+    listener: (status: PeerStatusStream) => void,
+  )
+  public on(event: 'consensusPhase', listener: (phase: ConsensusStream) => void)
+  public on(event: 'path_find', listener: (path: PathFindStream) => void)
+  public on(event: string, listener: (...args: any[]) => void)
+  public on(eventName: string, listener: (...args: any[]) => void) {
+    return super.on(eventName, listener)
   }
 
   /**

@@ -1,0 +1,65 @@
+{
+  "alternatives": [
+    {
+      "paths_computed": [
+        [
+          {
+            "currency": "USD",
+            "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+            "type": 48
+          }
+        ],
+        [
+          {
+            "currency": "USD",
+            "issuer": "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq",
+            "type": 48
+          },
+          {
+            "currency": "USD",
+            "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+            "type": 48
+          }
+        ],
+        [
+          {
+            "currency": "USD",
+            "issuer": "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq",
+            "type": 48
+          },
+          {
+            "account": "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq",
+            "type": 1
+          },
+          {
+            "account": "rpix35SSFEukMTm64NB4k4BPBS7fXJrLJM",
+            "type": 1
+          }
+        ],
+        [
+          {
+            "currency": "CNY",
+            "issuer": "rKiCet8SdvWxPXnAgYarFUXMh1zCPz432Y",
+            "type": 48
+          },
+          {
+            "currency": "USD",
+            "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+            "type": 48
+          }
+        ]
+      ],
+      "source_amount": "786"
+    }
+  ],
+  "destination_account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+  "destination_amount": {
+    "currency": "USD",
+    "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+    "value": "0.001"
+  },
+  "full_reply": true,
+  "id": 8,
+  "source_account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+  "type": "path_find"
+}

@@ -58,7 +58,11 @@ export default class BroadcastClient extends Client {
       ...Object.getOwnPropertyNames(Object.getPrototypeOf(firstClient)),
     )
     for (const name of methods) {
-      if (typeof firstClient[name] === 'function' && name !== 'constructor') {
+      if (
+        typeof firstClient[name] === 'function' &&
+        name !== 'constructor' &&
+        name !== 'on'
+      ) {
         methodNames.push(name)
       }
     }
