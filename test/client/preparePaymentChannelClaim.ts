@@ -116,6 +116,10 @@ describe('client.preparePaymentChannelClaim', function () {
             )}`,
           )
         } catch (err) {
+          if (!(err instanceof Error)) {
+            throw err
+          }
+
           assert.strictEqual(err.name, 'ValidationError')
           assert.strictEqual(
             err.message,
@@ -143,6 +147,10 @@ describe('client.preparePaymentChannelClaim', function () {
             )}`,
           )
         } catch (err) {
+          if (!(err instanceof Error)) {
+            throw err
+          }
+
           assert.strictEqual(err.name, 'ValidationError')
           assert.strictEqual(
             err.message,

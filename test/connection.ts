@@ -262,7 +262,10 @@ describe('Connection', function () {
     try {
       await this.client.connect()
     } catch (error) {
-      assert.instanceOf(error, DisconnectedError)
+      if (!(error instanceof Error)) {
+        throw error
+      }
+
       assert.strictEqual(
         error.message,
         'WebSocket is not open: readyState 0 (CONNECTING)',

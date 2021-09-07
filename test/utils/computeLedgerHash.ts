@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { ValidationError } from '../../src/common/errors'
+import { ValidationError, XrplError } from '../../src/common/errors'
 import { computeLedgerHeaderHash } from '../../src/utils'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
@@ -18,6 +18,10 @@ describe('computeLedgerHash', function () {
     try {
       hash = computeLedgerHeaderHash(ledger, { computeTreeHashes: true })
     } catch (error) {
+      if (!(error instanceof XrplError)) {
+        throw error
+      }
+
       assert(error instanceof ValidationError)
       assert.strictEqual(
         error.message,
@@ -45,6 +49,10 @@ describe('computeLedgerHash', function () {
     try {
       hash = computeLedgerHeaderHash(ledger, { computeTreeHashes: true })
     } catch (error) {
+      if (!(error instanceof Error)) {
+        throw error
+      }
+
       assert(error instanceof ValidationError)
       assert.strictEqual(error.message, 'ledger is missing raw transactions')
       return
@@ -73,6 +81,10 @@ describe('computeLedgerHash', function () {
       try {
         hash = computeLedgerHash(ledgerToCompute, { computeTreeHashes: true })
       } catch (error) {
+        if (!(error instanceof Error)) {
+          throw error
+        }
+
         assert(error instanceof ValidationError)
         assert.strictEqual(error.message, expectedError)
         return

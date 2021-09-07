@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 import binary from 'ripple-binary-codec'
 
+import { XrplError } from '../../src/common/errors'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
@@ -398,12 +399,17 @@ describe('client.sign', function () {
             new Error('this.client.sign should have thrown'),
           )
         } catch (error) {
+          if (!(error instanceof XrplError)) {
+            throw error
+          }
+
           assert.equal(error.name, 'ValidationError')
           assert.equal(
             error.message,
             'Serialized transaction does not match original txJSON. See `error.data`',
           )
-          assert.deepEqual(error.data.diff, {
+
+          assert.deepEqual((error.data as any).diff, {
             TakerGets: {
               value: '3.14',
             },

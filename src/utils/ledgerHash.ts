@@ -45,8 +45,9 @@ function computeTransactionHash(
       )
     } catch (e) {
       if (
+        e instanceof Error &&
         e.toString() ===
-        'SyntaxError: Unexpected' + ' token u in JSON at position 0'
+          'SyntaxError: Unexpected' + ' token u in JSON at position 0'
       ) {
         // one or more of the `tx.rawTransaction`s is undefined
         throw new ValidationError('ledger' + ' is missing raw transactions')

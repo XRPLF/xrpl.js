@@ -349,8 +349,9 @@ export class Connection extends EventEmitter {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Must be a JSON dictionary
       data = JSON.parse(message)
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Errors have messages
-      this.emit('error', 'badMessage', error.message, message)
+      if (error instanceof Error) {
+        this.emit('error', 'badMessage', error.message, message)
+      }
       return
     }
     if (data.type == null && data.error) {
@@ -366,8 +367,9 @@ export class Connection extends EventEmitter {
       try {
         this.requestManager.handleResponse(data)
       } catch (error) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Errors have messages
-        this.emit('error', 'badMessage', error.message, message)
+        if (error instanceof Error) {
+          this.emit('error', 'badMessage', error.message, message)
+        }
       }
     }
   }
@@ -435,10 +437,12 @@ export class Connection extends EventEmitter {
       this.connectionManager.resolveAllAwaiting()
       this.emit('connected')
     } catch (error) {
-      this.connectionManager.rejectAllAwaiting(error)
-      // Ignore this error, propagate the root cause.
-      // eslint-disable-next-line @typescript-eslint/no-empty-function -- Need empty catch
-      await this.disconnect().catch(() => {})
+      if (error instanceof Error) {
+        this.connectionManager.rejectAllAwaiting(error)
+        // Ignore this error, propagate the root cause.
+        // eslint-disable-next-line @typescript-eslint/no-empty-function -- Need empty catch
+        await this.disconnect().catch(() => {})
+      }
     }
   }
 
