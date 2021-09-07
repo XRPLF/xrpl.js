@@ -1,12 +1,12 @@
-import * as assert from "assert";
+import * as assert from 'assert'
 
-import { removeUndefined } from "../../utils";
+import { removeUndefined } from '../../utils'
 
-import parseAmount from "./amount";
-import { parseTimestamp, parseMemos } from "./utils";
+import parseAmount from './amount'
+import { parseTimestamp, parseMemos } from './utils'
 
 function parsePaymentChannelCreate(tx: any): object {
-  assert.ok(tx.TransactionType === "PaymentChannelCreate");
+  assert.ok(tx.TransactionType === 'PaymentChannelCreate')
 
   return removeUndefined({
     memos: parseMemos(tx),
@@ -17,7 +17,7 @@ function parsePaymentChannelCreate(tx: any): object {
     cancelAfter: tx.CancelAfter && parseTimestamp(tx.CancelAfter),
     sourceTag: tx.SourceTag,
     destinationTag: tx.DestinationTag,
-  });
+  })
 }
 
-export default parsePaymentChannelCreate;
+export default parsePaymentChannelCreate

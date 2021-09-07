@@ -1,0 +1,9 @@
+{
+  "action": "CLOSING_LEDGER",
+  "date": 508546525,
+  "ledger_hash": "4D4CD9CD543F0C1EF023CC457F5BEFEA59EEF73E4552542D40E7C4FA08D3C320",
+  "ledger_index": 18853106,
+  "ledger_index_max": 18853106,
+  "ledger_index_min": 18852082,
+  "type": "peerStatusChange"
+}

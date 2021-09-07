@@ -4,124 +4,125 @@ import generateFaucetWallet from './generateFaucetWallet.json'
 import generateXAddress from './generateXAddress.json'
 import getAccountInfo from './getAccountInfo.json'
 import getAccountObjects from './getAccountObjects.json'
-import getBalanceSheet from './getBalanceSheet.json'
 import getBalances from './getBalances.json'
+import getBalanceSheet from './getBalanceSheet.json'
+import header from './getLedger.json'
 import headerByHash from './getLedgerByHash.json'
 import fullLedger from './getLedgerFull.json'
 import pre2014withPartial from './getLedgerPre2014WithPartial.json'
 import withPartial from './getLedgerWithPartialPayment.json'
 import withSettingsTx from './getLedgerWithSettingsTx.json'
 import withStateAsHashes from './getLedgerWithStateAsHashes.json'
-import header from './getLedger.json'
-import withXRPOrderBook from './getOrderbookWithXrp.json'
 import normalOrderBook from './getOrderbook.json'
+import withXRPOrderBook from './getOrderbookWithXrp.json'
 import getOrders from './getOrders.json'
+import XrpToUsd from './getPaths.json'
 import sendAll from './getPathsSendAll.json'
 import UsdToUsd from './getPathsSendUsd.json'
 import XrpToXrp from './getPathsXrpToXrp.json'
-import XrpToUsd from './getPaths.json'
-import fullPayChan from './getPaymentChannelFull.json'
 import normalPayChan from './getPaymentChannel.json'
+import fullPayChan from './getPaymentChannelFull.json'
 import getServerInfo from './getServerInfo.json'
 import getSettings from './getSettings.json'
-import accountDeleteWithMemo from './getTransactionAccountDeleteWithMemo.json'
 import accountDelete from './getTransactionAccountDelete.json'
+import accountDeleteWithMemo from './getTransactionAccountDeleteWithMemo.json'
 import amendment from './getTransactionAmendment.json'
-import checkCancelWithMemo from './getTransactionCheckCancelWithMemo.json'
 import checkCancel from './getTransactionCheckCancel.json'
-import checkCashWithMemo from './getTransactionCheckCashWithMemo.json'
+import checkCancelWithMemo from './getTransactionCheckCancelWithMemo.json'
 import checkCash from './getTransactionCheckCash.json'
-import checkCreateWithMemo from './getTransactionCheckCreateWithMemo.json'
+import checkCashWithMemo from './getTransactionCheckCashWithMemo.json'
 import checkCreate from './getTransactionCheckCreate.json'
+import checkCreateWithMemo from './getTransactionCheckCreateWithMemo.json'
 import depositPreauthWithMemo from './getTransactionDepositPreauthWithMemo.json'
 import escrowCancellation from './getTransactionEscrowCancellation.json'
 import escrowCreation from './getTransactionEscrowCreation.json'
-import escrowExecutionSimple from './getTransactionEscrowExecutionSimple.json'
 import escrowExecution from './getTransactionEscrowExecution.json'
-import feeUpdateWithMemo from './getTransactionFeeUpdateWithMemo.json'
+import escrowExecutionSimple from './getTransactionEscrowExecutionSimple.json'
 import feeUpdate from './getTransactionFeeUpdate.json'
+import feeUpdateWithMemo from './getTransactionFeeUpdateWithMemo.json'
 import noMeta from './getTransactionNoMeta.json'
 import notValidated from './getTransactionNotValidated.json'
-import orderCancellationWithMemo from './getTransactionOrderCancellationWithMemo.json'
+import order from './getTransactionOrder.json'
 import orderCancellation from './getTransactionOrderCancellation.json'
+import orderCancellationWithMemo from './getTransactionOrderCancellationWithMemo.json'
 import orderSell from './getTransactionOrderSell.json'
 import orderWithExpirationCancellation from './getTransactionOrderWithExpirationCancellation.json'
 import orderWithMemo from './getTransactionOrderWithMemo.json'
-import order from './getTransactionOrder.json'
-import paymentChannelClaimWithMemo from './getTransactionPaymentChannelClaimWithMemo.json'
-import paymentChannelClaim from './getTransactionPaymentChannelClaim.json'
-import paymentChannelCreateWithMemo from './getTransactionPaymentChannelCreateWithMemo.json'
-import paymentChannelCreate from './getTransactionPaymentChannelCreate.json'
-import paymentChannelFundWithMemo from './getTransactionPaymentChannelFundWithMemo.json'
-import paymentChannelFund from './getTransactionPaymentChannelFund.json'
-import paymentIncludeRawTransaction from './getTransactionPaymentIncludeRawTransaction.json'
 import payment from './getTransactionPayment.json'
+import paymentChannelClaim from './getTransactionPaymentChannelClaim.json'
+import paymentChannelClaimWithMemo from './getTransactionPaymentChannelClaimWithMemo.json'
+import paymentChannelCreate from './getTransactionPaymentChannelCreate.json'
+import paymentChannelCreateWithMemo from './getTransactionPaymentChannelCreateWithMemo.json'
+import paymentChannelFund from './getTransactionPaymentChannelFund.json'
+import paymentChannelFundWithMemo from './getTransactionPaymentChannelFundWithMemo.json'
+import paymentIncludeRawTransaction from './getTransactionPaymentIncludeRawTransaction.json'
+import normalTransactions from './getTransactions.json'
+import settings from './getTransactionSettings.json'
 import setRegularKey from './getTransactionSettingsSetRegularKey.json'
 import trackingOff from './getTransactionSettingsTrackingOff.json'
 import trackingOn from './getTransactionSettingsTrackingOn.json'
-import settings from './getTransactionSettings.json'
-import ticketCreateWithMemo from './getTransactionTicketCreateWithMemo.json'
-import trustlineAddMemo from './getTransactionTrustAddMemo.json'
-import trustlineNoQuality from './getTransactionTrustNoQuality.json'
-import trustlineFrozenOff from './getTransactionTrustSetFrozenOff.json'
-import trustline from './getTransactionTrustlineSet.json'
-import withMemo from './getTransactionWithMemo.json'
-import withMemos from './getTransactionWithMemos.json'
 import includeRawTransactions from './getTransactionsIncludeRawTransactions.json'
 import oneTransaction from './getTransactionsOne.json'
-import normalTransactions from './getTransactions.json'
+import ticketCreateWithMemo from './getTransactionTicketCreateWithMemo.json'
+import trustlineAddMemo from './getTransactionTrustAddMemo.json'
+import trustline from './getTransactionTrustlineSet.json'
+import trustlineNoQuality from './getTransactionTrustNoQuality.json'
+import trustlineFrozenOff from './getTransactionTrustSetFrozenOff.json'
+import withMemo from './getTransactionWithMemo.json'
+import withMemos from './getTransactionWithMemos.json'
+import filteredLines from './getTrustlines.json'
 import allTrustlines from './getTrustlinesAll.json'
 import ripplingDisabledLines from './getTrustlinesRipplingDisabled.json'
-import filteredLines from './getTrustlines.json'
 import ledgerEvent from './ledgerEvent.json'
-import ticketCheckCancel from './prepareCheckCancelTicket.json'
 import normalCheckCancel from './prepareCheckCancel.json'
+import ticketCheckCancel from './prepareCheckCancelTicket.json'
 import amountCheckCash from './prepareCheckCashAmount.json'
 import deliverMinCheckCash from './prepareCheckCashDelivermin.json'
 import ticketCheckCash from './prepareCheckCashTicket.json'
+import normalCheckCreate from './prepareCheckCreate.json'
 import fullCheckCreate from './prepareCheckCreateFull.json'
 import ticketCheckCreate from './prepareCheckCreateTicket.json'
-import normalCheckCreate from './prepareCheckCreate.json'
+import normalEscrowCancel from './prepareEscrowCancellation.json'
 import memosEscrowCancel from './prepareEscrowCancellationMemos.json'
 import ticketEscrowCancel from './prepareEscrowCancellationTicket.json'
-import normalEscrowCancel from './prepareEscrowCancellation.json'
+import normalEscrowCreate from './prepareEscrowCreation.json'
 import fullEscrowCreate from './prepareEscrowCreationFull.json'
 import ticketEscrowCreate from './prepareEscrowCreationTicket.json'
-import normalEscrowCreate from './prepareEscrowCreation.json'
+import normalEscrowExec from './prepareEscrowExecution.json'
 import simpleEscrowExec from './prepareEscrowExecutionSimple.json'
 import ticketEscrowExec from './prepareEscrowExecutionTicket.json'
-import normalEscrowExec from './prepareEscrowExecution.json'
+import buyOrder from './prepareOrder.json'
+import normalCancel from './prepareOrderCancellation.json'
 import withMemosCancel from './prepareOrderCancellationMemos.json'
 import noInstructionsCancel from './prepareOrderCancellationNoInstructions.json'
 import ticketCancel from './prepareOrderCancellationTicket.json'
-import normalCancel from './prepareOrderCancellation.json'
 import expirationOrder from './prepareOrderExpiration.json'
 import sellOrder from './prepareOrderSell.json'
 import ticketOrder from './prepareOrderTicket.json'
-import buyOrder from './prepareOrder.json'
+import normalPayment from './preparePayment.json'
 import allOptionsPayment from './preparePaymentAllOptions.json'
+import normalPayChanClaim from './preparePaymentChannelClaim.json'
 import closePayChanClaim from './preparePaymentChannelClaimClose.json'
 import renewPayChanClaim from './preparePaymentChannelClaimRenew.json'
 import ticketPayChanClaim from './preparePaymentChannelClaimTicket.json'
-import normalPayChanClaim from './preparePaymentChannelClaim.json'
+import normalPayChanCreate from './preparePaymentChannelCreate.json'
 import fullPayChanCreate from './preparePaymentChannelCreateFull.json'
 import ticketPayChanCreate from './preparePaymentChannelCreateTicket.json'
-import normalPayChanCreate from './preparePaymentChannelCreate.json'
+import normalPayChanFund from './preparePaymentChannelFund.json'
 import fullPayChanFund from './preparePaymentChannelFundFull.json'
 import ticketPayChanFund from './preparePaymentChannelFundTicket.json'
-import normalPayChanFund from './preparePaymentChannelFund.json'
-import minAmountXRPXRPPayment from './preparePaymentMinAmountXrpXrp.json'
-import minAmountXRPPayment from './preparePaymentMinAmountXrp.json'
 import minAmountPayment from './preparePaymentMinAmount.json'
+import minAmountXRPPayment from './preparePaymentMinAmountXrp.json'
+import minAmountXRPXRPPayment from './preparePaymentMinAmountXrpXrp.json'
 import noCounterpartyPayment from './preparePaymentNoCounterparty.json'
-import ticketSequencePayment from './preparePaymentTicketSequence.json'
 import ticketPayment from './preparePaymentTicket.json'
-import normalPayment from './preparePayment.json'
+import ticketSequencePayment from './preparePaymentTicketSequence.json'
+import flagsSettings from './prepareSettings.json'
 import fieldClear from './prepareSettingsFieldClear.json'
-import flagClearDepositAuth from './prepareSettingsFlagClearDepositAuth.json'
 import flagClear from './prepareSettingsFlagClear.json'
-import flagSetDepositAuth from './prepareSettingsFlagSetDepositAuth.json'
+import flagClearDepositAuth from './prepareSettingsFlagClearDepositAuth.json'
 import flagSet from './prepareSettingsFlagSet.json'
+import flagSetDepositAuth from './prepareSettingsFlagSetDepositAuth.json'
 import flagsMultisign from './prepareSettingsMultisign.json'
 import noInstructions from './prepareSettingsNoInstructions.json'
 import noMaxLedgerVersion from './prepareSettingsNoMaxledgerversion.json'
@@ -133,39 +134,38 @@ import setTransferRate from './prepareSettingsSetTransferRate.json'
 import signedSettings from './prepareSettingsSigned.json'
 import signersSettings from './prepareSettingsSigners.json'
 import ticketSettings from './prepareSettingsTicket.json'
-import flagsSettings from './prepareSettings.json'
+import complexTrustline from './prepareTrustline.json'
 import frozenTrustline from './prepareTrustlineFrozen.json'
 import issuedXAddressTrustline from './prepareTrustlineIssuerXaddress.json'
 import simpleTrustline from './prepareTrustlineSimple.json'
 import ticketTrustline from './prepareTrustlineTicket.json'
-import complexTrustline from './prepareTrustline.json'
+import normalSign from './sign.json'
 import signAsSign from './signAs.json'
 import escrowSign from './signEscrow.json'
 import signPaymentChannelClaim from './signPaymentChannelClaim.json'
 import ticketSign from './signTicket.json'
-import normalSign from './sign.json'
 import submit from './submit.json'
 import trustlineItems from './trustlineItem.json'
 
-function buildList(options: {item: any; count: number}): any[] {
+function buildList(options: { item: any; count: number }): any[] {
   return new Array(options.count).fill(options.item)
 }
 
 const getPaymentChannel = {
   normal: normalPayChan,
-  full: fullPayChan
+  full: fullPayChan,
 }
 
 const getOrderbook = {
   normal: normalOrderBook,
-  withXRP: withXRPOrderBook
+  withXRP: withXRPOrderBook,
 }
 
 const getPaths = {
   XrpToUsd,
   XrpToXrp,
   UsdToUsd,
-  sendAll
+  sendAll,
 }
 
 const getTransaction = {
@@ -211,23 +211,23 @@ const getTransaction = {
   accountDeleteWithMemo,
   ticketCreateWithMemo,
   withMemo,
-  withMemos
+  withMemos,
 }
 
 const getTransactions = {
   normal: normalTransactions,
   includeRawTransactions,
-  one: oneTransaction
+  one: oneTransaction,
 }
 
 const getTrustlines = {
   filtered: filteredLines,
   moreThan400Items: buildList({
     item: trustlineItems,
-    count: 401
+    count: 401,
   }),
   all: allTrustlines,
-  ripplingDisabled: ripplingDisabledLines
+  ripplingDisabled: ripplingDisabledLines,
 }
 
 const getLedger = {
@@ -237,21 +237,21 @@ const getLedger = {
   withSettingsTx,
   withStateAsHashes,
   withPartial,
-  pre2014withPartial
+  pre2014withPartial,
 }
 
 const prepareOrder = {
   buy: buyOrder,
   ticket: ticketOrder,
   sell: sellOrder,
-  expiration: expirationOrder
+  expiration: expirationOrder,
 }
 
 const prepareOrderCancellation = {
   normal: normalCancel,
   ticket: ticketCancel,
   withMemos: withMemosCancel,
-  noInstructions: noInstructionsCancel
+  noInstructions: noInstructionsCancel,
 }
 
 const preparePayment = {
@@ -262,7 +262,7 @@ const preparePayment = {
   allOptions: allOptionsPayment,
   noCounterparty: noCounterpartyPayment,
   minAmount: minAmountPayment,
-  ticketSequence: ticketSequencePayment
+  ticketSequence: ticketSequencePayment,
 }
 
 const prepareSettings = {
@@ -282,61 +282,61 @@ const prepareSettings = {
   noMaxLedgerVersion,
   signers: signersSettings,
   noSignerList,
-  noWeights
+  noWeights,
 }
 
 const prepareCheckCreate = {
   normal: normalCheckCreate,
   ticket: ticketCheckCreate,
-  full: fullCheckCreate
+  full: fullCheckCreate,
 }
 
 const prepareCheckCash = {
   amount: amountCheckCash,
   ticket: ticketCheckCash,
-  deliverMin: deliverMinCheckCash
+  deliverMin: deliverMinCheckCash,
 }
 
 const prepareCheckCancel = {
   normal: normalCheckCancel,
-  ticket: ticketCheckCancel
+  ticket: ticketCheckCancel,
 }
 
 const prepareEscrowCreation = {
   normal: normalEscrowCreate,
   ticket: ticketEscrowCreate,
-  full: fullEscrowCreate
+  full: fullEscrowCreate,
 }
 
 const prepareEscrowExecution = {
   normal: normalEscrowExec,
   ticket: ticketEscrowExec,
-  simple: simpleEscrowExec
+  simple: simpleEscrowExec,
 }
 
 const prepareEscrowCancellation = {
   normal: normalEscrowCancel,
   ticket: ticketEscrowCancel,
-  memos: memosEscrowCancel
+  memos: memosEscrowCancel,
 }
 
 const preparePaymentChannelCreate = {
   normal: normalPayChanCreate,
   ticket: ticketPayChanCreate,
-  full: fullPayChanCreate
+  full: fullPayChanCreate,
 }
 
 const preparePaymentChannelFund = {
   normal: normalPayChanFund,
   ticket: ticketPayChanFund,
-  full: fullPayChanFund
+  full: fullPayChanFund,
 }
 
 const preparePaymentChannelClaim = {
   normal: normalPayChanClaim,
   ticket: ticketPayChanClaim,
   renew: renewPayChanClaim,
-  close: closePayChanClaim
+  close: closePayChanClaim,
 }
 
 const prepareTrustline = {
@@ -344,18 +344,18 @@ const prepareTrustline = {
   ticket: ticketTrustline,
   frozen: frozenTrustline,
   issuedXAddress: issuedXAddressTrustline,
-  complex: complexTrustline
+  complex: complexTrustline,
 }
 
 const sign = {
   normal: normalSign,
   ticket: ticketSign,
   escrow: escrowSign,
-  signAs: signAsSign
+  signAs: signAsSign,
 }
 
 const combine = {
-  single: singleCombine
+  single: singleCombine,
 }
 
 const responses = {
@@ -394,7 +394,7 @@ const responses = {
   preparePaymentChannelClaim,
   prepareTrustline,
   sign,
-  combine
+  combine,
 }
 
 export default responses

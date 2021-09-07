@@ -1,14 +1,16 @@
-export { Client } from "./client";
-
-export * from "./transaction/types";
-
-export * from "./common/types/objects/ledger";
-
-export * from "./models/methods";
-
-export * from "./utils";
-
 // Broadcast client is experimental
-export { BroadcastClient } from "./client/broadcastClient";
+import BroadcastClient from './client/broadcastClient'
 
-export * from "./Wallet";
+export { Client } from './client'
+
+export * from './transaction/types'
+
+export * from './common/types/objects/ledger'
+
+export * from './models/methods'
+
+export * from './utils'
+
+export { BroadcastClient }
+
+export { default as Wallet } from './wallet'
