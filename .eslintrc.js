@@ -31,36 +31,7 @@ module.exports = {
       "error",
       {
         selector: "interface",
-        format: ["PascalCase"],
-      },
-      {
-        selector: "interface",
-        format: ["snake_case"],
-      },
-    ],
-    // Ignore type imports when counting dependencies.
-    "import/max-dependencies": [
-      "error",
-      {
-        max: 10,
-        ignoreTypeImports: true,
-      },
-    ],
-    // Removes comments and blank lines from the max-line rules
-    "max-lines-per-function": [
-      "warn",
-      {
-        max: 50,
-        skipBlankLines: true,
-        skipComments: true,
-      },
-    ],
-    "max-lines": [
-      "warn",
-      {
-        max: 250,
-        skipBlankLines: true,
-        skipComments: true,
+        format: ["PascalCase", 'snake_case'],
       },
     ],
     "max-statements": ["warn", 25],
