@@ -1,14 +1,14 @@
-import _ from "lodash";
+import _ from 'lodash'
 
-import { ValidationError } from "../common/errors";
+import { ValidationError } from '../common/errors'
 
 import {
   computeLedgerHash,
   computeTransactionTreeHash,
   computeStateTreeHash,
-} from "./hashes";
+} from './hashes'
 
-import { ISOTimeToRippleTime } from ".";
+import { ISOTimeToRippleTime } from '.'
 
 function convertLedgerHeader(header): any {
   return {
@@ -23,101 +23,101 @@ function convertLedgerHeader(header): any {
     parent_close_time: ISOTimeToRippleTime(header.parentCloseTime),
     total_coins: header.totalDrops,
     transaction_hash: header.transactionHash,
-  };
+  }
 }
 
 function hashLedgerHeader(ledgerHeader) {
-  const header = convertLedgerHeader(ledgerHeader);
-  return computeLedgerHash(header);
+  const header = convertLedgerHeader(ledgerHeader)
+  return computeLedgerHash(header)
 }
 
 function computeTransactionHash(
   ledger,
-  options: ComputeLedgerHeaderHashOptions
+  options: ComputeLedgerHeaderHashOptions,
 ) {
-  let transactions: any[] = [];
+  let transactions: any[] = []
   if (ledger.rawTransactions) {
-    transactions = JSON.parse(ledger.rawTransactions);
+    transactions = JSON.parse(ledger.rawTransactions)
   } else if (ledger.transactions) {
     try {
       transactions = ledger.transactions.map((tx) =>
-        JSON.parse(tx.rawTransaction)
-      );
+        JSON.parse(tx.rawTransaction),
+      )
     } catch (e) {
       if (
         e.toString() ===
-        "SyntaxError: Unexpected" + " token u in JSON at position 0"
+        'SyntaxError: Unexpected' + ' token u in JSON at position 0'
       ) {
         // one or more of the `tx.rawTransaction`s is undefined
-        throw new ValidationError("ledger" + " is missing raw transactions");
+        throw new ValidationError('ledger' + ' is missing raw transactions')
       }
     }
   } else {
     if (options.computeTreeHashes) {
       throw new ValidationError(
-        "transactions" + " property is missing from the ledger"
-      );
+        'transactions' + ' property is missing from the ledger',
+      )
     }
-    return ledger.transactionHash;
+    return ledger.transactionHash
   }
   const txs = transactions.map((tx) => {
-    const mergeTx = { ..._.omit(tx, "tx"), ...(tx.tx || {}) };
+    const mergeTx = { ..._.omit(tx, 'tx'), ...(tx.tx || {}) }
     // rename `meta` back to `metaData`
     const renameMeta = {
-      ..._.omit(mergeTx, "meta"),
+      ..._.omit(mergeTx, 'meta'),
       ...(tx.meta ? { metaData: tx.meta } : {}),
-    };
-    return renameMeta;
-  });
-  const transactionHash = computeTransactionTreeHash(txs);
+    }
+    return renameMeta
+  })
+  const transactionHash = computeTransactionTreeHash(txs)
   if (
     ledger.transactionHash != null &&
     ledger.transactionHash !== transactionHash
   ) {
     throw new ValidationError(
-      "transactionHash in header" +
-        " does not match computed hash of transactions",
+      'transactionHash in header' +
+        ' does not match computed hash of transactions',
       {
         transactionHashInHeader: ledger.transactionHash,
         computedHashOfTransactions: transactionHash,
-      }
-    );
+      },
+    )
   }
-  return transactionHash;
+  return transactionHash
 }
 
 function computeStateHash(ledger, options: ComputeLedgerHeaderHashOptions) {
   if (ledger.rawState == null) {
     if (options.computeTreeHashes) {
       throw new ValidationError(
-        "rawState" + " property is missing from the ledger"
-      );
+        'rawState' + ' property is missing from the ledger',
+      )
     }
-    return ledger.stateHash;
+    return ledger.stateHash
   }
-  const state = JSON.parse(ledger.rawState);
-  const stateHash = computeStateTreeHash(state);
+  const state = JSON.parse(ledger.rawState)
+  const stateHash = computeStateTreeHash(state)
   if (ledger.stateHash != null && ledger.stateHash !== stateHash) {
     throw new ValidationError(
-      "stateHash in header" + " does not match computed hash of state"
-    );
+      'stateHash in header' + ' does not match computed hash of state',
+    )
   }
-  return stateHash;
+  return stateHash
 }
 
 export interface ComputeLedgerHeaderHashOptions {
-  computeTreeHashes?: boolean;
+  computeTreeHashes?: boolean
 }
 
 function computeLedgerHeaderHash(
   ledger: any,
-  options: ComputeLedgerHeaderHashOptions = {}
+  options: ComputeLedgerHeaderHashOptions = {},
 ): string {
   const subhashes = {
     transactionHash: computeTransactionHash(ledger, options),
     stateHash: computeStateHash(ledger, options),
-  };
-  return hashLedgerHeader({ ...ledger, ...subhashes });
+  }
+  return hashLedgerHeader({ ...ledger, ...subhashes })
 }
 
-export default computeLedgerHeaderHash;
+export default computeLedgerHeaderHash

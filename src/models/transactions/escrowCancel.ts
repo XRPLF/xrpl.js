@@ -1,11 +1,11 @@
-import { ValidationError } from "../../common/errors";
+import { ValidationError } from '../../common/errors'
 
-import { BaseTransaction, verifyBaseTransaction } from "./common";
+import { BaseTransaction, verifyBaseTransaction } from './common'
 
 export interface EscrowCancel extends BaseTransaction {
-  TransactionType: "EscrowCancel";
-  Owner: string;
-  OfferSequence: number;
+  TransactionType: 'EscrowCancel'
+  Owner: string
+  OfferSequence: number
 }
 
 /**
@@ -15,21 +15,21 @@ export interface EscrowCancel extends BaseTransaction {
  * @throws When the EscrowCancel is Malformed.
  */
 export function verifyEscrowCancel(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx);
+  verifyBaseTransaction(tx)
 
   if (tx.Owner === undefined) {
-    throw new ValidationError("EscrowCancel: missing Owner");
+    throw new ValidationError('EscrowCancel: missing Owner')
   }
 
-  if (typeof tx.Owner !== "string") {
-    throw new ValidationError("EscrowCancel: Owner must be a string");
+  if (typeof tx.Owner !== 'string') {
+    throw new ValidationError('EscrowCancel: Owner must be a string')
   }
 
   if (tx.OfferSequence === undefined) {
-    throw new ValidationError("EscrowCancel: missing OfferSequence");
+    throw new ValidationError('EscrowCancel: missing OfferSequence')
   }
 
-  if (typeof tx.OfferSequence !== "number") {
-    throw new ValidationError("EscrowCancel: OfferSequence must be a number");
+  if (typeof tx.OfferSequence !== 'number') {
+    throw new ValidationError('EscrowCancel: OfferSequence must be a number')
   }
 }

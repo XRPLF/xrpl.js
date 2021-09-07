@@ -1,7 +1,7 @@
 import { assert } from "chai";
 
 import ECDSA from "../../src/common/ecdsa";
-import Wallet from "../../src/Wallet";
+import Wallet from "../../src/wallet";
 
 /**
  * Wallet testing.
@@ -9,6 +9,49 @@ import Wallet from "../../src/Wallet";
  * Provides tests for Wallet class.
  */
 describe("Wallet", function () {
+  describe("generate", function () {
+    const classicAddressPrefix = "r";
+    const ed25519KeyPrefix = "ED";
+    const secp256k1PrivateKeyPrefix = "00";
+
+    it("generates a new wallet using default algorithm", function () {
+      const wallet = Wallet.generate();
+
+      assert.isString(wallet.publicKey);
+      assert.isString(wallet.privateKey);
+      assert.isString(wallet.classicAddress);
+      assert.isString(wallet.seed);
+      assert.isTrue(wallet.publicKey.startsWith(ed25519KeyPrefix));
+      assert.isTrue(wallet.privateKey.startsWith(ed25519KeyPrefix));
+      assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix));
+    });
+
+    it("generates a new wallet using algorithm ecdsa-secp256k1", function () {
+      const algorithm = ECDSA.secp256k1;
+      const wallet = Wallet.generate(algorithm);
+
+      assert.isString(wallet.publicKey);
+      assert.isString(wallet.privateKey);
+      assert.isString(wallet.classicAddress);
+      assert.isString(wallet.seed);
+      assert.isTrue(wallet.privateKey.startsWith(secp256k1PrivateKeyPrefix));
+      assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix));
+    });
+
+    it("generates a new wallet using algorithm ed25519", function () {
+      const algorithm = ECDSA.ed25519;
+      const wallet = Wallet.generate(algorithm);
+
+      assert.isString(wallet.publicKey);
+      assert.isString(wallet.privateKey);
+      assert.isString(wallet.classicAddress);
+      assert.isString(wallet.seed);
+      assert.isTrue(wallet.publicKey.startsWith(ed25519KeyPrefix));
+      assert.isTrue(wallet.privateKey.startsWith(ed25519KeyPrefix));
+      assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix));
+    });
+  });
+
   describe("fromSeed", function () {
     const seed = "ssL9dv2W5RK8L3tuzQxYY6EaZhSxW";
     const publicKey =
@@ -65,7 +108,7 @@ describe("Wallet", function () {
   });
 
   describe("fromEntropy", function () {
-    const entropy: number[] = new Array(16).fill(0);
+    let entropy;
     const publicKey =
       "0390A196799EE412284A5D80BF78C3E84CBB80E1437A0AECD9ADF94D7FEAAFA284";
     const privateKey =
@@ -74,6 +117,11 @@ describe("Wallet", function () {
       "ED1A7C082846CFF58FF9A892BA4BA2593151CCF1DBA59F37714CC9ED39824AF85F";
     const privateKeyED25519 =
       "ED0B6CBAC838DFE7F47EA1BD0DF00EC282FDF45510C92161072CCFB84035390C4D";
+
+    beforeEach(function () {
+      const entropySize = 16;
+      entropy = new Array(entropySize).fill(0);
+    });
 
     it("derives a wallet using entropy", function () {
       const wallet = Wallet.fromEntropy(entropy);

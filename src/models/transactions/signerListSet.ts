@@ -1,15 +1,15 @@
-import { ValidationError } from "../../common/errors";
-import { SignerEntry } from "../common";
+import { ValidationError } from '../../common/errors'
+import { SignerEntry } from '../common'
 
-import { BaseTransaction, verifyBaseTransaction } from "./common";
+import { BaseTransaction, verifyBaseTransaction } from './common'
 
 export interface SignerListSet extends BaseTransaction {
-  TransactionType: "SignerListSet";
-  SignerQuorum: number;
-  SignerEntries: SignerEntry[];
+  TransactionType: 'SignerListSet'
+  SignerQuorum: number
+  SignerEntries: SignerEntry[]
 }
 
-const MAX_SIGNERS = 8;
+const MAX_SIGNERS = 8
 
 /**
  * Verify the form and type of an SignerListSet at runtime.
@@ -18,33 +18,33 @@ const MAX_SIGNERS = 8;
  * @throws When the SignerListSet is Malformed.
  */
 export function verifySignerListSet(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx);
+  verifyBaseTransaction(tx)
 
   if (tx.SignerQuorum === undefined) {
-    throw new ValidationError("SignerListSet: missing field SignerQuorum");
+    throw new ValidationError('SignerListSet: missing field SignerQuorum')
   }
 
-  if (typeof tx.SignerQuorum !== "number") {
-    throw new ValidationError("SignerListSet: invalid SignerQuorum");
+  if (typeof tx.SignerQuorum !== 'number') {
+    throw new ValidationError('SignerListSet: invalid SignerQuorum')
   }
 
   if (tx.SignerEntries === undefined) {
-    throw new ValidationError("SignerListSet: missing field SignerEntries");
+    throw new ValidationError('SignerListSet: missing field SignerEntries')
   }
 
   if (!Array.isArray(tx.SignerEntries)) {
-    throw new ValidationError("SignerListSet: invalid SignerEntries");
+    throw new ValidationError('SignerListSet: invalid SignerEntries')
   }
 
   if (tx.SignerEntries.length === 0) {
     throw new ValidationError(
-      "SignerListSet: need atleast 1 member in SignerEntries"
-    );
+      'SignerListSet: need atleast 1 member in SignerEntries',
+    )
   }
 
   if (tx.SignerEntries.length > MAX_SIGNERS) {
     throw new ValidationError(
-      "SignerListSet: maximum of 8 members allowed in SignerEntries"
-    );
+      'SignerListSet: maximum of 8 members allowed in SignerEntries',
+    )
   }
 }

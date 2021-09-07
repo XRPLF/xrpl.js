@@ -22,3 +22,8 @@ export interface OfferCreateTransaction {
   Memos?: Memo[];
   OfferSequence?: number;
 }
+
+export interface SignedTransaction {
+  signedTransaction: string;
+  id: string;
+}

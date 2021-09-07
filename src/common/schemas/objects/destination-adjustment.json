@@ -1,9 +1,0 @@
-{
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "destinationAdjustment",
-  "type": "object",
-  "oneOf": [
-    {"$ref": "destinationExactAdjustment"},
-    {"$ref": "minAdjustment"}
-  ]
-}
