@@ -115,7 +115,7 @@ export interface ConsensusStream extends BaseStream {
   consensus: "open" | "establish" | "accepted";
 }
 
-export interface PathFindStream {
+export interface PathFindStream extends BaseStream {
   type: "path_find";
   source_account: string;
   destination_account: string;
