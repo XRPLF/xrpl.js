@@ -61,7 +61,7 @@ function multisign(transactions: Array<Transaction | string>): Transaction {
 
     if (tx.SigningPubKey !== "") {
       throw new ValidationError(
-        "SigningPubKey must be an empty string for all transactions when multisigning.s"
+        "SigningPubKey must be an empty string for all transactions when multisigning."
       );
     }
 
