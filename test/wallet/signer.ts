@@ -154,7 +154,7 @@ const expectedmultisign: Transaction = {
   TransactionType: "TrustSet",
 };
 
-describe("Signer tests", function () {
+describe("Signer", function () {
   it("sign", function () {
     // Test case data generated using this tutorial - https://xrpl.org/send-xrp.html#send-xrp
     const tx3: Transaction = {
