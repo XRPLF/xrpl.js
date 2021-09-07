@@ -7,10 +7,10 @@ import { ValidationError } from "../../src/common/errors";
 import { Transaction } from "../../src/models/transactions";
 import Wallet from "../../src/Wallet";
 import {
-  verify,
   sign,
   authorizeChannel,
   multisign,
+  verifySignature,
 } from "../../src/wallet/signer";
 
 const publicKey =
@@ -120,7 +120,7 @@ const multisignTxToCombine2: Transaction = {
   TransactionType: "TrustSet",
 };
 
-const expectedmultisign: Transaction = {
+const expectedMultisign: Transaction = {
   Account: "rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC",
   Fee: "30000",
   Flags: 262144,
@@ -193,7 +193,7 @@ describe("Signer", function () {
       multisignTxToCombine2,
     ];
 
-    assert.deepEqual(multisign(transactions), expectedmultisign);
+    assert.deepEqual(multisign(transactions), expectedMultisign);
   });
 
   it("multisign runs successfully with tx_blobs", function () {
@@ -204,7 +204,7 @@ describe("Signer", function () {
 
     const encodedTransactions: string[] = transactions.map(encode);
 
-    assert.deepEqual(multisign(encodedTransactions), expectedmultisign);
+    assert.deepEqual(multisign(encodedTransactions), expectedMultisign);
   });
 
   it("multisign throws a validation error when there are no transactions", function () {
@@ -265,12 +265,12 @@ describe("Signer", function () {
     );
   });
 
-  it("verify succeeds for valid signed transaction blob", function () {
+  it("verifySignature succeeds for valid signed transaction blob", function () {
     const wallet = new Wallet(publicKey, privateKey);
 
     const signedTx: string = sign(wallet, tx);
 
-    assert.isTrue(verify(signedTx));
+    assert.isTrue(verifySignature(signedTx));
   });
 
   it("verify succeeds for valid signed transaction object", function () {
@@ -280,7 +280,7 @@ describe("Signer", function () {
 
     assert.isTrue(
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for interfacing with binary-codec
-      verify(decode(signedTx) as unknown as Transaction)
+      verifySignature(decode(signedTx) as unknown as Transaction)
     );
   });
 
@@ -295,6 +295,6 @@ describe("Signer", function () {
     decodedTx.SigningPubKey =
       "0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020";
 
-    assert.isFalse(verify(decodedTx));
+    assert.isFalse(verifySignature(decodedTx));
   });
 });

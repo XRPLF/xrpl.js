@@ -7,10 +7,7 @@ import {
   encodeForSigning,
   encodeForSigningClaim,
 } from "ripple-binary-codec";
-import {
-  sign as signWithKeypair,
-  verify as verifySignature,
-} from "ripple-keypairs";
+import { sign as signWithKeypair, verify } from "ripple-keypairs";
 
 import { ValidationError } from "../common/errors";
 import { Signer } from "../models/common";
@@ -113,9 +110,9 @@ function authorizeChannel(
  * @param tx - A transaction to verify the signature of. (Can be in object or encoded string format).
  * @returns Returns true if tx has a valid signature, and returns false otherwise.
  */
-function verify(tx: Transaction | string): boolean {
+function verifySignature(tx: Transaction | string): boolean {
   const decodedTx: Transaction = getDecodedTransaction(tx);
-  return verifySignature(
+  return verify(
     encodeForSigning(decodedTx),
     decodedTx.TxnSignature,
     decodedTx.SigningPubKey
@@ -189,4 +186,4 @@ function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
   return decode(txOrBlob) as unknown as Transaction;
 }
 
-export { sign, authorizeChannel, verify, multisign };
+export { sign, authorizeChannel, verifySignature, multisign };
