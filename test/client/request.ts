@@ -7,8 +7,9 @@ describe('client.request', function () {
   beforeEach(setupClient)
   afterEach(teardownClient)
 
-  addressTests.forEach(function (test) {
-    describe(test.type, function () {
+  // eslint-disable-next-line mocha/no-setup-in-describe -- Rule does not work with dynamically generated tests.
+  addressTests.forEach(function (testcase) {
+    describe(testcase.type, function () {
       it('request account_objects', async function () {
         this.mockRippled.addResponse(
           'account_objects',
@@ -16,7 +17,7 @@ describe('client.request', function () {
         )
         const result = await this.client.request({
           command: 'account_objects',
-          account: test.address,
+          account: testcase.address,
         })
 
         assertResultMatch(
@@ -33,7 +34,7 @@ describe('client.request', function () {
         )
         const result = await this.client.request({
           command: 'account_objects',
-          account: test.address,
+          account: testcase.address,
         })
 
         assertResultMatch(

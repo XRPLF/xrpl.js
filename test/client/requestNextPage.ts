@@ -5,7 +5,7 @@ import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
 import { assertRejects } from '../testUtils'
 
-const rippledResponse = function (request: Request): object {
+const rippledResponse = function (request: Request): Record<string, unknown> {
   if ('marker' in request) {
     return rippled.ledger_data.last_page
   }
