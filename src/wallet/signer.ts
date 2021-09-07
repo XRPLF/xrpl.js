@@ -1,19 +1,19 @@
-/* eslint-disable import/max-dependencies -- These imports are required for Signer */
-import { BigNumber } from "bignumber.js";
-import { flatMap } from "lodash";
-import { decodeAccountID } from "ripple-address-codec";
+import { BigNumber } from 'bignumber.js'
+import { flatMap } from 'lodash'
+import { decodeAccountID } from 'ripple-address-codec'
 import {
   decode,
   encodeForSigning,
   encodeForSigningClaim,
-} from "ripple-binary-codec";
-import { sign as signWithKeypair, verify } from "ripple-keypairs";
+} from 'ripple-binary-codec'
+import { sign as signWithKeypair, verify } from 'ripple-keypairs'
 
-import { ValidationError } from "../common/errors";
-import { Signer } from "../models/common";
-import { Transaction } from "../models/transactions";
-import { verifyBaseTransaction } from "../models/transactions/common";
-import Wallet from "../Wallet";
+import { ValidationError } from '../common/errors'
+import { Signer } from '../models/common'
+import { Transaction } from '../models/transactions'
+import { verifyBaseTransaction } from '../models/transactions/common'
+
+import Wallet from '.'
 
 /**
  * Uses a wallet to cryptographically sign a transaction which proves the owner of the wallet
@@ -21,18 +21,14 @@ import Wallet from "../Wallet";
  *
  * @param wallet - A Wallet that holds your cryptographic keys.
  * @param tx - The Transaction that is being signed.
- * @param multisign - If true, changes the signature format to encode for multisigning.
+ * @param forMultisign - If true, changes the signature format to encode for multisigning.
  * @returns A signed Transaction.
  */
-function sign(
-  wallet: Wallet,
-  tx: Transaction,
-  multisign: boolean = false
-): string {
+function sign(wallet: Wallet, tx: Transaction, forMultisign = false): string {
   return wallet.signTransaction(
     tx,
-    multisign ? { signAs: wallet.getClassicAddress() } : { signAs: "" }
-  );
+    forMultisign ? { signAs: wallet.getClassicAddress() } : { signAs: '' },
+  )
 }
 
 /**
@@ -48,39 +44,40 @@ function sign(
  */
 function multisign(transactions: Array<Transaction | string>): Transaction {
   if (transactions.length === 0) {
-    throw new ValidationError("There were 0 transactions to multisign");
+    throw new ValidationError('There were 0 transactions to multisign')
   }
 
   transactions.forEach((txOrBlob) => {
-    const tx: Transaction = getDecodedTransaction(txOrBlob);
+    const tx: Transaction = getDecodedTransaction(txOrBlob)
 
     // This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
-    // TODO: Replace this with verify() (The general validation function for all Transactions), also make verify accept '| Transaction' to avoid type casting here.
+    // TODO: Replace this with verify() (The general validation function for all Transactions)
+    // , also make verify accept '| Transaction' to avoid type casting here.
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- verify does not accept Transaction type
-    verifyBaseTransaction(tx as unknown as Record<string, unknown>);
+    verifyBaseTransaction(tx as unknown as Record<string, unknown>)
 
-    if (tx.SigningPubKey !== "") {
+    if (tx.SigningPubKey !== '') {
       throw new ValidationError(
-        "SigningPubKey must be an empty string for all transactions when multisigning."
-      );
+        'SigningPubKey must be an empty string for all transactions when multisigning.',
+      )
     }
 
     if (tx.Signers == null || tx.Signers.length === 0) {
       throw new ValidationError(
-        "For multisigning all transactions must include a Signers field containing an array of signatures. You may have forgotten to pass the 'multisign' parameter when signing."
-      );
+        "For multisigning all transactions must include a Signers field containing an array of signatures. You may have forgotten to pass the 'multisign' parameter when signing.",
+      )
     }
-  });
+  })
 
   const decodedTransactions: Transaction[] = transactions.map(
     (txOrBlob: string | Transaction) => {
-      return getDecodedTransaction(txOrBlob);
-    }
-  );
+      return getDecodedTransaction(txOrBlob)
+    },
+  )
 
-  validateTransactionEquivalence(decodedTransactions);
+  validateTransactionEquivalence(decodedTransactions)
 
-  return getTransactionWithAllSigners(decodedTransactions);
+  return getTransactionWithAllSigners(decodedTransactions)
 }
 
 /**
@@ -94,14 +91,14 @@ function multisign(transactions: Array<Transaction | string>): Transaction {
 function authorizeChannel(
   wallet: Wallet,
   channelId: string,
-  amount: string
+  amount: string,
 ): string {
   const signingData = encodeForSigningClaim({
     channel: channelId,
     amount,
-  });
+  })
 
-  return signWithKeypair(signingData, wallet.privateKey);
+  return signWithKeypair(signingData, wallet.privateKey)
 }
 
 /**
@@ -111,12 +108,12 @@ function authorizeChannel(
  * @returns Returns true if tx has a valid signature, and returns false otherwise.
  */
 function verifySignature(tx: Transaction | string): boolean {
-  const decodedTx: Transaction = getDecodedTransaction(tx);
+  const decodedTx: Transaction = getDecodedTransaction(tx)
   return verify(
     encodeForSigning(decodedTx),
     decodedTx.TxnSignature,
-    decodedTx.SigningPubKey
-  );
+    decodedTx.SigningPubKey,
+  )
 }
 
 /**
@@ -129,30 +126,30 @@ function validateTransactionEquivalence(transactions: Transaction[]): void {
   const exampleTransaction = JSON.stringify({
     ...transactions[0],
     Signers: null,
-  });
+  })
   if (
     transactions
       .slice(1)
       .some(
-        (tx) => JSON.stringify({ ...tx, Signers: null }) !== exampleTransaction
+        (tx) => JSON.stringify({ ...tx, Signers: null }) !== exampleTransaction,
       )
   ) {
     throw new ValidationError(
-      "txJSON is not the same for all signedTransactions"
-    );
+      'txJSON is not the same for all signedTransactions',
+    )
   }
 }
 
 function getTransactionWithAllSigners(
-  transactions: Transaction[]
+  transactions: Transaction[],
 ): Transaction {
   // Signers must be sorted in the combined transaction - See compareSigners' documentation for more details
   const sortedSigners: Signer[] = flatMap(
     transactions,
-    (tx) => tx.Signers ?? []
-  ).sort(compareSigners);
+    (tx) => tx.Signers ?? [],
+  ).sort(compareSigners)
 
-  return { ...transactions[0], Signers: sortedSigners };
+  return { ...transactions[0], Signers: sortedSigners }
 }
 
 /**
@@ -167,23 +164,23 @@ function getTransactionWithAllSigners(
  */
 function compareSigners(left: Signer, right: Signer): number {
   return addressToBigNumber(left.Signer.Account).comparedTo(
-    addressToBigNumber(right.Signer.Account)
-  );
+    addressToBigNumber(right.Signer.Account),
+  )
 }
 
 function addressToBigNumber(address: string): BigNumber {
-  const hex = Buffer.from(decodeAccountID(address)).toString("hex");
-  const numberOfBitsInHex = 16;
-  return new BigNumber(hex, numberOfBitsInHex);
+  const hex = Buffer.from(decodeAccountID(address)).toString('hex')
+  const numberOfBitsInHex = 16
+  return new BigNumber(hex, numberOfBitsInHex)
 }
 
 function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
-  if (typeof txOrBlob === "object") {
-    return txOrBlob;
+  if (typeof txOrBlob === 'object') {
+    return txOrBlob
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
-  return decode(txOrBlob) as unknown as Transaction;
+  return decode(txOrBlob) as unknown as Transaction
 }
 
-export { sign, authorizeChannel, verifySignature, multisign };
+export { sign, authorizeChannel, verifySignature, multisign }
