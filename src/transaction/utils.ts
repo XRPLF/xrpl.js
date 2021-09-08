@@ -5,7 +5,7 @@ import { ValidationError } from '../common/errors'
 import { Memo } from '../common/types/objects'
 import { removeUndefined } from '../utils'
 
-import { Instructions, Prepare, TransactionJSON } from './types'
+import { TransactionJSON } from './types'
 
 const txFlags = common.txFlags
 
