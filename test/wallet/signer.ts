@@ -194,21 +194,27 @@ describe('Signer', function () {
   })
 
   it('multisign runs successfully with Transaction objects', function () {
-    const transactions = [multisignTxToCombine1, multisignTxToCombine2]
+    const transactions: Transaction[] = [
+      multisignTxToCombine1,
+      multisignTxToCombine2,
+    ]
 
     assert.deepEqual(multisign(transactions), expectedMultisign)
   })
 
   it('multisign runs successfully with tx_blobs', function () {
-    const transactions = [multisignTxToCombine1, multisignTxToCombine2]
+    const transactions: Transaction[] = [
+      multisignTxToCombine1,
+      multisignTxToCombine2,
+    ]
 
-    const encodedTransactions = transactions.map(encode)
+    const encodedTransactions: string[] = transactions.map(encode)
 
     assert.deepEqual(multisign(encodedTransactions), expectedMultisign)
   })
 
   it('multisign throws a validation error when there are no transactions', function () {
-    const transactions = []
+    const transactions: Transaction[] = []
     assert.throws(() => multisign(transactions), ValidationError)
   })
 
@@ -234,7 +240,10 @@ describe('Signer', function () {
       ],
     }
 
-    const transactions = [multisignTxToCombine1, differentMultisignedTx]
+    const transactions: Transaction[] = [
+      multisignTxToCombine1,
+      differentMultisignedTx,
+    ]
 
     assert.throws(() => multisign(transactions))
   })
@@ -286,7 +295,7 @@ describe('Signer', function () {
   it('verify throws for invalid signing key', function () {
     const signedTx: string = sign(publicKey, privateKey, tx)
 
-    const decodedTx = decode(signedTx) as unknown as Transaction
+    const decodedTx: Transaction = decode(signedTx) as unknown as Transaction
 
     // Use a different key for validation
     decodedTx.SigningPubKey =
