@@ -18,7 +18,6 @@ const privateKey =
   '00141BA006D3363D2FB2785E8DF4E44D3A49908780CB4FB51F6D217C08C021429F'
 const address = 'rhvh5SrgBL5V8oeV9EpDuVszeJSSCEkbPc'
 const seed = 'ss1x3KLrSvfg7irFc1D929WXZ7z9H'
-const wallet = Wallet.fromSeed(seed)
 
 const tx: Transaction = {
   TransactionType: 'Payment',
@@ -170,24 +169,21 @@ describe('Signer', function () {
     const signedTxBlob =
       '120000228000000024013A0F74201B013A0FC36140000000014FB18068400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F544744730450221009ECB5324717E14DD6970126271F05BC2626D2A8FA9F3797555D417F8257C1E6002206BDD74A0F30425F2BA9DB69C90F21B3E27735C190FB4F3A640F066ACBBF06AD98114B3263BD0A9BF9DFDBBBBD07F536355FF477BF0E98314F667B0CA50CC7709A220B0561B85E53A48461FA8'
 
+    const wallet = Wallet.fromSeed(seed)
+
     const signedTx: string = sign(wallet.publicKey, wallet.privateKey, tx3)
 
     assert.equal(signedTx, signedTxBlob)
   })
 
   it('sign in multisign format', function () {
-    const multisignWallet = Wallet.fromSeed(unsignedSecret1)
+    const wallet = Wallet.fromSeed(unsignedSecret1)
 
     assert.deepEqual(
       decode(
-        sign(
-          multisignWallet.publicKey,
-          multisignWallet.privateKey,
-          unsignedTx1,
-          {
-            signAs: multisignWallet.getClassicAddress(),
-          },
-        ),
+        sign(wallet.publicKey, wallet.privateKey, unsignedTx1, {
+          signAs: wallet.getClassicAddress(),
+        }),
       ),
       multisignTx1 as unknown as JsonObject,
     )
@@ -258,42 +254,47 @@ describe('Signer', function () {
   })
 
   it('authorizeChannel succeeds with secp256k1 seed', function () {
-    const secp256k1Wallet = Wallet.fromSeed('snGHNrPbHrdUcszeuDEigMdC1Lyyd')
+    const wallet = Wallet.fromSeed('snGHNrPbHrdUcszeuDEigMdC1Lyyd')
     const channelId =
       '5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3'
     const amount = '1000000'
 
     assert.equal(
-      authorizeChannel(secp256k1Wallet.privateKey, channelId, amount),
+      authorizeChannel(wallet.privateKey, channelId, amount),
       '304402204E7052F33DDAFAAA55C9F5B132A5E50EE95B2CF68C0902F61DFE77299BC893740220353640B951DCD24371C16868B3F91B78D38B6F3FD1E826413CDF891FA8250AAC',
     )
   })
 
   it('authorizeChannel succeeds with ed25519 seed', function () {
-    const ed25519Wallet = Wallet.fromSeed('sEdSuqBPSQaood2DmNYVkwWTn1oQTj2')
+    const wallet = Wallet.fromSeed('sEdSuqBPSQaood2DmNYVkwWTn1oQTj2')
     const channelId =
       '5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3'
     const amount = '1000000'
     assert.equal(
-      authorizeChannel(ed25519Wallet.privateKey, channelId, amount),
+      authorizeChannel(wallet.privateKey, channelId, amount),
       '7E1C217A3E4B3C107B7A356E665088B4FBA6464C48C58267BEF64975E3375EA338AE22E6714E3F5E734AE33E6B97AAD59058E1E196C1F92346FC1498D0674404',
     )
   })
 
   it('verifySignature succeeds for valid signed transaction blob', function () {
-    const signedTx: string = sign(publicKey, privateKey, tx)
+    const wallet = new Wallet(publicKey, privateKey)
+
+    const signedTx: string = sign(wallet.publicKey, wallet.privateKey, tx)
 
     assert.isTrue(verifySignature(signedTx))
   })
 
   it('verify succeeds for valid signed transaction object', function () {
-    const signedTx: string = sign(publicKey, privateKey, tx)
+    const wallet = new Wallet(publicKey, privateKey)
+
+    const signedTx: string = sign(wallet.publicKey, wallet.privateKey, tx)
 
     assert.isTrue(verifySignature(decode(signedTx) as unknown as Transaction))
   })
 
   it('verify throws for invalid signing key', function () {
-    const signedTx: string = sign(publicKey, privateKey, tx)
+    const wallet = new Wallet(publicKey, privateKey)
+    const signedTx: string = sign(wallet.publicKey, wallet.privateKey, tx)
 
     const decodedTx: Transaction = decode(signedTx) as unknown as Transaction
 
