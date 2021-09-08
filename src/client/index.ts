@@ -107,23 +107,8 @@ import {
   UnsubscribeResponse,
 } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
-import prepareCheckCancel from '../transaction/check-cancel'
-import prepareCheckCash from '../transaction/check-cash'
-import prepareCheckCreate from '../transaction/check-create'
 import combine from '../transaction/combine'
-import prepareEscrowCancellation from '../transaction/escrow-cancellation'
-import prepareEscrowCreation from '../transaction/escrow-creation'
-import prepareEscrowExecution from '../transaction/escrow-execution'
-import prepareOrder from '../transaction/order'
-import prepareOrderCancellation from '../transaction/ordercancellation'
-import preparePayment from '../transaction/payment'
-import preparePaymentChannelClaim from '../transaction/payment-channel-claim'
-import preparePaymentChannelCreate from '../transaction/payment-channel-create'
-import preparePaymentChannelFund from '../transaction/payment-channel-fund'
-import prepareSettings from '../transaction/settings'
 import { sign } from '../transaction/sign'
-import prepareTicketCreate from '../transaction/ticket'
-import prepareTrustline from '../transaction/trustline'
 import { deriveAddress, deriveXAddress } from '../utils/derive'
 import generateFaucetWallet from '../wallet/generateFaucetWallet'
 
@@ -543,21 +528,6 @@ class Client extends EventEmitter {
   public getPaths = getPaths
   public getOrderbook = getOrderbook
 
-  public preparePayment = preparePayment
-  public prepareTrustline = prepareTrustline
-  public prepareOrder = prepareOrder
-  public prepareOrderCancellation = prepareOrderCancellation
-  public prepareEscrowCreation = prepareEscrowCreation
-  public prepareEscrowExecution = prepareEscrowExecution
-  public prepareEscrowCancellation = prepareEscrowCancellation
-  public preparePaymentChannelCreate = preparePaymentChannelCreate
-  public preparePaymentChannelFund = preparePaymentChannelFund
-  public preparePaymentChannelClaim = preparePaymentChannelClaim
-  public prepareCheckCreate = prepareCheckCreate
-  public prepareCheckCash = prepareCheckCash
-  public prepareCheckCancel = prepareCheckCancel
-  public prepareTicketCreate = prepareTicketCreate
-  public prepareSettings = prepareSettings
   public sign = sign
   public combine = combine
 
