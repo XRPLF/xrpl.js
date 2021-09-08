@@ -1,3 +1,5 @@
+import { Signer } from '../../../models/common'
+
 import { RippledAmount } from './amounts'
 import { Memo } from './memos'
 
@@ -10,7 +12,7 @@ export interface OfferCreateTransaction {
   Flags: number
   LastLedgerSequence?: number
   Sequence: number
-  Signers: any[]
+  Signers: Signer[]
   SigningPubKey: string
   SourceTag?: number
   TakerGets: RippledAmount
