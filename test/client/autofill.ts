@@ -199,4 +199,43 @@ describe('client.autofill', function () {
     const txResult = await this.client.autofill(tx)
     assert.strictEqual(txResult.LastLedgerSequence, 9038234)
   })
+
+  it('should autofill fields when all are missing', async function () {
+    const tx: Transaction = {
+      TransactionType: 'DepositPreauth',
+      Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+    }
+    this.mockRippled.addResponse('account_info', {
+      status: 'success',
+      type: 'response',
+      result: {
+        account_data: {
+          Sequence: 23,
+        },
+      },
+    })
+    this.mockRippled.addResponse('ledger', {
+      status: 'success',
+      type: 'response',
+      result: {
+        ledger_index: 9038214,
+      },
+    })
+    this.mockRippled.addResponse('server_info', {
+      status: 'success',
+      type: 'response',
+      result: {
+        info: {
+          validated_ledger: {
+            base_fee_xrp: 0.00001,
+          },
+        },
+      },
+    })
+    const txResult = await this.client.autofill(tx)
+    assert.strictEqual(txResult.Fee, '12')
+    assert.strictEqual(txResult.Sequence, 23)
+    assert.strictEqual(txResult.LastLedgerSequence, 9038234)
+  })
 })

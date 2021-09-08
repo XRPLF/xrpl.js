@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
+// eslint-disable-next-line import/no-cycle -- Client is only used as a type
 import { Client } from '..'
 import { ValidationError } from '../common/errors'
 import { AccountInfoRequest, LedgerRequest } from '../models/methods'
@@ -12,7 +13,7 @@ import { xrpToDrops } from '../utils'
 const LEDGER_OFFSET = 20
 // 5 XRP
 const ACCOUNT_DELETE_FEE = 5000000
-export interface ClassicAccountAndTag {
+interface ClassicAccountAndTag {
   classicAccount: string
   tag: number | false | undefined
 }
