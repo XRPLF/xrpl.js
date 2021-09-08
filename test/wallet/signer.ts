@@ -186,19 +186,13 @@ describe('Signer', function () {
   })
 
   it('multisign runs successfully with Transaction objects', function () {
-    const transactions: Transaction[] = [
-      multisignTxToCombine1,
-      multisignTxToCombine2,
-    ]
+    const transactions = [multisignTxToCombine1, multisignTxToCombine2]
 
     assert.deepEqual(multisign(transactions), expectedMultisign)
   })
 
   it('multisign runs successfully with tx_blobs', function () {
-    const transactions: Transaction[] = [
-      multisignTxToCombine1,
-      multisignTxToCombine2,
-    ]
+    const transactions = [multisignTxToCombine1, multisignTxToCombine2]
 
     const encodedTransactions: string[] = transactions.map(encode)
 
@@ -206,7 +200,7 @@ describe('Signer', function () {
   })
 
   it('multisign throws a validation error when there are no transactions', function () {
-    const transactions: Transaction[] = []
+    const transactions = []
     assert.throws(() => multisign(transactions), ValidationError)
   })
 
@@ -232,10 +226,7 @@ describe('Signer', function () {
       ],
     }
 
-    const transactions: Transaction[] = [
-      multisignTxToCombine1,
-      differentMultisignedTx,
-    ]
+    const transactions = [multisignTxToCombine1, differentMultisignedTx]
 
     assert.throws(() => multisign(transactions))
   })
@@ -273,21 +264,21 @@ describe('Signer', function () {
   })
 
   it('verifySignature succeeds for valid signed transaction blob', function () {
-    const signedTx: string = sign(verifyWallet, tx)
+    const signedTx = sign(verifyWallet, tx)
 
     assert.isTrue(verifySignature(signedTx))
   })
 
   it('verify succeeds for valid signed transaction object', function () {
-    const signedTx: string = sign(verifyWallet, tx)
+    const signedTx = sign(verifyWallet, tx)
 
     assert.isTrue(verifySignature(decode(signedTx) as unknown as Transaction))
   })
 
   it('verify throws for invalid signing key', function () {
-    const signedTx: string = sign(verifyWallet, tx)
+    const signedTx = sign(verifyWallet, tx)
 
-    const decodedTx: Transaction = decode(signedTx) as unknown as Transaction
+    const decodedTx = decode(signedTx) as unknown as Transaction
 
     // Use a different key for validation
     decodedTx.SigningPubKey =
