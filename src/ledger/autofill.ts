@@ -1,8 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
-// eslint-disable-next-line import/no-cycle -- Client is only used as a type
-import { Client } from '..'
+import type { Client } from '..'
 import { ValidationError } from '../common/errors'
 import { AccountInfoRequest, LedgerRequest } from '../models/methods'
 import { Transaction } from '../models/transactions'
@@ -75,7 +74,7 @@ function validateAccountAddress(
   // eslint-disable-next-line no-param-reassign -- param reassign is safe
   tx[accountField] = classicAccount
 
-  if (tag !== null) {
+  if (tag != null) {
     if (tx[tagField] && tx[tagField] !== tag) {
       throw new ValidationError(
         `The ${tagField}, if present, must match the tag of the ${accountField} X-address`,
@@ -109,6 +108,7 @@ function getClassicAccountAndTag(
 }
 
 function convertToClassicAddress(tx: Transaction, fieldName: string): void {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- assignment is safe
   const account = tx[fieldName]
   if (typeof account === 'string') {
     const { classicAccount } = getClassicAccountAndTag(account)
@@ -145,6 +145,7 @@ async function calculateFeePerTransactionType(
     const fulfillmentBytesSize: number = Math.ceil(tx.Fulfillment.length / 2)
     // 10 drops × (33 + (Fulfillment size in bytes / 16))
     const product = new BigNumber(
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expected use of magic numbers
       scaleValue(netFeeDrops, 33 + fulfillmentBytesSize / 16),
     )
     baseFee = product.dp(0, BigNumber.ROUND_CEIL)
@@ -168,12 +169,12 @@ async function calculateFeePerTransactionType(
       : BigNumber.min(baseFee, maxFeeDrops)
 
   // Round up baseFee and return it as a string
-  // eslint-disable-next-line no-param-reassign -- param reassign is safe
+  // eslint-disable-next-line no-param-reassign, @typescript-eslint/no-magic-numbers -- param reassign is safe, base 10 magic num
   tx.Fee = totalFee.dp(0, BigNumber.ROUND_CEIL).toString(10)
 }
 
-function scaleValue(value, multiplier, extra = 0): string {
-  return new BigNumber(value).times(multiplier).plus(extra).toString()
+function scaleValue(value, multiplier): string {
+  return new BigNumber(value).times(multiplier).toString()
 }
 
 async function setLatestValidatedLedgerSequence(

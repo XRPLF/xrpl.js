@@ -1,4 +1,4 @@
-/* eslint-disable no-bitwise -- expected use of bitwise */
+/* eslint-disable no-bitwise -- flags require bitwise operations */
 import { assert } from 'chai'
 
 import {

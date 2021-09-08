@@ -1,3 +1,7 @@
+/* eslint-disable no-param-reassign -- param reassign is safe */
+/* eslint-disable no-bitwise -- flags require bitwise operations */
+import { ValidationError } from '../../common/errors'
+// eslint-disable-next-line import/no-cycle -- cycle is safe
 import {
   OfferCreateFlags,
   OfferCreateFlagsEnum,
@@ -9,6 +13,7 @@ import {
   TrustSetFlags,
   TrustSetFlagsEnum,
 } from '../transactions'
+import type { GlobalFlags } from '../transactions/common'
 
 /**
  * Verify that all fields of an object are in fields.
@@ -32,7 +37,6 @@ export function onlyHasFields(
  * @returns True if checkFlag is enabled within Flags.
  */
 export function isFlagEnabled(Flags: number, checkFlag: number): boolean {
-  // eslint-disable-next-line no-bitwise -- Flags require bitwise operations
   return (checkFlag & Flags) === checkFlag
 }
 
@@ -40,7 +44,6 @@ export function isFlagEnabled(Flags: number, checkFlag: number): boolean {
  * Sets a transaction's flags to its numeric representation.
  *
  * @param tx - A transaction to set its flags to its numeric representation.
- * @returns
  */
 export function setTransactionFlagsToNumber(tx: Transaction): void {
   if (tx.Flags == null) {
@@ -53,20 +56,16 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
 
   switch (tx.TransactionType) {
     case 'OfferCreate':
-      tx.Flags = convertOfferCreateFlagsToNumber(tx.Flags as OfferCreateFlags)
+      tx.Flags = convertOfferCreateFlagsToNumber(tx.Flags)
       return
     case 'PaymentChannelClaim':
-      tx.Flags = convertPaymentChannelClaimFlagsToNumber(
-        tx.Flags as PaymentChannelClaimFlags,
-      )
+      tx.Flags = convertPaymentChannelClaimFlagsToNumber(tx.Flags)
       return
     case 'Payment':
-      tx.Flags = convertPaymentTransactionFlagsToNumber(
-        tx.Flags as PaymentTransactionFlags,
-      )
+      tx.Flags = convertPaymentTransactionFlagsToNumber(tx.Flags)
       return
     case 'TrustSet':
-      tx.Flags = convertTrustSetFlagsToNumber(tx.Flags as TrustSetFlags)
+      tx.Flags = convertTrustSetFlagsToNumber(tx.Flags)
       return
     default:
       tx.Flags = 0
@@ -74,75 +73,35 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
 }
 
 function convertOfferCreateFlagsToNumber(flags: OfferCreateFlags): number {
-  let resultFlags = 0
-
-  if (flags.tfPassive) {
-    resultFlags |= OfferCreateFlagsEnum.tfPassive
-  }
-  if (flags.tfImmediateOrCancel) {
-    resultFlags |= OfferCreateFlagsEnum.tfImmediateOrCancel
-  }
-  if (flags.tfFillOrKill) {
-    resultFlags |= OfferCreateFlagsEnum.tfFillOrKill
-  }
-  if (flags.tfSell) {
-    resultFlags |= OfferCreateFlagsEnum.tfSell
-  }
-
-  return resultFlags
+  return reduceFlags(flags, OfferCreateFlagsEnum)
 }
 
 function convertPaymentChannelClaimFlagsToNumber(
   flags: PaymentChannelClaimFlags,
 ): number {
-  let resultFlags = 0
-
-  if (flags.tfRenew) {
-    resultFlags |= PaymentChannelClaimFlagsEnum.tfRenew
-  }
-  if (flags.tfClose) {
-    resultFlags |= PaymentChannelClaimFlagsEnum.tfClose
-  }
-
-  return resultFlags
+  return reduceFlags(flags, PaymentChannelClaimFlagsEnum)
 }
 
 function convertPaymentTransactionFlagsToNumber(
   flags: PaymentTransactionFlags,
 ): number {
-  let resultFlags = 0
-
-  if (flags.tfNoDirectRipple) {
-    resultFlags |= PaymentTransactionFlagsEnum.tfNoDirectRipple
-  }
-  if (flags.tfPartialPayment) {
-    resultFlags |= PaymentTransactionFlagsEnum.tfPartialPayment
-  }
-  if (flags.tfLimitQuality) {
-    resultFlags |= PaymentTransactionFlagsEnum.tfLimitQuality
-  }
-
-  return resultFlags
+  return reduceFlags(flags, PaymentTransactionFlagsEnum)
 }
 
 function convertTrustSetFlagsToNumber(flags: TrustSetFlags): number {
-  let resultFlags = 0
+  return reduceFlags(flags, TrustSetFlagsEnum)
+}
 
-  if (flags.tfSetfAuth) {
-    resultFlags |= TrustSetFlagsEnum.tfSetfAuth
-  }
-  if (flags.tfSetNoRipple) {
-    resultFlags |= TrustSetFlagsEnum.tfSetNoRipple
-  }
-  if (flags.tfClearNoRipple) {
-    resultFlags |= TrustSetFlagsEnum.tfClearNoRipple
-  }
-  if (flags.tfSetFreeze) {
-    resultFlags |= TrustSetFlagsEnum.tfSetFreeze
-  }
-  if (flags.tfClearFreeze) {
-    resultFlags |= TrustSetFlagsEnum.tfClearFreeze
-  }
-
-  return resultFlags
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- added ValidationError check for flagEnum
+function reduceFlags(flags: GlobalFlags, flagEnum: any): number {
+  return Object.keys(flags).reduce((resultFlags, flag) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
+    if (flagEnum[flag] == null) {
+      throw new ValidationError(
+        `flag ${flag} doesn't exist in flagEnum: ${JSON.stringify(flagEnum)}`,
+      )
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
+    return flags[flag] ? resultFlags | flagEnum[flag] : resultFlags
+  }, 0)
 }
