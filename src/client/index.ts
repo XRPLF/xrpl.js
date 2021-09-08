@@ -124,8 +124,6 @@ import prepareSettings from '../transaction/settings'
 import { sign } from '../transaction/sign'
 import prepareTicketCreate from '../transaction/ticket'
 import prepareTrustline from '../transaction/trustline'
-import { TransactionJSON, Instructions, Prepare } from '../transaction/types'
-import * as transactionUtils from '../transaction/utils'
 import { deriveAddress, deriveXAddress } from '../utils/derive'
 import generateFaucetWallet from '../wallet/generateFaucetWallet'
 
@@ -426,21 +424,8 @@ class Client extends EventEmitter {
     return super.on(eventName, listener)
   }
 
-  /**
-   * Prepare a transaction.
-   *
-   * You can later submit the transaction with a `submit` request.
-   *
-   * @param txJSON - TODO: will be deleted.
-   * @param instructions - TODO: will be deleted.
-   * @returns TODO: will be deleted.
-   */
-  public async prepareTransaction(
-    txJSON: TransactionJSON,
-    instructions: Instructions = {},
-  ): Promise<Prepare> {
-    return transactionUtils.prepareTransaction(txJSON, this, instructions)
-  }
+  // @deprecated Use autofill instead
+  public prepareTransaction = prepend(autofill, this)
 
   public async requestAll(
     req: AccountChannelsRequest,
