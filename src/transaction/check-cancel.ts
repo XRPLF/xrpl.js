@@ -1,36 +1,34 @@
 import type { Client } from '..'
+import autofill from '../ledger/autofill'
+import { CheckCancel, Transaction } from '../models/transactions'
 
-import { Instructions, Prepare, TransactionJSON } from './types'
-import { prepareTransaction } from './utils'
-
-export interface CheckCancelParameters {
+interface CheckCancelParameters {
   checkID: string
 }
 
 function createCheckCancelTransaction(
   account: string,
   cancel: CheckCancelParameters,
-): TransactionJSON {
-  const txJSON = {
+): CheckCancel {
+  const transaction: CheckCancel = {
     Account: account,
     TransactionType: 'CheckCancel',
     CheckID: cancel.checkID,
   }
 
-  return txJSON
+  return transaction
 }
 
 async function prepareCheckCancel(
   this: Client,
   address: string,
   checkCancel: CheckCancelParameters,
-  instructions: Instructions = {},
-): Promise<Prepare> {
+): Promise<Transaction> {
   try {
-    const txJSON = createCheckCancelTransaction(address, checkCancel)
-    return await prepareTransaction(txJSON, this, instructions)
-  } catch (e) {
-    return Promise.reject(e)
+    const transaction = createCheckCancelTransaction(address, checkCancel)
+    return await autofill(this, transaction)
+  } catch (error) {
+    return Promise.reject(error)
   }
 }
 
