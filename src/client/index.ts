@@ -20,7 +20,6 @@ import {
   decodeXAddress,
 } from 'ripple-address-codec'
 
-import { partial } from '..'
 import { constants, errors, txFlags, ensureClassicAddress } from '../common'
 import { ValidationError, XrplError } from '../common/errors'
 import getFee from '../common/fee'
@@ -171,6 +170,20 @@ function getCollectKeyFromCommand(command: string): string | null {
   }
 }
 
+/**
+ * It returns a function that prepends params to the given func.
+ * A sugar function for JavaScript .bind() without the "this" (keyword) binding.
+ *
+ * @param func - A function to prepend params.
+ * @param params - Parameters to prepend to a function.
+ * @returns A function bound with params.
+ */
+// eslint-disable-next-line @typescript-eslint/ban-types -- expected param types
+function prepend(func: Function, ...params: unknown[]): Function {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- safe to return
+  return func.bind(null, ...params)
+}
+
 interface MarkerRequest extends BaseRequest {
   limit?: number
   marker?: unknown
@@ -201,8 +214,7 @@ class Client extends EventEmitter {
   public readonly maxFeeXRP: string
 
   // TODO: Use partial for other instance methods as well.
-  // eslint-disable-next-line @typescript-eslint/no-invalid-this -- this is expected
-  public autofill = partial(autofill, this)
+  public autofill = prepend(autofill, this)
 
   /**
    * Creates a new Client with a websocket connection to a rippled server.

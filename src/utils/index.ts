@@ -214,21 +214,7 @@ function ISOTimeToRippleTime(iso8601: string): number {
   return unixToRippleTimestamp(Date.parse(iso8601))
 }
 
-/**
- * It returns a function that prepends params to the given func.
- * A sugar function for JavaScript .bind().
- *
- * @param func - A function to prepend params.
- * @param params - Parameters to prepend to a function.
- * @returns A function bound with params.
- */
-function partial(func: Function, ...params: any[]): Function {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- safe to return
-  return func.bind(null, ...params)
-}
-
 export {
-  partial,
   computeLedgerHeaderHash,
   dropsToXrp,
   xrpToDrops,
