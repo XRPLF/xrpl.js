@@ -11,7 +11,6 @@ import {
 
 import ECDSA from '../common/ecdsa'
 import { ValidationError } from '../common/errors'
-import { SignedTransaction } from '../common/types/objects'
 import { signOffline } from '../transaction/sign'
 import { SignOptions } from '../transaction/types'
 
@@ -126,8 +125,9 @@ class Wallet {
   signTransaction(
     transaction: any, // TODO: transaction should be typed with Transaction type.
     options: SignOptions = { signAs: '' },
-  ): SignedTransaction {
+  ): string {
     return signOffline(this, JSON.stringify(transaction), options)
+      .signedTransaction
   }
 
   /**
@@ -152,6 +152,10 @@ class Wallet {
    */
   getXAddress(tag: number, test = false): string {
     return classicAddressToXAddress(this.classicAddress, tag, test)
+  }
+
+  getClassicAddress(): string {
+    return deriveAddress(this.publicKey)
   }
 }
 

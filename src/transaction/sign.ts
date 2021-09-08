@@ -5,7 +5,6 @@ import keypairs from 'ripple-keypairs'
 
 import type { Client, Wallet } from '..'
 import { ValidationError } from '../common/errors'
-import { SignedTransaction } from '../common/types/objects'
 import { xrpToDrops } from '../utils'
 import { computeBinaryTransactionHash } from '../utils/hashes'
 
@@ -25,7 +24,7 @@ function signWithKeypair(
   options: SignOptions = {
     signAs: '',
   },
-): SignedTransaction {
+): { signedTransaction: string; id: string } {
   const tx = JSON.parse(txJSON)
   if (tx.TxnSignature || tx.Signers) {
     throw new ValidationError(
@@ -222,7 +221,7 @@ function sign(
   secret?: any,
   options?: SignOptions,
   keypair?: KeyPair,
-): SignedTransaction {
+): { signedTransaction: string; id: string } {
   if (typeof secret === 'string') {
     // we can't validate that the secret matches the account because
     // the secret could correspond to the regular key
@@ -245,7 +244,7 @@ function signOffline(
   wallet: Wallet,
   txJSON: string,
   options?: SignOptions,
-): SignedTransaction {
+): { signedTransaction: string; id: string } {
   const { publicKey, privateKey } = wallet
   return signWithKeypair(null, txJSON, { publicKey, privateKey }, options)
 }
