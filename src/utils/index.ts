@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import _ from 'lodash'
+import { isEqual, omitBy } from 'lodash'
 import { xAddressToClassicAddress } from 'ripple-address-codec'
 
 import { ValidationError } from '../common/errors'
@@ -179,7 +179,7 @@ function convertKeysFromSnakeCaseToCamelCase(obj: any): any {
 }
 
 function removeUndefined<T extends object>(obj: T): T {
-  return _.omitBy(obj, (value) => value == null) as T
+  return omitBy(obj, (value) => value == null) as T
 }
 
 /**

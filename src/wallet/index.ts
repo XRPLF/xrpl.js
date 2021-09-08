@@ -12,6 +12,7 @@ import {
 import ECDSA from '../common/ecdsa'
 import { ValidationError } from '../common/errors'
 import { Transaction } from '../models/transactions'
+
 import { sign } from './signer'
 
 /**
@@ -120,14 +121,13 @@ class Wallet {
    *
    * @param transaction - A transaction to be signed offline.
    * @param options - Options to include for signing.
+   * @param forMultisign
    * @returns A signed transaction.
    */
-  signTransaction(
-    transaction: Transaction,
-    forMultisign: boolean = false,
-  ): string {
+  signTransaction(transaction: Transaction, forMultisign = false): string {
     return sign(
-      this,
+      this.publicKey,
+      this.privateKey,
       transaction,
       forMultisign ? { signAs: this.getClassicAddress() } : { signAs: '' },
     )
