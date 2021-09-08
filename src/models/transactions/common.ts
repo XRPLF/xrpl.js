@@ -55,7 +55,13 @@ const SIGNER_SIZE = 3
 
 function isSigner(obj: unknown): boolean {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-  const signer = obj as Record<string, unknown>
+  const signerWrapper = obj as Record<string, unknown>
+
+  if (signerWrapper.Signer == null) {
+    return false
+  }
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS and Signer is previously unknown
+  const signer = signerWrapper.Signer as Record<string, unknown>
   return (
     Object.keys(signer).length === SIGNER_SIZE &&
     typeof signer.Account === 'string' &&
@@ -105,6 +111,7 @@ export interface BaseTransaction {
   AccountTxnID?: string
   Flags?: number | GlobalFlags
   LastLedgerSequence?: number
+  // TODO: Make Memo match the format of Signer (By including the Memo: wrapper inside the Interface)
   Memos?: Array<{ Memo: Memo }>
   Signers?: Signer[]
   SourceTag?: number
