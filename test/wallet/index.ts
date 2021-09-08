@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 
 import ECDSA from '../../src/common/ecdsa'
+import { Transaction } from '../../src/models/transactions'
 import Wallet from '../../src/wallet'
 
 /**
@@ -155,7 +156,7 @@ describe('Wallet', function () {
     const address = 'rhvh5SrgBL5V8oeV9EpDuVszeJSSCEkbPc'
 
     it('signs a transaction offline', function () {
-      const txJSON = {
+      const tx: Transaction = {
         TransactionType: 'Payment',
         Account: address,
         Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
@@ -165,7 +166,7 @@ describe('Wallet', function () {
         SigningPubKey: publicKey,
       }
       const wallet = new Wallet(publicKey, privateKey)
-      const signedTx: string = wallet.signTransaction(txJSON)
+      const signedTx: string = wallet.signTransaction(tx)
 
       // TODO: Check the output of the signature against a known result
       assert.isString(signedTx)

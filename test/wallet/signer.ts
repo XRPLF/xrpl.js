@@ -180,7 +180,7 @@ describe('Signer', function () {
     const wallet = Wallet.fromSeed(unsignedSecret1)
 
     assert.deepEqual(
-      decode(sign(wallet, unsignedTx1, true)),
+      decode(sign(wallet, unsignedTx1, { signAs: wallet.getClassicAddress() })),
       multisignTx1 as unknown as JsonObject,
     )
   })
