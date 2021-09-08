@@ -1,12 +1,10 @@
 import type { Client } from '..'
 import { ValidationError } from '../common/errors'
 import { Amount } from '../common/types/objects'
+import { CheckCash, Transaction } from '../models/transactions'
 import { toRippledAmount } from '../utils'
 
-import { Instructions, Prepare, TransactionJSON } from './types'
-import * as utils from './utils'
-
-export interface CheckCashParameters {
+interface CheckCashParameters {
   checkID: string
   amount?: Amount
   deliverMin?: Amount
@@ -15,7 +13,7 @@ export interface CheckCashParameters {
 function createCheckCashTransaction(
   account: string,
   checkCash: CheckCashParameters,
-): TransactionJSON {
+): Transaction {
   if (checkCash.amount && checkCash.deliverMin) {
     throw new ValidationError(
       '"amount" and "deliverMin" properties on ' +
@@ -23,32 +21,31 @@ function createCheckCashTransaction(
     )
   }
 
-  const txJSON: any = {
+  const transaction: CheckCash = {
     Account: account,
     TransactionType: 'CheckCash',
     CheckID: checkCash.checkID,
   }
 
   if (checkCash.amount != null) {
-    txJSON.Amount = toRippledAmount(checkCash.amount)
+    transaction.Amount = toRippledAmount(checkCash.amount)
   }
 
   if (checkCash.deliverMin != null) {
-    txJSON.DeliverMin = toRippledAmount(checkCash.deliverMin)
+    transaction.DeliverMin = toRippledAmount(checkCash.deliverMin)
   }
 
-  return txJSON
+  return transaction
 }
 
 async function prepareCheckCash(
   this: Client,
   address: string,
   checkCash: CheckCashParameters,
-  instructions: Instructions = {},
-): Promise<Prepare> {
+): Promise<Transaction> {
   try {
-    const txJSON = createCheckCashTransaction(address, checkCash)
-    return await utils.prepareTransaction(txJSON, this, instructions)
+    const transaction = createCheckCashTransaction(address, checkCash)
+    return await autofill(this, transaction)
   } catch (e) {
     return Promise.reject(e)
   }
