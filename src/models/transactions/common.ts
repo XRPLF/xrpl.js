@@ -95,9 +95,7 @@ export function isAmount(amount: unknown): boolean {
   )
 }
 
-export interface GlobalFlags {
-  tfFullyCanonicalSig: boolean
-}
+export interface GlobalFlags {}
 
 export interface BaseTransaction {
   Account: string
