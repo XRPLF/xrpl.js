@@ -214,6 +214,72 @@ function ISOTimeToRippleTime(iso8601: string): number {
   return unixToRippleTimestamp(Date.parse(iso8601))
 }
 
+/**
+ * Compares two objects and creates a diff.
+ *
+ * @param a - An object to compare.
+ * @param b - The other object to compare with.
+ *
+ * @returns An object containing the differences between the two objects.
+ */
+function objectDiff(a: object, b: object): object {
+  const diffs = {}
+
+  // Compare two items and push non-matches to object
+  const compare = function (i1: any, i2: any, k: string): void {
+    const type1 = Object.prototype.toString.call(i1)
+    const type2 = Object.prototype.toString.call(i2)
+    if (type2 === '[object Undefined]') {
+      diffs[k] = null // Indicate that the item has been removed
+      return
+    }
+    if (type1 !== type2) {
+      diffs[k] = i2 // Indicate that the item has changed types
+      return
+    }
+    if (type1 === '[object Object]') {
+      const objDiff = objectDiff(i1, i2)
+      if (Object.keys(objDiff).length > 0) {
+        diffs[k] = objDiff
+      }
+      return
+    }
+    if (type1 === '[object Array]') {
+      if (!isEqual(i1, i2)) {
+        diffs[k] = i2 // If arrays do not match, add second item to diffs
+      }
+      return
+    }
+    if (type1 === '[object Function]') {
+      if (i1.toString() !== i2.toString()) {
+        diffs[k] = i2 // If functions differ, add second one to diffs
+      }
+      return
+    }
+    if (i1 !== i2) {
+      diffs[k] = i2
+    }
+  }
+
+  // Check items in first object
+  for (const key in a) {
+    if (a.hasOwnProperty(key)) {
+      compare(a[key], b[key], key)
+    }
+  }
+
+  // Get items that are in the second object but not the first
+  for (const key in b) {
+    if (b.hasOwnProperty(key)) {
+      if (!a[key] && a[key] !== b[key]) {
+        diffs[key] = b[key]
+      }
+    }
+  }
+
+  return diffs
+}
+
 export {
   computeLedgerHeaderHash,
   dropsToXrp,
@@ -240,6 +306,7 @@ export {
   deriveKeypair,
   deriveAddress,
   deriveXAddress,
+  objectDiff,
   signPaymentChannelClaim,
   verifyPaymentChannelClaim,
 }
