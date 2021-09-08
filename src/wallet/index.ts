@@ -11,8 +11,8 @@ import {
 
 import ECDSA from '../common/ecdsa'
 import { ValidationError } from '../common/errors'
-import { Transaction } from '../models/transactions'
-import { sign } from './signer'
+import { signOffline } from '../transaction/sign'
+import { SignOptions } from '../transaction/types'
 
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
@@ -123,14 +123,11 @@ class Wallet {
    * @returns A signed transaction.
    */
   signTransaction(
-    transaction: Transaction,
-    forMultisign: boolean = false,
+    transaction: any, // TODO: transaction should be typed with Transaction type.
+    options: SignOptions = { signAs: '' },
   ): string {
-    return sign(
-      this,
-      transaction,
-      forMultisign ? { signAs: this.getClassicAddress() } : { signAs: '' },
-    )
+    return signOffline(this, JSON.stringify(transaction), options)
+      .signedTransaction
   }
 
   /**
