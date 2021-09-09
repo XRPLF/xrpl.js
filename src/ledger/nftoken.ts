@@ -125,13 +125,19 @@ export const isNFTokenValid = async (
   return true
 }
 
+export interface CreateNFTokenParameters extends NFTokenParameters {
+  skipValidation?: boolean,
+}
+
 export const createNFToken = async (
   client: RippleAPI,
   senderSecret: string,
-  params: NFTokenParameters,
+  params: CreateNFTokenParameters,
 ): Promise<Object> => {
   // Validate prospective token
-  await validateNFToken(params)
+  if (params.skipValidation !== true) {
+    await validateNFToken(params)
+  }
 
   // Create tx
   const mintTx = {
