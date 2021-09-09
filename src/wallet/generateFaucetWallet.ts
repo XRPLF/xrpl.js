@@ -35,7 +35,6 @@ async function generateFaucetWallet(
   client: Client,
   wallet?: Wallet,
 ): Promise<Wallet | void> {
-  console.log('generateFaucetWallet')
   if (!client.isConnected()) {
     throw new RippledError('Client not connected, cannot call faucet')
   }
