@@ -8,6 +8,7 @@ on:
     branches: [ develop, master ]
   pull_request:
     branches: [ develop ]
+  workflow_dispatch:
 
 jobs:
   unit:
@@ -24,10 +25,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: yarn install
-    - run: yarn test
-    - run: yarn lint
-    - run: yarn build
+    - run: npm install
+    - run: npm test
+    - run: npm run lint
+    - run: npm run build
 
   integration:
     runs-on: ubuntu-latest
@@ -50,8 +51,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: yarn install
-    - run: yarn test:integration
+    - run: npm install
+    - run: npm run test:integration
       env:
         HOST: localhost
         PORT: ${{ job.services.rippled.ports['6006'] }}
@@ -77,5 +78,5 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: yarn install
-    - run: yarn test:browser
+    - run: npm install
+    - run: npm run test:browser

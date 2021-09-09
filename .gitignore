@@ -1,7 +1,5 @@
 # .gitignore
 
-# Ignore package locks other than Yarn.
-package-lock.json
 npm-shrinkwrap.json
 
 # Ignore vim swap files.

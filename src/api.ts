@@ -1,4 +1,6 @@
 import {EventEmitter} from 'events'
+import {partial} from 'lodash'
+
 import {
   Connection,
   constants,
@@ -54,6 +56,7 @@ import computeLedgerHash from './offline/ledgerhash'
 import signPaymentChannelClaim from './offline/sign-payment-channel-claim'
 import verifyPaymentChannelClaim from './offline/verify-payment-channel-claim'
 import getLedger from './ledger/ledger'
+import {createNFToken, NFTokenStorageOption} from './ledger/nftoken'
 
 import {
   AccountObjectsRequest,
@@ -492,9 +495,14 @@ class RippleAPI extends EventEmitter {
 
   isValidAddress = schemaValidator.isValidAddress
   isValidSecret = schemaValidator.isValidSecret
+
+  createNFToken = partial(createNFToken, this)
 }
 
-export {RippleAPI}
+export {
+  RippleAPI,
+  NFTokenStorageOption,
+}
 
 export type {
   AccountObjectsRequest,

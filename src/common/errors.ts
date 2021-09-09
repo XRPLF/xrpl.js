@@ -34,6 +34,8 @@ class RippleError extends Error {
   }
 }
 
+class ArgumentError extends RippleError {}
+
 class RippledError extends RippleError {}
 
 class UnexpectedError extends RippleError {}
@@ -82,6 +84,7 @@ export {
   RippleError,
   UnexpectedError,
   ConnectionError,
+  ArgumentError,
   RippledError,
   NotConnectedError,
   DisconnectedError,
