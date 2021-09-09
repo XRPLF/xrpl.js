@@ -3,9 +3,7 @@ import binary from 'ripple-binary-codec'
 
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
-import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
-import { addressTests } from '../testUtils'
 
 const { sign: REQUEST_FIXTURES } = requests
 const { sign: RESPONSE_FIXTURES } = responses
@@ -228,188 +226,143 @@ describe('client.sign', function () {
     assert.deepEqual(result, RESPONSE_FIXTURES.ticket)
   })
 
-  addressTests.forEach(function (test) {
-    describe(test.type, function () {
-      it('throws when Fee exceeds maxFeeXRP (in drops)', async function () {
-        const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
-        const request = {
-          txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"${test.address}","Domain":"6578616D706C652E636F6D","LastLedgerSequence":8820051,"Fee":"2010000","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
-          instructions: {
-            fee: '2.01',
-            sequence: 23,
-            maxLedgerVersion: 8820051,
-          },
-        }
+  it('throws when Fee exceeds maxFeeXRP (in drops)', async function () {
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
+    const request = {
+      txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"6578616D706C652E636F6D","LastLedgerSequence":8820051,"Fee":"2010000","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
+      instructions: {
+        fee: '2.01',
+        sequence: 23,
+        maxLedgerVersion: 8820051,
+      },
+    }
 
-        assert.throws(() => {
-          this.client.sign(request.txJSON, secret)
-        }, /Fee" should not exceed "2000000"\. To use a higher fee, set `maxFeeXRP` in the Client constructor\./)
-      })
+    assert.throws(() => {
+      this.client.sign(request.txJSON, secret)
+    }, /Fee" should not exceed "2000000"\. To use a higher fee, set `maxFeeXRP` in the Client constructor\./)
+  })
 
-      it('throws when Fee exceeds maxFeeXRP (in drops) - custom maxFeeXRP', async function () {
-        this.client.maxFeeXRP = '1.9'
-        const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
-        const request = {
-          txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"${test.address}","Domain":"6578616D706C652E636F6D","LastLedgerSequence":8820051,"Fee":"2010000","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
-          instructions: {
-            fee: '2.01',
-            sequence: 23,
-            maxLedgerVersion: 8820051,
-          },
-        }
+  it('throws when Fee exceeds maxFeeXRP (in drops) - custom maxFeeXRP', async function () {
+    this.client.maxFeeXRP = '1.9'
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
+    const request = {
+      txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"6578616D706C652E636F6D","LastLedgerSequence":8820051,"Fee":"2010000","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
+      instructions: {
+        fee: '2.01',
+        sequence: 23,
+        maxLedgerVersion: 8820051,
+      },
+    }
 
-        assert.throws(() => {
-          this.client.sign(request.txJSON, secret)
-        }, /Fee" should not exceed "1900000"\. To use a higher fee, set `maxFeeXRP` in the Client constructor\./)
-      })
+    assert.throws(() => {
+      this.client.sign(request.txJSON, secret)
+    }, /Fee" should not exceed "1900000"\. To use a higher fee, set `maxFeeXRP` in the Client constructor\./)
+  })
 
-      it('sign with paths', async function () {
-        this.mockRippled.addResponse('server_info', rippled.server_info.normal)
-        this.mockRippled.addResponse('fee', rippled.fee)
-        this.mockRippled.addResponse('ledger_current', rippled.ledger_current)
-        this.mockRippled.addResponse(
-          'account_info',
-          rippled.account_info.normal,
-        )
-        const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
-        const payment = {
-          source: {
-            address: test.address,
-            amount: {
-              currency: 'drops',
-              value: '100',
-            },
-          },
-          destination: {
-            address: 'rKT4JX4cCof6LcDYRz8o3rGRu7qxzZ2Zwj',
-            minAmount: {
-              currency: 'USD',
-              value: '0.00004579644712312366',
-              counterparty: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc',
-            },
-          },
-          // eslint-disable-next-line no-useless-escape
-          paths:
-            '[[{"currency":"USD","issuer":"rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc"}]]',
-        }
-        const ret = await this.client.preparePayment(test.address, payment, {
-          sequence: 1,
-          maxLedgerVersion: 15696358,
-        })
-        const result = this.client.sign(ret.txJSON, secret)
-        assert.deepEqual(result, {
-          signedTransaction:
-            '12000022800200002400000001201B00EF81E661EC6386F26FC0FFFF0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461968400000000000000C6940000000000000646AD3504529A0465E2E0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D1664619732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D87446304402200A693FB5CA6B21250EBDFD8CFF526EE0DF7C9E4E31EB0660692E75E6A93BF5F802203CC39463DDA21386898CA31E18AD1A6828647D65741DD637BAD71BC83E29DB9481145E7B112523F68D2F5E879DB4EAC51C6698A693048314CA6EDC7A28252DAEA6F2045B24F4D7C333E146170112300000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461900',
-          id: '78874FE5F5299FEE3EA85D3CF6C1FB1F1D46BB08F716662A3E3D1F0ADE4EF796',
-        })
-      })
-
-      it('succeeds - prepared payment', async function () {
-        this.mockRippled.addResponse('server_info', rippled.server_info.normal)
-        this.mockRippled.addResponse('fee', rippled.fee)
-        this.mockRippled.addResponse('ledger_current', rippled.ledger_current)
-        this.mockRippled.addResponse(
-          'account_info',
-          rippled.account_info.normal,
-        )
-        const payment = await this.client.preparePayment(test.address, {
-          source: {
-            address: test.address,
-            maxAmount: {
-              value: '1',
-              currency: 'drops',
-            },
-          },
-          destination: {
-            address: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
-            amount: {
-              value: '1',
-              currency: 'drops',
-            },
-          },
-        })
-        const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
-        const result = this.client.sign(payment.txJSON, secret)
-        const expectedResult = {
-          signedTransaction:
-            '12000022800000002400000017201B008694F261400000000000000168400000000000000C732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D874473045022100A9C91D4CFAE45686146EE0B56D4C53A2E7C2D672FB834D43E0BE2D2E9106519A022075DDA2F92DE552B0C45D83D4E6D35889B3FBF51BFBBD9B25EBF70DE3C96D0D6681145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
-          id: '88D6B913C66279EA31ADC25C5806C48B2D4E5680261666790A736E1961217700',
-        }
-        assert.deepEqual(result, expectedResult)
-      })
-
-      it('throws when encoded tx does not match decoded tx - prepared payment', async function () {
-        this.mockRippled.addResponse('server_info', rippled.server_info.normal)
-        this.mockRippled.addResponse('fee', rippled.fee)
-        this.mockRippled.addResponse('ledger_current', rippled.ledger_current)
-        this.mockRippled.addResponse(
-          'account_info',
-          rippled.account_info.normal,
-        )
-        const payment = await this.client.preparePayment(test.address, {
-          source: {
-            address: test.address,
-            maxAmount: {
-              value: '1.1234567',
-              currency: 'drops',
-            },
-          },
-          destination: {
-            address: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
-            amount: {
-              value: '1.1234567',
-              currency: 'drops',
-            },
-          },
-        })
-        const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
-        assert.throws(() => {
-          this.client.sign(payment.txJSON, secret)
-        }, /^1.1234567 is an illegal amount/)
-      })
-
-      it('throws when encoded tx does not match decoded tx - prepared order', async function () {
-        this.mockRippled.addResponse('server_info', rippled.server_info.normal)
-        this.mockRippled.addResponse('fee', rippled.fee)
-        this.mockRippled.addResponse('ledger_current', rippled.ledger_current)
-        this.mockRippled.addResponse(
-          'account_info',
-          rippled.account_info.normal,
-        )
-        const order = {
-          direction: 'sell',
-          quantity: {
-            currency: 'USD',
-            counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '3.140000',
-          },
-          totalPrice: {
-            currency: 'XRP',
-            value: '31415',
-          },
-        }
-        const prepared = await this.client.prepareOrder(test.address, order, {
-          sequence: 123,
-        })
-        const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
-        try {
-          this.client.sign(prepared.txJSON, secret)
-          return await Promise.reject(
-            new Error('this.client.sign should have thrown'),
-          )
-        } catch (error) {
-          assert.equal(error.name, 'ValidationError')
-          assert.equal(
-            error.message,
-            'Serialized transaction does not match original txJSON. See `error.data`',
-          )
-          assert.deepEqual(error.data.diff, {
-            TakerGets: {
-              value: '3.14',
-            },
-          })
-        }
-      })
+  it('sign with paths', async function () {
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
+    const payment = {
+      TransactionType: 'Payment',
+      Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+      Destination: 'rKT4JX4cCof6LcDYRz8o3rGRu7qxzZ2Zwj',
+      Amount: {
+        currency: 'USD',
+        issuer: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc',
+        value:
+          '999999999999999900000000000000000000000000000000000000000000000000000000000000000000000000000000',
+      },
+      Flags: 2147614720,
+      SendMax: '100',
+      DeliverMin: {
+        currency: 'USD',
+        issuer: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc',
+        value: '0.00004579644712312366',
+      },
+      Paths: [
+        [{ currency: 'USD', issuer: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc' }],
+      ],
+      LastLedgerSequence: 15696358,
+      Sequence: 1,
+      Fee: '12',
+    }
+    const result = this.client.sign(JSON.stringify(payment), secret)
+    assert.deepEqual(result, {
+      signedTransaction:
+        '12000022800200002400000001201B00EF81E661EC6386F26FC0FFFF0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461968400000000000000C6940000000000000646AD3504529A0465E2E0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D1664619732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D87446304402200A693FB5CA6B21250EBDFD8CFF526EE0DF7C9E4E31EB0660692E75E6A93BF5F802203CC39463DDA21386898CA31E18AD1A6828647D65741DD637BAD71BC83E29DB9481145E7B112523F68D2F5E879DB4EAC51C6698A693048314CA6EDC7A28252DAEA6F2045B24F4D7C333E146170112300000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461900',
+      id: '78874FE5F5299FEE3EA85D3CF6C1FB1F1D46BB08F716662A3E3D1F0ADE4EF796',
     })
+  })
+
+  it('succeeds - prepared payment', async function () {
+    const payment = {
+      TransactionType: 'Payment',
+      Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+      Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+      Amount: '1',
+      Flags: 2147483648,
+      Sequence: 23,
+      LastLedgerSequence: 8819954,
+      Fee: '12',
+    }
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
+    const result = this.client.sign(JSON.stringify(payment), secret)
+    const expectedResult = {
+      signedTransaction:
+        '12000022800000002400000017201B008694F261400000000000000168400000000000000C732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D874473045022100A9C91D4CFAE45686146EE0B56D4C53A2E7C2D672FB834D43E0BE2D2E9106519A022075DDA2F92DE552B0C45D83D4E6D35889B3FBF51BFBBD9B25EBF70DE3C96D0D6681145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
+      id: '88D6B913C66279EA31ADC25C5806C48B2D4E5680261666790A736E1961217700',
+    }
+    assert.deepEqual(result, expectedResult)
+  })
+
+  it('throws when encoded tx does not match decoded tx - prepared payment', async function () {
+    const payment = {
+      TransactionType: 'Payment',
+      Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+      Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+      Amount: '1.1234567',
+      Flags: 2147483648,
+      Sequence: 23,
+      LastLedgerSequence: 8819954,
+      Fee: '12',
+    }
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
+    assert.throws(() => {
+      this.client.sign(JSON.stringify(payment), secret)
+    }, /^1.1234567 is an illegal amount/)
+  })
+
+  it('throws when encoded tx does not match decoded tx - prepared order', async function () {
+    const offerCreate = {
+      TransactionType: 'OfferCreate',
+      Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+      TakerGets: {
+        currency: 'USD',
+        issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+        value: '3.140000',
+      },
+      TakerPays: '31415000000',
+      Flags: 2148007936,
+      Sequence: 123,
+      LastLedgerSequence: 8819954,
+      Fee: '12',
+    }
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
+    try {
+      this.client.sign(JSON.stringify(offerCreate), secret)
+      return await Promise.reject(
+        new Error('this.client.sign should have thrown'),
+      )
+    } catch (error) {
+      assert.equal(error.name, 'ValidationError')
+      assert.equal(
+        error.message,
+        'Serialized transaction does not match original txJSON. See `error.data`',
+      )
+      assert.deepEqual(error.data.diff, {
+        TakerGets: {
+          value: '3.14',
+        },
+      })
+    }
   })
 })

@@ -107,25 +107,8 @@ import {
   UnsubscribeResponse,
 } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
-import prepareCheckCancel from '../transaction/check-cancel'
-import prepareCheckCash from '../transaction/check-cash'
-import prepareCheckCreate from '../transaction/check-create'
 import combine from '../transaction/combine'
-import prepareEscrowCancellation from '../transaction/escrow-cancellation'
-import prepareEscrowCreation from '../transaction/escrow-creation'
-import prepareEscrowExecution from '../transaction/escrow-execution'
-import prepareOrder from '../transaction/order'
-import prepareOrderCancellation from '../transaction/ordercancellation'
-import preparePayment from '../transaction/payment'
-import preparePaymentChannelClaim from '../transaction/payment-channel-claim'
-import preparePaymentChannelCreate from '../transaction/payment-channel-create'
-import preparePaymentChannelFund from '../transaction/payment-channel-fund'
-import prepareSettings from '../transaction/settings'
 import { sign } from '../transaction/sign'
-import prepareTicketCreate from '../transaction/ticket'
-import prepareTrustline from '../transaction/trustline'
-import { TransactionJSON, Instructions, Prepare } from '../transaction/types'
-import * as transactionUtils from '../transaction/utils'
 import { deriveAddress, deriveXAddress } from '../utils/derive'
 import generateFaucetWallet from '../wallet/generateFaucetWallet'
 
@@ -212,9 +195,6 @@ class Client extends EventEmitter {
   // Maximum fee to use with transactions, in XRP. Must be a string-encoded
   // number. Defaults to '2'.
   public readonly maxFeeXRP: string
-
-  // TODO: Use partial for other instance methods as well.
-  public autofill = prepend(autofill, this)
 
   /**
    * Creates a new Client with a websocket connection to a rippled server.
@@ -426,22 +406,6 @@ class Client extends EventEmitter {
     return super.on(eventName, listener)
   }
 
-  /**
-   * Prepare a transaction.
-   *
-   * You can later submit the transaction with a `submit` request.
-   *
-   * @param txJSON - TODO: will be deleted.
-   * @param instructions - TODO: will be deleted.
-   * @returns TODO: will be deleted.
-   */
-  public async prepareTransaction(
-    txJSON: TransactionJSON,
-    instructions: Instructions = {},
-  ): Promise<Prepare> {
-    return transactionUtils.prepareTransaction(txJSON, this, instructions)
-  }
-
   public async requestAll(
     req: AccountChannelsRequest,
   ): Promise<AccountChannelsResponse[]>
@@ -551,6 +515,12 @@ class Client extends EventEmitter {
     return this.connection.isConnected()
   }
 
+  // TODO: Use prepend for other instance methods as well.
+  public autofill = prepend(autofill, this)
+
+  // @deprecated Use autofill instead
+  public prepareTransaction = prepend(autofill, this)
+
   public getFee = getFee
 
   public getTrustlines = getTrustlines
@@ -558,25 +528,10 @@ class Client extends EventEmitter {
   public getPaths = getPaths
   public getOrderbook = getOrderbook
 
-  public preparePayment = preparePayment
-  public prepareTrustline = prepareTrustline
-  public prepareOrder = prepareOrder
-  public prepareOrderCancellation = prepareOrderCancellation
-  public prepareEscrowCreation = prepareEscrowCreation
-  public prepareEscrowExecution = prepareEscrowExecution
-  public prepareEscrowCancellation = prepareEscrowCancellation
-  public preparePaymentChannelCreate = preparePaymentChannelCreate
-  public preparePaymentChannelFund = preparePaymentChannelFund
-  public preparePaymentChannelClaim = preparePaymentChannelClaim
-  public prepareCheckCreate = prepareCheckCreate
-  public prepareCheckCash = prepareCheckCash
-  public prepareCheckCancel = prepareCheckCancel
-  public prepareTicketCreate = prepareTicketCreate
-  public prepareSettings = prepareSettings
   public sign = sign
   public combine = combine
 
-  public generateFaucetWallet = generateFaucetWallet
+  public generateFaucetWallet = prepend(generateFaucetWallet, this)
 
   public errors = errors
 

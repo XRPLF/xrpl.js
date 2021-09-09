@@ -7,7 +7,6 @@ import type { Connection } from '../client'
 import * as common from '../common'
 import { Issue } from '../common/types/objects'
 import { AccountInfoRequest } from '../models/methods'
-import { FormattedTransactionType } from '../transaction/types'
 import { dropsToXrp } from '../utils'
 
 export interface RecursiveData {
@@ -82,32 +81,6 @@ function renameCounterpartyToIssuerInOrder(order: RequestBookOffersArgs) {
   return { ...order, ..._.omitBy(changes, (value) => value == null) }
 }
 
-function signum(num) {
-  return num === 0 ? 0 : num > 0 ? 1 : -1
-}
-
-/**
- * Order two rippled transactions based on their ledger_index.
- * If two transactions took place in the same ledger, sort
- * them based on TransactionIndex
- * See: https://developers.ripple.com/transaction-metadata.html.
- *
- * @param first
- * @param second
- */
-function compareTransactions(
-  first: FormattedTransactionType,
-  second: FormattedTransactionType,
-): number {
-  if (!first.outcome || !second.outcome) {
-    return 0
-  }
-  if (first.outcome.ledgerVersion === second.outcome.ledgerVersion) {
-    return signum(first.outcome.indexInLedger - second.outcome.indexInLedger)
-  }
-  return first.outcome.ledgerVersion < second.outcome.ledgerVersion ? -1 : 1
-}
-
 async function isPendingLedgerVersion(
   client: Client,
   maxLedgerVersion?: number,
@@ -142,7 +115,6 @@ async function ensureLedgerVersion(
 export {
   getXRPBalance,
   ensureLedgerVersion,
-  compareTransactions,
   renameCounterpartyToIssuer,
   renameCounterpartyToIssuerInOrder,
   getRecursive,

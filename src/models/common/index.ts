@@ -58,6 +58,8 @@ interface PathStep {
 export type Path = PathStep[]
 
 export interface SignerEntry {
-  Account: string
-  SignerWeight: number
+  SignerEntry: {
+    Account: string
+    SignerWeight: number
+  }
 }
