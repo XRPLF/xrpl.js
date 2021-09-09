@@ -1,8 +1,12 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers --
+ * Most of the magic numbers are the size of data in bits. */
+/* eslint-disable no-bitwise -- Manipulating bits requires bitwise operators */
 import BigNumber from 'bignumber.js'
 import { decodeAccountID } from 'ripple-address-codec'
 import { decode, encode } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../common/errors'
+import { Ledger, LedgerEntry } from '../../models/ledger'
 import { Transaction } from '../../models/transactions'
 
 import HashPrefix from './hashPrefix'
@@ -29,7 +33,7 @@ function bigintToHex(
   integerString: string | number | BigNumber,
   byteLength: number,
 ): string {
-  const hex = new BigNumber(integerString).toString(16)
+  const hex = new BigNumber(integerString).toString(BITS_IN_HEX)
   return padLeftZero(hex, byteLength * 2)
 }
 
@@ -52,6 +56,7 @@ function currencyToHex(currency: string): string {
   return currency
 }
 
+// For context on the numbers, see: https://xrpl.org/serialization.html#length-prefixing
 function addLengthPrefix(hex: string): string {
   const length = hex.length / 2
   if (length <= 192) {
@@ -59,13 +64,13 @@ function addLengthPrefix(hex: string): string {
   }
   if (length <= 12480) {
     const x = length - 193
-    // eslint-disable-next-line no-bitwise -- adding a prefix to hex requires bitwise operations
     return bytesToHex([193 + (x >>> 8), x & 0xff]) + hex
   }
   if (length <= 918744) {
     const x = length - 12481
-    // eslint-disable-next-line no-bitwise -- adding a prefix to hex requires bitwise operations
-    return bytesToHex([241 + (x >>> 16), (x >>> 8) & 0xff, x & 0xff]) + hex
+    return (
+      bytesToHex([241 + (x >>> BITS_IN_HEX), (x >>> 8) & 0xff, x & 0xff]) + hex
+    )
   }
   throw new Error('Variable integer overflow.')
 }
@@ -77,7 +82,6 @@ function addLengthPrefix(hex: string): string {
  * @returns A hash of tx.
  * @throws ValidationError if the Transaction is unsigned.
  */
-
 export function computeSignedTransactionHash(tx: Transaction | string): string {
   let txBlob
   let txObject
@@ -147,7 +151,7 @@ export function computeAccountRootIndex(address: string): string {
 export function computeSignerListIndex(address: string): string {
   return sha512Half(
     `${ledgerSpaceHex('signerList') + addressToHex(address)}00000000`,
-  ) // uint32(0) signer list index
+  )
 }
 
 /**
@@ -161,7 +165,8 @@ export function computeSignerListIndex(address: string): string {
  * This method computes an Offer Index (aka Order Index).
  *
  * @param address - The classic account address of the SignerList owner (starting with r).
- * @param sequence
+ * @param sequence - The Sequence number of the OfferCreate transaction that created the offer.
+ * If the OfferCreate transaction used a Ticket, use the TicketSequence value instead.
  * @returns The index of the account's Offer object.
  */
 export function computeOfferIndex(address: string, sequence: number): string {
@@ -169,6 +174,14 @@ export function computeOfferIndex(address: string, sequence: number): string {
   return sha512Half(prefix + addressToHex(address) + intToHex(sequence, 4))
 }
 
+/**
+ * Computes the RippleState ID - https://xrpl.org/ripplestate.html#ripplestate-id-format.
+ *
+ * @param address1 - The AccountID of one side of the trustline.
+ * @param address2 - The AccountID of the other side of the trustline.
+ * @param currency - The 160 bit currency code for the trustline.
+ * @returns The RippleState ID for this trustline.
+ */
 export function computeTrustlineHash(
   address1: string,
   address2: string,
@@ -203,7 +216,14 @@ export function computeTransactionTreeHash(transactions: any[]): string {
   return shamap.hash
 }
 
-export function computeStateTreeHash(entries: any[]): string {
+/**
+ * Get an ID for the top node in the state tree, which can be used to quickly compare if two ledgers have the same state.
+ *
+ * @param entries - All LedgerEntries in the current state.
+ * @returns A hash based on all LedgerEntries provided.
+ */
+// eslint-disable-next-line import/no-unused-modules -- Could be useful for end users
+export function computeStateTreeHash(entries: LedgerEntry[]): string {
   const shamap = new SHAMap()
 
   entries.forEach((ledgerEntry) => {
@@ -214,23 +234,36 @@ export function computeStateTreeHash(entries: any[]): string {
   return shamap.hash
 }
 
-// see rippled Ledger::calculateLedgerHash()
-export function computeLedgerHash(ledgerHeader): string {
+/**
+ * Creates a hash for this ledger - Mirrors rippled's Ledger::calculateLedgerHash() function.
+ *
+ * @param ledgerHeader - A Ledger object to hash.
+ * @returns An identifying hash for this ledger object.
+ */
+export function computeLedgerHash(ledgerHeader: Ledger): string {
   const prefix = HashPrefix.LEDGER.toString(16).toUpperCase()
   return sha512Half(
     prefix +
-      intToHex(ledgerHeader.ledger_index, 4) +
-      bigintToHex(ledgerHeader.total_coins, 8) +
-      ledgerHeader.parent_hash +
-      ledgerHeader.transaction_hash +
-      ledgerHeader.account_hash +
-      intToHex(ledgerHeader.parent_close_time, 4) +
-      intToHex(ledgerHeader.close_time, 4) +
-      intToHex(ledgerHeader.close_time_resolution, 1) +
-      intToHex(ledgerHeader.close_flags, 1),
+      intToHex(Number(ledgerHeader.ledger_index), 4)
+        .concat(bigintToHex(ledgerHeader.total_coins, 8))
+        .concat(ledgerHeader.parent_hash)
+        .concat(ledgerHeader.transaction_hash)
+        .concat(ledgerHeader.account_hash)
+        .concat(intToHex(ledgerHeader.parent_close_time, 4))
+        .concat(intToHex(ledgerHeader.close_time, 4))
+        .concat(intToHex(ledgerHeader.close_time_resolution, 1))
+        .concat(intToHex(ledgerHeader.close_flags, 1)),
   )
 }
 
+/**
+ * Create an Escrow ID - https://xrpl.org/escrow-object.html#escrow-id-format.
+ *
+ * @param address - The AccountID of the sender of the EscrowCreate transaction that created the Escrow object.
+ * @param sequence - The Sequence number of the EscrowCreate transaction that created the Escrow object.
+ * If the EscrowCreate transaction used a Ticket, use the TicketSequence value instead.
+ * @returns An ID for an Escrow object.
+ */
 export function computeEscrowHash(address: string, sequence: number): string {
   return sha512Half(
     ledgerSpaceHex('escrow') +
@@ -239,6 +272,15 @@ export function computeEscrowHash(address: string, sequence: number): string {
   )
 }
 
+/**
+ * Creates a PayChannel ID - https://xrpl.org/paychannel.html#paychannel-id-format.
+ *
+ * @param address - The AccountID of the source account.
+ * @param dstAddress - The AccountID of the destination account.
+ * @param sequence - The Sequence number of the PaymentChannelCreate transaction that created the channel.
+ * If the PaymentChannelCreate transaction used a Ticket, use the TicketSequence value instead.
+ * @returns A PayChannel ID.
+ */
 export function computePaymentChannelHash(
   address: string,
   dstAddress: string,
