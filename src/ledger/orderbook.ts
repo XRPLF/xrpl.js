@@ -17,8 +17,6 @@ interface Orderbook {
 }
 
 interface Options {
-  taker_pays: TakerAmount
-  taker_gets: TakerAmount
   limit?: number
   ledger_index?: LedgerIndex
   ledger_hash?: string
@@ -29,17 +27,21 @@ interface Options {
  * Fetch orderbook (buy/sell orders) between two accounts.
  *
  * @param client - Client.
+ * @param taker_pays - Specs of the currency account taking the offer pays.
+ * @param taker_gets - Specs of the currency account taking the offer receives.
  * @param options - Options to include for getting orderbook between payer and receiver.
  * @returns An object containing buy and sell objects.
  */
 export default async function getOrderbook(
   client: Client,
+  taker_pays: TakerAmount,
+  taker_gets: TakerAmount,
   options: Options,
 ): Promise<Orderbook> {
   const request: BookOffersRequest = {
     command: 'book_offers',
-    taker_pays: options.taker_pays,
-    taker_gets: options.taker_gets,
+    taker_pays,
+    taker_gets,
     ledger_index: options.ledger_index,
     ledger_hash: options.ledger_hash,
     limit: options.limit,
@@ -47,8 +49,8 @@ export default async function getOrderbook(
   }
   // 2. Make Request
   const directOfferResults = await client.requestAll(request)
-  request.taker_gets = options.taker_pays
-  request.taker_pays = options.taker_gets
+  request.taker_gets = taker_pays
+  request.taker_pays = taker_gets
   const reverseOfferResults = await client.requestAll(request)
   // 3. Return Formatted Response
   const directOffers = _.flatMap(
