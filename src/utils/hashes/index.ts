@@ -1,4 +1,3 @@
-/* eslint-disable id-length -- Small variables in the bit operations makes it easier to read */
 /* eslint-disable @typescript-eslint/no-magic-numbers --
  * Most of the magic numbers are the size of data in bits. */
 /* eslint-disable no-bitwise -- Manipulating bits requires bitwise operators */
@@ -39,7 +38,6 @@ function bigintToHex(
 }
 
 function ledgerSpaceHex(name: string): string {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call -- Easier to read
   return intToHex(ledgerSpaces[name].charCodeAt(0), 2)
 }
 
@@ -84,14 +82,12 @@ function addLengthPrefix(hex: string): string {
  * @returns A hash of tx.
  * @throws ValidationError if the Transaction is unsigned.
  */
-// eslint-disable-next-line import/no-unused-modules -- Could be useful for end users
 export function computeSignedTransactionHash(tx: Transaction | string): string {
   let txBlob
-  let txObject: Transaction
+  let txObject
   if (typeof tx === 'string') {
     txBlob = tx
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Decode produces a Transaction in JSON format
-    txObject = decode(tx) as unknown as Transaction
+    txObject = decode(tx)
   } else {
     txBlob = encode(tx)
     txObject = tx
@@ -100,7 +96,6 @@ export function computeSignedTransactionHash(tx: Transaction | string): string {
   if (
     txObject.TxnSignature === undefined &&
     (txObject.Signers === undefined ||
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- JS users may encounter this runtime error
       txObject.Signers[0].Signer.TxnSignature === undefined)
   ) {
     throw new ValidationError('The transaction must be signed to hash it.')
@@ -207,21 +202,11 @@ export function computeTrustlineHash(
   )
 }
 
-/**
- * Computes a combined hash for a set of transactions. This allows for easy comparison with other sets of Transactions.
- *
- * @param transactions - A set of all relevant transactions.
- * @returns A hash based on all given transactions.
- */
-// TODO: Type transactions up the call heirarchy so that we can use 'TransactionAndMetadata' instead of 'any' here.
-// (Currently the fields are not quite identical due to capitalization 'metaData' vs 'metadata')
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, import/no-unused-modules -- Allow transactions in JSON format
 export function computeTransactionTreeHash(transactions: any[]): string {
   const shamap = new SHAMap()
 
   transactions.forEach((txJSON) => {
     const txBlobHex = encode(txJSON)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- metaData is a field in the JSON
     const metaHex = encode(txJSON.metaData)
     const txHash = computeSignedTransactionHash(txBlobHex)
     const data = addLengthPrefix(txBlobHex) + addLengthPrefix(metaHex)
@@ -237,6 +222,7 @@ export function computeTransactionTreeHash(transactions: any[]): string {
  * @param entries - All LedgerEntries in the current state.
  * @returns A hash based on all LedgerEntries provided.
  */
+// eslint-disable-next-line import/no-unused-modules -- Could be useful for end users
 export function computeStateTreeHash(entries: LedgerEntry[]): string {
   const shamap = new SHAMap()
 
