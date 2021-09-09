@@ -5,7 +5,7 @@ import { BookOffersRequest } from '../../src'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
-import setupClient from '../setupClient'
+import { setupClient, teardownClient } from '../setupClient'
 import { addressTests, assertResultMatch } from '../testUtils'
 
 // function checkSortingOfOrders(orders) {
@@ -87,12 +87,18 @@ describe('client.getOrderbook', function () {
     describe(test.type, function () {
       it('normal', async function () {
         this.mockRippled.addResponse('book_offers', normalRippledResponse)
-        const response = await this.client.getOrderbook({
-          taker_pays: requests.getOrderbook.normal.taker_pays,
-          taker_gets: requests.getOrderbook.normal.taker_gets,
-          limit: 1,
-        })
-        assertResultMatch(response, responses.getOrderbook.new, 'getOrderbook')
+        const response = await this.client.getOrderbook(
+          requests.getOrderbook.normal.taker_pays,
+          requests.getOrderbook.normal.taker_gets,
+          {
+            limit: 1,
+          },
+        )
+        assertResultMatch(
+          response,
+          responses.getOrderbook.normal,
+          'getOrderbook',
+        )
       })
 
       // it("invalid options", async function () {
