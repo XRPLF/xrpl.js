@@ -1,13 +1,13 @@
-import * as assert from "assert";
+import * as assert from 'assert'
 
-import { parseMemos } from "./utils";
+import { parseMemos } from './utils'
 
 function parseOrderCancellation(tx: any): object {
-  assert.ok(tx.TransactionType === "OfferCancel");
+  assert.ok(tx.TransactionType === 'OfferCancel')
   return {
     memos: parseMemos(tx),
     orderSequence: tx.OfferSequence,
-  };
+  }
 }
 
-export default parseOrderCancellation;
+export default parseOrderCancellation

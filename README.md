@@ -25,7 +25,7 @@ What is ripple-lib used for? The applications on the list linked above use `ripp
 ### Requirements
 
 + **[Node.js v14](https://nodejs.org/)** is recommended. Other versions may work but are not frequently tested.
-+ **[Yarn](https://yarnpkg.com/)** is recommended. `npm` may work but we use `yarn.lock`.
++ **[npm](https://www.npmjs.com/)** is recommended. `yarn` may work but we use `package-lock.json`.
 
 ## Getting Started
 
@@ -33,7 +33,7 @@ See also: [RippleAPI Beginners Guide](https://xrpl.org/get-started-with-rippleap
 
 In an existing project (with `package.json`), install `ripple-lib`:
 ```
-$ yarn add ripple-lib
+$ npm install ripple-lib
 ```
 
 Then see the [documentation](#documentation).
@@ -45,12 +45,12 @@ If you want to use `ripple-lib` with React Native you will need to have some of 
 1. Install dependencies (you can use `npm` as well):
 
     ```shell
-    yarn add react-native-crypto
-    yarn add ripple-lib 
+    npm install react-native-crypto
+    npm install ripple-lib
     # install peer deps
-    yarn add react-native-randombytes
+    npm install react-native-randombytes
     # install latest rn-nodeify
-    yarn add rn-nodeify@latest --dev
+    npm install rn-nodeify@latest --dev
     ```
 
 2. After that, run the following command:
@@ -118,7 +118,7 @@ If you're using the XRP Ledger in production, you should run a [rippled server](
 
 To build the library for Node.js and the browser:
 ```
-$ yarn build
+$ npm run build
 ```
 
 The TypeScript compiler will [output](./tsconfig.json#L7) the resulting JS files in `./dist/npm/`.
@@ -132,12 +132,12 @@ For details, see the `scripts` in `package.json`.
 ### Unit Tests
 
 1. Clone the repository
-2. `cd` into the repository and install dependencies with `yarn install`
-3. `yarn test`
+2. `cd` into the repository and install dependencies with `npm install`
+3. `npm test`
 
 ### Linting
 
-Run `yarn lint` to lint the code with `eslint`.
+Run `npm run lint` to lint the code with `eslint`.
 
 ## Generating Documentation
 
@@ -145,7 +145,7 @@ Do not edit `./docs/index.md` directly because it is a generated file.
 
 Instead, edit the appropriate `.md.ejs` files in `./docs/src/`.
 
-If you make changes to the JSON schemas, fixtures, or documentation sources, update the documentation by running `yarn run docgen`.
+If you make changes to the JSON schemas, fixtures, or documentation sources, update the documentation by running `npm run docgen`.
 
 ## More Information
 

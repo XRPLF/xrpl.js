@@ -1,15 +1,15 @@
-import * as assert from "assert";
+import * as assert from 'assert'
 
-import { txFlags } from "../../common";
-import { removeUndefined } from "../../utils";
+import { txFlags } from '../../common'
+import { removeUndefined } from '../../utils'
 
-import parseAmount from "./amount";
-import { parseMemos } from "./utils";
+import parseAmount from './amount'
+import { parseMemos } from './utils'
 
-const claimFlags = txFlags.PaymentChannelClaim;
+const claimFlags = txFlags.PaymentChannelClaim
 
 function parsePaymentChannelClaim(tx: any): object {
-  assert.ok(tx.TransactionType === "PaymentChannelClaim");
+  assert.ok(tx.TransactionType === 'PaymentChannelClaim')
 
   return removeUndefined({
     memos: parseMemos(tx),
@@ -20,7 +20,7 @@ function parsePaymentChannelClaim(tx: any): object {
     publicKey: tx.PublicKey,
     renew: Boolean(tx.Flags & claimFlags.Renew) || undefined,
     close: Boolean(tx.Flags & claimFlags.Close) || undefined,
-  });
+  })
 }
 
-export default parsePaymentChannelClaim;
+export default parsePaymentChannelClaim

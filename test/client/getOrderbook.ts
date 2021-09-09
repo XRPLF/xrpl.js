@@ -1,12 +1,12 @@
 // import BigNumber from "bignumber.js";
 // import { assert } from "chai";
 
-import { BookOffersRequest } from "../../src";
-import requests from "../fixtures/requests";
-import responses from "../fixtures/responses";
-import rippled from "../fixtures/rippled";
-import setupClient from "../setupClient";
-import { addressTests, assertResultMatch } from "../testUtils";
+import { BookOffersRequest } from '../../src'
+import requests from '../fixtures/requests'
+import responses from '../fixtures/responses'
+import rippled from '../fixtures/rippled'
+import setupClient from '../setupClient'
+import { addressTests, assertResultMatch } from '../testUtils'
 
 // function checkSortingOfOrders(orders) {
 //   let previousRate = "0";
@@ -41,16 +41,16 @@ import { addressTests, assertResultMatch } from "../testUtils";
 
 function isUSD(currency: string) {
   return (
-    currency === "USD" ||
-    currency === "0000000000000000000000005553440000000000"
-  );
+    currency === 'USD' ||
+    currency === '0000000000000000000000005553440000000000'
+  )
 }
 
 function isBTC(currency: string) {
   return (
-    currency === "BTC" ||
-    currency === "0000000000000000000000004254430000000000"
-  );
+    currency === 'BTC' ||
+    currency === '0000000000000000000000004254430000000000'
+  )
 }
 
 function normalRippledResponse(request: BookOffersRequest): object {
@@ -58,15 +58,15 @@ function normalRippledResponse(request: BookOffersRequest): object {
     isBTC(request.taker_gets.currency) &&
     isUSD(request.taker_pays.currency)
   ) {
-    return rippled.book_offers.fabric.requestBookOffersBidsResponse(request);
+    return rippled.book_offers.fabric.requestBookOffersBidsResponse(request)
   }
   if (
     isUSD(request.taker_gets.currency) &&
     isBTC(request.taker_pays.currency)
   ) {
-    return rippled.book_offers.fabric.requestBookOffersAsksResponse(request);
+    return rippled.book_offers.fabric.requestBookOffersAsksResponse(request)
   }
-  throw new Error("unexpected end");
+  throw new Error('unexpected end')
 }
 
 // function xrpRippledResponse(request: BookOffersRequest): object {
@@ -79,21 +79,21 @@ function normalRippledResponse(request: BookOffersRequest): object {
 //   throw new Error("unexpected end");
 // }
 
-describe("client.getOrderbook", function () {
-  beforeEach(setupClient.setup);
-  afterEach(setupClient.teardown);
+describe('client.getOrderbook', function () {
+  beforeEach(setupClient)
+  afterEach(teardownClient)
 
   addressTests.forEach(function (test) {
     describe(test.type, function () {
-      it("normal", async function () {
-        this.mockRippled.addResponse("book_offers", normalRippledResponse);
+      it('normal', async function () {
+        this.mockRippled.addResponse('book_offers', normalRippledResponse)
         const response = await this.client.getOrderbook({
           taker_pays: requests.getOrderbook.normal.taker_pays,
           taker_gets: requests.getOrderbook.normal.taker_gets,
           limit: 1,
-        });
-        assertResultMatch(response, responses.getOrderbook.new, "getOrderbook");
-      });
+        })
+        assertResultMatch(response, responses.getOrderbook.new, 'getOrderbook')
+      })
 
       // it("invalid options", async function () {
       //   this.mockRippled.addResponse("book_offers", normalRippledResponse);
@@ -205,6 +205,6 @@ describe("client.getOrderbook", function () {
       //     response.asks.every((ask) => ask.specification.direction === "sell")
       //   );
       // });
-    });
-  });
-});
+    })
+  })
+})

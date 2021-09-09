@@ -1,70 +1,68 @@
+/* eslint-disable import/max-dependencies -- All methods need to be exported */
+
 import {
   AccountChannelsRequest,
   AccountChannelsResponse,
-} from "./accountChannels";
+} from './accountChannels'
 import {
   AccountCurrenciesRequest,
   AccountCurrenciesResponse,
-} from "./accountCurrencies";
-import { AccountInfoRequest, AccountInfoResponse } from "./accountInfo";
-import { AccountLinesRequest, AccountLinesResponse } from "./accountLines";
-import {
-  AccountObjectsRequest,
-  AccountObjectsResponse,
-} from "./accountObjects";
-import { AccountOffersRequest, AccountOffersResponse } from "./accountOffers";
-import { AccountTxRequest, AccountTxResponse } from "./accountTx";
-import { BookOffersRequest, BookOffersResponse } from "./bookOffers";
-import { ChannelVerifyRequest, ChannelVerifyResponse } from "./channelVerify";
+} from './accountCurrencies'
+import { AccountInfoRequest, AccountInfoResponse } from './accountInfo'
+import { AccountLinesRequest, AccountLinesResponse } from './accountLines'
+import { AccountObjectsRequest, AccountObjectsResponse } from './accountObjects'
+import { AccountOffersRequest, AccountOffersResponse } from './accountOffers'
+import { AccountTxRequest, AccountTxResponse } from './accountTx'
+import { BookOffersRequest, BookOffersResponse } from './bookOffers'
+import { ChannelVerifyRequest, ChannelVerifyResponse } from './channelVerify'
 import {
   DepositAuthorizedRequest,
   DepositAuthorizedResponse,
-} from "./depositAuthorized";
-import { FeeRequest, FeeResponse } from "./fee";
+} from './depositAuthorized'
+import { FeeRequest, FeeResponse } from './fee'
 import {
   GatewayBalancesRequest,
   GatewayBalancesResponse,
-} from "./gatewayBalances";
-import { LedgerRequest, LedgerResponse } from "./ledger";
-import { LedgerClosedRequest, LedgerClosedResponse } from "./ledgerClosed";
-import { LedgerCurrentRequest, LedgerCurrentResponse } from "./ledgerCurrent";
-import { LedgerDataRequest, LedgerDataResponse } from "./ledgerData";
-import { LedgerEntryRequest, LedgerEntryResponse } from "./ledgerEntry";
-import { ManifestRequest, ManifestResponse } from "./manifest";
-import { NoRippleCheckRequest, NoRippleCheckResponse } from "./norippleCheck";
-import { PathFindRequest, PathFindResponse } from "./pathFind";
-import { PingRequest, PingResponse } from "./ping";
-import { RandomRequest, RandomResponse } from "./random";
-import {
-  RipplePathFindRequest,
-  RipplePathFindResponse,
-} from "./ripplePathFind";
-import { ServerInfoRequest, ServerInfoResponse } from "./serverInfo";
-import { ServerStateRequest, ServerStateResponse } from "./serverState";
-import { SubmitRequest, SubmitResponse } from "./submit";
+} from './gatewayBalances'
+import { LedgerRequest, LedgerResponse } from './ledger'
+import { LedgerClosedRequest, LedgerClosedResponse } from './ledgerClosed'
+import { LedgerCurrentRequest, LedgerCurrentResponse } from './ledgerCurrent'
+import { LedgerDataRequest, LedgerDataResponse } from './ledgerData'
+import { LedgerEntryRequest, LedgerEntryResponse } from './ledgerEntry'
+import { ManifestRequest, ManifestResponse } from './manifest'
+import { NoRippleCheckRequest, NoRippleCheckResponse } from './norippleCheck'
+import { PathFindRequest, PathFindResponse } from './pathFind'
+import { PingRequest, PingResponse } from './ping'
+import { RandomRequest, RandomResponse } from './random'
+import { RipplePathFindRequest, RipplePathFindResponse } from './ripplePathFind'
+import { ServerInfoRequest, ServerInfoResponse } from './serverInfo'
+import { ServerStateRequest, ServerStateResponse } from './serverState'
+import { SubmitRequest, SubmitResponse } from './submit'
 import {
   SubmitMultisignedRequest,
   SubmitMultisignedResponse,
-} from "./submitMultisigned";
+} from './submitMultisigned'
 import {
   ConsensusStream,
   LedgerStream,
   OrderBookStream,
+  PathFindStream,
   PeerStatusStream,
   Stream,
   SubscribeRequest,
   SubscribeResponse,
   TransactionStream,
   ValidationStream,
-} from "./subscribe";
+} from './subscribe'
 import {
   TransactionEntryRequest,
   TransactionEntryResponse,
-} from "./transactionEntry";
-import { TxRequest, TxResponse } from "./tx";
-import { UnsubscribeRequest, UnsubscribeResponse } from "./unsubscribe";
+} from './transactionEntry'
+import { TxRequest, TxResponse } from './tx'
+import { UnsubscribeRequest, UnsubscribeResponse } from './unsubscribe'
 
-type Request =  // account methods
+// account methods
+type Request =
   | AccountChannelsRequest
   | AccountCurrenciesRequest
   | AccountInfoRequest
@@ -102,9 +100,10 @@ type Request =  // account methods
   | ServerStateRequest
   // utility methods
   | PingRequest
-  | RandomRequest;
+  | RandomRequest
 
-type Response =  // account methods
+// account methods
+type Response =
   | AccountChannelsResponse
   | AccountCurrenciesResponse
   | AccountInfoResponse
@@ -142,7 +141,7 @@ type Response =  // account methods
   | ServerStateResponse
   // utility methods
   | PingResponse
-  | RandomResponse;
+  | RandomResponse
 
 export {
   Request,
@@ -205,6 +204,7 @@ export {
   LedgerStream,
   ValidationStream,
   TransactionStream,
+  PathFindStream,
   PeerStatusStream,
   OrderBookStream,
   ConsensusStream,
@@ -224,4 +224,4 @@ export {
   PingResponse,
   RandomRequest,
   RandomResponse,
-};
+}

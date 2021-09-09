@@ -1,0 +1,11 @@
+{
+  "base_fee": 10,
+  "load_base": 256,
+  "load_factor": 256,
+  "load_factor_fee_escalation": 256,
+  "load_factor_fee_queue": 256,
+  "load_factor_fee_reference": 256,
+  "load_factor_server": 256,
+  "server_status": "full",
+  "type": "serverStatus"
+}

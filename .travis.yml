@@ -4,6 +4,6 @@ node_js:
   - 12
   - 13
 script:
-  - yarn test
-  - yarn build
-  - yarn lint
+  - npm test
+  - npm build
+  - npm lint
