@@ -1,6 +1,6 @@
-import { createHash } from "crypto";
+import { createHash } from 'crypto'
 
-const HASH_SIZE = 64;
+const HASH_SIZE = 64
 
 /**
  * Compute a sha512Half Hash of a hex string.
@@ -9,11 +9,11 @@ const HASH_SIZE = 64;
  * @returns Hash of hex.
  */
 function sha512Half(hex: string): string {
-  return createHash("sha512")
-    .update(Buffer.from(hex, "hex"))
-    .digest("hex")
+  return createHash('sha512')
+    .update(Buffer.from(hex, 'hex'))
+    .digest('hex')
     .toUpperCase()
-    .slice(0, HASH_SIZE);
+    .slice(0, HASH_SIZE)
 }
 
-export default sha512Half;
+export default sha512Half

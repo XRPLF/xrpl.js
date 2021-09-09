@@ -1,23 +1,23 @@
-import hashPrefix from "../hashPrefix";
-import sha512Half from "../sha512Half";
+import hashPrefix from '../hashPrefix'
+import sha512Half from '../sha512Half'
 
-import Leaf from "./leafNode";
-import { NodeType, Node } from "./node";
+import Leaf from './leafNode'
+import { NodeType, Node } from './node'
 
 const HEX_ZERO =
-  "0000000000000000000000000000000000000000000000000000000000000000";
+  '0000000000000000000000000000000000000000000000000000000000000000'
 
-const SLOT_MAX = 15;
-const HEX = 16;
+const SLOT_MAX = 15
+const HEX = 16
 
 /**
  * Class for SHAMap InnerNode.
  */
 class InnerNode extends Node {
-  public leaves: { [slot: number]: Node | undefined };
-  public type: NodeType;
-  public depth: number;
-  public empty: boolean;
+  public leaves: { [slot: number]: Node | undefined }
+  public type: NodeType
+  public depth: number
+  public empty: boolean
 
   /**
    * Define an Inner (non-leaf) node in a SHAMap tree.
@@ -25,11 +25,11 @@ class InnerNode extends Node {
    * @param depth - I.e. How many parent inner nodes.
    */
   public constructor(depth = 0) {
-    super();
-    this.leaves = {};
-    this.type = NodeType.INNER;
-    this.depth = depth;
-    this.empty = true;
+    super()
+    this.leaves = {}
+    this.type = NodeType.INNER
+    this.depth = depth
+    this.empty = true
   }
 
   /**
@@ -40,32 +40,32 @@ class InnerNode extends Node {
    * @throws If there is a index collision.
    */
   public addItem(tag: string, node: Node): void {
-    const existingNode = this.getNode(parseInt(tag[this.depth], HEX));
+    const existingNode = this.getNode(parseInt(tag[this.depth], HEX))
 
     if (existingNode === undefined) {
-      this.setNode(parseInt(tag[this.depth], HEX), node);
-      return;
+      this.setNode(parseInt(tag[this.depth], HEX), node)
+      return
     }
 
     // A node already exists in this slot
     if (existingNode instanceof InnerNode) {
       // There is an inner node, so we need to go deeper
-      existingNode.addItem(tag, node);
+      existingNode.addItem(tag, node)
     } else if (existingNode instanceof Leaf) {
       if (existingNode.tag === tag) {
         // Collision
         throw new Error(
-          "Tried to add a node to a SHAMap that was already in there."
-        );
+          'Tried to add a node to a SHAMap that was already in there.',
+        )
       } else {
-        const newInnerNode = new InnerNode(this.depth + 1);
+        const newInnerNode = new InnerNode(this.depth + 1)
 
         // Parent new and existing node
-        newInnerNode.addItem(existingNode.tag, existingNode);
-        newInnerNode.addItem(tag, node);
+        newInnerNode.addItem(existingNode.tag, existingNode)
+        newInnerNode.addItem(tag, node)
 
         // And place the newly created inner node in the slot
-        this.setNode(parseInt(tag[this.depth], HEX), newInnerNode);
+        this.setNode(parseInt(tag[this.depth], HEX), newInnerNode)
       }
     }
   }
@@ -79,10 +79,10 @@ class InnerNode extends Node {
    */
   public setNode(slot: number, node: Node): void {
     if (slot < 0 || slot > SLOT_MAX) {
-      throw new Error("Invalid slot: slot must be between 0-15.");
+      throw new Error('Invalid slot: slot must be between 0-15.')
     }
-    this.leaves[slot] = node;
-    this.empty = false;
+    this.leaves[slot] = node
+    this.empty = false
   }
 
   /**
@@ -94,9 +94,9 @@ class InnerNode extends Node {
    */
   public getNode(slot: number): Node | undefined {
     if (slot < 0 || slot > SLOT_MAX) {
-      throw new Error("Invalid slot: slot must be between 0-15.");
+      throw new Error('Invalid slot: slot must be between 0-15.')
     }
-    return this.leaves[slot];
+    return this.leaves[slot]
   }
 
   /**
@@ -106,18 +106,18 @@ class InnerNode extends Node {
    */
   public get hash(): string {
     if (this.empty) {
-      return HEX_ZERO;
+      return HEX_ZERO
     }
-    let hex = "";
+    let hex = ''
     for (let iter = 0; iter <= SLOT_MAX; iter++) {
-      const child = this.leaves[iter];
-      const hash: string = child == null ? HEX_ZERO : child.hash;
-      hex += hash;
+      const child = this.leaves[iter]
+      const hash: string = child == null ? HEX_ZERO : child.hash
+      hex += hash
     }
 
-    const prefix = hashPrefix.INNER_NODE.toString(HEX);
-    return sha512Half(prefix + hex);
+    const prefix = hashPrefix.INNER_NODE.toString(HEX)
+    return sha512Half(prefix + hex)
   }
 }
 
-export default InnerNode;
+export default InnerNode

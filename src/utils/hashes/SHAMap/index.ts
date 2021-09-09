@@ -1,15 +1,15 @@
-import InnerNode from "./innerNode";
-import Leaf from "./leafNode";
-import { NodeType } from "./node";
+import InnerNode from './innerNode'
+import Leaf from './leafNode'
+import { NodeType } from './node'
 
 class SHAMap {
-  public root: InnerNode;
+  public root: InnerNode
 
   /**
    * SHAMap tree constructor.
    */
   public constructor() {
-    this.root = new InnerNode(0);
+    this.root = new InnerNode(0)
   }
 
   /**
@@ -20,7 +20,7 @@ class SHAMap {
    * @param type - Type of the node to add.
    */
   public addItem(tag: string, data: string, type: NodeType): void {
-    this.root.addItem(tag, new Leaf(tag, data, type));
+    this.root.addItem(tag, new Leaf(tag, data, type))
   }
 
   /**
@@ -29,9 +29,9 @@ class SHAMap {
    * @returns The hash of the root of the SHAMap.
    */
   public get hash(): string {
-    return this.root.hash;
+    return this.root.hash
   }
 }
 
-export * from "./node";
-export default SHAMap;
+export * from './node'
+export default SHAMap

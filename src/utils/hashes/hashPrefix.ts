@@ -37,4 +37,4 @@ enum HashPrefix {
   LEDGER = 0x4c575200,
 }
 
-export default HashPrefix;
+export default HashPrefix

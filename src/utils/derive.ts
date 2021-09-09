@@ -1,10 +1,10 @@
-import { classicAddressToXAddress } from "ripple-address-codec";
-import { deriveKeypair, deriveAddress } from "ripple-keypairs";
+import { classicAddressToXAddress } from 'ripple-address-codec'
+import { deriveKeypair, deriveAddress } from 'ripple-keypairs'
 
 interface DeriveOptions {
-  publicKey: string;
-  tag: number | false;
-  test: boolean;
+  publicKey: string
+  tag: number | false
+  test: boolean
 }
 
 /**
@@ -14,8 +14,8 @@ interface DeriveOptions {
  * @returns X-Address.
  */
 function deriveXAddress(options: DeriveOptions): string {
-  const classicAddress = deriveAddress(options.publicKey);
-  return classicAddressToXAddress(classicAddress, options.tag, options.test);
+  const classicAddress = deriveAddress(options.publicKey)
+  return classicAddressToXAddress(classicAddress, options.tag, options.test)
 }
 
-export { deriveKeypair, deriveAddress, deriveXAddress };
+export { deriveKeypair, deriveAddress, deriveXAddress }

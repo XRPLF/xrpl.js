@@ -9,26 +9,26 @@
  * See [LedgerNameSpace enum](https://github.com/ripple/rippled/blob/master/src/ripple/protocol/LedgerFormats.h#L100).
  */
 const ledgerSpaces = {
-  account: "a",
-  dirNode: "d",
-  generatorMap: "g",
-  rippleState: "r",
+  account: 'a',
+  dirNode: 'd',
+  generatorMap: 'g',
+  rippleState: 'r',
   // Entry for an offer.
-  offer: "o",
+  offer: 'o',
   // Directory of things owned by an account.
-  ownerDir: "O",
+  ownerDir: 'O',
   // Directory of order books.
-  bookDir: "B",
-  contract: "c",
-  skipList: "s",
-  escrow: "u",
-  amendment: "f",
-  feeSettings: "e",
-  ticket: "T",
-  signerList: "S",
-  paychan: "x",
-  check: "C",
-  depositPreauth: "p",
-};
+  bookDir: 'B',
+  contract: 'c',
+  skipList: 's',
+  escrow: 'u',
+  amendment: 'f',
+  feeSettings: 'e',
+  ticket: 'T',
+  signerList: 'S',
+  paychan: 'x',
+  check: 'C',
+  depositPreauth: 'p',
+}
 
-export default ledgerSpaces;
+export default ledgerSpaces
