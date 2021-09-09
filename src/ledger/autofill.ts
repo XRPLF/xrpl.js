@@ -74,7 +74,7 @@ function validateAccountAddress(
   // eslint-disable-next-line no-param-reassign -- param reassign is safe
   tx[accountField] = classicAccount
 
-  if (tag != null) {
+  if (tag != null && tag !== false) {
     if (tx[tagField] && tx[tagField] !== tag) {
       throw new ValidationError(
         `The ${tagField}, if present, must match the tag of the ${accountField} X-address`,

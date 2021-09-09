@@ -5,10 +5,11 @@ import keypairs from 'ripple-keypairs'
 
 import type { Client, Wallet } from '..'
 import { ValidationError } from '../common/errors'
+import { Transaction } from '../models/transactions'
 import { xrpToDrops } from '../utils'
 import { computeSignedTransactionHash } from '../utils/hashes'
 
-import { SignOptions, KeyPair, TransactionJSON } from './types'
+import { SignOptions, KeyPair } from './types'
 
 function computeSignature(tx: object, privateKey: string, signAs?: string) {
   const signingData = signAs
@@ -140,7 +141,7 @@ function objectDiff(a: object, b: object): object {
  *
  * @returns This method does not return a value, but throws an error if the check fails.
  */
-function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
+function checkTxSerialization(serialized: string, tx: Transaction): void {
   // Decode the serialized transaction:
   const decoded = binaryCodec.decode(serialized)
 

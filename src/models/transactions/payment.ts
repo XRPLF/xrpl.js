@@ -59,10 +59,8 @@ export function verifyPayment(tx: Record<string, unknown>): void {
     throw new ValidationError('PaymentTransaction: invalid Destination')
   }
 
-  if (
-    tx.DestinationTag !== undefined &&
-    typeof tx.DestinationTag !== 'number'
-  ) {
+  if (tx.DestinationTag != null && typeof tx.DestinationTag !== 'number') {
+    console.log(tx.DestinationTag)
     throw new ValidationError(
       'PaymentTransaction: DestinationTag must be a number',
     )
