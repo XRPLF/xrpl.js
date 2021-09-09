@@ -214,6 +214,10 @@ function ISOTimeToRippleTime(iso8601: string): number {
   return unixToRippleTimestamp(Date.parse(iso8601))
 }
 
+function convertStringToHex(string: string): string {
+  return Buffer.from(string, 'utf8').toString('hex').toUpperCase()
+}
+
 export {
   computeLedgerHeaderHash,
   dropsToXrp,
@@ -242,4 +246,5 @@ export {
   deriveXAddress,
   signPaymentChannelClaim,
   verifyPaymentChannelClaim,
+  convertStringToHex,
 }

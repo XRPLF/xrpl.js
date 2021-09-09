@@ -6,6 +6,7 @@ import { isValidXAddress } from 'ripple-address-codec'
 import { Client } from 'xrpl-local'
 import { isValidSecret, generateXAddress, xrpToDrops } from 'xrpl-local/utils'
 
+import { convertStringToHex } from '../../src'
 import {
   AccountSet,
   OfferCreate,
@@ -455,9 +456,7 @@ describe('integration tests - standalone rippled', function () {
         const accountSet: AccountSet = {
           TransactionType: 'AccountSet',
           Account: address,
-          Domain: Buffer.from('example.com', 'ascii')
-            .toString('hex')
-            .toUpperCase(),
+          Domain: convertStringToHex('example.com'),
         }
         return this.client.autofill(accountSet, 2).then((tx) => {
           const signed1 = this.client.sign(JSON.stringify(tx), signer1secret, {
