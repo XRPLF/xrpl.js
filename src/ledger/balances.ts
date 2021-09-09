@@ -1,83 +1,70 @@
+import _ from 'lodash'
+
 import type { Client } from '..'
-import { ensureClassicAddress } from '../common'
-import { FormattedTrustline } from '../common/types/objects/trustlines'
+import { LedgerIndex } from '../models/common'
+import { AccountInfoRequest } from '../models/methods'
+import { AccountLinesRequest, Trustline } from '../models/methods/accountLines'
+import { dropsToXrp } from '../utils'
 
-import { GetTrustlinesOptions } from './trustlines'
-import * as utils from './utils'
-
-export interface Balance {
+interface Balance {
   value: string
   currency: string
-  counterparty?: string
+  issuer?: string
 }
 
-export type GetBalances = Balance[]
-
-function getTrustlineBalanceAmount(trustline: FormattedTrustline): Balance {
-  return {
-    currency: trustline.specification.currency,
-    counterparty: trustline.specification.counterparty,
-    value: trustline.state.balance,
-  }
+function formatBalances(trustlines: Trustline[]): Balance[] {
+  return trustlines.map((trustline) => ({
+    value: trustline.balance,
+    currency: trustline.currency,
+    issuer: trustline.account,
+  }))
 }
 
-function formatBalances(
-  options: GetTrustlinesOptions,
-  balances: { xrp: string; trustlines: FormattedTrustline[] },
-) {
-  const result = balances.trustlines.map(getTrustlineBalanceAmount)
-  if (
-    !(options.counterparty || (options.currency && options.currency !== 'XRP'))
-  ) {
-    const xrpBalance = {
-      currency: 'XRP',
-      value: balances.xrp,
-    }
-    result.unshift(xrpBalance)
-  }
-  if (options.limit && result.length > options.limit) {
-    const toRemove = result.length - options.limit
-    result.splice(-toRemove, toRemove)
-  }
-  return result
+interface GetBalancesOptions {
+  ledger_hash?: string
+  ledger_index?: LedgerIndex
+  peer?: string
+  limit?: number
 }
 
-async function getLedgerVersionHelper(
-  client: Client,
-  optionValue?: number,
-): Promise<number> {
-  if (optionValue != null && optionValue !== null) {
-    return Promise.resolve(optionValue)
-  }
-  return client
-    .request({
-      command: 'ledger',
-      ledger_index: 'validated',
-    })
-    .then((response) => response.result.ledger_index)
-}
-
+/**
+ * Get XRP/non-XRP balances for an account.
+ *
+ * @param client - Client.
+ * @param account - Account address.
+ * @param options - Options to include for getting balances.
+ * @returns An array of XRP/non-XRP balances.
+ */
 async function getBalances(
-  this: Client,
-  address: string,
-  options: GetTrustlinesOptions = {},
-): Promise<GetBalances> {
-  // Only support retrieving balances without a tag,
-  // since we currently do not calculate balances
-  // on a per-tag basis. Apps must interpret and
-  // use tags independent of the XRP Ledger, comparing
-  // with the XRP Ledger's balance as an accounting check.
-  address = ensureClassicAddress(address)
-
-  return Promise.all([
-    getLedgerVersionHelper(this, options.ledgerVersion).then(
-      async (ledgerVersion) =>
-        utils.getXRPBalance(this, address, ledgerVersion),
-    ),
-    this.getTrustlines(address, options),
-  ]).then((results) =>
-    formatBalances(options, { xrp: results[0], trustlines: results[1] }),
+  client: Client,
+  account: string,
+  options: GetBalancesOptions = {},
+): Promise<Balance[]> {
+  // 1. Get XRP Balance
+  const xrpRequest: AccountInfoRequest = {
+    command: 'account_info',
+    account,
+    ledger_index: options.ledger_index ?? 'validated',
+    ledger_hash: options.ledger_hash,
+  }
+  const balance = await client
+    .request(xrpRequest)
+    .then((response) => response.result.account_data.Balance)
+  const xrpBalance = { currency: 'XRP', value: dropsToXrp(balance) }
+  // 2. Get Non-XRP Balance
+  const linesRequest: AccountLinesRequest = {
+    command: 'account_lines',
+    account,
+    ledger_index: options.ledger_index ?? 'validated',
+    ledger_hash: options.ledger_hash,
+    peer: options.peer,
+    limit: options.limit,
+  }
+  const responses = await client.requestAll(linesRequest)
+  const accountLinesBalance = _.flatMap(responses, (response) =>
+    formatBalances(response.result.lines),
   )
+  return [xrpBalance, ...accountLinesBalance]
 }
 
 export default getBalances

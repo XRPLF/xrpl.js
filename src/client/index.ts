@@ -25,9 +25,7 @@ import { ValidationError, XrplError } from '../common/errors'
 import getFee from '../common/fee'
 import autofill from '../ledger/autofill'
 import getBalances from '../ledger/balances'
-import { getOrderbook, formatBidsAndAsks } from '../ledger/orderbook'
-import getPaths from '../ledger/pathfind'
-import getTrustlines from '../ledger/trustlines'
+import getOrderbook from '../ledger/orderbook'
 import { clamp } from '../ledger/utils'
 import {
   // account methods
@@ -523,10 +521,8 @@ class Client extends EventEmitter {
 
   public getFee = getFee
 
-  public getTrustlines = getTrustlines
-  public getBalances = getBalances
-  public getPaths = getPaths
-  public getOrderbook = getOrderbook
+  public getBalances = prepend(getBalances, this)
+  public getOrderbook = prepend(getOrderbook, this)
 
   public sign = sign
   public combine = combine
@@ -539,8 +535,6 @@ class Client extends EventEmitter {
 
   // Client.deriveClassicAddress (static) is a new name for client.deriveAddress
   public static deriveClassicAddress = deriveAddress
-
-  public static formatBidsAndAsks = formatBidsAndAsks
 
   /**
    * Static methods to expose ripple-address-codec methods.

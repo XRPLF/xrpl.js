@@ -2,120 +2,68 @@ import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 
 import type { Client } from '../client'
-import type { BookOffer } from '../common/types/commands'
-import type { Issue } from '../common/types/objects'
-
+import { LedgerIndex } from '../models/common'
 import {
-  parseOrderbookOrder,
-  FormattedOrderbookOrder,
-} from './parse/orderbook-order'
-import * as utils from './utils'
+  BookOffer,
+  BookOffersRequest,
+  TakerAmount,
+} from '../models/methods/bookOffers'
 
-export interface FormattedOrderbook {
-  bids: FormattedOrderbookOrder[]
-  asks: FormattedOrderbookOrder[]
-}
+import { orderFlags } from './parse/flags'
 
-function isSameIssue(a: Issue, b: Issue) {
-  return a.currency === b.currency && a.counterparty === b.counterparty
-}
+function sortOffers(offers: BookOffer[]): BookOffer[] {
+  return offers.sort((offerA, offerB) => {
+    const qualityA = offerA.quality ?? 0
+    const qualityB = offerB.quality ?? 0
 
-function directionFilter(direction: string, order: FormattedOrderbookOrder) {
-  return order.specification.direction === direction
-}
-
-function flipOrder(order: FormattedOrderbookOrder) {
-  const specification = order.specification
-  const flippedSpecification = {
-    quantity: specification.totalPrice,
-    totalPrice: specification.quantity,
-    direction: specification.direction === 'buy' ? 'sell' : 'buy',
-  }
-  const newSpecification = _.merge({}, specification, flippedSpecification)
-  return _.merge({}, order, { specification: newSpecification })
-}
-
-function alignOrder(
-  base: Issue,
-  order: FormattedOrderbookOrder,
-): FormattedOrderbookOrder {
-  const quantity = order.specification.quantity
-  return isSameIssue(quantity, base) ? order : flipOrder(order)
-}
-
-export function formatBidsAndAsks(
-  orderbook: OrderbookInfo,
-  offers: BookOffer[],
-) {
-  // the "base" currency is the currency that you are buying or selling
-  // the "counter" is the currency that the "base" is priced in
-  // a "bid"/"ask" is an order to buy/sell the base, respectively
-  // for bids: takerGets = totalPrice = counter, takerPays = quantity = base
-  // for asks: takerGets = quantity = base, takerPays = totalPrice = counter
-  // quality = takerPays / takerGets; price = totalPrice / quantity
-  // for bids: lowest quality => lowest quantity/totalPrice => highest price
-  // for asks: lowest quality => lowest totalPrice/quantity => lowest price
-  // for both bids and asks, lowest quality is closest to mid-market
-  // we sort the orders so that earlier orders are closer to mid-market
-  const orders = offers
-    .sort((a, b) => {
-      const qualityA = a.quality ?? 0
-      const qualityB = b.quality ?? 0
-
-      return new BigNumber(qualityA).comparedTo(qualityB)
-    })
-    .map(parseOrderbookOrder)
-
-  const alignedOrders = orders.map(_.partial(alignOrder, orderbook.base))
-  const bids = alignedOrders.filter(_.partial(directionFilter, 'buy'))
-  const asks = alignedOrders.filter(_.partial(directionFilter, 'sell'))
-  return { bids, asks }
-}
-
-// account is to specify a "perspective", which affects which unfunded offers
-// are returned
-async function makeRequest(
-  client: Client,
-  taker: string,
-  options: GetOrderbookOptions,
-  takerGets: Issue,
-  takerPays: Issue,
-) {
-  const orderData = utils.renameCounterpartyToIssuerInOrder({
-    taker_gets: takerGets,
-    taker_pays: takerPays,
-  })
-  return client.requestAll({
-    command: 'book_offers',
-    taker_gets: orderData.taker_gets,
-    taker_pays: orderData.taker_pays,
-    ledger_index: options.ledgerVersion || 'validated',
-    limit: options.limit,
-    taker,
+    return new BigNumber(qualityA).comparedTo(qualityB)
   })
 }
 
-export interface GetOrderbookOptions {
+interface Orderbook {
+  buy: BookOffer[]
+  sell: BookOffer[]
+}
+
+interface OrderbookOptions {
   limit?: number
-  ledgerVersion?: number
+  ledger_index?: LedgerIndex
+  ledger_hash?: string
+  taker?: string
 }
 
-export interface OrderbookInfo {
-  base: Issue
-  counter: Issue
-}
-
-export async function getOrderbook(
-  this: Client,
-  address: string,
-  orderbook: OrderbookInfo,
-  options: GetOrderbookOptions = {},
-): Promise<FormattedOrderbook> {
+/**
+ * Fetch orderbook (buy/sell orders) between two accounts.
+ *
+ * @param client - Client.
+ * @param taker_pays - Specs of the currency account taking the offer pays.
+ * @param taker_gets - Specs of the currency account taking the offer receives.
+ * @param takerPays
+ * @param takerGets
+ * @param options - Options to include for getting orderbook between payer and receiver.
+ * @returns An object containing buy and sell objects.
+ */
+// eslint-disable-next-line max-params -- Function needs 4 params.
+async function getOrderbook(
+  client: Client,
+  takerPays: TakerAmount,
+  takerGets: TakerAmount,
+  options: OrderbookOptions,
+): Promise<Orderbook> {
+  const request: BookOffersRequest = {
+    command: 'book_offers',
+    taker_pays: takerPays,
+    taker_gets: takerGets,
+    ledger_index: options.ledger_index,
+    ledger_hash: options.ledger_hash,
+    limit: options.limit,
+    taker: options.taker,
+  }
   // 2. Make Request
-  const [directOfferResults, reverseOfferResults] = await Promise.all([
-    makeRequest(this, address, options, orderbook.base, orderbook.counter),
-    makeRequest(this, address, options, orderbook.counter, orderbook.base),
-  ])
+  const directOfferResults = await client.requestAll(request)
+  request.taker_gets = takerPays
+  request.taker_pays = takerGets
+  const reverseOfferResults = await client.requestAll(request)
   // 3. Return Formatted Response
   const directOffers = _.flatMap(
     directOfferResults,
@@ -125,5 +73,22 @@ export async function getOrderbook(
     reverseOfferResults,
     (reverseOfferResult) => reverseOfferResult.result.offers,
   )
-  return formatBidsAndAsks(orderbook, [...directOffers, ...reverseOffers])
+  // Sort the orders
+  // for both buys and sells, lowest quality is closest to mid-market
+  // we sort the orders so that earlier orders are closer to mid-market
+
+  const orders = [...directOffers, ...reverseOffers]
+  // separate out the orders amongst buy and sell
+  const buy: BookOffer[] = []
+  const sell: BookOffer[] = []
+  orders.forEach((order) => {
+    if (order.Flags === orderFlags.Sell) {
+      sell.push(order)
+    } else {
+      buy.push(order)
+    }
+  })
+  return { buy: sortOffers(buy), sell: sortOffers(sell) }
 }
+
+export default getOrderbook

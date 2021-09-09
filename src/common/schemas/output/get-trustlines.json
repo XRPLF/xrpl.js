@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getTrustlines",
+  "type": "array",
+  "items": {
+    "properties": {
+      "currency": {
+        "$ref": "currency",
+        "description": "The currency this trustline applies to."
+      },
+      "issuer": {
+        "$ref": "address",
+        "description": "The address of the account this trustline extends trust to."
+      },
+      "value": {
+        "$ref": "signedValue",
+        "description": "The balance on the trust line, representing which party owes the other and by how much."
+      }
+    },
+    "required": ["issuer", "currency", "value"],
+    "additionalProperties": false
+  }
+}
