@@ -56,7 +56,7 @@ export type Transaction =
   | SetRegularKey
   | SignerListSet
   | TicketCreate
-  | TrustSet;
+  | TrustSet
 
 export interface TransactionAndMetadata {
   transaction: Transaction;
@@ -160,4 +160,3 @@ export function verify(tx: Record<string, unknown>): void {
   ) {
     throw new ValidationError(`Invalid Transaction: ${tx.TransactionType}`);
   }
-}

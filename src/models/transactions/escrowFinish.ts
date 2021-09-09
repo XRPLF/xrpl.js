@@ -1,13 +1,13 @@
-import { ValidationError } from "../../common/errors";
+import { ValidationError } from '../../common/errors'
 
-import { BaseTransaction, verifyBaseTransaction } from "./common";
+import { BaseTransaction, verifyBaseTransaction } from './common'
 
 export interface EscrowFinish extends BaseTransaction {
-  TransactionType: "EscrowFinish";
-  Owner: string;
-  OfferSequence: number;
-  Condition?: string;
-  Fulfillment?: string;
+  TransactionType: 'EscrowFinish'
+  Owner: string
+  OfferSequence: number
+  Condition?: string
+  Fulfillment?: string
 }
 
 /**
@@ -17,29 +17,29 @@ export interface EscrowFinish extends BaseTransaction {
  * @throws When the EscrowFinish is Malformed.
  */
 export function verifyEscrowFinish(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx);
+  verifyBaseTransaction(tx)
 
   if (tx.Owner === undefined) {
-    throw new ValidationError("EscrowFinish: missing field Owner");
+    throw new ValidationError('EscrowFinish: missing field Owner')
   }
 
-  if (typeof tx.Owner !== "string") {
-    throw new ValidationError("EscrowFinish: Owner must be a string");
+  if (typeof tx.Owner !== 'string') {
+    throw new ValidationError('EscrowFinish: Owner must be a string')
   }
 
   if (tx.OfferSequence === undefined) {
-    throw new ValidationError("EscrowFinish: missing field OfferSequence");
+    throw new ValidationError('EscrowFinish: missing field OfferSequence')
   }
 
-  if (typeof tx.OfferSequence !== "number") {
-    throw new ValidationError("EscrowFinish: OfferSequence must be a number");
+  if (typeof tx.OfferSequence !== 'number') {
+    throw new ValidationError('EscrowFinish: OfferSequence must be a number')
   }
 
-  if (tx.Condition !== undefined && typeof tx.Condition !== "string") {
-    throw new ValidationError("EscrowFinish: Condition must be a string");
+  if (tx.Condition !== undefined && typeof tx.Condition !== 'string') {
+    throw new ValidationError('EscrowFinish: Condition must be a string')
   }
 
-  if (tx.Fulfillment !== undefined && typeof tx.Fulfillment !== "string") {
-    throw new ValidationError("EscrowFinish: Fulfillment must be a string");
+  if (tx.Fulfillment !== undefined && typeof tx.Fulfillment !== 'string') {
+    throw new ValidationError('EscrowFinish: Fulfillment must be a string')
   }
 }

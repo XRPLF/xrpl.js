@@ -1,17 +1,19 @@
-import net from "net";
+/* eslint-disable @typescript-eslint/no-explicit-any -- Necessary for these methods TODO: further cleanup */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types -- Necessary for these methods TODO: further cleanup */
+import net from 'net'
 
-import { assert } from "chai";
-import _ from "lodash";
+import { assert } from 'chai'
+import _ from 'lodash'
 
-import addresses from "./fixtures/addresses.json";
+import addresses from './fixtures/addresses.json'
 
 /**
  * Setup to run tests on both classic addresses and X-addresses.
  */
 export const addressTests = [
-  { type: "Classic Address", address: addresses.ACCOUNT },
-  { type: "X-Address", address: addresses.ACCOUNT_X },
-];
+  { type: 'Classic Address', address: addresses.ACCOUNT },
+  { type: 'X-Address', address: addresses.ACCOUNT_X },
+]
 
 /**
  * Check the response against the expected result. Optionally validate
@@ -19,33 +21,33 @@ export const addressTests = [
  *
  * @param response - Response received from the method.
  * @param expected - Expected response from the method.
- * @param schemaName - Name of the schema used to validate the shape of the response.
+ * @param _schemaName - Name of the schema used to validate the shape of the response.
  */
 export function assertResultMatch(
   response: any,
   expected: any,
-  schemaName?: string
-) {
+  _schemaName?: string,
+): void {
   if (expected.txJSON) {
-    assert(response.txJSON);
+    assert(response.txJSON)
     assert.deepEqual(
-      JSON.parse(response.txJSON),
-      JSON.parse(expected.txJSON),
-      "checkResult: txJSON must match"
-    );
+      JSON.parse(response.txJSON as string),
+      JSON.parse(expected.txJSON as string),
+      'checkResult: txJSON must match',
+    )
   }
   if (expected.tx_json) {
-    assert(response.tx_json);
+    assert(response.tx_json)
     assert.deepEqual(
       response.tx_json,
       expected.tx_json,
-      "checkResult: tx_json must match"
-    );
+      'checkResult: tx_json must match',
+    )
   }
   assert.deepEqual(
-    _.omit(response, ["txJSON", "tx_json"]),
-    _.omit(expected, ["txJSON", "tx_json"])
-  );
+    _.omit(response, ['txJSON', 'tx_json']),
+    _.omit(expected, ['txJSON', 'tx_json']),
+  )
 }
 
 /**
@@ -56,40 +58,40 @@ export function assertResultMatch(
  * @param message - Expected error message/substring of the error message.
  */
 export async function assertRejects(
-  promise: PromiseLike<any>,
+  promise: PromiseLike<Record<string, unknown>>,
   instanceOf: any,
-  message?: string | RegExp
-) {
+  message?: string | RegExp,
+): Promise<void> {
   try {
-    await promise;
-    assert(false, "Expected an error to be thrown");
+    await promise
+    assert(false, 'Expected an error to be thrown')
   } catch (error) {
-    assert(error instanceof instanceOf, error.message);
-    if (typeof message === "string") {
-      assert.strictEqual(error.message, message);
+    assert(error instanceof instanceOf, error.message)
+    if (typeof message === 'string') {
+      assert.strictEqual(error.message, message)
     } else if (message instanceof RegExp) {
-      assert(message.test(error.message));
+      assert(message.test(error.message))
     }
   }
 }
 
 // using a free port instead of a constant port enables parallelization
-export function getFreePort() {
+export async function getFreePort(): Promise<number> {
   return new Promise((resolve, reject) => {
-    const server = net.createServer();
-    let port;
-    server.on("listening", function () {
-      port = (server.address() as any).port;
-      server.close();
-    });
-    server.on("close", function () {
-      resolve(port);
-    });
-    server.on("error", function (error) {
-      reject(error);
-    });
-    server.listen(0);
-  });
+    const server = net.createServer()
+    let port: number
+    server.on('listening', function () {
+      port = (server.address() as net.AddressInfo).port
+      server.close()
+    })
+    server.on('close', function () {
+      resolve(port)
+    })
+    server.on('error', function (error) {
+      reject(error)
+    })
+    server.listen(0)
+  })
 }
 
 /**
@@ -98,10 +100,11 @@ export function getFreePort() {
  * has come back.
  *
  * @param error - Thrown error.
+ * @throws If error is not websocket disconnect error.
  */
 export function ignoreWebSocketDisconnect(error: Error): void {
-  if (error.message === "websocket was closed") {
-    return;
+  if (error.message === 'websocket was closed') {
+    return
   }
-  throw error;
+  throw error
 }

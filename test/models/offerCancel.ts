@@ -8,8 +8,8 @@ import { verify } from "../../src/models/transactions";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("OfferCancel", function () {
-  let offer;
+describe('OfferCancel', function () {
+  let offer
 
   beforeEach(function () {
     offer = {
@@ -40,7 +40,7 @@ describe("OfferCancel", function () {
   });
 
   it(`throws w/ OfferSequence must be a number`, function () {
-    offer.OfferSequence = "99";
+    offer.OfferSequence = '99'
     assert.throws(
       () => verifyOfferCancel(offer),
       ValidationError,
@@ -52,9 +52,9 @@ describe("OfferCancel", function () {
       "OfferCancel: OfferSequence must be a number"
     );
   });
-
+  
   it(`throws w/ missing OfferSequence`, function () {
-    delete offer.OfferSequence;
+    delete offer.OfferSequence
     assert.throws(
       () => verifyOfferCancel(offer),
       ValidationError,

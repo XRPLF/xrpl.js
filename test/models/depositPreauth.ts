@@ -8,15 +8,15 @@ import { verify } from "../../src/models/transactions";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("DepositPreauth", function () {
-  let depositPreauth;
+describe('DepositPreauth', function () {
+  let depositPreauth
 
   beforeEach(function () {
     depositPreauth = {
-      TransactionType: "DepositPreauth",
-      Account: "rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo",
-    } as any;
-  });
+      TransactionType: 'DepositPreauth',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+    } as any
+  })
 
   it("verifies valid DepositPreauth when only Authorize is provided", function () {
     depositPreauth.Authorize = "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW";
@@ -31,9 +31,14 @@ describe("DepositPreauth", function () {
   //   verify(depositPreauth);
   // });
 
-  it("throws when both Authorize and Unauthorize are provided", function () {
-    depositPreauth.Authorize = "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW";
-    depositPreauth.Unauthorize = "raKEEVSGnKSD9Zyvxu4z6Pqpm4ABH8FS6n";
+  it('verifies valid DepositPreauth when only Unauthorize is provided', function () {
+    depositPreauth.Unauthorize = 'raKEEVSGnKSD9Zyvxu4z6Pqpm4ABH8FS6n'
+    assert.doesNotThrow(() => verifyDepositPreauth(depositPreauth))
+  })
+
+  it('throws when both Authorize and Unauthorize are provided', function () {
+    depositPreauth.Authorize = 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW'
+    depositPreauth.Unauthorize = 'raKEEVSGnKSD9Zyvxu4z6Pqpm4ABH8FS6n'
     assert.throws(
       () => verifyDepositPreauth(depositPreauth),
       ValidationError,
@@ -46,7 +51,7 @@ describe("DepositPreauth", function () {
     );
   });
 
-  it("throws when neither Authorize nor Unauthorize are provided", function () {
+  it('throws when neither Authorize nor Unauthorize are provided', function () {
     assert.throws(
       () => verifyDepositPreauth(depositPreauth),
       ValidationError,
@@ -59,8 +64,8 @@ describe("DepositPreauth", function () {
     );
   });
 
-  it("throws when Authorize is not a string", function () {
-    depositPreauth.Authorize = 1234;
+  it('throws when Authorize is not a string', function () {
+    depositPreauth.Authorize = 1234
     assert.throws(
       () => verifyDepositPreauth(depositPreauth),
       ValidationError,
@@ -73,17 +78,17 @@ describe("DepositPreauth", function () {
     );
   });
 
-  it("throws when an Account attempts to preauthorize its own address", function () {
-    depositPreauth.Authorize = depositPreauth.Account;
+  it('throws when an Account attempts to preauthorize its own address', function () {
+    depositPreauth.Authorize = depositPreauth.Account
     assert.throws(
       () => verifyDepositPreauth(depositPreauth),
       ValidationError,
-      "DepositPreauth: Account can't preauthorize its own address"
-    );
-  });
+      "DepositPreauth: Account can't preauthorize its own address",
+    )
+  })
 
-  it("throws when Unauthorize is not a string", function () {
-    depositPreauth.Unauthorize = 1234;
+  it('throws when Unauthorize is not a string', function () {
+    depositPreauth.Unauthorize = 1234
     assert.throws(
       () => verifyDepositPreauth(depositPreauth),
       ValidationError,
@@ -96,8 +101,8 @@ describe("DepositPreauth", function () {
     );
   });
 
-  it("throws when an Account attempts to unauthorize its own address", function () {
-    depositPreauth.Unauthorize = depositPreauth.Account;
+  it('throws when an Account attempts to unauthorize its own address', function () {
+    depositPreauth.Unauthorize = depositPreauth.Account
     assert.throws(
       () => verifyDepositPreauth(depositPreauth),
       ValidationError,

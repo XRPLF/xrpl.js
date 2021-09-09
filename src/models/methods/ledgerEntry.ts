@@ -1,72 +1,72 @@
-import { LedgerIndex } from "../common";
-import { LedgerEntry } from "../ledger";
+import { LedgerIndex } from '../common'
+import { LedgerEntry } from '../ledger'
 
-import { BaseRequest, BaseResponse } from "./baseMethod";
+import { BaseRequest, BaseResponse } from './baseMethod'
 
 export interface LedgerEntryRequest extends BaseRequest {
-  command: "ledger_entry";
-  binary?: boolean;
-  ledger_hash?: string;
-  ledger_index?: LedgerIndex;
+  command: 'ledger_entry'
+  binary?: boolean
+  ledger_hash?: string
+  ledger_index?: LedgerIndex
 
   // Only one of the following properties should be defined in a single request
   // https://xrpl.org/ledger_entry.html
 
-  index?: string;
+  index?: string
 
-  account_root?: string;
+  account_root?: string
 
   directory?:
     | {
-        sub_index?: number;
-        dir_root?: string;
-        owner?: string;
+        sub_index?: number
+        dir_root?: string
+        owner?: string
       }
-    | string;
+    | string
 
   offer?:
     | {
-        account: string;
-        seq: number;
+        account: string
+        seq: number
       }
-    | string;
+    | string
 
   ripple_state?: {
-    accounts: string[];
-    currency: string;
-  };
+    accounts: string[]
+    currency: string
+  }
 
-  check?: string;
+  check?: string
 
   escrow?:
     | {
-        owner: string;
-        seq: number;
+        owner: string
+        seq: number
       }
-    | string;
+    | string
 
-  payment_channel?: string;
+  payment_channel?: string
 
   deposit_preauth?:
     | {
-        owner: string;
-        authorized: string;
+        owner: string
+        authorized: string
       }
-    | string;
+    | string
 
   ticket?:
     | {
-        owner: string;
-        ticket_sequence: number;
+        owner: string
+        ticket_sequence: number
       }
-    | string;
+    | string
 }
 
 export interface LedgerEntryResponse extends BaseResponse {
   result: {
-    index: string;
-    ledger_index: number;
-    node?: LedgerEntry;
-    node_binary?: string;
-  };
+    index: string
+    ledger_index: number
+    node?: LedgerEntry
+    node_binary?: string
+  }
 }

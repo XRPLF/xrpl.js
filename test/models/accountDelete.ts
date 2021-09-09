@@ -1,3 +1,4 @@
+
 import { ValidationError } from "xrpl-local/common/errors";
 import { verifyAccountDelete } from "./../../src/models/transactions/accountDelete";
 import { verify } from "./../../src/models/transactions";
@@ -8,29 +9,29 @@ import { assert } from "chai";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("AccountDelete", function () {
+describe('AccountDelete', function () {
   it(`verifies valid AccountDelete`, function () {
     const validAccountDelete = {
-      TransactionType: "AccountDelete",
-      Account: "rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm",
-      Destination: "rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe",
+      TransactionType: 'AccountDelete',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Destination: 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe',
       DestinationTag: 13,
-      Fee: "5000000",
+      Fee: '5000000',
       Sequence: 2470665,
       Flags: 2147483648,
-    } as any;
+    } as any
 
-    assert.doesNotThrow(() => verifyAccountDelete(validAccountDelete));
-  });
+    assert.doesNotThrow(() => verifyAccountDelete(validAccountDelete))
+  })
 
   it(`throws w/ missing Destination`, function () {
     const invalidDestination = {
-      TransactionType: "AccountDelete",
-      Account: "rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm",
-      Fee: "5000000",
+      TransactionType: 'AccountDelete',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Fee: '5000000',
       Sequence: 2470665,
       Flags: 2147483648,
-    } as any;
+    } as any
 
     assert.throws(
       () => verifyAccountDelete(invalidDestination),
@@ -47,13 +48,13 @@ describe("AccountDelete", function () {
 
   it(`throws w/ invalid Destination`, function () {
     const invalidDestination = {
-      TransactionType: "AccountDelete",
-      Account: "rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm",
+      TransactionType: 'AccountDelete',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Destination: 65478965,
-      Fee: "5000000",
+      Fee: '5000000',
       Sequence: 2470665,
       Flags: 2147483648,
-    } as any;
+    } as any
 
     assert.throws(
       () => verifyAccountDelete(invalidDestination),
@@ -69,14 +70,14 @@ describe("AccountDelete", function () {
 
   it(`throws w/ invalid DestinationTag`, function () {
     const invalidDestinationTag = {
-      TransactionType: "AccountDelete",
-      Account: "rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm",
-      Destination: "rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe",
-      DestinationTag: "gvftyujnbv",
-      Fee: "5000000",
+      TransactionType: 'AccountDelete',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Destination: 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe',
+      DestinationTag: 'gvftyujnbv',
+      Fee: '5000000',
       Sequence: 2470665,
       Flags: 2147483648,
-    } as any;
+    } as any
 
     assert.throws(
       () => verifyAccountDelete(invalidDestinationTag),

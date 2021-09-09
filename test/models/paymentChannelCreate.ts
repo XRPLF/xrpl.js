@@ -8,23 +8,23 @@ import { verify } from "../../src/models/transactions";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("PaymentChannelCreate", function () {
-  let channel;
+describe('PaymentChannelCreate', function () {
+  let channel
 
   beforeEach(function () {
     channel = {
-      Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-      TransactionType: "PaymentChannelCreate",
-      Amount: "10000",
-      Destination: "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
+      Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+      TransactionType: 'PaymentChannelCreate',
+      Amount: '10000',
+      Destination: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',
       SettleDelay: 86400,
       PublicKey:
-        "32D2471DB72B27E3310F355BB33E339BF26F8392D5A93D3BC0FC3B566612DA0F0A",
+        '32D2471DB72B27E3310F355BB33E339BF26F8392D5A93D3BC0FC3B566612DA0F0A',
       CancelAfter: 533171558,
       DestinationTag: 23480,
       SourceTag: 11747,
-    };
-  });
+    }
+  })
 
   it(`verifies valid PaymentChannelCreate`, function () {
     assert.doesNotThrow(() => verifyPaymentChannelCreate(channel));
@@ -32,16 +32,16 @@ describe("PaymentChannelCreate", function () {
   });
 
   it(`verifies valid PaymentChannelCreate w/o optional`, function () {
-    delete channel.CancelAfter;
-    delete channel.DestinationTag;
-    delete channel.SourceTag;
+    delete channel.CancelAfter
+    delete channel.DestinationTag
+    delete channel.SourceTag
 
     assert.doesNotThrow(() => verifyPaymentChannelCreate(channel));
     assert.doesNotThrow(() => verify(channel));
   });
 
   it(`missing Amount`, function () {
-    delete channel.Amount;
+    delete channel.Amount
 
     assert.throws(
       () => verifyPaymentChannelCreate(channel),
@@ -56,7 +56,7 @@ describe("PaymentChannelCreate", function () {
   });
 
   it(`missing Destination`, function () {
-    delete channel.Destination;
+    delete channel.Destination
 
     assert.throws(
       () => verifyPaymentChannelCreate(channel),
@@ -71,7 +71,7 @@ describe("PaymentChannelCreate", function () {
   });
 
   it(`missing SettleDelay`, function () {
-    delete channel.SettleDelay;
+    delete channel.SettleDelay
 
     assert.throws(
       () => verifyPaymentChannelCreate(channel),
@@ -86,7 +86,7 @@ describe("PaymentChannelCreate", function () {
   });
 
   it(`missing PublicKey`, function () {
-    delete channel.PublicKey;
+    delete channel.PublicKey
 
     assert.throws(
       () => verifyPaymentChannelCreate(channel),
@@ -101,7 +101,7 @@ describe("PaymentChannelCreate", function () {
   });
 
   it(`invalid Amount`, function () {
-    channel.Amount = 1000;
+    channel.Amount = 1000
 
     assert.throws(
       () => verifyPaymentChannelCreate(channel),
@@ -116,7 +116,7 @@ describe("PaymentChannelCreate", function () {
   });
 
   it(`invalid Destination`, function () {
-    channel.Destination = 10;
+    channel.Destination = 10
 
     assert.throws(
       () => verifyPaymentChannelCreate(channel),
@@ -131,7 +131,7 @@ describe("PaymentChannelCreate", function () {
   });
 
   it(`invalid SettleDelay`, function () {
-    channel.SettleDelay = "10";
+    channel.SettleDelay = '10'
 
     assert.throws(
       () => verifyPaymentChannelCreate(channel),
@@ -146,7 +146,7 @@ describe("PaymentChannelCreate", function () {
   });
 
   it(`invalid PublicKey`, function () {
-    channel.PublicKey = 10;
+    channel.PublicKey = 10
 
     assert.throws(
       () => verifyPaymentChannelCreate(channel),
@@ -161,7 +161,7 @@ describe("PaymentChannelCreate", function () {
   });
 
   it(`invalid DestinationTag`, function () {
-    channel.DestinationTag = "10";
+    channel.DestinationTag = '10'
 
     assert.throws(
       () => verifyPaymentChannelCreate(channel),
@@ -176,7 +176,7 @@ describe("PaymentChannelCreate", function () {
   });
 
   it(`invalid CancelAfter`, function () {
-    channel.CancelAfter = "100";
+    channel.CancelAfter = '100'
 
     assert.throws(
       () => verifyPaymentChannelCreate(channel),

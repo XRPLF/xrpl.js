@@ -8,16 +8,16 @@ import { verify } from "../../src/models/transactions";
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe("CheckCash", function () {
+describe('CheckCash', function () {
   it(`verifies valid CheckCash`, function () {
     const validCheckCash = {
-      Account: "rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy",
-      TransactionType: "CheckCash",
-      Amount: "100000000",
+      Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      TransactionType: 'CheckCash',
+      Amount: '100000000',
       CheckID:
-        "838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334",
-      Fee: "12",
-    } as any;
+        '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
+      Fee: '12',
+    } as any
 
     assert.doesNotThrow(() => verifyCheckCash(validCheckCash));
     assert.doesNotThrow(() => verify(validCheckCash));
@@ -25,11 +25,11 @@ describe("CheckCash", function () {
 
   it(`throws w/ invalid CheckID`, function () {
     const invalidCheckID = {
-      Account: "rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy",
-      TransactionType: "CheckCash",
-      Amount: "100000000",
-      CheckID: 83876645678909854567890,
-    } as any;
+      Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      TransactionType: 'CheckCash',
+      Amount: '100000000',
+      CheckID: 83876645678567890,
+    } as any
 
     assert.throws(
       () => verifyCheckCash(invalidCheckID),
@@ -45,12 +45,12 @@ describe("CheckCash", function () {
 
   it(`throws w/ invalid Amount`, function () {
     const invalidAmount = {
-      Account: "rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy",
-      TransactionType: "CheckCash",
+      Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      TransactionType: 'CheckCash',
       Amount: 100000000,
       CheckID:
-        "838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334",
-    } as any;
+        '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
+    } as any
 
     assert.throws(
       () => verifyCheckCash(invalidAmount),
@@ -66,13 +66,13 @@ describe("CheckCash", function () {
 
   it(`throws w/ having both Amount and DeliverMin`, function () {
     const invalidDeliverMin = {
-      Account: "rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy",
-      TransactionType: "CheckCash",
-      Amount: "100000000",
+      Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      TransactionType: 'CheckCash',
+      Amount: '100000000',
       DeliverMin: 852156963,
       CheckID:
-        "838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334",
-    } as any;
+        '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
+    } as any
 
     assert.throws(
       () => verifyCheckCash(invalidDeliverMin),
@@ -88,12 +88,12 @@ describe("CheckCash", function () {
 
   it(`throws w/ invalid DeliverMin`, function () {
     const invalidDeliverMin = {
-      Account: "rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy",
-      TransactionType: "CheckCash",
+      Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      TransactionType: 'CheckCash',
       DeliverMin: 852156963,
       CheckID:
-        "838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334",
-    } as any;
+        '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
+    } as any
 
     assert.throws(
       () => verifyCheckCash(invalidDeliverMin),
