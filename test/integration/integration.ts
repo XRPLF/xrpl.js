@@ -4,15 +4,19 @@ import _ from 'lodash'
 import { isValidXAddress } from 'ripple-address-codec'
 
 import { Client } from 'xrpl-local'
-import { isValidSecret, generateXAddress, xrpToDrops } from 'xrpl-local/utils'
-
-import { convertStringToHex } from '../../src'
 import {
   AccountSet,
   OfferCreate,
   SignerListSet,
   TrustSet,
-} from '../../src/models/transactions'
+} from 'xrpl-local/models/transactions'
+import {
+  isValidSecret,
+  generateXAddress,
+  xrpToDrops,
+  convertStringToHex,
+} from 'xrpl-local/utils'
+
 import requests from '../fixtures/requests'
 
 import { payTo, ledgerAccept } from './utils'
