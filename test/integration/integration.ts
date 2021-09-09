@@ -390,57 +390,39 @@ describe('integration tests', function () {
     })
   })
 
-  it('getTrustlines', function () {
-    const fixture = requests.prepareTrustline.simple
-    const { currency, counterparty } = fixture
-    const options = { currency, counterparty }
-    return this.client.getTrustlines(address, options).then((data) => {
-      assert(data && data.length > 0 && data[0] && data[0].specification)
-      const specification = data[0].specification
-      assert.strictEqual(Number(specification.limit), Number(fixture.limit))
-      assert.strictEqual(specification.currency, fixture.currency)
-      assert.strictEqual(specification.counterparty, fixture.counterparty)
-    })
-  })
-
   it('getBalances', function () {
-    const fixture = requests.prepareTrustline.simple
-    const { currency, counterparty } = fixture
-    const options = { currency, counterparty }
-    return this.client.getBalances(address, options).then((data) => {
+    return this.client.getBalances(address).then((data) => {
       assert(data && data.length > 0 && data[0])
-      assert.strictEqual(data[0].currency, fixture.currency)
-      assert.strictEqual(data[0].counterparty, fixture.counterparty)
     })
   })
 
-  it('getOrderbook', function () {
-    const orderbook = {
-      base: {
-        currency: 'XRP',
-      },
-      counter: {
-        currency: 'USD',
-        counterparty: masterAccount,
-      },
-    }
-    return this.client.getOrderbook(address, orderbook).then((book) => {
-      assert(book && book.bids && book.bids.length > 0)
-      assert(book.asks && book.asks.length > 0)
-      const bid = book.bids[0]
-      assert(bid && bid.specification && bid.specification.quantity)
-      assert(bid.specification.totalPrice)
-      assert.strictEqual(bid.specification.direction, 'buy')
-      assert.strictEqual(bid.specification.quantity.currency, 'XRP')
-      assert.strictEqual(bid.specification.totalPrice.currency, 'USD')
-      const ask = book.asks[0]
-      assert(ask && ask.specification && ask.specification.quantity)
-      assert(ask.specification.totalPrice)
-      assert.strictEqual(ask.specification.direction, 'sell')
-      assert.strictEqual(ask.specification.quantity.currency, 'XRP')
-      assert.strictEqual(ask.specification.totalPrice.currency, 'USD')
-    })
-  })
+  // it('getOrderbook', function () {
+  //   const orderbook = {
+  //     taker_pa: {
+  //       currency: 'XRP',
+  //     },
+  //     counter: {
+  //       currency: 'USD',
+  //       counterparty: masterAccount,
+  //     },
+  //   }
+  //   return this.client.getOrderbook(address, orderbook).then((book) => {
+  //     assert(book && book.bids && book.bids.length > 0)
+  //     assert(book.asks && book.asks.length > 0)
+  //     const bid = book.bids[0]
+  //     assert(bid && bid.specification && bid.specification.quantity)
+  //     assert(bid.specification.totalPrice)
+  //     assert.strictEqual(bid.specification.direction, 'buy')
+  //     assert.strictEqual(bid.specification.quantity.currency, 'XRP')
+  //     assert.strictEqual(bid.specification.totalPrice.currency, 'USD')
+  //     const ask = book.asks[0]
+  //     assert(ask && ask.specification && ask.specification.quantity)
+  //     assert(ask.specification.totalPrice)
+  //     assert.strictEqual(ask.specification.direction, 'sell')
+  //     assert.strictEqual(ask.specification.quantity.currency, 'XRP')
+  //     assert.strictEqual(ask.specification.totalPrice.currency, 'USD')
+  //   })
+  // })
 
   // it("getOrderbook", function () {
   //   return this.client
