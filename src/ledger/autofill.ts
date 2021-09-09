@@ -25,11 +25,13 @@ interface ClassicAccountAndTag {
  * @param signersCount - The expected number of signers for this transaction. Used for multisign.
  * @returns An autofilled transaction.
  */
-async function autofill(
+async function autofill<T extends Transaction>(
   client: Client,
-  tx: Transaction,
+  transaction: T,
   signersCount?: number,
-): Promise<Transaction> {
+): Promise<T> {
+  const tx = {...transaction}
+
   setValidAddresses(tx)
 
   setTransactionFlagsToNumber(tx)

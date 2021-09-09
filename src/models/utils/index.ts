@@ -3,15 +3,17 @@
 import { ValidationError } from '../../common/errors'
 // eslint-disable-next-line import/no-cycle -- cycle is safe
 import {
-  OfferCreateFlags,
-  OfferCreateFlagsEnum,
-  PaymentChannelClaimFlags,
-  PaymentChannelClaimFlagsEnum,
+  AccountSetFlagsInterface,
+  AccountSetTransactionFlags,
+  OfferCreateFlagsInterface,
+  OfferCreateTransactionFlags,
+  PaymentChannelClaimFlagsInterface,
+  PaymentChannelClaimTransactionFlags,
+  PaymentFlagsInterface,
   PaymentTransactionFlags,
-  PaymentTransactionFlagsEnum,
   Transaction,
-  TrustSetFlags,
-  TrustSetFlagsEnum,
+  TrustSetFlagsInterface,
+  TrustSetTransactionFlags,
 } from '../transactions'
 import type { GlobalFlags } from '../transactions/common'
 
@@ -55,6 +57,9 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
   }
 
   switch (tx.TransactionType) {
+    case 'AccountSet':
+      tx.Flags =convertAccountSetFlagsToNumber(tx.Flags)
+      return
     case 'OfferCreate':
       tx.Flags = convertOfferCreateFlagsToNumber(tx.Flags)
       return
@@ -72,24 +77,28 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
   }
 }
 
-function convertOfferCreateFlagsToNumber(flags: OfferCreateFlags): number {
-  return reduceFlags(flags, OfferCreateFlagsEnum)
+function convertAccountSetFlagsToNumber(flags: AccountSetFlagsInterface): number {
+  return reduceFlags(flags, AccountSetTransactionFlags)
+}
+
+function convertOfferCreateFlagsToNumber(flags: OfferCreateFlagsInterface): number {
+  return reduceFlags(flags, OfferCreateTransactionFlags)
 }
 
 function convertPaymentChannelClaimFlagsToNumber(
-  flags: PaymentChannelClaimFlags,
+  flags: PaymentChannelClaimFlagsInterface,
 ): number {
-  return reduceFlags(flags, PaymentChannelClaimFlagsEnum)
+  return reduceFlags(flags, PaymentChannelClaimTransactionFlags)
 }
 
 function convertPaymentTransactionFlagsToNumber(
-  flags: PaymentTransactionFlags,
+  flags: PaymentFlagsInterface,
 ): number {
-  return reduceFlags(flags, PaymentTransactionFlagsEnum)
+  return reduceFlags(flags, PaymentTransactionFlags)
 }
 
-function convertTrustSetFlagsToNumber(flags: TrustSetFlags): number {
-  return reduceFlags(flags, TrustSetFlagsEnum)
+function convertTrustSetFlagsToNumber(flags: TrustSetFlagsInterface): number {
+  return reduceFlags(flags, TrustSetTransactionFlags)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- added ValidationError check for flagEnum
