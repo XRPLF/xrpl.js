@@ -1,11 +1,11 @@
 import BigNumber from 'bignumber.js'
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { decodeAccountID } from 'ripple-address-codec'
 import binary from 'ripple-binary-codec'
 import { JsonObject } from 'ripple-binary-codec/dist/types/serialized-type'
 
 import { ValidationError } from '../common/errors'
-import { computeBinaryTransactionHash } from '../utils/hashes'
+import { computeSignedTransactionHash } from '../utils/hashes'
 
 /**
  * The transactions should all be equal except for the 'Signers' field.
@@ -75,7 +75,7 @@ function combine(signedTransactions: string[]): object {
   )
   return {
     signedTransaction,
-    id: computeBinaryTransactionHash(signedTransaction),
+    id: computeSignedTransactionHash(signedTransaction),
   }
 }
 

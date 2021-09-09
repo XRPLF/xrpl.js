@@ -6,7 +6,7 @@ import keypairs from 'ripple-keypairs'
 import type { Client, Wallet } from '..'
 import { ValidationError } from '../common/errors'
 import { xrpToDrops } from '../utils'
-import { computeBinaryTransactionHash } from '../utils/hashes'
+import { computeSignedTransactionHash } from '../utils/hashes'
 
 import { SignOptions, KeyPair, TransactionJSON } from './types'
 
@@ -61,7 +61,7 @@ function signWithKeypair(
   checkTxSerialization(serialized, tx)
   return {
     signedTransaction: serialized,
-    id: computeBinaryTransactionHash(serialized),
+    id: computeSignedTransactionHash(serialized),
   }
 }
 
