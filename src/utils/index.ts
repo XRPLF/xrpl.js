@@ -8,8 +8,7 @@ import { RippledAmount } from '../common/types/objects'
 import { deriveKeypair, deriveAddress, deriveXAddress } from './derive'
 import { generateXAddress } from './generateAddress'
 import {
-  computeBinaryTransactionHash,
-  computeTransactionHash,
+  computeSignedTransactionHash,
   computeBinaryTransactionSigningHash,
   computeAccountRootIndex,
   computeSignerListIndex,
@@ -224,8 +223,7 @@ export {
   rippleTimeToISOTime,
   ISOTimeToRippleTime,
   isValidSecret,
-  computeBinaryTransactionHash,
-  computeTransactionHash,
+  computeSignedTransactionHash,
   computeBinaryTransactionSigningHash,
   computeAccountRootIndex,
   computeSignerListIndex,
