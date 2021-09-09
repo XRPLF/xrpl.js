@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { decodeAccountID } from 'ripple-address-codec'
 import binary from 'ripple-binary-codec'
 import { JsonObject } from 'ripple-binary-codec/dist/types/serialized-type'
