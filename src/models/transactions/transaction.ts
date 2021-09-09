@@ -32,7 +32,7 @@ import { SignerListSet, verifySignerListSet } from "./signerListSet";
 import { TicketCreate, verifyTicketCreate } from "./ticketCreate";
 import { TrustSet, verifyTrustSet } from "./trustSet";
 import { ValidationError } from "../../common/errors";
-import { isEqual } from "lodash";
+import { isEqual, omitBy, isUndefined } from "lodash";
 import { encode, decode } from "ripple-binary-codec";
 
 export type Transaction =
@@ -151,7 +151,6 @@ export interface TransactionAndMetadata {
       throw new ValidationError(`Invalid field TransactionType`)
   }
 
-  if(!isEqual(decode(encode(tx)),tx))
-    throw new ValidationError(`Invalid Transaction: ${tx.TransactionType}`)
-  
+  if (!isEqual(decode(encode(tx)), tx))
+    throw new ValidationError(`Invalid Transaction: ${tx.TransactionType}`);
 }

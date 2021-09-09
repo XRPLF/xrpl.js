@@ -144,11 +144,12 @@ describe('Payment Transaction Verification', () => {
         })
     })
 
-    it (`verifies valid DeliverMin with tfPartialPayment flag set as a boolean`, () => {
-        paymentTransaction.DeliverMin = '10000'
-        paymentTransaction.Flags = { tfPartialPayment: true }
-        assert.doesNotThrow(() => verifyPaymentTransaction(paymentTransaction))
-    })
+  it(`verifies valid DeliverMin with tfPartialPayment flag set as a boolean`, function () {
+    paymentTransaction.DeliverMin = "10000";
+    paymentTransaction.Flags = 0x00020000;
+    assert.doesNotThrow(() => verifyPaymentTransaction(paymentTransaction));
+    assert.doesNotThrow(() => verify(paymentTransaction));
+  });
 
     it (`throws when DeliverMin is invalid`, () => {
         paymentTransaction.DeliverMin = 10000
