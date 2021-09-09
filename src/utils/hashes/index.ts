@@ -106,7 +106,7 @@ export function computeSignedTransactionHash(tx: Transaction | string): string {
     throw new ValidationError('The transaction must be signed to hash it.')
   }
 
-  const prefix = HashPrefix.TRANSACTION_ID.toString(16).toUpperCase()
+  const prefix = HashPrefix.TRANSACTION_ID.toString(BITS_IN_HEX).toUpperCase()
   return sha512Half(prefix.concat(txBlob))
 }
 
@@ -119,7 +119,7 @@ export function computeSignedTransactionHash(tx: Transaction | string): string {
  * @returns The hash to sign.
  */
 export function computeBinaryTransactionSigningHash(txBlobHex: string): string {
-  const prefix = HashPrefix.TRANSACTION_SIGN.toString(16).toUpperCase()
+  const prefix = HashPrefix.TRANSACTION_SIGN.toString(BITS_IN_HEX).toUpperCase()
   return sha512Half(prefix + txBlobHex)
 }
 
@@ -195,8 +195,8 @@ export function computeTrustlineHash(
   const address1Hex = addressToHex(address1)
   const address2Hex = addressToHex(address2)
 
-  const swap = new BigNumber(address1Hex, 16).isGreaterThan(
-    new BigNumber(address2Hex, 16),
+  const swap = new BigNumber(address1Hex, BITS_IN_HEX).isGreaterThan(
+    new BigNumber(address2Hex, BITS_IN_HEX),
   )
   const lowAddressHex = swap ? address2Hex : address1Hex
   const highAddressHex = swap ? address1Hex : address2Hex
@@ -255,7 +255,7 @@ export function computeStateTreeHash(entries: LedgerEntry[]): string {
  * @returns An identifying hash for this ledger object.
  */
 export function computeLedgerHash(ledgerHeader: Ledger): string {
-  const prefix = HashPrefix.LEDGER.toString(16).toUpperCase()
+  const prefix = HashPrefix.LEDGER.toString(BITS_IN_HEX).toUpperCase()
   return sha512Half(
     prefix +
       intToHex(Number(ledgerHeader.ledger_index), 4)
