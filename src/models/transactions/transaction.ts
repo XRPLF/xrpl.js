@@ -1,5 +1,7 @@
-// eslint-disable max-lines-per-function
-// eslint-disable import/max-dependencies
+/* eslint-disable complexity -- verifies 19 tx types hence a lot of checks needed */
+/* eslint-disable max-lines-per-function -- need to work with a lot of Tx verifications */
+/* eslint-disable import/max-dependencies -- need to test more than 5 TxTypes */
+
 import _ from "lodash";
 import { encode, decode } from "ripple-binary-codec";
 
@@ -65,10 +67,11 @@ export interface TransactionAndMetadata {
 }
 
 /**
- * 
- * @param {Transaction} tx A Transaction.
- * @returns {void}
- * @throws {ValidationError} When the Transaction is malformed.
+ * Verifies various Transaction Types.
+ * Encode/decode and individual type validation.
+ *
+ * @param tx - A Transaction.
+ * @throws ValidationError When the Transaction is malformed.
  */
  export function verify(tx: Transaction): void {
    
@@ -163,6 +166,3 @@ export interface TransactionAndMetadata {
     throw new ValidationError(`Invalid Transaction: ${tx.TransactionType}`);
   }
 }
-
-// eslint-enable max-lines-per-function
-// eslint-enable import/max-dependencies
