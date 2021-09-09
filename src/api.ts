@@ -9,7 +9,7 @@ import {
   rippleTimeToISO8601,
   iso8601ToRippleTime,
   txFlags,
-  ensureClassicAddress,
+  ensureClassicAddress
 } from './common'
 import {
   connect,
@@ -488,6 +488,8 @@ class RippleAPI extends EventEmitter {
   rippleTimeToISO8601 = rippleTimeToISO8601 // @deprecated Invoke from top-level package instead
   iso8601ToRippleTime = iso8601ToRippleTime // @deprecated Invoke from top-level package instead
   txFlags = txFlags
+  static txFlags = txFlags
+  accountSetFlags = constants.AccountSetFlags
   static accountSetFlags = constants.AccountSetFlags
 
   isValidAddress = schemaValidator.isValidAddress
