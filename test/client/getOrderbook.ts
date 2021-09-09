@@ -87,11 +87,11 @@ describe("client.getOrderbook", function () {
     describe(test.type, function () {
       it("normal", async function () {
         this.mockRippled.addResponse("book_offers", normalRippledResponse);
-        const response = await this.client.getOrderbook(
-          requests.getOrderbook.normal.taker_pays,
-          requests.getOrderbook.normal.taker_gets,
-          1
-        );
+        const response = await this.client.getOrderbook({
+          taker_pays: requests.getOrderbook.normal.taker_pays,
+          taker_gets: requests.getOrderbook.normal.taker_gets,
+          limit: 1,
+        });
         assertResultMatch(response, responses.getOrderbook.new, "getOrderbook");
       });
 

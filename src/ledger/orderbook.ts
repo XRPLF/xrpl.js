@@ -6,7 +6,6 @@ import { LedgerIndex } from "../models/common";
 import {
   BookOffer,
   BookOffersRequest,
-  BookOffersResponse,
   TakerAmount,
 } from "../models/methods/bookOffers";
 
@@ -17,33 +16,40 @@ interface Orderbook {
   sell: BookOffer[];
 }
 
-async function getOrderbook(
-  this: Client,
-  taker_pays: TakerAmount,
-  taker_gets: TakerAmount,
-  limit?: number,
-  ledger_index?: LedgerIndex,
-  ledger_hash?: string,
-  taker?: string
+interface Options {
+  taker_pays: TakerAmount;
+  taker_gets: TakerAmount;
+  limit?: number;
+  ledger_index?: LedgerIndex;
+  ledger_hash?: string;
+  taker?: string;
+}
+
+/**
+ * Fetch orderbook (buy/sell orders) between two accounts.
+ *
+ * @param client - Client.
+ * @param options - Options to include for getting orderbook between payer and receiver.
+ * @returns An object containing buy and sell objects.
+ */
+export default async function getOrderbook(
+  client: Client,
+  options: Options
 ): Promise<Orderbook> {
   const request: BookOffersRequest = {
     command: "book_offers",
-    taker_pays,
-    taker_gets,
-    ledger_index,
-    ledger_hash,
-    limit,
-    taker,
+    taker_pays: options.taker_pays,
+    taker_gets: options.taker_gets,
+    ledger_index: options.ledger_index,
+    ledger_hash: options.ledger_hash,
+    limit: options.limit,
+    taker: options.taker,
   };
   // 2. Make Request
-  const directOfferResults: BookOffersResponse[] = await this.requestAll(
-    request
-  );
-  request.taker_gets = taker_pays;
-  request.taker_pays = taker_gets;
-  const reverseOfferResults: BookOffersResponse[] = await this.requestAll(
-    request
-  );
+  const directOfferResults = await client.requestAll(request);
+  request.taker_gets = options.taker_pays;
+  request.taker_pays = options.taker_gets;
+  const reverseOfferResults = await client.requestAll(request);
   // 3. Return Formatted Response
   const directOffers = _.flatMap(
     directOfferResults,
@@ -54,7 +60,7 @@ async function getOrderbook(
     (reverseOfferResult) => reverseOfferResult.result.offers
   );
   // Sort the orders
-  // for both bids and asks, lowest quality is closest to mid-market
+  // for both buys and sells, lowest quality is closest to mid-market
   // we sort the orders so that earlier orders are closer to mid-market
 
   const orders = [...directOffers, ...reverseOffers].sort((a, b) => {
@@ -75,4 +81,3 @@ async function getOrderbook(
   });
   return { buy, sell };
 }
-export default getOrderbook;
