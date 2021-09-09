@@ -73,15 +73,23 @@ describe('SignerListSet Transaction Verification', function () {
         )
     })
 
-    it (`throws w/ invalid SignerEntries`, () => {
-        SignerListSetTx.SignerEntries = "khgfgyhujk"
-        
-        assert.throws(() => {
-           verifySignerListSet(SignerListSetTx)
-            verify(SignerListSetTx)
-        },
-            ValidationError,
-            "SignerListSet: invalid SignerEntries"
-        )
-    })
-})
+    assert.throws(
+      () => verifySignerListSet(SignerListSetTx),
+      ValidationError,
+      "SignerListSet: invalid SignerEntries"
+    );
+    assert.throws(
+      () => verify(SignerListSetTx),
+      ValidationError,
+      "SignerListSet: invalid SignerEntries"
+    );
+
+    it(`throws w/ extra field`, function () {
+        SignerListSetTx.ExtraField = "garbage";
+        assert.throws(
+        () => verify(SignerListSetTx),
+        ValidationError,
+        "Invalid Transaction: SignerListSet"
+        );
+    });
+});

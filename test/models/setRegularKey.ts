@@ -28,10 +28,11 @@ describe('SetRegularKey Transaction Verification', function () {
         })
     })
 
-    it (`verifies w/o SetRegularKey`, () => {
-        account.RegularKey = undefined
-        assert.doesNotThrow(() => verifySetRegularKey(account))
-    })
+  it(`verifies w/o SetRegularKey`, function () {
+    account.RegularKey = undefined;
+    // assert.doesNotThrow(() => verifySetRegularKey(account));
+    assert.doesNotThrow(() => verify(account));
+  });
 
     it (`throws w/ invalid RegularKey`, () => {
         account.RegularKey = 12369846963

@@ -1,3 +1,9 @@
+// eslint-disable max-lines-per-function
+// eslint-disable import/max-dependencies
+import _ from "lodash";
+import { encode, decode } from "ripple-binary-codec";
+
+import { ValidationError } from "../../common/errors";
 import Metadata from "../common/metadata";
 
 import { AccountDelete, verifyAccountDelete } from "./accountDelete";
@@ -6,15 +12,11 @@ import { CheckCancel, verifyCheckCancel } from "./checkCancel";
 import { CheckCash, verifyCheckCash } from "./checkCash";
 import { CheckCreate, verifyCheckCreate } from "./checkCreate";
 import { DepositPreauth, verifyDepositPreauth } from "./depositPreauth";
-import { EscrowCreate, verifyEscrowCreate } from "./escrowCreate";
 import { EscrowCancel, verifyEscrowCancel } from "./escrowCancel";
+import { EscrowCreate, verifyEscrowCreate } from "./escrowCreate";
 import { EscrowFinish, verifyEscrowFinish } from "./escrowFinish";
 import { OfferCancel, verifyOfferCancel } from "./offerCancel";
 import { OfferCreate, verifyOfferCreate } from "./offerCreate";
-import {
-  PaymentTransaction,
-  verifyPaymentTransaction,
-} from "./paymentTransaction";
 import {
   PaymentChannelClaim,
   verifyPaymentChannelClaim,
@@ -27,13 +29,14 @@ import {
   PaymentChannelFund,
   verifyPaymentChannelFund,
 } from "./paymentChannelFund";
+import {
+  PaymentTransaction,
+  verifyPaymentTransaction,
+} from "./paymentTransaction";
 import { SetRegularKey, verifySetRegularKey } from "./setRegularKey";
 import { SignerListSet, verifySignerListSet } from "./signerListSet";
 import { TicketCreate, verifyTicketCreate } from "./ticketCreate";
 import { TrustSet, verifyTrustSet } from "./trustSet";
-import { ValidationError } from "../../common/errors";
-import { isEqual, omitBy, isUndefined } from "lodash";
-import { encode, decode } from "ripple-binary-codec";
 
 export type Transaction =
        AccountDelete
@@ -151,6 +154,15 @@ export interface TransactionAndMetadata {
       throw new ValidationError(`Invalid field TransactionType`)
   }
 
-  if (!isEqual(decode(encode(tx)), tx))
+  if (
+    !_.isEqual(
+      decode(encode(tx)),
+      _.omitBy(tx, (value) => value == null)
+    )
+  ) {
     throw new ValidationError(`Invalid Transaction: ${tx.TransactionType}`);
+  }
 }
+
+// eslint-enable max-lines-per-function
+// eslint-enable import/max-dependencies
