@@ -25,7 +25,7 @@ interface Orderbook {
   sell: BookOffer[]
 }
 
-interface Options {
+interface OrderbookOptions {
   limit?: number
   ledger_index?: LedgerIndex
   ledger_hash?: string
@@ -38,20 +38,22 @@ interface Options {
  * @param client - Client.
  * @param taker_pays - Specs of the currency account taking the offer pays.
  * @param taker_gets - Specs of the currency account taking the offer receives.
+ * @param takerPays
+ * @param takerGets
  * @param options - Options to include for getting orderbook between payer and receiver.
  * @returns An object containing buy and sell objects.
  */
 // eslint-disable-next-line max-params -- Function needs 4 params.
 async function getOrderbook(
   client: Client,
-  taker_pays: TakerAmount,
-  taker_gets: TakerAmount,
-  options: Options,
+  takerPays: TakerAmount,
+  takerGets: TakerAmount,
+  options: OrderbookOptions,
 ): Promise<Orderbook> {
   const request: BookOffersRequest = {
     command: 'book_offers',
-    taker_pays,
-    taker_gets,
+    taker_pays: takerPays,
+    taker_gets: takerGets,
     ledger_index: options.ledger_index,
     ledger_hash: options.ledger_hash,
     limit: options.limit,
@@ -59,8 +61,8 @@ async function getOrderbook(
   }
   // 2. Make Request
   const directOfferResults = await client.requestAll(request)
-  request.taker_gets = taker_pays
-  request.taker_pays = taker_gets
+  request.taker_gets = takerPays
+  request.taker_pays = takerGets
   const reverseOfferResults = await client.requestAll(request)
   // 3. Return Formatted Response
   const directOffers = _.flatMap(
