@@ -1,9 +1,10 @@
 import _ from 'lodash'
 
-import { Client, dropsToXrp } from '..'
+import type { Client } from '..'
 import { LedgerIndex } from '../models/common'
 import { AccountInfoRequest } from '../models/methods'
 import { AccountLinesRequest, Trustline } from '../models/methods/accountLines'
+import { dropsToXrp } from '../utils'
 
 interface Balance {
   value: string

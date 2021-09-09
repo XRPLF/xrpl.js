@@ -13,8 +13,9 @@ describe('getBalances', function () {
   beforeEach(setupClient)
   afterEach(teardownClient)
 
-  addressTests.forEach(function (test) {
-    describe(test.type, function () {
+  // eslint-disable-next-line mocha/no-setup-in-describe -- Rule does not allow dynamic test generation.
+  addressTests.forEach(function (testCase) {
+    describe(testCase.type, function () {
       it('getBalances', async function () {
         this.mockRippled.addResponse(
           'account_info',
@@ -25,7 +26,7 @@ describe('getBalances', function () {
           rippledAccountLines.normal,
         )
         this.mockRippled.addResponse('ledger', rippled.ledger.normal)
-        const result = await this.client.getBalances(test.address)
+        const result = await this.client.getBalances(testCase.address)
         assertResultMatch(result, responses.getBalances, 'getBalances')
       })
 

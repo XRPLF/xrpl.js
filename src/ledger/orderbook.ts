@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 
-import { Client } from '../client'
+import type { Client } from '../client'
 import { LedgerIndex } from '../models/common'
 import {
   BookOffer,
@@ -10,6 +10,15 @@ import {
 } from '../models/methods/bookOffers'
 
 import { orderFlags } from './parse/flags'
+
+function sortOffers(offers: BookOffer[]): BookOffer[] {
+  return offers.sort((offerA, offerB) => {
+    const qualityA = offerA.quality ?? 0
+    const qualityB = offerB.quality ?? 0
+
+    return new BigNumber(qualityA).comparedTo(qualityB)
+  })
+}
 
 interface Orderbook {
   buy: BookOffer[]
@@ -32,7 +41,8 @@ interface Options {
  * @param options - Options to include for getting orderbook between payer and receiver.
  * @returns An object containing buy and sell objects.
  */
-export default async function getOrderbook(
+// eslint-disable-next-line max-params -- Function needs 4 params.
+async function getOrderbook(
   client: Client,
   taker_pays: TakerAmount,
   taker_gets: TakerAmount,
@@ -65,12 +75,7 @@ export default async function getOrderbook(
   // for both buys and sells, lowest quality is closest to mid-market
   // we sort the orders so that earlier orders are closer to mid-market
 
-  const orders = [...directOffers, ...reverseOffers].sort((a, b) => {
-    const qualityA = a.quality ?? 0
-    const qualityB = b.quality ?? 0
-
-    return new BigNumber(qualityA).comparedTo(qualityB)
-  })
+  const orders = [...directOffers, ...reverseOffers]
   // separate out the orders amongst buy and sell
   const buy: BookOffer[] = []
   const sell: BookOffer[] = []
@@ -81,5 +86,7 @@ export default async function getOrderbook(
       buy.push(order)
     }
   })
-  return { buy, sell }
+  return { buy: sortOffers(buy), sell: sortOffers(sell) }
 }
+
+export default getOrderbook
