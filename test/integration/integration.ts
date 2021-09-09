@@ -4,9 +4,14 @@ import _ from 'lodash'
 import { isValidXAddress } from 'ripple-address-codec'
 
 import { Client } from 'xrpl-local'
-import { isValidSecret } from 'xrpl-local/utils'
+import { isValidSecret, generateXAddress, xrpToDrops } from 'xrpl-local/utils'
 
-import { generateXAddress } from '../../src/utils/generateAddress'
+import {
+  AccountSet,
+  OfferCreate,
+  SignerListSet,
+  TrustSet,
+} from '../../src/models/transactions'
 import requests from '../fixtures/requests'
 
 import { payTo, ledgerAccept } from './utils'
@@ -116,16 +121,20 @@ const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
 
 function makeTrustLine(testcase, address, secret) {
   const client = testcase.client
-  const specification = {
-    currency: 'USD',
-    counterparty: masterAccount,
-    limit: '1341.1',
-    ripplingDisabled: true,
+  const trustSet: TrustSet = {
+    TransactionType: 'TrustSet',
+    Account: address,
+    LimitAmount: {
+      value: '1341.1',
+      issuer: masterAccount,
+      currency: 'USD',
+    },
+    Flags: 0x00020000,
   }
   const trust = client
-    .prepareTrustline(address, specification, {})
-    .then((data) => {
-      const signed = client.sign(data.txJSON, secret)
+    .autofill(trustSet)
+    .then(async (tx) => {
+      const signed = client.sign(JSON.stringify(tx), secret)
       if (address === wallet.getAddress()) {
         testcase.transactions.push(signed.id)
       }
@@ -138,10 +147,10 @@ function makeTrustLine(testcase, address, secret) {
   return trust
 }
 
-function makeOrder(client, address, specification, secret) {
+function makeOrder(client, offerCreate, secret) {
   return client
-    .prepareOrder(address, specification)
-    .then((data) => client.sign(data.txJSON, secret))
+    .autofill(offerCreate)
+    .then((tx) => client.sign(JSON.stringify(tx), secret))
     .then((signed) =>
       client.request({ command: 'submit', tx_blob: signed.signedTransaction }),
     )
@@ -153,13 +162,19 @@ function setupAccounts(testcase) {
 
   const promise = payTo(client, 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM')
     .then(() => payTo(client, wallet.getAddress()))
-    .then(() => payTo(client, testcase.newWallet.xAddress))
+    .then(() => payTo(client, testcase.newWallet.classicAddress))
     .then(() => payTo(client, 'rKmBGxocj9Abgy25J51Mk1iqFzW9aVF9Tc'))
     .then(() => payTo(client, 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q'))
     .then(() => {
+      const accountSet: AccountSet = {
+        TransactionType: 'AccountSet',
+        Account: masterAccount,
+        // default ripple
+        SetFlag: 8,
+      }
       return client
-        .prepareSettings(masterAccount, { defaultRipple: true })
-        .then((data) => client.sign(data.txJSON, masterSecret))
+        .autofill(accountSet)
+        .then((tx) => client.sign(JSON.stringify(tx), masterSecret))
         .then((signed) =>
           client.request({
             command: 'submit',
@@ -181,44 +196,30 @@ function setupAccounts(testcase) {
     .then(() => payTo(client, wallet.getAddress(), '123', 'USD', masterAccount))
     .then(() => payTo(client, 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q'))
     .then(() => {
-      const orderSpecification = {
-        direction: 'buy',
-        quantity: {
+      const offerCreate: OfferCreate = {
+        TransactionType: 'OfferCreate',
+        Account: testcase.newWallet.xAddress,
+        TakerPays: {
           currency: 'USD',
           value: '432',
-          counterparty: masterAccount,
+          issuer: masterAccount,
         },
-        totalPrice: {
-          currency: 'XRP',
-          value: '432',
-        },
+        TakerGets: xrpToDrops('432'),
       }
-      return makeOrder(
-        testcase.client,
-        testcase.newWallet.xAddress,
-        orderSpecification,
-        testcase.newWallet.secret,
-      )
+      return makeOrder(testcase.client, offerCreate, testcase.newWallet.secret)
     })
     .then(() => {
-      const orderSpecification = {
-        direction: 'buy',
-        quantity: {
-          currency: 'XRP',
-          value: '1741',
-        },
-        totalPrice: {
+      const offerCreate: OfferCreate = {
+        TransactionType: 'OfferCreate',
+        Account: masterAccount,
+        TakerPays: xrpToDrops('1741'),
+        TakerGets: {
           currency: 'USD',
           value: '171',
-          counterparty: masterAccount,
+          issuer: masterAccount,
         },
       }
-      return makeOrder(
-        testcase.client,
-        masterAccount,
-        orderSpecification,
-        masterSecret,
-      )
+      return makeOrder(testcase.client, offerCreate, masterSecret)
     })
   return promise
 }
@@ -234,7 +235,10 @@ function suiteSetup(this: any) {
     setup
       .bind(this)(serverUrl)
       .then(() => ledgerAccept(this.client))
-      .then(() => (this.newWallet = generateXAddress()))
+      .then(
+        () =>
+          (this.newWallet = generateXAddress({ includeClassicAddress: true })),
+      )
       // two times to give time to server to send `ledgerClosed` event
       // so getLedgerVersion will return right value
       .then(() => ledgerAccept(this.client))
@@ -256,127 +260,11 @@ function suiteSetup(this: any) {
 
 describe('integration tests', function () {
   const address = wallet.getAddress()
-  const instructions = { maxLedgerVersionOffset: 10 }
   this.timeout(TIMEOUT)
 
   before(suiteSetup)
   beforeEach(_.partial(setup, serverUrl))
   afterEach(teardown)
-
-  it('trustline', function () {
-    return this.client
-      .request({
-        command: 'ledger',
-        ledger_index: 'validated',
-      })
-      .then((response) => response.result.ledger_index)
-      .then((ledgerVersion) => {
-        return this.client
-          .prepareTrustline(
-            address,
-            requests.prepareTrustline.simple,
-            instructions,
-          )
-          .then((prepared) =>
-            testTransaction(this, 'TrustSet', ledgerVersion, prepared),
-          )
-      })
-  })
-
-  it('payment', function () {
-    const amount = { currency: 'XRP', value: '0.000001' }
-    const paymentSpecification = {
-      source: {
-        address,
-        maxAmount: amount,
-      },
-      destination: {
-        address: 'rKmBGxocj9Abgy25J51Mk1iqFzW9aVF9Tc',
-        amount,
-      },
-    }
-    return this.client
-      .request({
-        command: 'ledger',
-        ledger_index: 'validated',
-      })
-      .then((response) => response.result.ledger_index)
-      .then((ledgerVersion) => {
-        return this.client
-          .preparePayment(address, paymentSpecification, instructions)
-          .then((prepared) =>
-            testTransaction(this, 'Payment', ledgerVersion, prepared),
-          )
-      })
-  })
-
-  it('order', function () {
-    const orderSpecification = {
-      direction: 'buy',
-      quantity: {
-        currency: 'USD',
-        value: '237',
-        counterparty: 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q',
-      },
-      totalPrice: {
-        currency: 'XRP',
-        value: '0.0002',
-      },
-    }
-    const expectedOrder = {
-      flags: 0,
-      quality: '1.185',
-      taker_gets: '200',
-      taker_pays: {
-        currency: 'USD',
-        value: '237',
-        issuer: 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q',
-      },
-    }
-    return this.client
-      .request({
-        command: 'ledger',
-        ledger_index: 'validated',
-      })
-      .then((response) => response.result.ledger_index)
-      .then((ledgerVersion) => {
-        return this.client
-          .prepareOrder(address, orderSpecification, instructions)
-          .then((prepared) =>
-            testTransaction(this, 'OfferCreate', ledgerVersion, prepared),
-          )
-          .then((result) => {
-            const txData = JSON.parse(result.txJSON)
-            return this.client
-              .request({
-                command: 'account_offers',
-                account: address,
-              })
-              .then((response) => response.result.offers)
-              .then((orders) => {
-                assert(orders && orders.length > 0)
-                const createdOrder = orders.filter((order) => {
-                  return order.seq === txData.Sequence
-                })[0]
-                assert(createdOrder)
-                delete createdOrder.seq
-                assert.deepEqual(createdOrder, expectedOrder)
-                return txData
-              })
-          })
-          .then((txData) =>
-            this.client
-              .prepareOrderCancellation(
-                address,
-                { orderSequence: txData.Sequence },
-                instructions,
-              )
-              .then((prepared) =>
-                testTransaction(this, 'OfferCancel', ledgerVersion, prepared),
-              ),
-          )
-      })
-  })
 
   it('isConnected', function () {
     assert(this.client.isConnected())
@@ -508,7 +396,6 @@ describe('integration tests', function () {
 })
 
 describe('integration tests - standalone rippled', function () {
-  const instructions = { maxLedgerVersionOffset: 10 }
   this.timeout(TIMEOUT)
 
   beforeEach(_.partial(setup, serverUrl))
@@ -521,12 +408,24 @@ describe('integration tests - standalone rippled', function () {
   const signer2secret = 'shUHQnL4EH27V4EiBrj6EfhWvZngF'
 
   it('submit multisigned transaction', function () {
-    const signers = {
-      threshold: 2,
-      weights: [
-        { address: signer1address, weight: 1 },
-        { address: signer2address, weight: 1 },
+    const signerListSet: SignerListSet = {
+      TransactionType: 'SignerListSet',
+      Account: address,
+      SignerEntries: [
+        {
+          SignerEntry: {
+            Account: signer1address,
+            SignerWeight: 1,
+          },
+        },
+        {
+          SignerEntry: {
+            Account: signer2address,
+            SignerWeight: 1,
+          },
+        },
       ],
+      SignerQuorum: 2,
     }
     let minLedgerVersion = null
     return payTo(this.client, address)
@@ -539,64 +438,61 @@ describe('integration tests - standalone rippled', function () {
           .then((response) => response.result.ledger_index)
           .then((ledgerVersion) => {
             minLedgerVersion = ledgerVersion
-            return this.client
-              .prepareSettings(address, { signers }, instructions)
-              .then((prepared) => {
-                return testTransaction(
-                  this,
-                  'SignerListSet',
-                  ledgerVersion,
-                  prepared,
-                  address,
-                  secret,
-                )
-              })
+          })
+          .then(() => this.client.autofill(signerListSet, 2))
+          .then((tx) => {
+            return testTransaction(
+              this,
+              'SignerListSet',
+              minLedgerVersion,
+              { txJSON: JSON.stringify(tx) },
+              address,
+              secret,
+            )
           })
       })
       .then(() => {
-        const multisignInstructions = { ...instructions, signersCount: 2 }
-        return this.client
-          .prepareSettings(
-            address,
-            { domain: 'example.com' },
-            multisignInstructions,
-          )
-          .then((prepared) => {
-            const signed1 = this.client.sign(prepared.txJSON, signer1secret, {
-              signAs: signer1address,
-            })
-            const signed2 = this.client.sign(prepared.txJSON, signer2secret, {
-              signAs: signer2address,
-            })
-            const combined = this.client.combine([
-              signed1.signedTransaction,
-              signed2.signedTransaction,
-            ])
-            return this.client
-              .request({
-                command: 'submit',
-                tx_blob: combined.signedTransaction,
-              })
-              .then((response) =>
-                acceptLedger(this.client).then(() => response),
-              )
-              .then((response) => {
-                assert.strictEqual(response.result.engine_result, 'tesSUCCESS')
-                const options = { minLedgerVersion }
-                return verifyTransaction(
-                  this,
-                  combined.id,
-                  'AccountSet',
-                  options,
-                  {},
-                  address,
-                )
-              })
-              .catch((error) => {
-                console.log(error.message)
-                throw error
-              })
+        const accountSet: AccountSet = {
+          TransactionType: 'AccountSet',
+          Account: address,
+          Domain: Buffer.from('example.com', 'ascii')
+            .toString('hex')
+            .toUpperCase(),
+        }
+        return this.client.autofill(accountSet, 2).then((tx) => {
+          const signed1 = this.client.sign(JSON.stringify(tx), signer1secret, {
+            signAs: signer1address,
           })
+          const signed2 = this.client.sign(JSON.stringify(tx), signer2secret, {
+            signAs: signer2address,
+          })
+          const combined = this.client.combine([
+            signed1.signedTransaction,
+            signed2.signedTransaction,
+          ])
+          return this.client
+            .request({
+              command: 'submit',
+              tx_blob: combined.signedTransaction,
+            })
+            .then((response) => acceptLedger(this.client).then(() => response))
+            .then((response) => {
+              assert.strictEqual(response.result.engine_result, 'tesSUCCESS')
+              const options = { minLedgerVersion }
+              return verifyTransaction(
+                this,
+                combined.id,
+                'AccountSet',
+                options,
+                {},
+                address,
+              )
+            })
+            .catch((error) => {
+              console.log(error.message)
+              throw error
+            })
+        })
       })
   })
 })

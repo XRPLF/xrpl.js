@@ -196,9 +196,6 @@ class Client extends EventEmitter {
   // number. Defaults to '2'.
   public readonly maxFeeXRP: string
 
-  // TODO: Use partial for other instance methods as well.
-  public autofill = prepend(autofill, this)
-
   /**
    * Creates a new Client with a websocket connection to a rippled server.
    *
@@ -409,9 +406,6 @@ class Client extends EventEmitter {
     return super.on(eventName, listener)
   }
 
-  // @deprecated Use autofill instead
-  public prepareTransaction = prepend(autofill, this)
-
   public async requestAll(
     req: AccountChannelsRequest,
   ): Promise<AccountChannelsResponse[]>
@@ -521,6 +515,12 @@ class Client extends EventEmitter {
     return this.connection.isConnected()
   }
 
+  // TODO: Use prepend for other instance methods as well.
+  public autofill = prepend(autofill, this)
+
+  // @deprecated Use autofill instead
+  public prepareTransaction = prepend(autofill, this)
+
   public getFee = getFee
 
   public getTrustlines = getTrustlines
@@ -531,7 +531,7 @@ class Client extends EventEmitter {
   public sign = sign
   public combine = combine
 
-  public generateFaucetWallet = generateFaucetWallet
+  public generateFaucetWallet = prepend(generateFaucetWallet, this)
 
   public errors = errors
 

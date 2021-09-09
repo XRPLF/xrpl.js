@@ -150,7 +150,7 @@ class Wallet {
    * @param test - A boolean to indicate if X-address should be in Testnet (true) or Mainnet (false) format.
    * @returns An X-address.
    */
-  getXAddress(tag: number, test = false): string {
+  getXAddress(tag: number | false = false, test = false): string {
     return classicAddressToXAddress(this.classicAddress, tag, test)
   }
 
