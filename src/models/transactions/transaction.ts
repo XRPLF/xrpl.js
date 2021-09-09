@@ -149,7 +149,9 @@ export function verify(tx: Record<string, unknown>): void {
       break
 
     default:
-      throw new ValidationError(`Invalid field TransactionType`)
+      throw new ValidationError(
+        `Invalid field TransactionType: ${tx.TransactionType}`,
+      )
   }
 
   if (
