@@ -32,10 +32,10 @@ function sign(wallet: Wallet, tx: Transaction, forMultisign = false): string {
 }
 
 /**
- * Takes several transactions (in object or blob form) and creates a single transaction with all Signers
- * that then gets signed and returned.
+ * Takes several transactions with Signer fields (in object or blob form) and creates a
+ * single transaction with all Signers that then gets signed and returned.
  *
- * @param transactions - An array of Transactions (in object or blob form) to combine and sign.
+ * @param transactions - An array of signed Transactions (in object or blob form) to combine into a single signed Transaction.
  * @returns A single signed Transaction which has all Signers from transactions within it.
  * @throws ValidationError if:
  * - There were no transactions given to sign
