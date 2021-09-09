@@ -3,6 +3,12 @@ import { ValidationError } from '../../common/errors'
 
 import { BaseTransaction, GlobalFlags, verifyBaseTransaction } from './common'
 
+// eslint-disable-next-line no-shadow -- variable declaration is unique
+export enum PaymentChannelClaimFlagsEnum {
+  tfRenew = 0x00010000,
+  tfClose = 0x00020000,
+}
+
 export interface PaymentChannelClaimFlags extends GlobalFlags {
   tfRenew?: boolean
   tfClose?: boolean

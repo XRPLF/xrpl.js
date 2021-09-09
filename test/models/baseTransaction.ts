@@ -42,9 +42,11 @@ describe('BaseTransaction', function () {
       ],
       Signers: [
         {
-          Account: 'r....',
-          TxnSignature: 'DEADBEEF',
-          SigningPubKey: 'hex-string',
+          Signer: {
+            Account: 'r....',
+            TxnSignature: 'DEADBEEF',
+            SigningPubKey: 'hex-string',
+          },
         },
       ],
       SourceTag: 31,
@@ -197,7 +199,9 @@ describe('BaseTransaction', function () {
       TransactionType: 'Payment',
       Signers: [
         {
-          Account: 'r....',
+          Signer: {
+            Account: 'r....',
+          },
         },
       ],
     } as any
