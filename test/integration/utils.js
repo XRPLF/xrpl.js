@@ -45,7 +45,9 @@ function pay(client, from, to, amount, secret, currency = 'XRP', issuer) {
           response.result.engine_result !== 'tecPATH_PARTIAL'
         ) {
           console.log(response)
-          assert.fail('Response not successful')
+          assert.fail(
+            `Response not successful, ${response.result.engine_result}`,
+          )
         }
         ledgerAccept(client)
       })
@@ -56,7 +58,7 @@ function pay(client, from, to, amount, secret, currency = 'XRP', issuer) {
 function payTo(
   client,
   to,
-  amount = utils.xrpToDrops(40),
+  amount = '40000000',
   currency = 'XRP',
   counterparty,
 ) {

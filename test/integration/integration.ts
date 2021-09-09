@@ -17,7 +17,7 @@ import {
   convertStringToHex,
 } from 'xrpl-local/utils'
 
-import requests from '../fixtures/requests'
+// import requests from '../fixtures/requests'
 
 import { payTo, ledgerAccept } from './utils'
 import wallet from './wallet'
@@ -148,7 +148,16 @@ function makeTrustLine(testcase, address, secret) {
         tx_blob: signed.signedTransaction,
       })
     })
-    .then(() => ledgerAccept(client))
+    .then((response) => {
+      if (
+        response.result.engine_result !== 'tesSUCCESS' &&
+        response.result.engine_result !== 'tecPATH_PARTIAL'
+      ) {
+        console.log(response)
+        assert.fail(`Response not successful, ${response.result.engine_result}`)
+      }
+      ledgerAccept(client)
+    })
   return trust
 }
 
@@ -159,17 +168,35 @@ function makeOrder(client, offerCreate, secret) {
     .then((signed) =>
       client.request({ command: 'submit', tx_blob: signed.signedTransaction }),
     )
-    .then(() => ledgerAccept(client))
+    .then((response) => {
+      if (
+        response.result.engine_result !== 'tesSUCCESS' &&
+        response.result.engine_result !== 'tecPATH_PARTIAL'
+      ) {
+        console.log(response)
+        assert.fail(`Response not successful, ${response.result.engine_result}`)
+      }
+      ledgerAccept(client)
+    })
 }
 
 function setupAccounts(testcase) {
   const client = testcase.client
+  let fundAmount = '20'
 
-  const promise = payTo(client, 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM')
-    .then(() => payTo(client, wallet.getAddress()))
-    .then(() => payTo(client, testcase.newWallet.classicAddress))
-    .then(() => payTo(client, 'rKmBGxocj9Abgy25J51Mk1iqFzW9aVF9Tc'))
-    .then(() => payTo(client, 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q'))
+  const promise = client
+    .request({ command: 'server_info' })
+    .then(
+      (response) =>
+        (fundAmount = xrpToDrops(
+          Number(response.result.info.validated_ledger.reserve_base_xrp) * 2,
+        )),
+    )
+    .then(() => payTo(client, 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM', fundAmount))
+    .then(() => payTo(client, wallet.getAddress(), fundAmount))
+    .then(() => payTo(client, testcase.newWallet.classicAddress, fundAmount))
+    .then(() => payTo(client, 'rKmBGxocj9Abgy25J51Mk1iqFzW9aVF9Tc', fundAmount))
+    .then(() => payTo(client, 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q', fundAmount))
     .then(() => {
       const accountSet: AccountSet = {
         TransactionType: 'AccountSet',
@@ -283,29 +310,29 @@ describe('integration tests', function () {
     })
   })
 
-  it('getTrustlines', function () {
-    const fixture = requests.prepareTrustline.simple
-    const { currency, counterparty } = fixture
-    const options = { currency, counterparty }
-    return this.client.getTrustlines(address, options).then((data) => {
-      assert(data && data.length > 0 && data[0] && data[0].specification)
-      const specification = data[0].specification
-      assert.strictEqual(Number(specification.limit), Number(fixture.limit))
-      assert.strictEqual(specification.currency, fixture.currency)
-      assert.strictEqual(specification.counterparty, fixture.counterparty)
-    })
-  })
+  // it('getTrustlines', function () {
+  //   const fixture = requests.prepareTrustline.simple
+  //   const { currency, counterparty } = fixture
+  //   const options = { currency, counterparty }
+  //   return this.client.getTrustlines(address, options).then((data) => {
+  //     assert(data && data.length > 0 && data[0] && data[0].specification)
+  //     const specification = data[0].specification
+  //     assert.strictEqual(Number(specification.limit), Number(fixture.limit))
+  //     assert.strictEqual(specification.currency, fixture.currency)
+  //     assert.strictEqual(specification.counterparty, fixture.counterparty)
+  //   })
+  // })
 
-  it('getBalances', function () {
-    const fixture = requests.prepareTrustline.simple
-    const { currency, counterparty } = fixture
-    const options = { currency, counterparty }
-    return this.client.getBalances(address, options).then((data) => {
-      assert(data && data.length > 0 && data[0])
-      assert.strictEqual(data[0].currency, fixture.currency)
-      assert.strictEqual(data[0].counterparty, fixture.counterparty)
-    })
-  })
+  // it('getBalances', function () {
+  //   const fixture = requests.prepareTrustline.simple
+  //   const { currency, counterparty } = fixture
+  //   const options = { currency, counterparty }
+  //   return this.client.getBalances(address, options).then((data) => {
+  //     assert(data && data.length > 0 && data[0])
+  //     assert.strictEqual(data[0].currency, fixture.currency)
+  //     assert.strictEqual(data[0].counterparty, fixture.counterparty)
+  //   })
+  // })
 
   it('getOrderbook', function () {
     const orderbook = {
@@ -398,15 +425,9 @@ describe('integration tests', function () {
     assert(isValidXAddress(newWallet.xAddress))
     assert(isValidSecret(newWallet.secret))
   })
-})
 
-describe('integration tests - standalone rippled', function () {
-  this.timeout(TIMEOUT)
-
-  beforeEach(_.partial(setup, serverUrl))
-  afterEach(teardown)
-  const address = 'r5nx8ZkwEbFztnc8Qyi22DE9JYjRzNmvs'
-  const secret = 'ss6F8381Br6wwpy9p582H8sBt19J3'
+  const multisignAccount = 'r5nx8ZkwEbFztnc8Qyi22DE9JYjRzNmvs'
+  const multisignSecret = 'ss6F8381Br6wwpy9p582H8sBt19J3'
   const signer1address = 'rQDhz2ZNXmhxzCYwxU6qAbdxsHA4HV45Y2'
   const signer1secret = 'shK6YXzwYfnFVn3YZSaMh5zuAddKx'
   const signer2address = 'r3RtUvGw9nMoJ5FuHxuoVJvcENhKtuF9ud'
@@ -415,7 +436,7 @@ describe('integration tests - standalone rippled', function () {
   it('submit multisigned transaction', function () {
     const signerListSet: SignerListSet = {
       TransactionType: 'SignerListSet',
-      Account: address,
+      Account: multisignAccount,
       SignerEntries: [
         {
           SignerEntry: {
@@ -433,69 +454,93 @@ describe('integration tests - standalone rippled', function () {
       SignerQuorum: 2,
     }
     let minLedgerVersion = null
-    return payTo(this.client, address)
-      .then(() => {
-        return this.client
-          .request({
-            command: 'ledger',
-            ledger_index: 'validated',
+    let fundAmount = '20'
+    return this.client
+      .request({ command: 'server_info' })
+      .then(
+        (response) =>
+          (fundAmount = xrpToDrops(
+            Number(response.result.info.validated_ledger.reserve_base_xrp) * 2,
+          )),
+      )
+      .then(() =>
+        payTo(this.client, multisignAccount, fundAmount)
+          .then(() => {
+            return this.client
+              .request({
+                command: 'ledger',
+                ledger_index: 'validated',
+              })
+              .then((response) => response.result.ledger_index)
+              .then((ledgerVersion) => {
+                minLedgerVersion = ledgerVersion
+              })
+              .then(() => this.client.autofill(signerListSet, 2))
+              .then((tx) => {
+                return testTransaction(
+                  this,
+                  'SignerListSet',
+                  minLedgerVersion,
+                  { txJSON: JSON.stringify(tx) },
+                  multisignAccount,
+                  multisignSecret,
+                )
+              })
           })
-          .then((response) => response.result.ledger_index)
-          .then((ledgerVersion) => {
-            minLedgerVersion = ledgerVersion
-          })
-          .then(() => this.client.autofill(signerListSet, 2))
-          .then((tx) => {
-            return testTransaction(
-              this,
-              'SignerListSet',
-              minLedgerVersion,
-              { txJSON: JSON.stringify(tx) },
-              address,
-              secret,
-            )
-          })
-      })
-      .then(() => {
-        const accountSet: AccountSet = {
-          TransactionType: 'AccountSet',
-          Account: address,
-          Domain: convertStringToHex('example.com'),
-        }
-        return this.client.autofill(accountSet, 2).then((tx) => {
-          const signed1 = this.client.sign(JSON.stringify(tx), signer1secret, {
-            signAs: signer1address,
-          })
-          const signed2 = this.client.sign(JSON.stringify(tx), signer2secret, {
-            signAs: signer2address,
-          })
-          const combined = this.client.combine([
-            signed1.signedTransaction,
-            signed2.signedTransaction,
-          ])
-          return this.client
-            .request({
-              command: 'submit',
-              tx_blob: combined.signedTransaction,
-            })
-            .then((response) => acceptLedger(this.client).then(() => response))
-            .then((response) => {
-              assert.strictEqual(response.result.engine_result, 'tesSUCCESS')
-              const options = { minLedgerVersion }
-              return verifyTransaction(
-                this,
-                combined.id,
-                'AccountSet',
-                options,
-                {},
-                address,
+          .then(() => {
+            const accountSet: AccountSet = {
+              TransactionType: 'AccountSet',
+              Account: multisignAccount,
+              Domain: convertStringToHex('example.com'),
+            }
+            return this.client.autofill(accountSet, 2).then((tx) => {
+              const signed1 = this.client.sign(
+                JSON.stringify(tx),
+                signer1secret,
+                {
+                  signAs: signer1address,
+                },
               )
+              const signed2 = this.client.sign(
+                JSON.stringify(tx),
+                signer2secret,
+                {
+                  signAs: signer2address,
+                },
+              )
+              const combined = this.client.combine([
+                signed1.signedTransaction,
+                signed2.signedTransaction,
+              ])
+              return this.client
+                .request({
+                  command: 'submit',
+                  tx_blob: combined.signedTransaction,
+                })
+                .then((response) =>
+                  acceptLedger(this.client).then(() => response),
+                )
+                .then((response) => {
+                  assert.strictEqual(
+                    response.result.engine_result,
+                    'tesSUCCESS',
+                  )
+                  const options = { minLedgerVersion }
+                  return verifyTransaction(
+                    this,
+                    combined.id,
+                    'AccountSet',
+                    options,
+                    {},
+                    multisignAccount,
+                  )
+                })
+                .catch((error) => {
+                  console.log(error.message)
+                  throw error
+                })
             })
-            .catch((error) => {
-              console.log(error.message)
-              throw error
-            })
-        })
-      })
+          }),
+      )
   })
 })
