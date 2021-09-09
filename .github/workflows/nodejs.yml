@@ -7,12 +7,29 @@ on:
   push:
     branches: [ develop, master, 2.0 ]
   pull_request:
-    branches: [ develop, 2.0 ]
+  workflow_dispatch:
 
 jobs:
-  unit:
+  # build-and-lint:
+  #   runs-on: ubuntu-latest
 
+  #   strategy:
+  #     matrix:
+  #       node-version: [14.x]
+
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Use Node.js ${{ matrix.node-version }}
+  #     uses: actions/setup-node@v1
+  #     with:
+  #       node-version: ${{ matrix.node-version }}
+  #   - run: npm run install
+  #   - run: npm run lint
+  #   - run: npm run build
+
+  unit:
     runs-on: ubuntu-latest
+
 
     strategy:
       matrix:
@@ -24,10 +41,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: yarn install
-    - run: yarn test
-    - run: yarn lint
-    - run: yarn build
+    - run: npm install --ignore-engines
+    - run: npm test
 
   integration:
     runs-on: ubuntu-latest
@@ -42,7 +57,7 @@ jobs:
         ports:
         - 6006:6006
         options:
-          --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s 
+          --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
     steps:
     - uses: actions/checkout@v2
@@ -50,8 +65,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: yarn install
-    - run: yarn test:integration
+    - run: npm install --ignore-engines
+    - run: npm run test:integration
       env:
         HOST: localhost
         PORT: ${{ job.services.rippled.ports['6006'] }}
@@ -69,7 +84,7 @@ jobs:
         ports:
         - 6006:6006
         options:
-          --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s 
+          --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
     steps:
     - uses: actions/checkout@v2
@@ -77,5 +92,5 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: yarn install
-    - run: yarn test:browser
+    - run: npm install
+    - run: npm run test:browser

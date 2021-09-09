@@ -196,9 +196,9 @@ If you omit the `server` parameter, RippleAPI operates [offline](#offline-functi
 
 ### Installation ###
 
-1. Install [Node.js](https://nodejs.org) and [Yarn](https://yarnpkg.com/en/docs/install). Most Linux distros have a package for Node.js; check that it's the version you want.
-2. Use yarn to install RippleAPI:
-      `yarn add ripple-lib`
+1. Install [Node.js](https://nodejs.org) and [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). Most Linux distros have a package for Node.js; check that it's the version you want.
+2. Use npm to install RippleAPI:
+      `npm install ripple-lib`
 
 After you have installed ripple-lib, you can create scripts using the [boilerplate](#boilerplate) and run them using the Node.js executable, typically named `node`:
 
@@ -364,7 +364,7 @@ Transaction instructions indicate how to execute a transaction, complementary wi
 Name | Type | Description
 ---- | ---- | -----------
 fee | [value](#value) | *Optional* An exact fee to pay for the transaction, before multiplying for multi-signed transactions. See [Transaction Fees](#transaction-fees) for more information.
-maxFee | [value](#value) | *Optional* Deprecated: Use `maxFeeXRP` in the RippleAPI constructor instead. The maximum fee to pay for this transaction. If this exceeds `maxFeeXRP`, use `maxFeeXRP` instead. See [Transaction Fees](#transaction-fees) for more information.
+maxFee | [value](#value) | *Optional* Deprecated: Use `maxFeeXRP` in the Client constructor instead. The maximum fee to pay for this transaction. If this exceeds `maxFeeXRP`, use `maxFeeXRP` instead. See [Transaction Fees](#transaction-fees) for more information.
 maxLedgerVersion | integer,null | *Optional* The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the default is 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 maxLedgerVersion | string,null | *Optional* The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the default is 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 maxLedgerVersionOffset | integer | *Optional* Offset from current validated ledger version to highest ledger version that the transaction can be included in.
@@ -1570,27 +1570,27 @@ return api.getServerInfo().then(info => {/* ... */});
 
 ```json
 {
-  "buildVersion": "0.24.0-rc1",
-  "completeLedgers": "32570-6595042",
-  "hostID": "ARTS",
-  "ioLatencyMs": 1,
-  "lastClose": {
-    "convergeTimeS": 2.007,
+  "build_version": "0.24.0-rc1",
+  "complete_ledgers": "32570-6595042",
+  "hostid": "ARTS",
+  "io_latency_ms": 1,
+  "last_close": {
+    "converge_time_s": 2.007,
     "proposers": 4
   },
-  "loadFactor": 1,
+  "load_factor": 1,
   "peers": 53,
-  "pubkeyNode": "n94wWvFUmaKGYrKUGgpv1DyYgDeXRGdACkNQaSe7zJiy5Znio7UC",
-  "serverState": "full",
-  "validatedLedger": {
+  "pubkey_node": "n94wWvFUmaKGYrKUGgpv1DyYgDeXRGdACkNQaSe7zJiy5Znio7UC",
+  "server_state": "full",
+  "validated_ledger": {
     "age": 5,
-    "baseFeeXRP": "0.00001",
+    "base_fee_xrp": 0.00001,
     "hash": "4482DEE5362332F54A4036ED57EE1767C9F33CF7CE5A6670355C16CECE381D46",
-    "reserveBaseXRP": "20",
-    "reserveIncrementXRP": "5",
-    "ledgerVersion": 6595042
+    "reserve_base_xrp": 20,
+    "reserve_inc_xrp": 5,
+    "seq": 6595042
   },
-  "validationQuorum": 3
+  "validation_quorum": 3
 }
 ```
 
@@ -1607,7 +1607,7 @@ This uses the [feeCushion parameter](#parameters) provided to the RippleAPI cons
 
 Name | Type | Description
 ---- | ---- | -----------
-cushion | number | *Optional* The fee is the product of the base fee, the `load_factor`, and this cushion. Default is provided by the `RippleAPI` constructor's `feeCushion`.
+cushion | number | *Optional* The fee is the product of the base fee, the `load_factor`, and this cushion. Default is provided by the `Client` constructor's `feeCushion`.
 
 ### Return Value
 
@@ -6123,6 +6123,7 @@ const wallet = await api.generateFaucetWallet()
     "balance": 1000
 }
 ```
+
 
 ## signPaymentChannelClaim
 

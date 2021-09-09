@@ -24,9 +24,9 @@ All "prepare*" methods have the same return type.
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
 
 // Buy 10.10 USD (of the specified issuer) for 2.0 XRP (2000000 drops), fill or kill.
-const order = <%- importFile('test/fixtures/requests/prepare-order.json') %>;
+const order = <%- importFile('test/fixtures/requests/prepareOrder.json') %>;
 return api.prepareOrder(address, order)
   .then(prepared => {/* ... */});
 ```
 
-<%- renderFixture('responses/prepare-order.json') %>
+<%- renderFixture('responses/prepareOrder.json') %>

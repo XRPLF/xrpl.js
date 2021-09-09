@@ -1,15 +1,14 @@
-import { ValidationError } from 'xrpl-local/common/errors'
-import { verifyPaymentChannelClaim } from './../../src/models/transactions/paymentChannelClaim'
-import { assert } from 'chai'
-import { verify } from '../../src/models/transactions'
-
+import { ValidationError } from "xrpl-local/common/errors";
+import { verifyPaymentChannelClaim } from "./../../src/models/transactions/paymentChannelClaim";
+import { assert } from "chai";
+import { verify } from "../../src/models/transactions";
 
 /**
- * PaymentChannelClaim Transaction Verification Testing
+ * PaymentChannelClaim Transaction Verification Testing.
  *
- * Providing runtime verification testing for each specific transaction type
+ * Providing runtime verification testing for each specific transaction type.
  */
-describe("PaymentChannelClaim Transaction Verification", function () {
+describe("PaymentChannelClaim", function () {
   let channel;
 
   beforeEach(function () {

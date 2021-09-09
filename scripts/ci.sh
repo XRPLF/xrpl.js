@@ -9,7 +9,7 @@ function checkEOL {
 
 lint() {
   echo "tslint $(node_modules/.bin/tslint --version)"
-  yarn lint
+  npm run lint
 }
 
 unittest() {
@@ -18,8 +18,8 @@ unittest() {
   # TODO: replace/upgrade mocha-junit-reporter
   #mocha test --reporter mocha-junit-reporter --reporter-options mochaFile=$CIRCLE_TEST_REPORTS/test-results.xml
 
-  yarn test --coverage
-  #yarn run coveralls
+  npm test --coverage
+  #npm run coveralls
 
   # test compiled version in "dist/npm"
   $(npm bin)/babel -D --optional runtime --ignore "**/node_modules/**" -d test-compiled/ test/
@@ -33,13 +33,13 @@ unittest() {
   #node --harmony test-compiled/mocked-server.js > /dev/null &
 
   #echo "Running tests in PhantomJS"
-  #mocha-phantomjs test/localrunner.html
+  #mocha-phantomjs test/localRunner.html
   #echo "Running tests using minified version in PhantomJS"
-  #mocha-phantomjs test/localrunnermin.html
+  #mocha-phantomjs test/localRunnerMin.html
 
   #echo "Running tests in SauceLabs"
   #http-server &
-  #yarn run sauce
+  #npm run sauce
 
   #pkill -f mocked-server.js
   #pkill -f http-server
@@ -47,17 +47,17 @@ unittest() {
 }
 
 integrationtest() {
-  mocha test/integration/integration-test.js
+  mocha test/integration/integration.js
 
   # run integration tests in PhantomJS
   #gulp build-tests build-min
   #echo "Running integragtion tests in PhantomJS"
-  #mocha-phantomjs test/localintegrationrunner.html
+  #mocha-phantomjs test/localIntegrationRunner.html
 }
 
 doctest() {
   mv docs/index.md docs/index.md.save
-  yarn run docgen
+  npm run docgen
   mv docs/index.md docs/index.md.test
   mv docs/index.md.save docs/index.md
   cmp docs/index.md docs/index.md.test
