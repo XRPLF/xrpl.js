@@ -15,6 +15,7 @@ import {
   computeTransactionTreeHash,
   computeStateTreeHash,
   computeLedgerHash,
+  computeLedgerHeaderHash,
   computeEscrowHash,
   computePaymentChannelHash,
 } from './hashes'
@@ -99,7 +100,6 @@ function removeUndefined<T extends Record<string, unknown>>(obj: T): T {
 }
 
 export {
-  computeLedgerHeaderHash,
   dropsToXrp,
   xrpToDrops,
   toRippledAmount,
@@ -116,6 +116,7 @@ export {
   computeTransactionTreeHash,
   computeStateTreeHash,
   computeLedgerHash,
+  computeLedgerHeaderHash,
   computeEscrowHash,
   computePaymentChannelHash,
   generateXAddress,

@@ -1,15 +1,15 @@
 import { assert } from 'chai'
 
 import { ValidationError } from '../../src/common/errors'
-import { computeLedgerHeaderHash } from '../../src/utils'
+import { computeLedgerHash } from '../../src/utils'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 
 const { computeLedgerHash: REQUEST_FIXTURES } = requests
 
 describe('computeLedgerHash', function () {
-  let ledger;
-  this.beforeEach(() => {
+  let ledger
+  beforeEach(function () {
     ledger = JSON.parse(JSON.stringify(responses.getLedger.full))
 
     if (ledger.rawState != null) {
@@ -25,7 +25,7 @@ describe('computeLedgerHash', function () {
     ledger.parent_close_time = ledger.close_time
     let hash
     try {
-      hash = computeLedgerHeaderHash(ledger, { computeTreeHashes: true })
+      hash = computeLedgerHash(ledger, { computeTreeHashes: true })
     } catch (error) {
       assert(error instanceof ValidationError)
       if (error instanceof ValidationError) {
@@ -53,7 +53,7 @@ describe('computeLedgerHash', function () {
     ledger.parentCloseTime = ledger.closeTime
 
     assert.throws(
-      () => computeLedgerHeaderHash(ledger, { computeTreeHashes: true }),
+      () => computeLedgerHash(ledger, { computeTreeHashes: true }),
       ValidationError,
       'transactions is missing from the ledger',
     )
@@ -66,8 +66,8 @@ describe('computeLedgerHash', function () {
 
     ledger.parent_close_time = ledger.close_time
 
-    function testCompute(ledger, expectedError) {
-      const hash = computeLedgerHeaderHash(ledger)
+    function testCompute(ledgerToTest, expectedError): void {
+      const hash = computeLedgerHash(ledgerToTest)
       assert.strictEqual(
         hash,
         'E6DB7365949BF9814D76BCC730B01818EB9136A89DB224F3F9F5AAE4569D758E',
@@ -75,7 +75,7 @@ describe('computeLedgerHash', function () {
 
       // fail if required to compute tree hashes
       assert.throws(
-        () => computeLedgerHeaderHash(ledger, { computeTreeHashes: true }),
+        () => computeLedgerHash(ledgerToTest, { computeTreeHashes: true }),
         ValidationError,
         expectedError,
       )
@@ -100,7 +100,7 @@ describe('computeLedgerHash', function () {
 
     assert.throws(
       () => {
-        computeLedgerHeaderHash(newLedger, { computeTreeHashes: true })
+        computeLedgerHash(newLedger, { computeTreeHashes: true })
       },
       ValidationError,
       'does not match computed hash of state',
@@ -109,7 +109,7 @@ describe('computeLedgerHash', function () {
 
   it('computeLedgerHash', function () {
     const header = REQUEST_FIXTURES.header
-    const ledgerHash = computeLedgerHeaderHash(header)
+    const ledgerHash = computeLedgerHash(header)
 
     assert.strictEqual(
       ledgerHash,
@@ -123,7 +123,7 @@ describe('computeLedgerHash', function () {
       transactionHash: undefined,
       rawTransactions: REQUEST_FIXTURES.transactions,
     }
-    const ledgerHash = computeLedgerHeaderHash(header)
+    const ledgerHash = computeLedgerHash(header)
     assert.strictEqual(
       ledgerHash,
       'F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349',
@@ -139,7 +139,7 @@ describe('computeLedgerHash', function () {
     }
 
     assert.throws(
-      () => computeLedgerHeaderHash(header, { computeTreeHashes: true }),
+      () => computeLedgerHash(header, { computeTreeHashes: true }),
       ValidationError,
       'transactionHash in header does not match computed hash of transactions',
     )

@@ -5,48 +5,26 @@
 
 import BigNumber from 'bignumber.js'
 import { decodeAccountID } from 'ripple-address-codec'
-import { decode, encode } from 'ripple-binary-codec'
-
-import { ValidationError } from '../../common/errors'
-import { Ledger, LedgerEntry } from '../../models/ledger'
-import { Transaction } from '../../models/transactions'
-import Metadata from '../../models/transactions/metadata'
 
 import HashPrefix from './hashPrefix'
-import computeLedgerHeaderHash from './ledgerHash'
+import computeLedgerHash, {
+  computeLedgerHeaderHash,
+  computeSignedTransactionHash,
+  computeTransactionTreeHash,
+  computeStateTreeHash,
+} from './ledgerHash'
 import ledgerSpaces from './ledgerSpaces'
 import sha512Half from './sha512Half'
-import SHAMap, { NodeType } from './shaMap'
 
-const BITS_IN_HEX = 16
+const HEX = 16
 const BYTE_LENGTH = 4
-
-function padLeftZero(string: string, length: number): string {
-  return Array(length - string.length + 1).join('0') + string
-}
-
-function intToHex(integer: number, byteLength: number): string {
-  return padLeftZero(Number(integer).toString(BITS_IN_HEX), byteLength * 2)
-}
-
-function bytesToHex(bytes: number[]): string {
-  return Buffer.from(bytes).toString('hex')
-}
-
-function bigintToHex(
-  integerString: string | number | BigNumber,
-  byteLength: number,
-): string {
-  const hex = new BigNumber(integerString).toString(16)
-  return padLeftZero(hex, byteLength * 2)
-}
-
-function ledgerSpaceHex(name: keyof typeof ledgerSpaces): string {
-  return intToHex(ledgerSpaces[name].charCodeAt(0), 2)
-}
 
 function addressToHex(address: string): string {
   return Buffer.from(decodeAccountID(address)).toString('hex')
+}
+
+function ledgerSpaceHex(name: keyof typeof ledgerSpaces): string {
+  return ledgerSpaces[name].charCodeAt(0).toString(HEX).padStart(4, '0')
 }
 
 const MASK = 0xff
@@ -59,60 +37,7 @@ function currencyToHex(currency: string): string {
   bytes[12] = currency.charCodeAt(0) & MASK
   bytes[13] = currency.charCodeAt(1) & MASK
   bytes[14] = currency.charCodeAt(2) & MASK
-  return bytesToHex(bytes)
-}
-
-function addLengthPrefix(hex: string): string {
-  const length = hex.length / 2
-  if (length <= 192) {
-    return bytesToHex([length]) + hex
-  }
-  if (length <= 12480) {
-    const prefix = length - 193
-    return bytesToHex([193 + (prefix >>> 8), prefix & 0xff]) + hex
-  }
-  if (length <= 918744) {
-    const prefix = length - 12481
-    return (
-      bytesToHex([
-        241 + (prefix >>> 16),
-        (prefix >>> 8) & 0xff,
-        prefix & 0xff,
-      ]) + hex
-    )
-  }
-  throw new Error('Variable integer overflow.')
-}
-
-/**
- * Hashes the Transaction object as the ledger does. Throws if the transaction is unsigned.
- *
- * @param tx - A transaction to hash. Tx may be in binary blob form. Tx must be signed.
- * @returns A hash of tx.
- * @throws ValidationError if the Transaction is unsigned.
- */
-
-export function computeSignedTransactionHash(tx: Transaction | string): string {
-  let txBlob
-  let txObject
-  if (typeof tx === 'string') {
-    txBlob = tx
-    txObject = decode(tx)
-  } else {
-    txBlob = encode(tx)
-    txObject = tx
-  }
-
-  if (
-    txObject.TxnSignature === undefined &&
-    (txObject.Signers === undefined ||
-      txObject.Signers[0].Signer.TxnSignature === undefined)
-  ) {
-    throw new ValidationError('The transaction must be signed to hash it.')
-  }
-
-  const prefix = HashPrefix.TRANSACTION_ID.toString(16).toUpperCase()
-  return sha512Half(prefix.concat(txBlob))
+  return Buffer.from(bytes).toString('hex')
 }
 
 /**
@@ -124,7 +49,7 @@ export function computeSignedTransactionHash(tx: Transaction | string): string {
  * @returns The hash to sign.
  */
 export function computeBinaryTransactionSigningHash(txBlobHex: string): string {
-  const prefix = HashPrefix.TRANSACTION_SIGN.toString(16).toUpperCase()
+  const prefix = HashPrefix.TRANSACTION_SIGN.toString(HEX).toUpperCase()
   return sha512Half(prefix + txBlobHex)
 }
 
@@ -179,8 +104,13 @@ export function computeSignerListIndex(address: string): string {
  * @returns The Index of the account's Offer object.
  */
 export function computeOfferIndex(address: string, sequence: number): string {
-  const prefix = `00${intToHex(ledgerSpaces.offer.charCodeAt(0), 1)}`
-  return sha512Half(prefix + addressToHex(address) + intToHex(sequence, 4))
+  const hexPrefix = ledgerSpaces.offer
+    .charCodeAt(0)
+    .toString(HEX)
+    .padStart(2, '0')
+  const hexSequence = sequence.toString(HEX).padStart(8, '0')
+  const prefix = `00${hexPrefix}`
+  return sha512Half(prefix + addressToHex(address) + hexSequence)
 }
 
 /**
@@ -212,66 +142,6 @@ export function computeTrustlineHash(
 }
 
 /**
- * Compute the root hash of the SHAMap containing all transactions.
- *
- * @param transactions - List of Transactions.
- * @returns The root hash of the SHAMap.
- */
-export function computeTransactionTreeHash(
-  transactions: Array<Transaction & { metaData?: Metadata }>,
-): string {
-  const shamap = new SHAMap()
-  for (const txJSON of transactions) {
-    const txBlobHex = encode(txJSON)
-    const metaHex = encode(txJSON.metaData ?? {})
-    const txHash = computeSignedTransactionHash(txBlobHex)
-    const data = addLengthPrefix(txBlobHex) + addLengthPrefix(metaHex)
-    shamap.addItem(txHash, data, NodeType.TRANSACTION_METADATA)
-  }
-
-  return shamap.hash
-}
-
-/**
- * Compute the state hash of a list of LedgerEntries.
- *
- * @param entries - List of LedgerEntries.
- * @returns Hash of SHAMap that consists of all entries.
- */
-export function computeStateTreeHash(entries: LedgerEntry[]): string {
-  const shamap = new SHAMap()
-
-  entries.forEach((ledgerEntry) => {
-    const data = encode(ledgerEntry)
-    shamap.addItem(ledgerEntry.index, data, NodeType.ACCOUNT_STATE)
-  })
-
-  return shamap.hash
-}
-
-/**
- * Compute the hash of a ledger.
- *
- * @param ledgerHeader - Ledger to compute the hash of.
- * @returns The hash of the ledger.
- */
-export function computeLedgerHash(ledgerHeader: Ledger): string {
-  const prefix = HashPrefix.LEDGER.toString(16).toUpperCase()
-  return sha512Half(
-    prefix +
-      intToHex(Number(ledgerHeader.ledger_index), 4) +
-      bigintToHex(ledgerHeader.total_coins, 8) +
-      ledgerHeader.parent_hash +
-      ledgerHeader.transaction_hash +
-      ledgerHeader.account_hash +
-      intToHex(ledgerHeader.parent_close_time, 4) +
-      intToHex(ledgerHeader.close_time, 4) +
-      intToHex(ledgerHeader.close_time_resolution, 1) +
-      intToHex(ledgerHeader.close_flags, 1),
-  )
-}
-
-/**
  * Compute the Hash of an Escrow LedgerEntry.
  *
  * @param address - Address of the Escrow.
@@ -282,7 +152,7 @@ export function computeEscrowHash(address: string, sequence: number): string {
   return sha512Half(
     ledgerSpaceHex('escrow') +
       addressToHex(address) +
-      intToHex(sequence, BYTE_LENGTH),
+      sequence.toString(HEX).padStart(BYTE_LENGTH * 2, '0'),
   )
 }
 
@@ -303,8 +173,14 @@ export function computePaymentChannelHash(
     ledgerSpaceHex('paychan') +
       addressToHex(address) +
       addressToHex(dstAddress) +
-      intToHex(sequence, BYTE_LENGTH),
+      sequence.toString(HEX).padStart(BYTE_LENGTH * 2, '0'),
   )
 }
 
-export { computeLedgerHeaderHash }
+export {
+  computeLedgerHeaderHash,
+  computeSignedTransactionHash,
+  computeLedgerHash,
+  computeStateTreeHash,
+  computeTransactionTreeHash,
+}
