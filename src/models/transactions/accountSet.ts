@@ -35,7 +35,7 @@ export interface AccountSetFlagsInterface {
 
 export interface AccountSet extends BaseTransaction {
   TransactionType: 'AccountSet'
-  Flags?: number | AccountSetTransactionFlags
+  Flags?: number | AccountSetFlagsInterface
   ClearFlag?: number
   Domain?: string
   EmailHash?: string
