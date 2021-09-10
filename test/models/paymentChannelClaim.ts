@@ -1,7 +1,7 @@
-import { ValidationError } from "xrpl-local/common/errors";
-import { verifyPaymentChannelClaim } from "./../../src/models/transactions/paymentChannelClaim";
-import { assert } from "chai";
-import { verify } from "../../src/models/transactions";
+import { ValidationError } from 'xrpl-local/common/errors'
+import { verifyPaymentChannelClaim } from './../../src/models/transactions/paymentChannelClaim'
+import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * PaymentChannelClaim Transaction Verification Testing.
@@ -13,8 +13,8 @@ describe('PaymentChannelClaim', function () {
 
   beforeEach(function () {
     channel = {
-      Account: "rB5Ux4Lv2nRx6eeoAAsZmtctnBQ2LiACnk",
-      TransactionType: "PaymentChannelClaim",
+      Account: 'rB5Ux4Lv2nRx6eeoAAsZmtctnBQ2LiACnk',
+      TransactionType: 'PaymentChannelClaim',
       Channel:
         'C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198',
       Balance: '1000000',
@@ -27,9 +27,9 @@ describe('PaymentChannelClaim', function () {
   })
 
   it(`verifies valid PaymentChannelClaim`, function () {
-    assert.doesNotThrow(() => verifyPaymentChannelClaim(channel));
-    assert.doesNotThrow(() => verify(channel));
-  });
+    assert.doesNotThrow(() => verifyPaymentChannelClaim(channel))
+    assert.doesNotThrow(() => verify(channel))
+  })
 
   it(`verifies valid PaymentChannelClaim w/o optional`, function () {
     delete channel.Balance
@@ -37,9 +37,9 @@ describe('PaymentChannelClaim', function () {
     delete channel.Signature
     delete channel.PublicKey
 
-    assert.doesNotThrow(() => verifyPaymentChannelClaim(channel));
-    assert.doesNotThrow(() => verify(channel));
-  });
+    assert.doesNotThrow(() => verifyPaymentChannelClaim(channel))
+    assert.doesNotThrow(() => verify(channel))
+  })
 
   it(`throws w/ missing Channel`, function () {
     delete channel.Channel
@@ -47,14 +47,14 @@ describe('PaymentChannelClaim', function () {
     assert.throws(
       () => verifyPaymentChannelClaim(channel),
       ValidationError,
-      "PaymentChannelClaim: missing Channel"
-    );
+      'PaymentChannelClaim: missing Channel',
+    )
     assert.throws(
       () => verify(channel),
       ValidationError,
-      "PaymentChannelClaim: missing Channel"
-    );
-  });
+      'PaymentChannelClaim: missing Channel',
+    )
+  })
 
   it(`throws w/ invalid Channel`, function () {
     channel.Channel = 100
@@ -62,14 +62,14 @@ describe('PaymentChannelClaim', function () {
     assert.throws(
       () => verifyPaymentChannelClaim(channel),
       ValidationError,
-      "PaymentChannelClaim: Channel must be a string"
-    );
+      'PaymentChannelClaim: Channel must be a string',
+    )
     assert.throws(
       () => verify(channel),
       ValidationError,
-      "PaymentChannelClaim: Channel must be a string"
-    );
-  });
+      'PaymentChannelClaim: Channel must be a string',
+    )
+  })
 
   it(`throws w/ invalid Balance`, function () {
     channel.Balance = 100
@@ -77,14 +77,14 @@ describe('PaymentChannelClaim', function () {
     assert.throws(
       () => verifyPaymentChannelClaim(channel),
       ValidationError,
-      "PaymentChannelClaim: Balance must be a string"
-    );
+      'PaymentChannelClaim: Balance must be a string',
+    )
     assert.throws(
       () => verify(channel),
       ValidationError,
-      "PaymentChannelClaim: Balance must be a string"
-    );
-  });
+      'PaymentChannelClaim: Balance must be a string',
+    )
+  })
 
   it(`throws w/ invalid Amount`, function () {
     channel.Amount = 1000
@@ -92,14 +92,14 @@ describe('PaymentChannelClaim', function () {
     assert.throws(
       () => verifyPaymentChannelClaim(channel),
       ValidationError,
-      "PaymentChannelClaim: Amount must be a string"
-    );
+      'PaymentChannelClaim: Amount must be a string',
+    )
     assert.throws(
       () => verify(channel),
       ValidationError,
-      "PaymentChannelClaim: Amount must be a string"
-    );
-  });
+      'PaymentChannelClaim: Amount must be a string',
+    )
+  })
 
   it(`throws w/ invalid Signature`, function () {
     channel.Signature = 1000
@@ -107,14 +107,14 @@ describe('PaymentChannelClaim', function () {
     assert.throws(
       () => verifyPaymentChannelClaim(channel),
       ValidationError,
-      "PaymentChannelClaim: Signature must be a string"
-    );
+      'PaymentChannelClaim: Signature must be a string',
+    )
     assert.throws(
       () => verify(channel),
       ValidationError,
-      "PaymentChannelClaim: Signature must be a string"
-    );
-  });
+      'PaymentChannelClaim: Signature must be a string',
+    )
+  })
 
   it(`throws w/ invalid PublicKey`, function () {
     channel.PublicKey = ['100000']
@@ -122,12 +122,12 @@ describe('PaymentChannelClaim', function () {
     assert.throws(
       () => verifyPaymentChannelClaim(channel),
       ValidationError,
-      "PaymentChannelClaim: PublicKey must be a string"
-    );
+      'PaymentChannelClaim: PublicKey must be a string',
+    )
     assert.throws(
       () => verify(channel),
       ValidationError,
-      "PaymentChannelClaim: PublicKey must be a string"
-    );
-  });
-});
+      'PaymentChannelClaim: PublicKey must be a string',
+    )
+  })
+})

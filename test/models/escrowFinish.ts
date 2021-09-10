@@ -1,7 +1,7 @@
-import { ValidationError } from "xrpl-local/common/errors";
-import { verifyEscrowFinish } from "./../../src/models/transactions/escrowFinish";
-import { assert } from "chai";
-import { verify } from "../../src/models/transactions";
+import { ValidationError } from 'xrpl-local/common/errors'
+import { verifyEscrowFinish } from './../../src/models/transactions/escrowFinish'
+import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * EscrowFinish Transaction Verification Testing.
@@ -23,17 +23,17 @@ describe('EscrowFinish', function () {
     }
   })
   it(`verifies valid EscrowFinish`, function () {
-    assert.doesNotThrow(() => verifyEscrowFinish(escrow));
-    assert.doesNotThrow(() => verify(escrow));
-  });
-  
+    assert.doesNotThrow(() => verifyEscrowFinish(escrow))
+    assert.doesNotThrow(() => verify(escrow))
+  })
+
   it(`verifies valid EscrowFinish w/o optional`, function () {
     delete escrow.Condition
     delete escrow.Fulfillment
 
-    assert.doesNotThrow(() => verifyEscrowFinish(escrow));
-    assert.doesNotThrow(() => verify(escrow));
-  });
+    assert.doesNotThrow(() => verifyEscrowFinish(escrow))
+    assert.doesNotThrow(() => verify(escrow))
+  })
 
   it(`throws w/ invalid Owner`, function () {
     escrow.Owner = 0x15415253
@@ -41,14 +41,14 @@ describe('EscrowFinish', function () {
     assert.throws(
       () => verifyEscrowFinish(escrow),
       ValidationError,
-      "EscrowFinish: Owner must be a string"
-    );
+      'EscrowFinish: Owner must be a string',
+    )
     assert.throws(
       () => verify(escrow),
       ValidationError,
-      "EscrowFinish: Owner must be a string"
-    );
-  });
+      'EscrowFinish: Owner must be a string',
+    )
+  })
 
   it(`throws w/ invalid OfferSequence`, function () {
     escrow.OfferSequence = '10'
@@ -56,14 +56,14 @@ describe('EscrowFinish', function () {
     assert.throws(
       () => verifyEscrowFinish(escrow),
       ValidationError,
-      "EscrowFinish: OfferSequence must be a number"
-    );
+      'EscrowFinish: OfferSequence must be a number',
+    )
     assert.throws(
       () => verify(escrow),
       ValidationError,
-      "EscrowFinish: OfferSequence must be a number"
-    );
-  });
+      'EscrowFinish: OfferSequence must be a number',
+    )
+  })
 
   it(`throws w/ invalid Condition`, function () {
     escrow.Condition = 10
@@ -71,14 +71,14 @@ describe('EscrowFinish', function () {
     assert.throws(
       () => verifyEscrowFinish(escrow),
       ValidationError,
-      "EscrowFinish: Condition must be a string"
-    );
+      'EscrowFinish: Condition must be a string',
+    )
     assert.throws(
       () => verify(escrow),
       ValidationError,
-      "EscrowFinish: Condition must be a string"
-    );
-  });
+      'EscrowFinish: Condition must be a string',
+    )
+  })
 
   it(`throws w/ invalid Fulfillment`, function () {
     escrow.Fulfillment = 0x142341
@@ -86,12 +86,12 @@ describe('EscrowFinish', function () {
     assert.throws(
       () => verifyEscrowFinish(escrow),
       ValidationError,
-      "EscrowFinish: Fulfillment must be a string"
-    );
+      'EscrowFinish: Fulfillment must be a string',
+    )
     assert.throws(
       () => verify(escrow),
       ValidationError,
-      "EscrowFinish: Fulfillment must be a string"
-    );
-  });
-});
+      'EscrowFinish: Fulfillment must be a string',
+    )
+  })
+})

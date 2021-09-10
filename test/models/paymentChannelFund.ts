@@ -1,7 +1,7 @@
-import { ValidationError } from "xrpl-local/common/errors";
-import { verifyPaymentChannelFund } from "./../../src/models/transactions/paymentChannelFund";
-import { assert } from "chai";
-import { verify } from "../../src/models/transactions";
+import { ValidationError } from 'xrpl-local/common/errors'
+import { verifyPaymentChannelFund } from './../../src/models/transactions/paymentChannelFund'
+import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * PaymentChannelFund Transaction Verification Testing.
@@ -23,16 +23,16 @@ describe('PaymentChannelFund', function () {
   })
 
   it(`verifies valid PaymentChannelFund`, function () {
-    assert.doesNotThrow(() => verifyPaymentChannelFund(channel));
-    assert.doesNotThrow(() => verify(channel));
-  });
+    assert.doesNotThrow(() => verifyPaymentChannelFund(channel))
+    assert.doesNotThrow(() => verify(channel))
+  })
 
   it(`verifies valid PaymentChannelFund w/o optional`, function () {
     delete channel.Expiration
 
-    assert.doesNotThrow(() => verifyPaymentChannelFund(channel));
-    assert.doesNotThrow(() => verify(channel));
-  });
+    assert.doesNotThrow(() => verifyPaymentChannelFund(channel))
+    assert.doesNotThrow(() => verify(channel))
+  })
 
   it(`throws w/ missing Amount`, function () {
     delete channel.Amount
@@ -40,14 +40,14 @@ describe('PaymentChannelFund', function () {
     assert.throws(
       () => verifyPaymentChannelFund(channel),
       ValidationError,
-      "PaymentChannelFund: missing Amount"
-    );
+      'PaymentChannelFund: missing Amount',
+    )
     assert.throws(
       () => verify(channel),
       ValidationError,
-      "PaymentChannelFund: missing Amount"
-    );
-  });
+      'PaymentChannelFund: missing Amount',
+    )
+  })
 
   it(`throws w/ missing Channel`, function () {
     delete channel.Channel
@@ -55,14 +55,14 @@ describe('PaymentChannelFund', function () {
     assert.throws(
       () => verifyPaymentChannelFund(channel),
       ValidationError,
-      "PaymentChannelFund: missing Channel"
-    );
+      'PaymentChannelFund: missing Channel',
+    )
     assert.throws(
       () => verify(channel),
       ValidationError,
-      "PaymentChannelFund: missing Channel"
-    );
-  });
+      'PaymentChannelFund: missing Channel',
+    )
+  })
 
   it(`throws w/ invalid Amount`, function () {
     channel.Amount = 100
@@ -70,14 +70,14 @@ describe('PaymentChannelFund', function () {
     assert.throws(
       () => verifyPaymentChannelFund(channel),
       ValidationError,
-      "PaymentChannelFund: Amount must be a string"
-    );
+      'PaymentChannelFund: Amount must be a string',
+    )
     assert.throws(
       () => verify(channel),
       ValidationError,
-      "PaymentChannelFund: Amount must be a string"
-    );
-  });
+      'PaymentChannelFund: Amount must be a string',
+    )
+  })
 
   it(`throws w/ invalid Channel`, function () {
     channel.Channel = 1000
@@ -85,14 +85,14 @@ describe('PaymentChannelFund', function () {
     assert.throws(
       () => verifyPaymentChannelFund(channel),
       ValidationError,
-      "PaymentChannelFund: Channel must be a string"
-    );
+      'PaymentChannelFund: Channel must be a string',
+    )
     assert.throws(
       () => verify(channel),
       ValidationError,
-      "PaymentChannelFund: Channel must be a string"
-    );
-  });
+      'PaymentChannelFund: Channel must be a string',
+    )
+  })
 
   it(`throws w/ invalid Expiration`, function () {
     channel.Expiration = '1000'
@@ -100,12 +100,12 @@ describe('PaymentChannelFund', function () {
     assert.throws(
       () => verifyPaymentChannelFund(channel),
       ValidationError,
-      "PaymentChannelFund: Expiration must be a number"
-    );
+      'PaymentChannelFund: Expiration must be a number',
+    )
     assert.throws(
       () => verify(channel),
       ValidationError,
-      "PaymentChannelFund: Expiration must be a number"
-    );
-  });
-});
+      'PaymentChannelFund: Expiration must be a number',
+    )
+  })
+})

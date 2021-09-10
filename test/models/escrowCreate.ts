@@ -1,7 +1,7 @@
-import { ValidationError } from "xrpl-local/common/errors";
-import { verifyEscrowCreate } from "./../../src/models/transactions/escrowCreate";
-import { assert } from "chai";
-import { verify } from "../../src/models/transactions";
+import { ValidationError } from 'xrpl-local/common/errors'
+import { verifyEscrowCreate } from './../../src/models/transactions/escrowCreate'
+import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * EscrowCreate Transaction Verification Testing.
@@ -27,9 +27,9 @@ describe('EscrowCreate', function () {
   })
 
   it(`verifies valid EscrowCreate`, function () {
-    assert.doesNotThrow(() => verifyEscrowCreate(escrow));
-    assert.doesNotThrow(() => verify(escrow));
-  });
+    assert.doesNotThrow(() => verifyEscrowCreate(escrow))
+    assert.doesNotThrow(() => verify(escrow))
+  })
 
   it(`Missing amount`, function () {
     delete escrow.Amount
@@ -37,14 +37,14 @@ describe('EscrowCreate', function () {
     assert.throws(
       () => verifyEscrowCreate(escrow),
       ValidationError,
-      "EscrowCreate: missing field Amount"
-    );
+      'EscrowCreate: missing field Amount',
+    )
     assert.throws(
       () => verify(escrow),
       ValidationError,
-      "EscrowCreate: missing field Amount"
-    );
-  });
+      'EscrowCreate: missing field Amount',
+    )
+  })
 
   it(`Missing destination`, function () {
     delete escrow.Destination
@@ -52,14 +52,14 @@ describe('EscrowCreate', function () {
     assert.throws(
       () => verifyEscrowCreate(escrow),
       ValidationError,
-      "EscrowCreate: missing field Destination"
-    );
+      'EscrowCreate: missing field Destination',
+    )
     assert.throws(
       () => verify(escrow),
       ValidationError,
-      "EscrowCreate: missing field Destination"
-    );
-  });
+      'EscrowCreate: missing field Destination',
+    )
+  })
 
   it(`throws w/ invalid Destination`, function () {
     escrow.Destination = 10
@@ -67,14 +67,14 @@ describe('EscrowCreate', function () {
     assert.throws(
       () => verifyEscrowCreate(escrow),
       ValidationError,
-      "EscrowCreate: Destination must be a string"
-    );
+      'EscrowCreate: Destination must be a string',
+    )
     assert.throws(
       () => verify(escrow),
       ValidationError,
-      "EscrowCreate: Destination must be a string"
-    );
-  });
+      'EscrowCreate: Destination must be a string',
+    )
+  })
 
   it(`throws w/ invalid Amount`, function () {
     escrow.Amount = 1000
@@ -82,14 +82,14 @@ describe('EscrowCreate', function () {
     assert.throws(
       () => verifyEscrowCreate(escrow),
       ValidationError,
-      "EscrowCreate: Amount must be a string"
-    );
+      'EscrowCreate: Amount must be a string',
+    )
     assert.throws(
       () => verify(escrow),
       ValidationError,
-      "EscrowCreate: Amount must be a string"
-    );
-  });
+      'EscrowCreate: Amount must be a string',
+    )
+  })
 
   it(`invalid CancelAfter`, function () {
     escrow.CancelAfter = '100'
@@ -97,14 +97,14 @@ describe('EscrowCreate', function () {
     assert.throws(
       () => verifyEscrowCreate(escrow),
       ValidationError,
-      "EscrowCreate: CancelAfter must be a number"
-    );
+      'EscrowCreate: CancelAfter must be a number',
+    )
     assert.throws(
       () => verify(escrow),
       ValidationError,
-      "EscrowCreate: CancelAfter must be a number"
-    );
-  });
+      'EscrowCreate: CancelAfter must be a number',
+    )
+  })
 
   it(`invalid FinishAfter`, function () {
     escrow.FinishAfter = '1000'
@@ -122,14 +122,14 @@ describe('EscrowCreate', function () {
     assert.throws(
       () => verifyEscrowCreate(escrow),
       ValidationError,
-      "EscrowCreate: Condition must be a string"
-    );
+      'EscrowCreate: Condition must be a string',
+    )
     assert.throws(
       () => verify(escrow),
       ValidationError,
-      "EscrowCreate: Condition must be a string"
-    );
-  });
+      'EscrowCreate: Condition must be a string',
+    )
+  })
 
   it(`invalid DestinationTag`, function () {
     escrow.DestinationTag = '100'
@@ -137,14 +137,14 @@ describe('EscrowCreate', function () {
     assert.throws(
       () => verifyEscrowCreate(escrow),
       ValidationError,
-      "EscrowCreate: DestinationTag must be a number"
-    );
+      'EscrowCreate: DestinationTag must be a number',
+    )
     assert.throws(
       () => verify(escrow),
       ValidationError,
-      "EscrowCreate: DestinationTag must be a number"
-    );
-  });
+      'EscrowCreate: DestinationTag must be a number',
+    )
+  })
 
   it(`Missing both CancelAfter and FinishAfter`, function () {
     delete escrow.CancelAfter
@@ -164,12 +164,12 @@ describe('EscrowCreate', function () {
     assert.throws(
       () => verifyEscrowCreate(escrow),
       ValidationError,
-      "EscrowCreate: Either Condition or FinishAfter must be specified"
-    );
+      'EscrowCreate: Either Condition or FinishAfter must be specified',
+    )
     assert.throws(
       () => verify(escrow),
       ValidationError,
-      "EscrowCreate: Either Condition or FinishAfter must be specified"
-    );
-  });
-});
+      'EscrowCreate: Either Condition or FinishAfter must be specified',
+    )
+  })
+})

@@ -1,7 +1,7 @@
-import { ValidationError } from "xrpl-local/common/errors";
-import { verifyTrustSet } from "./../../src/models/transactions/trustSet";
-import { assert } from "chai";
-import { verify } from "../../src/models/transactions";
+import { ValidationError } from 'xrpl-local/common/errors'
+import { verifyTrustSet } from './../../src/models/transactions/trustSet'
+import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * TrustSet Transaction Verification Testing.
@@ -24,65 +24,65 @@ describe('TrustSet', function () {
       QualityOut: 4321,
     } as any
   })
-  
-  it("verifies valid TrustSet", function () {
-    assert.doesNotThrow(() => verifyTrustSet(trustSet));
-    assert.doesNotThrow(() => verify(trustSet));
-  });
+
+  it('verifies valid TrustSet', function () {
+    assert.doesNotThrow(() => verifyTrustSet(trustSet))
+    assert.doesNotThrow(() => verify(trustSet))
+  })
 
   it('throws when LimitAmount is missing', function () {
     delete trustSet.LimitAmount
     assert.throws(
       () => verifyTrustSet(trustSet),
       ValidationError,
-      "TrustSet: missing field LimitAmount"
-    );
+      'TrustSet: missing field LimitAmount',
+    )
     assert.throws(
       () => verify(trustSet),
       ValidationError,
-      "TrustSet: missing field LimitAmount"
-    );
-  });
+      'TrustSet: missing field LimitAmount',
+    )
+  })
 
   it('throws when LimitAmount is invalid', function () {
     trustSet.LimitAmount = 1234
     assert.throws(
       () => verifyTrustSet(trustSet),
       ValidationError,
-      "TrustSet: invalid LimitAmount"
-    );
+      'TrustSet: invalid LimitAmount',
+    )
     assert.throws(
       () => verify(trustSet),
       ValidationError,
-      "TrustSet: invalid LimitAmount"
-    );
-  });
+      'TrustSet: invalid LimitAmount',
+    )
+  })
 
   it('throws when QualityIn is not a number', function () {
     trustSet.QualityIn = '1234'
     assert.throws(
       () => verifyTrustSet(trustSet),
       ValidationError,
-      "TrustSet: QualityIn must be a number"
-    );
+      'TrustSet: QualityIn must be a number',
+    )
     assert.throws(
       () => verify(trustSet),
       ValidationError,
-      "TrustSet: QualityIn must be a number"
-    );
-  });
+      'TrustSet: QualityIn must be a number',
+    )
+  })
 
   it('throws when QualityOut is not a number', function () {
     trustSet.QualityOut = '4321'
     assert.throws(
       () => verifyTrustSet(trustSet),
       ValidationError,
-      "TrustSet: QualityOut must be a number"
-    );
+      'TrustSet: QualityOut must be a number',
+    )
     assert.throws(
       () => verify(trustSet),
       ValidationError,
-      "TrustSet: QualityOut must be a number"
-    );
-  });
-});
+      'TrustSet: QualityOut must be a number',
+    )
+  })
+})

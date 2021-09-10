@@ -2,8 +2,8 @@ import { assert } from 'chai'
 
 import { ValidationError } from 'xrpl-local/common/errors'
 
-import { verify } from "../../src/models/transactions";
-import { verifySignerListSet } from "../../src/models/transactions/signerListSet";
+import { verify } from '../../src/models/transactions'
+import { verifySignerListSet } from '../../src/models/transactions/signerListSet'
 
 /**
  * SignerListSet Transaction Verification Testing.
@@ -44,9 +44,9 @@ describe('SignerListSet', function () {
   })
 
   it(`verifies valid SignerListSet`, function () {
-    assert.doesNotThrow(() => verifySignerListSet(SignerListSetTx));
-    assert.doesNotThrow(() => verify(SignerListSetTx));
-  });
+    assert.doesNotThrow(() => verifySignerListSet(SignerListSetTx))
+    assert.doesNotThrow(() => verify(SignerListSetTx))
+  })
 
   it(`throws w/ missing SignerQuorum`, function () {
     SignerListSetTx.SignerQuorum = undefined
@@ -54,14 +54,14 @@ describe('SignerListSet', function () {
     assert.throws(
       () => verifySignerListSet(SignerListSetTx),
       ValidationError,
-      "SignerListSet: missing field SignerQuorum"
-    );
+      'SignerListSet: missing field SignerQuorum',
+    )
     assert.throws(
       () => verify(SignerListSetTx),
       ValidationError,
-      "SignerListSet: missing field SignerQuorum"
-    );
-  });
+      'SignerListSet: missing field SignerQuorum',
+    )
+  })
 
   it(`throws w/ empty SignerEntries`, function () {
     SignerListSetTx.SignerEntries = []
@@ -69,14 +69,14 @@ describe('SignerListSet', function () {
     assert.throws(
       () => verifySignerListSet(SignerListSetTx),
       ValidationError,
-      "SignerListSet: need atleast 1 member in SignerEntries"
-    );
+      'SignerListSet: need atleast 1 member in SignerEntries',
+    )
     assert.throws(
       () => verify(SignerListSetTx),
       ValidationError,
-      "SignerListSet: need atleast 1 member in SignerEntries"
-    );
-  });
+      'SignerListSet: need atleast 1 member in SignerEntries',
+    )
+  })
 
   it(`throws w/ invalid SignerEntries`, function () {
     SignerListSetTx.SignerEntries = 'khgfgyhujk'
@@ -84,21 +84,21 @@ describe('SignerListSet', function () {
     assert.throws(
       () => verifySignerListSet(SignerListSetTx),
       ValidationError,
-      "SignerListSet: invalid SignerEntries"
-    );
+      'SignerListSet: invalid SignerEntries',
+    )
     assert.throws(
       () => verify(SignerListSetTx),
       ValidationError,
-      "SignerListSet: invalid SignerEntries"
-    );
-  });
+      'SignerListSet: invalid SignerEntries',
+    )
+  })
 
   it(`throws w/ extra field`, function () {
-    SignerListSetTx.ExtraField = "garbage";
+    SignerListSetTx.ExtraField = 'garbage'
     assert.throws(
       () => verify(SignerListSetTx),
       ValidationError,
-      "Invalid Transaction: SignerListSet"
-    );
-  });
-});
+      'Invalid Transaction: SignerListSet',
+    )
+  })
+})
