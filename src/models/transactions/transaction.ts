@@ -36,6 +36,7 @@ import { SetRegularKey, verifySetRegularKey } from './setRegularKey'
 import { SignerListSet, verifySignerListSet } from './signerListSet'
 import { TicketCreate, verifyTicketCreate } from './ticketCreate'
 import { TrustSet, verifyTrustSet } from './trustSet'
+import { setTransactionFlagsToNumber } from '../utils'
 
 export type Transaction =
   | AccountDelete
@@ -70,7 +71,9 @@ export interface TransactionAndMetadata {
  * @param tx - A Transaction.
  * @throws ValidationError When the Transaction is malformed.
  */
-export function verify(tx: Record<string, unknown>): void {
+export function verify(transaction: Record<string, unknown>): void {
+  const tx = { ...transaction }
+  setTransactionFlagsToNumber(tx as unknown as Transaction)
   switch (tx.TransactionType) {
     case 'AccountDelete':
       verifyAccountDelete(tx)
