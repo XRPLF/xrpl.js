@@ -3,7 +3,6 @@
 import assert from 'assert'
 
 import _ from 'lodash'
-import { isValidXAddress } from 'ripple-address-codec'
 import { encode } from 'ripple-binary-codec'
 
 import { Client, SubmitResponse, Wallet } from 'xrpl-local'
@@ -15,7 +14,6 @@ import {
   Transaction,
 } from 'xrpl-local/models/transactions'
 import {
-  isValidSecret,
   generateXAddress,
   xrpToDrops,
   convertStringToHex,
@@ -259,7 +257,6 @@ async function suiteSetup(this: any) {
 }
 
 describe('integration tests', function () {
-  const address = walletAddress
   this.timeout(TIMEOUT)
 
   before(suiteSetup)
@@ -268,129 +265,6 @@ describe('integration tests', function () {
 
   it('isConnected', function () {
     assert(this.client.isConnected())
-  })
-
-  it('getFee', async function () {
-    return (this.client as Client).getFee().then((fee) => {
-      assert.strictEqual(typeof fee, 'string')
-      assert(!Number.isNaN(Number(fee)))
-      assert(parseFloat(fee) === Number(fee))
-    })
-  })
-
-  // it('getTrustlines', function () {
-  //   const fixture = requests.prepareTrustline.simple
-  //   const { currency, counterparty } = fixture
-  //   const options = { currency, counterparty }
-  //   return this.client.getTrustlines(address, options).then((data) => {
-  //     assert(data && data.length > 0 && data[0] && data[0].specification)
-  //     const specification = data[0].specification
-  //     assert.strictEqual(Number(specification.limit), Number(fixture.limit))
-  //     assert.strictEqual(specification.currency, fixture.currency)
-  //     assert.strictEqual(specification.counterparty, fixture.counterparty)
-  //   })
-  // })
-
-  // it('getBalances', function () {
-  //   const fixture = requests.prepareTrustline.simple
-  //   const { currency, counterparty } = fixture
-  //   const options = { currency, counterparty }
-  //   return this.client.getBalances(address, options).then((data) => {
-  //     assert(data && data.length > 0 && data[0])
-  //     assert.strictEqual(data[0].currency, fixture.currency)
-  //     assert.strictEqual(data[0].counterparty, fixture.counterparty)
-  //   })
-  // })
-
-  it('getOrderbook', async function () {
-    const orderbook = {
-      base: {
-        currency: 'XRP',
-      },
-      counter: {
-        currency: 'USD',
-        counterparty: masterAccount,
-      },
-    }
-    const book = await (this.client as Client).getOrderbook(address, orderbook)
-    assert(book.bids.length > 0)
-    assert(book.asks.length > 0)
-    const bid = book.bids[0]
-    assert(bid.specification.quantity)
-    assert(bid.specification.totalPrice)
-    assert.strictEqual(bid.specification.direction, 'buy')
-    assert.strictEqual(bid.specification.quantity.currency, 'XRP')
-    assert.strictEqual(bid.specification.totalPrice.currency, 'USD')
-    const ask = book.asks[0]
-    assert(ask.specification.quantity)
-    assert(ask.specification.totalPrice)
-    assert.strictEqual(ask.specification.direction, 'sell')
-    assert.strictEqual(ask.specification.quantity.currency, 'XRP')
-    assert.strictEqual(ask.specification.totalPrice.currency, 'USD')
-  })
-
-  // it('getPaths', function () {
-  //   const pathfind = {
-  //     source: {
-  //       address: address
-  //     },
-  //     destination: {
-  //       address: this.newWallet.address,
-  //       amount: {
-  //         value: '1',
-  //         currency: 'USD',
-  //         counterparty: masterAccount
-  //       }
-  //     }
-  //   }
-  //   return this.client.getPaths(pathfind).then((data) => {
-  //     assert(data && data.length > 0)
-  //     const path = data[0]
-  //     assert(path && path.source)
-  //     assert.strictEqual(path.source.address, address)
-  //     assert(path.paths && path.paths.length > 0)
-  //   })
-  // })
-
-  // it('getPaths - send all', function () {
-  //   const pathfind = {
-  //     source: {
-  //       address: address,
-  //       amount: {
-  //         currency: 'USD',
-  //         value: '0.005'
-  //       }
-  //     },
-  //     destination: {
-  //       address: this.newWallet.address,
-  //       amount: {
-  //         currency: 'USD'
-  //       }
-  //     }
-  //   }
-
-  //   return this.client.getPaths(pathfind).then((data) => {
-  //     assert(data && data.length > 0)
-  //     assert(
-  //       data.every((path) => {
-  //         return (
-  //           parseFloat(path.source.amount.value) <=
-  //           parseFloat(pathfind.source.amount.value)
-  //         )
-  //       })
-  //     )
-  //     const path = data[0]
-  //     assert(path && path.source)
-  //     assert.strictEqual(path.source.address, pathfind.source.address)
-  //     assert(path.paths && path.paths.length > 0)
-  //   })
-  // })
-
-  it('generateWallet', function () {
-    const newWallet = generateXAddress()
-    assert(newWallet.xAddress && newWallet.secret)
-    assert(isValidXAddress(newWallet.xAddress))
-    assert(isValidSecret(newWallet.secret))
   })
 
   const multisignAccount = 'r5nx8ZkwEbFztnc8Qyi22DE9JYjRzNmvs'
