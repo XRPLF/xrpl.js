@@ -2,36 +2,39 @@
 const path = require('path')
 const webpack = require('webpack')
 const assert = require('assert')
-const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer')
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 
 function getDefaultConfiguration() {
   return {
     cache: true,
-    performance: {hints: false},
+    performance: { hints: false },
     stats: 'errors-only',
     entry: './dist/npm/index.js',
     output: {
       library: 'ripple',
       path: path.join(__dirname, 'build/'),
-      filename: `ripple-lib.default.js`
+      filename: `xrpl.default.js`,
     },
     plugins: [
       new webpack.NormalModuleReplacementPlugin(/^ws$/, './wsWrapper'),
-      new webpack.NormalModuleReplacementPlugin(/^\.\/wallet\/index$/, './wallet-web'),
+      new webpack.NormalModuleReplacementPlugin(
+        /^\.\/wallet\/index$/,
+        './wallet-web',
+      ),
       new webpack.NormalModuleReplacementPlugin(
         /^.*setup-api$/,
-        './setup-api-web'
+        './setup-api-web',
       ),
-      new webpack.ProvidePlugin({process: 'process/browser'}),
-      new webpack.ProvidePlugin({Buffer: ['buffer', 'Buffer']})
+      new webpack.ProvidePlugin({ process: 'process/browser' }),
+      new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
     ],
     module: {
-      rules: []
+      rules: [],
     },
     resolve: {
       alias: {
-        'ws': './dist/npm/client/wsWrapper.js',
-        'https-proxy-agent': false
+        ws: './dist/npm/client/wsWrapper.js',
+        'https-proxy-agent': false,
       },
       extensions: ['.js', '.json'],
       fallback: {
@@ -41,9 +44,9 @@ function getDefaultConfiguration() {
         stream: require.resolve('stream-browserify'),
         crypto: require.resolve('crypto-browserify'),
         https: require.resolve('https-browserify'),
-        http: require.resolve('stream-http')
-      }
-    }
+        http: require.resolve('stream-http'),
+      },
+    },
   }
 }
 
@@ -58,24 +61,24 @@ function webpackForTest(testFileName) {
     externals: [
       {
         'xrpl-local': 'ripple',
-        'net': 'null'
-      }
+        net: 'null',
+      },
     ],
     entry: testFileName,
     output: {
       library: match[1].replace(/-/g, '_'),
       path: path.join(__dirname, './testCompiledForWeb/'),
-      filename: match[1] + '.js'
+      filename: match[1] + '.js',
     },
     plugins: [
-      new webpack.ProvidePlugin({process: 'process/browser'}),
-      new webpack.ProvidePlugin({Buffer: ['buffer', 'Buffer']})
+      new webpack.ProvidePlugin({ process: 'process/browser' }),
+      new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
     ],
     module: {
       rules: [
         {
           test: /jayson/,
-          use: 'null'
+          use: 'null',
         },
         {
           test: /\.ts$/,
@@ -86,23 +89,23 @@ function webpackForTest(testFileName) {
                 compilerOptions: {
                   composite: false,
                   declaration: false,
-                  declarationMap: false
-                }
-              }
-            }
-          ]
-        }
-      ]
+                  declarationMap: false,
+                },
+              },
+            },
+          ],
+        },
+      ],
     },
     node: {
       global: true,
       __filename: false,
-      __dirname: true
+      __dirname: true,
     },
     resolve: {
       alias: {
-        'ws': './dist/npm/client/wsWrapper.js',
-        'https-proxy-agent': false
+        ws: './dist/npm/client/wsWrapper.js',
+        'https-proxy-agent': false,
       },
       extensions: ['.ts', '.js', '.json'],
       fallback: {
@@ -112,9 +115,9 @@ function webpackForTest(testFileName) {
         stream: require.resolve('stream-browserify'),
         crypto: require.resolve('crypto-browserify'),
         path: require.resolve('path-browserify'),
-        http: require.resolve('stream-http')
-      }
-    }
+        http: require.resolve('stream-http'),
+      },
+    },
   }
   return Object.assign({}, getDefaultConfiguration(), test)
 }
@@ -123,17 +126,17 @@ module.exports = [
   (env, argv) => {
     const config = getDefaultConfiguration()
     config.mode = 'development'
-    config.output.filename = `ripple-latest.js`
+    config.output.filename = `xrpl-latest.js`
     return config
   },
   (env, argv) => {
     const config = getDefaultConfiguration()
     config.mode = 'production'
-    config.output.filename = `ripple-latest-min.js`
+    config.output.filename = `xrpl-latest-min.js`
     if (process.argv.includes('--analyze')) {
       config.plugins.push(new BundleAnalyzerPlugin())
     }
     return config
   },
-  (env, argv) => webpackForTest('./test/integration/integration.ts')
+  (env, argv) => webpackForTest('./test/integration/integration.ts'),
 ]

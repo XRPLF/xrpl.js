@@ -28,7 +28,7 @@
 //  * - https://xrpl.org/monitor-incoming-payments-with-websocket.html.
 //  *
 //  * For the implementation in this example, we have made the following decisions:
-//  * 1) The script will choose the account sequence and LastLedgerSequence numbers automatically. We allow ripple-lib to choose the fee.
+//  * 1) The script will choose the account sequence and LastLedgerSequence numbers automatically. We allow xrpl.js to choose the fee.
 //  *    Payments are defined upfront, and idempotency is not needed. If the script is run a second time, duplicate payments will result.
 //  * 2) We will listen for notification that a new validated ledger has been found, and poll for transaction status at that time.
 //  *    Futhermore, as a precaution, we will wait until the server is 3 ledgers past the transaction's LastLedgerSequence
