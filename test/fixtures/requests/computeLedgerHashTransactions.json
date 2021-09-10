@@ -1,21 +1,16 @@
 [
   {
-    "hash": "F8F337DEE5D5B238A10AF4A4D56926BA26C83EE7AF5A5A6474340C56F9252DF3",
-    "date": "2015-08-12T01:01:10+00:00",
-    "ledger_index": 15202439,
-    "tx": {
-      "TransactionType": "Payment",
-      "Flags": 2147483648,
-      "Sequence": 1608,
-      "LastLedgerSequence": 15202446,
-      "Amount": "120000000",
-      "Fee": "15000",
-      "SigningPubKey": "03BC0973F997BC6384BE455B163519A3E96BC2D725C37F7172D5FED5DD38E2A357",
-      "TxnSignature": "3045022100D80A1802B00AEEF9FDFDE594B0D568217A312D54E6337B8519C0D699841EFB96022067F6913B13D0EC2354C5A67CE0A41AE4181A09CD08A1BB0638D128D357961006",
-      "Account": "rDPL68aNpdfp9h59R4QT5R6B1Z2W9oRc51",
-      "Destination": "rE4S4Xw8euysJ3mt7gmK8EhhYEwmALpb3R"
-    },
-    "meta": {
+    "TransactionType": "Payment",
+    "Flags": 2147483648,
+    "Sequence": 1608,
+    "LastLedgerSequence": 15202446,
+    "Amount": "120000000",
+    "Fee": "15000",
+    "SigningPubKey": "03BC0973F997BC6384BE455B163519A3E96BC2D725C37F7172D5FED5DD38E2A357",
+    "TxnSignature": "3045022100D80A1802B00AEEF9FDFDE594B0D568217A312D54E6337B8519C0D699841EFB96022067F6913B13D0EC2354C5A67CE0A41AE4181A09CD08A1BB0638D128D357961006",
+    "Account": "rDPL68aNpdfp9h59R4QT5R6B1Z2W9oRc51",
+    "Destination": "rE4S4Xw8euysJ3mt7gmK8EhhYEwmALpb3R",
+    "metaData": {
       "TransactionIndex": 6,
       "AffectedNodes": [
         {
@@ -60,22 +55,17 @@
     }
   },
   {
-    "hash": "F8D5DE632B1D8B64E577C46912CCE483D6DF4FD4E2CF4A3D586A099DE3B27021",
-    "date": "2015-08-12T01:01:10+00:00",
-    "ledger_index": 15202439,
-    "tx": {
-      "TransactionType": "Payment",
-      "Flags": 2147483648,
-      "Sequence": 18874,
-      "LastLedgerSequence": 15202446,
-      "Amount": "120000000",
-      "Fee": "15000",
-      "SigningPubKey": "035D097E75D4B35345CEB30F9B1D18CB81165FE6ADD02481AA5B02B5F9C8107EE1",
-      "TxnSignature": "304402203D80E8BC71908AB345948AB71FB7B8DE239DD79636D96D3C5BDA2B2F192A5EEA0220686413D69BF0D813FC61DABD437AEFAAE69925D3E10FCD5B2C4D90B5AF7B883D",
-      "Account": "rnHScgV6wSP9sR25uYWiMo3QYNA5ybQ7cH",
-      "Destination": "rwnnfHDaEAwXaVji52cWWizbHVMs2Cz5K9"
-    },
-    "meta": {
+    "TransactionType": "Payment",
+    "Flags": 2147483648,
+    "Sequence": 18874,
+    "LastLedgerSequence": 15202446,
+    "Amount": "120000000",
+    "Fee": "15000",
+    "SigningPubKey": "035D097E75D4B35345CEB30F9B1D18CB81165FE6ADD02481AA5B02B5F9C8107EE1",
+    "TxnSignature": "304402203D80E8BC71908AB345948AB71FB7B8DE239DD79636D96D3C5BDA2B2F192A5EEA0220686413D69BF0D813FC61DABD437AEFAAE69925D3E10FCD5B2C4D90B5AF7B883D",
+    "Account": "rnHScgV6wSP9sR25uYWiMo3QYNA5ybQ7cH",
+    "Destination": "rwnnfHDaEAwXaVji52cWWizbHVMs2Cz5K9",
+    "metaData": {
       "TransactionIndex": 5,
       "AffectedNodes": [
         {
@@ -120,22 +110,17 @@
     }
   },
   {
-    "hash": "E9004490A92413E92DACD621AC73FD434A8950C350F7572FFEAF4D6AAF8FC288",
-    "date": "2015-08-12T01:01:10+00:00",
-    "ledger_index": 15202439,
-    "tx": {
-      "TransactionType": "Payment",
-      "Flags": 2147483648,
-      "Sequence": 1615,
-      "LastLedgerSequence": 15202446,
-      "Amount": "400000000",
-      "Fee": "15000",
-      "SigningPubKey": "03ACFAA11628C558AB5E7FA64705F442BDAABA6E9D318B30E010BC87CDEA8D1D7D",
-      "TxnSignature": "3045022100A3530C2E983FB05DFF27172C649494291F7BEBA2E6A59EEAF945CB9728D1DB5E022015BCA0E9D69760224DD7C2B68F3BC1F239D89C3397161AA3901C2E04EE31C18F",
-      "Account": "razcSDpwds1aTeqDphqzBr7ay1ZELYAWTm",
-      "Destination": "rhuqJAE2UfhGCvkR7Ve35bvm39JmRvFML4"
-    },
-    "meta": {
+    "TransactionType": "Payment",
+    "Flags": 2147483648,
+    "Sequence": 1615,
+    "LastLedgerSequence": 15202446,
+    "Amount": "400000000",
+    "Fee": "15000",
+    "SigningPubKey": "03ACFAA11628C558AB5E7FA64705F442BDAABA6E9D318B30E010BC87CDEA8D1D7D",
+    "TxnSignature": "3045022100A3530C2E983FB05DFF27172C649494291F7BEBA2E6A59EEAF945CB9728D1DB5E022015BCA0E9D69760224DD7C2B68F3BC1F239D89C3397161AA3901C2E04EE31C18F",
+    "Account": "razcSDpwds1aTeqDphqzBr7ay1ZELYAWTm",
+    "Destination": "rhuqJAE2UfhGCvkR7Ve35bvm39JmRvFML4",
+    "metaData": {
       "TransactionIndex": 4,
       "AffectedNodes": [
         {
@@ -180,22 +165,17 @@
     }
   },
   {
-    "hash": "D44BFF924D23211B82B8F604AF6D92F260F8DD13103A96F03E48825C4A978FD6",
-    "date": "2015-08-12T01:01:10+00:00",
-    "ledger_index": 15202439,
-    "tx": {
-      "TransactionType": "Payment",
-      "Flags": 2147483648,
-      "Sequence": 1674,
-      "LastLedgerSequence": 15202446,
-      "Amount": "800000000",
-      "Fee": "15000",
-      "SigningPubKey": "028F28D78FDA74222F4008F012247DF3BBD42B90CE4CFD87E29598196108E91B52",
-      "TxnSignature": "3044022065A003194D91E774D180BE47D4E086BB2624BC8F6DB7C655E135D5C6C03BBC7C02205DC961C2B7A06D701B29C2116ACF6F84CC84205FF44411576C15507852ECC31C",
-      "Account": "rQGLp9nChtWkdgcHjj6McvJithN2S2HJsP",
-      "Destination": "rEUubanepAAugnNJY1gxEZLDnk9W5NCoFU"
-    },
-    "meta": {
+    "TransactionType": "Payment",
+    "Flags": 2147483648,
+    "Sequence": 1674,
+    "LastLedgerSequence": 15202446,
+    "Amount": "800000000",
+    "Fee": "15000",
+    "SigningPubKey": "028F28D78FDA74222F4008F012247DF3BBD42B90CE4CFD87E29598196108E91B52",
+    "TxnSignature": "3044022065A003194D91E774D180BE47D4E086BB2624BC8F6DB7C655E135D5C6C03BBC7C02205DC961C2B7A06D701B29C2116ACF6F84CC84205FF44411576C15507852ECC31C",
+    "Account": "rQGLp9nChtWkdgcHjj6McvJithN2S2HJsP",
+    "Destination": "rEUubanepAAugnNJY1gxEZLDnk9W5NCoFU",
+    "metaData": {
       "TransactionIndex": 3,
       "AffectedNodes": [
         {
@@ -240,39 +220,34 @@
     }
   },
   {
-    "hash": "C978D915BFB17687335CBFC4B207D9E7213BCEE35B468C2EEE016CDCE4EDB6E4",
-    "date": "2015-08-12T01:01:10+00:00",
-    "ledger_index": 15202439,
-    "tx": {
-      "TransactionType": "OfferCreate",
-      "Sequence": 289444,
-      "OfferSequence": 289443,
-      "LastLedgerSequence": 15202441,
-      "TakerPays": {
-        "value": "19.99999999991",
-        "currency": "EUR",
-        "issuer": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
-      },
-      "TakerGets": {
-        "value": "20.88367500010602",
-        "currency": "USD",
-        "issuer": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
-      },
-      "Fee": "10000",
-      "SigningPubKey": "024D129D4F5A12D4C5A9E9D1E4AC447BBE3496F182FAE82F7709C7EB9F12DBC697",
-      "TxnSignature": "3044022041EBE6B06BA493867F4FFBD72E5D6253F97306E1E82DABDF9649E15B1151B59F0220539C589F40174471C067FDC761A2B791F36F1A3C322734B43DB16880E489BD81",
-      "Account": "rD8LigXE7165r3VWhSQ4FwzJy7PNrTMwUq",
-      "Memos": [
-        {
-          "Memo": {
-            "MemoType": "6F666665725F636F6D6D656E74",
-            "MemoData": "72655F6575722368656467655F726970706C65",
-            "parsed_memo_type": "offer_comment"
-          }
-        }
-      ]
+    "TransactionType": "OfferCreate",
+    "Sequence": 289444,
+    "OfferSequence": 289443,
+    "LastLedgerSequence": 15202441,
+    "TakerPays": {
+      "value": "19.99999999991",
+      "currency": "EUR",
+      "issuer": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
     },
-    "meta": {
+    "TakerGets": {
+      "value": "20.88367500010602",
+      "currency": "USD",
+      "issuer": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+    },
+    "Fee": "10000",
+    "SigningPubKey": "024D129D4F5A12D4C5A9E9D1E4AC447BBE3496F182FAE82F7709C7EB9F12DBC697",
+    "TxnSignature": "3044022041EBE6B06BA493867F4FFBD72E5D6253F97306E1E82DABDF9649E15B1151B59F0220539C589F40174471C067FDC761A2B791F36F1A3C322734B43DB16880E489BD81",
+    "Account": "rD8LigXE7165r3VWhSQ4FwzJy7PNrTMwUq",
+    "Memos": [
+      {
+        "Memo": {
+          "MemoType": "6F666665725F636F6D6D656E74",
+          "MemoData": "72655F6575722368656467655F726970706C65",
+          "parsed_memo_type": "offer_comment"
+        }
+      }
+    ],
+    "metaData": {
       "TransactionIndex": 2,
       "AffectedNodes": [
         {
@@ -372,20 +347,15 @@
     }
   },
   {
-    "hash": "31B34FD7C90CDC6CF680A814DEBC6F616C69275C0E99711F904DE088A8ED4B28",
-    "date": "2015-08-12T01:01:10+00:00",
-    "ledger_index": 15202439,
-    "tx": {
-      "TransactionType": "AccountSet",
-      "Flags": 2147483648,
-      "Sequence": 387262,
-      "LastLedgerSequence": 15202440,
-      "Fee": "10500",
-      "SigningPubKey": "027DFE042DC2BD07D2E88DD526A5FBF816C831C25CA0BB62A3BF320A3B2BA6DB5C",
-      "TxnSignature": "30440220572D89688D9F9DB9874CDDDD3EBDCB5808A836982864C81F185FBC54FAD1A7B902202E09AAA6D65EECC9ACDEA7F70D8D2EE024152C7B288FA9E42C427260CF922F58",
-      "Account": "rn6uAt46Xi6uxA2dRCtqaJyM3aaP6V9WWM"
-    },
-    "meta": {
+    "TransactionType": "AccountSet",
+    "Flags": 2147483648,
+    "Sequence": 387262,
+    "LastLedgerSequence": 15202440,
+    "Fee": "10500",
+    "SigningPubKey": "027DFE042DC2BD07D2E88DD526A5FBF816C831C25CA0BB62A3BF320A3B2BA6DB5C",
+    "TxnSignature": "30440220572D89688D9F9DB9874CDDDD3EBDCB5808A836982864C81F185FBC54FAD1A7B902202E09AAA6D65EECC9ACDEA7F70D8D2EE024152C7B288FA9E42C427260CF922F58",
+    "Account": "rn6uAt46Xi6uxA2dRCtqaJyM3aaP6V9WWM",
+    "metaData": {
       "TransactionIndex": 1,
       "AffectedNodes": [
         {
@@ -412,22 +382,17 @@
     }
   },
   {
-    "hash": "260BC2964FFE6D81CB25C152F8054FFB2CE6ED04FF89D8D0D0559BC14BEF0E46",
-    "date": "2015-08-12T01:01:10+00:00",
-    "ledger_index": 15202439,
-    "tx": {
-      "TransactionType": "Payment",
-      "Flags": 2147483648,
-      "Sequence": 1673,
-      "LastLedgerSequence": 15202446,
-      "Amount": "1700000000",
-      "Fee": "15000",
-      "SigningPubKey": "02C26CF5D395A1CB352BE10D5AAB73FE27FC0AFAE0BD6121E55D097EBDCF394E11",
-      "TxnSignature": "304402204190B6DC7D14B1CC8DDAA87F1C01FEDA6D67D598D65E1AA19D4ADE937ED14B720220662EE404438F415AD3335B9FBA1A4C2A5F72AA387740D8A011A8C53346481B1D",
-      "Account": "rEE77T1E5vEFcEB9zM92jBD3rPs3kPdS1j",
-      "Destination": "r3AsrDRMNYaKNCofo9a5Us7R66RAzTigiU"
-    },
-    "meta": {
+    "TransactionType": "Payment",
+    "Flags": 2147483648,
+    "Sequence": 1673,
+    "LastLedgerSequence": 15202446,
+    "Amount": "1700000000",
+    "Fee": "15000",
+    "SigningPubKey": "02C26CF5D395A1CB352BE10D5AAB73FE27FC0AFAE0BD6121E55D097EBDCF394E11",
+    "TxnSignature": "304402204190B6DC7D14B1CC8DDAA87F1C01FEDA6D67D598D65E1AA19D4ADE937ED14B720220662EE404438F415AD3335B9FBA1A4C2A5F72AA387740D8A011A8C53346481B1D",
+    "Account": "rEE77T1E5vEFcEB9zM92jBD3rPs3kPdS1j",
+    "Destination": "r3AsrDRMNYaKNCofo9a5Us7R66RAzTigiU",
+    "metaData": {
       "TransactionIndex": 0,
       "AffectedNodes": [
         {
