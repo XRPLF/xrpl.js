@@ -8,9 +8,7 @@ import { encode } from 'ripple-binary-codec'
 import { Client, SubmitResponse, Wallet } from 'xrpl-local'
 import {
   AccountSet,
-  OfferCreate,
   SignerListSet,
-  TrustSet,
   Transaction,
 } from 'xrpl-local/models/transactions'
 import {
@@ -125,49 +123,6 @@ async function setup(this: TestCase, server = serverUrl): Promise<void> {
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
 
-async function makeTrustLine(
-  testcase: TestCase,
-  address: string,
-  secret: string,
-) {
-  const client: Client = testcase.client
-  const trustSet: TrustSet = {
-    TransactionType: 'TrustSet',
-    Account: address,
-    LimitAmount: {
-      value: '1341.1',
-      issuer: masterAccount,
-      currency: 'USD',
-    },
-    Flags: 0x00020000,
-  }
-  const response = await submitTransaction(client, secret, trustSet)
-  if (
-    response.result.engine_result !== 'tesSUCCESS' &&
-    response.result.engine_result !== 'tecPATH_PARTIAL'
-  ) {
-    console.log(response)
-    assert.fail(`Response not successful, ${response.result.engine_result}`)
-  }
-  ledgerAccept(client)
-}
-
-async function makeOrder(
-  client: Client,
-  offerCreate: OfferCreate,
-  secret: string,
-): Promise<void> {
-  const response = await submitTransaction(client, secret, offerCreate)
-  if (
-    response.result.engine_result !== 'tesSUCCESS' &&
-    response.result.engine_result !== 'tecPATH_PARTIAL'
-  ) {
-    console.log(response)
-    assert.fail(`Response not successful, ${response.result.engine_result}`)
-  }
-  ledgerAccept(client)
-}
-
 async function setupAccounts(testcase: TestCase): Promise<void> {
   const client = testcase.client
 
@@ -190,36 +145,8 @@ async function setupAccounts(testcase: TestCase): Promise<void> {
   }
   await submitTransaction(client, masterSecret, accountSet)
   await ledgerAccept(client)
-  await makeTrustLine(testcase, walletAddress, walletSecret)
-  await makeTrustLine(
-    testcase,
-    testcase.newWallet.xAddress,
-    testcase.newWallet.secret,
-  )
   await payTo(client, walletAddress, '123', 'USD', masterAccount)
   await payTo(client, 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q')
-  const offerCreate: OfferCreate = {
-    TransactionType: 'OfferCreate',
-    Account: testcase.newWallet.xAddress,
-    TakerPays: {
-      currency: 'USD',
-      value: '432',
-      issuer: masterAccount,
-    },
-    TakerGets: xrpToDrops('432'),
-  }
-  await makeOrder(testcase.client, offerCreate, testcase.newWallet.secret)
-  const offerCreate2: OfferCreate = {
-    TransactionType: 'OfferCreate',
-    Account: masterAccount,
-    TakerPays: xrpToDrops('1741'),
-    TakerGets: {
-      currency: 'USD',
-      value: '171',
-      issuer: masterAccount,
-    },
-  }
-  await makeOrder(testcase.client, offerCreate2, masterSecret)
 }
 
 async function teardown(this: TestCase): Promise<void> {
