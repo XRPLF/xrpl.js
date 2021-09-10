@@ -1,3 +1,4 @@
+/* eslint-disable max-params -- helper test functions */
 import { assert } from 'chai'
 
 import { Client, SubmitResponse, Wallet, xrpToDrops } from 'xrpl-local'
@@ -29,7 +30,6 @@ export async function ledgerAccept(
   return client.connection.request(request) as Promise<LedgerAcceptResponse>
 }
 
-// eslint-disable-next-line max-params -- helper test function
 export async function pay(
   client: Client,
   from: string,
@@ -63,6 +63,7 @@ export async function pay(
     response.result.engine_result !== 'tesSUCCESS' &&
     response.result.engine_result !== 'tecPATH_PARTIAL'
   ) {
+    // eslint-disable-next-line no-console -- happens only when something goes wrong
     console.log(response)
     assert.fail(`Response not successful, ${response.result.engine_result}`)
   }
@@ -70,7 +71,6 @@ export async function pay(
   return id
 }
 
-// eslint-disable-next-line max-params -- Helper test function
 export async function payTo(
   client: Client,
   to: string,
@@ -101,7 +101,6 @@ export async function verifyTransaction(
   options: { minLedgerVersion: number; maxLedgerVersion?: number },
   account: string,
 ): Promise<void> {
-  console.log('VERIFY...')
   const data = await testcase.client.request({
     command: 'tx',
     transaction: hash,
@@ -133,7 +132,6 @@ export async function testTransaction(
   assert.strictEqual(txData.Account, address)
   const client: Client = testcase.client
   const signedData = sign(Wallet.fromSeed(secret), txData)
-  console.log('PREPARED...')
 
   const attemptedResponse = await client.request({
     command: 'submit',
@@ -143,7 +141,6 @@ export async function testTransaction(
     ? await ledgerAccept(client).then(() => attemptedResponse)
     : attemptedResponse
 
-  console.log('SUBMITTED...')
   assert.strictEqual(submittedResponse.result.engine_result, 'tesSUCCESS')
   const options = {
     minLedgerVersion: lastClosedLedgerVersion,
