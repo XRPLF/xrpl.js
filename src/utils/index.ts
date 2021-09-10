@@ -99,6 +99,10 @@ function removeUndefined<T extends Record<string, unknown>>(obj: T): T {
   return newObj
 }
 
+function convertStringToHex(string: string): string {
+  return Buffer.from(string, 'utf8').toString('hex').toUpperCase()
+}
+
 export {
   dropsToXrp,
   xrpToDrops,
@@ -125,4 +129,5 @@ export {
   deriveXAddress,
   signPaymentChannelClaim,
   verifyPaymentChannelClaim,
+  convertStringToHex,
 }
