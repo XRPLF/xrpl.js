@@ -21,7 +21,7 @@ interface ClassicAccountAndTag {
  * Autofills fields in a transaction.
  *
  * @param client - A client.
- * @param tx - A transaction to autofill fields.
+ * @param transaction - A transaction to autofill fields.
  * @param signersCount - The expected number of signers for this transaction. Used for multisign.
  * @returns An autofilled transaction.
  */
@@ -30,7 +30,7 @@ async function autofill<T extends Transaction>(
   transaction: T,
   signersCount?: number,
 ): Promise<T> {
-  const tx = {...transaction}
+  const tx = { ...transaction }
 
   setValidAddresses(tx)
 
