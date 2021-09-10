@@ -11,10 +11,10 @@ import { verifySignerListSet } from '../../src/models/transactions/signerListSet
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('SignerListSet', function () {
-  let SignerListSetTx
+  let signerListSetTx
 
   beforeEach(function () {
-    SignerListSetTx = {
+    signerListSetTx = {
       Flags: 0,
       TransactionType: 'SignerListSet',
       Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
@@ -44,61 +44,52 @@ describe('SignerListSet', function () {
   })
 
   it(`verifies valid SignerListSet`, function () {
-    assert.doesNotThrow(() => verifySignerListSet(SignerListSetTx))
-    assert.doesNotThrow(() => verify(SignerListSetTx))
+    assert.doesNotThrow(() => verifySignerListSet(signerListSetTx))
+    assert.doesNotThrow(() => verify(signerListSetTx))
   })
 
   it(`throws w/ missing SignerQuorum`, function () {
-    SignerListSetTx.SignerQuorum = undefined
+    signerListSetTx.SignerQuorum = undefined
 
     assert.throws(
-      () => verifySignerListSet(SignerListSetTx),
+      () => verifySignerListSet(signerListSetTx),
       ValidationError,
       'SignerListSet: missing field SignerQuorum',
     )
     assert.throws(
-      () => verify(SignerListSetTx),
+      () => verify(signerListSetTx),
       ValidationError,
       'SignerListSet: missing field SignerQuorum',
     )
   })
 
   it(`throws w/ empty SignerEntries`, function () {
-    SignerListSetTx.SignerEntries = []
+    signerListSetTx.SignerEntries = []
 
     assert.throws(
-      () => verifySignerListSet(SignerListSetTx),
+      () => verifySignerListSet(signerListSetTx),
       ValidationError,
       'SignerListSet: need atleast 1 member in SignerEntries',
     )
     assert.throws(
-      () => verify(SignerListSetTx),
+      () => verify(signerListSetTx),
       ValidationError,
       'SignerListSet: need atleast 1 member in SignerEntries',
     )
   })
 
   it(`throws w/ invalid SignerEntries`, function () {
-    SignerListSetTx.SignerEntries = 'khgfgyhujk'
+    signerListSetTx.SignerEntries = 'khgfgyhujk'
 
     assert.throws(
-      () => verifySignerListSet(SignerListSetTx),
+      () => verifySignerListSet(signerListSetTx),
       ValidationError,
       'SignerListSet: invalid SignerEntries',
     )
     assert.throws(
-      () => verify(SignerListSetTx),
+      () => verify(signerListSetTx),
       ValidationError,
       'SignerListSet: invalid SignerEntries',
-    )
-  })
-
-  it(`throws w/ extra field`, function () {
-    SignerListSetTx.ExtraField = 'garbage'
-    assert.throws(
-      () => verify(SignerListSetTx),
-      ValidationError,
-      'Invalid Transaction: SignerListSet',
     )
   })
 })

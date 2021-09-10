@@ -30,7 +30,7 @@ describe('SetRegularKey', function () {
 
   it(`verifies w/o SetRegularKey`, function () {
     account.RegularKey = undefined
-    // assert.doesNotThrow(() => verifySetRegularKey(account));
+    assert.doesNotThrow(() => verifySetRegularKey(account))
     assert.doesNotThrow(() => verify(account))
   })
 

@@ -13,12 +13,12 @@ describe('OfferCancel', function () {
 
   beforeEach(function () {
     offer = {
-      Account: 'rB5Ux4Lv2nRx6eeoAAsZmtctnBQ2LiACnk',
-      Fee: '12',
+      Account: 'rnKiczmiQkZFiDES8THYyLA2pQohC5C6EF',
+      Fee: '10',
+      LastLedgerSequence: 65477334,
+      OfferSequence: 60797528,
+      Sequence: 60797535,
       Flags: 2147483648,
-      LastLedgerSequence: 65953204,
-      OfferSequence: 63822840,
-      Sequence: 63822842,
       SigningPubKey:
         '0369C9BC4D18FAE741898828A1F48E53E53F6F3DB3191441CC85A14D4FC140E031',
       TransactionType: 'OfferCancel',
@@ -29,8 +29,7 @@ describe('OfferCancel', function () {
 
   it(`verifies valid OfferCancel`, function () {
     assert.doesNotThrow(() => verifyOfferCancel(offer))
-    // assert.doesNotThrow(() => verify(offer));
-    verify(offer)
+    assert.doesNotThrow(() => verify(offer))
   })
 
   it(`verifies valid OfferCancel with flags`, function () {

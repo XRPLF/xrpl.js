@@ -18,13 +18,10 @@ describe('Payment', function () {
 
   beforeEach(function () {
     paymentTransaction = {
-      Account: 'rEDkMjt2bUtbwJDrp2Z2G54p8XauGjDkfq',
-      Amount: {
-        currency: 'DGX',
-        issuer: 'rwZZuhKUjaR3ANckeUMmX2KDdA4AoAB5WM',
-        value: '5',
-      },
-      Destination: 'rL87kubrKHCm1psco3KpemtR7ephUuuVV9',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      Amount: '1234',
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      DestinationTag: 1,
       Fee: '12',
       Flags: 2147483648,
       LastLedgerSequence: 65953073,
@@ -165,8 +162,7 @@ describe('Payment', function () {
 
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a boolean`, function () {
     paymentTransaction.DeliverMin = '10000'
-    paymentTransaction.Flags = PaymentTransactionFlagsEnum.tfPartialPayment
-    // paymentTransaction.Flags = { tfPartialPayment: true };
+    paymentTransaction.Flags = { tfPartialPayment: true }
     assert.doesNotThrow(() => verifyPayment(paymentTransaction))
     assert.doesNotThrow(() => verify(paymentTransaction))
   })

@@ -151,6 +151,11 @@ describe('EscrowCreate', function () {
     delete escrow.FinishAfter
 
     assert.throws(
+      () => verifyEscrowCreate(escrow),
+      ValidationError,
+      'EscrowCreate: Either CancelAfter or FinishAfter must be specified',
+    )
+    assert.throws(
       () => verify(escrow),
       ValidationError,
       'EscrowCreate: Either CancelAfter or FinishAfter must be specified',
