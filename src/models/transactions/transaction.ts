@@ -166,3 +166,12 @@ export function verify(transaction: Record<string, unknown>): void {
     throw new ValidationError(`Invalid Transaction: ${tx.TransactionType}`)
   }
 }
+
+export {
+  AccountSetFlags,
+  AccountSetTransactionFlags,
+  OfferCreateTransactionFlags,
+  PaymentTransactionFlags,
+  PaymentChannelClaimTransactionFlags,
+  TrustSetTransactionFlags,
+}

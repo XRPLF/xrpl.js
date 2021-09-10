@@ -4,13 +4,13 @@ import { assert } from 'chai'
 import {
   DepositPreauth,
   OfferCreate,
-  OfferCreateFlagsEnum,
+  OfferCreateTransactionFlags,
   PaymentChannelClaim,
-  PaymentChannelClaimFlagsEnum,
+  PaymentChannelClaimTransactionFlags,
   Payment,
-  PaymentTransactionFlagsEnum,
+  PaymentTransactionFlags,
   TrustSet,
-  TrustSetFlagsEnum,
+  TrustSetTransactionFlags,
 } from '../../src/models/transactions'
 import {
   isFlagEnabled,
@@ -65,7 +65,7 @@ describe('Models Utils', function () {
         },
       }
 
-      const { tfPassive, tfFillOrKill } = OfferCreateFlagsEnum
+      const { tfPassive, tfFillOrKill } = OfferCreateTransactionFlags
       const expected: number = tfPassive | tfFillOrKill
 
       setTransactionFlagsToNumber(tx)
@@ -84,7 +84,7 @@ describe('Models Utils', function () {
         },
       }
 
-      const { tfRenew } = PaymentChannelClaimFlagsEnum
+      const { tfRenew } = PaymentChannelClaimTransactionFlags
       const expected: number = tfRenew
 
       setTransactionFlagsToNumber(tx)
@@ -104,7 +104,7 @@ describe('Models Utils', function () {
         },
       }
 
-      const { tfPartialPayment, tfLimitQuality } = PaymentTransactionFlagsEnum
+      const { tfPartialPayment, tfLimitQuality } = PaymentTransactionFlags
       const expected: number = tfPartialPayment | tfLimitQuality
 
       setTransactionFlagsToNumber(tx)
@@ -131,7 +131,7 @@ describe('Models Utils', function () {
         },
       }
 
-      const { tfSetfAuth, tfClearNoRipple, tfClearFreeze } = TrustSetFlagsEnum
+      const { tfSetfAuth, tfClearNoRipple, tfClearFreeze } = TrustSetTransactionFlags
       const expected: number = tfSetfAuth | tfClearNoRipple | tfClearFreeze
 
       setTransactionFlagsToNumber(tx)

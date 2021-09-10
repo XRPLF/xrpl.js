@@ -1,4 +1,3 @@
-/* eslint-disable import/max-dependencies -- Client needs a lot of dependencies by definition */
 /* eslint-disable @typescript-eslint/member-ordering -- TODO: remove when instance methods aren't members */
 /* eslint-disable max-lines -- This might not be necessary later, but this file needs to be big right now */
 import { EventEmitter } from 'events'
@@ -27,6 +26,7 @@ import autofill from '../ledger/autofill'
 import getBalances from '../ledger/balances'
 import { getOrderbook, formatBidsAndAsks } from '../ledger/orderbook'
 import getPaths from '../ledger/pathfind'
+import { submitTransaction, submitSignedTransaction } from '../ledger/submit'
 import getTrustlines from '../ledger/trustlines'
 import { clamp } from '../ledger/utils'
 import {
@@ -161,6 +161,7 @@ function getCollectKeyFromCommand(command: string): string | null {
  * @param params - Parameters to prepend to a function.
  * @returns A function bound with params.
  */
+// TODO Need to refactor prepend so TS can infer the correct function signature type
 // eslint-disable-next-line @typescript-eslint/ban-types -- expected param types
 function prepend(func: Function, ...params: unknown[]): Function {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- safe to return
@@ -389,20 +390,36 @@ class Client extends EventEmitter {
     return this.connection.request(nextPageRequest) as unknown as U
   }
 
-  public on(event: 'ledgerClosed', listener: (ledger: LedgerStream) => void)
+  public on(
+    event: 'ledgerClosed',
+    listener: (ledger: LedgerStream) => void,
+  ): this
   public on(
     event: 'validationReceived',
     listener: (validation: ValidationStream) => void,
-  )
-  public on(event: 'transaction', listener: (tx: TransactionStream) => void)
+  ): this
+  public on(
+    event: 'transaction',
+    listener: (tx: TransactionStream) => void,
+  ): this
   public on(
     event: 'peerStatusChange',
     listener: (status: PeerStatusStream) => void,
-  )
-  public on(event: 'consensusPhase', listener: (phase: ConsensusStream) => void)
-  public on(event: 'path_find', listener: (path: PathFindStream) => void)
-  public on(event: string, listener: (...args: any[]) => void)
-  public on(eventName: string, listener: (...args: any[]) => void) {
+  ): this
+  public on(
+    event: 'consensusPhase',
+    listener: (phase: ConsensusStream) => void,
+  ): this
+  public on(event: 'path_find', listener: (path: PathFindStream) => void): this
+  public on(event: 'error', listener: (...err: any[]) => void): this
+  /**
+   * Event handler for subscription streams.
+   *
+   * @param eventName - Name of the event. Only forwards streams.
+   * @param listener - Function to run on event.
+   * @returns This, because it inherits from EventEmitter.
+   */
+  public on(eventName: string, listener: (...args: any[]) => void): this {
     return super.on(eventName, listener)
   }
 
@@ -520,6 +537,10 @@ class Client extends EventEmitter {
 
   // @deprecated Use autofill instead
   public prepareTransaction = prepend(autofill, this)
+
+  public submitTransaction = prepend(submitTransaction, this)
+
+  public submitSignedTransaction = prepend(submitSignedTransaction, this)
 
   public getFee = getFee
 

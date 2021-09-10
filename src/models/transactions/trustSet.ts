@@ -8,7 +8,7 @@ import {
   verifyBaseTransaction,
 } from './common'
 
-export enum TrustSetFlagsEnum {
+export enum TrustSetTransactionFlags {
   tfSetfAuth = 0x00010000,
   tfSetNoRipple = 0x00020000,
   tfClearNoRipple = 0x00040000,
@@ -16,7 +16,7 @@ export enum TrustSetFlagsEnum {
   tfClearFreeze = 0x00200000,
 }
 
-export interface TrustSetFlags extends GlobalFlags {
+export interface TrustSetFlagsInterface extends GlobalFlags {
   tfSetfAuth?: boolean
   tfSetNoRipple?: boolean
   tfClearNoRipple?: boolean
@@ -29,7 +29,7 @@ export interface TrustSet extends BaseTransaction {
   LimitAmount: Amount
   QualityIn?: number
   QualityOut?: number
-  Flags?: number | TrustSetFlags
+  Flags?: number | TrustSetFlagsInterface
 }
 
 /**

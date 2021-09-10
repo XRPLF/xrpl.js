@@ -168,7 +168,6 @@ describe('generateAddress', function () {
 
       secret: 'sEdSJHS4oiAdz7w2X2ni1gFiqtbJHqE',
       classicAddress: 'r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7',
-      address: 'r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7',
     })
   })
 
@@ -211,7 +210,6 @@ describe('generateAddress', function () {
       xAddress: 'T7t4HeTMF5tT68agwuVbJwu23ssMPeh8dDtGysZoQiij1oo',
       secret: 'sEdSJHS4oiAdz7w2X2ni1gFiqtbJHqE',
       classicAddress: 'r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7',
-      address: 'r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7',
     })
   })
 
