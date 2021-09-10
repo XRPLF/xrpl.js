@@ -55,7 +55,7 @@ describe('client.submitSignedTransaction', function () {
     }
   })
 
-  it('should throw a ValidationError when submiting an unsigned transaction', async function () {
+  it('should throw a ValidationError when submitting an unsigned transaction', async function () {
     const signedTx: Transaction = { ...signedTransaction }
     delete signedTx.SigningPubKey
     delete signedTx.TxnSignature
