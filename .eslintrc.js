@@ -34,6 +34,7 @@ module.exports = {
         format: ['PascalCase', 'snake_case'],
       },
     ],
+    'max-lines-per-function': ['warn', 40],
     'max-statements': ['warn', 25],
     'id-length': ['error', { exceptions: ['_'] }], // exception for lodash
   },
