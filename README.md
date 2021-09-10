@@ -84,10 +84,10 @@ If you want to use `xrpl.js` with React Native you will need to have some of the
 Until official support for [Deno](https://deno.land) is added, you can use the following work-around to use `xrpl.js` with Deno:
 
 ```javascript
-import ripple from 'https://dev.jspm.io/npm:xrpl';
+import xrpl from 'https://dev.jspm.io/npm:xrpl';
 
 (async () => {
-  const api = new (ripple as any).RippleAPI({ server: 'wss://s.altnet.rippletest.net:51233' });
+  const api = new (xrpl as any).RippleAPI({ server: 'wss://s.altnet.rippletest.net:51233' });
   const address = 'rH8NxV12EuV...khfJ5uw9kT';
 
   api.connect().then(() => {
