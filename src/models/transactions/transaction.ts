@@ -1,7 +1,11 @@
 /* eslint-disable import/max-dependencies -- All methods need to be exported */
 
 import { AccountDelete } from './accountDelete'
-import { AccountSet } from './accountSet'
+import {
+  AccountSet,
+  AccountSetFlags,
+  AccountSetTransactionFlags,
+} from './accountSet'
 import { CheckCancel } from './checkCancel'
 import { CheckCash } from './checkCash'
 import { CheckCreate } from './checkCreate'
@@ -11,15 +15,18 @@ import { EscrowCreate } from './escrowCreate'
 import { EscrowFinish } from './escrowFinish'
 import Metadata from './metadata'
 import { OfferCancel } from './offerCancel'
-import { OfferCreate } from './offerCreate'
-import { Payment } from './payment'
-import { PaymentChannelClaim } from './paymentChannelClaim'
+import { OfferCreate, OfferCreateTransactionFlags } from './offerCreate'
+import { Payment, PaymentTransactionFlags } from './payment'
+import {
+  PaymentChannelClaim,
+  PaymentChannelClaimTransactionFlags,
+} from './paymentChannelClaim'
 import { PaymentChannelCreate } from './paymentChannelCreate'
 import { PaymentChannelFund } from './paymentChannelFund'
 import { SetRegularKey } from './setRegularKey'
 import { SignerListSet } from './signerListSet'
 import { TicketCreate } from './ticketCreate'
-import { TrustSet } from './trustSet'
+import { TrustSet, TrustSetTransactionFlags } from './trustSet'
 
 export type Transaction =
   | AccountDelete
@@ -45,4 +52,13 @@ export type Transaction =
 export interface TransactionAndMetadata {
   transaction: Transaction
   metadata: Metadata
+}
+
+export {
+  AccountSetFlags,
+  AccountSetTransactionFlags,
+  OfferCreateTransactionFlags,
+  PaymentTransactionFlags,
+  PaymentChannelClaimTransactionFlags,
+  TrustSetTransactionFlags,
 }
