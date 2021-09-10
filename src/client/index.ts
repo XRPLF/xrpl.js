@@ -1,4 +1,3 @@
-/* eslint-disable import/max-dependencies -- Client needs a lot of dependencies by definition */
 /* eslint-disable @typescript-eslint/member-ordering -- TODO: remove when instance methods aren't members */
 /* eslint-disable max-lines -- This might not be necessary later, but this file needs to be big right now */
 import { EventEmitter } from 'events'
@@ -389,20 +388,36 @@ class Client extends EventEmitter {
     return this.connection.request(nextPageRequest) as unknown as U
   }
 
-  public on(event: 'ledgerClosed', listener: (ledger: LedgerStream) => void)
+  public on(
+    event: 'ledgerClosed',
+    listener: (ledger: LedgerStream) => void,
+  ): this
   public on(
     event: 'validationReceived',
     listener: (validation: ValidationStream) => void,
-  )
-  public on(event: 'transaction', listener: (tx: TransactionStream) => void)
+  ): this
+  public on(
+    event: 'transaction',
+    listener: (tx: TransactionStream) => void,
+  ): this
   public on(
     event: 'peerStatusChange',
     listener: (status: PeerStatusStream) => void,
-  )
-  public on(event: 'consensusPhase', listener: (phase: ConsensusStream) => void)
-  public on(event: 'path_find', listener: (path: PathFindStream) => void)
-  public on(event: string, listener: (...args: any[]) => void)
-  public on(eventName: string, listener: (...args: any[]) => void) {
+  ): this
+  public on(
+    event: 'consensusPhase',
+    listener: (phase: ConsensusStream) => void,
+  ): this
+  public on(event: 'path_find', listener: (path: PathFindStream) => void): this
+  public on(event: 'error', listener: (...err: any[]) => void): this
+  /**
+   * Event handler for subscription streams.
+   *
+   * @param eventName - Name of the event. Only forwards streams.
+   * @param listener - Function to run on event.
+   * @returns This, because it inherits from EventEmitter.
+   */
+  public on(eventName: string, listener: (...args: any[]) => void): this {
     return super.on(eventName, listener)
   }
 
