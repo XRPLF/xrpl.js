@@ -1,6 +1,6 @@
-# xrpl.js (RippleAPI)
+# xrpl.js
 
-A JavaScript/TypeScript API for interacting with the XRP Ledger
+A JavaScript/TypeScript library for interacting with the XRP Ledger
 
 [![NPM](https://nodei.co/npm/xrpl.png)](https://www.npmjs.org/package/xrpl)
 
@@ -84,7 +84,7 @@ If you want to use `xrpl.js` with React Native you will need to have some of the
 Until official support for [Deno](https://deno.land) is added, you can use the following work-around to use `xrpl.js` with Deno:
 
 ```javascript
-import ripple from 'https://dev.jspm.io/npm:xrpl.js';
+import ripple from 'https://dev.jspm.io/npm:xrpl';
 
 (async () => {
   const api = new (ripple as any).RippleAPI({ server: 'wss://s.altnet.rippletest.net:51233' });
