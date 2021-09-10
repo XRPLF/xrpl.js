@@ -1,9 +1,9 @@
 import { assert } from 'chai'
 
 import { RippledError } from 'xrpl-local/common/errors'
+import { Transaction } from 'xrpl-local/models/transactions'
+import Wallet from 'xrpl-local/wallet'
 
-import { Wallet } from '../../src'
-import { Transaction } from '../../src/models/transactions'
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
 import { assertRejects } from '../testUtils'
