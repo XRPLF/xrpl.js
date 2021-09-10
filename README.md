@@ -1,8 +1,8 @@
-# ripple-lib (RippleAPI)
+# xrpl.js
 
-A JavaScript/TypeScript API for interacting with the XRP Ledger
+A JavaScript/TypeScript library for interacting with the XRP Ledger
 
-[![NPM](https://nodei.co/npm/ripple-lib.png)](https://www.npmjs.org/package/ripple-lib)
+[![NPM](https://nodei.co/npm/xrpl.png)](https://www.npmjs.org/package/xrpl)
 
 This is the recommended library for integrating a JavaScript/TypeScript app with the XRP Ledger, especially if you intend to use advanced functionality such as IOUs, payment paths, the decentralized exchange, account settings, payment channels, escrows, multi-signing, and more.
 
@@ -12,7 +12,7 @@ See the full reference documentation on the XRP Ledger Dev Portal.
 
 ## [➡️ Applications and Projects](APPLICATIONS.md)
 
-What is ripple-lib used for? The applications on the list linked above use `ripple-lib`. Open a PR to add your app or project to the list!
+What is xrpl.js used for? The applications on the list linked above use `xrpl.js`. Open a PR to add your app or project to the list!
 
 ### Features
 
@@ -31,22 +31,22 @@ What is ripple-lib used for? The applications on the list linked above use `ripp
 
 See also: [RippleAPI Beginners Guide](https://xrpl.org/get-started-with-rippleapi-for-javascript.html)
 
-In an existing project (with `package.json`), install `ripple-lib`:
+In an existing project (with `package.json`), install `xrpl.js`:
 ```
-$ npm install ripple-lib
+$ npm install xrpl
 ```
 
 Then see the [documentation](#documentation).
 
-### Using ripple-lib with React Native
+### Using xrpl.js with React Native
 
-If you want to use `ripple-lib` with React Native you will need to have some of the NodeJS modules available. To help with this you can use a module like [rn-nodeify](https://github.com/tradle/rn-nodeify).
+If you want to use `xrpl.js` with React Native you will need to have some of the NodeJS modules available. To help with this you can use a module like [rn-nodeify](https://github.com/tradle/rn-nodeify).
 
 1. Install dependencies (you can use `npm` as well):
 
     ```shell
     npm install react-native-crypto
-    npm install ripple-lib
+    npm install xrpl
     # install peer deps
     npm install react-native-randombytes
     # install latest rn-nodeify
@@ -79,15 +79,15 @@ If you want to use `ripple-lib` with React Native you will need to have some of 
   ...
   ```
 
-### Using ripple-lib with Deno
+### Using xrpl.js with Deno
 
-Until official support for [Deno](https://deno.land) is added, you can use the following work-around to use `ripple-lib` with Deno:
+Until official support for [Deno](https://deno.land) is added, you can use the following work-around to use `xrpl.js` with Deno:
 
 ```javascript
-import ripple from 'https://dev.jspm.io/npm:ripple-lib';
+import xrpl from 'https://dev.jspm.io/npm:xrpl';
 
 (async () => {
-  const api = new (ripple as any).RippleAPI({ server: 'wss://s.altnet.rippletest.net:51233' });
+  const api = new (xrpl as any).RippleAPI({ server: 'wss://s.altnet.rippletest.net:51233' });
   const address = 'rH8NxV12EuV...khfJ5uw9kT';
 
   api.connect().then(() => {
@@ -106,7 +106,7 @@ import ripple from 'https://dev.jspm.io/npm:ripple-lib';
 
 ### Mailing Lists
 
-We have a low-traffic mailing list for announcements of new ripple-lib releases. (About 1 email per week)
+We have a low-traffic mailing list for announcements of new xrpl.js releases. (About 1 email per week)
 
 + [Subscribe to ripple-lib-announce](https://groups.google.com/forum/#!forum/ripple-lib-announce)
 
@@ -141,16 +141,10 @@ Run `npm run lint` to lint the code with `eslint`.
 
 ## Generating Documentation
 
-Do not edit `./docs/index.md` directly because it is a generated file.
-
-Instead, edit the appropriate `.md.ejs` files in `./docs/src/`.
-
-If you make changes to the JSON schemas, fixtures, or documentation sources, update the documentation by running `npm run docgen`.
+Update the documentation by running `npm run docgen`.
 
 ## More Information
 
 + [ripple-lib-announce mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) - subscribe for release announcements
 + [RippleAPI Reference](https://xrpl.org/rippleapi-reference.html) - XRP Ledger Dev Portal
 + [XRP Ledger Dev Portal](https://xrpl.org/)
-
- [![Build Status](https://travis-ci.org/ripple/ripple-lib.svg?branch=master)](https://travis-ci.org/ripple/ripple-lib)
