@@ -60,7 +60,7 @@ const validateCentralizedOffLedger = async (
   try {
     await axios({
       method: 'head',
-      responseType: 'document',
+      responseType: 'text',
       timeout: HTTP_TIMEOUT_MS,
       url: uri,
     })
@@ -75,7 +75,7 @@ const validateCentralizedOffLedger = async (
   try {
     httpResponse = await axios({
       method: 'get',
-      responseType: 'document',
+      responseType: 'text',
       timeout: HTTP_TIMEOUT_MS,
       url: tomlUri,
     })
