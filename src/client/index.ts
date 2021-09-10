@@ -27,6 +27,7 @@ import autofill from '../ledger/autofill'
 import getBalances from '../ledger/balances'
 import { getOrderbook, formatBidsAndAsks } from '../ledger/orderbook'
 import getPaths from '../ledger/pathfind'
+import submitTransaction from '../ledger/submit'
 import getTrustlines from '../ledger/trustlines'
 import { clamp } from '../ledger/utils'
 import {
@@ -520,6 +521,8 @@ class Client extends EventEmitter {
 
   // @deprecated Use autofill instead
   public prepareTransaction = prepend(autofill, this)
+
+  public submitTransaction = prepend(submitTransaction, this)
 
   public getFee = getFee
 
