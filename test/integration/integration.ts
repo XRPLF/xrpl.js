@@ -6,7 +6,6 @@ import { encode } from 'ripple-binary-codec'
 import { Client, Wallet } from 'xrpl-local'
 import { AccountSet, SignerListSet } from 'xrpl-local/models/transactions'
 import { convertStringToHex } from 'xrpl-local/utils'
-import { computeSignedTransactionHash } from 'xrpl-local/utils/hashes'
 import { sign, multisign } from 'xrpl-local/wallet/signer'
 
 import serverUrl from './serverUrl'
@@ -14,7 +13,7 @@ import { setupClient, suiteClientSetup, teardownClient } from './setup'
 import {
   ledgerAccept,
   testTransaction,
-  verifyTransaction,
+  verifySubmittedTransaction,
   fundAccount,
 } from './utils'
 
@@ -32,15 +31,23 @@ describe('integration tests', function () {
     assert(this.client.isConnected())
   })
 
-  const multisignAccount = 'r5nx8ZkwEbFztnc8Qyi22DE9JYjRzNmvs'
-  const multisignSecret = 'ss6F8381Br6wwpy9p582H8sBt19J3'
-  const signer1address = 'rQDhz2ZNXmhxzCYwxU6qAbdxsHA4HV45Y2'
-  const signer1secret = 'shK6YXzwYfnFVn3YZSaMh5zuAddKx'
-  const signer2address = 'r3RtUvGw9nMoJ5FuHxuoVJvcENhKtuF9ud'
-  const signer2secret = 'shUHQnL4EH27V4EiBrj6EfhWvZngF'
-
   it('submit multisigned transaction', async function () {
     const client: Client = this.client
+    const multisignAccount = 'r5nx8ZkwEbFztnc8Qyi22DE9JYjRzNmvs'
+    const multisignSecret = 'ss6F8381Br6wwpy9p582H8sBt19J3'
+    const signer1address = 'rQDhz2ZNXmhxzCYwxU6qAbdxsHA4HV45Y2'
+    const signer1secret = 'shK6YXzwYfnFVn3YZSaMh5zuAddKx'
+    const signer2address = 'r3RtUvGw9nMoJ5FuHxuoVJvcENhKtuF9ud'
+    const signer2secret = 'shUHQnL4EH27V4EiBrj6EfhWvZngF'
+    await fundAccount(client, multisignAccount)
+
+    const ledgerResponse = await client.request({
+      command: 'ledger',
+      ledger_index: 'validated',
+    })
+    const minLedgerVersion = ledgerResponse.result.ledger_index
+
+    // set up the multisigners for the account
     const signerListSet: SignerListSet = {
       TransactionType: 'SignerListSet',
       Account: multisignAccount,
@@ -60,22 +67,16 @@ describe('integration tests', function () {
       ],
       SignerQuorum: 2,
     }
-    await fundAccount(client, multisignAccount)
-    const minLedgerVersion = (
-      await client.request({
-        command: 'ledger',
-        ledger_index: 'validated',
-      })
-    ).result.ledger_index
     const tx = await client.autofill(signerListSet, 2)
     await testTransaction(
       this,
-      'SignerListSet',
       minLedgerVersion,
       tx,
       multisignAccount,
       multisignSecret,
     )
+
+    // try to multisign
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
       Account: multisignAccount,
@@ -85,6 +86,7 @@ describe('integration tests', function () {
     const signed1 = sign(Wallet.fromSeed(signer1secret), accountSetTx, true)
     const signed2 = sign(Wallet.fromSeed(signer2secret), accountSetTx, true)
     const combined = multisign([signed1, signed2])
+    // TODO: replace with `client.submitSignedTransaction`
     const submitResponse = await client.request({
       command: 'submit',
       tx_blob: encode(combined),
@@ -92,12 +94,6 @@ describe('integration tests', function () {
     await ledgerAccept(client)
     assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
     const options = { minLedgerVersion }
-    await verifyTransaction(
-      this,
-      computeSignedTransactionHash(combined),
-      'AccountSet',
-      options,
-      multisignAccount,
-    )
+    await verifySubmittedTransaction(this, combined, options)
   })
 })

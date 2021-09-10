@@ -1,5 +1,7 @@
 /* eslint-disable max-params -- helper test functions */
 import { assert } from 'chai'
+import _ from 'lodash'
+import { decode } from 'ripple-binary-codec'
 
 import { Client, SubmitResponse, Wallet } from 'xrpl-local'
 import { BaseResponse } from 'xrpl-local/models/methods/baseMethod'
@@ -65,13 +67,12 @@ export async function fundAccount(
   await ledgerAccept(client)
 }
 
-export async function verifyTransaction(
+export async function verifySubmittedTransaction(
   testcase: Mocha.Context,
-  hash: string,
-  type: string,
+  tx: Transaction,
   options: { minLedgerVersion: number; maxLedgerVersion?: number },
-  account: string,
 ): Promise<void> {
+  const hash = computeSignedTransactionHash(tx)
   const data = await testcase.client.request({
     command: 'tx',
     transaction: hash,
@@ -80,8 +81,17 @@ export async function verifyTransaction(
   })
 
   assert(data.result)
-  assert.strictEqual(data.result.TransactionType, type)
-  assert.strictEqual(data.result.Account, account)
+  assert.deepEqual(
+    _.omit(data.result, [
+      'date',
+      'hash',
+      'inLedger',
+      'ledger_index',
+      'meta',
+      'validated',
+    ]),
+    tx,
+  )
   if (typeof data.result.meta === 'object') {
     assert.strictEqual(data.result.meta.TransactionResult, 'tesSUCCESS')
   } else {
@@ -94,7 +104,6 @@ export async function verifyTransaction(
 
 export async function testTransaction(
   testcase: Mocha.Context,
-  type: string,
   lastClosedLedgerVersion: number,
   txData: Transaction,
   address = walletAddress,
@@ -118,11 +127,9 @@ export async function testTransaction(
     maxLedgerVersion: txData.LastLedgerSequence,
   }
   await ledgerAccept(testcase.client)
-  await verifyTransaction(
+  await verifySubmittedTransaction(
     testcase,
-    computeSignedTransactionHash(signedData),
-    type,
+    decode(signedData) as unknown as Transaction,
     options,
-    address,
   )
 }
