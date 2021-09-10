@@ -1,6 +1,7 @@
-import { encode } from 'ripple-binary-codec'
+import { decode, encode } from 'ripple-binary-codec'
 
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
+import { ValidationError } from '../common/errors'
 import { Transaction } from '../models/transactions'
 import { sign } from '../wallet/signer'
 
@@ -42,6 +43,10 @@ async function submitSignedTransaction(
   client: Client,
   signedTransaction: Transaction | string,
 ): Promise<SubmitResponse> {
+  if (!isSigned(signedTransaction)) {
+    throw new ValidationError('Transaction must be signed')
+  }
+
   const signedTxEncoded =
     typeof signedTransaction === 'string'
       ? signedTransaction
@@ -51,6 +56,14 @@ async function submitSignedTransaction(
     tx_blob: signedTxEncoded,
   }
   return client.request(request)
+}
+
+function isSigned(transaction: Transaction | string): boolean {
+  const tx = typeof transaction === 'string' ? decode(transaction) : transaction
+  return (
+    typeof tx !== 'string' &&
+    (tx.SigningPubKey != null || tx.TxnSignature != null)
+  )
 }
 
 export { submitTransaction, submitSignedTransaction }
