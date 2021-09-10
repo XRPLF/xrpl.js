@@ -68,6 +68,7 @@ export default class RequestManager {
       throw new Error(`No existing promise with id ${id}`)
     }
     clearTimeout(promise.timer)
+    // TODO: figure out how to have a better stack trace for an error
     promise.reject(error)
     this.deletePromise(id)
   }

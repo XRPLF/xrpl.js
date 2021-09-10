@@ -38,7 +38,7 @@ async function pay(
     Amount: paymentAmount,
   }
 
-  const paymentTx = client.autofill(payment, 1)
+  const paymentTx = await client.autofill(payment, 1)
   verifyPayment(paymentTx)
   const signed = client.sign(JSON.stringify(paymentTx), secret)
   const id = signed.id
