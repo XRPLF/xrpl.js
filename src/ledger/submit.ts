@@ -24,7 +24,7 @@ async function submitTransaction(
   client: Client,
   wallet: Wallet,
   transaction: Transaction,
-): Promise<void> {
+): Promise<SubmitResponse> {
   const tx: Transaction = await autofill(client, transaction)
   const signedTxSerialized: string = sign(wallet, tx)
   return submitRequest(client, signedTxSerialized)
@@ -41,7 +41,7 @@ async function submitTransaction(
 async function submitSignedTransaction(
   client: Client,
   signedTransaction: Transaction,
-): Promise<void> {
+): Promise<SubmitResponse> {
   const serialized = encode(signedTransaction)
   return submitRequest(client, serialized)
 }
@@ -49,7 +49,7 @@ async function submitSignedTransaction(
 async function submitRequest(
   client: Client,
   txSerialized: string,
-): Promise<void> {
+): Promise<SubmitResponse> {
   const request: SubmitRequest = {
     command: 'submit',
     tx_blob: txSerialized,
@@ -58,6 +58,7 @@ async function submitRequest(
   if (response.result.engine_result !== 'tesSUCCESS') {
     throw new RippledError(response.result.engine_result_message)
   }
+  return response
 }
 
 export { submitTransaction, submitSignedTransaction }
