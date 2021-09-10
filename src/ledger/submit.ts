@@ -26,7 +26,7 @@ async function submitTransaction(
 ): Promise<SubmitResponse> {
   // TODO: replace with client.autofill(transaction) once prepend refactor is fixed.
   const tx = await autofill(client, transaction)
-  const signedTxEncoded: string = sign(wallet, tx)
+  const signedTxEncoded = sign(wallet, tx)
   return submitSignedTransaction(client, signedTxEncoded)
 }
 
