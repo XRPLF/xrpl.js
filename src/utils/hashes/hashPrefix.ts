@@ -12,29 +12,29 @@
  */
 
 enum HashPrefix {
-  // transaction plus signature to give transaction ID
-  TRANSACTION_ID = 0x54584e00, // 'TXN'
+  // transaction plus signature to give transaction ID 'TXN'
+  TRANSACTION_ID = 0x54584e00,
 
-  // transaction plus metadata
-  TRANSACTION_NODE = 0x534e4400, // 'TND'
+  // transaction plus metadata 'TND'
+  TRANSACTION_NODE = 0x534e4400,
 
-  // inner node in tree
-  INNER_NODE = 0x4d494e00, // 'MIN'
+  // inner node in tree 'MIN'
+  INNER_NODE = 0x4d494e00,
 
-  // leaf node in tree
-  LEAF_NODE = 0x4d4c4e00, // 'MLN'
+  // leaf node in tree 'MLN'
+  LEAF_NODE = 0x4d4c4e00,
 
-  // inner transaction to sign
-  TRANSACTION_SIGN = 0x53545800, // 'STX'
+  // inner transaction to sign 'STX'
+  TRANSACTION_SIGN = 0x53545800,
 
-  // inner transaction to sign (TESTNET)
-  TRANSACTION_SIGN_TESTNET = 0x73747800, // 'stx'
+  // inner transaction to sign (TESTNET) 'stx'
+  TRANSACTION_SIGN_TESTNET = 0x73747800,
 
-  // inner transaction to multisign
-  TRANSACTION_MULTISIGN = 0x534d5400, // 'SMT'
+  // inner transaction to multisign 'SMT'
+  TRANSACTION_MULTISIGN = 0x534d5400,
 
-  // ledger
-  LEDGER = 0x4c575200, // 'LWR'
+  // ledger 'LWR'
+  LEDGER = 0x4c575200,
 }
 
 export default HashPrefix

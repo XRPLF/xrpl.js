@@ -1,13 +1,12 @@
 import { classicAddressToXAddress } from 'ripple-address-codec'
 import keypairs from 'ripple-keypairs'
 
-import { errors } from '../common'
 import ECDSA from '../common/ecdsa'
+import { UnexpectedError } from '../common/errors'
 
 export interface GeneratedAddress {
   xAddress: string
   classicAddress?: string
-  address?: string // @deprecated Use `classicAddress` instead.
   secret: string
 }
 
@@ -27,7 +26,14 @@ export interface GenerateAddressOptions {
   includeClassicAddress?: boolean
 }
 
-// TODO: move this function to be a static function of the Wallet class (Along with its helper data types)
+/**
+ * TODO: Move this function to be a static function of the Wallet Class.
+ * TODO: Doc this function.
+ *
+ * @param options - Options for generating X-Address.
+ * @returns A generated address.
+ * @throws When cannot generate an address.
+ */
 function generateXAddress(
   options: GenerateAddressOptions = {},
 ): GeneratedAddress {
@@ -44,7 +50,7 @@ function generateXAddress(
     const secret = keypairs.generateSeed(generateSeedOptions)
     const keypair = keypairs.deriveKeypair(secret)
     const classicAddress = keypairs.deriveAddress(keypair.publicKey)
-    const returnValue: any = {
+    const returnValue: GeneratedAddress = {
       xAddress: classicAddressToXAddress(
         classicAddress,
         false,
@@ -54,11 +60,14 @@ function generateXAddress(
     }
     if (options.includeClassicAddress) {
       returnValue.classicAddress = classicAddress
-      returnValue.address = classicAddress
     }
     return returnValue
   } catch (error) {
-    throw new errors.UnexpectedError(error.message)
+    if (error instanceof Error) {
+      throw new UnexpectedError(error.message)
+    }
+
+    throw error
   }
 }
 

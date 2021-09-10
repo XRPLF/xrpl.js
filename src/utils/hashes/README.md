@@ -40,7 +40,7 @@ Compute the hash of an account, given the account's classic address (starting wi
 
 Compute the hash of an account's SignerList.
 
-### computeOrderID = (address: string, sequence: number): string
+### computeOfferID = (address: string, sequence: number): string
 
 Compute the hash of an order, given the owner's classic address (starting with `r`) and the account sequence number of the `OfferCreate` order transaction.
 
