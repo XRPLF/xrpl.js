@@ -5,190 +5,32 @@ import assert from 'assert'
 import _ from 'lodash'
 import { encode } from 'ripple-binary-codec'
 
-import { Client, SubmitResponse, Wallet } from 'xrpl-local'
-import {
-  AccountSet,
-  SignerListSet,
-  Transaction,
-} from 'xrpl-local/models/transactions'
-import {
-  generateXAddress,
-  xrpToDrops,
-  convertStringToHex,
-} from 'xrpl-local/utils'
+import { Client, Wallet } from 'xrpl-local'
+import { AccountSet, SignerListSet } from 'xrpl-local/models/transactions'
+import { xrpToDrops, convertStringToHex } from 'xrpl-local/utils'
 import { computeSignedTransactionHash } from 'xrpl-local/utils/hashes'
 import { sign, multisign } from 'xrpl-local/wallet/signer'
 
 import serverUrl from './serverUrl'
-import { payTo, ledgerAccept } from './utils'
-import { walletAddress, walletSecret } from './wallet'
+import { setupClient, suiteClientSetup, teardownClient } from './setup'
+import {
+  payTo,
+  ledgerAccept,
+  testTransaction,
+  verifyTransaction,
+} from './utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
 
 console.log(serverUrl)
 
-async function submitTransaction(
-  client: Client,
-  secret: string,
-  transaction: Transaction,
-): Promise<SubmitResponse> {
-  const wallet = Wallet.fromSeed(secret)
-  const tx = await client.autofill(transaction)
-  const signedTxEncoded: string = sign(wallet, tx)
-  return client.request({ command: 'submit', tx_blob: signedTxEncoded })
-}
-
-type TestCase = Mocha.Context
-
-async function verifyTransaction(
-  testcase: TestCase,
-  hash: string,
-  type: string,
-  options: { minLedgerVersion: number; maxLedgerVersion?: number },
-  account: string,
-): Promise<void> {
-  console.log('VERIFY...')
-  const data = await testcase.client.request({
-    command: 'tx',
-    transaction: hash,
-    min_ledger: options.minLedgerVersion,
-    max_ledger: options.maxLedgerVersion,
-  })
-
-  assert(data.result)
-  assert.strictEqual(data.result.TransactionType, type)
-  assert.strictEqual(data.result.Account, account)
-  if (typeof data.result.meta === 'object') {
-    assert.strictEqual(data.result.meta.TransactionResult, 'tesSUCCESS')
-  } else {
-    assert.strictEqual(data.result.meta, 'tesSUCCESS')
-  }
-  if (testcase.transactions != null) {
-    testcase.transactions.push(hash)
-  }
-}
-
-async function testTransaction(
-  testcase: TestCase,
-  type: string,
-  lastClosedLedgerVersion: number,
-  txData: Transaction,
-  address = walletAddress,
-  secret = walletSecret,
-): Promise<void> {
-  assert.strictEqual(txData.Account, address)
-  const client: Client = testcase.client
-  const signedData = sign(Wallet.fromSeed(secret), txData)
-  console.log('PREPARED...')
-
-  const attemptedResponse = await client.request({
-    command: 'submit',
-    tx_blob: signedData,
-  })
-  const submittedResponse = testcase.test?.title.includes('multisign')
-    ? await ledgerAccept(client).then(() => attemptedResponse)
-    : attemptedResponse
-
-  console.log('SUBMITTED...')
-  assert.strictEqual(submittedResponse.result.engine_result, 'tesSUCCESS')
-  const options = {
-    minLedgerVersion: lastClosedLedgerVersion,
-    maxLedgerVersion: txData.LastLedgerSequence,
-  }
-  await ledgerAccept(testcase.client)
-  await verifyTransaction(
-    testcase,
-    computeSignedTransactionHash(signedData),
-    type,
-    options,
-    address,
-  )
-}
-
-async function setup(this: TestCase, server = serverUrl): Promise<void> {
-  this.client = new Client(server)
-  console.log('CONNECTING...')
-  return this.client.connect().then(
-    () => {
-      console.log('CONNECTED...')
-    },
-    (error) => {
-      console.log('ERROR:', error)
-      throw error
-    },
-  )
-}
-
-const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
-const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
-
-async function setupAccounts(testcase: TestCase): Promise<void> {
-  const client = testcase.client
-
-  const serverInfoResponse = await client.request({ command: 'server_info' })
-  const fundAmount = xrpToDrops(
-    Number(serverInfoResponse.result.info.validated_ledger?.reserve_base_xrp) *
-      2,
-  )
-  await payTo(client, 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM', fundAmount)
-  await payTo(client, walletAddress, fundAmount)
-  await payTo(client, testcase.newWallet.classicAddress, fundAmount)
-  await payTo(client, 'rKmBGxocj9Abgy25J51Mk1iqFzW9aVF9Tc', fundAmount)
-  await payTo(client, 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q', fundAmount)
-
-  const accountSet: AccountSet = {
-    TransactionType: 'AccountSet',
-    Account: masterAccount,
-    // default ripple
-    SetFlag: 8,
-  }
-  await submitTransaction(client, masterSecret, accountSet)
-  await ledgerAccept(client)
-  await payTo(client, walletAddress, '123', 'USD', masterAccount)
-  await payTo(client, 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q')
-}
-
-async function teardown(this: TestCase): Promise<void> {
-  return this.client.disconnect()
-}
-
-async function suiteSetup(this: any) {
-  this.transactions = []
-
-  return (
-    setup
-      .bind(this)(serverUrl)
-      .then(async () => ledgerAccept(this.client))
-      .then(
-        () =>
-          (this.newWallet = generateXAddress({ includeClassicAddress: true })),
-      )
-      // two times to give time to server to send `ledgerClosed` event
-      // so getLedgerVersion will return right value
-      .then(async () => ledgerAccept(this.client))
-      .then(() =>
-        this.client
-          .request({
-            command: 'ledger',
-            ledger_index: 'validated',
-          })
-          .then((response) => response.result.ledger_index),
-      )
-      .then((ledgerVersion) => {
-        this.startLedgerVersion = ledgerVersion
-      })
-      .then(async () => setupAccounts(this))
-      .then(async () => teardown.bind(this)())
-  )
-}
-
 describe('integration tests', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteSetup)
-  beforeEach(_.partial(setup, serverUrl))
-  afterEach(teardown)
+  before(suiteClientSetup)
+  beforeEach(_.partial(setupClient, serverUrl))
+  afterEach(teardownClient)
 
   it('isConnected', function () {
     assert(this.client.isConnected())
