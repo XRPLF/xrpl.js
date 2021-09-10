@@ -1,11 +1,9 @@
 import { assert } from 'chai'
 
-import { RippledError } from 'xrpl-local/common/errors'
 import { Transaction } from 'xrpl-local/models/transactions'
 
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
-import { assertRejects } from '../testUtils'
 
 describe('client.submitSignedTransaction', function () {
   beforeEach(setupClient)
@@ -52,16 +50,5 @@ describe('client.submitSignedTransaction', function () {
     } catch (_error) {
       assert(false, 'Did not expect an error to be thrown')
     }
-  })
-
-  it('should throw a RippledError on failed submit response', async function () {
-    const signedTx: Transaction = { ...signedTransaction }
-
-    this.mockRippled.addResponse('submit', rippled.submit.failure)
-
-    return assertRejects(
-      this.client.submitSignedTransaction(signedTx),
-      RippledError,
-    )
   })
 })

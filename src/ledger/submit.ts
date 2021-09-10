@@ -1,7 +1,6 @@
 import { encode } from 'ripple-binary-codec'
 
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
-import { RippledError } from '../common/errors'
 import { Transaction } from '../models/transactions'
 import { sign } from '../wallet/signer'
 
@@ -27,7 +26,7 @@ async function submitTransaction(
 ): Promise<SubmitResponse> {
   const tx: Transaction = await autofill(client, transaction)
   const signedTxEncoded: string = sign(wallet, tx)
-  return submitRequest(client, signedTxEncoded)
+  return submitSignedTransaction(client, signedTxEncoded)
 }
 
 /**
@@ -46,22 +45,11 @@ async function submitSignedTransaction(
     typeof signedTransaction === 'string'
       ? signedTransaction
       : encode(signedTransaction)
-  return submitRequest(client, signedTxEncoded)
-}
-
-async function submitRequest(
-  client: Client,
-  txSerialized: string,
-): Promise<SubmitResponse> {
   const request: SubmitRequest = {
     command: 'submit',
-    tx_blob: txSerialized,
+    tx_blob: signedTxEncoded,
   }
-  const response: SubmitResponse = await client.request(request)
-  if (response.result.engine_result !== 'tesSUCCESS') {
-    throw new RippledError(response.result.engine_result_message)
-  }
-  return response
+  return client.request(request)
 }
 
 export { submitTransaction, submitSignedTransaction }
