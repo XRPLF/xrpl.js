@@ -24,7 +24,8 @@ import wallet from './wallet'
 
 // how long before each test case times out
 const TIMEOUT = 20000
-const INTERVAL = 1000 // how long to wait between checks for validated ledger
+// how long to wait between checks for validated ledger
+const INTERVAL = 1000
 
 const HOST = process.env.HOST ?? '0.0.0.0'
 const PORT = process.env.PORT ?? '6006'
