@@ -1,7 +1,7 @@
 import { generateXAddress, Client } from 'xrpl-local'
 
 import serverUrl from './serverUrl'
-import { ledgerAccept, setupAccounts } from './utils'
+import { ledgerAccept } from './utils'
 
 export async function teardownClient(this: Mocha.Context): Promise<void> {
   this.client.disconnect()
@@ -22,7 +22,6 @@ export async function suiteClientSetup(this: Mocha.Context): Promise<void> {
   })
   const ledgerVersion = response.result.ledger_index
   this.startLedgerVersion = ledgerVersion
-  await setupAccounts(this)
   await teardownClient.bind(this)()
 }
 

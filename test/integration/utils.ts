@@ -1,13 +1,12 @@
 /* eslint-disable max-params -- helper test functions */
 import { assert } from 'chai'
 
-import { Client, SubmitResponse, Wallet, xrpToDrops } from 'xrpl-local'
+import { Client, SubmitResponse, Wallet } from 'xrpl-local'
 import { BaseResponse } from 'xrpl-local/models/methods/baseMethod'
 import {
   verifyPayment,
   Payment,
   Transaction,
-  AccountSet,
 } from 'xrpl-local/models/transactions'
 import { computeSignedTransactionHash } from 'xrpl-local/utils/hashes'
 import { sign } from 'xrpl-local/wallet/signer'
@@ -30,57 +29,7 @@ export async function ledgerAccept(
   return client.connection.request(request) as Promise<LedgerAcceptResponse>
 }
 
-export async function pay(
-  client: Client,
-  from: string,
-  to: string,
-  amount: string,
-  secret: string,
-  issuer: string,
-  currency = 'XRP',
-): Promise<string> {
-  const paymentAmount =
-    currency === 'XRP' ? amount : { value: amount, currency, issuer }
-
-  const payment: Payment = {
-    TransactionType: 'Payment',
-    Account: from,
-    Destination: to,
-    Amount: paymentAmount,
-  }
-
-  const paymentTx = await client.autofill(payment, 1)
-  verifyPayment(paymentTx)
-  const signed = client.sign(JSON.stringify(paymentTx), secret)
-  const id = signed.id
-  const response = await client.request({
-    command: 'submit',
-    tx_blob: signed.signedTransaction,
-  })
-  // TODO: add better error handling here
-  // TODO: fix path issues
-  if (
-    response.result.engine_result !== 'tesSUCCESS' &&
-    response.result.engine_result !== 'tecPATH_PARTIAL'
-  ) {
-    // eslint-disable-next-line no-console -- happens only when something goes wrong
-    console.log(response)
-    assert.fail(`Response not successful, ${response.result.engine_result}`)
-  }
-  ledgerAccept(client)
-  return id
-}
-
-export async function payTo(
-  client: Client,
-  to: string,
-  amount = '40000000',
-  currency = 'XRP',
-  issuer = '',
-): Promise<string> {
-  return pay(client, masterAccount, to, amount, masterSecret, issuer, currency)
-}
-
+// TODO: replace with `client.submitTransaction` once that has been merged
 export async function submitTransaction(
   client: Client,
   secret: string,
@@ -92,10 +41,32 @@ export async function submitTransaction(
   return client.request({ command: 'submit', tx_blob: signedTxEncoded })
 }
 
-type TestCase = Mocha.Context
+export async function fundAccount(
+  client: Client,
+  account: string,
+): Promise<void> {
+  const payment: Payment = {
+    TransactionType: 'Payment',
+    Account: masterAccount,
+    Destination: account,
+    // 2 times the amount needed for a new account (20 XRP)
+    Amount: '40000000',
+  }
+  const paymentTx = await client.autofill(payment)
+  verifyPayment(paymentTx)
+
+  const response = await submitTransaction(client, masterSecret, paymentTx)
+  if (response.result.engine_result !== 'tesSUCCESS') {
+    // eslint-disable-next-line no-console -- happens only when something goes wrong
+    console.log(response)
+    assert.fail(`Response not successful, ${response.result.engine_result}`)
+  }
+
+  await ledgerAccept(client)
+}
 
 export async function verifyTransaction(
-  testcase: TestCase,
+  testcase: Mocha.Context,
   hash: string,
   type: string,
   options: { minLedgerVersion: number; maxLedgerVersion?: number },
@@ -122,7 +93,7 @@ export async function verifyTransaction(
 }
 
 export async function testTransaction(
-  testcase: TestCase,
+  testcase: Mocha.Context,
   type: string,
   lastClosedLedgerVersion: number,
   txData: Transaction,
@@ -154,30 +125,4 @@ export async function testTransaction(
     options,
     address,
   )
-}
-
-export async function setupAccounts(testcase: TestCase): Promise<void> {
-  const client = testcase.client
-
-  const serverInfoResponse = await client.request({ command: 'server_info' })
-  const fundAmount = xrpToDrops(
-    Number(serverInfoResponse.result.info.validated_ledger?.reserve_base_xrp) *
-      2,
-  )
-  await payTo(client, 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM', fundAmount)
-  await payTo(client, walletAddress, fundAmount)
-  await payTo(client, testcase.newWallet.classicAddress, fundAmount)
-  await payTo(client, 'rKmBGxocj9Abgy25J51Mk1iqFzW9aVF9Tc', fundAmount)
-  await payTo(client, 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q', fundAmount)
-
-  const accountSet: AccountSet = {
-    TransactionType: 'AccountSet',
-    Account: masterAccount,
-    // default ripple
-    SetFlag: 8,
-  }
-  await submitTransaction(client, masterSecret, accountSet)
-  await ledgerAccept(client)
-  await payTo(client, walletAddress, '123', 'USD', masterAccount)
-  await payTo(client, 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q')
 }
