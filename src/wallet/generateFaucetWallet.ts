@@ -120,7 +120,7 @@ async function onEnd(
   client: Client,
   startingBalance: number,
   fundWallet: Wallet,
-  resolve: (wallet: Wallet | undefined) => void,
+  resolve: (wallet?: Wallet) => void,
   reject: (err: ErrorConstructor | Error) => void,
 ): Promise<void> {
   const body = Buffer.concat(chunks).toString()
@@ -154,7 +154,7 @@ async function processSuccessfulResponse(
   body: string,
   startingBalance: number,
   fundWallet: Wallet,
-  resolve: (wallet: Wallet | undefined) => void,
+  resolve: (wallet?: Wallet) => void,
   reject: (err: ErrorConstructor | Error) => void,
 ): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- We know this is safe and correct
@@ -210,8 +210,12 @@ async function getAddressXrpBalance(
     )
     return xrpBalance[0].value
   } catch (err) {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- Is going to be an error
-    return `Unable to retrieve ${address} balance. Error: ${err}`
+    if (err instanceof Error) {
+      throw new XRPLFaucetError(
+        `Unable to retrieve ${address} balance. Error: ${err.message}`,
+      )
+    }
+    throw err
   }
 }
 
@@ -247,12 +251,14 @@ async function hasAddressBalanceIncreased(
         }
       } catch (err) {
         clearInterval(interval)
-        reject(
-          new XRPLFaucetError(
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- Is going to be an error
-            `Unable to check if the address ${address} balance has increased. Error: ${err}`,
-          ),
-        )
+        if (err instanceof Error) {
+          reject(
+            new XRPLFaucetError(
+              `Unable to check if the address ${address} balance has increased. Error: ${err.message}`,
+            ),
+          )
+        }
+        reject(err)
       }
     }, INTERVAL_SECONDS * 1000)
   })
