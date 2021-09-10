@@ -5,17 +5,17 @@ import { encode } from 'ripple-binary-codec'
 
 import { Client, Wallet } from 'xrpl-local'
 import { AccountSet, SignerListSet } from 'xrpl-local/models/transactions'
-import { xrpToDrops, convertStringToHex } from 'xrpl-local/utils'
+import { convertStringToHex } from 'xrpl-local/utils'
 import { computeSignedTransactionHash } from 'xrpl-local/utils/hashes'
 import { sign, multisign } from 'xrpl-local/wallet/signer'
 
 import serverUrl from './serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from './setup'
 import {
-  payTo,
   ledgerAccept,
   testTransaction,
   verifyTransaction,
+  fundAccount,
 } from './utils'
 
 // how long before each test case times out
@@ -60,15 +60,7 @@ describe('integration tests', function () {
       ],
       SignerQuorum: 2,
     }
-    const serverInfoResponse = await client.request({
-      command: 'server_info',
-    })
-    const fundAmount = xrpToDrops(
-      Number(
-        serverInfoResponse.result.info.validated_ledger?.reserve_base_xrp,
-      ) * 2,
-    )
-    await payTo(client, multisignAccount, fundAmount)
+    await fundAccount(client, multisignAccount)
     const minLedgerVersion = (
       await client.request({
         command: 'ledger',
@@ -100,16 +92,12 @@ describe('integration tests', function () {
     await ledgerAccept(client)
     assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
     const options = { minLedgerVersion }
-    return verifyTransaction(
+    await verifyTransaction(
       this,
       computeSignedTransactionHash(combined),
       'AccountSet',
       options,
       multisignAccount,
-    ).catch((error) => {
-      // eslint-disable-next-line no-console -- only if something goes wrong
-      console.log(error.message)
-      throw error
-    })
+    )
   })
 })
