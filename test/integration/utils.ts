@@ -52,7 +52,7 @@ export async function fundAccount(
     Account: masterAccount,
     Destination: account,
     // 2 times the amount needed for a new account (20 XRP)
-    Amount: '40000000',
+    Amount: '400000000',
   }
   const paymentTx = await client.autofill(payment)
   verifyPayment(paymentTx)
