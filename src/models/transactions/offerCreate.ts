@@ -10,14 +10,14 @@ import {
 } from './common'
 
 // eslint-disable-next-line no-shadow -- variable declaration is unique
-export enum OfferCreateFlagsEnum {
+export enum OfferCreateTransactionFlags {
   tfPassive = 0x00010000,
   tfImmediateOrCancel = 0x00020000,
   tfFillOrKill = 0x00040000,
   tfSell = 0x00080000,
 }
 
-export interface OfferCreateFlags extends GlobalFlags {
+export interface OfferCreateFlagsInterface extends GlobalFlags {
   tfPassive?: boolean
   tfImmediateOrCancel?: boolean
   tfFillOrKill?: boolean
@@ -26,7 +26,7 @@ export interface OfferCreateFlags extends GlobalFlags {
 
 export interface OfferCreate extends BaseTransaction {
   TransactionType: 'OfferCreate'
-  Flags?: number | OfferCreateFlags
+  Flags?: number | OfferCreateFlagsInterface
   Expiration?: number
   OfferSequence?: number
   TakerGets: Amount
