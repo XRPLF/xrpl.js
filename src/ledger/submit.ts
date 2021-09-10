@@ -24,7 +24,8 @@ async function submitTransaction(
   wallet: Wallet,
   transaction: Transaction,
 ): Promise<SubmitResponse> {
-  const tx: Transaction = await autofill(client, transaction)
+  // TODO: replace with client.autofill(transaction) once prepend refactor is fixed.
+  const tx = await autofill(client, transaction)
   const signedTxEncoded: string = sign(wallet, tx)
   return submitSignedTransaction(client, signedTxEncoded)
 }

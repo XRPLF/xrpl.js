@@ -162,6 +162,7 @@ function getCollectKeyFromCommand(command: string): string | null {
  * @param params - Parameters to prepend to a function.
  * @returns A function bound with params.
  */
+// TODO Need to refactor prepend so TS can infer the correct function signature type
 // eslint-disable-next-line @typescript-eslint/ban-types -- expected param types
 function prepend(func: Function, ...params: unknown[]): Function {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- safe to return
