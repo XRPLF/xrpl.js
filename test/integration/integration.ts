@@ -1,5 +1,3 @@
-/* eslint-disable no-console -- temporary until later */
-/* eslint-disable max-params -- helper test functions */
 import assert from 'assert'
 
 import _ from 'lodash'
@@ -22,8 +20,6 @@ import {
 
 // how long before each test case times out
 const TIMEOUT = 20000
-
-console.log(serverUrl)
 
 describe('integration tests', function () {
   this.timeout(TIMEOUT)
@@ -111,6 +107,7 @@ describe('integration tests', function () {
       options,
       multisignAccount,
     ).catch((error) => {
+      // eslint-disable-next-line no-console -- only if something goes wrong
       console.log(error.message)
       throw error
     })
