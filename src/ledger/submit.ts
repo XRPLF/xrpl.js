@@ -26,24 +26,27 @@ async function submitTransaction(
   transaction: Transaction,
 ): Promise<SubmitResponse> {
   const tx: Transaction = await autofill(client, transaction)
-  const signedTxSerialized: string = sign(wallet, tx)
-  return submitRequest(client, signedTxSerialized)
+  const signedTxEncoded: string = sign(wallet, tx)
+  return submitRequest(client, signedTxEncoded)
 }
 
 /**
  * Encodes and submits a signed transaction.
  *
  * @param client - A Client.
- * @param signedTransaction - A signed transaction to encode and submit.
+ * @param signedTransaction - A signed transaction to encode (if not already) and submit.
  * @returns A promise that contains SubmitResponse.
  * @throws RippledError if submit request fails.
  */
 async function submitSignedTransaction(
   client: Client,
-  signedTransaction: Transaction,
+  signedTransaction: Transaction | string,
 ): Promise<SubmitResponse> {
-  const serialized = encode(signedTransaction)
-  return submitRequest(client, serialized)
+  const signedTxEncoded =
+    typeof signedTransaction === 'string'
+      ? signedTransaction
+      : encode(signedTransaction)
+  return submitRequest(client, signedTxEncoded)
 }
 
 async function submitRequest(
