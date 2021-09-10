@@ -37,8 +37,9 @@ describe('client.submitTransaction', function () {
     try {
       const response = await this.client.submitTransaction(wallet, tx)
       assert(response.result.engine_result, 'tesSUCCESS')
-    } catch (_error) {
-      assert(false, 'Did not expect an error to be thrown')
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- error type thrown can be any
+      assert(false, `Did not expect an error to be thrown: ${error}`)
     }
   })
 })
