@@ -26,6 +26,7 @@ import autofill from '../ledger/autofill'
 import getBalances from '../ledger/balances'
 import { getOrderbook, formatBidsAndAsks } from '../ledger/orderbook'
 import getPaths from '../ledger/pathfind'
+import { submitTransaction, submitSignedTransaction } from '../ledger/submit'
 import getTrustlines from '../ledger/trustlines'
 import { clamp } from '../ledger/utils'
 import {
@@ -160,6 +161,7 @@ function getCollectKeyFromCommand(command: string): string | null {
  * @param params - Parameters to prepend to a function.
  * @returns A function bound with params.
  */
+// TODO Need to refactor prepend so TS can infer the correct function signature type
 // eslint-disable-next-line @typescript-eslint/ban-types -- expected param types
 function prepend(func: Function, ...params: unknown[]): Function {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- safe to return
@@ -535,6 +537,10 @@ class Client extends EventEmitter {
 
   // @deprecated Use autofill instead
   public prepareTransaction = prepend(autofill, this)
+
+  public submitTransaction = prepend(submitTransaction, this)
+
+  public submitSignedTransaction = prepend(submitSignedTransaction, this)
 
   public getFee = getFee
 
