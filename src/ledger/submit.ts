@@ -16,8 +16,8 @@ import autofill from './autofill'
  *
  * @param client - A Client.
  * @param wallet - A Wallet to sign a transaction.
- * @param transaction - A transaction to submit.
- * @returns A promise.
+ * @param transaction - A transaction to autofill, sign & encode, and submit.
+ * @returns A promise that contains SubmitResponse.
  * @throws RippledError if submit request fails.
  */
 async function submitTransaction(
@@ -34,8 +34,8 @@ async function submitTransaction(
  * Encodes and submits a signed transaction.
  *
  * @param client - A Client.
- * @param signedTransaction - A signed transaction to submit.
- * @returns A promise.
+ * @param signedTransaction - A signed transaction to encode and submit.
+ * @returns A promise that contains SubmitResponse.
  * @throws RippledError if submit request fails.
  */
 async function submitSignedTransaction(
