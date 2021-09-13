@@ -262,6 +262,10 @@ describe('Connection', function () {
     try {
       await this.client.connect()
     } catch (error) {
+      if (!(error instanceof Error)) {
+        throw error
+      }
+      
       assert.instanceOf(error, DisconnectedError)
       assert.strictEqual(
         error.message,

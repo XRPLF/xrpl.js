@@ -17,8 +17,8 @@ export default class RequestManager {
   private readonly promisesAwaitingResponse = new Map<
     string | number,
     {
-      resolve: (value?: Response | PromiseLike<Response>) => void
-      reject: (value?: Error) => void
+      resolve: (value: Response | PromiseLike<Response>) => void
+      reject: (value: Error) => void
       timer: NodeJS.Timeout
     }
   >()
@@ -109,11 +109,12 @@ export default class RequestManager {
     if (timer.unref) {
       timer.unref()
     }
-    const newPromise = new Promise(
-      (resolve: (value?: Response | PromiseLike<Response>) => void, reject) => {
+    const newPromise = new Promise<Response>(
+      (resolve: (value: Response | PromiseLike<Response>) => void, reject) => {
         this.promisesAwaitingResponse.set(newId, { resolve, reject, timer })
       },
     )
+
     return [newId, newRequest, newPromise]
   }
 
