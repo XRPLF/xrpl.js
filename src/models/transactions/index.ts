@@ -2,7 +2,11 @@
 /* eslint-disable import/max-dependencies -- Needs to export all types + verify methods */
 // TODO: replace * imports with direct imports
 export * from './transaction'
-export * from './accountSet'
+export {
+  AccountSetFlagsInterface,
+  AccountSet,
+  verifyAccountSet,
+} from './accountSet'
 export * from './accountDelete'
 export * from './checkCancel'
 export * from './checkCash'
@@ -12,12 +16,20 @@ export * from './escrowCancel'
 export * from './escrowCreate'
 export * from './escrowFinish'
 export * from './offerCancel'
-export * from './offerCreate'
-export * from './payment'
-export * from './paymentChannelClaim'
+export {
+  OfferCreateFlagsInterface,
+  OfferCreate,
+  verifyOfferCreate,
+} from './offerCreate'
+export { PaymentFlagsInterface, Payment, verifyPayment } from './payment'
+export {
+  PaymentChannelClaimFlagsInterface,
+  PaymentChannelClaim,
+  verifyPaymentChannelClaim,
+} from './paymentChannelClaim'
 export * from './paymentChannelCreate'
 export * from './paymentChannelFund'
 export * from './setRegularKey'
 export * from './signerListSet'
 export * from './ticketCreate'
-export * from './trustSet'
+export { TrustSetFlagsInterface, TrustSet, verifyTrustSet } from './trustSet'

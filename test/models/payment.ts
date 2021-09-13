@@ -5,7 +5,7 @@ import { ValidationError } from 'xrpl-local/common/errors'
 import {
   verifyPayment,
   verify,
-  PaymentTransactionFlagsEnum,
+  PaymentTransactionFlags,
 } from '../../src/models/transactions'
 
 /**
