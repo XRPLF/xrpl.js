@@ -202,7 +202,6 @@ class Client extends EventEmitter {
    * @param server - URL of the server to connect to.
    * @param options - Options for client settings.
    */
-  // eslint-disable-next-line max-lines-per-function -- Client needs to space for initializing subscriptions
   public constructor(server: string, options: ClientOptions = {}) {
     super()
     if (typeof server !== 'string' || !/wss?(?:\+unix)?:\/\//u.exec(server)) {
@@ -456,7 +455,6 @@ class Client extends EventEmitter {
    * @returns The array of all responses.
    * @throws ValidationError if there is no collection key (either from a known command or for the unknown command).
    */
-  // eslint-disable-next-line max-lines-per-function -- The length comes from variables which is necessary complexity
   public async requestAll<T extends MarkerRequest, U extends MarkerResponse>(
     request: T,
     collect?: string,
