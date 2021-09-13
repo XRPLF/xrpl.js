@@ -109,7 +109,6 @@ import {
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 import combine from '../transaction/combine'
 import { sign } from '../transaction/sign'
-import { deriveAddress, deriveXAddress } from '../utils/derive'
 import generateFaucetWallet from '../wallet/generateFaucetWallet'
 
 import {
@@ -555,11 +554,6 @@ class Client extends EventEmitter {
   public generateFaucetWallet = prepend(generateFaucetWallet, this)
 
   public errors = errors
-
-  public static deriveXAddress = deriveXAddress
-
-  // Client.deriveClassicAddress (static) is a new name for client.deriveAddress
-  public static deriveClassicAddress = deriveAddress
 
   public static formatBidsAndAsks = formatBidsAndAsks
 
