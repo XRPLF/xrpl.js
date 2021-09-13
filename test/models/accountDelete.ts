@@ -1,8 +1,7 @@
-import { assert } from 'chai'
-
 import { ValidationError } from 'xrpl-local/common/errors'
-
-import { verifyAccountDelete } from '../../src/models/transactions/accountDelete'
+import { verifyAccountDelete } from './../../src/models/transactions/accountDelete'
+import { verify } from './../../src/models/transactions'
+import { assert } from 'chai'
 
 /**
  * AccountDelete Transaction Verification Testing.
@@ -38,6 +37,12 @@ describe('AccountDelete', function () {
       ValidationError,
       'AccountDelete: missing field Destination',
     )
+
+    assert.throws(
+      () => verify(invalidDestination),
+      ValidationError,
+      'AccountDelete: missing field Destination',
+    )
   })
 
   it(`throws w/ invalid Destination`, function () {
@@ -52,6 +57,11 @@ describe('AccountDelete', function () {
 
     assert.throws(
       () => verifyAccountDelete(invalidDestination),
+      ValidationError,
+      'AccountDelete: invalid Destination',
+    )
+    assert.throws(
+      () => verify(invalidDestination),
       ValidationError,
       'AccountDelete: invalid Destination',
     )
@@ -70,6 +80,12 @@ describe('AccountDelete', function () {
 
     assert.throws(
       () => verifyAccountDelete(invalidDestinationTag),
+      ValidationError,
+      'AccountDelete: invalid DestinationTag',
+    )
+
+    assert.throws(
+      () => verify(invalidDestinationTag),
       ValidationError,
       'AccountDelete: invalid DestinationTag',
     )

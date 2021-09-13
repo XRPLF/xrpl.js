@@ -1,8 +1,7 @@
-import { assert } from 'chai'
-
 import { ValidationError } from 'xrpl-local/common/errors'
-
-import { verifyTicketCreate } from '../../src/models/transactions/ticketCreate'
+import { verifyTicketCreate } from './../../src/models/transactions/ticketCreate'
+import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * TicketCreate Transaction Verification Testing.
@@ -22,12 +21,18 @@ describe('TicketCreate', function () {
 
   it('verifies valid TicketCreate', function () {
     assert.doesNotThrow(() => verifyTicketCreate(ticketCreate))
+    assert.doesNotThrow(() => verify(ticketCreate))
   })
 
   it('throws when TicketCount is missing', function () {
     delete ticketCreate.TicketCount
     assert.throws(
       () => verifyTicketCreate(ticketCreate),
+      ValidationError,
+      'TicketCreate: missing field TicketCount',
+    )
+    assert.throws(
+      () => verify(ticketCreate),
       ValidationError,
       'TicketCreate: missing field TicketCount',
     )
@@ -40,12 +45,22 @@ describe('TicketCreate', function () {
       ValidationError,
       'TicketCreate: TicketCount must be a number',
     )
+    assert.throws(
+      () => verify(ticketCreate),
+      ValidationError,
+      'TicketCreate: TicketCount must be a number',
+    )
   })
 
   it('throws when TicketCount is not an integer', function () {
     ticketCreate.TicketCount = 12.5
     assert.throws(
       () => verifyTicketCreate(ticketCreate),
+      ValidationError,
+      'TicketCreate: TicketCount must be an integer from 1 to 250',
+    )
+    assert.throws(
+      () => verify(ticketCreate),
       ValidationError,
       'TicketCreate: TicketCount must be an integer from 1 to 250',
     )
@@ -58,12 +73,22 @@ describe('TicketCreate', function () {
       ValidationError,
       'TicketCreate: TicketCount must be an integer from 1 to 250',
     )
+    assert.throws(
+      () => verify(ticketCreate),
+      ValidationError,
+      'TicketCreate: TicketCount must be an integer from 1 to 250',
+    )
   })
 
   it('throws when TicketCount is > 250', function () {
     ticketCreate.TicketCount = 251
     assert.throws(
       () => verifyTicketCreate(ticketCreate),
+      ValidationError,
+      'TicketCreate: TicketCount must be an integer from 1 to 250',
+    )
+    assert.throws(
+      () => verify(ticketCreate),
       ValidationError,
       'TicketCreate: TicketCount must be an integer from 1 to 250',
     )
