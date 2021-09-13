@@ -1,7 +1,7 @@
+import { verifyEscrowCancel } from './../../src/models/transactions/escrowCancel'
 import { assert } from 'chai'
-
 import { ValidationError } from '../../src/common/errors'
-import { verifyEscrowCancel } from '../../src/models/transactions/escrowCancel'
+import { verify } from '../../src/models/transactions'
 
 /**
  * Transaction Verification Testing.
@@ -22,6 +22,7 @@ describe('EscrowCancel', function () {
 
   it(`Valid EscrowCancel`, function () {
     assert.doesNotThrow(() => verifyEscrowCancel(cancel))
+    assert.doesNotThrow(() => verify(cancel))
   })
 
   it(`Invalid EscrowCancel missing owner`, function () {
@@ -29,6 +30,11 @@ describe('EscrowCancel', function () {
 
     assert.throws(
       () => verifyEscrowCancel(cancel),
+      ValidationError,
+      'EscrowCancel: missing Owner',
+    )
+    assert.throws(
+      () => verify(cancel),
       ValidationError,
       'EscrowCancel: missing Owner',
     )
@@ -42,6 +48,11 @@ describe('EscrowCancel', function () {
       ValidationError,
       'EscrowCancel: missing OfferSequence',
     )
+    assert.throws(
+      () => verify(cancel),
+      ValidationError,
+      'EscrowCancel: missing OfferSequence',
+    )
   })
 
   it(`Invalid OfferSequence`, function () {
@@ -52,6 +63,11 @@ describe('EscrowCancel', function () {
       ValidationError,
       'EscrowCancel: Owner must be a string',
     )
+    assert.throws(
+      () => verify(cancel),
+      ValidationError,
+      'EscrowCancel: Owner must be a string',
+    )
   })
 
   it(`Invalid owner`, function () {
@@ -59,6 +75,11 @@ describe('EscrowCancel', function () {
 
     assert.throws(
       () => verifyEscrowCancel(cancel),
+      ValidationError,
+      'EscrowCancel: OfferSequence must be a number',
+    )
+    assert.throws(
+      () => verify(cancel),
       ValidationError,
       'EscrowCancel: OfferSequence must be a number',
     )

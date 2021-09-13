@@ -1,8 +1,7 @@
-import { assert } from 'chai'
-
 import { ValidationError } from 'xrpl-local/common/errors'
-
-import { verifyCheckCash } from '../../src/models/transactions/checkCash'
+import { verifyCheckCash } from './../../src/models/transactions/checkCash'
+import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * CheckCash Transaction Verification Testing.
@@ -21,6 +20,7 @@ describe('CheckCash', function () {
     } as any
 
     assert.doesNotThrow(() => verifyCheckCash(validCheckCash))
+    assert.doesNotThrow(() => verify(validCheckCash))
   })
 
   it(`throws w/ invalid CheckID`, function () {
@@ -33,6 +33,11 @@ describe('CheckCash', function () {
 
     assert.throws(
       () => verifyCheckCash(invalidCheckID),
+      ValidationError,
+      'CheckCash: invalid CheckID',
+    )
+    assert.throws(
+      () => verify(invalidCheckID),
       ValidationError,
       'CheckCash: invalid CheckID',
     )
@@ -49,6 +54,11 @@ describe('CheckCash', function () {
 
     assert.throws(
       () => verifyCheckCash(invalidAmount),
+      ValidationError,
+      'CheckCash: invalid Amount',
+    )
+    assert.throws(
+      () => verify(invalidAmount),
       ValidationError,
       'CheckCash: invalid Amount',
     )
@@ -69,6 +79,11 @@ describe('CheckCash', function () {
       ValidationError,
       'CheckCash: cannot have both Amount and DeliverMin',
     )
+    assert.throws(
+      () => verify(invalidDeliverMin),
+      ValidationError,
+      'CheckCash: cannot have both Amount and DeliverMin',
+    )
   })
 
   it(`throws w/ invalid DeliverMin`, function () {
@@ -82,6 +97,11 @@ describe('CheckCash', function () {
 
     assert.throws(
       () => verifyCheckCash(invalidDeliverMin),
+      ValidationError,
+      'CheckCash: invalid DeliverMin',
+    )
+    assert.throws(
+      () => verify(invalidDeliverMin),
       ValidationError,
       'CheckCash: invalid DeliverMin',
     )

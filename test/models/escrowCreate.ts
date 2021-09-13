@@ -1,8 +1,7 @@
-import { assert } from 'chai'
-
 import { ValidationError } from 'xrpl-local/common/errors'
-
-import { verifyEscrowCreate } from '../../src/models/transactions/escrowCreate'
+import { verifyEscrowCreate } from './../../src/models/transactions/escrowCreate'
+import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * EscrowCreate Transaction Verification Testing.
@@ -29,6 +28,7 @@ describe('EscrowCreate', function () {
 
   it(`verifies valid EscrowCreate`, function () {
     assert.doesNotThrow(() => verifyEscrowCreate(escrow))
+    assert.doesNotThrow(() => verify(escrow))
   })
 
   it(`Missing amount`, function () {
@@ -36,6 +36,11 @@ describe('EscrowCreate', function () {
 
     assert.throws(
       () => verifyEscrowCreate(escrow),
+      ValidationError,
+      'EscrowCreate: missing field Amount',
+    )
+    assert.throws(
+      () => verify(escrow),
       ValidationError,
       'EscrowCreate: missing field Amount',
     )
@@ -49,6 +54,11 @@ describe('EscrowCreate', function () {
       ValidationError,
       'EscrowCreate: missing field Destination',
     )
+    assert.throws(
+      () => verify(escrow),
+      ValidationError,
+      'EscrowCreate: missing field Destination',
+    )
   })
 
   it(`throws w/ invalid Destination`, function () {
@@ -56,6 +66,11 @@ describe('EscrowCreate', function () {
 
     assert.throws(
       () => verifyEscrowCreate(escrow),
+      ValidationError,
+      'EscrowCreate: Destination must be a string',
+    )
+    assert.throws(
+      () => verify(escrow),
       ValidationError,
       'EscrowCreate: Destination must be a string',
     )
@@ -69,6 +84,11 @@ describe('EscrowCreate', function () {
       ValidationError,
       'EscrowCreate: Amount must be a string',
     )
+    assert.throws(
+      () => verify(escrow),
+      ValidationError,
+      'EscrowCreate: Amount must be a string',
+    )
   })
 
   it(`invalid CancelAfter`, function () {
@@ -76,6 +96,11 @@ describe('EscrowCreate', function () {
 
     assert.throws(
       () => verifyEscrowCreate(escrow),
+      ValidationError,
+      'EscrowCreate: CancelAfter must be a number',
+    )
+    assert.throws(
+      () => verify(escrow),
       ValidationError,
       'EscrowCreate: CancelAfter must be a number',
     )
@@ -99,6 +124,11 @@ describe('EscrowCreate', function () {
       ValidationError,
       'EscrowCreate: Condition must be a string',
     )
+    assert.throws(
+      () => verify(escrow),
+      ValidationError,
+      'EscrowCreate: Condition must be a string',
+    )
   })
 
   it(`invalid DestinationTag`, function () {
@@ -106,6 +136,11 @@ describe('EscrowCreate', function () {
 
     assert.throws(
       () => verifyEscrowCreate(escrow),
+      ValidationError,
+      'EscrowCreate: DestinationTag must be a number',
+    )
+    assert.throws(
+      () => verify(escrow),
       ValidationError,
       'EscrowCreate: DestinationTag must be a number',
     )
@@ -120,6 +155,11 @@ describe('EscrowCreate', function () {
       ValidationError,
       'EscrowCreate: Either CancelAfter or FinishAfter must be specified',
     )
+    assert.throws(
+      () => verify(escrow),
+      ValidationError,
+      'EscrowCreate: Either CancelAfter or FinishAfter must be specified',
+    )
   })
 
   it(`Missing both Condition and FinishAfter`, function () {
@@ -128,6 +168,11 @@ describe('EscrowCreate', function () {
 
     assert.throws(
       () => verifyEscrowCreate(escrow),
+      ValidationError,
+      'EscrowCreate: Either Condition or FinishAfter must be specified',
+    )
+    assert.throws(
+      () => verify(escrow),
       ValidationError,
       'EscrowCreate: Either Condition or FinishAfter must be specified',
     )
