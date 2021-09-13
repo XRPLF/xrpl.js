@@ -58,7 +58,7 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
 
   switch (tx.TransactionType) {
     case 'AccountSet':
-      tx.Flags =convertAccountSetFlagsToNumber(tx.Flags)
+      tx.Flags = convertAccountSetFlagsToNumber(tx.Flags)
       return
     case 'OfferCreate':
       tx.Flags = convertOfferCreateFlagsToNumber(tx.Flags)
@@ -77,11 +77,15 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
   }
 }
 
-function convertAccountSetFlagsToNumber(flags: AccountSetFlagsInterface): number {
+function convertAccountSetFlagsToNumber(
+  flags: AccountSetFlagsInterface,
+): number {
   return reduceFlags(flags, AccountSetTransactionFlags)
 }
 
-function convertOfferCreateFlagsToNumber(flags: OfferCreateFlagsInterface): number {
+function convertOfferCreateFlagsToNumber(
+  flags: OfferCreateFlagsInterface,
+): number {
   return reduceFlags(flags, OfferCreateTransactionFlags)
 }
 
