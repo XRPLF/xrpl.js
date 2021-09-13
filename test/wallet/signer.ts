@@ -304,11 +304,9 @@ describe('Signer', function () {
     assert.deepEqual(result, RESPONSE_FIXTURES.normal.signedTransaction)
   })
 
-  /*
-
   it('sign with lowercase hex data in memo (hex should be case insensitive)', async function () {
     const secret = 'shd2nxpFD6iBRKWsRss2P4tKMWyy9'
-    const lowercaseMemoTxJson = {
+    const lowercaseMemoTx: Transaction = {
       TransactionType: 'Payment',
       Flags: 2147483648,
       Account: 'rwiZ3q3D3QuG4Ga2HyGdq3kPKJRGctVG8a',
@@ -330,28 +328,31 @@ describe('Signer', function () {
       ],
     }
 
-    const txParams = JSON.stringify(lowercaseMemoTxJson)
-    const result = sign(txParams, secret)
-    assert.deepEqual(result, {
-      signedTransaction:
-        '120000228000000023000022B8240000000C2E0000270F201B00D5A36761400000000098968068400000000000000C73210305E09ED602D40AB1AF65646A4007C2DAC17CB6CDACDE301E74FB2D728EA057CF744730450221009C00E8439E017CA622A5A1EE7643E26B4DE9C808DE2ABE45D33479D49A4CEC66022062175BE8733442FA2A4D9A35F85A57D58252AE7B19A66401FE238B36FA28E5A081146C1856D0E36019EA75C56D7E8CBA6E35F9B3F71583147FB49CD110A1C46838788CD12764E3B0F837E0DDF9EA7C1F687474703A2F2F6578616D706C652E636F6D2F6D656D6F2F67656E657269637D0472656E74E1F1',
-      id: '41B9CB78D8E18A796CDD4B0BC6FB0EA19F64C4F25FDE23049197852CAB71D10D',
-    })
+    const result = sign(Wallet.fromSeed(secret), lowercaseMemoTx)
+    assert.equal(
+      result,
+      '120000228000000023000022B8240000000C2E0000270F201B00D5A36761400000000098968068400000000000000C73210305E09ED602D40AB1AF65646A4007C2DAC17CB6CDACDE301E74FB2D728EA057CF744730450221009C00E8439E017CA622A5A1EE7643E26B4DE9C808DE2ABE45D33479D49A4CEC66022062175BE8733442FA2A4D9A35F85A57D58252AE7B19A66401FE238B36FA28E5A081146C1856D0E36019EA75C56D7E8CBA6E35F9B3F71583147FB49CD110A1C46838788CD12764E3B0F837E0DDF9EA7C1F687474703A2F2F6578616D706C652E636F6D2F6D656D6F2F67656E657269637D0472656E74E1F1',
+    )
   })
 
   it('EscrowExecution', async function () {
     const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
-    const result = sign(REQUEST_FIXTURES.escrow.txJSON, secret)
-    assert.deepEqual(result, RESPONSE_FIXTURES.escrow)
+    const result = sign(
+      Wallet.fromSeed(secret),
+      JSON.parse(REQUEST_FIXTURES.escrow.txJSON) as unknown as Transaction,
+    )
+    assert.deepEqual(result, RESPONSE_FIXTURES.escrow.signedTransaction)
   })
 
   it('signAs', async function () {
     const txJSON = REQUEST_FIXTURES.signAs
     const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
-    const signature = sign(JSON.stringify(txJSON), secret, {
-      signAs: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
-    })
-    assert.deepEqual(signature, RESPONSE_FIXTURES.signAs)
+    const signature = sign(
+      Wallet.fromSeed(secret),
+      txJSON as unknown as Transaction,
+      true,
+    )
+    assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
   })
 
   it('withKeypair', async function () {
@@ -361,24 +362,29 @@ describe('Signer', function () {
       publicKey:
         '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8',
     }
-    const result = sign(REQUEST_FIXTURES.normal.txJSON, keypair)
-    assert.deepEqual(result, RESPONSE_FIXTURES.normal)
+    const result = sign(
+      new Wallet(keypair.publicKey, keypair.privateKey),
+      JSON.parse(REQUEST_FIXTURES.normal.txJSON) as unknown as Transaction,
+    )
+    assert.deepEqual(result, RESPONSE_FIXTURES.normal.signedTransaction)
   })
 
   it('withKeypair already signed', async function () {
-    const keypair = {
-      privateKey:
-        '00ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A',
-      publicKey:
-        '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8',
-    }
-    const result = sign(REQUEST_FIXTURES.normal.txJSON, keypair)
+    const wallet = new Wallet(
+      '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8',
+      '00ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A',
+    )
+
+    const result = sign(
+      wallet,
+      JSON.parse(REQUEST_FIXTURES.normal.txJSON) as unknown as Transaction,
+    )
     assert.throws(() => {
-      const tx = JSON.stringify(decode(result.signedTransaction))
-      sign(tx, keypair)
+      const tx = decode(result) as unknown as Transaction
+      sign(wallet, tx)
     }, /txJSON must not contain "TxnSignature" or "Signers" properties/)
   })
-
+  /*
   it('withKeypair EscrowExecution', async function () {
     const keypair = {
       privateKey:
