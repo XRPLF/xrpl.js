@@ -9,7 +9,12 @@ import { ValidationError } from '../../common/errors'
 import TransactionMetadata from './metadata'
 
 import { AccountDelete, verifyAccountDelete } from './accountDelete'
-import { AccountSet, verifyAccountSet } from './accountSet'
+import {
+  AccountSet,
+  verifyAccountSet,
+  AccountSetFlags,
+  AccountSetTransactionFlags,
+} from './accountSet'
 import { CheckCancel, verifyCheckCancel } from './checkCancel'
 import { CheckCash, verifyCheckCash } from './checkCash'
 import { CheckCreate, verifyCheckCreate } from './checkCreate'
@@ -18,10 +23,15 @@ import { EscrowCancel, verifyEscrowCancel } from './escrowCancel'
 import { EscrowCreate, verifyEscrowCreate } from './escrowCreate'
 import { EscrowFinish, verifyEscrowFinish } from './escrowFinish'
 import { OfferCancel, verifyOfferCancel } from './offerCancel'
-import { OfferCreate, verifyOfferCreate } from './offerCreate'
+import {
+  OfferCreate,
+  verifyOfferCreate,
+  OfferCreateTransactionFlags,
+} from './offerCreate'
 import {
   PaymentChannelClaim,
   verifyPaymentChannelClaim,
+  PaymentChannelClaimTransactionFlags,
 } from './paymentChannelClaim'
 import {
   PaymentChannelCreate,
@@ -31,11 +41,11 @@ import {
   PaymentChannelFund,
   verifyPaymentChannelFund,
 } from './paymentChannelFund'
-import { Payment, verifyPayment } from './payment'
+import { Payment, verifyPayment, PaymentTransactionFlags } from './payment'
 import { SetRegularKey, verifySetRegularKey } from './setRegularKey'
 import { SignerListSet, verifySignerListSet } from './signerListSet'
 import { TicketCreate, verifyTicketCreate } from './ticketCreate'
-import { TrustSet, verifyTrustSet } from './trustSet'
+import { TrustSet, verifyTrustSet, TrustSetTransactionFlags } from './trustSet'
 import { setTransactionFlagsToNumber } from '../utils'
 
 export type Transaction =
