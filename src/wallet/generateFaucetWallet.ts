@@ -118,7 +118,7 @@ async function onEnd(
   startingBalance: number,
   fundWallet: Wallet,
   resolve: (wallet?: Wallet) => void,
-  reject: (err: ErrorConstructor | Error) => void,
+  reject: (err: ErrorConstructor | Error | unknown) => void,
 ): Promise<void> {
   const body = Buffer.concat(chunks).toString()
 
@@ -152,7 +152,7 @@ async function processSuccessfulResponse(
   startingBalance: number,
   fundWallet: Wallet,
   resolve: (wallet?: Wallet) => void,
-  reject: (err: ErrorConstructor | Error) => void,
+  reject: (err: ErrorConstructor | Error | unknown) => void,
 ): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- We know this is safe and correct
   const faucetWallet: FaucetWallet = JSON.parse(body)
@@ -182,7 +182,10 @@ async function processSuccessfulResponse(
       )
     }
   } catch (err) {
-    reject(new XRPLFaucetError(err))
+    if (err instanceof Error) {
+      reject(new XRPLFaucetError(err.message))
+    }
+    reject(err)
   }
 }
 
