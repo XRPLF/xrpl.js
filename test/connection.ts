@@ -265,7 +265,7 @@ describe('Connection', function () {
       if (!(error instanceof Error)) {
         throw error
       }
-      
+
       assert.instanceOf(error, DisconnectedError)
       assert.strictEqual(
         error.message,
