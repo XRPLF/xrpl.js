@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import _ from 'lodash'
+import { Client } from 'xrpl-local'
 
-import { PingResponse, RandomResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 
@@ -16,10 +16,10 @@ describe('Utility method integration tests', function () {
   afterEach(teardownClient)
 
   it('ping', async function () {
-    const response = (await this.client.request({
+    const response = await (this.client as Client).request({
       command: 'ping',
-    })) as PingResponse
-    const expected: PingResponse = {
+    })
+    const expected = {
       id: 0,
       result: { role: 'admin', unlimited: true },
       status: 'success',
@@ -29,10 +29,10 @@ describe('Utility method integration tests', function () {
   })
 
   it('random', async function () {
-    const response = (await this.client.request({
+    const response = await (this.client as Client).request({
       command: 'random',
-    })) as RandomResponse
-    const expected: RandomResponse = {
+    })
+    const expected = {
       id: 0,
       result: {
         random: '[random string of 64 bytes]',
