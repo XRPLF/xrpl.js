@@ -24,16 +24,10 @@ describe('DepositPreauth', function () {
     assert.doesNotThrow(() => verify(depositPreauth))
   })
 
-  // it("verifies valid DepositPreauth when only Unauthorize is provided", function () {
-  //   depositPreauth.Unauthorize = "raKEEVSGnKSDv9Zyvxu4z6Pqpm4ABH8FS6n";
-  //   assert.doesNotThrow(() => verifyDepositPreauth(depositPreauth));
-  //   // assert.doesNotThrow(() => verify(depositPreauth));
-  //   verify(depositPreauth);
-  // });
-
   it('verifies valid DepositPreauth when only Unauthorize is provided', function () {
     depositPreauth.Unauthorize = 'raKEEVSGnKSD9Zyvxu4z6Pqpm4ABH8FS6n'
     assert.doesNotThrow(() => verifyDepositPreauth(depositPreauth))
+    assert.doesNotThrow(() => verify(depositPreauth))
   })
 
   it('throws when both Authorize and Unauthorize are provided', function () {
