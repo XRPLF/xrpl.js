@@ -159,8 +159,12 @@ class Wallet {
     transaction: Transaction,
     options: SignOptions = { signAs: '' },
   ): string {
-    return signOffline(this, JSON.stringify(transaction), options)
-      .signedTransaction
+    return signWithKeypair(
+      JSON.stringify(transaction),
+      this.publicKey,
+      this.privateKey,
+      options,
+    ).signedTransaction
   }
 
   /**
@@ -243,7 +247,8 @@ function signWithKeypair(
 
 /**
  *  Decode a serialized transaction, remove the fields that are added during the signing process,
- *  and verify that it matches the transaction prior to signing.
+ *  and verify that it matches the transaction prior to signing. This gives the user a sanity check
+ *  to ensure that what they try to encode matches the message that will be recieved by rippled.
  *
  * @param serialized - A signed and serialized transaction.
  * @param tx - The transaction prior to signing.
@@ -302,14 +307,6 @@ function computeSignature(tx: object, privateKey: string, signAs?: string) {
     ? encodeForMultisigning(tx, signAs)
     : encodeForSigning(tx)
   return sign(signingData, privateKey)
-}
-
-function signOffline(
-  wallet: Wallet,
-  txJSON: string,
-  options?: SignOptions,
-): { signedTransaction: string; id: string } {
-  return signWithKeypair(txJSON, wallet.publicKey, wallet.privateKey, options)
 }
 
 export default Wallet

@@ -25,6 +25,8 @@ const privateKey =
 const address = 'rhvh5SrgBL5V8oeV9EpDuVszeJSSCEkbPc'
 const seed = 'ss1x3KLrSvfg7irFc1D929WXZ7z9H'
 const wallet = Wallet.fromSeed(seed)
+const wallet2 = Wallet.fromSeed('shsWGZcmZz6YsWWmcnpfr6fLTdtFV')
+
 const verifyWallet = new Wallet(publicKey, privateKey)
 
 const tx: Transaction = {
@@ -296,9 +298,8 @@ describe('Signer', function () {
   // TODO: Refactor the below tests to work with the new Signer object
 
   it('sign', async function () {
-    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const result = sign(
-      Wallet.fromSeed(secret),
+      wallet2,
       JSON.parse(REQUEST_FIXTURES.normal.txJSON) as unknown as Transaction,
     )
     assert.deepEqual(result, RESPONSE_FIXTURES.normal.signedTransaction)
@@ -384,38 +385,33 @@ describe('Signer', function () {
       sign(wallet, tx)
     }, /txJSON must not contain "TxnSignature" or "Signers" properties/)
   })
-  /*
+
   it('withKeypair EscrowExecution', async function () {
-    const keypair = {
-      privateKey:
-        '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
-      publicKey:
-        '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
-    }
-    const result = sign(REQUEST_FIXTURES.escrow.txJSON, keypair)
-    assert.deepEqual(result, RESPONSE_FIXTURES.escrow)
+    const wallet = new Wallet(
+      '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
+      '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
+    )
+    const result = sign(
+      wallet,
+      JSON.parse(REQUEST_FIXTURES.escrow.txJSON) as unknown as Transaction,
+    )
+    assert.deepEqual(result, RESPONSE_FIXTURES.escrow.signedTransaction)
   })
 
   it('withKeypair signAs', async function () {
-    const txJSON = REQUEST_FIXTURES.signAs
-    const keypair = {
-      privateKey:
-        '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
-      publicKey:
-        '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
-    }
-    const signature = sign(JSON.stringify(txJSON), keypair, {
-      signAs: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
-    })
-    assert.deepEqual(signature, RESPONSE_FIXTURES.signAs)
+    const tx = REQUEST_FIXTURES.signAs as unknown as Transaction
+    const wallet = new Wallet(
+      '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
+      '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
+    )
+    const signature = sign(wallet, tx, true)
+    assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
   })
 
   it('already signed', async function () {
-    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
-    const result = sign(REQUEST_FIXTURES.normal.txJSON, secret)
+    const result = sign(wallet2, JSON.parse(REQUEST_FIXTURES.normal.txJSON))
     assert.throws(() => {
-      const tx = JSON.stringify(binary.decode(result.signedTransaction))
-      sign(tx, secret)
+      sign(wallet, decode(result) as unknown as Transaction)
     }, /txJSON must not contain "TxnSignature" or "Signers" properties/)
   })
 
@@ -423,18 +419,16 @@ describe('Signer', function () {
     const txJSON =
       '{"TransactionType":"Payment","Account":"r45Rev1EXGxy2hAUmJPCne97KUE7qyrD3j","Destination":"rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r","Amount":"20000000","Sequence":1,"Fee":"12"}'
     const secret = 'shotKgaEotpcYsshSE39vmSnBDRim'
-    const result = sign(txJSON, secret)
-    const expectedResult = {
-      signedTransaction:
-        '1200002400000001614000000001312D0068400000000000000C7321022B05847086686F9D0499B13136B94AD4323EE1B67D4C429ECC987AB35ACFA34574473045022100C104B7B97C31FACA4597E7D6FCF13BD85BD11375963A62A0AC45B0061236E39802207784F157F6A98DFC85B051CDDF61CC3084C4F5750B82674801C8E9950280D1998114EE3046A5DDF8422C40DDB93F1D522BB4FE6419158314FDB08D07AAA0EB711793A3027304D688E10C3648',
-      id: '0596925967F541BF332FF6756645B2576A9858414B5B363DC3D34915BE8A70D6',
-    }
-    const decoded = binary.decode(result.signedTransaction)
+    const wallet = Wallet.fromSeed(secret)
+    const result = sign(wallet, JSON.parse(txJSON))
+    const expectedResult =
+      '1200002400000001614000000001312D0068400000000000000C7321022B05847086686F9D0499B13136B94AD4323EE1B67D4C429ECC987AB35ACFA34574473045022100C104B7B97C31FACA4597E7D6FCF13BD85BD11375963A62A0AC45B0061236E39802207784F157F6A98DFC85B051CDDF61CC3084C4F5750B82674801C8E9950280D1998114EE3046A5DDF8422C40DDB93F1D522BB4FE6419158314FDB08D07AAA0EB711793A3027304D688E10C3648'
+    const decoded = decode(result)
     assert(
       decoded.Flags == null,
       `Flags = ${decoded.Flags}, should be undefined`,
     )
-    assert.deepEqual(result, expectedResult)
+    assert.equal(result, expectedResult)
   })
 
   it('sign succeeds with source.amount/destination.minAmount', async function () {
@@ -443,13 +437,11 @@ describe('Signer', function () {
     const txJSON =
       '{"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Destination":"rEX4LtGJubaUcMWCJULcy4NVxGT9ZEMVRq","Amount":{"currency":"USD","issuer":"rMaa8VLBTjwTJWA2kSme4Sqgphhr6Lr6FH","value":"999999999999999900000000000000000000000000000000000000000000000000000000000000000000000000000000"},"Flags":2147614720,"SendMax":{"currency":"GBP","issuer":"rpat5TmYjDsnFSStmgTumFgXCM9eqsWPro","value":"0.1"},"DeliverMin":{"currency":"USD","issuer":"rMaa8VLBTjwTJWA2kSme4Sqgphhr6Lr6FH","value":"0.1248548562296331"},"Sequence":23,"LastLedgerSequence":8820051,"Fee":"12"}'
     const secret = 'shotKgaEotpcYsshSE39vmSnBDRim'
-    const result = sign(txJSON, secret)
-    const expectedResult = {
-      signedTransaction:
-        '12000022800200002400000017201B0086955361EC6386F26FC0FFFF0000000000000000000000005553440000000000DC596C88BCDE4E818D416FCDEEBF2C8656BADC9A68400000000000000C69D4438D7EA4C6800000000000000000000000000047425000000000000C155FFE99C8C91F67083CEFFDB69EBFE76348CA6AD4446F8C5D8A5E0B0000000000000000000000005553440000000000DC596C88BCDE4E818D416FCDEEBF2C8656BADC9A7321022B05847086686F9D0499B13136B94AD4323EE1B67D4C429ECC987AB35ACFA34574473045022100D9634523D8E232D4A7807A71856023D82AC928FA29848571B820867898413B5F022041AC00EC1F81A26A6504EBF844A38CC3204694EF2CC1A97A87632721631F93DA81145E7B112523F68D2F5E879DB4EAC51C6698A6930483149F500E50C2F016CA01945E5A1E5846B61EF2D376',
-      id: '1C558AA9B926C24FB6BBD6950B2DB1350A83F9F12E4385208867907019761A2D',
-    }
-    const decoded = binary.decode(result.signedTransaction)
+    const wallet = Wallet.fromSeed(secret)
+    const result = sign(wallet, JSON.parse(txJSON))
+    const expectedResult =
+      '12000022800200002400000017201B0086955361EC6386F26FC0FFFF0000000000000000000000005553440000000000DC596C88BCDE4E818D416FCDEEBF2C8656BADC9A68400000000000000C69D4438D7EA4C6800000000000000000000000000047425000000000000C155FFE99C8C91F67083CEFFDB69EBFE76348CA6AD4446F8C5D8A5E0B0000000000000000000000005553440000000000DC596C88BCDE4E818D416FCDEEBF2C8656BADC9A7321022B05847086686F9D0499B13136B94AD4323EE1B67D4C429ECC987AB35ACFA34574473045022100D9634523D8E232D4A7807A71856023D82AC928FA29848571B820867898413B5F022041AC00EC1F81A26A6504EBF844A38CC3204694EF2CC1A97A87632721631F93DA81145E7B112523F68D2F5E879DB4EAC51C6698A6930483149F500E50C2F016CA01945E5A1E5846B61EF2D376'
+    const decoded = decode(result)
     assert(
       decoded.Flags === 2147614720,
       `Flags = ${decoded.Flags}, should be 2147614720`,
@@ -458,7 +450,6 @@ describe('Signer', function () {
   })
 
   it('throws when encoded tx does not match decoded tx - AccountSet', async function () {
-    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const request = {
       // TODO: This fails when address is X-address
       txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"6578616D706C652E636F6D","LastLedgerSequence":8820051,"Fee":"1.2","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
@@ -470,12 +461,11 @@ describe('Signer', function () {
     }
 
     assert.throws(() => {
-      sign(request.txJSON, secret)
+      sign(wallet2, JSON.parse(request.txJSON))
     }, /1\.2 is an illegal amount/)
   })
 
   it('throws when encoded tx does not match decoded tx - higher fee', async function () {
-    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const request = {
       // TODO: This fails when address is X-address
       txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"6578616D706C652E636F6D","LastLedgerSequence":8820051,"Fee":"1123456.7","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
@@ -487,34 +477,11 @@ describe('Signer', function () {
     }
 
     assert.throws(() => {
-      sign(request.txJSON, secret)
+      sign(wallet2, JSON.parse(request.txJSON))
     }, /1123456\.7 is an illegal amount/)
   })
 
-  it('permits fee exceeding 2000000 drops when maxFeeXRP is higher than 2 XRP', async function () {
-    this.client.maxFeeXRP = '2.1'
-    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
-    const request = {
-      // TODO: This fails when address is X-address
-      txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","LastLedgerSequence":8820051,"Fee":"2010000","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
-      instructions: {
-        fee: '2.01',
-        sequence: 23,
-        maxLedgerVersion: 8820051,
-      },
-    }
-
-    const result = sign(request.txJSON, secret)
-
-    const expectedResponse = {
-      signedTransaction:
-        '12000322800000002400000017201B008695536840000000001EAB90732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D87446304402200203F219F5371D2C6506888B1B02B27E74998F7A42D412C32FE319AC1A5B8DEF02205959A1B02253ACCCE542759E9886466C56D16B04676FA492AD34AA0E877E91F381145E7B112523F68D2F5E879DB4EAC51C6698A69304',
-      id: '061D5593E0A117F389826419CAC049A73C7CFCA65A20B788781D41240143D864',
-    }
-
-    assert.deepEqual(result, expectedResponse)
-  })
-
+  /*
   it('sign with ticket', async function () {
     const secret = 'sn7n5R1cR5Y3fRFkuWXA94Ts1frVJ'
     const result = sign(REQUEST_FIXTURES.ticket.txJSON, secret)
