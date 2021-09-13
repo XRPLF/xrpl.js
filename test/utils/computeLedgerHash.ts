@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { ValidationError } from '../../src/common/errors'
+import { ValidationError, XrplError } from '../../src/common/errors'
 import { computeLedgerHash } from '../../src/utils'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
@@ -27,6 +27,10 @@ describe('computeLedgerHash', function () {
     try {
       hash = computeLedgerHash(ledger, { computeTreeHashes: true })
     } catch (error) {
+      if (!(error instanceof XrplError)) {
+        throw error
+      }
+
       assert(error instanceof ValidationError)
       if (error instanceof ValidationError) {
         assert.strictEqual(
