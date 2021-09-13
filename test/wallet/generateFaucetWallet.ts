@@ -1,8 +1,9 @@
 import { assert } from 'chai'
 
-import { getFaucetUrl, FaucetNetwork } from '../src/wallet/generateFaucetWallet'
+import { _private } from '../../src/wallet/generateFaucetWallet'
+import { setupClient, teardownClient } from '../setupClient'
 
-import { setupClient, teardownClient } from './setupClient'
+const { FaucetNetwork, getFaucetUrl } = _private
 
 describe('Get Faucet URL', function () {
   beforeEach(setupClient)
