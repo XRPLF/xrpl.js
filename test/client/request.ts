@@ -7,7 +7,6 @@ describe('client.request', function () {
   beforeEach(setupClient)
   afterEach(teardownClient)
 
-  // eslint-disable-next-line mocha/no-setup-in-describe -- Rule does not work with dynamically generated tests.
   addressTests.forEach(function (testcase) {
     describe(testcase.type, function () {
       it('request account_objects', async function () {
