@@ -1,3 +1,5 @@
+import path from 'path'
+
 import { expect, assert } from 'chai'
 import puppeteer from 'puppeteer'
 
@@ -6,7 +8,9 @@ describe('Browser Tests', function () {
     const browser = await puppeteer.launch({ headless: true })
     try {
       const page = await browser.newPage().catch()
-      await page.goto(`file:///${__dirname}/../localIntegrationRunner.html`)
+      await page.goto(
+        path.join('file:///', __dirname, '../localIntegrationRunner.html'),
+      )
 
       await page.waitForFunction(
         'document.querySelector("body").innerText.includes("submit multisigned transaction")',
@@ -26,6 +30,7 @@ describe('Browser Tests', function () {
       expect(fails).to.equal('failures: 0')
       expect(passes).to.not.equal('passes: 0')
     } catch (err) {
+      // eslint-disable-next-line no-console -- only prints if something goes wrong
       console.log(err)
       assert(false)
     } finally {
