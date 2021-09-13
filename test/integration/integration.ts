@@ -1,12 +1,13 @@
 import assert from 'assert'
 
 import _ from 'lodash'
-import { encode } from 'ripple-binary-codec'
+import { decode } from 'ripple-binary-codec'
 
 import { Client, Wallet } from 'xrpl-local'
 import { AccountSet, SignerListSet } from 'xrpl-local/models/transactions'
 import { convertStringToHex } from 'xrpl-local/utils'
 import { sign, multisign } from 'xrpl-local/wallet/signer'
+import { Transaction } from '../../src/models/transactions'
 
 import serverUrl from './serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from './setup'
@@ -89,11 +90,15 @@ describe('integration tests', function () {
     // TODO: replace with `client.submitSignedTransaction`
     const submitResponse = await client.request({
       command: 'submit',
-      tx_blob: encode(combined),
+      tx_blob: combined,
     })
     await ledgerAccept(client)
     assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
     const options = { minLedgerVersion }
-    await verifySubmittedTransaction(this, combined, options)
+    await verifySubmittedTransaction(
+      this,
+      decode(combined) as unknown as Transaction,
+      options,
+    )
   })
 })
