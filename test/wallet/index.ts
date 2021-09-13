@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 
 import ECDSA from '../../src/common/ecdsa'
+import { Payment } from '../../src/models/transactions'
 import Wallet from '../../src/wallet'
 
 /**
@@ -155,7 +156,7 @@ describe('Wallet', function () {
     const address = 'rhvh5SrgBL5V8oeV9EpDuVszeJSSCEkbPc'
 
     it('signs a transaction offline', function () {
-      const txJSON = {
+      const txJSON: Payment = {
         TransactionType: 'Payment',
         Account: address,
         Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',

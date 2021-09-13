@@ -11,8 +11,16 @@ import {
 
 import ECDSA from '../common/ecdsa'
 import { ValidationError } from '../common/errors'
+import { Transaction } from '../models/transactions'
 import { signOffline } from '../transaction/sign'
 import { SignOptions } from '../transaction/types'
+
+const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
+const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
+
+function hexFromBuffer(buffer: Buffer): string {
+  return buffer.toString('hex').toUpperCase()
+}
 
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
@@ -20,14 +28,19 @@ import { SignOptions } from '../transaction/types'
  * It provides functionality to sign/verify transactions offline.
  */
 class Wallet {
-  readonly publicKey: string
-  readonly privateKey: string
-  readonly classicAddress: string
-  readonly seed?: string
-  private static readonly defaultAlgorithm: ECDSA = ECDSA.ed25519
-  private static readonly defaultDerivationPath: string = "m/44'/144'/0'/0/0"
+  public readonly publicKey: string
+  public readonly privateKey: string
+  public readonly classicAddress: string
+  public readonly seed?: string
 
-  constructor(publicKey: string, privateKey: string, seed?: string) {
+  /**
+   * Creates a new Wallet.
+   *
+   * @param publicKey - The public key for the account.
+   * @param privateKey - The private key used for signing transactions for the account.
+   * @param seed - (Optional) The seed used to derive the account keys.
+   */
+  public constructor(publicKey: string, privateKey: string, seed?: string) {
     this.publicKey = publicKey
     this.privateKey = privateKey
     this.classicAddress = deriveAddress(publicKey)
@@ -40,7 +53,7 @@ class Wallet {
    * @param algorithm - The digital signature algorithm to generate an address for.
    * @returns A new Wallet derived from a generated seed.
    */
-  static generate(algorithm: ECDSA = Wallet.defaultAlgorithm): Wallet {
+  public static generate(algorithm: ECDSA = DEFAULT_ALGORITHM): Wallet {
     const seed = generateSeed({ algorithm })
     return Wallet.fromSeed(seed)
   }
@@ -52,9 +65,9 @@ class Wallet {
    * @param algorithm - The digital signature algorithm to generate an address for.
    * @returns A Wallet derived from a seed.
    */
-  static fromSeed(
+  public static fromSeed(
     seed: string,
-    algorithm: ECDSA = Wallet.defaultAlgorithm,
+    algorithm: ECDSA = DEFAULT_ALGORITHM,
   ): Wallet {
     return Wallet.deriveWallet(seed, algorithm)
   }
@@ -65,10 +78,11 @@ class Wallet {
    * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
    * @param derivationPath - The path to derive a keypair (publicKey/privateKey) from a seed (that was converted from a mnemonic).
    * @returns A Wallet derived from a mnemonic.
+   * @throws ValidationError if unable to derive private key from mnemonic input.
    */
-  static fromMnemonic(
+  public static fromMnemonic(
     mnemonic: string,
-    derivationPath: string = Wallet.defaultDerivationPath,
+    derivationPath: string = DEFAULT_DERIVATION_PATH,
   ): Wallet {
     const seed = mnemonicToSeedSync(mnemonic)
     const masterNode = fromSeed(seed)
@@ -79,8 +93,8 @@ class Wallet {
       )
     }
 
-    const publicKey = Wallet.hexFromBuffer(node.publicKey)
-    const privateKey = Wallet.hexFromBuffer(node.privateKey)
+    const publicKey = hexFromBuffer(node.publicKey)
+    const privateKey = hexFromBuffer(node.privateKey)
     return new Wallet(publicKey, `00${privateKey}`)
   }
 
@@ -91,9 +105,9 @@ class Wallet {
    * @param algorithm - The digital signature algorithm to generate an address for.
    * @returns A Wallet derived from an entropy.
    */
-  static fromEntropy(
+  public static fromEntropy(
     entropy: Uint8Array | number[],
-    algorithm: ECDSA = Wallet.defaultAlgorithm,
+    algorithm: ECDSA = DEFAULT_ALGORITHM,
   ): Wallet {
     const options = {
       entropy: Uint8Array.from(entropy),
@@ -103,13 +117,16 @@ class Wallet {
     return Wallet.deriveWallet(seed, algorithm)
   }
 
-  private static hexFromBuffer(buffer: Buffer): string {
-    return buffer.toString('hex').toUpperCase()
-  }
-
+  /**
+   * Derive a Wallet from a seed.
+   *
+   * @param seed - The seed used to derive the wallet.
+   * @param algorithm - The algorithm used to do the derivation.
+   * @returns A Wallet derived from the seed.
+   */
   private static deriveWallet(
     seed: string,
-    algorithm: ECDSA = Wallet.defaultAlgorithm,
+    algorithm: ECDSA = DEFAULT_ALGORITHM,
   ): Wallet {
     const { publicKey, privateKey } = deriveKeypair(seed, { algorithm })
     return new Wallet(publicKey, privateKey, seed)
@@ -122,8 +139,8 @@ class Wallet {
    * @param options - Options to include for signing.
    * @returns A signed transaction.
    */
-  signTransaction(
-    transaction: any, // TODO: transaction should be typed with Transaction type.
+  public signTransaction(
+    transaction: Transaction,
     options: SignOptions = { signAs: '' },
   ): string {
     return signOffline(this, JSON.stringify(transaction), options)
@@ -136,7 +153,7 @@ class Wallet {
    * @param signedTransaction - A signed transaction (hex string of signTransaction result) to be verified offline.
    * @returns Returns true if a signedTransaction is valid.
    */
-  verifyTransaction(signedTransaction: string): boolean {
+  public verifyTransaction(signedTransaction: string): boolean {
     const tx = decode(signedTransaction)
     const messageHex: string = encodeForSigning(tx)
     const signature = tx.TxnSignature
@@ -147,14 +164,19 @@ class Wallet {
    * Gets an X-address in Testnet/Mainnet format.
    *
    * @param tag - A tag to be included within the X-address.
-   * @param test - A boolean to indicate if X-address should be in Testnet (true) or Mainnet (false) format.
+   * @param isTestnet - A boolean to indicate if X-address should be in Testnet (true) or Mainnet (false) format.
    * @returns An X-address.
    */
-  getXAddress(tag: number | false = false, test = false): string {
-    return classicAddressToXAddress(this.classicAddress, tag, test)
+  public getXAddress(tag: number | false = false, isTestnet = false): string {
+    return classicAddressToXAddress(this.classicAddress, tag, isTestnet)
   }
 
-  getClassicAddress(): string {
+  /**
+   * Gets the classic address of the account this wallet represents.
+   *
+   * @returns A classic address.
+   */
+  public getClassicAddress(): string {
     return deriveAddress(this.publicKey)
   }
 }

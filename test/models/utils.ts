@@ -131,7 +131,8 @@ describe('Models Utils', function () {
         },
       }
 
-      const { tfSetfAuth, tfClearNoRipple, tfClearFreeze } = TrustSetTransactionFlags
+      const { tfSetfAuth, tfClearNoRipple, tfClearFreeze } =
+        TrustSetTransactionFlags
       const expected: number = tfSetfAuth | tfClearNoRipple | tfClearFreeze
 
       setTransactionFlagsToNumber(tx)

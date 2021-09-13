@@ -6,7 +6,7 @@ const RIPPLE_EPOCH_DIFF = 0x386d4380
  * @param rpepoch - (seconds since 1/1/2000 GMT).
  * @returns Milliseconds since unix epoch.
  */
- function rippleToUnixTimestamp(rpepoch: number): number {
+function rippleToUnixTimestamp(rpepoch: number): number {
   return (rpepoch + RIPPLE_EPOCH_DIFF) * 1000
 }
 
@@ -40,7 +40,4 @@ function ISOTimeToRippleTime(iso8601: string): number {
   return unixToRippleTimestamp(Date.parse(iso8601))
 }
 
-export {
-  rippleTimeToISOTime,
-  ISOTimeToRippleTime,
-}
+export { rippleTimeToISOTime, ISOTimeToRippleTime }
