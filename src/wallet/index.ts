@@ -73,6 +73,20 @@ class Wallet {
   }
 
   /**
+   * Derives a wallet from a secret (AKA a seed)
+   *
+   * @param secret - A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
+   * @param algorithm - The digital signature algorithm to generate an address fro.
+   * @returns A Wallet derived from a secret (AKA a seed).
+   */
+  public static fromSecret(
+    secret: string,
+    algorithm: ECDSA = DEFAULT_ALGORITHM,
+  ): Wallet {
+    return Wallet.fromSeed(secret, algorithm)
+  }
+
+  /**
    * Derives a wallet from a mnemonic.
    *
    * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
