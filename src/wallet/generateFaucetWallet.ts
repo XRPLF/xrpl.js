@@ -4,7 +4,7 @@ import { isValidClassicAddress } from 'ripple-address-codec'
 
 import type { Client } from '..'
 import { errors } from '../common'
-import { RippledError } from '../common/errors'
+import { RippledError, XRPLFaucetError } from '../common/errors'
 import { GeneratedAddress } from '../utils/generateAddress'
 
 import Wallet from '.'
@@ -104,7 +104,7 @@ async function generateFaucetWallet(
                 resolve(fundWallet)
               } else {
                 reject(
-                  new errors.XRPLFaucetError(
+                  new XRPLFaucetError(
                     `Unable to fund address with faucet after waiting ${
                       INTERVAL_SECONDS * MAX_ATTEMPTS
                     } seconds`,
@@ -112,11 +112,15 @@ async function generateFaucetWallet(
                 )
               }
             } catch (err) {
-              reject(new errors.XRPLFaucetError(err))
+              if (err instanceof Error) {
+                reject(new XRPLFaucetError(err.message))
+              }
+
+              reject(err)
             }
           } else {
             reject(
-              new errors.XRPLFaucetError(
+              new XRPLFaucetError(
                 `The faucet account classic address is undefined`,
               ),
             )

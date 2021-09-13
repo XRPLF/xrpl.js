@@ -1,6 +1,7 @@
-import { assert } from 'chai'
+import { assert, expect } from 'chai'
 import binary from 'ripple-binary-codec'
 
+import { ValidationError } from '../../src/common/errors'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import { setupClient, teardownClient } from '../setupClient'
@@ -347,22 +348,29 @@ describe('client.sign', function () {
       Fee: '12',
     }
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
+
     try {
       this.client.sign(JSON.stringify(offerCreate), secret)
       return await Promise.reject(
         new Error('this.client.sign should have thrown'),
       )
     } catch (error) {
-      assert.equal(error.name, 'ValidationError')
-      assert.equal(
-        error.message,
-        'Serialized transaction does not match original txJSON. See `error.data`',
-      )
-      assert.deepEqual(error.data.diff, {
-        TakerGets: {
-          value: '3.14',
-        },
-      })
+      if (error instanceof ValidationError) {
+        assert.equal(error.name, 'ValidationError')
+        assert.equal(
+          error.message,
+          'Serialized transaction does not match original txJSON. See `error.data`',
+        )
+        expect(error.data).to.deep.include({
+          diff: {
+            TakerGets: {
+              value: '3.14',
+            },
+          },
+        })
+      } else {
+        assert(false)
+      }
     }
   })
 })

@@ -78,9 +78,12 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
           )
         }
       } catch (err) {
+        if (!(err instanceof Error)) {
+          throw err
+        }
+
         if (!mock.suppressOutput) {
-          // eslint-disable-next-line no-console, @typescript-eslint/restrict-template-expressions -- Error
-          console.error(`Error: ${err.message}`)
+          console.error(err.message)
         }
         if (request != null) {
           conn.send(
