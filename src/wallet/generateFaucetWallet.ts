@@ -1,5 +1,5 @@
 import { IncomingMessage } from 'http'
-import * as https from 'https'
+import { request as httpsRequest, RequestOptions } from 'https'
 
 import { isValidClassicAddress } from 'ripple-address-codec'
 
@@ -70,7 +70,7 @@ async function generateFaucetWallet(
   const options = getOptions(client, postBody)
 
   return new Promise((resolve, reject) => {
-    const request = https.request(options, (response) => {
+    const request = httpsRequest(options, (response) => {
       const chunks: Uint8Array[] = []
       response.on('data', (data) => chunks.push(data))
       // eslint-disable-next-line @typescript-eslint/no-misused-promises -- not actually misused, different resolve/reject
@@ -97,10 +97,7 @@ async function generateFaucetWallet(
   })
 }
 
-function getOptions(
-  client: Client,
-  postBody: Uint8Array,
-): https.RequestOptions {
+function getOptions(client: Client, postBody: Uint8Array): RequestOptions {
   return {
     hostname: getFaucetUrl(client),
     port: 443,
