@@ -6,6 +6,7 @@
         "./test/**/*.ts",
         "./snippets/src/**/*.ts",
         ".prettierrc.js",
+        ".eslintrc.js",
         "jest.config.js"
     ]
 }

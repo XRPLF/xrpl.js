@@ -9,14 +9,14 @@
     <div id="mocha"></div>
     <script src="../node_modules/mocha/mocha.js"></script>
     <script src="hacks/phantomhacks.js"></script>
-    <script src="../build/ripple-latest.js"></script>
+    <script src="../build/xrpl-latest.js"></script>
     <script>
       if (window.initMochaPhantomJS) {
         window.initMochaPhantomJS();
       }
       mocha.ui('bdd')
     </script>
- 
+
     <script src="../testCompiledForWeb/integration.js"></script>
 
     <script>

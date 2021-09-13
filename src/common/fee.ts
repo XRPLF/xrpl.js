@@ -16,7 +16,7 @@ const BASE_10 = 10
  */
 export default async function getFee(
   this: Client,
-  cushion: number | null,
+  cushion?: number,
 ): Promise<string> {
   const feeCushion = cushion ?? this.feeCushion
 

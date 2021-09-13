@@ -3,14 +3,19 @@ import { ValidationError } from '../../common/errors'
 
 import { BaseTransaction, GlobalFlags, verifyBaseTransaction } from './common'
 
-export interface PaymentChannelClaimFlags extends GlobalFlags {
+export enum PaymentChannelClaimTransactionFlags {
+  tfRenew = 0x00010000,
+  tfClose = 0x00020000,
+}
+
+export interface PaymentChannelClaimFlagsInterface extends GlobalFlags {
   tfRenew?: boolean
   tfClose?: boolean
 }
 
 export interface PaymentChannelClaim extends BaseTransaction {
   TransactionType: 'PaymentChannelClaim'
-  Flags?: number | PaymentChannelClaimFlags
+  Flags?: number | PaymentChannelClaimFlagsInterface
   Channel: string
   Balance?: string
   Amount?: string

@@ -1,8 +1,7 @@
-import { assert } from 'chai'
-
 import { ValidationError } from 'xrpl-local/common/errors'
-
-import { verifyEscrowFinish } from '../../src/models/transactions/escrowFinish'
+import { verifyEscrowFinish } from './../../src/models/transactions/escrowFinish'
+import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * EscrowFinish Transaction Verification Testing.
@@ -25,6 +24,7 @@ describe('EscrowFinish', function () {
   })
   it(`verifies valid EscrowFinish`, function () {
     assert.doesNotThrow(() => verifyEscrowFinish(escrow))
+    assert.doesNotThrow(() => verify(escrow))
   })
 
   it(`verifies valid EscrowFinish w/o optional`, function () {
@@ -32,6 +32,7 @@ describe('EscrowFinish', function () {
     delete escrow.Fulfillment
 
     assert.doesNotThrow(() => verifyEscrowFinish(escrow))
+    assert.doesNotThrow(() => verify(escrow))
   })
 
   it(`throws w/ invalid Owner`, function () {
@@ -39,6 +40,11 @@ describe('EscrowFinish', function () {
 
     assert.throws(
       () => verifyEscrowFinish(escrow),
+      ValidationError,
+      'EscrowFinish: Owner must be a string',
+    )
+    assert.throws(
+      () => verify(escrow),
       ValidationError,
       'EscrowFinish: Owner must be a string',
     )
@@ -52,6 +58,11 @@ describe('EscrowFinish', function () {
       ValidationError,
       'EscrowFinish: OfferSequence must be a number',
     )
+    assert.throws(
+      () => verify(escrow),
+      ValidationError,
+      'EscrowFinish: OfferSequence must be a number',
+    )
   })
 
   it(`throws w/ invalid Condition`, function () {
@@ -62,6 +73,11 @@ describe('EscrowFinish', function () {
       ValidationError,
       'EscrowFinish: Condition must be a string',
     )
+    assert.throws(
+      () => verify(escrow),
+      ValidationError,
+      'EscrowFinish: Condition must be a string',
+    )
   })
 
   it(`throws w/ invalid Fulfillment`, function () {
@@ -69,6 +85,11 @@ describe('EscrowFinish', function () {
 
     assert.throws(
       () => verifyEscrowFinish(escrow),
+      ValidationError,
+      'EscrowFinish: Fulfillment must be a string',
+    )
+    assert.throws(
+      () => verify(escrow),
       ValidationError,
       'EscrowFinish: Fulfillment must be a string',
     )

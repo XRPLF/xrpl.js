@@ -2,6 +2,7 @@ import { assert } from 'chai'
 
 import { ValidationError } from 'xrpl-local/common/errors'
 
+import { verify } from '../../src/models/transactions'
 import { verifySetRegularKey } from '../../src/models/transactions/setRegularKey'
 
 /**
@@ -24,11 +25,13 @@ describe('SetRegularKey', function () {
 
   it(`verifies valid SetRegularKey`, function () {
     assert.doesNotThrow(() => verifySetRegularKey(account))
+    assert.doesNotThrow(() => verify(account))
   })
 
   it(`verifies w/o SetRegularKey`, function () {
     account.RegularKey = undefined
     assert.doesNotThrow(() => verifySetRegularKey(account))
+    assert.doesNotThrow(() => verify(account))
   })
 
   it(`throws w/ invalid RegularKey`, function () {
@@ -36,6 +39,11 @@ describe('SetRegularKey', function () {
 
     assert.throws(
       () => verifySetRegularKey(account),
+      ValidationError,
+      'SetRegularKey: RegularKey must be a string',
+    )
+    assert.throws(
+      () => verify(account),
       ValidationError,
       'SetRegularKey: RegularKey must be a string',
     )

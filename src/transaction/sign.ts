@@ -5,11 +5,11 @@ import keypairs from 'ripple-keypairs'
 
 import type { Client, Wallet } from '..'
 import { ValidationError } from '../common/errors'
-import { SignedTransaction } from '../common/types/objects'
+import { Transaction } from '../models/transactions'
 import { xrpToDrops } from '../utils'
-import { computeBinaryTransactionHash } from '../utils/hashes'
+import { computeSignedTransactionHash } from '../utils/hashes'
 
-import { SignOptions, KeyPair, TransactionJSON } from './types'
+import { SignOptions, KeyPair } from './types'
 
 function computeSignature(tx: object, privateKey: string, signAs?: string) {
   const signingData = signAs
@@ -25,7 +25,7 @@ function signWithKeypair(
   options: SignOptions = {
     signAs: '',
   },
-): SignedTransaction {
+): { signedTransaction: string; id: string } {
   const tx = JSON.parse(txJSON)
   if (tx.TxnSignature || tx.Signers) {
     throw new ValidationError(
@@ -62,7 +62,7 @@ function signWithKeypair(
   checkTxSerialization(serialized, tx)
   return {
     signedTransaction: serialized,
-    id: computeBinaryTransactionHash(serialized),
+    id: computeSignedTransactionHash(serialized),
   }
 }
 
@@ -141,7 +141,7 @@ function objectDiff(a: object, b: object): object {
  *
  * @returns This method does not return a value, but throws an error if the check fails.
  */
-function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
+function checkTxSerialization(serialized: string, tx: Transaction): void {
   // Decode the serialized transaction:
   const decoded = binaryCodec.decode(serialized)
 
@@ -222,7 +222,7 @@ function sign(
   secret?: any,
   options?: SignOptions,
   keypair?: KeyPair,
-): SignedTransaction {
+): { signedTransaction: string; id: string } {
   if (typeof secret === 'string') {
     // we can't validate that the secret matches the account because
     // the secret could correspond to the regular key
@@ -245,7 +245,7 @@ function signOffline(
   wallet: Wallet,
   txJSON: string,
   options?: SignOptions,
-): SignedTransaction {
+): { signedTransaction: string; id: string } {
   const { publicKey, privateKey } = wallet
   return signWithKeypair(null, txJSON, { publicKey, privateKey }, options)
 }

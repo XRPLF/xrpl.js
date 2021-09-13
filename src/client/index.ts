@@ -1,4 +1,3 @@
-/* eslint-disable import/max-dependencies -- Client needs a lot of dependencies by definition */
 /* eslint-disable @typescript-eslint/member-ordering -- TODO: remove when instance methods aren't members */
 /* eslint-disable max-lines -- This might not be necessary later, but this file needs to be big right now */
 import { EventEmitter } from 'events'
@@ -23,9 +22,11 @@ import {
 import { constants, errors, txFlags, ensureClassicAddress } from '../common'
 import { ValidationError, XrplError } from '../common/errors'
 import getFee from '../common/fee'
+import autofill from '../ledger/autofill'
 import getBalances from '../ledger/balances'
 import { getOrderbook, formatBidsAndAsks } from '../ledger/orderbook'
 import getPaths from '../ledger/pathfind'
+import { submitTransaction, submitSignedTransaction } from '../ledger/submit'
 import getTrustlines from '../ledger/trustlines'
 import { clamp } from '../ledger/utils'
 import {
@@ -106,25 +107,8 @@ import {
   UnsubscribeResponse,
 } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
-import prepareCheckCancel from '../transaction/check-cancel'
-import prepareCheckCash from '../transaction/check-cash'
-import prepareCheckCreate from '../transaction/check-create'
 import combine from '../transaction/combine'
-import prepareEscrowCancellation from '../transaction/escrow-cancellation'
-import prepareEscrowCreation from '../transaction/escrow-creation'
-import prepareEscrowExecution from '../transaction/escrow-execution'
-import prepareOrder from '../transaction/order'
-import prepareOrderCancellation from '../transaction/ordercancellation'
-import preparePayment from '../transaction/payment'
-import preparePaymentChannelClaim from '../transaction/payment-channel-claim'
-import preparePaymentChannelCreate from '../transaction/payment-channel-create'
-import preparePaymentChannelFund from '../transaction/payment-channel-fund'
-import prepareSettings from '../transaction/settings'
 import { sign } from '../transaction/sign'
-import prepareTicketCreate from '../transaction/ticket'
-import prepareTrustline from '../transaction/trustline'
-import { TransactionJSON, Instructions, Prepare } from '../transaction/types'
-import * as transactionUtils from '../transaction/utils'
 import { deriveAddress, deriveXAddress } from '../utils/derive'
 import generateFaucetWallet from '../wallet/generateFaucetWallet'
 
@@ -167,6 +151,21 @@ function getCollectKeyFromCommand(command: string): string | null {
     default:
       return null
   }
+}
+
+/**
+ * It returns a function that prepends params to the given func.
+ * A sugar function for JavaScript .bind() without the "this" (keyword) binding.
+ *
+ * @param func - A function to prepend params.
+ * @param params - Parameters to prepend to a function.
+ * @returns A function bound with params.
+ */
+// TODO Need to refactor prepend so TS can infer the correct function signature type
+// eslint-disable-next-line @typescript-eslint/ban-types -- expected param types
+function prepend(func: Function, ...params: unknown[]): Function {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- safe to return
+  return func.bind(null, ...params)
 }
 
 interface MarkerRequest extends BaseRequest {
@@ -391,37 +390,37 @@ class Client extends EventEmitter {
     return this.connection.request(nextPageRequest) as unknown as U
   }
 
-  public on(event: 'ledgerClosed', listener: (ledger: LedgerStream) => void)
+  public on(
+    event: 'ledgerClosed',
+    listener: (ledger: LedgerStream) => void,
+  ): this
   public on(
     event: 'validationReceived',
     listener: (validation: ValidationStream) => void,
-  )
-  public on(event: 'transaction', listener: (tx: TransactionStream) => void)
+  ): this
+  public on(
+    event: 'transaction',
+    listener: (tx: TransactionStream) => void,
+  ): this
   public on(
     event: 'peerStatusChange',
     listener: (status: PeerStatusStream) => void,
-  )
-  public on(event: 'consensusPhase', listener: (phase: ConsensusStream) => void)
-  public on(event: 'path_find', listener: (path: PathFindStream) => void)
-  public on(event: string, listener: (...args: any[]) => void)
-  public on(eventName: string, listener: (...args: any[]) => void) {
-    return super.on(eventName, listener)
-  }
-
+  ): this
+  public on(
+    event: 'consensusPhase',
+    listener: (phase: ConsensusStream) => void,
+  ): this
+  public on(event: 'path_find', listener: (path: PathFindStream) => void): this
+  public on(event: 'error', listener: (...err: any[]) => void): this
   /**
-   * Prepare a transaction.
+   * Event handler for subscription streams.
    *
-   * You can later submit the transaction with a `submit` request.
-   *
-   * @param txJSON - TODO: will be deleted.
-   * @param instructions - TODO: will be deleted.
-   * @returns TODO: will be deleted.
+   * @param eventName - Name of the event. Only forwards streams.
+   * @param listener - Function to run on event.
+   * @returns This, because it inherits from EventEmitter.
    */
-  public async prepareTransaction(
-    txJSON: TransactionJSON,
-    instructions: Instructions = {},
-  ): Promise<Prepare> {
-    return transactionUtils.prepareTransaction(txJSON, this, instructions)
+  public on(eventName: string, listener: (...args: any[]) => void): this {
+    return super.on(eventName, listener)
   }
 
   public async requestAll(
@@ -533,6 +532,16 @@ class Client extends EventEmitter {
     return this.connection.isConnected()
   }
 
+  // TODO: Use prepend for other instance methods as well.
+  public autofill = prepend(autofill, this)
+
+  // @deprecated Use autofill instead
+  public prepareTransaction = prepend(autofill, this)
+
+  public submitTransaction = prepend(submitTransaction, this)
+
+  public submitSignedTransaction = prepend(submitSignedTransaction, this)
+
   public getFee = getFee
 
   public getTrustlines = getTrustlines
@@ -540,25 +549,10 @@ class Client extends EventEmitter {
   public getPaths = getPaths
   public getOrderbook = getOrderbook
 
-  public preparePayment = preparePayment
-  public prepareTrustline = prepareTrustline
-  public prepareOrder = prepareOrder
-  public prepareOrderCancellation = prepareOrderCancellation
-  public prepareEscrowCreation = prepareEscrowCreation
-  public prepareEscrowExecution = prepareEscrowExecution
-  public prepareEscrowCancellation = prepareEscrowCancellation
-  public preparePaymentChannelCreate = preparePaymentChannelCreate
-  public preparePaymentChannelFund = preparePaymentChannelFund
-  public preparePaymentChannelClaim = preparePaymentChannelClaim
-  public prepareCheckCreate = prepareCheckCreate
-  public prepareCheckCash = prepareCheckCash
-  public prepareCheckCancel = prepareCheckCancel
-  public prepareTicketCreate = prepareTicketCreate
-  public prepareSettings = prepareSettings
   public sign = sign
   public combine = combine
 
-  public generateFaucetWallet = generateFaucetWallet
+  public generateFaucetWallet = prepend(generateFaucetWallet, this)
 
   public errors = errors
 

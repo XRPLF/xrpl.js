@@ -11,13 +11,13 @@ import {
   verifyBaseTransaction,
 } from './common'
 
-export enum PaymentTransactionFlagsEnum {
+export enum PaymentTransactionFlags {
   tfNoDirectRipple = 0x00010000,
   tfPartialPayment = 0x00020000,
   tfLimitQuality = 0x00040000,
 }
 
-export interface PaymentTransactionFlags extends GlobalFlags {
+export interface PaymentFlagsInterface extends GlobalFlags {
   tfNoDirectRipple?: boolean
   tfPartialPayment?: boolean
   tfLimitQuality?: boolean
@@ -31,7 +31,7 @@ export interface Payment extends BaseTransaction {
   Paths?: Path[]
   SendMax?: Amount
   DeliverMin?: Amount
-  Flags?: number | PaymentTransactionFlags
+  Flags?: number | PaymentFlagsInterface
 }
 
 /**
@@ -59,10 +59,8 @@ export function verifyPayment(tx: Record<string, unknown>): void {
     throw new ValidationError('PaymentTransaction: invalid Destination')
   }
 
-  if (
-    tx.DestinationTag !== undefined &&
-    typeof tx.DestinationTag !== 'number'
-  ) {
+  if (tx.DestinationTag != null && typeof tx.DestinationTag !== 'number') {
+    console.log(tx.DestinationTag)
     throw new ValidationError(
       'PaymentTransaction: DestinationTag must be a number',
     )
@@ -96,11 +94,11 @@ function checkPartialPayment(tx: Record<string, unknown>): void {
     }
 
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-    const flags = tx.Flags as number | PaymentTransactionFlags
+    const flags = tx.Flags as number | PaymentFlagsInterface
     const isTfPartialPayment =
-      typeof flags === 'number'
-        ? isFlagEnabled(flags, PaymentTransactionFlagsEnum.tfPartialPayment)
-        : flags.tfPartialPayment ?? false
+      typeof flags !== 'number'
+        ? flags.tfPartialPayment ?? false
+        : isFlagEnabled(flags, PaymentTransactionFlags.tfPartialPayment)
 
     if (!isTfPartialPayment) {
       throw new ValidationError(

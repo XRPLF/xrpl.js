@@ -11,7 +11,6 @@ import {
 
 import ECDSA from '../common/ecdsa'
 import { ValidationError } from '../common/errors'
-import { SignedTransaction } from '../common/types/objects'
 import { signOffline } from '../transaction/sign'
 import { SignOptions } from '../transaction/types'
 
@@ -126,8 +125,9 @@ class Wallet {
   signTransaction(
     transaction: any, // TODO: transaction should be typed with Transaction type.
     options: SignOptions = { signAs: '' },
-  ): SignedTransaction {
+  ): string {
     return signOffline(this, JSON.stringify(transaction), options)
+      .signedTransaction
   }
 
   /**
@@ -150,8 +150,12 @@ class Wallet {
    * @param test - A boolean to indicate if X-address should be in Testnet (true) or Mainnet (false) format.
    * @returns An X-address.
    */
-  getXAddress(tag: number, test = false): string {
+  getXAddress(tag: number | false = false, test = false): string {
     return classicAddressToXAddress(this.classicAddress, tag, test)
+  }
+
+  getClassicAddress(): string {
+    return deriveAddress(this.publicKey)
   }
 }
 

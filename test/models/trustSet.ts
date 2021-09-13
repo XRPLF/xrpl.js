@@ -1,8 +1,7 @@
-import { assert } from 'chai'
-
 import { ValidationError } from 'xrpl-local/common/errors'
-
-import { verifyTrustSet } from '../../src/models/transactions/trustSet'
+import { verifyTrustSet } from './../../src/models/transactions/trustSet'
+import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * TrustSet Transaction Verification Testing.
@@ -28,12 +27,18 @@ describe('TrustSet', function () {
 
   it('verifies valid TrustSet', function () {
     assert.doesNotThrow(() => verifyTrustSet(trustSet))
+    assert.doesNotThrow(() => verify(trustSet))
   })
 
   it('throws when LimitAmount is missing', function () {
     delete trustSet.LimitAmount
     assert.throws(
       () => verifyTrustSet(trustSet),
+      ValidationError,
+      'TrustSet: missing field LimitAmount',
+    )
+    assert.throws(
+      () => verify(trustSet),
       ValidationError,
       'TrustSet: missing field LimitAmount',
     )
@@ -46,6 +51,11 @@ describe('TrustSet', function () {
       ValidationError,
       'TrustSet: invalid LimitAmount',
     )
+    assert.throws(
+      () => verify(trustSet),
+      ValidationError,
+      'TrustSet: invalid LimitAmount',
+    )
   })
 
   it('throws when QualityIn is not a number', function () {
@@ -55,12 +65,22 @@ describe('TrustSet', function () {
       ValidationError,
       'TrustSet: QualityIn must be a number',
     )
+    assert.throws(
+      () => verify(trustSet),
+      ValidationError,
+      'TrustSet: QualityIn must be a number',
+    )
   })
 
   it('throws when QualityOut is not a number', function () {
     trustSet.QualityOut = '4321'
     assert.throws(
       () => verifyTrustSet(trustSet),
+      ValidationError,
+      'TrustSet: QualityOut must be a number',
+    )
+    assert.throws(
+      () => verify(trustSet),
       ValidationError,
       'TrustSet: QualityOut must be a number',
     )

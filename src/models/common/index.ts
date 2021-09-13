@@ -26,9 +26,11 @@ export interface IssuedCurrencyAmount extends IssuedCurrency {
 export type Amount = IssuedCurrencyAmount | string
 
 export interface Signer {
-  Account: string
-  TxnSignature: string
-  SigningPubKey: string
+  Signer: {
+    Account: string
+    TxnSignature: string
+    SigningPubKey: string
+  }
 }
 
 export interface Memo {
@@ -56,6 +58,8 @@ interface PathStep {
 export type Path = PathStep[]
 
 export interface SignerEntry {
-  Account: string
-  SignerWeight: number
+  SignerEntry: {
+    Account: string
+    SignerWeight: number
+  }
 }
