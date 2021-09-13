@@ -1,8 +1,7 @@
-import { assert } from 'chai'
-
 import { ValidationError } from 'xrpl-local/common/errors'
-
-import { verifyCheckCancel } from '../../src/models/transactions/checkCancel'
+import { verifyCheckCancel } from './../../src/models/transactions/checkCancel'
+import { assert } from 'chai'
+import { verify } from '../../src/models/transactions'
 
 /**
  * CheckCancel Transaction Verification Testing.
@@ -19,6 +18,7 @@ describe('CheckCancel', function () {
     } as any
 
     assert.doesNotThrow(() => verifyCheckCancel(validCheckCancel))
+    assert.doesNotThrow(() => verify(validCheckCancel))
   })
 
   it(`throws w/ invalid CheckCancel`, function () {
@@ -30,6 +30,11 @@ describe('CheckCancel', function () {
 
     assert.throws(
       () => verifyCheckCancel(invalidCheckID),
+      ValidationError,
+      'CheckCancel: invalid CheckID',
+    )
+    assert.throws(
+      () => verify(invalidCheckID),
       ValidationError,
       'CheckCancel: invalid CheckID',
     )
