@@ -92,7 +92,6 @@ import getOrderbook from '../sugar/orderbook'
 import { submitTransaction, submitSignedTransaction } from '../sugar/submit'
 import { ensureClassicAddress } from '../sugar/utils'
 import combine from '../transaction/combine'
-import { sign } from '../transaction/sign'
 import generateFaucetWallet from '../wallet/generateFaucetWallet'
 
 import {
@@ -534,7 +533,6 @@ class Client extends EventEmitter {
   public getBalances = prepend(getBalances, this)
   public getOrderbook = prepend(getOrderbook, this)
 
-  public sign = sign
   public combine = combine
 
   public generateFaucetWallet = prepend(generateFaucetWallet, this)

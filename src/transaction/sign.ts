@@ -1,12 +1,10 @@
-import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 import binaryCodec from 'ripple-binary-codec'
 import keypairs from 'ripple-keypairs'
 
-import type { Client, Wallet } from '..'
+import type { Wallet } from '..'
 import { ValidationError } from '../common/errors'
 import { Transaction } from '../models/transactions'
-import { xrpToDrops } from '../utils'
 import { computeSignedTransactionHash } from '../utils/hashes'
 
 import { SignOptions, KeyPair } from './types'
@@ -19,7 +17,6 @@ function computeSignature(tx: object, privateKey: string, signAs?: string) {
 }
 
 function signWithKeypair(
-  client: Client | null,
   txJSON: string,
   keypair: KeyPair,
   options: SignOptions = {
@@ -31,10 +28,6 @@ function signWithKeypair(
     throw new ValidationError(
       'txJSON must not contain "TxnSignature" or "Signers" properties',
     )
-  }
-
-  if (client != null) {
-    checkFee(client, tx.Fee)
   }
 
   const txToSignAndEncode = { ...tx }
@@ -195,51 +188,6 @@ function checkTxSerialization(serialized: string, tx: Transaction): void {
   }
 }
 
-/**
- *  Check that a given transaction fee does not exceed maxFeeXRP (in drops).
- *
- *  See https://xrpl.org/rippleapi-reference.html#parameters.
- *
- * @param client - A Client instance.
- * @param txFee - The transaction fee in drops, encoded as a string.
- *
- * @returns This method does not return a value, but throws an error if the check fails.
- */
-function checkFee(client: Client, txFee: string): void {
-  const fee = new BigNumber(txFee)
-  const maxFeeDrops = xrpToDrops(client.maxFeeXRP)
-  if (fee.isGreaterThan(maxFeeDrops)) {
-    throw new ValidationError(
-      `"Fee" should not exceed "${maxFeeDrops}". ` +
-        'To use a higher fee, set `maxFeeXRP` in the Client constructor.',
-    )
-  }
-}
-
-function sign(
-  this: Client,
-  txJSON: string,
-  secret?: any,
-  options?: SignOptions,
-  keypair?: KeyPair,
-): { signedTransaction: string; id: string } {
-  if (typeof secret === 'string') {
-    // we can't validate that the secret matches the account because
-    // the secret could correspond to the regular key
-    return signWithKeypair(
-      this,
-      txJSON,
-      keypairs.deriveKeypair(secret),
-      options,
-    )
-  }
-  if (!keypair && !secret) {
-    // Clearer message than 'ValidationError: instance is not exactly one from [subschema 0],[subschema 1]'
-    throw new ValidationError('sign: Missing secret or keypair.')
-  }
-  return signWithKeypair(this, txJSON, keypair || secret, options)
-}
-
 // TODO: move this to Wallet class
 function signOffline(
   wallet: Wallet,
@@ -247,7 +195,7 @@ function signOffline(
   options?: SignOptions,
 ): { signedTransaction: string; id: string } {
   const { publicKey, privateKey } = wallet
-  return signWithKeypair(null, txJSON, { publicKey, privateKey }, options)
+  return signWithKeypair(txJSON, { publicKey, privateKey }, options)
 }
 
-export { sign, signOffline }
+export { signOffline }
