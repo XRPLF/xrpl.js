@@ -3,7 +3,7 @@ import { xAddressToClassicAddress } from 'ripple-address-codec'
 import { ValidationError } from '../common/errors'
 import { RippledAmount } from '../common/types/objects'
 
-import { deriveKeypair, deriveAddress, deriveXAddress } from './derive'
+import { deriveKeypair, deriveXAddress } from './derive'
 import { generateXAddress } from './generateAddress'
 import {
   computeSignedTransactionHash,
@@ -125,7 +125,6 @@ export {
   computePaymentChannelHash,
   generateXAddress,
   deriveKeypair,
-  deriveAddress,
   deriveXAddress,
   signPaymentChannelClaim,
   verifyPaymentChannelClaim,
