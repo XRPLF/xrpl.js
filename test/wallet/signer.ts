@@ -121,7 +121,7 @@ const multisignTxToCombine2: Transaction = {
   TransactionType: 'TrustSet',
 }
 
-const expectedMultisign: Transaction = {
+const expectedMultisign: string = encode({
   Account: 'rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC',
   Fee: '30000',
   Flags: 262144,
@@ -153,7 +153,7 @@ const expectedMultisign: Transaction = {
   ],
   SigningPubKey: '',
   TransactionType: 'TrustSet',
-}
+})
 
 describe('Signer', function () {
   it('sign', function () {

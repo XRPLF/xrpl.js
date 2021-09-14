@@ -8,14 +8,17 @@
  *
  * See [LedgerNameSpace enum](https://github.com/ripple/rippled/blob/master/src/ripple/protocol/LedgerFormats.h#L100).
  */
-export default {
+const ledgerSpaces = {
   account: 'a',
   dirNode: 'd',
   generatorMap: 'g',
   rippleState: 'r',
-  offer: 'o', // Entry for an offer.
-  ownerDir: 'O', // Directory of things owned by an account.
-  bookDir: 'B', // Directory of order books.
+  // Entry for an offer.
+  offer: 'o',
+  // Directory of things owned by an account.
+  ownerDir: 'O',
+  // Directory of order books.
+  bookDir: 'B',
   contract: 'c',
   skipList: 's',
   escrow: 'u',
@@ -27,3 +30,5 @@ export default {
   check: 'C',
   depositPreauth: 'p',
 }
+
+export default ledgerSpaces

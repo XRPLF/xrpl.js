@@ -178,7 +178,7 @@ const getOrderbook = {
 }
 
 const computeLedgerHash = {
-  header: { ...header, rawTransactions: JSON.stringify(transactions) },
+  header,
   transactions,
 }
 

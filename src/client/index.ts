@@ -1,4 +1,3 @@
-/* eslint-disable import/max-dependencies -- Client needs a lot of dependencies by definition */
 /* eslint-disable @typescript-eslint/member-ordering -- TODO: remove when instance methods aren't members */
 /* eslint-disable max-lines -- This might not be necessary later, but this file needs to be big right now */
 import { EventEmitter } from 'events'
@@ -26,6 +25,7 @@ import getFee from '../common/fee'
 import autofill from '../ledger/autofill'
 import getBalances from '../ledger/balances'
 import getOrderbook from '../ledger/orderbook'
+import { submitTransaction, submitSignedTransaction } from '../ledger/submit'
 import { clamp } from '../ledger/utils'
 import {
   // account methods
@@ -107,7 +107,6 @@ import {
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 import combine from '../transaction/combine'
 import { sign } from '../transaction/sign'
-import { deriveAddress, deriveXAddress } from '../utils/derive'
 import generateFaucetWallet from '../wallet/generateFaucetWallet'
 
 import {
@@ -159,6 +158,7 @@ function getCollectKeyFromCommand(command: string): string | null {
  * @param params - Parameters to prepend to a function.
  * @returns A function bound with params.
  */
+// TODO Need to refactor prepend so TS can infer the correct function signature type
 // eslint-disable-next-line @typescript-eslint/ban-types -- expected param types
 function prepend(func: Function, ...params: unknown[]): Function {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- safe to return
@@ -387,20 +387,36 @@ class Client extends EventEmitter {
     return this.connection.request(nextPageRequest) as unknown as U
   }
 
-  public on(event: 'ledgerClosed', listener: (ledger: LedgerStream) => void)
+  public on(
+    event: 'ledgerClosed',
+    listener: (ledger: LedgerStream) => void,
+  ): this
   public on(
     event: 'validationReceived',
     listener: (validation: ValidationStream) => void,
-  )
-  public on(event: 'transaction', listener: (tx: TransactionStream) => void)
+  ): this
+  public on(
+    event: 'transaction',
+    listener: (tx: TransactionStream) => void,
+  ): this
   public on(
     event: 'peerStatusChange',
     listener: (status: PeerStatusStream) => void,
-  )
-  public on(event: 'consensusPhase', listener: (phase: ConsensusStream) => void)
-  public on(event: 'path_find', listener: (path: PathFindStream) => void)
-  public on(event: string, listener: (...args: any[]) => void)
-  public on(eventName: string, listener: (...args: any[]) => void) {
+  ): this
+  public on(
+    event: 'consensusPhase',
+    listener: (phase: ConsensusStream) => void,
+  ): this
+  public on(event: 'path_find', listener: (path: PathFindStream) => void): this
+  public on(event: 'error', listener: (...err: any[]) => void): this
+  /**
+   * Event handler for subscription streams.
+   *
+   * @param eventName - Name of the event. Only forwards streams.
+   * @param listener - Function to run on event.
+   * @returns This, because it inherits from EventEmitter.
+   */
+  public on(eventName: string, listener: (...args: any[]) => void): this {
     return super.on(eventName, listener)
   }
 
@@ -520,6 +536,9 @@ class Client extends EventEmitter {
   public prepareTransaction = prepend(autofill, this)
 
   public getFee = prepend(getFee, this)
+  public submitTransaction = prepend(submitTransaction, this)
+
+  public submitSignedTransaction = prepend(submitSignedTransaction, this)
 
   public getBalances = prepend(getBalances, this)
   public getOrderbook = prepend(getOrderbook, this)
@@ -530,11 +549,6 @@ class Client extends EventEmitter {
   public generateFaucetWallet = prepend(generateFaucetWallet, this)
 
   public errors = errors
-
-  public static deriveXAddress = deriveXAddress
-
-  // Client.deriveClassicAddress (static) is a new name for client.deriveAddress
-  public static deriveClassicAddress = deriveAddress
 
   /**
    * Static methods to expose ripple-address-codec methods.

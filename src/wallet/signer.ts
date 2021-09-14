@@ -3,6 +3,7 @@ import { flatMap } from 'lodash'
 import { decodeAccountID } from 'ripple-address-codec'
 import {
   decode,
+  encode,
   encodeForSigning,
   encodeForSigningClaim,
 } from 'ripple-binary-codec'
@@ -42,7 +43,7 @@ function sign(wallet: Wallet, tx: Transaction, forMultisign = false): string {
  * - The SigningPubKey field is not the empty string in any given transaction
  * - Any transaction is missing a Signers field.
  */
-function multisign(transactions: Array<Transaction | string>): Transaction {
+function multisign(transactions: Array<Transaction | string>): string {
   if (transactions.length === 0) {
     throw new ValidationError('There were 0 transactions to multisign')
   }
@@ -76,7 +77,7 @@ function multisign(transactions: Array<Transaction | string>): Transaction {
 
   validateTransactionEquivalence(decodedTransactions)
 
-  return getTransactionWithAllSigners(decodedTransactions)
+  return encode(getTransactionWithAllSigners(decodedTransactions))
 }
 
 /**
