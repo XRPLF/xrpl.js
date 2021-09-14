@@ -4,7 +4,6 @@ import _ from 'lodash'
 import { decode } from 'ripple-binary-codec'
 
 import { Client, SubmitResponse, Wallet } from 'xrpl-local'
-import { BaseResponse } from 'xrpl-local/models/methods/baseMethod'
 import {
   verifyPayment,
   Payment,
@@ -18,17 +17,9 @@ import { walletAddress, walletSecret } from './wallet'
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
 
-interface LedgerAcceptResponse extends BaseResponse {
-  result: {
-    ledger_current_index: number
-  }
-}
-
-export async function ledgerAccept(
-  client: Client,
-): Promise<LedgerAcceptResponse> {
+export async function ledgerAccept(client: Client): Promise<void> {
   const request = { command: 'ledger_accept' }
-  return client.connection.request(request) as Promise<LedgerAcceptResponse>
+  await client.connection.request(request)
 }
 
 // TODO: replace with `client.submitTransaction` once that has been merged
