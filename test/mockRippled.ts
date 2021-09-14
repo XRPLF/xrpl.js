@@ -86,6 +86,7 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
         }
 
         if (!mock.suppressOutput) {
+          // eslint-disable-next-line no-console -- only printed out on error
           console.error(err.message)
         }
         if (request != null) {

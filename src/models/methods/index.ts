@@ -1,5 +1,3 @@
-/* eslint-disable import/max-dependencies -- All methods need to be exported */
-
 import {
   AccountChannelsRequest,
   AccountChannelsResponse,

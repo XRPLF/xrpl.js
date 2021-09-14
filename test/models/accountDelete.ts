@@ -1,7 +1,9 @@
-import { ValidationError } from 'xrpl-local/common/errors'
-import { verifyAccountDelete } from './../../src/models/transactions/accountDelete'
-import { verify } from './../../src/models/transactions'
 import { assert } from 'chai'
+
+import { ValidationError } from 'xrpl-local/common/errors'
+
+import { verify } from '../../src/models/transactions'
+import { verifyAccountDelete } from '../../src/models/transactions/accountDelete'
 
 /**
  * AccountDelete Transaction Verification Testing.

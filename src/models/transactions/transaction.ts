@@ -6,7 +6,7 @@ import _ from 'lodash'
 import { encode, decode } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../common/errors'
-import TransactionMetadata from './metadata'
+import { setTransactionFlagsToNumber } from '../utils'
 
 import { AccountDelete, verifyAccountDelete } from './accountDelete'
 import {
@@ -22,12 +22,14 @@ import { DepositPreauth, verifyDepositPreauth } from './depositPreauth'
 import { EscrowCancel, verifyEscrowCancel } from './escrowCancel'
 import { EscrowCreate, verifyEscrowCreate } from './escrowCreate'
 import { EscrowFinish, verifyEscrowFinish } from './escrowFinish'
+import TransactionMetadata from './metadata'
 import { OfferCancel, verifyOfferCancel } from './offerCancel'
 import {
   OfferCreate,
   verifyOfferCreate,
   OfferCreateTransactionFlags,
 } from './offerCreate'
+import { Payment, verifyPayment, PaymentTransactionFlags } from './payment'
 import {
   PaymentChannelClaim,
   verifyPaymentChannelClaim,
@@ -41,12 +43,10 @@ import {
   PaymentChannelFund,
   verifyPaymentChannelFund,
 } from './paymentChannelFund'
-import { Payment, verifyPayment, PaymentTransactionFlags } from './payment'
 import { SetRegularKey, verifySetRegularKey } from './setRegularKey'
 import { SignerListSet, verifySignerListSet } from './signerListSet'
 import { TicketCreate, verifyTicketCreate } from './ticketCreate'
 import { TrustSet, verifyTrustSet, TrustSetTransactionFlags } from './trustSet'
-import { setTransactionFlagsToNumber } from '../utils'
 
 export type Transaction =
   | AccountDelete
@@ -79,6 +79,7 @@ export interface TransactionAndMetadata {
  * Encode/decode and individual type validation.
  *
  * @param tx - A Transaction.
+ * @param transaction
  * @throws ValidationError When the Transaction is malformed.
  */
 export function verify(transaction: Record<string, unknown>): void {
