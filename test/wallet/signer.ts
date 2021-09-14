@@ -20,7 +20,6 @@ const privateKey =
 const address = 'rhvh5SrgBL5V8oeV9EpDuVszeJSSCEkbPc'
 const seed = 'ss1x3KLrSvfg7irFc1D929WXZ7z9H'
 const wallet = Wallet.fromSeed(seed)
-
 const verifyWallet = new Wallet(publicKey, privateKey)
 
 const tx: Transaction = {
