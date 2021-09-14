@@ -15,7 +15,6 @@ import {
   verify,
   sign,
 } from 'ripple-keypairs'
-import { computeSignedTransactionHash } from '..'
 
 import ECDSA from '../common/ecdsa'
 import { ValidationError } from '../common/errors'
@@ -164,7 +163,7 @@ class Wallet {
       this.publicKey,
       this.privateKey,
       options,
-    ).signedTransaction
+    )
   }
 
   /**
@@ -208,7 +207,7 @@ function signWithKeypair(
   options: SignOptions = {
     signAs: '',
   },
-): { signedTransaction: string; id: string } {
+): string {
   const tx = JSON.parse(txJSON)
   if (tx.TxnSignature || tx.Signers) {
     throw new ValidationError(
@@ -239,10 +238,7 @@ function signWithKeypair(
   }
   const serialized = encode(txToSignAndEncode)
   checkTxSerialization(serialized, tx)
-  return {
-    signedTransaction: serialized,
-    id: computeSignedTransactionHash(serialized),
-  }
+  return serialized
 }
 
 /**
