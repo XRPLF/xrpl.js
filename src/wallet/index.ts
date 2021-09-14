@@ -249,7 +249,9 @@ function signWithKeypair(
  * @param serialized - A signed and serialized transaction.
  * @param tx - The transaction prior to signing.
  *
- * @returns This method does not return a value, but throws an error if the check fails.
+ * @returns This method does not return a value
+ * @throws a ValidationError if the transaction does not have a TxnSignature/Signers property, or an AssertionError if
+ * the serialized Transaction desn't match the original transaction.
  */
 function checkTxSerialization(serialized: string, tx: Transaction): void {
   // Decode the serialized transaction:
