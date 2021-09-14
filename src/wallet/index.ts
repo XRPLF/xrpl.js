@@ -79,12 +79,7 @@ class Wallet {
    * @param algorithm - The digital signature algorithm to generate an address fro.
    * @returns A Wallet derived from a secret (AKA a seed).
    */
-  public static fromSecret(
-    secret: string,
-    algorithm: ECDSA = DEFAULT_ALGORITHM,
-  ): Wallet {
-    return Wallet.fromSeed(secret, algorithm)
-  }
+  public static fromSecret = Wallet.fromSeed
 
   /**
    * Derives a wallet from a mnemonic.
