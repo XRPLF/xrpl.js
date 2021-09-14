@@ -519,7 +519,7 @@ class Client extends EventEmitter {
   // @deprecated Use autofill instead
   public prepareTransaction = prepend(autofill, this)
 
-  public getFee = getFee
+  public getFee = prepend(getFee, this)
 
   public getBalances = prepend(getBalances, this)
   public getOrderbook = prepend(getOrderbook, this)
