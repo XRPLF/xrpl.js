@@ -79,7 +79,11 @@ module.exports = {
 
         // Tests are already in 2 callbacks, so max 3 is pretty restrictive
         'max-nested-callbacks': 'off',
-
+      },
+    },
+    {
+      files: ['test/client/*.ts'],
+      rules: {
         // Rule does not work with dynamically generated tests.
         'mocha/no-setup-in-describe': 'off',
       },
