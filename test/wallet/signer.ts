@@ -26,6 +26,10 @@ const address = 'rhvh5SrgBL5V8oeV9EpDuVszeJSSCEkbPc'
 const seed = 'ss1x3KLrSvfg7irFc1D929WXZ7z9H'
 const wallet = Wallet.fromSeed(seed)
 const wallet2 = Wallet.fromSeed('shsWGZcmZz6YsWWmcnpfr6fLTdtFV')
+const wallet3 = new Wallet(
+  '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8',
+  '00ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A',
+)
 
 const verifyWallet = new Wallet(publicKey, privateKey)
 
@@ -295,8 +299,6 @@ describe('Signer', function () {
     assert.isFalse(verifySignature(decodedTx))
   })
 
-  // TODO: Refactor the below tests to work with the new Signer object
-
   it('sign', async function () {
     const result = sign(
       wallet2,
@@ -357,27 +359,16 @@ describe('Signer', function () {
   })
 
   it('withKeypair', async function () {
-    const keypair = {
-      privateKey:
-        '00ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A',
-      publicKey:
-        '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8',
-    }
     const result = sign(
-      new Wallet(keypair.publicKey, keypair.privateKey),
+      wallet3,
       JSON.parse(REQUEST_FIXTURES.normal.txJSON) as unknown as Transaction,
     )
     assert.deepEqual(result, RESPONSE_FIXTURES.normal.signedTransaction)
   })
 
   it('withKeypair already signed', async function () {
-    const wallet = new Wallet(
-      '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8',
-      '00ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A',
-    )
-
     const result = sign(
-      wallet,
+      wallet3,
       JSON.parse(REQUEST_FIXTURES.normal.txJSON) as unknown as Transaction,
     )
     assert.throws(() => {
@@ -451,7 +442,6 @@ describe('Signer', function () {
 
   it('throws when encoded tx does not match decoded tx - AccountSet', async function () {
     const request = {
-      // TODO: This fails when address is X-address
       txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"6578616D706C652E636F6D","LastLedgerSequence":8820051,"Fee":"1.2","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
       instructions: {
         fee: '0.0000012',
@@ -467,7 +457,6 @@ describe('Signer', function () {
 
   it('throws when encoded tx does not match decoded tx - higher fee', async function () {
     const request = {
-      // TODO: This fails when address is X-address
       txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"6578616D706C652E636F6D","LastLedgerSequence":8820051,"Fee":"1123456.7","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
       instructions: {
         fee: '1.1234567',
@@ -519,10 +508,9 @@ describe('Signer', function () {
       '12000022800200002400000001201B00EF81E661EC6386F26FC0FFFF0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461968400000000000000C6940000000000000646AD3504529A0465E2E0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D1664619732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D87446304402200A693FB5CA6B21250EBDFD8CFF526EE0DF7C9E4E31EB0660692E75E6A93BF5F802203CC39463DDA21386898CA31E18AD1A6828647D65741DD637BAD71BC83E29DB9481145E7B112523F68D2F5E879DB4EAC51C6698A693048314CA6EDC7A28252DAEA6F2045B24F4D7C333E146170112300000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461900',
     )
   })
-  /*
 
   it('succeeds - prepared payment', async function () {
-    const payment = {
+    const payment: Transaction = {
       TransactionType: 'Payment',
       Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
       Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
@@ -532,18 +520,14 @@ describe('Signer', function () {
       LastLedgerSequence: 8819954,
       Fee: '12',
     }
-    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
-    const result = sign(JSON.stringify(payment), secret)
-    const expectedResult = {
-      signedTransaction:
-        '12000022800000002400000017201B008694F261400000000000000168400000000000000C732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D874473045022100A9C91D4CFAE45686146EE0B56D4C53A2E7C2D672FB834D43E0BE2D2E9106519A022075DDA2F92DE552B0C45D83D4E6D35889B3FBF51BFBBD9B25EBF70DE3C96D0D6681145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
-      id: '88D6B913C66279EA31ADC25C5806C48B2D4E5680261666790A736E1961217700',
-    }
+    const result = sign(wallet2, payment)
+    const expectedResult =
+      '12000022800000002400000017201B008694F261400000000000000168400000000000000C732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D874473045022100A9C91D4CFAE45686146EE0B56D4C53A2E7C2D672FB834D43E0BE2D2E9106519A022075DDA2F92DE552B0C45D83D4E6D35889B3FBF51BFBBD9B25EBF70DE3C96D0D6681145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648'
     assert.deepEqual(result, expectedResult)
   })
 
   it('throws when encoded tx does not match decoded tx - prepared payment', async function () {
-    const payment = {
+    const payment: Transaction = {
       TransactionType: 'Payment',
       Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
       Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
@@ -553,49 +537,8 @@ describe('Signer', function () {
       LastLedgerSequence: 8819954,
       Fee: '12',
     }
-    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     assert.throws(() => {
-      sign(JSON.stringify(payment), secret)
+      sign(wallet2, payment)
     }, /^1.1234567 is an illegal amount/)
   })
-
-  it('throws when encoded tx does not match decoded tx - prepared order', async function () {
-    const offerCreate = {
-      TransactionType: 'OfferCreate',
-      Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
-      TakerGets: {
-        currency: 'USD',
-        issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-        value: '3.140000',
-      },
-      TakerPays: '31415000000',
-      Flags: 2148007936,
-      Sequence: 123,
-      LastLedgerSequence: 8819954,
-      Fee: '12',
-    }
-    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
-
-    try {
-      sign(JSON.stringify(offerCreate), secret)
-      return await Promise.reject(new Error('sign should have thrown'))
-    } catch (error) {
-      if (error instanceof ValidationError) {
-        assert.equal(error.name, 'ValidationError')
-        assert.equal(
-          error.message,
-          'Serialized transaction does not match original txJSON. See `error.data`',
-        )
-        expect(error.data).to.deep.include({
-          diff: {
-            TakerGets: {
-              value: '3.14',
-            },
-          },
-        })
-      } else {
-        assert(false)
-      }
-    }
-  }) */
 })
