@@ -13,6 +13,7 @@ import { AccountLinesRequest, AccountLinesResponse } from './accountLines'
 import { AccountObjectsRequest, AccountObjectsResponse } from './accountObjects'
 import { AccountOffersRequest, AccountOffersResponse } from './accountOffers'
 import { AccountTxRequest, AccountTxResponse } from './accountTx'
+import { ErrorResponse } from './baseMethod'
 import { BookOffersRequest, BookOffersResponse } from './bookOffers'
 import { ChannelVerifyRequest, ChannelVerifyResponse } from './channelVerify'
 import {
@@ -224,4 +225,5 @@ export {
   PingResponse,
   RandomRequest,
   RandomResponse,
+  ErrorResponse,
 }
