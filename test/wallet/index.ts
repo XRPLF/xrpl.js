@@ -84,6 +84,37 @@ describe('Wallet', function () {
     })
   })
 
+  describe('fromSecret', function () {
+    const seed = 'ssL9dv2W5RK8L3tuzQxYY6EaZhSxW'
+    const publicKey =
+      '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
+    const privateKey =
+      '00141BA006D3363D2FB2785E8DF4E44D3A49908780CB4FB51F6D217C08C021429F'
+
+    it('derives a wallet using default algorithm', function () {
+      const wallet = Wallet.fromSecret(seed)
+
+      assert.equal(wallet.publicKey, publicKey)
+      assert.equal(wallet.privateKey, privateKey)
+    })
+
+    it('derives a wallet using algorithm ecdsa-secp256k1', function () {
+      const algorithm = ECDSA.secp256k1
+      const wallet = Wallet.fromSecret(seed, algorithm)
+
+      assert.equal(wallet.publicKey, publicKey)
+      assert.equal(wallet.privateKey, privateKey)
+    })
+
+    it('derives a wallet using algorithm ed25519', function () {
+      const algorithm = ECDSA.ed25519
+      const wallet = Wallet.fromSecret(seed, algorithm)
+
+      assert.equal(wallet.publicKey, publicKey)
+      assert.equal(wallet.privateKey, privateKey)
+    })
+  })
+
   describe('fromMnemonic', function () {
     const mnemonic =
       'try milk link drift aware pass obtain again music stick pluck fold'
