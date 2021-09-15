@@ -221,9 +221,7 @@ describe('Wallet', function () {
     })
 
     it('sign', async function () {
-      const result = wallet2.signTransaction(
-        JSON.parse(REQUEST_FIXTURES.normal.txJSON) as unknown as Transaction,
-      )
+      const result = wallet2.signTransaction(REQUEST_FIXTURES.normal.txJSON)
       assert.deepEqual(result, RESPONSE_FIXTURES.normal.signedTransaction)
     })
 
@@ -258,10 +256,10 @@ describe('Wallet', function () {
       )
     })
 
-    it('EscrowExecution', async function () {
+    it('EscrowFinish', async function () {
       const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
       const result = Wallet.fromSeed(secret).signTransaction(
-        JSON.parse(REQUEST_FIXTURES.escrow.txJSON) as unknown as Transaction,
+        REQUEST_FIXTURES.escrow.txJSON as unknown as Transaction,
       )
       assert.deepEqual(result, RESPONSE_FIXTURES.escrow.signedTransaction)
     })
@@ -278,16 +276,12 @@ describe('Wallet', function () {
     })
 
     it('withKeypair', async function () {
-      const result = wallet3.signTransaction(
-        JSON.parse(REQUEST_FIXTURES.normal.txJSON) as unknown as Transaction,
-      )
+      const result = wallet3.signTransaction(REQUEST_FIXTURES.normal.txJSON)
       assert.deepEqual(result, RESPONSE_FIXTURES.normal.signedTransaction)
     })
 
     it('withKeypair already signed', async function () {
-      const result = wallet3.signTransaction(
-        JSON.parse(REQUEST_FIXTURES.normal.txJSON) as unknown as Transaction,
-      )
+      const result = wallet3.signTransaction(REQUEST_FIXTURES.normal.txJSON)
       assert.throws(() => {
         const tx = decode(result) as unknown as Transaction
         wallet.signTransaction(tx)
@@ -300,7 +294,7 @@ describe('Wallet', function () {
         '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
       )
       const result = wallet.signTransaction(
-        JSON.parse(REQUEST_FIXTURES.escrow.txJSON) as unknown as Transaction,
+        REQUEST_FIXTURES.escrow.txJSON as unknown as Transaction,
       )
       assert.deepEqual(result, RESPONSE_FIXTURES.escrow.signedTransaction)
     })
@@ -316,20 +310,24 @@ describe('Wallet', function () {
     })
 
     it('already signed', async function () {
-      const result = wallet2.signTransaction(
-        JSON.parse(REQUEST_FIXTURES.normal.txJSON),
-      )
+      const result = wallet2.signTransaction(REQUEST_FIXTURES.normal.txJSON)
       assert.throws(() => {
         wallet.signTransaction(decode(result) as unknown as Transaction)
       }, /txJSON must not contain "TxnSignature" or "Signers" properties/)
     })
 
     it('succeeds - no flags', async function () {
-      const txJSON =
-        '{"TransactionType":"Payment","Account":"r45Rev1EXGxy2hAUmJPCne97KUE7qyrD3j","Destination":"rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r","Amount":"20000000","Sequence":1,"Fee":"12"}'
+      const tx: Transaction = {
+        TransactionType: 'Payment',
+        Account: 'r45Rev1EXGxy2hAUmJPCne97KUE7qyrD3j',
+        Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+        Amount: '20000000',
+        Sequence: 1,
+        Fee: '12',
+      }
       const secret = 'shotKgaEotpcYsshSE39vmSnBDRim'
       const wallet = Wallet.fromSeed(secret)
-      const result = wallet.signTransaction(JSON.parse(txJSON))
+      const result = wallet.signTransaction(tx)
       const expectedResult =
         '1200002400000001614000000001312D0068400000000000000C7321022B05847086686F9D0499B13136B94AD4323EE1B67D4C429ECC987AB35ACFA34574473045022100C104B7B97C31FACA4597E7D6FCF13BD85BD11375963A62A0AC45B0061236E39802207784F157F6A98DFC85B051CDDF61CC3084C4F5750B82674801C8E9950280D1998114EE3046A5DDF8422C40DDB93F1D522BB4FE6419158314FDB08D07AAA0EB711793A3027304D688E10C3648'
       const decoded = decode(result)
@@ -343,11 +341,35 @@ describe('Wallet', function () {
     it('sign succeeds with source.amount/destination.minAmount', async function () {
       // See also: 'preparePayment with source.amount/destination.minAmount'
 
-      const txJSON =
-        '{"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Destination":"rEX4LtGJubaUcMWCJULcy4NVxGT9ZEMVRq","Amount":{"currency":"USD","issuer":"rMaa8VLBTjwTJWA2kSme4Sqgphhr6Lr6FH","value":"999999999999999900000000000000000000000000000000000000000000000000000000000000000000000000000000"},"Flags":2147614720,"SendMax":{"currency":"GBP","issuer":"rpat5TmYjDsnFSStmgTumFgXCM9eqsWPro","value":"0.1"},"DeliverMin":{"currency":"USD","issuer":"rMaa8VLBTjwTJWA2kSme4Sqgphhr6Lr6FH","value":"0.1248548562296331"},"Sequence":23,"LastLedgerSequence":8820051,"Fee":"12"}'
+      const tx: Transaction = {
+        TransactionType: 'Payment',
+        Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+        Destination: 'rEX4LtGJubaUcMWCJULcy4NVxGT9ZEMVRq',
+        Amount: {
+          currency: 'USD',
+          issuer: 'rMaa8VLBTjwTJWA2kSme4Sqgphhr6Lr6FH',
+          value:
+            '999999999999999900000000000000000000000000000000000000000000000000000000000000000000000000000000',
+        },
+        Flags: 2147614720,
+        SendMax: {
+          currency: 'GBP',
+          issuer: 'rpat5TmYjDsnFSStmgTumFgXCM9eqsWPro',
+          value: '0.1',
+        },
+        DeliverMin: {
+          currency: 'USD',
+          issuer: 'rMaa8VLBTjwTJWA2kSme4Sqgphhr6Lr6FH',
+          value: '0.1248548562296331',
+        },
+        Sequence: 23,
+        LastLedgerSequence: 8820051,
+        Fee: '12',
+      }
+
       const secret = 'shotKgaEotpcYsshSE39vmSnBDRim'
       const wallet = Wallet.fromSeed(secret)
-      const result = wallet.signTransaction(JSON.parse(txJSON))
+      const result = wallet.signTransaction(tx)
       const expectedResult =
         '12000022800200002400000017201B0086955361EC6386F26FC0FFFF0000000000000000000000005553440000000000DC596C88BCDE4E818D416FCDEEBF2C8656BADC9A68400000000000000C69D4438D7EA4C6800000000000000000000000000047425000000000000C155FFE99C8C91F67083CEFFDB69EBFE76348CA6AD4446F8C5D8A5E0B0000000000000000000000005553440000000000DC596C88BCDE4E818D416FCDEEBF2C8656BADC9A7321022B05847086686F9D0499B13136B94AD4323EE1B67D4C429ECC987AB35ACFA34574473045022100D9634523D8E232D4A7807A71856023D82AC928FA29848571B820867898413B5F022041AC00EC1F81A26A6504EBF844A38CC3204694EF2CC1A97A87632721631F93DA81145E7B112523F68D2F5E879DB4EAC51C6698A6930483149F500E50C2F016CA01945E5A1E5846B61EF2D376'
       const decoded = decode(result)
@@ -359,39 +381,45 @@ describe('Wallet', function () {
     })
 
     it('throws when encoded tx does not match decoded tx - AccountSet', async function () {
-      const request = {
-        txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"6578616D706C652E636F6D","LastLedgerSequence":8820051,"Fee":"1.2","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
-        instructions: {
-          fee: '0.0000012',
-          sequence: 23,
-          maxLedgerVersion: 8820051,
-        },
+      const tx: Transaction = {
+        Flags: 2147483648,
+        TransactionType: 'AccountSet',
+        Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+        Domain: '6578616D706C652E636F6D',
+        LastLedgerSequence: 8820051,
+        Fee: '1.2',
+        Sequence: 23,
+        SigningPubKey:
+          '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8',
       }
 
       assert.throws(() => {
-        wallet2.signTransaction(JSON.parse(request.txJSON))
+        wallet2.signTransaction(tx)
       }, /1\.2 is an illegal amount/)
     })
 
     it('throws when encoded tx does not match decoded tx - higher fee', async function () {
-      const request = {
-        txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"6578616D706C652E636F6D","LastLedgerSequence":8820051,"Fee":"1123456.7","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
-        instructions: {
-          fee: '1.1234567',
-          sequence: 23,
-          maxLedgerVersion: 8820051,
-        },
+      const tx = {
+        Flags: 2147483648,
+        TransactionType: 'AccountSet',
+        Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+        Domain: '6578616D706C652E636F6D',
+        LastLedgerSequence: 8820051,
+        Fee: '1123456.7',
+        Sequence: 23,
+        SigningPubKey:
+          '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8',
       }
 
       assert.throws(() => {
-        wallet2.signTransaction(JSON.parse(request.txJSON))
+        wallet2.signTransaction(tx)
       }, /1123456\.7 is an illegal amount/)
     })
 
     it('sign with ticket', async function () {
       const wallet = Wallet.fromSeed('sn7n5R1cR5Y3fRFkuWXA94Ts1frVJ')
       const result = wallet.signTransaction(
-        JSON.parse(REQUEST_FIXTURES.ticket.txJSON),
+        REQUEST_FIXTURES.ticket.txJSON as unknown as Transaction,
       )
       assert.deepEqual(result, RESPONSE_FIXTURES.ticket.signedTransaction)
     })
