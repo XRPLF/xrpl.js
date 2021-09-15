@@ -223,7 +223,7 @@ class Wallet {
    * @returns A classic address.
    */
   public getClassicAddress(): string {
-    return deriveAddress(this.publicKey)
+    return this.classicAddress
   }
 
   /**
