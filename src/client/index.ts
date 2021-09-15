@@ -19,14 +19,14 @@ import {
   decodeXAddress,
 } from 'ripple-address-codec'
 
-import { constants, errors, txFlags, ensureClassicAddress } from '../common'
+import { constants, errors, txFlags, ensureClassicAddress } from '../sugar'
 import { ValidationError, XrplError } from '../common/errors'
-import getFee from '../common/fee'
-import autofill from '../ledger/autofill'
-import getBalances from '../ledger/balances'
-import getOrderbook from '../ledger/orderbook'
-import { submitTransaction, submitSignedTransaction } from '../ledger/submit'
-import { clamp } from '../ledger/utils'
+import getFee from '../sugar/fee'
+import autofill from '../sugar/autofill'
+import getBalances from '../sugar/balances'
+import getOrderbook from '../sugar/orderbook'
+import { submitTransaction, submitSignedTransaction } from '../sugar/submit'
+import { clamp } from '../sugar/utils'
 import {
   // account methods
   AccountChannelsRequest,

@@ -2,7 +2,7 @@ import * as assert from 'assert'
 
 import _ from 'lodash'
 
-import { constants } from '../../common'
+import { constants } from '..'
 
 import parseFields from './fields'
 

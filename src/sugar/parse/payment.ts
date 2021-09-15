@@ -2,7 +2,7 @@ import * as assert from 'assert'
 
 import _ from 'lodash'
 
-import { txFlags } from '../../common'
+import { txFlags } from '..'
 import { removeUndefined } from '../../utils'
 
 import parseAmount from './amount'
