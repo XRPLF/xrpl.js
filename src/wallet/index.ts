@@ -150,12 +150,14 @@ class Wallet {
    * Signs a transaction offline.
    *
    * @param transaction - A transaction to be signed offline.
-   * @param signAs - An account corresponding to the multi-signature being added.
+   * @param multisignAddress - Multisign only. An account address corresponding to the multi-signature being added. If this
+   * wallet represents your [master keypair](https://xrpl.org/cryptographic-keys.html#master-key-pair) you can get your account address
+   * with the Wallet.getClassicAddress() function.
    * @returns A signed transaction.
    */
   public signTransaction(
     transaction: Transaction,
-    signAs: string = '',
+    multisignAddress: string = '',
   ): string {
     if (transaction.TxnSignature || transaction.Signers) {
       throw new ValidationError(
@@ -165,16 +167,16 @@ class Wallet {
 
     const txToSignAndEncode = { ...transaction }
 
-    txToSignAndEncode.SigningPubKey = signAs ? '' : this.publicKey
+    txToSignAndEncode.SigningPubKey = multisignAddress ? '' : this.publicKey
 
-    if (signAs) {
+    if (multisignAddress) {
       const signer = {
-        Account: signAs,
+        Account: multisignAddress,
         SigningPubKey: this.publicKey,
         TxnSignature: this.computeSignature(
           txToSignAndEncode,
           this.privateKey,
-          signAs,
+          multisignAddress,
         ),
       }
       txToSignAndEncode.Signers = [{ Signer: signer }]
@@ -214,7 +216,9 @@ class Wallet {
   }
 
   /**
-   * Gets the classic address of the account this wallet represents.
+   * Gets the classic address of the account this wallet represents. This only is correct if this wallet corresponds
+   * to your [master keypair](https://xrpl.org/cryptographic-keys.html#master-key-pair). If this wallet represents a
+   * [regular keypair](https://xrpl.org/cryptographic-keys.html#regular-key-pair) this will provide an incorrect address.
    *
    * @returns A classic address.
    */
