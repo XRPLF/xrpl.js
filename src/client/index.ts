@@ -19,16 +19,14 @@ import {
   decodeXAddress,
 } from 'ripple-address-codec'
 
-import { constants, errors, txFlags, ensureClassicAddress } from '../common'
+import { constants, errors, txFlags, ensureClassicAddress } from '../sugar'
 import { ValidationError, XrplError } from '../common/errors'
-import getFee from '../common/fee'
-import autofill from '../ledger/autofill'
-import getBalances from '../ledger/balances'
-import { getOrderbook, formatBidsAndAsks } from '../ledger/orderbook'
-import getPaths from '../ledger/pathfind'
-import { submitTransaction, submitSignedTransaction } from '../ledger/submit'
-import getTrustlines from '../ledger/trustlines'
-import { clamp } from '../ledger/utils'
+import getFee from '../sugar/fee'
+import autofill from '../sugar/autofill'
+import getBalances from '../sugar/balances'
+import getOrderbook from '../sugar/orderbook'
+import { submitTransaction, submitSignedTransaction } from '../sugar/submit'
+import { clamp } from '../sugar/utils'
 import {
   // account methods
   AccountChannelsRequest,
@@ -537,16 +535,13 @@ class Client extends EventEmitter {
   // @deprecated Use autofill instead
   public prepareTransaction = prepend(autofill, this)
 
+  public getFee = prepend(getFee, this)
   public submitTransaction = prepend(submitTransaction, this)
 
   public submitSignedTransaction = prepend(submitSignedTransaction, this)
 
-  public getFee = getFee
-
-  public getTrustlines = getTrustlines
-  public getBalances = getBalances
-  public getPaths = getPaths
-  public getOrderbook = getOrderbook
+  public getBalances = prepend(getBalances, this)
+  public getOrderbook = prepend(getOrderbook, this)
 
   public sign = sign
   public combine = combine
@@ -554,8 +549,6 @@ class Client extends EventEmitter {
   public generateFaucetWallet = prepend(generateFaucetWallet, this)
 
   public errors = errors
-
-  public static formatBidsAndAsks = formatBidsAndAsks
 
   /**
    * Static methods to expose ripple-address-codec methods.

@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import transactionParser from 'ripple-lib-transactionparser'
 
-import { txFlags } from '../../common'
+import { txFlags } from '..'
 import { Amount, Memo } from '../../common/types/objects'
 import { removeUndefined, dropsToXrp, rippleTimeToISOTime } from '../../utils'
 

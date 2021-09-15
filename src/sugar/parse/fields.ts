@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 
-import { constants } from '../../common'
+import { constants } from '..'
 
 const AccountFields = constants.AccountFields
 

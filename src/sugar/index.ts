@@ -1,7 +1,7 @@
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
-import * as constants from './constants'
-import * as errors from './errors'
+import * as constants from '../common/constants'
+import * as errors from '../common/errors'
 
 /**
  * If an address is an X-Address, converts it to a classic address.
@@ -30,4 +30,4 @@ export function ensureClassicAddress(account: string): string {
 }
 
 export { constants, errors }
-export { txFlags } from './txflags'
+export { txFlags } from '../common/txflags'

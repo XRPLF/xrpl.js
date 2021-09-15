@@ -16,10 +16,7 @@ import withStateAsHashes from './getLedgerWithStateAsHashes.json'
 import normalOrderBook from './getOrderbook.json'
 import withXRPOrderBook from './getOrderbookWithXrp.json'
 import getOrders from './getOrders.json'
-import XrpToUsd from './getPaths.json'
 import sendAll from './getPathsSendAll.json'
-import UsdToUsd from './getPathsSendUsd.json'
-import XrpToXrp from './getPathsXrpToXrp.json'
 import normalPayChan from './getPaymentChannel.json'
 import fullPayChan from './getPaymentChannelFull.json'
 import getServerInfo from './getServerInfo.json'
@@ -70,9 +67,6 @@ import trustlineNoQuality from './getTransactionTrustNoQuality.json'
 import trustlineFrozenOff from './getTransactionTrustSetFrozenOff.json'
 import withMemo from './getTransactionWithMemo.json'
 import withMemos from './getTransactionWithMemos.json'
-import filteredLines from './getTrustlines.json'
-import allTrustlines from './getTrustlinesAll.json'
-import ripplingDisabledLines from './getTrustlinesRipplingDisabled.json'
 import ledgerEvent from './ledgerEvent.json'
 import normalCheckCancel from './prepareCheckCancel.json'
 import ticketCheckCancel from './prepareCheckCancelTicket.json'
@@ -145,11 +139,6 @@ import escrowSign from './signEscrow.json'
 import signPaymentChannelClaim from './signPaymentChannelClaim.json'
 import ticketSign from './signTicket.json'
 import submit from './submit.json'
-import trustlineItems from './trustlineItem.json'
-
-function buildList(options: { item: any; count: number }): any[] {
-  return new Array(options.count).fill(options.item)
-}
 
 const getPaymentChannel = {
   normal: normalPayChan,
@@ -162,9 +151,6 @@ const getOrderbook = {
 }
 
 const getPaths = {
-  XrpToUsd,
-  XrpToXrp,
-  UsdToUsd,
   sendAll,
 }
 
@@ -218,16 +204,6 @@ const getTransactions = {
   normal: normalTransactions,
   includeRawTransactions,
   one: oneTransaction,
-}
-
-const getTrustlines = {
-  filtered: filteredLines,
-  moreThan400Items: buildList({
-    item: trustlineItems,
-    count: 401,
-  }),
-  all: allTrustlines,
-  ripplingDisabled: ripplingDisabledLines,
 }
 
 const getLedger = {
@@ -377,7 +353,6 @@ const responses = {
   getPaths,
   getTransaction,
   getTransactions,
-  getTrustlines,
   getLedger,
   prepareOrder,
   prepareOrderCancellation,

@@ -3,7 +3,7 @@ import { Offer } from '../ledger'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
-interface TakerAmount {
+export interface TakerAmount {
   currency: string
   issuer?: string
 }
@@ -18,7 +18,7 @@ export interface BookOffersRequest extends BaseRequest {
   taker_pays: TakerAmount
 }
 
-interface BookOffer extends Offer {
+export interface BookOffer extends Offer {
   owner_funds?: string
   taker_gets_funded?: Amount
   taker_pays_funded?: Amount
