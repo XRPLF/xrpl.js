@@ -20,7 +20,7 @@ import {
   decodeXAddress,
 } from 'ripple-address-codec'
 
-import { constants, errors, txFlags, ensureClassicAddress } from '../sugar'
+import { ensureClassicAddress } from '../sugar/utils'
 import { ValidationError, XrplError } from '../common/errors'
 import getFee from '../sugar/fee'
 import autofill from '../sugar/autofill'
@@ -114,6 +114,9 @@ import {
   ConnectionUserOptions,
   INTENTIONAL_DISCONNECT_CODE,
 } from './connection'
+import * as errors from '../common/errors'
+import * as constants from '../common/constants'
+import { txFlags } from '../common/txflags'
 
 export interface ClientOptions extends ConnectionUserOptions {
   feeCushion?: number
