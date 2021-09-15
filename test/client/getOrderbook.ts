@@ -53,9 +53,7 @@ function isBTC(currency: string) {
   )
 }
 
-function normalRippledResponse(
-  request: BookOffersRequest,
-): Record<string, unknown> {
+function normalRippledResponse(request: BookOffersRequest): object {
   if (
     isBTC(request.taker_gets.currency) &&
     isUSD(request.taker_pays.currency)
@@ -85,9 +83,8 @@ describe('client.getOrderbook', function () {
   beforeEach(setupClient)
   afterEach(teardownClient)
 
-  // eslint-disable-next-line mocha/no-setup-in-describe -- Rule does not allow dynamic test generation.
-  addressTests.forEach(function (testCase) {
-    describe(testCase.type, function () {
+  addressTests.forEach(function (test) {
+    describe(test.type, function () {
       it('normal', async function () {
         this.mockRippled.addResponse('book_offers', normalRippledResponse)
         const response = await this.client.getOrderbook(

@@ -569,6 +569,8 @@ class Client extends EventEmitter {
   public static decodeXAddress = decodeXAddress
 
   public txFlags = txFlags
+  public static txFlags = txFlags
+  public accountSetFlags = constants.AccountSetFlags
   public static accountSetFlags = constants.AccountSetFlags
 }
 
