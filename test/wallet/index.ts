@@ -7,6 +7,9 @@ import Wallet from '../../src/wallet'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 
+const { sign: REQUEST_FIXTURES } = requests
+const { sign: RESPONSE_FIXTURES } = responses
+
 /**
  * Wallet testing.
  *
@@ -188,15 +191,18 @@ describe('Wallet', function () {
     const privateKey =
       '00141BA006D3363D2FB2785E8DF4E44D3A49908780CB4FB51F6D217C08C021429F'
     const address = 'rhvh5SrgBL5V8oeV9EpDuVszeJSSCEkbPc'
+    let wallet
+    let wallet2
+    let wallet3
 
-    const { sign: REQUEST_FIXTURES } = requests
-    const { sign: RESPONSE_FIXTURES } = responses
-    const wallet = Wallet.fromSeed('ss1x3KLrSvfg7irFc1D929WXZ7z9H')
-    const wallet2 = Wallet.fromSeed('shsWGZcmZz6YsWWmcnpfr6fLTdtFV')
-    const wallet3 = new Wallet(
-      '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8',
-      '00ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A',
-    )
+    this.beforeAll(function () {
+      wallet = Wallet.fromSeed('ss1x3KLrSvfg7irFc1D929WXZ7z9H')
+      wallet2 = Wallet.fromSeed('shsWGZcmZz6YsWWmcnpfr6fLTdtFV')
+      wallet3 = new Wallet(
+        '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8',
+        '00ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A',
+      )
+    })
 
     it('signs a transaction offline', function () {
       const txJSON: Payment = {
