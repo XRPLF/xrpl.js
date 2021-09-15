@@ -240,7 +240,7 @@ describe('client.sign', function () {
 
     assert.throws(() => {
       this.client.sign(request.txJSON, secret)
-    }, /Fee" should not exceed "2000000"\. To use a higher fee, set `maxFeeXRP` in the Client constructor\./)
+    }, /Fee" should not exceed "2000000"\. To use a higher fee, set `maxFeeXRP` in the Client constructor\./u)
   })
 
   it('throws when Fee exceeds maxFeeXRP (in drops) - custom maxFeeXRP', async function () {
@@ -257,7 +257,7 @@ describe('client.sign', function () {
 
     assert.throws(() => {
       this.client.sign(request.txJSON, secret)
-    }, /Fee" should not exceed "1900000"\. To use a higher fee, set `maxFeeXRP` in the Client constructor\./)
+    }, /Fee" should not exceed "1900000"\. To use a higher fee, set `maxFeeXRP` in the Client constructor\./u)
   })
 
   it('sign with paths', async function () {
@@ -329,7 +329,7 @@ describe('client.sign', function () {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     assert.throws(() => {
       this.client.sign(JSON.stringify(payment), secret)
-    }, /^1.1234567 is an illegal amount/)
+    }, /^1.1234567 is an illegal amount/u)
   })
 
   it('throws when encoded tx does not match decoded tx - prepared order', async function () {
