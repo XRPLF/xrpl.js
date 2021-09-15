@@ -51,6 +51,7 @@ async function submitSignedTransaction(
   const request: SubmitRequest = {
     command: 'submit',
     tx_blob: signedTxEncoded,
+    fail_hard: true,
   }
   return this.request(request)
 }
