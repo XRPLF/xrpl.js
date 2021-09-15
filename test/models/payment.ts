@@ -1,8 +1,7 @@
 import { assert } from 'chai'
 
-import { ValidationError } from 'xrpl-local/common/errors'
-
 import { validatePayment, validate, PaymentTransactionFlags } from 'xrpl-local'
+import { ValidationError } from 'xrpl-local/common/errors'
 
 /**
  * PaymentTransaction Verification Testing.

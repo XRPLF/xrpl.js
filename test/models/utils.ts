@@ -12,6 +12,7 @@ import {
   TrustSet,
   TrustSetTransactionFlags,
 } from 'xrpl-local'
+
 import {
   isFlagEnabled,
   setTransactionFlagsToNumber,
