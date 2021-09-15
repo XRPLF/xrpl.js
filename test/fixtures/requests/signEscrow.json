@@ -10,11 +10,5 @@
     "LastLedgerSequence":102,
     "Fee":"12",
     "Sequence":1
-  },
-
-    "instructions": {
-    "fee": "0.000012",
-    "sequence": 1,
-    "maxLedgerVersion": 102
   }
 }
