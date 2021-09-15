@@ -19,7 +19,6 @@ import {
 import ECDSA from '../common/ecdsa'
 import { ValidationError } from '../common/errors'
 import { Transaction } from '../models/transactions'
-import { SignOptions } from '../transaction/types'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
@@ -151,19 +150,43 @@ class Wallet {
    * Signs a transaction offline.
    *
    * @param transaction - A transaction to be signed offline.
-   * @param options - Options to include for signing.
+   * @param signAs - An account corresponding to the multi-signature being added.
    * @returns A signed transaction.
    */
   public signTransaction(
     transaction: Transaction,
-    options: SignOptions = { signAs: '' },
+    signAs: string = '',
   ): string {
-    return signWithKeypair(
-      JSON.stringify(transaction),
-      this.publicKey,
-      this.privateKey,
-      options,
-    )
+    if (transaction.TxnSignature || transaction.Signers) {
+      throw new ValidationError(
+        'txJSON must not contain "TxnSignature" or "Signers" properties',
+      )
+    }
+
+    const txToSignAndEncode = { ...transaction }
+
+    txToSignAndEncode.SigningPubKey = signAs ? '' : this.publicKey
+
+    if (signAs) {
+      const signer = {
+        Account: signAs,
+        SigningPubKey: this.publicKey,
+        TxnSignature: this.computeSignature(
+          txToSignAndEncode,
+          this.privateKey,
+          signAs,
+        ),
+      }
+      txToSignAndEncode.Signers = [{ Signer: signer }]
+    } else {
+      txToSignAndEncode.TxnSignature = this.computeSignature(
+        txToSignAndEncode,
+        this.privateKey,
+      )
+    }
+    const serialized = encode(txToSignAndEncode)
+    this.checkTxSerialization(serialized, transaction)
+    return serialized
   }
 
   /**
@@ -198,113 +221,72 @@ class Wallet {
   public getClassicAddress(): string {
     return deriveAddress(this.publicKey)
   }
-}
 
-function signWithKeypair(
-  txJSON: string,
-  publicKey: string,
-  privateKey: string,
-  options: SignOptions = {
-    signAs: '',
-  },
-): string {
-  const tx = JSON.parse(txJSON)
-  if (tx.TxnSignature || tx.Signers) {
-    throw new ValidationError(
-      'txJSON must not contain "TxnSignature" or "Signers" properties',
+  /**
+   *  Decode a serialized transaction, remove the fields that are added during the signing process,
+   *  and verify that it matches the transaction prior to signing. This gives the user a sanity check
+   *  to ensure that what they try to encode matches the message that will be recieved by rippled.
+   *
+   * @param serialized - A signed and serialized transaction.
+   * @param tx - The transaction prior to signing.
+   *
+   * @returns This method does not return a value
+   * @throws a ValidationError if the transaction does not have a TxnSignature/Signers property, or an AssertionError if
+   * the serialized Transaction desn't match the original transaction.
+   */
+  private checkTxSerialization(serialized: string, tx: Transaction): void {
+    // Decode the serialized transaction:
+    const decoded = decode(serialized)
+
+    // ...And ensure it is equal to the original tx, except:
+    // - It must have a TxnSignature or Signers (multisign).
+    if (!decoded.TxnSignature && !decoded.Signers) {
+      throw new ValidationError(
+        'Serialized transaction must have a TxnSignature or Signers property',
+      )
+    }
+    // - We know that the original tx did not have TxnSignature, so we should delete it:
+    delete decoded.TxnSignature
+    // - We know that the original tx did not have Signers, so if it exists, we should delete it:
+    delete decoded.Signers
+
+    // - If SigningPubKey was not in the original tx, then we should delete it.
+    //   But if it was in the original tx, then we should ensure that it has not been changed.
+    if (!tx.SigningPubKey) {
+      delete decoded.SigningPubKey
+    }
+
+    // - Memos have exclusively hex data which should ignore case.
+    //   Since decode goes to upper case, we set all tx memos to be uppercase for the comparison.
+    tx.Memos?.map((memo) => {
+      if (memo.Memo.MemoData) {
+        memo.Memo.MemoData = memo.Memo.MemoData.toUpperCase()
+      }
+
+      if (memo.Memo.MemoType) {
+        memo.Memo.MemoType = memo.Memo.MemoType.toUpperCase()
+      }
+
+      if (memo.Memo.MemoFormat) {
+        memo.Memo.MemoFormat = memo.Memo.MemoFormat.toUpperCase()
+      }
+
+      return memo
+    })
+
+    assert.deepEqual(
+      decoded as unknown as Transaction,
+      tx,
+      'Serialized transaction does not match the original transaction.',
     )
   }
 
-  const txToSignAndEncode = { ...tx }
-
-  txToSignAndEncode.SigningPubKey = options.signAs ? '' : publicKey
-
-  if (options.signAs) {
-    const signer = {
-      Account: options.signAs,
-      SigningPubKey: publicKey,
-      TxnSignature: computeSignature(
-        txToSignAndEncode,
-        privateKey,
-        options.signAs,
-      ),
-    }
-    txToSignAndEncode.Signers = [{ Signer: signer }]
-  } else {
-    txToSignAndEncode.TxnSignature = computeSignature(
-      txToSignAndEncode,
-      privateKey,
-    )
+  private computeSignature(tx: object, privateKey: string, signAs?: string) {
+    const signingData = signAs
+      ? encodeForMultisigning(tx, signAs)
+      : encodeForSigning(tx)
+    return sign(signingData, privateKey)
   }
-  const serialized = encode(txToSignAndEncode)
-  checkTxSerialization(serialized, tx)
-  return serialized
-}
-
-/**
- *  Decode a serialized transaction, remove the fields that are added during the signing process,
- *  and verify that it matches the transaction prior to signing. This gives the user a sanity check
- *  to ensure that what they try to encode matches the message that will be recieved by rippled.
- *
- * @param serialized - A signed and serialized transaction.
- * @param tx - The transaction prior to signing.
- *
- * @returns This method does not return a value
- * @throws a ValidationError if the transaction does not have a TxnSignature/Signers property, or an AssertionError if
- * the serialized Transaction desn't match the original transaction.
- */
-function checkTxSerialization(serialized: string, tx: Transaction): void {
-  // Decode the serialized transaction:
-  const decoded = decode(serialized)
-
-  // ...And ensure it is equal to the original tx, except:
-  // - It must have a TxnSignature or Signers (multisign).
-  if (!decoded.TxnSignature && !decoded.Signers) {
-    throw new ValidationError(
-      'Serialized transaction must have a TxnSignature or Signers property',
-    )
-  }
-  // - We know that the original tx did not have TxnSignature, so we should delete it:
-  delete decoded.TxnSignature
-  // - We know that the original tx did not have Signers, so if it exists, we should delete it:
-  delete decoded.Signers
-
-  // - If SigningPubKey was not in the original tx, then we should delete it.
-  //   But if it was in the original tx, then we should ensure that it has not been changed.
-  if (!tx.SigningPubKey) {
-    delete decoded.SigningPubKey
-  }
-
-  // - Memos have exclusively hex data which should ignore case.
-  //   Since decode goes to upper case, we set all tx memos to be uppercase for the comparison.
-  tx.Memos?.map((memo) => {
-    if (memo.Memo.MemoData) {
-      memo.Memo.MemoData = memo.Memo.MemoData.toUpperCase()
-    }
-
-    if (memo.Memo.MemoType) {
-      memo.Memo.MemoType = memo.Memo.MemoType.toUpperCase()
-    }
-
-    if (memo.Memo.MemoFormat) {
-      memo.Memo.MemoFormat = memo.Memo.MemoFormat.toUpperCase()
-    }
-
-    return memo
-  })
-
-  assert.deepEqual(
-    decoded as unknown as Transaction,
-    tx,
-    'Serialized transaction does not match the original transaction.',
-  )
-}
-
-function computeSignature(tx: object, privateKey: string, signAs?: string) {
-  const signingData = signAs
-    ? encodeForMultisigning(tx, signAs)
-    : encodeForSigning(tx)
-  return sign(signingData, privateKey)
 }
 
 export default Wallet

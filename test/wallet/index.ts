@@ -211,7 +211,6 @@ describe('Wallet', function () {
       const wallet = new Wallet(publicKey, privateKey)
       const signedTx: string = wallet.signTransaction(txJSON)
 
-      // TODO: Check the output of the signature against a known result
       assert.isString(signedTx)
     })
 
@@ -267,9 +266,7 @@ describe('Wallet', function () {
       const wallet = Wallet.fromSeed(secret)
       const signature = wallet.signTransaction(
         txJSON as unknown as Transaction,
-        {
-          signAs: wallet.getClassicAddress(),
-        },
+        wallet.getClassicAddress(),
       )
       assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
     })
@@ -308,9 +305,7 @@ describe('Wallet', function () {
         '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
         '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
       )
-      const signature = wallet.signTransaction(tx, {
-        signAs: wallet.getClassicAddress(),
-      })
+      const signature = wallet.signTransaction(tx, wallet.getClassicAddress())
       assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
     })
 
