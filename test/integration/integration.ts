@@ -69,10 +69,7 @@ describe('integration tests', function () {
     const signed1 = sign(signerWallet1, accountSetTx, true)
     const signed2 = sign(signerWallet2, accountSetTx, true)
     const combined = multisign([signed1, signed2])
-    const submitResponse = await client.request({
-      command: 'submit',
-      tx_blob: combined,
-    })
+    const submitResponse = await client.submitSignedTransaction(combined)
     await ledgerAccept(client)
     assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
     await verifySubmittedTransaction(this.client, combined)
