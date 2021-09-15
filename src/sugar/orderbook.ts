@@ -8,8 +8,7 @@ import {
   BookOffersRequest,
   TakerAmount,
 } from '../models/methods/bookOffers'
-
-import { orderFlags } from './parse/flags'
+import { OfferCreateTransactionFlags } from '../models/transactions'
 
 function sortOffers(offers: BookOffer[]): BookOffer[] {
   return offers.sort((offerA, offerB) => {
@@ -82,7 +81,7 @@ async function getOrderbook(
   const buy: BookOffer[] = []
   const sell: BookOffer[] = []
   orders.forEach((order) => {
-    if (order.Flags === orderFlags.Sell) {
+    if (order.Flags === OfferCreateTransactionFlags.tfSell) {
       sell.push(order)
     } else {
       buy.push(order)
