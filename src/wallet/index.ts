@@ -168,7 +168,7 @@ class Wallet {
    */
   public signTransaction(
     transaction: Transaction,
-    multisignAddress = '',
+    multisignAddress?: string,
   ): string {
     if (transaction.TxnSignature || transaction.Signers) {
       throw new ValidationError(
