@@ -84,7 +84,7 @@ async function getOrderbook(
   const buy: BookOffer[] = []
   const sell: BookOffer[] = []
   orders.forEach((order) => {
-    if (order.Flags === SELL_OFFER_FLAGS) {
+    if ((order.Flags & SELL_OFFER_FLAGS) !== 0) {
       sell.push(order)
     } else {
       buy.push(order)
