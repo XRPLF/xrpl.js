@@ -1,9 +1,8 @@
 import assert from 'assert'
 
 import _ from 'lodash'
-import { decode } from 'ripple-binary-codec'
 
-import { Client, Wallet, Transaction } from 'xrpl-local'
+import { Client, Wallet } from 'xrpl-local'
 import { AccountSet, SignerListSet } from 'xrpl-local/models/transactions'
 import { convertStringToHex } from 'xrpl-local/utils'
 import { sign, multisign } from 'xrpl-local/wallet/signer'
@@ -41,12 +40,6 @@ describe('integration tests', function () {
     const signer2secret = 'shUHQnL4EH27V4EiBrj6EfhWvZngF'
     await fundAccount(client, multisignAccount)
 
-    const ledgerResponse = await client.request({
-      command: 'ledger',
-      ledger_index: 'validated',
-    })
-    const minLedgerVersion = ledgerResponse.result.ledger_index
-
     // set up the multisigners for the account
     const signerListSet: SignerListSet = {
       TransactionType: 'SignerListSet',
@@ -68,13 +61,7 @@ describe('integration tests', function () {
       SignerQuorum: 2,
     }
     const tx = await client.autofill(signerListSet, 2)
-    await testTransaction(
-      this,
-      minLedgerVersion,
-      tx,
-      multisignAccount,
-      multisignSecret,
-    )
+    await testTransaction(this.client, tx, Wallet.fromSecret(multisignSecret))
 
     // try to multisign
     const accountSet: AccountSet = {
@@ -86,18 +73,12 @@ describe('integration tests', function () {
     const signed1 = sign(Wallet.fromSeed(signer1secret), accountSetTx, true)
     const signed2 = sign(Wallet.fromSeed(signer2secret), accountSetTx, true)
     const combined = multisign([signed1, signed2])
-    // TODO: replace with `client.submitSignedTransaction`
     const submitResponse = await client.request({
       command: 'submit',
       tx_blob: combined,
     })
     await ledgerAccept(client)
     assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
-    const options = { minLedgerVersion }
-    await verifySubmittedTransaction(
-      this,
-      decode(combined) as unknown as Transaction,
-      options,
-    )
+    await verifySubmittedTransaction(this.client, combined)
   })
 })

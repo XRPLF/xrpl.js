@@ -11,8 +11,7 @@ import {
 } from 'xrpl-local/models/transactions'
 import { computeSignedTransactionHash } from 'xrpl-local/utils/hashes'
 import { sign } from 'xrpl-local/wallet/signer'
-
-import { walletAddress, walletSecret } from './wallet'
+import { wallet as defaultWallet } from './wallet'
 
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
@@ -59,16 +58,13 @@ export async function fundAccount(
 }
 
 export async function verifySubmittedTransaction(
-  testcase: Mocha.Context,
-  tx: Transaction,
-  options: { minLedgerVersion: number; maxLedgerVersion?: number },
+  client: Client,
+  tx: Transaction | string,
 ): Promise<void> {
   const hash = computeSignedTransactionHash(tx)
-  const data = await testcase.client.request({
+  const data = await client.request({
     command: 'tx',
     transaction: hash,
-    min_ledger: options.minLedgerVersion,
-    max_ledger: options.maxLedgerVersion,
   })
 
   assert(data.result)
@@ -81,46 +77,30 @@ export async function verifySubmittedTransaction(
       'meta',
       'validated',
     ]),
-    tx,
+    typeof tx === 'string' ? decode(tx) : tx,
   )
   if (typeof data.result.meta === 'object') {
     assert.strictEqual(data.result.meta.TransactionResult, 'tesSUCCESS')
   } else {
     assert.strictEqual(data.result.meta, 'tesSUCCESS')
   }
-  if (testcase.transactions != null) {
-    testcase.transactions.push(hash)
-  }
 }
 
 export async function testTransaction(
-  testcase: Mocha.Context,
-  lastClosedLedgerVersion: number,
-  txData: Transaction,
-  address = walletAddress,
-  secret = walletSecret,
+  client: Client,
+  transaction: Transaction,
+  wallet: Wallet = defaultWallet,
 ): Promise<void> {
-  assert.strictEqual(txData.Account, address)
-  const client: Client = testcase.client
-  const signedData = sign(Wallet.fromSeed(secret), txData)
+  // sign/submit the transaction
+  const response = await client.submitTransaction(wallet, transaction)
 
-  const attemptedResponse = await client.request({
-    command: 'submit',
-    tx_blob: signedData,
-  })
-  const submittedResponse = testcase.test?.title.includes('multisign')
-    ? await ledgerAccept(client).then(() => attemptedResponse)
-    : attemptedResponse
+  // check that the transaction was successful
+  assert.equal(response.status, 'success')
+  assert.equal(response.type, 'response')
+  assert.equal(response.result.engine_result, 'tesSUCCESS')
 
-  assert.strictEqual(submittedResponse.result.engine_result, 'tesSUCCESS')
-  const options = {
-    minLedgerVersion: lastClosedLedgerVersion,
-    maxLedgerVersion: txData.LastLedgerSequence,
-  }
-  await ledgerAccept(testcase.client)
-  await verifySubmittedTransaction(
-    testcase,
-    decode(signedData) as unknown as Transaction,
-    options,
-  )
+  // check that the transaction is on the ledger
+  const signedTx = _.omit(response.result.tx_json, 'hash')
+  await ledgerAccept(client)
+  await verifySubmittedTransaction(client, signedTx as Transaction)
 }

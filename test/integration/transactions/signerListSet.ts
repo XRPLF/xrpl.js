@@ -1,10 +1,9 @@
-import { assert } from 'chai'
 import _ from 'lodash'
-import { Client } from 'xrpl-local'
 import { SignerListSet } from 'xrpl-local/models/transactions'
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { testTransaction } from '../utils'
 import { wallet } from '../wallet'
 
 // how long before each test case times out
@@ -18,7 +17,6 @@ describe('SignerListSet', function () {
   afterEach(teardownClient)
 
   it('base', async function () {
-    const client: Client = this.client
     const tx: SignerListSet = {
       TransactionType: 'SignerListSet',
       Account: wallet.getClassicAddress(),
@@ -38,7 +36,6 @@ describe('SignerListSet', function () {
       ],
       SignerQuorum: 2,
     }
-    const response = await client.submitTransaction(wallet, tx)
-    assert.equal(response.status, 'success')
+    await testTransaction(this.client, tx, wallet)
   })
 })
