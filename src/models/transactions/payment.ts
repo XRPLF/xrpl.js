@@ -17,18 +17,49 @@ export enum PaymentTransactionFlags {
 }
 
 export interface PaymentFlagsInterface extends GlobalFlags {
+  /** Do not use the default path; only use paths included in the Paths field.
+   * This is intended to force the transaction to take arbitrage opportunities.
+   * Most clients do not need this. */
   tfNoDirectRipple?: boolean
+  /** If the specified Amount cannot be sent without spending more than SendMax,
+   * reduce the received amount instead of failing outright. See Partial
+   * Payments for more details. */
   tfPartialPayment?: boolean
+  /** Only take paths where all the conversions have an input:output ratio that
+   * is equal or better than the ratio of Amount:SendMax. See Limit Quality for
+   * details. */
   tfLimitQuality?: boolean
 }
+
+/** A Payment transaction represents a transfer of value from one account to
+ * another. */
 export interface Payment extends BaseTransaction {
   TransactionType: 'Payment'
+  /** The amount of currency to deliver. For non-XRP amounts, the nested field
+   * names MUST be lower-case. If the tfPartialPayment flag is set, deliver up
+   * to this amount instead. */
   Amount: Amount
+  /** The unique address of the account receiving the payment. */
   Destination: string
+  /** Arbitrary tag that identifies the reason for the payment to the
+   * destination, or a hosted recipient to pay. */
   DestinationTag?: number
+  /** Arbitrary 256-bit hash representing a specific reason or identifier for
+   * this payment. */
   InvoiceID?: string
+  /** Array of payment paths to be used for this transaction. Must be omitted
+   * for XRP-to-XRP transactions. */
   Paths?: Path[]
+  /** Highest amount of source currency this transaction is allowed to cost,
+   * including transfer fees, exchange rates, and slippage . Does not include
+   * the XRP destroyed as a cost for submitting the transaction. For non-XRP
+   * amounts, the nested field names MUST be lower-case. Must be supplied for
+   * cross-currency/cross-issue payments. Must be omitted for XRP-to-XRP
+   * payments. */
   SendMax?: Amount
+  /** Minimum amount of destination currency this transaction should deliver.
+   * Only valid if this is a partial payment. For non-XRP amounts, the nested
+   * field names are lower-case. */
   DeliverMin?: Amount
   Flags?: number | PaymentFlagsInterface
 }
