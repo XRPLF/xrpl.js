@@ -250,6 +250,7 @@ class Wallet {
   private checkTxSerialization(serialized: string, tx: Transaction): void {
     // Decode the serialized transaction:
     const decoded = decode(serialized)
+    const txCopy = { ...tx }
 
     // ...And ensure it is equal to the original tx, except:
     // - It must have a TxnSignature or Signers (multisign).
@@ -271,7 +272,7 @@ class Wallet {
 
     // - Memos have exclusively hex data which should ignore case.
     //   Since decode goes to upper case, we set all tx memos to be uppercase for the comparison.
-    tx.Memos?.map((memo) => {
+    txCopy.Memos?.map((memo) => {
       if (memo.Memo.MemoData) {
         memo.Memo.MemoData = memo.Memo.MemoData.toUpperCase()
       }
@@ -290,7 +291,7 @@ class Wallet {
     try {
       assert.deepEqual(
         decoded as unknown as Transaction,
-        tx,
+        txCopy,
         'Serialized transaction does not match the original transaction.',
       )
     } catch (error: unknown) {
