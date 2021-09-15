@@ -2,7 +2,7 @@ import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec/dist'
 
 import ECDSA from '../../src/common/ecdsa'
-import { Payment, Transaction } from '../../src/models/transactions'
+import { Transaction } from '../../src/models/transactions'
 import Wallet from '../../src/wallet'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
@@ -186,11 +186,6 @@ describe('Wallet', function () {
   })
 
   describe('signTransaction', function () {
-    const publicKey =
-      '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
-    const privateKey =
-      '00141BA006D3363D2FB2785E8DF4E44D3A49908780CB4FB51F6D217C08C021429F'
-    const address = 'rhvh5SrgBL5V8oeV9EpDuVszeJSSCEkbPc'
     let wallet
     let wallet2
     let wallet3
@@ -204,28 +199,12 @@ describe('Wallet', function () {
       )
     })
 
-    it('signs a transaction offline', function () {
-      const txJSON: Payment = {
-        TransactionType: 'Payment',
-        Account: address,
-        Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
-        Amount: '20000000',
-        Sequence: 1,
-        Fee: '12',
-        SigningPubKey: publicKey,
-      }
-      const wallet = new Wallet(publicKey, privateKey)
-      const signedTx: string = wallet.signTransaction(txJSON)
-
-      assert.isString(signedTx)
-    })
-
-    it('sign', async function () {
+    it('signTransaction successfully', async function () {
       const result = wallet2.signTransaction(REQUEST_FIXTURES.normal.txJSON)
       assert.deepEqual(result, RESPONSE_FIXTURES.normal.signedTransaction)
     })
 
-    it('sign with lowercase hex data in memo (hex should be case insensitive)', async function () {
+    it('signTransaction with lowercase hex data in memo (hex should be case insensitive)', async function () {
       const secret = 'shd2nxpFD6iBRKWsRss2P4tKMWyy9'
       const lowercaseMemoTx: Transaction = {
         TransactionType: 'Payment',
@@ -256,7 +235,7 @@ describe('Wallet', function () {
       )
     })
 
-    it('EscrowFinish', async function () {
+    it('signTransaction with EscrowFinish', async function () {
       const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
       const result = Wallet.fromSeed(secret).signTransaction(
         REQUEST_FIXTURES.escrow.txJSON as unknown as Transaction,
@@ -264,7 +243,7 @@ describe('Wallet', function () {
       assert.deepEqual(result, RESPONSE_FIXTURES.escrow.signedTransaction)
     })
 
-    it('signAs', async function () {
+    it('signTransaction with multisignAddress', async function () {
       const txJSON = REQUEST_FIXTURES.signAs
       const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
       const wallet = Wallet.fromSeed(secret)
@@ -275,12 +254,37 @@ describe('Wallet', function () {
       assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
     })
 
-    it('withKeypair', async function () {
+    it('signTransaction with X Address and no given tag for multisignAddress', async function () {
+      const txJSON = REQUEST_FIXTURES.signAs
+      const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
+      const wallet = Wallet.fromSeed(secret)
+      const signature = wallet.signTransaction(
+        txJSON as unknown as Transaction,
+        wallet.getXAddress(),
+      )
+      assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
+    })
+
+    it('signTransaction with X Address and tag for multisignAddress', async function () {
+      const txJSON = REQUEST_FIXTURES.signAs
+      const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
+      const wallet = Wallet.fromSeed(secret)
+      const signature = wallet.signTransaction(
+        txJSON as unknown as Transaction,
+        wallet.getXAddress(0),
+      )
+      // This is slightly different than RESPONSE_FIXTURES.signAs.signedTransaction due to tag corresponding to a new classicAddress
+      const expectedSignature =
+        '120000240000000261400000003B9ACA00684000000000000032730081142E244E6F20104E57C0C60BD823CB312BF10928C78314B5F762798A53D543A014CAF8B297CFF8F2F937E8F3E010230000000073210330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD02074473045022100BB6FC77F26BC88587204CAA79B2230C420D7EC937B8AC3A0CF9B0BE988BAB0D002203BF86893BA3B764375FFFAD9D54A4AAEDABD07C4D72ADB9C1B20C10B4DD712898114B5F762798A53D543A014CAF8B297CFF8F2F937E8E1F1'
+      assert.deepEqual(signature, expectedSignature)
+    })
+
+    it('signTransaction with a wallet generated from public and private keys', async function () {
       const result = wallet3.signTransaction(REQUEST_FIXTURES.normal.txJSON)
       assert.deepEqual(result, RESPONSE_FIXTURES.normal.signedTransaction)
     })
 
-    it('withKeypair already signed', async function () {
+    it('signTransaction throws when given a transaction that is already signed', async function () {
       const result = wallet3.signTransaction(REQUEST_FIXTURES.normal.txJSON)
       assert.throws(() => {
         const tx = decode(result) as unknown as Transaction
@@ -288,7 +292,7 @@ describe('Wallet', function () {
       }, /txJSON must not contain "TxnSignature" or "Signers" properties/)
     })
 
-    it('withKeypair EscrowExecution', async function () {
+    it('signTransaction with an EscrowExecution transaction', async function () {
       const wallet = new Wallet(
         '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
         '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
@@ -299,7 +303,7 @@ describe('Wallet', function () {
       assert.deepEqual(result, RESPONSE_FIXTURES.escrow.signedTransaction)
     })
 
-    it('withKeypair signAs', async function () {
+    it('signTransaction with multisignAddress and a wallet generated from public and private key', async function () {
       const tx = REQUEST_FIXTURES.signAs as unknown as Transaction
       const wallet = new Wallet(
         '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
@@ -309,14 +313,7 @@ describe('Wallet', function () {
       assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
     })
 
-    it('already signed', async function () {
-      const result = wallet2.signTransaction(REQUEST_FIXTURES.normal.txJSON)
-      assert.throws(() => {
-        wallet.signTransaction(decode(result) as unknown as Transaction)
-      }, /txJSON must not contain "TxnSignature" or "Signers" properties/)
-    })
-
-    it('succeeds - no flags', async function () {
+    it('signTransaction succeeds when given a transaction with no flags', async function () {
       const tx: Transaction = {
         TransactionType: 'Payment',
         Account: 'r45Rev1EXGxy2hAUmJPCne97KUE7qyrD3j',
@@ -338,7 +335,7 @@ describe('Wallet', function () {
       assert.equal(result, expectedResult)
     })
 
-    it('sign succeeds with source.amount/destination.minAmount', async function () {
+    it('signTransaction succeeds with source.amount/destination.minAmount', async function () {
       // See also: 'preparePayment with source.amount/destination.minAmount'
 
       const tx: Transaction = {
@@ -380,7 +377,7 @@ describe('Wallet', function () {
       assert.deepEqual(result, expectedResult)
     })
 
-    it('throws when encoded tx does not match decoded tx - AccountSet', async function () {
+    it('signTransaction throws when encoded tx does not match decoded tx because of illegal small fee', async function () {
       const tx: Transaction = {
         Flags: 2147483648,
         TransactionType: 'AccountSet',
@@ -398,7 +395,7 @@ describe('Wallet', function () {
       }, /1\.2 is an illegal amount/)
     })
 
-    it('throws when encoded tx does not match decoded tx - higher fee', async function () {
+    it('signTransaction throws when encoded tx does not match decoded tx because of illegal higher fee', async function () {
       const tx = {
         Flags: 2147483648,
         TransactionType: 'AccountSet',
@@ -416,7 +413,7 @@ describe('Wallet', function () {
       }, /1123456\.7 is an illegal amount/)
     })
 
-    it('sign with ticket', async function () {
+    it('signTransaction with a ticket transaction', async function () {
       const wallet = Wallet.fromSeed('sn7n5R1cR5Y3fRFkuWXA94Ts1frVJ')
       const result = wallet.signTransaction(
         REQUEST_FIXTURES.ticket.txJSON as unknown as Transaction,
@@ -424,7 +421,7 @@ describe('Wallet', function () {
       assert.deepEqual(result, RESPONSE_FIXTURES.ticket.signedTransaction)
     })
 
-    it('sign with paths', async function () {
+    it('signTransaction with a Payment transaction with paths', async function () {
       const wallet = Wallet.fromSeed('shsWGZcmZz6YsWWmcnpfr6fLTdtFV')
       const payment: Transaction = {
         TransactionType: 'Payment',
@@ -457,7 +454,7 @@ describe('Wallet', function () {
       )
     })
 
-    it('succeeds - prepared payment', async function () {
+    it('signTransaction with a prepared payment', async function () {
       const payment: Transaction = {
         TransactionType: 'Payment',
         Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -474,7 +471,7 @@ describe('Wallet', function () {
       assert.deepEqual(result, expectedResult)
     })
 
-    it('throws when encoded tx does not match decoded tx - prepared payment', async function () {
+    it('signTransaction throws when an illegal amount is provided', async function () {
       const payment: Transaction = {
         TransactionType: 'Payment',
         Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',

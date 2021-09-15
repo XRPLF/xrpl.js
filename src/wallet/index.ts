@@ -1,7 +1,11 @@
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync } from 'bip39'
 import { assert, AssertionError } from 'chai'
-import { classicAddressToXAddress } from 'ripple-address-codec'
+import {
+  classicAddressToXAddress,
+  isValidXAddress,
+  xAddressToClassicAddress,
+} from 'ripple-address-codec'
 import {
   decode,
   encodeForSigning,
@@ -35,6 +39,11 @@ function hexFromBuffer(buffer: Buffer): string {
 class Wallet {
   public readonly publicKey: string
   public readonly privateKey: string
+  /**
+   * This only is correct if this wallet corresponds to your
+   * [master keypair](https://xrpl.org/cryptographic-keys.html#master-key-pair). If this wallet represents a
+   * [regular keypair](https://xrpl.org/cryptographic-keys.html#regular-key-pair) this will provide an incorrect address.
+   */
   public readonly classicAddress: string
   public readonly seed?: string
 
@@ -294,10 +303,15 @@ class Wallet {
   }
 
   private computeSignature(tx: object, privateKey: string, signAs?: string) {
-    const signingData = signAs
-      ? encodeForMultisigning(tx, signAs)
-      : encodeForSigning(tx)
-    return sign(signingData, privateKey)
+    if (signAs) {
+      const classicAddress = isValidXAddress(signAs)
+        ? xAddressToClassicAddress(signAs).classicAddress
+        : signAs
+
+      return sign(encodeForMultisigning(tx, classicAddress), privateKey)
+    } else {
+      return sign(encodeForSigning(tx), privateKey)
+    }
   }
 }
 
