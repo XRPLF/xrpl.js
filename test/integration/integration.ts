@@ -13,7 +13,6 @@ import {
   ledgerAccept,
   testTransaction,
   verifySubmittedTransaction,
-  fundAccount,
 } from './utils'
 
 // how long before each test case times out
@@ -38,7 +37,6 @@ describe('integration tests', function () {
     const signer1secret = 'shK6YXzwYfnFVn3YZSaMh5zuAddKx'
     const signer2address = 'r3RtUvGw9nMoJ5FuHxuoVJvcENhKtuF9ud'
     const signer2secret = 'shUHQnL4EH27V4EiBrj6EfhWvZngF'
-    await fundAccount(client, multisignAccount)
 
     // set up the multisigners for the account
     const signerListSet: SignerListSet = {
@@ -60,8 +58,11 @@ describe('integration tests', function () {
       ],
       SignerQuorum: 2,
     }
-    const tx = await client.autofill(signerListSet, 2)
-    await testTransaction(this.client, tx, Wallet.fromSecret(multisignSecret))
+    await testTransaction(
+      this.client,
+      signerListSet,
+      Wallet.fromSecret(multisignSecret),
+    )
 
     // try to multisign
     const accountSet: AccountSet = {

@@ -11,7 +11,6 @@ import {
 } from 'xrpl-local/models/transactions'
 import { computeSignedTransactionHash } from 'xrpl-local/utils/hashes'
 import { sign } from 'xrpl-local/wallet/signer'
-import { wallet as defaultWallet } from './wallet'
 
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
@@ -89,8 +88,10 @@ export async function verifySubmittedTransaction(
 export async function testTransaction(
   client: Client,
   transaction: Transaction,
-  wallet: Wallet = defaultWallet,
+  wallet: Wallet,
+  accountNeedsFunds: boolean = true,
 ): Promise<void> {
+  if (accountNeedsFunds) await fundAccount(client, wallet.getClassicAddress())
   // sign/submit the transaction
   const response = await client.submitTransaction(wallet, transaction)
 
