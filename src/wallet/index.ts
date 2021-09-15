@@ -1,6 +1,6 @@
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync } from 'bip39'
-import { assert } from 'chai'
+import { assert, AssertionError } from 'chai'
 import { classicAddressToXAddress } from 'ripple-address-codec'
 import {
   decode,
@@ -235,7 +235,7 @@ class Wallet {
    * @param tx - The transaction prior to signing.
    *
    * @returns This method does not return a value
-   * @throws a ValidationError if the transaction does not have a TxnSignature/Signers property, or an AssertionError if
+   * @throws a ValidationError if the transaction does not have a TxnSignature/Signers property, or if
    * the serialized Transaction desn't match the original transaction.
    */
   private checkTxSerialization(serialized: string, tx: Transaction): void {
@@ -278,11 +278,19 @@ class Wallet {
       return memo
     })
 
-    assert.deepEqual(
-      decoded as unknown as Transaction,
-      tx,
-      'Serialized transaction does not match the original transaction.',
-    )
+    try {
+      assert.deepEqual(
+        decoded as unknown as Transaction,
+        tx,
+        'Serialized transaction does not match the original transaction.',
+      )
+    } catch (error: unknown) {
+      if (error instanceof AssertionError) {
+        throw new ValidationError(error.message)
+      } else {
+        throw error
+      }
+    }
   }
 
   private computeSignature(tx: object, privateKey: string, signAs?: string) {
