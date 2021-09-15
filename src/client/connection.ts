@@ -55,52 +55,54 @@ export const INTENTIONAL_DISCONNECT_CODE = 4000
 type WebsocketState = 0 | 1 | 2 | 3
 
 function getAgent(url: string, config: ConnectionOptions): Agent | undefined {
-  if (config.proxy != null) {
-    const parsedURL = new URL(url)
-    const parsedProxyURL = new URL(config.proxy)
-    const proxyInfo = {
-      href: parsedProxyURL.href,
-      origin: parsedProxyURL.origin,
-      protocol: parsedProxyURL.protocol,
-      username: parsedProxyURL.username,
-      password: parsedProxyURL.password,
-      host: parsedProxyURL.host,
-      hostname: parsedProxyURL.hostname,
-      port: parsedProxyURL.port,
-      pathname: parsedProxyURL.pathname,
-      search: parsedProxyURL.search,
-      hash: parsedProxyURL.hash,
-    }
-
-    const proxyOverrides = _.omitBy(
-      {
-        secureEndpoint: parsedURL.protocol === 'wss:',
-        secureProxy: parsedProxyURL.protocol === 'https:',
-        auth: config.proxyAuthorization,
-        ca: config.trustedCertificates,
-        key: config.key,
-        passphrase: config.passphrase,
-        cert: config.certificate,
-      },
-      (value) => value == null,
-    )
-
-    const proxyOptions = {
-      ...proxyInfo,
-      ...proxyOverrides,
-    }
-    let HttpsProxyAgent: new (opt: typeof proxyOptions) => Agent
-    try {
-      // eslint-disable-next-line max-len -- Long eslint-disable-next-line required.
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-require-imports, node/global-require, global-require, -- Necessary for the `require`
-      HttpsProxyAgent = require('https-proxy-agent')
-    } catch (_error) {
-      throw new Error('"proxy" option is not supported in the browser')
-    }
-
-    return new HttpsProxyAgent(proxyOptions)
+  if (config.proxy == null) {
+    return undefined
   }
-  return undefined
+
+  const parsedURL = new URL(url)
+  const parsedProxyURL = new URL(config.proxy)
+
+  const proxy = {
+    href: parsedProxyURL.href,
+    origin: parsedProxyURL.origin,
+    protocol: parsedProxyURL.protocol,
+    username: parsedProxyURL.username,
+    password: parsedProxyURL.password,
+    host: parsedProxyURL.host,
+    hostname: parsedProxyURL.hostname,
+    port: parsedProxyURL.port,
+    pathname: parsedProxyURL.pathname,
+    search: parsedProxyURL.search,
+    hash: parsedProxyURL.hash,
+  }
+
+  const proxyOverrides = _.omitBy(
+    {
+      secureEndpoint: parsedURL.protocol === 'wss:',
+      secureProxy: parsedProxyURL.protocol === 'https:',
+      auth: config.proxyAuthorization,
+      ca: config.trustedCertificates,
+      key: config.key,
+      passphrase: config.passphrase,
+      cert: config.certificate,
+    },
+    (value) => value == null,
+  )
+
+  const proxyOptions = { ...proxy, ...proxyOverrides }
+
+  let HttpsProxyAgent: new (opt: typeof proxyOptions) => Agent
+  try {
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-require-imports,
+      node/global-require, global-require, -- Necessary for the `require` */
+    HttpsProxyAgent = require('https-proxy-agent')
+    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-require-imports,
+      node/global-require, global-require */
+  } catch (_error) {
+    throw new Error('"proxy" option is not supported in the browser')
+  }
+
+  return new HttpsProxyAgent(proxyOptions)
 }
 
 /**
