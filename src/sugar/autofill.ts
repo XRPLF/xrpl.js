@@ -20,13 +20,13 @@ interface ClassicAccountAndTag {
 /**
  * Autofills fields in a transaction.
  *
- * @param client - A client.
+ * @param this - A client.
  * @param transaction - A transaction to autofill fields.
  * @param signersCount - The expected number of signers for this transaction. Used for multisign.
  * @returns An autofilled transaction.
  */
 async function autofill<T extends Transaction>(
-  client: Client,
+  this: Client,
   transaction: T,
   signersCount?: number,
 ): Promise<T> {
@@ -38,13 +38,13 @@ async function autofill<T extends Transaction>(
 
   const promises: Array<Promise<void>> = []
   if (tx.Sequence == null) {
-    promises.push(setNextValidSequenceNumber(client, tx))
+    promises.push(setNextValidSequenceNumber(this, tx))
   }
   if (tx.Fee == null) {
-    promises.push(calculateFeePerTransactionType(client, tx, signersCount))
+    promises.push(calculateFeePerTransactionType(this, tx, signersCount))
   }
   if (tx.LastLedgerSequence == null) {
-    promises.push(setLatestValidatedLedgerSequence(client, tx))
+    promises.push(setLatestValidatedLedgerSequence(this, tx))
   }
 
   return Promise.all(promises).then(() => tx)

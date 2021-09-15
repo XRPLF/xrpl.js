@@ -1,8 +1,6 @@
 /* eslint-disable max-lines -- Connection is a big class */
 import { EventEmitter } from 'events'
 import { Agent } from 'http'
-// eslint-disable-next-line node/no-deprecated-api -- TODO: resolve this
-import { parse as parseURL } from 'url'
 
 import _ from 'lodash'
 import WebSocket from 'ws'
@@ -57,10 +55,23 @@ export const INTENTIONAL_DISCONNECT_CODE = 4000
 type WebsocketState = 0 | 1 | 2 | 3
 
 function getAgent(url: string, config: ConnectionOptions): Agent | undefined {
-  // TODO: replace deprecated method
   if (config.proxy != null) {
-    const parsedURL = parseURL(url)
-    const parsedProxyURL = parseURL(config.proxy)
+    const parsedURL = new URL(url)
+    const parsedProxyURL = new URL(config.proxy)
+    const proxyInfo = {
+      href: parsedProxyURL.href,
+      origin: parsedProxyURL.origin,
+      protocol: parsedProxyURL.protocol,
+      username: parsedProxyURL.username,
+      password: parsedProxyURL.password,
+      host: parsedProxyURL.host,
+      hostname: parsedProxyURL.hostname,
+      port: parsedProxyURL.port,
+      pathname: parsedProxyURL.pathname,
+      search: parsedProxyURL.search,
+      hash: parsedProxyURL.hash,
+    }
+
     const proxyOverrides = _.omitBy(
       {
         secureEndpoint: parsedURL.protocol === 'wss:',
@@ -73,17 +84,21 @@ function getAgent(url: string, config: ConnectionOptions): Agent | undefined {
       },
       (value) => value == null,
     )
-    const proxyOptions = { ...parsedProxyURL, ...proxyOverrides }
-    let HttpsProxyAgent
+
+    const proxyOptions = {
+      ...proxyInfo,
+      ...proxyOverrides,
+    }
+    let HttpsProxyAgent: new (opt: typeof proxyOptions) => Agent
     try {
-      // eslint-disable-next-line max-len -- Long eslint-disable-next-line TODO: figure out how to make this nicer
-      // eslint-disable-next-line import/max-dependencies, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-require-imports, node/global-require, global-require, -- Necessary for the `require`
+      // eslint-disable-next-line max-len -- Long eslint-disable-next-line required.
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-require-imports, node/global-require, global-require, -- Necessary for the `require`
       HttpsProxyAgent = require('https-proxy-agent')
     } catch (_error) {
       throw new Error('"proxy" option is not supported in the browser')
     }
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-call -- Necessary
-    return new HttpsProxyAgent(proxyOptions) as unknown as Agent
+
+    return new HttpsProxyAgent(proxyOptions)
   }
   return undefined
 }
@@ -244,8 +259,9 @@ export class Connection extends EventEmitter {
     this.ws.on('error', () => clearTimeout(connectionTimeoutID))
     this.ws.on('close', (reason) => this.onConnectionFailed(reason))
     this.ws.on('close', () => clearTimeout(connectionTimeoutID))
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises -- TODO: resolve this
-    this.ws.once('open', async () => this.onceOpen(connectionTimeoutID))
+    this.ws.once('open', () => {
+      void this.onceOpen(connectionTimeoutID)
+    })
     return this.connectionManager.awaitConnection()
   }
 
@@ -473,11 +489,9 @@ export class Connection extends EventEmitter {
    */
   private startHeartbeatInterval(): void {
     this.clearHeartbeatInterval()
-    this.heartbeatIntervalID = setInterval(
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises -- TODO: resolve this
-      async () => this.heartbeat(),
-      this.config.timeout,
-    )
+    this.heartbeatIntervalID = setInterval(() => {
+      void this.heartbeat()
+    }, this.config.timeout)
   }
 
   /**

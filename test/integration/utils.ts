@@ -4,11 +4,7 @@ import _ from 'lodash'
 import { decode } from 'ripple-binary-codec'
 
 import { Client, SubmitResponse, Wallet } from 'xrpl-local'
-import {
-  verifyPayment,
-  Payment,
-  Transaction,
-} from 'xrpl-local/models/transactions'
+import { Payment, Transaction } from 'xrpl-local/models/transactions'
 import { computeSignedTransactionHash } from 'xrpl-local/utils/hashes'
 import { sign } from 'xrpl-local/wallet/signer'
 
@@ -46,7 +42,6 @@ export async function fundAccount(
     Amount: '400000000',
   }
   const paymentTx = await client.autofill(payment)
-  verifyPayment(paymentTx)
 
   const response = await submitTransaction(client, masterSecret, paymentTx)
   if (response.result.engine_result !== 'tesSUCCESS') {
