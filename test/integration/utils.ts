@@ -72,11 +72,7 @@ export async function testTransaction(
   client: Client,
   transaction: Transaction,
   wallet: Wallet,
-  accountNeedsFunds = true,
 ): Promise<void> {
-  if (accountNeedsFunds) {
-    await fundAccount(client, wallet)
-  }
   // sign/submit the transaction
   const response = await client.submitTransaction(wallet, transaction)
 
