@@ -3,7 +3,7 @@ import { decode, encode } from 'ripple-binary-codec/dist'
 import { JsonObject } from 'ripple-binary-codec/dist/types/serialized-type'
 
 import { ValidationError } from '../../src/common/errors'
-import { Transaction } from '../../src/models/transactions'
+import { Transaction } from 'xrpl-local'
 import Wallet from '../../src/wallet'
 import {
   sign,

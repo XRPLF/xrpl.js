@@ -1,11 +1,6 @@
 import { assert } from 'chai'
 
-import {
-  AccountDelete,
-  EscrowFinish,
-  Payment,
-  Transaction,
-} from '../../src/models/transactions'
+import { AccountDelete, EscrowFinish, Payment, Transaction } from 'xrpl-local'
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
 

@@ -6,7 +6,7 @@ import { encode } from 'ripple-binary-codec'
 
 import { ValidationError } from 'xrpl-local/common/errors'
 
-import { OfferCreate, Transaction } from '../../src/models/transactions'
+import { OfferCreate, Transaction } from 'xrpl-local'
 import {
   computeStateTreeHash,
   computeTransactionTreeHash,

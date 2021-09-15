@@ -9,7 +9,7 @@ export * from './common/types/objects/ledger'
 
 export * from './models/methods'
 
-export * from './models/methods'
+export * from './models/transactions'
 
 export * from './utils'
 
