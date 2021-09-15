@@ -1,6 +1,6 @@
-/* eslint-disable max-lines-per-function -- Necessary for verifyBaseTransaction */
-/* eslint-disable complexity -- Necessary for verifyBaseTransaction */
-/* eslint-disable max-statements -- Necessary for verifyBaseTransaction */
+/* eslint-disable max-lines-per-function -- Necessary for validateBaseTransaction */
+/* eslint-disable complexity -- Necessary for validateBaseTransaction */
+/* eslint-disable max-statements -- Necessary for validateBaseTransaction */
 import { ValidationError } from '../../common/errors'
 import { Memo, Signer } from '../common'
 import { onlyHasFields } from '../utils'
@@ -121,14 +121,14 @@ export interface BaseTransaction {
 }
 
 /**
- * Verify the common fields of a transaction. The verify functionality will be
+ * Verify the common fields of a transaction. The validate functionality will be
  * optional, and will check transaction form at runtime. This should be called
  * any time a transaction will be verified.
  *
  * @param common - An interface w/ common transaction fields.
  * @throws When the common param is malformed.
  */
-export function verifyBaseTransaction(common: Record<string, unknown>): void {
+export function validateBaseTransaction(common: Record<string, unknown>): void {
   if (common.Account === undefined) {
     throw new ValidationError('BaseTransaction: missing field Account')
   }

@@ -1,6 +1,6 @@
 import { ValidationError } from '../../common/errors'
 
-import { BaseTransaction, verifyBaseTransaction } from './common'
+import { BaseTransaction, validateBaseTransaction } from './common'
 
 export interface TicketCreate extends BaseTransaction {
   TransactionType: 'TicketCreate'
@@ -15,8 +15,8 @@ const MAX_TICKETS = 250
  * @param tx - A TicketCreate Transaction.
  * @throws When the TicketCreate is malformed.
  */
-export function verifyTicketCreate(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx)
+export function validateTicketCreate(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
   const { TicketCount } = tx
 
   if (TicketCount === undefined) {

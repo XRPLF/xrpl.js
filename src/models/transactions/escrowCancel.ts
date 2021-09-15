@@ -1,6 +1,6 @@
 import { ValidationError } from '../../common/errors'
 
-import { BaseTransaction, verifyBaseTransaction } from './common'
+import { BaseTransaction, validateBaseTransaction } from './common'
 
 export interface EscrowCancel extends BaseTransaction {
   TransactionType: 'EscrowCancel'
@@ -14,8 +14,8 @@ export interface EscrowCancel extends BaseTransaction {
  * @param tx - An EscrowCancel Transaction.
  * @throws When the EscrowCancel is Malformed.
  */
-export function verifyEscrowCancel(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx)
+export function validateEscrowCancel(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
 
   if (tx.Owner === undefined) {
     throw new ValidationError('EscrowCancel: missing Owner')

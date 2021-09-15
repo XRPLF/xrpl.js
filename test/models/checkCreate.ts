@@ -2,8 +2,8 @@ import { assert } from 'chai'
 
 import { ValidationError } from 'xrpl-local/common/errors'
 
-import { verify } from '../../src/models/transactions'
-import { verifyCheckCreate } from '../../src/models/transactions/checkCreate'
+import { validate } from '../../src/models/transactions'
+import { validateCheckCreate } from '../../src/models/transactions/checkCreate'
 
 /**
  * CheckCreate Transaction Verification Testing.
@@ -24,8 +24,8 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assert.doesNotThrow(() => verifyCheckCreate(validCheck))
-    assert.doesNotThrow(() => verify(validCheck))
+    assert.doesNotThrow(() => validateCheckCreate(validCheck))
+    assert.doesNotThrow(() => validate(validCheck))
   })
 
   it(`throws w/ invalid Destination`, function () {
@@ -42,12 +42,12 @@ describe('CheckCreate', function () {
     } as any
 
     assert.throws(
-      () => verifyCheckCreate(invalidDestination),
+      () => validateCheckCreate(invalidDestination),
       ValidationError,
       'CheckCreate: invalid Destination',
     )
     assert.throws(
-      () => verify(invalidDestination),
+      () => validate(invalidDestination),
       ValidationError,
       'CheckCreate: invalid Destination',
     )
@@ -67,12 +67,12 @@ describe('CheckCreate', function () {
     } as any
 
     assert.throws(
-      () => verifyCheckCreate(invalidSendMax),
+      () => validateCheckCreate(invalidSendMax),
       ValidationError,
       'CheckCreate: invalid SendMax',
     )
     assert.throws(
-      () => verify(invalidSendMax),
+      () => validate(invalidSendMax),
       ValidationError,
       'CheckCreate: invalid SendMax',
     )
@@ -92,12 +92,12 @@ describe('CheckCreate', function () {
     } as any
 
     assert.throws(
-      () => verifyCheckCreate(invalidDestinationTag),
+      () => validateCheckCreate(invalidDestinationTag),
       ValidationError,
       'CheckCreate: invalid DestinationTag',
     )
     assert.throws(
-      () => verify(invalidDestinationTag),
+      () => validate(invalidDestinationTag),
       ValidationError,
       'CheckCreate: invalid DestinationTag',
     )
@@ -117,12 +117,12 @@ describe('CheckCreate', function () {
     } as any
 
     assert.throws(
-      () => verifyCheckCreate(invalidExpiration),
+      () => validateCheckCreate(invalidExpiration),
       ValidationError,
       'CheckCreate: invalid Expiration',
     )
     assert.throws(
-      () => verify(invalidExpiration),
+      () => validate(invalidExpiration),
       ValidationError,
       'CheckCreate: invalid Expiration',
     )
@@ -141,12 +141,12 @@ describe('CheckCreate', function () {
     } as any
 
     assert.throws(
-      () => verifyCheckCreate(invalidInvoiceID),
+      () => validateCheckCreate(invalidInvoiceID),
       ValidationError,
       'CheckCreate: invalid InvoiceID',
     )
     assert.throws(
-      () => verify(invalidInvoiceID),
+      () => validate(invalidInvoiceID),
       ValidationError,
       'CheckCreate: invalid InvoiceID',
     )

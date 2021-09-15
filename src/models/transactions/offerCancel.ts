@@ -1,6 +1,6 @@
 import { ValidationError } from '../../common/errors'
 
-import { BaseTransaction, verifyBaseTransaction } from './common'
+import { BaseTransaction, validateBaseTransaction } from './common'
 
 export interface OfferCancel extends BaseTransaction {
   TransactionType: 'OfferCancel'
@@ -13,8 +13,8 @@ export interface OfferCancel extends BaseTransaction {
  * @param tx - An OfferCancel Transaction.
  * @throws When the OfferCancel is Malformed.
  */
-export function verifyOfferCancel(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx)
+export function validateOfferCancel(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
 
   if (tx.OfferSequence === undefined) {
     throw new ValidationError('OfferCancel: missing field OfferSequence')

@@ -2,7 +2,7 @@ import { assert } from 'chai'
 
 import { ValidationError } from 'xrpl-local/common/errors'
 
-import { verifyBaseTransaction } from '../../src/models/transactions/common'
+import { validateBaseTransaction } from '../../src/models/transactions/common'
 
 /**
  * Transaction Verification Testing.
@@ -57,7 +57,7 @@ describe('BaseTransaction', function () {
         '3045022100C6708538AE5A697895937C758E99A595B57A16393F370F11B8D4C032E80B532002207776A8E85BB9FAF460A92113B9C60F170CD964196B1F084E0DAB65BAEC368B66',
     }
 
-    assert.doesNotThrow(() => verifyBaseTransaction(txJson))
+    assert.doesNotThrow(() => validateBaseTransaction(txJson))
   })
 
   it(`Verifies only required BaseTransaction`, function () {
@@ -66,7 +66,7 @@ describe('BaseTransaction', function () {
       TransactionType: 'Payment',
     }
 
-    assert.doesNotThrow(() => verifyBaseTransaction(txJson))
+    assert.doesNotThrow(() => validateBaseTransaction(txJson))
   })
 
   it(`Handles invalid Fee`, function () {
@@ -77,7 +77,7 @@ describe('BaseTransaction', function () {
     } as any
 
     assert.throws(
-      () => verifyBaseTransaction(invalidFee),
+      () => validateBaseTransaction(invalidFee),
       ValidationError,
       'BaseTransaction: invalid Fee',
     )
@@ -91,7 +91,7 @@ describe('BaseTransaction', function () {
     } as any
 
     assert.throws(
-      () => verifyBaseTransaction(invalidSeq),
+      () => validateBaseTransaction(invalidSeq),
       ValidationError,
       'BaseTransaction: invalid Sequence',
     )
@@ -105,7 +105,7 @@ describe('BaseTransaction', function () {
     } as any
 
     assert.throws(
-      () => verifyBaseTransaction(invalidID),
+      () => validateBaseTransaction(invalidID),
       ValidationError,
       'BaseTransaction: invalid AccountTxnID',
     )
@@ -119,7 +119,7 @@ describe('BaseTransaction', function () {
     } as any
 
     assert.throws(
-      () => verifyBaseTransaction(invalidLastLedgerSequence),
+      () => validateBaseTransaction(invalidLastLedgerSequence),
       ValidationError,
       'BaseTransaction: invalid LastLedgerSequence',
     )
@@ -133,7 +133,7 @@ describe('BaseTransaction', function () {
     } as any
 
     assert.throws(
-      () => verifyBaseTransaction(invalidSourceTag),
+      () => validateBaseTransaction(invalidSourceTag),
       ValidationError,
       'BaseTransaction: invalid SourceTag',
     )
@@ -147,7 +147,7 @@ describe('BaseTransaction', function () {
     } as any
 
     assert.throws(
-      () => verifyBaseTransaction(invalidSigningPubKey),
+      () => validateBaseTransaction(invalidSigningPubKey),
       ValidationError,
       'BaseTransaction: invalid SigningPubKey',
     )
@@ -161,7 +161,7 @@ describe('BaseTransaction', function () {
     } as any
 
     assert.throws(
-      () => verifyBaseTransaction(invalidTicketSequence),
+      () => validateBaseTransaction(invalidTicketSequence),
       ValidationError,
       'BaseTransaction: invalid TicketSequence',
     )
@@ -175,7 +175,7 @@ describe('BaseTransaction', function () {
     } as any
 
     assert.throws(
-      () => verifyBaseTransaction(invalidTxnSignature),
+      () => validateBaseTransaction(invalidTxnSignature),
       ValidationError,
       'BaseTransaction: invalid TxnSignature',
     )
@@ -189,7 +189,7 @@ describe('BaseTransaction', function () {
     } as any
 
     assert.throws(
-      () => verifyBaseTransaction(invalidSigners),
+      () => validateBaseTransaction(invalidSigners),
       ValidationError,
       'BaseTransaction: invalid Signers',
     )
@@ -207,7 +207,7 @@ describe('BaseTransaction', function () {
     } as any
 
     assert.throws(
-      () => verifyBaseTransaction(invalidSigners2),
+      () => validateBaseTransaction(invalidSigners2),
       ValidationError,
       'BaseTransaction: invalid Signers',
     )
@@ -228,7 +228,7 @@ describe('BaseTransaction', function () {
     } as any
 
     assert.throws(
-      () => verifyBaseTransaction(invalidMemo),
+      () => validateBaseTransaction(invalidMemo),
       ValidationError,
       'BaseTransaction: invalid Memos',
     )

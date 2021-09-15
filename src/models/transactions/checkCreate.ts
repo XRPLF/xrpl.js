@@ -1,10 +1,10 @@
-/* eslint-disable complexity -- Necessary for verifyCheckCreate */
+/* eslint-disable complexity -- Necessary for validateCheckCreate */
 import { ValidationError } from '../../common/errors'
 import { Amount } from '../common'
 
 import {
   BaseTransaction,
-  verifyBaseTransaction,
+  validateBaseTransaction,
   isIssuedCurrency,
 } from './common'
 
@@ -23,8 +23,8 @@ export interface CheckCreate extends BaseTransaction {
  * @param tx - An CheckCreate Transaction.
  * @throws When the CheckCreate is Malformed.
  */
-export function verifyCheckCreate(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx)
+export function validateCheckCreate(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
 
   if (tx.SendMax === undefined) {
     throw new ValidationError('CheckCreate: missing field SendMax')

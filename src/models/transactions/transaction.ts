@@ -7,45 +7,49 @@ import { encode, decode } from 'ripple-binary-codec'
 import { ValidationError } from '../../common/errors'
 import { setTransactionFlagsToNumber } from '../utils'
 
-import { AccountDelete, verifyAccountDelete } from './accountDelete'
+import { AccountDelete, validateAccountDelete } from './accountDelete'
 import {
   AccountSet,
-  verifyAccountSet,
+  validateAccountSet,
   AccountSetFlags,
   AccountSetTransactionFlags,
 } from './accountSet'
-import { CheckCancel, verifyCheckCancel } from './checkCancel'
-import { CheckCash, verifyCheckCash } from './checkCash'
-import { CheckCreate, verifyCheckCreate } from './checkCreate'
-import { DepositPreauth, verifyDepositPreauth } from './depositPreauth'
-import { EscrowCancel, verifyEscrowCancel } from './escrowCancel'
-import { EscrowCreate, verifyEscrowCreate } from './escrowCreate'
-import { EscrowFinish, verifyEscrowFinish } from './escrowFinish'
+import { CheckCancel, validateCheckCancel } from './checkCancel'
+import { CheckCash, validateCheckCash } from './checkCash'
+import { CheckCreate, validateCheckCreate } from './checkCreate'
+import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
+import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
+import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
+import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
 import TransactionMetadata from './metadata'
-import { OfferCancel, verifyOfferCancel } from './offerCancel'
+import { OfferCancel, validateOfferCancel } from './offerCancel'
 import {
   OfferCreate,
-  verifyOfferCreate,
+  validateOfferCreate,
   OfferCreateTransactionFlags,
 } from './offerCreate'
-import { Payment, verifyPayment, PaymentTransactionFlags } from './payment'
+import { Payment, validatePayment, PaymentTransactionFlags } from './payment'
 import {
   PaymentChannelClaim,
-  verifyPaymentChannelClaim,
+  validatePaymentChannelClaim,
   PaymentChannelClaimTransactionFlags,
 } from './paymentChannelClaim'
 import {
   PaymentChannelCreate,
-  verifyPaymentChannelCreate,
+  validatePaymentChannelCreate,
 } from './paymentChannelCreate'
 import {
   PaymentChannelFund,
-  verifyPaymentChannelFund,
+  validatePaymentChannelFund,
 } from './paymentChannelFund'
-import { SetRegularKey, verifySetRegularKey } from './setRegularKey'
-import { SignerListSet, verifySignerListSet } from './signerListSet'
-import { TicketCreate, verifyTicketCreate } from './ticketCreate'
-import { TrustSet, verifyTrustSet, TrustSetTransactionFlags } from './trustSet'
+import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
+import { SignerListSet, validateSignerListSet } from './signerListSet'
+import { TicketCreate, validateTicketCreate } from './ticketCreate'
+import {
+  TrustSet,
+  validateTrustSet,
+  TrustSetTransactionFlags,
+} from './trustSet'
 
 export type Transaction =
   | AccountDelete
@@ -80,84 +84,84 @@ export interface TransactionAndMetadata {
  * @param transaction - A Transaction.
  * @throws ValidationError When the Transaction is malformed.
  */
-export function verify(transaction: Record<string, unknown>): void {
+export function validate(transaction: Record<string, unknown>): void {
   const tx = { ...transaction }
   setTransactionFlagsToNumber(tx as unknown as Transaction)
   switch (tx.TransactionType) {
     case 'AccountDelete':
-      verifyAccountDelete(tx)
+      validateAccountDelete(tx)
       break
 
     case 'AccountSet':
-      verifyAccountSet(tx)
+      validateAccountSet(tx)
       break
 
     case 'CheckCancel':
-      verifyCheckCancel(tx)
+      validateCheckCancel(tx)
       break
 
     case 'CheckCash':
-      verifyCheckCash(tx)
+      validateCheckCash(tx)
       break
 
     case 'CheckCreate':
-      verifyCheckCreate(tx)
+      validateCheckCreate(tx)
       break
 
     case 'DepositPreauth':
-      verifyDepositPreauth(tx)
+      validateDepositPreauth(tx)
       break
 
     case 'EscrowCancel':
-      verifyEscrowCancel(tx)
+      validateEscrowCancel(tx)
       break
 
     case 'EscrowCreate':
-      verifyEscrowCreate(tx)
+      validateEscrowCreate(tx)
       break
 
     case 'EscrowFinish':
-      verifyEscrowFinish(tx)
+      validateEscrowFinish(tx)
       break
 
     case 'OfferCancel':
-      verifyOfferCancel(tx)
+      validateOfferCancel(tx)
       break
 
     case 'OfferCreate':
-      verifyOfferCreate(tx)
+      validateOfferCreate(tx)
       break
 
     case 'Payment':
-      verifyPayment(tx)
+      validatePayment(tx)
       break
 
     case 'PaymentChannelClaim':
-      verifyPaymentChannelClaim(tx)
+      validatePaymentChannelClaim(tx)
       break
 
     case 'PaymentChannelCreate':
-      verifyPaymentChannelCreate(tx)
+      validatePaymentChannelCreate(tx)
       break
 
     case 'PaymentChannelFund':
-      verifyPaymentChannelFund(tx)
+      validatePaymentChannelFund(tx)
       break
 
     case 'SetRegularKey':
-      verifySetRegularKey(tx)
+      validateSetRegularKey(tx)
       break
 
     case 'SignerListSet':
-      verifySignerListSet(tx)
+      validateSignerListSet(tx)
       break
 
     case 'TicketCreate':
-      verifyTicketCreate(tx)
+      validateTicketCreate(tx)
       break
 
     case 'TrustSet':
-      verifyTrustSet(tx)
+      validateTrustSet(tx)
       break
 
     default:
