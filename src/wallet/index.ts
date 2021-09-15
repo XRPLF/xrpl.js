@@ -1,6 +1,6 @@
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync } from 'bip39'
-import { assert, AssertionError } from 'chai'
+import _ from 'lodash'
 import {
   classicAddressToXAddress,
   isValidXAddress,
@@ -289,20 +289,16 @@ class Wallet {
 
       return memo
     })
-
-    try {
-      assert.deepEqual(
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Comparison requires same type
-        decoded as unknown as Transaction,
-        txCopy,
-        'Serialized transaction does not match the original transaction.',
-      )
-    } catch (error: unknown) {
-      if (error instanceof AssertionError) {
-        throw new ValidationError(error.message)
-      } else {
-        throw error
+    if (!_.isEqual(decoded, tx)) {
+      const data = {
+        decoded,
+        tx,
       }
+      const error = new ValidationError(
+        'Serialized transaction does not match original txJSON. See error.data',
+        data,
+      )
+      throw error
     }
   }
 
