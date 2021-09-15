@@ -515,6 +515,8 @@ class Client extends EventEmitter {
 
   public autofill = autofill
 
+  public getFee = getFee
+
   // @deprecated Use autofill instead
   public prepareTransaction = autofill
 
