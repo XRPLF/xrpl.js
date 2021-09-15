@@ -189,6 +189,7 @@ describe('Wallet', function () {
     let wallet
     let wallet2
     let wallet3
+    let wallet4
 
     beforeEach(function () {
       wallet = Wallet.fromSeed('ss1x3KLrSvfg7irFc1D929WXZ7z9H')
@@ -197,6 +198,7 @@ describe('Wallet', function () {
         '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8',
         '00ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A',
       )
+      wallet4 = Wallet.fromSeed('snoPBrXtMeMyMHUVTgbuqAfg1SUTb')
     })
 
     it('signTransaction successfully', async function () {
@@ -236,8 +238,7 @@ describe('Wallet', function () {
     })
 
     it('signTransaction with EscrowFinish', async function () {
-      const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
-      const result = Wallet.fromSeed(secret).signTransaction(
+      const result = wallet4.signTransaction(
         REQUEST_FIXTURES.escrow.txJSON as unknown as Transaction,
       )
       assert.deepEqual(result, RESPONSE_FIXTURES.escrow.signedTransaction)
@@ -245,34 +246,27 @@ describe('Wallet', function () {
 
     it('signTransaction with multisignAddress', async function () {
       const txJSON = REQUEST_FIXTURES.signAs
-      const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
-      const localWallet = Wallet.fromSeed(secret)
-      const signature = localWallet.signTransaction(
+      const signature = wallet4.signTransaction(
         txJSON as unknown as Transaction,
-        localWallet.getClassicAddress(),
+        wallet4.getClassicAddress(),
       )
       assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
     })
 
     it('signTransaction with X Address and no given tag for multisignAddress', async function () {
       const txJSON = REQUEST_FIXTURES.signAs
-      const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
-      const localWallet = Wallet.fromSeed(secret)
-      const signature = localWallet.signTransaction(
+      const signature = wallet4.signTransaction(
         txJSON as unknown as Transaction,
-        localWallet.getXAddress(),
+        wallet4.getXAddress(),
       )
       assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
     })
 
-    // TODO: Refactor xAddress to reuse wallets
     it('signTransaction with X Address and tag for multisignAddress', async function () {
       const txJSON = REQUEST_FIXTURES.signAs
-      const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
-      const localWallet = Wallet.fromSeed(secret)
-      const signature = localWallet.signTransaction(
+      const signature = wallet4.signTransaction(
         txJSON as unknown as Transaction,
-        localWallet.getXAddress(0),
+        wallet4.getXAddress(0),
       )
       // Adding a tag changes the classicAddress, which changes the signature from RESPONSE_FIXTURES.signAs
       const expectedSignature =
