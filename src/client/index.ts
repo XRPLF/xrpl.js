@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering -- TODO: remove when instance methods aren't members */
 /* eslint-disable max-lines -- This might not be necessary later, but this file needs to be big right now */
 import { EventEmitter } from 'events'
+import * as assert from 'assert'
 
 import {
   classicAddressToXAddress,
@@ -26,7 +27,6 @@ import autofill from '../sugar/autofill'
 import getBalances from '../sugar/balances'
 import getOrderbook from '../sugar/orderbook'
 import { submitTransaction, submitSignedTransaction } from '../sugar/submit'
-import { clamp } from '../sugar/utils'
 import {
   // account methods
   AccountChannelsRequest,
@@ -148,6 +148,11 @@ function getCollectKeyFromCommand(command: string): string | null {
     default:
       return null
   }
+}
+
+function clamp(value: number, min: number, max: number): number {
+  assert.ok(min <= max, 'Illegal clamp bounds')
+  return Math.min(Math.max(value, min), max)
 }
 
 /**
