@@ -93,8 +93,8 @@ describe('client.getOrderbook', function () {
       it('normal', async function () {
         this.mockRippled.addResponse('book_offers', normalRippledResponse)
         const response = await this.client.getOrderbook(
-          testcase.address,
-          requests.getOrderbook.normal,
+          requests.getOrderbook.normal.taker_pays,
+          requests.getOrderbook.normal.taker_gets,
           { limit: 20 },
         )
         assert.deepEqual(response, responses.getOrderbook.normal)
@@ -113,7 +113,6 @@ describe('client.getOrderbook', function () {
       //     this.client.errors.ValidationError,
       //   )
       // })
-
       // it('with XRP', async function () {
       //   this.mockRippled.addResponse('book_offers', xrpRippledResponse)
       //   const response = await this.client.getOrderbook(
@@ -126,7 +125,6 @@ describe('client.getOrderbook', function () {
       //     'getOrderbook',
       //   )
       // })
-
       // 'sample XRP/JPY book has orders sorted correctly', async function () {
       //   const orderbookInfo = {
       //     base: {
@@ -143,7 +141,6 @@ describe('client.getOrderbook', function () {
       //   assert.deepStrictEqual([], response.bids)
       //   checkSortingOfOrders(response.asks)
       // },
-
       // 'sample USD/XRP book has orders sorted correctly', async function () {
       //   const orderbookInfo = {
       //     counter: {currency: 'XRP'},
@@ -157,7 +154,6 @@ describe('client.getOrderbook', function () {
       //   checkSortingOfOrders(response.bids)
       //   checkSortingOfOrders(response.asks)
       // },
-
       // WARNING: This test fails to catch the sorting bug, issue #766
       // it("sorted so that best deals come first [bad test]", async function () {
       //   this.mockRippled.addResponse("book_offers", normalRippledResponse);
@@ -183,7 +179,6 @@ describe('client.getOrderbook', function () {
       //     askRates
       //   );
       // });
-
       // it("currency & counterparty are correct", async function () {
       //   this.mockRippled.addResponse("book_offers", normalRippledResponse);
       //   const response = await this.client.getOrderbook(
@@ -200,7 +195,6 @@ describe('client.getOrderbook', function () {
       //     assert.strictEqual(totalPrice.counterparty, counter.counterparty);
       //   });
       // });
-
       // it("direction is correct for bids and asks", async function () {
       //   this.mockRippled.addResponse("book_offers", normalRippledResponse);
       //   const response = await this.client.getOrderbook(
