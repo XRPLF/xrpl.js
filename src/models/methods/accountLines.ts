@@ -2,7 +2,7 @@ import { LedgerIndex } from '../common'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
-interface Trustline {
+export interface Trustline {
   account: string
   balance: string
   currency: string

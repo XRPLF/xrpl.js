@@ -4,7 +4,7 @@ import _ from 'lodash'
 
 import type { Client } from '..'
 import type { Connection } from '../client'
-import * as common from '../common'
+import * as common from '.'
 import { Issue } from '../common/types/objects'
 import { AccountInfoRequest } from '../models/methods'
 import { dropsToXrp } from '../utils'

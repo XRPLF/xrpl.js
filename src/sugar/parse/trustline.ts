@@ -1,6 +1,6 @@
 import * as assert from 'assert'
 
-import { txFlags } from '../../common'
+import { txFlags } from '..'
 import { removeUndefined } from '../../utils'
 
 import { parseQuality, parseMemos } from './utils'
