@@ -8,7 +8,8 @@ import {
   BookOffersRequest,
   TakerAmount,
 } from '../models/methods/bookOffers'
-import { OfferCreateTransactionFlags } from '../models/transactions'
+
+const SELL_OFFER_FLAGS = 0x00020000
 
 function sortOffers(offers: BookOffer[]): BookOffer[] {
   return offers.sort((offerA, offerB) => {
@@ -63,6 +64,7 @@ async function getOrderbook(
   request.taker_gets = takerPays
   request.taker_pays = takerGets
   const reverseOfferResults = await client.requestAll(request)
+
   // 3. Return Formatted Response
   const directOffers = _.flatMap(
     directOfferResults,
@@ -72,6 +74,7 @@ async function getOrderbook(
     reverseOfferResults,
     (reverseOfferResult) => reverseOfferResult.result.offers,
   )
+
   // Sort the orders
   // for both buys and sells, lowest quality is closest to mid-market
   // we sort the orders so that earlier orders are closer to mid-market
@@ -81,7 +84,7 @@ async function getOrderbook(
   const buy: BookOffer[] = []
   const sell: BookOffer[] = []
   orders.forEach((order) => {
-    if (order.Flags === OfferCreateTransactionFlags.tfSell) {
+    if (order.Flags === SELL_OFFER_FLAGS) {
       sell.push(order)
     } else {
       buy.push(order)
