@@ -93,6 +93,7 @@ class Wallet {
    * @param algorithm - The digital signature algorithm to generate an address fro.
    * @returns A Wallet derived from a secret (AKA a seed).
    */
+  // eslint-disable-next-line @typescript-eslint/member-ordering -- Member is used as a function here
   public static fromSecret = Wallet.fromSeed
 
   /**
@@ -162,11 +163,12 @@ class Wallet {
    * @param multisignAddress - Multisign only. An account address corresponding to the multi-signature being added. If this
    * wallet represents your [master keypair](https://xrpl.org/cryptographic-keys.html#master-key-pair) you can get your account address
    * with the Wallet.getClassicAddress() function.
+   * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    * @returns A signed transaction.
    */
   public signTransaction(
     transaction: Transaction,
-    multisignAddress: string = '',
+    multisignAddress = '',
   ): string {
     if (transaction.TxnSignature || transaction.Signers) {
       throw new ValidationError(
@@ -242,11 +244,10 @@ class Wallet {
    *
    * @param serialized - A signed and serialized transaction.
    * @param tx - The transaction prior to signing.
-   *
-   * @returns This method does not return a value
-   * @throws a ValidationError if the transaction does not have a TxnSignature/Signers property, or if
+   * @throws A ValidationError if the transaction does not have a TxnSignature/Signers property, or if
    * the serialized Transaction desn't match the original transaction.
    */
+  // eslint-disable-next-line class-methods-use-this -- Helper for organization purposes
   private checkTxSerialization(serialized: string, tx: Transaction): void {
     // Decode the serialized transaction:
     const decoded = decode(serialized)
@@ -273,16 +274,17 @@ class Wallet {
     // - Memos have exclusively hex data which should ignore case.
     //   Since decode goes to upper case, we set all tx memos to be uppercase for the comparison.
     txCopy.Memos?.map((memo) => {
+      const memoCopy = { ...memo }
       if (memo.Memo.MemoData) {
-        memo.Memo.MemoData = memo.Memo.MemoData.toUpperCase()
+        memoCopy.Memo.MemoData = memo.Memo.MemoData.toUpperCase()
       }
 
       if (memo.Memo.MemoType) {
-        memo.Memo.MemoType = memo.Memo.MemoType.toUpperCase()
+        memoCopy.Memo.MemoType = memo.Memo.MemoType.toUpperCase()
       }
 
       if (memo.Memo.MemoFormat) {
-        memo.Memo.MemoFormat = memo.Memo.MemoFormat.toUpperCase()
+        memoCopy.Memo.MemoFormat = memo.Memo.MemoFormat.toUpperCase()
       }
 
       return memo
@@ -290,6 +292,7 @@ class Wallet {
 
     try {
       assert.deepEqual(
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Comparison requires same type
         decoded as unknown as Transaction,
         txCopy,
         'Serialized transaction does not match the original transaction.',
@@ -303,16 +306,29 @@ class Wallet {
     }
   }
 
-  private computeSignature(tx: object, privateKey: string, signAs?: string) {
+  /**
+   * Signs a transaction with the proper signing encoding.
+   *
+   * @param tx - A transaction to sign.
+   * @param privateKey - = A key to sign the transaction with.
+   * @param signAs - Multisign only. An account address to include in the Signer field.
+   * Can be either a classic address or an XAddress.
+   * @returns A signed transaction in the proper format.
+   */
+  // eslint-disable-next-line class-methods-use-this -- Helper to add organizational clarity
+  private computeSignature(
+    tx: Transaction,
+    privateKey: string,
+    signAs?: string,
+  ): string {
     if (signAs) {
       const classicAddress = isValidXAddress(signAs)
         ? xAddressToClassicAddress(signAs).classicAddress
         : signAs
 
       return sign(encodeForMultisigning(tx, classicAddress), privateKey)
-    } else {
-      return sign(encodeForSigning(tx), privateKey)
     }
+    return sign(encodeForSigning(tx), privateKey)
   }
 }
 
