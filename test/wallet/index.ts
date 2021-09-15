@@ -190,7 +190,7 @@ describe('Wallet', function () {
     let wallet2
     let wallet3
 
-    this.beforeAll(function () {
+    beforeEach(function () {
       wallet = Wallet.fromSeed('ss1x3KLrSvfg7irFc1D929WXZ7z9H')
       wallet2 = Wallet.fromSeed('shsWGZcmZz6YsWWmcnpfr6fLTdtFV')
       wallet3 = new Wallet(
@@ -246,10 +246,10 @@ describe('Wallet', function () {
     it('signTransaction with multisignAddress', async function () {
       const txJSON = REQUEST_FIXTURES.signAs
       const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
-      const wallet = Wallet.fromSeed(secret)
-      const signature = wallet.signTransaction(
+      const localWallet = Wallet.fromSeed(secret)
+      const signature = localWallet.signTransaction(
         txJSON as unknown as Transaction,
-        wallet.getClassicAddress(),
+        localWallet.getClassicAddress(),
       )
       assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
     })
@@ -257,21 +257,22 @@ describe('Wallet', function () {
     it('signTransaction with X Address and no given tag for multisignAddress', async function () {
       const txJSON = REQUEST_FIXTURES.signAs
       const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
-      const wallet = Wallet.fromSeed(secret)
-      const signature = wallet.signTransaction(
+      const localWallet = Wallet.fromSeed(secret)
+      const signature = localWallet.signTransaction(
         txJSON as unknown as Transaction,
-        wallet.getXAddress(),
+        localWallet.getXAddress(),
       )
       assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
     })
 
+    // TODO: Refactor xAddress to reuse wallets
     it('signTransaction with X Address and tag for multisignAddress', async function () {
       const txJSON = REQUEST_FIXTURES.signAs
       const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
-      const wallet = Wallet.fromSeed(secret)
-      const signature = wallet.signTransaction(
+      const localWallet = Wallet.fromSeed(secret)
+      const signature = localWallet.signTransaction(
         txJSON as unknown as Transaction,
-        wallet.getXAddress(0),
+        localWallet.getXAddress(0),
       )
       // Adding a tag changes the classicAddress, which changes the signature from RESPONSE_FIXTURES.signAs
       const expectedSignature =
@@ -289,15 +290,15 @@ describe('Wallet', function () {
       assert.throws(() => {
         const tx = decode(result) as unknown as Transaction
         wallet.signTransaction(tx)
-      }, /txJSON must not contain "TxnSignature" or "Signers" properties/)
+      }, /txJSON must not contain "TxnSignature" or "Signers" properties/u)
     })
 
     it('signTransaction with an EscrowExecution transaction', async function () {
-      const wallet = new Wallet(
+      const localWallet = new Wallet(
         '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
         '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
       )
-      const result = wallet.signTransaction(
+      const result = localWallet.signTransaction(
         REQUEST_FIXTURES.escrow.txJSON as unknown as Transaction,
       )
       assert.deepEqual(result, RESPONSE_FIXTURES.escrow.signedTransaction)
@@ -305,11 +306,14 @@ describe('Wallet', function () {
 
     it('signTransaction with multisignAddress and a wallet generated from public and private key', async function () {
       const tx = REQUEST_FIXTURES.signAs as unknown as Transaction
-      const wallet = new Wallet(
+      const localWallet = new Wallet(
         '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
         '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
       )
-      const signature = wallet.signTransaction(tx, wallet.getClassicAddress())
+      const signature = localWallet.signTransaction(
+        tx,
+        localWallet.getClassicAddress(),
+      )
       assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
     })
 
@@ -323,14 +327,14 @@ describe('Wallet', function () {
         Fee: '12',
       }
       const secret = 'shotKgaEotpcYsshSE39vmSnBDRim'
-      const wallet = Wallet.fromSeed(secret)
-      const result = wallet.signTransaction(tx)
+      const localWallet = Wallet.fromSeed(secret)
+      const result = localWallet.signTransaction(tx)
       const expectedResult =
         '1200002400000001614000000001312D0068400000000000000C7321022B05847086686F9D0499B13136B94AD4323EE1B67D4C429ECC987AB35ACFA34574473045022100C104B7B97C31FACA4597E7D6FCF13BD85BD11375963A62A0AC45B0061236E39802207784F157F6A98DFC85B051CDDF61CC3084C4F5750B82674801C8E9950280D1998114EE3046A5DDF8422C40DDB93F1D522BB4FE6419158314FDB08D07AAA0EB711793A3027304D688E10C3648'
       const decoded = decode(result)
       assert(
         decoded.Flags == null,
-        `Flags = ${decoded.Flags}, should be undefined`,
+        `Flags = ${JSON.stringify(decoded.Flags)}, should be undefined`,
       )
       assert.equal(result, expectedResult)
     })
@@ -365,14 +369,14 @@ describe('Wallet', function () {
       }
 
       const secret = 'shotKgaEotpcYsshSE39vmSnBDRim'
-      const wallet = Wallet.fromSeed(secret)
-      const result = wallet.signTransaction(tx)
+      const localWallet = Wallet.fromSeed(secret)
+      const result = localWallet.signTransaction(tx)
       const expectedResult =
         '12000022800200002400000017201B0086955361EC6386F26FC0FFFF0000000000000000000000005553440000000000DC596C88BCDE4E818D416FCDEEBF2C8656BADC9A68400000000000000C69D4438D7EA4C6800000000000000000000000000047425000000000000C155FFE99C8C91F67083CEFFDB69EBFE76348CA6AD4446F8C5D8A5E0B0000000000000000000000005553440000000000DC596C88BCDE4E818D416FCDEEBF2C8656BADC9A7321022B05847086686F9D0499B13136B94AD4323EE1B67D4C429ECC987AB35ACFA34574473045022100D9634523D8E232D4A7807A71856023D82AC928FA29848571B820867898413B5F022041AC00EC1F81A26A6504EBF844A38CC3204694EF2CC1A97A87632721631F93DA81145E7B112523F68D2F5E879DB4EAC51C6698A6930483149F500E50C2F016CA01945E5A1E5846B61EF2D376'
       const decoded = decode(result)
       assert(
         decoded.Flags === 2147614720,
-        `Flags = ${decoded.Flags}, should be 2147614720`,
+        `Flags = ${JSON.stringify(decoded.Flags)}, should be 2147614720`,
       )
       assert.deepEqual(result, expectedResult)
     })
@@ -392,7 +396,7 @@ describe('Wallet', function () {
 
       assert.throws(() => {
         wallet2.signTransaction(tx)
-      }, /1\.2 is an illegal amount/)
+      }, /1\.2 is an illegal amount/u)
     })
 
     it('signTransaction throws when encoded tx does not match decoded tx because of illegal higher fee', async function () {
@@ -410,19 +414,19 @@ describe('Wallet', function () {
 
       assert.throws(() => {
         wallet2.signTransaction(tx)
-      }, /1123456\.7 is an illegal amount/)
+      }, /1123456\.7 is an illegal amount/u)
     })
 
     it('signTransaction with a ticket transaction', async function () {
-      const wallet = Wallet.fromSeed('sn7n5R1cR5Y3fRFkuWXA94Ts1frVJ')
-      const result = wallet.signTransaction(
+      const localWallet = Wallet.fromSeed('sn7n5R1cR5Y3fRFkuWXA94Ts1frVJ')
+      const result = localWallet.signTransaction(
         REQUEST_FIXTURES.ticket.txJSON as unknown as Transaction,
       )
       assert.deepEqual(result, RESPONSE_FIXTURES.ticket.signedTransaction)
     })
 
     it('signTransaction with a Payment transaction with paths', async function () {
-      const wallet = Wallet.fromSeed('shsWGZcmZz6YsWWmcnpfr6fLTdtFV')
+      const localWallet = Wallet.fromSeed('shsWGZcmZz6YsWWmcnpfr6fLTdtFV')
       const payment: Transaction = {
         TransactionType: 'Payment',
         Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -447,7 +451,7 @@ describe('Wallet', function () {
         Sequence: 1,
         Fee: '12',
       }
-      const result = wallet.signTransaction(payment)
+      const result = localWallet.signTransaction(payment)
       assert.deepEqual(
         result,
         '12000022800200002400000001201B00EF81E661EC6386F26FC0FFFF0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461968400000000000000C6940000000000000646AD3504529A0465E2E0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D1664619732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D87446304402200A693FB5CA6B21250EBDFD8CFF526EE0DF7C9E4E31EB0660692E75E6A93BF5F802203CC39463DDA21386898CA31E18AD1A6828647D65741DD637BAD71BC83E29DB9481145E7B112523F68D2F5E879DB4EAC51C6698A693048314CA6EDC7A28252DAEA6F2045B24F4D7C333E146170112300000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461900',
@@ -484,7 +488,7 @@ describe('Wallet', function () {
       }
       assert.throws(() => {
         wallet2.signTransaction(payment)
-      }, /^1.1234567 is an illegal amount/)
+      }, /^1.1234567 is an illegal amount/u)
     })
   })
 
