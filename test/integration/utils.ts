@@ -17,12 +17,12 @@ export async function ledgerAccept(client: Client): Promise<void> {
 
 export async function fundAccount(
   client: Client,
-  account: string,
+  wallet: Wallet,
 ): Promise<void> {
   const payment: Payment = {
     TransactionType: 'Payment',
     Account: masterAccount,
-    Destination: account,
+    Destination: wallet.getClassicAddress(),
     // 2 times the amount needed for a new account (20 XRP)
     Amount: '400000000',
   }
@@ -75,7 +75,7 @@ export async function testTransaction(
   accountNeedsFunds = true,
 ): Promise<void> {
   if (accountNeedsFunds) {
-    await fundAccount(client, wallet.getClassicAddress())
+    await fundAccount(client, wallet)
   }
   // sign/submit the transaction
   const response = await client.submitTransaction(wallet, transaction)
