@@ -1,0 +1,13 @@
+{
+  "id": 1,
+  "status": "success",
+  "type": "response",
+  "result": {
+    "account": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+    "account_objects": [],
+    "ledger_hash":
+      "053DF17D2289D1C4971C22F235BC1FCA7D4B3AE966F842E5819D0749E0B8ECD3",
+    "ledger_index": 14378733,
+    "validated": true
+  }
+}
