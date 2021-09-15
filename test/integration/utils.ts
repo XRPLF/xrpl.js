@@ -3,14 +3,9 @@ import { assert } from 'chai'
 import _ from 'lodash'
 import { decode } from 'ripple-binary-codec'
 
-import { Client, SubmitResponse, Wallet } from 'xrpl-local'
-import {
-  validatePayment,
-  Payment,
-  Transaction,
-} from 'xrpl-local/models/transactions'
+import { Client, Wallet } from 'xrpl-local'
+import { Payment, Transaction } from 'xrpl-local/models/transactions'
 import { computeSignedTransactionHash } from 'xrpl-local/utils/hashes'
-import { sign } from 'xrpl-local/wallet/signer'
 
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
@@ -18,18 +13,6 @@ const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
 export async function ledgerAccept(client: Client): Promise<void> {
   const request = { command: 'ledger_accept' }
   await client.connection.request(request)
-}
-
-// TODO: replace with `client.submitTransaction` once that has been merged
-export async function submitTransaction(
-  client: Client,
-  secret: string,
-  transaction: Transaction,
-): Promise<SubmitResponse> {
-  const wallet = Wallet.fromSeed(secret)
-  const tx = await client.autofill(transaction)
-  const signedTxEncoded: string = sign(wallet, tx)
-  return client.request({ command: 'submit', tx_blob: signedTxEncoded })
 }
 
 export async function fundAccount(
@@ -43,10 +26,10 @@ export async function fundAccount(
     // 2 times the amount needed for a new account (20 XRP)
     Amount: '400000000',
   }
-  const paymentTx = await client.autofill(payment)
-  validatePayment(paymentTx)
-
-  const response = await submitTransaction(client, masterSecret, paymentTx)
+  const response = await client.submitTransaction(
+    Wallet.fromSeed(masterSecret),
+    payment,
+  )
   if (response.result.engine_result !== 'tesSUCCESS') {
     // eslint-disable-next-line no-console -- happens only when something goes wrong
     console.log(response)
@@ -89,9 +72,11 @@ export async function testTransaction(
   client: Client,
   transaction: Transaction,
   wallet: Wallet,
-  accountNeedsFunds: boolean = true,
+  accountNeedsFunds = true,
 ): Promise<void> {
-  if (accountNeedsFunds) await fundAccount(client, wallet.getClassicAddress())
+  if (accountNeedsFunds) {
+    await fundAccount(client, wallet.getClassicAddress())
+  }
   // sign/submit the transaction
   const response = await client.submitTransaction(wallet, transaction)
 
