@@ -514,13 +514,13 @@ describe('Connection', function () {
     this.client.on('error', (errorCode, errorMessage, message) => {
       assert.strictEqual(errorCode, 'badMessage')
       assert.strictEqual(errorMessage, 'valid id not found in response')
-      assert.strictEqual(message, '{"type":"response","id":"must be integer"}')
+      assert.strictEqual(message, '{"type":"response","id":{}}')
       done()
     })
     this.client.connection.onMessage(
       JSON.stringify({
         type: 'response',
-        id: 'must be integer',
+        id: {},
       }),
     )
   })

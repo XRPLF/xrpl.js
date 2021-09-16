@@ -138,7 +138,10 @@ export default class RequestManager {
    * @throws ResponseFormatError if the response format is invalid, RippledError if rippled returns an error.
    */
   public handleResponse(response: Partial<Response | ErrorResponse>): void {
-    if (response.id == null) {
+    if (
+      response.id == null ||
+      !(typeof response.id === 'string' || typeof response.id === 'number')
+    ) {
       throw new ResponseFormatError('valid id not found in response', response)
     }
     if (!this.promisesAwaitingResponse.has(response.id)) {
