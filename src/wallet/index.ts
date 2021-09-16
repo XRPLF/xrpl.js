@@ -21,7 +21,7 @@ import {
 } from 'ripple-keypairs'
 
 import ECDSA from '../ecdsa'
-import { ValidationError } from '../common/errors'
+import { ValidationError } from '../errors'
 import { Transaction } from '../models/transactions'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519

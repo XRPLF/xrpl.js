@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function -- Necessary for validateBaseTransaction */
 /* eslint-disable complexity -- Necessary for validateBaseTransaction */
 /* eslint-disable max-statements -- Necessary for validateBaseTransaction */
-import { ValidationError } from '../../common/errors'
+import { ValidationError } from '../../errors'
 import { Memo, Signer } from '../common'
 import { onlyHasFields } from '../utils'
 

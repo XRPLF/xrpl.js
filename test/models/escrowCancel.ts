@@ -1,7 +1,6 @@
 import { assert } from 'chai'
 
-import { validateEscrowCancel, validate } from 'xrpl-local'
-import { ValidationError } from 'xrpl-local/common/errors'
+import { validateEscrowCancel, validate, ValidationError } from 'xrpl-local'
 
 /**
  * Transaction Verification Testing.

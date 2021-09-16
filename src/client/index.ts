@@ -3,8 +3,8 @@
 import * as assert from 'assert'
 import { EventEmitter } from 'events'
 
-import { ValidationError, XrplError } from '../common/errors'
-import * as errors from '../common/errors'
+import { ValidationError, XrplError } from '../errors'
+import * as errors from '../errors'
 import {
   // account methods
   AccountChannelsRequest,

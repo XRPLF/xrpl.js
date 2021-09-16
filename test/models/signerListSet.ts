@@ -1,7 +1,6 @@
 import { assert } from 'chai'
 
-import { validate, validateSignerListSet } from 'xrpl-local'
-import { ValidationError } from 'xrpl-local/common/errors'
+import { validate, validateSignerListSet, ValidationError } from 'xrpl-local'
 
 /**
  * SignerListSet Transaction Verification Testing.

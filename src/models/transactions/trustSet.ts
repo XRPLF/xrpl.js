@@ -1,4 +1,4 @@
-import { ValidationError } from '../../common/errors'
+import { ValidationError } from '../../errors'
 import { Amount } from '../common'
 
 import {

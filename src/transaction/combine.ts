@@ -4,7 +4,7 @@ import { decodeAccountID } from 'ripple-address-codec'
 import binary from 'ripple-binary-codec'
 import { JsonObject } from 'ripple-binary-codec/dist/types/serialized-type'
 
-import { ValidationError } from '../common/errors'
+import { ValidationError } from '../errors'
 import { computeSignedTransactionHash } from '../utils/hashes'
 
 /**

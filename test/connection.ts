@@ -3,17 +3,16 @@ import net from 'net'
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { Client } from 'xrpl-local'
-import { Connection } from 'xrpl-local/client'
-
 import {
+  Client,
   ConnectionError,
   DisconnectedError,
   NotConnectedError,
   ResponseFormatError,
   XrplError,
   TimeoutError,
-} from '../src/common/errors'
+} from 'xrpl-local'
+import { Connection } from 'xrpl-local/client'
 
 import rippled from './fixtures/rippled'
 import { setupClient, teardownClient } from './setupClient'

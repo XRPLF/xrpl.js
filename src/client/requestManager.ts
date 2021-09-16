@@ -1,8 +1,4 @@
-import {
-  ResponseFormatError,
-  RippledError,
-  TimeoutError,
-} from '../common/errors'
+import { ResponseFormatError, RippledError, TimeoutError } from '../errors'
 import { Response } from '../models/methods'
 import { BaseRequest, ErrorResponse } from '../models/methods/baseMethod'
 

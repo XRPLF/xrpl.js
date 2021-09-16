@@ -9,4 +9,6 @@ export * from './models/transactions'
 
 export * from './utils'
 
+export * from './errors'
+
 export { default as Wallet } from './wallet'
