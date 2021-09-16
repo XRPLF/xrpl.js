@@ -211,6 +211,7 @@ async function checkAccountDeleteBlockers(client: Client, tx: AccountDelete) {
   if (response.result.account_objects.length > 0) {
     throw new XrplError(
       `Account ${tx.Account} cannot be deleted; there are Escrows, PayChannels, RippleStates, or Checks associated with the account.`,
+      response.result.account_objects,
     )
   }
 }
