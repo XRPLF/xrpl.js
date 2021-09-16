@@ -3,7 +3,6 @@
 import * as assert from 'assert'
 import { EventEmitter } from 'events'
 
-import * as constants from '../common/constants'
 import { ValidationError, XrplError } from '../common/errors'
 import * as errors from '../common/errors'
 import { txFlags } from '../common/txflags'
@@ -541,8 +540,6 @@ class Client extends EventEmitter {
 
   public txFlags = txFlags
   public static txFlags = txFlags
-  public accountSetFlags = constants.AccountSetFlags
-  public static accountSetFlags = constants.AccountSetFlags
 }
 
 export { Client, Connection }
