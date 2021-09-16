@@ -62,21 +62,7 @@ function getAgent(url: string, config: ConnectionOptions): Agent | undefined {
   const parsedURL = new URL(url)
   const parsedProxyURL = new URL(config.proxy)
 
-  const proxy = {
-    href: parsedProxyURL.href,
-    origin: parsedProxyURL.origin,
-    protocol: parsedProxyURL.protocol,
-    username: parsedProxyURL.username,
-    password: parsedProxyURL.password,
-    host: parsedProxyURL.host,
-    hostname: parsedProxyURL.hostname,
-    port: parsedProxyURL.port,
-    pathname: parsedProxyURL.pathname,
-    search: parsedProxyURL.search,
-    hash: parsedProxyURL.hash,
-  }
-
-  const proxyOverrides = _.omitBy(
+  const proxyOptions = _.omitBy(
     {
       secureEndpoint: parsedURL.protocol === 'wss:',
       secureProxy: parsedProxyURL.protocol === 'https:',
@@ -85,11 +71,20 @@ function getAgent(url: string, config: ConnectionOptions): Agent | undefined {
       key: config.key,
       passphrase: config.passphrase,
       cert: config.certificate,
+      href: parsedProxyURL.href,
+      origin: parsedProxyURL.origin,
+      protocol: parsedProxyURL.protocol,
+      username: parsedProxyURL.username,
+      password: parsedProxyURL.password,
+      host: parsedProxyURL.host,
+      hostname: parsedProxyURL.hostname,
+      port: parsedProxyURL.port,
+      pathname: parsedProxyURL.pathname,
+      search: parsedProxyURL.search,
+      hash: parsedProxyURL.hash,
     },
     (value) => value == null,
   )
-
-  const proxyOptions = { ...proxy, ...proxyOverrides }
 
   let HttpsProxyAgent: new (opt: typeof proxyOptions) => Agent
   try {
