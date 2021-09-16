@@ -1,4 +1,19 @@
-import { xAddressToClassicAddress } from 'ripple-address-codec'
+import {
+  classicAddressToXAddress,
+  decodeAccountID,
+  decodeAccountPublic,
+  decodeNodePublic,
+  decodeSeed,
+  decodeXAddress,
+  encodeAccountID,
+  encodeAccountPublic,
+  encodeNodePublic,
+  encodeSeed,
+  encodeXAddress,
+  isValidClassicAddress,
+  isValidXAddress,
+  xAddressToClassicAddress,
+} from 'ripple-address-codec'
 
 import { ValidationError } from '../common/errors'
 import { RippledAmount } from '../common/types/objects'
@@ -129,4 +144,18 @@ export {
   signPaymentChannelClaim,
   verifyPaymentChannelClaim,
   convertStringToHex,
+  classicAddressToXAddress,
+  xAddressToClassicAddress,
+  isValidXAddress,
+  isValidClassicAddress,
+  encodeSeed,
+  decodeSeed,
+  encodeAccountID,
+  decodeAccountID,
+  encodeNodePublic,
+  decodeNodePublic,
+  encodeAccountPublic,
+  decodeAccountPublic,
+  encodeXAddress,
+  decodeXAddress,
 }

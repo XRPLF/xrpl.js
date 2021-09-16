@@ -1,32 +1,12 @@
 /* eslint-disable @typescript-eslint/member-ordering -- TODO: remove when instance methods aren't members */
 /* eslint-disable max-lines -- This might not be necessary later, but this file needs to be big right now */
-import { EventEmitter } from 'events'
 import * as assert from 'assert'
+import { EventEmitter } from 'events'
 
-import {
-  classicAddressToXAddress,
-  xAddressToClassicAddress,
-  isValidXAddress,
-  isValidClassicAddress,
-  encodeSeed,
-  decodeSeed,
-  encodeAccountID,
-  decodeAccountID,
-  encodeNodePublic,
-  decodeNodePublic,
-  encodeAccountPublic,
-  decodeAccountPublic,
-  encodeXAddress,
-  decodeXAddress,
-} from 'ripple-address-codec'
-
-import { ensureClassicAddress } from '../sugar/utils'
+import * as constants from '../common/constants'
 import { ValidationError, XrplError } from '../common/errors'
-import getFee from '../sugar/fee'
-import autofill from '../sugar/autofill'
-import getBalances from '../sugar/balances'
-import getOrderbook from '../sugar/orderbook'
-import { submitTransaction, submitSignedTransaction } from '../sugar/submit'
+import * as errors from '../common/errors'
+import { txFlags } from '../common/txflags'
 import {
   // account methods
   AccountChannelsRequest,
@@ -105,6 +85,12 @@ import {
   UnsubscribeResponse,
 } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
+import autofill from '../sugar/autofill'
+import getBalances from '../sugar/balances'
+import getFee from '../sugar/fee'
+import getOrderbook from '../sugar/orderbook'
+import { submitTransaction, submitSignedTransaction } from '../sugar/submit'
+import { ensureClassicAddress } from '../sugar/utils'
 import combine from '../transaction/combine'
 import { sign } from '../transaction/sign'
 import generateFaucetWallet from '../wallet/generateFaucetWallet'
@@ -114,9 +100,6 @@ import {
   ConnectionUserOptions,
   INTENTIONAL_DISCONNECT_CODE,
 } from './connection'
-import * as errors from '../common/errors'
-import * as constants from '../common/constants'
-import { txFlags } from '../common/txflags'
 
 export interface ClientOptions extends ConnectionUserOptions {
   feeCushion?: number
@@ -557,24 +540,6 @@ class Client extends EventEmitter {
   public generateFaucetWallet = prepend(generateFaucetWallet, this)
 
   public errors = errors
-
-  /**
-   * Static methods to expose ripple-address-codec methods.
-   */
-  public static classicAddressToXAddress = classicAddressToXAddress
-  public static xAddressToClassicAddress = xAddressToClassicAddress
-  public static isValidXAddress = isValidXAddress
-  public static isValidClassicAddress = isValidClassicAddress
-  public static encodeSeed = encodeSeed
-  public static decodeSeed = decodeSeed
-  public static encodeAccountID = encodeAccountID
-  public static decodeAccountID = decodeAccountID
-  public static encodeNodePublic = encodeNodePublic
-  public static decodeNodePublic = decodeNodePublic
-  public static encodeAccountPublic = encodeAccountPublic
-  public static decodeAccountPublic = decodeAccountPublic
-  public static encodeXAddress = encodeXAddress
-  public static decodeXAddress = decodeXAddress
 
   public txFlags = txFlags
   public static txFlags = txFlags
