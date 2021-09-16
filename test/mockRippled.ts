@@ -3,7 +3,10 @@ import _ from 'lodash'
 import { Server as WebSocketServer } from 'ws'
 
 import type { Request } from '../src'
-import type { BaseResponse } from '../src/models/methods/baseMethod'
+import type {
+  BaseResponse,
+  ErrorResponse,
+} from '../src/models/methods/baseMethod'
 
 import { getFreePort } from './testUtils'
 
@@ -83,6 +86,7 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
         }
 
         if (!mock.suppressOutput) {
+          // eslint-disable-next-line no-console -- only printed out on error
           console.error(err.message)
         }
         if (request != null) {
@@ -104,8 +108,9 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
   mock.addResponse = function (
     command: string,
     response:
-      | Record<string, unknown>
-      | ((r: Request) => Record<string, unknown>),
+      | Response
+      | ErrorResponse
+      | ((r: Request) => Response | ErrorResponse),
   ): void {
     if (typeof command !== 'string') {
       throw new Error('command is not a string')

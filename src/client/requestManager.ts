@@ -4,7 +4,7 @@ import {
   TimeoutError,
 } from '../common/errors'
 import { Response } from '../models/methods'
-import { BaseRequest } from '../models/methods/baseMethod'
+import { BaseRequest, ErrorResponse } from '../models/methods/baseMethod'
 
 /**
  * Manage all the requests made to the websocket, and their async responses
@@ -126,7 +126,7 @@ export default class RequestManager {
    * @param response - The response to handle.
    * @throws ResponseFormatError if the response format is invalid, RippledError if rippled returns an error.
    */
-  public handleResponse(response: Partial<Response>): void {
+  public handleResponse(response: Partial<Response | ErrorResponse>): void {
     if (
       response.id == null ||
       !Number.isInteger(response.id) ||
@@ -142,9 +142,11 @@ export default class RequestManager {
       this.reject(response.id, error)
     }
     if (response.status === 'error') {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We know this must be true
+      const errorResponse = response as Partial<ErrorResponse>
       const error = new RippledError(
-        response.error_message ?? response.error,
-        response,
+        errorResponse.error_message ?? errorResponse.error,
+        errorResponse,
       )
       this.reject(response.id, error)
       return

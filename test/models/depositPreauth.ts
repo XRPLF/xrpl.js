@@ -1,7 +1,9 @@
-import { ValidationError } from 'xrpl-local/common/errors'
-import { verifyDepositPreauth } from './../../src/models/transactions/depositPreauth'
 import { assert } from 'chai'
+
+import { ValidationError } from 'xrpl-local/common/errors'
+
 import { verify } from '../../src/models/transactions'
+import { verifyDepositPreauth } from '../../src/models/transactions/depositPreauth'
 
 /**
  * DepositPreauth Transaction Verification Testing.

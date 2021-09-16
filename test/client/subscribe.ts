@@ -1,8 +1,7 @@
 import { assert } from 'chai'
 
 import rippled from '../fixtures/rippled'
-import {setupClient, teardownClient} from '../setupClient'
-
+import { setupClient, teardownClient } from '../setupClient'
 
 describe('Subscription', function () {
   beforeEach(setupClient)
