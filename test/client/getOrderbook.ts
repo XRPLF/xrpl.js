@@ -95,7 +95,7 @@ describe('client.getOrderbook', function () {
         const response = await this.client.getOrderbook(
           requests.getOrderbook.normal.taker_pays,
           requests.getOrderbook.normal.taker_gets,
-          { limit: 20 },
+          { limit: 1 },
         )
         assert.deepEqual(response, responses.getOrderbook.normal)
       })
