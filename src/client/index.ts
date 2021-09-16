@@ -5,7 +5,6 @@ import { EventEmitter } from 'events'
 
 import { ValidationError, XrplError } from '../common/errors'
 import * as errors from '../common/errors'
-import { txFlags } from '../common/txflags'
 import {
   // account methods
   AccountChannelsRequest,
@@ -537,9 +536,6 @@ class Client extends EventEmitter {
   public generateFaucetWallet = prepend(generateFaucetWallet, this)
 
   public errors = errors
-
-  public txFlags = txFlags
-  public static txFlags = txFlags
 }
 
 export { Client, Connection }
