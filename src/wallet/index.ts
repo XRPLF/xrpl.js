@@ -43,7 +43,7 @@ class Wallet {
    * This only is correct if this wallet corresponds to your
    * [master keypair](https://xrpl.org/cryptographic-keys.html#master-key-pair). If this wallet represents a
    * [regular keypair](https://xrpl.org/cryptographic-keys.html#regular-key-pair) this will provide an incorrect address.
-   * TODO: Add support for Regular Keys to Wallet (And their corresponding impact on figuring out classicAddress)
+   * TODO: Add support for Regular Keys to Wallet (And their corresponding impact on figuring out classicAddress).
    */
   public readonly classicAddress: string
   public readonly seed?: string
@@ -164,8 +164,8 @@ class Wallet {
    * @param multisignAddress - Multisign only. An account address corresponding to the multi-signature being added. If this
    * wallet represents your [master keypair](https://xrpl.org/cryptographic-keys.html#master-key-pair) you can get your account address
    * with the Wallet.getClassicAddress() function.
-   * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    * @returns A signed transaction.
+   * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    */
   public signTransaction(
     transaction: Transaction,
@@ -187,16 +187,12 @@ class Wallet {
         SigningPubKey: this.publicKey,
         TxnSignature: this.computeSignature(
           txToSignAndEncode,
-          this.privateKey,
           multisignAddress,
         ),
       }
       txToSignAndEncode.Signers = [{ Signer: signer }]
     } else {
-      txToSignAndEncode.TxnSignature = this.computeSignature(
-        txToSignAndEncode,
-        this.privateKey,
-      )
+      txToSignAndEncode.TxnSignature = this.computeSignature(txToSignAndEncode)
     }
     const serialized = encode(txToSignAndEncode)
     this.checkTxSerialization(serialized, transaction)
@@ -313,19 +309,15 @@ class Wallet {
    * @returns A signed transaction in the proper format.
    */
   // eslint-disable-next-line class-methods-use-this -- Helper to add organizational clarity
-  private computeSignature(
-    tx: Transaction,
-    privateKey: string,
-    signAs?: string,
-  ): string {
+  private computeSignature(tx: Transaction, signAs?: string): string {
     if (signAs) {
       const classicAddress = isValidXAddress(signAs)
         ? xAddressToClassicAddress(signAs).classicAddress
         : signAs
 
-      return sign(encodeForMultisigning(tx, classicAddress), privateKey)
+      return sign(encodeForMultisigning(tx, classicAddress), this.privateKey)
     }
-    return sign(encodeForSigning(tx), privateKey)
+    return sign(encodeForSigning(tx), this.privateKey)
   }
 }
 
