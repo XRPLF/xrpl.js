@@ -16,3 +16,8 @@ export default interface Offer extends BaseLedgerEntry {
   PreviousTxnLgrSeq: number
   Expiration?: number
 }
+
+export enum OfferLedgerFlags {
+  lsfPassive = 0x00010000,
+  lsfSell = 0x00020000,
+}
