@@ -58,6 +58,7 @@ async function getOrderbook(
     limit: options.limit ?? DEFAULT_LIMIT,
     taker: options.taker,
   }
+  console.log(request)
   // 2. Make Request
   const directOfferResults = await this.requestAll(request)
   request.taker_gets = takerPays

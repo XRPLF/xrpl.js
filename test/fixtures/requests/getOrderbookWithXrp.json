@@ -1,9 +1,9 @@
 {
-  "base": {
+  "taker_pays": {
     "currency": "USD",
-    "counterparty": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw"
+    "issuer": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw"
   },
-  "counter": {
+  "taker_gets": {
     "currency": "XRP"
   }
 }
