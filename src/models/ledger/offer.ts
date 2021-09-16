@@ -19,5 +19,5 @@ export default interface Offer extends BaseLedgerEntry {
 
 export enum OfferLedgerFlags {
   lsfPassive = 0x00010000,
-  lsfSell = 0x00020000, // True, offer was placed as a sell.
+  lsfSell = 0x00020000,
 }
