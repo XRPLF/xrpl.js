@@ -202,7 +202,7 @@ describe('Wallet', function () {
     })
 
     it('signTransaction successfully', async function () {
-      const result = wallet2.signTransaction(REQUEST_FIXTURES.normal.txJSON)
+      const result = wallet2.signTransaction(REQUEST_FIXTURES.normal)
       assert.deepEqual(result, RESPONSE_FIXTURES.normal.signedTransaction)
     })
 
@@ -239,33 +239,30 @@ describe('Wallet', function () {
 
     it('signTransaction with EscrowFinish', async function () {
       const result = wallet4.signTransaction(
-        REQUEST_FIXTURES.escrow.txJSON as unknown as Transaction,
+        REQUEST_FIXTURES.escrow as Transaction,
       )
       assert.deepEqual(result, RESPONSE_FIXTURES.escrow.signedTransaction)
     })
 
     it('signTransaction with multisignAddress', async function () {
-      const txJSON = REQUEST_FIXTURES.signAs
       const signature = wallet4.signTransaction(
-        txJSON as unknown as Transaction,
+        REQUEST_FIXTURES.signAs as Transaction,
         wallet4.getClassicAddress(),
       )
       assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
     })
 
     it('signTransaction with X Address and no given tag for multisignAddress', async function () {
-      const txJSON = REQUEST_FIXTURES.signAs
       const signature = wallet4.signTransaction(
-        txJSON as unknown as Transaction,
+        REQUEST_FIXTURES.signAs as Transaction,
         wallet4.getXAddress(),
       )
       assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
     })
 
     it('signTransaction with X Address and tag for multisignAddress', async function () {
-      const txJSON = REQUEST_FIXTURES.signAs
       const signature = wallet4.signTransaction(
-        txJSON as unknown as Transaction,
+        REQUEST_FIXTURES.signAs as Transaction,
         wallet4.getXAddress(0),
       )
       // Adding a tag changes the classicAddress, which changes the signature from RESPONSE_FIXTURES.signAs
@@ -275,12 +272,12 @@ describe('Wallet', function () {
     })
 
     it('signTransaction with a wallet generated from public and private keys', async function () {
-      const result = wallet3.signTransaction(REQUEST_FIXTURES.normal.txJSON)
+      const result = wallet3.signTransaction(REQUEST_FIXTURES.normal)
       assert.deepEqual(result, RESPONSE_FIXTURES.normal.signedTransaction)
     })
 
     it('signTransaction throws when given a transaction that is already signed', async function () {
-      const result = wallet3.signTransaction(REQUEST_FIXTURES.normal.txJSON)
+      const result = wallet3.signTransaction(REQUEST_FIXTURES.normal)
       assert.throws(() => {
         const tx = decode(result) as unknown as Transaction
         wallet.signTransaction(tx)
@@ -293,13 +290,13 @@ describe('Wallet', function () {
         '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
       )
       const result = localWallet.signTransaction(
-        REQUEST_FIXTURES.escrow.txJSON as unknown as Transaction,
+        REQUEST_FIXTURES.escrow as Transaction,
       )
       assert.deepEqual(result, RESPONSE_FIXTURES.escrow.signedTransaction)
     })
 
     it('signTransaction with multisignAddress and a wallet generated from public and private key', async function () {
-      const tx = REQUEST_FIXTURES.signAs as unknown as Transaction
+      const tx = REQUEST_FIXTURES.signAs as Transaction
       const localWallet = new Wallet(
         '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
         '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
@@ -414,7 +411,7 @@ describe('Wallet', function () {
     it('signTransaction with a ticket transaction', async function () {
       const localWallet = Wallet.fromSeed('sn7n5R1cR5Y3fRFkuWXA94Ts1frVJ')
       const result = localWallet.signTransaction(
-        REQUEST_FIXTURES.ticket.txJSON as unknown as Transaction,
+        REQUEST_FIXTURES.ticket as Transaction,
       )
       assert.deepEqual(result, RESPONSE_FIXTURES.ticket.signedTransaction)
     })
