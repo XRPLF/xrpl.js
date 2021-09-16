@@ -1,6 +1,5 @@
-import { OfferCreateTransaction } from '../../common/types/objects'
 import type { Amount, Currency, Path, StreamType } from '../common'
-import { Transaction } from '../transactions'
+import { OfferCreate, Transaction } from '../transactions'
 import TransactionMetadata from '../transactions/metadata'
 
 import type { BaseRequest, BaseResponse } from './baseMethod'
@@ -88,7 +87,7 @@ export interface PeerStatusStream extends BaseStream {
   ledger_index_min?: number
 }
 
-interface ModifiedOfferCreateTransaction extends OfferCreateTransaction {
+interface ModifiedOfferCreateTransaction extends OfferCreate {
   owner_funds: string
 }
 

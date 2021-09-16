@@ -3,8 +3,6 @@ export { default as BroadcastClient } from './client/broadcastClient'
 
 export { Client } from './client'
 
-export * from './common/types/objects/ledger'
-
 export * from './models/methods'
 
 export * from './models/transactions'

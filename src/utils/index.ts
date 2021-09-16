@@ -16,7 +16,6 @@ import {
 } from 'ripple-address-codec'
 
 import { ValidationError } from '../common/errors'
-import { RippledAmount } from '../common/types/objects'
 
 import { deriveKeypair, deriveXAddress } from './derive'
 import { generateXAddress } from './generateAddress'
@@ -58,10 +57,10 @@ function isValidSecret(secret: string): boolean {
  * TODO: Remove/rename this function.
  *
  * @param amount - Convert an Amount in.
- * @returns Amount without X-Address issuer.
+ * @returns Amount in a format Rippled can understand (by converting X-Addresses to classicAdresses).
  * @throws When issuer X-Address includes a tag.
  */
-function toRippledAmount(amount: RippledAmount): RippledAmount {
+function toRippledAmount(amount: Amount): Amount {
   if (typeof amount === 'string') {
     return amount
   }
@@ -73,7 +72,7 @@ function toRippledAmount(amount: RippledAmount): RippledAmount {
     return amount.value
   }
 
-  let issuer = amount.counterparty ?? amount.issuer
+  let issuer = amount.issuer
   let tag: number | false = false
 
   try {
