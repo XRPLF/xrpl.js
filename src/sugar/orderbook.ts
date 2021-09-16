@@ -3,13 +3,12 @@ import _ from 'lodash'
 
 import type { Client } from '../client'
 import { LedgerIndex } from '../models/common'
+import { OfferLedgerFlags } from '../models/ledger/offer'
 import {
   BookOffer,
   BookOffersRequest,
   TakerAmount,
 } from '../models/methods/bookOffers'
-
-const SELL_OFFER_FLAGS = 0x00020000
 
 function sortOffers(offers: BookOffer[]): BookOffer[] {
   return offers.sort((offerA, offerB) => {
@@ -84,7 +83,7 @@ async function getOrderbook(
   const buy: BookOffer[] = []
   const sell: BookOffer[] = []
   orders.forEach((order) => {
-    if ((order.Flags & SELL_OFFER_FLAGS) !== 0) {
+    if ((order.Flags & OfferLedgerFlags.lsfSell) !== 0) {
       sell.push(order)
     } else {
       buy.push(order)
