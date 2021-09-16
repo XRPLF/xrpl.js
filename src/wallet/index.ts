@@ -43,6 +43,7 @@ class Wallet {
    * This only is correct if this wallet corresponds to your
    * [master keypair](https://xrpl.org/cryptographic-keys.html#master-key-pair). If this wallet represents a
    * [regular keypair](https://xrpl.org/cryptographic-keys.html#regular-key-pair) this will provide an incorrect address.
+   * TODO: Add support for Regular Keys to Wallet (And their corresponding impact on figuring out classicAddress)
    */
   public readonly classicAddress: string
   public readonly seed?: string
