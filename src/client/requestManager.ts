@@ -1,4 +1,9 @@
-import { ResponseFormatError, RippledError, TimeoutError } from '../errors'
+import {
+  ResponseFormatError,
+  RippledError,
+  TimeoutError,
+  XrplError,
+} from '../errors'
 import { Response } from '../models/methods'
 import { BaseRequest, ErrorResponse } from '../models/methods/baseMethod'
 
@@ -77,6 +82,7 @@ export default class RequestManager {
   public rejectAll(error: Error): void {
     this.promisesAwaitingResponse.forEach((_promise, id, _map) => {
       this.reject(id, error)
+      this.deletePromise(id)
     })
   }
 
@@ -110,6 +116,9 @@ export default class RequestManager {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Reason above.
     if (timer.unref) {
       timer.unref()
+    }
+    if (this.promisesAwaitingResponse.has(newId)) {
+      throw new XrplError(`Response with id ${newId} is already pending`)
     }
     const newPromise = new Promise<Response>(
       (resolve: (value: Response | PromiseLike<Response>) => void, reject) => {
