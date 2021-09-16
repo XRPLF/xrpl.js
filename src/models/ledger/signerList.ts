@@ -17,3 +17,7 @@ export default interface SignerList extends BaseLedgerEntry {
   SignerListID: number
   SignerQuorum: number
 }
+
+export enum SignerListLedgerFlags {
+  lsfOneOwnerCount = 0x00010000, // True, uses only one OwnerCount
+}

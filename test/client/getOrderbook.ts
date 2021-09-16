@@ -1,12 +1,13 @@
 // import BigNumber from "bignumber.js";
 // import { assert } from "chai";
 
+import { assert } from 'chai'
 import { BookOffersRequest } from '../../src'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
-import { addressTests, assertResultMatch } from '../testUtils'
+import { addressTests } from '../testUtils'
 
 // function checkSortingOfOrders(orders) {
 //   let previousRate = "0";
@@ -94,11 +95,7 @@ describe('client.getOrderbook', function () {
             limit: 1,
           },
         )
-        assertResultMatch(
-          response,
-          responses.getOrderbook.normal,
-          'getOrderbook',
-        )
+        assert.deepEqual(response, responses.getOrderbook.normal)
       })
 
       // it("invalid options", async function () {
