@@ -1,7 +1,9 @@
-import { ValidationError } from 'xrpl-local/common/errors'
-import { verifyPaymentChannelClaim } from './../../src/models/transactions/paymentChannelClaim'
 import { assert } from 'chai'
+
+import { ValidationError } from 'xrpl-local/common/errors'
+
 import { verify } from '../../src/models/transactions'
+import { verifyPaymentChannelClaim } from '../../src/models/transactions/paymentChannelClaim'
 
 /**
  * PaymentChannelClaim Transaction Verification Testing.

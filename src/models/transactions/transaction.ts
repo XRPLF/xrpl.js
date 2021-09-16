@@ -1,12 +1,11 @@
 /* eslint-disable complexity -- verifies 19 tx types hence a lot of checks needed */
 /* eslint-disable max-lines-per-function -- need to work with a lot of Tx verifications */
-/* eslint-disable import/max-dependencies -- need to test more than 5 TxTypes */
 
 import _ from 'lodash'
 import { encode, decode } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../common/errors'
-import TransactionMetadata from './metadata'
+import { setTransactionFlagsToNumber } from '../utils'
 
 import { AccountDelete, verifyAccountDelete } from './accountDelete'
 import {
@@ -22,12 +21,14 @@ import { DepositPreauth, verifyDepositPreauth } from './depositPreauth'
 import { EscrowCancel, verifyEscrowCancel } from './escrowCancel'
 import { EscrowCreate, verifyEscrowCreate } from './escrowCreate'
 import { EscrowFinish, verifyEscrowFinish } from './escrowFinish'
+import TransactionMetadata from './metadata'
 import { OfferCancel, verifyOfferCancel } from './offerCancel'
 import {
   OfferCreate,
   verifyOfferCreate,
   OfferCreateTransactionFlags,
 } from './offerCreate'
+import { Payment, verifyPayment, PaymentTransactionFlags } from './payment'
 import {
   PaymentChannelClaim,
   verifyPaymentChannelClaim,
@@ -41,12 +42,10 @@ import {
   PaymentChannelFund,
   verifyPaymentChannelFund,
 } from './paymentChannelFund'
-import { Payment, verifyPayment, PaymentTransactionFlags } from './payment'
 import { SetRegularKey, verifySetRegularKey } from './setRegularKey'
 import { SignerListSet, verifySignerListSet } from './signerListSet'
 import { TicketCreate, verifyTicketCreate } from './ticketCreate'
 import { TrustSet, verifyTrustSet, TrustSetTransactionFlags } from './trustSet'
-import { setTransactionFlagsToNumber } from '../utils'
 
 export type Transaction =
   | AccountDelete
@@ -78,7 +77,7 @@ export interface TransactionAndMetadata {
  * Verifies various Transaction Types.
  * Encode/decode and individual type validation.
  *
- * @param tx - A Transaction.
+ * @param transaction - A Transaction.
  * @throws ValidationError When the Transaction is malformed.
  */
 export function verify(transaction: Record<string, unknown>): void {

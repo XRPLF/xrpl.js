@@ -1,7 +1,9 @@
-import { ValidationError } from 'xrpl-local/common/errors'
-import { verifyAccountSet } from './../../src/models/transactions/accountSet'
-import { verify } from '../../src/models/transactions'
 import { assert } from 'chai'
+
+import { ValidationError } from 'xrpl-local/common/errors'
+
+import { verify } from '../../src/models/transactions'
+import { verifyAccountSet } from '../../src/models/transactions/accountSet'
 
 /**
  * AccountSet Transaction Verification Testing.

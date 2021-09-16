@@ -1,7 +1,9 @@
-import { ValidationError } from 'xrpl-local/common/errors'
-import { verifyCheckCash } from './../../src/models/transactions/checkCash'
 import { assert } from 'chai'
+
+import { ValidationError } from 'xrpl-local/common/errors'
+
 import { verify } from '../../src/models/transactions'
+import { verifyCheckCash } from '../../src/models/transactions/checkCash'
 
 /**
  * CheckCash Transaction Verification Testing.

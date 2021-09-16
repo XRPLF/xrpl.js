@@ -1,7 +1,8 @@
-import { verifyEscrowCancel } from './../../src/models/transactions/escrowCancel'
 import { assert } from 'chai'
+
 import { ValidationError } from '../../src/common/errors'
 import { verify } from '../../src/models/transactions'
+import { verifyEscrowCancel } from '../../src/models/transactions/escrowCancel'
 
 /**
  * Transaction Verification Testing.
