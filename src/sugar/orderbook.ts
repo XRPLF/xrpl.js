@@ -58,7 +58,6 @@ async function getOrderbook(
     limit: options.limit ?? DEFAULT_LIMIT,
     taker: options.taker,
   }
-  console.log(request)
   // 2. Make Request
   const directOfferResults = await this.requestAll(request)
   request.taker_gets = takerPays
@@ -74,12 +73,8 @@ async function getOrderbook(
     (reverseOfferResult) => reverseOfferResult.result.offers,
   )
 
-  // Sort the orders
-  // for both buys and sells, lowest quality is closest to mid-market
-  // we sort the orders so that earlier orders are closer to mid-market
-
   const orders = [...directOffers, ...reverseOffers]
-  // separate out the orders amongst buy and sell
+  // separate out the buy and sell orders
   const buy: BookOffer[] = []
   const sell: BookOffer[] = []
   orders.forEach((order) => {
@@ -90,6 +85,9 @@ async function getOrderbook(
       sell.push(order)
     }
   })
+  // Sort the orders
+  // for both buys and sells, lowest quality is closest to mid-market
+  // we sort the orders so that earlier orders are closer to mid-market
   return { buy: sortOffers(buy), sell: sortOffers(sell) }
 }
 
