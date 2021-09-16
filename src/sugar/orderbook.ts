@@ -48,16 +48,16 @@ async function getOrderbook(
   this: Client,
   takerPays: TakerAmount,
   takerGets: TakerAmount,
-  options?: OrderbookOptions,
+  options: OrderbookOptions = {},
 ): Promise<Orderbook> {
   const request: BookOffersRequest = {
     command: 'book_offers',
     taker_pays: takerPays,
     taker_gets: takerGets,
-    ledger_index: options?.ledger_index ?? 'validated',
-    ledger_hash: options?.ledger_hash ?? undefined,
-    limit: options?.limit ?? DEFAULT_LIMIT,
-    taker: options?.taker ?? undefined,
+    ledger_index: options.ledger_index ?? 'validated',
+    ledger_hash: options.ledger_hash,
+    limit: options.limit ?? DEFAULT_LIMIT,
+    taker: options.taker,
   }
   // 2. Make Request
   const directOfferResults = await this.requestAll(request)
