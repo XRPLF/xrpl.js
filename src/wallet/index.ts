@@ -160,6 +160,7 @@ class Wallet {
   /**
    * Signs a transaction offline.
    *
+   * @param this - Wallet instance.
    * @param transaction - A transaction to be signed offline.
    * @param multisignAddress - Multisign only. An account address corresponding to the multi-signature being added. If this
    * wallet represents your [master keypair](https://xrpl.org/cryptographic-keys.html#master-key-pair) you can get your account address
@@ -168,6 +169,7 @@ class Wallet {
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    */
   public signTransaction(
+    this: Wallet,
     transaction: Transaction,
     multisignAddress?: string,
   ): string {
@@ -185,14 +187,18 @@ class Wallet {
       const signer = {
         Account: multisignAddress,
         SigningPubKey: this.publicKey,
-        TxnSignature: this.computeSignature(
+        TxnSignature: computeSignature(
           txToSignAndEncode,
+          this.privateKey,
           multisignAddress,
         ),
       }
       txToSignAndEncode.Signers = [{ Signer: signer }]
     } else {
-      txToSignAndEncode.TxnSignature = this.computeSignature(txToSignAndEncode)
+      txToSignAndEncode.TxnSignature = computeSignature(
+        txToSignAndEncode,
+        this.privateKey,
+      )
     }
     const serialized = encode(txToSignAndEncode)
     this.checkTxSerialization(serialized, transaction)
@@ -298,27 +304,30 @@ class Wallet {
       throw error
     }
   }
+}
 
-  /**
-   * Signs a transaction with the proper signing encoding.
-   *
-   * @param tx - A transaction to sign.
-   * @param privateKey - = A key to sign the transaction with.
-   * @param signAs - Multisign only. An account address to include in the Signer field.
-   * Can be either a classic address or an XAddress.
-   * @returns A signed transaction in the proper format.
-   */
-  // eslint-disable-next-line class-methods-use-this -- Helper to add organizational clarity
-  private computeSignature(tx: Transaction, signAs?: string): string {
-    if (signAs) {
-      const classicAddress = isValidXAddress(signAs)
-        ? xAddressToClassicAddress(signAs).classicAddress
-        : signAs
+/**
+ * Signs a transaction with the proper signing encoding.
+ *
+ * @param tx - A transaction to sign.
+ * @param privateKey - = A key to sign the transaction with.
+ * @param signAs - Multisign only. An account address to include in the Signer field.
+ * Can be either a classic address or an XAddress.
+ * @returns A signed transaction in the proper format.
+ */
+function computeSignature(
+  tx: Transaction,
+  privateKey: string,
+  signAs?: string,
+): string {
+  if (signAs) {
+    const classicAddress = isValidXAddress(signAs)
+      ? xAddressToClassicAddress(signAs).classicAddress
+      : signAs
 
-      return sign(encodeForMultisigning(tx, classicAddress), this.privateKey)
-    }
-    return sign(encodeForSigning(tx), this.privateKey)
+    return sign(encodeForMultisigning(tx, classicAddress), privateKey)
   }
+  return sign(encodeForSigning(tx), privateKey)
 }
 
 export default Wallet
