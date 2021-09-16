@@ -15,7 +15,9 @@ describe('client.hasNextPage', function () {
   })
 
   it('returns false when there are no more pages', async function () {
-    const rippledResponse = function (request: Request): object {
+    const rippledResponse = function (
+      request: Request,
+    ): Record<string, unknown> {
       if ('marker' in request) {
         return rippled.ledger_data.last_page
       }

@@ -25,6 +25,6 @@ describe('client.combine', function () {
     request.push(binary.encode(tx))
     assert.throws(() => {
       this.client.combine(request)
-    }, /txJSON is not the same for all signedTransactions/)
+    }, /txJSON is not the same for all signedTransactions/u)
   })
 })

@@ -88,7 +88,7 @@ describe('client.sign', function () {
     assert.throws(() => {
       const tx = JSON.stringify(binary.decode(result.signedTransaction))
       this.client.sign(tx, keypair)
-    }, /txJSON must not contain "TxnSignature" or "Signers" properties/)
+    }, /txJSON must not contain "TxnSignature" or "Signers" properties/u)
   })
 
   it('withKeypair EscrowExecution', async function () {
@@ -122,7 +122,7 @@ describe('client.sign', function () {
     assert.throws(() => {
       const tx = JSON.stringify(binary.decode(result.signedTransaction))
       this.client.sign(tx, secret)
-    }, /txJSON must not contain "TxnSignature" or "Signers" properties/)
+    }, /txJSON must not contain "TxnSignature" or "Signers" properties/u)
   })
 
   it('succeeds - no flags', async function () {
@@ -138,7 +138,7 @@ describe('client.sign', function () {
     const decoded = binary.decode(result.signedTransaction)
     assert(
       decoded.Flags == null,
-      `Flags = ${decoded.Flags}, should be undefined`,
+      `Flags = ${decoded.Flags as number}, should be undefined`,
     )
     assert.deepEqual(result, expectedResult)
   })
@@ -158,7 +158,7 @@ describe('client.sign', function () {
     const decoded = binary.decode(result.signedTransaction)
     assert(
       decoded.Flags === 2147614720,
-      `Flags = ${decoded.Flags}, should be 2147614720`,
+      `Flags = ${decoded.Flags as number}, should be 2147614720`,
     )
     assert.deepEqual(result, expectedResult)
   })
@@ -177,7 +177,7 @@ describe('client.sign', function () {
 
     assert.throws(() => {
       this.client.sign(request.txJSON, secret)
-    }, /1\.2 is an illegal amount/)
+    }, /1\.2 is an illegal amount/u)
   })
 
   it('throws when encoded tx does not match decoded tx - higher fee', async function () {
@@ -194,7 +194,7 @@ describe('client.sign', function () {
 
     assert.throws(() => {
       this.client.sign(request.txJSON, secret)
-    }, /1123456\.7 is an illegal amount/)
+    }, /1123456\.7 is an illegal amount/u)
   })
 
   it('permits fee exceeding 2000000 drops when maxFeeXRP is higher than 2 XRP', async function () {
@@ -240,7 +240,7 @@ describe('client.sign', function () {
 
     assert.throws(() => {
       this.client.sign(request.txJSON, secret)
-    }, /Fee" should not exceed "2000000"\. To use a higher fee, set `maxFeeXRP` in the Client constructor\./)
+    }, /Fee" should not exceed "2000000"\. To use a higher fee, set `maxFeeXRP` in the Client constructor\./u)
   })
 
   it('throws when Fee exceeds maxFeeXRP (in drops) - custom maxFeeXRP', async function () {
@@ -257,7 +257,7 @@ describe('client.sign', function () {
 
     assert.throws(() => {
       this.client.sign(request.txJSON, secret)
-    }, /Fee" should not exceed "1900000"\. To use a higher fee, set `maxFeeXRP` in the Client constructor\./)
+    }, /Fee" should not exceed "1900000"\. To use a higher fee, set `maxFeeXRP` in the Client constructor\./u)
   })
 
   it('sign with paths', async function () {
@@ -329,7 +329,7 @@ describe('client.sign', function () {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     assert.throws(() => {
       this.client.sign(JSON.stringify(payment), secret)
-    }, /^1.1234567 is an illegal amount/)
+    }, /^1.1234567 is an illegal amount/u)
   })
 
   it('throws when encoded tx does not match decoded tx - prepared order', async function () {
