@@ -94,6 +94,7 @@ export default class RequestManager {
    * @param request - Request to create.
    * @param timeout - Timeout length to catch hung responses.
    * @returns Request ID, new request form, and the promise for resolving the request.
+   * @throws XrplError if request with the same ID is already pending.
    */
   public createRequest<T extends BaseRequest>(
     request: T,
@@ -118,7 +119,7 @@ export default class RequestManager {
       timer.unref()
     }
     if (this.promisesAwaitingResponse.has(newId)) {
-      throw new XrplError(`Response with id ${newId} is already pending`)
+      throw new XrplError(`Response with id '${newId}' is already pending`)
     }
     const newPromise = new Promise<Response>(
       (resolve: (value: Response | PromiseLike<Response>) => void, reject) => {
@@ -137,11 +138,7 @@ export default class RequestManager {
    * @throws ResponseFormatError if the response format is invalid, RippledError if rippled returns an error.
    */
   public handleResponse(response: Partial<Response | ErrorResponse>): void {
-    if (
-      response.id == null ||
-      !Number.isInteger(response.id) ||
-      response.id < 0
-    ) {
+    if (response.id == null) {
       throw new ResponseFormatError('valid id not found in response', response)
     }
     if (!this.promisesAwaitingResponse.has(response.id)) {

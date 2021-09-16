@@ -17,7 +17,7 @@ import { Connection } from 'xrpl-local/client/connection'
 
 import rippled from './fixtures/rippled'
 import { setupClient, teardownClient } from './setupClient'
-import { ignoreWebSocketDisconnect } from './testUtils'
+import { assertRejects, ignoreWebSocketDisconnect } from './testUtils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -618,5 +618,14 @@ describe('Connection', function () {
       })
       .then(() => new Error('Should not have succeeded'))
       .catch(done())
+  })
+
+  it('should throw error if pending response with same ID', async function () {
+    await this.client.connection.request({ id: 'test', command: 'ping' })
+    assertRejects(
+      this.client.connection.request({ id: 'test', command: 'ping' }),
+      XrplError,
+      "Response with id 'test' is already pending",
+    )
   })
 })
