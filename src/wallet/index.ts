@@ -20,7 +20,7 @@ import {
   sign,
 } from 'ripple-keypairs'
 
-import ECDSA from '../common/ecdsa'
+import ECDSA from '../ecdsa'
 import { ValidationError } from '../common/errors'
 import { Transaction } from '../models/transactions'
 

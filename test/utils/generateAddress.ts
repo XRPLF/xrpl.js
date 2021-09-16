@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import ECDSA from '../../src/common/ecdsa'
+import ECDSA from '../../src/ecdsa'
 import { UnexpectedError } from '../../src/common/errors'
 import {
   generateXAddress,
