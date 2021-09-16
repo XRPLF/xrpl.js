@@ -93,8 +93,13 @@ export default class RequestManager {
     request: T,
     timeout: number,
   ): [string | number, string, Promise<Response>] {
-    const newId = request.id ? request.id : this.nextId
-    this.nextId += 1
+    let newId: string | number
+    if (request.id == null) {
+      newId = this.nextId
+      this.nextId += 1
+    } else {
+      newId = request.id
+    }
     const newRequest = JSON.stringify({ ...request, id: newId })
     const timer = setTimeout(
       () => this.reject(newId, new TimeoutError()),
