@@ -13,9 +13,8 @@ describe('getBalances', function () {
   beforeEach(setupClient)
   afterEach(teardownClient)
 
-  // eslint-disable-next-line mocha/no-setup-in-describe -- Rule does not allow dynamic test generation.
-  addressTests.forEach(function (testCase) {
-    describe(testCase.type, function () {
+  addressTests.forEach(function (testcase) {
+    describe(testcase.type, function () {
       it('getBalances', async function () {
         this.mockRippled.addResponse(
           'account_info',
@@ -26,45 +25,43 @@ describe('getBalances', function () {
           rippledAccountLines.normal,
         )
         this.mockRippled.addResponse('ledger', rippled.ledger.normal)
-        const result = await this.client.getBalances(testCase.address)
+        const result = await this.client.getBalances(testcase.address)
         assertResultMatch(result, responses.getBalances, 'getBalances')
       })
 
-      // it("getBalances - limit", async function () {
-      //   const request = {
-      //     account: test.address,
-      //     limit: 10,
-      //     ledger_index: 123456,
-      //   };
+      // it('getBalances - limit', async function () {
+      //   const options = { limit: 3, ledgerVersion: 123456 }
       //   this.mockRippled.addResponse(
-      //     "account_info",
-      //     rippled.account_info.normal
-      //   );
+      //     'account_info',
+      //     rippled.account_info.normal,
+      //   )
       //   this.mockRippled.addResponse(
-      //     "account_lines",
-      //     rippledAccountLines.normal
-      //   );
-      //   this.mockRippled.addResponse("ledger", rippled.ledger.normal);
-      //   const expectedResponse = responses.getBalances.slice(0, 10);
-      //   const result = await this.client.getBalances(request);
-      //   assertResultMatch(result, expectedResponse, "getBalances");
-      // });
+      //     'account_lines',
+      //     rippledAccountLines.normal,
+      //   )
+      //   this.mockRippled.addResponse('ledger', rippled.ledger.normal)
+      //   const expectedResponse = responses.getBalances.slice(0, 3)
+      //   const result = await this.client.getBalances(testcase.address, options)
+      //   assertResultMatch(result, expectedResponse, 'getBalances')
+      // })
 
-      //   it("getBalances - limit", async function () {
-      //     const options = { limit: 3, ledgerVersion: 123456 };
-      //     this.mockRippled.addResponse(
-      //       "account_info",
-      //       rippled.account_info.normal
-      //     );
-      //     this.mockRippled.addResponse(
-      //       "account_lines",
-      //       rippledAccountLines.normal
-      //     );
-      //     this.mockRippled.addResponse("ledger", rippled.ledger.normal);
-      //     const expectedResponse = responses.getBalances.slice(0, 3);
-      //     const result = await this.client.getBalances(test.address, options);
-      //     assertResultMatch(result, expectedResponse, "getBalances");
-      //   });
+      // it('getBalances - limit & currency', async function () {
+      //   const options = { currency: 'USD', limit: 3 }
+      //   this.mockRippled.addResponse(
+      //     'account_info',
+      //     rippled.account_info.normal,
+      //   )
+      //   this.mockRippled.addResponse(
+      //     'account_lines',
+      //     rippledAccountLines.normal,
+      //   )
+      //   this.mockRippled.addResponse('ledger', rippled.ledger.normal)
+      //   const expectedResponse = responses.getBalances
+      //     .filter((item) => item.currency === 'USD')
+      //     .slice(0, 3)
+      //   const result = await this.client.getBalances(testcase.address, options)
+      //   assertResultMatch(result, expectedResponse, 'getBalances')
+      // })
 
       //   it("getBalances - limit & currency", async function () {
       //     const options = { currency: "USD", limit: 3 };
