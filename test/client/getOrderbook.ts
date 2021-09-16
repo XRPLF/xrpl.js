@@ -1,4 +1,4 @@
-// import BigNumber from "bignumber.js";
+import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 
 import { BookOffersRequest } from '../../src'
@@ -11,36 +11,36 @@ import {
   assertRejects,
 } from '../testUtils'
 
-// function checkSortingOfOrders(orders) {
-//   let previousRate = "0";
-//   for (let i = 0; i < orders.length; i++) {
-//     const order = orders[i];
-//     let rate;
+function checkSortingOfOrders(orders) {
+  let previousRate = '0'
+  for (let i = 0; i < orders.length; i++) {
+    const order = orders[i]
+    let rate
 
-//     // We calculate the quality of output/input here as a test.
-//     // This won't hold in general because when output and input amounts get tiny,
-//     // the quality can differ significantly. However, the offer stays in the
-//     // order book where it was originally placed. It would be more consistent
-//     // to check the quality from the offer book, but for the test data set,
-//     // this calculation holds.
+    // We calculate the quality of output/input here as a test.
+    // This won't hold in general because when output and input amounts get tiny,
+    // the quality can differ significantly. However, the offer stays in the
+    // order book where it was originally placed. It would be more consistent
+    // to check the quality from the offer book, but for the test data set,
+    // this calculation holds.
 
-//     if (order.specification.direction === "buy") {
-//       rate = new BigNumber(order.specification.quantity.value)
-//         .dividedBy(order.specification.totalPrice.value)
-//         .toString();
-//     } else {
-//       rate = new BigNumber(order.specification.totalPrice.value)
-//         .dividedBy(order.specification.quantity.value)
-//         .toString();
-//     }
-//     assert(
-//       new BigNumber(rate).isGreaterThanOrEqualTo(previousRate),
-//       `Rates must be sorted from least to greatest: ${rate} should be >= ${previousRate}`
-//     );
-//     previousRate = rate;
-//   }
-//   return true;
-// }
+    if (order.specification.direction === 'buy') {
+      rate = new BigNumber(order.specification.quantity.value)
+        .dividedBy(order.specification.totalPrice.value)
+        .toString()
+    } else {
+      rate = new BigNumber(order.specification.totalPrice.value)
+        .dividedBy(order.specification.quantity.value)
+        .toString()
+    }
+    assert(
+      new BigNumber(rate).isGreaterThanOrEqualTo(previousRate),
+      `Rates must be sorted from least to greatest: ${rate} should be >= ${previousRate}`,
+    )
+    previousRate = rate
+  }
+  return true
+}
 
 function isUSD(currency: string): boolean {
   return (
@@ -152,19 +152,22 @@ describe('client.getOrderbook', function () {
     //   // checkSortingOfOrders(response.asks)
     // })
 
-    // 'sample USD/XRP book has orders sorted correctly', async function () {
-    //   const orderbookInfo = {
-    //     counter: {currency: 'XRP'},
-    //     base: {
-    //       currency: 'USD',
-    //       counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-    //     }
-    //   }
-    //   const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR'
-    //   const response = await this.client.getOrderbook(myAddress, orderbookInfo)
-    //   checkSortingOfOrders(response.bids)
-    //   checkSortingOfOrders(response.asks)
-    // },
+    it('sample USD/XRP book has orders sorted correctly', async function () {
+      this.mockRippled.addResponse('book_offers', xrpRippledResponse)
+      // const orderbookInfo = {
+      //   taker_pays: { currency: 'XRP' },
+      //   taker_gets: {
+      //     currency: 'USD',
+      //     issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+      //   },
+      // }
+      const response = await this.client.getOrderbook(
+        requests.getOrderbook.withXRP.taker_pays,
+        requests.getOrderbook.withXRP.taker_gets,
+      )
+      checkSortingOfOrders(response.buy)
+      checkSortingOfOrders(response.sell)
+    })
 
     // WARNING: This test fails to catch the sorting bug, issue #766
     // it("sorted so that best deals come first [bad test]", async function () {
@@ -191,25 +194,6 @@ describe('client.getOrderbook', function () {
     //     askRates
     //   );
     // });
-
-    it('currency & counterparty are correct', async function () {
-      this.mockRippled.addResponse('book_offers', normalRippledResponse)
-      const response = await this.client.getOrderbook(
-        requests.getOrderbook.normal.taker_pays,
-        requests.getOrderbook.normal.taker_gets,
-      )
-      console.log(response)
-      const { taker_pays, taker_gets } = requests.getOrderbook.normal
-      console.log(requests.getOrderbook.normal)
-      response.sell.forEach((resp) => {
-        // console.log(response)
-        // console.log(requests.getOrderbook.normal)
-        assert.strictEqual(resp.TakerGets.currency, taker_pays.currency)
-        assert.strictEqual(resp.TakerGets.issuer, taker_pays.issuer)
-        assert.strictEqual(resp.TakerPays.currency, taker_gets.currency)
-        assert.strictEqual(resp.TakerPays.issuer, taker_gets.issuer)
-      })
-    })
 
     it('direction is correct for buy and sell', async function () {
       this.mockRippled.addResponse('book_offers', normalRippledResponse)
