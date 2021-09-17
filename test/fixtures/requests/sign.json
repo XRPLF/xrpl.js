@@ -1,8 +1,10 @@
 {
-  "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"AccountSet\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Domain\":\"6578616D706C652E636F6D\",\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23,\"SigningPubKey\":\"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8\"}",
-  "instructions": {
-    "fee": "0.000012",
-    "sequence": 23,
-    "maxLedgerVersion": 8820051
-  }
+  "TransactionType":"AccountSet",
+  "Flags":2147483648,
+  "Sequence":23,
+  "LastLedgerSequence":8820051,
+  "Fee":"12",
+  "SigningPubKey":"02A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F544",
+  "Domain":"6578616D706C652E636F6D",
+  "Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59"
 }

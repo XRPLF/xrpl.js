@@ -28,7 +28,7 @@ import Wallet from '.'
 function sign(wallet: Wallet, tx: Transaction, forMultisign = false): string {
   return wallet.signTransaction(
     tx,
-    forMultisign ? { signAs: wallet.getClassicAddress() } : { signAs: '' },
+    forMultisign ? wallet.getClassicAddress() : '',
   )
 }
 

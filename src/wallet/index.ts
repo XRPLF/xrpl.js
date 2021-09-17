@@ -1,19 +1,28 @@
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync } from 'bip39'
-import { classicAddressToXAddress } from 'ripple-address-codec'
-import { decode, encodeForSigning } from 'ripple-binary-codec'
+import _ from 'lodash'
+import {
+  classicAddressToXAddress,
+  isValidXAddress,
+  xAddressToClassicAddress,
+} from 'ripple-address-codec'
+import {
+  decode,
+  encodeForSigning,
+  encodeForMultisigning,
+  encode,
+} from 'ripple-binary-codec'
 import {
   deriveAddress,
   deriveKeypair,
   generateSeed,
   verify,
+  sign,
 } from 'ripple-keypairs'
 
 import ECDSA from '../common/ecdsa'
 import { ValidationError } from '../common/errors'
 import { Transaction } from '../models/transactions'
-import { signOffline } from '../transaction/sign'
-import { SignOptions } from '../transaction/types'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
@@ -30,6 +39,12 @@ function hexFromBuffer(buffer: Buffer): string {
 class Wallet {
   public readonly publicKey: string
   public readonly privateKey: string
+  /**
+   * This only is correct if this wallet corresponds to your
+   * [master keypair](https://xrpl.org/cryptographic-keys.html#master-key-pair). If this wallet represents a
+   * [regular keypair](https://xrpl.org/cryptographic-keys.html#regular-key-pair) this will provide an incorrect address.
+   * TODO: Add support for Regular Keys to Wallet (And their corresponding impact on figuring out classicAddress).
+   */
   public readonly classicAddress: string
   public readonly seed?: string
 
@@ -79,6 +94,7 @@ class Wallet {
    * @param algorithm - The digital signature algorithm to generate an address fro.
    * @returns A Wallet derived from a secret (AKA a seed).
    */
+  // eslint-disable-next-line @typescript-eslint/member-ordering -- Member is used as a function here
   public static fromSecret = Wallet.fromSeed
 
   /**
@@ -144,16 +160,49 @@ class Wallet {
   /**
    * Signs a transaction offline.
    *
+   * @param this - Wallet instance.
    * @param transaction - A transaction to be signed offline.
-   * @param options - Options to include for signing.
+   * @param multisignAddress - Multisign only. An account address corresponding to the multi-signature being added. If this
+   * wallet represents your [master keypair](https://xrpl.org/cryptographic-keys.html#master-key-pair) you can get your account address
+   * with the Wallet.getClassicAddress() function.
    * @returns A signed transaction.
+   * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    */
   public signTransaction(
+    this: Wallet,
     transaction: Transaction,
-    options: SignOptions = { signAs: '' },
+    multisignAddress?: string,
   ): string {
-    return signOffline(this, JSON.stringify(transaction), options)
-      .signedTransaction
+    if (transaction.TxnSignature || transaction.Signers) {
+      throw new ValidationError(
+        'txJSON must not contain "TxnSignature" or "Signers" properties',
+      )
+    }
+
+    const txToSignAndEncode = { ...transaction }
+
+    txToSignAndEncode.SigningPubKey = multisignAddress ? '' : this.publicKey
+
+    if (multisignAddress) {
+      const signer = {
+        Account: multisignAddress,
+        SigningPubKey: this.publicKey,
+        TxnSignature: computeSignature(
+          txToSignAndEncode,
+          this.privateKey,
+          multisignAddress,
+        ),
+      }
+      txToSignAndEncode.Signers = [{ Signer: signer }]
+    } else {
+      txToSignAndEncode.TxnSignature = computeSignature(
+        txToSignAndEncode,
+        this.privateKey,
+      )
+    }
+    const serialized = encode(txToSignAndEncode)
+    this.checkTxSerialization(serialized, transaction)
+    return serialized
   }
 
   /**
@@ -181,13 +230,104 @@ class Wallet {
   }
 
   /**
-   * Gets the classic address of the account this wallet represents.
+   * Gets the classic address of the account this wallet represents. This only is correct if this wallet corresponds
+   * to your [master keypair](https://xrpl.org/cryptographic-keys.html#master-key-pair). If this wallet represents a
+   * [regular keypair](https://xrpl.org/cryptographic-keys.html#regular-key-pair) this will provide an incorrect address.
    *
    * @returns A classic address.
    */
   public getClassicAddress(): string {
-    return deriveAddress(this.publicKey)
+    return this.classicAddress
   }
+
+  /**
+   *  Decode a serialized transaction, remove the fields that are added during the signing process,
+   *  and verify that it matches the transaction prior to signing. This gives the user a sanity check
+   *  to ensure that what they try to encode matches the message that will be recieved by rippled.
+   *
+   * @param serialized - A signed and serialized transaction.
+   * @param tx - The transaction prior to signing.
+   * @throws A ValidationError if the transaction does not have a TxnSignature/Signers property, or if
+   * the serialized Transaction desn't match the original transaction.
+   */
+  // eslint-disable-next-line class-methods-use-this -- Helper for organization purposes
+  private checkTxSerialization(serialized: string, tx: Transaction): void {
+    // Decode the serialized transaction:
+    const decoded = decode(serialized)
+    const txCopy = { ...tx }
+
+    // ...And ensure it is equal to the original tx, except:
+    // - It must have a TxnSignature or Signers (multisign).
+    if (!decoded.TxnSignature && !decoded.Signers) {
+      throw new ValidationError(
+        'Serialized transaction must have a TxnSignature or Signers property',
+      )
+    }
+    // - We know that the original tx did not have TxnSignature, so we should delete it:
+    delete decoded.TxnSignature
+    // - We know that the original tx did not have Signers, so if it exists, we should delete it:
+    delete decoded.Signers
+
+    // - If SigningPubKey was not in the original tx, then we should delete it.
+    //   But if it was in the original tx, then we should ensure that it has not been changed.
+    if (!tx.SigningPubKey) {
+      delete decoded.SigningPubKey
+    }
+
+    // - Memos have exclusively hex data which should ignore case.
+    //   Since decode goes to upper case, we set all tx memos to be uppercase for the comparison.
+    txCopy.Memos?.map((memo) => {
+      const memoCopy = { ...memo }
+      if (memo.Memo.MemoData) {
+        memoCopy.Memo.MemoData = memo.Memo.MemoData.toUpperCase()
+      }
+
+      if (memo.Memo.MemoType) {
+        memoCopy.Memo.MemoType = memo.Memo.MemoType.toUpperCase()
+      }
+
+      if (memo.Memo.MemoFormat) {
+        memoCopy.Memo.MemoFormat = memo.Memo.MemoFormat.toUpperCase()
+      }
+
+      return memo
+    })
+    if (!_.isEqual(decoded, tx)) {
+      const data = {
+        decoded,
+        tx,
+      }
+      const error = new ValidationError(
+        'Serialized transaction does not match original txJSON. See error.data',
+        data,
+      )
+      throw error
+    }
+  }
+}
+
+/**
+ * Signs a transaction with the proper signing encoding.
+ *
+ * @param tx - A transaction to sign.
+ * @param privateKey - A key to sign the transaction with.
+ * @param signAs - Multisign only. An account address to include in the Signer field.
+ * Can be either a classic address or an XAddress.
+ * @returns A signed transaction in the proper format.
+ */
+function computeSignature(
+  tx: Transaction,
+  privateKey: string,
+  signAs?: string,
+): string {
+  if (signAs) {
+    const classicAddress = isValidXAddress(signAs)
+      ? xAddressToClassicAddress(signAs).classicAddress
+      : signAs
+
+    return sign(encodeForMultisigning(tx, classicAddress), privateKey)
+  }
+  return sign(encodeForSigning(tx), privateKey)
 }
 
 export default Wallet
