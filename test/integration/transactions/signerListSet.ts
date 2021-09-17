@@ -1,3 +1,4 @@
+/* eslint-disable mocha/no-hooks-for-single-case -- Gives consistent formatting between tests */
 import _ from 'lodash'
 
 import { SignerListSet } from 'xrpl-local'
