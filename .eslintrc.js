@@ -84,6 +84,9 @@ module.exports = {
 
         // Tests are already in 2 callbacks, so max 3 is pretty restrictive
         'max-nested-callbacks': 'off',
+
+        // setup/teardown client is easier to do in before/after, even if there is only one testcase
+        'mocha/no-hooks-for-single-case': 'off',
       },
     },
     {

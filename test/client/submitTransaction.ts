@@ -1,4 +1,3 @@
-/* eslint-disable mocha/no-hooks-for-single-case -- expected for setupClient & teardownClient */
 import { assert } from 'chai'
 
 import { Transaction } from 'xrpl-local/models/transactions'
