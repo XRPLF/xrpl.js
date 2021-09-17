@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow -- no shadow, not sure why this error is happening
 export enum NodeType {
   INNER = 1,
   TRANSACTION_NO_METADATA = 2,

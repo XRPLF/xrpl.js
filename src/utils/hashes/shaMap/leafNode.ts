@@ -30,11 +30,12 @@ class Leaf extends Node {
   /**
    * Add item to Leaf.
    *
-   * @param tag - Index of the Node.
-   * @param node - Node to insert.
+   * @param _tag - Index of the Node.
+   * @param _node - Node to insert.
    * @throws When called, because LeafNodes cannot addItem.
    */
-  public addItem(tag: string, node: Node): void {
+  // eslint-disable-next-line class-methods-use-this -- no `this` needed here
+  public addItem(_tag: string, _node: Node): void {
     throw new Error('Cannot call addItem on a LeafNode')
   }
 
