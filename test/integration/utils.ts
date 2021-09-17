@@ -84,7 +84,11 @@ export async function testTransaction(
   // check that the transaction was successful
   assert.equal(response.status, 'success')
   assert.equal(response.type, 'response')
-  assert.equal(response.result.engine_result, 'tesSUCCESS')
+  assert.equal(
+    response.result.engine_result,
+    'tesSUCCESS',
+    response.result.engine_result_message,
+  )
 
   // check that the transaction is on the ledger
   const signedTx = _.omit(response.result.tx_json, 'hash')
