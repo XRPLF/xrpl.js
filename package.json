@@ -86,7 +86,7 @@
     "docgen": "typedoc ./src/index.ts",
     "prepublish": "run-s clean build",
     "test": "nyc mocha --config=test/.mocharc.json --exit",
-    "test:integration": "TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/integration/*.ts",
+    "test:integration": "TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/integration/**/*.ts ./test/integration/*.ts",
     "test:browser": "TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/browser/*.ts",
     "test:watch": "TS_NODE_PROJECT=src/tsconfig.json mocha --config=test/.mocharc.json --watch --reporter dot",
     "format": "prettier --write '{src,test}/**/*.ts'",
