@@ -1,2 +1,5 @@
-export const walletAddress = 'rQDhz2ZNXmhxzCYwxU6qAbdxsHA4HV45Y2'
-export const walletSecret = 'shK6YXzwYfnFVn3YZSaMh5zuAddKx'
+import { Wallet } from 'xrpl-local'
+
+const walletSecret = 'shK6YXzwYfnFVn3YZSaMh5zuAddKx'
+
+export const wallet = Wallet.fromSeed(walletSecret)
