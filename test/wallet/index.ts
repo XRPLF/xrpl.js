@@ -186,14 +186,16 @@ describe('Wallet', function () {
   })
 
   describe('signTransaction', function () {
-    let wallet
+    let wallet: Wallet
 
     beforeEach(function () {
       wallet = Wallet.fromSeed('ss1x3KLrSvfg7irFc1D929WXZ7z9H')
     })
 
     it('signTransaction successfully', async function () {
-      const result = wallet.signTransaction(REQUEST_FIXTURES.normal)
+      const result = wallet.signTransaction(
+        REQUEST_FIXTURES.normal as Transaction,
+      )
       assert.deepEqual(result, RESPONSE_FIXTURES.normal.signedTransaction)
     })
 
@@ -263,7 +265,9 @@ describe('Wallet', function () {
     })
 
     it('signTransaction throws when given a transaction that is already signed', async function () {
-      const result = wallet.signTransaction(REQUEST_FIXTURES.normal)
+      const result = wallet.signTransaction(
+        REQUEST_FIXTURES.normal as Transaction,
+      )
       assert.throws(() => {
         const tx = decode(result) as unknown as Transaction
         wallet.signTransaction(tx)
@@ -356,7 +360,7 @@ describe('Wallet', function () {
     })
 
     it('signTransaction throws when encoded tx does not match decoded tx because of illegal higher fee', async function () {
-      const tx = {
+      const tx: Transaction = {
         Flags: 2147483648,
         TransactionType: 'AccountSet',
         Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
