@@ -1,4 +1,3 @@
-/* eslint-disable max-statements -- Necessary for validatePayment */
 /* eslint-disable complexity -- Necessary for validatePayment */
 import { ValidationError } from '../../errors'
 import { Amount, Path } from '../common'
@@ -95,9 +94,9 @@ function checkPartialPayment(tx: Record<string, unknown>): void {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
     const flags = tx.Flags as number | PaymentFlagsInterface
     const isTfPartialPayment =
-      typeof flags !== 'number'
-        ? flags.tfPartialPayment ?? false
-        : isFlagEnabled(flags, PaymentTransactionFlags.tfPartialPayment)
+      typeof flags === 'number'
+        ? isFlagEnabled(flags, PaymentTransactionFlags.tfPartialPayment)
+        : flags.tfPartialPayment ?? false
 
     if (!isTfPartialPayment) {
       throw new ValidationError(

@@ -39,7 +39,12 @@ module.exports = {
       { max: 40, skipBlankLines: true, skipComments: true },
     ],
     'max-statements': ['warn', 25],
-    'id-length': ['error', { exceptions: ['_'] }], // exception for lodash
+    // exception for lodash
+    'id-length': ['error', { exceptions: ['_'] }],
+
+    // no-shadow has false-positives for enum, @typescript-eslint version fixes that
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': ['error'],
   },
   overrides: [
     {

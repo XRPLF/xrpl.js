@@ -1,4 +1,3 @@
-/* eslint-disable import/max-dependencies -- Needed for the type */
 import AccountRoot from './accountRoot'
 import Amendments from './amendments'
 import Check from './check'

@@ -20,5 +20,6 @@ export function onlyHasFields(
  * @returns True if checkFlag is enabled within Flags.
  */
 export function isFlagEnabled(Flags: number, checkFlag: number): boolean {
+  // eslint-disable-next-line no-bitwise -- flags needs bitwise
   return (checkFlag & Flags) === checkFlag
 }

@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign -- param reassign is safe */
 /* eslint-disable no-bitwise -- flags require bitwise operations */
 
-import { ValidationError } from '../../common/errors'
+import { ValidationError } from '../../errors'
 import {
   AccountSetFlagsInterface,
   AccountSetTransactionFlags,
@@ -30,7 +30,7 @@ import {
  *
  * @param tx - A transaction to set its flags to its numeric representation.
  */
-export function setTransactionFlagsToNumber(tx: Transaction): void {
+export default function setTransactionFlagsToNumber(tx: Transaction): void {
   if (tx.Flags == null) {
     tx.Flags = 0
     return
