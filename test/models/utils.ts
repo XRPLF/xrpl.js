@@ -12,11 +12,8 @@ import {
   TrustSet,
   TrustSetTransactionFlags,
 } from 'xrpl-local'
-
-import {
-  isFlagEnabled,
-  setTransactionFlagsToNumber,
-} from '../../src/models/utils'
+import { isFlagEnabled } from 'xrpl-local/models/utils'
+import setTransactionFlagsToNumber from 'xrpl-local/models/utils/flags'
 
 /**
  * Utils Testing.

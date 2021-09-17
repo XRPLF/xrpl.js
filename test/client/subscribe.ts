@@ -3,7 +3,7 @@ import { assert } from 'chai'
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
 
-describe('Subscription', function () {
+describe('client.subscribe', function () {
   beforeEach(setupClient)
   afterEach(teardownClient)
 

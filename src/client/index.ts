@@ -171,6 +171,7 @@ class Client extends EventEmitter {
    * @param server - URL of the server to connect to.
    * @param options - Options for client settings.
    */
+  // eslint-disable-next-line max-lines-per-function -- okay because we have to set up all the connection handlers
   public constructor(server: string, options: ClientOptions = {}) {
     super()
     if (typeof server !== 'string' || !/wss?(?:\+unix)?:\/\//u.exec(server)) {
@@ -200,8 +201,34 @@ class Client extends EventEmitter {
         finalCode = 1000
       }
       this.emit('disconnected', finalCode)
+    })
 
-      this.addSubscribeListeners()
+    this.connection.on('ledgerClosed', (ledger) => {
+      this.emit('ledgerClosed', ledger)
+    })
+
+    this.connection.on('transaction', (tx) => {
+      this.emit('transaction', tx)
+    })
+
+    this.connection.on('validationReceived', (validation) => {
+      this.emit('validationReceived', validation)
+    })
+
+    this.connection.on('manifestReceived', (manifest) => {
+      this.emit('manifestReceived', manifest)
+    })
+
+    this.connection.on('peerStatusChange', (status) => {
+      this.emit('peerStatusChange', status)
+    })
+
+    this.connection.on('consensusPhase', (consensus) => {
+      this.emit('consensusPhase', consensus)
+    })
+
+    this.connection.on('path_find', (path) => {
+      this.emit('path_find', path)
     })
   }
 
@@ -493,41 +520,6 @@ class Client extends EventEmitter {
   public generateFaucetWallet = generateFaucetWallet
 
   public errors = errors
-
-  /**
-   * Constructor helper, adds the subscribe listeners.
-   *
-   * @param this - The Client to which to add the subscribe listeners.
-   */
-  private addSubscribeListeners(this: Client): void {
-    this.connection.on('ledgerClosed', (ledger) => {
-      this.emit('ledgerClosed', ledger)
-    })
-
-    this.connection.on('transaction', (tx) => {
-      this.emit('transaction', tx)
-    })
-
-    this.connection.on('validationReceived', (validation) => {
-      this.emit('validationReceived', validation)
-    })
-
-    this.connection.on('manifestReceived', (manifest) => {
-      this.emit('manifestReceived', manifest)
-    })
-
-    this.connection.on('peerStatusChange', (status) => {
-      this.emit('peerStatusChange', status)
-    })
-
-    this.connection.on('consensusPhase', (consensus) => {
-      this.emit('consensusPhase', consensus)
-    })
-
-    this.connection.on('path_find', (path) => {
-      this.emit('path_find', path)
-    })
-  }
 }
 
 export { Client }
