@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering -- TODO: remove when instance methods aren't members */
 /* eslint-disable max-lines -- This might not be necessary later, but this file needs to be big right now */
 import { EventEmitter } from 'events'
+import * as assert from 'assert'
 
 import {
   classicAddressToXAddress,
@@ -19,14 +20,13 @@ import {
   decodeXAddress,
 } from 'ripple-address-codec'
 
-import { constants, errors, txFlags, ensureClassicAddress } from '../sugar'
+import { ensureClassicAddress } from '../sugar/utils'
 import { ValidationError, XrplError } from '../common/errors'
 import getFee from '../sugar/fee'
 import autofill from '../sugar/autofill'
 import getBalances from '../sugar/balances'
 import getOrderbook from '../sugar/orderbook'
 import { submitTransaction, submitSignedTransaction } from '../sugar/submit'
-import { clamp } from '../sugar/utils'
 import {
   // account methods
   AccountChannelsRequest,
@@ -114,6 +114,9 @@ import {
   ConnectionUserOptions,
   INTENTIONAL_DISCONNECT_CODE,
 } from './connection'
+import * as errors from '../common/errors'
+import * as constants from '../common/constants'
+import { txFlags } from '../common/txflags'
 
 export interface ClientOptions extends ConnectionUserOptions {
   feeCushion?: number
@@ -148,6 +151,11 @@ function getCollectKeyFromCommand(command: string): string | null {
     default:
       return null
   }
+}
+
+function clamp(value: number, min: number, max: number): number {
+  assert.ok(min <= max, 'Illegal clamp bounds')
+  return Math.min(Math.max(value, min), max)
 }
 
 /**
