@@ -8,7 +8,7 @@ import {
   AccountObjectsRequest,
   LedgerRequest,
 } from '../models/methods'
-import { AccountDelete, Transaction } from '../models/transactions'
+import { Transaction } from '../models/transactions'
 import setTransactionFlagsToNumber from '../models/utils/flags'
 import { xrpToDrops } from '../utils'
 
@@ -200,7 +200,10 @@ async function setLatestValidatedLedgerSequence(
   tx.LastLedgerSequence = ledgerSequence + LEDGER_OFFSET
 }
 
-async function checkAccountDeleteBlockers(client: Client, tx: AccountDelete) {
+async function checkAccountDeleteBlockers(
+  client: Client,
+  tx: Transaction,
+): Promise<void> {
   const request: AccountObjectsRequest = {
     command: 'account_objects',
     account: tx.Account,
@@ -208,12 +211,17 @@ async function checkAccountDeleteBlockers(client: Client, tx: AccountDelete) {
     deletion_blockers_only: true,
   }
   const response = await client.request(request)
-  if (response.result.account_objects.length > 0) {
-    throw new XrplError(
-      `Account ${tx.Account} cannot be deleted; there are Escrows, PayChannels, RippleStates, or Checks associated with the account.`,
-      response.result.account_objects,
-    )
-  }
+  return new Promise((resolve, reject) => {
+    if (response.result.account_objects.length > 0) {
+      reject(
+        new XrplError(
+          `Account ${tx.Account} cannot be deleted; there are Escrows, PayChannels, RippleStates, or Checks associated with the account.`,
+          response.result.account_objects,
+        ),
+      )
+    }
+    resolve()
+  })
 }
 
 export default autofill
