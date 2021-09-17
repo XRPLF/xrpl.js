@@ -74,15 +74,6 @@ describe('Subscription', function () {
     this.client.connection.onMessage(JSON.stringify(rippled.streams.pathFind))
   })
 
-  it('Emits peerStatusChange', async function (done) {
-    this.client.on('peerStatusChange', (path) => {
-      assert(path.type === 'peerStatusChange')
-      done()
-    })
-
-    this.client.connection.onMessage(JSON.stringify(rippled.streams.peerStatus))
-  })
-
   it('Emits validationReceived', async function (done) {
     this.client.on('validationReceived', (path) => {
       assert(path.type === 'validationReceived')

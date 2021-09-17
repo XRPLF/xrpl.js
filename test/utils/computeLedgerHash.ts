@@ -23,7 +23,7 @@ describe('computeLedgerHash', function () {
     )
 
     ledger.parent_close_time = ledger.close_time
-    let hash
+    let hash: string
     try {
       hash = computeLedgerHash(ledger, { computeTreeHashes: true })
     } catch (error) {
