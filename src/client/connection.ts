@@ -380,8 +380,11 @@ export class Connection extends EventEmitter {
       try {
         this.requestManager.handleResponse(data)
       } catch (error) {
+        // eslint-disable-next-line max-depth -- okay here
         if (error instanceof Error) {
           this.emit('error', 'badMessage', error.message, message)
+        } else {
+          this.emit('error', 'badMessage', error, error)
         }
       }
     }

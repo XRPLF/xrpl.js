@@ -188,34 +188,6 @@ class Client extends EventEmitter {
       this.emit('error', errorCode, errorMessage, data)
     })
 
-    this.connection.on('ledgerClosed', (ledger) => {
-      this.emit('ledgerClosed', ledger)
-    })
-
-    this.connection.on('transaction', (tx) => {
-      this.emit('transaction', tx)
-    })
-
-    this.connection.on('validationReceived', (validation) => {
-      this.emit('validationReceived', validation)
-    })
-
-    this.connection.on('manifestReceived', (manifest) => {
-      this.emit('manifestReceived', manifest)
-    })
-
-    this.connection.on('peerStatusChange', (status) => {
-      this.emit('peerStatusChange', status)
-    })
-
-    this.connection.on('consensusPhase', (consensus) => {
-      this.emit('consensusPhase', consensus)
-    })
-
-    this.connection.on('path_find', (path) => {
-      this.emit('path_find', path)
-    })
-
     this.connection.on('connected', () => {
       this.emit('connected')
     })
@@ -228,6 +200,8 @@ class Client extends EventEmitter {
         finalCode = 1000
       }
       this.emit('disconnected', finalCode)
+
+      this.addSubscribeListeners()
     })
   }
 
@@ -379,6 +353,7 @@ class Client extends EventEmitter {
     listener: (phase: ConsensusStream) => void,
   ): this
   public on(event: 'path_find', listener: (path: PathFindStream) => void): this
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- actually needs to be any here
   public on(event: 'error', listener: (...err: any[]) => void): this
   /**
    * Event handler for subscription streams.
@@ -387,6 +362,7 @@ class Client extends EventEmitter {
    * @param listener - Function to run on event.
    * @returns This, because it inherits from EventEmitter.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- actually needs to be any here
   public on(eventName: string, listener: (...args: any[]) => void): this {
     return super.on(eventName, listener)
   }
@@ -517,6 +493,41 @@ class Client extends EventEmitter {
   public generateFaucetWallet = generateFaucetWallet
 
   public errors = errors
+
+  /**
+   * Constructor helper, adds the subscribe listeners.
+   *
+   * @param this - The Client to which to add the subscribe listeners.
+   */
+  private addSubscribeListeners(this: Client): void {
+    this.connection.on('ledgerClosed', (ledger) => {
+      this.emit('ledgerClosed', ledger)
+    })
+
+    this.connection.on('transaction', (tx) => {
+      this.emit('transaction', tx)
+    })
+
+    this.connection.on('validationReceived', (validation) => {
+      this.emit('validationReceived', validation)
+    })
+
+    this.connection.on('manifestReceived', (manifest) => {
+      this.emit('manifestReceived', manifest)
+    })
+
+    this.connection.on('peerStatusChange', (status) => {
+      this.emit('peerStatusChange', status)
+    })
+
+    this.connection.on('consensusPhase', (consensus) => {
+      this.emit('consensusPhase', consensus)
+    })
+
+    this.connection.on('path_find', (path) => {
+      this.emit('path_find', path)
+    })
+  }
 }
 
-export { Client, Connection }
+export { Client }
