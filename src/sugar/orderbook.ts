@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function -- Needs to process orderbooks. */
 import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 
@@ -88,7 +89,10 @@ async function getOrderbook(
   // Sort the orders
   // for both buys and sells, lowest quality is closest to mid-market
   // we sort the orders so that earlier orders are closer to mid-market
-  return { buy: sortOffers(buy), sell: sortOffers(sell) }
+  return {
+    buy: sortOffers(buy).slice(0, options.limit),
+    sell: sortOffers(sell).slice(0, options.limit),
+  }
 }
 
 export default getOrderbook
