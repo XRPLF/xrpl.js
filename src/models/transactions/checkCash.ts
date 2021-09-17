@@ -1,8 +1,8 @@
-/* eslint-disable complexity -- Necessary for verifyCheckCash */
+/* eslint-disable complexity -- Necessary for validateCheckCash */
 import { ValidationError } from '../../common/errors'
 import { Amount } from '../common'
 
-import { BaseTransaction, verifyBaseTransaction, isAmount } from './common'
+import { BaseTransaction, validateBaseTransaction, isAmount } from './common'
 
 export interface CheckCash extends BaseTransaction {
   TransactionType: 'CheckCash'
@@ -17,8 +17,8 @@ export interface CheckCash extends BaseTransaction {
  * @param tx - An CheckCash Transaction.
  * @throws When the CheckCash is Malformed.
  */
-export function verifyCheckCash(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx)
+export function validateCheckCash(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
 
   if (tx.Amount == null && tx.DeliverMin == null) {
     throw new ValidationError(

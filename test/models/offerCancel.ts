@@ -1,9 +1,7 @@
 import { assert } from 'chai'
 
+import { validateOfferCancel, validate } from 'xrpl-local'
 import { ValidationError } from 'xrpl-local/common/errors'
-
-import { verify } from '../../src/models/transactions'
-import { verifyOfferCancel } from '../../src/models/transactions/offerCancel'
 
 /**
  * OfferCancel Transaction Verification Testing.
@@ -30,25 +28,25 @@ describe('OfferCancel', function () {
   })
 
   it(`verifies valid OfferCancel`, function () {
-    assert.doesNotThrow(() => verifyOfferCancel(offer))
-    assert.doesNotThrow(() => verify(offer))
+    assert.doesNotThrow(() => validateOfferCancel(offer))
+    assert.doesNotThrow(() => validate(offer))
   })
 
   it(`verifies valid OfferCancel with flags`, function () {
     offer.Flags = 2147483648
-    assert.doesNotThrow(() => verifyOfferCancel(offer))
-    assert.doesNotThrow(() => verify(offer))
+    assert.doesNotThrow(() => validateOfferCancel(offer))
+    assert.doesNotThrow(() => validate(offer))
   })
 
   it(`throws w/ OfferSequence must be a number`, function () {
     offer.OfferSequence = '99'
     assert.throws(
-      () => verifyOfferCancel(offer),
+      () => validateOfferCancel(offer),
       ValidationError,
       'OfferCancel: OfferSequence must be a number',
     )
     assert.throws(
-      () => verify(offer),
+      () => validate(offer),
       ValidationError,
       'OfferCancel: OfferSequence must be a number',
     )
@@ -57,12 +55,12 @@ describe('OfferCancel', function () {
   it(`throws w/ missing OfferSequence`, function () {
     delete offer.OfferSequence
     assert.throws(
-      () => verifyOfferCancel(offer),
+      () => validateOfferCancel(offer),
       ValidationError,
       'OfferCancel: missing field OfferSequence',
     )
     assert.throws(
-      () => verify(offer),
+      () => validate(offer),
       ValidationError,
       'OfferCancel: missing field OfferSequence',
     )

@@ -1,11 +1,11 @@
-/* eslint-disable complexity -- Necessary for verifyOfferCreate */
+/* eslint-disable complexity -- Necessary for validateOfferCreate */
 import { ValidationError } from '../../common/errors'
 import { Amount } from '../common'
 
 import {
   BaseTransaction,
   GlobalFlags,
-  verifyBaseTransaction,
+  validateBaseTransaction,
   isAmount,
 } from './common'
 
@@ -39,8 +39,8 @@ export interface OfferCreate extends BaseTransaction {
  * @param tx - An OfferCreate Transaction.
  * @throws When the OfferCreate is Malformed.
  */
-export function verifyOfferCreate(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx)
+export function validateOfferCreate(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
 
   if (tx.TakerGets === undefined) {
     throw new ValidationError('OfferCreate: missing field TakerGets')

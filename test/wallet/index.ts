@@ -1,7 +1,8 @@
 import { assert } from 'chai'
 
+import { Payment } from 'xrpl-local'
+
 import ECDSA from '../../src/common/ecdsa'
-import { Payment } from '../../src/models/transactions'
 import Wallet from '../../src/wallet'
 
 /**

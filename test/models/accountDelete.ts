@@ -1,9 +1,7 @@
 import { assert } from 'chai'
 
+import { validateAccountDelete, validate } from 'xrpl-local'
 import { ValidationError } from 'xrpl-local/common/errors'
-
-import { verify } from '../../src/models/transactions'
-import { verifyAccountDelete } from '../../src/models/transactions/accountDelete'
 
 /**
  * AccountDelete Transaction Verification Testing.
@@ -22,7 +20,7 @@ describe('AccountDelete', function () {
       Flags: 2147483648,
     } as any
 
-    assert.doesNotThrow(() => verifyAccountDelete(validAccountDelete))
+    assert.doesNotThrow(() => validateAccountDelete(validAccountDelete))
   })
 
   it(`throws w/ missing Destination`, function () {
@@ -35,13 +33,13 @@ describe('AccountDelete', function () {
     } as any
 
     assert.throws(
-      () => verifyAccountDelete(invalidDestination),
+      () => validateAccountDelete(invalidDestination),
       ValidationError,
       'AccountDelete: missing field Destination',
     )
 
     assert.throws(
-      () => verify(invalidDestination),
+      () => validate(invalidDestination),
       ValidationError,
       'AccountDelete: missing field Destination',
     )
@@ -58,12 +56,12 @@ describe('AccountDelete', function () {
     } as any
 
     assert.throws(
-      () => verifyAccountDelete(invalidDestination),
+      () => validateAccountDelete(invalidDestination),
       ValidationError,
       'AccountDelete: invalid Destination',
     )
     assert.throws(
-      () => verify(invalidDestination),
+      () => validate(invalidDestination),
       ValidationError,
       'AccountDelete: invalid Destination',
     )
@@ -81,13 +79,13 @@ describe('AccountDelete', function () {
     } as any
 
     assert.throws(
-      () => verifyAccountDelete(invalidDestinationTag),
+      () => validateAccountDelete(invalidDestinationTag),
       ValidationError,
       'AccountDelete: invalid DestinationTag',
     )
 
     assert.throws(
-      () => verify(invalidDestinationTag),
+      () => validate(invalidDestinationTag),
       ValidationError,
       'AccountDelete: invalid DestinationTag',
     )

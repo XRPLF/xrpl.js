@@ -1,7 +1,7 @@
-/* eslint-disable complexity -- Necessary for verifyAccountSet */
+/* eslint-disable complexity -- Necessary for validateAccountSet */
 import { ValidationError } from '../../common/errors'
 
-import { BaseTransaction, verifyBaseTransaction } from './common'
+import { BaseTransaction, validateBaseTransaction } from './common'
 
 export enum AccountSetFlags {
   asfRequireDest = 1,
@@ -54,8 +54,8 @@ const MAX_TICK_SIZE = 15
  * @param tx - An AccountSet Transaction.
  * @throws When the AccountSet is Malformed.
  */
-export function verifyAccountSet(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx)
+export function validateAccountSet(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
 
   if (tx.ClearFlag !== undefined) {
     if (typeof tx.ClearFlag !== 'number') {
