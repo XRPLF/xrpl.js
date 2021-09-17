@@ -1,9 +1,8 @@
 {
-  "txJSON": "{\"TransactionType\": \"TicketCreate\", \"TicketCount\": 1, \"Account\": \"r4SDqUD1ZcfoZrhnsZ94XNFKxYL4oHYJyA\", \"Sequence\": 0, \"TicketSequence\": 23, \"Fee\": \"10000\"}",
-  "instructions": {
-    "ticketSequence": 23,
-    "maxLedgerVersion": 8820051
-  }
+  "TransactionType":"TicketCreate",
+  "TicketCount":1,
+  "Account":"r4SDqUD1ZcfoZrhnsZ94XNFKxYL4oHYJyA",
+  "Sequence":0,
+  "TicketSequence":23,
+  "Fee":"10000"
 }
-
-

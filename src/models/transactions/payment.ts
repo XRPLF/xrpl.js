@@ -60,7 +60,6 @@ export function validatePayment(tx: Record<string, unknown>): void {
   }
 
   if (tx.DestinationTag != null && typeof tx.DestinationTag !== 'number') {
-    console.log(tx.DestinationTag)
     throw new ValidationError(
       'PaymentTransaction: DestinationTag must be a number',
     )
