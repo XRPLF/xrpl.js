@@ -15,7 +15,6 @@ interface FaucetWallet {
   balance: number
 }
 
-// eslint-disable-next-line no-shadow -- Not previously declared
 enum FaucetNetwork {
   Testnet = 'faucet.altnet.rippletest.net',
   Devnet = 'faucet.devnet.rippletest.net',
@@ -69,6 +68,17 @@ async function generateFaucetWallet(
   // Options to pass to https.request
   const options = getOptions(client, postBody)
 
+  return returnPromise(options, client, startingBalance, fundWallet, postBody)
+}
+
+// eslint-disable-next-line max-params -- Helper function created for organizational purposes
+async function returnPromise(
+  options: RequestOptions,
+  client: Client,
+  startingBalance: number,
+  fundWallet: Wallet,
+  postBody: Uint8Array,
+): Promise<Wallet | undefined> {
   return new Promise((resolve, reject) => {
     const request = httpsRequest(options, (response) => {
       const chunks: Uint8Array[] = []

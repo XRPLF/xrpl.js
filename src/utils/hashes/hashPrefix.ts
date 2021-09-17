@@ -11,7 +11,6 @@
  * some arbitrary string. For example "TXN".
  */
 
-// eslint-disable-next-line no-shadow -- No shadow here, not sure what the error is here
 enum HashPrefix {
   // transaction plus signature to give transaction ID 'TXN'
   TRANSACTION_ID = 0x54584e00,

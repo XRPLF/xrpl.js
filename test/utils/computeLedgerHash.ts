@@ -139,6 +139,7 @@ describe('computeLedgerHash', function () {
       ...REQUEST_FIXTURES.header,
       transaction_hash:
         '325EACC5271322539EEEC2D6A5292471EF1B3E72AE7180533EFC3B8F0AD435C9',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- okay for tests
       transactions: REQUEST_FIXTURES.transactions as any,
     }
 
