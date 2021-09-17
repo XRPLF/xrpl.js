@@ -1,6 +1,6 @@
 import { ValidationError } from '../../common/errors'
 
-import { BaseTransaction, verifyBaseTransaction } from './common'
+import { BaseTransaction, validateBaseTransaction } from './common'
 
 export interface PaymentChannelFund extends BaseTransaction {
   TransactionType: 'PaymentChannelFund'
@@ -15,8 +15,8 @@ export interface PaymentChannelFund extends BaseTransaction {
  * @param tx - An PaymentChannelFund Transaction.
  * @throws When the PaymentChannelFund is Malformed.
  */
-export function verifyPaymentChannelFund(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx)
+export function validatePaymentChannelFund(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
 
   if (tx.Channel === undefined) {
     throw new ValidationError('PaymentChannelFund: missing Channel')

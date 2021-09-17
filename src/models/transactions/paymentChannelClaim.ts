@@ -1,7 +1,7 @@
-/* eslint-disable complexity -- Necessary for verifyPaymentChannelClaim */
+/* eslint-disable complexity -- Necessary for validatePaymentChannelClaim */
 import { ValidationError } from '../../common/errors'
 
-import { BaseTransaction, GlobalFlags, verifyBaseTransaction } from './common'
+import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
 
 export enum PaymentChannelClaimTransactionFlags {
   tfRenew = 0x00010000,
@@ -29,8 +29,8 @@ export interface PaymentChannelClaim extends BaseTransaction {
  * @param tx - An PaymentChannelClaim Transaction.
  * @throws When the PaymentChannelClaim is Malformed.
  */
-export function verifyPaymentChannelClaim(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx)
+export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
 
   if (tx.Channel === undefined) {
     throw new ValidationError('PaymentChannelClaim: missing Channel')

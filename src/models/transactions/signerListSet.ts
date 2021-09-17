@@ -1,7 +1,7 @@
 import { ValidationError } from '../../common/errors'
 import { SignerEntry } from '../common'
 
-import { BaseTransaction, verifyBaseTransaction } from './common'
+import { BaseTransaction, validateBaseTransaction } from './common'
 
 export interface SignerListSet extends BaseTransaction {
   TransactionType: 'SignerListSet'
@@ -17,8 +17,8 @@ const MAX_SIGNERS = 8
  * @param tx - An SignerListSet Transaction.
  * @throws When the SignerListSet is Malformed.
  */
-export function verifySignerListSet(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx)
+export function validateSignerListSet(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
 
   if (tx.SignerQuorum === undefined) {
     throw new ValidationError('SignerListSet: missing field SignerQuorum')

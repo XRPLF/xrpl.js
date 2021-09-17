@@ -1,6 +1,6 @@
 import { ValidationError } from '../../common/errors'
 
-import { BaseTransaction, verifyBaseTransaction } from './common'
+import { BaseTransaction, validateBaseTransaction } from './common'
 
 export interface AccountDelete extends BaseTransaction {
   TransactionType: 'AccountDelete'
@@ -14,8 +14,8 @@ export interface AccountDelete extends BaseTransaction {
  * @param tx - An AccountDelete Transaction.
  * @throws When the AccountDelete is Malformed.
  */
-export function verifyAccountDelete(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx)
+export function validateAccountDelete(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
 
   if (tx.Destination === undefined) {
     throw new ValidationError('AccountDelete: missing field Destination')

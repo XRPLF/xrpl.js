@@ -5,7 +5,7 @@ import { decode } from 'ripple-binary-codec'
 
 import { Client, SubmitResponse, Wallet } from 'xrpl-local'
 import {
-  verifyPayment,
+  validatePayment,
   Payment,
   Transaction,
 } from 'xrpl-local/models/transactions'
@@ -46,7 +46,7 @@ export async function fundAccount(
     Amount: '400000000',
   }
   const paymentTx = await client.autofill(payment)
-  verifyPayment(paymentTx)
+  validatePayment(paymentTx)
 
   const response = await submitTransaction(client, masterSecret, paymentTx)
   if (response.result.engine_result !== 'tesSUCCESS') {

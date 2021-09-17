@@ -1,9 +1,7 @@
 import { assert } from 'chai'
 
+import { validateCheckCash, validate } from 'xrpl-local'
 import { ValidationError } from 'xrpl-local/common/errors'
-
-import { verify } from '../../src/models/transactions'
-import { verifyCheckCash } from '../../src/models/transactions/checkCash'
 
 /**
  * CheckCash Transaction Verification Testing.
@@ -21,8 +19,8 @@ describe('CheckCash', function () {
       Fee: '12',
     } as any
 
-    assert.doesNotThrow(() => verifyCheckCash(validCheckCash))
-    assert.doesNotThrow(() => verify(validCheckCash))
+    assert.doesNotThrow(() => validateCheckCash(validCheckCash))
+    assert.doesNotThrow(() => validate(validCheckCash))
   })
 
   it(`throws w/ invalid CheckID`, function () {
@@ -34,12 +32,12 @@ describe('CheckCash', function () {
     } as any
 
     assert.throws(
-      () => verifyCheckCash(invalidCheckID),
+      () => validateCheckCash(invalidCheckID),
       ValidationError,
       'CheckCash: invalid CheckID',
     )
     assert.throws(
-      () => verify(invalidCheckID),
+      () => validate(invalidCheckID),
       ValidationError,
       'CheckCash: invalid CheckID',
     )
@@ -55,12 +53,12 @@ describe('CheckCash', function () {
     } as any
 
     assert.throws(
-      () => verifyCheckCash(invalidAmount),
+      () => validateCheckCash(invalidAmount),
       ValidationError,
       'CheckCash: invalid Amount',
     )
     assert.throws(
-      () => verify(invalidAmount),
+      () => validate(invalidAmount),
       ValidationError,
       'CheckCash: invalid Amount',
     )
@@ -77,12 +75,12 @@ describe('CheckCash', function () {
     } as any
 
     assert.throws(
-      () => verifyCheckCash(invalidDeliverMin),
+      () => validateCheckCash(invalidDeliverMin),
       ValidationError,
       'CheckCash: cannot have both Amount and DeliverMin',
     )
     assert.throws(
-      () => verify(invalidDeliverMin),
+      () => validate(invalidDeliverMin),
       ValidationError,
       'CheckCash: cannot have both Amount and DeliverMin',
     )
@@ -98,12 +96,12 @@ describe('CheckCash', function () {
     } as any
 
     assert.throws(
-      () => verifyCheckCash(invalidDeliverMin),
+      () => validateCheckCash(invalidDeliverMin),
       ValidationError,
       'CheckCash: invalid DeliverMin',
     )
     assert.throws(
-      () => verify(invalidDeliverMin),
+      () => validate(invalidDeliverMin),
       ValidationError,
       'CheckCash: invalid DeliverMin',
     )

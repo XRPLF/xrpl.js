@@ -1,7 +1,7 @@
-/* eslint-disable complexity -- Necessary for verifyPaymentChannelCreate */
+/* eslint-disable complexity -- Necessary for validatePaymentChannelCreate */
 import { ValidationError } from '../../common/errors'
 
-import { BaseTransaction, verifyBaseTransaction } from './common'
+import { BaseTransaction, validateBaseTransaction } from './common'
 
 export interface PaymentChannelCreate extends BaseTransaction {
   TransactionType: 'PaymentChannelCreate'
@@ -19,8 +19,10 @@ export interface PaymentChannelCreate extends BaseTransaction {
  * @param tx - An PaymentChannelCreate Transaction.
  * @throws When the PaymentChannelCreate is Malformed.
  */
-export function verifyPaymentChannelCreate(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx)
+export function validatePaymentChannelCreate(
+  tx: Record<string, unknown>,
+): void {
+  validateBaseTransaction(tx)
 
   if (tx.Amount === undefined) {
     throw new ValidationError('PaymentChannelCreate: missing Amount')

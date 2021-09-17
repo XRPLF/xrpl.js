@@ -1,9 +1,7 @@
 import { assert } from 'chai'
 
+import { validatePaymentChannelCreate, validate } from 'xrpl-local'
 import { ValidationError } from 'xrpl-local/common/errors'
-
-import { verify } from '../../src/models/transactions'
-import { verifyPaymentChannelCreate } from '../../src/models/transactions/paymentChannelCreate'
 
 /**
  * PaymentChannelCreate Transaction Verification Testing.
@@ -29,8 +27,8 @@ describe('PaymentChannelCreate', function () {
   })
 
   it(`verifies valid PaymentChannelCreate`, function () {
-    assert.doesNotThrow(() => verifyPaymentChannelCreate(channel))
-    assert.doesNotThrow(() => verify(channel))
+    assert.doesNotThrow(() => validatePaymentChannelCreate(channel))
+    assert.doesNotThrow(() => validate(channel))
   })
 
   it(`verifies valid PaymentChannelCreate w/o optional`, function () {
@@ -38,20 +36,20 @@ describe('PaymentChannelCreate', function () {
     delete channel.DestinationTag
     delete channel.SourceTag
 
-    assert.doesNotThrow(() => verifyPaymentChannelCreate(channel))
-    assert.doesNotThrow(() => verify(channel))
+    assert.doesNotThrow(() => validatePaymentChannelCreate(channel))
+    assert.doesNotThrow(() => validate(channel))
   })
 
   it(`missing Amount`, function () {
     delete channel.Amount
 
     assert.throws(
-      () => verifyPaymentChannelCreate(channel),
+      () => validatePaymentChannelCreate(channel),
       ValidationError,
       'PaymentChannelCreate: missing Amount',
     )
     assert.throws(
-      () => verify(channel),
+      () => validate(channel),
       ValidationError,
       'PaymentChannelCreate: missing Amount',
     )
@@ -61,12 +59,12 @@ describe('PaymentChannelCreate', function () {
     delete channel.Destination
 
     assert.throws(
-      () => verifyPaymentChannelCreate(channel),
+      () => validatePaymentChannelCreate(channel),
       ValidationError,
       'PaymentChannelCreate: missing Destination',
     )
     assert.throws(
-      () => verify(channel),
+      () => validate(channel),
       ValidationError,
       'PaymentChannelCreate: missing Destination',
     )
@@ -76,12 +74,12 @@ describe('PaymentChannelCreate', function () {
     delete channel.SettleDelay
 
     assert.throws(
-      () => verifyPaymentChannelCreate(channel),
+      () => validatePaymentChannelCreate(channel),
       ValidationError,
       'PaymentChannelCreate: missing SettleDelay',
     )
     assert.throws(
-      () => verify(channel),
+      () => validate(channel),
       ValidationError,
       'PaymentChannelCreate: missing SettleDelay',
     )
@@ -91,12 +89,12 @@ describe('PaymentChannelCreate', function () {
     delete channel.PublicKey
 
     assert.throws(
-      () => verifyPaymentChannelCreate(channel),
+      () => validatePaymentChannelCreate(channel),
       ValidationError,
       'PaymentChannelCreate: missing PublicKey',
     )
     assert.throws(
-      () => verify(channel),
+      () => validate(channel),
       ValidationError,
       'PaymentChannelCreate: missing PublicKey',
     )
@@ -106,12 +104,12 @@ describe('PaymentChannelCreate', function () {
     channel.Amount = 1000
 
     assert.throws(
-      () => verifyPaymentChannelCreate(channel),
+      () => validatePaymentChannelCreate(channel),
       ValidationError,
       'PaymentChannelCreate: Amount must be a string',
     )
     assert.throws(
-      () => verify(channel),
+      () => validate(channel),
       ValidationError,
       'PaymentChannelCreate: Amount must be a string',
     )
@@ -121,12 +119,12 @@ describe('PaymentChannelCreate', function () {
     channel.Destination = 10
 
     assert.throws(
-      () => verifyPaymentChannelCreate(channel),
+      () => validatePaymentChannelCreate(channel),
       ValidationError,
       'PaymentChannelCreate: Destination must be a string',
     )
     assert.throws(
-      () => verify(channel),
+      () => validate(channel),
       ValidationError,
       'PaymentChannelCreate: Destination must be a string',
     )
@@ -136,12 +134,12 @@ describe('PaymentChannelCreate', function () {
     channel.SettleDelay = '10'
 
     assert.throws(
-      () => verifyPaymentChannelCreate(channel),
+      () => validatePaymentChannelCreate(channel),
       ValidationError,
       'PaymentChannelCreate: SettleDelay must be a number',
     )
     assert.throws(
-      () => verify(channel),
+      () => validate(channel),
       ValidationError,
       'PaymentChannelCreate: SettleDelay must be a number',
     )
@@ -151,12 +149,12 @@ describe('PaymentChannelCreate', function () {
     channel.PublicKey = 10
 
     assert.throws(
-      () => verifyPaymentChannelCreate(channel),
+      () => validatePaymentChannelCreate(channel),
       ValidationError,
       'PaymentChannelCreate: PublicKey must be a string',
     )
     assert.throws(
-      () => verify(channel),
+      () => validate(channel),
       ValidationError,
       'PaymentChannelCreate: PublicKey must be a string',
     )
@@ -166,12 +164,12 @@ describe('PaymentChannelCreate', function () {
     channel.DestinationTag = '10'
 
     assert.throws(
-      () => verifyPaymentChannelCreate(channel),
+      () => validatePaymentChannelCreate(channel),
       ValidationError,
       'PaymentChannelCreate: DestinationTag must be a number',
     )
     assert.throws(
-      () => verify(channel),
+      () => validate(channel),
       ValidationError,
       'PaymentChannelCreate: DestinationTag must be a number',
     )
@@ -181,12 +179,12 @@ describe('PaymentChannelCreate', function () {
     channel.CancelAfter = '100'
 
     assert.throws(
-      () => verifyPaymentChannelCreate(channel),
+      () => validatePaymentChannelCreate(channel),
       ValidationError,
       'PaymentChannelCreate: CancelAfter must be a number',
     )
     assert.throws(
-      () => verify(channel),
+      () => validate(channel),
       ValidationError,
       'PaymentChannelCreate: CancelAfter must be a number',
     )

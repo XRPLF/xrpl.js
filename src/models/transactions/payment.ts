@@ -1,5 +1,5 @@
-/* eslint-disable max-statements -- Necessary for verifyPayment */
-/* eslint-disable complexity -- Necessary for verifyPayment */
+/* eslint-disable max-statements -- Necessary for validatePayment */
+/* eslint-disable complexity -- Necessary for validatePayment */
 import { ValidationError } from '../../common/errors'
 import { Amount, Path } from '../common'
 import { isFlagEnabled } from '../utils'
@@ -8,7 +8,7 @@ import {
   BaseTransaction,
   isAmount,
   GlobalFlags,
-  verifyBaseTransaction,
+  validateBaseTransaction,
 } from './common'
 
 export enum PaymentTransactionFlags {
@@ -40,8 +40,8 @@ export interface Payment extends BaseTransaction {
  * @param tx - A Payment Transaction.
  * @throws When the Payment is malformed.
  */
-export function verifyPayment(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx)
+export function validatePayment(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
 
   if (tx.Amount === undefined) {
     throw new ValidationError('PaymentTransaction: missing field Amount')

@@ -1,7 +1,7 @@
-/* eslint-disable complexity -- Necessary for verifyEscrowCreate */
+/* eslint-disable complexity -- Necessary for validateEscrowCreate */
 import { ValidationError } from '../../common/errors'
 
-import { BaseTransaction, verifyBaseTransaction } from './common'
+import { BaseTransaction, validateBaseTransaction } from './common'
 
 export interface EscrowCreate extends BaseTransaction {
   TransactionType: 'EscrowCreate'
@@ -19,8 +19,8 @@ export interface EscrowCreate extends BaseTransaction {
  * @param tx - An EscrowCreate Transaction.
  * @throws When the EscrowCreate is Malformed.
  */
-export function verifyEscrowCreate(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx)
+export function validateEscrowCreate(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
 
   if (tx.Amount === undefined) {
     throw new ValidationError('EscrowCreate: missing field Amount')
