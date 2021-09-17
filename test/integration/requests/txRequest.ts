@@ -2,14 +2,14 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { convertStringToHex } from 'xrpl-local/utils'
-
 import {
   AccountSet,
   computeSignedTransactionHash,
   SubmitResponse,
   TxResponse,
-} from '../../../src'
+} from 'xrpl-local'
+import { convertStringToHex } from 'xrpl-local/utils'
+
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 
