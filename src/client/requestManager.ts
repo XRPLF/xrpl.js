@@ -179,7 +179,6 @@ export default class RequestManager {
    * @param id - ID of the request.
    */
   private deletePromise(id: string | number): void {
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Needs to delete promise after request has been fulfilled.
-    delete this.promisesAwaitingResponse[id]
+    this.promisesAwaitingResponse.delete(id)
   }
 }

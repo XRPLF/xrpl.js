@@ -621,9 +621,16 @@ describe('Connection', function () {
   })
 
   it('should throw error if pending response with same ID', async function () {
-    await this.client.connection.request({ id: 'test', command: 'ping' })
-    assertRejects(
-      this.client.connection.request({ id: 'test', command: 'ping' }),
+    const promise1 = this.client.connection.request({
+      id: 'test',
+      command: 'ping',
+    })
+    const promise2 = this.client.connection.request({
+      id: 'test',
+      command: 'ping',
+    })
+    await assertRejects(
+      Promise.all([promise1, promise2]),
       XrplError,
       "Response with id 'test' is already pending",
     )

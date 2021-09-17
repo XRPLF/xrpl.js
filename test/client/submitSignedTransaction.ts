@@ -62,7 +62,7 @@ describe('client.submitSignedTransaction', function () {
 
     this.mockRippled.addResponse('submit', rippled.submit.success)
 
-    assertRejects(
+    await assertRejects(
       this.client.submitSignedTransaction(signedTx),
       ValidationError,
       'Transaction must be signed',
