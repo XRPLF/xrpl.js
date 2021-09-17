@@ -187,22 +187,13 @@ describe('Wallet', function () {
 
   describe('signTransaction', function () {
     let wallet
-    let wallet2
-    let wallet3
-    let wallet4
 
     beforeEach(function () {
       wallet = Wallet.fromSeed('ss1x3KLrSvfg7irFc1D929WXZ7z9H')
-      wallet2 = Wallet.fromSeed('shsWGZcmZz6YsWWmcnpfr6fLTdtFV')
-      wallet3 = new Wallet(
-        '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8',
-        '00ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A',
-      )
-      wallet4 = Wallet.fromSeed('snoPBrXtMeMyMHUVTgbuqAfg1SUTb')
     })
 
     it('signTransaction successfully', async function () {
-      const result = wallet2.signTransaction(REQUEST_FIXTURES.normal)
+      const result = wallet.signTransaction(REQUEST_FIXTURES.normal)
       assert.deepEqual(result, RESPONSE_FIXTURES.normal.signedTransaction)
     })
 
@@ -238,46 +229,41 @@ describe('Wallet', function () {
     })
 
     it('signTransaction with EscrowFinish', async function () {
-      const result = wallet4.signTransaction(
+      const result = wallet.signTransaction(
         REQUEST_FIXTURES.escrow as Transaction,
       )
       assert.deepEqual(result, RESPONSE_FIXTURES.escrow.signedTransaction)
     })
 
     it('signTransaction with multisignAddress', async function () {
-      const signature = wallet4.signTransaction(
+      const signature = wallet.signTransaction(
         REQUEST_FIXTURES.signAs as Transaction,
-        wallet4.getClassicAddress(),
+        wallet.getClassicAddress(),
       )
       assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
     })
 
     it('signTransaction with X Address and no given tag for multisignAddress', async function () {
-      const signature = wallet4.signTransaction(
+      const signature = wallet.signTransaction(
         REQUEST_FIXTURES.signAs as Transaction,
-        wallet4.getXAddress(),
+        wallet.getXAddress(),
       )
       assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
     })
 
     it('signTransaction with X Address and tag for multisignAddress', async function () {
-      const signature = wallet4.signTransaction(
+      const signature = wallet.signTransaction(
         REQUEST_FIXTURES.signAs as Transaction,
-        wallet4.getXAddress(0),
+        wallet.getXAddress(0),
       )
       // Adding a tag changes the classicAddress, which changes the signature from RESPONSE_FIXTURES.signAs
       const expectedSignature =
-        '120000240000000261400000003B9ACA00684000000000000032730081142E244E6F20104E57C0C60BD823CB312BF10928C78314B5F762798A53D543A014CAF8B297CFF8F2F937E8F3E010230000000073210330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD02074473045022100BB6FC77F26BC88587204CAA79B2230C420D7EC937B8AC3A0CF9B0BE988BAB0D002203BF86893BA3B764375FFFAD9D54A4AAEDABD07C4D72ADB9C1B20C10B4DD712898114B5F762798A53D543A014CAF8B297CFF8F2F937E8E1F1'
+        '120000240000000261400000003B9ACA00684000000000000032730081142E244E6F20104E57C0C60BD823CB312BF10928C78314B5F762798A53D543A014CAF8B297CFF8F2F937E8F3E0102300000000732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F54474473045022100B3F8205578C6A68D3BBD27650F5D2E983718D502C250C5147F07B7EDD8E8583E02207B892818BD58E328C2797F15694A505937861586D527849065B582523E390B128114B3263BD0A9BF9DFDBBBBD07F536355FF477BF0E9E1F1'
       assert.deepEqual(signature, expectedSignature)
     })
 
-    it('signTransaction with a wallet generated from public and private keys', async function () {
-      const result = wallet3.signTransaction(REQUEST_FIXTURES.normal)
-      assert.deepEqual(result, RESPONSE_FIXTURES.normal.signedTransaction)
-    })
-
     it('signTransaction throws when given a transaction that is already signed', async function () {
-      const result = wallet3.signTransaction(REQUEST_FIXTURES.normal)
+      const result = wallet.signTransaction(REQUEST_FIXTURES.normal)
       assert.throws(() => {
         const tx = decode(result) as unknown as Transaction
         wallet.signTransaction(tx)
@@ -285,27 +271,10 @@ describe('Wallet', function () {
     })
 
     it('signTransaction with an EscrowExecution transaction', async function () {
-      const localWallet = new Wallet(
-        '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
-        '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
-      )
-      const result = localWallet.signTransaction(
+      const result = wallet.signTransaction(
         REQUEST_FIXTURES.escrow as Transaction,
       )
       assert.deepEqual(result, RESPONSE_FIXTURES.escrow.signedTransaction)
-    })
-
-    it('signTransaction with multisignAddress and a wallet generated from public and private key', async function () {
-      const tx = REQUEST_FIXTURES.signAs as Transaction
-      const localWallet = new Wallet(
-        '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
-        '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
-      )
-      const signature = localWallet.signTransaction(
-        tx,
-        localWallet.getClassicAddress(),
-      )
-      assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
     })
 
     it('signTransaction succeeds when given a transaction with no flags', async function () {
@@ -317,11 +286,9 @@ describe('Wallet', function () {
         Sequence: 1,
         Fee: '12',
       }
-      const secret = 'shotKgaEotpcYsshSE39vmSnBDRim'
-      const localWallet = Wallet.fromSeed(secret)
-      const result = localWallet.signTransaction(tx)
+      const result = wallet.signTransaction(tx)
       const expectedResult =
-        '1200002400000001614000000001312D0068400000000000000C7321022B05847086686F9D0499B13136B94AD4323EE1B67D4C429ECC987AB35ACFA34574473045022100C104B7B97C31FACA4597E7D6FCF13BD85BD11375963A62A0AC45B0061236E39802207784F157F6A98DFC85B051CDDF61CC3084C4F5750B82674801C8E9950280D1998114EE3046A5DDF8422C40DDB93F1D522BB4FE6419158314FDB08D07AAA0EB711793A3027304D688E10C3648'
+        '1200002400000001614000000001312D0068400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F5447446304402201C0A74EE8ECF5ED83734D7171FB65C01D90D67040DEDCC66414BD546CE302B5802205356843841BFFF60D15F5F5F9FB0AB9D66591778140AB2D137FF576D9DEC44BC8114EE3046A5DDF8422C40DDB93F1D522BB4FE6419158314FDB08D07AAA0EB711793A3027304D688E10C3648'
       const decoded = decode(result)
       assert(
         decoded.Flags == null,
@@ -359,11 +326,9 @@ describe('Wallet', function () {
         Fee: '12',
       }
 
-      const secret = 'shotKgaEotpcYsshSE39vmSnBDRim'
-      const localWallet = Wallet.fromSeed(secret)
-      const result = localWallet.signTransaction(tx)
+      const result = wallet.signTransaction(tx)
       const expectedResult =
-        '12000022800200002400000017201B0086955361EC6386F26FC0FFFF0000000000000000000000005553440000000000DC596C88BCDE4E818D416FCDEEBF2C8656BADC9A68400000000000000C69D4438D7EA4C6800000000000000000000000000047425000000000000C155FFE99C8C91F67083CEFFDB69EBFE76348CA6AD4446F8C5D8A5E0B0000000000000000000000005553440000000000DC596C88BCDE4E818D416FCDEEBF2C8656BADC9A7321022B05847086686F9D0499B13136B94AD4323EE1B67D4C429ECC987AB35ACFA34574473045022100D9634523D8E232D4A7807A71856023D82AC928FA29848571B820867898413B5F022041AC00EC1F81A26A6504EBF844A38CC3204694EF2CC1A97A87632721631F93DA81145E7B112523F68D2F5E879DB4EAC51C6698A6930483149F500E50C2F016CA01945E5A1E5846B61EF2D376'
+        '12000022800200002400000017201B0086955361EC6386F26FC0FFFF0000000000000000000000005553440000000000DC596C88BCDE4E818D416FCDEEBF2C8656BADC9A68400000000000000C69D4438D7EA4C6800000000000000000000000000047425000000000000C155FFE99C8C91F67083CEFFDB69EBFE76348CA6AD4446F8C5D8A5E0B0000000000000000000000005553440000000000DC596C88BCDE4E818D416FCDEEBF2C8656BADC9A732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F544744630440220297E0C7670C7DA491E0D649E62C123D988BA93FD7EA1B9141F1D376CDDF902F502205AF1936B22B18BBA7793A88ABEEABADB4CE0E4C3BE583066480F2F476B5ED08E81145E7B112523F68D2F5E879DB4EAC51C6698A6930483149F500E50C2F016CA01945E5A1E5846B61EF2D376'
       const decoded = decode(result)
       assert(
         decoded.Flags === 2147614720,
@@ -386,7 +351,7 @@ describe('Wallet', function () {
       }
 
       assert.throws(() => {
-        wallet2.signTransaction(tx)
+        wallet.signTransaction(tx)
       }, /1\.2 is an illegal amount/u)
     })
 
@@ -404,20 +369,18 @@ describe('Wallet', function () {
       }
 
       assert.throws(() => {
-        wallet2.signTransaction(tx)
+        wallet.signTransaction(tx)
       }, /1123456\.7 is an illegal amount/u)
     })
 
     it('signTransaction with a ticket transaction', async function () {
-      const localWallet = Wallet.fromSeed('sn7n5R1cR5Y3fRFkuWXA94Ts1frVJ')
-      const result = localWallet.signTransaction(
+      const result = wallet.signTransaction(
         REQUEST_FIXTURES.ticket as Transaction,
       )
       assert.deepEqual(result, RESPONSE_FIXTURES.ticket.signedTransaction)
     })
 
     it('signTransaction with a Payment transaction with paths', async function () {
-      const localWallet = Wallet.fromSeed('shsWGZcmZz6YsWWmcnpfr6fLTdtFV')
       const payment: Transaction = {
         TransactionType: 'Payment',
         Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -442,10 +405,10 @@ describe('Wallet', function () {
         Sequence: 1,
         Fee: '12',
       }
-      const result = localWallet.signTransaction(payment)
+      const result = wallet.signTransaction(payment)
       assert.deepEqual(
         result,
-        '12000022800200002400000001201B00EF81E661EC6386F26FC0FFFF0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461968400000000000000C6940000000000000646AD3504529A0465E2E0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D1664619732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D87446304402200A693FB5CA6B21250EBDFD8CFF526EE0DF7C9E4E31EB0660692E75E6A93BF5F802203CC39463DDA21386898CA31E18AD1A6828647D65741DD637BAD71BC83E29DB9481145E7B112523F68D2F5E879DB4EAC51C6698A693048314CA6EDC7A28252DAEA6F2045B24F4D7C333E146170112300000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461900',
+        '12000022800200002400000001201B00EF81E661EC6386F26FC0FFFF0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461968400000000000000C6940000000000000646AD3504529A0465E2E0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D1664619732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F54474463044022049AD75980A5088EBCD768547E06427736BD8C4396B9BD3762CA8C1341BD7A4F9022060C94071C3BDF99FAB4BEB7C0578D6EBEE083157B470699645CCE4738A41D61081145E7B112523F68D2F5E879DB4EAC51C6698A693048314CA6EDC7A28252DAEA6F2045B24F4D7C333E146170112300000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461900',
       )
     })
 
@@ -460,9 +423,9 @@ describe('Wallet', function () {
         LastLedgerSequence: 8819954,
         Fee: '12',
       }
-      const result = wallet2.signTransaction(payment)
+      const result = wallet.signTransaction(payment)
       const expectedResult =
-        '12000022800000002400000017201B008694F261400000000000000168400000000000000C732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D874473045022100A9C91D4CFAE45686146EE0B56D4C53A2E7C2D672FB834D43E0BE2D2E9106519A022075DDA2F92DE552B0C45D83D4E6D35889B3FBF51BFBBD9B25EBF70DE3C96D0D6681145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648'
+        '12000022800000002400000017201B008694F261400000000000000168400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F54474473045022100E8929B68B137AB2AAB1AD3A4BB253883B0C8C318DC8BB39579375751B8E54AC502206893B2D61244AFE777DAC9FA3D9DDAC7780A9810AF4B322D629784FD626B8CE481145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648'
       assert.deepEqual(result, expectedResult)
     })
 
@@ -478,7 +441,7 @@ describe('Wallet', function () {
         Fee: '12',
       }
       assert.throws(() => {
-        wallet2.signTransaction(payment)
+        wallet.signTransaction(payment)
       }, /^1.1234567 is an illegal amount/u)
     })
   })
