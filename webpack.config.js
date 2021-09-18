@@ -11,7 +11,7 @@ function getDefaultConfiguration() {
     stats: 'errors-only',
     entry: './dist/npm/index.js',
     output: {
-      library: 'ripple',
+      library: 'xrpl',
       path: path.join(__dirname, 'build/'),
       filename: `xrpl.default.js`,
     },
