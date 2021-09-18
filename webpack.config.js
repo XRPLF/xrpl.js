@@ -60,7 +60,7 @@ function webpackForTest(testFileName) {
     cache: true,
     externals: [
       {
-        'xrpl-local': 'ripple',
+        'xrpl-local': 'xrpl',
         net: 'null',
       },
     ],
