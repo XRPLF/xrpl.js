@@ -10,6 +10,8 @@ import {
   LedgerCurrentRequest,
   LedgerDataRequest,
   LedgerDataResponse,
+  LedgerEntryRequest,
+  LedgerEntryResponse,
 } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
@@ -70,5 +72,28 @@ describe('Ledger Methods', function () {
     verifySuccessfulResponse(ledgerDataResponse)
 
     assert(ledgerDataResponse.result.state.length > 0)
+  })
+
+  it('LedgerEntry', async function () {
+    const validatedLedgerResponse: LedgerDataResponse =
+      await this.client.request({
+        command: 'ledger_data',
+        ledger_index: 'validated',
+      })
+    verifySuccessfulResponse(validatedLedgerResponse)
+
+    const ledgerEntryIndex = validatedLedgerResponse.result.state[0].index
+
+    const ledgerEntryRequest: LedgerEntryRequest = {
+      command: 'ledger_entry',
+      index: ledgerEntryIndex,
+    }
+
+    const ledgerEntryResponse: LedgerEntryResponse = await this.client.request(
+      ledgerEntryRequest,
+    )
+    verifySuccessfulResponse(ledgerEntryResponse)
+
+    assert.equal(ledgerEntryResponse.result.index, ledgerEntryIndex)
   })
 })
