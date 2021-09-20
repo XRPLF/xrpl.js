@@ -22,7 +22,6 @@ describe('Payment', function () {
       TransactionType: 'Payment',
       Account: this.wallet.getClassicAddress(),
       Destination: wallet2.getClassicAddress(),
-      // 2 times the amount needed for a new account (20 XRP)
       Amount: '1000',
     }
     await testTransaction(this.client, tx, this.wallet)
