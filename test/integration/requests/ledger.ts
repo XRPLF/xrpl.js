@@ -6,10 +6,12 @@ import {
   LedgerResponse,
   LedgerClosedRequest,
   LedgerClosedResponse,
+  LedgerCurrentResponse,
   LedgerCurrentRequest,
+  LedgerDataRequest,
+  LedgerDataResponse,
 } from 'xrpl-local'
 
-import { LedgerCurrentResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 import { verifySuccessfulResponse } from '../utils'
@@ -55,5 +57,18 @@ describe('Ledger Methods', function () {
       await this.client.request(ledgerCurrentRequest)
 
     verifySuccessfulResponse(ledgerCurrentResponse)
+  })
+
+  it('LedgerData', async function () {
+    const ledgerDataRequest: LedgerDataRequest = {
+      command: 'ledger_data',
+      ledger_index: 'validated',
+    }
+    const ledgerDataResponse: LedgerDataResponse = await this.client.request(
+      ledgerDataRequest,
+    )
+    verifySuccessfulResponse(ledgerDataResponse)
+
+    assert(ledgerDataResponse.result.state.length > 0)
   })
 })
