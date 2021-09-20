@@ -10,8 +10,7 @@ import { xrpToDrops } from '../utils'
 
 // 20 drops
 const LEDGER_OFFSET = 20
-// 5 XRP
-const ACCOUNT_DELETE_FEE = 5000000
+const DROPS_PER_XRP = 1000000
 interface ClassicAccountAndTag {
   classicAccount: string
   tag: number | false | undefined
@@ -132,6 +131,19 @@ async function setNextValidSequenceNumber(
   tx.Sequence = data.result.account_data.Sequence
 }
 
+async function fetchAccountDeleteFee(client: Client): Promise<BigNumber> {
+  const response = await client.request({ command: 'server_info' })
+  console.log(response.result.info.validated_ledger)
+
+  const fee = response.result.info.validated_ledger?.reserve_inc_xrp
+
+  if (fee == null) {
+    return Promise.reject(new Error('Could not fetch Owner Reserve.'))
+  }
+
+  return new BigNumber(fee).multipliedBy(DROPS_PER_XRP)
+}
+
 async function calculateFeePerTransactionType(
   client: Client,
   tx: Transaction,
@@ -155,7 +167,7 @@ async function calculateFeePerTransactionType(
 
   // AccountDelete Transaction
   if (tx.TransactionType === 'AccountDelete') {
-    baseFee = new BigNumber(ACCOUNT_DELETE_FEE)
+    baseFee = await fetchAccountDeleteFee(client)
   }
 
   // Multi-signed Transaction

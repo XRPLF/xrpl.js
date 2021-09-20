@@ -139,13 +139,14 @@ describe('client.autofill', function () {
           info: {
             validated_ledger: {
               base_fee_xrp: 0.00001,
+              reserve_inc_xrp: 2,
             },
           },
         },
       })
       const txResult = await this.client.autofill(tx)
 
-      assert.strictEqual(txResult.Fee, '5000000')
+      assert.strictEqual(txResult.Fee, '2000000')
     })
 
     it('should autofill Fee of an EscrowFinish transaction with signersCount', async function () {
