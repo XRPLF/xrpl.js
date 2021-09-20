@@ -1,9 +1,15 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { LedgerRequest, LedgerResponse } from 'xrpl-local'
+import {
+  LedgerRequest,
+  LedgerResponse,
+  LedgerClosedRequest,
+  LedgerClosedResponse,
+  LedgerCurrentRequest,
+} from 'xrpl-local'
 
-import { LedgerClosedRequest, LedgerClosedResponse } from '../../../src'
+import { LedgerCurrentResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 import { verifySuccessfulResponse } from '../utils'
@@ -11,7 +17,7 @@ import { verifySuccessfulResponse } from '../utils'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('Ledger', function () {
+describe('Ledger Methods', function () {
   this.timeout(TIMEOUT)
 
   before(suiteClientSetup)
@@ -36,6 +42,18 @@ describe('Ledger', function () {
     }
     const ledgerClosedResponse: LedgerClosedResponse =
       await this.client.request(ledgerClosedRequest)
+
     verifySuccessfulResponse(ledgerClosedResponse)
+  })
+
+  it('LedgerCurrent', async function () {
+    const ledgerCurrentRequest: LedgerCurrentRequest = {
+      command: 'ledger_current',
+    }
+
+    const ledgerCurrentResponse: LedgerCurrentResponse =
+      await this.client.request(ledgerCurrentRequest)
+
+    verifySuccessfulResponse(ledgerCurrentResponse)
   })
 })
