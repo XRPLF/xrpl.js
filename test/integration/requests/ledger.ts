@@ -28,14 +28,16 @@ describe('Ledger Methods', function () {
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
-  it('LedgerRequest', async function () {
+  it('Ledger', async function () {
     const ledgerRequest: LedgerRequest = {
       command: 'ledger',
       ledger_index: 'validated',
     }
+
     const ledgerResponse: LedgerResponse = await this.client.request(
       ledgerRequest,
     )
+
     verifySuccessfulResponse(ledgerResponse)
     assert.ok(ledgerResponse.result.validated)
   })
@@ -66,11 +68,12 @@ describe('Ledger Methods', function () {
       command: 'ledger_data',
       ledger_index: 'validated',
     }
+
     const ledgerDataResponse: LedgerDataResponse = await this.client.request(
       ledgerDataRequest,
     )
-    verifySuccessfulResponse(ledgerDataResponse)
 
+    verifySuccessfulResponse(ledgerDataResponse)
     assert(ledgerDataResponse.result.state.length > 0)
   })
 
@@ -80,8 +83,8 @@ describe('Ledger Methods', function () {
         command: 'ledger_data',
         ledger_index: 'validated',
       })
-    verifySuccessfulResponse(validatedLedgerResponse)
 
+    verifySuccessfulResponse(validatedLedgerResponse)
     const ledgerEntryIndex = validatedLedgerResponse.result.state[0].index
 
     const ledgerEntryRequest: LedgerEntryRequest = {
@@ -92,8 +95,8 @@ describe('Ledger Methods', function () {
     const ledgerEntryResponse: LedgerEntryResponse = await this.client.request(
       ledgerEntryRequest,
     )
-    verifySuccessfulResponse(ledgerEntryResponse)
 
+    verifySuccessfulResponse(ledgerEntryResponse)
     assert.equal(ledgerEntryResponse.result.index, ledgerEntryIndex)
   })
 })

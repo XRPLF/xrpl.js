@@ -2,11 +2,9 @@ import { assert } from 'chai'
 import _ from 'lodash'
 import { decode } from 'ripple-binary-codec'
 
-import { Client, Wallet } from 'xrpl-local'
+import { Client, Wallet, Response } from 'xrpl-local'
 import { Payment, Transaction } from 'xrpl-local/models/transactions'
 import { computeSignedTransactionHash } from 'xrpl-local/utils/hashes'
-
-import { Response } from '../../src'
 
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
