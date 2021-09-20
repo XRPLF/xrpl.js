@@ -1,10 +1,21 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 import { decode } from 'ripple-binary-codec'
+import keypairs from 'ripple-keypairs'
 
 import { Client, Wallet } from 'xrpl-local'
 import { Payment, Transaction } from 'xrpl-local/models/transactions'
+import {
+  submitTransaction,
+  // submitSignedTransaction,
+} from 'xrpl-local/sugar/submit'
+// import { sign } from 'xrpl-local/transaction/sign'
 import { computeSignedTransactionHash } from 'xrpl-local/utils/hashes'
+
+import {
+  PaymentChannelCreate,
+  SetRegularKey,
+} from '../../src/models/transactions'
 
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
@@ -90,4 +101,53 @@ export async function testTransaction(
   const signedTx = _.omit(response.result.tx_json, 'hash')
   await ledgerAccept(client)
   await verifySubmittedTransaction(client, signedTx as Transaction)
+}
+
+export async function createChannel(
+  client: Client,
+  wallet: Wallet,
+): Promise<void> {
+  const keypair = keypairs.deriveKeypair(masterSecret)
+
+  const tx: PaymentChannelCreate = {
+    Amount: '40000000',
+    Account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+    TransactionType: 'PaymentChannelCreate',
+    Destination: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',
+    SettleDelay: 86400,
+    PublicKey: keypair.publicKey,
+  }
+  // const tx = {
+  //   command: 'sign',
+  //   tx_json: {
+  //     Amount: '40000000',
+  //     Account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+  //     TransactionType: 'PaymentChannelCreate',
+  //     Destination: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',
+  //     SettleDelay: 86400,
+  //     PublicKey: keypair.publicKey,
+  //   },
+  //   secret: masterSecret,
+  //   offline: false,
+  //   fee_mult_max: 1000,
+  // }
+  setRegularKey(client, wallet)
+  const signedTransaction = await submitTransaction(client, wallet, tx)
+  // client.sign
+  // const response = client.sign(tx, masterSecret)
+  //   const signedTx = { ...signedTransaction }
+  //   const response = await submitSignedTransaction(client, signedTx)
+  //   console.log(response)
+  console.log(signedTransaction)
+}
+
+async function setRegularKey(client: Client, wallet: Wallet) {
+  const tx: SetRegularKey = {
+    Flags: 0,
+    TransactionType: 'SetRegularKey',
+    Account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+    Fee: '12',
+  }
+  const response = await submitTransaction(client, wallet, tx)
+  console.log(response)
 }
