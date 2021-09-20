@@ -6,7 +6,7 @@ export interface GatewayBalancesRequest extends BaseRequest {
   command: 'gateway_balances'
   account: string
   strict?: boolean
-  hotwallet: string | string[]
+  hotwallet?: string | string[]
   ledger_hash?: string
   ledger_index?: LedgerIndex
 }
