@@ -1,21 +1,10 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 import { decode } from 'ripple-binary-codec'
-import keypairs from 'ripple-keypairs'
 
 import { Client, Wallet } from 'xrpl-local'
 import { Payment, Transaction } from 'xrpl-local/models/transactions'
-import {
-  submitTransaction,
-  // submitSignedTransaction,
-} from 'xrpl-local/sugar/submit'
-// import { sign } from 'xrpl-local/transaction/sign'
 import { computeSignedTransactionHash } from 'xrpl-local/utils/hashes'
-
-import {
-  PaymentChannelCreate,
-  SetRegularKey,
-} from '../../src/models/transactions'
 
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
