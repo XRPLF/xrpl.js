@@ -323,13 +323,15 @@ class Client extends EventEmitter {
     req: R,
   ): Promise<T> {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
-    return this.connection.request({
+    const response = (await this.connection.request({
       ...req,
       account: req.account
         ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be string
           ensureClassicAddress(req.account as string)
         : undefined,
-    }) as unknown as T
+    })) as T
+
+    return response
   }
 
   public async requestNextPage(
