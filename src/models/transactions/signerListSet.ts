@@ -1,4 +1,4 @@
-import { ValidationError } from '../../common/errors'
+import { ValidationError } from '../../errors'
 import { SignerEntry } from '../common'
 
 import { BaseTransaction, validateBaseTransaction } from './common'

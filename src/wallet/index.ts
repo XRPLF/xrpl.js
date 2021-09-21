@@ -20,8 +20,8 @@ import {
   sign,
 } from 'ripple-keypairs'
 
-import ECDSA from '../common/ecdsa'
-import { ValidationError } from '../common/errors'
+import ECDSA from '../ecdsa'
+import { ValidationError } from '../errors'
 import { Transaction } from '../models/transactions'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519

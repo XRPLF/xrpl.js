@@ -1,8 +1,8 @@
 import { classicAddressToXAddress } from 'ripple-address-codec'
 import keypairs from 'ripple-keypairs'
 
-import ECDSA from '../common/ecdsa'
-import { UnexpectedError } from '../common/errors'
+import ECDSA from '../ecdsa'
+import { UnexpectedError } from '../errors'
 
 export interface GeneratedAddress {
   xAddress: string

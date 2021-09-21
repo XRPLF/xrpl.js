@@ -1,5 +1,5 @@
 /* eslint-disable complexity -- Necessary for validatePaymentChannelCreate */
-import { ValidationError } from '../../common/errors'
+import { ValidationError } from '../../errors'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
 

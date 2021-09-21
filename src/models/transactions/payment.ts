@@ -1,6 +1,6 @@
 /* eslint-disable max-statements -- Necessary for validatePayment */
 /* eslint-disable complexity -- Necessary for validatePayment */
-import { ValidationError } from '../../common/errors'
+import { ValidationError } from '../../errors'
 import { Amount, Path } from '../common'
 import { isFlagEnabled } from '../utils'
 

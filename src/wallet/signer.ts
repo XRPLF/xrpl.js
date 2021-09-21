@@ -9,7 +9,7 @@ import {
 } from 'ripple-binary-codec'
 import { sign as signWithKeypair, verify } from 'ripple-keypairs'
 
-import { ValidationError } from '../common/errors'
+import { ValidationError } from '../errors'
 import { Signer } from '../models/common'
 import { Transaction } from '../models/transactions'
 import { validateBaseTransaction } from '../models/transactions/common'

@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { ValidationError, XrplError } from '../../src/common/errors'
+import { ValidationError, XrplError } from 'xrpl-local'
 import { computeLedgerHash } from '../../src/utils'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'

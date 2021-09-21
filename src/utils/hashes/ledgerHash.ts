@@ -6,7 +6,7 @@
 import BigNumber from 'bignumber.js'
 import { decode, encode } from 'ripple-binary-codec'
 
-import { ValidationError } from '../../common/errors'
+import { ValidationError } from '../../errors'
 import type { Ledger } from '../../models/ledger'
 import { LedgerEntry } from '../../models/ledger'
 import { Transaction } from '../../models/transactions'
