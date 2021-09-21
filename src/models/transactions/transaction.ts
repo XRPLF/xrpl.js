@@ -4,7 +4,7 @@
 import _ from 'lodash'
 import { encode, decode } from 'ripple-binary-codec'
 
-import { ValidationError } from '../../common/errors'
+import { ValidationError } from '../../errors'
 import { setTransactionFlagsToNumber } from '../utils'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'

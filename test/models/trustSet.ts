@@ -1,7 +1,6 @@
 import { assert } from 'chai'
 
-import { validateTrustSet, validate } from 'xrpl-local'
-import { ValidationError } from 'xrpl-local/common/errors'
+import { validateTrustSet, validate, ValidationError } from 'xrpl-local'
 
 /**
  * TrustSet Transaction Verification Testing.

@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 
-import ECDSA from '../../src/common/ecdsa'
-import { UnexpectedError } from '../../src/common/errors'
+import ECDSA from '../../src/ecdsa'
+import { UnexpectedError } from 'xrpl-local'
 import {
   generateXAddress,
   GenerateAddressOptions,
