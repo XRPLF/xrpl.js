@@ -15,12 +15,12 @@ const BASE_10 = 10
  * @returns The transaction fee.
  */
 export default async function getFee(
-  client: Client,
+  this: Client,
   cushion?: number,
 ): Promise<string> {
-  const feeCushion = cushion ?? client.feeCushion
+  const feeCushion = cushion ?? this.feeCushion
 
-  const serverInfo = (await client.request({ command: 'server_info' })).result
+  const serverInfo = (await this.request({ command: 'server_info' })).result
     .info
 
   const baseFee = serverInfo.validated_ledger?.base_fee_xrp
@@ -37,7 +37,7 @@ export default async function getFee(
   let fee = baseFeeXrp.times(serverInfo.load_factor).times(feeCushion)
 
   // Cap fee to `client.maxFeeXRP`
-  fee = BigNumber.min(fee, client.maxFeeXRP)
+  fee = BigNumber.min(fee, this.maxFeeXRP)
   // Round fee to 6 decimal places
   return new BigNumber(fee.toFixed(NUM_DECIMAL_PLACES)).toString(BASE_10)
 }

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/member-ordering -- TODO: remove when instance methods aren't members */
 /* eslint-disable max-lines -- This might not be necessary later, but this file needs to be big right now */
 import * as assert from 'assert'
 import { EventEmitter } from 'events'
@@ -136,21 +135,6 @@ function getCollectKeyFromCommand(command: string): string | null {
 function clamp(value: number, min: number, max: number): number {
   assert.ok(min <= max, 'Illegal clamp bounds')
   return Math.min(Math.max(value, min), max)
-}
-
-/**
- * It returns a function that prepends params to the given func.
- * A sugar function for JavaScript .bind() without the "this" (keyword) binding.
- *
- * @param func - A function to prepend params.
- * @param params - Parameters to prepend to a function.
- * @returns A function bound with params.
- */
-// TODO Need to refactor prepend so TS can infer the correct function signature type
-// eslint-disable-next-line @typescript-eslint/ban-types -- expected param types
-function prepend(func: Function, ...params: unknown[]): Function {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- safe to return
-  return func.bind(null, ...params)
 }
 
 interface MarkerRequest extends BaseRequest {
@@ -517,23 +501,23 @@ class Client extends EventEmitter {
     return this.connection.isConnected()
   }
 
-  // TODO: Use prepend for other instance methods as well.
-  public autofill = prepend(autofill, this)
+  public autofill = autofill
+
+  public getFee = getFee
 
   // @deprecated Use autofill instead
-  public prepareTransaction = prepend(autofill, this)
+  public prepareTransaction = autofill
 
-  public getFee = prepend(getFee, this)
-  public submitTransaction = prepend(submitTransaction, this)
+  public submitTransaction = submitTransaction
 
-  public submitSignedTransaction = prepend(submitSignedTransaction, this)
+  public submitSignedTransaction = submitSignedTransaction
 
-  public getBalances = prepend(getBalances, this)
-  public getOrderbook = prepend(getOrderbook, this)
+  public getBalances = getBalances
+  public getOrderbook = getOrderbook
 
   public combine = combine
 
-  public generateFaucetWallet = prepend(generateFaucetWallet, this)
+  public generateFaucetWallet = generateFaucetWallet
 
   public errors = errors
 }

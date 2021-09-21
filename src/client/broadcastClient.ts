@@ -19,13 +19,13 @@ export default class BroadcastClient extends Client {
       (server) => new Client(server, options),
     )
 
-    // exposed for testing
     this.clients = clients
     this.getMethodNames().forEach((name: string) => {
       this[name] = async (...args): Promise<unknown> =>
-        // eslint-disable-next-line max-len -- Need a long comment, TODO: figure out how to avoid this weirdness
-        /* eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call -- Types are outlined in Client class */
+        /* eslint-disable @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call -- Generates types
+          from the Client */
         Promise.race(clients.map(async (client) => client[name](...args)))
+      /* eslint-enable @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call */
     })
 
     // connection methods must be overridden to apply to all client instances

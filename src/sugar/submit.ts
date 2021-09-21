@@ -5,8 +5,6 @@ import { ValidationError } from '../errors'
 import { Transaction } from '../models/transactions'
 import { sign } from '../wallet/signer'
 
-import autofill from './autofill'
-
 /**
  * Submits an unsigned transaction.
  * Steps performed on a transaction:
@@ -14,33 +12,32 @@ import autofill from './autofill'
  *    2. Sign & Encode.
  *    3. Submit.
  *
- * @param client - A Client.
+ * @param this - A Client.
  * @param wallet - A Wallet to sign a transaction.
  * @param transaction - A transaction to autofill, sign & encode, and submit.
  * @returns A promise that contains SubmitResponse.
  * @throws RippledError if submit request fails.
  */
 async function submitTransaction(
-  client: Client,
+  this: Client,
   wallet: Wallet,
   transaction: Transaction,
 ): Promise<SubmitResponse> {
-  // TODO: replace with client.autofill(transaction) once prepend refactor is fixed.
-  const tx = await autofill(client, transaction)
+  const tx = await this.autofill(transaction)
   const signedTxEncoded = sign(wallet, tx)
-  return submitSignedTransaction(client, signedTxEncoded)
+  return this.submitSignedTransaction(signedTxEncoded)
 }
 
 /**
  * Encodes and submits a signed transaction.
  *
- * @param client - A Client.
+ * @param this - A Client.
  * @param signedTransaction - A signed transaction to encode (if not already) and submit.
  * @returns A promise that contains SubmitResponse.
  * @throws RippledError if submit request fails.
  */
 async function submitSignedTransaction(
-  client: Client,
+  this: Client,
   signedTransaction: Transaction | string,
 ): Promise<SubmitResponse> {
   if (!isSigned(signedTransaction)) {
@@ -55,7 +52,7 @@ async function submitSignedTransaction(
     command: 'submit',
     tx_blob: signedTxEncoded,
   }
-  return client.request(request)
+  return this.request(request)
 }
 
 function isSigned(transaction: Transaction | string): boolean {
