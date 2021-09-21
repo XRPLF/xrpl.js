@@ -11,7 +11,8 @@ import {
   PaymentTransactionFlags,
   TrustSet,
   TrustSetTransactionFlags,
-} from '../../src/models/transactions'
+} from 'xrpl-local'
+
 import {
   isFlagEnabled,
   setTransactionFlagsToNumber,

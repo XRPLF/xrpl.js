@@ -1,9 +1,6 @@
 import { assert } from 'chai'
 
-import { ValidationError } from 'xrpl-local/common/errors'
-
-import { verify } from '../../src/models/transactions'
-import { verifySignerListSet } from '../../src/models/transactions/signerListSet'
+import { validate, validateSignerListSet, ValidationError } from 'xrpl-local'
 
 /**
  * SignerListSet Transaction Verification Testing.
@@ -44,20 +41,20 @@ describe('SignerListSet', function () {
   })
 
   it(`verifies valid SignerListSet`, function () {
-    assert.doesNotThrow(() => verifySignerListSet(signerListSetTx))
-    assert.doesNotThrow(() => verify(signerListSetTx))
+    assert.doesNotThrow(() => validateSignerListSet(signerListSetTx))
+    assert.doesNotThrow(() => validate(signerListSetTx))
   })
 
   it(`throws w/ missing SignerQuorum`, function () {
     signerListSetTx.SignerQuorum = undefined
 
     assert.throws(
-      () => verifySignerListSet(signerListSetTx),
+      () => validateSignerListSet(signerListSetTx),
       ValidationError,
       'SignerListSet: missing field SignerQuorum',
     )
     assert.throws(
-      () => verify(signerListSetTx),
+      () => validate(signerListSetTx),
       ValidationError,
       'SignerListSet: missing field SignerQuorum',
     )
@@ -67,12 +64,12 @@ describe('SignerListSet', function () {
     signerListSetTx.SignerEntries = []
 
     assert.throws(
-      () => verifySignerListSet(signerListSetTx),
+      () => validateSignerListSet(signerListSetTx),
       ValidationError,
       'SignerListSet: need atleast 1 member in SignerEntries',
     )
     assert.throws(
-      () => verify(signerListSetTx),
+      () => validate(signerListSetTx),
       ValidationError,
       'SignerListSet: need atleast 1 member in SignerEntries',
     )
@@ -82,12 +79,12 @@ describe('SignerListSet', function () {
     signerListSetTx.SignerEntries = 'khgfgyhujk'
 
     assert.throws(
-      () => verifySignerListSet(signerListSetTx),
+      () => validateSignerListSet(signerListSetTx),
       ValidationError,
       'SignerListSet: invalid SignerEntries',
     )
     assert.throws(
-      () => verify(signerListSetTx),
+      () => validate(signerListSetTx),
       ValidationError,
       'SignerListSet: invalid SignerEntries',
     )

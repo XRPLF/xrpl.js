@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign -- param reassign is safe */
 /* eslint-disable no-bitwise -- flags require bitwise operations */
-import { ValidationError } from '../../common/errors'
+import { ValidationError } from '../../errors'
 // eslint-disable-next-line import/no-cycle -- cycle is safe
 import {
   AccountSetFlagsInterface,

@@ -1,12 +1,11 @@
 import { assert } from 'chai'
 
-import { ValidationError } from 'xrpl-local/common/errors'
-
 import {
-  verifyPayment,
-  verify,
+  validatePayment,
+  validate,
   PaymentTransactionFlags,
-} from '../../src/models/transactions'
+  ValidationError,
+} from 'xrpl-local'
 
 /**
  * PaymentTransaction Verification Testing.
@@ -41,19 +40,19 @@ describe('Payment', function () {
   })
 
   it(`verifies valid PaymentTransaction`, function () {
-    assert.doesNotThrow(() => verifyPayment(paymentTransaction))
-    assert.doesNotThrow(() => verify(paymentTransaction))
+    assert.doesNotThrow(() => validatePayment(paymentTransaction))
+    assert.doesNotThrow(() => validate(paymentTransaction))
   })
 
   it(`throws when Amount is missing`, function () {
     delete paymentTransaction.Amount
     assert.throws(
-      () => verifyPayment(paymentTransaction),
+      () => validatePayment(paymentTransaction),
       ValidationError,
       'PaymentTransaction: missing field Amount',
     )
     assert.throws(
-      () => verify(paymentTransaction),
+      () => validate(paymentTransaction),
       ValidationError,
       'PaymentTransaction: missing field Amount',
     )
@@ -62,12 +61,12 @@ describe('Payment', function () {
   it(`throws when Amount is invalid`, function () {
     paymentTransaction.Amount = 1234
     assert.throws(
-      () => verifyPayment(paymentTransaction),
+      () => validatePayment(paymentTransaction),
       ValidationError,
       'PaymentTransaction: invalid Amount',
     )
     assert.throws(
-      () => verify(paymentTransaction),
+      () => validate(paymentTransaction),
       ValidationError,
       'PaymentTransaction: invalid Amount',
     )
@@ -76,12 +75,12 @@ describe('Payment', function () {
   it(`throws when Destination is missing`, function () {
     delete paymentTransaction.Destination
     assert.throws(
-      () => verifyPayment(paymentTransaction),
+      () => validatePayment(paymentTransaction),
       ValidationError,
       'PaymentTransaction: missing field Destination',
     )
     assert.throws(
-      () => verify(paymentTransaction),
+      () => validate(paymentTransaction),
       ValidationError,
       'PaymentTransaction: missing field Destination',
     )
@@ -90,12 +89,12 @@ describe('Payment', function () {
   it(`throws when Destination is invalid`, function () {
     paymentTransaction.Destination = 7896214
     assert.throws(
-      () => verifyPayment(paymentTransaction),
+      () => validatePayment(paymentTransaction),
       ValidationError,
       'PaymentTransaction: invalid Destination',
     )
     assert.throws(
-      () => verify(paymentTransaction),
+      () => validate(paymentTransaction),
       ValidationError,
       'PaymentTransaction: invalid Destination',
     )
@@ -104,12 +103,12 @@ describe('Payment', function () {
   it(`throws when DestinationTag is not a number`, function () {
     paymentTransaction.DestinationTag = '1'
     assert.throws(
-      () => verifyPayment(paymentTransaction),
+      () => validatePayment(paymentTransaction),
       ValidationError,
       'PaymentTransaction: DestinationTag must be a number',
     )
     assert.throws(
-      () => verify(paymentTransaction),
+      () => validate(paymentTransaction),
       ValidationError,
       'PaymentTransaction: DestinationTag must be a number',
     )
@@ -118,12 +117,12 @@ describe('Payment', function () {
   it(`throws when InvoiceID is not a string`, function () {
     paymentTransaction.InvoiceID = 19832
     assert.throws(
-      () => verifyPayment(paymentTransaction),
+      () => validatePayment(paymentTransaction),
       ValidationError,
       'PaymentTransaction: InvoiceID must be a string',
     )
     assert.throws(
-      () => verify(paymentTransaction),
+      () => validate(paymentTransaction),
       ValidationError,
       'PaymentTransaction: InvoiceID must be a string',
     )
@@ -132,12 +131,12 @@ describe('Payment', function () {
   it(`throws when Paths is invalid`, function () {
     paymentTransaction.Paths = [[{ account: 123 }]]
     assert.throws(
-      () => verifyPayment(paymentTransaction),
+      () => validatePayment(paymentTransaction),
       ValidationError,
       'PaymentTransaction: invalid Paths',
     )
     assert.throws(
-      () => verify(paymentTransaction),
+      () => validate(paymentTransaction),
       ValidationError,
       'PaymentTransaction: invalid Paths',
     )
@@ -146,12 +145,12 @@ describe('Payment', function () {
   it(`throws when SendMax is invalid`, function () {
     paymentTransaction.SendMax = 100000000
     assert.throws(
-      () => verifyPayment(paymentTransaction),
+      () => validatePayment(paymentTransaction),
       ValidationError,
       'PaymentTransaction: invalid SendMax',
     )
     assert.throws(
-      () => verify(paymentTransaction),
+      () => validate(paymentTransaction),
       ValidationError,
       'PaymentTransaction: invalid SendMax',
     )
@@ -160,27 +159,27 @@ describe('Payment', function () {
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a number`, function () {
     paymentTransaction.DeliverMin = '10000'
     paymentTransaction.Flags = PaymentTransactionFlags.tfPartialPayment
-    assert.doesNotThrow(() => verifyPayment(paymentTransaction))
-    assert.doesNotThrow(() => verify(paymentTransaction))
+    assert.doesNotThrow(() => validatePayment(paymentTransaction))
+    assert.doesNotThrow(() => validate(paymentTransaction))
   })
 
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a boolean`, function () {
     paymentTransaction.DeliverMin = '10000'
     paymentTransaction.Flags = { tfPartialPayment: true }
-    assert.doesNotThrow(() => verifyPayment(paymentTransaction))
-    assert.doesNotThrow(() => verify(paymentTransaction))
+    assert.doesNotThrow(() => validatePayment(paymentTransaction))
+    assert.doesNotThrow(() => validate(paymentTransaction))
   })
 
   it(`throws when DeliverMin is invalid`, function () {
     paymentTransaction.DeliverMin = 10000
     paymentTransaction.Flags = { tfPartialPayment: true }
     assert.throws(
-      () => verifyPayment(paymentTransaction),
+      () => validatePayment(paymentTransaction),
       ValidationError,
       'PaymentTransaction: invalid DeliverMin',
     )
     assert.throws(
-      () => verify(paymentTransaction),
+      () => validate(paymentTransaction),
       ValidationError,
       'PaymentTransaction: invalid DeliverMin',
     )
@@ -189,12 +188,12 @@ describe('Payment', function () {
   it(`throws when tfPartialPayment flag is missing with valid DeliverMin`, function () {
     paymentTransaction.DeliverMin = '10000'
     assert.throws(
-      () => verifyPayment(paymentTransaction),
+      () => validatePayment(paymentTransaction),
       ValidationError,
       'PaymentTransaction: tfPartialPayment flag required with DeliverMin',
     )
     assert.throws(
-      () => verify(paymentTransaction),
+      () => validate(paymentTransaction),
       ValidationError,
       'PaymentTransaction: tfPartialPayment flag required with DeliverMin',
     )

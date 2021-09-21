@@ -4,7 +4,7 @@ import { request as httpsRequest, RequestOptions } from 'https'
 import { isValidClassicAddress } from 'ripple-address-codec'
 
 import type { Client } from '..'
-import { RippledError, XRPLFaucetError } from '../common/errors'
+import { RippledError, XRPLFaucetError } from '../errors'
 import { GeneratedAddress } from '../utils/generateAddress'
 
 import Wallet from '.'

@@ -1,31 +1,9 @@
 /* eslint-disable max-lines -- This might not be necessary later, but this file needs to be big right now */
+import * as assert from 'assert'
 import { EventEmitter } from 'events'
 
-import {
-  classicAddressToXAddress,
-  xAddressToClassicAddress,
-  isValidXAddress,
-  isValidClassicAddress,
-  encodeSeed,
-  decodeSeed,
-  encodeAccountID,
-  decodeAccountID,
-  encodeNodePublic,
-  decodeNodePublic,
-  encodeAccountPublic,
-  decodeAccountPublic,
-  encodeXAddress,
-  decodeXAddress,
-} from 'ripple-address-codec'
-
-import { constants, errors, txFlags, ensureClassicAddress } from '../sugar'
-import { ValidationError, XrplError } from '../common/errors'
-import getFee from '../sugar/fee'
-import autofill from '../sugar/autofill'
-import getBalances from '../sugar/balances'
-import getOrderbook from '../sugar/orderbook'
-import { submitTransaction, submitSignedTransaction } from '../sugar/submit'
-import { clamp } from '../sugar/utils'
+import { ValidationError, XrplError } from '../errors'
+import * as errors from '../errors'
 import {
   // account methods
   AccountChannelsRequest,
@@ -104,8 +82,13 @@ import {
   UnsubscribeResponse,
 } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
+import autofill from '../sugar/autofill'
+import getBalances from '../sugar/balances'
+import getFee from '../sugar/fee'
+import getOrderbook from '../sugar/orderbook'
+import { submitTransaction, submitSignedTransaction } from '../sugar/submit'
+import { ensureClassicAddress } from '../sugar/utils'
 import combine from '../transaction/combine'
-import { sign } from '../transaction/sign'
 import generateFaucetWallet from '../wallet/generateFaucetWallet'
 
 import {
@@ -147,6 +130,11 @@ function getCollectKeyFromCommand(command: string): string | null {
     default:
       return null
   }
+}
+
+function clamp(value: number, min: number, max: number): number {
+  assert.ok(min <= max, 'Illegal clamp bounds')
+  return Math.min(Math.max(value, min), max)
 }
 
 interface MarkerRequest extends BaseRequest {
@@ -527,35 +515,11 @@ class Client extends EventEmitter {
   public getBalances = getBalances
   public getOrderbook = getOrderbook
 
-  public sign = sign
   public combine = combine
 
   public generateFaucetWallet = generateFaucetWallet
 
   public errors = errors
-
-  /**
-   * Static methods to expose ripple-address-codec methods.
-   */
-  public static classicAddressToXAddress = classicAddressToXAddress
-  public static xAddressToClassicAddress = xAddressToClassicAddress
-  public static isValidXAddress = isValidXAddress
-  public static isValidClassicAddress = isValidClassicAddress
-  public static encodeSeed = encodeSeed
-  public static decodeSeed = decodeSeed
-  public static encodeAccountID = encodeAccountID
-  public static decodeAccountID = decodeAccountID
-  public static encodeNodePublic = encodeNodePublic
-  public static decodeNodePublic = decodeNodePublic
-  public static encodeAccountPublic = encodeAccountPublic
-  public static decodeAccountPublic = decodeAccountPublic
-  public static encodeXAddress = encodeXAddress
-  public static decodeXAddress = decodeXAddress
-
-  public txFlags = txFlags
-  public static txFlags = txFlags
-  public accountSetFlags = constants.AccountSetFlags
-  public static accountSetFlags = constants.AccountSetFlags
 }
 
 export { Client, Connection }

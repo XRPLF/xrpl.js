@@ -1,7 +1,6 @@
-import { verifyEscrowCancel } from './../../src/models/transactions/escrowCancel'
 import { assert } from 'chai'
-import { ValidationError } from '../../src/common/errors'
-import { verify } from '../../src/models/transactions'
+
+import { validateEscrowCancel, validate, ValidationError } from 'xrpl-local'
 
 /**
  * Transaction Verification Testing.
@@ -21,20 +20,20 @@ describe('EscrowCancel', function () {
   })
 
   it(`Valid EscrowCancel`, function () {
-    assert.doesNotThrow(() => verifyEscrowCancel(cancel))
-    assert.doesNotThrow(() => verify(cancel))
+    assert.doesNotThrow(() => validateEscrowCancel(cancel))
+    assert.doesNotThrow(() => validate(cancel))
   })
 
   it(`Invalid EscrowCancel missing owner`, function () {
     delete cancel.Owner
 
     assert.throws(
-      () => verifyEscrowCancel(cancel),
+      () => validateEscrowCancel(cancel),
       ValidationError,
       'EscrowCancel: missing Owner',
     )
     assert.throws(
-      () => verify(cancel),
+      () => validate(cancel),
       ValidationError,
       'EscrowCancel: missing Owner',
     )
@@ -44,12 +43,12 @@ describe('EscrowCancel', function () {
     delete cancel.OfferSequence
 
     assert.throws(
-      () => verifyEscrowCancel(cancel),
+      () => validateEscrowCancel(cancel),
       ValidationError,
       'EscrowCancel: missing OfferSequence',
     )
     assert.throws(
-      () => verify(cancel),
+      () => validate(cancel),
       ValidationError,
       'EscrowCancel: missing OfferSequence',
     )
@@ -59,12 +58,12 @@ describe('EscrowCancel', function () {
     cancel.Owner = 10
 
     assert.throws(
-      () => verifyEscrowCancel(cancel),
+      () => validateEscrowCancel(cancel),
       ValidationError,
       'EscrowCancel: Owner must be a string',
     )
     assert.throws(
-      () => verify(cancel),
+      () => validate(cancel),
       ValidationError,
       'EscrowCancel: Owner must be a string',
     )
@@ -74,12 +73,12 @@ describe('EscrowCancel', function () {
     cancel.OfferSequence = '10'
 
     assert.throws(
-      () => verifyEscrowCancel(cancel),
+      () => validateEscrowCancel(cancel),
       ValidationError,
       'EscrowCancel: OfferSequence must be a number',
     )
     assert.throws(
-      () => verify(cancel),
+      () => validate(cancel),
       ValidationError,
       'EscrowCancel: OfferSequence must be a number',
     )

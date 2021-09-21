@@ -4,9 +4,8 @@ import path from 'path'
 import { assert } from 'chai'
 import { encode } from 'ripple-binary-codec'
 
-import { ValidationError } from 'xrpl-local/common/errors'
+import { OfferCreate, Transaction, ValidationError } from 'xrpl-local'
 
-import { OfferCreate, Transaction } from '../../src/models/transactions'
 import {
   computeStateTreeHash,
   computeTransactionTreeHash,

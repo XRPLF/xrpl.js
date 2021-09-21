@@ -1,11 +1,11 @@
-import { ValidationError } from '../../common/errors'
+import { ValidationError } from '../../errors'
 import { Amount } from '../common'
 
 import {
   BaseTransaction,
   GlobalFlags,
   isAmount,
-  verifyBaseTransaction,
+  validateBaseTransaction,
 } from './common'
 
 export enum TrustSetTransactionFlags {
@@ -38,8 +38,8 @@ export interface TrustSet extends BaseTransaction {
  * @param tx - A TrustSet Transaction.
  * @throws When the TrustSet is malformed.
  */
-export function verifyTrustSet(tx: Record<string, unknown>): void {
-  verifyBaseTransaction(tx)
+export function validateTrustSet(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
   const { LimitAmount, QualityIn, QualityOut } = tx
 
   if (LimitAmount === undefined) {

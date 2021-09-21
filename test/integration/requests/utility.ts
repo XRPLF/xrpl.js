@@ -1,5 +1,6 @@
 import { assert } from 'chai'
 import _ from 'lodash'
+
 import { Client } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
@@ -25,7 +26,7 @@ describe('Utility method integration tests', function () {
       status: 'success',
       type: 'response',
     }
-    assert.deepEqual(response, expected)
+    assert.deepEqual(_.omit(response, 'id'), _.omit(expected, 'id'))
   })
 
   it('random', async function () {
@@ -40,7 +41,6 @@ describe('Utility method integration tests', function () {
       status: 'success',
       type: 'response',
     }
-    assert.equal(response.id, expected.id)
     assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
     assert.equal(response.result.random.length, 64)

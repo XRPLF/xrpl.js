@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { ValidationError } from 'xrpl-local/common/errors'
+import { ValidationError } from 'xrpl-local'
 import { Transaction } from 'xrpl-local/models/transactions'
 
 import rippled from '../fixtures/rippled'

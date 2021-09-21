@@ -10,7 +10,7 @@ import {
   NotConnectedError,
   ConnectionError,
   XrplError,
-} from '../common/errors'
+} from '../errors'
 import { BaseRequest } from '../models/methods/baseMethod'
 
 import ExponentialBackoff from './backoff'

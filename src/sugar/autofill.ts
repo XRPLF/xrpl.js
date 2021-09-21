@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 import type { Client } from '..'
-import { ValidationError } from '../common/errors'
+import { ValidationError } from '../errors'
 import { AccountInfoRequest, LedgerRequest } from '../models/methods'
 import { Transaction } from '../models/transactions'
 import { setTransactionFlagsToNumber } from '../models/utils'

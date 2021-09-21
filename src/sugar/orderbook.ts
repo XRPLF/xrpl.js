@@ -3,13 +3,12 @@ import _ from 'lodash'
 
 import type { Client } from '../client'
 import { LedgerIndex } from '../models/common'
+import { OfferLedgerFlags } from '../models/ledger/offer'
 import {
   BookOffer,
   BookOffersRequest,
   TakerAmount,
 } from '../models/methods/bookOffers'
-
-import { orderFlags } from './parse/flags'
 
 const DEFAULT_LIMIT = 20
 
@@ -73,6 +72,7 @@ async function getOrderbook(
     reverseOfferResults,
     (reverseOfferResult) => reverseOfferResult.result.offers,
   )
+
   // Sort the orders
   // for both buys and sells, lowest quality is closest to mid-market
   // we sort the orders so that earlier orders are closer to mid-market
@@ -82,7 +82,7 @@ async function getOrderbook(
   const buy: BookOffer[] = []
   const sell: BookOffer[] = []
   orders.forEach((order) => {
-    if (order.Flags === orderFlags.Sell) {
+    if ((order.Flags & OfferLedgerFlags.lsfSell) !== 0) {
       sell.push(order)
     } else {
       buy.push(order)

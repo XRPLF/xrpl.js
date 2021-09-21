@@ -1,3 +1,4 @@
+/* eslint-disable mocha/no-hooks-for-single-case -- Use of hooks is restricted when there is a single test case. */
 import { assert } from 'chai'
 
 import { setupClient, teardownClient } from '../setupClient'

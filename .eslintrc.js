@@ -82,6 +82,13 @@ module.exports = {
       },
     },
     {
+      files: ['test/client/*.ts'],
+      rules: {
+        // Rule does not work with dynamically generated tests.
+        'mocha/no-setup-in-describe': 'off',
+      },
+    },
+    {
       files: ['test/models/*.ts'],
       rules: {
         '@typescript-eslint/consistent-type-assertions': 'off',

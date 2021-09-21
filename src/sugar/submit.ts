@@ -1,7 +1,7 @@
 import { decode, encode } from 'ripple-binary-codec'
 
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
-import { ValidationError } from '../common/errors'
+import { ValidationError } from '../errors'
 import { Transaction } from '../models/transactions'
 import { sign } from '../wallet/signer'
 

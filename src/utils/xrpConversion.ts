@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 
-import { ValidationError } from '../common/errors'
+import { ValidationError } from '../errors'
 
 const DROPS_PER_XRP = 1000000.0
 const MAX_FRACTION_LENGTH = 6

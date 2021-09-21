@@ -1,11 +1,11 @@
-/* eslint-disable import/no-unused-modules -- Needs to export all types + verify methods */
-/* eslint-disable import/max-dependencies -- Needs to export all types + verify methods */
+/* eslint-disable import/no-unused-modules -- Needs to export all types + validate methods */
+/* eslint-disable import/max-dependencies -- Needs to export all types + validate methods */
 // TODO: replace * imports with direct imports
 export * from './transaction'
 export {
   AccountSetFlagsInterface,
   AccountSet,
-  verifyAccountSet,
+  validateAccountSet,
 } from './accountSet'
 export * from './accountDelete'
 export * from './checkCancel'
@@ -19,17 +19,17 @@ export * from './offerCancel'
 export {
   OfferCreateFlagsInterface,
   OfferCreate,
-  verifyOfferCreate,
+  validateOfferCreate,
 } from './offerCreate'
-export { PaymentFlagsInterface, Payment, verifyPayment } from './payment'
+export { PaymentFlagsInterface, Payment, validatePayment } from './payment'
 export {
   PaymentChannelClaimFlagsInterface,
   PaymentChannelClaim,
-  verifyPaymentChannelClaim,
+  validatePaymentChannelClaim,
 } from './paymentChannelClaim'
 export * from './paymentChannelCreate'
 export * from './paymentChannelFund'
 export * from './setRegularKey'
 export * from './signerListSet'
 export * from './ticketCreate'
-export { TrustSetFlagsInterface, TrustSet, verifyTrustSet } from './trustSet'
+export { TrustSetFlagsInterface, TrustSet, validateTrustSet } from './trustSet'
