@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { PathFindRequest, PathFindResponse } from 'xrpl-local'
+import { RipplePathFindRequest, RipplePathFindResponse } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
@@ -10,7 +10,7 @@ import { generateFundedWallet } from '../utils'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('PathFind', function () {
+describe('RipplePathFind', function () {
   this.timeout(TIMEOUT)
 
   before(suiteClientSetup)
@@ -19,15 +19,17 @@ describe('PathFind', function () {
 
   it('base', async function () {
     const wallet2 = await generateFundedWallet(this.client)
-    const pathFind: PathFindRequest = {
-      command: 'path_find',
+    const ripplePathFind: RipplePathFindRequest = {
+      command: 'ripple_path_find',
       subcommand: 'create',
       source_account: this.wallet.getClassicAddress(),
       destination_account: wallet2.getClassicAddress(),
       destination_amount: '100',
     }
 
-    const response: PathFindResponse = await this.client.request(pathFind)
+    const response: RipplePathFindResponse = await this.client.request(
+      ripplePathFind,
+    )
     assert.equal(response.status, 'success')
     assert.equal(response.type, 'response')
   })
