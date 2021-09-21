@@ -15,9 +15,6 @@ import {
   xAddressToClassicAddress,
 } from 'ripple-address-codec'
 
-import { ValidationError } from '../common/errors'
-import { RippledAmount } from '../common/types/objects'
-
 import { deriveKeypair, deriveXAddress } from './derive'
 import { generateXAddress } from './generateAddress'
 import {
@@ -55,47 +52,6 @@ function isValidSecret(secret: string): boolean {
 }
 
 /**
- * TODO: Remove/rename this function.
- *
- * @param amount - Convert an Amount in.
- * @returns Amount without X-Address issuer.
- * @throws When issuer X-Address includes a tag.
- */
-function toRippledAmount(amount: RippledAmount): RippledAmount {
-  if (typeof amount === 'string') {
-    return amount
-  }
-
-  if (amount.currency === 'XRP') {
-    return xrpToDrops(amount.value)
-  }
-  if (amount.currency === 'drops') {
-    return amount.value
-  }
-
-  let issuer = amount.counterparty ?? amount.issuer
-  let tag: number | false = false
-
-  try {
-    if (issuer) {
-      ;({ classicAddress: issuer, tag } = xAddressToClassicAddress(issuer))
-    }
-  } catch (_e) {
-    /* not an X-address */
-  }
-
-  if (tag !== false) {
-    throw new ValidationError('Issuer X-address includes a tag')
-  }
-
-  return {
-    currency: amount.currency,
-    issuer,
-    value: amount.value,
-  }
-}
-
-/**
  * Removes undefined values from an object.
  *
  * @param obj - Object to remove undefined values from.
@@ -121,7 +77,6 @@ function convertStringToHex(string: string): string {
 export {
   dropsToXrp,
   xrpToDrops,
-  toRippledAmount,
   removeUndefined,
   rippleTimeToISOTime,
   ISOTimeToRippleTime,
