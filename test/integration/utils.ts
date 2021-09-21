@@ -39,6 +39,12 @@ export async function fundAccount(
   await ledgerAccept(client)
 }
 
+export async function generateFundedWallet(client: Client): Promise<Wallet> {
+  const wallet = Wallet.generate()
+  await fundAccount(client, wallet)
+  return wallet
+}
+
 export async function verifySubmittedTransaction(
   client: Client,
   tx: Transaction | string,
