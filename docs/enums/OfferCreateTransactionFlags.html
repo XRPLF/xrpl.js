@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>SignOptions | xrpl</title>
+	<title>OfferCreateTransactionFlags | xrpl</title>
 	<meta name="description" content="Documentation for xrpl">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,46 +55,71 @@
 					<a href="../modules.html">xrpl</a>
 				</li>
 				<li>
-					<a href="SignOptions.html">SignOptions</a>
+					<a href="OfferCreateTransactionFlags.html">OfferCreateTransactionFlags</a>
 				</li>
 			</ul>
-			<h1>Interface SignOptions</h1>
+			<h1>Enumeration OfferCreateTransactionFlags</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-hierarchy">
-				<h3>Hierarchy</h3>
-				<ul class="tsd-hierarchy">
-					<li>
-						<span class="target">SignOptions</span>
-					</li>
-				</ul>
-			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Properties</h3>
+							<h3>Enumeration members</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="SignOptions.html#signAs" class="tsd-kind-icon">sign<wbr>As</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="OfferCreateTransactionFlags.html#tfFillOrKill" class="tsd-kind-icon">tf<wbr>Fill<wbr>OrKill</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="OfferCreateTransactionFlags.html#tfImmediateOrCancel" class="tsd-kind-icon">tf<wbr>Immediate<wbr>OrCancel</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="OfferCreateTransactionFlags.html#tfPassive" class="tsd-kind-icon">tf<wbr>Passive</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="OfferCreateTransactionFlags.html#tfSell" class="tsd-kind-icon">tf<wbr>Sell</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="signAs" class="tsd-anchor"></a>
-					<h3>sign<wbr>As</h3>
-					<div class="tsd-signature tsd-kind-icon">sign<wbr>As<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+				<h2>Enumeration members</h2>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="tfFillOrKill" class="tsd-anchor"></a>
+					<h3>tf<wbr>Fill<wbr>OrKill</h3>
+					<div class="tsd-signature tsd-kind-icon">tf<wbr>Fill<wbr>OrKill<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 262144</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/transaction/types.ts#L16">src/transaction/types.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/1c2c1ad8/src/models/transactions/offerCreate.ts#L16">src/models/transactions/offerCreate.ts:16</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="tfImmediateOrCancel" class="tsd-anchor"></a>
+					<h3>tf<wbr>Immediate<wbr>OrCancel</h3>
+					<div class="tsd-signature tsd-kind-icon">tf<wbr>Immediate<wbr>OrCancel<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 131072</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/1c2c1ad8/src/models/transactions/offerCreate.ts#L15">src/models/transactions/offerCreate.ts:15</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="tfPassive" class="tsd-anchor"></a>
+					<h3>tf<wbr>Passive</h3>
+					<div class="tsd-signature tsd-kind-icon">tf<wbr>Passive<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 65536</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/1c2c1ad8/src/models/transactions/offerCreate.ts#L14">src/models/transactions/offerCreate.ts:14</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="tfSell" class="tsd-anchor"></a>
+					<h3>tf<wbr>Sell</h3>
+					<div class="tsd-signature tsd-kind-icon">tf<wbr>Sell<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 524288</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/1c2c1ad8/src/models/transactions/offerCreate.ts#L17">src/models/transactions/offerCreate.ts:17</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -112,11 +137,20 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface">
-						<a href="SignOptions.html" class="tsd-kind-icon">Sign<wbr>Options</a>
+					<li class="current tsd-kind-enum">
+						<a href="OfferCreateTransactionFlags.html" class="tsd-kind-icon">Offer<wbr>Create<wbr>Transaction<wbr>Flags</a>
 						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="SignOptions.html#signAs" class="tsd-kind-icon">sign<wbr>As</a>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="OfferCreateTransactionFlags.html#tfFillOrKill" class="tsd-kind-icon">tf<wbr>Fill<wbr>OrKill</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="OfferCreateTransactionFlags.html#tfImmediateOrCancel" class="tsd-kind-icon">tf<wbr>Immediate<wbr>OrCancel</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="OfferCreateTransactionFlags.html#tfPassive" class="tsd-kind-icon">tf<wbr>Passive</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="OfferCreateTransactionFlags.html#tfSell" class="tsd-kind-icon">tf<wbr>Sell</a>
 							</li>
 						</ul>
 					</li>
@@ -137,6 +171,7 @@
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
 			</ul>
