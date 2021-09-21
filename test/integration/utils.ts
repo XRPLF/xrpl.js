@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 import { decode } from 'ripple-binary-codec'
+import keypairs from 'ripple-keypairs'
 
 import { Client, Wallet, Response } from 'xrpl-local'
 import { Payment, Transaction } from 'xrpl-local/models/transactions'
@@ -99,4 +100,8 @@ export async function testTransaction(
   const signedTx = _.omit(response.result.tx_json, 'hash')
   await ledgerAccept(client)
   await verifySubmittedTransaction(client, signedTx as Transaction)
+}
+
+export function getMasterPublicKey(): string {
+  return keypairs.deriveKeypair(masterSecret).publicKey
 }
