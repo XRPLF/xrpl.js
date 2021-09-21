@@ -10,6 +10,8 @@ import {
   TakerAmount,
 } from '../models/methods/bookOffers'
 
+const DEFAULT_LIMIT = 20
+
 function sortOffers(offers: BookOffer[]): BookOffer[] {
   return offers.sort((offerA, offerB) => {
     const qualityA = offerA.quality ?? 0
@@ -34,36 +36,33 @@ interface OrderbookOptions {
 /**
  * Fetch orderbook (buy/sell orders) between two accounts.
  *
- * @param client - Client.
- * @param taker_pays - Specs of the currency account taking the offer pays.
- * @param taker_gets - Specs of the currency account taking the offer receives.
- * @param takerPays
- * @param takerGets
+ * @param this - Client.
+ * @param takerPays - Specs of the currency account taking the offer pays.
+ * @param takerGets - Specs of the currency account taking the offer receives.
  * @param options - Options to include for getting orderbook between payer and receiver.
  * @returns An object containing buy and sell objects.
  */
 // eslint-disable-next-line max-params -- Function needs 4 params.
 async function getOrderbook(
-  client: Client,
+  this: Client,
   takerPays: TakerAmount,
   takerGets: TakerAmount,
-  options: OrderbookOptions,
+  options: OrderbookOptions = {},
 ): Promise<Orderbook> {
   const request: BookOffersRequest = {
     command: 'book_offers',
     taker_pays: takerPays,
     taker_gets: takerGets,
-    ledger_index: options.ledger_index,
+    ledger_index: options.ledger_index ?? 'validated',
     ledger_hash: options.ledger_hash,
-    limit: options.limit,
+    limit: options.limit ?? DEFAULT_LIMIT,
     taker: options.taker,
   }
   // 2. Make Request
-  const directOfferResults = await client.requestAll(request)
+  const directOfferResults = await this.requestAll(request)
   request.taker_gets = takerPays
   request.taker_pays = takerGets
-  const reverseOfferResults = await client.requestAll(request)
-
+  const reverseOfferResults = await this.requestAll(request)
   // 3. Return Formatted Response
   const directOffers = _.flatMap(
     directOfferResults,

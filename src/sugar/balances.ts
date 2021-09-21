@@ -36,7 +36,7 @@ interface GetBalancesOptions {
  * @returns An array of XRP/non-XRP balances.
  */
 async function getBalances(
-  client: Client,
+  this: Client,
   account: string,
   options: GetBalancesOptions = {},
 ): Promise<Balance[]> {
@@ -47,9 +47,9 @@ async function getBalances(
     ledger_index: options.ledger_index ?? 'validated',
     ledger_hash: options.ledger_hash,
   }
-  const balance = await client
-    .request(xrpRequest)
-    .then((response) => response.result.account_data.Balance)
+  const balance = await this.request(xrpRequest).then(
+    (response) => response.result.account_data.Balance,
+  )
   const xrpBalance = { currency: 'XRP', value: dropsToXrp(balance) }
   // 2. Get Non-XRP Balance
   const linesRequest: AccountLinesRequest = {
@@ -60,7 +60,7 @@ async function getBalances(
     peer: options.peer,
     limit: options.limit,
   }
-  const responses = await client.requestAll(linesRequest)
+  const responses = await this.requestAll(linesRequest)
   const accountLinesBalance = _.flatMap(responses, (response) =>
     formatBalances(response.result.lines),
   )
