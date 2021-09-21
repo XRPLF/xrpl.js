@@ -1,4 +1,3 @@
-/* eslint-disable mocha/no-hooks-for-single-case -- Makes test setup consistent */
 import { assert } from 'chai'
 import _ from 'lodash'
 
