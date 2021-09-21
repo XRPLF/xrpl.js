@@ -2,7 +2,7 @@ import assert from 'assert'
 
 import _ from 'lodash'
 
-import { Client, Wallet } from 'xrpl-local'
+import { Client } from 'xrpl-local'
 import { AccountSet, SignerListSet } from 'xrpl-local/models/transactions'
 import { convertStringToHex } from 'xrpl-local/utils'
 import { sign, multisign } from 'xrpl-local/wallet/signer'
@@ -10,7 +10,7 @@ import { sign, multisign } from 'xrpl-local/wallet/signer'
 import serverUrl from './serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from './setup'
 import {
-  fundAccount,
+  generateFundedWallet,
   ledgerAccept,
   testTransaction,
   verifySubmittedTransaction,
@@ -32,10 +32,8 @@ describe('integration tests', function () {
 
   it('submit multisigned transaction', async function () {
     const client: Client = this.client
-    const signerWallet1 = Wallet.generate()
-    await fundAccount(client, signerWallet1)
-    const signerWallet2 = Wallet.generate()
-    await fundAccount(client, signerWallet2)
+    const signerWallet1 = await generateFundedWallet(client)
+    const signerWallet2 = await generateFundedWallet(client)
 
     // set up the multisigners for the account
     const signerListSet: SignerListSet = {
