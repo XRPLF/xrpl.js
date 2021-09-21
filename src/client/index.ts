@@ -88,7 +88,6 @@ import getFee from '../sugar/fee'
 import getOrderbook from '../sugar/orderbook'
 import { submitTransaction, submitSignedTransaction } from '../sugar/submit'
 import { ensureClassicAddress } from '../sugar/utils'
-import combine from '../transaction/combine'
 import generateFaucetWallet from '../wallet/generateFaucetWallet'
 
 import {
@@ -514,8 +513,6 @@ class Client extends EventEmitter {
 
   public getBalances = getBalances
   public getOrderbook = getOrderbook
-
-  public combine = combine
 
   public generateFaucetWallet = generateFaucetWallet
 
