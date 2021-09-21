@@ -8,6 +8,8 @@ import { ValidationError, XrplError } from '../common/errors'
 import * as errors from '../common/errors'
 import { txFlags } from '../common/txflags'
 import {
+  Request,
+  Response,
   // account methods
   AccountChannelsRequest,
   AccountChannelsResponse,
@@ -99,6 +101,10 @@ import {
   ConnectionUserOptions,
   INTENTIONAL_DISCONNECT_CODE,
 } from './connection'
+import {
+  handlePartialPayment,
+  handleStreamPartialPayment,
+} from './partialPayment'
 
 export interface ClientOptions extends ConnectionUserOptions {
   feeCushion?: number
@@ -212,6 +218,7 @@ class Client extends EventEmitter {
     })
 
     this.connection.on('transaction', (tx) => {
+      handleStreamPartialPayment(tx)
       this.emit('transaction', tx)
     })
 
@@ -319,7 +326,7 @@ class Client extends EventEmitter {
    * @param req - Request to send to the server.
    * @returns The response from the server.
    */
-  public async request<R extends BaseRequest, T extends BaseResponse>(
+  public async request<R extends Request, T extends Response>(
     req: R,
   ): Promise<T> {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
@@ -330,6 +337,8 @@ class Client extends EventEmitter {
           ensureClassicAddress(req.account as string)
         : undefined,
     })) as T
+
+    handlePartialPayment(req.command, response)
 
     return response
   }
@@ -376,7 +385,7 @@ class Client extends EventEmitter {
     }
     const nextPageRequest = { ...req, marker: resp.result.marker }
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
-    return this.connection.request(nextPageRequest) as unknown as U
+    return this.request(nextPageRequest as any) as unknown as U
   }
 
   public on(
@@ -409,6 +418,10 @@ class Client extends EventEmitter {
    * @returns This, because it inherits from EventEmitter.
    */
   public on(eventName: string, listener: (...args: any[]) => void): this {
+    // if (args[0]?.type === 'transaction') {
+    //   handlePartialPaymentStream(args[0])
+    // }
+
     return super.on(eventName, listener)
   }
 
