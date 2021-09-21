@@ -1,11 +1,13 @@
 /* eslint-disable mocha/no-hooks-for-single-case -- Makes test setup consistent across files */
 import { assert } from 'chai'
 import _ from 'lodash'
+import { decode } from 'ripple-binary-codec/dist'
 
 import { AccountSet, Client, SignerListSet, Wallet } from 'xrpl-local'
 import { convertStringToHex } from 'xrpl-local/utils'
 import { multisign, sign } from 'xrpl-local/wallet/signer'
 
+import { SubmitMultisignedRequest, Transaction } from '../../../src'
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 import {
@@ -25,7 +27,7 @@ describe('multisign', function () {
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
-  it('submit multisigned transaction', async function () {
+  it('submit_multisigned transaction', async function () {
     const client: Client = this.client
     const signerWallet1 = Wallet.generate()
     await fundAccount(client, signerWallet1)
@@ -64,7 +66,11 @@ describe('multisign', function () {
     const signed1 = sign(signerWallet1, accountSetTx, true)
     const signed2 = sign(signerWallet2, accountSetTx, true)
     const combined = multisign([signed1, signed2])
-    const submitResponse = await client.submitSignedTransaction(combined)
+    const multisignedRequest: SubmitMultisignedRequest = {
+      command: 'submit_multisigned',
+      tx_json: decode(combined) as unknown as Transaction,
+    }
+    const submitResponse = await client.request(multisignedRequest)
     await ledgerAccept(client)
     assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
     await verifySubmittedTransaction(this.client, combined)
