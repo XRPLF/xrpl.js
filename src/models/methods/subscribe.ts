@@ -75,6 +75,7 @@ export interface TransactionStream extends BaseStream {
   meta?: TransactionMetadata
   transaction: Transaction
   validated?: boolean
+  warnings?: Array<{ id: number; message: string }>
 }
 
 export interface PeerStatusStream extends BaseStream {
