@@ -1,5 +1,6 @@
 'use strict'
 const path = require('path')
+const fs = require('fs')
 const webpack = require('webpack')
 const assert = require('assert')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
@@ -51,7 +52,7 @@ function getDefaultConfiguration() {
 }
 
 function webpackForTest(testFileName) {
-  const match = testFileName.match(/\/?([^\/]*).ts$/)
+  const match = testFileName.match(/\/?([^\/]*)\.ts$/)
   if (!match) {
     assert(false, 'wrong filename:' + testFileName)
   }
@@ -119,7 +120,28 @@ function webpackForTest(testFileName) {
       },
     },
   }
-  return Object.assign({}, getDefaultConfiguration(), test)
+  // return Object.assign({}, getDefaultConfiguration(), test)
+  return test
+}
+
+function webpackIntegrationTests() {
+  const dir = './test/integration/'
+  const tests = []
+  const dirPaths = fs.readdirSync(dir)
+  tests.push(webpackForTest(`./${path.join(dir, 'integration.ts')}`))
+  const subdirs = dirPaths.filter(
+    (filename) =>
+      !filename.match(/\/?([^\/]*)\.ts$/) && filename !== 'README.md',
+  )
+  subdirs.forEach((subdir) => {
+    const subdirPaths = fs.readdirSync(path.join(dir, subdir))
+    subdirPaths.forEach((filename) => {
+      tests.push(webpackForTest(`./${path.join(dir, subdir, filename)}`))
+    })
+  })
+  return tests.map(
+    (test) => (env, argv) => Object.assign({}, getDefaultConfiguration(), test),
+  )
 }
 
 module.exports = [
@@ -138,5 +160,5 @@ module.exports = [
     }
     return config
   },
-  (env, argv) => webpackForTest('./test/integration/integration.ts'),
+  ...webpackIntegrationTests(),
 ]
