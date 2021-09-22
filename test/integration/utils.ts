@@ -9,6 +9,8 @@ import { computeSignedTransactionHash } from 'xrpl-local/utils/hashes'
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
 
+let sequence: number
+
 export async function ledgerAccept(client: Client): Promise<void> {
   const request = { command: 'ledger_accept' }
   await client.connection.request(request)
@@ -88,7 +90,7 @@ export async function testTransaction(
 
   // sign/submit the transaction
   const response = await client.submitTransaction(wallet, transaction)
-
+  console.log(response)
   // check that the transaction was successful
   assert.equal(response.status, 'success')
   assert.equal(response.type, 'response')
@@ -98,8 +100,21 @@ export async function testTransaction(
     response.result.engine_result_message,
   )
 
+  sequence = Number(response.result.tx_json.Sequence)
+
   // check that the transaction is on the ledger
   const signedTx = _.omit(response.result.tx_json, 'hash')
   await ledgerAccept(client)
   await verifySubmittedTransaction(client, signedTx as Transaction)
+}
+
+export function getEpochTime(): number {
+  const now = new Date()
+  const utcMilllisecondsSinceEpoch =
+    now.getTime() + now.getTimezoneOffset() * 60 * 1000
+  return Math.round(utcMilllisecondsSinceEpoch / 1000) - 946684800
+}
+
+export function getSequence(): number {
+  return sequence
 }
