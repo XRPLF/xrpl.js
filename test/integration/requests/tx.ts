@@ -41,7 +41,23 @@ describe('tx', function () {
       transaction: hash,
     })
 
-    assert(data.result)
-    assert.equal(computeSignedTransactionHash(data.result), hash)
+    const expectedResponse: TxResponse = {
+      id: data.id,
+      type: 'response',
+      status: 'success',
+      result: {
+        ...accountSet,
+        Fee: data.result.Fee,
+        Flags: 0,
+        LastLedgerSequence: data.result.LastLedgerSequence,
+        Sequence: data.result.Sequence,
+        SigningPubKey: this.wallet.publicKey,
+        TxnSignature: data.result.TxnSignature,
+        hash: computeSignedTransactionHash(response.result.tx_blob),
+        validated: false,
+      },
+    }
+
+    assert.deepEqual(data, expectedResponse)
   })
 })
