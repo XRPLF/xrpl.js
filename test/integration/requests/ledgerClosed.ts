@@ -9,7 +9,7 @@ import { verifySuccessfulResponse } from '../utils'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('LedgerClosed', function () {
+describe('ledger_closed', function () {
   this.timeout(TIMEOUT)
 
   before(suiteClientSetup)
