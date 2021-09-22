@@ -10,6 +10,8 @@ import {
   Wallet,
   SubmitMultisignedRequest,
   Transaction,
+  SubmitMultisignedResponse,
+  computeSignedTransactionHash,
 } from 'xrpl-local'
 import { convertStringToHex } from 'xrpl-local/utils'
 import { multisign, sign } from 'xrpl-local/wallet/signer'
@@ -71,14 +73,38 @@ describe('submit_multisigned', function () {
     const accountSetTx = await client.autofill(accountSet, 2)
     const signed1 = sign(signerWallet1, accountSetTx, true)
     const signed2 = sign(signerWallet2, accountSetTx, true)
-    const combined = multisign([signed1, signed2])
+    const multisigned = multisign([signed1, signed2])
     const multisignedRequest: SubmitMultisignedRequest = {
       command: 'submit_multisigned',
-      tx_json: decode(combined) as unknown as Transaction,
+      tx_json: decode(multisigned) as unknown as Transaction,
     }
-    const submitResponse = await client.request(multisignedRequest)
+    const submitResponse: SubmitMultisignedResponse = await client.request(
+      multisignedRequest,
+    )
     await ledgerAccept(client)
     assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
-    await verifySubmittedTransaction(this.client, combined)
+    await verifySubmittedTransaction(this.client, multisigned)
+
+    // The ledger returns an extra 'hash' field on 'submit' requests which is easily calculatable with a normal tx_blob
+    const tx_json = {
+      ...(decode(multisigned) as unknown as Transaction),
+      hash: computeSignedTransactionHash(multisigned),
+    }
+
+    const expectedResponse: SubmitMultisignedResponse = {
+      id: submitResponse.id,
+      status: 'success',
+      type: 'response',
+      result: {
+        engine_result: 'tesSUCCESS',
+        engine_result_code: 0,
+        engine_result_message:
+          'The transaction was applied. Only final in a validated ledger.',
+        tx_blob: multisigned,
+        tx_json,
+      },
+    }
+
+    assert.deepEqual(submitResponse, expectedResponse)
   })
 })
