@@ -29,24 +29,9 @@ describe('ledger_data', function () {
 
     verifySuccessfulResponse(ledgerDataResponse)
 
-    // Removing the deprecated field 'ledger' which is returned by the 'ledger_data' request
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Removing this field let's us test the request shape
-    delete (ledgerDataResponse.result as any).ledger
-
-    const expectedResponse: LedgerDataResponse = {
-      id: ledgerDataResponse.id,
-      result: {
-        ledger_hash: ledgerDataResponse.result.ledger_hash,
-        ledger_index: ledgerDataResponse.result.ledger_index,
-        marker: ledgerDataResponse.result.marker,
-        state: ledgerDataResponse.result.state,
-        validated: true,
-      },
-      status: 'success',
-      type: 'response',
-    }
-
+    assert.equal(ledgerDataResponse.result.validated, true)
     assert(ledgerDataResponse.result.state.length > 0)
-    assert.deepEqual(ledgerDataResponse, expectedResponse)
+    assert.equal(ledgerDataResponse.status, 'success')
+    assert.equal(ledgerDataResponse.type, 'response')
   })
 })
