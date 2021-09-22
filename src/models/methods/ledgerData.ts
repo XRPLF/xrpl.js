@@ -26,5 +26,6 @@ export interface LedgerDataResponse extends BaseResponse {
     ledger_hash: string
     state: State[]
     marker?: unknown
+    validated?: boolean
   }
 }
