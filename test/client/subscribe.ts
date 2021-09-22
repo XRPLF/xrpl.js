@@ -3,7 +3,7 @@ import { assert } from 'chai'
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
 
-describe('Subscription', function () {
+describe('Client subscription', function () {
   beforeEach(setupClient)
   afterEach(teardownClient)
 
@@ -72,15 +72,6 @@ describe('Subscription', function () {
     })
 
     this.client.connection.onMessage(JSON.stringify(rippled.streams.pathFind))
-  })
-
-  it('Emits peerStatusChange', async function (done) {
-    this.client.on('peerStatusChange', (path) => {
-      assert(path.type === 'peerStatusChange')
-      done()
-    })
-
-    this.client.connection.onMessage(JSON.stringify(rippled.streams.peerStatus))
   })
 
   it('Emits validationReceived', async function (done) {

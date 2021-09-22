@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unused-modules -- Used by webpack */
 /* eslint-disable max-classes-per-file -- Needs to be a wrapper for ws */
 import { EventEmitter } from 'events'
 
@@ -27,7 +28,7 @@ interface WSWrapperOptions {
  * Provides `EventEmitter` interface for native browser `WebSocket`,
  * same, as `ws` package provides.
  */
-class WSWrapper extends EventEmitter {
+export default class WSWrapper extends EventEmitter {
   public static CONNECTING = 0
   public static OPEN = 1
   public static CLOSING = 2
@@ -96,5 +97,3 @@ class WSWrapper extends EventEmitter {
     return this.ws.readyState
   }
 }
-
-export default WSWrapper

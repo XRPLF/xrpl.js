@@ -92,7 +92,7 @@ function getAgent(url: string, config: ConnectionOptions): Agent | undefined {
       node/global-require, global-require, -- Necessary for the `require` */
     HttpsProxyAgent = require('https-proxy-agent')
     /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-require-imports,
-      node/global-require, global-require */
+      node/global-require, global-require, */
   } catch (_error) {
     throw new Error('"proxy" option is not supported in the browser')
   }
@@ -239,9 +239,8 @@ export class Connection extends EventEmitter {
     const connectionTimeoutID = setTimeout(() => {
       this.onConnectionFailed(
         new ConnectionError(
-          `Error: connect() timed out after ${this.config.connectionTimeout} ms. ` +
-            `If your internet connection is working, the rippled server may be blocked or inaccessible. ` +
-            `You can also try setting the 'connectionTimeout' option in the Client constructor.`,
+          `Error: connect() timed out after ${this.config.connectionTimeout} ms. If your internet connection is working, the ` +
+            `rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.`,
         ),
       )
     }, this.config.connectionTimeout)
@@ -380,8 +379,11 @@ export class Connection extends EventEmitter {
       try {
         this.requestManager.handleResponse(data)
       } catch (error) {
+        // eslint-disable-next-line max-depth -- okay here
         if (error instanceof Error) {
           this.emit('error', 'badMessage', error.message, message)
+        } else {
+          this.emit('error', 'badMessage', error, error)
         }
       }
     }

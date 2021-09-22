@@ -30,7 +30,7 @@ interface GetBalancesOptions {
 /**
  * Get XRP/non-XRP balances for an account.
  *
- * @param client - Client.
+ * @param this - Client.
  * @param account - Account address.
  * @param options - Options to include for getting balances.
  * @returns An array of XRP/non-XRP balances.

@@ -5,7 +5,7 @@ import type { Client } from '..'
 import { ValidationError } from '../errors'
 import { AccountInfoRequest, LedgerRequest } from '../models/methods'
 import { Transaction } from '../models/transactions'
-import { setTransactionFlagsToNumber } from '../models/utils'
+import setTransactionFlagsToNumber from '../models/utils/flags'
 import { xrpToDrops } from '../utils'
 
 // 20 drops
@@ -138,9 +138,9 @@ async function calculateFeePerTransactionType(
   signersCount = 0,
 ): Promise<void> {
   // netFee is usually 0.00001 XRP (10 drops)
-  const netFeeXRP: string = await client.getFee()
-  const netFeeDrops: string = xrpToDrops(netFeeXRP)
-  let baseFee: BigNumber = new BigNumber(netFeeDrops)
+  const netFeeXRP = await client.getFee()
+  const netFeeDrops = xrpToDrops(netFeeXRP)
+  let baseFee = new BigNumber(netFeeDrops)
 
   // EscrowFinish Transaction with Fulfillment
   if (tx.TransactionType === 'EscrowFinish' && tx.Fulfillment != null) {

@@ -19,8 +19,10 @@ module.exports = {
 
   // Specify global variables that are predefined
   env: {
-    node: true, // Enable node global variables & Node.js scoping
-    es2020: true, // Add all ECMAScript 2020 globals and automatically set the ecmaVersion parser option to ES2020
+    // Enable node global variables & Node.js scoping
+    node: true,
+    // Add all ECMAScript 2020 globals and automatically set the ecmaVersion parser option to ES2020
+    es2020: true,
   },
 
   plugins: [],
@@ -39,9 +41,30 @@ module.exports = {
       { max: 40, skipBlankLines: true, skipComments: true },
     ],
     'max-statements': ['warn', 25],
-    'id-length': ['error', { exceptions: ['_'] }], // exception for lodash
+    // exception for lodash
+    'id-length': ['error', { exceptions: ['_'] }],
+
+    // no-shadow has false-positives for enum, @typescript-eslint version fixes that
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': ['error'],
   },
   overrides: [
+    {
+      files: ['.eslintrc.js'],
+      rules: {
+        'import/no-unused-modules': 'off',
+        '@typescript-eslint/no-magic-numbers': 'off',
+      },
+    },
+    {
+      // TODO: remove when snippets are written
+      files: ['snippets/src/*.ts'],
+      rules: {
+        'max-len': 'off',
+        'import/unambiguous': 'off',
+        'import/no-unused-modules': 'off',
+      },
+    },
     {
       files: ['test/**/*.ts'],
       rules: {
@@ -79,6 +102,9 @@ module.exports = {
 
         // Tests are already in 2 callbacks, so max 3 is pretty restrictive
         'max-nested-callbacks': 'off',
+
+        // setup/teardown client is easier to do in before/after, even if there is only one testcase
+        'mocha/no-hooks-for-single-case': 'off',
       },
     },
     {

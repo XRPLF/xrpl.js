@@ -82,10 +82,11 @@ async function getOrderbook(
   const buy: BookOffer[] = []
   const sell: BookOffer[] = []
   orders.forEach((order) => {
-    if ((order.Flags & OfferLedgerFlags.lsfSell) !== 0) {
-      sell.push(order)
-    } else {
+    // eslint-disable-next-line no-bitwise -- necessary for flags check
+    if ((order.Flags & OfferLedgerFlags.lsfSell) === 0) {
       buy.push(order)
+    } else {
+      sell.push(order)
     }
   })
   return { buy: sortOffers(buy), sell: sortOffers(sell) }

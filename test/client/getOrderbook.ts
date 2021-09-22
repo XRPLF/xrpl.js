@@ -2,6 +2,7 @@
 // import { assert } from "chai";
 
 import { assert } from 'chai'
+
 import { BookOffersRequest } from '../../src'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'

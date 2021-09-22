@@ -4,6 +4,7 @@ import { Client } from 'xrpl-local'
 
 describe('client constructor', function () {
   it('Client - implicit server port', function () {
+    // eslint-disable-next-line no-new -- Testing constructor
     new Client('wss://s1.ripple.com')
   })
 

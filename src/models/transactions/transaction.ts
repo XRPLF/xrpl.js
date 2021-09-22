@@ -5,7 +5,7 @@ import _ from 'lodash'
 import { encode, decode } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
-import { setTransactionFlagsToNumber } from '../utils'
+import setTransactionFlagsToNumber from '../utils/flags'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'
 import {
@@ -86,6 +86,13 @@ export interface TransactionAndMetadata {
  */
 export function validate(transaction: Record<string, unknown>): void {
   const tx = { ...transaction }
+  if (tx.TransactionType == null) {
+    throw new ValidationError('Object does not have a `TransactionType`')
+  }
+  if (typeof tx.TransactionType !== 'string') {
+    throw new ValidationError("Object's `TransactionType` is not a string")
+  }
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- okay here
   setTransactionFlagsToNumber(tx as unknown as Transaction)
   switch (tx.TransactionType) {
     case 'AccountDelete':
