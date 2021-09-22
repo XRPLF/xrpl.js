@@ -32,9 +32,7 @@ export async function fundAccount(
   if (response.result.engine_result !== 'tesSUCCESS') {
     // eslint-disable-next-line no-console -- happens only when something goes wrong
     console.log(response)
-    assert.fail(
-      `Response not successful, ${response.result.engine_result as string}`,
-    )
+    assert.fail(`Response not successful, ${response.result.engine_result}`)
   }
 
   await ledgerAccept(client)
