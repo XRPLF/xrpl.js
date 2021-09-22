@@ -19,8 +19,10 @@ module.exports = {
 
   // Specify global variables that are predefined
   env: {
-    node: true, // Enable node global variables & Node.js scoping
-    es2020: true, // Add all ECMAScript 2020 globals and automatically set the ecmaVersion parser option to ES2020
+    // Enable node global variables & Node.js scoping
+    node: true,
+    // Add all ECMAScript 2020 globals and automatically set the ecmaVersion parser option to ES2020
+    es2020: true,
   },
 
   plugins: [],
@@ -47,6 +49,22 @@ module.exports = {
     '@typescript-eslint/no-shadow': ['error'],
   },
   overrides: [
+    {
+      files: ['.eslintrc.js'],
+      rules: {
+        'import/no-unused-modules': 'off',
+        '@typescript-eslint/no-magic-numbers': 'off',
+      },
+    },
+    {
+      // TODO: remove when snippets are written
+      files: ['snippets/src/*.ts'],
+      rules: {
+        'max-len': 'off',
+        'import/unambiguous': 'off',
+        'import/no-unused-modules': 'off',
+      },
+    },
     {
       files: ['test/**/*.ts'],
       rules: {
