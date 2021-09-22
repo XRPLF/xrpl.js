@@ -70,6 +70,12 @@ function removeUndefined<T extends Record<string, unknown>>(obj: T): T {
   return newObj
 }
 
+/**
+ * Converts a string to its hex equivalent. Useful for Memos.
+ *
+ * @param string - The string to convert to Hex.
+ * @returns The Hex equivalent of the string.
+ */
 function convertStringToHex(string: string): string {
   return Buffer.from(string, 'utf8').toString('hex').toUpperCase()
 }

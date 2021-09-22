@@ -12,7 +12,7 @@ import {
   XrplError,
   TimeoutError,
 } from 'xrpl-local'
-import { Connection } from 'xrpl-local/client'
+import { Connection } from 'xrpl-local/client/connection'
 
 import rippled from './fixtures/rippled'
 import { setupClient, teardownClient } from './setupClient'

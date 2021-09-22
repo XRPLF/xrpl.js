@@ -101,6 +101,7 @@ export function isAmount(amount: unknown): boolean {
   )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface -- no global flags right now, so this is fine
 export interface GlobalFlags {}
 
 export interface BaseTransaction {

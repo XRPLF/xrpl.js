@@ -9,7 +9,6 @@ import {
   isAmount,
 } from './common'
 
-// eslint-disable-next-line no-shadow -- variable declaration is unique
 export enum OfferCreateTransactionFlags {
   tfPassive = 0x00010000,
   tfImmediateOrCancel = 0x00020000,

@@ -1,4 +1,3 @@
-/* eslint-disable max-params -- helper test functions */
 import { assert } from 'chai'
 import _ from 'lodash'
 import { decode } from 'ripple-binary-codec'

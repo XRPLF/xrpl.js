@@ -68,19 +68,17 @@ export function xrpToDrops(xrpToConvert: BigNumber.Value): string {
   if (typeof xrp === 'string') {
     if (!/^-?[0-9]*\.?[0-9]*$/u.exec(xrp)) {
       throw new ValidationError(
-        `xrpToDrops: invalid value '${xrp}',` +
-          ` should be a number matching (^-?[0-9]*\\.?[0-9]*$).`,
+        `xrpToDrops: invalid value '${xrp}', should be a number matching (^-?[0-9]*\\.?[0-9]*$).`,
       )
     } else if (xrp === '.') {
       throw new ValidationError(
-        `xrpToDrops: invalid value '${xrp}',` +
-          ` should be a BigNumber or string-encoded number.`,
+        `xrpToDrops: invalid value '${xrp}', should be a BigNumber or string-encoded number.`,
       )
     }
   }
 
   // Important: specify base 10 to avoid exponential notation, e.g. '1e-7'.
-  xrp = new BigNumber(xrp).toString(10)
+  xrp = new BigNumber(xrp).toString(BASE_TEN)
   // This should never happen; the value has already been
   // validated above. This just ensures BigNumber did not do
   // something unexpected.

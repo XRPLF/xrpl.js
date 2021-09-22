@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/member-ordering -- Okay for Client so that client methods can be near the bottom */
 /* eslint-disable max-lines -- This might not be necessary later, but this file needs to be big right now */
 import * as assert from 'assert'
 import { EventEmitter } from 'events'
@@ -171,6 +172,7 @@ class Client extends EventEmitter {
    * @param server - URL of the server to connect to.
    * @param options - Options for client settings.
    */
+  // eslint-disable-next-line max-lines-per-function -- okay because we have to set up all the connection handlers
   public constructor(server: string, options: ClientOptions = {}) {
     super()
     if (typeof server !== 'string' || !/wss?(?:\+unix)?:\/\//u.exec(server)) {
@@ -186,6 +188,20 @@ class Client extends EventEmitter {
 
     this.connection.on('error', (errorCode, errorMessage, data) => {
       this.emit('error', errorCode, errorMessage, data)
+    })
+
+    this.connection.on('connected', () => {
+      this.emit('connected')
+    })
+
+    this.connection.on('disconnected', (code: number) => {
+      let finalCode = code
+      // 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
+      // Since 4000 is a normal disconnect reason, we convert this to the standard exit code 1000
+      if (finalCode === INTENTIONAL_DISCONNECT_CODE) {
+        finalCode = 1000
+      }
+      this.emit('disconnected', finalCode)
     })
 
     this.connection.on('ledgerClosed', (ledger) => {
@@ -214,20 +230,6 @@ class Client extends EventEmitter {
 
     this.connection.on('path_find', (path) => {
       this.emit('path_find', path)
-    })
-
-    this.connection.on('connected', () => {
-      this.emit('connected')
-    })
-
-    this.connection.on('disconnected', (code: number) => {
-      let finalCode = code
-      // 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
-      // Since 4000 is a normal disconnect reason, we convert this to the standard exit code 1000
-      if (finalCode === INTENTIONAL_DISCONNECT_CODE) {
-        finalCode = 1000
-      }
-      this.emit('disconnected', finalCode)
     })
   }
 
@@ -379,6 +381,7 @@ class Client extends EventEmitter {
     listener: (phase: ConsensusStream) => void,
   ): this
   public on(event: 'path_find', listener: (path: PathFindStream) => void): this
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- actually needs to be any here
   public on(event: 'error', listener: (...err: any[]) => void): this
   /**
    * Event handler for subscription streams.
@@ -387,6 +390,7 @@ class Client extends EventEmitter {
    * @param listener - Function to run on event.
    * @returns This, because it inherits from EventEmitter.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- actually needs to be any here
   public on(eventName: string, listener: (...args: any[]) => void): this {
     return super.on(eventName, listener)
   }
@@ -519,4 +523,4 @@ class Client extends EventEmitter {
   public errors = errors
 }
 
-export { Client, Connection }
+export { Client }

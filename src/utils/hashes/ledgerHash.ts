@@ -154,7 +154,7 @@ export function computeStateTreeHash(entries: LedgerEntry[]): string {
   return shamap.hash
 }
 
-export function computeTransactionHash(
+function computeTransactionHash(
   ledger: Ledger,
   options: ComputeLedgerHeaderHashOptions,
 ): string {
@@ -184,7 +184,7 @@ export function computeTransactionHash(
   return transactionHash
 }
 
-export function computeStateHash(
+function computeStateHash(
   ledger: Ledger,
   options: ComputeLedgerHeaderHashOptions,
 ): string {

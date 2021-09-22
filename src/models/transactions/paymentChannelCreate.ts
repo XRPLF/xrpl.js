@@ -19,6 +19,7 @@ export interface PaymentChannelCreate extends BaseTransaction {
  * @param tx - An PaymentChannelCreate Transaction.
  * @throws When the PaymentChannelCreate is Malformed.
  */
+// eslint-disable-next-line max-lines-per-function -- okay for this function, there's a lot of things to check
 export function validatePaymentChannelCreate(
   tx: Record<string, unknown>,
 ): void {

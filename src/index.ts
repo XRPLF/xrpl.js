@@ -12,3 +12,5 @@ export * from './utils'
 export * from './errors'
 
 export { default as Wallet } from './wallet'
+
+export * from './wallet/signer'
