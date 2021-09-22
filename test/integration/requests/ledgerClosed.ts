@@ -1,3 +1,4 @@
+import { assert } from 'chai'
 import _ from 'lodash'
 
 import { LedgerClosedRequest, LedgerClosedResponse } from 'xrpl-local'
@@ -24,5 +25,16 @@ describe('ledger_closed', function () {
       await this.client.request(ledgerClosedRequest)
 
     verifySuccessfulResponse(ledgerClosedResponse)
+
+    const expectedResponse: LedgerClosedResponse = {
+      id: ledgerClosedResponse.id,
+      status: 'success',
+      type: 'response',
+      result: {
+        ledger_hash: ledgerClosedResponse.result.ledger_hash,
+        ledger_index: ledgerClosedResponse.result.ledger_index,
+      },
+    }
+    assert.deepEqual(ledgerClosedResponse, expectedResponse)
   })
 })
