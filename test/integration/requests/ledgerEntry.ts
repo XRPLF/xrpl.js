@@ -40,7 +40,19 @@ describe('ledger_entry', function () {
       ledgerEntryRequest,
     )
 
+    const expectedResponse: LedgerEntryResponse = {
+      id: ledgerEntryResponse.id,
+      status: 'success',
+      type: 'response',
+      result: {
+        index: ledgerEntryIndex,
+        ledger_current_index: ledgerEntryResponse.result.ledger_current_index,
+        node: ledgerEntryResponse.result.node,
+        validated: false,
+      },
+    }
+
     verifySuccessfulResponse(ledgerEntryResponse)
-    assert.equal(ledgerEntryResponse.result.index, ledgerEntryIndex)
+    assert.deepEqual(ledgerEntryResponse, expectedResponse)
   })
 })
