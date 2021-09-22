@@ -3,11 +3,17 @@ import { assert } from 'chai'
 import _ from 'lodash'
 import { decode } from 'ripple-binary-codec/dist'
 
-import { AccountSet, Client, SignerListSet, Wallet } from 'xrpl-local'
+import {
+  AccountSet,
+  Client,
+  SignerListSet,
+  Wallet,
+  SubmitMultisignedRequest,
+  Transaction,
+} from 'xrpl-local'
 import { convertStringToHex } from 'xrpl-local/utils'
 import { multisign, sign } from 'xrpl-local/wallet/signer'
 
-import { SubmitMultisignedRequest, Transaction } from '../../../src'
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 import {
