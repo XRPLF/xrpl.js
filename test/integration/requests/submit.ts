@@ -1,10 +1,9 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { AccountSet } from 'xrpl-local'
+import { AccountSet, SubmitRequest, SubmitResponse } from 'xrpl-local'
 import { convertStringToHex } from 'xrpl-local/utils'
 
-import { SubmitRequest, SubmitResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 import { ledgerAccept, verifySubmittedTransaction } from '../utils'
