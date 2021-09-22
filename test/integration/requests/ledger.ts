@@ -27,7 +27,19 @@ describe('ledger', function () {
       ledgerRequest,
     )
 
+    const expectedResponse: LedgerResponse = {
+      id: ledgerResponse.id,
+      status: 'success',
+      type: 'response',
+      result: {
+        ledger: ledgerResponse.result.ledger,
+        ledger_hash: ledgerResponse.result.ledger_hash,
+        ledger_index: ledgerResponse.result.ledger_index,
+        validated: true,
+      },
+    }
+
     verifySuccessfulResponse(ledgerResponse)
-    assert.ok(ledgerResponse.result.validated)
+    assert.deepEqual(ledgerResponse, expectedResponse)
   })
 })
