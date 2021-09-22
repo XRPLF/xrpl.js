@@ -128,7 +128,7 @@ function webpackIntegrationTests() {
   const dir = './test/integration/'
   const tests = []
   const dirPaths = fs.readdirSync(dir)
-  tests.push(webpackForTest(path.join(dir, 'integration.ts')))
+  tests.push(webpackForTest(`./${path.join(dir, 'integration.ts')}`))
   const subdirs = dirPaths.filter(
     (filename) =>
       !filename.match(/\/?([^\/]*)\.ts$/) && filename !== 'README.md',
@@ -136,10 +136,13 @@ function webpackIntegrationTests() {
   subdirs.forEach((subdir) => {
     const subdirPaths = fs.readdirSync(path.join(dir, subdir))
     subdirPaths.forEach((filename) => {
-      tests.push(webpackForTest(path.join(dir, subdir, filename)))
+      tests.push(webpackForTest(`./${path.join(dir, subdir, filename)}`))
     })
   })
-  return Object.assign({}, getDefaultConfiguration(), tests)
+  console.log(tests)
+  return tests.map(
+    (test) => (env, argv) => Object.assign({}, getDefaultConfiguration(), test),
+  )
 }
 
 module.exports = [
@@ -158,5 +161,7 @@ module.exports = [
     }
     return config
   },
-  (env, argv) => webpackIntegrationTests(),
+  ...webpackIntegrationTests(),
 ]
+
+console.log(module.exports)
