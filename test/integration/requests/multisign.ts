@@ -26,7 +26,7 @@ import {
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('multisign', function () {
+describe('submit_multisigned', function () {
   this.timeout(TIMEOUT)
 
   before(suiteClientSetup)
