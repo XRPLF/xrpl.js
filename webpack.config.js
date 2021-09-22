@@ -139,7 +139,6 @@ function webpackIntegrationTests() {
       tests.push(webpackForTest(`./${path.join(dir, subdir, filename)}`))
     })
   })
-  console.log(tests)
   return tests.map(
     (test) => (env, argv) => Object.assign({}, getDefaultConfiguration(), test),
   )
@@ -163,5 +162,3 @@ module.exports = [
   },
   ...webpackIntegrationTests(),
 ]
-
-console.log(module.exports)
