@@ -30,7 +30,7 @@ export interface RipplePathFindResponse extends BaseResponse {
     destination_currencies: string[]
     destination_amount: Amount
     full_reply?: boolean
-    id?: any
+    id?: number | string
     ledger_current_index?: number
     source_account: string
     validated: boolean
