@@ -39,7 +39,6 @@ function isBTC(currency: string): boolean {
 function normalRippledResponse(
   request: BookOffersRequest,
 ): Record<string, unknown> {
-  console.log(request)
   if (
     isBTC(request.taker_gets.currency) &&
     isUSD(request.taker_pays.currency)
