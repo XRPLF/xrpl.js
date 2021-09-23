@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { LedgerRequest, LedgerResponse } from 'xrpl-local'
+import { LedgerRequest } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
@@ -23,23 +23,9 @@ describe('ledger', function () {
       ledger_index: 'validated',
     }
 
-    const ledgerResponse: LedgerResponse = await this.client.request(
-      ledgerRequest,
-    )
-
-    const expectedResponse: LedgerResponse = {
-      id: ledgerResponse.id,
-      status: 'success',
-      type: 'response',
-      result: {
-        ledger: ledgerResponse.result.ledger,
-        ledger_hash: ledgerResponse.result.ledger_hash,
-        ledger_index: ledgerResponse.result.ledger_index,
-        validated: true,
-      },
-    }
+    const ledgerResponse = await this.client.request(ledgerRequest)
 
     verifySuccessfulResponse(ledgerResponse)
-    assert.deepEqual(ledgerResponse, expectedResponse)
+    assert(ledgerResponse.result.validated)
   })
 })
