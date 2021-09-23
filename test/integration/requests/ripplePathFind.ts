@@ -27,10 +27,25 @@ describe('RipplePathFind', function () {
       destination_amount: '100',
     }
 
-    const response: RipplePathFindResponse = await this.client.request(
-      ripplePathFind,
-    )
-    assert.equal(response.status, 'success')
-    assert.equal(response.type, 'response')
+    const response = await this.client.request(ripplePathFind)
+
+    const expectedResponse: RipplePathFindResponse = {
+      id: response.id,
+      status: 'success',
+      type: 'response',
+      result: {
+        alternatives: response.result.alternatives,
+        destination_account: wallet2.getClassicAddress(),
+        destination_currencies: response.result.destination_currencies,
+        destination_amount: ripplePathFind.destination_amount,
+        full_reply: true,
+        id: response.id,
+        ledger_current_index: response.result.ledger_current_index,
+        source_account: ripplePathFind.source_account,
+        validated: false,
+      },
+    }
+
+    assert.deepEqual(response, expectedResponse)
   })
 })
