@@ -66,7 +66,7 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
           throw new Error(`Request has no id: ${requestJSON}`)
         }
         if (request.command == null) {
-          throw new Error(`Request has no id: ${requestJSON}`)
+          throw new Error(`Request has no command: ${requestJSON}`)
         }
         if (request.command === 'ping') {
           ping(conn, request)
