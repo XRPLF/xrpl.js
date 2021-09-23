@@ -36,28 +36,28 @@ describe('tx', function () {
     )
 
     const hash = computeSignedTransactionHash(response.result.tx_blob)
-    const data: TxResponse = await this.client.request({
+    const txResponse = await this.client.request({
       command: 'tx',
       transaction: hash,
     })
 
     const expectedResponse: TxResponse = {
-      id: data.id,
+      id: txResponse.id,
       type: 'response',
       status: 'success',
       result: {
         ...accountSet,
-        Fee: data.result.Fee,
+        Fee: txResponse.result.Fee,
         Flags: 0,
-        LastLedgerSequence: data.result.LastLedgerSequence,
-        Sequence: data.result.Sequence,
+        LastLedgerSequence: txResponse.result.LastLedgerSequence,
+        Sequence: txResponse.result.Sequence,
         SigningPubKey: this.wallet.publicKey,
-        TxnSignature: data.result.TxnSignature,
+        TxnSignature: txResponse.result.TxnSignature,
         hash: computeSignedTransactionHash(response.result.tx_blob),
         validated: false,
       },
     }
 
-    assert.deepEqual(data, expectedResponse)
+    assert.deepEqual(txResponse, expectedResponse)
   })
 })

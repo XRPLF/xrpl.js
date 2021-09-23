@@ -77,9 +77,7 @@ describe('submit_multisigned', function () {
       command: 'submit_multisigned',
       tx_json: decode(multisigned) as unknown as Transaction,
     }
-    const submitResponse: SubmitMultisignedResponse = await client.request(
-      multisignedRequest,
-    )
+    const submitResponse = await client.request(multisignedRequest)
     await ledgerAccept(client)
     assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
     await verifySubmittedTransaction(this.client, multisigned)

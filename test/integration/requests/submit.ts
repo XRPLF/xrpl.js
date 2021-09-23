@@ -38,8 +38,8 @@ describe('submit', function () {
       command: 'submit',
       tx_blob: signedTx,
     }
-    const response: SubmitResponse = await this.client.request(submitRequest)
-    assert.equal(response.status, 'success')
+    const submitResponse = await this.client.request(submitRequest)
+    assert.equal(submitResponse.status, 'success')
 
     await ledgerAccept(this.client)
     await verifySubmittedTransaction(this.client, signedTx)
@@ -51,7 +51,7 @@ describe('submit', function () {
     }
 
     const expectedResponse: SubmitResponse = {
-      id: response.id,
+      id: submitResponse.id,
       type: 'response',
       status: 'success',
       result: {
@@ -62,17 +62,18 @@ describe('submit', function () {
         tx_blob: signedTx,
         tx_json,
         accepted: true,
-        account_sequence_available: response.result.account_sequence_available,
-        account_sequence_next: response.result.account_sequence_next,
+        account_sequence_available:
+          submitResponse.result.account_sequence_available,
+        account_sequence_next: submitResponse.result.account_sequence_next,
         applied: true,
-        broadcast: response.result.broadcast,
+        broadcast: submitResponse.result.broadcast,
         kept: true,
         queued: false,
-        open_ledger_cost: response.result.open_ledger_cost,
-        validated_ledger_index: response.result.validated_ledger_index,
+        open_ledger_cost: submitResponse.result.open_ledger_cost,
+        validated_ledger_index: submitResponse.result.validated_ledger_index,
       },
     }
 
-    assert.deepEqual(response, expectedResponse)
+    assert.deepEqual(submitResponse, expectedResponse)
   })
 })
