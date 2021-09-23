@@ -1,7 +1,8 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { AccountOffersRequest } from '../../../src'
+import { AccountOffersRequest } from 'xrpl-local'
+
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 
@@ -22,7 +23,22 @@ describe('AccountOffers', function () {
       strict: true,
     }
     const response = await this.client.request(request)
-    assert.equal(response.status, 'success')
-    assert.equal(response.type, 'response')
+    const expected = {
+      id: 5,
+      result: {
+        account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        ledger_current_index: 1443,
+        offers: [],
+        validated: false,
+      },
+      status: 'success',
+      type: 'response',
+    }
+    assert.equal(response.status, expected.status)
+    assert.equal(response.type, expected.type)
+    assert.deepEqual(
+      _.omit(response.result, 'ledger_current_index'),
+      _.omit(expected.result, 'ledger_current_index'),
+    )
   })
 })
