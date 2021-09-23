@@ -25,10 +25,21 @@ describe('deposit_authorized', function () {
       destination_account: wallet2.getClassicAddress(),
     }
 
-    const response: DepositAuthorizedResponse = await this.client.request(
-      depositAuthorized,
-    )
-    assert.equal(response.status, 'success')
-    assert.equal(response.type, 'response')
+    const response = await this.client.request(depositAuthorized)
+
+    const expectedResponse: DepositAuthorizedResponse = {
+      id: response.id,
+      status: 'success',
+      type: 'response',
+      result: {
+        deposit_authorized: true,
+        destination_account: depositAuthorized.destination_account,
+        ledger_current_index: response.result.ledger_current_index,
+        source_account: depositAuthorized.source_account,
+        validated: false,
+      },
+    }
+
+    assert.deepEqual(response, expectedResponse)
   })
 })
