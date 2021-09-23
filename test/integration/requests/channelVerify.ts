@@ -27,11 +27,17 @@ describe('ChannelVerify', function () {
       amount: '1000000',
     }
 
-    const response: ChannelVerifyResponse = await this.client.request(
-      channelVerify,
-    )
-    assert.equal(response.status, 'success')
-    assert.equal(response.type, 'response')
-    assert(response.result.signature_verified)
+    const response = await this.client.request(channelVerify)
+
+    const expectedResponse: ChannelVerifyResponse = {
+      id: response.id,
+      status: 'success',
+      type: 'response',
+      result: {
+        signature_verified: response.result.signature_verified,
+      },
+    }
+
+    assert.deepEqual(response, expectedResponse)
   })
 })
