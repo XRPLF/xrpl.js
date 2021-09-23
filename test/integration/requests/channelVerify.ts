@@ -9,7 +9,7 @@ import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('ChannelVerify', function () {
+describe('channel_verify', function () {
   this.timeout(TIMEOUT)
 
   before(suiteClientSetup)
