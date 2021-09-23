@@ -27,8 +27,19 @@ describe('book_offers', function () {
         issuer: this.wallet.getClassicAddress(),
       },
     }
-    const response: BookOffersResponse = await this.client.request(bookOffer)
-    assert.equal(response.status, 'success')
-    assert.equal(response.type, 'response')
+    const response = await this.client.request(bookOffer)
+
+    const expectedResponse: BookOffersResponse = {
+      id: response.id,
+      status: 'success',
+      type: 'response',
+      result: {
+        ledger_current_index: response.result.ledger_current_index,
+        offers: response.result.offers,
+        validated: false,
+      },
+    }
+
+    assert.deepEqual(response, expectedResponse)
   })
 })
