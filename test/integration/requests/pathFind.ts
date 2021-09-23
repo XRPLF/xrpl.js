@@ -27,8 +27,22 @@ describe('path_find', function () {
       destination_amount: '100',
     }
 
-    const response: PathFindResponse = await this.client.request(pathFind)
-    assert.equal(response.status, 'success')
-    assert.equal(response.type, 'response')
+    const response = await this.client.request(pathFind)
+
+    const expectedResponse: PathFindResponse = {
+      id: response.id,
+      status: 'success',
+      type: 'response',
+      result: {
+        alternatives: response.result.alternatives,
+        destination_account: pathFind.destination_account,
+        destination_amount: pathFind.destination_amount,
+        source_account: pathFind.source_account,
+        full_reply: false,
+        id: response.id,
+      },
+    }
+
+    assert.deepEqual(response, expectedResponse)
   })
 })
