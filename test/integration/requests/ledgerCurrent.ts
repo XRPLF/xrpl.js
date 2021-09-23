@@ -22,8 +22,9 @@ describe('ledger_current', function () {
       command: 'ledger_current',
     }
 
-    const ledgerCurrentResponse: LedgerCurrentResponse =
-      await this.client.request(ledgerCurrentRequest)
+    const ledgerCurrentResponse = await this.client.request(
+      ledgerCurrentRequest,
+    )
 
     verifySuccessfulResponse(ledgerCurrentResponse)
 

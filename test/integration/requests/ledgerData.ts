@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { LedgerDataRequest, LedgerDataResponse } from 'xrpl-local'
+import { LedgerDataRequest } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
@@ -23,9 +23,7 @@ describe('ledger_data', function () {
       ledger_index: 'validated',
     }
 
-    const ledgerDataResponse: LedgerDataResponse = await this.client.request(
-      ledgerDataRequest,
-    )
+    const ledgerDataResponse = await this.client.request(ledgerDataRequest)
 
     verifySuccessfulResponse(ledgerDataResponse)
 

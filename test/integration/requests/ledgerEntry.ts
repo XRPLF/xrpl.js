@@ -1,11 +1,7 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import {
-  LedgerDataResponse,
-  LedgerEntryRequest,
-  LedgerEntryResponse,
-} from 'xrpl-local'
+import { LedgerEntryRequest, LedgerEntryResponse } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
@@ -22,11 +18,10 @@ describe('ledger_entry', function () {
   afterEach(teardownClient)
 
   it('base', async function () {
-    const validatedLedgerResponse: LedgerDataResponse =
-      await this.client.request({
-        command: 'ledger_data',
-        ledger_index: 'validated',
-      })
+    const validatedLedgerResponse = await this.client.request({
+      command: 'ledger_data',
+      ledger_index: 'validated',
+    })
 
     verifySuccessfulResponse(validatedLedgerResponse)
     const ledgerEntryIndex = validatedLedgerResponse.result.state[0].index
@@ -36,9 +31,7 @@ describe('ledger_entry', function () {
       index: ledgerEntryIndex,
     }
 
-    const ledgerEntryResponse: LedgerEntryResponse = await this.client.request(
-      ledgerEntryRequest,
-    )
+    const ledgerEntryResponse = await this.client.request(ledgerEntryRequest)
 
     const expectedResponse: LedgerEntryResponse = {
       id: ledgerEntryResponse.id,
