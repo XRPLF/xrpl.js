@@ -8,9 +8,8 @@ import { Transaction } from '../models/transactions'
 import setTransactionFlagsToNumber from '../models/utils/flags'
 import { xrpToDrops } from '../utils'
 
-// 20 drops
+// Expire unconfirmed transactions after 20 ledger versions, approximately 1 minute, by default
 const LEDGER_OFFSET = 20
-const DROPS_PER_XRP = 1000000
 interface ClassicAccountAndTag {
   classicAccount: string
   tag: number | false | undefined
@@ -132,16 +131,14 @@ async function setNextValidSequenceNumber(
 }
 
 async function fetchAccountDeleteFee(client: Client): Promise<BigNumber> {
-  const response = await client.request({ command: 'server_info' })
-  console.log(response.result.info.validated_ledger)
-
-  const fee = response.result.info.validated_ledger?.reserve_inc_xrp
+  const response = await client.request({ command: 'server_state' })
+  const fee = response.result.state.validated_ledger?.reserve_inc
 
   if (fee == null) {
     return Promise.reject(new Error('Could not fetch Owner Reserve.'))
   }
 
-  return new BigNumber(fee).multipliedBy(DROPS_PER_XRP)
+  return new BigNumber(fee)
 }
 
 async function calculateFeePerTransactionType(

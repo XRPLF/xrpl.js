@@ -139,7 +139,17 @@ describe('client.autofill', function () {
           info: {
             validated_ledger: {
               base_fee_xrp: 0.00001,
-              reserve_inc_xrp: 2,
+            },
+          },
+        },
+      })
+      this.mockRippled.addResponse('server_state', {
+        status: 'success',
+        type: 'response',
+        result: {
+          state: {
+            validated_ledger: {
+              reserve_inc: 2000000,
             },
           },
         },
