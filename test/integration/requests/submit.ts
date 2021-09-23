@@ -44,12 +44,6 @@ describe('submit', function () {
     await ledgerAccept(this.client)
     await verifySubmittedTransaction(this.client, signedTx)
 
-    // The ledger returns an extra 'hash' field on 'submit' requests which is easily calculatable with a normal tx_blob
-    const tx_json = {
-      ...(decode(signedTx) as unknown as Transaction),
-      hash: computeSignedTransactionHash(signedTx),
-    }
-
     const expectedResponse: SubmitResponse = {
       id: submitResponse.id,
       type: 'response',
@@ -60,7 +54,10 @@ describe('submit', function () {
         engine_result_message:
           'The transaction was applied. Only final in a validated ledger.',
         tx_blob: signedTx,
-        tx_json,
+        tx_json: {
+          ...(decode(signedTx) as unknown as Transaction),
+          hash: computeSignedTransactionHash(signedTx),
+        },
         accepted: true,
         account_sequence_available:
           submitResponse.result.account_sequence_available,

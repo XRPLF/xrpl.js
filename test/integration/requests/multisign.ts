@@ -82,12 +82,6 @@ describe('submit_multisigned', function () {
     assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
     await verifySubmittedTransaction(this.client, multisigned)
 
-    // The ledger returns an extra 'hash' field on 'submit' requests which is easily calculatable with a normal tx_blob
-    const tx_json = {
-      ...(decode(multisigned) as unknown as Transaction),
-      hash: computeSignedTransactionHash(multisigned),
-    }
-
     const expectedResponse: SubmitMultisignedResponse = {
       id: submitResponse.id,
       status: 'success',
@@ -98,7 +92,10 @@ describe('submit_multisigned', function () {
         engine_result_message:
           'The transaction was applied. Only final in a validated ledger.',
         tx_blob: multisigned,
-        tx_json,
+        tx_json: {
+          ...(decode(multisigned) as unknown as Transaction),
+          hash: computeSignedTransactionHash(multisigned),
+        },
       },
     }
 
