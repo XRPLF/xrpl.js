@@ -10,7 +10,7 @@ import { generateFundedWallet } from '../utils'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('RipplePathFind', function () {
+describe('ripple_path_find', function () {
   this.timeout(TIMEOUT)
 
   before(suiteClientSetup)
