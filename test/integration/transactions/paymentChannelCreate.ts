@@ -8,7 +8,7 @@ import { generateFundedWallet, testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
-// TODO: PaymentChannelCreate, PaymentChannelFund, and PaymentChannelClaim
+
 describe('PaymentChannelCreate', function () {
   this.timeout(TIMEOUT)
 
