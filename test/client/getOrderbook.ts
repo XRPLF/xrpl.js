@@ -74,8 +74,8 @@ describe('client.getOrderbook', function () {
   it('normal', async function () {
     this.mockRippled.addResponse('book_offers', normalRippledResponse)
     const response = await this.client.getOrderbook(
-      requests.getOrderbook.normal.takerPays,
-      requests.getOrderbook.normal.takerGets,
+      requests.getOrderbook.normal.TakerPays,
+      requests.getOrderbook.normal.TakerGets,
       {
         limit: 1,
       },
@@ -91,8 +91,8 @@ describe('client.getOrderbook', function () {
     this.mockRippled.addResponse('book_offers', normalRippledResponse)
     assertRejects(
       this.client.getOrderbook(
-        requests.getOrderbook.normal.takerPays,
-        requests.getOrderbook.normal.takerGets,
+        requests.getOrderbook.normal.TakerPays,
+        requests.getOrderbook.normal.TakerGets,
         {
           invalid: 'options',
         },
@@ -104,8 +104,8 @@ describe('client.getOrderbook', function () {
   it('with XRP', async function () {
     this.mockRippled.addResponse('book_offers', xrpRippledResponse)
     const response = await this.client.getOrderbook(
-      requests.getOrderbook.withXRP.takerPays,
-      requests.getOrderbook.withXRP.takerGets,
+      requests.getOrderbook.withXRP.TakerPays,
+      requests.getOrderbook.withXRP.TakerGets,
     )
     assertResultMatch(response, responses.getOrderbook.withXRP, 'getOrderbook')
   })
@@ -113,8 +113,8 @@ describe('client.getOrderbook', function () {
   it('sample USD/XRP book has orders sorted correctly', async function () {
     this.mockRippled.addResponse('book_offers', xrpRippledResponse)
     const response = await this.client.getOrderbook(
-      requests.getOrderbook.withXRP.takerPays,
-      requests.getOrderbook.withXRP.takerGets,
+      requests.getOrderbook.withXRP.TakerPays,
+      requests.getOrderbook.withXRP.TakerGets,
     )
     checkSortingOfOrders(response.buy)
     checkSortingOfOrders(response.sell)
@@ -123,8 +123,8 @@ describe('client.getOrderbook', function () {
   it('sorted so that best deals come first [bad test]', async function () {
     this.mockRippled.addResponse('book_offers', normalRippledResponse)
     const response = await this.client.getOrderbook(
-      requests.getOrderbook.normal.takerPays,
-      requests.getOrderbook.normal.takerGets,
+      requests.getOrderbook.normal.TakerPays,
+      requests.getOrderbook.normal.TakerGets,
     )
     const buyRates = response.buy.map(async (item) => item.quality as number)
     const sellRates = response.sell.map(async (item) => item.quality as number)
@@ -142,8 +142,8 @@ describe('client.getOrderbook', function () {
   it('sorted so that best deals come first [bad test](XRP)', async function () {
     this.mockRippled.addResponse('book_offers', xrpRippledResponse)
     const response = await this.client.getOrderbook(
-      requests.getOrderbook.withXRP.takerPays,
-      requests.getOrderbook.withXRP.takerGets,
+      requests.getOrderbook.withXRP.TakerPays,
+      requests.getOrderbook.withXRP.TakerGets,
     )
     const buyRates = response.buy.map(async (item) => item.quality as number)
     const sellRates = response.sell.map(async (item) => item.quality as number)
@@ -161,8 +161,8 @@ describe('client.getOrderbook', function () {
   it('direction is correct for buy and sell', async function () {
     this.mockRippled.addResponse('book_offers', normalRippledResponse)
     const response = await this.client.getOrderbook(
-      requests.getOrderbook.normal.takerPays,
-      requests.getOrderbook.normal.takerGets,
+      requests.getOrderbook.normal.TakerPays,
+      requests.getOrderbook.normal.TakerGets,
     )
     assert.strictEqual(
       response.buy.every((item) => item.Flags !== OfferLedgerFlags.lsfSell),
@@ -178,8 +178,8 @@ describe('client.getOrderbook', function () {
     this.mockRippled.addResponse('book_offers', normalRippledResponse)
     const LIMIT = 3
     const response = await this.client.getOrderbook(
-      requests.getOrderbook.normal.takerPays,
-      requests.getOrderbook.normal.takerGets,
+      requests.getOrderbook.normal.TakerPays,
+      requests.getOrderbook.normal.TakerGets,
       {
         limit: LIMIT,
       },

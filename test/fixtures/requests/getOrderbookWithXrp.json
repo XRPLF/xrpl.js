@@ -1,9 +1,9 @@
 {
-  "takerPays": {
+  "TakerPays": {
     "currency": "USD",
     "issuer": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw"
   },
-  "takerGets": {
+  "TakerGets": {
     "currency": "XRP"
   }
 }
