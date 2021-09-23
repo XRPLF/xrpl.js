@@ -212,6 +212,7 @@
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-function"><a href="modules.html#ISOTimeToRippleTime" class="tsd-kind-icon">ISOTime<wbr>ToRipple<wbr>Time</a></li>
+								<li class="tsd-kind-function"><a href="modules.html#authorizeChannel" class="tsd-kind-icon">authorize<wbr>Channel</a></li>
 								<li class="tsd-kind-function tsd-is-external"><a href="modules.html#classicAddressToXAddress" class="tsd-kind-icon">classic<wbr>Address<wbr>ToXAddress</a></li>
 								<li class="tsd-kind-function"><a href="modules.html#computeAccountRootIndex" class="tsd-kind-icon">compute<wbr>Account<wbr>Root<wbr>Index</a></li>
 								<li class="tsd-kind-function"><a href="modules.html#computeBinaryTransactionSigningHash" class="tsd-kind-icon">compute<wbr>Binary<wbr>Transaction<wbr>Signing<wbr>Hash</a></li>
@@ -242,8 +243,10 @@
 								<li class="tsd-kind-function tsd-is-external"><a href="modules.html#isValidClassicAddress" class="tsd-kind-icon">is<wbr>Valid<wbr>Classic<wbr>Address</a></li>
 								<li class="tsd-kind-function"><a href="modules.html#isValidSecret" class="tsd-kind-icon">is<wbr>Valid<wbr>Secret</a></li>
 								<li class="tsd-kind-function tsd-is-external"><a href="modules.html#isValidXAddress" class="tsd-kind-icon">is<wbr>ValidXAddress</a></li>
+								<li class="tsd-kind-function"><a href="modules.html#multisign" class="tsd-kind-icon">multisign</a></li>
 								<li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#removeUndefined" class="tsd-kind-icon">remove<wbr>Undefined</a></li>
 								<li class="tsd-kind-function"><a href="modules.html#rippleTimeToISOTime" class="tsd-kind-icon">ripple<wbr>Time<wbr>ToISOTime</a></li>
+								<li class="tsd-kind-function"><a href="modules.html#sign" class="tsd-kind-icon">sign</a></li>
 								<li class="tsd-kind-function"><a href="modules.html#signPaymentChannelClaim" class="tsd-kind-icon">sign<wbr>Payment<wbr>Channel<wbr>Claim</a></li>
 								<li class="tsd-kind-function"><a href="modules.html#validate" class="tsd-kind-icon">validate</a></li>
 								<li class="tsd-kind-function"><a href="modules.html#validateAccountDelete" class="tsd-kind-icon">validate<wbr>Account<wbr>Delete</a></li>
@@ -266,6 +269,7 @@
 								<li class="tsd-kind-function"><a href="modules.html#validateTicketCreate" class="tsd-kind-icon">validate<wbr>Ticket<wbr>Create</a></li>
 								<li class="tsd-kind-function"><a href="modules.html#validateTrustSet" class="tsd-kind-icon">validate<wbr>Trust<wbr>Set</a></li>
 								<li class="tsd-kind-function"><a href="modules.html#verifyPaymentChannelClaim" class="tsd-kind-icon">verify<wbr>Payment<wbr>Channel<wbr>Claim</a></li>
+								<li class="tsd-kind-function"><a href="modules.html#verifySignature" class="tsd-kind-icon">verify<wbr>Signature</a></li>
 								<li class="tsd-kind-function tsd-is-external"><a href="modules.html#xAddressToClassicAddress" class="tsd-kind-icon">x<wbr>Address<wbr>ToClassic<wbr>Address</a></li>
 								<li class="tsd-kind-function"><a href="modules.html#xrpToDrops" class="tsd-kind-icon">xrp<wbr>ToDrops</a></li>
 							</ul>
@@ -281,7 +285,7 @@
 					<div class="tsd-signature tsd-kind-icon">Path<wbr>Find<wbr>Request<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">PathFindCreateRequest</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">PathFindCloseRequest</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">PathFindStatusRequest</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/methods/pathFind.ts#L27">src/models/methods/pathFind.ts:27</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/methods/pathFind.ts#L27">src/models/methods/pathFind.ts:27</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -291,7 +295,7 @@
 					<div class="tsd-signature tsd-kind-icon">Request<span class="tsd-signature-symbol">:</span> <a href="interfaces/AccountChannelsRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountChannelsRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/AccountCurrenciesRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountCurrenciesRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/AccountInfoRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountInfoRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/AccountLinesRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountLinesRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/AccountObjectsRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountObjectsRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/AccountOffersRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountOffersRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/AccountTxRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountTxRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/GatewayBalancesRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">GatewayBalancesRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/NoRippleCheckRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">NoRippleCheckRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/LedgerRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">LedgerRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/LedgerClosedRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">LedgerClosedRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/LedgerCurrentRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">LedgerCurrentRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/LedgerDataRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">LedgerDataRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/LedgerEntryRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">LedgerEntryRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/SubmitRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">SubmitRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/SubmitMultisignedRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">SubmitMultisignedRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/TransactionEntryRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">TransactionEntryRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/TxRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">TxRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/BookOffersRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">BookOffersRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/DepositAuthorizedRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">DepositAuthorizedRequest</a><span class="tsd-signature-symbol"> | </span><a href="modules.html#PathFindRequest" class="tsd-signature-type" data-tsd-kind="Type alias">PathFindRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/RipplePathFindRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">RipplePathFindRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/ChannelVerifyRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">ChannelVerifyRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/SubscribeRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">SubscribeRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/UnsubscribeRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">UnsubscribeRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/FeeRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">FeeRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/ManifestRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">ManifestRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/ServerInfoRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">ServerInfoRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/ServerStateRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">ServerStateRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/PingRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">PingRequest</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/RandomRequest.html" class="tsd-signature-type" data-tsd-kind="Interface">RandomRequest</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/methods/index.ts#L64">src/models/methods/index.ts:64</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/methods/index.ts#L64">src/models/methods/index.ts:64</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -301,7 +305,7 @@
 					<div class="tsd-signature tsd-kind-icon">Response<span class="tsd-signature-symbol">:</span> <a href="interfaces/AccountChannelsResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountChannelsResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/AccountCurrenciesResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountCurrenciesResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/AccountInfoResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountInfoResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/AccountLinesResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountLinesResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/AccountObjectsResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountObjectsResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/AccountOffersResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountOffersResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/AccountTxResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountTxResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/GatewayBalancesResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">GatewayBalancesResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/NoRippleCheckResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">NoRippleCheckResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/LedgerResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">LedgerResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/LedgerClosedResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">LedgerClosedResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/LedgerCurrentResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">LedgerCurrentResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/LedgerDataResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">LedgerDataResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/LedgerEntryResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">LedgerEntryResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/SubmitResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">SubmitResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/SubmitMultisignedResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">SubmitMultisignedResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/TransactionEntryResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">TransactionEntryResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/TxResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">TxResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/BookOffersResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">BookOffersResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/DepositAuthorizedResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">DepositAuthorizedResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/PathFindResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">PathFindResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/RipplePathFindResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">RipplePathFindResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/ChannelVerifyResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">ChannelVerifyResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/SubscribeResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">SubscribeResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/UnsubscribeResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">UnsubscribeResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/FeeResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">FeeResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/ManifestResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">ManifestResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/ServerInfoResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">ServerInfoResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/ServerStateResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">ServerStateResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/PingResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">PingResponse</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/RandomResponse.html" class="tsd-signature-type" data-tsd-kind="Interface">RandomResponse</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/methods/index.ts#L105">src/models/methods/index.ts:105</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/methods/index.ts#L105">src/models/methods/index.ts:105</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -311,7 +315,7 @@
 					<div class="tsd-signature tsd-kind-icon">Stream<span class="tsd-signature-symbol">:</span> <a href="interfaces/LedgerStream.html" class="tsd-signature-type" data-tsd-kind="Interface">LedgerStream</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/ValidationStream.html" class="tsd-signature-type" data-tsd-kind="Interface">ValidationStream</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/TransactionStream.html" class="tsd-signature-type" data-tsd-kind="Interface">TransactionStream</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/PathFindStream.html" class="tsd-signature-type" data-tsd-kind="Interface">PathFindStream</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/PeerStatusStream.html" class="tsd-signature-type" data-tsd-kind="Interface">PeerStatusStream</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/OrderBookStream.html" class="tsd-signature-type" data-tsd-kind="Interface">OrderBookStream</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/ConsensusStream.html" class="tsd-signature-type" data-tsd-kind="Interface">ConsensusStream</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/methods/subscribe.ts#L127">src/models/methods/subscribe.ts:127</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/methods/subscribe.ts#L127">src/models/methods/subscribe.ts:127</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -321,7 +325,7 @@
 					<div class="tsd-signature tsd-kind-icon">Transaction<span class="tsd-signature-symbol">:</span> <a href="interfaces/AccountDelete.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountDelete</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/AccountSet.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountSet</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/CheckCancel.html" class="tsd-signature-type" data-tsd-kind="Interface">CheckCancel</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/CheckCash.html" class="tsd-signature-type" data-tsd-kind="Interface">CheckCash</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/CheckCreate.html" class="tsd-signature-type" data-tsd-kind="Interface">CheckCreate</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/DepositPreauth.html" class="tsd-signature-type" data-tsd-kind="Interface">DepositPreauth</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/EscrowCancel.html" class="tsd-signature-type" data-tsd-kind="Interface">EscrowCancel</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/EscrowCreate.html" class="tsd-signature-type" data-tsd-kind="Interface">EscrowCreate</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/EscrowFinish.html" class="tsd-signature-type" data-tsd-kind="Interface">EscrowFinish</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/OfferCancel.html" class="tsd-signature-type" data-tsd-kind="Interface">OfferCancel</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/OfferCreate.html" class="tsd-signature-type" data-tsd-kind="Interface">OfferCreate</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/Payment.html" class="tsd-signature-type" data-tsd-kind="Interface">Payment</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/PaymentChannelClaim.html" class="tsd-signature-type" data-tsd-kind="Interface">PaymentChannelClaim</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/PaymentChannelCreate.html" class="tsd-signature-type" data-tsd-kind="Interface">PaymentChannelCreate</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/PaymentChannelFund.html" class="tsd-signature-type" data-tsd-kind="Interface">PaymentChannelFund</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/SetRegularKey.html" class="tsd-signature-type" data-tsd-kind="Interface">SetRegularKey</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/SignerListSet.html" class="tsd-signature-type" data-tsd-kind="Interface">SignerListSet</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/TicketCreate.html" class="tsd-signature-type" data-tsd-kind="Interface">TicketCreate</a><span class="tsd-signature-symbol"> | </span><a href="interfaces/TrustSet.html" class="tsd-signature-type" data-tsd-kind="Interface">TrustSet</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/transaction.ts#L54">src/models/transactions/transaction.ts:54</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/transaction.ts#L54">src/models/transactions/transaction.ts:54</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -383,7 +387,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/timeConversion.ts#L39">src/utils/timeConversion.ts:39</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/timeConversion.ts#L39">src/utils/timeConversion.ts:39</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -402,6 +406,50 @@
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 							<p>Seconds since ripple epoch (1/1/2000 GMT).</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="authorizeChannel" class="tsd-anchor"></a>
+					<h3>authorize<wbr>Channel</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">authorize<wbr>Channel<span class="tsd-signature-symbol">(</span>wallet<span class="tsd-signature-symbol">: </span><a href="classes/Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a>, channelId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, amount<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/wallet/signer.ts#L91">src/wallet/signer.ts:91</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a signature that can be used to redeem a specific amount of XRP from a payment channel.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>wallet: <a href="classes/Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The account that will sign for this payment channel.</p>
+									</div>
+								</li>
+								<li>
+									<h5>channelId: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>An id for the payment channel to redeem XRP from.</p>
+									</div>
+								</li>
+								<li>
+									<h5>amount: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The amount in drops to redeem.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<p>A signature that can be used to redeem a specific amount of XRP from a payment channel.</p>
 						</li>
 					</ul>
 				</section>
@@ -444,7 +492,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/hashes/index.ts#L69">src/utils/hashes/index.ts:69</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/hashes/index.ts#L69">src/utils/hashes/index.ts:69</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -481,7 +529,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/hashes/index.ts#L51">src/utils/hashes/index.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/hashes/index.ts#L51">src/utils/hashes/index.ts:51</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -514,7 +562,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/hashes/index.ts#L151">src/utils/hashes/index.ts:151</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/hashes/index.ts#L151">src/utils/hashes/index.ts:151</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -552,7 +600,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/hashes/ledgerHash.ts#L219">src/utils/hashes/ledgerHash.ts:219</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/hashes/ledgerHash.ts#L219">src/utils/hashes/ledgerHash.ts:219</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -590,7 +638,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/hashes/ledgerHash.ts#L101">src/utils/hashes/ledgerHash.ts:101</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/hashes/ledgerHash.ts#L101">src/utils/hashes/ledgerHash.ts:101</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -622,7 +670,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/hashes/index.ts#L106">src/utils/hashes/index.ts:106</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/hashes/index.ts#L106">src/utils/hashes/index.ts:106</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -667,7 +715,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/hashes/index.ts#L167">src/utils/hashes/index.ts:167</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/hashes/index.ts#L167">src/utils/hashes/index.ts:167</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -711,7 +759,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/hashes/ledgerHash.ts#L74">src/utils/hashes/ledgerHash.ts:74</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/hashes/ledgerHash.ts#L74">src/utils/hashes/ledgerHash.ts:74</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -748,7 +796,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/hashes/index.ts#L86">src/utils/hashes/index.ts:86</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/hashes/index.ts#L86">src/utils/hashes/index.ts:86</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -787,7 +835,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/hashes/ledgerHash.ts#L146">src/utils/hashes/ledgerHash.ts:146</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/hashes/ledgerHash.ts#L146">src/utils/hashes/ledgerHash.ts:146</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -819,7 +867,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/hashes/ledgerHash.ts#L125">src/utils/hashes/ledgerHash.ts:125</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/hashes/ledgerHash.ts#L125">src/utils/hashes/ledgerHash.ts:125</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -851,7 +899,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/hashes/index.ts#L124">src/utils/hashes/index.ts:124</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/hashes/index.ts#L124">src/utils/hashes/index.ts:124</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -895,16 +943,25 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/index.ts#L73">src/utils/index.ts:73</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/index.ts#L79">src/utils/index.ts:79</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Converts a string to its hex equivalent. Useful for Memos.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>string: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The string to convert to Hex.</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<p>The Hex equivalent of the string.</p>
 						</li>
 					</ul>
 				</section>
@@ -1069,7 +1126,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/derive.ts#L16">src/utils/derive.ts:16</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/derive.ts#L16">src/utils/derive.ts:16</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1101,7 +1158,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/xrpConversion.ts#L17">src/utils/xrpConversion.ts:17</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/xrpConversion.ts#L17">src/utils/xrpConversion.ts:17</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1262,7 +1319,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/generateAddress.ts#L37">src/utils/generateAddress.ts:37</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/generateAddress.ts#L37">src/utils/generateAddress.ts:37</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1323,7 +1380,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/index.ts#L45">src/utils/index.ts:45</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/index.ts#L45">src/utils/index.ts:45</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1368,6 +1425,49 @@
 						</li>
 					</ul>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="multisign" class="tsd-anchor"></a>
+					<h3>multisign</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">multisign<span class="tsd-signature-symbol">(</span>transactions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><a href="modules.html#Transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/wallet/signer.ts#L46">src/wallet/signer.ts:46</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Takes several transactions with Signer fields (in object or blob form) and creates a
+									single transaction with all Signers that then gets signed and returned.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>ValidationError if:</p>
+										<ul>
+											<li>There were no transactions given to sign</li>
+											<li>The SigningPubKey field is not the empty string in any given transaction</li>
+											<li>Any transaction is missing a Signers field.</li>
+										</ul>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>transactions: <span class="tsd-signature-symbol">(</span><a href="modules.html#Transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>An array of signed Transactions (in object or blob form) to combine into a single signed Transaction.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<p>A single signed Transaction which has all Signers from transactions within it.</p>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-has-type-parameter">
 					<a name="removeUndefined" class="tsd-anchor"></a>
 					<h3>remove<wbr>Undefined</h3>
@@ -1378,7 +1478,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/index.ts#L60">src/utils/index.ts:60</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/index.ts#L60">src/utils/index.ts:60</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1416,7 +1516,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/timeConversion.ts#L29">src/utils/timeConversion.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/timeConversion.ts#L29">src/utils/timeConversion.ts:29</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1439,6 +1539,51 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="sign" class="tsd-anchor"></a>
+					<h3>sign</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">sign<span class="tsd-signature-symbol">(</span>wallet<span class="tsd-signature-symbol">: </span><a href="classes/Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a>, tx<span class="tsd-signature-symbol">: </span><a href="modules.html#Transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a>, forMultisign<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/wallet/signer.ts#L28">src/wallet/signer.ts:28</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Uses a wallet to cryptographically sign a transaction which proves the owner of the wallet
+									is issuing this transaction.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>wallet: <a href="classes/Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A Wallet that holds your cryptographic keys.</p>
+									</div>
+								</li>
+								<li>
+									<h5>tx: <a href="modules.html#Transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The Transaction that is being signed.</p>
+									</div>
+								</li>
+								<li>
+									<h5>forMultisign: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>If true, changes the signature format to encode for multisigning.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<p>A signed Transaction.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
 					<a name="signPaymentChannelClaim" class="tsd-anchor"></a>
 					<h3>sign<wbr>Payment<wbr>Channel<wbr>Claim</h3>
 					<ul class="tsd-signatures tsd-kind-function">
@@ -1448,7 +1593,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/signPaymentChannelClaim.ts#L14">src/utils/signPaymentChannelClaim.ts:14</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/signPaymentChannelClaim.ts#L14">src/utils/signPaymentChannelClaim.ts:14</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1492,7 +1637,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/transaction.ts#L87">src/models/transactions/transaction.ts:87</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/transaction.ts#L87">src/models/transactions/transaction.ts:87</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1529,7 +1674,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/accountDelete.ts#L17">src/models/transactions/accountDelete.ts:17</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/accountDelete.ts#L17">src/models/transactions/accountDelete.ts:17</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1565,7 +1710,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/accountSet.ts#L57">src/models/transactions/accountSet.ts:57</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/accountSet.ts#L58">src/models/transactions/accountSet.ts:58</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1601,7 +1746,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/checkCancel.ts#L16">src/models/transactions/checkCancel.ts:16</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/checkCancel.ts#L16">src/models/transactions/checkCancel.ts:16</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1637,7 +1782,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/checkCash.ts#L20">src/models/transactions/checkCash.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/checkCash.ts#L20">src/models/transactions/checkCash.ts:20</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1673,7 +1818,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/checkCreate.ts#L26">src/models/transactions/checkCreate.ts:26</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/checkCreate.ts#L26">src/models/transactions/checkCreate.ts:26</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1709,7 +1854,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/depositPreauth.ts#L18">src/models/transactions/depositPreauth.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/depositPreauth.ts#L18">src/models/transactions/depositPreauth.ts:18</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1745,7 +1890,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/escrowCancel.ts#L17">src/models/transactions/escrowCancel.ts:17</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/escrowCancel.ts#L17">src/models/transactions/escrowCancel.ts:17</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1781,7 +1926,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/escrowCreate.ts#L22">src/models/transactions/escrowCreate.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/escrowCreate.ts#L22">src/models/transactions/escrowCreate.ts:22</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1817,7 +1962,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/escrowFinish.ts#L19">src/models/transactions/escrowFinish.ts:19</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/escrowFinish.ts#L19">src/models/transactions/escrowFinish.ts:19</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1853,7 +1998,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/offerCancel.ts#L16">src/models/transactions/offerCancel.ts:16</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/offerCancel.ts#L16">src/models/transactions/offerCancel.ts:16</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1889,7 +2034,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/offerCreate.ts#L42">src/models/transactions/offerCreate.ts:42</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/offerCreate.ts#L41">src/models/transactions/offerCreate.ts:41</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1925,7 +2070,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/payment.ts#L43">src/models/transactions/payment.ts:43</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/payment.ts#L42">src/models/transactions/payment.ts:42</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1961,7 +2106,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/paymentChannelClaim.ts#L32">src/models/transactions/paymentChannelClaim.ts:32</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/paymentChannelClaim.ts#L32">src/models/transactions/paymentChannelClaim.ts:32</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1997,7 +2142,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/paymentChannelCreate.ts#L22">src/models/transactions/paymentChannelCreate.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/paymentChannelCreate.ts#L23">src/models/transactions/paymentChannelCreate.ts:23</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2033,7 +2178,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/paymentChannelFund.ts#L18">src/models/transactions/paymentChannelFund.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/paymentChannelFund.ts#L18">src/models/transactions/paymentChannelFund.ts:18</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2069,7 +2214,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/setRegularKey.ts#L16">src/models/transactions/setRegularKey.ts:16</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/setRegularKey.ts#L16">src/models/transactions/setRegularKey.ts:16</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2105,7 +2250,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/signerListSet.ts#L20">src/models/transactions/signerListSet.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/signerListSet.ts#L20">src/models/transactions/signerListSet.ts:20</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2141,7 +2286,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/ticketCreate.ts#L18">src/models/transactions/ticketCreate.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/ticketCreate.ts#L18">src/models/transactions/ticketCreate.ts:18</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2177,7 +2322,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/models/transactions/trustSet.ts#L41">src/models/transactions/trustSet.ts:41</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/models/transactions/trustSet.ts#L41">src/models/transactions/trustSet.ts:41</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2213,7 +2358,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/verifyPaymentChannelClaim.ts#L15">src/utils/verifyPaymentChannelClaim.ts:15</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/verifyPaymentChannelClaim.ts#L16">src/utils/verifyPaymentChannelClaim.ts:16</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2250,6 +2395,38 @@
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 							<p>True if the channel is valid.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="verifySignature" class="tsd-anchor"></a>
+					<h3>verify<wbr>Signature</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">verify<wbr>Signature<span class="tsd-signature-symbol">(</span>tx<span class="tsd-signature-symbol">: </span><a href="modules.html#Transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/wallet/signer.ts#L110">src/wallet/signer.ts:110</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Verifies that the given transaction has a valid signature based on public-key encryption.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>tx: <a href="modules.html#Transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A transaction to verify the signature of. (Can be in object or encoded string format).</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+							<p>Returns true if tx has a valid signature, and returns false otherwise.</p>
 						</li>
 					</ul>
 				</section>
@@ -2297,7 +2474,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/7886a06f/src/utils/xrpConversion.ts#L66">src/utils/xrpConversion.ts:66</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/e82cc065/src/utils/xrpConversion.ts#L66">src/utils/xrpConversion.ts:66</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2705,6 +2882,9 @@
 					<li class=" tsd-kind-function">
 						<a href="modules.html#ISOTimeToRippleTime" class="tsd-kind-icon">ISOTime<wbr>ToRipple<wbr>Time</a>
 					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#authorizeChannel" class="tsd-kind-icon">authorize<wbr>Channel</a>
+					</li>
 					<li class=" tsd-kind-function tsd-is-external">
 						<a href="modules.html#classicAddressToXAddress" class="tsd-kind-icon">classic<wbr>Address<wbr>ToXAddress</a>
 					</li>
@@ -2795,11 +2975,17 @@
 					<li class=" tsd-kind-function tsd-is-external">
 						<a href="modules.html#isValidXAddress" class="tsd-kind-icon">is<wbr>ValidXAddress</a>
 					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#multisign" class="tsd-kind-icon">multisign</a>
+					</li>
 					<li class=" tsd-kind-function tsd-has-type-parameter">
 						<a href="modules.html#removeUndefined" class="tsd-kind-icon">remove<wbr>Undefined</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="modules.html#rippleTimeToISOTime" class="tsd-kind-icon">ripple<wbr>Time<wbr>ToISOTime</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#sign" class="tsd-kind-icon">sign</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="modules.html#signPaymentChannelClaim" class="tsd-kind-icon">sign<wbr>Payment<wbr>Channel<wbr>Claim</a>
@@ -2866,6 +3052,9 @@
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="modules.html#verifyPaymentChannelClaim" class="tsd-kind-icon">verify<wbr>Payment<wbr>Channel<wbr>Claim</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#verifySignature" class="tsd-kind-icon">verify<wbr>Signature</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
 						<a href="modules.html#xAddressToClassicAddress" class="tsd-kind-icon">x<wbr>Address<wbr>ToClassic<wbr>Address</a>

@@ -1,0 +1,6 @@
+{
+  "entryPoints": ["./src/index.ts"],
+  "out": "./docs",
+  "categoryOrder": ["Clients", "Transaction Models", "Flags", "Errors"],
+  "categorizeByGroup": false
+}
