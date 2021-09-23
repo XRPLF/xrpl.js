@@ -45,7 +45,10 @@ describe('getBalances', function () {
           rippledAccountLines.normal,
         )
         this.mockRippled.addResponse('ledger', rippled.ledger.normal)
-        const expectedResponse = responses.getBalances.slice(0, 10)
+        const expectedResponse = responses.getBalances.slice(
+          0,
+          request.options.limit,
+        )
         const result = await this.client.getBalances(
           request.account,
           request.options,
@@ -68,7 +71,7 @@ describe('getBalances', function () {
         this.mockRippled.addResponse('ledger', rippled.ledger.normal)
 
         const expectedResponse = responses.getBalances.filter(
-          (item) => item.issuer === 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+          (item) => item.issuer === options.peer,
         )
         const result = await this.client.getBalances(testcase.address, options)
         assertResultMatch(result, expectedResponse, 'getBalances')
@@ -90,8 +93,8 @@ describe('getBalances', function () {
         this.mockRippled.addResponse('ledger', rippled.ledger.normal)
 
         const expectedResponse = responses.getBalances
-          .filter((item) => item.issuer === 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B')
-          .slice(0, 10)
+          .filter((item) => item.issuer === options.peer)
+          .slice(0, options.limit)
         const result = await this.client.getBalances(testcase.address, options)
         assertResultMatch(result, expectedResponse, 'getBalances')
       })

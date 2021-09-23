@@ -9,7 +9,7 @@ import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
 import { assertResultMatch, assertRejects } from '../testUtils'
 
-function checkSortingOfOrders(orders): boolean {
+function checkSortingOfOrders(orders): void {
   let previousRate = '0'
   for (const order of orders) {
     assert(
@@ -20,7 +20,6 @@ function checkSortingOfOrders(orders): boolean {
     )
     previousRate = order.quality
   }
-  return true
 }
 
 function isUSD(currency: string): boolean {
@@ -40,6 +39,7 @@ function isBTC(currency: string): boolean {
 function normalRippledResponse(
   request: BookOffersRequest,
 ): Record<string, unknown> {
+  console.log(request)
   if (
     isBTC(request.taker_gets.currency) &&
     isUSD(request.taker_pays.currency)
@@ -73,16 +73,21 @@ describe('client.getOrderbook', function () {
 
   it('normal', async function () {
     this.mockRippled.addResponse('book_offers', normalRippledResponse)
-    const response = await this.client.getOrderbook(
-      requests.getOrderbook.normal.TakerPays,
-      requests.getOrderbook.normal.TakerGets,
-      {
+    const request = {
+      TakerPays: requests.getOrderbook.normal.TakerPays,
+      TakerGets: requests.getOrderbook.normal.TakerGets,
+      options: {
         limit: 1,
       },
+    }
+    const response = await this.client.getOrderbook(
+      request.TakerPays,
+      request.TakerGets,
+      request.options,
     )
     const expectedResponse = {
-      buy: responses.getOrderbook.normal.buy.slice(0, 1),
-      sell: responses.getOrderbook.normal.sell.slice(0, 1),
+      buy: responses.getOrderbook.normal.buy.slice(0, request.options.limit),
+      sell: responses.getOrderbook.normal.sell.slice(0, request.options.limit),
     }
     assertResultMatch(response, expectedResponse, 'getOrderbook')
   })
@@ -120,7 +125,7 @@ describe('client.getOrderbook', function () {
     checkSortingOfOrders(response.sell)
   })
 
-  it('sorted so that best deals come first [bad test]', async function () {
+  it('sorted so that best deals come first [failure test]', async function () {
     this.mockRippled.addResponse('book_offers', normalRippledResponse)
     const response = await this.client.getOrderbook(
       requests.getOrderbook.normal.TakerPays,
