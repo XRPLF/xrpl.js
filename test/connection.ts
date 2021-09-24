@@ -17,7 +17,7 @@ import { Connection } from 'xrpl-local/client/connection'
 
 import rippled from './fixtures/rippled'
 import { setupClient, teardownClient } from './setupClient'
-import { ignoreWebSocketDisconnect } from './testUtils'
+import { assertRejects, ignoreWebSocketDisconnect } from './testUtils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -514,13 +514,13 @@ describe('Connection', function () {
     this.client.on('error', (errorCode, errorMessage, message) => {
       assert.strictEqual(errorCode, 'badMessage')
       assert.strictEqual(errorMessage, 'valid id not found in response')
-      assert.strictEqual(message, '{"type":"response","id":"must be integer"}')
+      assert.strictEqual(message, '{"type":"response","id":{}}')
       done()
     })
     this.client.connection.onMessage(
       JSON.stringify({
         type: 'response',
-        id: 'must be integer',
+        id: {},
       }),
     )
   })
@@ -618,5 +618,21 @@ describe('Connection', function () {
       })
       .then(() => new Error('Should not have succeeded'))
       .catch(done())
+  })
+
+  it('should throw error if pending response with same ID', async function () {
+    const promise1 = this.client.connection.request({
+      id: 'test',
+      command: 'ping',
+    })
+    const promise2 = this.client.connection.request({
+      id: 'test',
+      command: 'ping',
+    })
+    await assertRejects(
+      Promise.all([promise1, promise2]),
+      XrplError,
+      "Response with id 'test' is already pending",
+    )
   })
 })

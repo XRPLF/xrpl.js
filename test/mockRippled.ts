@@ -180,6 +180,16 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
       )
     } else if (request.data.closeServer) {
       conn.close()
+    } else if (request.data.delayedResponseIn) {
+      setTimeout(() => {
+        conn.send(
+          createResponse(request, {
+            status: 'success',
+            type: 'response',
+            result: {},
+          }),
+        )
+      }, request.data.delayedResponseIn)
     }
   }
 
