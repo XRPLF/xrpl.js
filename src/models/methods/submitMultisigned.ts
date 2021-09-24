@@ -14,6 +14,6 @@ export interface SubmitMultisignedResponse extends BaseResponse {
     engine_result_code: number
     engine_result_message: string
     tx_blob: string
-    tx_json: Transaction
+    tx_json: Transaction & { hash?: string }
   }
 }
