@@ -14,8 +14,8 @@ export interface TxRequest extends BaseRequest {
 export interface TxResponse extends BaseResponse {
   result: {
     hash: string
-    ledger_index: number
-    meta: TransactionMetadata | string
+    ledger_index?: number
+    meta?: TransactionMetadata | string
     validated?: boolean
   } & Transaction
   searched_all?: boolean
