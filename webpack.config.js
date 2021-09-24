@@ -58,6 +58,7 @@ function webpackForTest(testFileName) {
   }
 
   const test = {
+    mode: 'production',
     cache: true,
     externals: [
       {
