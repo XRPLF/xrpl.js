@@ -14,7 +14,7 @@ export interface SubmitResponse extends BaseResponse {
     engine_result_code: number
     engine_result_message: string
     tx_blob: string
-    tx_json: Transaction
+    tx_json: Transaction & { hash?: string }
     accepted: boolean
     account_sequence_available: number
     account_sequence_next: number

@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/member-ordering -- Okay for Client so that client methods can be near the bottom */
-/* eslint-disable max-lines -- This might not be necessary later, but this file needs to be big right now */
+/* eslint-disable @typescript-eslint/member-ordering -- TODO: remove when instance methods aren't members */
+/* eslint-disable max-lines -- Client is a large file w/ lots of imports/exports */
 import * as assert from 'assert'
 import { EventEmitter } from 'events'
 
