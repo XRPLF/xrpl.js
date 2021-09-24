@@ -41,7 +41,7 @@ function isPartialPayment(
   if (tx == null || metadata == null || tx.TransactionType !== 'Payment') {
     return false
   }
-∏
+
   let meta = metadata
   if (typeof meta === 'string') {
     if (meta === 'unavailable') {
