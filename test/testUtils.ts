@@ -58,7 +58,7 @@ export function assertResultMatch(
  * @param message - Expected error message/substring of the error message.
  */
 export async function assertRejects(
-  promise: PromiseLike<Record<string, unknown>>,
+  promise: PromiseLike<any>,
   instanceOf: any,
   message?: string | RegExp,
 ): Promise<void> {
@@ -72,7 +72,7 @@ export async function assertRejects(
 
     assert(error instanceof instanceOf, error.message)
     if (typeof message === 'string') {
-      assert.strictEqual(error.message, message)
+      assert.strictEqual(error.message, message, 'Messages do not match')
     } else if (message instanceof RegExp) {
       assert(message.test(error.message))
     }
