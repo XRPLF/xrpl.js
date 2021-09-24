@@ -199,12 +199,7 @@ async function setLatestValidatedLedgerSequence(
   client: Client,
   tx: Transaction,
 ): Promise<void> {
-  const request: LedgerRequest = {
-    command: 'ledger',
-    ledger_index: 'validated',
-  }
-  const data = await client.request(request)
-  const ledgerSequence = data.result.ledger_index
+  const ledgerSequence = await client.getLedgerIndex()
   // eslint-disable-next-line no-param-reassign -- param reassign is safe
   tx.LastLedgerSequence = ledgerSequence + LEDGER_OFFSET
 }
