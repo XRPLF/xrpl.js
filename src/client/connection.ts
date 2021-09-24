@@ -1,4 +1,4 @@
-/* eslint-disable max-lines -- Connection is a big class */
+/* eslint-disable max-lines -- Connection is a large file w/ lots of imports/exports */
 import { EventEmitter } from 'events'
 import { Agent } from 'http'
 
@@ -304,7 +304,7 @@ export class Connection extends EventEmitter {
   public async reconnect(): Promise<void> {
     // NOTE: We currently have a "reconnecting" event, but that only triggers
     // through an unexpected connection retry logic.
-    // See: https://github.com/ripple/ripple-lib/pull/1101#issuecomment-565360423
+    // See: https://github.com/XRPLF/xrpl.js/pull/1101#issuecomment-565360423
     this.emit('reconnect')
     await this.disconnect()
     await this.connect()

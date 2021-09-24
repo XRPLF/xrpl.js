@@ -1,4 +1,9 @@
-import { ResponseFormatError, RippledError, TimeoutError } from '../errors'
+import {
+  ResponseFormatError,
+  RippledError,
+  TimeoutError,
+  XrplError,
+} from '../errors'
 import { Response } from '../models/methods'
 import { BaseRequest, ErrorResponse } from '../models/methods/baseMethod'
 
@@ -77,6 +82,7 @@ export default class RequestManager {
   public rejectAll(error: Error): void {
     this.promisesAwaitingResponse.forEach((_promise, id, _map) => {
       this.reject(id, error)
+      this.deletePromise(id)
     })
   }
 
@@ -88,13 +94,19 @@ export default class RequestManager {
    * @param request - Request to create.
    * @param timeout - Timeout length to catch hung responses.
    * @returns Request ID, new request form, and the promise for resolving the request.
+   * @throws XrplError if request with the same ID is already pending.
    */
   public createRequest<T extends BaseRequest>(
     request: T,
     timeout: number,
   ): [string | number, string, Promise<Response>] {
-    const newId = request.id ? request.id : this.nextId
-    this.nextId += 1
+    let newId: string | number
+    if (request.id == null) {
+      newId = this.nextId
+      this.nextId += 1
+    } else {
+      newId = request.id
+    }
     const newRequest = JSON.stringify({ ...request, id: newId })
     const timer = setTimeout(
       () => this.reject(newId, new TimeoutError()),
@@ -105,6 +117,9 @@ export default class RequestManager {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Reason above.
     if (timer.unref) {
       timer.unref()
+    }
+    if (this.promisesAwaitingResponse.has(newId)) {
+      throw new XrplError(`Response with id '${newId}' is already pending`)
     }
     const newPromise = new Promise<Response>(
       (resolve: (value: Response | PromiseLike<Response>) => void, reject) => {
@@ -125,8 +140,7 @@ export default class RequestManager {
   public handleResponse(response: Partial<Response | ErrorResponse>): void {
     if (
       response.id == null ||
-      !Number.isInteger(response.id) ||
-      response.id < 0
+      !(typeof response.id === 'string' || typeof response.id === 'number')
     ) {
       throw new ResponseFormatError('valid id not found in response', response)
     }
@@ -165,7 +179,6 @@ export default class RequestManager {
    * @param id - ID of the request.
    */
   private deletePromise(id: string | number): void {
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Needs to delete promise after request has been fulfilled.
-    delete this.promisesAwaitingResponse[id]
+    this.promisesAwaitingResponse.delete(id)
   }
 }

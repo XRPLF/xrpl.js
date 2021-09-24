@@ -51,6 +51,7 @@ async function submitSignedTransaction(
   const request: SubmitRequest = {
     command: 'submit',
     tx_blob: signedTxEncoded,
+    fail_hard: isAccountDelete(signedTransaction),
   }
   return this.request(request)
 }
@@ -61,6 +62,11 @@ function isSigned(transaction: Transaction | string): boolean {
     typeof tx !== 'string' &&
     (tx.SigningPubKey != null || tx.TxnSignature != null)
   )
+}
+
+function isAccountDelete(transaction: Transaction | string): boolean {
+  const tx = typeof transaction === 'string' ? decode(transaction) : transaction
+  return tx.TransactionType === 'AccountDelete'
 }
 
 export { submitTransaction, submitSignedTransaction }

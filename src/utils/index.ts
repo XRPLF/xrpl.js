@@ -32,7 +32,12 @@ import {
   computePaymentChannelHash,
 } from './hashes'
 import signPaymentChannelClaim from './signPaymentChannelClaim'
-import { rippleTimeToISOTime, ISOTimeToRippleTime } from './timeConversion'
+import {
+  rippleTimeToISOTime,
+  ISOTimeToRippleTime,
+  rippleTimeToUnixTime,
+  unixTimeToRippleTime,
+} from './timeConversion'
 import verifyPaymentChannelClaim from './verifyPaymentChannelClaim'
 import { xrpToDrops, dropsToXrp } from './xrpConversion'
 
@@ -86,6 +91,8 @@ export {
   removeUndefined,
   rippleTimeToISOTime,
   ISOTimeToRippleTime,
+  rippleTimeToUnixTime,
+  unixTimeToRippleTime,
   isValidSecret,
   computeSignedTransactionHash,
   computeBinaryTransactionSigningHash,

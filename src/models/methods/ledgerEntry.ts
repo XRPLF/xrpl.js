@@ -65,8 +65,9 @@ export interface LedgerEntryRequest extends BaseRequest {
 export interface LedgerEntryResponse extends BaseResponse {
   result: {
     index: string
-    ledger_index: number
+    ledger_current_index: number
     node?: LedgerEntry
     node_binary?: string
+    validated?: boolean
   }
 }

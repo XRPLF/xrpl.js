@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function -- Needs to process orderbooks. */
 import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 
@@ -53,7 +54,7 @@ async function getOrderbook(
     command: 'book_offers',
     taker_pays: takerPays,
     taker_gets: takerGets,
-    ledger_index: options.ledger_index ?? 'validated',
+    ledger_index: options.ledger_index,
     ledger_hash: options.ledger_hash,
     limit: options.limit ?? DEFAULT_LIMIT,
     taker: options.taker,
@@ -73,12 +74,8 @@ async function getOrderbook(
     (reverseOfferResult) => reverseOfferResult.result.offers,
   )
 
-  // Sort the orders
-  // for both buys and sells, lowest quality is closest to mid-market
-  // we sort the orders so that earlier orders are closer to mid-market
-
   const orders = [...directOffers, ...reverseOffers]
-  // separate out the orders amongst buy and sell
+  // separate out the buy and sell orders
   const buy: BookOffer[] = []
   const sell: BookOffer[] = []
   orders.forEach((order) => {
@@ -89,7 +86,13 @@ async function getOrderbook(
       sell.push(order)
     }
   })
-  return { buy: sortOffers(buy), sell: sortOffers(sell) }
+  // Sort the orders
+  // for both buys and sells, lowest quality is closest to mid-market
+  // we sort the orders so that earlier orders are closer to mid-market
+  return {
+    buy: sortOffers(buy).slice(0, options.limit),
+    sell: sortOffers(sell).slice(0, options.limit),
+  }
 }
 
 export default getOrderbook

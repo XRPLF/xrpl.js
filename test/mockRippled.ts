@@ -66,7 +66,7 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
           throw new Error(`Request has no id: ${requestJSON}`)
         }
         if (request.command == null) {
-          throw new Error(`Request has no id: ${requestJSON}`)
+          throw new Error(`Request has no command: ${requestJSON}`)
         }
         if (request.command === 'ping') {
           ping(conn, request)
@@ -180,6 +180,16 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
       )
     } else if (request.data.closeServer) {
       conn.close()
+    } else if (request.data.delayedResponseIn) {
+      setTimeout(() => {
+        conn.send(
+          createResponse(request, {
+            status: 'success',
+            type: 'response',
+            result: {},
+          }),
+        )
+      }, request.data.delayedResponseIn)
     }
   }
 
