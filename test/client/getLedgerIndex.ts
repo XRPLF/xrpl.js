@@ -9,7 +9,7 @@ describe('client.getLedgerIndex', function () {
 
   it('getLedgerIndex', async function () {
     this.mockRippled.addResponse('ledger', rippled.ledger.normal)
-    const fee = await this.client.getLedgerIndex()
-    assert.strictEqual(fee, 9038214)
+    const ledgerIndex = await this.client.getLedgerIndex()
+    assert.strictEqual(ledgerIndex, 9038214)
   })
 })
