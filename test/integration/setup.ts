@@ -16,9 +16,6 @@ export async function suiteClientSetup(this: Mocha.Context): Promise<void> {
   // two times to give time to server to send `ledgerClosed` event
   // so getLedgerVersion will return right value
   await ledgerAccept(this.client)
-  const response = await this.client.getLedgerIndex()
-  const ledgerVersion = response.result.ledger_index
-  this.startLedgerVersion = ledgerVersion
   await teardownClient.bind(this)()
 }
 
