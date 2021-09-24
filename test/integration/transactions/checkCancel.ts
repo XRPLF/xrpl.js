@@ -3,6 +3,7 @@ import _ from 'lodash'
 
 import { CheckCreate } from 'xrpl-local'
 
+import { CheckCancel } from '../../../src'
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
@@ -10,7 +11,7 @@ import { generateFundedWallet, testTransaction } from '../utils'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('CheckCreate', function () {
+describe('CheckCancel', function () {
   this.timeout(TIMEOUT)
 
   before(suiteClientSetup)
@@ -19,16 +20,38 @@ describe('CheckCreate', function () {
 
   it('base', async function () {
     const wallet2 = await generateFundedWallet(this.client)
-    const tx: CheckCreate = {
+    const setupTx: CheckCreate = {
       TransactionType: 'CheckCreate',
       Account: this.wallet.getClassicAddress(),
       Destination: wallet2.getClassicAddress(),
       SendMax: '50',
     }
 
+    await testTransaction(this.client, setupTx, this.wallet)
+
+    // get check ID
+    const response1 = await this.client.request({
+      command: 'account_objects',
+      account: this.wallet.getClassicAddress(),
+      type: 'check',
+    })
+    assert.lengthOf(
+      response1.result.account_objects,
+      1,
+      'Should be exactly one check on the ledger',
+    )
+    const checkId = response1.result.account_objects[0].index
+
+    // actual test - cancel the check
+    const tx: CheckCancel = {
+      TransactionType: 'CheckCancel',
+      Account: this.wallet.getClassicAddress(),
+      CheckID: checkId,
+    }
+
     await testTransaction(this.client, tx, this.wallet)
 
-    // confirm that the check actually went through
+    // confirm that the check no longer exists
     const accountOffersResponse = await this.client.request({
       command: 'account_objects',
       account: this.wallet.getClassicAddress(),
@@ -36,8 +59,8 @@ describe('CheckCreate', function () {
     })
     assert.lengthOf(
       accountOffersResponse.result.account_objects,
-      1,
-      'Should be exactly one check on the ledger',
+      0,
+      'Should be no checks on the ledger',
     )
   })
 })
