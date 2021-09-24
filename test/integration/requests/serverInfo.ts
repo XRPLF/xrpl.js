@@ -22,7 +22,7 @@ describe('server_info', function () {
     }
     const response = await this.client.request(request)
     const expected = {
-      id: 5,
+      id: 0,
       result: {
         info: {
           build_version: '1.7.3',
@@ -30,8 +30,22 @@ describe('server_info', function () {
           hostid: '44578fe64241',
           io_latency_ms: 1,
           jq_trans_overflow: '0',
-          last_close: [Object],
-          load: [Object],
+          last_close: { converge_time_s: 0.1, proposers: 0 },
+          load: {
+            job_types: [
+              {
+                in_progress: 1,
+                job_type: 'clientCommand',
+                peak_time: 4,
+                per_second: 9,
+              },
+              { job_type: 'updatePaths', per_second: 1 },
+              { job_type: 'advanceLedger', per_second: 1 },
+              { job_type: 'pathFind', per_second: 1 },
+              { job_type: 'WriteNode', per_second: 17 },
+            ],
+            threads: 1,
+          },
           load_factor: 1,
           peer_disconnects: '0',
           peer_disconnects_resources: '0',
@@ -40,12 +54,29 @@ describe('server_info', function () {
           pubkey_validator: 'none',
           server_state: 'full',
           server_state_duration_us: '8752395105',
-          state_accounting: [Object],
+          state_accounting: {
+            connected: { duration_us: '0', transitions: 0 },
+            disconnected: { duration_us: '41860', transitions: 1 },
+            full: { duration_us: '20723121268', transitions: 1 },
+            syncing: { duration_us: '0', transitions: 0 },
+            tracking: { duration_us: '0', transitions: 0 },
+          },
           time: '2021-Sep-23 22:56:55.320858 UTC',
           uptime: 8752,
-          validated_ledger: [Object],
+          validated_ledger: {
+            age: 0,
+            base_fee_xrp: 0.00001,
+            hash: '532175EC25CF34081D7F83584F37DAB70035A422CBE94352BEDA8EC123CB8F60',
+            reserve_base_xrp: 20,
+            reserve_inc_xrp: 5,
+            seq: 1906,
+          },
           validation_quorum: 0,
-          validator_list: [Object],
+          validator_list: {
+            count: 0,
+            expiration: 'unknown',
+            status: 'unknown',
+          },
         },
       },
       status: 'success',
@@ -53,48 +84,26 @@ describe('server_info', function () {
     }
     assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
-    assert.equal(
-      _.every(
-        Object.keys(expected.result.info),
-        // eslint-disable-next-line @typescript-eslint/unbound-method -- has verifies if the object actually has the key.
-        _.partial(_.has, response.result.info),
-      ),
-      true,
-    )
 
-    // types
-    for (const key of [
-      'io_latency_ms',
-      'load_factor',
-      'peers',
+    const removeKeys = [
+      'hash',
+      'time',
       'uptime',
-      'validation_quorum',
-    ]) {
-      assert.equal(typeof response.result.info[key], 'number')
-    }
-
-    const stringKeys = [
-      'build_version',
+      'seq',
       'complete_ledgers',
       'hostid',
-      'jq_trans_overflow',
-      'peer_disconnects',
-      'peer_disconnects_resources',
+      'load',
+      'state_accounting',
       'pubkey_node',
-      'pubkey_validator',
-      'server_state',
       'server_state_duration_us',
-      'time',
+      'validated_ledger.hash',
+      'validated_ledger.seq',
     ]
-    for (const key of stringKeys) {
-      assert.equal(typeof response.result.info[key], 'string')
-    }
+    assert.deepEqual(
+      _.omit(response.result.info, removeKeys),
+      _.omit(expected.result.info, removeKeys),
+    )
 
-    // objects
-    // last_close
-    for (const key of Object.keys(response.result.info.last_close)) {
-      assert.equal(typeof response.result.info.last_close[key], 'number')
-    }
     // load
     assert.equal(typeof response.result.info.load.threads, 'number')
     for (const obj of response.result.info.load.job_types) {
@@ -112,19 +121,5 @@ describe('server_info', function () {
         'number',
       )
     })
-    // validated_ledger
-    assert.equal(typeof response.result.info.validated_ledger.hash, 'string')
-    for (const key of Object.keys(
-      _.omit(response.result.info.validated_ledger, 'hash'),
-    )) {
-      assert.equal(typeof response.result.info.validated_ledger[key], 'number')
-    }
-    // validator_list
-    assert.equal(typeof response.result.info.validator_list.count, 'number')
-    assert.equal(
-      typeof response.result.info.validator_list.expiration,
-      'string',
-    )
-    assert.equal(typeof response.result.info.validator_list.status, 'string')
   })
 })

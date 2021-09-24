@@ -22,7 +22,7 @@ describe('fee', function () {
     }
     const response = await this.client.request(request)
     const expected = {
-      id: 5,
+      id: 0,
       result: {
         current_ledger_size: '0',
         current_queue_size: '0',
@@ -48,36 +48,9 @@ describe('fee', function () {
     assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
 
-    assert.equal(typeof response.result.current_ledger_size, 'string')
-    assert.equal(typeof response.result.current_queue_size, 'string')
-    assert.equal(typeof response.result.max_queue_size, 'string')
-    assert.equal(typeof response.result.expected_ledger_size, 'string')
-    assert.equal(typeof response.result.ledger_current_index, 'number')
-
-    // drops
-    assert.equal(
-      _.every(
-        Object.keys(expected.result.drops),
-        // eslint-disable-next-line @typescript-eslint/unbound-method -- need has
-        _.partial(_.has, response.result.drops),
-      ),
-      true,
+    assert.deepEqual(
+      _.omit(response.result, ['ledger_current_index']),
+      _.omit(expected.result, ['ledger_current_index']),
     )
-    for (const key of Object.keys(response.result.drops)) {
-      assert.equal(typeof response.result.drops[key], 'string')
-    }
-
-    // levels
-    assert.equal(
-      _.every(
-        Object.keys(expected.result.levels),
-        // eslint-disable-next-line @typescript-eslint/unbound-method -- need has
-        _.partial(_.has, response.result.levels),
-      ),
-      true,
-    )
-    for (const key of Object.keys(response.result.levels)) {
-      assert.equal(typeof response.result.levels[key], 'string')
-    }
   })
 })

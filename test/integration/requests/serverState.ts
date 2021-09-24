@@ -22,14 +22,17 @@ describe('server_state', function () {
     }
     const response = await this.client.request(request)
     const expected = {
-      id: 5,
+      id: 0,
       result: {
         state: {
           build_version: '1.7.3',
           complete_ledgers: '2563-2932',
           io_latency_ms: 1,
           jq_trans_overflow: '0',
-          last_close: [Object],
+          last_close: {
+            converge_time: 100,
+            proposers: 0,
+          },
           load: [Object],
           load_base: 256,
           load_factor: 256,
@@ -47,7 +50,14 @@ describe('server_state', function () {
           state_accounting: [Object],
           time: '2021-Sep-23 22:56:55.413151 UTC',
           uptime: 8752,
-          validated_ledger: [Object],
+          validated_ledger: {
+            base_fee: 10,
+            close_time: 685829741,
+            hash: 'B98AABCE40A54DF654C86E56088AD7D46BBA8B8E93AD3FAC2426FEFF847F7937',
+            reserve_base: 20000000,
+            reserve_inc: 5000000,
+            seq: 2294,
+          },
           validation_quorum: 0,
           validator_list_expires: 0,
         },
@@ -57,53 +67,23 @@ describe('server_state', function () {
     }
     assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
-    assert.equal(
-      _.every(
-        Object.keys(expected.result.state),
-        // eslint-disable-next-line @typescript-eslint/unbound-method -- has verifies if the object actually has the key.
-        _.partial(_.has, response.result.state),
-      ),
-      true,
+    const removeKeys = [
+      'complete_ledgers',
+      'load',
+      'state_accounting',
+      'pubkey_node',
+      'time',
+      'uptime',
+      'server_state_duration_us',
+      'validated_ledger.hash',
+      'validated_ledger.seq',
+      'validated_ledger.close_time',
+    ]
+    assert.deepEqual(
+      _.omit(response.result.state, removeKeys),
+      _.omit(expected.result.state, removeKeys),
     )
 
-    // types
-    const numberKeys = [
-      'io_latency_ms',
-      'load_base',
-      'load_factor',
-      'load_factor_fee_escalation',
-      'load_factor_fee_queue',
-      'load_factor_fee_reference',
-      'load_factor_server',
-      'peers',
-      'uptime',
-      'validation_quorum',
-      'validator_list_expires',
-    ]
-    for (const key of numberKeys) {
-      assert.equal(typeof response.result.state[key], 'number')
-    }
-    const stringKeys = [
-      'build_version',
-      'complete_ledgers',
-      'jq_trans_overflow',
-      'peer_disconnects',
-      'peer_disconnects_resources',
-      'pubkey_node',
-      'pubkey_validator',
-      'server_state',
-      'server_state_duration_us',
-      'time',
-    ]
-    for (const key of stringKeys) {
-      assert.equal(typeof response.result.state[key], 'string')
-    }
-
-    // objects
-    // last_close
-    for (const key of Object.keys(response.result.state.last_close)) {
-      assert.equal(typeof response.result.state.last_close[key], 'number')
-    }
     // load
     assert.equal(typeof response.result.state.load.threads, 'number')
     for (const obj of response.result.state.load.job_types) {
@@ -121,12 +101,5 @@ describe('server_state', function () {
         'number',
       )
     })
-    // validated_ledger
-    assert.equal(typeof response.result.state.validated_ledger.hash, 'string')
-    for (const key of Object.keys(
-      _.omit(response.result.state.validated_ledger, 'hash'),
-    )) {
-      assert.equal(typeof response.result.state.validated_ledger[key], 'number')
-    }
   })
 })
