@@ -28,16 +28,16 @@ const MAX_ATTEMPTS = 20
 /**
  * Generates a random wallet with some amount of XRP (usually 1000 XRP).
  *
- * @param client - Client.
+ * @param this - Client.
  * @param wallet - An existing XRPL Wallet to fund, if undefined, a new Wallet will be created.
  * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP.
  * @throws When either Client isn't connected or unable to fund wallet address.
  */
 async function generateFaucetWallet(
-  client: Client,
+  this: Client,
   wallet?: Wallet,
 ): Promise<Wallet | undefined> {
-  if (!client.isConnected()) {
+  if (!this.isConnected()) {
     throw new RippledError('Client not connected, cannot call faucet')
   }
 
@@ -55,7 +55,7 @@ async function generateFaucetWallet(
   )
   // Retrieve the existing account balance
   const addressToFundBalance = await getAddressXrpBalance(
-    client,
+    this,
     fundWallet.classicAddress,
   )
 
@@ -66,9 +66,9 @@ async function generateFaucetWallet(
       : 0
 
   // Options to pass to https.request
-  const options = getOptions(client, postBody)
+  const options = getOptions(this, postBody)
 
-  return returnPromise(options, client, startingBalance, fundWallet, postBody)
+  return returnPromise(options, this, startingBalance, fundWallet, postBody)
 }
 
 // eslint-disable-next-line max-params -- Helper function created for organizational purposes
@@ -222,7 +222,7 @@ async function getAddressXrpBalance(
   } catch (err) {
     if (err instanceof Error) {
       throw new XRPLFaucetError(
-        `Unable to retrieve ${address} balance. Error: ${err.message}`,
+        `Unable to retrieve balance of ${address}. Error: ${err.message}`,
       )
     }
     throw err
