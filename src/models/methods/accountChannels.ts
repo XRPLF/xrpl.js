@@ -23,7 +23,7 @@ export interface AccountChannelsRequest extends BaseRequest {
   destination_account?: string
   ledger_hash?: string
   ledger_index?: LedgerIndex
-  limit: number
+  limit?: number
   marker?: unknown
 }
 
