@@ -25,7 +25,6 @@ describe('noripple_check', function () {
       transactions: true,
     }
     const response = await this.client.request(request)
-    console.log(response.result)
     const expected = {
       id: 0,
       result: {

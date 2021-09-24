@@ -22,79 +22,71 @@ describe('account_tx', function () {
       account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
       ledger_index: 'validated',
     }
-    const response = await this.client.requestAll(request)
-    const expected = [
-      {
-        result: {
-          account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
-          limit: 400,
-          transactions: [
-            {
-              tx: {
-                Account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
-                Amount: '400000000',
-                Destination: 'rHmrx1NK3vJ2zLzaKxxCeCZjwtiKvBMJJ8',
-                Fee: '12',
-                Flags: 0,
-                LastLedgerSequence: 1753,
-                Sequence: 843,
-                SigningPubKey:
-                  '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
-                TransactionType: 'Payment',
-                TxnSignature:
-                  '30440220693D244BC13967E3DA67BDC974096784ED03DD4ACE6F36645E5176988452AFCF02200F8AB172432913899F27EC5523829AEDAD00CC2445690400E294EDF652A85945',
-                date: 685747005,
-                hash: '2E68BC15813B4A836FAC4D80E42E6FDA6410E99AB973937DEA5E6C2E9A116BAB',
-                inLedger: 1734,
-                ledger_index: 1734,
-              },
+    const response = await this.client.request(request)
+    const expected = {
+      result: {
+        account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        limit: 400,
+        transactions: [
+          {
+            tx: {
+              Account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+              Amount: '400000000',
+              Destination: 'rHmrx1NK3vJ2zLzaKxxCeCZjwtiKvBMJJ8',
+              Fee: '12',
+              Flags: 0,
+              LastLedgerSequence: 1753,
+              Sequence: 843,
+              SigningPubKey:
+                '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
+              TransactionType: 'Payment',
+              TxnSignature:
+                '30440220693D244BC13967E3DA67BDC974096784ED03DD4ACE6F36645E5176988452AFCF02200F8AB172432913899F27EC5523829AEDAD00CC2445690400E294EDF652A85945',
+              date: 685747005,
+              hash: '2E68BC15813B4A836FAC4D80E42E6FDA6410E99AB973937DEA5E6C2E9A116BAB',
+              inLedger: 1734,
+              ledger_index: 1734,
             },
-          ],
-        },
-        status: 'success',
-        type: 'response',
+          },
+        ],
       },
-    ]
-    assert.equal(response[0].status, expected[0].status)
-    assert.equal(response[0].type, expected[0].type)
-    assert.equal(response[0].result.account, expected[0].result.account)
+      status: 'success',
+      type: 'response',
+    }
+    assert.equal(response.status, expected.status)
+    assert.equal(response.type, expected.type)
+    assert.equal(response.result.account, expected.result.account)
     assert.equal(
-      response[0].result.transactions[0].meta.TransactionResult,
+      response.result.transactions[0].meta.TransactionResult,
       'tesSUCCESS',
     )
     assert.equal(
-      typeof response[0].result.transactions[0].tx.Destination,
+      typeof response.result.transactions[0].tx.Destination,
       'string',
     )
     assert.equal(
-      typeof response[0].result.transactions[0].tx.LastLedgerSequence,
+      typeof response.result.transactions[0].tx.LastLedgerSequence,
       'number',
     )
+    assert.equal(typeof response.result.transactions[0].tx.Sequence, 'number')
     assert.equal(
-      typeof response[0].result.transactions[0].tx.Sequence,
-      'number',
-    )
-    assert.equal(
-      typeof response[0].result.transactions[0].tx.SigningPubKey,
+      typeof response.result.transactions[0].tx.SigningPubKey,
       'string',
     )
     assert.equal(
-      typeof response[0].result.transactions[0].tx.TxnSignature,
+      typeof response.result.transactions[0].tx.TxnSignature,
       'string',
     )
-    assert.equal(typeof response[0].result.transactions[0].tx.Fee, 'string')
-    assert.equal(typeof response[0].result.transactions[0].tx.hash, 'string')
+    assert.equal(typeof response.result.transactions[0].tx.Fee, 'string')
+    assert.equal(typeof response.result.transactions[0].tx.hash, 'string')
+    assert.equal(typeof response.result.transactions[0].tx.inLedger, 'number')
     assert.equal(
-      typeof response[0].result.transactions[0].tx.inLedger,
-      'number',
-    )
-    assert.equal(
-      typeof response[0].result.transactions[0].tx.ledger_index,
+      typeof response.result.transactions[0].tx.ledger_index,
       'number',
     )
 
-    const responseTx = response[0].result.transactions[0].tx
-    const expectedTx = expected[0].result.transactions[0].tx
+    const responseTx = response.result.transactions[0].tx
+    const expectedTx = expected.result.transactions[0].tx
     assert.deepEqual(
       [
         responseTx.Flags,
