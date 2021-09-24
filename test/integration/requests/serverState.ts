@@ -67,6 +67,16 @@ describe('server_state', function () {
     }
     assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
+
+    assert.equal(typeof response.result.state.complete_ledgers, 'string')
+    assert.equal(typeof response.result.state.pubkey_node, 'string')
+    assert.equal(typeof response.result.state.time, 'string')
+    assert.equal(typeof response.result.state.uptime, 'number')
+    assert.equal(
+      typeof response.result.state.server_state_duration_us,
+      'string',
+    )
+
     const removeKeys = [
       'complete_ledgers',
       'load',

@@ -85,11 +85,15 @@ describe('server_info', function () {
     assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
 
+    assert.equal(typeof response.result.info.time, 'string')
+    assert.equal(typeof response.result.info.uptime, 'number')
+    assert.equal(typeof response.result.info.complete_ledgers, 'string')
+    assert.equal(typeof response.result.info.hostid, 'string')
+    assert.equal(typeof response.result.info.pubkey_node, 'string')
+    assert.equal(typeof response.result.info.server_state_duration_us, 'string')
     const removeKeys = [
-      'hash',
       'time',
       'uptime',
-      'seq',
       'complete_ledgers',
       'hostid',
       'load',

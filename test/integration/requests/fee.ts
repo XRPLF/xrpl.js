@@ -47,7 +47,7 @@ describe('fee', function () {
     }
     assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
-
+    assert.equal(typeof response.result.ledger_current_index, 'number')
     assert.deepEqual(
       _.omit(response.result, ['ledger_current_index']),
       _.omit(expected.result, ['ledger_current_index']),
