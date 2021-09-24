@@ -11,6 +11,7 @@ export * from './transactions/depositPreauth'
 export * from './transactions/paymentChannelCreate'
 export * from './transactions/paymentChannelClaim'
 export * from './transactions/paymentChannelFund'
+export * from './transactions/trustSet'
 
 export * from './requests/accountChannels'
 export * from './requests/accountCurrencies'
