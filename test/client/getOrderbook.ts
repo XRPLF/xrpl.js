@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 
-import { BookOffersRequest } from '../../src'
+import { BookOffersRequest, ValidationError } from '../../src'
 import { OfferLedgerFlags } from '../../src/models/ledger/offer'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
@@ -101,7 +101,7 @@ describe('client.getOrderbook', function () {
           invalid: 'options',
         },
       ),
-      this.client.errors.ValidationError,
+      ValidationError,
     )
   })
 

@@ -13,15 +13,6 @@ export async function suiteClientSetup(this: Mocha.Context): Promise<void> {
   await setupClient.bind(this)(serverUrl)
   await ledgerAccept(this.client)
   this.newWallet = generateXAddress({ includeClassicAddress: true })
-  // two times to give time to server to send `ledgerClosed` event
-  // so getLedgerVersion will return right value
-  await ledgerAccept(this.client)
-  const response = await this.client.request({
-    command: 'ledger',
-    ledger_index: 'validated',
-  })
-  const ledgerVersion = response.result.ledger_index
-  this.startLedgerVersion = ledgerVersion
   await teardownClient.bind(this)()
 }
 

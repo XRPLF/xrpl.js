@@ -8,7 +8,6 @@ const BASE_10 = 10
 /**
  * Calculates the current transaction fee for the ledger.
  * Note: This is a public API that can be called directly.
- * This is not used by the `prepare*` methods. See `src/transaction/utils.ts`.
  *
  * @param this - The Client used to connect to the ledger.
  * @param cushion - The fee cushion to use.

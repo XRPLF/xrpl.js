@@ -88,6 +88,7 @@ import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 import autofill from '../sugar/autofill'
 import getBalances from '../sugar/balances'
 import getFee from '../sugar/fee'
+import getLedgerIndex from '../sugar/ledgerIndex'
 import getOrderbook from '../sugar/orderbook'
 import { submitTransaction, submitSignedTransaction } from '../sugar/submit'
 import { ensureClassicAddress } from '../sugar/utils'
@@ -522,23 +523,22 @@ class Client extends EventEmitter {
     return this.connection.isConnected()
   }
 
+  // syntactic sugar
+
   public autofill = autofill
-
-  public getFee = getFee
-
   // @deprecated Use autofill instead
   public prepareTransaction = autofill
 
-  public submitTransaction = submitTransaction
+  public getFee = getFee
+  public getLedgerIndex = getLedgerIndex
 
+  public submitTransaction = submitTransaction
   public submitSignedTransaction = submitSignedTransaction
 
   public getBalances = getBalances
   public getOrderbook = getOrderbook
 
   public generateFaucetWallet = generateFaucetWallet
-
-  public errors = errors
 }
 
 export { Client }
