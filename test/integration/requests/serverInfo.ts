@@ -67,8 +67,8 @@ describe('server_info', function () {
             age: 0,
             base_fee_xrp: 0.00001,
             hash: '532175EC25CF34081D7F83584F37DAB70035A422CBE94352BEDA8EC123CB8F60',
-            reserve_base_xrp: 20,
-            reserve_inc_xrp: 5,
+            reserve_base_xrp: 200,
+            reserve_inc_xrp: 50,
             seq: 1906,
           },
           validation_quorum: 0,
@@ -96,8 +96,7 @@ describe('server_info', function () {
       'state_accounting',
       'pubkey_node',
       'server_state_duration_us',
-      'validated_ledger.hash',
-      'validated_ledger.seq',
+      'validated_ledger',
     ]
     assert.deepEqual(
       _.omit(response.result.info, removeKeys),
@@ -121,5 +120,13 @@ describe('server_info', function () {
         'number',
       )
     })
+
+    // validated_ledger
+    assert.equal(typeof response.result.info.validated_ledger.hash, 'string')
+    for (const key of Object.keys(
+      _.omit(response.result.info.validated_ledger, 'hash'),
+    )) {
+      assert.equal(typeof response.result.info.validated_ledger[key], 'number')
+    }
   })
 })

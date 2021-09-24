@@ -54,8 +54,8 @@ describe('server_state', function () {
             base_fee: 10,
             close_time: 685829741,
             hash: 'B98AABCE40A54DF654C86E56088AD7D46BBA8B8E93AD3FAC2426FEFF847F7937',
-            reserve_base: 20000000,
-            reserve_inc: 5000000,
+            reserve_base: 200000000,
+            reserve_inc: 50000000,
             seq: 2294,
           },
           validation_quorum: 0,
@@ -75,9 +75,7 @@ describe('server_state', function () {
       'time',
       'uptime',
       'server_state_duration_us',
-      'validated_ledger.hash',
-      'validated_ledger.seq',
-      'validated_ledger.close_time',
+      'validated_ledger',
     ]
     assert.deepEqual(
       _.omit(response.result.state, removeKeys),
@@ -101,5 +99,13 @@ describe('server_state', function () {
         'number',
       )
     })
+
+    // validated_ledger
+    assert.equal(typeof response.result.state.validated_ledger.hash, 'string')
+    for (const key of Object.keys(
+      _.omit(response.result.state.validated_ledger, 'hash'),
+    )) {
+      assert.equal(typeof response.result.state.validated_ledger[key], 'number')
+    }
   })
 })
