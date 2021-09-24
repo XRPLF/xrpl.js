@@ -140,6 +140,17 @@ describe('client.autofill', function () {
       }
       this.mockRippled.addResponse('account_info', rippled.account_info.normal)
       this.mockRippled.addResponse('ledger', rippled.ledger.normal)
+      this.mockRippled.addResponse('server_state', {
+        status: 'success',
+        type: 'response',
+        result: {
+          state: {
+            validated_ledger: {
+              reserve_inc: 2000000,
+            },
+          },
+        },
+      })
       this.mockRippled.addResponse('server_info', rippled.server_info.normal)
       this.mockRippled.addResponse(
         'account_objects',
@@ -147,7 +158,7 @@ describe('client.autofill', function () {
       )
       const txResult = await this.client.autofill(tx)
 
-      assert.strictEqual(txResult.Fee, '5000000')
+      assert.strictEqual(txResult.Fee, '2000000')
     })
 
     it('should autofill Fee of an EscrowFinish transaction with signersCount', async function () {
