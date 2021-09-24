@@ -371,7 +371,7 @@ class Client extends EventEmitter {
     }
     const nextPageRequest = { ...req, marker: resp.result.marker }
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
-    return this.request(nextPageRequest as any) as unknown as U
+    return this.request(nextPageRequest) as unknown as U
   }
 
   public on(

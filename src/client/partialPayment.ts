@@ -1,51 +1,54 @@
 import BigNumber from 'bignumber.js'
 import { decode } from 'ripple-binary-codec'
-import {
+
+import type {
   AccountTxResponse,
   Response,
   TransactionEntryResponse,
   TransactionStream,
   TxResponse,
 } from '..'
-import { Amount } from '../models/common'
+import type { Amount } from '../models/common'
 import { PaymentTransactionFlags, Transaction } from '../models/transactions'
-import TransactionMetadata from '../models/transactions/metadata'
+import type TransactionMetadata from '../models/transactions/metadata'
 import { isFlagEnabled } from '../models/utils'
 
 const WARN_PARTIAL_PAYMENT_CODE = 2001
 
-function amountsEqual(a: Amount, b: Amount): boolean {
-  if (typeof a === 'string' && typeof b === 'string') {
-    return a === b
+function amountsEqual(amt1: Amount, amt2: Amount): boolean {
+  if (typeof amt1 === 'string' && typeof amt2 === 'string') {
+    return amt1 === amt2
   }
 
-  if (typeof a === 'string' || typeof b === 'string') {
+  if (typeof amt1 === 'string' || typeof amt2 === 'string') {
     return false
   }
 
-  const aValue = new BigNumber(a.value)
-  const bValue = new BigNumber(b.value)
+  const aValue = new BigNumber(amt1.value)
+  const bValue = new BigNumber(amt2.value)
 
   return (
-    a.currency === b.currency &&
-    a.issuer === b.issuer &&
+    amt1.currency === amt2.currency &&
+    amt1.issuer === amt2.issuer &&
     aValue.isEqualTo(bValue)
   )
 }
 
 function isPartialPayment(
   tx?: Transaction,
-  meta?: TransactionMetadata | string,
+  metadata?: TransactionMetadata | string,
 ): boolean {
-  if (tx == null || meta == null || tx.TransactionType !== 'Payment') {
+  if (tx == null || metadata == null || tx.TransactionType !== 'Payment') {
     return false
   }
 
+  let meta = metadata
   if (typeof meta === 'string') {
     if (meta === 'unavailable') {
       return false
     }
 
+    /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- binary-codec typing */
     meta = decode(meta) as unknown as TransactionMetadata
   }
 
@@ -83,6 +86,7 @@ function accountTxHasPartialPayment(response: AccountTxResponse): boolean {
 }
 
 function hasPartialPayment(command: string, response: Response): boolean {
+  /* eslint-disable @typescript-eslint/consistent-type-assertions -- Request type is known at runtime from command */
   switch (command) {
     case 'tx':
       return txHasPartialPayment(response as TxResponse)
@@ -93,8 +97,15 @@ function hasPartialPayment(command: string, response: Response): boolean {
     default:
       return false
   }
+  /* eslint-enable @typescript-eslint/consistent-type-assertions */
 }
 
+/**
+ * Checks a response for a partial payment.
+ *
+ * @param command - Command from the request, tells us what response to expect.
+ * @param response - Response to check for a partial payment.
+ */
 export function handlePartialPayment(
   command: string,
   response: Response,
@@ -113,6 +124,11 @@ export function handlePartialPayment(
   }
 }
 
+/**
+ * Check a transaction from a subscription stream for partial payment.
+ *
+ * @param stream - Stream Transaction to check for partial payment,.
+ */
 export function handleStreamPartialPayment(stream: TransactionStream): void {
   if (isPartialPayment(stream.transaction, stream.meta)) {
     const warnings = stream.warnings ?? []
@@ -124,6 +140,7 @@ export function handleStreamPartialPayment(stream: TransactionStream): void {
 
     warnings.push(warning)
 
+    /* eslint-disable-next-line no-param-reassign -- Handles the case where there are no warnings */
     stream.warnings = warnings
   }
 }

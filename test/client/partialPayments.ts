@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- required for formatting transactions */
 import { expect } from 'chai'
 
-import { TransactionStream } from '../../src'
+import type { TransactionStream } from '../../src'
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
 
@@ -52,7 +53,10 @@ describe('client handling of tfPartialPayments', function () {
   })
 
   it('account_tx with IOU tfPartialPayment', async function () {
-    const partial: any = { ...rippled.tx.Payment, result: partialPaymentIOU }
+    const partial = {
+      ...rippled.tx.Payment,
+      result: partialPaymentIOU,
+    }
     const mockResponse = rippled.account_tx.normal
     mockResponse.result.transactions.push({
       tx: partial.result,
@@ -71,7 +75,7 @@ describe('client handling of tfPartialPayments', function () {
   })
 
   it('account_tx with XRP tfPartialPayment', async function () {
-    const partial: any = { ...rippled.tx.Payment, result: partialPaymentXRP }
+    const partial = { ...rippled.tx.Payment, result: partialPaymentXRP }
     const mockResponse = rippled.account_tx.normal
     mockResponse.result.transactions.push({
       tx: partial.result,
