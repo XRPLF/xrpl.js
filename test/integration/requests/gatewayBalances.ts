@@ -19,7 +19,7 @@ describe('gateway_balances', function () {
   it('base', async function () {
     const request: GatewayBalancesRequest = {
       command: 'gateway_balances',
-      account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+      account: this.wallet.getClassicAddress(),
       ledger_index: 'validated',
       strict: true,
     }
@@ -27,7 +27,7 @@ describe('gateway_balances', function () {
     const expected = {
       id: 0,
       result: {
-        account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        account: this.wallet.getClassicAddress(),
         ledger_hash:
           '28D68B351ED58B9819502EF5FC05BA4412A048597E5159E1C226703BDF7C7897',
         ledger_index: 1294,

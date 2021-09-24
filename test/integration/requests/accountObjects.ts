@@ -19,14 +19,14 @@ describe('account_objects', function () {
   it('base', async function () {
     const request: AccountObjectsRequest = {
       command: 'account_objects',
-      account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+      account: this.wallet.getClassicAddress(),
       ledger_index: 'validated',
     }
     const response = await this.client.request(request)
     const expected = {
       id: 0,
       result: {
-        account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        account: this.wallet.getClassicAddress(),
         account_objects: [],
         ledger_hash:
           '28D68B351ED58B9819502EF5FC05BA4412A048597E5159E1C226703BDF7C7897',

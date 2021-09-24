@@ -19,7 +19,7 @@ describe('account_currencies', function () {
   it('base', async function () {
     const request: AccountCurrenciesRequest = {
       command: 'account_currencies',
-      account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+      account: this.wallet.getClassicAddress(),
       strict: true,
       ledger_index: 'validated',
     }

@@ -19,20 +19,20 @@ describe('account_tx', function () {
   it('base', async function () {
     const request: AccountTxRequest = {
       command: 'account_tx',
-      account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+      account: this.wallet.getClassicAddress(),
       ledger_index: 'validated',
     }
     const response = await this.client.request(request)
     const expected = {
       result: {
-        account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        account: this.wallet.getClassicAddress(),
         limit: 400,
         transactions: [
           {
             tx: {
               Account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
               Amount: '400000000',
-              Destination: 'rHmrx1NK3vJ2zLzaKxxCeCZjwtiKvBMJJ8',
+              Destination: this.wallet.getClassicAddress(),
               Fee: '12',
               Flags: 0,
               LastLedgerSequence: 1753,
@@ -59,10 +59,6 @@ describe('account_tx', function () {
     assert.equal(
       response.result.transactions[0].meta.TransactionResult,
       'tesSUCCESS',
-    )
-    assert.equal(
-      typeof response.result.transactions[0].tx.Destination,
-      'string',
     )
     assert.equal(
       typeof response.result.transactions[0].tx.LastLedgerSequence,
@@ -93,12 +89,14 @@ describe('account_tx', function () {
         responseTx.TransactionType,
         responseTx.Account,
         responseTx.Amount,
+        responseTx.Destination,
       ],
       [
         expectedTx.Flags,
         expectedTx.TransactionType,
         expectedTx.Account,
         expectedTx.Amount,
+        expectedTx.Destination,
       ],
     )
   })

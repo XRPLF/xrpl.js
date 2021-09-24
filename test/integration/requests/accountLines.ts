@@ -19,7 +19,7 @@ describe('account_lines', function () {
   it('base', async function () {
     const request: AccountLinesRequest = {
       command: 'account_lines',
-      account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+      account: this.wallet.getClassicAddress(),
       strict: true,
       ledger_index: 'validated',
     }
@@ -27,7 +27,7 @@ describe('account_lines', function () {
     const expected = {
       id: 0,
       result: {
-        account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        account: this.wallet.getClassicAddress(),
         ledger_hash:
           '0C09AAFA88AC1A616058220CF33269788D3985DAA6F2386196D4A7404252BB61',
         ledger_index: 1074,

@@ -19,14 +19,14 @@ describe('account_offers', function () {
   it('base', async function () {
     const request: AccountOffersRequest = {
       command: 'account_offers',
-      account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+      account: this.wallet.getClassicAddress(),
       strict: true,
     }
     const response = await this.client.request(request)
     const expected = {
       id: 0,
       result: {
-        account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        account: this.wallet.getClassicAddress(),
         ledger_current_index: 1443,
         offers: [],
         validated: false,

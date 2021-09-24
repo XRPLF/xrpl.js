@@ -19,14 +19,14 @@ describe('account_channels', function () {
   it('base', async function () {
     const request: AccountChannelsRequest = {
       command: 'account_channels',
-      account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+      account: this.wallet.getClassicAddress(),
       ledger_index: 'validated',
     }
     const response = await this.client.request(request)
     const expected = {
       id: 0,
       result: {
-        account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        account: this.wallet.getClassicAddress(),
         channels: [],
         ledger_hash:
           'C8BFA74A740AA22AD9BD724781589319052398B0C6C817B88D55628E07B7B4A1',

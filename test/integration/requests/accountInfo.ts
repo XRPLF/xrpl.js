@@ -19,7 +19,7 @@ describe('account_info', function () {
   it('base', async function () {
     const request: AccountInfoRequest = {
       command: 'account_info',
-      account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+      account: this.wallet.getClassicAddress(),
       strict: true,
       ledger_index: 'validated',
     }
@@ -28,8 +28,8 @@ describe('account_info', function () {
       id: 0,
       result: {
         account_data: {
-          Account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
-          Balance: '99999887199996616',
+          Account: this.wallet.getClassicAddress(),
+          Balance: '400000000',
           Flags: 0,
           LedgerEntryType: 'AccountRoot',
           OwnerCount: 0,
@@ -38,7 +38,7 @@ describe('account_info', function () {
           PreviousTxnLgrSeq: 582,
           Sequence: 283,
           index:
-            '2B6AC232AA4C4BE41BF49D2459FA4A0347E1B543A4C92FCEE0821C0201E2E9A8',
+            'BD4815E6EB304136E6044F778FB68D4E464CC8DFC59B8F6CC93D90A3709AE194',
         },
         ledger_hash:
           'F0DEEC46A7185BBB535517EE38CF2025973022D5B0532B36407F492521FDB0C6',
@@ -50,11 +50,11 @@ describe('account_info', function () {
     }
     assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
-    assert.equal(typeof response.result.account_data.Balance, 'string')
     assert.equal(response.result.validated, expected.result.validated)
     assert.equal(typeof response.result.ledger_hash, 'string')
     assert.equal(typeof response.result.ledger_index, 'number')
     assert.equal(typeof response.result.account_data.PreviousTxnID, 'string')
+    assert.equal(typeof response.result.account_data.index, 'string')
     assert.equal(
       typeof response.result.account_data.PreviousTxnLgrSeq,
       'number',
@@ -65,13 +65,13 @@ describe('account_info', function () {
         'PreviousTxnID',
         'PreviousTxnLgrSeq',
         'Sequence',
-        'Balance',
+        'index',
       ]),
       _.omit(expected.result.account_data, [
         'PreviousTxnID',
         'PreviousTxnLgrSeq',
         'Sequence',
-        'Balance',
+        'index',
       ]),
     )
   })
