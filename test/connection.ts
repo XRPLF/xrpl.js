@@ -1,3 +1,4 @@
+/* eslint-disable max-statements -- test has a lot of statements */
 import net from 'net'
 
 import { assert } from 'chai'

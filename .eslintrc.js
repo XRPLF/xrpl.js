@@ -71,6 +71,10 @@ module.exports = {
         // We have lots of magic numbers in tests
         '@typescript-eslint/no-magic-numbers': 'off',
 
+        // We have files with a lot of tests
+        'max-lines-per-function': 'off',
+        'max-lines': 'off',
+
         // We need to test things without type guards sometimes
         '@typescript-eslint/no-unsafe-assignment': 'off',
         '@typescript-eslint/no-unsafe-call': 'off',
@@ -116,7 +120,7 @@ module.exports = {
         // Removed this as eslint prevents us from doing this differently
         'import/unambiguous': 'off',
 
-        // Exports in a javascript format
+        // Javascript files have CommonJS exports
         'import/no-unused-modules': 'off',
       },
     },
