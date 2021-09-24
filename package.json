@@ -1,5 +1,5 @@
 {
-  "name": "ripple-lib",
+  "name": "xrpl",
   "version": "1.10.0",
   "license": "ISC",
   "description": "A TypeScript/JavaScript API for interacting with the XRP Ledger in Node.js and the browser",
@@ -90,7 +90,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/ripple/ripple-lib.git"
+    "url": "git@github.com:XRPLF/xrpl.js.git"
   },
   "readmeFilename": "README.md",
   "engines": {
