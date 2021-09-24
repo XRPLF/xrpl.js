@@ -31,5 +31,6 @@ export interface BookOffersResponse extends BaseResponse {
     ledger_index?: number
     ledger_hash?: string
     offers: BookOffer[]
+    validated?: boolean
   }
 }
