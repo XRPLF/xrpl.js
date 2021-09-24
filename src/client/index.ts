@@ -6,6 +6,8 @@ import { EventEmitter } from 'events'
 import { ValidationError, XrplError } from '../errors'
 import * as errors from '../errors'
 import {
+  Request,
+  Response,
   // account methods
   AccountChannelsRequest,
   AccountChannelsResponse,
@@ -96,6 +98,10 @@ import {
   ConnectionUserOptions,
   INTENTIONAL_DISCONNECT_CODE,
 } from './connection'
+import {
+  handlePartialPayment,
+  handleStreamPartialPayment,
+} from './partialPayment'
 
 export interface ClientOptions extends ConnectionUserOptions {
   feeCushion?: number
@@ -209,6 +215,7 @@ class Client extends EventEmitter {
     })
 
     this.connection.on('transaction', (tx) => {
+      handleStreamPartialPayment(tx)
       this.emit('transaction', tx)
     })
 
@@ -295,6 +302,9 @@ class Client extends EventEmitter {
     r: TransactionEntryRequest,
   ): Promise<TransactionEntryResponse>
   public async request(r: TxRequest): Promise<TxResponse>
+  public async request<R extends BaseRequest, T extends BaseResponse>(
+    r: R,
+  ): Promise<T>
   /**
    * Makes a request to the client with the given command and
    * additional request body parameters.
@@ -302,17 +312,21 @@ class Client extends EventEmitter {
    * @param req - Request to send to the server.
    * @returns The response from the server.
    */
-  public async request<R extends BaseRequest, T extends BaseResponse>(
+  public async request<R extends Request, T extends Response>(
     req: R,
   ): Promise<T> {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
-    return this.connection.request({
+    const response = (await this.connection.request({
       ...req,
       account: req.account
         ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be string
           ensureClassicAddress(req.account as string)
         : undefined,
-    }) as unknown as T
+    })) as T
+
+    handlePartialPayment(req.command, response)
+
+    return response
   }
 
   public async requestNextPage(
@@ -357,7 +371,7 @@ class Client extends EventEmitter {
     }
     const nextPageRequest = { ...req, marker: resp.result.marker }
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
-    return this.connection.request(nextPageRequest) as unknown as U
+    return this.request(nextPageRequest) as unknown as U
   }
 
   public on(
@@ -392,6 +406,10 @@ class Client extends EventEmitter {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- actually needs to be any here
   public on(eventName: string, listener: (...args: any[]) => void): this {
+    // if (args[0]?.type === 'transaction') {
+    //   handlePartialPaymentStream(args[0])
+    // }
+
     return super.on(eventName, listener)
   }
 
