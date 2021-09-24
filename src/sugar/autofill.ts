@@ -2,8 +2,12 @@ import BigNumber from 'bignumber.js'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 import type { Client } from '..'
-import { ValidationError } from '../errors'
-import { AccountInfoRequest, LedgerRequest } from '../models/methods'
+import { ValidationError, XrplError } from '../errors'
+import {
+  AccountInfoRequest,
+  AccountObjectsRequest,
+  LedgerRequest,
+} from '../models/methods'
 import { Transaction } from '../models/transactions'
 import setTransactionFlagsToNumber from '../models/utils/flags'
 import { xrpToDrops } from '../utils'
@@ -45,6 +49,9 @@ async function autofill<T extends Transaction>(
   }
   if (tx.LastLedgerSequence == null) {
     promises.push(setLatestValidatedLedgerSequence(this, tx))
+  }
+  if (tx.TransactionType === 'AccountDelete') {
+    promises.push(checkAccountDeleteBlockers(this, tx))
   }
 
   return Promise.all(promises).then(() => tx)
@@ -191,6 +198,30 @@ async function setLatestValidatedLedgerSequence(
   const ledgerSequence = data.result.ledger_index
   // eslint-disable-next-line no-param-reassign -- param reassign is safe
   tx.LastLedgerSequence = ledgerSequence + LEDGER_OFFSET
+}
+
+async function checkAccountDeleteBlockers(
+  client: Client,
+  tx: Transaction,
+): Promise<void> {
+  const request: AccountObjectsRequest = {
+    command: 'account_objects',
+    account: tx.Account,
+    ledger_index: 'validated',
+    deletion_blockers_only: true,
+  }
+  const response = await client.request(request)
+  return new Promise((resolve, reject) => {
+    if (response.result.account_objects.length > 0) {
+      reject(
+        new XrplError(
+          `Account ${tx.Account} cannot be deleted; there are Escrows, PayChannels, RippleStates, or Checks associated with the account.`,
+          response.result.account_objects,
+        ),
+      )
+    }
+    resolve()
+  })
 }
 
 export default autofill
