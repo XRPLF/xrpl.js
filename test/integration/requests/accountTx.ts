@@ -9,7 +9,7 @@ import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('AccountTx', function () {
+describe('account_tx', function () {
   this.timeout(TIMEOUT)
 
   before(suiteClientSetup)
@@ -62,12 +62,39 @@ describe('AccountTx', function () {
       response[0].result.transactions[0].meta.TransactionResult,
       'tesSUCCESS',
     )
+    assert.equal(
+      typeof response[0].result.transactions[0].tx.Destination,
+      'string',
+    )
+    assert.equal(
+      typeof response[0].result.transactions[0].tx.LastLedgerSequence,
+      'number',
+    )
+    assert.equal(
+      typeof response[0].result.transactions[0].tx.Sequence,
+      'number',
+    )
+    assert.equal(
+      typeof response[0].result.transactions[0].tx.SigningPubKey,
+      'string',
+    )
+    assert.equal(
+      typeof response[0].result.transactions[0].tx.TxnSignature,
+      'string',
+    )
+    assert.equal(typeof response[0].result.transactions[0].tx.Fee, 'string')
+    assert.equal(typeof response[0].result.transactions[0].tx.hash, 'string')
+    assert.equal(
+      typeof response[0].result.transactions[0].tx.inLedger,
+      'number',
+    )
+    assert.equal(
+      typeof response[0].result.transactions[0].tx.ledger_index,
+      'number',
+    )
+
     const responseTx = response[0].result.transactions[0].tx
     const expectedTx = expected[0].result.transactions[0].tx
-    assert.equal(
-      _.has(responseTx, 'Destination'),
-      _.has(expectedTx, 'Destination'),
-    )
     assert.deepEqual(
       [
         responseTx.Flags,

@@ -9,7 +9,7 @@ import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('NoRippleCheck', function () {
+describe('noripple_check', function () {
   this.timeout(TIMEOUT)
 
   before(suiteClientSetup)
@@ -25,8 +25,9 @@ describe('NoRippleCheck', function () {
       transactions: true,
     }
     const response = await this.client.request(request)
+    console.log(response.result)
     const expected = {
-      id: 5,
+      id: 0,
       result: {
         ledger_current_index: 2535,
         problems: ['You should immediately set your default ripple flag'],
@@ -46,6 +47,11 @@ describe('NoRippleCheck', function () {
     }
     assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
+    assert.equal(typeof response.result.transactions[0].Fee, 'number')
+    assert.equal(typeof response.result.transactions[0].Sequence, 'number')
+    assert.equal(typeof response.result.problems, 'object')
+    assert.equal(typeof response.result.problems[0], 'string')
+
     const responseTx = response.result.transactions[0]
     const expectedTx = expected.result.transactions[0]
     assert.deepEqual(

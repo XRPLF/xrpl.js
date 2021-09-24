@@ -9,7 +9,7 @@ import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('AccountLines', function () {
+describe('account_lines', function () {
   this.timeout(TIMEOUT)
 
   before(suiteClientSetup)
@@ -25,7 +25,7 @@ describe('AccountLines', function () {
     }
     const response = await this.client.request(request)
     const expected = {
-      id: 5,
+      id: 0,
       result: {
         account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
         ledger_hash:
@@ -39,6 +39,8 @@ describe('AccountLines', function () {
     }
     assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
+    assert.equal(typeof response.result.ledger_hash, 'string')
+    assert.equal(typeof response.result.ledger_index, 'number')
     assert.deepEqual(
       _.omit(response.result, ['ledger_hash', 'ledger_index']),
       _.omit(expected.result, ['ledger_hash', 'ledger_index']),

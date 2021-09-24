@@ -9,7 +9,7 @@ import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('AccountInfo', function () {
+describe('account_info', function () {
   this.timeout(TIMEOUT)
 
   before(suiteClientSetup)
@@ -25,7 +25,7 @@ describe('AccountInfo', function () {
     }
     const response = await this.client.request(request)
     const expected = {
-      id: 5,
+      id: 0,
       result: {
         account_data: {
           Account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
@@ -48,13 +48,18 @@ describe('AccountInfo', function () {
       status: 'success',
       type: 'response',
     }
-    assert.equal(
-      _.has(response.result.account_data, 'Balance'),
-      _.has(expected.result.account_data, 'Balance'),
-    )
     assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
+    assert.equal(typeof response.result.account_data.Balance, 'string')
     assert.equal(response.result.validated, expected.result.validated)
+    assert.equal(typeof response.result.ledger_hash, 'string')
+    assert.equal(typeof response.result.ledger_index, 'number')
+    assert.equal(typeof response.result.account_data.PreviousTxnID, 'string')
+    assert.equal(
+      typeof response.result.account_data.PreviousTxnLgrSeq,
+      'number',
+    )
+    assert.equal(typeof response.result.account_data.Sequence, 'number')
     assert.deepEqual(
       _.omit(response.result.account_data, [
         'PreviousTxnID',
