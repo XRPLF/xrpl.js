@@ -1,4 +1,3 @@
-/* eslint-disable max-lines -- Connection is a big class */
 import { EventEmitter } from 'events'
 import { Agent } from 'http'
 

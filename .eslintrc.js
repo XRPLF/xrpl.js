@@ -36,17 +36,8 @@ module.exports = {
         format: ['PascalCase', 'snake_case'],
       },
     ],
-    'max-lines-per-function': [
-      'warn',
-      { max: 40, skipBlankLines: true, skipComments: true },
-    ],
-    'max-statements': ['warn', 25],
     // exception for lodash
     'id-length': ['error', { exceptions: ['_'] }],
-
-    // no-shadow has false-positives for enum, @typescript-eslint version fixes that
-    'no-shadow': 'off',
-    '@typescript-eslint/no-shadow': ['error'],
   },
   overrides: [
     {
@@ -68,20 +59,7 @@ module.exports = {
     {
       files: ['test/**/*.ts'],
       rules: {
-        // Removed the max for test files and test helper files, since tests usually need to import more things
-        'import/max-dependencies': 'off',
-
-        // describe blocks count as a function in Mocha tests, and can be insanely long
-        'max-lines-per-function': 'off',
-
-        // Tests can be very long turns off max-line count
-        'max-lines': 'off',
-
-        // We have lots of statements in tests
-        'max-statements': 'off',
-
         // We have lots of magic numbers in tests
-        'no-magic-number': 'off',
         '@typescript-eslint/no-magic-numbers': 'off',
 
         // We need to test things without type guards sometimes
@@ -117,7 +95,6 @@ module.exports = {
     {
       files: ['test/models/*.ts'],
       rules: {
-        '@typescript-eslint/consistent-type-assertions': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
       },
     },
@@ -129,6 +106,9 @@ module.exports = {
 
         // Removed this as eslint prevents us from doing this differently
         'import/unambiguous': 'off',
+
+        // Exports in a javascript format
+        'import/no-unused-modules': 'off',
       },
     },
   ],
