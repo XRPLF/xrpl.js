@@ -99,7 +99,7 @@
   "prettier": "@xrplf/prettier-config",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ripple/ripple-lib.git"
+    "url": "git://github.com/XRPLF/xrpl.js.git"
   },
   "readmeFilename": "README.md",
   "engines": {
