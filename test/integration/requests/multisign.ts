@@ -6,7 +6,6 @@ import {
   AccountSet,
   Client,
   SignerListSet,
-  Wallet,
   SubmitMultisignedRequest,
   Transaction,
   SubmitMultisignedResponse,
@@ -18,7 +17,7 @@ import { multisign, sign } from 'xrpl-local/wallet/signer'
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 import {
-  fundAccount,
+  generateFundedWallet,
   ledgerAccept,
   testTransaction,
   verifySubmittedTransaction,
@@ -36,10 +35,8 @@ describe('submit_multisigned', function () {
 
   it('submit_multisigned transaction', async function () {
     const client: Client = this.client
-    const signerWallet1 = Wallet.generate()
-    await fundAccount(client, signerWallet1)
-    const signerWallet2 = Wallet.generate()
-    await fundAccount(client, signerWallet2)
+    const signerWallet1 = await generateFundedWallet(this.client)
+    const signerWallet2 = await generateFundedWallet(this.client)
 
     // set up the multisigners for the account
     const signerListSet: SignerListSet = {
