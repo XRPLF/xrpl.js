@@ -1,11 +1,10 @@
-/* eslint-disable mocha/no-hooks-for-single-case -- Use of hooks is restricted when there is a single test case. */
 import _ from 'lodash'
 
 import { AccountDelete } from 'xrpl-local/models/transactions'
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
-import { getMasterAccount, testTransaction } from '../utils'
+import { generateFundedWallet, ledgerAccept, testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -18,10 +17,17 @@ describe('AccountDelete', function () {
   afterEach(teardownClient)
 
   it('base', async function () {
+    const wallet = await generateFundedWallet(this.client)
+    const promises: Array<Promise<void>> = []
+    for (let iter = 0; iter < 256; iter += 1) {
+      promises.push(ledgerAccept(this.client))
+    }
+
+    await Promise.all(promises)
     const tx: AccountDelete = {
       TransactionType: 'AccountDelete',
       Account: this.wallet.getClassicAddress(),
-      Destination: getMasterAccount(),
+      Destination: wallet.getClassicAddress(),
     }
     await testTransaction(this.client, tx, this.wallet)
   })
