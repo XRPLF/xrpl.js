@@ -39,7 +39,7 @@
     "@types/puppeteer": "5.4.4",
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.0.0",
-    "@xrplf/eslint-config": "^1.3.0",
+    "@xrplf/eslint-config": "^1.4.0",
     "@xrplf/prettier-config": "^1.2.0",
     "assert": "^2.0.0",
     "buffer": "^6.0.2",

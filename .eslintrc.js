@@ -68,21 +68,12 @@ module.exports = {
     {
       files: ['test/**/*.ts'],
       rules: {
-        // Removed the max for test files and test helper files, since tests usually need to import more things
-        'import/max-dependencies': 'off',
-
-        // describe blocks count as a function in Mocha tests, and can be insanely long
-        'max-lines-per-function': 'off',
-
-        // Tests can be very long turns off max-line count
-        'max-lines': 'off',
-
-        // We have lots of statements in tests
-        'max-statements': 'off',
-
         // We have lots of magic numbers in tests
-        'no-magic-number': 'off',
         '@typescript-eslint/no-magic-numbers': 'off',
+
+        // We have files with a lot of tests
+        'max-lines-per-function': 'off',
+        'max-lines': 'off',
 
         // We need to test things without type guards sometimes
         '@typescript-eslint/no-unsafe-assignment': 'off',
@@ -117,7 +108,6 @@ module.exports = {
     {
       files: ['test/models/*.ts'],
       rules: {
-        '@typescript-eslint/consistent-type-assertions': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
       },
     },
@@ -129,6 +119,9 @@ module.exports = {
 
         // Removed this as eslint prevents us from doing this differently
         'import/unambiguous': 'off',
+
+        // Javascript files have CommonJS exports
+        'import/no-unused-modules': 'off',
       },
     },
   ],
