@@ -2,7 +2,7 @@ import { assert } from 'chai'
 import _ from 'lodash'
 import { decode } from 'ripple-binary-codec'
 
-import { Client, Wallet } from 'xrpl-local'
+import { Client, Wallet, Response } from 'xrpl-local'
 import { Payment, Transaction } from 'xrpl-local/models/transactions'
 import { computeSignedTransactionHash } from 'xrpl-local/utils/hashes'
 
@@ -71,6 +71,11 @@ export async function verifySubmittedTransaction(
   } else {
     assert.strictEqual(data.result.meta, 'tesSUCCESS')
   }
+}
+
+export function verifySuccessfulResponse(response: Response): void {
+  assert.equal(response.status, 'success')
+  assert.equal(response.type, 'response')
 }
 
 export async function testTransaction(
