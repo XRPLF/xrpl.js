@@ -1,9 +1,16 @@
 import { assert } from 'chai'
 
-import { AccountDelete, EscrowFinish, Payment, Transaction } from 'xrpl-local'
+import {
+  XrplError,
+  AccountDelete,
+  EscrowFinish,
+  Payment,
+  Transaction,
+} from 'xrpl-local'
 
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
+import { assertRejects } from '../testUtils'
 
 const Fee = '10'
 const Sequence = 1432
@@ -71,6 +78,27 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.Sequence, 23)
   })
 
+  it('should throw error if account deletion blockers exist', async function () {
+    this.mockRippled.addResponse('account_info', rippled.account_info.normal)
+    this.mockRippled.addResponse('ledger', rippled.ledger.normal)
+    this.mockRippled.addResponse('server_info', rippled.server_info.normal)
+    this.mockRippled.addResponse(
+      'account_objects',
+      rippled.account_objects.normal,
+    )
+
+    const tx: AccountDelete = {
+      Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+      TransactionType: 'AccountDelete',
+      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+
+    await assertRejects(this.client.autofill(tx), XrplError)
+  })
+
   describe('when autofill Fee is missing', function () {
     it('should autofill Fee of a Transaction', async function () {
       const tx: Transaction = {
@@ -80,17 +108,7 @@ describe('client.autofill', function () {
         Sequence,
         LastLedgerSequence,
       }
-      this.mockRippled.addResponse('server_info', {
-        status: 'success',
-        type: 'response',
-        result: {
-          info: {
-            validated_ledger: {
-              base_fee_xrp: 0.00001,
-            },
-          },
-        },
-      })
+      this.mockRippled.addResponse('server_info', rippled.server_info.normal)
       const txResult = await this.client.autofill(tx)
 
       assert.strictEqual(txResult.Fee, '12')
@@ -108,19 +126,9 @@ describe('client.autofill', function () {
       }
       this.mockRippled.addResponse('account_info', rippled.account_info.normal)
       this.mockRippled.addResponse('ledger', rippled.ledger.normal)
-      this.mockRippled.addResponse('server_info', {
-        status: 'success',
-        type: 'response',
-        result: {
-          info: {
-            validated_ledger: {
-              base_fee_xrp: 0.00001,
-            },
-          },
-        },
-      })
-      const txResult = await this.client.autofill(tx)
+      this.mockRippled.addResponse('server_info', rippled.server_info.normal)
 
+      const txResult = await this.client.autofill(tx)
       assert.strictEqual(txResult.Fee, '399')
     })
 
@@ -132,17 +140,11 @@ describe('client.autofill', function () {
       }
       this.mockRippled.addResponse('account_info', rippled.account_info.normal)
       this.mockRippled.addResponse('ledger', rippled.ledger.normal)
-      this.mockRippled.addResponse('server_info', {
-        status: 'success',
-        type: 'response',
-        result: {
-          info: {
-            validated_ledger: {
-              base_fee_xrp: 0.00001,
-            },
-          },
-        },
-      })
+      this.mockRippled.addResponse('server_info', rippled.server_info.normal)
+      this.mockRippled.addResponse(
+        'account_objects',
+        rippled.account_objects.empty,
+      )
       const txResult = await this.client.autofill(tx)
 
       assert.strictEqual(txResult.Fee, '5000000')
@@ -160,17 +162,7 @@ describe('client.autofill', function () {
       }
       this.mockRippled.addResponse('account_info', rippled.account_info.normal)
       this.mockRippled.addResponse('ledger', rippled.ledger.normal)
-      this.mockRippled.addResponse('server_info', {
-        status: 'success',
-        type: 'response',
-        result: {
-          info: {
-            validated_ledger: {
-              base_fee_xrp: 0.00001,
-            },
-          },
-        },
-      })
+      this.mockRippled.addResponse('server_info', rippled.server_info.normal)
       const txResult = await this.client.autofill(tx, 4)
 
       assert.strictEqual(txResult.Fee, '459')

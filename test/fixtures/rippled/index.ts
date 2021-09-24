@@ -1,5 +1,6 @@
 import normalAccountInfo from './accountInfo.json'
 import notfoundAccountInfo from './accountInfoNotFound.json'
+import emptyAccountObjects from './accountObjectsEmpty.json'
 import normalAccountObjects from './accountObjectsNormal.json'
 import account_offers from './accountOffers'
 import normalAccountTx from './accountTx'
@@ -133,7 +134,7 @@ const streams = {
 
 const account_objects = {
   normal: normalAccountObjects,
-  //   notfound: notfoundAccountObjects
+  empty: emptyAccountObjects,
 }
 
 const account_info = {
