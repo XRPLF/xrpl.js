@@ -1,16 +1,16 @@
 {
   "name": "xrpl",
-  "version": "2.0.0-beta.0",
+  "version": "2.0.0-beta.1",
   "license": "ISC",
   "description": "A TypeScript/JavaScript API for interacting with the XRP Ledger in Node.js and the browser",
   "files": [
     "dist/npm/*",
-    "build/ripple-latest-min.js",
-    "build/ripple-latest.js"
+    "build/xrpl-latest-min.js",
+    "build/xrpl-latest.js"
   ],
   "main": "dist/npm/",
-  "unpkg": "build/ripple-latest-min.js",
-  "jsdelivr": "build/ripple-latest-min.js",
+  "unpkg": "build/xrpl-latest-min.js",
+  "jsdelivr": "build/xrpl-latest-min.js",
   "types": "dist/npm/index.d.ts",
   "directories": {
     "test": "test"
