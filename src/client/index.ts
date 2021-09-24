@@ -319,6 +319,9 @@ class Client extends EventEmitter {
     r: TransactionEntryRequest,
   ): Promise<TransactionEntryResponse>
   public async request(r: TxRequest): Promise<TxResponse>
+  public async request<R extends BaseRequest, T extends BaseResponse>(
+    r: R,
+  ): Promise<T>
   /**
    * Makes a request to the client with the given command and
    * additional request body parameters.
