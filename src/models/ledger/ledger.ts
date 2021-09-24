@@ -1,4 +1,5 @@
 import { Transaction } from '../transactions'
+import TransactionMetadata from '../transactions/metadata'
 
 import LedgerEntry from './ledgerEntry'
 
@@ -16,5 +17,5 @@ export default interface Ledger {
   parent_hash: string
   total_coins: string
   transaction_hash: string
-  transactions?: Transaction[]
+  transactions?: Array<Transaction & { metaData?: TransactionMetadata }>
 }

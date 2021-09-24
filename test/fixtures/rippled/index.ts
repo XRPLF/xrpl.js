@@ -3,7 +3,7 @@ import notfoundAccountInfo from './accountInfoNotFound.json'
 import emptyAccountObjects from './accountObjectsEmpty.json'
 import normalAccountObjects from './accountObjectsNormal.json'
 import account_offers from './accountOffers'
-import normalAccountTx from './accountTx'
+import normalAccountTx from './accountTx.json'
 import fabric from './bookOffers'
 import usd_xrp from './bookOffersUsdXrp.json'
 import xrp_usd from './bookOffersXrpUsd.json'
@@ -24,6 +24,8 @@ import withoutCloseTime from './ledgerWithoutCloseTime.json'
 import withPartialPayment from './ledgerWithPartialPayment.json'
 import withSettingsTx from './ledgerWithSettingsTx.json'
 import withStateAsHashes from './ledgerWithStateAsHashes.json'
+import iouPartialPayment from './partialPaymentIOU.json'
+import xrpPartialPayment from './partialPaymentXRP.json'
 import generate from './pathFind'
 import sendAll from './pathFindSendAll.json'
 import sendUSD from './pathFindSendUsd.json'
@@ -50,6 +52,7 @@ import successSubmit from './submit.json'
 import failureSubmit from './submitFailed.json'
 import successSubscribe from './subscribe.json'
 import errorSubscribe from './subscribeError.json'
+import transaction_entry from './transactionEntry.json'
 import AccountDelete from './tx/accountDelete.json'
 import AccountDeleteWithMemo from './tx/accountDeleteWithMemo.json'
 import AccountSet from './tx/accountSet.json'
@@ -130,6 +133,11 @@ const streams = {
   serverStatus: serverStatusStream,
   validation: validationStream,
   manifest: manifestStream,
+}
+
+const partial_payments = {
+  xrp: xrpPartialPayment,
+  iou: iouPartialPayment,
 }
 
 const account_objects = {
@@ -250,12 +258,14 @@ const rippled = {
   ledger_data,
   ledger_entry,
   ledger_current,
+  partial_payments,
   path_find,
   payment_channel,
   server_info,
   streams,
   submit,
   subscribe,
+  transaction_entry,
   tx,
   unsubscribe,
 }
