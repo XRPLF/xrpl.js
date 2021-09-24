@@ -3,11 +3,7 @@ import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 import type { Client } from '..'
 import { ValidationError, XrplError } from '../errors'
-import {
-  AccountInfoRequest,
-  AccountObjectsRequest,
-  LedgerRequest,
-} from '../models/methods'
+import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
 import { Transaction } from '../models/transactions'
 import setTransactionFlagsToNumber from '../models/utils/flags'
 import { xrpToDrops } from '../utils'
@@ -199,12 +195,7 @@ async function setLatestValidatedLedgerSequence(
   client: Client,
   tx: Transaction,
 ): Promise<void> {
-  const request: LedgerRequest = {
-    command: 'ledger',
-    ledger_index: 'validated',
-  }
-  const data = await client.request(request)
-  const ledgerSequence = data.result.ledger_index
+  const ledgerSequence = await client.getLedgerIndex()
   // eslint-disable-next-line no-param-reassign -- param reassign is safe
   tx.LastLedgerSequence = ledgerSequence + LEDGER_OFFSET
 }
