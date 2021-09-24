@@ -6,7 +6,7 @@ import type { Client } from '..'
  * @param this - The Client used to connect to the ledger.
  * @returns The ledger index.
  */
-export default async function getLedgerIndex(this: Client): Promise<int> {
+export default async function getLedgerIndex(this: Client): Promise<number> {
   const ledgerResponse = await this.request({
     command: 'ledger',
     ledger_index: 'validated',
