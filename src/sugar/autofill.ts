@@ -3,11 +3,7 @@ import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 import type { Client } from '..'
 import { ValidationError, XrplError } from '../errors'
-import {
-  AccountInfoRequest,
-  AccountObjectsRequest,
-  LedgerRequest,
-} from '../models/methods'
+import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
 import { Transaction } from '../models/transactions'
 import setTransactionFlagsToNumber from '../models/utils/flags'
 import { xrpToDrops } from '../utils'
