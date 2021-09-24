@@ -1,5 +1,4 @@
 /* eslint-disable import/export -- Tells webpack which files exist. */
-export * from './integration'
 export * from './transactions/signerListSet'
 export * from './transactions/payment'
 export * from './transactions/offerCreate'
@@ -15,3 +14,4 @@ export * from './requests/accountTx'
 export * from './requests/gatewayBalances'
 export * from './requests/noRippleCheck'
 export * from './requests/utility'
+export * from './integration'
