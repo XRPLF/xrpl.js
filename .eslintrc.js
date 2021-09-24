@@ -36,8 +36,17 @@ module.exports = {
         format: ['PascalCase', 'snake_case'],
       },
     ],
+    'max-lines-per-function': [
+      'warn',
+      { max: 40, skipBlankLines: true, skipComments: true },
+    ],
+    'max-statements': ['warn', 25],
     // exception for lodash
     'id-length': ['error', { exceptions: ['_'] }],
+
+    // no-shadow has false-positives for enum, @typescript-eslint version fixes that
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': ['error'],
   },
   overrides: [
     {
