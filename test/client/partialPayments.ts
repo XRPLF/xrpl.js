@@ -78,6 +78,7 @@ describe('client handling of tfPartialPayments', function () {
   })
 
   it('account_tx with XRP tfPartialPayment', async function () {
+    // TODO: Create fixtues with partial payments instead of using ...
     const partial = { ...rippled.tx.Payment, result: partialPaymentXRP }
     const mockResponse = rippled.account_tx.normal
     mockResponse.result.transactions.push({
