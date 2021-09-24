@@ -64,7 +64,10 @@ describe('client handling of tfPartialPayments', function () {
     } as any)
 
     this.mockRippled.addResponse('account_tx', mockResponse)
-    const resp = await this.client.request({ command: 'account_tx' })
+    const resp = await this.client.request({
+      command: 'account_tx',
+      account: mockResponse.result.account,
+    })
 
     expect(resp.warnings).to.deep.equal([
       {
@@ -83,7 +86,10 @@ describe('client handling of tfPartialPayments', function () {
     } as any)
 
     this.mockRippled.addResponse('account_tx', mockResponse)
-    const resp = await this.client.request({ command: 'account_tx' })
+    const resp = await this.client.request({
+      command: 'account_tx',
+      account: mockResponse.result.account,
+    })
 
     expect(resp.warnings).to.deep.equal([
       {
