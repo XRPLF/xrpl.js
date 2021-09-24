@@ -304,7 +304,7 @@ export class Connection extends EventEmitter {
   public async reconnect(): Promise<void> {
     // NOTE: We currently have a "reconnecting" event, but that only triggers
     // through an unexpected connection retry logic.
-    // See: https://github.com/ripple/ripple-lib/pull/1101#issuecomment-565360423
+    // See: https://github.com/XRPLF/xrpl.js/pull/1101#issuecomment-565360423
     this.emit('reconnect')
     await this.disconnect()
     await this.connect()
