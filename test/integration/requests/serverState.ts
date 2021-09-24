@@ -1,21 +1,22 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { ServerStateRequest } from '../../../src'
+import { ServerStateRequest } from 'xrpl-local'
+
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('Server Info ServerState', function () {
+describe('server_state', function () {
   this.timeout(TIMEOUT)
 
   before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
-  it('serverState', async function () {
+  it('base', async function () {
     const request: ServerStateRequest = {
       command: 'server_state',
     }
@@ -56,5 +57,76 @@ describe('Server Info ServerState', function () {
     }
     assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
+    assert.equal(
+      _.every(
+        Object.keys(expected.result.state),
+        // eslint-disable-next-line @typescript-eslint/unbound-method -- has verifies if the object actually has the key.
+        _.partial(_.has, response.result.state),
+      ),
+      true,
+    )
+
+    // types
+    const numberKeys = [
+      'io_latency_ms',
+      'load_base',
+      'load_factor',
+      'load_factor_fee_escalation',
+      'load_factor_fee_queue',
+      'load_factor_fee_reference',
+      'load_factor_server',
+      'peers',
+      'uptime',
+      'validation_quorum',
+      'validator_list_expires',
+    ]
+    for (const key of numberKeys) {
+      assert.equal(typeof response.result.state[key], 'number')
+    }
+    const stringKeys = [
+      'build_version',
+      'complete_ledgers',
+      'jq_trans_overflow',
+      'peer_disconnects',
+      'peer_disconnects_resources',
+      'pubkey_node',
+      'pubkey_validator',
+      'server_state',
+      'server_state_duration_us',
+      'time',
+    ]
+    for (const key of stringKeys) {
+      assert.equal(typeof response.result.state[key], 'string')
+    }
+
+    // objects
+    // last_close
+    for (const key of Object.keys(response.result.state.last_close)) {
+      assert.equal(typeof response.result.state.last_close[key], 'number')
+    }
+    // load
+    assert.equal(typeof response.result.state.load.threads, 'number')
+    for (const obj of response.result.state.load.job_types) {
+      assert.equal(typeof obj.per_second, 'number')
+      assert.equal(typeof obj.job_type, 'string')
+    }
+    // state_accounting
+    Object.keys(response.result.state.state_accounting).forEach(function (key) {
+      assert.equal(
+        typeof response.result.state.state_accounting[key].duration_us,
+        'string',
+      )
+      assert.equal(
+        typeof response.result.state.state_accounting[key].transitions,
+        'number',
+      )
+    })
+    // validated_ledger
+    assert.equal(typeof response.result.state.validated_ledger.hash, 'string')
+    for (const key of Object.keys(
+      _.omit(response.result.state.validated_ledger, 'hash'),
+    )) {
+      assert.equal(typeof response.result.state.validated_ledger[key], 'number')
+    }
   })
 })
