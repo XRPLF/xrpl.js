@@ -20,7 +20,10 @@ class XrplError extends Error {
     this.name = this.constructor.name
     this.message = message
     this.data = data
-    Error.captureStackTrace(this, this.constructor)
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- `captureStackTrace` can be null in browsers
+    if (Error.captureStackTrace != null) {
+      Error.captureStackTrace(this, this.constructor)
+    }
   }
 
   /**
