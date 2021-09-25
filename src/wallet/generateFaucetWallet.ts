@@ -209,7 +209,7 @@ async function processSuccessfulResponse(
 async function getAddressXrpBalance(
   client: Client,
   address: string,
-): Promise<string> {
+): Promise<string | undefined> {
   // Get all the account balances
   try {
     const balances = await client.getBalances(address)
@@ -221,6 +221,11 @@ async function getAddressXrpBalance(
     return xrpBalance[0].value
   } catch (err) {
     if (err instanceof Error) {
+      /* eslint-disable-next-line max-depth -- needed for case where account doesn't exist */
+      if (err.message === 'Account not found.') {
+        return undefined
+      }
+
       throw new XRPLFaucetError(
         `Unable to retrieve balance of ${address}. Error: ${err.message}`,
       )
