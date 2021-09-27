@@ -17,15 +17,7 @@
       mocha.ui('bdd')
     </script>
 
-    <script>
-      (async () => {
-      const api = new xrpl.Client("wss://s2.ripple.com:51233")
-      await api.connect()
-      console.log("CONNECTED")
-      const sending_wallet = await api.generateFaucetWallet()
-      console.log(sending_wallet)
-      })();
-    </script>
+    <script src="../testCompiledForWeb/index.js"></script>
 
     <script>
       mocha.run()
