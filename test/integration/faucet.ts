@@ -4,7 +4,7 @@ import _ from 'lodash'
 
 import { Client, isValidClassicAddress, isValidXAddress } from 'xrpl-local'
 // how long before each test case times out
-const TIMEOUT = 30000
+const TIMEOUT = 60000
 // This test is reliant on external networks, and as such may be flaky.
 describe('generateFaucetWallet', function () {
   this.timeout(TIMEOUT)
