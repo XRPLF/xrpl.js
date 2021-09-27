@@ -33,7 +33,21 @@ describe('server_state', function () {
             converge_time: 100,
             proposers: 0,
           },
-          load: [Object],
+          load: {
+            job_types: [
+              {
+                in_progress: 1,
+                job_type: 'clientCommand',
+                peak_time: 4,
+                per_second: 9,
+              },
+              { job_type: 'updatePaths', per_second: 1 },
+              { job_type: 'advanceLedger', per_second: 1 },
+              { job_type: 'pathFind', per_second: 1 },
+              { job_type: 'WriteNode', per_second: 17 },
+            ],
+            threads: 1,
+          },
           load_base: 256,
           load_factor: 256,
           load_factor_fee_escalation: 256,
@@ -47,7 +61,13 @@ describe('server_state', function () {
           pubkey_validator: 'none',
           server_state: 'full',
           server_state_duration_us: '8752487389',
-          state_accounting: [Object],
+          state_accounting: {
+            connected: { duration_us: '0', transitions: 0 },
+            disconnected: { duration_us: '41860', transitions: 1 },
+            full: { duration_us: '20723121268', transitions: 1 },
+            syncing: { duration_us: '0', transitions: 0 },
+            tracking: { duration_us: '0', transitions: 0 },
+          },
           time: '2021-Sep-23 22:56:55.413151 UTC',
           uptime: 8752,
           validated_ledger: {
