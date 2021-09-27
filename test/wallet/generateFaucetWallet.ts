@@ -32,6 +32,6 @@ describe('Get Faucet URL', function () {
 
   it('returns undefined if not a Testnet or Devnet server URL', function () {
     // Info: setupClient.setup creates a connection to 'localhost'
-    assert.strictEqual(getFaucetUrl(this.client), undefined)
+    assert.throws(() => getFaucetUrl(this.client))
   })
 })

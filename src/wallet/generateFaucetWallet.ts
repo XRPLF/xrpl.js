@@ -54,10 +54,15 @@ async function generateFaucetWallet(
     }),
   )
   // Retrieve the existing account balance
-  const addressToFundBalance = await getAddressXrpBalance(
-    this,
-    fundWallet.classicAddress,
-  )
+  let addressToFundBalance: undefined | string
+  try {
+    addressToFundBalance = await getAddressXrpBalance(
+      this,
+      fundWallet.classicAddress,
+    )
+  } catch {
+    /* addressToFundBalance remains undefined */
+  }
 
   // Check the address balance is not undefined and is a number
   const startingBalance =
@@ -212,13 +217,12 @@ async function getAddressXrpBalance(
 ): Promise<string> {
   // Get all the account balances
   try {
-    const balances = await client.getBalances(address)
+    const balances = await client.request({
+      command: 'account_info',
+      account: address,
+    })
 
-    // Retrieve the XRP balance
-    const xrpBalance = balances.filter(
-      (balance) => balance.currency.toUpperCase() === 'XRP',
-    )
-    return xrpBalance[0].value
+    return balances.result.account_data.Balance
   } catch (err) {
     if (err instanceof Error) {
       throw new XRPLFaucetError(
@@ -254,7 +258,13 @@ async function hasAddressBalanceIncreased(
       }
 
       try {
-        const newBalance = Number(await getAddressXrpBalance(client, address))
+        let newBalance
+        try {
+          newBalance = Number(await getAddressXrpBalance(client, address))
+        } catch {
+          /* newBalance remains undefined */
+        }
+
         if (newBalance > originalBalance) {
           clearInterval(interval)
           resolve(true)
@@ -279,6 +289,7 @@ async function hasAddressBalanceIncreased(
  *
  * @param client - Client.
  * @returns A {@link FaucetNetwork}.
+ * @throws When the client url is not on altnet or devnet.
  */
 function getFaucetUrl(client: Client): FaucetNetwork | undefined {
   const connectionUrl = client.connection.getUrl()
@@ -292,7 +303,7 @@ function getFaucetUrl(client: Client): FaucetNetwork | undefined {
     return FaucetNetwork.Devnet
   }
 
-  return undefined
+  throw new XRPLFaucetError('Faucet URL is not defined or inferrable.')
 }
 
 export default generateFaucetWallet
