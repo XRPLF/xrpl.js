@@ -214,7 +214,7 @@ async function processSuccessfulResponse(
 async function getAddressXrpBalance(
   client: Client,
   address: string,
-): Promise<string | undefined> {
+): Promise<string> {
   // Get all the account balances
   try {
     const balances = await client.request({

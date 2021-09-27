@@ -8,6 +8,7 @@ const TIMEOUT = 60000
 // This test is reliant on external networks, and as such may be flaky.
 describe('generateFaucetWallet', function () {
   this.timeout(TIMEOUT)
+
   it('submit generates a testnet wallet', async function () {
     const api = new Client('wss://s.altnet.rippletest.net:51233')
 
