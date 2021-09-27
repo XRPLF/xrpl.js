@@ -57,6 +57,17 @@ function isValidSecret(secret: string): boolean {
 }
 
 /**
+ * Validates that a given address is a valid X-Address or a valid classic
+ * address.
+ *
+ * @param address - Address to validate.
+ * @returns True if address is a valid X-Address or classic address.
+ */
+function isValidAddress(address: string): boolean {
+  return isValidXAddress(address) || isValidClassicAddress(address)
+}
+
+/**
  * Removes undefined values from an object.
  *
  * @param obj - Object to remove undefined values from.
@@ -94,6 +105,7 @@ export {
   rippleTimeToUnixTime,
   unixTimeToRippleTime,
   isValidSecret,
+  isValidAddress,
   computeSignedTransactionHash,
   computeBinaryTransactionSigningHash,
   computeAccountRootIndex,
