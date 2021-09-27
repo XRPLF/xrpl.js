@@ -1,14 +1,14 @@
 /* eslint-disable mocha/no-hooks-for-single-case -- Use of hooks is restricted when there is a single test case. */
 import _ from 'lodash'
 
-import { EscrowCancel, EscrowCreate, Wallet } from 'xrpl-local'
+import { EscrowCancel, EscrowCreate } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 import {
-  fundAccount,
-  getEpochTime,
+  generateFundedWallet,
   getSequence,
+  ledgerAccept,
   testTransaction,
 } from '../utils'
 
@@ -23,24 +23,30 @@ describe('EscrowCancel', function () {
   afterEach(teardownClient)
 
   it('base', async function () {
-    const wallet1 = Wallet.generate()
-    await fundAccount(this.client, wallet1)
+    // get the most recent close_time from the standalone container for cancel & finish after.
+    const CLOSE_TIME: number = (
+      await this.client.request({
+        command: 'ledger',
+        ledger_index: 'validated',
+      })
+    ).result.ledger.close_time
+    const wallet1 = await generateFundedWallet(this.client)
     const createTx: EscrowCreate = {
+      Account: this.wallet.getClassicAddress(),
       TransactionType: 'EscrowCreate',
       Amount: '10000',
-      Account: this.wallet.getClassicAddress(),
       Destination: wallet1.getClassicAddress(),
-      CancelAfter: getEpochTime() + 2,
+      CancelAfter: CLOSE_TIME + 2,
+      FinishAfter: CLOSE_TIME + 1,
     }
-    console.log(createTx)
     await testTransaction(this.client, createTx, this.wallet)
+    await ledgerAccept(this.client)
     const cancelTx: EscrowCancel = {
       TransactionType: 'EscrowCancel',
       Account: this.wallet.getClassicAddress(),
       Owner: this.wallet.getClassicAddress(),
       OfferSequence: getSequence(),
     }
-    console.log(cancelTx)
     await testTransaction(this.client, cancelTx, this.wallet)
   })
 })

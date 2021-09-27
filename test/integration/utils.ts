@@ -90,7 +90,6 @@ export async function testTransaction(
 
   // sign/submit the transaction
   const response = await client.submitTransaction(wallet, transaction)
-  console.log(response)
   // check that the transaction was successful
   assert.equal(response.status, 'success')
   assert.equal(response.type, 'response')
@@ -106,13 +105,6 @@ export async function testTransaction(
   const signedTx = _.omit(response.result.tx_json, 'hash')
   await ledgerAccept(client)
   await verifySubmittedTransaction(client, signedTx as Transaction)
-}
-
-export function getEpochTime(): number {
-  const now = new Date()
-  const utcMilllisecondsSinceEpoch =
-    now.getTime() + now.getTimezoneOffset() * 60 * 1000
-  return Math.round(utcMilllisecondsSinceEpoch / 1000) - 946684800
 }
 
 export function getSequence(): number {
