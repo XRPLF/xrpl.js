@@ -3,17 +3,23 @@ import path from 'path'
 import { expect, assert } from 'chai'
 import puppeteer from 'puppeteer'
 
+const TIMEOUT = 60000
 describe('Browser Tests', function () {
+  this.timeout(TIMEOUT)
+
   it('Integration Tests', async function () {
     const browser = await puppeteer.launch({ headless: true })
     try {
       const page = await browser.newPage().catch()
+      page.setDefaultNavigationTimeout(0)
+
       await page.goto(
         path.join('file:///', __dirname, '../localIntegrationRunner.html'),
       )
 
       await page.waitForFunction(
         'document.querySelector("body").innerText.includes("submit multisigned transaction")',
+        { timeout: TIMEOUT },
       )
 
       const fails = await page.evaluate(() => {
