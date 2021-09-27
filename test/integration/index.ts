@@ -37,5 +37,5 @@ export * from './requests/submit'
 export * from './requests/tx'
 export * from './requests/utility'
 
-export * from './faucet'
+export * from './generateFaucetWallet'
 export * from './integration'
