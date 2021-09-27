@@ -217,13 +217,12 @@ async function getAddressXrpBalance(
 ): Promise<string | undefined> {
   // Get all the account balances
   try {
-    const balances = await client.getBalances(address)
+    const balances = await client.request({
+      command: 'account_info',
+      account: address,
+    })
 
-    // Retrieve the XRP balance
-    const xrpBalance = balances.filter(
-      (balance) => balance.currency.toUpperCase() === 'XRP',
-    )
-    return xrpBalance[0].value
+    return balances.result.account_data.Balance
   } catch (err) {
     if (err instanceof Error) {
       throw new XRPLFaucetError(
