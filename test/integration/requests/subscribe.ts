@@ -88,14 +88,6 @@ describe('subscribe', function () {
   })
 
   it('Emits ledger', async function () {
-    const event = new Promise((resolve, reject) => {
-      const client: Client = this.client
-      client.on('ledgerClosed', (ledger) => {
-        assert.equal(ledger.type, 'ledgerClosed')
-        resolve('success')
-      })
-    })
-
     const request: SubscribeRequest = {
       command: 'subscribe',
       streams: ['ledger'],
@@ -120,6 +112,23 @@ describe('subscribe', function () {
     assert.equal(response.type, 'response')
     assert.deepEqual(response.result, expectedResult)
 
+    const event = new Promise((resolve, reject) => {
+      const client: Client = this.client
+      client.on('ledgerClosed', (ledger) => {
+        // Fields that are expected to change between the initial test and now are updated
+        assert.deepEqual(ledger, {
+          ...expectedResult,
+          type: 'ledgerClosed',
+          txn_count: ledger.txn_count,
+          ledger_hash: ledger.ledger_hash,
+          ledger_index: expectedResult.ledger_index + 1,
+          ledger_time: ledger.ledger_time,
+          validated_ledgers: ledger.validated_ledgers,
+        })
+        resolve('success')
+      })
+    })
+
     // Trigger the event
     ledgerAccept(this.client)
 
@@ -138,14 +147,32 @@ describe('subscribe', function () {
   //   this.client.connection.onMessage(JSON.stringify(rippled.streams.peerStatus))
   // })
 
-  it('Emits consensusPhase', async function (done) {
-    this.client.on('consensusPhase', (phase) => {
-      assert(phase.type === 'consensusPhase')
-      done()
-    })
+  // it('Emits consensusPhase', async function () {
+  //   const event = new Promise((resolve, reject) => {
+  //     const client: Client = this.client
+  //     client.on('consensusPhase', (phase) => {
+  //       assert.equal(phase.type, 'consensusPhase')
+  //       assert.equal(phase.consensus, 'accepted')
+  //       resolve('success')
+  //     })
+  //   })
 
-    this.client.connection.onMessage(JSON.stringify(rippled.streams.consensus))
-  })
+  //   const request: SubscribeRequest = {
+  //     command: 'subscribe',
+  //     streams: ['consensus'],
+  //   }
+
+  //   const response = await this.client.request(request)
+
+  //   assert.equal(response.status, 'success')
+  //   assert.equal(response.type, 'response')
+  //   assert.deepEqual(response.result, {})
+
+  //   // Trigger the event
+  //   ledgerAccept(this.client)
+
+  //   return event
+  // })
 
   it('Emits path_find', async function (done) {
     this.client.on('path_find', (path) => {
