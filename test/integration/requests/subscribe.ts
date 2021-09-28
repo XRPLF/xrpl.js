@@ -174,15 +174,6 @@ describe('subscribe', function () {
   //   return event
   // })
 
-  it('Emits path_find', async function (done) {
-    this.client.on('path_find', (path) => {
-      assert(path.type === 'path_find')
-      done()
-    })
-
-    this.client.connection.onMessage(JSON.stringify(rippled.streams.pathFind))
-  })
-
   it('Emits validationReceived', async function (done) {
     this.client.on('validationReceived', (path) => {
       assert(path.type === 'validationReceived')
