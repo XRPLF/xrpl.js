@@ -89,9 +89,6 @@ export async function testTransaction(
   // sign/submit the transaction
   const response = await client.submitTransaction(wallet, transaction)
 
-  // Validate the transaction
-  await ledgerAccept(client)
-
   // check that the transaction was successful
   assert.equal(response.status, 'success')
   assert.equal(response.type, 'response')
