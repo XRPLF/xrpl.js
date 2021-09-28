@@ -3,6 +3,7 @@ import _ from 'lodash'
 
 import {
   Client,
+  LedgerStream,
   OfferCreate,
   SubscribeRequest,
   SubscribeResponse,
@@ -14,7 +15,7 @@ import {
 import rippled from '../../fixtures/rippled'
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
-import { testTransaction } from '../utils'
+import { ledgerAccept, testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -27,8 +28,6 @@ describe('subscribe', function () {
   afterEach(teardownClient)
 
   it('Successfully Subscribes', async function () {
-    //    this.mockRippled.addResponse('subscribe', rippled.subscribe.success)
-
     const result = await this.client.request({
       command: 'subscribe',
     })
@@ -37,8 +36,6 @@ describe('subscribe', function () {
   })
 
   it('Successfully Unsubscribes', async function () {
-    // this.mockRippled.addResponse('unsubscribe', rippled.unsubscribe)
-
     const result = await this.client.request({
       command: 'unsubscribe',
     })
@@ -50,7 +47,7 @@ describe('subscribe', function () {
     const event = new Promise((resolve, reject) => {
       const client: Client = this.client
       client.on('transaction', (tx) => {
-        assert(tx.type === 'transaction')
+        assert.equal(tx.type, 'transaction')
         resolve('success')
       })
     })
@@ -67,6 +64,7 @@ describe('subscribe', function () {
     assert.equal(response.type, 'response')
     assert.deepEqual(response.result, {})
 
+    // Trigger the event
     const tx: OfferCreate = {
       TransactionType: 'OfferCreate',
       Account: this.wallet.getClassicAddress(),
@@ -80,20 +78,46 @@ describe('subscribe', function () {
 
     await testTransaction(this.client, tx, this.wallet)
 
-    // this.client.connection.onMessage(
-    //   JSON.stringify(rippled.streams.transaction),
-    // )
-
     return event
   })
 
-  it('Emits ledger', async function (done) {
-    this.client.on('ledgerClosed', (ledger) => {
-      assert(ledger.type === 'ledgerClosed')
-      done()
+  it('Emits ledger', async function () {
+    const event = new Promise((resolve, reject) => {
+      const client: Client = this.client
+      client.on('ledgerClosed', (ledger) => {
+        assert.equal(ledger.type, 'ledgerClosed')
+        resolve('success')
+      })
     })
 
-    this.client.connection.onMessage(JSON.stringify(rippled.streams.ledger))
+    const request: SubscribeRequest = {
+      command: 'subscribe',
+      streams: ['ledger'],
+      accounts: [this.wallet.getClassicAddress()],
+    }
+
+    const response = await this.client.request(request)
+
+    // Explicitly checking that there are only known fields in the return
+    const expectedResult: LedgerStream = {
+      fee_base: response.result.fee_base,
+      fee_ref: response.result.fee_ref,
+      ledger_hash: response.result.ledger_hash,
+      ledger_index: response.result.ledger_index,
+      ledger_time: response.result.ledger_time,
+      reserve_base: response.result.reserve_base,
+      reserve_inc: response.result.reserve_inc,
+      validated_ledgers: response.result.validated_ledgers,
+    }
+
+    assert.equal(response.status, 'success')
+    assert.equal(response.type, 'response')
+    assert.deepEqual(response.result, expectedResult)
+
+    // Trigger the event
+    ledgerAccept(this.client)
+
+    return event
   })
 
   it('Emits peerStatusChange', async function (done) {
