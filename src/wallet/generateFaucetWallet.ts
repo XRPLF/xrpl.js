@@ -53,22 +53,15 @@ async function generateFaucetWallet(
       destination: fundWallet.classicAddress,
     }),
   )
-  // Retrieve the existing account balance
-  let addressToFundBalance: undefined | string
+
+  let startingBalance = 0
   try {
-    addressToFundBalance = await getAddressXrpBalance(
-      this,
-      fundWallet.classicAddress,
+    startingBalance = Number(
+      await getAddressXrpBalance(this, fundWallet.classicAddress),
     )
   } catch {
-    /* addressToFundBalance remains undefined */
+    /* startingBalance remains '0' */
   }
-
-  // Check the address balance is not undefined and is a number
-  const startingBalance =
-    addressToFundBalance && !Number.isNaN(Number(addressToFundBalance))
-      ? Number(addressToFundBalance)
-      : 0
 
   // Options to pass to https.request
   const options = getOptions(this, postBody)
