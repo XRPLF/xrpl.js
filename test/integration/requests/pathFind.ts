@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars-experimental -- Promise does not need reject because timeout is enough */
+/* eslint-disable @typescript-eslint/no-unused-vars -- Promise does not need reject because timeout is enough */
 import { assert } from 'chai'
 import _ from 'lodash'
 
