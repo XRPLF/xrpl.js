@@ -16,12 +16,12 @@ describe('generateFaucetWallet', function () {
     const wallet = await api.generateFaucetWallet()
 
     assert.notEqual(wallet, undefined)
-    assert(isValidClassicAddress(wallet?.classicAddress ?? ''))
-    assert(isValidXAddress(wallet?.getXAddress() ?? ''))
+    assert(isValidClassicAddress(wallet.classicAddress))
+    assert(isValidXAddress(wallet.getXAddress()))
 
     const info = await api.request({
       command: 'account_info',
-      account: wallet?.classicAddress ?? '',
+      account: wallet.classicAddress,
     })
     assert.equal(info.result.account_data.Balance, '1000000000')
 
@@ -29,8 +29,9 @@ describe('generateFaucetWallet', function () {
 
     const afterSent = await api.request({
       command: 'account_info',
-      account: wallet?.classicAddress ?? '',
+      account: wallet.classicAddress,
     })
+
     assert.equal(afterSent.result.account_data.Balance, '2000000000')
 
     await api.disconnect()
@@ -42,12 +43,12 @@ describe('generateFaucetWallet', function () {
     const wallet = await api.generateFaucetWallet()
 
     assert.notEqual(wallet, undefined)
-    assert(isValidClassicAddress(wallet?.classicAddress ?? ''))
-    assert(isValidXAddress(wallet?.getXAddress() ?? ''))
+    assert(isValidClassicAddress(wallet.classicAddress))
+    assert(isValidXAddress(wallet.getXAddress()))
 
     const info = await api.request({
       command: 'account_info',
-      account: wallet?.classicAddress ?? '',
+      account: wallet.classicAddress,
     })
     assert.equal(info.result.account_data.Balance, '1000000000')
 
@@ -55,7 +56,7 @@ describe('generateFaucetWallet', function () {
 
     const afterSent = await api.request({
       command: 'account_info',
-      account: wallet?.classicAddress ?? '',
+      account: wallet.classicAddress,
     })
     assert.equal(afterSent.result.account_data.Balance, '2000000000')
 

@@ -36,7 +36,7 @@ const MAX_ATTEMPTS = 20
 async function generateFaucetWallet(
   this: Client,
   wallet?: Wallet,
-): Promise<Wallet | undefined> {
+): Promise<Wallet> {
   if (!this.isConnected()) {
     throw new RippledError('Client not connected, cannot call faucet')
   }
@@ -76,7 +76,7 @@ async function returnPromise(
   startingBalance: number,
   fundWallet: Wallet,
   postBody: Uint8Array,
-): Promise<Wallet | undefined> {
+): Promise<Wallet> {
   return new Promise((resolve, reject) => {
     const request = httpsRequest(options, (response) => {
       const chunks: Uint8Array[] = []
@@ -125,7 +125,7 @@ async function onEnd(
   client: Client,
   startingBalance: number,
   fundWallet: Wallet,
-  resolve: (wallet?: Wallet) => void,
+  resolve: (wallet: Wallet) => void,
   reject: (err: ErrorConstructor | Error | unknown) => void,
 ): Promise<void> {
   const body = Buffer.concat(chunks).toString()
@@ -159,7 +159,7 @@ async function processSuccessfulResponse(
   body: string,
   startingBalance: number,
   fundWallet: Wallet,
-  resolve: (wallet?: Wallet) => void,
+  resolve: (wallet: Wallet) => void,
   reject: (err: ErrorConstructor | Error | unknown) => void,
 ): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- We know this is safe and correct
