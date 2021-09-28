@@ -213,6 +213,7 @@ async function getAddressXrpBalance(
     const balances = await client.request({
       command: 'account_info',
       account: address,
+      ledger_index: 'validated',
     })
 
     return balances.result.account_data.Balance

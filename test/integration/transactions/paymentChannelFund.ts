@@ -35,7 +35,6 @@ describe('PaymentChannelFund', function () {
       this.wallet,
       paymentChannelCreate,
     )
-
     await testTransaction(this.client, paymentChannelCreate, this.wallet)
 
     const paymentChannelFund: PaymentChannelFund = {

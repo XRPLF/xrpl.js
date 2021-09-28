@@ -54,7 +54,7 @@ async function getOrderbook(
     command: 'book_offers',
     taker_pays: takerPays,
     taker_gets: takerGets,
-    ledger_index: options.ledger_index,
+    ledger_index: options.ledger_index ?? 'validated',
     ledger_hash: options.ledger_hash,
     limit: options.limit ?? DEFAULT_LIMIT,
     taker: options.taker,

@@ -127,6 +127,7 @@ async function setNextValidSequenceNumber(
   const request: AccountInfoRequest = {
     command: 'account_info',
     account: tx.Account,
+    ledger_index: 'validated',
   }
   const data = await client.request(request)
   // eslint-disable-next-line no-param-reassign, require-atomic-updates -- param reassign is safe with no race condition
