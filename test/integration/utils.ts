@@ -83,6 +83,9 @@ export async function testTransaction(
   transaction: Transaction,
   wallet: Wallet,
 ): Promise<void> {
+  // Accept any un-validated changes.
+  await ledgerAccept(client)
+
   // sign/submit the transaction
   const response = await client.submitTransaction(wallet, transaction)
 
