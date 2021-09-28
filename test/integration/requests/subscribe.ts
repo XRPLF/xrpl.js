@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars-experimental -- rejected occurs naturally with timeout in promises */
+/* eslint-disable @typescript-eslint/no-unused-vars -- rejected occurs naturally with timeout in promises */
 import { assert } from 'chai'
 import _ from 'lodash'
 
@@ -7,11 +9,8 @@ import {
   OfferCreate,
   SubscribeRequest,
   SubscribeResponse,
-  //  SubscribeRequest,
-  // OfferCreate,
-  // SubscribeRequest,
-  // SubscribeResponse,
-} from '../../../src'
+} from 'xrpl-local'
+
 import rippled from '../../fixtures/rippled'
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
@@ -42,6 +41,13 @@ describe('subscribe', function () {
 
     assert.equal(result.status, 'success')
   })
+
+  // TODO: Add transactions_proposed test
+  // TODO: Add accounts test
+  // TODO: Add accounts_proposed test
+  // TODO: Add a books test
+
+  // TODO: Check how we might be able to do integration tests on peerStatusChange
 
   it('Emits transaction', async function () {
     const event = new Promise((resolve, reject) => {
@@ -120,14 +126,17 @@ describe('subscribe', function () {
     return event
   })
 
-  it('Emits peerStatusChange', async function (done) {
-    this.client.on('peerStatusChange', (status) => {
-      assert(status.type === 'peerStatusChange')
-      done()
-    })
+  // it('Emits peerStatusChange', async function () {
+  //   const event = new Promise((resolve, reject) => {
+  //     const client: Client = this.client
+  //     client.on('peerStatusChange', (ledger) => {
+  //       assert.equal(ledger.type, 'peerStatusChange')
+  //       resolve('success')
+  //     })
+  //   })
 
-    this.client.connection.onMessage(JSON.stringify(rippled.streams.peerStatus))
-  })
+  //   this.client.connection.onMessage(JSON.stringify(rippled.streams.peerStatus))
+  // })
 
   it('Emits consensusPhase', async function (done) {
     this.client.on('consensusPhase', (phase) => {
