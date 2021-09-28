@@ -344,10 +344,12 @@ export interface PathFindStream extends BaseStream {
    * Array of objects with suggested paths to take. If empty, then no paths
    * were found connecting the source and destination accounts.
    */
-  alternatives: {
-    paths_computed: Path[]
-    source_amount: Amount
-  }
+  alternatives:
+    | []
+    | {
+        paths_computed: Path[]
+        source_amount: Amount
+      }
 }
 
 /**
