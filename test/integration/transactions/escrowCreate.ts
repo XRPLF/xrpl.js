@@ -1,4 +1,3 @@
-/* eslint-disable mocha/no-hooks-for-single-case -- Use of hooks is restricted when there is a single test case. */
 import _ from 'lodash'
 
 import { EscrowCreate } from 'xrpl-local'
