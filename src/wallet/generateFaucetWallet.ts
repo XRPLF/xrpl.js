@@ -48,10 +48,12 @@ async function generateFaucetWallet(
       : Wallet.generate()
 
   // Create the POST request body
-  const postBody = new TextEncoder().encode(
-    JSON.stringify({
-      destination: fundWallet.classicAddress,
-    }),
+  const postBody = Buffer.from(
+    new TextEncoder().encode(
+      JSON.stringify({
+        destination: fundWallet.classicAddress,
+      }),
+    ),
   )
 
   let startingBalance = 0
@@ -75,7 +77,7 @@ async function returnPromise(
   client: Client,
   startingBalance: number,
   fundWallet: Wallet,
-  postBody: Uint8Array,
+  postBody: Buffer,
 ): Promise<Wallet> {
   return new Promise((resolve, reject) => {
     const request = httpsRequest(options, (response) => {
