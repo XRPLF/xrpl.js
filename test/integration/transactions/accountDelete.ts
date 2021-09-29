@@ -17,7 +17,8 @@ describe('AccountDelete', function () {
   afterEach(teardownClient)
 
   it('base', async function () {
-    const wallet = await generateFundedWallet(this.client)
+    const wallet2 = await generateFundedWallet(this.client)
+    // to the satisfy the condition that account sequence and current ledger_index should be 256 apart.
     const promises: Array<Promise<void>> = []
     for (let iter = 0; iter < 256; iter += 1) {
       promises.push(ledgerAccept(this.client))
@@ -27,7 +28,7 @@ describe('AccountDelete', function () {
     const tx: AccountDelete = {
       TransactionType: 'AccountDelete',
       Account: this.wallet.getClassicAddress(),
-      Destination: wallet.getClassicAddress(),
+      Destination: wallet2.getClassicAddress(),
     }
     await testTransaction(this.client, tx, this.wallet)
   })
