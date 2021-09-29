@@ -9,7 +9,9 @@ import {
   OfferCreate,
   SubscribeRequest,
   SubscribeResponse,
+  Wallet,
 } from 'xrpl-local'
+import { StreamType } from 'xrpl-local/models/common'
 
 import rippled from '../../fixtures/rippled'
 import serverUrl from '../serverUrl'
@@ -18,6 +20,33 @@ import { ledgerAccept, testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
+
+async function createTxHandlerTest(
+  client: Client,
+  wallet: Wallet,
+  subscriptionStream: StreamType,
+): Promise<unknown> {
+  const event = new Promise((resolve, reject) => {
+    client.on('transaction', (tx) => {
+      assert.equal(tx.type, 'transaction')
+      resolve('success')
+    })
+  })
+
+  const request: SubscribeRequest = {
+    command: 'subscribe',
+    streams: [subscriptionStream],
+    accounts: [wallet.getClassicAddress()],
+  }
+
+  const response: SubscribeResponse = await client.request(request)
+
+  assert.equal(response.status, 'success')
+  assert.equal(response.type, 'response')
+  assert.deepEqual(response.result, {})
+
+  return event
+}
 
 describe('subscribe', function () {
   this.timeout(TIMEOUT)
@@ -46,29 +75,12 @@ describe('subscribe', function () {
   // TODO: Add accounts test
   // TODO: Add accounts_proposed test
   // TODO: Add a books test
+  // TODO: Add a 'server' test
 
   // TODO: Check how we might be able to do integration tests on peerStatusChange
 
   it('Emits transaction', async function () {
-    const event = new Promise((resolve, reject) => {
-      const client: Client = this.client
-      client.on('transaction', (tx) => {
-        assert.equal(tx.type, 'transaction')
-        resolve('success')
-      })
-    })
-
-    const request: SubscribeRequest = {
-      command: 'subscribe',
-      streams: ['transactions'],
-      accounts: [this.wallet.getClassicAddress()],
-    }
-
-    const response: SubscribeResponse = await this.client.request(request)
-
-    assert.equal(response.status, 'success')
-    assert.equal(response.type, 'response')
-    assert.deepEqual(response.result, {})
+    const event = createTxHandlerTest(this.client, this.wallet, 'transactions')
 
     // Trigger the event
     const tx: OfferCreate = {
@@ -84,6 +96,32 @@ describe('subscribe', function () {
 
     await testTransaction(this.client, tx, this.wallet)
 
+    // Lets the test wait until the event succeeds (or times out)
+    return event
+  })
+
+  it('Emits transaction on transactions_proposed', async function () {
+    const event = createTxHandlerTest(
+      this.client,
+      this.wallet,
+      'transactions_proposed',
+    )
+
+    const tx: OfferCreate = {
+      TransactionType: 'OfferCreate',
+      Account: this.wallet.getClassicAddress(),
+      TakerGets: '13100000',
+      TakerPays: {
+        currency: 'USD',
+        issuer: this.wallet.getClassicAddress(),
+        value: '10',
+      },
+    }
+
+    // The transactions_proposed stream should trigger the transaction handler WITHOUT ledgerAccept
+    await this.client.submitTransaction(this.wallet, tx)
+
+    // Lets the test wait until the event succeeds (or times out)
     return event
   })
 
