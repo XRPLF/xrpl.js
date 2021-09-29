@@ -55,6 +55,16 @@ describe('subscribe', function () {
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
+  /**
+   * Subscribe streams which are not testable with just a standalone node:
+   * (If that changes, please add tests for these streams).
+   *
+   * 'consensus'
+   * 'manifests'
+   * 'peer_status'
+   * 'validations'.
+   */
+
   it('Successfully Subscribes', async function () {
     const result = await this.client.request({
       command: 'subscribe',
@@ -71,13 +81,7 @@ describe('subscribe', function () {
     assert.equal(result.status, 'success')
   })
 
-  // TODO: Add transactions_proposed test
-  // TODO: Add accounts test
-  // TODO: Add accounts_proposed test
-  // TODO: Add a books test
   // TODO: Add a 'server' test
-
-  // TODO: Check how we might be able to do integration tests on peerStatusChange
 
   it('Emits transaction', async function () {
     const event = createTxHandlerTest(this.client, this.wallet, 'transactions')
@@ -171,62 +175,5 @@ describe('subscribe', function () {
     ledgerAccept(this.client)
 
     return event
-  })
-
-  // it('Emits peerStatusChange', async function () {
-  //   const event = new Promise((resolve, reject) => {
-  //     const client: Client = this.client
-  //     client.on('peerStatusChange', (ledger) => {
-  //       assert.equal(ledger.type, 'peerStatusChange')
-  //       resolve('success')
-  //     })
-  //   })
-
-  //   this.client.connection.onMessage(JSON.stringify(rippled.streams.peerStatus))
-  // })
-
-  // it('Emits consensusPhase', async function () {
-  //   const event = new Promise((resolve, reject) => {
-  //     const client: Client = this.client
-  //     client.on('consensusPhase', (phase) => {
-  //       assert.equal(phase.type, 'consensusPhase')
-  //       assert.equal(phase.consensus, 'accepted')
-  //       resolve('success')
-  //     })
-  //   })
-
-  //   const request: SubscribeRequest = {
-  //     command: 'subscribe',
-  //     streams: ['consensus'],
-  //   }
-
-  //   const response = await this.client.request(request)
-
-  //   assert.equal(response.status, 'success')
-  //   assert.equal(response.type, 'response')
-  //   assert.deepEqual(response.result, {})
-
-  //   // Trigger the event
-  //   ledgerAccept(this.client)
-
-  //   return event
-  // })
-
-  it('Emits validationReceived', async function (done) {
-    this.client.on('validationReceived', (path) => {
-      assert(path.type === 'validationReceived')
-      done()
-    })
-
-    this.client.connection.onMessage(JSON.stringify(rippled.streams.validation))
-  })
-
-  it('Emits manifestReceived', async function (done) {
-    this.client.on('manifestReceived', (path) => {
-      assert(path.type === 'manifestReceived')
-      done()
-    })
-
-    this.client.connection.onMessage(JSON.stringify(rippled.streams.manifest))
   })
 })
