@@ -33,7 +33,7 @@ See also: [RippleAPI Beginners Guide](https://xrpl.org/get-started-with-rippleap
 
 In an existing project (with `package.json`), install `xrpl.js`:
 ```
-$ npm install xrpl
+$ npm install xrpl@beta
 ```
 
 Then see the [documentation](#documentation).
