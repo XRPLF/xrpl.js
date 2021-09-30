@@ -46,7 +46,7 @@ If you want to use `xrpl.js` with React Native you will need to have some of the
 
     ```shell
     npm install react-native-crypto
-    npm install xrpl
+    npm install xrpl@beta
     # install peer deps
     npm install react-native-randombytes
     # install latest rn-nodeify
