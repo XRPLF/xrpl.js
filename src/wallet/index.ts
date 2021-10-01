@@ -48,6 +48,11 @@ class Wallet {
   public readonly classicAddress: string
   public readonly seed?: string
 
+  /**
+   * Alias for wallet.classicAddress.
+   *
+   * @returns The wallet's classic address.
+   */
   public get address(): string {
     return this.classicAddress
   }
