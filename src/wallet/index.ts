@@ -48,6 +48,10 @@ class Wallet {
   public readonly classicAddress: string
   public readonly seed?: string
 
+  public get address(): string {
+    return this.classicAddress
+  }
+
   /**
    * Creates a new Wallet.
    *
