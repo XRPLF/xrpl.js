@@ -1,3 +1,4 @@
+import { assert } from 'chai'
 import _ from 'lodash'
 
 import { EscrowCreate } from 'xrpl-local'
@@ -26,5 +27,16 @@ describe('EscrowCreate', function () {
       FinishAfter: Math.round(Date.now() / 1000) - 0x386d4380 + 1000000,
     }
     await testTransaction(this.client, tx, this.wallet)
+
+    // check that the object was actually created
+    assert.equal(
+      (
+        await this.client.request({
+          command: 'account_objects',
+          account: this.wallet.getClassicAddress(),
+        })
+      ).result.account_objects.length === 1,
+      true,
+    )
   })
 })
