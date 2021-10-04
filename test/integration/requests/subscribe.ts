@@ -61,7 +61,8 @@ describe('subscribe', function () {
    * 'consensus'
    * 'manifests'
    * 'peer_status'
-   * 'validations'.
+   * 'validations'
+   * 'server'.
    */
 
   it('Successfully Subscribes', async function () {
