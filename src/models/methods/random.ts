@@ -1,8 +1,11 @@
 import { BaseRequest, BaseResponse } from './baseMethod'
 
-/** The random command provides a random number to be used as a source of
+/**
+ * The random command provides a random number to be used as a source of
  * entropy for random number generation by clients. Expects a response in the
- * form of a {@link RandomResponse}
+ * form of a {@link RandomResponse}.
+ *
+ * @category Requests
  */
 export interface RandomRequest extends BaseRequest {
   command: 'random'
@@ -10,6 +13,8 @@ export interface RandomRequest extends BaseRequest {
 
 /**
  * Response expected from a {@link RandomRequest}.
+ *
+ * @category Responses
  */
 export interface RandomResponse extends BaseResponse {
   result: {

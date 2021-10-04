@@ -23,6 +23,8 @@ interface Channel {
  * channel's source, not the destination. (A channel's "source" and "owner" are
  * the same.) All information retrieved is relative to a particular version of
  * the ledger. Expects an {@link AccountChannelsResponse}.
+ *
+ * @category Requests
  */
 export interface AccountChannelsRequest extends BaseRequest {
   command: 'account_channels'
@@ -47,7 +49,11 @@ export interface AccountChannelsRequest extends BaseRequest {
   marker?: unknown
 }
 
-/** The expected response from an {@link AccountChannelsRequest} */
+/**
+ * The expected response from an {@link AccountChannelsRequest}.
+ *
+ * @category Responses
+ */
 export interface AccountChannelsResponse extends BaseResponse {
   result: {
     /** The address of the source/owner of the payment channels. This.

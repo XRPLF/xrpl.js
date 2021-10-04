@@ -50,10 +50,14 @@ export interface Trustline {
   freeze_peer?: boolean
 }
 
-/** The account_lines method returns information about an account's trust lines,
+/** ..........
+ * The account_lines method returns information about an account's trust lines,
  *  including balances in all non-XRP currencies and assets. All information
  * retrieved is relative to a particular version of the ledger. Expects an.
- * {@link AccountLinesResponse} */
+ * {@link AccountLinesResponse}
+ *
+ * @category Requests
+ */
 export interface AccountLinesRequest extends BaseRequest {
   command: 'account_lines'
   /** A unique identifier for the account, most commonly the account's Address. */
@@ -74,7 +78,11 @@ export interface AccountLinesRequest extends BaseRequest {
   marker?: unknown
 }
 
-/** Response expected from an {@link AccountLinesRequest} */
+/**
+ * Response expected from an {@link AccountLinesRequest}.
+ *
+ * @category Responses
+ */
 export interface AccountLinesResponse extends BaseResponse {
   result: {
     /** Unique Address of the account this request corresponds to. This is the.

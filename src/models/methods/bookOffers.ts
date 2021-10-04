@@ -8,8 +8,12 @@ export interface TakerAmount {
   issuer?: string
 }
 
-/** The book_offers method retrieves a list of offers, also known as the order.
- * book, between two currencies. Expects an {@link BookOffersResponse}. */
+/** .
+ * The book_offers method retrieves a list of offers, also known as the order.
+ * Book, between two currencies. Expects an {@link BookOffersResponse}.
+ *
+ * @category Requests
+ */
 export interface BookOffersRequest extends BaseRequest {
   command: 'book_offers'
   /** A 20-byte hex string for the ledger version to use. */
@@ -54,6 +58,8 @@ export interface BookOffer extends Offer {
 
 /**
  * Expected response from a {@link BookOffersResponse}.
+ *
+ * @category Responses
  */
 export interface BookOffersResponse extends BaseResponse {
   result: {

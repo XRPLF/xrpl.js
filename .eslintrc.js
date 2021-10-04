@@ -48,6 +48,10 @@ module.exports = {
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
     'multiline-comment-style': 'off',
+
+    // Allows the usage of @category -- TODO: try to add this in base config
+    'jsdoc/check-tag-names': 'off',
+    'tsdoc/syntax': 'off',
   },
   overrides: [
     {

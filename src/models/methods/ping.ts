@@ -1,8 +1,11 @@
 import { BaseRequest, BaseResponse } from './baseMethod'
 
-/** The ping command returns an acknowledgement, so that clients can test the
+/**
+ * The ping command returns an acknowledgement, so that clients can test the
  * connection status and latency. Expects a response in the form of a {@link
  * PingResponse}.
+ *
+ * @category Requests
  */
 export interface PingRequest extends BaseRequest {
   command: 'ping'
@@ -10,6 +13,8 @@ export interface PingRequest extends BaseRequest {
 
 /**
  * Response expected from a {@link PingRequest}.
+ *
+ * @category Responses
  */
 export interface PingResponse extends BaseResponse {
   // TODO: figure out if there's a better way to type this

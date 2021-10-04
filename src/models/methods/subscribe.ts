@@ -21,9 +21,13 @@ interface Book {
   both?: boolean
 }
 
-/** The subscribe method requests periodic notifications from the server when
+/**
+ * The subscribe method requests periodic notifications from the server when
  * certain events happen. Expects a response in the form of a.
- * {@link SubscribeResponse}. */
+ * {@link SubscribeResponse}.
+ *
+ * @category Requests
+ */
 export interface SubscribeRequest extends BaseRequest {
   command: 'subscribe'
   /** Array of string names of generic streams to subscribe to. */
@@ -47,7 +51,11 @@ export interface SubscribeRequest extends BaseRequest {
   url_password?: string
 }
 
-/** Response expected from a {@link SubscribeRequest} */
+/**
+ * Response expected from a {@link SubscribeRequest}.
+ *
+ * @category Responses
+ */
 export interface SubscribeResponse extends BaseResponse {
   result: {} | Stream
 }
@@ -56,9 +64,13 @@ interface BaseStream {
   type: string
 }
 
-/** The `ledger` stream only sends `ledgerClosed` messages when the consensus
- * process declares a new validated ledger. The message identifies the ledger.
- * and provides some information about its contents. */
+/** .
+ * The `ledger` stream only sends `ledgerClosed` messages when the consensus
+ * process declares a new validated ledger. The message identifies the ledger
+ * And provides some information about its contents.
+ *
+ * @category Streams
+ */
 export interface LedgerStream extends BaseStream {
   type: 'ledgerClosed'
   /** The reference transaction cost as of this ledger version, in drops of XRP.
@@ -94,6 +106,8 @@ export interface LedgerStream extends BaseStream {
  * The validations stream sends messages whenever it receives validation
  * messages, also called validation votes, regardless of whether or not the
  * validation message is from a trusted validator.
+ *
+ * @category Streams
  */
 export interface ValidationStream extends BaseStream {
   type: 'validationReceived'
@@ -142,7 +156,11 @@ export interface ValidationStream extends BaseStream {
   validation_public_key: string
 }
 
-/** Many subscriptions result in messages about transactions. */
+/**
+ * Many subscriptions result in messages about transactions.
+ *
+ * @category Streams
+ */
 export interface TransactionStream extends BaseStream {
   status: string
   type: 'transaction'
@@ -171,9 +189,13 @@ export interface TransactionStream extends BaseStream {
   warnings?: Array<{ id: number; message: string }>
 }
 
-/** The admin-only `peer_status` stream reports a large amount of information on
+/** .
+ * The admin-only `peer_status` stream reports a large amount of information on
  * the activities of other rippled servers to which this server is connected, in.
- * particular their status in the consensus process. */
+ * Particular their status in the consensus process.
+ *
+ * @category Streams
+ */
 export interface PeerStatusStream extends BaseStream {
   type: 'peerStatusChange'
   /** The type of event that prompted this message. See Peer Status Events for.
@@ -201,10 +223,14 @@ interface ModifiedOfferCreateTransaction extends OfferCreate {
   owner_funds: string
 }
 
-/** When you subscribe to one or more order books with the `books` field, you
+/** .
+ * When you subscribe to one or more order books with the `books` field, you
  * get back any transactions that affect those order books. Has the same format
  * as a {@link TransactionStream} but the transaction can have a `owner_funds`.
- * field. */
+ * Field.
+ *
+ * @category Streams
+ */
 export interface OrderBookStream extends BaseStream {
   status: string
   type: 'transaction'
@@ -219,9 +245,13 @@ export interface OrderBookStream extends BaseStream {
   validated: boolean
 }
 
-/** The consensus stream sends consensusPhase messages when the consensus
- * process changes phase. The message contains the new phase of consensus the.
- * server is in. */
+/**
+ * The consensus stream sends consensusPhase messages when the consensus
+ * process changes phase. The message contains the new phase of consensus the
+ * server is in.
+ *
+ * @category Streams
+ */
 export interface ConsensusStream extends BaseStream {
   type: 'consensusPhase'
   /** The new consensus phase the server is in. Possible values are open,.
@@ -229,6 +259,13 @@ export interface ConsensusStream extends BaseStream {
   consensus: 'open' | 'establish' | 'accepted'
 }
 
+/**
+ * The path_find method searches for a path along which a transaction can
+ * possibly be made, and periodically sends updates when the path changes over
+ * time.
+ *
+ * @category Streams
+ */
 export interface PathFindStream extends BaseStream {
   type: 'path_find'
   /** Unique address that would send a transaction. */
@@ -255,6 +292,9 @@ export interface PathFindStream extends BaseStream {
   }
 }
 
+/**
+ * @category Streams
+ */
 export type Stream =
   | LedgerStream
   | ValidationStream

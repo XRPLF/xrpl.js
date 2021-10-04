@@ -3,7 +3,7 @@ import { LedgerEntry } from '../ledger'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
-/**
+/** ..........
  * The `ledger_entry` method returns a single ledger object from the XRP Ledger
  * in its raw format. Expects a response in the form of a {@link
  * LedgerEntryResponse}.
@@ -14,7 +14,9 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *   ledger_index: 60102302,
  *   index: "7DB0788C020F02780A673DC74757F23823FA3014C1866E72CC4CD8B226CD6EF4"
  * }
- * ```.
+ * ```
+ *
+ * @category Requests
  */
 export interface LedgerEntryRequest extends BaseRequest {
   command: 'ledger_entry'
@@ -118,6 +120,8 @@ export interface LedgerEntryRequest extends BaseRequest {
 
 /**
  * Response expected from a {@link LedgerEntryRequest}.
+ *
+ * @category Responses
  */
 export interface LedgerEntryResponse extends BaseResponse {
   result: {

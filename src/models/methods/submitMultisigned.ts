@@ -6,6 +6,8 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  * The `submit_multisigned` command applies a multi-signed transaction and sends
  * it to the network to be included in future ledgers. Expects a response in the
  * form of a {@link SubmitMultisignedRequest}.
+ *
+ * @category Requests
  */
 export interface SubmitMultisignedRequest extends BaseRequest {
   command: 'submit_multisigned'
@@ -18,7 +20,11 @@ export interface SubmitMultisignedRequest extends BaseRequest {
   fail_hard?: boolean
 }
 
-/** Response expected from a {@link SubmitMultisignedRequest} */
+/**
+ * Response expected from a {@link SubmitMultisignedRequest}.
+ *
+ * @category Responses
+ */
 export interface SubmitMultisignedResponse extends BaseResponse {
   result: {
     /** Code indicating the preliminary result of the transaction, for example.

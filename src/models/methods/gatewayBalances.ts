@@ -2,7 +2,7 @@ import { LedgerIndex } from '../common'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
-/**
+/** ..........
  * The gateway_balances command calculates the total balances issued by a given
  * account, optionally excluding amounts held by operational addresses. Expects
  * a response in the form of a {@link GatewayBalancesResponse}.
@@ -16,7 +16,9 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *   "hotwallet": ["rKm4uWpg9tfwbVSeATv4KxDe6mpE9yPkgJ","ra7JkEzrgeKHdzKgo4EUUVBnxggY4z37kt"],
  *   "ledger_index": "validated"
  * }
- * ```.
+ * ```
+ *
+ * @category Requests
  */
 export interface GatewayBalancesRequest extends BaseRequest {
   command: 'gateway_balances'
@@ -40,7 +42,11 @@ interface Balance {
   value: string
 }
 
-/** Expected response from a {@link GatewayBalancesRequest} */
+/**
+ * Expected response from a {@link GatewayBalancesRequest}.
+ *
+ * @category Responses
+ */
 export interface GatewayBalancesResponse extends BaseResponse {
   result: {
     /** The address of the account that issued the balances. */

@@ -6,10 +6,12 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  * The submit method applies a transaction and sends it to the network to be
  * confirmed and included in future ledgers. Expects a response in the form of a
  * {@link SubmitResponse}.
+ *
+ * @category Requests
  */
 export interface SubmitRequest extends BaseRequest {
   command: 'submit'
-  /** The complete transaction in hex string format */
+  /** The complete transaction in hex string format. */
   tx_blob: string
   /** If true, and the transaction fails locally, do not retry or relay the.
    * transaction to other servers. The default is false. */
@@ -18,6 +20,8 @@ export interface SubmitRequest extends BaseRequest {
 
 /**
  * Response expected from a {@link SubmitRequest}.
+ *
+ * @category Responses
  */
 export interface SubmitResponse extends BaseResponse {
   result: {
