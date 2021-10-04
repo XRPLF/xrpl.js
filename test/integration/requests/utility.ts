@@ -20,7 +20,7 @@ describe('Utility method integration tests', function () {
     const response = await (this.client as Client).request({
       command: 'ping',
     })
-    const expected = {
+    const expected: unknown = {
       id: 0,
       result: { role: 'admin', unlimited: true },
       type: 'response',

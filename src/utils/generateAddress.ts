@@ -29,8 +29,7 @@ interface GenerateAddressOptions {
 }
 
 /**
- * TODO: Move this function to be a static function of the Wallet Class.
- * TODO: Doc this function.
+ * Generates an X-Address and a secret.
  *
  * @param options - Options for generating X-Address.
  * @returns A generated address.
