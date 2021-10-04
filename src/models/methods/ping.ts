@@ -17,5 +17,5 @@ export interface PingRequest extends BaseRequest {
  * @category Responses
  */
 export interface PingResponse extends BaseResponse {
-  result: Record<string, never>
+  result: { role?: string; unlimited?: boolean }
 }
