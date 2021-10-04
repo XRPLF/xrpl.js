@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 
 import type { Client } from '..'
-import { XrplError } from './errors'
+import { XrplError } from '../common/errors'
 
 const NUM_DECIMAL_PLACES = 6
 const BASE_10 = 10
