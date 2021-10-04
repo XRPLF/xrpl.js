@@ -3,6 +3,11 @@ import { ValidationError } from '../../errors'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
 
+/**
+ * Enum for AccountSet Flags.
+ *
+ * @category Flags
+ */
 export enum AccountSetFlags {
   /** Require a destination tag to send transactions to this account. */
   asfRequireDest = 1,
@@ -12,13 +17,13 @@ export enum AccountSetFlags {
   /** XRP should not be sent to this account. */
   asfDisallowXRP = 3,
   /** Disallow use of the master key pair. Can only be enabled if the account
-   * has configured another way to sign transactions, such as a Regular Key or a
+   * has configured another way to sign transactions, such as a Regular Key or a.
    * Signer List. */
   asfDisableMaster = 4,
-  /** Track the ID of this account's most recent transaction. Required for
+  /** Track the ID of this account's most recent transaction. Required for.
    * AccountTxnID */
   asfAccountTxnID = 5,
-  /** Permanently give up the ability to freeze individual trust lines or
+  /** Permanently give up the ability to freeze individual trust lines or.
    * disable Global Freeze. This flag can never be disabled after being enabled. */
   asfNoFreeze = 6,
   /** Freeze all assets issued by this account. */
@@ -29,6 +34,11 @@ export enum AccountSetFlags {
   asfDepositAuth = 9,
 }
 
+/**
+ * Enum for AccountSet Transaction Flags.
+ *
+ * @category Flags
+ */
 export enum AccountSetTransactionFlags {
   /** The same as SetFlag: asfRequireDest */
   tfRequireDestTag = 0x00010000,
@@ -54,13 +64,16 @@ export interface AccountSetFlagsInterface {
 }
 
 /** An AccountSet transaction modifies the properties of an account in the XRP
- * Ledger. */
+ * Ledger.
+ *
+ * @category Transaction Models
+ */
 export interface AccountSet extends BaseTransaction {
   TransactionType: 'AccountSet'
   Flags?: number | AccountSetFlagsInterface
   /** Unique identifier of a flag to disable for this account. */
   ClearFlag?: number
-  /** The domain that owns this account, as a string of hex representing the
+  /** The domain that owns this account, as a string of hex representing the.
    * ASCII for the domain in lowercase. */
   Domain?: string
   /** Hash of an email address to be used for generating an avatar image. */
@@ -70,11 +83,11 @@ export interface AccountSet extends BaseTransaction {
   /** Integer flag to enable for this account. */
   SetFlag?: AccountSetFlags
   /** The fee to charge when users transfer this account's issued currencies,
-   * represented as billionths of a unit. Cannot be more than 2000000000 or less
+   * represented as billionths of a unit. Cannot be more than 2000000000 or less.
    * than 1000000000, except for the special case 0 meaning no fee. */
   TransferRate?: number
   /** Tick size to use for offers involving a currency issued by this address.
-   * The exchange rates of those offers is rounded to this many significant
+   * The exchange rates of those offers is rounded to this many significant.
    * digits. Valid values are 3 to 15 inclusive, or 0 to disable. */
   TickSize?: number
 }

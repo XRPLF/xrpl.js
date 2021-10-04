@@ -161,6 +161,11 @@ const DEFAULT_MAX_FEE_XRP = '2'
 const MIN_LIMIT = 10
 const MAX_LIMIT = 400
 
+/**
+ * Client for interacting with rippled servers.
+ *
+ * @category Clients
+ */
 class Client extends EventEmitter {
   // New in > 0.21.0
   // non-validated ledger versions are allowed, and passed to rippled as-is.
