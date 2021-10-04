@@ -40,6 +40,35 @@ describe('Payment', function () {
     assert.doesNotThrow(() => validate(paymentTransaction))
   })
 
+  it(`Verifies memos correctly`, function () {
+    paymentTransaction.Memos = [
+      {
+        Memo: {
+          MemoData: '32324324',
+        },
+      },
+    ]
+
+    assert.doesNotThrow(() => validate(paymentTransaction))
+  })
+
+  it(`Verifies memos correctly`, function () {
+    paymentTransaction.Memos = [
+      {
+        Memo: {
+          MemoData: '32324324',
+          MemoType: 121221,
+        },
+      },
+    ]
+
+    assert.throws(
+      () => validate(paymentTransaction),
+      ValidationError,
+      'BaseTransaction: invalid Memos',
+    )
+  })
+
   it(`throws when Amount is missing`, function () {
     delete paymentTransaction.Amount
     assert.throws(
