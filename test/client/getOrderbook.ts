@@ -55,17 +55,15 @@ function normalRippledResponse(
   throw new XrplError('unexpected end')
 }
 
-function xrpRippledResponse(
-  request: BookOffersRequest,
-): Record<string, unknown> {
-  if (request.taker_pays.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
-    return rippled.book_offers.xrp_usd
-  }
-  if (request.taker_gets.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
-    return rippled.book_offers.usd_xrp
-  }
-  throw new XrplError('unexpected end')
-}
+// function xrpRippledResponse(request: BookOffersRequest): object {
+//   if (request.taker_pays.issuer === "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw") {
+//     return rippled.book_offers.xrp_usd;
+//   }
+//   if (request.taker_gets.issuer === "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw") {
+//     return rippled.book_offers.usd_xrp;
+//   }
+//   throw new Error("unexpected end");
+// }
 
 describe('client.getOrderbook', function () {
   beforeEach(setupClient)
