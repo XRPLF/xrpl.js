@@ -21,11 +21,10 @@ describe('Utility method integration tests', function () {
       command: 'ping',
     })
     const expected: unknown = {
-      id: 0,
       result: { role: 'admin', unlimited: true },
       type: 'response',
     }
-    assert.deepEqual(_.omit(response, 'id'), _.omit(expected, 'id'))
+    assert.deepEqual(_.omit(response, 'id'), expected)
   })
 
   it('random', async function () {
