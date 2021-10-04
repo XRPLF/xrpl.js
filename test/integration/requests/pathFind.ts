@@ -12,7 +12,7 @@ import {
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
-import { generateFundedWallet } from '../utils'
+import { generateFundedWallet, ledgerAccept } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -99,6 +99,8 @@ describe('path_find', function () {
     })
 
     assert.deepEqual(response, expectedResponse)
+
+    ledgerAccept(this.client)
 
     return event
   })
