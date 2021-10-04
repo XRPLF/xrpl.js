@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Wallet | ripple-lib</title>
-	<meta name="description" content="Documentation for ripple-lib">
+	<title>Wallet | xrpl</title>
+	<meta name="description" content="Documentation for xrpl">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
 	<script async src="../assets/js/search.js" id="search-script"></script>
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">ripple-lib</a>
+					<a href="../index.html" class="title">xrpl</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -52,7 +52,7 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="../modules.html">ripple-lib</a>
+					<a href="../modules.html">xrpl</a>
 				</li>
 				<li>
 					<a href="Wallet.html">Wallet</a>
@@ -99,13 +99,12 @@
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="Wallet.html#privateKey" class="tsd-kind-icon">private<wbr>Key</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="Wallet.html#publicKey" class="tsd-kind-icon">public<wbr>Key</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="Wallet.html#seed" class="tsd-kind-icon">seed</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static"><a href="Wallet.html#defaultAlgorithm" class="tsd-kind-icon">default<wbr>Algorithm</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static"><a href="Wallet.html#defaultDerivationPath" class="tsd-kind-icon">default<wbr>Derivation<wbr>Path</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="Wallet.html#getClassicAddress" class="tsd-kind-icon">get<wbr>Classic<wbr>Address</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="Wallet.html#getXAddress" class="tsd-kind-icon">getXAddress</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="Wallet.html#signTransaction" class="tsd-kind-icon">sign<wbr>Transaction</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="Wallet.html#verifyTransaction" class="tsd-kind-icon">verify<wbr>Transaction</a></li>
@@ -114,7 +113,6 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="Wallet.html#fromMnemonic" class="tsd-kind-icon">from<wbr>Mnemonic</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="Wallet.html#fromSeed" class="tsd-kind-icon">from<wbr>Seed</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="Wallet.html#generate" class="tsd-kind-icon">generate</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private tsd-is-static"><a href="Wallet.html#hexFromBuffer" class="tsd-kind-icon">hex<wbr>From<wbr>Buffer</a></li>
 							</ul>
 						</section>
 					</div>
@@ -132,19 +130,39 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/wallet/index.ts#L31">src/wallet/index.ts:31</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/wallet/index.ts#L43">src/wallet/index.ts:43</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a new Wallet.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>publicKey: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>The public key for the account.</p>
+										</div>
+									</div>
 								</li>
 								<li>
 									<h5>privateKey: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>The private key used for signing transactions for the account.</p>
+										</div>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> seed: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>(Optional) The seed used to derive the account keys.</p>
+										</div>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a></h4>
@@ -160,7 +178,7 @@
 					<div class="tsd-signature tsd-kind-icon">classic<wbr>Address<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/wallet/index.ts#L26">src/wallet/index.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/wallet/index.ts#L33">src/wallet/index.ts:33</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -170,7 +188,7 @@
 					<div class="tsd-signature tsd-kind-icon">private<wbr>Key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/wallet/index.ts#L25">src/wallet/index.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/wallet/index.ts#L32">src/wallet/index.ts:32</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -180,7 +198,7 @@
 					<div class="tsd-signature tsd-kind-icon">public<wbr>Key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/wallet/index.ts#L24">src/wallet/index.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/wallet/index.ts#L31">src/wallet/index.ts:31</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -190,27 +208,7 @@
 					<div class="tsd-signature tsd-kind-icon">seed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/wallet/index.ts#L27">src/wallet/index.ts:27</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static">
-					<a name="defaultAlgorithm" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagStatic">Static</span> <span class="tsd-flag ts-flagPrivate">Private</span> <span class="tsd-flag ts-flagReadonly">Readonly</span> default<wbr>Algorithm</h3>
-					<div class="tsd-signature tsd-kind-icon">default<wbr>Algorithm<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ECDSA</span><span class="tsd-signature-symbol"> = ...</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/wallet/index.ts#L28">src/wallet/index.ts:28</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static">
-					<a name="defaultDerivationPath" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagStatic">Static</span> <span class="tsd-flag ts-flagPrivate">Private</span> <span class="tsd-flag ts-flagReadonly">Readonly</span> default<wbr>Derivation<wbr>Path</h3>
-					<div class="tsd-signature tsd-kind-icon">default<wbr>Derivation<wbr>Path<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;m/44&#x27;/144&#x27;/0&#x27;/0/0&quot;</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/wallet/index.ts#L29">src/wallet/index.ts:29</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/wallet/index.ts#L34">src/wallet/index.ts:34</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -218,16 +216,39 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="getXAddress" class="tsd-anchor"></a>
-					<h3>getXAddress</h3>
+					<a name="getClassicAddress" class="tsd-anchor"></a>
+					<h3>get<wbr>Classic<wbr>Address</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">getXAddress<span class="tsd-signature-symbol">(</span>tag<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, test<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Classic<wbr>Address<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/wallet/index.ts#L153">src/wallet/index.ts:153</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/wallet/index.ts#L179">src/wallet/index.ts:179</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Gets the classic address of the account this wallet represents.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<p>A classic address.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getXAddress" class="tsd-anchor"></a>
+					<h3>getXAddress</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">getXAddress<span class="tsd-signature-symbol">(</span>tag<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span>, isTestnet<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/wallet/index.ts#L170">src/wallet/index.ts:170</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -238,13 +259,13 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>tag: <span class="tsd-signature-type">number</span></h5>
+									<h5>tag: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> = false</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>A tag to be included within the X-address.</p>
 									</div>
 								</li>
 								<li>
-									<h5>test: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></h5>
+									<h5>isTestnet: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>A boolean to indicate if X-address should be in Testnet (true) or Mainnet (false) format.</p>
 									</div>
@@ -259,13 +280,13 @@
 					<a name="signTransaction" class="tsd-anchor"></a>
 					<h3>sign<wbr>Transaction</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">sign<wbr>Transaction<span class="tsd-signature-symbol">(</span>transaction<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/SignOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">SignOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SignedTransaction</span></li>
+						<li class="tsd-signature tsd-kind-icon">sign<wbr>Transaction<span class="tsd-signature-symbol">(</span>transaction<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Transaction</span>, options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/SignOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">SignOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/wallet/index.ts#L126">src/wallet/index.ts:126</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/wallet/index.ts#L142">src/wallet/index.ts:142</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -276,7 +297,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>transaction: <span class="tsd-signature-type">any</span></h5>
+									<h5>transaction: <span class="tsd-signature-type">Transaction</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>A transaction to be signed offline.</p>
 									</div>
@@ -288,7 +309,7 @@
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">SignedTransaction</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
 							<p>A signed transaction.</p>
 						</li>
 					</ul>
@@ -303,7 +324,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/wallet/index.ts#L139">src/wallet/index.ts:139</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/wallet/index.ts#L156">src/wallet/index.ts:156</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -335,19 +356,31 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/wallet/index.ts#L111">src/wallet/index.ts:111</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/wallet/index.ts#L127">src/wallet/index.ts:127</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Derive a Wallet from a seed.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>seed: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The seed used to derive the wallet.</p>
+									</div>
 								</li>
 								<li>
 									<h5>algorithm: <span class="tsd-signature-type">ECDSA</span><span class="tsd-signature-symbol"> = ...</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The algorithm used to do the derivation.</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a></h4>
+							<p>A Wallet derived from the seed.</p>
 						</li>
 					</ul>
 				</section>
@@ -361,7 +394,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/wallet/index.ts#L95">src/wallet/index.ts:95</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/wallet/index.ts#L108">src/wallet/index.ts:108</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -399,13 +432,18 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/wallet/index.ts#L70">src/wallet/index.ts:70</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/wallet/index.ts#L83">src/wallet/index.ts:83</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Derives a wallet from a mnemonic.</p>
 								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>ValidationError if unable to derive private key from mnemonic input.</p>
+									</dd>
+								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -437,7 +475,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/wallet/index.ts#L56">src/wallet/index.ts:56</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/wallet/index.ts#L68">src/wallet/index.ts:68</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -475,7 +513,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/wallet/index.ts#L44">src/wallet/index.ts:44</a></li>
+									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/wallet/index.ts#L56">src/wallet/index.ts:56</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -494,29 +532,6 @@
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a></h4>
 							<p>A new Wallet derived from a generated seed.</p>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private tsd-is-static">
-					<a name="hexFromBuffer" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagStatic">Static</span> <span class="tsd-flag ts-flagPrivate">Private</span> hex<wbr>From<wbr>Buffer</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private tsd-is-static">
-						<li class="tsd-signature tsd-kind-icon">hex<wbr>From<wbr>Buffer<span class="tsd-signature-symbol">(</span>buffer<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/wallet/index.ts#L107">src/wallet/index.ts:107</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>buffer: <span class="tsd-signature-type">Buffer</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -552,11 +567,8 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="Wallet.html#seed" class="tsd-kind-icon">seed</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static">
-								<a href="Wallet.html#defaultAlgorithm" class="tsd-kind-icon">default<wbr>Algorithm</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static">
-								<a href="Wallet.html#defaultDerivationPath" class="tsd-kind-icon">default<wbr>Derivation<wbr>Path</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="Wallet.html#getClassicAddress" class="tsd-kind-icon">get<wbr>Classic<wbr>Address</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="Wallet.html#getXAddress" class="tsd-kind-icon">getXAddress</a>
@@ -581,9 +593,6 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
 								<a href="Wallet.html#generate" class="tsd-kind-icon">generate</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private tsd-is-static">
-								<a href="Wallet.html#hexFromBuffer" class="tsd-kind-icon">hex<wbr>From<wbr>Buffer</a>
 							</li>
 						</ul>
 					</li>

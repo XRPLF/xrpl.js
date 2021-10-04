@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ripple-lib</title>
-	<meta name="description" content="Documentation for ripple-lib">
+	<title>xrpl</title>
+	<meta name="description" content="Documentation for xrpl">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
 	<script async src="assets/js/search.js" id="search-script"></script>
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title">ripple-lib</a>
+					<a href="index.html" class="title">xrpl</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -50,7 +50,7 @@
 	</div>
 	<div class="tsd-page-title">
 		<div class="container">
-			<h1>ripple-lib</h1>
+			<h1>xrpl</h1>
 		</div>
 	</div>
 </header>
@@ -58,11 +58,11 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
-				<a href="#ripple-lib-rippleapi" id="ripple-lib-rippleapi" style="color: inherit; text-decoration: none;">
-					<h1>ripple-lib (RippleAPI)</h1>
+				<a href="#xrpljs" id="xrpljs" style="color: inherit; text-decoration: none;">
+					<h1>xrpl.js</h1>
 				</a>
-				<p>A JavaScript/TypeScript API for interacting with the XRP Ledger</p>
-				<p><a href="https://www.npmjs.org/package/ripple-lib"><img src="https://nodei.co/npm/ripple-lib.png" alt="NPM"></a></p>
+				<p>A JavaScript/TypeScript library for interacting with the XRP Ledger</p>
+				<p><a href="https://www.npmjs.org/package/xrpl"><img src="https://nodei.co/npm/xrpl.png" alt="NPM"></a></p>
 				<p>This is the recommended library for integrating a JavaScript/TypeScript app with the XRP Ledger, especially if you intend to use advanced functionality such as IOUs, payment paths, the decentralized exchange, account settings, payment channels, escrows, multi-signing, and more.</p>
 				<a href="#➡️-reference-documentation" id="➡️-reference-documentation" style="color: inherit; text-decoration: none;">
 					<h2><a href="https://xrpl.org/rippleapi-reference.html">➡️ Reference Documentation</a></h2>
@@ -71,7 +71,7 @@
 				<a href="#➡️-applications-and-projects" id="➡️-applications-and-projects" style="color: inherit; text-decoration: none;">
 					<h2><a href="APPLICATIONS.md">➡️ Applications and Projects</a></h2>
 				</a>
-				<p>What is ripple-lib used for? The applications on the list linked above use <code>ripple-lib</code>. Open a PR to add your app or project to the list!</p>
+				<p>What is xrpl.js used for? The applications on the list linked above use <code>xrpl.js</code>. Open a PR to add your app or project to the list!</p>
 				<a href="#features" id="features" style="color: inherit; text-decoration: none;">
 					<h3>Features</h3>
 				</a>
@@ -93,18 +93,18 @@
 					<h2>Getting Started</h2>
 				</a>
 				<p>See also: <a href="https://xrpl.org/get-started-with-rippleapi-for-javascript.html">RippleAPI Beginners Guide</a></p>
-				<p>In an existing project (with <code>package.json</code>), install <code>ripple-lib</code>:</p>
-				<pre><code><span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span><span style="color: #000000"> </span><span style="color: #001080">ripple</span><span style="color: #000000">-</span><span style="color: #001080">lib</span>
+				<p>In an existing project (with <code>package.json</code>), install <code>xrpl.js</code>:</p>
+				<pre><code><span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span><span style="color: #000000"> </span><span style="color: #001080">xrpl</span>
 </code></pre>
 				<p>Then see the <a href="#documentation">documentation</a>.</p>
-				<a href="#using-ripple-lib-with-react-native" id="using-ripple-lib-with-react-native" style="color: inherit; text-decoration: none;">
-					<h3>Using ripple-lib with React Native</h3>
+				<a href="#using-xrpljs-with-react-native" id="using-xrpljs-with-react-native" style="color: inherit; text-decoration: none;">
+					<h3>Using xrpl.js with React Native</h3>
 				</a>
-				<p>If you want to use <code>ripple-lib</code> with React Native you will need to have some of the NodeJS modules available. To help with this you can use a module like <a href="https://github.com/tradle/rn-nodeify">rn-nodeify</a>.</p>
+				<p>If you want to use <code>xrpl.js</code> with React Native you will need to have some of the NodeJS modules available. To help with this you can use a module like <a href="https://github.com/tradle/rn-nodeify">rn-nodeify</a>.</p>
 				<ol>
 					<li><p>Install dependencies (you can use <code>npm</code> as well):</p>
 						<pre><code class="language-shell"><span style="color: #000000">npm install react-native-crypto</span>
-<span style="color: #000000">npm install ripple-lib</span>
+<span style="color: #000000">npm install xrpl</span>
 <span style="color: #008000"># install peer deps</span>
 <span style="color: #000000">npm install react-native-randombytes</span>
 <span style="color: #008000"># install latest rn-nodeify</span>
@@ -131,14 +131,14 @@
 				<pre><code class="language-javascript"><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;./shim&#039;</span>
 <span style="color: #000000">...</span>
 </code></pre>
-				<a href="#using-ripple-lib-with-deno" id="using-ripple-lib-with-deno" style="color: inherit; text-decoration: none;">
-					<h3>Using ripple-lib with Deno</h3>
+				<a href="#using-xrpljs-with-deno" id="using-xrpljs-with-deno" style="color: inherit; text-decoration: none;">
+					<h3>Using xrpl.js with Deno</h3>
 				</a>
-				<p>Until official support for <a href="https://deno.land">Deno</a> is added, you can use the following work-around to use <code>ripple-lib</code> with Deno:</p>
-				<pre><code class="language-javascript"><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">ripple</span><span style="color: #000000"> </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;https://dev.jspm.io/npm:ripple-lib&#039;</span><span style="color: #000000">;</span>
+				<p>Until official support for <a href="https://deno.land">Deno</a> is added, you can use the following work-around to use <code>xrpl.js</code> with Deno:</p>
+				<pre><code class="language-javascript"><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">xrpl</span><span style="color: #000000"> </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;https://dev.jspm.io/npm:xrpl&#039;</span><span style="color: #000000">;</span>
 
 <span style="color: #000000">(</span><span style="color: #0000FF">async</span><span style="color: #000000"> () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
-<span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">api</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> (</span><span style="color: #001080">ripple</span><span style="color: #000000"> </span><span style="color: #AF00DB">as</span><span style="color: #000000"> </span><span style="color: #267F99">any</span><span style="color: #000000">).</span><span style="color: #795E26">RippleAPI</span><span style="color: #000000">({ </span><span style="color: #001080">server:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;wss://s.altnet.rippletest.net:51233&#039;</span><span style="color: #000000"> });</span>
+<span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">api</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> (</span><span style="color: #001080">xrpl</span><span style="color: #000000"> </span><span style="color: #AF00DB">as</span><span style="color: #000000"> </span><span style="color: #267F99">any</span><span style="color: #000000">).</span><span style="color: #795E26">RippleAPI</span><span style="color: #000000">({ </span><span style="color: #001080">server:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;wss://s.altnet.rippletest.net:51233&#039;</span><span style="color: #000000"> });</span>
 <span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">address</span><span style="color: #000000"> = </span><span style="color: #A31515">&#039;rH8NxV12EuV...khfJ5uw9kT&#039;</span><span style="color: #000000">;</span>
 
 <span style="color: #000000">  </span><span style="color: #001080">api</span><span style="color: #000000">.</span><span style="color: #795E26">connect</span><span style="color: #000000">().</span><span style="color: #795E26">then</span><span style="color: #000000">(() </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
@@ -159,7 +159,7 @@
 				<a href="#mailing-lists" id="mailing-lists" style="color: inherit; text-decoration: none;">
 					<h3>Mailing Lists</h3>
 				</a>
-				<p>We have a low-traffic mailing list for announcements of new ripple-lib releases. (About 1 email per week)</p>
+				<p>We have a low-traffic mailing list for announcements of new xrpl.js releases. (About 1 email per week)</p>
 				<ul>
 					<li><a href="https://groups.google.com/forum/#!forum/ripple-lib-announce">Subscribe to ripple-lib-announce</a></li>
 				</ul>
@@ -194,9 +194,7 @@
 				<a href="#generating-documentation" id="generating-documentation" style="color: inherit; text-decoration: none;">
 					<h2>Generating Documentation</h2>
 				</a>
-				<p>Do not edit <code>./docs/index.md</code> directly because it is a generated file.</p>
-				<p>Instead, edit the appropriate <code>.md.ejs</code> files in <code>./docs/src/</code>.</p>
-				<p>If you make changes to the JSON schemas, fixtures, or documentation sources, update the documentation by running <code>npm run docgen</code>.</p>
+				<p>Update the documentation by running <code>npm run docgen</code>.</p>
 				<a href="#more-information" id="more-information" style="color: inherit; text-decoration: none;">
 					<h2>More Information</h2>
 				</a>
@@ -205,7 +203,6 @@
 					<li><a href="https://xrpl.org/rippleapi-reference.html">RippleAPI Reference</a> - XRP Ledger Dev Portal</li>
 					<li><a href="https://xrpl.org/">XRP Ledger Dev Portal</a></li>
 				</ul>
-				<p> <a href="https://travis-ci.org/ripple/ripple-lib"><img src="https://travis-ci.org/ripple/ripple-lib.svg?branch=master" alt="Build Status"></a></p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -218,9 +215,6 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-reference">
-						<a href="modules.html#deriveXAddress" class="tsd-kind-icon">deriveXAddress</a>
-					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/BroadcastClient.html" class="tsd-kind-icon">Broadcast<wbr>Client</a>
 					</li>
@@ -300,34 +294,10 @@
 						<a href="interfaces/FeeResponse.html" class="tsd-kind-icon">Fee<wbr>Response</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/FormattedOrderCancellation.html" class="tsd-kind-icon">Formatted<wbr>Order<wbr>Cancellation</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/FormattedOrderCancellationTransaction.html" class="tsd-kind-icon">Formatted<wbr>Order<wbr>Cancellation<wbr>Transaction</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/FormattedOrderTransaction.html" class="tsd-kind-icon">Formatted<wbr>Order<wbr>Transaction</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/FormattedPayment.html" class="tsd-kind-icon">Formatted<wbr>Payment</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/FormattedPaymentTransaction.html" class="tsd-kind-icon">Formatted<wbr>Payment<wbr>Transaction</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/FormattedSettingsTransaction.html" class="tsd-kind-icon">Formatted<wbr>Settings<wbr>Transaction</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/FormattedTrustlineTransaction.html" class="tsd-kind-icon">Formatted<wbr>Trustline<wbr>Transaction</a>
-					</li>
-					<li class=" tsd-kind-interface">
 						<a href="interfaces/GatewayBalancesRequest.html" class="tsd-kind-icon">Gateway<wbr>Balances<wbr>Request</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/GatewayBalancesResponse.html" class="tsd-kind-icon">Gateway<wbr>Balances<wbr>Response</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/Instructions.html" class="tsd-kind-icon">Instructions</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/KeyPair.html" class="tsd-kind-icon">Key<wbr>Pair</a>
@@ -384,9 +354,6 @@
 						<a href="interfaces/NoRippleCheckResponse.html" class="tsd-kind-icon">No<wbr>Ripple<wbr>Check<wbr>Response</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/OfferCreateTransaction.html" class="tsd-kind-icon">Offer<wbr>Create<wbr>Transaction</a>
-					</li>
-					<li class=" tsd-kind-interface">
 						<a href="interfaces/OrderBookStream.html" class="tsd-kind-icon">Order<wbr>Book<wbr>Stream</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -406,9 +373,6 @@
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/PingResponse.html" class="tsd-kind-icon">Ping<wbr>Response</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/Prepare.html" class="tsd-kind-icon">Prepare</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/RandomRequest.html" class="tsd-kind-icon">Random<wbr>Request</a>
@@ -433,9 +397,6 @@
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/ServerStateResponse.html" class="tsd-kind-icon">Server<wbr>State<wbr>Response</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/SettingsTransaction.html" class="tsd-kind-icon">Settings<wbr>Transaction</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/SignOptions.html" class="tsd-kind-icon">Sign<wbr>Options</a>
@@ -468,9 +429,6 @@
 						<a href="interfaces/TransactionEntryResponse.html" class="tsd-kind-icon">Transaction<wbr>Entry<wbr>Response</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/TransactionJSON.html" class="tsd-kind-icon">TransactionJSON</a>
-					</li>
-					<li class=" tsd-kind-interface">
 						<a href="interfaces/TransactionStream.html" class="tsd-kind-icon">Transaction<wbr>Stream</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -489,9 +447,6 @@
 						<a href="interfaces/ValidationStream.html" class="tsd-kind-icon">Validation<wbr>Stream</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#FormattedTransactionType" class="tsd-kind-icon">Formatted<wbr>Transaction<wbr>Type</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
 						<a href="modules.html#PathFindRequest" class="tsd-kind-icon">Path<wbr>Find<wbr>Request</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
@@ -504,9 +459,6 @@
 						<a href="modules.html#Stream" class="tsd-kind-icon">Stream</a>
 					</li>
 					<li class=" tsd-kind-property tsd-is-external">
-						<a href="modules.html#deriveAddress" class="tsd-kind-icon">derive<wbr>Address</a>
-					</li>
-					<li class=" tsd-kind-property tsd-is-external">
 						<a href="modules.html#deriveKeypair" class="tsd-kind-icon">derive<wbr>Keypair</a>
 					</li>
 					<li class=" tsd-kind-function">
@@ -514,9 +466,6 @@
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="modules.html#computeAccountRootIndex" class="tsd-kind-icon">compute<wbr>Account<wbr>Root<wbr>Index</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="modules.html#computeBinaryTransactionHash" class="tsd-kind-icon">compute<wbr>Binary<wbr>Transaction<wbr>Hash</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="modules.html#computeBinaryTransactionSigningHash" class="tsd-kind-icon">compute<wbr>Binary<wbr>Transaction<wbr>Signing<wbr>Hash</a>
@@ -537,13 +486,13 @@
 						<a href="modules.html#computePaymentChannelHash" class="tsd-kind-icon">compute<wbr>Payment<wbr>Channel<wbr>Hash</a>
 					</li>
 					<li class=" tsd-kind-function">
+						<a href="modules.html#computeSignedTransactionHash" class="tsd-kind-icon">compute<wbr>Signed<wbr>Transaction<wbr>Hash</a>
+					</li>
+					<li class=" tsd-kind-function">
 						<a href="modules.html#computeSignerListIndex" class="tsd-kind-icon">compute<wbr>Signer<wbr>List<wbr>Index</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="modules.html#computeStateTreeHash" class="tsd-kind-icon">compute<wbr>State<wbr>Tree<wbr>Hash</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="modules.html#computeTransactionHash" class="tsd-kind-icon">compute<wbr>Transaction<wbr>Hash</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="modules.html#computeTransactionTreeHash" class="tsd-kind-icon">compute<wbr>Transaction<wbr>Tree<wbr>Hash</a>
@@ -552,7 +501,10 @@
 						<a href="modules.html#computeTrustlineHash" class="tsd-kind-icon">compute<wbr>Trustline<wbr>Hash</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="modules.html#convertKeysFromSnakeCaseToCamelCase" class="tsd-kind-icon">convert<wbr>Keys<wbr>From<wbr>Snake<wbr>Case<wbr>ToCamel<wbr>Case</a>
+						<a href="modules.html#convertStringToHex" class="tsd-kind-icon">convert<wbr>String<wbr>ToHex</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#deriveXAddress" class="tsd-kind-icon">deriveXAddress</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="modules.html#dropsToXrp" class="tsd-kind-icon">drops<wbr>ToXrp</a>

@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>TransactionStream | ripple-lib</title>
-	<meta name="description" content="Documentation for ripple-lib">
+	<title>TransactionStream | xrpl</title>
+	<meta name="description" content="Documentation for xrpl">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
 	<script async src="../assets/js/search.js" id="search-script"></script>
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">ripple-lib</a>
+					<a href="../index.html" class="title">xrpl</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -52,7 +52,7 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="../modules.html">ripple-lib</a>
+					<a href="../modules.html">xrpl</a>
 				</li>
 				<li>
 					<a href="TransactionStream.html">TransactionStream</a>
@@ -65,6 +65,13 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Many subscriptions result in messages about transactions.</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -109,9 +116,14 @@
 					<div class="tsd-signature tsd-kind-icon">engine_<wbr>result<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/subscribe.ts#L70">src/models/methods/subscribe.ts:70</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/models/methods/subscribe.ts#L151">src/models/methods/subscribe.ts:151</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>String Transaction result code.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="engine_result_code" class="tsd-anchor"></a>
@@ -119,9 +131,14 @@
 					<div class="tsd-signature tsd-kind-icon">engine_<wbr>result_<wbr>code<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/subscribe.ts#L71">src/models/methods/subscribe.ts:71</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/models/methods/subscribe.ts#L153">src/models/methods/subscribe.ts:153</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Numeric transaction response code, if applicable.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="engine_result_message" class="tsd-anchor"></a>
@@ -129,9 +146,14 @@
 					<div class="tsd-signature tsd-kind-icon">engine_<wbr>result_<wbr>message<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/subscribe.ts#L72">src/models/methods/subscribe.ts:72</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/models/methods/subscribe.ts#L155">src/models/methods/subscribe.ts:155</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Human-readable explanation for the transaction response.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="ledger_current_index" class="tsd-anchor"></a>
@@ -139,9 +161,15 @@
 					<div class="tsd-signature tsd-kind-icon">ledger_<wbr>current_<wbr>index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/subscribe.ts#L73">src/models/methods/subscribe.ts:73</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/models/methods/subscribe.ts#L158">src/models/methods/subscribe.ts:158</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The ledger index of the current in-progress ledger version for which this
+							transaction is currently proposed.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="ledger_hash" class="tsd-anchor"></a>
@@ -149,9 +177,14 @@
 					<div class="tsd-signature tsd-kind-icon">ledger_<wbr>hash<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/subscribe.ts#L74">src/models/methods/subscribe.ts:74</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/models/methods/subscribe.ts#L160">src/models/methods/subscribe.ts:160</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The identifying hash of the ledger version that includes this transaction.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="ledger_index" class="tsd-anchor"></a>
@@ -159,9 +192,14 @@
 					<div class="tsd-signature tsd-kind-icon">ledger_<wbr>index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/subscribe.ts#L75">src/models/methods/subscribe.ts:75</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/models/methods/subscribe.ts#L162">src/models/methods/subscribe.ts:162</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The ledger index of the ledger version that includes this transaction.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="meta" class="tsd-anchor"></a>
@@ -169,9 +207,15 @@
 					<div class="tsd-signature tsd-kind-icon">meta<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">default</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/subscribe.ts#L76">src/models/methods/subscribe.ts:76</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/models/methods/subscribe.ts#L165">src/models/methods/subscribe.ts:165</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The transaction metadata, which shows the exact outcome of the transaction
+							in detail.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="status" class="tsd-anchor"></a>
@@ -179,7 +223,7 @@
 					<div class="tsd-signature tsd-kind-icon">status<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/subscribe.ts#L68">src/models/methods/subscribe.ts:68</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/models/methods/subscribe.ts#L148">src/models/methods/subscribe.ts:148</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -189,9 +233,14 @@
 					<div class="tsd-signature tsd-kind-icon">transaction<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Transaction</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/subscribe.ts#L77">src/models/methods/subscribe.ts:77</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/models/methods/subscribe.ts#L167">src/models/methods/subscribe.ts:167</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The definition of the transaction in JSON format</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
 					<a name="type" class="tsd-anchor"></a>
@@ -200,7 +249,7 @@
 					<aside class="tsd-sources">
 						<p>Overrides BaseStream.type</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/subscribe.ts#L69">src/models/methods/subscribe.ts:69</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/models/methods/subscribe.ts#L149">src/models/methods/subscribe.ts:149</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -210,9 +259,16 @@
 					<div class="tsd-signature tsd-kind-icon">validated<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/subscribe.ts#L78">src/models/methods/subscribe.ts:78</a></li>
+							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/335be79d/src/models/methods/subscribe.ts#L171">src/models/methods/subscribe.ts:171</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>If true, this transaction is included in a validated ledger and its
+								outcome is final. Responses from the transaction stream should always be
+							validated.</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
