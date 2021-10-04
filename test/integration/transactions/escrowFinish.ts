@@ -5,7 +5,7 @@ import { EscrowFinish, EscrowCreate, dropsToXrp } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
-import { generateFundedWallet, getSequence, testTransaction } from '../utils'
+import { generateFundedWallet, testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -43,22 +43,29 @@ describe('EscrowFinish', function () {
     )[0].value
 
     // check that the object was actually created
-    assert.equal(
-      (
-        await this.client.request({
-          command: 'account_objects',
-          account: this.wallet.getClassicAddress(),
-        })
-      ).result.account_objects.length === 1,
-      true,
-    )
+    const accountObjects = (
+      await this.client.request({
+        command: 'account_objects',
+        account: this.wallet.getClassicAddress(),
+      })
+    ).result.account_objects
+
+    assert.equal(accountObjects.length, 1)
+
+    const sequence = (
+      await this.client.request({
+        command: 'tx',
+        transaction: accountObjects[0].PreviousTxnID,
+      })
+    ).result.Sequence
 
     const finishTx: EscrowFinish = {
       TransactionType: 'EscrowFinish',
       Account: this.wallet.getClassicAddress(),
       Owner: this.wallet.getClassicAddress(),
-      OfferSequence: getSequence(),
+      OfferSequence: sequence,
     }
+
     await testTransaction(this.client, finishTx, this.wallet)
 
     const expectedBalance = Number(initialBalance) + Number(dropsToXrp(AMOUNT))
