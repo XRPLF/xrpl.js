@@ -18,7 +18,7 @@ export interface CheckCreate extends BaseTransaction {
   TransactionType: 'CheckCreate'
   /** The unique address of the account that can cash the Check. */
   Destination: string
-  /** 	Maximum amount of source currency the Check is allowed to debit the
+  /** Maximum amount of source currency the Check is allowed to debit the
    * sender, including transfer fees on non-XRP currencies. The Check can only
    * credit the destination with the same currency (from the same issuer, for
    * non-XRP currencies). For non-XRP amounts, the nested field names MUST be.

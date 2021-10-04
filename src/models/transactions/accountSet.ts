@@ -40,17 +40,17 @@ export enum AccountSetFlags {
  * @category Flags
  */
 export enum AccountSetTransactionFlags {
-  /** The same as SetFlag: asfRequireDest */
+  /** The same as SetFlag: asfRequireDest. */
   tfRequireDestTag = 0x00010000,
-  /** The same as ClearFlag: asfRequireDest */
+  /** The same as ClearFlag: asfRequireDest. */
   tfOptionalDestTag = 0x00020000,
-  /** The same as SetFlag: asfRequireAuth */
+  /** The same as SetFlag: asfRequireAuth. */
   tfRequireAuth = 0x00040000,
-  /** The same as ClearFlag: asfRequireAuth */
+  /** The same as ClearFlag: asfRequireAuth. */
   tfOptionalAuth = 0x00080000,
-  /** The same as SetFlag: asfDisallowXRP */
+  /** The same as SetFlag: asfDisallowXRP. */
   tfDisallowXRP = 0x00100000,
-  /** The same as ClearFlag: asfDisallowXRP */
+  /** The same as ClearFlag: asfDisallowXRP. */
   tfAllowXRP = 0x00200000,
 }
 
