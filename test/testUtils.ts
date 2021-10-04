@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any -- required for
+assertions. */
 import net from 'net'
 
 import { assert } from 'chai'
@@ -13,11 +15,6 @@ export const addressTests = [
   { type: 'X-Address', address: addresses.ACCOUNT_X },
 ]
 
-interface Result {
-  txJSON: string
-  tx_json?: unknown
-}
-
 /**
  * Check the response against the expected result. Optionally validate
  * that response against a given schema as well.
@@ -27,8 +24,8 @@ interface Result {
  * @param _schemaName - Name of the schema used to validate the shape of the response.
  */
 export function assertResultMatch(
-  response: Result,
-  expected: Result,
+  response: any,
+  expected: any,
   _schemaName?: string,
 ): void {
   if (expected.txJSON) {
@@ -62,7 +59,7 @@ export function assertResultMatch(
  */
 export async function assertRejects(
   promise: PromiseLike<unknown>,
-  instanceOf: typeof Error,
+  instanceOf: any,
   message?: string | RegExp,
 ): Promise<void> {
   try {
