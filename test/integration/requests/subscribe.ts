@@ -13,7 +13,6 @@ import {
 } from 'xrpl-local'
 import { StreamType } from 'xrpl-local/models/common'
 
-import rippled from '../../fixtures/rippled'
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 import { ledgerAccept, testTransaction } from '../utils'
@@ -80,8 +79,6 @@ describe('subscribe', function () {
 
     assert.equal(result.status, 'success')
   })
-
-  // TODO: Add a 'server' test
 
   it('Emits transaction', async function () {
     const event = createTxHandlerTest(this.client, this.wallet, 'transactions')
