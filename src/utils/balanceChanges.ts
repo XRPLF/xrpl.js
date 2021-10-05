@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 
+import { Amount, IssuedCurrencyAmount } from '../models/common'
 import TransactionMetadata, { Node } from '../models/transactions/metadata'
 
 import { dropsToXrp } from './xrpConversion'
@@ -12,18 +13,20 @@ interface Balance {
 }
 
 interface BalanceChange {
-  address: string
+  account: string
   balance: Balance
 }
 
 interface BalanceChanges {
-  address: string
+  account: string
   balances: Balance[]
 }
 
 interface Fields {
   Account?: string
-  Balance?: string
+  Balance?: Amount
+  LowLimit?: IssuedCurrencyAmount
+  HighLimit?: IssuedCurrencyAmount
   // eslint-disable-next-line @typescript-eslint/member-ordering -- okay here, just some of the fields are typed to make it easier
   [field: string]: unknown
 }
@@ -49,9 +52,9 @@ function normalizeNode(affectedNode: Node): NormalizedNode {
     NodeType: diffType,
     LedgerEntryType: node.LedgerEntryType,
     LedgerIndex: node.LedgerIndex,
-    NewFields: node.NewFields ?? {},
-    FinalFields: node.FinalFields ?? {},
-    PreviousFields: node.PreviousFields ?? {},
+    NewFields: node.NewFields,
+    FinalFields: node.FinalFields,
+    PreviousFields: node.PreviousFields,
   }
 }
 
@@ -62,23 +65,27 @@ function normalizeNodes(metadata: TransactionMetadata): NormalizedNode[] {
   return metadata.AffectedNodes.map(normalizeNode)
 }
 
-function groupByAddress(balanceChanges: BalanceChange[]): BalanceChanges[] {
-  const grouped = _.groupBy(balanceChanges, (node) => node.address)
-  return Object.entries(grouped).map(([address, items]) => {
-    return { address, balances: items.map((item) => item.balance) }
+function groupByAccount(balanceChanges: BalanceChange[]): BalanceChanges[] {
+  const grouped = _.groupBy(balanceChanges, (node) => node.account)
+  return Object.entries(grouped).map(([account, items]) => {
+    return { account, balances: items.map((item) => item.balance) }
   })
-  // return _.mapValues(grouped, function (group) {
-  //   return group.map((node) => node.balance))
-  // })
+}
+
+function getValue(balance: Amount): BigNumber {
+  if (typeof balance === 'string') {
+    return new BigNumber(balance)
+  }
+  return new BigNumber(balance.value)
 }
 
 function computeBalanceChange(node: NormalizedNode): BigNumber | null {
   let value: BigNumber | null = null
   if (node.NewFields?.Balance) {
-    value = new BigNumber(node.NewFields.Balance)
+    value = getValue(node.NewFields.Balance)
   } else if (node.PreviousFields?.Balance && node.FinalFields?.Balance) {
-    value = new BigNumber(node.FinalFields.Balance).minus(
-      new BigNumber(node.PreviousFields.Balance),
+    value = getValue(node.FinalFields.Balance).minus(
+      getValue(node.PreviousFields.Balance),
     )
   }
   if (value === null || value.isZero()) {
@@ -97,9 +104,9 @@ function computeBalanceChange(node: NormalizedNode): BigNumber | null {
 //   return null
 // }
 
-function parseXRPQuantity(
+function getXRPQuantity(
   node: NormalizedNode,
-): { address: string; balance: Balance } | null {
+): { account: string; balance: Balance } | null {
   const value = computeBalanceChange(node)
 
   if (value === null) {
@@ -108,7 +115,7 @@ function parseXRPQuantity(
 
   return {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- okay here
-    address: (node.FinalFields?.Account ?? node.NewFields?.Account) as string,
+    account: (node.FinalFields?.Account ?? node.NewFields?.Account) as string,
     balance: {
       currency: 'XRP',
       value: dropsToXrp(value).toString(),
@@ -116,44 +123,44 @@ function parseXRPQuantity(
   }
 }
 
-// function flipTrustlinePerspective(quantity) {
-//   const negatedBalance = new BigNumber(quantity.balance.value).negated()
-//   return {
-//     address: quantity.balance.issuer,
-//     balance: {
-//       issuer: quantity.address,
-//       currency: quantity.balance.currency,
-//       value: negatedBalance.toString(),
-//     },
-//   }
-// }
+function flipTrustlinePerspective(balanceChange: BalanceChange): BalanceChange {
+  const negatedBalance = new BigNumber(balanceChange.balance.value).negated()
+  return {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- we know this is true
+    account: balanceChange.balance.issuer as string,
+    balance: {
+      issuer: balanceChange.account,
+      currency: balanceChange.balance.currency,
+      value: negatedBalance.toString(),
+    },
+  }
+}
 
-// function parseTrustlineQuantity(node: NormalizedNode, valueParser) {
-//   const value = valueParser(node)
+function getTrustlineQuantity(node: NormalizedNode): BalanceChange[] | null {
+  const value = computeBalanceChange(node)
 
-//   if (value === null) {
-//     return null
-//   }
+  if (value === null) {
+    return null
+  }
 
-//   // A trustline can be created with a non-zero starting balance
-//   // If an offer is placed to acquire an asset with no existing trustline,
-//   // the trustline can be created when the offer is taken.
-//   const fields =
-//     node.NewFields == null || node.NewFields.length === 0
-//       ? node.FinalFields
-//       : node.NewFields
+  // A trustline can be created with a non-zero starting balance
+  // If an offer is placed to acquire an asset with no existing trustline,
+  // the trustline can be created when the offer is taken.
+  const fields = node.NewFields == null ? node.FinalFields : node.NewFields
 
-//   // the balance is always from low node's perspective
-//   const result = {
-//     address: fields?.LowLimit.issuer,
-//     balance: {
-//       issuer: fields?.HighLimit?.issuer,
-//       currency: fields?.Balance?.currency,
-//       value: value.toString(),
-//     },
-//   }
-//   return [result, flipTrustlinePerspective(result)]
-// }
+  // the balance is always from low node's perspective
+  const result = {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- we know that this is true
+    account: fields?.LowLimit?.issuer as string,
+    balance: {
+      issuer: fields?.HighLimit?.issuer,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- we know that this is true
+      currency: (fields?.Balance as IssuedCurrencyAmount).currency,
+      value: value.toString(),
+    },
+  }
+  return [result, flipTrustlinePerspective(result)]
+}
 
 /**
  *  Computes the complete list of every balance that changed in the ledger
@@ -167,16 +174,20 @@ export default function getBalanceChanges(
 ): BalanceChanges[] {
   const quantities = normalizeNodes(metadata).map((node) => {
     if (node.LedgerEntryType === 'AccountRoot') {
-      const xrpQuantity = parseXRPQuantity(node)
+      const xrpQuantity = getXRPQuantity(node)
       if (xrpQuantity == null) {
         return []
       }
       return [xrpQuantity]
     }
-    // if (node.LedgerEntryType === 'RippleState') {
-    //   return parseTrustlineQuantity(node, valueParser)
-    // }
+    if (node.LedgerEntryType === 'RippleState') {
+      const trustlineQuantity = getTrustlineQuantity(node)
+      if (trustlineQuantity == null) {
+        return []
+      }
+      return trustlineQuantity
+    }
     return []
   })
-  return groupByAddress(_.flatten(quantities))
+  return groupByAccount(_.flatten(quantities))
 }
