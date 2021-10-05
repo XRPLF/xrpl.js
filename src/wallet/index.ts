@@ -175,12 +175,21 @@ class Wallet {
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    */
+  // eslint-disable-next-line max-lines-per-function --- checks a lot of stuff.
   public sign(
     this: Wallet,
     transaction: Transaction,
-    forMultisign?: boolean,
+    forMultisign?: boolean | string,
   ): string {
-    const multisignAddress = forMultisign ? this.getClassicAddress() : ''
+    let multisignAddress: boolean | string = false
+    if (
+      typeof forMultisign === 'string' &&
+      forMultisign.trim().startsWith('X')
+    ) {
+      multisignAddress = forMultisign
+    } else if (typeof forMultisign === 'boolean' && forMultisign) {
+      multisignAddress = this.getClassicAddress()
+    }
 
     if (transaction.TxnSignature || transaction.Signers) {
       throw new ValidationError(
@@ -211,7 +220,6 @@ class Wallet {
     }
     const serialized = encode(txToSignAndEncode)
     this.checkTxSerialization(serialized, transaction)
-    console.log(serialized)
     return serialized
   }
 
