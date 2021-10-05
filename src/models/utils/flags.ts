@@ -3,6 +3,10 @@
 
 import { ValidationError } from '../../errors'
 import {
+  AccountRootFlagsInterface,
+  AccountRootFlags,
+} from '../ledger/accountRoot'
+import {
   AccountSetFlagsInterface,
   AccountSetTfFlags,
 } from '../transactions/accountSet'
@@ -18,6 +22,34 @@ import {
 } from '../transactions/paymentChannelClaim'
 import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlagsInterface, TrustSetFlags } from '../transactions/trustSet'
+
+/**
+ * Convert an AccountRoot Flags number into an interface for easy interpretation.
+ *
+ * @param flags - A number which is the bitwise and of all enabled AccountRootFlagsInterface.
+ * @returns An interface with all flags as booleans.
+ */
+// eslint-disable-next-line import/no-unused-modules -- Used by end user
+export function parseAccountRootFlags(
+  flags: number,
+): AccountRootFlagsInterface {
+  const flagsInterface = {
+    lsfPasswordSpent: isSet(flags, AccountRootFlags.lsfPasswordSpent),
+    lsfRequireDestTag: isSet(flags, AccountRootFlags.lsfRequireDestTag),
+    lsfRequireAuth: isSet(flags, AccountRootFlags.lsfRequireAuth),
+    lsfDisallowXRP: isSet(flags, AccountRootFlags.lsfDisallowXRP),
+    lsfDisableMaster: isSet(flags, AccountRootFlags.lsfDisableMaster),
+    lsfNoFreeze: isSet(flags, AccountRootFlags.lsfNoFreeze),
+    lsfGlobalFreeze: isSet(flags, AccountRootFlags.lsfGlobalFreeze),
+    lsfDefaultRipple: isSet(flags, AccountRootFlags.lsfDefaultRipple),
+    lsfDepositAuth: isSet(flags, AccountRootFlags.lsfDepositAuth),
+  }
+  return flagsInterface
+}
+
+function isSet(num: number, flag: AccountRootFlags): boolean {
+  return (num & flag) === flag
+}
 
 /**
  * Sets a transaction's flags to its numeric representation.
