@@ -94,16 +94,6 @@ function computeBalanceChange(node: NormalizedNode): BigNumber | null {
   return value
 }
 
-// function getFinalBalance(node: NormalizedNode) {
-//   if (node.NewFields?.Balance) {
-//     return parseValue(node.NewFields.Balance as string)
-//   }
-//   if (node.FinalFields?.Balance) {
-//     return parseValue(node.FinalFields.Balance as string)
-//   }
-//   return null
-// }
-
 function getXRPQuantity(
   node: NormalizedNode,
 ): { account: string; balance: Balance } | null {
