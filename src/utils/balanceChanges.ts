@@ -1,4 +1,3 @@
-/* eslint-disable func-names */
 import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 
@@ -6,20 +5,44 @@ import TransactionMetadata, { Node } from '../models/transactions/metadata'
 
 import { dropsToXrp } from './xrpConversion'
 
+interface Balance {
+  currency: string
+  issuer?: string
+  value: string
+}
+
+interface BalanceChange {
+  address: string
+  balance: Balance
+}
+
+interface BalanceChanges {
+  address: string
+  balances: Balance[]
+}
+
+interface Fields {
+  Account?: string
+  Balance?: string
+  // eslint-disable-next-line @typescript-eslint/member-ordering -- okay here, just some of the fields are typed to make it easier
+  [field: string]: unknown
+}
+
 interface NormalizedNode {
   // 'CreatedNode' | 'ModifiedNode' | 'DeletedNode'
   NodeType: string
   LedgerEntryType: string
   LedgerIndex: string
-  NewFields?: { [field: string]: unknown }
-  FinalFields?: { [field: string]: unknown }
-  PreviousFields?: { [field: string]: unknown }
+  NewFields?: Fields
+  FinalFields?: Fields
+  PreviousFields?: Fields
   PreviousTxnID?: string
   PreviouTxnLgrSeq?: number
 }
 
 function normalizeNode(affectedNode: Node): NormalizedNode {
   const diffType = Object.keys(affectedNode)[0]
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- not quite right, but close enough
   const node = affectedNode[diffType] as NormalizedNode
   return {
     ...node,
@@ -39,20 +62,23 @@ function normalizeNodes(metadata: TransactionMetadata): NormalizedNode[] {
   return metadata.AffectedNodes.map(normalizeNode)
 }
 
-// function groupByAddress(balanceChanges) {
-//   const grouped = _.groupBy(balanceChanges, (node) => node.address)
-//   return _.mapValues(grouped, function (group) {
-//     return group.map((node) => node.balance))
-//   })
-// }
+function groupByAddress(balanceChanges: BalanceChange[]): BalanceChanges[] {
+  const grouped = _.groupBy(balanceChanges, (node) => node.address)
+  return Object.entries(grouped).map(([address, items]) => {
+    return { address, balances: items.map((item) => item.balance) }
+  })
+  // return _.mapValues(grouped, function (group) {
+  //   return group.map((node) => node.balance))
+  // })
+}
 
 function computeBalanceChange(node: NormalizedNode): BigNumber | null {
   let value: BigNumber | null = null
   if (node.NewFields?.Balance) {
-    value = new BigNumber(node.NewFields.Balance as string)
+    value = new BigNumber(node.NewFields.Balance)
   } else if (node.PreviousFields?.Balance && node.FinalFields?.Balance) {
-    value = new BigNumber(node.FinalFields.Balance as string).minus(
-      new BigNumber(node.PreviousFields.Balance as string),
+    value = new BigNumber(node.FinalFields.Balance).minus(
+      new BigNumber(node.PreviousFields.Balance),
     )
   }
   if (value === null || value.isZero()) {
@@ -81,7 +107,8 @@ function parseXRPQuantity(
   }
 
   return {
-    address: (node.FinalFields?.Account || node.NewFields?.Account) as string,
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- okay here
+    address: (node.FinalFields?.Account ?? node.NewFields?.Account) as string,
     balance: {
       currency: 'XRP',
       value: dropsToXrp(value).toString(),
@@ -128,17 +155,6 @@ function parseXRPQuantity(
 //   return [result, flipTrustlinePerspective(result)]
 // }
 
-interface Balance {
-  currency: string
-  issuer?: string
-  value: string
-}
-
-interface BalanceChange {
-  address: string
-  balance: Balance
-}
-
 /**
  *  Computes the complete list of every balance that changed in the ledger
  *  as a result of the given transaction.
@@ -148,8 +164,8 @@ interface BalanceChange {
  */
 export default function getBalanceChanges(
   metadata: TransactionMetadata,
-): BalanceChange[] {
-  const quantities = normalizeNodes(metadata).map(function (node) {
+): BalanceChanges[] {
+  const quantities = normalizeNodes(metadata).map((node) => {
     if (node.LedgerEntryType === 'AccountRoot') {
       const xrpQuantity = parseXRPQuantity(node)
       if (xrpQuantity == null) {
@@ -162,5 +178,5 @@ export default function getBalanceChanges(
     // }
     return []
   })
-  return _.flatten(quantities)
+  return groupByAddress(_.flatten(quantities))
 }
