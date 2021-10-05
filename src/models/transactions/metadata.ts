@@ -31,7 +31,6 @@ export type Node = CreatedNode | ModifiedNode | DeletedNode
 
 export default interface TransactionMetadata {
   AffectedNodes: Node[]
-  DeliveredAmount?: Amount
   delivered_amount?: Amount
   TransactionIndex: number
   TransactionResult: string
