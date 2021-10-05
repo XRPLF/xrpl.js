@@ -1,11 +1,11 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { EscrowFinish, EscrowCreate, dropsToXrp } from 'xrpl-local'
+import { EscrowFinish, EscrowCreate } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
-import { generateFundedWallet, testTransaction } from '../utils'
+import { generateFundedWallet, getXRPBalance, testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -28,19 +28,18 @@ describe('EscrowFinish', function () {
     const wallet1 = await generateFundedWallet(this.client)
 
     const AMOUNT = 10000
+
     const createTx: EscrowCreate = {
       Account: this.wallet.getClassicAddress(),
       TransactionType: 'EscrowCreate',
-      Amount: String(AMOUNT),
+      Amount: '10000',
       Destination: wallet1.getClassicAddress(),
       FinishAfter: CLOSE_TIME + 2,
     }
 
     await testTransaction(this.client, createTx, this.wallet)
 
-    const initialBalance = (
-      await this.client.getBalances(wallet1.getClassicAddress())
-    )[0].value
+    const initialBalance = await getXRPBalance(this.client, wallet1)
 
     // check that the object was actually created
     const accountObjects = (
@@ -68,10 +67,7 @@ describe('EscrowFinish', function () {
 
     await testTransaction(this.client, finishTx, this.wallet)
 
-    const expectedBalance = Number(initialBalance) + Number(dropsToXrp(AMOUNT))
-    assert.equal(
-      (await this.client.getBalances(wallet1.getClassicAddress()))[0].value,
-      expectedBalance,
-    )
+    const expectedBalance = String(Number(initialBalance) + Number(AMOUNT))
+    assert.equal(await getXRPBalance(this.client, wallet1), expectedBalance)
   })
 })
