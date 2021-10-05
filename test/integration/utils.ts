@@ -2,7 +2,7 @@ import { assert } from 'chai'
 import _ from 'lodash'
 import { decode } from 'ripple-binary-codec'
 
-import { Client, Wallet, Response } from 'xrpl-local'
+import { Client, Wallet, Response, AccountInfoRequest } from 'xrpl-local'
 import { Payment, Transaction } from 'xrpl-local/models/transactions'
 import { computeSignedTransactionHash } from 'xrpl-local/utils/hashes'
 
@@ -102,4 +102,15 @@ export async function testTransaction(
   const signedTx = _.omit(response.result.tx_json, 'hash')
   await ledgerAccept(client)
   await verifySubmittedTransaction(client, signedTx as Transaction)
+}
+
+export async function getXRPBalance(
+  client: Client,
+  wallet: Wallet,
+): Promise<string> {
+  const request: AccountInfoRequest = {
+    command: 'account_info',
+    account: wallet.getClassicAddress(),
+  }
+  return (await client.request(request)).result.account_data.Balance
 }
