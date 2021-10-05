@@ -27,8 +27,11 @@ describe('client.getFee', function () {
       'server_info',
       rippled.server_info.highLoadFactor,
     )
-    // Ensure that overriding with high maxFeeXRP of '51540' causes no errors.
-    // (fee will actually be 51539.607552)
+
+    /*
+     * Ensure that overriding with high maxFeeXRP of '51540' causes no errors.
+     * (fee will actually be 51539.607552)
+     */
     this.client.maxFeeXRP = '51540'
     const fee = await this.client.getFee()
     assert.strictEqual(fee, '51539.607552')
@@ -41,8 +44,10 @@ describe('client.getFee', function () {
     assert.strictEqual(fee, '0.000014')
   })
 
-  // This is not recommended since it may result in attempting to pay
-  // less than the base fee. However, this test verifies the existing behavior.
+  /*
+   * This is not recommended since it may result in attempting to pay
+   * less than the base fee. However, this test verifies the existing behavior.
+   */
   it('getFee cushion less than 1.0', async function () {
     this.mockRippled.addResponse('server_info', rippled.server_info.normal)
     this.client.feeCushion = 0.9

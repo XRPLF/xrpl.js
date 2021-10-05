@@ -3,8 +3,12 @@ import TransactionMetadata from '../transactions/metadata'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
-/** The tx method retrieves information on a single transaction, by its
- * identifying hash. Expects a response in the form of a {@link TxResponse}. */
+/**
+ * The tx method retrieves information on a single transaction, by its
+ * Identifying hash. Expects a response in the form of a {@link TxResponse}.
+ *
+ * @category Requests
+ */
 export interface TxRequest extends BaseRequest {
   command: 'tx'
   transaction: string

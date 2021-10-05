@@ -256,8 +256,10 @@ class Wallet {
     const decoded = decode(serialized)
     const txCopy = { ...tx }
 
-    // ...And ensure it is equal to the original tx, except:
-    // - It must have a TxnSignature or Signers (multisign).
+    /*
+     * ...And ensure it is equal to the original tx, except:
+     * - It must have a TxnSignature or Signers (multisign).
+     */
     if (!decoded.TxnSignature && !decoded.Signers) {
       throw new ValidationError(
         'Serialized transaction must have a TxnSignature or Signers property',
@@ -268,14 +270,18 @@ class Wallet {
     // - We know that the original tx did not have Signers, so if it exists, we should delete it:
     delete decoded.Signers
 
-    // - If SigningPubKey was not in the original tx, then we should delete it.
-    //   But if it was in the original tx, then we should ensure that it has not been changed.
+    /*
+     * - If SigningPubKey was not in the original tx, then we should delete it.
+     *   But if it was in the original tx, then we should ensure that it has not been changed.
+     */
     if (!tx.SigningPubKey) {
       delete decoded.SigningPubKey
     }
 
-    // - Memos have exclusively hex data which should ignore case.
-    //   Since decode goes to upper case, we set all tx memos to be uppercase for the comparison.
+    /*
+     * - Memos have exclusively hex data which should ignore case.
+     *   Since decode goes to upper case, we set all tx memos to be uppercase for the comparison.
+     */
     txCopy.Memos?.map((memo) => {
       const memoCopy = { ...memo }
       if (memo.Memo.MemoData) {

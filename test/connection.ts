@@ -244,8 +244,10 @@ describe('Connection', function () {
   })
 
   it('DisconnectedError on initial onOpen send', async function () {
-    // onOpen previously could throw PromiseRejectionHandledWarning: Promise rejection was handled asynchronously
-    // do not rely on the client.setup hook to test this as it bypasses the case, disconnect client connection first
+    /*
+     * onOpen previously could throw PromiseRejectionHandledWarning: Promise rejection was handled asynchronously
+     * do not rely on the client.setup hook to test this as it bypasses the case, disconnect client connection first
+     */
     await this.client.disconnect()
 
     // stub _onOpen to only run logic relevant to test case
@@ -560,8 +562,10 @@ describe('Connection', function () {
   })
 
   it('unrecognized message type', function (done) {
-    // This enables us to automatically support any
-    // new messages added by rippled in the future.
+    /*
+     * This enables us to automatically support any
+     * new messages added by rippled in the future.
+     */
     this.client.connection.on('unknown', (event) => {
       assert.deepEqual(event, { type: 'unknown' })
       done()
@@ -570,23 +574,25 @@ describe('Connection', function () {
     this.client.connection.onMessage(JSON.stringify({ type: 'unknown' }))
   })
 
-  // it('should clean up websocket connection if error after websocket is opened', async function () {
-  //   await this.client.disconnect()
-  //   // fail on connection
-  //   this.client.connection.subscribeToLedger = async () => {
-  //     throw new Error('error on _subscribeToLedger')
-  //   }
-  //   try {
-  //     await this.client.connect()
-  //     throw new Error('expected connect() to reject, but it resolved')
-  //   } catch (err) {
-  //     assert(err.message === 'error on _subscribeToLedger')
-  //     // _ws.close event listener should have cleaned up the socket when disconnect _ws.close is run on connection error
-  //     // do not fail on connection anymore
-  //     this.client.connection.subscribeToLedger = async () => {}
-  //     await this.client.connection.reconnect()
-  //   }
-  // })
+  /*
+   * it('should clean up websocket connection if error after websocket is opened', async function () {
+   *   await this.client.disconnect()
+   *   // fail on connection
+   *   this.client.connection.subscribeToLedger = async () => {
+   *     throw new Error('error on _subscribeToLedger')
+   *   }
+   *   try {
+   *     await this.client.connect()
+   *     throw new Error('expected connect() to reject, but it resolved')
+   *   } catch (err) {
+   *     assert(err.message === 'error on _subscribeToLedger')
+   *     // _ws.close event listener should have cleaned up the socket when disconnect _ws.close is run on connection error
+   *     // do not fail on connection anymore
+   *     this.client.connection.subscribeToLedger = async () => {}
+   *     await this.client.connection.reconnect()
+   *   }
+   * })
+   */
 
   it('should try to reconnect on empty subscribe response on reconnect', function (done) {
     this.timeout(23000)

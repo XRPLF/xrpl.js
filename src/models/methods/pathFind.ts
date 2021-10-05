@@ -47,6 +47,8 @@ export interface PathFindResponse extends BaseResponse {
   }
 }
 
-// TODO: figure out where to put the path_find asynchronous follow-ups
-// https://xrpl.org/path_find.html#asynchronous-follow-ups
-// probably with the subscribe response objects
+/*
+ * TODO: figure out where to put the path_find asynchronous follow-ups
+ * https://xrpl.org/path_find.html#asynchronous-follow-ups
+ * probably with the subscribe response objects
+ */

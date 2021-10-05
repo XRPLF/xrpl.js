@@ -30,9 +30,11 @@ export function dropsToXrp(dropsToConvert: BigNumber.Value): string {
     }
   }
 
-  // Converting to BigNumber and then back to string should remove any
-  // decimal point followed by zeros, e.g. '1.00'.
-  // Important: specify base 10 to avoid exponential notation, e.g. '1e-7'.
+  /*
+   * Converting to BigNumber and then back to string should remove any
+   * decimal point followed by zeros, e.g. '1.00'.
+   * Important: specify base 10 to avoid exponential notation, e.g. '1e-7'.
+   */
   drops = new BigNumber(drops).toString(BASE_TEN)
 
   // drops are only whole units
@@ -42,9 +44,11 @@ export function dropsToXrp(dropsToConvert: BigNumber.Value): string {
     )
   }
 
-  // This should never happen; the value has already been
-  // validated above. This just ensures BigNumber did not do
-  // something unexpected.
+  /*
+   * This should never happen; the value has already been
+   * validated above. This just ensures BigNumber did not do
+   * something unexpected.
+   */
   if (!SANITY_CHECK.exec(drops)) {
     throw new ValidationError(
       `dropsToXrp: failed sanity check -` +
@@ -79,9 +83,11 @@ export function xrpToDrops(xrpToConvert: BigNumber.Value): string {
 
   // Important: specify base 10 to avoid exponential notation, e.g. '1e-7'.
   xrp = new BigNumber(xrp).toString(BASE_TEN)
-  // This should never happen; the value has already been
-  // validated above. This just ensures BigNumber did not do
-  // something unexpected.
+  /*
+   * This should never happen; the value has already been
+   * validated above. This just ensures BigNumber did not do
+   * something unexpected.
+   */
   if (!SANITY_CHECK.exec(xrp)) {
     throw new ValidationError(
       `xrpToDrops: failed sanity check -` +

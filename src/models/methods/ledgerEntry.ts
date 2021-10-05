@@ -9,8 +9,10 @@ export interface LedgerEntryRequest extends BaseRequest {
   ledger_hash?: string
   ledger_index?: LedgerIndex
 
-  // Only one of the following properties should be defined in a single request
-  // https://xrpl.org/ledger_entry.html
+  /*
+   * Only one of the following properties should be defined in a single request
+   * https://xrpl.org/ledger_entry.html
+   */
 
   index?: string
 
