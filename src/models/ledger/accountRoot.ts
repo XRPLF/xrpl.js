@@ -1,7 +1,11 @@
 import BaseLedgerEntry from './baseLedgerEntry'
 
-/** The AccountRoot object type describes a single account, its settings, and
- * XRP balance. */
+/**
+ * The AccountRoot object type describes a single account, its settings, and
+ * XRP balance.
+ *
+ * @category Ledger Entries
+ */
 export default interface AccountRoot extends BaseLedgerEntry {
   LedgerEntryType: 'AccountRoot'
   /** The identifying (classic) address of this account. */
@@ -10,23 +14,23 @@ export default interface AccountRoot extends BaseLedgerEntry {
   Balance: string
   /** A bit-map of boolean flags enabled for this account. */
   Flags: number
-  /**	The number of objects this account owns in the ledger, which contributes
+  /**	The number of objects this account owns in the ledger, which contributes.
    * to its owner reserve. */
   OwnerCount: number
-  /** The identifying hash of the transaction that most recently modified this
+  /** The identifying hash of the transaction that most recently modified this.
    * object. */
   PreviousTxnID: string
-  /** The index of the ledger that contains the transaction that most recently
+  /** The index of the ledger that contains the transaction that most recently.
    * modified this object. */
   PreviousTxnLgrSeq: number
   /** The sequence number of the next valid transaction for this account. */
   Sequence: number
   /** The identifying hash of the transaction most recently sent by this
    * account. This field must be enabled to use the AccountTxnID transaction
-   * field. To enable it, send an AccountSet transaction with the
+   * field. To enable it, send an AccountSet transaction with the.
    * `asfAccountTxnID` flag enabled. */
   AccountTxnID?: string
-  /** A domain associated with this account. In JSON, this is the hexadecimal
+  /** A domain associated with this account. In JSON, this is the hexadecimal.
    * for the ASCII representation of the domain. */
   Domain?: string
   /** The md5 hash of an email address. */
@@ -35,17 +39,17 @@ export default interface AccountRoot extends BaseLedgerEntry {
    * In JSON, uses hexadecimal */
   MessageKey?: string
   /** The address of a key pair that can be used to sign transactions for this
-   * account instead of the master key. Use a SetRegularKey transaction to
+   * account instead of the master key. Use a SetRegularKey transaction to.
    * change this value. */
   RegularKey?: string
   /** How many Tickets this account owns in the ledger. This is updated
-   * automatically to ensure that the account stays within the hard limit of 250
+   * automatically to ensure that the account stays within the hard limit of 250.
    * Tickets at a time. */
   TicketCount?: number
-  /** How many significant digits to use for exchange rates of Offers involving
+  /** How many significant digits to use for exchange rates of Offers involving.
    * currencies issued by this address. Valid values are 3 to 15, inclusive. */
   TickSize?: number
-  /** A transfer fee  to charge other users for sending currency issued by this
+  /** A transfer fee  to charge other users for sending currency issued by this.
    * account to each other. */
   TransferRate?: number
 }
