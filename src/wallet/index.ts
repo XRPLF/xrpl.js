@@ -171,17 +171,17 @@ class Wallet {
    *
    * @param this - Wallet instance.
    * @param transaction - A transaction to be signed offline.
-   * @param multisignAddress - Multisign only. An account address corresponding to the multi-signature being added. If this
-   * wallet represents your [master keypair](https://xrpl.org/cryptographic-keys.html#master-key-pair) you can get your account address
-   * with the Wallet.getClassicAddress() function.
+   * @param forMultisign - Specify true/false if this is a multisign tx request.
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    */
-  public signTransaction(
+  public sign(
     this: Wallet,
     transaction: Transaction,
-    multisignAddress?: string,
+    forMultisign?: boolean,
   ): string {
+    const multisignAddress = forMultisign ? this.getClassicAddress() : ''
+
     if (transaction.TxnSignature || transaction.Signers) {
       throw new ValidationError(
         'txJSON must not contain "TxnSignature" or "Signers" properties',

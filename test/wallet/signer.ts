@@ -5,7 +5,6 @@ import { JsonObject } from 'ripple-binary-codec/dist/types/serialized-type'
 import { Transaction, ValidationError } from 'xrpl-local'
 import Wallet from 'xrpl-local/wallet'
 import {
-  sign,
   authorizeChannel,
   multisign,
   verifySignature,
@@ -170,7 +169,7 @@ describe('Signer', function () {
     const signedTxBlob =
       '120000228000000024013A0F74201B013A0FC36140000000014FB18068400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F544744730450221009ECB5324717E14DD6970126271F05BC2626D2A8FA9F3797555D417F8257C1E6002206BDD74A0F30425F2BA9DB69C90F21B3E27735C190FB4F3A640F066ACBBF06AD98114B3263BD0A9BF9DFDBBBBD07F536355FF477BF0E98314F667B0CA50CC7709A220B0561B85E53A48461FA8'
 
-    const signedTx: string = sign(wallet, tx3)
+    const signedTx: string = wallet.sign(tx3)
 
     assert.equal(signedTx, signedTxBlob)
   })
@@ -179,7 +178,9 @@ describe('Signer', function () {
     const multisignWallet = Wallet.fromSeed(unsignedSecret1)
 
     assert.deepEqual(
-      decode(sign(multisignWallet, unsignedTx1, true)),
+      decode(
+        multisignWallet.sign(unsignedTx1, multisignWallet.getClassicAddress()),
+      ),
       multisignTx1 as unknown as JsonObject,
     )
   })
@@ -263,19 +264,19 @@ describe('Signer', function () {
   })
 
   it('verifySignature succeeds for valid signed transaction blob', function () {
-    const signedTx = sign(verifyWallet, tx)
+    const signedTx = verifyWallet.sign(tx)
 
     assert.isTrue(verifySignature(signedTx))
   })
 
   it('verify succeeds for valid signed transaction object', function () {
-    const signedTx = sign(verifyWallet, tx)
+    const signedTx = verifyWallet.sign(tx)
 
     assert.isTrue(verifySignature(decode(signedTx) as unknown as Transaction))
   })
 
   it('verify throws for invalid signing key', function () {
-    const signedTx = sign(verifyWallet, tx)
+    const signedTx = verifyWallet.sign(tx)
 
     const decodedTx = decode(signedTx) as unknown as Transaction
 

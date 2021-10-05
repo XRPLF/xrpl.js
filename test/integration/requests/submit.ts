@@ -34,7 +34,7 @@ describe('submit', function () {
     }
 
     const autofilledTx = await this.client.autofill(accountSet)
-    const signedTx = this.wallet.signTransaction(autofilledTx)
+    const signedTx = this.wallet.sign(autofilledTx)
     const submitRequest: SubmitRequest = {
       command: 'submit',
       tx_blob: signedTx,
