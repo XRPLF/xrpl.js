@@ -17,6 +17,23 @@ const { sign: RESPONSE_FIXTURES } = responses
  * Provides tests for Wallet class.
  */
 describe('Wallet', function () {
+  describe('constructor', function () {
+    it('initializes a wallet using a Regular Key Pair', function () {
+      const classicAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
+      const regularPublicKey =
+        'aBRNH5wUurfhZcoyR6nRwDSa95gMBkovBJ8V4cp1C1pM28H7EPL1'
+      const regularPrivateKey = 'sh8i92YRnEjJy3fpFkL8txQSCVo79'
+
+      const wallet = new Wallet(regularPublicKey, regularPrivateKey, {
+        classicAddress,
+      })
+
+      assert.equal(wallet.publicKey, regularPublicKey)
+      assert.isString(wallet.privateKey, regularPrivateKey)
+      assert.isString(wallet.classicAddress, classicAddress)
+    })
+  })
+
   describe('generate', function () {
     const classicAddressPrefix = 'r'
     const ed25519KeyPrefix = 'ED'

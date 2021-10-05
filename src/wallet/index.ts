@@ -31,6 +31,13 @@ function hexFromBuffer(buffer: Buffer): string {
   return buffer.toString('hex').toUpperCase()
 }
 
+interface WalletOptions {
+  // The classicAddress corresponding to its Regular Key Pair.
+  classicAddress?: string
+  // The seed used to derive the account keys.
+  seed?: string
+}
+
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
  * A wallet can be derived from either a seed, mnemnoic, or entropy (array of random numbers).
@@ -39,12 +46,6 @@ function hexFromBuffer(buffer: Buffer): string {
 class Wallet {
   public readonly publicKey: string
   public readonly privateKey: string
-  /**
-   * This only is correct if this wallet corresponds to your
-   * [master keypair](https://xrpl.org/cryptographic-keys.html#master-key-pair). If this wallet represents a
-   * [regular keypair](https://xrpl.org/cryptographic-keys.html#regular-key-pair) this will provide an incorrect address.
-   * TODO: Add support for Regular Keys to Wallet (And their corresponding impact on figuring out classicAddress).
-   */
   public readonly classicAddress: string
   public readonly seed?: string
 
@@ -53,13 +54,17 @@ class Wallet {
    *
    * @param publicKey - The public key for the account.
    * @param privateKey - The private key used for signing transactions for the account.
-   * @param seed - (Optional) The seed used to derive the account keys.
+   * @param opts - (Optional) The seed and classicAddress (corresponding to its Regular Key Pair) for the account.
    */
-  public constructor(publicKey: string, privateKey: string, seed?: string) {
+  public constructor(
+    publicKey: string,
+    privateKey: string,
+    opts: WalletOptions = {},
+  ) {
     this.publicKey = publicKey
     this.privateKey = privateKey
-    this.classicAddress = deriveAddress(publicKey)
-    this.seed = seed
+    this.classicAddress = opts.classicAddress ?? deriveAddress(publicKey)
+    this.seed = opts.seed
   }
 
   /**
@@ -154,7 +159,7 @@ class Wallet {
     algorithm: ECDSA = DEFAULT_ALGORITHM,
   ): Wallet {
     const { publicKey, privateKey } = deriveKeypair(seed, { algorithm })
-    return new Wallet(publicKey, privateKey, seed)
+    return new Wallet(publicKey, privateKey, { seed })
   }
 
   /**
