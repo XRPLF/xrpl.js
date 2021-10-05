@@ -17,17 +17,25 @@ interface Book {
  */
 export interface UnsubscribeRequest extends BaseRequest {
   command: 'unsubscribe'
-  /** Array of string names of generic streams to unsubscribe from, including.
-   * ledger, server, transactions, and transactions_proposed. */
+  /**
+   * Array of string names of generic streams to unsubscribe from, including.
+   * Ledger, server, transactions, and transactions_proposed.
+   */
   streams?: StreamType[]
-  /** Array of unique account addresses to stop receiving updates for, in the.
-   * XRP Ledger's base58 format. */
+  /**
+   * Array of unique account addresses to stop receiving updates for, in the.
+   * XRP Ledger's base58 format.
+   */
   accounts?: string[]
-  /** Like accounts, but for accounts_proposed subscriptions that included.
-   * not-yet-validated transactions. */
+  /**
+   * Like accounts, but for accounts_proposed subscriptions that included
+   * not-yet-validated transactions.
+   */
   accounts_proposed?: string[]
-  /** Array of objects defining order books to unsubscribe from, as explained.
-   * below. */
+  /**
+   * Array of objects defining order books to unsubscribe from, as explained
+   * below.
+   */
   books?: Book[]
 }
 
@@ -37,5 +45,5 @@ export interface UnsubscribeRequest extends BaseRequest {
  * @category Responses
  */
 export interface UnsubscribeResponse extends BaseResponse {
-  result: {}
+  result: Record<string, never>
 }

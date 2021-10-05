@@ -162,15 +162,21 @@ const MIN_LIMIT = 10
 const MAX_LIMIT = 400
 
 class Client extends EventEmitter {
-  // New in > 0.21.0
-  // non-validated ledger versions are allowed, and passed to rippled as-is.
+  /*
+   * New in > 0.21.0
+   * non-validated ledger versions are allowed, and passed to rippled as-is.
+   */
   public readonly connection: Connection
 
-  // Factor to multiply estimated fee by to provide a cushion in case the
-  // required fee rises during submission of a transaction. Defaults to 1.2.
+  /*
+   * Factor to multiply estimated fee by to provide a cushion in case the
+   * required fee rises during submission of a transaction. Defaults to 1.2.
+   */
   public readonly feeCushion: number
-  // Maximum fee to use with transactions, in XRP. Must be a string-encoded
-  // number. Defaults to '2'.
+  /*
+   * Maximum fee to use with transactions, in XRP. Must be a string-encoded
+   * number. Defaults to '2'.
+   */
   public readonly maxFeeXRP: string
 
   /**
@@ -203,8 +209,10 @@ class Client extends EventEmitter {
 
     this.connection.on('disconnected', (code: number) => {
       let finalCode = code
-      // 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
-      // Since 4000 is a normal disconnect reason, we convert this to the standard exit code 1000
+      /*
+       * 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
+       * Since 4000 is a normal disconnect reason, we convert this to the standard exit code 1000
+       */
       if (finalCode === INTENTIONAL_DISCONNECT_CODE) {
         finalCode = 1000
       }
@@ -407,9 +415,11 @@ class Client extends EventEmitter {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- actually needs to be any here
   public on(eventName: string, listener: (...args: any[]) => void): this {
-    // if (args[0]?.type === 'transaction') {
-    //   handlePartialPaymentStream(args[0])
-    // }
+    /*
+     * if (args[0]?.type === 'transaction') {
+     *   handlePartialPaymentStream(args[0])
+     * }
+     */
 
     return super.on(eventName, listener)
   }
@@ -451,14 +461,18 @@ class Client extends EventEmitter {
     request: T,
     collect?: string,
   ): Promise<U[]> {
-    // The data under collection is keyed based on the command. Fail if command
-    // not recognized and collection key not provided.
+    /*
+     * The data under collection is keyed based on the command. Fail if command
+     * not recognized and collection key not provided.
+     */
     const collectKey = collect ?? getCollectKeyFromCommand(request.command)
     if (!collectKey) {
       throw new ValidationError(`no collect key for command ${request.command}`)
     }
-    // If limit is not provided, fetches all data over multiple requests.
-    // NOTE: This may return much more than needed. Set limit when possible.
+    /*
+     * If limit is not provided, fetches all data over multiple requests.
+     * NOTE: This may return much more than needed. Set limit when possible.
+     */
     const countTo: number = request.limit == null ? Infinity : request.limit
     let count = 0
     let marker: unknown = request.marker
@@ -509,8 +523,10 @@ class Client extends EventEmitter {
    * @returns A promise that resolves with a void value when a connection is destroyed.
    */
   public async disconnect(): Promise<void> {
-    // backwards compatibility: connection.disconnect() can return a number, but
-    // this method returns nothing. SO we await but don't return any result.
+    /*
+     * backwards compatibility: connection.disconnect() can return a number, but
+     * this method returns nothing. SO we await but don't return any result.
+     */
     await this.connection.disconnect()
   }
 

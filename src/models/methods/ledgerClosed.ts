@@ -1,10 +1,11 @@
 import { BaseRequest, BaseResponse } from './baseMethod'
 
-/** .....................
+/**
  * The ledger_closed method returns the unique identifiers of the most recently
  * closed ledger. Expects a response in the form of a {@link
  * LedgerClosedResponse}.
  *
+ * @example
  *  *
  * ```ts
  * const ledgerClosed: LedgerClosedRequest = {

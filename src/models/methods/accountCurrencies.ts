@@ -2,10 +2,10 @@ import { LedgerIndex } from '../common'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
-/** .....................
+/**
  * The `account_currencies` command retrieves a list of currencies that an
  * account can send or receive, based on its trust lines. Expects an
- * {@link AccountCurrenciesResponse}
+ * {@link AccountCurrenciesResponse}.
  *
  * @category Requests
  */
@@ -15,12 +15,16 @@ export interface AccountCurrenciesRequest extends BaseRequest {
   account: string
   /** A 20-byte hex string for the ledger version to use. */
   ledger_hash?: string
-  /** The ledger index of the ledger to use, or a shortcut string to choose a.
-   * ledger automatically. */
+  /**
+   * The ledger index of the ledger to use, or a shortcut string to choose a
+   * ledger automatically.
+   */
   ledger_index?: LedgerIndex
-  /** If true, then the account field only accepts a public key or XRP Ledger
-   * address. Otherwise, account can be a secret or passphrase (not.
-   * recommended). The default is false. */
+  /**
+   * If true, then the account field only accepts a public key or XRP Ledger
+   * address. Otherwise, account can be a secret or passphrase (not
+   * recommended). The default is false.
+   */
   strict?: boolean
 }
 
@@ -31,8 +35,10 @@ export interface AccountCurrenciesRequest extends BaseRequest {
  */
 export interface AccountCurrenciesResponse extends BaseResponse {
   result: {
-    /** The identifying hash of the ledger version used to retrieve this data,.
-     * as hex. */
+    /**
+     * The identifying hash of the ledger version used to retrieve this data,
+     * as hex.
+     */
     ledger_hash?: string
     /** The ledger index of the ledger version used to retrieve this data. */
     ledger_index: number

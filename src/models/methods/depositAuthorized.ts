@@ -17,8 +17,10 @@ export interface DepositAuthorizedRequest extends BaseRequest {
   destination_account: string
   /** A 20-byte hex string for the ledger version to use. */
   ledger_hash?: string
-  /** The ledger index of the ledger to use, or a shortcut string to choose a.
-   * ledger automatically.  */
+  /**
+   * The ledger index of the ledger to use, or a shortcut string to choose a.
+   * Ledger automatically.  .
+   */
   ledger_index?: LedgerIndex
 }
 
@@ -29,21 +31,29 @@ export interface DepositAuthorizedRequest extends BaseRequest {
  */
 export interface DepositAuthorizedResponse extends BaseResponse {
   result: {
-    /**	Whether the specified source account is authorized to send payments
+    /**
+     * Whether the specified source account is authorized to send payments
      * directly to the destination account. If true, either the destination
-     * account does not require Deposit Authorization or the source account is.
-     * preauthorized. */
+     * account does not require Deposit Authorization or the source account is
+     * Preauthorized.
+     */
     deposit_authorized: boolean
     /** The destination account specified in the request. */
     destination_account: string
-    /** The identifying hash of the ledger that was used to generate this.
-     * response. */
+    /**
+     * The identifying hash of the ledger that was used to generate this
+     * Response.
+     */
     ledger_hash?: string
-    /** The ledger index of the ledger version that was used to generate this.
-     * response. */
+    /**
+     * The ledger index of the ledger version that was used to generate this
+     * Response.
+     */
     ledger_index?: number
-    /** The ledger index of the current in-progress ledger version, which was.
-     * used to generate this response. */
+    /**
+     * The ledger index of the current in-progress ledger version, which was
+     * used to generate this response.
+     */
     ledger_current_index?: number
     /** The source account specified in the request. */
     source_account: string

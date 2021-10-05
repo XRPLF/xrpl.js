@@ -16,31 +16,43 @@ export interface AccountInfoRequest extends BaseRequest {
   account: string
   /** A 20-byte hex string for the ledger version to use. */
   ledger_hash?: string
-  /** The ledger index of the ledger to use, or a shortcut string to choose a.
-   * ledger automatically. */
+  /**
+   * The ledger index of the ledger to use, or a shortcut string to choose a
+   * ledger automatically.
+   */
   ledger_index?: LedgerIndex
-  /** F true, and the FeeEscalation amendment is enabled, also returns stats
+  /**
+   * F true, and the FeeEscalation amendment is enabled, also returns stats
    * about queued transactions associated with this account. Can only be used
    * when querying for the data from the current open ledger. New in: rippled.
-   * 0.33.0  Not available from servers in Reporting Mode. */
+   * 0.33.0  Not available from servers in Reporting Mode.
+   */
   queue?: boolean
-  /** If true, and the MultiSign amendment is enabled, also returns any.
-   * SignerList objects associated with this account. */
+  /**
+   * If true, and the MultiSign amendment is enabled, also returns any.
+   * SignerList objects associated with this account.
+   */
   signer_lists?: boolean
-  /** If true, then the account field only accepts a public key or XRP Ledger
-   * address. Otherwise, account can be a secret or passphrase (not.
-   * recommended). The default is false. */
+  /**
+   * If true, then the account field only accepts a public key or XRP Ledger
+   * address. Otherwise, account can be a secret or passphrase (not
+   * recommended). The default is false.
+   */
   strict?: boolean
 }
 
 interface QueueTransaction {
-  /** Whether this transaction changes this address's ways of authorizing.
-   * transactions. */
+  /**
+   * Whether this transaction changes this address's ways of authorizing
+   * transactions.
+   */
   auth_change: boolean
   /** The Transaction Cost of this transaction, in drops of XRP. */
   fee: string
-  /** The transaction cost of this transaction, relative to the minimum cost for.
-   * this type of transaction, in fee levels. */
+  /**
+   * The transaction cost of this transaction, relative to the minimum cost for
+   * this type of transaction, in fee levels.
+   */
   fee_level: string
   /** The maximum amount of XRP, in drops, this transaction could send or destroy. */
   max_spend_drops: string
@@ -51,17 +63,21 @@ interface QueueTransaction {
 interface QueueData {
   /** Number of queued transactions from this address. */
   txn_count: number
-  /** Whether a transaction in the queue changes this address's ways of
+  /**
+   * Whether a transaction in the queue changes this address's ways of
    * authorizing transactions. If true, this address can queue no further
-   * transactions until that transaction has been executed or dropped from the.
-   * queue. */
+   * transactions until that transaction has been executed or dropped from the
+   * queue.
+   */
   auth_change_queued?: boolean
   /** The lowest Sequence Number among transactions queued by this address. */
   lowest_sequence?: number
   /** The highest Sequence Number among transactions queued by this address. */
   highest_sequence?: number
-  /** Integer amount of drops of XRP that could be debited from this address if.
-   * every transaction in the queue consumes the maximum amount of XRP possible. */
+  /**
+   * Integer amount of drops of XRP that could be debited from this address if
+   * every transaction in the queue consumes the maximum amount of XRP possible.
+   */
   max_spend_drops_total?: string
   /** Information about each queued transaction from this address. */
   transactions?: QueueTransaction[]
@@ -74,28 +90,40 @@ interface QueueData {
  */
 export interface AccountInfoResponse extends BaseResponse {
   result: {
-    /** The AccountRoot ledger object with this account's information, as stored.
-     * in the ledger. */
+    /**
+     * The AccountRoot ledger object with this account's information, as stored
+     * in the ledger.
+     */
     account_data: AccountRoot
-    /** Array of SignerList ledger objects associated with this account for
-     * Multi-Signing. Since an account can own at most one SignerList, this.
-     * array must have exactly one member if it is present. */
+    /**
+     * Array of SignerList ledger objects associated with this account for
+     * Multi-Signing. Since an account can own at most one SignerList, this
+     * array must have exactly one member if it is present.
+     */
     signer_lists?: SignerList[]
-    /** The ledger index of the current in-progress ledger, which was used when.
-     * retrieving this information. */
+    /**
+     * The ledger index of the current in-progress ledger, which was used when
+     * retrieving this information.
+     */
     ledger_current_index?: number
-    /** The ledger index of the ledger version used when retrieving this
-     * information. The information does not contain any changes from ledger.
-     * versions newer than this one. */
+    /**
+     * The ledger index of the ledger version used when retrieving this
+     * information. The information does not contain any changes from ledger
+     * versions newer than this one.
+     */
     ledger_index?: number
-    /** Information about queued transactions sent by this account. This
+    /**
+     * Information about queued transactions sent by this account. This
      * information describes the state of the local rippled server, which may be
      * different from other servers in the peer-to-peer XRP Ledger network. Some
-     * fields may be omitted because the values are calculated "lazily" by the.
-     * queuing mechanism. */
+     * fields may be omitted because the values are calculated "lazily" by the
+     * queuing mechanism.
+     */
     queue_data?: QueueData
-    /** True if this data is from a validated ledger version; if omitted or set.
-     * to false, this data is not final. */
+    /**
+     * True if this data is from a validated ledger version; if omitted or set
+     * to false, this data is not final.
+     */
     validated?: boolean
   }
 }

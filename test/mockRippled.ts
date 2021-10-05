@@ -42,8 +42,10 @@ export interface PortResponse extends BaseResponse {
   }
 }
 
-// We mock out WebSocketServer in these tests and add a lot of custom
-// properties not defined on the normal WebSocketServer object.
+/*
+ * We mock out WebSocketServer in these tests and add a lot of custom
+ * properties not defined on the normal WebSocketServer object.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- typing is too complicated otherwise
 type MockedWebSocketServer = any
 
@@ -102,9 +104,11 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
     })
   })
 
-  // Adds a mocked response
-  // If an object is passed in for `response`, then the response is static for the command
-  // If a function is passed in for `response`, then the response can be determined by the exact request shape
+  /*
+   * Adds a mocked response
+   * If an object is passed in for `response`, then the response is static for the command
+   * If a function is passed in for `response`, then the response can be determined by the exact request shape
+   */
   mock.addResponse = function (
     command: string,
     response:

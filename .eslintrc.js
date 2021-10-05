@@ -47,7 +47,8 @@ module.exports = {
     // no-shadow has false-positives for enum, @typescript-eslint version fixes that
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
-    'multiline-comment-style': 'off',
+    'multiline-comment-style': ['error', 'starred-block'],
+    'jsdoc/check-examples': 'off',
 
     // Allows the usage of @category -- TODO: try to add this in base config
     'jsdoc/check-tag-names': 'off',

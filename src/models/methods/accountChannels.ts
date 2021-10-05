@@ -28,24 +28,34 @@ interface Channel {
  */
 export interface AccountChannelsRequest extends BaseRequest {
   command: 'account_channels'
-  /** The unique identifier of an account, typically the account's address. The
+  /**
+   * The unique identifier of an account, typically the account's address. The
    * request returns channels where this account is the channel's owner/source.
-   * */
+   *
+   */
   account: string
-  /** The unique identifier of an account, typically the account's Address. If
-   * provided, filter results to payment channels whose destination is this.
-   * account. */
+  /**
+   * The unique identifier of an account, typically the account's Address. If
+   * provided, filter results to payment channels whose destination is this
+   * account.
+   */
   destination_account?: string
   /** 20-byte hex string for the ledger version to use. */
   ledger_hash?: string
-  /** The ledger index of the ledger to use, or a shortcut string to choose a.
-   * ledger automatically. */
+  /**
+   * The ledger index of the ledger to use, or a shortcut string to choose a
+   * ledger automatically.
+   */
   ledger_index?: LedgerIndex
-  /** Limit the number of transactions to retrieve. Cannot be less than 10 or.
-   * more than 400. The default is 200. */
+  /**
+   * Limit the number of transactions to retrieve. Cannot be less than 10 or
+   * more than 400. The default is 200.
+   */
   limit?: number
-  /** Value from a previous paginated response. Resume retrieving data where.
-   * that response left off */
+  /**
+   * Value from a previous paginated response. Resume retrieving data where.
+   * That response left off .
+   */
   marker?: unknown
 }
 
@@ -56,25 +66,35 @@ export interface AccountChannelsRequest extends BaseRequest {
  */
 export interface AccountChannelsResponse extends BaseResponse {
   result: {
-    /** The address of the source/owner of the payment channels. This.
-     * corresponds to the account field of the request. */
+    /**
+     * The address of the source/owner of the payment channels. This
+     * corresponds to the account field of the request.
+     */
     account: string
     /** Payment channels owned by this account. */
     channels: Channel[]
-    /** The identifying hash of the ledger version used to generate this.
-     * response. */
+    /**
+     * The identifying hash of the ledger version used to generate this
+     * response.
+     */
     ledger_hash: string
     /** The ledger index of the ledger version used to generate this response. */
     ledger_index: number
-    /** If true, the information in this response comes from a validated ledger.
-     * version. Otherwise, the information is subject to change. */
+    /**
+     * If true, the information in this response comes from a validated ledger
+     * version. Otherwise, the information is subject to change.
+     */
     validated?: boolean
-    /** The limit to how many channel objects were actually returned by this.
-     * request. */
+    /**
+     * The limit to how many channel objects were actually returned by this
+     * request.
+     */
     limit?: number
-    /** Server-defined value for pagination. Pass this to the next call to
-     * resume getting results where this call left off. Omitted when there are.
-     * no additional pages after this one. */
+    /**
+     * Server-defined value for pagination. Pass this to the next call to
+     * resume getting results where this call left off. Omitted when there are
+     * no additional pages after this one.
+     */
     marker?: unknown
   }
 }

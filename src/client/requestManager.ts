@@ -112,8 +112,10 @@ export default class RequestManager {
       () => this.reject(newId, new TimeoutError()),
       timeout,
     )
-    // Node.js won't exit if a timer is still running, so we tell Node to ignore.
-    // (Node will still wait for the request to complete).
+    /*
+     * Node.js won't exit if a timer is still running, so we tell Node to ignore.
+     * (Node will still wait for the request to complete).
+     */
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Reason above.
     if (timer.unref) {
       timer.unref()

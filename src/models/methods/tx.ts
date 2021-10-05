@@ -12,19 +12,25 @@ import { BaseRequest, BaseResponse } from './baseMethod'
 export interface TxRequest extends BaseRequest {
   command: 'tx'
   transaction: string
-  /** If true, return transaction data and metadata as binary serialized to
+  /**
+   * If true, return transaction data and metadata as binary serialized to
    * hexadecimal strings. If false, return transaction data and metadata as.
-   * JSON. The default is false. */
+   * JSON. The default is false.
+   */
   binary?: boolean
-  /** Use this with max_ledger to specify a range of up to 1000 ledger indexes,
+  /**
+   * Use this with max_ledger to specify a range of up to 1000 ledger indexes,
    * starting with this ledger (inclusive). If the server cannot find the
-   * transaction, it confirms whether it was able to search all the ledgers in.
-   * this range. */
+   * transaction, it confirms whether it was able to search all the ledgers in
+   * this range.
+   */
   min_ledger?: number
-  /** Use this with min_ledger to specify a range of up to 1000 ledger indexes,
+  /**
+   * Use this with min_ledger to specify a range of up to 1000 ledger indexes,
    * ending with this ledger (inclusive). If the server cannot find the
-   * transaction, it confirms whether it was able to search all the ledgers in.
-   * the requested range. */
+   * transaction, it confirms whether it was able to search all the ledgers in
+   * the requested range.
+   */
   max_ledger?: number
 }
 
@@ -41,13 +47,17 @@ export interface TxResponse extends BaseResponse {
     ledger_index?: number
     /** Transaction metadata, which describes the results of the transaction. */
     meta?: TransactionMetadata | string
-    /**	If true, this data comes from a validated ledger version; if omitted or.
-     * set to false, this data is not final. */
+    /**
+     * If true, this data comes from a validated ledger version; if omitted or.
+     * Set to false, this data is not final.
+     */
     validated?: boolean
   } & Transaction
-  /** If true, the server was able to search all of the specified ledger
+  /**
+   * If true, the server was able to search all of the specified ledger
    * versions, and the transaction was in none of them. If false, the server did
    * not have all of the specified ledger versions available, so it is not sure.
-   * if one of them might contain the transaction. */
+   * If one of them might contain the transaction.
+   */
   searched_all?: boolean
 }

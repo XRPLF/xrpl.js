@@ -15,18 +15,26 @@ export interface AccountOffersRequest extends BaseRequest {
   account: string
   /** A 20-byte hex string identifying the ledger version to use. */
   ledger_hash?: string
-  /** The ledger index of the ledger to use, or "current", "closed", or.
-   * "validated" to select a ledger dynamically.  */
+  /**
+   * The ledger index of the ledger to use, or "current", "closed", or.
+   * "validated" to select a ledger dynamically.
+   */
   ledger_index?: LedgerIndex
-  /** Limit the number of transactions to retrieve. The server is not required.
-   * to honor this value. Must be within the inclusive range 10 to 400. */
+  /**
+   * Limit the number of transactions to retrieve. The server is not required
+   * To honor this value. Must be within the inclusive range 10 to 400.
+   */
   limit?: number
-  /** Value from a previous paginated response. Resume retrieving data where.
-   * that response left off. */
+  /**
+   * Value from a previous paginated response. Resume retrieving data where
+   * that response left off.
+   */
   marker?: unknown
-  /** If true, then the account field only accepts a public key or XRP Ledger
-   * address. Otherwise, account can be a secret or passphrase (not.
-   * recommended). The default is false. */
+  /**
+   * If true, then the account field only accepts a public key or XRP Ledger
+   * address. Otherwise, account can be a secret or passphrase (not
+   * recommended). The default is false.
+   */
   strict?: boolean
 }
 
@@ -35,19 +43,27 @@ interface AccountOffer {
   flags: number
   /** Sequence number of the transaction that created this entry. */
   seq: number
-  /** The amount the account accepting the offer receives, as a String.
-   * representing an amount in XRP, or a currency specification object. */
+  /**
+   * The amount the account accepting the offer receives, as a String
+   * representing an amount in XRP, or a currency specification object.
+   */
   taker_gets: Amount
-  /** The amount the account accepting the offer provides, as a String.
-   * representing an amount in XRP, or a currency specification object. */
+  /**
+   * The amount the account accepting the offer provides, as a String
+   * representing an amount in XRP, or a currency specification object.
+   */
   taker_pays: Amount
-  /** The exchange rate of the offer, as the ratio of the original taker_pay
+  /**
+   * The exchange rate of the offer, as the ratio of the original taker_pay
    * divided by the original taker_gets. When executing offers, the offer with
-   * the most favorable (lowest) quality is consumed first; offers with the same.
-   * quality are executed from oldest to newest. */
+   * the most favorable (lowest) quality is consumed first; offers with the same
+   * quality are executed from oldest to newest.
+   */
   quality: string
-  /** A time after which this offer is considered unfunded, as the number of.
-   * seconds since the Ripple Epoch. See also: Offer Expiration. */
+  /**
+   * A time after which this offer is considered unfunded, as the number of
+   * Seconds since the Ripple Epoch. See also: Offer Expiration.
+   */
   expiration?: number
 }
 
@@ -58,24 +74,34 @@ interface AccountOffer {
  */
 export interface AccountOffersResponse extends BaseResponse {
   result: {
-    /** Unique Address identifying the account that made the offers */
+    /** Unique Address identifying the account that made the offers. */
     account: string
-    /** Array of objects, where each object represents an offer made by this
-     * account that is outstanding as of the requested ledger version. If the.
-     * number of offers is large, only returns up to limit at a time. */
+    /**
+     * Array of objects, where each object represents an offer made by this
+     * account that is outstanding as of the requested ledger version. If the
+     * number of offers is large, only returns up to limit at a time.
+     */
     offers?: AccountOffer[]
-    /** The ledger index of the current in-progress ledger version, which was.
-     * used when retrieving this data. */
+    /**
+     * The ledger index of the current in-progress ledger version, which was
+     * used when retrieving this data.
+     */
     ledger_current_index?: number
-    /** The ledger index of the ledger version that was used when retrieving.
-     * this data, as requested. */
+    /**
+     * The ledger index of the ledger version that was used when retrieving
+     * this data, as requested.
+     */
     ledger_index?: number
-    /** The identifying hash of the ledger version that was used when retrieving.
-     * this data. */
+    /**
+     * The identifying hash of the ledger version that was used when retrieving
+     * this data.
+     */
     ledger_hash?: string
-    /** Server-defined value indicating the response is paginated. Pass this to
-     * the next call to resume where this call left off. Omitted when there are.
-     * no pages of information after this one. */
+    /**
+     * Server-defined value indicating the response is paginated. Pass this to
+     * the next call to resume where this call left off. Omitted when there are
+     * no pages of information after this one.
+     */
     marker?: unknown
   }
 }

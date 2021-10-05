@@ -11,12 +11,16 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  */
 export interface SubmitMultisignedRequest extends BaseRequest {
   command: 'submit_multisigned'
-  /** Transaction in JSON format with an array of Signers. To be successful, the
+  /**
+   * Transaction in JSON format with an array of Signers. To be successful, the
    * weights of the signatures must be equal or higher than the quorum of the.
-   * {@link SignerList}. */
+   * {@link SignerList}.
+   */
   tx_json: Transaction
-  /** If true, and the transaction fails locally, do not retry or relay the.
-   * transaction to other servers. */
+  /**
+   * If true, and the transaction fails locally, do not retry or relay the
+   * transaction to other servers.
+   */
   fail_hard?: boolean
 }
 
@@ -27,11 +31,15 @@ export interface SubmitMultisignedRequest extends BaseRequest {
  */
 export interface SubmitMultisignedResponse extends BaseResponse {
   result: {
-    /** Code indicating the preliminary result of the transaction, for example.
-     * `tesSUCCESS` */
+    /**
+     * Code indicating the preliminary result of the transaction, for example.
+     * `tesSUCCESS` .
+     */
     engine_result: string
-    /** Numeric code indicating the preliminary result of the transaction,.
-     * directly correlated to `engine_result`. */
+    /**
+     * Numeric code indicating the preliminary result of the transaction,
+     * directly correlated to `engine_result`.
+     */
     engine_result_code: number
     /** Human-readable explanation of the preliminary transaction result. */
     engine_result_message: string
