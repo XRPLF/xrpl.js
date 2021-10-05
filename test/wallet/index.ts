@@ -243,7 +243,7 @@ describe('Wallet', function () {
     it('signTransaction with multisignAddress', async function () {
       const signature = wallet.sign(
         REQUEST_FIXTURES.signAs as Transaction,
-        wallet.getClassicAddress(),
+        true,
       )
       assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
     })
@@ -251,7 +251,7 @@ describe('Wallet', function () {
     it('signTransaction with X Address and no given tag for multisignAddress', async function () {
       const signature = wallet.sign(
         REQUEST_FIXTURES.signAs as Transaction,
-        wallet.getXAddress(),
+        true,
       )
       assert.deepEqual(signature, RESPONSE_FIXTURES.signAs.signedTransaction)
     })
@@ -259,7 +259,7 @@ describe('Wallet', function () {
     it('signTransaction with X Address and tag for multisignAddress', async function () {
       const signature = wallet.sign(
         REQUEST_FIXTURES.signAs as Transaction,
-        wallet.getXAddress(0),
+        true,
       )
       // Adding a tag changes the classicAddress, which changes the signature from RESPONSE_FIXTURES.signAs
       const expectedSignature =

@@ -211,6 +211,7 @@ class Wallet {
     }
     const serialized = encode(txToSignAndEncode)
     this.checkTxSerialization(serialized, transaction)
+    console.log(serialized)
     return serialized
   }
 
