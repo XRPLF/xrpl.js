@@ -27,7 +27,7 @@ interface DeletedNode {
   }
 }
 
-type Node = CreatedNode | ModifiedNode | DeletedNode
+export type Node = CreatedNode | ModifiedNode | DeletedNode
 
 export default interface TransactionMetadata {
   AffectedNodes: Node[]
