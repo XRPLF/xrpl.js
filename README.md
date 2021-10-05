@@ -108,11 +108,11 @@ import xrpl from 'https://dev.jspm.io/npm:xrpl';
 
 We have a low-traffic mailing list for announcements of new xrpl.js releases. (About 1 email per week)
 
-+ [Subscribe to ripple-lib-announce](https://groups.google.com/forum/#!forum/ripple-lib-announce)
++ [Subscribe to xrpl-announce](https://groups.google.com/g/xrpl-announce)
 
 If you're using the XRP Ledger in production, you should run a [rippled server](https://github.com/ripple/rippled) and subscribe to the ripple-server mailing list as well.
 
-+ [Subscribe to ripple-server](https://groups.google.com/forum/#!forum/ripple-server)
++ [Subscribe to ripple-server](https://groups.google.com/g/ripple-server)
 
 ## Development
 
@@ -145,6 +145,6 @@ Update the documentation by running `npm run docgen`.
 
 ## More Information
 
-+ [ripple-lib-announce mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) - subscribe for release announcements
++ [xrpl-announce mailing list](https://groups.google.com/g/xrpl-announce) - subscribe for release announcements
 + [RippleAPI Reference](https://xrpl.org/rippleapi-reference.html) - XRP Ledger Dev Portal
 + [XRP Ledger Dev Portal](https://xrpl.org/)
