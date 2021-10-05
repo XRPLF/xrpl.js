@@ -20,17 +20,22 @@ describe('Wallet', function () {
   describe('constructor', function () {
     it('initializes a wallet using a Regular Key Pair', function () {
       const classicAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
-      const regularPublicKey =
-        'aBRNH5wUurfhZcoyR6nRwDSa95gMBkovBJ8V4cp1C1pM28H7EPL1'
-      const regularPrivateKey = 'sh8i92YRnEjJy3fpFkL8txQSCVo79'
+      const regularKeyPair = {
+        publicKey: 'aBRNH5wUurfhZcoyR6nRwDSa95gMBkovBJ8V4cp1C1pM28H7EPL1',
+        privateKey: 'sh8i92YRnEjJy3fpFkL8txQSCVo79',
+      }
 
-      const wallet = new Wallet(regularPublicKey, regularPrivateKey, {
-        classicAddress,
-      })
+      const wallet = new Wallet(
+        regularKeyPair.publicKey,
+        regularKeyPair.privateKey,
+        {
+          classicAddress,
+        },
+      )
 
-      assert.equal(wallet.publicKey, regularPublicKey)
-      assert.isString(wallet.privateKey, regularPrivateKey)
-      assert.isString(wallet.classicAddress, classicAddress)
+      assert.equal(wallet.publicKey, regularKeyPair.publicKey)
+      assert.equal(wallet.privateKey, regularKeyPair.privateKey)
+      assert.equal(wallet.classicAddress, classicAddress)
     })
   })
 
