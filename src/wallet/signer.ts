@@ -17,22 +17,6 @@ import { validateBaseTransaction } from '../models/transactions/common'
 import Wallet from '.'
 
 /**
- * Uses a wallet to cryptographically sign a transaction which proves the owner of the wallet
- * is issuing this transaction.
- *
- * @param wallet - A Wallet that holds your cryptographic keys.
- * @param tx - The Transaction that is being signed.
- * @param forMultisign - If true, changes the signature format to encode for multisigning.
- * @returns A signed Transaction.
- */
-function sign(wallet: Wallet, tx: Transaction, forMultisign = false): string {
-  return wallet.signTransaction(
-    tx,
-    forMultisign ? wallet.getClassicAddress() : '',
-  )
-}
-
-/**
  * Takes several transactions with Signer fields (in object or blob form) and creates a
  * single transaction with all Signers that then gets signed and returned.
  *
@@ -183,4 +167,4 @@ function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
   return decode(txOrBlob) as unknown as Transaction
 }
 
-export { sign, authorizeChannel, verifySignature, multisign }
+export { authorizeChannel, verifySignature, multisign }
