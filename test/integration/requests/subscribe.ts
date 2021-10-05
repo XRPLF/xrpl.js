@@ -152,7 +152,7 @@ describe('subscribe', function () {
     assert.equal(response.type, 'response')
     assert.deepEqual(response.result, expectedResult)
 
-    const event = new Promise((resolve, reject) => {
+    const event = new Promise<void>((resolve, reject) => {
       const client: Client = this.client
       client.on('ledgerClosed', (ledger) => {
         // Fields that are expected to change between the initial test and now are updated
@@ -165,7 +165,7 @@ describe('subscribe', function () {
           ledger_time: ledger.ledger_time,
           validated_ledgers: ledger.validated_ledgers,
         })
-        resolve('success')
+        resolve()
       })
     })
 
