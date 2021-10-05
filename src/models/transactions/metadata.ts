@@ -12,8 +12,8 @@ interface ModifiedNode {
   ModifiedNode: {
     LedgerEntryType: string
     LedgerIndex: string
-    FinalFields: { [field: string]: unknown }
-    PreviousFields: { [field: string]: unknown }
+    FinalFields?: { [field: string]: unknown }
+    PreviousFields?: { [field: string]: unknown }
     PreviousTxnID?: string
     PreviouTxnLgrSeq?: number
   }
