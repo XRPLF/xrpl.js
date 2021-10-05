@@ -65,7 +65,7 @@
     "path-browserify": "1.0.1",
     "prettier": "^2.3.2",
     "process": "^0.11.10",
-    "puppeteer": "10.2.0",
+    "puppeteer": "10.4.0",
     "stream-browserify": "^3.0.0",
     "stream-http": "3.2.0",
     "ts-loader": "^9.2.5",
