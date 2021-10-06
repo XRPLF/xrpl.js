@@ -36,7 +36,7 @@ const MAX_ATTEMPTS = 20
 async function generateFaucetWallet(
   this: Client,
   wallet?: Wallet,
-): Promise<Wallet> {
+): Promise<WalletWithStartingBalance> {
   if (!this.isConnected()) {
     throw new RippledError('Client not connected, cannot call faucet')
   }
@@ -78,7 +78,7 @@ async function returnPromise(
   startingBalance: number,
   fundWallet: Wallet,
   postBody: Buffer,
-): Promise<Wallet> {
+): Promise<WalletWithStartingBalance> {
   return new Promise((resolve, reject) => {
     const request = httpsRequest(options, (response) => {
       const chunks: Uint8Array[] = []
@@ -127,7 +127,7 @@ async function onEnd(
   client: Client,
   startingBalance: number,
   fundWallet: Wallet,
-  resolve: (wallet: Wallet) => void,
+  resolve: (response: WalletWithStartingBalance) => void,
   reject: (err: ErrorConstructor | Error | unknown) => void,
 ): Promise<void> {
   const body = Buffer.concat(chunks).toString()
@@ -154,6 +154,10 @@ async function onEnd(
     )
   }
 }
+interface WalletWithStartingBalance {
+  wallet: Wallet
+  balance: number
+}
 
 // eslint-disable-next-line max-params -- Only used as a helper function
 async function processSuccessfulResponse(
@@ -161,7 +165,7 @@ async function processSuccessfulResponse(
   body: string,
   startingBalance: number,
   fundWallet: Wallet,
-  resolve: (wallet: Wallet) => void,
+  resolve: (response: WalletWithStartingBalance) => void,
   reject: (err: ErrorConstructor | Error | unknown) => void,
 ): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- We know this is safe and correct
@@ -181,7 +185,7 @@ async function processSuccessfulResponse(
     )
 
     if (isFunded) {
-      resolve(fundWallet)
+      resolve({ wallet: fundWallet, balance: startingBalance })
     } else {
       reject(
         new XRPLFaucetError(

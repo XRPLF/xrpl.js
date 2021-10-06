@@ -13,7 +13,7 @@ describe('generateFaucetWallet', function () {
     const api = new Client('wss://s.altnet.rippletest.net:51233')
 
     await api.connect()
-    const wallet = await api.generateFaucetWallet()
+    const wallet = (await api.generateFaucetWallet()).wallet
 
     assert.notEqual(wallet, undefined)
     assert(isValidClassicAddress(wallet.classicAddress))
@@ -40,7 +40,7 @@ describe('generateFaucetWallet', function () {
     const api = new Client('wss://s.devnet.rippletest.net:51233')
 
     await api.connect()
-    const wallet = await api.generateFaucetWallet()
+    const wallet = (await api.generateFaucetWallet()).wallet
 
     assert.notEqual(wallet, undefined)
     assert(isValidClassicAddress(wallet.classicAddress))
