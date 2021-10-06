@@ -3,7 +3,7 @@ import { ValidationError } from '../../errors'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
 
-export enum AccountSetFlags {
+export enum AccountSetAsfFlags {
   asfRequireDest = 1,
   asfRequireAuth = 2,
   asfDisallowXRP = 3,
@@ -15,7 +15,7 @@ export enum AccountSetFlags {
   asfDepositAuth = 9,
 }
 
-export enum AccountSetTransactionFlags {
+export enum AccountSetTfFlags {
   tfRequireDestTag = 0x00010000,
   tfOptionalDestTag = 0x00020000,
   tfRequireAuth = 0x00040000,
@@ -40,7 +40,7 @@ export interface AccountSet extends BaseTransaction {
   Domain?: string
   EmailHash?: string
   MessageKey?: string
-  SetFlag?: AccountSetFlags
+  SetFlag?: AccountSetAsfFlags
   TransferRate?: number
   TickSize?: number
 }
@@ -62,7 +62,7 @@ export function validateAccountSet(tx: Record<string, unknown>): void {
     if (typeof tx.ClearFlag !== 'number') {
       throw new ValidationError('AccountSet: invalid ClearFlag')
     }
-    if (!Object.values(AccountSetFlags).includes(tx.ClearFlag)) {
+    if (!Object.values(AccountSetAsfFlags).includes(tx.ClearFlag)) {
       throw new ValidationError('AccountSet: invalid ClearFlag')
     }
   }
@@ -83,7 +83,7 @@ export function validateAccountSet(tx: Record<string, unknown>): void {
     if (typeof tx.SetFlag !== 'number') {
       throw new ValidationError('AccountSet: invalid SetFlag')
     }
-    if (!Object.values(AccountSetFlags).includes(tx.SetFlag)) {
+    if (!Object.values(AccountSetAsfFlags).includes(tx.SetFlag)) {
       throw new ValidationError('AccountSet: invalid SetFlag')
     }
   }

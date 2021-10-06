@@ -8,7 +8,7 @@ import {
   validateBaseTransaction,
 } from './common'
 
-export enum TrustSetTransactionFlags {
+export enum TrustSetFlags {
   tfSetfAuth = 0x00010000,
   tfSetNoRipple = 0x00020000,
   tfClearNoRipple = 0x00040000,

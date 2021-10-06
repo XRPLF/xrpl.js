@@ -9,7 +9,7 @@ import type {
   TxResponse,
 } from '..'
 import type { Amount } from '../models/common'
-import { PaymentTransactionFlags, Transaction } from '../models/transactions'
+import { PaymentFlags, Transaction } from '../models/transactions'
 import type TransactionMetadata from '../models/transactions/metadata'
 import { isFlagEnabled } from '../models/utils'
 
@@ -54,7 +54,7 @@ function isPartialPayment(
 
   const tfPartial =
     typeof tx.Flags === 'number'
-      ? isFlagEnabled(tx.Flags, PaymentTransactionFlags.tfPartialPayment)
+      ? isFlagEnabled(tx.Flags, PaymentFlags.tfPartialPayment)
       : tx.Flags?.tfPartialPayment
 
   if (!tfPartial) {
