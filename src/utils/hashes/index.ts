@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js'
 import { decodeAccountID } from 'ripple-address-codec'
 
 import HashPrefix from './hashPrefix'
-import computeLedgerHash, {
+import hashLedger, {
   computeLedgerHeaderHash,
   hashSignedTx,
   hashTxTreeHash,
@@ -180,7 +180,7 @@ export function computePaymentChannelHash(
 export {
   computeLedgerHeaderHash,
   hashSignedTx,
-  computeLedgerHash,
+  hashLedger,
   hashStateTree,
   hashTxTreeHash,
 }
