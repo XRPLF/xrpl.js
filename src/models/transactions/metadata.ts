@@ -31,7 +31,9 @@ export type Node = CreatedNode | ModifiedNode | DeletedNode
 
 export default interface TransactionMetadata {
   AffectedNodes: Node[]
-  delivered_amount?: Amount
+  DeliveredAmount?: Amount
+  // "unavailable" possible for transactions before 2014-01-20
+  delivered_amount?: Amount | 'unavailable'
   TransactionIndex: number
   TransactionResult: string
 }
