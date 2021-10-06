@@ -3,6 +3,16 @@ import { assert } from 'chai'
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
 
+async function assertDoesNotThrow(promise: Promise<unknown>): Promise<void> {
+  try {
+    await promise
+    assert(true)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- should be type error
+  } catch (err: any) {
+    assert.fail(err.message || err)
+  }
+}
+
 describe('Client subscription', function () {
   beforeEach(setupClient)
   afterEach(teardownClient)
@@ -10,21 +20,17 @@ describe('Client subscription', function () {
   it('Successfully Subscribes', async function () {
     this.mockRippled.addResponse('subscribe', rippled.subscribe.success)
 
-    const result = await this.client.request({
-      command: 'subscribe',
-    })
-
-    assert.equal(result.status, 'success')
+    await assertDoesNotThrow(this.client.request({ command: 'subscribe' }))
   })
 
   it('Successfully Unsubscribes', async function () {
     this.mockRippled.addResponse('unsubscribe', rippled.unsubscribe)
 
-    const result = await this.client.request({
-      command: 'unsubscribe',
-    })
-
-    assert.equal(result.status, 'success')
+    await assertDoesNotThrow(
+      this.client.request({
+        command: 'unsubscribe',
+      }),
+    )
   })
 
   it('Emits transaction', async function (done) {
