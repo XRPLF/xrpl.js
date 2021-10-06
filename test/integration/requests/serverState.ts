@@ -82,10 +82,8 @@ describe('server_state', function () {
           validator_list_expires: 0,
         },
       },
-      status: 'success',
       type: 'response',
     }
-    assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
 
     assert.equal(typeof response.result.state.complete_ledgers, 'string')

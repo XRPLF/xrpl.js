@@ -74,7 +74,6 @@ export async function verifySubmittedTransaction(
 }
 
 export function verifySuccessfulResponse(response: Response): void {
-  assert.equal(response.status, 'success')
   assert.equal(response.type, 'response')
 }
 
@@ -90,7 +89,6 @@ export async function testTransaction(
   const response = await client.submitTransaction(wallet, transaction)
 
   // check that the transaction was successful
-  assert.equal(response.status, 'success')
   assert.equal(response.type, 'response')
   assert.equal(
     response.result.engine_result,

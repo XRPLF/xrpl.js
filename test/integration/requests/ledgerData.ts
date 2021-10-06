@@ -29,7 +29,6 @@ describe('ledger_data', function () {
 
     assert.equal(ledgerDataResponse.result.validated, true)
     assert(ledgerDataResponse.result.state.length > 0)
-    assert.equal(ledgerDataResponse.status, 'success')
     assert.equal(ledgerDataResponse.type, 'response')
   })
 })

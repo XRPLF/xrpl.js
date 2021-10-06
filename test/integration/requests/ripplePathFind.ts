@@ -31,7 +31,6 @@ describe('ripple_path_find', function () {
 
     const expectedResponse: RipplePathFindResponse = {
       id: response.id,
-      status: 'success',
       type: 'response',
       result: {
         alternatives: response.result.alternatives,

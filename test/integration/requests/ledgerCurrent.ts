@@ -30,7 +30,6 @@ describe('ledger_current', function () {
 
     const expectedResponse: LedgerCurrentResponse = {
       id: ledgerCurrentResponse.id,
-      status: 'success',
       type: 'response',
       result: {
         ledger_current_index: ledgerCurrentResponse.result.ledger_current_index,

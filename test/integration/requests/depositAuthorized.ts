@@ -29,7 +29,6 @@ describe('deposit_authorized', function () {
 
     const expectedResponse: DepositAuthorizedResponse = {
       id: response.id,
-      status: 'success',
       type: 'response',
       result: {
         deposit_authorized: true,

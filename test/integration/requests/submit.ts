@@ -39,7 +39,6 @@ describe('submit', function () {
       tx_blob: signedTx,
     }
     const submitResponse = await this.client.request(submitRequest)
-    assert.equal(submitResponse.status, 'success')
 
     await ledgerAccept(this.client)
     await verifySubmittedTransaction(this.client, signedTx)
@@ -47,7 +46,6 @@ describe('submit', function () {
     const expectedResponse: SubmitResponse = {
       id: submitResponse.id,
       type: 'response',
-      status: 'success',
       result: {
         engine_result: 'tesSUCCESS',
         engine_result_code: 0,

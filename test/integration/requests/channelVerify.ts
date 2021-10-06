@@ -31,7 +31,6 @@ describe('channel_verify', function () {
 
     const expectedResponse: ChannelVerifyResponse = {
       id: response.id,
-      status: 'success',
       type: 'response',
       result: {
         signature_verified: response.result.signature_verified,

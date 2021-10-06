@@ -28,7 +28,6 @@ describe('ledger_closed', function () {
 
     const expectedResponse: LedgerClosedResponse = {
       id: ledgerClosedResponse.id,
-      status: 'success',
       type: 'response',
       result: {
         ledger_hash: ledgerClosedResponse.result.ledger_hash,

@@ -31,7 +31,6 @@ describe('path_find', function () {
 
     const expectedResponse: PathFindResponse = {
       id: response.id,
-      status: 'success',
       type: 'response',
       result: {
         alternatives: response.result.alternatives,

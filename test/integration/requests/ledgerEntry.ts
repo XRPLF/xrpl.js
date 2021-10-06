@@ -35,7 +35,6 @@ describe('ledger_entry', function () {
 
     const expectedResponse: LedgerEntryResponse = {
       id: ledgerEntryResponse.id,
-      status: 'success',
       type: 'response',
       result: {
         index: ledgerEntryIndex,
