@@ -90,7 +90,12 @@ import getBalances from '../sugar/balances'
 import getFee from '../sugar/fee'
 import getLedgerIndex from '../sugar/ledgerIndex'
 import getOrderbook from '../sugar/orderbook'
-import { submitTransaction, submitSignedTransaction } from '../sugar/submit'
+import {
+  submitTransaction,
+  submitSignedTransaction,
+  submitTransactionReliable,
+  submitSignedTransactionReliable,
+} from '../sugar/submit'
 import { ensureClassicAddress } from '../sugar/utils'
 import generateFaucetWallet from '../wallet/generateFaucetWallet'
 
@@ -534,6 +539,8 @@ class Client extends EventEmitter {
 
   public submitTransaction = submitTransaction
   public submitSignedTransaction = submitSignedTransaction
+  public submitTransactionReliable = submitTransactionReliable
+  public submitSignedTransactionReliable = submitSignedTransactionReliable
 
   public getBalances = getBalances
   public getOrderbook = getOrderbook
