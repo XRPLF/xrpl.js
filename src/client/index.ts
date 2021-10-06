@@ -176,7 +176,7 @@ class Client extends EventEmitter {
    * New in > 0.21.0
    * non-validated ledger versions are allowed, and passed to rippled as-is.
    */
-  private readonly connection: Connection
+  public readonly connection: Connection
 
   /**
    * Factor to multiply estimated fee by to provide a cushion in case the
@@ -420,6 +420,7 @@ class Client extends EventEmitter {
   /**
    * Event handler for subscription streams.
    *
+   * @example
    * ```ts
    * const api = new Client('wss://s.altnet.rippletest.net:51233')
    *
