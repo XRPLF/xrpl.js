@@ -8,9 +8,10 @@ import { AccountSet, convertStringToHex } from 'xrpl-local'
 import serverUrl from './serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from './setup'
 import { ledgerAccept } from './utils'
+
 // how long before each test case times out
 const TIMEOUT = 60000
-// This test is reliant on external networks, and as such may be flaky.
+
 describe('reliable submission', function () {
   this.timeout(TIMEOUT)
 
