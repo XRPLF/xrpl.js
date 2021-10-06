@@ -79,10 +79,8 @@ describe('server_info', function () {
           },
         },
       },
-      status: 'success',
       type: 'response',
     }
-    assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
 
     assert.equal(typeof response.result.info.time, 'string')

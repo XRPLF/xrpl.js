@@ -23,7 +23,6 @@ describe('Utility method integration tests', function () {
     const expected = {
       id: 0,
       result: { role: 'admin', unlimited: true },
-      status: 'success',
       type: 'response',
     }
     assert.deepEqual(_.omit(response, 'id'), _.omit(expected, 'id'))
@@ -38,10 +37,8 @@ describe('Utility method integration tests', function () {
       result: {
         random: '[random string of 64 bytes]',
       },
-      status: 'success',
       type: 'response',
     }
-    assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
     assert.equal(response.result.random.length, 64)
   })

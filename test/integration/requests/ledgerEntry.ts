@@ -5,7 +5,6 @@ import { LedgerEntryRequest, LedgerEntryResponse } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
-import { verifySuccessfulResponse } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -23,7 +22,7 @@ describe('ledger_entry', function () {
       ledger_index: 'validated',
     })
 
-    verifySuccessfulResponse(validatedLedgerResponse)
+    assert.equal(validatedLedgerResponse.type, 'response')
     const ledgerEntryIndex = validatedLedgerResponse.result.state[0].index
 
     const ledgerEntryRequest: LedgerEntryRequest = {
@@ -35,7 +34,6 @@ describe('ledger_entry', function () {
 
     const expectedResponse: LedgerEntryResponse = {
       id: ledgerEntryResponse.id,
-      status: 'success',
       type: 'response',
       result: {
         index: ledgerEntryIndex,
@@ -45,7 +43,7 @@ describe('ledger_entry', function () {
       },
     }
 
-    verifySuccessfulResponse(ledgerEntryResponse)
+    assert.equal(ledgerEntryResponse.type, 'response')
     assert.deepEqual(ledgerEntryResponse, expectedResponse)
   })
 })

@@ -45,10 +45,8 @@ describe('account_info', function () {
         ledger_index: 582,
         validated: true,
       },
-      status: 'success',
       type: 'response',
     }
-    assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
     assert.equal(response.result.validated, expected.result.validated)
     assert.equal(typeof response.result.ledger_hash, 'string')

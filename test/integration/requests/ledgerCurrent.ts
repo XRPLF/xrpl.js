@@ -5,7 +5,6 @@ import { LedgerCurrentResponse, LedgerCurrentRequest } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
-import { verifySuccessfulResponse } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -26,16 +25,14 @@ describe('ledger_current', function () {
       ledgerCurrentRequest,
     )
 
-    verifySuccessfulResponse(ledgerCurrentResponse)
-
     const expectedResponse: LedgerCurrentResponse = {
       id: ledgerCurrentResponse.id,
-      status: 'success',
       type: 'response',
       result: {
-        ledger_current_index: ledgerCurrentResponse.result.ledger_current_index,
+        ledger_current_index: 1,
       },
     }
-    assert.deepEqual(ledgerCurrentResponse, expectedResponse)
+    assert.equal(ledgerCurrentResponse.type, expectedResponse.type)
+    assert.typeOf(ledgerCurrentResponse.result.ledger_current_index, 'number')
   })
 })

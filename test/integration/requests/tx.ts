@@ -44,7 +44,6 @@ describe('tx', function () {
     const expectedResponse: TxResponse = {
       id: txResponse.id,
       type: 'response',
-      status: 'success',
       result: {
         ...accountSet,
         Fee: txResponse.result.Fee,
