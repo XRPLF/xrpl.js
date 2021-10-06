@@ -48,7 +48,7 @@ function currencyToHex(currency: string): string {
  * @param txBlobHex - The binary transaction blob as a hexadecimal string.
  * @returns The hash to sign.
  */
-export function computeBinaryTransactionSigningHash(txBlobHex: string): string {
+export function hashTx(txBlobHex: string): string {
   const prefix = HashPrefix.TRANSACTION_SIGN.toString(HEX).toUpperCase()
   return sha512Half(prefix + txBlobHex)
 }

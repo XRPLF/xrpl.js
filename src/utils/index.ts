@@ -19,7 +19,7 @@ import { deriveKeypair, deriveXAddress } from './derive'
 import { generateXAddress } from './generateAddress'
 import {
   hashSignedTx,
-  computeBinaryTransactionSigningHash,
+  hashTx,
   computeAccountRootIndex,
   computeSignerListIndex,
   computeOfferIndex,
@@ -107,7 +107,7 @@ export {
   isValidSecret,
   isValidAddress,
   hashSignedTx,
-  computeBinaryTransactionSigningHash,
+  hashTx,
   computeAccountRootIndex,
   computeSignerListIndex,
   computeOfferIndex,
