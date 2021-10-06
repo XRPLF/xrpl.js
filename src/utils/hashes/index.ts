@@ -10,7 +10,7 @@ import HashPrefix from './hashPrefix'
 import computeLedgerHash, {
   computeLedgerHeaderHash,
   hashSignedTx,
-  computeTransactionTreeHash,
+  hashTxTreeHash,
   computeStateTreeHash,
 } from './ledgerHash'
 import ledgerSpaces from './ledgerSpaces'
@@ -182,5 +182,5 @@ export {
   hashSignedTx,
   computeLedgerHash,
   computeStateTreeHash,
-  computeTransactionTreeHash,
+  hashTxTreeHash,
 }
