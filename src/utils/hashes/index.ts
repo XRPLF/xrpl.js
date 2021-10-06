@@ -83,7 +83,7 @@ export function hashAccountRootId(address: string): string {
  * @param address - The classic account address of the SignerList owner (starting with r).
  * @returns The Index of the account's SignerList object.
  */
-export function computeSignerListIndex(address: string): string {
+export function hashSignerListId(address: string): string {
   return sha512Half(
     `${ledgerSpaceHex('signerList') + addressToHex(address)}00000000`,
   )

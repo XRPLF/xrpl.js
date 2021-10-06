@@ -15,7 +15,7 @@ import {
   hashSignedTx,
   hashAccountRootId,
   computeOfferIndex,
-  computeSignerListIndex,
+  hashSignerListId,
 } from '../../src/utils/hashes'
 import fixtures from '../fixtures/rippled'
 import { assertResultMatch } from '../testUtils'
@@ -118,11 +118,11 @@ describe('Hashes', function () {
     assert.equal(actualEntryHash, expectedEntryHash)
   })
 
-  it('computeSignerListIndex', function () {
+  it('hashSignerListId', function () {
     const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
     const expectedEntryHash =
       '778365D5180F5DF3016817D1F318527AD7410D83F8636CF48C43E8AF72AB49BF'
-    const actualEntryHash = computeSignerListIndex(account)
+    const actualEntryHash = hashSignerListId(account)
     assert.equal(actualEntryHash, expectedEntryHash)
   })
 
