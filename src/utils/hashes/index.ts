@@ -121,7 +121,7 @@ export function hashOfferId(address: string, sequence: number): string {
  * @param currency - Currency in the Trustline.
  * @returns The hash of the Trustline.
  */
-export function computeTrustlineHash(
+export function hashTrustline(
   address1: string,
   address2: string,
   currency: string,

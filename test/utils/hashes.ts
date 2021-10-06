@@ -9,7 +9,7 @@ import { OfferCreate, Transaction, ValidationError } from 'xrpl-local'
 import {
   computeStateTreeHash,
   computeTransactionTreeHash,
-  computeTrustlineHash,
+  hashTrustline,
   computeEscrowHash,
   computePaymentChannelHash,
   hashSignedTx,
@@ -87,8 +87,8 @@ describe('Hashes', function () {
 
     const expectedEntryHash =
       'C683B5BB928F025F1E860D9D69D6C554C2202DE0D45877ADB3077DA4CB9E125C'
-    const actualEntryHash1 = computeTrustlineHash(account1, account2, currency)
-    const actualEntryHash2 = computeTrustlineHash(account2, account1, currency)
+    const actualEntryHash1 = hashTrustline(account1, account2, currency)
+    const actualEntryHash2 = hashTrustline(account2, account1, currency)
 
     assert.equal(actualEntryHash1, expectedEntryHash)
     assert.equal(actualEntryHash2, expectedEntryHash)
@@ -101,8 +101,8 @@ describe('Hashes', function () {
 
     const expectedEntryHash =
       'AE9ADDC584358E5847ADFC971834E471436FC3E9DE6EA1773DF49F419DC0F65E'
-    const actualEntryHash1 = computeTrustlineHash(account1, account2, currency)
-    const actualEntryHash2 = computeTrustlineHash(account2, account1, currency)
+    const actualEntryHash1 = hashTrustline(account1, account2, currency)
+    const actualEntryHash2 = hashTrustline(account2, account1, currency)
 
     assert.equal(actualEntryHash1, expectedEntryHash)
     assert.equal(actualEntryHash2, expectedEntryHash)
