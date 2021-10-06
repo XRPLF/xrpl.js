@@ -7,7 +7,7 @@ import { encode } from 'ripple-binary-codec'
 import { OfferCreate, Transaction, ValidationError } from 'xrpl-local'
 
 import {
-  computeStateTreeHash,
+  hashStateTree,
   hashTxTreeHash,
   hashTrustline,
   computeEscrowHash,
@@ -46,7 +46,7 @@ function createLedgerTest(ledgerIndex: number): void {
       it(`has account_hash of ${ledgerJSON.account_hash}`, function () {
         assert.equal(
           ledgerJSON.account_hash,
-          computeStateTreeHash(ledgerJSON.accountState),
+          hashStateTree(ledgerJSON.accountState),
         )
       })
     }

@@ -143,7 +143,7 @@ export function hashTxTreeHash(
  * @param entries - List of LedgerEntries.
  * @returns Hash of SHAMap that consists of all entries.
  */
-export function computeStateTreeHash(entries: LedgerEntry[]): string {
+export function hashStateTree(entries: LedgerEntry[]): string {
   const shamap = new SHAMap()
 
   entries.forEach((ledgerEntry) => {
@@ -198,7 +198,7 @@ function computeStateHash(
     throw new ValidationError('accountState is missing from the ledger')
   }
 
-  const stateHash = computeStateTreeHash(ledger.accountState)
+  const stateHash = hashStateTree(ledger.accountState)
 
   if (account_hash !== stateHash) {
     throw new ValidationError(

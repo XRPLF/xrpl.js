@@ -11,7 +11,7 @@ import computeLedgerHash, {
   computeLedgerHeaderHash,
   hashSignedTx,
   hashTxTreeHash,
-  computeStateTreeHash,
+  hashStateTree,
 } from './ledgerHash'
 import ledgerSpaces from './ledgerSpaces'
 import sha512Half from './sha512Half'
@@ -181,6 +181,6 @@ export {
   computeLedgerHeaderHash,
   hashSignedTx,
   computeLedgerHash,
-  computeStateTreeHash,
+  hashStateTree,
   hashTxTreeHash,
 }

@@ -50,7 +50,7 @@ Compute the hash of a trustline, given the two parties' classic addresses (start
 
 ### computeTransactionTreeHash = (transactions: any[]): string
 
-### computeStateTreeHash = (entries: any[]): string
+### hashStateTree = (entries: any[]): string
 
 ### computeLedgerHash = (ledgerHeader): string
 
