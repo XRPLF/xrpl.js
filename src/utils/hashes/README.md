@@ -56,7 +56,7 @@ Compute the hash of a trustline, given the two parties' classic addresses (start
 
 Compute the hash of a ledger.
 
-### computeEscrowHash = (address, sequence): string
+### hashEscrow = (address, sequence): string
 
 Compute the hash of an escrow, given the owner's classic address (starting with `r`) and the account sequence number of the `EscrowCreate` escrow transaction.
 

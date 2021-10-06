@@ -10,7 +10,7 @@ import {
   hashStateTree,
   hashTxTreeHash,
   hashTrustline,
-  computeEscrowHash,
+  hashEscrow,
   computePaymentChannelHash,
   hashSignedTx,
   hashAccountRootId,
@@ -131,7 +131,7 @@ describe('Hashes', function () {
     const sequence = 84
     const expectedEntryHash =
       '61E8E8ED53FA2CEBE192B23897071E9A75217BF5A410E9CB5B45AAB7AECA567A'
-    const actualEntryHash = computeEscrowHash(account, sequence)
+    const actualEntryHash = hashEscrow(account, sequence)
 
     assert.equal(actualEntryHash, expectedEntryHash)
   })

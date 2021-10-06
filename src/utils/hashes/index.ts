@@ -148,7 +148,7 @@ export function hashTrustline(
  * @param sequence - OfferSequence of the Escrow.
  * @returns The hash of the Escrow LedgerEntry.
  */
-export function computeEscrowHash(address: string, sequence: number): string {
+export function hashEscrow(address: string, sequence: number): string {
   return sha512Half(
     ledgerSpaceHex('escrow') +
       addressToHex(address) +
