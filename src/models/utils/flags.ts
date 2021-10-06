@@ -4,25 +4,22 @@
 import { ValidationError } from '../../errors'
 import {
   AccountSetFlagsInterface,
-  AccountSetTransactionFlags,
+  AccountSetTfFlags,
 } from '../transactions/accountSet'
 import { GlobalFlags } from '../transactions/common'
 import {
   OfferCreateFlagsInterface,
-  OfferCreateTransactionFlags,
+  OfferCreateTfFlags,
 } from '../transactions/offerCreate'
-import {
-  PaymentFlagsInterface,
-  PaymentTransactionFlags,
-} from '../transactions/payment'
+import { PaymentFlagsInterface, PaymentTfFlags } from '../transactions/payment'
 import {
   PaymentChannelClaimFlagsInterface,
-  PaymentChannelClaimTransactionFlags,
+  PaymentChannelClaimTfFlags,
 } from '../transactions/paymentChannelClaim'
 import type { Transaction } from '../transactions/transaction'
 import {
   TrustSetFlagsInterface,
-  TrustSetTransactionFlags,
+  TrustSetTfFlags,
 } from '../transactions/trustSet'
 
 /**
@@ -63,29 +60,29 @@ export default function setTransactionFlagsToNumber(tx: Transaction): void {
 function convertAccountSetFlagsToNumber(
   flags: AccountSetFlagsInterface,
 ): number {
-  return reduceFlags(flags, AccountSetTransactionFlags)
+  return reduceFlags(flags, AccountSetTfFlags)
 }
 
 function convertOfferCreateFlagsToNumber(
   flags: OfferCreateFlagsInterface,
 ): number {
-  return reduceFlags(flags, OfferCreateTransactionFlags)
+  return reduceFlags(flags, OfferCreateTfFlags)
 }
 
 function convertPaymentChannelClaimFlagsToNumber(
   flags: PaymentChannelClaimFlagsInterface,
 ): number {
-  return reduceFlags(flags, PaymentChannelClaimTransactionFlags)
+  return reduceFlags(flags, PaymentChannelClaimTfFlags)
 }
 
 function convertPaymentTransactionFlagsToNumber(
   flags: PaymentFlagsInterface,
 ): number {
-  return reduceFlags(flags, PaymentTransactionFlags)
+  return reduceFlags(flags, PaymentTfFlags)
 }
 
 function convertTrustSetFlagsToNumber(flags: TrustSetFlagsInterface): number {
-  return reduceFlags(flags, TrustSetTransactionFlags)
+  return reduceFlags(flags, TrustSetTfFlags)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- added ValidationError check for flagEnum
