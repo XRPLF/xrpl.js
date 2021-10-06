@@ -1,12 +1,12 @@
 import { assert } from 'chai'
 
 import { getBalanceChanges } from '../../src/utils'
-import paymentIou from '../fixtures/utils/paymentIou.json'
-import paymentIouDestinationNoBalance from '../fixtures/utils/paymentIouDestinationNoBalance.json'
-import paymentIouMultipath from '../fixtures/utils/paymentIouMultipath.json'
-import paymentIouRedeem from '../fixtures/utils/paymentIouRedeem.json'
-import paymentIouRedeemThenIssue from '../fixtures/utils/paymentIouRedeemThenIssue.json'
-import paymentIouSpendFullBalance from '../fixtures/utils/paymentIouSpendFullBalance.json'
+import paymentToken from '../fixtures/utils/paymentToken.json'
+import paymentTokenDestinationNoBalance from '../fixtures/utils/paymentTokenDestinationNoBalance.json'
+import paymentTokenMultipath from '../fixtures/utils/paymentTokenMultipath.json'
+import paymentTokenRedeem from '../fixtures/utils/paymentTokenRedeem.json'
+import paymentTokenRedeemThenIssue from '../fixtures/utils/paymentTokenRedeemThenIssue.json'
+import paymentTokenSpendFullBalance from '../fixtures/utils/paymentTokenSpendFullBalance.json'
 import paymentXrpCreateAccount from '../fixtures/utils/paymentXrpCreateAccount.json'
 import trustlineCreate from '../fixtures/utils/trustlineCreate.json'
 import trustlineDelete from '../fixtures/utils/trustlineDelete.json'
@@ -31,7 +31,7 @@ describe('getBalanceChanges', function () {
   })
 
   it('USD payment to account with no USD', function () {
-    const result = getBalanceChanges(paymentIouDestinationNoBalance.metadata)
+    const result = getBalanceChanges(paymentTokenDestinationNoBalance.metadata)
     const expected = [
       {
         account: 'rKmBGxocj9Abgy25J51Mk1iqFzW9aVF9Tc',
@@ -77,7 +77,7 @@ describe('getBalanceChanges', function () {
   })
 
   it('USD payment of all USD in source account', function () {
-    const result = getBalanceChanges(paymentIouSpendFullBalance.metadata)
+    const result = getBalanceChanges(paymentTokenSpendFullBalance.metadata)
     const expected = [
       {
         account: 'rKmBGxocj9Abgy25J51Mk1iqFzW9aVF9Tc',
@@ -124,7 +124,7 @@ describe('getBalanceChanges', function () {
   })
 
   it('USD payment to account with USD', function () {
-    const result = getBalanceChanges(paymentIou.metadata)
+    const result = getBalanceChanges(paymentToken.metadata)
     const expected = [
       {
         account: 'rKmBGxocj9Abgy25J51Mk1iqFzW9aVF9Tc',
@@ -295,7 +295,7 @@ describe('getBalanceChanges', function () {
   })
 
   it('Redeem USD', function () {
-    const result = getBalanceChanges(paymentIouRedeem.result.meta)
+    const result = getBalanceChanges(paymentTokenRedeem.result.meta)
     const expected = [
       {
         account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
@@ -326,7 +326,7 @@ describe('getBalanceChanges', function () {
   })
 
   it('Redeem then issue USD', function () {
-    const result = getBalanceChanges(paymentIouRedeemThenIssue.result.meta)
+    const result = getBalanceChanges(paymentTokenRedeemThenIssue.result.meta)
     const expected = [
       {
         account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
@@ -357,7 +357,7 @@ describe('getBalanceChanges', function () {
   })
 
   it('Multipath USD payment', function () {
-    const result = getBalanceChanges(paymentIouMultipath.result.meta)
+    const result = getBalanceChanges(paymentTokenMultipath.result.meta)
     const expected = [
       {
         account: 'rrnsYgWn13Z28GtRgznrSUsLfMkvsXCZSu',
