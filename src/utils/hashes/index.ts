@@ -8,7 +8,7 @@ import { decodeAccountID } from 'ripple-address-codec'
 
 import HashPrefix from './hashPrefix'
 import hashLedger, {
-  computeLedgerHeaderHash,
+  hashLedgerHeader,
   hashSignedTx,
   hashTxTreeHash,
   hashStateTree,
@@ -178,7 +178,7 @@ export function computePaymentChannelHash(
 }
 
 export {
-  computeLedgerHeaderHash,
+  hashLedgerHeader,
   hashSignedTx,
   hashLedger,
   hashStateTree,

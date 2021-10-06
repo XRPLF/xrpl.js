@@ -27,7 +27,7 @@ import {
   hashTxTreeHash,
   hashStateTree,
   hashLedger,
-  computeLedgerHeaderHash,
+  hashLedgerHeader,
   computeEscrowHash,
   computePaymentChannelHash,
 } from './hashes'
@@ -115,7 +115,7 @@ export {
   hashTxTreeHash,
   hashStateTree,
   hashLedger,
-  computeLedgerHeaderHash,
+  hashLedgerHeader,
   computeEscrowHash,
   computePaymentChannelHash,
   generateXAddress,

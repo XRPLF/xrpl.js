@@ -18,7 +18,7 @@ import SHAMap, { NodeType } from './shaMap'
 
 const HEX = 16
 
-interface ComputeLedgerHeaderHashOptions {
+interface HashLedgerHeaderOptions {
   computeTreeHashes?: boolean
 }
 
@@ -98,7 +98,7 @@ export function hashSignedTx(tx: Transaction | string): string {
  * @param ledgerHeader - Ledger to compute the hash of.
  * @returns The hash of the ledger.
  */
-export function computeLedgerHeaderHash(ledgerHeader: Ledger): string {
+export function hashLedgerHeader(ledgerHeader: Ledger): string {
   const prefix = HashPrefix.LEDGER.toString(HEX).toUpperCase()
 
   const ledger =
@@ -156,7 +156,7 @@ export function hashStateTree(entries: LedgerEntry[]): string {
 
 function computeTransactionHash(
   ledger: Ledger,
-  options: ComputeLedgerHeaderHashOptions,
+  options: HashLedgerHeaderOptions,
 ): string {
   const { transaction_hash } = ledger
 
@@ -186,7 +186,7 @@ function computeTransactionHash(
 
 function computeStateHash(
   ledger: Ledger,
-  options: ComputeLedgerHeaderHashOptions,
+  options: HashLedgerHeaderOptions,
 ): string {
   const { account_hash } = ledger
 
@@ -218,13 +218,13 @@ function computeStateHash(
  */
 function hashLedger(
   ledger: Ledger,
-  options: ComputeLedgerHeaderHashOptions = {},
+  options: HashLedgerHeaderOptions = {},
 ): string {
   const subhashes = {
     transaction_hash: computeTransactionHash(ledger, options),
     account_hash: computeStateHash(ledger, options),
   }
-  return computeLedgerHeaderHash({ ...ledger, ...subhashes })
+  return hashLedgerHeader({ ...ledger, ...subhashes })
 }
 
 export default hashLedger
