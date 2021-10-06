@@ -9,18 +9,15 @@ import {
 import { GlobalFlags } from '../transactions/common'
 import {
   OfferCreateFlagsInterface,
-  OfferCreateTfFlags,
+  OfferCreateFlags,
 } from '../transactions/offerCreate'
-import { PaymentFlagsInterface, PaymentTfFlags } from '../transactions/payment'
+import { PaymentFlagsInterface, PaymentFlags } from '../transactions/payment'
 import {
   PaymentChannelClaimFlagsInterface,
-  PaymentChannelClaimTfFlags,
+  PaymentChannelClaimFlags,
 } from '../transactions/paymentChannelClaim'
 import type { Transaction } from '../transactions/transaction'
-import {
-  TrustSetFlagsInterface,
-  TrustSetTfFlags,
-} from '../transactions/trustSet'
+import { TrustSetFlagsInterface, TrustSetFlags } from '../transactions/trustSet'
 
 /**
  * Sets a transaction's flags to its numeric representation.
@@ -66,23 +63,23 @@ function convertAccountSetFlagsToNumber(
 function convertOfferCreateFlagsToNumber(
   flags: OfferCreateFlagsInterface,
 ): number {
-  return reduceFlags(flags, OfferCreateTfFlags)
+  return reduceFlags(flags, OfferCreateFlags)
 }
 
 function convertPaymentChannelClaimFlagsToNumber(
   flags: PaymentChannelClaimFlagsInterface,
 ): number {
-  return reduceFlags(flags, PaymentChannelClaimTfFlags)
+  return reduceFlags(flags, PaymentChannelClaimFlags)
 }
 
 function convertPaymentTransactionFlagsToNumber(
   flags: PaymentFlagsInterface,
 ): number {
-  return reduceFlags(flags, PaymentTfFlags)
+  return reduceFlags(flags, PaymentFlags)
 }
 
 function convertTrustSetFlagsToNumber(flags: TrustSetFlagsInterface): number {
-  return reduceFlags(flags, TrustSetTfFlags)
+  return reduceFlags(flags, TrustSetFlags)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- added ValidationError check for flagEnum

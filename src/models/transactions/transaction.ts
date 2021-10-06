@@ -26,13 +26,13 @@ import { OfferCancel, validateOfferCancel } from './offerCancel'
 import {
   OfferCreate,
   validateOfferCreate,
-  OfferCreateTfFlags,
+  OfferCreateFlags,
 } from './offerCreate'
-import { Payment, validatePayment, PaymentTfFlags } from './payment'
+import { Payment, validatePayment, PaymentFlags } from './payment'
 import {
   PaymentChannelClaim,
   validatePaymentChannelClaim,
-  PaymentChannelClaimTfFlags,
+  PaymentChannelClaimFlags,
 } from './paymentChannelClaim'
 import {
   PaymentChannelCreate,
@@ -45,7 +45,7 @@ import {
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
-import { TrustSet, validateTrustSet, TrustSetTfFlags } from './trustSet'
+import { TrustSet, validateTrustSet, TrustSetFlags } from './trustSet'
 
 export type Transaction =
   | AccountDelete
@@ -186,8 +186,8 @@ export function validate(transaction: Record<string, unknown>): void {
 export {
   AccountSetAsfFlags,
   AccountSetTfFlags,
-  OfferCreateTfFlags,
-  PaymentTfFlags,
-  PaymentChannelClaimTfFlags,
-  TrustSetTfFlags,
+  OfferCreateFlags,
+  PaymentFlags,
+  PaymentChannelClaimFlags,
+  TrustSetFlags,
 }

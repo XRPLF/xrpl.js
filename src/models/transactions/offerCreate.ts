@@ -9,7 +9,7 @@ import {
   isAmount,
 } from './common'
 
-export enum OfferCreateTfFlags {
+export enum OfferCreateFlags {
   tfPassive = 0x00010000,
   tfImmediateOrCancel = 0x00020000,
   tfFillOrKill = 0x00040000,

@@ -3,7 +3,7 @@ import { assert } from 'chai'
 import {
   validatePayment,
   validate,
-  PaymentTfFlags,
+  PaymentFlags,
   ValidationError,
 } from 'xrpl-local'
 
@@ -158,7 +158,7 @@ describe('Payment', function () {
 
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a number`, function () {
     paymentTransaction.DeliverMin = '10000'
-    paymentTransaction.Flags = PaymentTfFlags.tfPartialPayment
+    paymentTransaction.Flags = PaymentFlags.tfPartialPayment
     assert.doesNotThrow(() => validatePayment(paymentTransaction))
     assert.doesNotThrow(() => validate(paymentTransaction))
   })
