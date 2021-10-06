@@ -29,7 +29,7 @@ import {
   hashLedger,
   hashLedgerHeader,
   hashEscrow,
-  computePaymentChannelHash,
+  hashPaymentChannel,
 } from './hashes'
 import signPaymentChannelClaim from './signPaymentChannelClaim'
 import {
@@ -117,7 +117,7 @@ export {
   hashLedger,
   hashLedgerHeader,
   hashEscrow,
-  computePaymentChannelHash,
+  hashPaymentChannel,
   generateXAddress,
   deriveKeypair,
   deriveXAddress,

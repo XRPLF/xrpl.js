@@ -60,6 +60,6 @@ Compute the hash of a ledger.
 
 Compute the hash of an escrow, given the owner's classic address (starting with `r`) and the account sequence number of the `EscrowCreate` escrow transaction.
 
-### computePaymentChannelHash = (address, dstAddress, sequence): string
+### hashPaymentChannel = (address, dstAddress, sequence): string
 
 Compute the hash of a payment channel, given the owner's classic address (starting with `r`), the classic address of the destination, and the account sequence number of the `PaymentChannelCreate` payment channel transaction.

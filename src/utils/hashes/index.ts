@@ -164,7 +164,7 @@ export function hashEscrow(address: string, sequence: number): string {
  * @param sequence - Sequence number of the Transaction that created the Payment Channel.
  * @returns Hash of the Payment Channel.
  */
-export function computePaymentChannelHash(
+export function hashPaymentChannel(
   address: string,
   dstAddress: string,
   sequence: number,

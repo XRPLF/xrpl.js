@@ -2,7 +2,7 @@ import _ from 'lodash'
 
 import {
   PaymentChannelCreate,
-  computePaymentChannelHash,
+  hashPaymentChannel,
   PaymentChannelClaim,
 } from 'xrpl-local'
 
@@ -41,7 +41,7 @@ describe('PaymentChannelClaim', function () {
     const paymentChannelClaim: PaymentChannelClaim = {
       Account: this.wallet.getClassicAddress(),
       TransactionType: 'PaymentChannelClaim',
-      Channel: computePaymentChannelHash(
+      Channel: hashPaymentChannel(
         this.wallet.getClassicAddress(),
         wallet2.getClassicAddress(),
         paymentChannelResponse.result.tx_json.Sequence ?? 0,
