@@ -15,6 +15,7 @@ import {
   xAddressToClassicAddress,
 } from 'ripple-address-codec'
 
+import getBalanceChanges from './balanceChanges'
 import { deriveKeypair, deriveXAddress } from './derive'
 import { generateXAddress } from './generateAddress'
 import {
@@ -97,6 +98,7 @@ function convertStringToHex(string: string): string {
 }
 
 export {
+  getBalanceChanges,
   dropsToXrp,
   xrpToDrops,
   removeUndefined,

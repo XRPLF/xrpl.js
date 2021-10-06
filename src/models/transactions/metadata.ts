@@ -12,8 +12,8 @@ interface ModifiedNode {
   ModifiedNode: {
     LedgerEntryType: string
     LedgerIndex: string
-    FinalFields: { [field: string]: unknown }
-    PreviousFields: { [field: string]: unknown }
+    FinalFields?: { [field: string]: unknown }
+    PreviousFields?: { [field: string]: unknown }
     PreviousTxnID?: string
     PreviouTxnLgrSeq?: number
   }
@@ -27,12 +27,13 @@ interface DeletedNode {
   }
 }
 
-type Node = CreatedNode | ModifiedNode | DeletedNode
+export type Node = CreatedNode | ModifiedNode | DeletedNode
 
 export default interface TransactionMetadata {
   AffectedNodes: Node[]
   DeliveredAmount?: Amount
-  delivered_amount?: Amount
+  // "unavailable" possible for transactions before 2014-01-20
+  delivered_amount?: Amount | 'unavailable'
   TransactionIndex: number
   TransactionResult: string
 }
