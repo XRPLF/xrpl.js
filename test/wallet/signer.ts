@@ -10,6 +10,8 @@ import {
   verifySignature,
 } from 'xrpl-local/wallet/signer'
 
+import { SignedTxBlobHash } from '../../src/wallet'
+
 const publicKey =
   '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
 const privateKey =
@@ -166,19 +168,21 @@ describe('Signer', function () {
       Fee: '12',
       Sequence: 20582260,
     }
-    const signedTxBlob =
-      '120000228000000024013A0F74201B013A0FC36140000000014FB18068400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F544744730450221009ECB5324717E14DD6970126271F05BC2626D2A8FA9F3797555D417F8257C1E6002206BDD74A0F30425F2BA9DB69C90F21B3E27735C190FB4F3A640F066ACBBF06AD98114B3263BD0A9BF9DFDBBBBD07F536355FF477BF0E98314F667B0CA50CC7709A220B0561B85E53A48461FA8'
+    const signedTxResponse = {
+      tx_blob:
+        '120000228000000024013A0F74201B013A0FC36140000000014FB18068400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F544744730450221009ECB5324717E14DD6970126271F05BC2626D2A8FA9F3797555D417F8257C1E6002206BDD74A0F30425F2BA9DB69C90F21B3E27735C190FB4F3A640F066ACBBF06AD98114B3263BD0A9BF9DFDBBBBD07F536355FF477BF0E98314F667B0CA50CC7709A220B0561B85E53A48461FA8',
+      hash: 'F73E975C70497A3DA61ADB76A3B39CD971A2DE017419A690BFAD6733B5FD8B3B',
+    }
 
-    const signedTx: string = wallet.sign(tx3)
-
-    assert.equal(signedTx, signedTxBlob)
+    const signedTx: SignedTxBlobHash = wallet.sign(tx3)
+    assert.deepEqual(signedTx, signedTxResponse)
   })
 
   it('sign in multisign format', function () {
     const multisignWallet = Wallet.fromSeed(unsignedSecret1)
 
     assert.deepEqual(
-      decode(multisignWallet.sign(unsignedTx1, true)),
+      decode(multisignWallet.sign(unsignedTx1, true).tx_blob),
       multisignTx1 as unknown as JsonObject,
     )
   })
@@ -264,19 +268,21 @@ describe('Signer', function () {
   it('verifySignature succeeds for valid signed transaction blob', function () {
     const signedTx = verifyWallet.sign(tx)
 
-    assert.isTrue(verifySignature(signedTx))
+    assert.isTrue(verifySignature(signedTx.tx_blob))
   })
 
   it('verify succeeds for valid signed transaction object', function () {
     const signedTx = verifyWallet.sign(tx)
 
-    assert.isTrue(verifySignature(decode(signedTx) as unknown as Transaction))
+    assert.isTrue(
+      verifySignature(decode(signedTx.tx_blob) as unknown as Transaction),
+    )
   })
 
   it('verify throws for invalid signing key', function () {
     const signedTx = verifyWallet.sign(tx)
 
-    const decodedTx = decode(signedTx) as unknown as Transaction
+    const decodedTx = decode(signedTx.tx_blob) as unknown as Transaction
 
     // Use a different key for validation
     decodedTx.SigningPubKey =

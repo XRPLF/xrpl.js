@@ -23,12 +23,17 @@ import {
 import ECDSA from '../ecdsa'
 import { ValidationError } from '../errors'
 import { Transaction } from '../models/transactions'
+import { computeSignedTransactionHash } from '../utils/hashes/ledgerHash'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
 
 function hexFromBuffer(buffer: Buffer): string {
   return buffer.toString('hex').toUpperCase()
+}
+export interface SignedTxBlobHash {
+  tx_blob: string
+  hash: string
 }
 
 /**
@@ -171,7 +176,7 @@ class Wallet {
    *
    * @param this - Wallet instance.
    * @param transaction - A transaction to be signed offline.
-   * @param forMultisign - Specify true/false if this is a multisign tx request.
+   * @param multisign - Specify true/false to use multisign or actual address (classic/x-address) to make multisign tx request.
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    */
@@ -179,15 +184,12 @@ class Wallet {
   public sign(
     this: Wallet,
     transaction: Transaction,
-    forMultisign?: boolean | string,
-  ): string {
+    multisign?: boolean | string,
+  ): SignedTxBlobHash {
     let multisignAddress: boolean | string = false
-    if (
-      typeof forMultisign === 'string' &&
-      forMultisign.trim().startsWith('X')
-    ) {
-      multisignAddress = forMultisign
-    } else if (typeof forMultisign === 'boolean' && forMultisign) {
+    if (typeof multisign === 'string' && multisign.trim().startsWith('X')) {
+      multisignAddress = multisign
+    } else if (typeof multisign === 'boolean' && multisign) {
       multisignAddress = this.getClassicAddress()
     }
 
@@ -220,7 +222,10 @@ class Wallet {
     }
     const serialized = encode(txToSignAndEncode)
     this.checkTxSerialization(serialized, transaction)
-    return serialized
+    return {
+      tx_blob: serialized,
+      hash: computeSignedTransactionHash(serialized),
+    }
   }
 
   /**
