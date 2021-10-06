@@ -14,7 +14,7 @@ import {
   computePaymentChannelHash,
   hashSignedTx,
   hashAccountRootId,
-  computeOfferIndex,
+  hashOfferId,
   hashSignerListId,
 } from '../../src/utils/hashes'
 import fixtures from '../fixtures/rippled'
@@ -113,7 +113,7 @@ describe('Hashes', function () {
     const sequence = 137
     const expectedEntryHash =
       '03F0AED09DEEE74CEF85CD57A0429D6113507CF759C597BABB4ADB752F734CE3'
-    const actualEntryHash = computeOfferIndex(account, sequence)
+    const actualEntryHash = hashOfferId(account, sequence)
 
     assert.equal(actualEntryHash, expectedEntryHash)
   })

@@ -103,7 +103,7 @@ export function hashSignerListId(address: string): string {
  * @param sequence - Sequence of the Offer.
  * @returns The Index of the account's Offer object.
  */
-export function computeOfferIndex(address: string, sequence: number): string {
+export function hashOfferId(address: string, sequence: number): string {
   const hexPrefix = ledgerSpaces.offer
     .charCodeAt(0)
     .toString(HEX)
