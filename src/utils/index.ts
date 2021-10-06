@@ -20,7 +20,7 @@ import { generateXAddress } from './generateAddress'
 import {
   hashSignedTx,
   hashTx,
-  computeAccountRootIndex,
+  hashAccountRootId,
   computeSignerListIndex,
   computeOfferIndex,
   computeTrustlineHash,
@@ -108,7 +108,7 @@ export {
   isValidAddress,
   hashSignedTx,
   hashTx,
-  computeAccountRootIndex,
+  hashAccountRootId,
   computeSignerListIndex,
   computeOfferIndex,
   computeTrustlineHash,
