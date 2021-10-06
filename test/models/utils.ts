@@ -12,8 +12,11 @@ import {
   TrustSet,
   TrustSetFlags,
 } from 'xrpl-local'
+import { AccountRootLedgerFlags } from 'xrpl-local/models/ledger'
 import { isFlagEnabled } from 'xrpl-local/models/utils'
-import setTransactionFlagsToNumber from 'xrpl-local/models/utils/flags'
+import setTransactionFlagsToNumber, {
+  parseAccountRootFlags,
+} from 'xrpl-local/models/utils/flags'
 
 /**
  * Utils Testing.
@@ -145,6 +148,49 @@ describe('Models Utils', function () {
 
       setTransactionFlagsToNumber(tx)
       assert.strictEqual(tx.Flags, 0)
+    })
+
+    it('parseAccountRootFlags all enabled', function () {
+      const accountRootFlags =
+        AccountRootLedgerFlags.lsfDefaultRipple |
+        AccountRootLedgerFlags.lsfDepositAuth |
+        AccountRootLedgerFlags.lsfDisableMaster |
+        AccountRootLedgerFlags.lsfDisallowXRP |
+        AccountRootLedgerFlags.lsfGlobalFreeze |
+        AccountRootLedgerFlags.lsfNoFreeze |
+        AccountRootLedgerFlags.lsfPasswordSpent |
+        AccountRootLedgerFlags.lsfRequireAuth |
+        AccountRootLedgerFlags.lsfRequireDestTag
+
+      const parsed = parseAccountRootFlags(accountRootFlags)
+
+      assert.isTrue(
+        parsed.lsfDefaultRipple &&
+          parsed.lsfDepositAuth &&
+          parsed.lsfDisableMaster &&
+          parsed.lsfDisallowXRP &&
+          parsed.lsfGlobalFreeze &&
+          parsed.lsfNoFreeze &&
+          parsed.lsfPasswordSpent &&
+          parsed.lsfRequireAuth &&
+          parsed.lsfRequireDestTag,
+      )
+    })
+
+    it('parseAccountFlags all false', function () {
+      const parsed = parseAccountRootFlags(0)
+
+      assert.isFalse(
+        parsed.lsfDefaultRipple ||
+          parsed.lsfDepositAuth ||
+          parsed.lsfDisableMaster ||
+          parsed.lsfDisallowXRP ||
+          parsed.lsfGlobalFreeze ||
+          parsed.lsfNoFreeze ||
+          parsed.lsfPasswordSpent ||
+          parsed.lsfRequireAuth ||
+          parsed.lsfRequireDestTag,
+      )
     })
   })
 })
