@@ -9,7 +9,7 @@ import {
   SubmitMultisignedRequest,
   Transaction,
   SubmitMultisignedResponse,
-  computeSignedTransactionHash,
+  hashSignedTx,
 } from 'xrpl-local'
 import { convertStringToHex } from 'xrpl-local/utils'
 import { multisign, sign } from 'xrpl-local/wallet/signer'
@@ -91,7 +91,7 @@ describe('submit_multisigned', function () {
         tx_blob: multisigned,
         tx_json: {
           ...(decode(multisigned) as unknown as Transaction),
-          hash: computeSignedTransactionHash(multisigned),
+          hash: hashSignedTx(multisigned),
         },
       },
     }

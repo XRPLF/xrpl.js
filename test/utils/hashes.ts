@@ -12,7 +12,7 @@ import {
   computeTrustlineHash,
   computeEscrowHash,
   computePaymentChannelHash,
-  computeSignedTransactionHash,
+  hashSignedTx,
   computeAccountRootIndex,
   computeOfferIndex,
   computeSignerListIndex,
@@ -156,9 +156,7 @@ describe('Hashes', function () {
       '458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2'
 
     assertResultMatch(
-      computeSignedTransactionHash(
-        fixtures.tx.OfferCreateSell.result as Transaction,
-      ),
+      hashSignedTx(fixtures.tx.OfferCreateSell.result as Transaction),
       expected_hash,
     )
   })
@@ -168,7 +166,7 @@ describe('Hashes', function () {
       '458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2'
 
     assertResultMatch(
-      computeSignedTransactionHash(encode(fixtures.tx.OfferCreateSell.result)),
+      hashSignedTx(encode(fixtures.tx.OfferCreateSell.result)),
       expected_hash,
     )
   })
@@ -180,7 +178,7 @@ describe('Hashes', function () {
     }
 
     assert.throws(
-      () => computeSignedTransactionHash(offerCreateWithNoSignature),
+      () => hashSignedTx(offerCreateWithNoSignature),
       ValidationError,
     )
   })
@@ -192,7 +190,7 @@ describe('Hashes', function () {
     })
 
     assert.throws(
-      () => computeSignedTransactionHash(encodedOfferCreateWithNoSignature),
+      () => hashSignedTx(encodedOfferCreateWithNoSignature),
       ValidationError,
     )
   })

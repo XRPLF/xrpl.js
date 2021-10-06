@@ -18,7 +18,7 @@ import {
 import { deriveKeypair, deriveXAddress } from './derive'
 import { generateXAddress } from './generateAddress'
 import {
-  computeSignedTransactionHash,
+  hashSignedTx,
   computeBinaryTransactionSigningHash,
   computeAccountRootIndex,
   computeSignerListIndex,
@@ -106,7 +106,7 @@ export {
   unixTimeToRippleTime,
   isValidSecret,
   isValidAddress,
-  computeSignedTransactionHash,
+  hashSignedTx,
   computeBinaryTransactionSigningHash,
   computeAccountRootIndex,
   computeSignerListIndex,

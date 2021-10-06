@@ -71,7 +71,7 @@ function addLengthPrefix(hex: string): string {
  * @returns A hash of tx.
  * @throws ValidationError if the Transaction is unsigned.
  */
-export function computeSignedTransactionHash(tx: Transaction | string): string {
+export function hashSignedTx(tx: Transaction | string): string {
   let txBlob: string
   let txObject: Transaction
   if (typeof tx === 'string') {
@@ -129,7 +129,7 @@ export function computeTransactionTreeHash(
   for (const txJSON of transactions) {
     const txBlobHex = encode(txJSON)
     const metaHex = encode(txJSON.metaData ?? {})
-    const txHash = computeSignedTransactionHash(txBlobHex)
+    const txHash = hashSignedTx(txBlobHex)
     const data = addLengthPrefix(txBlobHex) + addLengthPrefix(metaHex)
     shamap.addItem(txHash, data, NodeType.TRANSACTION_METADATA)
   }
@@ -216,7 +216,7 @@ function computeStateHash(
  * @param options - Allow client to recompute Transaction and State Hashes.
  * @returns The has of ledger.
  */
-function computeLedgerHash(
+function hashLedger(
   ledger: Ledger,
   options: ComputeLedgerHeaderHashOptions = {},
 ): string {
@@ -227,4 +227,4 @@ function computeLedgerHash(
   return computeLedgerHeaderHash({ ...ledger, ...subhashes })
 }
 
-export default computeLedgerHash
+export default hashLedger

@@ -3,7 +3,7 @@ import _ from 'lodash'
 
 import {
   AccountSet,
-  computeSignedTransactionHash,
+  hashSignedTx,
   SubmitResponse,
   TxResponse,
 } from 'xrpl-local'
@@ -35,7 +35,7 @@ describe('tx', function () {
       accountSet,
     )
 
-    const hash = computeSignedTransactionHash(response.result.tx_blob)
+    const hash = hashSignedTx(response.result.tx_blob)
     const txResponse = await this.client.request({
       command: 'tx',
       transaction: hash,
@@ -53,7 +53,7 @@ describe('tx', function () {
         Sequence: txResponse.result.Sequence,
         SigningPubKey: this.wallet.publicKey,
         TxnSignature: txResponse.result.TxnSignature,
-        hash: computeSignedTransactionHash(response.result.tx_blob),
+        hash: hashSignedTx(response.result.tx_blob),
         validated: false,
       },
     }

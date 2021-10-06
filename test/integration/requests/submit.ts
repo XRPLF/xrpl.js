@@ -6,7 +6,7 @@ import {
   AccountSet,
   SubmitRequest,
   SubmitResponse,
-  computeSignedTransactionHash,
+  hashSignedTx,
   Transaction,
 } from 'xrpl-local'
 import { convertStringToHex } from 'xrpl-local/utils'
@@ -56,7 +56,7 @@ describe('submit', function () {
         tx_blob: signedTx,
         tx_json: {
           ...(decode(signedTx) as unknown as Transaction),
-          hash: computeSignedTransactionHash(signedTx),
+          hash: hashSignedTx(signedTx),
         },
         accepted: true,
         account_sequence_available:
