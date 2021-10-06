@@ -20,15 +20,15 @@ export default interface AccountRoot extends BaseLedgerEntry {
 }
 
 export interface AccountRootFlagsInterface {
-  lsfPasswordSpent: boolean
-  lsfRequireDestTag: boolean
-  lsfRequireAuth: boolean
-  lsfDisallowXRP: boolean
-  lsfDisableMaster: boolean
-  lsfNoFreeze: boolean
-  lsfGlobalFreeze: boolean
-  lsfDefaultRipple: boolean
-  lsfDepositAuth: boolean
+  lsfPasswordSpent?: boolean
+  lsfRequireDestTag?: boolean
+  lsfRequireAuth?: boolean
+  lsfDisallowXRP?: boolean
+  lsfDisableMaster?: boolean
+  lsfNoFreeze?: boolean
+  lsfGlobalFreeze?: boolean
+  lsfDefaultRipple?: boolean
+  lsfDepositAuth?: boolean
 }
 
 export enum AccountRootFlags {

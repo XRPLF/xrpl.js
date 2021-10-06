@@ -180,17 +180,15 @@ describe('Models Utils', function () {
     it('parseAccountFlags all false', function () {
       const parsed = parseAccountRootFlags(0)
 
-      assert.isFalse(
-        parsed.lsfDefaultRipple ||
-          parsed.lsfDepositAuth ||
-          parsed.lsfDisableMaster ||
-          parsed.lsfDisallowXRP ||
-          parsed.lsfGlobalFreeze ||
-          parsed.lsfNoFreeze ||
-          parsed.lsfPasswordSpent ||
-          parsed.lsfRequireAuth ||
-          parsed.lsfRequireDestTag,
-      )
+      assert.isUndefined(parsed.lsfDefaultRipple)
+      assert.isUndefined(parsed.lsfDepositAuth)
+      assert.isUndefined(parsed.lsfDisableMaster)
+      assert.isUndefined(parsed.lsfDisallowXRP)
+      assert.isUndefined(parsed.lsfGlobalFreeze)
+      assert.isUndefined(parsed.lsfNoFreeze)
+      assert.isUndefined(parsed.lsfPasswordSpent)
+      assert.isUndefined(parsed.lsfRequireAuth)
+      assert.isUndefined(parsed.lsfRequireDestTag)
     })
   })
 })

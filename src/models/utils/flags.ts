@@ -23,6 +23,8 @@ import {
 import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlagsInterface, TrustSetFlags } from '../transactions/trustSet'
 
+import { isFlagEnabled } from '.'
+
 /**
  * Convert an AccountRoot Flags number into an interface for easy interpretation.
  *
@@ -44,6 +46,7 @@ export function parseAccountRootFlags(
     lsfDefaultRipple: isSet(flags, AccountRootFlags.lsfDefaultRipple),
     lsfDepositAuth: isSet(flags, AccountRootFlags.lsfDepositAuth),
   }
+
   return flagsInterface
 }
 
