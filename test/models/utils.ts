@@ -4,13 +4,13 @@ import { assert } from 'chai'
 import {
   DepositPreauth,
   OfferCreate,
-  OfferCreateTransactionFlags,
+  OfferCreateFlags,
   PaymentChannelClaim,
-  PaymentChannelClaimTransactionFlags,
+  PaymentChannelClaimFlags,
   Payment,
-  PaymentTransactionFlags,
+  PaymentFlags,
   TrustSet,
-  TrustSetTransactionFlags,
+  TrustSetFlags,
 } from 'xrpl-local'
 import { isFlagEnabled } from 'xrpl-local/models/utils'
 import setTransactionFlagsToNumber from 'xrpl-local/models/utils/flags'
@@ -63,7 +63,7 @@ describe('Models Utils', function () {
         },
       }
 
-      const { tfPassive, tfFillOrKill } = OfferCreateTransactionFlags
+      const { tfPassive, tfFillOrKill } = OfferCreateFlags
       const expected: number = tfPassive | tfFillOrKill
 
       setTransactionFlagsToNumber(tx)
@@ -82,7 +82,7 @@ describe('Models Utils', function () {
         },
       }
 
-      const { tfRenew } = PaymentChannelClaimTransactionFlags
+      const { tfRenew } = PaymentChannelClaimFlags
       const expected: number = tfRenew
 
       setTransactionFlagsToNumber(tx)
@@ -102,7 +102,7 @@ describe('Models Utils', function () {
         },
       }
 
-      const { tfPartialPayment, tfLimitQuality } = PaymentTransactionFlags
+      const { tfPartialPayment, tfLimitQuality } = PaymentFlags
       const expected: number = tfPartialPayment | tfLimitQuality
 
       setTransactionFlagsToNumber(tx)
@@ -129,8 +129,7 @@ describe('Models Utils', function () {
         },
       }
 
-      const { tfSetfAuth, tfClearNoRipple, tfClearFreeze } =
-        TrustSetTransactionFlags
+      const { tfSetfAuth, tfClearNoRipple, tfClearFreeze } = TrustSetFlags
       const expected: number = tfSetfAuth | tfClearNoRipple | tfClearFreeze
 
       setTransactionFlagsToNumber(tx)

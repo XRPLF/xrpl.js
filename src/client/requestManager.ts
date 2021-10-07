@@ -169,6 +169,8 @@ export default class RequestManager {
       this.reject(response.id, error)
       return
     }
+    // status no longer needed because error is thrown if status is not "success"
+    delete response.status
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be a valid Response here
     this.resolve(response.id, response as unknown as Response)
   }

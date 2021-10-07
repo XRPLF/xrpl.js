@@ -50,10 +50,8 @@ describe('account_tx', function () {
           },
         ],
       },
-      status: 'success',
       type: 'response',
     }
-    assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
     assert.equal(response.result.account, expected.result.account)
     assert.equal(

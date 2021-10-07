@@ -4,7 +4,7 @@ import _ from 'lodash'
 
 import type { Client } from '../client'
 import { LedgerIndex } from '../models/common'
-import { OfferLedgerFlags } from '../models/ledger/offer'
+import { OfferFlags } from '../models/ledger/offer'
 import {
   BookOffer,
   BookOffersRequest,
@@ -80,7 +80,7 @@ async function getOrderbook(
   const sell: BookOffer[] = []
   orders.forEach((order) => {
     // eslint-disable-next-line no-bitwise -- necessary for flags check
-    if ((order.Flags & OfferLedgerFlags.lsfSell) === 0) {
+    if ((order.Flags & OfferFlags.lsfSell) === 0) {
       buy.push(order)
     } else {
       sell.push(order)

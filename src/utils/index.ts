@@ -15,6 +15,7 @@ import {
   xAddressToClassicAddress,
 } from 'ripple-address-codec'
 
+import getBalanceChanges from './balanceChanges'
 import { deriveKeypair, deriveXAddress } from './derive'
 import { generateXAddress } from './generateAddress'
 import {
@@ -112,6 +113,7 @@ const hashes = {
 }
 
 export {
+  getBalanceChanges,
   dropsToXrp,
   xrpToDrops,
   removeUndefined,

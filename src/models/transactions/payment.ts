@@ -10,7 +10,7 @@ import {
   validateBaseTransaction,
 } from './common'
 
-export enum PaymentTransactionFlags {
+export enum PaymentFlags {
   tfNoDirectRipple = 0x00010000,
   tfPartialPayment = 0x00020000,
   tfLimitQuality = 0x00040000,
@@ -95,7 +95,7 @@ function checkPartialPayment(tx: Record<string, unknown>): void {
     const flags = tx.Flags as number | PaymentFlagsInterface
     const isTfPartialPayment =
       typeof flags === 'number'
-        ? isFlagEnabled(flags, PaymentTransactionFlags.tfPartialPayment)
+        ? isFlagEnabled(flags, PaymentFlags.tfPartialPayment)
         : flags.tfPartialPayment ?? false
 
     if (!isTfPartialPayment) {

@@ -18,7 +18,7 @@ export default interface RippleState extends BaseLedgerEntry {
   HighQualityOut?: number
 }
 
-export enum RippleStateLedgerFlags {
+export enum RippleStateFlags {
   // True, if entry counts toward reserve.
   lsfLowReserve = 0x00010000,
   lsfHighReserve = 0x00020000,

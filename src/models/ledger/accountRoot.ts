@@ -19,7 +19,7 @@ export default interface AccountRoot extends BaseLedgerEntry {
   TransferRate?: number
 }
 
-export enum AccountRootLedgerFlags {
+export enum AccountRootFlags {
   lsfPasswordSpent = 0x00010000,
   lsfRequireDestTag = 0x00020000,
   lsfRequireAuth = 0x00040000,

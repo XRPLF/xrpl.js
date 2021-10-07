@@ -17,7 +17,7 @@ export default interface Offer extends BaseLedgerEntry {
   Expiration?: number
 }
 
-export enum OfferLedgerFlags {
+export enum OfferFlags {
   lsfPassive = 0x00010000,
   lsfSell = 0x00020000,
 }

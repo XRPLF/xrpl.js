@@ -15,7 +15,7 @@ interface Warning {
 
 export interface BaseResponse {
   id: number | string
-  status: 'success' | string
+  status?: 'success' | string
   type: 'response' | string
   result: unknown
   warning?: 'load'

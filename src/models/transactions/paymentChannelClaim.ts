@@ -3,7 +3,7 @@ import { ValidationError } from '../../errors'
 
 import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
 
-export enum PaymentChannelClaimTransactionFlags {
+export enum PaymentChannelClaimFlags {
   tfRenew = 0x00010000,
   tfClose = 0x00020000,
 }

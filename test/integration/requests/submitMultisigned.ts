@@ -82,7 +82,6 @@ describe('submit_multisigned', function () {
 
     const expectedResponse: SubmitMultisignedResponse = {
       id: submitResponse.id,
-      status: 'success',
       type: 'response',
       result: {
         engine_result: 'tesSUCCESS',
