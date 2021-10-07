@@ -104,11 +104,7 @@ import {
   ConnectionUserOptions,
   INTENTIONAL_DISCONNECT_CODE,
 } from './connection'
-import {
-  handlePartialPayment,
-  handleStreamPartialPayment,
-  isStreamPartialPayment,
-} from './partialPayment'
+import { handlePartialPayment, isStreamPartialPayment } from './partialPayment'
 
 export interface ClientOptions extends ConnectionUserOptions {
   feeCushion?: number
@@ -242,7 +238,6 @@ class Client extends EventEmitter {
     })
 
     this.connection.on('transaction', (tx) => {
-      handleStreamPartialPayment(tx)
       if (isStreamPartialPayment(tx)) {
         this.connection.trace('Partial payment received', tx)
       } else {

@@ -276,7 +276,6 @@ export interface TransactionStream extends BaseStream {
    * validated.
    */
   validated?: boolean
-  warnings?: Array<{ id: number; message: string }>
 }
 
 /**
