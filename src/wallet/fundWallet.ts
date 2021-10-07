@@ -64,7 +64,7 @@ async function fundWallet(
   let startingBalance = 0
   try {
     startingBalance = Number(
-      await getAddressXrpBalance(this, walletToFund.classicAddress),
+      await this.getXrpBalance(walletToFund.classicAddress),
     )
   } catch {
     /* startingBalance remains '0' */
@@ -212,36 +212,6 @@ async function processSuccessfulResponse(
 }
 
 /**
- * Retrieves an XRPL address XRP balance.
- *
- * @param client - Client.
- * @param address - XRPL address.
- * @returns The address's balance of XRP.
- */
-async function getAddressXrpBalance(
-  client: Client,
-  address: string,
-): Promise<string> {
-  // Get all the account balances
-  try {
-    const balances = await client.request({
-      command: 'account_info',
-      account: address,
-      ledger_index: 'validated',
-    })
-
-    return balances.result.account_data.Balance
-  } catch (err) {
-    if (err instanceof Error) {
-      throw new XRPLFaucetError(
-        `Unable to retrieve balance of ${address}. Error: ${err.message}`,
-      )
-    }
-    throw err
-  }
-}
-
-/**
  * Check at regular interval if the address is enabled on the XRPL and funded.
  *
  * @param client - Client.
@@ -268,7 +238,7 @@ async function getUpdatedBalance(
       try {
         let newBalance
         try {
-          newBalance = Number(await getAddressXrpBalance(client, address))
+          newBalance = Number(await client.getXrpBalance(address))
         } catch {
           /* newBalance remains undefined */
         }
