@@ -36,7 +36,7 @@ async function submit(
 ): Promise<SubmitResponse> {
   const tx = await this.autofill(transaction)
   const signedTxEncoded = sign(wallet, tx)
-  return this.submitSignedTransaction(signedTxEncoded)
+  return this.submitSigned(signedTxEncoded)
 }
 
 /**
@@ -84,7 +84,7 @@ async function submitReliable(
 ): Promise<TxResponse> {
   const tx = await this.autofill(transaction)
   const signedTxEncoded = sign(wallet, tx)
-  return this.submitSignedTransactionReliable(signedTxEncoded)
+  return this.submitSignedReliable(signedTxEncoded)
 }
 
 /**
