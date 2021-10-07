@@ -159,7 +159,7 @@ interface WalletWithStartingBalance {
   balance: number
 }
 
-// eslint-disable-next-line max-params -- Only used as a helper function
+// eslint-disable-next-line max-params, max-lines-per-function -- Only used as a helper function, lines inc due to added balance.
 async function processSuccessfulResponse(
   client: Client,
   body: string,
@@ -185,7 +185,21 @@ async function processSuccessfulResponse(
     )
 
     if (isFunded) {
-      resolve({ wallet: fundWallet, balance: startingBalance })
+      resolve({
+        wallet: fundWallet,
+        balance: (await hasAddressBalanceIncreased(
+          client,
+          fundWallet.getClassicAddress(),
+          startingBalance,
+        ))
+          ? Number(
+              await getAddressXrpBalance(
+                client,
+                fundWallet.getClassicAddress(),
+              ),
+            )
+          : startingBalance,
+      })
     } else {
       reject(
         new XRPLFaucetError(

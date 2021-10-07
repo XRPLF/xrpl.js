@@ -13,7 +13,7 @@ describe('generateFaucetWallet', function () {
     const api = new Client('wss://s.altnet.rippletest.net:51233')
 
     await api.connect()
-    const wallet = (await api.generateFaucetWallet()).wallet
+    const { wallet, balance } = await api.generateFaucetWallet()
 
     assert.notEqual(wallet, undefined)
     assert(isValidClassicAddress(wallet.classicAddress))
@@ -23,16 +23,16 @@ describe('generateFaucetWallet', function () {
       command: 'account_info',
       account: wallet.classicAddress,
     })
-    assert.equal(info.result.account_data.Balance, '1000000000')
+    assert.equal(info.result.account_data.Balance, balance)
 
-    await api.generateFaucetWallet(wallet)
+    const { balance: newBalance } = await api.generateFaucetWallet(wallet)
 
     const afterSent = await api.request({
       command: 'account_info',
       account: wallet.classicAddress,
     })
 
-    assert.equal(afterSent.result.account_data.Balance, '2000000000')
+    assert.equal(afterSent.result.account_data.Balance, newBalance)
 
     await api.disconnect()
   })
@@ -40,7 +40,7 @@ describe('generateFaucetWallet', function () {
     const api = new Client('wss://s.devnet.rippletest.net:51233')
 
     await api.connect()
-    const wallet = (await api.generateFaucetWallet()).wallet
+    const { wallet, balance } = await api.generateFaucetWallet()
 
     assert.notEqual(wallet, undefined)
     assert(isValidClassicAddress(wallet.classicAddress))
@@ -50,15 +50,16 @@ describe('generateFaucetWallet', function () {
       command: 'account_info',
       account: wallet.classicAddress,
     })
-    assert.equal(info.result.account_data.Balance, '1000000000')
 
-    await api.generateFaucetWallet(wallet)
+    assert.equal(info.result.account_data.Balance, balance)
+
+    const { balance: newBalance } = await api.generateFaucetWallet(wallet)
 
     const afterSent = await api.request({
       command: 'account_info',
       account: wallet.classicAddress,
     })
-    assert.equal(afterSent.result.account_data.Balance, '2000000000')
+    assert.equal(afterSent.result.account_data.Balance, newBalance)
 
     await api.disconnect()
   })
