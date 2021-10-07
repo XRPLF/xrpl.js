@@ -1,22 +1,34 @@
-// import {Client} from '../../dist/npm'
-// import {TransactionMetadata} from '../../src/models/common/transaction'
+/* eslint-disable no-console -- logs are helpful to understand snippets */
+import { Client, LedgerResponse, TxResponse } from '../../dist/npm'
+import TransactionMetadata from '../../dist/npm/models/transactions/metadata'
 
-// const client = new Client('wss://s.altnet.rippletest.net:51233')
+const client = new Client('wss://s.altnet.rippletest.net:51233')
 
-// getTransaction()
+void getTransaction()
 
-// async function getTransaction() {
-//   await client.connect()
-//   const ledger = await client.request({command: 'ledger', transactions: true})
-//   console.log(ledger)
-//   const tx = await client.request({
-//     command: 'tx',
-//     transaction: ledger.result.ledger.transactions[0] as string
-//   })
-//   console.log(tx)
-//   console.log(
-//     'deliveredAmount:',
-//     (tx.result.meta as TransactionMetadata).DeliveredAmount
-//   )
-//   process.exit(0)
-// }
+async function getTransaction(): Promise<void> {
+  await client.connect()
+  const ledger: LedgerResponse = await client.request({
+    command: 'ledger',
+    transactions: true,
+    ledger_index: 'validated',
+  })
+  console.log(ledger)
+
+  const transactions = ledger.result.ledger.transactions
+  if (transactions) {
+    const tx: TxResponse = await client.request({
+      command: 'tx',
+      transaction: transactions[0],
+    })
+    console.log(tx)
+
+    console.log(
+      'deliveredAmount:',
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- assertion needed
+      (tx.result.meta as TransactionMetadata).DeliveredAmount,
+    )
+  }
+
+  void client.disconnect()
+}
