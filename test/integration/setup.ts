@@ -5,6 +5,7 @@ import { fundAccount, ledgerAccept } from './utils'
 
 export async function teardownClient(this: Mocha.Context): Promise<void> {
   this.client.disconnect()
+  this.client.removeAllListeners()
 }
 
 export async function suiteClientSetup(this: Mocha.Context): Promise<void> {
