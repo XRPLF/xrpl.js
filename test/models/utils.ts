@@ -12,7 +12,7 @@ import {
   TrustSet,
   TrustSetFlags,
 } from 'xrpl-local'
-import { AccountRootLedgerFlags } from 'xrpl-local/models/ledger'
+import { AccountRootFlags } from 'xrpl-local/models/ledger'
 import { isFlagEnabled } from 'xrpl-local/models/utils'
 import setTransactionFlagsToNumber, {
   parseAccountRootFlags,
@@ -152,15 +152,15 @@ describe('Models Utils', function () {
 
     it('parseAccountRootFlags all enabled', function () {
       const accountRootFlags =
-        AccountRootLedgerFlags.lsfDefaultRipple |
-        AccountRootLedgerFlags.lsfDepositAuth |
-        AccountRootLedgerFlags.lsfDisableMaster |
-        AccountRootLedgerFlags.lsfDisallowXRP |
-        AccountRootLedgerFlags.lsfGlobalFreeze |
-        AccountRootLedgerFlags.lsfNoFreeze |
-        AccountRootLedgerFlags.lsfPasswordSpent |
-        AccountRootLedgerFlags.lsfRequireAuth |
-        AccountRootLedgerFlags.lsfRequireDestTag
+        AccountRootFlags.lsfDefaultRipple |
+        AccountRootFlags.lsfDepositAuth |
+        AccountRootFlags.lsfDisableMaster |
+        AccountRootFlags.lsfDisallowXRP |
+        AccountRootFlags.lsfGlobalFreeze |
+        AccountRootFlags.lsfNoFreeze |
+        AccountRootFlags.lsfPasswordSpent |
+        AccountRootFlags.lsfRequireAuth |
+        AccountRootFlags.lsfRequireDestTag
 
       const parsed = parseAccountRootFlags(accountRootFlags)
 
