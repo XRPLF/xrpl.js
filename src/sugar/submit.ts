@@ -122,12 +122,7 @@ async function submitSignedReliable(
     tx_blob: signedTxEncoded,
     fail_hard: isAccountDelete(signedTransaction),
   }
-  const response = await this.request(request)
-  if (response.result.engine_result !== 'tesSUCCESS') {
-    throw new XrplError(
-      `Transaction failed, ${response.result.engine_result}: ${response.result.engine_result_message}`,
-    )
-  }
+  await this.request(request)
 
   return waitForFinalTransactionOutcome(this, txHash)
 }
