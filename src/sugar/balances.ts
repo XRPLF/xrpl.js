@@ -70,21 +70,18 @@ async function getBalances(
   account: string,
   options: GetBalancesOptions = {},
 ): Promise<Balance[]> {
-  // 1. Get XRP Balance
-  const xrpBalance: Balance[] = []
+  const balances: Balance[] = []
+
+  // get XRP balance
+  let xrpPromise: Promise<string> = Promise.resolve('')
   if (!options.peer) {
-    const xrpRequest: AccountInfoRequest = {
-      command: 'account_info',
-      account,
-      ledger_index: options.ledger_index ?? 'validated',
+    xrpPromise = this.getXrpBalance(account, {
       ledger_hash: options.ledger_hash,
-    }
-    const balance = await this.request(xrpRequest).then(
-      (response) => response.result.account_data.Balance,
-    )
-    xrpBalance.push({ currency: 'XRP', value: dropsToXrp(balance) })
+      ledger_index: options.ledger_index,
+    })
   }
-  // 2. Get Non-XRP Balance
+
+  // get non-XRP balances
   const linesRequest: AccountLinesRequest = {
     command: 'account_lines',
     account,
@@ -93,11 +90,21 @@ async function getBalances(
     peer: options.peer,
     limit: options.limit,
   }
-  const responses = await this.requestAll(linesRequest)
-  const accountLinesBalance = _.flatMap(responses, (response) =>
-    formatBalances(response.result.lines),
+  const linesPromise = this.requestAll(linesRequest)
+
+  // combine results
+  await Promise.all([xrpPromise, linesPromise]).then(
+    ([xrpBalance, linesResponses]) => {
+      const accountLinesBalance = _.flatMap(linesResponses, (response) =>
+        formatBalances(response.result.lines),
+      )
+      if (xrpBalance !== '') {
+        balances.push({ currency: 'XRP', value: xrpBalance })
+      }
+      balances.push(...accountLinesBalance)
+    },
   )
-  return [...xrpBalance, ...accountLinesBalance].slice(0, options.limit)
+  return balances.slice(0, options.limit)
 }
 
 export { getXrpBalance, getBalances }
