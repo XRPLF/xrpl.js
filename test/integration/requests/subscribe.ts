@@ -5,7 +5,6 @@ import _ from 'lodash'
 
 import {
   Client,
-  LedgerStream,
   OfferCreate,
   SubscribeRequest,
   SubscribeResponse,
@@ -137,7 +136,7 @@ describe('subscribe', function () {
     const response = await this.client.request(request)
 
     // Explicitly checking that there are only known fields in the return
-    const expectedResult: LedgerStream = {
+    const expectedResult = {
       fee_base: response.result.fee_base,
       fee_ref: response.result.fee_ref,
       ledger_hash: response.result.ledger_hash,
@@ -161,7 +160,7 @@ describe('subscribe', function () {
           type: 'ledgerClosed',
           txn_count: ledger.txn_count,
           ledger_hash: ledger.ledger_hash,
-          ledger_index: expectedResult.ledger_index + 1,
+          ledger_index: parseInt(expectedResult.ledger_index, 10) + 1,
           ledger_time: ledger.ledger_time,
           validated_ledgers: ledger.validated_ledgers,
         })
