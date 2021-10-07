@@ -20,11 +20,33 @@ function formatBalances(trustlines: Trustline[]): Balance[] {
   }))
 }
 
+interface GetXrpBalanceOptions {
+  ledger_hash?: string
+  ledger_index?: LedgerIndex
+  peer?: string
+  limit?: number
+}
+
 interface GetBalancesOptions {
   ledger_hash?: string
   ledger_index?: LedgerIndex
   peer?: string
   limit?: number
+}
+
+async function getXrpBalance(
+  this: Client,
+  account: string,
+  options: GetXrpBalanceOptions = {},
+): Promise<string> {
+  const xrpRequest: AccountInfoRequest = {
+    command: 'account_info',
+    account,
+    ledger_index: options.ledger_index ?? 'validated',
+    ledger_hash: options.ledger_hash,
+  }
+  const response = await this.request(xrpRequest)
+  return dropsToXrp(response.result.account_data.Balance)
 }
 
 /**
