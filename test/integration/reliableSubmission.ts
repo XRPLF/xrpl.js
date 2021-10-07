@@ -19,16 +19,13 @@ describe('reliable submission', function () {
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
-  it('submitTransactionReliable', async function () {
+  it('submitReliable', async function () {
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
       Account: this.wallet.getClassicAddress(),
       Domain: convertStringToHex('example.com'),
     }
-    const responsePromise = this.client.submitTransactionReliable(
-      this.wallet,
-      accountSet,
-    )
+    const responsePromise = this.client.submitReliable(this.wallet, accountSet)
     const ledgerPromise = setTimeout(ledgerAccept, 1000, this.client)
     return Promise.all([responsePromise, ledgerPromise]).then(
       ([response, _ledger]) => {
@@ -38,7 +35,7 @@ describe('reliable submission', function () {
     )
   })
 
-  it('submitSignedTransactionReliable', async function () {
+  it('submitSignedReliable', async function () {
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
       Account: this.wallet.getClassicAddress(),
@@ -47,8 +44,7 @@ describe('reliable submission', function () {
     const signedAccountSet = this.wallet.signTransaction(
       await this.client.autofill(accountSet),
     )
-    const responsePromise =
-      this.client.submitSignedTransactionReliable(signedAccountSet)
+    const responsePromise = this.client.submitSignedReliable(signedAccountSet)
     const ledgerPromise = setTimeout(ledgerAccept, 1000, this.client)
     return Promise.all([responsePromise, ledgerPromise]).then(
       ([response, _ledger]) => {
@@ -58,7 +54,7 @@ describe('reliable submission', function () {
     )
   })
 
-  it('submitSignedTransactionReliable longer', async function () {
+  it('submitSignedReliable longer', async function () {
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
       Account: this.wallet.getClassicAddress(),
@@ -67,8 +63,7 @@ describe('reliable submission', function () {
     const signedAccountSet = this.wallet.signTransaction(
       await this.client.autofill(accountSet),
     )
-    const responsePromise =
-      this.client.submitSignedTransactionReliable(signedAccountSet)
+    const responsePromise = this.client.submitSignedReliable(signedAccountSet)
     const ledgerPromise = setTimeout(ledgerAccept, 5000, this.client)
     return Promise.all([responsePromise, ledgerPromise]).then(
       ([response, _ledger]) => {
