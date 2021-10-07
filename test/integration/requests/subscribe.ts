@@ -18,8 +18,10 @@ async function createTxHandlerTest(
   done: Mocha.Done,
   subscriptionStream: StreamType,
 ): Promise<void> {
-  client.on('transaction', (tx) => {
-    assert.equal(tx.type, 'transaction')
+  const txStream = 'transaction'
+
+  client.on(txStream, (tx) => {
+    assert.equal(tx.type, txStream)
     done()
   })
 
