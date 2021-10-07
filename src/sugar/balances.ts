@@ -34,6 +34,14 @@ interface GetBalancesOptions {
   limit?: number
 }
 
+/**
+ * Get the XRP balance for an account.
+ *
+ * @param this - Client.
+ * @param account - Account address.
+ * @param options - Options to include for getting the XRP balance.
+ * @returns The XRP balance of the account (as a string).
+ */
 async function getXrpBalance(
   this: Client,
   account: string,
@@ -92,4 +100,4 @@ async function getBalances(
   return [...xrpBalance, ...accountLinesBalance].slice(0, options.limit)
 }
 
-export default getBalances
+export { getXrpBalance, getBalances }
