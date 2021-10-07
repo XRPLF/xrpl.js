@@ -9,13 +9,13 @@ import { assertResultMatch, addressTests } from '../testUtils'
  * - Check out the "TestSuite" type for documentation on the interface.
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
-describe('getBalances', function () {
+describe('client.getBalances', function () {
   beforeEach(setupClient)
   afterEach(teardownClient)
 
   addressTests.forEach(function (testcase) {
     describe(testcase.type, function () {
-      it('getBalances', async function () {
+      it('getBalances - base', async function () {
         this.mockRippled.addResponse(
           'account_info',
           rippled.account_info.normal,
