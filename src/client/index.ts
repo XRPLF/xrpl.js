@@ -107,6 +107,7 @@ import {
 import {
   handlePartialPayment,
   handleStreamPartialPayment,
+  isStreamPartialPayment,
 } from './partialPayment'
 
 export interface ClientOptions extends ConnectionUserOptions {
@@ -242,7 +243,12 @@ class Client extends EventEmitter {
 
     this.connection.on('transaction', (tx) => {
       handleStreamPartialPayment(tx)
-      this.emit('transaction', tx)
+      if (isStreamPartialPayment(tx)) {
+        this.connection.trace('Partial payment received', tx)
+      } else {
+        this.emit('transaction', tx)
+      }
+      this.emit('unsafeTransaction', tx)
     })
 
     this.connection.on('validationReceived', (validation) => {

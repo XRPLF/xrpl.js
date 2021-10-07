@@ -353,7 +353,7 @@ export class Connection extends EventEmitter {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function -- Does nothing on default
-  private readonly trace: (id: string, message: string) => void = () => {}
+  public readonly trace: (id: string, message: string) => void = () => {}
 
   /**
    * Handler for when messages are received from the server.
