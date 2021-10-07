@@ -29,7 +29,7 @@ async function sleep(ms: number): Promise<void> {
  * @returns A promise that contains SubmitResponse.
  * @throws RippledError if submit request fails.
  */
-async function submitTransaction(
+async function submit(
   this: Client,
   wallet: Wallet,
   transaction: Transaction,
@@ -47,7 +47,7 @@ async function submitTransaction(
  * @returns A promise that contains SubmitResponse.
  * @throws ValidationError if the transaction isn't signed, RippledError if submit request fails.
  */
-async function submitSignedTransaction(
+async function submitSigned(
   this: Client,
   signedTransaction: Transaction | string,
 ): Promise<SubmitResponse> {
@@ -77,7 +77,7 @@ async function submitSignedTransaction(
  * @param transaction - A transaction to autofill, sign & encode, and submit.
  * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
  */
-async function submitTransactionReliable(
+async function submitReliable(
   this: Client,
   wallet: Wallet,
   transaction: Transaction,
@@ -98,7 +98,7 @@ async function submitTransactionReliable(
  * @throws ValidationError if the request is not signed/doesn't have a LastLedgerSequence, RippledError if the submit request
  *   fails, XrplError if the reliable submission fails.
  */
-async function submitSignedTransactionReliable(
+async function submitSignedReliable(
   this: Client,
   signedTransaction: Transaction | string,
 ): Promise<TxResponse> {
@@ -188,9 +188,4 @@ function isAccountDelete(transaction: Transaction | string): boolean {
   return tx.TransactionType === 'AccountDelete'
 }
 
-export {
-  submitTransaction,
-  submitSignedTransaction,
-  submitTransactionReliable,
-  submitSignedTransactionReliable,
-}
+export { submit, submitSigned, submitReliable, submitSignedReliable }
