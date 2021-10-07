@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- required for formatting transactions */
-import { expect } from 'chai'
+import { assert, expect } from 'chai'
 
 import type { TransactionStream } from 'xrpl-local'
 
@@ -123,10 +123,20 @@ describe('client handling of tfPartialPayments', function () {
   })
 
   it('Transactions stream with no tfPartialPayment', async function (done) {
+    let firstDone = false
+    function twoDones(): void {
+      if (firstDone) {
+        done()
+      } else {
+        firstDone = true
+      }
+    }
     this.mockRippled.addResponse('transaction_entry', rippled.transaction_entry)
-    this.client.on('transaction', (tx: TransactionStream) => {
-      expect(tx.warnings).to.equal(undefined)
-      done()
+    this.client.on('transaction', (_tx: TransactionStream) => {
+      twoDones()
+    })
+    this.client.on('unsafeTransaction', (_tx: TransactionStream) => {
+      twoDones()
     })
 
     this.client.connection.onMessage(
@@ -136,20 +146,14 @@ describe('client handling of tfPartialPayments', function () {
 
   it('Transactions stream with XRP tfPartialPayment', async function (done) {
     this.mockRippled.addResponse('transaction_entry', rippled.transaction_entry)
-    this.client.on('transaction', (tx: TransactionStream) => {
-      expect(tx.warnings).to.deep.equal([
-        {
-          id: 2001,
-          message: 'This response contains a Partial Payment',
-        },
-      ])
+    this.client.on('transaction', (_tx: TransactionStream) => {
+      assert.fail('Should not have received a transaction here')
+    })
+    this.client.on('unsafeTransaction', (_tx: TransactionStream) => {
       done()
     })
-
-    const partial: any = rippled.streams.transaction
-    partial.transaction = rippled.tx.Payment.result
-    partial.meta.delivered_amount = '1000'
-    partial.transaction.Flags = 0x00020000
-    this.client.connection.onMessage(JSON.stringify(partial))
+    this.client.connection.onMessage(
+      JSON.stringify(rippled.streams.partialPaymentTransaction),
+    )
   })
 })

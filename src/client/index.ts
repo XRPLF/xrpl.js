@@ -433,7 +433,7 @@ class Client extends EventEmitter {
     listener: (validation: ValidationStream) => void,
   ): this
   public on(
-    event: 'transaction',
+    event: 'transaction' | 'unsafeTransaction',
     listener: (tx: TransactionStream) => void,
   ): this
   public on(
