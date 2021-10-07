@@ -5,7 +5,7 @@ import { Client, OfferCreate, SubscribeRequest, Wallet } from 'xrpl-local'
 import { StreamType } from 'xrpl-local/models/common'
 
 import serverUrl from '../serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { setupClient, suiteClientSetup } from '../setup'
 import { ledgerAccept, testTransaction } from '../utils'
 
 // how long before each test case times out
@@ -36,12 +36,19 @@ async function createTxHandlerTest(
   })
 }
 
+async function teardownClientAndClearListeners(
+  this: Mocha.Context,
+): Promise<void> {
+  this.client.removeAllListeners()
+  this.client.disconnect()
+}
+
 describe('subscribe', function () {
   this.timeout(TIMEOUT)
 
   before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
-  afterEach(teardownClient)
+  afterEach(teardownClientAndClearListeners)
 
   /**
    * Subscribe streams which are not testable with just a standalone node:
