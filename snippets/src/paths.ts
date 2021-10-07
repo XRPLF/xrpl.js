@@ -1,53 +1,31 @@
-// import {Client} from '../../dist/npm'
+/* eslint-disable no-console -- logs are helpful to understand snippets */
+import { Client, RipplePathFindResponse } from '../../dist/npm'
 
-// const client = new Client(
-//   // 'wss://s.altnet.rippletest.net:51233'
-//   // 'ws://35.158.96.209:51233'
-//   'ws://34.210.87.206:51233'
-// )
+const client = new Client('wss://s.altnet.rippletest.net:51233')
 
-// sign()
+void sign()
 
-// async function sign() {
-//   await client.connect()
-//   const pathfind: any = {
-//     source: {
-//       address: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
-//       amount: {
-//         currency: 'drops',
-//         value: '100'
-//       }
-//     },
-//     destination: {
-//       address: 'rKT4JX4cCof6LcDYRz8o3rGRu7qxzZ2Zwj',
-//       amount: {
-//         currency: 'USD',
-//         counterparty: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc'
-//       }
-//     }
-//   }
+async function sign(): Promise<void> {
+  await client.connect()
+  const resp: RipplePathFindResponse = await client.request({
+    command: 'ripple_path_find',
+    source_account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+    source_currencies: [
+      {
+        currency: 'XRP',
+      },
+    ],
+    destination_account: 'rKT4JX4cCof6LcDYRz8o3rGRu7qxzZ2Zwj',
+    destination_amount: {
+      value: '0.001',
+      currency: 'USD',
+      issuer: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc',
+    },
+  })
+  console.log(resp)
 
-//   await client
-//     .getPaths(pathfind)
-//     .then(async (data) => {
-//       console.log('paths:', JSON.stringify(data))
-//       const fakeSecret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
+  const paths = resp.result.alternatives[0].paths_computed
+  console.log(paths)
 
-//       pathfind.paths = data[0].paths
-//       pathfind.destination = data[0].destination
-//       await client
-//         .preparePayment('r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59', pathfind)
-//         .then((ret) => {
-//           const signed = client.sign(ret.txJSON, fakeSecret)
-//           console.log('signed:', signed)
-//         })
-//         .catch((err) => {
-//           console.log('ERR 1:', JSON.stringify(err))
-//         })
-//     })
-//     .catch((err) => {
-//       console.log('ERR 2:', err)
-//     })
-
-//   client.disconnect()
-// }
+  void client.disconnect()
+}
