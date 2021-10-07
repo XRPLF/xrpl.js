@@ -2,7 +2,7 @@ import { assert } from 'chai'
 
 import { ValidationError, XrplError } from 'xrpl-local'
 
-import { hashLedger } from '../../src/utils/hashes'
+import { hashLedger } from '../../src/utils'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 
