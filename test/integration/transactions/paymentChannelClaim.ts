@@ -1,10 +1,6 @@
 import _ from 'lodash'
 
-import {
-  PaymentChannelCreate,
-  hashPaymentChannel,
-  PaymentChannelClaim,
-} from 'xrpl-local'
+import { PaymentChannelCreate, hashes, PaymentChannelClaim } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
@@ -12,6 +8,7 @@ import { generateFundedWallet, testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
+const { hashPaymentChannel } = hashes
 
 describe('PaymentChannelClaim', function () {
   this.timeout(TIMEOUT)

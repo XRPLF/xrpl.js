@@ -96,16 +96,7 @@ function convertStringToHex(string: string): string {
   return Buffer.from(string, 'utf8').toString('hex').toUpperCase()
 }
 
-export {
-  dropsToXrp,
-  xrpToDrops,
-  removeUndefined,
-  rippleTimeToISOTime,
-  ISOTimeToRippleTime,
-  rippleTimeToUnixTime,
-  unixTimeToRippleTime,
-  isValidSecret,
-  isValidAddress,
+const hashes = {
   hashSignedTx,
   hashTx,
   hashAccountRootId,
@@ -118,6 +109,19 @@ export {
   hashLedgerHeader,
   hashEscrow,
   hashPaymentChannel,
+}
+
+export {
+  dropsToXrp,
+  xrpToDrops,
+  removeUndefined,
+  rippleTimeToISOTime,
+  ISOTimeToRippleTime,
+  rippleTimeToUnixTime,
+  unixTimeToRippleTime,
+  isValidSecret,
+  isValidAddress,
+  hashes,
   generateXAddress,
   deriveKeypair,
   deriveXAddress,

@@ -2,10 +2,11 @@ import { assert } from 'chai'
 
 import { ValidationError, XrplError } from 'xrpl-local'
 
-import { hashLedger } from '../../src/utils'
+import { hashes } from '../../src/utils'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 
+const { hashLedger } = hashes
 const { hashLedger: REQUEST_FIXTURES } = requests
 
 describe('hashLedger', function () {

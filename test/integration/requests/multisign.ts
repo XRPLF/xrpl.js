@@ -9,7 +9,7 @@ import {
   SubmitMultisignedRequest,
   Transaction,
   SubmitMultisignedResponse,
-  hashSignedTx,
+  hashes,
 } from 'xrpl-local'
 import { convertStringToHex } from 'xrpl-local/utils'
 import { multisign, sign } from 'xrpl-local/wallet/signer'
@@ -25,6 +25,7 @@ import {
 
 // how long before each test case times out
 const TIMEOUT = 20000
+const { hashSignedTx } = hashes
 
 describe('submit_multisigned', function () {
   this.timeout(TIMEOUT)

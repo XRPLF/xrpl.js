@@ -1,12 +1,7 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import {
-  AccountSet,
-  hashSignedTx,
-  SubmitResponse,
-  TxResponse,
-} from 'xrpl-local'
+import { AccountSet, hashes, SubmitResponse, TxResponse } from 'xrpl-local'
 import { convertStringToHex } from 'xrpl-local/utils'
 
 import serverUrl from '../serverUrl'
@@ -14,6 +9,7 @@ import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 
 // how long before each test case times out
 const TIMEOUT = 20000
+const { hashSignedTx } = hashes
 
 describe('tx', function () {
   this.timeout(TIMEOUT)
