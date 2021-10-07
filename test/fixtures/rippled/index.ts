@@ -27,7 +27,6 @@ import withStateAsHashes from './ledgerWithStateAsHashes.json'
 import iouPartialPayment from './partialPaymentIOU.json'
 import xrpPartialPayment from './partialPaymentXRP.json'
 import generate from './pathFind'
-import sendAll from './pathFindSendAll.json'
 import sendUSD from './pathFindSendUsd.json'
 import srcActNotFound from './pathFindSrcActNotFound.json'
 import sourceAmountLow from './pathFindSrcAmtLow.json'
@@ -182,7 +181,6 @@ const server_info = {
 const path_find = {
   generate,
   sendUSD,
-  sendAll,
   XrpToXrp,
   srcActNotFound,
   sourceAmountLow,
