@@ -35,23 +35,15 @@ import { isFlagEnabled } from '.'
 export function parseAccountRootFlags(
   flags: number,
 ): AccountRootFlagsInterface {
-  const flagsInterface = {
-    lsfPasswordSpent: isSet(flags, AccountRootFlags.lsfPasswordSpent),
-    lsfRequireDestTag: isSet(flags, AccountRootFlags.lsfRequireDestTag),
-    lsfRequireAuth: isSet(flags, AccountRootFlags.lsfRequireAuth),
-    lsfDisallowXRP: isSet(flags, AccountRootFlags.lsfDisallowXRP),
-    lsfDisableMaster: isSet(flags, AccountRootFlags.lsfDisableMaster),
-    lsfNoFreeze: isSet(flags, AccountRootFlags.lsfNoFreeze),
-    lsfGlobalFreeze: isSet(flags, AccountRootFlags.lsfGlobalFreeze),
-    lsfDefaultRipple: isSet(flags, AccountRootFlags.lsfDefaultRipple),
-    lsfDepositAuth: isSet(flags, AccountRootFlags.lsfDepositAuth),
-  }
+  const flagsInterface: AccountRootFlagsInterface = {}
+
+  Object.keys(AccountRootFlags).forEach((flag) => {
+    if (isFlagEnabled(flags, AccountRootFlags[flag])) {
+      flagsInterface[flag] = true
+    }
+  })
 
   return flagsInterface
-}
-
-function isSet(num: number, flag: AccountRootFlags): boolean {
-  return (num & flag) === flag
 }
 
 /**
