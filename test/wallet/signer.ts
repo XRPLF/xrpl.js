@@ -71,91 +71,98 @@ const multisignTx1: Transaction = {
   SigningPubKey: '',
 }
 
-const multisignTxToCombine1: Transaction = {
-  Account: 'rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC',
-  Fee: '30000',
-  Flags: 262144,
-  LimitAmount: {
-    currency: 'USD',
-    issuer: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
-    value: '100',
-  },
-  Sequence: 2,
-  Signers: [
-    {
-      Signer: {
-        Account: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',
-        SigningPubKey:
-          '02B3EC4E5DD96029A647CFA20DA07FE1F85296505552CCAC114087E66B46BD77DF',
-        TxnSignature:
-          '30450221009C195DBBF7967E223D8626CA19CF02073667F2B22E206727BFE848FF42BEAC8A022048C323B0BED19A988BDBEFA974B6DE8AA9DCAE250AA82BBD1221787032A864E5',
-      },
-    },
-  ],
-  SigningPubKey: '',
-  TransactionType: 'TrustSet',
-}
-
-const multisignTxToCombine2: Transaction = {
-  Account: 'rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC',
-  Fee: '30000',
-  Flags: 262144,
-  LimitAmount: {
-    currency: 'USD',
-    issuer: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
-    value: '100',
-  },
-  Sequence: 2,
-  Signers: [
-    {
-      Signer: {
-        Account: 'rJvuSQhQR37czfxRou4vNWaM97uEhT4ShE',
-        SigningPubKey:
-          '02B78EEA571B2633180834CC6E7B4ED84FBF6811D12ECB59410E0C92D13B7726F5',
-        TxnSignature:
-          '304502210098009CEFA61EE9843BB7FC29B78CFFAACF28352A4A7CF3AAE79EF12D79BA50910220684F116266E5E4519A7A33F7421631EB8494082BE51A8B03FECCB3E59F77154A',
-      },
-    },
-  ],
-  SigningPubKey: '',
-  TransactionType: 'TrustSet',
-}
-
-const expectedMultisign: string = encode({
-  Account: 'rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC',
-  Fee: '30000',
-  Flags: 262144,
-  LimitAmount: {
-    currency: 'USD',
-    issuer: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
-    value: '100',
-  },
-  Sequence: 2,
-  Signers: [
-    {
-      Signer: {
-        Account: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',
-        SigningPubKey:
-          '02B3EC4E5DD96029A647CFA20DA07FE1F85296505552CCAC114087E66B46BD77DF',
-        TxnSignature:
-          '30450221009C195DBBF7967E223D8626CA19CF02073667F2B22E206727BFE848FF42BEAC8A022048C323B0BED19A988BDBEFA974B6DE8AA9DCAE250AA82BBD1221787032A864E5',
-      },
-    },
-    {
-      Signer: {
-        Account: 'rJvuSQhQR37czfxRou4vNWaM97uEhT4ShE',
-        SigningPubKey:
-          '02B78EEA571B2633180834CC6E7B4ED84FBF6811D12ECB59410E0C92D13B7726F5',
-        TxnSignature:
-          '304502210098009CEFA61EE9843BB7FC29B78CFFAACF28352A4A7CF3AAE79EF12D79BA50910220684F116266E5E4519A7A33F7421631EB8494082BE51A8B03FECCB3E59F77154A',
-      },
-    },
-  ],
-  SigningPubKey: '',
-  TransactionType: 'TrustSet',
-})
-
 describe('Signer', function () {
+  let multisignTxToCombine1
+  let multisignTxToCombine2
+  let multisignJSON
+  let expectedMultisign
+
+  beforeEach(function () {
+    multisignTxToCombine1 = {
+      Account: 'rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC',
+      Fee: '30000',
+      Flags: 262144,
+      LimitAmount: {
+        currency: 'USD',
+        issuer: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        value: '100',
+      },
+      Sequence: 2,
+      Signers: [
+        {
+          Signer: {
+            Account: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',
+            SigningPubKey:
+              '02B3EC4E5DD96029A647CFA20DA07FE1F85296505552CCAC114087E66B46BD77DF',
+            TxnSignature:
+              '30450221009C195DBBF7967E223D8626CA19CF02073667F2B22E206727BFE848FF42BEAC8A022048C323B0BED19A988BDBEFA974B6DE8AA9DCAE250AA82BBD1221787032A864E5',
+          },
+        },
+      ],
+      SigningPubKey: '',
+      TransactionType: 'TrustSet',
+    } as Transaction
+
+    multisignTxToCombine2 = {
+      Account: 'rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC',
+      Fee: '30000',
+      Flags: 262144,
+      LimitAmount: {
+        currency: 'USD',
+        issuer: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        value: '100',
+      },
+      Sequence: 2,
+      Signers: [
+        {
+          Signer: {
+            Account: 'rJvuSQhQR37czfxRou4vNWaM97uEhT4ShE',
+            SigningPubKey:
+              '02B78EEA571B2633180834CC6E7B4ED84FBF6811D12ECB59410E0C92D13B7726F5',
+            TxnSignature:
+              '304502210098009CEFA61EE9843BB7FC29B78CFFAACF28352A4A7CF3AAE79EF12D79BA50910220684F116266E5E4519A7A33F7421631EB8494082BE51A8B03FECCB3E59F77154A',
+          },
+        },
+      ],
+      SigningPubKey: '',
+      TransactionType: 'TrustSet',
+    } as Transaction
+
+    multisignJSON = {
+      Account: 'rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC',
+      Fee: '30000',
+      Flags: 262144,
+      LimitAmount: {
+        currency: 'USD',
+        issuer: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        value: '100',
+      },
+      Sequence: 2,
+      Signers: [
+        {
+          Signer: {
+            Account: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',
+            SigningPubKey:
+              '02B3EC4E5DD96029A647CFA20DA07FE1F85296505552CCAC114087E66B46BD77DF',
+            TxnSignature:
+              '30450221009C195DBBF7967E223D8626CA19CF02073667F2B22E206727BFE848FF42BEAC8A022048C323B0BED19A988BDBEFA974B6DE8AA9DCAE250AA82BBD1221787032A864E5',
+          },
+        },
+        {
+          Signer: {
+            Account: 'rJvuSQhQR37czfxRou4vNWaM97uEhT4ShE',
+            SigningPubKey:
+              '02B78EEA571B2633180834CC6E7B4ED84FBF6811D12ECB59410E0C92D13B7726F5',
+            TxnSignature:
+              '304502210098009CEFA61EE9843BB7FC29B78CFFAACF28352A4A7CF3AAE79EF12D79BA50910220684F116266E5E4519A7A33F7421631EB8494082BE51A8B03FECCB3E59F77154A',
+          },
+        },
+      ],
+      SigningPubKey: '',
+      TransactionType: 'TrustSet',
+    }
+    expectedMultisign = encode(multisignJSON)
+  })
   it('sign', function () {
     // Test case data generated using this tutorial - https://xrpl.org/send-xrp.html#send-xrp
     const tx3: Transaction = {
@@ -188,6 +195,17 @@ describe('Signer', function () {
   })
 
   it('multisign runs successfully with Transaction objects', function () {
+    const transactions = [multisignTxToCombine1, multisignTxToCombine2]
+
+    assert.deepEqual(multisign(transactions), expectedMultisign)
+  })
+
+  it('multisign runs successfully with X-address', function () {
+    multisignTxToCombine1.Account =
+      'XVJfK5FpouB7gtk3kaZHqbgV4Bswir4ccz3rsJw9oMf71tc'
+    multisignTxToCombine2.Account =
+      'XVJfK5FpouB7gtk3kaZHqbgV4Bswir4ccz3rsJw9oMf71tc'
+
     const transactions = [multisignTxToCombine1, multisignTxToCombine2]
 
     assert.deepEqual(multisign(transactions), expectedMultisign)
