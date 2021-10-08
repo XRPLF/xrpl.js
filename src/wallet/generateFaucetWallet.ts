@@ -178,16 +178,16 @@ async function processSuccessfulResponse(
   }
   try {
     // Check at regular interval if the address is enabled on the XRPL and funded
-    const isFunded = await hasAddressBalanceIncreased(
+    const updatedBalance = await getUpdatedBalance(
       client,
       classicAddress,
       startingBalance,
     )
 
-    if (isFunded) {
+    if (updatedBalance > startingBalance) {
       resolve({
         wallet: fundWallet,
-        balance: await hasAddressBalanceIncreased(
+        balance: await getUpdatedBalance(
           client,
           fundWallet.getClassicAddress(),
           startingBalance,
@@ -248,7 +248,7 @@ async function getAddressXrpBalance(
  * @param originalBalance - The initial balance before the funding.
  * @returns A Promise boolean.
  */
-async function hasAddressBalanceIncreased(
+async function getUpdatedBalance(
   client: Client,
   address: string,
   originalBalance: number,
