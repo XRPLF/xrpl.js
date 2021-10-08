@@ -15,6 +15,11 @@ interface FaucetWallet {
   balance: number
 }
 
+interface WalletWithStartingBalance {
+  wallet: Wallet
+  balance: number
+}
+
 enum FaucetNetwork {
   Testnet = 'faucet.altnet.rippletest.net',
   Devnet = 'faucet.devnet.rippletest.net',
@@ -33,16 +38,16 @@ const MAX_ATTEMPTS = 20
  * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP.
  * @throws When either Client isn't connected or unable to fund wallet address.
  */
-async function generateFaucetWallet(
+async function fundWallet(
   this: Client,
   wallet?: Wallet,
-): Promise<Wallet> {
+): Promise<WalletWithStartingBalance> {
   if (!this.isConnected()) {
     throw new RippledError('Client not connected, cannot call faucet')
   }
 
   // Generate a new Wallet if no existing Wallet is provided or its address is invalid to fund
-  const fundWallet =
+  const walletToFund =
     wallet && isValidClassicAddress(wallet.classicAddress)
       ? wallet
       : Wallet.generate()
@@ -51,7 +56,7 @@ async function generateFaucetWallet(
   const postBody = Buffer.from(
     new TextEncoder().encode(
       JSON.stringify({
-        destination: fundWallet.classicAddress,
+        destination: walletToFund.classicAddress,
       }),
     ),
   )
@@ -59,7 +64,7 @@ async function generateFaucetWallet(
   let startingBalance = 0
   try {
     startingBalance = Number(
-      await getAddressXrpBalance(this, fundWallet.classicAddress),
+      await getAddressXrpBalance(this, walletToFund.classicAddress),
     )
   } catch {
     /* startingBalance remains '0' */
@@ -68,7 +73,7 @@ async function generateFaucetWallet(
   // Options to pass to https.request
   const options = getOptions(this, postBody)
 
-  return returnPromise(options, this, startingBalance, fundWallet, postBody)
+  return returnPromise(options, this, startingBalance, walletToFund, postBody)
 }
 
 // eslint-disable-next-line max-params -- Helper function created for organizational purposes
@@ -76,9 +81,9 @@ async function returnPromise(
   options: RequestOptions,
   client: Client,
   startingBalance: number,
-  fundWallet: Wallet,
+  walletToFund: Wallet,
   postBody: Buffer,
-): Promise<Wallet> {
+): Promise<WalletWithStartingBalance> {
   return new Promise((resolve, reject) => {
     const request = httpsRequest(options, (response) => {
       const chunks: Uint8Array[] = []
@@ -90,7 +95,7 @@ async function returnPromise(
           chunks,
           client,
           startingBalance,
-          fundWallet,
+          walletToFund,
           resolve,
           reject,
         ),
@@ -126,8 +131,8 @@ async function onEnd(
   chunks: Uint8Array[],
   client: Client,
   startingBalance: number,
-  fundWallet: Wallet,
-  resolve: (wallet: Wallet) => void,
+  walletToFund: Wallet,
+  resolve: (response: WalletWithStartingBalance) => void,
   reject: (err: ErrorConstructor | Error | unknown) => void,
 ): Promise<void> {
   const body = Buffer.concat(chunks).toString()
@@ -138,7 +143,7 @@ async function onEnd(
       client,
       body,
       startingBalance,
-      fundWallet,
+      walletToFund,
       resolve,
       reject,
     )
@@ -155,13 +160,13 @@ async function onEnd(
   }
 }
 
-// eslint-disable-next-line max-params -- Only used as a helper function
+// eslint-disable-next-line max-params, max-lines-per-function -- Only used as a helper function, lines inc due to added balance.
 async function processSuccessfulResponse(
   client: Client,
   body: string,
   startingBalance: number,
-  fundWallet: Wallet,
-  resolve: (wallet: Wallet) => void,
+  walletToFund: Wallet,
+  resolve: (response: WalletWithStartingBalance) => void,
   reject: (err: ErrorConstructor | Error | unknown) => void,
 ): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- We know this is safe and correct
@@ -174,14 +179,21 @@ async function processSuccessfulResponse(
   }
   try {
     // Check at regular interval if the address is enabled on the XRPL and funded
-    const isFunded = await hasAddressBalanceIncreased(
+    const updatedBalance = await getUpdatedBalance(
       client,
       classicAddress,
       startingBalance,
     )
 
-    if (isFunded) {
-      resolve(fundWallet)
+    if (updatedBalance > startingBalance) {
+      resolve({
+        wallet: walletToFund,
+        balance: await getUpdatedBalance(
+          client,
+          walletToFund.getClassicAddress(),
+          startingBalance,
+        ),
+      })
     } else {
       reject(
         new XRPLFaucetError(
@@ -237,18 +249,18 @@ async function getAddressXrpBalance(
  * @param originalBalance - The initial balance before the funding.
  * @returns A Promise boolean.
  */
-async function hasAddressBalanceIncreased(
+async function getUpdatedBalance(
   client: Client,
   address: string,
   originalBalance: number,
-): Promise<boolean> {
+): Promise<number> {
   return new Promise((resolve, reject) => {
     let attempts = MAX_ATTEMPTS
     // eslint-disable-next-line @typescript-eslint/no-misused-promises -- Not actually misused here, different resolve
     const interval = setInterval(async () => {
       if (attempts < 0) {
         clearInterval(interval)
-        resolve(false)
+        resolve(originalBalance)
       } else {
         attempts -= 1
       }
@@ -263,7 +275,7 @@ async function hasAddressBalanceIncreased(
 
         if (newBalance > originalBalance) {
           clearInterval(interval)
-          resolve(true)
+          resolve(newBalance)
         }
       } catch (err) {
         clearInterval(interval)
@@ -302,7 +314,7 @@ function getFaucetUrl(client: Client): FaucetNetwork | undefined {
   throw new XRPLFaucetError('Faucet URL is not defined or inferrable.')
 }
 
-export default generateFaucetWallet
+export default fundWallet
 
 const _private = {
   FaucetNetwork,
