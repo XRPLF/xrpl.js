@@ -45,6 +45,7 @@ describe('account_info', function () {
         ledger_index: 582,
         validated: true,
       },
+      status: 'succes',
       type: 'response',
     }
     assert.equal(response.type, expected.type)
