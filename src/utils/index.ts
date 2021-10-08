@@ -21,7 +21,7 @@ import { generateXAddress } from './generateAddress'
 import {
   hashSignedTx,
   hashTx,
-  hashAccountRootId,
+  hashAccountRoot,
   hashSignerListId,
   hashOfferId,
   hashTrustline,
@@ -100,7 +100,7 @@ function convertStringToHex(string: string): string {
 const hashes = {
   hashSignedTx,
   hashTx,
-  hashAccountRootId,
+  hashAccountRoot,
   hashSignerListId,
   hashOfferId,
   hashTrustline,

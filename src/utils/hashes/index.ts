@@ -66,7 +66,7 @@ export function hashTx(txBlobHex: string): string {
  * @param address - The classic account address.
  * @returns The Ledger Object Index for the account.
  */
-export function hashAccountRootId(address: string): string {
+export function hashAccountRoot(address: string): string {
   return sha512Half(ledgerSpaceHex('account') + addressToHex(address))
 }
 
