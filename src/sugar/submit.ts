@@ -4,7 +4,7 @@ import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { TxResponse } from '../models/methods'
 import { Transaction } from '../models/transactions'
-import { computeSignedTransactionHash } from '../utils'
+import { hashes } from '../utils'
 import { sign } from '../wallet/signer'
 
 // general time for a ledger to close, in milliseconds
@@ -115,7 +115,7 @@ async function submitSignedReliable(
     typeof signedTransaction === 'string'
       ? signedTransaction
       : encode(signedTransaction)
-  const txHash = computeSignedTransactionHash(signedTransaction)
+  const txHash = hashes.hashSignedTx(signedTransaction)
 
   const request: SubmitRequest = {
     command: 'submit',
