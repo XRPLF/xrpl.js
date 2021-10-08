@@ -4,7 +4,7 @@ import { decode } from 'ripple-binary-codec'
 
 import { Client, Wallet, AccountInfoRequest } from 'xrpl-local'
 import { Payment, Transaction } from 'xrpl-local/models/transactions'
-import { computeSignedTransactionHash } from 'xrpl-local/utils/hashes'
+import { hashSignedTx } from 'xrpl-local/utils/hashes'
 
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
@@ -25,10 +25,7 @@ export async function fundAccount(
     // 2 times the amount needed for a new account (20 XRP)
     Amount: '400000000',
   }
-  const response = await client.submitTransaction(
-    Wallet.fromSeed(masterSecret),
-    payment,
-  )
+  const response = await client.submit(Wallet.fromSeed(masterSecret), payment)
   if (response.result.engine_result !== 'tesSUCCESS') {
     // eslint-disable-next-line no-console -- happens only when something goes wrong
     console.log(response)
@@ -47,8 +44,9 @@ export async function generateFundedWallet(client: Client): Promise<Wallet> {
 export async function verifySubmittedTransaction(
   client: Client,
   tx: Transaction | string,
+  hashTx?: string,
 ): Promise<void> {
-  const hash = computeSignedTransactionHash(tx)
+  const hash = hashTx ?? hashSignedTx(tx)
   const data = await client.request({
     command: 'tx',
     transaction: hash,
@@ -82,7 +80,7 @@ export async function testTransaction(
   await ledgerAccept(client)
 
   // sign/submit the transaction
-  const response = await client.submitTransaction(wallet, transaction)
+  const response = await client.submit(wallet, transaction)
 
   // check that the transaction was successful
   assert.equal(response.type, 'response')

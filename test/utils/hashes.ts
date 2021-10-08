@@ -7,15 +7,15 @@ import { encode } from 'ripple-binary-codec'
 import { OfferCreate, Transaction, ValidationError } from 'xrpl-local'
 
 import {
-  computeStateTreeHash,
-  computeTransactionTreeHash,
-  computeTrustlineHash,
-  computeEscrowHash,
-  computePaymentChannelHash,
-  computeSignedTransactionHash,
-  computeAccountRootIndex,
-  computeOfferIndex,
-  computeSignerListIndex,
+  hashStateTree,
+  hashTxTree,
+  hashTrustline,
+  hashEscrow,
+  hashPaymentChannel,
+  hashSignedTx,
+  hashAccountRoot,
+  hashOfferId,
+  hashSignerListId,
 } from '../../src/utils/hashes'
 import fixtures from '../fixtures/rippled'
 import { assertResultMatch } from '../testUtils'
@@ -46,7 +46,7 @@ function createLedgerTest(ledgerIndex: number): void {
       it(`has account_hash of ${ledgerJSON.account_hash}`, function () {
         assert.equal(
           ledgerJSON.account_hash,
-          computeStateTreeHash(ledgerJSON.accountState),
+          hashStateTree(ledgerJSON.accountState),
         )
       })
     }
@@ -54,7 +54,7 @@ function createLedgerTest(ledgerIndex: number): void {
     it(`has transaction_hash of ${ledgerJSON.transaction_hash}`, function () {
       assert.equal(
         ledgerJSON.transaction_hash,
-        computeTransactionTreeHash(ledgerJSON.transactions),
+        hashTxTree(ledgerJSON.transactions),
       )
     })
   })
@@ -75,7 +75,7 @@ describe('Hashes', function () {
     const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
     const expectedEntryHash =
       '2B6AC232AA4C4BE41BF49D2459FA4A0347E1B543A4C92FCEE0821C0201E2E9A8'
-    const actualEntryHash = computeAccountRootIndex(account)
+    const actualEntryHash = hashAccountRoot(account)
 
     assert.equal(actualEntryHash, expectedEntryHash)
   })
@@ -87,8 +87,8 @@ describe('Hashes', function () {
 
     const expectedEntryHash =
       'C683B5BB928F025F1E860D9D69D6C554C2202DE0D45877ADB3077DA4CB9E125C'
-    const actualEntryHash1 = computeTrustlineHash(account1, account2, currency)
-    const actualEntryHash2 = computeTrustlineHash(account2, account1, currency)
+    const actualEntryHash1 = hashTrustline(account1, account2, currency)
+    const actualEntryHash2 = hashTrustline(account2, account1, currency)
 
     assert.equal(actualEntryHash1, expectedEntryHash)
     assert.equal(actualEntryHash2, expectedEntryHash)
@@ -101,8 +101,8 @@ describe('Hashes', function () {
 
     const expectedEntryHash =
       'AE9ADDC584358E5847ADFC971834E471436FC3E9DE6EA1773DF49F419DC0F65E'
-    const actualEntryHash1 = computeTrustlineHash(account1, account2, currency)
-    const actualEntryHash2 = computeTrustlineHash(account2, account1, currency)
+    const actualEntryHash1 = hashTrustline(account1, account2, currency)
+    const actualEntryHash2 = hashTrustline(account2, account1, currency)
 
     assert.equal(actualEntryHash1, expectedEntryHash)
     assert.equal(actualEntryHash2, expectedEntryHash)
@@ -113,16 +113,16 @@ describe('Hashes', function () {
     const sequence = 137
     const expectedEntryHash =
       '03F0AED09DEEE74CEF85CD57A0429D6113507CF759C597BABB4ADB752F734CE3'
-    const actualEntryHash = computeOfferIndex(account, sequence)
+    const actualEntryHash = hashOfferId(account, sequence)
 
     assert.equal(actualEntryHash, expectedEntryHash)
   })
 
-  it('computeSignerListIndex', function () {
+  it('hashSignerListId', function () {
     const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
     const expectedEntryHash =
       '778365D5180F5DF3016817D1F318527AD7410D83F8636CF48C43E8AF72AB49BF'
-    const actualEntryHash = computeSignerListIndex(account)
+    const actualEntryHash = hashSignerListId(account)
     assert.equal(actualEntryHash, expectedEntryHash)
   })
 
@@ -131,7 +131,7 @@ describe('Hashes', function () {
     const sequence = 84
     const expectedEntryHash =
       '61E8E8ED53FA2CEBE192B23897071E9A75217BF5A410E9CB5B45AAB7AECA567A'
-    const actualEntryHash = computeEscrowHash(account, sequence)
+    const actualEntryHash = hashEscrow(account, sequence)
 
     assert.equal(actualEntryHash, expectedEntryHash)
   })
@@ -142,11 +142,7 @@ describe('Hashes', function () {
     const sequence = 82
     const expectedEntryHash =
       'E35708503B3C3143FB522D749AAFCC296E8060F0FB371A9A56FAE0B1ED127366'
-    const actualEntryHash = computePaymentChannelHash(
-      account,
-      dstAccount,
-      sequence,
-    )
+    const actualEntryHash = hashPaymentChannel(account, dstAccount, sequence)
 
     assert.equal(actualEntryHash, expectedEntryHash)
   })
@@ -156,9 +152,7 @@ describe('Hashes', function () {
       '458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2'
 
     assertResultMatch(
-      computeSignedTransactionHash(
-        fixtures.tx.OfferCreateSell.result as Transaction,
-      ),
+      hashSignedTx(fixtures.tx.OfferCreateSell.result as Transaction),
       expected_hash,
     )
   })
@@ -168,7 +162,7 @@ describe('Hashes', function () {
       '458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2'
 
     assertResultMatch(
-      computeSignedTransactionHash(encode(fixtures.tx.OfferCreateSell.result)),
+      hashSignedTx(encode(fixtures.tx.OfferCreateSell.result)),
       expected_hash,
     )
   })
@@ -180,7 +174,7 @@ describe('Hashes', function () {
     }
 
     assert.throws(
-      () => computeSignedTransactionHash(offerCreateWithNoSignature),
+      () => hashSignedTx(offerCreateWithNoSignature),
       ValidationError,
     )
   })
@@ -192,7 +186,7 @@ describe('Hashes', function () {
     })
 
     assert.throws(
-      () => computeSignedTransactionHash(encodedOfferCreateWithNoSignature),
+      () => hashSignedTx(encodedOfferCreateWithNoSignature),
       ValidationError,
     )
   })

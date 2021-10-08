@@ -1,7 +1,7 @@
-import header from './computeLedgerHash.json'
-import transactions from './computeLedgerHashTransactions.json'
 import normalOrderBook from './getOrderbook.json'
 import withXRPOrderBook from './getOrderbookWithXrp.json'
+import header from './hashLedger.json'
+import transactions from './hashLedgerTransactions.json'
 import normalSign from './sign.json'
 import signAsSign from './signAs.json'
 import escrowSign from './signEscrow.json'
@@ -20,13 +20,13 @@ const getOrderbook = {
   withXRP: withXRPOrderBook,
 }
 
-const computeLedgerHash = {
+const hashLedger = {
   header,
   transactions,
 }
 
 const requests = {
-  computeLedgerHash,
+  hashLedger,
   getOrderbook,
   sign,
   signPaymentChannelClaim,

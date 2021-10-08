@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { _private } from '../../src/wallet/generateFaucetWallet'
+import { _private } from '../../src/wallet/fundWallet'
 import { setupClient, teardownClient } from '../setupClient'
 
 const { FaucetNetwork, getFaucetUrl } = _private
