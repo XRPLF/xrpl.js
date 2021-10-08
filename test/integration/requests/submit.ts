@@ -34,15 +34,19 @@ describe('submit', function () {
     }
 
     const autofilledTx = await this.client.autofill(accountSet)
-    const signedTx = this.wallet.signTransaction(autofilledTx)
+    const signedTx = this.wallet.sign(autofilledTx)
     const submitRequest: SubmitRequest = {
       command: 'submit',
-      tx_blob: signedTx,
+      tx_blob: signedTx.tx_blob,
     }
     const submitResponse = await this.client.request(submitRequest)
 
     await ledgerAccept(this.client)
-    await verifySubmittedTransaction(this.client, signedTx)
+    await verifySubmittedTransaction(
+      this.client,
+      signedTx.tx_blob,
+      signedTx.hash,
+    )
 
     const expectedResponse: SubmitResponse = {
       id: submitResponse.id,
@@ -52,10 +56,10 @@ describe('submit', function () {
         engine_result_code: 0,
         engine_result_message:
           'The transaction was applied. Only final in a validated ledger.',
-        tx_blob: signedTx,
+        tx_blob: signedTx.tx_blob,
         tx_json: {
-          ...(decode(signedTx) as unknown as Transaction),
-          hash: hashSignedTx(signedTx),
+          ...(decode(signedTx.tx_blob) as unknown as Transaction),
+          hash: hashSignedTx(signedTx.tx_blob),
         },
         accepted: true,
         account_sequence_available:

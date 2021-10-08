@@ -5,7 +5,6 @@ import { ValidationError, XrplError } from '../errors'
 import { TxResponse } from '../models/methods'
 import { Transaction } from '../models/transactions'
 import { hashes } from '../utils'
-import { sign } from '../wallet/signer'
 
 // general time for a ledger to close, in milliseconds
 const LEDGER_CLOSE_TIME = 4000
@@ -35,8 +34,8 @@ async function submit(
   transaction: Transaction,
 ): Promise<SubmitResponse> {
   const tx = await this.autofill(transaction)
-  const signedTxEncoded = sign(wallet, tx)
-  return this.submitSigned(signedTxEncoded)
+  const { tx_blob } = wallet.sign(tx)
+  return this.submitSigned(tx_blob)
 }
 
 /**
@@ -83,8 +82,8 @@ async function submitReliable(
   transaction: Transaction,
 ): Promise<TxResponse> {
   const tx = await this.autofill(transaction)
-  const signedTxEncoded = sign(wallet, tx)
-  return this.submitSignedReliable(signedTxEncoded)
+  const { tx_blob } = wallet.sign(tx)
+  return this.submitSignedReliable(tx_blob)
 }
 
 /**

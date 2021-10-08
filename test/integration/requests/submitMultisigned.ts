@@ -12,7 +12,7 @@ import {
   hashes,
 } from 'xrpl-local'
 import { convertStringToHex } from 'xrpl-local/utils'
-import { multisign, sign } from 'xrpl-local/wallet/signer'
+import { multisign } from 'xrpl-local/wallet/signer'
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
@@ -68,9 +68,9 @@ describe('submit_multisigned', function () {
       Domain: convertStringToHex('example.com'),
     }
     const accountSetTx = await client.autofill(accountSet, 2)
-    const signed1 = sign(signerWallet1, accountSetTx, true)
-    const signed2 = sign(signerWallet2, accountSetTx, true)
-    const multisigned = multisign([signed1, signed2])
+    const signed1 = signerWallet1.sign(accountSetTx, true)
+    const signed2 = signerWallet2.sign(accountSetTx, true)
+    const multisigned = multisign([signed1.tx_blob, signed2.tx_blob])
     const multisignedRequest: SubmitMultisignedRequest = {
       command: 'submit_multisigned',
       tx_json: decode(multisigned) as unknown as Transaction,

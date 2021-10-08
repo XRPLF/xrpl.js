@@ -41,7 +41,7 @@ describe('reliable submission', function () {
       Account: this.wallet.getClassicAddress(),
       Domain: convertStringToHex('example.com'),
     }
-    const signedAccountSet = this.wallet.signTransaction(
+    const { tx_blob: signedAccountSet } = this.wallet.sign(
       await this.client.autofill(accountSet),
     )
     const responsePromise = this.client.submitSignedReliable(signedAccountSet)
@@ -60,7 +60,7 @@ describe('reliable submission', function () {
       Account: this.wallet.getClassicAddress(),
       Domain: convertStringToHex('example.com'),
     }
-    const signedAccountSet = this.wallet.signTransaction(
+    const { tx_blob: signedAccountSet } = this.wallet.sign(
       await this.client.autofill(accountSet),
     )
     const responsePromise = this.client.submitSignedReliable(signedAccountSet)
