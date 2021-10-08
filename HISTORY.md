@@ -1145,7 +1145,7 @@ e6ad9a9c111ab696f5637bfa372d80999e5ae362  ripple-0.17.9-min.js
 
 ## 0.16.2
 
-+ Bump `ripple-binary-codec` dependency version to 0.1.1 to fix issue with `hashLedger` for transactions with `DeliverMin`
++ Bump `ripple-binary-codec` dependency version to 0.1.1 to fix issue with `computeLedgerHash` for transactions with `DeliverMin`
 
 ## 0.16.1
 
