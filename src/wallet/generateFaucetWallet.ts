@@ -187,18 +187,11 @@ async function processSuccessfulResponse(
     if (isFunded) {
       resolve({
         wallet: fundWallet,
-        balance: (await hasAddressBalanceIncreased(
+        balance: await hasAddressBalanceIncreased(
           client,
           fundWallet.getClassicAddress(),
           startingBalance,
-        ))
-          ? Number(
-              await getAddressXrpBalance(
-                client,
-                fundWallet.getClassicAddress(),
-              ),
-            )
-          : startingBalance,
+        ),
       })
     } else {
       reject(
@@ -259,14 +252,14 @@ async function hasAddressBalanceIncreased(
   client: Client,
   address: string,
   originalBalance: number,
-): Promise<boolean> {
+): Promise<number> {
   return new Promise((resolve, reject) => {
     let attempts = MAX_ATTEMPTS
     // eslint-disable-next-line @typescript-eslint/no-misused-promises -- Not actually misused here, different resolve
     const interval = setInterval(async () => {
       if (attempts < 0) {
         clearInterval(interval)
-        resolve(false)
+        resolve(originalBalance)
       } else {
         attempts -= 1
       }
@@ -281,7 +274,7 @@ async function hasAddressBalanceIncreased(
 
         if (newBalance > originalBalance) {
           clearInterval(interval)
-          resolve(true)
+          resolve(newBalance)
         }
       } catch (err) {
         clearInterval(interval)
