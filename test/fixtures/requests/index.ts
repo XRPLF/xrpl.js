@@ -1,6 +1,4 @@
 import setDomain from './combine.json'
-import header from './computeLedgerHash.json'
-import transactions from './computeLedgerHashTransactions.json'
 import normalOrderBook from './getOrderbook.json'
 import withXRPOrderBook from './getOrderbookWithXrp.json'
 import invalid from './getpaths/invalid.json'
@@ -14,6 +12,8 @@ import sendAll from './getpaths/sendAll.json'
 import UsdToUsd from './getpaths/usd2usd.json'
 import XrpToXrp from './getpaths/xrp2xrp.json'
 import XrpToXrpNotEnough from './getpaths/xrp2xrpNotEnough.json'
+import header from './hashLedger.json'
+import transactions from './hashLedgerTransactions.json'
 import normalCheckCancel from './prepareCheckCancel.json'
 import amountCheckCash from './prepareCheckCashAmount.json'
 import deliverMinCheckCash from './prepareCheckCashDelivermin.json'
@@ -177,7 +177,7 @@ const getOrderbook = {
   withXRP: withXRPOrderBook,
 }
 
-const computeLedgerHash = {
+const hashLedger = {
   header,
   transactions,
 }
@@ -188,7 +188,7 @@ const combine = {
 
 const requests = {
   combine,
-  computeLedgerHash,
+  hashLedger,
   getOrderbook,
   getPaths,
   prepareCheckCash,

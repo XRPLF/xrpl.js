@@ -18,7 +18,7 @@ import SHAMap, { NodeType } from './shaMap'
 
 const HEX = 16
 
-interface ComputeLedgerHeaderHashOptions {
+interface HashLedgerHeaderOptions {
   computeTreeHashes?: boolean
 }
 
@@ -71,7 +71,7 @@ function addLengthPrefix(hex: string): string {
  * @returns A hash of tx.
  * @throws ValidationError if the Transaction is unsigned.
  */
-export function computeSignedTransactionHash(tx: Transaction | string): string {
+export function hashSignedTx(tx: Transaction | string): string {
   let txBlob: string
   let txObject: Transaction
   if (typeof tx === 'string') {
@@ -98,7 +98,7 @@ export function computeSignedTransactionHash(tx: Transaction | string): string {
  * @param ledgerHeader - Ledger to compute the hash of.
  * @returns The hash of the ledger.
  */
-export function computeLedgerHeaderHash(ledgerHeader: Ledger): string {
+export function hashLedgerHeader(ledgerHeader: Ledger): string {
   const prefix = HashPrefix.LEDGER.toString(HEX).toUpperCase()
 
   const ledger =
@@ -122,14 +122,14 @@ export function computeLedgerHeaderHash(ledgerHeader: Ledger): string {
  * @param transactions - List of Transactions.
  * @returns The root hash of the SHAMap.
  */
-export function computeTransactionTreeHash(
+export function hashTxTree(
   transactions: Array<Transaction & { metaData?: Metadata }>,
 ): string {
   const shamap = new SHAMap()
   for (const txJSON of transactions) {
     const txBlobHex = encode(txJSON)
     const metaHex = encode(txJSON.metaData ?? {})
-    const txHash = computeSignedTransactionHash(txBlobHex)
+    const txHash = hashSignedTx(txBlobHex)
     const data = addLengthPrefix(txBlobHex) + addLengthPrefix(metaHex)
     shamap.addItem(txHash, data, NodeType.TRANSACTION_METADATA)
   }
@@ -143,7 +143,7 @@ export function computeTransactionTreeHash(
  * @param entries - List of LedgerEntries.
  * @returns Hash of SHAMap that consists of all entries.
  */
-export function computeStateTreeHash(entries: LedgerEntry[]): string {
+export function hashStateTree(entries: LedgerEntry[]): string {
   const shamap = new SHAMap()
 
   entries.forEach((ledgerEntry) => {
@@ -156,7 +156,7 @@ export function computeStateTreeHash(entries: LedgerEntry[]): string {
 
 function computeTransactionHash(
   ledger: Ledger,
-  options: ComputeLedgerHeaderHashOptions,
+  options: HashLedgerHeaderOptions,
 ): string {
   const { transaction_hash } = ledger
 
@@ -168,7 +168,7 @@ function computeTransactionHash(
     throw new ValidationError('transactions is missing from the ledger')
   }
 
-  const transactionHash = computeTransactionTreeHash(ledger.transactions)
+  const transactionHash = hashTxTree(ledger.transactions)
 
   if (transaction_hash !== transactionHash) {
     throw new ValidationError(
@@ -186,7 +186,7 @@ function computeTransactionHash(
 
 function computeStateHash(
   ledger: Ledger,
-  options: ComputeLedgerHeaderHashOptions,
+  options: HashLedgerHeaderOptions,
 ): string {
   const { account_hash } = ledger
 
@@ -198,7 +198,7 @@ function computeStateHash(
     throw new ValidationError('accountState is missing from the ledger')
   }
 
-  const stateHash = computeStateTreeHash(ledger.accountState)
+  const stateHash = hashStateTree(ledger.accountState)
 
   if (account_hash !== stateHash) {
     throw new ValidationError(
@@ -216,15 +216,15 @@ function computeStateHash(
  * @param options - Allow client to recompute Transaction and State Hashes.
  * @returns The has of ledger.
  */
-function computeLedgerHash(
+function hashLedger(
   ledger: Ledger,
-  options: ComputeLedgerHeaderHashOptions = {},
+  options: HashLedgerHeaderOptions = {},
 ): string {
   const subhashes = {
     transaction_hash: computeTransactionHash(ledger, options),
     account_hash: computeStateHash(ledger, options),
   }
-  return computeLedgerHeaderHash({ ...ledger, ...subhashes })
+  return hashLedgerHeader({ ...ledger, ...subhashes })
 }
 
-export default computeLedgerHash
+export default hashLedger

@@ -6,7 +6,7 @@ import {
   AccountSet,
   SubmitRequest,
   SubmitResponse,
-  computeSignedTransactionHash,
+  hashes,
   Transaction,
 } from 'xrpl-local'
 import { convertStringToHex } from 'xrpl-local/utils'
@@ -17,6 +17,7 @@ import { ledgerAccept, verifySubmittedTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
+const { hashSignedTx } = hashes
 
 describe('submit', function () {
   this.timeout(TIMEOUT)
@@ -54,7 +55,7 @@ describe('submit', function () {
         tx_blob: signedTx,
         tx_json: {
           ...(decode(signedTx) as unknown as Transaction),
-          hash: computeSignedTransactionHash(signedTx),
+          hash: hashSignedTx(signedTx),
         },
         accepted: true,
         account_sequence_available:

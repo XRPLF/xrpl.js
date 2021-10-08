@@ -4,7 +4,7 @@ import { decode } from 'ripple-binary-codec'
 
 import { Client, Wallet, AccountInfoRequest } from 'xrpl-local'
 import { Payment, Transaction } from 'xrpl-local/models/transactions'
-import { computeSignedTransactionHash } from 'xrpl-local/utils/hashes'
+import { hashSignedTx } from 'xrpl-local/utils/hashes'
 
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
@@ -45,7 +45,7 @@ export async function verifySubmittedTransaction(
   client: Client,
   tx: Transaction | string,
 ): Promise<void> {
-  const hash = computeSignedTransactionHash(tx)
+  const hash = hashSignedTx(tx)
   const data = await client.request({
     command: 'tx',
     transaction: hash,

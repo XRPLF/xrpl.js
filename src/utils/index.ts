@@ -19,18 +19,18 @@ import getBalanceChanges from './balanceChanges'
 import { deriveKeypair, deriveXAddress } from './derive'
 import { generateXAddress } from './generateAddress'
 import {
-  computeSignedTransactionHash,
-  computeBinaryTransactionSigningHash,
-  computeAccountRootIndex,
-  computeSignerListIndex,
-  computeOfferIndex,
-  computeTrustlineHash,
-  computeTransactionTreeHash,
-  computeStateTreeHash,
-  computeLedgerHash,
-  computeLedgerHeaderHash,
-  computeEscrowHash,
-  computePaymentChannelHash,
+  hashSignedTx,
+  hashTx,
+  hashAccountRoot,
+  hashSignerListId,
+  hashOfferId,
+  hashTrustline,
+  hashTxTree,
+  hashStateTree,
+  hashLedger,
+  hashLedgerHeader,
+  hashEscrow,
+  hashPaymentChannel,
 } from './hashes'
 import signPaymentChannelClaim from './signPaymentChannelClaim'
 import {
@@ -97,6 +97,21 @@ function convertStringToHex(string: string): string {
   return Buffer.from(string, 'utf8').toString('hex').toUpperCase()
 }
 
+const hashes = {
+  hashSignedTx,
+  hashTx,
+  hashAccountRoot,
+  hashSignerListId,
+  hashOfferId,
+  hashTrustline,
+  hashTxTree,
+  hashStateTree,
+  hashLedger,
+  hashLedgerHeader,
+  hashEscrow,
+  hashPaymentChannel,
+}
+
 export {
   getBalanceChanges,
   dropsToXrp,
@@ -108,18 +123,7 @@ export {
   unixTimeToRippleTime,
   isValidSecret,
   isValidAddress,
-  computeSignedTransactionHash,
-  computeBinaryTransactionSigningHash,
-  computeAccountRootIndex,
-  computeSignerListIndex,
-  computeOfferIndex,
-  computeTrustlineHash,
-  computeTransactionTreeHash,
-  computeStateTreeHash,
-  computeLedgerHash,
-  computeLedgerHeaderHash,
-  computeEscrowHash,
-  computePaymentChannelHash,
+  hashes,
   generateXAddress,
   deriveKeypair,
   deriveXAddress,
