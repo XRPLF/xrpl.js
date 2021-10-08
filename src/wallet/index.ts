@@ -23,7 +23,7 @@ import {
 import ECDSA from '../ecdsa'
 import { ValidationError } from '../errors'
 import { Transaction } from '../models/transactions'
-import { computeSignedTransactionHash } from '../utils/hashes/ledgerHash'
+import { hashSignedTx } from '../utils/hashes/ledgerHash'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
@@ -224,7 +224,7 @@ class Wallet {
     this.checkTxSerialization(serialized, transaction)
     return {
       tx_blob: serialized,
-      hash: computeSignedTransactionHash(serialized),
+      hash: hashSignedTx(serialized),
     }
   }
 

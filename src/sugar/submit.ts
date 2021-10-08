@@ -5,7 +5,6 @@ import { ValidationError, XrplError } from '../errors'
 import { TxResponse } from '../models/methods'
 import { Transaction } from '../models/transactions'
 import { hashes } from '../utils'
-import { sign } from '../wallet/signer'
 
 // general time for a ledger to close, in milliseconds
 const LEDGER_CLOSE_TIME = 4000
@@ -14,29 +13,6 @@ async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms)
   })
-}
-
-/**
- * Submits an unsigned transaction.
- * Steps performed on a transaction:
- *    1. Autofill.
- *    2. Sign & Encode.
- *    3. Submit.
- *
- * @param this - A Client.
- * @param wallet - A Wallet to sign a transaction.
- * @param transaction - A transaction to autofill, sign & encode, and submit.
- * @returns A promise that contains SubmitResponse.
- * @throws RippledError if submit request fails.
- */
-async function submit(
-  this: Client,
-  wallet: Wallet,
-  transaction: Transaction,
-): Promise<SubmitResponse> {
-  const tx = await this.autofill(transaction)
-  const { tx_blob }: { tx_blob: string } = wallet.sign(tx)
-  return this.submitSigned(tx_blob)
 }
 
 /**
@@ -65,6 +41,29 @@ async function submitSigned(
     fail_hard: isAccountDelete(signedTransaction),
   }
   return this.request(request)
+}
+
+/**
+ * Submits an unsigned transaction.
+ * Steps performed on a transaction:
+ *    1. Autofill.
+ *    2. Sign & Encode.
+ *    3. Submit.
+ *
+ * @param this - A Client.
+ * @param wallet - A Wallet to sign a transaction.
+ * @param transaction - A transaction to autofill, sign & encode, and submit.
+ * @returns A promise that contains SubmitResponse.
+ * @throws RippledError if submit request fails.
+ */
+async function submit(
+  this: Client,
+  wallet: Wallet,
+  transaction: Transaction,
+): Promise<SubmitResponse> {
+  const tx = await this.autofill(transaction)
+  const { tx_blob } = wallet.sign(tx)
+  return this.submitSigned(tx_blob)
 }
 
 /**
