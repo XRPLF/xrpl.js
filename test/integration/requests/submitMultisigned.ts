@@ -70,7 +70,7 @@ describe('submit_multisigned', function () {
     const accountSetTx = await client.autofill(accountSet, 2)
     const signed1 = signerWallet1.sign(accountSetTx, true)
     const signed2 = signerWallet2.sign(accountSetTx, true)
-    const multisigned = multisign([signed1, signed2])
+    const multisigned = multisign([signed1.tx_blob, signed2.tx_blob])
     const multisignedRequest: SubmitMultisignedRequest = {
       command: 'submit_multisigned',
       tx_json: decode(multisigned) as unknown as Transaction,

@@ -180,16 +180,16 @@ class Wallet {
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    */
-  // eslint-disable-next-line max-lines-per-function --- checks a lot of stuff.
+  // eslint-disable-next-line max-lines-per-function -- introduced more checks to support both string and boolean inputs.
   public sign(
     this: Wallet,
     transaction: Transaction,
     multisign?: boolean | string,
   ): SignedTxBlobHash {
     let multisignAddress: boolean | string = false
-    if (typeof multisign === 'string' && multisign.trim().startsWith('X')) {
+    if (typeof multisign === 'string' && multisign.startsWith('X')) {
       multisignAddress = multisign
-    } else if (typeof multisign === 'boolean' && multisign) {
+    } else if (multisign) {
       multisignAddress = this.getClassicAddress()
     }
 
