@@ -31,7 +31,7 @@ describe('PaymentChannelFund', function () {
       PublicKey: this.wallet.publicKey,
     }
 
-    const paymentChannelResponse = await this.client.submitTransaction(
+    const paymentChannelResponse = await this.client.submit(
       this.wallet,
       paymentChannelCreate,
     )

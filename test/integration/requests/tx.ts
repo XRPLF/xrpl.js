@@ -30,7 +30,7 @@ describe('tx', function () {
       Domain: convertStringToHex('example.com'),
     }
 
-    const response: SubmitResponse = await this.client.submitTransaction(
+    const response: SubmitResponse = await this.client.submit(
       this.wallet,
       accountSet,
     )

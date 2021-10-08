@@ -7,7 +7,7 @@ import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
 import { assertRejects } from '../testUtils'
 
-describe('client.submitSignedTransaction', function () {
+describe('client.submitSigned', function () {
   beforeEach(setupClient)
   afterEach(teardownClient)
 
@@ -31,7 +31,7 @@ describe('client.submitSignedTransaction', function () {
     this.mockRippled.addResponse('submit', rippled.submit.success)
 
     try {
-      const response = await this.client.submitSignedTransaction(signedTx)
+      const response = await this.client.submitSigned(signedTx)
       assert(response.result.engine_result, 'tesSUCCESS')
     } catch (_error) {
       assert(false, 'Did not expect an error to be thrown')
@@ -45,9 +45,7 @@ describe('client.submitSignedTransaction', function () {
     this.mockRippled.addResponse('submit', rippled.submit.success)
 
     try {
-      const response = await this.client.submitSignedTransaction(
-        signedTxEncoded,
-      )
+      const response = await this.client.submitSigned(signedTxEncoded)
       assert(response.result.engine_result, 'tesSUCCESS')
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- error type thrown can be any
@@ -63,7 +61,7 @@ describe('client.submitSignedTransaction', function () {
     this.mockRippled.addResponse('submit', rippled.submit.success)
 
     await assertRejects(
-      this.client.submitSignedTransaction(signedTx),
+      this.client.submitSigned(signedTx),
       ValidationError,
       'Transaction must be signed',
     )

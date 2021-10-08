@@ -6,7 +6,7 @@ import Wallet from 'xrpl-local/wallet'
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
 
-describe('client.submitTransaction', function () {
+describe('client.submit', function () {
   beforeEach(setupClient)
   afterEach(teardownClient)
 
@@ -34,7 +34,7 @@ describe('client.submitTransaction', function () {
     this.mockRippled.addResponse('submit', rippled.submit.success)
 
     try {
-      const response = await this.client.submitTransaction(wallet, tx)
+      const response = await this.client.submit(wallet, tx)
       assert(response.result.engine_result, 'tesSUCCESS')
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- error type thrown can be any
