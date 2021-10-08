@@ -51,7 +51,7 @@ describe('path_find', function () {
   })
 
   // For other stream style tests look at integration/requests/subscribe.ts
-  it('path_find stream succeeds', async function (done) {
+  it('path_find stream succeeds', function (done) {
     generateFundedWallet(this.client)
       .then((wallet2) => {
         const pathFind: PathFindRequest = {

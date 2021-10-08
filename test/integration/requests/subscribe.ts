@@ -4,6 +4,7 @@ import _ from 'lodash'
 import { Client, OfferCreate, SubscribeRequest, Wallet } from 'xrpl-local'
 import { StreamType } from 'xrpl-local/models/common'
 
+import { SubscribeResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup } from '../setup'
 import { ledgerAccept, testTransaction } from '../utils'
@@ -64,19 +65,21 @@ describe('subscribe', function () {
    */
 
   it('Successfully Subscribes', async function () {
-    const result = await this.client.request({
+    const response: SubscribeResponse = await this.client.request({
       command: 'subscribe',
     })
 
-    assert.equal(result.status, 'success')
+    assert.deepEqual(response.result, {})
+    assert.equal(response.type, 'response')
   })
 
   it('Successfully Unsubscribes', async function () {
-    const result = await this.client.request({
+    const response = await this.client.request({
       command: 'unsubscribe',
     })
 
-    assert.equal(result.status, 'success')
+    assert.deepEqual(response.result, {})
+    assert.equal(response.type, 'response')
   })
 
   it('Emits transaction', function (done) {
