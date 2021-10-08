@@ -58,8 +58,8 @@ describe('submit', function () {
           'The transaction was applied. Only final in a validated ledger.',
         tx_blob: signedTx.tx_blob,
         tx_json: {
-          ...(decode(signedTx) as unknown as Transaction),
-          hash: hashSignedTx(signedTx),
+          ...(decode(signedTx.tx_blob) as unknown as Transaction),
+          hash: hashSignedTx(signedTx.tx_blob),
         },
         accepted: true,
         account_sequence_available:
