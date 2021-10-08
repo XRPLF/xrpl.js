@@ -97,7 +97,7 @@ import {
   submitSignedReliable,
 } from '../sugar/submit'
 import { ensureClassicAddress } from '../sugar/utils'
-import generateFaucetWallet from '../wallet/generateFaucetWallet'
+import fundWallet from '../wallet/fundWallet'
 
 import {
   Connection,
@@ -545,7 +545,7 @@ class Client extends EventEmitter {
   public getBalances = getBalances
   public getOrderbook = getOrderbook
 
-  public generateFaucetWallet = generateFaucetWallet
+  public fundWallet = fundWallet
 }
 
 export { Client }
