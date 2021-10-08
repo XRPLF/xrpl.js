@@ -42,7 +42,11 @@ describe('submit', function () {
     const submitResponse = await this.client.request(submitRequest)
 
     await ledgerAccept(this.client)
-    await verifySubmittedTransaction(this.client, signedTx.tx_blob)
+    await verifySubmittedTransaction(
+      this.client,
+      signedTx.tx_blob,
+      signedTx.hash,
+    )
 
     const expectedResponse: SubmitResponse = {
       id: submitResponse.id,

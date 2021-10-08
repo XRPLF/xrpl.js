@@ -44,8 +44,9 @@ export async function generateFundedWallet(client: Client): Promise<Wallet> {
 export async function verifySubmittedTransaction(
   client: Client,
   tx: Transaction | string,
+  hashTx?: string,
 ): Promise<void> {
-  const hash = hashSignedTx(tx)
+  const hash = hashTx ?? hashSignedTx(tx)
   const data = await client.request({
     command: 'tx',
     transaction: hash,
