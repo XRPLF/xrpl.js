@@ -64,9 +64,9 @@ describe('integration tests', function () {
       Domain: convertStringToHex('example.com'),
     }
     const accountSetTx = await client.autofill(accountSet, 2)
-    const signed1 = signerWallet1.sign(accountSetTx, true)
-    const signed2 = signerWallet2.sign(accountSetTx, true)
-    const multisignedTx = multisign([signed1, signed2])
+    const { tx_blob: tx_blob1 } = signerWallet1.sign(accountSetTx, true)
+    const { tx_blob: tx_blob2 } = signerWallet2.sign(accountSetTx, true)
+    const multisignedTx = multisign([tx_blob1, tx_blob2])
     const submitResponse = await client.submitSigned(multisignedTx)
     await ledgerAccept(client)
     assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
