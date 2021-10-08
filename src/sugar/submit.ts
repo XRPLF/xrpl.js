@@ -16,6 +16,29 @@ async function sleep(ms: number): Promise<void> {
 }
 
 /**
+ * Submits an unsigned transaction.
+ * Steps performed on a transaction:
+ *    1. Autofill.
+ *    2. Sign & Encode.
+ *    3. Submit.
+ *
+ * @param this - A Client.
+ * @param wallet - A Wallet to sign a transaction.
+ * @param transaction - A transaction to autofill, sign & encode, and submit.
+ * @returns A promise that contains SubmitResponse.
+ * @throws RippledError if submit request fails.
+ */
+async function submit(
+  this: Client,
+  wallet: Wallet,
+  transaction: Transaction,
+): Promise<SubmitResponse> {
+  const tx = await this.autofill(transaction)
+  const { tx_blob } = wallet.sign(tx)
+  return this.submitSigned(tx_blob)
+}
+
+/**
  * Encodes and submits a signed transaction.
  *
  * @param this - A Client.
@@ -41,29 +64,6 @@ async function submitSigned(
     fail_hard: isAccountDelete(signedTransaction),
   }
   return this.request(request)
-}
-
-/**
- * Submits an unsigned transaction.
- * Steps performed on a transaction:
- *    1. Autofill.
- *    2. Sign & Encode.
- *    3. Submit.
- *
- * @param this - A Client.
- * @param wallet - A Wallet to sign a transaction.
- * @param transaction - A transaction to autofill, sign & encode, and submit.
- * @returns A promise that contains SubmitResponse.
- * @throws RippledError if submit request fails.
- */
-async function submit(
-  this: Client,
-  wallet: Wallet,
-  transaction: Transaction,
-): Promise<SubmitResponse> {
-  const tx = await this.autofill(transaction)
-  const { tx_blob } = wallet.sign(tx)
-  return this.submitSigned(tx_blob)
 }
 
 /**
