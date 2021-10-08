@@ -122,7 +122,7 @@ export function hashLedgerHeader(ledgerHeader: Ledger): string {
  * @param transactions - List of Transactions.
  * @returns The root hash of the SHAMap.
  */
-export function hashTxTreeHash(
+export function hashTxTree(
   transactions: Array<Transaction & { metaData?: Metadata }>,
 ): string {
   const shamap = new SHAMap()
@@ -168,7 +168,7 @@ function computeTransactionHash(
     throw new ValidationError('transactions is missing from the ledger')
   }
 
-  const transactionHash = hashTxTreeHash(ledger.transactions)
+  const transactionHash = hashTxTree(ledger.transactions)
 
   if (transaction_hash !== transactionHash) {
     throw new ValidationError(

@@ -10,7 +10,7 @@ import HashPrefix from './hashPrefix'
 import hashLedger, {
   hashLedgerHeader,
   hashSignedTx,
-  hashTxTreeHash,
+  hashTxTree,
   hashStateTree,
 } from './ledgerHash'
 import ledgerSpaces from './ledgerSpaces'
@@ -177,10 +177,4 @@ export function hashPaymentChannel(
   )
 }
 
-export {
-  hashLedgerHeader,
-  hashSignedTx,
-  hashLedger,
-  hashStateTree,
-  hashTxTreeHash,
-}
+export { hashLedgerHeader, hashSignedTx, hashLedger, hashStateTree, hashTxTree }

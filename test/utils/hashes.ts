@@ -8,7 +8,7 @@ import { OfferCreate, Transaction, ValidationError } from 'xrpl-local'
 
 import {
   hashStateTree,
-  hashTxTreeHash,
+  hashTxTree,
   hashTrustline,
   hashEscrow,
   hashPaymentChannel,
@@ -54,7 +54,7 @@ function createLedgerTest(ledgerIndex: number): void {
     it(`has transaction_hash of ${ledgerJSON.transaction_hash}`, function () {
       assert.equal(
         ledgerJSON.transaction_hash,
-        hashTxTreeHash(ledgerJSON.transactions),
+        hashTxTree(ledgerJSON.transactions),
       )
     })
   })

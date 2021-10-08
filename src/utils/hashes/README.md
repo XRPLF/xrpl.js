@@ -48,7 +48,7 @@ Compute the hash of an order, given the owner's classic address (starting with `
 
 Compute the hash of a trustline, given the two parties' classic addresses (starting with `r`) and the currency code.
 
-### hashTxTreeHash = (transactions: any[]): string
+### hashTxTree = (transactions: any[]): string
 
 ### hashStateTree = (entries: any[]): string
 
