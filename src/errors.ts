@@ -137,7 +137,8 @@ class ValidationError extends XrplError {}
  */
 class XRPLFaucetError extends XrplError {}
 
-/** .
+/**
+ * .
  * Error thrown when xrpl.js cannot retrieve a transaction, ledger, account, etc.
  * From rippled.
  *

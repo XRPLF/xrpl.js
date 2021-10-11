@@ -9,7 +9,7 @@ import { hashSignedTx } from 'xrpl-local/utils/hashes'
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
 
-export async function ledgerAccept(client: any): Promise<void> {
+export async function ledgerAccept(client: Client): Promise<void> {
   const request = { command: 'ledger_accept' }
   await client.connection.request(request)
 }

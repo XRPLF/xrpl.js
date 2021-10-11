@@ -11,12 +11,16 @@ import { BaseTransaction, validateBaseTransaction } from './common'
  */
 export interface AccountDelete extends BaseTransaction {
   TransactionType: 'AccountDelete'
-  /** The address of an account to receive any leftover XRP after deleting the
+  /**
+   * The address of an account to receive any leftover XRP after deleting the
    * sending account. Must be a funded account in the ledger, and must not be.
-   * the sending account. */
+   * the sending account.
+   */
   Destination: string
-  /** Arbitrary destination tag that identifies a hosted recipient or other.
-   * information for the recipient of the deleted account's leftover XRP. */
+  /**
+   * Arbitrary destination tag that identifies a hosted recipient or other.
+   * information for the recipient of the deleted account's leftover XRP.
+   */
   DestinationTag?: number
 }
 

@@ -11,14 +11,18 @@ import { BaseTransaction, validateBaseTransaction } from './common'
  */
 export interface SignerListSet extends BaseTransaction {
   TransactionType: 'SignerListSet'
-  /** A target number for the signer weights. A multi-signature from this list
+  /**
+   * A target number for the signer weights. A multi-signature from this list
    * is valid only if the sum weights of the signatures provided is greater than.
-   * or equal to this value. To delete a signer list, use the value 0. */
+   * or equal to this value. To delete a signer list, use the value 0.
+   */
   SignerQuorum: number
-  /** Array of SignerEntry objects, indicating the addresses and weights of
+  /**
+   * Array of SignerEntry objects, indicating the addresses and weights of
    * signers in this list. This signer list must have at least 1 member and no
    * more than 8 members. No address may appear more than once in the list, nor.
-   * may the Account submitting the transaction appear in the list. */
+   * may the Account submitting the transaction appear in the list.
+   */
   SignerEntries: SignerEntry[]
 }
 

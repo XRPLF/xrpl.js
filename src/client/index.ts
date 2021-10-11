@@ -647,6 +647,11 @@ class Client extends EventEmitter {
   public getOrderbook = getOrderbook
 
   /**
+   * @category Abstraction
+   */
+  public getLedgerIndex = getLedgerIndex
+
+  /**
    * @category Faucet
    */
   public fundWallet = fundWallet

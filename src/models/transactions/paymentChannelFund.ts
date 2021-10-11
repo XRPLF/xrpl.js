@@ -11,20 +11,26 @@ import { BaseTransaction, validateBaseTransaction } from './common'
  */
 export interface PaymentChannelFund extends BaseTransaction {
   TransactionType: 'PaymentChannelFund'
-  /** The unique ID of the channel to fund, as a 64-character hexadecimal.
-   * string. */
+  /**
+   * The unique ID of the channel to fund, as a 64-character hexadecimal.
+   * string.
+   */
   Channel: string
-  /** Amount of XRP, in drops to add to the channel. Must be a positive amount.
-   * of XRP. */
+  /**
+   * Amount of XRP, in drops to add to the channel. Must be a positive amount.
+   * of XRP.
+   */
   Amount: string
-  /** New Expiration time to set for the channel, in seconds since the Ripple
+  /**
+   * New Expiration time to set for the channel, in seconds since the Ripple
    * Epoch. This must be later than either the current time plus the SettleDelay
    * of the channel, or the existing Expiration of the channel. After the
    * Expiration time, any transaction that would access the channel closes the
    * channel without taking its normal action. Any unspent XRP is returned to
    * the source address when the channel closes. (Expiration is separate from
    * the channel's immutable CancelAfter time.) For more information, see the.
-   * PayChannel ledger object type. */
+   * PayChannel ledger object type.
+   */
   Expiration?: number
 }
 

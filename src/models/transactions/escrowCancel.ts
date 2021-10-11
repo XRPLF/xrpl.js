@@ -11,8 +11,10 @@ export interface EscrowCancel extends BaseTransaction {
   TransactionType: 'EscrowCancel'
   /** Address of the source account that funded the escrow payment. */
   Owner: string
-  /** Transaction sequence (or Ticket  number) of EscrowCreate transaction that.
-   * created the escrow to cancel. */
+  /**
+   * Transaction sequence (or Ticket  number) of EscrowCreate transaction that.
+   * created the escrow to cancel.
+   */
   OfferSequence: number
 }
 

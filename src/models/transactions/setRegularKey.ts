@@ -10,9 +10,11 @@ import { BaseTransaction, validateBaseTransaction } from './common'
  */
 export interface SetRegularKey extends BaseTransaction {
   TransactionType: 'SetRegularKey'
-  /**  A base-58-encoded Address that indicates the regular key pair to be
+  /**
+   *  A base-58-encoded Address that indicates the regular key pair to be
    * assigned to the account. If omitted, removes any existing regular key pair.
-   * from the account. Must not match the master key pair for the address. */
+   * from the account. Must not match the master key pair for the address.
+   */
   RegularKey?: string
 }
 

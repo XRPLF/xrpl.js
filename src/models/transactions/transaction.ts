@@ -182,12 +182,3 @@ export function validate(transaction: Record<string, unknown>): void {
     throw new ValidationError(`Invalid Transaction: ${tx.TransactionType}`)
   }
 }
-
-export {
-  AccountSetAsfFlags,
-  AccountSetTfFlags,
-  OfferCreateFlags,
-  PaymentFlags,
-  PaymentChannelClaimFlags,
-  TrustSetFlags,
-}

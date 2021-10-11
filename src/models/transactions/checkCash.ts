@@ -4,7 +4,8 @@ import { Amount } from '../common'
 
 import { BaseTransaction, validateBaseTransaction, isAmount } from './common'
 
-/** Attempts to redeem a Check object in the ledger to receive up to the amount
+/**
+ * Attempts to redeem a Check object in the ledger to receive up to the amount
  * authorized by the corresponding CheckCreate transaction. Only the Destination
  * address of a Check can cash it with a CheckCash transaction.
  *
@@ -12,16 +13,22 @@ import { BaseTransaction, validateBaseTransaction, isAmount } from './common'
  */
 export interface CheckCash extends BaseTransaction {
   TransactionType: 'CheckCash'
-  /** The ID of the Check ledger object to cash, as a 64-character hexadecimal.
-   * string. */
+  /**
+   * The ID of the Check ledger object to cash, as a 64-character hexadecimal.
+   * string.
+   */
   CheckID: string
-  /** Redeem the Check for exactly this amount, if possible. The currency must
+  /**
+   * Redeem the Check for exactly this amount, if possible. The currency must
    * match that of the SendMax of the corresponding CheckCreate transaction. You.
-   * must provide either this field or DeliverMin. */
+   * must provide either this field or DeliverMin.
+   */
   Amount?: Amount
-  /** Redeem the Check for at least this amount and for as much as possible. The
+  /**
+   * Redeem the Check for at least this amount and for as much as possible. The
    * currency must match that of the SendMax of the corresponding CheckCreate.
-   * transaction. You must provide either this field or Amount. */
+   * transaction. You must provide either this field or Amount.
+   */
   DeliverMin?: Amount
 }
 
