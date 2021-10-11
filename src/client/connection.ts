@@ -45,12 +45,10 @@ interface ConnectionOptions {
  */
 export type ConnectionUserOptions = Partial<ConnectionOptions>
 
-/*
- *
+/**
  * Represents an intentionally triggered web-socket disconnect code.
  * WebSocket spec allows 4xxx codes for app/library specific codes.
  * See: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
- *
  */
 export const INTENTIONAL_DISCONNECT_CODE = 4000
 

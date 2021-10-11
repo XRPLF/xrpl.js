@@ -38,7 +38,7 @@ export interface SignedTxBlobHash {
 
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
- * A wallet can be derived from either a seed, Mnemonic, or entropy (array of random numbers).
+ * A wallet can be derived from either a seed, mnemonic, or entropy (array of random numbers).
  * It provides functionality to sign/verify transactions offline.
  *
  * @example

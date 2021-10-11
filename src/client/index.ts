@@ -173,8 +173,7 @@ const MAX_LIMIT = 400
  */
 class Client extends EventEmitter {
   /*
-   * New in > 0.21.0
-   * non-validated ledger versions are allowed, and passed to rippled as-is.
+   * Underlying connection to rippled.
    */
   public readonly connection: Connection
 
@@ -470,12 +469,6 @@ class Client extends EventEmitter {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
   public on(eventName: string, listener: (...args: any[]) => void): this {
-    /*
-     * if (args[0]?.type === 'transaction') {
-     *   handlePartialPaymentStream(args[0])
-     * }
-     */
-
     return super.on(eventName, listener)
   }
 

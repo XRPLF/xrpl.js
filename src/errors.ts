@@ -73,13 +73,6 @@ class RippledError extends XrplError {}
 class UnexpectedError extends XrplError {}
 
 /**
- * Error thrown when xrpl.js.
- *
- * @category Errors
- */
-class LedgerVersionError extends XrplError {}
-
-/**
  * Error thrown when xrpl.js has an error with connection to rippled.
  *
  * @category Errors
@@ -122,8 +115,7 @@ class TimeoutError extends ConnectionError {}
 class ResponseFormatError extends ConnectionError {}
 
 /**
- * Error thrown when xrpl.js sees a malformed transaction. Only used in
- * {@link validate}.
+ * Error thrown when xrpl.js sees a malformed transaction.
  *
  * @category Errors
  */
@@ -167,6 +159,5 @@ export {
   ResponseFormatError,
   ValidationError,
   NotFoundError,
-  LedgerVersionError,
   XRPLFaucetError,
 }
