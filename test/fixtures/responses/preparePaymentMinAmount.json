@@ -1,8 +1,0 @@
-{
-  "txJSON": "{\"Flags\":2147614720,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"ra5nK24KXen9AHvsdFTKHSANinZseWnPcX\",\"Amount\":{\"value\":\"999999999999999900000000000000000000000000000000000000000000000000000000000000000000000000000000\",\"currency\":\"USD\",\"issuer\":\"ra5nK24KXen9AHvsdFTKHSANinZseWnPcX\"},\"SendMax\":{\"value\":\"5\",\"currency\":\"USD\",\"issuer\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\"},\"DeliverMin\":{\"value\":\"4.93463759481038\",\"currency\":\"USD\",\"issuer\":\"ra5nK24KXen9AHvsdFTKHSANinZseWnPcX\"},\"Paths\":[[{\"account\":\"rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B\"},{\"currency\":\"XRP\"},{\"issuer\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\",\"currency\":\"USD\"},{\"account\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"},{\"account\":\"rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn\"}],[{\"account\":\"rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B\"},{\"currency\":\"XRP\"},{\"issuer\":\"rfsEoNBUBbvkf4jPcFe2u9CyaQagLVHGfP\",\"currency\":\"USD\"},{\"account\":\"rfsEoNBUBbvkf4jPcFe2u9CyaQagLVHGfP\"},{\"account\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"}]],\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
-  "instructions": {
-    "fee": "0.000012",
-    "sequence": 23,
-    "maxLedgerVersion": 8820051
-  }
-}
