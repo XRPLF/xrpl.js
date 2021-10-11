@@ -1,6 +1,8 @@
 import { assert } from 'chai'
 
-import { validateAccountSet, validate, ValidationError } from 'xrpl-local'
+import { validate, ValidationError } from 'xrpl-local'
+
+import { validateAccountSet } from '../../src/models/transactions/accountSet'
 
 /**
  * AccountSet Transaction Verification Testing.

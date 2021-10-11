@@ -12,7 +12,7 @@ async function setupClient(this: any, port = defaultPort): Promise<void> {
   return tclient
     .connect()
     .then(async () => {
-      return tclient.connection.request({
+      return tclient.request({
         command: 'test_command',
         data: { openOnOtherPort: true },
       })

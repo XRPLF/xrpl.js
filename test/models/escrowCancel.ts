@@ -1,6 +1,8 @@
 import { assert } from 'chai'
 
-import { validateEscrowCancel, validate, ValidationError } from 'xrpl-local'
+import { validate, ValidationError } from 'xrpl-local'
+
+import { validateEscrowCancel } from '../../src/models/transactions/escrowCancel'
 
 /**
  * Transaction Verification Testing.

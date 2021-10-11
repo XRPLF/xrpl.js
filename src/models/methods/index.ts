@@ -60,7 +60,9 @@ import {
 import { TxRequest, TxResponse } from './tx'
 import { UnsubscribeRequest, UnsubscribeResponse } from './unsubscribe'
 
-// account methods
+/**
+ * @category Requests
+ */
 type Request =
   | AccountChannelsRequest
   | AccountCurrenciesRequest
@@ -101,7 +103,9 @@ type Request =
   | PingRequest
   | RandomRequest
 
-// account methods
+/**
+ * @category Responses
+ */
 type Response =
   | AccountChannelsResponse
   | AccountCurrenciesResponse

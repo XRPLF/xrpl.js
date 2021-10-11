@@ -12,8 +12,6 @@ import responses from '../fixtures/responses'
 describe('generateAddress', function () {
   it('generateAddress', function () {
     assert.deepEqual(
-      // GIVEN entropy of all zeros
-      // WHEN generating an address
       generateXAddress({ entropy: new Array(16).fill(0) }),
 
       // THEN we get the expected return value
@@ -23,12 +21,16 @@ describe('generateAddress', function () {
 
   it('generateAddress invalid entropy', function () {
     assert.throws(() => {
-      // GIVEN entropy of 1 byte
-      // WHEN generating an address
+      /*
+       * GIVEN entropy of 1 byte
+       * WHEN generating an address
+       */
       generateXAddress({ entropy: new Array(1).fill(0) })
 
-      // THEN an UnexpectedError is thrown
-      // because 16 bytes of entropy are required
+      /*
+       * THEN an UnexpectedError is thrown
+       * because 16 bytes of entropy are required
+       */
     }, UnexpectedError)
   })
 

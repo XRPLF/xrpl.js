@@ -171,8 +171,10 @@ async function calculateFeePerTransactionType(
     baseFee = await fetchAccountDeleteFee(client)
   }
 
-  // Multi-signed Transaction
-  // 10 drops × (1 + Number of Signatures Provided)
+  /*
+   * Multi-signed Transaction
+   * 10 drops × (1 + Number of Signatures Provided)
+   */
   if (signersCount > 0) {
     baseFee = BigNumber.sum(baseFee, scaleValue(netFeeDrops, 1 + signersCount))
   }
