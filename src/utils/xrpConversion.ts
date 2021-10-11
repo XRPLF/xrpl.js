@@ -18,8 +18,7 @@ export function dropsToXrp(dropsToConvert: BigNumber.Value): string {
   if (typeof dropsToConvert === 'string') {
     if (dropsToConvert === '.') {
       throw new ValidationError(
-        `dropsToXrp: invalid value '${dropsToConvert}',` +
-          ` should be a BigNumber or string-encoded number.`,
+        `dropsToXrp: invalid value '${dropsToConvert}', should be a BigNumber or string-encoded number.`,
       )
     }
   }
@@ -93,18 +92,14 @@ export function xrpToDrops(xrpToConvert: BigNumber.Value): string {
    */
   if (!SANITY_CHECK.exec(xrp)) {
     throw new ValidationError(
-      `xrpToDrops: failed sanity check -` +
-        ` value '${xrp}',` +
-        ` does not match (^-?[0-9.]+$).`,
+      `xrpToDrops: failed sanity check - value '${xrp}', does not match (^-?[0-9.]+$).`,
     )
   }
 
   const components = xrp.split('.')
   if (components.length > 2) {
     throw new ValidationError(
-      `xrpToDrops: failed sanity check -` +
-        ` value '${xrp}' has` +
-        ` too many decimal points.`,
+      `xrpToDrops: failed sanity check - value '${xrp}' has too many decimal points.`,
     )
   }
 

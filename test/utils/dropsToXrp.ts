@@ -109,6 +109,10 @@ describe('dropsToXrp', function () {
     }, /invalid value/u)
 
     assert.throws(() => {
+      dropsToXrp('1e-7')
+    }, /decimal place/u)
+
+    assert.throws(() => {
       dropsToXrp('2,0')
     }, /invalid value/u)
 
