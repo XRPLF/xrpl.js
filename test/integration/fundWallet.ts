@@ -2,7 +2,12 @@ import assert from 'assert'
 
 import _ from 'lodash'
 
-import { Client, isValidClassicAddress, isValidXAddress } from 'xrpl-local'
+import {
+  Client,
+  isValidClassicAddress,
+  isValidXAddress,
+  dropsToXrp,
+} from 'xrpl-local'
 // how long before each test case times out
 const TIMEOUT = 60000
 // This test is reliant on external networks, and as such may be flaky.
@@ -23,7 +28,7 @@ describe('fundWallet', function () {
       command: 'account_info',
       account: wallet.classicAddress,
     })
-    assert.equal(info.result.account_data.Balance, balance)
+    assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
 
     const { balance: newBalance } = await api.fundWallet(wallet)
 
@@ -32,7 +37,7 @@ describe('fundWallet', function () {
       account: wallet.classicAddress,
     })
 
-    assert.equal(afterSent.result.account_data.Balance, newBalance)
+    assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
 
     await api.disconnect()
   })
@@ -51,7 +56,7 @@ describe('fundWallet', function () {
       account: wallet.classicAddress,
     })
 
-    assert.equal(info.result.account_data.Balance, balance)
+    assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
 
     const { balance: newBalance } = await api.fundWallet(wallet)
 
@@ -59,7 +64,7 @@ describe('fundWallet', function () {
       command: 'account_info',
       account: wallet.classicAddress,
     })
-    assert.equal(afterSent.result.account_data.Balance, newBalance)
+    assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
 
     await api.disconnect()
   })
