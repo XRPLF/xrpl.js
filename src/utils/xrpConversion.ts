@@ -15,16 +15,10 @@ const SANITY_CHECK = /^-?[0-9.]+$/u
  * @throws When drops amount is invalid.
  */
 export function dropsToXrp(dropsToConvert: BigNumber.Value): string {
-  let drops = dropsToConvert
-  if (typeof drops === 'string') {
-    if (!/^-?[0-9]*\.?[0-9]*$/u.exec(drops)) {
+  if (typeof dropsToConvert === 'string') {
+    if (dropsToConvert === '.') {
       throw new ValidationError(
-        `dropsToXrp: invalid value '${drops}',` +
-          ` should be a number matching (^-?[0-9]*\\.?[0-9]*$).`,
-      )
-    } else if (drops === '.') {
-      throw new ValidationError(
-        `dropsToXrp: invalid value '${drops}',` +
+        `dropsToXrp: invalid value '${dropsToConvert}',` +
           ` should be a BigNumber or string-encoded number.`,
       )
     }
@@ -35,7 +29,14 @@ export function dropsToXrp(dropsToConvert: BigNumber.Value): string {
    * decimal point followed by zeros, e.g. '1.00'.
    * Important: specify base 10 to avoid exponential notation, e.g. '1e-7'.
    */
-  drops = new BigNumber(drops).toString(BASE_TEN)
+  const drops = new BigNumber(dropsToConvert).toString(BASE_TEN)
+
+  // check that the
+  if (typeof dropsToConvert === 'string' && drops === 'NaN') {
+    throw new ValidationError(
+      `dropsToXrp: invalid value '${dropsToConvert}', should be a number.`,
+    )
+  }
 
   // drops are only whole units
   if (drops.includes('.')) {
@@ -68,21 +69,27 @@ export function dropsToXrp(dropsToConvert: BigNumber.Value): string {
  * @throws When amount in xrp is invalid.
  */
 export function xrpToDrops(xrpToConvert: BigNumber.Value): string {
-  let xrp = xrpToConvert
-  if (typeof xrp === 'string') {
-    if (!/^-?[0-9]*\.?[0-9]*$/u.exec(xrp)) {
+  if (typeof xrpToConvert === 'string') {
+    // if (!/^-?[0-9]*\.?[0-9]*$/u.exec(xrp)) {
+    // throw new ValidationError(
+    //   `xrpToDrops: invalid value '${xrp}', should be a number matching (^-?[0-9]*\\.?[0-9]*$).`,
+    // )
+    if (xrpToConvert === '.') {
       throw new ValidationError(
-        `xrpToDrops: invalid value '${xrp}', should be a number matching (^-?[0-9]*\\.?[0-9]*$).`,
-      )
-    } else if (xrp === '.') {
-      throw new ValidationError(
-        `xrpToDrops: invalid value '${xrp}', should be a BigNumber or string-encoded number.`,
+        `xrpToDrops: invalid value '${xrpToConvert}', should be a BigNumber or string-encoded number.`,
       )
     }
   }
 
   // Important: specify base 10 to avoid exponential notation, e.g. '1e-7'.
-  xrp = new BigNumber(xrp).toString(BASE_TEN)
+  const xrp = new BigNumber(xrpToConvert).toString(BASE_TEN)
+
+  if (typeof xrpToConvert === 'string' && xrp === 'NaN') {
+    throw new ValidationError(
+      `xrpToDrops: invalid value '${xrpToConvert}', should be a float.`,
+    )
+  }
+
   /*
    * This should never happen; the value has already been
    * validated above. This just ensures BigNumber did not do
