@@ -98,6 +98,9 @@ describe('xrpToDrops', function () {
       xrpToDrops('FOO')
     }, /invalid value/u)
     assert.throws(() => {
+      xrpToDrops('1e-7')
+    }, /decimal place/u)
+    assert.throws(() => {
       xrpToDrops('2,0')
     }, /invalid value/u)
     assert.throws(() => {
