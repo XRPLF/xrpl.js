@@ -12,6 +12,7 @@ describe('Browser Tests', function () {
 
   it('Integration Tests', async function () {
     const browser = await puppeteer.launch({ headless: true })
+    let mocha_results
     try {
       const page = await browser.newPage().catch()
       page.setDefaultNavigationTimeout(0)
@@ -30,7 +31,7 @@ describe('Browser Tests', function () {
         error?: string
       }
 
-      const mocha_results = await page.evaluate(() => {
+      mocha_results = await page.evaluate(() => {
         const results: Array<{ type: string; test: TestCaseInfo[] }> = []
         const items = document.querySelectorAll('.suite')
         items.forEach((item) => {
@@ -62,19 +63,29 @@ describe('Browser Tests', function () {
         return element == null ? null : element.textContent
       })
 
-      console.log('Failed Tests:')
+      expect(fails).to.equal('failures: 0')
+      expect(passes).to.not.equal('passes: 0')
+    } catch {
+      console.log('\x1b[31m', 'Failed Tests:')
+      let count = 0
       for (const result of mocha_results) {
         for (const testCase of result.test) {
           if (Object.prototype.hasOwnProperty.call(testCase, 'error')) {
-            console.log(result.type, JSON.stringify(testCase, null, '\t'))
+            count += 1
+            console.log(
+              `${count})`,
+              result.type,
+              JSON.stringify(testCase, null, '\t'),
+            )
           }
         }
       }
-      expect(fails).to.equal('failures: 0')
-      expect(passes).to.not.equal('passes: 0')
-    } catch (err) {
-      console.log(err)
-      assert(false)
+      console.log(
+        `Total ${count} test${count === 1 ? '' : 's'} failed. \n`,
+        '\x1b[0m',
+      )
+      // we would always want the no. of failing tests to be zero.
+      assert.equal(0, count)
     } finally {
       await browser.close()
     }
