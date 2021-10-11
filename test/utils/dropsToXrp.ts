@@ -84,6 +84,15 @@ describe('dropsToXrp', function () {
     assert.strictEqual(xrp, '-2', '(number) -2 million drops equals -2 XRP')
   })
 
+  it('works with scientific notation', function () {
+    const xrp = dropsToXrp('1e6')
+    assert.strictEqual(
+      xrp,
+      '1',
+      '(scientific notation string) 1e6 drops equals 1 XRP',
+    )
+  })
+
   it('throws with an amount with too many decimal places', function () {
     assert.throws(() => {
       dropsToXrp('1.2')
@@ -97,10 +106,6 @@ describe('dropsToXrp', function () {
   it('throws with an invalid value', function () {
     assert.throws(() => {
       dropsToXrp('FOO')
-    }, /invalid value/u)
-
-    assert.throws(() => {
-      dropsToXrp('1e-7')
     }, /invalid value/u)
 
     assert.throws(() => {

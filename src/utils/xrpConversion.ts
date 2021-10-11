@@ -70,10 +70,6 @@ export function dropsToXrp(dropsToConvert: BigNumber.Value): string {
  */
 export function xrpToDrops(xrpToConvert: BigNumber.Value): string {
   if (typeof xrpToConvert === 'string') {
-    // if (!/^-?[0-9]*\.?[0-9]*$/u.exec(xrp)) {
-    // throw new ValidationError(
-    //   `xrpToDrops: invalid value '${xrp}', should be a number matching (^-?[0-9]*\\.?[0-9]*$).`,
-    // )
     if (xrpToConvert === '.') {
       throw new ValidationError(
         `xrpToDrops: invalid value '${xrpToConvert}', should be a BigNumber or string-encoded number.`,

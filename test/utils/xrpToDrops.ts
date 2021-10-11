@@ -61,17 +61,26 @@ describe('xrpToDrops', function () {
 
   it('works with a number', function () {
     // This is not recommended. Use strings or BigNumber objects to avoid precision errors.
-    let drops = xrpToDrops(2)
+    const drops = xrpToDrops(2)
     assert.strictEqual(
       drops,
       '2000000',
       '(number) 2 XRP equals 2 million drops',
     )
-    drops = xrpToDrops(-2)
+    const drops2 = xrpToDrops(-2)
     assert.strictEqual(
-      drops,
+      drops2,
       '-2000000',
       '(number) -2 XRP equals -2 million drops',
+    )
+  })
+
+  it('works with scientific notation', function () {
+    const drops = xrpToDrops('1e-6')
+    assert.strictEqual(
+      drops,
+      '1',
+      '(scientific notation string) 1e-6 XRP equals 1 drop',
     )
   })
 
@@ -87,9 +96,6 @@ describe('xrpToDrops', function () {
   it('throws with an invalid value', function () {
     assert.throws(() => {
       xrpToDrops('FOO')
-    }, /invalid value/u)
-    assert.throws(() => {
-      xrpToDrops('1e-7')
     }, /invalid value/u)
     assert.throws(() => {
       xrpToDrops('2,0')
