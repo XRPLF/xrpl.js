@@ -27,11 +27,11 @@ describe('integration tests', function () {
   afterEach(teardownClient)
 
   it('isConnected', function () {
-    assert(this.client.isConnected())
+    assert(this.clien.isConnected())
   })
 
   it('submit multisigned transaction', async function () {
-    const client: Client = this.client
+    const client: Client = this.clien
     const signerWallet1 = await generateFundedWallet(client)
     const signerWallet2 = await generateFundedWallet(client)
 

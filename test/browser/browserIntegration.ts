@@ -1,9 +1,12 @@
+/* eslint-disable no-console -- Logging out errors. */
+/* eslint-disable max-depth -- Result object is deeply nested. */
 import path from 'path'
 
 import { expect, assert } from 'chai'
 import puppeteer from 'puppeteer'
 
 const TIMEOUT = 60000
+
 describe('Browser Tests', function () {
   this.timeout(TIMEOUT)
 
@@ -59,25 +62,17 @@ describe('Browser Tests', function () {
         return element == null ? null : element.textContent
       })
 
-      console.log(`%cFailed Tests`, 'color:Red; font-weight:bold;')
+      console.log('Failed Tests:')
       for (const result of mocha_results) {
-        // eslint-disable-next-line max-depth -- result object is deeply nested.
         for (const testCase of result.test) {
-          // eslint-disable-next-line max-depth -- result object is deeply nested.
           if (Object.prototype.hasOwnProperty.call(testCase, 'error')) {
-            console.log(
-              '%c',
-              result.type,
-              ';font-weight:bold;',
-              JSON.stringify(testCase, null, '\t'),
-            )
+            console.log(result.type, JSON.stringify(testCase, null, '\t'))
           }
         }
       }
       expect(fails).to.equal('failures: 0')
       expect(passes).to.not.equal('passes: 0')
     } catch (err) {
-      // eslint-disable-next-line no-console -- only prints if something goes wrong
       console.log(err)
       assert(false)
     } finally {
