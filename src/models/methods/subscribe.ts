@@ -79,7 +79,6 @@ interface BaseStream {
 }
 
 /**
- * .
  * The `ledger` stream only sends `ledgerClosed` messages when the consensus
  * process declares a new validated ledger. The message identifies the ledger
  * And provides some information about its contents.

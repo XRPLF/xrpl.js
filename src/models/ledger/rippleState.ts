@@ -14,8 +14,7 @@ export default interface RippleState extends BaseLedgerEntry {
   /**
    * The balance of the trust line, from the perspective of the low account. A
    * negative balance indicates that the low account has issued currency to the
-   * high account. The issuer in this is always set to the neutral value.
-   * ACCOUNT_ONE.
+   * high account. The issuer is always the neutral value ACCOUNT_ONE.
    */
   Balance: IssuedCurrencyAmount
   /**

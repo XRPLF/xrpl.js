@@ -186,7 +186,7 @@ class Client extends EventEmitter {
   public readonly feeCushion: number
 
   /**
-   * Maximum fee to use with transactions, in XRP. Must be a string-encoded
+   * Maximum transaction cost to allow, in decimal XRP. Must be a string-encoded
    * number. Defaults to '2'.
    *
    * @category Fee

@@ -123,14 +123,14 @@ class ValidationError extends XrplError {}
 
 /**
  * Error thrown when a client cannot generate a wallet from the testnet/devnet
- * faucets.
+ * faucets, or when the client cannot infer the faucet URL (i.e. when the Client
+ * if connected to mainnet).
  *
  * @category Errors
  */
 class XRPLFaucetError extends XrplError {}
 
 /**
- * .
  * Error thrown when xrpl.js cannot retrieve a transaction, ledger, account, etc.
  * From rippled.
  *

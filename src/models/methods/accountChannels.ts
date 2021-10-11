@@ -22,7 +22,7 @@ interface Channel {
  * Channels. This includes only channels where the specified account is the
  * channel's source, not the destination. (A channel's "source" and "owner" are
  * the same.) All information retrieved is relative to a particular version of
- * the ledger. Expects an {@link AccountChannelsResponse}.
+ * the ledger. Returns an {@link AccountChannelsResponse}.
  *
  * @category Requests
  */
@@ -35,7 +35,7 @@ export interface AccountChannelsRequest extends BaseRequest {
    */
   account: string
   /**
-   * The unique identifier of an account, typically the account's Address. If
+   * The unique identifier of an account, typically the account's address. If
    * provided, filter results to payment channels whose destination is this
    * account.
    */

@@ -35,9 +35,9 @@ export interface LedgerEntryRequest extends BaseRequest {
   /*
    * Only one of the following properties should be defined in a single request
    * https://xrpl.org/ledger_entry.html.
+   *
+   * Retrieve any type of ledger object by its unique ID.
    */
-
-  /** Retrieve any type of ledger object by its unique ID. */
   index?: string
 
   /**

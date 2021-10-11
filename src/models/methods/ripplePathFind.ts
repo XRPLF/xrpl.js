@@ -40,7 +40,7 @@ export interface RipplePathFindRequest extends BaseRequest {
   ledger_hash?: string
   /**
    * The ledger index of the ledger to use, or a shortcut string to choose a
-   * Ledger automatically.
+   * ledger automatically.
    */
   ledger_index?: LedgerIndex
 }

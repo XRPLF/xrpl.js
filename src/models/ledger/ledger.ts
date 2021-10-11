@@ -4,15 +4,15 @@ import TransactionMetadata from '../transactions/metadata'
 import LedgerEntry from './ledgerEntry'
 
 /**
- * Every ledger version has a unique header that describes the contents. You.
- * Can look up a ledger's header information with the ledger method.
+ * A ledger is a block of transactions and shared state data. It has a unique
+ * header that describes its contents using cryptographic hashes.
  *
  * @category Ledger Entries
  */
 export default interface Ledger {
   /** The SHA-512Half of this ledger's state tree information. */
   account_hash: string
-  /** All the account-state information in this ledger. */
+  /** All the state information in this ledger. */
   accountState?: LedgerEntry[]
   /** A bit-map of flags relating to the closing of this ledger. */
   close_flags: number
@@ -23,8 +23,8 @@ export default interface Ledger {
    */
   close_time: number
   /**
-   * The time this ledger was closed, in human-readable format. Always uses the.
-   * UTC time zone.
+   * The approximate time this ledger was closed, in human-readable format.
+   * Always uses the UTC time zone.
    */
   close_time_human: string
   /**
@@ -44,7 +44,7 @@ export default interface Ledger {
    * integer; some display it as a native JSON number.
    */
   ledger_index: string
-  /** The time at which the previous ledger was closed. */
+  /** The approximate time at which the previous ledger was closed. */
   parent_close_time: number
   /**
    * Unique identifying hash of the ledger that came immediately before this

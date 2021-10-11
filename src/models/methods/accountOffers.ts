@@ -22,7 +22,7 @@ export interface AccountOffersRequest extends BaseRequest {
   ledger_index?: LedgerIndex
   /**
    * Limit the number of transactions to retrieve. The server is not required
-   * To honor this value. Must be within the inclusive range 10 to 400.
+   * to honor this value. Must be within the inclusive range 10 to 400.
    */
   limit?: number
   /**
@@ -44,17 +44,15 @@ interface AccountOffer {
   /** Sequence number of the transaction that created this entry. */
   seq: number
   /**
-   * The amount the account accepting the offer receives, as a String
-   * representing an amount in XRP, or a currency specification object.
+   * The amount the account placing this Offer receives.
    */
   taker_gets: Amount
   /**
-   * The amount the account accepting the offer provides, as a String
-   * representing an amount in XRP, or a currency specification object.
+   * The amount the account placing this Offer pays.
    */
   taker_pays: Amount
   /**
-   * The exchange rate of the offer, as the ratio of the original taker_pay
+   * The exchange rate of the Offer, as the ratio of the original taker_pays
    * divided by the original taker_gets. When executing offers, the offer with
    * the most favorable (lowest) quality is consumed first; offers with the same
    * quality are executed from oldest to newest.
@@ -62,7 +60,7 @@ interface AccountOffer {
   quality: string
   /**
    * A time after which this offer is considered unfunded, as the number of
-   * Seconds since the Ripple Epoch. See also: Offer Expiration.
+   * seconds since the Ripple Epoch. See also: Offer Expiration.
    */
   expiration?: number
 }

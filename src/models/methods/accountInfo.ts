@@ -6,7 +6,7 @@ import { BaseRequest, BaseResponse } from './baseMethod'
 /**
  * The `account_info` command retrieves information about an account, its
  * activity, and its XRP balance. All information retrieved is relative to a
- * particular version of the ledger. Expects an {@link AccountInfoResponse}.
+ * particular version of the ledger. Returns an {@link AccountInfoResponse}.
  *
  * @category Requests
  */
@@ -22,15 +22,13 @@ export interface AccountInfoRequest extends BaseRequest {
    */
   ledger_index?: LedgerIndex
   /**
-   * F true, and the FeeEscalation amendment is enabled, also returns stats
-   * about queued transactions associated with this account. Can only be used
-   * when querying for the data from the current open ledger. New in: rippled.
-   * 0.33.0  Not available from servers in Reporting Mode.
+   * Whether to get info about this account's queued transactions. Can only be
+   * used when querying for the data from the current open ledger. Not available
+   * from servers in Reporting Mode.
    */
   queue?: boolean
   /**
-   * If true, and the MultiSign amendment is enabled, also returns any.
-   * SignerList objects associated with this account.
+   * Request SignerList objects associated with this account.
    */
   signer_lists?: boolean
   /**

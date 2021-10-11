@@ -11,8 +11,8 @@ import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
 export enum PaymentChannelClaimFlags {
   /**
    * Clear the channel's Expiration time. (Expiration is different from the
-   * channel's immutable CancelAfter time.) Only the source address of the.
-   * Payment channel can use this flag. .
+   * channel's immutable CancelAfter time.) Only the source address of the
+   * payment channel can use this flag.
    */
   tfRenew = 0x00010000,
   /**
@@ -25,8 +25,8 @@ export enum PaymentChannelClaimFlags {
    * the channel to the close time of the previous ledger plus the channel's
    * SettleDelay time, unless the channel already has an earlier Expiration
    * time.) If the destination address uses this flag when the channel still
-   * holds XRP, any XRP that remains after processing the claim is returned to.
-   * The source address. .
+   * holds XRP, any XRP that remains after processing the claim is returned to
+   * the source address.
    */
   tfClose = 0x00020000,
 }
@@ -40,8 +40,8 @@ export enum PaymentChannelClaimFlags {
 export interface PaymentChannelClaimFlagsInterface extends GlobalFlags {
   /**
    * Clear the channel's Expiration time. (Expiration is different from the
-   * channel's immutable CancelAfter time.) Only the source address of the.
-   * Payment channel can use this flag. .
+   * channel's immutable CancelAfter time.) Only the source address of the
+   * payment channel can use this flag.
    */
   tfRenew?: boolean
   /**
@@ -54,15 +54,15 @@ export interface PaymentChannelClaimFlagsInterface extends GlobalFlags {
    * the channel to the close time of the previous ledger plus the channel's
    * SettleDelay time, unless the channel already has an earlier Expiration
    * time.) If the destination address uses this flag when the channel still
-   * holds XRP, any XRP that remains after processing the claim is returned to.
-   * The source address. .
+   * holds XRP, any XRP that remains after processing the claim is returned to
+   * the source address.
    */
   tfClose?: boolean
 }
 
 /**
- * Claim XRP from a payment channel, adjust the payment channel's expiration,.
- * Or both. .
+ * Claim XRP from a payment channel, adjust the payment channel's expiration,
+ * or both.
  */
 export interface PaymentChannelClaim extends BaseTransaction {
   TransactionType: 'PaymentChannelClaim'
@@ -72,27 +72,27 @@ export interface PaymentChannelClaim extends BaseTransaction {
   /**
    * Total amount of XRP, in drops, delivered by this channel after processing
    * this claim. Required to deliver XRP. Must be more than the total amount
-   * delivered by the channel so far, but not greater than the Amount of the.
-   * Signed claim. Must be provided except when closing the channel. .
+   * delivered by the channel so far, but not greater than the Amount of the
+   * signed claim. Must be provided except when closing the channel.
    */
   Balance?: string
   /**
    * The amount of XRP, in drops, authorized by the Signature. This must match
-   * the amount in the signed message. This is the cumulative amount of XRP that.
-   * Can be dispensed by the channel, including XRP previously redeemed. .
+   * the amount in the signed message. This is the cumulative amount of XRP that
+   * can be dispensed by the channel, including XRP previously redeemed.
    */
   Amount?: string
   /**
    * The signature of this claim, as hexadecimal. The signed message contains
-   * the channel ID and the amount of the claim. Required unless the sender of.
-   * The transaction is the source address of the channel. .
+   * the channel ID and the amount of the claim. Required unless the sender of
+   * the transaction is the source address of the channel.
    */
   Signature?: string
   /**
    * The public key used for the signature, as hexadecimal. This must match the
    * PublicKey stored in the ledger for the channel. Required unless the sender
-   * of the transaction is the source address of the channel and the Signature.
-   * Field is omitted.  .
+   * of the transaction is the source address of the channel and the Signature
+   * field is omitted.
    */
   PublicKey?: string
 }

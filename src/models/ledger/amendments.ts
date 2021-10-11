@@ -14,7 +14,7 @@ interface Majority {
 
 /**
  * The Amendments object type contains a list of Amendments that are currently
- * active. Each ledger version contains at most one Amendments object.
+ * active.
  *
  * @category Ledger Entries
  */

@@ -326,7 +326,7 @@ class Wallet {
     const txCopy = { ...tx }
 
     /*
-     * ...And ensure it is equal to the original tx, except:
+     * And ensure it is equal to the original tx, except:
      * - It must have a TxnSignature or Signers (multisign).
      */
     if (!decoded.TxnSignature && !decoded.Signers) {

@@ -14,8 +14,7 @@ interface DisabledValidator {
 export default interface NegativeUNL extends BaseLedgerEntry {
   LedgerEntryType: 'NegativeUNL'
   /**
-   * A list of DisabledValidator objects (see below), each representing a
-   * trusted validator that is currently disabled.
+   * A list of trusted validators that are currently disabled.
    */
   DisabledValidators?: DisabledValidator[]
   /**

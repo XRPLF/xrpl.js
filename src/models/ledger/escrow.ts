@@ -28,10 +28,7 @@ export default interface Escrow extends BaseLedgerEntry {
    */
   Condition?: string
   /**
-   * The held payment can be canceled if and only if this field is present and
-   * the time it specifies has passed. Specifically, this is specified as
-   * seconds since the Ripple Epoch and it "has passed" if it's earlier than the
-   * close time of the previous validated ledger.
+   * The time after which this Escrow is considered expired.
    */
   CancelAfter?: number
   /**

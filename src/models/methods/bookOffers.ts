@@ -9,9 +9,8 @@ export interface TakerAmount {
 }
 
 /**
- * .
  * The book_offers method retrieves a list of offers, also known as the order.
- * Book, between two currencies. Expects an {@link BookOffersResponse}.
+ * Book, between two currencies. Returns an {@link BookOffersResponse}.
  *
  * @category Requests
  */

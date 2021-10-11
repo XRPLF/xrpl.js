@@ -26,19 +26,19 @@ export interface AccountObjectsRequest extends BaseRequest {
   account: string
   /**
    * If included, filter results to include only this type of ledger object.
-   * The valid types are: Check , DepositPreauth, Escrow, Offer, PayChannel,.
+   * The valid types are: Check , DepositPreauth, Escrow, Offer, PayChannel,
    * SignerList, Ticket, and RippleState (trust line).
    */
   type?: AccountObjectType
   /**
-   * If true, the response only includes objects that would block this account.
-   * From being deleted. The default is false.
+   * If true, the response only includes objects that would block this account
+   * from being deleted. The default is false.
    */
   deletion_blockers_only?: boolean
   /** A 20-byte hex string for the ledger version to use. */
   ledger_hash?: string
   /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a.
+   * The ledger index of the ledger to use, or a shortcut string to choose a
    * Ledger automatically.
    */
   ledger_index?: LedgerIndex

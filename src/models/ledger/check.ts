@@ -18,8 +18,8 @@ export default interface Check extends BaseLedgerEntry {
    */
   Destination: string
   /**
-   * A bit-map of boolean flags. No flags are defined for Checks, so this value.
-   * Is always 0.
+   * A bit-map of boolean flags. No flags are defined for Checks, so this value
+   * is always 0.
    */
   Flags: 0
   /**

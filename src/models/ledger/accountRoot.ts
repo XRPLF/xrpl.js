@@ -46,8 +46,8 @@ export default interface AccountRoot extends BaseLedgerEntry {
   /** The md5 hash of an email address. */
   EmailHash?: string
   /**
-   * A public key that may be used to send encrypted messages to this account.
-   * In JSON, uses hexadecimal .
+   * A public key that may be used to send encrypted messages to this account
+   * in JSON, uses hexadecimal.
    */
   MessageKey?: string
   /**
@@ -68,7 +68,7 @@ export default interface AccountRoot extends BaseLedgerEntry {
    */
   TickSize?: number
   /**
-   * A transfer fee  to charge other users for sending currency issued by this
+   * A transfer fee to charge other users for sending currency issued by this
    * account to each other.
    */
   TransferRate?: number

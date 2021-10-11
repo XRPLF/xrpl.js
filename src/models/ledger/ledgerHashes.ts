@@ -1,10 +1,9 @@
 import BaseLedgerEntry from './baseLedgerEntry'
 
 /**
- * .
  * The LedgerHashes objects exist to make it possible to look up a previous
- * ledger's hash with only the current ledger version and at most one lookup of.
- * A previous ledger version.
+ * ledger's hash with only the current ledger version and at most one lookup of
+ * a previous ledger version.
  *
  * @category Ledger Entries
  */

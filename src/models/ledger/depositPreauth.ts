@@ -1,9 +1,8 @@
 import BaseLedgerEntry from './baseLedgerEntry'
 
 /**
- * .
- * A DepositPreauth object tracks a preauthorization from one account to.
- * Another. DepositPreauth transactions create these objects.
+ * A DepositPreauth object tracks a preauthorization from one account to
+ * another. DepositPreauth transactions create these objects.
  *
  * @category Ledger Entries
  */

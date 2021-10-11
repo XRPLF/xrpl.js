@@ -32,14 +32,13 @@ export interface AccountTxRequest extends BaseRequest {
   /** Use to look for transactions from a single ledger only. */
   ledger_index?: LedgerIndex
   /**
-   * Defaults to false. If set to true, returns transactions as hex strings
-   * instead of JSON.
+   * If true, return transactions as hex strings instead of JSON. The default is
+   * false.
    */
   binary?: boolean
   /**
-   * Defaults to false. If set to true, returns values indexed with the oldest
-   * ledger first. Otherwise, the results are indexed with the newest ledger
-   * first.
+   * If true, returns values indexed with the oldest ledger first. Otherwise,
+   * the results are indexed with the newest ledger first.
    */
   forward?: boolean
   /**
