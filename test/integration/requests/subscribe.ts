@@ -12,7 +12,7 @@ import { StreamType } from 'xrpl-local/models/common'
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
-import { ledgerAccept, testTransaction } from '../utils'
+import { ledgerAccept, subscribeDone, testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -28,7 +28,7 @@ async function createTxHandlerTest(
 
   client.on(txStream, (tx) => {
     assert.equal(tx.type, txStream)
-    done()
+    subscribeDone(client, done)
   })
 
   const request: SubscribeRequest = {
@@ -158,7 +158,7 @@ describe('subscribe', function () {
           ledger_time: ledger.ledger_time,
           validated_ledgers: ledger.validated_ledgers,
         })
-        done()
+        subscribeDone(this.client, done)
       })
 
       // Trigger the event

@@ -10,7 +10,7 @@ import {
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
-import { generateFundedWallet, ledgerAccept } from '../utils'
+import { generateFundedWallet, ledgerAccept, subscribeDone } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -93,7 +93,7 @@ describe('path_find', function () {
               _.omit(path, 'id'),
               _.omit(expectedStreamResult, 'id'),
             )
-            done()
+            subscribeDone(this.client, done)
           })
 
           assert.deepEqual(response, expectedResponse)

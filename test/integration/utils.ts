@@ -14,6 +14,11 @@ export async function ledgerAccept(client: Client): Promise<void> {
   await client.connection.request(request)
 }
 
+export function subscribeDone(client: Client, done: Mocha.Done): void {
+  client.removeAllListeners()
+  done()
+}
+
 export async function fundAccount(
   client: Client,
   wallet: Wallet,
