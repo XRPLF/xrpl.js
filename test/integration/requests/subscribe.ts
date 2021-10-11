@@ -17,6 +17,7 @@ import { ledgerAccept, subscribeDone, testTransaction } from '../utils'
 // how long before each test case times out
 const TIMEOUT = 20000
 
+// Note: This test use '.then' to avoid awaits in order to use 'done' style tests.
 // eslint-disable-next-line max-params -- Helps keep things well-typed
 async function createTxHandlerTest(
   client: Client,
@@ -123,6 +124,7 @@ describe('subscribe', function () {
     })
   })
 
+  // Note: This test use '.then' to avoid awaits in order to use 'done' style tests.
   it('Emits ledger', function (done) {
     const request: SubscribeRequest = {
       command: 'subscribe',
