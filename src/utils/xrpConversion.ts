@@ -30,7 +30,7 @@ export function dropsToXrp(dropsToConvert: BigNumber.Value): string {
    */
   const drops = new BigNumber(dropsToConvert).toString(BASE_TEN)
 
-  // check that the
+  // check that the value is valid and actually a number
   if (typeof dropsToConvert === 'string' && drops === 'NaN') {
     throw new ValidationError(
       `dropsToXrp: invalid value '${dropsToConvert}', should be a number.`,
@@ -79,6 +79,7 @@ export function xrpToDrops(xrpToConvert: BigNumber.Value): string {
   // Important: specify base 10 to avoid exponential notation, e.g. '1e-7'.
   const xrp = new BigNumber(xrpToConvert).toString(BASE_TEN)
 
+  // check that the value is valid and actually a number
   if (typeof xrpToConvert === 'string' && xrp === 'NaN') {
     throw new ValidationError(
       `xrpToDrops: invalid value '${xrpToConvert}', should be a float.`,
