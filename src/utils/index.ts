@@ -82,10 +82,15 @@ function convertStringToHex(string: string): string {
 }
 
 /**
- * Determines whether a Response object has a next page of results on the XRPL.
+ * Returns true if there are more pages of data.
  *
- * @param response - The response object to check for the next page.
- * @returns Whether the Response object has a next page to use.
+ * When there are more results than contained in the response, the response
+ * includes a `marker` field.
+ *
+ * See https://ripple.com/build/rippled-apis/#markers-and-pagination.
+ *
+ * @param response - Response to check for more pages on.
+ * @returns Whether the response has more pages of data.
  */
 function hasNextPage(response: Response): boolean {
   // eslint-disable-next-line @typescript-eslint/dot-notation -- only checking if it exists
