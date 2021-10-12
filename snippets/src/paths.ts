@@ -1,5 +1,5 @@
 /* eslint-disable no-console -- logs are helpful to understand snippets */
-import { Client, RipplePathFindResponse } from '../../dist/npm'
+import { Client, Payment, RipplePathFindResponse, Wallet } from '../../dist/npm'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
@@ -7,9 +7,11 @@ void sign()
 
 async function sign(): Promise<void> {
   await client.connect()
-  const resp: RipplePathFindResponse = await client.request({
+
+  const wallet = Wallet.fromSeed('ss1x3KLrSvfg7irFc1D929WXZ7z9H')
+  const request = {
     command: 'ripple_path_find',
-    source_account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+    source_account: wallet.classicAddress,
     source_currencies: [
       {
         currency: 'XRP',
@@ -21,11 +23,25 @@ async function sign(): Promise<void> {
       currency: 'USD',
       issuer: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc',
     },
-  })
+  }
+
+  const resp: RipplePathFindResponse = await client.request(request)
   console.log(resp)
 
   const paths = resp.result.alternatives[0].paths_computed
   console.log(paths)
+
+  const tx: Payment = {
+    TransactionType: 'Payment',
+    Account: wallet.classicAddress,
+    Amount: request.destination_amount,
+    Destination: request.destination_account,
+    Paths: paths,
+  }
+
+  await client.autofill(tx)
+  const signed = wallet.signTransaction(tx)
+  console.log('signed:', signed)
 
   void client.disconnect()
 }
