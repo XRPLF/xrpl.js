@@ -1,4 +1,5 @@
 import type { Amount, Currency, Path, StreamType } from '../common'
+import Offer from '../ledger/offer'
 import { OfferCreate, Transaction } from '../transactions'
 import TransactionMetadata from '../transactions/metadata'
 
@@ -71,8 +72,11 @@ export interface SubscribeRequest extends BaseRequest {
  * @category Responses
  */
 export interface SubscribeResponse extends BaseResponse {
-  result: Record<string, never> | Stream
+  // eslint-disable-next-line @typescript-eslint/ban-types -- actually should be an empty object
+  result: {} | LedgerStreamResponse | BooksSnapshot
 }
+
+type BooksSnapshot = Offer[]
 
 interface BaseStream {
   type: string
@@ -115,6 +119,46 @@ export interface LedgerStream extends BaseStream {
   reserve_inc: number
   /** Number of new transactions included in this ledger version. */
   txn_count: number
+  /**
+   * Range of ledgers that the server has available. This may be a disjoint
+   * sequence such as 24900901-24900984,24901116-24901158. This field is not
+   * returned if the server is not connected to the network, or if it is
+   * connected but has not yet obtained a ledger from the network.
+   */
+  validated_ledgers?: string
+}
+
+/**
+ * This response mirrors the LedgerStream, except it does NOT include the 'type' nor 'txn_count' fields.
+ */
+// eslint-disable-next-line import/no-unused-modules -- Detailed enough to be worth exporting for end users.
+export interface LedgerStreamResponse {
+  /**
+   * The reference transaction cost as of this ledger version, in drops of XRP.
+   * If this ledger version includes a SetFee pseudo-transaction the new.
+   * Transaction cost applies starting with the following ledger version.
+   */
+  fee_base: number
+  /** The reference transaction cost in "fee units". */
+  fee_ref: number
+  /** The identifying hash of the ledger version that was closed. */
+  ledger_hash: string
+  /** The ledger index of the ledger that was closed. */
+  ledger_index: number
+  /** The time this ledger was closed, in seconds since the Ripple Epoch. */
+  ledger_time: number
+  /**
+   * The minimum reserve, in drops of XRP, that is required for an account. If
+   * this ledger version includes a SetFee pseudo-transaction the new base reserve
+   * applies starting with the following ledger version.
+   */
+  reserve_base: number
+  /**
+   * The owner reserve for each object an account owns in the ledger, in drops
+   * of XRP. If the ledger includes a SetFee pseudo-transaction the new owner
+   * reserve applies after this ledger.
+   */
+  reserve_inc: number
   /**
    * Range of ledgers that the server has available. This may be a disjoint
    * sequence such as 24900901-24900984,24901116-24901158. This field is not
@@ -344,10 +388,12 @@ export interface PathFindStream extends BaseStream {
    * Array of objects with suggested paths to take. If empty, then no paths
    * were found connecting the source and destination accounts.
    */
-  alternatives: {
-    paths_computed: Path[]
-    source_amount: Amount
-  }
+  alternatives:
+    | []
+    | {
+        paths_computed: Path[]
+        source_amount: Amount
+      }
 }
 
 /**

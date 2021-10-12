@@ -34,6 +34,7 @@ export * from './requests/noRippleCheck'
 export * from './requests/pathFind'
 export * from './requests/ripplePathFind'
 export * from './requests/submit'
+export * from './requests/subscribe'
 export * from './requests/tx'
 export * from './requests/utility'
 
