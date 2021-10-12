@@ -11,7 +11,7 @@ interface TestCaseInfo {
   error?: string
 }
 
-function getErrorCountAndDisplay(result): number {
+function getCountAndDisplayError(result): number {
   let count = 0
   for (const testCase of result.test) {
     if (Object.prototype.hasOwnProperty.call(testCase, 'error')) {
@@ -84,7 +84,7 @@ describe('Browser Tests', function () {
       console.log('\x1b[31m', 'Failed Tests:')
       let count = 0
       for (const result of mocha_results) {
-        count += getErrorCountAndDisplay(result)
+        count += getCountAndDisplayError(result)
       }
       // '\x1b[0m' specifies that console text color will be reset.
       console.log(
@@ -92,7 +92,7 @@ describe('Browser Tests', function () {
         '\x1b[0m',
       )
 
-      // we would always want the no. of failing tests to be zero.
+      // we would always want the number of failing tests to be zero.
       assert.equal(0, count)
     } finally {
       await browser.close()
