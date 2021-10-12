@@ -197,7 +197,7 @@ async function processSuccessfulResponse(
         wallet: walletToFund,
         balance: await getUpdatedBalance(
           client,
-          walletToFund.getClassicAddress(),
+          walletToFund.classicAddress,
           startingBalance,
         ),
       })

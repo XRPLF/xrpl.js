@@ -50,8 +50,10 @@ describe('path_find', function () {
     assert.deepEqual(response, expectedResponse)
   })
 
-  // For other stream style tests look at integration/requests/subscribe.ts
-  // Note: This test uses '.then' to avoid awaits in order to use 'done' style tests.
+  /**
+   * For other stream style tests look at integration/requests/subscribe.ts
+   * Note: This test uses '.then' to avoid awaits in order to use 'done' style tests.
+   */
   it('path_find stream succeeds', function (done) {
     generateFundedWallet(this.client)
       .then((wallet2) => {
