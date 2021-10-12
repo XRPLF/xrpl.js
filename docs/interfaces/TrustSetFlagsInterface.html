@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>FormattedSettingsTransaction | ripple-lib</title>
-	<meta name="description" content="Documentation for ripple-lib">
+	<title>TrustSetFlagsInterface | xrpl</title>
+	<meta name="description" content="Documentation for xrpl">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
 	<script async src="../assets/js/search.js" id="search-script"></script>
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">ripple-lib</a>
+					<a href="../index.html" class="title">xrpl</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -52,24 +52,37 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="../modules.html">ripple-lib</a>
+					<a href="../modules.html">xrpl</a>
 				</li>
 				<li>
-					<a href="FormattedSettingsTransaction.html">FormattedSettingsTransaction</a>
+					<a href="TrustSetFlagsInterface.html">TrustSetFlagsInterface</a>
 				</li>
 			</ul>
-			<h1>Interface FormattedSettingsTransaction</h1>
+			<h1>Interface TrustSetFlagsInterface</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Map of flags to boolean values representing <a href="TrustSet.html">TrustSet</a> transaction
+						flags.</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">FormattedSettingsTransaction</span>
+						<span class="tsd-signature-type">GlobalFlags</span>
+						<ul class="tsd-hierarchy">
+							<li>
+								<span class="target">TrustSetFlagsInterface</span>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</section>
@@ -80,12 +93,11 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="FormattedSettingsTransaction.html#address" class="tsd-kind-icon">address</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="FormattedSettingsTransaction.html#id" class="tsd-kind-icon">id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="FormattedSettingsTransaction.html#outcome" class="tsd-kind-icon">outcome</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="FormattedSettingsTransaction.html#sequence" class="tsd-kind-icon">sequence</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="FormattedSettingsTransaction.html#specification" class="tsd-kind-icon">specification</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="FormattedSettingsTransaction.html#type" class="tsd-kind-icon">type</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="TrustSetFlagsInterface.html#tfClearFreeze" class="tsd-kind-icon">tf<wbr>Clear<wbr>Freeze</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="TrustSetFlagsInterface.html#tfClearNoRipple" class="tsd-kind-icon">tf<wbr>Clear<wbr>NoRipple</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="TrustSetFlagsInterface.html#tfSetFreeze" class="tsd-kind-icon">tf<wbr>Set<wbr>Freeze</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="TrustSetFlagsInterface.html#tfSetNoRipple" class="tsd-kind-icon">tf<wbr>Set<wbr>NoRipple</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="TrustSetFlagsInterface.html#tfSetfAuth" class="tsd-kind-icon">tf<wbr>Setf<wbr>Auth</a></li>
 							</ul>
 						</section>
 					</div>
@@ -94,64 +106,81 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="address" class="tsd-anchor"></a>
-					<h3>address</h3>
-					<div class="tsd-signature tsd-kind-icon">address<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="tfClearFreeze" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> tf<wbr>Clear<wbr>Freeze</h3>
+					<div class="tsd-signature tsd-kind-icon">tf<wbr>Clear<wbr>Freeze<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/transaction/types.ts#L155">src/transaction/types.ts:155</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/transactions/trustSet.ts#L57">src/models/transactions/trustSet.ts:57</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Unfreeze the trust line.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="id" class="tsd-anchor"></a>
-					<h3>id</h3>
-					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="tfClearNoRipple" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> tf<wbr>Clear<wbr>NoRipple</h3>
+					<div class="tsd-signature tsd-kind-icon">tf<wbr>Clear<wbr>NoRipple<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/transaction/types.ts#L154">src/transaction/types.ts:154</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/transactions/trustSet.ts#L53">src/models/transactions/trustSet.ts:53</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Disable the No Ripple flag, allowing rippling on this trust line.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="outcome" class="tsd-anchor"></a>
-					<h3>outcome</h3>
-					<div class="tsd-signature tsd-kind-icon">outcome<span class="tsd-signature-symbol">:</span> <a href="Outcome.html" class="tsd-signature-type" data-tsd-kind="Interface">Outcome</a></div>
+					<a name="tfSetFreeze" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> tf<wbr>Set<wbr>Freeze</h3>
+					<div class="tsd-signature tsd-kind-icon">tf<wbr>Set<wbr>Freeze<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/transaction/types.ts#L153">src/transaction/types.ts:153</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/transactions/trustSet.ts#L55">src/models/transactions/trustSet.ts:55</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Freeze the trust line.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="sequence" class="tsd-anchor"></a>
-					<h3>sequence</h3>
-					<div class="tsd-signature tsd-kind-icon">sequence<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="tfSetNoRipple" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> tf<wbr>Set<wbr>NoRipple</h3>
+					<div class="tsd-signature tsd-kind-icon">tf<wbr>Set<wbr>NoRipple<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/transaction/types.ts#L156">src/transaction/types.ts:156</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/transactions/trustSet.ts#L51">src/models/transactions/trustSet.ts:51</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Enable the No Ripple flag, which blocks rippling between two trust lines
+							of the same currency if this flag is enabled on both.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="specification" class="tsd-anchor"></a>
-					<h3>specification</h3>
-					<div class="tsd-signature tsd-kind-icon">specification<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">FormattedSettings</span></div>
+					<a name="tfSetfAuth" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> tf<wbr>Setf<wbr>Auth</h3>
+					<div class="tsd-signature tsd-kind-icon">tf<wbr>Setf<wbr>Auth<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/transaction/types.ts#L152">src/transaction/types.ts:152</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/transactions/trustSet.ts#L46">src/models/transactions/trustSet.ts:46</a></li>
 						</ul>
 					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="type" class="tsd-anchor"></a>
-					<h3>type</h3>
-					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/transaction/types.ts#L151">src/transaction/types.ts:151</a></li>
-						</ul>
-					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Authorize the other party to hold currency issued by this account. (No
+							effect unless using the asfRequireAuth AccountSet flag.) Cannot be unset.</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -168,25 +197,22 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="FormattedSettingsTransaction.html" class="tsd-kind-icon">Formatted<wbr>Settings<wbr>Transaction</a>
+						<a href="TrustSetFlagsInterface.html" class="tsd-kind-icon">Trust<wbr>Set<wbr>Flags<wbr>Interface</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="FormattedSettingsTransaction.html#address" class="tsd-kind-icon">address</a>
+								<a href="TrustSetFlagsInterface.html#tfClearFreeze" class="tsd-kind-icon">tf<wbr>Clear<wbr>Freeze</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="FormattedSettingsTransaction.html#id" class="tsd-kind-icon">id</a>
+								<a href="TrustSetFlagsInterface.html#tfClearNoRipple" class="tsd-kind-icon">tf<wbr>Clear<wbr>NoRipple</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="FormattedSettingsTransaction.html#outcome" class="tsd-kind-icon">outcome</a>
+								<a href="TrustSetFlagsInterface.html#tfSetFreeze" class="tsd-kind-icon">tf<wbr>Set<wbr>Freeze</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="FormattedSettingsTransaction.html#sequence" class="tsd-kind-icon">sequence</a>
+								<a href="TrustSetFlagsInterface.html#tfSetNoRipple" class="tsd-kind-icon">tf<wbr>Set<wbr>NoRipple</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="FormattedSettingsTransaction.html#specification" class="tsd-kind-icon">specification</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="FormattedSettingsTransaction.html#type" class="tsd-kind-icon">type</a>
+								<a href="TrustSetFlagsInterface.html#tfSetfAuth" class="tsd-kind-icon">tf<wbr>Setf<wbr>Auth</a>
 							</li>
 						</ul>
 					</li>
@@ -207,6 +233,7 @@
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
 			</ul>
