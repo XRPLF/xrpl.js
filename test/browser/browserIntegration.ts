@@ -6,6 +6,11 @@ import { expect, assert } from 'chai'
 import puppeteer from 'puppeteer'
 
 const TIMEOUT = 60000
+interface TestCaseInfo {
+  name: string
+  span: string
+  error?: string
+}
 
 describe('Browser Tests', function () {
   this.timeout(TIMEOUT)
@@ -25,11 +30,6 @@ describe('Browser Tests', function () {
         'document.querySelector("body").innerText.includes("submit multisigned transaction")',
         { timeout: TIMEOUT },
       )
-      interface TestCaseInfo {
-        name: string
-        span: string
-        error?: string
-      }
 
       mocha_results = await page.evaluate(() => {
         const results: Array<{ type: string; test: TestCaseInfo[] }> = []
