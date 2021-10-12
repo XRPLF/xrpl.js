@@ -3,7 +3,7 @@ import { decode, encode } from 'ripple-binary-codec/dist'
 import { JsonObject } from 'ripple-binary-codec/dist/types/serialized-type'
 
 import { Transaction, ValidationError } from 'xrpl-local'
-import Wallet, { SignedTxBlobHash } from 'xrpl-local/wallet'
+import Wallet from 'xrpl-local/wallet'
 import {
   authorizeChannel,
   multisign,
@@ -179,7 +179,7 @@ describe('Signer', function () {
       hash: 'F73E975C70497A3DA61ADB76A3B39CD971A2DE017419A690BFAD6733B5FD8B3B',
     }
 
-    const signedTx: SignedTxBlobHash = wallet.sign(tx3)
+    const signedTx = wallet.sign(tx3)
     assert.deepEqual(signedTx, signedTxResponse)
   })
 
