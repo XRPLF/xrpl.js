@@ -23,12 +23,17 @@ import {
 import ECDSA from '../ecdsa'
 import { ValidationError } from '../errors'
 import { Transaction } from '../models/transactions'
+import { hashSignedTx } from '../utils/hashes/ledgerHash'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
 
 function hexFromBuffer(buffer: Buffer): string {
   return buffer.toString('hex').toUpperCase()
+}
+export interface SignedTxBlobHash {
+  tx_blob: string
+  hash: string
 }
 
 /**
@@ -47,6 +52,15 @@ class Wallet {
    */
   public readonly classicAddress: string
   public readonly seed?: string
+
+  /**
+   * Alias for wallet.classicAddress.
+   *
+   * @returns The wallet's classic address.
+   */
+  public get address(): string {
+    return this.classicAddress
+  }
 
   /**
    * Creates a new Wallet.
@@ -162,17 +176,23 @@ class Wallet {
    *
    * @param this - Wallet instance.
    * @param transaction - A transaction to be signed offline.
-   * @param multisignAddress - Multisign only. An account address corresponding to the multi-signature being added. If this
-   * wallet represents your [master keypair](https://xrpl.org/cryptographic-keys.html#master-key-pair) you can get your account address
-   * with the Wallet.getClassicAddress() function.
+   * @param multisign - Specify true/false to use multisign or actual address (classic/x-address) to make multisign tx request.
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    */
-  public signTransaction(
+  // eslint-disable-next-line max-lines-per-function -- introduced more checks to support both string and boolean inputs.
+  public sign(
     this: Wallet,
     transaction: Transaction,
-    multisignAddress?: string,
-  ): string {
+    multisign?: boolean | string,
+  ): SignedTxBlobHash {
+    let multisignAddress: boolean | string = false
+    if (typeof multisign === 'string' && multisign.startsWith('X')) {
+      multisignAddress = multisign
+    } else if (multisign) {
+      multisignAddress = this.getClassicAddress()
+    }
+
     if (transaction.TxnSignature || transaction.Signers) {
       throw new ValidationError(
         'txJSON must not contain "TxnSignature" or "Signers" properties',
@@ -202,7 +222,10 @@ class Wallet {
     }
     const serialized = encode(txToSignAndEncode)
     this.checkTxSerialization(serialized, transaction)
-    return serialized
+    return {
+      tx_blob: serialized,
+      hash: hashSignedTx(serialized),
+    }
   }
 
   /**

@@ -3,6 +3,10 @@
 
 import { ValidationError } from '../../errors'
 import {
+  AccountRootFlagsInterface,
+  AccountRootFlags,
+} from '../ledger/accountRoot'
+import {
   AccountSetFlagsInterface,
   AccountSetTfFlags,
 } from '../transactions/accountSet'
@@ -18,6 +22,29 @@ import {
 } from '../transactions/paymentChannelClaim'
 import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlagsInterface, TrustSetFlags } from '../transactions/trustSet'
+
+import { isFlagEnabled } from '.'
+
+/**
+ * Convert an AccountRoot Flags number into an interface for easy interpretation.
+ *
+ * @param flags - A number which is the bitwise and of all enabled AccountRootFlagsInterface.
+ * @returns An interface with all flags as booleans.
+ */
+// eslint-disable-next-line import/no-unused-modules -- Used by end user
+export function parseAccountRootFlags(
+  flags: number,
+): AccountRootFlagsInterface {
+  const flagsInterface: AccountRootFlagsInterface = {}
+
+  Object.keys(AccountRootFlags).forEach((flag) => {
+    if (isFlagEnabled(flags, AccountRootFlags[flag])) {
+      flagsInterface[flag] = true
+    }
+  })
+
+  return flagsInterface
+}
 
 /**
  * Sets a transaction's flags to its numeric representation.

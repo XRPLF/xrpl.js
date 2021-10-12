@@ -31,3 +31,5 @@ export * from './setRegularKey'
 export * from './signerListSet'
 export * from './ticketCreate'
 export { TrustSetFlagsInterface, TrustSet, validateTrustSet } from './trustSet'
+
+export { default as setTransactionFlagsToNumber } from '../utils/flags'
