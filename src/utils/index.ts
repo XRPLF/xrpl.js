@@ -15,6 +15,8 @@ import {
   xAddressToClassicAddress,
 } from 'ripple-address-codec'
 
+import { Response } from '../models/methods'
+
 import getBalanceChanges from './balanceChanges'
 import { deriveKeypair, deriveXAddress } from './derive'
 import { generateXAddress } from './generateAddress'
@@ -98,6 +100,17 @@ function convertStringToHex(string: string): string {
   return Buffer.from(string, 'utf8').toString('hex').toUpperCase()
 }
 
+/**
+ * Determines whether a Response object has a next page of results on the XRPL.
+ *
+ * @param response - The response object to check for the next page.
+ * @returns Whether the Response object has a next page to use.
+ */
+function hasNextPage(response: Response): boolean {
+  // eslint-disable-next-line @typescript-eslint/dot-notation -- only checking if it exists
+  return Boolean(response.result['marker'])
+}
+
 const hashes = {
   hashSignedTx,
   hashTx,
@@ -118,6 +131,7 @@ export {
   dropsToXrp,
   xrpToDrops,
   removeUndefined,
+  hasNextPage,
   rippleTimeToISOTime,
   ISOTimeToRippleTime,
   rippleTimeToUnixTime,
