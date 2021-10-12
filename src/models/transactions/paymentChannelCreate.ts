@@ -30,7 +30,7 @@ export interface PaymentChannelCreate extends BaseTransaction {
   SettleDelay: number
   /**
    * The public key of the key pair the source will use to sign claims against
-   * this channel, in hexadecimal. This can be any secp256k1 or Ed25519 public
+   * this channel in hexadecimal. This can be any secp256k1 or ed25519 public
    * key.
    */
   PublicKey: string

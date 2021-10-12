@@ -1,6 +1,6 @@
 /*
  * import {Client} from '../../dist/npm'
- * import {TransactionMetadata} from '../../src/models/common/transaction'
+ * import {TransactionMetadata} from 'xrpl-local/models/common/transaction'
  */
 
 // const client = new Client('wss://s.altnet.rippletest.net:51233')

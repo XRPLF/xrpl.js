@@ -106,7 +106,7 @@ interface BinaryLedger
 }
 
 /**
- * Response expected from a {@link LedgerResponse}.
+ * Response expected from a {@link LedgerRequest}.
  *
  * @category Responses
  */

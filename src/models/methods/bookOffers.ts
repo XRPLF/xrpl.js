@@ -75,7 +75,7 @@ export interface BookOffer extends Offer {
 }
 
 /**
- * Expected response from a {@link BookOffersResponse}.
+ * Expected response from a {@link BookOffersRequest}.
  *
  * @category Responses
  */

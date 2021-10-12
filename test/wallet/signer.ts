@@ -10,7 +10,7 @@ import {
   verifySignature,
 } from 'xrpl-local/wallet/signer'
 
-import { SignedTxBlobHash } from '../../src/wallet'
+import { SignedTxBlobHash } from 'xrpl-local/wallet'
 
 const publicKey =
   '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'

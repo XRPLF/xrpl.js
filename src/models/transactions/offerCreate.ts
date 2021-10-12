@@ -17,16 +17,16 @@ import {
 export enum OfferCreateFlags {
   /**
    * If enabled, the offer does not consume offers that exactly match it, and
-   * instead becomes an Offer object in the ledger. It still consumes offers.
-   * That cross it. .
+   * instead becomes an Offer object in the ledger. It still consumes offers
+   * that cross it.
    */
   tfPassive = 0x00010000,
   /**
    * Treat the offer as an Immediate or Cancel order. If enabled, the offer
    * never becomes a ledger object: it only tries to match existing offers in
    * the ledger. If the offer cannot match any offers immediately, it executes
-   * "successfully" without trading any currency. In this case, the transaction.
-   * Has the result code tesSUCCESS, but creates no Offer objects in the ledger. .
+   * "successfully" without trading any currency. In this case, the transaction
+   * has the result code tesSUCCESS, but creates no Offer objects in the ledger.
    */
   tfImmediateOrCancel = 0x00020000,
   /**
@@ -34,13 +34,13 @@ export enum OfferCreateFlags {
    * offers in the ledger, and only do so if the entire TakerPays quantity can
    * be obtained. If the fix1578 amendment is enabled and the offer cannot be
    * executed when placed, the transaction has the result code tecKILLED;
-   * otherwise, the transaction uses the result code tesSUCCESS even when it was.
-   * Killed without trading any currency. .
+   * otherwise, the transaction uses the result code tesSUCCESS even when it was
+   * killed without trading any currency.
    */
   tfFillOrKill = 0x00040000,
   /**
-   * Exchange the entire TakerGets amount, even if it means obtaining more than.
-   * The TakerPays amount in exchange. .
+   * Exchange the entire TakerGets amount, even if it means obtaining more than
+   * the TakerPays amount in exchange.
    */
   tfSell = 0x00080000,
 }

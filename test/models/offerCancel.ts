@@ -2,7 +2,7 @@ import { assert } from 'chai'
 
 import { validate, ValidationError } from 'xrpl-local'
 
-import { validateOfferCancel } from '../../src/models/transactions/offerCancel'
+import { validateOfferCancel } from 'xrpl-local/models/transactions/offerCancel'
 
 /**
  * OfferCancel Transaction Verification Testing.

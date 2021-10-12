@@ -15,13 +15,13 @@ import {
  */
 export enum TrustSetFlags {
   /**
-   * Authorize the other party to hold currency issued by this account. (No.
-   * Effect unless using the asfRequireAuth AccountSet flag.) Cannot be unset. .
+   * Authorize the other party to hold currency issued by this account. (No
+   * effect unless using the asfRequireAuth AccountSet flag.) Cannot be unset.
    */
   tfSetfAuth = 0x00010000,
   /**
    * Enable the No Ripple flag, which blocks rippling between two trust lines.
-   * Of the same currency if this flag is enabled on both. .
+   * of the same currency if this flag is enabled on both.
    */
   tfSetNoRipple = 0x00020000,
   /** Disable the No Ripple flag, allowing rippling on this trust line. */
@@ -40,13 +40,13 @@ export enum TrustSetFlags {
  */
 export interface TrustSetFlagsInterface extends GlobalFlags {
   /**
-   * Authorize the other party to hold currency issued by this account. (No.
-   * Effect unless using the asfRequireAuth AccountSet flag.) Cannot be unset. .
+   * Authorize the other party to hold currency issued by this account. (No
+   * effect unless using the asfRequireAuth AccountSet flag.) Cannot be unset.
    */
   tfSetfAuth?: boolean
   /**
-   * Enable the No Ripple flag, which blocks rippling between two trust lines.
-   * Of the same currency if this flag is enabled on both. .
+   * Enable the No Ripple flag, which blocks rippling between two trust lines
+   * of the same currency if this flag is enabled on both.
    */
   tfSetNoRipple?: boolean
   /** Disable the No Ripple flag, allowing rippling on this trust line. */
@@ -65,20 +65,20 @@ export interface TrustSetFlagsInterface extends GlobalFlags {
 export interface TrustSet extends BaseTransaction {
   TransactionType: 'TrustSet'
   /**
-   * Object defining the trust line to create or modify, in the format of a.
+   * Object defining the trust line to create or modify, in the format of a
    * Currency Amount.
    */
   LimitAmount: Amount
   /**
    * Value incoming balances on this trust line at the ratio of this number per
-   * 1,000,000,000 units. A value of 0 is shorthand for treating balances at.
-   * Face value. .
+   * 1,000,000,000 units. A value of 0 is shorthand for treating balances at
+   * face value.
    */
   QualityIn?: number
   /**
    * Value outgoing balances on this trust line at the ratio of this number per
-   * 1,000,000,000 units. A value of 0 is shorthand for treating balances at.
-   * Face value. .
+   * 1,000,000,000 units. A value of 0 is shorthand for treating balances at
+   * face value.
    */
   QualityOut?: number
   Flags?: number | TrustSetFlagsInterface

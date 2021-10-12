@@ -12,26 +12,26 @@ export enum AccountSetAsfFlags {
   /** Require a destination tag to send transactions to this account. */
   asfRequireDest = 1,
   /**
-   * Require authorization for users to hold balances issued by this address.
-   * Can only be enabled if the address has no trust lines connected to it.
+   * Require authorization for users to hold balances issued by this address
+   * can only be enabled if the address has no trust lines connected to it.
    */
   asfRequireAuth = 2,
   /** XRP should not be sent to this account. */
   asfDisallowXRP = 3,
   /**
    * Disallow use of the master key pair. Can only be enabled if the account
-   * has configured another way to sign transactions, such as a Regular Key or a.
+   * has configured another way to sign transactions, such as a Regular Key or a
    * Signer List.
    */
   asfDisableMaster = 4,
   /**
-   * Track the ID of this account's most recent transaction. Required for.
-   * AccountTxnID .
+   * Track the ID of this account's most recent transaction. Required for
+   * AccountTxnID.
    */
   asfAccountTxnID = 5,
   /**
-   * Permanently give up the ability to freeze individual trust lines or.
-   * Disable Global Freeze. This flag can never be disabled after being enabled. .
+   * Permanently give up the ability to freeze individual trust lines or
+   * disable Global Freeze. This flag can never be disabled after being enabled.
    */
   asfNoFreeze = 6,
   /** Freeze all assets issued by this account. */
@@ -101,14 +101,14 @@ export interface AccountSet extends BaseTransaction {
   SetFlag?: AccountSetAsfFlags
   /**
    * The fee to charge when users transfer this account's issued currencies,
-   * represented as billionths of a unit. Cannot be more than 2000000000 or less.
-   * Than 1000000000, except for the special case 0 meaning no fee. .
+   * represented as billionths of a unit. Cannot be more than 2000000000 or less
+   * than 1000000000, except for the special case 0 meaning no fee.
    */
   TransferRate?: number
   /**
    * Tick size to use for offers involving a currency issued by this address.
-   * The exchange rates of those offers is rounded to this many significant.
-   * Digits. Valid values are 3 to 15 inclusive, or 0 to disable. .
+   * The exchange rates of those offers is rounded to this many significant
+   * digits. Valid values are 3 to 15 inclusive, or 0 to disable.
    */
   TickSize?: number
 }

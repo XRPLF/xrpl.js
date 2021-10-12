@@ -37,7 +37,7 @@ const MAX_ATTEMPTS = 20
  * ```typescript
  * const api = new xrpl.Client("wss://s.altnet.rippletest.net:51233")
  * await api.connect()
- * const wallet = await api.generateFaucetWallet()
+ * const wallet = await api.fundWallet()
  * ```
  *
  * @param this - Client.

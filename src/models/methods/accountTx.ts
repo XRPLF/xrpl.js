@@ -74,7 +74,7 @@ interface AccountTransaction {
 }
 
 /**
- * Expected response from an {@link AccountTxResponse}.
+ * Expected response from an {@link AccountTxRequest}.
  *
  * @category Responses
  */

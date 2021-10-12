@@ -32,7 +32,7 @@ export default interface Escrow extends BaseLedgerEntry {
    */
   CancelAfter?: number
   /**
-   * The time, in seconds since the Ripple Epoch, after which this held payment
+   * The time, in seconds, since the Ripple Epoch, after which this held payment
    * can be finished. Any EscrowFinish transaction before this time fails.
    */
   FinishAfter?: number

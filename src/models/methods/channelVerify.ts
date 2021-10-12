@@ -12,7 +12,7 @@ export interface ChannelVerifyRequest extends BaseRequest {
   /** The amount of XRP, in drops, the provided signature authorizes. */
   amount: string
   /**
-   * The Channel ID of the channel that provides the XRP. This is a.
+   * The Channel ID of the channel that provides the XRP. This is a
    * 64-character hexadecimal string.
    */
   channel_id: string

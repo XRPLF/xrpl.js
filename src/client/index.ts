@@ -166,6 +166,8 @@ const DEFAULT_MAX_FEE_XRP = '2'
 const MIN_LIMIT = 10
 const MAX_LIMIT = 400
 
+const NORMAL_DISCONNECT_CODE = 1000
+
 /**
  * Client for interacting with rippled servers.
  *
@@ -229,7 +231,7 @@ class Client extends EventEmitter {
        * Since 4000 is a normal disconnect reason, we convert this to the standard exit code 1000
        */
       if (finalCode === INTENTIONAL_DISCONNECT_CODE) {
-        finalCode = 1000
+        finalCode = NORMAL_DISCONNECT_CODE
       }
       this.emit('disconnected', finalCode)
     })

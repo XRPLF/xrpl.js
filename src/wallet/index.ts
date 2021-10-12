@@ -72,10 +72,9 @@ export interface SignedTxBlobHash {
  *      ...........
  * }).
  *
- * Console.log(signed)
+ * console.log(signed)
  * // '1200007321......B01BE1DFF3'.
- *
- * Console.log(decode(signed))
+ * console.log(decode(signed))
  * // {
  * //   TransactionType: 'Payment',
  * //   SigningPubKey: '02FE9932A9C4AA2AC9F0ED0F2B89302DE7C2C95F91D782DA3CF06E64E1C1216449',

@@ -16,7 +16,7 @@ import {
   hashAccountRoot,
   hashOfferId,
   hashSignerListId,
-} from '../../src/utils/hashes'
+} from 'xrpl-local/utils/hashes'
 import fixtures from '../fixtures/rippled'
 import { assertResultMatch } from '../testUtils'
 

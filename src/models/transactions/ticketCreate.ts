@@ -12,7 +12,7 @@ export interface TicketCreate extends BaseTransaction {
   TransactionType: 'TicketCreate'
   /**
    * How many Tickets to create. This must be a positive number and cannot
-   * cause the account to own more than 250 Tickets after executing this.
+   * cause the account to own more than 250 Tickets after executing this
    * transaction.
    */
   TicketCount: number

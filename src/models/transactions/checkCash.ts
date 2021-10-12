@@ -14,7 +14,7 @@ import { BaseTransaction, validateBaseTransaction, isAmount } from './common'
 export interface CheckCash extends BaseTransaction {
   TransactionType: 'CheckCash'
   /**
-   * The ID of the Check ledger object to cash, as a 64-character hexadecimal.
+   * The ID of the Check ledger object to cash as a 64-character hexadecimal
    * string.
    */
   CheckID: string

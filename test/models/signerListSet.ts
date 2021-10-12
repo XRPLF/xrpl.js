@@ -2,7 +2,7 @@ import { assert } from 'chai'
 
 import { validate, ValidationError } from 'xrpl-local'
 
-import { validateSignerListSet } from '../../src/models/transactions/signerListSet'
+import { validateSignerListSet } from 'xrpl-local/models/transactions/signerListSet'
 
 /**
  * SignerListSet Transaction Verification Testing.

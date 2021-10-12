@@ -90,8 +90,8 @@ export default interface PayChannel extends BaseLedgerEntry {
    */
   CancelAfter?: number
   /**
-   * An arbitrary tag to further specify the source for this payment channel,
-   * such as a hosted recipient at the owner's address.
+   * An arbitrary tag to further specify the source for this payment channel.
+   * Useful for specifying a hosted recipient at the owner's address.
    */
   SourceTag?: number
   /**

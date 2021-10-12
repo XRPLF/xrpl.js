@@ -13,8 +13,8 @@ import { BaseTransaction, validateBaseTransaction } from './common'
 export interface CheckCancel extends BaseTransaction {
   TransactionType: 'CheckCancel'
   /**
-   * The ID of the Check ledger object to cancel, as a 64-character hexadecimal.
-   *  string.
+   * The ID of the Check ledger object to cancel as a 64-character hexadecimal
+   * string.
    */
   CheckID: string
 }

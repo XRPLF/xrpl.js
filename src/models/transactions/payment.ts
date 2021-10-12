@@ -30,8 +30,8 @@ export enum PaymentFlags {
   tfPartialPayment = 0x00020000,
   /**
    * Only take paths where all the conversions have an input:output ratio that
-   * is equal or better than the ratio of Amount:SendMax. See Limit Quality for.
-   * Details. .
+   * is equal or better than the ratio of Amount:SendMax. See Limit Quality for
+   * details.
    */
   tfLimitQuality = 0x00040000,
 }
@@ -57,8 +57,8 @@ export interface PaymentFlagsInterface extends GlobalFlags {
   tfPartialPayment?: boolean
   /**
    * Only take paths where all the conversions have an input:output ratio that
-   * is equal or better than the ratio of Amount:SendMax. See Limit Quality for.
-   * Details. .
+   * is equal or better than the ratio of Amount:SendMax. See Limit Quality for
+   * details.
    */
   tfLimitQuality?: boolean
 }
@@ -73,25 +73,25 @@ export interface Payment extends BaseTransaction {
   TransactionType: 'Payment'
   /**
    * The amount of currency to deliver. For non-XRP amounts, the nested field
-   * names MUST be lower-case. If the tfPartialPayment flag is set, deliver up.
-   * To this amount instead. .
+   * names MUST be lower-case. If the tfPartialPayment flag is set, deliver up
+   * to this amount instead.
    */
   Amount: Amount
   /** The unique address of the account receiving the payment. */
   Destination: string
   /**
-   * Arbitrary tag that identifies the reason for the payment to the.
-   * Destination, or a hosted recipient to pay. .
+   * Arbitrary tag that identifies the reason for the payment to the
+   * destination, or a hosted recipient to pay.
    */
   DestinationTag?: number
   /**
-   * Arbitrary 256-bit hash representing a specific reason or identifier for.
-   * This payment. .
+   * Arbitrary 256-bit hash representing a specific reason or identifier for
+   * this payment.
    */
   InvoiceID?: string
   /**
-   * Array of payment paths to be used for this transaction. Must be omitted.
-   * For XRP-to-XRP transactions. .
+   * Array of payment paths to be used for this transaction. Must be omitted
+   * for XRP-to-XRP transactions.
    */
   Paths?: Path[]
   /**
@@ -99,14 +99,14 @@ export interface Payment extends BaseTransaction {
    * including transfer fees, exchange rates, and slippage . Does not include
    * the XRP destroyed as a cost for submitting the transaction. For non-XRP
    * amounts, the nested field names MUST be lower-case. Must be supplied for
-   * cross-currency/cross-issue payments. Must be omitted for XRP-to-XRP.
-   * Payments. .
+   * cross-currency/cross-issue payments. Must be omitted for XRP-to-XRP
+   * Payments.
    */
   SendMax?: Amount
   /**
    * Minimum amount of destination currency this transaction should deliver.
-   * Only valid if this is a partial payment. For non-XRP amounts, the nested.
-   * Field names are lower-case. .
+   * Only valid if this is a partial payment. For non-XRP amounts, the nested
+   * field names are lower-case.
    */
   DeliverMin?: Amount
   Flags?: number | PaymentFlagsInterface

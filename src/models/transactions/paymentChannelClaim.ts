@@ -67,7 +67,7 @@ export interface PaymentChannelClaimFlagsInterface extends GlobalFlags {
 export interface PaymentChannelClaim extends BaseTransaction {
   TransactionType: 'PaymentChannelClaim'
   Flags?: number | PaymentChannelClaimFlagsInterface
-  /** The unique ID of the channel, as a 64-character hexadecimal string. */
+  /** The unique ID of the channel as a 64-character hexadecimal string. */
   Channel: string
   /**
    * Total amount of XRP, in drops, delivered by this channel after processing
