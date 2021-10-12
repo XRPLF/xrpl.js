@@ -1,8 +1,9 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 
-import { BookOffersRequest, ValidationError } from '../../src'
-import { OfferFlags } from '../../src/models/ledger/offer'
+import { BookOffersRequest, ValidationError } from 'xrpl-local'
+import { OfferFlags } from 'xrpl-local/models/ledger/offer'
+
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'

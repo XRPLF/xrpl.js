@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 
-import { Client } from '../../src'
+import { Client } from 'xrpl-local'
+
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
 

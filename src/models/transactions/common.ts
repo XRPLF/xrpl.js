@@ -104,20 +104,78 @@ export function isAmount(amount: unknown): boolean {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface -- no global flags right now, so this is fine
 export interface GlobalFlags {}
 
+/**
+ * Every transaction has the same set of common fields.
+ */
 export interface BaseTransaction {
+  /** The unique address of the account that initiated the transaction. */
   Account: string
+  /**
+   * The type of transaction. Valid types include: `Payment`, `OfferCreate`,
+   * `SignerListSet`, `EscrowCreate`, `EscrowFinish`, `EscrowCancel`,
+   * `PaymentChannelCreate`, `PaymentChannelFund`, `PaymentChannelClaim`, and
+   * `DepositPreauth`.
+   */
   TransactionType: string
+  /**
+   * Integer amount of XRP, in drops, to be destroyed as a cost for
+   * distributing this transaction to the network. Some transaction types have
+   * different minimum requirements.
+   */
   Fee?: string
+  /**
+   * The sequence number of the account sending the transaction. A transaction
+   * is only valid if the Sequence number is exactly 1 greater than the previous
+   * transaction from the same account. The special case 0 means the transaction
+   * is using a Ticket instead.
+   */
   Sequence?: number
+  /**
+   * Hash value identifying another transaction. If provided, this transaction
+   * is only valid if the sending account's previously-sent transaction matches
+   * the provided hash.
+   */
   AccountTxnID?: string
+  /** Set of bit-flags for this transaction. */
   Flags?: number | GlobalFlags
+  /**
+   * Highest ledger index this transaction can appear in. Specifying this field
+   * places a strict upper limit on how long the transaction can wait to be
+   * validated or rejected.
+   */
   LastLedgerSequence?: number
   // TODO: Make Memo match the format of Signer (By including the Memo: wrapper inside the Interface)
+  /**
+   * Additional arbitrary information used to identify this transaction.
+   */
   Memos?: Array<{ Memo: Memo }>
+  /**
+   * Array of objects that represent a multi-signature which authorizes this
+   * transaction.
+   */
   Signers?: Signer[]
+  /**
+   * Arbitrary integer used to identify the reason for this payment, or a sender
+   * on whose behalf this transaction is made. Conventionally, a refund should
+   * specify the initial payment's SourceTag as the refund payment's
+   * DestinationTag.
+   */
   SourceTag?: number
+  /**
+   * Hex representation of the public key that corresponds to the private key
+   * used to sign this transaction. If an empty string, indicates a
+   * multi-signature is present in the Signers field instead.
+   */
   SigningPubKey?: string
+  /**
+   * The sequence number of the ticket to use in place of a Sequence number. If
+   * this is provided, Sequence must be 0. Cannot be used with AccountTxnID.
+   */
   TicketSequence?: number
+  /**
+   * The signature that verifies this transaction as originating from the
+   * account it says it is from.
+   */
   TxnSignature?: string
 }
 

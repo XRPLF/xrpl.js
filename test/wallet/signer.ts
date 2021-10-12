@@ -10,8 +10,6 @@ import {
   verifySignature,
 } from 'xrpl-local/wallet/signer'
 
-import { SignedTxBlobHash } from '../../src/wallet'
-
 const publicKey =
   '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
 const privateKey =
@@ -181,7 +179,7 @@ describe('Signer', function () {
       hash: 'F73E975C70497A3DA61ADB76A3B39CD971A2DE017419A690BFAD6733B5FD8B3B',
     }
 
-    const signedTx: SignedTxBlobHash = wallet.sign(tx3)
+    const signedTx = wallet.sign(tx3)
     assert.deepEqual(signedTx, signedTxResponse)
   })
 

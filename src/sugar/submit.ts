@@ -6,7 +6,7 @@ import { TxResponse } from '../models/methods'
 import { Transaction } from '../models/transactions'
 import { hashes } from '../utils'
 
-// general time for a ledger to close, in milliseconds
+/** Approximate time for a ledger to close, in milliseconds */
 const LEDGER_CLOSE_TIME = 4000
 
 async function sleep(ms: number): Promise<void> {
@@ -128,10 +128,12 @@ async function submitSignedReliable(
 
 // Helper functions
 
-// The core logic of reliable submission.  Polls the ledger until the result of the
-// transaction can be considered final, meaning it has either been included in a
-// validated ledger, or the transaction's lastLedgerSequence has been surpassed by the
-// latest ledger sequence (meaning it will never be included in a validated ledger).
+/*
+ * The core logic of reliable submission.  This polls the ledger until the result of the
+ * transaction can be considered final, meaning it has either been included in a
+ * validated ledger, or the transaction's lastLedgerSequence has been surpassed by the
+ * latest ledger sequence (meaning it will never be included in a validated ledger).
+ */
 async function waitForFinalTransactionOutcome(
   client: Client,
   txHash: string,

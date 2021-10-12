@@ -31,15 +31,60 @@ const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
 function hexFromBuffer(buffer: Buffer): string {
   return buffer.toString('hex').toUpperCase()
 }
-export interface SignedTxBlobHash {
+interface SignedTxBlobHash {
   tx_blob: string
   hash: string
 }
 
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
- * A wallet can be derived from either a seed, mnemnoic, or entropy (array of random numbers).
+ * A wallet can be derived from either a seed, mnemonic, or entropy (array of random numbers).
  * It provides functionality to sign/verify transactions offline.
+ *
+ * @example
+ * ```typescript
+ * // Derive a wallet from a bip38 Mnemonic
+ * const wallet = Wallet.fromMnemonic(
+ *   'jewel insect retreat jump claim horse second chef west gossip bone frown exotic embark laundry'
+ * )
+ * console.log(wallet)
+ * // Wallet {
+ * // publicKey: '02348F89E9A6A3615BA317F8474A3F51D66221562D3CA32BFA8D21348FF67012B2',
+ * // privateKey: '00A8F2E77FC0E05890C1B5088AFE0ECF9D96466A4419B897B1AB383E336E1735A2',
+ * // classicAddress: 'rwZiksrExmVkR64pf87Jor4cYbmff47SUm',
+ * // seed: undefined
+ * // }.
+ *
+ * // Derive a wallet from a base58 encoded seed.
+ * const seedWallet = Wallet.fromSeed('ssZkdwURFMBXenJPbrpE14b6noJSu')
+ * console.log(seedWallet)
+ * // Wallet {
+ * // publicKey: '02FE9932A9C4AA2AC9F0ED0F2B89302DE7C2C95F91D782DA3CF06E64E1C1216449',
+ * // privateKey: '00445D0A16DD05EFAF6D5AF45E6B8A6DE4170D93C0627021A0B8E705786CBCCFF7',
+ * // classicAddress: 'rG88FVLjvYiQaGftSa1cKuE2qNx7aK5ivo',
+ * // seed: 'ssZkdwURFMBXenJPbrpE14b6noJSu'
+ * // }.
+ *
+ * // Sign a JSON Transaction
+ *  const signed = seedWallet.signTransaction({
+ *      TransactionType: 'Payment',
+ *      Account: 'rG88FVLjvYiQaGftSa1cKuE2qNx7aK5ivo'
+ *      ...........
+ * }).
+ *
+ * console.log(signed)
+ * // '1200007321......B01BE1DFF3'.
+ * console.log(decode(signed))
+ * // {
+ * //   TransactionType: 'Payment',
+ * //   SigningPubKey: '02FE9932A9C4AA2AC9F0ED0F2B89302DE7C2C95F91D782DA3CF06E64E1C1216449',
+ * //   TxnSignature: '3045022100AAD......5B631ABD21171B61B07D304',
+ * //   Account: 'rG88FVLjvYiQaGftSa1cKuE2qNx7aK5ivo'
+ * //   ...........
+ * // }
+ * ```
+ *
+ * @category Offline Signing
  */
 class Wallet {
   public readonly publicKey: string
@@ -279,8 +324,10 @@ class Wallet {
     const decoded = decode(serialized)
     const txCopy = { ...tx }
 
-    // ...And ensure it is equal to the original tx, except:
-    // - It must have a TxnSignature or Signers (multisign).
+    /*
+     * And ensure it is equal to the original tx, except:
+     * - It must have a TxnSignature or Signers (multisign).
+     */
     if (!decoded.TxnSignature && !decoded.Signers) {
       throw new ValidationError(
         'Serialized transaction must have a TxnSignature or Signers property',
@@ -291,14 +338,18 @@ class Wallet {
     // - We know that the original tx did not have Signers, so if it exists, we should delete it:
     delete decoded.Signers
 
-    // - If SigningPubKey was not in the original tx, then we should delete it.
-    //   But if it was in the original tx, then we should ensure that it has not been changed.
+    /*
+     * - If SigningPubKey was not in the original tx, then we should delete it.
+     *   But if it was in the original tx, then we should ensure that it has not been changed.
+     */
     if (!tx.SigningPubKey) {
       delete decoded.SigningPubKey
     }
 
-    // - Memos have exclusively hex data which should ignore case.
-    //   Since decode goes to upper case, we set all tx memos to be uppercase for the comparison.
+    /*
+     * - Memos have exclusively hex data which should ignore case.
+     *   Since decode goes to upper case, we set all tx memos to be uppercase for the comparison.
+     */
     txCopy.Memos?.map((memo) => {
       const memoCopy = { ...memo }
       if (memo.Memo.MemoData) {

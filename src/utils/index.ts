@@ -47,6 +47,7 @@ import { xrpToDrops, dropsToXrp } from './xrpConversion'
  *
  * @param secret - Secret to test for validity.
  * @returns True if secret can be derived into a keypair.
+ * @category Utilities
  */
 function isValidSecret(secret: string): boolean {
   try {

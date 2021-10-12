@@ -47,125 +47,139 @@
 //    */
 //   const payments = []
 
-//   const sourceAccount = (await generateTestnetAccount()).account
-//   console.log(
-//     `Generated new Testnet account: ${sourceAccount.classicAddress}/${sourceAccount.secret}`
-//   )
-//   // Send amounts from 1 drop to 10 drops
-//   for (let i = 1; i <= 10; i++) {
-//     payments.push({
-//       source: sourceAccount,
-//       destination: 'rhsoCozhUxwcyQgzFi1FVRoMVQgk7cZd4L', // Random Testnet destination
-//       amount_drops: i.toString()
-//     })
-//   }
-//   const results = await performPayments(payments)
-//   console.log(JSON.stringify(results, null, 2))
-//   process.exit(0)
-// }
+/*
+ *   const sourceAccount = (await generateTestnetAccount()).account
+ *   console.log(
+ *     `Generated new Testnet account: ${sourceAccount.classicAddress}/${sourceAccount.secret}`
+ *   )
+ *   // Send amounts from 1 drop to 10 drops
+ *   for (let i = 1; i <= 10; i++) {
+ *     payments.push({
+ *       source: sourceAccount,
+ *       destination: 'rhsoCozhUxwcyQgzFi1FVRoMVQgk7cZd4L', // Random Testnet destination
+ *       amount_drops: i.toString()
+ *     })
+ *   }
+ *   const results = await performPayments(payments)
+ *   console.log(JSON.stringify(results, null, 2))
+ *   process.exit(0)
+ * }
+ */
 
-// async function performPayments(payments) {
-//   const finalResults = []
-//   const txFinalizedPromises = []
-//   const client = new Client('wss://s.altnet.rippletest.net:51233')
-//   await client.connect()
+/*
+ * async function performPayments(payments) {
+ *   const finalResults = []
+ *   const txFinalizedPromises = []
+ *   const client = new Client('wss://s.altnet.rippletest.net:51233')
+ *   await client.connect()
+ */
 
-//   for (let i = 0; i < payments.length; i++) {
-//     const payment = payments[i]
-//     const account_info: AccountInfoResponse = await client.request({
-//       command: 'account_info',
-//       account: payment.source.classicAddress,
-//       ledger_index: 'current'
-//     })
-//     const sequence = account_info.result.account_data.Sequence
-//     const preparedPayment = await client.preparePayment(
-//       payment.source.classicAddress,
-//       {
-//         source: {
-//           address: payment.source.classicAddress,
-//           amount: {
-//             value: payment.amount_drops,
-//             currency: 'drops'
-//           }
-//         },
-//         destination: {
-//           address: payment.destination,
-//           minAmount: {
-//             value: payment.amount_drops,
-//             currency: 'drops'
-//           }
-//         }
-//       },
-//       {
-//         sequence
-//       }
-//     )
-//     const signed = client.sign(preparedPayment.txJSON, payment.source.secret)
-//     finalResults.push({
-//       id: signed.id
-//     })
-//     const response = await client.request({
-//       command: 'submit',
-//       tx_blob: signed.signedTransaction
-//     })
+/*
+ *   for (let i = 0; i < payments.length; i++) {
+ *     const payment = payments[i]
+ *     const account_info: AccountInfoResponse = await client.request({
+ *       command: 'account_info',
+ *       account: payment.source.classicAddress,
+ *       ledger_index: 'current'
+ *     })
+ *     const sequence = account_info.result.account_data.Sequence
+ *     const preparedPayment = await client.preparePayment(
+ *       payment.source.classicAddress,
+ *       {
+ *         source: {
+ *           address: payment.source.classicAddress,
+ *           amount: {
+ *             value: payment.amount_drops,
+ *             currency: 'drops'
+ *           }
+ *         },
+ *         destination: {
+ *           address: payment.destination,
+ *           minAmount: {
+ *             value: payment.amount_drops,
+ *             currency: 'drops'
+ *           }
+ *         }
+ *       },
+ *       {
+ *         sequence
+ *       }
+ *     )
+ *     const signed = client.sign(preparedPayment.txJSON, payment.source.secret)
+ *     finalResults.push({
+ *       id: signed.id
+ *     })
+ *     const response = await client.request({
+ *       command: 'submit',
+ *       tx_blob: signed.signedTransaction
+ *     })
+ */
 
-//     // Most of the time we'll get 'tesSUCCESS' or (after many submissions) 'terQUEUED'
-//     console.log(`tx ${i} - tentative: ${response.result.engine_result}`)
+/*
+ *     // Most of the time we'll get 'tesSUCCESS' or (after many submissions) 'terQUEUED'
+ *     console.log(`tx ${i} - tentative: ${response.result.engine_result}`)
+ */
 
-//     const txFinalizedPromise = new Promise<void>((resolve) => {
-//       const ledgerClosedCallback = async (event: LedgerClosedEvent) => {
-//         let status
-//         try {
-//           status = await client.request({command: 'tx', transaction: signed.id})
-//         } catch (e) {
-//           // Typical error when the tx hasn't been validated yet:
-//           if (e.name !== 'MissingLedgerHistoryError') {
-//             console.log(e)
-//           }
+/*
+ *     const txFinalizedPromise = new Promise<void>((resolve) => {
+ *       const ledgerClosedCallback = async (event: LedgerClosedEvent) => {
+ *         let status
+ *         try {
+ *           status = await client.request({command: 'tx', transaction: signed.id})
+ *         } catch (e) {
+ *           // Typical error when the tx hasn't been validated yet:
+ *           if (e.name !== 'MissingLedgerHistoryError') {
+ *             console.log(e)
+ *           }
+ */
 
-//           if (
-//             event.ledger_index >
-//             preparedPayment.instructions.maxLedgerVersion + 3
-//           ) {
-//             // Assumptions:
-//             // - We are still connected to the same rippled server
-//             // - No ledger gaps occurred
-//             // - All ledgers between the time we submitted the tx and now have been checked for the tx
-//             status = {
-//               finalResult:
-//                 'Transaction was not, and never will be, included in a validated ledger'
-//             }
-//           } else {
-//             // Check again later:
-//             client.connection.once('ledgerClosed', ledgerClosedCallback)
-//             return
-//           }
-//         }
+/*
+ *           if (
+ *             event.ledger_index >
+ *             preparedPayment.instructions.maxLedgerVersion + 3
+ *           ) {
+ *             // Assumptions:
+ *             // - We are still connected to the same rippled server
+ *             // - No ledger gaps occurred
+ *             // - All ledgers between the time we submitted the tx and now have been checked for the tx
+ *             status = {
+ *               finalResult:
+ *                 'Transaction was not, and never will be, included in a validated ledger'
+ *             }
+ *           } else {
+ *             // Check again later:
+ *             client.connection.once('ledgerClosed', ledgerClosedCallback)
+ *             return
+ *           }
+ *         }
+ */
 
-//         for (let j = 0; j < finalResults.length; j++) {
-//           if (finalResults[j].id === signed.id) {
-//             finalResults[j].result = status.address
-//               ? {
-//                   source: status.address,
-//                   destination: status.specification.destination.address,
-//                   deliveredAmount: status.outcome.deliveredAmount,
-//                   result: status.outcome.result,
-//                   timestamp: status.outcome.timestamp,
-//                   ledgerVersion: status.outcome.ledgerVersion
-//                 }
-//               : status
-//             process.stdout.write('.')
-//             return resolve()
-//           }
-//         }
-//       }
-//       client.connection.once('ledgerClosed', ledgerClosedCallback)
-//     })
-//     txFinalizedPromises.push(txFinalizedPromise)
-//   }
-//   await Promise.all(txFinalizedPromises)
-//   return finalResults
-// }
+/*
+ *         for (let j = 0; j < finalResults.length; j++) {
+ *           if (finalResults[j].id === signed.id) {
+ *             finalResults[j].result = status.address
+ *               ? {
+ *                   source: status.address,
+ *                   destination: status.specification.destination.address,
+ *                   deliveredAmount: status.outcome.deliveredAmount,
+ *                   result: status.outcome.result,
+ *                   timestamp: status.outcome.timestamp,
+ *                   ledgerVersion: status.outcome.ledgerVersion
+ *                 }
+ *               : status
+ *             process.stdout.write('.')
+ *             return resolve()
+ *           }
+ *         }
+ *       }
+ *       client.connection.once('ledgerClosed', ledgerClosedCallback)
+ *     })
+ *     txFinalizedPromises.push(txFinalizedPromise)
+ *   }
+ *   await Promise.all(txFinalizedPromises)
+ *   return finalResults
+ * }
+ */
 
 // /**
 //  * Generate a new Testnet account by requesting one from the faucet.
@@ -194,22 +208,24 @@
 //       response.on('end', () => {
 //         const body = Buffer.concat(chunks).toString()
 
-//         // "application/json; charset=utf-8"
-//         if (response.headers['content-type'].startsWith('application/json')) {
-//           resolve(JSON.parse(body))
-//         } else {
-//           reject({
-//             statusCode: response.statusCode,
-//             contentType: response.headers['content-type'],
-//             body
-//           })
-//         }
-//       })
-//     })
-//     request.on('error', (error) => {
-//       console.error(error)
-//       reject(error)
-//     })
-//     request.end()
-//   })
-// }
+/*
+ *         // "application/json; charset=utf-8"
+ *         if (response.headers['content-type'].startsWith('application/json')) {
+ *           resolve(JSON.parse(body))
+ *         } else {
+ *           reject({
+ *             statusCode: response.statusCode,
+ *             contentType: response.headers['content-type'],
+ *             body
+ *           })
+ *         }
+ *       })
+ *     })
+ *     request.on('error', (error) => {
+ *       console.error(error)
+ *       reject(error)
+ *     })
+ *     request.end()
+ *   })
+ * }
+ */

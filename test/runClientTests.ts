@@ -12,8 +12,10 @@ import { Client } from 'xrpl-local'
  */
 
 describe('Client', function () {
-  // doesn't need a functional client, just needs to instantiate to get a list of public methods
-  // (to determine what methods are missing from )
+  /*
+   * Doesn't need a functional client, just needs to instantiate to get a list of public methods
+   * (to determine what methods are missing from )
+   */
 
   const allPublicMethods = getAllPublicMethods(new Client('wss://'))
 

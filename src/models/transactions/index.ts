@@ -1,35 +1,33 @@
-// TODO: replace * imports with direct imports
-export * from './transaction'
+export { validate, TransactionAndMetadata, Transaction } from './transaction'
 export {
+  AccountSetAsfFlags,
+  AccountSetTfFlags,
   AccountSetFlagsInterface,
   AccountSet,
-  validateAccountSet,
 } from './accountSet'
-export * from './accountDelete'
-export * from './checkCancel'
-export * from './checkCash'
-export * from './checkCreate'
-export * from './depositPreauth'
-export * from './escrowCancel'
-export * from './escrowCreate'
-export * from './escrowFinish'
-export * from './offerCancel'
+export { AccountDelete } from './accountDelete'
+export { CheckCancel } from './checkCancel'
+export { CheckCash } from './checkCash'
+export { CheckCreate } from './checkCreate'
+export { DepositPreauth } from './depositPreauth'
+export { EscrowCancel } from './escrowCancel'
+export { EscrowCreate } from './escrowCreate'
+export { EscrowFinish } from './escrowFinish'
+export { OfferCancel } from './offerCancel'
 export {
+  OfferCreateFlags,
   OfferCreateFlagsInterface,
   OfferCreate,
-  validateOfferCreate,
 } from './offerCreate'
-export { PaymentFlagsInterface, Payment, validatePayment } from './payment'
+export { PaymentFlags, PaymentFlagsInterface, Payment } from './payment'
 export {
+  PaymentChannelClaimFlags,
   PaymentChannelClaimFlagsInterface,
   PaymentChannelClaim,
-  validatePaymentChannelClaim,
 } from './paymentChannelClaim'
-export * from './paymentChannelCreate'
-export * from './paymentChannelFund'
-export * from './setRegularKey'
-export * from './signerListSet'
-export * from './ticketCreate'
-export { TrustSetFlagsInterface, TrustSet, validateTrustSet } from './trustSet'
-
-export { default as setTransactionFlagsToNumber } from '../utils/flags'
+export { PaymentChannelCreate } from './paymentChannelCreate'
+export { PaymentChannelFund } from './paymentChannelFund'
+export { SetRegularKey } from './setRegularKey'
+export { SignerListSet } from './signerListSet'
+export { TicketCreate } from './ticketCreate'
+export { TrustSetFlagsInterface, TrustSetFlags, TrustSet } from './trustSet'

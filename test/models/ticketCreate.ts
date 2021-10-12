@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 
-import { validateTicketCreate, validate, ValidationError } from 'xrpl-local'
+import { validate, ValidationError } from 'xrpl-local'
+import { validateTicketCreate } from 'xrpl-local/models/transactions/ticketCreate'
 
 /**
  * TicketCreate Transaction Verification Testing.

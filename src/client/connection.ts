@@ -45,11 +45,11 @@ interface ConnectionOptions {
  */
 export type ConnectionUserOptions = Partial<ConnectionOptions>
 
-//
-// Represents an intentionally triggered web-socket disconnect code.
-// WebSocket spec allows 4xxx codes for app/library specific codes.
-// See: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
-//
+/**
+ * Represents an intentionally triggered web-socket disconnect code.
+ * WebSocket spec allows 4xxx codes for app/library specific codes.
+ * See: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
+ */
 export const INTENTIONAL_DISCONNECT_CODE = 4000
 
 type WebsocketState = 0 | 1 | 2 | 3
@@ -129,8 +129,10 @@ function createWebSocket(
   )
   const websocketOptions = { ...options, ...optionsOverrides }
   const websocket = new WebSocket(url, websocketOptions)
-  // we will have a listener for each outstanding request,
-  // so we have to raise the limit (the default is 10)
+  /*
+   * we will have a listener for each outstanding request,
+   * so we have to raise the limit (the default is 10)
+   */
   if (typeof websocket.setMaxListeners === 'function') {
     websocket.setMaxListeners(Infinity)
   }
@@ -289,9 +291,11 @@ export class Connection extends EventEmitter {
       if (this.ws != null) {
         this.ws.once('close', (code) => resolve(code))
       }
-      // Connection already has a disconnect handler for the disconnect logic.
-      // Just close the websocket manually (with our "intentional" code) to
-      // trigger that.
+      /*
+       * Connection already has a disconnect handler for the disconnect logic.
+       * Just close the websocket manually (with our "intentional" code) to
+       * trigger that.
+       */
       if (this.ws != null && this.state !== WebSocket.CLOSING) {
         this.ws.close(INTENTIONAL_DISCONNECT_CODE)
       }
@@ -302,9 +306,11 @@ export class Connection extends EventEmitter {
    * Disconnect the websocket, then connect again.
    */
   public async reconnect(): Promise<void> {
-    // NOTE: We currently have a "reconnecting" event, but that only triggers
-    // through an unexpected connection retry logic.
-    // See: https://github.com/XRPLF/xrpl.js/pull/1101#issuecomment-565360423
+    /*
+     * NOTE: We currently have a "reconnecting" event, but that only triggers
+     * through an unexpected connection retry logic.
+     * See: https://github.com/XRPLF/xrpl.js/pull/1101#issuecomment-565360423
+     */
     this.emit('reconnect')
     await this.disconnect()
     await this.connect()
@@ -465,8 +471,10 @@ export class Connection extends EventEmitter {
     const retryTimeout = this.retryConnectionBackoff.duration()
     this.trace('reconnect', `Retrying connection in ${retryTimeout}ms.`)
     this.emit('reconnecting', this.retryConnectionBackoff.attempts)
-    // Start the reconnect timeout, but set it to `this.reconnectTimeoutID`
-    // so that we can cancel one in-progress on disconnect.
+    /*
+     * Start the reconnect timeout, but set it to `this.reconnectTimeoutID`
+     * so that we can cancel one in-progress on disconnect.
+     */
     this.reconnectTimeoutID = setTimeout(() => {
       this.reconnect().catch((error: Error) => {
         this.emit('error', 'reconnect', error.message, error)
@@ -516,8 +524,10 @@ export class Connection extends EventEmitter {
     if (this.ws) {
       this.ws.removeAllListeners()
       this.ws.on('error', () => {
-        // Correctly listen for -- but ignore -- any future errors: If you
-        // don't have a listener on "error" node would log a warning on error.
+        /*
+         * Correctly listen for -- but ignore -- any future errors: If you
+         * don't have a listener on "error" node would log a warning on error.
+         */
       })
       this.ws.close()
       this.ws = null

@@ -8,12 +8,7 @@ import { ValidationError } from '../../errors'
 import setTransactionFlagsToNumber from '../utils/flags'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'
-import {
-  AccountSet,
-  validateAccountSet,
-  AccountSetAsfFlags,
-  AccountSetTfFlags,
-} from './accountSet'
+import { AccountSet, validateAccountSet } from './accountSet'
 import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
@@ -23,16 +18,11 @@ import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
 import TransactionMetadata from './metadata'
 import { OfferCancel, validateOfferCancel } from './offerCancel'
-import {
-  OfferCreate,
-  validateOfferCreate,
-  OfferCreateFlags,
-} from './offerCreate'
-import { Payment, validatePayment, PaymentFlags } from './payment'
+import { OfferCreate, validateOfferCreate } from './offerCreate'
+import { Payment, validatePayment } from './payment'
 import {
   PaymentChannelClaim,
   validatePaymentChannelClaim,
-  PaymentChannelClaimFlags,
 } from './paymentChannelClaim'
 import {
   PaymentChannelCreate,
@@ -45,7 +35,7 @@ import {
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
-import { TrustSet, validateTrustSet, TrustSetFlags } from './trustSet'
+import { TrustSet, validateTrustSet } from './trustSet'
 
 export type Transaction =
   | AccountDelete
@@ -181,13 +171,4 @@ export function validate(transaction: Record<string, unknown>): void {
   ) {
     throw new ValidationError(`Invalid Transaction: ${tx.TransactionType}`)
   }
-}
-
-export {
-  AccountSetAsfFlags,
-  AccountSetTfFlags,
-  OfferCreateFlags,
-  PaymentFlags,
-  PaymentChannelClaimFlags,
-  TrustSetFlags,
 }

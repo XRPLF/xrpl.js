@@ -35,9 +35,11 @@ function multisign(transactions: Array<Transaction | string>): string {
   transactions.forEach((txOrBlob) => {
     const tx: Transaction = getDecodedTransaction(txOrBlob)
 
-    // This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
-    // TODO: Replace this with validate() (The general validation function for all Transactions)
-    // also make validate accept '| Transaction' to avoid type casting here.
+    /*
+     * This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
+     * TODO: Replace this with validate() (The general validation function for all Transactions)
+     * also make validate accept '| Transaction' to avoid type casting here.
+     */
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
     validateBaseTransaction(tx as unknown as Record<string, unknown>)
     if (tx.Signers == null || tx.Signers.length === 0) {
