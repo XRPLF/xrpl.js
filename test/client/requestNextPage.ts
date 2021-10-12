@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { Client } from 'xrpl-local'
+import { hasNextPage } from 'xrpl-local'
 
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
@@ -36,7 +36,7 @@ describe('client.requestNextPage', function () {
       { command: 'ledger_data' },
       response,
     )
-    assert(!Client.hasNextPage(responseNextPage))
+    assert(!hasNextPage(responseNextPage))
     await assertRejects(
       this.client.requestNextPage({ command: 'ledger_data' }, responseNextPage),
       Error,
