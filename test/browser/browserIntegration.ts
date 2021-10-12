@@ -1,5 +1,4 @@
 /* eslint-disable no-console -- Logging out errors. */
-/* eslint-disable max-depth -- Result object is deeply nested. */
 import path from 'path'
 
 import { expect, assert } from 'chai'
@@ -10,6 +9,21 @@ interface TestCaseInfo {
   name: string
   span: string
   error?: string
+}
+
+function getErrorCountAndDisplay(result): number {
+  let count = 0
+  for (const testCase of result.test) {
+    if (Object.prototype.hasOwnProperty.call(testCase, 'error')) {
+      count += 1
+      console.log(
+        `${count})`,
+        result.type,
+        JSON.stringify(testCase, null, '\t'),
+      )
+    }
+  }
+  return count
 }
 
 describe('Browser Tests', function () {
@@ -70,16 +84,7 @@ describe('Browser Tests', function () {
       console.log('\x1b[31m', 'Failed Tests:')
       let count = 0
       for (const result of mocha_results) {
-        for (const testCase of result.test) {
-          if (Object.prototype.hasOwnProperty.call(testCase, 'error')) {
-            count += 1
-            console.log(
-              `${count})`,
-              result.type,
-              JSON.stringify(testCase, null, '\t'),
-            )
-          }
-        }
+        count += getErrorCountAndDisplay(result)
       }
       // '\x1b[0m' specifies that console text color will be reset.
       console.log(
