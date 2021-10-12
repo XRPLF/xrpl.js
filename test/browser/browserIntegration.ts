@@ -66,6 +66,7 @@ describe('Browser Tests', function () {
       expect(fails).to.equal('failures: 0')
       expect(passes).to.not.equal('passes: 0')
     } catch {
+      // '\x1b[31m' specifies that console text will be displayed in color red here on.
       console.log('\x1b[31m', 'Failed Tests:')
       let count = 0
       for (const result of mocha_results) {
@@ -80,10 +81,12 @@ describe('Browser Tests', function () {
           }
         }
       }
+      // '\x1b[0m' specifies that console text color will be reset.
       console.log(
         `Total ${count} test${count === 1 ? '' : 's'} failed. \n`,
         '\x1b[0m',
       )
+
       // we would always want the no. of failing tests to be zero.
       assert.equal(0, count)
     } finally {
