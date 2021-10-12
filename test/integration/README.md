@@ -5,4 +5,4 @@ To run integration tests:
 2. Run `npm test:integration` or `npm test:browser`
 
 When editing integration tests:
-* All imports should be from `xrpl-local` instead of `xrpl-local` (browser tests need this)
+* All imports should be from `xrpl-local` instead of `../../src` (browser tests need this)

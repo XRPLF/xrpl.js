@@ -31,7 +31,7 @@ const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
 function hexFromBuffer(buffer: Buffer): string {
   return buffer.toString('hex').toUpperCase()
 }
-export interface SignedTxBlobHash {
+interface SignedTxBlobHash {
   tx_blob: string
   hash: string
 }

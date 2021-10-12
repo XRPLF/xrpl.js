@@ -1,12 +1,12 @@
 import { assert } from 'chai'
 
 import { UnexpectedError } from 'xrpl-local'
-
 import ECDSA from 'xrpl-local/ecdsa'
 import {
   generateXAddress,
   GenerateAddressOptions,
 } from 'xrpl-local/utils/generateAddress'
+
 import responses from '../fixtures/responses'
 
 describe('generateAddress', function () {

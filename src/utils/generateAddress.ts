@@ -10,7 +10,7 @@ export interface GeneratedAddress {
   secret: string
 }
 
-export interface GenerateAddressOptions {
+interface GenerateAddressOptions {
   // The entropy to use to generate the seed.
   entropy?: Uint8Array | number[]
 

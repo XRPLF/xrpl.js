@@ -1,7 +1,6 @@
 import { assert } from 'chai'
 
 import { validate, ValidationError } from 'xrpl-local'
-
 import { validateEscrowCancel } from 'xrpl-local/models/transactions/escrowCancel'
 
 /**

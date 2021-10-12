@@ -1,7 +1,6 @@
 import { assert } from 'chai'
 
 import { validate, ValidationError } from 'xrpl-local'
-
 import { validateAccountDelete } from 'xrpl-local/models/transactions/accountDelete'
 
 /**

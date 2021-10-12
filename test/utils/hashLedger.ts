@@ -1,8 +1,8 @@
 import { assert } from 'chai'
 
 import { ValidationError, XrplError } from 'xrpl-local'
-
 import { hashes } from 'xrpl-local/utils'
+
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 

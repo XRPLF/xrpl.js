@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 
 import { _private } from 'xrpl-local/wallet/fundWallet'
+
 import { setupClient, teardownClient } from '../setupClient'
 
 const { FaucetNetwork, getFaucetUrl } = _private

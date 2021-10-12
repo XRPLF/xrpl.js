@@ -3,14 +3,12 @@ import { decode, encode } from 'ripple-binary-codec/dist'
 import { JsonObject } from 'ripple-binary-codec/dist/types/serialized-type'
 
 import { Transaction, ValidationError } from 'xrpl-local'
-import Wallet from 'xrpl-local/wallet'
+import Wallet, { SignedTxBlobHash } from 'xrpl-local/wallet'
 import {
   authorizeChannel,
   multisign,
   verifySignature,
 } from 'xrpl-local/wallet/signer'
-
-import { SignedTxBlobHash } from 'xrpl-local/wallet'
 
 const publicKey =
   '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
