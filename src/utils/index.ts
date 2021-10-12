@@ -15,6 +15,8 @@ import {
   xAddressToClassicAddress,
 } from 'ripple-address-codec'
 
+import { Response } from '../models/methods'
+
 import getBalanceChanges from './balanceChanges'
 import { deriveKeypair, deriveXAddress } from './derive'
 import { generateXAddress } from './generateAddress'
@@ -70,25 +72,6 @@ function isValidAddress(address: string): boolean {
 }
 
 /**
- * Removes undefined values from an object.
- *
- * @param obj - Object to remove undefined values from.
- * @returns The same object, but without undefined values.
- */
-function removeUndefined<T extends Record<string, unknown>>(obj: T): T {
-  const newObj = { ...obj }
-
-  Object.entries(obj).forEach(([key, value]) => {
-    if (value == null) {
-      /* eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Deletes undefined values. */
-      delete newObj[key]
-    }
-  })
-
-  return newObj
-}
-
-/**
  * Converts a string to its hex equivalent. Useful for Memos.
  *
  * @param string - The string to convert to Hex.
@@ -96,6 +79,22 @@ function removeUndefined<T extends Record<string, unknown>>(obj: T): T {
  */
 function convertStringToHex(string: string): string {
   return Buffer.from(string, 'utf8').toString('hex').toUpperCase()
+}
+
+/**
+ * Returns true if there are more pages of data.
+ *
+ * When there are more results than contained in the response, the response
+ * includes a `marker` field.
+ *
+ * See https://ripple.com/build/rippled-apis/#markers-and-pagination.
+ *
+ * @param response - Response to check for more pages on.
+ * @returns Whether the response has more pages of data.
+ */
+function hasNextPage(response: Response): boolean {
+  // eslint-disable-next-line @typescript-eslint/dot-notation -- only checking if it exists
+  return Boolean(response.result['marker'])
 }
 
 const hashes = {
@@ -117,7 +116,7 @@ export {
   getBalanceChanges,
   dropsToXrp,
   xrpToDrops,
-  removeUndefined,
+  hasNextPage,
   rippleTimeToISOTime,
   ISOTimeToRippleTime,
   rippleTimeToUnixTime,

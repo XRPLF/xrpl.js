@@ -277,22 +277,6 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Returns true if there are more pages of data.
-   *
-   * When there are more results than contained in the response, the response
-   * includes a `marker` field.
-   *
-   * See https://ripple.com/build/rippled-apis/#markers-and-pagination.
-   *
-   * @param response - Response to check for more pages on.
-   * @returns Whether the response has more pages of data.
-   * @category Network
-   */
-  public static hasNextPage(response: MarkerResponse): boolean {
-    return Boolean(response.result.marker)
-  }
-
-  /**
    * @category Network
    */
   public async request(
