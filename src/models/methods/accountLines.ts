@@ -14,19 +14,19 @@ export interface Trustline {
   /** A Currency Code identifying what currency this trust line can hold. */
   currency: string
   /**
-   * The maximum amount of the given currency that this account is willing to.
-   * Owe the peer account .
+   * The maximum amount of the given currency that this account is willing to
+   * owe the peer account.
    */
   limit: string
   /**
-   * The maximum amount of currency that the issuer account is willing to owe.
-   * The perspective account .
+   * The maximum amount of currency that the issuer account is willing to owe
+   * the perspective account.
    */
   limit_peer: string
   /**
    * Rate at which the account values incoming balances on this trust line, as
    * a ratio of this value per 1 billion units. (For example, a value of 500
-   * million represents a 0.5:1 ratio.) As a special case, 0 is treated as a.
+   * million represents a 0.5:1 ratio.) As a special case, 0 is treated as a
    * 1:1 ratio.
    */
   quality_in: number
@@ -69,7 +69,7 @@ export interface Trustline {
 /**
  * The account_lines method returns information about an account's trust lines,
  *  including balances in all non-XRP currencies and assets. All information
- * retrieved is relative to a particular version of the ledger. Expects an.
+ * retrieved is relative to a particular version of the ledger. Expects an
  * {@link AccountLinesResponse}.
  *
  * @category Requests
@@ -92,7 +92,7 @@ export interface AccountLinesRequest extends BaseRequest {
   peer?: string
   /**
    * Limit the number of trust lines to retrieve. The server is not required to
-   * Honor this value. Must be within the inclusive range 10 to 400.
+   * honor this value. Must be within the inclusive range 10 to 400.
    */
   limit?: number
   /**
@@ -110,7 +110,7 @@ export interface AccountLinesRequest extends BaseRequest {
 export interface AccountLinesResponse extends BaseResponse {
   result: {
     /**
-     * Unique Address of the account this request corresponds to. This is the.
+     * Unique Address of the account this request corresponds to. This is the
      * "perspective account" for purpose of the trust lines.
      */
     account: string

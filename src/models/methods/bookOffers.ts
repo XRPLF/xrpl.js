@@ -53,7 +53,7 @@ export interface BookOffer extends Offer {
    * Amount of the TakerGets currency the side placing the offer has available
    * to be traded. (XRP is represented as drops; any other currency is
    * represented as a decimal value.) If a trader has multiple offers in the
-   * Same book, only the highest-ranked offer includes this field.
+   * same book, only the highest-ranked offer includes this field.
    */
   owner_funds?: string
   /**
@@ -82,8 +82,8 @@ export interface BookOffer extends Offer {
 export interface BookOffersResponse extends BaseResponse {
   result: {
     /**
-     * The ledger index of the current in-progress ledger version, which was.
-     * Used to retrieve this information .
+     * The ledger index of the current in-progress ledger version, which was
+     * used to retrieve this information.
      */
     ledger_current_index?: number
     /**

@@ -53,8 +53,8 @@ export interface AccountChannelsRequest extends BaseRequest {
    */
   limit?: number
   /**
-   * Value from a previous paginated response. Resume retrieving data where.
-   * That response left off .
+   * Value from a previous paginated response. Resume retrieving data where
+   * that response left off.
    */
   marker?: unknown
 }

@@ -46,7 +46,7 @@ export interface LedgerRequest extends BaseRequest {
   accounts?: boolean
   /**
    * If true, return information on transactions in the specified ledger
-   * Version. Defaults to false. Ignored if you did not specify a ledger
+   * version. Defaults to false. Ignored if you did not specify a ledger
    * version.
    */
   transactions?: boolean

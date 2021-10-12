@@ -48,8 +48,8 @@ export interface AccountTxRequest extends BaseRequest {
   limit?: number
   /**
    * Value from a previous paginated response. Resume retrieving data where
-   * that response left off. This value is stable even if there is a change in.
-   * The server's range of available ledgers.
+   * that response left off. This value is stable even if there is a change in
+   * the server's range of available ledgers.
    */
   marker?: unknown
 }

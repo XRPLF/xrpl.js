@@ -16,7 +16,7 @@ export interface AccountOffersRequest extends BaseRequest {
   /** A 20-byte hex string identifying the ledger version to use. */
   ledger_hash?: string
   /**
-   * The ledger index of the ledger to use, or "current", "closed", or.
+   * The ledger index of the ledger to use, or "current", "closed", or
    * "validated" to select a ledger dynamically.
    */
   ledger_index?: LedgerIndex
