@@ -40,7 +40,7 @@ async function sign(): Promise<void> {
   }
 
   await client.autofill(tx)
-  const signed = wallet.signTransaction(tx)
+  const signed = wallet.sign(tx)
   console.log('signed:', signed)
 
   void client.disconnect()
