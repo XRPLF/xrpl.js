@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>AccountTxRequest | ripple-lib</title>
-	<meta name="description" content="Documentation for ripple-lib">
+	<title>AccountTxRequest | xrpl</title>
+	<meta name="description" content="Documentation for xrpl">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
 	<script async src="../assets/js/search.js" id="search-script"></script>
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">ripple-lib</a>
+					<a href="../index.html" class="title">xrpl</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -52,7 +52,7 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="../modules.html">ripple-lib</a>
+					<a href="../modules.html">xrpl</a>
 				</li>
 				<li>
 					<a href="AccountTxRequest.html">AccountTxRequest</a>
@@ -65,6 +65,14 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The account_tx method retrieves a list of transactions that involved the
+						specified account. Expects a response in the form of a <a href="AccountTxResponse.html">AccountTxResponse</a>.</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -110,9 +118,14 @@
 					<div class="tsd-signature tsd-kind-icon">account<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountTx.ts#L9">src/models/methods/accountTx.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountTx.ts#L17">src/models/methods/accountTx.ts:17</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A unique identifier for the account, most commonly the account&#39;s address.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="api_version" class="tsd-anchor"></a>
@@ -121,9 +134,14 @@
 					<aside class="tsd-sources">
 						<p>Inherited from BaseRequest.api_version</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/baseMethod.ts#L5">src/models/methods/baseMethod.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L14">src/models/methods/baseMethod.ts:14</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The API version to use. If omitted, use version 1.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="binary" class="tsd-anchor"></a>
@@ -131,9 +149,15 @@
 					<div class="tsd-signature tsd-kind-icon">binary<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountTx.ts#L14">src/models/methods/accountTx.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountTx.ts#L38">src/models/methods/accountTx.ts:38</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>If true, return transactions as hex strings instead of JSON. The default is
+							false.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
 					<a name="command" class="tsd-anchor"></a>
@@ -142,7 +166,7 @@
 					<aside class="tsd-sources">
 						<p>Overrides BaseRequest.command</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountTx.ts#L8">src/models/methods/accountTx.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountTx.ts#L15">src/models/methods/accountTx.ts:15</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -152,9 +176,15 @@
 					<div class="tsd-signature tsd-kind-icon">forward<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountTx.ts#L15">src/models/methods/accountTx.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountTx.ts#L43">src/models/methods/accountTx.ts:43</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>If true, returns values indexed with the oldest ledger first. Otherwise,
+							the results are indexed with the newest ledger first.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="id" class="tsd-anchor"></a>
@@ -163,9 +193,16 @@
 					<aside class="tsd-sources">
 						<p>Inherited from BaseRequest.id</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/baseMethod.ts#L3">src/models/methods/baseMethod.ts:3</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L10">src/models/methods/baseMethod.ts:10</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A unique value to identify this request. The response to this request uses
+								the same id field. This way, even if responses arrive out of order, you
+							know which request prompted which response.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="ledger_hash" class="tsd-anchor"></a>
@@ -173,9 +210,14 @@
 					<div class="tsd-signature tsd-kind-icon">ledger_<wbr>hash<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountTx.ts#L12">src/models/methods/accountTx.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountTx.ts#L31">src/models/methods/accountTx.ts:31</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Use to look for transactions from a single ledger only.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="ledger_index" class="tsd-anchor"></a>
@@ -183,9 +225,14 @@
 					<div class="tsd-signature tsd-kind-icon">ledger_<wbr>index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">LedgerIndex</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountTx.ts#L13">src/models/methods/accountTx.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountTx.ts#L33">src/models/methods/accountTx.ts:33</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Use to look for transactions from a single ledger only.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="ledger_index_max" class="tsd-anchor"></a>
@@ -193,9 +240,16 @@
 					<div class="tsd-signature tsd-kind-icon">ledger_<wbr>index_<wbr>max<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountTx.ts#L11">src/models/methods/accountTx.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountTx.ts#L29">src/models/methods/accountTx.ts:29</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Use to specify the most recent ledger to include transactions from. A
+								value of -1 instructs the server to use the most recent validated ledger
+							version available.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="ledger_index_min" class="tsd-anchor"></a>
@@ -203,9 +257,16 @@
 					<div class="tsd-signature tsd-kind-icon">ledger_<wbr>index_<wbr>min<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountTx.ts#L10">src/models/methods/accountTx.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountTx.ts#L23">src/models/methods/accountTx.ts:23</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Use to specify the earliest ledger to include transactions from. A value
+								of -1 instructs the server to use the earliest validated ledger version
+							available.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="limit" class="tsd-anchor"></a>
@@ -213,9 +274,15 @@
 					<div class="tsd-signature tsd-kind-icon">limit<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountTx.ts#L16">src/models/methods/accountTx.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountTx.ts#L48">src/models/methods/accountTx.ts:48</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Default varies. Limit the number of transactions to retrieve. The server
+							is not required to honor this value.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="marker" class="tsd-anchor"></a>
@@ -223,9 +290,16 @@
 					<div class="tsd-signature tsd-kind-icon">marker<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unknown</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountTx.ts#L17">src/models/methods/accountTx.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountTx.ts#L54">src/models/methods/accountTx.ts:54</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Value from a previous paginated response. Resume retrieving data where
+								that response left off. This value is stable even if there is a change in
+							the server&#39;s range of available ledgers.</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -299,6 +373,7 @@
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
 			</ul>

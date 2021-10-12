@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Instructions | ripple-lib</title>
-	<meta name="description" content="Documentation for ripple-lib">
+	<title>ErrorResponse | xrpl</title>
+	<meta name="description" content="Documentation for xrpl">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
 	<script async src="../assets/js/search.js" id="search-script"></script>
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">ripple-lib</a>
+					<a href="../index.html" class="title">xrpl</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -52,24 +52,32 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="../modules.html">ripple-lib</a>
+					<a href="../modules.html">xrpl</a>
 				</li>
 				<li>
-					<a href="Instructions.html">Instructions</a>
+					<a href="ErrorResponse.html">ErrorResponse</a>
 				</li>
 			</ul>
-			<h1>Interface Instructions</h1>
+			<h1>Interface ErrorResponse</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The shape of an error response from rippled. xrpl.js handles rejections by
+						throwing, and allowing the user to handle in the catch block of a promise.</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">Instructions</span>
+						<span class="target">ErrorResponse</span>
 					</li>
 				</ul>
 			</section>
@@ -80,13 +88,14 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="Instructions.html#fee" class="tsd-kind-icon">fee</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="Instructions.html#maxFee" class="tsd-kind-icon">max<wbr>Fee</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="Instructions.html#maxLedgerVersion" class="tsd-kind-icon">max<wbr>Ledger<wbr>Version</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="Instructions.html#maxLedgerVersionOffset" class="tsd-kind-icon">max<wbr>Ledger<wbr>Version<wbr>Offset</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="Instructions.html#sequence" class="tsd-kind-icon">sequence</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="Instructions.html#signersCount" class="tsd-kind-icon">signers<wbr>Count</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="Instructions.html#ticketSequence" class="tsd-kind-icon">ticket<wbr>Sequence</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ErrorResponse.html#api_version" class="tsd-kind-icon">api_<wbr>version</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ErrorResponse.html#error" class="tsd-kind-icon">error</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ErrorResponse.html#error_code" class="tsd-kind-icon">error_<wbr>code</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ErrorResponse.html#error_message" class="tsd-kind-icon">error_<wbr>message</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ErrorResponse.html#id" class="tsd-kind-icon">id</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ErrorResponse.html#request" class="tsd-kind-icon">request</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ErrorResponse.html#status" class="tsd-kind-icon">status</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ErrorResponse.html#type" class="tsd-kind-icon">type</a></li>
 							</ul>
 						</section>
 					</div>
@@ -95,72 +104,82 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="fee" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> fee</h3>
-					<div class="tsd-signature tsd-kind-icon">fee<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="api_version" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> api_<wbr>version</h3>
+					<div class="tsd-signature tsd-kind-icon">api_<wbr>version<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/transaction/types.ts#L24">src/transaction/types.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L48">src/models/methods/baseMethod.ts:48</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="maxFee" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> max<wbr>Fee</h3>
-					<div class="tsd-signature tsd-kind-icon">max<wbr>Fee<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="error" class="tsd-anchor"></a>
+					<h3>error</h3>
+					<div class="tsd-signature tsd-kind-icon">error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/transaction/types.ts#L26">src/transaction/types.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L44">src/models/methods/baseMethod.ts:44</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="maxLedgerVersion" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> max<wbr>Ledger<wbr>Version</h3>
-					<div class="tsd-signature tsd-kind-icon">max<wbr>Ledger<wbr>Version<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="error_code" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> error_<wbr>code</h3>
+					<div class="tsd-signature tsd-kind-icon">error_<wbr>code<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/transaction/types.ts#L27">src/transaction/types.ts:27</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L45">src/models/methods/baseMethod.ts:45</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="maxLedgerVersionOffset" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> max<wbr>Ledger<wbr>Version<wbr>Offset</h3>
-					<div class="tsd-signature tsd-kind-icon">max<wbr>Ledger<wbr>Version<wbr>Offset<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="error_message" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> error_<wbr>message</h3>
+					<div class="tsd-signature tsd-kind-icon">error_<wbr>message<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/transaction/types.ts#L28">src/transaction/types.ts:28</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L46">src/models/methods/baseMethod.ts:46</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="sequence" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> sequence</h3>
-					<div class="tsd-signature tsd-kind-icon">sequence<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="id" class="tsd-anchor"></a>
+					<h3>id</h3>
+					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/transaction/types.ts#L22">src/transaction/types.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L41">src/models/methods/baseMethod.ts:41</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="signersCount" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> signers<wbr>Count</h3>
-					<div class="tsd-signature tsd-kind-icon">signers<wbr>Count<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="request" class="tsd-anchor"></a>
+					<h3>request</h3>
+					<div class="tsd-signature tsd-kind-icon">request<span class="tsd-signature-symbol">:</span> <a href="../modules.html#Request" class="tsd-signature-type" data-tsd-kind="Type alias">Request</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/transaction/types.ts#L29">src/transaction/types.ts:29</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L47">src/models/methods/baseMethod.ts:47</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="ticketSequence" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> ticket<wbr>Sequence</h3>
-					<div class="tsd-signature tsd-kind-icon">ticket<wbr>Sequence<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="status" class="tsd-anchor"></a>
+					<h3>status</h3>
+					<div class="tsd-signature tsd-kind-icon">status<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;error&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/transaction/types.ts#L23">src/transaction/types.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L42">src/models/methods/baseMethod.ts:42</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="type" class="tsd-anchor"></a>
+					<h3>type</h3>
+					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L43">src/models/methods/baseMethod.ts:43</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -179,28 +198,31 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="Instructions.html" class="tsd-kind-icon">Instructions</a>
+						<a href="ErrorResponse.html" class="tsd-kind-icon">Error<wbr>Response</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="Instructions.html#fee" class="tsd-kind-icon">fee</a>
+								<a href="ErrorResponse.html#api_version" class="tsd-kind-icon">api_<wbr>version</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="Instructions.html#maxFee" class="tsd-kind-icon">max<wbr>Fee</a>
+								<a href="ErrorResponse.html#error" class="tsd-kind-icon">error</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="Instructions.html#maxLedgerVersion" class="tsd-kind-icon">max<wbr>Ledger<wbr>Version</a>
+								<a href="ErrorResponse.html#error_code" class="tsd-kind-icon">error_<wbr>code</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="Instructions.html#maxLedgerVersionOffset" class="tsd-kind-icon">max<wbr>Ledger<wbr>Version<wbr>Offset</a>
+								<a href="ErrorResponse.html#error_message" class="tsd-kind-icon">error_<wbr>message</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="Instructions.html#sequence" class="tsd-kind-icon">sequence</a>
+								<a href="ErrorResponse.html#id" class="tsd-kind-icon">id</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="Instructions.html#signersCount" class="tsd-kind-icon">signers<wbr>Count</a>
+								<a href="ErrorResponse.html#request" class="tsd-kind-icon">request</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="Instructions.html#ticketSequence" class="tsd-kind-icon">ticket<wbr>Sequence</a>
+								<a href="ErrorResponse.html#status" class="tsd-kind-icon">status</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="ErrorResponse.html#type" class="tsd-kind-icon">type</a>
 							</li>
 						</ul>
 					</li>
@@ -221,6 +243,7 @@
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
 			</ul>
