@@ -72,25 +72,6 @@ function isValidAddress(address: string): boolean {
 }
 
 /**
- * Removes undefined values from an object.
- *
- * @param obj - Object to remove undefined values from.
- * @returns The same object, but without undefined values.
- */
-function removeUndefined<T extends Record<string, unknown>>(obj: T): T {
-  const newObj = { ...obj }
-
-  Object.entries(obj).forEach(([key, value]) => {
-    if (value == null) {
-      /* eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Deletes undefined values. */
-      delete newObj[key]
-    }
-  })
-
-  return newObj
-}
-
-/**
  * Converts a string to its hex equivalent. Useful for Memos.
  *
  * @param string - The string to convert to Hex.
@@ -130,7 +111,6 @@ export {
   getBalanceChanges,
   dropsToXrp,
   xrpToDrops,
-  removeUndefined,
   hasNextPage,
   rippleTimeToISOTime,
   ISOTimeToRippleTime,
