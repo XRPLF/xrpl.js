@@ -1,4 +1,5 @@
 import type { Amount, Currency, Path, StreamType } from '../common'
+import { Offer } from '../ledger'
 import { OfferCreate, Transaction } from '../transactions'
 import TransactionMetadata from '../transactions/metadata'
 
@@ -64,6 +65,8 @@ export interface SubscribeRequest extends BaseRequest {
   /** Password to provide for basic authentication at the callback URL. */
   url_password?: string
 }
+
+type BooksSnapshot = Offer[]
 
 /**
  * Response expected from a {@link SubscribeRequest}.
