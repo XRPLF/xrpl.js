@@ -3,8 +3,8 @@
 import * as assert from 'assert'
 import { EventEmitter } from 'events'
 
+import { NotFoundError } from '..'
 import { ValidationError, XrplError } from '../errors'
-import * as errors from '../errors'
 import {
   Request,
   Response,

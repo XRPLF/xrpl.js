@@ -3,7 +3,7 @@ import {
   RippledError,
   TimeoutError,
   XrplError,
-} from '../common/errors'
+} from '../errors'
 import { Response } from '../models/methods'
 import { BaseRequest, ErrorResponse } from '../models/methods/baseMethod'
 

@@ -1,9 +1,11 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 
-import { BookOffersRequest, ValidationError, XrplError } from 'xrpl-local'
-import { OfferFlags } from 'xrpl-local/models/ledger/offer'
+import { ValidationError } from 'xrpl-local/errors'
 
+import { BookOffersRequest } from '../../src'
+import { XrplError } from '../../src/errors'
+import { OfferLedgerFlags } from '../../src/models/ledger'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
@@ -55,15 +57,17 @@ function normalRippledResponse(
   throw new XrplError('unexpected end')
 }
 
-// function xrpRippledResponse(request: BookOffersRequest): object {
-//   if (request.taker_pays.issuer === "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw") {
-//     return rippled.book_offers.xrp_usd;
-//   }
-//   if (request.taker_gets.issuer === "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw") {
-//     return rippled.book_offers.usd_xrp;
-//   }
-//   throw new Error("unexpected end");
-// }
+function xrpRippledResponse(
+  request: BookOffersRequest,
+): Record<string, unknown> {
+  if (request.taker_pays.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
+    return rippled.book_offers.xrp_usd
+  }
+  if (request.taker_gets.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
+    return rippled.book_offers.usd_xrp
+  }
+  throw new Error('unexpected end')
+}
 
 describe('client.getOrderbook', function () {
   beforeEach(setupClient)
@@ -168,11 +172,11 @@ describe('client.getOrderbook', function () {
       requests.getOrderbook.normal.takerGets,
     )
     assert.strictEqual(
-      response.buy.every((item) => item.Flags !== OfferFlags.lsfSell),
+      response.buy.every((item) => item.Flags !== OfferLedgerFlags.lsfSell),
       true,
     )
     assert.strictEqual(
-      response.sell.every((item) => item.Flags === OfferFlags.lsfSell),
+      response.sell.every((item) => item.Flags === OfferLedgerFlags.lsfSell),
       true,
     )
   })

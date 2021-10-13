@@ -4,7 +4,7 @@ import path from 'path'
 
 import { Client } from 'xrpl-local'
 
-import { XrplError } from '../src/common/errors'
+import { XrplError } from '../src/errors'
 
 /**
  * Client Test Runner.

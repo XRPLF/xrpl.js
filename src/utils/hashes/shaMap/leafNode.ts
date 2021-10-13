@@ -1,4 +1,4 @@
-import { XrplError } from '../../../common/errors'
+import { XrplError } from '../../../errors'
 import hashPrefix from '../hashPrefix'
 import sha512Half from '../sha512Half'
 

@@ -3,8 +3,11 @@ import _ from 'lodash'
 import { Server as WebSocketServer } from 'ws'
 
 import type { Request } from '../src'
-import { XrplError } from '../src/common/errors'
-import type { BaseResponse } from '../src/models/methods/baseMethod'
+import { XrplError } from '../src/errors'
+import type {
+  BaseResponse,
+  ErrorResponse,
+} from '../src/models/methods/baseMethod'
 
 import { getFreePort } from './testUtils'
 
