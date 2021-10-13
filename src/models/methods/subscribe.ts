@@ -71,7 +71,7 @@ export interface SubscribeRequest extends BaseRequest {
  * @category Responses
  */
 export interface SubscribeResponse extends BaseResponse {
-  result: Record<string, never> | Stream
+  result: Record<string, never> | LedgerStreamResponse | BooksSnapshot
 }
 
 interface BaseStream {

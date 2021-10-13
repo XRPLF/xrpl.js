@@ -159,7 +159,9 @@ function addressToBigNumber(address: string): BigNumber {
 
 function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
   if (typeof txOrBlob === 'object') {
-    return txOrBlob
+    // We need this to handle X-addresses in multisigning
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
+    return decode(encode(txOrBlob)) as unknown as Transaction
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
