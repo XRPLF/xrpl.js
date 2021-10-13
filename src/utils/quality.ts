@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 
-import { ValidationError } from '..'
+import { ValidationError } from '../errors'
 
 const BASE_TEN = 10
 const ONE_BILLION = '1000000000'
