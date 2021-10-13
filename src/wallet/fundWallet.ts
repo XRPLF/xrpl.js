@@ -5,9 +5,8 @@ import { isValidClassicAddress } from 'ripple-address-codec'
 
 import type { Client } from '..'
 import { RippledError, XRPLFaucetError } from '../errors'
-import { GeneratedAddress } from '../utils/generateAddress'
 
-import Wallet from '.'
+import Wallet, { GeneratedAddress } from '.'
 
 interface FaucetWallet {
   account: GeneratedAddress

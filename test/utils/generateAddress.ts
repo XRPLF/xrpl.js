@@ -1,15 +1,14 @@
 import { assert } from 'chai'
 
-import { UnexpectedError } from 'xrpl-local'
+import { UnexpectedError, Wallet } from 'xrpl-local'
 import ECDSA from 'xrpl-local/ecdsa'
-import { generateXAddress } from 'xrpl-local/utils/generateAddress'
 
 import responses from '../fixtures/responses'
 
 describe('generateAddress', function () {
   it('generateAddress', function () {
     assert.deepEqual(
-      generateXAddress({ entropy: new Array(16).fill(0) }),
+      Wallet.generateXAddress({ entropy: new Array(16).fill(0) }),
 
       // THEN we get the expected return value
       responses.generateXAddress,
@@ -22,7 +21,7 @@ describe('generateAddress', function () {
        * GIVEN entropy of 1 byte
        * WHEN generating an address
        */
-      generateXAddress({ entropy: new Array(1).fill(0) })
+      Wallet.generateXAddress({ entropy: new Array(1).fill(0) })
 
       /*
        * THEN an UnexpectedError is thrown
@@ -35,7 +34,7 @@ describe('generateAddress', function () {
     // GIVEN no options
 
     // WHEN generating an address
-    const account = generateXAddress()
+    const account = Wallet.generateXAddress()
 
     // THEN we get an object with an xAddress starting with 'x' and a secret starting with 's'
     assert(account.xAddress.startsWith('X'), 'Address must start with `X`')
@@ -47,7 +46,7 @@ describe('generateAddress', function () {
     const options = {}
 
     // WHEN generating an address
-    const account = generateXAddress(options)
+    const account = Wallet.generateXAddress(options)
 
     // THEN we get an object with an xAddress starting with 'x' and a secret starting with 's'
     assert(account.xAddress.startsWith('X'), 'Address must start with `X`')
@@ -62,7 +61,7 @@ describe('generateAddress', function () {
     }
 
     // WHEN generating an address
-    const account = generateXAddress(options)
+    const account = Wallet.generateXAddress(options)
 
     // THEN we get an object with an address starting with 'r' and a secret starting with 's' (not 'sEd')
     assert(
@@ -89,7 +88,7 @@ describe('generateAddress', function () {
     }
 
     // WHEN generating an address
-    const account = generateXAddress(options)
+    const account = Wallet.generateXAddress(options)
 
     // THEN we get an object with an address starting with 'r' and a secret starting with 'sEd'
     assert(
@@ -111,7 +110,7 @@ describe('generateAddress', function () {
     }
 
     // WHEN generating an address
-    const account = generateXAddress(options)
+    const account = Wallet.generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, responses.generateXAddress)
@@ -125,7 +124,7 @@ describe('generateAddress', function () {
     }
 
     // WHEN generating an address
-    const account = generateXAddress(options)
+    const account = Wallet.generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, {
@@ -144,7 +143,7 @@ describe('generateAddress', function () {
     }
 
     // WHEN generating an address
-    const account = generateXAddress(options)
+    const account = Wallet.generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, responses.generateAddress)
@@ -159,7 +158,7 @@ describe('generateAddress', function () {
     }
 
     // WHEN generating an address
-    const account = generateXAddress(options)
+    const account = Wallet.generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, {
@@ -181,7 +180,7 @@ describe('generateAddress', function () {
     }
 
     // WHEN generating an address
-    const account = generateXAddress(options)
+    const account = Wallet.generateXAddress(options)
 
     // THEN we get the expected return value
     const response = {
@@ -202,7 +201,7 @@ describe('generateAddress', function () {
     }
 
     // WHEN generating an address
-    const account = generateXAddress(options)
+    const account = Wallet.generateXAddress(options)
 
     // THEN we get the expected return value
     assert.deepEqual(account, {
@@ -218,7 +217,7 @@ describe('generateAddress', function () {
     const options = { test: true }
 
     // WHEN generating an address
-    const account = generateXAddress(options)
+    const account = Wallet.generateXAddress(options)
 
     // THEN we get an object with xAddress starting with 'T' and a secret starting with 's'
 
