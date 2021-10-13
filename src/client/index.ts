@@ -84,12 +84,15 @@ import {
   UnsubscribeResponse,
 } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
-import { ensureClassicAddress } from '../sugar'
-import autofill from '../sugar/autofill'
-import { getBalances, getXrpBalance } from '../sugar/balances'
-import getFee from '../sugar/fee'
-import getLedgerIndex from '../sugar/ledgerIndex'
-import getOrderbook from '../sugar/orderbook'
+import {
+  autofill,
+  ensureClassicAddress,
+  getLedgerIndex,
+  getOrderbook,
+  getFee,
+  getBalances,
+  getXrpBalance,
+} from '../sugar'
 import {
   submit,
   submitSigned,

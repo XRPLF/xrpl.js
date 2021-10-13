@@ -1,6 +1,6 @@
 export { default as autofill } from './autofill'
 
-export { default as getBalances } from './balances'
+export { getBalances, getXrpBalance } from './balances'
 
 export { default as getFee } from './fee'
 

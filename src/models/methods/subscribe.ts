@@ -1,5 +1,4 @@
 import type { Amount, Currency, Path, StreamType } from '../common'
-import Offer from '../ledger/offer'
 import { OfferCreate, Transaction } from '../transactions'
 import TransactionMetadata from '../transactions/metadata'
 
@@ -74,8 +73,6 @@ export interface SubscribeRequest extends BaseRequest {
 export interface SubscribeResponse extends BaseResponse {
   result: Record<string, never> | Stream
 }
-
-type BooksSnapshot = Offer[]
 
 interface BaseStream {
   type: string
