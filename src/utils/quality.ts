@@ -11,7 +11,8 @@ function percentToDecimal(percent: string): BigNumber {
     throw new ValidationError(`Value ${percent} must end with %`)
   }
 
-  const split = percent.split('%')
+  // Split the string on % and filter out any empty strings
+  const split = percent.split('%').filter((str) => str !== '')
   if (split.length !== 1) {
     throw new ValidationError(`Value ${percent} contains too many % signs`)
   }
