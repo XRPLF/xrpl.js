@@ -30,7 +30,7 @@ describe('Client', function () {
       // TODO: Once migration is complete, remove `.skip()` so that missing tests are reported as failures.
       // eslint-disable-next-line mocha/no-skipped-tests -- See above TODO
       it.skip(`${methodName} - no test suite found`, function () {
-        throw new Error(
+        throw new XrplError(
           `Test file not found! Create file "test/client/${methodName}.ts".`,
         )
       })

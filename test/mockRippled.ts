@@ -3,10 +3,8 @@ import _ from 'lodash'
 import { Server as WebSocketServer } from 'ws'
 
 import type { Request } from '../src'
-import type {
-  BaseResponse,
-  ErrorResponse,
-} from '../src/models/methods/baseMethod'
+import { XrplError } from '../src/common/errors'
+import type { BaseResponse } from '../src/models/methods/baseMethod'
 
 import { getFreePort } from './testUtils'
 
@@ -15,7 +13,7 @@ function createResponse(
   response: Record<string, unknown>,
 ): string {
   if (!('type' in response) && !('error' in response)) {
-    throw new Error(
+    throw new XrplError(
       `Bad response format. Must contain \`type\` or \`error\`. ${JSON.stringify(
         response,
       )}`,
@@ -65,10 +63,10 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
       try {
         request = JSON.parse(requestJSON)
         if (request.id == null) {
-          throw new Error(`Request has no id: ${requestJSON}`)
+          throw new XrplError(`Request has no id: ${requestJSON}`)
         }
         if (request.command == null) {
-          throw new Error(`Request has no command: ${requestJSON}`)
+          throw new XrplError(`Request has no id: ${requestJSON}`)
         }
         if (request.command === 'ping') {
           ping(conn, request)
@@ -77,7 +75,7 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
         } else if (request.command in mock.responses) {
           conn.send(createResponse(request, mock.getResponse(request)))
         } else {
-          throw new Error(
+          throw new XrplError(
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- We know it's there
             `No event handler registered in mock rippled for ${request.command}`,
           )
@@ -117,14 +115,14 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
       | ((r: Request) => Response | ErrorResponse),
   ): void {
     if (typeof command !== 'string') {
-      throw new Error('command is not a string')
+      throw new XrplError('command is not a string')
     }
     if (
       typeof response === 'object' &&
       !('type' in response) &&
       !('error' in response)
     ) {
-      throw new Error(
+      throw new XrplError(
         `Bad response format. Must contain \`type\` or \`error\`. ${JSON.stringify(
           response,
         )}`,
@@ -135,7 +133,7 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
 
   mock.getResponse = (request: Request): Record<string, unknown> => {
     if (!(request.command in mock.responses)) {
-      throw new Error(`No handler for ${request.command}`)
+      throw new XrplError(`No handler for ${request.command}`)
     }
     const functionOrObject = mock.responses[request.command]
     if (typeof functionOrObject === 'function') {

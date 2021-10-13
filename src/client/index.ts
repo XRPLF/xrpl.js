@@ -394,7 +394,7 @@ class Client extends EventEmitter {
   >(req: T, resp: U): Promise<U> {
     if (!resp.result.marker) {
       return Promise.reject(
-        new errors.NotFoundError('response does not have a next page'),
+        new NotFoundError('response does not have a next page'),
       )
     }
     const nextPageRequest = { ...req, marker: resp.result.marker }

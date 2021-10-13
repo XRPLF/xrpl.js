@@ -6,7 +6,7 @@
 import BigNumber from 'bignumber.js'
 import { decode, encode } from 'ripple-binary-codec'
 
-import { ValidationError } from '../../errors'
+import { ValidationError, XrplError } from '../../common/errors'
 import type { Ledger } from '../../models/ledger'
 import { LedgerEntry } from '../../models/ledger'
 import { Transaction } from '../../models/transactions'
@@ -61,7 +61,7 @@ function addLengthPrefix(hex: string): string {
       ]) + hex
     )
   }
-  throw new Error('Variable integer overflow.')
+  throw new XrplError('Variable integer overflow.')
 }
 
 /**

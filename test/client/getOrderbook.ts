@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 
-import { BookOffersRequest, ValidationError } from 'xrpl-local'
+import { BookOffersRequest, ValidationError, XrplError } from 'xrpl-local'
 import { OfferFlags } from 'xrpl-local/models/ledger/offer'
 
 import requests from '../fixtures/requests'
@@ -52,7 +52,7 @@ function normalRippledResponse(
   ) {
     return rippled.book_offers.fabric.requestBookOffersAsksResponse(request)
   }
-  throw new Error('unexpected end')
+  throw new XrplError('unexpected end')
 }
 
 function xrpRippledResponse(
@@ -64,7 +64,7 @@ function xrpRippledResponse(
   if (request.taker_gets.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
     return rippled.book_offers.usd_xrp
   }
-  throw new Error('unexpected end')
+  throw new XrplError('unexpected end')
 }
 
 describe('client.getOrderbook', function () {

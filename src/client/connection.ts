@@ -250,7 +250,7 @@ export class Connection extends EventEmitter {
     this.ws = createWebSocket(this.url, this.config)
 
     if (this.ws == null) {
-      throw new Error('Connect: created null websocket')
+      throw new XrplError('Connect: created null websocket')
     }
 
     this.ws.on('error', (error) => this.onConnectionFailed(error))
@@ -422,7 +422,7 @@ export class Connection extends EventEmitter {
    */
   private async onceOpen(connectionTimeoutID: NodeJS.Timeout): Promise<void> {
     if (this.ws == null) {
-      throw new Error('onceOpen: ws is null')
+      throw new XrplError('onceOpen: ws is null')
     }
 
     // Once the connection completes successfully, remove all old listeners
@@ -436,7 +436,7 @@ export class Connection extends EventEmitter {
     // Handle a closed connection: reconnect if it was unexpected
     this.ws.once('close', (code, reason) => {
       if (this.ws == null) {
-        throw new Error('onceClose: ws is null')
+        throw new XrplError('onceClose: ws is null')
       }
 
       this.clearHeartbeatInterval()
