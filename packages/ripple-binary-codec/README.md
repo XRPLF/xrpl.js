@@ -98,10 +98,10 @@ Encode the transaction object for multi-signing.
 
 Run unit tests with:
 
-    yarn test
+    npm test
 
 Use `--coverage` to generate and display code coverage information:
 
-    yarn test --coverage
+    npm test --coverage
 
 This tells jest to output code coverage info in the `./coverage` directory, in addition to showing it on the command line.

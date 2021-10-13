@@ -11,7 +11,8 @@ let json = {
   Account: "rUnFEsHjxqTswbivzL2DNHBb34rhAgZZZK",
   PreviousTxnLgrSeq: 8,
   LedgerEntryType: "AccountRoot",
-  PreviousTxnID: "0735A0B32B2A3F4C938B76D6933003E29447DB8C7CE382BBE089402FF12A03E5".toLowerCase(),
+  PreviousTxnID:
+    "0735A0B32B2A3F4C938B76D6933003E29447DB8C7CE382BBE089402FF12A03E5".toLowerCase(),
   Flags: 0,
   Sequence: 1,
   Balance: "10000000000",

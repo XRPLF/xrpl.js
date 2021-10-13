@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   build_with_nvm:
@@ -23,10 +23,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: "${{ steps.nvm.outputs.NVMRC }}"
-    - run: yarn install
-    - run: yarn run test
-    - run: yarn run lint
-    - run: yarn run compile
+    - run: npm install
+    - run: npm test
+    - run: npm run lint
+    - run: npm run compile
 
   build:
 
@@ -42,7 +42,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: yarn install
-    - run: yarn run test
-    - run: yarn run lint
-    - run: yarn run compile
+    - run: npm install
+    - run: npm test
+    - run: npm run lint
+    - run: npm run compile
