@@ -62,7 +62,8 @@ async function getXrpBalance(
  *
  * @param this - Client.
  * @param account - Account address.
- * @param options - Options to include for getting balances.
+ * @param options - Allows the user to to look up balance in a ledger with given
+ * ledger_index or ledger_hash, filter by peer, and limit number of balances.
  * @returns An array of XRP/non-XRP balances.
  */
 async function getBalances(
