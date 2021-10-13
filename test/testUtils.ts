@@ -13,6 +13,11 @@ export const addressTests = [
   { type: 'X-Address', address: addresses.ACCOUNT_X },
 ]
 
+interface Result {
+  txJSON: string
+  tx_json?: unknown
+}
+
 /**
  * Check the response against the expected result. Optionally validate
  * that response against a given schema as well.
@@ -22,8 +27,8 @@ export const addressTests = [
  * @param _schemaName - Name of the schema used to validate the shape of the response.
  */
 export function assertResultMatch(
-  response: any,
-  expected: any,
+  response: Result,
+  expected: Result,
   _schemaName?: string,
 ): void {
   if (expected.txJSON) {
@@ -56,8 +61,8 @@ export function assertResultMatch(
  * @param message - Expected error message/substring of the error message.
  */
 export async function assertRejects(
-  promise: PromiseLike<any>,
-  instanceOf: any,
+  promise: PromiseLike<unknown>,
+  instanceOf: typeof Error,
   message?: string | RegExp,
 ): Promise<void> {
   try {

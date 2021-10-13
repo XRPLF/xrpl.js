@@ -31,12 +31,13 @@ class Leaf extends Node {
   /**
    * Add item to Leaf.
    *
-   * @param _tag - Index of the Node.
-   * @param _node - Node to insert.
+   * @param tag - Index of the Node.
+   * @param node - Node to insert.
    * @throws When called, because LeafNodes cannot addItem.
    */
-  public addItem(_tag: string, _node: Node): void {
+  public addItem(tag: string, node: Node): void {
     throw new XrplError('Cannot call addItem on a LeafNode')
+    this.addItem(tag, node)
   }
 
   /**

@@ -3,8 +3,7 @@
 import * as assert from 'assert'
 import { EventEmitter } from 'events'
 
-import { NotFoundError } from '..'
-import { ValidationError, XrplError } from '../errors'
+import { NotFoundError, ValidationError, XrplError } from '../errors'
 import {
   Request,
   Response,
@@ -97,7 +96,6 @@ import {
   submitReliable,
   submitSignedReliable,
 } from '../sugar/submit'
-import { ensureClassicAddress } from '../sugar/utils'
 import fundWallet from '../wallet/fundWallet'
 
 import {

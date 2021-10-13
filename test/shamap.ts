@@ -10,7 +10,7 @@ const HEX_ZERO =
 /**
  * Generates data to hash for testing.
  *
- * @param v - TODO: fill in.
+ * @param int - TODO: fill in.
  * @returns TODO: fill in.
  */
 function intToVuc(int: number): string {
