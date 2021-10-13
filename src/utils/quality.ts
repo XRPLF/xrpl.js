@@ -43,6 +43,10 @@ export function percentToTransferRate(percent: string): number {
     return 0
   }
 
+  if (billionths === 'NaN') {
+    throw new ValidationError(`Value ${percent} is not a number`)
+  }
+
   if (billionths.includes('.')) {
     throw new ValidationError(`Value ${percent} exceeds maximum precision.`)
   }
@@ -65,6 +69,10 @@ export function percentToQuality(percent: string): number {
   const rate = decimal.times(ONE_BILLION)
 
   const billionths = rate.toString(BASE_TEN)
+
+  if (billionths === 'NaN') {
+    throw new ValidationError(`Value ${percent} is not a number`)
+  }
 
   if (billionths === ONE_BILLION) {
     return 0

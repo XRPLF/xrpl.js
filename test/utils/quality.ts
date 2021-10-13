@@ -66,4 +66,12 @@ describe('Billionths format', function () {
       'Value .0000000000000011221% exceeds maximum precision.',
     )
   })
+
+  it('Throws with gibberish', function () {
+    assert.throws(
+      () => percentToQuality('3dsadflk%'),
+      ValidationError,
+      'Value 3dsadflk% is not a number',
+    )
+  })
 })
