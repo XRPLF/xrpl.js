@@ -72,8 +72,7 @@ export interface SubscribeRequest extends BaseRequest {
  * @category Responses
  */
 export interface SubscribeResponse extends BaseResponse {
-  // eslint-disable-next-line @typescript-eslint/ban-types -- actually should be an empty object
-  result: {} | LedgerStreamResponse | BooksSnapshot
+  result: Record<string, never> | Stream
 }
 
 type BooksSnapshot = Offer[]

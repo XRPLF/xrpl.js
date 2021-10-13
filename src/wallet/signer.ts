@@ -11,8 +11,10 @@ import { sign as signWithKeypair, verify } from 'ripple-keypairs'
 
 import { ValidationError } from '../errors'
 import { Signer } from '../models/common'
-import { Transaction } from '../models/transactions'
-import { validateBaseTransaction } from '../models/transactions/common'
+import {
+  Transaction,
+  verify as verifyTransaction,
+} from '../models/transactions'
 
 import Wallet from '.'
 
@@ -41,7 +43,7 @@ function multisign(transactions: Array<Transaction | string>): string {
      * also make validate accept '| Transaction' to avoid type casting here.
      */
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
-    validateBaseTransaction(tx as unknown as Record<string, unknown>)
+    validate(tx as unknown as Record<string, unknown>)
     if (tx.Signers == null || tx.Signers.length === 0) {
       throw new ValidationError(
         "For multisigning all transactions must include a Signers field containing an array of signatures. You may have forgotten to pass the 'forMultisign' parameter when signing.",
