@@ -20,9 +20,8 @@ import {
   sign,
 } from 'ripple-keypairs'
 
-import { UnexpectedError } from '..'
 import ECDSA from '../ecdsa'
-import { ValidationError } from '../errors'
+import { UnexpectedError, ValidationError } from '../errors'
 import { Transaction } from '../models/transactions'
 import { hashSignedTx } from '../utils/hashes/ledgerHash'
 
@@ -227,6 +226,50 @@ class Wallet {
   }
 
   /**
+   * Generates an X-Address and a secret.
+   *
+   * @param options - Options for generating X-Address.
+   * @returns A generated address.
+   * @throws When cannot generate an address.
+   */
+  public static generateXAddress(
+    options: GenerateAddressOptions = {},
+  ): GeneratedAddress {
+    try {
+      const generateSeedOptions: {
+        entropy?: Uint8Array
+        algorithm?: ECDSA
+      } = {
+        algorithm: options.algorithm,
+      }
+      if (options.entropy) {
+        generateSeedOptions.entropy = Uint8Array.from(options.entropy)
+      }
+      const secret = generateSeed(generateSeedOptions)
+      const keypair = deriveKeypair(secret)
+      const classicAddress = deriveAddress(keypair.publicKey)
+      const returnValue: GeneratedAddress = {
+        xAddress: classicAddressToXAddress(
+          classicAddress,
+          false,
+          options.test ?? false,
+        ),
+        secret,
+      }
+      if (options.includeClassicAddress) {
+        returnValue.classicAddress = classicAddress
+      }
+      return returnValue
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new UnexpectedError(error.message)
+      }
+
+      throw error
+    }
+  }
+
+  /**
    * Derive a Wallet from a seed.
    *
    * @param seed - The seed used to derive the wallet.
@@ -309,50 +352,6 @@ class Wallet {
     const messageHex: string = encodeForSigning(tx)
     const signature = tx.TxnSignature
     return verify(messageHex, signature, this.publicKey)
-  }
-
-  /**
-   * Generates an X-Address and a secret.
-   *
-   * @param options - Options for generating X-Address.
-   * @returns A generated address.
-   * @throws When cannot generate an address.
-   */
-  public static generateXAddress(
-    options: GenerateAddressOptions = {},
-  ): GeneratedAddress {
-    try {
-      const generateSeedOptions: {
-        entropy?: Uint8Array
-        algorithm?: ECDSA
-      } = {
-        algorithm: options.algorithm,
-      }
-      if (options.entropy) {
-        generateSeedOptions.entropy = Uint8Array.from(options.entropy)
-      }
-      const secret = generateSeed(generateSeedOptions)
-      const keypair = deriveKeypair(secret)
-      const classicAddress = deriveAddress(keypair.publicKey)
-      const returnValue: GeneratedAddress = {
-        xAddress: classicAddressToXAddress(
-          classicAddress,
-          false,
-          options.test ?? false,
-        ),
-        secret,
-      }
-      if (options.includeClassicAddress) {
-        returnValue.classicAddress = classicAddress
-      }
-      return returnValue
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new UnexpectedError(error.message)
-      }
-
-      throw error
-    }
   }
 
   /**
