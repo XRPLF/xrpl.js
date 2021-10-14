@@ -30,35 +30,16 @@ interface SubmitOptions {
  *
  * @param this - A Client.
  * @param transaction - A transaction to autofill, sign & encode, and submit.
- * @param opts - A Wallet to sign a transaction and a boolean to autofill transaction.
+ * @param opts - (Optional) A Wallet to sign a transaction and a boolean to autofill transaction.
  * @returns A promise that contains SubmitResponse.
  * @throws RippledError if submit request fails.
  */
 async function submit(
   this: Client,
   transaction: Transaction | string,
-  { autofill = true, wallet }: SubmitOptions = {},
+  opts?: SubmitOptions,
 ): Promise<SubmitResponse> {
-  let signedTx = transaction
-  if (!isSigned(transaction)) {
-    if (!wallet) {
-      throw new ValidationError('Missing wallet to sign transaction')
-    }
-
-    let tx =
-      typeof transaction === 'string'
-        ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- this is expected
-          (decode(transaction) as unknown as Transaction)
-        : transaction
-
-    if (autofill) {
-      tx = await this.autofill(tx)
-    }
-
-    const { tx_blob } = wallet.sign(tx)
-    signedTx = tx_blob
-  }
-
+  const signedTx = await prepareSubmit(this, transaction, opts)
   return submitSigned(this, signedTx)
 }
 
@@ -96,18 +77,17 @@ async function submitSigned(
  * See [Reliable Transaction Submission](https://xrpl.org/reliable-transaction-submission.html).
  *
  * @param this - A Client.
- * @param wallet - A Wallet to sign a transaction.
  * @param transaction - A transaction to autofill, sign & encode, and submit.
+ * @param opts - (Optional) A Wallet to sign a transaction and a boolean to autofill transaction.
  * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
  */
 async function submitReliable(
   this: Client,
-  wallet: Wallet,
-  transaction: Transaction,
+  transaction: Transaction | string,
+  opts?: SubmitOptions,
 ): Promise<TxResponse> {
-  const tx = await this.autofill(transaction)
-  const { tx_blob } = wallet.sign(tx)
-  return this.submitSignedReliable(tx_blob)
+  const signedTx = await prepareSubmit(this, transaction, opts)
+  return submitSignedReliable(this, signedTx)
 }
 
 /**
@@ -115,14 +95,14 @@ async function submitReliable(
  * validated ledger (or has errored/will not be included for some reason).
  * See [Reliable Transaction Submission](https://xrpl.org/reliable-transaction-submission.html).
  *
- * @param this - A Client.
+ * @param client - A Client.
  * @param signedTransaction - A signed transaction to encode (if not already) and submit.
  * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
  * @throws ValidationError if the request is not signed/doesn't have a LastLedgerSequence, RippledError if the submit request
  *   fails, XrplError if the reliable submission fails.
  */
 async function submitSignedReliable(
-  this: Client,
+  client: Client,
   signedTransaction: Transaction | string,
 ): Promise<TxResponse> {
   if (!isSigned(signedTransaction)) {
@@ -145,9 +125,9 @@ async function submitSignedReliable(
     tx_blob: signedTxEncoded,
     fail_hard: isAccountDelete(signedTransaction),
   }
-  await this.request(request)
+  await client.request(request)
 
-  return waitForFinalTransactionOutcome(this, txHash)
+  return waitForFinalTransactionOutcome(client, txHash)
 }
 
 // Helper functions
@@ -196,6 +176,34 @@ function isSigned(transaction: Transaction | string): boolean {
   )
 }
 
+// checks if the transaction has been signed
+async function prepareSubmit(
+  client: Client,
+  transaction: Transaction | string,
+  { autofill = true, wallet }: SubmitOptions = {},
+): Promise<Transaction | string> {
+  if (isSigned(transaction)) {
+    return transaction
+  }
+
+  if (!wallet) {
+    throw new ValidationError('Missing wallet to sign transaction')
+  }
+
+  let tx =
+    typeof transaction === 'string'
+      ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- this is expected
+        (decode(transaction) as unknown as Transaction)
+      : transaction
+
+  if (autofill) {
+    tx = await client.autofill(tx)
+  }
+
+  const { tx_blob } = wallet.sign(tx)
+  return tx_blob
+}
+
 // checks if there is a LastLedgerSequence as a part of the transaction
 function hasLastLedgerSequence(transaction: Transaction | string): boolean {
   const tx = typeof transaction === 'string' ? decode(transaction) : transaction
@@ -208,4 +216,4 @@ function isAccountDelete(transaction: Transaction | string): boolean {
   return tx.TransactionType === 'AccountDelete'
 }
 
-export { submit, submitReliable, submitSignedReliable }
+export { submit, submitReliable }

@@ -25,7 +25,9 @@ describe('reliable submission', function () {
       Account: this.wallet.getClassicAddress(),
       Domain: convertStringToHex('example.com'),
     }
-    const responsePromise = this.client.submitReliable(this.wallet, accountSet)
+    const responsePromise = this.client.submitReliable(accountSet, {
+      wallet: this.wallet,
+    })
     const ledgerPromise = setTimeout(ledgerAccept, 1000, this.client)
     return Promise.all([responsePromise, ledgerPromise]).then(
       ([response, _ledger]) => {

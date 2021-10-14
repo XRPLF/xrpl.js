@@ -90,7 +90,7 @@ import { getBalances, getXrpBalance } from '../sugar/balances'
 import getFee from '../sugar/fee'
 import getLedgerIndex from '../sugar/ledgerIndex'
 import getOrderbook from '../sugar/orderbook'
-import { submit, submitReliable, submitSignedReliable } from '../sugar/submit'
+import { submit, submitReliable } from '../sugar/submit'
 import { ensureClassicAddress } from '../sugar/utils'
 import fundWallet from '../wallet/fundWallet'
 
@@ -592,10 +592,6 @@ class Client extends EventEmitter {
    * @category Core
    */
   public submitReliable = submitReliable
-  /**
-   * @category Core
-   */
-  public submitSignedReliable = submitSignedReliable
 
   /**
    * @deprecated Use autofill instead, provided for users familiar with v1
