@@ -219,4 +219,6 @@ describe('regular key', function () {
 
     assert.deepEqual(submitResponse, expectedResponse)
   })
+
+  // TODO: Add a case for same keys being used, but wrong address (Specifically the address corresponds to the publicKey of the wallet)
 })
