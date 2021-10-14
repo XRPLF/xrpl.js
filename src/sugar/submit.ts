@@ -59,19 +59,19 @@ async function submit(
     signedTx = tx_blob
   }
 
-  return this.submitSigned(signedTx)
+  return submitSigned(this, signedTx)
 }
 
 /**
  * Encodes and submits a signed transaction.
  *
- * @param this - A Client.
+ * @param client - A Client.
  * @param signedTransaction - A signed transaction to encode (if not already) and submit.
  * @returns A promise that contains SubmitResponse.
  * @throws ValidationError if the transaction isn't signed, RippledError if submit request fails.
  */
 async function submitSigned(
-  this: Client,
+  client: Client,
   signedTransaction: Transaction | string,
 ): Promise<SubmitResponse> {
   if (!isSigned(signedTransaction)) {
@@ -87,7 +87,7 @@ async function submitSigned(
     tx_blob: signedTxEncoded,
     fail_hard: isAccountDelete(signedTransaction),
   }
-  return this.request(request)
+  return client.request(request)
 }
 
 /**
@@ -208,4 +208,4 @@ function isAccountDelete(transaction: Transaction | string): boolean {
   return tx.TransactionType === 'AccountDelete'
 }
 
-export { submit, submitSigned, submitReliable, submitSignedReliable }
+export { submit, submitReliable, submitSignedReliable }

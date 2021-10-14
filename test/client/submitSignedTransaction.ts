@@ -31,7 +31,7 @@ describe('client.submitSigned', function () {
     this.mockRippled.addResponse('submit', rippled.submit.success)
 
     try {
-      const response = await this.client.submitSigned(signedTx)
+      const response = await this.client.submit(signedTx)
       assert(response.result.engine_result, 'tesSUCCESS')
     } catch (_error) {
       assert(false, 'Did not expect an error to be thrown')
@@ -45,7 +45,7 @@ describe('client.submitSigned', function () {
     this.mockRippled.addResponse('submit', rippled.submit.success)
 
     try {
-      const response = await this.client.submitSigned(signedTxEncoded)
+      const response = await this.client.submit(signedTxEncoded)
       assert(response.result.engine_result, 'tesSUCCESS')
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- error type thrown can be any
@@ -53,7 +53,7 @@ describe('client.submitSigned', function () {
     }
   })
 
-  it('should throw a ValidationError when submitting an unsigned transaction', async function () {
+  it('should throw a ValidationError when submitting an unsigned transaction without a wallet', async function () {
     const signedTx: Transaction = { ...signedTransaction }
     delete signedTx.SigningPubKey
     delete signedTx.TxnSignature
@@ -61,9 +61,9 @@ describe('client.submitSigned', function () {
     this.mockRippled.addResponse('submit', rippled.submit.success)
 
     await assertRejects(
-      this.client.submitSigned(signedTx),
+      this.client.submit(signedTx),
       ValidationError,
-      'Transaction must be signed',
+      'Missing wallet to sign transaction',
     )
   })
 })

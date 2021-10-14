@@ -90,12 +90,7 @@ import { getBalances, getXrpBalance } from '../sugar/balances'
 import getFee from '../sugar/fee'
 import getLedgerIndex from '../sugar/ledgerIndex'
 import getOrderbook from '../sugar/orderbook'
-import {
-  submit,
-  submitSigned,
-  submitReliable,
-  submitSignedReliable,
-} from '../sugar/submit'
+import { submit, submitReliable, submitSignedReliable } from '../sugar/submit'
 import { ensureClassicAddress } from '../sugar/utils'
 import fundWallet from '../wallet/fundWallet'
 
@@ -593,10 +588,6 @@ class Client extends EventEmitter {
    * @category Core
    */
   public submit = submit
-  /**
-   * @category Core
-   */
-  public submitSigned = submitSigned
   /**
    * @category Core
    */
