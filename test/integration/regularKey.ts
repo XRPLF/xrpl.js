@@ -144,6 +144,53 @@ describe('regular key', function () {
     await testTransaction(this.client, tx, regularKeyWallet)
   })
 
+  it('try to enable and disable a regular key', async function () {
+    const wallets = await generateFundedWalletWithRegularKey(this.client, true)
+    const masterWallet = wallets.masterWallet
+    const regularKeyWallet = wallets.regularKeyWallet
+
+    const enableMasterKey: AccountSet = {
+      TransactionType: 'AccountSet',
+      Account: masterWallet.classicAddress,
+      ClearFlag: AccountSetAsfFlags.asfDisableMaster,
+    }
+
+    const client: Client = this.client
+    const response = await client.submit(masterWallet, enableMasterKey)
+    assert.equal(
+      response.result.engine_result,
+      'tefMASTER_DISABLED',
+      'Master key was disabled, yet the master key still was able to sign and submit a transaction',
+    )
+
+    await testTransaction(client, enableMasterKey, regularKeyWallet)
+
+    const turnOffRegularKey: SetRegularKey = {
+      TransactionType: 'SetRegularKey',
+      Account: masterWallet.address,
+    }
+
+    await testTransaction(this.client, turnOffRegularKey, masterWallet)
+
+    const tx: OfferCreate = {
+      TransactionType: 'OfferCreate',
+      Account: regularKeyWallet.classicAddress,
+      TakerGets: '13100000',
+      TakerPays: {
+        currency: 'USD',
+        issuer: regularKeyWallet.classicAddress,
+        value: '10',
+      },
+    }
+
+    const response2 = await client.submit(regularKeyWallet, tx)
+    assert.equal(
+      response2.result.engine_result,
+      'tefBAD_AUTH',
+      'Regular key should have been disabled, but somehow was still able to sign and submit a transaction.',
+    )
+  })
+
   it('submit_multisigned transaction with regular keys set', async function () {
     const client: Client = this.client
 
