@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- required for formatting transactions */
 import { expect } from 'chai'
 
-import type { TransactionStream } from '../../src'
+import type { TransactionStream } from 'xrpl-local'
+
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
 

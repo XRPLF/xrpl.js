@@ -1,8 +1,0 @@
-{
-  "txJSON": "{\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"TransactionType\":\"CheckCancel\",\"CheckID\":\"49647F0D748DC3FE26BDACBC57F251AADEFFF391403EC9BF87C97F67E9977FB0\",\"Flags\":2147483648,\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":0,\"TicketSequence\":23}",
-  "instructions": {
-    "fee": "0.000012",
-    "ticketSequence": 23,
-    "maxLedgerVersion": 8820051
-  }
-}

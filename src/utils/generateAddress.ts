@@ -10,16 +10,18 @@ export interface GeneratedAddress {
   secret: string
 }
 
-export interface GenerateAddressOptions {
+interface GenerateAddressOptions {
   // The entropy to use to generate the seed.
   entropy?: Uint8Array | number[]
 
   // The digital signature algorithm to generate an address for. Can be `ecdsa-secp256k1` (default) or `ed25519`.
   algorithm?: ECDSA
 
-  // Specifies whether the address is intended for use on a test network such as Testnet or Devnet.
-  // If `true`, the address should only be used for testing, and will start with `T`.
-  // If `false` (default), the address should only be used on mainnet, and will start with `X`.
+  /*
+   * Specifies whether the address is intended for use on a test network such as Testnet or Devnet.
+   * If `true`, the address should only be used for testing, and will start with `T`.
+   * If `false` (default), the address should only be used on mainnet, and will start with `X`.
+   */
   test?: boolean
 
   // If `true`, return the classic address, in addition to the X-address.

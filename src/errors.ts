@@ -3,6 +3,12 @@ import { inspect } from 'util'
 
 // TODO: replace all `new Error`s with `new XrplError`s
 
+/**
+ * Base Error class for xrpl.js. All Errors thrown by xrpl.js should throw
+ * XrplErrors.
+ *
+ * @category Errors
+ */
 class XrplError extends Error {
   public readonly name: string
   public readonly message: string
@@ -52,28 +58,84 @@ class XrplError extends Error {
   }
 }
 
+/**
+ * Error thrown when rippled responds with an error.
+ *
+ * @category Errors
+ */
 class RippledError extends XrplError {}
 
+/**
+ * Error thrown when xrpl.js cannot specify error type.
+ *
+ * @category Errors
+ */
 class UnexpectedError extends XrplError {}
 
-class LedgerVersionError extends XrplError {}
-
+/**
+ * Error thrown when xrpl.js has an error with connection to rippled.
+ *
+ * @category Errors
+ */
 class ConnectionError extends XrplError {}
 
+/**
+ * Error thrown when xrpl.js is not connected to rippled server.
+ *
+ * @category Errors
+ */
 class NotConnectedError extends ConnectionError {}
 
+/**
+ * Error thrown when xrpl.js has disconnected from rippled server.
+ *
+ * @category Errors
+ */
 class DisconnectedError extends ConnectionError {}
 
+/**
+ * Error thrown when rippled is not initialized.
+ *
+ * @category Errors
+ */
 class RippledNotInitializedError extends ConnectionError {}
 
+/**
+ * Error thrown when xrpl.js times out.
+ *
+ * @category Errors
+ */
 class TimeoutError extends ConnectionError {}
 
+/**
+ * Error thrown when xrpl.js sees a response in the wrong format.
+ *
+ * @category Errors
+ */
 class ResponseFormatError extends ConnectionError {}
 
+/**
+ * Error thrown when xrpl.js sees a malformed transaction.
+ *
+ * @category Errors
+ */
 class ValidationError extends XrplError {}
 
+/**
+ * Error thrown when a client cannot generate a wallet from the testnet/devnet
+ * faucets, or when the client cannot infer the faucet URL (i.e. when the Client
+ * is connected to mainnet).
+ *
+ * @category Errors
+ */
 class XRPLFaucetError extends XrplError {}
 
+/**
+ * Error thrown when xrpl.js cannot retrieve a transaction, ledger, account, etc.
+ * From rippled.
+ *
+ * @category Errors
+ */
 class NotFoundError extends XrplError {
   /**
    * Construct an XrplError.
@@ -97,6 +159,5 @@ export {
   ResponseFormatError,
   ValidationError,
   NotFoundError,
-  LedgerVersionError,
   XRPLFaucetError,
 }

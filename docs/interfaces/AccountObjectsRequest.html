@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>AccountObjectsRequest | ripple-lib</title>
-	<meta name="description" content="Documentation for ripple-lib">
+	<title>AccountObjectsRequest | xrpl</title>
+	<meta name="description" content="Documentation for xrpl">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
 	<script async src="../assets/js/search.js" id="search-script"></script>
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">ripple-lib</a>
+					<a href="../index.html" class="title">xrpl</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -52,7 +52,7 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="../modules.html">ripple-lib</a>
+					<a href="../modules.html">xrpl</a>
 				</li>
 				<li>
 					<a href="AccountObjectsRequest.html">AccountObjectsRequest</a>
@@ -65,6 +65,16 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The account_objects command returns the raw ledger format for all objects
+							owned by an account. For a higher-level view of an account&#39;s trust lines and
+							balances, see the account_lines method instead. Expects a response in the
+						form of an <a href="AccountObjectsResponse.html">AccountObjectsResponse</a>.</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -108,9 +118,14 @@
 					<div class="tsd-signature tsd-kind-icon">account<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountObjects.ts#L17">src/models/methods/accountObjects.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountObjects.ts#L26">src/models/methods/accountObjects.ts:26</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A unique identifier for the account, most commonly the account&#39;s address.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="api_version" class="tsd-anchor"></a>
@@ -119,9 +134,14 @@
 					<aside class="tsd-sources">
 						<p>Inherited from BaseRequest.api_version</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/baseMethod.ts#L5">src/models/methods/baseMethod.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L14">src/models/methods/baseMethod.ts:14</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The API version to use. If omitted, use version 1.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
 					<a name="command" class="tsd-anchor"></a>
@@ -130,7 +150,7 @@
 					<aside class="tsd-sources">
 						<p>Overrides BaseRequest.command</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountObjects.ts#L16">src/models/methods/accountObjects.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountObjects.ts#L24">src/models/methods/accountObjects.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -140,9 +160,15 @@
 					<div class="tsd-signature tsd-kind-icon">deletion_<wbr>blockers_<wbr>only<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountObjects.ts#L19">src/models/methods/accountObjects.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountObjects.ts#L37">src/models/methods/accountObjects.ts:37</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>If true, the response only includes objects that would block this account
+							from being deleted. The default is false.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="id" class="tsd-anchor"></a>
@@ -151,9 +177,16 @@
 					<aside class="tsd-sources">
 						<p>Inherited from BaseRequest.id</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/baseMethod.ts#L3">src/models/methods/baseMethod.ts:3</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L10">src/models/methods/baseMethod.ts:10</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A unique value to identify this request. The response to this request uses
+								the same id field. This way, even if responses arrive out of order, you
+							know which request prompted which response.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="ledger_hash" class="tsd-anchor"></a>
@@ -161,9 +194,14 @@
 					<div class="tsd-signature tsd-kind-icon">ledger_<wbr>hash<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountObjects.ts#L20">src/models/methods/accountObjects.ts:20</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountObjects.ts#L39">src/models/methods/accountObjects.ts:39</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A 20-byte hex string for the ledger version to use.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="ledger_index" class="tsd-anchor"></a>
@@ -171,9 +209,15 @@
 					<div class="tsd-signature tsd-kind-icon">ledger_<wbr>index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">LedgerIndex</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountObjects.ts#L21">src/models/methods/accountObjects.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountObjects.ts#L44">src/models/methods/accountObjects.ts:44</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The ledger index of the ledger to use, or a shortcut string to choose a
+							Ledger automatically.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="limit" class="tsd-anchor"></a>
@@ -181,9 +225,15 @@
 					<div class="tsd-signature tsd-kind-icon">limit<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountObjects.ts#L22">src/models/methods/accountObjects.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountObjects.ts#L49">src/models/methods/accountObjects.ts:49</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The maximum number of objects to include in the results. Must be within
+							the inclusive range 10 to 400 on non-admin connections. The default is 200.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="marker" class="tsd-anchor"></a>
@@ -191,9 +241,15 @@
 					<div class="tsd-signature tsd-kind-icon">marker<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unknown</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountObjects.ts#L23">src/models/methods/accountObjects.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountObjects.ts#L54">src/models/methods/accountObjects.ts:54</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Value from a previous paginated response. Resume retrieving data where
+							that response left off.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="type" class="tsd-anchor"></a>
@@ -201,9 +257,16 @@
 					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">AccountObjectType</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountObjects.ts#L18">src/models/methods/accountObjects.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountObjects.ts#L32">src/models/methods/accountObjects.ts:32</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>If included, filter results to include only this type of ledger object.
+								The valid types are: Check , DepositPreauth, Escrow, Offer, PayChannel,
+							SignerList, Ticket, and RippleState (trust line).</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -271,6 +334,7 @@
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
 			</ul>

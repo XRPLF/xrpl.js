@@ -25,8 +25,7 @@ describe('Client', function () {
 
   it('Client valid options', function () {
     const client = new Client('wss://s:1')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: fix when src/client linting is merged
-    const privateConnectionUrl = (client.connection as any).url
+    const privateConnectionUrl = client.url
     assert.deepEqual(privateConnectionUrl, 'wss://s:1')
   })
 
@@ -35,7 +34,9 @@ describe('Client', function () {
   })
 
   it('Client connect() times out after 2 seconds', function () {
-    // TODO: Use a timer mock like https://jestjs.io/docs/en/timer-mocks
-    //       to test that connect() times out after 2 seconds.
+    /*
+     * TODO: Use a timer mock like https://jestjs.io/docs/en/timer-mocks
+     *       to test that connect() times out after 2 seconds.
+     */
   })
 })

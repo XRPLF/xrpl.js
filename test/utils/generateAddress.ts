@@ -1,19 +1,14 @@
 import { assert } from 'chai'
 
 import { UnexpectedError } from 'xrpl-local'
+import ECDSA from 'xrpl-local/ecdsa'
+import { generateXAddress } from 'xrpl-local/utils/generateAddress'
 
-import ECDSA from '../../src/ecdsa'
-import {
-  generateXAddress,
-  GenerateAddressOptions,
-} from '../../src/utils/generateAddress'
 import responses from '../fixtures/responses'
 
 describe('generateAddress', function () {
   it('generateAddress', function () {
     assert.deepEqual(
-      // GIVEN entropy of all zeros
-      // WHEN generating an address
       generateXAddress({ entropy: new Array(16).fill(0) }),
 
       // THEN we get the expected return value
@@ -23,12 +18,16 @@ describe('generateAddress', function () {
 
   it('generateAddress invalid entropy', function () {
     assert.throws(() => {
-      // GIVEN entropy of 1 byte
-      // WHEN generating an address
+      /*
+       * GIVEN entropy of 1 byte
+       * WHEN generating an address
+       */
       generateXAddress({ entropy: new Array(1).fill(0) })
 
-      // THEN an UnexpectedError is thrown
-      // because 16 bytes of entropy are required
+      /*
+       * THEN an UnexpectedError is thrown
+       * because 16 bytes of entropy are required
+       */
     }, UnexpectedError)
   })
 
@@ -57,7 +56,7 @@ describe('generateAddress', function () {
 
   it('generateAddress with algorithm `ecdsa-secp256k1`', function () {
     // GIVEN we want to use 'ecdsa-secp256k1'
-    const options: GenerateAddressOptions = {
+    const options = {
       algorithm: ECDSA.secp256k1,
       includeClassicAddress: true,
     }
@@ -84,7 +83,7 @@ describe('generateAddress', function () {
 
   it('generateAddress with algorithm `ed25519`', function () {
     // GIVEN we want to use 'ed25519'
-    const options: GenerateAddressOptions = {
+    const options = {
       algorithm: ECDSA.ed25519,
       includeClassicAddress: true,
     }
@@ -106,7 +105,7 @@ describe('generateAddress', function () {
 
   it('generateAddress with algorithm `ecdsa-secp256k1` and given entropy', function () {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
-    const options: GenerateAddressOptions = {
+    const options = {
       algorithm: ECDSA.secp256k1,
       entropy: new Array(16).fill(0),
     }
@@ -120,7 +119,7 @@ describe('generateAddress', function () {
 
   it('generateAddress with algorithm `ed25519` and given entropy', function () {
     // GIVEN we want to use 'ed25519' with entropy of zero
-    const options: GenerateAddressOptions = {
+    const options = {
       algorithm: ECDSA.ed25519,
       entropy: new Array(16).fill(0),
     }
@@ -138,7 +137,7 @@ describe('generateAddress', function () {
 
   it('generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address', function () {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
-    const options: GenerateAddressOptions = {
+    const options = {
       algorithm: ECDSA.secp256k1,
       entropy: new Array(16).fill(0),
       includeClassicAddress: true,
@@ -153,7 +152,7 @@ describe('generateAddress', function () {
 
   it('generateAddress with algorithm `ed25519` and given entropy; include classic address', function () {
     // GIVEN we want to use 'ed25519' with entropy of zero
-    const options: GenerateAddressOptions = {
+    const options = {
       algorithm: ECDSA.ed25519,
       entropy: new Array(16).fill(0),
       includeClassicAddress: true,
@@ -174,7 +173,7 @@ describe('generateAddress', function () {
 
   it('generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address; for test network use', function () {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
-    const options: GenerateAddressOptions = {
+    const options = {
       algorithm: ECDSA.secp256k1,
       entropy: new Array(16).fill(0),
       includeClassicAddress: true,
@@ -195,7 +194,7 @@ describe('generateAddress', function () {
 
   it('generateAddress with algorithm `ed25519` and given entropy; include classic address; for test network use', function () {
     // GIVEN we want to use 'ed25519' with entropy of zero
-    const options: GenerateAddressOptions = {
+    const options = {
       algorithm: ECDSA.ed25519,
       entropy: new Array(16).fill(0),
       includeClassicAddress: true,
@@ -216,7 +215,7 @@ describe('generateAddress', function () {
 
   it('generateAddress for test network use', function () {
     // GIVEN we want an address for test network use
-    const options: GenerateAddressOptions = { test: true }
+    const options = { test: true }
 
     // WHEN generating an address
     const account = generateXAddress(options)

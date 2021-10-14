@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>AccountChannelsRequest | ripple-lib</title>
-	<meta name="description" content="Documentation for ripple-lib">
+	<title>AccountChannelsRequest | xrpl</title>
+	<meta name="description" content="Documentation for xrpl">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
 	<script async src="../assets/js/search.js" id="search-script"></script>
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">ripple-lib</a>
+					<a href="../index.html" class="title">xrpl</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -52,7 +52,7 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="../modules.html">ripple-lib</a>
+					<a href="../modules.html">xrpl</a>
 				</li>
 				<li>
 					<a href="AccountChannelsRequest.html">AccountChannelsRequest</a>
@@ -65,6 +65,17 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The account_channels method returns information about an account&#39;s Payment
+							Channels. This includes only channels where the specified account is the
+							channel&#39;s source, not the destination. (A channel&#39;s &quot;source&quot; and &quot;owner&quot; are
+							the same.) All information retrieved is relative to a particular version of
+						the ledger. Returns an <a href="AccountChannelsResponse.html">AccountChannelsResponse</a>.</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -107,9 +118,15 @@
 					<div class="tsd-signature tsd-kind-icon">account<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountChannels.ts#L22">src/models/methods/accountChannels.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountChannels.ts#L36">src/models/methods/accountChannels.ts:36</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The unique identifier of an account, typically the account&#39;s address. The
+							request returns channels where this account is the channel&#39;s owner/source.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="api_version" class="tsd-anchor"></a>
@@ -118,9 +135,14 @@
 					<aside class="tsd-sources">
 						<p>Inherited from BaseRequest.api_version</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/baseMethod.ts#L5">src/models/methods/baseMethod.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L14">src/models/methods/baseMethod.ts:14</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The API version to use. If omitted, use version 1.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
 					<a name="command" class="tsd-anchor"></a>
@@ -129,7 +151,7 @@
 					<aside class="tsd-sources">
 						<p>Overrides BaseRequest.command</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountChannels.ts#L21">src/models/methods/accountChannels.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountChannels.ts#L30">src/models/methods/accountChannels.ts:30</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -139,9 +161,16 @@
 					<div class="tsd-signature tsd-kind-icon">destination_<wbr>account<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountChannels.ts#L23">src/models/methods/accountChannels.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountChannels.ts#L42">src/models/methods/accountChannels.ts:42</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The unique identifier of an account, typically the account&#39;s address. If
+								provided, filter results to payment channels whose destination is this
+							account.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="id" class="tsd-anchor"></a>
@@ -150,9 +179,16 @@
 					<aside class="tsd-sources">
 						<p>Inherited from BaseRequest.id</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/baseMethod.ts#L3">src/models/methods/baseMethod.ts:3</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L10">src/models/methods/baseMethod.ts:10</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A unique value to identify this request. The response to this request uses
+								the same id field. This way, even if responses arrive out of order, you
+							know which request prompted which response.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="ledger_hash" class="tsd-anchor"></a>
@@ -160,9 +196,14 @@
 					<div class="tsd-signature tsd-kind-icon">ledger_<wbr>hash<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountChannels.ts#L24">src/models/methods/accountChannels.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountChannels.ts#L44">src/models/methods/accountChannels.ts:44</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>20-byte hex string for the ledger version to use.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="ledger_index" class="tsd-anchor"></a>
@@ -170,19 +211,31 @@
 					<div class="tsd-signature tsd-kind-icon">ledger_<wbr>index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">LedgerIndex</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountChannels.ts#L25">src/models/methods/accountChannels.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountChannels.ts#L49">src/models/methods/accountChannels.ts:49</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The ledger index of the ledger to use, or a shortcut string to choose a
+							ledger automatically.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="limit" class="tsd-anchor"></a>
-					<h3>limit</h3>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> limit</h3>
 					<div class="tsd-signature tsd-kind-icon">limit<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountChannels.ts#L26">src/models/methods/accountChannels.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountChannels.ts#L54">src/models/methods/accountChannels.ts:54</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Limit the number of transactions to retrieve. Cannot be less than 10 or
+							more than 400. The default is 200.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="marker" class="tsd-anchor"></a>
@@ -190,9 +243,15 @@
 					<div class="tsd-signature tsd-kind-icon">marker<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unknown</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/accountChannels.ts#L27">src/models/methods/accountChannels.ts:27</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/accountChannels.ts#L59">src/models/methods/accountChannels.ts:59</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Value from a previous paginated response. Resume retrieving data where
+							that response left off.</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -257,6 +316,7 @@
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
 			</ul>

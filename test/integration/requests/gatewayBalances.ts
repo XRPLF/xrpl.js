@@ -33,10 +33,8 @@ describe('gateway_balances', function () {
         ledger_index: 1294,
         validated: true,
       },
-      status: 'success',
       type: 'response',
     }
-    assert.equal(response.status, expected.status)
     assert.equal(response.type, expected.type)
     assert.equal(typeof response.result.ledger_hash, 'string')
     assert.equal(typeof response.result.ledger_index, 'number')

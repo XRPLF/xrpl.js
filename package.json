@@ -1,6 +1,6 @@
 {
   "name": "xrpl",
-  "version": "2.0.0-beta.2",
+  "version": "2.0.0-beta.4",
   "license": "ISC",
   "description": "A TypeScript/JavaScript API for interacting with the XRP Ledger in Node.js and the browser",
   "files": [
@@ -14,6 +14,9 @@
   "types": "dist/npm/index.d.ts",
   "directories": {
     "test": "test"
+  },
+  "browser": {
+    "ws": "./dist/npm/client/wsWrapper.js"
   },
   "dependencies": {
     "@types/lodash": "^4.14.136",
@@ -62,7 +65,7 @@
     "path-browserify": "1.0.1",
     "prettier": "^2.3.2",
     "process": "^0.11.10",
-    "puppeteer": "10.2.0",
+    "puppeteer": "10.4.0",
     "stream-browserify": "^3.0.0",
     "stream-http": "3.2.0",
     "ts-loader": "^9.2.5",
@@ -83,7 +86,7 @@
     "analyze": "run-s build:web --analyze",
     "watch": "run-s build:lib --watch",
     "clean": "rm -rf dist",
-    "docgen": "typedoc ./src/index.ts",
+    "docgen": "typedoc",
     "prepublish": "run-s clean build",
     "test": "nyc mocha --config=test/.mocharc.json --exit",
     "test:integration": "TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/integration/**/*.ts ./test/integration/*.ts",

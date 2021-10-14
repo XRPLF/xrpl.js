@@ -127,7 +127,7 @@ async function setNextValidSequenceNumber(
   const request: AccountInfoRequest = {
     command: 'account_info',
     account: tx.Account,
-    ledger_index: 'validated',
+    ledger_index: 'current',
   }
   const data = await client.request(request)
   // eslint-disable-next-line no-param-reassign, require-atomic-updates -- param reassign is safe with no race condition
@@ -171,8 +171,10 @@ async function calculateFeePerTransactionType(
     baseFee = await fetchAccountDeleteFee(client)
   }
 
-  // Multi-signed Transaction
-  // 10 drops × (1 + Number of Signatures Provided)
+  /*
+   * Multi-signed Transaction
+   * 10 drops × (1 + Number of Signatures Provided)
+   */
   if (signersCount > 0) {
     baseFee = BigNumber.sum(baseFee, scaleValue(netFeeDrops, 1 + signersCount))
   }

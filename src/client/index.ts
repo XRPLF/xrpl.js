@@ -86,13 +86,18 @@ import {
 } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 import autofill from '../sugar/autofill'
-import getBalances from '../sugar/balances'
+import { getBalances, getXrpBalance } from '../sugar/balances'
 import getFee from '../sugar/fee'
 import getLedgerIndex from '../sugar/ledgerIndex'
 import getOrderbook from '../sugar/orderbook'
-import { submitTransaction, submitSignedTransaction } from '../sugar/submit'
+import {
+  submit,
+  submitSigned,
+  submitReliable,
+  submitSignedReliable,
+} from '../sugar/submit'
 import { ensureClassicAddress } from '../sugar/utils'
-import generateFaucetWallet from '../wallet/generateFaucetWallet'
+import fundWallet from '../wallet/fundWallet'
 
 import {
   Connection,
@@ -161,16 +166,33 @@ const DEFAULT_MAX_FEE_XRP = '2'
 const MIN_LIMIT = 10
 const MAX_LIMIT = 400
 
+const NORMAL_DISCONNECT_CODE = 1000
+
+/**
+ * Client for interacting with rippled servers.
+ *
+ * @category Clients
+ */
 class Client extends EventEmitter {
-  // New in > 0.21.0
-  // non-validated ledger versions are allowed, and passed to rippled as-is.
+  /*
+   * Underlying connection to rippled.
+   */
   public readonly connection: Connection
 
-  // Factor to multiply estimated fee by to provide a cushion in case the
-  // required fee rises during submission of a transaction. Defaults to 1.2.
+  /**
+   * Factor to multiply estimated fee by to provide a cushion in case the
+   * required fee rises during submission of a transaction. Defaults to 1.2.
+   *
+   * @category Fee
+   */
   public readonly feeCushion: number
-  // Maximum fee to use with transactions, in XRP. Must be a string-encoded
-  // number. Defaults to '2'.
+
+  /**
+   * Maximum transaction cost to allow, in decimal XRP. Must be a string-encoded
+   * number. Defaults to '2'.
+   *
+   * @category Fee
+   */
   public readonly maxFeeXRP: string
 
   /**
@@ -178,6 +200,7 @@ class Client extends EventEmitter {
    *
    * @param server - URL of the server to connect to.
    * @param options - Options for client settings.
+   * @category Constructor
    */
   // eslint-disable-next-line max-lines-per-function -- okay because we have to set up all the connection handlers
   public constructor(server: string, options: ClientOptions = {}) {
@@ -203,10 +226,12 @@ class Client extends EventEmitter {
 
     this.connection.on('disconnected', (code: number) => {
       let finalCode = code
-      // 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
-      // Since 4000 is a normal disconnect reason, we convert this to the standard exit code 1000
+      /*
+       * 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
+       * Since 4000 is a normal disconnect reason, we convert this to the standard exit code 1000
+       */
       if (finalCode === INTENTIONAL_DISCONNECT_CODE) {
-        finalCode = 1000
+        finalCode = NORMAL_DISCONNECT_CODE
       }
       this.emit('disconnected', finalCode)
     })
@@ -242,20 +267,18 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Returns true if there are more pages of data.
+   * Get the url that the client is connected to.
    *
-   * When there are more results than contained in the response, the response
-   * includes a `marker` field.
-   *
-   * See https://ripple.com/build/rippled-apis/#markers-and-pagination.
-   *
-   * @param response - Response to check for more pages on.
-   * @returns Whether the response has more pages of data.
+   * @returns The URL of the server this client is connected to.
+   * @category Network
    */
-  public static hasNextPage(response: MarkerResponse): boolean {
-    return Boolean(response.result.marker)
+  public get url(): string {
+    return this.connection.getUrl()
   }
 
+  /**
+   * @category Network
+   */
   public async request(
     r: AccountChannelsRequest,
   ): Promise<AccountChannelsResponse>
@@ -312,6 +335,7 @@ class Client extends EventEmitter {
    *
    * @param req - Request to send to the server.
    * @returns The response from the server.
+   * @category Network
    */
   public async request<R extends Request, T extends Response>(
     req: R,
@@ -330,6 +354,9 @@ class Client extends EventEmitter {
     return response
   }
 
+  /**
+   * @category Network
+   */
   public async requestNextPage(
     req: AccountChannelsRequest,
     resp: AccountChannelsResponse,
@@ -375,6 +402,27 @@ class Client extends EventEmitter {
     return this.request(nextPageRequest) as unknown as U
   }
 
+  /**
+   * Event handler for subscription streams.
+   *
+   * @example
+   * ```ts
+   * const api = new Client('wss://s.altnet.rippletest.net:51233')
+   *
+   * api.on('transactions', (tx: TransactionStream) => {
+   *  console.log("Received Transaction")
+   *  console.log(tx)
+   * })
+   *
+   * await api.connect()
+   * const response = await api.request({
+   *     command: 'subscribe',
+   *     streams: ['transactions_proposed']
+   * })
+   * ```
+   *
+   * @category Network
+   */
   public on(
     event: 'ledgerClosed',
     listener: (ledger: LedgerStream) => void,
@@ -396,7 +444,7 @@ class Client extends EventEmitter {
     listener: (phase: ConsensusStream) => void,
   ): this
   public on(event: 'path_find', listener: (path: PathFindStream) => void): this
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- actually needs to be any here
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
   public on(event: 'error', listener: (...err: any[]) => void): this
   /**
    * Event handler for subscription streams.
@@ -405,15 +453,14 @@ class Client extends EventEmitter {
    * @param listener - Function to run on event.
    * @returns This, because it inherits from EventEmitter.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- actually needs to be any here
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
   public on(eventName: string, listener: (...args: any[]) => void): this {
-    // if (args[0]?.type === 'transaction') {
-    //   handlePartialPaymentStream(args[0])
-    // }
-
     return super.on(eventName, listener)
   }
 
+  /**
+   * @category Network
+   */
   public async requestAll(
     req: AccountChannelsRequest,
   ): Promise<AccountChannelsResponse[]>
@@ -451,14 +498,18 @@ class Client extends EventEmitter {
     request: T,
     collect?: string,
   ): Promise<U[]> {
-    // The data under collection is keyed based on the command. Fail if command
-    // not recognized and collection key not provided.
+    /*
+     * The data under collection is keyed based on the command. Fail if command
+     * not recognized and collection key not provided.
+     */
     const collectKey = collect ?? getCollectKeyFromCommand(request.command)
     if (!collectKey) {
       throw new ValidationError(`no collect key for command ${request.command}`)
     }
-    // If limit is not provided, fetches all data over multiple requests.
-    // NOTE: This may return much more than needed. Set limit when possible.
+    /*
+     * If limit is not provided, fetches all data over multiple requests.
+     * NOTE: This may return much more than needed. Set limit when possible.
+     */
     const countTo: number = request.limit == null ? Infinity : request.limit
     let count = 0
     let marker: unknown = request.marker
@@ -498,6 +549,7 @@ class Client extends EventEmitter {
    * Tells the Client instance to connect to its rippled server.
    *
    * @returns A promise that resolves with a void value when a connection is established.
+   * @category Network
    */
   public async connect(): Promise<void> {
     return this.connection.connect()
@@ -507,10 +559,13 @@ class Client extends EventEmitter {
    * Tells the Client instance to disconnect from it's rippled server.
    *
    * @returns A promise that resolves with a void value when a connection is destroyed.
+   * @category Network
    */
   public async disconnect(): Promise<void> {
-    // backwards compatibility: connection.disconnect() can return a number, but
-    // this method returns nothing. SO we await but don't return any result.
+    /*
+     * backwards compatibility: connection.disconnect() can return a number, but
+     * this method returns nothing. SO we await but don't return any result.
+     */
     await this.connection.disconnect()
   }
 
@@ -518,27 +573,68 @@ class Client extends EventEmitter {
    * Checks if the Client instance is connected to its rippled server.
    *
    * @returns Whether the client instance is connected.
+   * @category Network
    */
   public isConnected(): boolean {
     return this.connection.isConnected()
   }
 
-  // syntactic sugar
-
+  /**
+   * @category Core
+   */
   public autofill = autofill
-  // @deprecated Use autofill instead
+
+  /**
+   * @category Fee
+   */
+  public getFee = getFee
+
+  /**
+   * @category Core
+   */
+  public submit = submit
+  /**
+   * @category Core
+   */
+  public submitSigned = submitSigned
+  /**
+   * @category Core
+   */
+  public submitReliable = submitReliable
+  /**
+   * @category Core
+   */
+  public submitSignedReliable = submitSignedReliable
+
+  /**
+   * @deprecated Use autofill instead, provided for users familiar with v1
+   */
   public prepareTransaction = autofill
 
-  public getFee = getFee
-  public getLedgerIndex = getLedgerIndex
+  /**
+   * @category Abstraction
+   */
+  public getXrpBalance = getXrpBalance
 
-  public submitTransaction = submitTransaction
-  public submitSignedTransaction = submitSignedTransaction
-
+  /**
+   * @category Abstraction
+   */
   public getBalances = getBalances
+
+  /**
+   * @category Abstraction
+   */
   public getOrderbook = getOrderbook
 
-  public generateFaucetWallet = generateFaucetWallet
+  /**
+   * @category Abstraction
+   */
+  public getLedgerIndex = getLedgerIndex
+
+  /**
+   * @category Faucet
+   */
+  public fundWallet = fundWallet
 }
 
 export { Client }

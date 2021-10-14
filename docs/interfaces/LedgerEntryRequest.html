@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>LedgerEntryRequest | ripple-lib</title>
-	<meta name="description" content="Documentation for ripple-lib">
+	<title>LedgerEntryRequest | xrpl</title>
+	<meta name="description" content="Documentation for xrpl">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
 	<script async src="../assets/js/search.js" id="search-script"></script>
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">ripple-lib</a>
+					<a href="../index.html" class="title">xrpl</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -52,7 +52,7 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="../modules.html">ripple-lib</a>
+					<a href="../modules.html">xrpl</a>
 				</li>
 				<li>
 					<a href="LedgerEntryRequest.html">LedgerEntryRequest</a>
@@ -65,6 +65,24 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The <code>ledger_entry</code> method returns a single ledger object from the XRP Ledger
+						in its raw format. Expects a response in the form of a <a href="LedgerEntryResponse.html">LedgerEntryResponse</a>.</p>
+					</div>
+					<dl class="tsd-comment-tags">
+						<dt>example</dt>
+						<dd><pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ledgerEntry</span><span style="color: #000000">: </span><span style="color: #267F99">LedgerEntryRequest</span><span style="color: #000000"> = {</span>
+<span style="color: #000000">  </span><span style="color: #001080">command:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;ledger_entry&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">ledger_index:</span><span style="color: #000000"> </span><span style="color: #098658">60102302</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">index:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;7DB0788C020F02780A673DC74757F23823FA3014C1866E72CC4CD8B226CD6EF4&quot;</span>
+<span style="color: #000000">}</span>
+</code></pre>
+						</dd>
+					</dl>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -114,9 +132,15 @@
 					<div class="tsd-signature tsd-kind-icon">account_<wbr>root<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/ledgerEntry.ts#L17">src/models/methods/ledgerEntry.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/ledgerEntry.ts#L47">src/models/methods/ledgerEntry.ts:47</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Retrieve an AccountRoot object by its address. This is roughly equivalent
+							to the an <a href="AccountInfoRequest.html">AccountInfoRequest</a>.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="api_version" class="tsd-anchor"></a>
@@ -125,9 +149,14 @@
 					<aside class="tsd-sources">
 						<p>Inherited from BaseRequest.api_version</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/baseMethod.ts#L5">src/models/methods/baseMethod.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L14">src/models/methods/baseMethod.ts:14</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The API version to use. If omitted, use version 1.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="binary" class="tsd-anchor"></a>
@@ -135,9 +164,16 @@
 					<div class="tsd-signature tsd-kind-icon">binary<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/ledgerEntry.ts#L8">src/models/methods/ledgerEntry.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/ledgerEntry.ts#L29">src/models/methods/ledgerEntry.ts:29</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>If true, return the requested ledger object&#39;s contents as a hex string in
+								the XRP Ledger&#39;s binary format. Otherwise, return data in JSON format. The
+							default is false.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="check" class="tsd-anchor"></a>
@@ -145,9 +181,14 @@
 					<div class="tsd-signature tsd-kind-icon">check<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/ledgerEntry.ts#L39">src/models/methods/ledgerEntry.ts:39</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/ledgerEntry.ts#L95">src/models/methods/ledgerEntry.ts:95</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The object ID of a Check object to retrieve.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
 					<a name="command" class="tsd-anchor"></a>
@@ -156,7 +197,7 @@
 					<aside class="tsd-sources">
 						<p>Overrides BaseRequest.command</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/ledgerEntry.ts#L7">src/models/methods/ledgerEntry.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/ledgerEntry.ts#L23">src/models/methods/ledgerEntry.ts:23</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -166,9 +207,16 @@
 					<div class="tsd-signature tsd-kind-icon">deposit_<wbr>preauth<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>authorized<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>owner<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/ledgerEntry.ts#L50">src/models/methods/ledgerEntry.ts:50</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/ledgerEntry.ts#L118">src/models/methods/ledgerEntry.ts:118</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Specify a DepositPreauth object to retrieve. If a string, must be the
+								object ID of the DepositPreauth object, as hexadecimal. If an object,
+							requires owner and authorized sub-fields.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="directory" class="tsd-anchor"></a>
@@ -176,9 +224,16 @@
 					<div class="tsd-signature tsd-kind-icon">directory<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>dir_root<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>owner<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>sub_index<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/ledgerEntry.ts#L19">src/models/methods/ledgerEntry.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/ledgerEntry.ts#L54">src/models/methods/ledgerEntry.ts:54</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The DirectoryNode to retrieve. If a string, must be the object ID of the
+								directory, as hexadecimal. If an object, requires either <code>dir_root</code> o
+							Owner as a sub-field, plus optionally a <code>sub_index</code> sub-field.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="escrow" class="tsd-anchor"></a>
@@ -186,9 +241,15 @@
 					<div class="tsd-signature tsd-kind-icon">escrow<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>owner<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>seq<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/ledgerEntry.ts#L41">src/models/methods/ledgerEntry.ts:41</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/ledgerEntry.ts#L101">src/models/methods/ledgerEntry.ts:101</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The Escrow object to retrieve. If a string, must be the object ID of the
+							escrow, as hexadecimal. If an object, requires owner and seq sub-fields.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="id" class="tsd-anchor"></a>
@@ -197,9 +258,16 @@
 					<aside class="tsd-sources">
 						<p>Inherited from BaseRequest.id</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/baseMethod.ts#L3">src/models/methods/baseMethod.ts:3</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L10">src/models/methods/baseMethod.ts:10</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A unique value to identify this request. The response to this request uses
+								the same id field. This way, even if responses arrive out of order, you
+							know which request prompted which response.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="index" class="tsd-anchor"></a>
@@ -207,7 +275,7 @@
 					<div class="tsd-signature tsd-kind-icon">index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/ledgerEntry.ts#L15">src/models/methods/ledgerEntry.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/ledgerEntry.ts#L41">src/models/methods/ledgerEntry.ts:41</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -217,9 +285,14 @@
 					<div class="tsd-signature tsd-kind-icon">ledger_<wbr>hash<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/ledgerEntry.ts#L9">src/models/methods/ledgerEntry.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/ledgerEntry.ts#L31">src/models/methods/ledgerEntry.ts:31</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A 20-byte hex string for the ledger version to use.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="ledger_index" class="tsd-anchor"></a>
@@ -227,9 +300,14 @@
 					<div class="tsd-signature tsd-kind-icon">ledger_<wbr>index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">LedgerIndex</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/ledgerEntry.ts#L10">src/models/methods/ledgerEntry.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/ledgerEntry.ts#L33">src/models/methods/ledgerEntry.ts:33</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The ledger index of the ledger to use, or a shortcut string.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="offer" class="tsd-anchor"></a>
@@ -237,9 +315,16 @@
 					<div class="tsd-signature tsd-kind-icon">offer<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>account<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>seq<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/ledgerEntry.ts#L27">src/models/methods/ledgerEntry.ts:27</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/ledgerEntry.ts#L70">src/models/methods/ledgerEntry.ts:70</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The Offer object to retrieve. If a string, interpret as the unique object
+								ID to the Offer. If an object, requires the sub-fields <code>account</code> and <code>seq</code>
+							to uniquely identify the offer.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="payment_channel" class="tsd-anchor"></a>
@@ -247,9 +332,14 @@
 					<div class="tsd-signature tsd-kind-icon">payment_<wbr>channel<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/ledgerEntry.ts#L48">src/models/methods/ledgerEntry.ts:48</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/ledgerEntry.ts#L111">src/models/methods/ledgerEntry.ts:111</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The object ID of a PayChannel object to retrieve.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="ripple_state" class="tsd-anchor"></a>
@@ -257,17 +347,35 @@
 					<div class="tsd-signature tsd-kind-icon">ripple_<wbr>state<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>accounts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>currency<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/ledgerEntry.ts#L34">src/models/methods/ledgerEntry.ts:34</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/ledgerEntry.ts#L84">src/models/methods/ledgerEntry.ts:84</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Object specifying the RippleState (trust line) object to retrieve. The
+								accounts and currency sub-fields are required to uniquely specify the
+							rippleState entry to retrieve.</p>
+						</div>
+					</div>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter">
 								<h5>accounts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>2-length array of account Addresses, defining the two accounts linked by
+										this RippleState object.</p>
+									</div>
+								</div>
 							</li>
 							<li class="tsd-parameter">
 								<h5>currency<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>Currency Code of the RippleState object to retrieve.</p>
+									</div>
+								</div>
 							</li>
 						</ul>
 					</div>
@@ -278,9 +386,16 @@
 					<div class="tsd-signature tsd-kind-icon">ticket<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>owner<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>ticket_sequence<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/ledgerEntry.ts#L57">src/models/methods/ledgerEntry.ts:57</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/ledgerEntry.ts#L132">src/models/methods/ledgerEntry.ts:132</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The Ticket object to retrieve. If a string, must be the object ID of the
+								Ticket, as hexadecimal. If an object, the <code>owner</code> and <code>ticket_sequence</code>
+							sub-fields are required to uniquely specify the Ticket entry.</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -366,6 +481,7 @@
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
 			</ul>

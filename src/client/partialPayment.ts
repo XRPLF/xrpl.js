@@ -9,7 +9,7 @@ import type {
   TxResponse,
 } from '..'
 import type { Amount } from '../models/common'
-import { PaymentTransactionFlags, Transaction } from '../models/transactions'
+import { PaymentFlags, Transaction } from '../models/transactions'
 import type TransactionMetadata from '../models/transactions/metadata'
 import { isFlagEnabled } from '../models/utils'
 
@@ -54,7 +54,7 @@ function isPartialPayment(
 
   const tfPartial =
     typeof tx.Flags === 'number'
-      ? isFlagEnabled(tx.Flags, PaymentTransactionFlags.tfPartialPayment)
+      ? isFlagEnabled(tx.Flags, PaymentFlags.tfPartialPayment)
       : tx.Flags?.tfPartialPayment
 
   if (!tfPartial) {
@@ -127,7 +127,7 @@ export function handlePartialPayment(
 /**
  * Check a transaction from a subscription stream for partial payment.
  *
- * @param stream - Stream Transaction to check for partial payment,.
+ * @param stream - Stream Transaction to check for partial payment.
  */
 export function handleStreamPartialPayment(stream: TransactionStream): void {
   if (isPartialPayment(stream.transaction, stream.meta)) {

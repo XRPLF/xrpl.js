@@ -2,8 +2,15 @@ import type { Request } from '.'
 
 export interface BaseRequest {
   [x: string]: unknown
+  /**
+   * A unique value to identify this request. The response to this request uses
+   * the same id field. This way, even if responses arrive out of order, you
+   * know which request prompted which response.
+   */
   id?: number | string
+  /** The name of the API method. */
   command: string
+  /** The API version to use. If omitted, use version 1. */
   api_version?: number
 }
 
@@ -15,7 +22,7 @@ interface Warning {
 
 export interface BaseResponse {
   id: number | string
-  status: 'success' | string
+  status?: 'success' | string
   type: 'response' | string
   result: unknown
   warning?: 'load'
@@ -24,6 +31,12 @@ export interface BaseResponse {
   api_version?: number
 }
 
+/**
+ * The shape of an error response from rippled. xrpl.js handles rejections by
+ * throwing, and allowing the user to handle in the catch block of a promise.
+ *
+ * @category Responses
+ */
 export interface ErrorResponse {
   id: number | string
   status: 'error'

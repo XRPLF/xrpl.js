@@ -2,6 +2,8 @@ import { Client, ClientOptions } from '.'
 
 /**
  * Client that can rely on multiple different servers.
+ *
+ * @category Clients
  */
 export default class BroadcastClient extends Client {
   private readonly clients: Client[]

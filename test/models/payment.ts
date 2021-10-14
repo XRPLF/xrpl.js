@@ -1,11 +1,7 @@
 import { assert } from 'chai'
 
-import {
-  validatePayment,
-  validate,
-  PaymentTransactionFlags,
-  ValidationError,
-} from 'xrpl-local'
+import { validate, PaymentFlags, ValidationError } from 'xrpl-local'
+import { validatePayment } from 'xrpl-local/models/transactions/payment'
 
 /**
  * PaymentTransaction Verification Testing.
@@ -158,7 +154,7 @@ describe('Payment', function () {
 
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a number`, function () {
     paymentTransaction.DeliverMin = '10000'
-    paymentTransaction.Flags = PaymentTransactionFlags.tfPartialPayment
+    paymentTransaction.Flags = PaymentFlags.tfPartialPayment
     assert.doesNotThrow(() => validatePayment(paymentTransaction))
     assert.doesNotThrow(() => validate(paymentTransaction))
   })

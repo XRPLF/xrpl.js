@@ -5,7 +5,6 @@ import { LedgerClosedRequest, LedgerClosedResponse } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
-import { verifySuccessfulResponse } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -24,17 +23,16 @@ describe('ledger_closed', function () {
     const ledgerClosedResponse: LedgerClosedResponse =
       await this.client.request(ledgerClosedRequest)
 
-    verifySuccessfulResponse(ledgerClosedResponse)
-
     const expectedResponse: LedgerClosedResponse = {
       id: ledgerClosedResponse.id,
-      status: 'success',
       type: 'response',
       result: {
-        ledger_hash: ledgerClosedResponse.result.ledger_hash,
-        ledger_index: ledgerClosedResponse.result.ledger_index,
+        ledger_hash: 'string',
+        ledger_index: 1,
       },
     }
-    assert.deepEqual(ledgerClosedResponse, expectedResponse)
+    assert.equal(ledgerClosedResponse.type, expectedResponse.type)
+    assert.typeOf(ledgerClosedResponse.result.ledger_hash, 'string')
+    assert.typeOf(ledgerClosedResponse.result.ledger_index, 'number')
   })
 })

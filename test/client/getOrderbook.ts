@@ -1,8 +1,9 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 
-import { BookOffersRequest, ValidationError } from '../../src'
-import { OfferLedgerFlags } from '../../src/models/ledger/offer'
+import { BookOffersRequest, ValidationError } from 'xrpl-local'
+import { OfferFlags } from 'xrpl-local/models/ledger/offer'
+
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
@@ -169,11 +170,11 @@ describe('client.getOrderbook', function () {
       requests.getOrderbook.normal.takerGets,
     )
     assert.strictEqual(
-      response.buy.every((item) => item.Flags !== OfferLedgerFlags.lsfSell),
+      response.buy.every((item) => item.Flags !== OfferFlags.lsfSell),
       true,
     )
     assert.strictEqual(
-      response.sell.every((item) => item.Flags === OfferLedgerFlags.lsfSell),
+      response.sell.every((item) => item.Flags === OfferFlags.lsfSell),
       true,
     )
   })

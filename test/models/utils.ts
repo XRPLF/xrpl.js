@@ -4,16 +4,19 @@ import { assert } from 'chai'
 import {
   DepositPreauth,
   OfferCreate,
-  OfferCreateTransactionFlags,
+  OfferCreateFlags,
   PaymentChannelClaim,
-  PaymentChannelClaimTransactionFlags,
+  PaymentChannelClaimFlags,
   Payment,
-  PaymentTransactionFlags,
+  PaymentFlags,
   TrustSet,
-  TrustSetTransactionFlags,
+  TrustSetFlags,
 } from 'xrpl-local'
+import { AccountRootFlags } from 'xrpl-local/models/ledger'
 import { isFlagEnabled } from 'xrpl-local/models/utils'
-import setTransactionFlagsToNumber from 'xrpl-local/models/utils/flags'
+import setTransactionFlagsToNumber, {
+  parseAccountRootFlags,
+} from 'xrpl-local/models/utils/flags'
 
 /**
  * Utils Testing.
@@ -63,7 +66,7 @@ describe('Models Utils', function () {
         },
       }
 
-      const { tfPassive, tfFillOrKill } = OfferCreateTransactionFlags
+      const { tfPassive, tfFillOrKill } = OfferCreateFlags
       const expected: number = tfPassive | tfFillOrKill
 
       setTransactionFlagsToNumber(tx)
@@ -82,7 +85,7 @@ describe('Models Utils', function () {
         },
       }
 
-      const { tfRenew } = PaymentChannelClaimTransactionFlags
+      const { tfRenew } = PaymentChannelClaimFlags
       const expected: number = tfRenew
 
       setTransactionFlagsToNumber(tx)
@@ -102,7 +105,7 @@ describe('Models Utils', function () {
         },
       }
 
-      const { tfPartialPayment, tfLimitQuality } = PaymentTransactionFlags
+      const { tfPartialPayment, tfLimitQuality } = PaymentFlags
       const expected: number = tfPartialPayment | tfLimitQuality
 
       setTransactionFlagsToNumber(tx)
@@ -129,8 +132,7 @@ describe('Models Utils', function () {
         },
       }
 
-      const { tfSetfAuth, tfClearNoRipple, tfClearFreeze } =
-        TrustSetTransactionFlags
+      const { tfSetfAuth, tfClearNoRipple, tfClearFreeze } = TrustSetFlags
       const expected: number = tfSetfAuth | tfClearNoRipple | tfClearFreeze
 
       setTransactionFlagsToNumber(tx)
@@ -146,6 +148,47 @@ describe('Models Utils', function () {
 
       setTransactionFlagsToNumber(tx)
       assert.strictEqual(tx.Flags, 0)
+    })
+
+    it('parseAccountRootFlags all enabled', function () {
+      const accountRootFlags =
+        AccountRootFlags.lsfDefaultRipple |
+        AccountRootFlags.lsfDepositAuth |
+        AccountRootFlags.lsfDisableMaster |
+        AccountRootFlags.lsfDisallowXRP |
+        AccountRootFlags.lsfGlobalFreeze |
+        AccountRootFlags.lsfNoFreeze |
+        AccountRootFlags.lsfPasswordSpent |
+        AccountRootFlags.lsfRequireAuth |
+        AccountRootFlags.lsfRequireDestTag
+
+      const parsed = parseAccountRootFlags(accountRootFlags)
+
+      assert.isTrue(
+        parsed.lsfDefaultRipple &&
+          parsed.lsfDepositAuth &&
+          parsed.lsfDisableMaster &&
+          parsed.lsfDisallowXRP &&
+          parsed.lsfGlobalFreeze &&
+          parsed.lsfNoFreeze &&
+          parsed.lsfPasswordSpent &&
+          parsed.lsfRequireAuth &&
+          parsed.lsfRequireDestTag,
+      )
+    })
+
+    it('parseAccountFlags all false', function () {
+      const parsed = parseAccountRootFlags(0)
+
+      assert.isUndefined(parsed.lsfDefaultRipple)
+      assert.isUndefined(parsed.lsfDepositAuth)
+      assert.isUndefined(parsed.lsfDisableMaster)
+      assert.isUndefined(parsed.lsfDisallowXRP)
+      assert.isUndefined(parsed.lsfGlobalFreeze)
+      assert.isUndefined(parsed.lsfNoFreeze)
+      assert.isUndefined(parsed.lsfPasswordSpent)
+      assert.isUndefined(parsed.lsfRequireAuth)
+      assert.isUndefined(parsed.lsfRequireDestTag)
     })
   })
 })
