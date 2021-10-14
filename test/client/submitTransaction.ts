@@ -34,7 +34,7 @@ describe('client.submit', function () {
     this.mockRippled.addResponse('submit', rippled.submit.success)
 
     try {
-      const response = await this.client.submit(wallet, tx)
+      const response = await this.client.submit(tx, { wallet })
       assert(response.result.engine_result, 'tesSUCCESS')
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- error type thrown can be any

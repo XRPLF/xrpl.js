@@ -15,27 +15,51 @@ async function sleep(ms: number): Promise<void> {
   })
 }
 
+interface SubmitOptions {
+  autofill?: boolean
+  failHard?: boolean
+  wallet?: Wallet
+}
+
 /**
- * Submits an unsigned transaction.
+ * Submits a signed/unsigned transaction.
  * Steps performed on a transaction:
  *    1. Autofill.
  *    2. Sign & Encode.
  *    3. Submit.
  *
  * @param this - A Client.
- * @param wallet - A Wallet to sign a transaction.
  * @param transaction - A transaction to autofill, sign & encode, and submit.
+ * @param opts - A Wallet to sign a transaction and a boolean to autofill transaction.
  * @returns A promise that contains SubmitResponse.
  * @throws RippledError if submit request fails.
  */
 async function submit(
   this: Client,
-  wallet: Wallet,
-  transaction: Transaction,
+  transaction: Transaction | string,
+  { autofill = true, wallet }: SubmitOptions = {},
 ): Promise<SubmitResponse> {
-  const tx = await this.autofill(transaction)
-  const { tx_blob } = wallet.sign(tx)
-  return this.submitSigned(tx_blob)
+  let signedTx = transaction
+  if (!isSigned(transaction)) {
+    if (!wallet) {
+      throw new ValidationError('Missing wallet to sign transaction')
+    }
+
+    let tx =
+      typeof transaction === 'string'
+        ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- this is expected
+          (decode(transaction) as unknown as Transaction)
+        : transaction
+
+    if (autofill) {
+      tx = await this.autofill(tx)
+    }
+
+    const { tx_blob } = wallet.sign(tx)
+    signedTx = tx_blob
+  }
+
+  return this.submitSigned(signedTx)
 }
 
 /**
