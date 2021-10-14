@@ -12,10 +12,11 @@ A migration guide is available at (TODO: add link here).
 * All rippled request methods are now supported by client request methods
 * JavaScript method (`validate`) to check the shape of transaction models
 * Methods to multisign (`multisign`), authorize a payment channel (`authorizeChannel`) and verify a transaction signature (`verifySignature`)
-* autofill
-* partial payment stuff
+* `client.autofill` (converts X-Addresses, converts transaction flags from objects to numbers, and fills in `Sequence`, `LastLedgerSequence`, and `Fee`)
+* partial payment stuff (TODO: based on #1709)
 * `getBalanceChanges` added in from `ripple-lib-transactionparser`
 * Changed return shape of some methods
+* Reliable transaction submission (waits until the transaction has been validated or `LastLedgerSequence` has failed before returning)
 
 ### Changed
 * Renamed package from `ripple-lib` to `xrpl.js`
@@ -26,7 +27,8 @@ A migration guide is available at (TODO: add link here).
   * Added TypeScript typing to subscription handlers
   * `client.request` now takes a request object that matches the rippled format, instead of separating out the `command`
   * `client.requestAll` is now a public method that anyone can use
-  * `client.getLedgerVersion` -> `client.getLedgerIndex`
+  * `api.getLedgerVersion` -> `client.getLedgerIndex`
+  * `client.submit` will now sign a transaction
 * Better TypeScript typing everywhere
 * Completely revamped library documentation (now available at js.xrpl.org)
 * Utils
@@ -35,8 +37,7 @@ A migration guide is available at (TODO: add link here).
   * Moved `ripple-address-codec` functions from `Client` to `utils` (and exported at the top level)
   * Moved `hasNextPage` from `Client` to `utils`
 * Renamed `client.generateFaucetWallet` to `client.fundWallet` (and it now returns a `Wallet`)
-* submit transaction flow
-* flags
+* Better flag organization
 * Updated dependencies
   * ws, typescript
 
@@ -47,21 +48,21 @@ A migration guide is available at (TODO: add link here).
 * Automatic client subscription to incoming ledgers
 * prepare functions
 * Several client abstraction methods that were deemed no longer necessary
-  * `client.getAccountInfo` -> `client.request({command: 'account_info', ...})`
-  * `client.getAccountObjects` -> `client.request({command: 'account_objects', ...})`
-  * `client.getBalanceSheet` -> `client.request({command: 'gateway_balances', ...})`
-  * `client.getLedger` -> `client.request({command: 'ledger', ...})`
-  * `client.getOrders` -> `client.request({command: 'account_offers', ...})`
-  * `client.getPaymentChannel` -> `client.request({command: 'ledger_entry', ...})`
-  * `client.getSettings` -> `client.request({command: 'account_info', ...})`
-  * `client.getServerInfo` -> `client.request({command: 'server_info'})`
-  * `client.getTransaction` -> `client.request({command: 'tx', ...})`
-  * `client.getTransactions` -> `client.request({command: 'account_tx', ...})`
-  * `client.getTrustlines` -> `client.request({command: 'account_lines', ...})`
-  * `client.getPaths` -> `client.request({command: ripple_path_find, ...})`
+  * `api.getAccountInfo` -> `client.request({command: 'account_info', ...})`
+  * `api.getAccountObjects` -> `client.request({command: 'account_objects', ...})`
+  * `api.getBalanceSheet` -> `client.request({command: 'gateway_balances', ...})`
+  * `api.getLedger` -> `client.request({command: 'ledger', ...})`
+  * `api.getOrders` -> `client.request({command: 'account_offers', ...})`
+  * `api.getPaymentChannel` -> `client.request({command: 'ledger_entry', ...})`
+  * `api.getSettings` -> `client.request({command: 'account_info', ...})`
+  * `api.getServerInfo` -> `client.request({command: 'server_info'})`
+  * `api.getTransaction` -> `client.request({command: 'tx', ...})`
+  * `api.getTransactions` -> `client.request({command: 'account_tx', ...})`
+  * `api.getTrustlines` -> `client.request({command: 'account_lines', ...})`
+  * `api.getPaths` -> `client.request({command: ripple_path_find, ...})`
+  * `api.combine` -> `multisign`
+  * `api.sign` -> `Wallet.sign`
 * `jsonschemas`
-* `api.combine` -> `multisign`
-* `api.sign` -> `Wallet.sign`
 * `generateXAddress` -> `Wallet.generate(...).getXAddress(...)`
 * Helper methods/utils that are no longer necessary (such as `renameCounterpartyToIssuer` and `formatBidsAndAsks`)
 
