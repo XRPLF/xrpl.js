@@ -23,7 +23,7 @@ function percentToDecimal(percent: string): string {
 /**
  * Converts a string decimal to "billionths" format for use with TransferRate.
  *
- * @param percent - A string decimal between 0 and 1.00
+ * @param decimal - A string decimal between 0 and 1.00
  * @returns A number in the "billionths" format.
  * @throws ValidationError when the parameter is not convertible to
  * "billionths" format.
@@ -70,7 +70,7 @@ export function percentToTransferRate(percent: string): number {
  * Converts a string decimal to the "billionths" format for use with QualityIn/
  * QualityOut
  *
- * @param percent - A string decimal (i.e. ".00034").
+ * @param decimal - A string decimal (i.e. ".00034").
  * @returns A number in the "billionths" format.
  * @throws ValidationError when the parameter is not convertible to
  * "billionths" format.
