@@ -2,7 +2,7 @@ import { assert } from 'chai'
 
 import { ValidationError } from 'xrpl-local'
 
-import { percentToTransferRate } from '../../src'
+import { percentToTransferRate, decimalToTransferRate } from '../../src'
 
 describe('TransferRate utils', function () {
   it('converts 1 percent to valid TransferRate', function () {
@@ -11,11 +11,25 @@ describe('TransferRate utils', function () {
     assert.equal(billionths, 1010000000)
   })
 
+  it('converts .01 percent to valid TransferRate', function () {
+    const billionths = decimalToTransferRate('.01')
+
+    assert.equal(billionths, 1010000000)
+  })
+
   it('Throws when TransferRate < 0%', function () {
     assert.throws(
       () => percentToTransferRate('-1%'),
       ValidationError,
-      'Value -1% must be between 0% and 100%.',
+      'Decimal value must be between 0 and 1.00.',
+    )
+  })
+
+  it('Throws when TransferRate < 0', function () {
+    assert.throws(
+      () => decimalToTransferRate('-.01'),
+      ValidationError,
+      'Decimal value must be between 0 and 1.00.',
     )
   })
 
@@ -23,20 +37,42 @@ describe('TransferRate utils', function () {
     assert.throws(
       () => percentToTransferRate('101%'),
       ValidationError,
-      'Value 101% must be between 0% and 100%.',
+      'Decimal value must be between 0 and 1.00.',
     )
   })
 
-  it('Throws when TransferRate greater than maximum precision', function () {
+  it('Throws when TransferRate >1.00', function () {
+    assert.throws(
+      () => decimalToTransferRate('1.01'),
+      ValidationError,
+      'Decimal value must be between 0 and 1.00.',
+    )
+  })
+
+  it('percentToTransferRate greater than maximum precision', function () {
     assert.throws(
       () => percentToTransferRate('.0000000000000011221%'),
       ValidationError,
-      'Value .0000000000000011221% exceeds maximum precision.',
+      'Decimal exceeds maximum precision.',
+    )
+  })
+
+  it('decimalToTransferRate greater than maximum precision', function () {
+    assert.throws(
+      () => decimalToTransferRate('.000000000000000011221'),
+      ValidationError,
+      'Decimal exceeds maximum precision.',
     )
   })
 
   it('converts 0 percent to valid 0', function () {
     const billionths = percentToTransferRate('0%')
+
+    assert.equal(billionths, 0)
+  })
+
+  it('converts 0 to valid 0', function () {
+    const billionths = decimalToTransferRate('0')
 
     assert.equal(billionths, 0)
   })
