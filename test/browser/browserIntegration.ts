@@ -97,5 +97,5 @@ describe('Browser Tests', function () {
     } finally {
       await browser.close()
     }
-  }).timeout(40000)
+  }).timeout(TIMEOUT)
 })
