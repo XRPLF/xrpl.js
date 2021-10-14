@@ -308,28 +308,6 @@ describe('regular key', function () {
     }
     const submitResponse = await client.request(multisignedRequest)
     await ledgerAccept(client)
-    console.log(submitResponse)
-    // TODO: See what the response actually is and fix this expectation
-    assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
-    await verifySubmittedTransaction(this.client, multisigned)
-
-    const expectedResponse: SubmitMultisignedResponse = {
-      id: submitResponse.id,
-      type: 'response',
-      result: {
-        engine_result: 'tesSUCCESS',
-        engine_result_code: 0,
-        engine_result_message:
-          'The transaction was applied. Only final in a validated ledger.',
-        tx_blob: multisigned,
-        tx_json: {
-          ...(decode(multisigned) as unknown as Transaction),
-          hash: hashSignedTx(multisigned),
-        },
-      },
-    }
-
-    assert.deepEqual(submitResponse, expectedResponse)
+    assert.strictEqual(submitResponse.result.engine_result, 'tefBAD_SIGNATURE')
   })
-  // TODO: Add a case for same keys being used, but wrong address (The address corresponds to the publicKey of the regular key)
 })
