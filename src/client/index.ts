@@ -92,13 +92,11 @@ import {
   getFee,
   getBalances,
   getXrpBalance,
-} from '../sugar'
-import {
   submit,
   submitSigned,
   submitReliable,
   submitSignedReliable,
-} from '../sugar/submit'
+} from '../sugar'
 import fundWallet from '../wallet/fundWallet'
 
 import {

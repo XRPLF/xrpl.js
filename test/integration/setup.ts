@@ -1,4 +1,4 @@
-import { generateXAddress, Client, Wallet } from 'xrpl-local'
+import { Client, Wallet } from 'xrpl-local'
 
 import serverUrl from './serverUrl'
 import { fundAccount, ledgerAccept } from './utils'
@@ -12,7 +12,7 @@ export async function suiteClientSetup(this: Mocha.Context): Promise<void> {
 
   await setupClient.bind(this)(serverUrl)
   await ledgerAccept(this.client)
-  this.newWallet = generateXAddress({ includeClassicAddress: true })
+  this.newWallet = Wallet.generate()
   await teardownClient.bind(this)()
 }
 
