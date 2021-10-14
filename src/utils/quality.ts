@@ -20,6 +20,14 @@ function percentToDecimal(percent: string): string {
   return new BigNumber(split[0]).dividedBy('100').toString(BASE_TEN)
 }
 
+/**
+ * Converts a string decimal to "billionths" format for use with TransferRate.
+ *
+ * @param percent - A string decimal between 0 and 1.00
+ * @returns A number in the "billionths" format.
+ * @throws ValidationError when the parameter is not convertible to
+ * "billionths" format.
+ */
 export function decimalToTransferRate(decimal: string): number {
   const rate = new BigNumber(decimal).times(ONE_BILLION).plus(ONE_BILLION)
 
@@ -58,6 +66,15 @@ export function percentToTransferRate(percent: string): number {
   return decimalToTransferRate(decimal)
 }
 
+/**
+ * Converts a string decimal to the "billionths" format for use with QualityIn/
+ * QualityOut
+ *
+ * @param percent - A string decimal (i.e. ".00034").
+ * @returns A number in the "billionths" format.
+ * @throws ValidationError when the parameter is not convertible to
+ * "billionths" format.
+ */
 export function decimalToQuality(decimal: string): number {
   const rate = new BigNumber(decimal).times(ONE_BILLION)
 
