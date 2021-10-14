@@ -32,7 +32,7 @@ function hexFromBuffer(buffer: Buffer): string {
 }
 
 interface WalletBaseOptions {
-  // The classicAddress corresponding to its Regular Key Pair.
+  // Include if making a wallet for a Regular Key Pair. This should be the classicAddress of the account.
   classicAddress?: string
 }
 
