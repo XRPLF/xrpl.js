@@ -2,7 +2,7 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
-## 2.0.0 (TBD)
+## 2.0.0 (2021-10-20)
 
 A migration guide is available at (TODO: add link here).
 
@@ -36,17 +36,22 @@ A migration guide is available at (TODO: add link here).
   * Renamed many of the utils to be more descriptive and more succinct
   * Moved `ripple-address-codec` functions from `Client` to `utils` (and exported at the top level)
   * Moved `hasNextPage` from `Client` to `utils`
-* Renamed `client.generateFaucetWallet` to `client.fundWallet` (and it now returns a `Wallet`)
+* Renamed `client.generateFaucetWallet` to `client.fundWallet` (and it now returns a `Wallet` and the wallet's balance)
 * Better flag organization
 * Updated dependencies
   * ws, typescript
 
 ### Deprecated
-* `api.prepareTransaction` (use `client.autofill` instead)
+* `api.prepareTransaction` (left in for easier migration, but it is now just an alias of `client.autofill`, which should be used instead)
 
 ### Removed
 * Automatic client subscription to incoming ledgers
-* prepare functions
+* Removed `jsonschemas` in favor of TypeScript types and `validate` for JS users
+* Functions that were replaced by similar functionality elsewhere in the library
+  * `api.combine` -> `multisign`
+  * `api.sign` -> `Wallet.sign`
+  * `generateXAddress` -> `Wallet.generate(...).getXAddress(...)`
+  * `api.prepare...` -> `client.autofill(tx)` (they have slightly different APIs, but serve a similar purpose)
 * Several client abstraction methods that were deemed no longer necessary
   * `api.getAccountInfo` -> `client.request({command: 'account_info', ...})`
   * `api.getAccountObjects` -> `client.request({command: 'account_objects', ...})`
@@ -60,14 +65,10 @@ A migration guide is available at (TODO: add link here).
   * `api.getTransactions` -> `client.request({command: 'account_tx', ...})`
   * `api.getTrustlines` -> `client.request({command: 'account_lines', ...})`
   * `api.getPaths` -> `client.request({command: ripple_path_find, ...})`
-  * `api.combine` -> `multisign`
-  * `api.sign` -> `Wallet.sign`
-* `jsonschemas`
-* `generateXAddress` -> `Wallet.generate(...).getXAddress(...)`
 * Helper methods/utils that are no longer necessary (such as `renameCounterpartyToIssuer` and `formatBidsAndAsks`)
 
 ### Security
-* Fixed potential vulnerability in xrp-drops conversion
+* Fixed potential vulnerability in xrp-drops conversion (#1714)
 
 ### Changes for library contributors
 * Linted code
@@ -86,6 +87,7 @@ A migration guide is available at (TODO: add link here).
   * All additional abstraction functions are in `src/sugar`
   * All independent methods that don't require a connection are in `src/utils`
   * Everything to do with wallets is in `src/wallet`
+
 
 ## 1.10.0 (2021-08-12)
 
