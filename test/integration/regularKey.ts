@@ -85,6 +85,8 @@ describe('regular key', function () {
       Account: regularKeyWallet.classicAddress,
       Domain: convertStringToHex('example.com'),
     }
+
+    testTransaction(this.client, accountSet, regularKeyWallet)
   })
 
   it('sign and submit using the master key of an account with a regular key', async function () {
