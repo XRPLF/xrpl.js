@@ -33,9 +33,8 @@ const { hashSignedTx } = hashes
 
 async function generateFundedWalletWithRegularKey(
   client: Client,
-  returnMasterWallet = false,
   disableMasterKey = false,
-): Promise<Wallet> {
+): Promise<{ masterWallet: Wallet; regularKeyWallet: Wallet }> {
   const regularKeyInfo = {
     seed: 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb',
     accountId: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
@@ -66,10 +65,7 @@ async function generateFundedWalletWithRegularKey(
     await testTransaction(client, accountSet, masterWallet)
   }
 
-  if (returnMasterWallet) {
-    return masterWallet
-  }
-  return regularKeyWallet
+  return { masterWallet, regularKeyWallet }
 }
 
 describe('regular key', function () {
@@ -79,10 +75,10 @@ describe('regular key', function () {
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
-  it('sign and submit with a regular key', function () {
-    const regularKeyWallet = await generateFundedWalletWithRegularKey(
-      this.client,
-    )
+  it('sign and submit with a regular key', async function () {
+    const regularKeyWallet = (
+      await generateFundedWalletWithRegularKey(this.client)
+    ).regularKeyWallet
 
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
@@ -92,10 +88,8 @@ describe('regular key', function () {
   })
 
   it('sign and submit using the master key of an account with a regular key', async function () {
-    const masterWallet = await generateFundedWalletWithRegularKey(
-      this.client,
-      true,
-    )
+    const masterWallet = (await generateFundedWalletWithRegularKey(this.client))
+      .masterWallet
 
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
@@ -107,11 +101,9 @@ describe('regular key', function () {
   })
 
   it('try to sign with master key after disabling', async function () {
-    const masterWallet = await generateFundedWalletWithRegularKey(
-      this.client,
-      true,
-      true,
-    )
+    const masterWallet = (
+      await generateFundedWalletWithRegularKey(this.client, true)
+    ).masterWallet
 
     const tx: OfferCreate = {
       TransactionType: 'OfferCreate',
@@ -134,11 +126,9 @@ describe('regular key', function () {
   })
 
   it('sign with regular key after disabling the master key', async function () {
-    const regularKeyWallet = await generateFundedWalletWithRegularKey(
-      this.client,
-      false,
-      true,
-    )
+    const regularKeyWallet = (
+      await generateFundedWalletWithRegularKey(this.client, true)
+    ).regularKeyWallet
 
     const tx: OfferCreate = {
       TransactionType: 'OfferCreate',
@@ -157,7 +147,8 @@ describe('regular key', function () {
   it('submit_multisigned transaction with regular keys set', async function () {
     const client: Client = this.client
 
-    const regularKeyWallet = await generateFundedWalletWithRegularKey(client)
+    const regularKeyWallet = (await generateFundedWalletWithRegularKey(client))
+      .regularKeyWallet
     const signerWallet2 = await generateFundedWallet(this.client)
 
     // set up the multisigners for the account
@@ -220,5 +211,5 @@ describe('regular key', function () {
     assert.deepEqual(submitResponse, expectedResponse)
   })
 
-  // TODO: Add a case for same keys being used, but wrong address (Specifically the address corresponds to the publicKey of the wallet)
+  // TODO: Add a case for same keys being used, but wrong address (The address corresponds to the publicKey of the regular key)
 })
