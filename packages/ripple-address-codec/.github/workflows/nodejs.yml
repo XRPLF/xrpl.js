@@ -8,6 +8,7 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -25,7 +26,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: yarn install
-    - run: yarn run compile
-    - run: yarn run test
-    - run: yarn run lint
+    - run: npm install
+    - run: npm run compile
+    - run: npm test
+    - run: npm run lint

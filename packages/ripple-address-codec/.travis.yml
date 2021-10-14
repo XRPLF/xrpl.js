@@ -4,6 +4,6 @@ node_js:
 - 12
 - 13
 script:
-- yarn compile
-- yarn test
-- yarn lint
+- npm run compile
+- npm test
+- npm run lint

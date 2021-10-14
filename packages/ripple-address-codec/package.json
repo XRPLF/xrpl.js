@@ -32,9 +32,10 @@
     "ts-jest": "^26.4.4",
     "tslint": "^5.19.0",
     "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^4.1.3"
+    "typescript": "^3.9.9"
   },
   "engines": {
-    "node": ">= 10"
+    "node": ">= 10",
+    "npm": ">=7.0.0"
   }
 }
