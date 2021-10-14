@@ -258,5 +258,78 @@ describe('regular key', function () {
     assert.deepEqual(submitResponse, expectedResponse)
   })
 
+  it('try multisigning with the account address used to set up a regular key', async function () {
+    const client: Client = this.client
+
+    const regularKeyWallet = (await generateFundedWalletWithRegularKey(client))
+      .regularKeyWallet
+    const signerWallet2 = await generateFundedWallet(this.client)
+
+    const sameKeyDefaultAddressWallet = new Wallet(
+      regularKeyWallet.publicKey,
+      regularKeyWallet.privateKey,
+    )
+
+    // set up the multisigners for the account
+    const signerListSet: SignerListSet = {
+      TransactionType: 'SignerListSet',
+      Account: this.wallet.classicAddress,
+      SignerEntries: [
+        {
+          SignerEntry: {
+            Account: regularKeyWallet.classicAddress,
+            SignerWeight: 1,
+          },
+        },
+        {
+          SignerEntry: {
+            Account: signerWallet2.classicAddress,
+            SignerWeight: 1,
+          },
+        },
+      ],
+      SignerQuorum: 2,
+    }
+    await testTransaction(this.client, signerListSet, this.wallet)
+
+    // try to multisign
+    const accountSet: AccountSet = {
+      TransactionType: 'AccountSet',
+      Account: this.wallet.classicAddress,
+      Domain: convertStringToHex('example.com'),
+    }
+    const accountSetTx = await client.autofill(accountSet, 2)
+    const signed1 = sameKeyDefaultAddressWallet.sign(accountSetTx, true)
+    const signed2 = signerWallet2.sign(accountSetTx, true)
+    const multisigned = multisign([signed1.tx_blob, signed2.tx_blob])
+    const multisignedRequest: SubmitMultisignedRequest = {
+      command: 'submit_multisigned',
+      tx_json: decode(multisigned) as unknown as Transaction,
+    }
+    const submitResponse = await client.request(multisignedRequest)
+    await ledgerAccept(client)
+    console.log(submitResponse)
+    // TODO: See what the response actually is and fix this expectation
+    assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
+    await verifySubmittedTransaction(this.client, multisigned)
+
+    const expectedResponse: SubmitMultisignedResponse = {
+      id: submitResponse.id,
+      type: 'response',
+      result: {
+        engine_result: 'tesSUCCESS',
+        engine_result_code: 0,
+        engine_result_message:
+          'The transaction was applied. Only final in a validated ledger.',
+        tx_blob: multisigned,
+        tx_json: {
+          ...(decode(multisigned) as unknown as Transaction),
+          hash: hashSignedTx(multisigned),
+        },
+      },
+    }
+
+    assert.deepEqual(submitResponse, expectedResponse)
+  })
   // TODO: Add a case for same keys being used, but wrong address (The address corresponds to the publicKey of the regular key)
 })
