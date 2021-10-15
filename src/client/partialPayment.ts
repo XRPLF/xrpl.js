@@ -137,9 +137,7 @@ export function isStreamPartialPayment(stream: TransactionStream): boolean {
 /**
  * Check a transaction from a subscription stream for partial payment.
  *
- * @param stream - Stream Transaction to check for partial payment,.
  * @param stream - Stream Transaction to check for partial payment.
- * @returns Whether the stream transaction is a partial payment.
  */
 export function handleStreamPartialPayment(stream: TransactionStream): void {
   if (isStreamPartialPayment(stream)) {
