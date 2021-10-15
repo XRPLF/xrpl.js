@@ -17,6 +17,28 @@ const { sign: RESPONSE_FIXTURES } = responses
  * Provides tests for Wallet class.
  */
 describe('Wallet', function () {
+  describe('constructor', function () {
+    it('initializes a wallet using a Regular Key Pair', function () {
+      const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
+      const regularKeyPair = {
+        publicKey: 'aBRNH5wUurfhZcoyR6nRwDSa95gMBkovBJ8V4cp1C1pM28H7EPL1',
+        privateKey: 'sh8i92YRnEjJy3fpFkL8txQSCVo79',
+      }
+
+      const wallet = new Wallet(
+        regularKeyPair.publicKey,
+        regularKeyPair.privateKey,
+        {
+          masterAddress,
+        },
+      )
+
+      assert.equal(wallet.publicKey, regularKeyPair.publicKey)
+      assert.equal(wallet.privateKey, regularKeyPair.privateKey)
+      assert.equal(wallet.classicAddress, masterAddress)
+    })
+  })
+
   describe('generate', function () {
     const classicAddressPrefix = 'r'
     const ed25519KeyPrefix = 'ED'
@@ -82,7 +104,7 @@ describe('Wallet', function () {
 
     it('derives a wallet using algorithm ecdsa-secp256k1', function () {
       const algorithm = ECDSA.secp256k1
-      const wallet = Wallet.fromSeed(seed, algorithm)
+      const wallet = Wallet.fromSeed(seed, { algorithm })
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
@@ -90,10 +112,27 @@ describe('Wallet', function () {
 
     it('derives a wallet using algorithm ed25519', function () {
       const algorithm = ECDSA.ed25519
-      const wallet = Wallet.fromSeed(seed, algorithm)
+      const wallet = Wallet.fromSeed(seed, { algorithm })
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
+    })
+
+    it('derives a wallet using a Regular Key Pair', function () {
+      const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
+      const regularKeyPair = {
+        seed: 'sh8i92YRnEjJy3fpFkL8txQSCVo79',
+        publicKey:
+          '03AEEFE1E8ED4BBC009DE996AC03A8C6B5713B1554794056C66E5B8D1753C7DD0E',
+        privateKey:
+          '004265A28F3E18340A490421D47B2EB8DBC2C0BF2C24CEFEA971B61CED2CABD233',
+      }
+
+      const wallet = Wallet.fromSeed(regularKeyPair.seed, { masterAddress })
+
+      assert.equal(wallet.publicKey, regularKeyPair.publicKey)
+      assert.equal(wallet.privateKey, regularKeyPair.privateKey)
+      assert.equal(wallet.classicAddress, masterAddress)
     })
   })
 
@@ -113,7 +152,7 @@ describe('Wallet', function () {
 
     it('derives a wallet using algorithm ecdsa-secp256k1', function () {
       const algorithm = ECDSA.secp256k1
-      const wallet = Wallet.fromSecret(seed, algorithm)
+      const wallet = Wallet.fromSecret(seed, { algorithm })
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
@@ -121,10 +160,27 @@ describe('Wallet', function () {
 
     it('derives a wallet using algorithm ed25519', function () {
       const algorithm = ECDSA.ed25519
-      const wallet = Wallet.fromSecret(seed, algorithm)
+      const wallet = Wallet.fromSecret(seed, { algorithm })
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
+    })
+
+    it('derives a wallet using a Regular Key Pair', function () {
+      const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
+      const regularKeyPair = {
+        seed: 'sh8i92YRnEjJy3fpFkL8txQSCVo79',
+        publicKey:
+          '03AEEFE1E8ED4BBC009DE996AC03A8C6B5713B1554794056C66E5B8D1753C7DD0E',
+        privateKey:
+          '004265A28F3E18340A490421D47B2EB8DBC2C0BF2C24CEFEA971B61CED2CABD233',
+      }
+
+      const wallet = Wallet.fromSecret(regularKeyPair.seed, { masterAddress })
+
+      assert.equal(wallet.publicKey, regularKeyPair.publicKey)
+      assert.equal(wallet.privateKey, regularKeyPair.privateKey)
+      assert.equal(wallet.classicAddress, masterAddress)
     })
   })
 
@@ -145,10 +201,29 @@ describe('Wallet', function () {
 
     it('derives a wallet using an input derivation path', function () {
       const derivationPath = "m/44'/144'/0'/0/0"
-      const wallet = Wallet.fromMnemonic(mnemonic, derivationPath)
+      const wallet = Wallet.fromMnemonic(mnemonic, { derivationPath })
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
+    })
+
+    it('derives a wallet using a Regular Key Pair', function () {
+      const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
+      const regularKeyPair = {
+        mnemonic: 'KNEW BENT LYNN LED GAD BEN KENT SHAM HOBO RINK WALT ALLY',
+        publicKey:
+          '02FBC77338A52D9733641437A77369ACB0D89D52642740A008509F7A3A7450C841',
+        privateKey:
+          '007A10DF756751129060DD29C9BB6733ADB92507B7DD83BB0795CAA09FB815BE22',
+      }
+
+      const wallet = Wallet.fromMnemonic(regularKeyPair.mnemonic, {
+        masterAddress,
+      })
+
+      assert.equal(wallet.publicKey, regularKeyPair.publicKey)
+      assert.equal(wallet.privateKey, regularKeyPair.privateKey)
+      assert.equal(wallet.classicAddress, masterAddress)
     })
   })
 
@@ -177,7 +252,7 @@ describe('Wallet', function () {
 
     it('derives a wallet using algorithm ecdsa-secp256k1', function () {
       const algorithm = ECDSA.secp256k1
-      const wallet = Wallet.fromEntropy(entropy, algorithm)
+      const wallet = Wallet.fromEntropy(entropy, { algorithm })
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
@@ -185,10 +260,19 @@ describe('Wallet', function () {
 
     it('derives a wallet using algorithm ed25519', function () {
       const algorithm = ECDSA.ed25519
-      const wallet = Wallet.fromEntropy(entropy, algorithm)
+      const wallet = Wallet.fromEntropy(entropy, { algorithm })
 
       assert.equal(wallet.publicKey, publicKeyED25519)
       assert.equal(wallet.privateKey, privateKeyED25519)
+    })
+
+    it('derives a wallet using a regular key pair', function () {
+      const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
+      const wallet = Wallet.fromEntropy(entropy, { masterAddress })
+
+      assert.equal(wallet.publicKey, publicKeyED25519)
+      assert.equal(wallet.privateKey, privateKeyED25519)
+      assert.equal(wallet.classicAddress, masterAddress)
     })
   })
 
