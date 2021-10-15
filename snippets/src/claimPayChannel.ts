@@ -8,12 +8,6 @@ import {
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
-async function sleep(ms): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms)
-  })
-}
-
 void claimPayChannel()
 
 async function claimPayChannel(): Promise<void> {
@@ -35,10 +29,11 @@ async function claimPayChannel(): Promise<void> {
     PublicKey: wallet1.publicKey,
   }
 
-  const paymentChannelResponse = await client.submit(
+  const paymentChannelResponse = await client.submitReliable(
     wallet1,
     paymentChannelCreate,
   )
+  console.log(paymentChannelResponse)
 
   // check that the object was actually created
   const accountObjectsRequest: AccountObjectsRequest = {
@@ -51,17 +46,13 @@ async function claimPayChannel(): Promise<void> {
 
   console.log(accountObjects)
 
-  // wait for one ledger close time.
-  const WAIT_TIME = 4000
-  await sleep(WAIT_TIME)
-
   const paymentChannelClaim: PaymentChannelClaim = {
     Account: wallet1.getClassicAddress(),
     TransactionType: 'PaymentChannelClaim',
     Channel: hashes.hashPaymentChannel(
       wallet1.getClassicAddress(),
       wallet2.getClassicAddress(),
-      paymentChannelResponse.result.tx_json.Sequence ?? 0,
+      paymentChannelResponse.result.Sequence ?? 0,
     ),
     Amount: '100',
   }
