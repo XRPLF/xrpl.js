@@ -47,7 +47,7 @@ interface WalletOptions extends WalletBaseOptions {
   seed?: string
 }
 
-interface FromSeedOptions extends WalletBaseOptions {
+interface DeriveWalletOptions extends WalletBaseOptions {
   // The digital signature algorithm to generate an address for.
   algorithm?: ECDSA
 }
@@ -55,16 +55,6 @@ interface FromSeedOptions extends WalletBaseOptions {
 interface FromMnemonicOptions extends WalletBaseOptions {
   // The path to derive a keypair (publicKey/privateKey) used for mnemonic-to-seed conversion.
   derivationPath?: string
-}
-
-interface FromEntropyOptions extends WalletBaseOptions {
-  // The digital signature algorithm to generate an address for.
-  algorithm?: ECDSA
-}
-
-interface DeriveWalletOptions extends WalletBaseOptions {
-  // The digital signature algorithm to generate an address for.
-  algorithm?: ECDSA
 }
 
 /**
@@ -174,7 +164,7 @@ class Wallet {
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from a seed.
    */
-  public static fromSeed(seed: string, opts: FromSeedOptions = {}): Wallet {
+  public static fromSeed(seed: string, opts: DeriveWalletOptions = {}): Wallet {
     return Wallet.deriveWallet(seed, {
       algorithm: opts.algorithm,
       masterAddress: opts.masterAddress,
@@ -236,7 +226,7 @@ class Wallet {
    */
   public static fromEntropy(
     entropy: Uint8Array | number[],
-    opts: FromEntropyOptions = {},
+    opts: DeriveWalletOptions = {},
   ): Wallet {
     const algorithm = opts.algorithm ?? DEFAULT_ALGORITHM
     const options = {
