@@ -14,7 +14,7 @@ import { convertStringToHex } from 'xrpl-local/utils'
 import { multisign } from 'xrpl-local/wallet/signer'
 
 import serverUrl from './serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from './setup'
+import { setupClient, teardownClient } from './setup'
 import {
   generateFundedWallet,
   ledgerAccept,
@@ -65,7 +65,6 @@ async function generateFundedWalletWithRegularKey(
 describe('regular key', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
