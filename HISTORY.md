@@ -46,7 +46,7 @@ A migration guide is available at https://xrpl.org/xrpljs2-migration-guide.html.
 
 ### Removed
 * Automatic client subscription to incoming ledgers
-* Removed `jsonschemas` in favor of TypeScript types and `validate` for JS users
+* Removed `jsonschema` in favor of TypeScript types and `validate` for JS users
 * Functions that were replaced by similar functionality elsewhere in the library
   * `api.combine` -> `multisign`
   * `api.sign` -> `Wallet.sign`
