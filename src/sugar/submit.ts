@@ -42,7 +42,7 @@ async function submit(
   transaction: Transaction | string,
   opts?: SubmitOptions,
 ): Promise<SubmitResponse> {
-  const signedTx = await initSubmitTx(this, transaction, opts)
+  const signedTx = await getSignedTx(this, transaction, opts)
   return submitRequest(this, signedTx, opts?.failHard)
 }
 
@@ -91,7 +91,7 @@ async function submitAndWait(
   transaction: Transaction | string,
   opts?: SubmitOptions,
 ): Promise<TxResponse> {
-  const signedTx = await initSubmitTx(this, transaction, opts)
+  const signedTx = await getSignedTx(this, transaction, opts)
 
   if (!hasLastLedgerSequence(signedTx)) {
     throw new ValidationError(
@@ -152,7 +152,7 @@ function isSigned(transaction: Transaction | string): boolean {
 }
 
 // initializes a transaction for a submit request
-async function initSubmitTx(
+async function getSignedTx(
   client: Client,
   transaction: Transaction | string,
   { autofill = true, wallet }: SubmitOptions = {},
