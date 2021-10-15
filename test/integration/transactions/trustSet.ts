@@ -1,8 +1,7 @@
 import _ from 'lodash'
 
-import { TrustSet } from 'xrpl-local'
+import { TrustSet, percentToQuality } from 'xrpl-local'
 
-import { percentToQuality } from '../../../src'
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
@@ -36,12 +35,12 @@ describe('TrustSet', function () {
     const wallet2 = await generateFundedWallet(this.client)
     const tx: TrustSet = {
       TransactionType: 'TrustSet',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.address,
       QualityIn: percentToQuality('99%'),
       QualityOut: percentToQuality('99%'),
       LimitAmount: {
         currency: 'USD',
-        issuer: wallet2.getClassicAddress(),
+        issuer: wallet2.address,
         value: '100',
       },
     }
@@ -55,10 +54,10 @@ describe('TrustSet', function () {
       TransactionType: 'TrustSet',
       QualityIn: percentToQuality('101%'),
       QualityOut: percentToQuality('101%'),
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.address,
       LimitAmount: {
         currency: 'USD',
-        issuer: wallet2.getClassicAddress(),
+        issuer: wallet2.address,
         value: '100',
       },
     }
