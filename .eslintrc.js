@@ -64,12 +64,13 @@ module.exports = {
       },
     },
     {
-      // TODO: remove when snippets are written
       files: ['snippets/src/*.ts'],
       rules: {
-        'max-len': 'off',
-        'import/unambiguous': 'off',
         'import/no-unused-modules': 'off',
+        // Each file has a particular flow.
+        'max-lines-per-function': 'off',
+        // Snippets have logs on console to better understand the working.
+        'no-console': 'off',
       },
     },
     {

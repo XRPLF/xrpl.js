@@ -1,6 +1,4 @@
-/* eslint-disable max-lines-per-function -- Snippet for sending escrow flow. */
-/* eslint-disable no-console -- logs are helpful to understand snippets */
-import { Client, Payment, TrustSet } from '../../dist/npm'
+import { Client, Payment, PaymentFlags, TrustSet } from '../../dist/npm'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
@@ -20,7 +18,8 @@ async function main(): Promise<void> {
     LimitAmount: {
       currency: currency_code,
       issuer: wallet1.getClassicAddress(),
-      value: '10000000000', // Large limit, arbitrarily chosen
+      // Value for the new IOU - 10000000000 - is arbitarily chosen.
+      value: '10000000000',
     },
   }
 
@@ -55,6 +54,10 @@ async function main(): Promise<void> {
    * Send money less than the amount specified on 2 conditions:
    * 1. Sender has less money than the aamount specified in the payment Tx.
    * 2. Sender has the tfPartialPayment flag activated.
+   *
+   * Other ways to specify flags are by using Hex code and decimal code.
+   * eg. For partial payment(tfPartialPayment)
+   * decimal ->131072, hex -> 0x00020000
    */
   const partialPayment: Payment = {
     TransactionType: 'Payment',
@@ -65,7 +68,7 @@ async function main(): Promise<void> {
       issuer: wallet1.getClassicAddress(),
     },
     Destination: wallet1.getClassicAddress(),
-    Flags: 131072, // PaymentFlags.tfPartialPayment // 0x00020000
+    Flags: PaymentFlags.tfPartialPayment,
   }
 
   // submit payment

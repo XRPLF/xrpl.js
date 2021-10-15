@@ -1,4 +1,3 @@
-/* eslint-disable no-console -- logs are helpful to understand snippets */
 import { Client, Payment, SetRegularKey } from '../../dist/npm'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')

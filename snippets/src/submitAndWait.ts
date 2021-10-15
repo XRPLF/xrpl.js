@@ -1,4 +1,3 @@
-/* eslint-disable no-console -- logs are helpful to understand snippets */
 import { Client, Payment } from '../../dist/npm'
 
 /*
