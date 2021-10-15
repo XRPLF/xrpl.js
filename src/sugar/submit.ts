@@ -83,15 +83,7 @@ async function submitAndWait(
 
 // Helper functions
 
-/**
- * Encodes and submits a signed transaction.
- *
- * @param client - A Client.
- * @param signedTransaction - A signed transaction to encode (if not already) and submit.
- * @param failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
- * @returns A promise that contains SubmitResponse.
- * @throws ValidationError if the transaction isn't signed, RippledError if submit request fails.
- */
+// Encodes and submits a signed transaction.
 async function submitRequest(
   client: Client,
   signedTransaction: Transaction | string,
