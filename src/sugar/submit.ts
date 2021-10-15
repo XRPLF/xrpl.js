@@ -43,7 +43,7 @@ async function submit(
   opts?: SubmitOptions,
 ): Promise<SubmitResponse> {
   const signedTx = await prepareSubmit(this, transaction, opts)
-  return submitRequest(this, signedTx, opts)
+  return submitRequest(this, signedTx, opts?.failHard)
 }
 
 /**
@@ -58,7 +58,7 @@ async function submit(
 async function submitRequest(
   client: Client,
   signedTransaction: Transaction | string,
-  { failHard }: SubmitOptions = {},
+  failHard = false,
 ): Promise<SubmitResponse> {
   if (!isSigned(signedTransaction)) {
     throw new ValidationError('Transaction must be signed')
@@ -99,7 +99,7 @@ async function submitAndWait(
     )
   }
 
-  await submitRequest(this, signedTx, opts)
+  await submitRequest(this, signedTx, opts?.failHard)
 
   const txHash = hashes.hashSignedTx(signedTx)
   return waitForFinalTransactionOutcome(this, txHash)
