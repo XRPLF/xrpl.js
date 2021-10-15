@@ -15,7 +15,7 @@ import { convertStringToHex } from 'xrpl-local/utils'
 import { multisign } from 'xrpl-local/wallet/signer'
 
 import serverUrl from '../serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { setupClient, teardownClient } from '../setup'
 import {
   generateFundedWallet,
   ledgerAccept,
@@ -30,7 +30,6 @@ const { hashSignedTx } = hashes
 describe('submit_multisigned', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 

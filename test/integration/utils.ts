@@ -36,8 +36,9 @@ export async function fundAccount(
     console.log(response)
     assert.fail(`Response not successful, ${response.result.engine_result}`)
   }
-
   await ledgerAccept(client)
+  const signedTx = _.omit(response.result.tx_json, 'hash')
+  await verifySubmittedTransaction(client, signedTx as Transaction)
 }
 
 export async function generateFundedWallet(client: Client): Promise<Wallet> {
