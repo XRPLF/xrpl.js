@@ -23,6 +23,7 @@ import {
 import ECDSA from '../ecdsa'
 import { ValidationError } from '../errors'
 import { Transaction } from '../models/transactions'
+import { ensureClassicAddress } from '../sugar/utils'
 import { hashSignedTx } from '../utils/hashes/ledgerHash'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
@@ -145,7 +146,9 @@ class Wallet {
   ) {
     this.publicKey = publicKey
     this.privateKey = privateKey
-    this.classicAddress = opts.classicAddress ?? deriveAddress(publicKey)
+    this.classicAddress = opts.classicAddress
+      ? ensureClassicAddress(opts.classicAddress)
+      : deriveAddress(publicKey)
     this.seed = opts.seed
   }
 
