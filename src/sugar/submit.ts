@@ -37,10 +37,10 @@ interface SubmitOptions {
 async function submit(
   this: Client,
   transaction: Transaction | string,
-  opts?: SubmitOptions,
+  opts: SubmitOptions = {},
 ): Promise<SubmitResponse> {
   const signedTx = await prepareSubmit(this, transaction, opts)
-  return submitRequest(this, signedTx)
+  return submitRequest(this, signedTx, opts.failHard)
 }
 
 /**
@@ -48,12 +48,14 @@ async function submit(
  *
  * @param client - A Client.
  * @param signedTransaction - A signed transaction to encode (if not already) and submit.
+ * @param failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
  * @returns A promise that contains SubmitResponse.
  * @throws ValidationError if the transaction isn't signed, RippledError if submit request fails.
  */
 async function submitRequest(
   client: Client,
   signedTransaction: Transaction | string,
+  failHard?: boolean,
 ): Promise<SubmitResponse> {
   if (!isSigned(signedTransaction)) {
     throw new ValidationError('Transaction must be signed')
@@ -66,7 +68,7 @@ async function submitRequest(
   const request: SubmitRequest = {
     command: 'submit',
     tx_blob: signedTxEncoded,
-    fail_hard: isAccountDelete(signedTransaction),
+    fail_hard: isAccountDelete(signedTransaction) || failHard,
   }
   return client.request(request)
 }
@@ -84,37 +86,20 @@ async function submitRequest(
 async function submitAndWait(
   this: Client,
   transaction: Transaction | string,
-  opts?: SubmitOptions,
+  opts: SubmitOptions = {},
 ): Promise<TxResponse> {
   const signedTx = await prepareSubmit(this, transaction, opts)
-  return submitSignedAndWait(this, signedTx)
-}
 
-/**
- * Asynchronously submits a transaction and verifies that it has been included in a
- * validated ledger (or has errored/will not be included for some reason).
- * See [Reliable Transaction Submission](https://xrpl.org/reliable-transaction-submission.html).
- *
- * @param client - A Client.
- * @param signedTransaction - A signed transaction to encode (if not already) and submit.
- * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
- * @throws ValidationError if the request is not signed/doesn't have a LastLedgerSequence, RippledError if the submit request
- *   fails, XrplError if the reliable submission fails.
- */
-async function submitSignedAndWait(
-  client: Client,
-  signedTransaction: Transaction | string,
-): Promise<TxResponse> {
-  if (!hasLastLedgerSequence(signedTransaction)) {
+  if (!hasLastLedgerSequence(signedTx)) {
     throw new ValidationError(
       'Transaction must contain a LastLedgerSequence value for reliable submission.',
     )
   }
 
-  await submitRequest(client, signedTransaction)
+  await submitRequest(this, signedTx, opts.failHard)
 
-  const txHash = hashes.hashSignedTx(signedTransaction)
-  return waitForFinalTransactionOutcome(client, txHash)
+  const txHash = hashes.hashSignedTx(signedTx)
+  return waitForFinalTransactionOutcome(this, txHash)
 }
 
 // Helper functions
