@@ -60,8 +60,8 @@ describe('path_find', function () {
         const pathFind: PathFindRequest = {
           command: 'path_find',
           subcommand: 'create',
-          source_account: this.wallet.classicAddress,
-          destination_account: wallet2.classicAddress,
+          source_account: this.wallet.getClassicAddress(),
+          destination_account: wallet2.getClassicAddress(),
           destination_amount: '100',
         }
         this.client.request(pathFind).then((response) => {
