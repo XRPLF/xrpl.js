@@ -1,11 +1,9 @@
-/* eslint-disable no-await-in-loop -- waiting required. */
 import {
   AccountInfoRequest,
   AccountObjectsRequest,
   Client,
   EscrowCreate,
   EscrowFinish,
-  LedgerRequest,
   ISOTimeToRippleTime,
 } from '../../dist/npm'
 
@@ -68,17 +66,9 @@ async function sendEscrow(): Promise<void> {
   )
   console.log(accountObjects)
 
-  // wait till we get a ledger with close time > finish time
-  const ledgerRequest: LedgerRequest = {
-    command: 'ledger',
-    ledger_index: 'validated',
-  }
-  let updatedCloseTime
-  do {
-    await sleep(1000)
-    updatedCloseTime = (await client.request(ledgerRequest)).result.ledger
-      .close_time
-  } while (updatedCloseTime <= finishAfter)
+  // wait for `finishAfter` to pass.
+  const WAIT_TIME = 4000
+  await sleep(WAIT_TIME)
 
   const finishTx: EscrowFinish = {
     TransactionType: 'EscrowFinish',
@@ -88,11 +78,6 @@ async function sendEscrow(): Promise<void> {
   }
 
   await client.submit(wallet1, finishTx)
-
-  console.log('Account objects after the Escrow Finish tx')
-  console.log(
-    (await client.request(accountObjectsRequest)).result.account_objects,
-  )
 
   console.log('Balances of wallets after Escrow was sent')
   console.log(

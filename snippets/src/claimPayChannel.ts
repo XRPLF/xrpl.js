@@ -1,12 +1,9 @@
-/* eslint-disable no-await-in-loop -- waiting required. */
 import {
   AccountObjectsRequest,
   Client,
   PaymentChannelCreate,
   PaymentChannelClaim,
   hashes,
-  LedgerRequest,
-  ISOTimeToRippleTime,
 } from '../../dist/npm'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
@@ -28,9 +25,6 @@ async function claimPayChannel(): Promise<void> {
   console.log('Balances of wallets before Payment Channel is claimed')
   console.log(await client.getXrpBalance(wallet1.classicAddress))
   console.log(await client.getXrpBalance(wallet2.classicAddress))
-
-  // eslint-disable-next-line new-cap -- function defined as that.
-  const finishAfter = ISOTimeToRippleTime(Date()) + 2
 
   const paymentChannelCreate: PaymentChannelCreate = {
     TransactionType: 'PaymentChannelCreate',
@@ -57,17 +51,9 @@ async function claimPayChannel(): Promise<void> {
 
   console.log(accountObjects)
 
-  // wait till we get a ledger with close time > finish time
-  const ledgerRequest: LedgerRequest = {
-    command: 'ledger',
-    ledger_index: 'validated',
-  }
-  let updatedCloseTime
-  do {
-    await sleep(1000)
-    updatedCloseTime = (await client.request(ledgerRequest)).result.ledger
-      .close_time
-  } while (updatedCloseTime <= finishAfter)
+  // wait for one ledger close time.
+  const WAIT_TIME = 4000
+  await sleep(WAIT_TIME)
 
   const paymentChannelClaim: PaymentChannelClaim = {
     Account: wallet1.getClassicAddress(),
