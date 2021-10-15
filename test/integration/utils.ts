@@ -30,7 +30,9 @@ export async function fundAccount(
     // 2 times the amount needed for a new account (20 XRP)
     Amount: '400000000',
   }
-  const response = await client.submit(Wallet.fromSeed(masterSecret), payment)
+  const response = await client.submit(payment, {
+    wallet: Wallet.fromSeed(masterSecret),
+  })
   if (response.result.engine_result !== 'tesSUCCESS') {
     // eslint-disable-next-line no-console -- happens only when something goes wrong
     console.log(response)
@@ -86,7 +88,7 @@ export async function testTransaction(
   await ledgerAccept(client)
 
   // sign/submit the transaction
-  const response = await client.submit(wallet, transaction)
+  const response = await client.submit(transaction, { wallet })
 
   // check that the transaction was successful
   assert.equal(response.type, 'response')

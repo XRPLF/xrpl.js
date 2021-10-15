@@ -66,7 +66,7 @@ describe('integration tests', function () {
     const { tx_blob: tx_blob1 } = signerWallet1.sign(accountSetTx, true)
     const { tx_blob: tx_blob2 } = signerWallet2.sign(accountSetTx, true)
     const multisignedTx = multisign([tx_blob1, tx_blob2])
-    const submitResponse = await client.submitSigned(multisignedTx)
+    const submitResponse = await client.submit(multisignedTx)
     await ledgerAccept(client)
     assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
     await verifySubmittedTransaction(this.client, multisignedTx)

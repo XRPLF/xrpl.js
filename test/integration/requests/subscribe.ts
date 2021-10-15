@@ -118,7 +118,7 @@ describe('subscribe', function () {
 
       // The transactions_proposed stream should trigger the transaction handler WITHOUT ledgerAccept
       const client: Client = this.client
-      client.submit(this.wallet, tx)
+      client.submit(tx, { wallet: this.wallet })
     })
   })
 

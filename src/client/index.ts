@@ -93,9 +93,7 @@ import {
   getBalances,
   getXrpBalance,
   submit,
-  submitSigned,
-  submitReliable,
-  submitSignedReliable,
+  submitAndWait,
 } from '../sugar'
 import fundWallet from '../wallet/fundWallet'
 
@@ -596,15 +594,7 @@ class Client extends EventEmitter {
   /**
    * @category Core
    */
-  public submitSigned = submitSigned
-  /**
-   * @category Core
-   */
-  public submitReliable = submitReliable
-  /**
-   * @category Core
-   */
-  public submitSignedReliable = submitSignedReliable
+  public submitAndWait = submitAndWait
 
   /**
    * @deprecated Use autofill instead, provided for users familiar with v1

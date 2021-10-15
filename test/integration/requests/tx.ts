@@ -25,10 +25,9 @@ describe('tx', function () {
       Domain: convertStringToHex('example.com'),
     }
 
-    const response: SubmitResponse = await this.client.submit(
-      this.wallet,
-      accountSet,
-    )
+    const response: SubmitResponse = await this.client.submit(accountSet, {
+      wallet: this.wallet,
+    })
 
     const hash = hashSignedTx(response.result.tx_blob)
     const txResponse = await this.client.request({

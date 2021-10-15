@@ -15,55 +15,38 @@ async function sleep(ms: number): Promise<void> {
   })
 }
 
+interface SubmitOptions {
+  // If true, autofill a transaction.
+  autofill?: boolean
+  // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+  failHard?: boolean
+  // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+  wallet?: Wallet
+}
+
 /**
- * Submits an unsigned transaction.
+ * Submits a signed/unsigned transaction.
  * Steps performed on a transaction:
  *    1. Autofill.
  *    2. Sign & Encode.
  *    3. Submit.
  *
  * @param this - A Client.
- * @param wallet - A Wallet to sign a transaction.
  * @param transaction - A transaction to autofill, sign & encode, and submit.
+ * @param opts - (Optional) Options used to sign and submit a transaction.
+ * @param opts.autofill - If true, autofill a transaction.
+ * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+ * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
  * @returns A promise that contains SubmitResponse.
  * @throws RippledError if submit request fails.
  */
 async function submit(
   this: Client,
-  wallet: Wallet,
-  transaction: Transaction,
+  transaction: Transaction | string,
+  opts?: SubmitOptions,
 ): Promise<SubmitResponse> {
-  const tx = await this.autofill(transaction)
-  const { tx_blob } = wallet.sign(tx)
-  return this.submitSigned(tx_blob)
-}
-
-/**
- * Encodes and submits a signed transaction.
- *
- * @param this - A Client.
- * @param signedTransaction - A signed transaction to encode (if not already) and submit.
- * @returns A promise that contains SubmitResponse.
- * @throws ValidationError if the transaction isn't signed, RippledError if submit request fails.
- */
-async function submitSigned(
-  this: Client,
-  signedTransaction: Transaction | string,
-): Promise<SubmitResponse> {
-  if (!isSigned(signedTransaction)) {
-    throw new ValidationError('Transaction must be signed')
-  }
-
-  const signedTxEncoded =
-    typeof signedTransaction === 'string'
-      ? signedTransaction
-      : encode(signedTransaction)
-  const request: SubmitRequest = {
-    command: 'submit',
-    tx_blob: signedTxEncoded,
-    fail_hard: isAccountDelete(signedTransaction),
-  }
-  return this.request(request)
+  const signedTx = await getSignedTx(this, transaction, opts)
+  return submitRequest(this, signedTx, opts?.failHard)
 }
 
 /**
@@ -72,61 +55,55 @@ async function submitSigned(
  * See [Reliable Transaction Submission](https://xrpl.org/reliable-transaction-submission.html).
  *
  * @param this - A Client.
- * @param wallet - A Wallet to sign a transaction.
  * @param transaction - A transaction to autofill, sign & encode, and submit.
+ * @param opts - (Optional) Options used to sign and submit a transaction.
+ * @param opts.autofill - If true, autofill a transaction.
+ * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+ * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
  * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
  */
-async function submitReliable(
+async function submitAndWait(
   this: Client,
-  wallet: Wallet,
-  transaction: Transaction,
+  transaction: Transaction | string,
+  opts?: SubmitOptions,
 ): Promise<TxResponse> {
-  const tx = await this.autofill(transaction)
-  const { tx_blob } = wallet.sign(tx)
-  return this.submitSignedReliable(tx_blob)
-}
+  const signedTx = await getSignedTx(this, transaction, opts)
 
-/**
- * Asynchronously submits a transaction and verifies that it has been included in a
- * validated ledger (or has errored/will not be included for some reason).
- * See [Reliable Transaction Submission](https://xrpl.org/reliable-transaction-submission.html).
- *
- * @param this - A Client.
- * @param signedTransaction - A signed transaction to encode (if not already) and submit.
- * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
- * @throws ValidationError if the request is not signed/doesn't have a LastLedgerSequence, RippledError if the submit request
- *   fails, XrplError if the reliable submission fails.
- */
-async function submitSignedReliable(
-  this: Client,
-  signedTransaction: Transaction | string,
-): Promise<TxResponse> {
-  if (!isSigned(signedTransaction)) {
-    throw new ValidationError('Transaction must be signed')
-  }
-  if (!hasLastLedgerSequence(signedTransaction)) {
+  if (!hasLastLedgerSequence(signedTx)) {
     throw new ValidationError(
       'Transaction must contain a LastLedgerSequence value for reliable submission.',
     )
   }
 
-  const signedTxEncoded =
-    typeof signedTransaction === 'string'
-      ? signedTransaction
-      : encode(signedTransaction)
-  const txHash = hashes.hashSignedTx(signedTransaction)
+  await submitRequest(this, signedTx, opts?.failHard)
 
-  const request: SubmitRequest = {
-    command: 'submit',
-    tx_blob: signedTxEncoded,
-    fail_hard: isAccountDelete(signedTransaction),
-  }
-  await this.request(request)
-
+  const txHash = hashes.hashSignedTx(signedTx)
   return waitForFinalTransactionOutcome(this, txHash)
 }
 
 // Helper functions
+
+// Encodes and submits a signed transaction.
+async function submitRequest(
+  client: Client,
+  signedTransaction: Transaction | string,
+  failHard = false,
+): Promise<SubmitResponse> {
+  if (!isSigned(signedTransaction)) {
+    throw new ValidationError('Transaction must be signed')
+  }
+
+  const signedTxEncoded =
+    typeof signedTransaction === 'string'
+      ? signedTransaction
+      : encode(signedTransaction)
+  const request: SubmitRequest = {
+    command: 'submit',
+    tx_blob: signedTxEncoded,
+    fail_hard: isAccountDelete(signedTransaction) || failHard,
+  }
+  return client.request(request)
+}
 
 /*
  * The core logic of reliable submission.  This polls the ledger until the result of the
@@ -172,6 +149,35 @@ function isSigned(transaction: Transaction | string): boolean {
   )
 }
 
+// initializes a transaction for a submit request
+async function getSignedTx(
+  client: Client,
+  transaction: Transaction | string,
+  { autofill = true, wallet }: SubmitOptions = {},
+): Promise<Transaction | string> {
+  if (isSigned(transaction)) {
+    return transaction
+  }
+
+  if (!wallet) {
+    throw new ValidationError(
+      'Wallet must be provided when submitting an unsigned transaction',
+    )
+  }
+
+  let tx =
+    typeof transaction === 'string'
+      ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- converts JsonObject to correct Transaction type
+        (decode(transaction) as unknown as Transaction)
+      : transaction
+
+  if (autofill) {
+    tx = await client.autofill(tx)
+  }
+
+  return wallet.sign(tx).tx_blob
+}
+
 // checks if there is a LastLedgerSequence as a part of the transaction
 function hasLastLedgerSequence(transaction: Transaction | string): boolean {
   const tx = typeof transaction === 'string' ? decode(transaction) : transaction
@@ -184,4 +190,4 @@ function isAccountDelete(transaction: Transaction | string): boolean {
   return tx.TransactionType === 'AccountDelete'
 }
 
-export { submit, submitSigned, submitReliable, submitSignedReliable }
+export { submit, submitAndWait }

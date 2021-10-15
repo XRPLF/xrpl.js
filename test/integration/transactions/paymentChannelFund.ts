@@ -28,8 +28,8 @@ describe('PaymentChannelFund', function () {
     }
 
     const paymentChannelResponse = await this.client.submit(
-      this.wallet,
       paymentChannelCreate,
+      { wallet: this.wallet },
     )
     await testTransaction(this.client, paymentChannelCreate, this.wallet)
 
