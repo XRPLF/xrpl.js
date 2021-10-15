@@ -22,8 +22,8 @@ describe('CheckCash', function () {
 
     const setupTx: CheckCreate = {
       TransactionType: 'CheckCreate',
-      Account: this.wallet.getClassicAddress(),
-      Destination: wallet2.getClassicAddress(),
+      Account: this.wallet.classicAddress,
+      Destination: wallet2.classicAddress,
       SendMax: amount,
     }
 
@@ -32,7 +32,7 @@ describe('CheckCash', function () {
     // get check ID
     const response1 = await this.client.request({
       command: 'account_objects',
-      account: this.wallet.getClassicAddress(),
+      account: this.wallet.classicAddress,
       type: 'check',
     })
     assert.lengthOf(
@@ -45,7 +45,7 @@ describe('CheckCash', function () {
     // actual test - cash the check
     const tx: CheckCash = {
       TransactionType: 'CheckCash',
-      Account: wallet2.getClassicAddress(),
+      Account: wallet2.classicAddress,
       CheckID: checkId,
       Amount: amount,
     }
@@ -55,7 +55,7 @@ describe('CheckCash', function () {
     // confirm that the check no longer exists
     const accountOffersResponse = await this.client.request({
       command: 'account_objects',
-      account: this.wallet.getClassicAddress(),
+      account: this.wallet.classicAddress,
       type: 'check',
     })
     assert.lengthOf(

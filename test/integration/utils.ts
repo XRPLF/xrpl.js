@@ -26,7 +26,7 @@ export async function fundAccount(
   const payment: Payment = {
     TransactionType: 'Payment',
     Account: masterAccount,
-    Destination: wallet.getClassicAddress(),
+    Destination: wallet.classicAddress,
     // 2 times the amount needed for a new account (20 XRP)
     Amount: '400000000',
   }
@@ -108,7 +108,7 @@ export async function getXRPBalance(
 ): Promise<string> {
   const request: AccountInfoRequest = {
     command: 'account_info',
-    account: wallet.getClassicAddress(),
+    account: wallet.classicAddress,
   }
   return (await client.request(request)).result.account_data.Balance
 }

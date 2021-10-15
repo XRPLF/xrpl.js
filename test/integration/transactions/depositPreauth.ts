@@ -20,8 +20,8 @@ describe('DepositPreauth', function () {
     fundAccount(this.client, wallet2)
     const tx: DepositPreauth = {
       TransactionType: 'DepositPreauth',
-      Account: this.wallet.getClassicAddress(),
-      Authorize: wallet2.getClassicAddress(),
+      Account: this.wallet.classicAddress,
+      Authorize: wallet2.classicAddress,
     }
     await testTransaction(this.client, tx, this.wallet)
   })

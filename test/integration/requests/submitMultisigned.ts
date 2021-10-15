@@ -41,17 +41,17 @@ describe('submit_multisigned', function () {
     // set up the multisigners for the account
     const signerListSet: SignerListSet = {
       TransactionType: 'SignerListSet',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       SignerEntries: [
         {
           SignerEntry: {
-            Account: signerWallet1.getClassicAddress(),
+            Account: signerWallet1.classicAddress,
             SignerWeight: 1,
           },
         },
         {
           SignerEntry: {
-            Account: signerWallet2.getClassicAddress(),
+            Account: signerWallet2.classicAddress,
             SignerWeight: 1,
           },
         },
@@ -63,7 +63,7 @@ describe('submit_multisigned', function () {
     // try to multisign
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       Domain: convertStringToHex('example.com'),
     }
     const accountSetTx = await client.autofill(accountSet, 2)

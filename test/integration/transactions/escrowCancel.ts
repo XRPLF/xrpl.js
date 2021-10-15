@@ -27,10 +27,10 @@ describe('EscrowCancel', function () {
     const wallet1 = await generateFundedWallet(this.client)
 
     const createTx: EscrowCreate = {
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       TransactionType: 'EscrowCreate',
       Amount: '10000',
-      Destination: wallet1.getClassicAddress(),
+      Destination: wallet1.classicAddress,
       CancelAfter: CLOSE_TIME + 3,
       FinishAfter: CLOSE_TIME + 2,
     }
@@ -43,7 +43,7 @@ describe('EscrowCancel', function () {
     const accountObjects = (
       await this.client.request({
         command: 'account_objects',
-        account: this.wallet.getClassicAddress(),
+        account: this.wallet.classicAddress,
       })
     ).result.account_objects
 
@@ -58,8 +58,8 @@ describe('EscrowCancel', function () {
 
     const cancelTx: EscrowCancel = {
       TransactionType: 'EscrowCancel',
-      Account: this.wallet.getClassicAddress(),
-      Owner: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
+      Owner: this.wallet.classicAddress,
       OfferSequence: sequence,
     }
 

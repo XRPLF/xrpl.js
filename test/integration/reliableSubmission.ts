@@ -21,7 +21,7 @@ describe('reliable submission', function () {
   it('submitReliable', async function () {
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       Domain: convertStringToHex('example.com'),
     }
     const responsePromise = this.client.submitReliable(this.wallet, accountSet)
@@ -37,7 +37,7 @@ describe('reliable submission', function () {
   it('submitSignedReliable', async function () {
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       Domain: convertStringToHex('example.com'),
     }
     const { tx_blob: signedAccountSet } = this.wallet.sign(
@@ -56,7 +56,7 @@ describe('reliable submission', function () {
   it('submitSignedReliable longer', async function () {
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       Domain: convertStringToHex('example.com'),
     }
     const { tx_blob: signedAccountSet } = this.wallet.sign(

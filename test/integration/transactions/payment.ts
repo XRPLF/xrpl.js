@@ -19,8 +19,8 @@ describe('Payment', function () {
     const wallet2 = await generateFundedWallet(this.client)
     const tx: Payment = {
       TransactionType: 'Payment',
-      Account: this.wallet.getClassicAddress(),
-      Destination: wallet2.getClassicAddress(),
+      Account: this.wallet.classicAddress,
+      Destination: wallet2.classicAddress,
       Amount: '1000',
     }
     await testTransaction(this.client, tx, this.wallet)

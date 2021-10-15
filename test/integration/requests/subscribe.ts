@@ -35,7 +35,7 @@ async function createTxHandlerTest(
   const request: SubscribeRequest = {
     command: 'subscribe',
     streams: [subscriptionStream],
-    accounts: [wallet.getClassicAddress()],
+    accounts: [wallet.classicAddress],
   }
 
   client.request(request).then((response) => {
@@ -85,11 +85,11 @@ describe('subscribe', function () {
       // Trigger the event
       const tx: OfferCreate = {
         TransactionType: 'OfferCreate',
-        Account: this.wallet.getClassicAddress(),
+        Account: this.wallet.classicAddress,
         TakerGets: '13100000',
         TakerPays: {
           currency: 'USD',
-          issuer: this.wallet.getClassicAddress(),
+          issuer: this.wallet.classicAddress,
           value: '10',
         },
       }
@@ -107,11 +107,11 @@ describe('subscribe', function () {
     ).then(() => {
       const tx: OfferCreate = {
         TransactionType: 'OfferCreate',
-        Account: this.wallet.getClassicAddress(),
+        Account: this.wallet.classicAddress,
         TakerGets: '13100000',
         TakerPays: {
           currency: 'USD',
-          issuer: this.wallet.getClassicAddress(),
+          issuer: this.wallet.classicAddress,
           value: '10',
         },
       }
@@ -127,7 +127,7 @@ describe('subscribe', function () {
     const request: SubscribeRequest = {
       command: 'subscribe',
       streams: ['ledger'],
-      accounts: [this.wallet.getClassicAddress()],
+      accounts: [this.wallet.classicAddress],
     }
 
     this.client.request(request).then((response) => {

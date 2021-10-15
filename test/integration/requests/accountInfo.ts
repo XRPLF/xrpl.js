@@ -18,7 +18,7 @@ describe('account_info', function () {
   it('base', async function () {
     const request: AccountInfoRequest = {
       command: 'account_info',
-      account: this.wallet.getClassicAddress(),
+      account: this.wallet.classicAddress,
       strict: true,
       ledger_index: 'validated',
     }
@@ -27,7 +27,7 @@ describe('account_info', function () {
       id: 0,
       result: {
         account_data: {
-          Account: this.wallet.getClassicAddress(),
+          Account: this.wallet.classicAddress,
           Balance: '400000000',
           Flags: 0,
           LedgerEntryType: 'AccountRoot',
