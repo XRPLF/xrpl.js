@@ -28,8 +28,8 @@ async function claimPayChannel(): Promise<void> {
   const { wallet: wallet2 } = await client.fundWallet()
 
   console.log('Balances of wallets before Payment Channel is claimed')
-  console.log(client.getXrpBalance(wallet1.classicAddress))
-  console.log(client.getXrpBalance(wallet2.classicAddress))
+  console.log(await client.getXrpBalance(wallet1.classicAddress))
+  console.log(await client.getXrpBalance(wallet2.classicAddress))
 
   // eslint-disable-next-line new-cap -- function defined as that.
   const finishAfter = ISOTimeToRippleTime(Date()) + 2
@@ -86,8 +86,8 @@ async function claimPayChannel(): Promise<void> {
   console.log(channelClaimResponse)
 
   console.log('Balances of wallets after Payment Channel is claimed')
-  console.log(client.getXrpBalance(wallet1.classicAddress))
-  console.log(client.getXrpBalance(wallet2.classicAddress))
+  console.log(await client.getXrpBalance(wallet1.classicAddress))
+  console.log(await client.getXrpBalance(wallet2.classicAddress))
 
   void client.disconnect()
 }
