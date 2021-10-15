@@ -61,9 +61,7 @@ export function decimalToTransferRate(decimal: string): number {
  * "billionths" format.
  */
 export function percentToTransferRate(percent: string): number {
-  const decimal = percentToDecimal(percent)
-
-  return decimalToTransferRate(decimal)
+  return decimalToTransferRate(percentToDecimal(percent))
 }
 
 /**
@@ -109,6 +107,5 @@ export function decimalToQuality(decimal: string): number {
  * "billionths" format.
  */
 export function percentToQuality(percent: string): number {
-  const decimal = percentToDecimal(percent)
-  return decimalToQuality(decimal)
+  return decimalToQuality(percentToDecimal(percent))
 }
