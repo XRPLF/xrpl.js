@@ -17,12 +17,6 @@ async function getXRPBalance(account: string): Promise<string> {
   return (await client.request(request)).result.account_data.Balance
 }
 
-async function sleep(ms): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms)
-  })
-}
-
 void sendEscrow()
 
 async function sendEscrow(): Promise<void> {
@@ -48,7 +42,7 @@ async function sendEscrow(): Promise<void> {
     FinishAfter: finishAfter,
   }
 
-  const createEscrowResponse = await client.submit(wallet1, createTx)
+  const createEscrowResponse = await client.submitReliable(wallet1, createTx)
 
   console.log(createEscrowResponse)
 
@@ -66,15 +60,11 @@ async function sendEscrow(): Promise<void> {
   )
   console.log(accountObjects)
 
-  // wait for `finishAfter` to pass.
-  const WAIT_TIME = 4000
-  await sleep(WAIT_TIME)
-
   const finishTx: EscrowFinish = {
     TransactionType: 'EscrowFinish',
     Account: wallet1.getClassicAddress(),
     Owner: wallet1.getClassicAddress(),
-    OfferSequence: Number(createEscrowResponse.result.tx_json.Sequence),
+    OfferSequence: Number(createEscrowResponse.result.Sequence),
   }
 
   await client.submit(wallet1, finishTx)
