@@ -18,7 +18,7 @@ describe('tx', function () {
   afterEach(teardownClient)
 
   it('base', async function () {
-    const account = this.wallet.getClassicAddress()
+    const account = this.wallet.classicAddress
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
       Account: account,

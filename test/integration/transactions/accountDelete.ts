@@ -26,8 +26,8 @@ describe('AccountDelete', function () {
     await Promise.all(promises)
     const tx: AccountDelete = {
       TransactionType: 'AccountDelete',
-      Account: this.wallet.getClassicAddress(),
-      Destination: wallet2.getClassicAddress(),
+      Account: this.wallet.classicAddress,
+      Destination: wallet2.classicAddress,
     }
     await testTransaction(this.client, tx, this.wallet)
   })

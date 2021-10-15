@@ -18,7 +18,7 @@ describe('SignerListSet', function () {
   it('base', async function () {
     const tx: SignerListSet = {
       TransactionType: 'SignerListSet',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       SignerEntries: [
         {
           SignerEntry: {

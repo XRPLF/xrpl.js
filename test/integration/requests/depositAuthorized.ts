@@ -20,8 +20,8 @@ describe('deposit_authorized', function () {
     const wallet2 = await generateFundedWallet(this.client)
     const depositAuthorized: DepositAuthorizedRequest = {
       command: 'deposit_authorized',
-      source_account: this.wallet.getClassicAddress(),
-      destination_account: wallet2.getClassicAddress(),
+      source_account: this.wallet.classicAddress,
+      destination_account: wallet2.classicAddress,
     }
 
     const response = await this.client.request(depositAuthorized)

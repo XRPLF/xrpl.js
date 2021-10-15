@@ -19,11 +19,11 @@ describe('OfferCreate', function () {
   it('base', async function () {
     const tx: OfferCreate = {
       TransactionType: 'OfferCreate',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       TakerGets: '13100000',
       TakerPays: {
         currency: 'USD',
-        issuer: this.wallet.getClassicAddress(),
+        issuer: this.wallet.classicAddress,
         value: '10',
       },
     }
@@ -33,7 +33,7 @@ describe('OfferCreate', function () {
     // confirm that the offer actually went through
     const accountOffersResponse = await this.client.request({
       command: 'account_offers',
-      account: this.wallet.getClassicAddress(),
+      account: this.wallet.classicAddress,
     })
     assert.lengthOf(
       accountOffersResponse.result.offers,

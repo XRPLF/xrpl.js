@@ -18,7 +18,7 @@ describe('noripple_check', function () {
   it('base', async function () {
     const request: NoRippleCheckRequest = {
       command: 'noripple_check',
-      account: this.wallet.getClassicAddress(),
+      account: this.wallet.classicAddress,
       role: 'gateway',
       ledger_index: 'current',
       transactions: true,
@@ -31,7 +31,7 @@ describe('noripple_check', function () {
         problems: ['You should immediately set your default ripple flag'],
         transactions: [
           {
-            Account: this.wallet.getClassicAddress(),
+            Account: this.wallet.classicAddress,
             Fee: 10,
             Sequence: 1268,
             SetFlag: 8,
