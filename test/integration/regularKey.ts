@@ -1,15 +1,10 @@
 import { assert } from 'chai'
 import _ from 'lodash'
-import { decode } from 'ripple-binary-codec/dist'
 
 import {
   AccountSet,
   Client,
   SignerListSet,
-  SubmitMultisignedRequest,
-  Transaction,
-  SubmitMultisignedResponse,
-  hashes,
   SetRegularKey,
   Wallet,
   AccountSetAsfFlags,
@@ -29,7 +24,6 @@ import {
 
 // how long before each test case times out
 const TIMEOUT = 20000
-const { hashSignedTx } = hashes
 
 async function generateFundedWalletWithRegularKey(
   client: Client,
@@ -232,32 +226,11 @@ describe('regular key', function () {
     const signed1 = regularKeyWallet.sign(accountSetTx, true)
     const signed2 = signerWallet2.sign(accountSetTx, true)
     const multisigned = multisign([signed1.tx_blob, signed2.tx_blob])
-    const multisignedRequest: SubmitMultisignedRequest = {
-      command: 'submit_multisigned',
-      tx_json: decode(multisigned) as unknown as Transaction,
-    }
-    const submitResponse = await client.request(multisignedRequest)
+    const submitResponse = await client.submitSigned(multisigned)
     await ledgerAccept(client)
+
     assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
     await verifySubmittedTransaction(this.client, multisigned)
-
-    const expectedResponse: SubmitMultisignedResponse = {
-      id: submitResponse.id,
-      type: 'response',
-      result: {
-        engine_result: 'tesSUCCESS',
-        engine_result_code: 0,
-        engine_result_message:
-          'The transaction was applied. Only final in a validated ledger.',
-        tx_blob: multisigned,
-        tx_json: {
-          ...(decode(multisigned) as unknown as Transaction),
-          hash: hashSignedTx(multisigned),
-        },
-      },
-    }
-
-    assert.deepEqual(submitResponse, expectedResponse)
   })
 
   it('try multisigning with the account address used to set up a regular key', async function () {
@@ -304,11 +277,7 @@ describe('regular key', function () {
     const signed1 = sameKeyDefaultAddressWallet.sign(accountSetTx, true)
     const signed2 = signerWallet2.sign(accountSetTx, true)
     const multisigned = multisign([signed1.tx_blob, signed2.tx_blob])
-    const multisignedRequest: SubmitMultisignedRequest = {
-      command: 'submit_multisigned',
-      tx_json: decode(multisigned) as unknown as Transaction,
-    }
-    const submitResponse = await client.request(multisignedRequest)
+    const submitResponse = await client.submitSigned(multisigned)
     await ledgerAccept(client)
     assert.strictEqual(submitResponse.result.engine_result, 'tefBAD_SIGNATURE')
   })
