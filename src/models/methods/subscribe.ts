@@ -1,5 +1,5 @@
 import type { Amount, Currency, Path, StreamType } from '../common'
-import Offer from '../ledger/offer'
+import { Offer } from '../ledger'
 import { OfferCreate, Transaction } from '../transactions'
 import TransactionMetadata from '../transactions/metadata'
 
@@ -66,17 +66,16 @@ export interface SubscribeRequest extends BaseRequest {
   url_password?: string
 }
 
+type BooksSnapshot = Offer[]
+
 /**
  * Response expected from a {@link SubscribeRequest}.
  *
  * @category Responses
  */
 export interface SubscribeResponse extends BaseResponse {
-  // eslint-disable-next-line @typescript-eslint/ban-types -- actually should be an empty object
-  result: {} | LedgerStreamResponse | BooksSnapshot
+  result: Record<string, never> | LedgerStreamResponse | BooksSnapshot
 }
-
-type BooksSnapshot = Offer[]
 
 interface BaseStream {
   type: string

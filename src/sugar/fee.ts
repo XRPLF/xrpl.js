@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js'
 
 import type { Client } from '..'
+import { XrplError } from '../errors'
 
 const NUM_DECIMAL_PLACES = 6
 const BASE_10 = 10
@@ -25,7 +26,7 @@ export default async function getFee(
   const baseFee = serverInfo.validated_ledger?.base_fee_xrp
 
   if (baseFee == null) {
-    throw new Error('getFee: Could not get base_fee_xrp from server_info')
+    throw new XrplError('getFee: Could not get base_fee_xrp from server_info')
   }
 
   const baseFeeXrp = new BigNumber(baseFee)

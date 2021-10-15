@@ -40,3 +40,4 @@ export * from './requests/utility'
 
 export * from './fundWallet'
 export * from './integration'
+export * from './regularKey'

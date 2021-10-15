@@ -19,12 +19,11 @@ describe('Utility method integration tests', function () {
     const response = await (this.client as Client).request({
       command: 'ping',
     })
-    const expected = {
-      id: 0,
+    const expected: unknown = {
       result: { role: 'admin', unlimited: true },
       type: 'response',
     }
-    assert.deepEqual(_.omit(response, 'id'), _.omit(expected, 'id'))
+    assert.deepEqual(_.omit(response, 'id'), expected)
   })
 
   it('random', async function () {

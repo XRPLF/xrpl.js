@@ -6,7 +6,7 @@
 import BigNumber from 'bignumber.js'
 import { decode, encode } from 'ripple-binary-codec'
 
-import { ValidationError } from '../../errors'
+import { ValidationError, XrplError } from '../../errors'
 import type { Ledger } from '../../models/ledger'
 import { LedgerEntry } from '../../models/ledger'
 import { Transaction } from '../../models/transactions'
@@ -61,7 +61,7 @@ function addLengthPrefix(hex: string): string {
       ]) + hex
     )
   }
-  throw new Error('Variable integer overflow.')
+  throw new XrplError('Variable integer overflow.')
 }
 
 /**
@@ -76,7 +76,6 @@ export function hashSignedTx(tx: Transaction | string): string {
   let txObject: Transaction
   if (typeof tx === 'string') {
     txBlob = tx
-    // TODO: type ripple-binary-codec with Transaction
     /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required until updated in binary codec. */
     txObject = decode(tx) as unknown as Transaction
   } else {

@@ -23,6 +23,7 @@ import {
 import ECDSA from '../ecdsa'
 import { ValidationError } from '../errors'
 import { Transaction } from '../models/transactions'
+import { ensureClassicAddress } from '../sugar/utils'
 import { hashSignedTx } from '../utils/hashes/ledgerHash'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
@@ -34,6 +35,26 @@ function hexFromBuffer(buffer: Buffer): string {
 interface SignedTxBlobHash {
   tx_blob: string
   hash: string
+}
+
+interface WalletBaseOptions {
+  // Include if a wallet uses a Regular Key Pair. It must be the master address of the account.
+  masterAddress?: string
+}
+
+interface WalletOptions extends WalletBaseOptions {
+  // The seed used to derive the account keys.
+  seed?: string
+}
+
+interface DeriveWalletOptions extends WalletBaseOptions {
+  // The digital signature algorithm to generate an address for.
+  algorithm?: ECDSA
+}
+
+interface FromMnemonicOptions extends WalletBaseOptions {
+  // The path to derive a keypair (publicKey/privateKey) used for mnemonic-to-seed conversion.
+  derivationPath?: string
 }
 
 /**
@@ -89,12 +110,6 @@ interface SignedTxBlobHash {
 class Wallet {
   public readonly publicKey: string
   public readonly privateKey: string
-  /**
-   * This only is correct if this wallet corresponds to your
-   * [master keypair](https://xrpl.org/cryptographic-keys.html#master-key-pair). If this wallet represents a
-   * [regular keypair](https://xrpl.org/cryptographic-keys.html#regular-key-pair) this will provide an incorrect address.
-   * TODO: Add support for Regular Keys to Wallet (And their corresponding impact on figuring out classicAddress).
-   */
   public readonly classicAddress: string
   public readonly seed?: string
 
@@ -112,13 +127,21 @@ class Wallet {
    *
    * @param publicKey - The public key for the account.
    * @param privateKey - The private key used for signing transactions for the account.
-   * @param seed - (Optional) The seed used to derive the account keys.
+   * @param opts - (Optional) Options to initialize a Wallet.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
+   * @param opts.seed - The seed used to derive the account keys.
    */
-  public constructor(publicKey: string, privateKey: string, seed?: string) {
+  public constructor(
+    publicKey: string,
+    privateKey: string,
+    opts: WalletOptions = {},
+  ) {
     this.publicKey = publicKey
     this.privateKey = privateKey
-    this.classicAddress = deriveAddress(publicKey)
-    this.seed = seed
+    this.classicAddress = opts.masterAddress
+      ? ensureClassicAddress(opts.masterAddress)
+      : deriveAddress(publicKey)
+    this.seed = opts.seed
   }
 
   /**
@@ -136,21 +159,25 @@ class Wallet {
    * Derives a wallet from a seed.
    *
    * @param seed - A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
-   * @param algorithm - The digital signature algorithm to generate an address for.
+   * @param opts - (Optional) Options to derive a Wallet.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from a seed.
    */
-  public static fromSeed(
-    seed: string,
-    algorithm: ECDSA = DEFAULT_ALGORITHM,
-  ): Wallet {
-    return Wallet.deriveWallet(seed, algorithm)
+  public static fromSeed(seed: string, opts: DeriveWalletOptions = {}): Wallet {
+    return Wallet.deriveWallet(seed, {
+      algorithm: opts.algorithm,
+      masterAddress: opts.masterAddress,
+    })
   }
 
   /**
    * Derives a wallet from a secret (AKA a seed).
    *
    * @param secret - A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
-   * @param algorithm - The digital signature algorithm to generate an address fro.
+   * @param opts - (Optional) Options to derive a Wallet.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from a secret (AKA a seed).
    */
   // eslint-disable-next-line @typescript-eslint/member-ordering -- Member is used as a function here
@@ -160,17 +187,21 @@ class Wallet {
    * Derives a wallet from a mnemonic.
    *
    * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
-   * @param derivationPath - The path to derive a keypair (publicKey/privateKey) from a seed (that was converted from a mnemonic).
+   * @param opts - (Optional) Options to derive a Wallet.
+   * @param opts.derivationPath - The path to derive a keypair (publicKey/privateKey) used for mnemonic-to-seed conversion.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from a mnemonic.
    * @throws ValidationError if unable to derive private key from mnemonic input.
    */
   public static fromMnemonic(
     mnemonic: string,
-    derivationPath: string = DEFAULT_DERIVATION_PATH,
+    opts: FromMnemonicOptions = {},
   ): Wallet {
     const seed = mnemonicToSeedSync(mnemonic)
     const masterNode = fromSeed(seed)
-    const node = masterNode.derivePath(derivationPath)
+    const node = masterNode.derivePath(
+      opts.derivationPath ?? DEFAULT_DERIVATION_PATH,
+    )
     if (node.privateKey === undefined) {
       throw new ValidationError(
         'Unable to derive privateKey from mnemonic input',
@@ -179,41 +210,56 @@ class Wallet {
 
     const publicKey = hexFromBuffer(node.publicKey)
     const privateKey = hexFromBuffer(node.privateKey)
-    return new Wallet(publicKey, `00${privateKey}`)
+    return new Wallet(publicKey, `00${privateKey}`, {
+      masterAddress: opts.masterAddress,
+    })
   }
 
   /**
    * Derives a wallet from an entropy (array of random numbers).
    *
    * @param entropy - An array of random numbers to generate a seed used to derive a wallet.
-   * @param algorithm - The digital signature algorithm to generate an address for.
+   * @param opts - (Optional) Options to derive a Wallet.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from an entropy.
    */
   public static fromEntropy(
     entropy: Uint8Array | number[],
-    algorithm: ECDSA = DEFAULT_ALGORITHM,
+    opts: DeriveWalletOptions = {},
   ): Wallet {
+    const algorithm = opts.algorithm ?? DEFAULT_ALGORITHM
     const options = {
       entropy: Uint8Array.from(entropy),
       algorithm,
     }
     const seed = generateSeed(options)
-    return Wallet.deriveWallet(seed, algorithm)
+    return Wallet.deriveWallet(seed, {
+      algorithm,
+      masterAddress: opts.masterAddress,
+    })
   }
 
   /**
    * Derive a Wallet from a seed.
    *
    * @param seed - The seed used to derive the wallet.
-   * @param algorithm - The algorithm used to do the derivation.
+   * @param opts - (Optional) Options to derive a Wallet.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from the seed.
    */
   private static deriveWallet(
     seed: string,
-    algorithm: ECDSA = DEFAULT_ALGORITHM,
+    opts: DeriveWalletOptions = {},
   ): Wallet {
-    const { publicKey, privateKey } = deriveKeypair(seed, { algorithm })
-    return new Wallet(publicKey, privateKey, seed)
+    const { publicKey, privateKey } = deriveKeypair(seed, {
+      algorithm: opts.algorithm ?? DEFAULT_ALGORITHM,
+    })
+    return new Wallet(publicKey, privateKey, {
+      seed,
+      masterAddress: opts.masterAddress,
+    })
   }
 
   /**

@@ -19,7 +19,6 @@ import { Response } from '../models/methods'
 
 import getBalanceChanges from './balanceChanges'
 import { deriveKeypair, deriveXAddress } from './derive'
-import { generateXAddress } from './generateAddress'
 import {
   hashSignedTx,
   hashTx,
@@ -124,7 +123,6 @@ export {
   isValidSecret,
   isValidAddress,
   hashes,
-  generateXAddress,
   deriveKeypair,
   deriveXAddress,
   signPaymentChannelClaim,
