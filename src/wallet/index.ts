@@ -38,8 +38,8 @@ interface SignedTxBlobHash {
 }
 
 interface WalletBaseOptions {
-  // Include if making a wallet for a Regular Key Pair. This should be the classicAddress of the account.
-  classicAddress?: string
+  // Include if making a wallet for a Regular Key Pair. This should be the masterAddress of the account.
+  masterAddress?: string
 }
 
 interface WalletOptions extends WalletBaseOptions {
@@ -146,8 +146,8 @@ class Wallet {
   ) {
     this.publicKey = publicKey
     this.privateKey = privateKey
-    this.classicAddress = opts.classicAddress
-      ? ensureClassicAddress(opts.classicAddress)
+    this.classicAddress = opts.masterAddress
+      ? ensureClassicAddress(opts.masterAddress)
       : deriveAddress(publicKey)
     this.seed = opts.seed
   }
@@ -173,7 +173,7 @@ class Wallet {
   public static fromSeed(seed: string, opts: FromSeedOptions = {}): Wallet {
     return Wallet.deriveWallet(seed, {
       algorithm: opts.algorithm,
-      classicAddress: opts.classicAddress,
+      masterAddress: opts.masterAddress,
     })
   }
 
@@ -213,7 +213,7 @@ class Wallet {
     const publicKey = hexFromBuffer(node.publicKey)
     const privateKey = hexFromBuffer(node.privateKey)
     return new Wallet(publicKey, `00${privateKey}`, {
-      classicAddress: opts.classicAddress,
+      masterAddress: opts.masterAddress,
     })
   }
 
@@ -236,7 +236,7 @@ class Wallet {
     const seed = generateSeed(options)
     return Wallet.deriveWallet(seed, {
       algorithm,
-      classicAddress: opts.classicAddress,
+      masterAddress: opts.masterAddress,
     })
   }
 
@@ -256,7 +256,7 @@ class Wallet {
     })
     return new Wallet(publicKey, privateKey, {
       seed,
-      classicAddress: opts.classicAddress,
+      masterAddress: opts.masterAddress,
     })
   }
 

@@ -19,7 +19,7 @@ const { sign: RESPONSE_FIXTURES } = responses
 describe('Wallet', function () {
   describe('constructor', function () {
     it('initializes a wallet using a Regular Key Pair', function () {
-      const classicAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
+      const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
         publicKey: 'aBRNH5wUurfhZcoyR6nRwDSa95gMBkovBJ8V4cp1C1pM28H7EPL1',
         privateKey: 'sh8i92YRnEjJy3fpFkL8txQSCVo79',
@@ -29,13 +29,13 @@ describe('Wallet', function () {
         regularKeyPair.publicKey,
         regularKeyPair.privateKey,
         {
-          classicAddress,
+          masterAddress,
         },
       )
 
       assert.equal(wallet.publicKey, regularKeyPair.publicKey)
       assert.equal(wallet.privateKey, regularKeyPair.privateKey)
-      assert.equal(wallet.classicAddress, classicAddress)
+      assert.equal(wallet.classicAddress, masterAddress)
     })
   })
 
@@ -119,7 +119,7 @@ describe('Wallet', function () {
     })
 
     it('derives a wallet using a Regular Key Pair', function () {
-      const classicAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
+      const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
         seed: 'sh8i92YRnEjJy3fpFkL8txQSCVo79',
         publicKey:
@@ -128,11 +128,11 @@ describe('Wallet', function () {
           '004265A28F3E18340A490421D47B2EB8DBC2C0BF2C24CEFEA971B61CED2CABD233',
       }
 
-      const wallet = Wallet.fromSeed(regularKeyPair.seed, { classicAddress })
+      const wallet = Wallet.fromSeed(regularKeyPair.seed, { masterAddress })
 
       assert.equal(wallet.publicKey, regularKeyPair.publicKey)
       assert.equal(wallet.privateKey, regularKeyPair.privateKey)
-      assert.equal(wallet.classicAddress, classicAddress)
+      assert.equal(wallet.classicAddress, masterAddress)
     })
   })
 
@@ -167,7 +167,7 @@ describe('Wallet', function () {
     })
 
     it('derives a wallet using a Regular Key Pair', function () {
-      const classicAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
+      const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
         seed: 'sh8i92YRnEjJy3fpFkL8txQSCVo79',
         publicKey:
@@ -176,11 +176,11 @@ describe('Wallet', function () {
           '004265A28F3E18340A490421D47B2EB8DBC2C0BF2C24CEFEA971B61CED2CABD233',
       }
 
-      const wallet = Wallet.fromSecret(regularKeyPair.seed, { classicAddress })
+      const wallet = Wallet.fromSecret(regularKeyPair.seed, { masterAddress })
 
       assert.equal(wallet.publicKey, regularKeyPair.publicKey)
       assert.equal(wallet.privateKey, regularKeyPair.privateKey)
-      assert.equal(wallet.classicAddress, classicAddress)
+      assert.equal(wallet.classicAddress, masterAddress)
     })
   })
 
@@ -208,7 +208,7 @@ describe('Wallet', function () {
     })
 
     it('derives a wallet using a Regular Key Pair', function () {
-      const classicAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
+      const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
         mnemonic: 'KNEW BENT LYNN LED GAD BEN KENT SHAM HOBO RINK WALT ALLY',
         publicKey:
@@ -218,12 +218,12 @@ describe('Wallet', function () {
       }
 
       const wallet = Wallet.fromMnemonic(regularKeyPair.mnemonic, {
-        classicAddress,
+        masterAddress,
       })
 
       assert.equal(wallet.publicKey, regularKeyPair.publicKey)
       assert.equal(wallet.privateKey, regularKeyPair.privateKey)
-      assert.equal(wallet.classicAddress, classicAddress)
+      assert.equal(wallet.classicAddress, masterAddress)
     })
   })
 
@@ -267,12 +267,12 @@ describe('Wallet', function () {
     })
 
     it('derives a wallet using a regular key pair', function () {
-      const classicAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
-      const wallet = Wallet.fromEntropy(entropy, { classicAddress })
+      const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
+      const wallet = Wallet.fromEntropy(entropy, { masterAddress })
 
       assert.equal(wallet.publicKey, publicKeyED25519)
       assert.equal(wallet.privateKey, privateKeyED25519)
-      assert.equal(wallet.classicAddress, classicAddress)
+      assert.equal(wallet.classicAddress, masterAddress)
     })
   })
 

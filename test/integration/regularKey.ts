@@ -37,7 +37,7 @@ async function generateFundedWalletWithRegularKey(
   const masterWallet = await generateFundedWallet(client)
 
   const regularKeyWallet = Wallet.fromSeed(regularKeyInfo.seed, {
-    classicAddress: masterWallet.address,
+    masterAddress: masterWallet.address,
   })
 
   const setRegularTx: SetRegularKey = {
