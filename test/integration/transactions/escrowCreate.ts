@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { EscrowCreate } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { setupClient, teardownClient } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
 
 // how long before each test case times out
@@ -13,7 +13,6 @@ const TIMEOUT = 20000
 describe('EscrowCreate', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
