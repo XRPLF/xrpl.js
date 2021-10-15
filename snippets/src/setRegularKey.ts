@@ -10,8 +10,8 @@ async function main(): Promise<void> {
   const { wallet: regularKeyWallet } = await client.fundWallet()
 
   console.log('Balances before payment')
-  console.log(client.getXrpBalance(wallet1.classicAddress))
-  console.log(client.getXrpBalance(wallet2.classicAddress))
+  console.log(await client.getXrpBalance(wallet1.classicAddress))
+  console.log(await client.getXrpBalance(wallet2.classicAddress))
 
   const tx: SetRegularKey = {
     TransactionType: 'SetRegularKey',
@@ -31,11 +31,11 @@ async function main(): Promise<void> {
   }
 
   const submitTx = await client.submit(regularKeyWallet, payment)
-  console.log('Blob for tx signed using Regular Key')
+  console.log('Response for tx signed using Regular Key')
   console.log(submitTx)
-  console.log('Balances before payment')
-  console.log(client.getXrpBalance(wallet1.classicAddress))
-  console.log(client.getXrpBalance(wallet2.classicAddress))
+  console.log('Balances after payment')
+  console.log(await client.getXrpBalance(wallet1.classicAddress))
+  console.log(await client.getXrpBalance(wallet2.classicAddress))
 
   await client.disconnect()
 }

@@ -47,11 +47,9 @@ async function main(): Promise<void> {
   const initialPayment = await client.submit(wallet1, payment)
   console.log(initialPayment)
 
-  /*
-   * console.log('Balances after issuer(wallet1) sends IOU("FOO") to wallet2');
-   * await displayBalance(wallet1.classicAddress)
-   * await displayBalance(wallet2.classicAddress)
-   */
+  console.log('Balances after issuer(wallet1) sends IOU("FOO") to wallet2')
+  await displayBalance(wallet1.classicAddress)
+  await displayBalance(wallet2.classicAddress)
 
   /*
    * Send money less than the amount specified on 2 conditions:

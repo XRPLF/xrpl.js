@@ -17,8 +17,8 @@ async function sendReliableTx(): Promise<void> {
   const { wallet: wallet2 } = await client.fundWallet()
 
   console.log('Balances of wallets before Payment tx')
-  console.log(client.getXrpBalance(wallet1.classicAddress))
-  console.log(client.getXrpBalance(wallet2.classicAddress))
+  console.log(await client.getXrpBalance(wallet1.classicAddress))
+  console.log(await client.getXrpBalance(wallet2.classicAddress))
 
   const payment: Payment = {
     TransactionType: 'Payment',
@@ -32,8 +32,8 @@ async function sendReliableTx(): Promise<void> {
   console.log(paymentResponse)
 
   console.log('Balances of wallets before Payment tx')
-  console.log(client.getXrpBalance(wallet1.classicAddress))
-  console.log(client.getXrpBalance(wallet2.classicAddress))
+  console.log(await client.getXrpBalance(wallet1.classicAddress))
+  console.log(await client.getXrpBalance(wallet2.classicAddress))
 
   void client.disconnect()
 }
