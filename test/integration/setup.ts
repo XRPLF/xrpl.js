@@ -1,19 +1,10 @@
 import { Client, Wallet } from 'xrpl-local'
 
 import serverUrl from './serverUrl'
-import { fundAccount, ledgerAccept } from './utils'
+import { fundAccount } from './utils'
 
 export async function teardownClient(this: Mocha.Context): Promise<void> {
   this.client.disconnect()
-}
-
-export async function suiteClientSetup(this: Mocha.Context): Promise<void> {
-  this.transactions = []
-
-  await setupClient.bind(this)(serverUrl)
-  await ledgerAccept(this.client)
-  this.newWallet = Wallet.generate()
-  await teardownClient.bind(this)()
 }
 
 export async function setupClient(

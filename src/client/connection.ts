@@ -441,7 +441,9 @@ export class Connection extends EventEmitter {
 
       this.clearHeartbeatInterval()
       this.requestManager.rejectAll(
-        new DisconnectedError(`websocket was closed, ${reason}`),
+        new DisconnectedError(
+          `websocket was closed, ${new TextDecoder('utf-8').decode(reason)}`,
+        ),
       )
       this.ws.removeAllListeners()
       this.ws = null
