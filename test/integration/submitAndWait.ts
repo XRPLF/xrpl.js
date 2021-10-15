@@ -41,7 +41,7 @@ describe('client.submitAndWait', function () {
   it('should throw a ValidationError when submitting an unsigned transaction without a wallet', async function () {
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       Domain: convertStringToHex('example.com'),
     }
 
