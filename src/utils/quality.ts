@@ -84,6 +84,10 @@ export function decimalToQuality(decimal: string): number {
     throw new ValidationError(`Value is not a number`)
   }
 
+  if (billionths.indexOf('-') !== -1) {
+    throw new ValidationError('Cannot have negative Quality')
+  }
+
   if (billionths === ONE_BILLION) {
     return 0
   }

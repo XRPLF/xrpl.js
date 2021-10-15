@@ -2,6 +2,7 @@ import _ from 'lodash'
 
 import { TrustSet } from 'xrpl-local'
 
+import { percentToQuality } from '../../../src'
 import serverUrl from '../serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
@@ -20,6 +21,40 @@ describe('TrustSet', function () {
     const wallet2 = await generateFundedWallet(this.client)
     const tx: TrustSet = {
       TransactionType: 'TrustSet',
+      Account: this.wallet.getClassicAddress(),
+      LimitAmount: {
+        currency: 'USD',
+        issuer: wallet2.getClassicAddress(),
+        value: '100',
+      },
+    }
+
+    await testTransaction(this.client, tx, this.wallet)
+  })
+
+  it('Quality < 1', async function () {
+    const wallet2 = await generateFundedWallet(this.client)
+    const tx: TrustSet = {
+      TransactionType: 'TrustSet',
+      Account: this.wallet.getClassicAddress(),
+      QualityIn: percentToQuality('99%'),
+      QualityOut: percentToQuality('99%'),
+      LimitAmount: {
+        currency: 'USD',
+        issuer: wallet2.getClassicAddress(),
+        value: '100',
+      },
+    }
+
+    await testTransaction(this.client, tx, this.wallet)
+  })
+
+  it('Quality > 1', async function () {
+    const wallet2 = await generateFundedWallet(this.client)
+    const tx: TrustSet = {
+      TransactionType: 'TrustSet',
+      QualityIn: percentToQuality('101%'),
+      QualityOut: percentToQuality('101%'),
       Account: this.wallet.getClassicAddress(),
       LimitAmount: {
         currency: 'USD',
