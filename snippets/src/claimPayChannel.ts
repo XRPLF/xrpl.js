@@ -2,7 +2,6 @@
 /* eslint-disable max-lines-per-function -- Snippet for sending escrow flow. */
 /* eslint-disable no-console -- logs are helpful to understand snippets */
 import {
-  AccountInfoRequest,
   AccountObjectsRequest,
   Client,
   PaymentChannelCreate,
@@ -13,14 +12,6 @@ import {
 } from '../../dist/npm'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
-
-async function getXRPBalance(account: string): Promise<string> {
-  const request: AccountInfoRequest = {
-    command: 'account_info',
-    account,
-  }
-  return (await client.request(request)).result.account_data.Balance
-}
 
 async function sleep(ms): Promise<void> {
   return new Promise((resolve) => {
@@ -37,10 +28,9 @@ async function claimPayChannel(): Promise<void> {
   const { wallet: wallet2 } = await client.fundWallet()
 
   console.log('Balances of wallets before Payment Channel is claimed')
-  console.log(
-    await getXRPBalance(wallet1.classicAddress),
-    await getXRPBalance(wallet2.classicAddress),
-  )
+  console.log(client.getXrpBalance(wallet1.classicAddress))
+  console.log(client.getXrpBalance(wallet2.classicAddress))
+
   // eslint-disable-next-line new-cap -- function defined as that.
   const finishAfter = ISOTimeToRippleTime(Date()) + 2
 
@@ -96,10 +86,8 @@ async function claimPayChannel(): Promise<void> {
   console.log(channelClaimResponse)
 
   console.log('Balances of wallets after Payment Channel is claimed')
-  console.log(
-    await getXRPBalance(wallet1.classicAddress),
-    await getXRPBalance(wallet2.classicAddress),
-  )
+  console.log(client.getXrpBalance(wallet1.classicAddress))
+  console.log(client.getXrpBalance(wallet2.classicAddress))
 
   void client.disconnect()
 }
