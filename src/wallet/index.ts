@@ -36,12 +36,6 @@ interface SignedTxBlobHash {
   hash: string
 }
 
-export interface GeneratedAddress {
-  xAddress: string
-  classicAddress?: string
-  secret: string
-}
-
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
  * A wallet can be derived from either a seed, mnemonic, or entropy (array of random numbers).
