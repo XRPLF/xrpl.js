@@ -33,7 +33,10 @@ interface SubmitOptions {
  *
  * @param this - A Client.
  * @param transaction - A transaction to autofill, sign & encode, and submit.
- * @param opts - (Optional) Options to include a wallet to sign a transaction and booleans to autofill/failHard a transaction.
+ * @param opts - (Optional) Options used to sign and submit a transaction.
+ * @param opts.autofill - If true, autofill a transaction.
+ * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+ * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
  * @returns A promise that contains SubmitResponse.
  * @throws RippledError if submit request fails.
  */
