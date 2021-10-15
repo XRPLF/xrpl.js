@@ -151,7 +151,7 @@ function isSigned(transaction: Transaction | string): boolean {
   )
 }
 
-// checks if the transaction has been signed
+// prepares a submit request
 async function prepareSubmit(
   client: Client,
   transaction: Transaction | string,
