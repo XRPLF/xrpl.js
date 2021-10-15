@@ -2,6 +2,93 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
+## 2.0.0 (2021-10-20)
+
+A migration guide is available at https://xrpl.org/xrpljs2-migration-guide.html.
+
+### Added
+* New request and transaction models that exactly mirror rippled
+* Wallet object to handle key pairs
+* All rippled request methods are now supported by client request methods
+* JavaScript method (`validate`) to check the shape of transaction models
+* Methods to multisign (`multisign`), authorize a payment channel (`authorizeChannel`) and verify a transaction signature (`verifySignature`)
+* `client.autofill` (converts X-Addresses, converts transaction flags from objects to numbers, and fills in `Sequence`, `LastLedgerSequence`, and `Fee`)
+* Adds a message to the connection's trace whenever a partial payment is received on a stream
+* `getBalanceChanges` added in from `ripple-lib-transactionparser`
+* Changed return shape of some methods
+* Reliable transaction submission (waits until the transaction has been validated or `LastLedgerSequence` has failed before returning)
+
+### Changed
+* Renamed package from `ripple-lib` to `xrpl.js`
+* Main client
+  * Renamed from `RippleAPI` to `Client`
+  * Removed all methods that did not require a connection to the ledger (most were moved to the utils)
+  * Changed the constructor params to take a mandatory server URL and then the rest of the optional params (since there are no longer any functions on the Client that don't require a server connection)
+  * Added TypeScript typing to subscription handlers
+  * `client.request` now takes a request object that matches the rippled format, instead of separating out the `command`
+  * `client.requestAll` is now a public method that anyone can use
+  * `api.getLedgerVersion` -> `client.getLedgerIndex`
+  * `client.submit` will now sign a transaction
+* Better TypeScript typing everywhere
+* Completely revamped library documentation (now available at js.xrpl.org)
+* Utils
+  * Exported all utils at the top level and removed them from the client
+  * Renamed many of the utils to be more descriptive and more succinct
+  * Moved `ripple-address-codec` functions from `Client` to `utils` (and exported at the top level)
+  * Moved `hasNextPage` from `Client` to `utils`
+* Renamed `client.generateFaucetWallet` to `client.fundWallet` (and it now returns a `Wallet` and the wallet's balance)
+* Better flag organization
+* Updated dependencies
+  * ws, typescript
+
+### Deprecated
+* `api.prepareTransaction` (left in for easier migration, but it is now just an alias of `client.autofill`, which should be used instead)
+
+### Removed
+* Automatic client subscription to incoming ledgers
+* Removed `jsonschemas` in favor of TypeScript types and `validate` for JS users
+* Functions that were replaced by similar functionality elsewhere in the library
+  * `api.combine` -> `multisign`
+  * `api.sign` -> `Wallet.sign`
+  * `generateXAddress` -> `Wallet.generate(...).getXAddress(...)`
+  * `api.prepare...` -> `client.autofill(tx)` (they have slightly different APIs, but serve a similar purpose)
+* Several client abstraction methods that were deemed no longer necessary
+  * `api.getAccountInfo` -> `client.request({command: 'account_info', ...})`
+  * `api.getAccountObjects` -> `client.request({command: 'account_objects', ...})`
+  * `api.getBalanceSheet` -> `client.request({command: 'gateway_balances', ...})`
+  * `api.getLedger` -> `client.request({command: 'ledger', ...})`
+  * `api.getOrders` -> `client.request({command: 'account_offers', ...})`
+  * `api.getPaymentChannel` -> `client.request({command: 'ledger_entry', ...})`
+  * `api.getSettings` -> `client.request({command: 'account_info', ...})`
+  * `api.getServerInfo` -> `client.request({command: 'server_info'})`
+  * `api.getTransaction` -> `client.request({command: 'tx', ...})`
+  * `api.getTransactions` -> `client.request({command: 'account_tx', ...})`
+  * `api.getTrustlines` -> `client.request({command: 'account_lines', ...})`
+  * `api.getPaths` -> `client.request({command: ripple_path_find, ...})`
+* Helper methods/utils that are no longer necessary (such as `renameCounterpartyToIssuer` and `formatBidsAndAsks`)
+
+### Security
+* Fixed potential vulnerability in xrp-drops conversion (#1714)
+
+### Changes for library contributors
+* Linted code
+* Changed the docs framework to `typedoc`
+* Changes to testing structure
+  * Moved fixtures out of `test/mockRippled` - they are now defined in the test that they are used
+  * Renamed all files to be camelCase
+  * Fixtures now use TypeScript
+  * Use chai instead of assert-diff
+* Much more extensive integration testing
+* Switched from yarn to npm
+* Updated dev dependencies - replaced assert-diff with chai, updated linters, removed jsonschemas, updated types
+* Reorganized files
+  * Anything connection/client-related is in `src/client`
+  * All models are in `src/models`
+  * All additional abstraction functions are in `src/sugar`
+  * All independent methods that don't require a connection are in `src/utils`
+  * Everything to do with wallets is in `src/wallet`
+
+
 ## 1.10.0 (2021-08-12)
 
 * Add address generation from Devnet/Testnet faucets (#1497)
