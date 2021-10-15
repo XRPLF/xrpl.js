@@ -106,7 +106,6 @@ import {
 } from './connection'
 import {
   handlePartialPayment,
-  isStreamPartialPayment,
   handleStreamPartialPayment,
 } from './partialPayment'
 
@@ -243,10 +242,7 @@ class Client extends EventEmitter {
 
     this.connection.on('transaction', (tx) => {
       // mutates `tx` to add warnings
-      handleStreamPartialPayment(tx)
-      if (isStreamPartialPayment(tx)) {
-        this.connection.trace('Partial payment received', tx)
-      }
+      handleStreamPartialPayment(tx, this.connection.trace)
       this.emit('transaction', tx)
     })
 
