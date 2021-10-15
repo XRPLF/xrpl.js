@@ -4,7 +4,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## 2.0.0 (2021-10-20)
 
-A migration guide is available at (TODO: add link here).
+A migration guide is available at https://xrpl.org/xrpljs2-migration-guide.html.
 
 ### Added
 * New request and transaction models that exactly mirror rippled
@@ -13,7 +13,7 @@ A migration guide is available at (TODO: add link here).
 * JavaScript method (`validate`) to check the shape of transaction models
 * Methods to multisign (`multisign`), authorize a payment channel (`authorizeChannel`) and verify a transaction signature (`verifySignature`)
 * `client.autofill` (converts X-Addresses, converts transaction flags from objects to numbers, and fills in `Sequence`, `LastLedgerSequence`, and `Fee`)
-* partial payment stuff (TODO: based on #1709)
+* Adds a message to the connection's trace whenever a partial payment is received on a stream
 * `getBalanceChanges` added in from `ripple-lib-transactionparser`
 * Changed return shape of some methods
 * Reliable transaction submission (waits until the transaction has been validated or `LastLedgerSequence` has failed before returning)
