@@ -1,5 +1,5 @@
 /* eslint-disable no-console -- logs are helpful to understand snippets */
-import { AccountInfoRequest, Client, Payment } from '../../dist/npm'
+import { Client, Payment } from '../../dist/npm'
 
 /*
  *  * References:
@@ -7,14 +7,6 @@ import { AccountInfoRequest, Client, Payment } from '../../dist/npm'
  */
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
-
-async function getXRPBalance(account: string): Promise<string> {
-  const request: AccountInfoRequest = {
-    command: 'account_info',
-    account,
-  }
-  return (await client.request(request)).result.account_data.Balance
-}
 
 void sendReliableTx()
 
@@ -25,10 +17,8 @@ async function sendReliableTx(): Promise<void> {
   const { wallet: wallet2 } = await client.fundWallet()
 
   console.log('Balances of wallets before Payment tx')
-  console.log(
-    await getXRPBalance(wallet1.classicAddress),
-    await getXRPBalance(wallet2.classicAddress),
-  )
+  console.log(client.getXrpBalance(wallet1.classicAddress))
+  console.log(client.getXrpBalance(wallet2.classicAddress))
 
   const payment: Payment = {
     TransactionType: 'Payment',
@@ -42,10 +32,8 @@ async function sendReliableTx(): Promise<void> {
   console.log(paymentResponse)
 
   console.log('Balances of wallets before Payment tx')
-  console.log(
-    await getXRPBalance(wallet1.classicAddress),
-    await getXRPBalance(wallet2.classicAddress),
-  )
+  console.log(client.getXrpBalance(wallet1.classicAddress))
+  console.log(client.getXrpBalance(wallet2.classicAddress))
 
   void client.disconnect()
 }
