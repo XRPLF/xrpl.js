@@ -98,6 +98,55 @@ export function decimalToQuality(decimal: string): number {
 }
 
 /**
+ * Converts a quality in "billionths" format to a decimal.
+ *
+ * @param quality - Quality to convert to decimal.
+ * @returns decimal representation of quality.
+ */
+export function qualityToDecimal(quality: number): string {
+  if (!Number.isInteger(quality)) {
+    throw new ValidationError('Quality must be an integer')
+  }
+
+  if (quality < 0) {
+    throw new ValidationError('Negative quality not allowed')
+  }
+
+  if (quality === 0) {
+    return '1'
+  }
+
+  const decimal = new BigNumber(quality).dividedBy(ONE_BILLION)
+
+  return decimal.toString(BASE_TEN)
+}
+
+/**
+ * Converts a transfer rate in "billionths" format to a decimal.
+ *
+ * @param rate - TransferRate to convert to decimal.
+ * @returns decimal representation of transfer Rate.
+ * @throws ValidationError when it cannot convert from billionths format
+ */
+export function transferRateToDecimal(rate: number): string {
+  if (!Number.isInteger(rate)) {
+    throw new ValidationError('Quality must be an integer')
+  }
+
+  if (rate === 0) {
+    return '0'
+  }
+
+  const decimal = new BigNumber(rate).minus(ONE_BILLION).dividedBy(ONE_BILLION)
+
+  if (decimal.isLessThan(0)) {
+    throw new ValidationError('Negative quality not allowed')
+  }
+
+  return decimal.toString(BASE_TEN)
+}
+
+/**
  * Converts a string percent to the "billionths" format for use with QualityIn/
  * QualityOut
  *

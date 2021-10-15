@@ -35,8 +35,10 @@ import {
 import {
   percentToTransferRate,
   decimalToTransferRate,
+  transferRateToDecimal,
   percentToQuality,
   decimalToQuality,
+  qualityToDecimal,
 } from './quality'
 import signPaymentChannelClaim from './signPaymentChannelClaim'
 import {
@@ -132,6 +134,8 @@ export {
   decimalToQuality,
   percentToTransferRate,
   decimalToTransferRate,
+  transferRateToDecimal,
+  qualityToDecimal,
   isValidSecret,
   isValidAddress,
   hashes,

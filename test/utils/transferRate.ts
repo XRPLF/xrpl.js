@@ -2,7 +2,11 @@ import { assert } from 'chai'
 
 import { ValidationError } from 'xrpl-local'
 
-import { percentToTransferRate, decimalToTransferRate } from '../../src'
+import {
+  percentToTransferRate,
+  decimalToTransferRate,
+  transferRateToDecimal,
+} from '../../src'
 
 describe('TransferRate utils', function () {
   it('converts 1 percent to valid TransferRate', function () {
@@ -12,9 +16,8 @@ describe('TransferRate utils', function () {
   })
 
   it('converts .01 percent to valid TransferRate', function () {
-    const billionths = decimalToTransferRate('.01')
-
-    assert.equal(billionths, 1010000000)
+    assert.equal(decimalToTransferRate('.01'), 1010000000)
+    assert.equal(transferRateToDecimal(1010000000), '0.01')
   })
 
   it('Throws when TransferRate < 0%', function () {
@@ -72,8 +75,7 @@ describe('TransferRate utils', function () {
   })
 
   it('converts 0 to valid 0', function () {
-    const billionths = decimalToTransferRate('0')
-
-    assert.equal(billionths, 0)
+    assert.equal(decimalToTransferRate('0'), 0)
+    assert.equal(transferRateToDecimal(0), '0')
   })
 })

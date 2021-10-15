@@ -2,7 +2,7 @@ import { assert } from 'chai'
 
 import { ValidationError } from 'xrpl-local'
 
-import { decimalToQuality, percentToQuality } from '../../src'
+import { decimalToQuality, percentToQuality, qualityToDecimal } from '../../src'
 
 describe('Quality utils', function () {
   it('converts 101 percent to valid Quality', function () {
@@ -12,9 +12,8 @@ describe('Quality utils', function () {
   })
 
   it('converts 1.01 to valid Quality', function () {
-    const billionths = decimalToQuality('1.01')
-
-    assert.equal(billionths, 1010000000)
+    assert.equal(decimalToQuality('1.01'), 1010000000)
+    assert.equal(qualityToDecimal(1010000000), '1.01')
   })
 
   it('converts 99 percent to valid Quality', function () {
@@ -24,9 +23,8 @@ describe('Quality utils', function () {
   })
 
   it('converts .99 to valid Quality', function () {
-    const billionths = decimalToQuality('.99')
-
-    assert.equal(billionths, 990000000)
+    assert.equal(decimalToQuality('.99'), 990000000)
+    assert.equal(qualityToDecimal(990000000), '0.99')
   })
 
   it('converts 100 percent to 0', function () {
@@ -36,9 +34,8 @@ describe('Quality utils', function () {
   })
 
   it('converts 1.00 percent to 0', function () {
-    const billionths = decimalToQuality('1.00')
-
-    assert.equal(billionths, 0)
+    assert.equal(decimalToQuality('1.00'), 0)
+    assert.equal(qualityToDecimal(0), '1')
   })
 
   it('Throws when percent Quality greater than maximum precision', function () {
