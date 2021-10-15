@@ -102,6 +102,7 @@ export function decimalToQuality(decimal: string): number {
  *
  * @param quality - Quality to convert to decimal.
  * @returns decimal representation of quality.
+ * @throws ValidationError when quality is not convertible to decimal format.
  */
 export function qualityToDecimal(quality: number): string {
   if (!Number.isInteger(quality)) {
