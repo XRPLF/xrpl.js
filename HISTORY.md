@@ -80,7 +80,7 @@ A migration guide is available at https://xrpl.org/xrpljs2-migration-guide.html.
   * Use chai instead of assert-diff
 * Much more extensive integration testing
 * Switched from yarn to npm
-* Updated dev dependencies - replaced assert-diff with chai, updated linters, removed jsonschemas
+* Updated dev dependencies - replaced assert-diff with chai, updated linters, removed jsonschemas, updated types
 * Reorganized files
   * Anything connection/client-related is in `src/client`
   * All models are in `src/models`
