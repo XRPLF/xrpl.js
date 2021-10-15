@@ -16,8 +16,11 @@ async function sleep(ms: number): Promise<void> {
 }
 
 interface SubmitOptions {
+  // If true, autofill a transaction.
   autofill?: boolean
+  // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
   failHard?: boolean
+  // A wallet must be provided when submitting an unsigned transaction.
   wallet?: Wallet
 }
 
@@ -30,17 +33,17 @@ interface SubmitOptions {
  *
  * @param this - A Client.
  * @param transaction - A transaction to autofill, sign & encode, and submit.
- * @param opts - (Optional) A Wallet to sign a transaction and a boolean to autofill transaction.
+ * @param opts - (Optional) A Wallet to sign a transaction and booleans to autofill/failHard a transaction.
  * @returns A promise that contains SubmitResponse.
  * @throws RippledError if submit request fails.
  */
 async function submit(
   this: Client,
   transaction: Transaction | string,
-  opts: SubmitOptions = {},
+  opts?: SubmitOptions,
 ): Promise<SubmitResponse> {
   const signedTx = await prepareSubmit(this, transaction, opts)
-  return submitRequest(this, signedTx, opts.failHard)
+  return submitRequest(this, signedTx, opts)
 }
 
 /**
@@ -55,7 +58,7 @@ async function submit(
 async function submitRequest(
   client: Client,
   signedTransaction: Transaction | string,
-  failHard?: boolean,
+  { failHard }: SubmitOptions = {},
 ): Promise<SubmitResponse> {
   if (!isSigned(signedTransaction)) {
     throw new ValidationError('Transaction must be signed')
@@ -86,7 +89,7 @@ async function submitRequest(
 async function submitAndWait(
   this: Client,
   transaction: Transaction | string,
-  opts: SubmitOptions = {},
+  opts?: SubmitOptions,
 ): Promise<TxResponse> {
   const signedTx = await prepareSubmit(this, transaction, opts)
 
@@ -96,7 +99,7 @@ async function submitAndWait(
     )
   }
 
-  await submitRequest(this, signedTx, opts.failHard)
+  await submitRequest(this, signedTx, opts)
 
   const txHash = hashes.hashSignedTx(signedTx)
   return waitForFinalTransactionOutcome(this, txHash)
@@ -166,7 +169,7 @@ async function prepareSubmit(
 
   let tx =
     typeof transaction === 'string'
-      ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- this is expected
+      ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- converts JsonObject to correct Transaction type
         (decode(transaction) as unknown as Transaction)
       : transaction
 
