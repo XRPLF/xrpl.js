@@ -187,7 +187,9 @@ async function prepareSubmit(
   }
 
   if (!wallet) {
-    throw new ValidationError('Missing wallet to sign transaction')
+    throw new ValidationError(
+      'Wallet must be provided when submitting an unsigned transaction',
+    )
   }
 
   let tx =
