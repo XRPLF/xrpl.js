@@ -40,7 +40,7 @@ async function submit(
   opts?: SubmitOptions,
 ): Promise<SubmitResponse> {
   const signedTx = await prepareSubmit(this, transaction, opts)
-  return submitSigned(this, signedTx)
+  return submitRequest(this, signedTx)
 }
 
 /**
@@ -51,7 +51,7 @@ async function submit(
  * @returns A promise that contains SubmitResponse.
  * @throws ValidationError if the transaction isn't signed, RippledError if submit request fails.
  */
-async function submitSigned(
+async function submitRequest(
   client: Client,
   signedTransaction: Transaction | string,
 ): Promise<SubmitResponse> {
@@ -105,28 +105,15 @@ async function submitSignedAndWait(
   client: Client,
   signedTransaction: Transaction | string,
 ): Promise<TxResponse> {
-  if (!isSigned(signedTransaction)) {
-    throw new ValidationError('Transaction must be signed')
-  }
   if (!hasLastLedgerSequence(signedTransaction)) {
     throw new ValidationError(
       'Transaction must contain a LastLedgerSequence value for reliable submission.',
     )
   }
 
-  const signedTxEncoded =
-    typeof signedTransaction === 'string'
-      ? signedTransaction
-      : encode(signedTransaction)
+  await submitRequest(client, signedTransaction)
+
   const txHash = hashes.hashSignedTx(signedTransaction)
-
-  const request: SubmitRequest = {
-    command: 'submit',
-    tx_blob: signedTxEncoded,
-    fail_hard: isAccountDelete(signedTransaction),
-  }
-  await client.request(request)
-
   return waitForFinalTransactionOutcome(client, txHash)
 }
 
