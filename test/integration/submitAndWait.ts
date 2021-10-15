@@ -3,7 +3,9 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { AccountSet, convertStringToHex } from 'xrpl-local'
+import { AccountSet, convertStringToHex, ValidationError } from 'xrpl-local'
+
+import { assertRejects } from '../testUtils'
 
 import serverUrl from './serverUrl'
 import { setupClient, suiteClientSetup, teardownClient } from './setup'
@@ -12,14 +14,14 @@ import { ledgerAccept } from './utils'
 // how long before each test case times out
 const TIMEOUT = 60000
 
-describe('reliable submission', function () {
+describe('client.submitAndWait', function () {
   this.timeout(TIMEOUT)
 
   before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
-  it('submitAndWait', async function () {
+  it('submitAndWait an unsigned transaction', async function () {
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
       Account: this.wallet.getClassicAddress(),
@@ -37,7 +39,21 @@ describe('reliable submission', function () {
     )
   })
 
-  it('submitSignedReliable', async function () {
+  it('should throw a ValidationError when submitting an unsigned transaction without a wallet', async function () {
+    const accountSet: AccountSet = {
+      TransactionType: 'AccountSet',
+      Account: this.wallet.getClassicAddress(),
+      Domain: convertStringToHex('example.com'),
+    }
+
+    await assertRejects(
+      this.client.submitAndWait(accountSet),
+      ValidationError,
+      'Wallet must be provided when submitting an unsigned transaction',
+    )
+  })
+
+  it('submitAndWait a signed transaction', async function () {
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
       Account: this.wallet.getClassicAddress(),
@@ -46,7 +62,7 @@ describe('reliable submission', function () {
     const { tx_blob: signedAccountSet } = this.wallet.sign(
       await this.client.autofill(accountSet),
     )
-    const responsePromise = this.client.submitSignedReliable(signedAccountSet)
+    const responsePromise = this.client.submitAndWait(signedAccountSet)
     const ledgerPromise = setTimeout(ledgerAccept, 1000, this.client)
     return Promise.all([responsePromise, ledgerPromise]).then(
       ([response, _ledger]) => {
@@ -56,7 +72,7 @@ describe('reliable submission', function () {
     )
   })
 
-  it('submitSignedReliable longer', async function () {
+  it('submitAndWait a signed transaction longer', async function () {
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
       Account: this.wallet.getClassicAddress(),
@@ -65,7 +81,7 @@ describe('reliable submission', function () {
     const { tx_blob: signedAccountSet } = this.wallet.sign(
       await this.client.autofill(accountSet),
     )
-    const responsePromise = this.client.submitSignedReliable(signedAccountSet)
+    const responsePromise = this.client.submitAndWait(signedAccountSet)
     const ledgerPromise = setTimeout(ledgerAccept, 5000, this.client)
     return Promise.all([responsePromise, ledgerPromise]).then(
       ([response, _ledger]) => {
