@@ -50,6 +50,40 @@ async function submit(
 }
 
 /**
+ * Asynchronously submits a transaction and verifies that it has been included in a
+ * validated ledger (or has errored/will not be included for some reason).
+ * See [Reliable Transaction Submission](https://xrpl.org/reliable-transaction-submission.html).
+ *
+ * @param this - A Client.
+ * @param transaction - A transaction to autofill, sign & encode, and submit.
+ * @param opts - (Optional) Options used to sign and submit a transaction.
+ * @param opts.autofill - If true, autofill a transaction.
+ * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+ * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+ * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
+ */
+async function submitAndWait(
+  this: Client,
+  transaction: Transaction | string,
+  opts?: SubmitOptions,
+): Promise<TxResponse> {
+  const signedTx = await getSignedTx(this, transaction, opts)
+
+  if (!hasLastLedgerSequence(signedTx)) {
+    throw new ValidationError(
+      'Transaction must contain a LastLedgerSequence value for reliable submission.',
+    )
+  }
+
+  await submitRequest(this, signedTx, opts?.failHard)
+
+  const txHash = hashes.hashSignedTx(signedTx)
+  return waitForFinalTransactionOutcome(this, txHash)
+}
+
+// Helper functions
+
+/**
  * Encodes and submits a signed transaction.
  *
  * @param client - A Client.
@@ -78,37 +112,6 @@ async function submitRequest(
   }
   return client.request(request)
 }
-
-/**
- * Asynchronously submits a transaction and verifies that it has been included in a
- * validated ledger (or has errored/will not be included for some reason).
- * See [Reliable Transaction Submission](https://xrpl.org/reliable-transaction-submission.html).
- *
- * @param this - A Client.
- * @param transaction - A transaction to autofill, sign & encode, and submit.
- * @param opts - (Optional) Options to include a wallet to sign a transaction and booleans to autofill/failHard a transaction.
- * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
- */
-async function submitAndWait(
-  this: Client,
-  transaction: Transaction | string,
-  opts?: SubmitOptions,
-): Promise<TxResponse> {
-  const signedTx = await getSignedTx(this, transaction, opts)
-
-  if (!hasLastLedgerSequence(signedTx)) {
-    throw new ValidationError(
-      'Transaction must contain a LastLedgerSequence value for reliable submission.',
-    )
-  }
-
-  await submitRequest(this, signedTx, opts?.failHard)
-
-  const txHash = hashes.hashSignedTx(signedTx)
-  return waitForFinalTransactionOutcome(this, txHash)
-}
-
-// Helper functions
 
 /*
  * The core logic of reliable submission.  This polls the ledger until the result of the
