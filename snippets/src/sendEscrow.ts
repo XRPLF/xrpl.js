@@ -1,6 +1,4 @@
 /* eslint-disable no-await-in-loop -- waiting required. */
-/* eslint-disable max-lines-per-function -- Snippet for sending escrow flow. */
-/* eslint-disable no-console -- logs are helpful to understand snippets */
 import {
   AccountInfoRequest,
   AccountObjectsRequest,
