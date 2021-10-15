@@ -1,6 +1,6 @@
 import { Currency, StreamType } from '../common'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import type { BaseRequest, BaseResponse } from './baseMethod'
 
 interface Book {
   taker_gets: Currency

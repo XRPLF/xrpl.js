@@ -4,6 +4,8 @@ import path from 'path'
 
 import { Client } from 'xrpl-local'
 
+import { XrplError } from '../src/errors'
+
 /**
  * Client Test Runner.
  *
@@ -27,10 +29,10 @@ describe('Client', function () {
   )
   for (const methodName of allPublicMethods) {
     if (!allTestedMethods.has(methodName)) {
-      // TODO: Once migration is complete, remove `.skip()` so that missing tests are reported as failures.
-      // eslint-disable-next-line mocha/no-skipped-tests -- See above TODO
+      /** TODO: Remove the skip, rename methods. */
+      // eslint-disable-next-line mocha/no-skipped-tests -- skip these tests for now.
       it.skip(`${methodName} - no test suite found`, function () {
-        throw new Error(
+        throw new XrplError(
           `Test file not found! Create file "test/client/${methodName}.ts".`,
         )
       })

@@ -34,9 +34,11 @@ export interface Signer {
 }
 
 export interface Memo {
-  MemoData?: string
-  MemoType?: string
-  MemoFormat?: string
+  Memo: {
+    MemoData?: string
+    MemoType?: string
+    MemoFormat?: string
+  }
 }
 
 export type StreamType =

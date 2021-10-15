@@ -1,8 +1,6 @@
 /* eslint-disable max-classes-per-file -- Errors can be defined in the same file */
 import { inspect } from 'util'
 
-// TODO: replace all `new Error`s with `new XrplError`s
-
 /**
  * Base Error class for xrpl.js. All Errors thrown by xrpl.js should throw
  * XrplErrors.

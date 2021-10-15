@@ -1,3 +1,4 @@
+import { XrplError } from '../../../errors'
 import hashPrefix from '../hashPrefix'
 import sha512Half from '../sha512Half'
 
@@ -30,13 +31,13 @@ class Leaf extends Node {
   /**
    * Add item to Leaf.
    *
-   * @param _tag - Index of the Node.
-   * @param _node - Node to insert.
+   * @param tag - Index of the Node.
+   * @param node - Node to insert.
    * @throws When called, because LeafNodes cannot addItem.
    */
-  // eslint-disable-next-line class-methods-use-this -- no `this` needed here
-  public addItem(_tag: string, _node: Node): void {
-    throw new Error('Cannot call addItem on a LeafNode')
+  public addItem(tag: string, node: Node): void {
+    throw new XrplError('Cannot call addItem on a LeafNode')
+    this.addItem(tag, node)
   }
 
   /**
@@ -60,7 +61,7 @@ class Leaf extends Node {
         return sha512Half(txNodePrefix + this.data + this.tag)
       }
       default:
-        throw new Error('Tried to hash a SHAMap node of unknown type.')
+        throw new XrplError('Tried to hash a SHAMap node of unknown type.')
     }
   }
 }

@@ -1,8 +1,9 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 
-import { BookOffersRequest, ValidationError } from 'xrpl-local'
-import { OfferFlags } from 'xrpl-local/models/ledger/offer'
+import { BookOffersRequest } from 'xrpl-local'
+import { ValidationError, XrplError } from 'xrpl-local/errors'
+import { OfferFlags } from 'xrpl-local/models/ledger'
 
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
@@ -52,7 +53,7 @@ function normalRippledResponse(
   ) {
     return rippled.book_offers.fabric.requestBookOffersAsksResponse(request)
   }
-  throw new Error('unexpected end')
+  throw new XrplError('unexpected end')
 }
 
 function xrpRippledResponse(

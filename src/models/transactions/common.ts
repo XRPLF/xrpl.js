@@ -144,11 +144,10 @@ export interface BaseTransaction {
    * validated or rejected.
    */
   LastLedgerSequence?: number
-  // TODO: Make Memo match the format of Signer (By including the Memo: wrapper inside the Interface)
   /**
    * Additional arbitrary information used to identify this transaction.
    */
-  Memos?: Array<{ Memo: Memo }>
+  Memos?: Memo[]
   /**
    * Array of objects that represent a multi-signature which authorizes this
    * transaction.

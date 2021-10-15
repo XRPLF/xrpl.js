@@ -33,7 +33,7 @@ export default class RequestManager {
   public cancel(id: string | number): void {
     const promise = this.promisesAwaitingResponse.get(id)
     if (promise == null) {
-      throw new Error(`No existing promise with id ${id}`)
+      throw new XrplError(`No existing promise with id ${id}`)
     }
     clearTimeout(promise.timer)
     this.deletePromise(id)
@@ -49,7 +49,7 @@ export default class RequestManager {
   public resolve(id: string | number, response: Response): void {
     const promise = this.promisesAwaitingResponse.get(id)
     if (promise == null) {
-      throw new Error(`No existing promise with id ${id}`)
+      throw new XrplError(`No existing promise with id ${id}`)
     }
     clearTimeout(promise.timer)
     promise.resolve(response)
@@ -66,7 +66,7 @@ export default class RequestManager {
   public reject(id: string | number, error: Error): void {
     const promise = this.promisesAwaitingResponse.get(id)
     if (promise == null) {
-      throw new Error(`No existing promise with id ${id}`)
+      throw new XrplError(`No existing promise with id ${id}`)
     }
     clearTimeout(promise.timer)
     // TODO: figure out how to have a better stack trace for an error

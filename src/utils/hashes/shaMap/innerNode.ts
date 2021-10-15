@@ -1,3 +1,4 @@
+import { XrplError } from '../../../errors'
 import hashPrefix from '../hashPrefix'
 import sha512Half from '../sha512Half'
 
@@ -54,7 +55,7 @@ class InnerNode extends Node {
     } else if (existingNode instanceof Leaf) {
       if (existingNode.tag === tag) {
         // Collision
-        throw new Error(
+        throw new XrplError(
           'Tried to add a node to a SHAMap that was already in there.',
         )
       } else {
@@ -79,7 +80,7 @@ class InnerNode extends Node {
    */
   public setNode(slot: number, node: Node): void {
     if (slot < 0 || slot > SLOT_MAX) {
-      throw new Error('Invalid slot: slot must be between 0-15.')
+      throw new XrplError('Invalid slot: slot must be between 0-15.')
     }
     this.leaves[slot] = node
     this.empty = false
@@ -94,7 +95,7 @@ class InnerNode extends Node {
    */
   public getNode(slot: number): Node | undefined {
     if (slot < 0 || slot > SLOT_MAX) {
-      throw new Error('Invalid slot: slot must be between 0-15.')
+      throw new XrplError('Invalid slot: slot must be between 0-15.')
     }
     return this.leaves[slot]
   }
