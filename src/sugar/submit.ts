@@ -81,13 +81,13 @@ async function submitSigned(
  * @param opts - (Optional) A Wallet to sign a transaction and a boolean to autofill transaction.
  * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
  */
-async function submitReliable(
+async function submitAndWait(
   this: Client,
   transaction: Transaction | string,
   opts?: SubmitOptions,
 ): Promise<TxResponse> {
   const signedTx = await prepareSubmit(this, transaction, opts)
-  return submitSignedReliable(this, signedTx)
+  return submitSignedAndWait(this, signedTx)
 }
 
 /**
@@ -101,7 +101,7 @@ async function submitReliable(
  * @throws ValidationError if the request is not signed/doesn't have a LastLedgerSequence, RippledError if the submit request
  *   fails, XrplError if the reliable submission fails.
  */
-async function submitSignedReliable(
+async function submitSignedAndWait(
   client: Client,
   signedTransaction: Transaction | string,
 ): Promise<TxResponse> {
@@ -200,8 +200,7 @@ async function prepareSubmit(
     tx = await client.autofill(tx)
   }
 
-  const { tx_blob } = wallet.sign(tx)
-  return tx_blob
+  return wallet.sign(tx).tx_blob
 }
 
 // checks if there is a LastLedgerSequence as a part of the transaction
@@ -216,4 +215,4 @@ function isAccountDelete(transaction: Transaction | string): boolean {
   return tx.TransactionType === 'AccountDelete'
 }
 
-export { submit, submitReliable }
+export { submit, submitAndWait }

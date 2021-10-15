@@ -19,13 +19,13 @@ describe('reliable submission', function () {
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
-  it('submitReliable', async function () {
+  it('submitAndWait', async function () {
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
       Account: this.wallet.getClassicAddress(),
       Domain: convertStringToHex('example.com'),
     }
-    const responsePromise = this.client.submitReliable(accountSet, {
+    const responsePromise = this.client.submitAndWait(accountSet, {
       wallet: this.wallet,
     })
     const ledgerPromise = setTimeout(ledgerAccept, 1000, this.client)
