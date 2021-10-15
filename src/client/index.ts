@@ -104,7 +104,11 @@ import {
   ConnectionUserOptions,
   INTENTIONAL_DISCONNECT_CODE,
 } from './connection'
-import { handlePartialPayment, isStreamPartialPayment } from './partialPayment'
+import {
+  handlePartialPayment,
+  isStreamPartialPayment,
+  handleStreamPartialPayment,
+} from './partialPayment'
 
 export interface ClientOptions extends ConnectionUserOptions {
   feeCushion?: number
@@ -238,12 +242,12 @@ class Client extends EventEmitter {
     })
 
     this.connection.on('transaction', (tx) => {
+      // mutates `tx` to add warnings
+      handleStreamPartialPayment(tx)
       if (isStreamPartialPayment(tx)) {
         this.connection.trace('Partial payment received', tx)
-      } else {
-        this.emit('transaction', tx)
       }
-      this.emit('unsafeTransaction', tx)
+      this.emit('transaction', tx)
     })
 
     this.connection.on('validationReceived', (validation) => {
@@ -350,6 +354,7 @@ class Client extends EventEmitter {
         : undefined,
     })) as T
 
+    // mutates `response` to add warnings
     handlePartialPayment(req.command, response)
 
     return response

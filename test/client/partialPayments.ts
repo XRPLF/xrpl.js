@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- required for formatting transactions */
-import { assert, expect } from 'chai'
+import { expect } from 'chai'
 import _ from 'lodash'
 
 import type { TransactionStream } from 'xrpl-local'
@@ -124,20 +124,10 @@ describe('client handling of tfPartialPayments', function () {
   })
 
   it('Transactions stream with no tfPartialPayment', async function (done) {
-    let firstDone = false
-    function twoDones(): void {
-      if (firstDone) {
-        done()
-      } else {
-        firstDone = true
-      }
-    }
     this.mockRippled.addResponse('transaction_entry', rippled.transaction_entry)
-    this.client.on('transaction', (_tx: TransactionStream) => {
-      twoDones()
-    })
-    this.client.on('unsafeTransaction', (_tx: TransactionStream) => {
-      twoDones()
+    this.client.on('transaction', (tx: TransactionStream) => {
+      expect(tx.warnings).to.equal(undefined)
+      done()
     })
 
     this.client.connection.onMessage(
@@ -147,12 +137,16 @@ describe('client handling of tfPartialPayments', function () {
 
   it('Transactions stream with XRP tfPartialPayment', async function (done) {
     this.mockRippled.addResponse('transaction_entry', rippled.transaction_entry)
-    this.client.on('transaction', (_tx: TransactionStream) => {
-      assert.fail('Should not have received a transaction here')
-    })
-    this.client.on('unsafeTransaction', (_tx: TransactionStream) => {
+    this.client.on('transaction', (tx: TransactionStream) => {
+      expect(tx.warnings).to.deep.equal([
+        {
+          id: 2001,
+          message: 'This response contains a Partial Payment',
+        },
+      ])
       done()
     })
+
     this.client.connection.onMessage(
       JSON.stringify(rippled.streams.partialPaymentTransaction),
     )

@@ -34,22 +34,9 @@ describe('Client subscription', function () {
   })
 
   it('Emits transaction', async function (done) {
-    let firstDone = false
-    function twoDones(): void {
-      if (firstDone) {
-        done()
-      } else {
-        firstDone = true
-      }
-    }
-
     this.client.on('transaction', (tx) => {
       assert(tx.type === 'transaction')
-      twoDones()
-    })
-    this.client.on('unsafeTransaction', (tx) => {
-      assert(tx.type === 'transaction')
-      twoDones()
+      done()
     })
 
     this.client.connection.onMessage(

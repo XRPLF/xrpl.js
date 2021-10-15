@@ -133,3 +133,26 @@ export function handlePartialPayment(
 export function isStreamPartialPayment(stream: TransactionStream): boolean {
   return isPartialPayment(stream.transaction, stream.meta)
 }
+
+/**
+ * Check a transaction from a subscription stream for partial payment.
+ *
+ * @param stream - Stream Transaction to check for partial payment,.
+ * @param stream - Stream Transaction to check for partial payment.
+ * @returns Whether the stream transaction is a partial payment.
+ */
+export function handleStreamPartialPayment(stream: TransactionStream): void {
+  if (isStreamPartialPayment(stream)) {
+    const warnings = stream.warnings ?? []
+
+    const warning = {
+      id: WARN_PARTIAL_PAYMENT_CODE,
+      message: 'This response contains a Partial Payment',
+    }
+
+    warnings.push(warning)
+
+    /* eslint-disable-next-line no-param-reassign -- Handles the case where there are no warnings */
+    stream.warnings = warnings
+  }
+}
