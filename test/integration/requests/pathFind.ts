@@ -9,7 +9,7 @@ import {
 } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { setupClient, teardownClient } from '../setup'
 import { generateFundedWallet, ledgerAccept, subscribeDone } from '../utils'
 
 // how long before each test case times out
@@ -18,7 +18,6 @@ const TIMEOUT = 20000
 describe('path_find', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
@@ -64,10 +63,30 @@ describe('path_find', function () {
           destination_account: wallet2.getClassicAddress(),
           destination_amount: '100',
         }
+
+        const expectedStreamResult: PathFindStream = {
+          type: 'path_find',
+          source_account: pathFind.source_account,
+          destination_account: pathFind.destination_account,
+          destination_amount: pathFind.destination_amount,
+          full_reply: true,
+          id: 10,
+          alternatives: [],
+        }
+
+        const client: Client = this.client
+        client.on('path_find', (path) => {
+          assert.equal(path.type, 'path_find')
+          assert.deepEqual(
+            _.omit(path, 'id'),
+            _.omit(expectedStreamResult, 'id'),
+          )
+          subscribeDone(this.client, done)
+        })
+
         this.client.request(pathFind).then((response) => {
           const expectedResponse: PathFindResponse = {
             id: response.id,
-            status: 'success',
             type: 'response',
             result: {
               alternatives: response.result.alternatives,
@@ -78,26 +97,6 @@ describe('path_find', function () {
               id: response.id,
             },
           }
-
-          const expectedStreamResult: PathFindStream = {
-            type: 'path_find',
-            source_account: pathFind.source_account,
-            destination_account: pathFind.destination_account,
-            destination_amount: pathFind.destination_amount,
-            full_reply: true,
-            id: 10,
-            alternatives: [],
-          }
-
-          const client: Client = this.client
-          client.on('path_find', (path) => {
-            assert.equal(path.type, 'path_find')
-            assert.deepEqual(
-              _.omit(path, 'id'),
-              _.omit(expectedStreamResult, 'id'),
-            )
-            subscribeDone(this.client, done)
-          })
 
           assert.deepEqual(response, expectedResponse)
         })

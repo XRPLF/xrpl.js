@@ -11,7 +11,7 @@ import {
 import { StreamType } from 'xrpl-local/models/common'
 
 import serverUrl from '../serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { setupClient, teardownClient } from '../setup'
 import { ledgerAccept, subscribeDone, testTransaction } from '../utils'
 
 // how long before each test case times out
@@ -39,7 +39,6 @@ async function createTxHandlerTest(
   }
 
   client.request(request).then((response) => {
-    assert.equal(response.status, 'success')
     assert.equal(response.type, 'response')
     assert.deepEqual(response.result, {})
   })
@@ -48,7 +47,6 @@ async function createTxHandlerTest(
 describe('subscribe', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 

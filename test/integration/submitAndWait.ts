@@ -8,7 +8,7 @@ import { AccountSet, convertStringToHex, ValidationError } from 'xrpl-local'
 import { assertRejects } from '../testUtils'
 
 import serverUrl from './serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from './setup'
+import { setupClient, teardownClient } from './setup'
 import { ledgerAccept } from './utils'
 
 // how long before each test case times out
@@ -17,7 +17,6 @@ const TIMEOUT = 60000
 describe('client.submitAndWait', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
