@@ -38,7 +38,7 @@ interface SignedTxBlobHash {
 }
 
 interface WalletBaseOptions {
-  // Include if making a wallet for a Regular Key Pair. This should be the masterAddress of the account.
+  // Include if a wallet uses a Regular Key Pair. It must be the master address of the account.
   masterAddress?: string
 }
 
@@ -53,7 +53,7 @@ interface FromSeedOptions extends WalletBaseOptions {
 }
 
 interface FromMnemonicOptions extends WalletBaseOptions {
-  // The path to derive a keypair (publicKey/privateKey) from a seed (that was converted from a mnemonic).
+  // The path to derive a keypair (publicKey/privateKey) used for mnemonic-to-seed conversion.
   derivationPath?: string
 }
 
@@ -137,7 +137,9 @@ class Wallet {
    *
    * @param publicKey - The public key for the account.
    * @param privateKey - The private key used for signing transactions for the account.
-   * @param opts - (Optional) The seed and classicAddress (corresponding to its Regular Key Pair) for the account.
+   * @param opts - (Optional) Options to initialize a Wallet.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
+   * @param opts.seed - The seed used to derive the account keys.
    */
   public constructor(
     publicKey: string,
@@ -167,7 +169,9 @@ class Wallet {
    * Derives a wallet from a seed.
    *
    * @param seed - A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
-   * @param opts - (Optional) The algorithm (to derive the wallet) and classicAddress (corresponding to its Regular Key Pair).
+   * @param opts - (Optional) Options to derive a Wallet.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from a seed.
    */
   public static fromSeed(seed: string, opts: FromSeedOptions = {}): Wallet {
@@ -181,7 +185,9 @@ class Wallet {
    * Derives a wallet from a secret (AKA a seed).
    *
    * @param secret - A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
-   * @param opts - (Optional) The algorithm (to derive the wallet) and classicAddress (corresponding to its Regular Key Pair).
+   * @param opts - (Optional) Options to derive a Wallet.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from a secret (AKA a seed).
    */
   // eslint-disable-next-line @typescript-eslint/member-ordering -- Member is used as a function here
@@ -191,7 +197,9 @@ class Wallet {
    * Derives a wallet from a mnemonic.
    *
    * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
-   * @param opts - (Optional) The derivationPath and classicAddress (corresponding to its Regular Key Pair).
+   * @param opts - (Optional) Options to derive a Wallet.
+   * @param opts.derivationPath - The path to derive a keypair (publicKey/privateKey) used for mnemonic-to-seed conversion.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from a mnemonic.
    * @throws ValidationError if unable to derive private key from mnemonic input.
    */
@@ -221,7 +229,9 @@ class Wallet {
    * Derives a wallet from an entropy (array of random numbers).
    *
    * @param entropy - An array of random numbers to generate a seed used to derive a wallet.
-   * @param opts - (Optional) The algorithm (to derive the wallet) and classicAddress (corresponding to its Regular Key Pair).
+   * @param opts - (Optional) Options to derive a Wallet.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from an entropy.
    */
   public static fromEntropy(
@@ -244,7 +254,9 @@ class Wallet {
    * Derive a Wallet from a seed.
    *
    * @param seed - The seed used to derive the wallet.
-   * @param opts - (Optional) The algorithm (to derive the wallet) and classicAddress (corresponding to its Regular Key Pair).
+   * @param opts - (Optional) Options to derive a Wallet.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from the seed.
    */
   private static deriveWallet(
