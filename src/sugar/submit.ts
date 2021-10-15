@@ -20,7 +20,7 @@ interface SubmitOptions {
   autofill?: boolean
   // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
   failHard?: boolean
-  // A wallet must be provided when submitting an unsigned transaction.
+  // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
   wallet?: Wallet
 }
 
@@ -33,7 +33,7 @@ interface SubmitOptions {
  *
  * @param this - A Client.
  * @param transaction - A transaction to autofill, sign & encode, and submit.
- * @param opts - (Optional) A Wallet to sign a transaction and booleans to autofill/failHard a transaction.
+ * @param opts - (Optional) Options to include a wallet to sign a transaction and booleans to autofill/failHard a transaction.
  * @returns A promise that contains SubmitResponse.
  * @throws RippledError if submit request fails.
  */
@@ -83,7 +83,7 @@ async function submitRequest(
  *
  * @param this - A Client.
  * @param transaction - A transaction to autofill, sign & encode, and submit.
- * @param opts - (Optional) A Wallet to sign a transaction and a boolean to autofill transaction.
+ * @param opts - (Optional) Options to include a wallet to sign a transaction and booleans to autofill/failHard a transaction.
  * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
  */
 async function submitAndWait(
