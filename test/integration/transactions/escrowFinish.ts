@@ -29,10 +29,10 @@ describe('EscrowFinish', function () {
     const AMOUNT = 10000
 
     const createTx: EscrowCreate = {
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       TransactionType: 'EscrowCreate',
       Amount: '10000',
-      Destination: wallet1.getClassicAddress(),
+      Destination: wallet1.classicAddress,
       FinishAfter: CLOSE_TIME + 2,
     }
 
@@ -44,7 +44,7 @@ describe('EscrowFinish', function () {
     const accountObjects = (
       await this.client.request({
         command: 'account_objects',
-        account: this.wallet.getClassicAddress(),
+        account: this.wallet.classicAddress,
       })
     ).result.account_objects
 
@@ -59,8 +59,8 @@ describe('EscrowFinish', function () {
 
     const finishTx: EscrowFinish = {
       TransactionType: 'EscrowFinish',
-      Account: this.wallet.getClassicAddress(),
-      Owner: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
+      Owner: this.wallet.classicAddress,
       OfferSequence: sequence,
     }
 

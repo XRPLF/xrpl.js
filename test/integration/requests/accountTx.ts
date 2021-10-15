@@ -18,20 +18,20 @@ describe('account_tx', function () {
   it('base', async function () {
     const request: AccountTxRequest = {
       command: 'account_tx',
-      account: this.wallet.getClassicAddress(),
+      account: this.wallet.classicAddress,
       ledger_index: 'validated',
     }
     const response = await this.client.request(request)
     const expected = {
       result: {
-        account: this.wallet.getClassicAddress(),
+        account: this.wallet.classicAddress,
         limit: 400,
         transactions: [
           {
             tx: {
               Account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
               Amount: '400000000',
-              Destination: this.wallet.getClassicAddress(),
+              Destination: this.wallet.classicAddress,
               Fee: '12',
               Flags: 0,
               LastLedgerSequence: 1753,

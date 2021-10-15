@@ -19,10 +19,10 @@ describe('TrustSet', function () {
     const wallet2 = await generateFundedWallet(this.client)
     const tx: TrustSet = {
       TransactionType: 'TrustSet',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       LimitAmount: {
         currency: 'USD',
-        issuer: wallet2.getClassicAddress(),
+        issuer: wallet2.classicAddress,
         value: '100',
       },
     }

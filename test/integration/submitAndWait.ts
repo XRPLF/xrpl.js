@@ -23,7 +23,7 @@ describe('client.submitAndWait', function () {
   it('submitAndWait an unsigned transaction', async function () {
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       Domain: convertStringToHex('example.com'),
     }
     const responsePromise = this.client.submitAndWait(accountSet, {
@@ -55,7 +55,7 @@ describe('client.submitAndWait', function () {
   it('submitAndWait a signed transaction', async function () {
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       Domain: convertStringToHex('example.com'),
     }
     const { tx_blob: signedAccountSet } = this.wallet.sign(
@@ -74,7 +74,7 @@ describe('client.submitAndWait', function () {
   it('submitAndWait a signed transaction longer', async function () {
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       Domain: convertStringToHex('example.com'),
     }
     const { tx_blob: signedAccountSet } = this.wallet.sign(

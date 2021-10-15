@@ -19,9 +19,9 @@ describe('PaymentChannelCreate', function () {
     const wallet2 = await generateFundedWallet(this.client)
     const paymentChannelCreate: PaymentChannelCreate = {
       TransactionType: 'PaymentChannelCreate',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       Amount: '100',
-      Destination: wallet2.getClassicAddress(),
+      Destination: wallet2.classicAddress,
       SettleDelay: 86400,
       PublicKey: this.wallet.publicKey,
     }

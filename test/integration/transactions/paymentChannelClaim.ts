@@ -20,9 +20,9 @@ describe('PaymentChannelClaim', function () {
     const wallet2 = await generateFundedWallet(this.client)
     const paymentChannelCreate: PaymentChannelCreate = {
       TransactionType: 'PaymentChannelCreate',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       Amount: '100',
-      Destination: wallet2.getClassicAddress(),
+      Destination: wallet2.classicAddress,
       SettleDelay: 86400,
       PublicKey: this.wallet.publicKey,
     }
@@ -35,11 +35,11 @@ describe('PaymentChannelClaim', function () {
     await testTransaction(this.client, paymentChannelCreate, this.wallet)
 
     const paymentChannelClaim: PaymentChannelClaim = {
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       TransactionType: 'PaymentChannelClaim',
       Channel: hashPaymentChannel(
-        this.wallet.getClassicAddress(),
-        wallet2.getClassicAddress(),
+        this.wallet.classicAddress,
+        wallet2.classicAddress,
         paymentChannelResponse.result.tx_json.Sequence ?? 0,
       ),
       Amount: '100',

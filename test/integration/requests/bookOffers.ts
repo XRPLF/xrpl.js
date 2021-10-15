@@ -23,7 +23,7 @@ describe('book_offers', function () {
       },
       taker_pays: {
         currency: 'USD',
-        issuer: this.wallet.getClassicAddress(),
+        issuer: this.wallet.classicAddress,
       },
     }
     const response = await this.client.request(bookOffer)

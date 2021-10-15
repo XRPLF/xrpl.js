@@ -18,7 +18,7 @@ describe('AccountSet', function () {
   it('base', async function () {
     const tx: AccountSet = {
       TransactionType: 'AccountSet',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
     }
     await testTransaction(this.client, tx, this.wallet)
   })

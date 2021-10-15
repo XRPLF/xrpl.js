@@ -21,8 +21,8 @@ describe('ripple_path_find', function () {
     const ripplePathFind: RipplePathFindRequest = {
       command: 'ripple_path_find',
       subcommand: 'create',
-      source_account: this.wallet.getClassicAddress(),
-      destination_account: wallet2.getClassicAddress(),
+      source_account: this.wallet.classicAddress,
+      destination_account: wallet2.classicAddress,
       destination_amount: '100',
     }
 
@@ -33,7 +33,7 @@ describe('ripple_path_find', function () {
       type: 'response',
       result: {
         alternatives: response.result.alternatives,
-        destination_account: wallet2.getClassicAddress(),
+        destination_account: wallet2.classicAddress,
         destination_currencies: response.result.destination_currencies,
         destination_amount: ripplePathFind.destination_amount,
         full_reply: true,

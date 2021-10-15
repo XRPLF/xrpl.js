@@ -281,7 +281,7 @@ class Wallet {
     if (typeof multisign === 'string' && multisign.startsWith('X')) {
       multisignAddress = multisign
     } else if (multisign) {
-      multisignAddress = this.getClassicAddress()
+      multisignAddress = this.classicAddress
     }
 
     if (transaction.TxnSignature || transaction.Signers) {
@@ -341,17 +341,6 @@ class Wallet {
    */
   public getXAddress(tag: number | false = false, isTestnet = false): string {
     return classicAddressToXAddress(this.classicAddress, tag, isTestnet)
-  }
-
-  /**
-   * Gets the classic address of the account this wallet represents. This only is correct if this wallet corresponds
-   * to your [master keypair](https://xrpl.org/cryptographic-keys.html#master-key-pair). If this wallet represents a
-   * [regular keypair](https://xrpl.org/cryptographic-keys.html#regular-key-pair) this will provide an incorrect address.
-   *
-   * @returns A classic address.
-   */
-  public getClassicAddress(): string {
-    return this.classicAddress
   }
 
   /**
