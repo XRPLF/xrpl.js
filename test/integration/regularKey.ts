@@ -47,7 +47,7 @@ async function generateFundedWalletWithRegularKey(
   }
 
   // Add a regular key to the first account
-  await client.submit(masterWallet, setRegularTx)
+  await client.submit(setRegularTx, { wallet: masterWallet })
 
   if (disableMasterKey) {
     const accountSet: AccountSet = {
@@ -112,7 +112,7 @@ describe('regular key', function () {
     }
 
     const client: Client = this.client
-    const response = await client.submit(masterWallet, tx)
+    const response = await client.submit(tx, { wallet: masterWallet })
     assert.equal(
       response.result.engine_result,
       'tefMASTER_DISABLED',
@@ -151,7 +151,9 @@ describe('regular key', function () {
     }
 
     const client: Client = this.client
-    const response = await client.submit(masterWallet, enableMasterKey)
+    const response = await client.submit(enableMasterKey, {
+      wallet: masterWallet,
+    })
     assert.equal(
       response.result.engine_result,
       'tefMASTER_DISABLED',
@@ -178,7 +180,7 @@ describe('regular key', function () {
       },
     }
 
-    const response2 = await client.submit(regularKeyWallet, tx)
+    const response2 = await client.submit(tx, { wallet: regularKeyWallet })
     assert.equal(
       response2.result.engine_result,
       'tefBAD_AUTH',
@@ -225,7 +227,7 @@ describe('regular key', function () {
     const signed1 = regularKeyWallet.sign(accountSetTx, true)
     const signed2 = signerWallet2.sign(accountSetTx, true)
     const multisigned = multisign([signed1.tx_blob, signed2.tx_blob])
-    const submitResponse = await client.submitSigned(multisigned)
+    const submitResponse = await client.submit(multisigned)
     await ledgerAccept(client)
 
     assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
@@ -276,7 +278,7 @@ describe('regular key', function () {
     const signed1 = sameKeyDefaultAddressWallet.sign(accountSetTx, true)
     const signed2 = signerWallet2.sign(accountSetTx, true)
     const multisigned = multisign([signed1.tx_blob, signed2.tx_blob])
-    const submitResponse = await client.submitSigned(multisigned)
+    const submitResponse = await client.submit(multisigned)
     await ledgerAccept(client)
     assert.strictEqual(submitResponse.result.engine_result, 'tefBAD_SIGNATURE')
   })
