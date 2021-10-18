@@ -24,7 +24,7 @@ describe('Client', function () {
   const allTestSuites = loadTestSuites()
 
   const testExceptions = new Set([
-    // instance variables on Client
+    // instance variables on Client, not actual methods
     'feeCushion',
     'maxFeeXRP',
     'connection',
@@ -64,8 +64,7 @@ function getAllPublicMethods(client: Client): string[] {
       ...Object.getOwnPropertyNames(client),
       ...Object.getOwnPropertyNames(Client.prototype),
     ]),
-    // removes private methods
-  ).filter((key) => !key.startsWith('_'))
+  )
 }
 
 /**
