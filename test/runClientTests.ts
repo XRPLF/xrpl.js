@@ -49,9 +49,7 @@ describe('Client', function () {
   )
   for (const methodName of allPublicMethods) {
     if (!allTestedMethods.has(methodName) && !testExceptions.has(methodName)) {
-      /** TODO: Remove the skip, rename methods. */
-      // eslint-disable-next-line mocha/no-skipped-tests -- See above TODO
-      it.skip(`${methodName} - no test suite found`, function () {
+      it(`${methodName} - no test suite found`, function () {
         throw new XrplError(
           `Test file not found! Create file "test/client/${methodName}.ts".`,
         )
