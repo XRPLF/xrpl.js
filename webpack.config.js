@@ -38,6 +38,7 @@ function getDefaultConfiguration() {
       alias: {
         ws: './dist/npm/client/wsWrapper.js',
         'https-proxy-agent': false,
+        'bn.js': path.join(__dirname, 'node_modules/bn.js/lib/bn.js'),
       },
       extensions: ['.js', '.json'],
       fallback: {
