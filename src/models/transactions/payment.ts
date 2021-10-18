@@ -41,6 +41,41 @@ export enum PaymentFlags {
  * flags.
  *
  * @category Transaction Flags
+ *
+ * @example
+ * ```typescript
+ * const partialPayment: Payment = {
+ *  TransactionType: 'Payment',
+ *  Account: 'rM9WCfJU6udpFkvKThRaFHDMsp7L8rpgN',
+ *  Amount: {
+ *    currency: 'FOO',
+ *    value: '4000',
+ *    issuer: 'rPzwM2JfCSDjhbesdTCqFjWWdK7eFtTwZz',
+ *  },
+ *  Destination: 'rPzwM2JfCSDjhbesdTCqFjWWdK7eFtTwZz',
+ *  Flags: {
+ *    tfPartialPayment: true
+ *  }
+ * }
+ *
+ * // Autofill the tx to see how flags actually look compared to the interface usage.
+ * const autofilledTx = await client.autofill(partialPayment)
+ * console.log(autofilledTx)
+ * // {
+ * //  TransactionType: 'Payment',
+ * //  Account: 'rM9WCfJU6udpFkvKThRaFHDMsp7L8rpgN',
+ * //  Amount: {
+ * //   currency: 'FOO',
+ * //   value: '4000',
+ * //   issuer: 'rPzwM2JfCSDjhbesdTCqFjWWdK7eFtTwZz'
+ * //  },
+ * //  Destination: 'rPzwM2JfCSDjhbesdTCqFjWWdK7eFtTwZz',
+ * //  Flags: 131072,
+ * //  Sequence: 21970996,
+ * //  Fee: '12',
+ * //  LastLedgerSequence: 21971016
+ * // }
+ * ```
  */
 export interface PaymentFlagsInterface extends GlobalFlags {
   /**

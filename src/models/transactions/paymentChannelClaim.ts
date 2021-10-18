@@ -57,14 +57,14 @@ export enum PaymentChannelClaimFlags {
  * const autofilledTx = await client.autofill(paymentChannelClaim)
  * console.log(autofilledTx)
  * // {
- * // Account: 'rMpxZpuy5RBSP47oK2hDWUtk3B5BNQHfGj',
- * // TransactionType: 'PaymentChannelClaim',
- * // Channel: 'FC14BF9245D731DC1749EE0F070765E4EB4E993F8ECEE3D00F7E6E26D6EF98CF',
- * // Amount: '100',
- * // Flags: 131072,
- * // Sequence: 21970713,
- * // Fee: '12',
- * // LastLedgerSequence: 21970658
+ * //  Account: 'rMpxZpuy5RBSP47oK2hDWUtk3B5BNQHfGj',
+ * //  TransactionType: 'PaymentChannelClaim',
+ * //  Channel: 'FC14BF9245D731DC1749EE0F070765E4EB4E993F8ECEE3D00F7E6E26D6EF98CF',
+ * //  Amount: '100',
+ * //  Flags: 131072,
+ * //  Sequence: 21970713,
+ * //  Fee: '12',
+ * //  LastLedgerSequence: 21970658
  * // }
  * ```
  */
