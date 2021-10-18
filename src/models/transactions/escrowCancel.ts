@@ -2,9 +2,19 @@ import { ValidationError } from '../../errors'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
 
+/**
+ * Return escrowed XRP to the sender.
+ *
+ * @category Transaction Models
+ */
 export interface EscrowCancel extends BaseTransaction {
   TransactionType: 'EscrowCancel'
+  /** Address of the source account that funded the escrow payment. */
   Owner: string
+  /**
+   * Transaction sequence (or Ticket  number) of EscrowCreate transaction that.
+   * created the escrow to cancel.
+   */
   OfferSequence: number
 }
 

@@ -1,11 +1,7 @@
 import { assert } from 'chai'
 
-import {
-  validatePayment,
-  validate,
-  PaymentFlags,
-  ValidationError,
-} from 'xrpl-local'
+import { validate, PaymentFlags, ValidationError } from 'xrpl-local'
+import { validatePayment } from 'xrpl-local/models/transactions/payment'
 
 /**
  * PaymentTransaction Verification Testing.
@@ -42,6 +38,35 @@ describe('Payment', function () {
   it(`verifies valid PaymentTransaction`, function () {
     assert.doesNotThrow(() => validatePayment(paymentTransaction))
     assert.doesNotThrow(() => validate(paymentTransaction))
+  })
+
+  it(`Verifies memos correctly`, function () {
+    paymentTransaction.Memos = [
+      {
+        Memo: {
+          MemoData: '32324324',
+        },
+      },
+    ]
+
+    assert.doesNotThrow(() => validate(paymentTransaction))
+  })
+
+  it(`Verifies memos correctly`, function () {
+    paymentTransaction.Memos = [
+      {
+        Memo: {
+          MemoData: '32324324',
+          MemoType: 121221,
+        },
+      },
+    ]
+
+    assert.throws(
+      () => validate(paymentTransaction),
+      ValidationError,
+      'BaseTransaction: invalid Memos',
+    )
   })
 
   it(`throws when Amount is missing`, function () {

@@ -12,7 +12,7 @@ import {
 import { convertStringToHex } from 'xrpl-local/utils'
 
 import serverUrl from '../serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { setupClient, teardownClient } from '../setup'
 import { ledgerAccept, verifySubmittedTransaction } from '../utils'
 
 // how long before each test case times out
@@ -22,14 +22,13 @@ const { hashSignedTx } = hashes
 describe('submit', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
   it('submit', async function () {
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       Domain: convertStringToHex('example.com'),
     }
 

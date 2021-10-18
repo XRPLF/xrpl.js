@@ -14,6 +14,11 @@ export async function ledgerAccept(client: Client): Promise<void> {
   await client.connection.request(request)
 }
 
+export function subscribeDone(client: Client, done: Mocha.Done): void {
+  client.removeAllListeners()
+  done()
+}
+
 export async function fundAccount(
   client: Client,
   wallet: Wallet,
@@ -21,18 +26,21 @@ export async function fundAccount(
   const payment: Payment = {
     TransactionType: 'Payment',
     Account: masterAccount,
-    Destination: wallet.getClassicAddress(),
+    Destination: wallet.classicAddress,
     // 2 times the amount needed for a new account (20 XRP)
     Amount: '400000000',
   }
-  const response = await client.submit(Wallet.fromSeed(masterSecret), payment)
+  const response = await client.submit(payment, {
+    wallet: Wallet.fromSeed(masterSecret),
+  })
   if (response.result.engine_result !== 'tesSUCCESS') {
     // eslint-disable-next-line no-console -- happens only when something goes wrong
     console.log(response)
     assert.fail(`Response not successful, ${response.result.engine_result}`)
   }
-
   await ledgerAccept(client)
+  const signedTx = _.omit(response.result.tx_json, 'hash')
+  await verifySubmittedTransaction(client, signedTx as Transaction)
 }
 
 export async function generateFundedWallet(client: Client): Promise<Wallet> {
@@ -80,7 +88,7 @@ export async function testTransaction(
   await ledgerAccept(client)
 
   // sign/submit the transaction
-  const response = await client.submit(wallet, transaction)
+  const response = await client.submit(transaction, { wallet })
 
   // check that the transaction was successful
   assert.equal(response.type, 'response')
@@ -102,7 +110,7 @@ export async function getXRPBalance(
 ): Promise<string> {
   const request: AccountInfoRequest = {
     command: 'account_info',
-    account: wallet.getClassicAddress(),
+    account: wallet.classicAddress,
   }
   return (await client.request(request)).result.account_data.Balance
 }

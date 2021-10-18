@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { Client } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { setupClient, teardownClient } from '../setup'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -12,7 +12,6 @@ const TIMEOUT = 20000
 describe('Utility method integration tests', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
@@ -20,12 +19,11 @@ describe('Utility method integration tests', function () {
     const response = await (this.client as Client).request({
       command: 'ping',
     })
-    const expected = {
-      id: 0,
+    const expected: unknown = {
       result: { role: 'admin', unlimited: true },
       type: 'response',
     }
-    assert.deepEqual(_.omit(response, 'id'), _.omit(expected, 'id'))
+    assert.deepEqual(_.omit(response, 'id'), expected)
   })
 
   it('random', async function () {

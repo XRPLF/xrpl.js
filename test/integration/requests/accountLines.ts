@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { AccountLinesRequest } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { setupClient, teardownClient } from '../setup'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -12,14 +12,13 @@ const TIMEOUT = 20000
 describe('account_lines', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
   it('base', async function () {
     const request: AccountLinesRequest = {
       command: 'account_lines',
-      account: this.wallet.getClassicAddress(),
+      account: this.wallet.classicAddress,
       strict: true,
       ledger_index: 'validated',
     }
@@ -27,7 +26,7 @@ describe('account_lines', function () {
     const expected = {
       id: 0,
       result: {
-        account: this.wallet.getClassicAddress(),
+        account: this.wallet.classicAddress,
         ledger_hash:
           '0C09AAFA88AC1A616058220CF33269788D3985DAA6F2386196D4A7404252BB61',
         ledger_index: 1074,

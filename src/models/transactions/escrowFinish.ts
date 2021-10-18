@@ -2,11 +2,29 @@ import { ValidationError } from '../../errors'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
 
+/**
+ * Deliver XRP from a held payment to the recipient.
+ *
+ * @category Transaction Models
+ */
 export interface EscrowFinish extends BaseTransaction {
   TransactionType: 'EscrowFinish'
+  /** Address of the source account that funded the held payment. */
   Owner: string
+  /**
+   * Transaction sequence of EscrowCreate transaction that created the held.
+   * payment to finish.
+   */
   OfferSequence: number
+  /**
+   * Hex value matching the previously-supplied PREIMAGE-SHA-256.
+   * crypto-condition of the held payment.
+   */
   Condition?: string
+  /**
+   * Hex value of the PREIMAGE-SHA-256 crypto-condition fulfillment matching.
+   * the held payment's Condition.
+   */
   Fulfillment?: string
 }
 

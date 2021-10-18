@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { CheckCreate, CheckCancel } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { setupClient, teardownClient } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
 
 // how long before each test case times out
@@ -13,7 +13,6 @@ const TIMEOUT = 20000
 describe('CheckCancel', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
@@ -21,8 +20,8 @@ describe('CheckCancel', function () {
     const wallet2 = await generateFundedWallet(this.client)
     const setupTx: CheckCreate = {
       TransactionType: 'CheckCreate',
-      Account: this.wallet.getClassicAddress(),
-      Destination: wallet2.getClassicAddress(),
+      Account: this.wallet.classicAddress,
+      Destination: wallet2.classicAddress,
       SendMax: '50',
     }
 
@@ -31,7 +30,7 @@ describe('CheckCancel', function () {
     // get check ID
     const response1 = await this.client.request({
       command: 'account_objects',
-      account: this.wallet.getClassicAddress(),
+      account: this.wallet.classicAddress,
       type: 'check',
     })
     assert.lengthOf(
@@ -44,7 +43,7 @@ describe('CheckCancel', function () {
     // actual test - cancel the check
     const tx: CheckCancel = {
       TransactionType: 'CheckCancel',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       CheckID: checkId,
     }
 
@@ -53,7 +52,7 @@ describe('CheckCancel', function () {
     // confirm that the check no longer exists
     const accountOffersResponse = await this.client.request({
       command: 'account_objects',
-      account: this.wallet.getClassicAddress(),
+      account: this.wallet.classicAddress,
       type: 'check',
     })
     assert.lengthOf(

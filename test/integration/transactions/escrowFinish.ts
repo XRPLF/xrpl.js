@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { EscrowFinish, EscrowCreate } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { setupClient, teardownClient } from '../setup'
 import { generateFundedWallet, getXRPBalance, testTransaction } from '../utils'
 
 // how long before each test case times out
@@ -13,7 +13,6 @@ const TIMEOUT = 20000
 describe('EscrowFinish', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
@@ -30,10 +29,10 @@ describe('EscrowFinish', function () {
     const AMOUNT = 10000
 
     const createTx: EscrowCreate = {
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       TransactionType: 'EscrowCreate',
       Amount: '10000',
-      Destination: wallet1.getClassicAddress(),
+      Destination: wallet1.classicAddress,
       FinishAfter: CLOSE_TIME + 2,
     }
 
@@ -45,7 +44,7 @@ describe('EscrowFinish', function () {
     const accountObjects = (
       await this.client.request({
         command: 'account_objects',
-        account: this.wallet.getClassicAddress(),
+        account: this.wallet.classicAddress,
       })
     ).result.account_objects
 
@@ -60,8 +59,8 @@ describe('EscrowFinish', function () {
 
     const finishTx: EscrowFinish = {
       TransactionType: 'EscrowFinish',
-      Account: this.wallet.getClassicAddress(),
-      Owner: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
+      Owner: this.wallet.classicAddress,
       OfferSequence: sequence,
     }
 

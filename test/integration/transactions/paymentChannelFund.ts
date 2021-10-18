@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { PaymentChannelCreate, hashes, PaymentChannelFund } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { setupClient, teardownClient } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
 
 // how long before each test case times out
@@ -13,7 +13,6 @@ const { hashPaymentChannel } = hashes
 describe('PaymentChannelFund', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
@@ -21,25 +20,25 @@ describe('PaymentChannelFund', function () {
     const wallet2 = await generateFundedWallet(this.client)
     const paymentChannelCreate: PaymentChannelCreate = {
       TransactionType: 'PaymentChannelCreate',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       Amount: '100',
-      Destination: wallet2.getClassicAddress(),
+      Destination: wallet2.classicAddress,
       SettleDelay: 86400,
       PublicKey: this.wallet.publicKey,
     }
 
     const paymentChannelResponse = await this.client.submit(
-      this.wallet,
       paymentChannelCreate,
+      { wallet: this.wallet },
     )
     await testTransaction(this.client, paymentChannelCreate, this.wallet)
 
     const paymentChannelFund: PaymentChannelFund = {
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       TransactionType: 'PaymentChannelFund',
       Channel: hashPaymentChannel(
-        this.wallet.getClassicAddress(),
-        wallet2.getClassicAddress(),
+        this.wallet.classicAddress,
+        wallet2.classicAddress,
         paymentChannelResponse.result.tx_json.Sequence ?? 0,
       ),
       Amount: '100',

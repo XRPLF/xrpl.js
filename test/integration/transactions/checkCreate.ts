@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { CheckCreate } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { setupClient, teardownClient } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
 
 // how long before each test case times out
@@ -13,7 +13,6 @@ const TIMEOUT = 20000
 describe('CheckCreate', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
@@ -21,8 +20,8 @@ describe('CheckCreate', function () {
     const wallet2 = await generateFundedWallet(this.client)
     const tx: CheckCreate = {
       TransactionType: 'CheckCreate',
-      Account: this.wallet.getClassicAddress(),
-      Destination: wallet2.getClassicAddress(),
+      Account: this.wallet.classicAddress,
+      Destination: wallet2.classicAddress,
       SendMax: '50',
     }
 
@@ -31,7 +30,7 @@ describe('CheckCreate', function () {
     // confirm that the check actually went through
     const accountOffersResponse = await this.client.request({
       command: 'account_objects',
-      account: this.wallet.getClassicAddress(),
+      account: this.wallet.classicAddress,
       type: 'check',
     })
     assert.lengthOf(

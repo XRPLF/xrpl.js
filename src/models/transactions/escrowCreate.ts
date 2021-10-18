@@ -3,13 +3,42 @@ import { ValidationError } from '../../errors'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
 
+/**
+ * Sequester XRP until the escrow process either finishes or is canceled.
+ *
+ * @category Transaction Models
+ */
 export interface EscrowCreate extends BaseTransaction {
   TransactionType: 'EscrowCreate'
+  /**
+   * Amount of XRP, in drops, to deduct from the sender's balance and escrow.
+   * Once escrowed, the XRP can either go to the Destination address (after the.
+   * FinishAfter time) or returned to the sender (after the CancelAfter time).
+   */
   Amount: string
+  /** Address to receive escrowed XRP. */
   Destination: string
+  /**
+   * The time, in seconds since the Ripple Epoch, when this escrow expires.
+   * This value is immutable; the funds can only be returned the sender after.
+   * this time.
+   */
   CancelAfter?: number
+  /**
+   * The time, in seconds since the Ripple Epoch, when the escrowed XRP can be
+   * released to the recipient. This value is immutable; the funds cannot move.
+   * until this time is reached.
+   */
   FinishAfter?: number
+  /**
+   * Hex value representing a PREIMAGE-SHA-256 crypto-condition . The funds can.
+   * only be delivered to the recipient if this condition is fulfilled.
+   */
   Condition?: string
+  /**
+   * Arbitrary tag to further specify the destination for this escrowed.
+   * payment, such as a hosted recipient at the destination address.
+   */
   DestinationTag?: number
 }
 

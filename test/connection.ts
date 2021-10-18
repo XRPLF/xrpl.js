@@ -244,8 +244,10 @@ describe('Connection', function () {
   })
 
   it('DisconnectedError on initial onOpen send', async function () {
-    // onOpen previously could throw PromiseRejectionHandledWarning: Promise rejection was handled asynchronously
-    // do not rely on the client.setup hook to test this as it bypasses the case, disconnect client connection first
+    /*
+     * onOpen previously could throw PromiseRejectionHandledWarning: Promise rejection was handled asynchronously
+     * do not rely on the client.setup hook to test this as it bypasses the case, disconnect client connection first
+     */
     await this.client.disconnect()
 
     // stub _onOpen to only run logic relevant to test case
@@ -253,7 +255,7 @@ describe('Connection', function () {
       // overload websocket send on open when _ws exists
       this.client.connection.ws.send = function (_0, _1, _2): void {
         // recent ws throws this error instead of calling back
-        throw new Error('WebSocket is not open: readyState 0 (CONNECTING)')
+        throw new XrplError('WebSocket is not open: readyState 0 (CONNECTING)')
       }
       const request = { command: 'subscribe', streams: ['ledger'] }
       this.client.connection.request(request)
@@ -338,20 +340,22 @@ describe('Connection', function () {
         if (connectsCount === num) {
           if (disconnectsCount !== num) {
             done(
-              new Error(
+              new XrplError(
                 `disconnectsCount must be equal to ${num}(got ${disconnectsCount} instead)`,
               ),
             )
           } else if (reconnectsCount !== num) {
             done(
-              new Error(
+              new XrplError(
                 `reconnectsCount must be equal to ${num} (got ${reconnectsCount} instead)`,
               ),
             )
             // eslint-disable-next-line no-negated-condition -- Necessary
           } else if (code !== 1006) {
             done(
-              new Error(`disconnect must send code 1006 (got ${code} instead)`),
+              new XrplError(
+                `disconnect must send code 1006 (got ${code} instead)`,
+              ),
             )
           } else {
             done()
@@ -397,14 +401,14 @@ describe('Connection', function () {
     this.timeout(5000)
     // fail on reconnect/connection
     this.client.connection.reconnect = async (): Promise<void> => {
-      throw new Error('error on reconnect')
+      throw new XrplError('error on reconnect')
     }
     // Hook up a listener for the reconnect error event
     this.client.on('error', (error, message) => {
       if (error === 'reconnect' && message === 'error on reconnect') {
         return done()
       }
-      return done(new Error('Expected error on reconnect'))
+      return done(new XrplError('Expected error on reconnect'))
     })
     // Trigger a heartbeat
     this.client.connection.heartbeat()
@@ -420,7 +424,7 @@ describe('Connection', function () {
 
   it('should emit disconnected event with code 1006 (CLOSE_ABNORMAL)', function (done) {
     this.client.connection.once('error', (error) => {
-      done(new Error(`should not throw error, got ${String(error)}`))
+      done(new XrplError(`should not throw error, got ${String(error)}`))
     })
     this.client.connection.once('disconnected', (code) => {
       assert.strictEqual(code, 1006)
@@ -560,8 +564,10 @@ describe('Connection', function () {
   })
 
   it('unrecognized message type', function (done) {
-    // This enables us to automatically support any
-    // new messages added by rippled in the future.
+    /*
+     * This enables us to automatically support any
+     * new messages added by rippled in the future.
+     */
     this.client.connection.on('unknown', (event) => {
       assert.deepEqual(event, { type: 'unknown' })
       done()
@@ -570,35 +576,37 @@ describe('Connection', function () {
     this.client.connection.onMessage(JSON.stringify({ type: 'unknown' }))
   })
 
-  // it('should clean up websocket connection if error after websocket is opened', async function () {
-  //   await this.client.disconnect()
-  //   // fail on connection
-  //   this.client.connection.subscribeToLedger = async () => {
-  //     throw new Error('error on _subscribeToLedger')
-  //   }
-  //   try {
-  //     await this.client.connect()
-  //     throw new Error('expected connect() to reject, but it resolved')
-  //   } catch (err) {
-  //     assert(err.message === 'error on _subscribeToLedger')
-  //     // _ws.close event listener should have cleaned up the socket when disconnect _ws.close is run on connection error
-  //     // do not fail on connection anymore
-  //     this.client.connection.subscribeToLedger = async () => {}
-  //     await this.client.connection.reconnect()
-  //   }
-  // })
+  /*
+   * it('should clean up websocket connection if error after websocket is opened', async function () {
+   *   await this.client.disconnect()
+   *   // fail on connection
+   *   this.client.connection.subscribeToLedger = async () => {
+   *     throw new Error('error on _subscribeToLedger')
+   *   }
+   *   try {
+   *     await this.client.connect()
+   *     throw new Error('expected connect() to reject, but it resolved')
+   *   } catch (err) {
+   *     assert(err.message === 'error on _subscribeToLedger')
+   *     // _ws.close event listener should have cleaned up the socket when disconnect _ws.close is run on connection error
+   *     // do not fail on connection anymore
+   *     this.client.connection.subscribeToLedger = async () => {}
+   *     await this.client.connection.reconnect()
+   *   }
+   * })
+   */
 
   it('should try to reconnect on empty subscribe response on reconnect', function (done) {
     this.timeout(23000)
     this.client.on('error', (error) => {
-      done(error || new Error('Should not emit error.'))
+      done(error || new XrplError('Should not emit error.'))
     })
     let disconnectedCount = 0
     this.client.on('connected', () => {
       done(
         disconnectedCount === 1
           ? undefined
-          : new Error('Wrong number of disconnects'),
+          : new XrplError('Wrong number of disconnects'),
       )
     })
     this.client.on('disconnected', () => {
@@ -616,7 +624,7 @@ describe('Connection', function () {
       .request({
         command: 'test_garbage',
       })
-      .then(() => new Error('Should not have succeeded'))
+      .then(() => new XrplError('Should not have succeeded'))
       .catch(done())
   })
 

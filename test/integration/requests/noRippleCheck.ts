@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { NoRippleCheckRequest } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { setupClient, teardownClient } from '../setup'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -12,14 +12,13 @@ const TIMEOUT = 20000
 describe('noripple_check', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
   it('base', async function () {
     const request: NoRippleCheckRequest = {
       command: 'noripple_check',
-      account: this.wallet.getClassicAddress(),
+      account: this.wallet.classicAddress,
       role: 'gateway',
       ledger_index: 'current',
       transactions: true,
@@ -32,7 +31,7 @@ describe('noripple_check', function () {
         problems: ['You should immediately set your default ripple flag'],
         transactions: [
           {
-            Account: this.wallet.getClassicAddress(),
+            Account: this.wallet.classicAddress,
             Fee: 10,
             Sequence: 1268,
             SetFlag: 8,

@@ -6,13 +6,9 @@ A JavaScript/TypeScript library for interacting with the XRP Ledger
 
 This is the recommended library for integrating a JavaScript/TypeScript app with the XRP Ledger, especially if you intend to use advanced functionality such as IOUs, payment paths, the decentralized exchange, account settings, payment channels, escrows, multi-signing, and more.
 
-## [➡️ Reference Documentation](https://xrpl.org/rippleapi-reference.html)
-
-See the full reference documentation on the XRP Ledger Dev Portal.
-
 ## [➡️ Applications and Projects](APPLICATIONS.md)
 
-What is xrpl.js used for? The applications on the list linked above use `xrpl.js`. Open a PR to add your app or project to the list!
+What is `xrpl.js` used for? The applications on the list linked above use `xrpl.js`. Open a PR to add your app or project to the list!
 
 ### Features
 
@@ -32,8 +28,8 @@ What is xrpl.js used for? The applications on the list linked above use `xrpl.js
 See also: [RippleAPI Beginners Guide](https://xrpl.org/get-started-with-rippleapi-for-javascript.html)
 
 In an existing project (with `package.json`), install `xrpl.js`:
-```
-$ npm install xrpl@beta
+```shell
+npm install xrpl@beta
 ```
 
 Then see the [documentation](#documentation).
@@ -87,7 +83,7 @@ Until official support for [Deno](https://deno.land) is added, you can use the f
 import xrpl from 'https://dev.jspm.io/npm:xrpl';
 
 (async () => {
-  const api = new (xrpl as any).RippleAPI({ server: 'wss://s.altnet.rippletest.net:51233' });
+  const api = new (xrpl as any).Client('wss://s.altnet.rippletest.net:51233');
   const address = 'rH8NxV12EuV...khfJ5uw9kT';
 
   api.connect().then(() => {
@@ -106,7 +102,7 @@ import xrpl from 'https://dev.jspm.io/npm:xrpl';
 
 ### Mailing Lists
 
-We have a low-traffic mailing list for announcements of new xrpl.js releases. (About 1 email per week)
+We have a low-traffic mailing list for announcements of new `xrpl.js` releases. (About 1 email per week)
 
 + [Subscribe to xrpl-announce](https://groups.google.com/g/xrpl-announce)
 
@@ -117,8 +113,8 @@ If you're using the XRP Ledger in production, you should run a [rippled server](
 ## Development
 
 To build the library for Node.js and the browser:
-```
-$ npm run build
+```shell
+npm run build
 ```
 
 The TypeScript compiler will [output](./tsconfig.json#L7) the resulting JS files in `./dist/npm/`.

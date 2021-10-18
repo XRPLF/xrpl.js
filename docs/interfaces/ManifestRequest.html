@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ManifestRequest | ripple-lib</title>
-	<meta name="description" content="Documentation for ripple-lib">
+	<title>ManifestRequest | xrpl</title>
+	<meta name="description" content="Documentation for xrpl">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
 	<script async src="../assets/js/search.js" id="search-script"></script>
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">ripple-lib</a>
+					<a href="../index.html" class="title">xrpl</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -52,7 +52,7 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="../modules.html">ripple-lib</a>
+					<a href="../modules.html">xrpl</a>
 				</li>
 				<li>
 					<a href="ManifestRequest.html">ManifestRequest</a>
@@ -65,6 +65,24 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The <code>manifest</code> method reports the current &quot;manifest&quot; information for a given
+							validator public key. The &quot;manifest&quot; is the public portion of that
+						validator&#39;s configured token. Expects a response in the form of a <a href="ManifestResponse.html">ManifestResponse</a>.</p>
+					</div>
+					<dl class="tsd-comment-tags">
+						<dt>example</dt>
+						<dd><pre><code class="language-ts"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">manifest</span><span style="color: #000000">: </span><span style="color: #267F99">ManifestRequest</span><span style="color: #000000"> = {</span>
+<span style="color: #000000"> </span><span style="color: #A31515">&quot;command&quot;</span><span style="color: #001080">:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;manifest&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000"> </span><span style="color: #A31515">&quot;public_key&quot;</span><span style="color: #001080">:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;nHUFE9prPXPrHcG3SkwP1UzAQbSphqyQkQK9ATXLZsfkezhhda3p&quot;</span>
+<span style="color: #000000">}</span>
+</code></pre>
+						</dd>
+					</dl>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -103,9 +121,14 @@
 					<aside class="tsd-sources">
 						<p>Inherited from BaseRequest.api_version</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/baseMethod.ts#L5">src/models/methods/baseMethod.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L14">src/models/methods/baseMethod.ts:14</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The API version to use. If omitted, use version 1.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
 					<a name="command" class="tsd-anchor"></a>
@@ -114,7 +137,7 @@
 					<aside class="tsd-sources">
 						<p>Overrides BaseRequest.command</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/manifest.ts#L4">src/models/methods/manifest.ts:4</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/manifest.ts#L20">src/models/methods/manifest.ts:20</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -125,9 +148,16 @@
 					<aside class="tsd-sources">
 						<p>Inherited from BaseRequest.id</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/baseMethod.ts#L3">src/models/methods/baseMethod.ts:3</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/baseMethod.ts#L10">src/models/methods/baseMethod.ts:10</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A unique value to identify this request. The response to this request uses
+								the same id field. This way, even if responses arrive out of order, you
+							know which request prompted which response.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="public_key" class="tsd-anchor"></a>
@@ -135,9 +165,15 @@
 					<div class="tsd-signature tsd-kind-icon">public_<wbr>key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ripple/ripple-lib/blob/0c571f2e/src/models/methods/manifest.ts#L5">src/models/methods/manifest.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/xrplf/xrpl.js/blob/615504db/src/models/methods/manifest.ts#L25">src/models/methods/manifest.ts:25</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The base58-encoded public key of the validator to look up. This can be the
+							master public key or ephemeral public key.</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -187,6 +223,7 @@
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
 			</ul>

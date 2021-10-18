@@ -2,7 +2,7 @@ import { assert } from 'chai'
 
 import { deriveXAddress } from 'xrpl-local'
 
-describe('client.deriveXAddress', function () {
+describe('deriveXAddress', function () {
   it('returns address for public key', function () {
     assert.equal(
       deriveXAddress({

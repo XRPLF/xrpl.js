@@ -3,27 +3,71 @@ import { ValidationError } from '../../errors'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
 
+/**
+ * Enum for AccountSet Flags.
+ *
+ * @category Transaction Flags
+ */
 export enum AccountSetAsfFlags {
+  /** Require a destination tag to send transactions to this account. */
   asfRequireDest = 1,
+  /**
+   * Require authorization for users to hold balances issued by this address
+   * can only be enabled if the address has no trust lines connected to it.
+   */
   asfRequireAuth = 2,
+  /** XRP should not be sent to this account. */
   asfDisallowXRP = 3,
+  /**
+   * Disallow use of the master key pair. Can only be enabled if the account
+   * has configured another way to sign transactions, such as a Regular Key or a
+   * Signer List.
+   */
   asfDisableMaster = 4,
+  /**
+   * Track the ID of this account's most recent transaction. Required for
+   * AccountTxnID.
+   */
   asfAccountTxnID = 5,
+  /**
+   * Permanently give up the ability to freeze individual trust lines or
+   * disable Global Freeze. This flag can never be disabled after being enabled.
+   */
   asfNoFreeze = 6,
+  /** Freeze all assets issued by this account. */
   asfGlobalFreeze = 7,
+  /** Enable rippling on this account's trust lines by default. */
   asfDefaultRipple = 8,
+  /** Enable Deposit Authorization on this account. */
   asfDepositAuth = 9,
 }
 
+/**
+ * Enum for AccountSet Transaction Flags.
+ *
+ * @category Transaction Flags
+ */
 export enum AccountSetTfFlags {
+  /** The same as SetFlag: asfRequireDest. */
   tfRequireDestTag = 0x00010000,
+  /** The same as ClearFlag: asfRequireDest. */
   tfOptionalDestTag = 0x00020000,
+  /** The same as SetFlag: asfRequireAuth. */
   tfRequireAuth = 0x00040000,
+  /** The same as ClearFlag: asfRequireAuth. */
   tfOptionalAuth = 0x00080000,
+  /** The same as SetFlag: asfDisallowXRP. */
   tfDisallowXRP = 0x00100000,
+  /** The same as ClearFlag: asfDisallowXRP. */
   tfAllowXRP = 0x00200000,
 }
 
+/**
+ * Map of flags to boolean values representing {@link AccountSet} transaction
+ * flags.
+ *
+ * @category Transaction Flags
+ */
 export interface AccountSetFlagsInterface {
   tfRequireDestTag?: boolean
   tfOptionalDestTag?: boolean
@@ -33,15 +77,39 @@ export interface AccountSetFlagsInterface {
   tfAllowXRP?: boolean
 }
 
+/**
+ * An AccountSet transaction modifies the properties of an account in the XRP
+ * Ledger.
+ *
+ * @category Transaction Models
+ */
 export interface AccountSet extends BaseTransaction {
   TransactionType: 'AccountSet'
   Flags?: number | AccountSetFlagsInterface
+  /** Unique identifier of a flag to disable for this account. */
   ClearFlag?: number
+  /**
+   * The domain that owns this account, as a string of hex representing the.
+   * ASCII for the domain in lowercase.
+   */
   Domain?: string
+  /** Hash of an email address to be used for generating an avatar image. */
   EmailHash?: string
+  /** Public key for sending encrypted messages to this account. */
   MessageKey?: string
+  /** Integer flag to enable for this account. */
   SetFlag?: AccountSetAsfFlags
+  /**
+   * The fee to charge when users transfer this account's issued currencies,
+   * represented as billionths of a unit. Cannot be more than 2000000000 or less
+   * than 1000000000, except for the special case 0 meaning no fee.
+   */
   TransferRate?: number
+  /**
+   * Tick size to use for offers involving a currency issued by this address.
+   * The exchange rates of those offers is rounded to this many significant
+   * digits. Valid values are 3 to 15 inclusive, or 0 to disable.
+   */
   TickSize?: number
 }
 

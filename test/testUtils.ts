@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- Necessary for these methods TODO: further cleanup */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types -- Necessary for these methods TODO: further cleanup */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any -- required for
+assertions. */
 import net from 'net'
 
 import { assert } from 'chai'
@@ -31,8 +31,8 @@ export function assertResultMatch(
   if (expected.txJSON) {
     assert(response.txJSON)
     assert.deepEqual(
-      JSON.parse(response.txJSON as string),
-      JSON.parse(expected.txJSON as string),
+      JSON.parse(response.txJSON),
+      JSON.parse(expected.txJSON),
       'checkResult: txJSON must match',
     )
   }
@@ -58,7 +58,7 @@ export function assertResultMatch(
  * @param message - Expected error message/substring of the error message.
  */
 export async function assertRejects(
-  promise: PromiseLike<any>,
+  promise: PromiseLike<unknown>,
   instanceOf: any,
   message?: string | RegExp,
 ): Promise<void> {

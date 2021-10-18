@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { OfferCreate, OfferCancel } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { setupClient, teardownClient } from '../setup'
 import { testTransaction } from '../utils'
 
 // how long before each test case times out
@@ -13,7 +13,6 @@ const TIMEOUT = 20000
 describe('OfferCancel', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
@@ -21,11 +20,11 @@ describe('OfferCancel', function () {
     // set up an offer
     const setupTx: OfferCreate = {
       TransactionType: 'OfferCreate',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       TakerGets: '13100000',
       TakerPays: {
         currency: 'USD',
-        issuer: this.wallet.getClassicAddress(),
+        issuer: this.wallet.classicAddress,
         value: '10',
       },
     }
@@ -34,7 +33,7 @@ describe('OfferCancel', function () {
 
     const accountOffersResponse = await this.client.request({
       command: 'account_offers',
-      account: this.wallet.getClassicAddress(),
+      account: this.wallet.classicAddress,
     })
     assert.lengthOf(
       accountOffersResponse.result.offers,
@@ -46,7 +45,7 @@ describe('OfferCancel', function () {
     // actually test OfferCancel
     const tx: OfferCancel = {
       TransactionType: 'OfferCancel',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       OfferSequence: seq,
     }
 
@@ -54,7 +53,7 @@ describe('OfferCancel', function () {
 
     const accountOffersResponse2 = await this.client.request({
       command: 'account_offers',
-      account: this.wallet.getClassicAddress(),
+      account: this.wallet.classicAddress,
     })
     assert.lengthOf(
       accountOffersResponse2.result.offers,

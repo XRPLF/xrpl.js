@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 
-import { validateCheckCancel, validate, ValidationError } from 'xrpl-local'
+import { validate, ValidationError } from 'xrpl-local'
+import { validateCheckCancel } from 'xrpl-local/models/transactions/checkCancel'
 
 /**
  * CheckCancel Transaction Verification Testing.

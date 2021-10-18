@@ -86,9 +86,11 @@ async function getOrderbook(
       sell.push(order)
     }
   })
-  // Sort the orders
-  // for both buys and sells, lowest quality is closest to mid-market
-  // we sort the orders so that earlier orders are closer to mid-market
+  /*
+   * Sort the orders
+   * for both buys and sells, lowest quality is closest to mid-market
+   * we sort the orders so that earlier orders are closer to mid-market
+   */
   return {
     buy: sortOffers(buy).slice(0, options.limit),
     sell: sortOffers(sell).slice(0, options.limit),

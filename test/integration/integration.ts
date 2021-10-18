@@ -8,7 +8,7 @@ import { convertStringToHex } from 'xrpl-local/utils'
 import { multisign } from 'xrpl-local/wallet/signer'
 
 import serverUrl from './serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from './setup'
+import { setupClient, teardownClient } from './setup'
 import {
   generateFundedWallet,
   ledgerAccept,
@@ -22,7 +22,6 @@ const TIMEOUT = 20000
 describe('integration tests', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
@@ -38,17 +37,17 @@ describe('integration tests', function () {
     // set up the multisigners for the account
     const signerListSet: SignerListSet = {
       TransactionType: 'SignerListSet',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       SignerEntries: [
         {
           SignerEntry: {
-            Account: signerWallet1.getClassicAddress(),
+            Account: signerWallet1.classicAddress,
             SignerWeight: 1,
           },
         },
         {
           SignerEntry: {
-            Account: signerWallet2.getClassicAddress(),
+            Account: signerWallet2.classicAddress,
             SignerWeight: 1,
           },
         },
@@ -60,14 +59,14 @@ describe('integration tests', function () {
     // try to multisign
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
-      Account: this.wallet.getClassicAddress(),
+      Account: this.wallet.classicAddress,
       Domain: convertStringToHex('example.com'),
     }
     const accountSetTx = await client.autofill(accountSet, 2)
     const { tx_blob: tx_blob1 } = signerWallet1.sign(accountSetTx, true)
     const { tx_blob: tx_blob2 } = signerWallet2.sign(accountSetTx, true)
     const multisignedTx = multisign([tx_blob1, tx_blob2])
-    const submitResponse = await client.submitSigned(multisignedTx)
+    const submitResponse = await client.submit(multisignedTx)
     await ledgerAccept(client)
     assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
     await verifySubmittedTransaction(this.client, multisignedTx)

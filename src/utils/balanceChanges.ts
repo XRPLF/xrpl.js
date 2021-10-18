@@ -133,9 +133,11 @@ function getTrustlineQuantity(node: NormalizedNode): BalanceChange[] | null {
     return null
   }
 
-  // A trustline can be created with a non-zero starting balance
-  // If an offer is placed to acquire an asset with no existing trustline,
-  // the trustline can be created when the offer is taken.
+  /*
+   * A trustline can be created with a non-zero starting balance.
+   * If an offer is placed to acquire an asset with no existing trustline,
+   * the trustline can be created when the offer is taken.
+   */
   const fields = node.NewFields == null ? node.FinalFields : node.NewFields
 
   // the balance is always from low node's perspective

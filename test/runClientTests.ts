@@ -4,6 +4,8 @@ import path from 'path'
 
 import { Client } from 'xrpl-local'
 
+import { XrplError } from '../src/errors'
+
 /**
  * Client Test Runner.
  *
@@ -12,23 +14,46 @@ import { Client } from 'xrpl-local'
  */
 
 describe('Client', function () {
-  // doesn't need a functional client, just needs to instantiate to get a list of public methods
-  // (to determine what methods are missing from )
+  /*
+   * Doesn't need a functional client, just needs to instantiate to get a list of public methods
+   * (to determine what methods are missing from )
+   */
 
   const allPublicMethods = getAllPublicMethods(new Client('wss://'))
 
   const allTestSuites = loadTestSuites()
+
+  const testExceptions = new Set([
+    // instance variables on Client, not actual methods
+    'feeCushion',
+    'maxFeeXRP',
+    'connection',
+    'url',
+    // tested in integration tests, can't be tested with mockRippled
+    'submitAndWait',
+    'fundWallet',
+    // tested in setup and in client.ts and connection.ts
+    'connect',
+    'disconnect',
+    // used in subscriptions, can't really test directly
+    'on',
+    // copy of autofill
+    'prepareTransaction',
+    // inherited from EventEmitter
+    'domain',
+    '_eventsCount',
+    '_events',
+    '_maxListeners',
+  ])
 
   // Report any missing tests.
   const allTestedMethods = new Set(
     allTestSuites.map((testsuite) => testsuite.name),
   )
   for (const methodName of allPublicMethods) {
-    if (!allTestedMethods.has(methodName)) {
-      // TODO: Once migration is complete, remove `.skip()` so that missing tests are reported as failures.
-      // eslint-disable-next-line mocha/no-skipped-tests -- See above TODO
-      it.skip(`${methodName} - no test suite found`, function () {
-        throw new Error(
+    if (!allTestedMethods.has(methodName) && !testExceptions.has(methodName)) {
+      it(`${methodName} - no test suite found`, function () {
+        throw new XrplError(
           `Test file not found! Create file "test/client/${methodName}.ts".`,
         )
       })
@@ -42,8 +67,7 @@ function getAllPublicMethods(client: Client): string[] {
       ...Object.getOwnPropertyNames(client),
       ...Object.getOwnPropertyNames(Client.prototype),
     ]),
-    // removes private methods
-  ).filter((key) => !key.startsWith('_'))
+  )
 }
 
 /**

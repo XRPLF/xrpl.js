@@ -15,6 +15,7 @@ import highLoadFactor from './serverInfoHighLoadFactor.json'
 import consensusStream from './streams/consensusPhase.json'
 import ledgerStream from './streams/ledger.json'
 import manifestStream from './streams/manifest.json'
+import partialPaymentTransactionStream from './streams/partialPaymentTransaction.json'
 import pathFindStream from './streams/pathFind.json'
 import peerStatusStream from './streams/peerStatusChange.json'
 import transactionStream from './streams/transaction.json'
@@ -43,6 +44,7 @@ const subscribe = {
 const streams = {
   ledger: ledgerStream,
   transaction: transactionStream,
+  partialPaymentTransaction: partialPaymentTransactionStream,
   consensus: consensusStream,
   pathFind: pathFindStream,
   peerStatus: peerStatusStream,

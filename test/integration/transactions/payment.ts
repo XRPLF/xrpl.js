@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { Payment } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { setupClient, teardownClient } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
 
 // how long before each test case times out
@@ -12,7 +12,6 @@ const TIMEOUT = 20000
 describe('Payment', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
@@ -20,8 +19,8 @@ describe('Payment', function () {
     const wallet2 = await generateFundedWallet(this.client)
     const tx: Payment = {
       TransactionType: 'Payment',
-      Account: this.wallet.getClassicAddress(),
-      Destination: wallet2.getClassicAddress(),
+      Account: this.wallet.classicAddress,
+      Destination: wallet2.classicAddress,
       Amount: '1000',
     }
     await testTransaction(this.client, tx, this.wallet)

@@ -1,0 +1,103 @@
+{
+  "engine_result": "tesSUCCESS",
+  "engine_result_code": 0,
+  "engine_result_message": "The transaction was applied. Only final in a validated ledger.",
+  "ledger_hash": "922099A5528EFDF820ABFAB0CAAB8647DF6E7103B3BA8CDD3A6D56EAF1B39B3B",
+  "ledger_index": 66093882,
+  "meta": {
+    "AffectedNodes": [
+      {
+        "ModifiedNode": {
+          "FinalFields": {
+            "Account": "rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe",
+            "Balance": "96096948024602394",
+            "Flags": 0,
+            "OwnerCount": 0,
+            "Sequence": 2898052
+          },
+          "LedgerEntryType": "AccountRoot",
+          "LedgerIndex": "31CCE9D28412FF973E9AB6D0FA219BACF19687D9A2456A0C2ABC3280E9D47E37",
+          "PreviousFields": {
+            "Balance": "96096948024597938"
+          },
+          "PreviousTxnID": "0D63C8EC6EB8E6A649AA93BE810974218339E4AB7D2C33D18D51DD309E356DAF",
+          "PreviousTxnLgrSeq": 21659586
+        }
+      },
+      {
+        "ModifiedNode": {
+          "FinalFields": {
+            "Account": "rrvV6w5Jho4RYpcdH8x1subhYzK89DZDW",
+            "Balance": "999995508",
+            "Flags": 0,
+            "OwnerCount": 2,
+            "Sequence": 21659589
+          },
+          "LedgerEntryType": "AccountRoot",
+          "LedgerIndex": "3805A2A11556E4102A06D043FB7F257E487A3FA3209FAE0E248082AC03FE7670",
+          "PreviousFields": {
+            "Balance": "999999976",
+            "Sequence": 21659588
+          },
+          "PreviousTxnID": "41E477342EEF6F59F5A54FBCFD5691EF79DACD5D834961D6C36ACFD296B26EE9",
+          "PreviousTxnLgrSeq": 21659594
+        }
+      },
+      {
+        "ModifiedNode": {
+          "FinalFields": {
+            "Account": "rrvV6w5Jho4RYpcdH8x1subhYzK89DZDW",
+            "BookDirectory": "1862B15E8FB247FA2F08A22042617B4DFC5E58213514E98B4F038D7EA4C68000",
+            "BookNode": "0",
+            "Flags": 0,
+            "OwnerNode": "0",
+            "Sequence": 21659587,
+            "TakerGets": "999999999995544",
+            "TakerPays": {
+              "currency": "BAR",
+              "issuer": "rNAUehJrqcWiDBNQ2wcbGucPPAtZvtb7xE",
+              "value": "999999999.995545"
+            }
+          },
+          "LedgerEntryType": "Offer",
+          "LedgerIndex": "6DC736E5FB74F40252B685B6A416ECE8E5719F48F1FDEBCDB1BCBDFD39B03EEA",
+          "PreviousFields": {
+            "TakerGets": "1000000000000000",
+            "TakerPays": {
+              "currency": "BAR",
+              "issuer": "rNAUehJrqcWiDBNQ2wcbGucPPAtZvtb7xE",
+              "value": "1000000000"
+            }
+          },
+          "PreviousTxnID": "41E477342EEF6F59F5A54FBCFD5691EF79DACD5D834961D6C36ACFD296B26EE9",
+          "PreviousTxnLgrSeq": 21659594
+        }
+      }
+    ],
+    "DeliveredAmount": "4456",
+    "TransactionIndex": 0,
+    "TransactionResult": "tesSUCCESS",
+    "delivered_amount": "4456"
+  },
+  "status": "closed",
+  "transaction": {
+    "Account": "rrvV6w5Jho4RYpcdH8x1subhYzK89DZDW",
+    "Amount": "1000000000000000",
+    "Destination": "rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe",
+    "Fee": "12",
+    "Flags": 2147614720,
+    "LastLedgerSequence": 21659598,
+    "SendMax": {
+      "currency": "BAR",
+      "issuer": "rNAUehJrqcWiDBNQ2wcbGucPPAtZvtb7xE",
+      "value": "0.00445549772955297"
+    },
+    "Sequence": 21659588,
+    "SigningPubKey": "02A6FD99488B3D45E231D18E8FACEE627880F77E1EB529A523ADAA18289F6B984B",
+    "TransactionType": "Payment",
+    "TxnSignature": "3045022100D5748F931535AC181F500951107E7804136950A5472C6B32165BCC2A119B031B02205AB1F280B6229F86A75916D37B41BBB67B4C1356CB96746F96D2763E8D063F24",
+    "date": "2021-10-07T21:06:12Z"
+  },
+  "type": "transaction",
+  "validated": true
+}

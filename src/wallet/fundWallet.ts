@@ -5,12 +5,15 @@ import { isValidClassicAddress } from 'ripple-address-codec'
 
 import type { Client } from '..'
 import { RippledError, XRPLFaucetError } from '../errors'
-import { GeneratedAddress } from '../utils/generateAddress'
 
 import Wallet from '.'
 
 interface FaucetWallet {
-  account: GeneratedAddress
+  account: {
+    xAddress: string
+    classicAddress?: string
+    secret: string
+  }
   amount: number
   balance: number
 }
@@ -32,6 +35,13 @@ const MAX_ATTEMPTS = 20
 
 /**
  * Generates a random wallet with some amount of XRP (usually 1000 XRP).
+ *
+ * @example
+ * ```typescript
+ * const api = new xrpl.Client("wss://s.altnet.rippletest.net:51233")
+ * await api.connect()
+ * const wallet = await api.fundWallet()
+ * ```
  *
  * @param this - Client.
  * @param wallet - An existing XRPL Wallet to fund, if undefined, a new Wallet will be created.
@@ -190,7 +200,7 @@ async function processSuccessfulResponse(
         wallet: walletToFund,
         balance: await getUpdatedBalance(
           client,
-          walletToFund.getClassicAddress(),
+          walletToFund.classicAddress,
           startingBalance,
         ),
       })
@@ -270,7 +280,7 @@ async function getUpdatedBalance(
  * @throws When the client url is not on altnet or devnet.
  */
 function getFaucetUrl(client: Client): FaucetNetwork | undefined {
-  const connectionUrl = client.connection.getUrl()
+  const connectionUrl = client.url
 
   // 'altnet' for Ripple Testnet server and 'testnet' for XRPL Labs Testnet server
   if (connectionUrl.includes('altnet') || connectionUrl.includes('testnet')) {
@@ -290,4 +300,5 @@ const _private = {
   FaucetNetwork,
   getFaucetUrl,
 }
+
 export { _private }

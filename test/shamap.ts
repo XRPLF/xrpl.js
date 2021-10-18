@@ -10,17 +10,15 @@ const HEX_ZERO =
 /**
  * Generates data to hash for testing.
  *
- * @param v - TODO: fill in.
+ * @param int - TODO: fill in.
  * @returns TODO: fill in.
  */
-// eslint-disable-next-line id-length -- TODO: figure out what this variable means
-function intToVuc(v: number): string {
+function intToVuc(int: number): string {
   let ret = ''
 
-  // eslint-disable-next-line id-length -- TODO: figure out what this variable means
-  for (let i = 0; i < 32; i++) {
+  for (let it = 0; it < 32; it++) {
     ret += '0'
-    ret += v.toString(16).toUpperCase()
+    ret += int.toString(16).toUpperCase()
   }
   return ret
 }

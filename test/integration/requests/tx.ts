@@ -5,7 +5,7 @@ import { AccountSet, hashes, SubmitResponse, TxResponse } from 'xrpl-local'
 import { convertStringToHex } from 'xrpl-local/utils'
 
 import serverUrl from '../serverUrl'
-import { setupClient, suiteClientSetup, teardownClient } from '../setup'
+import { setupClient, teardownClient } from '../setup'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -14,22 +14,20 @@ const { hashSignedTx } = hashes
 describe('tx', function () {
   this.timeout(TIMEOUT)
 
-  before(suiteClientSetup)
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
   it('base', async function () {
-    const account = this.wallet.getClassicAddress()
+    const account = this.wallet.classicAddress
     const accountSet: AccountSet = {
       TransactionType: 'AccountSet',
       Account: account,
       Domain: convertStringToHex('example.com'),
     }
 
-    const response: SubmitResponse = await this.client.submit(
-      this.wallet,
-      accountSet,
-    )
+    const response: SubmitResponse = await this.client.submit(accountSet, {
+      wallet: this.wallet,
+    })
 
     const hash = hashSignedTx(response.result.tx_blob)
     const txResponse = await this.client.request({
