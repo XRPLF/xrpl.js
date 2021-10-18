@@ -3,9 +3,9 @@ export { default as BroadcastClient } from './client/BroadcastClient'
 
 export { Client } from './client'
 
-export * from './models/methods'
+export * from './models'
 
-export * from './models/transactions'
+export * from './sugar'
 
 export * from './utils'
 

@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unused-modules -- Needs to export all ledger objects */
 import AccountRoot, { AccountRootFlags } from './AccountRoot'
 import Amendments from './Amendments'
 import Check from './Check'
