@@ -43,5 +43,5 @@ async function sign(): Promise<void> {
   const signed = wallet.sign(tx)
   console.log('signed:', signed)
 
-  void client.disconnect()
+  await client.disconnect()
 }

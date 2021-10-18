@@ -30,5 +30,5 @@ async function getTransaction(): Promise<void> {
     )
   }
 
-  void client.disconnect()
+  await client.disconnect()
 }
