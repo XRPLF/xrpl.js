@@ -54,7 +54,7 @@ export enum OfferCreateFlags {
  * @example
  * ```typescript
  * const tx: OfferCreate = {
- * Account: wallet1.classicAddress,
+ * Account: 'rhFcpWDHLqpBmX4ezWiA5VLSS4e1BHqhHd',
  * TakerGets: '43000.51',
  * TakerPays: '12928290425',
  * TransactionType: 'OfferCreate',
