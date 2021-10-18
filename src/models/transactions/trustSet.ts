@@ -37,6 +37,40 @@ export enum TrustSetFlags {
  * flags.
  *
  * @category Transaction Flags
+ *
+ * @example
+ * ```typescript
+ *
+ * const trustSetTx: TrustSet = {
+ *  TransactionType: 'TrustSet',
+ *  Account: wallet2.getClassicAddress(),
+ *  LimitAmount: {
+ *    currency: 'FOO',
+ *    issuer: wallet1.getClassicAddress(),
+ *    value: '10000000000',
+ *  },
+ *  Flags: {
+ *    tfSetNoRipple: true
+ *  }
+ * }
+ *
+ * // Autofill the tx to see how flags actually look compared to the interface usage.
+ * const autofilledTx = await client.autofill(trustSetTx)
+ * console.log(autofilledTx)
+ * // {
+ * //  TransactionType: 'TrustSet',
+ * //  Account: 'r9dAdQQCBcGajVSeC9CqW3LCugjPDnAkEb',
+ * //  LimitAmount: {
+ * //   currency: 'FOO',
+ * //   issuer: 'rWZzUjo5xGiAoRBqzsndyzonXz47UV8u1',
+ * //   value: '10000000000'
+ * //  },
+ * //  Flags: 131072,
+ * //  Sequence: 21971483,
+ * //  Fee: '12',
+ * //  LastLedgerSequence: 21971503
+ * // }
+ * ```
  */
 export interface TrustSetFlagsInterface extends GlobalFlags {
   /**
