@@ -2,7 +2,6 @@
 const path = require('path')
 const webpack = require('webpack')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
-const { DuplicatesPlugin } = require('inspectpack/plugin')
 
 const bnJsReplaces = [
   'tiny-secp256k1',
