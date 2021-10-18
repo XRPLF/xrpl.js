@@ -27,6 +27,7 @@ function percentToDecimal(percent: string): string {
  * @returns A number in the "billionths" format.
  * @throws ValidationError when the parameter is not convertible to
  * "billionths" format.
+ * @category Utilities
  */
 export function decimalToTransferRate(decimal: string): number {
   const rate = new BigNumber(decimal).times(ONE_BILLION).plus(ONE_BILLION)
@@ -59,6 +60,7 @@ export function decimalToTransferRate(decimal: string): number {
  * @returns A number in the "billionths" format.
  * @throws ValidationError when the percent parameter is not convertible to
  * "billionths" format.
+ * @category Utilities
  */
 export function percentToTransferRate(percent: string): number {
   return decimalToTransferRate(percentToDecimal(percent))
@@ -72,6 +74,7 @@ export function percentToTransferRate(percent: string): number {
  * @returns A number in the "billionths" format.
  * @throws ValidationError when the parameter is not convertible to
  * "billionths" format.
+ * @category Utilities
  */
 export function decimalToQuality(decimal: string): number {
   const rate = new BigNumber(decimal).times(ONE_BILLION)
@@ -103,6 +106,7 @@ export function decimalToQuality(decimal: string): number {
  * @param quality - Quality to convert to decimal.
  * @returns decimal representation of quality.
  * @throws ValidationError when quality is not convertible to decimal format.
+ * @category Utilities
  */
 export function qualityToDecimal(quality: number): string {
   if (!Number.isInteger(quality)) {
@@ -127,7 +131,8 @@ export function qualityToDecimal(quality: number): string {
  *
  * @param rate - TransferRate to convert to decimal.
  * @returns decimal representation of transfer Rate.
- * @throws ValidationError when it cannot convert from billionths format
+ * @throws ValidationError when it cannot convert from billionths format.
+ * @category Utilities
  */
 export function transferRateToDecimal(rate: number): string {
   if (!Number.isInteger(rate)) {
@@ -157,6 +162,7 @@ export function transferRateToDecimal(rate: number): string {
  * @returns A number in the "billionths" format.
  * @throws ValidationError when the percent parameter is not convertible to
  * "billionths" format.
+ * @category Utilities
  */
 export function percentToQuality(percent: string): number {
   return decimalToQuality(percentToDecimal(percent))

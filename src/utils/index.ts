@@ -14,15 +14,12 @@ import {
   isValidXAddress,
   xAddressToClassicAddress,
 } from 'ripple-address-codec'
-import {
-  encode,
-  decode,
-  encodeForMultisigning,
-  encodeForSigning,
-  encodeForSigningClaim,
-} from 'ripple-binary-codec'
+import * as rbc from 'ripple-binary-codec'
 
+import { LedgerEntry } from '../models/ledger'
 import { Response } from '../models/methods'
+import { PaymentChannelClaim } from '../models/transactions/paymentChannelClaim'
+import { Transaction } from '../models/transactions/transaction'
 
 import getBalanceChanges from './balanceChanges'
 import { deriveKeypair, deriveXAddress } from './derive'
@@ -72,6 +69,57 @@ function isValidSecret(secret: string): boolean {
   } catch (_err) {
     return false
   }
+}
+
+/**
+ * Encodes a LedgerEntry or Transaction into a hex string
+ *
+ * @param object - LedgerEntry or Transaction in JSON format.
+ * @returns A hex string representing the encoded object.
+ */
+function encode(object: Transaction | LedgerEntry): string {
+  return rbc.encode(object)
+}
+
+/**
+ * Encodes a Transaction for signing
+ *
+ * @param object - LedgerEntry in JSON or Transaction format.
+ * @returns A hex string representing the encoded object.
+ */
+function encodeForSigning(object: Transaction): string {
+  return rbc.encodeForSigning(object)
+}
+
+/**
+ * Encodes a PaymentChannelClaim for signing
+ *
+ * @param object - PaymentChannelClaim in JSON format.
+ * @returns A hex string representing the encoded object.
+ */
+function encodeForSigningClaim(object: PaymentChannelClaim): string {
+  return rbc.encodeForSigningClaim(object)
+}
+
+/**
+ * Encodes a Transaction for multi-signing
+ *
+ * @param object - Transaction in JSON format.
+ * @param signer - The address of the account signing this transaction
+ * @returns A hex string representing the encoded object.
+ */
+function encodeForMultiSigning(object: Transaction, signer: string): string {
+  return rbc.encodeForMultisigning(object, signer)
+}
+
+/**
+ * Decodes a hex string into a transaction | ledger entry
+ *
+ * @param hex - hex string in the XRPL serialization format.
+ * @returns The hex string decoded according to XRPL serialization format.
+ */
+function decode(hex: string): Record<string, unknown> {
+  return rbc.decode(hex)
 }
 
 /**
@@ -171,7 +219,7 @@ export {
   decodeXAddress,
   encode,
   decode,
-  encodeForMultisigning,
+  encodeForMultiSigning,
   encodeForSigning,
   encodeForSigningClaim,
 }
