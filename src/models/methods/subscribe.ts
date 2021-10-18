@@ -1,7 +1,7 @@
 import type { Amount, Currency, Path, StreamType } from '../common'
 import { Offer } from '../ledger'
 import { OfferCreate, Transaction } from '../transactions'
-import TransactionMetadata from '../transactions/metadata'
+import { TransactionMetadata } from '../transactions/metadata'
 
 import type { BaseRequest, BaseResponse } from './baseMethod'
 

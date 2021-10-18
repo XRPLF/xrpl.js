@@ -9,8 +9,7 @@ import { decode, encode } from 'ripple-binary-codec'
 import { ValidationError, XrplError } from '../../errors'
 import type { Ledger } from '../../models/ledger'
 import { LedgerEntry } from '../../models/ledger'
-import { Transaction } from '../../models/transactions'
-import Metadata from '../../models/transactions/metadata'
+import { Transaction, TransactionMetadata } from '../../models/transactions'
 
 import HashPrefix from './hashPrefix'
 import sha512Half from './sha512Half'
@@ -122,7 +121,7 @@ export function hashLedgerHeader(ledgerHeader: Ledger): string {
  * @returns The root hash of the SHAMap.
  */
 export function hashTxTree(
-  transactions: Array<Transaction & { metaData?: Metadata }>,
+  transactions: Array<Transaction & { metaData?: TransactionMetadata }>,
 ): string {
   const shamap = new SHAMap()
   for (const txJSON of transactions) {

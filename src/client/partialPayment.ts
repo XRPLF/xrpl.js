@@ -10,7 +10,7 @@ import type {
 } from '..'
 import type { Amount } from '../models/common'
 import { PaymentFlags, Transaction } from '../models/transactions'
-import type TransactionMetadata from '../models/transactions/metadata'
+import type { TransactionMetadata } from '../models/transactions/metadata'
 import { isFlagEnabled } from '../models/utils'
 
 const WARN_PARTIAL_PAYMENT_CODE = 2001

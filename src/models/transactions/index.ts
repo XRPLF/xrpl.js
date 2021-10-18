@@ -1,4 +1,5 @@
 export { validate, TransactionAndMetadata, Transaction } from './transaction'
+export { TransactionMetadata } from './metadata'
 export {
   AccountSetAsfFlags,
   AccountSetTfFlags,
