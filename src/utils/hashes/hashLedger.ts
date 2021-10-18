@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js'
 import { decode, encode } from 'ripple-binary-codec'
 
 import { ValidationError, XrplError } from '../../errors'
-import { LedgerEntry } from '../../models'
+import { LedgerEntry } from '../../models/ledger'
 import type { Ledger } from '../../models/ledger'
 import { Transaction } from '../../models/transactions'
 import { TransactionMetadata } from '../../models/transactions/metadata'
@@ -146,7 +146,7 @@ export function hashTxTree(
  * @returns Hash of SHAMap that consists of all entries.
  * @category Utilities
  */
-export function hashStateTree(entries: LedgerEntry.LedgerEntry[]): string {
+export function hashStateTree(entries: LedgerEntry[]): string {
   const shamap = new SHAMap()
 
   entries.forEach((ledgerEntry) => {
