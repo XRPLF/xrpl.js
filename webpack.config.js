@@ -2,6 +2,16 @@
 const path = require('path')
 const webpack = require('webpack')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+const { DuplicatesPlugin } = require('inspectpack/plugin')
+
+const bnJsReplaces = [
+  'tiny-secp256k1',
+  'asn1.js',
+  'create-ecdh',
+  'miller-rabin',
+  'public-encrypt',
+  'elliptic',
+]
 
 function getDefaultConfiguration() {
   return {
@@ -16,19 +26,22 @@ function getDefaultConfiguration() {
     },
     plugins: [
       new webpack.NormalModuleReplacementPlugin(/^ws$/, './wsWrapper'),
-      new webpack.NormalModuleReplacementPlugin(
-        /^\.\/wallet\/index$/,
-        './wallet-web',
-      ),
-      new webpack.NormalModuleReplacementPlugin(
-        /^.*setup-api$/,
-        './setup-api-web',
-      ),
       new webpack.ProvidePlugin({ process: 'process/browser' }),
       new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
       new webpack.IgnorePlugin({
         resourceRegExp: /^\.\/wordlists\/(?!english)/,
         contextRegExp: /bip39\/src$/,
+      }),
+      // this is a bit of a hack to prevent 'bn.js' from being installed 6 times
+      // TODO: any package that is updated to use bn.js 5.x needs to be removed from `bnJsReplaces` above
+      new webpack.NormalModuleReplacementPlugin(/^bn.js$/, (resource) => {
+        if (
+          bnJsReplaces.some((pkg) =>
+            resource.context.includes(`node_modules/${pkg}`),
+          )
+        ) {
+          resource.request = 'diffie-hellman/node_modules/bn.js'
+        }
       }),
     ],
     module: {
@@ -38,7 +51,6 @@ function getDefaultConfiguration() {
       alias: {
         ws: './dist/npm/client/wsWrapper.js',
         'https-proxy-agent': false,
-        'bn.js': path.join(__dirname, 'node_modules/bn.js/lib/bn.js'),
       },
       extensions: ['.js', '.json'],
       fallback: {
@@ -55,12 +67,12 @@ function getDefaultConfiguration() {
 }
 
 module.exports = [
-  (env, argv) => {
-    const config = getDefaultConfiguration()
-    config.mode = 'development'
-    config.output.filename = `xrpl-latest.js`
-    return config
-  },
+  // (env, argv) => {
+  //   const config = getDefaultConfiguration()
+  //   config.mode = 'development'
+  //   config.output.filename = `xrpl-latest.js`
+  //   return config
+  // },
   (env, argv) => {
     const config = getDefaultConfiguration()
     config.mode = 'production'

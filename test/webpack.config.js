@@ -3,6 +3,15 @@ const path = require('path')
 const webpack = require('webpack')
 const assert = require('assert')
 
+const bnJsReplaces = [
+  'tiny-secp256k1',
+  'asn1.js',
+  'create-ecdh',
+  'miller-rabin',
+  'public-encrypt',
+  'elliptic',
+]
+
 function webpackForTest(testFileName) {
   const match = testFileName.match(/\/?([^\/]*)\.ts$/)
   if (!match) {
@@ -30,6 +39,17 @@ function webpackForTest(testFileName) {
       new webpack.IgnorePlugin({
         resourceRegExp: /^\.\/wordlists\/(?!english)/,
         contextRegExp: /bip39\/src$/,
+      }),
+      // this is a bit of a hack to prevent 'bn.js' from being installed 6 times
+      // TODO: any package that is updated to use bn.js 5.x needs to be removed from `bnJsReplaces` above
+      new webpack.NormalModuleReplacementPlugin(/^bn.js$/, (resource) => {
+        if (
+          bnJsReplaces.some((pkg) =>
+            resource.context.includes(`node_modules/${pkg}`),
+          )
+        ) {
+          resource.request = 'diffie-hellman/node_modules/bn.js'
+        }
       }),
     ],
     module: {
@@ -64,7 +84,6 @@ function webpackForTest(testFileName) {
       alias: {
         ws: './dist/npm/client/wsWrapper.js',
         'https-proxy-agent': false,
-        'bn.js': path.join(__dirname, 'node_modules/bn.js/lib/bn.js'),
       },
       extensions: ['.ts', '.js', '.json'],
       fallback: {
