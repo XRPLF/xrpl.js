@@ -24,7 +24,7 @@ interface ClassicAccountAndTag {
  * @param this - A client.
  * @param transaction - A {@link Transaction} in JSON format
  * @param signersCount - The expected number of signers for this transaction.
- * Used for multisign.
+ * Only used for multisigned transactions.
  * @returns The autofilled transaction.
  */
 async function autofill<T extends Transaction>(
