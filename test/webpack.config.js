@@ -27,6 +27,10 @@ function webpackForTest(testFileName) {
     plugins: [
       new webpack.ProvidePlugin({ process: 'process/browser' }),
       new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^\.\/wordlists\/(?!english)/,
+        contextRegExp: /bip39\/src$/,
+      }),
     ],
     module: {
       rules: [
