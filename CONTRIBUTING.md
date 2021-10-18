@@ -11,7 +11,6 @@ To set up the repository:
 
 To build the library:
 ```bash
-npm install
 npm run build
 ```
 
@@ -93,7 +92,7 @@ npm run docgen
 9. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
 
 ## Mailing Lists
-We have a low-traffic mailing list for announcements of new `xrpl.js` releases. (About 1 email every couple of week)
+We have a low-traffic mailing list for announcements of new `xrpl.js` releases. (About 1 email every couple of weeks)
 
 + [Subscribe to xrpl-announce](https://groups.google.com/g/xrpl-announce)
 
