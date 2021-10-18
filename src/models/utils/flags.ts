@@ -31,7 +31,6 @@ import { isFlagEnabled } from '.'
  * @param flags - A number which is the bitwise and of all enabled AccountRootFlagsInterface.
  * @returns An interface with all flags as booleans.
  */
-// eslint-disable-next-line import/no-unused-modules -- Used by end user
 export function parseAccountRootFlags(
   flags: number,
 ): AccountRootFlagsInterface {
