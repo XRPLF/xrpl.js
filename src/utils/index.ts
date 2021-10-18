@@ -33,6 +33,14 @@ import {
   hashEscrow,
   hashPaymentChannel,
 } from './hashes'
+import {
+  percentToTransferRate,
+  decimalToTransferRate,
+  transferRateToDecimal,
+  percentToQuality,
+  decimalToQuality,
+  qualityToDecimal,
+} from './quality'
 import signPaymentChannelClaim from './signPaymentChannelClaim'
 import {
   rippleTimeToISOTime,
@@ -120,6 +128,12 @@ export {
   ISOTimeToRippleTime,
   rippleTimeToUnixTime,
   unixTimeToRippleTime,
+  percentToQuality,
+  decimalToQuality,
+  percentToTransferRate,
+  decimalToTransferRate,
+  transferRateToDecimal,
+  qualityToDecimal,
   isValidSecret,
   isValidAddress,
   hashes,
