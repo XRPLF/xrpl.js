@@ -25,7 +25,7 @@ What is `xrpl.js` used for? The applications on the list linked above use `xrpl.
 
 ### Requirements
 
-+ **[Node.js v14](https://nodejs.org/)** is recommended. Other versions may work but are not frequently tested.
++ **[Node.js v14](https://nodejs.org/)** is recommended. We also support v12 and v16. Other versions may work but are not frequently tested.
 + **[npm](https://www.npmjs.com/)** is recommended. `yarn` may work but we use `package-lock.json`.
 
 ## Getting Started
@@ -133,38 +133,6 @@ We have a low-traffic mailing list for announcements of new `xrpl.js` releases. 
 If you're using the XRP Ledger in production, you should run a [rippled server](https://github.com/ripple/rippled) and subscribe to the ripple-server mailing list as well.
 
 + [Subscribe to ripple-server](https://groups.google.com/g/ripple-server)
-
-## Development
-
-To build the library for Node.js and the browser:
-
-```
-$ npm run build
-```
-
-**Tip:** This can take a minute or two to complete.
-
-The TypeScript compiler will [output](./tsconfig.json#L7) the resulting JS files in `./dist/npm/`.
-
-webpack will output the resulting JS files in `./build/`.
-
-For details, see the `scripts` in `package.json`.
-
-## Running Tests
-
-### Unit Tests
-
-1. Clone the repository
-2. `cd` into the repository and install dependencies with `npm install`
-3. `npm test`
-
-### Linting
-
-Run `npm run lint` to lint the code with `eslint`.
-
-## Generating Documentation
-
-Update the documentation by running `npm run docgen`.
 
 ## More Information
 
