@@ -23,14 +23,34 @@ describe('Client', function () {
 
   const allTestSuites = loadTestSuites()
 
+  const testExceptions = new Set([
+    // instance variables on Client
+    'feeCushion',
+    'maxFeeXRP',
+    'connection',
+    'url',
+    // tested in integration tests
+    'submitAndWait',
+    'fundWallet',
+    // tested in setup and in client.ts and connection.ts
+    'connect',
+    'disconnect',
+    // used in subscriptions, can't really test directly
+    'on',
+    // copy of autofill
+    'prepareTransaction',
+    // I have no clue what this particular variable is - it doesn't exist anywhere in our codebase
+    'domain',
+  ])
+
   // Report any missing tests.
   const allTestedMethods = new Set(
     allTestSuites.map((testsuite) => testsuite.name),
   )
   for (const methodName of allPublicMethods) {
-    if (!allTestedMethods.has(methodName)) {
+    if (!allTestedMethods.has(methodName) && !testExceptions.has(methodName)) {
       /** TODO: Remove the skip, rename methods. */
-      // eslint-disable-next-line mocha/no-skipped-tests -- skip these tests for now.
+      // eslint-disable-next-line mocha/no-skipped-tests -- See above TODO
       it.skip(`${methodName} - no test suite found`, function () {
         throw new XrplError(
           `Test file not found! Create file "test/client/${methodName}.ts".`,
