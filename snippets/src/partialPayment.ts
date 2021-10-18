@@ -11,19 +11,20 @@ async function main(): Promise<void> {
   const { wallet: wallet1 } = await client.fundWallet()
   const { wallet: wallet2 } = await client.fundWallet()
 
-  const currency_code = 'FOO'
   const trust_set_tx: TrustSet = {
     TransactionType: 'TrustSet',
-    Account: wallet2.getClassicAddress(),
+    Account: wallet2.classicAddress,
     LimitAmount: {
-      currency: currency_code,
-      issuer: wallet1.getClassicAddress(),
+      currency: 'FOO',
+      issuer: wallet1.classicAddress,
       // Value for the new IOU - 10000000000 - is arbitarily chosen.
       value: '10000000000',
     },
   }
 
-  await client.submit(wallet2, trust_set_tx)
+  await client.submit(trust_set_tx, {
+    wallet: wallet2,
+  })
 
   console.log('Balances after trustline is created')
   await displayBalance(wallet1.classicAddress)
@@ -33,17 +34,19 @@ async function main(): Promise<void> {
   const issue_quantity = '3840'
   const payment: Payment = {
     TransactionType: 'Payment',
-    Account: wallet1.getClassicAddress(),
+    Account: wallet1.classicAddress,
     Amount: {
-      currency: currency_code,
+      currency: 'FOO',
       value: issue_quantity,
-      issuer: wallet1.getClassicAddress(),
+      issuer: wallet1.classicAddress,
     },
-    Destination: wallet2.getClassicAddress(),
+    Destination: wallet2.classicAddress,
   }
 
   // submit payment
-  const initialPayment = await client.submit(wallet1, payment)
+  const initialPayment = await client.submit(payment, {
+    wallet: wallet1,
+  })
   console.log(initialPayment)
 
   console.log('Balances after issuer(wallet1) sends IOU("FOO") to wallet2')
@@ -61,18 +64,20 @@ async function main(): Promise<void> {
    */
   const partialPayment: Payment = {
     TransactionType: 'Payment',
-    Account: wallet2.getClassicAddress(),
+    Account: wallet2.classicAddress,
     Amount: {
-      currency: currency_code,
+      currency: 'FOO',
       value: '4000',
-      issuer: wallet1.getClassicAddress(),
+      issuer: wallet1.classicAddress,
     },
-    Destination: wallet1.getClassicAddress(),
+    Destination: wallet1.classicAddress,
     Flags: PaymentFlags.tfPartialPayment,
   }
 
   // submit payment
-  const submitResponse = await client.submit(wallet2, partialPayment)
+  const submitResponse = await client.submit(partialPayment, {
+    wallet: wallet2,
+  })
   console.log(submitResponse)
 
   console.log(

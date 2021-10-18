@@ -17,7 +17,9 @@ async function main(): Promise<void> {
     Account: wallet1.classicAddress,
     RegularKey: regularKeyWallet.classicAddress,
   }
-  const response = await client.submitReliable(wallet1, tx)
+  const response = await client.submitAndWait(tx, {
+    wallet: wallet1,
+  })
 
   console.log('Response for successful SetRegularKey tx')
   console.log(response)
@@ -29,7 +31,9 @@ async function main(): Promise<void> {
     Amount: '1000',
   }
 
-  const submitTx = await client.submit(regularKeyWallet, payment)
+  const submitTx = await client.submit(payment, {
+    wallet: wallet1,
+  })
   console.log('Response for tx signed using Regular Key')
   console.log(submitTx)
   console.log('Balances after payment')

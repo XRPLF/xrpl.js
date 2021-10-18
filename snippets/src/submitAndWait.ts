@@ -21,13 +21,15 @@ async function sendReliableTx(): Promise<void> {
 
   const payment: Payment = {
     TransactionType: 'Payment',
-    Account: wallet1.getClassicAddress(),
+    Account: wallet1.classicAddress,
     Amount: '1000',
-    Destination: wallet2.getClassicAddress(),
+    Destination: wallet2.classicAddress,
   }
 
   // Reliable submission of tx, meaning the tx was validated on a ledger and is final.
-  const paymentResponse = await client.submitReliable(wallet1, payment)
+  const paymentResponse = await client.submitAndWait(payment, {
+    wallet: wallet1,
+  })
   console.log(paymentResponse)
 
   console.log('Balances of wallets before Payment tx')

@@ -22,23 +22,23 @@ async function claimPayChannel(): Promise<void> {
 
   const paymentChannelCreate: PaymentChannelCreate = {
     TransactionType: 'PaymentChannelCreate',
-    Account: wallet1.getClassicAddress(),
+    Account: wallet1.classicAddress,
     Amount: '100',
-    Destination: wallet2.getClassicAddress(),
+    Destination: wallet2.classicAddress,
     SettleDelay: 86400,
     PublicKey: wallet1.publicKey,
   }
 
-  const paymentChannelResponse = await client.submitReliable(
-    wallet1,
+  const paymentChannelResponse = await client.submitAndWait(
     paymentChannelCreate,
+    { wallet: wallet1 },
   )
   console.log(paymentChannelResponse)
 
   // check that the object was actually created
   const accountObjectsRequest: AccountObjectsRequest = {
     command: 'account_objects',
-    account: wallet1.getClassicAddress(),
+    account: wallet1.classicAddress,
   }
 
   const accountObjects = (await client.request(accountObjectsRequest)).result
@@ -47,17 +47,19 @@ async function claimPayChannel(): Promise<void> {
   console.log(accountObjects)
 
   const paymentChannelClaim: PaymentChannelClaim = {
-    Account: wallet1.getClassicAddress(),
+    Account: wallet1.classicAddress,
     TransactionType: 'PaymentChannelClaim',
     Channel: hashes.hashPaymentChannel(
-      wallet1.getClassicAddress(),
-      wallet2.getClassicAddress(),
+      wallet1.classicAddress,
+      wallet2.classicAddress,
       paymentChannelResponse.result.Sequence ?? 0,
     ),
     Amount: '100',
   }
 
-  const channelClaimResponse = await client.submit(wallet1, paymentChannelClaim)
+  const channelClaimResponse = await client.submit(paymentChannelClaim, {
+    wallet: wallet1,
+  })
   console.log(channelClaimResponse)
 
   console.log('Balances of wallets after Payment Channel is claimed')
