@@ -39,8 +39,11 @@ describe('Client', function () {
     'on',
     // copy of autofill
     'prepareTransaction',
-    // I have no clue what this particular variable is - it doesn't exist anywhere in our codebase
+    // inherited from EventEmitter
     'domain',
+    '_eventsCount',
+    '_events',
+    '_maxListeners',
   ])
 
   // Report any missing tests.
