@@ -33,6 +33,7 @@ function getDefaultConfiguration() {
       }),
       // this is a bit of a hack to prevent 'bn.js' from being installed 6 times
       // TODO: any package that is updated to use bn.js 5.x needs to be removed from `bnJsReplaces` above
+      // https://github.com/webpack/webpack/issues/5593#issuecomment-390356276
       new webpack.NormalModuleReplacementPlugin(/^bn.js$/, (resource) => {
         if (
           bnJsReplaces.some((pkg) =>
