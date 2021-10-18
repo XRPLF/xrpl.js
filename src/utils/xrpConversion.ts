@@ -13,6 +13,7 @@ const SANITY_CHECK = /^-?[0-9.]+$/u
  * @param dropsToConvert - Drops to convert to XRP.
  * @returns Amount in XRP.
  * @throws When drops amount is invalid.
+ * @category Utilities
  */
 export function dropsToXrp(dropsToConvert: BigNumber.Value): string {
   /*
@@ -58,6 +59,7 @@ export function dropsToXrp(dropsToConvert: BigNumber.Value): string {
  * @param xrpToConvert - Amount in XRP.
  * @returns Amount in drops.
  * @throws When amount in xrp is invalid.
+ * @category Utilities
  */
 export function xrpToDrops(xrpToConvert: BigNumber.Value): string {
   // Important: specify base BASE_TEN to avoid exponential notation, e.g. '1e-7'.

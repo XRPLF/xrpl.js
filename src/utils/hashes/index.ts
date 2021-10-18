@@ -47,6 +47,7 @@ function currencyToHex(currency: string): string {
  *
  * @param txBlobHex - The binary transaction blob as a hexadecimal string.
  * @returns The hash to sign.
+ * @category Utilities
  */
 export function hashTx(txBlobHex: string): string {
   const prefix = HashPrefix.TRANSACTION_SIGN.toString(HEX).toUpperCase()
@@ -65,6 +66,7 @@ export function hashTx(txBlobHex: string): string {
  *
  * @param address - The classic account address.
  * @returns The Ledger Object Index for the account.
+ * @category Utilities
  */
 export function hashAccountRoot(address: string): string {
   return sha512Half(ledgerSpaceHex('account') + addressToHex(address))
@@ -82,6 +84,7 @@ export function hashAccountRoot(address: string): string {
  *
  * @param address - The classic account address of the SignerList owner (starting with r).
  * @returns The Index of the account's SignerList object.
+ * @category Utilities
  */
 export function hashSignerListId(address: string): string {
   return sha512Half(
@@ -102,6 +105,7 @@ export function hashSignerListId(address: string): string {
  * @param address - The classic account address of the SignerList owner (starting with r).
  * @param sequence - Sequence of the Offer.
  * @returns The Index of the account's Offer object.
+ * @category Utilities
  */
 export function hashOfferId(address: string, sequence: number): string {
   const hexPrefix = ledgerSpaces.offer
@@ -120,6 +124,7 @@ export function hashOfferId(address: string, sequence: number): string {
  * @param address2 - The other address in the Trustline.
  * @param currency - Currency in the Trustline.
  * @returns The hash of the Trustline.
+ * @category Utilities
  */
 export function hashTrustline(
   address1: string,
@@ -147,6 +152,7 @@ export function hashTrustline(
  * @param address - Address of the Escrow.
  * @param sequence - OfferSequence of the Escrow.
  * @returns The hash of the Escrow LedgerEntry.
+ * @category Utilities
  */
 export function hashEscrow(address: string, sequence: number): string {
   return sha512Half(
@@ -163,6 +169,7 @@ export function hashEscrow(address: string, sequence: number): string {
  * @param dstAddress - Destination Account of the Payment Channel.
  * @param sequence - Sequence number of the Transaction that created the Payment Channel.
  * @returns Hash of the Payment Channel.
+ * @category Utilities
  */
 export function hashPaymentChannel(
   address: string,

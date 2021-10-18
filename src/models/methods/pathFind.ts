@@ -7,7 +7,11 @@ interface BasePathFindRequest extends BaseRequest {
   subcommand: string
 }
 
-/** Start sending pathfinding information. */
+/**
+ * Start sending pathfinding information.
+ *
+ * @internal
+ */
 interface PathFindCreateRequest extends BasePathFindRequest {
   subcommand: 'create'
   /**

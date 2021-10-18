@@ -12,6 +12,7 @@ interface DeriveOptions {
  *
  * @param options - Public key and destination tag to encode as an X-Address.
  * @returns X-Address.
+ * @category Utilities
  */
 function deriveXAddress(options: DeriveOptions): string {
   const classicAddress = deriveAddress(options.publicKey)

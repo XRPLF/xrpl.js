@@ -11,6 +11,7 @@ import { xrpToDrops } from './xrpConversion'
  * @param signature - Signature produced from signing paymentChannelClaim.
  * @param publicKey - Public key that signed the paymentChannelClaim.
  * @returns True if the channel is valid.
+ * @category Utilities
  */
 // eslint-disable-next-line max-params -- Needs 4 params
 function verifyPaymentChannelClaim(

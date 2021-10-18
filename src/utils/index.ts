@@ -14,6 +14,13 @@ import {
   isValidXAddress,
   xAddressToClassicAddress,
 } from 'ripple-address-codec'
+import {
+  encode,
+  decode,
+  encodeForMultisigning,
+  encodeForSigning,
+  encodeForSigningClaim,
+} from 'ripple-binary-codec'
 
 import { Response } from '../models/methods'
 
@@ -73,6 +80,7 @@ function isValidSecret(secret: string): boolean {
  *
  * @param address - Address to validate.
  * @returns True if address is a valid X-Address or classic address.
+ * @category Utilities
  */
 function isValidAddress(address: string): boolean {
   return isValidXAddress(address) || isValidClassicAddress(address)
@@ -83,6 +91,7 @@ function isValidAddress(address: string): boolean {
  *
  * @param string - The string to convert to Hex.
  * @returns The Hex equivalent of the string.
+ * @category Utilities
  */
 function convertStringToHex(string: string): string {
   return Buffer.from(string, 'utf8').toString('hex').toUpperCase()
@@ -98,12 +107,16 @@ function convertStringToHex(string: string): string {
  *
  * @param response - Response to check for more pages on.
  * @returns Whether the response has more pages of data.
+ * @category Utilities
  */
 function hasNextPage(response: Response): boolean {
   // eslint-disable-next-line @typescript-eslint/dot-notation -- only checking if it exists
   return Boolean(response.result['marker'])
 }
 
+/**
+ * @category Utilities
+ */
 const hashes = {
   hashSignedTx,
   hashTx,
@@ -156,4 +169,9 @@ export {
   decodeAccountPublic,
   encodeXAddress,
   decodeXAddress,
+  encode,
+  decode,
+  encodeForMultisigning,
+  encodeForSigning,
+  encodeForSigningClaim,
 }
