@@ -67,12 +67,12 @@ function getDefaultConfiguration() {
 }
 
 module.exports = [
-  // (env, argv) => {
-  //   const config = getDefaultConfiguration()
-  //   config.mode = 'development'
-  //   config.output.filename = `xrpl-latest.js`
-  //   return config
-  // },
+  (env, argv) => {
+    const config = getDefaultConfiguration()
+    config.mode = 'development'
+    config.output.filename = `xrpl-latest.js`
+    return config
+  },
   (env, argv) => {
     const config = getDefaultConfiguration()
     config.mode = 'production'
