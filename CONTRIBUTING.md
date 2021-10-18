@@ -15,7 +15,7 @@ npm install
 npm run build
 ```
 
-### Run the linter
+## Run the linter
 
 ```bash
 npm install
