@@ -131,7 +131,9 @@ export function qualityToDecimal(quality: number): string {
  */
 export function transferRateToDecimal(rate: number): string {
   if (!Number.isInteger(rate)) {
-    throw new ValidationError('Quality must be an integer')
+    throw new ValidationError(
+      'Error decoding, transfer Rate must be an integer',
+    )
   }
 
   if (rate === 0) {
@@ -141,7 +143,7 @@ export function transferRateToDecimal(rate: number): string {
   const decimal = new BigNumber(rate).minus(ONE_BILLION).dividedBy(ONE_BILLION)
 
   if (decimal.isLessThan(0)) {
-    throw new ValidationError('Negative quality not allowed')
+    throw new ValidationError('Error decoding, negative transfer rate')
   }
 
   return decimal.toString(BASE_TEN)
