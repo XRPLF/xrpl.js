@@ -1,6 +1,5 @@
 import { assert } from 'chai'
 import { decode, encode } from 'ripple-binary-codec/dist'
-import { JsonObject } from 'ripple-binary-codec/dist/types/serialized-type'
 
 import { Transaction, ValidationError } from 'xrpl-local'
 import Wallet from 'xrpl-local/wallet'
@@ -15,8 +14,6 @@ const publicKey =
 const privateKey =
   '00141BA006D3363D2FB2785E8DF4E44D3A49908780CB4FB51F6D217C08C021429F'
 const address = 'rhvh5SrgBL5V8oeV9EpDuVszeJSSCEkbPc'
-const seed = 'ss1x3KLrSvfg7irFc1D929WXZ7z9H'
-const wallet = Wallet.fromSeed(seed)
 const verifyWallet = new Wallet(publicKey, privateKey)
 
 const tx: Transaction = {
@@ -27,46 +24,6 @@ const tx: Transaction = {
   Sequence: 1,
   Fee: '12',
   SigningPubKey: publicKey,
-}
-
-const unsignedTx1: Transaction = {
-  TransactionType: 'TrustSet',
-  Account: 'rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC',
-  Fee: '30000',
-  Flags: 262144,
-  LimitAmount: {
-    currency: 'USD',
-    issuer: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
-    value: '100',
-  },
-  Sequence: 2,
-}
-
-const unsignedSecret1 = 'spzGHmohX9bAM6gzF4m9FvJmJb1CR'
-
-const multisignTx1: Transaction = {
-  TransactionType: 'TrustSet',
-  Account: 'rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC',
-  Fee: '30000',
-  Flags: 262144,
-  LimitAmount: {
-    currency: 'USD',
-    issuer: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
-    value: '100',
-  },
-  Sequence: 2,
-  Signers: [
-    {
-      Signer: {
-        Account: 'rJvuSQhQR37czfxRou4vNWaM97uEhT4ShE',
-        SigningPubKey:
-          '02B78EEA571B2633180834CC6E7B4ED84FBF6811D12ECB59410E0C92D13B7726F5',
-        TxnSignature:
-          '304502210098009CEFA61EE9843BB7FC29B78CFFAACF28352A4A7CF3AAE79EF12D79BA50910220684F116266E5E4519A7A33F7421631EB8494082BE51A8B03FECCB3E59F77154A',
-      },
-    },
-  ],
-  SigningPubKey: '',
 }
 
 describe('Signer', function () {
@@ -160,36 +117,6 @@ describe('Signer', function () {
       TransactionType: 'TrustSet',
     }
     expectedMultisign = encode(multisignJSON)
-  })
-  it('sign', function () {
-    // Test case data generated using this tutorial - https://xrpl.org/send-xrp.html#send-xrp
-    const tx3: Transaction = {
-      TransactionType: 'Payment',
-      Account: 'rHLEki8gPUMnF72JnuALvnAMRhRemzhRke',
-      Amount: '22000000',
-      Destination: 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe',
-      Flags: 2147483648,
-      LastLedgerSequence: 20582339,
-      Fee: '12',
-      Sequence: 20582260,
-    }
-    const signedTxResponse = {
-      tx_blob:
-        '120000228000000024013A0F74201B013A0FC36140000000014FB18068400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F544744730450221009ECB5324717E14DD6970126271F05BC2626D2A8FA9F3797555D417F8257C1E6002206BDD74A0F30425F2BA9DB69C90F21B3E27735C190FB4F3A640F066ACBBF06AD98114B3263BD0A9BF9DFDBBBBD07F536355FF477BF0E98314F667B0CA50CC7709A220B0561B85E53A48461FA8',
-      hash: 'F73E975C70497A3DA61ADB76A3B39CD971A2DE017419A690BFAD6733B5FD8B3B',
-    }
-
-    const signedTx = wallet.sign(tx3)
-    assert.deepEqual(signedTx, signedTxResponse)
-  })
-
-  it('sign in multisign format', function () {
-    const multisignWallet = Wallet.fromSeed(unsignedSecret1)
-
-    assert.deepEqual(
-      decode(multisignWallet.sign(unsignedTx1, true).tx_blob),
-      multisignTx1 as unknown as JsonObject,
-    )
   })
 
   it('multisign runs successfully with Transaction objects', function () {
