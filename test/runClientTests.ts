@@ -29,7 +29,7 @@ describe('Client', function () {
     'maxFeeXRP',
     'connection',
     'url',
-    // tested in integration tests
+    // tested in integration tests, can't be tested with mockRippled
     'submitAndWait',
     'fundWallet',
     // tested in setup and in client.ts and connection.ts
