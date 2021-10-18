@@ -148,5 +148,7 @@ export function handleStreamPartialPayment(
     stream.warnings = warnings
 
     log('Partial payment received', JSON.stringify(stream))
+    // eslint-disable-next-line no-console -- we want to warn here when there's a partial payment
+    console.warn('Partial payment received', stream)
   }
 }
