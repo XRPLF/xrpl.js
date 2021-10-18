@@ -128,8 +128,12 @@ export function handlePartialPayment(
  * Check a transaction from a subscription stream for partial payment.
  *
  * @param stream - Stream Transaction to check for partial payment.
+ * @param log - The method used for logging by the connection (to report the partial payment).
  */
-export function handleStreamPartialPayment(stream: TransactionStream): void {
+export function handleStreamPartialPayment(
+  stream: TransactionStream,
+  log: (id: string, message: string) => void,
+): void {
   if (isPartialPayment(stream.transaction, stream.meta)) {
     const warnings = stream.warnings ?? []
 
@@ -142,5 +146,9 @@ export function handleStreamPartialPayment(stream: TransactionStream): void {
 
     /* eslint-disable-next-line no-param-reassign -- Handles the case where there are no warnings */
     stream.warnings = warnings
+
+    log('Partial payment received', JSON.stringify(stream))
+    // eslint-disable-next-line no-console -- we want to warn here when there's a partial payment
+    console.warn('Partial payment received', stream)
   }
 }

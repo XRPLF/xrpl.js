@@ -239,7 +239,8 @@ class Client extends EventEmitter {
     })
 
     this.connection.on('transaction', (tx) => {
-      handleStreamPartialPayment(tx)
+      // mutates `tx` to add warnings
+      handleStreamPartialPayment(tx, this.connection.trace)
       this.emit('transaction', tx)
     })
 
@@ -347,6 +348,7 @@ class Client extends EventEmitter {
         : undefined,
     })) as T
 
+    // mutates `response` to add warnings
     handlePartialPayment(req.command, response)
 
     return response

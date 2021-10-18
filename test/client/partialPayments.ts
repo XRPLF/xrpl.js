@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- required for formatting transactions */
 import { expect } from 'chai'
+import _ from 'lodash'
 
 import type { TransactionStream } from 'xrpl-local'
 
@@ -109,9 +110,9 @@ describe('client handling of tfPartialPayments', function () {
   })
 
   it('transaction_entry with XRP tfPartialPayment', async function () {
-    const mockResponse = rippled.transaction_entry
+    const mockResponse = _.cloneDeep(rippled.transaction_entry)
     mockResponse.result.tx_json.Amount = '1000'
-    this.mockRippled.addResponse('transaction_entry', rippled.transaction_entry)
+    this.mockRippled.addResponse('transaction_entry', mockResponse)
     const resp = await this.client.request({ command: 'transaction_entry' })
 
     expect(resp.warnings).to.deep.equal([
@@ -146,10 +147,8 @@ describe('client handling of tfPartialPayments', function () {
       done()
     })
 
-    const partial: any = rippled.streams.transaction
-    partial.transaction = rippled.tx.Payment.result
-    partial.meta.delivered_amount = '1000'
-    partial.transaction.Flags = 0x00020000
-    this.client.connection.onMessage(JSON.stringify(partial))
+    this.client.connection.onMessage(
+      JSON.stringify(rippled.streams.partialPaymentTransaction),
+    )
   })
 })
