@@ -42,14 +42,16 @@ async function sendEscrow(): Promise<void> {
     FinishAfter: finishAfter,
   }
 
-  const createEscrowResponse = await client.submitReliable(wallet1, createTx)
+  const createEscrowResponse = await client.submitAndWait(createTx, {
+    wallet: wallet1,
+  })
 
   console.log(createEscrowResponse)
 
   // check that the object was actually created
   const accountObjectsRequest: AccountObjectsRequest = {
     command: 'account_objects',
-    account: wallet1.getClassicAddress(),
+    account: wallet1.classicAddress,
   }
 
   const accountObjects = (await client.request(accountObjectsRequest)).result
@@ -62,12 +64,14 @@ async function sendEscrow(): Promise<void> {
 
   const finishTx: EscrowFinish = {
     TransactionType: 'EscrowFinish',
-    Account: wallet1.getClassicAddress(),
-    Owner: wallet1.getClassicAddress(),
+    Account: wallet1.classicAddress,
+    Owner: wallet1.classicAddress,
     OfferSequence: Number(createEscrowResponse.result.Sequence),
   }
 
-  await client.submit(wallet1, finishTx)
+  await client.submit(finishTx, {
+    wallet: wallet1,
+  })
 
   console.log('Balances of wallets after Escrow was sent')
   console.log(
