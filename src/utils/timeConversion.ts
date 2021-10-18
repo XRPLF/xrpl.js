@@ -5,6 +5,7 @@ const RIPPLE_EPOCH_DIFF = 0x386d4380
  *
  * @param rpepoch - (seconds since 1/1/2000 GMT).
  * @returns Milliseconds since unix epoch.
+ * @category Utilities
  */
 function rippleTimeToUnixTime(rpepoch: number): number {
   return (rpepoch + RIPPLE_EPOCH_DIFF) * 1000
@@ -15,6 +16,7 @@ function rippleTimeToUnixTime(rpepoch: number): number {
  *
  * @param timestamp - (ms since unix epoch).
  * @returns Seconds since Ripple Epoch (1/1/2000 GMT).
+ * @category Utilities
  */
 function unixTimeToRippleTime(timestamp: number): number {
   return Math.round(timestamp / 1000) - RIPPLE_EPOCH_DIFF
@@ -25,6 +27,7 @@ function unixTimeToRippleTime(timestamp: number): number {
  *
  * @param rippleTime - Is the number of seconds since Ripple Epoch (1/1/2000 GMT).
  * @returns Iso8601 international standard date format.
+ * @category Utilities
  */
 function rippleTimeToISOTime(rippleTime: number): string {
   return new Date(rippleTimeToUnixTime(rippleTime)).toISOString()
@@ -35,6 +38,7 @@ function rippleTimeToISOTime(rippleTime: number): string {
  *
  * @param iso8601 - International standard date format.
  * @returns Seconds since ripple epoch (1/1/2000 GMT).
+ * @category Utilities
  */
 function ISOTimeToRippleTime(iso8601: string): number {
   return unixTimeToRippleTime(Date.parse(iso8601))

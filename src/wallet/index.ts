@@ -105,7 +105,7 @@ interface FromMnemonicOptions extends WalletBaseOptions {
  * // }
  * ```
  *
- * @category Offline Signing
+ * @category Signing
  */
 class Wallet {
   public readonly publicKey: string

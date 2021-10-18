@@ -155,11 +155,12 @@ function getTrustlineQuantity(node: NormalizedNode): BalanceChange[] | null {
 }
 
 /**
- *  Computes the complete list of every balance that changed in the ledger
- *  as a result of the given transaction.
+ * Computes the complete list of every balance that changed in the ledger
+ * as a result of the given transaction.
  *
- *  @param metadata - Transaction metada.
- *  @returns Parsed balance changes.
+ * @param metadata - Transaction metada.
+ * @returns Parsed balance changes.
+ * @category Utilities
  */
 export default function getBalanceChanges(
   metadata: TransactionMetadata,
