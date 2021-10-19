@@ -33,7 +33,7 @@ What is `xrpl.js` used for? The applications on the list linked above use `xrpl.
 In an existing project (with `package.json`), install `xrpl.js`:
 
 ```
-$ npm install xrpl@beta
+$ npm install xrpl
 ```
 
 Example usage:
@@ -66,7 +66,7 @@ If you want to use `xrpl.js` with React Native you will need to have some of the
 
     ```shell
     npm install react-native-crypto
-    npm install xrpl@beta
+    npm install xrpl
     # install peer deps
     npm install react-native-randombytes
     # install latest rn-nodeify
