@@ -27,10 +27,15 @@ async function getTransaction(): Promise<void> {
     })
     console.log(tx)
 
+    /*
+     * delivered_amount is the amount actually received by the destination account.
+     * Use this field to determine how much was delivered, regardless of whether the transaction is a partial payment.
+     * https://xrpl.org/transaction-metadata.html#delivered_amount
+     */
     console.log(
-      'deliveredAmount:',
+      'delivered_amount:',
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-member-access -- assertion needed
-      (tx.result.meta as TransactionMetadata).DeliveredAmount,
+      (tx.result.meta as TransactionMetadata).delivered_amount,
     )
   }
 
