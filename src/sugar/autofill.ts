@@ -18,12 +18,16 @@ interface ClassicAccountAndTag {
 }
 
 /**
- * Autofills fields in a transaction.
+ * Autofills fields in a transaction. This will set `Sequence`, `Fee`,
+ * `lastLedgerSequence` according to the current state of the server this Client
+ * is connected to. It also converts all X-Addresses to classic addresses and
+ * flags interfaces into numbers.
  *
  * @param this - A client.
- * @param transaction - A transaction to autofill fields.
- * @param signersCount - The expected number of signers for this transaction. Used for multisign.
- * @returns An autofilled transaction.
+ * @param transaction - A {@link Transaction} in JSON format
+ * @param signersCount - The expected number of signers for this transaction.
+ * Only used for multisigned transactions.
+ * @returns The autofilled transaction.
  */
 async function autofill<T extends Transaction>(
   this: Client,
