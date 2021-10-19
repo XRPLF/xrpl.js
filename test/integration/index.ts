@@ -41,4 +41,6 @@ export * from './requests/utility'
 export * from './fundWallet'
 export * from './integration'
 export * from './regularKey'
-export * from './test'
+
+// Ensure you export all added tests above "export * from './finalTest'", otherwise they will not be run.
+export * from './finalTest'
