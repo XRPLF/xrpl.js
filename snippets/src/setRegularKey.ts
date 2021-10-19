@@ -4,9 +4,7 @@ const client = new Client('wss://s.altnet.rippletest.net:51233')
 
 /*
  * The snippet walks us through an example usage of RegularKey.
- * It generates a wallet (key-pair) and assigns it to the first wallet using `SetRegularKey`.
- * Later, when first wallet tries to send payment to some other wallet and
- * signs using the regular key wallet, the transaction goes through.
+ * Later,
  */
 async function setRegularKey(): Promise<void> {
   await client.connect()
@@ -18,6 +16,7 @@ async function setRegularKey(): Promise<void> {
   console.log(await client.getXrpBalance(wallet1.classicAddress))
   console.log(await client.getXrpBalance(wallet2.classicAddress))
 
+  // assigns key-pair(regularKeyWallet) to wallet1 using `SetRegularKey`.
   const tx: SetRegularKey = {
     TransactionType: 'SetRegularKey',
     Account: wallet1.classicAddress,
@@ -30,6 +29,10 @@ async function setRegularKey(): Promise<void> {
   console.log('Response for successful SetRegularKey tx')
   console.log(response)
 
+  /*
+   * when wallet1 sends payment to wallet2 and
+   * signs using the regular key wallet, the transaction goes through.
+   */
   const payment: Payment = {
     TransactionType: 'Payment',
     Account: wallet1.classicAddress,

@@ -9,15 +9,12 @@ import {
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
 void sendEscrow()
-/*
- * The snippet walks us through creating wallets as prerequisite
- * and then creating an Escrow using `EscrowCreate` and submit and wait for tx to be validated.
- * Then the creator finishes the Escrow using `EscrowFinish` to release the Escrow
- * and we see the balances to verify.
- */
+
+// The snippet walks us through creating and finishing escrows.
 async function sendEscrow(): Promise<void> {
   await client.connect()
 
+  // creating wallets as prerequisite
   const { wallet: wallet1 } = await client.fundWallet()
   const { wallet: wallet2 } = await client.fundWallet()
 
@@ -30,6 +27,7 @@ async function sendEscrow(): Promise<void> {
   // finish 2 seconds after the escrow is actually created and tx is validated.
   const finishAfter = isoTimeToRippleTime(Date()) + 2
 
+  // creating an Escrow using `EscrowCreate` and submit and wait for tx to be validated.
   const createTx: EscrowCreate = {
     TransactionType: 'EscrowCreate',
     Account: wallet1.address,
@@ -56,6 +54,7 @@ async function sendEscrow(): Promise<void> {
   console.log("Escrow object exists in `wallet1`'s account")
   console.log(accountObjects)
 
+  // the creator finishes the Escrow using `EscrowFinish` to release the Escrow
   const finishTx: EscrowFinish = {
     TransactionType: 'EscrowFinish',
     Account: wallet1.classicAddress,
@@ -67,6 +66,7 @@ async function sendEscrow(): Promise<void> {
     wallet: wallet1,
   })
 
+  // we see the balances to verify.
   console.log('Balances of wallets after Escrow was sent')
   console.log(
     await client.getXrpBalance(wallet1.classicAddress),

@@ -10,14 +10,11 @@ const client = new Client('wss://s.altnet.rippletest.net:51233')
 
 void claimPayChannel()
 
-/*
- * The snippet walks us through creating wallets as prerequisite
- * and then creating a Payment Channel and submit and wait for tx to be validated.
- * Then the destination claims the Payment Channel and we see the balances to verify.
- */
+// The snippet walks us through creating and claiming a Payment Channel.
 async function claimPayChannel(): Promise<void> {
   await client.connect()
 
+  // creating wallets as prerequisite
   const { wallet: wallet1 } = await client.fundWallet()
   const { wallet: wallet2 } = await client.fundWallet()
 
@@ -25,6 +22,7 @@ async function claimPayChannel(): Promise<void> {
   console.log(await client.getXrpBalance(wallet1.classicAddress))
   console.log(await client.getXrpBalance(wallet2.classicAddress))
 
+  // create a Payment Channel and submit and wait for tx to be validated
   const paymentChannelCreate: PaymentChannelCreate = {
     TransactionType: 'PaymentChannelCreate',
     Account: wallet1.classicAddress,
@@ -51,6 +49,7 @@ async function claimPayChannel(): Promise<void> {
 
   console.log(accountObjects)
 
+  // destination claims the Payment Channel and we see the balances to verify.
   const paymentChannelClaim: PaymentChannelClaim = {
     Account: wallet2.classicAddress,
     TransactionType: 'PaymentChannelClaim',
