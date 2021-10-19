@@ -2,10 +2,6 @@ import { Client, Payment, PaymentFlags, TrustSet } from '../../dist/npm'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
-async function displayBalance(account: string): Promise<void> {
-  console.log(await client.getBalances(account, { ledger_index: 'current' }))
-}
-
 // This snippet walks us through partial payment.
 async function partialPayment(): Promise<void> {
   await client.connect()
@@ -31,8 +27,8 @@ async function partialPayment(): Promise<void> {
   })
 
   console.log('Balances after trustline is created')
-  await displayBalance(wallet1.classicAddress)
-  await displayBalance(wallet2.classicAddress)
+  console.log(await client.getBalances(wallet1.classicAddress))
+  console.log(await client.getBalances(wallet2.classicAddress))
 
   // Initially, the issuer(wallet1) sends an amount to the other account(wallet2)
   const issue_quantity = '3840'
@@ -54,8 +50,8 @@ async function partialPayment(): Promise<void> {
   console.log(initialPayment)
 
   console.log('Balances after issuer(wallet1) sends IOU("FOO") to wallet2')
-  await displayBalance(wallet1.classicAddress)
-  await displayBalance(wallet2.classicAddress)
+  console.log(await client.getBalances(wallet1.classicAddress))
+  console.log(await client.getBalances(wallet2.classicAddress))
 
   /*
    * Send money less than the amount specified on 2 conditions:
@@ -87,8 +83,8 @@ async function partialPayment(): Promise<void> {
   console.log(
     "Balances after Partial Payment, when wallet2 tried to send 4000 FOO's",
   )
-  await displayBalance(wallet1.classicAddress)
-  await displayBalance(wallet2.classicAddress)
+  console.log(await client.getBalances(wallet1.classicAddress))
+  console.log(await client.getBalances(wallet2.classicAddress))
 
   await client.disconnect()
 }
