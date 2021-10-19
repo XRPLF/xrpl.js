@@ -16,7 +16,7 @@
     "test": "test"
   },
   "browser": {
-    "ws": "./dist/npm/client/wsWrapper.js"
+    "ws": "./dist/npm/client/WSWrapper.js"
   },
   "dependencies": {
     "bignumber.js": "^9.0.0",

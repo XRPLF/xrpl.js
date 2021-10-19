@@ -83,7 +83,7 @@ function webpackForTest(testFileName) {
     },
     resolve: {
       alias: {
-        ws: './dist/npm/client/wsWrapper.js',
+        ws: './dist/npm/client/WSWrapper.js',
         'https-proxy-agent': false,
       },
       extensions: ['.ts', '.js', '.json'],

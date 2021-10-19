@@ -24,7 +24,7 @@ function getDefaultConfiguration() {
       filename: `xrpl.default.js`,
     },
     plugins: [
-      new webpack.NormalModuleReplacementPlugin(/^ws$/, './wsWrapper'),
+      new webpack.NormalModuleReplacementPlugin(/^ws$/, './WSWrapper'),
       new webpack.ProvidePlugin({ process: 'process/browser' }),
       new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
       new webpack.IgnorePlugin({
@@ -49,7 +49,7 @@ function getDefaultConfiguration() {
     },
     resolve: {
       alias: {
-        ws: './dist/npm/client/wsWrapper.js',
+        ws: './dist/npm/client/WSWrapper.js',
         'https-proxy-agent': false,
       },
       extensions: ['.js', '.json'],
