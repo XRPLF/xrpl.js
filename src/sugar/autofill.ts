@@ -151,7 +151,7 @@ async function calculateFeePerTransactionType(
   signersCount = 0,
 ): Promise<void> {
   // netFee is usually 0.00001 XRP (10 drops)
-  const netFeeXRP = await client.getFeeXRP()
+  const netFeeXRP = await client.getFeeXrp()
   const netFeeDrops = xrpToDrops(netFeeXRP)
   let baseFee = new BigNumber(netFeeDrops)
 

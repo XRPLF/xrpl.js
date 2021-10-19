@@ -14,7 +14,7 @@ const BASE_10 = 10
  * @param cushion - The fee cushion to use.
  * @returns The transaction fee.
  */
-export default async function getFeeXRP(
+export default async function getFeeXrp(
   this: Client,
   cushion?: number,
 ): Promise<string> {
@@ -27,7 +27,7 @@ export default async function getFeeXRP(
 
   if (baseFee == null) {
     throw new XrplError(
-      'getFeeXRP: Could not get base_fee_xrp from server_info',
+      'getFeeXrp: Could not get base_fee_xrp from server_info',
     )
   }
 

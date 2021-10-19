@@ -2,7 +2,7 @@ export { default as autofill } from './autofill'
 
 export { getBalances, getXrpBalance } from './balances'
 
-export { default as getFeeXRP } from './fee'
+export { default as getFeeXrp } from './fee'
 
 export { default as getLedgerIndex } from './ledgerIndex'
 
