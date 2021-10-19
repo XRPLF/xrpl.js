@@ -16,7 +16,7 @@ async function claimPayChannel(): Promise<void> {
   const { wallet: wallet1 } = await client.fundWallet()
   const { wallet: wallet2 } = await client.fundWallet()
 
-  console.log('Balances of wallets before Payment Channel is claimed')
+  console.log('Balances of wallets before Payment Channel is claimed:')
   console.log(await client.getXrpBalance(wallet1.classicAddress))
   console.log(await client.getXrpBalance(wallet2.classicAddress))
 
@@ -66,5 +66,5 @@ async function claimPayChannel(): Promise<void> {
   console.log(await client.getXrpBalance(wallet1.classicAddress))
   console.log(await client.getXrpBalance(wallet2.classicAddress))
 
-  void client.disconnect()
+  await client.disconnect()
 }

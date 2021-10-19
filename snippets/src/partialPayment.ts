@@ -11,6 +11,7 @@ async function main(): Promise<void> {
   const { wallet: wallet1 } = await client.fundWallet()
   const { wallet: wallet2 } = await client.fundWallet()
 
+  // create a trustline to issue an IOU `FOO` and set limit on it.
   const trust_set_tx: TrustSet = {
     TransactionType: 'TrustSet',
     Account: wallet2.classicAddress,
