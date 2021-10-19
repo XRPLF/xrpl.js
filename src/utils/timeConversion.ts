@@ -40,8 +40,9 @@ function rippleTimeToISOTime(rippleTime: number): string {
  * @returns Seconds since ripple epoch (1/1/2000 GMT).
  * @category Utilities
  */
-function isoTimeToRippleTime(iso8601: string): number {
-  return unixTimeToRippleTime(Date.parse(iso8601))
+function isoTimeToRippleTime(iso8601: string | Date): number {
+  const isoDate = typeof iso8601 === 'string' ? new Date(iso8601) : iso8601
+  return unixTimeToRippleTime(isoDate.getTime())
 }
 
 export {

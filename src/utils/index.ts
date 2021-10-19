@@ -186,7 +186,7 @@ export {
   xrpToDrops,
   hasNextPage,
   rippleTimeToISOTime,
-  isoTimeToRippleTime as ISOTimeToRippleTime,
+  isoTimeToRippleTime,
   rippleTimeToUnixTime,
   unixTimeToRippleTime,
   percentToQuality,
