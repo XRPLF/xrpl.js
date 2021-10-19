@@ -7,8 +7,6 @@ import {
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
-void getTransaction()
-
 async function getTransaction(): Promise<void> {
   await client.connect()
   const ledger: LedgerResponse = await client.request({
@@ -39,3 +37,5 @@ async function getTransaction(): Promise<void> {
 
   await client.disconnect()
 }
+
+void getTransaction()

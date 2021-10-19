@@ -2,8 +2,6 @@ import { Client, Payment, RipplePathFindResponse } from '../../dist/npm'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
-void createTxWithPaths()
-
 async function createTxWithPaths(): Promise<void> {
   await client.connect()
 
@@ -47,3 +45,5 @@ async function createTxWithPaths(): Promise<void> {
 
   await client.disconnect()
 }
+
+void createTxWithPaths()
