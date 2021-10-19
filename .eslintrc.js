@@ -50,8 +50,6 @@ module.exports = {
     'multiline-comment-style': ['error', 'starred-block'],
     'jsdoc/check-examples': 'off',
 
-    // Allows the usage of @category -- TODO: try to add this in base config
-    'jsdoc/check-tag-names': 'off',
     'tsdoc/syntax': 'off',
     'jsdoc/require-description-complete-sentence': 'off',
   },
@@ -103,6 +101,9 @@ module.exports = {
 
         // setup/teardown client is easier to do in before/after, even if there is only one testcase
         'mocha/no-hooks-for-single-case': 'off',
+
+        // messes with fixtures
+        'consistent-default-export-name/default-import-match-filename': 'off',
       },
     },
     {

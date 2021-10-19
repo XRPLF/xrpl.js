@@ -1,6 +1,6 @@
 import { Amount } from '../common'
 
-import BaseLedgerEntry from './baseLedgerEntry'
+import BaseLedgerEntry from './BaseLedgerEntry'
 
 /**
  * A Check object describes a check, similar to a paper personal check, which

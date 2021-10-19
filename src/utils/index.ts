@@ -21,8 +21,8 @@ import { Response } from '../models/methods'
 import { PaymentChannelClaim } from '../models/transactions/paymentChannelClaim'
 import { Transaction } from '../models/transactions/transaction'
 
-import getBalanceChanges from './balanceChanges'
 import { deriveKeypair, deriveXAddress } from './derive'
+import getBalanceChanges from './getBalanceChanges'
 import {
   hashSignedTx,
   hashTx,

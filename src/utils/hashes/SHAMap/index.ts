@@ -1,5 +1,5 @@
-import InnerNode from './innerNode'
-import Leaf from './leafNode'
+import InnerNode from './InnerNode'
+import LeafNode from './LeafNode'
 import { NodeType } from './node'
 
 class SHAMap {
@@ -20,7 +20,7 @@ class SHAMap {
    * @param type - Type of the node to add.
    */
   public addItem(tag: string, data: string, type: NodeType): void {
-    this.root.addItem(tag, new Leaf(tag, data, type))
+    this.root.addItem(tag, new LeafNode(tag, data, type))
   }
 
   /**

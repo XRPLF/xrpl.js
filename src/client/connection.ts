@@ -13,9 +13,9 @@ import {
 } from '../errors'
 import { BaseRequest } from '../models/methods/baseMethod'
 
-import ExponentialBackoff from './backoff'
-import ConnectionManager from './connectionManager'
-import RequestManager from './requestManager'
+import ConnectionManager from './ConnectionManager'
+import ExponentialBackoff from './ExponentialBackoff'
+import RequestManager from './RequestManager'
 
 const SECONDS_PER_MINUTE = 60
 const TIMEOUT = 20

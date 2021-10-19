@@ -5,10 +5,10 @@ import type { Client } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
 import { Transaction } from '../models/transactions'
-import setTransactionFlagsToNumber from '../models/utils/flags'
+import { setTransactionFlagsToNumber } from '../models/utils/flags'
 import { xrpToDrops } from '../utils'
 
-import getFeeXrp from './fee'
+import getFeeXrp from './getFeeXrp'
 
 // Expire unconfirmed transactions after 20 ledger versions, approximately 1 minute, by default
 const LEDGER_OFFSET = 20

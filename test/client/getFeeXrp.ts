@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import getFeeXrp from '../../src/sugar/fee'
+import getFeeXrp from '../../src/sugar/getFeeXrp'
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
 

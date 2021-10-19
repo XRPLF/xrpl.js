@@ -1,5 +1,5 @@
 // Broadcast client is experimental
-export { default as BroadcastClient } from './client/broadcastClient'
+export { default as BroadcastClient } from './client/BroadcastClient'
 
 export { Client } from './client'
 
@@ -11,6 +11,6 @@ export * from './utils'
 
 export * from './errors'
 
-export { default as Wallet } from './wallet'
+export { default as Wallet } from './Wallet'
 
-export * from './wallet/signer'
+export * from './Wallet/signer'

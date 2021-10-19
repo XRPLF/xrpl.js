@@ -10,11 +10,11 @@ import { ValidationError, XrplError } from '../../errors'
 import type { Ledger } from '../../models/ledger'
 import { LedgerEntry } from '../../models/ledger'
 import { Transaction } from '../../models/transactions'
-import Metadata from '../../models/transactions/metadata'
+import { TransactionMetadata } from '../../models/transactions/metadata'
 
-import HashPrefix from './hashPrefix'
+import HashPrefix from './HashPrefix'
 import sha512Half from './sha512Half'
-import SHAMap, { NodeType } from './shaMap'
+import SHAMap, { NodeType } from './SHAMap'
 
 const HEX = 16
 
@@ -125,7 +125,7 @@ export function hashLedgerHeader(ledgerHeader: Ledger): string {
  * @category Utilities
  */
 export function hashTxTree(
-  transactions: Array<Transaction & { metaData?: Metadata }>,
+  transactions: Array<Transaction & { metaData?: TransactionMetadata }>,
 ): string {
   const shamap = new SHAMap()
   for (const txJSON of transactions) {

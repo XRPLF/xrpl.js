@@ -29,7 +29,7 @@ interface DeletedNode {
 
 export type Node = CreatedNode | ModifiedNode | DeletedNode
 
-export default interface TransactionMetadata {
+export interface TransactionMetadata {
   AffectedNodes: Node[]
   DeliveredAmount?: Amount
   // "unavailable" possible for transactions before 2014-01-20

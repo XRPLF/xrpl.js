@@ -1,5 +1,5 @@
 import { Transaction } from '../transactions'
-import TransactionMetadata from '../transactions/metadata'
+import { TransactionMetadata } from '../transactions/metadata'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 

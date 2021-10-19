@@ -1,8 +1,8 @@
 import { XrplError } from '../../../errors'
-import hashPrefix from '../hashPrefix'
+import HashPrefix from '../HashPrefix'
 import sha512Half from '../sha512Half'
 
-import Leaf from './leafNode'
+import LeafNode from './LeafNode'
 import { NodeType, Node } from './node'
 
 const HEX_ZERO =
@@ -52,7 +52,7 @@ class InnerNode extends Node {
     if (existingNode instanceof InnerNode) {
       // There is an inner node, so we need to go deeper
       existingNode.addItem(tag, node)
-    } else if (existingNode instanceof Leaf) {
+    } else if (existingNode instanceof LeafNode) {
       if (existingNode.tag === tag) {
         // Collision
         throw new XrplError(
@@ -116,7 +116,7 @@ class InnerNode extends Node {
       hex += hash
     }
 
-    const prefix = hashPrefix.INNER_NODE.toString(HEX)
+    const prefix = HashPrefix.INNER_NODE.toString(HEX)
     return sha512Half(prefix + hex)
   }
 }

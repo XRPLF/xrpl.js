@@ -5,7 +5,7 @@ import { ValidationError } from '../../errors'
 import {
   AccountRootFlagsInterface,
   AccountRootFlags,
-} from '../ledger/accountRoot'
+} from '../ledger/AccountRoot'
 import {
   AccountSetFlagsInterface,
   AccountSetTfFlags,
@@ -51,7 +51,7 @@ export function parseAccountRootFlags(
  *
  * @param tx - A transaction to set its flags to its numeric representation.
  */
-export default function setTransactionFlagsToNumber(tx: Transaction): void {
+export function setTransactionFlagsToNumber(tx: Transaction): void {
   if (tx.Flags == null) {
     tx.Flags = 0
     return
