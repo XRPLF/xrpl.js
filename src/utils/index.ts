@@ -48,7 +48,7 @@ import {
 import signPaymentChannelClaim from './signPaymentChannelClaim'
 import {
   rippleTimeToISOTime,
-  ISOTimeToRippleTime,
+  isoTimeToRippleTime,
   rippleTimeToUnixTime,
   unixTimeToRippleTime,
 } from './timeConversion'
@@ -186,7 +186,7 @@ export {
   xrpToDrops,
   hasNextPage,
   rippleTimeToISOTime,
-  ISOTimeToRippleTime,
+  isoTimeToRippleTime,
   rippleTimeToUnixTime,
   unixTimeToRippleTime,
   percentToQuality,
