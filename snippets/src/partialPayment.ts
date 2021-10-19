@@ -22,7 +22,7 @@ async function partialPayment(): Promise<void> {
     },
   }
 
-  await client.submit(trust_set_tx, {
+  await client.submitAndWait(trust_set_tx, {
     wallet: wallet2,
   })
 
