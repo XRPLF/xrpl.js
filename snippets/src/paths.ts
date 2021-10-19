@@ -1,5 +1,5 @@
 /* eslint-disable no-console -- logs are helpful to understand snippets */
-import { Client, Payment, RipplePathFindResponse, Wallet } from '../../dist/npm'
+import { Client, Payment, RipplePathFindResponse } from '../../dist/npm'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
@@ -8,7 +8,7 @@ void sign()
 async function sign(): Promise<void> {
   await client.connect()
 
-  const wallet = Wallet.fromSeed('ss1x3KLrSvfg7irFc1D929WXZ7z9H')
+  const { wallet } = await client.fundWallet()
   const request = {
     command: 'ripple_path_find',
     source_account: wallet.classicAddress,
