@@ -25,6 +25,7 @@ import Wallet from '.'
  * - There were no transactions given to sign
  * - The SigningPubKey field is not the empty string in any given transaction
  * - Any transaction is missing a Signers field.
+ * @category Signing
  */
 function multisign(transactions: Array<Transaction | string>): string {
   if (transactions.length === 0) {
@@ -70,6 +71,7 @@ function multisign(transactions: Array<Transaction | string>): string {
  * @param channelId - An id for the payment channel to redeem XRP from.
  * @param amount - The amount in drops to redeem.
  * @returns A signature that can be used to redeem a specific amount of XRP from a payment channel.
+ * @category Utilities
  */
 function authorizeChannel(
   wallet: Wallet,
@@ -89,6 +91,7 @@ function authorizeChannel(
  *
  * @param tx - A transaction to verify the signature of. (Can be in object or encoded string format).
  * @returns Returns true if tx has a valid signature, and returns false otherwise.
+ * @category Utilities
  */
 function verifySignature(tx: Transaction | string): boolean {
   const decodedTx: Transaction = getDecodedTransaction(tx)

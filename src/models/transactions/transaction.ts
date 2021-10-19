@@ -37,6 +37,9 @@ import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
 
+/**
+ * @category Transaction Models
+ */
 export type Transaction =
   | AccountDelete
   | AccountSet
@@ -58,6 +61,9 @@ export type Transaction =
   | TicketCreate
   | TrustSet
 
+/**
+ * @category Transaction Models
+ */
 export interface TransactionAndMetadata {
   transaction: Transaction
   metadata: TransactionMetadata
@@ -69,6 +75,7 @@ export interface TransactionAndMetadata {
  *
  * @param transaction - A Transaction.
  * @throws ValidationError When the Transaction is malformed.
+ * @category Utilities
  */
 export function validate(transaction: Record<string, unknown>): void {
   const tx = { ...transaction }

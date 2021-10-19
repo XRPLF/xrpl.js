@@ -68,7 +68,8 @@ function addLengthPrefix(hex: string): string {
  *
  * @param tx - A transaction to hash. Tx may be in binary blob form. Tx must be signed.
  * @returns A hash of tx.
- * @throws ValidationError if the Transaction is unsigned.
+ * @throws ValidationError if the Transaction is unsigned.\
+ * @category Utilities
  */
 export function hashSignedTx(tx: Transaction | string): string {
   let txBlob: string
@@ -95,6 +96,7 @@ export function hashSignedTx(tx: Transaction | string): string {
  *
  * @param ledgerHeader - Ledger to compute the hash of.
  * @returns The hash of the ledger.
+ * @category Utilities
  */
 export function hashLedgerHeader(ledgerHeader: Ledger): string {
   const prefix = HashPrefix.LEDGER.toString(HEX).toUpperCase()
@@ -119,6 +121,7 @@ export function hashLedgerHeader(ledgerHeader: Ledger): string {
  *
  * @param transactions - List of Transactions.
  * @returns The root hash of the SHAMap.
+ * @category Utilities
  */
 export function hashTxTree(
   transactions: Array<Transaction & { metaData?: TransactionMetadata }>,
@@ -140,6 +143,7 @@ export function hashTxTree(
  *
  * @param entries - List of LedgerEntries.
  * @returns Hash of SHAMap that consists of all entries.
+ * @category Utilities
  */
 export function hashStateTree(entries: LedgerEntry[]): string {
   const shamap = new SHAMap()
@@ -213,6 +217,7 @@ function computeStateHash(
  * @param ledger - Ledger to compute the hash for.
  * @param options - Allow client to recompute Transaction and State Hashes.
  * @returns The has of ledger.
+ * @category Utilities
  */
 function hashLedger(
   ledger: Ledger,

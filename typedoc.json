@@ -4,13 +4,14 @@
   "categoryOrder": [
     "Constructor",
     "Clients",
+    "Signing",
     "Transaction Models",
     "Transaction Flags",
     "Ledger Flags",
     "Utilities",
     "Requests",
     "Responses",
-    "Flags",
+    "Streams",
     "Errors"
   ],
   "categorizeByGroup": false

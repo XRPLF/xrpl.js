@@ -10,6 +10,7 @@ import { xrpToDrops } from './xrpConversion'
  * @param amount - Amount specified by the paymentChannelClaim.
  * @param privateKey - Private Key to sign paymentChannelClaim with.
  * @returns True if the channel is valid.
+ * @category Utilities
  */
 function signPaymentChannelClaim(
   channel: string,
