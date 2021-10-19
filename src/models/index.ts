@@ -1,6 +1,6 @@
 export * as LedgerEntry from './ledger'
 export {
-  default as setTransactionFlagsToNumber,
+  setTransactionFlagsToNumber,
   parseAccountRootFlags,
 } from './utils/flags'
 export * from './methods'
