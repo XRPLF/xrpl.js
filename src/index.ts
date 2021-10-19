@@ -5,8 +5,6 @@ export { Client } from './client'
 
 export * from './models'
 
-export * from './sugar'
-
 export * from './utils'
 
 export * from './errors'
