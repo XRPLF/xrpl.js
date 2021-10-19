@@ -3,9 +3,9 @@ import { Client, Payment, RipplePathFindResponse } from '../../dist/npm'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
-void sign()
+void createTxWithPaths()
 
-async function sign(): Promise<void> {
+async function createTxWithPaths(): Promise<void> {
   await client.connect()
 
   const { wallet } = await client.fundWallet()
