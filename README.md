@@ -7,7 +7,7 @@ A JavaScript/TypeScript library for interacting with the XRP Ledger
 
 This is the recommended library for integrating a JavaScript/TypeScript app with the XRP Ledger, especially if you intend to use advanced functionality such as IOUs, payment paths, the decentralized exchange, account settings, payment channels, escrows, multi-signing, and more.
 
-## [➡️ Reference Documentation](http://xrplf.github.io/xrpl.js/)
+## [➡️ Reference Documentation](http://js.xrpl.org)
 
 See the full reference documentation for all classes, methods, and utilities.
 
@@ -121,7 +121,7 @@ import xrpl from 'https://dev.jspm.io/npm:xrpl';
 ## Documentation
 
 + [Get Started in Node.js](https://xrpl.org/get-started-using-node-js.html)
-+ [Full Reference Documentation](https://xrplf.github.io/xrpl.js/)
++ [Full Reference Documentation](https://js.xrpl.org)
 + [Code Samples](https://github.com/XRPLF/xrpl.js/tree/develop/docs/samples)
 
 ### Mailing Lists
@@ -169,5 +169,5 @@ Update the documentation by running `npm run docgen`.
 ## More Information
 
 + [xrpl-announce mailing list](https://groups.google.com/g/xrpl-announce) - subscribe for release announcements
-+ [xrpl.js API Reference](https://xrplf.github.io/xrpl.js/)
-+ [XRP Ledger Dev Portal](https://xrpl.org/)
++ [xrpl.js API Reference](https://js.xrpl.org)
++ [XRP Ledger Dev Portal](https://xrpl.org)
