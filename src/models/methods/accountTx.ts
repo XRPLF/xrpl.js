@@ -1,6 +1,6 @@
 import { LedgerIndex } from '../common'
 import { Transaction } from '../transactions'
-import Metadata from '../transactions/metadata'
+import { TransactionMetadata } from '../transactions/metadata'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
@@ -61,7 +61,7 @@ interface AccountTransaction {
    * If binary is True, then this is a hex string of the transaction metadata.
    * Otherwise, the transaction metadata is included in JSON format.
    */
-  meta: string | Metadata
+  meta: string | TransactionMetadata
   /** JSON object defining the transaction. */
   tx?: Transaction
   /** Unique hashed String representing the transaction. */

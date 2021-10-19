@@ -1,7 +1,7 @@
 import { LedgerIndex } from '../common'
 import { Ledger } from '../ledger'
 import { Transaction, TransactionAndMetadata } from '../transactions'
-import TransactionMetadata from '../transactions/metadata'
+import { TransactionMetadata } from '../transactions/metadata'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 

@@ -1,4 +1,4 @@
-import BaseLedgerEntry from './baseLedgerEntry'
+import BaseLedgerEntry from './BaseLedgerEntry'
 
 /**
  * The AccountRoot object type describes a single account, its settings, and

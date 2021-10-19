@@ -1,4 +1,4 @@
-import BaseLedgerEntry from './baseLedgerEntry'
+import BaseLedgerEntry from './BaseLedgerEntry'
 
 /**
  * The Escrow object type represents a held payment of XRP waiting to be

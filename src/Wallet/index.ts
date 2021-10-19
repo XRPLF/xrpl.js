@@ -20,11 +20,11 @@ import {
   sign,
 } from 'ripple-keypairs'
 
-import ECDSA from '../ecdsa'
+import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
 import { Transaction } from '../models/transactions'
 import { ensureClassicAddress } from '../sugar/utils'
-import { hashSignedTx } from '../utils/hashes/ledgerHash'
+import { hashSignedTx } from '../utils/hashes/hashLedger'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"

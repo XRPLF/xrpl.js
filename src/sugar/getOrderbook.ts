@@ -4,7 +4,7 @@ import _ from 'lodash'
 
 import type { Client } from '../client'
 import { LedgerIndex } from '../models/common'
-import { OfferFlags } from '../models/ledger/offer'
+import { OfferFlags } from '../models/ledger/Offer'
 import {
   BookOffer,
   BookOffersRequest,

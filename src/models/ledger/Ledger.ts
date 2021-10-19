@@ -1,7 +1,7 @@
 import { Transaction } from '../transactions'
-import TransactionMetadata from '../transactions/metadata'
+import { TransactionMetadata } from '../transactions/metadata'
 
-import LedgerEntry from './ledgerEntry'
+import LedgerEntry from './LedgerEntry'
 
 /**
  * A ledger is a block of transactions and shared state data. It has a unique

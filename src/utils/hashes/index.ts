@@ -6,13 +6,13 @@
 import BigNumber from 'bignumber.js'
 import { decodeAccountID } from 'ripple-address-codec'
 
-import HashPrefix from './hashPrefix'
 import hashLedger, {
   hashLedgerHeader,
   hashSignedTx,
   hashTxTree,
   hashStateTree,
-} from './ledgerHash'
+} from './hashLedger'
+import HashPrefix from './HashPrefix'
 import ledgerSpaces from './ledgerSpaces'
 import sha512Half from './sha512Half'
 

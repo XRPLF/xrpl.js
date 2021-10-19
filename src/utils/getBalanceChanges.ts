@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 
 import { Amount, IssuedCurrencyAmount } from '../models/common'
-import TransactionMetadata, { Node } from '../models/transactions/metadata'
+import { TransactionMetadata, Node } from '../models/transactions/metadata'
 
 import { dropsToXrp } from './xrpConversion'
 

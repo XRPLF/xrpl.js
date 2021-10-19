@@ -1,4 +1,4 @@
-import BaseLedgerEntry from './baseLedgerEntry'
+import BaseLedgerEntry from './BaseLedgerEntry'
 
 /**
  * The DirectoryNode object type provides a list of links to other objects in

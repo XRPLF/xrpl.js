@@ -14,7 +14,8 @@ import {
 } from 'xrpl-local'
 import { AccountRootFlags } from 'xrpl-local/models/ledger'
 import { isFlagEnabled } from 'xrpl-local/models/utils'
-import setTransactionFlagsToNumber, {
+import {
+  setTransactionFlagsToNumber,
   parseAccountRootFlags,
 } from 'xrpl-local/models/utils/flags'
 

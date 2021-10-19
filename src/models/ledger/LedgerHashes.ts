@@ -1,4 +1,4 @@
-import BaseLedgerEntry from './baseLedgerEntry'
+import BaseLedgerEntry from './BaseLedgerEntry'
 
 /**
  * The LedgerHashes objects exist to make it possible to look up a previous

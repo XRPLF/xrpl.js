@@ -95,7 +95,7 @@ import {
   submit,
   submitAndWait,
 } from '../sugar'
-import fundWallet from '../wallet/fundWallet'
+import fundWallet from '../Wallet/fundWallet'
 
 import {
   Connection,

@@ -1,4 +1,4 @@
-import BaseLedgerEntry from './baseLedgerEntry'
+import BaseLedgerEntry from './BaseLedgerEntry'
 
 /**
  * A DepositPreauth object tracks a preauthorization from one account to

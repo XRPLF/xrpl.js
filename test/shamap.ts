@@ -1,6 +1,6 @@
 import assert from 'assert'
 
-import SHAMap, { NodeType } from '../src/utils/hashes/shaMap'
+import SHAMap, { NodeType } from '../src/utils/hashes/SHAMap'
 
 const TYPE_TRANSACTION_NO_METADATA = NodeType.TRANSACTION_NO_METADATA
 
