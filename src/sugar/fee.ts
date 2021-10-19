@@ -14,7 +14,7 @@ const BASE_10 = 10
  * @param cushion - The fee cushion to use.
  * @returns The transaction fee.
  */
-export default async function getFee(
+export default async function getFeeXRP(
   this: Client,
   cushion?: number,
 ): Promise<string> {
@@ -26,7 +26,9 @@ export default async function getFee(
   const baseFee = serverInfo.validated_ledger?.base_fee_xrp
 
   if (baseFee == null) {
-    throw new XrplError('getFee: Could not get base_fee_xrp from server_info')
+    throw new XrplError(
+      'getFeeXRP: Could not get base_fee_xrp from server_info',
+    )
   }
 
   const baseFeeXrp = new BigNumber(baseFee)

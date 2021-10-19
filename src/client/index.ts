@@ -89,7 +89,7 @@ import {
   ensureClassicAddress,
   getLedgerIndex,
   getOrderbook,
-  getFee,
+  getFeeXRP,
   getBalances,
   getXrpBalance,
   submit,
@@ -587,7 +587,7 @@ class Client extends EventEmitter {
   /**
    * @category Fee
    */
-  public getFee = getFee
+  public getFeeXRP = getFeeXRP
 
   /**
    * @category Core
