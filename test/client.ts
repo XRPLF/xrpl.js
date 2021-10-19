@@ -3,15 +3,11 @@ import _ from 'lodash'
 
 import { Client } from 'xrpl-local'
 
-import { setupClient, teardownClient } from './setupClient'
-
 // how long before each test case times out
 const TIMEOUT = 20000
 
 describe('Client', function () {
   this.timeout(TIMEOUT)
-  beforeEach(setupClient)
-  afterEach(teardownClient)
 
   it('Client - implicit server port', function () {
     // eslint-disable-next-line no-new -- Need to test constructor
