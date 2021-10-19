@@ -25,21 +25,6 @@ export default class RequestManager {
   >()
 
   /**
-   * Cancels a request.
-   *
-   * @param id - ID of the request.
-   * @throws Error if no existing promise with the given ID.
-   */
-  public cancel(id: string | number): void {
-    const promise = this.promisesAwaitingResponse.get(id)
-    if (promise == null) {
-      throw new XrplError(`No existing promise with id ${id}`)
-    }
-    clearTimeout(promise.timer)
-    this.deletePromise(id)
-  }
-
-  /**
    * Successfully resolves a request.
    *
    * @param id - ID of the request.
