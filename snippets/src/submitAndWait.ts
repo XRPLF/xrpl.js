@@ -12,7 +12,6 @@ void sendReliableTx()
 /*
  * The snippet walks us through an example usage of submitting an transaction
  * and waiting until it is successful and goes in a validated ledger.
- * The response we get in return verified that the transaction in fact is validated.
  */
 async function sendReliableTx(): Promise<void> {
   await client.connect()

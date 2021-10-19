@@ -5,15 +5,12 @@ const client = new Client('wss://s.altnet.rippletest.net:51233')
 async function displayBalance(account: string): Promise<void> {
   console.log(await client.getBalances(account, { ledger_index: 'current' }))
 }
-/*
- * This snippet walks us through partial payment.
- * Issusing a token `FOO` by creating a trustline. Initially, the issuer sends
- * an amount to the other account and when the other account tries to send more
- * than what it had, with the tfPartialPayment flag, we see only the partial
- * amount was delivered and the tx was successful.
- */
+
+// This snippet walks us through partial payment.
 async function partialPayment(): Promise<void> {
   await client.connect()
+
+  // creating wallets as prerequisite
   const { wallet: wallet1 } = await client.fundWallet()
   const { wallet: wallet2 } = await client.fundWallet()
 
@@ -37,7 +34,7 @@ async function partialPayment(): Promise<void> {
   await displayBalance(wallet1.classicAddress)
   await displayBalance(wallet2.classicAddress)
 
-  // Issuer(wallet1) sending to wallet2
+  // Initially, the issuer(wallet1) sends an amount to the other account(wallet2)
   const issue_quantity = '3840'
   const payment: Payment = {
     TransactionType: 'Payment',
