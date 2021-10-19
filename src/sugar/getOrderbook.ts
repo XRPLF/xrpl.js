@@ -38,12 +38,21 @@ interface OrderbookOptions {
  * Fetch orderbook (buy/sell orders) between two accounts.
  *
  * @param this - Client.
- * @param takerPays - Specs of the currency account taking the offer pays.
- * @param takerGets - Specs of the currency account taking the offer receives.
- * @param options - Options to include for getting orderbook between payer and receiver.
+ * @param takerPays - Specification of which currency the account taking the
+ * offer would pay, as an object with `currency` and `issuer` fields.
+ * @param takerGets - Specification of which currency the account taking the
+ * offer would receive, as an object with `currency` and `issuer` fields.
+ * @param options - Options allowing the client to specify ledger_index,
+ * ledger_hash, filter by taker, and/or limit number of orders.
+ * @param options.ledger_index - Retrieve the orderbook at a given ledger_index.
+ * @param options.ledger_hash - Retrieve the orderbook at the ledger with a
+ * given ledger_hash.
+ * @param options.taker - Filter orders by taker.
+ * @param options.limit - Limit number of order books to fetch for each side of
+ * the order book. Defaults to 20.
  * @returns An object containing buy and sell objects.
  */
-// eslint-disable-next-line max-params -- Function needs 4 params.
+// eslint-disable-next-line max-params -- Once bound to Client, getOrderbook only has 3 parameters.
 async function getOrderbook(
   this: Client,
   takerPays: TakerAmount,

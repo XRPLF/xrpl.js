@@ -8,6 +8,8 @@ import { Transaction } from '../models/transactions'
 import { setTransactionFlagsToNumber } from '../models/utils/flags'
 import { xrpToDrops } from '../utils'
 
+import getFeeXrp from './getFeeXrp'
+
 // Expire unconfirmed transactions after 20 ledger versions, approximately 1 minute, by default
 const LEDGER_OFFSET = 20
 interface ClassicAccountAndTag {
@@ -16,12 +18,16 @@ interface ClassicAccountAndTag {
 }
 
 /**
- * Autofills fields in a transaction.
+ * Autofills fields in a transaction. This will set `Sequence`, `Fee`,
+ * `lastLedgerSequence` according to the current state of the server this Client
+ * is connected to. It also converts all X-Addresses to classic addresses and
+ * flags interfaces into numbers.
  *
  * @param this - A client.
- * @param transaction - A transaction to autofill fields.
- * @param signersCount - The expected number of signers for this transaction. Used for multisign.
- * @returns An autofilled transaction.
+ * @param transaction - A {@link Transaction} in JSON format
+ * @param signersCount - The expected number of signers for this transaction.
+ * Only used for multisigned transactions.
+ * @returns The autofilled transaction.
  */
 async function autofill<T extends Transaction>(
   this: Client,
@@ -151,7 +157,7 @@ async function calculateFeePerTransactionType(
   signersCount = 0,
 ): Promise<void> {
   // netFee is usually 0.00001 XRP (10 drops)
-  const netFeeXRP = await client.getFee()
+  const netFeeXRP = await getFeeXrp(client)
   const netFeeDrops = xrpToDrops(netFeeXRP)
   let baseFee = new BigNumber(netFeeDrops)
 
