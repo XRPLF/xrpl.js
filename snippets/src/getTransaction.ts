@@ -1,4 +1,3 @@
-/* eslint-disable no-console -- logs are helpful to understand snippets */
 import {
   Client,
   LedgerResponse,
@@ -34,7 +33,7 @@ async function getTransaction(): Promise<void> {
      */
     console.log(
       'delivered_amount:',
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-member-access -- assertion needed
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- assertion needed
       (tx.result.meta as TransactionMetadata).delivered_amount,
     )
   }
