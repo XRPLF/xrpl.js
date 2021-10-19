@@ -44,7 +44,7 @@ interface GetBalancesOptions {
  * ```
  *
  * @param this - Client.
- * @param account - Address of the account to retrieve XRP balance.
+ * @param address - Address of the account to retrieve XRP balance.
  * @param options - Options to include for getting the XRP balance.
  * @param options.ledger_index - Retrieve the account balances at a given
  * ledger_index.
@@ -54,12 +54,12 @@ interface GetBalancesOptions {
  */
 async function getXrpBalance(
   this: Client,
-  account: string,
+  address: string,
   options: GetXrpBalanceOptions = {},
 ): Promise<string> {
   const xrpRequest: AccountInfoRequest = {
     command: 'account_info',
-    account,
+    account: address,
     ledger_index: options.ledger_index ?? 'validated',
     ledger_hash: options.ledger_hash,
   }
