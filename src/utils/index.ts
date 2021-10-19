@@ -148,7 +148,7 @@ function convertStringToHex(string: string): string {
 /**
  * Converts hex to its string equivalent. Useful to read the Domain field and some Memos.
  *
- * @param string - The hex to convert to a string.
+ * @param hex - The hex to convert to a string.
  * @param encoding - The encoding to use. Defaults to 'utf8' (UTF-8). 'ascii' is also allowed.
  * @returns The converted string.
  * @category Utilities
