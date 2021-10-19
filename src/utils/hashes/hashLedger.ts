@@ -7,8 +7,8 @@ import BigNumber from 'bignumber.js'
 import { decode, encode } from 'ripple-binary-codec'
 
 import { ValidationError, XrplError } from '../../errors'
-import { LedgerEntry } from '../../models/ledger'
 import type { Ledger } from '../../models/ledger'
+import { LedgerEntry } from '../../models/ledger'
 import { Transaction } from '../../models/transactions'
 import { TransactionMetadata } from '../../models/transactions/metadata'
 
