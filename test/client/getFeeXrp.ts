@@ -1,15 +1,16 @@
 import { assert } from 'chai'
 
+import getFeeXrp from '../../src/sugar/fee'
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'
 
-describe('client.getFeeXrp', function () {
+describe('getFeeXrp', function () {
   beforeEach(setupClient)
   afterEach(teardownClient)
 
   it('getFeeXrp', async function () {
     this.mockRippled.addResponse('server_info', rippled.server_info.normal)
-    const fee = await this.client.getFeeXrp()
+    const fee = await getFeeXrp(this.client)
     assert.strictEqual(fee, '0.000012')
   })
 
@@ -18,7 +19,7 @@ describe('client.getFeeXrp', function () {
       'server_info',
       rippled.server_info.highLoadFactor,
     )
-    const fee = await this.client.getFeeXrp()
+    const fee = await getFeeXrp(this.client)
     assert.strictEqual(fee, '2')
   })
 
@@ -33,14 +34,14 @@ describe('client.getFeeXrp', function () {
      * (fee will actually be 51539.607552)
      */
     this.client.maxFeeXRP = '51540'
-    const fee = await this.client.getFeeXrp()
+    const fee = await getFeeXrp(this.client)
     assert.strictEqual(fee, '51539.607552')
   })
 
   it('getFeeXrp custom cushion', async function () {
     this.mockRippled.addResponse('server_info', rippled.server_info.normal)
     this.client.feeCushion = 1.4
-    const fee = await this.client.getFeeXrp()
+    const fee = await getFeeXrp(this.client)
     assert.strictEqual(fee, '0.000014')
   })
 
@@ -51,13 +52,13 @@ describe('client.getFeeXrp', function () {
   it('getFeeXrp cushion less than 1.0', async function () {
     this.mockRippled.addResponse('server_info', rippled.server_info.normal)
     this.client.feeCushion = 0.9
-    const fee = await this.client.getFeeXrp()
+    const fee = await getFeeXrp(this.client)
     assert.strictEqual(fee, '0.000009')
   })
 
   it('getFeeXrp reporting', async function () {
     this.mockRippled.addResponse('server_info', rippled.server_info.normal)
-    const fee = await this.client.getFeeXrp()
+    const fee = await getFeeXrp(this.client)
     assert.strictEqual(fee, '0.000012')
   })
 })

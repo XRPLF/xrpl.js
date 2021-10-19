@@ -89,7 +89,6 @@ import {
   ensureClassicAddress,
   getLedgerIndex,
   getOrderbook,
-  getFeeXrp,
   getBalances,
   getXrpBalance,
   submit,
@@ -583,11 +582,6 @@ class Client extends EventEmitter {
    * @category Core
    */
   public autofill = autofill
-
-  /**
-   * @category Fee
-   */
-  public getFeeXrp = getFeeXrp
 
   /**
    * @category Core
