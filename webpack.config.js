@@ -3,6 +3,15 @@ const path = require('path')
 const webpack = require('webpack')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 
+const bnJsReplaces = [
+  'tiny-secp256k1',
+  'asn1.js',
+  'create-ecdh',
+  'miller-rabin',
+  'public-encrypt',
+  'elliptic',
+]
+
 function getDefaultConfiguration() {
   return {
     cache: true,
@@ -15,20 +24,24 @@ function getDefaultConfiguration() {
       filename: `xrpl.default.js`,
     },
     plugins: [
-      new webpack.NormalModuleReplacementPlugin(/^ws$/, './wsWrapper'),
-      new webpack.NormalModuleReplacementPlugin(
-        /^\.\/wallet\/index$/,
-        './wallet-web',
-      ),
-      new webpack.NormalModuleReplacementPlugin(
-        /^.*setup-api$/,
-        './setup-api-web',
-      ),
+      new webpack.NormalModuleReplacementPlugin(/^ws$/, './WSWrapper'),
       new webpack.ProvidePlugin({ process: 'process/browser' }),
       new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
       new webpack.IgnorePlugin({
         resourceRegExp: /^\.\/wordlists\/(?!english)/,
         contextRegExp: /bip39\/src$/,
+      }),
+      // this is a bit of a hack to prevent 'bn.js' from being installed 6 times
+      // TODO: any package that is updated to use bn.js 5.x needs to be removed from `bnJsReplaces` above
+      // https://github.com/webpack/webpack/issues/5593#issuecomment-390356276
+      new webpack.NormalModuleReplacementPlugin(/^bn.js$/, (resource) => {
+        if (
+          bnJsReplaces.some((pkg) =>
+            resource.context.includes(`node_modules/${pkg}`),
+          )
+        ) {
+          resource.request = 'diffie-hellman/node_modules/bn.js'
+        }
       }),
     ],
     module: {
@@ -36,7 +49,7 @@ function getDefaultConfiguration() {
     },
     resolve: {
       alias: {
-        ws: './dist/npm/client/wsWrapper.js',
+        ws: './dist/npm/client/WSWrapper.js',
         'https-proxy-agent': false,
       },
       extensions: ['.js', '.json'],

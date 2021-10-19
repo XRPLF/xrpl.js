@@ -1,5 +1,5 @@
 import { XrplError } from '../../../errors'
-import hashPrefix from '../hashPrefix'
+import HashPrefix from '../HashPrefix'
 import sha512Half from '../sha512Half'
 
 import { NodeType, Node } from './node'
@@ -9,7 +9,7 @@ const HEX = 16
 /**
  * Class for SHAMap Leaf Node.
  */
-class Leaf extends Node {
+class LeafNode extends Node {
   public tag: string
   public type: NodeType
   public data: string
@@ -49,15 +49,15 @@ class Leaf extends Node {
   public get hash(): string {
     switch (this.type) {
       case NodeType.ACCOUNT_STATE: {
-        const leafPrefix = hashPrefix.LEAF_NODE.toString(HEX)
+        const leafPrefix = HashPrefix.LEAF_NODE.toString(HEX)
         return sha512Half(leafPrefix + this.data + this.tag)
       }
       case NodeType.TRANSACTION_NO_METADATA: {
-        const txIDPrefix = hashPrefix.TRANSACTION_ID.toString(HEX)
+        const txIDPrefix = HashPrefix.TRANSACTION_ID.toString(HEX)
         return sha512Half(txIDPrefix + this.data)
       }
       case NodeType.TRANSACTION_METADATA: {
-        const txNodePrefix = hashPrefix.TRANSACTION_NODE.toString(HEX)
+        const txNodePrefix = HashPrefix.TRANSACTION_NODE.toString(HEX)
         return sha512Half(txNodePrefix + this.data + this.tag)
       }
       default:
@@ -66,4 +66,4 @@ class Leaf extends Node {
   }
 }
 
-export default Leaf
+export default LeafNode

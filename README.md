@@ -7,14 +7,18 @@ A JavaScript/TypeScript library for interacting with the XRP Ledger
 
 This is the recommended library for integrating a JavaScript/TypeScript app with the XRP Ledger, especially if you intend to use advanced functionality such as IOUs, payment paths, the decentralized exchange, account settings, payment channels, escrows, multi-signing, and more.
 
+## [➡️ Reference Documentation](http://js.xrpl.org)
+
+See the full reference documentation for all classes, methods, and utilities.
+
 ## [➡️ Applications and Projects](APPLICATIONS.md)
 
 What is `xrpl.js` used for? The applications on the list linked above use `xrpl.js`. Open a PR to add your app or project to the list!
 
 ### Features
 
-+ Connect to a `rippled` server from Node.js or a web browser
-+ Helpers for creating requests and parsing responses for the [rippled API](https://developers.ripple.com/rippled-api.html)
++ Works in Node.js and in web browsers
++ Helpers for creating requests and parsing responses for the [XRP Ledger APIs](https://xrpl.org/rippled-api.html)
 + Listen to events on the XRP Ledger (transactions, ledger, validations, etc.)
 + Sign and submit transactions to the XRP Ledger
 + Type definitions for TypeScript
@@ -26,14 +30,33 @@ What is `xrpl.js` used for? The applications on the list linked above use `xrpl.
 
 ## Getting Started
 
-See also: [RippleAPI Beginners Guide](https://xrpl.org/get-started-with-rippleapi-for-javascript.html)
-
 In an existing project (with `package.json`), install `xrpl.js`:
-```shell
-npm install xrpl@beta
+
+```
+$ npm install xrpl@beta
 ```
 
-Then see the [documentation](#documentation).
+Example usage:
+
+```js
+const xrpl = require("xrpl")
+async function main() {
+  const client = new xrpl.Client("https://s.altnet.rippletest.net:51234/")
+  await client.connect()
+
+  const response = await client.request({
+    "command": "account_info",
+    "account": "rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe",
+    "ledger_index": "validated"
+  })
+  console.log(response)
+
+  client.disconnect()
+}
+main()
+```
+
+For more examples, see the [documentation](#documentation).
 
 ### Using xrpl.js with React Native
 
@@ -97,9 +120,9 @@ import xrpl from 'https://dev.jspm.io/npm:xrpl';
 
 ## Documentation
 
-+ [RippleAPI Beginners Guide](https://xrpl.org/get-started-with-rippleapi-for-javascript.html)
-+ [RippleAPI Full Reference Documentation](https://xrpl.org/rippleapi-reference.html) ([in this repo](https://github.com/ripple/ripple-lib/blob/develop/docs/index.md))
-+ [Code Samples](https://github.com/ripple/ripple-lib/tree/develop/docs/samples)
++ [Get Started in Node.js](https://xrpl.org/get-started-using-node-js.html)
++ [Full Reference Documentation](https://js.xrpl.org)
++ [Code Samples](https://github.com/XRPLF/xrpl.js/tree/develop/docs/samples)
 
 ### Mailing Lists
 
@@ -114,9 +137,12 @@ If you're using the XRP Ledger in production, you should run a [rippled server](
 ## Development
 
 To build the library for Node.js and the browser:
-```shell
-npm run build
+
 ```
+$ npm run build
+```
+
+**Tip:** This can take a minute or two to complete.
 
 The TypeScript compiler will [output](./tsconfig.json#L7) the resulting JS files in `./dist/npm/`.
 
@@ -143,5 +169,5 @@ Update the documentation by running `npm run docgen`.
 ## More Information
 
 + [xrpl-announce mailing list](https://groups.google.com/g/xrpl-announce) - subscribe for release announcements
-+ [RippleAPI Reference](https://xrpl.org/rippleapi-reference.html) - XRP Ledger Dev Portal
-+ [XRP Ledger Dev Portal](https://xrpl.org/)
++ [xrpl.js API Reference](https://js.xrpl.org)
++ [XRP Ledger Dev Portal](https://xrpl.org)

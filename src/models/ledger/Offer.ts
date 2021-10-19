@@ -1,6 +1,6 @@
 import { Amount } from '../common'
 
-import BaseLedgerEntry from './baseLedgerEntry'
+import BaseLedgerEntry from './BaseLedgerEntry'
 
 export default interface Offer extends BaseLedgerEntry {
   LedgerEntryType: 'Offer'

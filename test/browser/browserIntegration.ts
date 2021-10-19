@@ -4,7 +4,7 @@ import path from 'path'
 import { expect, assert } from 'chai'
 import puppeteer from 'puppeteer'
 
-const TIMEOUT = 60000
+const TIMEOUT = 80000
 interface TestCaseInfo {
   name: string
   span: string
@@ -41,7 +41,7 @@ describe('Browser Tests', function () {
       )
 
       await page.waitForFunction(
-        'document.querySelector("body").innerText.includes("submit multisigned transaction")',
+        'document.querySelector("body").innerText.includes("closing test")',
         { timeout: TIMEOUT },
       )
 

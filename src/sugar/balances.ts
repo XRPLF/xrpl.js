@@ -23,8 +23,6 @@ function formatBalances(trustlines: Trustline[]): Balance[] {
 interface GetXrpBalanceOptions {
   ledger_hash?: string
   ledger_index?: LedgerIndex
-  peer?: string
-  limit?: number
 }
 
 interface GetBalancesOptions {
@@ -37,19 +35,31 @@ interface GetBalancesOptions {
 /**
  * Get the XRP balance for an account.
  *
+ * @example
+ * ```ts
+ * const client = new Client(wss://s.altnet.rippletest.net:51233)
+ * const balance = await client.getXrpBalance('rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn')
+ * console.log(balance)
+ * /// '200'
+ * ```
+ *
  * @param this - Client.
- * @param account - Account address.
+ * @param address - Address of the account to retrieve XRP balance.
  * @param options - Options to include for getting the XRP balance.
+ * @param options.ledger_index - Retrieve the account balances at a given
+ * ledger_index.
+ * @param options.ledger_hash - Retrieve the account balances at the ledger with
+ * a given ledger_hash.
  * @returns The XRP balance of the account (as a string).
  */
 async function getXrpBalance(
   this: Client,
-  account: string,
+  address: string,
   options: GetXrpBalanceOptions = {},
 ): Promise<string> {
   const xrpRequest: AccountInfoRequest = {
     command: 'account_info',
-    account,
+    account: address,
     ledger_index: options.ledger_index ?? 'validated',
     ledger_hash: options.ledger_hash,
   }
@@ -61,13 +71,20 @@ async function getXrpBalance(
  * Get XRP/non-XRP balances for an account.
  *
  * @param this - Client.
- * @param account - Account address.
- * @param options - Options to include for getting balances.
- * @returns An array of XRP/non-XRP balances.
+ * @param address - Address of the account to retrieve balances for.
+ * @param options - Allows the client to specify a ledger_hash, ledger_index,
+ * filter by peer, and/or limit number of balances.
+ * @param options.ledger_index - Retrieve the account balances at a given
+ * ledger_index.
+ * @param options.ledger_hash - Retrieve the account balances at the ledger with
+ * a given ledger_hash.
+ * @param options.peer - Filter balances by peer.
+ * @param options.limit - Limit number of balances to return.
+ * @returns An array of XRP/non-XRP balances for the given account.
  */
 async function getBalances(
   this: Client,
-  account: string,
+  address: string,
   options: GetBalancesOptions = {},
 ): Promise<Balance[]> {
   const balances: Balance[] = []
@@ -75,7 +92,7 @@ async function getBalances(
   // get XRP balance
   let xrpPromise: Promise<string> = Promise.resolve('')
   if (!options.peer) {
-    xrpPromise = this.getXrpBalance(account, {
+    xrpPromise = this.getXrpBalance(address, {
       ledger_hash: options.ledger_hash,
       ledger_index: options.ledger_index,
     })
@@ -84,7 +101,7 @@ async function getBalances(
   // get non-XRP balances
   const linesRequest: AccountLinesRequest = {
     command: 'account_lines',
-    account,
+    account: address,
     ledger_index: options.ledger_index ?? 'validated',
     ledger_hash: options.ledger_hash,
     peer: options.peer,

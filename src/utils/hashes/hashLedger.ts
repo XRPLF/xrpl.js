@@ -11,9 +11,9 @@ import type { Ledger } from '../../models/ledger'
 import { LedgerEntry } from '../../models/ledger'
 import { Transaction, TransactionMetadata } from '../../models/transactions'
 
-import HashPrefix from './hashPrefix'
+import HashPrefix from './HashPrefix'
 import sha512Half from './sha512Half'
-import SHAMap, { NodeType } from './shaMap'
+import SHAMap, { NodeType } from './SHAMap'
 
 const HEX = 16
 

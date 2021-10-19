@@ -89,13 +89,12 @@ import {
   ensureClassicAddress,
   getLedgerIndex,
   getOrderbook,
-  getFee,
   getBalances,
   getXrpBalance,
   submit,
   submitAndWait,
 } from '../sugar'
-import fundWallet from '../wallet/fundWallet'
+import fundWallet from '../Wallet/fundWallet'
 
 import {
   Connection,
@@ -583,11 +582,6 @@ class Client extends EventEmitter {
    * @category Core
    */
   public autofill = autofill
-
-  /**
-   * @category Fee
-   */
-  public getFee = getFee
 
   /**
    * @category Core

@@ -21,8 +21,8 @@ import { Response } from '../models/methods'
 import { PaymentChannelClaim } from '../models/transactions/paymentChannelClaim'
 import { Transaction } from '../models/transactions/transaction'
 
-import getBalanceChanges from './balanceChanges'
 import { deriveKeypair, deriveXAddress } from './derive'
+import getBalanceChanges from './getBalanceChanges'
 import {
   hashSignedTx,
   hashTx,
@@ -48,7 +48,7 @@ import {
 import signPaymentChannelClaim from './signPaymentChannelClaim'
 import {
   rippleTimeToISOTime,
-  ISOTimeToRippleTime,
+  isoTimeToRippleTime,
   rippleTimeToUnixTime,
   unixTimeToRippleTime,
 } from './timeConversion'
@@ -186,7 +186,7 @@ export {
   xrpToDrops,
   hasNextPage,
   rippleTimeToISOTime,
-  ISOTimeToRippleTime,
+  isoTimeToRippleTime,
   rippleTimeToUnixTime,
   unixTimeToRippleTime,
   percentToQuality,

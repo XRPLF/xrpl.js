@@ -1,6 +1,6 @@
 import { IssuedCurrencyAmount } from '../common'
 
-import BaseLedgerEntry from './baseLedgerEntry'
+import BaseLedgerEntry from './BaseLedgerEntry'
 
 /**
  * The RippleState object type connects two accounts in a single currency.

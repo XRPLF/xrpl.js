@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types -- Necessary for test setup */
 import { Client, BroadcastClient } from 'xrpl-local'
 
-import { PortResponse } from './mockRippled'
+import { PortResponse } from './createMockRippled'
 
 const defaultPort = 34371
 const baseUrl = 'ws://testripple.circleci.com:'

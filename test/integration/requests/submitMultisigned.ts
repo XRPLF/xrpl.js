@@ -12,7 +12,7 @@ import {
   hashes,
 } from 'xrpl-local'
 import { convertStringToHex } from 'xrpl-local/utils'
-import { multisign } from 'xrpl-local/wallet/signer'
+import { multisign } from 'xrpl-local/Wallet/signer'
 
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'
