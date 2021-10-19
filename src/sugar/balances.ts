@@ -23,8 +23,6 @@ function formatBalances(trustlines: Trustline[]): Balance[] {
 interface GetXrpBalanceOptions {
   ledger_hash?: string
   ledger_index?: LedgerIndex
-  peer?: string
-  limit?: number
 }
 
 interface GetBalancesOptions {
@@ -62,8 +60,15 @@ async function getXrpBalance(
  *
  * @param this - Client.
  * @param account - Account address.
- * @param options - Options to include for getting balances.
- * @returns An array of XRP/non-XRP balances.
+ * @param options - Allows the user to to look up balance in a ledger with given
+ * ledger_index or ledger_hash, filter by peer, and limit number of balances.
+ * @param options.ledger_index - Retrieve the account balances at a given
+ * ledger_index.
+ * @param options.ledger_hash - Retrieve the account balances at the ledger with
+ * a given ledger_hash.
+ * @param options.peer - Filter balances by peer.
+ * @param options.limit - Limit number of balances to return.
+ * @returns An array of XRP/non-XRP balances for the given account.
  */
 async function getBalances(
   this: Client,

@@ -40,12 +40,13 @@ const MAX_ATTEMPTS = 20
  * ```typescript
  * const api = new xrpl.Client("wss://s.altnet.rippletest.net:51233")
  * await api.connect()
- * const wallet = await api.fundWallet()
+ * const { wallet, balance } = await api.fundWallet()
  * ```
  *
  * @param this - Client.
  * @param wallet - An existing XRPL Wallet to fund, if undefined, a new Wallet will be created.
- * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP.
+ * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP,
+ * and that wallet's balance in XRP.
  * @throws When either Client isn't connected or unable to fund wallet address.
  */
 async function fundWallet(
