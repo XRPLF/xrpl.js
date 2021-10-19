@@ -4,6 +4,7 @@ import serverUrl from './serverUrl'
 import { fundAccount } from './utils'
 
 export async function teardownClient(this: Mocha.Context): Promise<void> {
+  this.client.removeAllListeners()
   this.client.disconnect()
 }
 

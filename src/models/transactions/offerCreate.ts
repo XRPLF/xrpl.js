@@ -50,6 +50,34 @@ export enum OfferCreateFlags {
  * flags.
  *
  * @category Transaction Flags
+ *
+ * @example
+ * ```typescript
+ * const tx: OfferCreate = {
+ * Account: 'rhFcpWDHLqpBmX4ezWiA5VLSS4e1BHqhHd',
+ * TakerGets: '43000.51',
+ * TakerPays: '12928290425',
+ * TransactionType: 'OfferCreate',
+ * Flags: {
+ *   tfPassive: true,
+ *   tfFillOrKill: true,
+ *  },
+ * }
+ *
+ * // Autofill the tx to see how flags actually look compared to the interface usage.
+ * const autofilledTx = await client.autofill(tx)
+ * console.log(autofilledTx)
+ * // {
+ * // Account: 'rhFcpWDHLqpBmX4ezWiA5VLSS4e1BHqhHd',
+ * // TakerGets: '43000.51',
+ * // TakerPays: '12928290425',
+ * // TransactionType: 'OfferCreate',
+ * // Flags: 327680,
+ * // Sequence: 21970384,
+ * // Fee: '12',
+ * // LastLedgerSequence: 21970404
+ * // }
+ * ```
  */
 export interface OfferCreateFlagsInterface extends GlobalFlags {
   tfPassive?: boolean

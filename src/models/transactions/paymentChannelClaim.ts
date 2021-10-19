@@ -36,6 +36,37 @@ export enum PaymentChannelClaimFlags {
  * transaction flags.
  *
  * @category Transaction Flags
+ *
+ * @example
+ * ```typescript
+ * const paymentChannelClaim: PaymentChannelClaim = {
+ *  Account: 'rMpxZpuy5RBSP47oK2hDWUtk3B5BNQHfGj,
+ *  TransactionType: 'PaymentChannelClaim',
+ *  Channel: hashes.hashPaymentChannel(
+ *    'rMpxZpuy5RBSP47oK2hDWUtk3B5BNQHfGj',
+ *    'rQGYqiyH5Ue9J96p4E6Qt6AvqxK4sDhnS5',
+ *    21970712,
+ *  ),
+ *  Amount: '100',
+ *  Flags: {
+ *    tfClose: true
+ *  }
+ *}
+ *
+ * // Autofill the tx to see how flags actually look compared to the interface usage.
+ * const autofilledTx = await client.autofill(paymentChannelClaim)
+ * console.log(autofilledTx)
+ * // {
+ * //  Account: 'rMpxZpuy5RBSP47oK2hDWUtk3B5BNQHfGj',
+ * //  TransactionType: 'PaymentChannelClaim',
+ * //  Channel: 'FC14BF9245D731DC1749EE0F070765E4EB4E993F8ECEE3D00F7E6E26D6EF98CF',
+ * //  Amount: '100',
+ * //  Flags: 131072,
+ * //  Sequence: 21970713,
+ * //  Fee: '12',
+ * //  LastLedgerSequence: 21970658
+ * // }
+ * ```
  */
 export interface PaymentChannelClaimFlagsInterface extends GlobalFlags {
   /**

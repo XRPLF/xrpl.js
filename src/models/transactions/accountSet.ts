@@ -67,6 +67,28 @@ export enum AccountSetTfFlags {
  * flags.
  *
  * @category Transaction Flags
+ *
+ * @example
+ *  const accountSetTx: AccountSet = {
+ *    TransactionType: 'AccountSet',
+ *    Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+ *    Flags: {
+ *      tfOptionalDestTag: true,
+ *      tfRequireAuth: true
+ *    },
+ *  }
+ *
+ * // Autofill the tx to see how flags actually look compared to the interface usage.
+ * const autofilledTx = await client.autofill(accountSetTx)
+ * console.log(autofilledTx)
+ * // {
+ * //  TransactionType: 'AccountSet',
+ * //  Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+ * //  Flags: 393216,
+ * //  Sequence: 1,
+ * //  Fee: '12',
+ * //  LastLedgerSequence: 21971793
+ * // }
  */
 export interface AccountSetFlagsInterface {
   tfRequireDestTag?: boolean
