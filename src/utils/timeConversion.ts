@@ -34,13 +34,13 @@ function rippleTimeToISOTime(rippleTime: number): string {
 }
 
 /**
- * Convert an Iso8601 timestmap to a ripple timestamp.
+ * Convert an ISO8601 timestmap to a ripple timestamp.
  *
  * @param iso8601 - International standard date format.
  * @returns Seconds since ripple epoch (1/1/2000 GMT).
  * @category Utilities
  */
-function ISOTimeToRippleTime(iso8601: string): number {
+function isoTimeToRippleTime(iso8601: string): number {
   return unixTimeToRippleTime(Date.parse(iso8601))
 }
 
@@ -48,5 +48,5 @@ export {
   rippleTimeToUnixTime,
   unixTimeToRippleTime,
   rippleTimeToISOTime,
-  ISOTimeToRippleTime,
+  isoTimeToRippleTime,
 }
