@@ -9,7 +9,12 @@ import {
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
 void sendEscrow()
-
+/*
+ * The snippet walks us through creating wallets as prerequisite
+ * and then creating an Escrow using `EscrowCreate` and submit and wait for tx to be validated.
+ * Then the creator finishes the Escrow using `EscrowFinish` to release the Escrow
+ * and we see the balances to verify.
+ */
 async function sendEscrow(): Promise<void> {
   await client.connect()
 
