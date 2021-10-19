@@ -1,3 +1,5 @@
+import { assert } from 'chai'
+
 import { Client } from 'xrpl-local'
 
 import serverUrl from './serverUrl'
@@ -23,7 +25,9 @@ describe('on handlers', function () {
   it('on disconnect', async function () {
     const client = new Client(serverUrl)
     return new Promise<void>(function (resolve) {
-      client.on('disconnected', function () {
+      client.on('disconnected', function (code: number) {
+        // should be the normal disconnect code
+        assert.equal(code, 1000)
         client.removeAllListeners()
         resolve()
       })

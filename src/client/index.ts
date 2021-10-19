@@ -422,7 +422,8 @@ class Client extends EventEmitter {
    *
    * @category Network
    */
-  public on(event: 'connected' | 'disconnected', listener: () => void): this
+  public on(event: 'connected', listener: () => void): this
+  public on(event: 'disconnected', listener: (code: number) => void): this
   public on(
     event: 'ledgerClosed',
     listener: (ledger: LedgerStream) => void,
