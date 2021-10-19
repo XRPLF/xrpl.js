@@ -1,10 +1,9 @@
-/* eslint-disable new-cap -- kjifnuwie. */
 import {
   AccountObjectsRequest,
   Client,
   EscrowCreate,
   EscrowFinish,
-  ISOTimeToRippleTime,
+  isoTimeToRippleTime,
 } from '../../dist/npm'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
@@ -24,8 +23,7 @@ async function sendEscrow(): Promise<void> {
   )
 
   // finish 2 seconds after the escrow is actually created and tx is validated.
-  const finishAfter = ISOTimeToRippleTime(Date()) + 2
-  console.log(finishAfter, ISOTimeToRippleTime(Date()), Date())
+  const finishAfter = isoTimeToRippleTime(Date()) + 2
 
   const createTx: EscrowCreate = {
     TransactionType: 'EscrowCreate',
@@ -53,7 +51,6 @@ async function sendEscrow(): Promise<void> {
   console.log("Escrow object exists in `wallet1`'s account")
   console.log(accountObjects)
 
-  // console.log(finishAfter, ISOTimeToRippleTime(Date()), Date())
   const finishTx: EscrowFinish = {
     TransactionType: 'EscrowFinish',
     Account: wallet1.classicAddress,
