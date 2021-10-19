@@ -9,6 +9,13 @@ async function sign(): Promise<void> {
   await client.connect()
 
   const { wallet } = await client.fundWallet()
+  const destination_account = 'rKT4JX4cCof6LcDYRz8o3rGRu7qxzZ2Zwj'
+  const destination_amount = {
+    value: '0.001',
+    currency: 'USD',
+    issuer: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc',
+  }
+
   const request = {
     command: 'ripple_path_find',
     source_account: wallet.classicAddress,
@@ -17,12 +24,8 @@ async function sign(): Promise<void> {
         currency: 'XRP',
       },
     ],
-    destination_account: 'rKT4JX4cCof6LcDYRz8o3rGRu7qxzZ2Zwj',
-    destination_amount: {
-      value: '0.001',
-      currency: 'USD',
-      issuer: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc',
-    },
+    destination_account,
+    destination_amount,
   }
 
   const resp: RipplePathFindResponse = await client.request(request)
@@ -34,8 +37,8 @@ async function sign(): Promise<void> {
   const tx: Payment = {
     TransactionType: 'Payment',
     Account: wallet.classicAddress,
-    Amount: request.destination_amount,
-    Destination: request.destination_account,
+    Amount: destination_amount,
+    Destination: destination_account,
     Paths: paths,
   }
 
