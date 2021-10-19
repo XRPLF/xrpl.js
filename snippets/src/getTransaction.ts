@@ -33,7 +33,6 @@ async function getTransaction(): Promise<void> {
      */
     console.log(
       'delivered_amount:',
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- assertion needed
       (tx.result.meta as TransactionMetadata).delivered_amount,
     )
   }
