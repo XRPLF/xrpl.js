@@ -34,9 +34,9 @@ async function main(): Promise<void> {
   const submitTx = await client.submit(payment, {
     wallet: wallet1,
   })
-  console.log('Response for tx signed using Regular Key')
+  console.log('Response for tx signed using Regular Key:')
   console.log(submitTx)
-  console.log('Balances after payment')
+  console.log('Balances after payment:')
   console.log(await client.getXrpBalance(wallet1.classicAddress))
   console.log(await client.getXrpBalance(wallet2.classicAddress))
 

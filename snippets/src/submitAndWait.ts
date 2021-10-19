@@ -36,5 +36,5 @@ async function sendReliableTx(): Promise<void> {
   console.log(await client.getXrpBalance(wallet1.classicAddress))
   console.log(await client.getXrpBalance(wallet2.classicAddress))
 
-  void client.disconnect()
+  await client.disconnect()
 }

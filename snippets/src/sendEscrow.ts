@@ -1,5 +1,5 @@
+/* eslint-disable new-cap -- kjifnuwie. */
 import {
-  AccountInfoRequest,
   AccountObjectsRequest,
   Client,
   EscrowCreate,
@@ -9,14 +9,6 @@ import {
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
-async function getXRPBalance(account: string): Promise<string> {
-  const request: AccountInfoRequest = {
-    command: 'account_info',
-    account,
-  }
-  return (await client.request(request)).result.account_data.Balance
-}
-
 void sendEscrow()
 
 async function sendEscrow(): Promise<void> {
@@ -25,14 +17,15 @@ async function sendEscrow(): Promise<void> {
   const { wallet: wallet1 } = await client.fundWallet()
   const { wallet: wallet2 } = await client.fundWallet()
 
-  console.log('Balances of wallets before Escrow tx was created')
+  console.log('Balances of wallets before Escrow tx was created:')
   console.log(
-    await getXRPBalance(wallet1.classicAddress),
-    await getXRPBalance(wallet2.classicAddress),
+    await client.getXrpBalance(wallet1.classicAddress),
+    await client.getXrpBalance(wallet2.classicAddress),
   )
 
-  // eslint-disable-next-line new-cap -- function defined as that.
+  // finish 2 seconds after the escrow is actually created and tx is validated.
   const finishAfter = ISOTimeToRippleTime(Date()) + 2
+  console.log(finishAfter, ISOTimeToRippleTime(Date()), Date())
 
   const createTx: EscrowCreate = {
     TransactionType: 'EscrowCreate',
@@ -57,11 +50,10 @@ async function sendEscrow(): Promise<void> {
   const accountObjects = (await client.request(accountObjectsRequest)).result
     .account_objects
 
-  console.log(
-    "Escrow object was created and we can see the info in wallet1's account",
-  )
+  console.log("Escrow object exists in `wallet1`'s account")
   console.log(accountObjects)
 
+  // console.log(finishAfter, ISOTimeToRippleTime(Date()), Date())
   const finishTx: EscrowFinish = {
     TransactionType: 'EscrowFinish',
     Account: wallet1.classicAddress,
@@ -75,9 +67,9 @@ async function sendEscrow(): Promise<void> {
 
   console.log('Balances of wallets after Escrow was sent')
   console.log(
-    await getXRPBalance(wallet1.classicAddress),
-    await getXRPBalance(wallet2.classicAddress),
+    await client.getXrpBalance(wallet1.classicAddress),
+    await client.getXrpBalance(wallet2.classicAddress),
   )
 
-  void client.disconnect()
+  await client.disconnect()
 }
