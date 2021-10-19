@@ -51,7 +51,7 @@ async function partialPayment(): Promise<void> {
   }
 
   // submit payment
-  const initialPayment = await client.submit(payment, {
+  const initialPayment = await client.submitAndWait(payment, {
     wallet: wallet1,
   })
   console.log(initialPayment)
@@ -82,7 +82,7 @@ async function partialPayment(): Promise<void> {
   }
 
   // submit payment
-  const submitResponse = await client.submit(partialPaymentTx, {
+  const submitResponse = await client.submitAndWait(partialPaymentTx, {
     wallet: wallet2,
   })
   console.log(submitResponse)
