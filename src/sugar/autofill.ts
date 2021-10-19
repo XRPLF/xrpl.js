@@ -8,6 +8,8 @@ import { Transaction } from '../models/transactions'
 import setTransactionFlagsToNumber from '../models/utils/flags'
 import { xrpToDrops } from '../utils'
 
+import getFeeXrp from './fee'
+
 // Expire unconfirmed transactions after 20 ledger versions, approximately 1 minute, by default
 const LEDGER_OFFSET = 20
 interface ClassicAccountAndTag {
@@ -151,7 +153,7 @@ async function calculateFeePerTransactionType(
   signersCount = 0,
 ): Promise<void> {
   // netFee is usually 0.00001 XRP (10 drops)
-  const netFeeXRP = await client.getFee()
+  const netFeeXRP = await getFeeXrp(client)
   const netFeeDrops = xrpToDrops(netFeeXRP)
   let baseFee = new BigNumber(netFeeDrops)
 
