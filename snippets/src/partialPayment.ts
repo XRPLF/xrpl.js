@@ -1,0 +1,98 @@
+import { Client, Payment, PaymentFlags, TrustSet } from '../../dist/npm'
+
+const client = new Client('wss://s.altnet.rippletest.net:51233')
+
+async function displayBalance(account: string): Promise<void> {
+  console.log(await client.getBalances(account, { ledger_index: 'current' }))
+}
+/*
+ * This snippet walks us through partial payment.
+ * Issusing a token `FOO` by creating a trustline. Initially, the issuer sends
+ * an amount to the other account and when the other account tries to send more
+ * than what it had, with the tfPartialPayment flag, we see only the partial
+ * amount was delivered and the tx was successful.
+ */
+async function partialPayment(): Promise<void> {
+  await client.connect()
+  const { wallet: wallet1 } = await client.fundWallet()
+  const { wallet: wallet2 } = await client.fundWallet()
+
+  // create a trustline to issue an IOU `FOO` and set limit on it.
+  const trust_set_tx: TrustSet = {
+    TransactionType: 'TrustSet',
+    Account: wallet2.classicAddress,
+    LimitAmount: {
+      currency: 'FOO',
+      issuer: wallet1.classicAddress,
+      // Value for the new IOU - 10000000000 - is arbitarily chosen.
+      value: '10000000000',
+    },
+  }
+
+  await client.submit(trust_set_tx, {
+    wallet: wallet2,
+  })
+
+  console.log('Balances after trustline is created')
+  await displayBalance(wallet1.classicAddress)
+  await displayBalance(wallet2.classicAddress)
+
+  // Issuer(wallet1) sending to wallet2
+  const issue_quantity = '3840'
+  const payment: Payment = {
+    TransactionType: 'Payment',
+    Account: wallet1.classicAddress,
+    Amount: {
+      currency: 'FOO',
+      value: issue_quantity,
+      issuer: wallet1.classicAddress,
+    },
+    Destination: wallet2.classicAddress,
+  }
+
+  // submit payment
+  const initialPayment = await client.submit(payment, {
+    wallet: wallet1,
+  })
+  console.log(initialPayment)
+
+  console.log('Balances after issuer(wallet1) sends IOU("FOO") to wallet2')
+  await displayBalance(wallet1.classicAddress)
+  await displayBalance(wallet2.classicAddress)
+
+  /*
+   * Send money less than the amount specified on 2 conditions:
+   * 1. Sender has less money than the aamount specified in the payment Tx.
+   * 2. Sender has the tfPartialPayment flag activated.
+   *
+   * Other ways to specify flags are by using Hex code and decimal code.
+   * eg. For partial payment(tfPartialPayment)
+   * decimal ->131072, hex -> 0x00020000
+   */
+  const partialPaymentTx: Payment = {
+    TransactionType: 'Payment',
+    Account: wallet2.classicAddress,
+    Amount: {
+      currency: 'FOO',
+      value: '4000',
+      issuer: wallet1.classicAddress,
+    },
+    Destination: wallet1.classicAddress,
+    Flags: PaymentFlags.tfPartialPayment,
+  }
+
+  // submit payment
+  const submitResponse = await client.submit(partialPaymentTx, {
+    wallet: wallet2,
+  })
+  console.log(submitResponse)
+
+  console.log(
+    "Balances after Partial Payment, when wallet2 tried to send 4000 FOO's",
+  )
+  await displayBalance(wallet1.classicAddress)
+  await displayBalance(wallet2.classicAddress)
+
+  await client.disconnect()
+}
+void partialPayment()

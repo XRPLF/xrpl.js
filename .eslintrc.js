@@ -62,17 +62,6 @@ module.exports = {
         '@typescript-eslint/no-magic-numbers': 'off',
       },
     },
-    /*
-     * {
-     *   // TODO: remove when snippets are written
-     *   files: ['snippets/src/*.ts'],
-     *   rules: {
-     *     'max-len': 'off',
-     *     'import/unambiguous': 'off',
-     *     'import/no-unused-modules': 'off',
-     *   },
-     * },
-     */
     {
       files: ['test/**/*.ts'],
       rules: {
