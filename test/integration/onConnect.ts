@@ -13,6 +13,7 @@ describe('on handlers', function () {
     return new Promise<void>(function (resolve) {
       client.on('connected', function () {
         client.removeAllListeners()
+        client.disconnect()
         resolve()
       })
       client.connect()
