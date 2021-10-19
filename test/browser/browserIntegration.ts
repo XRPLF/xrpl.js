@@ -41,7 +41,7 @@ describe('Browser Tests', function () {
       )
 
       await page.waitForFunction(
-        'document.querySelector("body").innerText.includes("submit multisigned transaction")',
+        'document.querySelector("body").innerText.includes("closing test")',
         { timeout: TIMEOUT },
       )
 
