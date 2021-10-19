@@ -5,8 +5,14 @@ const client = new Client('wss://s.altnet.rippletest.net:51233')
 async function displayBalance(account: string): Promise<void> {
   console.log(await client.getBalances(account, { ledger_index: 'current' }))
 }
-
-async function main(): Promise<void> {
+/*
+ * This snippet walks us through partial payment.
+ * Issusing a token `FOO` by creating a trustline. Initially, the issuer sends
+ * an amount to the other account and when the other account tries to send more
+ * than what it had, with the tfPartialPayment flag, we see only the partial
+ * amount was delivered and the tx was successful.
+ */
+async function partialPayment(): Promise<void> {
   await client.connect()
   const { wallet: wallet1 } = await client.fundWallet()
   const { wallet: wallet2 } = await client.fundWallet()
@@ -63,7 +69,7 @@ async function main(): Promise<void> {
    * eg. For partial payment(tfPartialPayment)
    * decimal ->131072, hex -> 0x00020000
    */
-  const partialPayment: Payment = {
+  const partialPaymentTx: Payment = {
     TransactionType: 'Payment',
     Account: wallet2.classicAddress,
     Amount: {
@@ -76,7 +82,7 @@ async function main(): Promise<void> {
   }
 
   // submit payment
-  const submitResponse = await client.submit(partialPayment, {
+  const submitResponse = await client.submit(partialPaymentTx, {
     wallet: wallet2,
   })
   console.log(submitResponse)
@@ -89,4 +95,4 @@ async function main(): Promise<void> {
 
   await client.disconnect()
 }
-void main()
+void partialPayment()

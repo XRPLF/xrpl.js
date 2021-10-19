@@ -2,7 +2,13 @@ import { Client, Payment, SetRegularKey } from '../../dist/npm'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
-async function main(): Promise<void> {
+/*
+ * The snippet walks us through an example usage of RegularKey.
+ * It generates a wallet (key-pair) and assigns it to the first wallet using `SetRegularKey`.
+ * Later, when first wallet tries to send payment to some other wallet and
+ * signs using the regular key wallet, the transaction goes through.
+ */
+async function setRegularKey(): Promise<void> {
   await client.connect()
   const { wallet: wallet1 } = await client.fundWallet()
   const { wallet: wallet2 } = await client.fundWallet()
@@ -42,4 +48,4 @@ async function main(): Promise<void> {
 
   await client.disconnect()
 }
-void main()
+void setRegularKey()
