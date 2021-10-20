@@ -64,7 +64,6 @@ module.exports = {
     {
       files: ['snippets/src/*.ts'],
       rules: {
-        'import/unambiguous': 'off',
         'import/no-unused-modules': 'off',
         // Each file has a particular flow.
         'max-lines-per-function': 'off',

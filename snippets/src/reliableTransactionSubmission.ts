@@ -65,8 +65,9 @@ async function sendReliableTx(): Promise<void> {
   const paymentResponse = await client.submitAndWait(payment, {
     wallet: wallet1,
   })
-  console.log('\nTransaction was submitted.\n')
+
   // With the following reponse we are able to see that the tx was indeed validated.
+  console.log('\nTransaction was submitted.\n')
   const txResponse = await client.request({
     command: 'tx',
     transaction: paymentResponse.result.hash,

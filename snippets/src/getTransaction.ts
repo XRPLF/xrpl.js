@@ -1,9 +1,4 @@
-import {
-  Client,
-  LedgerResponse,
-  TxResponse,
-  TransactionMetadata,
-} from '../../dist/npm'
+import { Client, LedgerResponse, TxResponse } from '../../dist/npm'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
@@ -24,15 +19,15 @@ async function getTransaction(): Promise<void> {
     })
     console.log(tx)
 
+    if (tx.result.meta == null || typeof tx.result.meta === 'string') {
+      throw new Error('Unexpected type in response field "meta"')
+    }
     /*
      * delivered_amount is the amount actually received by the destination account.
      * Use this field to determine how much was delivered, regardless of whether the transaction is a partial payment.
      * https://xrpl.org/transaction-metadata.html#delivered_amount
      */
-    console.log(
-      'delivered_amount:',
-      (tx.result.meta as TransactionMetadata).delivered_amount,
-    )
+    console.log('delivered_amount:', tx.result.meta.delivered_amount)
   }
 
   await client.disconnect()
