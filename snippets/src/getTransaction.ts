@@ -1,26 +1,39 @@
-/*
- * import {Client} from '../../dist/npm'
- * import {TransactionMetadata} from 'xrpl-local/models/common/transaction'
- */
+import { Client, LedgerResponse, TxResponse } from '../../dist/npm'
 
-// const client = new Client('wss://s.altnet.rippletest.net:51233')
+const client = new Client('wss://s.altnet.rippletest.net:51233')
 
-// getTransaction()
+async function getTransaction(): Promise<void> {
+  await client.connect()
+  const ledger: LedgerResponse = await client.request({
+    command: 'ledger',
+    transactions: true,
+    ledger_index: 'validated',
+  })
+  console.log(ledger)
 
-/*
- * async function getTransaction() {
- *   await client.connect()
- *   const ledger = await client.request({command: 'ledger', transactions: true})
- *   console.log(ledger)
- *   const tx = await client.request({
- *     command: 'tx',
- *     transaction: ledger.result.ledger.transactions[0] as string
- *   })
- *   console.log(tx)
- *   console.log(
- *     'deliveredAmount:',
- *     (tx.result.meta as TransactionMetadata).DeliveredAmount
- *   )
- *   process.exit(0)
- * }
- */
+  const transactions = ledger.result.ledger.transactions
+  if (transactions) {
+    const tx: TxResponse = await client.request({
+      command: 'tx',
+      transaction: transactions[0],
+    })
+    console.log(tx)
+
+    // The meta field would be a string(hex) when the `binary` parameter is `true` for the `tx` request.
+    if (tx.result.meta == null) {
+      throw new Error('meta not included in the response')
+    }
+    /*
+     * delivered_amount is the amount actually received by the destination account.
+     * Use this field to determine how much was delivered, regardless of whether the transaction is a partial payment.
+     * https://xrpl.org/transaction-metadata.html#delivered_amount
+     */
+    if (typeof tx.result.meta !== 'string') {
+      console.log('delivered_amount:', tx.result.meta.delivered_amount)
+    }
+  }
+
+  await client.disconnect()
+}
+
+void getTransaction()

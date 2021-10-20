@@ -1,5 +1,4 @@
-import { Transaction } from '../transactions'
-import { TransactionMetadata } from '../transactions/metadata'
+import { Transaction, TransactionMetadata } from '../transactions'
 
 import LedgerEntry from './LedgerEntry'
 

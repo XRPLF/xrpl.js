@@ -1,231 +1,83 @@
-// import https = require('https')
+import { Client, Payment } from '../../dist/npm'
 
-// import {Client, AccountInfoResponse, LedgerClosedEvent} from '../../dist/npm'
-
-// /**
-//  * When implementing Reliable Transaction Submission, there are many potential solutions, each with different trade-offs. The main decision points are:
-//  * 1) Transaction preparation:
-//  *    - How do we decide which account sequence and LastLedgerSequence numbers to use?
-//  *      (To prevent unintentional duplicate transactions, an {account, account_sequence} pair can be used as a transaction's idempotency key)
-//  *    - How do we decide how much to pay for the transaction fee? (If our transactions have been failing due to low fee, we should consider increasing this value)
-//  * 2) Transaction status retrieval. Options include:
-//  *    - Poll for transaction status:
-//  *      - On a regular interval (e.g. Every 3-5 seconds), or
-//  *      - When a new validated ledger is detected
-//  *      + (To accommodate an edge case in transaction retrieval, check the sending account's Sequence number to confirm that it has the expected value;
-//  *         alternatively, wait until a few additional ledgers have been validated before deciding that a transaction has definitively not been included in a validated ledger)
-//  *    - Listen for transaction status: scan all validated transactions to see if our transactions are among them
-//  * 3) What do we do when a transaction fails? It is possible to implement retry logic, but caution is advised. Note that there are a few ways for a transaction to fail:
-//  *    A) `tec`: The transaction was included in a ledger but only claimed the transaction fee
-//  *    B) `tesSUCCESS` but unexpected result: The transaction was successful but did not have the expected result. This generally does not occur for XRP-to-XRP payments
-//  *    C) The transaction was not, and never will be, included in a validated ledger [3C].
-//  *
-//  * References:
-//  * - https://xrpl.org/reliable-transaction-submission.html
-//  * - https://xrpl.org/send-xrp.html
-//  * - https://xrpl.org/look-up-transaction-results.html
-//  * - https://xrpl.org/get-started-with-rippleapi-for-javascript.html
-//  * - https://xrpl.org/monitor-incoming-payments-with-websocket.html.
-//  *
-//  * For the implementation in this example, we have made the following decisions:
-//  * 1) The script will choose the account sequence and LastLedgerSequence numbers automatically. We allow xrpl.js to choose the fee.
-//  *    Payments are defined upfront, and idempotency is not needed. If the script is run a second time, duplicate payments will result.
-//  * 2) We will listen for notification that a new validated ledger has been found, and poll for transaction status at that time.
-//  *    Futhermore, as a precaution, we will wait until the server is 3 ledgers past the transaction's LastLedgerSequence
-//  *    (with the transaction nowhere to be seen) before deciding that it has definitively failed per [3C]
-//  * 3) Transactions will not be automatically retried. Transactions are limited to XRP-to-XRP payments and cannot "succeed" in an unexpected way.
-//  */
-// reliableTransactionSubmissionExample()
-
-// async function reliableTransactionSubmissionExample() {
-//   /**
-//    * Array of payments to execute.
-//    *
-//    * For brevity, these are XRP-to-XRP payments, taking a source, destination, and an amount in drops.
-//    *
-//    * The script will attempt to make all of these payments as quickly as possible, and report the final status of each. Transactions that fail are NOT retried.
-//    */
-//   const payments = []
-
-/*
- *   const sourceAccount = (await generateTestnetAccount()).account
- *   console.log(
- *     `Generated new Testnet account: ${sourceAccount.classicAddress}/${sourceAccount.secret}`
- *   )
- *   // Send amounts from 1 drop to 10 drops
- *   for (let i = 1; i <= 10; i++) {
- *     payments.push({
- *       source: sourceAccount,
- *       destination: 'rhsoCozhUxwcyQgzFi1FVRoMVQgk7cZd4L', // Random Testnet destination
- *       amount_drops: i.toString()
- *     })
- *   }
- *   const results = await performPayments(payments)
- *   console.log(JSON.stringify(results, null, 2))
- *   process.exit(0)
- * }
+/**
+ * When implementing Reliable Transaction Submission, there are many potential solutions, each with different trade-offs.
+ * The main decision points are:
+ * 1) Transaction preparation:
+ *    - The autofill function as a part of the submitAndWait should be able to correctly populate
+ *      values for the fields Sequence, LastLedgerSequence and Fee.
+ * 2) Transaction status retrieval. Options include:
+ *    - Poll for transaction status:
+ *      - On a regular interval (e.g. Every 3-5 seconds), or
+ *      - When a new validated ledger is detected
+ *      + (To accommodate an edge case in transaction retrieval,
+ *         check the sending account's Sequence number to confirm that it has the expected value;
+ *         alternatively, wait until a few additional ledgers have been validated before deciding that a
+ *         transaction has definitively not been included in a validated ledger)
+ *    - Listen for transaction status: scan all validated transactions to see if our transactions are among them
+ * 3) What do we do when a transaction fails? It is possible to implement retry logic, but caution is advised.
+ *  Note that there are a few ways for a transaction to fail:
+ *    A) `tec`: The transaction was included in a ledger but only claimed the transaction fee
+ *    B) `tesSUCCESS` but unexpected result: The transaction was successful but did not have the expected result.
+ *        This generally does not occur for XRP-to-XRP payments
+ *    C) The transaction was not, and never will be, included in a validated ledger [3C].
+ *
+ * References:
+ * - https://xrpl.org/reliable-transaction-submission.html
+ * - https://xrpl.org/send-xrp.html
+ * - https://xrpl.org/look-up-transaction-results.html
+ * - https://xrpl.org/monitor-incoming-payments-with-websocket.html.
+ *
+ * For the implementation in this example, we have made the following decisions:
+ * 1) We allow the autofill function as a part of submitAndWait to fill up the account sequence,
+ *    LastLedgerSequence and Fee. Payments are defined upfront, and idempotency is not needed.
+ *    If the script is run a second time, duplicate payments will result.
+ * 2) We will rely on the xrpl.js submitAndWait function to get us the transaction submission result after the wait time.
+ * 3) Transactions will not be automatically retried. Transactions are limited to XRP-to-XRP payments
+ *     and cannot "succeed" in an unexpected way.
  */
 
-/*
- * async function performPayments(payments) {
- *   const finalResults = []
- *   const txFinalizedPromises = []
- *   const client = new Client('wss://s.altnet.rippletest.net:51233')
- *   await client.connect()
- */
+const client = new Client('wss://s.altnet.rippletest.net:51233')
 
-/*
- *   for (let i = 0; i < payments.length; i++) {
- *     const payment = payments[i]
- *     const account_info: AccountInfoResponse = await client.request({
- *       command: 'account_info',
- *       account: payment.source.classicAddress,
- *       ledger_index: 'current'
- *     })
- *     const sequence = account_info.result.account_data.Sequence
- *     const preparedPayment = await client.preparePayment(
- *       payment.source.classicAddress,
- *       {
- *         source: {
- *           address: payment.source.classicAddress,
- *           amount: {
- *             value: payment.amount_drops,
- *             currency: 'drops'
- *           }
- *         },
- *         destination: {
- *           address: payment.destination,
- *           minAmount: {
- *             value: payment.amount_drops,
- *             currency: 'drops'
- *           }
- *         }
- *       },
- *       {
- *         sequence
- *       }
- *     )
- *     const signed = client.sign(preparedPayment.txJSON, payment.source.secret)
- *     finalResults.push({
- *       id: signed.id
- *     })
- *     const response = await client.request({
- *       command: 'submit',
- *       tx_blob: signed.signedTransaction
- *     })
- */
+void sendReliableTx()
 
-/*
- *     // Most of the time we'll get 'tesSUCCESS' or (after many submissions) 'terQUEUED'
- *     console.log(`tx ${i} - tentative: ${response.result.engine_result}`)
- */
+async function sendReliableTx(): Promise<void> {
+  await client.connect()
 
-/*
- *     const txFinalizedPromise = new Promise<void>((resolve) => {
- *       const ledgerClosedCallback = async (event: LedgerClosedEvent) => {
- *         let status
- *         try {
- *           status = await client.request({command: 'tx', transaction: signed.id})
- *         } catch (e) {
- *           // Typical error when the tx hasn't been validated yet:
- *           if (e.name !== 'MissingLedgerHistoryError') {
- *             console.log(e)
- *           }
- */
+  // creating wallets as prerequisite
+  const { wallet: wallet1 } = await client.fundWallet()
+  const { wallet: wallet2 } = await client.fundWallet()
 
-/*
- *           if (
- *             event.ledger_index >
- *             preparedPayment.instructions.maxLedgerVersion + 3
- *           ) {
- *             // Assumptions:
- *             // - We are still connected to the same rippled server
- *             // - No ledger gaps occurred
- *             // - All ledgers between the time we submitted the tx and now have been checked for the tx
- *             status = {
- *               finalResult:
- *                 'Transaction was not, and never will be, included in a validated ledger'
- *             }
- *           } else {
- *             // Check again later:
- *             client.connection.once('ledgerClosed', ledgerClosedCallback)
- *             return
- *           }
- *         }
- */
+  console.log('Balances of wallets before Payment tx')
+  console.log(
+    await client.getXrpBalance(wallet1.classicAddress),
+    await client.getXrpBalance(wallet2.classicAddress),
+  )
 
-/*
- *         for (let j = 0; j < finalResults.length; j++) {
- *           if (finalResults[j].id === signed.id) {
- *             finalResults[j].result = status.address
- *               ? {
- *                   source: status.address,
- *                   destination: status.specification.destination.address,
- *                   deliveredAmount: status.outcome.deliveredAmount,
- *                   result: status.outcome.result,
- *                   timestamp: status.outcome.timestamp,
- *                   ledgerVersion: status.outcome.ledgerVersion
- *                 }
- *               : status
- *             process.stdout.write('.')
- *             return resolve()
- *           }
- *         }
- *       }
- *       client.connection.once('ledgerClosed', ledgerClosedCallback)
- *     })
- *     txFinalizedPromises.push(txFinalizedPromise)
- *   }
- *   await Promise.all(txFinalizedPromises)
- *   return finalResults
- * }
- */
+  // create a Payment tx and submit and wait for tx to be validated
+  const payment: Payment = {
+    TransactionType: 'Payment',
+    Account: wallet1.classicAddress,
+    Amount: '1000',
+    Destination: wallet2.classicAddress,
+  }
 
-// /**
-//  * Generate a new Testnet account by requesting one from the faucet.
-//  */
-// async function generateTestnetAccount(): Promise<{
-//   account: {
-//     xAddress: string
-//     classicAddress
-//     string
-//     secret: string
-//   }
-//   balance: number
-// }> {
-//   const options = {
-//     hostname: 'faucet.altnet.rippletest.net',
-//     port: 443,
-//     path: '/accounts',
-//     method: 'POST'
-//   }
-//   return new Promise((resolve, reject) => {
-//     const request = https.request(options, (response) => {
-//       const chunks = []
-//       response.on('data', (d) => {
-//         chunks.push(d)
-//       })
-//       response.on('end', () => {
-//         const body = Buffer.concat(chunks).toString()
+  const paymentResponse = await client.submitAndWait(payment, {
+    wallet: wallet1,
+  })
+  console.log('\nTransaction was submitted.\n')
+  const txResponse = await client.request({
+    command: 'tx',
+    transaction: paymentResponse.result.hash,
+  })
+  // With the following reponse we are able to see that the tx was indeed validated.
+  console.log('Validated:', txResponse.result.validated)
 
-/*
- *         // "application/json; charset=utf-8"
- *         if (response.headers['content-type'].startsWith('application/json')) {
- *           resolve(JSON.parse(body))
- *         } else {
- *           reject({
- *             statusCode: response.statusCode,
- *             contentType: response.headers['content-type'],
- *             body
- *           })
- *         }
- *       })
- *     })
- *     request.on('error', (error) => {
- *       console.error(error)
- *       reject(error)
- *     })
- *     request.end()
- *   })
- * }
- */
+  console.log('Balances of wallets after Payment tx:')
+  console.log(
+    await client.getXrpBalance(wallet1.classicAddress),
+    await client.getXrpBalance(wallet2.classicAddress),
+  )
+
+  await client.disconnect()
+}
