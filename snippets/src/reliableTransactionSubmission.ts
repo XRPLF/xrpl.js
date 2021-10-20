@@ -10,14 +10,16 @@ import { Client, Payment } from '../../dist/npm'
  *    - Poll for transaction status:
  *      - On a regular interval (e.g. Every 3-5 seconds), or
  *      - When a new validated ledger is detected
- *      + (To accommodate an edge case in transaction retrieval, check the sending account's Sequence number to confirm that it has the expected value;
+ *      + (To accommodate an edge case in transaction retrieval,
+ *         check the sending account's Sequence number to confirm that it has the expected value;
  *         alternatively, wait until a few additional ledgers have been validated before deciding that a
  *         transaction has definitively not been included in a validated ledger)
  *    - Listen for transaction status: scan all validated transactions to see if our transactions are among them
  * 3) What do we do when a transaction fails? It is possible to implement retry logic, but caution is advised.
  *  Note that there are a few ways for a transaction to fail:
  *    A) `tec`: The transaction was included in a ledger but only claimed the transaction fee
- *    B) `tesSUCCESS` but unexpected result: The transaction was successful but did not have the expected result. This generally does not occur for XRP-to-XRP payments
+ *    B) `tesSUCCESS` but unexpected result: The transaction was successful but did not have the expected result.
+ *        This generally does not occur for XRP-to-XRP payments
  *    C) The transaction was not, and never will be, included in a validated ledger [3C].
  *
  * References:
@@ -28,10 +30,11 @@ import { Client, Payment } from '../../dist/npm'
  *
  * For the implementation in this example, we have made the following decisions:
  * 1) We allow the autofill function as a part of submitAndWait to fill up the account sequence,
- *    LastLedgerSequence and Fee.
- *    Payments are defined upfront, and idempotency is not needed. If the script is run a second time, duplicate payments will result.
+ *    LastLedgerSequence and Fee. Payments are defined upfront, and idempotency is not needed.
+ *    If the script is run a second time, duplicate payments will result.
  * 2) We will rely on the xrpl.js submitAndWait function to get us the transaction submission result after the wait time.
- * 3) Transactions will not be automatically retried. Transactions are limited to XRP-to-XRP payments and cannot "succeed" in an unexpected way.
+ * 3) Transactions will not be automatically retried. Transactions are limited to XRP-to-XRP payments
+ *     and cannot "succeed" in an unexpected way.
  */
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')

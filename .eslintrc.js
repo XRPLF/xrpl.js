@@ -27,7 +27,6 @@ module.exports = {
 
   plugins: [],
   extends: ['@xrplf/eslint-config/base', 'plugin:mocha/recommended'],
-  ignorePatterns: ['snippets/src/*.ts'],
   rules: {
     // Certain rippled APIs require snake_case naming
     '@typescript-eslint/naming-convention': [
@@ -60,6 +59,18 @@ module.exports = {
       rules: {
         'import/no-unused-modules': 'off',
         '@typescript-eslint/no-magic-numbers': 'off',
+      },
+    },
+    {
+      files: ['snippets/src/*.ts'],
+      rules: {
+        'import/unambiguous': 'off',
+        'import/no-unused-modules': 'off',
+        // Each file has a particular flow.
+        'max-lines-per-function': 'off',
+        'max-statements': 'off',
+        // Snippets have logs on console to better understand the working.
+        'no-console': 'off',
       },
     },
     {
