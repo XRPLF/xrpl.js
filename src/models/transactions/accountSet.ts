@@ -69,6 +69,7 @@ export enum AccountSetTfFlags {
  * @category Transaction Flags
  *
  * @example
+ * ```typescript
  *  const accountSetTx: AccountSet = {
  *    TransactionType: 'AccountSet',
  *    Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
@@ -89,6 +90,7 @@ export enum AccountSetTfFlags {
  * //  Fee: '12',
  * //  LastLedgerSequence: 21971793
  * // }
+ * ```
  */
 export interface AccountSetFlagsInterface {
   tfRequireDestTag?: boolean

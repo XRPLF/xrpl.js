@@ -11,7 +11,7 @@ This is the recommended library for integrating a JavaScript/TypeScript app with
 
 See the full reference documentation for all classes, methods, and utilities.
 
-## [➡️ Applications and Projects](APPLICATIONS.md)
+## [➡️ Applications and Projects](https://github.com/XRPLF/xrpl.js/blob/master/APPLICATIONS.md)
 
 What is `xrpl.js` used for? The applications on the list linked above use `xrpl.js`. Open a PR to add your app or project to the list!
 
