@@ -60,9 +60,9 @@ For more examples, see the [documentation](#documentation).
 
 ### Using xrpl.js with React Native
 
-If you want to use `xrpl.js` with React Native you will need to have some of the NodeJS modules available. To help with this you can use a module like [rn-nodeify](https://github.com/tradle/rn-nodeify).
+If you want to use `xrpl.js` with React Native you will need to install shims for core NodeJS modules. To help with this you can use a module like [rn-nodeify](https://github.com/tradle/rn-nodeify).
 
-1. Install dependencies (you can use `npm` as well):
+1. Install dependencies (you can use `yarn` as well):
 
     ```shell
     npm install react-native-crypto
@@ -122,7 +122,7 @@ import xrpl from 'https://dev.jspm.io/npm:xrpl';
 
 + [Get Started in Node.js](https://xrpl.org/get-started-using-node-js.html)
 + [Full Reference Documentation](https://js.xrpl.org)
-+ [Code Samples](https://github.com/XRPLF/xrpl.js/tree/develop/docs/samples)
++ [Code Samples](https://github.com/XRPLF/xrpl.js/tree/develop/snippets/src)
 
 ### Mailing Lists
 
