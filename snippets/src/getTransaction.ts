@@ -19,15 +19,18 @@ async function getTransaction(): Promise<void> {
     })
     console.log(tx)
 
-    if (tx.result.meta == null || typeof tx.result.meta === 'string') {
-      throw new Error('Unexpected type in response field "meta"')
+    // The meta field would be a string(hex) when the `binary` parameter is `true` for the `tx` request.
+    if (tx.result.meta == null) {
+      throw new Error('meta not included in the response')
     }
     /*
      * delivered_amount is the amount actually received by the destination account.
      * Use this field to determine how much was delivered, regardless of whether the transaction is a partial payment.
      * https://xrpl.org/transaction-metadata.html#delivered_amount
      */
-    console.log('delivered_amount:', tx.result.meta.delivered_amount)
+    if (typeof tx.result.meta !== 'string') {
+      console.log('delivered_amount:', tx.result.meta.delivered_amount)
+    }
   }
 
   await client.disconnect()
