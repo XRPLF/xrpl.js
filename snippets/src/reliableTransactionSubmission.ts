@@ -41,6 +41,7 @@ void sendReliableTx()
 async function sendReliableTx(): Promise<void> {
   await client.connect()
 
+  // creating wallets as prerequisite
   const { wallet: wallet1 } = await client.fundWallet()
   const { wallet: wallet2 } = await client.fundWallet()
 
@@ -50,6 +51,7 @@ async function sendReliableTx(): Promise<void> {
     await client.getXrpBalance(wallet2.classicAddress),
   )
 
+  // create a Payment tx and submit and wait for tx to be validated
   const payment: Payment = {
     TransactionType: 'Payment',
     Account: wallet1.classicAddress,
@@ -57,23 +59,18 @@ async function sendReliableTx(): Promise<void> {
     Destination: wallet2.classicAddress,
   }
 
-  // Reliable submission of tx, meaning the tx was validated on a ledger and is final.
   const paymentResponse = await client.submitAndWait(payment, {
     wallet: wallet1,
   })
   console.log('\nTransaction was submitted.\n')
   // With the following reponse we are able to see that the tx was indeed validated.
-  console.log(
-    'Validated:',
-    (
-      await client.request({
-        command: 'tx',
-        transaction: paymentResponse.result.hash,
-      })
-    ).result.validated,
-  )
+  const txResponse = await client.request({
+    command: 'tx',
+    transaction: paymentResponse.result.hash,
+  })
+  console.log('Validated:', txResponse.result.validated)
 
-  console.log('Balances of wallets before Payment tx:')
+  console.log('Balances of wallets after Payment tx:')
   console.log(
     await client.getXrpBalance(wallet1.classicAddress),
     await client.getXrpBalance(wallet2.classicAddress),
