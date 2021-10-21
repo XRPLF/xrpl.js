@@ -34,12 +34,6 @@ function webpackForTest(testFileName) {
       filename: match[1] + '.js',
     },
     plugins: [
-      new webpack.ProvidePlugin({ process: 'process/browser' }),
-      new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
-      new webpack.IgnorePlugin({
-        resourceRegExp: /^\.\/wordlists\/(?!english)/,
-        contextRegExp: /bip39\/src$/,
-      }),
       // this is a bit of a hack to prevent 'bn.js' from being installed 6 times
       // TODO: any package that is updated to use bn.js 5.x needs to be removed from `bnJsReplaces` above
       // https://github.com/webpack/webpack/issues/5593#issuecomment-390356276
@@ -51,6 +45,12 @@ function webpackForTest(testFileName) {
         ) {
           resource.request = 'diffie-hellman/node_modules/bn.js'
         }
+      }),
+      new webpack.ProvidePlugin({ process: 'process/browser' }),
+      new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^\.\/wordlists\/(?!english)/,
+        contextRegExp: /bip39\/src$/,
       }),
     ],
     module: {
