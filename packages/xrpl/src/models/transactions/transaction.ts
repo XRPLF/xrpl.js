@@ -17,6 +17,8 @@ import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
 import { TransactionMetadata } from './metadata'
+import { NFTokenBurn, validateNFTokenBurn } from './NFTokenBurn'
+import { NFTokenMint, validateNFTokenMint } from './NFTokenMint'
 import { OfferCancel, validateOfferCancel } from './offerCancel'
 import { OfferCreate, validateOfferCreate } from './offerCreate'
 import { Payment, validatePayment } from './payment'
@@ -50,6 +52,8 @@ export type Transaction =
   | EscrowCancel
   | EscrowCreate
   | EscrowFinish
+  | NFTokenBurn
+  | NFTokenMint
   | OfferCancel
   | OfferCreate
   | Payment
@@ -122,6 +126,14 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'EscrowFinish':
       validateEscrowFinish(tx)
+      break
+
+    case 'NFTokenBurn':
+      validateNFTokenBurn(tx)
+      break
+
+    case 'NFTokenMint':
+      validateNFTokenMint(tx)
       break
 
     case 'OfferCancel':
