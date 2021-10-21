@@ -14,6 +14,12 @@ export { DepositPreauth } from './depositPreauth'
 export { EscrowCancel } from './escrowCancel'
 export { EscrowCreate } from './escrowCreate'
 export { EscrowFinish } from './escrowFinish'
+export { NFTokenBurn } from './NFTokenBurn'
+export {
+  NFTokenMint,
+  NFTokenMintFlags,
+  NFTokenMintFlagsInterface,
+} from './NFTokenMint'
 export { OfferCancel } from './offerCancel'
 export {
   OfferCreateFlags,
