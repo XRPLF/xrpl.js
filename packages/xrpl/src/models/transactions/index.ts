@@ -16,6 +16,11 @@ export { EscrowCreate } from './escrowCreate'
 export { EscrowFinish } from './escrowFinish'
 export { NFTokenBurn } from './NFTokenBurn'
 export {
+  NFTokenCreateOffer,
+  NFTokenCreateOfferFlags,
+  NFTokenCreateOfferFlagsInterface,
+} from './NFTokenCreateOffer'
+export {
   NFTokenMint,
   NFTokenMintFlags,
   NFTokenMintFlagsInterface,
