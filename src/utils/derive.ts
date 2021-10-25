@@ -6,7 +6,7 @@ import { deriveKeypair, deriveAddress } from 'ripple-keypairs'
  *
  * @param options - Public key and destination tag to encode as an X-Address.
  * @param options.publicKey - The public key corresponding to an address.
- * @param options.tag - A destination tag to encode into an X-address.
+ * @param options.tag - A destination tag to encode into an X-address. False indicates no destination tag.
  * @param options.test - Whether this address is for use in Testnet.
  * @returns X-Address.
  * @category Utilities
