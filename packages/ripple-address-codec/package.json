@@ -10,7 +10,7 @@
   "types": "dist/index.d.ts",
   "license": "ISC",
   "dependencies": {
-    "base-x": "3.0.8",
+    "base-x": "3.0.9",
     "create-hash": "^1.1.2"
   },
   "repository": {
