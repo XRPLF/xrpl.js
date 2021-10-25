@@ -155,7 +155,7 @@ function getTrustlineQuantity(node: NormalizedNode): BalanceChange[] | null {
  * Computes the complete list of every balance that changed in the ledger
  * as a result of the given transaction.
  *
- * @param metadata - Transaction metada.
+ * @param metadata - Transaction metadata.
  * @returns Parsed balance changes.
  * @category Utilities
  */
@@ -163,7 +163,11 @@ export default function getBalanceChanges(
   metadata: TransactionMetadata,
 ): Array<{
   account: string
-  balances: Balance[]
+  balances: Array<{
+    currency: string
+    issuer?: string
+    value: string
+  }>
 }> {
   const quantities = normalizeNodes(metadata).map((node) => {
     if (node.LedgerEntryType === 'AccountRoot') {
