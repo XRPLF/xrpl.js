@@ -32,30 +32,6 @@ const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
 function hexFromBuffer(buffer: Buffer): string {
   return buffer.toString('hex').toUpperCase()
 }
-interface SignedTxBlobHash {
-  tx_blob: string
-  hash: string
-}
-
-interface WalletBaseOptions {
-  // Include if a wallet uses a Regular Key Pair. It must be the master address of the account.
-  masterAddress?: string
-}
-
-interface WalletOptions extends WalletBaseOptions {
-  // The seed used to derive the account keys.
-  seed?: string
-}
-
-interface DeriveWalletOptions extends WalletBaseOptions {
-  // The digital signature algorithm to generate an address for.
-  algorithm?: ECDSA
-}
-
-interface FromMnemonicOptions extends WalletBaseOptions {
-  // The path to derive a keypair (publicKey/privateKey) used for mnemonic-to-seed conversion.
-  derivationPath?: string
-}
 
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
@@ -134,7 +110,10 @@ class Wallet {
   public constructor(
     publicKey: string,
     privateKey: string,
-    opts: WalletOptions = {},
+    opts: {
+      masterAddress?: string
+      seed?: string
+    } = {},
   ) {
     this.publicKey = publicKey
     this.privateKey = privateKey
@@ -164,7 +143,10 @@ class Wallet {
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from a seed.
    */
-  public static fromSeed(seed: string, opts: DeriveWalletOptions = {}): Wallet {
+  public static fromSeed(
+    seed: string,
+    opts: { masterAddress?: string; algorithm?: ECDSA } = {},
+  ): Wallet {
     return Wallet.deriveWallet(seed, {
       algorithm: opts.algorithm,
       masterAddress: opts.masterAddress,
@@ -195,7 +177,7 @@ class Wallet {
    */
   public static fromMnemonic(
     mnemonic: string,
-    opts: FromMnemonicOptions = {},
+    opts: { masterAddress?: string; derivationPath?: string } = {},
   ): Wallet {
     const seed = mnemonicToSeedSync(mnemonic)
     const masterNode = fromSeed(seed)
@@ -226,7 +208,7 @@ class Wallet {
    */
   public static fromEntropy(
     entropy: Uint8Array | number[],
-    opts: DeriveWalletOptions = {},
+    opts: { masterAddress?: string; algorithm?: ECDSA } = {},
   ): Wallet {
     const algorithm = opts.algorithm ?? DEFAULT_ALGORITHM
     const options = {
@@ -251,7 +233,7 @@ class Wallet {
    */
   private static deriveWallet(
     seed: string,
-    opts: DeriveWalletOptions = {},
+    opts: { masterAddress?: string; algorithm?: ECDSA } = {},
   ): Wallet {
     const { publicKey, privateKey } = deriveKeypair(seed, {
       algorithm: opts.algorithm ?? DEFAULT_ALGORITHM,
@@ -276,7 +258,10 @@ class Wallet {
     this: Wallet,
     transaction: Transaction,
     multisign?: boolean | string,
-  ): SignedTxBlobHash {
+  ): {
+    tx_blob: string
+    hash: string
+  } {
     let multisignAddress: boolean | string = false
     if (typeof multisign === 'string' && multisign.startsWith('X')) {
       multisignAddress = multisign
