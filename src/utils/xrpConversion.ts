@@ -10,7 +10,7 @@ const SANITY_CHECK = /^-?[0-9.]+$/u
 /**
  * Convert Drops to XRP.
  *
- * @param dropsToConvert - Drops to convert to XRP.
+ * @param dropsToConvert - Drops to convert to XRP. This can be a string, number, or BigNumber.
  * @returns Amount in XRP.
  * @throws When drops amount is invalid.
  * @category Utilities
