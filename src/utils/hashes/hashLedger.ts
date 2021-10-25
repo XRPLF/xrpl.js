@@ -216,12 +216,15 @@ function computeStateHash(
  *
  * @param ledger - Ledger to compute the hash for.
  * @param options - Allow client to recompute Transaction and State Hashes.
+ * @param options.computeTreeHashes - Whether to recompute the Transaction and State Hashes.
  * @returns The has of ledger.
  * @category Utilities
  */
 function hashLedger(
   ledger: Ledger,
-  options: HashLedgerHeaderOptions = {},
+  options: {
+    computeTreeHashes?: boolean
+  } = {},
 ): string {
   const subhashes = {
     transaction_hash: computeTransactionHash(ledger, options),
