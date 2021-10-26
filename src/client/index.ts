@@ -106,7 +106,6 @@ import {
   handleStreamPartialPayment,
 } from './partialPayment'
 
-// TODO: Migrate this one (Seems complicated and requires more docs)
 export interface ClientOptions extends ConnectionUserOptions {
   feeCushion?: number
   maxFeeXRP?: string
