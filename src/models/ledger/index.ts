@@ -1,4 +1,7 @@
-import AccountRoot, { AccountRootFlags } from './AccountRoot'
+import AccountRoot, {
+  AccountRootFlags,
+  AccountRootFlagsInterface,
+} from './AccountRoot'
 import Amendments from './Amendments'
 import Check from './Check'
 import DepositPreauth from './DepositPreauth'
@@ -18,6 +21,7 @@ import Ticket from './Ticket'
 export {
   AccountRoot,
   AccountRootFlags,
+  AccountRootFlagsInterface,
   Amendments,
   Check,
   DepositPreauth,
