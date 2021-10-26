@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unused-modules -- Exported for documentation and for users to instantiate */
 import {
   AccountChannelsRequest,
   AccountChannelsResponse,
@@ -30,7 +31,13 @@ import { LedgerDataRequest, LedgerDataResponse } from './ledgerData'
 import { LedgerEntryRequest, LedgerEntryResponse } from './ledgerEntry'
 import { ManifestRequest, ManifestResponse } from './manifest'
 import { NoRippleCheckRequest, NoRippleCheckResponse } from './norippleCheck'
-import { PathFindRequest, PathFindResponse } from './pathFind'
+import {
+  PathFindRequest,
+  PathFindCloseRequest,
+  PathFindCreateRequest,
+  PathFindStatusRequest,
+  PathFindResponse,
+} from './pathFind'
 import { PingRequest, PingResponse } from './ping'
 import { RandomRequest, RandomResponse } from './random'
 import { RipplePathFindRequest, RipplePathFindResponse } from './ripplePathFind'
@@ -194,6 +201,9 @@ export {
   DepositAuthorizedRequest,
   DepositAuthorizedResponse,
   PathFindRequest,
+  PathFindCreateRequest,
+  PathFindCloseRequest,
+  PathFindStatusRequest,
   PathFindResponse,
   RipplePathFindRequest,
   RipplePathFindResponse,
