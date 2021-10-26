@@ -176,6 +176,18 @@ export interface BaseTransaction {
    * account it says it is from.
    */
   TxnSignature?: string
+  /**
+   * The date/time when this transaction was included in a validated ledger.
+   */
+  date?: number
+  /**
+   * An identifying hash value unique to this transaction, as a hex string.
+   */
+  hash?: string
+  /**
+   * The sequence number of the ledger that included this transaction.
+   */
+  ledger_index?: number
 }
 
 /**
