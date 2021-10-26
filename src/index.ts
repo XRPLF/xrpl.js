@@ -1,7 +1,7 @@
 // Broadcast client is experimental
 export { default as BroadcastClient } from './client/BroadcastClient'
 
-export { Client } from './client'
+export { Client, ClientOptions } from './client'
 
 export * from './models'
 
