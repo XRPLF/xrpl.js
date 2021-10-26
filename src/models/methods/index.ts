@@ -13,7 +13,7 @@ import { AccountObjectsRequest, AccountObjectsResponse } from './accountObjects'
 import { AccountOffersRequest, AccountOffersResponse } from './accountOffers'
 import { AccountTxRequest, AccountTxResponse } from './accountTx'
 import { ErrorResponse } from './baseMethod'
-import { BookOffersRequest, BookOffersResponse } from './bookOffers'
+import { BookOffersRequest, BookOffer, BookOffersResponse } from './bookOffers'
 import { ChannelVerifyRequest, ChannelVerifyResponse } from './channelVerify'
 import {
   DepositAuthorizedRequest,
@@ -197,6 +197,7 @@ export {
   TxResponse,
   // path and order book methods
   BookOffersRequest,
+  BookOffer,
   BookOffersResponse,
   DepositAuthorizedRequest,
   DepositAuthorizedResponse,

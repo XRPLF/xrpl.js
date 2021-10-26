@@ -22,18 +22,6 @@ function sortOffers(offers: BookOffer[]): BookOffer[] {
   })
 }
 
-interface Orderbook {
-  buy: BookOffer[]
-  sell: BookOffer[]
-}
-
-interface OrderbookOptions {
-  limit?: number
-  ledger_index?: LedgerIndex
-  ledger_hash?: string
-  taker?: string
-}
-
 /**
  * Fetch orderbook (buy/sell orders) between two accounts.
  *
@@ -57,8 +45,16 @@ async function getOrderbook(
   this: Client,
   takerPays: TakerAmount,
   takerGets: TakerAmount,
-  options: OrderbookOptions = {},
-): Promise<Orderbook> {
+  options: {
+    limit?: number
+    ledger_index?: LedgerIndex
+    ledger_hash?: string
+    taker?: string
+  } = {},
+): Promise<{
+  buy: BookOffer[]
+  sell: BookOffer[]
+}> {
   const request: BookOffersRequest = {
     command: 'book_offers',
     taker_pays: takerPays,
