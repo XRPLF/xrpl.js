@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unused-modules -- Exported for documentation and for users to instantiate */
 import {
   AccountChannelsRequest,
   AccountChannelsResponse,
