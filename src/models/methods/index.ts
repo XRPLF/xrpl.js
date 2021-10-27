@@ -8,6 +8,7 @@ import {
 } from './accountCurrencies'
 import { AccountInfoRequest, AccountInfoResponse } from './accountInfo'
 import { AccountLinesRequest, AccountLinesResponse } from './accountLines'
+import { AccountNFTsRequest, AccountNFTsResponse } from './accountNFTs'
 import { AccountObjectsRequest, AccountObjectsResponse } from './accountObjects'
 import { AccountOffersRequest, AccountOffersResponse } from './accountOffers'
 import { AccountTxRequest, AccountTxResponse } from './accountTx'
@@ -29,6 +30,8 @@ import { LedgerCurrentRequest, LedgerCurrentResponse } from './ledgerCurrent'
 import { LedgerDataRequest, LedgerDataResponse } from './ledgerData'
 import { LedgerEntryRequest, LedgerEntryResponse } from './ledgerEntry'
 import { ManifestRequest, ManifestResponse } from './manifest'
+import { NFTBuyOffersRequest, NFTBuyOffersResponse } from './nftBuyOffers'
+import { NFTSellOffersRequest, NFTSellOffersResponse } from './nftSellOffers'
 import { NoRippleCheckRequest, NoRippleCheckResponse } from './norippleCheck'
 import { PathFindRequest, PathFindResponse } from './pathFind'
 import { PingRequest, PingResponse } from './ping'
@@ -64,10 +67,12 @@ import { UnsubscribeRequest, UnsubscribeResponse } from './unsubscribe'
  * @category Requests
  */
 type Request =
+  // account methods
   | AccountChannelsRequest
   | AccountCurrenciesRequest
   | AccountInfoRequest
   | AccountLinesRequest
+  | AccountNFTsRequest
   | AccountObjectsRequest
   | AccountOffersRequest
   | AccountTxRequest
@@ -102,15 +107,20 @@ type Request =
   // utility methods
   | PingRequest
   | RandomRequest
+  // NFT methods
+  | NFTBuyOffersRequest
+  | NFTSellOffersRequest
 
 /**
  * @category Responses
  */
 type Response =
+  // account methods
   | AccountChannelsResponse
   | AccountCurrenciesResponse
   | AccountInfoResponse
   | AccountLinesResponse
+  | AccountNFTsResponse
   | AccountObjectsResponse
   | AccountOffersResponse
   | AccountTxResponse
@@ -145,6 +155,9 @@ type Response =
   // utility methods
   | PingResponse
   | RandomResponse
+  // NFT methods
+  | NFTBuyOffersResponse
+  | NFTSellOffersResponse
 
 export {
   Request,
@@ -158,6 +171,8 @@ export {
   AccountInfoResponse,
   AccountLinesRequest,
   AccountLinesResponse,
+  AccountNFTsRequest,
+  AccountNFTsResponse,
   AccountObjectsRequest,
   AccountObjectsResponse,
   AccountOffersRequest,
@@ -228,4 +243,9 @@ export {
   RandomRequest,
   RandomResponse,
   ErrorResponse,
+  // NFT methods
+  NFTBuyOffersRequest,
+  NFTBuyOffersResponse,
+  NFTSellOffersRequest,
+  NFTSellOffersResponse,
 }

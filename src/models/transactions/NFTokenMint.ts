@@ -53,10 +53,6 @@ export interface NFTokenMintFlagsInterface extends GlobalFlags {
 export interface NFTokenMint extends BaseTransaction {
   TransactionType: 'NFTokenMint'
   /**
-   * Indicates the account that is minting the token.
-   */
-  Account: string
-  /**
    * Indicates the taxon associated with this token. The taxon is generally a
    * value chosen by the minter of the token and a given taxon may be used for
    * multiple tokens. The implementation reserves taxon identifiers greater
