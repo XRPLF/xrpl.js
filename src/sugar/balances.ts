@@ -20,18 +20,6 @@ function formatBalances(trustlines: Trustline[]): Balance[] {
   }))
 }
 
-interface GetXrpBalanceOptions {
-  ledger_hash?: string
-  ledger_index?: LedgerIndex
-}
-
-interface GetBalancesOptions {
-  ledger_hash?: string
-  ledger_index?: LedgerIndex
-  peer?: string
-  limit?: number
-}
-
 /**
  * Get the XRP balance for an account.
  *
@@ -55,7 +43,10 @@ interface GetBalancesOptions {
 async function getXrpBalance(
   this: Client,
   address: string,
-  options: GetXrpBalanceOptions = {},
+  options: {
+    ledger_hash?: string
+    ledger_index?: LedgerIndex
+  } = {},
 ): Promise<string> {
   const xrpRequest: AccountInfoRequest = {
     command: 'account_info',
@@ -82,11 +73,19 @@ async function getXrpBalance(
  * @param options.limit - Limit number of balances to return.
  * @returns An array of XRP/non-XRP balances for the given account.
  */
+// eslint-disable-next-line max-lines-per-function -- Longer definition is required for end users to see the definition.
 async function getBalances(
   this: Client,
   address: string,
-  options: GetBalancesOptions = {},
-): Promise<Balance[]> {
+  options: {
+    ledger_hash?: string
+    ledger_index?: LedgerIndex
+    peer?: string
+    limit?: number
+  } = {},
+): Promise<
+  Array<{ value: string; currency: string; issuer?: string | undefined }>
+> {
   const balances: Balance[] = []
 
   // get XRP balance

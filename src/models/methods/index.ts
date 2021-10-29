@@ -12,7 +12,7 @@ import { AccountObjectsRequest, AccountObjectsResponse } from './accountObjects'
 import { AccountOffersRequest, AccountOffersResponse } from './accountOffers'
 import { AccountTxRequest, AccountTxResponse } from './accountTx'
 import { ErrorResponse } from './baseMethod'
-import { BookOffersRequest, BookOffersResponse } from './bookOffers'
+import { BookOffersRequest, BookOffer, BookOffersResponse } from './bookOffers'
 import { ChannelVerifyRequest, ChannelVerifyResponse } from './channelVerify'
 import {
   DepositAuthorizedRequest,
@@ -30,7 +30,13 @@ import { LedgerDataRequest, LedgerDataResponse } from './ledgerData'
 import { LedgerEntryRequest, LedgerEntryResponse } from './ledgerEntry'
 import { ManifestRequest, ManifestResponse } from './manifest'
 import { NoRippleCheckRequest, NoRippleCheckResponse } from './norippleCheck'
-import { PathFindRequest, PathFindResponse } from './pathFind'
+import {
+  PathFindRequest,
+  PathFindCloseRequest,
+  PathFindCreateRequest,
+  PathFindStatusRequest,
+  PathFindResponse,
+} from './pathFind'
 import { PingRequest, PingResponse } from './ping'
 import { RandomRequest, RandomResponse } from './random'
 import { RipplePathFindRequest, RipplePathFindResponse } from './ripplePathFind'
@@ -190,10 +196,14 @@ export {
   TxResponse,
   // path and order book methods
   BookOffersRequest,
+  BookOffer,
   BookOffersResponse,
   DepositAuthorizedRequest,
   DepositAuthorizedResponse,
   PathFindRequest,
+  PathFindCreateRequest,
+  PathFindCloseRequest,
+  PathFindStatusRequest,
   PathFindResponse,
   RipplePathFindRequest,
   RipplePathFindResponse,

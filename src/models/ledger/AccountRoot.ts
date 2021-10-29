@@ -74,26 +74,86 @@ export default interface AccountRoot extends BaseLedgerEntry {
   TransferRate?: number
 }
 
+/**
+ * A boolean map of AccountRootFlags for simplified code checking AccountRoot settings.
+ * For submitting settings flags to the ledger, use AccountRootFlags instead.
+ */
 export interface AccountRootFlagsInterface {
+  /**
+   * The account has used its free SetRegularKey transaction.
+   */
   lsfPasswordSpent?: boolean
+  /**
+   * Requires incoming payments to specify a Destination Tag.
+   */
   lsfRequireDestTag?: boolean
+  /**
+   * This account must individually approve other users for those users to hold this account's issued currencies.
+   */
   lsfRequireAuth?: boolean
+  /**
+   * Client applications should not send XRP to this account. Not enforced by rippled.
+   */
   lsfDisallowXRP?: boolean
+  /**
+   * Disallows use of the master key to sign transactions for this account.
+   */
   lsfDisableMaster?: boolean
+  /**
+   * This address cannot freeze trust lines connected to it. Once enabled, cannot be disabled.
+   */
   lsfNoFreeze?: boolean
+  /**
+   * All assets issued by this address are frozen.
+   */
   lsfGlobalFreeze?: boolean
+  /**
+   * Enable rippling on this addresses's trust lines by default. Required for issuing addresses; discouraged for others.
+   */
   lsfDefaultRipple?: boolean
+  /**
+   * This account can only receive funds from transactions it sends, and from preauthorized accounts.
+   * (It has DepositAuth enabled.)
+   */
   lsfDepositAuth?: boolean
 }
 
 export enum AccountRootFlags {
+  /**
+   * The account has used its free SetRegularKey transaction.
+   */
   lsfPasswordSpent = 0x00010000,
+  /**
+   * Requires incoming payments to specify a Destination Tag.
+   */
   lsfRequireDestTag = 0x00020000,
+  /**
+   * This account must individually approve other users for those users to hold this account's issued currencies.
+   */
   lsfRequireAuth = 0x00040000,
+  /**
+   * Client applications should not send XRP to this account. Not enforced by rippled.
+   */
   lsfDisallowXRP = 0x00080000,
+  /**
+   * Disallows use of the master key to sign transactions for this account.
+   */
   lsfDisableMaster = 0x00100000,
+  /**
+   * This address cannot freeze trust lines connected to it. Once enabled, cannot be disabled.
+   */
   lsfNoFreeze = 0x00200000,
+  /**
+   * All assets issued by this address are frozen.
+   */
   lsfGlobalFreeze = 0x00400000,
+  /**
+   * Enable rippling on this addresses's trust lines by default. Required for issuing addresses; discouraged for others.
+   */
   lsfDefaultRipple = 0x00800000,
+  /**
+   * This account can only receive funds from transactions it sends, and from preauthorized accounts.
+   * (It has DepositAuth enabled.)
+   */
   lsfDepositAuth = 0x01000000,
 }

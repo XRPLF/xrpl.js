@@ -15,15 +15,6 @@ async function sleep(ms: number): Promise<void> {
   })
 }
 
-interface SubmitOptions {
-  // If true, autofill a transaction.
-  autofill?: boolean
-  // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
-  failHard?: boolean
-  // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
-  wallet?: Wallet
-}
-
 /**
  * Submits a signed/unsigned transaction.
  * Steps performed on a transaction:
@@ -43,7 +34,14 @@ interface SubmitOptions {
 async function submit(
   this: Client,
   transaction: Transaction | string,
-  opts?: SubmitOptions,
+  opts?: {
+    // If true, autofill a transaction.
+    autofill?: boolean
+    // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+    failHard?: boolean
+    // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+    wallet?: Wallet
+  },
 ): Promise<SubmitResponse> {
   const signedTx = await getSignedTx(this, transaction, opts)
   return submitRequest(this, signedTx, opts?.failHard)
@@ -65,7 +63,14 @@ async function submit(
 async function submitAndWait(
   this: Client,
   transaction: Transaction | string,
-  opts?: SubmitOptions,
+  opts?: {
+    // If true, autofill a transaction.
+    autofill?: boolean
+    // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+    failHard?: boolean
+    // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+    wallet?: Wallet
+  },
 ): Promise<TxResponse> {
   const signedTx = await getSignedTx(this, transaction, opts)
 
@@ -153,7 +158,17 @@ function isSigned(transaction: Transaction | string): boolean {
 async function getSignedTx(
   client: Client,
   transaction: Transaction | string,
-  { autofill = true, wallet }: SubmitOptions = {},
+  {
+    autofill = true,
+    wallet,
+  }: {
+    // If true, autofill a transaction.
+    autofill?: boolean
+    // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+    failHard?: boolean
+    // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+    wallet?: Wallet
+  } = {},
 ): Promise<Transaction | string> {
   if (isSigned(transaction)) {
     return transaction

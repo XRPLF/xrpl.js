@@ -11,6 +11,7 @@ export default class BroadcastClient extends Client {
   /**
    * Creates a new BroadcastClient.
    *
+   * @category Constructor
    * @param servers - An array of names of servers.
    * @param options - Options for the clients.
    */

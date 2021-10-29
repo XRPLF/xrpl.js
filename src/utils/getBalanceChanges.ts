@@ -16,12 +16,6 @@ interface BalanceChange {
   account: string
   balance: Balance
 }
-
-interface BalanceChanges {
-  account: string
-  balances: Balance[]
-}
-
 interface Fields {
   Account?: string
   Balance?: Amount
@@ -65,7 +59,10 @@ function normalizeNodes(metadata: TransactionMetadata): NormalizedNode[] {
   return metadata.AffectedNodes.map(normalizeNode)
 }
 
-function groupByAccount(balanceChanges: BalanceChange[]): BalanceChanges[] {
+function groupByAccount(balanceChanges: BalanceChange[]): Array<{
+  account: string
+  balances: Balance[]
+}> {
   const grouped = _.groupBy(balanceChanges, (node) => node.account)
   return Object.entries(grouped).map(([account, items]) => {
     return { account, balances: items.map((item) => item.balance) }
@@ -158,13 +155,20 @@ function getTrustlineQuantity(node: NormalizedNode): BalanceChange[] | null {
  * Computes the complete list of every balance that changed in the ledger
  * as a result of the given transaction.
  *
- * @param metadata - Transaction metada.
+ * @param metadata - Transaction metadata.
  * @returns Parsed balance changes.
  * @category Utilities
  */
 export default function getBalanceChanges(
   metadata: TransactionMetadata,
-): BalanceChanges[] {
+): Array<{
+  account: string
+  balances: Array<{
+    currency: string
+    issuer?: string
+    value: string
+  }>
+}> {
   const quantities = normalizeNodes(metadata).map((node) => {
     if (node.LedgerEntryType === 'AccountRoot') {
       const xrpQuantity = getXRPQuantity(node)

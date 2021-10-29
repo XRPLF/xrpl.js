@@ -18,11 +18,6 @@ interface FaucetWallet {
   balance: number
 }
 
-interface WalletWithStartingBalance {
-  wallet: Wallet
-  balance: number
-}
-
 enum FaucetNetwork {
   Testnet = 'faucet.altnet.rippletest.net',
   Devnet = 'faucet.devnet.rippletest.net',
@@ -52,7 +47,10 @@ const MAX_ATTEMPTS = 20
 async function fundWallet(
   this: Client,
   wallet?: Wallet,
-): Promise<WalletWithStartingBalance> {
+): Promise<{
+  wallet: Wallet
+  balance: number
+}> {
   if (!this.isConnected()) {
     throw new RippledError('Client not connected, cannot call faucet')
   }
@@ -94,7 +92,10 @@ async function returnPromise(
   startingBalance: number,
   walletToFund: Wallet,
   postBody: Buffer,
-): Promise<WalletWithStartingBalance> {
+): Promise<{
+  wallet: Wallet
+  balance: number
+}> {
   return new Promise((resolve, reject) => {
     const request = httpsRequest(options, (response) => {
       const chunks: Uint8Array[] = []
@@ -143,7 +144,7 @@ async function onEnd(
   client: Client,
   startingBalance: number,
   walletToFund: Wallet,
-  resolve: (response: WalletWithStartingBalance) => void,
+  resolve: (response: { wallet: Wallet; balance: number }) => void,
   reject: (err: ErrorConstructor | Error | unknown) => void,
 ): Promise<void> {
   const body = Buffer.concat(chunks).toString()
@@ -177,7 +178,7 @@ async function processSuccessfulResponse(
   body: string,
   startingBalance: number,
   walletToFund: Wallet,
-  resolve: (response: WalletWithStartingBalance) => void,
+  resolve: (response: { wallet: Wallet; balance: number }) => void,
   reject: (err: ErrorConstructor | Error | unknown) => void,
 ): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- We know this is safe and correct

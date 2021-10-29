@@ -8,7 +8,7 @@ interface BasePathFindRequest extends BaseRequest {
 }
 
 /** Start sending pathfinding information. */
-interface PathFindCreateRequest extends BasePathFindRequest {
+export interface PathFindCreateRequest extends BasePathFindRequest {
   subcommand: 'create'
   /**
    * Unique address of the account to find a path from. In other words, the.
@@ -33,12 +33,12 @@ interface PathFindCreateRequest extends BasePathFindRequest {
 }
 
 /** Stop sending pathfinding information. */
-interface PathFindCloseRequest extends BasePathFindRequest {
+export interface PathFindCloseRequest extends BasePathFindRequest {
   subcommand: 'close'
 }
 
 /** Get the information of the currently-open pathfinding request. */
-interface PathFindStatusRequest extends BasePathFindRequest {
+export interface PathFindStatusRequest extends BasePathFindRequest {
   subcommand: 'status'
 }
 
