@@ -2,6 +2,10 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
+## 2.0.1 (2021-11-01)
+
+* Fix private interfaces not showing up in the docs (#1769)
+
 ## 2.0.0 (2021-10-20)
 
 A migration guide is available at https://xrpl.org/xrpljs2-migration-guide.html.
