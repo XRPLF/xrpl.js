@@ -6,9 +6,9 @@ A JavaScript/TypeScript API for interacting with the XRP Ledger
 
 This is the recommended library for integrating a JavaScript/TypeScript app with the XRP Ledger, especially if you intend to use advanced functionality such as IOUs, payment paths, the decentralized exchange, account settings, payment channels, escrows, multi-signing, and more.
 
-## [➡️ Reference Documentation](https://xrpl.org/rippleapi-reference.html)
+## [➡️ Reference Documentation](https://github.com/XRPLF/xrpl.js/blob/1.x/docs/index.md)
 
-See the full reference documentation on the XRP Ledger Dev Portal.
+See the full reference documentation.
 
 ## [➡️ Applications and Projects](APPLICATIONS.md)
 
