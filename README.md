@@ -41,7 +41,7 @@ Example usage:
 ```js
 const xrpl = require("xrpl")
 async function main() {
-  const client = new xrpl.Client("https://s.altnet.rippletest.net:51234/")
+  const client = new xrpl.Client("wss://s.altnet.rippletest.net:51233")
   await client.connect()
 
   const response = await client.request({
