@@ -6,7 +6,7 @@
     "build": "tsc -b",
     "test": "tsc -b && nyc mocha",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
-    "lint": "eslint . --ext .ts --fix",
+    "lint": "eslint . --ext .ts",
     "prepublish": "npm run lint && npm test"
   },
   "files": [
@@ -21,32 +21,14 @@
     "brorand": "^1.0.5",
     "elliptic": "^6.5.4",
     "hash.js": "^1.0.3",
-    "ripple-address-codec": "^4.0.0"
-  },
-  "devDependencies": {
-    "@types/mocha": "^9.0.0",
-    "@types/node": "^16.4.3",
-    "@typescript-eslint/eslint-plugin": "^2.19.0",
-    "@typescript-eslint/parser": "^2.16.0",
-    "eslint": "^7.32.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-config-airbnb-typescript": "^7.0.0",
-    "eslint-config-prettier": "^6.9.0",
-    "eslint-plugin-import": "^2.20.0",
-    "eslint-plugin-mocha": "^9.0.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "mocha": "^9.1.1",
-    "nyc": "^15.0.1",
-    "prettier": "^2.0.5",
-    "source-map-support": "^0.5.16",
-    "ts-node": "^10.2.1",
-    "typescript": "^4.0.3"
+    "ripple-address-codec": "file:../ripple-address-codec"
   },
   "repository": {
     "type": "git",
     "url": "git@github.com:XRPLF/xrpl.js.git"
   },
   "license": "ISC",
+  "prettier": "@xrplf/prettier-config",
   "engines": {
     "node": ">= 10",
     "npm": ">=7.0.0"

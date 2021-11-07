@@ -1,5 +1,3 @@
-/* eslint-disable func-style */
-
 const { binary } = require("../dist/coretypes");
 const { encode, decode } = require("../dist");
 const { makeParser, BytesList, BinarySerializer } = binary;
@@ -139,11 +137,9 @@ function assertRecycles(blob) {
 
 function nestedObjectTests() {
   fixtures.whole_objects.forEach((f, i) => {
-    /*eslint-disable jest/expect-expect*/
     test(`whole_objects[${i}]: can parse blob and dump out same blob`, () => {
       assertRecycles(f.blob_with_no_signing);
     });
-    /*eslint-enable jest/expect-expect*/
   });
 }
 

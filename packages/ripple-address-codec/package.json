@@ -22,18 +22,10 @@
   "scripts": {
     "build": "tsc -b",
     "test": "jest",
-    "lint": "tslint -p ./",
+    "lint": "eslint . --ext .ts",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo"
   },
-  "devDependencies": {
-    "@types/jest": "^27.0.2",
-    "@types/node": "^16.4.3",
-    "jest": "^26.6.3",
-    "ts-jest": "^26.4.4",
-    "tslint": "^5.19.0",
-    "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^4.4.4"
-  },
+  "prettier": "@xrplf/prettier-config",
   "engines": {
     "node": ">= 10",
     "npm": ">=7.0.0"

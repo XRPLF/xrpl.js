@@ -17,22 +17,7 @@
     "buffer": "5.6.0",
     "create-hash": "^1.2.0",
     "decimal.js": "^10.2.0",
-    "ripple-address-codec": "^4.1.1"
-  },
-  "devDependencies": {
-    "@types/jest": "^26.0.7",
-    "@types/node": "^14.0.10",
-    "@typescript-eslint/eslint-plugin": "^3.2.0",
-    "@typescript-eslint/parser": "^3.2.0",
-    "eslint": "^7.7.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-import": "^2.21.1",
-    "eslint-plugin-jest": "^23.20.0",
-    "eslint-plugin-mocha": "^7.0.1",
-    "eslint-plugin-prettier": "^3.1.3",
-    "jest": "^26.0.1",
-    "prettier": "^2.0.4",
-    "typescript": "^3.9.5"
+    "ripple-address-codec": "file:../ripple-address-codec"
   },
   "scripts": {
     "build": "tsc -b && cp ./src/enums/definitions.json ./dist/enums",
@@ -51,9 +36,7 @@
   "homepage": "https://github.com/XRPLF/xrpl.js/packages/ripple-binary-codec#readme",
   "license": "ISC",
   "readmeFilename": "README.md",
-  "prettier": {
-    "semi": true
-  },
+  "prettier": "@xrplf/prettier-config",
   "engines": {
     "node": ">=10.22.0",
     "npm": ">=7.0.0"

@@ -1,5 +1,3 @@
-/* eslint-disable func-style */
-
 const { coreTypes } = require("../dist/types");
 const Decimal = require("decimal.js");
 

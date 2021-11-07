@@ -22,91 +22,104 @@ module.exports = {
     jest: true, // Add Mocha testing global variables
   },
 
-  plugins: [
-    '@typescript-eslint', // Add some TypeScript specific rules, and disable rules covered by the typechecker
-    'import', // Add rules that help validate proper imports
-    'prettier', // Allows running prettier as an ESLint rule, and reporting differences as individual linting issues
-    'jest'
-  ],
+  plugins: [],
+  extends: ['@xrplf/eslint-config/base'],
 
-  extends: [
-    // ESLint recommended rules
-    'eslint:recommended',
-
-    // Add TypeScript-specific rules, and disable rules covered by typechecker
-    'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended',
-
-    // Add rules for import/export syntax
-    'plugin:import/errors',
-    'plugin:import/warnings',
-    'plugin:import/typescript',
-
-    // Add rules that specifically require type information using our tsconfig
-    'plugin:@typescript-eslint/recommended-requiring-type-checking',
-
-    // Enable Prettier for ESLint --fix, and disable rules that conflict with Prettier
-    'prettier/@typescript-eslint',
-    'plugin:prettier/recommended',
-  ],
-
-  // rules: {
-  //   // This rule is about explicitly using `return undefined` when a function returns any non-undefined object.
-  //   // However, since we're using TypeScript, it will yell at us if a function is not allowed to return `undefined` in its signature, so we don't need this rule.
-  //   "consistent-return": "off",
-  // },
-
-  overrides: [
-    // Overrides for all test files
-    {
-      files: 'test/**/*.test.js',
-      extends: ["plugin:jest/recommended"],
-      rules: {
-        // For our Mocha test files, the pattern has been to have unnamed functions
-        'func-names': 'off',
-        // For some test files, we shadow testing constants with function parameter names
-        'no-shadow': 'off',
-        // Some of our test files declare helper classes with errors
-        'max-classes-per-file': 'off',
-        // Test files are in javascript, turn off TypeScript linting.
-        '@typescript-eslint/no-var-requires': 'off',
-        '@typescript-eslint/no-unsafe-call': 'off',
-        '@typescript-eslint/no-unsafe-member-access': 'off',
-        '@typescript-eslint/restrict-template-expressions': 'off',
-        '@typescript-eslint/no-unsafe-assignment': 'off',
-        '@typescript-eslint/restrict-template-expressions': 'off',
-        '@typescript-eslint/no-unsafe-return': 'off',
-        '@typescript-eslint/unbound-method': 'off'
-      },
-    },
-    {
-      files: '**/*.ts',
-      rules: {
-        // Allow unused variables in our files when explicitly prepended with `_`.
-        '@typescript-eslint/no-unused-vars': [
-          'error',
-          { argsIgnorePattern: '^_' },
-        ],
-
-        '@typescript-eslint/ban-types': 'off',
-
-        // These rules are deprecated, but we have an old config that enables it
-        '@typescript-eslint/camelcase': 'off',
-        '@typescript-eslint/ban-ts-ignore': 'off',
-
-        // These rules are actually disabled in @xpring-eng/eslint-config-base/loose at the moment
-        '@typescript-eslint/no-unsafe-call': 'off',
-        '@typescript-eslint/no-unsafe-member-access': 'off',
-        '@typescript-eslint/no-unsafe-assignment': 'off',
-        "spaced-comment": ["error", "always"],
-      },
-    },
-    {
-      files: ['src/XRP/default-xrp-client.ts'],
-      rules: {
-        // This is actually a good rule to have enabled, but for the XRPClient, we define a helper error message class in the same file
-        'max-classes-per-file': 'off',
-      },
-    },
-  ],
+  rules: {
+    // ** TODO **
+    // all of the below are turned off for now during the migration to a
+    // monorepo. They need to actually be addressed!
+    // **
+    '@typescript-eslint/naming-convention': 'off',
+    '@typescript-eslint/prefer-readonly': 'off',
+    '@typescript-eslint/no-parameter-properties': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-unsafe-member-access': 'off',
+    '@typescript-eslint/no-unsafe-call': 'off',
+    '@typescript-eslint/no-var-requires': 'off',
+    '@typescript-eslint/no-require-imports': 'off',
+    '@typescript-eslint/no-unsafe-assignment': 'off',
+    '@typescript-eslint/restrict-plus-operands': 'off',
+    '@typescript-eslint/unbound-method': 'off',
+    '@typescript-eslint/restrict-template-expressions': 'off',
+    '@typescript-eslint/no-base-to-string': 'off',
+    '@typescript-eslint/no-unsafe-return': 'off',
+    '@typescript-eslint/promise-function-async': 'off',
+    '@typescript-eslint/explicit-member-accessibility': 'off',
+    '@typescript-eslint/array-type': 'off',
+    '@typescript-eslint/no-magic-numbers': 'off',
+    '@typescript-eslint/no-useless-constructor': 'off',
+    '@typescript-eslint/no-unnecessary-condition': 'off',
+    '@typescript-eslint/consistent-type-assertions': 'off',
+    '@typescript-eslint/prefer-for-of': 'off',
+    '@typescript-eslint/prefer-nullish-coalescing': 'off',
+    '@typescript-eslint/require-array-sort-compare': 'off',
+    '@typescript-eslint/prefer-includes': 'off',
+    '@typescript-eslint/dot-notation': 'off',
+    '@typescript-eslint/consistent-type-definitions': 'off',
+    '@typescript-eslint/no-type-alias': 'off',
+    '@typescript-eslint/member-ordering': 'off',
+    '@typescript-eslint/prefer-string-starts-ends-with': 'off',
+    '@typescript-eslint/ban-types': 'off',
+    '@typescript-eslint/no-extraneous-class': 'off',
+    '@typescript-eslint/consistent-type-assertions': 'off',
+    'import/unambiguous': 'off',
+    'import/extensions': 'off',
+    'import/prefer-default-export': 'off',
+    'import/no-useless-path-segments': 'off',
+    'import/no-unused-modules': 'off',
+    'import/no-cycle': 'off',
+    'import/order': 'off',
+    'import/no-commonjs': 'off',
+    'import/newline-after-import': 'off',
+    'node/global-require': 'off',
+    'consistent-default-export-name/default-import-match-filename': 'off',
+    'prettier/prettier': 'off',
+    'jsdoc/require-throws': 'off',
+    'jsdoc/require-description-complete-sentence': 'off',
+    'jsdoc/require-jsdoc': 'off',
+    'jsdoc/check-tag-names': 'off',
+    'jsdoc/require-returns': 'off',
+    'jsdoc/require-hyphen-before-param-description': 'off',
+    'jsdoc/require-description': 'off',
+    'jsdoc/require-param': 'off',
+    'jsdoc/check-param-names': 'off',
+    'jsdoc/newline-after-description': 'off',
+    'jsdoc/require-returns-check': 'off',
+    'tsdoc/syntax': 'off',
+    'eslint-comments/require-description': 'off',
+    'eslint-comments/no-unused-disable': 'off',
+    'prefer-const': 'off',
+    'global-require': 'off',
+    'id-length': 'off',
+    'no-shadow': 'off',
+    'no-bitwise': 'off',
+    'spaced-comment': 'off',
+    'prefer-template': 'off',
+    'prefer-object-spread': 'off',
+    'no-inline-comments': 'off',
+    'no-plusplus': 'off',
+    'new-cap': 'off',
+    'id-blacklist': 'off',
+    'max-lines-per-function': 'off',
+    'require-unicode-regexp': 'off',
+    'no-undef-init': 'off',
+    'curly': 'off',
+    'eqeqeq': 'off',
+    'no-console': 'off',
+    'max-classes-per-file': 'off',
+    'operator-assignment': 'off',
+    'class-methods-use-this': 'off',
+    'no-else-return': 'off',
+    'yoda': 'off',
+    'max-depth': 'off',
+    'multiline-comment-style': 'off',
+    'one-var': 'off',
+    'no-negated-condition': 'off',
+    'radix': 'off',
+    'no-nested-ternary': 'off',
+    'no-useless-concat': 'off',
+    'object-shorthand': 'off',
+    'no-param-reassign': 'off',
+  },
 }

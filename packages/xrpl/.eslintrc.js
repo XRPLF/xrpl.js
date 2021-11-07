@@ -75,6 +75,11 @@ module.exports = {
     {
       files: ['test/**/*.ts'],
       rules: {
+        // Because this project is managed by lerna, dev dependencies are
+        // hoisted and do not appear in the package.json.
+        'import/no-extraneous-dependencies': 'off',
+        'node/no-extraneous-import': 'off',
+
         // We have lots of magic numbers in tests
         '@typescript-eslint/no-magic-numbers': 'off',
 
@@ -89,14 +94,6 @@ module.exports = {
 
         // We need to mess with internal things to generate certain testing situations
         '@typescript-eslint/no-unsafe-member-access': 'off',
-
-        // We need to be able to import xrpl-local
-        'node/no-extraneous-import': [
-          'error',
-          {
-            allowModules: ['xrpl-local'],
-          },
-        ],
 
         // Tests are already in 2 callbacks, so max 3 is pretty restrictive
         'max-nested-callbacks': 'off',

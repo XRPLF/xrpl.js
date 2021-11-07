@@ -97,7 +97,6 @@ const ed25519 = {
   },
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function select(algorithm): any {
   const methods = { 'ecdsa-secp256k1': secp256k1, ed25519 }
   return methods[algorithm]

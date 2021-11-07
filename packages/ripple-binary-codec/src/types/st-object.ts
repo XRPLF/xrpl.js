@@ -103,7 +103,7 @@ class STObject extends SerializedType {
       let handled: JsonObject | undefined = undefined;
       if (val && isValidXAddress(val.toString())) {
         handled = handleXAddress(key, val.toString());
-        checkForDuplicateTags(handled, value as JsonObject);
+        checkForDuplicateTags(handled, value);
       }
       return Object.assign(acc, handled ?? { [key]: val });
     }, {});

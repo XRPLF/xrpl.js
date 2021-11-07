@@ -1,7 +1,5 @@
-/* eslint-disable */
-
 import * as elliptic from 'elliptic'
-import Sha512 from './sha512'
+import Sha512 from './Sha512'
 
 const secp256k1 = elliptic.ec('secp256k1')
 

@@ -1,5 +1,5 @@
-/* eslint-disable */
-
+/* eslint-disable no-bitwise --
+ * lots of bitwise operators necessary for this */
 import * as hashjs from 'hash.js'
 import * as BigNum from 'bn.js'
 
