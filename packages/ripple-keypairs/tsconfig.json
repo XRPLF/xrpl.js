@@ -1,31 +1,20 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    // Basic Options
     "target": "ES2017",
-    "module": "CommonJS",
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true,
-
-    // Directories
-    "outDir": "dist",
-    "rootDir": "src",
-
-    // Strict Type-Checking Options
-    "strict": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
     "noImplicitAny": false,
-
-    // Additional Checks
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-
-    // Module Resolution Options
-    "moduleResolution": "node",
-
-    // Advanced Options
     "forceConsistentCasingInFileNames": true
   },
+  "references": [{
+    "path": "../ripple-address-codec/tsconfig.json"
+  }],
   "include": ["src/**/*.ts"]
 }

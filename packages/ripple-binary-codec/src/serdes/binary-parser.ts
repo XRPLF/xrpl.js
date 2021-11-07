@@ -24,7 +24,7 @@ class BinaryParser {
    * @returns The first byte of the BinaryParser
    */
   peek(): number {
-    assert(this.bytes.byteLength !== 0);
+    assert.ok(this.bytes.byteLength !== 0);
     return this.bytes[0];
   }
 
@@ -34,7 +34,7 @@ class BinaryParser {
    * @param n the number of bytes to skip
    */
   skip(n: number): void {
-    assert(n <= this.bytes.byteLength);
+    assert.ok(n <= this.bytes.byteLength);
     this.bytes = this.bytes.slice(n);
   }
 
@@ -45,7 +45,7 @@ class BinaryParser {
    * @return The bytes
    */
   read(n: number): Buffer {
-    assert(n <= this.bytes.byteLength);
+    assert.ok(n <= this.bytes.byteLength);
 
     const slice = this.bytes.slice(0, n);
     this.skip(n);
@@ -59,7 +59,7 @@ class BinaryParser {
    * @return The number represented by those bytes
    */
   readUIntN(n: number): number {
-    assert(0 < n && n <= 4, "invalid n");
+    assert.ok(0 < n && n <= 4, "invalid n");
     return this.read(n).reduce((a, b) => (a << 8) | b) >>> 0;
   }
 

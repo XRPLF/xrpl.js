@@ -45,7 +45,7 @@ interface transactionItemObject extends JsonObject {
 function transactionItemizer(
   json: transactionItemObject
 ): [Hash256, ShaMapNode, undefined] {
-  assert(json.hash);
+  assert.ok(json.hash);
   const index = Hash256.from(json.hash);
   const item = {
     hashPrefix() {
@@ -139,8 +139,8 @@ interface ledgerObject {
 function ledgerHash(header: ledgerObject): Hash256 {
   const hash = new Sha512Half();
   hash.put(HashPrefix.ledgerHeader);
-  assert(header.parent_close_time !== undefined);
-  assert(header.close_flags !== undefined);
+  assert.ok(header.parent_close_time !== undefined);
+  assert.ok(header.close_flags !== undefined);
 
   UInt32.from<number>(header.ledger_index).toBytesSink(hash);
   UInt64.from<bigInt.BigInteger>(
@@ -163,7 +163,7 @@ function ledgerHash(header: ledgerObject): Hash256 {
  * @returns A JSON object describing a ledger header
  */
 function decodeLedgerData(binary: string): object {
-  assert(typeof binary === "string", "binary must be a hex string");
+  assert.ok(typeof binary === "string", "binary must be a hex string");
   const parser = new BinaryParser(binary);
   return {
     ledger_index: parser.readUInt32(),

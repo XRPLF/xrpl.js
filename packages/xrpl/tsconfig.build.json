@@ -1,4 +1,18 @@
 {
-    "extends": "./tsconfig.json",
-    "include": ["src/**/*.ts"]
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./src"
+  },
+  "include": ["./src/**/*.ts"],
+  "references": [
+    {
+      "path": "../ripple-address-codec/tsconfig.json"
+    },
+    {
+      "path": "../ripple-binary-codec/tsconfig.json"
+    },
+    {
+      "path": "../ripple-keypairs/tsconfig.json"
+    }
+  ]
 }

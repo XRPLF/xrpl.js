@@ -18,7 +18,7 @@ const {
  * @returns the JSON representation of the transaction
  */
 function decode(binary: string): JsonObject {
-  assert(typeof binary === "string", "binary must be a hex string");
+  assert.ok(typeof binary === "string", "binary must be a hex string");
   return binaryToJSON(binary);
 }
 
@@ -29,7 +29,7 @@ function decode(binary: string): JsonObject {
  * @returns A hex-string of the encoded transaction
  */
 function encode(json: object): string {
-  assert(typeof json === "object");
+  assert.ok(typeof json === "object");
   return serializeObject(json as JsonObject)
     .toString("hex")
     .toUpperCase();
@@ -43,7 +43,7 @@ function encode(json: object): string {
  * @returns a hex string of the encoded transaction
  */
 function encodeForSigning(json: object): string {
-  assert(typeof json === "object");
+  assert.ok(typeof json === "object");
   return signingData(json as JsonObject)
     .toString("hex")
     .toUpperCase();
@@ -57,7 +57,7 @@ function encodeForSigning(json: object): string {
  * @returns a hex string of the encoded transaction
  */
 function encodeForSigningClaim(json: object): string {
-  assert(typeof json === "object");
+  assert.ok(typeof json === "object");
   return signingClaimData(json as ClaimObject)
     .toString("hex")
     .toUpperCase();
@@ -71,7 +71,7 @@ function encodeForSigningClaim(json: object): string {
  * @returns a hex string of the encoded transaction
  */
 function encodeForMultisigning(json: object, signer: string): string {
-  assert(typeof json === "object");
+  assert.ok(typeof json === "object");
   assert.equal(json["SigningPubKey"], "");
   return multiSigningData(json as JsonObject, signer)
     .toString("hex")
@@ -85,7 +85,7 @@ function encodeForMultisigning(json: object, signer: string): string {
  * @returns a hex-string representing the quality
  */
 function encodeQuality(value: string): string {
-  assert(typeof value === "string");
+  assert.ok(typeof value === "string");
   return quality.encode(value).toString("hex").toUpperCase();
 }
 
@@ -96,7 +96,7 @@ function encodeQuality(value: string): string {
  * @returns a string representing the quality
  */
 function decodeQuality(value: string): string {
-  assert(typeof value === "string");
+  assert.ok(typeof value === "string");
   return quality.decode(value).toString();
 }
 

@@ -12,7 +12,7 @@ function bytesToHex(a): string {
 }
 
 function hexToBytes(a): number[] {
-  assert(a.length % 2 === 0)
+  assert.ok(a.length % 2 === 0)
   return new BN(a, 16).toArray(null, a.length / 2)
 }
 

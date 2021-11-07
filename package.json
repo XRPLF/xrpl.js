@@ -1,7 +1,11 @@
 {
   "private": true,
   "scripts": {
-    "test": "mocha"
+    "test": "lerna run test",
+    "test:browser": "lerna run test:browser",
+    "test:integration": "lerna run test:integration",
+    "lint": "lerna run lint",
+    "build": "lerna run build"
   },
   "devDependencies": {
     "lerna": "^4.0.0"

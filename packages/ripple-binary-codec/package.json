@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "assert": "^2.0.0",
-    "buffer": "5.6.0",
     "big-integer": "^1.6.48",
+    "buffer": "5.6.0",
     "create-hash": "^1.2.0",
     "decimal.js": "^10.2.0",
     "ripple-address-codec": "^4.1.1"
@@ -35,19 +35,20 @@
     "typescript": "^3.9.5"
   },
   "scripts": {
-    "compile": "tsc && cp ./src/enums/definitions.json ./dist/enums",
-    "prepare": "npm run compile && npm test",
+    "build": "tsc -b && cp ./src/enums/definitions.json ./dist/enums",
+    "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
+    "prepare": "npm run build && npm test",
     "test": "jest",
     "lint": "eslint . --ext .ts --ext .test.js"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/ripple/ripple-binary-codec.git"
+    "url": "git@github.com:XRPLF/xrpl.js.git"
   },
   "bugs": {
-    "url": "https://github.com/ripple/ripple-binary-codec/issues"
+    "url": "https://github.com/XRPLF/xrpl.js/issues"
   },
-  "homepage": "https://github.com/ripple/ripple-binary-codec#readme",
+  "homepage": "https://github.com/XRPLF/xrpl.js/packages/ripple-binary-codec#readme",
   "license": "ISC",
   "readmeFilename": "README.md",
   "prettier": {

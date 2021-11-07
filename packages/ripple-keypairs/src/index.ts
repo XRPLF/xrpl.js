@@ -19,7 +19,10 @@ function generateSeed(
     algorithm?: 'ed25519' | 'ecdsa-secp256k1'
   } = {},
 ): string {
-  assert(!options.entropy || options.entropy.length >= 16, 'entropy too short')
+  assert.ok(
+    !options.entropy || options.entropy.length >= 16,
+    'entropy too short',
+  )
   const entropy = options.entropy ? options.entropy.slice(0, 16) : brorand(16)
   const type = options.algorithm === 'ed25519' ? 'ed25519' : 'secp256k1'
   return addressCodec.encodeSeed(entropy, type)
@@ -79,7 +82,7 @@ const ed25519 = {
   sign(message, privateKey): string {
     // caution: Ed25519.sign interprets all strings as hex, stripping
     // any non-hex characters without warning
-    assert(Array.isArray(message), 'message must be array of octets')
+    assert.ok(Array.isArray(message), 'message must be array of octets')
     return bytesToHex(
       Ed25519.sign(message, hexToBytes(privateKey).slice(1)).toBytes(),
     )

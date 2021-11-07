@@ -3,11 +3,11 @@
   "version": "1.0.3",
   "description": "Cryptographic key pairs for the XRP Ledger",
   "scripts": {
-    "compile": "tsc",
-    "test": "tsc && nyc mocha",
+    "build": "tsc -b",
+    "test": "tsc -b && nyc mocha",
+    "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
     "lint": "eslint . --ext .ts --fix",
-    "prepublish": "npm run lint && npm test",
-    "coverage": "nyc --reporter=lcov mocha && codecov"
+    "prepublish": "npm run lint && npm test"
   },
   "files": [
     "dist/*"
@@ -28,7 +28,6 @@
     "@types/node": "^16.4.3",
     "@typescript-eslint/eslint-plugin": "^2.19.0",
     "@typescript-eslint/parser": "^2.16.0",
-    "codecov": "^3.6.2",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-airbnb-typescript": "^7.0.0",
@@ -45,7 +44,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/ripple/ripple-keypairs.git"
+    "url": "git@github.com:XRPLF/xrpl.js.git"
   },
   "license": "ISC",
   "engines": {

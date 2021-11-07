@@ -1,16 +1,11 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "pretty": true,
     "target": "es6",
-    "module": "commonjs",
-    "moduleResolution": "node",
     "outDir": "./dist/npm",
-
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true,
-
-    "strict": true,
     "strictNullChecks": true,
     "noImplicitAny": false,
     "noUnusedLocals": true,

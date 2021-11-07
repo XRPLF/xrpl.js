@@ -15,15 +15,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/ripple/ripple-address-codec.git"
+    "url": "git@github.com:XRPLF/xrpl.js.git"
   },
-  "prepublish": "tsc",
-  "prepublishOnly": "tslint -p ./ && jest",
+  "prepublish": "tsc -b",
+  "prepublishOnly": "tslint -b ./ && jest",
   "scripts": {
-    "build": "tsc",
-    "compile": "tsc",
+    "build": "tsc -b",
     "test": "jest",
-    "lint": "tslint -p ./"
+    "lint": "tslint -p ./",
+    "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",

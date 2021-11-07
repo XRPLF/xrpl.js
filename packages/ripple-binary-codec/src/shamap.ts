@@ -158,7 +158,7 @@ class ShaMapInner extends ShaMapNode {
    * @param leaf Leaf node to insert when branch doesn't exist
    */
   addItem(index?: Hash256, item?: ShaMapNode, leaf?: ShaMapLeaf): void {
-    assert(index !== undefined);
+    assert.ok(index !== undefined);
     const nibble = index.nibblet(this.depth);
     const existing = this.branches[nibble];
 
