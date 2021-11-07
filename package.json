@@ -1,4 +1,5 @@
 {
+  "name": "xrpl.js",
   "private": true,
   "scripts": {
     "test": "lerna run test",
@@ -6,6 +7,12 @@
     "test:integration": "lerna run test:integration",
     "lint": "lerna run lint",
     "build": "lerna run build"
+  },
+  "dependencies": {
+    "ripple-address-codec": "file:packages/ripple-address-codec",
+    "ripple-binary-codec": "file:packages/ripple-binary-codec",
+    "ripple-keypairs": "file:packages/ripple-keypairs",
+    "xrpl": "file:packages/xrpl"
   },
   "devDependencies": {
     "@types/chai": "^4.2.21",
@@ -17,7 +24,7 @@
     "@types/ws": "^8.2.0",
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.0.0",
-    "@xrplf/eslint-config": "^1.5.0",
+    "@xrplf/eslint-config": "^1.6.0",
     "@xrplf/prettier-config": "^1.5.0",
     "assert": "^2.0.0",
     "buffer": "^6.0.2",
@@ -25,14 +32,10 @@
     "crypto-browserify": "^3.12.0",
     "ejs": "^3.0.1",
     "eslint": "^7.5.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-config-airbnb-typescript": "^7.0.0",
-    "eslint-config-prettier": "^6.9.0",
     "eslint-plugin-array-func": "^3.1.7",
     "eslint-plugin-consistent-default-export-name": "^0.0.13",
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-import": "^2.24.1",
-    "eslint-plugin-jest": "^23.20.0",
     "eslint-plugin-jsdoc": "^36.0.0",
     "eslint-plugin-mocha": "^9.0.0",
     "eslint-plugin-node": "^11.1.0",
@@ -55,8 +58,6 @@
     "ts-jest": "^26.4.4",
     "ts-loader": "^9.2.5",
     "ts-node": "^10.2.1",
-    "tslint": "^5.19.0",
-    "tslint-eslint-rules": "^5.4.0",
     "typedoc": "^0.22.5",
     "typescript": "^4.4.2",
     "url": "^0.11.0",
@@ -70,12 +71,5 @@
   "engines": {
     "node": ">=10.0.0",
     "npm": ">=7.0.0 < 8.0.0"
-  },
-  "name": "xrpl.js",
-  "dependencies": {
-    "ripple-address-codec": "file:packages/ripple-address-codec",
-    "ripple-binary-codec": "file:packages/ripple-binary-codec",
-    "ripple-keypairs": "file:packages/ripple-keypairs",
-    "xrpl": "file:packages/xrpl"
   }
 }
