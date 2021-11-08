@@ -127,7 +127,7 @@ npm uninstall abbrev -w xrpl
 
 1. Ensure that all tests passed on the last CI that ran on `develop`.
 2. Open a PR to update the docs if docs were modified.
-3. Create a branch off `develop` that properly increments the version in `package.json` and ensures that `HISTORY.md` is updated appropriately. We follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+3. Create a branch off `develop` that ensures that `HISTORY.md` is updated appropriately for each package.
   * Use `shasum -a 256 build/*` to get the SHA-256 checksums. Add these to `HISTORY.md` as well.
 4. Merge this branch into `develop`.
 5. If this is not a beta release: Merge `develop` into `master` (`--ff-only`) and push to github. This is important because we have docs telling developers to use master to get the latest release.
