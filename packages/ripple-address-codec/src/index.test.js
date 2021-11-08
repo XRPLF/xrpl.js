@@ -1,9 +1,9 @@
-import {
+const {
   classicAddressToXAddress,
   xAddressToClassicAddress,
   isValidXAddress,
   encodeXAddress
-} from './index'
+} = require('./index')
 
 const testCases = [
   [
@@ -146,9 +146,9 @@ const testCases = [
 
   for (const i in testCases) {
     const testCase = testCases[i]
-    const classicAddress = testCase[0] as string
-    const tag = testCase[1] !== false ? testCase[1] as number : false
-    const xAddress = isTestAddress ? testCase[3] as string : testCase[2] as string
+    const classicAddress = testCase[0]
+    const tag = testCase[1] !== false ? testCase[1] : false
+    const xAddress = isTestAddress ? testCase[3] : testCase[2]
     test(`Converts ${classicAddress}${tag ? ':' + tag : ''} to ${xAddress}${network}`, () => {
       expect(classicAddressToXAddress(classicAddress, tag, isTestAddress)).toBe(xAddress)
       const myClassicAddress = xAddressToClassicAddress(xAddress)
@@ -191,7 +191,7 @@ const testCases = [
 
     highAndLowAccounts.forEach(accountId => {
       [false, 0, 1, MAX_32_BIT_UNSIGNED_INT].forEach(t => {
-        const tag = (t as number | false)
+        const tag = (t | false)
         const xAddress = encodeXAddress(accountId, tag, isTestAddress)
         test(`Encoding ${accountId.toString('hex')}${tag ? ':' + tag : ''} to ${xAddress} has expected length`, () => {
           expect(xAddress.length).toBe(47)

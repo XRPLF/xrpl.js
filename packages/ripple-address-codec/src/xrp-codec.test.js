@@ -1,10 +1,10 @@
-import * as api from './xrp-codec'
+const api = require('./xrp-codec')
 
-function toHex(bytes: Buffer) {
+function toHex(bytes) {
   return Buffer.from(bytes).toString('hex').toUpperCase()
 }
 
-function toBytes(hex: string) {
+function toBytes(hex) {
   return Buffer.from(hex, 'hex')
 }
 
@@ -16,7 +16,7 @@ function toBytes(hex: string) {
  * @param base58 Base58-encoded string to decode
  * @param hex Hexadecimal representation of expected decoded data
  */
-function makeEncodeDecodeTest(encoder: Function, decoder: Function, base58: string, hex: string) {
+function makeEncodeDecodeTest(encoder, decoder, base58, hex) {
   test(`can translate between ${hex} and ${base58}`, function() {
     const actual = encoder(toBytes(hex))
     expect(actual).toBe(base58)
