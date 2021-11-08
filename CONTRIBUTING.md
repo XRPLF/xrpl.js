@@ -2,14 +2,29 @@
 
 ## Set up your dev environment
 
-We use Node v14 for development - that is the version that our linters require.
+### Requirements
 
-To set up the repository:
+We use Node v14 for development - that is the version that our linters require.
+You must also use `npm` v7. You can check your `npm` version with:
+
+```bash
+npm -v
+```
+
+If your `npm` version is too old, use this command to update it:
+
+```bash
+npm -g i npm@7
+```
+
+### Set up
+
 1. Clone the repository
 2. `cd` into the repository
 3. Install dependencies with `npm install`
 
-To build the library:
+### Build
+
 ```bash
 npm run build
 ```
@@ -18,17 +33,18 @@ npm run build
 
 ```bash
 npm install
+npm run build
 npm run lint
 ```
 
 ## Running Tests
-
 For integration and browser tests, we use a `rippled` node in standalone mode to test xrpl.js code against. To set this up, you can either run `rippled` locally, or set up the Docker container `natenichols/rippled-standalone:latest` for this purpose. The latter will require you to [install Docker](https://docs.docker.com/get-docker/).
 
 ### Unit Tests
 
 ```bash
 npm install
+npm run build
 npm test
 ```
 
@@ -38,6 +54,7 @@ npm test
 npm install
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
 docker run -p 6006:6006 -it natenichols/rippled-standalone:latest
+npm run build
 npm run test:integration
 ```
 
@@ -50,7 +67,7 @@ One is in the browser - run `npm run build:browserTests` and open `test/localInt
 The other is in the command line (this is what we use for CI) -
 
 ```bash
-npm run build:browserTests
+npm run build
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
 docker run -p 6006:6006 -it natenichols/rippled-standalone:latest
 npm run test:browser
@@ -62,6 +79,37 @@ You can see the complete reference documentation at [`xrpl.js` docs](js.xrpl.org
 
 ```bash
 npm run docgen
+```
+
+## Adding and removing packages
+
+`xrpl.js` uses `lerna` and `npm`'s workspaces features to manage a monorepo.
+Adding and removing packages requires a slightly different process than normal
+as a result.
+
+### Adding or removing development dependencies
+
+`xrpl.js` strives to use the same development dependencies in all packages.
+You may add and remove dev dependencies like normal:
+
+```bash
+### adding a new dependency
+npm install --save-dev abbrev
+### removing a dependency
+npm uninstall --save-dev abbrev
+```
+
+### Adding or removing runtime dependencies
+
+You need to specify which package is changing using the `-w` flag:
+
+```bash
+### adding a new dependency to `xrpl`
+npm install abbrev -w xrpl
+### adding a new dependency to `ripple-keypairs`
+npm install abbrev -w ripple-keypairs
+### removing a dependency
+npm uninstall abbrev -w xrpl
 ```
 
 ## Release process

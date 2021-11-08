@@ -6,7 +6,9 @@
     "test:browser": "lerna run test:browser --stream",
     "test:integration": "lerna run test:integration --stream",
     "lint": "lerna run lint --stream",
-    "build": "lerna run build --stream"
+    "clean": "lerna run clean --stream",
+    "build": "lerna run build --stream",
+    "docgen": "lerna run docgen --stream"
   },
   "dependencies": {
     "ripple-address-codec": "file:packages/ripple-address-codec",
