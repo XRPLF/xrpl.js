@@ -71,3 +71,6 @@ scripts/cache
 
 # browser tests
 testCompiledForWeb
+
+# lerna debug
+lerna-debug.log

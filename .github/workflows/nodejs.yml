@@ -23,9 +23,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm install
-    - run: npm run lint
+    - run: npm install -g npm@7
+    - run: npm ci
     - run: npm run build
+    - run: npm run lint
 
   unit:
     runs-on: ubuntu-latest
@@ -41,7 +42,9 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm install --ignore-engines
+    - run: npm install -g npm@7
+    - run: npm ci
+    - run: npm run build
     - run: npm test
 
   integration:
@@ -65,7 +68,9 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm install --ignore-engines
+    - run: npm install -g npm@7
+    - run: npm ci
+    - run: npm run build
     - run: npm run test:integration
       env:
         HOST: localhost
@@ -92,5 +97,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm install
+    - run: npm install -g npm@7
+    - run: npm ci 
+    - run: npm run build
     - run: npm run test:browser
