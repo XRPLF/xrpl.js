@@ -1,0 +1,58 @@
+{
+  "Account": "rDd6FpNbeY2CrQajSmP178BmNGusmQiYMM",
+  "Authorize": "rDJFnv5sEfp42LMFiX3mVQKczpFTdxYDzM",
+  "Fee": "10",
+  "Flags": 2147483648,
+  "Sequence": 65,
+  "SigningPubKey": "03EB1E2603E7571D6144684996C10DA75063D6E2F3B3FDABE38B857C1BE9578A55",
+  "TransactionType": "DepositPreauth",
+  "TxnSignature": "3045022100B0A5672E3E09FA3AF8CF1DCC1D8C881F58B39212D6FDC42CCF30E5400D0EFD9F02202DDD9517D9409D1D9A529B8AEA7DE13AE4CDF96BB6D18FA0D9732DBFC887348D",
+  "hash": "B5D94C027C846171B2F5D4C2D126E88580BF369986A155C1890352F5BC4D7AF9",
+  "meta": {
+    "AffectedNodes": [
+      {
+        "ModifiedNode": {
+          "FinalFields": {
+            "Account": "rDd6FpNbeY2CrQajSmP178BmNGusmQiYMM",
+            "Balance": "9827999174",
+            "Flags": 0,
+            "OwnerCount": 8,
+            "Sequence": 66
+          },
+          "LedgerEntryType": "AccountRoot",
+          "LedgerIndex": "146AAAF7A266D8A92DFFEAB1A71B6523534F27820873F4E213014B23398867D2",
+          "PreviousFields": {
+            "Balance": "9827999184",
+            "OwnerCount": 7,
+            "Sequence": 65
+          },
+          "PreviousTxnID": "8107CEE99D556326ACD4662CA10A24550240D9F933E55435A0C0DB3B06DD343E",
+          "PreviousTxnLgrSeq": 11427673
+        }
+      },
+      {
+        "CreatedNode": {
+          "LedgerEntryType": "DepositPreauth",
+          "LedgerIndex": "C2D0317AD266B93CB3B36AEB0ABB673B0AFFAB134809CCACFD7158F539603C3A",
+          "NewFields": {
+            "Account": "rDd6FpNbeY2CrQajSmP178BmNGusmQiYMM",
+            "Authorize": "rDJFnv5sEfp42LMFiX3mVQKczpFTdxYDzM"
+          }
+        }
+      },
+      {
+        "ModifiedNode": {
+          "FinalFields": {
+            "Flags": 0,
+            "Owner": "rDd6FpNbeY2CrQajSmP178BmNGusmQiYMM",
+            "RootIndex": "CD08416851CA53E9649408118A4908E01E43436ED950886D1B1E66F4B68B82EC"
+          },
+          "LedgerEntryType": "DirectoryNode",
+          "LedgerIndex": "CD08416851CA53E9649408118A4908E01E43436ED950886D1B1E66F4B68B82EC"
+        }
+      }
+    ],
+    "TransactionIndex": 0,
+    "TransactionResult": "tesSUCCESS"
+  }
+}

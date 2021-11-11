@@ -1,0 +1,94 @@
+{
+  "Account": "rfCp6hiUS4qqN1i4hTyX4ogA49MEbXgCau",
+  "Fee": "11",
+  "Flags": 2147483648,
+  "LastLedgerSequence": 24268341,
+  "Sequence": 15177,
+  "SignerEntries": [
+    {
+      "SignerEntry": {
+        "Account": "r4PQv7BCpp4SAJx3isNpQM8T2BuGrMQs5U",
+        "SignerWeight": 1
+      }
+    },
+    {
+      "SignerEntry": {
+        "Account": "rH7KDR67MZR7LDV7gesmEMXtaqU3FaK7Lr",
+        "SignerWeight": 1
+      }
+    },
+    {
+      "SignerEntry": {
+        "Account": "rPqHsX34XApKSfE4UxKbqVXb3WRmmgMY2u",
+        "SignerWeight": 1
+      }
+    }
+  ],
+  "SignerQuorum": 3,
+  "SigningPubKey": "0315B15964B3704B171E860DE1FC914D283395EE825C8546AEEBF0D24A5802BBC5",
+  "TransactionType": "SignerListSet",
+  "TxnSignature": "3044022069FC98D0BC32F510D4F94ECC726613E957D290050E428DD86EDA2C2515A1732D02207064EF085437B3F12A744AC6528D9E0C59FAA5A9FE903DF3639D2F09B522175F",
+  "date": 527847001,
+  "hash": "98C33CABFAE9F830CE842C260E34C25B0F987EE691941C0C9225AD476871B73D",
+  "inLedger": 24268339,
+  "ledger_index": 24268339,
+  "meta": {
+    "AffectedNodes": [
+      {
+        "ModifiedNode": {
+          "FinalFields": {
+            "Account": "rfCp6hiUS4qqN1i4hTyX4ogA49MEbXgCau",
+            "Balance": "4556673359",
+            "Flags": 0,
+            "OwnerCount": 25,
+            "RegularKey": "rK7ShY9CeDMBHLNFSMtTrSAUd9uzwcymcL",
+            "Sequence": 15178
+          },
+          "LedgerEntryType": "AccountRoot",
+          "LedgerIndex": "0DAF42BEE40F0EEFCFD8D54E81ECACD9371D281CDD9B77384FCDAF0E16560A44",
+          "PreviousFields": {
+            "Balance": "4556673370",
+            "Sequence": 15177
+          },
+          "PreviousTxnID": "4CD30C2526418A76ABED74713DF144B19F1B29BD8F7BC9EADCF16D33D7EC83D8",
+          "PreviousTxnLgrSeq": 24265571
+        }
+      },
+      {
+        "ModifiedNode": {
+          "FinalFields": {
+            "Flags": 0,
+            "OwnerNode": "0000000000000000",
+            "SignerEntries": [
+              {
+                "SignerEntry": {
+                  "Account": "rH7KDR67MZR7LDV7gesmEMXtaqU3FaK7Lr",
+                  "SignerWeight": 1
+                }
+              },
+              {
+                "SignerEntry": {
+                  "Account": "r4PQv7BCpp4SAJx3isNpQM8T2BuGrMQs5U",
+                  "SignerWeight": 1
+                }
+              },
+              {
+                "SignerEntry": {
+                  "Account": "rPqHsX34XApKSfE4UxKbqVXb3WRmmgMY2u",
+                  "SignerWeight": 1
+                }
+              }
+            ],
+            "SignerListID": 0,
+            "SignerQuorum": 3
+          },
+          "LedgerEntryType": "SignerList",
+          "LedgerIndex": "16F6AEEC6B85C9658B4BF604671677B7A7B2FAAFDB2FA5A0B72CBB49CAE80924"
+        }
+      }
+    ],
+    "TransactionIndex": 8,
+    "TransactionResult": "tesSUCCESS"
+  },
+  "validated": true
+}

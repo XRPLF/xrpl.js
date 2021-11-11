@@ -1,0 +1,206 @@
+import * as assert from "assert";
+import { Field, FieldInstance } from "../enums";
+import { SerializedType } from "../types/serialized-type";
+import { Buffer } from "buffer/";
+
+/**
+ * BinaryParser is used to compute fields and values from a HexString
+ */
+class BinaryParser {
+  private bytes: Buffer;
+
+  /**
+   * Initialize bytes to a hex string
+   *
+   * @param hexBytes a hex string
+   */
+  constructor(hexBytes: string) {
+    this.bytes = Buffer.from(hexBytes, "hex");
+  }
+
+  /**
+   * Peek the first byte of the BinaryParser
+   *
+   * @returns The first byte of the BinaryParser
+   */
+  peek(): number {
+    assert.ok(this.bytes.byteLength !== 0);
+    return this.bytes[0];
+  }
+
+  /**
+   * Consume the first n bytes of the BinaryParser
+   *
+   * @param n the number of bytes to skip
+   */
+  skip(n: number): void {
+    assert.ok(n <= this.bytes.byteLength);
+    this.bytes = this.bytes.slice(n);
+  }
+
+  /**
+   * read the first n bytes from the BinaryParser
+   *
+   * @param n The number of bytes to read
+   * @return The bytes
+   */
+  read(n: number): Buffer {
+    assert.ok(n <= this.bytes.byteLength);
+
+    const slice = this.bytes.slice(0, n);
+    this.skip(n);
+    return slice;
+  }
+
+  /**
+   * Read an integer of given size
+   *
+   * @param n The number of bytes to read
+   * @return The number represented by those bytes
+   */
+  readUIntN(n: number): number {
+    assert.ok(0 < n && n <= 4, "invalid n");
+    return this.read(n).reduce((a, b) => (a << 8) | b) >>> 0;
+  }
+
+  readUInt8(): number {
+    return this.readUIntN(1);
+  }
+
+  readUInt16(): number {
+    return this.readUIntN(2);
+  }
+
+  readUInt32(): number {
+    return this.readUIntN(4);
+  }
+
+  size(): number {
+    return this.bytes.byteLength;
+  }
+
+  end(customEnd?: number): boolean {
+    const length = this.bytes.byteLength;
+    return length === 0 || (customEnd !== undefined && length <= customEnd);
+  }
+
+  /**
+   * Reads variable length encoded bytes
+   *
+   * @return The variable length bytes
+   */
+  readVariableLength(): Buffer {
+    return this.read(this.readVariableLengthLength());
+  }
+
+  /**
+   * Reads the length of the variable length encoded bytes
+   *
+   * @return The length of the variable length encoded bytes
+   */
+  readVariableLengthLength(): number {
+    const b1 = this.readUInt8();
+    if (b1 <= 192) {
+      return b1;
+    } else if (b1 <= 240) {
+      const b2 = this.readUInt8();
+      return 193 + (b1 - 193) * 256 + b2;
+    } else if (b1 <= 254) {
+      const b2 = this.readUInt8();
+      const b3 = this.readUInt8();
+      return 12481 + (b1 - 241) * 65536 + b2 * 256 + b3;
+    }
+    throw new Error("Invalid variable length indicator");
+  }
+
+  /**
+   * Reads the field ordinal from the BinaryParser
+   *
+   * @return Field ordinal
+   */
+  readFieldOrdinal(): number {
+    let type = this.readUInt8();
+    let nth = type & 15;
+    type >>= 4;
+
+    if (type === 0) {
+      type = this.readUInt8();
+      if (type === 0 || type < 16) {
+        throw new Error("Cannot read FieldOrdinal, type_code out of range");
+      }
+    }
+
+    if (nth === 0) {
+      nth = this.readUInt8();
+      if (nth === 0 || nth < 16) {
+        throw new Error("Cannot read FieldOrdinal, field_code out of range");
+      }
+    }
+
+    return (type << 16) | nth;
+  }
+
+  /**
+   * Read the field from the BinaryParser
+   *
+   * @return The field represented by the bytes at the head of the BinaryParser
+   */
+  readField(): FieldInstance {
+    return Field.fromString(this.readFieldOrdinal().toString());
+  }
+
+  /**
+   * Read a given type from the BinaryParser
+   *
+   * @param type The type that you want to read from the BinaryParser
+   * @return The instance of that type read from the BinaryParser
+   */
+  readType(type: typeof SerializedType): SerializedType {
+    return type.fromParser(this);
+  }
+
+  /**
+   * Get the type associated with a given field
+   *
+   * @param field The field that you wan to get the type of
+   * @return The type associated with the given field
+   */
+  typeForField(field: FieldInstance): typeof SerializedType {
+    return field.associatedType;
+  }
+
+  /**
+   * Read value of the type specified by field from the BinaryParser
+   *
+   * @param field The field that you want to get the associated value for
+   * @return The value associated with the given field
+   */
+  readFieldValue(field: FieldInstance): SerializedType {
+    const type = this.typeForField(field);
+    if (!type) {
+      throw new Error(`unsupported: (${field.name}, ${field.type.name})`);
+    }
+    const sizeHint = field.isVariableLengthEncoded
+      ? this.readVariableLengthLength()
+      : undefined;
+    const value = type.fromParser(this, sizeHint);
+    if (value === undefined) {
+      throw new Error(
+        `fromParser for (${field.name}, ${field.type.name}) -> undefined `
+      );
+    }
+    return value;
+  }
+
+  /**
+   * Get the next field and value from the BinaryParser
+   *
+   * @return The field and value
+   */
+  readFieldAndValue(): [FieldInstance, SerializedType] {
+    const field = this.readField();
+    return [field, this.readFieldValue(field)];
+  }
+}
+
+export { BinaryParser };

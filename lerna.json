@@ -1,0 +1,5 @@
+{
+  "version": "independent",
+  "useWorkspaces": true,
+  "npmClient": "npm"
+}
