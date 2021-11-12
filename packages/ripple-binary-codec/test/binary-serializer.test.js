@@ -247,7 +247,7 @@ function ticketTest() {
 function nfTokenTest() {
   const fixtures = require('./fixtures/nf-token.json')
 
-  for (const txName in fixtures) {
+  for (const txName of Object.keys(fixtures)) {
     test(`can serialize transaction ${txName}`, () => {
       expect(encode(fixtures[txName].tx.json)).toEqual(
         fixtures[txName].tx.binary,
