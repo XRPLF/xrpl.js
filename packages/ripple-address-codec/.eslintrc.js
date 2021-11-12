@@ -63,7 +63,6 @@ module.exports = {
     'tsdoc/syntax': 'off',
     'import/no-commonjs': 'off',
     'import/order': 'off',
-    'prettier/prettier': 'off',
     'no-restricted-syntax': 'off',
     'guard-for-in': 'off',
     'object-shorthand': 'off',

@@ -29,15 +29,15 @@ function isSequence(val: Sequence | number): val is Sequence {
 }
 
 /**
-* Concatenate all `arguments` into a single array. Each argument can be either
-* a single element or a sequence, which has a `length` property and supports
-* element retrieval via sequence[ix].
-*
-* > concatArgs(1, [2, 3], Buffer.from([4,5]), new Uint8Array([6, 7]));
-*  [1,2,3,4,5,6,7]
-*
-* @returns {number[]} Array of concatenated arguments
-*/
+ * Concatenate all `arguments` into a single array. Each argument can be either
+ * a single element or a sequence, which has a `length` property and supports
+ * element retrieval via sequence[ix].
+ *
+ * > concatArgs(1, [2, 3], Buffer.from([4,5]), new Uint8Array([6, 7]));
+ *  [1,2,3,4,5,6,7]
+ *
+ * @returns {number[]} Array of concatenated arguments
+ */
 export function concatArgs(...args: (number | Sequence)[]): number[] {
   const ret: number[] = []
 

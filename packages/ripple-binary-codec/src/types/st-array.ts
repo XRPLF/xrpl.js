@@ -1,20 +1,20 @@
-import { SerializedType, JsonObject } from "./serialized-type";
-import { STObject } from "./st-object";
-import { BinaryParser } from "../serdes/binary-parser";
-import { Buffer } from "buffer/";
+import { SerializedType, JsonObject } from './serialized-type'
+import { STObject } from './st-object'
+import { BinaryParser } from '../serdes/binary-parser'
+import { Buffer } from 'buffer/'
 
-const ARRAY_END_MARKER = Buffer.from([0xf1]);
-const ARRAY_END_MARKER_NAME = "ArrayEndMarker";
+const ARRAY_END_MARKER = Buffer.from([0xf1])
+const ARRAY_END_MARKER_NAME = 'ArrayEndMarker'
 
-const OBJECT_END_MARKER = Buffer.from([0xe1]);
+const OBJECT_END_MARKER = Buffer.from([0xe1])
 
 /**
  * TypeGuard for Array<JsonObject>
  */
 function isObjects(args): args is Array<JsonObject> {
   return (
-    Array.isArray(args) && (args.length === 0 || typeof args[0] === "object")
-  );
+    Array.isArray(args) && (args.length === 0 || typeof args[0] === 'object')
+  )
 }
 
 /**
@@ -28,23 +28,23 @@ class STArray extends SerializedType {
    * @returns An STArray Object
    */
   static fromParser(parser: BinaryParser): STArray {
-    const bytes: Array<Buffer> = [];
+    const bytes: Array<Buffer> = []
 
     while (!parser.end()) {
-      const field = parser.readField();
+      const field = parser.readField()
       if (field.name === ARRAY_END_MARKER_NAME) {
-        break;
+        break
       }
 
       bytes.push(
         field.header,
         parser.readFieldValue(field).toBytes(),
-        OBJECT_END_MARKER
-      );
+        OBJECT_END_MARKER,
+      )
     }
 
-    bytes.push(ARRAY_END_MARKER);
-    return new STArray(Buffer.concat(bytes));
+    bytes.push(ARRAY_END_MARKER)
+    return new STArray(Buffer.concat(bytes))
   }
 
   /**
@@ -55,20 +55,20 @@ class STArray extends SerializedType {
    */
   static from<T extends STArray | Array<JsonObject>>(value: T): STArray {
     if (value instanceof STArray) {
-      return value;
+      return value
     }
 
     if (isObjects(value)) {
-      const bytes: Array<Buffer> = [];
+      const bytes: Array<Buffer> = []
       value.forEach((obj) => {
-        bytes.push(STObject.from(obj).toBytes());
-      });
+        bytes.push(STObject.from(obj).toBytes())
+      })
 
-      bytes.push(ARRAY_END_MARKER);
-      return new STArray(Buffer.concat(bytes));
+      bytes.push(ARRAY_END_MARKER)
+      return new STArray(Buffer.concat(bytes))
     }
 
-    throw new Error("Cannot construct STArray from value given");
+    throw new Error('Cannot construct STArray from value given')
   }
 
   /**
@@ -77,23 +77,23 @@ class STArray extends SerializedType {
    * @returns An Array of JSON objects
    */
   toJSON(): Array<JsonObject> {
-    const result: Array<JsonObject> = [];
+    const result: Array<JsonObject> = []
 
-    const arrayParser = new BinaryParser(this.toString());
+    const arrayParser = new BinaryParser(this.toString())
 
     while (!arrayParser.end()) {
-      const field = arrayParser.readField();
+      const field = arrayParser.readField()
       if (field.name === ARRAY_END_MARKER_NAME) {
-        break;
+        break
       }
 
-      const outer = {};
-      outer[field.name] = STObject.fromParser(arrayParser).toJSON();
-      result.push(outer);
+      const outer = {}
+      outer[field.name] = STObject.fromParser(arrayParser).toJSON()
+      result.push(outer)
     }
 
-    return result;
+    return result
   }
 }
 
-export { STArray };
+export { STArray }

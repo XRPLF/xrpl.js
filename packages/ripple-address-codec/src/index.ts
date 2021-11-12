@@ -8,21 +8,29 @@ import {
   decodeNodePublic,
   encodeAccountPublic,
   decodeAccountPublic,
-  isValidClassicAddress
+  isValidClassicAddress,
 } from './xrp-codec'
 import * as assert from 'assert'
 
 const PREFIX_BYTES = {
   MAIN: Buffer.from([0x05, 0x44]), // 5, 68
-  TEST: Buffer.from([0x04, 0x93]) // 4, 147
+  TEST: Buffer.from([0x04, 0x93]), // 4, 147
 }
 
-function classicAddressToXAddress(classicAddress: string, tag: number | false, test: boolean): string {
+function classicAddressToXAddress(
+  classicAddress: string,
+  tag: number | false,
+  test: boolean,
+): string {
   const accountId = decodeAccountID(classicAddress)
   return encodeXAddress(accountId, tag, test)
 }
 
-function encodeXAddress(accountId: Buffer, tag: number | false, test: boolean): string {
+function encodeXAddress(
+  accountId: Buffer,
+  tag: number | false,
+  test: boolean,
+): string {
   if (accountId.length !== 20) {
     // RIPEMD160 is 160 bits = 20 bytes
     throw new Error('Account ID must be 20 bytes')
@@ -35,41 +43,44 @@ function encodeXAddress(accountId: Buffer, tag: number | false, test: boolean): 
   if (tag === false) {
     tag = 0
   }
-  const bytes = Buffer.concat(
-    [
-      test ? PREFIX_BYTES.TEST : PREFIX_BYTES.MAIN,
-      accountId,
-      Buffer.from(
-        [
-          flag, // 0x00 if no tag, 0x01 if 32-bit tag
-          tag & 0xff, // first byte
-          (tag >> 8) & 0xff, // second byte
-          (tag >> 16) & 0xff, // third byte
-          (tag >> 24) & 0xff, // fourth byte
-          0, 0, 0, 0 // four zero bytes (reserved for 64-bit tags)
-        ]
-      )
-    ]
-  )
+  const bytes = Buffer.concat([
+    test ? PREFIX_BYTES.TEST : PREFIX_BYTES.MAIN,
+    accountId,
+    Buffer.from([
+      flag, // 0x00 if no tag, 0x01 if 32-bit tag
+      tag & 0xff, // first byte
+      (tag >> 8) & 0xff, // second byte
+      (tag >> 16) & 0xff, // third byte
+      (tag >> 24) & 0xff, // fourth byte
+      0,
+      0,
+      0,
+      0, // four zero bytes (reserved for 64-bit tags)
+    ]),
+  ])
   const xAddress = codec.encodeChecked(bytes)
   return xAddress
 }
 
-function xAddressToClassicAddress(xAddress: string): {classicAddress: string, tag: number | false, test: boolean} {
-  const {
-    accountId,
-    tag,
-    test
-  } = decodeXAddress(xAddress)
+function xAddressToClassicAddress(xAddress: string): {
+  classicAddress: string
+  tag: number | false
+  test: boolean
+} {
+  const { accountId, tag, test } = decodeXAddress(xAddress)
   const classicAddress = encodeAccountID(accountId)
   return {
     classicAddress,
     tag,
-    test
+    test,
   }
 }
 
-function decodeXAddress(xAddress: string): {accountId: Buffer, tag: number | false, test: boolean} {
+function decodeXAddress(xAddress: string): {
+  accountId: Buffer
+  tag: number | false
+  test: boolean
+} {
   const decoded = codec.decodeChecked(xAddress)
   const test = isBufferForTestAddress(decoded)
   const accountId = decoded.slice(2, 22)
@@ -77,7 +88,7 @@ function decodeXAddress(xAddress: string): {accountId: Buffer, tag: number | fal
   return {
     accountId,
     tag,
-    test
+    test,
   }
 }
 
@@ -103,8 +114,10 @@ function tagFromBuffer(buf: Buffer): number | false {
     return buf[23] + buf[24] * 0x100 + buf[25] * 0x10000 + buf[26] * 0x1000000
   }
   assert.strictEqual(flag, 0, 'flag must be zero to indicate no tag')
-  assert.ok(Buffer.from('0000000000000000', 'hex').equals(buf.slice(23, 23 + 8)),
-    'remaining bytes must be zero')
+  assert.ok(
+    Buffer.from('0000000000000000', 'hex').equals(buf.slice(23, 23 + 8)),
+    'remaining bytes must be zero',
+  )
   return false
 }
 
@@ -132,5 +145,5 @@ export {
   encodeXAddress, // Encode account ID, tag, and network ID to X-address
   xAddressToClassicAddress, // Decode X-address to account ID, tag, and network ID
   decodeXAddress, // Convert X-address to classic address, tag, and network ID
-  isValidXAddress // Check whether an X-address (X...) is valid
+  isValidXAddress, // Check whether an X-address (X...) is valid
 }

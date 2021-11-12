@@ -1,14 +1,14 @@
-import { SerializedType } from "./serialized-type";
-import { BinaryParser } from "../serdes/binary-parser";
-import { Hash256 } from "./hash-256";
-import { BytesList } from "../serdes/binary-serializer";
-import { Buffer } from "buffer/";
+import { SerializedType } from './serialized-type'
+import { BinaryParser } from '../serdes/binary-parser'
+import { Hash256 } from './hash-256'
+import { BytesList } from '../serdes/binary-serializer'
+import { Buffer } from 'buffer/'
 
 /**
  * TypeGuard for Array<string>
  */
 function isStrings(arg): arg is Array<string> {
-  return Array.isArray(arg) && (arg.length === 0 || typeof arg[0] === "string");
+  return Array.isArray(arg) && (arg.length === 0 || typeof arg[0] === 'string')
 }
 
 /**
@@ -16,7 +16,7 @@ function isStrings(arg): arg is Array<string> {
  */
 class Vector256 extends SerializedType {
   constructor(bytes: Buffer) {
-    super(bytes);
+    super(bytes)
   }
 
   /**
@@ -27,13 +27,13 @@ class Vector256 extends SerializedType {
    * @returns a Vector256 object
    */
   static fromParser(parser: BinaryParser, hint?: number): Vector256 {
-    const bytesList = new BytesList();
-    const bytes = hint ?? parser.size();
-    const hashes = bytes / 32;
+    const bytesList = new BytesList()
+    const bytes = hint ?? parser.size()
+    const hashes = bytes / 32
     for (let i = 0; i < hashes; i++) {
-      Hash256.fromParser(parser).toBytesSink(bytesList);
+      Hash256.fromParser(parser).toBytesSink(bytesList)
     }
-    return new Vector256(bytesList.toBytes());
+    return new Vector256(bytesList.toBytes())
   }
 
   /**
@@ -44,18 +44,18 @@ class Vector256 extends SerializedType {
    */
   static from<T extends Vector256 | Array<string>>(value: T): Vector256 {
     if (value instanceof Vector256) {
-      return value;
+      return value
     }
 
     if (isStrings(value)) {
-      const bytesList = new BytesList();
+      const bytesList = new BytesList()
       value.forEach((hash) => {
-        Hash256.from(hash).toBytesSink(bytesList);
-      });
-      return new Vector256(bytesList.toBytes());
+        Hash256.from(hash).toBytesSink(bytesList)
+      })
+      return new Vector256(bytesList.toBytes())
     }
 
-    throw new Error("Cannot construct Vector256 from given value");
+    throw new Error('Cannot construct Vector256 from given value')
   }
 
   /**
@@ -65,20 +65,20 @@ class Vector256 extends SerializedType {
    */
   toJSON(): Array<string> {
     if (this.bytes.byteLength % 32 !== 0) {
-      throw new Error("Invalid bytes for Vector256");
+      throw new Error('Invalid bytes for Vector256')
     }
 
-    const result: Array<string> = [];
+    const result: Array<string> = []
     for (let i = 0; i < this.bytes.byteLength; i += 32) {
       result.push(
         this.bytes
           .slice(i, i + 32)
-          .toString("hex")
-          .toUpperCase()
-      );
+          .toString('hex')
+          .toUpperCase(),
+      )
     }
-    return result;
+    return result
   }
 }
 
-export { Vector256 };
+export { Vector256 }

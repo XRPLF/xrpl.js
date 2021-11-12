@@ -1,4 +1,4 @@
-import { Buffer } from "buffer/";
+import { Buffer } from 'buffer/'
 
 /**
  * Write a 32 bit integer to a Buffer
@@ -7,9 +7,9 @@ import { Buffer } from "buffer/";
  * @returns a buffer with the bytes representation of uint32
  */
 function bytes(uint32: number): Buffer {
-  const result = Buffer.alloc(4);
-  result.writeUInt32BE(uint32, 0);
-  return result;
+  const result = Buffer.alloc(4)
+  result.writeUInt32BE(uint32, 0)
+  return result
 }
 
 /**
@@ -35,6 +35,6 @@ const HashPrefix: Record<string, Buffer> = {
   proposal: bytes(0x50525000),
   // payment channel claim
   paymentChannelClaim: bytes(0x434c4d00),
-};
+}
 
-export { HashPrefix };
+export { HashPrefix }
