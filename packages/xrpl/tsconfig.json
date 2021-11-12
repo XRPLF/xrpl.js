@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "pretty": true,
+    "target": "es6",
+    "outDir": "./dist/npm",
+    "declaration": true,
+    "declarationMap": true,
+    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "noUnusedLocals": true,
+    "removeComments": true,
+    "preserveConstEnums": false,
+    "esModuleInterop": true,
+    "suppressImplicitAnyIndexErrors": false,
+    "resolveJsonModule": true,
+    "preserveSymlinks": true
+  }
+}

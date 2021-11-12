@@ -1,0 +1,36 @@
+{
+  "name": "ripple-keypairs",
+  "version": "1.0.3",
+  "description": "Cryptographic key pairs for the XRP Ledger",
+  "scripts": {
+    "build": "tsc -b",
+    "test": "tsc -b && nyc mocha",
+    "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
+    "lint": "eslint . --ext .ts",
+    "prepublish": "npm run lint && npm test"
+  },
+  "files": [
+    "dist/*"
+  ],
+  "main": "dist/",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "bn.js": "^5.1.1",
+    "brorand": "^1.0.5",
+    "elliptic": "^6.5.4",
+    "hash.js": "^1.0.3",
+    "ripple-address-codec": "^4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:XRPLF/xrpl.js.git"
+  },
+  "license": "ISC",
+  "prettier": "@xrplf/prettier-config",
+  "engines": {
+    "node": ">= 10",
+    "npm": ">=7.0.0"
+  }
+}
