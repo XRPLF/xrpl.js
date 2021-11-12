@@ -1,13 +1,13 @@
-import * as assert from "assert";
-import { Field, FieldInstance } from "../enums";
-import { SerializedType } from "../types/serialized-type";
-import { Buffer } from "buffer/";
+import * as assert from 'assert'
+import { Field, FieldInstance } from '../enums'
+import { SerializedType } from '../types/serialized-type'
+import { Buffer } from 'buffer/'
 
 /**
  * BinaryParser is used to compute fields and values from a HexString
  */
 class BinaryParser {
-  private bytes: Buffer;
+  private bytes: Buffer
 
   /**
    * Initialize bytes to a hex string
@@ -15,7 +15,7 @@ class BinaryParser {
    * @param hexBytes a hex string
    */
   constructor(hexBytes: string) {
-    this.bytes = Buffer.from(hexBytes, "hex");
+    this.bytes = Buffer.from(hexBytes, 'hex')
   }
 
   /**
@@ -24,8 +24,8 @@ class BinaryParser {
    * @returns The first byte of the BinaryParser
    */
   peek(): number {
-    assert.ok(this.bytes.byteLength !== 0);
-    return this.bytes[0];
+    assert.ok(this.bytes.byteLength !== 0)
+    return this.bytes[0]
   }
 
   /**
@@ -34,8 +34,8 @@ class BinaryParser {
    * @param n the number of bytes to skip
    */
   skip(n: number): void {
-    assert.ok(n <= this.bytes.byteLength);
-    this.bytes = this.bytes.slice(n);
+    assert.ok(n <= this.bytes.byteLength)
+    this.bytes = this.bytes.slice(n)
   }
 
   /**
@@ -45,11 +45,11 @@ class BinaryParser {
    * @return The bytes
    */
   read(n: number): Buffer {
-    assert.ok(n <= this.bytes.byteLength);
+    assert.ok(n <= this.bytes.byteLength)
 
-    const slice = this.bytes.slice(0, n);
-    this.skip(n);
-    return slice;
+    const slice = this.bytes.slice(0, n)
+    this.skip(n)
+    return slice
   }
 
   /**
@@ -59,29 +59,29 @@ class BinaryParser {
    * @return The number represented by those bytes
    */
   readUIntN(n: number): number {
-    assert.ok(0 < n && n <= 4, "invalid n");
-    return this.read(n).reduce((a, b) => (a << 8) | b) >>> 0;
+    assert.ok(0 < n && n <= 4, 'invalid n')
+    return this.read(n).reduce((a, b) => (a << 8) | b) >>> 0
   }
 
   readUInt8(): number {
-    return this.readUIntN(1);
+    return this.readUIntN(1)
   }
 
   readUInt16(): number {
-    return this.readUIntN(2);
+    return this.readUIntN(2)
   }
 
   readUInt32(): number {
-    return this.readUIntN(4);
+    return this.readUIntN(4)
   }
 
   size(): number {
-    return this.bytes.byteLength;
+    return this.bytes.byteLength
   }
 
   end(customEnd?: number): boolean {
-    const length = this.bytes.byteLength;
-    return length === 0 || (customEnd !== undefined && length <= customEnd);
+    const length = this.bytes.byteLength
+    return length === 0 || (customEnd !== undefined && length <= customEnd)
   }
 
   /**
@@ -90,7 +90,7 @@ class BinaryParser {
    * @return The variable length bytes
    */
   readVariableLength(): Buffer {
-    return this.read(this.readVariableLengthLength());
+    return this.read(this.readVariableLengthLength())
   }
 
   /**
@@ -99,18 +99,18 @@ class BinaryParser {
    * @return The length of the variable length encoded bytes
    */
   readVariableLengthLength(): number {
-    const b1 = this.readUInt8();
+    const b1 = this.readUInt8()
     if (b1 <= 192) {
-      return b1;
+      return b1
     } else if (b1 <= 240) {
-      const b2 = this.readUInt8();
-      return 193 + (b1 - 193) * 256 + b2;
+      const b2 = this.readUInt8()
+      return 193 + (b1 - 193) * 256 + b2
     } else if (b1 <= 254) {
-      const b2 = this.readUInt8();
-      const b3 = this.readUInt8();
-      return 12481 + (b1 - 241) * 65536 + b2 * 256 + b3;
+      const b2 = this.readUInt8()
+      const b3 = this.readUInt8()
+      return 12481 + (b1 - 241) * 65536 + b2 * 256 + b3
     }
-    throw new Error("Invalid variable length indicator");
+    throw new Error('Invalid variable length indicator')
   }
 
   /**
@@ -119,25 +119,25 @@ class BinaryParser {
    * @return Field ordinal
    */
   readFieldOrdinal(): number {
-    let type = this.readUInt8();
-    let nth = type & 15;
-    type >>= 4;
+    let type = this.readUInt8()
+    let nth = type & 15
+    type >>= 4
 
     if (type === 0) {
-      type = this.readUInt8();
+      type = this.readUInt8()
       if (type === 0 || type < 16) {
-        throw new Error("Cannot read FieldOrdinal, type_code out of range");
+        throw new Error('Cannot read FieldOrdinal, type_code out of range')
       }
     }
 
     if (nth === 0) {
-      nth = this.readUInt8();
+      nth = this.readUInt8()
       if (nth === 0 || nth < 16) {
-        throw new Error("Cannot read FieldOrdinal, field_code out of range");
+        throw new Error('Cannot read FieldOrdinal, field_code out of range')
       }
     }
 
-    return (type << 16) | nth;
+    return (type << 16) | nth
   }
 
   /**
@@ -146,7 +146,7 @@ class BinaryParser {
    * @return The field represented by the bytes at the head of the BinaryParser
    */
   readField(): FieldInstance {
-    return Field.fromString(this.readFieldOrdinal().toString());
+    return Field.fromString(this.readFieldOrdinal().toString())
   }
 
   /**
@@ -156,7 +156,7 @@ class BinaryParser {
    * @return The instance of that type read from the BinaryParser
    */
   readType(type: typeof SerializedType): SerializedType {
-    return type.fromParser(this);
+    return type.fromParser(this)
   }
 
   /**
@@ -166,7 +166,7 @@ class BinaryParser {
    * @return The type associated with the given field
    */
   typeForField(field: FieldInstance): typeof SerializedType {
-    return field.associatedType;
+    return field.associatedType
   }
 
   /**
@@ -176,20 +176,20 @@ class BinaryParser {
    * @return The value associated with the given field
    */
   readFieldValue(field: FieldInstance): SerializedType {
-    const type = this.typeForField(field);
+    const type = this.typeForField(field)
     if (!type) {
-      throw new Error(`unsupported: (${field.name}, ${field.type.name})`);
+      throw new Error(`unsupported: (${field.name}, ${field.type.name})`)
     }
     const sizeHint = field.isVariableLengthEncoded
       ? this.readVariableLengthLength()
-      : undefined;
-    const value = type.fromParser(this, sizeHint);
+      : undefined
+    const value = type.fromParser(this, sizeHint)
     if (value === undefined) {
       throw new Error(
-        `fromParser for (${field.name}, ${field.type.name}) -> undefined `
-      );
+        `fromParser for (${field.name}, ${field.type.name}) -> undefined `,
+      )
     }
-    return value;
+    return value
   }
 
   /**
@@ -198,9 +198,9 @@ class BinaryParser {
    * @return The field and value
    */
   readFieldAndValue(): [FieldInstance, SerializedType] {
-    const field = this.readField();
-    return [field, this.readFieldValue(field)];
+    const field = this.readField()
+    return [field, this.readFieldValue(field)]
   }
 }
 
-export { BinaryParser };
+export { BinaryParser }

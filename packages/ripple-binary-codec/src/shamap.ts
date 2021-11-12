@@ -1,20 +1,20 @@
-import { strict as assert } from "assert";
-import { coreTypes } from "./types";
-import { HashPrefix } from "./hash-prefixes";
-import { Sha512Half } from "./hashes";
-import { Hash256 } from "./types/hash-256";
-import { BytesList } from "./serdes/binary-serializer";
-import { Buffer } from "buffer/";
+import { strict as assert } from 'assert'
+import { coreTypes } from './types'
+import { HashPrefix } from './hash-prefixes'
+import { Sha512Half } from './hashes'
+import { Hash256 } from './types/hash-256'
+import { BytesList } from './serdes/binary-serializer'
+import { Buffer } from 'buffer/'
 
 /**
  * Abstract class describing a SHAMapNode
  */
 abstract class ShaMapNode {
-  abstract hashPrefix(): Buffer;
-  abstract isLeaf(): boolean;
-  abstract isInner(): boolean;
-  abstract toBytesSink(list: BytesList): void;
-  abstract hash(): Hash256;
+  abstract hashPrefix(): Buffer
+  abstract isLeaf(): boolean
+  abstract isInner(): boolean
+  abstract toBytesSink(list: BytesList): void
+  abstract hash(): Hash256
 }
 
 /**
@@ -22,21 +22,21 @@ abstract class ShaMapNode {
  */
 class ShaMapLeaf extends ShaMapNode {
   constructor(public index: Hash256, public item?: ShaMapNode) {
-    super();
+    super()
   }
 
   /**
    * @returns true as ShaMapLeaf is a leaf node
    */
   isLeaf(): boolean {
-    return true;
+    return true
   }
 
   /**
    * @returns false as ShaMapLeaf is not an inner node
    */
   isInner(): boolean {
-    return false;
+    return false
   }
 
   /**
@@ -45,7 +45,7 @@ class ShaMapLeaf extends ShaMapNode {
    * @returns The hash prefix, unless this.item is undefined, then it returns an empty Buffer
    */
   hashPrefix(): Buffer {
-    return this.item === undefined ? Buffer.alloc(0) : this.item.hashPrefix();
+    return this.item === undefined ? Buffer.alloc(0) : this.item.hashPrefix()
   }
 
   /**
@@ -54,9 +54,9 @@ class ShaMapLeaf extends ShaMapNode {
    * @returns hash of this.item concatenated with this.index
    */
   hash(): Hash256 {
-    const hash = Sha512Half.put(this.hashPrefix());
-    this.toBytesSink(hash);
-    return hash.finish();
+    const hash = Sha512Half.put(this.hashPrefix())
+    this.toBytesSink(hash)
+    return hash.finish()
   }
 
   /**
@@ -65,9 +65,9 @@ class ShaMapLeaf extends ShaMapNode {
    */
   toBytesSink(list: BytesList): void {
     if (this.item !== undefined) {
-      this.item.toBytesSink(list);
+      this.item.toBytesSink(list)
     }
-    this.index.toBytesSink(list);
+    this.index.toBytesSink(list)
   }
 }
 
@@ -75,25 +75,25 @@ class ShaMapLeaf extends ShaMapNode {
  * Class defining an Inner Node of a SHAMap
  */
 class ShaMapInner extends ShaMapNode {
-  private slotBits = 0;
-  private branches: Array<ShaMapNode> = Array(16);
+  private slotBits = 0
+  private branches: Array<ShaMapNode> = Array(16)
 
   constructor(private depth: number = 0) {
-    super();
+    super()
   }
 
   /**
    * @returns true as ShaMapInner is an inner node
    */
   isInner(): boolean {
-    return true;
+    return true
   }
 
   /**
    * @returns false as ShaMapInner is not a leaf node
    */
   isLeaf(): boolean {
-    return false;
+    return false
   }
 
   /**
@@ -102,7 +102,7 @@ class ShaMapInner extends ShaMapNode {
    * @returns hash prefix describing an inner node
    */
   hashPrefix(): Buffer {
-    return HashPrefix.innerNode;
+    return HashPrefix.innerNode
   }
 
   /**
@@ -112,15 +112,15 @@ class ShaMapInner extends ShaMapNode {
    * @param branch Branch to add
    */
   setBranch(slot: number, branch: ShaMapNode): void {
-    this.slotBits = this.slotBits | (1 << slot);
-    this.branches[slot] = branch;
+    this.slotBits = this.slotBits | (1 << slot)
+    this.branches[slot] = branch
   }
 
   /**
    * @returns true if node is empty
    */
   empty(): boolean {
-    return this.slotBits === 0;
+    return this.slotBits === 0
   }
 
   /**
@@ -130,11 +130,11 @@ class ShaMapInner extends ShaMapNode {
    */
   hash(): Hash256 {
     if (this.empty()) {
-      return coreTypes.Hash256.ZERO_256;
+      return coreTypes.Hash256.ZERO_256
     }
-    const hash = Sha512Half.put(this.hashPrefix());
-    this.toBytesSink(hash);
-    return hash.finish();
+    const hash = Sha512Half.put(this.hashPrefix())
+    this.toBytesSink(hash)
+    return hash.finish()
   }
 
   /**
@@ -144,9 +144,9 @@ class ShaMapInner extends ShaMapNode {
    */
   toBytesSink(list: BytesList): void {
     for (let i = 0; i < this.branches.length; i++) {
-      const branch = this.branches[i];
-      const hash = branch ? branch.hash() : coreTypes.Hash256.ZERO_256;
-      hash.toBytesSink(list);
+      const branch = this.branches[i]
+      const hash = branch ? branch.hash() : coreTypes.Hash256.ZERO_256
+      hash.toBytesSink(list)
     }
   }
 
@@ -158,25 +158,25 @@ class ShaMapInner extends ShaMapNode {
    * @param leaf Leaf node to insert when branch doesn't exist
    */
   addItem(index?: Hash256, item?: ShaMapNode, leaf?: ShaMapLeaf): void {
-    assert.ok(index !== undefined);
-    const nibble = index.nibblet(this.depth);
-    const existing = this.branches[nibble];
+    assert.ok(index !== undefined)
+    const nibble = index.nibblet(this.depth)
+    const existing = this.branches[nibble]
 
     if (existing === undefined) {
-      this.setBranch(nibble, leaf || new ShaMapLeaf(index, item));
+      this.setBranch(nibble, leaf || new ShaMapLeaf(index, item))
     } else if (existing instanceof ShaMapLeaf) {
-      const newInner = new ShaMapInner(this.depth + 1);
-      newInner.addItem(existing.index, undefined, existing);
-      newInner.addItem(index, item, leaf);
-      this.setBranch(nibble, newInner);
+      const newInner = new ShaMapInner(this.depth + 1)
+      newInner.addItem(existing.index, undefined, existing)
+      newInner.addItem(index, item, leaf)
+      this.setBranch(nibble, newInner)
     } else if (existing instanceof ShaMapInner) {
-      existing.addItem(index, item, leaf);
+      existing.addItem(index, item, leaf)
     } else {
-      throw new Error("invalid ShaMap.addItem call");
+      throw new Error('invalid ShaMap.addItem call')
     }
   }
 }
 
 class ShaMap extends ShaMapInner {}
 
-export { ShaMap, ShaMapNode, ShaMapLeaf };
+export { ShaMap, ShaMapNode, ShaMapLeaf }
