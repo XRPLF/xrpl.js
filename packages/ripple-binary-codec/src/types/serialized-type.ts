@@ -1,32 +1,32 @@
-import { BytesList } from "../serdes/binary-serializer";
-import { BinaryParser } from "../serdes/binary-parser";
-import * as bigInt from "big-integer";
-import { Buffer } from "buffer/";
+import { BytesList } from '../serdes/binary-serializer'
+import { BinaryParser } from '../serdes/binary-parser'
+import * as bigInt from 'big-integer'
+import { Buffer } from 'buffer/'
 
-type JSON = string | number | boolean | null | undefined | JSON[] | JsonObject;
+type JSON = string | number | boolean | null | undefined | JSON[] | JsonObject
 
-type JsonObject = { [key: string]: JSON };
+type JsonObject = { [key: string]: JSON }
 
 /**
  * The base class for all binary-codec types
  */
 class SerializedType {
-  protected readonly bytes: Buffer = Buffer.alloc(0);
+  protected readonly bytes: Buffer = Buffer.alloc(0)
 
   constructor(bytes: Buffer) {
-    this.bytes = bytes ?? Buffer.alloc(0);
+    this.bytes = bytes ?? Buffer.alloc(0)
   }
 
   static fromParser(parser: BinaryParser, hint?: number): SerializedType {
-    throw new Error("fromParser not implemented");
-    return this.fromParser(parser, hint);
+    throw new Error('fromParser not implemented')
+    return this.fromParser(parser, hint)
   }
 
   static from(
-    value: SerializedType | JSON | bigInt.BigInteger
+    value: SerializedType | JSON | bigInt.BigInteger,
   ): SerializedType {
-    throw new Error("from not implemented");
-    return this.from(value);
+    throw new Error('from not implemented')
+    return this.from(value)
   }
 
   /**
@@ -35,7 +35,7 @@ class SerializedType {
    * @param list The BytesList to write SerializedType bytes to
    */
   toBytesSink(list: BytesList): void {
-    list.put(this.bytes);
+    list.put(this.bytes)
   }
 
   /**
@@ -44,7 +44,7 @@ class SerializedType {
    * @returns hex String of this.bytes
    */
   toHex(): string {
-    return this.toBytes().toString("hex").toUpperCase();
+    return this.toBytes().toString('hex').toUpperCase()
   }
 
   /**
@@ -54,11 +54,11 @@ class SerializedType {
    */
   toBytes(): Buffer {
     if (this.bytes) {
-      return this.bytes;
+      return this.bytes
     }
-    const bytes = new BytesList();
-    this.toBytesSink(bytes);
-    return bytes.toBytes();
+    const bytes = new BytesList()
+    this.toBytesSink(bytes)
+    return bytes.toBytes()
   }
 
   /**
@@ -67,14 +67,14 @@ class SerializedType {
    * @returns any type, if not overloaded returns hexString representation of bytes
    */
   toJSON(): JSON {
-    return this.toHex();
+    return this.toHex()
   }
 
   /**
    * @returns hexString representation of this.bytes
    */
   toString(): string {
-    return this.toHex();
+    return this.toHex()
   }
 }
 
@@ -83,23 +83,23 @@ class SerializedType {
  */
 class Comparable extends SerializedType {
   lt(other: Comparable): boolean {
-    return this.compareTo(other) < 0;
+    return this.compareTo(other) < 0
   }
 
   eq(other: Comparable): boolean {
-    return this.compareTo(other) === 0;
+    return this.compareTo(other) === 0
   }
 
   gt(other: Comparable): boolean {
-    return this.compareTo(other) > 0;
+    return this.compareTo(other) > 0
   }
 
   gte(other: Comparable): boolean {
-    return this.compareTo(other) > -1;
+    return this.compareTo(other) > -1
   }
 
   lte(other: Comparable): boolean {
-    return this.compareTo(other) < 1;
+    return this.compareTo(other) < 1
   }
 
   /**
@@ -109,10 +109,8 @@ class Comparable extends SerializedType {
    * @returns A number denoting the relationship of this and other
    */
   compareTo(other: Comparable): number {
-    throw new Error(
-      `cannot compare ${this.toString()} and ${other.toString()}`
-    );
+    throw new Error(`cannot compare ${this.toString()} and ${other.toString()}`)
   }
 }
 
-export { SerializedType, Comparable, JSON, JsonObject };
+export { SerializedType, Comparable, JSON, JsonObject }

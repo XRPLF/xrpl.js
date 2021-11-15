@@ -1,6 +1,6 @@
-import * as bigInt from "big-integer";
-import { Comparable } from "./serialized-type";
-import { Buffer } from "buffer/";
+import * as bigInt from 'big-integer'
+import { Comparable } from './serialized-type'
+import { Buffer } from 'buffer/'
 
 /**
  * Compare numbers and bigInts n1 and n2
@@ -11,19 +11,19 @@ import { Buffer } from "buffer/";
  */
 function compare(
   n1: number | bigInt.BigInteger,
-  n2: number | bigInt.BigInteger
+  n2: number | bigInt.BigInteger,
 ): number {
-  return n1 < n2 ? -1 : n1 == n2 ? 0 : 1;
+  return n1 < n2 ? -1 : n1 == n2 ? 0 : 1
 }
 
 /**
  * Base class for serializing and deserializing unsigned integers.
  */
 abstract class UInt extends Comparable {
-  protected static width: number;
+  protected static width: number
 
   constructor(bytes: Buffer) {
-    super(bytes);
+    super(bytes)
   }
 
   /**
@@ -33,7 +33,7 @@ abstract class UInt extends Comparable {
    * @returns -1, 0, or 1 depending on how the objects relate to each other
    */
   compareTo(other: UInt): number {
-    return compare(this.valueOf(), other.valueOf());
+    return compare(this.valueOf(), other.valueOf())
   }
 
   /**
@@ -42,8 +42,8 @@ abstract class UInt extends Comparable {
    * @returns number or string represented by this.bytes
    */
   toJSON(): number | string {
-    const val = this.valueOf();
-    return typeof val === "number" ? val : val.toString();
+    const val = this.valueOf()
+    return typeof val === 'number' ? val : val.toString()
   }
 
   /**
@@ -51,7 +51,7 @@ abstract class UInt extends Comparable {
    *
    * @returns the value
    */
-  abstract valueOf(): number | bigInt.BigInteger;
+  abstract valueOf(): number | bigInt.BigInteger
 }
 
-export { UInt };
+export { UInt }
