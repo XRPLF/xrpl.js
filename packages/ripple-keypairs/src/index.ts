@@ -25,7 +25,7 @@ function generateSeed(
   )
   const entropy = options.entropy ? options.entropy.slice(0, 16) : brorand(16)
   const type = options.algorithm === 'ed25519' ? 'ed25519' : 'secp256k1'
-  return addressCodec.encodeSeed(entropy, type)
+  return addressCodec.encodeSeed(Buffer.from(entropy), type)
 }
 
 function hash(message): number[] {
