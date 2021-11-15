@@ -244,15 +244,46 @@ function ticketTest() {
   })
 }
 
+function nfTokenTest() {
+  const fixtures = require('./fixtures/nf-token.json')
+
+  for (const txName of Object.keys(fixtures)) {
+    test(`can serialize transaction ${txName}`, () => {
+      expect(encode(fixtures[txName].tx.json)).toEqual(
+        fixtures[txName].tx.binary,
+      )
+    })
+
+    test(`can deserialize transaction ${txName}`, () => {
+      expect(decode(fixtures[txName].tx.binary)).toEqual(
+        fixtures[txName].tx.json,
+      )
+    })
+
+    test(`can serialize meta ${txName}`, () => {
+      expect(encode(fixtures[txName].meta.json)).toEqual(
+        fixtures[txName].meta.binary,
+      )
+    })
+
+    test(`can deserialize meta ${txName}`, () => {
+      expect(decode(fixtures[txName].meta.binary)).toEqual(
+        fixtures[txName].meta.json,
+      )
+    })
+  }
+}
+
 describe('Binary Serialization', function () {
-  describe('nestedObjectTests', () => nestedObjectTests())
-  describe('BytesList', () => bytesListTest())
-  describe('DeliverMin', () => deliverMinTest())
-  describe('DepositPreauth', () => DepositPreauthTest())
-  describe('SignerListSet', () => SignerListSetTest())
-  describe('Escrow', () => EscrowTest())
-  describe('PaymentChannel', () => PaymentChannelTest())
-  describe('NegativeUNLTest', () => NegativeUNLTest())
-  describe('OmitUndefined', () => omitUndefinedTest())
-  describe('TicketTest', () => ticketTest())
+  describe('nestedObjectTests', nestedObjectTests)
+  describe('BytesList', bytesListTest)
+  describe('DeliverMin', deliverMinTest)
+  describe('DepositPreauth', DepositPreauthTest)
+  describe('SignerListSet', SignerListSetTest)
+  describe('Escrow', EscrowTest)
+  describe('PaymentChannel', PaymentChannelTest)
+  describe('NegativeUNLTest', NegativeUNLTest)
+  describe('OmitUndefined', omitUndefinedTest)
+  describe('TicketTest', ticketTest)
+  describe('NFToken', nfTokenTest)
 })
