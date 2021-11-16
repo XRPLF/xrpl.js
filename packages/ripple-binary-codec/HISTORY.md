@@ -1,5 +1,10 @@
 # ripple-binary-codec Release History
 
+## 1.2.0 (2021-11-15)
+- Converts ripple-binary-codec into a monorepo with ripple-address-codec,
+  ripple-keypairs, and xrpl
+- Adds preliminary support for XLS-20 NFT definitions
+
 ## 1.1.3 (2021-06-11)
 - Fix for case UInt64.from string allowing lowercase hex (#135)
 - Fix for `ValidatorToReEnable` field code (#130)

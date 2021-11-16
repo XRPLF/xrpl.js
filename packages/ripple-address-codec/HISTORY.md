@@ -1,4 +1,9 @@
-# ripple-address-cod
+# ripple-address-codec
+
+## 4.2.0 (2021-11-15)
+- Converts ripple-address-codec into a monorepo with ripple-binary-codec,
+  ripple-keypairs, and xrpl. Changes to build tooling but no new features or
+  bug fixes
 
 ## 4.1.3 (2021-05-10)
 
