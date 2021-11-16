@@ -19,10 +19,7 @@ import {
   verify,
   sign,
 } from 'ripple-keypairs'
-
-import {
-  Utils
-} from 'xrpl-secret-numbers'
+import { Utils } from 'xrpl-secret-numbers'
 
 import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
@@ -116,7 +113,7 @@ class Wallet {
     privateKey: string,
     opts: {
       masterAddress?: string
-      seed?: string,
+      seed?: string
       secretNumbers?: string
     } = {},
   ) {
@@ -211,16 +208,16 @@ class Wallet {
    * @returns A Wallet derived from secret numbers.
    * @throws ValidationError if unable to derive private key from secret number input.
    */
-   public static fromSecretNumbers(
-    secretNumbers: Array<string> | string,
-    opts: { masterAddress?: string, algorithm?: ECDSA } = {},
+  public static fromSecretNumbers(
+    secretNumbers: string[] | string,
+    opts: { masterAddress?: string; algorithm?: ECDSA } = {},
   ): Wallet {
-    let numbersArray:Array<string> = [];
+    let numbersArray: string[] = []
 
     if (typeof secretNumbers === 'string') {
-      numbersArray = Utils.parseSecretString(secretNumbers);
+      numbersArray = Utils.parseSecretString(secretNumbers)
     } else if (Array.isArray(secretNumbers)) {
-      numbersArray = secretNumbers;
+      numbersArray = secretNumbers
     }
 
     const entropy = Utils.secretToEntropy(numbersArray)
@@ -228,7 +225,7 @@ class Wallet {
     return Wallet.fromEntropy(entropy, {
       algorithm: opts.algorithm ?? ECDSA.secp256k1,
       masterAddress: opts.masterAddress,
-    });
+    })
   }
 
   /**

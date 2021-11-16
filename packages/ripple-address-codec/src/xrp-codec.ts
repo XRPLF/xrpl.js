@@ -202,14 +202,22 @@ export function encodeAccountID(bytes: Buffer): string {
   return codecWithXrpAlphabet.encode(bytes, opts)
 }
 
+/* eslint-disable import/no-unused-modules ---
+ * unclear why this is aliased but we should keep it in case someone else is
+ * importing it with the aliased name */
 export const encodeAddress = encodeAccountID
+/* eslint-enable import/no-unused-modules */
 
 export function decodeAccountID(accountId: string): Buffer {
   const opts = { versions: [ACCOUNT_ID], expectedLength: 20 }
   return codecWithXrpAlphabet.decode(accountId, opts).bytes
 }
 
+/* eslint-disable import/no-unused-modules ---
+ * unclear why this is aliased but we should keep it in case someone else is
+ * importing it with the aliased name */
 export const decodeAddress = decodeAccountID
+/* eslint-enable import/no-unused-modules */
 
 export function decodeNodePublic(base58string: string): Buffer {
   const opts = { versions: [NODE_PUBLIC], expectedLength: 33 }
