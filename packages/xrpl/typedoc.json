@@ -1,0 +1,19 @@
+{
+  "entryPoints": ["./src/index.ts"],
+  "tsconfig": "./tsconfig.build.json",
+  "out": "./docs",
+  "categoryOrder": [
+    "Constructor",
+    "Clients",
+    "Signing",
+    "Transaction Models",
+    "Transaction Flags",
+    "Ledger Flags",
+    "Utilities",
+    "Requests",
+    "Responses",
+    "Streams",
+    "Errors"
+  ],
+  "categorizeByGroup": false
+}

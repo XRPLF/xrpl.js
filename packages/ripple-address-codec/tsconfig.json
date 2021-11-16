@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "target": "es6",
+    "lib": [
+      "es2017"
+    ],
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": false,
+    "preserveConstEnums": false,
+    "suppressImplicitAnyIndexErrors": false,
+    "skipLibCheck": true,
+    "declaration": true
+  },
+  "include": ["src/**/*.ts"]
+}
