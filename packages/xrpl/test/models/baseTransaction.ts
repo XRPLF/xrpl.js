@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 
-import { ValidationError } from 'xrpl-local'
-import { validateBaseTransaction } from 'xrpl-local/models/transactions/common'
+import { ValidationError } from 'xrpl-local/src'
+import { validateBaseTransaction } from 'xrpl-local/src/models/transactions/common'
 
 /**
  * Transaction Verification Testing.

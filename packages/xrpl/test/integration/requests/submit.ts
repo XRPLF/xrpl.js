@@ -8,8 +8,8 @@ import {
   SubmitResponse,
   hashes,
   Transaction,
-} from 'xrpl-local'
-import { convertStringToHex } from 'xrpl-local/utils'
+} from 'xrpl-local/src'
+import { convertStringToHex } from 'xrpl-local/src/utils'
 
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'

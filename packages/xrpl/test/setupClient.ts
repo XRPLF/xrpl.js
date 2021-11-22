@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign -- Necessary for test setup */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types -- Necessary for test setup */
-import { Client, BroadcastClient } from 'xrpl-local'
+import { Client, BroadcastClient } from 'xrpl-local/src'
 
 import createMockRippled from './createMockRippled'
 import { getFreePort } from './testUtils'

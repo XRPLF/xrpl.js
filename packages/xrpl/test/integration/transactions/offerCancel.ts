@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { OfferCreate, OfferCancel } from 'xrpl-local'
+import { OfferCreate, OfferCancel } from 'xrpl-local/src'
 
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'

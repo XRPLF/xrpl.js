@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { deriveXAddress } from 'xrpl-local'
+import { deriveXAddress } from 'xrpl-local/src'
 
 describe('deriveXAddress', function () {
   it('returns address for public key', function () {

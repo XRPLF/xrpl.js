@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { Client } from 'xrpl-local'
+import { Client } from 'xrpl-local/src'
 
 // how long before each test case times out
 const TIMEOUT = 20000

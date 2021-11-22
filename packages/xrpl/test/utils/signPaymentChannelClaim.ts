@@ -1,4 +1,4 @@
-import signPaymentChannelClaim from 'xrpl-local/utils/signPaymentChannelClaim'
+import signPaymentChannelClaim from 'xrpl-local/src/utils/signPaymentChannelClaim'
 
 import responses from '../fixtures/responses'
 import { assertResultMatch } from '../testUtils'

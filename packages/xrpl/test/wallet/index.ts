@@ -1,9 +1,8 @@
 import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec/dist'
-
-import { Transaction } from 'xrpl-local'
-import ECDSA from 'xrpl-local/ECDSA'
-import Wallet from 'xrpl-local/Wallet'
+import { Transaction } from 'xrpl-local/src'
+import ECDSA from 'xrpl-local/src/ECDSA'
+import Wallet from 'xrpl-local/src/Wallet'
 
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'

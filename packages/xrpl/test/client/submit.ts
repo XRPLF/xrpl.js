@@ -1,9 +1,9 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { ValidationError } from 'xrpl-local'
-import { Transaction } from 'xrpl-local/models/transactions'
-import Wallet from 'xrpl-local/Wallet'
+import { ValidationError } from 'xrpl-local/src'
+import { Transaction } from 'xrpl-local/src/models/transactions'
+import Wallet from 'xrpl-local/src/Wallet'
 
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'

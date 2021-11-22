@@ -12,8 +12,8 @@ import {
   ResponseFormatError,
   XrplError,
   TimeoutError,
-} from 'xrpl-local'
-import { Connection } from 'xrpl-local/client/connection'
+} from 'xrpl-local/src'
+import { Connection } from 'xrpl-local/src/client/connection'
 
 import rippled from './fixtures/rippled'
 import { setupClient, teardownClient } from './setupClient'

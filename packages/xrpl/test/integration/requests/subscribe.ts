@@ -7,8 +7,8 @@ import {
   SubscribeRequest,
   Wallet,
   SubscribeResponse,
-} from 'xrpl-local'
-import { StreamType } from 'xrpl-local/models/common'
+} from 'xrpl-local/src'
+import { StreamType } from 'xrpl-local/src/models/common'
 
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'

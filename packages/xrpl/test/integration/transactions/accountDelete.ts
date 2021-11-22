@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-import { AccountDelete } from 'xrpl-local/models/transactions'
+import { AccountDelete } from 'xrpl-local/src/models/transactions'
 
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'

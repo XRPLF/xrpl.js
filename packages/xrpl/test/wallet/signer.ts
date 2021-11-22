@@ -1,13 +1,12 @@
 import { assert } from 'chai'
 import { decode, encode } from 'ripple-binary-codec/dist'
-
-import { Transaction, ValidationError } from 'xrpl-local'
-import Wallet from 'xrpl-local/Wallet'
+import { Transaction, ValidationError } from 'xrpl-local/src'
+import Wallet from 'xrpl-local/src/Wallet'
 import {
   authorizeChannel,
   multisign,
   verifySignature,
-} from 'xrpl-local/Wallet/signer'
+} from 'xrpl-local/src/Wallet/signer'
 
 const publicKey =
   '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'

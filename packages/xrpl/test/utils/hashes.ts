@@ -4,7 +4,7 @@ import path from 'path'
 import { assert } from 'chai'
 import { encode } from 'ripple-binary-codec'
 
-import { OfferCreate, Transaction, ValidationError } from 'xrpl-local'
+import { OfferCreate, Transaction, ValidationError } from 'xrpl-local/src'
 import {
   hashStateTree,
   hashTxTree,
@@ -15,7 +15,7 @@ import {
   hashAccountRoot,
   hashOfferId,
   hashSignerListId,
-} from 'xrpl-local/utils/hashes'
+} from 'xrpl-local/src/utils/hashes'
 
 import fixtures from '../fixtures/rippled'
 import { assertResultMatch } from '../testUtils'

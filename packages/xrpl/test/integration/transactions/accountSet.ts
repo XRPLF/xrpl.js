@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-import { AccountSet } from 'xrpl-local/models/transactions'
+import { AccountSet } from 'xrpl-local/src/models/transactions'
 
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'

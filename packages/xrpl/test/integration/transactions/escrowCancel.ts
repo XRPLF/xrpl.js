@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { EscrowCancel, EscrowCreate } from 'xrpl-local'
+import { EscrowCancel, EscrowCreate } from 'xrpl-local/src'
 
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'

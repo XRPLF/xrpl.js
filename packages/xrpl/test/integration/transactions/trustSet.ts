@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-import { TrustSet, percentToQuality } from 'xrpl-local'
+import { TrustSet, percentToQuality } from 'xrpl-local/src'
 
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'

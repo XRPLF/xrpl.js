@@ -3,7 +3,7 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { AccountSet, convertStringToHex, ValidationError } from 'xrpl-local'
+import { AccountSet, convertStringToHex, ValidationError } from 'xrpl-local/src'
 
 import { assertRejects } from '../testUtils'
 

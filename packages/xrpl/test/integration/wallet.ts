@@ -1,4 +1,4 @@
-import { Wallet } from 'xrpl-local'
+import { Wallet } from 'xrpl-local/src'
 
 const walletSecret = 'shK6YXzwYfnFVn3YZSaMh5zuAddKx'
 

@@ -11,13 +11,13 @@ import {
   PaymentFlags,
   TrustSet,
   TrustSetFlags,
-} from 'xrpl-local'
-import { AccountRootFlags } from 'xrpl-local/models/ledger'
-import { isFlagEnabled } from 'xrpl-local/models/utils'
+} from 'xrpl-local/src'
+import { AccountRootFlags } from 'xrpl-local/src/models/ledger'
+import { isFlagEnabled } from 'xrpl-local/src/models/utils'
 import {
   setTransactionFlagsToNumber,
   parseAccountRootFlags,
-} from 'xrpl-local/models/utils/flags'
+} from 'xrpl-local/src/models/utils/flags'
 
 /**
  * Utils Testing.

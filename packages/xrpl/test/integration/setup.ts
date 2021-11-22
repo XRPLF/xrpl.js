@@ -1,4 +1,4 @@
-import { Client, Wallet } from 'xrpl-local'
+import { Client, Wallet } from 'xrpl-local/src'
 
 import serverUrl from './serverUrl'
 import { fundAccount } from './utils'

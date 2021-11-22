@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { Client } from 'xrpl-local'
+import { Client } from 'xrpl-local/src'
 
 import serverUrl from './serverUrl'
 

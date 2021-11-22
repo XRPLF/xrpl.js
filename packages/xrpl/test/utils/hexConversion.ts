@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { convertHexToString, convertStringToHex } from 'xrpl-local/utils'
+import { convertHexToString, convertStringToHex } from 'xrpl-local/src/utils'
 
 describe('convertHexToString and convertStringToHex', function () {
   it('converts "example.com"', function () {

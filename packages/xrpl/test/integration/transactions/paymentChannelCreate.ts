@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-import { PaymentChannelCreate } from 'xrpl-local'
+import { PaymentChannelCreate } from 'xrpl-local/src'
 
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'

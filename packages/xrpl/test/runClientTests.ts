@@ -2,7 +2,7 @@
 import fs from 'fs'
 import path from 'path'
 
-import { Client } from 'xrpl-local'
+import { Client } from 'xrpl-local/src'
 
 import { XrplError } from '../src/errors'
 
