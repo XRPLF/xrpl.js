@@ -2,7 +2,7 @@
 import { expect } from 'chai'
 import _ from 'lodash'
 
-import type { TransactionStream } from 'xrpl-local/src'
+import type { TransactionStream } from 'xrpl-local'
 
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'

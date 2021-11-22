@@ -7,7 +7,7 @@ import {
   isValidClassicAddress,
   isValidXAddress,
   dropsToXrp,
-} from 'xrpl-local/src'
+} from 'xrpl-local'
 // how long before each test case times out
 const TIMEOUT = 60000
 // This test is reliant on external networks, and as such may be flaky.

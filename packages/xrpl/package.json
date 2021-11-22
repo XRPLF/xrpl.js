@@ -30,7 +30,7 @@
     "ws": "^8.2.2"
   },
   "devDependencies": {
-    "xrpl-local": "file:./"
+    "xrpl-local": "file:./src"
   },
   "resolutions": {
     "elliptic": "^6.5.4"

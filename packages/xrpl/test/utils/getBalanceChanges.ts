@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { getBalanceChanges } from 'xrpl-local/src/utils'
+import { getBalanceChanges } from 'xrpl-local/utils'
 
 import paymentToken from '../fixtures/utils/paymentToken.json'
 import paymentTokenDestinationNoBalance from '../fixtures/utils/paymentTokenDestinationNoBalance.json'

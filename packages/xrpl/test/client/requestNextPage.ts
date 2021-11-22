@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { hasNextPage } from 'xrpl-local/src'
+import { hasNextPage } from 'xrpl-local'
 
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'

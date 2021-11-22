@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types -- Necessary for test setup */
-import { Client, BroadcastClient } from 'xrpl-local/src'
+import { Client, BroadcastClient } from 'xrpl-local'
 
 import { PortResponse } from './createMockRippled'
 

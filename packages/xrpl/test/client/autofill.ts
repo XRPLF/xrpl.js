@@ -5,7 +5,7 @@ import {
   EscrowFinish,
   Payment,
   Transaction,
-} from 'xrpl-local/src'
+} from 'xrpl-local'
 
 import rippled from '../fixtures/rippled'
 import { setupClient, teardownClient } from '../setupClient'

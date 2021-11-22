@@ -6,7 +6,7 @@ import {
   PathFindResponse,
   Client,
   PathFindStream,
-} from 'xrpl-local/src'
+} from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'

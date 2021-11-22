@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-import { DepositPreauth, Wallet } from 'xrpl-local/src'
+import { DepositPreauth, Wallet } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'

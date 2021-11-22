@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 
-import { validate, ValidationError } from 'xrpl-local/src'
-import { validatePaymentChannelCreate } from 'xrpl-local/src/models/transactions/paymentChannelCreate'
+import { validate, ValidationError } from 'xrpl-local'
+import { validatePaymentChannelCreate } from 'xrpl-local/models/transactions/paymentChannelCreate'
 
 /**
  * PaymentChannelCreate Transaction Verification Testing.

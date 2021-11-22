@@ -1,8 +1,8 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { AccountSet, hashes, SubmitResponse, TxResponse } from 'xrpl-local/src'
-import { convertStringToHex } from 'xrpl-local/src/utils'
+import { AccountSet, hashes, SubmitResponse, TxResponse } from 'xrpl-local'
+import { convertStringToHex } from 'xrpl-local/utils'
 
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'

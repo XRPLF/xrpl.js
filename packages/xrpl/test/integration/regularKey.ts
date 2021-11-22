@@ -9,9 +9,9 @@ import {
   Wallet,
   AccountSetAsfFlags,
   OfferCreate,
-} from 'xrpl-local/src'
-import { convertStringToHex } from 'xrpl-local/src/utils'
-import { multisign } from 'xrpl-local/src/Wallet/signer'
+} from 'xrpl-local'
+import { convertStringToHex } from 'xrpl-local/utils'
+import { multisign } from 'xrpl-local/Wallet/signer'
 
 import serverUrl from './serverUrl'
 import { setupClient, teardownClient } from './setup'

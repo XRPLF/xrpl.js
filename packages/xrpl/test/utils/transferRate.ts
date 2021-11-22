@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { ValidationError } from 'xrpl-local/src'
+import { ValidationError } from 'xrpl-local'
 
 import {
   percentToTransferRate,

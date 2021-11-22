@@ -1,4 +1,4 @@
-import { verifyPaymentChannelClaim } from 'xrpl-local/src'
+import { verifyPaymentChannelClaim } from 'xrpl-local'
 
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'

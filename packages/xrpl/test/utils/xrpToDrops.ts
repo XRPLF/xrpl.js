@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
-import { xrpToDrops } from 'xrpl-local/src/utils'
+import { xrpToDrops } from 'xrpl-local/utils'
 
 describe('xrpToDrops', function () {
   it('works with a typical amount', function () {

@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { LedgerEntryRequest, LedgerEntryResponse } from 'xrpl-local/src'
+import { LedgerEntryRequest, LedgerEntryResponse } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'

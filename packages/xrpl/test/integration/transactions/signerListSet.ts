@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-import { SignerListSet } from 'xrpl-local/src'
+import { SignerListSet } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'

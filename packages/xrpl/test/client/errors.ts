@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { XrplError, NotFoundError } from 'xrpl-local/src'
+import { XrplError, NotFoundError } from 'xrpl-local'
 
 import { setupClient, teardownClient } from '../setupClient'
 

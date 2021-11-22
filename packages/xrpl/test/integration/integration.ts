@@ -2,10 +2,10 @@ import assert from 'assert'
 
 import _ from 'lodash'
 
-import { Client } from 'xrpl-local/src'
-import { AccountSet, SignerListSet } from 'xrpl-local/src/models/transactions'
-import { convertStringToHex } from 'xrpl-local/src/utils'
-import { multisign } from 'xrpl-local/src/Wallet/signer'
+import { Client } from 'xrpl-local'
+import { AccountSet, SignerListSet } from 'xrpl-local/models/transactions'
+import { convertStringToHex } from 'xrpl-local/utils'
+import { multisign } from 'xrpl-local/Wallet/signer'
 
 import serverUrl from './serverUrl'
 import { setupClient, teardownClient } from './setup'

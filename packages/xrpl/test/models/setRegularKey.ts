@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 
-import { validate, ValidationError } from 'xrpl-local/src'
-import { validateSetRegularKey } from 'xrpl-local/src/models/transactions/setRegularKey'
+import { validate, ValidationError } from 'xrpl-local'
+import { validateSetRegularKey } from 'xrpl-local/models/transactions/setRegularKey'
 
 /**
  * SetRegularKey Transaction Verification Testing.

@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 
-import { ChannelVerifyRequest, ChannelVerifyResponse } from 'xrpl-local/src'
+import { ChannelVerifyRequest, ChannelVerifyResponse } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'
