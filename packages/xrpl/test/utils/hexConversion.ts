@@ -1,5 +1,4 @@
 import { assert } from 'chai'
-
 import { convertHexToString, convertStringToHex } from 'xrpl-local/utils'
 
 describe('convertHexToString and convertStringToHex', function () {

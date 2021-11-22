@@ -1,5 +1,4 @@
 import { assert } from 'chai'
-
 import { isValidAddress } from 'xrpl-local'
 
 describe('isValidAddress', function () {

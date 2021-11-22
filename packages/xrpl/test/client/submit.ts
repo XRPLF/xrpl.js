@@ -1,6 +1,5 @@
 import { assert } from 'chai'
 import _ from 'lodash'
-
 import { ValidationError } from 'xrpl-local'
 import { Transaction } from 'xrpl-local/models/transactions'
 import Wallet from 'xrpl-local/Wallet'

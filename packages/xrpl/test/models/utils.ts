@@ -1,6 +1,5 @@
 /* eslint-disable no-bitwise -- flags require bitwise operations */
 import { assert } from 'chai'
-
 import {
   DepositPreauth,
   OfferCreate,

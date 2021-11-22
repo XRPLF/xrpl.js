@@ -1,6 +1,5 @@
 import { assert } from 'chai'
 import _ from 'lodash'
-
 import { OfferCreate, OfferCancel } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'

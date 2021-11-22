@@ -1,6 +1,5 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
-
 import { dropsToXrp } from 'xrpl-local/utils'
 
 describe('dropsToXrp', function () {

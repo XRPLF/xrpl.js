@@ -1,5 +1,4 @@
 import { assert } from 'chai'
-
 import { ValidationError } from 'xrpl-local'
 
 import { decimalToQuality, percentToQuality, qualityToDecimal } from '../../src'
