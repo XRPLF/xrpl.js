@@ -29,6 +29,9 @@
     "ripple-keypairs": "^1.1.0",
     "ws": "^8.2.2"
   },
+  "devDependencies": {
+    "xrpl-local": "file:./src"
+  },
   "resolutions": {
     "elliptic": "^6.5.4"
   },

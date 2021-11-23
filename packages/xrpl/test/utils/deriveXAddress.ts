@@ -1,5 +1,4 @@
 import { assert } from 'chai'
-
 import { deriveXAddress } from 'xrpl-local'
 
 describe('deriveXAddress', function () {

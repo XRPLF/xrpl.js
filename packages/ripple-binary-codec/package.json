@@ -20,7 +20,9 @@
     "ripple-address-codec": "^4.2.0"
   },
   "scripts": {
-    "build": "tsc -b && cp ./src/enums/definitions.json ./dist/enums",
+    "build": "run-script-os",
+    "build:default": "tsc -b && copy .\\src\\enums\\definitions.json .\\dist\\enums",
+    "build:nix": "tsc -b && cp ./src/enums/definitions.json ./dist/enums",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
     "prepare": "npm run build && npm test",
     "test": "jest",

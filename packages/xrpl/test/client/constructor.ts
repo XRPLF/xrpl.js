@@ -1,5 +1,4 @@
 import { assert } from 'chai'
-
 import { Client } from 'xrpl-local'
 
 describe('client constructor', function () {

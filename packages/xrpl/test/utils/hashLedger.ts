@@ -1,5 +1,4 @@
 import { assert } from 'chai'
-
 import { ValidationError, XrplError } from 'xrpl-local'
 import { hashes } from 'xrpl-local/utils'
 

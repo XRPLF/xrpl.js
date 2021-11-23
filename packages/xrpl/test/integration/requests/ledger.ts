@@ -1,6 +1,5 @@
 import { assert } from 'chai'
 import _ from 'lodash'
-
 import { LedgerRequest, LedgerResponse } from 'xrpl-local'
 import { Ledger } from 'xrpl-local/models/ledger'
 

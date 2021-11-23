@@ -1,6 +1,5 @@
 import { assert } from 'chai'
 import _ from 'lodash'
-
 import { FeeRequest } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'

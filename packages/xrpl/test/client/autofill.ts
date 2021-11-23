@@ -1,5 +1,4 @@
 import { assert } from 'chai'
-
 import {
   XrplError,
   AccountDelete,

@@ -1,6 +1,5 @@
 import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec/dist'
-
 import { Transaction } from 'xrpl-local'
 import ECDSA from 'xrpl-local/ECDSA'
 import Wallet from 'xrpl-local/Wallet'

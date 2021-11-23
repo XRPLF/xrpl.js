@@ -1,5 +1,4 @@
 import _ from 'lodash'
-
 import { AccountSet } from 'xrpl-local/models/transactions'
 
 import serverUrl from '../serverUrl'

@@ -1,5 +1,4 @@
 import { assert } from 'chai'
-
 import { validate, ValidationError } from 'xrpl-local'
 import { validateCheckCancel } from 'xrpl-local/models/transactions/checkCancel'
 
