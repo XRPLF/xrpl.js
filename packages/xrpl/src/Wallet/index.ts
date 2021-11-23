@@ -219,7 +219,7 @@ class Wallet {
     } else if (Array.isArray(secretNumbers)) {
       numbersArray = secretNumbers
     } else {
-         throw new ValidationError("Unable to parse the given secret numbers.")
+      throw new ValidationError("Unable to parse the given secret numbers.")
     }
 
     const entropy = Utils.secretToEntropy(numbersArray)
