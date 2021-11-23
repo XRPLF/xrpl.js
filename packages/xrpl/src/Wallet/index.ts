@@ -114,7 +114,6 @@ class Wallet {
     opts: {
       masterAddress?: string
       seed?: string
-      secretNumbers?: string
     } = {},
   ) {
     this.publicKey = publicKey
@@ -205,6 +204,7 @@ class Wallet {
    * @param secretNumbers - A string consisting of 8 times 6 numbers (whitespace delimited) used to derive a wallet.
    * @param opts - (Optional) Options to derive a Wallet.
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for.
    * @returns A Wallet derived from secret numbers.
    * @throws ValidationError if unable to derive private key from secret number input.
    */
