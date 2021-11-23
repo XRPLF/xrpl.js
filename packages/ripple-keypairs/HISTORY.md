@@ -1,5 +1,10 @@
 # ripple-keypairs Release History
 
+## 1.1.0 (2021-11-15)
+- Converts ripple-keypairs into a monorepo with ripple-binary-codec,
+  ripple-address-codec, and xrpl. Changes to build tooling but no new features or
+  bug fixes
+
 ## 1.0.3 (2021-02-22)
 
 * Update dependencies:

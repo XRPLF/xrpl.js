@@ -2,6 +2,10 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
+## 2.0.2 (2021-11-15)
+* Imports ripple-address-codec, ripple-binary-codec, and ripple-keypairs into
+  this repo. No new features or bug fixes
+
 ## 2.0.1 (2021-11-01)
 
 * Fix private interfaces not showing up in the docs (#1769)
