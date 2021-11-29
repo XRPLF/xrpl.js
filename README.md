@@ -127,7 +127,7 @@ import xrpl from 'https://dev.jspm.io/npm:xrpl';
 
 + [Get Started in Node.js](https://xrpl.org/get-started-using-node-js.html)
 + [Full Reference Documentation](https://js.xrpl.org)
-+ [Code Samples](https://github.com/XRPLF/xrpl.js/tree/develop/packages/xrpl/snippets/src)
++ [Code Samples](https://github.com/XRPLF/xrpl.js/tree/main/packages/xrpl/snippets/src)
 
 ### Mailing Lists
 
