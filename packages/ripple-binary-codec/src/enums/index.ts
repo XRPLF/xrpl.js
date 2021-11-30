@@ -31,7 +31,7 @@ function fieldHeader(type: number, nth: number): Buffer {
  * @brief: Bytes, name, and ordinal representing one type, ledger_type, transaction type, or result
  */
 export class Bytes {
-  readonly bytes: Uint8Array
+  readonly bytes: Buffer
 
   constructor(
     readonly name: string,
@@ -49,7 +49,7 @@ export class Bytes {
   }
 
   toBytesSink(sink: BytesList): void {
-    sink.put(Buffer.concat([this.bytes]))
+    sink.put(this.bytes)
   }
 
   toBytes(): Uint8Array {
