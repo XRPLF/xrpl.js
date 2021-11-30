@@ -177,7 +177,7 @@ This tells jest to output code coverage info in the `./coverage` directory, in a
 
 ## Releases
 
-Use the [ripple-lib release checklist](https://github.com/ripple/ripple-lib/wiki/Release-Checklist), but just use `master` instead of `develop` as this project does not use a develop branch.
+Use the [xrpl.js release process](https://github.com/XRPLF/xrpl.js/blob/main/CONTRIBUTING.md#release).
 
 ## Acknowledgements
 

@@ -81,6 +81,9 @@ You can see the complete reference documentation at [`xrpl.js` docs](js.xrpl.org
 npm run docgen
 ```
 
+After generating the docs, copy the docs from `packages/xrpl/docs` to `docs` at the top level.
+(That is where GitHub pages looks for the docs, if the docs aren't moved, js.xrpl.org will NOT update)
+
 ## Adding and removing packages
 
 `xrpl.js` uses `lerna` and `npm`'s workspaces features to manage a monorepo.
@@ -119,25 +122,24 @@ npm uninstall abbrev -w xrpl
 * Your changes should have unit and/or integration tests.
 * Your changes should pass the linter.
 * Your code should pass all the tests on Github (which check the linter, unit and integration tests on Node 12/14/16, and browser tests).
-* Open a PR against `develop` and ensure that all CI passes.
+* Open a PR against `main` and ensure that all CI passes.
 * Get a full code review from one of the maintainers.
 * Merge your changes.
 
 ### Release
 
-1. Ensure that all tests passed on the last CI that ran on `develop`.
+1. Ensure that all tests passed on the last CI that ran on `main`.
 2. Open a PR to update the docs if docs were modified.
-3. Create a branch off `develop` that ensures that `HISTORY.md` is updated appropriately for each package.
-4. Merge this branch into `develop`.
-5. If this is not a beta release: Merge `develop` into `master` (`--ff-only`) and push to github. This is important because we have docs telling developers to use master to get the latest release.
+3. Create a branch off `main` that ensures that `HISTORY.md` is updated appropriately for each package.
+4. Merge this branch into `main`.
 ___
 NOW WE ARE READY TO PUBLISH! No new code changes happen manually now.
 ___
-6. Checkout `master` and `git pull`.
+6. Checkout `main` and `git pull`.
 7. Run `npm run build` to triple check the build still works
 8. Run `npx lerna publish`. This command will diff all packages. Any changed
    package will be staged for publication.
-9. For each changed package, pick what the new version should be. Lerna will bump the versions, commit version bumps to `master`, and create a new git tag for each published package.
+9. For each changed package, pick what the new version should be. Lerna will bump the versions, commit version bumps to `main`, and create a new git tag for each published package.
 10. Enter your [npmjs.com](https://npmjs.com) OTP (one-time password) to complete publication.
 ___
 NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
