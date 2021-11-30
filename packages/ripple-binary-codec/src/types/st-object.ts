@@ -128,8 +128,12 @@ class STObject extends SerializedType {
         xAddressDecoded[field.name],
       )
       if ((associatedValue as unknown as Bytes).name === 'UNLModify') {
+        // triggered when the TransactionType field has a value of 'UNLModify'
         isUnlModify = true
       }
+      // true when in the UNLModify pseudotransaction (after the transaction type has been processed) and working with the
+      // Account field
+      // The Account field must not be a part of the UNLModify pseudotransaction encoding, due to a bug in rippled
       const isUnlModifyWorkaround = field.name == 'Account' && isUnlModify
       bytes.writeFieldAndValue(field, associatedValue, isUnlModifyWorkaround)
       if (field.type.name === ST_OBJECT) {

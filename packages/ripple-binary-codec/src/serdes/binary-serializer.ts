@@ -154,7 +154,10 @@ class BinarySerializer {
     isUnlModifyWorkaround = false,
   ): void {
     const bytes = new BytesList()
-    if (!isUnlModifyWorkaround) value.toBytesSink(bytes)
+    if (!isUnlModifyWorkaround) {
+      // this part doesn't happen for the Account field in a UNLModify transaction
+      value.toBytesSink(bytes)
+    }
     this.put(this.encodeVariableLength(bytes.getLength()))
     this.writeBytesList(bytes)
   }
