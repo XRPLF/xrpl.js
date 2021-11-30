@@ -25,6 +25,10 @@ module.exports = {
   extends: ['@xrplf/eslint-config/base'],
 
   rules: {
+    // This creates a lot of false positives. We should turn this off in our
+    // general config.
+    'jsdoc/require-description-complete-sentence': 'off',
+
     // ** TODO **
     // all of the below are turned off for now during the migration to a
     // monorepo. They need to actually be addressed!

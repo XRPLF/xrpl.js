@@ -1,5 +1,5 @@
 /**
- * Codec class.
+ * Codec class
  */
 
 import * as baseCodec from 'base-x'
@@ -142,7 +142,7 @@ class Codec {
 }
 
 /**
- * XRP codec.
+ * XRP codec
  */
 
 // base58 encodings: https://xrpl.org/base58-encodings.html
