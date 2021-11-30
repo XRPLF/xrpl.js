@@ -96,8 +96,6 @@ class STObject extends SerializedType {
     const list: BytesList = new BytesList()
     const bytes: BinarySerializer = new BinarySerializer(list)
 
-    let isUnlModify = false
-
     const xAddressDecoded = Object.entries(value).reduce((acc, [key, val]) => {
       let handled: JsonObject | undefined = undefined
       if (val && isValidXAddress(val.toString())) {
@@ -127,9 +125,8 @@ class STObject extends SerializedType {
       const associatedValue = field.associatedType.from(
         xAddressDecoded[field.name],
       )
-      if ((associatedValue as unknown as Bytes).name === 'UNLModify') {
-        isUnlModify = true
-      }
+      const isUnlModify =
+        (associatedValue as unknown as Bytes).name === 'UNLModify'
       const isUnlModifyWorkaround = field.name == 'Account' && isUnlModify
       bytes.writeFieldAndValue(field, associatedValue, isUnlModifyWorkaround)
       if (field.type.name === ST_OBJECT) {
