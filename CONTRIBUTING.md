@@ -81,6 +81,9 @@ You can see the complete reference documentation at [`xrpl.js` docs](js.xrpl.org
 npm run docgen
 ```
 
+After generating the docs, copy the docs from `packages/xrpl/docs` to `docs` at the top level.
+(That is where GitHub pages looks for the docs, if the docs aren't moved, js.xrpl.org will NOT update)
+
 ## Adding and removing packages
 
 `xrpl.js` uses `lerna` and `npm`'s workspaces features to manage a monorepo.
