@@ -49,7 +49,7 @@ export class Bytes {
   }
 
   toBytesSink(sink: BytesList): void {
-    sink.put(this.bytes)
+    sink.put(Buffer.concat([this.bytes]))
   }
 
   toBytes(): Uint8Array {
