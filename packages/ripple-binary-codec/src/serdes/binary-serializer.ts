@@ -137,8 +137,6 @@ class BinarySerializer {
 
     this.sink.put(field.header)
 
-    console.log(field.name, field.isVariableLengthEncoded)
-
     if (field.isVariableLengthEncoded) {
       this.writeLengthEncoded(associatedValue, isUnlModifyWorkaround)
     } else {

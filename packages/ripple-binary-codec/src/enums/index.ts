@@ -1,6 +1,7 @@
 import * as enums from './definitions.json'
 import { SerializedType } from '../types/serialized-type'
 import { Buffer } from 'buffer/'
+import { BytesList } from '../binary'
 
 const TYPE_WIDTH = 2
 const LEDGER_ENTRY_WIDTH = 2
@@ -47,7 +48,7 @@ export class Bytes {
     return this.name
   }
 
-  toBytesSink(sink): void {
+  toBytesSink(sink: BytesList): void {
     sink.put(this.bytes)
   }
 
