@@ -18,6 +18,7 @@
   },
   "devDependencies": {
     "@types/chai": "^4.2.21",
+    "@types/create-hash": "^1.2.2",
     "@types/lodash": "^4.14.136",
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.4.3",

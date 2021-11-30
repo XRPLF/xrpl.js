@@ -3,12 +3,14 @@
  */
 
 import * as baseCodec from 'base-x'
+import * as createHash from 'create-hash'
+
 import { seqEqual, concatArgs } from './utils'
 
 class Codec {
   sha256: (bytes: Uint8Array) => Buffer
   alphabet: string
-  codec: any
+  codec: baseCodec.BaseConverter
   base: number
 
   constructor(options: {
@@ -24,8 +26,8 @@ class Codec {
   /**
    * Encoder.
    *
-   * @param bytes Buffer of data to encode.
-   * @param opts Options object including the version bytes and the expected length of the data to encode.
+   * @param bytes - Buffer of data to encode.
+   * @param opts - Options object including the version bytes and the expected length of the data to encode.
    */
   encode(
     bytes: Buffer,
@@ -64,13 +66,15 @@ class Codec {
   /**
    * Decoder.
    *
-   * @param base58string Base58Check-encoded string to decode.
-   * @param opts Options object including the version byte(s) and the expected length of the data after decoding.
+   * @param base58string - Base58Check-encoded string to decode.
+   * @param opts - Options object including the version byte(s) and the expected length of the data after decoding.
    */
+  /* eslint-disable max-lines-per-function --
+   * TODO refactor */
   decode(
     base58string: string,
     opts: {
-      versions: (number | number[])[]
+      versions: Array<number | number[]>
       expectedLength?: number
       versionTypes?: ['ed25519', 'secp256k1']
     },
@@ -90,7 +94,7 @@ class Codec {
       )
     }
     const versionLengthGuess =
-      typeof versions[0] === 'number' ? 1 : (versions[0] as number[]).length
+      typeof versions[0] === 'number' ? 1 : versions[0].length
     const payloadLength =
       opts.expectedLength || withoutSum.length - versionLengthGuess
     const versionBytes = withoutSum.slice(0, -payloadLength)
@@ -113,6 +117,7 @@ class Codec {
       'version_invalid: version bytes do not match any of the provided version(s)',
     )
   }
+  /* eslint-enable max-lines-per-function */
 
   decodeChecked(base58string: string): Buffer {
     const buffer = this.decodeRaw(base58string)
@@ -140,19 +145,21 @@ class Codec {
  * XRP codec
  */
 
-// Pure JavaScript hash functions in the browser, native hash functions in Node.js
-const createHash = require('create-hash')
-
 // base58 encodings: https://xrpl.org/base58-encodings.html
-const ACCOUNT_ID = 0 // Account address (20 bytes)
-const ACCOUNT_PUBLIC_KEY = 0x23 // Account public key (33 bytes)
-const FAMILY_SEED = 0x21 // 33; Seed value (for secret keys) (16 bytes)
-const NODE_PUBLIC = 0x1c // 28; Validation public key (33 bytes)
+// Account address (20 bytes)
+const ACCOUNT_ID = 0
+// Account public key (33 bytes)
+const ACCOUNT_PUBLIC_KEY = 0x23
+// 33; Seed value (for secret keys) (16 bytes)
+const FAMILY_SEED = 0x21
+// 28; Validation public key (33 bytes)
+const NODE_PUBLIC = 0x1c
 
-const ED25519_SEED = [0x01, 0xe1, 0x4b] // [1, 225, 75]
+// [1, 225, 75]
+const ED25519_SEED = [0x01, 0xe1, 0x4b]
 
 const codecOptions = {
-  sha256: function (bytes: Uint8Array) {
+  sha256(bytes: Uint8Array) {
     return createHash('sha256').update(Buffer.from(bytes)).digest()
   },
   alphabet: 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz',
@@ -186,7 +193,7 @@ export function decodeSeed(
   seed: string,
   opts: {
     versionTypes: ['ed25519', 'secp256k1']
-    versions: (number | number[])[]
+    versions: Array<number | number[]>
     expectedLength: number
   } = {
     versionTypes: ['ed25519', 'secp256k1'],
@@ -202,14 +209,22 @@ export function encodeAccountID(bytes: Buffer): string {
   return codecWithXrpAlphabet.encode(bytes, opts)
 }
 
+/* eslint-disable import/no-unused-modules ---
+ * unclear why this is aliased but we should keep it in case someone else is
+ * importing it with the aliased name */
 export const encodeAddress = encodeAccountID
+/* eslint-enable import/no-unused-modules */
 
 export function decodeAccountID(accountId: string): Buffer {
   const opts = { versions: [ACCOUNT_ID], expectedLength: 20 }
   return codecWithXrpAlphabet.decode(accountId, opts).bytes
 }
 
+/* eslint-disable import/no-unused-modules ---
+ * unclear why this is aliased but we should keep it in case someone else is
+ * importing it with the aliased name */
 export const decodeAddress = decodeAccountID
+/* eslint-enable import/no-unused-modules */
 
 export function decodeNodePublic(base58string: string): Buffer {
   const opts = { versions: [NODE_PUBLIC], expectedLength: 33 }
@@ -234,7 +249,7 @@ export function decodeAccountPublic(base58string: string): Buffer {
 export function isValidClassicAddress(address: string): boolean {
   try {
     decodeAccountID(address)
-  } catch (e) {
+  } catch (_error) {
     return false
   }
   return true

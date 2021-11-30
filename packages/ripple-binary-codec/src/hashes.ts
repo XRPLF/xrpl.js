@@ -9,7 +9,7 @@ import { Buffer } from 'buffer/'
  * @extends BytesList So SerializedTypes can write bytes to a Sha512Half
  */
 class Sha512Half extends BytesList {
-  private hash: createHash = createHash('sha512')
+  private hash = createHash('sha512')
 
   /**
    * Construct a new Sha512Hash and write bytes this.hash
@@ -38,8 +38,7 @@ class Sha512Half extends BytesList {
    * @returns half of a SHA512 hash
    */
   finish256(): Buffer {
-    const bytes: Buffer = this.hash.digest()
-    return bytes.slice(0, 32)
+    return Buffer.from(this.hash.digest().slice(0, 32))
   }
 
   /**
