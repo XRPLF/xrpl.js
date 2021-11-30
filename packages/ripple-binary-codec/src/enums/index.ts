@@ -29,7 +29,7 @@ function fieldHeader(type: number, nth: number): Buffer {
 /*
  * @brief: Bytes, name, and ordinal representing one type, ledger_type, transaction type, or result
  */
-class Bytes {
+export class Bytes {
   readonly bytes: Uint8Array
 
   constructor(

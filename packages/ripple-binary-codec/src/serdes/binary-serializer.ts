@@ -126,15 +126,21 @@ class BinarySerializer {
    * @param field field to write to BinarySerializer
    * @param value value to write to BinarySerializer
    */
-  writeFieldAndValue(field: FieldInstance, value: SerializedType): void {
+  writeFieldAndValue(
+    field: FieldInstance,
+    value: SerializedType,
+    isUnlModifyWorkaround = false,
+  ): void {
     const associatedValue = field.associatedType.from(value)
     assert.ok(associatedValue.toBytesSink !== undefined)
     assert.ok(field.name !== undefined)
 
     this.sink.put(field.header)
 
+    console.log(field.name, field.isVariableLengthEncoded)
+
     if (field.isVariableLengthEncoded) {
-      this.writeLengthEncoded(associatedValue)
+      this.writeLengthEncoded(associatedValue, isUnlModifyWorkaround)
     } else {
       associatedValue.toBytesSink(this.sink)
     }
@@ -145,9 +151,12 @@ class BinarySerializer {
    *
    * @param value length encoded value to write to BytesList
    */
-  public writeLengthEncoded(value: SerializedType): void {
+  public writeLengthEncoded(
+    value: SerializedType,
+    isUnlModifyWorkaround = false,
+  ): void {
     const bytes = new BytesList()
-    value.toBytesSink(bytes)
+    if (!isUnlModifyWorkaround) value.toBytesSink(bytes)
     this.put(this.encodeVariableLength(bytes.getLength()))
     this.writeBytesList(bytes)
   }

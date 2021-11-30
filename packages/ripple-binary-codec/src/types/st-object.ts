@@ -1,4 +1,4 @@
-import { Field, FieldInstance } from '../enums'
+import { Field, FieldInstance, Bytes } from '../enums'
 import { SerializedType, JsonObject } from './serialized-type'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { BinaryParser } from '../serdes/binary-parser'
@@ -92,9 +92,12 @@ class STObject extends SerializedType {
     if (value instanceof STObject) {
       return value
     }
+    console.log('HIIIIIIIIIIIIIIII')
 
     const list: BytesList = new BytesList()
     const bytes: BinarySerializer = new BinarySerializer(list)
+
+    let isUnlModify = false
 
     const xAddressDecoded = Object.entries(value).reduce((acc, [key, val]) => {
       let handled: JsonObject | undefined = undefined
@@ -120,13 +123,19 @@ class STObject extends SerializedType {
     if (filter !== undefined) {
       sorted = sorted.filter(filter)
     }
+    // console.log(sorted)
 
     sorted.forEach((field) => {
       const associatedValue = field.associatedType.from(
         xAddressDecoded[field.name],
       )
-
-      bytes.writeFieldAndValue(field, associatedValue)
+      // console.log(field, associatedValue)
+      if ((associatedValue as unknown as Bytes).name === 'UNLModify') {
+        isUnlModify = true
+      }
+      const isUnlModifyWorkaround = field.name == 'Account' && isUnlModify
+      console.log(isUnlModify, field.name, isUnlModifyWorkaround)
+      bytes.writeFieldAndValue(field, associatedValue, isUnlModifyWorkaround)
       if (field.type.name === ST_OBJECT) {
         bytes.put(OBJECT_END_MARKER_BYTE)
       }
