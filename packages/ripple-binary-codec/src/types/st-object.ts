@@ -1,4 +1,4 @@
-import { Field, FieldInstance } from '../enums'
+import { Field, FieldInstance, Bytes } from '../enums'
 import { SerializedType, JsonObject } from './serialized-type'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { BinaryParser } from '../serdes/binary-parser'
@@ -96,6 +96,8 @@ class STObject extends SerializedType {
     const list: BytesList = new BytesList()
     const bytes: BinarySerializer = new BinarySerializer(list)
 
+    let isUnlModify = false
+
     const xAddressDecoded = Object.entries(value).reduce((acc, [key, val]) => {
       let handled: JsonObject | undefined = undefined
       if (val && isValidXAddress(val.toString())) {
@@ -125,8 +127,15 @@ class STObject extends SerializedType {
       const associatedValue = field.associatedType.from(
         xAddressDecoded[field.name],
       )
-
-      bytes.writeFieldAndValue(field, associatedValue)
+      if ((associatedValue as unknown as Bytes).name === 'UNLModify') {
+        // triggered when the TransactionType field has a value of 'UNLModify'
+        isUnlModify = true
+      }
+      // true when in the UNLModify pseudotransaction (after the transaction type has been processed) and working with the
+      // Account field
+      // The Account field must not be a part of the UNLModify pseudotransaction encoding, due to a bug in rippled
+      const isUnlModifyWorkaround = field.name == 'Account' && isUnlModify
+      bytes.writeFieldAndValue(field, associatedValue, isUnlModifyWorkaround)
       if (field.type.name === ST_OBJECT) {
         bytes.put(OBJECT_END_MARKER_BYTE)
       }
