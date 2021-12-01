@@ -38,9 +38,5 @@
   "homepage": "https://github.com/XRPLF/xrpl.js/packages/ripple-binary-codec#readme",
   "license": "ISC",
   "readmeFilename": "README.md",
-  "prettier": "@xrplf/prettier-config",
-  "engines": {
-    "node": ">=10.22.0",
-    "npm": ">=7.0.0"
-  }
+  "prettier": "@xrplf/prettier-config"
 }
