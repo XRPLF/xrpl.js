@@ -30,7 +30,6 @@
   "license": "ISC",
   "prettier": "@xrplf/prettier-config",
   "engines": {
-    "node": ">= 10",
-    "npm": ">=7.0.0"
+    "node": ">= 10"
   }
 }

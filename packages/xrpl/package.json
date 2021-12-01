@@ -64,7 +64,6 @@
   },
   "readmeFilename": "README.md",
   "engines": {
-    "node": ">=10.13.0",
-    "npm": ">=7.14.0 <8.0.0"
+    "node": ">=10.13.0"
   }
 }
