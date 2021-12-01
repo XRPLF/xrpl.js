@@ -1,6 +1,6 @@
 {
   "name": "ripple-keypairs",
-  "version": "1.1.1-beta.0",
+  "version": "1.1.1",
   "description": "Cryptographic key pairs for the XRP Ledger",
   "scripts": {
     "build": "tsc -b",
@@ -21,7 +21,7 @@
     "brorand": "^1.0.5",
     "elliptic": "^6.5.4",
     "hash.js": "^1.0.3",
-    "ripple-address-codec": "^4.2.1-beta.0"
+    "ripple-address-codec": "^4.2.1"
   },
   "repository": {
     "type": "git",
