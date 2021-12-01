@@ -25,5 +25,8 @@
     "lint": "eslint . --ext .ts",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo"
   },
-  "prettier": "@xrplf/prettier-config"
+  "prettier": "@xrplf/prettier-config",
+  "engines": {
+    "node": ">= 10"
+  }
 }

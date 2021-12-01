@@ -28,5 +28,8 @@
     "url": "git@github.com:XRPLF/xrpl.js.git"
   },
   "license": "ISC",
-  "prettier": "@xrplf/prettier-config"
+  "prettier": "@xrplf/prettier-config",
+  "engines": {
+    "node": ">= 10"
+  }
 }

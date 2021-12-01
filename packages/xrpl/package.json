@@ -62,5 +62,8 @@
     "type": "git",
     "url": "git@github.com:XRPLF/xrpl.js.git"
   },
-  "readmeFilename": "README.md"
+  "readmeFilename": "README.md",
+  "engines": {
+    "node": ">=10.13.0"
+  }
 }
