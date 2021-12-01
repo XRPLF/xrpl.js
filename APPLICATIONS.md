@@ -109,6 +109,10 @@ Warning: Use at your own risk.
 - **[XRP Account Mnemonic Recovery](https://github.com/WietseWind/xrp-mnemonic-recovery)** (uses `ripple-keypairs`)
 
   Recover a 24 word mnemonic if one word is wrong or one word is missing.
+  
+- **[Trustline](https://trustline.co)**
+
+  A decentralized stablecoin wallet that runs on the XRP Ledger.
 
 ## Send and request payments
 
