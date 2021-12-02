@@ -89,7 +89,7 @@ class Currency extends Hash160 {
 
     if (this.bytes[0] !== 0) {
       this._iso = null
-    } else if (code.toString('hex') === '000000') {
+    } else if (/^0*$/.test(this.bytes.toString('hex'))) {
       this._iso = 'XRP'
     } else {
       this._iso = isoCodeFromHex(code)
