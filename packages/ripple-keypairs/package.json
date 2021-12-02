@@ -31,5 +31,6 @@
   "prettier": "@xrplf/prettier-config",
   "engines": {
     "node": ">= 10"
-  }
+  },
+  "gitHead": "7c6230b18ec2ed031c7e379ffb94e34b940b6542"
 }
