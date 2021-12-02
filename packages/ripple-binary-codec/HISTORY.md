@@ -1,5 +1,8 @@
 # ripple-binary-codec Release History
 
+## 1.2.2 (2021-12-2)
+- Fix issue where unsupported currency codes weren't being correctly processed
+
 ## 1.2.1 (2021-12-1)
 - Fix issue where npm < 7 could not install the library
 
