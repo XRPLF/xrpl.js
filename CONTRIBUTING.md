@@ -150,8 +150,8 @@ ___
 NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
 ___
 15. On github, click the "releases" link on the right-hand side of the page.
-16. In the top-left corner, click the "tags" toggle.
-17. For each new tag created by lerna, click the context button (the one that looks like "...") and select "new release" to create a new release from this tag.
+16. Click "Draft a new release"
+17. Click "Choose a tag" and type in the name of a repo, and it's newest version to create a new tag (Ex. xrpl@2.0.3)
 18. Edit the name of the release to match the tag (IE \<package\>@\<version\>) and edit the description as you see fit.
 19. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
 
