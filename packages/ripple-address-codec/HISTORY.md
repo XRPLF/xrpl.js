@@ -1,5 +1,9 @@
 # ripple-address-codec
 
+## 4.2.1 (2021-12-1)
+- Fix issue where npm < 7 could not install the library
+- Initial pass at linting this codebase with new rules
+
 ## 4.2.0 (2021-11-15)
 - Converts ripple-address-codec into a monorepo with ripple-binary-codec,
   ripple-keypairs, and xrpl. Changes to build tooling but no new features or

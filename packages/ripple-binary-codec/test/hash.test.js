@@ -69,6 +69,7 @@ describe('Currency', function () {
     expect(Currency.from('X8P').toJSON()).toBe('X8P')
     expect(Currency.from('USD').toJSON()).toBe('USD')
   })
+
   test('can be constructed from a Buffer', function () {
     const xrp = new Currency(Buffer.alloc(20))
     expect(xrp.iso()).toBe('XRP')
@@ -77,6 +78,12 @@ describe('Currency', function () {
     const currency = '015841551A748AD2C1F76FF6ECB0CCCD00000000'
     expect(Currency.from(currency).toJSON()).toBe(currency)
   })
+
+  test('Can handle other non-standard currency codes', () => {
+    const currency = '0000000000414C6F676F30330000000000000000'
+    expect(Currency.from(currency).toJSON()).toBe(currency)
+  })
+
   test('throws on invalid reprs', function () {
     expect(() => Currency.from(Buffer.alloc(19))).toThrow()
     expect(() => Currency.from(1)).toThrow()
