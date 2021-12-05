@@ -13,12 +13,15 @@ import {
   isValidClassicAddress,
 } from './xrp-codec'
 
+/* eslint-disable @typescript-eslint/naming-convention --
+ * there are just sub constants */
 const PREFIX_BYTES = {
   // 5, 68
   MAIN: Buffer.from([0x05, 0x44]),
   // 4, 147
   TEST: Buffer.from([0x04, 0x93]),
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 const MAX_32_BIT_UNSIGNED_INT = 4294967295
 
@@ -72,6 +75,8 @@ function encodeXAddress(
   return codec.encodeChecked(bytes)
 }
 
+/* eslint-disable @typescript-eslint/naming-convention --
+ * not a big deal on these old param names */
 function xAddressToClassicAddress(xAddress: string): {
   classicAddress: string
   tag: number | false
@@ -85,7 +90,10 @@ function xAddressToClassicAddress(xAddress: string): {
     test,
   }
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
+/* eslint-disable @typescript-eslint/naming-convention --
+ * not a big deal on these old param names */
 function decodeXAddress(xAddress: string): {
   accountId: Buffer
   tag: number | false
@@ -101,6 +109,7 @@ function decodeXAddress(xAddress: string): {
     test,
   }
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 function isBufferForTestAddress(buf: Buffer): boolean {
   const decodedPrefix = buf.slice(0, 2)

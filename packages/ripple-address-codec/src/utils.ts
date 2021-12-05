@@ -5,6 +5,8 @@ type Sequence = number[] | Buffer | Uint8Array
  *
  * @param arr1 - One of the arrays to compare.
  * @param arr2 - The other array to compare.
+ *
+ * @returns true if arguments are equal; false otherwise.
  */
 export function seqEqual(arr1: Sequence, arr2: Sequence): boolean {
   if (arr1.length !== arr2.length) {
@@ -23,9 +25,11 @@ export function seqEqual(arr1: Sequence, arr2: Sequence): boolean {
  * Check whether a value is a sequence (e.g. Array of numbers).
  *
  * @param val - The value to check.
+ *
+ * @returns true if value is a Sequence; false otherwise.
  */
 function isSequence(val: Sequence | number): val is Sequence {
-  return (val as Sequence).length !== undefined
+  return typeof val === 'object' && val.length !== undefined
 }
 
 /**
