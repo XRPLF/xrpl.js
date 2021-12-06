@@ -151,7 +151,7 @@ NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
 ___
 15. On github, click the "releases" link on the right-hand side of the page.
 16. Click "Draft a new release"
-17. Click "Choose a tag" and type in the name of a repo, and it's newest version to create a new tag (Ex. xrpl@2.0.3)
+17. Click "Choose a tag" then type in the name of a repo `@` it's newest version to create a new tag (Ex. xrpl@2.0.3)
 18. Edit the name of the release to match the tag (IE \<package\>@\<version\>) and edit the description as you see fit.
 19. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
 
