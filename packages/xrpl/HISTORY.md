@@ -4,7 +4,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## 2.0.3 (2021-12-1)
 * Removes requirement for npm version > 7 for non-contributors
-* Added a workaround for rippled UNLModify encoding bug (#1830)
 * For contributors -
   * Renamed the master branch to main, and now just have one main branch
   * Fixed issues which made Windows contributors unable to build the library
