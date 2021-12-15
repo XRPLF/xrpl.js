@@ -11,16 +11,15 @@ import { BaseTransaction, validateBaseTransaction } from './common'
 export interface NFTokenCancelOffer extends BaseTransaction {
   TransactionType: 'NFTokenCancelOffer'
   /**
-   * An array of TokenID objects, each identifying an
-   * NFTokenOffer object, which should be cancelled by this
-   * transaction.
+   * An array of identifiers of NFTokenOffer objects that should be cancelled
+   * by this transaction.
    *
    * It is an error if an entry in this list points to an
    * object that is not an NFTokenOffer object. It is not an
    * error if an entry in this list points to an object that
-   * does not exist.
+   * does not exist. This field is required.
    */
-  TokenIDs: string[]
+  TokenOffers: string[]
 }
 
 /**
@@ -32,7 +31,7 @@ export interface NFTokenCancelOffer extends BaseTransaction {
 export function validateNFTokenCancelOffer(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (!Array.isArray(tx.TokenIDs) || tx.TokenIDs.length < 1) {
-    throw new ValidationError('NFTokenCancelOffer: missing field TokenIDs')
+  if (!Array.isArray(tx.TokenOffers) || tx.TokenOffers.length < 1) {
+    throw new ValidationError('NFTokenCancelOffer: missing field TokenOffers')
   }
 }
