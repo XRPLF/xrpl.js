@@ -1,22 +1,36 @@
 import { ValidationError } from '../../errors'
 import { Amount } from '../common'
 
-import { BaseTransaction, validateBaseTransaction, isAmount } from './common'
+import {
+  BaseTransaction,
+  parseAmountValue,
+  validateBaseTransaction,
+} from './common'
 
 /**
- * The NFTokenAcceptOffer transaction creates an NFToken object and adds it to the
- * relevant NFTokenPage object of the minter. If the transaction is
- * successful, the newly minted token will be owned by the minter account
- * specified by the transaction.
+ *  The NFTokenOfferAccept transaction is used to accept offers
+ *  to buy or sell an NFToken. It can either:
+ *
+ *  1. Allow one offer to be accepted. This is called direct
+ *     mode.
+ *  2. Allow two distinct offers, one offering to buy a
+ *     given NFToken and the other offering to sell the same
+ *     NFToken, to be accepted in an atomic fashion. This is
+ *     called brokered mode.
+ *
+ *  To indicate direct mode, use either the `sell_offer` or
+ *  `buy_offer` fields, but not both. To indicate brokered mode,
+ *  use both the `sell_offer` and `buy_offer` fields. If you use
+ *  neither `sell_offer` nor `buy_offer`, the transaction is invalid.
  */
 export interface NFTokenAcceptOffer extends BaseTransaction {
   TransactionType: 'NFTokenAcceptOffer'
   /**
-   * Identifies the NFTokenOffer that offers to sell the NFToken.
+   *  Identifies the NFTokenOffer that offers to sell the NFToken.
    *
-   * In direct mode this field is optional, but either SellOffer or
-   * BuyOffer must be specified. In brokered mode, both SellOffer
-   * and BuyOffer MUST be specified.
+   *  In direct mode this field is optional, but either SellOffer or
+   *  BuyOffer must be specified. In brokered mode, both SellOffer
+   *  and BuyOffer must be specified.
    */
   SellOffer?: string
   /**
@@ -24,11 +38,11 @@ export interface NFTokenAcceptOffer extends BaseTransaction {
    *
    * In direct mode this field is optional, but either SellOffer or
    * BuyOffer must be specified. In brokered mode, both SellOffer
-   * and BuyOffer MUST be specified.
+   * and BuyOffer must be specified.
    */
   BuyOffer?: string
   /**
-   * This field is only valid in brokered mode and specifies the
+   * This field is only valid in brokered mode. It specifies the
    * amount that the broker will keep as part of their fee for
    * bringing the two offers together; the remaining amount will
    * be sent to the seller of the NFToken being bought. If
@@ -43,20 +57,30 @@ export interface NFTokenAcceptOffer extends BaseTransaction {
    * larger amount, without the broker having to own the NFToken
    * or custody funds.
    *
-   * If both offers are for the same asset, it is possible that
-   * the order in which funds are transferred might cause a
-   * transaction that would succeed to fail due to an apparent
-   * lack of funds. To ensure deterministic transaction execution
-   * and maximimize the chances of successful execution, this
-   * proposal requires that the account attempting to buy the
-   * NFToken is debited first and that funds due to the broker
-   * are credited before crediting the seller.
-   *
-   * Note: in brokered mode, The offers referenced by BuyOffer
+   * Note: in brokered mode, the offers referenced by BuyOffer
    * and SellOffer must both specify the same TokenID; that is,
    * both must be for the same NFToken.
    */
   BrokerFee?: Amount
+}
+
+function validateBrokerFee(tx: Record<string, unknown>): void {
+  const value = parseAmountValue(tx.BrokerFee)
+  if (Number.isNaN(value)) {
+    throw new ValidationError('NFTokenAcceptOffer: invalid BrokerFee')
+  }
+
+  if (value <= 0) {
+    throw new ValidationError(
+      'NFTokenAcceptOffer: BrokerFee must be greater than 0; omit if there is no fee',
+    )
+  }
+
+  if (tx.SellOffer == null || tx.BuyOffer == null) {
+    throw new ValidationError(
+      'NFTokenAcceptOffer: both SellOffer and BuyOffer must be set if using brokered mode',
+    )
+  }
 }
 
 /**
@@ -68,13 +92,13 @@ export interface NFTokenAcceptOffer extends BaseTransaction {
 export function validateNFTokenAcceptOffer(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (
-    tx.BrokerFee != null &&
-    typeof tx.BrokerFee !== 'string' &&
-    !isAmount(tx.BrokerFee)
-  ) {
-    throw new ValidationError('NFTokenAcceptOffer: invalid BrokerFee')
+  if (tx.BrokerFee != null) {
+    validateBrokerFee(tx)
   }
 
-  // TODO more validations
+  if (tx.SellOffer == null && tx.BuyOffer == null) {
+    throw new ValidationError(
+      'NFTokenAcceptOffer: must set either SellOffer or BuyOffer',
+    )
+  }
 }

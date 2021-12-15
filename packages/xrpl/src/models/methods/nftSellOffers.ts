@@ -1,4 +1,4 @@
-import { Amount } from '../common'
+import { NFTOffer } from '../common'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
@@ -17,21 +17,6 @@ export interface NFTSellOffersRequest extends BaseRequest {
 }
 
 /**
- * One sell offer that might be returned from an {@link NFTSellOffersRequest}.
- *
- * @category Responses
- */
-interface NFTSellOffer {
-  // TODO Need to check all this
-  amount: Amount
-  destination: string
-  expiration: number
-  flags: number
-  index: string
-  owner: string
-}
-
-/**
  * Response expected from an {@link NFTSellOffersRequest}.
  *
  * @category Responses
@@ -41,7 +26,7 @@ export interface NFTSellOffersResponse extends BaseResponse {
     /**
      * A list of sell offers for the specified NFToken.
      */
-    offers: NFTSellOffer[]
+    offers: NFTOffer[]
     /**
      * The token ID of the NFToken to which these offers pertain.
      */

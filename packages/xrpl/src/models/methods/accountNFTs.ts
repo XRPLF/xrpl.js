@@ -30,11 +30,10 @@ export interface AccountNFTsRequest extends BaseRequest {
  * @category Responses
  */
 interface AccountNFToken {
-  // TODO Need to check all this
   Flags: number
   Issuer: string
   TokenID: string
-  TokenTaxons: number
+  TokenTaxon: number
   nft_serial: number
 }
 
@@ -45,6 +44,10 @@ interface AccountNFToken {
  */
 export interface AccountNFTsResponse extends BaseResponse {
   result: {
+    /**
+     * The account requested.
+     */
+    account: string
     /**
      * A list of NFTs owned by the specified account.
      */

@@ -65,3 +65,18 @@ export interface SignerEntry {
     SignerWeight: number
   }
 }
+
+/**
+ * One offer that might be returned from either an {@link NFTBuyOffersRequest}
+ * or an {@link NFTSellOffersRequest}.
+ *
+ * @category Responses
+ */
+export interface NFTOffer {
+  amount: Amount
+  flags: number
+  index: string
+  owner: string
+  destination?: string
+  expiration?: number
+}

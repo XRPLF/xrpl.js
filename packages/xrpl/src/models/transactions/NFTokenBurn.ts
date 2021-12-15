@@ -36,10 +36,6 @@ export interface NFTokenBurn extends BaseTransaction {
 export function validateNFTokenBurn(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Account == null) {
-    throw new ValidationError('NFTokenBurn: missing field Account')
-  }
-
   if (tx.TokenID == null) {
     throw new ValidationError('NFTokenBurn: missing field TokenID')
   }

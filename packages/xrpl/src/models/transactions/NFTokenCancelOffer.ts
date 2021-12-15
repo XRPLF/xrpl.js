@@ -3,10 +3,14 @@ import { ValidationError } from '../../errors'
 import { BaseTransaction, validateBaseTransaction } from './common'
 
 /**
- * The NFTokenCancelOffer transaction creates an NFToken object and adds it to the
- * relevant NFTokenPage object of the minter. If the transaction is
- * successful, the newly minted token will be owned by the minter account
- * specified by the transaction.
+ * The NFTokenCancelOffer transaction deletes existing NFTokenOffer objects.
+ * It is useful if you want to free up space on your account to lower your
+ * reserve requirement.
+ *
+ * The transaction can be executed by the account that originally created
+ * the NFTokenOffer, the account in the `Recipient` field of the NFTokenOffer
+ * (if present), or any account if the NFTokenOffer has an `Expiration` and
+ * the NFTokenOffer has already expired.
  */
 export interface NFTokenCancelOffer extends BaseTransaction {
   TransactionType: 'NFTokenCancelOffer'

@@ -56,7 +56,8 @@ export interface NFTokenMint extends BaseTransaction {
    * Indicates the taxon associated with this token. The taxon is generally a
    * value chosen by the minter of the token and a given taxon may be used for
    * multiple tokens. The implementation reserves taxon identifiers greater
-   * than or equal to 2147483648 (0x80000000).
+   * than or equal to 2147483648 (0x80000000). If you have no use for this
+   * field, set it to 0.
    */
   TokenTaxon: number
   /**
@@ -81,6 +82,9 @@ export interface NFTokenMint extends BaseTransaction {
    * magnet link, immediate data encoded as an RFC2379 "data" URL, or even an
    * opaque issuer-specific encoding. The URI is NOT checked for validity, but
    * the field is limited to a maximum length of 256 bytes.
+   *
+   * This field must be hex-encoded. You can use `convertStringToHex` to
+   * convert this field to the proper encoding.
    */
   URI?: string
   Flags?: number | NFTokenMintFlagsInterface
@@ -95,8 +99,10 @@ export interface NFTokenMint extends BaseTransaction {
 export function validateNFTokenMint(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Account == null) {
-    throw new ValidationError('NFTokenMint: missing field Account')
+  if (tx.Account === tx.Issuer) {
+    throw new ValidationError(
+      'NFTokenMint: Issuer must not be equal to Account',
+    )
   }
 
   if (tx.TokenTaxon == null) {

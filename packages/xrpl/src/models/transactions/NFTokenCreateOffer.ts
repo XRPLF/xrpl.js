@@ -1,11 +1,13 @@
 import { ValidationError } from '../../errors'
 import { Amount } from '../common'
+import { isFlagEnabled } from '../utils'
 
 import {
   BaseTransaction,
   GlobalFlags,
   validateBaseTransaction,
   isAmount,
+  parseAmountValue,
 } from './common'
 
 /**
@@ -32,18 +34,12 @@ export interface NFTokenCreateOfferFlagsInterface extends GlobalFlags {
 }
 
 /**
- * The NFTokenCreateOffer transaction creates an NFToken object and adds it to the
- * relevant NFTokenPage object of the minter. If the transaction is
- * successful, the newly minted token will be owned by the minter account
- * specified by the transaction.
+ * The NFTokenCreateOffer transaction creates either an offer to buy an
+ * NFT the submitting account does not own, or an offer to sell an NFT
+ * the submitting account does own.
  */
 export interface NFTokenCreateOffer extends BaseTransaction {
   TransactionType: 'NFTokenCreateOffer'
-  /**
-   * Indicates the AccountID of the account that initiated the
-   * transaction.
-   */
-  Account: string
   /**
    * Identifies the TokenID of the NFToken object that the
    * offer references.
@@ -52,12 +48,10 @@ export interface NFTokenCreateOffer extends BaseTransaction {
   /**
    * Indicates the amount expected or offered for the Token.
    *
-   * The amount must be non-zero, except where this is an
-   * offer is an offer to sell and the asset is XRP; then it
-   * is legal to specify an amount of zero, which means that
-   * the current owner of the token is giving it away, gratis,
-   * either to anyone at all, or to the account identified by
-   * the Destination field.
+   * The amount must be non-zero, except when this is a sell
+   * offer and the asset is XRP. This would indicate that the current
+   * owner of the token is giving it away free, either to anyone at all,
+   * or to the account identified by the Destination field.
    */
   Amount: Amount
   /**
@@ -89,6 +83,28 @@ export interface NFTokenCreateOffer extends BaseTransaction {
   Flags?: number | NFTokenCreateOfferFlagsInterface
 }
 
+function validateSellOfferCases(tx: Record<string, unknown>): void {
+  if (tx.Owner != null) {
+    throw new ValidationError(
+      'NFTokenCreateOffer: Owner must not be present for sell offers',
+    )
+  }
+}
+
+function validateBuyOfferCases(tx: Record<string, unknown>): void {
+  if (tx.Owner == null) {
+    throw new ValidationError(
+      'NFTokenCreateOffer: Owner must be present for buy offers',
+    )
+  }
+
+  if (parseAmountValue(tx.Amount) <= 0) {
+    throw new ValidationError(
+      'NFTokenCreateOffer: Amount must be greater than 0 for buy offers',
+    )
+  }
+}
+
 /**
  * Verify the form and type of an NFTokenCreateOffer at runtime.
  *
@@ -98,19 +114,32 @@ export interface NFTokenCreateOffer extends BaseTransaction {
 export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Account == null) {
-    throw new ValidationError('NFTokenCreateOffer: missing field Account')
+  if (tx.Account === tx.Owner) {
+    throw new ValidationError(
+      'NFTokenCreateOffer: Owner and Account must not be equal',
+    )
+  }
+
+  if (tx.Account === tx.Destination) {
+    throw new ValidationError(
+      'NFTokenCreateOffer: Destination and Account must not be equal',
+    )
   }
 
   if (tx.TokenID == null) {
     throw new ValidationError('NFTokenCreateOffer: missing field TokenID')
   }
 
-  if (tx.Amount == null) {
-    throw new ValidationError('NFTokenCreateOffer: missing field Amount')
+  if (!isAmount(tx.Amount)) {
+    throw new ValidationError('NFTokenCreateOffer: invalid Amount')
   }
 
-  if (typeof tx.Amount !== 'string' && !isAmount(tx.Amount)) {
-    throw new ValidationError('NFTokenCreateOffer: invalid Amount')
+  if (
+    typeof tx.Flags === 'number' &&
+    isFlagEnabled(tx.Flags, NFTokenCreateOfferFlags.tfSellToken)
+  ) {
+    validateSellOfferCases(tx)
+  } else {
+    validateBuyOfferCases(tx)
   }
 }
