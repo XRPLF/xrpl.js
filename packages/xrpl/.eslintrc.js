@@ -28,6 +28,13 @@ module.exports = {
   plugins: [],
   extends: ['@xrplf/eslint-config/base', 'plugin:mocha/recommended'],
   rules: {
+    // Maintain existing line endings
+    'prettier/prettier': [
+      'error',
+      {
+        'endOfLine': 'auto',
+      }
+    ],
     // Certain rippled APIs require snake_case naming
     '@typescript-eslint/naming-convention': [
       'error',
