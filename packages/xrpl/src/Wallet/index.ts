@@ -212,22 +212,19 @@ class Wallet {
     secretNumbers: string[] | string,
     opts: { masterAddress?: string; algorithm?: ECDSA } = {},
   ): Wallet {
-    let numbersArray: string[] = []
+    const numbersArray: string[] = []
 
     if (typeof secretNumbers === 'string') {
-      numbersArray = Utils.parseSecretString(secretNumbers)
+      numbersArray.concat(Utils.parseSecretString(secretNumbers))
     } else if (Array.isArray(secretNumbers)) {
-      numbersArray = secretNumbers
+      numbersArray.concat(secretNumbers)
     } else {
       throw new ValidationError('Unable to parse the given secret numbers.')
     }
 
     const entropy = Utils.secretToEntropy(numbersArray)
 
-    return Wallet.fromEntropy(entropy, {
-      algorithm: opts.algorithm ?? ECDSA.secp256k1,
-      masterAddress: opts.masterAddress,
-    })
+    return Wallet.fromEntropy(entropy, opts)
   }
 
   /**
