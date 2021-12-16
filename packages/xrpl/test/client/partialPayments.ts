@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- required for formatting transactions */
 import { expect } from 'chai'
 import _ from 'lodash'
-
 import type { TransactionStream } from 'xrpl-local'
 
 import rippled from '../fixtures/rippled'

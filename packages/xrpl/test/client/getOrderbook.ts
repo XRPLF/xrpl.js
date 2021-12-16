@@ -1,6 +1,5 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
-
 import { BookOffersRequest } from 'xrpl-local'
 import { ValidationError, XrplError } from 'xrpl-local/errors'
 import { OfferFlags } from 'xrpl-local/models/ledger'

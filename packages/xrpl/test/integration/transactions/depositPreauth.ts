@@ -1,5 +1,4 @@
 import _ from 'lodash'
-
 import { DepositPreauth, Wallet } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'

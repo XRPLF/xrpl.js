@@ -11,7 +11,7 @@ This is the recommended library for integrating a JavaScript/TypeScript app with
 
 See the full reference documentation for all classes, methods, and utilities.
 
-## [➡️ Applications and Projects](https://github.com/XRPLF/xrpl.js/blob/master/APPLICATIONS.md)
+## [➡️ Applications and Projects](https://github.com/XRPLF/xrpl.js/blob/main/APPLICATIONS.md)
 
 What is `xrpl.js` used for? The applications on the list linked above use `xrpl.js`. Open a PR to add your app or project to the list!
 
@@ -127,7 +127,7 @@ import xrpl from 'https://dev.jspm.io/npm:xrpl';
 
 + [Get Started in Node.js](https://xrpl.org/get-started-using-node-js.html)
 + [Full Reference Documentation](https://js.xrpl.org)
-+ [Code Samples](https://github.com/XRPLF/xrpl.js/tree/develop/packages/xrpl/snippets/src)
++ [Code Samples](https://github.com/XRPLF/xrpl.js/tree/main/packages/xrpl/snippets/src)
 
 ### Mailing Lists
 

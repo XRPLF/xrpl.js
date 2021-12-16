@@ -1,6 +1,5 @@
 import { assert } from 'chai'
 import { decode, encode } from 'ripple-binary-codec/dist'
-
 import { Transaction, ValidationError } from 'xrpl-local'
 import Wallet from 'xrpl-local/Wallet'
 import {

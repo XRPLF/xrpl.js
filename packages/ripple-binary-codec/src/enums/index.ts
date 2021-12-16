@@ -1,6 +1,7 @@
 import * as enums from './definitions.json'
 import { SerializedType } from '../types/serialized-type'
 import { Buffer } from 'buffer/'
+import { BytesList } from '../binary'
 
 const TYPE_WIDTH = 2
 const LEDGER_ENTRY_WIDTH = 2
@@ -29,8 +30,8 @@ function fieldHeader(type: number, nth: number): Buffer {
 /*
  * @brief: Bytes, name, and ordinal representing one type, ledger_type, transaction type, or result
  */
-class Bytes {
-  readonly bytes: Uint8Array
+export class Bytes {
+  readonly bytes: Buffer
 
   constructor(
     readonly name: string,
@@ -47,7 +48,7 @@ class Bytes {
     return this.name
   }
 
-  toBytesSink(sink): void {
+  toBytesSink(sink: BytesList): void {
     sink.put(this.bytes)
   }
 

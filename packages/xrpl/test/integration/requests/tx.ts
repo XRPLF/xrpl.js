@@ -1,6 +1,5 @@
 import { assert } from 'chai'
 import _ from 'lodash'
-
 import { AccountSet, hashes, SubmitResponse, TxResponse } from 'xrpl-local'
 import { convertStringToHex } from 'xrpl-local/utils'
 

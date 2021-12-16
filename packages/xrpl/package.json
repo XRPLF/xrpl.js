@@ -1,6 +1,6 @@
 {
   "name": "xrpl",
-  "version": "2.0.2",
+  "version": "2.0.4",
   "license": "ISC",
   "description": "A TypeScript/JavaScript API for interacting with the XRP Ledger in Node.js and the browser",
   "files": [
@@ -24,11 +24,14 @@
     "bip39": "^3.0.4",
     "https-proxy-agent": "^5.0.0",
     "lodash": "^4.17.4",
-    "ripple-address-codec": "^4.2.0",
-    "ripple-binary-codec": "^1.2.0",
-    "ripple-keypairs": "^1.1.0",
+    "ripple-address-codec": "^4.2.2",
+    "ripple-binary-codec": "^1.2.2",
+    "ripple-keypairs": "^1.1.2",
     "ws": "^8.2.2",
     "xrpl-secret-numbers": "^0.3.3"
+  },
+  "devDependencies": {
+    "xrpl-local": "file:./src"
   },
   "resolutions": {
     "elliptic": "^6.5.4"
@@ -62,7 +65,6 @@
   },
   "readmeFilename": "README.md",
   "engines": {
-    "node": ">=10.13.0",
-    "npm": ">=7.14.0 <8.0.0"
+    "node": ">=10.13.0"
   }
 }

@@ -1,5 +1,12 @@
 # ripple-binary-codec Release History
 
+## 1.2.2 (2021-12-2)
+- Fix issue where unsupported currency codes weren't being correctly processed
+- Added a workaround for rippled UNLModify encoding bug (#1830)
+
+## 1.2.1 (2021-12-1)
+- Fix issue where npm < 7 could not install the library
+
 ## 1.2.0 (2021-11-15)
 - Converts ripple-binary-codec into a monorepo with ripple-address-codec,
   ripple-keypairs, and xrpl

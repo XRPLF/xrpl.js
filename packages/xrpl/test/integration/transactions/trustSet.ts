@@ -1,5 +1,4 @@
 import _ from 'lodash'
-
 import { TrustSet, percentToQuality } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'

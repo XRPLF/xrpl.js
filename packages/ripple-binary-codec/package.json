@@ -1,6 +1,6 @@
 {
   "name": "ripple-binary-codec",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "XRP Ledger binary codec",
   "files": [
     "dist/*",
@@ -17,10 +17,12 @@
     "buffer": "5.6.0",
     "create-hash": "^1.2.0",
     "decimal.js": "^10.2.0",
-    "ripple-address-codec": "^4.2.0"
+    "ripple-address-codec": "^4.2.2"
   },
   "scripts": {
-    "build": "tsc -b && cp ./src/enums/definitions.json ./dist/enums",
+    "build": "run-script-os",
+    "build:default": "tsc -b && copy .\\src\\enums\\definitions.json .\\dist\\enums",
+    "build:nix": "tsc -b && cp ./src/enums/definitions.json ./dist/enums",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
     "prepare": "npm run build && npm test",
     "test": "jest",
@@ -38,7 +40,6 @@
   "readmeFilename": "README.md",
   "prettier": "@xrplf/prettier-config",
   "engines": {
-    "node": ">=10.22.0",
-    "npm": ">=7.0.0"
+    "node": ">=10.22.0"
   }
 }

@@ -3,7 +3,6 @@ import path from 'path'
 
 import { assert } from 'chai'
 import { encode } from 'ripple-binary-codec'
-
 import { OfferCreate, Transaction, ValidationError } from 'xrpl-local'
 import {
   hashStateTree,

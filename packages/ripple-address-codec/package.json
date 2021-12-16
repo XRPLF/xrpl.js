@@ -1,6 +1,6 @@
 {
   "name": "ripple-address-codec",
-  "version": "4.2.0",
+  "version": "4.2.2",
   "description": "encodes/decodes base58 encoded XRP Ledger identifiers",
   "files": [
     "dist/*",
@@ -27,7 +27,6 @@
   },
   "prettier": "@xrplf/prettier-config",
   "engines": {
-    "node": ">= 10",
-    "npm": ">=7.0.0"
+    "node": ">= 10"
   }
 }
