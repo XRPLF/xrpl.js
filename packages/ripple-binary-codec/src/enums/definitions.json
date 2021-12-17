@@ -856,6 +856,16 @@
       }
     ],
     [
+      "BrokerFee",
+      {
+        "nth": 19,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
       "taker_gets_funded",
       {
         "nth": 258,
@@ -1536,7 +1546,7 @@
       }
     ],
     [
-      "TokenIDs",
+      "TokenOffers",
       {
         "nth": 4,
         "isVLEncoded": true,
@@ -1856,6 +1866,8 @@
     "tefBAD_AUTH_MASTER": -183,
     "tefINVARIANT_FAILED": -182,
     "tefTOO_BIG": -181,
+    "tefNO_TICKET": -180,
+    "tefTOKEN_IS_NOT_TRANSFERABLE": -179,
 
     "terRETRY": -99,
     "terFUNDS_SPENT": -98,
