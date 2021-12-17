@@ -1866,6 +1866,8 @@
     "tefBAD_AUTH_MASTER": -183,
     "tefINVARIANT_FAILED": -182,
     "tefTOO_BIG": -181,
+    "tefNO_TICKET": -180,
+    "tefTOKEN_IS_NOT_TRANSFERABLE": -179,
 
     "terRETRY": -99,
     "terFUNDS_SPENT": -98,
