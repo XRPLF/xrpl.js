@@ -856,6 +856,16 @@
       }
     ],
     [
+      "BrokerFee",
+      {
+        "nth": 19,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
       "taker_gets_funded",
       {
         "nth": 258,

@@ -35,7 +35,11 @@ export interface NFTokenCancelOffer extends BaseTransaction {
 export function validateNFTokenCancelOffer(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (!Array.isArray(tx.TokenOffers) || tx.TokenOffers.length < 1) {
+  if (!Array.isArray(tx.TokenOffers)) {
     throw new ValidationError('NFTokenCancelOffer: missing field TokenOffers')
+  }
+
+  if (tx.TokenOffers.length < 1) {
+    throw new ValidationError('NFTokenCancelOffer: empty field TokenOffers')
   }
 }
