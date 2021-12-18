@@ -44,7 +44,7 @@
     "analyze": "run-s build:web --analyze",
     "watch": "run-s build:lib --watch",
     "clean": "rm -rf dist",
-    "docgen": "typedoc && echo js.xrpl.org >> ./docs/CNAME",
+    "docgen": "typedoc && echo js.xrpl.org >> ../../docs/CNAME",
     "prepublish": "run-s clean build",
     "test": "nyc mocha --config=test/.mocharc.json --exit",
     "test:integration": "TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/integration/**/*.ts ./test/integration/*.ts",
