@@ -2,6 +2,10 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
+## Unreleased 
+### Added
+* Support for the [XLS-20 NFT proposal](https://github.com/XRPLF/XRPL-Standards/discussions/46)
+
 ## 2.0.3 (2021-12-1)
 * Removes requirement for npm version > 7 for non-contributors
 * For contributors -

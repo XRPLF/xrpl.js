@@ -1,31 +1,11 @@
 /* eslint-disable max-lines-per-function -- Necessary for validateBaseTransaction */
 /* eslint-disable complexity -- Necessary for validateBaseTransaction */
 /* eslint-disable max-statements -- Necessary for validateBaseTransaction */
-import { ValidationError } from '../../errors'
-import { Memo, Signer } from '../common'
-import { onlyHasFields } from '../utils'
+import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
-const transactionTypes = [
-  'AccountSet',
-  'AccountDelete',
-  'CheckCancel',
-  'CheckCash',
-  'CheckCreate',
-  'DepositPreauth',
-  'EscrowCancel',
-  'EscrowCreate',
-  'EscrowFinish',
-  'OfferCancel',
-  'OfferCreate',
-  'Payment',
-  'PaymentChannelClaim',
-  'PaymentChannelCreate',
-  'PaymentChannelFund',
-  'SetRegularKey',
-  'SignerListSet',
-  'TicketCreate',
-  'TrustSet',
-]
+import { ValidationError } from '../../errors'
+import { Amount, IssuedCurrencyAmount, Memo, Signer } from '../common'
+import { onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
 
@@ -72,18 +52,25 @@ function isSigner(obj: unknown): boolean {
 
 const ISSUED_CURRENCY_SIZE = 3
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object'
+}
+
 /**
  * Verify the form and type of an IssuedCurrencyAmount at runtime.
  *
- * @param obj - The object to check the form and type of.
+ * @param input - The input to check the form and type of.
  * @returns Whether the IssuedCurrencyAmount is malformed.
  */
-export function isIssuedCurrency(obj: Record<string, unknown>): boolean {
+export function isIssuedCurrency(
+  input: unknown,
+): input is IssuedCurrencyAmount {
   return (
-    Object.keys(obj).length === ISSUED_CURRENCY_SIZE &&
-    typeof obj.value === 'string' &&
-    typeof obj.issuer === 'string' &&
-    typeof obj.currency === 'string'
+    isRecord(input) &&
+    Object.keys(input).length === ISSUED_CURRENCY_SIZE &&
+    typeof input.value === 'string' &&
+    typeof input.issuer === 'string' &&
+    typeof input.currency === 'string'
   )
 }
 
@@ -93,12 +80,8 @@ export function isIssuedCurrency(obj: Record<string, unknown>): boolean {
  * @param amount - The object to check the form and type of.
  * @returns Whether the Amount is malformed.
  */
-export function isAmount(amount: unknown): boolean {
-  return (
-    typeof amount === 'string' ||
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-    isIssuedCurrency(amount as Record<string, unknown>)
-  )
+export function isAmount(amount: unknown): amount is Amount {
+  return typeof amount === 'string' || isIssuedCurrency(amount)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface -- no global flags right now, so this is fine
@@ -203,7 +186,7 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
     throw new ValidationError('BaseTransaction: TransactionType not string')
   }
 
-  if (!transactionTypes.includes(common.TransactionType)) {
+  if (!TRANSACTION_TYPES.includes(common.TransactionType)) {
     throw new ValidationError('BaseTransaction: Unknown TransactionType')
   }
 
@@ -269,4 +252,20 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
   ) {
     throw new ValidationError('BaseTransaction: invalid TxnSignature')
   }
+}
+
+/**
+ * Parse the value of an amount, expressed either in XRP or as an Issued Currency, into a number.
+ *
+ * @param amount - An Amount to parse for its value.
+ * @returns The parsed amount value, or NaN if the amount count not be parsed.
+ */
+export function parseAmountValue(amount: unknown): number {
+  if (!isAmount(amount)) {
+    return NaN
+  }
+  if (typeof amount === 'string') {
+    return parseFloat(amount)
+  }
+  return parseFloat(amount.value)
 }

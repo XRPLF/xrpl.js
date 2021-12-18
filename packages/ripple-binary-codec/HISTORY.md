@@ -1,5 +1,11 @@
 # ripple-binary-codec Release History
 
+## Unreleased
+### Added
+- Exported `TRANSACTION_TYPES` value 
+### Fixed
+- Adds missing fields from XLS-20 NFT implementation
+
 ## 1.2.2 (2021-12-2)
 - Fix issue where unsupported currency codes weren't being correctly processed
 - Added a workaround for rippled UNLModify encoding bug (#1830)

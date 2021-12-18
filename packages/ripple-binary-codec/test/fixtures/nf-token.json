@@ -328,7 +328,7 @@
         "LastLedgerSequence": 27,
         "Sequence": 10,
         "SigningPubKey": "0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020",
-        "TokenIDs": [
+        "TokenOffers": [
           "00090032B5F762798A53D543A014CAF8B297CFF8F2F937E80000099B00000000"
         ],
         "TransactionType": "NFTokenCancelOffer",

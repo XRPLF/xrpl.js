@@ -40,6 +40,10 @@ export enum AccountSetAsfFlags {
   asfDefaultRipple = 8,
   /** Enable Deposit Authorization on this account. */
   asfDepositAuth = 9,
+  /**
+   * Allow another account to mint and burn tokens on behalf of this account.
+   */
+  asfAuthorizedMinter = 10,
 }
 
 /**
@@ -135,6 +139,11 @@ export interface AccountSet extends BaseTransaction {
    * digits. Valid values are 3 to 15 inclusive, or 0 to disable.
    */
   TickSize?: number
+  /**
+   * Sets an alternate account that is allowed to mint NFTokens on this
+   * account's behalf using NFTokenMint's `Issuer` field.
+   */
+  Minter?: string
 }
 
 const MIN_TICK_SIZE = 3
