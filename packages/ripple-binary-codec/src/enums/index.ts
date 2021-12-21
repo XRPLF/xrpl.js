@@ -3,6 +3,13 @@ import { SerializedType } from '../types/serialized-type'
 import { Buffer } from 'buffer/'
 import { BytesList } from '../binary'
 
+/*
+ * @brief: All valid transaction types
+ */
+export const TRANSACTION_TYPES = Object.entries(enums.TRANSACTION_TYPES)
+  .filter(([_key, value]) => value >= 0)
+  .map(([key, _value]) => key)
+
 const TYPE_WIDTH = 2
 const LEDGER_ENTRY_WIDTH = 2
 const TRANSACTION_TYPE_WIDTH = 2

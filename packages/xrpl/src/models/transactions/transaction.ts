@@ -17,6 +17,20 @@ import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
 import { TransactionMetadata } from './metadata'
+import {
+  NFTokenAcceptOffer,
+  validateNFTokenAcceptOffer,
+} from './NFTokenAcceptOffer'
+import { NFTokenBurn, validateNFTokenBurn } from './NFTokenBurn'
+import {
+  NFTokenCancelOffer,
+  validateNFTokenCancelOffer,
+} from './NFTokenCancelOffer'
+import {
+  NFTokenCreateOffer,
+  validateNFTokenCreateOffer,
+} from './NFTokenCreateOffer'
+import { NFTokenMint, validateNFTokenMint } from './NFTokenMint'
 import { OfferCancel, validateOfferCancel } from './offerCancel'
 import { OfferCreate, validateOfferCreate } from './offerCreate'
 import { Payment, validatePayment } from './payment'
@@ -50,6 +64,11 @@ export type Transaction =
   | EscrowCancel
   | EscrowCreate
   | EscrowFinish
+  | NFTokenAcceptOffer
+  | NFTokenBurn
+  | NFTokenCancelOffer
+  | NFTokenCreateOffer
+  | NFTokenMint
   | OfferCancel
   | OfferCreate
   | Payment
@@ -122,6 +141,26 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'EscrowFinish':
       validateEscrowFinish(tx)
+      break
+
+    case 'NFTokenAcceptOffer':
+      validateNFTokenAcceptOffer(tx)
+      break
+
+    case 'NFTokenBurn':
+      validateNFTokenBurn(tx)
+      break
+
+    case 'NFTokenCancelOffer':
+      validateNFTokenCancelOffer(tx)
+      break
+
+    case 'NFTokenCreateOffer':
+      validateNFTokenCreateOffer(tx)
+      break
+
+    case 'NFTokenMint':
+      validateNFTokenMint(tx)
       break
 
     case 'OfferCancel':

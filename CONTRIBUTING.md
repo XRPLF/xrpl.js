@@ -130,25 +130,30 @@ npm uninstall abbrev -w xrpl
 
 1. Ensure that all tests passed on the last CI that ran on `main`.
 2. Open a PR to update the docs if docs were modified.
-3. Create a branch off `main` that ensures that `HISTORY.md` is updated appropriately for each package.
-4. Merge this branch into `main`.
 ___
 NOW WE ARE READY TO PUBLISH! No new code changes happen manually now.
 ___
-6. Checkout `main` and `git pull`.
-7. Run `npm run build` to triple check the build still works
-8. Run `npx lerna publish`. This command will diff all packages. Any changed
-   package will be staged for publication.
-9. For each changed package, pick what the new version should be. Lerna will bump the versions, commit version bumps to `main`, and create a new git tag for each published package.
-10. Enter your [npmjs.com](https://npmjs.com) OTP (one-time password) to complete publication.
+3. Checkout `main` and `git pull`.
+4. Create a new branch to capture updates that take place during this process. `git checkout -b <BRANCH_NAME>`
+5. Run `npm run build` to triple check the build still works
+6. Run `npx lerna version --no-git-tag-version` - This creates a draft PR and release tags for the new version.
+7. For each changed package, pick what the new version should be. Lerna will bump the versions, commit version bumps to `main`, and create a new git tag for each published package.
+8. Run `npm i` to update the package-lock with the updated versions
+9. Create a new PR from this branch into `main` and merge it.
+10. Checkout `main` and `git pull`
+11. Run `npx lerna publish from-package --yes` - This will actually publish the packages.
+12. If it asks for it, enter your [npmjs.com](https://npmjs.com) OTP (one-time password) to complete publication.
+13. Create a new branch to capture the updated packages from the release (`git checkout -b <BRANCH_NAME>`)
+14. Make a PR to merge those changes into `main`
+
 ___
 NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
 ___
-11. On github, click the "releases" link on the right-hand side of the page.
-12. In the top-left corner, click the "tags" toggle.
-13. For each new tag created by lerna, click the context button (the one that looks like "...") and select "new release" to create a new release from this tag.
-14. Edit the name of the release to match the tag (IE \<package\>@\<version\>) and edit the description as you see fit.
-15. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
+15. On github, click the "releases" link on the right-hand side of the page.
+16. Click "Draft a new release"
+17. Click "Choose a tag" then type in the name of a repo `@` it's newest version to create a new tag (Ex. xrpl@2.0.3)
+18. Edit the name of the release to match the tag (IE \<package\>@\<version\>) and edit the description as you see fit.
+19. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
 
 ## Mailing Lists
 We have a low-traffic mailing list for announcements of new `xrpl.js` releases. (About 1 email every couple of weeks)
