@@ -15,9 +15,9 @@ import {
 
 const PREFIX_BYTES = {
   // 5, 68
-  MAIN: Buffer.from([0x05, 0x44]),
+  main: Buffer.from([0x05, 0x44]),
   // 4, 147
-  TEST: Buffer.from([0x04, 0x93]),
+  test: Buffer.from([0x04, 0x93]),
 }
 
 const MAX_32_BIT_UNSIGNED_INT = 4294967295
@@ -48,7 +48,7 @@ function encodeXAddress(
   /* eslint-disable no-bitwise ---
    * need to use bitwise operations here */
   const bytes = Buffer.concat([
-    test ? PREFIX_BYTES.TEST : PREFIX_BYTES.MAIN,
+    test ? PREFIX_BYTES.test : PREFIX_BYTES.main,
     accountId,
     Buffer.from([
       // 0x00 if no tag, 0x01 if 32-bit tag
@@ -77,7 +77,11 @@ function xAddressToClassicAddress(xAddress: string): {
   tag: number | false
   test: boolean
 } {
+  /* eslint-disable @typescript-eslint/naming-convention --
+   * TODO 'test' should be something like 'isTest', do this later
+   */
   const { accountId, tag, test } = decodeXAddress(xAddress)
+  /* eslint-enable @typescript-eslint/naming-convention */
   const classicAddress = encodeAccountID(accountId)
   return {
     classicAddress,
@@ -92,7 +96,11 @@ function decodeXAddress(xAddress: string): {
   test: boolean
 } {
   const decoded = codec.decodeChecked(xAddress)
+  /* eslint-disable @typescript-eslint/naming-convention --
+   * TODO 'test' should be something like 'isTest', do this later
+   */
   const test = isBufferForTestAddress(decoded)
+  /* eslint-enable @typescript-eslint/naming-convention */
   const accountId = decoded.slice(2, 22)
   const tag = tagFromBuffer(decoded)
   return {
@@ -104,10 +112,10 @@ function decodeXAddress(xAddress: string): {
 
 function isBufferForTestAddress(buf: Buffer): boolean {
   const decodedPrefix = buf.slice(0, 2)
-  if (PREFIX_BYTES.MAIN.equals(decodedPrefix)) {
+  if (PREFIX_BYTES.main.equals(decodedPrefix)) {
     return false
   }
-  if (PREFIX_BYTES.TEST.equals(decodedPrefix)) {
+  if (PREFIX_BYTES.test.equals(decodedPrefix)) {
     return true
   }
   throw new Error('Invalid X-address: bad prefix')

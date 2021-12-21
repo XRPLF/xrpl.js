@@ -25,7 +25,7 @@ export function seqEqual(arr1: Sequence, arr2: Sequence): boolean {
  * @param val - The value to check.
  */
 function isSequence(val: Sequence | number): val is Sequence {
-  return (val as Sequence).length !== undefined
+  return typeof val !== 'number'
 }
 
 /**
@@ -36,6 +36,7 @@ function isSequence(val: Sequence | number): val is Sequence {
  * > concatArgs(1, [2, 3], Buffer.from([4,5]), new Uint8Array([6, 7]));
  * [1,2,3,4,5,6,7]
  *
+ * @param args - Concatenate of these args into a single array.
  * @returns Array of concatenated arguments
  */
 export function concatArgs(...args: Array<number | Sequence>): number[] {
