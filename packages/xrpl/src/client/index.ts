@@ -16,6 +16,8 @@ import {
   AccountInfoResponse,
   AccountLinesRequest,
   AccountLinesResponse,
+  AccountNFTsRequest,
+  AccountNFTsResponse,
   AccountObjectsRequest,
   AccountObjectsResponse,
   AccountOffersRequest,
@@ -82,6 +84,11 @@ import {
   SubscribeResponse,
   UnsubscribeRequest,
   UnsubscribeResponse,
+  // NFT methods
+  NFTBuyOffersRequest,
+  NFTBuyOffersResponse,
+  NFTSellOffersRequest,
+  NFTSellOffersResponse,
 } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 import {
@@ -285,6 +292,7 @@ class Client extends EventEmitter {
   ): Promise<AccountCurrenciesResponse>
   public async request(r: AccountInfoRequest): Promise<AccountInfoResponse>
   public async request(r: AccountLinesRequest): Promise<AccountLinesResponse>
+  public async request(r: AccountNFTsRequest): Promise<AccountNFTsResponse>
   public async request(
     r: AccountObjectsRequest,
   ): Promise<AccountObjectsResponse>
@@ -305,6 +313,8 @@ class Client extends EventEmitter {
   public async request(r: LedgerDataRequest): Promise<LedgerDataResponse>
   public async request(r: LedgerEntryRequest): Promise<LedgerEntryResponse>
   public async request(r: ManifestRequest): Promise<ManifestResponse>
+  public async request(r: NFTBuyOffersRequest): Promise<NFTBuyOffersResponse>
+  public async request(r: NFTSellOffersRequest): Promise<NFTSellOffersResponse>
   public async request(r: NoRippleCheckRequest): Promise<NoRippleCheckResponse>
   public async request(r: PathFindRequest): Promise<PathFindResponse>
   public async request(r: PingRequest): Promise<PingResponse>

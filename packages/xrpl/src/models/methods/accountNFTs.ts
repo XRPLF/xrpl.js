@@ -34,6 +34,7 @@ interface AccountNFToken {
   Issuer: string
   TokenID: string
   TokenTaxon: number
+  URI?: string
   nft_serial: number
 }
 
