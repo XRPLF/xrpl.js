@@ -130,11 +130,11 @@ async function waitForFinalTransactionOutcome(
     .catch(async (error) => {
       // this type of error does not have its interface, type-assert and extract the value we need.
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-member-access -- L131
-      const castedError = error.data as { error: string }
-      if (castedError.error === 'txnNotFound') {
+      const message = error.data.error as string
+      if (message === 'txnNotFound') {
         return waitForFinalTransactionOutcome(client, txHash)
       }
-      throw new Error(String(castedError.error))
+      throw new Error(message)
     })
 
   if (txResponse.result.validated) {
