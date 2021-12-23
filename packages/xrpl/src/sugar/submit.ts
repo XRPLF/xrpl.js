@@ -1,3 +1,5 @@
+/* eslint-disable max-params -- waitForFinalTxOutcome needs to display and do with more information to work perfectly. */
+/* eslint-disable max-lines-per-function -- waitForFinalTxOutcome has a lot of computations to do and conditions to check. */
 import { decode, encode } from 'ripple-binary-codec'
 
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
@@ -81,10 +83,15 @@ async function submitAndWait(
     )
   }
 
-  await submitRequest(this, signedTx, opts?.failHard)
+  const response = await submitRequest(this, signedTx, opts?.failHard)
 
   const txHash = hashes.hashSignedTx(signedTx)
-  return waitForFinalTransactionOutcome(this, txHash, lastLedger)
+  return waitForFinalTransactionOutcome(
+    this,
+    txHash,
+    lastLedger,
+    response.result.engine_result,
+  )
 }
 
 // Helper functions
@@ -121,6 +128,7 @@ async function waitForFinalTransactionOutcome(
   client: Client,
   txHash: string,
   lastLedger: number,
+  submissionResult: string,
 ): Promise<TxResponse> {
   await sleep(LEDGER_CLOSE_TIME)
 
@@ -138,12 +146,18 @@ async function waitForFinalTransactionOutcome(
       if (message === 'txnNotFound') {
         if (lastLedger < (await client.getLedgerIndex())) {
           throw new XrplError(
-            `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${lastLedger}).`,
+            `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${lastLedger}).
+            Preliminary result: ${submissionResult}`,
           )
         }
-        return waitForFinalTransactionOutcome(client, txHash, lastLedger)
+        return waitForFinalTransactionOutcome(
+          client,
+          txHash,
+          lastLedger,
+          submissionResult,
+        )
       }
-      throw new Error(message)
+      throw new Error(`Preliminary result: ${submissionResult}.\n ${message}`)
     })
 
   if (txResponse.result.validated) {
@@ -151,11 +165,17 @@ async function waitForFinalTransactionOutcome(
   }
 
   if (lastLedger > latestLedger) {
-    return waitForFinalTransactionOutcome(client, txHash, lastLedger)
+    return waitForFinalTransactionOutcome(
+      client,
+      txHash,
+      lastLedger,
+      submissionResult,
+    )
   }
 
   throw new XrplError(
-    `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${lastLedger}).`,
+    `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${lastLedger}).
+    Preliminary result: ${submissionResult}`,
   )
 }
 
