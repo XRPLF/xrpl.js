@@ -1,7 +1,7 @@
 import { decode, encode } from 'ripple-binary-codec'
 
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
-import { ValidationError, XrplError } from '../errors'
+import { RippledError, ValidationError, XrplError } from '../errors'
 import { TxResponse } from '../models/methods'
 import { Transaction } from '../models/transactions'
 import { hashes } from '../utils'
@@ -122,15 +122,22 @@ async function waitForFinalTransactionOutcome(
 ): Promise<TxResponse> {
   await sleep(LEDGER_CLOSE_TIME)
 
-  const txResponse = await client.request({
-    command: 'tx',
-    transaction: txHash,
-  })
-  if (txResponse.result.validated) {
+  const txResponse = await client
+    .request({
+      command: 'tx',
+      transaction: txHash,
+    })
+    .catch((failure) => {
+      if (failure.data.error !== 'txnNotFound') {
+        throw new RippledError(failure.data.error_message)
+      }
+    })
+
+  if (txResponse?.result.validated) {
     return txResponse
   }
 
-  const txLastLedger = txResponse.result.LastLedgerSequence
+  const txLastLedger = txResponse?.result.LastLedgerSequence
   if (txLastLedger == null) {
     throw new XrplError('LastLedgerSequence cannot be null')
   }
