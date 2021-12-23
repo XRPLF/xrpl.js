@@ -74,7 +74,9 @@ async function submitAndWait(
 ): Promise<TxResponse> {
   const signedTx = await getSignedTx(this, transaction, opts)
 
-  if (!hasLastLedgerSequence(signedTx)) {
+
+  const lastLedger = getLastLedgerSequence(signedTx)
+  if (lastLedger == null) {
     throw new ValidationError(
       'Transaction must contain a LastLedgerSequence value for reliable submission.',
     )
@@ -83,7 +85,7 @@ async function submitAndWait(
   await submitRequest(this, signedTx, opts?.failHard)
 
   const txHash = hashes.hashSignedTx(signedTx)
-  return waitForFinalTransactionOutcome(this, txHash)
+  return waitForFinalTransactionOutcome(this, txHash, lastLedger)
 }
 
 // Helper functions
@@ -119,6 +121,7 @@ async function submitRequest(
 async function waitForFinalTransactionOutcome(
   client: Client,
   txHash: string,
+  lastLedger: number
 ): Promise<TxResponse> {
   await sleep(LEDGER_CLOSE_TIME)
 
@@ -126,22 +129,27 @@ async function waitForFinalTransactionOutcome(
     command: 'tx',
     transaction: txHash,
   })
-  if (txResponse.result.validated) {
-    return txResponse
-  }
+  .catch((error) => {
+    const message = error.data.error as string
+    if (message !== 'txnNotFound') {
+      throw error
+    }
 
-  const txLastLedger = txResponse.result.LastLedgerSequence
-  if (txLastLedger == null) {
-    throw new XrplError('LastLedgerSequence cannot be null')
-  }
+    return null
+  })
+
+  if (txResponse && txResponse.result.validated)
+    return txResponse
+
+
   const latestLedger = await client.getLedgerIndex()
 
-  if (txLastLedger > latestLedger) {
-    return waitForFinalTransactionOutcome(client, txHash)
+  if (latestLedger > lastLedger) {
+    return waitForFinalTransactionOutcome(client, txHash, lastLedger)
   }
 
   throw new XrplError(
-    `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${txLastLedger}).`,
+    `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${lastLedger}).`,
   )
 }
 
@@ -194,9 +202,9 @@ async function getSignedTx(
 }
 
 // checks if there is a LastLedgerSequence as a part of the transaction
-function hasLastLedgerSequence(transaction: Transaction | string): boolean {
+function getLastLedgerSequence(transaction: Transaction | string): number | null {
   const tx = typeof transaction === 'string' ? decode(transaction) : transaction
-  return typeof tx !== 'string' && tx.LastLedgerSequence != null
+  return tx.LastLedgerSequence as number
 }
 
 // checks if the transaction is an AccountDelete transaction
