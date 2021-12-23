@@ -136,7 +136,7 @@ async function waitForFinalTransactionOutcome(
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-member-access -- L131
       const message = error.data.error as string
       if (message === 'txnNotFound') {
-        if (lastLedger > (await client.getLedgerIndex())) {
+        if (lastLedger < (await client.getLedgerIndex())) {
           throw new XrplError(
             `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${lastLedger}).`,
           )
