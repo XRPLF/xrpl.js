@@ -7,11 +7,9 @@ import {
   SubmitResponse,
   hashes,
   Transaction,
-  RippledError,
 } from 'xrpl-local'
 import { convertStringToHex } from 'xrpl-local/utils'
 
-import { assertRejects } from '../../testUtils'
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'
 import { ledgerAccept, verifySubmittedTransaction } from '../utils'
@@ -75,26 +73,5 @@ describe('submit', function () {
     }
 
     assert.deepEqual(submitResponse, expectedResponse)
-  })
-
-  // Reproduces the 'txnNotFound' case
-  it('submit & quickly check status without waiting', async function () {
-    const accountSet: AccountSet = {
-      TransactionType: 'AccountSet',
-      Account: this.wallet.classicAddress,
-      Domain: convertStringToHex('example.com'),
-    }
-    const { tx_blob: signedAccountSet } = this.wallet.sign(
-      await this.client.autofill(accountSet),
-    )
-    this.client.submit(signedAccountSet)
-
-    await assertRejects(
-      this.client.request({
-        command: 'tx',
-        transaction: hashes.hashSignedTx(signedAccountSet),
-      }),
-      RippledError,
-    )
   })
 })
