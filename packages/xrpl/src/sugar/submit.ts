@@ -127,20 +127,21 @@ async function waitForFinalTransactionOutcome(
       command: 'tx',
       transaction: txHash,
     })
-    .catch((error) => {
+    .catch(async (error) => {
+      // this type of error does not have its interface, type-assert and extract the value we need.
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-member-access -- L131
       const castedError = error.data as { error: string }
-      if (castedError.error == 'txnNotFound') {
+      if (castedError.error === 'txnNotFound') {
         return waitForFinalTransactionOutcome(client, txHash)
-      } else {
-        throw new Error(String(castedError.error))
       }
+      throw new Error(String(castedError.error))
     })
 
-  if (txResponse?.result.validated) {
+  if (txResponse.result.validated) {
     return txResponse
   }
 
-  const txLastLedger = txResponse?.result.LastLedgerSequence
+  const txLastLedger = txResponse.result.LastLedgerSequence
   if (txLastLedger == null) {
     throw new XrplError('LastLedgerSequence cannot be null')
   }
