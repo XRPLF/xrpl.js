@@ -1,7 +1,7 @@
 import { decode, encode } from 'ripple-binary-codec'
 
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
-import { RippledError, ValidationError, XrplError } from '../errors'
+import { ValidationError, XrplError } from '../errors'
 import { TxResponse } from '../models/methods'
 import { Transaction } from '../models/transactions'
 import { hashes } from '../utils'
@@ -127,9 +127,12 @@ async function waitForFinalTransactionOutcome(
       command: 'tx',
       transaction: txHash,
     })
-    .catch((failure) => {
-      if (failure.data.error !== 'txnNotFound') {
-        throw new RippledError(failure.data.error_message)
+    .catch((error) => {
+      const castedError = error.data as { error: string }
+      if (castedError.error == 'txnNotFound') {
+        return waitForFinalTransactionOutcome(client, txHash)
+      } else {
+        throw new Error(String(castedError.error))
       }
     })
 
