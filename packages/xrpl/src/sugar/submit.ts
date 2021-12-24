@@ -1,5 +1,3 @@
-/* eslint-disable max-params -- waitForFinalTxOutcome needs to display and do with more information to work perfectly. */
-/* eslint-disable max-lines-per-function -- waitForFinalTxOutcome has a lot of computations to do and conditions to check. */
 import { decode, encode } from 'ripple-binary-codec'
 
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
@@ -124,6 +122,7 @@ async function submitRequest(
  * validated ledger, or the transaction's lastLedgerSequence has been surpassed by the
  * latest ledger sequence (meaning it will never be included in a validated ledger).
  */
+// eslint-disable-next-line max-params, max-lines-per-function -- fn needs to display and do with more information.
 async function waitForFinalTransactionOutcome(
   client: Client,
   txHash: string,
@@ -147,7 +146,7 @@ async function waitForFinalTransactionOutcome(
       transaction: txHash,
     })
     .catch(async (error) => {
-      // this type of error does not have its interface, type-assert and extract the value we need.
+      // error is of an unknown type and hence we assert type to extract the value we need.
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-member-access -- L131
       const message = error.data.error as string
       if (message === 'txnNotFound') {
