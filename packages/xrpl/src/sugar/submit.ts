@@ -122,7 +122,7 @@ async function submitRequest(
  * validated ledger, or the transaction's lastLedgerSequence has been surpassed by the
  * latest ledger sequence (meaning it will never be included in a validated ledger).
  */
-// eslint-disable-next-line max-params, max-lines-per-function -- fn needs to display and do with more information.
+// eslint-disable max-params, max-lines-per-function -- waitForFinalTxOutcome needs to display and do with more information.
 async function waitForFinalTransactionOutcome(
   client: Client,
   txHash: string,
@@ -135,8 +135,8 @@ async function waitForFinalTransactionOutcome(
 
   if (lastLedger < latestLedger) {
     throw new XrplError(
-      `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${lastLedger}).
-      Preliminary result: ${submissionResult}`,
+      `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${lastLedger}).\n` +
+        `Preliminary result: ${submissionResult}`,
     )
   }
 

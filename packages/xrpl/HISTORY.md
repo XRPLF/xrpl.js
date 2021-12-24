@@ -2,7 +2,13 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
-## Unreleased 
+## Unreleased
+
+## 2.1.1 (2021-12-23)
+### Fixed
+* A bug in submitAndWait function where the transaction could still be in queue and the server returns `txnNotFound`.
+
+## 2.1.0 (2021-12-17)
 ### Added
 * Support for the [XLS-20 NFT proposal](https://github.com/XRPLF/XRPL-Standards/discussions/46)
 
