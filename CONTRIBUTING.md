@@ -151,8 +151,8 @@ NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
 ___
 15. Pull the most recent changes to main locally.
 16. Run `git tag ${tag} -m ${tag}`, where `tag` is the new package and version (e.g. `xrpl@2.1.1`), for each version released.
-17. Run `git push origin ${tag}`, for each tag created in step 16.
-18. On github, click the "releases" link on the right-hand side of the page.
+17. Run `git push --follow-tags`, to push the tags to Github.
+18. On Github, click the "releases" link on the right-hand side of the page.
 19. Click "Draft a new release"
 20. Click "Choose a tag", and choose a tag that you just created.
 21. Edit the name of the release to match the tag (IE \<package\>@\<version\>) and edit the description as you see fit.
