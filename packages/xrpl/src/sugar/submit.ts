@@ -134,6 +134,13 @@ async function waitForFinalTransactionOutcome(
 
   const latestLedger = await client.getLedgerIndex()
 
+  if (lastLedger < latestLedger) {
+    throw new XrplError(
+      `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${lastLedger}).
+      Preliminary result: ${submissionResult}`,
+    )
+  }
+
   const txResponse = await client
     .request({
       command: 'tx',
@@ -144,12 +151,6 @@ async function waitForFinalTransactionOutcome(
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-member-access -- L131
       const message = error.data.error as string
       if (message === 'txnNotFound') {
-        if (lastLedger < (await client.getLedgerIndex())) {
-          throw new XrplError(
-            `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${lastLedger}).
-            Preliminary result: ${submissionResult}`,
-          )
-        }
         return waitForFinalTransactionOutcome(
           client,
           txHash,
@@ -157,25 +158,18 @@ async function waitForFinalTransactionOutcome(
           submissionResult,
         )
       }
-      throw new Error(`Preliminary result: ${submissionResult}.\n ${message}`)
+      throw new Error(`${message} \n Preliminary result: ${submissionResult}.`)
     })
 
   if (txResponse.result.validated) {
     return txResponse
   }
 
-  if (lastLedger > latestLedger) {
-    return waitForFinalTransactionOutcome(
-      client,
-      txHash,
-      lastLedger,
-      submissionResult,
-    )
-  }
-
-  throw new XrplError(
-    `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${lastLedger}).
-    Preliminary result: ${submissionResult}`,
+  return waitForFinalTransactionOutcome(
+    client,
+    txHash,
+    lastLedger,
+    submissionResult,
   )
 }
 
