@@ -122,7 +122,7 @@ async function submitRequest(
  * validated ledger, or the transaction's lastLedgerSequence has been surpassed by the
  * latest ledger sequence (meaning it will never be included in a validated ledger).
  */
-// eslint-disable max-params, max-lines-per-function -- waitForFinalTxOutcome needs to display and do with more information.
+// eslint-disable-next-line max-params, max-lines-per-function -- this function needs to display and do with more information.
 async function waitForFinalTransactionOutcome(
   client: Client,
   txHash: string,
