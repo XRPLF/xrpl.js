@@ -74,16 +74,22 @@ async function submitAndWait(
 ): Promise<TxResponse> {
   const signedTx = await getSignedTx(this, transaction, opts)
 
-  if (!hasLastLedgerSequence(signedTx)) {
+  const lastLedger = getLastLedgerSequence(signedTx)
+  if (lastLedger == null) {
     throw new ValidationError(
       'Transaction must contain a LastLedgerSequence value for reliable submission.',
     )
   }
 
-  await submitRequest(this, signedTx, opts?.failHard)
+  const response = await submitRequest(this, signedTx, opts?.failHard)
 
   const txHash = hashes.hashSignedTx(signedTx)
-  return waitForFinalTransactionOutcome(this, txHash)
+  return waitForFinalTransactionOutcome(
+    this,
+    txHash,
+    lastLedger,
+    response.result.engine_result,
+  )
 }
 
 // Helper functions
@@ -116,32 +122,53 @@ async function submitRequest(
  * validated ledger, or the transaction's lastLedgerSequence has been surpassed by the
  * latest ledger sequence (meaning it will never be included in a validated ledger).
  */
+// eslint-disable-next-line max-params, max-lines-per-function -- this function needs to display and do with more information.
 async function waitForFinalTransactionOutcome(
   client: Client,
   txHash: string,
+  lastLedger: number,
+  submissionResult: string,
 ): Promise<TxResponse> {
   await sleep(LEDGER_CLOSE_TIME)
 
-  const txResponse = await client.request({
-    command: 'tx',
-    transaction: txHash,
-  })
+  const latestLedger = await client.getLedgerIndex()
+
+  if (lastLedger < latestLedger) {
+    throw new XrplError(
+      `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${lastLedger}).\n` +
+        `Preliminary result: ${submissionResult}`,
+    )
+  }
+
+  const txResponse = await client
+    .request({
+      command: 'tx',
+      transaction: txHash,
+    })
+    .catch(async (error) => {
+      // error is of an unknown type and hence we assert type to extract the value we need.
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-member-access -- ^
+      const message = error.data.error as string
+      if (message === 'txnNotFound') {
+        return waitForFinalTransactionOutcome(
+          client,
+          txHash,
+          lastLedger,
+          submissionResult,
+        )
+      }
+      throw new Error(`${message} \n Preliminary result: ${submissionResult}.`)
+    })
+
   if (txResponse.result.validated) {
     return txResponse
   }
 
-  const txLastLedger = txResponse.result.LastLedgerSequence
-  if (txLastLedger == null) {
-    throw new XrplError('LastLedgerSequence cannot be null')
-  }
-  const latestLedger = await client.getLedgerIndex()
-
-  if (txLastLedger > latestLedger) {
-    return waitForFinalTransactionOutcome(client, txHash)
-  }
-
-  throw new XrplError(
-    `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${txLastLedger}).`,
+  return waitForFinalTransactionOutcome(
+    client,
+    txHash,
+    lastLedger,
+    submissionResult,
   )
 }
 
@@ -194,9 +221,12 @@ async function getSignedTx(
 }
 
 // checks if there is a LastLedgerSequence as a part of the transaction
-function hasLastLedgerSequence(transaction: Transaction | string): boolean {
+function getLastLedgerSequence(
+  transaction: Transaction | string,
+): number | null {
   const tx = typeof transaction === 'string' ? decode(transaction) : transaction
-  return typeof tx !== 'string' && tx.LastLedgerSequence != null
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- converts LastLedgSeq to number if present.
+  return tx.LastLedgerSequence as number | null
 }
 
 // checks if the transaction is an AccountDelete transaction
