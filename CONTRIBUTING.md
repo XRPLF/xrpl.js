@@ -149,11 +149,15 @@ ___
 ___
 NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
 ___
-15. On github, click the "releases" link on the right-hand side of the page.
-16. Click "Draft a new release"
-17. Click "Choose a tag" then type in the name of a repo `@` it's newest version to create a new tag (Ex. xrpl@2.0.3)
-18. Edit the name of the release to match the tag (IE \<package\>@\<version\>) and edit the description as you see fit.
-19. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
+15. Pull the most recent changes to main locally.
+16. Run `git tag <tagname> -m <tagname>`, where `<tagname>` is the new package and version (e.g. `xrpl@2.1.1`), for each version released.
+17. Run `git push --follow-tags`, to push the tags to Github.
+18. On Github, click the "releases" link on the right-hand side of the page.
+19. Click "Draft a new release"
+20. Click "Choose a tag", and choose a tag that you just created.
+21. Edit the name of the release to match the tag (IE \<package\>@\<version\>) and edit the description as you see fit.
+22. Repeat steps 19-21 for each release.
+23. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
 
 ## Mailing Lists
 We have a low-traffic mailing list for announcements of new `xrpl.js` releases. (About 1 email every couple of weeks)
