@@ -268,7 +268,10 @@ export interface TransactionStream extends BaseStream {
    */
   meta?: TransactionMetadata
   /** The definition of the transaction in JSON format. */
-  transaction: Transaction
+  transaction: Transaction & {
+    date?: number
+    hash?: string
+  }
   /**
    * If true, this transaction is included in a validated ledger and its
    * outcome is final. Responses from the transaction stream should always be
@@ -336,7 +339,10 @@ export interface OrderBookStream extends BaseStream {
   ledger_hash?: string
   ledger_index?: number
   meta: TransactionMetadata
-  transaction: Transaction | ModifiedOfferCreateTransaction
+  transaction: (Transaction | ModifiedOfferCreateTransaction) & {
+    date?: number
+    hash?: string
+  }
   validated: boolean
 }
 
