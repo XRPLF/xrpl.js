@@ -272,7 +272,7 @@ export interface TransactionStream extends BaseStream {
     /**
      * A unix timestamp (in seconds) marking the time of the transaction
      */
-    date?: Number
+    date?: number
     /**
      * Every signed transaction has a unique "hash" that identifies it.
      * The transaction hash can be used as a "proof of payment" to verify the final status.
@@ -350,7 +350,7 @@ export interface OrderBookStream extends BaseStream {
     /**
      * A unix timestamp (in seconds) marking the time of the transaction
      */
-    date?: Number
+    date?: number
     /**
      * Every signed transaction has a unique "hash" that identifies it.
      * The transaction hash can be used as a "proof of payment" to verify the final status.
