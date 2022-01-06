@@ -52,7 +52,7 @@ export interface TxResponse extends BaseResponse {
      */
     validated?: boolean
     /**
-     * A unix timestamp (in seconds) marking the time of the transaction
+     * This number measures the number of seconds since the "Ripple Epoch" of January 1, 2000 (00:00 UTC)
      */
     date?: number
   } & Transaction
