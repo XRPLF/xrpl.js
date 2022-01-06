@@ -163,7 +163,7 @@ export interface BaseTransaction {
    * Every signed transaction has a unique "hash" that identifies it. 
    * The transaction hash can be used as a "proof of payment" to verify the final status.
    */
-     hash?: string
+  hash?: string
 }
 
 /**
