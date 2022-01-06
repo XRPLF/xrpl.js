@@ -51,6 +51,10 @@ export interface TxResponse extends BaseResponse {
      * Set to false, this data is not final.
      */
     validated?: boolean
+    /**
+     * A unix timestamp (in seconds) marking the time of the transaction
+     */
+    date?: number
   } & Transaction
   /**
    * If true, the server was able to search all of the specified ledger
