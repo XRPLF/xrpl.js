@@ -269,7 +269,14 @@ export interface TransactionStream extends BaseStream {
   meta?: TransactionMetadata
   /** The definition of the transaction in JSON format. */
   transaction: Transaction & {
-    date?: number
+    /**
+     * A unix timestamp (in seconds) marking the time of the transaction
+     */
+    date?: Number
+    /**
+     * Every signed transaction has a unique "hash" that identifies it.
+     * The transaction hash can be used as a "proof of payment" to verify the final status.
+     */
     hash?: string
   }
   /**
@@ -340,7 +347,14 @@ export interface OrderBookStream extends BaseStream {
   ledger_index?: number
   meta: TransactionMetadata
   transaction: (Transaction | ModifiedOfferCreateTransaction) & {
-    date?: number
+    /**
+     * A unix timestamp (in seconds) marking the time of the transaction
+     */
+    date?: Number
+    /**
+     * Every signed transaction has a unique "hash" that identifies it.
+     * The transaction hash can be used as a "proof of payment" to verify the final status.
+     */
     hash?: string
   }
   validated: boolean
