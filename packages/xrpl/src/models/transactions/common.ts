@@ -159,15 +159,6 @@ export interface BaseTransaction {
    * account it says it is from.
    */
   TxnSignature?: string
-  /**
-   * A unix timestamp (in seconds) marking the time of the transaction
-   */
-  date?: Number
-  /**
-   * Every signed transaction has a unique "hash" that identifies it. 
-   * The transaction hash can be used as a "proof of payment" to verify the final status.
-   */
-  hash?: string
 }
 
 /**
