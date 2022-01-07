@@ -275,7 +275,7 @@ export interface TransactionStream extends BaseStream {
     date?: number
     /**
      * Every signed transaction has a unique "hash" that identifies it.
-     * The transaction hash can be used as a "proof of payment" to verify the final status.
+     * The transaction hash can be used to look up its final status, which may serve as a "proof of payment"
      */
     hash?: string
   }
