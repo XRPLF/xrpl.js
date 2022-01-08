@@ -13,7 +13,7 @@ import { deriveKeypair, deriveAddress } from 'ripple-keypairs'
  */
 function deriveXAddress(options: {
   publicKey: string
-  tag: number | false
+  tag: number ?? false
   test: boolean
 }): string {
   const classicAddress = deriveAddress(options.publicKey)
