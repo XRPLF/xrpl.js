@@ -51,6 +51,10 @@ export interface TxResponse extends BaseResponse {
      * Set to false, this data is not final.
      */
     validated?: boolean
+    /**
+     * This number measures the number of seconds since the "Ripple Epoch" of January 1, 2000 (00:00 UTC)
+     */
+    date?: number
   } & Transaction
   /**
    * If true, the server was able to search all of the specified ledger

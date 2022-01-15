@@ -268,7 +268,17 @@ export interface TransactionStream extends BaseStream {
    */
   meta?: TransactionMetadata
   /** The definition of the transaction in JSON format. */
-  transaction: Transaction
+  transaction: Transaction & {
+    /**
+     * This number measures the number of seconds since the "Ripple Epoch" of January 1, 2000 (00:00 UTC)
+     */
+    date?: number
+    /**
+     * Every signed transaction has a unique "hash" that identifies it.
+     * The transaction hash can be used to look up its final status, which may serve as a "proof of payment"
+     */
+    hash?: string
+  }
   /**
    * If true, this transaction is included in a validated ledger and its
    * outcome is final. Responses from the transaction stream should always be
@@ -336,7 +346,17 @@ export interface OrderBookStream extends BaseStream {
   ledger_hash?: string
   ledger_index?: number
   meta: TransactionMetadata
-  transaction: Transaction | ModifiedOfferCreateTransaction
+  transaction: (Transaction | ModifiedOfferCreateTransaction) & {
+    /**
+     * This number measures the number of seconds since the "Ripple Epoch" of January 1, 2000 (00:00 UTC)
+     */
+    date?: number
+    /**
+     * Every signed transaction has a unique "hash" that identifies it.
+     * The transaction hash can be used to look up its final status, which may serve as a "proof of payment"
+     */
+    hash?: string
+  }
   validated: boolean
 }
 

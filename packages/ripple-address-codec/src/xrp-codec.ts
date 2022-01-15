@@ -8,19 +8,17 @@ import * as createHash from 'create-hash'
 import { seqEqual, concatArgs } from './utils'
 
 class Codec {
-  sha256: (bytes: Uint8Array) => Buffer
-  alphabet: string
-  codec: baseCodec.BaseConverter
-  base: number
+  private readonly _sha256: (bytes: Uint8Array) => Buffer
+  private readonly _alphabet: string
+  private readonly _codec: baseCodec.BaseConverter
 
-  constructor(options: {
+  public constructor(options: {
     sha256: (bytes: Uint8Array) => Buffer
     alphabet: string
   }) {
-    this.sha256 = options.sha256
-    this.alphabet = options.alphabet
-    this.codec = baseCodec(this.alphabet)
-    this.base = this.alphabet.length
+    this._sha256 = options.sha256
+    this._alphabet = options.alphabet
+    this._codec = baseCodec(this._alphabet)
   }
 
   /**
@@ -29,7 +27,7 @@ class Codec {
    * @param bytes - Buffer of data to encode.
    * @param opts - Options object including the version bytes and the expected length of the data to encode.
    */
-  encode(
+  public encode(
     bytes: Buffer,
     opts: {
       versions: number[]
@@ -37,30 +35,7 @@ class Codec {
     },
   ): string {
     const versions = opts.versions
-    return this.encodeVersioned(bytes, versions, opts.expectedLength)
-  }
-
-  encodeVersioned(
-    bytes: Buffer,
-    versions: number[],
-    expectedLength: number,
-  ): string {
-    if (expectedLength && bytes.length !== expectedLength) {
-      throw new Error(
-        'unexpected_payload_length: bytes.length does not match expectedLength.' +
-          ' Ensure that the bytes are a Buffer.',
-      )
-    }
-    return this.encodeChecked(Buffer.from(concatArgs(versions, bytes)))
-  }
-
-  encodeChecked(buffer: Buffer): string {
-    const check = this.sha256(this.sha256(buffer)).slice(0, 4)
-    return this.encodeRaw(Buffer.from(concatArgs(buffer, check)))
-  }
-
-  encodeRaw(bytes: Buffer): string {
-    return this.codec.encode(bytes)
+    return this._encodeVersioned(bytes, versions, opts.expectedLength)
   }
 
   /**
@@ -71,7 +46,7 @@ class Codec {
    */
   /* eslint-disable max-lines-per-function --
    * TODO refactor */
-  decode(
+  public decode(
     base58string: string,
     opts: {
       versions: Array<number | number[]>
@@ -96,11 +71,13 @@ class Codec {
     const versionLengthGuess =
       typeof versions[0] === 'number' ? 1 : versions[0].length
     const payloadLength =
-      opts.expectedLength || withoutSum.length - versionLengthGuess
+      opts.expectedLength ?? withoutSum.length - versionLengthGuess
     const versionBytes = withoutSum.slice(0, -payloadLength)
     const payload = withoutSum.slice(-payloadLength)
 
     for (let i = 0; i < versions.length; i++) {
+      /* eslint-disable @typescript-eslint/consistent-type-assertions --
+       * TODO refactor */
       const version: number[] = Array.isArray(versions[i])
         ? (versions[i] as number[])
         : [versions[i] as number]
@@ -111,31 +88,55 @@ class Codec {
           type: types ? types[i] : null,
         }
       }
+      /* eslint-enable @typescript-eslint/consistent-type-assertions */
     }
 
     throw new Error(
       'version_invalid: version bytes do not match any of the provided version(s)',
     )
   }
-  /* eslint-enable max-lines-per-function */
 
-  decodeChecked(base58string: string): Buffer {
-    const buffer = this.decodeRaw(base58string)
+  public encodeChecked(buffer: Buffer): string {
+    const check = this._sha256(this._sha256(buffer)).slice(0, 4)
+    return this._encodeRaw(Buffer.from(concatArgs(buffer, check)))
+  }
+
+  public decodeChecked(base58string: string): Buffer {
+    const buffer = this._decodeRaw(base58string)
     if (buffer.length < 5) {
       throw new Error('invalid_input_size: decoded data must have length >= 5')
     }
-    if (!this.verifyCheckSum(buffer)) {
+    if (!this._verifyCheckSum(buffer)) {
       throw new Error('checksum_invalid')
     }
     return buffer.slice(0, -4)
   }
 
-  decodeRaw(base58string: string): Buffer {
-    return this.codec.decode(base58string)
+  private _encodeVersioned(
+    bytes: Buffer,
+    versions: number[],
+    expectedLength: number,
+  ): string {
+    if (expectedLength && bytes.length !== expectedLength) {
+      throw new Error(
+        'unexpected_payload_length: bytes.length does not match expectedLength.' +
+          ' Ensure that the bytes are a Buffer.',
+      )
+    }
+    return this.encodeChecked(Buffer.from(concatArgs(versions, bytes)))
   }
 
-  verifyCheckSum(bytes: Buffer): boolean {
-    const computed = this.sha256(this.sha256(bytes.slice(0, -4))).slice(0, 4)
+  private _encodeRaw(bytes: Buffer): string {
+    return this._codec.encode(bytes)
+  }
+  /* eslint-enable max-lines-per-function */
+
+  private _decodeRaw(base58string: string): Buffer {
+    return this._codec.decode(base58string)
+  }
+
+  private _verifyCheckSum(bytes: Buffer): boolean {
+    const computed = this._sha256(this._sha256(bytes.slice(0, -4))).slice(0, 4)
     const checksum = bytes.slice(-4)
     return seqEqual(computed, checksum)
   }
@@ -159,7 +160,7 @@ const NODE_PUBLIC = 0x1c
 const ED25519_SEED = [0x01, 0xe1, 0x4b]
 
 const codecOptions = {
-  sha256(bytes: Uint8Array) {
+  sha256(bytes: Uint8Array): Buffer {
     return createHash('sha256').update(Buffer.from(bytes)).digest()
   },
   alphabet: 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz',
@@ -200,7 +201,11 @@ export function decodeSeed(
     versions: [ED25519_SEED, FAMILY_SEED],
     expectedLength: 16,
   },
-) {
+): {
+  version: number[]
+  bytes: Buffer
+  type: string | null
+} {
   return codecWithXrpAlphabet.decode(seed, opts)
 }
 
