@@ -69,11 +69,13 @@ describe('fundWallet', function () {
     await api.disconnect()
   })
 
-  it('can generate and fund wallets using a custom host', async function() {
-    const api = new Client('wss://xls20-sandbox.rippletest.net:51233')
+  it('can generate and fund wallets using a custom host', async function () {
+    const api = new Client('ws://xls20-sandbox.rippletest.net:51233')
 
     await api.connect()
-    const { wallet, balance } = await api.fundWallet(null, { faucetHost: 'faucet-nft.ripple.com' })
+    const { wallet, balance } = await api.fundWallet(null, {
+      faucetHost: 'faucet-nft.ripple.com',
+    })
 
     assert.notEqual(wallet, undefined)
     assert(isValidClassicAddress(wallet.classicAddress))
