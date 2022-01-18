@@ -88,7 +88,9 @@ describe('fundWallet', function () {
 
     assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
 
-    const { balance: newBalance } = await api.fundWallet(wallet)
+    const { balance: newBalance } = await api.fundWallet(wallet, {
+      faucetHost: 'faucet-nft.ripple.com',
+    })
 
     const afterSent = await api.request({
       command: 'account_info',
