@@ -39,14 +39,23 @@ const MAX_ATTEMPTS = 20
  * ```
  *
  * @param this - Client.
- * @param wallet - An existing XRPL Wallet to fund, if undefined, a new Wallet will be created.
+ * @param wallet - An existing XRPL Wallet to fund. If undefined or null, a new Wallet will be created.
+ * @param options - See below.
+ * @param options.faucetHost - A custom host for a faucet server. On devnet and
+ * testnet, `fundWallet` will attempt to determine the correct server
+ * automatically. In other environments, or if you would like to customize the
+ * faucet host in devnet or testnet, you should provide the host using this
+ * option.
  * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP,
  * and that wallet's balance in XRP.
  * @throws When either Client isn't connected or unable to fund wallet address.
  */
 async function fundWallet(
   this: Client,
-  wallet?: Wallet,
+  wallet?: Wallet | null,
+  options?: {
+    faucetHost?: string
+  },
 ): Promise<{
   wallet: Wallet
   balance: number
@@ -80,9 +89,15 @@ async function fundWallet(
   }
 
   // Options to pass to https.request
-  const options = getOptions(this, postBody)
+  const httpOptions = getHTTPOptions(this, postBody, options?.faucetHost)
 
-  return returnPromise(options, this, startingBalance, walletToFund, postBody)
+  return returnPromise(
+    httpOptions,
+    this,
+    startingBalance,
+    walletToFund,
+    postBody,
+  )
 }
 
 // eslint-disable-next-line max-params -- Helper function created for organizational purposes
@@ -124,9 +139,13 @@ async function returnPromise(
   })
 }
 
-function getOptions(client: Client, postBody: Uint8Array): RequestOptions {
+function getHTTPOptions(
+  client: Client,
+  postBody: Uint8Array,
+  hostname?: string,
+): RequestOptions {
   return {
-    hostname: getFaucetUrl(client),
+    hostname: hostname ?? getFaucetHost(client),
     port: 443,
     path: '/accounts',
     method: 'POST',
@@ -275,13 +294,13 @@ async function getUpdatedBalance(
 }
 
 /**
- * Get the faucet URL based on the Client connection.
+ * Get the faucet host based on the Client connection.
  *
  * @param client - Client.
  * @returns A {@link FaucetNetwork}.
  * @throws When the client url is not on altnet or devnet.
  */
-function getFaucetUrl(client: Client): FaucetNetwork | undefined {
+function getFaucetHost(client: Client): FaucetNetwork | undefined {
   const connectionUrl = client.url
 
   // 'altnet' for Ripple Testnet server and 'testnet' for XRPL Labs Testnet server
@@ -300,7 +319,7 @@ export default fundWallet
 
 const _private = {
   FaucetNetwork,
-  getFaucetUrl,
+  getFaucetHost,
 }
 
 export { _private }
