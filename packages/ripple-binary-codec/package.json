@@ -35,7 +35,7 @@
   "bugs": {
     "url": "https://github.com/XRPLF/xrpl.js/issues"
   },
-  "homepage": "https://github.com/XRPLF/xrpl.js/packages/ripple-binary-codec#readme",
+  "homepage": "https://github.com/XRPLF/xrpl.js/tree/main/packages/ripple-binary-codec#readme",
   "license": "ISC",
   "readmeFilename": "README.md",
   "prettier": "@xrplf/prettier-config",
