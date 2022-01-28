@@ -1,16 +1,19 @@
 # ripple-binary-codec Release History
 
-## Unreleased
+## 1.3.1 (2022-01-28)
+- Fix "homepage" field in package.json
+
+## 1.3.0 (2021-12-17)
 ### Added
-- Exported `TRANSACTION_TYPES` value 
+- Exported `TRANSACTION_TYPES` value
 ### Fixed
 - Adds missing fields from XLS-20 NFT implementation
 
-## 1.2.2 (2021-12-2)
+## 1.2.2 (2021-12-02)
 - Fix issue where unsupported currency codes weren't being correctly processed
 - Added a workaround for rippled UNLModify encoding bug (#1830)
 
-## 1.2.1 (2021-12-1)
+## 1.2.1 (2021-12-01)
 - Fix issue where npm < 7 could not install the library
 
 ## 1.2.0 (2021-11-15)
