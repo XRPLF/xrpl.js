@@ -21,7 +21,7 @@
     "@types/create-hash": "^1.2.2",
     "@types/lodash": "^4.14.136",
     "@types/mocha": "^9.0.0",
-    "@types/node": "^16.4.3",
+    "@types/node": "^17.0.14",
     "@types/puppeteer": "5.4.4",
     "@types/ws": "^8.2.0",
     "@typescript-eslint/eslint-plugin": "^4.30.0",
