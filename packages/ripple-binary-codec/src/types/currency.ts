@@ -1,7 +1,7 @@
 import { Hash160 } from './hash-160'
 import { Buffer } from 'buffer/'
 
-const XRP_REGEX = /^0{40}$/
+const XRP_HEX_REGEX = /^0{40}$/
 const ISO_REGEX = /^[A-Z0-9]{3}$/
 const HEX_REGEX = /^[A-F0-9]{40}$/
 // eslint-disable-next-line no-control-regex
@@ -90,7 +90,7 @@ class Currency extends Hash160 {
     super(byteBuf ?? Currency.XRP.bytes)
     const hex = this.bytes.toString('hex')
 
-    if (XRP_REGEX.test(hex)) {
+    if (XRP_HEX_REGEX.test(hex)) {
       this._iso = 'XRP'
     } else if (STANDARD_FORMAT_HEX_REGEX.test(hex)) {
       this._iso = isoCodeFromHex(this.bytes.slice(12, 15))
