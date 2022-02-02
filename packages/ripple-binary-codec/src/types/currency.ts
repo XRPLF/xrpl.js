@@ -28,11 +28,6 @@ function isIsoCode(iso: string): boolean {
 
 function isoCodeFromHex(code: Buffer): string | null {
   const iso = code.toString()
-  if (iso === 'XRP') {
-    throw new Error(
-      'Disallowed currency code: to indicate the currency XRP you must use 20 bytes of 0s',
-    )
-  }
   if (isIsoCode(iso)) {
     return iso
   }
