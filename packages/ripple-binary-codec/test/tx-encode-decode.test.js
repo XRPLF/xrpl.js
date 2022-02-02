@@ -1,3 +1,6 @@
+// Chai is included in the lerna dependencies.
+/* eslint-disable node/no-extraneous-require */
+/* eslint-disable-next-line import/no-extraneous-dependencies */
 const { expect } = require('chai')
 const { encode, decode } = require('../dist')
 
