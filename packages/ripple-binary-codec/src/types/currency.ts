@@ -28,6 +28,9 @@ function isIsoCode(iso: string): boolean {
 
 function isoCodeFromHex(code: Buffer): string | null {
   const iso = code.toString()
+  if (iso === 'XRP') {
+    return null
+  }
   if (isIsoCode(iso)) {
     return iso
   }
