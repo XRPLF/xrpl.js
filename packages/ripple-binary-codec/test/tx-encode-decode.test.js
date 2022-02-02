@@ -54,7 +54,7 @@ describe('encoding and decoding tx_json', function () {
     const decoded = decode(encoded)
     expect(my_tx).deep.equal(decoded)
   })
-  test('can decode an transaction with an issued currency that evaluates to XRP', function () {
+  test('can decode a transaction with an issued currency that evaluates to XRP', function () {
     // Encoding is done prior, because this is disallowed during encoding with client libraries to avoid scam XRP tokens.
     const expectedTx = {
       TransactionType: 'TrustSet',
