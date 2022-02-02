@@ -87,12 +87,13 @@ class Currency extends Hash160 {
     super(byteBuf ?? Currency.XRP.bytes)
     const code = this.bytes.slice(12, 15)
 
-    if (this.bytes[0] !== 0) {
-      this._iso = null
-    } else if (/^0*$/.test(this.bytes.toString('hex'))) {
+    if (/^0*$/.test(this.bytes.toString('hex'))) {
       this._iso = 'XRP'
-    } else {
+      // eslint-disable-next-line no-control-regex
+    } else if (/0{24}[\x00-\x7F]{6}0{10}/gm.test(this.bytes.toString('hex'))) {
       this._iso = isoCodeFromHex(code)
+    } else {
+      this._iso = null
     }
   }
 
