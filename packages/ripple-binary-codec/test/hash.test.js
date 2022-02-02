@@ -52,7 +52,7 @@ describe('Hash256', function () {
 describe('Currency', function () {
   test('Decoding allows dodgy XRP without throwing', function () {
     const currencyCode = '0000000000000000000000005852500000000000'
-    expect(Currency.from(currencyCode).toJSON()).toBe('XRP')
+    expect(Currency.from(currencyCode).toJSON()).toBe(currencyCode)
   })
   test('Currency with lowercase letters decode to hex', () => {
     expect(Currency.from('xRp').toJSON()).toBe(
