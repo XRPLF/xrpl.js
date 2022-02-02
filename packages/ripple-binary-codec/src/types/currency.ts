@@ -3,6 +3,8 @@ import { Buffer } from 'buffer/'
 
 const ISO_REGEX = /^[A-Z0-9]{3}$/
 const HEX_REGEX = /^[A-F0-9]{40}$/
+// eslint-disable-next-line no-control-regex
+const STANDARD_FORMAT_HEX_REGEX = /0{24}[\x00-\x7F]{6}0{10}/
 
 /**
  * Convert an ISO code to a currency bytes representation
@@ -89,8 +91,7 @@ class Currency extends Hash160 {
 
     if (/^0*$/.test(this.bytes.toString('hex'))) {
       this._iso = 'XRP'
-      // eslint-disable-next-line no-control-regex
-    } else if (/0{24}[\x00-\x7F]{6}0{10}/gm.test(this.bytes.toString('hex'))) {
+    } else if (STANDARD_FORMAT_HEX_REGEX.test(this.bytes.toString('hex'))) {
       this._iso = isoCodeFromHex(code)
     } else {
       this._iso = null
