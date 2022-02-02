@@ -1,8 +1,11 @@
 import { Hash160 } from './hash-160'
 import { Buffer } from 'buffer/'
 
+const XRP_HEX_REGEX = /^0{40}$/
 const ISO_REGEX = /^[A-Z0-9]{3}$/
 const HEX_REGEX = /^[A-F0-9]{40}$/
+// eslint-disable-next-line no-control-regex
+const STANDARD_FORMAT_HEX_REGEX = /^0{24}[\x00-\x7F]{6}0{10}$/
 
 /**
  * Convert an ISO code to a currency bytes representation
@@ -85,14 +88,14 @@ class Currency extends Hash160 {
 
   constructor(byteBuf: Buffer) {
     super(byteBuf ?? Currency.XRP.bytes)
-    const code = this.bytes.slice(12, 15)
+    const hex = this.bytes.toString('hex')
 
-    if (this.bytes[0] !== 0) {
-      this._iso = null
-    } else if (/^0*$/.test(this.bytes.toString('hex'))) {
+    if (XRP_HEX_REGEX.test(hex)) {
       this._iso = 'XRP'
+    } else if (STANDARD_FORMAT_HEX_REGEX.test(hex)) {
+      this._iso = isoCodeFromHex(this.bytes.slice(12, 15))
     } else {
-      this._iso = isoCodeFromHex(code)
+      this._iso = null
     }
   }
 

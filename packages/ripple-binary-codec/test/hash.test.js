@@ -50,7 +50,7 @@ describe('Hash256', function () {
 })
 
 describe('Currency', function () {
-  test('Will throw an error for dodgy XRP ', function () {
+  test('Will throw an error for dodgy XRP', function () {
     expect(() =>
       Currency.from('0000000000000000000000005852500000000000'),
     ).toThrow()
@@ -68,6 +68,18 @@ describe('Currency', function () {
   test('Currency codes with uppercase and 0-9 decode to ISO codes', () => {
     expect(Currency.from('X8P').toJSON()).toBe('X8P')
     expect(Currency.from('USD').toJSON()).toBe('USD')
+  })
+
+  test('Currency codes with no contiguous zeroes in first 96 type code & reserved bits', function () {
+    expect(
+      Currency.from('0000000023410000000000005852520000000000').iso(),
+    ).toBe(null)
+  })
+
+  test('Currency codes with no contiguous zeroes in last 40 reserved bits', function () {
+    expect(
+      Currency.from('0000000000000000000000005852527570656500').iso(),
+    ).toBe(null)
   })
 
   test('can be constructed from a Buffer', function () {

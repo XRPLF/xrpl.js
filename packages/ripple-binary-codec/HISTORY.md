@@ -2,9 +2,12 @@
 
 ## Unreleased
 ### Added
-- Exported `TRANSACTION_TYPES` value 
+- Exported `TRANSACTION_TYPES` value
 ### Fixed
 - Adds missing fields from XLS-20 NFT implementation
+
+## 1.2.3 (2022-2-2)
+- Fix issue where ISO is invalid when parsing currency code
 
 ## 1.2.2 (2021-12-2)
 - Fix issue where unsupported currency codes weren't being correctly processed
