@@ -88,10 +88,11 @@ class Currency extends Hash160 {
   constructor(byteBuf: Buffer) {
     super(byteBuf ?? Currency.XRP.bytes)
     const code = this.bytes.slice(12, 15)
+    const hex = this.bytes.toString('hex')
 
-    if (/^0*$/.test(this.bytes.toString('hex'))) {
+    if (/^0*$/.test(hex)) {
       this._iso = 'XRP'
-    } else if (STANDARD_FORMAT_HEX_REGEX.test(this.bytes.toString('hex'))) {
+    } else if (STANDARD_FORMAT_HEX_REGEX.test(hex)) {
       this._iso = isoCodeFromHex(code)
     } else {
       this._iso = null
