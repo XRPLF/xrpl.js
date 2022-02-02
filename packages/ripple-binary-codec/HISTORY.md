@@ -5,6 +5,7 @@
 - Exported `TRANSACTION_TYPES` value
 ### Fixed
 - Adds missing fields from XLS-20 NFT implementation
+- Fixed error being raised when decoding issued currencies in non-standard formats that decode to XRP.
 
 ## 1.2.3 (2022-2-2)
 - Fix issue where ISO is invalid when parsing currency code
