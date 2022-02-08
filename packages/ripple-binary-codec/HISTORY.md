@@ -1,5 +1,18 @@
 # ripple-binary-codec Release History
 
+## 1.3.2 (2022-02-02)
+- Fixed error being raised when decoding issued currencies in non-standard formats that decode to XRP (#1920)
+- Fix ISO when parsing currency code (#1921)
+- Internal - build(deps-dev):
+  - bump webpack from 5.66.0 to 5.68.0 (#1910)
+  - bump webpack-cli from 4.9.1 to 4.9.2 (#1911)
+  - bump eslint-plugin-mocha from 9.0.0 to 10.0.3 (#1912)
+  - bump @types/node from 16.11.11 to 17.0.14 (#1913)
+  - bump @types/mocha from 9.0.0 to 9.1.0 (#1914)
+  - bump typescript from 4.5.2 to 4.5.5 (#1918)
+  - bump typedoc from 0.22.10 to 0.22.11 (#1916)
+  - bump chai from 4.3.4 to 4.3.6 (#1915)
+
 ## 1.3.1 (2022-01-28)
 - Fix "homepage" field in package.json
 
@@ -8,7 +21,6 @@
 - Exported `TRANSACTION_TYPES` value
 ### Fixed
 - Adds missing fields from XLS-20 NFT implementation
-- Fixed error being raised when decoding issued currencies in non-standard formats that decode to XRP.
 
 ## 1.2.3 (2022-2-2)
 - Fix issue where ISO is invalid when parsing currency code
