@@ -2,7 +2,7 @@
 
 ## 1.3.2 (2022-02-02)
 - Fixed error being raised when decoding issued currencies in non-standard formats that decode to XRP (#1920)
-  - Fix ISO when parsing currency code (#1921)
+- Fix ISO when parsing currency code (#1921)
 - Internal - build(deps-dev):
   - bump webpack from 5.66.0 to 5.68.0 (#1910)
   - bump webpack-cli from 4.9.1 to 4.9.2 (#1911)
