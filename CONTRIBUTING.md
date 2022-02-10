@@ -75,14 +75,13 @@ npm run test:browser
 
 ## Generate reference docs
 
-You can see the complete reference documentation at [`xrpl.js` docs](js.xrpl.org). You can also generate them locally using `typedoc`:
+You can see the complete reference documentation at [`xrpl.js` docs](https://js.xrpl.org). You can also generate them locally using `typedoc`:
 
 ```bash
 npm run docgen
 ```
 
-After generating the docs, copy the docs from `packages/xrpl/docs` to `docs` at the top level.
-(That is where GitHub pages looks for the docs, if the docs aren't moved, js.xrpl.org will NOT update)
+This updates `docs/` at the top level, where GitHub Pages looks for the docs.
 
 ## Adding and removing packages
 
