@@ -5,9 +5,7 @@ const AccountFlags = constants.AccountFlags
 import parseFields from './fields'
 
 function getAccountRootModifiedNode(tx: any) {
-  const modifiedNodes = tx.meta.AffectedNodes.filter(
-    (node) => node.ModifiedNode.LedgerEntryType === 'AccountRoot'
-  )
+  const modifiedNodes = tx.meta.AffectedNodes.filter(node => node.ModifiedNode?.LedgerEntryType === 'AccountRoot');
   assert.ok(modifiedNodes.length === 1)
   return modifiedNodes[0].ModifiedNode
 }
