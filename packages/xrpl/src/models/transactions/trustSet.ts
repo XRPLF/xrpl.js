@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { Amount } from '../common'
+import { IssuedCurrencyAmount } from '../common'
 
 import {
   BaseTransaction,
@@ -102,7 +102,7 @@ export interface TrustSet extends BaseTransaction {
    * Object defining the trust line to create or modify, in the format of a
    * Currency Amount.
    */
-  LimitAmount: Amount
+  LimitAmount: IssuedCurrencyAmount
   /**
    * Value incoming balances on this trust line at the ratio of this number per
    * 1,000,000,000 units. A value of 0 is shorthand for treating balances at
