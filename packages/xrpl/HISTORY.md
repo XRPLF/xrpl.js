@@ -5,6 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Fixed
+* Type of TrustSet transaction edited, specifically LimitAmount property type (fixed typescript issue)
 * Remove unnecessary console.warn for partial payments (#1783, #1784, #1896)
 
 ## 2.1.1 (2021-12-23)
