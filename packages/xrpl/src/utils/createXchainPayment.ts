@@ -1,7 +1,8 @@
-import { convertStringToHex } from './stringConversion'
+import { XrplError } from '../errors'
 import { Payment } from '../models'
 import { Memo } from '../models/common'
-import { XrplError } from '../errors'
+
+import { convertStringToHex } from './stringConversion'
 
 /**
  * Computes the complete list of every balance that changed in the ledger
@@ -24,7 +25,7 @@ export default function createXchainPayment(
   const destAccountHex = convertStringToHex(destAccount)
   const destAccountMemo: Memo = { Memo: { MemoData: destAccountHex } }
 
-  const memos = payment.Memos || []
+  const memos = payment.Memos ?? []
   if (memos.length > 2) {
     throw new XrplError(
       'Cannot have more than 2 memos in a cross-chain transaction.',

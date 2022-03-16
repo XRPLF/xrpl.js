@@ -21,6 +21,7 @@ import { Response } from '../models/methods'
 import { PaymentChannelClaim } from '../models/transactions/paymentChannelClaim'
 import { Transaction } from '../models/transactions/transaction'
 
+import createXchainPayment from './createXchainPayment'
 import { deriveKeypair, deriveXAddress } from './derive'
 import getBalanceChanges from './getBalanceChanges'
 import {
@@ -46,6 +47,7 @@ import {
   qualityToDecimal,
 } from './quality'
 import signPaymentChannelClaim from './signPaymentChannelClaim'
+import { convertHexToString, convertStringToHex } from './stringConversion'
 import {
   rippleTimeToISOTime,
   isoTimeToRippleTime,
@@ -54,8 +56,6 @@ import {
 } from './timeConversion'
 import verifyPaymentChannelClaim from './verifyPaymentChannelClaim'
 import { xrpToDrops, dropsToXrp } from './xrpConversion'
-import { convertHexToString, convertStringToHex } from './stringConversion'
-import createXchainPayment from './createXchainPayment'
 
 /**
  * Check if a secret is valid.

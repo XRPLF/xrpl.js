@@ -29,21 +29,21 @@ export interface FederatorInfoResponse extends BaseResponse {
         listener_info: {
           state: 'syncing' | 'normal'
         }
-        pending_transactions: {
+        pending_transactions: Array<{
           amount: string
           destination_account: string
-          signatures: {
+          signatures: Array<{
             public_key: string
             seq: number
-          }[]
-        }[]
+          }>
+        }>
         sequence: number
         tickets: {
           initialized: boolean
-          tickets: {
+          tickets: Array<{
             status: 'taken' | 'available'
             ticket_seq: number
-          }[]
+          }>
         }
       }
       public_key: string
@@ -56,21 +56,21 @@ export interface FederatorInfoResponse extends BaseResponse {
         listener_info: {
           state: 'syncing' | 'normal'
         }
-        pending_transactions: {
+        pending_transactions: Array<{
           amount: string
           destination_account: string
-          signatures: {
+          signatures: Array<{
             public_key: string
             seq: number
-          }[]
-        }[]
+          }>
+        }>
         sequence: number
         tickets: {
           initialized: boolean
-          tickets: {
+          tickets: Array<{
             status: 'taken' | 'available'
             ticket_seq: number
-          }[]
+          }>
         }
       }
     }
