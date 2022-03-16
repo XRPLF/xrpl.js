@@ -1,4 +1,4 @@
-import { convertStringToHex } from './'
+import { convertStringToHex } from './stringConversion'
 import { Payment } from '../models'
 import { Memo } from '../models/common'
 import { XrplError } from '../errors'
@@ -10,9 +10,11 @@ import { XrplError } from '../errors'
  * @param payment - The initial payment transaction. If the transaction is
  * signed, then it will need to be re-signed. There must be no more than 2
  * memos, since one memo is used for the sidechain destination account.
+ * @param destAccount - the destination account on the sidechain.
  * @returns A cross-chain payment transaction, where the mainchain door account
  * is the `Destination` and the destination account on the sidechain is encoded
  * in the memos.
+ * @throws XrplError - if there are more than 2 memos.
  * @category Utilities
  */
 export default function createXchainPayment(
