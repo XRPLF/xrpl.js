@@ -2,8 +2,9 @@ import { BaseRequest, BaseResponse } from './baseMethod'
 
 /**
  * The `federator_info` command asks the federator for information
- * about the door account and other bridge-related information.
- * Expects a response in the form of a {@link FederatorInfoResponse}.
+ * about the door account and other bridge-related information. This
+ * method only exists on sidechain federators. Expects a response in
+ * the form of a {@link FederatorInfoResponse}.
  *
  * @category Requests
  */
