@@ -23,11 +23,11 @@ export interface FederatorInfoResponse extends BaseResponse {
       mainchain: {
         door_status: {
           initialized: boolean
-          status: string
+          status: 'open' | 'opening' | 'closed' | 'closing'
         }
         last_transaction_sent_seq: number
         listener_info: {
-          state: string
+          state: 'syncing' | 'normal'
         }
         pending_transactions: {
           amount: string
@@ -50,11 +50,11 @@ export interface FederatorInfoResponse extends BaseResponse {
       sidechain: {
         door_status: {
           initialized: boolean
-          status: string
+          status: 'open' | 'opening' | 'closed' | 'closing'
         }
         last_transaction_sent_seq: number
         listener_info: {
-          state: string
+          state: 'syncing' | 'normal'
         }
         pending_transactions: {
           amount: string
