@@ -3,6 +3,8 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
+### Added
+* Export deriveAddress from ripple-keypairs in xrpl.js
 
 ## 2.2.1 (2022-04-21)
 ### Fixed
@@ -18,6 +20,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Type of TrustSet transaction edited, specifically LimitAmount property type (fixed typescript issue)
 * Remove unnecessary console.warn for partial payments (#1783, #1784, #1896)
 * Matched 1.9.0's breaking changes to NFT fields.
+
 
 ## 2.1.1 (2021-12-23)
 ### Fixed
