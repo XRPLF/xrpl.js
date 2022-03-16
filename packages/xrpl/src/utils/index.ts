@@ -54,6 +54,7 @@ import {
 } from './timeConversion'
 import verifyPaymentChannelClaim from './verifyPaymentChannelClaim'
 import { xrpToDrops, dropsToXrp } from './xrpConversion'
+import createXchainPayment from './createXchainPayment'
 
 /**
  * Check if a secret is valid.
@@ -238,4 +239,5 @@ export {
   encodeForMultiSigning,
   encodeForSigning,
   encodeForSigningClaim,
+  createXchainPayment,
 }
