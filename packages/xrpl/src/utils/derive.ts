@@ -20,4 +20,5 @@ function deriveXAddress(options: {
   return classicAddressToXAddress(classicAddress, options.tag, options.test)
 }
 
+// eslint-disable-next-line import/no-unused-modules - deriveAddress is used externally
 export { deriveKeypair, deriveXAddress, deriveAddress }
