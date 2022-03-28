@@ -1,7 +1,11 @@
 import { assert } from 'chai'
-import { createXchainPayment, convertStringToHex, Payment } from 'xrpl-local'
+import {
+  createCrossChainPayment,
+  convertStringToHex,
+  Payment,
+} from 'xrpl-local'
 
-describe('createXchainPayment', function () {
+describe('createCrossChainPayment', function () {
   it('successful xchain payment creation', function () {
     const payment: Payment = {
       TransactionType: 'Payment',
@@ -22,7 +26,7 @@ describe('createXchainPayment', function () {
       ],
     }
 
-    const resultPayment = createXchainPayment(payment, sidechainAccount)
+    const resultPayment = createCrossChainPayment(payment, sidechainAccount)
     assert.deepEqual(resultPayment, expectedPayment)
 
     // ensure that the original object wasn't modified
@@ -51,7 +55,7 @@ describe('createXchainPayment', function () {
     }
     delete expectedPayment.TxnSignature
 
-    const resultPayment = createXchainPayment(payment, sidechainAccount)
+    const resultPayment = createCrossChainPayment(payment, sidechainAccount)
     assert.deepEqual(resultPayment, expectedPayment)
 
     // ensure that the original object wasn't modified
@@ -83,7 +87,7 @@ describe('createXchainPayment', function () {
       ],
     }
     assert.throws(() => {
-      createXchainPayment(payment, 'rSidechain')
+      createCrossChainPayment(payment, 'rSidechain')
     }, /Cannot have more than 2 memos/u)
   })
 })

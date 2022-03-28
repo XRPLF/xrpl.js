@@ -18,7 +18,7 @@ import { convertStringToHex } from './stringConversion'
  * @throws XrplError - if there are more than 2 memos.
  * @category Utilities
  */
-export default function createXchainPayment(
+export default function createCrossChainPayment(
   payment: Payment,
   destAccount: string,
 ): Payment {
