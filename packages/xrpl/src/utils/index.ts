@@ -21,7 +21,7 @@ import { Response } from '../models/methods'
 import { PaymentChannelClaim } from '../models/transactions/paymentChannelClaim'
 import { Transaction } from '../models/transactions/transaction'
 
-import createXchainPayment from './createXchainPayment'
+import createCrossChainPayment from './createCrossChainPayment'
 import { deriveKeypair, deriveXAddress } from './derive'
 import getBalanceChanges from './getBalanceChanges'
 import {
@@ -214,5 +214,5 @@ export {
   encodeForMultiSigning,
   encodeForSigning,
   encodeForSigningClaim,
-  createXchainPayment,
+  createCrossChainPayment,
 }
