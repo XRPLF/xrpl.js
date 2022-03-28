@@ -33,6 +33,40 @@ describe('createCrossChainPayment', function () {
     assert.notDeepEqual(resultPayment, payment)
   })
 
+  it('successful xchain payment creation with memo', function () {
+    const memo = {
+      Memo: {
+        MemoData: 'deadbeef',
+      },
+    }
+    const payment: Payment = {
+      TransactionType: 'Payment',
+      Account: 'rRandom',
+      Destination: 'rRandom2',
+      Amount: '3489303',
+      Memos: [memo],
+    }
+    const sidechainAccount = 'rSidechain'
+
+    const expectedPayment = {
+      ...payment,
+      Memos: [
+        {
+          Memo: {
+            MemoData: convertStringToHex(sidechainAccount),
+          },
+        },
+        memo,
+      ],
+    }
+
+    const resultPayment = createCrossChainPayment(payment, sidechainAccount)
+    assert.deepEqual(resultPayment, expectedPayment)
+
+    // ensure that the original object wasn't modified
+    assert.notDeepEqual(resultPayment, payment)
+  })
+
   it('removes TxnSignature', function () {
     const payment: Payment = {
       TransactionType: 'Payment',
