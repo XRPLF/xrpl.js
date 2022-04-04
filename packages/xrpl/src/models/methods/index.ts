@@ -19,6 +19,7 @@ import {
   DepositAuthorizedRequest,
   DepositAuthorizedResponse,
 } from './depositAuthorized'
+import { FederatorInfoRequest, FederatorInfoResponse } from './federatorInfo'
 import { FeeRequest, FeeResponse } from './fee'
 import {
   GatewayBalancesRequest,
@@ -116,6 +117,8 @@ type Request =
   // NFT methods
   | NFTBuyOffersRequest
   | NFTSellOffersRequest
+  // sidechain methods
+  | FederatorInfoRequest
 
 /**
  * @category Responses
@@ -164,6 +167,8 @@ type Response =
   // NFT methods
   | NFTBuyOffersResponse
   | NFTSellOffersResponse
+  // sidechain methods
+  | FederatorInfoResponse
 
 export {
   Request,
@@ -258,4 +263,7 @@ export {
   NFTBuyOffersResponse,
   NFTSellOffersRequest,
   NFTSellOffersResponse,
+  // sidechain methods
+  FederatorInfoRequest,
+  FederatorInfoResponse,
 }

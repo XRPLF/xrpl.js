@@ -3,6 +3,9 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
+### Added
+* `federator_info` RPC support
+* Helper method for creating a cross-chain payment to/from a sidechain
 
 ### Fixed
 * Type of TrustSet transaction edited, specifically LimitAmount property type (fixed typescript issue)
