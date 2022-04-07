@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Doing hex string parsing. */
 import BigNumber from 'bignumber.js'
 import { encodeAccountID } from 'ripple-address-codec'
+
 import { XrplError } from '../errors'
 
 /**
@@ -39,7 +41,9 @@ interface NFTokenID {
  * @returns the opposite taxon. If the taxon was scrambled it becomes unscrambled, and vice versa.
  */
 function unscrambleTaxon(taxon: number, tokenSeq: number): number {
+  /* eslint-disable no-bitwise -- XOR is part of the encode/decode scheme. */
   return (taxon ^ (384160001 * tokenSeq + 2459)) % 4294967296
+  /* eslint-enable no-bitwise */
 }
 
 /**
@@ -62,11 +66,12 @@ function unscrambleTaxon(taxon: number, tokenSeq: number): number {
  * `---> Flags: 11 -> lsfBurnable, lsfOnlyXRP and lsfTransferable
  *
  * @param tokenID - A hex string which identifies an NFToken on the ledger.
+ * @throws XrplError when given an invalid tokenID.
  * @returns a decoded tokenID with all information encoded within.
  */
 function parseNFTokenID(tokenID: string): NFTokenID {
   const expectedLength = 64
-  if (tokenID.length != expectedLength) {
+  if (tokenID.length !== expectedLength) {
     throw new XrplError(`Attempting to parse a tokenID with length ${tokenID.length}
     , but expected a token with length ${expectedLength}`)
   }
@@ -77,7 +82,7 @@ function parseNFTokenID(tokenID: string): NFTokenID {
   const NFTokenIDData: NFTokenID = {
     TokenID: tokenID,
     Flags: new BigNumber(tokenID.substring(0, 4), 16).toNumber(),
-    TransferFee: new BigNumber(tokenID.substring(4, 8), 16).toNumber(), // basis points (bps)
+    TransferFee: new BigNumber(tokenID.substring(4, 8), 16).toNumber(),
     Issuer: encodeAccountID(Buffer.from(tokenID.substring(8, 48), 'hex')),
     Taxon: unscrambleTaxon(scrambledTaxon, sequence),
     Sequence: sequence,
