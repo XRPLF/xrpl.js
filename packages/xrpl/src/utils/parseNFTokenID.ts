@@ -3,24 +3,7 @@ import BigNumber from 'bignumber.js'
 import { encodeAccountID } from 'ripple-address-codec'
 
 import { XrplError } from '../errors'
-
-/**
- * All information encoded within an NFTokenID.
- */
-interface NFTokenID {
-  /** The encoded hex string which represents an NFToken on ledger. */
-  TokenID: string
-  /** Which flags were enabled when the token was minted. */
-  Flags: number
-  /** The fee given to the minter on each trade of this NFToken in basis points. */
-  TransferFee: number
-  /** The original creator of this NFT. */
-  Issuer: string
-  /** A number associated with the token chosen by the minter. */
-  Taxon: number
-  /** The sequence number of the transaction which minted this token. */
-  Sequence: number
-}
+import NFTokenID from '../models/utils/NFTokenID'
 
 /**
  * An issuer may issue several NFTs with the same taxon; to ensure that NFTs are
