@@ -6,8 +6,6 @@ export { default as getLedgerIndex } from './getLedgerIndex'
 
 export { default as getOrderbook } from './getOrderbook'
 
-export * from './parseNFTokenID'
-
 export * from './submit'
 
 export * from './utils'

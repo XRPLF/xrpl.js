@@ -56,6 +56,7 @@ import {
 } from './timeConversion'
 import verifyPaymentChannelClaim from './verifyPaymentChannelClaim'
 import { xrpToDrops, dropsToXrp } from './xrpConversion'
+import { parseNFTokenID, NFTokenID } from './parseNFTokenID'
 
 /**
  * Check if a secret is valid.
@@ -215,4 +216,6 @@ export {
   encodeForSigning,
   encodeForSigningClaim,
   createCrossChainPayment,
+  parseNFTokenID,
+  NFTokenID,
 }
