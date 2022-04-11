@@ -1,7 +1,7 @@
 import { LedgerIndex } from '../common'
 import { Transaction, TransactionMetadata } from '../transactions'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { ResponseOnlyTxInfo, BaseRequest, BaseResponse } from './baseMethod'
 
 /**
  * The `transaction_entry` method retrieves information on a single transaction
@@ -46,6 +46,6 @@ export interface TransactionEntryResponse extends BaseResponse {
      */
     metadata: TransactionMetadata
     /** JSON representation of the Transaction object. */
-    tx_json: Transaction
+    tx_json: Transaction & ResponseOnlyTxInfo
   }
 }

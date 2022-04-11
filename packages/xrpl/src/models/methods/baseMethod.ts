@@ -20,6 +20,26 @@ interface Warning {
   details?: { [key: string]: string }
 }
 
+/**
+ * This information is added to Transactions in request responses, but is not part
+ * of the canonical Transaction information on ledger. These fields are denoted with
+ * lowercase letters to indicate this in the rippled responses.
+ */
+export interface ResponseOnlyTxInfo {
+  /**
+   * The date/time when this transaction was included in a validated ledger.
+   */
+  date?: number
+  /**
+   * An identifying hash value unique to this transaction, as a hex string.
+   */
+  hash?: string
+  /**
+   * The sequence number of the ledger that included this transaction.
+   */
+  ledger_index?: number
+}
+
 export interface BaseResponse {
   id: number | string
   status?: 'success' | string

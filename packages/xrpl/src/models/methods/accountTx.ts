@@ -1,7 +1,7 @@
 import { LedgerIndex } from '../common'
 import { Transaction, TransactionMetadata } from '../transactions'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { ResponseOnlyTxInfo, BaseRequest, BaseResponse } from './baseMethod'
 
 /**
  * The account_tx method retrieves a list of transactions that involved the
@@ -62,7 +62,7 @@ interface AccountTransaction {
    */
   meta: string | TransactionMetadata
   /** JSON object defining the transaction. */
-  tx?: Transaction
+  tx?: Transaction & ResponseOnlyTxInfo
   /** Unique hashed String representing the transaction. */
   tx_blob?: string
   /**
@@ -70,6 +70,14 @@ interface AccountTransaction {
    * transaction not yet in a validated ledger is subject to change.
    */
   validated: boolean
+  /**
+   * The date/time when this transaction was included in a validated ledger.
+   */
+  date?: number
+  /**
+   * An identifying hash value unique to this transaction, as a hex string.
+   */
+  hash?: string
 }
 
 /**
