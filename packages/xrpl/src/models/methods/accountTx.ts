@@ -70,14 +70,6 @@ interface AccountTransaction {
    * transaction not yet in a validated ledger is subject to change.
    */
   validated: boolean
-  /**
-   * The date/time when this transaction was included in a validated ledger.
-   */
-  date?: number
-  /**
-   * An identifying hash value unique to this transaction, as a hex string.
-   */
-  hash?: string
 }
 
 /**
