@@ -1,7 +1,7 @@
-import { LedgerIndex } from '../common'
+import { LedgerIndex, ResponseOnlyTxInfo } from '../common'
 import { Transaction, TransactionMetadata } from '../transactions'
 
-import { ResponseOnlyTxInfo, BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse } from './baseMethod'
 
 /**
  * The `transaction_entry` method retrieves information on a single transaction

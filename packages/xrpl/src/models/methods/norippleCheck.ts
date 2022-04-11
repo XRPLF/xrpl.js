@@ -1,7 +1,7 @@
-import { LedgerIndex } from '../common'
+import { LedgerIndex, ResponseOnlyTxInfo } from '../common'
 import { Transaction } from '../transactions'
 
-import { ResponseOnlyTxInfo, BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse } from './baseMethod'
 
 /**
  * The `noripple_check` command provides a quick way to check the status of th
