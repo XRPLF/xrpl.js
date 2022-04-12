@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { parseNFTokenID, NFTokenID } from 'xrpl-local'
+import { parseNFTokenID } from 'xrpl-local'
 
 import { assertResultMatch } from '../testUtils'
 
@@ -8,7 +8,7 @@ describe('parseNFTokenID', function () {
     const tokenID =
       '000B0539C35B55AA096BA6D87A6E6C965A6534150DC56E5E12C5D09E0000000C'
     const result = parseNFTokenID(tokenID)
-    const expected: NFTokenID = {
+    const expected = {
       TokenID: tokenID,
       Flags: 11,
       TransferFee: 1337,

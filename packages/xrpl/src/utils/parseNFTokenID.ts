@@ -5,24 +5,6 @@ import { encodeAccountID } from 'ripple-address-codec'
 import { XrplError } from '../errors'
 
 /**
- * All information encoded within an NFTokenID.
- */
-interface NFTokenID {
-  /** The encoded hex string which represents an NFToken on ledger. */
-  TokenID: string
-  /** Which flags were enabled when the token was minted. */
-  Flags: number
-  /** The fee given to the issuer on each trade of this NFToken in basis points. */
-  TransferFee: number
-  /** The original creator of this NFT. */
-  Issuer: string
-  /** A number associated with the token chosen by the issuer. */
-  Taxon: number
-  /** The sequence number of the transaction which minted this token. */
-  Sequence: number
-}
-
-/**
  * An issuer may issue several NFTs with the same taxon; to ensure that NFTs are
  * spread across multiple pages we lightly mix the taxon up by using the sequence
  * (which is not under the issuer's direct control) as the seed for a simple linear
@@ -67,9 +49,16 @@ function unscrambleTaxon(taxon: number, tokenSeq: number): number {
  *
  * @param tokenID - A hex string which identifies an NFToken on the ledger.
  * @throws XrplError when given an invalid tokenID.
- * @returns a decoded tokenID with all information encoded within.
+ * @returns a decoded tokenID with all fields encoded within.
  */
-function parseNFTokenID(tokenID: string): NFTokenID {
+export default function parseNFTokenID(tokenID: string): {
+  TokenID: string
+  Flags: number
+  TransferFee: number
+  Issuer: string
+  Taxon: number
+  Sequence: number
+} {
   const expectedLength = 64
   if (tokenID.length !== expectedLength) {
     throw new XrplError(`Attempting to parse a tokenID with length ${tokenID.length}
@@ -79,7 +68,7 @@ function parseNFTokenID(tokenID: string): NFTokenID {
   const scrambledTaxon = new BigNumber(tokenID.substring(48, 56), 16).toNumber()
   const sequence = new BigNumber(tokenID.substring(56, 64), 16).toNumber()
 
-  const NFTokenIDData: NFTokenID = {
+  const NFTokenIDData = {
     TokenID: tokenID,
     Flags: new BigNumber(tokenID.substring(0, 4), 16).toNumber(),
     TransferFee: new BigNumber(tokenID.substring(4, 8), 16).toNumber(),
@@ -90,5 +79,3 @@ function parseNFTokenID(tokenID: string): NFTokenID {
 
   return NFTokenIDData
 }
-
-export { parseNFTokenID, NFTokenID }
