@@ -7,7 +7,7 @@ import { XrplError } from '../errors'
 /**
  * All information encoded within an NFTokenID.
  */
-export default interface NFTokenID {
+interface NFTokenID {
   /** The encoded hex string which represents an NFToken on ledger. */
   TokenID: string
   /** Which flags were enabled when the token was minted. */
