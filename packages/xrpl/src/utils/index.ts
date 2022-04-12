@@ -38,6 +38,7 @@ import {
   hashEscrow,
   hashPaymentChannel,
 } from './hashes'
+import parseNFTokenID from './parseNFTokenID'
 import {
   percentToTransferRate,
   decimalToTransferRate,
@@ -215,4 +216,5 @@ export {
   encodeForSigning,
   encodeForSigningClaim,
   createCrossChainPayment,
+  parseNFTokenID,
 }

@@ -6,6 +6,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Added
 * `federator_info` RPC support
 * Helper method for creating a cross-chain payment to/from a sidechain
+* Helper method for parsing an NFTokenID
 
 ### Fixed
 * Type of TrustSet transaction edited, specifically LimitAmount property type (fixed typescript issue)
