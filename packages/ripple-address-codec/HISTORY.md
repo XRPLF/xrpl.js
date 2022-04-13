@@ -1,5 +1,8 @@
 # ripple-address-codec
 
+## Unreleased
+- Fixed `encodeXAddress` to handle `null` equivalently to `false`.
+
 ## 4.2.1 (2021-12-1)
 - Fix issue where npm < 7 could not install the library
 - Initial pass at linting this codebase with new rules
