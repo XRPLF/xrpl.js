@@ -44,9 +44,9 @@ function encodeXAddress(
     throw new Error('Invalid tag')
   }
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Passing null is a common js mistake
-  const theTag = tag === false || tag === null ? 0 : tag
+  const theTag = tag === false || tag == null ? 0 : tag
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Passing null is a common js mistake
-  const flag = tag === false || tag === null ? 0 : 1
+  const flag = tag === false || tag == null ? 0 : 1
   /* eslint-disable no-bitwise ---
    * need to use bitwise operations here */
   const bytes = Buffer.concat([
