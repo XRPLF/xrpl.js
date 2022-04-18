@@ -28,16 +28,16 @@ export interface NFTokenAcceptOffer extends BaseTransaction {
   /**
    *  Identifies the NFTokenOffer that offers to sell the NFToken.
    *
-   *  In direct mode this field is optional, but either SellOffer or
-   *  NFTokenBuyOffer must be specified. In brokered mode, both SellOffer
+   *  In direct mode this field is optional, but either NFTokenSellOffer or
+   *  NFTokenBuyOffer must be specified. In brokered mode, both NFTokenSellOffer
    *  and NFTokenBuyOffer must be specified.
    */
-  SellOffer?: string
+  NFTokenSellOffer?: string
   /**
    * Identifies the NFTokenOffer that offers to buy the NFToken.
    *
-   * In direct mode this field is optional, but either SellOffer or
-   * NFTokenBuyOffer must be specified. In brokered mode, both SellOffer
+   * In direct mode this field is optional, but either NFTokenSellOffer or
+   * NFTokenBuyOffer must be specified. In brokered mode, both NFTokenSellOffer
    * and NFTokenBuyOffer must be specified.
    */
   NFTokenBuyOffer?: string
@@ -58,7 +58,7 @@ export interface NFTokenAcceptOffer extends BaseTransaction {
    * or custody funds.
    *
    * Note: in brokered mode, the offers referenced by NFTokenBuyOffer
-   * and SellOffer must both specify the same NFTokenID; that is,
+   * and NFTokenSellOffer must both specify the same NFTokenID; that is,
    * both must be for the same NFToken.
    */
   NFTokenBrokerFee?: Amount
@@ -76,9 +76,9 @@ function validateNFTokenBrokerFee(tx: Record<string, unknown>): void {
     )
   }
 
-  if (tx.SellOffer == null || tx.NFTokenBuyOffer == null) {
+  if (tx.NFTokenSellOffer == null || tx.NFTokenBuyOffer == null) {
     throw new ValidationError(
-      'NFTokenAcceptOffer: both SellOffer and NFTokenBuyOffer must be set if using brokered mode',
+      'NFTokenAcceptOffer: both NFTokenSellOffer and NFTokenBuyOffer must be set if using brokered mode',
     )
   }
 }
@@ -96,9 +96,9 @@ export function validateNFTokenAcceptOffer(tx: Record<string, unknown>): void {
     validateNFTokenBrokerFee(tx)
   }
 
-  if (tx.SellOffer == null && tx.NFTokenBuyOffer == null) {
+  if (tx.NFTokenSellOffer == null && tx.NFTokenBuyOffer == null) {
     throw new ValidationError(
-      'NFTokenAcceptOffer: must set either SellOffer or NFTokenBuyOffer',
+      'NFTokenAcceptOffer: must set either NFTokenSellOffer or NFTokenBuyOffer',
     )
   }
 }

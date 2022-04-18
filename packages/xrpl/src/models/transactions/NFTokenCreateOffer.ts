@@ -83,7 +83,7 @@ export interface NFTokenCreateOffer extends BaseTransaction {
   Flags?: number | NFTokenCreateOfferFlagsInterface
 }
 
-function validateSellOfferCases(tx: Record<string, unknown>): void {
+function validateNFTokenSellOfferCases(tx: Record<string, unknown>): void {
   if (tx.Owner != null) {
     throw new ValidationError(
       'NFTokenCreateOffer: Owner must not be present for sell offers',
@@ -138,7 +138,7 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
     typeof tx.Flags === 'number' &&
     isFlagEnabled(tx.Flags, NFTokenCreateOfferFlags.tfSellToken)
   ) {
-    validateSellOfferCases(tx)
+    validateNFTokenSellOfferCases(tx)
   } else {
     validateNFTokenBuyOfferCases(tx)
   }
