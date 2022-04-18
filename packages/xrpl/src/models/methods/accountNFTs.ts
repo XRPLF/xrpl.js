@@ -33,7 +33,7 @@ interface AccountNFToken {
   Flags: number
   Issuer: string
   TokenID: string
-  TokenTaxon: number
+  NFTokenTaxon: number
   URI?: string
   nft_serial: number
 }

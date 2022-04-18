@@ -1626,7 +1626,7 @@
       }
     ],
     [
-      "TokenTaxon",
+      "NFTokenTaxon",
       {
         "nth": 42,
         "isVLEncoded": false,
