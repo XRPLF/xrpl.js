@@ -442,7 +442,7 @@
               "FinalFields": {
                 "Amount": "100",
                 "Flags": 1,
-                "OfferNode": "0000000000000000",
+                "NFTokenOfferNode": "0000000000000000",
                 "Owner": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
                 "OwnerNode": "0000000000000000",
                 "NFTokenID": "00090032B5F762798A53D543A014CAF8B297CFF8F2F937E844B17C9E00000003"

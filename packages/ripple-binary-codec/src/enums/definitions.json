@@ -1786,7 +1786,7 @@
       }
     ],
     [
-      "OfferNode",
+      "NFTokenOfferNode",
       {
         "nth": 12,
         "isVLEncoded": false,
