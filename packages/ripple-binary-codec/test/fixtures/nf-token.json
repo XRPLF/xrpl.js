@@ -141,7 +141,7 @@
               "FinalFields": {
                 "Account": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
                 "Balance": "99999999999999928",
-                "BurnedTokens": 1,
+                "BurnedNFTokens": 1,
                 "Flags": 0,
                 "MintedNFTokens": 5,
                 "OwnerCount": 1,
@@ -274,7 +274,7 @@
               "FinalFields": {
                 "Account": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
                 "Balance": "99999999999999892",
-                "BurnedTokens": 1,
+                "BurnedNFTokens": 1,
                 "Flags": 0,
                 "MintedNFTokens": 5,
                 "OwnerCount": 2,
@@ -344,7 +344,7 @@
               "FinalFields": {
                 "Account": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
                 "Balance": "99999999999999880",
-                "BurnedTokens": 1,
+                "BurnedNFTokens": 1,
                 "Flags": 0,
                 "MintedNFTokens": 5,
                 "OwnerCount": 2,
@@ -390,7 +390,7 @@
               "FinalFields": {
                 "Account": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
                 "Balance": "99997999999999932",
-                "BurnedTokens": 1,
+                "BurnedNFTokens": 1,
                 "Flags": 0,
                 "MintedNFTokens": 5,
                 "OwnerCount": 3,

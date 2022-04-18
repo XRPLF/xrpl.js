@@ -1646,7 +1646,7 @@
       }
     ],
     [
-      "BurnedTokens",
+      "BurnedNFTokens",
       {
         "nth": 44,
         "isVLEncoded": false,
