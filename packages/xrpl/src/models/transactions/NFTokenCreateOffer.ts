@@ -41,10 +41,10 @@ export interface NFTokenCreateOfferFlagsInterface extends GlobalFlags {
 export interface NFTokenCreateOffer extends BaseTransaction {
   TransactionType: 'NFTokenCreateOffer'
   /**
-   * Identifies the TokenID of the NFToken object that the
+   * Identifies the NFTokenID of the NFToken object that the
    * offer references.
    */
-  TokenID: string
+  NFTokenID: string
   /**
    * Indicates the amount expected or offered for the Token.
    *
@@ -126,8 +126,8 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
     )
   }
 
-  if (tx.TokenID == null) {
-    throw new ValidationError('NFTokenCreateOffer: missing field TokenID')
+  if (tx.NFTokenID == null) {
+    throw new ValidationError('NFTokenCreateOffer: missing field NFTokenID')
   }
 
   if (!isAmount(tx.Amount)) {

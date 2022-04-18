@@ -58,7 +58,7 @@ export interface NFTokenAcceptOffer extends BaseTransaction {
    * or custody funds.
    *
    * Note: in brokered mode, the offers referenced by BuyOffer
-   * and SellOffer must both specify the same TokenID; that is,
+   * and SellOffer must both specify the same NFTokenID; that is,
    * both must be for the same NFToken.
    */
   BrokerFee?: Amount

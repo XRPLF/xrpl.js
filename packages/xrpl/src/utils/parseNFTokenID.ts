@@ -47,12 +47,12 @@ function unscrambleTaxon(taxon: number, tokenSeq: number): number {
  * |
  * `---> Flags: 11 -> lsfBurnable, lsfOnlyXRP and lsfTransferable
  *
- * @param tokenID - A hex string which identifies an NFToken on the ledger.
- * @throws XrplError when given an invalid tokenID.
- * @returns a decoded tokenID with all fields encoded within.
+ * @param nftokenID - A hex string which identifies an NFToken on the ledger.
+ * @throws XrplError when given an invalid nftokenID.
+ * @returns a decoded nftokenID with all fields encoded within.
  */
-export default function parseNFTokenID(tokenID: string): {
-  TokenID: string
+export default function parseNFTokenID(nftokenID: string): {
+  NFTokenID: string
   Flags: number
   TransferFee: number
   Issuer: string
@@ -60,19 +60,22 @@ export default function parseNFTokenID(tokenID: string): {
   Sequence: number
 } {
   const expectedLength = 64
-  if (tokenID.length !== expectedLength) {
-    throw new XrplError(`Attempting to parse a tokenID with length ${tokenID.length}
+  if (nftokenID.length !== expectedLength) {
+    throw new XrplError(`Attempting to parse a nftokenID with length ${nftokenID.length}
     , but expected a token with length ${expectedLength}`)
   }
 
-  const scrambledTaxon = new BigNumber(tokenID.substring(48, 56), 16).toNumber()
-  const sequence = new BigNumber(tokenID.substring(56, 64), 16).toNumber()
+  const scrambledTaxon = new BigNumber(
+    nftokenID.substring(48, 56),
+    16,
+  ).toNumber()
+  const sequence = new BigNumber(nftokenID.substring(56, 64), 16).toNumber()
 
   const NFTokenIDData = {
-    TokenID: tokenID,
-    Flags: new BigNumber(tokenID.substring(0, 4), 16).toNumber(),
-    TransferFee: new BigNumber(tokenID.substring(4, 8), 16).toNumber(),
-    Issuer: encodeAccountID(Buffer.from(tokenID.substring(8, 48), 'hex')),
+    NFTokenID: nftokenID,
+    Flags: new BigNumber(nftokenID.substring(0, 4), 16).toNumber(),
+    TransferFee: new BigNumber(nftokenID.substring(4, 8), 16).toNumber(),
+    Issuer: encodeAccountID(Buffer.from(nftokenID.substring(8, 48), 'hex')),
     Taxon: unscrambleTaxon(scrambledTaxon, sequence),
     Sequence: sequence,
   }

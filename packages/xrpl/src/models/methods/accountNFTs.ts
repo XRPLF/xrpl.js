@@ -32,7 +32,7 @@ export interface AccountNFTsRequest extends BaseRequest {
 interface AccountNFToken {
   Flags: number
   Issuer: string
-  TokenID: string
+  NFTokenID: string
   NFTokenTaxon: number
   URI?: string
   nft_serial: number

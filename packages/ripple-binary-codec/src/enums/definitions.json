@@ -636,7 +636,7 @@
       }
     ],
     [
-      "TokenID",
+      "NFTokenID",
       {
         "nth": 10,
         "isVLEncoded": false,
