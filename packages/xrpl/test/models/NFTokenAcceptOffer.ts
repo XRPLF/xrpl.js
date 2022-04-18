@@ -54,12 +54,12 @@ describe('NFTokenAcceptOffer', function () {
     )
   })
 
-  it(`throws w/ missing SellOffer and present BrokerFee`, function () {
+  it(`throws w/ missing SellOffer and present NFTokenBrokerFee`, function () {
     const invalid = {
       TransactionType: 'NFTokenAcceptOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       BuyOffer: BUY_OFFER,
-      BrokerFee: '1',
+      NFTokenBrokerFee: '1',
       Fee: '5000000',
       Sequence: 2470665,
       Flags: 2147483648,
@@ -72,12 +72,12 @@ describe('NFTokenAcceptOffer', function () {
     )
   })
 
-  it(`throws w/ missing BuyOffer and present BrokerFee`, function () {
+  it(`throws w/ missing BuyOffer and present NFTokenBrokerFee`, function () {
     const invalid = {
       TransactionType: 'NFTokenAcceptOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       SellOffer: SELL_OFFER,
-      BrokerFee: '1',
+      NFTokenBrokerFee: '1',
       Fee: '5000000',
       Sequence: 2470665,
       Flags: 2147483648,
@@ -90,7 +90,7 @@ describe('NFTokenAcceptOffer', function () {
     )
   })
 
-  it(`verifies valid NFTokenAcceptOffer with both offers and no BrokerFee`, function () {
+  it(`verifies valid NFTokenAcceptOffer with both offers and no NFTokenBrokerFee`, function () {
     const validNFTokenAcceptOffer = {
       TransactionType: 'NFTokenAcceptOffer',
       SellOffer: SELL_OFFER,
@@ -104,12 +104,12 @@ describe('NFTokenAcceptOffer', function () {
     assert.doesNotThrow(() => validate(validNFTokenAcceptOffer))
   })
 
-  it(`verifies valid NFTokenAcceptOffer with BrokerFee`, function () {
+  it(`verifies valid NFTokenAcceptOffer with NFTokenBrokerFee`, function () {
     const validNFTokenAcceptOffer = {
       TransactionType: 'NFTokenAcceptOffer',
       SellOffer: SELL_OFFER,
       BuyOffer: BUY_OFFER,
-      BrokerFee: '1',
+      NFTokenBrokerFee: '1',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Fee: '5000000',
       Sequence: 2470665,
@@ -119,13 +119,13 @@ describe('NFTokenAcceptOffer', function () {
     assert.doesNotThrow(() => validate(validNFTokenAcceptOffer))
   })
 
-  it(`throws w/ BrokerFee === 0`, function () {
+  it(`throws w/ NFTokenBrokerFee === 0`, function () {
     const invalid = {
       TransactionType: 'NFTokenAcceptOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       SellOffer: SELL_OFFER,
       BuyOffer: BUY_OFFER,
-      BrokerFee: '0',
+      NFTokenBrokerFee: '0',
       Fee: '5000000',
       Sequence: 2470665,
       Flags: 2147483648,
@@ -134,17 +134,17 @@ describe('NFTokenAcceptOffer', function () {
     assert.throws(
       () => validate(invalid),
       ValidationError,
-      'NFTokenAcceptOffer: BrokerFee must be greater than 0; omit if there is no fee',
+      'NFTokenAcceptOffer: NFTokenBrokerFee must be greater than 0; omit if there is no fee',
     )
   })
 
-  it(`throws w/ BrokerFee < 0`, function () {
+  it(`throws w/ NFTokenBrokerFee < 0`, function () {
     const invalid = {
       TransactionType: 'NFTokenAcceptOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       SellOffer: SELL_OFFER,
       BuyOffer: BUY_OFFER,
-      BrokerFee: '-1',
+      NFTokenBrokerFee: '-1',
       Fee: '5000000',
       Sequence: 2470665,
       Flags: 2147483648,
@@ -153,17 +153,17 @@ describe('NFTokenAcceptOffer', function () {
     assert.throws(
       () => validate(invalid),
       ValidationError,
-      'NFTokenAcceptOffer: BrokerFee must be greater than 0; omit if there is no fee',
+      'NFTokenAcceptOffer: NFTokenBrokerFee must be greater than 0; omit if there is no fee',
     )
   })
 
-  it(`throws w/ invalid BrokerFee`, function () {
+  it(`throws w/ invalid NFTokenBrokerFee`, function () {
     const invalid = {
       TransactionType: 'NFTokenAcceptOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       SellOffer: SELL_OFFER,
       BuyOffer: BUY_OFFER,
-      BrokerFee: 1,
+      NFTokenBrokerFee: 1,
       Fee: '5000000',
       Sequence: 2470665,
       Flags: 2147483648,
@@ -172,7 +172,7 @@ describe('NFTokenAcceptOffer', function () {
     assert.throws(
       () => validate(invalid),
       ValidationError,
-      'NFTokenAcceptOffer: invalid BrokerFee',
+      'NFTokenAcceptOffer: invalid NFTokenBrokerFee',
     )
   })
 })

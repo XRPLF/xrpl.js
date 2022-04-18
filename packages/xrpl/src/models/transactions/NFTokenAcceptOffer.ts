@@ -61,18 +61,18 @@ export interface NFTokenAcceptOffer extends BaseTransaction {
    * and SellOffer must both specify the same NFTokenID; that is,
    * both must be for the same NFToken.
    */
-  BrokerFee?: Amount
+  NFTokenBrokerFee?: Amount
 }
 
-function validateBrokerFee(tx: Record<string, unknown>): void {
-  const value = parseAmountValue(tx.BrokerFee)
+function validateNFTokenBrokerFee(tx: Record<string, unknown>): void {
+  const value = parseAmountValue(tx.NFTokenBrokerFee)
   if (Number.isNaN(value)) {
-    throw new ValidationError('NFTokenAcceptOffer: invalid BrokerFee')
+    throw new ValidationError('NFTokenAcceptOffer: invalid NFTokenBrokerFee')
   }
 
   if (value <= 0) {
     throw new ValidationError(
-      'NFTokenAcceptOffer: BrokerFee must be greater than 0; omit if there is no fee',
+      'NFTokenAcceptOffer: NFTokenBrokerFee must be greater than 0; omit if there is no fee',
     )
   }
 
@@ -92,8 +92,8 @@ function validateBrokerFee(tx: Record<string, unknown>): void {
 export function validateNFTokenAcceptOffer(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.BrokerFee != null) {
-    validateBrokerFee(tx)
+  if (tx.NFTokenBrokerFee != null) {
+    validateNFTokenBrokerFee(tx)
   }
 
   if (tx.SellOffer == null && tx.BuyOffer == null) {

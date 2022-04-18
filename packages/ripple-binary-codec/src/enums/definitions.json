@@ -856,7 +856,7 @@
       }
     ],
     [
-      "BrokerFee",
+      "NFTokenBrokerFee",
       {
         "nth": 19,
         "isVLEncoded": false,
