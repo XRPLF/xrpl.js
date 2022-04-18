@@ -43,7 +43,7 @@ export enum AccountSetAsfFlags {
   /**
    * Allow another account to mint and burn tokens on behalf of this account.
    */
-  asfAuthorizedMinter = 10,
+  asfAuthorizedNFTokenMinter = 10,
 }
 
 /**
