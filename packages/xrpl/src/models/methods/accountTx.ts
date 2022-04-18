@@ -1,4 +1,4 @@
-import { LedgerIndex } from '../common'
+import { LedgerIndex, ResponseOnlyTxInfo } from '../common'
 import { Transaction, TransactionMetadata } from '../transactions'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
@@ -62,7 +62,7 @@ interface AccountTransaction {
    */
   meta: string | TransactionMetadata
   /** JSON object defining the transaction. */
-  tx?: Transaction
+  tx?: Transaction & ResponseOnlyTxInfo
   /** Unique hashed String representing the transaction. */
   tx_blob?: string
   /**
