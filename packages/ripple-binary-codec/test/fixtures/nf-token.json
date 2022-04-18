@@ -44,7 +44,7 @@
             "ModifiedNode": {
               "FinalFields": {
                 "Flags": 0,
-                "NonFungibleTokens": [
+                "NFTokens": [
                   {
                     "NFToken": {
                       "NFTokenID": "00090032B5F762798A53D543A014CAF8B297CFF8F2F937E80000099B00000000",
@@ -80,7 +80,7 @@
               "LedgerEntryType": "NFTokenPage",
               "LedgerIndex": "B5F762798A53D543A014CAF8B297CFF8F2F937E8FFFFFFFFFFFFFFFFFFFFFFFF",
               "PreviousFields": {
-                "NonFungibleTokens": [
+                "NFTokens": [
                   {
                     "NFToken": {
                       "NFTokenID": "00090032B5F762798A53D543A014CAF8B297CFF8F2F937E80000099B00000000",
@@ -161,7 +161,7 @@
             "ModifiedNode": {
               "FinalFields": {
                 "Flags": 0,
-                "NonFungibleTokens": [
+                "NFTokens": [
                   {
                     "NFToken": {
                       "NFTokenID": "00090032B5F762798A53D543A014CAF8B297CFF8F2F937E80000099B00000000",
@@ -191,7 +191,7 @@
               "LedgerEntryType": "NFTokenPage",
               "LedgerIndex": "B5F762798A53D543A014CAF8B297CFF8F2F937E8FFFFFFFFFFFFFFFFFFFFFFFF",
               "PreviousFields": {
-                "NonFungibleTokens": [
+                "NFTokens": [
                   {
                     "NFToken": {
                       "NFTokenID": "00090032B5F762798A53D543A014CAF8B297CFF8F2F937E80000099B00000000",
@@ -455,7 +455,7 @@
             "ModifiedNode": {
               "FinalFields": {
                 "Flags": 0,
-                "NonFungibleTokens": [
+                "NFTokens": [
                   {
                     "NFToken": {
                       "NFTokenID": "00090032B5F762798A53D543A014CAF8B297CFF8F2F937E80000099B00000000",
@@ -479,7 +479,7 @@
               "LedgerEntryType": "NFTokenPage",
               "LedgerIndex": "B5F762798A53D543A014CAF8B297CFF8F2F937E8FFFFFFFFFFFFFFFFFFFFFFFF",
               "PreviousFields": {
-                "NonFungibleTokens": [
+                "NFTokens": [
                   {
                     "NFToken": {
                       "NFTokenID": "00090032B5F762798A53D543A014CAF8B297CFF8F2F937E80000099B00000000",
@@ -515,7 +515,7 @@
               "LedgerEntryType": "NFTokenPage",
               "LedgerIndex": "C77B4F8423139A8F0939DDEB9EB076CC74F4A3B3FFFFFFFFFFFFFFFFFFFFFFFF",
               "NewFields": {
-                "NonFungibleTokens": [
+                "NFTokens": [
                   {
                     "NFToken": {
                       "NFTokenID": "00090032B5F762798A53D543A014CAF8B297CFF8F2F937E844B17C9E00000003",

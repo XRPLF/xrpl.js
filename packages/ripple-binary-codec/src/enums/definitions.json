@@ -1406,7 +1406,7 @@
       }
     ],
     [
-      "NonFungibleTokens",
+      "NFTokens",
       {
         "nth": 10,
         "isVLEncoded": false,
