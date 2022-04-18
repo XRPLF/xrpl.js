@@ -1636,7 +1636,7 @@
       }
     ],
     [
-      "MintedTokens",
+      "MintedNFTokens",
       {
         "nth": 43,
         "isVLEncoded": false,
