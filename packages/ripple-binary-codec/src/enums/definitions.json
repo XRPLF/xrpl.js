@@ -1846,6 +1846,8 @@
     "temCANNOT_PREAUTH_SELF": -267,
     "temUNCERTAIN": -266,
     "temUNKNOWN": -265,
+    "temSEQ_AND_TICKET": -264,
+    "temBAD_NFTOKEN_TRANSFER_FEE": -263,
 
     "tefFAILURE": -199,
     "tefALREADY": -198,
@@ -1880,6 +1882,7 @@
     "terLAST": -91,
     "terNO_RIPPLE": -90,
     "terQUEUED": -89,
+    "terPRE_TICKET": -88,
 
     "tesSUCCESS": 0,
 
