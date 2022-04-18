@@ -1166,7 +1166,7 @@
       }
     ],
     [
-      "Minter",
+      "NFTokenMinter",
       {
         "nth": 9,
         "isVLEncoded": true,
