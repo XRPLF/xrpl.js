@@ -1546,7 +1546,7 @@
       }
     ],
     [
-      "TokenOffers",
+      "NFTokenOffers",
       {
         "nth": 4,
         "isVLEncoded": true,

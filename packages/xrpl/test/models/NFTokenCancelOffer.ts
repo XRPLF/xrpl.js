@@ -13,7 +13,7 @@ describe('NFTokenCancelOffer', function () {
   it(`verifies valid NFTokenCancelOffer`, function () {
     const validNFTokenCancelOffer = {
       TransactionType: 'NFTokenCancelOffer',
-      TokenOffers: [BUY_OFFER],
+      NFTokenOffers: [BUY_OFFER],
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Fee: '5000000',
       Sequence: 2470665,
@@ -23,7 +23,7 @@ describe('NFTokenCancelOffer', function () {
     assert.doesNotThrow(() => validate(validNFTokenCancelOffer))
   })
 
-  it(`throws w/ missing TokenOffers`, function () {
+  it(`throws w/ missing NFTokenOffers`, function () {
     const invalid = {
       TransactionType: 'NFTokenCancelOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -35,15 +35,15 @@ describe('NFTokenCancelOffer', function () {
     assert.throws(
       () => validate(invalid),
       ValidationError,
-      'NFTokenCancelOffer: missing field TokenOffers',
+      'NFTokenCancelOffer: missing field NFTokenOffers',
     )
   })
 
-  it(`throws w/ empty TokenOffers`, function () {
+  it(`throws w/ empty NFTokenOffers`, function () {
     const invalid = {
       TransactionType: 'NFTokenCancelOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      TokenOffers: [],
+      NFTokenOffers: [],
       Fee: '5000000',
       Sequence: 2470665,
       Flags: 2147483648,
@@ -52,7 +52,7 @@ describe('NFTokenCancelOffer', function () {
     assert.throws(
       () => validate(invalid),
       ValidationError,
-      'NFTokenCancelOffer: empty field TokenOffers',
+      'NFTokenCancelOffer: empty field NFTokenOffers',
     )
   })
 })
