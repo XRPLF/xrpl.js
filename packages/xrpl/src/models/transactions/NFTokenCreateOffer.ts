@@ -91,7 +91,7 @@ function validateSellOfferCases(tx: Record<string, unknown>): void {
   }
 }
 
-function validateBuyOfferCases(tx: Record<string, unknown>): void {
+function validateNFTokenBuyOfferCases(tx: Record<string, unknown>): void {
   if (tx.Owner == null) {
     throw new ValidationError(
       'NFTokenCreateOffer: Owner must be present for buy offers',
@@ -140,6 +140,6 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
   ) {
     validateSellOfferCases(tx)
   } else {
-    validateBuyOfferCases(tx)
+    validateNFTokenBuyOfferCases(tx)
   }
 }

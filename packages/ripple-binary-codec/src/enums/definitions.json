@@ -1716,7 +1716,7 @@
       }
     ],
     [
-      "BuyOffer",
+      "NFTokenBuyOffer",
       {
         "nth": 28,
         "isVLEncoded": false,

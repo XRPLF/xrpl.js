@@ -29,18 +29,18 @@ export interface NFTokenAcceptOffer extends BaseTransaction {
    *  Identifies the NFTokenOffer that offers to sell the NFToken.
    *
    *  In direct mode this field is optional, but either SellOffer or
-   *  BuyOffer must be specified. In brokered mode, both SellOffer
-   *  and BuyOffer must be specified.
+   *  NFTokenBuyOffer must be specified. In brokered mode, both SellOffer
+   *  and NFTokenBuyOffer must be specified.
    */
   SellOffer?: string
   /**
    * Identifies the NFTokenOffer that offers to buy the NFToken.
    *
    * In direct mode this field is optional, but either SellOffer or
-   * BuyOffer must be specified. In brokered mode, both SellOffer
-   * and BuyOffer must be specified.
+   * NFTokenBuyOffer must be specified. In brokered mode, both SellOffer
+   * and NFTokenBuyOffer must be specified.
    */
-  BuyOffer?: string
+  NFTokenBuyOffer?: string
   /**
    * This field is only valid in brokered mode. It specifies the
    * amount that the broker will keep as part of their fee for
@@ -57,7 +57,7 @@ export interface NFTokenAcceptOffer extends BaseTransaction {
    * larger amount, without the broker having to own the NFToken
    * or custody funds.
    *
-   * Note: in brokered mode, the offers referenced by BuyOffer
+   * Note: in brokered mode, the offers referenced by NFTokenBuyOffer
    * and SellOffer must both specify the same NFTokenID; that is,
    * both must be for the same NFToken.
    */
@@ -76,9 +76,9 @@ function validateNFTokenBrokerFee(tx: Record<string, unknown>): void {
     )
   }
 
-  if (tx.SellOffer == null || tx.BuyOffer == null) {
+  if (tx.SellOffer == null || tx.NFTokenBuyOffer == null) {
     throw new ValidationError(
-      'NFTokenAcceptOffer: both SellOffer and BuyOffer must be set if using brokered mode',
+      'NFTokenAcceptOffer: both SellOffer and NFTokenBuyOffer must be set if using brokered mode',
     )
   }
 }
@@ -96,9 +96,9 @@ export function validateNFTokenAcceptOffer(tx: Record<string, unknown>): void {
     validateNFTokenBrokerFee(tx)
   }
 
-  if (tx.SellOffer == null && tx.BuyOffer == null) {
+  if (tx.SellOffer == null && tx.NFTokenBuyOffer == null) {
     throw new ValidationError(
-      'NFTokenAcceptOffer: must set either SellOffer or BuyOffer',
+      'NFTokenAcceptOffer: must set either SellOffer or NFTokenBuyOffer',
     )
   }
 }
