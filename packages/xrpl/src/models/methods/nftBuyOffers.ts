@@ -13,7 +13,7 @@ export interface NFTBuyOffersRequest extends BaseRequest {
   /**
    * The unique identifier of an NFToken. The request returns buy offers for this NFToken.
    */
-  nftokenid: string
+  nft_id: string
 }
 
 /**
@@ -30,6 +30,6 @@ export interface NFTBuyOffersResponse extends BaseResponse {
     /**
      * The token ID of the NFToken to which these offers pertain.
      */
-    nftokenid: string
+    nft_id: string
   }
 }
