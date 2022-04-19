@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import { validate, ValidationError, NFTokenCreateOfferFlags } from 'xrpl-local'
 
-const TOKEN_ID =
+const NFTOKEN_ID =
   '00090032B5F762798A53D543A014CAF8B297CFF8F2F937E844B17C9E00000003'
 
 /**
@@ -13,7 +13,7 @@ describe('NFTokenCreateOffer', function () {
   it(`verifies valid NFTokenCreateOffer buyside`, function () {
     const validNFTokenCreateOffer = {
       TransactionType: 'NFTokenCreateOffer',
-      TokenID: TOKEN_ID,
+      NFTokenID: NFTOKEN_ID,
       Amount: '1',
       Owner: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       Expiration: 1000,
@@ -29,7 +29,7 @@ describe('NFTokenCreateOffer', function () {
   it(`verifies valid NFTokenCreateOffer sellside`, function () {
     const validNFTokenCreateOffer = {
       TransactionType: 'NFTokenCreateOffer',
-      TokenID: TOKEN_ID,
+      NFTokenID: NFTOKEN_ID,
       Amount: '1',
       Flags: NFTokenCreateOfferFlags.tfSellToken,
       Expiration: 1000,
@@ -45,7 +45,7 @@ describe('NFTokenCreateOffer', function () {
   it(`verifies w/ 0 Amount NFTokenCreateOffer sellside`, function () {
     const validNFTokenCreateOffer = {
       TransactionType: 'NFTokenCreateOffer',
-      TokenID: TOKEN_ID,
+      NFTokenID: NFTOKEN_ID,
       Amount: '0',
       Flags: NFTokenCreateOfferFlags.tfSellToken,
       Expiration: 1000,
@@ -61,7 +61,7 @@ describe('NFTokenCreateOffer', function () {
   it(`throws w/ Account === Owner`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
-      TokenID: TOKEN_ID,
+      NFTokenID: NFTOKEN_ID,
       Amount: '1',
       Expiration: 1000,
       Owner: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -80,7 +80,7 @@ describe('NFTokenCreateOffer', function () {
   it(`throws w/ Account === Destination`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
-      TokenID: TOKEN_ID,
+      NFTokenID: NFTOKEN_ID,
       Amount: '1',
       Flags: NFTokenCreateOfferFlags.tfSellToken,
       Expiration: 1000,
@@ -97,7 +97,7 @@ describe('NFTokenCreateOffer', function () {
     )
   })
 
-  it(`throws w/out TokenID`, function () {
+  it(`throws w/out NFTokenID`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
       Amount: '1',
@@ -112,14 +112,14 @@ describe('NFTokenCreateOffer', function () {
     assert.throws(
       () => validate(invalid),
       ValidationError,
-      'NFTokenCreateOffer: missing field TokenID',
+      'NFTokenCreateOffer: missing field NFTokenID',
     )
   })
 
   it(`throws w/ invalid Amount`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
-      TokenID: TOKEN_ID,
+      NFTokenID: NFTOKEN_ID,
       Amount: 1,
       Owner: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXe',
       Expiration: 1000,
@@ -141,7 +141,7 @@ describe('NFTokenCreateOffer', function () {
       TransactionType: 'NFTokenCreateOffer',
       Owner: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXe',
       Expiration: 1000,
-      TokenID: TOKEN_ID,
+      NFTokenID: NFTOKEN_ID,
       Destination: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Fee: '5000000',
@@ -161,7 +161,7 @@ describe('NFTokenCreateOffer', function () {
       Expiration: 1000,
       Owner: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      TokenID: TOKEN_ID,
+      NFTokenID: NFTOKEN_ID,
       Flags: NFTokenCreateOfferFlags.tfSellToken,
       Amount: '1',
       Fee: '5000000',
@@ -181,7 +181,7 @@ describe('NFTokenCreateOffer', function () {
       Expiration: 1000,
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Amount: '1',
-      TokenID: TOKEN_ID,
+      NFTokenID: NFTOKEN_ID,
       Fee: '5000000',
       Sequence: 2470665,
     } as any
@@ -201,7 +201,7 @@ describe('NFTokenCreateOffer', function () {
       Owner: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       Amount: '0',
       Fee: '5000000',
-      TokenID: TOKEN_ID,
+      NFTokenID: NFTOKEN_ID,
       Sequence: 2470665,
     } as any
 
