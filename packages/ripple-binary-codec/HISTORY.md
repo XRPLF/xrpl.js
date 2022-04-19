@@ -1,6 +1,6 @@
 # ripple-binary-codec Release History
 
-## 1.3.3 (2022-04-18)
+## 1.4.0 (2022-04-18)
 - Updated NFT definitions to match 1.9.0's breaking naming changes
 
 ## 1.3.2 (2022-02-02)
