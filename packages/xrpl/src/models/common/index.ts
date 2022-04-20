@@ -95,7 +95,7 @@ export interface ResponseOnlyTxInfo {
 export interface NFTOffer {
   amount: Amount
   flags: number
-  index: string
+  nft_offer_index: string
   owner: string
   destination?: string
   expiration?: number
