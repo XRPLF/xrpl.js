@@ -1,6 +1,9 @@
 # ripple-address-codec
 
 ## Unreleased
+
+## 4.2.4 (2022-04-21)
+### Fixed
 - Fixed `encodeXAddress` to handle `null` equivalently to `false`.
 
 ## 4.2.1 (2021-12-1)

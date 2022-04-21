@@ -21,7 +21,7 @@
     "brorand": "^1.0.5",
     "elliptic": "^6.5.4",
     "hash.js": "^1.0.3",
-    "ripple-address-codec": "^4.2.3"
+    "ripple-address-codec": "^4.2.4"
   },
   "repository": {
     "type": "git",

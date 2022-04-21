@@ -4,6 +4,10 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+## 2.2.1 (2022-04-21)
+### Fixed
+* Fix return field of nft offer
+
 ## 2.2.0 (2022-04-19)
 ### Added
 * `federator_info` RPC support
