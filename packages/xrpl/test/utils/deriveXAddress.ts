@@ -22,4 +22,30 @@ describe('deriveXAddress', function () {
       'TVVrSWtmQQssgVcmoMBcFQZKKf56QscyWLKnUyiuZW8ALU4',
     )
   })
+
+  it('does not include tag when null', function () {
+    assert.equal(
+      deriveXAddress({
+        publicKey:
+          'ED02C98225BD1C79E9A4F95C6978026D300AFB7CA2A34358920BCFBCEBE6AFCD6A',
+        // @ts-expect-error -- Assessing null behavior (Common js mistake)
+        tag: null,
+        test: false,
+      }),
+      'X7FbrqVEqdTNoX5qq94rTdarGjeVYmkxi8A1TKAJUnyLL9g',
+    )
+  })
+
+  it('does not include tag when undefined', function () {
+    assert.equal(
+      deriveXAddress({
+        publicKey:
+          'ED02C98225BD1C79E9A4F95C6978026D300AFB7CA2A34358920BCFBCEBE6AFCD6A',
+        // @ts-expect-error -- Assessing undefined behavior
+        tag: undefined,
+        test: false,
+      }),
+      'X7FbrqVEqdTNoX5qq94rTdarGjeVYmkxi8A1TKAJUnyLL9g',
+    )
+  })
 })

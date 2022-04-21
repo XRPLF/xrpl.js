@@ -43,8 +43,9 @@ function encodeXAddress(
   if (tag > MAX_32_BIT_UNSIGNED_INT) {
     throw new Error('Invalid tag')
   }
-  const theTag = tag === false ? 0 : tag
-  const flag = tag === false ? 0 : 1
+  const theTag = tag || 0
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Passing null is a common js mistake
+  const flag = tag === false || tag == null ? 0 : 1
   /* eslint-disable no-bitwise ---
    * need to use bitwise operations here */
   const bytes = Buffer.concat([
