@@ -20,7 +20,7 @@ export enum NFTokenCreateOfferFlags {
    * If set, indicates that the offer is a sell offer.
    * Otherwise, it is a buy offer.
    */
-  tfSellToken = 0x00000001,
+  tfSellNFToken = 0x00000001,
 }
 
 /**
@@ -30,7 +30,7 @@ export enum NFTokenCreateOfferFlags {
  * @category Transaction Flags
  */
 export interface NFTokenCreateOfferFlagsInterface extends GlobalFlags {
-  tfSellToken?: boolean
+  tfSellNFToken?: boolean
 }
 
 /**
@@ -136,7 +136,7 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
 
   if (
     typeof tx.Flags === 'number' &&
-    isFlagEnabled(tx.Flags, NFTokenCreateOfferFlags.tfSellToken)
+    isFlagEnabled(tx.Flags, NFTokenCreateOfferFlags.tfSellNFToken)
   ) {
     validateNFTokenSellOfferCases(tx)
   } else {
