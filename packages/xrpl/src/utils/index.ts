@@ -22,7 +22,7 @@ import { PaymentChannelClaim } from '../models/transactions/paymentChannelClaim'
 import { Transaction } from '../models/transactions/transaction'
 
 import createCrossChainPayment from './createCrossChainPayment'
-import { deriveKeypair, deriveXAddress } from './derive'
+import { deriveKeypair, deriveAddress, deriveXAddress } from './derive'
 import getBalanceChanges from './getBalanceChanges'
 import {
   hashSignedTx,
@@ -191,6 +191,7 @@ export {
   isValidAddress,
   hashes,
   deriveKeypair,
+  deriveAddress,
   deriveXAddress,
   signPaymentChannelClaim,
   verifyPaymentChannelClaim,
