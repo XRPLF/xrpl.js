@@ -1,5 +1,8 @@
 # ripple-keypairs Release History
 
+## Unreleased
+- `hexToBytes` now produces empty output for empty input, rather than `[0]`.
+
 ## 1.1.1 (2021-12-1)
 - Fix issue where npm < 7 was not allowed to install the library
 
