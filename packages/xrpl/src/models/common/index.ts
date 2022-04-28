@@ -2,10 +2,12 @@ export type LedgerIndex = number | ('validated' | 'closed' | 'current')
 
 export type AccountObjectType =
   | 'check'
+  | 'deposit_preauth'
   | 'escrow'
   | 'offer'
   | 'payment_channel'
   | 'signer_list'
+  | 'ticket'
   | 'state'
 
 interface XRP {
