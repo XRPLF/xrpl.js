@@ -2,13 +2,11 @@ import * as assert from 'assert'
 import * as hashjs from 'hash.js'
 import * as BN from 'bn.js'
 
-function bytesToHex(a): string {
-  return a
-    .map((byteValue) => {
-      const hex = byteValue.toString(16).toUpperCase()
-      return hex.length > 1 ? hex : `0${hex}`
-    })
-    .join('')
+function bytesToHex(a: Iterable<number> | ArrayLike<number>): string {
+  return Array.from(a, (byteValue) => {
+    const hex = byteValue.toString(16).toUpperCase()
+    return hex.length > 1 ? hex : `0${hex}`
+  }).join('')
 }
 
 function hexToBytes(a): number[] {

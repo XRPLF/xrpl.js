@@ -11,4 +11,12 @@ describe('utils', () => {
   it('hexToBytes - DEADBEEF', () => {
     assert.deepEqual(utils.hexToBytes('DEADBEEF'), [222, 173, 190, 239])
   })
+
+  it('bytesToHex - DEADBEEF', () => {
+    assert.deepEqual(utils.bytesToHex([222, 173, 190, 239]), 'DEADBEEF')
+  });
+
+  it('bytesToHex - DEADBEEF (Uint8Array)', () => {
+    assert.deepEqual(utils.bytesToHex(new Uint8Array([222, 173, 190, 239])), 'DEADBEEF')
+  });
 })
