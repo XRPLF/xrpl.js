@@ -4,6 +4,10 @@ const assert = require('assert')
 const utils = require('../dist/utils')
 
 describe('utils', () => {
+  it('hexToBytes - empty', () => {
+    assert.deepEqual(utils.hexToBytes(''), [])
+  })
+
   it('hexToBytes - zero', () => {
     assert.deepEqual(utils.hexToBytes('000000'), [0, 0, 0])
   })

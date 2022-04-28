@@ -11,7 +11,10 @@ function bytesToHex(a: Iterable<number> | ArrayLike<number>): string {
 
 function hexToBytes(a): number[] {
   assert.ok(a.length % 2 === 0)
-  return new BN(a, 16).toArray(null, a.length / 2)
+  // Special-case length zero to return [].
+  // BN.toArray intentionally returns [0] rather than [] for length zero,
+  // which may make sense for BigNum data, but not for byte strings.
+  return a.length === 0 ? [] : new BN(a, 16).toArray(null, a.length / 2)
 }
 
 function computePublicKeyHash(publicKeyBytes: Buffer): Buffer {

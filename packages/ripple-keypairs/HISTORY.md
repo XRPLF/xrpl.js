@@ -1,6 +1,7 @@
 # ripple-keypairs Release History
 
 ## Unreleased
+- `hexToBytes` now produces empty output for empty input, rather than `[0]`.
 - Extend `bytesToHex` to work correctly with any input type accepted by `Array.from`.
   In particular, it now produces correct output for typed arrays such as `UInt8Array`.
 
