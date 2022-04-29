@@ -1,0 +1,91 @@
+{
+    "id": 1,
+    "result": {
+      "Account": "rsCpncqURaTmiaCy4yWaGb17xLioBPVMiN",
+      "Fee": "10000",
+      "Flags": 2147483648,
+      "LastLedgerSequence": 169578503,
+      "Memos": [
+        {
+          "Memo": {
+            "MemoData": "2265794A68624763694F694A46557A49314E694973496E523563434936496B705856434A392E65794A6A5957356A5A5778735A575266633246735A56397A5A5846315A57356A5A5349364E6A6B304D5441314D7A6373496D4E31636E4A6C626D4E35496A6F694D44497A4D444D784E544532524455794E7A59324E6A52464E4459314E444D344D7A597A4D544D344D7A51774D4441774D4441774D434973496D6C7A6333566C63694936496E497A59314E36635568574D31685252546836556A6468656C6831576D4E57536D6F7961336C71595556314E4649694C434A70595851694F6A45324E4451304D546B774E6A4973496D6C7A63794936496C4E766247396E5A57357059794247623356755A47463061573975496E302E4B6E7A4A4A414B716E4E6473576E4A67734D4434384472375A2D543641467131335A4B5F633732427231596666706C56345962677A423864414156757455454864626262713535375A6C304F35554E5F696F4E56485122"
+          }
+        },
+        {
+          "Memo": {
+            "MemoData": "64386231366631342D363630322D343362312D383438342D633739663866363236383639"
+          }
+        }
+      ],
+      "Sequence": 0,
+      "SigningPubKey": "03CDAA7E59BE32A0CF6DC60D94A428B962CB5318CFDE7B504BFA097A421417CF90",
+      "TicketSequence": 69410537,
+      "TransactionType": "AccountSet",
+      "TxnSignature": "3045022100F02A5233BEE411C212DA03342228BB60D814CDE6CE2FAA5590773C15753A1696022077FEDDA19B340674D69AB549E02BBD9449D26CABCADD09A4081205BECA32B959",
+      "date": 697734282,
+      "hash": "7CD33D44FD0474B4598186A9C6BCD7905DAD717CD69934A5DD1C571619BD1169",
+      "inLedger": 69578408,
+      "ledger_index": 69578408,
+      "meta": {
+        "AffectedNodes": [
+          {
+            "ModifiedNode": {
+              "FinalFields": {
+                "Flags": 0,
+                "Owner": "rsCpncqURaTmiaCy4yWaGb17xLioBPVMiN",
+                "RootIndex": "3F6D7C06CECD8300A89F10D60DEE8B0B50A0C9D0459CE322B8087749BCF24537"
+              },
+              "LedgerEntryType": "DirectoryNode",
+              "LedgerIndex": "6E6E7D74CA255FC5DAD0A2A5B1127F7E42472AB526B5CD59B6815EE9ADCED6E5"
+            }
+          },
+          {
+            "ModifiedNode": {
+              "FinalFields": {
+                "Account": "rsCpncqURaTmiaCy4yWaGb17xLioBPVMiN",
+                "Balance": "94106875",
+                "Flags": 0,
+                "OwnerCount": 38,
+                "Sequence": 69410538,
+                "TicketCount": 2
+              },
+              "LedgerEntryType": "AccountRoot",
+              "LedgerIndex": "B90A7CFC5D00A25F147686FFED98841B7D30DEBD95C4B6F333088E7F14FB23AD",
+              "PreviousFields": {
+                "Balance": "94116875",
+                "OwnerCount": 39,
+                "TicketCount": 3
+              },
+              "PreviousTxnID": "8F598717167B0357644DC0BBF5A116CDC23E7F4E3D69CD73A147DBBA55B1C790",
+              "PreviousTxnLgrSeq": 69578340
+            }
+          },
+          {
+            "DeletedNode": {
+              "FinalFields": {
+                "Account": "rsCpncqURaTmiaCy4yWaGb17xLioBPVMiN",
+                "Flags": 0,
+                "OwnerNode": "1",
+                "PreviousTxnID": "8F598717167B0357644DC0BBF5A116CDC23E7F4E3D69CD73A147DBBA55B1C790",
+                "PreviousTxnLgrSeq": 69578340,
+                "TicketSequence": 69410537
+              },
+              "LedgerEntryType": "Ticket",
+              "LedgerIndex": "F0BD623DBD0AA7BF134104B4F4D8ACC31ACBE773463F0F20D53DD774A6F51469"
+            }
+          }
+        ],
+        "TransactionIndex": 25,
+        "TransactionResult": "tesSUCCESS"
+      },
+      "validated": true,
+      "warnings": [
+        {
+          "id": 1004,
+          "message": "This is a reporting server.  The default behavior of a reporting server is to only return validated data. If you are looking for not yet validated data, include \"ledger_index : current\" in your request, which will cause this server to forward the request to a p2p node. If the forward is successful the response will include \"forwarded\" : \"true\""
+        }
+      ]
+    },
+    "status": "success",
+    "type": "response"
+  }
