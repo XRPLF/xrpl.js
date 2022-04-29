@@ -3,6 +3,16 @@ import { Client, ClientOptions } from '.'
 /**
  * Client that can rely on multiple different servers.
  *
+ * @deprecated since version 2.2.0.
+ * Will be deleted in version 3.0.0.
+ *
+ * Currently this implementation does not provide better reliability.
+ * To get better reliability, implement reconnect/error handling logic
+ * and choose a reliable endpoint.
+ *
+ * If you need the ability to fall-back to different endpoints, consider
+ * using [xrpl-client](https://github.com/XRPL-Labs/xrpl-client/)
+ *
  * @category Clients
  */
 export default class BroadcastClient extends Client {

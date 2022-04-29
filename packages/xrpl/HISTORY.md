@@ -5,6 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 ### Added
 * Export deriveAddress from ripple-keypairs in xrpl.js
+* Deprecated BroadcastClient as it does not solve the reliabile connection problem.
 
 ### Fixed
 * Add missing filter types in AccountObjectType
