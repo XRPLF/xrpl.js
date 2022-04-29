@@ -20,4 +20,4 @@ function deriveXAddress(options: {
   return classicAddressToXAddress(classicAddress, options.tag, options.test)
 }
 
-export { deriveKeypair, deriveXAddress }
+export { deriveKeypair, deriveAddress, deriveXAddress }

@@ -1,5 +1,8 @@
 # ripple-binary-codec Release History
 
+## 1.4.0 (2022-04-18)
+- Updated NFT definitions to match 1.9.0's breaking naming changes
+
 ## 1.3.2 (2022-02-02)
 - Fixed error being raised when decoding issued currencies in non-standard formats that decode to XRP (#1920)
 - Fix ISO when parsing currency code (#1921)
