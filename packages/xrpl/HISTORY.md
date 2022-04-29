@@ -6,6 +6,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Added
 * Export deriveAddress from ripple-keypairs in xrpl.js
 
+### Fixed
+* Add missing filter types in AccountObjectType
+
 ## 2.2.1 (2022-04-21)
 ### Fixed
 * Fix return field of nft offer
