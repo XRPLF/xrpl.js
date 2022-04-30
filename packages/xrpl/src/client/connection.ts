@@ -448,9 +448,22 @@ export class Connection extends EventEmitter {
       )
       this.ws.removeAllListeners()
       this.ws = null
-      this.emit('disconnected', code)
+
+      if(code === undefined) {
+        console.error(`Disconnected but the disconnect code was undefined (The given reason was ${reason}).` +
+        `This could be caused by an exception being thrown during a 'connect' callback. ` +
+        `Disconnecting with code 1011 to indicate an internal error has occurred.`)
+
+        // Error code 1011 represents an Internal Error according to
+        // https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
+        this.emit('disconnected', 1011)
+      } else {
+        this.emit('disconnected', code)
+      }
+
       // If this wasn't a manual disconnect, then lets reconnect ASAP.
-      if (code !== INTENTIONAL_DISCONNECT_CODE) {
+      // Code can be undefined if there's an exception while connecting.
+      if (code !== INTENTIONAL_DISCONNECT_CODE && code !== undefined) {
         this.intentionalDisconnect()
       }
     })
