@@ -4,13 +4,27 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 ### Added
+* Export deriveAddress from ripple-keypairs in xrpl.js
+* Deprecated BroadcastClient as it does not solve the reliabile connection problem.
+
+### Fixed
+* Added missing `Owner` field to NFTokenBurn type definition
+* Add missing filter types in AccountObjectType
+
+## 2.2.1 (2022-04-21)
+### Fixed
+* Fix return field of nft offer
+
+## 2.2.0 (2022-04-19)
+### Added
 * `federator_info` RPC support
 * Helper method for creating a cross-chain payment to/from a sidechain
+* Helper method for parsing an NFTokenID
 
 ### Fixed
 * Type of TrustSet transaction edited, specifically LimitAmount property type (fixed typescript issue)
 * Remove unnecessary console.warn for partial payments (#1783, #1784, #1896)
-* Added missing `Owner` field to NFTokenBurn type definition
+* Matched 1.9.0's breaking changes to NFT fields.
 
 ## 2.1.1 (2021-12-23)
 ### Fixed

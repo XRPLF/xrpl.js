@@ -19,7 +19,7 @@ describe('NFTokenMint', function () {
       Fee: '5000000',
       Sequence: 2470665,
       Flags: NFTokenMintFlags.tfTransferable,
-      TokenTaxon: 0,
+      NFTokenTaxon: 0,
       Issuer: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       TransferFee: 1,
       URI: convertStringToHex('http://xrpl.org'),
@@ -28,7 +28,7 @@ describe('NFTokenMint', function () {
     assert.doesNotThrow(() => validate(validNFTokenMint))
   })
 
-  it(`throws w/ missing TokenTaxon`, function () {
+  it(`throws w/ missing NFTokenTaxon`, function () {
     const invalid = {
       TransactionType: 'NFTokenMint',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -43,7 +43,7 @@ describe('NFTokenMint', function () {
     assert.throws(
       () => validate(invalid),
       ValidationError,
-      'NFTokenMint: missing field TokenTaxon',
+      'NFTokenMint: missing field NFTokenTaxon',
     )
   })
 
@@ -56,7 +56,7 @@ describe('NFTokenMint', function () {
       Flags: NFTokenMintFlags.tfTransferable,
       Issuer: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       TransferFee: 1,
-      TokenTaxon: 0,
+      NFTokenTaxon: 0,
       URI: convertStringToHex('http://xrpl.org'),
     } as any
 

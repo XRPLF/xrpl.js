@@ -28,19 +28,19 @@ export interface NFTokenAcceptOffer extends BaseTransaction {
   /**
    *  Identifies the NFTokenOffer that offers to sell the NFToken.
    *
-   *  In direct mode this field is optional, but either SellOffer or
-   *  BuyOffer must be specified. In brokered mode, both SellOffer
-   *  and BuyOffer must be specified.
+   *  In direct mode this field is optional, but either NFTokenSellOffer or
+   *  NFTokenBuyOffer must be specified. In brokered mode, both NFTokenSellOffer
+   *  and NFTokenBuyOffer must be specified.
    */
-  SellOffer?: string
+  NFTokenSellOffer?: string
   /**
    * Identifies the NFTokenOffer that offers to buy the NFToken.
    *
-   * In direct mode this field is optional, but either SellOffer or
-   * BuyOffer must be specified. In brokered mode, both SellOffer
-   * and BuyOffer must be specified.
+   * In direct mode this field is optional, but either NFTokenSellOffer or
+   * NFTokenBuyOffer must be specified. In brokered mode, both NFTokenSellOffer
+   * and NFTokenBuyOffer must be specified.
    */
-  BuyOffer?: string
+  NFTokenBuyOffer?: string
   /**
    * This field is only valid in brokered mode. It specifies the
    * amount that the broker will keep as part of their fee for
@@ -57,28 +57,28 @@ export interface NFTokenAcceptOffer extends BaseTransaction {
    * larger amount, without the broker having to own the NFToken
    * or custody funds.
    *
-   * Note: in brokered mode, the offers referenced by BuyOffer
-   * and SellOffer must both specify the same TokenID; that is,
+   * Note: in brokered mode, the offers referenced by NFTokenBuyOffer
+   * and NFTokenSellOffer must both specify the same NFTokenID; that is,
    * both must be for the same NFToken.
    */
-  BrokerFee?: Amount
+  NFTokenBrokerFee?: Amount
 }
 
-function validateBrokerFee(tx: Record<string, unknown>): void {
-  const value = parseAmountValue(tx.BrokerFee)
+function validateNFTokenBrokerFee(tx: Record<string, unknown>): void {
+  const value = parseAmountValue(tx.NFTokenBrokerFee)
   if (Number.isNaN(value)) {
-    throw new ValidationError('NFTokenAcceptOffer: invalid BrokerFee')
+    throw new ValidationError('NFTokenAcceptOffer: invalid NFTokenBrokerFee')
   }
 
   if (value <= 0) {
     throw new ValidationError(
-      'NFTokenAcceptOffer: BrokerFee must be greater than 0; omit if there is no fee',
+      'NFTokenAcceptOffer: NFTokenBrokerFee must be greater than 0; omit if there is no fee',
     )
   }
 
-  if (tx.SellOffer == null || tx.BuyOffer == null) {
+  if (tx.NFTokenSellOffer == null || tx.NFTokenBuyOffer == null) {
     throw new ValidationError(
-      'NFTokenAcceptOffer: both SellOffer and BuyOffer must be set if using brokered mode',
+      'NFTokenAcceptOffer: both NFTokenSellOffer and NFTokenBuyOffer must be set if using brokered mode',
     )
   }
 }
@@ -92,13 +92,13 @@ function validateBrokerFee(tx: Record<string, unknown>): void {
 export function validateNFTokenAcceptOffer(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.BrokerFee != null) {
-    validateBrokerFee(tx)
+  if (tx.NFTokenBrokerFee != null) {
+    validateNFTokenBrokerFee(tx)
   }
 
-  if (tx.SellOffer == null && tx.BuyOffer == null) {
+  if (tx.NFTokenSellOffer == null && tx.NFTokenBuyOffer == null) {
     throw new ValidationError(
-      'NFTokenAcceptOffer: must set either SellOffer or BuyOffer',
+      'NFTokenAcceptOffer: must set either NFTokenSellOffer or NFTokenBuyOffer',
     )
   }
 }

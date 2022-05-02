@@ -24,7 +24,7 @@ export interface NFTokenBurn extends BaseTransaction {
   /**
    * Identifies the NFToken object to be removed by the transaction.
    */
-  TokenID: string
+  NFTokenID: string
   /**
    * Indicates which account currently owns the token if it is different than
    * Account. Only used to burn tokens which have the lsfBurnable flag enabled
@@ -42,7 +42,7 @@ export interface NFTokenBurn extends BaseTransaction {
 export function validateNFTokenBurn(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.TokenID == null) {
-    throw new ValidationError('NFTokenBurn: missing field TokenID')
+  if (tx.NFTokenID == null) {
+    throw new ValidationError('NFTokenBurn: missing field NFTokenID')
   }
 }

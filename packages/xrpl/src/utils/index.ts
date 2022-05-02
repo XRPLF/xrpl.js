@@ -22,7 +22,7 @@ import { PaymentChannelClaim } from '../models/transactions/paymentChannelClaim'
 import { Transaction } from '../models/transactions/transaction'
 
 import createCrossChainPayment from './createCrossChainPayment'
-import { deriveKeypair, deriveXAddress } from './derive'
+import { deriveKeypair, deriveAddress, deriveXAddress } from './derive'
 import getBalanceChanges from './getBalanceChanges'
 import {
   hashSignedTx,
@@ -38,6 +38,7 @@ import {
   hashEscrow,
   hashPaymentChannel,
 } from './hashes'
+import parseNFTokenID from './parseNFTokenID'
 import {
   percentToTransferRate,
   decimalToTransferRate,
@@ -190,6 +191,7 @@ export {
   isValidAddress,
   hashes,
   deriveKeypair,
+  deriveAddress,
   deriveXAddress,
   signPaymentChannelClaim,
   verifyPaymentChannelClaim,
@@ -215,4 +217,5 @@ export {
   encodeForSigning,
   encodeForSigningClaim,
   createCrossChainPayment,
+  parseNFTokenID,
 }

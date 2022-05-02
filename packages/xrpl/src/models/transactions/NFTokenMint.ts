@@ -59,7 +59,7 @@ export interface NFTokenMint extends BaseTransaction {
    * than or equal to 2147483648 (0x80000000). If you have no use for this
    * field, set it to 0.
    */
-  TokenTaxon: number
+  NFTokenTaxon: number
   /**
    * Indicates the account that should be the issuer of this token. This value
    * is optional and should only be specified if the account executing the
@@ -105,7 +105,7 @@ export function validateNFTokenMint(tx: Record<string, unknown>): void {
     )
   }
 
-  if (tx.TokenTaxon == null) {
-    throw new ValidationError('NFTokenMint: missing field TokenTaxon')
+  if (tx.NFTokenTaxon == null) {
+    throw new ValidationError('NFTokenMint: missing field NFTokenTaxon')
   }
 }

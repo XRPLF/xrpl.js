@@ -13,7 +13,7 @@ describe('NFTokenBurn', function () {
   it(`verifies valid NFTokenBurn`, function () {
     const validNFTokenBurn = {
       TransactionType: 'NFTokenBurn',
-      TokenID: TOKEN_ID,
+      NFTokenID: TOKEN_ID,
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Fee: '5000000',
       Sequence: 2470665,
@@ -23,7 +23,7 @@ describe('NFTokenBurn', function () {
     assert.doesNotThrow(() => validate(validNFTokenBurn))
   })
 
-  it(`throws w/ missing TokenID`, function () {
+  it(`throws w/ missing NFTokenID`, function () {
     const invalid = {
       TransactionType: 'NFTokenBurn',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -35,7 +35,7 @@ describe('NFTokenBurn', function () {
     assert.throws(
       () => validate(invalid),
       ValidationError,
-      'NFTokenBurn: missing field TokenID',
+      'NFTokenBurn: missing field NFTokenID',
     )
   })
 })

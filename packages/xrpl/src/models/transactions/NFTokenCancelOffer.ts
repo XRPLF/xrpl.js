@@ -23,7 +23,7 @@ export interface NFTokenCancelOffer extends BaseTransaction {
    * error if an entry in this list points to an object that
    * does not exist. This field is required.
    */
-  TokenOffers: string[]
+  NFTokenOffers: string[]
 }
 
 /**
@@ -35,11 +35,11 @@ export interface NFTokenCancelOffer extends BaseTransaction {
 export function validateNFTokenCancelOffer(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (!Array.isArray(tx.TokenOffers)) {
-    throw new ValidationError('NFTokenCancelOffer: missing field TokenOffers')
+  if (!Array.isArray(tx.NFTokenOffers)) {
+    throw new ValidationError('NFTokenCancelOffer: missing field NFTokenOffers')
   }
 
-  if (tx.TokenOffers.length < 1) {
-    throw new ValidationError('NFTokenCancelOffer: empty field TokenOffers')
+  if (tx.NFTokenOffers.length < 1) {
+    throw new ValidationError('NFTokenCancelOffer: empty field NFTokenOffers')
   }
 }

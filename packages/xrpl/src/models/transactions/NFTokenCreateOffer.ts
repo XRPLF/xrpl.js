@@ -20,7 +20,7 @@ export enum NFTokenCreateOfferFlags {
    * If set, indicates that the offer is a sell offer.
    * Otherwise, it is a buy offer.
    */
-  tfSellToken = 0x00000001,
+  tfSellNFToken = 0x00000001,
 }
 
 /**
@@ -30,7 +30,7 @@ export enum NFTokenCreateOfferFlags {
  * @category Transaction Flags
  */
 export interface NFTokenCreateOfferFlagsInterface extends GlobalFlags {
-  tfSellToken?: boolean
+  tfSellNFToken?: boolean
 }
 
 /**
@@ -41,10 +41,10 @@ export interface NFTokenCreateOfferFlagsInterface extends GlobalFlags {
 export interface NFTokenCreateOffer extends BaseTransaction {
   TransactionType: 'NFTokenCreateOffer'
   /**
-   * Identifies the TokenID of the NFToken object that the
+   * Identifies the NFTokenID of the NFToken object that the
    * offer references.
    */
-  TokenID: string
+  NFTokenID: string
   /**
    * Indicates the amount expected or offered for the Token.
    *
@@ -83,7 +83,7 @@ export interface NFTokenCreateOffer extends BaseTransaction {
   Flags?: number | NFTokenCreateOfferFlagsInterface
 }
 
-function validateSellOfferCases(tx: Record<string, unknown>): void {
+function validateNFTokenSellOfferCases(tx: Record<string, unknown>): void {
   if (tx.Owner != null) {
     throw new ValidationError(
       'NFTokenCreateOffer: Owner must not be present for sell offers',
@@ -91,7 +91,7 @@ function validateSellOfferCases(tx: Record<string, unknown>): void {
   }
 }
 
-function validateBuyOfferCases(tx: Record<string, unknown>): void {
+function validateNFTokenBuyOfferCases(tx: Record<string, unknown>): void {
   if (tx.Owner == null) {
     throw new ValidationError(
       'NFTokenCreateOffer: Owner must be present for buy offers',
@@ -126,8 +126,8 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
     )
   }
 
-  if (tx.TokenID == null) {
-    throw new ValidationError('NFTokenCreateOffer: missing field TokenID')
+  if (tx.NFTokenID == null) {
+    throw new ValidationError('NFTokenCreateOffer: missing field NFTokenID')
   }
 
   if (!isAmount(tx.Amount)) {
@@ -136,10 +136,10 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
 
   if (
     typeof tx.Flags === 'number' &&
-    isFlagEnabled(tx.Flags, NFTokenCreateOfferFlags.tfSellToken)
+    isFlagEnabled(tx.Flags, NFTokenCreateOfferFlags.tfSellNFToken)
   ) {
-    validateSellOfferCases(tx)
+    validateNFTokenSellOfferCases(tx)
   } else {
-    validateBuyOfferCases(tx)
+    validateNFTokenBuyOfferCases(tx)
   }
 }
