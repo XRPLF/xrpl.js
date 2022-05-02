@@ -2,6 +2,8 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
+## Unreleased
+
 ## 2.2.2 (2022-05-02)
 ### Added
 * Export deriveAddress from ripple-keypairs in xrpl.js
