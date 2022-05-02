@@ -8,6 +8,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Deprecated BroadcastClient as it does not solve the reliabile connection problem.
 
 ### Fixed
+* Added missing `Owner` field to NFTokenBurn type definition
 * Add missing filter types in AccountObjectType
 
 ## 2.2.1 (2022-04-21)
