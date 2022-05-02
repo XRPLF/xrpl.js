@@ -3,12 +3,15 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
+
+## 2.2.2 (2022-05-02)
 ### Added
 * Export deriveAddress from ripple-keypairs in xrpl.js
 * Deprecated BroadcastClient as it does not solve the reliabile connection problem.
 
 ### Fixed
 * Added missing `Owner` field to NFTokenBurn type definition
+* Changed `tfSellToken` to `tfSellNFToken` to match the 1.9.0 naming for NFTokenSellOffers
 * Add missing filter types in AccountObjectType
 
 ## 2.2.1 (2022-04-21)
