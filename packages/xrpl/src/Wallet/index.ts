@@ -1,5 +1,6 @@
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync } from 'bip39'
+import {english_to_key} from './rfc1751'
 import _ from 'lodash'
 import {
   classicAddressToXAddress,
@@ -25,6 +26,7 @@ import { ValidationError } from '../errors'
 import { Transaction } from '../models/transactions'
 import { ensureClassicAddress } from '../sugar/utils'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
+import { encodeSeed } from 'ripple-address-codec'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
@@ -40,7 +42,7 @@ function hexFromBuffer(buffer: Buffer): string {
  *
  * @example
  * ```typescript
- * // Derive a wallet from a bip38 Mnemonic
+ * // Derive a wallet from a bip39 Mnemonic
  * const wallet = Wallet.fromMnemonic(
  *   'jewel insect retreat jump claim horse second chef west gossip bone frown exotic embark laundry'
  * )
@@ -165,21 +167,54 @@ class Wallet {
   // eslint-disable-next-line @typescript-eslint/member-ordering -- Member is used as a function here
   public static fromSecret = Wallet.fromSeed
 
+
   /**
-   * Derives a wallet from a mnemonic.
+   * Derives a wallet from a RFC1751 mnemonic, which is how `wallet_propose` encodes mnemonics.
+   *
+   * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
+   * @param opts - (Optional) Options to derive a Wallet.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @returns A Wallet derived from a mnemonic.
+   */
+  public static fromRFC1751Mnemonic(mnemonic: string, opts: { masterAddress?: string; algorithm?: ECDSA }): Wallet {
+    const seed = english_to_key(mnemonic)
+    let encodeAlgorithm: "ed25519" | "secp256k1";
+    if(opts?.algorithm === ECDSA.ed25519) {
+      encodeAlgorithm = "ed25519"
+    } else {
+      // Defaults to secp256k1 since that's the default for `wallet_propose`
+      encodeAlgorithm = "secp256k1"
+    }
+    const encodedSeed = encodeSeed(seed, encodeAlgorithm)
+    return Wallet.fromSeed(encodedSeed, {masterAddress: opts.masterAddress, algorithm: opts.algorithm})
+  }
+
+  /**
+   * Derives a wallet from a bip39 mnemonic.
    *
    * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
    * @param opts - (Optional) Options to derive a Wallet.
    * @param opts.derivationPath - The path to derive a keypair (publicKey/privateKey) used for mnemonic-to-seed conversion.
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
+   * @param opts.useRFC1751 - Decode usinge the mnemonic encoding from rippled's `wallet_propose` instead of a bip39 mnemonic.
    * @returns A Wallet derived from a mnemonic.
    * @throws ValidationError if unable to derive private key from mnemonic input.
    */
   public static fromMnemonic(
     mnemonic: string,
-    opts: { masterAddress?: string; derivationPath?: string } = {},
+    opts: { masterAddress?: string; derivationPath?: string, useRFC1751?: boolean } = {},
   ): Wallet {
-    const seed = mnemonicToSeedSync(mnemonic)
+    let seed;
+    if(opts.useRFC1751) {
+      console.log("Used RFC1751")
+      seed = english_to_key(mnemonic)
+      seed = encodeSeed(seed, "secp256k1") // TODO: Allow for either encoding type
+      return Wallet.fromSeed(seed, {masterAddress: opts.masterAddress}) // TODO: This doesn't allow for both encoding types
+    } else {
+      seed = mnemonicToSeedSync(mnemonic)
+    }
+    console.log("rfc1751 - Mnemonic to key", mnemonic, english_to_key(mnemonic))
     const masterNode = fromSeed(seed)
     const node = masterNode.derivePath(
       opts.derivationPath ?? DEFAULT_DERIVATION_PATH,
