@@ -212,19 +212,9 @@ class Wallet {
     opts: {
       masterAddress?: string
       derivationPath?: string
-      useRFC1751?: boolean
     } = {},
   ): Wallet {
-    let seed
-    if (opts.useRFC1751) {
-      console.log('Used RFC1751')
-      seed = english_to_key(mnemonic)
-      seed = encodeSeed(seed, 'secp256k1') // TODO: Allow for either encoding type
-      return Wallet.fromSeed(seed, { masterAddress: opts.masterAddress }) // TODO: This doesn't allow for both encoding types
-    }
-    seed = mnemonicToSeedSync(mnemonic)
-
-    console.log('rfc1751 - Mnemonic to key', mnemonic, english_to_key(mnemonic))
+    const seed = mnemonicToSeedSync(mnemonic)
     const masterNode = fromSeed(seed)
     const node = masterNode.derivePath(
       opts.derivationPath ?? DEFAULT_DERIVATION_PATH,
