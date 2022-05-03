@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Doing many bitwise operations which need specific numbers */
 
 /*
  *rfc1751.js : Converts between 128-bit strings and a human-readable
@@ -258,32 +258,52 @@ const rfc1751_wordlist = [ "A", "ABE", "ACE", "ACT", "AD", "ADA", "ADD",
 const binary = ['0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111',
               '1000', '1001', '1010', '1011', '1100', '1101', '1110', '1111'];
 
-function _key2bin(key) {
+/**
+ * Convert a number array into a binary string.
+ *
+ * @param key - An array of numbers in base 10.
+ * @returns A binary string.
+ */
+function _key2bin(key: number[]): string {
   let res = ''
-  for (let i = 0; i < key.length; i++) {
-    res += binary[key[i] >> 4] + binary[key[i] & 0x0f]
+  for (let index = 0; index < key.length; index++) {
+    res += binary[key[index] >> 4] + binary[key[index] & 0x0f]
   }
   return res
 }
 
-function _extract(key, start, length): number {
-  const k = key.substring(start, start + length)
+/**
+ * Converts a substring of an encoded secret to it's numeric value.
+ *
+ * @param key - The encoded secret.
+ * @param start - The start index to parse from.
+ * @param length - The number of digits to parse after the start index.
+ * @returns The binary value of the substring.
+ */
+function _extract(key: string, start: number, length: number): number {
+  const subkey = key.substring(start, start + length)
   let acc = 0
-  for (let i = 0; i < k.length; i++) {
-    acc = acc * 2 + k.charCodeAt(i) - 48
+  for (let index = 0; index < subkey.length; index++) {
+    acc = acc * 2 + subkey.charCodeAt(index) - 48
   }
   return acc
 }
 
-function key_to_english(hex_key) {
+/**
+ * Generates a modified RFC1751 mnemonic in the same way rippled's wallet_propose does.
+ *
+ * @param hex_key - An encoded secret in hex format.
+ * @returns A mnemonic following rippled's modified RFC1751 mnemonic standard.
+ */
+function key_to_english(hex_key: string): string {
   // Remove whitespace and interpret hex
   const buf = Buffer.from(hex_key.replace(/\s+/g, ''), 'hex')
   // Swap byte order and use rfc1751
-  let key = buffer_to_array(swap128(buf))
+  let key: number[] = buffer_to_array(swap128(buf))
 
   // pad to 8 bytes
   const padding: number[] = []
-  for (let i = 0; i < (8 - (key.length % 8)) % 8; i++) {
+  for (let index = 0; index < (8 - (key.length % 8)) % 8; index++) {
     padding.push(0)
   }
   key = padding.concat(key)
@@ -294,20 +314,26 @@ function key_to_english(hex_key) {
 
     // add parity
     let skbin = _key2bin(subkey)
-    let p = 0
-    for (let i = 0; i < 64; i += 2) {
-      p += _extract(skbin, i, 2)
+    let parity = 0
+    for (let j = 0; j < 64; j += 2) {
+      parity += _extract(skbin, j, 2)
     }
-    subkey.push((p << 6) & 0xff)
+    subkey.push((parity << 6) & 0xff)
 
     skbin = _key2bin(subkey)
-    for (let i = 0; i < 64; i += 11) {
-      english.push(rfc1751_wordlist[_extract(skbin, i, 11)])
+    for (let j = 0; j < 64; j += 11) {
+      english.push(rfc1751_wordlist[_extract(skbin, j, 11)])
     }
   }
   return english.join(' ')
 }
 
+/**
+ * Converts an english mnemonic following rippled's modified RFC1751 standard to an encoded hex secret.
+ *
+ * @param english - A mnemonic generated using ripple's modified RFC1751 standard.
+ * @returns - A Buffer containing an encoded secret.
+ */
 function english_to_key(english: string): Buffer {
   const words = english.split(' ')
   let key: number[] = []
@@ -317,8 +343,8 @@ function english_to_key(english: string): Buffer {
     let bits = 0
     const ch = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     let word = ''
-    for (let k = 0; k < sublist.length; k++) {
-      word = sublist[k]
+    for (let j = 0; j < sublist.length; j++) {
+      word = sublist[j]
       const idx = rfc1751_wordlist.indexOf(word)
       const shift = (8 - ((bits + 11) % 8)) % 8
       const y = idx << shift
