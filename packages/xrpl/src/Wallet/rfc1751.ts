@@ -264,7 +264,7 @@ const binary = ['0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111',
  * @param key - An array of numbers in base 10.
  * @returns A binary string.
  */
-function _key2bin(key: number[]): string {
+function keyToBinary(key: number[]): string {
   let res = ''
   for (let index = 0; index < key.length; index++) {
     res += binary[key[index] >> 4] + binary[key[index] & 0x0f]
@@ -280,7 +280,7 @@ function _key2bin(key: number[]): string {
  * @param length - The number of digits to parse after the start index.
  * @returns The binary value of the substring.
  */
-function _extract(key: string, start: number, length: number): number {
+function extract(key: string, start: number, length: number): number {
   const subkey = key.substring(start, start + length)
   let acc = 0
   for (let index = 0; index < subkey.length; index++) {
@@ -295,11 +295,11 @@ function _extract(key: string, start: number, length: number): number {
  * @param hex_key - An encoded secret in hex format.
  * @returns A mnemonic following rippled's modified RFC1751 mnemonic standard.
  */
-function key_to_english(hex_key: string): string {
+function keyToRFC1751Mnemonic(hex_key: string): string {
   // Remove whitespace and interpret hex
   const buf = Buffer.from(hex_key.replace(/\s+/g, ''), 'hex')
   // Swap byte order and use rfc1751
-  let key: number[] = buffer_to_array(swap128(buf))
+  let key: number[] = bufferToArray(swap128(buf))
 
   // pad to 8 bytes
   const padding: number[] = []
@@ -313,16 +313,16 @@ function key_to_english(hex_key: string): string {
     const subkey = key.slice(index, index + 8)
 
     // add parity
-    let skbin = _key2bin(subkey)
+    let skbin = keyToBinary(subkey)
     let parity = 0
     for (let j = 0; j < 64; j += 2) {
-      parity += _extract(skbin, j, 2)
+      parity += extract(skbin, j, 2)
     }
     subkey.push((parity << 6) & 0xff)
 
-    skbin = _key2bin(subkey)
+    skbin = keyToBinary(subkey)
     for (let j = 0; j < 64; j += 11) {
-      english.push(rfc1751_wordlist[_extract(skbin, j, 11)])
+      english.push(rfc1751_wordlist[extract(skbin, j, 11)])
     }
   }
   return english.join(' ')
@@ -334,7 +334,7 @@ function key_to_english(hex_key: string): string {
  * @param english - A mnemonic generated using ripple's modified RFC1751 standard.
  * @returns - A Buffer containing an encoded secret.
  */
-function english_to_key(english: string): Buffer {
+function rfc1751MnemonicToKey(english: string): Buffer {
   const words = english.split(' ')
   let key: number[] = []
 
@@ -367,12 +367,12 @@ function english_to_key(english: string): Buffer {
     const subkey: number[] = ch.slice()
 
     // check parity
-    const skbin = _key2bin(subkey)
+    const skbin = keyToBinary(subkey)
     let parity = 0
-    for (let i = 0; i < 64; i += 2) {
-      parity += _extract(skbin, i, 2)
+    for (let j = 0; j < 64; j += 2) {
+      parity += extract(skbin, j, 2)
     }
-    const cs0 = _extract(skbin, 64, 2)
+    const cs0 = extract(skbin, 64, 2)
     const cs1 = parity & 3
     if (cs0 != cs1) {
       throw new Error(`Parity error at ${word}`)
@@ -382,11 +382,11 @@ function english_to_key(english: string): Buffer {
   }
 
   // This is a step specific to the XRPL's implementation
-  const buffer_key = swap128(Buffer.from(key))
-  return buffer_key
+  const bufferKey = swap128(Buffer.from(key))
+  return bufferKey
 }
 
-function buffer_to_array(buf) {
+function bufferToArray(buf) {
   return Array.prototype.slice.call(buf)
 }
 
@@ -396,11 +396,11 @@ function buffer_to_array(buf) {
  * @param buf - A 128-bit (16 byte) buffer
  * @returns A buffer containing the same data with reversed endianness
  */
-function swap128(buf) {
+function swap128(buf: Buffer): Buffer {
   const result = Buffer.alloc(16)
   result.writeBigUInt64LE(buf.readBigUInt64BE(0), 8)
   result.writeBigUInt64LE(buf.readBigUInt64BE(8), 0)
   return result
 }
 
-export { english_to_key, key_to_english }
+export { rfc1751MnemonicToKey, keyToRFC1751Mnemonic }

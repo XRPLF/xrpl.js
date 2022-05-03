@@ -27,7 +27,7 @@ import { Transaction } from '../models/transactions'
 import { ensureClassicAddress } from '../sugar/utils'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
 
-import { english_to_key } from './rfc1751'
+import { rfc1751MnemonicToKey } from './rfc1751'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
@@ -181,7 +181,7 @@ class Wallet {
     mnemonic: string,
     opts: { masterAddress?: string; algorithm?: ECDSA },
   ): Wallet {
-    const seed = english_to_key(mnemonic)
+    const seed = rfc1751MnemonicToKey(mnemonic)
     let encodeAlgorithm: 'ed25519' | 'secp256k1'
     if (opts.algorithm === ECDSA.ed25519) {
       encodeAlgorithm = 'ed25519'
