@@ -1,13 +1,16 @@
-/*
-    rfc1751.js : Converts between 128-bit strings and a human-readable
-    sequence of words, as defined in RFC1751: "A Convention for
-    Human-Readable 128-bit Keys", by Daniel L. McDonald.
-    Ported from rfc1751.py / Python Cryptography Toolkit (public domain).
-    Copied from https://github.com/bip32/bip32.github.io/blob/master/js/rfc1751.js which
-    is part of the public domain.
-*/
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 
-var rfc1751_wordlist = [ "A", "ABE", "ACE", "ACT", "AD", "ADA", "ADD",
+/*
+ *rfc1751.js : Converts between 128-bit strings and a human-readable
+ *sequence of words, as defined in RFC1751: "A Convention for
+ *Human-Readable 128-bit Keys", by Daniel L. McDonald.
+ *Ported from rfc1751.py / Python Cryptography Toolkit (public domain).
+ *Copied from https://github.com/bip32/bip32.github.io/blob/master/js/rfc1751.js which
+ *is part of the public domain.
+ */
+
+// prettier-ignore
+const rfc1751_wordlist = [ "A", "ABE", "ACE", "ACT", "AD", "ADA", "ADD",
    "AGO", "AID", "AIM", "AIR", "ALL", "ALP", "AM", "AMY", "AN", "ANA",
    "AND", "ANN", "ANT", "ANY", "APE", "APS", "APT", "ARC", "ARE", "ARK",
    "ARM", "ART", "AS", "ASH", "ASK", "AT", "ATE", "AUG", "AUK", "AVE",
@@ -251,126 +254,127 @@ var rfc1751_wordlist = [ "A", "ABE", "ACE", "ACT", "AD", "ADA", "ADD",
    "YANG", "YANK", "YARD", "YARN", "YAWL", "YAWN", "YEAH", "YEAR",
    "YELL", "YOGA", "YOKE" ];
 
-var binary = ['0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111',
+// prettier-ignore
+const binary = ['0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111',
               '1000', '1001', '1010', '1011', '1100', '1101', '1110', '1111'];
 
 function _key2bin(key) {
-    let res = ''
-    for (var i = 0; i < key.length; i++) {
-        res += binary[key[i] >> 4] + binary [key[i] & 0x0f];
-    }
-    return res;
+  let res = ''
+  for (let i = 0; i < key.length; i++) {
+    res += binary[key[i] >> 4] + binary[key[i] & 0x0f]
+  }
+  return res
 }
 
 function _extract(key, start, length): number {
-    const k = key.substring(start, start+length);
-    var acc = 0;
-    for (var i = 0; i < k.length; i++) {
-        acc = acc * 2 + k.charCodeAt(i) - 48;
-    }
-    return acc;
+  const k = key.substring(start, start + length)
+  let acc = 0
+  for (let i = 0; i < k.length; i++) {
+    acc = acc * 2 + k.charCodeAt(i) - 48
+  }
+  return acc
 }
 
 function key_to_english(hex_key) {
-    // Remove whitespace and interpret hex
-    const buf = Buffer.from(hex_key.replace(/\s+/g, ''), 'hex');
-    // Swap byte order and use rfc1751
-    var key = buffer_to_array(swap128(buf))
+  // Remove whitespace and interpret hex
+  const buf = Buffer.from(hex_key.replace(/\s+/g, ''), 'hex')
+  // Swap byte order and use rfc1751
+  let key = buffer_to_array(swap128(buf))
 
-    //pad to 8 bytes
-    var padding: number[] = [];
-    for (var i = 0; i < (8 - (key.length % 8)) % 8; i++) {
-        padding.push(0);
+  // pad to 8 bytes
+  const padding: number[] = []
+  for (let i = 0; i < (8 - (key.length % 8)) % 8; i++) {
+    padding.push(0)
+  }
+  key = padding.concat(key)
+
+  const english: string[] = []
+  for (let index = 0; index < key.length; index += 8) {
+    const subkey = key.slice(index, index + 8)
+
+    // add parity
+    let skbin = _key2bin(subkey)
+    let p = 0
+    for (let i = 0; i < 64; i += 2) {
+      p += _extract(skbin, i, 2)
     }
-    key = padding.concat(key);
+    subkey.push((p << 6) & 0xff)
 
-    var english: string[] = [];
-    for (var index = 0; index < key.length; index += 8) {
-        var subkey = key.slice(index, index + 8);
-
-        //add parity
-        var skbin = _key2bin(subkey);
-        var p = 0;
-        for (var i = 0; i < 64; i += 2) {
-            p = p + _extract(skbin, i, 2);
-        }
-        subkey.push((p << 6) & 0xff);
-
-        skbin = _key2bin(subkey);
-        for (var i = 0; i < 64; i += 11) {
-            english.push(rfc1751_wordlist[_extract(skbin, i, 11)]);
-        }
+    skbin = _key2bin(subkey)
+    for (let i = 0; i < 64; i += 11) {
+      english.push(rfc1751_wordlist[_extract(skbin, i, 11)])
     }
-    return english.join(' ');
+  }
+  return english.join(' ')
 }
 
-function english_to_key(str: string) {
+function english_to_key(english: string): Buffer {
+  const words = english.split(' ')
+  let key: number[] = []
 
-    var L = str.split(' ');
-    var key: number[] = [];
+  for (let index = 0; index < words.length; index += 6) {
+    const sublist = words.slice(index, index + 6)
+    let bits = 0
+    const ch = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    let word = ''
+    for (let k = 0; k < sublist.length; k++) {
+      word = sublist[k]
+      const idx = rfc1751_wordlist.indexOf(word)
+      const shift = (8 - ((bits + 11) % 8)) % 8
+      const y = idx << shift
+      const cl = y >> 16
+      const cc = (y >> 8) & 0xff
+      const cr = y & 0xff
+      const t = Math.floor(bits / 8)
+      if (shift > 5) {
+        ch[t] = ch[t] | cl
+        ch[t + 1] = ch[t + 1] | cc
+        ch[t + 2] = ch[t + 2] | cr
+      } else if (shift > -3) {
+        ch[t] = ch[t] | cc
+        ch[t + 1] = ch[t + 1] | cr
+      } else {
+        ch[t] = ch[t] | cr
+      }
+      bits += 11
+    }
+    const subkey: number[] = ch.slice()
 
-    for (var index = 0; index < L.length; index += 6) {
-        var sublist = L.slice(index, index + 6);
-        var bits = 0;
-        var ch = [0,0,0,0,0,0,0,0,0];
-        let word = ""
-        for (var k = 0; k < sublist.length; k++) {
-            word = sublist[k];
-            var idx = rfc1751_wordlist.indexOf(word);
-            var shift = (8 - (bits + 11) % 8) % 8;
-            var y = idx << shift;
-            var cl = y >> 16;
-            var cc = (y >> 8) & 0xff;
-            var cr = y & 0xff;
-            var t = Math.floor(bits / 8);
-            if (shift > 5) {
-                ch[t] = ch[t] | cl;
-                ch[t+1] = ch[t+1] | cc;
-                ch[t+2] = ch[t+2] | cr;
-            } else if (shift > -3) {
-                ch[t] = ch[t] | cc;
-                ch[t+1] = ch[t+1] | cr;
-            } else {
-                ch[t] = ch[t] | cr;
-            }
-            bits = bits + 11;
-        }
-        var subkey: Array<number> = ch.slice();
-
-        //check parity
-        var skbin = _key2bin(subkey);
-        var p = 0;
-        for (var i = 0; i < 64; i += 2) {
-            p = p + _extract(skbin, i, 2);
-        }
-        var cs0 = _extract(skbin, 64, 2);
-        var cs1 = p & 3;
-        if (cs0 != cs1) {
-            throw new Error("Parity error at " + word);
-        }
-
-        key = key.concat(subkey.slice(0,8));
+    // check parity
+    const skbin = _key2bin(subkey)
+    let parity = 0
+    for (let i = 0; i < 64; i += 2) {
+      parity += _extract(skbin, i, 2)
+    }
+    const cs0 = _extract(skbin, 64, 2)
+    const cs1 = parity & 3
+    if (cs0 != cs1) {
+      throw new Error(`Parity error at ${word}`)
     }
 
-    const buffer_key = swap128(Buffer.from(key))
-    return buffer_key;
+    key = key.concat(subkey.slice(0, 8))
+  }
+
+  // This is a step specific to the XRPL's implementation
+  const buffer_key = swap128(Buffer.from(key))
+  return buffer_key
 }
 
- function buffer_to_array(buf) {
-   return Array.prototype.slice.call(buf);
- }
+function buffer_to_array(buf) {
+  return Array.prototype.slice.call(buf)
+}
 
- /**
-  * Swap the byte order of a 128-bit buffer.
-  *
-  * @param {Buffer} buf - A 128-bit (16 byte) buffer
-  * @return {Buffer} - A buffer containing the same data with reversed endianness
-  */
- function swap128(buf) {
-   const result = Buffer.alloc(16);
-   result.writeBigUInt64LE(buf.readBigUInt64BE(0), 8);
-   result.writeBigUInt64LE(buf.readBigUInt64BE(8), 0);
-   return result;
- }
+/**
+ * Swap the byte order of a 128-bit buffer.
+ *
+ * @param buf - A 128-bit (16 byte) buffer
+ * @returns A buffer containing the same data with reversed endianness
+ */
+function swap128(buf) {
+  const result = Buffer.alloc(16)
+  result.writeBigUInt64LE(buf.readBigUInt64BE(0), 8)
+  result.writeBigUInt64LE(buf.readBigUInt64BE(8), 0)
+  return result
+}
 
 export { english_to_key, key_to_english }
