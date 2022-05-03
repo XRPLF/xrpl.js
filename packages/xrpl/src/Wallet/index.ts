@@ -203,7 +203,6 @@ class Wallet {
    * @param opts - (Optional) Options to derive a Wallet.
    * @param opts.derivationPath - The path to derive a keypair (publicKey/privateKey) used for mnemonic-to-seed conversion.
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
-   * @param opts.useRFC1751 - Decode usinge the mnemonic encoding from rippled's `wallet_propose` instead of a bip39 mnemonic.
    * @returns A Wallet derived from a mnemonic.
    * @throws ValidationError if unable to derive private key from mnemonic input.
    */
