@@ -202,7 +202,8 @@ class Wallet {
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @param opts.derivationPath - The path to derive a keypair (publicKey/privateKey). Only used for bip39 conversions.
    * @param opts.useRFC1751 - If true, this interprets the mnemonic as a rippled RFC1751 mnemonic like `wallet_propose`
-   *                          generates in rippled.
+   *                          generates in rippled. Defaults to secp256k1 to match `wallet_propose` default if
+   *                          opts.algorithm is not specified.
    * @param opts.algorithm - Only used if opts.useRFC1751Mnemonic is true. Allows the mnemonic to generate its
    *                         secp256k1 seed, or its ed25519 seed.
    * @returns A Wallet derived from a mnemonic.
