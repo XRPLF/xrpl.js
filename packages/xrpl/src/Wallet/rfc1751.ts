@@ -17,7 +17,7 @@ const rfc1751WordList: string[] = rfc1751Words
 // Added prettier-ignore to allow _BINARY to be on two lines, instead of one entry per line.
 
 // prettier-ignore
-const _BINARY = ['0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111',
+const BINARY = ['0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111',
                 '1000', '1001', '1010', '1011', '1100', '1101', '1110', '1111'];
 
 /**
@@ -29,7 +29,7 @@ const _BINARY = ['0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111',
 function keyToBinary(key: number[]): string {
   let res = ''
   for (const num of key) {
-    res += _BINARY[num >> 4] + _BINARY[num & 0x0f]
+    res += BINARY[num >> 4] + BINARY[num & 0x0f]
   }
   return res
 }
