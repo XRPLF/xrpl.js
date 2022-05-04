@@ -14,25 +14,9 @@ import rfc1751Words from './rfc1751Words.json'
 
 const rfc1751WordList: string[] = rfc1751Words
 
-// prettier-ignore - It's more readable to have this on two lines than one per line.
-const binary = [
-  '0000',
-  '0001',
-  '0010',
-  '0011',
-  '0100',
-  '0101',
-  '0110',
-  '0111',
-  '1000',
-  '1001',
-  '1010',
-  '1011',
-  '1100',
-  '1101',
-  '1110',
-  '1111',
-]
+// prettier-ignore
+const binary = ['0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111',
+                '1000', '1001', '1010', '1011', '1100', '1101', '1110', '1111'];
 
 /**
  * Convert a number array into a binary string.
