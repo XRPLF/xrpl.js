@@ -3,6 +3,7 @@
   "include": [
     "./src/**/*.ts",
     "./test/**/*.ts",
+    "./src/**/*.json",
     "./snippets/src/**/*.ts",
     ".eslintrc.js"
   ]
