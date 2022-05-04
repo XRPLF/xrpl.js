@@ -122,7 +122,8 @@ describe('Wallet', function () {
       const mnemonic =
         'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
       const expectedSeed = 'snVB4iTWYqsWZaj1hkvAy1QzqNbAg'
-      const wallet = Wallet.fromRFC1751Mnemonic(mnemonic, {
+      const wallet = Wallet.fromMnemonic(mnemonic, {
+        useRFC1751: true,
         algorithm,
       })
 
@@ -134,7 +135,8 @@ describe('Wallet', function () {
       const mnemonic =
         'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
       const expectedSeed = 'sEdVaw4m9W3H3ou3VnyvDwvPAP5BEz1'
-      const wallet = Wallet.fromRFC1751Mnemonic(mnemonic, {
+      const wallet = Wallet.fromMnemonic(mnemonic, {
+        useRFC1751: true,
         algorithm,
       })
 

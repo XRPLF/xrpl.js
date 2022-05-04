@@ -177,7 +177,7 @@ class Wallet {
    * @param opts.algorithm - The digital signature algorithm to generate an address for.
    * @returns A Wallet derived from a mnemonic.
    */
-  public static fromRFC1751Mnemonic(
+  private static fromRFC1751Mnemonic(
     mnemonic: string,
     opts: { masterAddress?: string; algorithm?: ECDSA },
   ): Wallet {
@@ -197,12 +197,16 @@ class Wallet {
   }
 
   /**
-   * Derives a wallet from a bip39 mnemonic.
+   * Derives a wallet from a bip39 or RFC1751 mnemonic (Defaults to bip39).
    *
    * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
    * @param opts - (Optional) Options to derive a Wallet.
-   * @param opts.derivationPath - The path to derive a keypair (publicKey/privateKey) used for mnemonic-to-seed conversion.
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
+   * @param opts.derivationPath - The path to derive a keypair (publicKey/privateKey). Only used for bip39 mnemonic-to-seed conversion.
+   * @param opts.useRFC1751 - If true, this interprets the mnemonic as a rippled RFC1751 mnemonic like `wallet_propose`
+   *                          generates in rippled.
+   * @param opts.algorithm - Only used if opts.useRFC1751Mnemonic is true. Allows the mnemonic to generate its
+   *                         secp256k1 seed, or its ed25519 seed.
    * @returns A Wallet derived from a mnemonic.
    * @throws ValidationError if unable to derive private key from mnemonic input.
    */
@@ -211,24 +215,30 @@ class Wallet {
     opts: {
       masterAddress?: string
       derivationPath?: string
+      useRFC1751?: boolean
+      algorithm?: ECDSA
     } = {},
   ): Wallet {
-    const seed = mnemonicToSeedSync(mnemonic)
-    const masterNode = fromSeed(seed)
-    const node = masterNode.derivePath(
-      opts.derivationPath ?? DEFAULT_DERIVATION_PATH,
-    )
-    if (node.privateKey === undefined) {
-      throw new ValidationError(
-        'Unable to derive privateKey from mnemonic input',
+    if(opts.useRFC1751) {
+      return Wallet.fromRFC1751Mnemonic(mnemonic, { masterAddress: opts.masterAddress, algorithm: opts.algorithm })
+    } else {
+      const seed = mnemonicToSeedSync(mnemonic)
+      const masterNode = fromSeed(seed)
+      const node = masterNode.derivePath(
+        opts.derivationPath ?? DEFAULT_DERIVATION_PATH,
       )
-    }
+      if (node.privateKey === undefined) {
+        throw new ValidationError(
+          'Unable to derive privateKey from mnemonic input',
+        )
+      }
 
-    const publicKey = hexFromBuffer(node.publicKey)
-    const privateKey = hexFromBuffer(node.privateKey)
-    return new Wallet(publicKey, `00${privateKey}`, {
-      masterAddress: opts.masterAddress,
-    })
+      const publicKey = hexFromBuffer(node.publicKey)
+      const privateKey = hexFromBuffer(node.privateKey)
+      return new Wallet(publicKey, `00${privateKey}`, {
+        masterAddress: opts.masterAddress,
+      })
+    }
   }
 
   /**
