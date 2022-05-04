@@ -12,8 +12,7 @@
 
 import rfc1751Words from './rfc1751Words.json'
 
-// prettier-ignore
-const rfc1751WordList = rfc1751Words.wordList
+const rfc1751WordList: string[] = rfc1751Words
 
 // prettier-ignore
 const binary = ['0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111',
@@ -101,7 +100,10 @@ function rfc1751MnemonicToKey(english: string): Buffer {
   let key: number[] = []
 
   for (let index = 0; index < words.length; index += 6) {
-    var { subKey, word }: { subKey: number[]; word: string; } = getSubKey(words, index);
+    const { subKey, word }: { subKey: number[]; word: string } = getSubKey(
+      words,
+      index,
+    )
 
     // check parity
     const skbin = keyToBinary(subKey)
@@ -124,33 +126,33 @@ function rfc1751MnemonicToKey(english: string): Buffer {
 }
 
 function getSubKey(words: string[], index: number) {
-  const sublist = words.slice(index, index + 6);
-  let bits = 0;
-  const ch = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-  let word = '';
+  const sublist = words.slice(index, index + 6)
+  let bits = 0
+  const ch = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+  let word = ''
   for (let j = 0; j < sublist.length; j++) {
-    word = sublist[j];
-    const idx = rfc1751WordList.indexOf(word);
-    const shift = (8 - ((bits + 11) % 8)) % 8;
-    const y = idx << shift;
-    const cl = y >> 16;
-    const cc = (y >> 8) & 0xff;
-    const cr = y & 0xff;
-    const t = Math.floor(bits / 8);
+    word = sublist[j]
+    const idx = rfc1751WordList.indexOf(word)
+    const shift = (8 - ((bits + 11) % 8)) % 8
+    const y = idx << shift
+    const cl = y >> 16
+    const cc = (y >> 8) & 0xff
+    const cr = y & 0xff
+    const t = Math.floor(bits / 8)
     if (shift > 5) {
-      ch[t] |= cl;
-      ch[t + 1] |= cc;
-      ch[t + 2] |= cr;
+      ch[t] |= cl
+      ch[t + 1] |= cc
+      ch[t + 2] |= cr
     } else if (shift > -3) {
-      ch[t] |= cc;
-      ch[t + 1] |= cr;
+      ch[t] |= cc
+      ch[t + 1] |= cr
     } else {
-      ch[t] |= cr;
+      ch[t] |= cr
     }
-    bits += 11;
+    bits += 11
   }
-  const subKey: number[] = ch.slice();
-  return { subKey, word };
+  const subKey: number[] = ch.slice()
+  return { subKey, word }
 }
 
 function bufferToArray(buf: Buffer): number[] {

@@ -219,26 +219,29 @@ class Wallet {
       algorithm?: ECDSA
     } = {},
   ): Wallet {
-    if(opts.useRFC1751) {
-      return Wallet.fromRFC1751Mnemonic(mnemonic, { masterAddress: opts.masterAddress, algorithm: opts.algorithm })
-    } else {
-      const seed = mnemonicToSeedSync(mnemonic)
-      const masterNode = fromSeed(seed)
-      const node = masterNode.derivePath(
-        opts.derivationPath ?? DEFAULT_DERIVATION_PATH,
-      )
-      if (node.privateKey === undefined) {
-        throw new ValidationError(
-          'Unable to derive privateKey from mnemonic input',
-        )
-      }
-
-      const publicKey = hexFromBuffer(node.publicKey)
-      const privateKey = hexFromBuffer(node.privateKey)
-      return new Wallet(publicKey, `00${privateKey}`, {
+    if (opts.useRFC1751) {
+      return Wallet.fromRFC1751Mnemonic(mnemonic, {
         masterAddress: opts.masterAddress,
+        algorithm: opts.algorithm,
       })
     }
+    // Otherwise decode using bip39's mnemonic standard
+    const seed = mnemonicToSeedSync(mnemonic)
+    const masterNode = fromSeed(seed)
+    const node = masterNode.derivePath(
+      opts.derivationPath ?? DEFAULT_DERIVATION_PATH,
+    )
+    if (node.privateKey === undefined) {
+      throw new ValidationError(
+        'Unable to derive privateKey from mnemonic input',
+      )
+    }
+
+    const publicKey = hexFromBuffer(node.publicKey)
+    const privateKey = hexFromBuffer(node.privateKey)
+    return new Wallet(publicKey, `00${privateKey}`, {
+      masterAddress: opts.masterAddress,
+    })
   }
 
   /**
