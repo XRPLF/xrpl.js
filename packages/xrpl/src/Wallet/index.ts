@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- There are lots of equivalent constructors which make sense to have here. */
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync } from 'bip39'
 import _ from 'lodash'
@@ -169,30 +170,27 @@ class Wallet {
   public static fromSecret = Wallet.fromSeed
 
   /**
-   * Derives a wallet from a RFC1751 mnemonic, which is how `wallet_propose` encodes mnemonics.
+   * Derives a wallet from an entropy (array of random numbers).
    *
-   * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
+   * @param entropy - An array of random numbers to generate a seed used to derive a wallet.
    * @param opts - (Optional) Options to derive a Wallet.
-   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @param opts.algorithm - The digital signature algorithm to generate an address for.
-   * @returns A Wallet derived from a mnemonic.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
+   * @returns A Wallet derived from an entropy.
    */
-  private static fromRFC1751Mnemonic(
-    mnemonic: string,
-    opts: { masterAddress?: string; algorithm?: ECDSA },
+  public static fromEntropy(
+    entropy: Uint8Array | number[],
+    opts: { masterAddress?: string; algorithm?: ECDSA } = {},
   ): Wallet {
-    const seed = rfc1751MnemonicToKey(mnemonic)
-    let encodeAlgorithm: 'ed25519' | 'secp256k1'
-    if (opts.algorithm === ECDSA.ed25519) {
-      encodeAlgorithm = 'ed25519'
-    } else {
-      // Defaults to secp256k1 since that's the default for `wallet_propose`
-      encodeAlgorithm = 'secp256k1'
+    const algorithm = opts.algorithm ?? DEFAULT_ALGORITHM
+    const options = {
+      entropy: Uint8Array.from(entropy),
+      algorithm,
     }
-    const encodedSeed = encodeSeed(seed, encodeAlgorithm)
-    return Wallet.fromSeed(encodedSeed, {
+    const seed = generateSeed(options)
+    return Wallet.deriveWallet(seed, {
+      algorithm,
       masterAddress: opts.masterAddress,
-      algorithm: opts.algorithm,
     })
   }
 
@@ -202,7 +200,7 @@ class Wallet {
    * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
    * @param opts - (Optional) Options to derive a Wallet.
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
-   * @param opts.derivationPath - The path to derive a keypair (publicKey/privateKey). Only used for bip39 mnemonic-to-seed conversion.
+   * @param opts.derivationPath - The path to derive a keypair (publicKey/privateKey). Only used for bip39 conversions.
    * @param opts.useRFC1751 - If true, this interprets the mnemonic as a rippled RFC1751 mnemonic like `wallet_propose`
    *                          generates in rippled.
    * @param opts.algorithm - Only used if opts.useRFC1751Mnemonic is true. Allows the mnemonic to generate its
@@ -245,27 +243,30 @@ class Wallet {
   }
 
   /**
-   * Derives a wallet from an entropy (array of random numbers).
+   * Derives a wallet from a RFC1751 mnemonic, which is how `wallet_propose` encodes mnemonics.
    *
-   * @param entropy - An array of random numbers to generate a seed used to derive a wallet.
+   * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
    * @param opts - (Optional) Options to derive a Wallet.
-   * @param opts.algorithm - The digital signature algorithm to generate an address for.
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
-   * @returns A Wallet derived from an entropy.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @returns A Wallet derived from a mnemonic.
    */
-  public static fromEntropy(
-    entropy: Uint8Array | number[],
-    opts: { masterAddress?: string; algorithm?: ECDSA } = {},
+  private static fromRFC1751Mnemonic(
+    mnemonic: string,
+    opts: { masterAddress?: string; algorithm?: ECDSA },
   ): Wallet {
-    const algorithm = opts.algorithm ?? DEFAULT_ALGORITHM
-    const options = {
-      entropy: Uint8Array.from(entropy),
-      algorithm,
+    const seed = rfc1751MnemonicToKey(mnemonic)
+    let encodeAlgorithm: 'ed25519' | 'secp256k1'
+    if (opts.algorithm === ECDSA.ed25519) {
+      encodeAlgorithm = 'ed25519'
+    } else {
+      // Defaults to secp256k1 since that's the default for `wallet_propose`
+      encodeAlgorithm = 'secp256k1'
     }
-    const seed = generateSeed(options)
-    return Wallet.deriveWallet(seed, {
-      algorithm,
+    const encodedSeed = encodeSeed(seed, encodeAlgorithm)
+    return Wallet.fromSeed(encodedSeed, {
       masterAddress: opts.masterAddress,
+      algorithm: opts.algorithm,
     })
   }
 

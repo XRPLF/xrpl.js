@@ -57,7 +57,7 @@ function extract(key: string, start: number, length: number): number {
  */
 function keyToRFC1751Mnemonic(hex_key: string): string {
   // Remove whitespace and interpret hex
-  const buf = Buffer.from(hex_key.replace(/\s+/g, ''), 'hex')
+  const buf = Buffer.from(hex_key.replace(/\s+/gu, ''), 'hex')
   // Swap byte order and use rfc1751
   let key: number[] = bufferToArray(swap128(buf))
 
@@ -125,13 +125,15 @@ function rfc1751MnemonicToKey(english: string): Buffer {
   return bufferKey
 }
 
-function getSubKey(words: string[], index: number) {
+function getSubKey(
+  words: string[],
+  index: number,
+): { subKey: number[]; word: string } {
   const sublist = words.slice(index, index + 6)
   let bits = 0
   const ch = [0, 0, 0, 0, 0, 0, 0, 0, 0]
   let word = ''
-  for (let j = 0; j < sublist.length; j++) {
-    word = sublist[j]
+  for (word of sublist) {
     const idx = rfc1751WordList.indexOf(word)
     const shift = (8 - ((bits + 11) % 8)) % 8
     const y = idx << shift
@@ -156,7 +158,8 @@ function getSubKey(words: string[], index: number) {
 }
 
 function bufferToArray(buf: Buffer): number[] {
-  return Array.prototype.slice.call(buf)
+  /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We know the end type */
+  return Array.prototype.slice.call(buf) as number[]
 }
 
 /**
