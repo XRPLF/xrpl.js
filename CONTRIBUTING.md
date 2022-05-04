@@ -128,12 +128,12 @@ npm uninstall abbrev -w xrpl
 ### Release
 
 1. Ensure that all tests passed on the last CI that ran on `main`.
-2. Open a PR to update the docs if docs were modified.
 ___
 NOW WE ARE READY TO PUBLISH! No new code changes happen manually now.
 ___
-3. Checkout `main` and `git pull`.
-4. Create a new branch to capture updates that take place during this process. `git checkout -b <BRANCH_NAME>`
+2. Checkout `main` and `git pull`.
+3. Create a new branch to capture updates that take place during this process. `git checkout -b <BRANCH_NAME>`
+4. Run `npm run docgen` if the docs were modified in this release to update them.
 5. Run `npm run build` to triple check the build still works
 6. Run `npx lerna version --no-git-tag-version` - This creates a draft PR and release tags for the new version.
 7. For each changed package, pick what the new version should be. Lerna will bump the versions, commit version bumps to `main`, and create a new git tag for each published package.
