@@ -3,6 +3,8 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
+# 2.2.3 (2022-05-04)
+* Fixed fromMnemonic having no way to decode mnemonics from rippled's `wallet_propose` method.
 
 ## 2.2.2 (2022-05-02)
 ### Added

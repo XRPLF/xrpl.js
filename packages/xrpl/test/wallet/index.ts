@@ -117,6 +117,32 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, privateKey)
     })
 
+    it('derives a wallet using rfc1751 mnemonic with secp256k1 key', function () {
+      const algorithm = ECDSA.secp256k1
+      const mnemonic =
+        'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
+      const expectedSeed = 'snVB4iTWYqsWZaj1hkvAy1QzqNbAg'
+      const wallet = Wallet.fromMnemonic(mnemonic, {
+        mnemonicEncoding: 'rfc1751',
+        algorithm,
+      })
+
+      assert.equal(wallet.seed, expectedSeed)
+    })
+
+    it('derives a wallet using rfc1751 mnemonic with ed25519 key', function () {
+      const algorithm = ECDSA.ed25519
+      const mnemonic =
+        'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
+      const expectedSeed = 'sEdVaw4m9W3H3ou3VnyvDwvPAP5BEz1'
+      const wallet = Wallet.fromMnemonic(mnemonic, {
+        mnemonicEncoding: 'rfc1751',
+        algorithm,
+      })
+
+      assert.equal(wallet.seed, expectedSeed)
+    })
+
     it('derives a wallet using a Regular Key Pair', function () {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
