@@ -5,6 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 ### Fixed
 * Client.disconnect() now stops the heartbeat health check as well
+* Infinite error/reconnect in browser if an exception was raised during the initial websocket connection event.
 
 ## 2.2.3 (2022-05-04)
 ### Fixed
@@ -19,7 +20,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Added missing `Owner` field to NFTokenBurn type definition
 * Changed `tfSellToken` to `tfSellNFToken` to match the 1.9.0 naming for NFTokenSellOffers
 * Add missing filter types in AccountObjectType
-* Infinite error/reconnect in browser if an exception was raised during the initial websocket connection event.
 
 ## 2.2.1 (2022-04-21)
 ### Fixed
