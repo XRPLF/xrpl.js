@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- There are lots of equivalent constructors which make sense to have here. */
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync } from 'bip39'
 import _ from 'lodash'
@@ -5,6 +6,7 @@ import {
   classicAddressToXAddress,
   isValidXAddress,
   xAddressToClassicAddress,
+  encodeSeed,
 } from 'ripple-address-codec'
 import {
   decode,
@@ -26,6 +28,8 @@ import { Transaction } from '../models/transactions'
 import { ensureClassicAddress } from '../sugar/utils'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
 
+import { rfc1751MnemonicToKey } from './rfc1751'
+
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
 
@@ -40,7 +44,7 @@ function hexFromBuffer(buffer: Buffer): string {
  *
  * @example
  * ```typescript
- * // Derive a wallet from a bip38 Mnemonic
+ * // Derive a wallet from a bip39 Mnemonic
  * const wallet = Wallet.fromMnemonic(
  *   'jewel insect retreat jump claim horse second chef west gossip bone frown exotic embark laundry'
  * )
@@ -166,38 +170,6 @@ class Wallet {
   public static fromSecret = Wallet.fromSeed
 
   /**
-   * Derives a wallet from a mnemonic.
-   *
-   * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
-   * @param opts - (Optional) Options to derive a Wallet.
-   * @param opts.derivationPath - The path to derive a keypair (publicKey/privateKey) used for mnemonic-to-seed conversion.
-   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
-   * @returns A Wallet derived from a mnemonic.
-   * @throws ValidationError if unable to derive private key from mnemonic input.
-   */
-  public static fromMnemonic(
-    mnemonic: string,
-    opts: { masterAddress?: string; derivationPath?: string } = {},
-  ): Wallet {
-    const seed = mnemonicToSeedSync(mnemonic)
-    const masterNode = fromSeed(seed)
-    const node = masterNode.derivePath(
-      opts.derivationPath ?? DEFAULT_DERIVATION_PATH,
-    )
-    if (node.privateKey === undefined) {
-      throw new ValidationError(
-        'Unable to derive privateKey from mnemonic input',
-      )
-    }
-
-    const publicKey = hexFromBuffer(node.publicKey)
-    const privateKey = hexFromBuffer(node.privateKey)
-    return new Wallet(publicKey, `00${privateKey}`, {
-      masterAddress: opts.masterAddress,
-    })
-  }
-
-  /**
    * Derives a wallet from an entropy (array of random numbers).
    *
    * @param entropy - An array of random numbers to generate a seed used to derive a wallet.
@@ -219,6 +191,83 @@ class Wallet {
     return Wallet.deriveWallet(seed, {
       algorithm,
       masterAddress: opts.masterAddress,
+    })
+  }
+
+  /**
+   * Derives a wallet from a bip39 or RFC1751 mnemonic (Defaults to bip39).
+   *
+   * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
+   * @param opts - (Optional) Options to derive a Wallet.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
+   * @param opts.derivationPath - The path to derive a keypair (publicKey/privateKey). Only used for bip39 conversions.
+   * @param opts.mnemonicEncoding - If set to 'rfc1751', this interprets the mnemonic as a rippled RFC1751 mnemonic like
+   *                          `wallet_propose` generates in rippled. Otherwise the function defaults to bip39 decoding.
+   * @param opts.algorithm - Only used if opts.mnemonicEncoding is 'rfc1751'. Allows the mnemonic to generate its
+   *                         secp256k1 seed, or its ed25519 seed. By default, it will generate the secp256k1 seed
+   *                         to match the rippled `wallet_propose` default algorithm.
+   * @returns A Wallet derived from a mnemonic.
+   * @throws ValidationError if unable to derive private key from mnemonic input.
+   */
+  public static fromMnemonic(
+    mnemonic: string,
+    opts: {
+      masterAddress?: string
+      derivationPath?: string
+      mnemonicEncoding?: 'bip39' | 'rfc1751'
+      algorithm?: ECDSA
+    } = {},
+  ): Wallet {
+    if (opts.mnemonicEncoding === 'rfc1751') {
+      return Wallet.fromRFC1751Mnemonic(mnemonic, {
+        masterAddress: opts.masterAddress,
+        algorithm: opts.algorithm,
+      })
+    }
+    // Otherwise decode using bip39's mnemonic standard
+    const seed = mnemonicToSeedSync(mnemonic)
+    const masterNode = fromSeed(seed)
+    const node = masterNode.derivePath(
+      opts.derivationPath ?? DEFAULT_DERIVATION_PATH,
+    )
+    if (node.privateKey === undefined) {
+      throw new ValidationError(
+        'Unable to derive privateKey from mnemonic input',
+      )
+    }
+
+    const publicKey = hexFromBuffer(node.publicKey)
+    const privateKey = hexFromBuffer(node.privateKey)
+    return new Wallet(publicKey, `00${privateKey}`, {
+      masterAddress: opts.masterAddress,
+    })
+  }
+
+  /**
+   * Derives a wallet from a RFC1751 mnemonic, which is how `wallet_propose` encodes mnemonics.
+   *
+   * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
+   * @param opts - (Optional) Options to derive a Wallet.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @returns A Wallet derived from a mnemonic.
+   */
+  private static fromRFC1751Mnemonic(
+    mnemonic: string,
+    opts: { masterAddress?: string; algorithm?: ECDSA },
+  ): Wallet {
+    const seed = rfc1751MnemonicToKey(mnemonic)
+    let encodeAlgorithm: 'ed25519' | 'secp256k1'
+    if (opts.algorithm === ECDSA.ed25519) {
+      encodeAlgorithm = 'ed25519'
+    } else {
+      // Defaults to secp256k1 since that's the default for `wallet_propose`
+      encodeAlgorithm = 'secp256k1'
+    }
+    const encodedSeed = encodeSeed(seed, encodeAlgorithm)
+    return Wallet.fromSeed(encodedSeed, {
+      masterAddress: opts.masterAddress,
+      algorithm: opts.algorithm,
     })
   }
 

@@ -25,6 +25,12 @@ export interface NFTokenBurn extends BaseTransaction {
    * Identifies the NFToken object to be removed by the transaction.
    */
   NFTokenID: string
+  /**
+   * Indicates which account currently owns the token if it is different than
+   * Account. Only used to burn tokens which have the lsfBurnable flag enabled
+   * and are not owned by the signing account.
+   */
+  Owner?: string
 }
 
 /**
