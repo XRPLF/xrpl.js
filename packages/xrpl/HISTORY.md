@@ -3,15 +3,17 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
+### Fixed
+* Client.disconnect() now stops the heartbeat health check as well
 
 ## 2.2.3 (2022-05-04)
 ### Fixed
-* Fixed fromMnemonic having no way to decode mnemonics from rippled's `wallet_propose` method.
+* Fixed fromMnemonic having no way to decode mnemonics from rippled's `wallet_propose` method
 
 ## 2.2.2 (2022-05-02)
 ### Added
 * Export deriveAddress from ripple-keypairs in xrpl.js
-* Deprecated BroadcastClient as it does not solve the reliabile connection problem.
+* Deprecated BroadcastClient as it does not solve the reliable connection problem
 
 ### Fixed
 * Added missing `Owner` field to NFTokenBurn type definition
@@ -20,7 +22,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## 2.2.1 (2022-04-21)
 ### Fixed
-* Fix return field of nft offer
+* Fix return field of NFT offer
 
 ## 2.2.0 (2022-04-19)
 ### Added
@@ -31,7 +33,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Fixed
 * Type of TrustSet transaction edited, specifically LimitAmount property type (fixed typescript issue)
 * Remove unnecessary console.warn for partial payments (#1783, #1784, #1896)
-* Matched 1.9.0's breaking changes to NFT fields.
+* Matched 1.9.0's breaking changes to NFT fields
 
 ## 2.1.1 (2021-12-23)
 ### Fixed
