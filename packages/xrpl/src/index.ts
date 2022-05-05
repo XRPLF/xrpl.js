@@ -11,4 +11,6 @@ export * from './errors'
 
 export { default as Wallet } from './Wallet'
 
+export { keyToRFC1751Mnemonic, rfc1751MnemonicToKey } from './Wallet/rfc1751'
+
 export * from './Wallet/signer'
