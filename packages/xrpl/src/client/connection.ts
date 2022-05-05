@@ -463,7 +463,7 @@ export class Connection extends EventEmitter {
          * Error code 1011 represents an Internal Error according to
          * https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
          */
-        const internalErrorCode = 1011
+        const internalErrorCode = 1012
         this.emit('disconnected', internalErrorCode)
       } else {
         this.emit('disconnected', code)
