@@ -452,7 +452,8 @@ export class Connection extends EventEmitter {
 
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- undefined can be passed in.
       if (code === undefined) {
-        const reasonText = reason ? reason.toString() : "undefined";
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- undefined can be passed in.
+        const reasonText = reason ? reason.toString() : 'undefined'
         // eslint-disable-next-line no-console -- The error is helpful for debugging.
         console.error(
           `Disconnected but the disconnect code was undefined (The given reason was ${reasonText}).` +
