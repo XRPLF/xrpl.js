@@ -5,6 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 ### Fixed
 * Client.disconnect() now stops the heartbeat health check as well
+* Updated dependencies which had a warning when running `npm audit`
 
 ## 2.2.3 (2022-05-04)
 ### Fixed
