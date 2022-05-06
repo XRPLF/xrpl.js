@@ -273,6 +273,7 @@ export class Connection extends EventEmitter {
    * @returns A promise containing either `undefined` or a disconnected code, that resolves when the connection is destroyed.
    */
   public async disconnect(): Promise<number | undefined> {
+    this.clearHeartbeatInterval()
     if (this.reconnectTimeoutID !== null) {
       clearTimeout(this.reconnectTimeoutID)
       this.reconnectTimeoutID = null
