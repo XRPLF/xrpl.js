@@ -6,3 +6,6 @@ updates:
     interval: monthly
     time: "15:00"
   open-pull-requests-limit: 10
+  ignore:
+    # See https://github.com/XRPLF/xrpl.js/pull/1839 for context
+    - dependency-name: bip32
