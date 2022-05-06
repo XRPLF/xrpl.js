@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "bignumber.js": "^9.0.0",
-    "bip32": "^2.0.6",
+    "bip32": "^3.0.1",
     "bip39": "^3.0.4",
     "https-proxy-agent": "^5.0.0",
     "lodash": "^4.17.4",
