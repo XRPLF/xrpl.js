@@ -436,7 +436,7 @@ export class Connection extends EventEmitter {
       this.emit('error', 'websocket', error.message, error),
     )
     // Handle a closed connection: reconnect if it was unexpected
-    this.ws.once('close', (code, reason) => {
+    this.ws.once('close', (code?: number, reason?: Buffer) => {
       if (this.ws == null) {
         throw new XrplError('onceClose: ws is null')
       }
@@ -450,9 +450,7 @@ export class Connection extends EventEmitter {
       this.ws.removeAllListeners()
       this.ws = null
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- undefined can be passed in.
       if (code === undefined) {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- undefined can be passed in.
         const reasonText = reason ? reason.toString() : 'undefined'
         // eslint-disable-next-line no-console -- The error is helpful for debugging.
         console.error(
@@ -475,7 +473,6 @@ export class Connection extends EventEmitter {
        * If this wasn't a manual disconnect, then lets reconnect ASAP.
        * Code can be undefined if there's an exception while connecting.
        */
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- undefined can be passed in.
       if (code !== INTENTIONAL_DISCONNECT_CODE && code !== undefined) {
         this.intentionalDisconnect()
       }
