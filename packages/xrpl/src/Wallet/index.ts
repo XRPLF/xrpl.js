@@ -1,4 +1,5 @@
 /* eslint-disable max-lines -- There are lots of equivalent constructors which make sense to have here. */
+import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync } from 'bip39'
 import _ from 'lodash'
@@ -32,6 +33,7 @@ import { rfc1751MnemonicToKey } from './rfc1751'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
+const TRAILING_ZEROS_REGEX = /.*\..*[0]+$/
 
 function hexFromBuffer(buffer: Buffer): string {
   return buffer.toString('hex').toUpperCase()
@@ -318,13 +320,26 @@ class Wallet {
       multisignAddress = this.classicAddress
     }
 
-    if (transaction.TxnSignature || transaction.Signers) {
+    const tx = { ...transaction }
+
+    if (tx.TxnSignature || tx.Signers) {
       throw new ValidationError(
         'txJSON must not contain "TxnSignature" or "Signers" properties',
       )
     }
 
-    const txToSignAndEncode = { ...transaction }
+    // Remove trailing insignificant zeros for non-XRP amount
+    if (tx.TransactionType === 'Payment' && tx.Amount) {
+      if (
+        typeof tx.Amount !== 'string' &&
+        TRAILING_ZEROS_REGEX.exec(tx.Amount.value) !== null
+      ) {
+        tx.Amount = { ...tx.Amount }
+        tx.Amount.value = new BigNumber(tx.Amount.value).toString()
+      }
+    }
+
+    const txToSignAndEncode = { ...tx }
 
     txToSignAndEncode.SigningPubKey = multisignAddress ? '' : this.publicKey
 
@@ -346,7 +361,7 @@ class Wallet {
       )
     }
     const serialized = encode(txToSignAndEncode)
-    this.checkTxSerialization(serialized, transaction)
+    this.checkTxSerialization(serialized, tx)
     return {
       tx_blob: serialized,
       hash: hashSignedTx(serialized),
