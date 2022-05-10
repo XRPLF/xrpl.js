@@ -148,7 +148,7 @@ async function waitForFinalTransactionOutcome(
     .catch(async (error) => {
       // error is of an unknown type and hence we assert type to extract the value we need.
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-member-access -- ^
-      const message = error.data.error as string
+      const message = error?.data?.error as string
       if (message === 'txnNotFound') {
         return waitForFinalTransactionOutcome(
           client,
