@@ -421,6 +421,7 @@ export class Connection extends EventEmitter {
    * @returns A promise that resolves to void when the connection is fully established.
    * @throws Error if the websocket initialized is somehow null.
    */
+  // eslint-disable-next-line max-lines-per-function -- Many error code conditionals to check.
   private async onceOpen(connectionTimeoutID: NodeJS.Timeout): Promise<void> {
     if (this.ws == null) {
       throw new XrplError('onceOpen: ws is null')
@@ -435,7 +436,7 @@ export class Connection extends EventEmitter {
       this.emit('error', 'websocket', error.message, error),
     )
     // Handle a closed connection: reconnect if it was unexpected
-    this.ws.once('close', (code, reason) => {
+    this.ws.once('close', (code?: number, reason?: Buffer) => {
       if (this.ws == null) {
         throw new XrplError('onceClose: ws is null')
       }
@@ -448,9 +449,31 @@ export class Connection extends EventEmitter {
       )
       this.ws.removeAllListeners()
       this.ws = null
-      this.emit('disconnected', code)
-      // If this wasn't a manual disconnect, then lets reconnect ASAP.
-      if (code !== INTENTIONAL_DISCONNECT_CODE) {
+
+      if (code === undefined) {
+        const reasonText = reason ? reason.toString() : 'undefined'
+        // eslint-disable-next-line no-console -- The error is helpful for debugging.
+        console.error(
+          `Disconnected but the disconnect code was undefined (The given reason was ${reasonText}).` +
+            `This could be caused by an exception being thrown during a 'connect' callback. ` +
+            `Disconnecting with code 1011 to indicate an internal error has occurred.`,
+        )
+
+        /*
+         * Error code 1011 represents an Internal Error according to
+         * https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
+         */
+        const internalErrorCode = 1011
+        this.emit('disconnected', internalErrorCode)
+      } else {
+        this.emit('disconnected', code)
+      }
+
+      /*
+       * If this wasn't a manual disconnect, then lets reconnect ASAP.
+       * Code can be undefined if there's an exception while connecting.
+       */
+      if (code !== INTENTIONAL_DISCONNECT_CODE && code !== undefined) {
         this.intentionalDisconnect()
       }
     })
