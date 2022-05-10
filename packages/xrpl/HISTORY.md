@@ -5,6 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 ### Fixed
 * Client.disconnect() now stops the heartbeat health check as well
+* Errors during reliable submission with no error message now properly show the preliminary result instead of a type error
 
 ## 2.2.3 (2022-05-04)
 ### Fixed
