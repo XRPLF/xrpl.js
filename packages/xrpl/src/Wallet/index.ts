@@ -33,7 +33,7 @@ import { rfc1751MnemonicToKey } from './rfc1751'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
-const TRAILING_ZEROS_REGEX = /.*\..*[0]+$/
+const TRAILING_ZEROS_REGEX = /.*\..*[0]+$/u
 
 function hexFromBuffer(buffer: Buffer): string {
   return buffer.toString('hex').toUpperCase()
@@ -304,7 +304,7 @@ class Wallet {
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    */
-  // eslint-disable-next-line max-lines-per-function -- introduced more checks to support both string and boolean inputs.
+  // eslint-disable-next-line complexity, max-lines-per-function -- added more checks to support both string & boolean inputs.
   public sign(
     this: Wallet,
     transaction: Transaction,
