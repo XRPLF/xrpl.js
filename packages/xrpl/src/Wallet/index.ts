@@ -304,7 +304,7 @@ class Wallet {
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    */
-  // eslint-disable-next-line complexity, max-lines-per-function -- added more checks to support both string & boolean inputs.
+  // eslint-disable-next-line complexity, max-lines-per-function -- added more checks to support both string and boolean inputs.
   public sign(
     this: Wallet,
     transaction: Transaction,
