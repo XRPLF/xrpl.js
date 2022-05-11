@@ -33,7 +33,7 @@ import { rfc1751MnemonicToKey } from './rfc1751'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
-const TRAILING_ZEROS_REGEX = /.*\..*[0]+$/u
+const TRAILING_ZEROS_REGEX = /[0-9]*\.[0-9]*[0]+$/u
 
 function hexFromBuffer(buffer: Buffer): string {
   return buffer.toString('hex').toUpperCase()
@@ -329,14 +329,13 @@ class Wallet {
     }
 
     // Remove trailing insignificant zeros for non-XRP amount
-    if (tx.TransactionType === 'Payment' && tx.Amount) {
-      if (
-        typeof tx.Amount !== 'string' &&
-        TRAILING_ZEROS_REGEX.exec(tx.Amount.value) !== null
-      ) {
-        tx.Amount = { ...tx.Amount }
-        tx.Amount.value = new BigNumber(tx.Amount.value).toString()
-      }
+    if (
+      tx.TransactionType === 'Payment' &&
+      typeof tx.Amount !== 'string' &&
+      TRAILING_ZEROS_REGEX.exec(tx.Amount.value) !== null
+    ) {
+      tx.Amount = { ...tx.Amount }
+      tx.Amount.value = new BigNumber(tx.Amount.value).toString()
     }
 
     const txToSignAndEncode = { ...tx }
