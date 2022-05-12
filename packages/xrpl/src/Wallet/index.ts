@@ -303,7 +303,7 @@ class Wallet {
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    */
-  // eslint-disable-next-line complexity, max-lines-per-function -- added more checks to support both string and boolean inputs.
+  // eslint-disable-next-line max-lines-per-function -- introduced more checks to support both string and boolean inputs.
   public sign(
     this: Wallet,
     transaction: Transaction,
@@ -384,17 +384,22 @@ class Wallet {
 
   /**
    * Remove trailing insignificant zeros for non-XRP Payment amount.
+   * This resolves the serialization mismatch bug when encoding/decoding a non-XRP Payment transaction
+   * with an amount that contains trailing insignificant zeros. For example, 123.4000
    *
    * @param tx - The transaction prior to signing.
    */
+  // eslint-disable-next-line class-methods-use-this -- Helper for organization purposes
   private removeTrailingZeros(tx: Transaction): void {
     if (
       tx.TransactionType === 'Payment' &&
       typeof tx.Amount !== 'string' &&
       tx.Amount.value.includes('.') &&
-      tx.Amount.value.charAt(tx.Amount.value.length - 1) === '0'
+      tx.Amount.value.endsWith('0')
     ) {
+      // eslint-disable-next-line no-param-reassign -- Required to update Transaction.Amount.value
       tx.Amount = { ...tx.Amount }
+      // eslint-disable-next-line no-param-reassign -- Required to update Transaction.Amount.value
       tx.Amount.value = new BigNumber(tx.Amount.value).toString()
     }
   }
