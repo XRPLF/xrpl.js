@@ -33,7 +33,6 @@ import { rfc1751MnemonicToKey } from './rfc1751'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
-const TRAILING_ZEROS_REGEX = /[0-9]*\.[0-9]*[0]$/u
 
 function hexFromBuffer(buffer: Buffer): string {
   return buffer.toString('hex').toUpperCase()
@@ -328,15 +327,7 @@ class Wallet {
       )
     }
 
-    // Remove trailing insignificant zeros for non-XRP amount
-    if (
-      tx.TransactionType === 'Payment' &&
-      typeof tx.Amount !== 'string' &&
-      TRAILING_ZEROS_REGEX.exec(tx.Amount.value) !== null
-    ) {
-      tx.Amount = { ...tx.Amount }
-      tx.Amount.value = new BigNumber(tx.Amount.value).toString()
-    }
+    this.removeTrailingZeros(tx)
 
     const txToSignAndEncode = { ...tx }
 
@@ -389,6 +380,23 @@ class Wallet {
    */
   public getXAddress(tag: number | false = false, isTestnet = false): string {
     return classicAddressToXAddress(this.classicAddress, tag, isTestnet)
+  }
+
+  /**
+   * Remove trailing insignificant zeros for non-XRP Payment amount.
+   *
+   * @param tx - The transaction prior to signing.
+   */
+  private removeTrailingZeros(tx: Transaction): void {
+    if (
+      tx.TransactionType === 'Payment' &&
+      typeof tx.Amount !== 'string' &&
+      tx.Amount.value.includes('.') &&
+      tx.Amount.value.charAt(tx.Amount.value.length - 1) === '0'
+    ) {
+      tx.Amount = { ...tx.Amount }
+      tx.Amount.value = new BigNumber(tx.Amount.value).toString()
+    }
   }
 
   /**
