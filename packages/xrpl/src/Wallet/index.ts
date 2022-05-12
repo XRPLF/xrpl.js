@@ -385,8 +385,8 @@ class Wallet {
   /**
    * Remove trailing insignificant zeros for non-XRP Payment amount.
    * This resolves the serialization mismatch bug when encoding/decoding a non-XRP Payment transaction
-   * with an amount that contains trailing insignificant zeros; '123.4000' would serialize to '123.4'
-   * and cause a mismatch.
+   * with an amount that contains trailing insignificant zeros; for example, '123.4000' would serialize
+   * to '123.4' and cause a mismatch.
    *
    * @param tx - The transaction prior to signing.
    */
