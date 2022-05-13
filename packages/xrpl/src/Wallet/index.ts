@@ -486,7 +486,6 @@ function computeSignature(
  *
  * @param tx - The transaction prior to signing.
  */
-// eslint-disable-next-line class-methods-use-this -- Helper for organization purposes
 function removeTrailingZeros(tx: Transaction): void {
   if (
     tx.TransactionType === 'Payment' &&
