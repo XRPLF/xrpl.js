@@ -327,7 +327,7 @@ class Wallet {
       )
     }
 
-    this.removeTrailingZeros(tx)
+    removeTrailingZeros(tx)
 
     const txToSignAndEncode = { ...tx }
 
@@ -380,29 +380,6 @@ class Wallet {
    */
   public getXAddress(tag: number | false = false, isTestnet = false): string {
     return classicAddressToXAddress(this.classicAddress, tag, isTestnet)
-  }
-
-  /**
-   * Remove trailing insignificant zeros for non-XRP Payment amount.
-   * This resolves the serialization mismatch bug when encoding/decoding a non-XRP Payment transaction
-   * with an amount that contains trailing insignificant zeros; for example, '123.4000' would serialize
-   * to '123.4' and cause a mismatch.
-   *
-   * @param tx - The transaction prior to signing.
-   */
-  // eslint-disable-next-line class-methods-use-this -- Helper for organization purposes
-  private removeTrailingZeros(tx: Transaction): void {
-    if (
-      tx.TransactionType === 'Payment' &&
-      typeof tx.Amount !== 'string' &&
-      tx.Amount.value.includes('.') &&
-      tx.Amount.value.endsWith('0')
-    ) {
-      // eslint-disable-next-line no-param-reassign -- Required to update Transaction.Amount.value
-      tx.Amount = { ...tx.Amount }
-      // eslint-disable-next-line no-param-reassign -- Required to update Transaction.Amount.value
-      tx.Amount.value = new BigNumber(tx.Amount.value).toString()
-    }
   }
 
   /**
@@ -499,6 +476,29 @@ function computeSignature(
     return sign(encodeForMultisigning(tx, classicAddress), privateKey)
   }
   return sign(encodeForSigning(tx), privateKey)
+}
+
+/**
+ * Remove trailing insignificant zeros for non-XRP Payment amount.
+ * This resolves the serialization mismatch bug when encoding/decoding a non-XRP Payment transaction
+ * with an amount that contains trailing insignificant zeros; for example, '123.4000' would serialize
+ * to '123.4' and cause a mismatch.
+ *
+ * @param tx - The transaction prior to signing.
+ */
+// eslint-disable-next-line class-methods-use-this -- Helper for organization purposes
+function removeTrailingZeros(tx: Transaction): void {
+  if (
+    tx.TransactionType === 'Payment' &&
+    typeof tx.Amount !== 'string' &&
+    tx.Amount.value.includes('.') &&
+    tx.Amount.value.endsWith('0')
+  ) {
+    // eslint-disable-next-line no-param-reassign -- Required to update Transaction.Amount.value
+    tx.Amount = { ...tx.Amount }
+    // eslint-disable-next-line no-param-reassign -- Required to update Transaction.Amount.value
+    tx.Amount.value = new BigNumber(tx.Amount.value).toString()
+  }
 }
 
 export default Wallet
