@@ -589,6 +589,56 @@ describe('Wallet', function () {
         wallet.sign(payment)
       }, /^1.1234567 is an illegal amount/u)
     })
+
+    it('sign handles non-XRP amount with a trailing zero', async function () {
+      const payment: Transaction = {
+        TransactionType: 'Payment',
+        Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+        Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+        Amount: {
+          currency: 'FOO',
+          issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+          value: '123.40',
+        },
+        Flags: 2147483648,
+        Sequence: 23,
+        LastLedgerSequence: 8819954,
+        Fee: '12',
+      }
+      const result = wallet.sign(payment)
+      const expectedResult = {
+        tx_blob:
+          '12000022800000002400000017201B008694F261D504625103A72000000000000000000000000000464F4F00000000002E099DD75FDD96EB4A603037844F964832FED86B68400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F5447446304402206EBFC9B8061C3F82D521506CE62B6BBA99995B2175BFE0E1BC516775932AECEB0220172B9CE9C0EFB3F4870E19B79B4E817DD376E5785F034AB792708F92282C65F781145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
+        hash: '6235E5A3CC14DB97F75CAE2A4B5AA9B4134B7AD48D7DD8C15473D81631435FE4',
+      }
+
+      assert.deepEqual(result, expectedResult)
+    })
+
+    it('sign handles non-XRP amount with trailing zeros', async function () {
+      const payment: Transaction = {
+        TransactionType: 'Payment',
+        Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+        Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+        Amount: {
+          currency: 'FOO',
+          issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+          value: '123.000',
+        },
+        Flags: 2147483648,
+        Sequence: 23,
+        LastLedgerSequence: 8819954,
+        Fee: '12',
+      }
+      const result = wallet.sign(payment)
+      const expectedResult = {
+        tx_blob:
+          '12000022800000002400000017201B008694F261D5045EADB112E000000000000000000000000000464F4F00000000002E099DD75FDD96EB4A603037844F964832FED86B68400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F54474473045022100C0C77D7D6D6453F0C5EDFF61DE60B5D3D6952C8F30D51543560936D72FA103B00220258CBFCEAC4D2DB5CC2B9417EB46225943E9F4B92944B303ADB810002530BFFB81145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
+        hash: 'FADCD5EE33C01103AA129FCF0923637D543DB56250CD57A1A308EC386A211CBB',
+      }
+
+      assert.deepEqual(result, expectedResult)
+    })
   })
 
   describe('verifyTransaction', function () {

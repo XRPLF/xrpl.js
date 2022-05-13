@@ -1,4 +1,5 @@
 /* eslint-disable max-lines -- There are lots of equivalent constructors which make sense to have here. */
+import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync } from 'bip39'
 import _ from 'lodash'
@@ -318,13 +319,17 @@ class Wallet {
       multisignAddress = this.classicAddress
     }
 
-    if (transaction.TxnSignature || transaction.Signers) {
+    const tx = { ...transaction }
+
+    if (tx.TxnSignature || tx.Signers) {
       throw new ValidationError(
         'txJSON must not contain "TxnSignature" or "Signers" properties',
       )
     }
 
-    const txToSignAndEncode = { ...transaction }
+    removeTrailingZeros(tx)
+
+    const txToSignAndEncode = { ...tx }
 
     txToSignAndEncode.SigningPubKey = multisignAddress ? '' : this.publicKey
 
@@ -346,7 +351,7 @@ class Wallet {
       )
     }
     const serialized = encode(txToSignAndEncode)
-    this.checkTxSerialization(serialized, transaction)
+    this.checkTxSerialization(serialized, tx)
     return {
       tx_blob: serialized,
       hash: hashSignedTx(serialized),
@@ -471,6 +476,28 @@ function computeSignature(
     return sign(encodeForMultisigning(tx, classicAddress), privateKey)
   }
   return sign(encodeForSigning(tx), privateKey)
+}
+
+/**
+ * Remove trailing insignificant zeros for non-XRP Payment amount.
+ * This resolves the serialization mismatch bug when encoding/decoding a non-XRP Payment transaction
+ * with an amount that contains trailing insignificant zeros; for example, '123.4000' would serialize
+ * to '123.4' and cause a mismatch.
+ *
+ * @param tx - The transaction prior to signing.
+ */
+function removeTrailingZeros(tx: Transaction): void {
+  if (
+    tx.TransactionType === 'Payment' &&
+    typeof tx.Amount !== 'string' &&
+    tx.Amount.value.includes('.') &&
+    tx.Amount.value.endsWith('0')
+  ) {
+    // eslint-disable-next-line no-param-reassign -- Required to update Transaction.Amount.value
+    tx.Amount = { ...tx.Amount }
+    // eslint-disable-next-line no-param-reassign -- Required to update Transaction.Amount.value
+    tx.Amount.value = new BigNumber(tx.Amount.value).toString()
+  }
 }
 
 export default Wallet
