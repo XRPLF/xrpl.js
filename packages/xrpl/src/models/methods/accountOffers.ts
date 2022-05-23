@@ -38,7 +38,7 @@ export interface AccountOffersRequest extends BaseRequest {
   strict?: boolean
 }
 
-interface AccountOffer {
+export interface AccountOffer {
   /** Options set for this offer entry as bit-flags. */
   flags: number
   /** Sequence number of the transaction that created this entry. */

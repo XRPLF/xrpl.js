@@ -10,7 +10,11 @@ import { AccountInfoRequest, AccountInfoResponse } from './accountInfo'
 import { AccountLinesRequest, AccountLinesResponse } from './accountLines'
 import { AccountNFTsRequest, AccountNFTsResponse } from './accountNFTs'
 import { AccountObjectsRequest, AccountObjectsResponse } from './accountObjects'
-import { AccountOffersRequest, AccountOffersResponse } from './accountOffers'
+import {
+  AccountOffer,
+  AccountOffersRequest,
+  AccountOffersResponse,
+} from './accountOffers'
 import { AccountTxRequest, AccountTxResponse } from './accountTx'
 import { ErrorResponse } from './baseMethod'
 import { BookOffersRequest, BookOffer, BookOffersResponse } from './bookOffers'
@@ -186,6 +190,7 @@ export {
   AccountNFTsResponse,
   AccountObjectsRequest,
   AccountObjectsResponse,
+  AccountOffer,
   AccountOffersRequest,
   AccountOffersResponse,
   AccountTxRequest,
