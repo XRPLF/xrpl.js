@@ -29,7 +29,8 @@ const INTERVAL_SECONDS = 1
 const MAX_ATTEMPTS = 20
 
 /**
- * Generates a random wallet with some amount of XRP (usually 1000 XRP).
+ * Only usable on test networks.
+ * Fills this wallet with some amount of XRP (usually 1000 XRP).
  *
  * @example
  * ```typescript
@@ -41,14 +42,14 @@ const MAX_ATTEMPTS = 20
  * @param this - Client.
  * @param wallet - An existing XRPL Wallet to fund. If undefined or null, a new Wallet will be created.
  * @param options - See below.
- * @param options.faucetHost - A custom host for a faucet server. On devnet and
- * testnet, `fundWallet` will attempt to determine the correct server
- * automatically. In other environments, or if you would like to customize the
- * faucet host in devnet or testnet, you should provide the host using this
- * option.
- * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP,
+ * @param options.faucetHost - A custom host for a faucet server. `fundWallet` will automatically
+ * determine the correct server for devnet and testnet as long as `faucetHost` is null or undefined.
+ * In other environments, you should provide the host using this option.
+ * Here's an example of how to format `faucetHost`: `faucet.devnet.rippletest.net`
+ * @returns A Wallet on a test network that contains some amount of XRP,
  * and that wallet's balance in XRP.
- * @throws When either Client isn't connected or unable to fund wallet address.
+ * @throws When the Client isn't connected, when it is unable to fund the wallet address,
+ * or if `faucetHost` is incorrectly formatted.
  */
 async function fundWallet(
   this: Client,
@@ -88,6 +89,17 @@ async function fundWallet(
     /* startingBalance remains '0' */
   }
 
+  if (
+    options?.faucetHost != null &&
+    (options.faucetHost.startsWith('ws://') ||
+      options.faucetHost.startsWith('wss://') ||
+      options.faucetHost.startsWith('http://') ||
+      options.faucetHost.startsWith('https://'))
+  ) {
+    throw new XRPLFaucetError(
+      `Invalid format for faucetHost. Should not include ws(s)/http(s) prefix. Received '${options.faucetHost}'.`,
+    )
+  }
   // Options to pass to https.request
   const httpOptions = getHTTPOptions(this, postBody, options?.faucetHost)
 

@@ -69,6 +69,47 @@ describe('fundWallet', function () {
     await api.disconnect()
   })
 
+  it('can fund an existing Wallet using the Wallet alias', async function () {
+    const api = new Client('wss://s.devnet.rippletest.net:51233')
+
+    await api.connect()
+    const { wallet, balance } = await api.fundWallet()
+
+    assert.notEqual(wallet, undefined)
+    assert(isValidClassicAddress(wallet.classicAddress))
+    assert(isValidXAddress(wallet.getXAddress()))
+
+    const info = await api.request({
+      command: 'account_info',
+      account: wallet.classicAddress,
+    })
+
+    assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
+
+    const { balance: newBalance } = await wallet.fundWallet(api)
+
+    const afterSent = await api.request({
+      command: 'account_info',
+      account: wallet.classicAddress,
+    })
+    assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
+
+    await api.disconnect()
+  })
+
+  it('throws when given an incorrectly formatted faucetHost', async function () {
+    const api = new Client('ws://xls20-sandbox.rippletest.net:51233')
+
+    await api.connect()
+    assert.throws(async () =>
+      api.fundWallet(null, {
+        faucetHost: 'https://faucet-nft.ripple.com/',
+      }),
+    )
+
+    await api.disconnect()
+  })
+
   it('can generate and fund wallets using a custom host', async function () {
     const api = new Client('ws://xls20-sandbox.rippletest.net:51233')
 

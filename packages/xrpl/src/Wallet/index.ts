@@ -23,6 +23,7 @@ import {
   sign,
 } from 'ripple-keypairs'
 
+import { Client } from '../client'
 import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
 import { Transaction } from '../models/transactions'
@@ -380,6 +381,34 @@ class Wallet {
    */
   public getXAddress(tag: number | false = false, isTestnet = false): string {
     return classicAddressToXAddress(this.classicAddress, tag, isTestnet)
+  }
+
+  /**
+   * Only usable on test networks.
+   * Funds an existing wallet using a faucet.
+   * This is an alias for Client.fundWallet()
+   *
+   * @param this - An existing XRPL Wallet to fund.
+   * @param client - An XRPL client.
+   * @param options - See below.
+   * @param options.faucetHost - A custom host for a faucet server. `fundWallet` will automatically
+   * determine the correct server for devnet and testnet as long as `faucetHost` is null or undefined.
+   * In other environments, you should provide the host using this option.
+   * Here's an example of how to format `faucetHost`: `faucet.devnet.rippletest.net`
+   * @returns This wallet and that its new balance in XRP.
+   * @throws When either Client isn't connected or unable to fund wallet address.
+   */
+  public async fundWallet(
+    this: Wallet,
+    client: Client,
+    options?: {
+      faucetHost?: string
+    },
+  ): Promise<{
+    wallet: Wallet
+    balance: number
+  }> {
+    return client.fundWallet(this, options)
   }
 
   /**
