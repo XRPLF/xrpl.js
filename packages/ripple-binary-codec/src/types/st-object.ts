@@ -130,11 +130,9 @@ class STObject extends SerializedType {
 
       if (associatedValue == undefined) {
         throw new TypeError(
-          'Unable to interpret "' +
-            field.name +
-            ': ' +
-            xAddressDecoded[field.name] +
-            '". There may be a typo in your transaction.',
+          `Unable to interpret "${field.name}: ${
+            xAddressDecoded[field.name]
+          }".`,
         )
       }
 
