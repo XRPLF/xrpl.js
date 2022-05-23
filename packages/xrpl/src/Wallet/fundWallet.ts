@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Relatively simple logic, but verbose */
 import { IncomingMessage } from 'http'
 import { request as httpsRequest, RequestOptions } from 'https'
 
@@ -52,6 +53,7 @@ const MAX_ATTEMPTS = 20
  * @throws When the Client isn't connected, when it is unable to fund the wallet address,
  * or if `faucetHost` is incorrectly formatted.
  */
+// eslint-disable-next-line max-lines-per-function -- Error checking makes for a better user experience.
 async function fundWallet(
   this: Client,
   wallet?: Wallet | null,

@@ -23,7 +23,7 @@ import {
   sign,
 } from 'ripple-keypairs'
 
-import { Client } from '../client'
+import type { Client } from '../client'
 import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
 import { Transaction } from '../models/transactions'
