@@ -392,7 +392,7 @@ class Wallet {
    * @throws A ValidationError if the transaction does not have a TxnSignature/Signers property, or if
    * the serialized Transaction desn't match the original transaction.
    */
-  // eslint-disable-next-line class-methods-use-this -- Helper for organization purposes
+  // eslint-disable-next-line class-methods-use-this, max-lines-per-function -- Helper for organization purposes
   private checkTxSerialization(serialized: string, tx: Transaction): void {
     // Decode the serialized transaction:
     const decoded = decode(serialized)
@@ -440,7 +440,12 @@ class Wallet {
 
       return memo
     })
-    if (!_.isEqual(decoded, tx)) {
+
+    if (txCopy.TransactionType === 'NFTokenMint' && txCopy.URI) {
+      txCopy.URI = txCopy.URI.toUpperCase()
+    }
+
+    if (!_.isEqual(decoded, txCopy)) {
       const data = {
         decoded,
         tx,

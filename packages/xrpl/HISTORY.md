@@ -9,6 +9,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Infinite error/reconnect in browser if an exception was raised during the initial websocket connection event.
 * Errors during reliable submission with no error message now properly show the preliminary result instead of a type error
 * Fixed serialize/deserialize verification bug in `Wallet.sign()` when signing a non-XRP Payment with an amount that contains trailing insignificant zeros
+* Allow lowercase hex values for `NFTokenMint.URI`
 
 ## 2.2.3 (2022-05-04)
 ### Fixed
