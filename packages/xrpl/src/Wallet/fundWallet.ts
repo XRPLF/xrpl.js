@@ -45,7 +45,8 @@ const MAX_ATTEMPTS = 20
  * @param options.faucetHost - A custom host for a faucet server. `fundWallet` will automatically
  * determine the correct server for devnet and testnet as long as `faucetHost` is null or undefined.
  * In other environments, you should provide the host using this option.
- * Here's an example of how to format `faucetHost`: `faucet.devnet.rippletest.net`
+ * Ex. Passing in faucetHost = `faucet.devnet.rippletest.net` will send a request
+ * to https://faucet.devnet.rippletest.net/accounts:443
  * @returns A Wallet on a test network that contains some amount of XRP,
  * and that wallet's balance in XRP.
  * @throws When the Client isn't connected, when it is unable to fund the wallet address,

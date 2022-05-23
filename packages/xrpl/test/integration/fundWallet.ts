@@ -6,6 +6,7 @@ import {
   isValidClassicAddress,
   isValidXAddress,
   dropsToXrp,
+  XRPLFaucetError,
 } from 'xrpl-local'
 // how long before each test case times out
 const TIMEOUT = 60000
@@ -96,17 +97,23 @@ describe('fundWallet', function () {
 
     await api.disconnect()
   })
-
   it('throws when given an incorrectly formatted faucetHost', async function () {
     const api = new Client('ws://xls20-sandbox.rippletest.net:51233')
 
+    let errorHappened = false
     await api.connect()
-    assert.throws(async () =>
-      api.fundWallet(null, {
-        faucetHost: 'https://faucet-nft.ripple.com/',
-      }),
-    )
 
+    // Using try/catch instead of assert.throws because 'await' has to be top-level
+    try {
+      await api.fundWallet(null, {
+        faucetHost: 'https://faucet-nft.ripple.com/',
+      })
+    } catch (error) {
+      assert.ok(error instanceof XRPLFaucetError)
+      errorHappened = true
+    }
+
+    assert.ok(errorHappened)
     await api.disconnect()
   })
 
