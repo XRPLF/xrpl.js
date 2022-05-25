@@ -29,6 +29,12 @@ const ledgerSpaces = {
   paychan: 'x',
   check: 'C',
   depositPreauth: 'p',
+  negativeUnl: 'N',
+  nftokenOffer: 'q',
+  nftokenBuyOffers: 'h',
+  nftokenSellOffers: 'i',
+  sidechain: 'H',
+  xchainSeq: 'Q',
 }
 
 export default ledgerSpaces
