@@ -2050,7 +2050,7 @@
     "NFTokenCancelOffer": 28,
     "NFTokenAcceptOffer": 29,
     "XChainDoorCreate": 30,
-    "XChainSeqnumCreate": 31,
+    "XChainSeqNumCreate": 31,
     "XChainTransfer": 32,
     "XChainClaim": 33,
     "XChainAccountCreate": 34,

@@ -106,6 +106,8 @@ let json_omitted = {
 
 const NegativeUNL = require('./fixtures/negative-unl.json')
 const XChainDoorCreate = require('./fixtures/xchain-door-create.json')
+const XChainSeqNumCreate = require('./fixtures/xchain-seqnum-create.json')
+const XChainTransfer = require('./fixtures/xchain-transfer.json')
 
 function bytesListTest() {
   const list = new BytesList()
@@ -236,6 +238,18 @@ function sidechainTest() {
   })
   test('can deserialize XChainDoorCreate', () => {
     expect(decode(XChainDoorCreate.binary)).toEqual(XChainDoorCreate.tx)
+  })
+  test('can serialize XChainSeqNumCreate', () => {
+    expect(encode(XChainSeqNumCreate.tx)).toEqual(XChainSeqNumCreate.binary)
+  })
+  test('can deserialize XChainSeqNumCreate', () => {
+    expect(decode(XChainSeqNumCreate.binary)).toEqual(XChainSeqNumCreate.tx)
+  })
+  test('can serialize XChainTransfer', () => {
+    expect(encode(XChainTransfer.tx)).toEqual(XChainTransfer.binary)
+  })
+  test('can deserialize XChainTransfer', () => {
+    expect(decode(XChainTransfer.binary)).toEqual(XChainTransfer.tx)
   })
 }
 

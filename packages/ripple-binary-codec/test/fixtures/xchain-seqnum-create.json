@@ -1,0 +1,15 @@
+{
+  "binary": "12001F22800000008114621D345F8F094A085132431C69C89EC05D212CC20118CC86E58C9B58D4CF71CB8C1B41F21BB290CE13D40000000000000000000000000000000000000000C48CAD01682D7A86296EF14523074D4852C02EA90000000000000000000000000000000000000000",
+  "tx": {
+    "Account" : "r9A8UyNpW3X46FUc6P7JZqgn6WgAPjBwPg",
+    "Flags" : 2147483648,
+    "Sidechain" :
+    {
+      "dst_chain_door" : "rKeSSvHvaMZJp9ykaxutVwkhZgWuWMLnQt",
+      "dst_chain_issue" : "XRP",
+      "src_chain_door" : "rJvExveLEL4jNDEeLKCVdxaSCN9cEBnEQC",
+      "src_chain_issue" : "XRP"
+    },
+    "TransactionType" : "XChainSeqNumCreate"
+  }
+}
