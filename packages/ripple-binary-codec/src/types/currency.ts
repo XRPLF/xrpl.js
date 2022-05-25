@@ -2,7 +2,7 @@ import { Hash160 } from './hash-160'
 import { Buffer } from 'buffer/'
 
 const XRP_HEX_REGEX = /^0{40}$/
-const ISO_REGEX = /^[A-Z0-9]{3}$/
+const ISO_REGEX = /^[A-Z0-9a-z?!@#$%^&*(){}[\]|]{3}$/
 const HEX_REGEX = /^[A-F0-9]{40}$/
 // eslint-disable-next-line no-control-regex
 const STANDARD_FORMAT_HEX_REGEX = /^0{24}[\x00-\x7F]{6}0{10}$/

@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Added a clearer error message for trying to encode an invalid transaction. (Ex. With an incorrect TransactionType)
+- Fixed standard currency codes with lowercase and allowed symbols not decoding into standard codes.
 
 ## 1.4.0 (2022-04-18)
 - Updated NFT definitions to match 1.9.0's breaking naming changes
