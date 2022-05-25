@@ -1,0 +1,57 @@
+{
+  "binary": "12001E22800000002023000000048114C48CAD01682D7A86296EF14523074D4852C02EA9F4EB130001811474A41942D90FDD8E4E8BB25A7E91843CFEDB9A5DE1EB1300018114C287E75E44FEB7AF3537173BB3A866A652C91502E1EB1300018114F5B6BA5BA9F91592A4B607E0397E47A298B95EA2E1EB13000181145720A5ABFA7D844BD615F4E62FA7C963E85B0C7DE1EB1300018114B7521887260F712472A8E5775EE6234042641C0CE1F10118CC86E58C9B58D4CF71CB8C1B41F21BB290CE13D4000000000000000000000000555344000000000027B6C49755570AD538DDD42EE417A4708F17EF76C48CAD01682D7A86296EF14523074D4852C02EA90000000000000000000000000000000000000000",
+  "tx": {
+    "Account" : "rJvExveLEL4jNDEeLKCVdxaSCN9cEBnEQC",
+    "Flags" : 2147483648,
+    "Sidechain" :
+    {
+      "dst_chain_door" : "rKeSSvHvaMZJp9ykaxutVwkhZgWuWMLnQt",
+      "dst_chain_issue" : {
+        "currency" : "USD",
+        "issuer" : "rhczJR49YsdxwtYTPvxeSc1Jjr7R748cHv"
+      },
+      "src_chain_door" : "rJvExveLEL4jNDEeLKCVdxaSCN9cEBnEQC",
+      "src_chain_issue" : "XRP"
+    },
+    "SignerEntries" :
+    [
+      {
+        "SignerEntry" :
+        {
+          "Account" : "rBdjyperRHKTzdxnZhyN94MpjN2aknRX8G",
+          "SignerWeight" : 1
+        }
+      },
+      {
+        "SignerEntry" :
+        {
+          "Account" : "rJj2ty2MDGu7dtm1bvZMA5KuhzreNL2HHo",
+          "SignerWeight" : 1
+        }
+      },
+      {
+        "SignerEntry" :
+        {
+          "Account" : "rPQDTwG7tWYNzqjytf8YCYX6hZemGG9TTh",
+          "SignerWeight" : 1
+        }
+      },
+      {
+        "SignerEntry" :
+        {
+          "Account" : "r3AguhaYj2enNDz37mzJNskxcQKb3sAYjE",
+          "SignerWeight" : 1
+        }
+      },
+      {
+        "SignerEntry" :
+        {
+          "Account" : "rH5KrD1ocKBWq3Mf7WGy8tTtEi84M1uwGm",
+          "SignerWeight" : 1
+        }
+      }
+    ],
+    "SignerQuorum" : 4,
+    "TransactionType" : "XChainDoorCreate"
+  }
+}

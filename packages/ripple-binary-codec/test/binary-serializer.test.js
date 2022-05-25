@@ -105,6 +105,7 @@ let json_omitted = {
 }
 
 const NegativeUNL = require('./fixtures/negative-unl.json')
+const XChainDoorCreate = require('./fixtures/xchain-door-create.json')
 
 function bytesListTest() {
   const list = new BytesList()
@@ -220,12 +221,21 @@ function PaymentChannelTest() {
   })
 }
 
-function NegativeUNLTest() {
+function negativeUNLTest() {
   test('can serialize NegativeUNL', () => {
     expect(encode(NegativeUNL.tx)).toEqual(NegativeUNL.binary)
   })
   test('can deserialize NegativeUNL', () => {
     expect(decode(NegativeUNL.binary)).toEqual(NegativeUNL.tx)
+  })
+}
+
+function sidechainTest() {
+  test('can serialize XChainDoorCreate', () => {
+    expect(encode(XChainDoorCreate.tx)).toEqual(XChainDoorCreate.binary)
+  })
+  test('can deserialize XChainDoorCreate', () => {
+    expect(decode(XChainDoorCreate.binary)).toEqual(XChainDoorCreate.tx)
   })
 }
 
@@ -282,7 +292,8 @@ describe('Binary Serialization', function () {
   describe('SignerListSet', SignerListSetTest)
   describe('Escrow', EscrowTest)
   describe('PaymentChannel', PaymentChannelTest)
-  describe('NegativeUNLTest', NegativeUNLTest)
+  describe('NegativeUNLTest', negativeUNLTest)
+  describe('SidechainTest', sidechainTest)
   describe('OmitUndefined', omitUndefinedTest)
   describe('TicketTest', ticketTest)
   describe('NFToken', nfTokenTest)
