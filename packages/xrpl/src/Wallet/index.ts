@@ -24,9 +24,11 @@ import {
 } from 'ripple-keypairs'
 
 import ECDSA from '../ECDSA'
-import { ValidationError } from '../errors'
+import { ValidationError, XrplError } from '../errors'
+import { IssuedCurrencyAmount } from '../models/common'
 import { Transaction } from '../models/transactions'
 import { isHex } from '../models/utils'
+import { isIssuedCurrency } from '../models/transactions/common'
 import { ensureClassicAddress } from '../sugar/utils'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
 
@@ -351,6 +353,22 @@ class Wallet {
         this.privateKey,
       )
     }
+
+    Object.keys(txToSignAndEncode).forEach(function(key) {
+      if(txToSignAndEncode[key] && isIssuedCurrency(txToSignAndEncode[key])) {
+        const amount: IssuedCurrencyAmount = txToSignAndEncode[key]
+        if(amount.currency.length == 3 && (amount.currency != amount.currency.toUpperCase())) {
+          let errorMessage = `The standard currency code provided (${amount.currency}) has lowercase letters and may be impersonating a corresponding ISO currency.`
+          if(amount.currency.toUpperCase() === 'XRP') {
+            errorMessage = `The standard currency code provided (${amount.currency}) to sign a transaction involving an issued currency with a similar name to 'XRP'. This is likely a scam. XRP is not an issued currency.`
+          }
+          throw new XrplError(errorMessage)
+        }
+      }
+    })
+    // For each field in this transaction, if isIssuedCurrencyAmount and .toJSON() is 3 characters and contains lowercase letters, then
+    // we should throw an error.
+
     const serialized = encode(txToSignAndEncode)
     this.checkTxSerialization(serialized, tx)
     return {
