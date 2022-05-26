@@ -305,6 +305,8 @@ class Wallet {
    * @param multisign - Specify true/false to use multisign or actual address (classic/x-address) to make multisign tx request.
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
+   * @throws XrplError if the transaction includes an issued currency with lowercase standard currency codes as it may be
+   * impersonating a different token.
    */
   // eslint-disable-next-line max-lines-per-function -- introduced more checks to support both string and boolean inputs.
   public sign(
@@ -354,21 +356,6 @@ class Wallet {
       )
     }
 
-    Object.keys(txToSignAndEncode).forEach(function(key) {
-      if(txToSignAndEncode[key] && isIssuedCurrency(txToSignAndEncode[key])) {
-        const amount: IssuedCurrencyAmount = txToSignAndEncode[key]
-        if(amount.currency.length == 3 && (amount.currency != amount.currency.toUpperCase())) {
-          let errorMessage = `The standard currency code provided (${amount.currency}) has lowercase letters and may be impersonating a corresponding ISO currency.`
-          if(amount.currency.toUpperCase() === 'XRP') {
-            errorMessage = `The standard currency code provided (${amount.currency}) to sign a transaction involving an issued currency with a similar name to 'XRP'. This is likely a scam. XRP is not an issued currency.`
-          }
-          throw new XrplError(errorMessage)
-        }
-      }
-    })
-    // For each field in this transaction, if isIssuedCurrencyAmount and .toJSON() is 3 characters and contains lowercase letters, then
-    // we should throw an error.
-
     const serialized = encode(txToSignAndEncode)
     this.checkTxSerialization(serialized, tx)
     return {
@@ -410,6 +397,8 @@ class Wallet {
    * @param tx - The transaction prior to signing.
    * @throws A ValidationError if the transaction does not have a TxnSignature/Signers property, or if
    * the serialized Transaction desn't match the original transaction.
+   * @throws XrplError if the transaction includes an issued currency with lowercase standard currency codes as it may be
+   * impersonating a different token.
    */
   // eslint-disable-next-line class-methods-use-this, max-lines-per-function -- Helper for organization purposes
   private checkTxSerialization(serialized: string, tx: Transaction): void {
@@ -468,6 +457,40 @@ class Wallet {
     }
 
     if (!_.isEqual(decoded, txCopy)) {
+    Object.keys(txCopy).forEach(function (key) {
+      const amount: IssuedCurrencyAmount = txCopy[key]
+      const standard_currency_code_len = 3
+      if (amount && isIssuedCurrency(amount)) {
+        const decodedCurrency = (decoded[key] as unknown as IssuedCurrencyAmount).currency
+
+        // Check for potential scams and alert the user
+        if (
+          amount.currency.length === standard_currency_code_len &&
+          amount.currency !== amount.currency.toUpperCase()
+        ) {
+          let errorMessage = `The standard currency code provided (${amount.currency}) has lowercase letters and may be impersonating a corresponding ISO currency.`
+          if (amount.currency.toUpperCase() === 'XRP') {
+            errorMessage = `The standard currency code provided (${amount.currency}) to sign a transaction involving an issued currency with a similar name to 'XRP'.`
+                            + `This is likely a scam. XRP is not an issued currency.`
+          }
+          const hex = isoToHex(amount.currency)
+          const workAround = `If this is intentional, please use the 40 byte hex encoding of this currency code instead of the standard format (${amount.currency} -> ${hex}).`
+          throw new XrplError(errorMessage + " " + workAround)
+        }
+
+        // Then standardize the format of currency codes to the 40 byte hex string for comparison
+        if(amount.currency.length !== decodedCurrency.length) {
+          if(decodedCurrency.length == standard_currency_code_len) {
+            (decoded[key] as unknown as IssuedCurrencyAmount).currency = isoToHex(decodedCurrency)
+          } else {
+            txCopy[key].currency = isoToHex(txCopy[key].currency)
+          }
+        }
+      }
+    })
+  }
+
+    if (!_.isEqual(decoded, tx)) {
       const data = {
         decoded,
         tx,
@@ -525,6 +548,18 @@ function removeTrailingZeros(tx: Transaction): void {
     // eslint-disable-next-line no-param-reassign -- Required to update Transaction.Amount.value
     tx.Amount.value = new BigNumber(tx.Amount.value).toString()
   }
+}
+
+/**
+ * Convert an ISO code to a hex string representation
+ */
+ function isoToHex(iso: string): string {
+  const bytes = Buffer.alloc(20)
+  if (iso !== 'XRP') {
+    const isoBytes = iso.split('').map((c) => c.charCodeAt(0))
+    bytes.set(isoBytes, 12)
+  }
+  return bytes.toString('hex').toUpperCase()
 }
 
 export default Wallet

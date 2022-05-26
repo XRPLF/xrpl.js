@@ -301,6 +301,7 @@ describe('Wallet', function () {
     })
   })
 
+  // eslint-disable-next-line max-statements -- Required for test coverage.
   describe('sign', function () {
     let wallet: Wallet
 
@@ -629,6 +630,16 @@ describe('Wallet', function () {
       }, /^The standard currency code provided \(xrp\).*XRP is not an issued currency./u)
     })
 
+    it('sign does NOT throw when a payment contains an issued currency like xrp in hex string format', async function () {
+      const payment: Payment = { ...issuedCurrencyPayment }
+      payment.Amount = {
+        currency: '0000000000000000000000007872700000000000',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+      console.log(wallet.sign(payment))
+    })
+
     it('sign succeeds with standard currency code with symbols', async function () {
       const payment: Payment = { ...issuedCurrencyPayment }
       payment.Amount = {
@@ -641,6 +652,23 @@ describe('Wallet', function () {
         tx_blob:
           '12000022800000002400000017201B008694F261D504625103A720000000000000000000000000002A2A2A00000000002E099DD75FDD96EB4A603037844F964832FED86B68400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F54474463044022073E71588750C3D47D7D9A541F00FB897823DA67ED198D0A74404B6FE6D5E4AB5022021BE798D4159F375EBE13D0545F50EE864DF834D5A9F9A31504212156A57934C81145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
         hash: '95BF9931C1EA164960FE13A504D5FBAEB1E072C1D291D75B85BA3F22A50346DF',
+      }
+
+      assert.deepEqual(result, expectedResult)
+    })
+
+    it('sign succeeds with non-standard 3 digit currency code', async function () {
+      const payment: Payment = { ...issuedCurrencyPayment }
+      payment.Amount = {
+        currency: ':::',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+      const result = wallet.sign(payment)
+      const expectedResult = {
+        tx_blob:
+          '12000022800000002400000017201B008694F261D504625103A720000000000000000000000000003A3A3A00000000002E099DD75FDD96EB4A603037844F964832FED86B68400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F5447446304402205952993DB235D3A6398E2CB5F91D7F0AD9067F02CB8E62FD335C516B64130F4702206777746CC516F95F39ADDD62CD395AF2F6BAFCCA355B5D23B9B4D9358474A11281145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
+        hash: 'CE80072E6D70932BC7AA698B931BCF97B6CC3DD3984E08DF284B74E8CB4E543A',
       }
 
       assert.deepEqual(result, expectedResult)
