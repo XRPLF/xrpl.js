@@ -94,10 +94,7 @@ async function fundWallet(
 
   if (
     options?.faucetHost != null &&
-    (options.faucetHost.startsWith('ws://') ||
-      options.faucetHost.startsWith('wss://') ||
-      options.faucetHost.startsWith('http://') ||
-      options.faucetHost.startsWith('https://'))
+    /^(http|https|ws|wss):\/\//.test(options.faucetHost)
   ) {
     throw new XRPLFaucetError(
       `Invalid format for faucetHost. Should not include ws(s)/http(s) prefix. Received '${options.faucetHost}'.`,
