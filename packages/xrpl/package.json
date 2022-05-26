@@ -6,7 +6,9 @@
   "files": [
     "dist/npm/*",
     "build/xrpl-latest-min.js",
-    "build/xrpl-latest.js"
+    "build/xrpl-latest-min.js.map",
+    "build/xrpl-latest.js",
+    "build/xrpl-latest.js.map"
   ],
   "main": "dist/npm/",
   "unpkg": "build/xrpl-latest-min.js",
