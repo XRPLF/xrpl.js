@@ -668,6 +668,31 @@ describe('Wallet', function () {
 
       assert.deepEqual(result, expectedResult)
     })
+
+    it('sign throws when NFTokenMint.URI is not a hex value', async function () {
+      const tx: NFTokenMint = {
+        TransactionType: 'NFTokenMint',
+        Account: wallet.address,
+        TransferFee: 314,
+        NFTokenTaxon: 0,
+        Flags: 8,
+        Fee: '10',
+        URI: 'ipfs://bafybeigdyrzt5sfp7udm7hu76uh7y26nf4dfuylqabf3oclgtqy55fbzdi',
+        Memos: [
+          {
+            Memo: {
+              MemoType:
+                '687474703a2f2f6578616d706c652e636f6d2f6d656d6f2f67656e65726963',
+              MemoData: '72656e74',
+            },
+          },
+        ],
+      }
+
+      assert.throws(() => {
+        wallet.sign(tx)
+      }, /URI must be a hex value/u)
+    })
   })
 
   describe('verifyTransaction', function () {
