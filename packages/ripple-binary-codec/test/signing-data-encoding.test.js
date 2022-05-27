@@ -1,3 +1,4 @@
+const { throws } = require('assert')
 const {
   encodeForSigning,
   encodeForSigningClaim,
@@ -65,6 +66,16 @@ describe('Signing data', function () {
       ].join(''),
     )
   })
+
+  test('can fail gracefully for invalid TransactionType', function () {
+    const invalidTransactionType = {
+      ...tx_json,
+      TransactionType: 'NotAPayment',
+    }
+
+    throws(() => encodeForSigning(invalidTransactionType), /NotAPayment/u)
+  })
+
   test('can create multi signing blobs', function () {
     const signingAccount = 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN'
     const signingJson = Object.assign({}, tx_json, { SigningPubKey: '' })
