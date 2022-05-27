@@ -33,7 +33,7 @@ import { rfc1751MnemonicToKey } from './rfc1751'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
-const HEX_REGEX = /[0-9A-Fa-f]{6}/u
+const HEX_REGEX = /^[0-9A-Fa-f]+$/u
 
 function hexFromBuffer(buffer: Buffer): string {
   return buffer.toString('hex').toUpperCase()
@@ -446,6 +446,7 @@ class Wallet {
       if (!HEX_REGEX.test(txCopy.URI)) {
         throw new ValidationError('URI must be a hex value')
       }
+      console.log('yo')
       txCopy.URI = txCopy.URI.toUpperCase()
     }
 
