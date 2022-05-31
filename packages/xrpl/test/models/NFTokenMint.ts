@@ -66,4 +66,24 @@ describe('NFTokenMint', function () {
       'NFTokenMint: Issuer must not be equal to Account',
     )
   })
+
+  it(`throws w/ URI not in hex format`, function () {
+    const invalid = {
+      TransactionType: 'NFTokenMint',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Fee: '5000000',
+      Sequence: 2470665,
+      Flags: NFTokenMintFlags.tfTransferable,
+      NFTokenTaxon: 0,
+      Issuer: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
+      TransferFee: 1,
+      URI: 'http://xrpl.org',
+    } as any
+
+    assert.throws(
+      () => validate(invalid),
+      ValidationError,
+      'NFTokenMint: URI must be in hex format',
+    )
+  })
 })

@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec/dist'
-import { Transaction } from 'xrpl-local'
+import { NFTokenMint, Transaction } from 'xrpl-local'
 import ECDSA from 'xrpl-local/ECDSA'
 import Wallet from 'xrpl-local/Wallet'
 
@@ -638,6 +638,60 @@ describe('Wallet', function () {
       }
 
       assert.deepEqual(result, expectedResult)
+    })
+
+    it('sign allows lowercase hex value for NFTokenMint.URI', async function () {
+      const tx: NFTokenMint = {
+        TransactionType: 'NFTokenMint',
+        Account: wallet.address,
+        TransferFee: 314,
+        NFTokenTaxon: 0,
+        Flags: 8,
+        Fee: '10',
+        URI: '697066733a2f2f62616679626569676479727a74357366703775646d37687537367568377932366e6634646675796c71616266336f636c67747179353566627a6469',
+        Memos: [
+          {
+            Memo: {
+              MemoType:
+                '687474703a2f2f6578616d706c652e636f6d2f6d656d6f2f67656e65726963',
+              MemoData: '72656e74',
+            },
+          },
+        ],
+      }
+      const result = wallet.sign(tx)
+      const expectedResult = {
+        tx_blob:
+          '12001914013A2200000008202A0000000068400000000000000A732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F5447446304402203795B6E9D6D0086FB26E2C6B7A8C02D50B8560D45C9D5C80DF271D3349515E5302203B0898A7D8C06243D7C2116D2011ACB68DF3123BB7336D6C27269FD388C12CC07542697066733A2F2F62616679626569676479727A74357366703775646D37687537367568377932366E6634646675796C71616266336F636C67747179353566627A64698114B3263BD0A9BF9DFDBBBBD07F536355FF477BF0E9F9EA7C1F687474703A2F2F6578616D706C652E636F6D2F6D656D6F2F67656E657269637D0472656E74E1F1',
+        hash: '2F359B3CFD1CE6D7BFB672F8ADCE98FE964B1FD04CFC337177FB3D8FBE889788',
+      }
+
+      assert.deepEqual(result, expectedResult)
+    })
+
+    it('sign throws when NFTokenMint.URI is not a hex value', async function () {
+      const tx: NFTokenMint = {
+        TransactionType: 'NFTokenMint',
+        Account: wallet.address,
+        TransferFee: 314,
+        NFTokenTaxon: 0,
+        Flags: 8,
+        Fee: '10',
+        URI: 'ipfs://bafybeigdyrzt5sfp7udm7hu76uh7y26nf4dfuylqabf3oclgtqy55fbzdi',
+        Memos: [
+          {
+            Memo: {
+              MemoType:
+                '687474703a2f2f6578616d706c652e636f6d2f6d656d6f2f67656e65726963',
+              MemoData: '72656e74',
+            },
+          },
+        ],
+      }
+
+      assert.throws(() => {
+        wallet.sign(tx)
+      }, /URI must be a hex value/u)
     })
   })
 
