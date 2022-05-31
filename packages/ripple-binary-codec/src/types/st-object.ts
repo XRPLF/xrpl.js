@@ -127,6 +127,15 @@ class STObject extends SerializedType {
       const associatedValue = field.associatedType.from(
         xAddressDecoded[field.name],
       )
+
+      if (associatedValue == undefined) {
+        throw new TypeError(
+          `Unable to interpret "${field.name}: ${
+            xAddressDecoded[field.name]
+          }".`,
+        )
+      }
+
       if ((associatedValue as unknown as Bytes).name === 'UNLModify') {
         // triggered when the TransactionType field has a value of 'UNLModify'
         isUnlModify = true
