@@ -68,6 +68,13 @@ export interface SignerEntry {
   }
 }
 
+export interface Sidechain {
+  dst_chain_door: string
+  dst_chain_issue: Currency
+  src_chain_door: string
+  src_chain_issue: Currency
+}
+
 /**
  * This information is added to Transactions in request responses, but is not part
  * of the canonical Transaction information on ledger. These fields are denoted with
