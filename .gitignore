@@ -51,6 +51,7 @@ test/config.js
 
 # Ignore IntelliJ files
 .idea
+*.iml
 
 # Ignore npm-debug
 npm-debug.log
