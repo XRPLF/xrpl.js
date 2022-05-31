@@ -1,4 +1,5 @@
 import { ValidationError } from '../../errors'
+import { isHex } from '../utils'
 
 import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
 
@@ -103,6 +104,10 @@ export function validateNFTokenMint(tx: Record<string, unknown>): void {
     throw new ValidationError(
       'NFTokenMint: Issuer must not be equal to Account',
     )
+  }
+
+  if (typeof tx.URI === 'string' && !isHex(tx.URI)) {
+    throw new ValidationError('NFTokenMint: URI must be in hex format')
   }
 
   if (tx.NFTokenTaxon == null) {
