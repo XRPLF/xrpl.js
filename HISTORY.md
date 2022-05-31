@@ -8,6 +8,14 @@ This library (ripple-lib 1.x) has been deprecated in favor of [xrpl.js version 2
 
 * Fix bug in parseSettings: AffectedNodes can contain CreatedNode and DeletedNode ([#1907](https://github.com/XRPLF/xrpl.js/pull/1907))
 
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 build/*
+368ad4fe29bfeee7dd59e319eded72d486f57a2c05a2314d9e5c42db1fd70fcd  build/ripple-latest-min.js
+f8328b2b687757112b63675b1af272ee08bea15df2a392d1c50637604e938a22  build/ripple-latest-min.js.LICENSE.txt
+2631590b53ddee9a68cb4149af07b20a1135606a8b5d3d746594359e003411d4  build/ripple-latest.js
+```
+
 ## 1.10.0 (2021-08-12)
 
 * Add address generation from Devnet/Testnet faucets (#1497)
