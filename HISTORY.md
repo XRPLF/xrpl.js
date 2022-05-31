@@ -1,6 +1,12 @@
 # ripple-lib Release History
 
-Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
+# Deprecation Notice
+
+This library (ripple-lib 1.x) has been deprecated in favor of [xrpl.js version 2+](https://github.com/XRPLF/xrpl.js).
+
+## 1.10.1 (2022-05-31)
+
+* Fix bug in parseSettings: AffectedNodes can contain CreatedNode and DeletedNode ([#1907](https://github.com/XRPLF/xrpl.js/pull/1907))
 
 ## 1.10.0 (2021-08-12)
 

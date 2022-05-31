@@ -1,18 +1,18 @@
+## Deprecated
+
+This library (ripple-lib 1.x) has been deprecated in favor of [xrpl.js version 2+](https://github.com/XRPLF/xrpl.js).
+
 # ripple-lib (RippleAPI)
 
 A JavaScript/TypeScript API for interacting with the XRP Ledger
 
 [![NPM](https://nodei.co/npm/ripple-lib.png)](https://www.npmjs.org/package/ripple-lib)
 
-This is the recommended library for integrating a JavaScript/TypeScript app with the XRP Ledger, especially if you intend to use advanced functionality such as IOUs, payment paths, the decentralized exchange, account settings, payment channels, escrows, multi-signing, and more.
+This library is for integrating a JavaScript/TypeScript app with the XRP Ledger and supports functionality such as IOUs, payment paths, the decentralized exchange, account settings, payment channels, escrows, multi-signing, and more.
 
 ## [➡️ Reference Documentation](https://github.com/XRPLF/xrpl.js/blob/1.x/docs/index.md)
 
-See the full reference documentation.
-
-## [➡️ Applications and Projects](APPLICATIONS.md)
-
-What is ripple-lib used for? The applications on the list linked above use `ripple-lib`. Open a PR to add your app or project to the list!
+Use the above link to view the full reference documentation.
 
 ### Features
 
@@ -103,12 +103,13 @@ import ripple from 'https://dev.jspm.io/npm:ripple-lib';
 + [RippleAPI Beginners Guide](https://xrpl.org/get-started-with-rippleapi-for-javascript.html)
 + [RippleAPI Full Reference Documentation](https://xrpl.org/rippleapi-reference.html) ([in this repo](https://github.com/ripple/ripple-lib/blob/develop/docs/index.md))
 + [Code Samples](https://github.com/ripple/ripple-lib/tree/develop/docs/samples)
++ [XRP Ledger Dev Portal](https://xrpl.org/)
 
 ### Mailing Lists
 
 We have a low-traffic mailing list for announcements of new ripple-lib releases. (About 1 email per week)
 
-+ [Subscribe to ripple-lib-announce](https://groups.google.com/forum/#!forum/ripple-lib-announce)
++ [Subscribe to xrpl-announce](https://groups.google.com/g/xrpl-announce)
 
 If you're using the XRP Ledger in production, you should run a [rippled server](https://github.com/ripple/rippled) and subscribe to the ripple-server mailing list as well.
 
@@ -146,11 +147,3 @@ Do not edit `./docs/index.md` directly because it is a generated file.
 Instead, edit the appropriate `.md.ejs` files in `./docs/src/`.
 
 If you make changes to the JSON schemas, fixtures, or documentation sources, update the documentation by running `yarn run docgen`.
-
-## More Information
-
-+ [ripple-lib-announce mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) - subscribe for release announcements
-+ [RippleAPI Reference](https://xrpl.org/rippleapi-reference.html) - XRP Ledger Dev Portal
-+ [XRP Ledger Dev Portal](https://xrpl.org/)
-
- [![Build Status](https://travis-ci.org/ripple/ripple-lib.svg?branch=master)](https://travis-ci.org/ripple/ripple-lib)
