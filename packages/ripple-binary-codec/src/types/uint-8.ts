@@ -6,7 +6,7 @@ import { Buffer } from 'buffer/'
  * Derived UInt class for serializing/deserializing 8 bit UInt
  */
 class UInt8 extends UInt {
-  protected static readonly width: number = 8 / 8 // 1
+  public static readonly width: number = 8 / 8 // 1
   static readonly defaultUInt8: UInt8 = new UInt8(Buffer.alloc(UInt8.width))
 
   constructor(bytes: Buffer) {

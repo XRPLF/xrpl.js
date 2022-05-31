@@ -6,7 +6,7 @@ import { Buffer } from 'buffer/'
  * Derived UInt class for serializing/deserializing 32 bit UInt
  */
 class UInt32 extends UInt {
-  protected static readonly width: number = 32 / 8 // 4
+  public static readonly width: number = 32 / 8 // 4
   static readonly defaultUInt32: UInt32 = new UInt32(Buffer.alloc(UInt32.width))
 
   constructor(bytes: Buffer) {

@@ -21,7 +21,7 @@
     "UInt32": 2,
     "STArray": 15,
     "Sidechain": 24,
-    "XchainClaimProof": 25
+    "XChainClaimProof": 25
   },
   "LEDGER_ENTRY_TYPES": {
     "Any": -3,
