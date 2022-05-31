@@ -50,6 +50,13 @@ import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
+import { XChainClaim, validateXChainClaim } from './xChainClaim'
+import { XChainDoorCreate, validateXChainDoorCreate } from './xChainDoorCreate'
+import {
+  XChainSeqNumCreate,
+  validateXChainSeqNumCreate,
+} from './xChainSeqNumCreate'
+import { XChainTransfer, validateXChainTransfer } from './xChainTransfer'
 
 /**
  * @category Transaction Models
@@ -79,6 +86,10 @@ export type Transaction =
   | SignerListSet
   | TicketCreate
   | TrustSet
+  | XChainClaim
+  | XChainDoorCreate
+  | XChainSeqNumCreate
+  | XChainTransfer
 
 /**
  * @category Transaction Models
@@ -201,6 +212,22 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'TrustSet':
       validateTrustSet(tx)
+      break
+
+    case 'XChainClaim':
+      validateXChainClaim(tx)
+      break
+
+    case 'XChainDoorCreate':
+      validateXChainDoorCreate(tx)
+      break
+
+    case 'XChainSeqNumCreate':
+      validateXChainSeqNumCreate(tx)
+      break
+
+    case 'XChainTransfer':
+      validateXChainTransfer(tx)
       break
 
     default:
