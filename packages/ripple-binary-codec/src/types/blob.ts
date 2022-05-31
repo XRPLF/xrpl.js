@@ -14,7 +14,7 @@ class Blob extends SerializedType {
    * Defines how to read a Blob from a BinaryParser
    *
    * @param parser The binary parser to read the Blob from
-   * @param hint The length of the blob, computed by readVariableLength() and passed in
+   * @param hint The length of the blob, computed by readVariableLengthLength() and passed in
    * @returns A Blob object
    */
   static fromParser(parser: BinaryParser, hint: number): Blob {
