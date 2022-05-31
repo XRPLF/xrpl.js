@@ -27,10 +27,10 @@ export function isFlagEnabled(Flags: number, checkFlag: number): boolean {
 }
 
 /**
- * Check if value is in hex format.
+ * Check if string is in hex format.
  *
  * @param str - The string to check if it's in hex format.
- * @returns True if str is in hex format
+ * @returns True if string is in hex format
  */
 export function isHex(str: string): boolean {
   return HEX_REGEX.test(str)
