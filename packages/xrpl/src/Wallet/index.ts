@@ -455,31 +455,36 @@ class Wallet {
       txCopy.URI = txCopy.URI.toUpperCase()
     }
 
-    if (!_.isEqual(decoded, txCopy)) {
     Object.keys(txCopy).forEach(function (key) {
       const amount: IssuedCurrencyAmount = txCopy[key]
       const standard_currency_code_len = 3
       if (amount && isIssuedCurrency(amount)) {
-        const decodedCurrency = (decoded[key] as unknown as IssuedCurrencyAmount).currency
-        const txCurrency = txCopy[key].currency
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We check at runtime that this is safe
+        const decodedAmount = decoded[key] as unknown as IssuedCurrencyAmount
+        const decodedCurrency = decodedAmount.currency
+        const txCurrency = txCopy[key].currency as string
 
-        if(txCurrency.length === standard_currency_code_len && txCurrency.toUpperCase() === "XRP") {
-          throw new XrplError(`Trying to sign an issued currency with a similar standard code to XRP (received '${txCurrency}'). XRP is not an issued currency.`)
+        if (
+          txCurrency.length === standard_currency_code_len &&
+          txCurrency.toUpperCase() === 'XRP'
+        ) {
+          throw new XrplError(
+            `Trying to sign an issued currency with a similar standard code to XRP (received '${txCurrency}'). XRP is not an issued currency.`,
+          )
         }
 
         // Standardize the format of currency codes to the 40 byte hex string for comparison
-        if(amount.currency.length !== decodedCurrency.length) {
-          if(decodedCurrency.length === standard_currency_code_len) {
-            (decoded[key] as unknown as IssuedCurrencyAmount).currency = isoToHex(decodedCurrency)
+        if (amount.currency.length !== decodedCurrency.length) {
+          if (decodedCurrency.length === standard_currency_code_len) {
+            decodedAmount.currency = isoToHex(decodedCurrency)
           } else {
             txCopy[key].currency = isoToHex(txCopy[key].currency)
           }
         }
       }
     })
-  }
 
-    if (!_.isEqual(decoded, tx)) {
+    if (!_.isEqual(decoded, txCopy)) {
       const data = {
         decoded,
         tx,
@@ -545,8 +550,8 @@ function removeTrailingZeros(tx: Transaction): void {
  * @param iso - A 3 letter standard currency code
  */
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Magic numbers are from rippleds of currency code encoding */
- function isoToHex(iso: string): string {
-   assert(iso.length === 3)
+function isoToHex(iso: string): string {
+  assert(iso.length === 3)
   const bytes = Buffer.alloc(20)
   if (iso !== 'XRP') {
     const isoBytes = iso.split('').map((chr) => chr.charCodeAt(0))
@@ -554,5 +559,6 @@ function removeTrailingZeros(tx: Transaction): void {
   }
   return bytes.toString('hex').toUpperCase()
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers -- Only needed in this function */
 
 export default Wallet
