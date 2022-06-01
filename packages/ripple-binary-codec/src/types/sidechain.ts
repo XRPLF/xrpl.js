@@ -62,10 +62,10 @@ class Sidechain extends SerializedType {
       ).toBytes()
       return new Sidechain(
         Buffer.concat([
-          dst_chain_door,
-          dst_chain_issue,
           src_chain_door,
           src_chain_issue,
+          dst_chain_door,
+          dst_chain_issue,
         ]),
       )
     }
@@ -97,10 +97,10 @@ class Sidechain extends SerializedType {
    */
   toJSON(): SidechainObject {
     const parser = new BinaryParser(this.toString())
-    const dst_chain_door = AccountID.fromParser(parser) as AccountID
-    const dst_chain_issue = IssuedCurrency.fromParser(parser)
     const src_chain_door = AccountID.fromParser(parser) as AccountID
     const src_chain_issue = IssuedCurrency.fromParser(parser)
+    const dst_chain_door = AccountID.fromParser(parser) as AccountID
+    const dst_chain_issue = IssuedCurrency.fromParser(parser)
 
     return {
       dst_chain_door: dst_chain_door.toJSON(),
