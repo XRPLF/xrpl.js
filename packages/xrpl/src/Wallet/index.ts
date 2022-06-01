@@ -2,6 +2,7 @@
 import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync } from 'bip39'
+import { assert } from 'console'
 import _ from 'lodash'
 import {
   classicAddressToXAddress,
@@ -305,8 +306,7 @@ class Wallet {
    * @param multisign - Specify true/false to use multisign or actual address (classic/x-address) to make multisign tx request.
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
-   * @throws XrplError if the transaction includes an issued currency with lowercase standard currency codes as it may be
-   * impersonating a different token.
+   * @throws XrplError if the issued currency being signed is XRP ignoring case.
    */
   // eslint-disable-next-line max-lines-per-function -- introduced more checks to support both string and boolean inputs.
   public sign(
@@ -397,8 +397,7 @@ class Wallet {
    * @param tx - The transaction prior to signing.
    * @throws A ValidationError if the transaction does not have a TxnSignature/Signers property, or if
    * the serialized Transaction desn't match the original transaction.
-   * @throws XrplError if the transaction includes an issued currency with lowercase standard currency codes as it may be
-   * impersonating a different token.
+   * @throws XrplError if the transaction includes an issued currency which is equivalent to XRP ignoring case.
    */
   // eslint-disable-next-line class-methods-use-this, max-lines-per-function -- Helper for organization purposes
   private checkTxSerialization(serialized: string, tx: Transaction): void {
@@ -462,25 +461,15 @@ class Wallet {
       const standard_currency_code_len = 3
       if (amount && isIssuedCurrency(amount)) {
         const decodedCurrency = (decoded[key] as unknown as IssuedCurrencyAmount).currency
+        const txCurrency = txCopy[key].currency
 
-        // Check for potential scams and alert the user
-        if (
-          amount.currency.length === standard_currency_code_len &&
-          amount.currency !== amount.currency.toUpperCase()
-        ) {
-          let errorMessage = `The standard currency code provided (${amount.currency}) has lowercase letters and may be impersonating a corresponding ISO currency.`
-          if (amount.currency.toUpperCase() === 'XRP') {
-            errorMessage = `The standard currency code provided (${amount.currency}) to sign a transaction involving an issued currency with a similar name to 'XRP'.`
-                            + `This is likely a scam. XRP is not an issued currency.`
-          }
-          const hex = isoToHex(amount.currency)
-          const workAround = `If this is intentional, please use the 40 byte hex encoding of this currency code instead of the standard format (${amount.currency} -> ${hex}).`
-          throw new XrplError(errorMessage + " " + workAround)
+        if(txCurrency.length === standard_currency_code_len && txCurrency.toUpperCase() === "XRP") {
+          throw new XrplError(`Trying to sign an issued currency with a similar standard code to XRP (received '${txCurrency}'). XRP is not an issued currency.`)
         }
 
-        // Then standardize the format of currency codes to the 40 byte hex string for comparison
+        // Standardize the format of currency codes to the 40 byte hex string for comparison
         if(amount.currency.length !== decodedCurrency.length) {
-          if(decodedCurrency.length == standard_currency_code_len) {
+          if(decodedCurrency.length === standard_currency_code_len) {
             (decoded[key] as unknown as IssuedCurrencyAmount).currency = isoToHex(decodedCurrency)
           } else {
             txCopy[key].currency = isoToHex(txCopy[key].currency)
@@ -552,11 +541,15 @@ function removeTrailingZeros(tx: Transaction): void {
 
 /**
  * Convert an ISO code to a hex string representation
+ *
+ * @param iso - A 3 letter standard currency code
  */
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Magic numbers are from rippleds of currency code encoding */
  function isoToHex(iso: string): string {
+   assert(iso.length === 3)
   const bytes = Buffer.alloc(20)
   if (iso !== 'XRP') {
-    const isoBytes = iso.split('').map((c) => c.charCodeAt(0))
+    const isoBytes = iso.split('').map((chr) => chr.charCodeAt(0))
     bytes.set(isoBytes, 12)
   }
   return bytes.toString('hex').toUpperCase()

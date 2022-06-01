@@ -606,16 +606,37 @@ describe('Wallet', function () {
       Fee: '12',
     }
 
-    it('sign throws when an lowercase standard currency is provided', async function () {
+    it('lowercase standard currency code signs successfully', async function () {
       const payment: Payment = { ...issuedCurrencyPayment }
       payment.Amount = {
         currency: 'foo',
         issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
         value: '123.40',
       }
-      assert.throws(() => {
-        wallet.sign(payment)
-      }, /^The standard currency code provided \(foo\)/u)
+
+      assert.deepEqual(wallet.sign(payment), {
+        tx_blob:
+          '12000022800000002400000017201B008694F261D504625103A72000000000000000000000000000666F6F00000000002E099DD75FDD96EB4A603037844F964832FED86B68400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F54474473045022100D32EBD44F86FB6D0BE239A410B62A73A8B0C26CE3767321913D6FB7BE6FAC2410220430C011C25091DA9CD75E7C99BE406572FBB57B92132E39B4BF873863E744E2E81145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
+        hash: 'F822EA1D7B2A3026E4654A9152896652C3843B5690F8A56C4217CB4690C5C95A',
+      })
+    })
+
+    it('issued currency in standard or hex format signs to the same transaction', async function () {
+      const payment: Payment = { ...issuedCurrencyPayment }
+      payment.Amount = {
+        currency: '***',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+
+      const payment2: Payment = { ...issuedCurrencyPayment }
+      payment2.Amount = {
+        currency: '0000000000000000000000002A2A2A0000000000',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+
+      assert.deepEqual(wallet.sign(payment), wallet.sign(payment2))
     })
 
     it('sign throws when a payment contains an issued currency like XRP', async function () {
@@ -627,7 +648,7 @@ describe('Wallet', function () {
       }
       assert.throws(() => {
         wallet.sign(payment)
-      }, /^The standard currency code provided \(xrp\).*XRP is not an issued currency./u)
+      }, /^Trying to sign an issued currency with a similar standard code to XRP \(received 'xrp'\)\. XRP is not an issued currency\./u)
     })
 
     it('sign does NOT throw when a payment contains an issued currency like xrp in hex string format', async function () {
