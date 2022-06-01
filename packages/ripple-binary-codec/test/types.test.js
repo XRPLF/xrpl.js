@@ -21,7 +21,6 @@ describe('SerializedType interfaces', () => {
     })
     test(`${name}.from(json).toJSON() == json`, () => {
       const newJSON = new Value().toJSON()
-      console.log(newJSON)
       expect(Value.from(newJSON).toJSON()).toEqual(newJSON)
     })
     describe(`${name} supports all methods of the SerializedType mixin`, () => {

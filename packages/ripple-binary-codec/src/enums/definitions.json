@@ -1360,6 +1360,16 @@
       }
     ],
     [
+      "XChainProofSig",
+      {
+        "nth": 25,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
       "ArrayEndMarker",
       {
         "nth": 1,

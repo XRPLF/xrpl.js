@@ -14,7 +14,6 @@ import { Hash256 } from './hash-256'
 import { IssuedCurrency } from './issued-currency'
 import { PathSet } from './path-set'
 import { Sidechain } from './sidechain'
-import { Signature } from './signature'
 import { STArray } from './st-array'
 import { STObject } from './st-object'
 import { UInt16 } from './uint-16'
@@ -35,7 +34,6 @@ const coreTypes = {
   IssuedCurrency,
   PathSet,
   Sidechain,
-  Signature,
   STArray,
   STObject,
   UInt8,

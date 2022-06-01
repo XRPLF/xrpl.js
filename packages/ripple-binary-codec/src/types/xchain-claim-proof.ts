@@ -3,15 +3,18 @@ import { BinaryParser } from '../serdes/binary-parser'
 import { JsonObject, SerializedType } from './serialized-type'
 import { Buffer } from 'buffer/'
 import { Sidechain, SidechainObject } from './sidechain'
-import { Signature, SignatureObject } from './signature'
 import { Amount } from './amount'
 import { UInt8 } from './uint-8'
 import { UInt32 } from './uint-32'
+import { STArray } from './st-array'
 
 /**
- * Constants for separating Paths in a PathSet
+ * Interface for JSON objects that represent amounts
  */
-const ARRAY_END_BYTE = 0xf1
+interface SignatureObject extends JsonObject {
+  signature: string
+  signing_key: string
+}
 
 /**
  * Interface for JSON objects that represent amounts
@@ -45,11 +48,10 @@ function isProofObject(arg): arg is XChainClaimProofObject {
 class XChainClaimProof extends SerializedType {
   static readonly ZERO_PROOF: XChainClaimProof = new XChainClaimProof(
     Buffer.concat([
-      Amount.defaultAmount.toBytes(),
       Sidechain.ZERO_SIDECHAIN.toBytes(),
-      Buffer.from([ARRAY_END_BYTE]),
-      UInt8.defaultUInt8.toBytes(),
+      Amount.defaultAmount.toBytes(),
       UInt32.defaultUInt32.toBytes(),
+      UInt8.defaultUInt8.toBytes(),
     ]),
   )
 
@@ -72,24 +74,20 @@ class XChainClaimProof extends SerializedType {
     }
 
     if (isProofObject(value)) {
-      const amount = Amount.from(value.amount).toBytes()
       const sidechain = Sidechain.from(value.sidechain).toBytes()
-      const signatures: Array<Buffer> = []
-      value.signatures.forEach((signature: SignatureObject) => {
-        signatures.push(Signature.from(signature).toBytes())
-      })
-      signatures.push(Buffer.from([ARRAY_END_BYTE]))
+      const amount = Amount.from(value.amount).toBytes()
+      const xchain_seq = UInt32.from(value.xchain_seq).toBytes()
       const was_src_chain_send = UInt8.from(
         Number(value.was_src_chain_send),
       ).toBytes()
-      const xchain_seq = UInt32.from(value.xchain_seq).toBytes()
+      const signatures = STArray.from(value.signatures).toBytes()
       return new XChainClaimProof(
         Buffer.concat([
-          amount,
           sidechain,
-          ...signatures,
-          was_src_chain_send,
+          amount,
           xchain_seq,
+          was_src_chain_send,
+          signatures,
         ]),
       )
     }
@@ -106,18 +104,11 @@ class XChainClaimProof extends SerializedType {
   static fromParser(parser: BinaryParser): XChainClaimProof {
     const bytes: Array<Buffer> = []
 
-    bytes.push(Amount.fromParser(parser).toBytes())
     bytes.push(Sidechain.fromParser(parser).toBytes())
-    while (!parser.end()) {
-      bytes.push(Signature.fromParser(parser).toBytes())
-
-      if (parser.peek() === ARRAY_END_BYTE) {
-        bytes.push(parser.read(1))
-        break
-      }
-    }
-    bytes.push(parser.read(UInt8.width))
+    bytes.push(Amount.fromParser(parser).toBytes())
     bytes.push(parser.read(UInt32.width))
+    bytes.push(parser.read(UInt8.width))
+    bytes.push(STArray.fromParser(parser).toBytes())
 
     return new XChainClaimProof(Buffer.concat(bytes))
   }
@@ -129,25 +120,16 @@ class XChainClaimProof extends SerializedType {
    */
   toJSON(): XChainClaimProofObject {
     const parser = new BinaryParser(this.toString())
-    const amount = Amount.fromParser(parser).toJSON()
     const sidechain = Sidechain.fromParser(parser).toJSON()
-    const signatures: SignatureObject[] = []
-    while (!parser.end()) {
-      if (parser.peek() === ARRAY_END_BYTE) {
-        parser.skip(1)
-        break
-      }
-
-      signatures.push(Signature.fromParser(parser).toJSON())
-    }
-    const was_src_chain_send = UInt8.fromParser(parser).toJSON()
-
+    const amount = Amount.fromParser(parser).toJSON()
     const xchain_seq = UInt32.fromParser(parser).toJSON()
+    const was_src_chain_send = UInt8.fromParser(parser).toJSON()
+    const signatures = STArray.fromParser(parser).toJSON()
 
     return {
       amount: amount as string,
       sidechain,
-      signatures,
+      signatures: signatures as SignatureObject[],
       was_src_chain_send: Boolean(was_src_chain_send),
       xchain_seq: xchain_seq as number,
     }
