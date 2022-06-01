@@ -121,9 +121,8 @@ class Signature extends SerializedType {
 
     return {
       signature,
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      signing_key: encodeAccountPublic(signingKey.toBytes()),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- this is fine, they're both different bytes
+      signing_key: encodeAccountPublic(signingKey.toBytes() as any),
     }
   }
 }
