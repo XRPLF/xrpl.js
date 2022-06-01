@@ -33,6 +33,12 @@ class UInt8 extends UInt {
       return new UInt8(buf)
     }
 
+    if (typeof val === 'boolean') {
+      const buf = Buffer.alloc(UInt8.width)
+      buf.writeUInt8(Number(val), 0)
+      return new UInt8(buf)
+    }
+
     throw new Error('Cannot construct UInt8 from given value')
   }
 

@@ -9,15 +9,17 @@ import { UInt32 } from './uint-32'
 import { STArray } from './st-array'
 
 /**
- * Interface for JSON objects that represent amounts
+ * Interface for JSON objects that represent signatures
  */
 interface SignatureObject extends JsonObject {
-  signature: string
-  signing_key: string
+  XChainProofSig: {
+    Signature: string
+    PublicKey: string
+  }
 }
 
 /**
- * Interface for JSON objects that represent amounts
+ * Interface for JSON objects that represent XChainClaimProofs
  */
 interface XChainClaimProofObject extends JsonObject {
   amount: string
@@ -28,7 +30,7 @@ interface XChainClaimProofObject extends JsonObject {
 }
 
 /**
- * Type guard for AmountObject
+ * Type guard for XChainClaimProofObject
  */
 function isProofObject(arg): arg is XChainClaimProofObject {
   const keys = Object.keys(arg).sort()
@@ -43,7 +45,7 @@ function isProofObject(arg): arg is XChainClaimProofObject {
 }
 
 /**
- * Class for serializing/Deserializing Amounts
+ * Class for serializing/Deserializing XChainClaimProofs
  */
 class XChainClaimProof extends SerializedType {
   static readonly ZERO_PROOF: XChainClaimProof = new XChainClaimProof(
@@ -55,16 +57,24 @@ class XChainClaimProof extends SerializedType {
     ]),
   )
 
+  static readonly TYPE_ORDER: { name: string; type: typeof SerializedType }[] =
+    [
+      { name: 'sidechain', type: Sidechain },
+      { name: 'amount', type: Amount },
+      { name: 'xchain_seq', type: UInt32 },
+      { name: 'was_src_chain_send', type: UInt8 },
+      { name: 'signatures', type: STArray },
+    ]
+
   constructor(bytes: Buffer) {
     super(bytes ?? XChainClaimProof.ZERO_PROOF.bytes)
   }
 
   /**
-   * Construct an amount from an IOU or string amount
+   * Construct a XChainClaimProof from a JSON
    *
-   * @param value An Amount, object representing an IOU, or a string
-   *     representing an integer amount
-   * @returns An Amount object
+   * @param value XChainClaimProof or JSON to parse into an XChainClaimProof
+   * @returns A XChainClaimProof object
    */
   static from<T extends XChainClaimProof | XChainClaimProofObject>(
     value: T,
@@ -74,65 +84,52 @@ class XChainClaimProof extends SerializedType {
     }
 
     if (isProofObject(value)) {
-      const sidechain = Sidechain.from(value.sidechain).toBytes()
-      const amount = Amount.from(value.amount).toBytes()
-      const xchain_seq = UInt32.from(value.xchain_seq).toBytes()
-      const was_src_chain_send = UInt8.from(
-        Number(value.was_src_chain_send),
-      ).toBytes()
-      const signatures = STArray.from(value.signatures).toBytes()
-      return new XChainClaimProof(
-        Buffer.concat([
-          sidechain,
-          amount,
-          xchain_seq,
-          was_src_chain_send,
-          signatures,
-        ]),
-      )
+      const bytes: Array<Buffer> = []
+      this.TYPE_ORDER.forEach((item) => {
+        const { name, type } = item
+        const object = type.from(value[name])
+        bytes.push(object.toBytes())
+      })
+
+      return new XChainClaimProof(Buffer.concat(bytes))
     }
 
     throw new Error('Invalid type to construct a XChainClaimProof')
   }
 
   /**
-   * Read an amount from a BinaryParser
+   * Read a XChainClaimProof from a BinaryParser
    *
-   * @param parser BinaryParser to read the Amount from
-   * @returns An Amount object
+   * @param parser BinaryParser to read the XChainClaimProof from
+   * @returns A XChainClaimProof object
    */
   static fromParser(parser: BinaryParser): XChainClaimProof {
     const bytes: Array<Buffer> = []
 
-    bytes.push(Sidechain.fromParser(parser).toBytes())
-    bytes.push(Amount.fromParser(parser).toBytes())
-    bytes.push(parser.read(UInt32.width))
-    bytes.push(parser.read(UInt8.width))
-    bytes.push(STArray.fromParser(parser).toBytes())
+    this.TYPE_ORDER.forEach((item) => {
+      const { type } = item
+      const object = type.fromParser(parser)
+      bytes.push(object.toBytes())
+    })
 
     return new XChainClaimProof(Buffer.concat(bytes))
   }
 
   /**
-   * Get the JSON representation of this Amount
+   * Get the JSON representation of this XChainClaimProof
    *
    * @returns the JSON interpretation of this.bytes
    */
   toJSON(): XChainClaimProofObject {
     const parser = new BinaryParser(this.toString())
-    const sidechain = Sidechain.fromParser(parser).toJSON()
-    const amount = Amount.fromParser(parser).toJSON()
-    const xchain_seq = UInt32.fromParser(parser).toJSON()
-    const was_src_chain_send = UInt8.fromParser(parser).toJSON()
-    const signatures = STArray.fromParser(parser).toJSON()
-
-    return {
-      amount: amount as string,
-      sidechain,
-      signatures: signatures as SignatureObject[],
-      was_src_chain_send: Boolean(was_src_chain_send),
-      xchain_seq: xchain_seq as number,
-    }
+    const json = {}
+    XChainClaimProof.TYPE_ORDER.forEach((item) => {
+      const { name, type } = item
+      const object = type.fromParser(parser).toJSON()
+      json[name] = object
+    })
+    json['was_src_chain_send'] = Boolean(json['was_src_chain_send'])
+    return json as XChainClaimProofObject
   }
 }
 

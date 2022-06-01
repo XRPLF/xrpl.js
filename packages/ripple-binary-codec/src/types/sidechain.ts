@@ -6,7 +6,7 @@ import { Buffer } from 'buffer/'
 import { IssuedCurrency, IssuedCurrencyObject } from './issued-currency'
 
 /**
- * Interface for JSON objects that represent amounts
+ * Interface for JSON objects that represent sidechains
  */
 interface SidechainObject extends JsonObject {
   dst_chain_door: string
@@ -16,7 +16,7 @@ interface SidechainObject extends JsonObject {
 }
 
 /**
- * Type guard for AmountObject
+ * Type guard for SidechainObject
  */
 function isSidechainObject(arg): arg is SidechainObject {
   const keys = Object.keys(arg).sort()
@@ -30,21 +30,28 @@ function isSidechainObject(arg): arg is SidechainObject {
 }
 
 /**
- * Class for serializing/Deserializing Amounts
+ * Class for serializing/deserializing Sidechains
  */
 class Sidechain extends SerializedType {
   static readonly ZERO_SIDECHAIN: Sidechain = new Sidechain(Buffer.alloc(80))
+
+  static readonly TYPE_ORDER: { name: string; type: typeof SerializedType }[] =
+    [
+      { name: 'src_chain_door', type: AccountID },
+      { name: 'src_chain_issue', type: IssuedCurrency },
+      { name: 'dst_chain_door', type: AccountID },
+      { name: 'dst_chain_issue', type: IssuedCurrency },
+    ]
 
   constructor(bytes: Buffer) {
     super(bytes ?? Sidechain.ZERO_SIDECHAIN.bytes)
   }
 
   /**
-   * Construct an amount from an IOU or string amount
+   * Construct a sidechain from a JSON
    *
-   * @param value An Amount, object representing an IOU, or a string
-   *     representing an integer amount
-   * @returns An Amount object
+   * @param value Sidechain or JSON to parse into a Sidechain
+   * @returns A Sidechain object
    */
   static from<T extends Sidechain | SidechainObject>(value: T): Sidechain {
     if (value instanceof Sidechain) {
@@ -52,62 +59,50 @@ class Sidechain extends SerializedType {
     }
 
     if (isSidechainObject(value)) {
-      const dst_chain_door = AccountID.from(value.dst_chain_door).toBytes()
-      const dst_chain_issue = IssuedCurrency.from(
-        value.dst_chain_issue,
-      ).toBytes()
-      const src_chain_door = AccountID.from(value.src_chain_door).toBytes()
-      const src_chain_issue = IssuedCurrency.from(
-        value.src_chain_issue,
-      ).toBytes()
-      return new Sidechain(
-        Buffer.concat([
-          src_chain_door,
-          src_chain_issue,
-          dst_chain_door,
-          dst_chain_issue,
-        ]),
-      )
+      const bytes: Array<Buffer> = []
+      this.TYPE_ORDER.forEach((item) => {
+        const { name, type } = item
+        const object = type.from(value[name])
+        bytes.push(object.toBytes())
+      })
+      return new Sidechain(Buffer.concat(bytes))
     }
 
     throw new Error('Invalid type to construct a Sidechain')
   }
 
   /**
-   * Read an amount from a BinaryParser
+   * Read a Sidechain from a BinaryParser
    *
-   * @param parser BinaryParser to read the Amount from
-   * @returns An Amount object
+   * @param parser BinaryParser to read the Sidechain from
+   * @returns A Sidechain object
    */
   static fromParser(parser: BinaryParser): Sidechain {
     const bytes: Array<Buffer> = []
 
-    bytes.push(parser.read(AccountID.width))
-    bytes.push(IssuedCurrency.fromParser(parser).toBytes())
-    bytes.push(parser.read(AccountID.width))
-    bytes.push(IssuedCurrency.fromParser(parser).toBytes())
+    this.TYPE_ORDER.forEach((item) => {
+      const { type } = item
+      const object = type.fromParser(parser)
+      bytes.push(object.toBytes())
+    })
 
     return new Sidechain(Buffer.concat(bytes))
   }
 
   /**
-   * Get the JSON representation of this Amount
+   * Get the JSON representation of this Sidechain
    *
    * @returns the JSON interpretation of this.bytes
    */
   toJSON(): SidechainObject {
     const parser = new BinaryParser(this.toString())
-    const src_chain_door = AccountID.fromParser(parser) as AccountID
-    const src_chain_issue = IssuedCurrency.fromParser(parser)
-    const dst_chain_door = AccountID.fromParser(parser) as AccountID
-    const dst_chain_issue = IssuedCurrency.fromParser(parser)
-
-    return {
-      dst_chain_door: dst_chain_door.toJSON(),
-      dst_chain_issue: dst_chain_issue.toJSON(),
-      src_chain_door: src_chain_door.toJSON(),
-      src_chain_issue: src_chain_issue.toJSON(),
-    }
+    const json = {}
+    Sidechain.TYPE_ORDER.forEach((item) => {
+      const { name, type } = item
+      const object = type.fromParser(parser).toJSON()
+      json[name] = object
+    })
+    return json as SidechainObject
   }
 }
 
