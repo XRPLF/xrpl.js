@@ -2,7 +2,6 @@
 import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync } from 'bip39'
-import { assert } from 'console'
 import _ from 'lodash'
 import {
   classicAddressToXAddress,
@@ -455,14 +454,13 @@ class Wallet {
       txCopy.URI = txCopy.URI.toUpperCase()
     }
 
+    // eslint-disable @typescript-eslint/consistent-type-assertions -- We check at runtime that this is safe
     Object.keys(txCopy).forEach(function (key) {
-      const amount: IssuedCurrencyAmount = txCopy[key]
       const standard_currency_code_len = 3
-      if (amount && isIssuedCurrency(amount)) {
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We check at runtime that this is safe
+      if (txCopy[key] && isIssuedCurrency(txCopy[key])) {
         const decodedAmount = decoded[key] as unknown as IssuedCurrencyAmount
         const decodedCurrency = decodedAmount.currency
-        const txCurrency = txCopy[key].currency as string
+        const txCurrency = (txCopy[key] as IssuedCurrencyAmount).currency
 
         if (
           txCurrency.length === standard_currency_code_len &&
@@ -474,15 +472,19 @@ class Wallet {
         }
 
         // Standardize the format of currency codes to the 40 byte hex string for comparison
+        const amount: IssuedCurrencyAmount = txCopy[key]
         if (amount.currency.length !== decodedCurrency.length) {
           if (decodedCurrency.length === standard_currency_code_len) {
             decodedAmount.currency = isoToHex(decodedCurrency)
           } else {
-            txCopy[key].currency = isoToHex(txCopy[key].currency)
+            ;(txCopy[key] as IssuedCurrencyAmount).currency = isoToHex(
+              txCopy[key].currency,
+            )
           }
         }
       }
     })
+    // eslint-enable @typescript-eslint/consistent-type-assertions -- Done with dynamic checking
 
     if (!_.isEqual(decoded, txCopy)) {
       const data = {
@@ -551,7 +553,6 @@ function removeTrailingZeros(tx: Transaction): void {
  */
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Magic numbers are from rippleds of currency code encoding */
 function isoToHex(iso: string): string {
-  assert(iso.length === 3)
   const bytes = Buffer.alloc(20)
   if (iso !== 'XRP') {
     const isoBytes = iso.split('').map((chr) => chr.charCodeAt(0))
