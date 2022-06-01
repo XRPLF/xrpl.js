@@ -1,3 +1,5 @@
+const HEX_REGEX = /^[0-9A-Fa-f]+$/u
+
 /**
  * Verify that all fields of an object are in fields.
  *
@@ -22,4 +24,14 @@ export function onlyHasFields(
 export function isFlagEnabled(Flags: number, checkFlag: number): boolean {
   // eslint-disable-next-line no-bitwise -- flags needs bitwise
   return (checkFlag & Flags) === checkFlag
+}
+
+/**
+ * Check if string is in hex format.
+ *
+ * @param str - The string to check if it's in hex format.
+ * @returns True if string is in hex format
+ */
+export function isHex(str: string): boolean {
+  return HEX_REGEX.test(str)
 }
