@@ -1,13 +1,7 @@
 import { ValidationError } from '../../errors'
-import { Sidechain } from '../common'
+import { Sidechain, XChainProofSig } from '../common'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
-
-interface Signature {
-  signature: string
-
-  signing_key: string
-}
 
 /**
  * A XChainClaim transaction assigns, changes, or removes the regular key
@@ -23,7 +17,7 @@ export interface XChainClaim extends BaseTransaction {
 
     sidechain: Sidechain
 
-    signatures: Signature[]
+    signatures: XChainProofSig[]
 
     was_src_chain_send: boolean
 

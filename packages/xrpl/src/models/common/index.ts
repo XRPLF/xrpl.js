@@ -75,6 +75,13 @@ export interface Sidechain {
   src_chain_issue: Currency
 }
 
+export interface XChainProofSig {
+  XChainProofSig: {
+    Signature: string
+    PublicKey: string
+  }
+}
+
 /**
  * This information is added to Transactions in request responses, but is not part
  * of the canonical Transaction information on ledger. These fields are denoted with
