@@ -24,7 +24,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install -g npm@7
-    - run: npm ci
+    - run: lerna exec -- npm install --only=prod
     - run: npm run build
     - run: npm run lint
 
@@ -43,7 +43,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install -g npm@7
-    - run: npm install --only=prod
+    - run: lerna exec -- npm install --only=prod
     - run: npm run build
     - run: npm test
 
@@ -69,7 +69,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install -g npm@7
-    - run: npm install --only=prod
+    - run: lerna exec -- npm install --only=prod
     - run: npm run build
     - run: npm run test:integration
       env:
