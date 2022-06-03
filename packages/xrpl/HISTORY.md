@@ -3,10 +3,16 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
+
+## 2.3.0 (2022-06-02)
+### Added
+* Sourcemap generation for browser bundle
+* Exported the AccountOffer interface
+
 ### Fixed
 * Client.disconnect() now stops the heartbeat health check as well
 * Updated dependencies which had a warning when running `npm audit`
-* Infinite error/reconnect in browser if an exception was raised during the initial websocket connection event.
+* Infinite error/reconnect in browser if an exception was raised during the initial websocket connection event
 * Errors during reliable submission with no error message now properly show the preliminary result instead of a type error
 * Fixed serialize/deserialize verification bug in `Wallet.sign()` when signing a non-XRP Payment with an amount that contains trailing insignificant zeros
 * Allow lowercase hex values for `NFTokenMint.URI`

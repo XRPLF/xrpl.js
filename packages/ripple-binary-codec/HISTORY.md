@@ -1,6 +1,8 @@
 # ripple-binary-codec Release History
 
 ## Unreleased
+
+## 1.4.1 (2022-06-02)
 - Added a clearer error message for trying to encode an invalid transaction. (Ex. With an incorrect TransactionType)
 - Fixed standard currency codes with lowercase and allowed symbols not decoding into standard codes.
 
