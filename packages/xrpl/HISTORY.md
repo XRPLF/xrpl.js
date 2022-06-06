@@ -3,6 +3,7 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
+* Fixed signing tx with standard currency codes with lowercase and allowed symbols causing an error on decode.
 
 ## 2.3.0 (2022-06-02)
 ### Added
