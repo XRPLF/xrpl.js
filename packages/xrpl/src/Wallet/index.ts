@@ -27,8 +27,8 @@ import ECDSA from '../ECDSA'
 import { ValidationError, XrplError } from '../errors'
 import { IssuedCurrencyAmount } from '../models/common'
 import { Transaction } from '../models/transactions'
-import { isHex } from '../models/utils'
 import { isIssuedCurrency } from '../models/transactions/common'
+import { isHex } from '../models/utils'
 import { ensureClassicAddress } from '../sugar/utils'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
 
@@ -454,8 +454,8 @@ class Wallet {
       txCopy.URI = txCopy.URI.toUpperCase()
     }
 
-    // eslint-disable @typescript-eslint/consistent-type-assertions -- We check at runtime that this is safe
-    Object.keys(txCopy).forEach(function (key) {
+    /* eslint-disable @typescript-eslint/consistent-type-assertions -- We check at runtime that this is safe */
+    Object.keys(txCopy).forEach((key) => {
       const standard_currency_code_len = 3
       if (txCopy[key] && isIssuedCurrency(txCopy[key])) {
         const decodedAmount = decoded[key] as unknown as IssuedCurrencyAmount
@@ -472,19 +472,19 @@ class Wallet {
         }
 
         // Standardize the format of currency codes to the 40 byte hex string for comparison
-        const amount: IssuedCurrencyAmount = txCopy[key]
+        const amount = txCopy[key] as IssuedCurrencyAmount
         if (amount.currency.length !== decodedCurrency.length) {
+          /* eslint-disable-next-line max-depth -- Easier to read with two if-statements */
           if (decodedCurrency.length === standard_currency_code_len) {
             decodedAmount.currency = isoToHex(decodedCurrency)
           } else {
-            ;(txCopy[key] as IssuedCurrencyAmount).currency = isoToHex(
-              txCopy[key].currency,
-            )
+            /* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- We need to update txCopy directly */
+            txCopy[key].currency = isoToHex(txCopy[key].currency)
           }
         }
       }
     })
-    // eslint-enable @typescript-eslint/consistent-type-assertions -- Done with dynamic checking
+    /* eslint-enable @typescript-eslint/consistent-type-assertions -- Done with dynamic checking */
 
     if (!_.isEqual(decoded, txCopy)) {
       const data = {
