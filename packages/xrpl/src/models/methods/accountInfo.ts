@@ -94,12 +94,6 @@ export interface AccountInfoResponse extends BaseResponse {
      */
     account_data: AccountRoot
     /**
-     * Array of SignerList ledger objects associated with this account for
-     * Multi-Signing. Since an account can own at most one SignerList, this
-     * array must have exactly one member if it is present.
-     */
-    signer_lists?: SignerList[]
-    /**
      * The ledger index of the current in-progress ledger, which was used when
      * retrieving this information.
      */
