@@ -21,6 +21,7 @@ interface FaucetWallet {
 enum FaucetNetwork {
   Testnet = 'faucet.altnet.rippletest.net',
   Devnet = 'faucet.devnet.rippletest.net',
+  NFTDevnet = 'faucet-nft.ripple.com',
 }
 
 // Interval to check an account balance
@@ -310,6 +311,10 @@ function getFaucetHost(client: Client): FaucetNetwork | undefined {
 
   if (connectionUrl.includes('devnet')) {
     return FaucetNetwork.Devnet
+  }
+
+  if (connectionUrl.includes('xls20-sandbox')) {
+    return FaucetNetwork.NFTDevnet
   }
 
   throw new XRPLFaucetError('Faucet URL is not defined or inferrable.')
