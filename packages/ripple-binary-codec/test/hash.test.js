@@ -62,6 +62,11 @@ describe('Currency', function () {
   test('Currency codes with symbols not to decode to hex', () => {
     expect(Currency.from('x|p').toJSON()).toBe('x|p')
   })
+  test('Currency codes with unsupported symbols to hex', () => {
+    expect(Currency.from('A±§').toJSON()).toBe(
+      '00000000000000000000000041B1A70000000000',
+    )
+  })
   test('Currency codes with uppercase and 0-9 decode to ISO codes', () => {
     expect(Currency.from('X8P').toJSON()).toBe('X8P')
     expect(Currency.from('USD').toJSON()).toBe('USD')
