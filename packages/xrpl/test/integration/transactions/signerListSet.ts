@@ -36,4 +36,29 @@ describe('SignerListSet', function () {
     }
     await testTransaction(this.client, tx, this.wallet)
   })
+
+  it('sign with WalletLocator', async function () {
+    const tx: SignerListSet = {
+      TransactionType: 'SignerListSet',
+      Account: this.wallet.classicAddress,
+      SignerEntries: [
+        {
+          SignerEntry: {
+            Account: 'r5nx8ZkwEbFztnc8Qyi22DE9JYjRzNmvs',
+            SignerWeight: 1,
+            WalletLocator:
+              'CAFECAFECAFECAFECAFECAFECAFECAFECAFECAFECAFECAFECAFECAFECAFECAFE',
+          },
+        },
+        {
+          SignerEntry: {
+            Account: 'r3RtUvGw9nMoJ5FuHxuoVJvcENhKtuF9ud',
+            SignerWeight: 1,
+          },
+        },
+      ],
+      SignerQuorum: 2,
+    }
+    await testTransaction(this.client, tx, this.wallet)
+  })
 })
