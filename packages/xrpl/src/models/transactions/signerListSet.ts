@@ -20,7 +20,7 @@ export interface SignerListSet extends BaseTransaction {
   /**
    * Array of SignerEntry objects, indicating the addresses and weights of
    * signers in this list. This signer list must have at least 1 member and no
-   * more than 8 members. No address may appear more than once in the list, nor
+   * more than 32 members. No address may appear more than once in the list, nor
    * may the Account submitting the transaction appear in the list.
    */
   SignerEntries: SignerEntry[]
