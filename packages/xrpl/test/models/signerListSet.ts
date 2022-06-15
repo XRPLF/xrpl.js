@@ -127,11 +127,12 @@ describe('SignerListSet', function () {
       'rDuU2uSXMfEaoxN1qW8sj7aUNFLGEn3Hr2',
       'rsbjSjA4TCB9gtm7x7SrWbZHB6g4tt9CGU',
     ]
+    signerListSetTx.SignerQuorum = accounts.length
     for (const acc of accounts) {
       signerListSetTx.SignerEntries.push({
         SignerEntry: {
           Account: acc,
-          SignerWeight: 2,
+          SignerWeight: 1,
         },
       })
     }
