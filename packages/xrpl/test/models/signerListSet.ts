@@ -150,4 +150,66 @@ describe('SignerListSet', function () {
       errorMessage,
     )
   })
+
+  it(`verifies valid WalletLocator in SignerEntries`, function () {
+    signerListSetTx.SignerQuorum = 3
+    signerListSetTx.SignerEntries = [
+      {
+        SignerEntry: {
+          Account: 'rBFBipte4nAQCTsRxd2czwvSurhCpAf4X6',
+          SignerWeight: 1,
+          WalletLocator:
+            'CAFECAFECAFECAFECAFECAFECAFECAFECAFECAFECAFECAFECAFECAFECAFECAFE',
+        },
+      },
+      {
+        SignerEntry: {
+          Account: 'r3ijUH32iiy9tYNj3rD7hKWYjy1BFUxngm',
+          SignerWeight: 1,
+        },
+      },
+      {
+        SignerEntry: {
+          Account: 'rpwq8vi4Mn3L5kDJmb8Mg59CanPFPzMCnj',
+          SignerWeight: 1,
+          WalletLocator:
+            '00000000000000000000000000000000000000000000000000000000DEADBEEF',
+        },
+      },
+    ]
+
+    assert.doesNotThrow(() => validateSignerListSet(signerListSetTx))
+    assert.doesNotThrow(() => validate(signerListSetTx))
+  })
+
+  it(`throws w/ invalid WalletLocator in SignerEntries`, function () {
+    signerListSetTx.SignerQuorum = 2
+    signerListSetTx.SignerEntries = [
+      {
+        SignerEntry: {
+          Account: 'rBFBipte4nAQCTsRxd2czwvSurhCpAf4X6',
+          SignerWeight: 1,
+          WalletLocator: 'not_valid',
+        },
+      },
+      {
+        SignerEntry: {
+          Account: 'r3ijUH32iiy9tYNj3rD7hKWYjy1BFUxngm',
+          SignerWeight: 1,
+        },
+      },
+    ]
+    const errorMessage =
+      'SignerListSet: WalletLocator in SignerEntry must be a 256-bit (32-byte) hexadecimal value'
+    assert.throws(
+      () => validateSignerListSet(signerListSetTx),
+      ValidationError,
+      errorMessage,
+    )
+    assert.throws(
+      () => validate(signerListSetTx),
+      ValidationError,
+      errorMessage,
+    )
+  })
 })

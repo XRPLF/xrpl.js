@@ -28,6 +28,8 @@ export interface SignerListSet extends BaseTransaction {
 
 const MAX_SIGNERS = 32
 
+const HEX_WALLET_LOCATOR_REGEX = /^[0-9A-Fa-f]{64}$/u
+
 /**
  * Verify the form and type of an SignerListSet at runtime.
  *
@@ -63,5 +65,19 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
     throw new ValidationError(
       `SignerListSet: maximum of ${MAX_SIGNERS} members allowed in SignerEntries`,
     )
+  }
+
+  if (tx.SignerEntries.length > 0) {
+    for (const entry of tx.SignerEntries) {
+      const signerEntry = entry.SignerEntry
+      if (
+        signerEntry.WalletLocator !== undefined &&
+        !HEX_WALLET_LOCATOR_REGEX.test(signerEntry.WalletLocator)
+      ) {
+        throw new ValidationError(
+          `SignerListSet: WalletLocator in SignerEntry must be a 256-bit (32-byte) hexadecimal value`,
+        )
+      }
+    }
   }
 }
