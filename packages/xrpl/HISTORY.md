@@ -5,6 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 ### Added
 * Add ExpandedSignerList amendment support
+* When connected to nft-devnet, Client.fundWallet now defaults to using the nft-devnet faucet instead of requiring specification.
 
 ## 2.3.0 (2022-06-02)
 ### Added
