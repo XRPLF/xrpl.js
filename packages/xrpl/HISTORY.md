@@ -21,7 +21,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Errors during reliable submission with no error message now properly show the preliminary result instead of a type error
 * Fixed serialize/deserialize verification bug in `Wallet.sign()` when signing a non-XRP Payment with an amount that contains trailing insignificant zeros
 * Allow lowercase hex values for `NFTokenMint.URI`
-* Now allows signing of symbolic standard-currency codes, and gives better errors for lowercase standard currencies.
 
 ## 2.2.3 (2022-05-04)
 ### Fixed
