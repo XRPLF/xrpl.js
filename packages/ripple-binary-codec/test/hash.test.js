@@ -54,15 +54,19 @@ describe('Currency', function () {
     const currencyCode = '0000000000000000000000005852500000000000'
     expect(Currency.from(currencyCode).toJSON()).toBe(currencyCode)
   })
-  test('Currency with lowercase letters decode to hex', () => {
-    expect(Currency.from('xRp').toJSON()).toBe(
-      '0000000000000000000000007852700000000000',
+  test('Currency code with lowercase letters decodes to ISO code', () => {
+    expect(Currency.from('xRp').toJSON()).toBe('xRp')
+  })
+  test('Currency codes with symbols decodes to ISO code', () => {
+    expect(Currency.from('x|p').toJSON()).toBe('x|p')
+  })
+  test('Currency code with non-standard symbols decodes to hex', () => {
+    expect(Currency.from(':::').toJSON()).toBe(
+      '0000000000000000000000003A3A3A0000000000',
     )
   })
-  test('Currency codes with symbols decode to hex', () => {
-    expect(Currency.from('x|p').toJSON()).toBe(
-      '000000000000000000000000787C700000000000',
-    )
+  test('Currency codes can be exclusively standard symbols', () => {
+    expect(Currency.from('![]').toJSON()).toBe('![]')
   })
   test('Currency codes with uppercase and 0-9 decode to ISO codes', () => {
     expect(Currency.from('X8P').toJSON()).toBe('X8P')

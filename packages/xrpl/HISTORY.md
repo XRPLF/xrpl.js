@@ -3,6 +3,9 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
+### Fixed
+* Signing tx with standard currency codes with lowercase and allowed symbols causing an error on decode.
+
 ### Added
 * When connected to nft-devnet, Client.fundWallet now defaults to using the nft-devnet faucet instead of requiring specification.
 
