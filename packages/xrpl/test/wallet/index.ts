@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec/dist'
-import { NFTokenMint, Transaction } from 'xrpl-local'
+import { NFTokenMint, Payment, Transaction } from 'xrpl-local'
 import ECDSA from 'xrpl-local/ECDSA'
 import Wallet from 'xrpl-local/Wallet'
 
@@ -301,6 +301,7 @@ describe('Wallet', function () {
     })
   })
 
+  // eslint-disable-next-line max-statements -- Required for test coverage.
   describe('sign', function () {
     let wallet: Wallet
 
@@ -588,6 +589,114 @@ describe('Wallet', function () {
       assert.throws(() => {
         wallet.sign(payment)
       }, /^1.1234567 is an illegal amount/u)
+    })
+
+    const issuedCurrencyPayment: Transaction = {
+      TransactionType: 'Payment',
+      Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+      Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+      Amount: {
+        currency: 'foo',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      },
+      Flags: 2147483648,
+      Sequence: 23,
+      LastLedgerSequence: 8819954,
+      Fee: '12',
+    }
+
+    it('lowercase standard currency code signs successfully', async function () {
+      const payment: Payment = { ...issuedCurrencyPayment }
+      payment.Amount = {
+        currency: 'foo',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+
+      assert.deepEqual(wallet.sign(payment), {
+        tx_blob:
+          '12000022800000002400000017201B008694F261D504625103A72000000000000000000000000000666F6F00000000002E099DD75FDD96EB4A603037844F964832FED86B68400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F54474473045022100D32EBD44F86FB6D0BE239A410B62A73A8B0C26CE3767321913D6FB7BE6FAC2410220430C011C25091DA9CD75E7C99BE406572FBB57B92132E39B4BF873863E744E2E81145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
+        hash: 'F822EA1D7B2A3026E4654A9152896652C3843B5690F8A56C4217CB4690C5C95A',
+      })
+    })
+
+    it('issued currency in standard or hex format signs to the same transaction', async function () {
+      const payment: Payment = { ...issuedCurrencyPayment }
+      payment.Amount = {
+        currency: '***',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+
+      const payment2: Payment = { ...issuedCurrencyPayment }
+      payment2.Amount = {
+        currency: '0000000000000000000000002A2A2A0000000000',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+
+      assert.deepEqual(wallet.sign(payment), wallet.sign(payment2))
+    })
+
+    it('sign throws when a payment contains an issued currency like XRP', async function () {
+      const payment: Payment = { ...issuedCurrencyPayment }
+      payment.Amount = {
+        currency: 'xrp',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+      assert.throws(() => {
+        wallet.sign(payment)
+      }, /^Trying to sign an issued currency with a similar standard code to XRP \(received 'xrp'\)\. XRP is not an issued currency\./u)
+    })
+
+    it('sign does NOT throw when a payment contains an issued currency like xrp in hex string format', async function () {
+      const payment: Payment = { ...issuedCurrencyPayment }
+      payment.Amount = {
+        currency: '0000000000000000000000007872700000000000',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+      assert.deepEqual(wallet.sign(payment), {
+        tx_blob:
+          '12000022800000002400000017201B008694F261D504625103A7200000000000000000000000000078727000000000002E099DD75FDD96EB4A603037844F964832FED86B68400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F5447446304402202CD2BE27480860765B1B8DB6C499D299734C533F4FFA66317E46D1ADE5181EB7022066D2C65B975A6A9FEE56AB55211D5F2F65D6F988C8280019211874D11771A05D81145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
+        hash: '1FEAA7894E507E36D73F60DED89852CE28994366879BC7D3D806E4C50D10B1EE',
+      })
+    })
+
+    it('sign succeeds with standard currency code with symbols', async function () {
+      const payment: Payment = { ...issuedCurrencyPayment }
+      payment.Amount = {
+        currency: '***',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+      const result = wallet.sign(payment)
+      const expectedResult = {
+        tx_blob:
+          '12000022800000002400000017201B008694F261D504625103A720000000000000000000000000002A2A2A00000000002E099DD75FDD96EB4A603037844F964832FED86B68400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F54474463044022073E71588750C3D47D7D9A541F00FB897823DA67ED198D0A74404B6FE6D5E4AB5022021BE798D4159F375EBE13D0545F50EE864DF834D5A9F9A31504212156A57934C81145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
+        hash: '95BF9931C1EA164960FE13A504D5FBAEB1E072C1D291D75B85BA3F22A50346DF',
+      }
+
+      assert.deepEqual(result, expectedResult)
+    })
+
+    it('sign succeeds with non-standard 3 digit currency code', async function () {
+      const payment: Payment = { ...issuedCurrencyPayment }
+      payment.Amount = {
+        currency: ':::',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+      const result = wallet.sign(payment)
+      const expectedResult = {
+        tx_blob:
+          '12000022800000002400000017201B008694F261D504625103A720000000000000000000000000003A3A3A00000000002E099DD75FDD96EB4A603037844F964832FED86B68400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F5447446304402205952993DB235D3A6398E2CB5F91D7F0AD9067F02CB8E62FD335C516B64130F4702206777746CC516F95F39ADDD62CD395AF2F6BAFCCA355B5D23B9B4D9358474A11281145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
+        hash: 'CE80072E6D70932BC7AA698B931BCF97B6CC3DD3984E08DF284B74E8CB4E543A',
+      }
+
+      assert.deepEqual(result, expectedResult)
     })
 
     it('sign handles non-XRP amount with a trailing zero', async function () {
