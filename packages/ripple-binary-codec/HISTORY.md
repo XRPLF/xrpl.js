@@ -1,6 +1,8 @@
 # ripple-binary-codec Release History
 
 ## Unreleased
+
+## 1.4.2 (2022-06-27)
 - Fixed standard currency codes with lowercase and allowed symbols not decoding into standard codes.
 
 ## 1.4.1 (2022-06-02)
