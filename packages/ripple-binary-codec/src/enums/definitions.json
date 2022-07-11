@@ -41,7 +41,7 @@
     "PayChannel": 120,
     "Check": 67,
     "DepositPreauth": 112,
-    "NegativeUnl": 78,
+    "NegativeUNL": 78,
     "NFTokenPage": 80,
     "NFTokenOffer": 55,
     "Any": -3,
