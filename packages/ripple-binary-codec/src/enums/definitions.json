@@ -21,6 +21,10 @@
     "UInt192": 21,
     "UInt384": 22,
     "UInt512": 23,
+    "Bridge": 24,
+    "XChainAttestations": 25,
+    "XChainAttestationBatch": 26,
+    "XChainClaimProof": 27,
     "Transaction": 10001,
     "LedgerEntry": 10002,
     "Validation": 10003,
@@ -34,8 +38,10 @@
     "Ticket": 84,
     "SignerList": 83,
     "Offer": 111,
+    "Bridge": 105,
     "LedgerHashes": 104,
     "Amendments": 102,
+    "XChainClaimID": 113,
     "FeeSettings": 115,
     "Escrow": 117,
     "PayChannel": 120,
@@ -225,6 +231,16 @@
       "HookResult",
       {
         "nth": 18,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt8"
+      }
+    ],
+    [
+      "WasLockingChainSend",
+      {
+        "nth": 19,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -932,6 +948,36 @@
       }
     ],
     [
+      "XChainClaimID",
+      {
+        "nth": 20,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt64"
+      }
+    ],
+    [
+      "XChainAccountCreateCount",
+      {
+        "nth": 21,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt64"
+      }
+    ],
+    [
+      "XChainAccountClaimCount",
+      {
+        "nth": 22,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt64"
+      }
+    ],
+    [
       "EmailHash",
       {
         "nth": 1,
@@ -1422,6 +1468,36 @@
       }
     ],
     [
+      "XChainFee",
+      {
+        "nth": 20,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "SignatureReward",
+      {
+        "nth": 21,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "MinAccountCreateAmount",
+      {
+        "nth": 22,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
       "PublicKey",
       {
         "nth": 1,
@@ -1762,6 +1838,36 @@
       }
     ],
     [
+      "ThisChainAccount",
+      {
+        "nth": 17,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "AccountID"
+      }
+    ],
+    [
+      "OtherChainAccount",
+      {
+        "nth": 18,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "AccountID"
+      }
+    ],
+    [
+      "AttestationRewardAccount",
+      {
+        "nth": 19,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "AccountID"
+      }
+    ],
+    [
       "Indexes",
       {
         "nth": 1,
@@ -1809,6 +1915,36 @@
         "isSerialized": true,
         "isSigningField": true,
         "type": "PathSet"
+      }
+    ],
+    [
+      "Bridge",
+      {
+        "nth": 1,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Bridge"
+      }
+    ],
+    [
+      "XChainClaimProof",
+      {
+        "nth": 1,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "XChainClaimProof"
+      }
+    ],
+    [
+      "XChainAttestations",
+      {
+        "nth": 1,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "XChainAttestations"
       }
     ],
     [
@@ -2022,6 +2158,16 @@
       }
     ],
     [
+      "XChainProofSig",
+      {
+        "nth": 25,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
       "Signers",
       {
         "nth": 3,
@@ -2160,6 +2306,16 @@
         "isSigningField": true,
         "type": "STArray"
       }
+    ],
+    [
+      "XChainProofSigs",
+      {
+        "nth": 21,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
     ]
   ],
   "TRANSACTION_RESULTS": {
@@ -2215,6 +2371,12 @@
     "temUNKNOWN": -264,
     "temSEQ_AND_TICKET": -263,
     "temBAD_NFTOKEN_TRANSFER_FEE": -262,
+    "temEQUAL_DOOR_ACCOUNTS": -261,
+    "temBAD_XCHAIN_PROOF": -260,
+    "temSIDECHAIN_BAD_ISSUES": -259,
+    "temSIDECHAIN_NONDOOR_OWNER": -258,
+    "temXCHAIN_BRIDGE_BAD_MIN_ACCOUNT_CREATE_AMOUNT": -257,
+    "temXCHAIN_BRIDGE_BAD_REWARD_AMOUNT": -256,
 
     "tefFAILURE": -199,
     "tefALREADY": -198,
@@ -2298,7 +2460,16 @@
     "tecCANT_ACCEPT_OWN_NFTOKEN_OFFER": 158,
     "tecINSUFFICIENT_FUNDS": 159,
     "tecOBJECT_NOT_FOUND": 160,
-    "tecINSUFFICIENT_PAYMENT": 161
+    "tecINSUFFICIENT_PAYMENT": 161,
+    "tecBAD_XCHAIN_TRANSFER_ISSUE": 162,
+    "tecBAD_XCHAIN_CLAIM_ID": 163,
+    "tecXCHAIN_CLAIM_NO_QUORUM": 164,
+    "tecXCHAIN_PROOF_UNKNOWN_KEY": 165,
+    "tecXCHAIN_CREATE_ACCOUNT_NONXRP_ISSUE": 166,
+    "tecXCHAIN_CLAIM_ACCOUNT_DST_EXISTS": 167,
+    "tecXCHAIN_CLAIM_WRONG_CHAIN": 168,
+    "tecXCHAIN_REWARD_MISMATCH": 169,
+    "tecXCHAIN_NO_SIGNERS_LIST": 170
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
@@ -2330,6 +2501,13 @@
     "NFTokenCreateOffer": 27,
     "NFTokenCancelOffer": 28,
     "NFTokenAcceptOffer": 29,
+    "XChainCreateBridge": 30,
+    "XChainCreateClaimID": 31,
+    "XChainCommit": 32,
+    "XChainClaim": 33,
+    "SidechainXChainAccountCreate": 34,
+    "SidechainXChainAccountClaim": 35,
+    "XChainAddAttestation": 36,
     "EnableAmendment": 100,
     "SetFee": 101,
     "UNLModify": 102
