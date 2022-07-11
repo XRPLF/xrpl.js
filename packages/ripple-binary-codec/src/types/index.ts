@@ -7,10 +7,12 @@ import {
 import { AccountID } from './account-id'
 import { Amount } from './amount'
 import { Blob } from './blob'
+import { Bridge } from './bridge'
 import { Currency } from './currency'
 import { Hash128 } from './hash-128'
 import { Hash160 } from './hash-160'
 import { Hash256 } from './hash-256'
+import { IssuedCurrency } from './issued-currency'
 import { PathSet } from './path-set'
 import { STArray } from './st-array'
 import { STObject } from './st-object'
@@ -24,10 +26,12 @@ const coreTypes = {
   AccountID,
   Amount,
   Blob,
+  Bridge,
   Currency,
   Hash128,
   Hash160,
   Hash256,
+  IssuedCurrency,
   PathSet,
   STArray,
   STObject,
