@@ -22,8 +22,8 @@
   "scripts": {
     "build": "tsc -b && copyfiles ./src/enums/definitions.json ./dist/enums/",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
-    "prepare": "npm run build && npm test",
-    "test": "jest",
+    "prepare": "npm test",
+    "test": "npm run build && jest",
     "lint": "eslint . --ext .ts --ext .test.js"
   },
   "repository": {
