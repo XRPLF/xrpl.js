@@ -51,6 +51,7 @@ import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
 import { XChainClaim, validateXChainClaim } from './XChainClaim'
+import { XChainCommit, validateXChainCommit } from './XChainCommit'
 
 /**
  * @category Transaction Models
@@ -81,6 +82,7 @@ export type Transaction =
   | TicketCreate
   | TrustSet
   | XChainClaim
+  | XChainCommit
 
 /**
  * @category Transaction Models
@@ -207,6 +209,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'XChainClaim':
       validateXChainClaim(tx)
+      break
+
+    case 'XChainCommit':
+      validateXChainCommit(tx)
       break
 
     default:
