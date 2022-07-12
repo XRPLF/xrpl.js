@@ -31,7 +31,7 @@ export function validateXChainCommit(tx: Record<string, unknown>): void {
   }
 
   if (tx.XChainCommitID == null) {
-    throw new ValidationError('XChainCommit: missing field XChainCommitID')
+    throw new ValidationError('XChainCommit: missing field XChainClaimID')
   }
 
   if (tx.Amount == null) {
