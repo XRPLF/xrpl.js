@@ -50,6 +50,7 @@ import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
+import { XChainClaim, validateXChainClaim } from './XChainClaim'
 
 /**
  * @category Transaction Models
@@ -79,6 +80,7 @@ export type Transaction =
   | SignerListSet
   | TicketCreate
   | TrustSet
+  | XChainClaim
 
 /**
  * @category Transaction Models
@@ -201,6 +203,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'TrustSet':
       validateTrustSet(tx)
+      break
+
+    case 'XChainClaim':
+      validateXChainClaim(tx)
       break
 
     default:
