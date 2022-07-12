@@ -102,3 +102,10 @@ export interface NFTOffer {
   destination?: string
   expiration?: number
 }
+
+export interface Bridge {
+  src_chain_door: string
+  src_chain_issue: 'XRP' | IssuedCurrency
+  dst_chain_door: string
+  dst_chain_issue: 'XRP' | IssuedCurrency
+}
