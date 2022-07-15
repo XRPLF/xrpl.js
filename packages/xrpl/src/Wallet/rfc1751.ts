@@ -136,7 +136,13 @@ function getSubKey(
   const ch = [0, 0, 0, 0, 0, 0, 0, 0, 0]
   let word = ''
   for (word of sublist) {
-    const idx = rfc1751WordList.indexOf(word)
+    const idx = rfc1751WordList.indexOf(word.toUpperCase())
+    if (idx === -1) {
+      throw TypeError(
+        `Expected an RFC1751 word, but received '${word}'. ` +
+          `For the full list of words in the RFC1751 encoding see https://datatracker.ietf.org/doc/html/rfc1751`,
+      )
+    }
     const shift = (8 - ((bits + 11) % 8)) % 8
     const y = idx << shift
     const cl = y >> 16
