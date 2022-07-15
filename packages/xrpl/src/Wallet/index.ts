@@ -240,7 +240,7 @@ class Wallet {
     const node = masterNode.derivePath(
       opts.derivationPath ?? DEFAULT_DERIVATION_PATH,
     )
-    if (node?.privateKey === undefined) {
+    if (node.privateKey === undefined) {
       throw new ValidationError(
         'Unable to derive privateKey from mnemonic input',
       )

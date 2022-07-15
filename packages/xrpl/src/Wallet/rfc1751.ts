@@ -138,7 +138,7 @@ function getSubKey(
   for (word of sublist) {
     const idx = rfc1751WordList.indexOf(word.toUpperCase())
     if (idx === -1) {
-      throw TypeError(
+      throw new TypeError(
         `Expected an RFC1751 word, but received '${word}'. ` +
           `For the full list of words in the RFC1751 encoding see https://datatracker.ietf.org/doc/html/rfc1751`,
       )
