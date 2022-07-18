@@ -5,7 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 ### Fixed
 * fromMnemonic now allows lowercase for RFC1751 mnemnoics
-* fromMnemonic has better error handling if an invalid encoding is provided
+* `Wallet.fromMnemonic` detects when an invalid encoding is provided, and throws an error
 
 ## 2.3.1 (2022-06-27)
 ### Fixed
