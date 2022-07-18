@@ -1,7 +1,7 @@
 /* eslint-disable max-lines -- There are lots of equivalent constructors which make sense to have here. */
 import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
-import { mnemonicToSeedSync } from 'bip39'
+import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
 import _ from 'lodash'
 import {
   classicAddressToXAddress,
@@ -229,6 +229,12 @@ class Wallet {
       })
     }
     // Otherwise decode using bip39's mnemonic standard
+    if (!validateMnemonic(mnemonic)) {
+      throw new ValidationError(
+        'Unable to parse the given mnemonic using bip39 encoding',
+      )
+    }
+
     const seed = mnemonicToSeedSync(mnemonic)
     const masterNode = fromSeed(seed)
     const node = masterNode.derivePath(
