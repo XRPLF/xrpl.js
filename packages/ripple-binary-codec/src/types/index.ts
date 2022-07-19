@@ -7,7 +7,7 @@ import {
 import { AccountID } from './account-id'
 import { Amount } from './amount'
 import { Blob } from './blob'
-import { Bridge } from './bridge'
+import { XChainBridge } from './xchain-bridge'
 import { Currency } from './currency'
 import { Hash128 } from './hash-128'
 import { Hash160 } from './hash-160'
@@ -26,7 +26,7 @@ const coreTypes = {
   AccountID,
   Amount,
   Blob,
-  Bridge,
+  XChainBridge,
   Currency,
   Hash128,
   Hash160,
