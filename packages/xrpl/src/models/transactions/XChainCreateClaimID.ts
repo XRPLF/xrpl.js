@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { Amount, Bridge } from '../common'
+import { Amount, XChainBridge } from '../common'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
 
@@ -10,7 +10,7 @@ import { BaseTransaction, validateBaseTransaction } from './common'
 export interface XChainCreateClaimID extends BaseTransaction {
   TransactionType: 'XChainCreateClaimID'
 
-  Bridge: Bridge
+  XChainBridge: XChainBridge
 
   SignatureReward: Amount
 
@@ -26,8 +26,8 @@ export interface XChainCreateClaimID extends BaseTransaction {
 export function validateXChainCreateClaimID(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Bridge == null) {
-    throw new ValidationError('XChainCreateClaimID: missing field Bridge')
+  if (tx.XChainBridge == null) {
+    throw new ValidationError('XChainCreateClaimID: missing field XChainBridge')
   }
 
   if (tx.SignatureReward == null) {
