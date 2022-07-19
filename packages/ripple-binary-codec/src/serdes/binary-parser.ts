@@ -7,7 +7,7 @@ import { Buffer } from 'buffer/'
  * BinaryParser is used to compute fields and values from a HexString
  */
 class BinaryParser {
-  private bytes: Buffer
+  public bytes: Buffer
 
   /**
    * Initialize bytes to a hex string
