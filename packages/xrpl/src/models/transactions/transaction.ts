@@ -50,6 +50,10 @@ import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
+import {
+  XChainAddAttestation,
+  validateXChainAddAttestation,
+} from './XChainAddAttestation'
 import { XChainClaim, validateXChainClaim } from './XChainClaim'
 import { XChainCommit, validateXChainCommit } from './XChainCommit'
 import {
@@ -89,6 +93,7 @@ export type Transaction =
   | SignerListSet
   | TicketCreate
   | TrustSet
+  | XChainAddAttestation
   | XChainClaim
   | XChainCommit
   | XChainCreateBridge
@@ -215,6 +220,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'TrustSet':
       validateTrustSet(tx)
+      break
+
+    case 'XChainAddAttestation':
+      validateXChainAddAttestation(tx)
       break
 
     case 'XChainClaim':
