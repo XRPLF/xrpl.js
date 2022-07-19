@@ -12,7 +12,7 @@ export interface XChainAddAttestation extends BaseTransaction {
 
   XChainBridge: XChainBridge
 
-  XChainClaimAttestationBatch: {
+  XChainClaimAttestationBatch: Array<{
     XChainClaimAttestationBatchElement: {
       Account: string
 
@@ -29,10 +29,11 @@ export interface XChainAddAttestation extends BaseTransaction {
       WasLockingChainSend: 0 | 1
 
       XChainClaimID: string
-    }[]
-  }
+    }
+  }>
 
-  XChainCreateAccountAttestationBatch: {}[]
+  // TODO: update this once it's been implemented in rippled
+  XChainCreateAccountAttestationBatch: Array<Record<string, never>>
 }
 
 /**
