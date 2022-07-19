@@ -9,10 +9,10 @@ import { IssuedCurrency, IssuedCurrencyObject } from './issued-currency'
  * Interface for JSON objects that represent cross-chain bridges
  */
 interface XChainBridgeObject extends JsonObject {
-  dst_chain_door: string
-  dst_chain_issue: IssuedCurrencyObject | string
-  src_chain_door: string
-  src_chain_issue: IssuedCurrencyObject | string
+  LockingChainDoor: string
+  LockingChainIssue: IssuedCurrencyObject | string
+  IssuingChainDoor: string
+  IssuingChainIssue: IssuedCurrencyObject | string
 }
 
 /**
