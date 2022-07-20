@@ -83,6 +83,9 @@ npm run docgen
 
 This updates `docs/` at the top level, where GitHub Pages looks for the docs.
 
+## Update `definitions.json`
+Use [this repo](https://github.com/RichardAH/xrpl-codec-gen) to generate a new `definitions.json` file from the rippled source code. Instructions are available in that README.
+
 ## Adding and removing packages
 
 `xrpl.js` uses `lerna` and `npm`'s workspaces features to manage a monorepo.

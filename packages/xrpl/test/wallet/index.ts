@@ -143,6 +143,41 @@ describe('Wallet', function () {
       assert.equal(wallet.seed, expectedSeed)
     })
 
+    it('throws an error when using an RFC1751 mnemonic for bip39', function () {
+      const algorithm = ECDSA.ed25519
+      const mnemonic =
+        'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
+      assert.throws(() => {
+        Wallet.fromMnemonic(mnemonic, {
+          mnemonicEncoding: 'bip39',
+          algorithm,
+        })
+      }, /^Unable to parse the given mnemonic using bip39 encoding$/u)
+    })
+
+    it('throws an error when using an bip39 mnemonic for RFC1751', function () {
+      const mnemonic =
+        'draw attack antique swing base employ blur above palace lucky glide clap pen use illegal'
+      assert.throws(() => {
+        Wallet.fromMnemonic(mnemonic, {
+          mnemonicEncoding: 'rfc1751',
+        })
+      }, /^Expected an RFC1751 word, but received 'attack'\. For the full list of words in the RFC1751 encoding see https:\/\/datatracker\.ietf\.org\/doc\/html\/rfc1/u)
+    })
+
+    it('derives a wallet using rfc1751 mnemonic with lowercase words', function () {
+      const algorithm = ECDSA.ed25519
+      const mnemonic =
+        'cab beth hank bird mend sign gild any kern hyde chat stub'
+      const expectedSeed = 'sEdVaw4m9W3H3ou3VnyvDwvPAP5BEz1'
+      const wallet = Wallet.fromMnemonic(mnemonic, {
+        mnemonicEncoding: 'rfc1751',
+        algorithm,
+      })
+
+      assert.equal(wallet.seed, expectedSeed)
+    })
+
     it('derives a wallet using a Regular Key Pair', function () {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
@@ -211,11 +246,11 @@ describe('Wallet', function () {
 
   describe('fromMnemonic', function () {
     const mnemonic =
-      'try milk link drift aware pass obtain again music stick pluck fold'
+      'assault rare scout seed design extend noble drink talk control guitar quote'
     const publicKey =
-      '0257B550BA2FDCCF0ADDA3DEB2A5411700F3ADFDCC7C68E1DCD1E2B63E6B0C63E6'
+      '035953FCD81D001CF634EB44A87940F3F98ADF2483D09C914BAED0539BE50F385D'
     const privateKey =
-      '008F942B6E229C0E9CEE47E7A94253DABB6A9855F4BA2D8A741FA31851A1D423C3'
+      '0013FC461CA5799F1357C8130AF703CBA7E9C28E072C6CA8F7DEF8601CDE98F394'
 
     it('derives a wallet using default derivation path', function () {
       const wallet = Wallet.fromMnemonic(mnemonic)
@@ -235,15 +270,16 @@ describe('Wallet', function () {
     it('derives a wallet using a Regular Key Pair', function () {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
-        mnemonic: 'KNEW BENT LYNN LED GAD BEN KENT SHAM HOBO RINK WALT ALLY',
+        mnemonic: 'I IRE BOND BOW TRIO LAID SEAT GOAL HEN IBIS IBIS DARE',
         publicKey:
-          '02FBC77338A52D9733641437A77369ACB0D89D52642740A008509F7A3A7450C841',
+          '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
         privateKey:
-          '007A10DF756751129060DD29C9BB6733ADB92507B7DD83BB0795CAA09FB815BE22',
+          '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
       }
 
       const wallet = Wallet.fromMnemonic(regularKeyPair.mnemonic, {
         masterAddress,
+        mnemonicEncoding: 'rfc1751',
       })
 
       assert.equal(wallet.publicKey, regularKeyPair.publicKey)
@@ -253,7 +289,7 @@ describe('Wallet', function () {
   })
 
   describe('fromEntropy', function () {
-    let entropy
+    let entropy: number[]
     const publicKey =
       '0390A196799EE412284A5D80BF78C3E84CBB80E1437A0AECD9ADF94D7FEAAFA284'
     const privateKey =
