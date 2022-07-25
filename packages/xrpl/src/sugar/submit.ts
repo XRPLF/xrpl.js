@@ -157,7 +157,9 @@ async function waitForFinalTransactionOutcome(
           submissionResult,
         )
       }
-      throw new Error(`${message} \n Preliminary result: ${submissionResult}.`)
+      throw new Error(
+        `${message} \n Preliminary result: ${submissionResult}.\nFull error details: ${error}`,
+      )
     })
 
   if (txResponse.result.validated) {
