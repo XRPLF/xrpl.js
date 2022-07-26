@@ -158,7 +158,9 @@ async function waitForFinalTransactionOutcome(
         )
       }
       throw new Error(
-        `${message} \n Preliminary result: ${submissionResult}.\nFull error details: ${error}`,
+        `${message} \n Preliminary result: ${submissionResult}.\nFull error details: ${String(
+          error,
+        )}`,
       )
     })
 
