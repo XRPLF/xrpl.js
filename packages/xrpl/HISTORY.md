@@ -3,12 +3,10 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
-### Added
-* Made unexpected errors in `submitAndWait` more verbose to make them easier to debug.
-
 ### Fixed
 * `Wallet.fromMnemonic` now allows lowercase for RFC1751 mnemonics (#2046)
 * `Wallet.fromMnemonic` detects when an invalid encoding is provided, and throws an error
+* Made unexpected errors in `submitAndWait` more verbose to make them easier to debug.
 
 ## 2.3.1 (2022-06-27)
 ### Fixed
