@@ -47,6 +47,10 @@ import {
   validatePaymentChannelFund,
 } from './paymentChannelFund'
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
+import {
+  SidechainXChainAccountCreate,
+  validateSidechainXChainAccountCreate,
+} from './sidechainXChainAccountCreate'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
@@ -98,6 +102,7 @@ export type Transaction =
   | XChainCommit
   | XChainCreateBridge
   | XChainCreateClaimID
+  | SidechainXChainAccountCreate
 
 /**
  * @category Transaction Models
@@ -241,6 +246,9 @@ export function validate(transaction: Record<string, unknown>): void {
     case 'XChainCreateClaimID':
       validateXChainCreateClaimID(tx)
       break
+
+    case 'SidechainXChainAccountCreate':
+      validateSidechainXChainAccountCreate(tx)
 
     default:
       throw new ValidationError(
