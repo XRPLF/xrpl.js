@@ -21,11 +21,10 @@
     "UInt192": 21,
     "UInt384": 22,
     "UInt512": 23,
-    "XChainAttestations": 24,
-    "XChainClaimProof": 25,
-    "Issue": 26,
-    "XChainBridge": 27,
-    "XChainAttestationBatch": 28,
+    "XChainClaimProof": 24,
+    "Issue": 25,
+    "XChainBridge": 26,
+    "XChainAttestationBatch": 27,
     "Transaction": 10001,
     "LedgerEntry": 10002,
     "Validation": 10003,
@@ -43,6 +42,7 @@
     "LedgerHashes": 104,
     "Amendments": 102,
     "XChainClaimID": 113,
+    "XChainCreateAccountClaimID": 116,
     "FeeSettings": 115,
     "Escrow": 117,
     "PayChannel": 120,
@@ -1959,16 +1959,6 @@
       }
     ],
     [
-      "XChainAttestations",
-      {
-        "nth": 1,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "XChainAttestations"
-      }
-    ],
-    [
       "LockingChainIssue",
       {
         "nth": 1,
@@ -2219,7 +2209,7 @@
       }
     ],
     [
-      "XChainProofSig",
+      "XChainClaimProofSig",
       {
         "nth": 25,
         "isVLEncoded": false,
@@ -2229,7 +2219,7 @@
       }
     ],
     [
-      "XChainAttestationSigs",
+      "XChainCreateAccountProofSig",
       {
         "nth": 26,
         "isVLEncoded": false,
@@ -2447,6 +2437,26 @@
         "isSigningField": true,
         "type": "STArray"
       }
+    ],
+    [
+      "XChainClaimAttestations",
+      {
+        "nth": 24,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "XChainCreateAccountAttestations",
+      {
+        "nth": 25,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
     ]
   ],
   "TRANSACTION_RESULTS": {
@@ -2603,7 +2613,10 @@
     "tecXCHAIN_CLAIM_WRONG_CHAIN": 169,
     "tecXCHAIN_REWARD_MISMATCH": 170,
     "tecXCHAIN_NO_SIGNERS_LIST": 171,
-    "tecXCHAIN_SENDING_ACCOUNT_MISMATCH": 172
+    "tecXCHAIN_SENDING_ACCOUNT_MISMATCH": 172,
+    "tecXCHAIN_INSUFF_CREATE_AMOUNT": 173,
+    "tecXCHAIN_ACCOUNT_CREATE_PAST": 174,
+    "tecXCHAIN_ACCOUNT_CREATE_TOO_MANY": 175
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
