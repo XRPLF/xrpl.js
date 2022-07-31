@@ -249,6 +249,7 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'SidechainXChainAccountCreate':
       validateSidechainXChainAccountCreate(tx)
+      break
 
     default:
       throw new ValidationError(
