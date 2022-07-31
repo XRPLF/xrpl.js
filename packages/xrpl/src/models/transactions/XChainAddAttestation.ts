@@ -10,47 +10,49 @@ import { BaseTransaction, validateBaseTransaction } from './common'
 export interface XChainAddAttestation extends BaseTransaction {
   TransactionType: 'XChainAddAttestation'
 
-  XChainBridge: XChainBridge
+  XChainAttestationBatch: {
+    XChainBridge: XChainBridge
 
-  XChainClaimAttestationBatch: Array<{
-    XChainClaimAttestationBatchElement: {
-      Account: string
+    XChainClaimAttestationBatch: Array<{
+      XChainClaimAttestationBatchElement: {
+        Account: string
 
-      Amount: Amount
+        Amount: Amount
 
-      AttestationRewardAccount: string
+        AttestationRewardAccount: string
 
-      Destination: string
+        Destination: string
 
-      PublicKey: string
+        PublicKey: string
 
-      Signature: string
+        Signature: string
 
-      WasLockingChainSend: 0 | 1
+        WasLockingChainSend: 0 | 1
 
-      XChainClaimID: string
-    }
-  }>
+        XChainClaimID: string
+      }
+    }>
 
-  XChainCreateAccountAttestationBatch: Array<{
-    XChainClaimAttestationBatchElement: {
-      Account: string
+    XChainCreateAccountAttestationBatch: Array<{
+      XChainClaimAttestationBatchElement: {
+        Account: string
 
-      Amount: Amount
+        Amount: Amount
 
-      AttestationRewardAccount: string
+        AttestationRewardAccount: string
 
-      Destination: string
+        Destination: string
 
-      PublicKey: string
+        PublicKey: string
 
-      Signature: string
+        Signature: string
 
-      WasLockingChainSend: 0 | 1
+        WasLockingChainSend: 0 | 1
 
-      XChainAccountCreateCount: string
-    }
-  }>
+        XChainAccountCreateCount: string
+      }
+    }>
+  }
 }
 
 /**
