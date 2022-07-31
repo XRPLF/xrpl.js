@@ -81,15 +81,21 @@ export function validateXChainAddAttestation(
   /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known to be this */
   const attestationBatch = tx.XChainAttestationBatch as Record<string, unknown>
 
+  if (attestationBatch.XChainBridge == null) {
+    throw new ValidationError(
+      'XChainAddAttestation: missing field XChainAttestationBatch.XChainBridge',
+    )
+  }
+
   if (attestationBatch.XChainClaimAttestationBatch == null) {
     throw new ValidationError(
-      'XChainAddAttestation: missing field XChainClaimAttestationBatch',
+      'XChainAddAttestation: missing field XChainAttestationBatch.XChainClaimAttestationBatch',
     )
   }
 
   if (attestationBatch.XChainCreateAccountAttestationBatch == null) {
     throw new ValidationError(
-      'XChainAddAttestation: missing field XChainCreateAccountAttestationBatch',
+      'XChainAddAttestation: missing field XChainAttestationBatch.XChainCreateAccountAttestationBatch',
     )
   }
 }
