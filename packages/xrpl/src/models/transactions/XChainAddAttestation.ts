@@ -32,8 +32,25 @@ export interface XChainAddAttestation extends BaseTransaction {
     }
   }>
 
-  // TODO: update this once it's been implemented in rippled
-  XChainCreateAccountAttestationBatch: Array<Record<string, never>>
+  XChainCreateAccountAttestationBatch: Array<{
+    XChainClaimAttestationBatchElement: {
+      Account: string
+
+      Amount: Amount
+
+      AttestationRewardAccount: string
+
+      Destination: string
+
+      PublicKey: string
+
+      Signature: string
+
+      WasLockingChainSend: 0 | 1
+
+      XChainAccountCreateCount: string
+    }
+  }>
 }
 
 /**
