@@ -8,6 +8,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * Optional custom amount field to `fundWallet`.
+* Support for the cross-chain bridge feature.
 
 ### Changed
 * Add support for Transaction objects in `verifyTransaction`
