@@ -30,7 +30,7 @@ export function validateXChainCommit(tx: Record<string, unknown>): void {
     throw new ValidationError('XChainCommit: missing field XChainBridge')
   }
 
-  if (tx.XChainCommitID == null) {
+  if (tx.XChainClaimID == null) {
     throw new ValidationError('XChainCommit: missing field XChainClaimID')
   }
 
