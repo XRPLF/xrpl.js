@@ -66,19 +66,28 @@ export function validateXChainAddAttestation(
 ): void {
   validateBaseTransaction(tx)
 
-  if (tx.XChainBridge == null) {
+  if (tx.XChainAttestationBatch == null) {
     throw new ValidationError(
-      'XChainAddAttestation: missing field XChainBridge',
+      'XChainAddAttestation: missing field XChainAttestationBatch',
     )
   }
 
-  if (tx.XChainClaimAttestationBatch == null) {
+  if (typeof tx.XChainAttestationBatch !== 'object') {
+    throw new ValidationError(
+      'XChainAddAttestation: XChainAttestationBatch must be an object',
+    )
+  }
+
+  /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known to be this */
+  const attestationBatch = tx.XChainAttestationBatch as Record<string, unknown>
+
+  if (attestationBatch.XChainClaimAttestationBatch == null) {
     throw new ValidationError(
       'XChainAddAttestation: missing field XChainClaimAttestationBatch',
     )
   }
 
-  if (tx.XChainCreateAccountAttestationBatch == null) {
+  if (attestationBatch.XChainCreateAccountAttestationBatch == null) {
     throw new ValidationError(
       'XChainAddAttestation: missing field XChainCreateAccountAttestationBatch',
     )
