@@ -2655,6 +2655,7 @@
     "SidechainXChainAccountCreate": 34,
     "SidechainXChainAccountClaim": 35,
     "XChainAddAttestation": 36,
+    "XChainModifyBridge": 37,
     "EnableAmendment": 100,
     "SetFee": 101,
     "UNLModify": 102
