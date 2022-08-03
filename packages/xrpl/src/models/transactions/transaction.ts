@@ -68,6 +68,10 @@ import {
   XChainCreateClaimID,
   validateXChainCreateClaimID,
 } from './XChainCreateClaimID'
+import {
+  XChainModifyBridge,
+  validateXChainModifyBridge,
+} from './XChainModifyBridge'
 
 /**
  * @category Transaction Models
@@ -103,6 +107,7 @@ export type Transaction =
   | XChainCreateBridge
   | XChainCreateClaimID
   | SidechainXChainAccountCreate
+  | XChainModifyBridge
 
 /**
  * @category Transaction Models
@@ -249,6 +254,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'SidechainXChainAccountCreate':
       validateSidechainXChainAccountCreate(tx)
+      break
+
+    case 'XChainModifyBridge':
+      validateXChainModifyBridge(tx)
       break
 
     default:
