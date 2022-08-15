@@ -1,4 +1,4 @@
-import { LedgerIndex } from '../common'
+import { IssuedCurrency, LedgerIndex } from '../common'
 import { LedgerEntry } from '../ledger'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
@@ -135,6 +135,35 @@ export interface LedgerEntryRequest extends BaseRequest {
         owner: string
         /** The Ticket Sequence number of the Ticket entry to retrieve. */
         ticket_sequence: number
+      }
+    | string
+
+  xchain_bridge?:
+    | {
+        locking_chain_door: string
+        locking_chain_issue: 'XRP' | IssuedCurrency
+        issuing_chain_door: string
+        issuing_chain_issue: 'XRP' | IssuedCurrency
+      }
+    | string
+
+  xchain_claim_id?:
+    | {
+        locking_chain_door: string
+        locking_chain_issue: 'XRP' | IssuedCurrency
+        issuing_chain_door: string
+        issuing_chain_issue: 'XRP' | IssuedCurrency
+        xchain_claim_id: string | number
+      }
+    | string
+
+  xchain_create_account_claim_id?:
+    | {
+        locking_chain_door: string
+        locking_chain_issue: 'XRP' | IssuedCurrency
+        issuing_chain_door: string
+        issuing_chain_issue: 'XRP' | IssuedCurrency
+        xchain_create_account_claim_id: string | number
       }
     | string
 }

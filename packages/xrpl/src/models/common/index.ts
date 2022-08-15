@@ -9,12 +9,13 @@ export type AccountObjectType =
   | 'signer_list'
   | 'ticket'
   | 'state'
+  | 'xchain_seq'
 
 interface XRP {
   currency: 'XRP'
 }
 
-interface IssuedCurrency {
+export interface IssuedCurrency {
   currency: string
   issuer: string
 }
