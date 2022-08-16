@@ -44,6 +44,7 @@
     "NegativeUNL": 78,
     "NFTokenPage": 80,
     "NFTokenOffer": 55,
+    "Amm": 121,
     "Any": -3,
     "Child": -2,
     "Nickname": 110,
@@ -265,6 +266,16 @@
       "TransferFee",
       {
         "nth": 4,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt16"
+      }
+    ],
+    [
+      "TradingFee",
+      {
+        "nth": 5,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -762,6 +773,46 @@
       }
     ],
     [
+      "FeeVal",
+      {
+        "nth": 47,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "VoteWeight",
+      {
+        "nth": 48,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "TimeStamp",
+      {
+        "nth": 49,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "DiscountedFee",
+      {
+        "nth": 50,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "nth": 1,
@@ -982,6 +1033,26 @@
       }
     ],
     [
+      "TokenCurrency",
+      {
+        "nth": 5,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash160"
+      }
+    ],
+    [
+      "TokenIssuer",
+      {
+        "nth": 6,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash160"
+      }
+    ],
+    [
       "LedgerHash",
       {
         "nth": 1,
@@ -1105,6 +1176,16 @@
       "EmitHookHash",
       {
         "nth": 13,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "AMMID",
+      {
+        "nth": 14,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1382,6 +1463,46 @@
       }
     ],
     [
+      "Asset1",
+      {
+        "nth": 11,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "Asset2",
+      {
+        "nth": 12,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "MinSlotPrice",
+      {
+        "nth": 13,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "MaxSlotPrice",
+      {
+        "nth": 14,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
       "MinimumOffer",
       {
         "nth": 16,
@@ -1415,6 +1536,86 @@
       "NFTokenBrokerFee",
       {
         "nth": 19,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "Asset1In",
+      {
+        "nth": 20,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "Asset2In",
+      {
+        "nth": 21,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "Asset1Out",
+      {
+        "nth": 22,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "Asset2Out",
+      {
+        "nth": 23,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "LPTokens",
+      {
+        "nth": 24,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "EPrice",
+      {
+        "nth": 25,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "Price",
+      {
+        "nth": 26,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "LPTokenBalance",
+      {
+        "nth": 27,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1752,6 +1953,16 @@
       }
     ],
     [
+      "AMMAccount",
+      {
+        "nth": 11,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "AccountID"
+      }
+    ],
+    [
       "HookAccount",
       {
         "nth": 16,
@@ -1942,6 +2153,16 @@
       }
     ],
     [
+      "AMM",
+      {
+        "nth": 15,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
       "Signer",
       {
         "nth": 16,
@@ -2015,6 +2236,66 @@
       "HookGrant",
       {
         "nth": 24,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
+      "VoteEntry",
+      {
+        "nth": 25,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
+      "AuctionSlot",
+      {
+        "nth": 27,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
+      "AuthAccount",
+      {
+        "nth": 28,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
+      "AMMToken",
+      {
+        "nth": 29,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
+      "Token1",
+      {
+        "nth": 30,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
+      "Token2",
+      {
+        "nth": 31,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2105,6 +2386,26 @@
       "Hooks",
       {
         "nth": 11,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "VoteSlots",
+      {
+        "nth": 14,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "AuthAccounts",
+      {
+        "nth": 21,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2215,6 +2516,8 @@
     "temUNKNOWN": -264,
     "temSEQ_AND_TICKET": -263,
     "temBAD_NFTOKEN_TRANSFER_FEE": -262,
+    "temBAD_AMM_OPTIONS": -261,
+    "temBAD_AMM_TOKENS": -260,
 
     "tefFAILURE": -199,
     "tefALREADY": -198,
@@ -2298,7 +2601,16 @@
     "tecCANT_ACCEPT_OWN_NFTOKEN_OFFER": 158,
     "tecINSUFFICIENT_FUNDS": 159,
     "tecOBJECT_NOT_FOUND": 160,
-    "tecINSUFFICIENT_PAYMENT": 161
+    "tecINSUFFICIENT_PAYMENT": 161,
+    "tecUNFUNDED_AMM": 162,
+    "tecAMM_BALANCE": 163,
+    "tecAMM_FAILED_DEPOSIT": 164,
+    "tecAMM_FAILED_WITHDRAW": 165,
+    "tecAMM_INVALID_TOKENS": 166,
+    "tecAMM_EXISTS": 167,
+    "tecAMM_FAILED_BID": 168,
+    "tecAMM_DIRECT_PAYMENT": 169,
+    "tecAMM_FAILED_VOTE": 170
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
@@ -2330,6 +2642,11 @@
     "NFTokenCreateOffer": 27,
     "NFTokenCancelOffer": 28,
     "NFTokenAcceptOffer": 29,
+    "AMMInstanceCreate": 35,
+    "AMMDeposit": 36,
+    "AMMWithdraw": 37,
+    "AMMVote": 38,
+    "AMMBid": 39,
     "EnableAmendment": 100,
     "SetFee": 101,
     "UNLModify": 102
