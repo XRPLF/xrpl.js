@@ -9,6 +9,10 @@ import { setTransactionFlagsToNumber } from '../utils/flags'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'
 import { AccountSet, validateAccountSet } from './accountSet'
+import {
+  AMMInstanceCreate,
+  validateAMMInstanceCreate,
+} from './AMMInstanceCreate'
 import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
@@ -57,6 +61,7 @@ import { TrustSet, validateTrustSet } from './trustSet'
 export type Transaction =
   | AccountDelete
   | AccountSet
+  | AMMInstanceCreate
   | CheckCancel
   | CheckCash
   | CheckCreate
@@ -113,6 +118,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'AccountSet':
       validateAccountSet(tx)
+      break
+
+    case 'AMMInstanceCreate':
+      validateAMMInstanceCreate(tx)
       break
 
     case 'CheckCancel':
