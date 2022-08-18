@@ -1583,7 +1583,7 @@
       }
     ],
     [
-      "LPTokens",
+      "LPToken",
       {
         "nth": 24,
         "isVLEncoded": false,

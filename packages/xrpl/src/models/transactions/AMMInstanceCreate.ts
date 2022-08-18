@@ -3,7 +3,7 @@ import { Amount } from '../common'
 
 import { BaseTransaction, isAmount, validateBaseTransaction } from './common'
 
-const MAX_TRADING_FEE: number = 65000
+const MAX_TRADING_FEE = 65000
 
 /**
  * AMMInstanceCreate is used to create AccountRoot and the corresponding
