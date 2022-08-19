@@ -1,9 +1,6 @@
 import { ValidationError } from '../../errors'
 
-import {
-  BaseTransaction,
-  validateBaseTransaction,
-} from './common'
+import { BaseTransaction, validateBaseTransaction } from './common'
 
 /**
  * AMMVote is used for submitting a vote for the trading fee of an AMM Instance.
