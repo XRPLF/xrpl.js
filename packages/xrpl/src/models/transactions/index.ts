@@ -7,6 +7,7 @@ export {
   AccountSet,
 } from './accountSet'
 export { AccountDelete } from './accountDelete'
+export { AMMDeposit } from './AMMDeposit'
 export { AMMInstanceCreate } from './AMMInstanceCreate'
 export { CheckCancel } from './checkCancel'
 export { CheckCash } from './checkCash'

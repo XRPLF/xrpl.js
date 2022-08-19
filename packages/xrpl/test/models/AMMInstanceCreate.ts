@@ -2,7 +2,7 @@ import { assert } from 'chai'
 import { validate, ValidationError } from 'xrpl-local'
 
 /**
- * NFTokenMint Transaction Verification Testing.
+ * AMMInstanceCreate Transaction Verification Testing.
  *
  * Providing runtime verification testing for each specific transaction type.
  */
