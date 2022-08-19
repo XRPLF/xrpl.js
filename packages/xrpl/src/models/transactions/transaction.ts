@@ -14,6 +14,7 @@ import {
   AMMInstanceCreate,
   validateAMMInstanceCreate,
 } from './AMMInstanceCreate'
+import { AMMWithdraw, validateAMMWithdraw } from './AMMWithdraw'
 import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
@@ -64,6 +65,7 @@ export type Transaction =
   | AccountSet
   | AMMDeposit
   | AMMInstanceCreate
+  | AMMWithdraw
   | CheckCancel
   | CheckCash
   | CheckCreate
@@ -128,6 +130,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'AMMInstanceCreate':
       validateAMMInstanceCreate(tx)
+      break
+
+    case 'AMMWithdraw':
+      validateAMMWithdraw(tx)
       break
 
     case 'CheckCancel':
