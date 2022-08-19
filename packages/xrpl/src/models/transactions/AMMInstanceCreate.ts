@@ -44,7 +44,7 @@ export interface AMMInstanceCreate extends BaseTransaction {
 export function validateAMMInstanceCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Asset1 === undefined) {
+  if (tx.Asset1 == null) {
     throw new ValidationError('AMMInstanceCreate: missing field Asset1')
   }
 
@@ -52,7 +52,7 @@ export function validateAMMInstanceCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMInstanceCreate: Asset1 must be an Amount')
   }
 
-  if (tx.Asset2 === undefined) {
+  if (tx.Asset2 == null) {
     throw new ValidationError('AMMInstanceCreate: missing field Asset2')
   }
 
@@ -60,7 +60,7 @@ export function validateAMMInstanceCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMInstanceCreate: Asset2 must be an Amount')
   }
 
-  if (tx.TradingFee === undefined) {
+  if (tx.TradingFee == null) {
     throw new ValidationError('AMMInstanceCreate: missing field TradingFee')
   }
 

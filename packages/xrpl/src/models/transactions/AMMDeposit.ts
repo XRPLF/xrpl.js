@@ -61,7 +61,7 @@ export interface AMMDeposit extends BaseTransaction {
 export function validateAMMDeposit(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.AMMID === undefined) {
+  if (tx.AMMID == null) {
     throw new ValidationError('AMMDeposit: missing field AMMID')
   }
 
@@ -69,31 +69,31 @@ export function validateAMMDeposit(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMDeposit: AMMID must be a string')
   }
 
-  if (tx.Asset2In !== undefined && tx.Asset1In === undefined) {
+  if (tx.Asset2In != null && tx.Asset1In == null) {
     throw new ValidationError('AMMDeposit: must set Asset1In with Asset2In')
-  } else if (tx.EPrice !== undefined && tx.Asset1In === undefined) {
+  } else if (tx.EPrice != null && tx.Asset1In == null) {
     throw new ValidationError('AMMDeposit: must set Asset1In with EPrice')
-  } else if (tx.LPToken === undefined && tx.Asset1In === undefined) {
+  } else if (tx.LPToken == null && tx.Asset1In == null) {
     throw new ValidationError(
       'AMMDeposit: must set either or both LPToken with Asset1In',
     )
   }
 
-  if (tx.LPToken !== undefined && !isIssuedCurrency(tx.LPToken)) {
+  if (tx.LPToken != null && !isIssuedCurrency(tx.LPToken)) {
     throw new ValidationError(
       'AMMDeposit: LPToken must be an IssuedCurrencyAmount',
     )
   }
 
-  if (tx.Asset1In !== undefined && !isAmount(tx.Asset1In)) {
+  if (tx.Asset1In != null && !isAmount(tx.Asset1In)) {
     throw new ValidationError('AMMDeposit: Asset1In must be an Amount')
   }
 
-  if (tx.Asset2In !== undefined && !isAmount(tx.Asset2In)) {
+  if (tx.Asset2In != null && !isAmount(tx.Asset2In)) {
     throw new ValidationError('AMMDeposit: Asset2In must be an Amount')
   }
 
-  if (tx.EPrice !== undefined && typeof tx.EPrice !== 'string') {
+  if (tx.EPrice != null && typeof tx.EPrice !== 'string') {
     throw new ValidationError('AMMDeposit: EPrice must be a string')
   }
 }
