@@ -7,6 +7,7 @@ export {
   AccountSet,
 } from './accountSet'
 export { AccountDelete } from './accountDelete'
+export { AMMBid } from './AMMBid'
 export { AMMDeposit } from './AMMDeposit'
 export { AMMInstanceCreate } from './AMMInstanceCreate'
 export { AMMVote } from './AMMVote'
