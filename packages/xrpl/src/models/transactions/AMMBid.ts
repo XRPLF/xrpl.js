@@ -5,6 +5,12 @@ import { BaseTransaction, isAmount, validateBaseTransaction } from './common'
 
 const MAX_AUTH_ACCOUNTS = 4
 
+interface AuthAccount {
+  AuthAccount: {
+    Account: string
+  }
+}
+
 /**
  * AMMBid is used for submitting a vote for the trading fee of an AMM Instance.
  *
@@ -38,7 +44,7 @@ export interface AMMBid extends BaseTransaction {
    * at the discounted fee against the AMM instance.
    * A maximum of four accounts can be provided.
    */
-  AuthAccounts?: string[]
+  AuthAccounts?: AuthAccount[]
 }
 
 /**
