@@ -1,8 +1,7 @@
 import { ValidationError } from '../../errors'
 
+import { AMM_MAX_TRADING_FEE } from './AMMInstanceCreate'
 import { BaseTransaction, validateBaseTransaction } from './common'
-
-const MAX_TRADING_FEE = 65000
 
 /**
  * AMMVote is used for submitting a vote for the trading fee of an AMM Instance.
@@ -52,9 +51,9 @@ export function validateAMMVote(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMVote: FeeVal must be a number')
   }
 
-  if (tx.FeeVal > MAX_TRADING_FEE) {
+  if (tx.FeeVal > AMM_MAX_TRADING_FEE) {
     throw new ValidationError(
-      `AMMVote: FeeVal must not be greater than ${MAX_TRADING_FEE}`,
+      `AMMVote: FeeVal must not be greater than ${AMM_MAX_TRADING_FEE}`,
     )
   }
 }

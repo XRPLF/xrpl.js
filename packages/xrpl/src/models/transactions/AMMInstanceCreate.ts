@@ -3,7 +3,7 @@ import { Amount } from '../common'
 
 import { BaseTransaction, isAmount, validateBaseTransaction } from './common'
 
-const MAX_TRADING_FEE = 65000
+export const AMM_MAX_TRADING_FEE = 65000
 
 /**
  * AMMInstanceCreate is used to create AccountRoot and the corresponding
@@ -68,9 +68,9 @@ export function validateAMMInstanceCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMInstanceCreate: TradingFee must be a number')
   }
 
-  if (tx.TradingFee > MAX_TRADING_FEE) {
+  if (tx.TradingFee > AMM_MAX_TRADING_FEE) {
     throw new ValidationError(
-      `AMMInstanceCreate: TradingFee must not be greater than ${MAX_TRADING_FEE}`,
+      `AMMInstanceCreate: TradingFee must not be greater than ${AMM_MAX_TRADING_FEE}`,
     )
   }
 }
