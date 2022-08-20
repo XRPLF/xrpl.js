@@ -80,4 +80,20 @@ describe('AMMVote', function () {
       'AMMVote: FeeVal must be a number',
     )
   })
+
+  it(`throws w/ FeeVal must not be greater than 65000`, function () {
+    const invalid = {
+      TransactionType: 'AMMVote',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      AMMID: '24BA86F99302CF124AB27311C831F5BFAA72C4625DDA65B7EDF346A60CC19883',
+      FeeVal: 65001,
+      Sequence: 1337,
+    } as any
+
+    assert.throws(
+      () => validate(invalid),
+      ValidationError,
+      'AMMVote: FeeVal must not be greater than 65000',
+    )
+  })
 })
