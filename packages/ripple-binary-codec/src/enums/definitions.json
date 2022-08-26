@@ -1849,7 +1849,7 @@
       }
     ],
     [
-      "OtherChainAccount",
+      "OtherChainSource",
       {
         "nth": 18,
         "isVLEncoded": true,
@@ -1859,7 +1859,7 @@
       }
     ],
     [
-      "AttestationSignerAccount",
+      "OtherChainDestination",
       {
         "nth": 19,
         "isVLEncoded": true,
@@ -1869,7 +1869,7 @@
       }
     ],
     [
-      "AttestationRewardAccount",
+      "AttestationSignerAccount",
       {
         "nth": 20,
         "isVLEncoded": true,
@@ -1879,7 +1879,7 @@
       }
     ],
     [
-      "LockingChainDoor",
+      "AttestationRewardAccount",
       {
         "nth": 21,
         "isVLEncoded": true,
@@ -1889,9 +1889,19 @@
       }
     ],
     [
-      "IssuingChainDoor",
+      "LockingChainDoor",
       {
         "nth": 22,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "AccountID"
+      }
+    ],
+    [
+      "IssuingChainDoor",
+      {
+        "nth": 23,
         "isVLEncoded": true,
         "isSerialized": true,
         "isSigningField": true,
@@ -2610,13 +2620,14 @@
     "tecXCHAIN_PROOF_UNKNOWN_KEY": 166,
     "tecXCHAIN_CREATE_ACCOUNT_NONXRP_ISSUE": 167,
     "tecXCHAIN_CLAIM_ACCOUNT_DST_EXISTS": 168,
-    "tecXCHAIN_CLAIM_WRONG_CHAIN": 169,
+    "tecXCHAIN_WRONG_CHAIN": 169,
     "tecXCHAIN_REWARD_MISMATCH": 170,
     "tecXCHAIN_NO_SIGNERS_LIST": 171,
     "tecXCHAIN_SENDING_ACCOUNT_MISMATCH": 172,
     "tecXCHAIN_INSUFF_CREATE_AMOUNT": 173,
     "tecXCHAIN_ACCOUNT_CREATE_PAST": 174,
-    "tecXCHAIN_ACCOUNT_CREATE_TOO_MANY": 175
+    "tecXCHAIN_ACCOUNT_CREATE_TOO_MANY": 175,
+    "tecXCHAIN_PAYMENT_FAILED": 176
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
@@ -2653,7 +2664,6 @@
     "XChainCommit": 32,
     "XChainClaim": 33,
     "SidechainXChainAccountCreate": 34,
-    "SidechainXChainAccountClaim": 35,
     "XChainAddAttestation": 36,
     "XChainModifyBridge": 37,
     "EnableAmendment": 100,
