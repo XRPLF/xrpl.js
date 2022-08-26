@@ -4502,7 +4502,7 @@
         },
         "Fee": "10",
         "Flags": 2147483648,
-        "OtherChainAccount": "rGzx83BVoqTYbGn7tiVAnFw7cbxjin13jL",
+        "OtherChainSource": "rGzx83BVoqTYbGn7tiVAnFw7cbxjin13jL",
         "Sequence": 1,
         "SignatureReward": "10000",
         "SigningPubKey": "0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020",
