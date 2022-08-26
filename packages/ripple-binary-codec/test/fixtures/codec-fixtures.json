@@ -4573,7 +4573,7 @@
                  "XChainClaimAttestationBatchElement" : {
                     "Account" : "rnJmYAiqEVngtnb5ckRroXLtCbWC7CRUBx",
                     "Amount" : "100000000",
-                    "AttestationRewardAccount" : "rnJmYAiqEVngtnb5ckRroXLtCbWC7CRUBx",
+                    "AttestationSignerAccount" : "rnJmYAiqEVngtnb5ckRroXLtCbWC7CRUBx",
                     "Destination" : "r9A8UyNpW3X46FUc6P7JZqgn6WgAPjBwPg",
                     "PublicKey" : "03DAB289CA36FF377F3F4304C7A7203FDE5EDCBFC209F430F6A4355361425526D0",
                     "Signature" : "616263",
@@ -4630,7 +4630,7 @@
               "XChainCreateAccountAttestationBatchElement": {
                 "Account": "rnJmYAiqEVngtnb5ckRroXLtCbWC7CRUBx",
                 "Amount": "1000000000",
-                "AttestationRewardAccount": "rEziJZmeZzsJvGVUmpUTey7qxQLKYxaK9f",
+                "AttestationSignerAccount": "rEziJZmeZzsJvGVUmpUTey7qxQLKYxaK9f",
                 "Destination": "rKT9gDkaedAosiHyHZTjyZs2HvXpzuiGmC",
                 "PublicKey": "03ADB44CA8E56F78A0096825E5667C450ABD5C24C34E027BC1AAF7E5BD114CB5B5",
                 "Signature": "3044022036C8B90F85E8073C465F00625248A72D4714600F98EBBADBAD3B7ED226109A3A02204C5A0AE12D169CF790F66541F3DB59C289E0D99CA7511FDFE352BB601F667A26",
@@ -4643,7 +4643,7 @@
               "XChainCreateAccountAttestationBatchElement": {
                 "Account": "rnJmYAiqEVngtnb5ckRroXLtCbWC7CRUBx",
               "Amount": "1000000000",
-              "AttestationRewardAccount": "rEziJZmeZzsJvGVUmpUTey7qxQLKYxaK9f",
+              "AttestationSignerAccount": "rEziJZmeZzsJvGVUmpUTey7qxQLKYxaK9f",
               "Destination": "rKT9gDkaedAosiHyHZTjyZs2HvXpzuiGmC",
               "PublicKey": "02A14E886B3C3579FBAE3139F29728B903E6F4295AEE92160C8480695524D66A15",
               "Signature": "304402200C3F5EEE2D7DCB609EE8558258E6AAF1EF823133C2B7C716E0DC9AAD2110F08D0220180E9F285CB2F78E362D37E947C000A8ED60A4BD8EFF21F74C5E529E1A8870ED",
@@ -4656,7 +4656,7 @@
               "XChainCreateAccountAttestationBatchElement": {
                 "Account": "rnJmYAiqEVngtnb5ckRroXLtCbWC7CRUBx",
               "Amount": "1000000000",
-              "AttestationRewardAccount": "rEziJZmeZzsJvGVUmpUTey7qxQLKYxaK9f",
+              "AttestationSignerAccount": "rEziJZmeZzsJvGVUmpUTey7qxQLKYxaK9f",
               "Destination": "rKT9gDkaedAosiHyHZTjyZs2HvXpzuiGmC",
               "PublicKey": "02F7390DCF3352060847B81666EBAC79D52DEA2443BDF58439F75397C45334E2DC",
               "Signature": "30450221008E31CFF0198F09CBA8610A946C23E170A3F11BCB8FC95D0D56C7B79A126D97D102203F4E952C449F2F01C4AF67FC37772A0D4459D770387CC11DBD5464FAB2185428",
@@ -4669,7 +4669,7 @@
               "XChainCreateAccountAttestationBatchElement": {
                 "Account": "rnJmYAiqEVngtnb5ckRroXLtCbWC7CRUBx",
                 "Amount": "1000000000",
-                "AttestationRewardAccount": "rEziJZmeZzsJvGVUmpUTey7qxQLKYxaK9f",
+                "AttestationSignerAccount": "rEziJZmeZzsJvGVUmpUTey7qxQLKYxaK9f",
                 "Destination": "rKT9gDkaedAosiHyHZTjyZs2HvXpzuiGmC",
                 "PublicKey": "02498BD8CD9CA6A4BA567A2ECFA163F118AFD30511CBBA71429C2EC2F74D760592",
                 "Signature": "3045022100F4E2D672F456CB9929EF01766AB72B42C71314A181232098563B8666E4EEA49C02203F936877E9DCC8FF5F7713579233985DF3DADB155F2BDA78FE3A4321373F370E",
@@ -4682,7 +4682,7 @@
               "XChainCreateAccountAttestationBatchElement": {
                 "Account": "rnJmYAiqEVngtnb5ckRroXLtCbWC7CRUBx",
                 "Amount": "1000000000",
-                "AttestationRewardAccount": "rEziJZmeZzsJvGVUmpUTey7qxQLKYxaK9f",
+                "AttestationSignerAccount": "rEziJZmeZzsJvGVUmpUTey7qxQLKYxaK9f",
                 "Destination": "rKT9gDkaedAosiHyHZTjyZs2HvXpzuiGmC",
                 "PublicKey": "03219642288DEE8A3AA8FEA1F7DAE9ED4D9A9F0EADA1E2DE3DB56DD9598D9AD817",
                 "Signature": "3045022100D1BAFA57F40E16485310698B7B0BD0D4650E18782C4D65787A393CBB6D659EB802204EA28303089CCCD1463866A1BA0493A9B135AEA1EDFC8DD69A1A247DD9FEDB21",
