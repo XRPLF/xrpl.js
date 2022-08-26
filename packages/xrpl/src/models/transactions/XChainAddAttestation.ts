@@ -19,7 +19,7 @@ export interface XChainAddAttestation extends BaseTransaction {
 
         Amount: Amount
 
-        AttestationRewardAccount: string
+        AttestationSignerAccount: string
 
         Destination: string
 
@@ -39,7 +39,7 @@ export interface XChainAddAttestation extends BaseTransaction {
 
         Amount: Amount
 
-        AttestationRewardAccount: string
+        AttestationSignerAccount: string
 
         Destination: string
 
