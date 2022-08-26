@@ -1879,7 +1879,7 @@
       }
     ],
     [
-      "AttestationRewardAccount",
+      "AttestationSignerAccount",
       {
         "nth": 21,
         "isVLEncoded": true,
