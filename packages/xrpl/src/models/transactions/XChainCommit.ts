@@ -14,6 +14,8 @@ export interface XChainCommit extends BaseTransaction {
 
   XChainClaimID: number | string
 
+  OtherChainDestination?: string
+
   Amount: Amount
 }
 

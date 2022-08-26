@@ -14,7 +14,7 @@ export interface XChainCreateClaimID extends BaseTransaction {
 
   SignatureReward: Amount
 
-  OtherChainAccount: string
+  OtherChainSource: string
 }
 
 /**
@@ -36,9 +36,9 @@ export function validateXChainCreateClaimID(tx: Record<string, unknown>): void {
     )
   }
 
-  if (tx.OtherChainAccount == null) {
+  if (tx.OtherChainSource == null) {
     throw new ValidationError(
-      'XChainCreateClaimID: missing field OtherChainAccount',
+      'XChainCreateClaimID: missing field OtherChainSource',
     )
   }
 }
