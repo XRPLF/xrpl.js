@@ -21,7 +21,7 @@ describe('XChainCreateClaimID', function () {
       },
       Fee: '10',
       Flags: 2147483648,
-      OtherChainAccount: 'rGzx83BVoqTYbGn7tiVAnFw7cbxjin13jL',
+      OtherChainSource: 'rGzx83BVoqTYbGn7tiVAnFw7cbxjin13jL',
       Sequence: 1,
       SignatureReward: '10000',
       SigningPubKey:
@@ -67,18 +67,18 @@ describe('XChainCreateClaimID', function () {
     )
   })
 
-  it(`throws w/ missing OtherChainAccount`, function () {
-    delete tx.OtherChainAccount
+  it(`throws w/ missing OtherChainSource`, function () {
+    delete tx.OtherChainSource
 
     assert.throws(
       () => validateXChainCreateClaimID(tx),
       ValidationError,
-      'XChainCreateClaimID: missing field OtherChainAccount',
+      'XChainCreateClaimID: missing field OtherChainSource',
     )
     assert.throws(
       () => validate(tx),
       ValidationError,
-      'XChainCreateClaimID: missing field OtherChainAccount',
+      'XChainCreateClaimID: missing field OtherChainSource',
     )
   })
 })
