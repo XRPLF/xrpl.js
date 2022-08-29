@@ -4562,27 +4562,27 @@
         "TransactionType" : "XChainAddAttestation",
         "TxnSignature" : "3045022100A6A8CA05B2B6CB60E0FD645A4DA0314D46D79D9FA3D63307FC997357366151B202202266CC23E2CA827905F37F78F54AD435F73A3B704EDD634B89201E23625CE2E2",
         "XChainAttestationBatch" : {
-           "XChainBridge" : {
-              "IssuingChainDoor" : "rKeSSvHvaMZJp9ykaxutVwkhZgWuWMLnQt",
-              "IssuingChainIssue" : "XRP",
-              "LockingChainDoor" : "rJvExveLEL4jNDEeLKCVdxaSCN9cEBnEQC",
-              "LockingChainIssue" : "XRP"
+          "XChainBridge" : {
+            "IssuingChainDoor" : "rKeSSvHvaMZJp9ykaxutVwkhZgWuWMLnQt",
+            "IssuingChainIssue" : "XRP",
+            "LockingChainDoor" : "rJvExveLEL4jNDEeLKCVdxaSCN9cEBnEQC",
+            "LockingChainIssue" : "XRP"
            },
            "XChainClaimAttestationBatch" : [
-              {
-                 "XChainClaimAttestationBatchElement" : {
-                    "Account" : "rnJmYAiqEVngtnb5ckRroXLtCbWC7CRUBx",
-                    "Amount" : "100000000",
-                    "AttestationSignerAccount" : "rnJmYAiqEVngtnb5ckRroXLtCbWC7CRUBx",
-                    "Destination" : "r9A8UyNpW3X46FUc6P7JZqgn6WgAPjBwPg",
-                    "PublicKey" : "03DAB289CA36FF377F3F4304C7A7203FDE5EDCBFC209F430F6A4355361425526D0",
-                    "Signature" : "616263",
-                    "WasLockingChainSend" : 1,
-                    "XChainClaimID" : "0000000000000000"
-                 }
+            {
+              "XChainClaimAttestationBatchElement" : {
+                "Account" : "rnJmYAiqEVngtnb5ckRroXLtCbWC7CRUBx",
+                "Amount" : "100000000",
+                "AttestationSignerAccount" : "rnJmYAiqEVngtnb5ckRroXLtCbWC7CRUBx",
+                "Destination" : "r9A8UyNpW3X46FUc6P7JZqgn6WgAPjBwPg",
+                "PublicKey" : "03DAB289CA36FF377F3F4304C7A7203FDE5EDCBFC209F430F6A4355361425526D0",
+                "Signature" : "616263",
+                "WasLockingChainSend" : 1,
+                "XChainClaimID" : "0000000000000000"
               }
-           ],
-           "XChainCreateAccountAttestationBatch" : []
+            }
+          ],
+          "XChainCreateAccountAttestationBatch" : []
         }
       }
     },
@@ -4642,27 +4642,27 @@
             {
               "XChainCreateAccountAttestationBatchElement": {
                 "Account": "rnJmYAiqEVngtnb5ckRroXLtCbWC7CRUBx",
-              "Amount": "1000000000",
-              "AttestationSignerAccount": "rEziJZmeZzsJvGVUmpUTey7qxQLKYxaK9f",
-              "Destination": "rKT9gDkaedAosiHyHZTjyZs2HvXpzuiGmC",
-              "PublicKey": "02A14E886B3C3579FBAE3139F29728B903E6F4295AEE92160C8480695524D66A15",
-              "Signature": "304402200C3F5EEE2D7DCB609EE8558258E6AAF1EF823133C2B7C716E0DC9AAD2110F08D0220180E9F285CB2F78E362D37E947C000A8ED60A4BD8EFF21F74C5E529E1A8870ED",
-              "SignatureReward": "1000000",
-              "WasLockingChainSend": 1,
-              "XChainAccountCreateCount": "0000000000000001"
+                "Amount": "1000000000",
+                "AttestationSignerAccount": "rEziJZmeZzsJvGVUmpUTey7qxQLKYxaK9f",
+                "Destination": "rKT9gDkaedAosiHyHZTjyZs2HvXpzuiGmC",
+                "PublicKey": "02A14E886B3C3579FBAE3139F29728B903E6F4295AEE92160C8480695524D66A15",
+                "Signature": "304402200C3F5EEE2D7DCB609EE8558258E6AAF1EF823133C2B7C716E0DC9AAD2110F08D0220180E9F285CB2F78E362D37E947C000A8ED60A4BD8EFF21F74C5E529E1A8870ED",
+                "SignatureReward": "1000000",
+                "WasLockingChainSend": 1,
+                "XChainAccountCreateCount": "0000000000000001"
               }
             },
             {
               "XChainCreateAccountAttestationBatchElement": {
                 "Account": "rnJmYAiqEVngtnb5ckRroXLtCbWC7CRUBx",
-              "Amount": "1000000000",
-              "AttestationSignerAccount": "rEziJZmeZzsJvGVUmpUTey7qxQLKYxaK9f",
-              "Destination": "rKT9gDkaedAosiHyHZTjyZs2HvXpzuiGmC",
-              "PublicKey": "02F7390DCF3352060847B81666EBAC79D52DEA2443BDF58439F75397C45334E2DC",
-              "Signature": "30450221008E31CFF0198F09CBA8610A946C23E170A3F11BCB8FC95D0D56C7B79A126D97D102203F4E952C449F2F01C4AF67FC37772A0D4459D770387CC11DBD5464FAB2185428",
-              "SignatureReward": "1000000",
-              "WasLockingChainSend": 1,
-              "XChainAccountCreateCount": "0000000000000001"
+                "Amount": "1000000000",
+                "AttestationSignerAccount": "rEziJZmeZzsJvGVUmpUTey7qxQLKYxaK9f",
+                "Destination": "rKT9gDkaedAosiHyHZTjyZs2HvXpzuiGmC",
+                "PublicKey": "02F7390DCF3352060847B81666EBAC79D52DEA2443BDF58439F75397C45334E2DC",
+                "Signature": "30450221008E31CFF0198F09CBA8610A946C23E170A3F11BCB8FC95D0D56C7B79A126D97D102203F4E952C449F2F01C4AF67FC37772A0D4459D770387CC11DBD5464FAB2185428",
+                "SignatureReward": "1000000",
+                "WasLockingChainSend": 1,
+                "XChainAccountCreateCount": "0000000000000001"
               }
             },
             {
