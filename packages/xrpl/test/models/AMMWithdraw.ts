@@ -33,6 +33,12 @@ describe('AMMWithdraw', function () {
     assert.doesNotThrow(() => validate(withdraw))
   })
 
+  it(`verifies valid AMMWithdraw with Asset1Out and Asset2Out`, function () {
+    withdraw.Asset1Out = '1000'
+    withdraw.Asset2Out = '1000'
+    assert.doesNotThrow(() => validate(withdraw))
+  })
+
   it(`verifies valid AMMWithdraw with Asset1Out and LPToken`, function () {
     withdraw.Asset1Out = '1000'
     withdraw.LPToken = LPToken
