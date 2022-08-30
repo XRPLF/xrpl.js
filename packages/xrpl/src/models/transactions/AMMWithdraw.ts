@@ -77,7 +77,7 @@ export function validateAMMWithdraw(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMWithdraw: must set Asset1Out with EPrice')
   } else if (tx.LPToken == null && tx.Asset1Out == null) {
     throw new ValidationError(
-      'AMMWithdraw: must set either or both LPToken with Asset1Out',
+      'AMMWithdraw: must set at least LPToken or Asset1Out',
     )
   }
 

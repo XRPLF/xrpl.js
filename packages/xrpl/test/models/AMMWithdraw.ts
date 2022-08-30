@@ -69,11 +69,11 @@ describe('AMMWithdraw', function () {
     )
   })
 
-  it(`throws w/ must set either or both LPToken with Asset1Out`, function () {
+  it(`throws w/ must set at least LPToken or Asset1Out`, function () {
     assert.throws(
       () => validate(withdraw),
       ValidationError,
-      'AMMWithdraw: must set either or both LPToken with Asset1Out',
+      'AMMWithdraw: must set at least LPToken or Asset1Out',
     )
   })
 

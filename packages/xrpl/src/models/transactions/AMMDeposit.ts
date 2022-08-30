@@ -75,7 +75,7 @@ export function validateAMMDeposit(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMDeposit: must set Asset1In with EPrice')
   } else if (tx.LPToken == null && tx.Asset1In == null) {
     throw new ValidationError(
-      'AMMDeposit: must set either or both LPToken with Asset1In',
+      'AMMDeposit: must set at least LPToken or Asset1In',
     )
   }
 

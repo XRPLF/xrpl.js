@@ -69,11 +69,11 @@ describe('AMMDeposit', function () {
     )
   })
 
-  it(`throws w/ must set either or both LPToken with Asset1In`, function () {
+  it(`throws w/ must set at least LPToken or Asset1In`, function () {
     assert.throws(
       () => validate(deposit),
       ValidationError,
-      'AMMDeposit: must set either or both LPToken with Asset1In',
+      'AMMDeposit: must set at least LPToken or Asset1In',
     )
   })
 
