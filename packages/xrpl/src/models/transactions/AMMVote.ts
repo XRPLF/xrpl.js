@@ -51,9 +51,9 @@ export function validateAMMVote(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMVote: FeeVal must be a number')
   }
 
-  if (tx.FeeVal > AMM_MAX_TRADING_FEE) {
+  if (tx.FeeVal < 0 || tx.FeeVal > AMM_MAX_TRADING_FEE) {
     throw new ValidationError(
-      `AMMVote: FeeVal must not be greater than ${AMM_MAX_TRADING_FEE}`,
+      `AMMVote: FeeVal must be between 0 and ${AMM_MAX_TRADING_FEE}`,
     )
   }
 }

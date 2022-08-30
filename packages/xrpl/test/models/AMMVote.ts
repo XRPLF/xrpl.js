@@ -59,12 +59,21 @@ describe('AMMVote', function () {
     )
   })
 
-  it(`throws w/ FeeVal must not be greater than 65000`, function () {
+  it(`throws when FeeVal is greater than AMM_MAX_TRADING_FEE`, function () {
     vote.FeeVal = 65001
     assert.throws(
       () => validate(vote),
       ValidationError,
-      'AMMVote: FeeVal must not be greater than 65000',
+      'AMMVote: FeeVal must be between 0 and 65000',
+    )
+  })
+
+  it(`throws when FeeVal is a negative number`, function () {
+    vote.FeeVal = -1
+    assert.throws(
+      () => validate(vote),
+      ValidationError,
+      'AMMVote: FeeVal must be between 0 and 65000',
     )
   })
 })
