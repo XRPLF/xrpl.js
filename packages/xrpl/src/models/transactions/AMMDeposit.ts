@@ -49,7 +49,7 @@ export interface AMMDeposit extends BaseTransaction {
   /**
    * Specifies the maximum effective-price that LPToken can be traded out.
    */
-  EPrice?: number
+  EPrice?: Amount
 }
 
 /**

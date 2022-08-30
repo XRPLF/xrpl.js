@@ -51,7 +51,7 @@ export interface AMMWithdraw extends BaseTransaction {
    * Specifies the effective-price of the token out after successful execution of
    * the transaction.
    */
-  EPrice?: number
+  EPrice?: Amount
 }
 
 /**
