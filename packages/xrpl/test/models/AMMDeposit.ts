@@ -33,6 +33,12 @@ describe('AMMDeposit', function () {
     assert.doesNotThrow(() => validate(deposit))
   })
 
+  it(`verifies valid AMMDeposit with Asset1In adn Asset2In`, function () {
+    deposit.Asset1In = '1000'
+    deposit.Asset2In = '1000'
+    assert.doesNotThrow(() => validate(deposit))
+  })
+
   it(`verifies valid AMMDeposit with Asset1In and LPToken`, function () {
     deposit.Asset1In = '1000'
     deposit.LPToken = LPToken
