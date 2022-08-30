@@ -82,12 +82,21 @@ describe('AMMInstanceCreate', function () {
     )
   })
 
-  it(`throws w/ TradingFee must not be greater than 65000`, function () {
+  it(`throws when TradingFee is greater than 65000`, function () {
     instanceCreate.TradingFee = 65001
     assert.throws(
       () => validate(instanceCreate),
       ValidationError,
-      `AMMInstanceCreate: TradingFee must not be greater than 65000`,
+      `AMMInstanceCreate: TradingFee must be between 0 and 65000`,
+    )
+  })
+
+  it(`throws when TradingFee is a negative number`, function () {
+    instanceCreate.TradingFee = -1
+    assert.throws(
+      () => validate(instanceCreate),
+      ValidationError,
+      `AMMInstanceCreate: TradingFee must be between 0 and 65000`,
     )
   })
 })

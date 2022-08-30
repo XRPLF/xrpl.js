@@ -68,9 +68,9 @@ export function validateAMMInstanceCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMInstanceCreate: TradingFee must be a number')
   }
 
-  if (tx.TradingFee > AMM_MAX_TRADING_FEE) {
+  if (tx.TradingFee < 0 || tx.TradingFee > AMM_MAX_TRADING_FEE) {
     throw new ValidationError(
-      `AMMInstanceCreate: TradingFee must not be greater than ${AMM_MAX_TRADING_FEE}`,
+      `AMMInstanceCreate: TradingFee must be between 0 and ${AMM_MAX_TRADING_FEE}`,
     )
   }
 }
