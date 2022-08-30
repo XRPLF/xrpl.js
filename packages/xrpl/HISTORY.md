@@ -9,7 +9,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Made unexpected errors in `submitAndWait` more verbose to make them easier to debug.
 
 ### Added
-* Support for Automated Market Maker (AMM).
+* Support for Automated Market Maker (AMM) transactions and requests as defined in XLS-30.
 
 ## 2.3.1 (2022-06-27)
 ### Fixed
