@@ -88,4 +88,42 @@ describe('AMMWithdraw', function () {
       'AMMWithdraw: must set Asset1Out with EPrice',
     )
   })
+
+  it(`throws w/ LPToken must be an IssuedCurrencyAmount`, function () {
+    withdraw.LPToken = 1234
+    assert.throws(
+      () => validate(withdraw),
+      ValidationError,
+      'AMMWithdraw: LPToken must be an IssuedCurrencyAmount',
+    )
+  })
+
+  it(`throws w/ Asset1Out must be an Amount`, function () {
+    withdraw.Asset1Out = 1234
+    assert.throws(
+      () => validate(withdraw),
+      ValidationError,
+      'AMMWithdraw: Asset1Out must be an Amount',
+    )
+  })
+
+  it(`throws w/ Asset2Out must be an Amount`, function () {
+    withdraw.Asset1Out = '1000'
+    withdraw.Asset2Out = 1234
+    assert.throws(
+      () => validate(withdraw),
+      ValidationError,
+      'AMMWithdraw: Asset2Out must be an Amount',
+    )
+  })
+
+  it(`throws w/ EPrice must be an Amount`, function () {
+    withdraw.Asset1Out = '1000'
+    withdraw.EPrice = 1234
+    assert.throws(
+      () => validate(withdraw),
+      ValidationError,
+      'AMMWithdraw: EPrice must be an Amount',
+    )
+  })
 })

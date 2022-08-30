@@ -94,6 +94,6 @@ export function validateAMMDeposit(tx: Record<string, unknown>): void {
   }
 
   if (tx.EPrice != null && typeof tx.EPrice !== 'string') {
-    throw new ValidationError('AMMDeposit: EPrice must be a string')
+    throw new ValidationError('AMMDeposit: EPrice must be an Amount')
   }
 }

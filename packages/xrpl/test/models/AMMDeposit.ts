@@ -88,4 +88,42 @@ describe('AMMDeposit', function () {
       'AMMDeposit: must set Asset1In with EPrice',
     )
   })
+
+  it(`throws w/ LPToken must be an IssuedCurrencyAmount`, function () {
+    deposit.LPToken = 1234
+    assert.throws(
+      () => validate(deposit),
+      ValidationError,
+      'AMMDeposit: LPToken must be an IssuedCurrencyAmount',
+    )
+  })
+
+  it(`throws w/ Asset1In must be an Amount`, function () {
+    deposit.Asset1In = 1234
+    assert.throws(
+      () => validate(deposit),
+      ValidationError,
+      'AMMDeposit: Asset1In must be an Amount',
+    )
+  })
+
+  it(`throws w/ Asset2In must be an Amount`, function () {
+    deposit.Asset1In = '1000'
+    deposit.Asset2In = 1234
+    assert.throws(
+      () => validate(deposit),
+      ValidationError,
+      'AMMDeposit: Asset2In must be an Amount',
+    )
+  })
+
+  it(`throws w/ EPrice must be an Amount`, function () {
+    deposit.Asset1In = '1000'
+    deposit.EPrice = 1234
+    assert.throws(
+      () => validate(deposit),
+      ValidationError,
+      'AMMDeposit: EPrice must be an Amount',
+    )
+  })
 })
