@@ -21,10 +21,9 @@
     "UInt192": 21,
     "UInt384": 22,
     "UInt512": 23,
-    "XChainClaimProof": 24,
-    "Issue": 25,
-    "XChainBridge": 26,
-    "XChainAttestationBatch": 27,
+    "Issue": 24,
+    "XChainBridge": 25,
+    "XChainAttestationBatch": 26,
     "Transaction": 10001,
     "LedgerEntry": 10002,
     "Validation": 10003,
@@ -1959,16 +1958,6 @@
       }
     ],
     [
-      "XChainClaimProof",
-      {
-        "nth": 1,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "XChainClaimProof"
-      }
-    ],
-    [
       "LockingChainIssue",
       {
         "nth": 1,
@@ -2675,7 +2664,7 @@
     "XChainCreateClaimID": 41,
     "XChainCommit": 42,
     "XChainClaim": 43,
-    "SidechainXChainAccountCreate": 44,
+    "XChainAccountCreateCommit": 44,
     "XChainAddAttestation": 45,
     "XChainModifyBridge": 46,
     "EnableAmendment": 100,
