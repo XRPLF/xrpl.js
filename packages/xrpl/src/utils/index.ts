@@ -15,6 +15,7 @@ import {
   xAddressToClassicAddress,
 } from 'ripple-address-codec'
 import * as rbc from 'ripple-binary-codec'
+import { verify } from 'ripple-keypairs'
 
 import { LedgerEntry } from '../models/ledger'
 import { Response } from '../models/methods'
@@ -194,6 +195,7 @@ export {
   deriveAddress,
   deriveXAddress,
   signPaymentChannelClaim,
+  verify,
   verifyPaymentChannelClaim,
   convertStringToHex,
   convertHexToString,
