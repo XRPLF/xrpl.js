@@ -55,13 +55,13 @@ import {
   validatePaymentChannelFund,
 } from './paymentChannelFund'
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
-import {
-  SidechainXChainAccountCreate,
-  validateSidechainXChainAccountCreate,
-} from './sidechainXChainAccountCreate'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
+import {
+  XChainAccountCreateCommit,
+  validateXChainAccountCreateCommit,
+} from './XChainAccountCreateCommit'
 import {
   XChainAddAttestation,
   validateXChainAddAttestation,
@@ -119,7 +119,7 @@ export type Transaction =
   | XChainCommit
   | XChainCreateBridge
   | XChainCreateClaimID
-  | SidechainXChainAccountCreate
+  | XChainAccountCreateCommit
   | XChainModifyBridge
 
 /**
@@ -285,8 +285,8 @@ export function validate(transaction: Record<string, unknown>): void {
       validateXChainCreateClaimID(tx)
       break
 
-    case 'SidechainXChainAccountCreate':
-      validateSidechainXChainAccountCreate(tx)
+    case 'XChainAccountCreateCommit':
+      validateXChainAccountCreateCommit(tx)
       break
 
     case 'XChainModifyBridge':
