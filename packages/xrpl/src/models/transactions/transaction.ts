@@ -9,6 +9,14 @@ import { setTransactionFlagsToNumber } from '../utils/flags'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'
 import { AccountSet, validateAccountSet } from './accountSet'
+import { AMMBid, validateAMMBid } from './AMMBid'
+import { AMMDeposit, validateAMMDeposit } from './AMMDeposit'
+import {
+  AMMInstanceCreate,
+  validateAMMInstanceCreate,
+} from './AMMInstanceCreate'
+import { AMMVote, validateAMMVote } from './AMMVote'
+import { AMMWithdraw, validateAMMWithdraw } from './AMMWithdraw'
 import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
@@ -79,6 +87,11 @@ import {
 export type Transaction =
   | AccountDelete
   | AccountSet
+  | AMMBid
+  | AMMDeposit
+  | AMMInstanceCreate
+  | AMMVote
+  | AMMWithdraw
   | CheckCancel
   | CheckCash
   | CheckCreate
@@ -142,6 +155,26 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'AccountSet':
       validateAccountSet(tx)
+      break
+
+    case 'AMMBid':
+      validateAMMBid(tx)
+      break
+
+    case 'AMMDeposit':
+      validateAMMDeposit(tx)
+      break
+
+    case 'AMMInstanceCreate':
+      validateAMMInstanceCreate(tx)
+      break
+
+    case 'AMMVote':
+      validateAMMVote(tx)
+      break
+
+    case 'AMMWithdraw':
+      validateAMMWithdraw(tx)
       break
 
     case 'CheckCancel':
