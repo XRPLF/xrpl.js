@@ -47,13 +47,13 @@ import {
   validatePaymentChannelFund,
 } from './paymentChannelFund'
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
+import { SignerListSet, validateSignerListSet } from './signerListSet'
+import { TicketCreate, validateTicketCreate } from './ticketCreate'
+import { TrustSet, validateTrustSet } from './trustSet'
 import {
   XChainAccountCreateCommit,
   validateXChainAccountCreateCommit,
 } from './XChainAccountCreateCommit'
-import { SignerListSet, validateSignerListSet } from './signerListSet'
-import { TicketCreate, validateTicketCreate } from './ticketCreate'
-import { TrustSet, validateTrustSet } from './trustSet'
 import {
   XChainAddAttestation,
   validateXChainAddAttestation,
