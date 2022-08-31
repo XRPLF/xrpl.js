@@ -12,7 +12,7 @@ export interface XChainModifyBridge extends BaseTransaction {
 
   XChainBridge: XChainBridge
 
-  SignatureReward: Amount
+  SignatureReward?: Amount
 
   MinAccountCreateAmount?: Amount
 }
@@ -28,11 +28,5 @@ export function validateXChainModifyBridge(tx: Record<string, unknown>): void {
 
   if (tx.XChainBridge == null) {
     throw new ValidationError('XChainModifyBridge: missing field XChainBridge')
-  }
-
-  if (tx.SignatureReward == null) {
-    throw new ValidationError(
-      'XChainModifyBridge: missing field SignatureReward',
-    )
   }
 }
