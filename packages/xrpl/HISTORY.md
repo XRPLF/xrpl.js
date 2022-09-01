@@ -5,7 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 ### Added
 
-- Export `verify` from ripple-keypairs for use in web-apps.
+- Export `verify` from ripple-keypairs as `verifySignature` for use in web-apps.
 
 ### Fixed
 * `Wallet.fromMnemonic` now allows lowercase for RFC1751 mnemonics (#2046)
