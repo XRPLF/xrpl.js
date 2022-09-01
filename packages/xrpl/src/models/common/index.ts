@@ -9,7 +9,7 @@ export type AccountObjectType =
   | 'signer_list'
   | 'ticket'
   | 'state'
-  | 'xchain_seq'
+  | 'xchain_claim_id'
 
 interface XRP {
   currency: 'XRP'
