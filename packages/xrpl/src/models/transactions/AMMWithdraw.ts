@@ -95,7 +95,7 @@ export function validateAMMWithdraw(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMWithdraw: Asset2Out must be an Amount')
   }
 
-  if (tx.EPrice != null && typeof tx.EPrice !== 'string') {
+  if (tx.EPrice != null && typeof !isAmount(tx.EPrice)) {
     throw new ValidationError('AMMWithdraw: EPrice must be an Amount')
   }
 }
