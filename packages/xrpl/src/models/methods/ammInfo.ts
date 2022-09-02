@@ -69,6 +69,11 @@ export interface AMMInfoResponse extends BaseResponse {
     TradingFee: number
 
     /**
+     * A hash that uniquely identifies the AMM instance.
+     */
+    AMMID?: string
+
+    /**
      * The ledger index of the current in-progress ledger, which was used when
      * retrieving this information.
      */
