@@ -22,6 +22,7 @@ enum FaucetNetwork {
   Testnet = 'faucet.altnet.rippletest.net',
   Devnet = 'faucet.devnet.rippletest.net',
   NFTDevnet = 'faucet-nft.ripple.com',
+  HooksV2Testnet = 'hooks-testnet-v2.xrpl-labs.com',
 }
 
 // Interval to check an account balance
@@ -303,6 +304,10 @@ async function getUpdatedBalance(
  */
 function getFaucetHost(client: Client): FaucetNetwork | undefined {
   const connectionUrl = client.url
+
+  if (connectionUrl.includes('hooks-testnet-v2')) {
+    return FaucetNetwork.HooksV2Testnet
+  }
 
   // 'altnet' for Ripple Testnet server and 'testnet' for XRPL Labs Testnet server
   if (connectionUrl.includes('altnet') || connectionUrl.includes('testnet')) {
