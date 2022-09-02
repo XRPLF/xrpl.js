@@ -42,11 +42,6 @@ export interface AMMInfoResponse extends BaseResponse {
     AMMAccount: string
 
     /**
-     * A hash that uniquely identifies the AMM instance.
-     */
-    AMMID: string
-
-    /**
      * Specifies one of the pool assets (XRP or token) of the AMM instance.
      */
     Asset1: Amount
