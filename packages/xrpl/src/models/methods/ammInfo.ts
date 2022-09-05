@@ -29,6 +29,14 @@ export interface AMMInfoRequest extends BaseRequest {
   asset2?: Amount
 }
 
+interface VoteEntry {
+  VoteEntry: {
+    Account: string
+    FeeVal: number
+    VoteWeight: number
+  }
+}
+
 /**
  * Response expected from an {@link AMMInfoRequest}.
  *
@@ -72,6 +80,11 @@ export interface AMMInfoResponse extends BaseResponse {
      * A hash that uniquely identifies the AMM instance.
      */
     AMMID?: string
+
+    /**
+     * Keeps a track of up to eight active votes for the instance.
+     */
+    VoteSlots?: VoteEntry[]
 
     /**
      * The ledger index of the current in-progress ledger, which was used when
