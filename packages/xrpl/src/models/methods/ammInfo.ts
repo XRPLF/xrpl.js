@@ -30,11 +30,8 @@ export interface AMMInfoRequest extends BaseRequest {
 }
 
 interface VoteEntry {
-  VoteEntry: {
-    Account: string
-    FeeVal: number
-    VoteWeight: number
-  }
+  FeeVal: number
+  VoteWeight: number
 }
 
 /**
