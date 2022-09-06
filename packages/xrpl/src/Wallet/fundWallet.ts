@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- barely exceeds limit */
 import { IncomingMessage } from 'http'
 import { request as httpsRequest, RequestOptions } from 'https'
 
@@ -23,6 +24,13 @@ enum FaucetNetwork {
   Devnet = 'faucet.devnet.rippletest.net',
   NFTDevnet = 'faucet-nft.ripple.com',
   HooksV2Testnet = 'hooks-testnet-v2.xrpl-labs.com',
+}
+
+const FaucetNetworkPaths: Record<string, string> = {
+  [FaucetNetwork.Testnet]: '/accounts',
+  [FaucetNetwork.Devnet]: '/accounts',
+  [FaucetNetwork.NFTDevnet]: '/accounts',
+  [FaucetNetwork.HooksV2Testnet]: '/newcreds',
 }
 
 // Interval to check an account balance
@@ -146,10 +154,13 @@ function getHTTPOptions(
   postBody: Uint8Array,
   hostname?: string,
 ): RequestOptions {
+  const finalHostname = hostname ?? getFaucetHost(client)
+  const finalPath =
+    finalHostname === undefined ? undefined : FaucetNetworkPaths[finalHostname]
   return {
-    hostname: hostname ?? getFaucetHost(client),
+    hostname: finalHostname,
     port: 443,
-    path: '/accounts',
+    path: finalPath,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
