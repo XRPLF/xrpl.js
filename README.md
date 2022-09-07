@@ -62,6 +62,64 @@ main()
 ```
 
 For more examples, see the [documentation](#documentation).
+### Using xrpl.js with `create-react-app`
+If you want to use `xrpl.js` with React Native you will need to install shims for core NodeJS modules.
+In `webpack@5` shims stopped in included by default, so you will need to modify your webpack configuration this can be done by ejecting your config and modifying it or using another library such as `react-app-rewired` 
+
+1. Install shims (you can use `yarn` as well):
+```shell
+npm i --save-dev \
+    assert \
+    buffer \
+    crypto-browserify \
+    https-browserify \
+    os-browserify \
+    process \
+    stream-browserify \
+    stream-http \
+    url
+```
+2. Modify your webpack configuration
+    1. Install `react-app-rewired`
+    ````shell
+    npm install --save-dev react-app-rewired
+    ````
+    2. Add `config-overrides.js` to project root
+    ```javascript
+    const webpack = require('webpack');
+    
+    module.exports = function override(config) {
+        const fallback = config.resolve.fallback || {};
+        Object.assign(fallback, {
+            "assert": require.resolve("assert"),
+            "crypto": require.resolve("crypto-browserify"),
+            "http": require.resolve("stream-http"),
+            "https": require.resolve("https-browserify"),
+            "os": require.resolve("os-browserify"),
+            "stream": require.resolve("stream-browserify"),
+            "url": require.resolve("url"),
+        })
+        config.plugins = (config.plugins || []).concat([
+            new webpack.ProvidePlugin({
+                process: 'process/browser',
+                Buffer: ['buffer', 'Buffer']
+            })
+        ])
+    
+        // This is deprecated in webpack 5 but alias false does not seem to work
+        config.module.rules.push({
+            test: /node_modules[\\\/]https-proxy-agent[\\\/]/,
+            use: 'null-loader',
+        })
+        return config;
+    }
+    ```
+   3. Update package.json scripts section with
+   ```
+   "start": "react-app-rewired start", 
+   "build": "react-app-rewired build",
+   "test": "react-app-rewired test",
+   ```
 
 ### Using xrpl.js with React Native
 
