@@ -63,7 +63,7 @@ main()
 
 For more examples, see the [documentation](#documentation).
 ### Using xrpl.js with `create-react-app`
-If you want to use `xrpl.js` with React Native you will need to install shims for core NodeJS modules.
+If you want to use `xrpl.js` with React using CRA you will need to install shims for core NodeJS modules.
 In `webpack@5` shims stopped in included by default, so you will need to modify your webpack configuration this can be done by ejecting your config and modifying it or using another library such as `react-app-rewired` 
 
 1. Install shims (you can use `yarn` as well):
@@ -99,6 +99,7 @@ npm i --save-dev \
             "stream": require.resolve("stream-browserify"),
             "url": require.resolve("url"),
         })
+        config.resolve.fallback = fallback
         config.plugins = (config.plugins || []).concat([
             new webpack.ProvidePlugin({
                 process: 'process/browser',
