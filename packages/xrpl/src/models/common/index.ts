@@ -61,10 +61,31 @@ interface PathStep {
 
 export type Path = PathStep[]
 
+/**
+ * The object that describes the signer in SignerEntries.
+ */
 export interface SignerEntry {
+  /**
+   * The object that describes the signer in SignerEntries.
+   */
   SignerEntry: {
+    /**
+     * An XRP Ledger address whose signature contributes to the multi-signature.
+     * It does not need to be a funded address in the ledger.
+     */
     Account: string
+    /**
+     * The weight of a signature from this signer.
+     * A multi-signature is only valid if the sum weight of the signatures provided meets
+     * or exceeds the signer list's SignerQuorum value.
+     */
     SignerWeight: number
+    /**
+     * An arbitrary 256-bit (32-byte) field that can be used to identify the signer, which
+     * may be useful for smart contracts, or for identifying who controls a key in a large
+     * organization.
+     */
+    WalletLocator?: string
   }
 }
 
