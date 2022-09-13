@@ -67,17 +67,17 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
     )
   }
 
-  if (tx.SignerEntries.length > 0) {
-    for (const entry of tx.SignerEntries) {
-      const signerEntry = entry.SignerEntry
-      if (
-        signerEntry.WalletLocator !== undefined &&
-        !HEX_WALLET_LOCATOR_REGEX.test(signerEntry.WalletLocator)
-      ) {
-        throw new ValidationError(
-          `SignerListSet: WalletLocator in SignerEntry must be a 256-bit (32-byte) hexadecimal value`,
-        )
-      }
+  for (const entry of tx.SignerEntries) {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be a SignerEntry
+    const signerEntry = entry as SignerEntry
+    const { WalletLocator } = signerEntry.SignerEntry
+    if (
+      WalletLocator !== undefined &&
+      !HEX_WALLET_LOCATOR_REGEX.test(WalletLocator)
+    ) {
+      throw new ValidationError(
+        `SignerListSet: WalletLocator in SignerEntry must be a 256-bit (32-byte) hexadecimal value`,
+      )
     }
   }
 }
