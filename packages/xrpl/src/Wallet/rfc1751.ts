@@ -136,7 +136,13 @@ function getSubKey(
   const ch = [0, 0, 0, 0, 0, 0, 0, 0, 0]
   let word = ''
   for (word of sublist) {
-    const idx = rfc1751WordList.indexOf(word)
+    const idx = rfc1751WordList.indexOf(word.toUpperCase())
+    if (idx === -1) {
+      throw new TypeError(
+        `Expected an RFC1751 word, but received '${word}'. ` +
+          `For the full list of words in the RFC1751 encoding see https://datatracker.ietf.org/doc/html/rfc1751`,
+      )
+    }
     const shift = (8 - ((bits + 11) % 8)) % 8
     const y = idx << shift
     const cl = y >> 16
@@ -171,10 +177,14 @@ function bufferToArray(buf: Buffer): number[] {
  * @returns A buffer containing the same data with reversed endianness
  */
 function swap128(buf: Buffer): Buffer {
-  const result = Buffer.alloc(16)
-  result.writeBigUInt64LE(buf.readBigUInt64BE(0), 8)
-  result.writeBigUInt64LE(buf.readBigUInt64BE(8), 0)
-  return result
+  // Interprets buffer as an array of (two, in this case) 64-bit numbers and swaps byte order in-place.
+  const reversedBytes = buf.swap64()
+
+  // Swap the two 64-bit numbers since our buffer is 128 bits.
+  return Buffer.concat(
+    [reversedBytes.slice(8, 16), reversedBytes.slice(0, 8)],
+    16,
+  )
 }
 
 export { rfc1751MnemonicToKey, keyToRFC1751Mnemonic }

@@ -14,7 +14,7 @@ Warning: Use at your own risk.
 
 - **[The World Exchange](https://www.theworldexchange.net/)**
 
-  Trade, issue, and send directly on the XRP Ledger. A user interface for the XRPL's decentralized exchange.
+  Trade, issue, and send directly on the XRP Ledger. A user interface for the XRPL's decentralized exchange. Includes an implementation of an autobridged order book for token-to-token trading pairs in the [source code](https://github.com/pftq/TheWorldExchange).
 
 - **[Bitso](https://bitso.com/)**
 

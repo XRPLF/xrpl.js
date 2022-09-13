@@ -18,11 +18,12 @@ jobs:
         node-version: [14.x]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
+        cache: 'npm'
     - run: npm install -g npm@7
     - run: npm ci
     - run: npm run build
@@ -37,11 +38,13 @@ jobs:
         node-version: [12.x, 14.x, 16.x]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: '**/package-lock.json'
     - run: npm install -g npm@7
     - run: npm ci
     - run: npm run build
@@ -63,11 +66,13 @@ jobs:
           --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: '**/package-lock.json'
     - run: npm install -g npm@7
     - run: npm ci
     - run: npm run build
@@ -97,6 +102,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: '**/package-lock.json'
     - run: npm install -g npm@7
     - run: npm ci
     - run: npm run build

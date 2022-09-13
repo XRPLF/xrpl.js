@@ -36,6 +36,7 @@ interface ConnectionOptions {
   // request timeout
   timeout: number
   connectionTimeout: number
+  headers?: { [key: string]: string }
 }
 
 /**
@@ -114,9 +115,15 @@ function createWebSocket(
 ): WebSocket | null {
   const options: WebSocket.ClientOptions = {}
   options.agent = getAgent(url, config)
+  if (config.headers) {
+    options.headers = config.headers
+  }
   if (config.authorization != null) {
     const base64 = Buffer.from(config.authorization).toString('base64')
-    options.headers = { Authorization: `Basic ${base64}` }
+    options.headers = {
+      ...options.headers,
+      Authorization: `Basic ${base64}`,
+    }
   }
   const optionsOverrides = _.omitBy(
     {
