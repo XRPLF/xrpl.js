@@ -34,7 +34,7 @@ export interface XChainAddAttestation extends BaseTransaction {
     }>
 
     XChainCreateAccountAttestationBatch: Array<{
-      XChainClaimAttestationBatchElement: {
+      XChainCreateAccountAttestationBatchElement: {
         Account: string
 
         Amount: Amount
