@@ -3,7 +3,7 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 ### Added
-* Add ExpandedSignerList amendment support
+* Support for ExpandedSignerList amendment that expands the maximum signer list to 32 entries.
 
 ## 2.4.0 (2022-09-01)
 ### Added
