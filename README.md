@@ -84,7 +84,8 @@ npm i --save-dev \
     ````shell
     npm install --save-dev react-app-rewired
     ````
-    2. Add `config-overrides.js` to project root
+    2. At the project root, add a file named `config-overrides.js` with the following content:
+
     ```javascript
     const webpack = require('webpack');
     
