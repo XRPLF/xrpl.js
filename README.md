@@ -64,7 +64,7 @@ main()
 For more examples, see the [documentation](#documentation).
 ### Using xrpl.js with `create-react-app`
 If you want to use `xrpl.js` with React using CRA you will need to install shims for core NodeJS modules.
-In `webpack@5` shims stopped in included by default, so you will need to modify your webpack configuration this can be done by ejecting your config and modifying it or using another library such as `react-app-rewired` 
+Starting with version 5, Webpack stopped including shims by default, so you must modify your Webpack configuration to add the shims you need. Either you can eject your config and modify it, or you can use a library such as `react-app-rewired`. The example below uses `react-app-rewired`.
 
 1. Install shims (you can use `yarn` as well):
 ```shell
