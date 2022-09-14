@@ -6,6 +6,10 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Added
 * Support for the cross-chain bridge feature
 
+## 2.4.0 (2022-09-01)
+### Added
+- Export `verify` from ripple-keypairs as `verifyKeypairSignature` for use in web-apps.
+
 ### Fixed
 * `Wallet.fromMnemonic` now allows lowercase for RFC1751 mnemonics (#2046)
 * `Wallet.fromMnemonic` detects when an invalid encoding is provided, and throws an error
