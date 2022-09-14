@@ -25,7 +25,7 @@ What is `xrpl.js` used for? The applications on the list linked above use `xrpl.
 
 ### Requirements
 
-+ **[Node.js v14](https://nodejs.org/)** is recommended. We also support v12 and v16. Other versions may work but are not frequently tested.
++ **[Node.js v14](https://nodejs.org/)** is recommended. We also support v16 and v18. Other versions may work but are not frequently tested.
 
 ## Getting Started
 

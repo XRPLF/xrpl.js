@@ -24,6 +24,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    # TODO: Remove when upgrading to Node 16.x
     - run: npm install -g npm@7
     - run: npm ci
     - run: npm run build
@@ -35,7 +36,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
+        node-version: [14.x, 16.x, 18.x]
 
     steps:
     - uses: actions/checkout@v3
@@ -45,6 +46,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
         cache-dependency-path: '**/package-lock.json'
+    # TODO: Remove when upgrading to Node 16.x
     - run: npm install -g npm@7
     - run: npm ci
     - run: npm run build
@@ -55,7 +57,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
+        node-version: [14.x, 16.x, 18.x]
 
     services:
       rippled:
@@ -73,6 +75,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
         cache-dependency-path: '**/package-lock.json'
+    # TODO: Remove after ugprading to Node 16
     - run: npm install -g npm@7
     - run: npm ci
     - run: npm run build
@@ -104,6 +107,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
         cache-dependency-path: '**/package-lock.json'
+    # TODO: Remove after upgrading to Node 16
     - run: npm install -g npm@7
     - run: npm ci
     - run: npm run build
