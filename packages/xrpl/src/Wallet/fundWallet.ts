@@ -367,7 +367,9 @@ export default fundWallet
 
 const _private = {
   FaucetNetwork,
+  FaucetNetworkPaths,
   getFaucetHost,
+  getFaucetPath,
 }
 
 export { _private }
