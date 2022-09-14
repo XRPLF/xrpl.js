@@ -56,15 +56,22 @@ const MAX_ATTEMPTS = 20
  * automatically. In other environments, or if you would like to customize the
  * faucet host in devnet or testnet, you should provide the host using this
  * option.
+ * @param options.faucetPath - A custom path for a faucet server. On devnet and
+ * testnet, `fundWallet` will attempt to determine the correct path
+ * automatically. In other environments, or if you would like to customize the
+ * faucet path in devnet or testnet, you should provide the path using this
+ * option.
  * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP,
  * and that wallet's balance in XRP.
  * @throws When either Client isn't connected or unable to fund wallet address.
  */
+// eslint-disable-next-line max-lines-per-function -- couple lines over
 async function fundWallet(
   this: Client,
   wallet?: Wallet | null,
   options?: {
     faucetHost?: string
+    faucetPath?: string
   },
 ): Promise<{
   wallet: Wallet
@@ -99,7 +106,12 @@ async function fundWallet(
   }
 
   // Options to pass to https.request
-  const httpOptions = getHTTPOptions(this, postBody, options?.faucetHost)
+  const httpOptions = getHTTPOptions(
+    this,
+    postBody,
+    options?.faucetHost,
+    options?.faucetPath,
+  )
 
   return returnPromise(
     httpOptions,
@@ -149,18 +161,19 @@ async function returnPromise(
   })
 }
 
+// eslint-disable-next-line max-params -- helper function
 function getHTTPOptions(
   client: Client,
   postBody: Uint8Array,
   hostname?: string,
+  pathname?: string,
 ): RequestOptions {
   const finalHostname = hostname ?? getFaucetHost(client)
-  const finalPath =
-    finalHostname === undefined ? undefined : FaucetNetworkPaths[finalHostname]
+  const finalPathname = pathname ?? getFaucetPath(finalHostname)
   return {
     hostname: finalHostname,
     port: 443,
-    path: finalPath,
+    path: finalPathname,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -334,6 +347,20 @@ function getFaucetHost(client: Client): FaucetNetwork | undefined {
   }
 
   throw new XRPLFaucetError('Faucet URL is not defined or inferrable.')
+}
+
+/**
+ * Get the faucet pathname based on the faucet hostname.
+ *
+ * @param hostname - hostname.
+ * @returns A String with the correct path for the input hostname.
+ * If hostname undefined or cannot find (key, value) pair in {@link FaucetNetworkPaths}, defaults to '/accounts'
+ */
+function getFaucetPath(hostname: string | undefined): string {
+  if (hostname === undefined) {
+    return '/accounts'
+  }
+  return FaucetNetworkPaths[hostname] || '/accounts'
 }
 
 export default fundWallet
