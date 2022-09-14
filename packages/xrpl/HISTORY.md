@@ -4,7 +4,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 ### Added
-* Support for the cross-chain bridge feature
+* Support for the cross-chain bridge feature.
 
 ## 2.4.0 (2022-09-01)
 ### Added
