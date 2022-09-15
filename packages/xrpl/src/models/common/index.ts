@@ -9,12 +9,13 @@ export type AccountObjectType =
   | 'signer_list'
   | 'ticket'
   | 'state'
+  | 'xchain_claim_id'
 
 interface XRP {
   currency: 'XRP'
 }
 
-interface IssuedCurrency {
+export interface IssuedCurrency {
   currency: string
   issuer: string
 }
@@ -101,4 +102,11 @@ export interface NFTOffer {
   owner: string
   destination?: string
   expiration?: number
+}
+
+export interface XChainBridge {
+  LockingChainDoor: string
+  LockingChainIssue: 'XRP' | IssuedCurrency
+  IssuingChainDoor: string
+  IssuingChainIssue: 'XRP' | IssuedCurrency
 }

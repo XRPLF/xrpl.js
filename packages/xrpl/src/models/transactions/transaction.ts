@@ -58,6 +58,28 @@ import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
+import {
+  XChainAccountCreateCommit,
+  validateXChainAccountCreateCommit,
+} from './XChainAccountCreateCommit'
+import {
+  XChainAddAttestation,
+  validateXChainAddAttestation,
+} from './XChainAddAttestation'
+import { XChainClaim, validateXChainClaim } from './XChainClaim'
+import { XChainCommit, validateXChainCommit } from './XChainCommit'
+import {
+  XChainCreateBridge,
+  validateXChainCreateBridge,
+} from './XChainCreateBridge'
+import {
+  XChainCreateClaimID,
+  validateXChainCreateClaimID,
+} from './XChainCreateClaimID'
+import {
+  XChainModifyBridge,
+  validateXChainModifyBridge,
+} from './XChainModifyBridge'
 
 /**
  * @category Transaction Models
@@ -92,6 +114,13 @@ export type Transaction =
   | SignerListSet
   | TicketCreate
   | TrustSet
+  | XChainAddAttestation
+  | XChainClaim
+  | XChainCommit
+  | XChainCreateBridge
+  | XChainCreateClaimID
+  | XChainAccountCreateCommit
+  | XChainModifyBridge
 
 /**
  * @category Transaction Models
@@ -234,6 +263,34 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'TrustSet':
       validateTrustSet(tx)
+      break
+
+    case 'XChainAddAttestation':
+      validateXChainAddAttestation(tx)
+      break
+
+    case 'XChainClaim':
+      validateXChainClaim(tx)
+      break
+
+    case 'XChainCommit':
+      validateXChainCommit(tx)
+      break
+
+    case 'XChainCreateBridge':
+      validateXChainCreateBridge(tx)
+      break
+
+    case 'XChainCreateClaimID':
+      validateXChainCreateClaimID(tx)
+      break
+
+    case 'XChainAccountCreateCommit':
+      validateXChainAccountCreateCommit(tx)
+      break
+
+    case 'XChainModifyBridge':
+      validateXChainModifyBridge(tx)
       break
 
     default:
