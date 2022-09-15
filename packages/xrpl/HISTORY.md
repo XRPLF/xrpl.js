@@ -4,19 +4,18 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 ### Added
+* Support for ExpandedSignerList amendment that expands the maximum signer list to 32 entries.
 * Support for the cross-chain bridge feature.
+* Support for Automated Market Maker (AMM) transactions and requests as defined in XLS-30.
 
 ## 2.4.0 (2022-09-01)
 ### Added
-- Export `verify` from ripple-keypairs as `verifyKeypairSignature` for use in web-apps.
+* Export `verify` from ripple-keypairs as `verifyKeypairSignature` for use in web-apps.
 
 ### Fixed
 * `Wallet.fromMnemonic` now allows lowercase for RFC1751 mnemonics (#2046)
 * `Wallet.fromMnemonic` detects when an invalid encoding is provided, and throws an error
 * Made unexpected errors in `submitAndWait` more verbose to make them easier to debug.
-
-### Added
-* Support for Automated Market Maker (AMM) transactions and requests as defined in XLS-30.
 
 ## 2.3.1 (2022-06-27)
 ### Fixed

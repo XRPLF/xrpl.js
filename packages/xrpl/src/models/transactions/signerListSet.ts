@@ -20,13 +20,15 @@ export interface SignerListSet extends BaseTransaction {
   /**
    * Array of SignerEntry objects, indicating the addresses and weights of
    * signers in this list. This signer list must have at least 1 member and no
-   * more than 8 members. No address may appear more than once in the list, nor
+   * more than 32 members. No address may appear more than once in the list, nor
    * may the Account submitting the transaction appear in the list.
    */
   SignerEntries: SignerEntry[]
 }
 
-const MAX_SIGNERS = 8
+const MAX_SIGNERS = 32
+
+const HEX_WALLET_LOCATOR_REGEX = /^[0-9A-Fa-f]{64}$/u
 
 /**
  * Verify the form and type of an SignerListSet at runtime.
@@ -61,7 +63,21 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
 
   if (tx.SignerEntries.length > MAX_SIGNERS) {
     throw new ValidationError(
-      'SignerListSet: maximum of 8 members allowed in SignerEntries',
+      `SignerListSet: maximum of ${MAX_SIGNERS} members allowed in SignerEntries`,
     )
+  }
+
+  for (const entry of tx.SignerEntries) {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be a SignerEntry
+    const signerEntry = entry as SignerEntry
+    const { WalletLocator } = signerEntry.SignerEntry
+    if (
+      WalletLocator !== undefined &&
+      !HEX_WALLET_LOCATOR_REGEX.test(WalletLocator)
+    ) {
+      throw new ValidationError(
+        `SignerListSet: WalletLocator in SignerEntry must be a 256-bit (32-byte) hexadecimal value`,
+      )
+    }
   }
 }
