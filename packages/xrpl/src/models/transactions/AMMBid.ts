@@ -74,7 +74,9 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
 
   if (tx.AuthAccounts != null) {
     if (!Array.isArray(tx.AuthAccounts)) {
-      throw new ValidationError(`AMMBid: AuthAccounts must be a string array`)
+      throw new ValidationError(
+        `AMMBid: AuthAccounts must be an AuthAccount array`,
+      )
     }
     if (tx.AuthAccounts.length > MAX_AUTH_ACCOUNTS) {
       throw new ValidationError(
