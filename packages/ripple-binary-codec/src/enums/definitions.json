@@ -2649,16 +2649,6 @@
       }
     ],
     [
-      "AuthAccounts",
-      {
-        "nth": 21,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "STArray"
-      }
-    ],
-    [
       "Majorities",
       {
         "nth": 16,
@@ -2752,6 +2742,16 @@
       "XChainCreateAccountAttestations",
       {
         "nth": 25,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "AuthAccounts",
+      {
+        "nth": 26,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
