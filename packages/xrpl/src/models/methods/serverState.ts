@@ -35,7 +35,7 @@ export interface ServerStateResponse extends BaseResponse {
       io_latency_ms: number
       jq_trans_overflow: string
       last_close: {
-        converge_time_s: number
+        converge_time: number
         proposers: number
       }
       load?: {
