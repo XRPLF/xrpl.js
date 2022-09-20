@@ -4,6 +4,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 ### Added
 * Support for ExpandedSignerList amendment that expands the maximum signer list to 32 entries.
+* Add `cookie` and `data` to `ValidationStream` interface
 
 ## 2.4.0 (2022-09-01)
 ### Added
