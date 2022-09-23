@@ -130,7 +130,7 @@ class ShaMapInner extends ShaMapNode {
    */
   hash(): Hash256 {
     if (this.empty()) {
-      return coreTypes.Hash256.ZERO_256
+      return (coreTypes.Hash256 as typeof Hash256).ZERO_256
     }
     const hash = Sha512Half.put(this.hashPrefix())
     this.toBytesSink(hash)
@@ -145,7 +145,9 @@ class ShaMapInner extends ShaMapNode {
   toBytesSink(list: BytesList): void {
     for (let i = 0; i < this.branches.length; i++) {
       const branch = this.branches[i]
-      const hash = branch ? branch.hash() : coreTypes.Hash256.ZERO_256
+      const hash = branch
+        ? branch.hash()
+        : (coreTypes.Hash256 as typeof Hash256).ZERO_256
       hash.toBytesSink(list)
     }
   }
