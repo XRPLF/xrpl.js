@@ -1,5 +1,5 @@
 import * as assert from 'assert'
-import { Field, FieldInstance } from '../enums'
+import { DEFINITIONS, FieldInstance } from '../enums'
 import { SerializedType } from '../types/serialized-type'
 import { Buffer } from 'buffer/'
 
@@ -146,7 +146,7 @@ class BinaryParser {
    * @return The field represented by the bytes at the head of the BinaryParser
    */
   readField(): FieldInstance {
-    return Field.fromString(this.readFieldOrdinal().toString())
+    return DEFINITIONS.field.fromString(this.readFieldOrdinal().toString())
   }
 
   /**

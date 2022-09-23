@@ -1,19 +1,21 @@
+// TODO: Replace this back with normal definitions.json file
 import * as enums from './definitions.json'
 import { SerializedType } from '../types/serialized-type'
 import { Buffer } from 'buffer/'
 import { BytesList } from '../binary'
 
-/*
- * @brief: All valid transaction types
- */
-export const TRANSACTION_TYPES = Object.entries(enums.TRANSACTION_TYPES)
-  .filter(([_key, value]) => value >= 0)
-  .map(([key, _value]) => key)
-
 const TYPE_WIDTH = 2
 const LEDGER_ENTRY_WIDTH = 2
 const TRANSACTION_TYPE_WIDTH = 2
 const TRANSACTION_RESULT_WIDTH = 1
+
+interface DefinitionsData {
+  TYPES: Record<string, number>
+  LEDGER_ENTRY_TYPES: Record<string, number>
+  FIELDS: (string | FieldInfo)[][]
+  TRANSACTION_RESULTS: Record<string, number>
+  TRANSACTION_TYPES: Record<string, number>
+}
 
 /*
  * @brief: Serialize a field based on type_code and Field.nth
@@ -70,16 +72,28 @@ export class Bytes {
 class BytesLookup {
   constructor(types: Record<string, number>, readonly ordinalWidth: number) {
     Object.entries(types).forEach(([k, v]) => {
-      this[k] = new Bytes(k, v, ordinalWidth)
-      this[v.toString()] = this[k]
+      this.add(k, v)
     })
+  }
+
+  /**
+   * Add a new name value pair to the BytesLookup. Does not work properly if either name or value already
+   * exist within the BytesLookup.
+   *
+   * @param name - A human readable name for the field.
+   * @param value - The numeric value for the field.
+   */
+  add(name: string, value: number): void {
+    this[name] = new Bytes(name, value, this.ordinalWidth)
+    this[value.toString()] = this[name]
   }
 
   from(value: Bytes | string): Bytes {
     return value instanceof Bytes ? value : (this[value] as Bytes)
   }
 
-  fromParser(parser): Bytes {
+  // TODO: Type this better
+  fromParser(parser: any): Bytes {
     return this.from(parser.readUIntN(this.ordinalWidth).toString())
   }
 }
@@ -107,8 +121,11 @@ interface FieldInstance {
   readonly associatedType: typeof SerializedType
 }
 
-function buildField([name, info]: [string, FieldInfo]): FieldInstance {
-  const typeOrdinal = enums.TYPES[info.type]
+function buildField(
+  [name, info]: [string, FieldInfo],
+  types: Record<string, number>,
+): FieldInstance {
+  const typeOrdinal = types[info.type]
   const field = fieldHeader(typeOrdinal, info.nth)
   return {
     name: name,
@@ -119,7 +136,7 @@ function buildField([name, info]: [string, FieldInfo]): FieldInstance {
     ordinal: (typeOrdinal << 16) | info.nth,
     type: new Bytes(info.type, typeOrdinal, TYPE_WIDTH),
     header: field,
-    associatedType: SerializedType, // For later assignment in ./types/index.js
+    associatedType: SerializedType, // For later assignment in ./types/index.js or Definitions.updateAll(...)
   }
 }
 
@@ -127,38 +144,130 @@ function buildField([name, info]: [string, FieldInfo]): FieldInstance {
  * @brief: The collection of all fields as defined in definitions.json
  */
 class FieldLookup {
-  constructor(fields: Array<[string, FieldInfo]>) {
+  constructor(
+    fields: Array<[string, FieldInfo]>,
+    types: Record<string, number>,
+  ) {
     fields.forEach(([k, v]) => {
-      this[k] = buildField([k, v])
-      this[this[k].ordinal.toString()] = this[k]
+      this.add(k, v, types)
     })
+  }
+
+  public add(
+    name: string,
+    field_info: FieldInfo,
+    types: Record<string, number>,
+  ): void {
+    this[name] = buildField([name, field_info], types)
+    this[this[name].ordinal.toString()] = this[name]
   }
 
   fromString(value: string): FieldInstance {
     return this[value] as FieldInstance
   }
 }
+/**
+ * Stores the various types and fields for rippled to be used to encode/decode information later on.
+ *
+ */
+class DefinitionContents {
+  field: FieldLookup
+  ledgerEntryType: BytesLookup
+  type: BytesLookup
+  transactionResult: BytesLookup
+  transactionType: BytesLookup
+  transactionNames: string[]
 
-const Type = new BytesLookup(enums.TYPES, TYPE_WIDTH)
-const LedgerEntryType = new BytesLookup(
-  enums.LEDGER_ENTRY_TYPES,
-  LEDGER_ENTRY_WIDTH,
-)
-const TransactionType = new BytesLookup(
-  enums.TRANSACTION_TYPES,
-  TRANSACTION_TYPE_WIDTH,
-)
-const TransactionResult = new BytesLookup(
-  enums.TRANSACTION_RESULTS,
-  TRANSACTION_RESULT_WIDTH,
-)
-const Field = new FieldLookup(enums.FIELDS as Array<[string, FieldInfo]>)
+  /**
+   * Present rippled types in a typed and updatable format.
+   *
+   * @param enums - A json encoding of the core types, transaction types, transaction results, transaction names, and fields.
+   * For an example of the format see `definitions.json`
+   * To generate a new definitions file from rippled source code, use this tool: https://github.com/RichardAH/xrpl-codec-gen
+
+   */
+  constructor(enums: DefinitionsData) {
+    this.type = new BytesLookup(enums.TYPES, TYPE_WIDTH)
+    this.ledgerEntryType = new BytesLookup(
+      enums.LEDGER_ENTRY_TYPES,
+      LEDGER_ENTRY_WIDTH,
+    )
+    this.transactionType = new BytesLookup(
+      enums.TRANSACTION_TYPES,
+      TRANSACTION_TYPE_WIDTH,
+    )
+    this.transactionResult = new BytesLookup(
+      enums.TRANSACTION_RESULTS,
+      TRANSACTION_RESULT_WIDTH,
+    )
+    this.field = new FieldLookup(
+      enums.FIELDS as Array<[string, FieldInfo]>,
+      enums.TYPES,
+    )
+    this.transactionNames = Object.entries(enums.TRANSACTION_TYPES)
+      .filter(([_key, value]) => value >= 0)
+      .map(([key, _value]) => key)
+  }
+
+  /**
+   * Update the values of a Definitions object in-place.
+   *
+   * @param newDefinitions a definitions object to copy the fields of.
+   * @param types a list of type objects with the same name as the fields defined. Used to call associateTypes(types)
+   */
+  public updateAll(
+    newDefinitions: DefinitionContents,
+    types: Record<string, typeof SerializedType>,
+  ): void {
+    this.field = newDefinitions.field
+    this.ledgerEntryType = newDefinitions.ledgerEntryType
+    this.type = newDefinitions.type
+    this.transactionResult = newDefinitions.transactionResult
+    this.transactionType = newDefinitions.transactionType
+
+    this.associateTypes(types)
+  }
+
+  /**
+   * Associates each Field to a corresponding type that TypeScript can recognize.
+   *
+   * @param types a list of type objects with the same name as the fields defined.
+   */
+  public associateTypes(types: Record<string, typeof SerializedType>): void {
+    Object.values(this.field).forEach((field) => {
+      field.associatedType = types[field.type.name]
+    })
+
+    this.field['TransactionType'].associatedType = this.transactionType
+    this.field['TransactionResult'].associatedType = this.transactionResult
+    this.field['LedgerEntryType'].associatedType = this.ledgerEntryType
+  }
+}
+
+/**
+ * To update the definitions, use `Definitions.updateAll(<Your imported definitions.json>)`
+ */
+const DEFINITIONS = new DefinitionContents(enums)
+
+const Type = DEFINITIONS.type
+const LedgerEntryType = DEFINITIONS.ledgerEntryType
+const TransactionType = DEFINITIONS.transactionType
+const TransactionResult = DEFINITIONS.transactionResult
+const Field = DEFINITIONS.field
+
+/*
+ * @brief: All valid transaction types
+ */
+const TRANSACTION_TYPES = DEFINITIONS.transactionNames
 
 export {
+  DefinitionContents,
+  DEFINITIONS,
   Field,
   FieldInstance,
   Type,
   LedgerEntryType,
   TransactionResult,
   TransactionType,
+  TRANSACTION_TYPES,
 }

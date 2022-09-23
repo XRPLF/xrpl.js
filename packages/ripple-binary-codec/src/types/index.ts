@@ -1,9 +1,6 @@
-import {
-  Field,
-  TransactionResult,
-  TransactionType,
-  LedgerEntryType,
-} from '../enums'
+// TODO: Remove this
+import { DEFINITIONS } from '../enums'
+// import * as enums from '../enums/definitions.json'
 import { AccountID } from './account-id'
 import { Amount } from './amount'
 import { Blob } from './blob'
@@ -19,8 +16,9 @@ import { UInt32 } from './uint-32'
 import { UInt64 } from './uint-64'
 import { UInt8 } from './uint-8'
 import { Vector256 } from './vector-256'
+import { SerializedType } from './serialized-type'
 
-const coreTypes = {
+const coreTypes: Record<string, typeof SerializedType> = {
   AccountID,
   Amount,
   Blob,
@@ -38,12 +36,8 @@ const coreTypes = {
   Vector256,
 }
 
-Object.values(Field).forEach((field) => {
-  field.associatedType = coreTypes[field.type.name]
-})
-
-Field['TransactionType'].associatedType = TransactionType
-Field['TransactionResult'].associatedType = TransactionResult
-Field['LedgerEntryType'].associatedType = LedgerEntryType
+// Done here instead of in enums/index.ts to ensure that the coreTypes are
+// instantialized before being used.
+DEFINITIONS.associateTypes(coreTypes)
 
 export { coreTypes }
