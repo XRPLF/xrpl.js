@@ -112,7 +112,7 @@ export interface AccountRootFlagsInterface {
    */
   lsfDefaultRipple?: boolean
   /**
-   * This account can only receive funds from transactions it sends, and from pre-authorized accounts.
+   * This account can only receive funds from transactions it sends, and from preauthorized accounts.
    * (It has DepositAuth enabled.)
    */
   lsfDepositAuth?: boolean
@@ -152,7 +152,7 @@ export enum AccountRootFlags {
    */
   lsfDefaultRipple = 0x00800000,
   /**
-   * This account can only receive funds from transactions it sends, and from pre-authorized accounts.
+   * This account can only receive funds from transactions it sends, and from preauthorized accounts.
    * (It has DepositAuth enabled.)
    */
   lsfDepositAuth = 0x01000000,
