@@ -224,6 +224,7 @@ class DefinitionContents {
     this.type = newDefinitions.type
     this.transactionResult = newDefinitions.transactionResult
     this.transactionType = newDefinitions.transactionType
+    this.transactionNames = newDefinitions.transactionNames
 
     this.associateTypes(types)
   }
