@@ -1,4 +1,4 @@
-import { Field, FieldInstance, Bytes } from '../enums'
+import { DEFINITIONS, FieldInstance, Bytes } from '../enums'
 import { SerializedType, JsonObject } from './serialized-type'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { BinaryParser } from '../serdes/binary-parser'
@@ -108,7 +108,7 @@ class STObject extends SerializedType {
     }, {})
 
     let sorted = Object.keys(xAddressDecoded)
-      .map((f: string): FieldInstance => Field[f] as FieldInstance)
+      .map((f: string): FieldInstance => DEFINITIONS.field[f] as FieldInstance)
       .filter(
         (f: FieldInstance): boolean =>
           f !== undefined &&
