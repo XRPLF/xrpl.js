@@ -66,12 +66,12 @@ describe('SignerListSet', function () {
     assert.throws(
       () => validateSignerListSet(signerListSetTx),
       ValidationError,
-      'SignerListSet: need atleast 1 member in SignerEntries',
+      'SignerListSet: need at least 1 member in SignerEntries',
     )
     assert.throws(
       () => validate(signerListSetTx),
       ValidationError,
-      'SignerListSet: need atleast 1 member in SignerEntries',
+      'SignerListSet: need at least 1 member in SignerEntries',
     )
   })
 
