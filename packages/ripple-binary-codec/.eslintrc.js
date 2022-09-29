@@ -73,7 +73,6 @@ module.exports = {
     'import/no-commonjs': 'off',
     'import/newline-after-import': 'off',
     'node/global-require': 'off',
-    'consistent-default-export-name/default-import-match-filename': 'off',
     'jsdoc/require-throws': 'off',
     'jsdoc/require-description-complete-sentence': 'off',
     'jsdoc/require-jsdoc': 'off',

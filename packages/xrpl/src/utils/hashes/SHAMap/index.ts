@@ -2,7 +2,10 @@ import InnerNode from './InnerNode'
 import LeafNode from './LeafNode'
 import { NodeType } from './node'
 
+/* eslint-disable jsdoc/require-jsdoc --
+ * TODO from migration to eslint 8 */
 class SHAMap {
+  /* eslint-enable jsdoc/require-jsdoc */
   public root: InnerNode
 
   /**
@@ -10,6 +13,15 @@ class SHAMap {
    */
   public constructor() {
     this.root = new InnerNode(0)
+  }
+
+  /**
+   * Get the hash of the SHAMap.
+   *
+   * @returns The hash of the root of the SHAMap.
+   */
+  public get hash(): string {
+    return this.root.hash
   }
 
   /**
@@ -21,15 +33,6 @@ class SHAMap {
    */
   public addItem(tag: string, data: string, type: NodeType): void {
     this.root.addItem(tag, new LeafNode(tag, data, type))
-  }
-
-  /**
-   * Get the hash of the SHAMap.
-   *
-   * @returns The hash of the root of the SHAMap.
-   */
-  public get hash(): string {
-    return this.root.hash
   }
 }
 

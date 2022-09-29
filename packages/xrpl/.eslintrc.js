@@ -100,9 +100,6 @@ module.exports = {
 
         // setup/teardown client is easier to do in before/after, even if there is only one testcase
         'mocha/no-hooks-for-single-case': 'off',
-
-        // messes with fixtures
-        'consistent-default-export-name/default-import-match-filename': 'off',
       },
     },
     {

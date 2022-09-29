@@ -284,6 +284,9 @@ class Client extends EventEmitter {
   /**
    * @category Network
    */
+  /* eslint-disable jsdoc/require-jsdoc --
+   * these are just overloads so we don't need to define docs for each of them
+   * */
   public async request(
     r: AccountChannelsRequest,
   ): Promise<AccountChannelsResponse>
@@ -337,6 +340,7 @@ class Client extends EventEmitter {
   public async request<R extends BaseRequest, T extends BaseResponse>(
     r: R,
   ): Promise<T>
+  /* eslint-enable jsdoc/require-jsdoc */
   /**
    * Makes a request to the client with the given command and
    * additional request body parameters.
@@ -366,6 +370,9 @@ class Client extends EventEmitter {
   /**
    * @category Network
    */
+  /* eslint-disable jsdoc/require-jsdoc --
+   * these are just overloads so we don't need to define docs for each of them
+   * */
   public async requestNextPage(
     req: AccountChannelsRequest,
     resp: AccountChannelsResponse,
@@ -390,6 +397,7 @@ class Client extends EventEmitter {
     req: LedgerDataRequest,
     resp: LedgerDataResponse,
   ): Promise<LedgerDataResponse>
+  /* eslint-enable jsdoc/require-jsdoc */
   /**
    * Requests the next page of data.
    *
@@ -433,6 +441,9 @@ class Client extends EventEmitter {
    * @category Network
    */
   public on(event: 'connected', listener: () => void): this
+  /* eslint-disable jsdoc/require-jsdoc --
+   * these are just overloads so we don't need to define docs for each of them
+   * */
   public on(event: 'disconnected', listener: (code: number) => void): this
   public on(
     event: 'ledgerClosed',
@@ -457,6 +468,7 @@ class Client extends EventEmitter {
   public on(event: 'path_find', listener: (path: PathFindStream) => void): this
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
   public on(event: 'error', listener: (...err: any[]) => void): this
+  /* eslint-enable jsdoc/require-jsdoc */
   /**
    * Event handler for subscription streams.
    *
@@ -472,6 +484,9 @@ class Client extends EventEmitter {
   /**
    * @category Network
    */
+  /* eslint-disable jsdoc/require-jsdoc --
+   * these are just overloads so we don't need to define docs for each of them
+   * */
   public async requestAll(
     req: AccountChannelsRequest,
   ): Promise<AccountChannelsResponse[]>
@@ -487,6 +502,7 @@ class Client extends EventEmitter {
   public async requestAll(req: AccountTxRequest): Promise<AccountTxResponse[]>
   public async requestAll(req: BookOffersRequest): Promise<BookOffersResponse[]>
   public async requestAll(req: LedgerDataRequest): Promise<LedgerDataResponse[]>
+  /* eslint-enable jsdoc/require-jsdoc */
   /**
    * Makes multiple paged requests to the client to return a given number of
    * resources. Multiple paged requests will be made until the `limit`

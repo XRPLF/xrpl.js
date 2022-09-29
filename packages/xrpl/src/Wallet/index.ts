@@ -98,15 +98,6 @@ class Wallet {
   public readonly seed?: string
 
   /**
-   * Alias for wallet.classicAddress.
-   *
-   * @returns The wallet's classic address.
-   */
-  public get address(): string {
-    return this.classicAddress
-  }
-
-  /**
    * Creates a new Wallet.
    *
    * @param publicKey - The public key for the account.
@@ -129,6 +120,15 @@ class Wallet {
       ? ensureClassicAddress(opts.masterAddress)
       : deriveAddress(publicKey)
     this.seed = opts.seed
+  }
+
+  /**
+   * Alias for wallet.classicAddress.
+   *
+   * @returns The wallet's classic address.
+   */
+  public get address(): string {
+    return this.classicAddress
   }
 
   /**
