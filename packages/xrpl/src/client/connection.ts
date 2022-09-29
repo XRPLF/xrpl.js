@@ -13,6 +13,11 @@ import {
 } from '../errors'
 import { BaseRequest } from '../models/methods/baseMethod'
 
+if (typeof TextDecoder === 'undefined') {
+  global.TextEncoder = require('util').TextEncoder
+  global.TextDecoder = require('util').TextDecoder
+}
+
 import ConnectionManager from './ConnectionManager'
 import ExponentialBackoff from './ExponentialBackoff'
 import RequestManager from './RequestManager'
@@ -262,7 +267,7 @@ export class Connection extends EventEmitter {
 
     this.ws.on('error', (error) => this.onConnectionFailed(error))
     this.ws.on('error', () => clearTimeout(connectionTimeoutID))
-    this.ws.on('close', (reason) => this.onConnectionFailed(reason))
+    this.ws.on('close', (code, reason) => this.onConnectionFailed(code, reason))
     this.ws.on('close', () => clearTimeout(connectionTimeoutID))
     this.ws.once('open', () => {
       void this.onceOpen(connectionTimeoutID)
@@ -553,7 +558,12 @@ export class Connection extends EventEmitter {
    *
    * @param errorOrCode - (Optional) Error or code for connection failure.
    */
-  private onConnectionFailed(errorOrCode: Error | number | null): void {
+  private onConnectionFailed(
+    errorOrCode: Error | number | null,
+    reason?: Buffer,
+  ): void {
+    console.log('onConnectionFailed: ', errorOrCode)
+    console.log('onConnectionFailed: ', reason)
     if (this.ws) {
       this.ws.removeAllListeners()
       this.ws.on('error', () => {

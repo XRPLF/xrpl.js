@@ -33,6 +33,26 @@ export interface JobType {
   in_progress?: number
 }
 
+type RequireAtLeastOne<T, Keys extends keyof T = keyof T> = Pick<
+  T,
+  Exclude<keyof T, Keys>
+> &
+  {
+    [K in Keys]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<Keys, K>>>
+  }[Keys]
+
+export type StateAccountingFinal = Record<
+  Exclude<ServerState, 'full' | 'validating' | 'proposing'>,
+  StateAccounting
+> &
+  RequireAtLeastOne<
+    Record<
+      Extract<ServerState, 'full' | 'validating' | 'proposing'>,
+      StateAccounting
+    >,
+    'full' | 'validating' | 'proposing'
+  >
+
 /**
  * Response expected from a {@link ServerInfoRequest}.
  *
@@ -158,6 +178,8 @@ export interface ServerInfoResponse extends BaseResponse {
        * cost.
        */
       load_factor_server?: number
+      peer_disconnects?: string
+      peer_disconnects_resources?: string
       network_ledger?: 'waiting'
       /** How many other rippled servers this one is currently connected to. */
       peers: number
@@ -185,7 +207,7 @@ export interface ServerInfoResponse extends BaseResponse {
        * server spends in each. This can be useful for tracking the long-term
        * health of your server's connectivity to the network.
        */
-      state_accounting: Record<ServerState, StateAccounting>
+      state_accounting: StateAccountingFinal
       /** The current time in UTC, according to the server's clock. */
       time: string
       /** Number of consecutive seconds that the server has been operational. */
@@ -227,6 +249,11 @@ export interface ServerInfoResponse extends BaseResponse {
        * static validator list.
        */
       validator_list_expires?: string
+      validator_list?: {
+        count: number
+        expiration: 'never' | 'unknown' | string
+        status: 'active' | 'expired' | 'unknown'
+      }
     }
   }
 }

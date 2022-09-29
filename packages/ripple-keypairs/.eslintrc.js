@@ -19,7 +19,7 @@ module.exports = {
     browser: true, // Enable browser global variables
     node: true, // Enable node global variables & Node.js scoping
     es2020: true, // Add all ECMAScript 2020 globals and automatically set the ecmaVersion parser option to ES2020
-    mocha: true, // Add Mocha testing global variables
+    jest: true, // Add Mocha testing global variables
   },
 
   plugins: [],

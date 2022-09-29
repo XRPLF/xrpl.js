@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { decode } from 'ripple-binary-codec/dist'
+import { decode } from 'ripple-binary-codec'
 import { NFTokenMint, Payment, Transaction } from 'xrpl-local'
 import ECDSA from 'xrpl-local/ECDSA'
 import Wallet from 'xrpl-local/Wallet'
@@ -15,9 +15,9 @@ const { sign: RESPONSE_FIXTURES } = responses
  *
  * Provides tests for Wallet class.
  */
-describe('Wallet', function () {
-  describe('constructor', function () {
-    it('initializes a wallet using a Regular Key Pair', function () {
+describe('Wallet', () => {
+  describe('constructor', () => {
+    it('initializes a wallet using a Regular Key Pair', () => {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
         publicKey: 'aBRNH5wUurfhZcoyR6nRwDSa95gMBkovBJ8V4cp1C1pM28H7EPL1',
@@ -38,12 +38,12 @@ describe('Wallet', function () {
     })
   })
 
-  describe('generate', function () {
+  describe('generate', () => {
     const classicAddressPrefix = 'r'
     const ed25519KeyPrefix = 'ED'
     const secp256k1PrivateKeyPrefix = '00'
 
-    it('generates a new wallet using default algorithm', function () {
+    it('generates a new wallet using default algorithm', () => {
       const wallet = Wallet.generate()
 
       assert.isString(wallet.publicKey)
@@ -57,7 +57,7 @@ describe('Wallet', function () {
       assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
     })
 
-    it('generates a new wallet using algorithm ecdsa-secp256k1', function () {
+    it('generates a new wallet using algorithm ecdsa-secp256k1', () => {
       const algorithm = ECDSA.secp256k1
       const wallet = Wallet.generate(algorithm)
 
@@ -71,7 +71,7 @@ describe('Wallet', function () {
       assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
     })
 
-    it('generates a new wallet using algorithm ed25519', function () {
+    it('generates a new wallet using algorithm ed25519', () => {
       const algorithm = ECDSA.ed25519
       const wallet = Wallet.generate(algorithm)
 
@@ -87,21 +87,21 @@ describe('Wallet', function () {
     })
   })
 
-  describe('fromSeed', function () {
+  describe('fromSeed', () => {
     const seed = 'ssL9dv2W5RK8L3tuzQxYY6EaZhSxW'
     const publicKey =
       '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
     const privateKey =
       '00141BA006D3363D2FB2785E8DF4E44D3A49908780CB4FB51F6D217C08C021429F'
 
-    it('derives a wallet using default algorithm', function () {
+    it('derives a wallet using default algorithm', () => {
       const wallet = Wallet.fromSeed(seed)
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using algorithm ecdsa-secp256k1', function () {
+    it('derives a wallet using algorithm ecdsa-secp256k1', () => {
       const algorithm = ECDSA.secp256k1
       const wallet = Wallet.fromSeed(seed, { algorithm })
 
@@ -109,7 +109,7 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using algorithm ed25519', function () {
+    it('derives a wallet using algorithm ed25519', () => {
       const algorithm = ECDSA.ed25519
       const wallet = Wallet.fromSeed(seed, { algorithm })
 
@@ -117,7 +117,7 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using rfc1751 mnemonic with secp256k1 key', function () {
+    it('derives a wallet using rfc1751 mnemonic with secp256k1 key', () => {
       const algorithm = ECDSA.secp256k1
       const mnemonic =
         'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
@@ -130,7 +130,7 @@ describe('Wallet', function () {
       assert.equal(wallet.seed, expectedSeed)
     })
 
-    it('derives a wallet using rfc1751 mnemonic with ed25519 key', function () {
+    it('derives a wallet using rfc1751 mnemonic with ed25519 key', () => {
       const algorithm = ECDSA.ed25519
       const mnemonic =
         'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
@@ -143,7 +143,7 @@ describe('Wallet', function () {
       assert.equal(wallet.seed, expectedSeed)
     })
 
-    it('throws an error when using an RFC1751 mnemonic for bip39', function () {
+    it('throws an error when using an RFC1751 mnemonic for bip39', () => {
       const algorithm = ECDSA.ed25519
       const mnemonic =
         'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
@@ -155,7 +155,7 @@ describe('Wallet', function () {
       }, /^Unable to parse the given mnemonic using bip39 encoding$/u)
     })
 
-    it('throws an error when using an bip39 mnemonic for RFC1751', function () {
+    it('throws an error when using an bip39 mnemonic for RFC1751', () => {
       const mnemonic =
         'draw attack antique swing base employ blur above palace lucky glide clap pen use illegal'
       assert.throws(() => {
@@ -165,7 +165,7 @@ describe('Wallet', function () {
       }, /^Expected an RFC1751 word, but received 'attack'\. For the full list of words in the RFC1751 encoding see https:\/\/datatracker\.ietf\.org\/doc\/html\/rfc1/u)
     })
 
-    it('derives a wallet using rfc1751 mnemonic with lowercase words', function () {
+    it('derives a wallet using rfc1751 mnemonic with lowercase words', () => {
       const algorithm = ECDSA.ed25519
       const mnemonic =
         'cab beth hank bird mend sign gild any kern hyde chat stub'
@@ -178,7 +178,7 @@ describe('Wallet', function () {
       assert.equal(wallet.seed, expectedSeed)
     })
 
-    it('derives a wallet using a Regular Key Pair', function () {
+    it('derives a wallet using a Regular Key Pair', () => {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
         seed: 'sh8i92YRnEjJy3fpFkL8txQSCVo79',
@@ -196,21 +196,21 @@ describe('Wallet', function () {
     })
   })
 
-  describe('fromSecret', function () {
+  describe('fromSecret', () => {
     const seed = 'ssL9dv2W5RK8L3tuzQxYY6EaZhSxW'
     const publicKey =
       '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
     const privateKey =
       '00141BA006D3363D2FB2785E8DF4E44D3A49908780CB4FB51F6D217C08C021429F'
 
-    it('derives a wallet using default algorithm', function () {
+    it('derives a wallet using default algorithm', () => {
       const wallet = Wallet.fromSecret(seed)
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using algorithm ecdsa-secp256k1', function () {
+    it('derives a wallet using algorithm ecdsa-secp256k1', () => {
       const algorithm = ECDSA.secp256k1
       const wallet = Wallet.fromSecret(seed, { algorithm })
 
@@ -218,7 +218,7 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using algorithm ed25519', function () {
+    it('derives a wallet using algorithm ed25519', () => {
       const algorithm = ECDSA.ed25519
       const wallet = Wallet.fromSecret(seed, { algorithm })
 
@@ -226,7 +226,7 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using a Regular Key Pair', function () {
+    it('derives a wallet using a Regular Key Pair', () => {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
         seed: 'sh8i92YRnEjJy3fpFkL8txQSCVo79',
@@ -244,7 +244,7 @@ describe('Wallet', function () {
     })
   })
 
-  describe('fromMnemonic', function () {
+  describe('fromMnemonic', () => {
     const mnemonic =
       'assault rare scout seed design extend noble drink talk control guitar quote'
     const publicKey =
@@ -252,14 +252,14 @@ describe('Wallet', function () {
     const privateKey =
       '0013FC461CA5799F1357C8130AF703CBA7E9C28E072C6CA8F7DEF8601CDE98F394'
 
-    it('derives a wallet using default derivation path', function () {
+    it('derives a wallet using default derivation path', () => {
       const wallet = Wallet.fromMnemonic(mnemonic)
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using an input derivation path', function () {
+    it('derives a wallet using an input derivation path', () => {
       const derivationPath = "m/44'/144'/0'/0/0"
       const wallet = Wallet.fromMnemonic(mnemonic, { derivationPath })
 
@@ -267,7 +267,7 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using a Regular Key Pair', function () {
+    it('derives a wallet using a Regular Key Pair', () => {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
         mnemonic: 'I IRE BOND BOW TRIO LAID SEAT GOAL HEN IBIS IBIS DARE',
@@ -288,7 +288,7 @@ describe('Wallet', function () {
     })
   })
 
-  describe('fromEntropy', function () {
+  describe('fromEntropy', () => {
     let entropy: number[]
     const publicKey =
       '0390A196799EE412284A5D80BF78C3E84CBB80E1437A0AECD9ADF94D7FEAAFA284'
@@ -299,19 +299,19 @@ describe('Wallet', function () {
     const privateKeyED25519 =
       'ED0B6CBAC838DFE7F47EA1BD0DF00EC282FDF45510C92161072CCFB84035390C4D'
 
-    beforeEach(function () {
+    beforeEach(() => {
       const entropySize = 16
       entropy = new Array(entropySize).fill(0)
     })
 
-    it('derives a wallet using entropy', function () {
+    it('derives a wallet using entropy', () => {
       const wallet = Wallet.fromEntropy(entropy)
 
       assert.equal(wallet.publicKey, publicKeyED25519)
       assert.equal(wallet.privateKey, privateKeyED25519)
     })
 
-    it('derives a wallet using algorithm ecdsa-secp256k1', function () {
+    it('derives a wallet using algorithm ecdsa-secp256k1', () => {
       const algorithm = ECDSA.secp256k1
       const wallet = Wallet.fromEntropy(entropy, { algorithm })
 
@@ -319,7 +319,7 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using algorithm ed25519', function () {
+    it('derives a wallet using algorithm ed25519', () => {
       const algorithm = ECDSA.ed25519
       const wallet = Wallet.fromEntropy(entropy, { algorithm })
 
@@ -327,7 +327,7 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, privateKeyED25519)
     })
 
-    it('derives a wallet using a regular key pair', function () {
+    it('derives a wallet using a regular key pair', () => {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const wallet = Wallet.fromEntropy(entropy, { masterAddress })
 
@@ -338,14 +338,14 @@ describe('Wallet', function () {
   })
 
   // eslint-disable-next-line max-statements -- Required for test coverage.
-  describe('sign', function () {
+  describe('sign', () => {
     let wallet: Wallet
 
-    beforeEach(function () {
+    beforeEach(() => {
       wallet = Wallet.fromSeed('ss1x3KLrSvfg7irFc1D929WXZ7z9H')
     })
 
-    it('sign successfully', async function () {
+    it('sign successfully', async () => {
       const result = wallet.sign(REQUEST_FIXTURES.normal as Transaction)
       assert.deepEqual(result, {
         tx_blob: RESPONSE_FIXTURES.normal.signedTransaction,
@@ -353,7 +353,7 @@ describe('Wallet', function () {
       })
     })
 
-    it('sign with lowercase hex data in memo (hex should be case insensitive)', async function () {
+    it('sign with lowercase hex data in memo (hex should be case insensitive)', async () => {
       const secret = 'shd2nxpFD6iBRKWsRss2P4tKMWyy9'
       const lowercaseMemoTx: Transaction = {
         TransactionType: 'Payment',
@@ -385,7 +385,7 @@ describe('Wallet', function () {
       })
     })
 
-    it('sign with EscrowFinish', async function () {
+    it('sign with EscrowFinish', async () => {
       const result = wallet.sign(REQUEST_FIXTURES.escrow as Transaction)
       assert.deepEqual(result, {
         tx_blob: RESPONSE_FIXTURES.escrow.signedTransaction,
@@ -393,7 +393,7 @@ describe('Wallet', function () {
       })
     })
 
-    it('sign with multisignAddress', async function () {
+    it('sign with multisignAddress', async () => {
       const signature = wallet.sign(
         REQUEST_FIXTURES.signAs as Transaction,
         true,
@@ -404,7 +404,7 @@ describe('Wallet', function () {
       })
     })
 
-    it('sign with X Address and no given tag for multisignAddress', async function () {
+    it('sign with X Address and no given tag for multisignAddress', async () => {
       const signature = wallet.sign(
         REQUEST_FIXTURES.signAs as Transaction,
         wallet.getXAddress(),
@@ -415,7 +415,7 @@ describe('Wallet', function () {
       })
     })
 
-    it('sign with X Address and tag for multisignAddress', async function () {
+    it('sign with X Address and tag for multisignAddress', async () => {
       const signature = wallet.sign(
         REQUEST_FIXTURES.signAs as Transaction,
         wallet.getXAddress(0),
@@ -430,7 +430,7 @@ describe('Wallet', function () {
       assert.deepEqual(signature, expectedSignature)
     })
 
-    it('sign throws when given a transaction that is already signed', async function () {
+    it('sign throws when given a transaction that is already signed', async () => {
       const result = wallet.sign(REQUEST_FIXTURES.normal as Transaction)
       assert.throws(() => {
         const tx = decode(result.tx_blob) as unknown as Transaction
@@ -438,7 +438,7 @@ describe('Wallet', function () {
       }, /txJSON must not contain "TxnSignature" or "Signers" properties/u)
     })
 
-    it('sign with an EscrowExecution transaction', async function () {
+    it('sign with an EscrowExecution transaction', async () => {
       const result = wallet.sign(REQUEST_FIXTURES.escrow as Transaction)
       assert.deepEqual(result, {
         tx_blob: RESPONSE_FIXTURES.escrow.signedTransaction,
@@ -446,7 +446,7 @@ describe('Wallet', function () {
       })
     })
 
-    it('sign succeeds when given a transaction with no flags', async function () {
+    it('sign succeeds when given a transaction with no flags', async () => {
       const tx: Transaction = {
         TransactionType: 'Payment',
         Account: 'r45Rev1EXGxy2hAUmJPCne97KUE7qyrD3j',
@@ -470,7 +470,7 @@ describe('Wallet', function () {
       assert.deepEqual(result, expectedResult)
     })
 
-    it('sign succeeds with source.amount/destination.minAmount', async function () {
+    it('sign succeeds with source.amount/destination.minAmount', async () => {
       // See also: 'preparePayment with source.amount/destination.minAmount'
 
       const tx: Transaction = {
@@ -513,7 +513,7 @@ describe('Wallet', function () {
       assert.deepEqual(result, expectedResult)
     })
 
-    it('sign throws when encoded tx does not match decoded tx because of illegal small fee', async function () {
+    it('sign throws when encoded tx does not match decoded tx because of illegal small fee', async () => {
       const tx: Transaction = {
         Flags: 2147483648,
         TransactionType: 'AccountSet',
@@ -531,7 +531,7 @@ describe('Wallet', function () {
       }, /1\.2 is an illegal amount/u)
     })
 
-    it('sign throws when encoded tx does not match decoded tx because of illegal higher fee', async function () {
+    it('sign throws when encoded tx does not match decoded tx because of illegal higher fee', async () => {
       const tx: Transaction = {
         Flags: 2147483648,
         TransactionType: 'AccountSet',
@@ -549,7 +549,7 @@ describe('Wallet', function () {
       }, /1123456\.7 is an illegal amount/u)
     })
 
-    it('sign with a ticket transaction', async function () {
+    it('sign with a ticket transaction', async () => {
       const result = wallet.sign(REQUEST_FIXTURES.ticket as Transaction)
       assert.deepEqual(result, {
         tx_blob: RESPONSE_FIXTURES.ticket.signedTransaction,
@@ -557,7 +557,7 @@ describe('Wallet', function () {
       })
     })
 
-    it('sign with a Payment transaction with paths', async function () {
+    it('sign with a Payment transaction with paths', async () => {
       const payment: Transaction = {
         TransactionType: 'Payment',
         Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -590,7 +590,7 @@ describe('Wallet', function () {
       })
     })
 
-    it('sign with a prepared payment', async function () {
+    it('sign with a prepared payment', async () => {
       const payment: Transaction = {
         TransactionType: 'Payment',
         Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -611,7 +611,7 @@ describe('Wallet', function () {
       assert.deepEqual(result, expectedResult)
     })
 
-    it('sign throws when an illegal amount is provided', async function () {
+    it('sign throws when an illegal amount is provided', async () => {
       const payment: Transaction = {
         TransactionType: 'Payment',
         Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -642,7 +642,7 @@ describe('Wallet', function () {
       Fee: '12',
     }
 
-    it('lowercase standard currency code signs successfully', async function () {
+    it('lowercase standard currency code signs successfully', async () => {
       const payment: Payment = { ...issuedCurrencyPayment }
       payment.Amount = {
         currency: 'foo',
@@ -657,7 +657,7 @@ describe('Wallet', function () {
       })
     })
 
-    it('issued currency in standard or hex format signs to the same transaction', async function () {
+    it('issued currency in standard or hex format signs to the same transaction', async () => {
       const payment: Payment = { ...issuedCurrencyPayment }
       payment.Amount = {
         currency: '***',
@@ -675,7 +675,7 @@ describe('Wallet', function () {
       assert.deepEqual(wallet.sign(payment), wallet.sign(payment2))
     })
 
-    it('sign throws when a payment contains an issued currency like XRP', async function () {
+    it('sign throws when a payment contains an issued currency like XRP', async () => {
       const payment: Payment = { ...issuedCurrencyPayment }
       payment.Amount = {
         currency: 'xrp',
@@ -687,7 +687,7 @@ describe('Wallet', function () {
       }, /^Trying to sign an issued currency with a similar standard code to XRP \(received 'xrp'\)\. XRP is not an issued currency\./u)
     })
 
-    it('sign does NOT throw when a payment contains an issued currency like xrp in hex string format', async function () {
+    it('sign does NOT throw when a payment contains an issued currency like xrp in hex string format', async () => {
       const payment: Payment = { ...issuedCurrencyPayment }
       payment.Amount = {
         currency: '0000000000000000000000007872700000000000',
@@ -701,7 +701,7 @@ describe('Wallet', function () {
       })
     })
 
-    it('sign succeeds with standard currency code with symbols', async function () {
+    it('sign succeeds with standard currency code with symbols', async () => {
       const payment: Payment = { ...issuedCurrencyPayment }
       payment.Amount = {
         currency: '***',
@@ -718,7 +718,7 @@ describe('Wallet', function () {
       assert.deepEqual(result, expectedResult)
     })
 
-    it('sign succeeds with non-standard 3 digit currency code', async function () {
+    it('sign succeeds with non-standard 3 digit currency code', async () => {
       const payment: Payment = { ...issuedCurrencyPayment }
       payment.Amount = {
         currency: ':::',
@@ -735,7 +735,7 @@ describe('Wallet', function () {
       assert.deepEqual(result, expectedResult)
     })
 
-    it('sign handles non-XRP amount with a trailing zero', async function () {
+    it('sign handles non-XRP amount with a trailing zero', async () => {
       const payment: Transaction = {
         TransactionType: 'Payment',
         Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -760,7 +760,7 @@ describe('Wallet', function () {
       assert.deepEqual(result, expectedResult)
     })
 
-    it('sign handles non-XRP amount with trailing zeros', async function () {
+    it('sign handles non-XRP amount with trailing zeros', async () => {
       const payment: Transaction = {
         TransactionType: 'Payment',
         Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -785,7 +785,7 @@ describe('Wallet', function () {
       assert.deepEqual(result, expectedResult)
     })
 
-    it('sign allows lowercase hex value for NFTokenMint.URI', async function () {
+    it('sign allows lowercase hex value for NFTokenMint.URI', async () => {
       const tx: NFTokenMint = {
         TransactionType: 'NFTokenMint',
         Account: wallet.address,
@@ -814,7 +814,7 @@ describe('Wallet', function () {
       assert.deepEqual(result, expectedResult)
     })
 
-    it('sign throws when NFTokenMint.URI is not a hex value', async function () {
+    it('sign throws when NFTokenMint.URI is not a hex value', async () => {
       const tx: NFTokenMint = {
         TransactionType: 'NFTokenMint',
         Account: wallet.address,
@@ -840,7 +840,7 @@ describe('Wallet', function () {
     })
   })
 
-  describe('verifyTransaction', function () {
+  describe('verifyTransaction', () => {
     const publicKey =
       '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
     const privateKey =
@@ -851,7 +851,7 @@ describe('Wallet', function () {
       id: '30D9ECA2A7FB568C5A8607E5850D9567572A9E7C6094C26BEFD4DC4C2CF2657A',
     }
 
-    it('returns true when verifying a transaction signed by the same wallet', function () {
+    it('returns true when verifying a transaction signed by the same wallet', () => {
       const wallet = new Wallet(publicKey, privateKey)
       const isVerified: boolean = wallet.verifyTransaction(
         prepared.signedTransaction,
@@ -860,7 +860,7 @@ describe('Wallet', function () {
       assert.equal(isVerified, true)
     })
 
-    it('returns false when verifying a transaction signed by a different wallet', function () {
+    it('returns false when verifying a transaction signed by a different wallet', () => {
       const diffPublicKey =
         '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8'
       const diffPrivateKey =
@@ -874,7 +874,7 @@ describe('Wallet', function () {
     })
   })
 
-  describe('getXAddress', function () {
+  describe('getXAddress', () => {
     const publicKey =
       '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
     const privateKey =
@@ -884,17 +884,17 @@ describe('Wallet', function () {
     const mainnetXAddress = 'X7gJ5YK8abHf2eTPWPFHAAot8Knck11QGqmQ7a6a3Z8PJvk'
     const testnetXAddress = 'T7bq3e7kxYq9pwDz8UZhqAZoEkcRGTXSNr5immvcj3DYRaV'
 
-    it('returns a Testnet X-address when test is true', function () {
+    it('returns a Testnet X-address when test is true', () => {
       const result = wallet.getXAddress(tag, true)
       assert.equal(result, testnetXAddress)
     })
 
-    it('returns a Mainnet X-address when test is false', function () {
+    it('returns a Mainnet X-address when test is false', () => {
       const result = wallet.getXAddress(tag, false)
       assert.equal(result, mainnetXAddress)
     })
 
-    it("returns a Mainnet X-address when test isn't provided", function () {
+    it("returns a Mainnet X-address when test isn't provided", () => {
       const result = wallet.getXAddress(tag)
       assert.equal(result, mainnetXAddress)
     })

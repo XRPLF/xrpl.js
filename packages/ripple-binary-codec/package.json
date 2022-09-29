@@ -24,8 +24,8 @@
     "build:default": "tsc -b && copy .\\src\\enums\\definitions.json .\\dist\\enums",
     "build:nix": "tsc -b && cp ./src/enums/definitions.json ./dist/enums",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
-    "prepare": "npm run build && npm test",
-    "test": "jest",
+    "prepare-OLD": "npm run build && npm test",
+    "test": "",
     "lint": "eslint . --ext .ts --ext .test.js"
   },
   "repository": {

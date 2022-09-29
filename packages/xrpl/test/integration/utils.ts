@@ -1,7 +1,12 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 import { decode } from 'ripple-binary-codec'
-import { Client, Wallet, AccountInfoRequest } from 'xrpl-local'
+import {
+  Client,
+  Wallet,
+  AccountInfoRequest,
+  type SubmitResponse,
+} from 'xrpl-local'
 import { Payment, Transaction } from 'xrpl-local/models/transactions'
 import { hashSignedTx } from 'xrpl-local/utils/hashes'
 
@@ -13,15 +18,49 @@ export async function ledgerAccept(client: Client): Promise<void> {
   await client.connection.request(request)
 }
 
-export function subscribeDone(client: Client, done: Mocha.Done): void {
+export function subscribeDone(client: Client): void {
   client.removeAllListeners()
-  done()
+}
+
+async function runCommand({
+  client,
+  transaction,
+  wallet,
+  retry = { count: 5, delayMs: 1000 },
+}: {
+  client: Client
+  transaction: Transaction
+  wallet: Wallet
+  retry?: {
+    count: number
+    delayMs: number
+  }
+}): Promise<SubmitResponse> {
+  let response: SubmitResponse = await client.submit(transaction, { wallet })
+
+  while (
+    ['tefPAST_SEQ', 'tefMAX_LEDGER'].includes(response.result.engine_result) &&
+    retry.count > 0
+  ) {
+    // eslint-disable-next-line no-param-reassign -- we want to decrement the count
+    retry.count -= 1
+    // eslint-disable-next-line no-await-in-loop, no-promise-executor-return -- We are waiting on retries
+    await new Promise((resolve) => setTimeout(resolve, retry.delayMs))
+    // eslint-disable-next-line no-await-in-loop -- We are retryhing in a loop on purpose
+    response = await client.submit(transaction, { wallet })
+  }
+
+  return response
 }
 
 export async function fundAccount(
   client: Client,
   wallet: Wallet,
-): Promise<void> {
+  retry?: {
+    count: number
+    delayMs: number
+  },
+): Promise<SubmitResponse> {
   const payment: Payment = {
     TransactionType: 'Payment',
     Account: masterAccount,
@@ -29,9 +68,14 @@ export async function fundAccount(
     // 2 times the amount needed for a new account (20 XRP)
     Amount: '400000000',
   }
-  const response = await client.submit(payment, {
-    wallet: Wallet.fromSeed(masterSecret),
+  const wal = Wallet.fromSeed(masterSecret)
+  const response = await runCommand({
+    client,
+    wallet: wal,
+    transaction: payment,
+    retry,
   })
+
   if (response.result.engine_result !== 'tesSUCCESS') {
     // eslint-disable-next-line no-console -- happens only when something goes wrong
     console.log(response)
@@ -40,6 +84,7 @@ export async function fundAccount(
   await ledgerAccept(client)
   const signedTx = _.omit(response.result.tx_json, 'hash')
   await verifySubmittedTransaction(client, signedTx as Transaction)
+  return response
 }
 
 export async function generateFundedWallet(client: Client): Promise<Wallet> {
@@ -78,16 +123,37 @@ export async function verifySubmittedTransaction(
   }
 }
 
+/**
+ * Sends a test transaction for integration testing.
+ *
+ * @param client - The XRPL client
+ * @param transaction - The transaction object to send.
+ * @param wallet - The wallet to send the transaction from.
+ * @param retry - As of Sep 2022, xrpl.js does not track requests sent in parallel. Our sequence numbers can get off from
+ *               the server's sequence numbers. This is a fix to retry the transaction if it fails due to tefPAST_SEQ.
+ * @param retry.count - How many times the request should be retried.
+ * @param retry.delayMs - How long to wait between retries.
+ * @returns The response of the transaction.
+ */
+// eslint-disable-next-line max-params -- Test function, many params are needed
 export async function testTransaction(
   client: Client,
   transaction: Transaction,
   wallet: Wallet,
-): Promise<void> {
+  retry?: {
+    count: number
+    delayMs: number
+  },
+): Promise<SubmitResponse> {
   // Accept any un-validated changes.
   await ledgerAccept(client)
 
   // sign/submit the transaction
-  const response = await client.submit(transaction, { wallet })
+  const response = await runCommand({ client, wallet, transaction, retry })
+
+  if (response.warning) {
+    console.log(response.warning)
+  }
 
   // check that the transaction was successful
   assert.equal(response.type, 'response')
@@ -101,6 +167,7 @@ export async function testTransaction(
   const signedTx = _.omit(response.result.tx_json, 'hash')
   await ledgerAccept(client)
   await verifySubmittedTransaction(client, signedTx as Transaction)
+  return response
 }
 
 export async function getXRPBalance(

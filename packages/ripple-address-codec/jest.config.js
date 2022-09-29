@@ -1,8 +1,8 @@
+// Jest configuration for api
+const base = require('../../jest.config.base.js')
+
 module.exports = {
-  "roots": [
-    "<rootDir>/src"
-  ],
-  "transform": {
-    "^.+\\.tsx?$": "ts-jest"
-  },
+  ...base,
+  name: 'ripple-address-codec',
+  displayName: 'ripple-address-codec',
 }

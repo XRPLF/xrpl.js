@@ -3,24 +3,27 @@ import { Client, Wallet } from 'xrpl-local'
 import serverUrl from './serverUrl'
 import { fundAccount } from './utils'
 
-export async function teardownClient(this: Mocha.Context): Promise<void> {
-  this.client.removeAllListeners()
-  this.client.disconnect()
+export interface XrplIntegrationTestContext {
+  client: Client
+  wallet: Wallet
+}
+
+export async function teardownClient(
+  context: XrplIntegrationTestContext,
+): Promise<void> {
+  context.client.removeAllListeners()
+  context.client.disconnect()
 }
 
 export async function setupClient(
-  this: Mocha.Context,
   server = serverUrl,
-): Promise<void> {
-  this.wallet = Wallet.generate()
-  return new Promise<void>((resolve, reject) => {
-    this.client = new Client(server)
-    this.client
-      .connect()
-      .then(async () => {
-        await fundAccount(this.client, this.wallet)
-        resolve()
-      })
-      .catch(reject)
+): Promise<XrplIntegrationTestContext> {
+  const context: XrplIntegrationTestContext = {
+    client: new Client(server),
+    wallet: Wallet.generate(),
+  }
+  return context.client.connect().then(async () => {
+    await fundAccount(context.client, context.wallet)
+    return context
   })
 }

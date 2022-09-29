@@ -38,9 +38,9 @@ export * from './requests/subscribe'
 export * from './requests/tx'
 export * from './requests/utility'
 
-export * from './fundWallet'
-export * from './integration'
-export * from './regularKey'
+export * from './fundWallet.test'
+export * from './integration.test'
+export * from './regularKey.test'
 
 // Ensure you export all added tests above "export * from './finalTest'", otherwise they will not be run.
-export * from './finalTest'
+export * from './finalTest.test'

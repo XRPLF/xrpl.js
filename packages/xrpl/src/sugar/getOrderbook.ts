@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 
 import type { Client } from '../client'
+import { ValidationError } from '../errors'
 import { LedgerIndex } from '../models/common'
 import { OfferFlags } from '../models/ledger/Offer'
 import {
@@ -21,6 +22,13 @@ function sortOffers(offers: BookOffer[]): BookOffer[] {
     return new BigNumber(qualityA).comparedTo(qualityB)
   })
 }
+
+const getOrderbookOptionsSet = new Set([
+  'limit',
+  'ledger_index',
+  'ledger_hash',
+  'taker',
+])
 
 /**
  * Fetch orderbook (buy/sell orders) between two accounts.
@@ -55,6 +63,45 @@ async function getOrderbook(
   buy: BookOffer[]
   sell: BookOffer[]
 }> {
+  Object.keys(options).forEach((key) => {
+    if (false === getOrderbookOptionsSet.has(key)) {
+      throw new ValidationError(`Unexpected option: ${key}`, options)
+    }
+  })
+
+  if (undefined !== options.limit && typeof options.limit !== 'number') {
+    throw new ValidationError('limit must be a number', options.limit)
+  }
+
+  if (undefined !== options.ledger_index) {
+    if (typeof options.ledger_index !== 'number') {
+      if (
+        typeof options.ledger_index === 'string' &&
+        false ===
+          ['validated', 'closed', 'current'].includes(options.ledger_index)
+      ) {
+        throw new ValidationError(
+          'ledger_index must be a number or a string of "validated", "closed", or "current"',
+          options.ledger_index,
+        )
+      }
+    }
+  }
+
+  if (
+    undefined !== options.ledger_hash &&
+    typeof options.ledger_hash !== 'string'
+  ) {
+    throw new ValidationError(
+      'ledger_hash must be a string',
+      options.ledger_hash,
+    )
+  }
+
+  if (undefined !== options.taker && typeof options.taker !== 'string') {
+    throw new ValidationError('taker must be a string', options.taker)
+  }
+
   const request: BookOffersRequest = {
     command: 'book_offers',
     taker_pays: takerPays,

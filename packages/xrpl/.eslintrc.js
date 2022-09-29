@@ -23,10 +23,11 @@ module.exports = {
     node: true,
     // Add all ECMAScript 2020 globals and automatically set the ecmaVersion parser option to ES2020
     es2020: true,
+    jest: true,
   },
 
   plugins: [],
-  extends: ['@xrplf/eslint-config/base', 'plugin:mocha/recommended'],
+  extends: ['@xrplf/eslint-config/base'],
   rules: {
     // Certain rippled APIs require snake_case naming
     '@typescript-eslint/naming-convention': [
@@ -75,8 +76,10 @@ module.exports = {
     {
       files: ['test/**/*.ts'],
       rules: {
-        // Because this project is managed by lerna, dev dependencies are
-        // hoisted and do not appear in the package.json.
+        /*
+         * Because this project is managed by lerna, dev dependencies are
+         * hoisted and do not appear in the package.json.
+         */
         'import/no-extraneous-dependencies': 'off',
         'node/no-extraneous-import': 'off',
 
@@ -98,19 +101,12 @@ module.exports = {
         // Tests are already in 2 callbacks, so max 3 is pretty restrictive
         'max-nested-callbacks': 'off',
 
-        // setup/teardown client is easier to do in before/after, even if there is only one testcase
-        'mocha/no-hooks-for-single-case': 'off',
-
         // messes with fixtures
         'consistent-default-export-name/default-import-match-filename': 'off',
       },
     },
     {
       files: ['test/client/*.ts'],
-      rules: {
-        // Rule does not work with dynamically generated tests.
-        'mocha/no-setup-in-describe': 'off',
-      },
     },
     {
       files: ['test/models/*.ts'],

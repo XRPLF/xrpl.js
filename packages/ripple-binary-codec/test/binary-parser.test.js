@@ -1,14 +1,14 @@
-const { coreTypes } = require('../dist/types')
+const { coreTypes } = require('../src/types')
 const Decimal = require('decimal.js')
 
 const { encodeAccountID } = require('ripple-address-codec')
-const { binary } = require('../dist/coretypes')
+const { binary } = require('../src/coretypes')
 const { Amount, Hash160 } = coreTypes
 const { makeParser, readJSON } = binary
-const { Field, TransactionType } = require('./../dist/enums')
+const { Field, TransactionType } = require('./../src/enums')
 const { parseHexOnly, hexOnly, loadFixture } = require('./utils')
 const fixtures = loadFixture('data-driven-tests.json')
-const { BytesList } = require('../dist/serdes/binary-serializer')
+const { BytesList } = require('../src/serdes/binary-serializer')
 const { Buffer } = require('buffer/')
 
 const __ = hexOnly

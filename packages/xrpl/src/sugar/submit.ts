@@ -133,7 +133,7 @@ async function waitForFinalTransactionOutcome(
 
   const latestLedger = await client.getLedgerIndex()
 
-  if (lastLedger < latestLedger) {
+  if (lastLedger < latestLedger && submissionResult !== 'tesSUCCESS') {
     throw new XrplError(
       `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${lastLedger}).\n` +
         `Preliminary result: ${submissionResult}`,

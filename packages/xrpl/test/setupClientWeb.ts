@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types -- Necessary for test setup */
 import { Client, BroadcastClient } from 'xrpl-local'
 
 import { PortResponse } from './createMockRippled'
@@ -6,8 +5,13 @@ import { PortResponse } from './createMockRippled'
 const defaultPort = 34371
 const baseUrl = 'ws://testripple.circleci.com:'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Needed for setup
-async function setupClient(this: any, port = defaultPort): Promise<void> {
+export interface XrplClientWebTestContext {
+  client: Client | BroadcastClient
+}
+
+async function setupClient(
+  port = defaultPort,
+): Promise<XrplClientWebTestContext> {
   const tclient = new Client(`${baseUrl}${port}`)
   return tclient
     .connect()
@@ -18,35 +22,37 @@ async function setupClient(this: any, port = defaultPort): Promise<void> {
       })
     })
     .then(async (got: unknown) => {
-      return new Promise<void>((resolve, reject) => {
-        this.client = new Client(
-          `${baseUrl}${(got as PortResponse).result.port}`,
-        )
-        this.client.connect().then(resolve).catch(reject)
-      })
+      const context: XrplClientWebTestContext = {
+        client: new Client(`${baseUrl}${(got as PortResponse).result.port}`),
+      }
+      return context.client.connect().then(() => context)
     })
-    .then(async () => {
-      return tclient.disconnect()
+    .then(async (context: XrplClientWebTestContext) => {
+      await tclient.disconnect()
+      return context
     })
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Needed for setup
-async function setupBroadcast(this: any): Promise<void> {
+async function setupBroadcast(): Promise<XrplClientWebTestContext> {
   const servers = [defaultPort, defaultPort + 1].map(
     (port) => `${baseUrl}${port}`,
   )
-  this.client = new BroadcastClient(servers)
-  return new Promise<void>((resolve, reject) => {
-    this.client.connect().then(resolve).catch(reject)
-  })
+
+  const context: XrplClientWebTestContext = {
+    client: new BroadcastClient(servers),
+  }
+
+  return context.client.connect().then(() => context)
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Needed for teardown
-function teardownClient(this: any): undefined {
-  if (this.client.isConnected()) {
-    return this.client.disconnect() as undefined
+async function teardownClient(
+  context: XrplClientWebTestContext,
+): Promise<void> {
+  if (context.client.isConnected()) {
+    return context.client.disconnect()
   }
-  return undefined
+
+  return Promise.resolve()
 }
 
 export { setupClient as setup, teardownClient as teardown, setupBroadcast }

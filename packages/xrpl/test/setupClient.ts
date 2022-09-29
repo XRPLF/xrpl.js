@@ -1,62 +1,71 @@
-/* eslint-disable no-param-reassign -- Necessary for test setup */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types -- Necessary for test setup */
 import { Client, BroadcastClient } from 'xrpl-local'
 
-import createMockRippled from './createMockRippled'
+import createMockRippled, {
+  type MockedWebSocketServer,
+} from './createMockRippled'
 import { getFreePort } from './testUtils'
 
+export interface XrplTestContext {
+  client: Client | BroadcastClient
+  _mockedServerPort?: number
+  mockRippled?: MockedWebSocketServer
+  mocks?: MockedWebSocketServer[]
+}
+
 async function setupMockRippledConnection(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Typing is too complicated
-  testcase: any,
   port: number,
-): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    testcase.mockRippled = createMockRippled(port)
-    testcase._mockedServerPort = port
-    testcase.client = new Client(`ws://localhost:${port}`)
-    testcase.client.connect().then(resolve).catch(reject)
-  })
+): Promise<XrplTestContext> {
+  const context: XrplTestContext = {
+    mockRippled: createMockRippled(port),
+    _mockedServerPort: port,
+    client: new Client(`ws://localhost:${port}`),
+  }
+
+  return context.client.connect().then(() => context)
 }
 
 async function setupMockRippledConnectionForBroadcast(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Typing is too complicated
-  testcase: any,
   ports: number[],
-): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    const servers = ports.map((port) => `ws://localhost:${port}`)
-    // eslint-disable-next-line max-len -- Too many rules to disable
-    // eslint-disable-next-line @typescript-eslint/promise-function-async, @typescript-eslint/no-unsafe-return -- Typing is too complicated, not an async function
-    testcase.mocks = ports.map((port) => createMockRippled(port))
-    testcase.client = new BroadcastClient(servers)
-    testcase.client.connect().then(resolve).catch(reject)
-  })
+): Promise<XrplTestContext> {
+  const servers = ports.map((port) => `ws://localhost:${port}`)
+  const context: XrplTestContext = {
+    mocks: ports.map((port) => createMockRippled(port)),
+    client: new BroadcastClient(servers),
+  }
+
+  return context.client.connect().then(() => context)
 }
 
-async function setupClient(this: unknown): Promise<void> {
+async function setupClient(): Promise<XrplTestContext> {
   return getFreePort().then(async (port) => {
-    return setupMockRippledConnection(this, port)
+    return setupMockRippledConnection(port)
   })
 }
 
-async function setupBroadcast(this: unknown): Promise<void> {
+async function setupBroadcast(): Promise<XrplTestContext> {
   return Promise.all([getFreePort(), getFreePort()]).then(async (ports) => {
-    return setupMockRippledConnectionForBroadcast(this, ports)
+    return setupMockRippledConnectionForBroadcast(ports)
   })
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Typing is too complicated
-function teardownClient(this: any, done: () => void): void {
-  this.client
+async function teardownClient(
+  incomingContext: XrplTestContext,
+  done?: () => void,
+): Promise<void> {
+  return incomingContext.client
     .disconnect()
     .then(() => {
       // eslint-disable-next-line no-negated-condition -- Easier to read with negation
-      if (this.mockRippled != null) {
-        this.mockRippled.close()
+      if (incomingContext.mockRippled != null) {
+        incomingContext.mockRippled.close()
       } else {
-        this.mocks.forEach((mock: { close: () => void }) => mock.close())
+        incomingContext.mocks?.forEach((mock: { close: () => void }) =>
+          mock.close(),
+        )
       }
-      setImmediate(done)
+      if (done) {
+        setImmediate(done)
+      }
     })
     .catch(done)
 }

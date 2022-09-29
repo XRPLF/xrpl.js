@@ -1,4 +1,4 @@
-const { quality } = require('../dist/coretypes')
+const { quality } = require('../src/coretypes')
 
 describe('Quality encode/decode', function () {
   const bookDirectory =

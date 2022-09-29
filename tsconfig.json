@@ -3,8 +3,17 @@
     "composite": true,
     "module": "commonjs",
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "sourceMap": true,
-    "strict": true
+    "strict": false,
+    "paths": {
+      "ripple-address-codec": [ "./packages/ripple-address-codec/src/index"],
+      "ripple-binary-codec": [ "./packages/ripple-binary-codec/src/index"],
+      "ripple-keypairs": [ "./packages/ripple-keypairs/src/index"],
+      "ripple-address-codec/*": [ "./packages/ripple-address-codec/src/*"],
+      "ripple-binary-codec/*": [ "./packages/ripple-binary-codec/src/*"],
+      "ripple-keypairs/*": [ "./packages/ripple-keypairs/src/*"]
+    }
   },
   "exclude": [
     "node_modules",

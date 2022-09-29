@@ -1,5 +1,5 @@
-import binary from 'ripple-binary-codec'
-import keypairs from 'ripple-keypairs'
+import * as binary from 'ripple-binary-codec'
+import * as keypairs from 'ripple-keypairs'
 
 import { xrpToDrops } from './xrpConversion'
 

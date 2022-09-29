@@ -2,15 +2,16 @@
  * Codec class
  */
 
-import * as baseCodec from 'base-x'
-import * as createHash from 'create-hash'
+import baseCodec = require('base-x')
+import type { BaseConverter } from 'base-x'
+import createHash = require('create-hash')
 
 import { seqEqual, concatArgs } from './utils'
 
 class Codec {
   private readonly _sha256: (bytes: Uint8Array) => Buffer
   private readonly _alphabet: string
-  private readonly _codec: baseCodec.BaseConverter
+  private readonly _codec: BaseConverter
 
   public constructor(options: {
     sha256: (bytes: Uint8Array) => Buffer
@@ -132,7 +133,7 @@ class Codec {
   /* eslint-enable max-lines-per-function */
 
   private _decodeRaw(base58string: string): Buffer {
-    return this._codec.decode(base58string)
+    return this._codec.decode(base58string) as Buffer
   }
 
   private _verifyCheckSum(bytes: Buffer): boolean {
