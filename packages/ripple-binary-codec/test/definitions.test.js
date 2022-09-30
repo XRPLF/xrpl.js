@@ -1,62 +1,14 @@
 const { encode, decode } = require('../dist')
-const {
-  DefinitionContents,
-  DEFINITIONS,
-  Field,
-  TransactionType,
-  LedgerEntryType,
-  Type,
-  TransactionResult,
-} = require('../dist/coretypes')
+const { DefinitionContents, DEFINITIONS } = require('../dist/coretypes')
 const { coreTypes } = require('../dist/types')
-const normalDefinitions = require('./fixtures/normal-definitions.json')
-const newTransactionDefinitions = require('./fixtures/new-transaction-type.json')
-const { UInt8 } = require('../dist/types/uint-8')
-const { expect } = require('chai')
+const newTypeDefs = require('./fixtures/new-type.json')
+const newLedgerEntryTypeDefs = require('./fixtures/new-ledger-entry-type.json')
+const newTransactionResultsDefs = require('./fixtures/new-transaction-result.json')
+const newFieldDefs = require('./fixtures/new-field.json')
+const newTransactionDefs = require('./fixtures/new-transaction-type.json')
+const { UInt32 } = require('../dist/types/uint-32')
 
-// /**
-//  * Derived UInt class for serializing/deserializing 8 bit UInt
-//  */
-// class UInt8Alternate extends UInt8 {
-//   static width = 8 / 8 // 1
-//   static defaultUInt8 = new UInt8Alternate(Buffer.alloc(UInt8Alternate.width))
-
-//   constructor(bytes) {
-//     super(bytes ?? UInt8Alternate.defaultUInt8.bytes)
-//   }
-
-//   static fromParser(parser) {
-//     return new UInt8Alternate(parser.read(UInt8Alternate.width))
-//   }
-
-//   /**
-//    * Construct a UInt8 object from a number
-//    *
-//    * @param val UInt8 object or number
-//    */
-//   static from(val) {
-//     if (val instanceof UInt8Alternate) {
-//       return val // MODIFIED from UInt8 implementation to show encode/decode works
-//     }
-
-//     if (typeof val === 'number') {
-//       const buf = Buffer.alloc(UInt8Alternate.width)
-//       buf.writeUInt8(val, 0)
-//       return new UInt8Alternate(buf)
-//     }
-
-//     throw new Error('Cannot construct UInt8Alternate from given value')
-//   }
-
-//   /**
-//    * get the value of a UInt8 object
-//    *
-//    * @returns the number represented by this.bytes
-//    */
-//   valueOf() {
-//     return this.bytes.readUInt8(0)
-//   }
-// }
+const originalDefinitions = { ...DEFINITIONS }
 
 const tx_json = {
   Account: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
@@ -78,17 +30,90 @@ describe('encoding and decoding after modifying type definitions', function () {
   })
 
   test('can encode and decode a new TransactionType', function () {
+    DEFINITIONS.updateAll(originalDefinitions, coreTypes)
+
     const my_tx = Object.assign({}, tx_json, {
       TransactionType: 'NewTestTransaction',
     })
     // Before updating the types, this should not be encodable
-    expect(() => encode(my_tx)).throws()
+    expect(() => encode(my_tx)).toThrow()
 
-    const newDefs = new DefinitionContents(newTransactionDefinitions)
+    const newDefs = new DefinitionContents(newTransactionDefs)
     DEFINITIONS.updateAll(newDefs, coreTypes)
 
     const encodedAfter = encode(my_tx)
     const decoded = decode(encodedAfter)
-    expect(decoded).deep.equal(my_tx)
+    expect(decoded).toStrictEqual(my_tx)
+  })
+
+  test('can encode and decode a new Field', function () {
+    DEFINITIONS.updateAll(originalDefinitions, coreTypes)
+
+    const my_tx = Object.assign({}, tx_json, {
+      NewFieldDefinition: 10,
+    })
+
+    // Before updating the types, undefined fields will be ignored on encode
+    expect(decode(encode(my_tx))).not.toStrictEqual(my_tx)
+
+    const newDefs = new DefinitionContents(newFieldDefs)
+    DEFINITIONS.updateAll(newDefs, coreTypes)
+
+    const encodedAfter = encode(my_tx)
+    const decoded = decode(encodedAfter)
+    expect(decoded).toStrictEqual(my_tx)
+  })
+
+  test('can encode and decode a new Type', function () {
+    DEFINITIONS.updateAll(originalDefinitions, coreTypes)
+
+    const my_tx = Object.assign({}, tx_json, {
+      TestField: 10, // Should work the same as a UInt32
+    })
+
+    // Before updating the types, undefined fields will be ignored on encode
+    expect(decode(encode(my_tx))).not.toStrictEqual(my_tx)
+
+    class NewType extends UInt32 {
+      // Should be the same as UInt32
+    }
+
+    const extendedCoreTypes = { ...coreTypes }
+    extendedCoreTypes['NewType'] = NewType
+
+    const newDefs = new DefinitionContents(newTypeDefs)
+    DEFINITIONS.updateAll(newDefs, extendedCoreTypes)
+
+    const encodedAfter = encode(my_tx)
+    const decoded = decode(encodedAfter)
+    expect(decoded).toStrictEqual(my_tx)
+  })
+
+  test('can add a new TransactionResult', function () {
+    DEFINITIONS.updateAll(originalDefinitions, coreTypes)
+
+    const newResult = 'tecNewTransactionResult'
+
+    // Before defining the Transaction Result, there is no entry for it
+    expect(DEFINITIONS.transactionResult.from(newResult)).toBe(undefined)
+
+    const newDefs = new DefinitionContents(newTransactionResultsDefs)
+    DEFINITIONS.updateAll(newDefs, coreTypes)
+
+    expect(DEFINITIONS.transactionResult.from(newResult).name).toBe(newResult)
+  })
+
+  test('can add a new LedgerEntryType', function () {
+    DEFINITIONS.updateAll(originalDefinitions, coreTypes)
+
+    const newResult = 'NewLedgerEntryType'
+
+    // Before defining the Transaction Result, there is no entry for it
+    expect(DEFINITIONS.ledgerEntryType.from(newResult)).toBe(undefined)
+
+    const newDefs = new DefinitionContents(newLedgerEntryTypeDefs)
+    DEFINITIONS.updateAll(newDefs, coreTypes)
+
+    expect(DEFINITIONS.ledgerEntryType.from(newResult).name).toBe(newResult)
   })
 })
