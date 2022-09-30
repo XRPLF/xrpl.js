@@ -113,6 +113,13 @@ async function fundWallet(
     options?.faucetPath,
   )
 
+  // Currently, hooks testnet v2 has no way of funding a given wallet
+  if (httpOptions.hostname === 'hooks-testnet-v2.xrpl-labs.com' && wallet) {
+    throw new XRPLFaucetError(
+      'Cannot fund passed in wallet with hooks testnet v2',
+    )
+  }
+
   return returnPromise(
     httpOptions,
     this,
@@ -194,7 +201,7 @@ async function onEnd(
 ): Promise<void> {
   const body = Buffer.concat(chunks).toString()
 
-  // "application/json; charset=utf-8"
+  // ('application/json; charset=utf-8')
   if (response.headers['content-type']?.startsWith('application/json')) {
     await processSuccessfulResponse(
       client,
@@ -204,6 +211,8 @@ async function onEnd(
       resolve,
       reject,
     )
+  } else if (client.url === 'wss://hooks-testnet-v2.xrpl-labs.com') {
+    await processHooksV2Response(client, body, startingBalance, resolve, reject)
   } else {
     reject(
       new XRPLFaucetError(
@@ -229,6 +238,56 @@ async function processSuccessfulResponse(
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- We know this is safe and correct
   const faucetWallet: FaucetWallet = JSON.parse(body)
   const classicAddress = faucetWallet.account.classicAddress
+
+  if (!classicAddress) {
+    reject(new XRPLFaucetError(`The faucet account is undefined`))
+    return
+  }
+  try {
+    // Check at regular interval if the address is enabled on the XRPL and funded
+    const updatedBalance = await getUpdatedBalance(
+      client,
+      classicAddress,
+      startingBalance,
+    )
+
+    if (updatedBalance > startingBalance) {
+      resolve({
+        wallet: walletToFund,
+        balance: await getUpdatedBalance(
+          client,
+          walletToFund.classicAddress,
+          startingBalance,
+        ),
+      })
+    } else {
+      reject(
+        new XRPLFaucetError(
+          `Unable to fund address with faucet after waiting ${
+            INTERVAL_SECONDS * MAX_ATTEMPTS
+          } seconds`,
+        ),
+      )
+    }
+  } catch (err) {
+    if (err instanceof Error) {
+      reject(new XRPLFaucetError(err.message))
+    }
+    reject(err)
+  }
+}
+
+// eslint-disable-next-line max-params, max-lines-per-function -- Only used as a helper function, lines inc due to added balance.
+async function processHooksV2Response(
+  client: Client,
+  body: string,
+  startingBalance: number,
+  resolve: (response: { wallet: Wallet; balance: number }) => void,
+  reject: (err: ErrorConstructor | Error | unknown) => void,
+): Promise<void> {
+  const faucetWallet = JSON.parse(body)
+  const classicAddress = faucetWallet.address
+  const walletToFund = Wallet.fromSecret(faucetWallet.secret)
 
   if (!classicAddress) {
     reject(new XRPLFaucetError(`The faucet account is undefined`))

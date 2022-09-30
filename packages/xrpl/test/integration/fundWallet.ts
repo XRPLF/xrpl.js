@@ -135,6 +135,7 @@ describe('fundWallet', function () {
 
     await api.connect()
     const { wallet, balance } = await api.fundWallet()
+
     assert.notEqual(wallet, undefined)
     assert(isValidClassicAddress(wallet.classicAddress))
     assert(isValidXAddress(wallet.getXAddress()))
@@ -146,15 +147,19 @@ describe('fundWallet', function () {
 
     assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
 
-    const { balance: newBalance } = await api.fundWallet(wallet, {
-      faucetHost: 'hooks-testnet-v2.xrpl-labs.com',
-    })
+    /*
+     * const { balance: newBalance } = await api.fundWallet(wallet, {
+     *   faucetHost: 'hooks-testnet-v2.xrpl-labs.com',
+     * })
+     */
 
-    const afterSent = await api.request({
-      command: 'account_info',
-      account: wallet.classicAddress,
-    })
-    assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
+    /*
+     * const afterSent = await api.request({
+     *   command: 'account_info',
+     *   account: wallet.classicAddress,
+     * })
+     * assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
+     */
 
     await api.disconnect()
   })
