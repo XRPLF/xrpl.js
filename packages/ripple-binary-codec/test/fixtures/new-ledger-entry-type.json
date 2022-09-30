@@ -48,7 +48,8 @@
     "Child": -2,
     "Nickname": 110,
     "Contract": 99,
-    "GeneratorMap": 103
+    "GeneratorMap": 103,
+    "NewLedgerEntryType": 150
   },
   "FIELDS": [
     [
