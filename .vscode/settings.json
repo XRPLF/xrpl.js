@@ -1,7 +1,11 @@
 {
     "editor.tabSize": 2,
     "cSpell.words": [
-      "secp256k1"
+        "Multisigned",
+        "Setf",
+        "hostid",
+        "preauthorization",
+        "secp256k1"
     ],
     "[javascript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",

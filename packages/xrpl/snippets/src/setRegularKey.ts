@@ -41,7 +41,7 @@ async function setRegularKey(): Promise<void> {
   }
 
   const submitTx = await client.submit(payment, {
-    wallet: wallet1,
+    wallet: regularKeyWallet,
   })
   console.log('Response for tx signed using Regular Key:')
   console.log(submitTx)
