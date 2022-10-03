@@ -1,7 +1,7 @@
 import * as enums from './definitions.json'
 import { SerializedType } from '../types/serialized-type'
 import { Buffer } from 'buffer/'
-import { BytesList } from '../binary'
+import { BytesList, BinaryParser } from '../binary'
 import { coreTypes } from '../types'
 
 const TYPE_WIDTH = 2
@@ -92,14 +92,14 @@ class BytesLookup {
     return value instanceof Bytes ? value : (this[value] as Bytes)
   }
 
-  // TODO: Type this better
-  fromParser(parser: any): Bytes {
+  fromParser(parser: BinaryParser): Bytes {
     return this.from(parser.readUIntN(this.ordinalWidth).toString())
   }
 }
 
-/*
- * type FieldInfo is the type of the objects containing information about each field in definitions.json
+/**
+ * Encoding information for a rippled field, often used in transactions.
+ * See the enums [README.md](https://github.com/XRPLF/xrpl.js/tree/main/packages/ripple-binary-codec/src/enums) for more details on what each means.
  */
 interface FieldInfo {
   nth: number
@@ -176,11 +176,12 @@ class DefinitionContents {
 
   /**
    * Present rippled types in a typed and updatable format.
+   * For an example of the input format see `definitions.json`
+   * To generate a new definitions file from rippled source code, use this tool: https://github.com/RichardAH/xrpl-codec-gen
+   *
+   * See the definitions.test.js file for examples of how to create your own updated definitions.json.
    *
    * @param enums - A json encoding of the core types, transaction types, transaction results, transaction names, and fields.
-   * For an example of the format see `definitions.json`
-   * To generate a new definitions file from rippled source code, use this tool: https://github.com/RichardAH/xrpl-codec-gen
-
    */
   constructor(enums: DefinitionsData) {
     this.type = new BytesLookup(enums.TYPES, TYPE_WIDTH)
@@ -235,7 +236,7 @@ class DefinitionContents {
    * @param typeOrdinal - The number used to identify this type in the encoding.
    * @param newType - A corresponding class which implements SerializedType functions to allow for encoding/decoding.
    *                  The name of this class should match name.
-   * @throws If name and newType's classname are different. // TODO: Should this actually be a requirement?
+   * @throws If name and newType's classname are different.
    */
   public addNewType(
     name: string,
