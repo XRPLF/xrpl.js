@@ -6,11 +6,14 @@ import {
   isValidClassicAddress,
   isValidXAddress,
   dropsToXrp,
+  XRPLFaucetError,
+  Wallet,
 } from 'xrpl-local'
+
 // how long before each test case times out
 const TIMEOUT = 60000
 // This test is reliant on external networks, and as such may be flaky.
-describe('fundWallet', function () {
+describe.only('fundWallet', function () {
   this.timeout(TIMEOUT)
 
   it('submit generates a testnet wallet', async function () {
@@ -147,20 +150,25 @@ describe('fundWallet', function () {
 
     assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
 
-    /*
-     * const { balance: newBalance } = await api.fundWallet(wallet, {
-     *   faucetHost: 'hooks-testnet-v2.xrpl-labs.com',
-     * })
-     */
-
-    /*
-     * const afterSent = await api.request({
-     *   command: 'account_info',
-     *   account: wallet.classicAddress,
-     * })
-     * assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
-     */
-
     await api.disconnect()
   })
+
+  it('fail fund a given wallet on hooks v2 testnet', async function () {
+    const api = new Client('wss://hooks-testnet-v2.xrpl-labs.com')
+    await api.connect()
+    const wallet = Wallet.fromSeed('snNuVTaxtQ7EfAvXUzTHwT5VJocRc')
+
+    return api
+      .fundWallet(wallet, {
+        faucetHost: 'hooks-testnet-v2.xrpl-labs.com',
+      })
+      .then(() => {
+        assert.fail('Should throw XRPLFaucetError')
+      })
+      .catch((error) => {
+        assert(error instanceof XRPLFaucetError)
+      })
+  })
+
+  // try AMM
 })

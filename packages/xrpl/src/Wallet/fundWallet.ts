@@ -201,7 +201,7 @@ async function onEnd(
 ): Promise<void> {
   const body = Buffer.concat(chunks).toString()
 
-  // ('application/json; charset=utf-8')
+  // "application/json; charset=utf-8"
   if (response.headers['content-type']?.startsWith('application/json')) {
     await processSuccessfulResponse(
       client,
