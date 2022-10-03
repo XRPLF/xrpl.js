@@ -21,14 +21,6 @@ const tx_json = {
 }
 
 describe('encoding and decoding after modifying type definitions', function () {
-  test('can encode and decode novel transaction type', function () {
-    //TODO:
-  })
-
-  test('can remove a type and then return to normal', function () {
-    //TODO:
-  })
-
   test('can encode and decode a new TransactionType', function () {
     DEFINITIONS.updateAll(originalDefinitions, coreTypes)
 

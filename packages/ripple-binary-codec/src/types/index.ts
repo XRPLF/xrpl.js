@@ -1,6 +1,3 @@
-// TODO: Remove this
-import { DEFINITIONS } from '../enums'
-// import * as enums from '../enums/definitions.json'
 import { AccountID } from './account-id'
 import { Amount } from './amount'
 import { Blob } from './blob'
@@ -35,9 +32,5 @@ const coreTypes: Record<string, typeof SerializedType> = {
   UInt64,
   Vector256,
 }
-
-// Done here instead of in enums/index.ts to ensure that the coreTypes are
-// instantialized before being used.
-DEFINITIONS.associateTypes(coreTypes)
 
 export { coreTypes }
