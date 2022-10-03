@@ -82,8 +82,11 @@ const { coreTypes } = require('../dist/types')
 // newTypeDefs is where you can import your custom defined definitions.json file
 const newTypeDefs = require('./fixtures/new-type.json')
 
+
 // For any new Types you create, you'll need to make a class with the same name which extends a SerializedType object
 // In order to define how to serialize/deserialize that field. Here we simply make our NewType act like a UInt32.
+
+const { UInt32 } = require('../dist/types/uint-32')
 class NewType extends UInt32 {
   // Should be the same as UInt32
 }
