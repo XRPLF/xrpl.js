@@ -153,7 +153,7 @@ describe('fundWallet', function () {
     await api.disconnect()
   })
 
-  it('fail fund a given wallet on hooks v2 testnet', async function () {
+  it('fail to fund a given wallet on hooks v2 testnet', async function () {
     const api = new Client('wss://hooks-testnet-v2.xrpl-labs.com')
     await api.connect()
     const wallet = Wallet.fromSeed('snNuVTaxtQ7EfAvXUzTHwT5VJocRc')
@@ -170,5 +170,23 @@ describe('fundWallet', function () {
       })
   })
 
-  // try AMM
+  it('can generate and fund wallets on AMM devnet', async function () {
+    const api = new Client('wss://amm.devnet.rippletest.net:51233')
+
+    await api.connect()
+    const { wallet, balance } = await api.fundWallet()
+
+    assert.notEqual(wallet, undefined)
+    assert(isValidClassicAddress(wallet.classicAddress))
+    assert(isValidXAddress(wallet.getXAddress()))
+
+    const info = await api.request({
+      command: 'account_info',
+      account: wallet.classicAddress,
+    })
+
+    assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
+
+    await api.disconnect()
+  })
 })
