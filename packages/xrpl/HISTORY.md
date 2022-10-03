@@ -7,7 +7,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## 2.4.0 (2022-09-01)
 ### Added
-
 * Export `verify` from ripple-keypairs as `verifyKeypairSignature` for use in web-apps.
 * When connected to hooks v2 testnet or amm devnet, Client.fundWallet now defaults to using the faucet instead of requiring specification.
 
