@@ -230,41 +230,14 @@ class DefinitionContents {
   }
 
   /**
-   * Dynamically adds one new type at runtime.
-   *
-   * @param name - The name of the type. Should match the name of the newType class.
-   * @param typeOrdinal - The number used to identify this type in the encoding.
-   * @param newType - A corresponding class which implements SerializedType functions to allow for encoding/decoding.
-   *                  The name of this class should match name.
-   * @throws If name and newType's classname are different.
-   */
-  public addNewType(
-    name: string,
-    typeOrdinal: number,
-    newType: typeof SerializedType,
-  ): void {
-    if (name != newType.name) {
-      throw new Error(
-        `Name should be the same as NewType's classname. Instead received: ${name} and ${newType.name}`,
-      )
-    }
-    this.transactionType.add(name, typeOrdinal)
-    this.addedDataTypes[name] = newType
-    this.associateTypes()
-  }
-
-  /**
-   * Associates each Field to a corresponding type that TypeScript can recognize.
+   * Associates each Field to a corresponding class that TypeScript can recognize.
    *
    * @param types a list of type objects with the same name as the fields defined.
-   *              Defaults to the library's core definitions.
+   *              Defaults to xrpl.js's core type definitions.
    */
   public associateTypes(
     types: Record<string, typeof SerializedType> = coreTypes,
   ): void {
-    if (coreTypes == undefined) {
-      console.log('ERROR ERROR ERROR AAAAAAA')
-    }
     // Overwrite any existing type definitions with the given types
     const allTypes = Object.assign({}, this.addedDataTypes, types)
 
@@ -279,7 +252,8 @@ class DefinitionContents {
 }
 
 /**
- * To update the definitions, use `Definitions.updateAll(<Your imported definitions.json>)`
+ * To update the definitions, use `Definitions.updateAll(<Your imported definitions.json>, <type definitions here>)`
+ * By default, coreTypes from the `types` folder is where known type definitions are kept.
  */
 const DEFINITIONS = new DefinitionContents(enums)
 DEFINITIONS.associateTypes()
