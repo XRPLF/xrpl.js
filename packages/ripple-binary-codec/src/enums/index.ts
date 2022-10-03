@@ -1,4 +1,3 @@
-// TODO: Replace this back with normal definitions.json file
 import * as enums from './definitions.json'
 import { SerializedType } from '../types/serialized-type'
 import { Buffer } from 'buffer/'
