@@ -3,6 +3,7 @@ import * as enums from './definitions.json'
 import { SerializedType } from '../types/serialized-type'
 import { Buffer } from 'buffer/'
 import { BytesList } from '../binary'
+import { coreTypes } from '../types'
 
 const TYPE_WIDTH = 2
 const LEDGER_ENTRY_WIDTH = 2
@@ -123,9 +124,8 @@ interface FieldInstance {
 
 function buildField(
   [name, info]: [string, FieldInfo],
-  types: Record<string, number>,
+  typeOrdinal: number,
 ): FieldInstance {
-  const typeOrdinal = types[info.type]
   const field = fieldHeader(typeOrdinal, info.nth)
   return {
     name: name,
@@ -149,16 +149,12 @@ class FieldLookup {
     types: Record<string, number>,
   ) {
     fields.forEach(([k, v]) => {
-      this.add(k, v, types)
+      this.add(k, v, types[v.type])
     })
   }
 
-  public add(
-    name: string,
-    field_info: FieldInfo,
-    types: Record<string, number>,
-  ): void {
-    this[name] = buildField([name, field_info], types)
+  public add(name: string, field_info: FieldInfo, typeOrdinal: number): void {
+    this[name] = buildField([name, field_info], typeOrdinal)
     this[this[name].ordinal.toString()] = this[name]
   }
 
@@ -177,6 +173,7 @@ class DefinitionContents {
   transactionResult: BytesLookup
   transactionType: BytesLookup
   transactionNames: string[]
+  addedDataTypes: Record<string, typeof SerializedType>
 
   /**
    * Present rippled types in a typed and updatable format.
@@ -207,6 +204,8 @@ class DefinitionContents {
     this.transactionNames = Object.entries(enums.TRANSACTION_TYPES)
       .filter(([_key, value]) => value >= 0)
       .map(([key, _value]) => key)
+
+    this.addedDataTypes = {}
   }
 
   /**
@@ -225,18 +224,52 @@ class DefinitionContents {
     this.transactionResult = newDefinitions.transactionResult
     this.transactionType = newDefinitions.transactionType
     this.transactionNames = newDefinitions.transactionNames
+    this.addedDataTypes = newDefinitions.addedDataTypes
 
     this.associateTypes(types)
+  }
+
+  /**
+   * Dynamically adds one new type at runtime.
+   *
+   * @param name - The name of the type. Should match the name of the newType class.
+   * @param typeOrdinal - The number used to identify this type in the encoding.
+   * @param newType - A corresponding class which implements SerializedType functions to allow for encoding/decoding.
+   *                  The name of this class should match name.
+   * @throws If name and newType's classname are different. // TODO: Should this actually be a requirement?
+   */
+  public addNewType(
+    name: string,
+    typeOrdinal: number,
+    newType: typeof SerializedType,
+  ): void {
+    if (name != newType.name) {
+      throw new Error(
+        `Name should be the same as NewType's classname. Instead received: ${name} and ${newType.name}`,
+      )
+    }
+    this.transactionType.add(name, typeOrdinal)
+    this.addedDataTypes[name] = newType
+    this.associateTypes()
   }
 
   /**
    * Associates each Field to a corresponding type that TypeScript can recognize.
    *
    * @param types a list of type objects with the same name as the fields defined.
+   *              Defaults to the library's core definitions.
    */
-  public associateTypes(types: Record<string, typeof SerializedType>): void {
+  public associateTypes(
+    types: Record<string, typeof SerializedType> = coreTypes,
+  ): void {
+    if (coreTypes == undefined) {
+      console.log('ERROR ERROR ERROR AAAAAAA')
+    }
+    // Overwrite any existing type definitions with the given types
+    const allTypes = Object.assign({}, this.addedDataTypes, types)
+
     Object.values(this.field).forEach((field) => {
-      field.associatedType = types[field.type.name]
+      field.associatedType = allTypes[field.type.name]
     })
 
     this.field['TransactionType'].associatedType = this.transactionType
@@ -249,6 +282,7 @@ class DefinitionContents {
  * To update the definitions, use `Definitions.updateAll(<Your imported definitions.json>)`
  */
 const DEFINITIONS = new DefinitionContents(enums)
+DEFINITIONS.associateTypes()
 
 const Type = DEFINITIONS.type
 const LedgerEntryType = DEFINITIONS.ledgerEntryType
