@@ -19,6 +19,14 @@ interface FaucetWallet {
   balance: number
 }
 
+interface HooksV2FaucetWallet {
+  address: string
+  secret: string
+  xrp: number
+  hash: string
+  code: string
+}
+
 enum FaucetNetwork {
   Testnet = 'faucet.altnet.rippletest.net',
   Devnet = 'faucet.devnet.rippletest.net',
@@ -286,9 +294,10 @@ async function processHooksV2Response(
   resolve: (response: { wallet: Wallet; balance: number }) => void,
   reject: (err: ErrorConstructor | Error | unknown) => void,
 ): Promise<void> {
-  const faucetWallet = JSON.parse(body)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- We know this is safe and correct
+  const faucetWallet: HooksV2FaucetWallet = JSON.parse(body)
   const classicAddress = faucetWallet.address
-  const walletToFund = Wallet.fromSecret(faucetWallet.secret)
+  const walletToFund: Wallet = Wallet.fromSecret(faucetWallet.secret)
 
   if (!classicAddress) {
     reject(new XRPLFaucetError(`The faucet account is undefined`))
