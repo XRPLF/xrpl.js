@@ -31,7 +31,6 @@ import { isIssuedCurrency } from '../models/transactions/common'
 import { isHex } from '../models/utils'
 import { ensureClassicAddress } from '../sugar/utils'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
-
 import { rfc1751MnemonicToKey } from './rfc1751'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
@@ -439,14 +438,23 @@ class Wallet {
     txCopy.Memos?.map((memo) => {
       const memoCopy = { ...memo }
       if (memo.Memo.MemoData) {
+        if (!isHex(memo.Memo.MemoData)) {
+          throw new ValidationError('MemoData field must be a hex value')
+        }
         memoCopy.Memo.MemoData = memo.Memo.MemoData.toUpperCase()
       }
 
       if (memo.Memo.MemoType) {
+        if (!isHex(memo.Memo.MemoType)) {
+          throw new ValidationError('MemoType field must be a hex value')
+        }
         memoCopy.Memo.MemoType = memo.Memo.MemoType.toUpperCase()
       }
 
       if (memo.Memo.MemoFormat) {
+        if (!isHex(memo.Memo.MemoFormat)) {
+          throw new ValidationError('MemoFormat field must be a hex value')
+        }
         memoCopy.Memo.MemoFormat = memo.Memo.MemoFormat.toUpperCase()
       }
 
