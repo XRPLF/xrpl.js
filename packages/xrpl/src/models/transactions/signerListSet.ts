@@ -57,7 +57,7 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
 
   if (tx.SignerEntries.length === 0) {
     throw new ValidationError(
-      'SignerListSet: need atleast 1 member in SignerEntries',
+      'SignerListSet: need at least 1 member in SignerEntries',
     )
   }
 
