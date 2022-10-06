@@ -1,10 +1,12 @@
 import { assert } from 'chai'
 
-import { _private } from '../../src/Wallet/fundWallet'
+import {
+  FaucetNetwork,
+  FaucetNetworkPaths,
+  getFaucetHost,
+  getDefaultFaucetPath,
+} from '../../src/Wallet/defaultFaucets'
 import { setupClient, teardownClient } from '../setupClient'
-
-const { FaucetNetwork, FaucetNetworkPaths, getFaucetHost, getFaucetPath } =
-  _private
 
 describe('Get Faucet host ', function () {
   beforeEach(setupClient)
@@ -50,7 +52,7 @@ describe('Get Faucet host ', function () {
     this.client.connection.url = FaucetNetwork.Devnet
 
     assert.strictEqual(
-      getFaucetPath(getFaucetHost(this.client)),
+      getDefaultFaucetPath(getFaucetHost(this.client)),
       expectedFaucetPath,
     )
   })
@@ -60,7 +62,7 @@ describe('Get Faucet host ', function () {
     this.client.connection.url = FaucetNetwork.HooksV2Testnet
 
     assert.strictEqual(
-      getFaucetPath(getFaucetHost(this.client)),
+      getDefaultFaucetPath(getFaucetHost(this.client)),
       expectedFaucetPath,
     )
   })
@@ -68,7 +70,7 @@ describe('Get Faucet host ', function () {
   it('returns the correct faucetPath for undefined host', function () {
     const expectedFaucetPath = '/accounts'
 
-    assert.strictEqual(getFaucetPath(undefined), expectedFaucetPath)
+    assert.strictEqual(getDefaultFaucetPath(undefined), expectedFaucetPath)
   })
 
   it('returns undefined if not a Testnet, Devnet, NFT-Devnet, or HooksV2 Testnet server URL', function () {
