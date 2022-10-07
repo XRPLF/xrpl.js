@@ -162,10 +162,12 @@ describe('fundWallet', function () {
       .fundWallet(wallet, {
         faucetHost: 'hooks-testnet-v2.xrpl-labs.com',
       })
-      .then(() => {
+      .then(async () => {
+        await api.disconnect()
         assert.fail('Should throw XRPLFaucetError')
       })
-      .catch((error) => {
+      .catch(async (error) => {
+        await api.disconnect()
         assert(error instanceof XRPLFaucetError)
       })
   })
