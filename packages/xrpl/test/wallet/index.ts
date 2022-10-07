@@ -385,6 +385,83 @@ describe('Wallet', function () {
       })
     })
 
+    it('sign throws when MemoType is not a hex value', async function () {
+      const secret = 'shd2nxpFD6iBRKWsRss2P4tKMWyy9'
+      const lowercaseMemoTx: Transaction = {
+        TransactionType: 'Payment',
+        Flags: 2147483648,
+        Account: 'rwiZ3q3D3QuG4Ga2HyGdq3kPKJRGctVG8a',
+        Amount: '10000000',
+        LastLedgerSequence: 14000999,
+        Destination: 'rUeEBYXHo8vF86Rqir3zWGRQ84W9efdAQd',
+        Fee: '12',
+        Sequence: 12,
+        SourceTag: 8888,
+        DestinationTag: 9999,
+        Memos: [
+          {
+            Memo: {
+              MemoType: 'not hex value',
+              MemoData: '72656e74',
+            },
+          },
+        ],
+      }
+      assert.throws(() => {
+        Wallet.fromSeed(secret).sign(lowercaseMemoTx)
+      }, /MemoType field must be a hex value/u)
+    })
+    it('sign throws when MemoData is not a hex value', async function () {
+      const secret = 'shd2nxpFD6iBRKWsRss2P4tKMWyy9'
+      const lowercaseMemoTx: Transaction = {
+        TransactionType: 'Payment',
+        Flags: 2147483648,
+        Account: 'rwiZ3q3D3QuG4Ga2HyGdq3kPKJRGctVG8a',
+        Amount: '10000000',
+        LastLedgerSequence: 14000999,
+        Destination: 'rUeEBYXHo8vF86Rqir3zWGRQ84W9efdAQd',
+        Fee: '12',
+        Sequence: 12,
+        SourceTag: 8888,
+        DestinationTag: 9999,
+        Memos: [
+          {
+            Memo: {
+              MemoData: 'not hex value',
+            },
+          },
+        ],
+      }
+      assert.throws(() => {
+        Wallet.fromSeed(secret).sign(lowercaseMemoTx)
+      }, /MemoData field must be a hex value/u)
+    })
+    it('sign throws when MemoFormat is not a hex value', async function () {
+      const secret = 'shd2nxpFD6iBRKWsRss2P4tKMWyy9'
+      const lowercaseMemoTx: Transaction = {
+        TransactionType: 'Payment',
+        Flags: 2147483648,
+        Account: 'rwiZ3q3D3QuG4Ga2HyGdq3kPKJRGctVG8a',
+        Amount: '10000000',
+        LastLedgerSequence: 14000999,
+        Destination: 'rUeEBYXHo8vF86Rqir3zWGRQ84W9efdAQd',
+        Fee: '12',
+        Sequence: 12,
+        SourceTag: 8888,
+        DestinationTag: 9999,
+        Memos: [
+          {
+            Memo: {
+              MemoFormat: 'not hex value',
+            },
+          },
+        ],
+      }
+      assert.throws(() => {
+        Wallet.fromSeed(secret).sign(lowercaseMemoTx)
+      }, /MemoFormat field must be a hex value/u)
+    })
+
     it('sign with EscrowFinish', async function () {
       const result = wallet.sign(REQUEST_FIXTURES.escrow as Transaction)
       assert.deepEqual(result, {

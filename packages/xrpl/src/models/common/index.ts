@@ -4,6 +4,7 @@ export type AccountObjectType =
   | 'check'
   | 'deposit_preauth'
   | 'escrow'
+  | 'nft_offer'
   | 'offer'
   | 'payment_channel'
   | 'signer_list'

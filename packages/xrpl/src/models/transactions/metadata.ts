@@ -15,7 +15,7 @@ interface ModifiedNode {
     FinalFields?: { [field: string]: unknown }
     PreviousFields?: { [field: string]: unknown }
     PreviousTxnID?: string
-    PreviouTxnLgrSeq?: number
+    PreviousTxnLgrSeq?: number
   }
 }
 
