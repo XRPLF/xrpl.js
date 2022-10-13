@@ -26,7 +26,7 @@
     "@types/ws": "^8.2.0",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
-    "@xrplf/eslint-config": "file:../xrplf-typescript-style/packages/eslint-config/xrplf-eslint-config-1.8.0.tgz",
+    "@xrplf/eslint-config": "^1.9.0",
     "@xrplf/prettier-config": "^1.5.0",
     "assert": "^2.0.0",
     "buffer": "^6.0.2",
