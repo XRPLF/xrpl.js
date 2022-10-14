@@ -15,5 +15,6 @@
     "Streams",
     "Errors"
   ],
-  "categorizeByGroup": false
+  "categorizeByGroup": false,
+  "readme": "../../README.md"
 }
