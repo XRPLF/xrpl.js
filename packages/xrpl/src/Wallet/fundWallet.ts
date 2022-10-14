@@ -8,7 +8,6 @@ import { RippledError, XRPLFaucetError } from '../errors'
 
 import {
   FaucetWallet,
-  HooksV2FaucetWallet,
   getFaucetHost,
   getDefaultFaucetPath,
 } from './defaultFaucets'
@@ -186,23 +185,13 @@ async function onEnd(
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- We know this is safe and correct
     const faucetWallet: FaucetWallet = JSON.parse(body)
     const classicAddress = faucetWallet.account.classicAddress
+    if (client.url.includes('hooks-testnet-v2.xrpl-labs.com')) {
+      walletToFund = Wallet.fromSecret(faucetWallet.account.secret)
+    }
     await processSuccessfulResponse(
       client,
       classicAddress,
       walletToFund,
-      startingBalance,
-      resolve,
-      reject,
-    )
-  } else if (client.url.includes('hooks-testnet-v2.xrpl-labs.com')) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- We know this is safe and correct
-    const faucetWallet: HooksV2FaucetWallet = JSON.parse(body)
-    const classicAddress = faucetWallet.address
-    const generatedWalletToFund: Wallet = Wallet.fromSecret(faucetWallet.secret)
-    await processSuccessfulResponse(
-      client,
-      classicAddress,
-      generatedWalletToFund,
       startingBalance,
       resolve,
       reject,

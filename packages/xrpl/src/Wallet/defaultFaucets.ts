@@ -11,17 +11,6 @@ export interface FaucetWallet {
   balance: number
 }
 
-export interface HooksV2FaucetWallet {
-  address: string
-  secret: string
-  // xrp balance
-  xrp: number
-  // XRP Ledger hash value https://xrpl.org/basic-data-types.html#hashes
-  hash: string
-  // tec code https://xrpl.org/tec-codes.html#tec-codes
-  code: string
-}
-
 export enum FaucetNetwork {
   Testnet = 'faucet.altnet.rippletest.net',
   Devnet = 'faucet.devnet.rippletest.net',
@@ -35,7 +24,7 @@ export const FaucetNetworkPaths: Record<string, string> = {
   [FaucetNetwork.Devnet]: '/accounts',
   [FaucetNetwork.AMMDevnet]: '/accounts',
   [FaucetNetwork.NFTDevnet]: '/accounts',
-  [FaucetNetwork.HooksV2Testnet]: '/newcreds',
+  [FaucetNetwork.HooksV2Testnet]: '/accounts',
 }
 
 /**
