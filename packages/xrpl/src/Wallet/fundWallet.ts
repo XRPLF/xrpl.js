@@ -168,7 +168,7 @@ function getHTTPOptions(
   }
 }
 
-// eslint-disable-next-line max-lines-per-function, max-params -- Helper function created for organizational purposes
+// eslint-disable-next-line max-params -- Helper function created for organizational purposes
 async function onEnd(
   response: IncomingMessage,
   chunks: Uint8Array[],
@@ -186,6 +186,7 @@ async function onEnd(
     const faucetWallet: FaucetWallet = JSON.parse(body)
     const classicAddress = faucetWallet.account.classicAddress
     if (client.url.includes('hooks-testnet-v2.xrpl-labs.com')) {
+      // eslint-disable-next-line no-param-reassign -- special edge case because hooks cant fund given wallet
       walletToFund = Wallet.fromSecret(faucetWallet.account.secret)
     }
     await processSuccessfulResponse(
