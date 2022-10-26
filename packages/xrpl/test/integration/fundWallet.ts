@@ -149,7 +149,7 @@ describe('fundWallet', function () {
     assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
 
     // eslint-disable-next-line no-promise-executor-return -- hooks v2 faucet forces 10sec between calls
-    await new Promise((ra) => setTimeout(ra, 15000))
+    await new Promise((foo) => setTimeout(foo, 10000))
 
     const { balance: newBalance } = await api.fundWallet(wallet, {
       faucetHost: 'hooks-testnet-v2.xrpl-labs.com',
