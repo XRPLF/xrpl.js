@@ -83,7 +83,6 @@ async function fundWallet(
   } catch {
     /* startingBalance remains '0' */
   }
-
   // Options to pass to https.request
   const httpOptions = getHTTPOptions(
     this,
@@ -91,13 +90,6 @@ async function fundWallet(
     options?.faucetHost,
     options?.faucetPath,
   )
-
-  if (httpOptions.hostname === 'hooks-testnet-v2.xrpl-labs.com' && wallet) {
-    throw new XRPLFaucetError(
-      `Currently the Hooks Testnet v2 faucet has no way of funding a given wallet. If you need to do that,
-      you can create a new funded account and have it send a payment transaction to the existing account.`,
-    )
-  }
 
   return returnPromise(
     httpOptions,
@@ -185,10 +177,6 @@ async function onEnd(
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- We know this is safe and correct
     const faucetWallet: FaucetWallet = JSON.parse(body)
     const classicAddress = faucetWallet.account.classicAddress
-    if (client.url.includes('hooks-testnet-v2.xrpl-labs.com')) {
-      // eslint-disable-next-line no-param-reassign -- special edge case because hooks cant fund given wallet
-      walletToFund = Wallet.fromSecret(faucetWallet.account.secret)
-    }
     await processSuccessfulResponse(
       client,
       classicAddress,

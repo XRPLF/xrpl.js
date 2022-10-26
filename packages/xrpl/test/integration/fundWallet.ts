@@ -6,8 +6,6 @@ import {
   isValidClassicAddress,
   isValidXAddress,
   dropsToXrp,
-  XRPLFaucetError,
-  Wallet,
 } from 'xrpl-local'
 
 // how long before each test case times out
@@ -150,26 +148,20 @@ describe('fundWallet', function () {
 
     assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
 
+    // eslint-disable-next-line no-promise-executor-return -- hooks v2 faucet forces 10sec between calls
+    await new Promise((ra) => setTimeout(ra, 15000))
+
+    const { balance: newBalance } = await api.fundWallet(wallet, {
+      faucetHost: 'hooks-testnet-v2.xrpl-labs.com',
+    })
+
+    const afterSent = await api.request({
+      command: 'account_info',
+      account: wallet.classicAddress,
+    })
+    assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
+
     await api.disconnect()
-  })
-
-  it('fail to fund a given wallet on hooks v2 testnet', async function () {
-    const api = new Client('wss://hooks-testnet-v2.xrpl-labs.com')
-    await api.connect()
-    const wallet = Wallet.fromSeed('snNuVTaxtQ7EfAvXUzTHwT5VJocRc')
-
-    return api
-      .fundWallet(wallet, {
-        faucetHost: 'hooks-testnet-v2.xrpl-labs.com',
-      })
-      .then(async () => {
-        await api.disconnect()
-        assert.fail('Should throw XRPLFaucetError')
-      })
-      .catch(async (error) => {
-        await api.disconnect()
-        assert(error instanceof XRPLFaucetError)
-      })
   })
 
   it('can generate and fund wallets on AMM devnet', async function () {
