@@ -375,8 +375,11 @@ class Wallet {
    * @param signedTransaction - A signed transaction (hex string of signTransaction result) to be verified offline.
    * @returns Returns true if a signedTransaction is valid.
    */
-  public verifyTransaction(signedTransaction: string): boolean {
-    const tx = decode(signedTransaction)
+  public verifyTransaction(signedTransaction: Transaction | string): boolean {
+    const tx =
+      typeof signedTransaction === 'string'
+        ? decode(signedTransaction)
+        : signedTransaction
     const messageHex: string = encodeForSigning(tx)
     const signature = tx.TxnSignature
     return verify(messageHex, signature, this.publicKey)
