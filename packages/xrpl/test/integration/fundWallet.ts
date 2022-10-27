@@ -13,7 +13,7 @@ import {
 const TIMEOUT = 60000
 let timeOfLastHooksFaucetCall = 0
 // This test is reliant on external networks, and as such may be flaky.
-describe.only('fundWallet', function () {
+describe('fundWallet', function () {
   this.timeout(TIMEOUT)
 
   /*
