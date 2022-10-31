@@ -2,7 +2,7 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
-* When connected to hooks v2 testnet or amm devnet, Client.fundWallet now defaults to using the faucet instead of requiring specification.
+* When connected to hooks v2 testnet, Client.fundWallet now defaults to using the faucet instead of requiring specification.
 * Ability to specify faucet url for wallet generation/funding purposes
 
 ## 2.5.0 (2022-10-13)

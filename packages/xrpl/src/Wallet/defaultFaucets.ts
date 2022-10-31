@@ -14,7 +14,6 @@ export interface FaucetWallet {
 export enum FaucetNetwork {
   Testnet = 'faucet.altnet.rippletest.net',
   Devnet = 'faucet.devnet.rippletest.net',
-  AMMDevnet = 'ammfaucet.devnet.rippletest.net',
   NFTDevnet = 'faucet-nft.ripple.com',
   HooksV2Testnet = 'hooks-testnet-v2.xrpl-labs.com',
 }
@@ -22,7 +21,6 @@ export enum FaucetNetwork {
 export const FaucetNetworkPaths: Record<string, string> = {
   [FaucetNetwork.Testnet]: '/accounts',
   [FaucetNetwork.Devnet]: '/accounts',
-  [FaucetNetwork.AMMDevnet]: '/accounts',
   [FaucetNetwork.NFTDevnet]: '/accounts',
   [FaucetNetwork.HooksV2Testnet]: '/accounts',
 }
@@ -44,10 +42,6 @@ export function getFaucetHost(client: Client): FaucetNetwork | undefined {
   // 'altnet' for Ripple Testnet server and 'testnet' for XRPL Labs Testnet server
   if (connectionUrl.includes('altnet') || connectionUrl.includes('testnet')) {
     return FaucetNetwork.Testnet
-  }
-
-  if (connectionUrl.includes('amm')) {
-    return FaucetNetwork.AMMDevnet
   }
 
   if (connectionUrl.includes('devnet')) {
