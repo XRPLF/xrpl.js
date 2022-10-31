@@ -57,7 +57,7 @@ async function multisigning(): Promise<void> {
     console.log(submitResponse)
     if (submitResponse.result.tx_json.Signers) {
       console.log(
-        `Signers contain ${submitResponse.result.tx_json.Signers.length} entries`,
+        `The transaction had ${submitResponse.result.tx_json.Signers.length} signatures`,
       )
     }
   } else {
