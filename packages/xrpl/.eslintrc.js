@@ -48,7 +48,6 @@ module.exports = {
     // no-shadow has false-positives for enum, @typescript-eslint version fixes that
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
-    'multiline-comment-style': ['error', 'starred-block'],
     'jsdoc/check-examples': 'off',
 
     'tsdoc/syntax': 'off',

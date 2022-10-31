@@ -84,9 +84,13 @@ describe('Browser Tests', () => {
         // '\x1b[31m' specifies that console text will be displayed in color red here on.
         console.log('\x1b[31m', 'Failed Tests:')
         let count = 0
-        for (const result of mocha_results) {
-          count += getCountAndDisplayError(result)
+        if (mocha_results) {
+          // eslint-disable-next-line max-depth -- Necessary for loop.
+          for (const result of mocha_results) {
+            count += getCountAndDisplayError(result)
+          }
         }
+
         // '\x1b[0m' specifies that console text color will be reset.
         console.log(
           `Total ${count} test${count === 1 ? '' : 's'} failed. \n`,

@@ -92,6 +92,7 @@ describe('server_state', () => {
       }
       assert.equal(response.type, expected.type)
 
+      assert.equal(typeof response.result.state.io_latency_ms, 'number')
       assert.equal(typeof response.result.state.complete_ledgers, 'string')
       assert.equal(typeof response.result.state.pubkey_node, 'string')
       assert.equal(typeof response.result.state.time, 'string')
@@ -110,6 +111,7 @@ describe('server_state', () => {
         'uptime',
         'server_state_duration_us',
         'validated_ledger',
+        'io_latency_ms',
       ]
       assert.deepEqual(
         _.omit(response.result.state, removeKeys),

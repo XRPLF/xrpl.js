@@ -34,7 +34,10 @@ export default class RequestManager {
   public resolve(id: string | number, response: Response): void {
     const promise = this.promisesAwaitingResponse.get(id)
     if (promise == null) {
-      throw new XrplError(`No existing promise with id ${id}`)
+      throw new XrplError(`No existing promise with id ${id}`, {
+        type: 'resolve',
+        response,
+      })
     }
     clearTimeout(promise.timer)
     promise.resolve(response)
@@ -51,7 +54,10 @@ export default class RequestManager {
   public reject(id: string | number, error: Error): void {
     const promise = this.promisesAwaitingResponse.get(id)
     if (promise == null) {
-      throw new XrplError(`No existing promise with id ${id}`)
+      throw new XrplError(`No existing promise with id ${id}`, {
+        type: 'reject',
+        error,
+      })
     }
     clearTimeout(promise.timer)
     // TODO: figure out how to have a better stack trace for an error
@@ -93,10 +99,10 @@ export default class RequestManager {
       newId = request.id
     }
     const newRequest = JSON.stringify({ ...request, id: newId })
-    const timer = setTimeout(
-      () => this.reject(newId, new TimeoutError()),
-      timeout,
-    )
+    const timer = setTimeout(() => {
+      console.error('timeout: ', request)
+      this.reject(newId, new TimeoutError('Timeout for request', request))
+    }, timeout)
     /*
      * Node.js won't exit if a timer is still running, so we tell Node to ignore.
      * (Node will still wait for the request to complete).

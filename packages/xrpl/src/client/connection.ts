@@ -342,6 +342,7 @@ export class Connection extends EventEmitter {
     timeout?: number,
   ): Promise<unknown> {
     if (!this.shouldBeConnected || this.ws == null) {
+      console.error('request: not connected')
       throw new NotConnectedError()
     }
     const [id, message, responsePromise] = this.requestManager.createRequest(
@@ -562,8 +563,6 @@ export class Connection extends EventEmitter {
     errorOrCode: Error | number | null,
     reason?: Buffer,
   ): void {
-    console.log('onConnectionFailed: ', errorOrCode)
-    console.log('onConnectionFailed: ', reason)
     if (this.ws) {
       this.ws.removeAllListeners()
       this.ws.on('error', () => {
@@ -576,16 +575,19 @@ export class Connection extends EventEmitter {
       this.ws = null
     }
     if (typeof errorOrCode === 'number') {
+      console.error(`errorOrCode is a number: ${errorOrCode}`)
       this.connectionManager.rejectAllAwaiting(
         new NotConnectedError(`Connection failed with code ${errorOrCode}.`, {
           code: errorOrCode,
         }),
       )
     } else if (errorOrCode?.message) {
+      console.error(`errorOrCode.message: ${errorOrCode.message}`)
       this.connectionManager.rejectAllAwaiting(
         new NotConnectedError(errorOrCode.message, errorOrCode),
       )
     } else {
+      console.error(`errorOrCode is null: `, errorOrCode)
       this.connectionManager.rejectAllAwaiting(
         new NotConnectedError('Connection failed.'),
       )

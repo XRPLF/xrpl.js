@@ -45,13 +45,17 @@ describe('Connection', () => {
   let clientContext: XrplTestContext
 
   beforeEach(async () => {
+    // console.log(`before: `, expect.getState().currentTestName)
     clientContext = await setupClient()
   })
-  afterEach(async () => teardownClient(clientContext))
+  afterEach(async () => {
+    // console.log(`after: `, expect.getState().currentTestName)
+    await teardownClient(clientContext!)
+  })
 
   it(
     'default options',
-    () => {
+    async () => {
       const connection = new Connection('url')
       assert.strictEqual(connection.getUrl(), 'url')
       // @ts-expect-error -- Accessing private property for testing
@@ -68,7 +72,8 @@ describe('Connection', () => {
     let expectedMessages
     let originalConsoleLog
 
-    beforeEach(() => {
+    beforeEach(async () => {
+      clientContext = await setupClient()
       mockedRequestData = { mocked: 'request' }
       mockedResponse = JSON.stringify({ mocked: 'response', id: 0 })
       expectedMessages = [
@@ -80,9 +85,10 @@ describe('Connection', () => {
       originalConsoleLog = console.log
     })
 
-    afterEach(() => {
+    afterEach(async () => {
       // eslint-disable-next-line no-console -- Testing trace
       console.log = originalConsoleLog
+      await teardownClient(clientContext)
     })
 
     it(
@@ -100,10 +106,13 @@ describe('Connection', () => {
             /* purposefully empty */
           },
         }
-        await connection.request(mockedRequestData)
+        const requestPromise = connection.request(mockedRequestData, 10)
         // @ts-expect-error -- Accessing private property for testing
         connection.onMessage(mockedResponse)
         assert.deepEqual(messages, [])
+        await requestPromise.catch(() => {
+          // ignore error, we intetionally fail the promise
+        })
       },
       TIMEOUT,
     )
@@ -116,16 +125,20 @@ describe('Connection', () => {
         console.log = function (id: number | string, message: string): void {
           messages.push([id, message])
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Need to access private methods
-        const connection: any = new Connection('url', { trace: true })
+        const connection = new Connection('url', { trace: true })
+        // @ts-expect-error -- Accessing private methods for test
         connection.ws = {
           send(): void {
             /* purposefully empty */
           },
         }
-        await connection.request(mockedRequestData)
+        const requestPromise = connection.request(mockedRequestData, 10)
+        // @ts-expect-error -- Accessing private methods for test
         connection.onMessage(mockedResponse)
         assert.deepEqual(messages, expectedMessages)
+        await requestPromise.catch(() => {
+          // ignore error, we intetionally fail the promise
+        })
       },
       TIMEOUT,
     )
@@ -145,9 +158,12 @@ describe('Connection', () => {
             /* purposefully empty */
           },
         }
-        await connection.request(mockedRequestData)
+        const requestPromise = connection.request(mockedRequestData, 10)
         connection.onMessage(mockedResponse)
         assert.deepEqual(messages, expectedMessages)
+        await requestPromise.catch(() => {
+          // ignore error, we intetionally fail the promise
+        })
       },
       TIMEOUT,
     )
@@ -246,11 +262,14 @@ describe('Connection', () => {
         connection.on('error', resolve)
       })
 
-      await connection.connect().catch((error) => {
+      const connectionPromise = connection.connect().catch((error) => {
         assert(error instanceof NotConnectedError)
       })
 
-      await errorPromise
+      await new Promise((resolve) => {
+        errorPromise.then(resolve)
+        connectionPromise.then(resolve)
+      })
     },
     TIMEOUT,
   )
@@ -319,43 +338,37 @@ describe('Connection', () => {
   it(
     'DisconnectedError on initial onOpen send',
     async () => {
-      /*
-       * onOpen previously could throw PromiseRejectionHandledWarning: Promise rejection was handled asynchronously
-       * do not rely on the client.setup hook to test this as it bypasses the case, disconnect client connection first
-       */
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Testing private member
+      let spy: any
+
+      // onOpen previously could throw PromiseRejectionHandledWarning: Promise rejection was handled asynchronously
+      // do not rely on the client.setup hook to test this as it bypasses the case, disconnect client connection first
       await clientContext.client.disconnect()
 
-      /*
-       * stub _onOpen to only run logic relevant to test case
-       */
-      // @ts-expect-error -- Overriding function
-      clientContext.client.connection.onceOpen = (): void => {
-        /*
-         * overload websocket send on open when _ws exists
-         */
+      jest
         // @ts-expect-error -- Testing private member
-        clientContext.client.connection.ws.send = function (_0, _1, _2): void {
-          // recent ws throws this error instead of calling back
-          throw new XrplError(
-            'WebSocket is not open: readyState 0 (CONNECTING)',
-          )
-        }
-        const request = { command: 'subscribe', streams: ['ledger'] }
-        clientContext.client.connection.request(request)
-      }
+        .spyOn(clientContext.client.connection, 'onceOpen')
+        // @ts-expect-error -- Testing private member
+        .mockImplementation(async () => {
+          spy = jest
+            // @ts-expect-error -- Testing private member
+            .spyOn(clientContext.client.connection.ws, 'send')
+            // @ts-expect-error -- Testing private member
+            .mockImplementation((_0, _1, _2) => {
+              return 0
+            })
+
+          const request = { command: 'subscribe', streams: ['ledger'] }
+          return clientContext.client.connection.request(request)
+        })
 
       try {
         await clientContext.client.connect()
       } catch (error) {
-        if (!(error instanceof Error)) {
-          throw error
-        }
-
-        assert.instanceOf(error, DisconnectedError)
-        assert.strictEqual(
-          error.message,
-          'WebSocket is not open: readyState 0 (CONNECTING)',
+        expect(error.message).toEqual(
+          "Error: connect() timed out after 5000 ms. If your internet connection is working, the rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.",
         )
+        expect(spy).toHaveBeenCalled()
       }
     },
     TIMEOUT,
@@ -474,24 +487,24 @@ describe('Connection', () => {
       }
     }
 
-    /*
-     * Set the heartbeat to less than the 1 second ping response
-     */
+    // Set the heartbeat to less than the 1 second ping response
     // @ts-expect-error -- Testing private member
     clientContext.client.connection.config.timeout = 500
 
-    const reconnectPromise = new Promise((resolve) => {
+    const reconnectPromise = new Promise<void>((resolve) => {
       // Hook up a listener for the reconnect event
-      clientContext.client.connection.on('reconnect', () => resolve)
+      clientContext.client.connection.on('reconnect', () => {
+        resolve()
+      })
     })
 
-    /*
-     * Trigger a heartbeat
-     */
-    // @ts-expect-error -- Testing private member
-    await clientContext.client.connection.heartbeat().catch((_error) => {
-      /* Ignore error */
-    })
+    // Trigger a heartbeat
+    try {
+      // @ts-expect-error -- Testing private member
+      await clientContext.client.connection.heartbeat()
+    } catch (_error) {
+      // ignore
+    }
 
     await reconnectPromise
   }, 5000)
@@ -504,29 +517,31 @@ describe('Connection', () => {
       }
     }
 
-    /*
-     * Set the heartbeat to less than the 1 second ping response
-     */
+    // Set the heartbeat to less than the 1 second ping response
     // @ts-expect-error -- Testing private member
     clientContext.client.connection.config.timeout = 500
     // fail on reconnect/connection
-    clientContext.client.connection.reconnect = async (): Promise<void> => {
-      throw new XrplError('error on reconnect')
-    }
+    jest
+      .spyOn(clientContext.client.connection, 'reconnect')
+      .mockImplementation(async (): Promise<void> => {
+        throw new XrplError('error on reconnect')
+      })
 
-    const errorPromise = new Promise<void>((resolve) => {
+    // clientContext?.client.connection.reconnect = async (): Promise<void> => {
+    //   throw new XrplError('error on reconnect')
+    // }
+
+    const errorPromise = new Promise<void>((resolve, reject) => {
       // Hook up a listener for the reconnect error event
       clientContext.client.on('error', (error, message) => {
         if (error === 'reconnect' && message === 'error on reconnect') {
           return resolve()
         }
-        throw new XrplError('Expected error on reconnect')
+        return reject(new XrplError('Expected error on reconnect'))
       })
     })
 
-    /*
-     * Trigger a heartbeat
-     */
+    // Trigger a heartbeat
     // @ts-expect-error -- Testing private member
     await clientContext.client.connection.heartbeat()
 
@@ -780,10 +795,8 @@ describe('Connection', () => {
     'unrecognized message type',
     async () => {
       const unknownPromise = new Promise<void>((resolve) => {
-        /*
-         * This enables us to automatically support any
-         * new messages added by rippled in the future.
-         */
+        // This enables us to automatically support any
+        // new messages added by rippled in the future.
         clientContext.client.connection.on('unknown', (event) => {
           assert.deepEqual(event, { type: 'unknown' })
           resolve()
@@ -800,25 +813,30 @@ describe('Connection', () => {
     TIMEOUT,
   )
 
-  /*
-   * it('should clean up websocket connection if error after websocket is opened', async function () {
-   *   await this.client.disconnect()
-   *   // fail on connection
-   *   this.client.connection.subscribeToLedger = async () => {
-   *     throw new Error('error on _subscribeToLedger')
-   *   }
-   *   try {
-   *     await this.client.connect()
-   *     throw new Error('expected connect() to reject, but it resolved')
-   *   } catch (err) {
-   *     assert(err.message === 'error on _subscribeToLedger')
-   *     // _ws.close event listener should have cleaned up the socket when disconnect _ws.close is run on connection error
-   *     // do not fail on connection anymore
-   *     this.client.connection.subscribeToLedger = async () => {}
-   *     await this.client.connection.reconnect()
-   *   }
-   * })
-   */
+  // it('should clean up websocket connection if error after websocket is opened', async function () {
+  //   await clientContext.client.disconnect()
+  //   // fail on connection
+  //   // @ts-expect-error -- Testing private members
+  //   clientContext.client.connection.subscribeToLedger =
+  //     async (): Promise<void> => {
+  //       throw new Error('error on _subscribeToLedger')
+  //     }
+  //   try {
+  //     await clientContext.client.connect()
+  //     throw new Error('expected connect() to reject, but it resolved')
+  //   } catch (err) {
+  //     assert(err.message === 'error on _subscribeToLedger')
+
+  //     // _ws.close event listener should have cleaned up the socket when disconnect _ws.close is run on connection error
+  //     // do not fail on connection anymore
+  //     // @ts-expect-error -- Testing private members
+  //     clientContext.client.connection.subscribeToLedger =
+  //       async (): Promise<void> => {
+  //         // Ignore this function
+  //       }
+  //     await clientContext.client.connection.reconnect()
+  //   }
+  // })
 
   it('should try to reconnect on empty subscribe response on reconnect', async () => {
     const errorPromise = new Promise<void>((resolve, reject) => {

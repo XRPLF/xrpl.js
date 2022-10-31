@@ -6,6 +6,8 @@ import {
   Wallet,
   AccountInfoRequest,
   type SubmitResponse,
+  TimeoutError,
+  NotConnectedError,
 } from 'xrpl-local'
 import { Payment, Transaction } from 'xrpl-local/models/transactions'
 import { hashSignedTx } from 'xrpl-local/utils/hashes'
@@ -36,18 +38,42 @@ async function runCommand({
     delayMs: number
   }
 }): Promise<SubmitResponse> {
-  let response: SubmitResponse = await client.submit(transaction, { wallet })
-
-  while (
-    ['tefPAST_SEQ', 'tefMAX_LEDGER'].includes(response.result.engine_result) &&
-    retry.count > 0
-  ) {
-    // eslint-disable-next-line no-param-reassign -- we want to decrement the count
-    retry.count -= 1
-    // eslint-disable-next-line no-await-in-loop, no-promise-executor-return -- We are waiting on retries
-    await new Promise((resolve) => setTimeout(resolve, retry.delayMs))
-    // eslint-disable-next-line no-await-in-loop -- We are retryhing in a loop on purpose
+  let response: SubmitResponse
+  try {
     response = await client.submit(transaction, { wallet })
+
+    while (
+      ['tefPAST_SEQ', 'tefMAX_LEDGER'].includes(
+        response.result.engine_result,
+      ) &&
+      retry.count > 0
+    ) {
+      // eslint-disable-next-line no-param-reassign -- we want to decrement the count
+      retry.count -= 1
+      // eslint-disable-next-line no-await-in-loop, no-promise-executor-return -- We are waiting on retries
+      await new Promise((resolve) => setTimeout(resolve, retry.delayMs))
+      // eslint-disable-next-line no-await-in-loop -- We are retryhing in a loop on purpose
+      response = await client.submit(transaction, { wallet })
+    }
+  } catch (error) {
+    if (error instanceof TimeoutError || error instanceof NotConnectedError) {
+      console.error('runCommand: Timeout or NotConnected Error: ', {
+        ...error,
+        ...retry,
+      })
+      // retry
+      return runCommand({
+        client,
+        transaction,
+        wallet,
+        retry: {
+          ...retry,
+          count: retry.count > 0 ? retry.count - 1 : 0,
+        },
+      })
+    }
+
+    throw error
   }
 
   return response

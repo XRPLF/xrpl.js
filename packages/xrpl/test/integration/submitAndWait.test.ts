@@ -33,16 +33,48 @@ describe('client.submitAndWait', () => {
         Account: testContext.wallet.classicAddress,
         Domain: convertStringToHex('example.com'),
       }
-      const responsePromise = testContext.client.submitAndWait(accountSet, {
-        wallet: testContext.wallet,
-      })
-      const ledgerPromise = setTimeout(ledgerAccept, 1000, testContext.client)
-      return Promise.all([responsePromise, ledgerPromise]).then(
-        ([response, _ledger]) => {
+
+      let retries = 10
+
+      while (retries > 0) {
+        retries -= 1
+        const responsePromise = testContext.client.submitAndWait(accountSet, {
+          wallet: testContext.wallet,
+        })
+        const ledgerPromise = setTimeout(ledgerAccept, 1000, testContext.client)
+
+        try {
+          // eslint-disable-next-line no-await-in-loop -- Testing purposes
+          const [response, _ledger] = await Promise.all([
+            responsePromise,
+            ledgerPromise,
+          ])
+
           assert.equal(response.type, 'response')
           assert.equal(response.result.validated, true)
-        },
-      )
+          retries = 0
+        } catch (err) {
+          // From submit.ts
+          // if (lastLedger < latestLedger && submissionResult !== 'tesSUCCESS') {
+          //   throw new XrplError(
+          // eslint-disable-next-line max-len -- long error message
+          //     `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${lastLedger}).\n` +
+          //       `Preliminary result: ${submissionResult}`,
+          //   )
+          // }
+          const errorCodeRegex = /(?:Preliminary result:\s)(?<errorCode>.*)$/gu
+          const message = err.message as string
+          const matches = errorCodeRegex.exec(message)
+          const errorCode = matches?.groups?.errorCode
+          // eslint-disable-next-line max-depth -- Testing
+          if (['tefPAST_SEQ', 'tefMAX_LEDGER'].includes(errorCode || '')) {
+            // eslint-disable-next-line no-await-in-loop, no-promise-executor-return -- We are waiting on retries
+            await new Promise((resolve) => setTimeout(resolve, 1000))
+          } else {
+            retries = 0
+          }
+        }
+      }
     },
     TIMEOUT,
   )

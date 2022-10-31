@@ -45,7 +45,7 @@ describe('EscrowFinish', () => {
       }
 
       const finishAfterPromise = new Promise((resolve) => {
-        setTimeout(resolve, 2000)
+        setTimeout(resolve, 3000)
       })
 
       await testTransaction(testContext.client, createTx, testContext.wallet)

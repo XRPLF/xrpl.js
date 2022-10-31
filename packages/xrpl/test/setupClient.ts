@@ -21,6 +21,10 @@ async function setupMockRippledConnection(
     client: new Client(`ws://localhost:${port}`),
   }
 
+  context.client.on('error', () => {
+    // We must have an error listener attached for reconnect errors
+  })
+
   return context.client.connect().then(() => context)
 }
 
@@ -67,7 +71,14 @@ async function teardownClient(
         setImmediate(done)
       }
     })
-    .catch(done)
+    .catch((err) => {
+      console.error(err)
+      if (done) {
+        done()
+      } else {
+        throw err
+      }
+    })
 }
 
 export { setupClient, teardownClient, setupBroadcast, createMockRippled }

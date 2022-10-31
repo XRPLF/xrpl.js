@@ -48,7 +48,7 @@
     "clean": "rm -rf dist build coverage",
     "docgen": "typedoc && echo js.xrpl.org >> ../../docs/CNAME",
     "prepublish": "run-s clean build",
-    "test": "jest --verbose false --coverage=false --silent=false",
+    "test": "jest --verbose false --coverage=false --silent=false --runInBand",
     "test:integration": "TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/integration/**/*.ts ./test/integration/*.ts",
     "test:browser": "npm run build:browserTests && TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/browser/*.ts",
     "test:watch": "TS_NODE_PROJECT=src/tsconfig.json mocha --config=test/.mocharc.json --watch --reporter dot",

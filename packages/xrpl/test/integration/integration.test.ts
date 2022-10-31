@@ -1,7 +1,7 @@
 import assert from 'assert'
 
 import _ from 'lodash'
-import { Client } from 'xrpl-local'
+import { Client, SubmitResponse } from 'xrpl-local'
 import { AccountSet, SignerListSet } from 'xrpl-local/models/transactions'
 import { convertStringToHex } from 'xrpl-local/utils'
 import { multisign } from 'xrpl-local/Wallet/signer'
@@ -81,9 +81,27 @@ describe('integration tests', () => {
       const { tx_blob: tx_blob1 } = signerWallet1.sign(accountSetTx, true)
       const { tx_blob: tx_blob2 } = signerWallet2.sign(accountSetTx, true)
       const multisignedTx = multisign([tx_blob1, tx_blob2])
-      const submitResponse = await client.submit(multisignedTx)
+
+      let response: SubmitResponse = await client.submit(multisignedTx)
       await ledgerAccept(client)
-      assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
+      let retryCount = 20
+
+      while (
+        ['tefPAST_SEQ', 'tefMAX_LEDGER'].includes(
+          response.result.engine_result,
+        ) &&
+        retryCount > 0
+      ) {
+        retryCount -= 1
+        // eslint-disable-next-line no-await-in-loop, no-promise-executor-return -- We are waiting on retries
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        // eslint-disable-next-line no-await-in-loop -- We are retryhing in a loop on purpose
+        response = await client.submit(multisignedTx)
+        // eslint-disable-next-line no-await-in-loop -- We are retryhing in a loop on purpose
+        await ledgerAccept(client)
+      }
+
+      assert.strictEqual(response.result.engine_result, 'tesSUCCESS')
       await verifySubmittedTransaction(testContext.client, multisignedTx)
     },
     TIMEOUT,

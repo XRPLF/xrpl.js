@@ -12,7 +12,22 @@ export async function teardownClient(
   context: XrplIntegrationTestContext,
 ): Promise<void> {
   context.client.removeAllListeners()
-  context.client.disconnect()
+  return context.client.disconnect()
+}
+
+async function connectWithRetry(client: Client, tries = 0): Promise<void> {
+  return client.connect().catch(async (error) => {
+    console.error(error)
+    if (tries < 10) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(connectWithRetry(client, tries + 1))
+        }, 1000)
+      })
+    }
+
+    throw error
+  })
 }
 
 export async function setupClient(
@@ -22,8 +37,11 @@ export async function setupClient(
     client: new Client(server),
     wallet: Wallet.generate(),
   }
-  return context.client.connect().then(async () => {
-    await fundAccount(context.client, context.wallet)
+  return connectWithRetry(context.client).then(async () => {
+    await fundAccount(context.client, context.wallet, {
+      count: 20,
+      delayMs: 1000,
+    })
     return context
   })
 }
