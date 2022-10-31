@@ -1,5 +1,6 @@
 import { assert } from 'chai'
 import _ from 'lodash'
+// import debounce from 'lodash/debounce'
 import { decode } from 'ripple-binary-codec'
 import {
   Client,
@@ -15,9 +16,29 @@ import { hashSignedTx } from 'xrpl-local/utils/hashes'
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
 
-export async function ledgerAccept(client: Client): Promise<void> {
+// let ledgerAcceptMutex = false
+
+export async function ledgerAccept(
+  client: Client,
+  retries?: number,
+): Promise<void> {
   const request = { command: 'ledger_accept' }
-  await client.connection.request(request)
+
+  try {
+    await client.connection.request(request)
+  } catch (error) {
+    if (retries === undefined) {
+      setTimeout(() => {
+        ledgerAccept(client, 10)
+      }, 1000)
+    } else if (retries > 0) {
+      setTimeout(() => {
+        ledgerAccept(client, retries - 1)
+      }, 1000)
+    } else {
+      throw error
+    }
+  }
 }
 
 export function subscribeDone(client: Client): void {
@@ -183,6 +204,11 @@ export async function testTransaction(
 
   // check that the transaction was successful
   assert.equal(response.type, 'response')
+
+  if (response.result.engine_result !== 'tesSUCCESS') {
+    console.error(transaction)
+    console.error(response)
+  }
   assert.equal(
     response.result.engine_result,
     'tesSUCCESS',

@@ -121,7 +121,6 @@ describe('server_state', () => {
       // load
       assert.equal(typeof response.result.state.load?.threads, 'number')
       for (const obj of response.result.state.load?.job_types ?? []) {
-        assert.equal(typeof obj.per_second, 'number')
         assert.equal(typeof obj.job_type, 'string')
       }
       // state_accounting

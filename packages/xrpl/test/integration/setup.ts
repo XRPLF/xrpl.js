@@ -34,7 +34,7 @@ export async function setupClient(
   server = serverUrl,
 ): Promise<XrplIntegrationTestContext> {
   const context: XrplIntegrationTestContext = {
-    client: new Client(server),
+    client: new Client(server, { timeout: 200000 }),
     wallet: Wallet.generate(),
   }
   return connectWithRetry(context.client).then(async () => {

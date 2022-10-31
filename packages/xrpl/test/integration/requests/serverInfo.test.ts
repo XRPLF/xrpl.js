@@ -117,7 +117,6 @@ describe('server_info (rippled)', () => {
       // load
       assert.equal(typeof response.result.info.load?.threads, 'number')
       for (const obj of response.result.info.load?.job_types ?? []) {
-        assert.equal(typeof obj.per_second, 'number')
         assert.equal(typeof obj.job_type, 'string')
       }
       // state_accounting

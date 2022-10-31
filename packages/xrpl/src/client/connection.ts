@@ -342,8 +342,8 @@ export class Connection extends EventEmitter {
     timeout?: number,
   ): Promise<unknown> {
     if (!this.shouldBeConnected || this.ws == null) {
-      console.error('request: not connected')
-      throw new NotConnectedError()
+      console.error('request: not connected: ', request)
+      throw new NotConnectedError(JSON.stringify(request))
     }
     const [id, message, responsePromise] = this.requestManager.createRequest(
       request,

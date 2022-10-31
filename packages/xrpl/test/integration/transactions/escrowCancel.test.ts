@@ -35,12 +35,10 @@ describe('EscrowCancel', () => {
         })
       ).result.ledger.close_time
 
-      /*
-       * We set the CancelAfter timer to be 3 seconds after the last ledger close_time. We need to wait this long
-       * before we can cancel the escrow.
-       */
+      // We set the CancelAfter timer to be 3 seconds after the last ledger close_time. We need to wait this long
+      // before we can cancel the escrow.
       const threeSecondCancelAfterTimerPromise = new Promise((resolve) => {
-        setTimeout(resolve, 4000)
+        setTimeout(resolve, 3000)
       })
 
       const createTx: EscrowCreate = {
