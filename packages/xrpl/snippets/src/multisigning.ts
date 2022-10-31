@@ -53,7 +53,7 @@ async function multisigning(): Promise<void> {
   const submitResponse = await client.submit(multisignedTx)
 
   if (submitResponse.result.engine_result === 'tesSUCCESS') {
-    console.log('Transaction multisigned successfully:')
+    console.log('The multisigned transaction was accepted by the ledger:')
     console.log(submitResponse)
     if (submitResponse.result.tx_json.Signers) {
       console.log(
