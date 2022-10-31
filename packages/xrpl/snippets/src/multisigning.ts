@@ -45,7 +45,7 @@ async function multisigning(): Promise<void> {
     Domain: convertStringToHex('example.com'),
   }
   const accountSetTx = await client.autofill(accountSet, 2)
-  console.log('Transaction set successfully:')
+  console.log('AccountSet transaction is ready to be multisigned:')
   console.log(accountSetTx)
   const { tx_blob: tx_blob1 } = wallet1.sign(accountSetTx, true)
   const { tx_blob: tx_blob2 } = wallet2.sign(accountSetTx, true)
