@@ -61,7 +61,8 @@ async function multisigning(): Promise<void> {
       )
     }
   } else {
-    console.log('There was an error multi-signing this transaction.')
+    console.log('The multisigned transaction was rejected by rippled. Here's the response from rippled:')
+    console.log(submitResponse)
   }
 }
 
