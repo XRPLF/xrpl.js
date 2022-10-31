@@ -34,7 +34,7 @@ interface NormalizedNode {
   FinalFields?: Fields
   PreviousFields?: Fields
   PreviousTxnID?: string
-  PreviouTxnLgrSeq?: number
+  PreviousTxnLgrSeq?: number
 }
 
 function normalizeNode(affectedNode: Node): NormalizedNode {
