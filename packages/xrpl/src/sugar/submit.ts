@@ -7,7 +7,7 @@ import { Transaction } from '../models/transactions'
 import { hashes } from '../utils'
 
 /** Approximate time for a ledger to close, in milliseconds */
-const LEDGER_CLOSE_TIME = 4000
+const LEDGER_CLOSE_TIME = 1000
 
 async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => {
