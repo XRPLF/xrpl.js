@@ -15,27 +15,27 @@ import {
 } from '../setup'
 import { generateFundedWallet, getXRPBalance, testTransaction } from '../utils'
 
-function debugPrintLedgerTime(closeTime: number) {
-  const closeTimeUnix = rippleTimeToUnixTime(closeTime)
-  const closeTimeDate = new Date()
-  closeTimeDate.setTime(closeTimeUnix * 1000)
-  const currentTimeUnix = Math.floor(new Date().getTime())
-  const currentTimeRipple = unixTimeToRippleTime(currentTimeUnix)
-  const currentTimeDate = new Date()
-  currentTimeDate.setTime(currentTimeUnix * 1000)
-  console.error(
-    `closeTime (ripple): ${closeTime}\n`,
-    `closeTime (unix): ${closeTimeUnix}\n`,
-    `closeTime (date): ${closeTimeDate}\n`,
-    `currentTime (ripple): ${currentTimeRipple}\n`,
-    `currentTime (unix): ${currentTimeUnix}\n`,
-    `currentTime (date): ${currentTimeDate}\n`,
-    `diff (current - close) (unix): ${currentTimeUnix - closeTimeUnix}`,
-    `diff (current - close) (ripple): ${currentTimeRipple - closeTime}`,
-  )
+// function debugPrintLedgerTime(closeTime: number) {
+//   const closeTimeUnix = rippleTimeToUnixTime(closeTime)
+//   const closeTimeDate = new Date()
+//   closeTimeDate.setTime(closeTimeUnix * 1000)
+//   const currentTimeUnix = Math.floor(new Date().getTime())
+//   const currentTimeRipple = unixTimeToRippleTime(currentTimeUnix)
+//   const currentTimeDate = new Date()
+//   currentTimeDate.setTime(currentTimeUnix * 1000)
+//   console.error(
+//     `closeTime (ripple): ${closeTime}\n`,
+//     `closeTime (unix): ${closeTimeUnix}\n`,
+//     `closeTime (date): ${closeTimeDate}\n`,
+//     `currentTime (ripple): ${currentTimeRipple}\n`,
+//     `currentTime (unix): ${currentTimeUnix}\n`,
+//     `currentTime (date): ${currentTimeDate}\n`,
+//     `diff (current - close) (unix): ${currentTimeUnix - closeTimeUnix}`,
+//     `diff (current - close) (ripple): ${currentTimeRipple - closeTime}`,
+//   )
 
-  return currentTimeRipple - closeTime
-}
+//   return currentTimeRipple - closeTime
+// }
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -62,8 +62,11 @@ describe('EscrowCancel', () => {
         })
       ).result.ledger.close_time
 
-      const diff = debugPrintLedgerTime(CLOSE_TIME)
-      const waitTimeInMs = Math.round(Math.abs(diff) / 5) * 5 * 1000 + 3000
+      const currentTimeUnix = Math.floor(new Date().getTime())
+      const currentTimeRipple = unixTimeToRippleTime(currentTimeUnix)
+      const closeTimeCurrentTimeDiff = currentTimeRipple - CLOSE_TIME
+      const waitTimeInMs =
+        Math.round(Math.abs(closeTimeCurrentTimeDiff) / 5) * 5 * 1000 + 3000
 
       console.error(`waitTimeInMs: ${waitTimeInMs}`)
 
