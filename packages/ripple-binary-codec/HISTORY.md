@@ -1,6 +1,8 @@
 # ripple-binary-codec Release History
 
 ## Unreleased
+### Added
+- Allow custom type definitions to be used for encoding/decoding transactions at runtime (e.g. for sidechains/new amendments)
 
 ## 1.4.2 (2022-06-27)
 - Fixed standard currency codes with lowercase and allowed symbols not decoding into standard codes.

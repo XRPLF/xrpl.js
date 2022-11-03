@@ -2,6 +2,8 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
+### Added
+* Allow custom type definitions to be used for encoding/decoding transactions at runtime (e.g. for sidechains/new amendments)
 
 ## 2.5.0 (2022-10-13)
 ### Added
