@@ -66,9 +66,11 @@ See https://github.com/ripple/rippled/blob/develop/src/ripple/protocol/TxFormats
 If you're building your own side chain or amendment for the XRPL, you may need to create new definitions.
 
 To do that there are three high level things you need to do:
-1. Copy and modify the `definitions.json` file to have your definitions ([link](https://github.com/XRPLF/xrpl.js/blob/main/packages/ripple-binary-codec/src/enums/definitions.json)) as a baseline, or you can generate your own from rippled source code with [this tool](https://github.com/RichardAH/xrpl-codec-gen)
+1. Generate your own `definitions.json` file from rippled source code using [this tool](https://github.com/RichardAH/xrpl-codec-gen) (The default one for mainnet can be found [here](https://github.com/XRPLF/xrpl.js/blob/main/packages/ripple-binary-codec/src/enums/definitions.json))
 2. Create new SerializedType classes for any new Types (So that encode/decode behavior is defined)
-3. Import `DEFINITIONS` and update it with your new `definitions.json` and SerializedType definitions.
+  - For examples of how to implement that you can look at objects in the `types` folder, such as `Amount`, `UInt8`, or `STArray`.
+3. Import your `definitions.json` file and `coreTypes` from the `types` folder, then use them to construct your own `DefinitionContents` object.
+4. Pass the `DefinitionContents` object whenever you `encode` or `decode` a transaction.
 
 To see this in action, look at the below snippet (Or the test file which contains examples of adding each type of definition)
 
@@ -94,9 +96,12 @@ class NewType extends UInt32 {
 const extendedCoreTypes = { ...coreTypes }
 extendedCoreTypes['NewType'] = NewType
 
-const newDefs = new DefinitionContents(newTypeDefs)
-DEFINITIONS.updateAll(newDefs, extendedCoreTypes)
+const newDefs = new DefinitionContents(newTypeDefs, extendedCoreTypes)
 
 // From this point on, we should be able to serialize / deserialize Transactions with fields that have 'NewType' as their Type.
+
+const encoded = encode(my_tx, newDefs)
+const decoded = decode(encoded, newDefs)
 ```
-Example code is based on the test case in definitions.test.js which has other examples of modifying DEFINITIONS - You can find it and the corresponding example `definition` files in [this folder of test cases](https://github.com/XRPLF/xrpl.js/tree/main/packages/ripple-binary-codec/test)
+
+Example code is based on the test case in definitions.test.js which has other examples of modifying the `definitions.json` - You can find it and the corresponding example `definition` files in [this folder of test cases](https://github.com/XRPLF/xrpl.js/tree/main/packages/ripple-binary-codec/test)
