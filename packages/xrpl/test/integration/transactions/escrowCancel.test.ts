@@ -1,6 +1,11 @@
 import { assert } from 'chai'
 import _ from 'lodash'
-import { EscrowCancel, EscrowCreate } from 'xrpl-local'
+import {
+  EscrowCancel,
+  EscrowCreate,
+  rippleTimeToUnixTime,
+  unixTimeToRippleTime,
+} from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import {
@@ -9,6 +14,28 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { generateFundedWallet, getXRPBalance, testTransaction } from '../utils'
+
+function debugPrintLedgerTime(closeTime: number) {
+  const closeTimeUnix = rippleTimeToUnixTime(closeTime)
+  const closeTimeDate = new Date()
+  closeTimeDate.setTime(closeTimeUnix * 1000)
+  const currentTimeUnix = Math.floor(new Date().getTime())
+  const currentTimeRipple = unixTimeToRippleTime(currentTimeUnix)
+  const currentTimeDate = new Date()
+  currentTimeDate.setTime(currentTimeUnix * 1000)
+  console.error(
+    `closeTime (ripple): ${closeTime}\n`,
+    `closeTime (unix): ${closeTimeUnix}\n`,
+    `closeTime (date): ${closeTimeDate}\n`,
+    `currentTime (ripple): ${currentTimeRipple}\n`,
+    `currentTime (unix): ${currentTimeUnix}\n`,
+    `currentTime (date): ${currentTimeDate}\n`,
+    `diff (current - close) (unix): ${currentTimeUnix - closeTimeUnix}`,
+    `diff (current - close) (ripple): ${currentTimeRipple - closeTime}`,
+  )
+
+  return currentTimeRipple - closeTime
+}
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -35,11 +62,10 @@ describe('EscrowCancel', () => {
         })
       ).result.ledger.close_time
 
-      // We set the CancelAfter timer to be 3 seconds after the last ledger close_time. We need to wait this long
-      // before we can cancel the escrow.
-      const threeSecondCancelAfterTimerPromise = new Promise((resolve) => {
-        setTimeout(resolve, 3000)
-      })
+      const diff = debugPrintLedgerTime(CLOSE_TIME)
+      const waitTimeInMs = Math.round(Math.abs(diff) / 5) * 5 * 1000 + 3000
+
+      console.error(`waitTimeInMs: ${waitTimeInMs}`)
 
       const createTx: EscrowCreate = {
         Account: testContext.wallet.classicAddress,
@@ -84,6 +110,12 @@ describe('EscrowCancel', () => {
         Owner: testContext.wallet.classicAddress,
         OfferSequence: sequence,
       }
+
+      // We set the CancelAfter timer to be 3 seconds after the last ledger close_time. We need to wait this long
+      // before we can cancel the escrow.
+      const threeSecondCancelAfterTimerPromise = new Promise((resolve) => {
+        setTimeout(resolve, waitTimeInMs)
+      })
 
       // Make sure we waited at least 3 seconds before canceling the escrow.
       await threeSecondCancelAfterTimerPromise
