@@ -6,7 +6,7 @@ import { AccountID } from './types/account-id'
 import { HashPrefix } from './hash-prefixes'
 import { BinarySerializer, BytesList } from './serdes/binary-serializer'
 import { sha512Half, transactionID } from './hashes'
-import { FieldInstance } from './enums'
+import { DefinitionContents, DEFINITIONS, FieldInstance } from './enums'
 import { STObject } from './types/st-object'
 import { JsonObject } from './types/serialized-type'
 import { Buffer } from 'buffer/'
@@ -16,26 +16,44 @@ import * as bigInt from 'big-integer'
  * Construct a BinaryParser
  *
  * @param bytes hex-string to construct BinaryParser from
+ * @param customDefinitions Rippled definitions used to parse the values of transaction types and such.
+ *                          Can be customized for sidechains and amendments.
  * @returns A BinaryParser
  */
-const makeParser = (bytes: string): BinaryParser => new BinaryParser(bytes)
+const makeParser = (
+  bytes: string,
+  customDefinitions: DefinitionContents = DEFINITIONS,
+): BinaryParser => new BinaryParser(bytes, customDefinitions)
 
 /**
  * Parse BinaryParser into JSON
  *
  * @param parser BinaryParser object
+ * @param customDefinitions Rippled definitions used to parse the values of transaction types and such.
+ *                          Can be customized for sidechains and amendments.
  * @returns JSON for the bytes in the BinaryParser
  */
-const readJSON = (parser: BinaryParser): JsonObject =>
-  (parser.readType(coreTypes.STObject) as STObject).toJSON()
+const readJSON = (
+  parser: BinaryParser,
+  customDefinitions: DefinitionContents = DEFINITIONS,
+): JsonObject =>
+  (
+    parser.readType(customDefinitions.getAssociatedTypes().STObject) as STObject
+  ).toJSON(customDefinitions)
 
 /**
  * Parse a hex-string into its JSON interpretation
  *
  * @param bytes hex-string to parse into JSON
+ * @param customDefinitions Rippled definitions used to parse the values of transaction types and such.
+ *                          Can be customized for sidechains and amendments.
  * @returns JSON
  */
-const binaryToJSON = (bytes: string): JsonObject => readJSON(makeParser(bytes))
+const binaryToJSON = (
+  bytes: string,
+  customDefinitions: DefinitionContents = DEFINITIONS,
+): JsonObject =>
+  readJSON(makeParser(bytes, customDefinitions), customDefinitions)
 
 /**
  * Interface for passing parameters to SerializeObject
@@ -46,28 +64,31 @@ interface OptionObject {
   prefix?: Buffer
   suffix?: Buffer
   signingFieldsOnly?: boolean
+  customDefinitions?: DefinitionContents
 }
 
 /**
  * Function to serialize JSON object representing a transaction
  *
  * @param object JSON object to serialize
- * @param opts options for serializing, including optional prefix, suffix, and signingFieldOnly
+ * @param opts options for serializing, including optional prefix, suffix, signingFieldOnly, and customDefinitions
  * @returns A Buffer containing the serialized object
  */
 function serializeObject(object: JsonObject, opts: OptionObject = {}): Buffer {
-  const { prefix, suffix, signingFieldsOnly = false } = opts
+  const { prefix, suffix, signingFieldsOnly = false, customDefinitions } = opts
   const bytesList = new BytesList()
 
   if (prefix) {
     bytesList.put(prefix)
   }
 
+  const types = customDefinitions?.getAssociatedTypes() || coreTypes
+
   const filter = signingFieldsOnly
     ? (f: FieldInstance): boolean => f.isSigningField
     : undefined
-  ;(coreTypes.STObject as typeof STObject)
-    .from(object, filter)
+  ;(types.STObject as typeof STObject)
+    .from(object, filter, customDefinitions)
     .toBytesSink(bytesList)
 
   if (suffix) {
@@ -82,13 +103,19 @@ function serializeObject(object: JsonObject, opts: OptionObject = {}): Buffer {
  *
  * @param transaction Transaction to serialize
  * @param prefix Prefix bytes to put before the serialized object
+ * @param customDefinitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A Buffer with the serialized object
  */
 function signingData(
   transaction: JsonObject,
   prefix: Buffer = HashPrefix.transactionSig,
+  customDefinitions: DefinitionContents = DEFINITIONS,
 ): Buffer {
-  return serializeObject(transaction, { prefix, signingFieldsOnly: true })
+  return serializeObject(transaction, {
+    prefix,
+    signingFieldsOnly: true,
+    customDefinitions,
+  })
 }
 
 /**
@@ -103,13 +130,18 @@ interface ClaimObject extends JsonObject {
  * Serialize a signingClaim
  *
  * @param claim A claim object to serialize
+ * @param customDefinitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns the serialized object with appropriate prefix
  */
-function signingClaimData(claim: ClaimObject): Buffer {
+function signingClaimData(
+  claim: ClaimObject,
+  customDefinitions: DefinitionContents = DEFINITIONS,
+): Buffer {
   const num = bigInt(String(claim.amount))
   const prefix = HashPrefix.paymentChannelClaim
-  const channel = coreTypes.Hash256.from(claim.channel).toBytes()
-  const amount = coreTypes.UInt64.from(num).toBytes()
+  const types = customDefinitions.getAssociatedTypes()
+  const channel = types.Hash256.from(claim.channel).toBytes()
+  const amount = types.UInt64.from(num).toBytes()
 
   const bytesList = new BytesList()
 
@@ -124,18 +156,24 @@ function signingClaimData(claim: ClaimObject): Buffer {
  *
  * @param transaction transaction to serialize
  * @param signingAccount Account to sign the transaction with
+ * @param customDefinitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns serialized transaction with appropriate prefix and suffix
  */
 function multiSigningData(
   transaction: JsonObject,
   signingAccount: string | AccountID,
+  customDefinitions: DefinitionContents = DEFINITIONS,
 ): Buffer {
   const prefix = HashPrefix.transactionMultiSig
-  const suffix = coreTypes.AccountID.from(signingAccount).toBytes()
+  const suffix = customDefinitions
+    .getAssociatedTypes()
+    .AccountID.from(signingAccount)
+    .toBytes()
   return serializeObject(transaction, {
     prefix,
     suffix,
     signingFieldsOnly: true,
+    customDefinitions,
   })
 }
 

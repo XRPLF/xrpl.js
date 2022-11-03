@@ -7,7 +7,7 @@ import {
   AccountRootFlags,
 } from '../ledger/AccountRoot'
 import {
-  AccountSetFlagsInterface,
+  type AccountSetFlagsInterface,
   AccountSetTfFlags,
 } from '../transactions/accountSet'
 import { GlobalFlags } from '../transactions/common'
@@ -20,7 +20,7 @@ import {
   PaymentChannelClaimFlagsInterface,
   PaymentChannelClaimFlags,
 } from '../transactions/paymentChannelClaim'
-import type { Transaction } from '../transactions/transaction'
+import { type Transaction } from '../transactions/transaction'
 import { TrustSetFlagsInterface, TrustSetFlags } from '../transactions/trustSet'
 
 import { isFlagEnabled } from '.'

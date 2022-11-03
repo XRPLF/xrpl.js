@@ -1,9 +1,9 @@
 import * as assert from 'assert'
-import { quality, binary } from './coretypes'
+import { quality, binary, HashPrefix } from './coretypes'
 import { decodeLedgerData } from './ledger-hashes'
 import { ClaimObject } from './binary'
 import { JsonObject } from './types/serialized-type'
-import { TRANSACTION_TYPES } from './enums'
+import { DefinitionContents, DEFINITIONS, TRANSACTION_TYPES } from './enums'
 
 const {
   signingData,
@@ -17,22 +17,31 @@ const {
  * Decode a transaction
  *
  * @param binary hex-string of the encoded transaction
+ * @param customDefinitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns the JSON representation of the transaction
  */
-function decode(binary: string): JsonObject {
+function decode(
+  binary: string,
+  customDefinitions: DefinitionContents = DEFINITIONS,
+): JsonObject {
   assert.ok(typeof binary === 'string', 'binary must be a hex string')
-  return binaryToJSON(binary)
+  return binaryToJSON(binary, customDefinitions)
 }
 
 /**
  * Encode a transaction
  *
  * @param json The JSON representation of a transaction
+ * @param customDefinitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ *
  * @returns A hex-string of the encoded transaction
  */
-function encode(json: object): string {
+function encode(
+  json: object,
+  customDefinitions: DefinitionContents = DEFINITIONS,
+): string {
   assert.ok(typeof json === 'object')
-  return serializeObject(json as JsonObject)
+  return serializeObject(json as JsonObject, { customDefinitions })
     .toString('hex')
     .toUpperCase()
 }
@@ -42,11 +51,19 @@ function encode(json: object): string {
  *
  * @param json JSON object representing the transaction
  * @param signer string representing the account to sign the transaction with
+ * @param customDefinitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns a hex string of the encoded transaction
  */
-function encodeForSigning(json: object): string {
+function encodeForSigning(
+  json: object,
+  customDefinitions: DefinitionContents = DEFINITIONS,
+): string {
   assert.ok(typeof json === 'object')
-  return signingData(json as JsonObject)
+  return signingData(
+    json as JsonObject,
+    HashPrefix.transactionSig,
+    customDefinitions,
+  )
     .toString('hex')
     .toUpperCase()
 }
@@ -56,11 +73,15 @@ function encodeForSigning(json: object): string {
  *
  * @param json JSON object representing the transaction
  * @param signer string representing the account to sign the transaction with
+ * @param customDefinitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns a hex string of the encoded transaction
  */
-function encodeForSigningClaim(json: object): string {
+function encodeForSigningClaim(
+  json: object,
+  customDefinitions: DefinitionContents = DEFINITIONS,
+): string {
   assert.ok(typeof json === 'object')
-  return signingClaimData(json as ClaimObject)
+  return signingClaimData(json as ClaimObject, customDefinitions)
     .toString('hex')
     .toUpperCase()
 }
@@ -70,12 +91,17 @@ function encodeForSigningClaim(json: object): string {
  *
  * @param json JSON object representing the transaction
  * @param signer string representing the account to sign the transaction with
+ * @param customDefinitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns a hex string of the encoded transaction
  */
-function encodeForMultisigning(json: object, signer: string): string {
+function encodeForMultisigning(
+  json: object,
+  signer: string,
+  customDefinitions: DefinitionContents = DEFINITIONS,
+): string {
   assert.ok(typeof json === 'object')
   assert.equal(json['SigningPubKey'], '')
-  return multiSigningData(json as JsonObject, signer)
+  return multiSigningData(json as JsonObject, signer, customDefinitions)
     .toString('hex')
     .toUpperCase()
 }
