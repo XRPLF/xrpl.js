@@ -10,6 +10,11 @@ const client = new Client('wss://s.altnet.rippletest.net:51233')
 
 async function multisigning(): Promise<void> {
   await client.connect()
+  /*
+   * This wallet creation is for demonstration purposes.
+   * in practice, users generally will not have all keys in one spot,
+   * hence, users need to implement a way to get signatures.
+   */
   const { wallet: wallet1 } = await client.fundWallet()
   const { wallet: wallet2 } = await client.fundWallet()
   const { wallet: walletMaster } = await client.fundWallet()
