@@ -1,11 +1,6 @@
 import { assert } from 'chai'
 import _ from 'lodash'
-import {
-  EscrowCancel,
-  EscrowCreate,
-  rippleTimeToUnixTime,
-  unixTimeToRippleTime,
-} from 'xrpl-local'
+import { EscrowCancel, EscrowCreate, unixTimeToRippleTime } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import {
@@ -67,8 +62,6 @@ describe('EscrowCancel', () => {
       const closeTimeCurrentTimeDiff = currentTimeRipple - CLOSE_TIME
       const waitTimeInMs =
         Math.round(Math.abs(closeTimeCurrentTimeDiff) / 5) * 5 * 1000 + 3000
-
-      console.error(`waitTimeInMs: ${waitTimeInMs}`)
 
       const createTx: EscrowCreate = {
         Account: testContext.wallet.classicAddress,

@@ -32,6 +32,7 @@ describe('Utility method integration tests', () => {
         }
         assert.deepEqual(_.omit(response, 'id'), expected)
       } catch (error) {
+        // eslint-disable-next-line no-console -- console.log is fine for tests
         console.error(error)
       }
     },

@@ -72,6 +72,7 @@ async function teardownClient(
       }
     })
     .catch((err) => {
+      // eslint-disable-next-line no-console -- console.error is fine in tests
       console.error(err)
       if (done) {
         done()

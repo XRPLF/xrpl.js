@@ -1,10 +1,11 @@
-'use strict' // eslint-disable-line strict
+import assert from 'assert'
+import fixtures from './fixtures/api.json'
+import * as api from '../src'
 
-const assert = require('assert')
-const fixtures = require('./fixtures/api.json')
-const api = require('../src')
 const decodeSeed = api.decodeSeed
-const entropy = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+const entropy = new Uint8Array([
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+])
 
 describe('api', () => {
   it('generateSeed - secp256k1', () => {
@@ -13,7 +14,7 @@ describe('api', () => {
 
   it('generateSeed - secp256k1, random', () => {
     const seed = api.generateSeed()
-    assert(seed.charAt(0) === 's')
+    assert(seed.startsWith('s'))
     const { type, bytes } = decodeSeed(seed)
     assert(type === 'secp256k1')
     assert(bytes.length === 16)
@@ -28,7 +29,7 @@ describe('api', () => {
 
   it('generateSeed - ed25519, random', () => {
     const seed = api.generateSeed({ algorithm: 'ed25519' })
-    assert(seed.slice(0, 3) === 'sEd')
+    assert(seed.startsWith('sEd'))
     const { type, bytes } = decodeSeed(seed)
     assert(type === 'ed25519')
     assert(bytes.length === 16)
@@ -101,16 +102,16 @@ describe('api', () => {
   })
 
   it('deriveNodeAddress', () => {
-    const x = 'n9KHn8NfbBsZV5q8bLfS72XyGqwFt5mgoPbcTV4c6qKiuPTAtXYk'
-    const y = 'rU7bM9ENDkybaxNrefAVjdLTyNLuue1KaJ'
-    assert.strictEqual(api.deriveNodeAddress(x), y)
+    const addrX = 'n9KHn8NfbBsZV5q8bLfS72XyGqwFt5mgoPbcTV4c6qKiuPTAtXYk'
+    const addrY = 'rU7bM9ENDkybaxNrefAVjdLTyNLuue1KaJ'
+    assert.strictEqual(api.deriveNodeAddress(addrX), addrY)
   })
 
   it('Random Address', () => {
     const seed = api.generateSeed()
     const keypair = api.deriveKeypair(seed)
     const address = api.deriveAddress(keypair.publicKey)
-    assert(address[0] === 'r')
+    assert(address.startsWith('r'))
   })
 })
 

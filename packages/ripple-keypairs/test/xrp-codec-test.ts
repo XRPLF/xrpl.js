@@ -1,9 +1,5 @@
-/* eslint-disable no-unused-expressions/no-unused-expressions */
-
-'use strict'
-
-const assert = require('assert')
-const api = require('ripple-address-codec')
+import assert from 'assert'
+import * as api from 'ripple-address-codec'
 
 function toHex(bytes) {
   return Buffer.from(bytes).toString('hex').toUpperCase()
@@ -17,7 +13,7 @@ describe('ripple-address-codec', () => {
   describe('encodeSeed', () => {
     it('encodes a secp256k1 seed', () => {
       const result = api.encodeSeed(
-        toBytes('CF2DE378FBDD7E2EE87D486DFB5A7BFF'),
+        Buffer.from(toBytes('CF2DE378FBDD7E2EE87D486DFB5A7BFF')),
         'secp256k1',
       )
       assert.equal(result, 'sn259rEFXrQrWyx3Q7XneWcwV6dfL')
@@ -25,7 +21,7 @@ describe('ripple-address-codec', () => {
 
     it('encodes low secp256k1 seed', () => {
       const result = api.encodeSeed(
-        toBytes('00000000000000000000000000000000'),
+        Buffer.from(toBytes('00000000000000000000000000000000')),
         'secp256k1',
       )
       assert.equal(result, 'sp6JS7f14BuwFY8Mw6bTtLKWauoUs')
@@ -33,7 +29,7 @@ describe('ripple-address-codec', () => {
 
     it('encodes high secp256k1 seed', () => {
       const result = api.encodeSeed(
-        toBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'),
+        Buffer.from(toBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')),
         'secp256k1',
       )
       assert.equal(result, 'saGwBRReqUNKuWNLpUAq8i8NkXEPN')
@@ -41,7 +37,7 @@ describe('ripple-address-codec', () => {
 
     it('encodes an ed25519 seed', () => {
       const result = api.encodeSeed(
-        toBytes('4C3A1D213FBDFB14C7C28D609469B341'),
+        Buffer.from(toBytes('4C3A1D213FBDFB14C7C28D609469B341')),
         'ed25519',
       )
       assert.equal(result, 'sEdTM1uX8pu2do5XvTnutH6HsouMaM2')
@@ -49,7 +45,7 @@ describe('ripple-address-codec', () => {
 
     it('encodes low ed25519 seed', () => {
       const result = api.encodeSeed(
-        toBytes('00000000000000000000000000000000'),
+        Buffer.from(toBytes('00000000000000000000000000000000')),
         'ed25519',
       )
       assert.equal(result, 'sEdSJHS4oiAdz7w2X2ni1gFiqtbJHqE')
@@ -57,7 +53,7 @@ describe('ripple-address-codec', () => {
 
     it('encodes high ed25519 seed', () => {
       const result = api.encodeSeed(
-        toBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'),
+        Buffer.from(toBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')),
         'ed25519',
       )
       assert.equal(result, 'sEdV19BLfeQeKdEXyYA4NhjPJe6XBfG')
@@ -81,7 +77,7 @@ describe('ripple-address-codec', () => {
   describe('encodeAccountID', () => {
     it('can encode an AccountID', () => {
       const encoded = api.encodeAccountID(
-        toBytes('BA8E78626EE42C41B46D46C3048DF3A1C3C87072'),
+        Buffer.from(toBytes('BA8E78626EE42C41B46D46C3048DF3A1C3C87072')),
       )
       assert.equal(encoded, 'rJrRMgiRgrU6hDF4pgu5DXQdWyPbY35ErN')
     })

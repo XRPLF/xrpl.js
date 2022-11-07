@@ -6,7 +6,12 @@ module.exports = {
   parserOptions: {
     // Enable linting rules with type information from our tsconfig
     tsconfigRootDir: __dirname,
-    project: ['./tsconfig.eslint.json'],
+    project: [
+      './tsconfig.eslint.json',
+      '../ripple-binary-codec/tsconfig.eslint.json',
+      '../ripple-address-codec/tsconfig.eslint.json',
+      '../ripple-keypairs/tsconfig.eslint.json',
+    ],
 
     // Allow the use of imports / ES modules
     sourceType: 'module',
@@ -29,6 +34,7 @@ module.exports = {
   plugins: [],
   extends: ['@xrplf/eslint-config/base'],
   rules: {
+    'multiline-comment-style': 'off',
     // Certain rippled APIs require snake_case naming
     '@typescript-eslint/naming-convention': [
       'error',

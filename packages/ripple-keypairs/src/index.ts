@@ -1,5 +1,4 @@
 import * as assert from 'assert'
-// eslint-disable-next-line @typescript-eslint/no-require-imports -- required because this is the correct syntax from JS spec
 import brorand = require('brorand')
 import * as hashjs from 'hash.js'
 import * as elliptic from 'elliptic'

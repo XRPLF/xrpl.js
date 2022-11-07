@@ -1,9 +1,5 @@
-/* eslint-disable no-unused-expressions/no-unused-expressions */
-
-'use strict'
-
-const assert = require('assert')
-const api = require('ripple-address-codec')
+import assert from 'assert'
+import * as api from 'ripple-address-codec'
 
 function toHex(bytes) {
   return Buffer.from(bytes).toString('hex').toUpperCase()
@@ -15,24 +11,12 @@ function toBytes(hex) {
 
 describe('ripple-address-codec', () => {
   function makeTest(type, base58, hex) {
-    it('can translate between ' +
-      hex +
-      ' and ' +
-      base58 +
-      ' (encode ' +
-      type +
-      ')', () => {
-      const actual = api['encode' + type](toBytes(hex))
+    it(`can translate between ${hex} and ${base58} (encode ${type})`, () => {
+      const actual = api[`encode${type}`](toBytes(hex))
       assert.equal(actual, base58)
     })
-    it('can translate between ' +
-      base58 +
-      ' and ' +
-      hex +
-      ' (decode ' +
-      type +
-      ')', () => {
-      const buf = api['decode' + type](base58)
+    it(`can translate between ${base58} and ${hex} (decode ${type})`, () => {
+      const buf = api[`decode${type}`](base58)
       assert.equal(toHex(buf), hex)
     })
   }
@@ -64,6 +48,7 @@ describe('ripple-address-codec', () => {
     const decoded = api.decodeSeed(edSeed)
     assert.equal(toHex(decoded.bytes), '4C3A1D213FBDFB14C7C28D609469B341')
     assert.equal(decoded.type, 'ed25519')
+    // @ts-expect-error -- We are testing ed25519 here
     assert.equal(api.encodeSeed(decoded.bytes, decoded.type), edSeed)
   })
 })

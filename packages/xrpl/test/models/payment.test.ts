@@ -180,25 +180,19 @@ describe('Payment', () => {
     )
   })
 
-  it(
-    `verifies valid DeliverMin with tfPartialPayment flag set as a number`,
-    () => {
-      paymentTransaction.DeliverMin = '10000'
-      paymentTransaction.Flags = PaymentFlags.tfPartialPayment
-      assert.doesNotThrow(() => validatePayment(paymentTransaction))
-      assert.doesNotThrow(() => validate(paymentTransaction))
-    }
-  )
+  it(`verifies valid DeliverMin with tfPartialPayment flag set as a number`, () => {
+    paymentTransaction.DeliverMin = '10000'
+    paymentTransaction.Flags = PaymentFlags.tfPartialPayment
+    assert.doesNotThrow(() => validatePayment(paymentTransaction))
+    assert.doesNotThrow(() => validate(paymentTransaction))
+  })
 
-  it(
-    `verifies valid DeliverMin with tfPartialPayment flag set as a boolean`,
-    () => {
-      paymentTransaction.DeliverMin = '10000'
-      paymentTransaction.Flags = { tfPartialPayment: true }
-      assert.doesNotThrow(() => validatePayment(paymentTransaction))
-      assert.doesNotThrow(() => validate(paymentTransaction))
-    }
-  )
+  it(`verifies valid DeliverMin with tfPartialPayment flag set as a boolean`, () => {
+    paymentTransaction.DeliverMin = '10000'
+    paymentTransaction.Flags = { tfPartialPayment: true }
+    assert.doesNotThrow(() => validatePayment(paymentTransaction))
+    assert.doesNotThrow(() => validate(paymentTransaction))
+  })
 
   it(`throws when DeliverMin is invalid`, () => {
     paymentTransaction.DeliverMin = 10000
@@ -215,20 +209,17 @@ describe('Payment', () => {
     )
   })
 
-  it(
-    `throws when tfPartialPayment flag is missing with valid DeliverMin`,
-    () => {
-      paymentTransaction.DeliverMin = '10000'
-      assert.throws(
-        () => validatePayment(paymentTransaction),
-        ValidationError,
-        'PaymentTransaction: tfPartialPayment flag required with DeliverMin',
-      )
-      assert.throws(
-        () => validate(paymentTransaction),
-        ValidationError,
-        'PaymentTransaction: tfPartialPayment flag required with DeliverMin',
-      )
-    }
-  )
+  it(`throws when tfPartialPayment flag is missing with valid DeliverMin`, () => {
+    paymentTransaction.DeliverMin = '10000'
+    assert.throws(
+      () => validatePayment(paymentTransaction),
+      ValidationError,
+      'PaymentTransaction: tfPartialPayment flag required with DeliverMin',
+    )
+    assert.throws(
+      () => validate(paymentTransaction),
+      ValidationError,
+      'PaymentTransaction: tfPartialPayment flag required with DeliverMin',
+    )
+  })
 })

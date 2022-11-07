@@ -133,6 +133,7 @@ class Codec {
   /* eslint-enable max-lines-per-function */
 
   private _decodeRaw(base58string: string): Buffer {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Buffer is a subclass of Uint8Array
     return this._codec.decode(base58string) as Buffer
   }
 

@@ -327,4 +327,5 @@ const _private = {
   getFaucetHost,
 }
 
+// eslint-disable-next-line import/no-unused-modules -- Used in tests
 export { _private }

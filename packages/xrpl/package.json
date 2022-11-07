@@ -29,9 +29,7 @@
     "ripple-address-codec": "^4.2.4",
     "ripple-binary-codec": "^1.4.2",
     "ripple-keypairs": "^1.1.4",
-    "ws": "^8.2.2"
-  },
-  "devDependencies": {
+    "ws": "^8.2.2",
     "xrpl-local": "file:./src"
   },
   "resolutions": {
