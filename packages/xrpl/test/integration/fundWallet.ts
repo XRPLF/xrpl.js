@@ -29,7 +29,7 @@ describe('fundWallet', function () {
     })
     assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
 
-    const { balance: newBalance } = await api.fundWallet(wallet)
+    const { balance: newBalance } = await api.fundWallet('1000', wallet)
 
     const afterSent = await api.request({
       command: 'account_info',
@@ -58,7 +58,7 @@ describe('fundWallet', function () {
 
     assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
 
-    const { balance: newBalance } = await api.fundWallet(wallet)
+    const { balance: newBalance } = await api.fundWallet('1000', wallet)
 
     const afterSent = await api.request({
       command: 'account_info',
@@ -85,7 +85,7 @@ describe('fundWallet', function () {
 
     assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
 
-    const { balance: newBalance } = await api.fundWallet(wallet, {
+    const { balance: newBalance } = await api.fundWallet('1000', wallet, {
       faucetHost: 'faucet-nft.ripple.com',
     })
 
@@ -102,7 +102,7 @@ describe('fundWallet', function () {
     const api = new Client('ws://xls20-sandbox.rippletest.net:51233')
 
     await api.connect()
-    const { wallet, balance } = await api.fundWallet(null, {
+    const { wallet, balance } = await api.fundWallet('1000', null, {
       faucetHost: 'faucet-nft.ripple.com',
     })
 
@@ -117,7 +117,7 @@ describe('fundWallet', function () {
 
     assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
 
-    const { balance: newBalance } = await api.fundWallet(wallet, {
+    const { balance: newBalance } = await api.fundWallet('1000', wallet, {
       faucetHost: 'faucet-nft.ripple.com',
     })
 

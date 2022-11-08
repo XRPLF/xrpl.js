@@ -40,6 +40,7 @@ const MAX_ATTEMPTS = 20
  * ```
  *
  * @param this - Client.
+ * @param amount - A custom amount to fund, if undefined or null, the default amount will be 1000.
  * @param wallet - An existing XRPL Wallet to fund. If undefined or null, a new Wallet will be created.
  * @param options - See below.
  * @param options.faucetHost - A custom host for a faucet server. On devnet and
@@ -53,6 +54,7 @@ const MAX_ATTEMPTS = 20
  */
 async function fundWallet(
   this: Client,
+  amount?: string | '1000',
   wallet?: Wallet | null,
   options?: {
     faucetHost?: string
@@ -76,6 +78,7 @@ async function fundWallet(
     new TextEncoder().encode(
       JSON.stringify({
         destination: walletToFund.classicAddress,
+        xrpAmount: amount,
       }),
     ),
   )
