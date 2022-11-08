@@ -199,17 +199,16 @@ export async function testTransaction(
   // sign/submit the transaction
   const response = await runCommand({ client, wallet, transaction, retry })
 
-  if (response.warning) {
-    console.log(response.warning)
-  }
-
   // check that the transaction was successful
   assert.equal(response.type, 'response')
 
   if (response.result.engine_result !== 'tesSUCCESS') {
+    // eslint-disable-next-line no-console -- See output
     console.error(transaction)
+    // eslint-disable-next-line no-console -- See output
     console.error(response)
   }
+
   assert.equal(
     response.result.engine_result,
     'tesSUCCESS',

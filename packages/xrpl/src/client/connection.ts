@@ -1,4 +1,5 @@
 /* eslint-disable max-lines -- Connection is a large file w/ lots of imports/exports */
+/* eslint-disable max-len -- Connection is a large file w/ lots of imports/exports */
 import { EventEmitter } from 'events'
 import { Agent } from 'http'
 
@@ -13,14 +14,18 @@ import {
 } from '../errors'
 import { BaseRequest } from '../models/methods/baseMethod'
 
-if (typeof TextDecoder === 'undefined') {
-  global.TextEncoder = require('util').TextEncoder
-  global.TextDecoder = require('util').TextDecoder
-}
-
 import ConnectionManager from './ConnectionManager'
 import ExponentialBackoff from './ExponentialBackoff'
 import RequestManager from './RequestManager'
+
+if (typeof TextDecoder === 'undefined') {
+  // eslint-dsiable-next-line max-len -- necessary to disable all the rules
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, node/global-require, @typescript-eslint/no-require-imports, node/prefer-global/text-encoder, @typescript-eslint/no-unsafe-member-access, global-require, @typescript-eslint/no-var-requires -- Needed for Jest
+  global.TextEncoder = require('util').TextEncoder
+  // eslint-dsiable-next-line max-len -- necessary to disable all the rules
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, node/global-require, @typescript-eslint/no-require-imports, node/prefer-global/text-decoder, @typescript-eslint/no-unsafe-member-access, global-require, @typescript-eslint/no-var-requires -- Needed for Jest
+  global.TextDecoder = require('util').TextDecoder
+}
 
 const SECONDS_PER_MINUTE = 60
 const TIMEOUT = 20
@@ -267,7 +272,7 @@ export class Connection extends EventEmitter {
 
     this.ws.on('error', (error) => this.onConnectionFailed(error))
     this.ws.on('error', () => clearTimeout(connectionTimeoutID))
-    this.ws.on('close', (code, reason) => this.onConnectionFailed(code, reason))
+    this.ws.on('close', (code) => this.onConnectionFailed(code))
     this.ws.on('close', () => clearTimeout(connectionTimeoutID))
     this.ws.once('open', () => {
       void this.onceOpen(connectionTimeoutID)
@@ -342,8 +347,7 @@ export class Connection extends EventEmitter {
     timeout?: number,
   ): Promise<unknown> {
     if (!this.shouldBeConnected || this.ws == null) {
-      console.error('request: not connected: ', request)
-      throw new NotConnectedError(JSON.stringify(request))
+      throw new NotConnectedError(JSON.stringify(request), request)
     }
     const [id, message, responsePromise] = this.requestManager.createRequest(
       request,
@@ -559,10 +563,7 @@ export class Connection extends EventEmitter {
    *
    * @param errorOrCode - (Optional) Error or code for connection failure.
    */
-  private onConnectionFailed(
-    errorOrCode: Error | number | null,
-    reason?: Buffer,
-  ): void {
+  private onConnectionFailed(errorOrCode: Error | number | null): void {
     if (this.ws) {
       this.ws.removeAllListeners()
       this.ws.on('error', () => {
@@ -575,19 +576,16 @@ export class Connection extends EventEmitter {
       this.ws = null
     }
     if (typeof errorOrCode === 'number') {
-      console.error(`errorOrCode is a number: ${errorOrCode}`)
       this.connectionManager.rejectAllAwaiting(
         new NotConnectedError(`Connection failed with code ${errorOrCode}.`, {
           code: errorOrCode,
         }),
       )
     } else if (errorOrCode?.message) {
-      console.error(`errorOrCode.message: ${errorOrCode.message}`)
       this.connectionManager.rejectAllAwaiting(
         new NotConnectedError(errorOrCode.message, errorOrCode),
       )
     } else {
-      console.error(`errorOrCode is null: `, errorOrCode)
       this.connectionManager.rejectAllAwaiting(
         new NotConnectedError('Connection failed.'),
       )

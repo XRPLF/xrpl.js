@@ -100,7 +100,6 @@ export default class RequestManager {
     }
     const newRequest = JSON.stringify({ ...request, id: newId })
     const timer = setTimeout(() => {
-      console.error('timeout: ', request)
       this.reject(newId, new TimeoutError('Timeout for request', request))
     }, timeout)
     /*

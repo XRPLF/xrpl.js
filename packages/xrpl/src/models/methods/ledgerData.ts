@@ -49,6 +49,7 @@ export interface LedgerDataRequest extends BaseRequest {
 
 type LabeledLedgerEntry = { ledgerEntryType: string } & LedgerEntry
 
+// eslint-disable-next-line import/no-unused-modules -- Exporting for completeness
 export interface BinaryLedgerEntry {
   data: string
 }
