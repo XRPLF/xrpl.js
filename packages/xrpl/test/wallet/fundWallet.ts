@@ -57,6 +57,12 @@ describe('Get Faucet host ', function () {
     )
   })
 
+  it('can generate and fund wallets on AMM devnet', async function () {
+    await generate_faucet_wallet_and_fund_again(
+      'wss://amm.devnet.rippletest.net:51233',
+    )
+  })
+
   it('returns the correct faucetPath for Hooks V2 Testnet host', function () {
     const expectedFaucetPath = FaucetNetworkPaths[FaucetNetwork.HooksV2Testnet]
     this.client.connection.url = FaucetNetwork.HooksV2Testnet
