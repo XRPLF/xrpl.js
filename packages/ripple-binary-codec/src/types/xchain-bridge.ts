@@ -3,16 +3,16 @@ import { BinaryParser } from '../serdes/binary-parser'
 import { AccountID } from './account-id'
 import { JsonObject, SerializedType } from './serialized-type'
 import { Buffer } from 'buffer/'
-import { IssuedCurrency, IssuedCurrencyObject } from './issued-currency'
+import { Issue, IssueObject } from './issue'
 
 /**
  * Interface for JSON objects that represent cross-chain bridges
  */
 interface XChainBridgeObject extends JsonObject {
   LockingChainDoor: string
-  LockingChainIssue: IssuedCurrencyObject | string
+  LockingChainIssue: IssueObject | string
   IssuingChainDoor: string
-  IssuingChainIssue: IssuedCurrencyObject | string
+  IssuingChainIssue: IssueObject | string
 }
 
 /**
@@ -45,9 +45,9 @@ class XChainBridge extends SerializedType {
   static readonly TYPE_ORDER: { name: string; type: typeof SerializedType }[] =
     [
       { name: 'LockingChainDoor', type: AccountID },
-      { name: 'LockingChainIssue', type: IssuedCurrency },
+      { name: 'LockingChainIssue', type: Issue },
       { name: 'IssuingChainDoor', type: AccountID },
-      { name: 'IssuingChainIssue', type: IssuedCurrency },
+      { name: 'IssuingChainIssue', type: Issue },
     ]
 
   constructor(bytes: Buffer) {

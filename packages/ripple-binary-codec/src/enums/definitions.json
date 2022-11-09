@@ -2119,27 +2119,7 @@
       }
     ],
     [
-      "Asset",
-      {
-        "nth": 1,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "Issue"
-      }
-    ],
-    [
       "IssuingChainIssue",
-      {
-        "nth": 2,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "Issue"
-      }
-    ],
-    [
-      "Asset2",
       {
         "nth": 2,
         "isVLEncoded": false,
@@ -2853,7 +2833,8 @@
     "tecAMM_INVALID_TOKENS": 166,
     "tecAMM_EXISTS": 167,
     "tecAMM_FAILED_BID": 168,
-    "tecAMM_FAILED_VOTE": 169,
+    "tecAMM_DIRECT_PAYMENT": 169,
+    "tecAMM_FAILED_VOTE": 170,
     "tecBAD_XCHAIN_TRANSFER_ISSUE": 171,
     "tecXCHAIN_NO_CLAIM_ID": 172,
     "tecXCHAIN_BAD_CLAIM_ID": 173,

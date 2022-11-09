@@ -16,6 +16,8 @@ export interface XChainClaim extends BaseTransaction {
 
   Destination: string
 
+  DestinationTag?: number
+
   Amount: Amount
 }
 
