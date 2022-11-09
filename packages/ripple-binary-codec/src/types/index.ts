@@ -39,4 +39,5 @@ const coreTypes: Record<string, typeof SerializedType> = {
 // because some of the above types depend on BinarySerailizer which depends on enums/index.ts.
 DEFINITIONS.associateTypes(coreTypes)
 
-export { coreTypes }
+export { coreTypes, AccountID, Amount, Blob, Currency, Hash128, Hash160, Hash256, PathSet, STArray,
+  STObject, UInt8, UInt16, UInt32, UInt64, Vector256 }
