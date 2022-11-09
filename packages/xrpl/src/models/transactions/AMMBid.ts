@@ -32,17 +32,17 @@ export interface AMMBid extends BaseTransaction {
 
   /**
    * This field represents the minimum price that the bidder wants to pay for the slot.
-   * It is specified in units of LPToken. If specified let MinBidPrice be X and let
+   * It is specified in units of LPToken. If specified let BidMin be X and let
    * the slot-price computed by price scheduling algorithm be Y, then bidder always pays
    * the max(X, Y).
    */
-  MinBidPrice?: Amount
+  BidMin?: Amount
 
   /**
    * This field represents the maximum price that the bidder wants to pay for the slot.
    * It is specified in units of LPToken.
    */
-  MaxBidPrice?: Amount
+  BidMax?: Amount
 
   /**
    * This field represents an array of XRPL account IDs that are authorized to trade
@@ -61,12 +61,12 @@ export interface AMMBid extends BaseTransaction {
 export function validateAMMBid(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.MinBidPrice != null && !isAmount(tx.MinBidPrice)) {
-    throw new ValidationError('AMMBid: MinBidPrice must be an Amount')
+  if (tx.BidMin != null && !isAmount(tx.BidMin)) {
+    throw new ValidationError('AMMBid: BidMin must be an Amount')
   }
 
-  if (tx.MaxBidPrice != null && !isAmount(tx.MaxBidPrice)) {
-    throw new ValidationError('AMMBid: MaxBidPrice must be an Amount')
+  if (tx.BidMax != null && !isAmount(tx.BidMax)) {
+    throw new ValidationError('AMMBid: BidMax must be an Amount')
   }
 
   if (tx.AuthAccounts != null) {

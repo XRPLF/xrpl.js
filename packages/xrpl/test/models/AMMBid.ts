@@ -13,8 +13,8 @@ describe('AMMBid', function () {
     bid = {
       TransactionType: 'AMMBid',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MinBidPrice: '5',
-      MaxBidPrice: '10',
+      BidMin: '5',
+      BidMax: '10',
       AuthAccounts: [
         {
           AuthAccount: {
@@ -45,21 +45,21 @@ describe('AMMBid', function () {
     assert.doesNotThrow(() => validate(bid))
   })
 
-  it(`throws w/ MinBidPrice must be an Amount`, function () {
-    bid.MinBidPrice = 5
+  it(`throws w/ BidMin must be an Amount`, function () {
+    bid.BidMin = 5
     assert.throws(
       () => validate(bid),
       ValidationError,
-      'AMMBid: MinBidPrice must be an Amount',
+      'AMMBid: BidMin must be an Amount',
     )
   })
 
-  it(`throws w/ MaxBidPrice must be an Amount`, function () {
-    bid.MaxBidPrice = 10
+  it(`throws w/ BidMax must be an Amount`, function () {
+    bid.BidMax = 10
     assert.throws(
       () => validate(bid),
       ValidationError,
-      'AMMBid: MaxBidPrice must be an Amount',
+      'AMMBid: BidMax must be an Amount',
     )
   })
 
