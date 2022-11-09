@@ -1,10 +1,7 @@
 const { encode, decode } = require('../dist')
-const { DefinitionContents, DEFINITIONS } = require('../dist/coretypes')
+const { DefinitionContents } = require('../dist/coretypes')
 const { coreTypes } = require('../dist/types')
-// const { coreTypes } = require('../dist/types')
 const newTypeDefs = require('./fixtures/new-type.json')
-// const newLedgerEntryTypeDefs = require('./fixtures/new-ledger-entry-type.json') //TODO: Either add a test that involves these or remove them before merging.
-// const newTransactionResultsDefs = require('./fixtures/new-transaction-result.json')
 const newFieldDefs = require('./fixtures/new-field.json')
 const { UInt32 } = require('../dist/types/uint-32')
 const newTransactionDefs = require('./fixtures/new-transaction-type.json')
