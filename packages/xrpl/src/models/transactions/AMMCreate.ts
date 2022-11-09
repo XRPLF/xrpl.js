@@ -3,7 +3,7 @@ import { Amount } from '../common'
 
 import { BaseTransaction, isAmount, validateBaseTransaction } from './common'
 
-export const AMM_MAX_TRADING_FEE = 65000
+export const AMM_MAX_TRADING_FEE = 1000
 
 /**
  * AMMCreate is used to create AccountRoot and the corresponding
@@ -28,9 +28,9 @@ export interface AMMCreate extends BaseTransaction {
    * Specifies the fee, in basis point, to be charged
    * to the traders for the trades executed against the AMM instance.
    * Trading fee is a percentage of the trading volume.
-   * Valid values for this field are between 0 and 65000 inclusive.
+   * Valid values for this field are between 0 and 1000 inclusive.
    * A value of 1 is equivalent to 1/10 bps or 0.001%, allowing trading fee
-   * between 0% and 65%.
+   * between 0% and 1%.
    */
   TradingFee: number
 }

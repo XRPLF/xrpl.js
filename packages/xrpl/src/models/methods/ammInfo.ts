@@ -67,9 +67,9 @@ export interface AMMInfoResponse extends BaseResponse {
     /**
      * Specifies the fee, in basis point, to be charged to the traders for the trades
      * executed against the AMM instance. Trading fee is a percentage of the trading volume.
-     * Valid values for this field are between 0 and 65000 inclusive.
+     * Valid values for this field are between 0 and 1000 inclusive.
      * A value of 1 is equivalent to 1/10 bps or 0.001%, allowing trading fee
-     * between 0% and 65%. This field is required.
+     * between 0% and 1%. This field is required.
      */
     TradingFee: number
 

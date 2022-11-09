@@ -82,12 +82,12 @@ describe('AMMCreate', function () {
     )
   })
 
-  it(`throws when TradingFee is greater than 65000`, function () {
-    ammCreate.TradingFee = 65001
+  it(`throws when TradingFee is greater than 1000`, function () {
+    ammCreate.TradingFee = 1001
     assert.throws(
       () => validate(ammCreate),
       ValidationError,
-      `AMMCreate: TradingFee must be between 0 and 65000`,
+      `AMMCreate: TradingFee must be between 0 and 1000`,
     )
   })
 
@@ -96,7 +96,7 @@ describe('AMMCreate', function () {
     assert.throws(
       () => validate(ammCreate),
       ValidationError,
-      `AMMCreate: TradingFee must be between 0 and 65000`,
+      `AMMCreate: TradingFee must be between 0 and 1000`,
     )
   })
 })

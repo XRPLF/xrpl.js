@@ -60,11 +60,11 @@ describe('AMMVote', function () {
   })
 
   it(`throws when TradingFee is greater than AMM_MAX_TRADING_FEE`, function () {
-    vote.TradingFee = 65001
+    vote.TradingFee = 1001
     assert.throws(
       () => validate(vote),
       ValidationError,
-      'AMMVote: TradingFee must be between 0 and 65000',
+      'AMMVote: TradingFee must be between 0 and 1000',
     )
   })
 
@@ -73,7 +73,7 @@ describe('AMMVote', function () {
     assert.throws(
       () => validate(vote),
       ValidationError,
-      'AMMVote: TradingFee must be between 0 and 65000',
+      'AMMVote: TradingFee must be between 0 and 1000',
     )
   })
 })
