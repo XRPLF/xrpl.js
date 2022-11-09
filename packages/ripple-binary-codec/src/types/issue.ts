@@ -8,7 +8,7 @@ import { Buffer } from 'buffer/'
 /**
  * Interface for JSON objects that represent amounts
  */
-interface IssuedCurrencyObject extends JsonObject {
+interface IssueObject extends JsonObject {
   currency: string
   issuer: string
 }
@@ -16,7 +16,7 @@ interface IssuedCurrencyObject extends JsonObject {
 /**
  * Type guard for AmountObject
  */
-function isIssuedCurrencyObject(arg): arg is IssuedCurrencyObject {
+function isIssueObject(arg): arg is IssueObject {
   const keys = Object.keys(arg).sort()
   return keys.length === 2 && keys[0] === 'currency' && keys[1] === 'issuer'
 }
@@ -24,13 +24,11 @@ function isIssuedCurrencyObject(arg): arg is IssuedCurrencyObject {
 /**
  * Class for serializing/Deserializing Amounts
  */
-class IssuedCurrency extends SerializedType {
-  static readonly ZERO_ISSUED_CURRENCY: IssuedCurrency = new IssuedCurrency(
-    Buffer.alloc(20),
-  )
+class Issue extends SerializedType {
+  static readonly ZERO_ISSUED_CURRENCY: Issue = new Issue(Buffer.alloc(20))
 
   constructor(bytes: Buffer) {
-    super(bytes ?? IssuedCurrency.ZERO_ISSUED_CURRENCY.bytes)
+    super(bytes ?? Issue.ZERO_ISSUED_CURRENCY.bytes)
   }
 
   /**
@@ -40,25 +38,23 @@ class IssuedCurrency extends SerializedType {
    *     representing an integer amount
    * @returns An Amount object
    */
-  static from<T extends IssuedCurrency | IssuedCurrencyObject | string>(
-    value: T,
-  ): IssuedCurrency {
-    if (value instanceof IssuedCurrency) {
+  static from<T extends Issue | IssueObject | string>(value: T): Issue {
+    if (value instanceof Issue) {
       return value
     }
 
     if (typeof value === 'string') {
-      IssuedCurrency.assertXrpIsValid(value)
+      Issue.assertXrpIsValid(value)
 
       const currency = Currency.from(value).toBytes()
 
-      return new IssuedCurrency(currency)
+      return new Issue(currency)
     }
 
-    if (isIssuedCurrencyObject(value)) {
+    if (isIssueObject(value)) {
       const currency = Currency.from(value.currency).toBytes()
       const issuer = AccountID.from(value.issuer).toBytes()
-      return new IssuedCurrency(Buffer.concat([currency, issuer]))
+      return new Issue(Buffer.concat([currency, issuer]))
     }
 
     throw new Error('Invalid type to construct an Amount')
@@ -70,13 +66,13 @@ class IssuedCurrency extends SerializedType {
    * @param parser BinaryParser to read the Amount from
    * @returns An Amount object
    */
-  static fromParser(parser: BinaryParser): IssuedCurrency {
+  static fromParser(parser: BinaryParser): Issue {
     const currency = parser.read(20)
     if (new Currency(currency).toJSON() === 'XRP') {
-      return new IssuedCurrency(currency)
+      return new Issue(currency)
     }
     const currencyAndIssuer = [currency, parser.read(20)]
-    return new IssuedCurrency(Buffer.concat(currencyAndIssuer))
+    return new Issue(Buffer.concat(currencyAndIssuer))
   }
 
   /**
@@ -84,7 +80,7 @@ class IssuedCurrency extends SerializedType {
    *
    * @returns the JSON interpretation of this.bytes
    */
-  toJSON(): IssuedCurrencyObject | string {
+  toJSON(): IssueObject | string {
     const parser = new BinaryParser(this.toString())
     const currency = Currency.fromParser(parser) as Currency
     if (currency.toJSON() === 'XRP') {
@@ -111,4 +107,4 @@ class IssuedCurrency extends SerializedType {
   }
 }
 
-export { IssuedCurrency, IssuedCurrencyObject }
+export { Issue, IssueObject }
