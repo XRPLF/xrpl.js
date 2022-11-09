@@ -18,13 +18,13 @@ export interface AMMInfoRequest extends BaseRequest {
 
   /**
    * Specifies one of the pool assets (XRP or token) of the AMM instance.
-   * Both asset1 and asset2 must be defined to specify an AMM instance.
+   * Both asset and asset2 must be defined to specify an AMM instance.
    */
-  asset1?: Currency
+  asset?: Currency
 
   /**
    * Specifies the other pool asset of the AMM instance.
-   * Both asset1 and asset2 must be defined to specify an AMM instance.
+   * Both asset and asset2 must be defined to specify an AMM instance.
    */
   asset2?: Currency
 }
@@ -49,7 +49,7 @@ export interface AMMInfoResponse extends BaseResponse {
     /**
      * Specifies one of the pool assets (XRP or token) of the AMM instance.
      */
-    Asset1: Amount
+    asset: Amount
 
     /**
      * Specifies the other pool asset of the AMM instance.
