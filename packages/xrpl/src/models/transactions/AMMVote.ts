@@ -1,4 +1,5 @@
 import { ValidationError } from '../../errors'
+import { Issue } from '../common'
 
 import { AMM_MAX_TRADING_FEE } from './AMMCreate'
 import { BaseTransaction, validateBaseTransaction } from './common'
@@ -13,9 +14,14 @@ export interface AMMVote extends BaseTransaction {
   TransactionType: 'AMMVote'
 
   /**
-   * A hash that uniquely identifies the AMM instance. This field is required.
+   * Specifies one of the pool assets (XRP or token) of the AMM instance.
    */
-  AMMID: string
+  Asset: Issue
+
+  /**
+   * Specifies the other pool asset of the AMM instance.
+   */
+  Asset2: Issue
 
   /**
    * Specifies the fee, in basis point.
@@ -34,14 +40,6 @@ export interface AMMVote extends BaseTransaction {
  */
 export function validateAMMVote(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-
-  if (tx.AMMID == null) {
-    throw new ValidationError('AMMVote: missing field AMMID')
-  }
-
-  if (typeof tx.AMMID !== 'string') {
-    throw new ValidationError('AMMVote: AMMID must be a string')
-  }
 
   if (tx.TradingFee == null) {
     throw new ValidationError('AMMVote: missing field TradingFee')

@@ -1,6 +1,6 @@
 /* eslint-disable complexity -- required for validateAMMDeposit */
 import { ValidationError } from '../../errors'
-import { Amount, IssuedCurrencyAmount } from '../common'
+import { Amount, Issue, IssuedCurrencyAmount } from '../common'
 
 import {
   BaseTransaction,
@@ -24,9 +24,14 @@ export interface AMMDeposit extends BaseTransaction {
   TransactionType: 'AMMDeposit'
 
   /**
-   * A hash that uniquely identifies the AMM instance. This field is required.
+   * Specifies one of the pool assets (XRP or token) of the AMM instance.
    */
-  AMMID: string
+  Asset: Issue
+
+  /**
+   * Specifies the other pool asset of the AMM instance.
+   */
+  Asset2: Issue
 
   /**
    * Specifies the amount of shares of the AMM instance pools that the trader
@@ -60,14 +65,6 @@ export interface AMMDeposit extends BaseTransaction {
  */
 export function validateAMMDeposit(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-
-  if (tx.AMMID == null) {
-    throw new ValidationError('AMMDeposit: missing field AMMID')
-  }
-
-  if (typeof tx.AMMID !== 'string') {
-    throw new ValidationError('AMMDeposit: AMMID must be a string')
-  }
 
   if (tx.Amount2 != null && tx.Amount == null) {
     throw new ValidationError('AMMDeposit: must set Amount with Amount2')

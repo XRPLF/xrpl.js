@@ -18,7 +18,6 @@ describe('AMMDeposit', function () {
     deposit = {
       TransactionType: 'AMMDeposit',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      AMMID: '24BA86F99302CF124AB27311C831F5BFAA72C4625DDA65B7EDF346A60CC19883',
       Sequence: 1337,
     } as any
   })
@@ -49,24 +48,6 @@ describe('AMMDeposit', function () {
     deposit.Amount = '1000'
     deposit.EPrice = '25'
     assert.doesNotThrow(() => validate(deposit))
-  })
-
-  it(`throws w/ missing AMMID`, function () {
-    delete deposit.AMMID
-    assert.throws(
-      () => validate(deposit),
-      ValidationError,
-      'AMMDeposit: missing field AMMID',
-    )
-  })
-
-  it(`throws w/ AMMID must be a string`, function () {
-    deposit.AMMID = 1234
-    assert.throws(
-      () => validate(deposit),
-      ValidationError,
-      'AMMDeposit: AMMID must be a string',
-    )
   })
 
   it(`throws w/ must set at least LPTokenOut or Amount`, function () {

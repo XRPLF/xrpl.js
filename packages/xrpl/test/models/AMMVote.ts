@@ -13,7 +13,6 @@ describe('AMMVote', function () {
     vote = {
       TransactionType: 'AMMVote',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      AMMID: '24BA86F99302CF124AB27311C831F5BFAA72C4625DDA65B7EDF346A60CC19883',
       TradingFee: 25,
       Sequence: 1337,
     } as any
@@ -21,24 +20,6 @@ describe('AMMVote', function () {
 
   it(`verifies valid AMMVote`, function () {
     assert.doesNotThrow(() => validate(vote))
-  })
-
-  it(`throws w/ missing field AMMID`, function () {
-    delete vote.AMMID
-    assert.throws(
-      () => validate(vote),
-      ValidationError,
-      'AMMVote: missing field AMMID',
-    )
-  })
-
-  it(`throws w/ AMMID must be a string`, function () {
-    vote.AMMID = 1234
-    assert.throws(
-      () => validate(vote),
-      ValidationError,
-      'AMMVote: AMMID must be a string',
-    )
   })
 
   it(`throws w/ missing field TradingFee`, function () {

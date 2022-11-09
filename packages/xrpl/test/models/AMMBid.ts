@@ -13,7 +13,6 @@ describe('AMMBid', function () {
     bid = {
       TransactionType: 'AMMBid',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      AMMID: '24BA86F99302CF124AB27311C831F5BFAA72C4625DDA65B7EDF346A60CC19883',
       MinBidPrice: '5',
       MaxBidPrice: '10',
       AuthAccounts: [
@@ -44,24 +43,6 @@ describe('AMMBid', function () {
 
   it(`verifies valid AMMBid`, function () {
     assert.doesNotThrow(() => validate(bid))
-  })
-
-  it(`throws w/ missing field AMMID`, function () {
-    delete bid.AMMID
-    assert.throws(
-      () => validate(bid),
-      ValidationError,
-      'AMMBid: missing field AMMID',
-    )
-  })
-
-  it(`throws w/ AMMID must be a string`, function () {
-    bid.AMMID = 1234
-    assert.throws(
-      () => validate(bid),
-      ValidationError,
-      'AMMBid: AMMID must be a string',
-    )
   })
 
   it(`throws w/ MinBidPrice must be an Amount`, function () {

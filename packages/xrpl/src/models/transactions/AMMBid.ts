@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { Amount } from '../common'
+import { Amount, Issue } from '../common'
 
 import { BaseTransaction, isAmount, validateBaseTransaction } from './common'
 
@@ -21,9 +21,14 @@ export interface AMMBid extends BaseTransaction {
   TransactionType: 'AMMBid'
 
   /**
-   * A hash that uniquely identifies the AMM instance. This field is required.
+   * Specifies one of the pool assets (XRP or token) of the AMM instance.
    */
-  AMMID: string
+  Asset: Issue
+
+  /**
+   * Specifies the other pool asset of the AMM instance.
+   */
+  Asset2: Issue
 
   /**
    * This field represents the minimum price that the bidder wants to pay for the slot.
@@ -55,14 +60,6 @@ export interface AMMBid extends BaseTransaction {
  */
 export function validateAMMBid(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-
-  if (tx.AMMID == null) {
-    throw new ValidationError('AMMBid: missing field AMMID')
-  }
-
-  if (typeof tx.AMMID !== 'string') {
-    throw new ValidationError('AMMBid: AMMID must be a string')
-  }
 
   if (tx.MinBidPrice != null && !isAmount(tx.MinBidPrice)) {
     throw new ValidationError('AMMBid: MinBidPrice must be an Amount')

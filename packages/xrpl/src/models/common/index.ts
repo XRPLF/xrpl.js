@@ -22,6 +22,8 @@ interface IssuedCurrency {
 
 export type Currency = IssuedCurrency | XRP
 
+export type Issue = Currency
+
 export interface IssuedCurrencyAmount extends IssuedCurrency {
   value: string
 }

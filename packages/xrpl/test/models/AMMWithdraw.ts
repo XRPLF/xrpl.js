@@ -18,7 +18,6 @@ describe('AMMWithdraw', function () {
     withdraw = {
       TransactionType: 'AMMWithdraw',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      AMMID: '24BA86F99302CF124AB27311C831F5BFAA72C4625DDA65B7EDF346A60CC19883',
       Sequence: 1337,
     } as any
   })
@@ -49,24 +48,6 @@ describe('AMMWithdraw', function () {
     withdraw.Amount = '1000'
     withdraw.EPrice = '25'
     assert.doesNotThrow(() => validate(withdraw))
-  })
-
-  it(`throws w/ missing AMMID`, function () {
-    delete withdraw.AMMID
-    assert.throws(
-      () => validate(withdraw),
-      ValidationError,
-      'AMMWithdraw: missing field AMMID',
-    )
-  })
-
-  it(`throws w/ AMMID must be a string`, function () {
-    withdraw.AMMID = 1234
-    assert.throws(
-      () => validate(withdraw),
-      ValidationError,
-      'AMMWithdraw: AMMID must be a string',
-    )
   })
 
   it(`throws w/ must set at least LPTokenIn or Amount`, function () {
