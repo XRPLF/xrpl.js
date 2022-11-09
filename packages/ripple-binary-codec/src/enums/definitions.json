@@ -1966,7 +1966,7 @@
     [
       "Asset",
       {
-        "nth": 1,
+        "nth": 3,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1976,7 +1976,7 @@
     [
       "Asset2",
       {
-        "nth": 2,
+        "nth": 4,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
