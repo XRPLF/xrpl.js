@@ -52,6 +52,7 @@ const MAX_ATTEMPTS = 20
  * and that wallet's balance in XRP.
  * @throws When either Client isn't connected or unable to fund wallet address.
  */
+// eslint-disable-next-line max-params, max-lines-per-function -- this function needs to display and do with more information.
 async function fundWallet(
   this: Client,
   amount?: string | '1000',
