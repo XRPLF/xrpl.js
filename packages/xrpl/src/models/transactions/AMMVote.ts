@@ -1,6 +1,6 @@
 import { ValidationError } from '../../errors'
 
-import { AMM_MAX_TRADING_FEE } from './AMMInstanceCreate'
+import { AMM_MAX_TRADING_FEE } from './AMMCreate'
 import { BaseTransaction, validateBaseTransaction } from './common'
 
 /**
@@ -23,7 +23,7 @@ export interface AMMVote extends BaseTransaction {
    * A value of 1 is equivalent to 1/10 bps or 0.001%, allowing trading fee
    * between 0% and 65%. This field is required.
    */
-  FeeVal: number
+  TradingFee: number
 }
 
 /**
@@ -43,17 +43,17 @@ export function validateAMMVote(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMVote: AMMID must be a string')
   }
 
-  if (tx.FeeVal == null) {
-    throw new ValidationError('AMMVote: missing field FeeVal')
+  if (tx.TradingFee == null) {
+    throw new ValidationError('AMMVote: missing field TradingFee')
   }
 
-  if (typeof tx.FeeVal !== 'number') {
-    throw new ValidationError('AMMVote: FeeVal must be a number')
+  if (typeof tx.TradingFee !== 'number') {
+    throw new ValidationError('AMMVote: TradingFee must be a number')
   }
 
-  if (tx.FeeVal < 0 || tx.FeeVal > AMM_MAX_TRADING_FEE) {
+  if (tx.TradingFee < 0 || tx.TradingFee > AMM_MAX_TRADING_FEE) {
     throw new ValidationError(
-      `AMMVote: FeeVal must be between 0 and ${AMM_MAX_TRADING_FEE}`,
+      `AMMVote: TradingFee must be between 0 and ${AMM_MAX_TRADING_FEE}`,
     )
   }
 }

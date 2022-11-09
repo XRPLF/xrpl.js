@@ -27,17 +27,17 @@ export interface AMMBid extends BaseTransaction {
 
   /**
    * This field represents the minimum price that the bidder wants to pay for the slot.
-   * It is specified in units of LPToken. If specified let MinSlotPrice be X and let
+   * It is specified in units of LPToken. If specified let MinBidPrice be X and let
    * the slot-price computed by price scheduling algorithm be Y, then bidder always pays
    * the max(X, Y).
    */
-  MinSlotPrice?: Amount
+  MinBidPrice?: Amount
 
   /**
    * This field represents the maximum price that the bidder wants to pay for the slot.
    * It is specified in units of LPToken.
    */
-  MaxSlotPrice?: Amount
+  MaxBidPrice?: Amount
 
   /**
    * This field represents an array of XRPL account IDs that are authorized to trade
@@ -64,12 +64,12 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMBid: AMMID must be a string')
   }
 
-  if (tx.MinSlotPrice != null && !isAmount(tx.MinSlotPrice)) {
-    throw new ValidationError('AMMBid: MinSlotPrice must be an Amount')
+  if (tx.MinBidPrice != null && !isAmount(tx.MinBidPrice)) {
+    throw new ValidationError('AMMBid: MinBidPrice must be an Amount')
   }
 
-  if (tx.MaxSlotPrice != null && !isAmount(tx.MaxSlotPrice)) {
-    throw new ValidationError('AMMBid: MaxSlotPrice must be an Amount')
+  if (tx.MaxBidPrice != null && !isAmount(tx.MaxBidPrice)) {
+    throw new ValidationError('AMMBid: MaxBidPrice must be an Amount')
   }
 
   if (tx.AuthAccounts != null) {

@@ -7,7 +7,7 @@ import { validate, ValidationError } from 'xrpl-local'
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('AMMDeposit', function () {
-  const LPToken = {
+  const LPTokenOut = {
     currency: 'B3813FCAB4EE68B3D0D735D6849465A9113EE048',
     issuer: 'rH438jEAzTs5PYtV6CHZqpDpwCKQmPW9Cg',
     value: '1000',
@@ -23,30 +23,30 @@ describe('AMMDeposit', function () {
     } as any
   })
 
-  it(`verifies valid AMMDeposit with LPToken`, function () {
-    deposit.LPToken = LPToken
+  it(`verifies valid AMMDeposit with LPTokenOut`, function () {
+    deposit.LPTokenOut = LPTokenOut
     assert.doesNotThrow(() => validate(deposit))
   })
 
-  it(`verifies valid AMMDeposit with Asset1In`, function () {
-    deposit.Asset1In = '1000'
+  it(`verifies valid AMMDeposit with Amount`, function () {
+    deposit.Amount = '1000'
     assert.doesNotThrow(() => validate(deposit))
   })
 
-  it(`verifies valid AMMDeposit with Asset1In and Asset2In`, function () {
-    deposit.Asset1In = '1000'
-    deposit.Asset2In = '1000'
+  it(`verifies valid AMMDeposit with Amount and Amount2`, function () {
+    deposit.Amount = '1000'
+    deposit.Amount2 = '1000'
     assert.doesNotThrow(() => validate(deposit))
   })
 
-  it(`verifies valid AMMDeposit with Asset1In and LPToken`, function () {
-    deposit.Asset1In = '1000'
-    deposit.LPToken = LPToken
+  it(`verifies valid AMMDeposit with Amount and LPTokenOut`, function () {
+    deposit.Amount = '1000'
+    deposit.LPTokenOut = LPTokenOut
     assert.doesNotThrow(() => validate(deposit))
   })
 
-  it(`verifies valid AMMDeposit with Asset1In and EPrice`, function () {
-    deposit.Asset1In = '1000'
+  it(`verifies valid AMMDeposit with Amount and EPrice`, function () {
+    deposit.Amount = '1000'
     deposit.EPrice = '25'
     assert.doesNotThrow(() => validate(deposit))
   })
@@ -69,62 +69,62 @@ describe('AMMDeposit', function () {
     )
   })
 
-  it(`throws w/ must set at least LPToken or Asset1In`, function () {
+  it(`throws w/ must set at least LPTokenOut or Amount`, function () {
     assert.throws(
       () => validate(deposit),
       ValidationError,
-      'AMMDeposit: must set at least LPToken or Asset1In',
+      'AMMDeposit: must set at least LPTokenOut or Amount',
     )
   })
 
-  it(`throws w/ must set Asset1In with Asset2In`, function () {
-    deposit.Asset2In = '500'
+  it(`throws w/ must set Amount with Amount2`, function () {
+    deposit.Amount2 = '500'
     assert.throws(
       () => validate(deposit),
       ValidationError,
-      'AMMDeposit: must set Asset1In with Asset2In',
+      'AMMDeposit: must set Amount with Amount2',
     )
   })
 
-  it(`throws w/ must set Asset1In with EPrice`, function () {
+  it(`throws w/ must set Amount with EPrice`, function () {
     deposit.EPrice = '25'
     assert.throws(
       () => validate(deposit),
       ValidationError,
-      'AMMDeposit: must set Asset1In with EPrice',
+      'AMMDeposit: must set Amount with EPrice',
     )
   })
 
-  it(`throws w/ LPToken must be an IssuedCurrencyAmount`, function () {
-    deposit.LPToken = 1234
+  it(`throws w/ LPTokenOut must be an IssuedCurrencyAmount`, function () {
+    deposit.LPTokenOut = 1234
     assert.throws(
       () => validate(deposit),
       ValidationError,
-      'AMMDeposit: LPToken must be an IssuedCurrencyAmount',
+      'AMMDeposit: LPTokenOut must be an IssuedCurrencyAmount',
     )
   })
 
-  it(`throws w/ Asset1In must be an Amount`, function () {
-    deposit.Asset1In = 1234
+  it(`throws w/ Amount must be an Amount`, function () {
+    deposit.Amount = 1234
     assert.throws(
       () => validate(deposit),
       ValidationError,
-      'AMMDeposit: Asset1In must be an Amount',
+      'AMMDeposit: Amount must be an Amount',
     )
   })
 
-  it(`throws w/ Asset2In must be an Amount`, function () {
-    deposit.Asset1In = '1000'
-    deposit.Asset2In = 1234
+  it(`throws w/ Amount2 must be an Amount`, function () {
+    deposit.Amount = '1000'
+    deposit.Amount2 = 1234
     assert.throws(
       () => validate(deposit),
       ValidationError,
-      'AMMDeposit: Asset2In must be an Amount',
+      'AMMDeposit: Amount2 must be an Amount',
     )
   })
 
   it(`throws w/ EPrice must be an Amount`, function () {
-    deposit.Asset1In = '1000'
+    deposit.Amount = '1000'
     deposit.EPrice = 1234
     assert.throws(
       () => validate(deposit),

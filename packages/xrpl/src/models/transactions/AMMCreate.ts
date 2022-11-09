@@ -6,23 +6,23 @@ import { BaseTransaction, isAmount, validateBaseTransaction } from './common'
 export const AMM_MAX_TRADING_FEE = 65000
 
 /**
- * AMMInstanceCreate is used to create AccountRoot and the corresponding
+ * AMMCreate is used to create AccountRoot and the corresponding
  * AMM ledger entries.
  *
  * This allows for the creation of only one AMM instance per unique asset pair.
  */
-export interface AMMInstanceCreate extends BaseTransaction {
-  TransactionType: 'AMMInstanceCreate'
+export interface AMMCreate extends BaseTransaction {
+  TransactionType: 'AMMCreate'
 
   /**
    * Specifies one of the pool assets (XRP or token) of the AMM instance.
    */
-  Asset1: Amount
+  Amount: Amount
 
   /**
    * Specifies the other pool asset of the AMM instance.
    */
-  Asset2: Amount
+  Amount2: Amount
 
   /**
    * Specifies the fee, in basis point, to be charged
@@ -36,41 +36,41 @@ export interface AMMInstanceCreate extends BaseTransaction {
 }
 
 /**
- * Verify the form and type of an AMMInstanceCreate at runtime.
+ * Verify the form and type of an AMMCreate at runtime.
  *
- * @param tx - An AMMInstanceCreate Transaction.
- * @throws When the AMMInstanceCreate is Malformed.
+ * @param tx - An AMMCreate Transaction.
+ * @throws When the AMMCreate is Malformed.
  */
-export function validateAMMInstanceCreate(tx: Record<string, unknown>): void {
+export function validateAMMCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Asset1 == null) {
-    throw new ValidationError('AMMInstanceCreate: missing field Asset1')
+  if (tx.Amount == null) {
+    throw new ValidationError('AMMCreate: missing field Amount')
   }
 
-  if (!isAmount(tx.Asset1)) {
-    throw new ValidationError('AMMInstanceCreate: Asset1 must be an Amount')
+  if (!isAmount(tx.Amount)) {
+    throw new ValidationError('AMMCreate: Amount must be an Amount')
   }
 
-  if (tx.Asset2 == null) {
-    throw new ValidationError('AMMInstanceCreate: missing field Asset2')
+  if (tx.Amount2 == null) {
+    throw new ValidationError('AMMCreate: missing field Amount2')
   }
 
-  if (!isAmount(tx.Asset2)) {
-    throw new ValidationError('AMMInstanceCreate: Asset2 must be an Amount')
+  if (!isAmount(tx.Amount2)) {
+    throw new ValidationError('AMMCreate: Amount2 must be an Amount')
   }
 
   if (tx.TradingFee == null) {
-    throw new ValidationError('AMMInstanceCreate: missing field TradingFee')
+    throw new ValidationError('AMMCreate: missing field TradingFee')
   }
 
   if (typeof tx.TradingFee !== 'number') {
-    throw new ValidationError('AMMInstanceCreate: TradingFee must be a number')
+    throw new ValidationError('AMMCreate: TradingFee must be a number')
   }
 
   if (tx.TradingFee < 0 || tx.TradingFee > AMM_MAX_TRADING_FEE) {
     throw new ValidationError(
-      `AMMInstanceCreate: TradingFee must be between 0 and ${AMM_MAX_TRADING_FEE}`,
+      `AMMCreate: TradingFee must be between 0 and ${AMM_MAX_TRADING_FEE}`,
     )
   }
 }

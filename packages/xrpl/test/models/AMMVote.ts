@@ -14,7 +14,7 @@ describe('AMMVote', function () {
       TransactionType: 'AMMVote',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       AMMID: '24BA86F99302CF124AB27311C831F5BFAA72C4625DDA65B7EDF346A60CC19883',
-      FeeVal: 25,
+      TradingFee: 25,
       Sequence: 1337,
     } as any
   })
@@ -41,39 +41,39 @@ describe('AMMVote', function () {
     )
   })
 
-  it(`throws w/ missing field FeeVal`, function () {
-    delete vote.FeeVal
+  it(`throws w/ missing field TradingFee`, function () {
+    delete vote.TradingFee
     assert.throws(
       () => validate(vote),
       ValidationError,
-      'AMMVote: missing field FeeVal',
+      'AMMVote: missing field TradingFee',
     )
   })
 
-  it(`throws w/ FeeVal must be a number`, function () {
-    vote.FeeVal = '25'
+  it(`throws w/ TradingFee must be a number`, function () {
+    vote.TradingFee = '25'
     assert.throws(
       () => validate(vote),
       ValidationError,
-      'AMMVote: FeeVal must be a number',
+      'AMMVote: TradingFee must be a number',
     )
   })
 
-  it(`throws when FeeVal is greater than AMM_MAX_TRADING_FEE`, function () {
-    vote.FeeVal = 65001
+  it(`throws when TradingFee is greater than AMM_MAX_TRADING_FEE`, function () {
+    vote.TradingFee = 65001
     assert.throws(
       () => validate(vote),
       ValidationError,
-      'AMMVote: FeeVal must be between 0 and 65000',
+      'AMMVote: TradingFee must be between 0 and 65000',
     )
   })
 
-  it(`throws when FeeVal is a negative number`, function () {
-    vote.FeeVal = -1
+  it(`throws when TradingFee is a negative number`, function () {
+    vote.TradingFee = -1
     assert.throws(
       () => validate(vote),
       ValidationError,
-      'AMMVote: FeeVal must be between 0 and 65000',
+      'AMMVote: TradingFee must be between 0 and 65000',
     )
   })
 })

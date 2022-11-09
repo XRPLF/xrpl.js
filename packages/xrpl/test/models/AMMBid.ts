@@ -14,8 +14,8 @@ describe('AMMBid', function () {
       TransactionType: 'AMMBid',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       AMMID: '24BA86F99302CF124AB27311C831F5BFAA72C4625DDA65B7EDF346A60CC19883',
-      MinSlotPrice: '5',
-      MaxSlotPrice: '10',
+      MinBidPrice: '5',
+      MaxBidPrice: '10',
       AuthAccounts: [
         {
           AuthAccount: {
@@ -64,21 +64,21 @@ describe('AMMBid', function () {
     )
   })
 
-  it(`throws w/ MinSlotPrice must be an Amount`, function () {
-    bid.MinSlotPrice = 5
+  it(`throws w/ MinBidPrice must be an Amount`, function () {
+    bid.MinBidPrice = 5
     assert.throws(
       () => validate(bid),
       ValidationError,
-      'AMMBid: MinSlotPrice must be an Amount',
+      'AMMBid: MinBidPrice must be an Amount',
     )
   })
 
-  it(`throws w/ MaxSlotPrice must be an Amount`, function () {
-    bid.MaxSlotPrice = 10
+  it(`throws w/ MaxBidPrice must be an Amount`, function () {
+    bid.MaxBidPrice = 10
     assert.throws(
       () => validate(bid),
       ValidationError,
-      'AMMBid: MaxSlotPrice must be an Amount',
+      'AMMBid: MaxBidPrice must be an Amount',
     )
   })
 

@@ -21,6 +21,7 @@
     "UInt192": 21,
     "UInt384": 22,
     "UInt512": 23,
+    "Issue": 24,
     "Transaction": 10001,
     "LedgerEntry": 10002,
     "Validation": 10003,
@@ -773,7 +774,7 @@
       }
     ],
     [
-      "FeeVal",
+      "VoteWeight",
       {
         "nth": 47,
         "isVLEncoded": false,
@@ -783,29 +784,9 @@
       }
     ],
     [
-      "VoteWeight",
-      {
-        "nth": 48,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "TimeStamp",
-      {
-        "nth": 49,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "UInt32"
-      }
-    ],
-    [
       "DiscountedFee",
       {
-        "nth": 50,
+        "nth": 48,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1463,7 +1444,7 @@
       }
     ],
     [
-      "Asset1",
+      "Amount2",
       {
         "nth": 11,
         "isVLEncoded": false,
@@ -1473,7 +1454,7 @@
       }
     ],
     [
-      "Asset2",
+      "MinBidPrice",
       {
         "nth": 12,
         "isVLEncoded": false,
@@ -1483,19 +1464,9 @@
       }
     ],
     [
-      "MinSlotPrice",
+      "MaxBidPrice",
       {
         "nth": 13,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "Amount"
-      }
-    ],
-    [
-      "MaxSlotPrice",
-      {
-        "nth": 14,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1543,7 +1514,7 @@
       }
     ],
     [
-      "Asset1In",
+      "LPTokenOut",
       {
         "nth": 20,
         "isVLEncoded": false,
@@ -1553,7 +1524,7 @@
       }
     ],
     [
-      "Asset2In",
+      "LPTokenIn",
       {
         "nth": 21,
         "isVLEncoded": false,
@@ -1563,7 +1534,7 @@
       }
     ],
     [
-      "Asset1Out",
+      "EPrice",
       {
         "nth": 22,
         "isVLEncoded": false,
@@ -1573,7 +1544,7 @@
       }
     ],
     [
-      "Asset2Out",
+      "Price",
       {
         "nth": 23,
         "isVLEncoded": false,
@@ -1583,39 +1554,9 @@
       }
     ],
     [
-      "LPToken",
-      {
-        "nth": 24,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "Amount"
-      }
-    ],
-    [
-      "EPrice",
-      {
-        "nth": 25,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "Amount"
-      }
-    ],
-    [
-      "Price",
-      {
-        "nth": 26,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "Amount"
-      }
-    ],
-    [
       "LPTokenBalance",
       {
-        "nth": 27,
+        "nth": 24,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2023,6 +1964,26 @@
       }
     ],
     [
+      "Asset",
+      {
+        "nth": 1,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Issue"
+      }
+    ],
+    [
+      "Asset2",
+      {
+        "nth": 2,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Issue"
+      }
+    ],
+    [
       "TransactionMetaData",
       {
         "nth": 2,
@@ -2153,16 +2114,6 @@
       }
     ],
     [
-      "AMM",
-      {
-        "nth": 15,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "STObject"
-      }
-    ],
-    [
       "Signer",
       {
         "nth": 16,
@@ -2266,36 +2217,6 @@
       "AuthAccount",
       {
         "nth": 28,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "STObject"
-      }
-    ],
-    [
-      "AMMToken",
-      {
-        "nth": 29,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "STObject"
-      }
-    ],
-    [
-      "Token1",
-      {
-        "nth": 30,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "STObject"
-      }
-    ],
-    [
-      "Token2",
-      {
-        "nth": 31,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2553,6 +2474,7 @@
     "terNO_RIPPLE": -90,
     "terQUEUED": -89,
     "terPRE_TICKET": -88,
+    "terNO_AMM": -87,
 
     "tesSUCCESS": 0,
 
@@ -2609,8 +2531,7 @@
     "tecAMM_INVALID_TOKENS": 166,
     "tecAMM_EXISTS": 167,
     "tecAMM_FAILED_BID": 168,
-    "tecAMM_DIRECT_PAYMENT": 169,
-    "tecAMM_FAILED_VOTE": 170
+    "tecAMM_FAILED_VOTE": 169
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
@@ -2642,7 +2563,7 @@
     "NFTokenCreateOffer": 27,
     "NFTokenCancelOffer": 28,
     "NFTokenAcceptOffer": 29,
-    "AMMInstanceCreate": 35,
+    "AMMCreate": 35,
     "AMMDeposit": 36,
     "AMMWithdraw": 37,
     "AMMVote": 38,

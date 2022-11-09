@@ -11,14 +11,14 @@ import {
 
 /**
  * AMMDeposit is the deposit transaction used to add liquidity to the AMM instance pool,
- * thus obtaining some share of the instance's pools in the form of LPToken.
+ * thus obtaining some share of the instance's pools in the form of LPTokenOut.
  *
  * The following are the recommended valid combinations:
- * - LPToken
- * - Asset1In
- * - Asset1In and Asset2In
- * - Asset1In and LPToken
- * - Asset1In and EPrice
+ * - LPTokenOut
+ * - Amount
+ * - Amount and Amount2
+ * - Amount and LPTokenOut
+ * - Amount and EPrice
  */
 export interface AMMDeposit extends BaseTransaction {
   TransactionType: 'AMMDeposit'
@@ -32,22 +32,22 @@ export interface AMMDeposit extends BaseTransaction {
    * Specifies the amount of shares of the AMM instance pools that the trader
    * wants to redeem or trade in.
    */
-  LPToken?: IssuedCurrencyAmount
+  LPTokenOut?: IssuedCurrencyAmount
 
   /**
    * Specifies one of the pool assets (XRP or token) of the AMM instance to
    * deposit more of its value.
    */
-  Asset1In?: Amount
+  Amount?: Amount
 
   /**
    * Specifies the other pool asset of the AMM instance to deposit more of
    * its value.
    */
-  Asset2In?: Amount
+  Amount2?: Amount
 
   /**
-   * Specifies the maximum effective-price that LPToken can be traded out.
+   * Specifies the maximum effective-price that LPTokenOut can be traded out.
    */
   EPrice?: Amount
 }
@@ -69,28 +69,28 @@ export function validateAMMDeposit(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMDeposit: AMMID must be a string')
   }
 
-  if (tx.Asset2In != null && tx.Asset1In == null) {
-    throw new ValidationError('AMMDeposit: must set Asset1In with Asset2In')
-  } else if (tx.EPrice != null && tx.Asset1In == null) {
-    throw new ValidationError('AMMDeposit: must set Asset1In with EPrice')
-  } else if (tx.LPToken == null && tx.Asset1In == null) {
+  if (tx.Amount2 != null && tx.Amount == null) {
+    throw new ValidationError('AMMDeposit: must set Amount with Amount2')
+  } else if (tx.EPrice != null && tx.Amount == null) {
+    throw new ValidationError('AMMDeposit: must set Amount with EPrice')
+  } else if (tx.LPTokenOut == null && tx.Amount == null) {
     throw new ValidationError(
-      'AMMDeposit: must set at least LPToken or Asset1In',
+      'AMMDeposit: must set at least LPTokenOut or Amount',
     )
   }
 
-  if (tx.LPToken != null && !isIssuedCurrency(tx.LPToken)) {
+  if (tx.LPTokenOut != null && !isIssuedCurrency(tx.LPTokenOut)) {
     throw new ValidationError(
-      'AMMDeposit: LPToken must be an IssuedCurrencyAmount',
+      'AMMDeposit: LPTokenOut must be an IssuedCurrencyAmount',
     )
   }
 
-  if (tx.Asset1In != null && !isAmount(tx.Asset1In)) {
-    throw new ValidationError('AMMDeposit: Asset1In must be an Amount')
+  if (tx.Amount != null && !isAmount(tx.Amount)) {
+    throw new ValidationError('AMMDeposit: Amount must be an Amount')
   }
 
-  if (tx.Asset2In != null && !isAmount(tx.Asset2In)) {
-    throw new ValidationError('AMMDeposit: Asset2In must be an Amount')
+  if (tx.Amount2 != null && !isAmount(tx.Amount2)) {
+    throw new ValidationError('AMMDeposit: Amount2 must be an Amount')
   }
 
   if (tx.EPrice != null && !isAmount(tx.EPrice)) {
