@@ -30,7 +30,7 @@ export interface AMMInfoRequest extends BaseRequest {
 }
 
 interface VoteEntry {
-  FeeVal: number
+  TradingFee: number
   VoteWeight: number
 }
 
