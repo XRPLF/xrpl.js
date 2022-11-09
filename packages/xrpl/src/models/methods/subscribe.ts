@@ -190,6 +190,18 @@ export interface ValidationStream extends BaseStream {
   /** The amendments this server wants to be added to the protocol. */
   base_fee?: number
   /**
+   * An arbitrary value chosen by the server at startup.
+   *
+   * If the same validation key pair signs validations with different cookies
+   * concurrently, that usually indicates that multiple servers are incorrectly
+   * configured to use the same validation key pair.
+   */
+  cookie?: string
+  /**
+   * The contents of the validation message in its canonical binary form
+   */
+  data?: string
+  /**
    * The unscaled transaction cost (reference_fee value) this server wants to
    * set by Fee voting.
    */

@@ -1,4 +1,4 @@
-import { Amount, IssuedCurrencyAmount } from '../common'
+import { Amount, Currency, IssuedCurrencyAmount } from '../common'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
@@ -18,15 +18,15 @@ export interface AMMInfoRequest extends BaseRequest {
 
   /**
    * Specifies one of the pool assets (XRP or token) of the AMM instance.
-   * Both asset1 and asset2 must be defined to specify an AMM instance.
+   * Both asset and asset2 must be defined to specify an AMM instance.
    */
-  asset1?: Amount
+  asset?: Currency
 
   /**
    * Specifies the other pool asset of the AMM instance.
-   * Both asset1 and asset2 must be defined to specify an AMM instance.
+   * Both asset and asset2 must be defined to specify an AMM instance.
    */
-  asset2?: Amount
+  asset2?: Currency
 }
 
 interface VoteEntry {
@@ -49,7 +49,7 @@ export interface AMMInfoResponse extends BaseResponse {
     /**
      * Specifies one of the pool assets (XRP or token) of the AMM instance.
      */
-    Asset1: Amount
+    Asset: Amount
 
     /**
      * Specifies the other pool asset of the AMM instance.
@@ -67,9 +67,9 @@ export interface AMMInfoResponse extends BaseResponse {
     /**
      * Specifies the fee, in basis point, to be charged to the traders for the trades
      * executed against the AMM instance. Trading fee is a percentage of the trading volume.
-     * Valid values for this field are between 0 and 65000 inclusive.
+     * Valid values for this field are between 0 and 1000 inclusive.
      * A value of 1 is equivalent to 1/10 bps or 0.001%, allowing trading fee
-     * between 0% and 65%. This field is required.
+     * between 0% and 1%. This field is required.
      */
     TradingFee: number
 

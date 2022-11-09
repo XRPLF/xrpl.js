@@ -7,7 +7,7 @@ import { validate, ValidationError } from 'xrpl-local'
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('AMMWithdraw', function () {
-  const LPToken = {
+  const LPTokenIn = {
     currency: 'B3813FCAB4EE68B3D0D735D6849465A9113EE048',
     issuer: 'rH438jEAzTs5PYtV6CHZqpDpwCKQmPW9Cg',
     value: '1000',
@@ -18,113 +18,94 @@ describe('AMMWithdraw', function () {
     withdraw = {
       TransactionType: 'AMMWithdraw',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      AMMID: '24BA86F99302CF124AB27311C831F5BFAA72C4625DDA65B7EDF346A60CC19883',
       Sequence: 1337,
     } as any
   })
 
-  it(`verifies valid AMMWithdraw with LPToken`, function () {
-    withdraw.LPToken = LPToken
+  it(`verifies valid AMMWithdraw with LPTokenIn`, function () {
+    withdraw.LPTokenIn = LPTokenIn
     assert.doesNotThrow(() => validate(withdraw))
   })
 
-  it(`verifies valid AMMWithdraw with Asset1Out`, function () {
-    withdraw.Asset1Out = '1000'
+  it(`verifies valid AMMWithdraw with Amount`, function () {
+    withdraw.Amount = '1000'
     assert.doesNotThrow(() => validate(withdraw))
   })
 
-  it(`verifies valid AMMWithdraw with Asset1Out and Asset2Out`, function () {
-    withdraw.Asset1Out = '1000'
-    withdraw.Asset2Out = '1000'
+  it(`verifies valid AMMWithdraw with Amount and Amount2`, function () {
+    withdraw.Amount = '1000'
+    withdraw.Amount2 = '1000'
     assert.doesNotThrow(() => validate(withdraw))
   })
 
-  it(`verifies valid AMMWithdraw with Asset1Out and LPToken`, function () {
-    withdraw.Asset1Out = '1000'
-    withdraw.LPToken = LPToken
+  it(`verifies valid AMMWithdraw with Amount and LPTokenIn`, function () {
+    withdraw.Amount = '1000'
+    withdraw.LPTokenIn = LPTokenIn
     assert.doesNotThrow(() => validate(withdraw))
   })
 
-  it(`verifies valid AMMWithdraw with Asset1Out and EPrice`, function () {
-    withdraw.Asset1Out = '1000'
+  it(`verifies valid AMMWithdraw with Amount and EPrice`, function () {
+    withdraw.Amount = '1000'
     withdraw.EPrice = '25'
     assert.doesNotThrow(() => validate(withdraw))
   })
 
-  it(`throws w/ missing AMMID`, function () {
-    delete withdraw.AMMID
+  it(`throws w/ must set at least LPTokenIn or Amount`, function () {
     assert.throws(
       () => validate(withdraw),
       ValidationError,
-      'AMMWithdraw: missing field AMMID',
+      'AMMWithdraw: must set at least LPTokenIn or Amount',
     )
   })
 
-  it(`throws w/ AMMID must be a string`, function () {
-    withdraw.AMMID = 1234
+  it(`throws w/ must set Amount with Amount2`, function () {
+    withdraw.Amount2 = '500'
     assert.throws(
       () => validate(withdraw),
       ValidationError,
-      'AMMWithdraw: AMMID must be a string',
+      'AMMWithdraw: must set Amount with Amount2',
     )
   })
 
-  it(`throws w/ must set at least LPToken or Asset1Out`, function () {
-    assert.throws(
-      () => validate(withdraw),
-      ValidationError,
-      'AMMWithdraw: must set at least LPToken or Asset1Out',
-    )
-  })
-
-  it(`throws w/ must set Asset1Out with Asset2Out`, function () {
-    withdraw.Asset2Out = '500'
-    assert.throws(
-      () => validate(withdraw),
-      ValidationError,
-      'AMMWithdraw: must set Asset1Out with Asset2Out',
-    )
-  })
-
-  it(`throws w/ must set Asset1Out with EPrice`, function () {
+  it(`throws w/ must set Amount with EPrice`, function () {
     withdraw.EPrice = '25'
     assert.throws(
       () => validate(withdraw),
       ValidationError,
-      'AMMWithdraw: must set Asset1Out with EPrice',
+      'AMMWithdraw: must set Amount with EPrice',
     )
   })
 
-  it(`throws w/ LPToken must be an IssuedCurrencyAmount`, function () {
-    withdraw.LPToken = 1234
+  it(`throws w/ LPTokenIn must be an IssuedCurrencyAmount`, function () {
+    withdraw.LPTokenIn = 1234
     assert.throws(
       () => validate(withdraw),
       ValidationError,
-      'AMMWithdraw: LPToken must be an IssuedCurrencyAmount',
+      'AMMWithdraw: LPTokenIn must be an IssuedCurrencyAmount',
     )
   })
 
-  it(`throws w/ Asset1Out must be an Amount`, function () {
-    withdraw.Asset1Out = 1234
+  it(`throws w/ Amount must be an Amount`, function () {
+    withdraw.Amount = 1234
     assert.throws(
       () => validate(withdraw),
       ValidationError,
-      'AMMWithdraw: Asset1Out must be an Amount',
+      'AMMWithdraw: Amount must be an Amount',
     )
   })
 
-  it(`throws w/ Asset2Out must be an Amount`, function () {
-    withdraw.Asset1Out = '1000'
-    withdraw.Asset2Out = 1234
+  it(`throws w/ Amount2 must be an Amount`, function () {
+    withdraw.Amount = '1000'
+    withdraw.Amount2 = 1234
     assert.throws(
       () => validate(withdraw),
       ValidationError,
-      'AMMWithdraw: Asset2Out must be an Amount',
+      'AMMWithdraw: Amount2 must be an Amount',
     )
   })
 
   it(`throws w/ EPrice must be an Amount`, function () {
-    withdraw.Asset1Out = '1000'
+    withdraw.Amount = '1000'
     withdraw.EPrice = 1234
     assert.throws(
       () => validate(withdraw),
