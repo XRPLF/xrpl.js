@@ -49,7 +49,7 @@ export interface AMMInfoResponse extends BaseResponse {
     /**
      * Specifies one of the pool assets (XRP or token) of the AMM instance.
      */
-    asset: Amount
+    Asset: Amount
 
     /**
      * Specifies the other pool asset of the AMM instance.
