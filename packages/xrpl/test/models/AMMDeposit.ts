@@ -1,5 +1,6 @@
+/* eslint-disable no-bitwise -- bitwise necessary for enabling flags */
 import { assert } from 'chai'
-import { validate, ValidationError } from 'xrpl-local'
+import { AMMDepositFlags, validate, ValidationError } from 'xrpl-local'
 
 /**
  * AMMDeposit Transaction Verification Testing.
@@ -19,34 +20,40 @@ describe('AMMDeposit', function () {
       TransactionType: 'AMMDeposit',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Sequence: 1337,
+      Flags: 0,
     } as any
   })
 
   it(`verifies valid AMMDeposit with LPTokenOut`, function () {
     deposit.LPTokenOut = LPTokenOut
+    deposit.Flags |= AMMDepositFlags.tfLPToken
     assert.doesNotThrow(() => validate(deposit))
   })
 
   it(`verifies valid AMMDeposit with Amount`, function () {
     deposit.Amount = '1000'
+    deposit.Flags |= AMMDepositFlags.tfSingleAsset
     assert.doesNotThrow(() => validate(deposit))
   })
 
   it(`verifies valid AMMDeposit with Amount and Amount2`, function () {
     deposit.Amount = '1000'
     deposit.Amount2 = '1000'
+    deposit.Flags |= AMMDepositFlags.tfTwoAsset
     assert.doesNotThrow(() => validate(deposit))
   })
 
   it(`verifies valid AMMDeposit with Amount and LPTokenOut`, function () {
     deposit.Amount = '1000'
     deposit.LPTokenOut = LPTokenOut
+    deposit.Flags |= AMMDepositFlags.tfOneAssetLPToken
     assert.doesNotThrow(() => validate(deposit))
   })
 
   it(`verifies valid AMMDeposit with Amount and EPrice`, function () {
     deposit.Amount = '1000'
     deposit.EPrice = '25'
+    deposit.Flags |= AMMDepositFlags.tfLimitLPToken
     assert.doesNotThrow(() => validate(deposit))
   })
 

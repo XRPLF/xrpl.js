@@ -10,6 +10,14 @@ import {
   AccountSetFlagsInterface,
   AccountSetTfFlags,
 } from '../transactions/accountSet'
+import {
+  AMMDepositFlags,
+  AMMDepositFlagsInterface,
+} from '../transactions/AMMDeposit'
+import {
+  AMMWithdrawFlags,
+  AMMWithdrawFlagsInterface,
+} from '../transactions/AMMWithdraw'
 import { GlobalFlags } from '../transactions/common'
 import {
   OfferCreateFlagsInterface,
@@ -63,6 +71,12 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
     case 'AccountSet':
       tx.Flags = convertAccountSetFlagsToNumber(tx.Flags)
       return
+    case 'AMMDeposit':
+      tx.Flags = convertAMMDepositFlagsToNumber(tx.Flags)
+      return
+    case 'AMMWithdraw':
+      tx.Flags = convertAMMWithdrawFlagsToNumber(tx.Flags)
+      return
     case 'OfferCreate':
       tx.Flags = convertOfferCreateFlagsToNumber(tx.Flags)
       return
@@ -84,6 +98,18 @@ function convertAccountSetFlagsToNumber(
   flags: AccountSetFlagsInterface,
 ): number {
   return reduceFlags(flags, AccountSetTfFlags)
+}
+
+function convertAMMDepositFlagsToNumber(
+  flags: AMMDepositFlagsInterface,
+): number {
+  return reduceFlags(flags, AMMDepositFlags)
+}
+
+function convertAMMWithdrawFlagsToNumber(
+  flags: AMMWithdrawFlagsInterface,
+): number {
+  return reduceFlags(flags, AMMWithdrawFlags)
 }
 
 function convertOfferCreateFlagsToNumber(
