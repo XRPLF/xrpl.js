@@ -40,9 +40,9 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: ${{ runner.os }}-deps-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-deps-${{ env.cache-name }}-
+            ${{ runner.os }}-deps-${{ matrix.node-version }}-
             ${{ runner.os }}-deps-
 
       - name: Install Dependencies
@@ -82,9 +82,9 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: ${{ runner.os }}-deps-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-deps-${{ env.cache-name }}-
+            ${{ runner.os }}-deps-${{ matrix.node-version }}-
             ${{ runner.os }}-deps-
 
       - name: Install Dependencies
@@ -132,9 +132,9 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: ${{ runner.os }}-deps-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-deps-${{ env.cache-name }}-
+            ${{ runner.os }}-deps-${{ matrix.node-version }}-
             ${{ runner.os }}-deps-
 
       - name: Install Dependencies
@@ -185,9 +185,9 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: ${{ runner.os }}-deps-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-deps-${{ env.cache-name }}-
+            ${{ runner.os }}-deps-${{ matrix.node-version }}-
             ${{ runner.os }}-deps-
 
       - name: Install Dependencies
