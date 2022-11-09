@@ -4,10 +4,36 @@ import { Amount, Issue, IssuedCurrencyAmount } from '../common'
 
 import {
   BaseTransaction,
+  GlobalFlags,
   isAmount,
   isIssuedCurrency,
   validateBaseTransaction,
 } from './common'
+
+/**
+ * Enum representing values for AMMWithdrawFlags Transaction Flags.
+ *
+ * @category Transaction Flags
+ */
+export enum AMMWithdrawFlags {
+  tfLPToken = 0x00010000,
+  tfWithdrawAll = 0x00020000,
+  tfOneAssetWithdrawAll = 0x00040000,
+  tfSingleAsset = 0x00080000,
+  tfTwoAsset = 0x00100000,
+  tfOneAssetLPToken = 0x00200000,
+  tfLimitLPToken = 0x00400000,
+}
+
+export interface AMMWithdrawFlagsInterface extends GlobalFlags {
+  tfLPToken?: boolean
+  tfWithdrawAll?: boolean
+  tfOneAssetWithdrawAll?: boolean
+  tfSingleAsset?: boolean
+  tfTwoAsset?: boolean
+  tfOneAssetLPToken?: boolean
+  tfLimitLPToken?: boolean
+}
 
 /**
  * AMMWithdraw is the withdraw transaction used to remove liquidity from the AMM

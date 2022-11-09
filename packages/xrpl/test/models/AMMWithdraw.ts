@@ -1,5 +1,6 @@
+/* eslint-disable no-bitwise -- bitwise necessary for enabling flags */
 import { assert } from 'chai'
-import { validate, ValidationError } from 'xrpl-local'
+import { AMMWithdrawFlags, validate, ValidationError } from 'xrpl-local'
 
 /**
  * AMMWithdraw Transaction Verification Testing.
@@ -19,6 +20,7 @@ describe('AMMWithdraw', function () {
       TransactionType: 'AMMWithdraw',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Sequence: 1337,
+      Flags: 0,
     } as any
   })
 
@@ -29,6 +31,7 @@ describe('AMMWithdraw', function () {
 
   it(`verifies valid AMMWithdraw with Amount`, function () {
     withdraw.Amount = '1000'
+    withdraw.Flags |= AMMWithdrawFlags.tfSingleAsset
     assert.doesNotThrow(() => validate(withdraw))
   })
 

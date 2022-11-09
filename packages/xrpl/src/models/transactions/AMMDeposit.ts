@@ -4,10 +4,32 @@ import { Amount, Issue, IssuedCurrencyAmount } from '../common'
 
 import {
   BaseTransaction,
+  GlobalFlags,
   isAmount,
   isIssuedCurrency,
   validateBaseTransaction,
 } from './common'
+
+/**
+ * Enum representing values for AMMDeposit Transaction Flags.
+ *
+ * @category Transaction Flags
+ */
+export enum AMMDepositFlags {
+  tfLPToken = 0x00010000,
+  tfSingleAsset = 0x00080000,
+  tfTwoAsset = 0x00100000,
+  tfOneAssetLPToken = 0x00200000,
+  tfLimitLPToken = 0x00400000,
+}
+
+export interface AMMDepositFlagsInterface extends GlobalFlags {
+  tfLPToken?: boolean
+  tfSingleAsset?: boolean
+  tfTwoAsset?: boolean
+  tfOneAssetLPToken?: boolean
+  tfLimitLPToken?: boolean
+}
 
 /**
  * AMMDeposit is the deposit transaction used to add liquidity to the AMM instance pool,
