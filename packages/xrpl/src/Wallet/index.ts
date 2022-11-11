@@ -15,6 +15,7 @@ import {
   encodeForMultisigning,
   encode,
 } from 'ripple-binary-codec'
+import { DefinitionContents, DEFINITIONS } from 'ripple-binary-codec/dist/enums'
 import {
   deriveAddress,
   deriveKeypair,
@@ -309,6 +310,7 @@ class Wallet {
    * @param this - Wallet instance.
    * @param transaction - A transaction to be signed offline.
    * @param multisign - Specify true/false to use multisign or actual address (classic/x-address) to make multisign tx request.
+   * @param customDefinitions - Custom rippled type defintions used for sidechains and new amendments.
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    * @throws XrplError if the issued currency being signed is XRP ignoring case.
@@ -318,6 +320,7 @@ class Wallet {
     this: Wallet,
     transaction: Transaction,
     multisign?: boolean | string,
+    customDefinitions: DefinitionContents = DEFINITIONS,
   ): {
     tx_blob: string
     hash: string
@@ -342,6 +345,12 @@ class Wallet {
     const txToSignAndEncode = { ...tx }
 
     txToSignAndEncode.SigningPubKey = multisignAddress ? '' : this.publicKey
+    if (tx.SigningPubKey && txToSignAndEncode.SigningPubKey == '') {
+      throw new ValidationError(
+        'When multisigning, SigningPubKey should not be set, but it was set to ' +
+          tx.SigningPubKey,
+      )
+    }
 
     if (multisignAddress) {
       const signer = {
@@ -351,6 +360,7 @@ class Wallet {
           txToSignAndEncode,
           this.privateKey,
           multisignAddress,
+          customDefinitions,
         ),
       }
       txToSignAndEncode.Signers = [{ Signer: signer }]
@@ -358,14 +368,16 @@ class Wallet {
       txToSignAndEncode.TxnSignature = computeSignature(
         txToSignAndEncode,
         this.privateKey,
+        undefined,
+        customDefinitions,
       )
     }
 
-    const serialized = encode(txToSignAndEncode)
-    this.checkTxSerialization(serialized, tx)
+    const serialized = encode(txToSignAndEncode, customDefinitions)
+    this.checkTxSerialization(serialized, tx, customDefinitions)
     return {
       tx_blob: serialized,
-      hash: hashSignedTx(serialized),
+      hash: hashSignedTx(serialized, customDefinitions),
     }
   }
 
@@ -373,11 +385,15 @@ class Wallet {
    * Verifies a signed transaction offline.
    *
    * @param signedTransaction - A signed transaction (hex string of signTransaction result) to be verified offline.
+   * @param customDefinitions - Custom rippled type definitions. Used for sidechains and new amendments.
    * @returns Returns true if a signedTransaction is valid.
    */
-  public verifyTransaction(signedTransaction: string): boolean {
-    const tx = decode(signedTransaction)
-    const messageHex: string = encodeForSigning(tx)
+  public verifyTransaction(
+    signedTransaction: string,
+    customDefinitions: DefinitionContents = DEFINITIONS,
+  ): boolean {
+    const tx = decode(signedTransaction, customDefinitions)
+    const messageHex: string = encodeForSigning(tx, customDefinitions)
     const signature = tx.TxnSignature
     return verify(messageHex, signature, this.publicKey)
   }
@@ -400,14 +416,19 @@ class Wallet {
    *
    * @param serialized - A signed and serialized transaction.
    * @param tx - The transaction prior to signing.
+   * @param customDefinitions - Custom rippled type definitions. Used for sidechains and new amendments.
    * @throws A ValidationError if the transaction does not have a TxnSignature/Signers property, or if
    * the serialized Transaction desn't match the original transaction.
    * @throws XrplError if the transaction includes an issued currency which is equivalent to XRP ignoring case.
    */
   // eslint-disable-next-line class-methods-use-this, max-lines-per-function -- Helper for organization purposes
-  private checkTxSerialization(serialized: string, tx: Transaction): void {
+  private checkTxSerialization(
+    serialized: string,
+    tx: Transaction,
+    customDefinitions: DefinitionContents = DEFINITIONS,
+  ): void {
     // Decode the serialized transaction:
-    const decoded = decode(serialized)
+    const decoded = decode(serialized, customDefinitions)
     const txCopy = { ...tx }
 
     /*
@@ -522,21 +543,26 @@ class Wallet {
  * @param privateKey - A key to sign the transaction with.
  * @param signAs - Multisign only. An account address to include in the Signer field.
  * Can be either a classic address or an XAddress.
+ * @param customDefinitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns A signed transaction in the proper format.
  */
 function computeSignature(
   tx: Transaction,
   privateKey: string,
   signAs?: string,
+  customDefinitions: DefinitionContents = DEFINITIONS,
 ): string {
   if (signAs) {
     const classicAddress = isValidXAddress(signAs)
       ? xAddressToClassicAddress(signAs).classicAddress
       : signAs
 
-    return sign(encodeForMultisigning(tx, classicAddress), privateKey)
+    return sign(
+      encodeForMultisigning(tx, classicAddress, customDefinitions),
+      privateKey,
+    )
   }
-  return sign(encodeForSigning(tx), privateKey)
+  return sign(encodeForSigning(tx, customDefinitions), privateKey)
 }
 
 /**

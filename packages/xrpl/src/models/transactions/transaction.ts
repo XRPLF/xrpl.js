@@ -3,6 +3,7 @@
 
 import _ from 'lodash'
 import { encode, decode } from 'ripple-binary-codec'
+import { DefinitionContents, DEFINITIONS } from 'ripple-binary-codec/dist/enums'
 
 import { ValidationError } from '../../errors'
 import { setTransactionFlagsToNumber } from '../utils/flags'
@@ -93,10 +94,14 @@ export interface TransactionAndMetadata {
  * Encode/decode and individual type validation.
  *
  * @param transaction - A Transaction.
+ * @param customDefinitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @throws ValidationError When the Transaction is malformed.
  * @category Utilities
  */
-export function validate(transaction: Record<string, unknown>): void {
+export function validate(
+  transaction: Record<string, unknown>,
+  customDefinitions: DefinitionContents = DEFINITIONS,
+): void {
   const tx = { ...transaction }
   if (tx.TransactionType == null) {
     throw new ValidationError('Object does not have a `TransactionType`')
@@ -211,7 +216,7 @@ export function validate(transaction: Record<string, unknown>): void {
 
   if (
     !_.isEqual(
-      decode(encode(tx)),
+      decode(encode(tx, customDefinitions), customDefinitions),
       _.omitBy(tx, (value) => value == null),
     )
   ) {

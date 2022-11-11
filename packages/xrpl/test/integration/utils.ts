@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 import { decode } from 'ripple-binary-codec'
+import { DefinitionContents } from 'ripple-binary-codec/dist/enums'
 import { Client, Wallet, AccountInfoRequest } from 'xrpl-local'
 import { Payment, Transaction } from 'xrpl-local/models/transactions'
 import { hashSignedTx } from 'xrpl-local/utils/hashes'
@@ -52,6 +53,7 @@ export async function verifySubmittedTransaction(
   client: Client,
   tx: Transaction | string,
   hashTx?: string,
+  customDefinitions?: DefinitionContents,
 ): Promise<void> {
   const hash = hashTx ?? hashSignedTx(tx)
   const data = await client.request({
@@ -69,7 +71,7 @@ export async function verifySubmittedTransaction(
       'meta',
       'validated',
     ]),
-    typeof tx === 'string' ? decode(tx) : tx,
+    typeof tx === 'string' ? decode(tx, customDefinitions) : tx,
   )
   if (typeof data.result.meta === 'object') {
     assert.strictEqual(data.result.meta.TransactionResult, 'tesSUCCESS')

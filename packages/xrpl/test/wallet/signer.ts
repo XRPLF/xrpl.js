@@ -7,6 +7,9 @@ import {
   multisign,
   verifySignature,
 } from 'xrpl-local/Wallet/signer'
+import * as customDefinitions from '../fixtures/rippled/definitions-with-diff-payment.json'
+import { coreTypes } from 'ripple-binary-codec/dist/types'
+import { DefinitionContents } from 'ripple-binary-codec/dist/enums'
 
 const publicKey =
   '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
@@ -209,6 +212,19 @@ describe('Signer', function () {
     )
   })
 
+  it('authorizeChannel succeeds with unrelated custom definitions', function () {
+    const newDefs = new DefinitionContents(customDefinitions, coreTypes)
+    const secpWallet = Wallet.fromSeed('snGHNrPbHrdUcszeuDEigMdC1Lyyd')
+    const channelId =
+      '5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3'
+    const amount = '1000000'
+
+    assert.equal(
+      authorizeChannel(secpWallet, channelId, amount, newDefs),
+      '304402204E7052F33DDAFAAA55C9F5B132A5E50EE95B2CF68C0902F61DFE77299BC893740220353640B951DCD24371C16868B3F91B78D38B6F3FD1E826413CDF891FA8250AAC',
+    )
+  })
+
   it('verifySignature succeeds for valid signed transaction blob', function () {
     const signedTx = verifyWallet.sign(tx)
 
@@ -233,5 +249,65 @@ describe('Signer', function () {
       '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020'
 
     assert.isFalse(verifySignature(decodedTx))
+  })
+
+  it('should validly sign a transaction with custom defs', async function () {
+    const newDefs = new DefinitionContents(customDefinitions, coreTypes)
+    const signedTx = verifyWallet.sign(tx, false, newDefs)
+
+    const decodedTx = decode(
+      signedTx.tx_blob,
+      newDefs,
+    ) as unknown as Transaction
+
+    assert.isTrue(verifySignature(decodedTx, newDefs))
+  })
+
+  it('should fail to multisign transaction with SigningPubKey set', async function () {
+    assert.throws(() => verifyWallet.sign(tx, true))
+  })
+
+  it('should be able to multisign a transaction with custom defs', async function () {
+    const newDefs = new DefinitionContents(customDefinitions, coreTypes)
+    const wallet1 = Wallet.fromSeed('sEdTqWgUWAqvrL3AZyJDhVVa4V6LX3E')
+    const wallet2 = Wallet.fromSeed('sEdTco3Gx6dQzzdPovjGAMjU3v5SJ4S')
+
+    const txToMultisign = Object.assign({}, tx)
+    delete txToMultisign.SigningPubKey
+
+    const signedTx1 = wallet1.sign(txToMultisign, true, newDefs)
+    const signedTx2 = wallet2.sign(txToMultisign, true, newDefs)
+
+    const combinedTx = multisign(
+      [signedTx1.tx_blob, signedTx2.tx_blob],
+      newDefs,
+    )
+
+    const decodedTx = decode(combinedTx, newDefs) as unknown as Transaction
+    const expectedMultisignWithNewDefs = Object.assign({}, txToMultisign, {
+      Signers: [
+        {
+          Signer: {
+            Account: 'rp63BA1ieY2Kd16tGACZLDcFmQifVK3uSF',
+            SigningPubKey:
+              'ED6674228E890490BEE792C3C414725FAC2CF97633920811CB2604867D825ED734',
+            TxnSignature:
+              'E2B8ADB8CA89284B914C047F43D55A6FD95B10A6585EB2776375F6EBC9D5D6295B4C6E545AEE3D69C8E7DD0ADA1DCBF57CA146CB03CC13BB5B94B752C9895701',
+          },
+        },
+        {
+          Signer: {
+            Account: 'rLYyGaKM7Rfn7rfgy6fqFwLFGVTXNRefbN',
+            SigningPubKey:
+              'ED0A00DDCBFD7BBD33610D973AF6474DE7895E81013888661DECB8F38E5A166090',
+            TxnSignature:
+              'B5E48019F29074244063769B522DD329AB849EF3C31A958CB1234F7FD378E1531D4A0CE5DCD1B5026A5490D84D46CDEDAF3A265958CBAF6814687BB96348D20C',
+          },
+        },
+      ],
+      SigningPubKey: '',
+    })
+
+    assert.deepEqual(decodedTx, expectedMultisignWithNewDefs)
   })
 })

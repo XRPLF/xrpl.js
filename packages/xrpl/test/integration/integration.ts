@@ -1,10 +1,18 @@
 import assert from 'assert'
 
 import _ from 'lodash'
-import { Client } from 'xrpl-local'
-import { AccountSet, SignerListSet } from 'xrpl-local/models/transactions'
+import { DefinitionContents } from 'ripple-binary-codec/dist/enums'
+import { coreTypes } from 'ripple-binary-codec/dist/types'
+import { Client, RippledError } from 'xrpl-local'
+import {
+  AccountSet,
+  Payment,
+  SignerListSet,
+} from 'xrpl-local/models/transactions'
 import { convertStringToHex } from 'xrpl-local/utils'
 import { multisign } from 'xrpl-local/Wallet/signer'
+import * as newDefinitions from '../fixtures/rippled/definitions-with-massively-diff-payment.json'
+import { assertRejects } from '../testUtils'
 
 import serverUrl from './serverUrl'
 import { setupClient, teardownClient } from './setup'
@@ -69,5 +77,40 @@ describe('integration tests', function () {
     await ledgerAccept(client)
     assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
     await verifySubmittedTransaction(this.client, multisignedTx)
+  })
+
+  it('submitting an invalid transaction with proper custom types should send, but be rejected by rippled', async function () {
+    const client: Client = this.client
+    const wallet1 = await generateFundedWallet(client)
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: wallet1.address,
+      Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+      Amount: '20000000',
+      Sequence: 1,
+      Fee: '12',
+    }
+
+    const newDefs = new DefinitionContents(newDefinitions, coreTypes)
+
+    // It should successfully submit, but fail once rippled sees it since the new type definition is not on-ledger.
+    await assertRejects(
+      client.submit(tx, {
+        wallet: wallet1,
+        customDefinitions: newDefs,
+      }),
+      RippledError,
+      'invalidTransaction',
+    )
+
+    // Same for submitAndWait
+    await assertRejects(
+      client.submitAndWait(tx, {
+        wallet: wallet1,
+        customDefinitions: newDefs,
+      }),
+      RippledError,
+      'invalidTransaction',
+    )
   })
 })
