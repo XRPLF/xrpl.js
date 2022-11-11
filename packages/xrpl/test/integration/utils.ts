@@ -49,6 +49,7 @@ export async function generateFundedWallet(client: Client): Promise<Wallet> {
   return wallet
 }
 
+// eslint-disable-next-line max-params -- all parameters are necessary
 export async function verifySubmittedTransaction(
   client: Client,
   tx: Transaction | string,

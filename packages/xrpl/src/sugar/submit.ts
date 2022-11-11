@@ -62,6 +62,7 @@ async function submit(
  * @param opts.autofill - If true, autofill a transaction.
  * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
  * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+ * @param opts.customDefinitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
  */
 async function submitAndWait(
@@ -106,6 +107,7 @@ async function submitAndWait(
 // Helper functions
 
 // Encodes and submits a signed transaction.
+// eslint-disable-next-line max-params -- All params are required
 async function submitRequest(
   client: Client,
   signedTransaction: Transaction | string,

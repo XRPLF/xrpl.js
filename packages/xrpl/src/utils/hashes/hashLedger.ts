@@ -217,7 +217,7 @@ function computeStateHash(
 
   const stateHash = hashStateTree(
     ledger.accountState,
-    options?.customDefinitions,
+    options.customDefinitions,
   )
 
   if (account_hash !== stateHash) {

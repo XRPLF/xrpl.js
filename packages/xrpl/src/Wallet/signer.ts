@@ -7,6 +7,7 @@ import {
   encodeForSigning,
   encodeForSigningClaim,
 } from 'ripple-binary-codec'
+import { DefinitionContents, DEFINITIONS } from 'ripple-binary-codec/dist/enums'
 import { sign as signWithKeypair, verify } from 'ripple-keypairs'
 
 import { ValidationError } from '../errors'
@@ -14,14 +15,13 @@ import { Signer } from '../models/common'
 import { Transaction, validate } from '../models/transactions'
 
 import Wallet from '.'
-import { DefinitionContents, DEFINITIONS } from 'ripple-binary-codec/dist/enums'
 
 /**
  * Takes several transactions with Signer fields (in object or blob form) and creates a
  * single transaction with all Signers that then gets signed and returned.
  *
  * @param transactions - An array of signed Transactions (in object or blob form) to combine into a single signed Transaction.
- * @param customDefinitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @param customDefinitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A single signed Transaction which has all Signers from transactions within it.
  * @throws ValidationError if:
  * - There were no transactions given to sign
@@ -78,10 +78,11 @@ function multisign(
  * @param wallet - The account that will sign for this payment channel.
  * @param channelId - An id for the payment channel to redeem XRP from.
  * @param amount - The amount in drops to redeem.
- * @param customDefinitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @param customDefinitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A signature that can be used to redeem a specific amount of XRP from a payment channel.
  * @category Utilities
  */
+// eslint-disable-next-line max-params -- Parameters are necessary
 function authorizeChannel(
   wallet: Wallet,
   channelId: string,
@@ -103,7 +104,7 @@ function authorizeChannel(
  * Verifies that the given transaction has a valid signature based on public-key encryption.
  *
  * @param tx - A transaction to verify the signature of. (Can be in object or encoded string format).
- * @param customDefinitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @param customDefinitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns Returns true if tx has a valid signature, and returns false otherwise.
  * @category Utilities
  */
@@ -180,9 +181,9 @@ function addressToBigNumber(address: string): BigNumber {
 /**
  * Normalizes txOrBlob to Transaction format.
  *
- * @param txOrBlob the transaction either Transaction or blob format.
- * @param customDefinitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
- * @returns
+ * @param txOrBlob - the transaction either Transaction or blob format.
+ * @param customDefinitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @returns txOrBlob in Transaction format.
  */
 function getDecodedTransaction(
   txOrBlob: Transaction | string,

@@ -1,4 +1,5 @@
 /* eslint-disable max-lines -- There are lots of equivalent constructors which make sense to have here. */
+/* eslint-disable max-params -- The function parameters are necessary */
 import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
@@ -345,10 +346,9 @@ class Wallet {
     const txToSignAndEncode = { ...tx }
 
     txToSignAndEncode.SigningPubKey = multisignAddress ? '' : this.publicKey
-    if (tx.SigningPubKey && txToSignAndEncode.SigningPubKey == '') {
+    if (tx.SigningPubKey && txToSignAndEncode.SigningPubKey === '') {
       throw new ValidationError(
-        'When multisigning, SigningPubKey should not be set, but it was set to ' +
-          tx.SigningPubKey,
+        `When multisigning, SigningPubKey should not be set, but it was set to ${tx.SigningPubKey}`,
       )
     }
 

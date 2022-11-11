@@ -1,5 +1,7 @@
 import { assert } from 'chai'
 import { decode, encode } from 'ripple-binary-codec/dist'
+import { DefinitionContents } from 'ripple-binary-codec/dist/enums'
+import { coreTypes } from 'ripple-binary-codec/dist/types'
 import { Transaction, ValidationError } from 'xrpl-local'
 import Wallet from 'xrpl-local/Wallet'
 import {
@@ -7,9 +9,8 @@ import {
   multisign,
   verifySignature,
 } from 'xrpl-local/Wallet/signer'
+
 import * as customDefinitions from '../fixtures/rippled/definitions-with-diff-payment.json'
-import { coreTypes } from 'ripple-binary-codec/dist/types'
-import { DefinitionContents } from 'ripple-binary-codec/dist/enums'
 
 const publicKey =
   '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
@@ -272,7 +273,7 @@ describe('Signer', function () {
     const wallet1 = Wallet.fromSeed('sEdTqWgUWAqvrL3AZyJDhVVa4V6LX3E')
     const wallet2 = Wallet.fromSeed('sEdTco3Gx6dQzzdPovjGAMjU3v5SJ4S')
 
-    const txToMultisign = Object.assign({}, tx)
+    const txToMultisign = { ...tx }
     delete txToMultisign.SigningPubKey
 
     const signedTx1 = wallet1.sign(txToMultisign, true, newDefs)
@@ -284,29 +285,28 @@ describe('Signer', function () {
     )
 
     const decodedTx = decode(combinedTx, newDefs) as unknown as Transaction
-    const expectedMultisignWithNewDefs = Object.assign({}, txToMultisign, {
-      Signers: [
-        {
-          Signer: {
-            Account: 'rp63BA1ieY2Kd16tGACZLDcFmQifVK3uSF',
-            SigningPubKey:
-              'ED6674228E890490BEE792C3C414725FAC2CF97633920811CB2604867D825ED734',
-            TxnSignature:
-              'E2B8ADB8CA89284B914C047F43D55A6FD95B10A6585EB2776375F6EBC9D5D6295B4C6E545AEE3D69C8E7DD0ADA1DCBF57CA146CB03CC13BB5B94B752C9895701',
-          },
+    const expectedMultisignWithNewDefs = { ...txToMultisign }
+    expectedMultisignWithNewDefs.Signers = [
+      {
+        Signer: {
+          Account: 'rp63BA1ieY2Kd16tGACZLDcFmQifVK3uSF',
+          SigningPubKey:
+            'ED6674228E890490BEE792C3C414725FAC2CF97633920811CB2604867D825ED734',
+          TxnSignature:
+            'E2B8ADB8CA89284B914C047F43D55A6FD95B10A6585EB2776375F6EBC9D5D6295B4C6E545AEE3D69C8E7DD0ADA1DCBF57CA146CB03CC13BB5B94B752C9895701',
         },
-        {
-          Signer: {
-            Account: 'rLYyGaKM7Rfn7rfgy6fqFwLFGVTXNRefbN',
-            SigningPubKey:
-              'ED0A00DDCBFD7BBD33610D973AF6474DE7895E81013888661DECB8F38E5A166090',
-            TxnSignature:
-              'B5E48019F29074244063769B522DD329AB849EF3C31A958CB1234F7FD378E1531D4A0CE5DCD1B5026A5490D84D46CDEDAF3A265958CBAF6814687BB96348D20C',
-          },
+      },
+      {
+        Signer: {
+          Account: 'rLYyGaKM7Rfn7rfgy6fqFwLFGVTXNRefbN',
+          SigningPubKey:
+            'ED0A00DDCBFD7BBD33610D973AF6474DE7895E81013888661DECB8F38E5A166090',
+          TxnSignature:
+            'B5E48019F29074244063769B522DD329AB849EF3C31A958CB1234F7FD378E1531D4A0CE5DCD1B5026A5490D84D46CDEDAF3A265958CBAF6814687BB96348D20C',
         },
-      ],
-      SigningPubKey: '',
-    })
+      },
+    ]
+    expectedMultisignWithNewDefs.SigningPubKey = ''
 
     assert.deepEqual(decodedTx, expectedMultisignWithNewDefs)
   })

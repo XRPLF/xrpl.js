@@ -102,7 +102,7 @@ function encodeForSigning(
   object: Transaction,
   customDefinitions: DefinitionContents = DEFINITIONS,
 ): string {
-  return rbc.encodeForSigning(object)
+  return rbc.encodeForSigning(object, customDefinitions)
 }
 
 /**

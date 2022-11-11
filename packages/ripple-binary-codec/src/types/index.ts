@@ -39,7 +39,6 @@ const coreTypes: Record<string, typeof SerializedType> = {
 // because some of the above types depend on BinarySerailizer which depends on enums/index.ts.
 DEFINITIONS.associateTypes(coreTypes)
 
-// eslint-disable-next-line max-len -- Exporting a bunch of files is fine.
 export {
   coreTypes,
   AccountID,
