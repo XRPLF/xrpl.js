@@ -144,7 +144,6 @@ describe('subscribe', () => {
     TIMEOUT,
   )
 
-  // Note: This test use '.then' to avoid awaits in order to use 'done' style tests.
   it(
     'Emits ledger',
     async () => {

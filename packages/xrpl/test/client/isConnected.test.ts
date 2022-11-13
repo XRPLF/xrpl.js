@@ -12,7 +12,9 @@ describe('client.isConnected', () => {
   beforeEach(async () => {
     testContext = await setupClient()
   })
-  afterEach(async () => teardownClient(testContext))
+  afterEach(async () => {
+    await teardownClient(testContext)
+  })
 
   it('disconnect & isConnected', async () => {
     assert.strictEqual(testContext.client.isConnected(), true)

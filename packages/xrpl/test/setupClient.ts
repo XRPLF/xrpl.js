@@ -3,13 +3,14 @@ import { Client, BroadcastClient } from 'xrpl-local'
 import createMockRippled, {
   type MockedWebSocketServer,
 } from './createMockRippled'
-import { getFreePort } from './testUtils'
+import { destroyServer, getFreePort } from './testUtils'
 
 export interface XrplTestContext {
   client: Client | BroadcastClient
   _mockedServerPort?: number
   mockRippled?: MockedWebSocketServer
   mocks?: MockedWebSocketServer[]
+  servers?: number[]
 }
 
 async function setupMockRippledConnection(
@@ -19,6 +20,7 @@ async function setupMockRippledConnection(
     mockRippled: createMockRippled(port),
     _mockedServerPort: port,
     client: new Client(`ws://localhost:${port}`),
+    servers: [port],
   }
 
   context.client.on('error', () => {
@@ -35,6 +37,7 @@ async function setupMockRippledConnectionForBroadcast(
   const context: XrplTestContext = {
     mocks: ports.map((port) => createMockRippled(port)),
     client: new BroadcastClient(servers),
+    servers: ports,
   }
 
   return context.client.connect().then(() => context)
@@ -58,18 +61,33 @@ async function teardownClient(
 ): Promise<void> {
   return incomingContext.client
     .disconnect()
-    .then(() => {
-      // eslint-disable-next-line no-negated-condition -- Easier to read with negation
-      if (incomingContext.mockRippled != null) {
-        incomingContext.mockRippled.close()
-      } else {
-        incomingContext.mocks?.forEach((mock: { close: () => void }) =>
-          mock.close(),
-        )
-      }
-      if (done) {
-        setImmediate(done)
-      }
+    .then(async () => {
+      return new Promise<void>((resolve) => {
+        // eslint-disable-next-line no-negated-condition -- Easier to read with negation
+        if (incomingContext.mockRippled != null) {
+          incomingContext.mockRippled.close(() => {
+            resolve()
+          })
+        } else {
+          resolve()
+        }
+      })
+      // // eslint-disable-next-line no-negated-condition -- Easier to read with negation
+      // if (incomingContext.mockRippled != null) {
+      //   incomingContext.mockRippled.close()
+      // } else {
+      //   incomingContext.mocks?.forEach((mock: { close: () => void }) =>
+      //     mock.close(),
+      //   )
+      // }
+      // if (done) {
+      //   setImmediate(done)
+      // }
+    })
+    .then(async () => {
+      await Promise.all(
+        incomingContext.servers?.map(async (port) => destroyServer(port)) ?? [],
+      )
     })
     .catch((err) => {
       // eslint-disable-next-line no-console -- console.error is fine in tests

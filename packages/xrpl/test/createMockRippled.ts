@@ -8,7 +8,7 @@ import type {
   ErrorResponse,
 } from 'xrpl-local/models/methods/baseMethod'
 
-import { getFreePort } from './testUtils'
+import { destroyServer, getFreePort } from './testUtils'
 
 function createResponse(
   request: { id: number | string },
@@ -76,6 +76,11 @@ export type MockedWebSocketServer = WebSocketServer &
       },
     ) => void
   }
+
+export function destroyMockRippled(server: MockedWebSocketServer): void {
+  server.removeAllListeners()
+  server.close()
+}
 
 export default function createMockRippled(port: number): MockedWebSocketServer {
   const mock = new WebSocketServer({ port }) as MockedWebSocketServer
@@ -177,8 +182,9 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
         }),
       )
     } else if (request.data.openOnOtherPort) {
-      getFreePort().then((newPort) => {
-        createMockRippled(newPort)
+      // TODO: This promise is never awaited
+      getFreePort().then(async (newPort) => {
+        createMockRippled(port)
         conn.send(
           createResponse(request, {
             status: 'success',
@@ -186,6 +192,7 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
             result: { port: newPort },
           }),
         )
+        return destroyServer(newPort)
       })
     } else if (request.data.closeServerAndReopen) {
       setTimeout(() => {

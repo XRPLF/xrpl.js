@@ -30,43 +30,6 @@ const getOrderbookOptionsSet = new Set([
   'taker',
 ])
 
-// eslint-disable-next-line complexity -- Necessary to validate options.
-function verifyOrderbookOptions(
-  options: {
-    limit?: number
-    ledger_index?: LedgerIndex
-    ledger_hash?: string
-    taker?: string
-  } = {},
-): void {
-  Object.keys(options).forEach((key) => {
-    if (!getOrderbookOptionsSet.has(key)) {
-      throw new ValidationError(`Unexpected option: ${key}`, options)
-    }
-  })
-
-  if (options.limit && typeof options.limit !== 'number') {
-    throw new ValidationError('limit must be a number', options.limit)
-  } else if (
-    options.ledger_index &&
-    typeof options.ledger_index !== 'number' &&
-    typeof options.ledger_index === 'string' &&
-    !['validated', 'closed', 'current'].includes(options.ledger_index)
-  ) {
-    throw new ValidationError(
-      'ledger_index must be a number or a string of "validated", "closed", or "current"',
-      options.ledger_index,
-    )
-  } else if (options.ledger_hash && typeof options.ledger_hash !== 'string') {
-    throw new ValidationError(
-      'ledger_hash must be a string',
-      options.ledger_hash,
-    )
-  } else if (options.taker && typeof options.taker !== 'string') {
-    throw new ValidationError('taker must be a string', options.taker)
-  }
-}
-
 /**
  * Fetch orderbook (buy/sell orders) between two accounts.
  *
@@ -85,7 +48,7 @@ function verifyOrderbookOptions(
  * the order book. Defaults to 20.
  * @returns An object containing buy and sell objects.
  */
-// eslint-disable-next-line max-params -- Once bound to Client, getOrderbook only has 3 parameters.
+// eslint-disable-next-line max-params, complexity -- Once bound to Client, getOrderbook only has 3 parameters.
 async function getOrderbook(
   this: Client,
   takerPays: TakerAmount,
@@ -93,23 +56,62 @@ async function getOrderbook(
   options: {
     limit?: number
     ledger_index?: LedgerIndex
-    ledger_hash?: string
-    taker?: string
+    ledger_hash?: string | null
+    taker?: string | null
   } = {},
 ): Promise<{
   buy: BookOffer[]
   sell: BookOffer[]
 }> {
-  verifyOrderbookOptions(options)
+  Object.keys(options).forEach((key) => {
+    if (!getOrderbookOptionsSet.has(key)) {
+      throw new ValidationError(`Unexpected option: ${key}`, options)
+    }
+  })
+
+  if (options.limit && typeof options.limit !== 'number') {
+    throw new ValidationError('limit must be a number', options.limit)
+  }
+
+  if (
+    options.ledger_index &&
+    typeof options.ledger_index !== 'number' &&
+    typeof options.ledger_index === 'string' &&
+    !['validated', 'closed', 'current'].includes(options.ledger_index)
+  ) {
+    throw new ValidationError(
+      'ledger_index must be a number or a string of "validated", "closed", or "current"',
+      options.ledger_index,
+    )
+  }
+
+  if (
+    options.ledger_hash !== undefined &&
+    options.ledger_hash !== null &&
+    typeof options.ledger_hash !== 'string'
+  ) {
+    throw new ValidationError(
+      'ledger_hash must be a string',
+      options.ledger_hash,
+    )
+  }
+
+  if (
+    options.taker !== undefined &&
+    options.taker !== null &&
+    typeof options.taker !== 'string'
+  ) {
+    throw new ValidationError('taker must be a string', options.taker)
+  }
 
   const request: BookOffersRequest = {
     command: 'book_offers',
     taker_pays: takerPays,
     taker_gets: takerGets,
     ledger_index: options.ledger_index ?? 'validated',
-    ledger_hash: options.ledger_hash,
+    ledger_hash: options.ledger_hash === null ? undefined : options.ledger_hash,
     limit: options.limit ?? DEFAULT_LIMIT,
-    taker: options.taker,
+    taker: options.taker === null ? undefined : options.taker,
   }
   // 2. Make Request
   const directOfferResults = await this.requestAll(request)

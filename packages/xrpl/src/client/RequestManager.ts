@@ -100,7 +100,13 @@ export default class RequestManager {
     }
     const newRequest = JSON.stringify({ ...request, id: newId })
     const timer = setTimeout(() => {
-      this.reject(newId, new TimeoutError('Timeout for request', request))
+      this.reject(
+        newId,
+        new TimeoutError(
+          `Timeout for request: ${JSON.stringify(request)} with id ${newId}`,
+          request,
+        ),
+      )
     }, timeout)
     /*
      * Node.js won't exit if a timer is still running, so we tell Node to ignore.
@@ -111,6 +117,7 @@ export default class RequestManager {
       timer.unref()
     }
     if (this.promisesAwaitingResponse.has(newId)) {
+      clearTimeout(timer)
       throw new XrplError(`Response with id '${newId}' is already pending`)
     }
     const newPromise = new Promise<Response>(

@@ -1,6 +1,5 @@
 import { assert } from 'chai'
 import _ from 'lodash'
-// import debounce from 'lodash/debounce'
 import { decode } from 'ripple-binary-codec'
 import {
   Client,
@@ -78,11 +77,6 @@ async function runCommand({
     }
   } catch (error) {
     if (error instanceof TimeoutError || error instanceof NotConnectedError) {
-      // eslint-disable-next-line no-console -- We want to log the error
-      console.error('runCommand: Timeout or NotConnected Error: ', {
-        ...error,
-        ...retry,
-      })
       // retry
       return runCommand({
         client,

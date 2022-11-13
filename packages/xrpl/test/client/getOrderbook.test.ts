@@ -123,16 +123,24 @@ describe('client.getOrderbook', () => {
 
     testContext.mockRippled?.addResponse('book_offers', normalRippledResponse)
     await Promise.all(
-      invalidOptions.map(async (options) =>
-        assertRejects(
-          testContext.client.getOrderbook(
-            requests.getOrderbook.normal.takerPays,
-            requests.getOrderbook.normal.takerGets,
-            // @ts-expect-error Meant to be invalid for testing purposes
-            options,
-          ),
-          ValidationError,
-        ),
+      invalidOptions.map(
+        async (options) =>
+          new Promise<void>((resolve) => {
+            assertRejects(
+              testContext.client
+                .getOrderbook(
+                  requests.getOrderbook.normal.takerPays,
+                  requests.getOrderbook.normal.takerGets,
+                  // @ts-expect-error Meant to be invalid for testing purposes
+                  options,
+                )
+                .catch((error) => {
+                  resolve()
+                  throw error
+                }),
+              ValidationError,
+            )
+          }),
       ),
     )
   })

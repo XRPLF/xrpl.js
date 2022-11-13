@@ -79,6 +79,41 @@ export async function assertRejects(
   }
 }
 
+const lastSocketKeyMap: { [port: string]: number } = {}
+const socketMap: {
+  [port: string]:
+    | {
+        server: net.Server
+        sockets: { [socketKey: string]: net.Socket }
+      }
+    | undefined
+} = {}
+
+export async function destroyServer(port: number): Promise<void> {
+  // loop through all sockets and destroy them
+  if (socketMap[port]) {
+    Object.keys(socketMap[port]!.sockets).forEach(function (socketKey) {
+      socketMap[port]!.sockets[socketKey].destroy()
+    })
+  }
+
+  return new Promise((resolve, reject) => {
+    if (socketMap[port]) {
+      // after all the sockets are destroyed, we may close the server!
+      socketMap[port]!.server.close((error) => {
+        if (error) {
+          reject(error)
+          return
+        }
+
+        resolve()
+      })
+    } else {
+      resolve()
+    }
+  })
+}
+
 // using a free port instead of a constant port enables parallelization
 export async function getFreePort(): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -94,7 +129,25 @@ export async function getFreePort(): Promise<number> {
     server.on('error', function (error) {
       reject(error)
     })
-    server.listen(0)
+    const listener = server.listen(0)
+    // Keep track of all connections so we can destroy them at the end of the test
+    // This will prevent Jest from having open handles when all tests are done
+    listener.on('connection', (socket) => {
+      // generate a new, unique socket-key
+      lastSocketKeyMap[port] += 1
+      const lastSocketKey = lastSocketKeyMap[port]
+      // add socket when it is connected
+      if (socketMap[port]) {
+        socketMap[port]!.sockets[lastSocketKey] = socket
+      } else {
+        socketMap[port] = { sockets: { [lastSocketKey]: socket }, server }
+      }
+      socket.on('close', () => {
+        // remove socket when it is closed
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Necessary to delete key
+        delete socketMap[port]!.sockets[lastSocketKey]
+      })
+    })
   })
 }
 

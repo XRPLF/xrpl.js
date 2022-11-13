@@ -28,6 +28,28 @@ const TIMEOUT = 20000
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Necessary to get browser info
 const isBrowser = (process as any).browser
 
+let lastSocketKey = 0
+const socketMap: { [socketKey: string]: net.Socket } = {}
+
+async function destroyServer(server: net.Server): Promise<void> {
+  /* loop through all sockets and destroy them */
+  Object.keys(socketMap).forEach(function (socketKey) {
+    socketMap[socketKey].destroy()
+  })
+
+  return new Promise((resolve, reject) => {
+    // after all the sockets are destroyed, we may close the server!
+    server.close((error) => {
+      if (error) {
+        reject(error)
+        return
+      }
+
+      resolve()
+    })
+  })
+}
+
 async function createServer(): Promise<net.Server> {
   return new Promise((resolve, reject) => {
     const server = net.createServer()
@@ -37,7 +59,21 @@ async function createServer(): Promise<net.Server> {
     server.on('error', function (error) {
       reject(error)
     })
-    server.listen(0, '0.0.0.0')
+    const listener = server.listen(0, '0.0.0.0')
+    // Keep track of all connections so we can destroy them at the end of the test
+    // This will prevent Jest from having open handles when all tests are done
+    listener.on('connection', (socket) => {
+      // generate a new, unique socket-key
+      lastSocketKey += 1
+      const socketKey = lastSocketKey
+      // add socket when it is connected
+      socketMap[socketKey] = socket
+      socket.on('close', () => {
+        // remove socket when it is closed
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Necessary to delete key
+        delete socketMap[socketKey]
+      })
+    })
   })
 }
 
@@ -73,7 +109,6 @@ describe('Connection', () => {
     let originalConsoleLog
 
     beforeEach(async () => {
-      clientContext = await setupClient()
       mockedRequestData = { mocked: 'request' }
       mockedResponse = JSON.stringify({ mocked: 'response', id: 0 })
       expectedMessages = [
@@ -88,7 +123,6 @@ describe('Connection', () => {
     afterEach(async () => {
       // eslint-disable-next-line no-console -- Testing trace
       console.log = originalConsoleLog
-      await teardownClient(clientContext)
     })
 
     it(
@@ -194,9 +228,8 @@ describe('Connection', () => {
           socket.on('data', (data) => {
             const got = data.toString('ascii', 0, expect.length)
             assert.strictEqual(got, expect)
-            server.close()
             connection.disconnect()
-            resolve()
+            destroyServer(server).then(resolve)
           })
         })
       })
@@ -358,7 +391,11 @@ describe('Connection', () => {
               return 0
             })
 
-          const request = { command: 'subscribe', streams: ['ledger'] }
+          const request = {
+            command: 'subscribe',
+            streams: ['ledger'],
+            id: 'connectionSubscribe',
+          }
           return clientContext.client.connection.request(request)
         })
 
@@ -369,6 +406,10 @@ describe('Connection', () => {
           "Error: connect() timed out after 5000 ms. If your internet connection is working, the rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.",
         )
         expect(spy).toHaveBeenCalled()
+        // @ts-expect-error -- Promise throws timeout error after test is done
+        clientContext.client.connection.requestManager.resolve(
+          'connectionSubscribe',
+        )
       }
     },
     TIMEOUT,

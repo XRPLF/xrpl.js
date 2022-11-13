@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 import _ from 'lodash'
-import { EscrowFinish, EscrowCreate } from 'xrpl-local'
+import { EscrowFinish, EscrowCreate, unixTimeToRippleTime } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import {
@@ -11,7 +11,7 @@ import {
 import { generateFundedWallet, getXRPBalance, testTransaction } from '../utils'
 
 // how long before each test case times out
-const TIMEOUT = 20000
+const TIMEOUT = 30000
 
 describe('EscrowFinish', () => {
   let testContext: XrplIntegrationTestContext
@@ -34,6 +34,18 @@ describe('EscrowFinish', () => {
         })
       ).result.ledger.close_time
 
+      // Attempt to get the time after which we can check for the escrow to be finished.
+      // Sometimes thel edger close_time is in the future, so we need to wait for it to catch up.
+      const currentTimeUnix = Math.floor(new Date().getTime())
+      const currentTimeRipple = unixTimeToRippleTime(currentTimeUnix)
+      const closeTimeCurrentTimeDiff = currentTimeRipple - CLOSE_TIME
+      let waitTimeInMs = Math.min(
+        Math.abs(closeTimeCurrentTimeDiff) * 1000 + 5000,
+        // Maximum wait time of 20 seconds
+        20000,
+      )
+      waitTimeInMs = waitTimeInMs < 5000 ? 5000 : waitTimeInMs
+
       const AMOUNT = 10000
 
       const createTx: EscrowCreate = {
@@ -45,7 +57,7 @@ describe('EscrowFinish', () => {
       }
 
       const finishAfterPromise = new Promise((resolve) => {
-        setTimeout(resolve, 3000)
+        setTimeout(resolve, waitTimeInMs)
       })
 
       await testTransaction(testContext.client, createTx, testContext.wallet)

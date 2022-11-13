@@ -1,5 +1,3 @@
-const { pathsToModuleNameMapper } = require("ts-jest/utils");
-const { compilerOptions } = require("./tsconfig");
 const { TextDecoder, TextEncoder } = require("util");
 
 module.exports = {
@@ -12,9 +10,6 @@ module.exports = {
   collectCoverage: true,
   coveragePathIgnorePatterns: ["(tests/.*.mock).(jsx?|tsx?)$"],
   verbose: true,
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
-    prefix: "<rootDir>/../../",
-  }),
   testEnvironment: "node",
   globals: {
     TextDecoder: TextDecoder,
