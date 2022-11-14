@@ -144,5 +144,6 @@ describe('fundWallet', function () {
       account: wallet.classicAddress,
     })
     assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
+    await api.disconnect()
   })
 })
