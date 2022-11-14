@@ -4,7 +4,7 @@ import path from 'path'
 import { expect, assert } from 'chai'
 import puppeteer from 'puppeteer'
 
-const TIMEOUT = 120000
+const TIMEOUT = 150000
 interface TestCaseInfo {
   name: string
   span: string
