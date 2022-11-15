@@ -170,7 +170,7 @@ If you're using the XRP Ledger in production, you should run a [rippled server](
 
 + [Subscribe to ripple-server](https://groups.google.com/g/ripple-server)
 
-# How to upgrade gatsby & npm packages
+# How to upgrade npm packages
 
 We use a package called [npm-check-updates](https://www.npmjs.com/package/npm-check-updates). We use a file called `.ncurc.json` in order to filter which packages are skipped during update.
 
