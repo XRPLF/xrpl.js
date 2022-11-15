@@ -14,7 +14,7 @@ import { UInt64 } from './uint-64'
 import { UInt8 } from './uint-8'
 import { Vector256 } from './vector-256'
 import { type SerializedType } from './serialized-type'
-import { DEFINITIONS } from '../enums'
+import { DEFAULT_DEFINITIONS } from '../enums'
 
 const coreTypes: Record<string, typeof SerializedType> = {
   AccountID,
@@ -34,10 +34,10 @@ const coreTypes: Record<string, typeof SerializedType> = {
   Vector256,
 }
 
-// Ensures that the DEFINITIONS object connects these types to fields for serializing/deserializing
+// Ensures that the DEFAULT_DEFINITIONS object connects these types to fields for serializing/deserializing
 // This is done here instead of in enums/index.ts to avoid a circular dependency
 // because some of the above types depend on BinarySerailizer which depends on enums/index.ts.
-DEFINITIONS.associateTypes(coreTypes)
+DEFAULT_DEFINITIONS.associateTypes(coreTypes)
 
 export {
   coreTypes,

@@ -1,5 +1,9 @@
 import * as assert from 'assert'
-import { DefinitionContents, DEFINITIONS, FieldInstance } from '../enums'
+import {
+  DefinitionContents,
+  DEFAULT_DEFINITIONS,
+  FieldInstance,
+} from '../enums'
 import { type SerializedType } from '../types/serialized-type'
 import { Buffer } from 'buffer/'
 
@@ -13,12 +17,12 @@ class BinaryParser {
    * Initialize bytes to a hex string
    *
    * @param hexBytes a hex string
-   * @param customDefinitions Rippled definitions used to parse the values of transaction types and such.
+   * @param definitions Rippled definitions used to parse the values of transaction types and such.
    *                          Can be customized for sidechains and amendments.
    */
   constructor(
     hexBytes: string,
-    readonly customDefinitions: DefinitionContents = DEFINITIONS,
+    readonly definitions: DefinitionContents = DEFAULT_DEFINITIONS,
   ) {
     this.bytes = Buffer.from(hexBytes, 'hex')
   }
@@ -151,9 +155,7 @@ class BinaryParser {
    * @return The field represented by the bytes at the head of the BinaryParser
    */
   readField(): FieldInstance {
-    return this.customDefinitions.field.fromString(
-      this.readFieldOrdinal().toString(),
-    )
+    return this.definitions.field.fromString(this.readFieldOrdinal().toString())
   }
 
   /**

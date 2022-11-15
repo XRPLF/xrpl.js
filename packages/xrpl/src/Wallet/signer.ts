@@ -7,7 +7,10 @@ import {
   encodeForSigning,
   encodeForSigningClaim,
 } from 'ripple-binary-codec'
-import { DefinitionContents, DEFINITIONS } from 'ripple-binary-codec/dist/enums'
+import {
+  DefinitionContents,
+  DEFAULT_DEFINITIONS,
+} from 'ripple-binary-codec/dist/enums'
 import { sign as signWithKeypair, verify } from 'ripple-keypairs'
 
 import { ValidationError } from '../errors'
@@ -21,7 +24,7 @@ import Wallet from '.'
  * single transaction with all Signers that then gets signed and returned.
  *
  * @param transactions - An array of signed Transactions (in object or blob form) to combine into a single signed Transaction.
- * @param customDefinitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @param definitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A single signed Transaction which has all Signers from transactions within it.
  * @throws ValidationError if:
  * - There were no transactions given to sign
@@ -31,20 +34,20 @@ import Wallet from '.'
  */
 function multisign(
   transactions: Array<Transaction | string>,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): string {
   if (transactions.length === 0) {
     throw new ValidationError('There were 0 transactions to multisign')
   }
 
   transactions.forEach((txOrBlob) => {
-    const tx: Transaction = getDecodedTransaction(txOrBlob, customDefinitions)
+    const tx: Transaction = getDecodedTransaction(txOrBlob, definitions)
 
     /*
      * This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
      */
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
-    validate(tx as unknown as Record<string, unknown>, customDefinitions)
+    validate(tx as unknown as Record<string, unknown>, definitions)
     if (tx.Signers == null || tx.Signers.length === 0) {
       throw new ValidationError(
         "For multisigning all transactions must include a Signers field containing an array of signatures. You may have forgotten to pass the 'forMultisign' parameter when signing.",
@@ -60,16 +63,13 @@ function multisign(
 
   const decodedTransactions: Transaction[] = transactions.map(
     (txOrBlob: string | Transaction) => {
-      return getDecodedTransaction(txOrBlob, customDefinitions)
+      return getDecodedTransaction(txOrBlob, definitions)
     },
   )
 
   validateTransactionEquivalence(decodedTransactions)
 
-  return encode(
-    getTransactionWithAllSigners(decodedTransactions),
-    customDefinitions,
-  )
+  return encode(getTransactionWithAllSigners(decodedTransactions), definitions)
 }
 
 /**
@@ -78,7 +78,7 @@ function multisign(
  * @param wallet - The account that will sign for this payment channel.
  * @param channelId - An id for the payment channel to redeem XRP from.
  * @param amount - The amount in drops to redeem.
- * @param customDefinitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @param definitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A signature that can be used to redeem a specific amount of XRP from a payment channel.
  * @category Utilities
  */
@@ -87,14 +87,14 @@ function authorizeChannel(
   wallet: Wallet,
   channelId: string,
   amount: string,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): string {
   const signingData = encodeForSigningClaim(
     {
       channel: channelId,
       amount,
     },
-    customDefinitions,
+    definitions,
   )
 
   return signWithKeypair(signingData, wallet.privateKey)
@@ -104,17 +104,17 @@ function authorizeChannel(
  * Verifies that the given transaction has a valid signature based on public-key encryption.
  *
  * @param tx - A transaction to verify the signature of. (Can be in object or encoded string format).
- * @param customDefinitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @param definitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns Returns true if tx has a valid signature, and returns false otherwise.
  * @category Utilities
  */
 function verifySignature(
   tx: Transaction | string,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): boolean {
   const decodedTx: Transaction = getDecodedTransaction(tx)
   return verify(
-    encodeForSigning(decodedTx, customDefinitions),
+    encodeForSigning(decodedTx, definitions),
     decodedTx.TxnSignature,
     decodedTx.SigningPubKey,
   )
@@ -182,24 +182,24 @@ function addressToBigNumber(address: string): BigNumber {
  * Normalizes txOrBlob to Transaction format.
  *
  * @param txOrBlob - the transaction either Transaction or blob format.
- * @param customDefinitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @param definitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns txOrBlob in Transaction format.
  */
 function getDecodedTransaction(
   txOrBlob: Transaction | string,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): Transaction {
   if (typeof txOrBlob === 'object') {
     // We need this to handle X-addresses in multisigning
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
     return decode(
-      encode(txOrBlob, customDefinitions),
-      customDefinitions,
+      encode(txOrBlob, definitions),
+      definitions,
     ) as unknown as Transaction
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
-  return decode(txOrBlob, customDefinitions) as unknown as Transaction
+  return decode(txOrBlob, definitions) as unknown as Transaction
 }
 
 export { authorizeChannel, verifySignature, multisign }

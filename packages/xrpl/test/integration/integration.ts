@@ -98,7 +98,7 @@ describe('integration tests', function () {
     await assertRejects(
       client.submit(tx, {
         wallet: wallet1,
-        customDefinitions: newDefs,
+        definitions: newDefs,
       }),
       RippledError,
       'invalidTransaction',
@@ -108,7 +108,7 @@ describe('integration tests', function () {
     await assertRejects(
       client.submitAndWait(tx, {
         wallet: wallet1,
-        customDefinitions: newDefs,
+        definitions: newDefs,
       }),
       RippledError,
       'invalidTransaction',

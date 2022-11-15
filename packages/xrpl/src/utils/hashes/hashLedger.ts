@@ -5,7 +5,10 @@
 
 import BigNumber from 'bignumber.js'
 import { decode, encode } from 'ripple-binary-codec'
-import { DefinitionContents, DEFINITIONS } from 'ripple-binary-codec/dist/enums'
+import {
+  DefinitionContents,
+  DEFAULT_DEFINITIONS,
+} from 'ripple-binary-codec/dist/enums'
 
 import { ValidationError, XrplError } from '../../errors'
 import type { Ledger } from '../../models/ledger'
@@ -20,7 +23,7 @@ const HEX = 16
 
 interface HashLedgerHeaderOptions {
   computeTreeHashes?: boolean
-  customDefinitions?: DefinitionContents
+  definitions?: DefinitionContents
 }
 
 function intToHex(integer: number, byteLength: number): string {
@@ -69,23 +72,23 @@ function addLengthPrefix(hex: string): string {
  * Hashes the Transaction object as the ledger does. Throws if the transaction is unsigned.
  *
  * @param tx - A transaction to hash. Tx may be in binary blob form. Tx must be signed.
- * @param customDefinitions - rippled types to use instead of the default. Used for sidechains and amendments.
+ * @param definitions - rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A hash of tx.
  * @throws ValidationError if the Transaction is unsigned.\
  * @category Utilities
  */
 export function hashSignedTx(
   tx: Transaction | string,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): string {
   let txBlob: string
   let txObject: Transaction
   if (typeof tx === 'string') {
     txBlob = tx
     /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required until updated in binary codec. */
-    txObject = decode(tx, customDefinitions) as unknown as Transaction
+    txObject = decode(tx, definitions) as unknown as Transaction
   } else {
-    txBlob = encode(tx, customDefinitions)
+    txBlob = encode(tx, definitions)
     txObject = tx
   }
 
@@ -126,19 +129,19 @@ export function hashLedgerHeader(ledgerHeader: Ledger): string {
  * Compute the root hash of the SHAMap containing all transactions.
  *
  * @param transactions - List of Transactions.
- * @param customDefinitions - Custom rippled type definitions. Used by sidechains and new amendments.
+ * @param definitions - Custom rippled type definitions. Used by sidechains and new amendments.
  * @returns The root hash of the SHAMap.
  * @category Utilities
  */
 export function hashTxTree(
   transactions: Array<Transaction & { metaData?: TransactionMetadata }>,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): string {
   const shamap = new SHAMap()
   for (const txJSON of transactions) {
-    const txBlobHex = encode(txJSON, customDefinitions)
-    const metaHex = encode(txJSON.metaData ?? {}, customDefinitions)
-    const txHash = hashSignedTx(txBlobHex, customDefinitions)
+    const txBlobHex = encode(txJSON, definitions)
+    const metaHex = encode(txJSON.metaData ?? {}, definitions)
+    const txHash = hashSignedTx(txBlobHex, definitions)
     const data = addLengthPrefix(txBlobHex) + addLengthPrefix(metaHex)
     shamap.addItem(txHash, data, NodeType.TRANSACTION_METADATA)
   }
@@ -150,18 +153,18 @@ export function hashTxTree(
  * Compute the state hash of a list of LedgerEntries.
  *
  * @param entries - List of LedgerEntries.
- * @param customDefinitions - Custom rippled types. Used by sidechains and new amendments.
+ * @param definitions - Custom rippled types. Used by sidechains and new amendments.
  * @returns Hash of SHAMap that consists of all entries.
  * @category Utilities
  */
 export function hashStateTree(
   entries: LedgerEntry[],
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): string {
   const shamap = new SHAMap()
 
   entries.forEach((ledgerEntry) => {
-    const data = encode(ledgerEntry, customDefinitions)
+    const data = encode(ledgerEntry, definitions)
     shamap.addItem(ledgerEntry.index, data, NodeType.ACCOUNT_STATE)
   })
 
@@ -182,10 +185,7 @@ function computeTransactionHash(
     throw new ValidationError('transactions is missing from the ledger')
   }
 
-  const transactionHash = hashTxTree(
-    ledger.transactions,
-    options.customDefinitions,
-  )
+  const transactionHash = hashTxTree(ledger.transactions, options.definitions)
 
   if (transaction_hash !== transactionHash) {
     throw new ValidationError(
@@ -215,10 +215,7 @@ function computeStateHash(
     throw new ValidationError('accountState is missing from the ledger')
   }
 
-  const stateHash = hashStateTree(
-    ledger.accountState,
-    options.customDefinitions,
-  )
+  const stateHash = hashStateTree(ledger.accountState, options.definitions)
 
   if (account_hash !== stateHash) {
     throw new ValidationError(
@@ -235,7 +232,7 @@ function computeStateHash(
  * @param ledger - Ledger to compute the hash for.
  * @param options - Allow client to recompute Transaction and State Hashes.
  * @param options.computeTreeHashes - Whether to recompute the Transaction and State Hashes.
- * @param options.customDefinitions - Custom rippled type definitions. Used for sidechains and new amendments.
+ * @param options.definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns The has of ledger.
  * @category Utilities
  */

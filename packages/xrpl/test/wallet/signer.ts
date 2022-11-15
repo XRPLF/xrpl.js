@@ -10,7 +10,7 @@ import {
   verifySignature,
 } from 'xrpl-local/Wallet/signer'
 
-import * as customDefinitions from '../fixtures/rippled/definitions-with-diff-payment.json'
+import * as definitions from '../fixtures/rippled/definitions-with-diff-payment.json'
 
 const publicKey =
   '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
@@ -214,7 +214,7 @@ describe('Signer', function () {
   })
 
   it('authorizeChannel succeeds with unrelated custom definitions', function () {
-    const newDefs = new DefinitionContents(customDefinitions, coreTypes)
+    const newDefs = new DefinitionContents(definitions, coreTypes)
     const secpWallet = Wallet.fromSeed('snGHNrPbHrdUcszeuDEigMdC1Lyyd')
     const channelId =
       '5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3'
@@ -253,7 +253,7 @@ describe('Signer', function () {
   })
 
   it('should validly sign a transaction with custom defs', async function () {
-    const newDefs = new DefinitionContents(customDefinitions, coreTypes)
+    const newDefs = new DefinitionContents(definitions, coreTypes)
     const signedTx = verifyWallet.sign(tx, false, newDefs)
 
     const decodedTx = decode(
@@ -269,7 +269,7 @@ describe('Signer', function () {
   })
 
   it('should be able to multisign a transaction with custom defs', async function () {
-    const newDefs = new DefinitionContents(customDefinitions, coreTypes)
+    const newDefs = new DefinitionContents(definitions, coreTypes)
     const wallet1 = Wallet.fromSeed('sEdTqWgUWAqvrL3AZyJDhVVa4V6LX3E')
     const wallet2 = Wallet.fromSeed('sEdTco3Gx6dQzzdPovjGAMjU3v5SJ4S')
 

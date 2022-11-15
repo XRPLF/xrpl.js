@@ -54,7 +54,7 @@ export async function verifySubmittedTransaction(
   client: Client,
   tx: Transaction | string,
   hashTx?: string,
-  customDefinitions?: DefinitionContents,
+  definitions?: DefinitionContents,
 ): Promise<void> {
   const hash = hashTx ?? hashSignedTx(tx)
   const data = await client.request({
@@ -72,7 +72,7 @@ export async function verifySubmittedTransaction(
       'meta',
       'validated',
     ]),
-    typeof tx === 'string' ? decode(tx, customDefinitions) : tx,
+    typeof tx === 'string' ? decode(tx, definitions) : tx,
   )
   if (typeof data.result.meta === 'object') {
     assert.strictEqual(data.result.meta.TransactionResult, 'tesSUCCESS')

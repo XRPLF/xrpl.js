@@ -15,7 +15,10 @@ import {
   xAddressToClassicAddress,
 } from 'ripple-address-codec'
 import * as rbc from 'ripple-binary-codec'
-import { DefinitionContents, DEFINITIONS } from 'ripple-binary-codec/dist/enums'
+import {
+  DefinitionContents,
+  DEFAULT_DEFINITIONS,
+} from 'ripple-binary-codec/dist/enums'
 import { coreTypes } from 'ripple-binary-codec/dist/types'
 import { verify as verifyKeypairSignature } from 'ripple-keypairs'
 
@@ -81,42 +84,42 @@ function isValidSecret(secret: string): boolean {
  * Encodes a LedgerEntry or Transaction into a hex string
  *
  * @param object - LedgerEntry or Transaction in JSON format.
- * @param customDefinitions - Custom rippled type definitions. Used for sidechains and new amendments.
+ * @param definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns A hex string representing the encoded object.
  */
 function encode(
   object: Transaction | LedgerEntry,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): string {
-  return rbc.encode(object, customDefinitions)
+  return rbc.encode(object, definitions)
 }
 
 /**
  * Encodes a Transaction for signing
  *
  * @param object - LedgerEntry in JSON or Transaction format.
- * @param customDefinitions - Custom rippled type definitions. Used for sidechains and new amendments.
+ * @param definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns A hex string representing the encoded object.
  */
 function encodeForSigning(
   object: Transaction,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): string {
-  return rbc.encodeForSigning(object, customDefinitions)
+  return rbc.encodeForSigning(object, definitions)
 }
 
 /**
  * Encodes a PaymentChannelClaim for signing
  *
  * @param object - PaymentChannelClaim in JSON format.
- * @param customDefinitions - Custom rippled type definitions. Used for sidechains and new amendments.
+ * @param definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns A hex string representing the encoded object.
  */
 function encodeForSigningClaim(
   object: PaymentChannelClaim,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): string {
-  return rbc.encodeForSigningClaim(object, customDefinitions)
+  return rbc.encodeForSigningClaim(object, definitions)
 }
 
 /**
@@ -124,29 +127,29 @@ function encodeForSigningClaim(
  *
  * @param object - Transaction in JSON format.
  * @param signer - The address of the account signing this transaction
- * @param customDefinitions - Custom rippled type definitions. Used for sidechains and new amendments.
+ * @param definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns A hex string representing the encoded object.
  */
 function encodeForMultiSigning(
   object: Transaction,
   signer: string,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): string {
-  return rbc.encodeForMultisigning(object, signer, customDefinitions)
+  return rbc.encodeForMultisigning(object, signer, definitions)
 }
 
 /**
  * Decodes a hex string into a transaction | ledger entry
  *
  * @param hex - hex string in the XRPL serialization format.
- * @param customDefinitions - Custom rippled type definitions. Used for sidechains and new amendments.
+ * @param definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns The hex string decoded according to XRPL serialization format.
  */
 function decode(
   hex: string,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): Record<string, unknown> {
-  return rbc.decode(hex, customDefinitions)
+  return rbc.decode(hex, definitions)
 }
 
 /**
@@ -245,5 +248,5 @@ export {
   parseNFTokenID,
   coreTypes,
   DefinitionContents,
-  DEFINITIONS,
+  DEFAULT_DEFINITIONS,
 }

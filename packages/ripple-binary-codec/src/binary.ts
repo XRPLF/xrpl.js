@@ -6,7 +6,7 @@ import { AccountID } from './types/account-id'
 import { HashPrefix } from './hash-prefixes'
 import { BinarySerializer, BytesList } from './serdes/binary-serializer'
 import { sha512Half, transactionID } from './hashes'
-import { DefinitionContents, DEFINITIONS, FieldInstance } from './enums'
+import { DefinitionContents, DEFAULT_DEFINITIONS, FieldInstance } from './enums'
 import { STObject } from './types/st-object'
 import { JsonObject } from './types/serialized-type'
 import { Buffer } from 'buffer/'
@@ -16,44 +16,43 @@ import * as bigInt from 'big-integer'
  * Construct a BinaryParser
  *
  * @param bytes hex-string to construct BinaryParser from
- * @param customDefinitions Rippled definitions used to parse the values of transaction types and such.
+ * @param definitions rippled definitions used to parse the values of transaction types and such.
  *                          Can be customized for sidechains and amendments.
  * @returns A BinaryParser
  */
 const makeParser = (
   bytes: string,
-  customDefinitions: DefinitionContents = DEFINITIONS,
-): BinaryParser => new BinaryParser(bytes, customDefinitions)
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+): BinaryParser => new BinaryParser(bytes, definitions)
 
 /**
  * Parse BinaryParser into JSON
  *
  * @param parser BinaryParser object
- * @param customDefinitions Rippled definitions used to parse the values of transaction types and such.
+ * @param definitions rippled definitions used to parse the values of transaction types and such.
  *                          Can be customized for sidechains and amendments.
  * @returns JSON for the bytes in the BinaryParser
  */
 const readJSON = (
   parser: BinaryParser,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): JsonObject =>
   (
-    parser.readType(customDefinitions.getAssociatedTypes().STObject) as STObject
-  ).toJSON(customDefinitions)
+    parser.readType(definitions.getAssociatedTypes().STObject) as STObject
+  ).toJSON(definitions)
 
 /**
  * Parse a hex-string into its JSON interpretation
  *
  * @param bytes hex-string to parse into JSON
- * @param customDefinitions Rippled definitions used to parse the values of transaction types and such.
+ * @param definitions rippled definitions used to parse the values of transaction types and such.
  *                          Can be customized for sidechains and amendments.
  * @returns JSON
  */
 const binaryToJSON = (
   bytes: string,
-  customDefinitions: DefinitionContents = DEFINITIONS,
-): JsonObject =>
-  readJSON(makeParser(bytes, customDefinitions), customDefinitions)
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+): JsonObject => readJSON(makeParser(bytes, definitions), definitions)
 
 /**
  * Interface for passing parameters to SerializeObject
@@ -64,31 +63,31 @@ interface OptionObject {
   prefix?: Buffer
   suffix?: Buffer
   signingFieldsOnly?: boolean
-  customDefinitions?: DefinitionContents
+  definitions?: DefinitionContents
 }
 
 /**
  * Function to serialize JSON object representing a transaction
  *
  * @param object JSON object to serialize
- * @param opts options for serializing, including optional prefix, suffix, signingFieldOnly, and customDefinitions
+ * @param opts options for serializing, including optional prefix, suffix, signingFieldOnly, and definitions
  * @returns A Buffer containing the serialized object
  */
 function serializeObject(object: JsonObject, opts: OptionObject = {}): Buffer {
-  const { prefix, suffix, signingFieldsOnly = false, customDefinitions } = opts
+  const { prefix, suffix, signingFieldsOnly = false, definitions } = opts
   const bytesList = new BytesList()
 
   if (prefix) {
     bytesList.put(prefix)
   }
 
-  const types = customDefinitions?.getAssociatedTypes() || coreTypes
+  const types = definitions?.getAssociatedTypes() || coreTypes
 
   const filter = signingFieldsOnly
     ? (f: FieldInstance): boolean => f.isSigningField
     : undefined
   ;(types.STObject as typeof STObject)
-    .from(object, filter, customDefinitions)
+    .from(object, filter, definitions)
     .toBytesSink(bytesList)
 
   if (suffix) {
@@ -103,18 +102,18 @@ function serializeObject(object: JsonObject, opts: OptionObject = {}): Buffer {
  *
  * @param transaction Transaction to serialize
  * @param prefix Prefix bytes to put before the serialized object
- * @param customDefinitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A Buffer with the serialized object
  */
 function signingData(
   transaction: JsonObject,
   prefix: Buffer = HashPrefix.transactionSig,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): Buffer {
   return serializeObject(transaction, {
     prefix,
     signingFieldsOnly: true,
-    customDefinitions,
+    definitions,
   })
 }
 
@@ -130,16 +129,16 @@ interface ClaimObject extends JsonObject {
  * Serialize a signingClaim
  *
  * @param claim A claim object to serialize
- * @param customDefinitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns the serialized object with appropriate prefix
  */
 function signingClaimData(
   claim: ClaimObject,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): Buffer {
   const num = bigInt(String(claim.amount))
   const prefix = HashPrefix.paymentChannelClaim
-  const types = customDefinitions.getAssociatedTypes()
+  const types = definitions.getAssociatedTypes()
   const channel = types.Hash256.from(claim.channel).toBytes()
   const amount = types.UInt64.from(num).toBytes()
 
@@ -156,16 +155,16 @@ function signingClaimData(
  *
  * @param transaction transaction to serialize
  * @param signingAccount Account to sign the transaction with
- * @param customDefinitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns serialized transaction with appropriate prefix and suffix
  */
 function multiSigningData(
   transaction: JsonObject,
   signingAccount: string | AccountID,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): Buffer {
   const prefix = HashPrefix.transactionMultiSig
-  const suffix = customDefinitions
+  const suffix = definitions
     .getAssociatedTypes()
     .AccountID.from(signingAccount)
     .toBytes()
@@ -173,7 +172,7 @@ function multiSigningData(
     prefix,
     suffix,
     signingFieldsOnly: true,
-    customDefinitions,
+    definitions,
   })
 }
 

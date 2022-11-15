@@ -66,17 +66,20 @@ See https://github.com/ripple/rippled/blob/develop/src/ripple/protocol/TxFormats
 If you're building your own side chain or amendment for the XRPL, you may need to create new definitions.
 
 To do that there are three high level things you need to do:
-1. Generate your own `definitions.json` file from rippled source code using [this tool](https://github.com/RichardAH/xrpl-codec-gen) (The default one for mainnet can be found [here](https://github.com/XRPLF/xrpl.js/blob/main/packages/ripple-binary-codec/src/enums/definitions.json))
+
+1. Generate your own `definitions.json` file from rippled source code using [this tool](https://github.com/RichardAH/xrpl-codec-gen) (The default `definitions.json` for mainnet can be found [here](https://github.com/XRPLF/xrpl.js/blob/main/packages/ripple-binary-codec/src/enums/definitions.json))
 2. Create new SerializedType classes for any new Types (So that encode/decode behavior is defined)
-  - For examples of how to implement that you can look at objects in the `types` folder, such as `Amount`, `UInt8`, or `STArray`.
+
+- For examples of how to implement that you can look at objects in the `types` folder, such as `Amount`, `UInt8`, or `STArray`.
+
 3. Import your `definitions.json` file and `coreTypes` from the `types` folder, then use them to construct your own `DefinitionContents` object.
 4. Pass the `DefinitionContents` object whenever you `encode` or `decode` a transaction.
 
 To see this in action, look at the below snippet (Or the test file which contains examples of adding each type of definition)
 
 ```
-// DEFINITIONS is the global tracker of type definitions, so we have to update it to add new types
-const { DefinitionContents, DEFINITIONS } = require('../dist/coretypes')
+// DEFAULT_DEFINITIONS is the global tracker of type definitions, so we have to update it to add new types
+const { DefinitionContents, DEFAULT_DEFINITIONS } = require('../dist/coretypes')
 
 // coreTypes is the default list of serialized Types that are defined in xrpl.js
 const { coreTypes } = require('../dist/types')

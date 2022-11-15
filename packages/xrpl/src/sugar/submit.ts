@@ -1,5 +1,8 @@
 import { decode, encode } from 'ripple-binary-codec'
-import { DefinitionContents, DEFINITIONS } from 'ripple-binary-codec/dist/enums'
+import {
+  DefinitionContents,
+  DEFAULT_DEFINITIONS,
+} from 'ripple-binary-codec/dist/enums'
 
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
 import { ValidationError, XrplError } from '../errors'
@@ -29,7 +32,7 @@ async function sleep(ms: number): Promise<void> {
  * @param opts.autofill - If true, autofill a transaction.
  * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
  * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
- * @param opts.customDefinitions - Custom rippled type definitions. Used for sidechains and new amendments.
+ * @param opts.definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns A promise that contains SubmitResponse.
  * @throws RippledError if submit request fails.
  */
@@ -44,11 +47,11 @@ async function submit(
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
     wallet?: Wallet
     // Custom rippled types to use instead of the default. Used for sidechains and amendments.
-    customDefinitions?: DefinitionContents
+    definitions?: DefinitionContents
   },
 ): Promise<SubmitResponse> {
   const signedTx = await getSignedTx(this, transaction, opts)
-  return submitRequest(this, signedTx, opts?.failHard, opts?.customDefinitions)
+  return submitRequest(this, signedTx, opts?.failHard, opts?.definitions)
 }
 
 /**
@@ -62,7 +65,7 @@ async function submit(
  * @param opts.autofill - If true, autofill a transaction.
  * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
  * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
- * @param opts.customDefinitions - Custom rippled type definitions. Used for sidechains and new amendments.
+ * @param opts.definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
  */
 async function submitAndWait(
@@ -76,12 +79,12 @@ async function submitAndWait(
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
     wallet?: Wallet
     // Custom rippled types to use instead of the default. Used for sidechains and amendments.
-    customDefinitions?: DefinitionContents
+    definitions?: DefinitionContents
   },
 ): Promise<TxResponse> {
   const signedTx = await getSignedTx(this, transaction, opts)
 
-  const lastLedger = getLastLedgerSequence(signedTx, opts?.customDefinitions)
+  const lastLedger = getLastLedgerSequence(signedTx, opts?.definitions)
   if (lastLedger == null) {
     throw new ValidationError(
       'Transaction must contain a LastLedgerSequence value for reliable submission.',
@@ -92,7 +95,7 @@ async function submitAndWait(
     this,
     signedTx,
     opts?.failHard,
-    opts?.customDefinitions,
+    opts?.definitions,
   )
 
   const txHash = hashes.hashSignedTx(signedTx)
@@ -112,21 +115,20 @@ async function submitRequest(
   client: Client,
   signedTransaction: Transaction | string,
   failHard = false,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): Promise<SubmitResponse> {
-  if (!isSigned(signedTransaction, customDefinitions)) {
+  if (!isSigned(signedTransaction, definitions)) {
     throw new ValidationError('Transaction must be signed')
   }
 
   const signedTxEncoded =
     typeof signedTransaction === 'string'
       ? signedTransaction
-      : encode(signedTransaction, customDefinitions)
+      : encode(signedTransaction, definitions)
   const request: SubmitRequest = {
     command: 'submit',
     tx_blob: signedTxEncoded,
-    fail_hard:
-      isAccountDelete(signedTransaction, customDefinitions) || failHard,
+    fail_hard: isAccountDelete(signedTransaction, definitions) || failHard,
   }
   return client.request(request)
 }
@@ -194,11 +196,11 @@ async function waitForFinalTransactionOutcome(
 // checks if the transaction has been signed
 function isSigned(
   transaction: Transaction | string,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): boolean {
   const tx =
     typeof transaction === 'string'
-      ? decode(transaction, customDefinitions)
+      ? decode(transaction, definitions)
       : transaction
   return (
     typeof tx !== 'string' &&
@@ -213,7 +215,7 @@ async function getSignedTx(
   {
     autofill = true,
     wallet,
-    customDefinitions = DEFINITIONS,
+    definitions = DEFAULT_DEFINITIONS,
   }: {
     // If true, autofill a transaction.
     autofill?: boolean
@@ -222,10 +224,10 @@ async function getSignedTx(
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
     wallet?: Wallet
     // Custom rippled types to use instead of the default. Used for sidechains and amendments.
-    customDefinitions?: DefinitionContents
+    definitions?: DefinitionContents
   } = {},
 ): Promise<Transaction | string> {
-  if (isSigned(transaction, customDefinitions)) {
+  if (isSigned(transaction, definitions)) {
     return transaction
   }
 
@@ -238,24 +240,24 @@ async function getSignedTx(
   let tx =
     typeof transaction === 'string'
       ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- converts JsonObject to correct Transaction type
-        (decode(transaction, customDefinitions) as unknown as Transaction)
+        (decode(transaction, definitions) as unknown as Transaction)
       : transaction
 
   if (autofill) {
     tx = await client.autofill(tx)
   }
 
-  return wallet.sign(tx, false, customDefinitions).tx_blob
+  return wallet.sign(tx, false, definitions).tx_blob
 }
 
 // checks if there is a LastLedgerSequence as a part of the transaction
 function getLastLedgerSequence(
   transaction: Transaction | string,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): number | null {
   const tx =
     typeof transaction === 'string'
-      ? decode(transaction, customDefinitions)
+      ? decode(transaction, definitions)
       : transaction
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- converts LastLedgSeq to number if present.
   return tx.LastLedgerSequence as number | null
@@ -264,11 +266,11 @@ function getLastLedgerSequence(
 // checks if the transaction is an AccountDelete transaction
 function isAccountDelete(
   transaction: Transaction | string,
-  customDefinitions: DefinitionContents = DEFINITIONS,
+  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
 ): boolean {
   const tx =
     typeof transaction === 'string'
-      ? decode(transaction, customDefinitions)
+      ? decode(transaction, definitions)
       : transaction
   return tx.TransactionType === 'AccountDelete'
 }

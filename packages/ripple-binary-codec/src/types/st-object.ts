@@ -1,4 +1,9 @@
-import { DEFINITIONS, FieldInstance, Bytes, DefinitionContents } from '../enums'
+import {
+  DEFAULT_DEFINITIONS,
+  FieldInstance,
+  Bytes,
+  DefinitionContents,
+} from '../enums'
 import { SerializedType, JsonObject } from './serialized-type'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { BinaryParser } from '../serdes/binary-parser'
@@ -83,13 +88,13 @@ class STObject extends SerializedType {
    *
    * @param value An object to include
    * @param filter optional, denote which field to include in serialized object
-   * @param customDefinitions optional, types and values to use to encode/decode a transaction
+   * @param definitions optional, types and values to use to encode/decode a transaction
    * @returns a STObject object
    */
   static from<T extends STObject | JsonObject>(
     value: T,
     filter?: (...any) => boolean,
-    customDefinitions?: DefinitionContents,
+    definitions?: DefinitionContents,
   ): STObject {
     if (value instanceof STObject) {
       return value
@@ -109,10 +114,10 @@ class STObject extends SerializedType {
       return Object.assign(acc, handled ?? { [key]: val })
     }, {})
 
-    const definitions = customDefinitions ?? DEFINITIONS
+    const defs = definitions ?? DEFAULT_DEFINITIONS
 
     let sorted = Object.keys(xAddressDecoded)
-      .map((f: string): FieldInstance => definitions.field[f] as FieldInstance)
+      .map((f: string): FieldInstance => defs.field[f] as FieldInstance)
       .filter(
         (f: FieldInstance): boolean =>
           f !== undefined &&
@@ -159,12 +164,12 @@ class STObject extends SerializedType {
 
   /**
    * Get the JSON interpretation of this.bytes
-   * @param customDefinitions Rippled definitions used to parse the values of transaction types and such.
+   * @param definitions rippled definitions used to parse the values of transaction types and such.
    *                          Can be customized for sidechains and amendments.
    * @returns a JSON object
    */
-  toJSON(customDefinitions?: DefinitionContents): JsonObject {
-    const objectParser = new BinaryParser(this.toString(), customDefinitions)
+  toJSON(definitions?: DefinitionContents): JsonObject {
+    const objectParser = new BinaryParser(this.toString(), definitions)
     const accumulator = {}
 
     while (!objectParser.end()) {
