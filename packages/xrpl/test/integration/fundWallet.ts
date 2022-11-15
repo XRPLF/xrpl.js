@@ -129,4 +129,21 @@ describe('fundWallet', function () {
 
     await api.disconnect()
   })
+  it('submit funds wallet with custom amount', async function () {
+    const api = new Client('wss://s.altnet.rippletest.net:51233')
+
+    await api.connect()
+    const { wallet, balance } = await api.fundWallet(null, { amount: '2000' })
+    assert.equal(balance, '2000')
+    assert.notEqual(wallet, undefined)
+    assert(isValidClassicAddress(wallet.classicAddress))
+    assert(isValidXAddress(wallet.getXAddress()))
+
+    const info = await api.request({
+      command: 'account_info',
+      account: wallet.classicAddress,
+    })
+    assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
+    await api.disconnect()
+  })
 })

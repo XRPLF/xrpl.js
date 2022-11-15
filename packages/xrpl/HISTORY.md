@@ -2,12 +2,13 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
-
+### Added
+* Optional custom amount field to `fundWallet`.
 ## 2.5.0 (2022-10-13)
 ### Added
 * Support for ExpandedSignerList amendment that expands the maximum signer list to 32 entries.
 * Add `cookie` and `data` to `ValidationStream` interface
-* Addtional check for memos field format, provide more detailed error messages.
+* Additional check for memos field format, provide more detailed error messages.
 
 ## 2.4.0 (2022-09-01)
 ### Added
