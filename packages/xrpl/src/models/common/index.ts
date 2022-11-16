@@ -10,6 +10,7 @@ export type AccountObjectType =
   | 'signer_list'
   | 'ticket'
   | 'state'
+  | 'xchain_create_account_claim_id'
   | 'xchain_claim_id'
 
 interface XRP {
