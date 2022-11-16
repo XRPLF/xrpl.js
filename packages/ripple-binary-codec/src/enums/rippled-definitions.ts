@@ -183,7 +183,7 @@ class RippledDefinitions {
   transactionResult: BytesLookup
   transactionType: BytesLookup
   transactionNames: string[]
-  addedDataTypes: Record<string, typeof SerializedType>
+  dataTypes: Record<string, typeof SerializedType>
 
   /**
    * Present rippled types in a typed and updatable format.
@@ -229,7 +229,7 @@ class RippledDefinitions {
       .filter(([_key, value]) => value >= 0)
       .map(([key, _value]) => key)
 
-    this.addedDataTypes = {} // Filled in via associateTypes
+    this.dataTypes = {} // Filled in via associateTypes
     this.associateTypes(types)
   }
 
@@ -241,10 +241,10 @@ class RippledDefinitions {
    */
   public associateTypes(types: Record<string, typeof SerializedType>): void {
     // Overwrite any existing type definitions with the given types
-    this.addedDataTypes = Object.assign({}, this.addedDataTypes, types)
+    this.dataTypes = Object.assign({}, this.dataTypes, types)
 
     Object.values(this.field).forEach((field) => {
-      field.associatedType = this.addedDataTypes[field.type.name]
+      field.associatedType = this.dataTypes[field.type.name]
     })
 
     this.field['TransactionType'].associatedType = this.transactionType
@@ -253,7 +253,7 @@ class RippledDefinitions {
   }
 
   public getAssociatedTypes(): Record<string, typeof SerializedType> {
-    return this.addedDataTypes
+    return this.dataTypes
   }
 }
 
