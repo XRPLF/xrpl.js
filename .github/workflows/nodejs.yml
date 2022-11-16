@@ -12,6 +12,7 @@ on:
 jobs:
   build-and-lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     strategy:
       matrix:
@@ -31,7 +32,7 @@ jobs:
 
   unit:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 10
 
     strategy:
       matrix:
@@ -52,6 +53,7 @@ jobs:
 
   integration:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     strategy:
       matrix:
@@ -83,6 +85,7 @@ jobs:
 
   browser:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     strategy:
       matrix:
