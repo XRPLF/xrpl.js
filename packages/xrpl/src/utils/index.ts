@@ -89,7 +89,7 @@ function isValidSecret(secret: string): boolean {
  */
 function encode(
   object: Transaction | LedgerEntry,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions?: RippledDefinitions,
 ): string {
   return rbc.encode(object, definitions)
 }
@@ -103,7 +103,7 @@ function encode(
  */
 function encodeForSigning(
   object: Transaction,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions?: RippledDefinitions,
 ): string {
   return rbc.encodeForSigning(object, definitions)
 }
@@ -117,7 +117,7 @@ function encodeForSigning(
  */
 function encodeForSigningClaim(
   object: PaymentChannelClaim,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions?: RippledDefinitions,
 ): string {
   return rbc.encodeForSigningClaim(object, definitions)
 }
@@ -133,7 +133,7 @@ function encodeForSigningClaim(
 function encodeForMultiSigning(
   object: Transaction,
   signer: string,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions?: RippledDefinitions,
 ): string {
   return rbc.encodeForMultisigning(object, signer, definitions)
 }
@@ -147,7 +147,7 @@ function encodeForMultiSigning(
  */
 function decode(
   hex: string,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions?: RippledDefinitions,
 ): Record<string, unknown> {
   return rbc.decode(hex, definitions)
 }

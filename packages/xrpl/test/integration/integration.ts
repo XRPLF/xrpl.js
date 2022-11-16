@@ -1,7 +1,7 @@
 import assert from 'assert'
 
 import _ from 'lodash'
-import { RippledDefinitions } from 'ripple-binary-codec/dist/enums'
+import { type RippledDefinitions } from 'ripple-binary-codec/dist/enums'
 import { coreTypes } from 'ripple-binary-codec/dist/types'
 import { Client, RippledError } from 'xrpl-local'
 import {

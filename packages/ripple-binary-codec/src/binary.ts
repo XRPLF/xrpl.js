@@ -6,7 +6,11 @@ import { AccountID } from './types/account-id'
 import { HashPrefix } from './hash-prefixes'
 import { BinarySerializer, BytesList } from './serdes/binary-serializer'
 import { sha512Half, transactionID } from './hashes'
-import { RippledDefinitions, DEFAULT_DEFINITIONS, FieldInstance } from './enums'
+import {
+  type RippledDefinitions,
+  DEFAULT_DEFINITIONS,
+  type FieldInstance,
+} from './enums'
 import { STObject } from './types/st-object'
 import { JsonObject } from './types/serialized-type'
 import { Buffer } from 'buffer/'
@@ -22,7 +26,7 @@ import * as bigInt from 'big-integer'
  */
 const makeParser = (
   bytes: string,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions?: RippledDefinitions,
 ): BinaryParser => new BinaryParser(bytes, definitions)
 
 /**
@@ -51,7 +55,7 @@ const readJSON = (
  */
 const binaryToJSON = (
   bytes: string,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions?: RippledDefinitions,
 ): JsonObject => readJSON(makeParser(bytes, definitions), definitions)
 
 /**

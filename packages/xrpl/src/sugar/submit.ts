@@ -1,8 +1,5 @@
 import { decode, encode } from 'ripple-binary-codec'
-import {
-  RippledDefinitions,
-  DEFAULT_DEFINITIONS,
-} from 'ripple-binary-codec/dist/enums'
+import { type RippledDefinitions } from 'ripple-binary-codec/dist/enums'
 
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
 import { ValidationError, XrplError } from '../errors'
@@ -115,7 +112,7 @@ async function submitRequest(
   client: Client,
   signedTransaction: Transaction | string,
   failHard = false,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions?: RippledDefinitions,
 ): Promise<SubmitResponse> {
   if (!isSigned(signedTransaction, definitions)) {
     throw new ValidationError('Transaction must be signed')
@@ -196,7 +193,7 @@ async function waitForFinalTransactionOutcome(
 // checks if the transaction has been signed
 function isSigned(
   transaction: Transaction | string,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions?: RippledDefinitions,
 ): boolean {
   const tx =
     typeof transaction === 'string'
@@ -215,7 +212,7 @@ async function getSignedTx(
   {
     autofill = true,
     wallet,
-    definitions = DEFAULT_DEFINITIONS,
+    definitions,
   }: {
     // If true, autofill a transaction.
     autofill?: boolean
@@ -253,7 +250,7 @@ async function getSignedTx(
 // checks if there is a LastLedgerSequence as a part of the transaction
 function getLastLedgerSequence(
   transaction: Transaction | string,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions?: RippledDefinitions,
 ): number | null {
   const tx =
     typeof transaction === 'string'
@@ -266,7 +263,7 @@ function getLastLedgerSequence(
 // checks if the transaction is an AccountDelete transaction
 function isAccountDelete(
   transaction: Transaction | string,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions?: RippledDefinitions,
 ): boolean {
   const tx =
     typeof transaction === 'string'

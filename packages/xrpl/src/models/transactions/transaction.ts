@@ -4,10 +4,7 @@
 
 import _ from 'lodash'
 import { encode, decode } from 'ripple-binary-codec'
-import {
-  RippledDefinitions,
-  DEFAULT_DEFINITIONS,
-} from 'ripple-binary-codec/dist/enums'
+import { type RippledDefinitions } from 'ripple-binary-codec/dist/enums'
 
 import { ValidationError } from '../../errors'
 import { setTransactionFlagsToNumber } from '../utils/flags'
@@ -104,7 +101,7 @@ export interface TransactionAndMetadata {
  */
 export function validate(
   transaction: Record<string, unknown>,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions?: RippledDefinitions,
 ): void {
   const tx = { ...transaction }
   if (tx.TransactionType == null) {

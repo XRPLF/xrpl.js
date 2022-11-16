@@ -94,7 +94,7 @@ class STObject extends SerializedType {
   static from<T extends STObject | JsonObject>(
     value: T,
     filter?: (...any) => boolean,
-    definitions?: RippledDefinitions,
+    definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
   ): STObject {
     if (value instanceof STObject) {
       return value
@@ -114,10 +114,8 @@ class STObject extends SerializedType {
       return Object.assign(acc, handled ?? { [key]: val })
     }, {})
 
-    const defs = definitions ?? DEFAULT_DEFINITIONS
-
     let sorted = Object.keys(xAddressDecoded)
-      .map((f: string): FieldInstance => defs.field[f] as FieldInstance)
+      .map((f: string): FieldInstance => definitions.field[f] as FieldInstance)
       .filter(
         (f: FieldInstance): boolean =>
           f !== undefined &&

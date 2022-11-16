@@ -3,11 +3,7 @@ import { quality, binary, HashPrefix } from './coretypes'
 import { decodeLedgerData } from './ledger-hashes'
 import { ClaimObject } from './binary'
 import { JsonObject } from './types/serialized-type'
-import {
-  RippledDefinitions,
-  DEFAULT_DEFINITIONS,
-  TRANSACTION_TYPES,
-} from './enums'
+import { RippledDefinitions, TRANSACTION_TYPES } from './enums'
 
 const {
   signingData,
@@ -24,10 +20,7 @@ const {
  * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns the JSON representation of the transaction
  */
-function decode(
-  binary: string,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
-): JsonObject {
+function decode(binary: string, definitions?: RippledDefinitions): JsonObject {
   assert.ok(typeof binary === 'string', 'binary must be a hex string')
   return binaryToJSON(binary, definitions)
 }
@@ -40,10 +33,7 @@ function decode(
  *
  * @returns A hex-string of the encoded transaction
  */
-function encode(
-  json: object,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
-): string {
+function encode(json: object, definitions?: RippledDefinitions): string {
   assert.ok(typeof json === 'object')
   return serializeObject(json as JsonObject, { definitions })
     .toString('hex')
@@ -60,7 +50,7 @@ function encode(
  */
 function encodeForSigning(
   json: object,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions?: RippledDefinitions,
 ): string {
   assert.ok(typeof json === 'object')
   return signingData(json as JsonObject, HashPrefix.transactionSig, definitions)
@@ -78,7 +68,7 @@ function encodeForSigning(
  */
 function encodeForSigningClaim(
   json: object,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions?: RippledDefinitions,
 ): string {
   assert.ok(typeof json === 'object')
   return signingClaimData(json as ClaimObject, definitions)
@@ -97,7 +87,7 @@ function encodeForSigningClaim(
 function encodeForMultisigning(
   json: object,
   signer: string,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions?: RippledDefinitions,
 ): string {
   assert.ok(typeof json === 'object')
   assert.equal(json['SigningPubKey'], '')
