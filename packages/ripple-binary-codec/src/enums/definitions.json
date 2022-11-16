@@ -1014,26 +1014,6 @@
       }
     ],
     [
-      "TokenCurrency",
-      {
-        "nth": 5,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "Hash160"
-      }
-    ],
-    [
-      "TokenIssuer",
-      {
-        "nth": 6,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "Hash160"
-      }
-    ],
-    [
       "LedgerHash",
       {
         "nth": 1,
