@@ -10,7 +10,7 @@ import { Buffer } from 'buffer/'
  */
 interface IssueObject extends JsonObject {
   currency: string
-  issuer: string
+  issuer?: string
 }
 
 /**
@@ -18,6 +18,9 @@ interface IssueObject extends JsonObject {
  */
 function isIssueObject(arg): arg is IssueObject {
   const keys = Object.keys(arg).sort()
+  if (keys.length === 1) {
+    return keys[0] === 'currency'
+  }
   return keys.length === 2 && keys[0] === 'currency' && keys[1] === 'issuer'
 }
 
@@ -43,16 +46,11 @@ class Issue extends SerializedType {
       return value
     }
 
-    if (typeof value === 'string') {
-      Issue.assertXrpIsValid(value)
-
-      const currency = Currency.from(value).toBytes()
-
-      return new Issue(currency)
-    }
-
     if (isIssueObject(value)) {
       const currency = Currency.from(value.currency).toBytes()
+      if (value.issuer == null) {
+        return new Issue(currency)
+      }
       const issuer = AccountID.from(value.issuer).toBytes()
       return new Issue(Buffer.concat([currency, issuer]))
     }
@@ -80,29 +78,17 @@ class Issue extends SerializedType {
    *
    * @returns the JSON interpretation of this.bytes
    */
-  toJSON(): IssueObject | string {
+  toJSON(): IssueObject {
     const parser = new BinaryParser(this.toString())
     const currency = Currency.fromParser(parser) as Currency
     if (currency.toJSON() === 'XRP') {
-      return currency.toJSON()
+      return { currency: currency.toJSON() }
     }
     const issuer = AccountID.fromParser(parser) as AccountID
 
     return {
       currency: currency.toJSON(),
       issuer: issuer.toJSON(),
-    }
-  }
-
-  /**
-   * Validate XRP amount
-   *
-   * @param value String representing XRP amount
-   * @returns void, but will throw if invalid amount
-   */
-  private static assertXrpIsValid(value: string): void {
-    if (value !== 'XRP') {
-      throw new Error(`${value} is an illegal amount`)
     }
   }
 }
