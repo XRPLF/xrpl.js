@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { decode } from 'ripple-binary-codec/dist'
+import { decode } from 'ripple-binary-codec'
 import { NFTokenMint, Payment, Transaction } from 'xrpl-local'
 import ECDSA from 'xrpl-local/ECDSA'
 import Wallet from 'xrpl-local/Wallet'
@@ -948,6 +948,16 @@ describe('Wallet', function () {
       )
 
       assert.equal(isVerified, false)
+    })
+
+    it('returns true when verifying a deserialized Transaction object', function () {
+      const wallet = new Wallet(publicKey, privateKey)
+      const decodedTransaction = decode(
+        prepared.signedTransaction,
+      ) as unknown as Transaction
+      const isVerified: boolean = wallet.verifyTransaction(decodedTransaction)
+
+      assert.equal(isVerified, true)
     })
   })
 
