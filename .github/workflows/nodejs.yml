@@ -25,14 +25,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Setup npm version 8
-        id: npm8
+      - name: Setup npm version 7
         run: |
           npm i -g npm@7 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
@@ -67,14 +66,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Setup npm version 8
-        id: npm8
+      - name: Setup npm version 7
         run: |
           npm i -g npm@7 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
@@ -118,13 +116,12 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Setup npm version 7
-        id: npm8
         run: |
           npm i -g npm@7 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
@@ -170,14 +167,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Setup npm version 8
-        id: npm8
+      - name: Setup npm version 7
         run: |
           npm i -g npm@7 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
