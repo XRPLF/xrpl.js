@@ -1,5 +1,5 @@
 import {
-  RippledDefinitions,
+  XrplDefinitions,
   DEFAULT_DEFINITIONS,
   Field,
   TransactionType,
@@ -19,7 +19,7 @@ export {
   hashes,
   binary,
   ledgerHashes,
-  RippledDefinitions,
+  XrplDefinitions,
   DEFAULT_DEFINITIONS,
   Field,
   TransactionType,

@@ -2,7 +2,7 @@ import {
   DEFAULT_DEFINITIONS,
   FieldInstance,
   Bytes,
-  RippledDefinitions,
+  XrplDefinitions,
 } from '../enums'
 import { SerializedType, JsonObject } from './serialized-type'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
@@ -94,7 +94,7 @@ class STObject extends SerializedType {
   static from<T extends STObject | JsonObject>(
     value: T,
     filter?: (...any) => boolean,
-    definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+    definitions: XrplDefinitions = DEFAULT_DEFINITIONS,
   ): STObject {
     if (value instanceof STObject) {
       return value
@@ -166,7 +166,7 @@ class STObject extends SerializedType {
    *                          Can be customized for sidechains and amendments.
    * @returns a JSON object
    */
-  toJSON(definitions?: RippledDefinitions): JsonObject {
+  toJSON(definitions?: XrplDefinitions): JsonObject {
     const objectParser = new BinaryParser(this.toString(), definitions)
     const accumulator = {}
 

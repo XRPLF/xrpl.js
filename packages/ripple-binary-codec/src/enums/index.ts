@@ -1,9 +1,9 @@
 import * as enums from './definitions.json'
-import { RippledDefinitions, FieldInstance, Bytes } from './rippled-definitions'
+import { XrplDefinitions, FieldInstance, Bytes } from './xrpl-definitions'
 /**
  * By default, coreTypes from the `types` folder is where known type definitions are initialized to avoid import cycles.
  */
-const DEFAULT_DEFINITIONS = new RippledDefinitions(enums, {})
+const DEFAULT_DEFINITIONS = new XrplDefinitions(enums, {})
 
 const Type = DEFAULT_DEFINITIONS.type
 const LedgerEntryType = DEFAULT_DEFINITIONS.ledgerEntryType
@@ -18,7 +18,7 @@ const TRANSACTION_TYPES = DEFAULT_DEFINITIONS.transactionNames
 
 export {
   Bytes,
-  RippledDefinitions,
+  XrplDefinitions,
   DEFAULT_DEFINITIONS,
   Field,
   FieldInstance,

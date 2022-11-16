@@ -3,7 +3,7 @@ import { quality, binary, HashPrefix } from './coretypes'
 import { decodeLedgerData } from './ledger-hashes'
 import { ClaimObject } from './binary'
 import { JsonObject } from './types/serialized-type'
-import { RippledDefinitions, TRANSACTION_TYPES } from './enums'
+import { XrplDefinitions, TRANSACTION_TYPES } from './enums'
 
 const {
   signingData,
@@ -20,7 +20,7 @@ const {
  * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns the JSON representation of the transaction
  */
-function decode(binary: string, definitions?: RippledDefinitions): JsonObject {
+function decode(binary: string, definitions?: XrplDefinitions): JsonObject {
   assert.ok(typeof binary === 'string', 'binary must be a hex string')
   return binaryToJSON(binary, definitions)
 }
@@ -33,7 +33,7 @@ function decode(binary: string, definitions?: RippledDefinitions): JsonObject {
  *
  * @returns A hex-string of the encoded transaction
  */
-function encode(json: object, definitions?: RippledDefinitions): string {
+function encode(json: object, definitions?: XrplDefinitions): string {
   assert.ok(typeof json === 'object')
   return serializeObject(json as JsonObject, { definitions })
     .toString('hex')
@@ -48,10 +48,7 @@ function encode(json: object, definitions?: RippledDefinitions): string {
  * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns a hex string of the encoded transaction
  */
-function encodeForSigning(
-  json: object,
-  definitions?: RippledDefinitions,
-): string {
+function encodeForSigning(json: object, definitions?: XrplDefinitions): string {
   assert.ok(typeof json === 'object')
   return signingData(json as JsonObject, HashPrefix.transactionSig, definitions)
     .toString('hex')
@@ -68,7 +65,7 @@ function encodeForSigning(
  */
 function encodeForSigningClaim(
   json: object,
-  definitions?: RippledDefinitions,
+  definitions?: XrplDefinitions,
 ): string {
   assert.ok(typeof json === 'object')
   return signingClaimData(json as ClaimObject, definitions)
@@ -87,7 +84,7 @@ function encodeForSigningClaim(
 function encodeForMultisigning(
   json: object,
   signer: string,
-  definitions?: RippledDefinitions,
+  definitions?: XrplDefinitions,
 ): string {
   assert.ok(typeof json === 'object')
   assert.equal(json['SigningPubKey'], '')

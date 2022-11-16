@@ -176,7 +176,7 @@ class FieldLookup {
  * Stores the various types and fields for rippled to be used to encode/decode information later on.
  *
  */
-class RippledDefinitions {
+class XrplDefinitions {
   field: FieldLookup
   ledgerEntryType: BytesLookup
   type: BytesLookup
@@ -258,7 +258,7 @@ class RippledDefinitions {
 }
 
 export {
-  RippledDefinitions,
+  XrplDefinitions,
   FieldLookup,
   FieldInfo,
   FieldInstance,

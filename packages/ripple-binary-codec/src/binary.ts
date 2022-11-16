@@ -7,7 +7,7 @@ import { HashPrefix } from './hash-prefixes'
 import { BinarySerializer, BytesList } from './serdes/binary-serializer'
 import { sha512Half, transactionID } from './hashes'
 import {
-  type RippledDefinitions,
+  type XrplDefinitions,
   DEFAULT_DEFINITIONS,
   type FieldInstance,
 } from './enums'
@@ -26,7 +26,7 @@ import * as bigInt from 'big-integer'
  */
 const makeParser = (
   bytes: string,
-  definitions?: RippledDefinitions,
+  definitions?: XrplDefinitions,
 ): BinaryParser => new BinaryParser(bytes, definitions)
 
 /**
@@ -39,7 +39,7 @@ const makeParser = (
  */
 const readJSON = (
   parser: BinaryParser,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions: XrplDefinitions = DEFAULT_DEFINITIONS,
 ): JsonObject =>
   (
     parser.readType(definitions.getAssociatedTypes().STObject) as STObject
@@ -55,7 +55,7 @@ const readJSON = (
  */
 const binaryToJSON = (
   bytes: string,
-  definitions?: RippledDefinitions,
+  definitions?: XrplDefinitions,
 ): JsonObject => readJSON(makeParser(bytes, definitions), definitions)
 
 /**
@@ -67,7 +67,7 @@ interface OptionObject {
   prefix?: Buffer
   suffix?: Buffer
   signingFieldsOnly?: boolean
-  definitions?: RippledDefinitions
+  definitions?: XrplDefinitions
 }
 
 /**
@@ -112,7 +112,7 @@ function serializeObject(object: JsonObject, opts: OptionObject = {}): Buffer {
 function signingData(
   transaction: JsonObject,
   prefix: Buffer = HashPrefix.transactionSig,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions: XrplDefinitions = DEFAULT_DEFINITIONS,
 ): Buffer {
   return serializeObject(transaction, {
     prefix,
@@ -138,7 +138,7 @@ interface ClaimObject extends JsonObject {
  */
 function signingClaimData(
   claim: ClaimObject,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions: XrplDefinitions = DEFAULT_DEFINITIONS,
 ): Buffer {
   const num = bigInt(String(claim.amount))
   const prefix = HashPrefix.paymentChannelClaim
@@ -165,7 +165,7 @@ function signingClaimData(
 function multiSigningData(
   transaction: JsonObject,
   signingAccount: string | AccountID,
-  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
+  definitions: XrplDefinitions = DEFAULT_DEFINITIONS,
 ): Buffer {
   const prefix = HashPrefix.transactionMultiSig
   const suffix = definitions

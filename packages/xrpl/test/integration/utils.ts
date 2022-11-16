@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 import { decode } from 'ripple-binary-codec'
-import { type RippledDefinitions } from 'ripple-binary-codec/dist/enums'
+import { type XrplDefinitions } from 'ripple-binary-codec/dist/enums'
 import { Client, Wallet, AccountInfoRequest } from 'xrpl-local'
 import { Payment, Transaction } from 'xrpl-local/models/transactions'
 import { hashSignedTx } from 'xrpl-local/utils/hashes'
@@ -54,7 +54,7 @@ export async function verifySubmittedTransaction(
   client: Client,
   tx: Transaction | string,
   hashTx?: string,
-  definitions?: RippledDefinitions,
+  definitions?: XrplDefinitions,
 ): Promise<void> {
   const hash = hashTx ?? hashSignedTx(tx)
   const data = await client.request({
