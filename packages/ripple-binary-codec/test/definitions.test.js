@@ -6,7 +6,7 @@ const newFieldDefs = require('./fixtures/new-field.json')
 const { UInt32 } = require('../dist/types/uint-32')
 const newTransactionDefs = require('./fixtures/new-transaction-type.json')
 
-const tx_json = {
+const txJson = {
   Account: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
   Amount: '1000',
   Destination: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
@@ -18,43 +18,43 @@ const tx_json = {
 
 describe('encode and decode using new types as a parameter', function () {
   test('can encode and decode a new TransactionType', function () {
-    const my_tx = Object.assign({}, tx_json, {
+    const tx = Object.assign({}, txJson, {
       TransactionType: 'NewTestTransaction',
     })
     // Before updating the types, this should not be encodable
-    expect(() => encode(my_tx)).toThrow()
+    expect(() => encode(tx)).toThrow()
 
     const newDefs = new RippledDefinitions(newTransactionDefs, coreTypes)
 
-    const encoded = encode(my_tx, newDefs)
+    const encoded = encode(tx, newDefs)
     expect(() => decode(encoded)).toThrow()
     const decoded = decode(encoded, newDefs)
-    expect(decoded).toStrictEqual(my_tx)
+    expect(decoded).toStrictEqual(tx)
   })
 
   test('can encode and decode a new Field', function () {
-    const my_tx = Object.assign({}, tx_json, {
+    const tx = Object.assign({}, txJson, {
       NewFieldDefinition: 10,
     })
 
     // Before updating the types, undefined fields will be ignored on encode
-    expect(decode(encode(my_tx))).not.toStrictEqual(my_tx)
+    expect(decode(encode(tx))).not.toStrictEqual(tx)
 
     const newDefs = new RippledDefinitions(newFieldDefs, coreTypes)
 
-    const encoded = encode(my_tx, newDefs)
+    const encoded = encode(tx, newDefs)
     expect(() => decode(encoded)).toThrow()
     const decoded = decode(encoded, newDefs)
-    expect(decoded).toStrictEqual(my_tx)
+    expect(decoded).toStrictEqual(tx)
   })
 
   test('can encode and decode a new Type', function () {
-    const my_tx = Object.assign({}, tx_json, {
+    const tx = Object.assign({}, txJson, {
       TestField: 10, // Should work the same as a UInt32
     })
 
     // Before updating the types, undefined fields will be ignored on encode
-    expect(decode(encode(my_tx))).not.toStrictEqual(my_tx)
+    expect(decode(encode(tx))).not.toStrictEqual(tx)
 
     class NewType extends UInt32 {
       // Should be the same as UInt32
@@ -65,9 +65,9 @@ describe('encode and decode using new types as a parameter', function () {
 
     const newDefs = new RippledDefinitions(newTypeDefs, extendedCoreTypes)
 
-    const encoded = encode(my_tx, newDefs)
+    const encoded = encode(tx, newDefs)
     expect(() => decode(encoded)).toThrow()
     const decoded = decode(encoded, newDefs)
-    expect(decoded).toStrictEqual(my_tx)
+    expect(decoded).toStrictEqual(tx)
   })
 })
