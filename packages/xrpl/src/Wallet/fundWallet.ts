@@ -47,15 +47,18 @@ const MAX_ATTEMPTS = 20
  * automatically. In other environments, or if you would like to customize the
  * faucet host in devnet or testnet, you should provide the host using this
  * option.
+ * @param options.amount - A custom amount to fund, if undefined or null, the default amount will be 1000.
  * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP,
  * and that wallet's balance in XRP.
  * @throws When either Client isn't connected or unable to fund wallet address.
  */
+// eslint-disable-next-line max-lines-per-function -- this function needs to display and do with more information.
 async function fundWallet(
   this: Client,
   wallet?: Wallet | null,
   options?: {
     faucetHost?: string
+    amount?: string
   },
 ): Promise<{
   wallet: Wallet
@@ -76,6 +79,7 @@ async function fundWallet(
     new TextEncoder().encode(
       JSON.stringify({
         destination: walletToFund.classicAddress,
+        xrpAmount: options?.amount,
       }),
     ),
   )
