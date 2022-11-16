@@ -46,7 +46,6 @@ const MAX_ATTEMPTS = 20
  * @throws When either Client isn't connected or unable to fund wallet address.
  */
 // eslint-disable-next-line max-lines-per-function -- All lines necessary
-// eslint-disable-next-line max-lines-per-function -- this function needs to display and do with more information.
 async function fundWallet(
   this: Client,
   wallet?: Wallet | null,
