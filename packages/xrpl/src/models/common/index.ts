@@ -128,7 +128,7 @@ export interface NFTOffer {
 
 export interface XChainBridge {
   LockingChainDoor: string
-  LockingChainIssue: 'XRP' | IssuedCurrency
+  LockingChainIssue: Currency
   IssuingChainDoor: string
-  IssuingChainIssue: 'XRP' | IssuedCurrency
+  IssuingChainIssue: Currency
 }
