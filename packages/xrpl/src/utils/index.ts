@@ -16,7 +16,7 @@ import {
 } from 'ripple-address-codec'
 import * as rbc from 'ripple-binary-codec'
 import {
-  DefinitionContents,
+  RippledDefinitions,
   DEFAULT_DEFINITIONS,
 } from 'ripple-binary-codec/dist/enums'
 import { coreTypes } from 'ripple-binary-codec/dist/types'
@@ -89,7 +89,7 @@ function isValidSecret(secret: string): boolean {
  */
 function encode(
   object: Transaction | LedgerEntry,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): string {
   return rbc.encode(object, definitions)
 }
@@ -103,7 +103,7 @@ function encode(
  */
 function encodeForSigning(
   object: Transaction,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): string {
   return rbc.encodeForSigning(object, definitions)
 }
@@ -117,7 +117,7 @@ function encodeForSigning(
  */
 function encodeForSigningClaim(
   object: PaymentChannelClaim,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): string {
   return rbc.encodeForSigningClaim(object, definitions)
 }
@@ -133,7 +133,7 @@ function encodeForSigningClaim(
 function encodeForMultiSigning(
   object: Transaction,
   signer: string,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): string {
   return rbc.encodeForMultisigning(object, signer, definitions)
 }
@@ -147,7 +147,7 @@ function encodeForMultiSigning(
  */
 function decode(
   hex: string,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): Record<string, unknown> {
   return rbc.decode(hex, definitions)
 }
@@ -247,6 +247,6 @@ export {
   createCrossChainPayment,
   parseNFTokenID,
   coreTypes,
-  DefinitionContents,
+  RippledDefinitions,
   DEFAULT_DEFINITIONS,
 }

@@ -1,5 +1,5 @@
 const { encode, decode } = require('../dist')
-const { DefinitionContents } = require('../dist/coretypes')
+const { RippledDefinitions } = require('../dist/coretypes')
 const { coreTypes } = require('../dist/types')
 const newTypeDefs = require('./fixtures/new-type.json')
 const newFieldDefs = require('./fixtures/new-field.json')
@@ -24,7 +24,7 @@ describe('encode and decode using new types as a parameter', function () {
     // Before updating the types, this should not be encodable
     expect(() => encode(my_tx)).toThrow()
 
-    const newDefs = new DefinitionContents(newTransactionDefs, coreTypes)
+    const newDefs = new RippledDefinitions(newTransactionDefs, coreTypes)
 
     const encoded = encode(my_tx, newDefs)
     expect(() => decode(encoded)).toThrow()
@@ -40,7 +40,7 @@ describe('encode and decode using new types as a parameter', function () {
     // Before updating the types, undefined fields will be ignored on encode
     expect(decode(encode(my_tx))).not.toStrictEqual(my_tx)
 
-    const newDefs = new DefinitionContents(newFieldDefs, coreTypes)
+    const newDefs = new RippledDefinitions(newFieldDefs, coreTypes)
 
     const encoded = encode(my_tx, newDefs)
     expect(() => decode(encoded)).toThrow()
@@ -63,7 +63,7 @@ describe('encode and decode using new types as a parameter', function () {
     const extendedCoreTypes = { ...coreTypes }
     extendedCoreTypes['NewType'] = NewType
 
-    const newDefs = new DefinitionContents(newTypeDefs, extendedCoreTypes)
+    const newDefs = new RippledDefinitions(newTypeDefs, extendedCoreTypes)
 
     const encoded = encode(my_tx, newDefs)
     expect(() => decode(encoded)).toThrow()

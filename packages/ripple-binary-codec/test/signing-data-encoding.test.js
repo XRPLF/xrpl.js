@@ -4,7 +4,7 @@ const {
   encodeForSigningClaim,
   encodeForMultisigning,
 } = require('../dist')
-const { DefinitionContents } = require('../dist/enums')
+const { RippledDefinitions } = require('../dist/enums')
 const { coreTypes } = require('../dist/types')
 
 // This changes the Payment TransactionType from being 0 to being 30 (aka 0x001F when encoded)
@@ -73,7 +73,7 @@ describe('Signing data', function () {
   })
 
   test('can create single signing blobs with modified type', function () {
-    const newDefs = new DefinitionContents(definitions, coreTypes)
+    const newDefs = new RippledDefinitions(definitions, coreTypes)
     const actual = encodeForSigning(tx_json, newDefs)
     expect(actual).toBe(
       [
@@ -169,7 +169,7 @@ describe('Signing data', function () {
   })
 
   test('can create multi signing blobs with custom definitions', function () {
-    const newDefs = new DefinitionContents(definitions, coreTypes)
+    const newDefs = new RippledDefinitions(definitions, coreTypes)
     const signingAccount = 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN'
     const signingJson = Object.assign({}, tx_json, { SigningPubKey: '' })
     const actual = encodeForMultisigning(signingJson, signingAccount, newDefs)
@@ -233,7 +233,7 @@ describe('Signing data', function () {
   })
 
   test('can create claim blob with unrelated type changes', function () {
-    const newDefs = new DefinitionContents(definitions, coreTypes)
+    const newDefs = new RippledDefinitions(definitions, coreTypes)
 
     const channel =
       '43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1'

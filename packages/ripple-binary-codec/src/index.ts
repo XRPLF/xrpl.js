@@ -4,7 +4,7 @@ import { decodeLedgerData } from './ledger-hashes'
 import { ClaimObject } from './binary'
 import { JsonObject } from './types/serialized-type'
 import {
-  DefinitionContents,
+  RippledDefinitions,
   DEFAULT_DEFINITIONS,
   TRANSACTION_TYPES,
 } from './enums'
@@ -26,7 +26,7 @@ const {
  */
 function decode(
   binary: string,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): JsonObject {
   assert.ok(typeof binary === 'string', 'binary must be a hex string')
   return binaryToJSON(binary, definitions)
@@ -42,7 +42,7 @@ function decode(
  */
 function encode(
   json: object,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): string {
   assert.ok(typeof json === 'object')
   return serializeObject(json as JsonObject, { definitions })
@@ -60,7 +60,7 @@ function encode(
  */
 function encodeForSigning(
   json: object,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): string {
   assert.ok(typeof json === 'object')
   return signingData(json as JsonObject, HashPrefix.transactionSig, definitions)
@@ -78,7 +78,7 @@ function encodeForSigning(
  */
 function encodeForSigningClaim(
   json: object,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): string {
   assert.ok(typeof json === 'object')
   return signingClaimData(json as ClaimObject, definitions)
@@ -97,7 +97,7 @@ function encodeForSigningClaim(
 function encodeForMultisigning(
   json: object,
   signer: string,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): string {
   assert.ok(typeof json === 'object')
   assert.equal(json['SigningPubKey'], '')

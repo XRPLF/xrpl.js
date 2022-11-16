@@ -1,7 +1,7 @@
 import assert from 'assert'
 
 import _ from 'lodash'
-import { DefinitionContents } from 'ripple-binary-codec/dist/enums'
+import { RippledDefinitions } from 'ripple-binary-codec/dist/enums'
 import { coreTypes } from 'ripple-binary-codec/dist/types'
 import { Client, RippledError } from 'xrpl-local'
 import {
@@ -92,7 +92,7 @@ describe('integration tests', function () {
       Fee: '12',
     }
 
-    const newDefs = new DefinitionContents(newDefinitions, coreTypes)
+    const newDefs = new RippledDefinitions(newDefinitions, coreTypes)
 
     // It should successfully submit, but fail once rippled sees it since the new type definition is not on-ledger.
     await assertRejects(

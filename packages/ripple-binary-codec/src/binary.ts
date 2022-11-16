@@ -6,7 +6,7 @@ import { AccountID } from './types/account-id'
 import { HashPrefix } from './hash-prefixes'
 import { BinarySerializer, BytesList } from './serdes/binary-serializer'
 import { sha512Half, transactionID } from './hashes'
-import { DefinitionContents, DEFAULT_DEFINITIONS, FieldInstance } from './enums'
+import { RippledDefinitions, DEFAULT_DEFINITIONS, FieldInstance } from './enums'
 import { STObject } from './types/st-object'
 import { JsonObject } from './types/serialized-type'
 import { Buffer } from 'buffer/'
@@ -22,7 +22,7 @@ import * as bigInt from 'big-integer'
  */
 const makeParser = (
   bytes: string,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): BinaryParser => new BinaryParser(bytes, definitions)
 
 /**
@@ -35,7 +35,7 @@ const makeParser = (
  */
 const readJSON = (
   parser: BinaryParser,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): JsonObject =>
   (
     parser.readType(definitions.getAssociatedTypes().STObject) as STObject
@@ -51,7 +51,7 @@ const readJSON = (
  */
 const binaryToJSON = (
   bytes: string,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): JsonObject => readJSON(makeParser(bytes, definitions), definitions)
 
 /**
@@ -63,7 +63,7 @@ interface OptionObject {
   prefix?: Buffer
   suffix?: Buffer
   signingFieldsOnly?: boolean
-  definitions?: DefinitionContents
+  definitions?: RippledDefinitions
 }
 
 /**
@@ -108,7 +108,7 @@ function serializeObject(object: JsonObject, opts: OptionObject = {}): Buffer {
 function signingData(
   transaction: JsonObject,
   prefix: Buffer = HashPrefix.transactionSig,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): Buffer {
   return serializeObject(transaction, {
     prefix,
@@ -134,7 +134,7 @@ interface ClaimObject extends JsonObject {
  */
 function signingClaimData(
   claim: ClaimObject,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): Buffer {
   const num = bigInt(String(claim.amount))
   const prefix = HashPrefix.paymentChannelClaim
@@ -161,7 +161,7 @@ function signingClaimData(
 function multiSigningData(
   transaction: JsonObject,
   signingAccount: string | AccountID,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): Buffer {
   const prefix = HashPrefix.transactionMultiSig
   const suffix = definitions

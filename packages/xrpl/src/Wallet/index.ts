@@ -17,7 +17,7 @@ import {
   encode,
 } from 'ripple-binary-codec'
 import {
-  DefinitionContents,
+  RippledDefinitions,
   DEFAULT_DEFINITIONS,
 } from 'ripple-binary-codec/dist/enums'
 import {
@@ -324,7 +324,7 @@ class Wallet {
     this: Wallet,
     transaction: Transaction,
     multisign?: boolean | string,
-    definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+    definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
   ): {
     tx_blob: string
     hash: string
@@ -393,7 +393,7 @@ class Wallet {
    */
   public verifyTransaction(
     signedTransaction: string,
-    definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+    definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
   ): boolean {
     const tx = decode(signedTransaction, definitions)
     const messageHex: string = encodeForSigning(tx, definitions)
@@ -428,7 +428,7 @@ class Wallet {
   private checkTxSerialization(
     serialized: string,
     tx: Transaction,
-    definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+    definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
   ): void {
     // Decode the serialized transaction:
     const decoded = decode(serialized, definitions)
@@ -553,7 +553,7 @@ function computeSignature(
   tx: Transaction,
   privateKey: string,
   signAs?: string,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): string {
   if (signAs) {
     const classicAddress = isValidXAddress(signAs)

@@ -1,6 +1,6 @@
 import { decode, encode } from 'ripple-binary-codec'
 import {
-  DefinitionContents,
+  RippledDefinitions,
   DEFAULT_DEFINITIONS,
 } from 'ripple-binary-codec/dist/enums'
 
@@ -47,7 +47,7 @@ async function submit(
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
     wallet?: Wallet
     // Custom rippled types to use instead of the default. Used for sidechains and amendments.
-    definitions?: DefinitionContents
+    definitions?: RippledDefinitions
   },
 ): Promise<SubmitResponse> {
   const signedTx = await getSignedTx(this, transaction, opts)
@@ -79,7 +79,7 @@ async function submitAndWait(
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
     wallet?: Wallet
     // Custom rippled types to use instead of the default. Used for sidechains and amendments.
-    definitions?: DefinitionContents
+    definitions?: RippledDefinitions
   },
 ): Promise<TxResponse> {
   const signedTx = await getSignedTx(this, transaction, opts)
@@ -115,7 +115,7 @@ async function submitRequest(
   client: Client,
   signedTransaction: Transaction | string,
   failHard = false,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): Promise<SubmitResponse> {
   if (!isSigned(signedTransaction, definitions)) {
     throw new ValidationError('Transaction must be signed')
@@ -196,7 +196,7 @@ async function waitForFinalTransactionOutcome(
 // checks if the transaction has been signed
 function isSigned(
   transaction: Transaction | string,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): boolean {
   const tx =
     typeof transaction === 'string'
@@ -224,7 +224,7 @@ async function getSignedTx(
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
     wallet?: Wallet
     // Custom rippled types to use instead of the default. Used for sidechains and amendments.
-    definitions?: DefinitionContents
+    definitions?: RippledDefinitions
   } = {},
 ): Promise<Transaction | string> {
   if (isSigned(transaction, definitions)) {
@@ -253,7 +253,7 @@ async function getSignedTx(
 // checks if there is a LastLedgerSequence as a part of the transaction
 function getLastLedgerSequence(
   transaction: Transaction | string,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): number | null {
   const tx =
     typeof transaction === 'string'
@@ -266,7 +266,7 @@ function getLastLedgerSequence(
 // checks if the transaction is an AccountDelete transaction
 function isAccountDelete(
   transaction: Transaction | string,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): boolean {
   const tx =
     typeof transaction === 'string'

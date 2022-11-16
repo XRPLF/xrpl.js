@@ -5,7 +5,7 @@
 import _ from 'lodash'
 import { encode, decode } from 'ripple-binary-codec'
 import {
-  DefinitionContents,
+  RippledDefinitions,
   DEFAULT_DEFINITIONS,
 } from 'ripple-binary-codec/dist/enums'
 
@@ -104,7 +104,7 @@ export interface TransactionAndMetadata {
  */
 export function validate(
   transaction: Record<string, unknown>,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): void {
   const tx = { ...transaction }
   if (tx.TransactionType == null) {

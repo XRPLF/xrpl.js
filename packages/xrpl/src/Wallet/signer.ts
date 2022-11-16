@@ -8,7 +8,7 @@ import {
   encodeForSigningClaim,
 } from 'ripple-binary-codec'
 import {
-  DefinitionContents,
+  RippledDefinitions,
   DEFAULT_DEFINITIONS,
 } from 'ripple-binary-codec/dist/enums'
 import { sign as signWithKeypair, verify } from 'ripple-keypairs'
@@ -34,7 +34,7 @@ import Wallet from '.'
  */
 function multisign(
   transactions: Array<Transaction | string>,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): string {
   if (transactions.length === 0) {
     throw new ValidationError('There were 0 transactions to multisign')
@@ -87,7 +87,7 @@ function authorizeChannel(
   wallet: Wallet,
   channelId: string,
   amount: string,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): string {
   const signingData = encodeForSigningClaim(
     {
@@ -110,7 +110,7 @@ function authorizeChannel(
  */
 function verifySignature(
   tx: Transaction | string,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): boolean {
   const decodedTx: Transaction = getDecodedTransaction(tx)
   return verify(
@@ -187,7 +187,7 @@ function addressToBigNumber(address: string): BigNumber {
  */
 function getDecodedTransaction(
   txOrBlob: Transaction | string,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): Transaction {
   if (typeof txOrBlob === 'object') {
     // We need this to handle X-addresses in multisigning

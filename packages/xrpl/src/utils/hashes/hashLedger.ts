@@ -6,7 +6,7 @@
 import BigNumber from 'bignumber.js'
 import { decode, encode } from 'ripple-binary-codec'
 import {
-  DefinitionContents,
+  RippledDefinitions,
   DEFAULT_DEFINITIONS,
 } from 'ripple-binary-codec/dist/enums'
 
@@ -23,7 +23,7 @@ const HEX = 16
 
 interface HashLedgerHeaderOptions {
   computeTreeHashes?: boolean
-  definitions?: DefinitionContents
+  definitions?: RippledDefinitions
 }
 
 function intToHex(integer: number, byteLength: number): string {
@@ -79,7 +79,7 @@ function addLengthPrefix(hex: string): string {
  */
 export function hashSignedTx(
   tx: Transaction | string,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): string {
   let txBlob: string
   let txObject: Transaction
@@ -135,7 +135,7 @@ export function hashLedgerHeader(ledgerHeader: Ledger): string {
  */
 export function hashTxTree(
   transactions: Array<Transaction & { metaData?: TransactionMetadata }>,
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): string {
   const shamap = new SHAMap()
   for (const txJSON of transactions) {
@@ -159,7 +159,7 @@ export function hashTxTree(
  */
 export function hashStateTree(
   entries: LedgerEntry[],
-  definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+  definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
 ): string {
   const shamap = new SHAMap()
 

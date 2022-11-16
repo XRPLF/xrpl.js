@@ -1,6 +1,6 @@
 import * as assert from 'assert'
 import {
-  DefinitionContents,
+  RippledDefinitions,
   DEFAULT_DEFINITIONS,
   FieldInstance,
 } from '../enums'
@@ -22,7 +22,7 @@ class BinaryParser {
    */
   constructor(
     hexBytes: string,
-    readonly definitions: DefinitionContents = DEFAULT_DEFINITIONS,
+    readonly definitions: RippledDefinitions = DEFAULT_DEFINITIONS,
   ) {
     this.bytes = Buffer.from(hexBytes, 'hex')
   }
