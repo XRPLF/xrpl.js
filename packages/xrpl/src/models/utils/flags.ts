@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign -- param reassign is safe */
 /* eslint-disable no-bitwise -- flags require bitwise operations */
-/* eslint-disable import/no-cycle -- We do a type import of Transaction, which is not a real cycle */
 
 import { ValidationError } from '../../errors'
 import {
@@ -21,7 +20,7 @@ import {
   PaymentChannelClaimFlagsInterface,
   PaymentChannelClaimFlags,
 } from '../transactions/paymentChannelClaim'
-import { type Transaction } from '../transactions/transaction'
+import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlagsInterface, TrustSetFlags } from '../transactions/trustSet'
 
 import { isFlagEnabled } from '.'
