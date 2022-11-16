@@ -4,6 +4,10 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 ### Added
 * Optional custom amount field to `fundWallet`.
+
+### Changed
+* Add support for Transaction objects in `verifyTransaction`
+
 ## 2.5.0 (2022-10-13)
 ### Added
 * Support for ExpandedSignerList amendment that expands the maximum signer list to 32 entries.
