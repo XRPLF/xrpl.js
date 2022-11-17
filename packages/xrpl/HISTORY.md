@@ -11,14 +11,14 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Changed
 * Add support for Transaction objects in `verifyTransaction`
+* When connected to hooks v2 testnet or amm devnet, Client.fundWallet now defaults to using the faucet instead of requiring specification.
+* Ability to specify faucet url for wallet generation/funding purposes
 
 ## 2.5.0 (2022-10-13)
 ### Added
 * Support for ExpandedSignerList amendment that expands the maximum signer list to 32 entries.
 * Add `cookie` and `data` to `ValidationStream` interface
 * Additional check for memos field format, provide more detailed error messages.
-* When connected to hooks v2 testnet or amm devnet, Client.fundWallet now defaults to using the faucet instead of requiring specification.
-* Ability to specify faucet url for wallet generation/funding purposes
 
 ## 2.4.0 (2022-09-01)
 ### Added
