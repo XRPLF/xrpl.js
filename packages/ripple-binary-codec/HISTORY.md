@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 1.5.0-beta.2 (2022-11-17)
+- Added new Issue type
+
 ## 1.4.2 (2022-06-27)
 - Fixed standard currency codes with lowercase and allowed symbols not decoding into standard codes.
 
