@@ -33,6 +33,7 @@ describe('AMMWithdraw', function () {
 
   it(`verifies valid AMMWithdraw with LPTokenIn`, function () {
     withdraw.LPTokenIn = LPTokenIn
+    withdraw.Flags |= AMMWithdrawFlags.tfLPToken
     assert.doesNotThrow(() => validate(withdraw))
   })
 
@@ -49,18 +50,21 @@ describe('AMMWithdraw', function () {
       issuer: 'rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd',
       value: '2.5',
     }
+    withdraw.Flags |= AMMWithdrawFlags.tfTwoAsset
     assert.doesNotThrow(() => validate(withdraw))
   })
 
   it(`verifies valid AMMWithdraw with Amount and LPTokenIn`, function () {
     withdraw.Amount = '1000'
     withdraw.LPTokenIn = LPTokenIn
+    withdraw.Flags |= AMMWithdrawFlags.tfOneAssetLPToken
     assert.doesNotThrow(() => validate(withdraw))
   })
 
   it(`verifies valid AMMWithdraw with Amount and EPrice`, function () {
     withdraw.Amount = '1000'
     withdraw.EPrice = '25'
+    withdraw.Flags |= AMMWithdrawFlags.tfLimitLPToken
     assert.doesNotThrow(() => validate(withdraw))
   })
 
