@@ -144,7 +144,6 @@ async function returnPromise(
   })
 }
 
-// eslint-disable-next-line max-params -- helper function
 function getHTTPOptions(
   client: Client,
   postBody: Uint8Array,
