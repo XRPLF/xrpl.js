@@ -115,10 +115,6 @@ export function validateAMMWithdraw(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMWithdraw: must set Amount with Amount2')
   } else if (tx.EPrice != null && tx.Amount == null) {
     throw new ValidationError('AMMWithdraw: must set Amount with EPrice')
-  } else if (tx.LPTokenIn == null && tx.Amount == null) {
-    throw new ValidationError(
-      'AMMWithdraw: must set at least LPTokenIn or Amount',
-    )
   }
 
   if (tx.LPTokenIn != null && !isIssuedCurrency(tx.LPTokenIn)) {
