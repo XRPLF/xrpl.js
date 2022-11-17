@@ -13,8 +13,14 @@ describe('AMMVote', function () {
     vote = {
       TransactionType: 'AMMVote',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      AMMID: '24BA86F99302CF124AB27311C831F5BFAA72C4625DDA65B7EDF346A60CC19883',
-      FeeVal: 25,
+      Asset: {
+        currency: 'XRP',
+      },
+      Asset2: {
+        currency: 'ETH',
+        issuer: 'rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd',
+      },
+      TradingFee: 25,
       Sequence: 1337,
     } as any
   })
@@ -23,57 +29,75 @@ describe('AMMVote', function () {
     assert.doesNotThrow(() => validate(vote))
   })
 
-  it(`throws w/ missing field AMMID`, function () {
-    delete vote.AMMID
+  it(`throws w/ missing field Asset`, function () {
+    delete vote.Asset
     assert.throws(
       () => validate(vote),
       ValidationError,
-      'AMMVote: missing field AMMID',
+      'AMMVote: missing field Asset',
     )
   })
 
-  it(`throws w/ AMMID must be a string`, function () {
-    vote.AMMID = 1234
+  it(`throws w/ Asset must be an Issue`, function () {
+    vote.Asset = 1234
     assert.throws(
       () => validate(vote),
       ValidationError,
-      'AMMVote: AMMID must be a string',
+      'AMMVote: Asset must be an Issue',
     )
   })
 
-  it(`throws w/ missing field FeeVal`, function () {
-    delete vote.FeeVal
+  it(`throws w/ missing field Asset2`, function () {
+    delete vote.Asset2
     assert.throws(
       () => validate(vote),
       ValidationError,
-      'AMMVote: missing field FeeVal',
+      'AMMVote: missing field Asset2',
     )
   })
 
-  it(`throws w/ FeeVal must be a number`, function () {
-    vote.FeeVal = '25'
+  it(`throws w/ Asset2 must be an Issue`, function () {
+    vote.Asset2 = 1234
     assert.throws(
       () => validate(vote),
       ValidationError,
-      'AMMVote: FeeVal must be a number',
+      'AMMVote: Asset2 must be an Issue',
     )
   })
 
-  it(`throws when FeeVal is greater than AMM_MAX_TRADING_FEE`, function () {
-    vote.FeeVal = 65001
+  it(`throws w/ missing field TradingFee`, function () {
+    delete vote.TradingFee
     assert.throws(
       () => validate(vote),
       ValidationError,
-      'AMMVote: FeeVal must be between 0 and 65000',
+      'AMMVote: missing field TradingFee',
     )
   })
 
-  it(`throws when FeeVal is a negative number`, function () {
-    vote.FeeVal = -1
+  it(`throws w/ TradingFee must be a number`, function () {
+    vote.TradingFee = '25'
     assert.throws(
       () => validate(vote),
       ValidationError,
-      'AMMVote: FeeVal must be between 0 and 65000',
+      'AMMVote: TradingFee must be a number',
+    )
+  })
+
+  it(`throws when TradingFee is greater than AMM_MAX_TRADING_FEE`, function () {
+    vote.TradingFee = 1001
+    assert.throws(
+      () => validate(vote),
+      ValidationError,
+      'AMMVote: TradingFee must be between 0 and 1000',
+    )
+  })
+
+  it(`throws when TradingFee is a negative number`, function () {
+    vote.TradingFee = -1
+    assert.throws(
+      () => validate(vote),
+      ValidationError,
+      'AMMVote: TradingFee must be between 0 and 1000',
     )
   })
 })

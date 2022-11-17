@@ -1,7 +1,13 @@
+/* eslint-disable complexity -- required for validateAMMBid */
 import { ValidationError } from '../../errors'
-import { Amount } from '../common'
+import { Amount, Issue } from '../common'
 
-import { BaseTransaction, isAmount, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isAmount,
+  isIssue,
+  validateBaseTransaction,
+} from './common'
 
 const MAX_AUTH_ACCOUNTS = 4
 
@@ -21,23 +27,28 @@ export interface AMMBid extends BaseTransaction {
   TransactionType: 'AMMBid'
 
   /**
-   * A hash that uniquely identifies the AMM instance. This field is required.
+   * Specifies one of the pool assets (XRP or token) of the AMM instance.
    */
-  AMMID: string
+  Asset: Issue
+
+  /**
+   * Specifies the other pool asset of the AMM instance.
+   */
+  Asset2: Issue
 
   /**
    * This field represents the minimum price that the bidder wants to pay for the slot.
-   * It is specified in units of LPToken. If specified let MinSlotPrice be X and let
+   * It is specified in units of LPToken. If specified let BidMin be X and let
    * the slot-price computed by price scheduling algorithm be Y, then bidder always pays
    * the max(X, Y).
    */
-  MinSlotPrice?: Amount
+  BidMin?: Amount
 
   /**
    * This field represents the maximum price that the bidder wants to pay for the slot.
    * It is specified in units of LPToken.
    */
-  MaxSlotPrice?: Amount
+  BidMax?: Amount
 
   /**
    * This field represents an array of XRPL account IDs that are authorized to trade
@@ -56,20 +67,28 @@ export interface AMMBid extends BaseTransaction {
 export function validateAMMBid(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.AMMID == null) {
-    throw new ValidationError('AMMBid: missing field AMMID')
+  if (tx.Asset == null) {
+    throw new ValidationError('AMMBid: missing field Asset')
   }
 
-  if (typeof tx.AMMID !== 'string') {
-    throw new ValidationError('AMMBid: AMMID must be a string')
+  if (!isIssue(tx.Asset)) {
+    throw new ValidationError('AMMBid: Asset must be an Issue')
   }
 
-  if (tx.MinSlotPrice != null && !isAmount(tx.MinSlotPrice)) {
-    throw new ValidationError('AMMBid: MinSlotPrice must be an Amount')
+  if (tx.Asset2 == null) {
+    throw new ValidationError('AMMBid: missing field Asset2')
   }
 
-  if (tx.MaxSlotPrice != null && !isAmount(tx.MaxSlotPrice)) {
-    throw new ValidationError('AMMBid: MaxSlotPrice must be an Amount')
+  if (!isIssue(tx.Asset2)) {
+    throw new ValidationError('AMMBid: Asset2 must be an Issue')
+  }
+
+  if (tx.BidMin != null && !isAmount(tx.BidMin)) {
+    throw new ValidationError('AMMBid: BidMin must be an Amount')
+  }
+
+  if (tx.BidMax != null && !isAmount(tx.BidMax)) {
+    throw new ValidationError('AMMBid: BidMax must be an Amount')
   }
 
   if (tx.AuthAccounts != null) {

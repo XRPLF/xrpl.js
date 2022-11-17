@@ -1,7 +1,8 @@
 import { ValidationError } from '../../errors'
+import { Issue } from '../common'
 
-import { AMM_MAX_TRADING_FEE } from './AMMInstanceCreate'
-import { BaseTransaction, validateBaseTransaction } from './common'
+import { AMM_MAX_TRADING_FEE } from './AMMCreate'
+import { BaseTransaction, isIssue, validateBaseTransaction } from './common'
 
 /**
  * AMMVote is used for submitting a vote for the trading fee of an AMM Instance.
@@ -13,17 +14,22 @@ export interface AMMVote extends BaseTransaction {
   TransactionType: 'AMMVote'
 
   /**
-   * A hash that uniquely identifies the AMM instance. This field is required.
+   * Specifies one of the pool assets (XRP or token) of the AMM instance.
    */
-  AMMID: string
+  Asset: Issue
+
+  /**
+   * Specifies the other pool asset of the AMM instance.
+   */
+  Asset2: Issue
 
   /**
    * Specifies the fee, in basis point.
-   * Valid values for this field are between 0 and 65000 inclusive.
+   * Valid values for this field are between 0 and 1000 inclusive.
    * A value of 1 is equivalent to 1/10 bps or 0.001%, allowing trading fee
-   * between 0% and 65%. This field is required.
+   * between 0% and 1%. This field is required.
    */
-  FeeVal: number
+  TradingFee: number
 }
 
 /**
@@ -35,25 +41,33 @@ export interface AMMVote extends BaseTransaction {
 export function validateAMMVote(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.AMMID == null) {
-    throw new ValidationError('AMMVote: missing field AMMID')
+  if (tx.Asset == null) {
+    throw new ValidationError('AMMVote: missing field Asset')
   }
 
-  if (typeof tx.AMMID !== 'string') {
-    throw new ValidationError('AMMVote: AMMID must be a string')
+  if (!isIssue(tx.Asset)) {
+    throw new ValidationError('AMMVote: Asset must be an Issue')
   }
 
-  if (tx.FeeVal == null) {
-    throw new ValidationError('AMMVote: missing field FeeVal')
+  if (tx.Asset2 == null) {
+    throw new ValidationError('AMMVote: missing field Asset2')
   }
 
-  if (typeof tx.FeeVal !== 'number') {
-    throw new ValidationError('AMMVote: FeeVal must be a number')
+  if (!isIssue(tx.Asset2)) {
+    throw new ValidationError('AMMVote: Asset2 must be an Issue')
   }
 
-  if (tx.FeeVal < 0 || tx.FeeVal > AMM_MAX_TRADING_FEE) {
+  if (tx.TradingFee == null) {
+    throw new ValidationError('AMMVote: missing field TradingFee')
+  }
+
+  if (typeof tx.TradingFee !== 'number') {
+    throw new ValidationError('AMMVote: TradingFee must be a number')
+  }
+
+  if (tx.TradingFee < 0 || tx.TradingFee > AMM_MAX_TRADING_FEE) {
     throw new ValidationError(
-      `AMMVote: FeeVal must be between 0 and ${AMM_MAX_TRADING_FEE}`,
+      `AMMVote: TradingFee must be between 0 and ${AMM_MAX_TRADING_FEE}`,
     )
   }
 }

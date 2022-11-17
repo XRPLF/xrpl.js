@@ -1,4 +1,4 @@
-import { Amount, IssuedCurrencyAmount } from '../common'
+import { Amount, Issue, IssuedCurrencyAmount } from '../common'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
@@ -12,26 +12,30 @@ export interface AMMInfoRequest extends BaseRequest {
   command: 'amm_info'
 
   /**
-   * A hash that uniquely identifies the AMM instance.
-   */
-  amm_id?: string
-
-  /**
    * Specifies one of the pool assets (XRP or token) of the AMM instance.
-   * Both asset1 and asset2 must be defined to specify an AMM instance.
+   * Both asset and asset2 must be defined to specify an AMM instance.
    */
-  asset1?: Amount
+  asset?: Issue
 
   /**
    * Specifies the other pool asset of the AMM instance.
-   * Both asset1 and asset2 must be defined to specify an AMM instance.
+   * Both asset and asset2 must be defined to specify an AMM instance.
    */
-  asset2?: Amount
+  asset2?: Issue
+}
+
+interface AuthAccount {
+  AuthAccount: {
+    Account: string
+  }
 }
 
 interface VoteEntry {
-  FeeVal: number
-  VoteWeight: number
+  VoteEntry: {
+    Account: string
+    TradingFee: number
+    VoteWeight: number
+  }
 }
 
 /**
@@ -49,34 +53,59 @@ export interface AMMInfoResponse extends BaseResponse {
     /**
      * Specifies one of the pool assets (XRP or token) of the AMM instance.
      */
-    Asset1: Amount
+    Asset: Issue
 
     /**
      * Specifies the other pool asset of the AMM instance.
      */
-    Asset2: Amount
+    Asset2: Issue
 
     /**
-     * Represents the liquidity providers' shares of the AMM instance's pools.
-     * LPTokens are tokens on XRPL. Each LPToken represents a proportional share of each pool of the AMM instance.
-     * The AMM instance account issues the LPTokens to LPs upon liquidity provision.
-     * LPTokens are balanced in the LPs trustline upon liquidity removal.
+     * Details of the current owner of the auction slot.
      */
-    LPToken: IssuedCurrencyAmount
+    AuctionSlot?: {
+      /**
+       * The current owner of this auction slot.
+       */
+      Account: string
+
+      /**
+       * A list of at most 4 additional accounts that are authorized to trade at the discounted fee for this AMM instance.
+       */
+      AuthAccounts: AuthAccount[]
+
+      /**
+       * The trading fee to be charged to the auction owner, in the same format as TradingFee.
+       * By default this is 0, meaning that the auction owner can trade at no fee instead of the standard fee for this AMM.
+       */
+      DiscountedFee: number
+
+      /**
+       * The time when this slot expires, in seconds since the Ripple Epoch.
+       */
+      Expiration: string
+
+      /**
+       * The amount the auction owner paid to win this slot, in LPTokens.
+       */
+      Price: Amount
+    }
+
+    /**
+     * The total outstanding balance of liquidity provider tokens from this AMM instance.
+     * The holders of these tokens can vote on the AMM's trading fee in proportion to their holdings,
+     * or redeem the tokens for a share of the AMM's assets which grows with the trading fees collected.
+     */
+    LPTokenBalance: IssuedCurrencyAmount
 
     /**
      * Specifies the fee, in basis point, to be charged to the traders for the trades
      * executed against the AMM instance. Trading fee is a percentage of the trading volume.
-     * Valid values for this field are between 0 and 65000 inclusive.
+     * Valid values for this field are between 0 and 1000 inclusive.
      * A value of 1 is equivalent to 1/10 bps or 0.001%, allowing trading fee
-     * between 0% and 65%. This field is required.
+     * between 0% and 1%. This field is required.
      */
     TradingFee: number
-
-    /**
-     * A hash that uniquely identifies the AMM instance.
-     */
-    AMMID?: string
 
     /**
      * Keeps a track of up to eight active votes for the instance.

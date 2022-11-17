@@ -13,9 +13,15 @@ describe('AMMBid', function () {
     bid = {
       TransactionType: 'AMMBid',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      AMMID: '24BA86F99302CF124AB27311C831F5BFAA72C4625DDA65B7EDF346A60CC19883',
-      MinSlotPrice: '5',
-      MaxSlotPrice: '10',
+      Asset: {
+        currency: 'XRP',
+      },
+      Asset2: {
+        currency: 'ETH',
+        issuer: 'rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd',
+      },
+      BidMin: '5',
+      BidMax: '10',
       AuthAccounts: [
         {
           AuthAccount: {
@@ -46,39 +52,57 @@ describe('AMMBid', function () {
     assert.doesNotThrow(() => validate(bid))
   })
 
-  it(`throws w/ missing field AMMID`, function () {
-    delete bid.AMMID
+  it(`throws w/ missing field Asset`, function () {
+    delete bid.Asset
     assert.throws(
       () => validate(bid),
       ValidationError,
-      'AMMBid: missing field AMMID',
+      'AMMBid: missing field Asset',
     )
   })
 
-  it(`throws w/ AMMID must be a string`, function () {
-    bid.AMMID = 1234
+  it(`throws w/ Asset must be an Issue`, function () {
+    bid.Asset = 1234
     assert.throws(
       () => validate(bid),
       ValidationError,
-      'AMMBid: AMMID must be a string',
+      'AMMBid: Asset must be an Issue',
     )
   })
 
-  it(`throws w/ MinSlotPrice must be an Amount`, function () {
-    bid.MinSlotPrice = 5
+  it(`throws w/ missing field Asset2`, function () {
+    delete bid.Asset2
     assert.throws(
       () => validate(bid),
       ValidationError,
-      'AMMBid: MinSlotPrice must be an Amount',
+      'AMMBid: missing field Asset2',
     )
   })
 
-  it(`throws w/ MaxSlotPrice must be an Amount`, function () {
-    bid.MaxSlotPrice = 10
+  it(`throws w/ Asset2 must be an Issue`, function () {
+    bid.Asset2 = 1234
     assert.throws(
       () => validate(bid),
       ValidationError,
-      'AMMBid: MaxSlotPrice must be an Amount',
+      'AMMBid: Asset2 must be an Issue',
+    )
+  })
+
+  it(`throws w/ BidMin must be an Amount`, function () {
+    bid.BidMin = 5
+    assert.throws(
+      () => validate(bid),
+      ValidationError,
+      'AMMBid: BidMin must be an Amount',
+    )
+  })
+
+  it(`throws w/ BidMax must be an Amount`, function () {
+    bid.BidMax = 10
+    assert.throws(
+      () => validate(bid),
+      ValidationError,
+      'AMMBid: BidMax must be an Amount',
     )
   })
 
