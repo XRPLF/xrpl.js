@@ -2,6 +2,10 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
+
+### Fixed
+* Ignore `https-proxy-agent` in browsers for improved Vite integration
+
 ### Added
 * Optional custom amount field to `fundWallet`.
 

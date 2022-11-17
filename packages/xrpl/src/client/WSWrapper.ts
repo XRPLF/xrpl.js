@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unused-modules -- Used by webpack */
 /* eslint-disable max-classes-per-file -- Needs to be a wrapper for ws */
 import { EventEmitter } from 'events'
 
