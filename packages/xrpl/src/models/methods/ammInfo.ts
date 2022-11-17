@@ -1,4 +1,4 @@
-import { Amount, Currency, IssuedCurrencyAmount } from '../common'
+import { Issue, IssuedCurrencyAmount } from '../common'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
@@ -12,21 +12,16 @@ export interface AMMInfoRequest extends BaseRequest {
   command: 'amm_info'
 
   /**
-   * A hash that uniquely identifies the AMM instance.
-   */
-  amm_id?: string
-
-  /**
    * Specifies one of the pool assets (XRP or token) of the AMM instance.
    * Both asset and asset2 must be defined to specify an AMM instance.
    */
-  asset?: Currency
+  asset?: Issue
 
   /**
    * Specifies the other pool asset of the AMM instance.
    * Both asset and asset2 must be defined to specify an AMM instance.
    */
-  asset2?: Currency
+  asset2?: Issue
 }
 
 interface VoteEntry {
@@ -49,12 +44,12 @@ export interface AMMInfoResponse extends BaseResponse {
     /**
      * Specifies one of the pool assets (XRP or token) of the AMM instance.
      */
-    Asset: Amount
+    Asset: Issue
 
     /**
      * Specifies the other pool asset of the AMM instance.
      */
-    Asset2: Amount
+    Asset2: Issue
 
     /**
      * Represents the liquidity providers' shares of the AMM instance's pools.
@@ -72,11 +67,6 @@ export interface AMMInfoResponse extends BaseResponse {
      * between 0% and 1%. This field is required.
      */
     TradingFee: number
-
-    /**
-     * A hash that uniquely identifies the AMM instance.
-     */
-    AMMID?: string
 
     /**
      * Keeps a track of up to eight active votes for the instance.
