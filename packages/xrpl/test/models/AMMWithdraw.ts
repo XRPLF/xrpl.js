@@ -68,6 +68,17 @@ describe('AMMWithdraw', function () {
     assert.doesNotThrow(() => validate(withdraw))
   })
 
+  it(`verifies valid AMMWithdraw one asset withdraw all`, function () {
+    withdraw.Amount = '1000'
+    withdraw.Flags |= AMMWithdrawFlags.tfOneAssetWithdrawAll
+    assert.doesNotThrow(() => validate(withdraw))
+  })
+
+  it(`verifies valid AMMWithdraw withdraw all`, function () {
+    withdraw.Flags |= AMMWithdrawFlags.tfWithdrawAll
+    assert.doesNotThrow(() => validate(withdraw))
+  })
+
   it(`throws w/ missing field Asset`, function () {
     delete withdraw.Asset
     assert.throws(
@@ -101,14 +112,6 @@ describe('AMMWithdraw', function () {
       () => validate(withdraw),
       ValidationError,
       'AMMWithdraw: Asset2 must be an Issue',
-    )
-  })
-
-  it(`throws w/ must set at least LPTokenIn or Amount`, function () {
-    assert.throws(
-      () => validate(withdraw),
-      ValidationError,
-      'AMMWithdraw: must set at least LPTokenIn or Amount',
     )
   })
 
