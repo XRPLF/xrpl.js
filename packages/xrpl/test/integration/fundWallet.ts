@@ -25,7 +25,7 @@ describe('fundWallet', function () {
 
     await api.connect()
 
-    const wallet = Wallet.generate()
+    const wallet = Wallet.fromSeed('sEd73rvuVo5xFkV7NrzdEDFxuJHKwBe')
 
     const beforeSent = await api.request({
       command: 'account_info',
@@ -41,7 +41,7 @@ describe('fundWallet', function () {
     // eslint-disable-next-line require-atomic-updates -- Will not affect timeSinceLastHooksCall
     timeOfLastHooksFaucetCall = Date.now()
 
-    const { balance: newBalance } = await api.fundWallet(wallet, {
+    const { balance } = await api.fundWallet(wallet, {
       faucetHost: 'hooks-testnet-v2.xrpl-labs.com',
     })
 
@@ -54,7 +54,9 @@ describe('fundWallet', function () {
       dropsToXrp(afterSent.result.account_data.Balance) >
         dropsToXrp(beforeSent.result.account_data.Balance),
     )
-    assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
+    assert(
+      balance.toString() > dropsToXrp(beforeSent.result.account_data.Balance),
+    )
 
     await api.disconnect()
   })
