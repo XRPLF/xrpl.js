@@ -13,14 +13,14 @@ import {
 const TIMEOUT = 60000
 let timeOfLastHooksFaucetCall = 0
 // This test is reliant on external networks, and as such may be flaky.
-describe.only('fundWallet', function () {
+describe('fundWallet', function () {
   this.timeout(TIMEOUT)
 
   /*
    * Purposely separated from other hooks v2 testnet because required
    * 10 seconds between requests
    */
-  it.only('can fund given wallets on hooks v2 testnet', async function () {
+  it('can fund given wallets on hooks v2 testnet', async function () {
     const api = new Client('wss://hooks-testnet-v2.xrpl-labs.com')
 
     await api.connect()
