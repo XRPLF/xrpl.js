@@ -7,6 +7,16 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Support for the cross-chain bridge feature.
 * Support for Automated Market Maker (AMM) transactions and requests as defined in XLS-30.
 
+### Fixed
+* Ignore `https-proxy-agent` in browsers for improved Vite integration
+
+### Added
+* Optional custom amount field to `fundWallet`.
+* Support for the cross-chain bridge feature.
+
+### Changed
+* Add support for Transaction objects in `verifyTransaction`
+
 ## 2.5.0 (2022-10-13)
 ### Added
 * Support for ExpandedSignerList amendment that expands the maximum signer list to 32 entries.

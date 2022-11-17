@@ -18,7 +18,8 @@
     "test": "test"
   },
   "browser": {
-    "ws": "./dist/npm/client/WSWrapper.js"
+    "ws": "./dist/npm/client/WSWrapper.js",
+    "https-proxy-agent": false
   },
   "dependencies": {
     "bignumber.js": "^9.0.0",

@@ -4456,9 +4456,9 @@
         "Account": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
         "XChainBridge": {
           "LockingChainDoor": "rGzx83BVoqTYbGn7tiVAnFw7cbxjin13jL",
-          "LockingChainIssue": "XRP",
+          "LockingChainIssue": {"currency": "XRP"},
           "IssuingChainDoor": "r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV",
-          "IssuingChainIssue": "XRP"
+          "IssuingChainIssue": {"currency": "XRP"}
         },
         "Fee": "10",
         "Flags": 0,
@@ -4476,9 +4476,9 @@
         "Account": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
         "XChainBridge": {
           "LockingChainDoor": "rGzx83BVoqTYbGn7tiVAnFw7cbxjin13jL",
-          "LockingChainIssue": "XRP",
+          "LockingChainIssue": {"currency": "XRP"},
           "IssuingChainDoor": "r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV",
-          "IssuingChainIssue": "XRP"
+          "IssuingChainIssue": {"currency": "XRP"}
         },
         "Fee": "10",
         "Flags": 0,
@@ -4496,9 +4496,9 @@
         "Account": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
         "XChainBridge": {
           "LockingChainDoor": "rGzx83BVoqTYbGn7tiVAnFw7cbxjin13jL",
-          "LockingChainIssue": "XRP",
+          "LockingChainIssue": {"currency": "XRP"},
           "IssuingChainDoor": "r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV",
-          "IssuingChainIssue": "XRP"
+          "IssuingChainIssue": {"currency": "XRP"}
         },
         "Fee": "10",
         "Flags": 2147483648,
@@ -4517,9 +4517,9 @@
         "Amount": "10000",
         "XChainBridge": {
           "LockingChainDoor": "rGzx83BVoqTYbGn7tiVAnFw7cbxjin13jL",
-          "LockingChainIssue": "XRP",
+          "LockingChainIssue": {"currency": "XRP"},
           "IssuingChainDoor": "r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV",
-          "IssuingChainIssue": "XRP"
+          "IssuingChainIssue": {"currency": "XRP"}
         },
         "Fee": "10",
         "Flags": 2147483648,
@@ -4537,9 +4537,9 @@
         "Amount": "10000",
         "XChainBridge": {
           "LockingChainDoor": "rGzx83BVoqTYbGn7tiVAnFw7cbxjin13jL",
-          "LockingChainIssue": "XRP",
+          "LockingChainIssue": {"currency": "XRP"},
           "IssuingChainDoor": "r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV",
-          "IssuingChainIssue": "XRP"
+          "IssuingChainIssue": {"currency": "XRP"}
         },
         "Destination": "r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV",
         "Fee": "10",
@@ -4564,9 +4564,9 @@
         "XChainAttestationBatch" : {
           "XChainBridge" : {
             "IssuingChainDoor" : "rKeSSvHvaMZJp9ykaxutVwkhZgWuWMLnQt",
-            "IssuingChainIssue" : "XRP",
+            "IssuingChainIssue" : {"currency": "XRP"},
             "LockingChainDoor" : "rJvExveLEL4jNDEeLKCVdxaSCN9cEBnEQC",
-            "LockingChainIssue" : "XRP"
+            "LockingChainIssue" : {"currency": "XRP"}
            },
            "XChainClaimAttestationBatch" : [
             {
@@ -4592,9 +4592,9 @@
         "Account": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
         "XChainBridge": {
           "LockingChainDoor": "rGzx83BVoqTYbGn7tiVAnFw7cbxjin13jL",
-          "LockingChainIssue": "XRP",
+          "LockingChainIssue": {"currency": "XRP"},
           "IssuingChainDoor": "r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV",
-          "IssuingChainIssue": "XRP"
+          "IssuingChainIssue": {"currency": "XRP"}
         },
         "Amount": "1000000",
         "Fee": "10",
@@ -4620,9 +4620,9 @@
         "XChainAttestationBatch": {
           "XChainBridge": {
             "IssuingChainDoor": "rKeSSvHvaMZJp9ykaxutVwkhZgWuWMLnQt",
-            "IssuingChainIssue": "XRP",
+            "IssuingChainIssue": {"currency": "XRP"},
             "LockingChainDoor": "rJvExveLEL4jNDEeLKCVdxaSCN9cEBnEQC",
-            "LockingChainIssue": "XRP"
+            "LockingChainIssue": {"currency": "XRP"}
           },
           "XChainClaimAttestationBatch": [],
           "XChainCreateAccountAttestationBatch": [
