@@ -6,7 +6,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## 2.5.0-beta.2 (2022-11-17)
 ### Added
 * Optional custom amount field to `fundWallet`.
-* Support for the cross-chain bridge feature.
+* Support for cross-chain bridge proposal
+* New AMM API signature changes
 
 ### Fixed
 * Ignore `https-proxy-agent` in browsers for improved Vite integration
