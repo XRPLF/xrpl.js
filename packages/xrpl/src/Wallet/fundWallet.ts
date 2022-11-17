@@ -32,14 +32,18 @@ const MAX_ATTEMPTS = 20
  * @param this - Client.
  * @param wallet - An existing XRPL Wallet to fund. If undefined or null, a new Wallet will be created.
  * @param options - See below.
- * @param options.faucetHost - A custom host for a faucet server. On devnet, testnet, AMM devnet, NFT devnet, and HooksV2 testnet,
- * `fundWallet` will attempt to determine the correct server automatically. In other environments, or if you would like to
- * customize the faucet host in devnet or testnet, you should provide the host using this option.
- * @param options.faucetPath - A custom path for a faucet server. On devnet, testnet, AMM devnet, NFT devnet, and HooksV2 testnet,
- * `fundWallet` will attempt to determine the correct path automatically. In other environments, or if you would like to customize
- * the faucet path in devnet or testnet, you should provide the path using this option.
- * Ex: client.fundWallet(null,{'faucet.altnet.rippletest.net', '/accounts'}) specifies a request to
- * 'faucet.altnet.rippletest.net/accounts' to fund a new wallet.
+ * @param options.faucetHost - A custom host for a faucet server. On devnet,
+ * testnet, AMM devnet, NFT devnet, and HooksV2 testnet, `fundWallet` will
+ * attempt to determine the correct server automatically. In other environments,
+ * or if you would like to customize the faucet host in devnet or testnet,
+ * you should provide the host using this option.
+ * @param options.faucetPath - A custom path for a faucet server. On devnet,
+ * testnet, AMM devnet, NFT devnet, and HooksV2 testnet, `fundWallet` will
+ * attempt to determine the correct path automatically. In other environments,
+ * or if you would like to customize the faucet path in devnet or testnet,
+ * you should provide the path using this option.
+ * Ex: client.fundWallet(null,{'faucet.altnet.rippletest.net', '/accounts'})
+ * specifies a request to 'faucet.altnet.rippletest.net/accounts' to fund a new wallet.
  * @param options.amount - A custom amount to fund, if undefined or null, the default amount will be 1000.
  * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP,
  * and that wallet's balance in XRP.
