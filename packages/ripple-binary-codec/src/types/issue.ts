@@ -41,7 +41,7 @@ class Issue extends SerializedType {
    *     representing an integer amount
    * @returns An Amount object
    */
-  static from<T extends Issue | IssueObject | string>(value: T): Issue {
+  static from<T extends Issue | IssueObject>(value: T): Issue {
     if (value instanceof Issue) {
       return value
     }
