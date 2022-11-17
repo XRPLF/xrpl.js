@@ -92,7 +92,7 @@ export interface AMMInfoResponse extends BaseResponse {
     }
 
     /**
-     * 	The total outstanding balance of liquidity provider tokens from this AMM instance.
+     * The total outstanding balance of liquidity provider tokens from this AMM instance.
      * The holders of these tokens can vote on the AMM's trading fee in proportion to their holdings,
      * or redeem the tokens for a share of the AMM's assets which grows with the trading fees collected.
      */

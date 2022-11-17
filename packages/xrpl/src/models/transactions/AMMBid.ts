@@ -1,3 +1,4 @@
+/* eslint-disable complexity -- required for validateAMMBid */
 import { ValidationError } from '../../errors'
 import { Amount, Issue } from '../common'
 
