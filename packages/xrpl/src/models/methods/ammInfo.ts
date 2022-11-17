@@ -1,4 +1,4 @@
-import { Issue, IssuedCurrencyAmount } from '../common'
+import { Amount, Issue, IssuedCurrencyAmount } from '../common'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
@@ -24,9 +24,18 @@ export interface AMMInfoRequest extends BaseRequest {
   asset2?: Issue
 }
 
+interface AuthAccount {
+  AuthAccount: {
+    Account: string
+  }
+}
+
 interface VoteEntry {
-  TradingFee: number
-  VoteWeight: number
+  VoteEntry: {
+    Account: string
+    TradingFee: number
+    VoteWeight: number
+  }
 }
 
 /**
@@ -52,12 +61,42 @@ export interface AMMInfoResponse extends BaseResponse {
     Asset2: Issue
 
     /**
-     * Represents the liquidity providers' shares of the AMM instance's pools.
-     * LPTokens are tokens on XRPL. Each LPToken represents a proportional share of each pool of the AMM instance.
-     * The AMM instance account issues the LPTokens to LPs upon liquidity provision.
-     * LPTokens are balanced in the LPs trustline upon liquidity removal.
+     * Details of the current owner of the auction slot.
      */
-    LPToken: IssuedCurrencyAmount
+    AuctionSlot?: {
+      /**
+       * The current owner of this auction slot.
+       */
+      Account: string
+
+      /**
+       * A list of at most 4 additional accounts that are authorized to trade at the discounted fee for this AMM instance.
+       */
+      AuthAccounts: AuthAccount[]
+
+      /**
+       * The trading fee to be charged to the auction owner, in the same format as TradingFee.
+       * By default this is 0, meaning that the auction owner can trade at no fee instead of the standard fee for this AMM.
+       */
+      DiscountedFee: number
+
+      /**
+       * The time when this slot expires, in seconds since the Ripple Epoch.
+       */
+      Expiration: string
+
+      /**
+       * The amount the auction owner paid to win this slot, in LPTokens.
+       */
+      Price: Amount
+    }
+
+    /**
+     * 	The total outstanding balance of liquidity provider tokens from this AMM instance.
+     * The holders of these tokens can vote on the AMM's trading fee in proportion to their holdings,
+     * or redeem the tokens for a share of the AMM's assets which grows with the trading fees collected.
+     */
+    LPTokenBalance: IssuedCurrencyAmount
 
     /**
      * Specifies the fee, in basis point, to be charged to the traders for the trades
