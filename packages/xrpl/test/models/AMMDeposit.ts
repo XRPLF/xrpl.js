@@ -19,6 +19,13 @@ describe('AMMDeposit', function () {
     deposit = {
       TransactionType: 'AMMDeposit',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Asset: {
+        currency: 'XRP',
+      },
+      Asset2: {
+        currency: 'ETH',
+        issuer: 'rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd',
+      },
       Sequence: 1337,
       Flags: 0,
     } as any
@@ -38,7 +45,11 @@ describe('AMMDeposit', function () {
 
   it(`verifies valid AMMDeposit with Amount and Amount2`, function () {
     deposit.Amount = '1000'
-    deposit.Amount2 = '1000'
+    deposit.Amount2 = {
+      currency: 'ETH',
+      issuer: 'rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd',
+      value: '2.5',
+    }
     deposit.Flags |= AMMDepositFlags.tfTwoAsset
     assert.doesNotThrow(() => validate(deposit))
   })
@@ -57,6 +68,42 @@ describe('AMMDeposit', function () {
     assert.doesNotThrow(() => validate(deposit))
   })
 
+  it(`throws w/ missing field Asset`, function () {
+    delete deposit.Asset
+    assert.throws(
+      () => validate(deposit),
+      ValidationError,
+      'AMMDeposit: missing field Asset',
+    )
+  })
+
+  it(`throws w/ Asset must be an Issue`, function () {
+    deposit.Asset = 1234
+    assert.throws(
+      () => validate(deposit),
+      ValidationError,
+      'AMMDeposit: Asset must be an Issue',
+    )
+  })
+
+  it(`throws w/ missing field Asset2`, function () {
+    delete deposit.Asset2
+    assert.throws(
+      () => validate(deposit),
+      ValidationError,
+      'AMMDeposit: missing field Asset2',
+    )
+  })
+
+  it(`throws w/ Asset2 must be an Issue`, function () {
+    deposit.Asset2 = 1234
+    assert.throws(
+      () => validate(deposit),
+      ValidationError,
+      'AMMDeposit: Asset2 must be an Issue',
+    )
+  })
+
   it(`throws w/ must set at least LPTokenOut or Amount`, function () {
     assert.throws(
       () => validate(deposit),
@@ -66,7 +113,11 @@ describe('AMMDeposit', function () {
   })
 
   it(`throws w/ must set Amount with Amount2`, function () {
-    deposit.Amount2 = '500'
+    deposit.Amount2 = {
+      currency: 'ETH',
+      issuer: 'rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd',
+      value: '2.5',
+    }
     assert.throws(
       () => validate(deposit),
       ValidationError,

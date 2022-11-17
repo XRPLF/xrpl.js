@@ -4,7 +4,7 @@
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
-import { Amount, IssuedCurrencyAmount, Memo, Signer } from '../common'
+import { Amount, Issue, IssuedCurrencyAmount, Memo, Signer } from '../common'
 import { onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
@@ -82,6 +82,25 @@ export function isIssuedCurrency(
  */
 export function isAmount(amount: unknown): amount is Amount {
   return typeof amount === 'string' || isIssuedCurrency(amount)
+}
+
+/**
+ * Verify the form and type of an Issue at runtime.
+ *
+ * @param input - The object to check the form and type of.
+ * @returns Whether the Issue is malformed.
+ */
+export function isIssue(input: unknown): input is Issue {
+  if (!isRecord(input)) {
+    return false
+  }
+  const length = Object.keys(input).length
+  return (
+    (length === 1 && input.currency === 'XRP') ||
+    (length === 2 &&
+      typeof input.currency === 'string' &&
+      typeof input.issuer === 'string')
+  )
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface -- no global flags right now, so this is fine

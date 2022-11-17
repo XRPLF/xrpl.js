@@ -19,6 +19,13 @@ describe('AMMWithdraw', function () {
     withdraw = {
       TransactionType: 'AMMWithdraw',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Asset: {
+        currency: 'XRP',
+      },
+      Asset2: {
+        currency: 'ETH',
+        issuer: 'rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd',
+      },
       Sequence: 1337,
       Flags: 0,
     } as any
@@ -37,7 +44,11 @@ describe('AMMWithdraw', function () {
 
   it(`verifies valid AMMWithdraw with Amount and Amount2`, function () {
     withdraw.Amount = '1000'
-    withdraw.Amount2 = '1000'
+    withdraw.Amount2 = {
+      currency: 'ETH',
+      issuer: 'rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd',
+      value: '2.5',
+    }
     assert.doesNotThrow(() => validate(withdraw))
   })
 
@@ -53,6 +64,42 @@ describe('AMMWithdraw', function () {
     assert.doesNotThrow(() => validate(withdraw))
   })
 
+  it(`throws w/ missing field Asset`, function () {
+    delete withdraw.Asset
+    assert.throws(
+      () => validate(withdraw),
+      ValidationError,
+      'AMMWithdraw: missing field Asset',
+    )
+  })
+
+  it(`throws w/ Asset must be an Issue`, function () {
+    withdraw.Asset = 1234
+    assert.throws(
+      () => validate(withdraw),
+      ValidationError,
+      'AMMWithdraw: Asset must be an Issue',
+    )
+  })
+
+  it(`throws w/ missing field Asset2`, function () {
+    delete withdraw.Asset2
+    assert.throws(
+      () => validate(withdraw),
+      ValidationError,
+      'AMMWithdraw: missing field Asset2',
+    )
+  })
+
+  it(`throws w/ Asset2 must be an Issue`, function () {
+    withdraw.Asset2 = 1234
+    assert.throws(
+      () => validate(withdraw),
+      ValidationError,
+      'AMMWithdraw: Asset2 must be an Issue',
+    )
+  })
+
   it(`throws w/ must set at least LPTokenIn or Amount`, function () {
     assert.throws(
       () => validate(withdraw),
@@ -62,7 +109,11 @@ describe('AMMWithdraw', function () {
   })
 
   it(`throws w/ must set Amount with Amount2`, function () {
-    withdraw.Amount2 = '500'
+    withdraw.Amount2 = {
+      currency: 'ETH',
+      issuer: 'rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd',
+      value: '2.5',
+    }
     assert.throws(
       () => validate(withdraw),
       ValidationError,

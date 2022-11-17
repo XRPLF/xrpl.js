@@ -1,7 +1,12 @@
 import { ValidationError } from '../../errors'
 import { Amount, Issue } from '../common'
 
-import { BaseTransaction, isAmount, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isAmount,
+  isIssue,
+  validateBaseTransaction,
+} from './common'
 
 const MAX_AUTH_ACCOUNTS = 4
 
@@ -60,6 +65,22 @@ export interface AMMBid extends BaseTransaction {
  */
 export function validateAMMBid(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+
+  if (tx.Asset == null) {
+    throw new ValidationError('AMMBid: missing field Asset')
+  }
+
+  if (!isIssue(tx.Asset)) {
+    throw new ValidationError('AMMBid: Asset must be an Issue')
+  }
+
+  if (tx.Asset2 == null) {
+    throw new ValidationError('AMMBid: missing field Asset2')
+  }
+
+  if (!isIssue(tx.Asset2)) {
+    throw new ValidationError('AMMBid: Asset2 must be an Issue')
+  }
 
   if (tx.BidMin != null && !isAmount(tx.BidMin)) {
     throw new ValidationError('AMMBid: BidMin must be an Amount')

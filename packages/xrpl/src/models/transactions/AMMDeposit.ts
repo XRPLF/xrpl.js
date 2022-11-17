@@ -6,6 +6,7 @@ import {
   BaseTransaction,
   GlobalFlags,
   isAmount,
+  isIssue,
   isIssuedCurrency,
   validateBaseTransaction,
 } from './common'
@@ -87,6 +88,22 @@ export interface AMMDeposit extends BaseTransaction {
  */
 export function validateAMMDeposit(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+
+  if (tx.Asset == null) {
+    throw new ValidationError('AMMDeposit: missing field Asset')
+  }
+
+  if (!isIssue(tx.Asset)) {
+    throw new ValidationError('AMMDeposit: Asset must be an Issue')
+  }
+
+  if (tx.Asset2 == null) {
+    throw new ValidationError('AMMDeposit: missing field Asset2')
+  }
+
+  if (!isIssue(tx.Asset2)) {
+    throw new ValidationError('AMMDeposit: Asset2 must be an Issue')
+  }
 
   if (tx.Amount2 != null && tx.Amount == null) {
     throw new ValidationError('AMMDeposit: must set Amount with Amount2')

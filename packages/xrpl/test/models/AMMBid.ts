@@ -13,6 +13,13 @@ describe('AMMBid', function () {
     bid = {
       TransactionType: 'AMMBid',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Asset: {
+        currency: 'XRP',
+      },
+      Asset2: {
+        currency: 'ETH',
+        issuer: 'rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd',
+      },
       BidMin: '5',
       BidMax: '10',
       AuthAccounts: [
@@ -43,6 +50,42 @@ describe('AMMBid', function () {
 
   it(`verifies valid AMMBid`, function () {
     assert.doesNotThrow(() => validate(bid))
+  })
+
+  it(`throws w/ missing field Asset`, function () {
+    delete bid.Asset
+    assert.throws(
+      () => validate(bid),
+      ValidationError,
+      'AMMBid: missing field Asset',
+    )
+  })
+
+  it(`throws w/ Asset must be an Issue`, function () {
+    bid.Asset = 1234
+    assert.throws(
+      () => validate(bid),
+      ValidationError,
+      'AMMBid: Asset must be an Issue',
+    )
+  })
+
+  it(`throws w/ missing field Asset2`, function () {
+    delete bid.Asset2
+    assert.throws(
+      () => validate(bid),
+      ValidationError,
+      'AMMBid: missing field Asset2',
+    )
+  })
+
+  it(`throws w/ Asset2 must be an Issue`, function () {
+    bid.Asset2 = 1234
+    assert.throws(
+      () => validate(bid),
+      ValidationError,
+      'AMMBid: Asset2 must be an Issue',
+    )
   })
 
   it(`throws w/ BidMin must be an Amount`, function () {

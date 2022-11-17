@@ -6,6 +6,7 @@ import {
   BaseTransaction,
   GlobalFlags,
   isAmount,
+  isIssue,
   isIssuedCurrency,
   validateBaseTransaction,
 } from './common'
@@ -93,6 +94,22 @@ export interface AMMWithdraw extends BaseTransaction {
  */
 export function validateAMMWithdraw(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+
+  if (tx.Asset == null) {
+    throw new ValidationError('AMMWithdraw: missing field Asset')
+  }
+
+  if (!isIssue(tx.Asset)) {
+    throw new ValidationError('AMMWithdraw: Asset must be an Issue')
+  }
+
+  if (tx.Asset2 == null) {
+    throw new ValidationError('AMMWithdraw: missing field Asset2')
+  }
+
+  if (!isIssue(tx.Asset2)) {
+    throw new ValidationError('AMMWithdraw: Asset2 must be an Issue')
+  }
 
   if (tx.Amount2 != null && tx.Amount == null) {
     throw new ValidationError('AMMWithdraw: must set Amount with Amount2')

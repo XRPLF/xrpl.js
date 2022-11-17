@@ -2,7 +2,7 @@ import { ValidationError } from '../../errors'
 import { Issue } from '../common'
 
 import { AMM_MAX_TRADING_FEE } from './AMMCreate'
-import { BaseTransaction, validateBaseTransaction } from './common'
+import { BaseTransaction, isIssue, validateBaseTransaction } from './common'
 
 /**
  * AMMVote is used for submitting a vote for the trading fee of an AMM Instance.
@@ -40,6 +40,22 @@ export interface AMMVote extends BaseTransaction {
  */
 export function validateAMMVote(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+
+  if (tx.Asset == null) {
+    throw new ValidationError('AMMVote: missing field Asset')
+  }
+
+  if (!isIssue(tx.Asset)) {
+    throw new ValidationError('AMMVote: Asset must be an Issue')
+  }
+
+  if (tx.Asset2 == null) {
+    throw new ValidationError('AMMVote: missing field Asset2')
+  }
+
+  if (!isIssue(tx.Asset2)) {
+    throw new ValidationError('AMMVote: Asset2 must be an Issue')
+  }
 
   if (tx.TradingFee == null) {
     throw new ValidationError('AMMVote: missing field TradingFee')

@@ -13,6 +13,13 @@ describe('AMMVote', function () {
     vote = {
       TransactionType: 'AMMVote',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Asset: {
+        currency: 'XRP',
+      },
+      Asset2: {
+        currency: 'ETH',
+        issuer: 'rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd',
+      },
       TradingFee: 25,
       Sequence: 1337,
     } as any
@@ -20,6 +27,42 @@ describe('AMMVote', function () {
 
   it(`verifies valid AMMVote`, function () {
     assert.doesNotThrow(() => validate(vote))
+  })
+
+  it(`throws w/ missing field Asset`, function () {
+    delete vote.Asset
+    assert.throws(
+      () => validate(vote),
+      ValidationError,
+      'AMMVote: missing field Asset',
+    )
+  })
+
+  it(`throws w/ Asset must be an Issue`, function () {
+    vote.Asset = 1234
+    assert.throws(
+      () => validate(vote),
+      ValidationError,
+      'AMMVote: Asset must be an Issue',
+    )
+  })
+
+  it(`throws w/ missing field Asset2`, function () {
+    delete vote.Asset2
+    assert.throws(
+      () => validate(vote),
+      ValidationError,
+      'AMMVote: missing field Asset2',
+    )
+  })
+
+  it(`throws w/ Asset2 must be an Issue`, function () {
+    vote.Asset2 = 1234
+    assert.throws(
+      () => validate(vote),
+      ValidationError,
+      'AMMVote: Asset2 must be an Issue',
+    )
   })
 
   it(`throws w/ missing field TradingFee`, function () {
