@@ -87,12 +87,10 @@ async function fundWallet(
     /* startingBalance remains '0' */
   }
   // Options to pass to https.request
-  const httpOptions = getHTTPOptions(
-    this,
-    postBody,
-    options?.faucetHost,
-    options?.faucetPath,
-  )
+  const httpOptions = getHTTPOptions(this, postBody, {
+    hostname: options?.faucetHost,
+    pathname: options?.faucetPath,
+  })
 
   return returnPromise(
     httpOptions,
@@ -146,11 +144,13 @@ async function returnPromise(
 function getHTTPOptions(
   client: Client,
   postBody: Uint8Array,
-  hostname?: string,
-  pathname?: string,
+  options?: {
+    hostname?: string
+    pathname?: string
+  },
 ): RequestOptions {
-  const finalHostname = hostname ?? getFaucetHost(client)
-  const finalPathname = pathname ?? getDefaultFaucetPath(finalHostname)
+  const finalHostname = options?.hostname ?? getFaucetHost(client)
+  const finalPathname = options?.pathname ?? getDefaultFaucetPath(finalHostname)
   return {
     hostname: finalHostname,
     port: 443,
