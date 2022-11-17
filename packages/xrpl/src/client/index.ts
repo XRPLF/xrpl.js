@@ -24,6 +24,9 @@ import {
   AccountOffersResponse,
   AccountTxRequest,
   AccountTxResponse,
+  // AMM methods
+  AMMInfoRequest,
+  AMMInfoResponse,
   GatewayBalancesRequest,
   GatewayBalancesResponse,
   NoRippleCheckRequest,
@@ -298,6 +301,7 @@ class Client extends EventEmitter {
   ): Promise<AccountObjectsResponse>
   public async request(r: AccountOffersRequest): Promise<AccountOffersResponse>
   public async request(r: AccountTxRequest): Promise<AccountTxResponse>
+  public async request(r: AMMInfoRequest): Promise<AMMInfoResponse>
   public async request(r: BookOffersRequest): Promise<BookOffersResponse>
   public async request(r: ChannelVerifyRequest): Promise<ChannelVerifyResponse>
   public async request(
