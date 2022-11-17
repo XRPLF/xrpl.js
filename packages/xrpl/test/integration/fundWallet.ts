@@ -25,7 +25,12 @@ describe('fundWallet', function () {
 
     await api.connect()
 
-    const wallet = Wallet.fromSeed('sEd73rvuVo5xFkV7NrzdEDFxuJHKwBe')
+    const wallet = Wallet.generate()
+
+    const beforeSent = await api.request({
+      command: 'account_info',
+      account: wallet.classicAddress,
+    })
 
     const timeSinceLastHooksCall = Date.now() - timeOfLastHooksFaucetCall
     if (timeSinceLastHooksCall < 10000) {
@@ -45,6 +50,10 @@ describe('fundWallet', function () {
       account: wallet.classicAddress,
     })
 
+    assert(
+      dropsToXrp(afterSent.result.account_data.Balance) >
+        dropsToXrp(beforeSent.result.account_data.Balance),
+    )
     assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
 
     await api.disconnect()
