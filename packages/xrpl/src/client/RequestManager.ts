@@ -99,6 +99,7 @@ export default class RequestManager {
       newId = request.id
     }
     const newRequest = JSON.stringify({ ...request, id: newId })
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required for Jest running in browser
     const timer = setTimeout(() => {
       this.reject(
         newId,
@@ -107,7 +108,7 @@ export default class RequestManager {
           request,
         ),
       )
-    }, timeout)
+    }, timeout) as unknown as NodeJS.Timeout
     /*
      * Node.js won't exit if a timer is still running, so we tell Node to ignore.
      * (Node will still wait for the request to complete).

@@ -17,8 +17,8 @@ export async function teardownClient(
 
 async function connectWithRetry(client: Client, tries = 0): Promise<void> {
   return client.connect().catch(async (error) => {
-    // eslint-disable-next-line no-console -- console.log is fine for tests
-    console.error(error)
+    // // eslint-disable-next-line no-console -- console.log is fine for tests
+    // console.error(error)
     if (tries < 10) {
       return new Promise((resolve) => {
         setTimeout(() => {

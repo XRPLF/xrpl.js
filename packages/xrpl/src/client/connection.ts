@@ -1,5 +1,6 @@
 /* eslint-disable max-lines -- Connection is a large file w/ lots of imports/exports */
 /* eslint-disable max-len -- Connection is a large file w/ lots of imports/exports */
+
 import { EventEmitter } from 'events'
 import { Agent } from 'http'
 
@@ -17,6 +18,15 @@ import { BaseRequest } from '../models/methods/baseMethod'
 import ConnectionManager from './ConnectionManager'
 import ExponentialBackoff from './ExponentialBackoff'
 import RequestManager from './RequestManager'
+
+type GlobalThis = typeof globalThis
+type Global = GlobalThis & {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Necessary for Jest in browser
+  TextEncoder: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Necessary for Jest in browser
+  TextDecoder: any
+}
+declare const global: Global
 
 if (typeof TextDecoder === 'undefined') {
   // eslint-dsiable-next-line max-len -- necessary to disable all the rules
@@ -255,6 +265,7 @@ export class Connection extends EventEmitter {
     }
 
     // Create the connection timeout, in case the connection hangs longer than expected.
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required for Jest running in browser
     const connectionTimeoutID = setTimeout(() => {
       this.onConnectionFailed(
         new ConnectionError(
@@ -262,7 +273,7 @@ export class Connection extends EventEmitter {
             `rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.`,
         ),
       )
-    }, this.config.connectionTimeout)
+    }, this.config.connectionTimeout) as unknown as NodeJS.Timeout
     // Connection listeners: these stay attached only until a connection is done/open.
     this.ws = createWebSocket(this.url, this.config)
 
@@ -518,11 +529,12 @@ export class Connection extends EventEmitter {
      * Start the reconnect timeout, but set it to `this.reconnectTimeoutID`
      * so that we can cancel one in-progress on disconnect.
      */
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required for Jest running in browser
     this.reconnectTimeoutID = setTimeout(() => {
       this.reconnect().catch((error: Error) => {
         this.emit('error', 'reconnect', error.message, error)
       })
-    }, retryTimeout)
+    }, retryTimeout) as unknown as NodeJS.Timeout
   }
 
   /**
@@ -539,9 +551,10 @@ export class Connection extends EventEmitter {
    */
   private startHeartbeatInterval(): void {
     this.clearHeartbeatInterval()
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required for Jest running in browser
     this.heartbeatIntervalID = setInterval(() => {
       void this.heartbeat()
-    }, this.config.timeout)
+    }, this.config.timeout) as unknown as NodeJS.Timeout
   }
 
   /**

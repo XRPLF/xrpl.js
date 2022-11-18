@@ -4,7 +4,7 @@ import assert from 'assert'
 const TIMEOUT = 20000
 
 // the purpose of this file is to indicate the end of tests and not really test anything.
-test(
+it(
   'closing test',
   function () {
     assert(true)
