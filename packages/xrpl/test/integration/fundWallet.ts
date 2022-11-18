@@ -13,14 +13,14 @@ import {
 const TIMEOUT = 60000
 let timeOfLastHooksFaucetCall = 0
 // This test is reliant on external networks, and as such may be flaky.
-describe.only('fundWallet', function () {
+describe('fundWallet', function () {
   this.timeout(TIMEOUT)
 
   /*
    * Purposely separated from other hooks v2 testnet because required
    * 10 seconds between requests
    */
-  it.only('can fund given wallets on hooks v2 testnet', async function () {
+  it('can fund given wallets on hooks v2 testnet', async function () {
     const api = new Client('wss://hooks-testnet-v2.xrpl-labs.com')
 
     await api.connect()
@@ -49,13 +49,9 @@ describe.only('fundWallet', function () {
       command: 'account_info',
       account: wallet.classicAddress,
     })
-    console.log(
-      'top',
-      balance,
-      dropsToXrp(afterSent.result.account_data.Balance),
-      dropsToXrp(beforeSent.result.account_data.Balance),
-    )
-    assert.equal(dropsToXrp(afterSent.result.account_data.Balance), balance)
+
+    // afterSent could be > than balance if another person is running test cases at the same time
+    assert(Number(dropsToXrp(afterSent.result.account_data.Balance)) >= balance)
     assert(balance > Number(dropsToXrp(beforeSent.result.account_data.Balance)))
 
     /*
@@ -98,7 +94,7 @@ describe.only('fundWallet', function () {
     )
   })
 
-  it.only('can generate and fund wallet on hooks v2 testnet', async function () {
+  it('can generate and fund wallet on hooks v2 testnet', async function () {
     const api = new Client('wss://hooks-testnet-v2.xrpl-labs.com')
 
     await api.connect()
@@ -122,8 +118,6 @@ describe.only('fundWallet', function () {
       command: 'account_info',
       account: wallet.classicAddress,
     })
-
-    console.log('bot', balance, dropsToXrp(info.result.account_data.Balance))
 
     assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
     assert.equal(balance, 10000)
