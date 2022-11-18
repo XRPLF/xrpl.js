@@ -1,9 +1,12 @@
 import { assert } from 'chai'
 
-import { _private } from '../../src/Wallet/fundWallet'
+import {
+  FaucetNetwork,
+  FaucetNetworkPaths,
+  getFaucetHost,
+  getDefaultFaucetPath,
+} from '../../src/Wallet/defaultFaucets'
 import { setupClient, teardownClient } from '../setupClient'
-
-const { FaucetNetwork, getFaucetHost } = _private
 
 describe('Get Faucet host ', function () {
   beforeEach(setupClient)
@@ -30,7 +33,30 @@ describe('Get Faucet host ', function () {
     assert.strictEqual(getFaucetHost(this.client), expectedFaucet)
   })
 
-  it('returns undefined if not a Testnet or Devnet server URL', function () {
+  it('returns the NFT-Devnet host with the XLS-20 Sandbox server', function () {
+    const expectedFaucet = FaucetNetwork.NFTDevnet
+    this.client.connection.url = 'ws://xls20-sandbox.rippletest.net:51233'
+
+    assert.strictEqual(getFaucetHost(this.client), expectedFaucet)
+  })
+
+  it('returns the correct faucetPath for Devnet host', function () {
+    const expectedFaucetPath = FaucetNetworkPaths[FaucetNetwork.Devnet]
+    this.client.connection.url = FaucetNetwork.Devnet
+
+    assert.strictEqual(
+      getDefaultFaucetPath(getFaucetHost(this.client)),
+      expectedFaucetPath,
+    )
+  })
+
+  it('returns the correct faucetPath for undefined host', function () {
+    const expectedFaucetPath = '/accounts'
+
+    assert.strictEqual(getDefaultFaucetPath(undefined), expectedFaucetPath)
+  })
+
+  it('throws if not connected to a known faucet host', function () {
     // Info: setupClient.setup creates a connection to 'localhost'
     assert.throws(() => getFaucetHost(this.client))
   })

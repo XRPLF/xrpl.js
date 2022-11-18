@@ -6,23 +6,13 @@ import { isValidClassicAddress } from 'ripple-address-codec'
 import type { Client } from '..'
 import { RippledError, XRPLFaucetError } from '../errors'
 
+import {
+  FaucetWallet,
+  getFaucetHost,
+  getDefaultFaucetPath,
+} from './defaultFaucets'
+
 import Wallet from '.'
-
-interface FaucetWallet {
-  account: {
-    xAddress: string
-    classicAddress?: string
-    secret: string
-  }
-  amount: number
-  balance: number
-}
-
-enum FaucetNetwork {
-  Testnet = 'faucet.altnet.rippletest.net',
-  Devnet = 'faucet.devnet.rippletest.net',
-  NFTDevnet = 'faucet-nft.ripple.com',
-}
 
 // Interval to check an account balance
 const INTERVAL_SECONDS = 1
@@ -42,22 +32,30 @@ const MAX_ATTEMPTS = 20
  * @param this - Client.
  * @param wallet - An existing XRPL Wallet to fund. If undefined or null, a new Wallet will be created.
  * @param options - See below.
- * @param options.faucetHost - A custom host for a faucet server. On devnet and
- * testnet, `fundWallet` will attempt to determine the correct server
- * automatically. In other environments, or if you would like to customize the
- * faucet host in devnet or testnet, you should provide the host using this
- * option.
+ * @param options.faucetHost - A custom host for a faucet server. On devnet,
+ * testnet, AMM devnet, NFT devnet testnet, `fundWallet` will
+ * attempt to determine the correct server automatically. In other environments,
+ * or if you would like to customize the faucet host in devnet or testnet,
+ * you should provide the host using this option.
+ * @param options.faucetPath - A custom path for a faucet server. On devnet,
+ * testnet, AMM devnet, NFT devnet testnet, `fundWallet` will
+ * attempt to determine the correct path automatically. In other environments,
+ * or if you would like to customize the faucet path in devnet or testnet,
+ * you should provide the path using this option.
+ * Ex: client.fundWallet(null,{'faucet.altnet.rippletest.net', '/accounts'})
+ * specifies a request to 'faucet.altnet.rippletest.net/accounts' to fund a new wallet.
  * @param options.amount - A custom amount to fund, if undefined or null, the default amount will be 1000.
  * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP,
  * and that wallet's balance in XRP.
  * @throws When either Client isn't connected or unable to fund wallet address.
  */
-// eslint-disable-next-line max-lines-per-function -- this function needs to display and do with more information.
+// eslint-disable-next-line max-lines-per-function -- All lines necessary
 async function fundWallet(
   this: Client,
   wallet?: Wallet | null,
   options?: {
     faucetHost?: string
+    faucetPath?: string
     amount?: string
   },
 ): Promise<{
@@ -92,9 +90,11 @@ async function fundWallet(
   } catch {
     /* startingBalance remains '0' */
   }
-
   // Options to pass to https.request
-  const httpOptions = getHTTPOptions(this, postBody, options?.faucetHost)
+  const httpOptions = getHTTPOptions(this, postBody, {
+    hostname: options?.faucetHost,
+    pathname: options?.faucetPath,
+  })
 
   return returnPromise(
     httpOptions,
@@ -147,12 +147,17 @@ async function returnPromise(
 function getHTTPOptions(
   client: Client,
   postBody: Uint8Array,
-  hostname?: string,
+  options?: {
+    hostname?: string
+    pathname?: string
+  },
 ): RequestOptions {
+  const finalHostname = options?.hostname ?? getFaucetHost(client)
+  const finalPathname = options?.pathname ?? getDefaultFaucetPath(finalHostname)
   return {
-    hostname: hostname ?? getFaucetHost(client),
+    hostname: finalHostname,
     port: 443,
-    path: '/accounts',
+    path: finalPathname,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -175,11 +180,14 @@ async function onEnd(
 
   // "application/json; charset=utf-8"
   if (response.headers['content-type']?.startsWith('application/json')) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- We know this is safe and correct
+    const faucetWallet: FaucetWallet = JSON.parse(body)
+    const classicAddress = faucetWallet.account.classicAddress
     await processSuccessfulResponse(
       client,
-      body,
-      startingBalance,
+      classicAddress,
       walletToFund,
+      startingBalance,
       resolve,
       reject,
     )
@@ -199,16 +207,12 @@ async function onEnd(
 // eslint-disable-next-line max-params, max-lines-per-function -- Only used as a helper function, lines inc due to added balance.
 async function processSuccessfulResponse(
   client: Client,
-  body: string,
-  startingBalance: number,
+  classicAddress: string | undefined,
   walletToFund: Wallet,
+  startingBalance: number,
   resolve: (response: { wallet: Wallet; balance: number }) => void,
   reject: (err: ErrorConstructor | Error | unknown) => void,
 ): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- We know this is safe and correct
-  const faucetWallet: FaucetWallet = JSON.parse(body)
-  const classicAddress = faucetWallet.account.classicAddress
-
   if (!classicAddress) {
     reject(new XRPLFaucetError(`The faucet account is undefined`))
     return
@@ -298,37 +302,4 @@ async function getUpdatedBalance(
   })
 }
 
-/**
- * Get the faucet host based on the Client connection.
- *
- * @param client - Client.
- * @returns A {@link FaucetNetwork}.
- * @throws When the client url is not on altnet or devnet.
- */
-function getFaucetHost(client: Client): FaucetNetwork | undefined {
-  const connectionUrl = client.url
-
-  // 'altnet' for Ripple Testnet server and 'testnet' for XRPL Labs Testnet server
-  if (connectionUrl.includes('altnet') || connectionUrl.includes('testnet')) {
-    return FaucetNetwork.Testnet
-  }
-
-  if (connectionUrl.includes('devnet')) {
-    return FaucetNetwork.Devnet
-  }
-
-  if (connectionUrl.includes('xls20-sandbox')) {
-    return FaucetNetwork.NFTDevnet
-  }
-
-  throw new XRPLFaucetError('Faucet URL is not defined or inferrable.')
-}
-
 export default fundWallet
-
-const _private = {
-  FaucetNetwork,
-  getFaucetHost,
-}
-
-export { _private }

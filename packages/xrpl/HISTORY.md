@@ -11,6 +11,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Changed
 * Add support for Transaction objects in `verifyTransaction`
+* When connected to amm devnet, Client.fundWallet now defaults to using the faucet instead of requiring specification.
+* Ability to specify faucet url for wallet generation/funding purposes
 
 ## 2.5.0 (2022-10-13)
 ### Added
