@@ -91,6 +91,7 @@ describe('fundWallet', function () {
       'wss://amm.devnet.rippletest.net:51233',
     )
   })
+})
 
   it('can generate and fund wallet on hooks v2 testnet', async function () {
     const api = new Client('wss://hooks-testnet-v2.xrpl-labs.com')
@@ -112,24 +113,24 @@ describe('fundWallet', function () {
     assert(isValidClassicAddress(wallet.classicAddress))
     assert(isValidXAddress(wallet.getXAddress()))
 
-    const info = await api.request({
-      command: 'account_info',
-      account: wallet.classicAddress,
-    })
+  const { wallet, balance } = await api.fundWallet(null, {
+    faucetHost,
+    faucetPath,
+  })
+  assert.notEqual(wallet, undefined)
+  assert(isValidClassicAddress(wallet.classicAddress))
+  assert(isValidXAddress(wallet.getXAddress()))
 
-    assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
+  const info = await api.request({
+    command: 'account_info',
+    account: wallet.classicAddress,
+  })
 
     await api.disconnect()
   })
-  it('submit funds wallet with custom amount', async function () {
-    const api = new Client('wss://s.altnet.rippletest.net:51233')
+  assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
 
-    await api.connect()
-    const { wallet, balance } = await api.fundWallet(null, { amount: '2000' })
-    assert.equal(balance, '2000')
-    assert.notEqual(wallet, undefined)
-    assert(isValidClassicAddress(wallet.classicAddress))
-    assert(isValidXAddress(wallet.getXAddress()))
+  assert(newBalance > balance)
 
     const info = await api.request({
       command: 'account_info',
@@ -176,6 +177,6 @@ async function generate_faucet_wallet_and_fund_again(
   assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
 
   assert(newBalance > balance)
-
+  
   await api.disconnect()
 }

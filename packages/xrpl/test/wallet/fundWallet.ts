@@ -73,7 +73,7 @@ describe('Get Faucet host ', function () {
     assert.strictEqual(getDefaultFaucetPath(undefined), expectedFaucetPath)
   })
 
-  it('returns undefined if not a Testnet, Devnet, NFT-Devnet, or HooksV2 Testnet server URL', function () {
+  it('throws if not connected to a known faucet host', function () {
     // Info: setupClient.setup creates a connection to 'localhost'
     assert.throws(() => getFaucetHost(this.client))
   })
