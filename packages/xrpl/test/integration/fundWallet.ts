@@ -50,14 +50,12 @@ describe('fundWallet', function () {
       account: wallet.classicAddress,
     })
 
-    // afterSent could be > than balance if another person is running test cases at the same time
+    /*
+     * afterSent could be > than balance if test cases are being run more than once simulataneously
+     * because the same seed (same wallet) is being used
+     */
     assert(Number(dropsToXrp(afterSent.result.account_data.Balance)) >= balance)
     assert(balance > Number(dropsToXrp(beforeSent.result.account_data.Balance)))
-
-    /*
-     * assert beforeSent < afterSent
-     * assert balance = afterSent
-     */
 
     await api.disconnect()
   })
