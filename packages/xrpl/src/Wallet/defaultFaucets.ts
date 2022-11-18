@@ -40,7 +40,7 @@ export function getFaucetHost(client: Client): FaucetNetwork | undefined {
   if (connectionUrl.includes('hooks-testnet-v2')) {
     return FaucetNetwork.HooksV2Testnet
   }
-  
+
   // 'altnet' for Ripple Testnet server and 'testnet' for XRPL Labs Testnet server
   if (connectionUrl.includes('altnet') || connectionUrl.includes('testnet')) {
     return FaucetNetwork.Testnet

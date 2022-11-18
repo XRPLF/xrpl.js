@@ -13,14 +13,14 @@ import {
 const TIMEOUT = 60000
 let timeOfLastHooksFaucetCall = 0
 // This test is reliant on external networks, and as such may be flaky.
-describe('fundWallet', function () {
+describe.only('fundWallet', function () {
   this.timeout(TIMEOUT)
 
   /*
    * Purposely separated from other hooks v2 testnet because required
    * 10 seconds between requests
    */
-  it('can fund given wallets on hooks v2 testnet', async function () {
+  it.only('can fund given wallets on hooks v2 testnet', async function () {
     const api = new Client('wss://hooks-testnet-v2.xrpl-labs.com')
 
     await api.connect()
@@ -49,13 +49,19 @@ describe('fundWallet', function () {
       command: 'account_info',
       account: wallet.classicAddress,
     })
-    assert(
-      dropsToXrp(afterSent.result.account_data.Balance) >
-        dropsToXrp(beforeSent.result.account_data.Balance),
+    console.log(
+      'top',
+      balance,
+      dropsToXrp(afterSent.result.account_data.Balance),
+      dropsToXrp(beforeSent.result.account_data.Balance),
     )
-    assert(
-      balance.toString() > dropsToXrp(beforeSent.result.account_data.Balance),
-    )
+    assert.equal(dropsToXrp(afterSent.result.account_data.Balance), balance)
+    assert(balance > Number(dropsToXrp(beforeSent.result.account_data.Balance)))
+
+    /*
+     * assert beforeSent < afterSent
+     * assert balance = afterSent
+     */
 
     await api.disconnect()
   })
@@ -92,7 +98,7 @@ describe('fundWallet', function () {
     )
   })
 
-  it('can generate and fund wallet on hooks v2 testnet', async function () {
+  it.only('can generate and fund wallet on hooks v2 testnet', async function () {
     const api = new Client('wss://hooks-testnet-v2.xrpl-labs.com')
 
     await api.connect()
@@ -117,7 +123,10 @@ describe('fundWallet', function () {
       account: wallet.classicAddress,
     })
 
+    console.log('bot', balance, dropsToXrp(info.result.account_data.Balance))
+
     assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
+    assert.equal(balance, 10000)
 
     await api.disconnect()
   })
@@ -173,8 +182,8 @@ async function generate_faucet_wallet_and_fund_again(
     command: 'account_info',
     account: wallet.classicAddress,
   })
-  assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
 
+  assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
   assert(newBalance > balance)
 
   await api.disconnect()
