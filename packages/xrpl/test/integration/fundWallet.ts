@@ -6,59 +6,13 @@ import {
   isValidClassicAddress,
   isValidXAddress,
   dropsToXrp,
-  Wallet,
 } from 'xrpl-local'
 
 // how long before each test case times out
 const TIMEOUT = 60000
-let timeOfLastHooksFaucetCall = 0
 // This test is reliant on external networks, and as such may be flaky.
 describe('fundWallet', function () {
   this.timeout(TIMEOUT)
-
-  /*
-   * Purposely separated from other hooks v2 testnet because required
-   * 10 seconds between requests
-   */
-  it('can fund given wallets on hooks v2 testnet', async function () {
-    const api = new Client('wss://hooks-testnet-v2.xrpl-labs.com')
-
-    await api.connect()
-
-    const wallet = Wallet.fromSeed('sEd73rvuVo5xFkV7NrzdEDFxuJHKwBe')
-
-    const beforeSent = await api.request({
-      command: 'account_info',
-      account: wallet.classicAddress,
-    })
-
-    const timeSinceLastHooksCall = Date.now() - timeOfLastHooksFaucetCall
-    if (timeSinceLastHooksCall < 10000) {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 11000 - timeSinceLastHooksCall)
-      })
-    }
-    // eslint-disable-next-line require-atomic-updates -- Will not affect timeSinceLastHooksCall
-    timeOfLastHooksFaucetCall = Date.now()
-
-    const { balance } = await api.fundWallet(wallet, {
-      faucetHost: 'hooks-testnet-v2.xrpl-labs.com',
-    })
-
-    const afterSent = await api.request({
-      command: 'account_info',
-      account: wallet.classicAddress,
-    })
-
-    /*
-     * afterSent could be > than balance if test cases are being run more than once simulataneously
-     * because the same seed (same wallet) is being used
-     */
-    assert(Number(dropsToXrp(afterSent.result.account_data.Balance)) >= balance)
-    assert(balance > Number(dropsToXrp(beforeSent.result.account_data.Balance)))
-
-    await api.disconnect()
-  })
 
   it('submit generates a testnet wallet', async function () {
     await generate_faucet_wallet_and_fund_again(
@@ -97,15 +51,6 @@ describe('fundWallet', function () {
 
     await api.connect()
 
-    const timeSinceLastHooksCall = Date.now() - timeOfLastHooksFaucetCall
-    if (timeSinceLastHooksCall < 10000) {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 11000 - timeSinceLastHooksCall)
-      })
-    }
-    // eslint-disable-next-line require-atomic-updates -- Will not affect timeSinceLastHooksCall
-    timeOfLastHooksFaucetCall = Date.now()
-
     const { wallet, balance } = await api.fundWallet()
 
     assert.notEqual(wallet, undefined)
@@ -120,8 +65,15 @@ describe('fundWallet', function () {
     assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
     assert.equal(balance, 10000)
 
+    /*
+     * No test for fund given wallet because the hooks v2 testnet faucet
+     * requires 10 seconds between requests. Would significantly slow down
+     * the test suite.
+     */
+
     await api.disconnect()
   })
+
   it('submit funds wallet with custom amount', async function () {
     const api = new Client('wss://s.altnet.rippletest.net:51233')
 
