@@ -40,9 +40,26 @@ describe('Get Faucet host ', function () {
     assert.strictEqual(getFaucetHost(this.client), expectedFaucet)
   })
 
+  it('returns the Hooks V2 Testnet host', function () {
+    const expectedFaucet = FaucetNetwork.HooksV2Testnet
+    this.client.connection.url = FaucetNetwork.HooksV2Testnet
+
+    assert.strictEqual(getFaucetHost(this.client), expectedFaucet)
+  })
+
   it('returns the correct faucetPath for Devnet host', function () {
     const expectedFaucetPath = FaucetNetworkPaths[FaucetNetwork.Devnet]
     this.client.connection.url = FaucetNetwork.Devnet
+
+    assert.strictEqual(
+      getDefaultFaucetPath(getFaucetHost(this.client)),
+      expectedFaucetPath,
+    )
+  })
+
+  it('returns the correct faucetPath for Hooks V2 Testnet host', function () {
+    const expectedFaucetPath = FaucetNetworkPaths[FaucetNetwork.HooksV2Testnet]
+    this.client.connection.url = FaucetNetwork.HooksV2Testnet
 
     assert.strictEqual(
       getDefaultFaucetPath(getFaucetHost(this.client)),
