@@ -4,6 +4,15 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Fixed
+
+### Added
+
+
+### Changed
+
+## 2.6.0 (2022-11-21)
+
+### Fixed
 * Ignore `https-proxy-agent` in browsers for improved Vite integration
 
 ### Added
