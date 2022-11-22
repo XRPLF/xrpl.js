@@ -72,24 +72,40 @@ async function submitAndWait(
     wallet?: Wallet
   },
 ): Promise<TxResponse> {
-  const signedTx = await getSignedTx(this, transaction, opts)
+  return submitAndWaitHelper(this, transaction, opts)
+}
 
-  const lastLedger = getLastLedgerSequence(signedTx)
-  if (lastLedger == null) {
-    throw new ValidationError(
-      'Transaction must contain a LastLedgerSequence value for reliable submission.',
-    )
+/**
+ * Asynchronously submits a transaction and verifies that it has been included in a
+ * validated ledger (or has errored/will not be included for some reason).
+ * See [Reliable Transaction Submission](https://xrpl.org/reliable-transaction-submission.html).
+ *
+ * @param this - A Client.
+ * @param transactions - A batch of transactions to autofill, sign & encode, and submit synchronously.
+ * @param opts - (Optional) Options used to sign and submit a transaction.
+ * @param opts.autofill - If true, autofill a transaction.
+ * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+ * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+ * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
+ */
+async function submitAndWaitBatch(
+  this: Client,
+  transactions: Array<Transaction | string>,
+  opts?: {
+    // If true, autofill a transaction.
+    autofill?: boolean
+    // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+    failHard?: boolean
+    // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+    wallet?: Wallet
+  },
+): Promise<TxResponse[]> {
+  const result: TxResponse[] = []
+  for (const tx of transactions) {
+    // eslint-disable-next-line no-await-in-loop -- necessary
+    result.push(await submitAndWaitHelper(this, tx, opts))
   }
-
-  const response = await submitRequest(this, signedTx, opts?.failHard)
-
-  const txHash = hashes.hashSignedTx(signedTx)
-  return waitForFinalTransactionOutcome(
-    this,
-    txHash,
-    lastLedger,
-    response.result.engine_result,
-  )
+  return result
 }
 
 // Helper functions
@@ -176,6 +192,38 @@ async function waitForFinalTransactionOutcome(
   )
 }
 
+async function submitAndWaitHelper(
+  client: Client,
+  transaction: Transaction | string,
+  opts?: {
+    // If true, autofill a transaction.
+    autofill?: boolean
+    // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+    failHard?: boolean
+    // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+    wallet?: Wallet
+  },
+): Promise<TxResponse> {
+  const signedTx = await getSignedTx(client, transaction, opts)
+
+  const lastLedger = getLastLedgerSequence(signedTx)
+  if (lastLedger == null) {
+    throw new ValidationError(
+      'Transaction must contain a LastLedgerSequence value for reliable submission.',
+    )
+  }
+
+  const response = await submitRequest(client, signedTx, opts?.failHard)
+
+  const txHash = hashes.hashSignedTx(signedTx)
+  return waitForFinalTransactionOutcome(
+    client,
+    txHash,
+    lastLedger,
+    response.result.engine_result,
+  )
+}
+
 // checks if the transaction has been signed
 function isSigned(transaction: Transaction | string): boolean {
   const tx = typeof transaction === 'string' ? decode(transaction) : transaction
@@ -239,4 +287,4 @@ function isAccountDelete(transaction: Transaction | string): boolean {
   return tx.TransactionType === 'AccountDelete'
 }
 
-export { submit, submitAndWait }
+export { submit, submitAndWait, submitAndWaitBatch }

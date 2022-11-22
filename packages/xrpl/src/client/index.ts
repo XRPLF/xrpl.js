@@ -100,6 +100,7 @@ import {
   getXrpBalance,
   submit,
   submitAndWait,
+  submitAndWaitBatch,
 } from '../sugar'
 import fundWallet from '../Wallet/fundWallet'
 
@@ -603,6 +604,11 @@ class Client extends EventEmitter {
    * @category Core
    */
   public submitAndWait = submitAndWait
+
+  /**
+   * @category Core
+   */
+  public submitAndWaitBatch = submitAndWaitBatch
 
   /**
    * @deprecated Use autofill instead, provided for users familiar with v1

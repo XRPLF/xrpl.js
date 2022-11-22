@@ -31,6 +31,7 @@ describe('Client', function () {
     'url',
     // tested in integration tests, can't be tested with mockRippled
     'submitAndWait',
+    'submitAndWaitBatch',
     'fundWallet',
     // tested in setup and in client.ts and connection.ts
     'connect',
