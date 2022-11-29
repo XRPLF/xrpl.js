@@ -1,13 +1,17 @@
 import { assert } from 'chai'
-import { _private } from 'xrpl-local/Wallet/fundWallet'
+import type { Client } from 'xrpl-local'
 
+import {
+  FaucetNetwork,
+  FaucetNetworkPaths,
+  getFaucetHost,
+  getDefaultFaucetPath,
+} from '../../src/Wallet/defaultFaucets'
 import {
   setupClient,
   teardownClient,
   type XrplTestContext,
 } from '../setupClient'
-
-const { FaucetNetwork, getFaucetHost } = _private
 
 describe('Get Faucet host ', () => {
   let testContext: XrplTestContext
@@ -22,7 +26,10 @@ describe('Get Faucet host ', () => {
     // @ts-expect-error Intentionally modifying private data for test
     testContext.client.connection.url = FaucetNetwork.Devnet
 
-    assert.strictEqual(getFaucetHost(testContext.client), expectedFaucet)
+    assert.strictEqual(
+      getFaucetHost(testContext.client as Client),
+      expectedFaucet,
+    )
   })
 
   it('returns the Testnet host', () => {
@@ -30,7 +37,10 @@ describe('Get Faucet host ', () => {
     // @ts-expect-error Intentionally modifying private data for test
     testContext.client.connection.url = FaucetNetwork.Testnet
 
-    assert.strictEqual(getFaucetHost(testContext.client), expectedFaucet)
+    assert.strictEqual(
+      getFaucetHost(testContext.client as Client),
+      expectedFaucet,
+    )
   })
 
   it('returns the Testnet host with the XRPL Labs server', () => {
@@ -38,10 +48,64 @@ describe('Get Faucet host ', () => {
     // @ts-expect-error Intentionally modifying private data for test
     testContext.client.connection.url = 'wss://testnet.xrpl-labs.com'
 
-    assert.strictEqual(getFaucetHost(testContext.client), expectedFaucet)
+    assert.strictEqual(
+      getFaucetHost(testContext.client as Client),
+      expectedFaucet,
+    )
   })
 
-  it('returns undefined if not a Testnet or Devnet server URL', () => {
+  it('returns the NFT-Devnet host with the XLS-20 Sandbox server', () => {
+    const expectedFaucet = FaucetNetwork.NFTDevnet
+    // @ts-expect-error Intentionally modifying private data for test
+    testContext.client.connection.url =
+      'ws://xls20-sandbox.rippletest.net:51233'
+
+    assert.strictEqual(
+      getFaucetHost(testContext.client as Client),
+      expectedFaucet,
+    )
+  })
+
+  it('returns the Hooks V2 Testnet host', function () {
+    const expectedFaucet = FaucetNetwork.HooksV2Testnet
+    // @ts-expect-error Intentionally modifying private data for test
+    testContext.client.connection.url = FaucetNetwork.HooksV2Testnet
+
+    assert.strictEqual(
+      getFaucetHost(testContext.client as Client),
+      expectedFaucet,
+    )
+  })
+
+  it('returns the correct faucetPath for Devnet host', () => {
+    const expectedFaucetPath = FaucetNetworkPaths[FaucetNetwork.Devnet]
+    // @ts-expect-error Intentionally modifying private data for test
+    testContext.client.connection.url = FaucetNetwork.Devnet
+
+    assert.strictEqual(
+      getDefaultFaucetPath(getFaucetHost(testContext.client as Client)),
+      expectedFaucetPath,
+    )
+  })
+
+  it('returns the correct faucetPath for Hooks V2 Testnet host', () => {
+    const expectedFaucetPath = FaucetNetworkPaths[FaucetNetwork.HooksV2Testnet]
+    // @ts-expect-error Intentionally modifying private data for test
+    testContext.client.connection.url = FaucetNetwork.HooksV2Testnet
+
+    assert.strictEqual(
+      getDefaultFaucetPath(getFaucetHost(testContext.client as Client)),
+      expectedFaucetPath,
+    )
+  })
+
+  it('returns the correct faucetPath for undefined host', () => {
+    const expectedFaucetPath = '/accounts'
+
+    assert.strictEqual(getDefaultFaucetPath(undefined), expectedFaucetPath)
+  })
+
+  it('throws if not connected to a known faucet host', () => {
     // Info: setupClient.setup creates a connection to 'localhost'
     assert.throws(() => getFaucetHost(testContext.client))
   })

@@ -12,48 +12,50 @@ on:
 jobs:
   build-and-lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     strategy:
       matrix:
         node-version: [14.x]
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    # TODO: Remove when upgrading to Node 16.x
-    - run: npm install -g npm@7
-    - run: npm ci
-    - run: npm run build
-    - run: npm run lint
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      # TODO: Remove when upgrading to Node 16.x
+      - run: npm install -g npm@7
+      - run: npm ci
+      - run: npm run build
+      - run: npm run lint
 
   unit:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 10
 
     strategy:
       matrix:
         node-version: [14.x, 16.x, 18.x]
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: '**/package-lock.json'
-    # TODO: Remove when upgrading to Node 16.x
-    - run: npm install -g npm@7
-    - run: npm ci
-    - run: npm run build
-    - run: npm test
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+      # TODO: Remove when upgrading to Node 16.x
+      - run: npm install -g npm@7
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
 
   integration:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     strategy:
       matrix:
@@ -68,24 +70,25 @@ jobs:
           --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: '**/package-lock.json'
-    # TODO: Remove after ugprading to Node 16
-    - run: npm install -g npm@7
-    - run: npm ci
-    - run: npm run build
-    - run: npm run test:integration
-      env:
-        HOST: localhost
-        PORT: ${{ job.services.rippled.ports['6006'] }}
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+      # TODO: Remove after ugprading to Node 16
+      - run: npm install -g npm@7
+      - run: npm ci
+      - run: npm run build
+      - run: npm run test:integration
+        env:
+          HOST: localhost
+          PORT: ${{ job.services.rippled.ports['6006'] }}
 
   browser:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     strategy:
       matrix:
@@ -100,15 +103,15 @@ jobs:
           --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: '**/package-lock.json'
-    # TODO: Remove after upgrading to Node 16
-    - run: npm install -g npm@7
-    - run: npm ci
-    - run: npm run build
-    - run: npm run test:browser
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+      # TODO: Remove after upgrading to Node 16
+      - run: npm install -g npm@7
+      - run: npm ci
+      - run: npm run build
+      - run: npm run test:browser
