@@ -12,8 +12,10 @@ import {
 import { convertStringToHex } from 'xrpl-local/utils'
 import { multisign } from 'xrpl-local/Wallet/signer'
 
-import * as newDefinitions from '../fixtures/rippled/definitions-with-massively-diff-payment.json'
+import * as newPaymentDefinitions from '../fixtures/rippled/definitions-with-massively-diff-payment.json'
+import * as newTxDefinitions from '../fixtures/rippled/definitions-with-new-tx-type.json'
 import { assertRejects } from '../testUtils'
+import { NewTx } from './newTx'
 
 import serverUrl from './serverUrl'
 import { setupClient, teardownClient } from './setup'
@@ -92,7 +94,7 @@ describe('integration tests', function () {
       Fee: '12',
     }
 
-    const newDefs = new XrplDefinitions(newDefinitions, coreTypes)
+    const newDefs = new XrplDefinitions(newPaymentDefinitions, coreTypes)
 
     // It should successfully submit, but fail once rippled sees it since the new type definition is not on-ledger.
     await assertRejects(
@@ -105,6 +107,28 @@ describe('integration tests', function () {
     )
 
     // Same for submitAndWait
+    await assertRejects(
+      client.submitAndWait(tx, {
+        wallet: wallet1,
+        definitions: newDefs,
+      }),
+      RippledError,
+      'invalidTransaction',
+    )
+  })
+
+  it('Defining a new TransactionType should compile and run', async function () {
+    const newDefs = new XrplDefinitions(newTxDefinitions, coreTypes)
+
+    const tx: NewTx = {
+      TransactionType: 'NewTx',
+      Account: 'Test',
+      Amount: '100',
+    }
+
+    const client: Client = this.client
+    const wallet1 = await generateFundedWallet(client)
+
     await assertRejects(
       client.submitAndWait(tx, {
         wallet: wallet1,

@@ -53,33 +53,65 @@ import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
 
 /**
+ * Records all transaction types in an interface that can be extended.
+ * Transaction should be used instead of this for most purposes.
+ * This is only for adding new TransactionType models to typescript via .d.ts files.
+ */
+export interface TransactionTypeRegistry {
+  AccountDelete: AccountDelete
+  AccountSet: AccountSet
+  CheckCancel: CheckCancel
+  CheckCash: CheckCash
+  CheckCreate: CheckCreate
+  DepositPreauth: DepositPreauth
+  EscrowCancel: EscrowCancel
+  EscrowCreate: EscrowCreate
+  EscrowFinish: EscrowFinish
+  NFTokenAcceptOffer: NFTokenAcceptOffer
+  NFTokenBurn: NFTokenBurn
+  NFTokenCancelOffer: NFTokenCancelOffer
+  NFTokenCreateOffer: NFTokenCreateOffer
+  NFTokenMint: NFTokenMint
+  OfferCancel: OfferCancel
+  OfferCreate: OfferCreate
+  Payment: Payment
+  PaymentChannelClaim: PaymentChannelClaim
+  PaymentChannelCreate: PaymentChannelCreate
+  PaymentChannelFund: PaymentChannelFund
+  SetRegularKey: SetRegularKey
+  SignerListSet: SignerListSet
+  TicketCreate: TicketCreate
+  TrustSet: TrustSet
+}
+
+/**
  * @category Transaction Models
  */
-export type Transaction =
-  | AccountDelete
-  | AccountSet
-  | CheckCancel
-  | CheckCash
-  | CheckCreate
-  | DepositPreauth
-  | EscrowCancel
-  | EscrowCreate
-  | EscrowFinish
-  | NFTokenAcceptOffer
-  | NFTokenBurn
-  | NFTokenCancelOffer
-  | NFTokenCreateOffer
-  | NFTokenMint
-  | OfferCancel
-  | OfferCreate
-  | Payment
-  | PaymentChannelClaim
-  | PaymentChannelCreate
-  | PaymentChannelFund
-  | SetRegularKey
-  | SignerListSet
-  | TicketCreate
-  | TrustSet
+export type Transaction = TransactionTypeRegistry[keyof TransactionTypeRegistry]
+//   | AccountDelete
+//   | AccountSet
+//   | CheckCancel
+//   | CheckCash
+//   | CheckCreate
+//   | DepositPreauth
+//   | EscrowCancel
+//   | EscrowCreate
+//   | EscrowFinish
+//   | NFTokenAcceptOffer
+//   | NFTokenBurn
+//   | NFTokenCancelOffer
+//   | NFTokenCreateOffer
+//   | NFTokenMint
+//   | OfferCancel
+//   | OfferCreate
+//   | Payment
+//   | PaymentChannelClaim
+//   | PaymentChannelCreate
+//   | PaymentChannelFund
+//   | SetRegularKey
+//   | SignerListSet
+//   | TicketCreate
+//   | TrustSet
 
 /**
  * @category Transaction Models

@@ -17,12 +17,14 @@ import PayChannel from './PayChannel'
 import RippleState, { RippleStateFlags } from './RippleState'
 import SignerList, { SignerListFlags } from './SignerList'
 import Ticket from './Ticket'
+import BaseLedgerEntry from './BaseLedgerEntry'
 
 export {
   AccountRoot,
   AccountRootFlags,
   AccountRootFlagsInterface,
   Amendments,
+  BaseLedgerEntry,
   Check,
   DepositPreauth,
   DirectoryNode,

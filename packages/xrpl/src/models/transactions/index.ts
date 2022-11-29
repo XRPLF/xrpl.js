@@ -1,4 +1,9 @@
-export { validate, TransactionAndMetadata, Transaction } from './transaction'
+export {
+  validate,
+  TransactionAndMetadata,
+  Transaction,
+  TransactionTypeRegistry,
+} from './transaction'
 export { TransactionMetadata } from './metadata'
 export {
   AccountSetAsfFlags,
@@ -45,3 +50,4 @@ export { SetRegularKey } from './setRegularKey'
 export { SignerListSet } from './signerListSet'
 export { TicketCreate } from './ticketCreate'
 export { TrustSetFlagsInterface, TrustSetFlags, TrustSet } from './trustSet'
+export { BaseTransaction } from './common'
