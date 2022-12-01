@@ -146,7 +146,8 @@ ___
 11. Run `npx lerna publish from-package --yes` - This will actually publish the packages.
 12. If it asks for it, enter your [npmjs.com](https://npmjs.com) OTP (one-time password) to complete publication.
 13. Create a new branch to capture the updated packages from the release (`git checkout -b <BRANCH_NAME>`)
-14. Make a PR to merge those changes into `main`
+14. Update `HISTORY.md` to reflect release changes.
+15. Make a PR to merge those changes into `main`
 
 ___
 NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
