@@ -12,7 +12,11 @@ import { sign as signWithKeypair, verify } from 'ripple-keypairs'
 
 import { ValidationError } from '../errors'
 import { Signer } from '../models/common'
-import { Transaction, validate } from '../models/transactions'
+import {
+  type BaseTransaction,
+  type Transaction,
+  validate,
+} from '../models/transactions'
 
 import Wallet from '.'
 
@@ -29,8 +33,8 @@ import Wallet from '.'
  * - Any transaction is missing a Signers field.
  * @category Signing
  */
-function multisign(
-  transactions: Array<Transaction | string>,
+function multisign<T extends BaseTransaction = Transaction>(
+  transactions: Array<T | string>,
   definitions?: XrplDefinitions,
 ): string {
   if (transactions.length === 0) {
@@ -38,7 +42,7 @@ function multisign(
   }
 
   transactions.forEach((txOrBlob) => {
-    const tx: Transaction = getDecodedTransaction(txOrBlob, definitions)
+    const tx: BaseTransaction = getDecodedTransaction(txOrBlob, definitions)
 
     /*
      * This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
@@ -58,11 +62,9 @@ function multisign(
     }
   })
 
-  const decodedTransactions: Transaction[] = transactions.map(
-    (txOrBlob: string | Transaction) => {
-      return getDecodedTransaction(txOrBlob, definitions)
-    },
-  )
+  const decodedTransactions = transactions.map((txOrBlob: string | T) => {
+    return getDecodedTransaction(txOrBlob, definitions)
+  })
 
   validateTransactionEquivalence(decodedTransactions)
 
@@ -105,11 +107,11 @@ function authorizeChannel(
  * @returns Returns true if tx has a valid signature, and returns false otherwise.
  * @category Utilities
  */
-function verifySignature(
-  tx: Transaction | string,
+function verifySignature<T extends BaseTransaction = Transaction>(
+  tx: T | string,
   definitions?: XrplDefinitions,
 ): boolean {
-  const decodedTx: Transaction = getDecodedTransaction(tx)
+  const decodedTx = getDecodedTransaction(tx)
   return verify(
     encodeForSigning(decodedTx, definitions),
     decodedTx.TxnSignature,
@@ -123,7 +125,9 @@ function verifySignature(
  * @param transactions - An array of Transactions which are expected to be equal other than 'Signers'.
  * @throws ValidationError if the transactions are not equal in any field other than 'Signers'.
  */
-function validateTransactionEquivalence(transactions: Transaction[]): void {
+function validateTransactionEquivalence<
+  T extends BaseTransaction = Transaction,
+>(transactions: T[]): void {
   const exampleTransaction = JSON.stringify({
     ...transactions[0],
     Signers: null,
@@ -141,9 +145,9 @@ function validateTransactionEquivalence(transactions: Transaction[]): void {
   }
 }
 
-function getTransactionWithAllSigners(
-  transactions: Transaction[],
-): Transaction {
+function getTransactionWithAllSigners<T extends BaseTransaction = Transaction>(
+  transactions: T[],
+): T {
   // Signers must be sorted in the combined transaction - See compareSigners' documentation for more details
   const sortedSigners: Signer[] = flatMap(
     transactions,
@@ -182,21 +186,18 @@ function addressToBigNumber(address: string): BigNumber {
  * @param definitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns txOrBlob in Transaction format.
  */
-function getDecodedTransaction(
-  txOrBlob: Transaction | string,
+function getDecodedTransaction<T extends BaseTransaction = Transaction>(
+  txOrBlob: T | string,
   definitions?: XrplDefinitions,
-): Transaction {
+): T {
   if (typeof txOrBlob === 'object') {
     // We need this to handle X-addresses in multisigning
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
-    return decode(
-      encode(txOrBlob, definitions),
-      definitions,
-    ) as unknown as Transaction
+    return decode(encode(txOrBlob, definitions), definitions) as unknown as T
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
-  return decode(txOrBlob, definitions) as unknown as Transaction
+  return decode(txOrBlob, definitions) as unknown as T
 }
 
 export { authorizeChannel, verifySignature, multisign }

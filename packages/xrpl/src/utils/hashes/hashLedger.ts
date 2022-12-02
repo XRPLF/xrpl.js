@@ -10,7 +10,11 @@ import { type XrplDefinitions } from 'ripple-binary-codec/dist/enums'
 import { ValidationError, XrplError } from '../../errors'
 import type { Ledger } from '../../models/ledger'
 import { LedgerEntry } from '../../models/ledger'
-import { Transaction, TransactionMetadata } from '../../models/transactions'
+import {
+  BaseTransaction,
+  Transaction,
+  TransactionMetadata,
+} from '../../models/transactions'
 
 import HashPrefix from './HashPrefix'
 import sha512Half from './sha512Half'
@@ -74,16 +78,16 @@ function addLengthPrefix(hex: string): string {
  * @throws ValidationError if the Transaction is unsigned.\
  * @category Utilities
  */
-export function hashSignedTx(
-  tx: Transaction | string,
+export function hashSignedTx<T extends BaseTransaction = Transaction>(
+  tx: T | string,
   definitions?: XrplDefinitions,
 ): string {
   let txBlob: string
-  let txObject: Transaction
+  let txObject: T
   if (typeof tx === 'string') {
     txBlob = tx
     /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required until updated in binary codec. */
-    txObject = decode(tx, definitions) as unknown as Transaction
+    txObject = decode(tx, definitions) as unknown as T
   } else {
     txBlob = encode(tx, definitions)
     txObject = tx

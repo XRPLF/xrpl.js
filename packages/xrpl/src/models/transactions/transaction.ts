@@ -13,6 +13,7 @@ import { AccountSet, validateAccountSet } from './accountSet'
 import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
+import { type BaseTransaction } from './common'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
@@ -57,67 +58,43 @@ import { TrustSet, validateTrustSet } from './trustSet'
  * Transaction should be used instead of this for most purposes.
  * This is only for adding new TransactionType models to typescript via .d.ts files.
  */
-export interface TransactionTypeRegistry {
-  AccountDelete: AccountDelete
-  AccountSet: AccountSet
-  CheckCancel: CheckCancel
-  CheckCash: CheckCash
-  CheckCreate: CheckCreate
-  DepositPreauth: DepositPreauth
-  EscrowCancel: EscrowCancel
-  EscrowCreate: EscrowCreate
-  EscrowFinish: EscrowFinish
-  NFTokenAcceptOffer: NFTokenAcceptOffer
-  NFTokenBurn: NFTokenBurn
-  NFTokenCancelOffer: NFTokenCancelOffer
-  NFTokenCreateOffer: NFTokenCreateOffer
-  NFTokenMint: NFTokenMint
-  OfferCancel: OfferCancel
-  OfferCreate: OfferCreate
-  Payment: Payment
-  PaymentChannelClaim: PaymentChannelClaim
-  PaymentChannelCreate: PaymentChannelCreate
-  PaymentChannelFund: PaymentChannelFund
-  SetRegularKey: SetRegularKey
-  SignerListSet: SignerListSet
-  TicketCreate: TicketCreate
-  TrustSet: TrustSet
-}
 
 /**
  * @category Transaction Models
  */
-export type Transaction = TransactionTypeRegistry[keyof TransactionTypeRegistry]
-//   | AccountDelete
-//   | AccountSet
-//   | CheckCancel
-//   | CheckCash
-//   | CheckCreate
-//   | DepositPreauth
-//   | EscrowCancel
-//   | EscrowCreate
-//   | EscrowFinish
-//   | NFTokenAcceptOffer
-//   | NFTokenBurn
-//   | NFTokenCancelOffer
-//   | NFTokenCreateOffer
-//   | NFTokenMint
-//   | OfferCancel
-//   | OfferCreate
-//   | Payment
-//   | PaymentChannelClaim
-//   | PaymentChannelCreate
-//   | PaymentChannelFund
-//   | SetRegularKey
-//   | SignerListSet
-//   | TicketCreate
-//   | TrustSet
+export type Transaction =
+  | AccountDelete
+  | AccountSet
+  | CheckCancel
+  | CheckCash
+  | CheckCreate
+  | DepositPreauth
+  | EscrowCancel
+  | EscrowCreate
+  | EscrowFinish
+  | NFTokenAcceptOffer
+  | NFTokenBurn
+  | NFTokenCancelOffer
+  | NFTokenCreateOffer
+  | NFTokenMint
+  | OfferCancel
+  | OfferCreate
+  | Payment
+  | PaymentChannelClaim
+  | PaymentChannelCreate
+  | PaymentChannelFund
+  | SetRegularKey
+  | SignerListSet
+  | TicketCreate
+  | TrustSet
 
 /**
  * @category Transaction Models
  */
-export interface TransactionAndMetadata {
-  transaction: Transaction
+export interface TransactionAndMetadata<
+  T extends BaseTransaction = Transaction,
+> {
+  transaction: T
   metadata: TransactionMetadata
 }
 

@@ -28,8 +28,11 @@ import {
 import ECDSA from '../ECDSA'
 import { ValidationError, XrplError } from '../errors'
 import { IssuedCurrencyAmount } from '../models/common'
-import { Transaction } from '../models/transactions'
-import { isIssuedCurrency } from '../models/transactions/common'
+import { NFTokenMint, Transaction } from '../models/transactions'
+import {
+  BaseTransaction,
+  isIssuedCurrency,
+} from '../models/transactions/common'
 import { isHex } from '../models/utils'
 import { ensureClassicAddress } from '../sugar/utils'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
@@ -317,9 +320,9 @@ class Wallet {
    * @throws XrplError if the issued currency being signed is XRP ignoring case.
    */
   // eslint-disable-next-line max-lines-per-function -- introduced more checks to support both string and boolean inputs.
-  public sign(
+  public sign<T extends BaseTransaction = Transaction>(
     this: Wallet,
-    transaction: Transaction,
+    transaction: T,
     multisign?: boolean | string,
     definitions?: XrplDefinitions,
   ): {
@@ -341,7 +344,7 @@ class Wallet {
       )
     }
 
-    removeTrailingZeros(tx)
+    removeTrailingZeros(tx as Transaction)
 
     const txToSignAndEncode = { ...tx }
 
@@ -424,7 +427,7 @@ class Wallet {
   // eslint-disable-next-line class-methods-use-this, max-lines-per-function -- Helper for organization purposes
   private checkTxSerialization(
     serialized: string,
-    tx: Transaction,
+    tx: BaseTransaction,
     definitions?: XrplDefinitions,
   ): void {
     // Decode the serialized transaction:
@@ -483,11 +486,14 @@ class Wallet {
       return memo
     })
 
-    if (txCopy.TransactionType === 'NFTokenMint' && txCopy.URI) {
-      if (!isHex(txCopy.URI)) {
-        throw new ValidationError('URI must be a hex value')
+    if (txCopy.TransactionType === 'NFTokenMint') {
+      const uri = (txCopy as NFTokenMint).URI
+      if (uri) {
+        if (!isHex(uri)) {
+          throw new ValidationError('URI must be a hex value')
+        }
+        ;(txCopy as NFTokenMint).URI = uri.toUpperCase()
       }
-      txCopy.URI = txCopy.URI.toUpperCase()
     }
 
     /* eslint-disable @typescript-eslint/consistent-type-assertions -- We check at runtime that this is safe */
@@ -547,7 +553,7 @@ class Wallet {
  * @returns A signed transaction in the proper format.
  */
 function computeSignature(
-  tx: Transaction,
+  tx: BaseTransaction,
   privateKey: string,
   signAs?: string,
   definitions?: XrplDefinitions,

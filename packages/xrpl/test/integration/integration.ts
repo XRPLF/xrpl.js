@@ -15,8 +15,8 @@ import { multisign } from 'xrpl-local/Wallet/signer'
 import * as newPaymentDefinitions from '../fixtures/rippled/definitions-with-massively-diff-payment.json'
 import * as newTxDefinitions from '../fixtures/rippled/definitions-with-new-tx-type.json'
 import { assertRejects } from '../testUtils'
-import { NewTx } from './newTx'
 
+import { NewTx } from './newTx'
 import serverUrl from './serverUrl'
 import { setupClient, teardownClient } from './setup'
 import {
@@ -120,14 +120,14 @@ describe('integration tests', function () {
   it('Defining a new TransactionType should compile and run', async function () {
     const newDefs = new XrplDefinitions(newTxDefinitions, coreTypes)
 
-    const tx: NewTx = {
-      TransactionType: 'NewTx',
-      Account: 'Test',
-      Amount: '100',
-    }
-
     const client: Client = this.client
     const wallet1 = await generateFundedWallet(client)
+
+    const tx: NewTx = {
+      TransactionType: 'NewTx',
+      Account: wallet1.address,
+      Amount: '100',
+    }
 
     await assertRejects(
       client.submitAndWait(tx, {

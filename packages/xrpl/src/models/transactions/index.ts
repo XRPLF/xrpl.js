@@ -1,9 +1,4 @@
-export {
-  validate,
-  TransactionAndMetadata,
-  Transaction,
-  TransactionTypeRegistry,
-} from './transaction'
+export { validate, TransactionAndMetadata, Transaction } from './transaction'
 export { TransactionMetadata } from './metadata'
 export {
   AccountSetAsfFlags,

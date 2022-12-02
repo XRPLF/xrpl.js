@@ -1,4 +1,4 @@
-import { Transaction } from '../transactions'
+import { type BaseTransaction, type Transaction } from '../transactions'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
@@ -9,14 +9,16 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface SubmitMultisignedRequest extends BaseRequest {
+export interface SubmitMultisignedRequest<
+  T extends BaseTransaction = Transaction,
+> extends BaseRequest {
   command: 'submit_multisigned'
   /**
    * Transaction in JSON format with an array of Signers. To be successful, the
    * weights of the signatures must be equal or higher than the quorum of the.
    * {@link SignerList}.
    */
-  tx_json: Transaction
+  tx_json: T
   /**
    * If true, and the transaction fails locally, do not retry or relay the
    * transaction to other servers.
@@ -29,7 +31,9 @@ export interface SubmitMultisignedRequest extends BaseRequest {
  *
  * @category Responses
  */
-export interface SubmitMultisignedResponse extends BaseResponse {
+export interface SubmitMultisignedResponse<
+  T extends BaseTransaction = Transaction,
+> extends BaseResponse {
   result: {
     /**
      * Code indicating the preliminary result of the transaction, for example.
@@ -46,6 +50,6 @@ export interface SubmitMultisignedResponse extends BaseResponse {
     /** The complete transaction in hex string format. */
     tx_blob: string
     /** The complete transaction in JSON format. */
-    tx_json: Transaction & { hash?: string }
+    tx_json: T & { hash?: string }
   }
 }

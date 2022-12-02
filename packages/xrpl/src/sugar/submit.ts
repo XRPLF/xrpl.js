@@ -4,7 +4,7 @@ import { type XrplDefinitions } from 'ripple-binary-codec/dist/enums'
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { TxResponse } from '../models/methods'
-import { Transaction } from '../models/transactions'
+import { type BaseTransaction, type Transaction } from '../models/transactions'
 import { hashes } from '../utils'
 
 /** Approximate time for a ledger to close, in milliseconds */
@@ -33,9 +33,9 @@ async function sleep(ms: number): Promise<void> {
  * @returns A promise that contains SubmitResponse.
  * @throws RippledError if submit request fails.
  */
-async function submit(
+async function submit<T extends BaseTransaction = Transaction>(
   this: Client,
-  transaction: Transaction | string,
+  transaction: T | string,
   opts?: {
     // If true, autofill a transaction.
     autofill?: boolean
@@ -65,9 +65,9 @@ async function submit(
  * @param opts.definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
  */
-async function submitAndWait(
+async function submitAndWait<T extends BaseTransaction = Transaction>(
   this: Client,
-  transaction: Transaction | string,
+  transaction: T | string,
   opts?: {
     // If true, autofill a transaction.
     autofill?: boolean
@@ -108,9 +108,9 @@ async function submitAndWait(
 
 // Encodes and submits a signed transaction.
 // eslint-disable-next-line max-params -- All params are required
-async function submitRequest(
+async function submitRequest<T extends BaseTransaction = Transaction>(
   client: Client,
-  signedTransaction: Transaction | string,
+  signedTransaction: T | string,
   failHard = false,
   definitions?: XrplDefinitions,
 ): Promise<SubmitResponse> {
@@ -191,8 +191,8 @@ async function waitForFinalTransactionOutcome(
 }
 
 // checks if the transaction has been signed
-function isSigned(
-  transaction: Transaction | string,
+function isSigned<T extends BaseTransaction = Transaction>(
+  transaction: T | string,
   definitions?: XrplDefinitions,
 ): boolean {
   const tx =
@@ -206,9 +206,9 @@ function isSigned(
 }
 
 // initializes a transaction for a submit request
-async function getSignedTx(
+async function getSignedTx<T extends BaseTransaction = Transaction>(
   client: Client,
-  transaction: Transaction | string,
+  transaction: T | string,
   {
     autofill = true,
     wallet,
@@ -223,7 +223,7 @@ async function getSignedTx(
     // Custom rippled types to use instead of the default. Used for sidechains and amendments.
     definitions?: XrplDefinitions
   } = {},
-): Promise<Transaction | string> {
+): Promise<T | string> {
   if (isSigned(transaction, definitions)) {
     return transaction
   }
@@ -248,8 +248,8 @@ async function getSignedTx(
 }
 
 // checks if there is a LastLedgerSequence as a part of the transaction
-function getLastLedgerSequence(
-  transaction: Transaction | string,
+function getLastLedgerSequence<T extends BaseTransaction = Transaction>(
+  transaction: T | string,
   definitions?: XrplDefinitions,
 ): number | null {
   const tx =
@@ -261,8 +261,8 @@ function getLastLedgerSequence(
 }
 
 // checks if the transaction is an AccountDelete transaction
-function isAccountDelete(
-  transaction: Transaction | string,
+function isAccountDelete<T extends BaseTransaction = Transaction>(
+  transaction: T | string,
   definitions?: XrplDefinitions,
 ): boolean {
   const tx =
