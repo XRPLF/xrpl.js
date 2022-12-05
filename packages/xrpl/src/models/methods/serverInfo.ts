@@ -20,7 +20,6 @@ export type ServerState =
   | 'validating'
   | 'proposing'
 
-// eslint-disable-next-line import/no-unused-modules -- Exporting for completeness
 export interface StateAccounting {
   duration_us: string
   transitions: number

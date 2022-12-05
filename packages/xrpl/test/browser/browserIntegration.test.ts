@@ -29,7 +29,6 @@ function getCountAndDisplayError(result): number {
 describe('Browser Tests', () => {
   it(
     'Integration Tests',
-    // eslint-disable-next-line max-statements -- Testing
     async () => {
       const browser = await puppeteer.launch({ headless: true })
       let jest_results
