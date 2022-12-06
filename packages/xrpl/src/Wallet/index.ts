@@ -192,7 +192,7 @@ class Wallet {
    *
    * @deprecated since version 2.6.1.
    * Will be deleted in version 3.0.0.
-   * This representation is currently deprecated in rippled. 
+   * This representation is currently deprecated in rippled.
    * You should use another method to represent your keys such as a seed or public/private keypair.
    *
    * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
