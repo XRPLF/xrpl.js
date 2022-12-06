@@ -3,9 +3,10 @@ import assert from 'assert'
 import _ from 'lodash'
 import { XrplDefinitions } from 'ripple-binary-codec/dist/enums'
 import { coreTypes } from 'ripple-binary-codec/dist/types'
-import { Client, RippledError } from 'xrpl-local'
+import { Amount, Client, RippledError } from 'xrpl-local'
 import {
   AccountSet,
+  BaseTransaction,
   Payment,
   SignerListSet,
 } from 'xrpl-local/models/transactions'
@@ -16,7 +17,6 @@ import * as newPaymentDefinitions from '../fixtures/rippled/definitions-with-mas
 import * as newTxDefinitions from '../fixtures/rippled/definitions-with-new-tx-type.json'
 import { assertRejects } from '../testUtils'
 
-import { NewTx } from './newTx'
 import serverUrl from './serverUrl'
 import { setupClient, teardownClient } from './setup'
 import {
@@ -123,11 +123,17 @@ describe('integration tests', function () {
     const client: Client = this.client
     const wallet1 = await generateFundedWallet(client)
 
+    interface NewTx extends BaseTransaction {
+      Amount: Amount
+    }
+
     const tx: NewTx = {
       TransactionType: 'NewTx',
       Account: wallet1.address,
       Amount: '100',
     }
+
+    client.fundWallet()
 
     await assertRejects(
       client.submitAndWait(tx, {
