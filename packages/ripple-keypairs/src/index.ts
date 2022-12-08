@@ -155,6 +155,11 @@ function deriveNodeAddress(publicKey): string {
   return deriveAddressFromBytes(accountPublicBytes)
 }
 
+function derivePublicKey(privateKey): string {
+  const { publicKey } = deriveKeypair(privateKey)
+  return deriveAddress(publicKey)
+}
+
 const { decodeSeed } = addressCodec
 
 export = {
@@ -164,5 +169,6 @@ export = {
   verify,
   deriveAddress,
   deriveNodeAddress,
+  derivePublicKey,
   decodeSeed,
 }

@@ -100,6 +100,12 @@ describe('api', () => {
     assert.strictEqual(api.deriveNodeAddress(x), y)
   })
 
+  it('derivePublicKey', () => {
+    const x = 'spjsd1w9w6gd8XViE3zKaAkph8seb'
+    const y = 'rsWUKh9woaMr4fivNq1YpbM9n2vKT14dBs'
+    assert.strictEqual(api.derivePublicKey(x), y)
+  })
+
   it('Random Address', () => {
     const seed = api.generateSeed()
     const keypair = api.deriveKeypair(seed)
