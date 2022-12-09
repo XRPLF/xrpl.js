@@ -17,7 +17,7 @@ class Hash128 extends Hash {
   }
 
   /**
-   * Get the hex representation of a SerializedType's bytes
+   * Get the hex representation of a hash-128 bytes, allowing unset
    *
    * @returns hex String of this.bytes
    */
