@@ -112,13 +112,34 @@ function decodeXAddress(xAddress: string): {
 }
 
 function isBufferForTestAddress(buf: Buffer): boolean {
-  const decodedPrefix = buf.slice(0, 2)
-  if (PREFIX_BYTES.main.equals(decodedPrefix)) {
-    return false
+  let decodedPrefix = buf.slice(0, 2)
+  try {
+    if (PREFIX_BYTES.main.equals(decodedPrefix)) {
+      return false
+    }
+    if (PREFIX_BYTES.test.equals(decodedPrefix)) {
+      return true
+    }
+  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Message exists
+    if (error.message === 'Argument must be a Buffer') {
+      const mainBuffer = Buffer.from(PREFIX_BYTES.main)
+      // Convert to Buffer from Uint8Array
+      decodedPrefix = Buffer.from(decodedPrefix)
+
+      // eslint-disable-next-line max-depth -- Necessary
+      if (mainBuffer.equals(decodedPrefix)) {
+        return false
+      }
+      // eslint-disable-next-line max-depth -- Necessary
+      if (mainBuffer.equals(decodedPrefix)) {
+        return true
+      }
+    }
+
+    throw error
   }
-  if (PREFIX_BYTES.test.equals(decodedPrefix)) {
-    return true
-  }
+
   throw new Error('Invalid X-address: bad prefix')
 }
 
@@ -133,10 +154,22 @@ function tagFromBuffer(buf: Buffer): number | false {
     return buf[23] + buf[24] * 0x100 + buf[25] * 0x10000 + buf[26] * 0x1000000
   }
   assert.strictEqual(flag, 0, 'flag must be zero to indicate no tag')
-  assert.ok(
-    Buffer.from('0000000000000000', 'hex').equals(buf.slice(23, 23 + 8)),
-    'remaining bytes must be zero',
-  )
+  const zerosBuffer = Buffer.from('0000000000000000', 'hex')
+  let isBufOk = false
+  try {
+    isBufOk = zerosBuffer.equals(buf.slice(23, 23 + 8))
+  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Message exists
+    if (error.message === 'Argument must be a Buffer') {
+      // Convert to Buffer from Uint8Array
+      const converteInputBuffer = Buffer.from(buf).slice(23, 23 + 8)
+
+      isBufOk = zerosBuffer.equals(converteInputBuffer)
+    } else {
+      throw error
+    }
+  }
+  assert.ok(isBufOk, 'remaining bytes must be zero')
   return false
 }
 
