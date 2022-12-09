@@ -16,6 +16,8 @@ describe('Hash128', function () {
     const h3 = Hash128.from('000000000000000000000000000000003')
     expect(h1.lt(h2)).toBe(true)
     expect(h3.lt(h2)).toBe(true)
+    expect(h2.gt(h1)).toBe(true)
+    expect(h1.gt(h3)).toBe(true)
   })
   test('throws when constructed from invalid hash length', () => {
     expect(() => Hash128.from('1000000000000000000000000000000')).toThrow(
