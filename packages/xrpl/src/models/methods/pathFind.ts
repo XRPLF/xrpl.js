@@ -67,7 +67,7 @@ interface PathOption {
    * Destination Amount that the destination would receive along this path for the.
    * If the `send_max` field is set, this field will be set.
    */
-  destination_account?: Amount
+  destination_amount?: Amount
 }
 
 /**
