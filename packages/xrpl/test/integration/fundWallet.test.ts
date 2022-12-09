@@ -21,42 +21,28 @@ async function generate_faucet_wallet_and_fund_again(
     faucetHost,
     faucetPath,
   })
-  console.log('assert not equal: ', wallet)
   assert.notEqual(wallet, undefined)
-  console.log('assert isvalid classic: ', wallet.classicAddress)
   assert(isValidClassicAddress(wallet.classicAddress))
-  console.log('assert is valid X: ', wallet.getXAddress())
   assert(isValidXAddress(wallet.getXAddress()))
 
-  console.log('get account info')
   const info = await api.request({
     command: 'account_info',
     account: wallet.classicAddress,
   })
 
-  console.log('drops to xrp')
   assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
 
-  console.log('fund wallet')
   const { balance: newBalance } = await api.fundWallet(wallet, {
     faucetHost,
     faucetPath,
   })
 
-  console.log('account_info')
   const afterSent = await api.request({
     command: 'account_info',
     account: wallet.classicAddress,
   })
 
-  console.log('assert equal drops to xrp')
   assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
-  console.log(
-    'assert newBalance > balance -- new balance: ',
-    newBalance,
-    ' - balance: ',
-    balance,
-  )
   assert(newBalance > balance)
 
   await api.disconnect()
