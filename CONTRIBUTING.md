@@ -136,30 +136,31 @@ NOW WE ARE READY TO PUBLISH! No new code changes happen manually now.
 ___
 2. Checkout `main` and `git pull`.
 3. Create a new branch to capture updates that take place during this process. `git checkout -b <BRANCH_NAME>`
-4. Run `npm run docgen` if the docs were modified in this release to update them.
-5. Run `npm run build` to triple check the build still works
-6. Run `npx lerna version --no-git-tag-version` - This creates a draft PR and release tags for the new version.
-7. For each changed package, pick what the new version should be. Lerna will bump the versions, commit version bumps to `main`, and create a new git tag for each published package.
-8. Run `npm i` to update the package-lock with the updated versions
-9. Create a new PR from this branch into `main` and merge it.
-10. Checkout `main` and `git pull`
-11. Run `npx lerna publish from-package --yes` - This will actually publish the packages.
-12. If it asks for it, enter your [npmjs.com](https://npmjs.com) OTP (one-time password) to complete publication.
-13. Create a new branch to capture the updated packages from the release (`git checkout -b <BRANCH_NAME>`)
-14. Make a PR to merge those changes into `main`
+4. Update `HISTORY.md` to reflect release changes.
+5. Run `npm run docgen` if the docs were modified in this release to update them.
+6. Run `npm run build` to triple check the build still works
+7. Run `npx lerna version --no-git-tag-version` - This creates a draft PR and release tags for the new version.
+8. For each changed package, pick what the new version should be. Lerna will bump the versions, commit version bumps to `main`, and create a new git tag for each published package.
+9. Run `npm i` to update the package-lock with the updated versions
+10. Create a new PR from this branch into `main` and merge it.
+11. Checkout `main` and `git pull`
+12. Run `npx lerna publish from-package --yes` - This will actually publish the packages.
+13. If it asks for it, enter your [npmjs.com](https://npmjs.com) OTP (one-time password) to complete publication.
+14. Create a new branch to capture the updated packages from the release (`git checkout -b <BRANCH_NAME>`)
+15. Make a PR to merge those changes into `main`
 
 ___
 NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
 ___
-15. Pull the most recent changes to main locally.
-16. Run `git tag <tagname> -m <tagname>`, where `<tagname>` is the new package and version (e.g. `xrpl@2.1.1`), for each version released.
-17. Run `git push --follow-tags`, to push the tags to Github.
-18. On Github, click the "releases" link on the right-hand side of the page.
-19. Click "Draft a new release"
-20. Click "Choose a tag", and choose a tag that you just created.
-21. Edit the name of the release to match the tag (IE \<package\>@\<version\>) and edit the description as you see fit.
-22. Repeat steps 19-21 for each release.
-23. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
+16. Pull the most recent changes to main locally.
+17. Run `git tag <tagname> -m <tagname>`, where `<tagname>` is the new package and version (e.g. `xrpl@2.1.1`), for each version released.
+18. Run `git push --follow-tags`, to push the tags to Github.
+19. On Github, click the "releases" link on the right-hand side of the page.
+20. Click "Draft a new release"
+21. Click "Choose a tag", and choose a tag that you just created.
+22. Edit the name of the release to match the tag (IE \<package\>@\<version\>) and edit the description as you see fit.
+23. Repeat steps 19-21 for each release.
+24. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
 
 ## Mailing Lists
 We have a low-traffic mailing list for announcements of new `xrpl.js` releases. (About 1 email every couple of weeks)
