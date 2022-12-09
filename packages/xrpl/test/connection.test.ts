@@ -240,7 +240,7 @@ describe('Connection', () => {
 
       await connectionPromise
     },
-    TIMEOUT,
+    TIMEOUT * 2,
   )
 
   it(
