@@ -26,9 +26,6 @@ class Hash extends Comparable {
     }
 
     if (typeof value === 'string') {
-      if (value === '') {
-        return new this(Buffer.alloc(16))
-      }
       return new this(Buffer.from(value, 'hex'))
     }
 

@@ -44,11 +44,7 @@ class SerializedType {
    * @returns hex String of this.bytes
    */
   toHex(): string {
-    const hex = this.toBytes().toString('hex').toUpperCase()
-    if (/^0+$/.exec(hex)) {
-      return ''
-    }
-    return hex
+    return this.toBytes().toString('hex').toUpperCase()
   }
 
   /**
