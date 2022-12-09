@@ -229,6 +229,7 @@ describe('Connection', () => {
             const got = data.toString('ascii', 0, expect.length)
             assert.strictEqual(got, expect)
             connection.disconnect()
+            console.error('Destroying server')
             destroyServer(server).then(resolve)
           })
         })
@@ -238,9 +239,10 @@ describe('Connection', () => {
         assert(err instanceof NotConnectedError)
       })
 
+      console.error('Waiting for promise')
       await connectionPromise
     },
-    TIMEOUT * 2,
+    TIMEOUT,
   )
 
   it(
