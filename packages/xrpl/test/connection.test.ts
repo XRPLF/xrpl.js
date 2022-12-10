@@ -229,6 +229,7 @@ describe('Connection', () => {
             const got = data.toString('ascii', 0, expect.length)
             assert.strictEqual(got, expect)
             connection.disconnect()
+            // eslint-disable-next-line no-console -- Debugging
             console.error('Destroying server')
             destroyServer(server).then(resolve)
           })
@@ -239,6 +240,7 @@ describe('Connection', () => {
         assert(err instanceof NotConnectedError)
       })
 
+      // eslint-disable-next-line no-console -- Debugging
       console.error('Waiting for promise')
       await connectionPromise
     },
