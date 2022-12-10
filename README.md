@@ -212,11 +212,12 @@ build: {
 },
 resolve: {
   alias: {
-    'events': 'events',
-    'crypto': 'crypto-browserify',
-    'stream': 'stream-browserify',
-    'http': 'stream-http',
-    'https': 'https-browserify',
+    events: 'events',
+    crypto: 'crypto-browserify',
+    stream: 'stream-browserify',
+    http: 'stream-http',
+    https: 'https-browserify',
+    ws: 'xrpl/dist/npm/client/WSWrapper',
   },
 }})
 ```
