@@ -315,9 +315,13 @@ export class Connection extends EventEmitter {
 
     return new Promise((resolve) => {
       if (this.ws == null) {
+        // eslint-disable-next-line no-console -- debugging
+        console.error('ws null')
         resolve(undefined)
       }
       if (this.ws != null) {
+        // eslint-disable-next-line no-console -- debugging
+        console.error('ws once close')
         this.ws.once('close', (code) => resolve(code))
       }
       /*
@@ -326,6 +330,8 @@ export class Connection extends EventEmitter {
        * trigger that.
        */
       if (this.ws != null && this.state !== WebSocket.CLOSING) {
+        // eslint-disable-next-line no-console -- Debugging
+        console.error('INTENTIONAL_DISCONNECT_CODE')
         this.ws.close(INTENTIONAL_DISCONNECT_CODE)
       }
     })
