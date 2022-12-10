@@ -50,7 +50,7 @@ async function destroyServer(server: net.Server): Promise<void> {
   })
 }
 
-async function createServer(): Promise<net.Server> {
+async function createServer(port = 34245): Promise<net.Server> {
   return new Promise((resolve, reject) => {
     const server = net.createServer()
     server.on('listening', function () {
@@ -59,7 +59,7 @@ async function createServer(): Promise<net.Server> {
     server.on('error', function (error) {
       reject(error)
     })
-    const listener = server.listen(0, '0.0.0.0')
+    const listener = server.listen(port, '0.0.0.0')
     // Keep track of all connections so we can destroy them at the end of the test
     // This will prevent Jest from having open handles when all tests are done
     listener.on('connection', (socket) => {
@@ -225,13 +225,20 @@ describe('Connection', () => {
 
       const connectionPromise = new Promise<void>((resolve) => {
         server.on('connection', (socket) => {
+          // eslint-disable-next-line no-console -- Debugging
+          console.error('Connection established')
           socket.on('data', (data) => {
+            // eslint-disable-next-line no-console -- Debugging
+            console.error('Socket on data')
             const got = data.toString('ascii', 0, expect.length)
             assert.strictEqual(got, expect)
-            connection.disconnect()
-            // eslint-disable-next-line no-console -- Debugging
-            console.error('Destroying server')
-            destroyServer(server).then(resolve)
+            connection.disconnect().then(async () => {
+              // eslint-disable-next-line no-console -- Debugging
+              console.error('Disconnected')
+              // eslint-disable-next-line no-console -- Debugging
+              console.error('Destroying server')
+              return destroyServer(server).then(resolve)
+            })
           })
         })
       })
