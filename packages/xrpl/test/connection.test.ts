@@ -397,6 +397,7 @@ describe('Connection', () => {
           spy = jest
             // @ts-expect-error -- Testing private member
             .spyOn(clientContext.client.connection.ws, 'send')
+            // @ts-expect-error -- Testing private member
             .mockImplementation((_0, _1, _2) => {
               return 0
             })
