@@ -330,8 +330,6 @@ export class Connection extends EventEmitter {
        * trigger that.
        */
       if (this.ws != null && this.state !== WebSocket.CLOSING) {
-        // eslint-disable-next-line no-console -- Debugging
-        console.error('INTENTIONAL_DISCONNECT_CODE')
         this.ws.close(INTENTIONAL_DISCONNECT_CODE)
       }
     })

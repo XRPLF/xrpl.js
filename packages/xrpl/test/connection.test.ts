@@ -68,11 +68,11 @@ async function createServer(): Promise<net.Server> {
       const socketKey = lastSocketKey
       // add socket when it is connected
       socketMap[socketKey] = socket
-      socket.on('close', () => {
-        // remove socket when it is closed
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Necessary to delete key
-        delete socketMap[socketKey]
-      })
+      // socket.on('close', () => {
+      //   // remove socket when it is closed
+      //   // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Necessary to delete key
+      //   delete socketMap[socketKey]
+      // })
     })
   })
 }
