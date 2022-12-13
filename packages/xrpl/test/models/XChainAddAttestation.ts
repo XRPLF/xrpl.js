@@ -24,9 +24,9 @@ describe('XChainAddAttestation', function () {
       XChainAttestationBatch: {
         XChainBridge: {
           IssuingChainDoor: 'rKeSSvHvaMZJp9ykaxutVwkhZgWuWMLnQt',
-          IssuingChainIssue: {currency: 'XRP'},
+          IssuingChainIssue: { currency: 'XRP' },
           LockingChainDoor: 'rJvExveLEL4jNDEeLKCVdxaSCN9cEBnEQC',
-          LockingChainIssue: {currency: 'XRP'},
+          LockingChainIssue: { currency: 'XRP' },
         },
         XChainClaimAttestationBatch: [],
         XChainCreateAccountAttestationBatch: [
