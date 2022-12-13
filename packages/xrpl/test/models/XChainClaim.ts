@@ -16,9 +16,9 @@ describe('XChainClaim', function () {
       Amount: '10000',
       XChainBridge: {
         LockingChainDoor: 'rGzx83BVoqTYbGn7tiVAnFw7cbxjin13jL',
-        LockingChainIssue: 'XRP',
+        LockingChainIssue: {currency: 'XRP'},
         IssuingChainDoor: 'r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV',
-        IssuingChainIssue: 'XRP',
+        IssuingChainIssue: {currency: 'XRP'},
       },
       Destination: 'r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV',
       Fee: '10',
