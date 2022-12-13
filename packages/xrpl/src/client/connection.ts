@@ -315,13 +315,9 @@ export class Connection extends EventEmitter {
 
     return new Promise((resolve) => {
       if (this.ws == null) {
-        // eslint-disable-next-line no-console -- debugging
-        console.error('ws null')
         resolve(undefined)
       }
       if (this.ws != null) {
-        // eslint-disable-next-line no-console -- debugging
-        console.error('ws once close')
         this.ws.once('close', (code) => resolve(code))
       }
       /*

@@ -68,11 +68,11 @@ async function createServer(): Promise<net.Server> {
       const socketKey = lastSocketKey
       // add socket when it is connected
       socketMap[socketKey] = socket
-      // socket.on('close', () => {
-      //   // remove socket when it is closed
-      //   // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Necessary to delete key
-      //   delete socketMap[socketKey]
-      // })
+      socket.on('close', () => {
+        // remove socket when it is closed
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Necessary to delete key
+        delete socketMap[socketKey]
+      })
     })
   })
 }
@@ -225,20 +225,23 @@ describe('Connection', () => {
 
       const connectionPromise = new Promise<void>((resolve) => {
         server.on('connection', (socket) => {
-          // eslint-disable-next-line no-console -- Debugging
-          console.error('Connection established')
           socket.on('data', (data) => {
-            // eslint-disable-next-line no-console -- Debugging
-            console.error('Socket on data')
             const got = data.toString('ascii', 0, expect.length)
             assert.strictEqual(got, expect)
-            connection.disconnect().then(async () => {
-              // eslint-disable-next-line no-console -- Debugging
-              console.error('Disconnected')
-              // eslint-disable-next-line no-console -- Debugging
-              console.error('Destroying server')
-              return destroyServer(server).then(resolve)
-            })
+            if (connection.isConnected()) {
+              connection
+                .disconnect()
+                .then(async () => {
+                  return destroyServer(server).then(resolve)
+                })
+                .catch((error) => {
+                  // eslint-disable-next-line no-console -- Test
+                  console.error('Failed to disconnect')
+                  throw error
+                })
+            } else {
+              destroyServer(server).then(resolve)
+            }
           })
         })
       })
@@ -247,8 +250,6 @@ describe('Connection', () => {
         assert(err instanceof NotConnectedError)
       })
 
-      // eslint-disable-next-line no-console -- Debugging
-      console.error('Waiting for promise')
       await connectionPromise
     },
     TIMEOUT,
