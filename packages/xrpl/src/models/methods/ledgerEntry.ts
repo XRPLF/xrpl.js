@@ -1,4 +1,4 @@
-import { IssuedCurrency, LedgerIndex } from '../common'
+import { Currency, LedgerIndex } from '../common'
 import { LedgerEntry } from '../ledger'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
@@ -141,18 +141,18 @@ export interface LedgerEntryRequest extends BaseRequest {
   xchain_bridge?:
     | {
         locking_chain_door: string
-        locking_chain_issue: 'XRP' | IssuedCurrency
+        locking_chain_issue: Currency
         issuing_chain_door: string
-        issuing_chain_issue: 'XRP' | IssuedCurrency
+        issuing_chain_issue: Currency
       }
     | string
 
   xchain_claim_id?:
     | {
         locking_chain_door: string
-        locking_chain_issue: 'XRP' | IssuedCurrency
+        locking_chain_issue: Currency
         issuing_chain_door: string
-        issuing_chain_issue: 'XRP' | IssuedCurrency
+        issuing_chain_issue: Currency
         xchain_claim_id: string | number
       }
     | string
@@ -160,9 +160,9 @@ export interface LedgerEntryRequest extends BaseRequest {
   xchain_create_account_claim_id?:
     | {
         locking_chain_door: string
-        locking_chain_issue: 'XRP' | IssuedCurrency
+        locking_chain_issue: Currency
         issuing_chain_door: string
-        issuing_chain_issue: 'XRP' | IssuedCurrency
+        issuing_chain_issue: Currency
         xchain_create_account_claim_id: string | number
       }
     | string
