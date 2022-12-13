@@ -1,7 +1,5 @@
 import { assert } from 'chai'
-import { decode, encode } from 'ripple-binary-codec/dist'
-import { XrplDefinitions } from 'ripple-binary-codec/dist/enums'
-import { coreTypes } from 'ripple-binary-codec/dist/types'
+import { decode, encode, XrplDefinitions, coreTypes } from 'ripple-binary-codec'
 import { Transaction, ValidationError } from 'xrpl-local'
 import Wallet from 'xrpl-local/Wallet'
 import {

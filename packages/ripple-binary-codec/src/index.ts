@@ -3,7 +3,12 @@ import { quality, binary, HashPrefix } from './coretypes'
 import { decodeLedgerData } from './ledger-hashes'
 import { ClaimObject } from './binary'
 import { JsonObject } from './types/serialized-type'
-import { XrplDefinitions, TRANSACTION_TYPES } from './enums'
+import {
+  XrplDefinitions,
+  TRANSACTION_TYPES,
+  DEFAULT_DEFINITIONS,
+} from './enums'
+import { coreTypes } from './types'
 
 const {
   signingData,
@@ -125,4 +130,7 @@ export = {
   decodeQuality,
   decodeLedgerData,
   TRANSACTION_TYPES,
+  XrplDefinitions,
+  DEFAULT_DEFINITIONS,
+  coreTypes,
 }

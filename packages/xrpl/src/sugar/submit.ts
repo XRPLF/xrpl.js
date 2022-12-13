@@ -1,5 +1,5 @@
 import { decode, encode } from 'ripple-binary-codec'
-import { type XrplDefinitions } from 'ripple-binary-codec/dist/enums'
+import { type XrplDefinitions } from 'ripple-binary-codec'
 
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
 import { ValidationError, XrplError } from '../errors'
@@ -44,7 +44,7 @@ async function submit<T extends BaseTransaction = Transaction>(
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
     wallet?: Wallet
     // Custom rippled types to use instead of the default. Used for sidechains and amendments.
-    definitions?: XrplDefinitions
+    definitions?: InstanceType<typeof XrplDefinitions>
   },
 ): Promise<SubmitResponse> {
   const signedTx = await getSignedTx(this, transaction, opts)
@@ -76,7 +76,7 @@ async function submitAndWait<T extends BaseTransaction = Transaction>(
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
     wallet?: Wallet
     // Custom rippled types to use instead of the default. Used for sidechains and amendments.
-    definitions?: XrplDefinitions
+    definitions?: InstanceType<typeof XrplDefinitions>
   },
 ): Promise<TxResponse> {
   const signedTx = await getSignedTx(this, transaction, opts)
@@ -112,7 +112,7 @@ async function submitRequest<T extends BaseTransaction = Transaction>(
   client: Client,
   signedTransaction: T | string,
   failHard = false,
-  definitions?: XrplDefinitions,
+  definitions?: InstanceType<typeof XrplDefinitions>,
 ): Promise<SubmitResponse> {
   if (!isSigned(signedTransaction, definitions)) {
     throw new ValidationError('Transaction must be signed')
@@ -193,7 +193,7 @@ async function waitForFinalTransactionOutcome(
 // checks if the transaction has been signed
 function isSigned<T extends BaseTransaction = Transaction>(
   transaction: T | string,
-  definitions?: XrplDefinitions,
+  definitions?: InstanceType<typeof XrplDefinitions>,
 ): boolean {
   const tx =
     typeof transaction === 'string'
@@ -221,7 +221,7 @@ async function getSignedTx<T extends BaseTransaction = Transaction>(
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
     wallet?: Wallet
     // Custom rippled types to use instead of the default. Used for sidechains and amendments.
-    definitions?: XrplDefinitions
+    definitions?: InstanceType<typeof XrplDefinitions>
   } = {},
 ): Promise<T | string> {
   if (isSigned(transaction, definitions)) {
@@ -250,7 +250,7 @@ async function getSignedTx<T extends BaseTransaction = Transaction>(
 // checks if there is a LastLedgerSequence as a part of the transaction
 function getLastLedgerSequence<T extends BaseTransaction = Transaction>(
   transaction: T | string,
-  definitions?: XrplDefinitions,
+  definitions?: InstanceType<typeof XrplDefinitions>,
 ): number | null {
   const tx =
     typeof transaction === 'string'
@@ -263,7 +263,7 @@ function getLastLedgerSequence<T extends BaseTransaction = Transaction>(
 // checks if the transaction is an AccountDelete transaction
 function isAccountDelete<T extends BaseTransaction = Transaction>(
   transaction: T | string,
-  definitions?: XrplDefinitions,
+  definitions?: InstanceType<typeof XrplDefinitions>,
 ): boolean {
   const tx =
     typeof transaction === 'string'

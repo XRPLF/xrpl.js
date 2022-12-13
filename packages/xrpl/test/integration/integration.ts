@@ -1,8 +1,7 @@
 import assert from 'assert'
 
 import _ from 'lodash'
-import { XrplDefinitions } from 'ripple-binary-codec/dist/enums'
-import { coreTypes } from 'ripple-binary-codec/dist/types'
+import { XrplDefinitions, coreTypes } from 'ripple-binary-codec'
 import { Amount, Client, RippledError } from 'xrpl-local'
 import {
   AccountSet,

@@ -4,8 +4,7 @@
    bitwise operators for and-ing numbers with a mask and bit shifting. */
 
 import BigNumber from 'bignumber.js'
-import { decode, encode } from 'ripple-binary-codec'
-import { type XrplDefinitions } from 'ripple-binary-codec/dist/enums'
+import { decode, encode, XrplDefinitions } from 'ripple-binary-codec'
 
 import { ValidationError, XrplError } from '../../errors'
 import type { Ledger } from '../../models/ledger'
@@ -24,7 +23,7 @@ const HEX = 16
 
 interface HashLedgerHeaderOptions {
   computeTreeHashes?: boolean
-  definitions?: XrplDefinitions
+  definitions?: InstanceType<typeof XrplDefinitions>
 }
 
 function intToHex(integer: number, byteLength: number): string {
@@ -80,7 +79,7 @@ function addLengthPrefix(hex: string): string {
  */
 export function hashSignedTx<T extends BaseTransaction = Transaction>(
   tx: T | string,
-  definitions?: XrplDefinitions,
+  definitions?: InstanceType<typeof XrplDefinitions>,
 ): string {
   let txBlob: string
   let txObject: T
@@ -136,7 +135,7 @@ export function hashLedgerHeader(ledgerHeader: Ledger): string {
  */
 export function hashTxTree(
   transactions: Array<Transaction & { metaData?: TransactionMetadata }>,
-  definitions?: XrplDefinitions,
+  definitions?: InstanceType<typeof XrplDefinitions>,
 ): string {
   const shamap = new SHAMap()
   for (const txJSON of transactions) {
@@ -160,7 +159,7 @@ export function hashTxTree(
  */
 export function hashStateTree(
   entries: LedgerEntry[],
-  definitions?: XrplDefinitions,
+  definitions?: InstanceType<typeof XrplDefinitions>,
 ): string {
   const shamap = new SHAMap()
 

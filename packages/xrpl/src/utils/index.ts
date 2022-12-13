@@ -18,8 +18,8 @@ import * as rbc from 'ripple-binary-codec'
 import {
   XrplDefinitions,
   DEFAULT_DEFINITIONS,
-} from 'ripple-binary-codec/dist/enums'
-import { coreTypes } from 'ripple-binary-codec/dist/types'
+  coreTypes,
+} from 'ripple-binary-codec'
 import { verify as verifyKeypairSignature } from 'ripple-keypairs'
 
 import { LedgerEntry } from '../models/ledger'
@@ -89,7 +89,7 @@ function isValidSecret(secret: string): boolean {
  */
 function encode(
   object: Transaction | LedgerEntry,
-  definitions?: XrplDefinitions,
+  definitions?: InstanceType<typeof XrplDefinitions>,
 ): string {
   return rbc.encode(object, definitions)
 }
@@ -103,7 +103,7 @@ function encode(
  */
 function encodeForSigning(
   object: Transaction,
-  definitions?: XrplDefinitions,
+  definitions?: InstanceType<typeof XrplDefinitions>,
 ): string {
   return rbc.encodeForSigning(object, definitions)
 }
@@ -117,7 +117,7 @@ function encodeForSigning(
  */
 function encodeForSigningClaim(
   object: PaymentChannelClaim,
-  definitions?: XrplDefinitions,
+  definitions?: InstanceType<typeof XrplDefinitions>,
 ): string {
   return rbc.encodeForSigningClaim(object, definitions)
 }
@@ -133,7 +133,7 @@ function encodeForSigningClaim(
 function encodeForMultiSigning(
   object: Transaction,
   signer: string,
-  definitions?: XrplDefinitions,
+  definitions?: InstanceType<typeof XrplDefinitions>,
 ): string {
   return rbc.encodeForMultisigning(object, signer, definitions)
 }
@@ -147,7 +147,7 @@ function encodeForMultiSigning(
  */
 function decode(
   hex: string,
-  definitions?: XrplDefinitions,
+  definitions?: InstanceType<typeof XrplDefinitions>,
 ): Record<string, unknown> {
   return rbc.decode(hex, definitions)
 }
