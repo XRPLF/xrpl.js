@@ -392,10 +392,13 @@ class Wallet {
    * @returns Returns true if a signedTransaction is valid.
    */
   public verifyTransaction(
-    signedTransaction: string,
+    signedTransaction: Transaction | string,
     definitions?: InstanceType<typeof XrplDefinitions>,
   ): boolean {
-    const tx = decode(signedTransaction, definitions)
+    const tx = 
+      typeof signedTransaction === 'string'
+      ? decode(signedTransaction, definitions)
+      : signedTransaction
     const messageHex: string = encodeForSigning(tx, definitions)
     const signature = tx.TxnSignature
     return verify(messageHex, signature, this.publicKey)

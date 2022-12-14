@@ -949,6 +949,16 @@ describe('Wallet', function () {
 
       assert.equal(isVerified, false)
     })
+
+    it('returns true when verifying a deserialized Transaction object', function () {
+      const wallet = new Wallet(publicKey, privateKey)
+      const decodedTransaction = decode(
+        prepared.signedTransaction,
+      ) as unknown as Transaction
+      const isVerified: boolean = wallet.verifyTransaction(decodedTransaction)
+
+      assert.equal(isVerified, true)
+    })
   })
 
   describe('getXAddress', function () {

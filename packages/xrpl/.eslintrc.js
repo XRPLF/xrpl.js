@@ -28,6 +28,10 @@ module.exports = {
   plugins: [],
   extends: ['@xrplf/eslint-config/base', 'plugin:mocha/recommended'],
   rules: {
+    // Disabled until https://github.com/import-js/eslint-plugin-import/pull/2305 is resolved to
+    // accomodate this change https://github.com/XRPLF/xrpl.js/pull/2133
+    'import/no-unused-modules': 'off',
+    'eslint-comments/no-unused-disable': 'off',
     // Certain rippled APIs require snake_case naming
     '@typescript-eslint/naming-convention': [
       'error',

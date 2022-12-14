@@ -1,6 +1,6 @@
 {
   "name": "xrpl",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "license": "ISC",
   "description": "A TypeScript/JavaScript API for interacting with the XRP Ledger in Node.js and the browser",
   "files": [
@@ -18,7 +18,8 @@
     "test": "test"
   },
   "browser": {
-    "ws": "./dist/npm/client/WSWrapper.js"
+    "ws": "./dist/npm/client/WSWrapper.js",
+    "https-proxy-agent": false
   },
   "dependencies": {
     "bignumber.js": "^9.0.0",
