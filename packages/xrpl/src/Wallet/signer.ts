@@ -6,8 +6,8 @@ import {
   encode,
   encodeForSigning,
   encodeForSigningClaim,
+  XrplDefinitions,
 } from 'ripple-binary-codec'
-import { XrplDefinitions } from 'ripple-binary-codec'
 import { sign as signWithKeypair, verify } from 'ripple-keypairs'
 
 import { ValidationError } from '../errors'

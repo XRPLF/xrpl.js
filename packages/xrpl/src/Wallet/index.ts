@@ -1,3 +1,4 @@
+/* eslint-disable max-depth -- The depth helps readability */
 /* eslint-disable max-lines -- There are lots of equivalent constructors which make sense to have here. */
 /* eslint-disable max-params -- The function parameters are necessary */
 import BigNumber from 'bignumber.js'
@@ -15,8 +16,8 @@ import {
   encodeForSigning,
   encodeForMultisigning,
   encode,
+  XrplDefinitions,
 } from 'ripple-binary-codec'
-import { XrplDefinitions } from 'ripple-binary-codec'
 import {
   deriveAddress,
   deriveKeypair,
@@ -344,6 +345,7 @@ class Wallet {
       )
     }
 
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only modifies Payments
     removeTrailingZeros(tx as Transaction)
 
     const txToSignAndEncode = { ...tx }
@@ -395,10 +397,10 @@ class Wallet {
     signedTransaction: Transaction | string,
     definitions?: InstanceType<typeof XrplDefinitions>,
   ): boolean {
-    const tx = 
+    const tx =
       typeof signedTransaction === 'string'
-      ? decode(signedTransaction, definitions)
-      : signedTransaction
+        ? decode(signedTransaction, definitions)
+        : signedTransaction
     const messageHex: string = encodeForSigning(tx, definitions)
     const signature = tx.TxnSignature
     return verify(messageHex, signature, this.publicKey)
@@ -490,11 +492,13 @@ class Wallet {
     })
 
     if (txCopy.TransactionType === 'NFTokenMint') {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We just checked that this was ok.
       const uri = (txCopy as NFTokenMint).URI
       if (uri) {
         if (!isHex(uri)) {
           throw new ValidationError('URI must be a hex value')
         }
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We just checked that this was ok.
         ;(txCopy as NFTokenMint).URI = uri.toUpperCase()
       }
     }
@@ -519,7 +523,6 @@ class Wallet {
         // Standardize the format of currency codes to the 40 byte hex string for comparison
         const amount = txCopy[key] as IssuedCurrencyAmount
         if (amount.currency.length !== decodedCurrency.length) {
-          /* eslint-disable-next-line max-depth -- Easier to read with two if-statements */
           if (decodedCurrency.length === standard_currency_code_len) {
             decodedAmount.currency = isoToHex(decodedCurrency)
           } else {

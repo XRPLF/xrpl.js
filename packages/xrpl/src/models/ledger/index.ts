@@ -3,6 +3,7 @@ import AccountRoot, {
   AccountRootFlagsInterface,
 } from './AccountRoot'
 import Amendments from './Amendments'
+import BaseLedgerEntry from './BaseLedgerEntry'
 import Check from './Check'
 import DepositPreauth from './DepositPreauth'
 import DirectoryNode from './DirectoryNode'
@@ -17,7 +18,6 @@ import PayChannel from './PayChannel'
 import RippleState, { RippleStateFlags } from './RippleState'
 import SignerList, { SignerListFlags } from './SignerList'
 import Ticket from './Ticket'
-import BaseLedgerEntry from './BaseLedgerEntry'
 
 export {
   AccountRoot,

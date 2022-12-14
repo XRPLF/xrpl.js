@@ -168,8 +168,10 @@ async function calculateFeePerTransactionType(
   // EscrowFinish Transaction with Fulfillment
   if (
     tx.TransactionType === 'EscrowFinish' &&
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We just checked that this was fine.
     (tx as EscrowFinish).Fulfillment != null
   ) {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We just checked that this was fine.
     const fulfillment = (tx as EscrowFinish).Fulfillment
     if (fulfillment != null) {
       const fulfillmentBytesSize: number = Math.ceil(fulfillment.length / 2)

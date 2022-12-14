@@ -14,12 +14,8 @@ import {
   isValidXAddress,
   xAddressToClassicAddress,
 } from 'ripple-address-codec'
+// Imported as rbc so we can type the functions via wrappers with the same name
 import * as rbc from 'ripple-binary-codec'
-import {
-  XrplDefinitions,
-  DEFAULT_DEFINITIONS,
-  coreTypes,
-} from 'ripple-binary-codec'
 import { verify as verifyKeypairSignature } from 'ripple-keypairs'
 
 import { LedgerEntry } from '../models/ledger'
@@ -180,6 +176,9 @@ function hasNextPage(response: Response): boolean {
   // eslint-disable-next-line @typescript-eslint/dot-notation -- only checking if it exists
   return Boolean(response.result['marker'])
 }
+
+// Extracting to export the values
+const { XrplDefinitions, DEFAULT_DEFINITIONS, coreTypes } = rbc
 
 /**
  * @category Utilities

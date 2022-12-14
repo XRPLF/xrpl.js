@@ -1,5 +1,4 @@
-import { decode, encode } from 'ripple-binary-codec'
-import { type XrplDefinitions } from 'ripple-binary-codec'
+import { decode, encode, XrplDefinitions } from 'ripple-binary-codec'
 
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
 import { ValidationError, XrplError } from '../errors'
