@@ -31,24 +31,24 @@ const isBrowser = (process as any).browser
 let lastSocketKey = 0
 const socketMap: { [socketKey: string]: net.Socket } = {}
 
-async function destroyServer(server: net.Server): Promise<void> {
-  /* loop through all sockets and destroy them */
-  Object.keys(socketMap).forEach(function (socketKey) {
-    socketMap[socketKey].destroy()
-  })
+// async function destroyServer(server: net.Server): Promise<void> {
+//   /* loop through all sockets and destroy them */
+//   Object.keys(socketMap).forEach(function (socketKey) {
+//     socketMap[socketKey].destroy()
+//   })
 
-  return new Promise((resolve, reject) => {
-    // after all the sockets are destroyed, we may close the server!
-    server.close((error) => {
-      if (error) {
-        reject(error)
-        return
-      }
+//   return new Promise((resolve, reject) => {
+//     // after all the sockets are destroyed, we may close the server!
+//     server.close((error) => {
+//       if (error) {
+//         reject(error)
+//         return
+//       }
 
-      resolve()
-    })
-  })
-}
+//       resolve()
+//     })
+//   })
+// }
 
 async function createServer(): Promise<net.Server> {
   return new Promise((resolve, reject) => {
