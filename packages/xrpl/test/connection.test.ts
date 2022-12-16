@@ -228,21 +228,21 @@ describe('Connection', () => {
           socket.on('data', (data) => {
             const got = data.toString('ascii', 0, expect.length)
             assert.strictEqual(got, expect)
-            if (connection.isConnected()) {
-              destroyServer(server)
-                .then(async () => {
-                  return connection.disconnect().catch((error) => {
-                    // eslint-disable-next-line no-console -- Test
-                    console.error('Failed to disconnect')
-                    throw error
-                  })
-                })
-                .then(() => {
-                  resolve()
-                })
-            } else {
-              destroyServer(server).then(resolve)
-            }
+            // if (connection.isConnected()) {
+            //   destroyServer(server)
+            //     .then(async () => {
+            //       return connection.disconnect().catch((error) => {
+            //         // eslint-disable-next-line no-console -- Test
+            //         console.error('Failed to disconnect')
+            //         throw error
+            //       })
+            //     })
+            //     .then(() => {
+            //       resolve()
+            //     })
+            // } else {
+            destroyServer(server).then(resolve)
+            // }
           })
         })
       })
