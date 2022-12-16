@@ -225,12 +225,20 @@ describe('Connection', () => {
 
       const connectionPromise = new Promise<void>((resolve) => {
         server.on('connection', (socket) => {
+          // eslint-disable-next-line no-console -- Testing
+          console.error('server.on connection')
           socket.on('data', (data) => {
+            // eslint-disable-next-line no-console -- Testing
+            console.error('socket.on data')
             const got = data.toString('ascii', 0, expect.length)
             assert.strictEqual(got, expect)
             if (connection.isConnected()) {
+              // eslint-disable-next-line no-console -- Testing
+              console.error('connection still connected, trying destroy server')
               destroyServer(server)
                 .then(async () => {
+                  // eslint-disable-next-line no-console -- Testing
+                  console.error('trying disconnect')
                   return connection.disconnect().catch((error) => {
                     // eslint-disable-next-line no-console -- Test
                     console.error('Failed to disconnect')
@@ -238,18 +246,29 @@ describe('Connection', () => {
                   })
                 })
                 .then(() => {
+                  // eslint-disable-next-line no-console -- Testing
+                  console.error('resolve after disconnect')
                   resolve()
                 })
             } else {
+              // eslint-disable-next-line no-console -- Testing
+              console.error('Connection not connecteed, destorying server')
               destroyServer(server).then(resolve)
             }
           })
         })
       })
 
+      // eslint-disable-next-line no-console -- Testing
+      console.error('awaiting  connect')
       await connection.connect().catch((err) => {
+        // eslint-disable-next-line no-console -- Testing
+        console.error('Connection catch')
         assert(err instanceof NotConnectedError)
       })
+
+      // eslint-disable-next-line no-console -- Testing
+      console.error('after connect, awaiting connectionPromise')
 
       await connectionPromise
     },
