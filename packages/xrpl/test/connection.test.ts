@@ -228,7 +228,8 @@ describe('Connection', () => {
           socket.on('data', (data) => {
             const got = data.toString('ascii', 0, expect.length)
             assert.strictEqual(got, expect)
-            if (connection.isConnected()) {
+            // @ts-expect-error -- Using private member to workaround issue
+            if (connection.isConnected() && connection.ws) {
               connection
                 .disconnect()
                 .then(async () => {
