@@ -224,6 +224,11 @@ describe('Connection', () => {
       const expect = 'CONNECT localhost'
 
       const connectionPromise = new Promise<void>((resolve) => {
+        server.on('error', (error) => {
+          // eslint-disable-next-line no-console -- Testing
+          console.error('server.on error: ', error)
+          resolve()
+        })
         server.on('connection', (socket) => {
           // eslint-disable-next-line no-console -- Testing
           console.error('server.on connection')
