@@ -228,8 +228,11 @@ describe('Connection', () => {
           socket.on('data', (data) => {
             const got = data.toString('ascii', 0, expect.length)
             assert.strictEqual(got, expect)
-            // @ts-expect-error -- Using private member to workaround issue
-            if (connection.isConnected() && connection.ws) {
+            if (
+              connection.isConnected() &&
+              // @ts-expect-error -- Using private member to workaround issue with disconnect not firing close event
+              connection.state() !== WebSocket.CLOSED
+            ) {
               connection
                 .disconnect()
                 .then(async () => {
