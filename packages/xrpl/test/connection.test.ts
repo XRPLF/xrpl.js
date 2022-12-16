@@ -241,7 +241,8 @@ describe('Connection', () => {
             //       resolve()
             //     })
             // } else {
-            destroyServer(server).then(resolve)
+            // destroyServer(server).then(resolve)
+            resolve()
             // }
           })
         })
