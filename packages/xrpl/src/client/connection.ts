@@ -579,7 +579,7 @@ export class Connection extends EventEmitter {
    * Process a failed connection.
    *
    * @param errorOrCode - (Optional) Error or code for connection failure.
-   * @param reason
+   * @param reason - (Optional) Reason for connection failure.
    */
   private onConnectionFailed(
     errorOrCode: Error | number | null,
