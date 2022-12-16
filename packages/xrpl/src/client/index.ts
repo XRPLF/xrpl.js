@@ -1,3 +1,4 @@
+/* eslint-disable jsdoc/require-jsdoc -- Request has many aliases, but they don't need unique docs */
 /* eslint-disable @typescript-eslint/member-ordering -- TODO: remove when instance methods aren't members */
 /* eslint-disable max-lines -- Client is a large file w/ lots of imports/exports */
 import * as assert from 'assert'

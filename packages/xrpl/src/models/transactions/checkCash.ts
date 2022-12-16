@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition -- JavaScript users can always pass in undefined */
 /* eslint-disable complexity -- Necessary for validateCheckCash */
 import { ValidationError } from '../../errors'
 import { Amount } from '../common'

@@ -22,6 +22,7 @@
     "https-proxy-agent": false
   },
   "dependencies": {
+    "@types/node": "^18.11.15",
     "bignumber.js": "^9.0.0",
     "bip32": "^2.0.6",
     "bip39": "^3.0.4",

@@ -39,6 +39,7 @@ module.exports = {
     'jsdoc/require-throws': 'off',
     'jsdoc/require-jsdoc': 'off',
     'jsdoc/require-param': 'off',
+    'jsdoc/check-examples': 'off',
     'tsdoc/syntax': 'off',
   },
 }

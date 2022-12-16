@@ -70,6 +70,15 @@ export default class WSWrapper extends EventEmitter {
   }
 
   /**
+   * Get the ready state of the websocket.
+   *
+   * @returns The Websocket's ready state.
+   */
+  public get readyState(): number {
+    return this.ws.readyState
+  }
+
+  /**
    * Closes the websocket.
    */
   public close(): void {
@@ -85,14 +94,5 @@ export default class WSWrapper extends EventEmitter {
    */
   public send(message: string): void {
     this.ws.send(message)
-  }
-
-  /**
-   * Get the ready state of the websocket.
-   *
-   * @returns The Websocket's ready state.
-   */
-  public get readyState(): number {
-    return this.ws.readyState
   }
 }
