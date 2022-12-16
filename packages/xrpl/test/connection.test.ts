@@ -263,7 +263,7 @@ describe('Connection', () => {
       console.error('awaiting  connect')
       await connection.connect().catch((err) => {
         // eslint-disable-next-line no-console -- Testing
-        console.error('Connection catch')
+        console.error('Connection catch: ', err)
         assert(err instanceof NotConnectedError)
       })
 
