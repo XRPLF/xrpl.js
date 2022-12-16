@@ -31,24 +31,24 @@ const isBrowser = (process as any).browser
 let lastSocketKey = 0
 const socketMap: { [socketKey: string]: net.Socket } = {}
 
-// async function destroyServer(server: net.Server): Promise<void> {
-//   /* loop through all sockets and destroy them */
-//   Object.keys(socketMap).forEach(function (socketKey) {
-//     socketMap[socketKey].destroy()
-//   })
+async function destroyServer(server: net.Server): Promise<void> {
+  /* loop through all sockets and destroy them */
+  Object.keys(socketMap).forEach(function (socketKey) {
+    socketMap[socketKey].destroy()
+  })
 
-//   return new Promise((resolve, reject) => {
-//     // after all the sockets are destroyed, we may close the server!
-//     server.close((error) => {
-//       if (error) {
-//         reject(error)
-//         return
-//       }
+  return new Promise((resolve, reject) => {
+    // after all the sockets are destroyed, we may close the server!
+    server.close((error) => {
+      if (error) {
+        reject(error)
+        return
+      }
 
-//       resolve()
-//     })
-//   })
-// }
+      resolve()
+    })
+  })
+}
 
 async function createServer(): Promise<net.Server> {
   return new Promise((resolve, reject) => {
@@ -228,22 +228,21 @@ describe('Connection', () => {
           socket.on('data', (data) => {
             const got = data.toString('ascii', 0, expect.length)
             assert.strictEqual(got, expect)
-            // if (connection.isConnected()) {
-            //   destroyServer(server)
-            //     .then(async () => {
-            //       return connection.disconnect().catch((error) => {
-            //         // eslint-disable-next-line no-console -- Test
-            //         console.error('Failed to disconnect')
-            //         throw error
-            //       })
-            //     })
-            //     .then(() => {
-            //       resolve()
-            //     })
-            // } else {
-            // destroyServer(server).then(resolve)
-            resolve()
-            // }
+            if (connection.isConnected()) {
+              destroyServer(server)
+                .then(async () => {
+                  return connection.disconnect().catch((error) => {
+                    // eslint-disable-next-line no-console -- Test
+                    console.error('Failed to disconnect')
+                    throw error
+                  })
+                })
+                .then(() => {
+                  resolve()
+                })
+            } else {
+              destroyServer(server).then(resolve)
+            }
           })
         })
       })
