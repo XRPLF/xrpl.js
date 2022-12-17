@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "pretty": true,
-    "target": "es2021",
+    "target": "es2017",
     "outDir": "./dist/npm",
     "declaration": true,
     "declarationMap": true,
