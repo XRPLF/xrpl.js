@@ -1,3 +1,4 @@
+// Change to 'xrpl' if you are using this code outside of the xrpl.js repo
 import { Client, Payment, RipplePathFindResponse } from 'xrpl-local'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')

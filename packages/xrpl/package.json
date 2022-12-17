@@ -30,7 +30,8 @@
     "ripple-address-codec": "^4.2.4",
     "ripple-binary-codec": "^1.4.2",
     "ripple-keypairs": "^1.1.4",
-    "ws": "^8.2.2"
+    "ws": "^8.2.2",
+    "xrpl-local": "file:./src"
   },
   "resolutions": {
     "elliptic": "^6.5.4"
@@ -48,7 +49,7 @@
     "prepublish": "run-s clean build",
     "test": "jest --verbose false --silent=false --runInBand --detectOpenHandles ./test/*.test.ts ./test/models/*.test.ts ./test/utils/*.test.ts ./test/wallet/*.test.ts",
     "test:integration": "TS_NODE_PROJECT=tsconfig.build.json jest --verbose false --silent=false --runInBand ./test/integration/**/*.test.ts",
-    "test:browser": "npm run build:browserTests && karma start ./karma.config.js --single-run",
+    "test:browser": "npm run build && npm run build:browserTests && karma start ./karma.config.js --single-run",
     "test:watch": "jest --watch --verbose false --silent=false --runInBand --detectOpenHandles ./test/*.test.ts ./test/models/*.test.ts ./test/utils/*.test.ts ./test/wallet/*.test.ts",
     "format": "prettier --write '{src,test}/**/*.ts'",
     "lint": "eslint . --ext .ts --max-warnings 0",
@@ -72,7 +73,6 @@
     "@types/node": "^18.11.9",
     "assert-browserify": "^2.0.0",
     "browserify-fs": "^1.0.0",
-    "constants-browserify": "^1.0.0",
-    "xrpl-local": "file:./src"
+    "constants-browserify": "^1.0.0"
   }
 }

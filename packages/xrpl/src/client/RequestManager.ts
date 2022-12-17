@@ -99,8 +99,8 @@ export default class RequestManager {
       newId = request.id
     }
     const newRequest = JSON.stringify({ ...request, id: newId })
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required for Jest running in browser
-    const timer = setTimeout(() => {
+    // Typing required for Jest running in browser
+    const timer: ReturnType<typeof setTimeout> = setTimeout(() => {
       this.reject(
         newId,
         new TimeoutError(
@@ -108,7 +108,7 @@ export default class RequestManager {
           request,
         ),
       )
-    }, timeout) as unknown as NodeJS.Timeout
+    }, timeout)
     /*
      * Node.js won't exit if a timer is still running, so we tell Node to ignore.
      * (Node will still wait for the request to complete).
@@ -119,7 +119,10 @@ export default class RequestManager {
     }
     if (this.promisesAwaitingResponse.has(newId)) {
       clearTimeout(timer)
-      throw new XrplError(`Response with id '${newId}' is already pending`)
+      throw new XrplError(
+        `Response with id '${newId}' is already pending`,
+        request,
+      )
     }
     const newPromise = new Promise<Response>(
       (resolve: (value: Response | PromiseLike<Response>) => void, reject) => {

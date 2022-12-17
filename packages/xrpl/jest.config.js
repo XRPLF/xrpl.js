@@ -5,5 +5,5 @@ module.exports = {
   ...base,
   roots: [...base.roots, '<rootDir>/test'],
   displayName: 'xrpl.js',
-  setupFiles: ['<rootDir>/jestSetup.ts'],
+  // setupFiles: ['<rootDir>/jestSetup.ts'],
 }

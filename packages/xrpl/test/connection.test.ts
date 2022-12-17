@@ -22,6 +22,24 @@ import {
 } from './setupClient'
 import { assertRejects, ignoreWebSocketDisconnect } from './testUtils'
 
+type GlobalThis = typeof globalThis
+type Global = GlobalThis & {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Necessary for Jest in browser
+  TextEncoder: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Necessary for Jest in browser
+  TextDecoder: any
+}
+declare const global: Global
+
+if (typeof TextDecoder === 'undefined') {
+  // eslint-dsiable-next-line max-len -- necessary to disable all the rules
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, node/global-require, @typescript-eslint/no-require-imports, node/prefer-global/text-encoder, @typescript-eslint/no-unsafe-member-access, global-require, @typescript-eslint/no-var-requires -- Needed for Jest
+  global.TextEncoder = require('util').TextEncoder
+  // eslint-dsiable-next-line max-len -- necessary to disable all the rules
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, node/global-require, @typescript-eslint/no-require-imports, node/prefer-global/text-decoder, @typescript-eslint/no-unsafe-member-access, global-require, @typescript-eslint/no-var-requires -- Needed for Jest
+  global.TextDecoder = require('util').TextDecoder
+}
+
 // how long before each test case times out
 const TIMEOUT = 20000
 
@@ -224,8 +242,10 @@ describe('Connection', () => {
       const expect = 'CONNECT localhost'
 
       const connectionPromise = new Promise<void>((resolve) => {
-        server.on('error', (error) => {
-          resolve()
+        server.on('error', () => {
+          destroyServer(server).then(() => {
+            resolve()
+          })
         })
         server.on('connection', (socket) => {
           socket.on('data', (data) => {

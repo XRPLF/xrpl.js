@@ -19,24 +19,6 @@ import ConnectionManager from './ConnectionManager'
 import ExponentialBackoff from './ExponentialBackoff'
 import RequestManager from './RequestManager'
 
-type GlobalThis = typeof globalThis
-type Global = GlobalThis & {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Necessary for Jest in browser
-  TextEncoder: any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Necessary for Jest in browser
-  TextDecoder: any
-}
-declare const global: Global
-
-if (typeof TextDecoder === 'undefined') {
-  // eslint-dsiable-next-line max-len -- necessary to disable all the rules
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, node/global-require, @typescript-eslint/no-require-imports, node/prefer-global/text-encoder, @typescript-eslint/no-unsafe-member-access, global-require, @typescript-eslint/no-var-requires -- Needed for Jest
-  global.TextEncoder = require('util').TextEncoder
-  // eslint-dsiable-next-line max-len -- necessary to disable all the rules
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, node/global-require, @typescript-eslint/no-require-imports, node/prefer-global/text-decoder, @typescript-eslint/no-unsafe-member-access, global-require, @typescript-eslint/no-var-requires -- Needed for Jest
-  global.TextDecoder = require('util').TextDecoder
-}
-
 const SECONDS_PER_MINUTE = 60
 const TIMEOUT = 20
 const CONNECTION_TIMEOUT = 5
@@ -195,8 +177,10 @@ async function websocketSendAsync(
 export class Connection extends EventEmitter {
   private readonly url: string | undefined
   private ws: WebSocket | null = null
-  private reconnectTimeoutID: null | NodeJS.Timeout = null
-  private heartbeatIntervalID: null | NodeJS.Timeout = null
+  // Typing necessary for Jest tests running in browser
+  private reconnectTimeoutID: null | ReturnType<typeof setTimeout> = null
+  // Typing necessary for Jest tetsts running in browser
+  private heartbeatIntervalID: null | ReturnType<typeof setTimeout> = null
   private readonly retryConnectionBackoff = new ExponentialBackoff({
     min: 100,
     max: SECONDS_PER_MINUTE * 1000,
@@ -244,7 +228,7 @@ export class Connection extends EventEmitter {
    * @returns When the websocket is connected.
    * @throws ConnectionError if there is a connection error, RippleError if there is already a WebSocket in existence.
    */
-  // eslint-disable-next-line max-lines-per-function -- Necessary for this class.
+  // eslint-disable-next-line max-lines-per-function -- Necessary
   public async connect(): Promise<void> {
     if (this.isConnected()) {
       return Promise.resolve()
@@ -266,15 +250,17 @@ export class Connection extends EventEmitter {
     }
 
     // Create the connection timeout, in case the connection hangs longer than expected.
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required for Jest running in browser
-    const connectionTimeoutID = setTimeout(() => {
-      this.onConnectionFailed(
-        new ConnectionError(
-          `Error: connect() timed out after ${this.config.connectionTimeout} ms. If your internet connection is working, the ` +
-            `rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.`,
-        ),
-      )
-    }, this.config.connectionTimeout) as unknown as NodeJS.Timeout
+    const connectionTimeoutID: ReturnType<typeof setTimeout> = setTimeout(
+      () => {
+        this.onConnectionFailed(
+          new ConnectionError(
+            `Error: connect() timed out after ${this.config.connectionTimeout} ms. If your internet connection is working, the ` +
+              `rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.`,
+          ),
+        )
+      },
+      this.config.connectionTimeout,
+    )
     // Connection listeners: these stay attached only until a connection is done/open.
     this.ws = createWebSocket(this.url, this.config)
 
@@ -284,7 +270,7 @@ export class Connection extends EventEmitter {
 
     this.ws.on('error', (error) => this.onConnectionFailed(error))
     this.ws.on('error', () => clearTimeout(connectionTimeoutID))
-    this.ws.on('close', (code) => this.onConnectionFailed(code))
+    this.ws.on('close', (reason) => this.onConnectionFailed(reason))
     this.ws.on('close', () => clearTimeout(connectionTimeoutID))
     this.ws.once('open', () => {
       void this.onceOpen(connectionTimeoutID)
@@ -480,13 +466,14 @@ export class Connection extends EventEmitter {
       this.ws = null
 
       if (code === undefined) {
-        const reasonText = reason ? reason.toString() : 'undefined'
-        // eslint-disable-next-line no-console -- The error is helpful for debugging.
-        console.error(
-          `Disconnected but the disconnect code was undefined (The given reason was ${reasonText}).` +
-            `This could be caused by an exception being thrown during a 'connect' callback. ` +
-            `Disconnecting with code 1011 to indicate an internal error has occurred.`,
-        )
+        // Useful to keep this code for debugging purposes.
+        // const reasonText = reason ? reason.toString() : 'undefined'
+        // // eslint-disable-next-line no-console -- The error is helpful for debugging.
+        // console.error(
+        //   `Disconnected but the disconnect code was undefined (The given reason was ${reasonText}).` +
+        //     `This could be caused by an exception being thrown during a 'connect' callback. ` +
+        //     `Disconnecting with code 1011 to indicate an internal error has occurred.`,
+        // )
 
         /*
          * Error code 1011 represents an Internal Error according to
@@ -530,12 +517,11 @@ export class Connection extends EventEmitter {
      * Start the reconnect timeout, but set it to `this.reconnectTimeoutID`
      * so that we can cancel one in-progress on disconnect.
      */
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required for Jest running in browser
     this.reconnectTimeoutID = setTimeout(() => {
       this.reconnect().catch((error: Error) => {
         this.emit('error', 'reconnect', error.message, error)
       })
-    }, retryTimeout) as unknown as NodeJS.Timeout
+    }, retryTimeout)
   }
 
   /**
@@ -552,10 +538,9 @@ export class Connection extends EventEmitter {
    */
   private startHeartbeatInterval(): void {
     this.clearHeartbeatInterval()
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required for Jest running in browser
     this.heartbeatIntervalID = setInterval(() => {
       void this.heartbeat()
-    }, this.config.timeout) as unknown as NodeJS.Timeout
+    }, this.config.timeout)
   }
 
   /**
@@ -576,7 +561,6 @@ export class Connection extends EventEmitter {
    * Process a failed connection.
    *
    * @param errorOrCode - (Optional) Error or code for connection failure.
-   * @param reason - (Optional) Reason for connection failure.
    */
   private onConnectionFailed(errorOrCode: Error | number | null): void {
     if (this.ws) {

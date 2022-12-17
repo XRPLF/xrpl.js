@@ -1,3 +1,4 @@
+// Change to 'xrpl' if you are using this code outside of the xrpl.js repo
 import {
   AccountObjectsRequest,
   Client,

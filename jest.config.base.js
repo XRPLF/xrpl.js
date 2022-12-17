@@ -5,7 +5,6 @@ module.exports = {
   transform: {
     "^.+\\.ts$": "ts-jest",
   },
-  // testRegex: "(/(src|test)/.*.(test|spec|-test)).(jsx?|tsx?|js?|ts?)$",
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   collectCoverage: true,
   coveragePathIgnorePatterns: ["(tests/.*.mock).(jsx?|tsx?)$"],
