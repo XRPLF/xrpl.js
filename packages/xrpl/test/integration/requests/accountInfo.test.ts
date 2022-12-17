@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import _ from 'lodash'
+import omit from 'lodash/omit'
 import { AccountInfoRequest } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
@@ -64,13 +64,13 @@ describe('account_info', () => {
       )
       assert.equal(typeof response.result.account_data.Sequence, 'number')
       assert.deepEqual(
-        _.omit(response.result.account_data, [
+        omit(response.result.account_data, [
           'PreviousTxnID',
           'PreviousTxnLgrSeq',
           'Sequence',
           'index',
         ]),
-        _.omit(expected.result.account_data, [
+        omit(expected.result.account_data, [
           'PreviousTxnID',
           'PreviousTxnLgrSeq',
           'Sequence',

@@ -3,7 +3,7 @@ assertions. */
 import net from 'net'
 
 import { assert } from 'chai'
-import _ from 'lodash'
+import omit from 'lodash/omit'
 
 import addresses from './fixtures/addresses.json'
 
@@ -45,8 +45,8 @@ export function assertResultMatch(
     )
   }
   assert.deepEqual(
-    _.omit(response, ['txJSON', 'tx_json']),
-    _.omit(expected, ['txJSON', 'tx_json']),
+    omit(response, ['txJSON', 'tx_json']),
+    omit(expected, ['txJSON', 'tx_json']),
   )
 }
 

@@ -1,5 +1,4 @@
 import { assert } from 'chai'
-import _ from 'lodash'
 import { Client } from 'xrpl-local'
 
 // how long before each test case times out

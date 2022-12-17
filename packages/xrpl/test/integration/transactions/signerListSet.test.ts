@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { SignerListSet } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'

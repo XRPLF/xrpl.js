@@ -1,5 +1,4 @@
 import { assert } from 'chai'
-import _ from 'lodash'
 import { LedgerDataRequest } from 'xrpl-local'
 import type { BinaryLedgerEntry } from 'xrpl-local/models/methods/ledgerData'
 

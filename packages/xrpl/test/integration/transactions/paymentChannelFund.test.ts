@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { PaymentChannelCreate, hashes, PaymentChannelFund } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'

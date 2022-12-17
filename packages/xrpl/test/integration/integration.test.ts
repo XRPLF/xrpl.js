@@ -1,6 +1,5 @@
 import assert from 'assert'
 
-import _ from 'lodash'
 import { Client, SubmitResponse } from 'xrpl-local'
 import { AccountSet, SignerListSet } from 'xrpl-local/models/transactions'
 import { convertStringToHex } from 'xrpl-local/utils'

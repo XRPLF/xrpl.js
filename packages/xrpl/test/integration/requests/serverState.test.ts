@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import _ from 'lodash'
+import omit from 'lodash/omit'
 import { type ServerStateRequest, type ServerStateResponse } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
@@ -114,8 +114,8 @@ describe('server_state', () => {
         'io_latency_ms',
       ]
       assert.deepEqual(
-        _.omit(response.result.state, removeKeys),
-        _.omit(expected.result.state, removeKeys),
+        omit(response.result.state, removeKeys),
+        omit(expected.result.state, removeKeys),
       )
 
       // load
@@ -143,7 +143,7 @@ describe('server_state', () => {
         'string',
       )
       for (const key of Object.keys(
-        _.omit(response.result.state.validated_ledger, 'hash'),
+        omit(response.result.state.validated_ledger, 'hash'),
       )) {
         assert.equal(
           typeof response.result.state.validated_ledger?.[key],

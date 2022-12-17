@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function -- Needs to process orderbooks. */
 import BigNumber from 'bignumber.js'
-import _ from 'lodash'
+import flatMap from 'lodash/flatMap'
 
 import type { Client } from '../client'
 import { ValidationError } from '../errors'
@@ -119,11 +119,11 @@ async function getOrderbook(
   request.taker_pays = takerGets
   const reverseOfferResults = await this.requestAll(request)
   // 3. Return Formatted Response
-  const directOffers = _.flatMap(
+  const directOffers = flatMap(
     directOfferResults,
     (directOfferResult) => directOfferResult.result.offers,
   )
-  const reverseOffers = _.flatMap(
+  const reverseOffers = flatMap(
     reverseOfferResults,
     (reverseOfferResult) => reverseOfferResult.result.offers,
   )

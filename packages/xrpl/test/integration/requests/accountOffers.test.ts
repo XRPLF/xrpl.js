@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import _ from 'lodash'
+import omit from 'lodash/omit'
 import { AccountOffersRequest } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
@@ -42,8 +42,8 @@ describe('account_offers', () => {
       assert.equal(response.type, expected.type)
       assert.equal(typeof response.result.ledger_current_index, 'number')
       assert.deepEqual(
-        _.omit(response.result, 'ledger_current_index'),
-        _.omit(expected.result, 'ledger_current_index'),
+        omit(response.result, 'ledger_current_index'),
+        omit(expected.result, 'ledger_current_index'),
       )
     },
     TIMEOUT,

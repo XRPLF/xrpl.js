@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import _ from 'lodash'
+import omit from 'lodash/omit'
 import { AccountChannelsRequest } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
@@ -45,8 +45,8 @@ describe('account_channels', () => {
       assert.equal(typeof response.result.ledger_hash, 'string')
       assert.equal(typeof response.result.ledger_index, 'number')
       assert.deepEqual(
-        _.omit(response.result, ['ledger_hash', 'ledger_index']),
-        _.omit(expected.result, ['ledger_hash', 'ledger_index']),
+        omit(response.result, ['ledger_hash', 'ledger_index']),
+        omit(expected.result, ['ledger_hash', 'ledger_index']),
       )
     },
     TIMEOUT,

@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import _ from 'lodash'
+import omit from 'lodash/omit'
 import { type ServerInfoRequest, type ServerInfoResponse } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
@@ -110,8 +110,8 @@ describe('server_info (rippled)', () => {
         'validated_ledger',
       ]
       assert.deepEqual(
-        _.omit(response.result.info, removeKeys),
-        _.omit(expected.result.info, removeKeys),
+        omit(response.result.info, removeKeys),
+        omit(expected.result.info, removeKeys),
       )
 
       // load
@@ -136,7 +136,7 @@ describe('server_info (rippled)', () => {
       // validated_ledger
       assert.equal(typeof response.result.info.validated_ledger?.hash, 'string')
       for (const key of Object.keys(
-        _.omit(response.result.info.validated_ledger, 'hash'),
+        omit(response.result.info.validated_ledger, 'hash'),
       )) {
         assert.equal(
           typeof response.result.info.validated_ledger?.[key],

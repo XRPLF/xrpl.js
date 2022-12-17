@@ -1,5 +1,4 @@
 import { assert } from 'chai'
-import _ from 'lodash'
 import { EscrowCreate } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'

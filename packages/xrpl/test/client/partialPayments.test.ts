@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- required for formatting transactions */
 import { expect } from 'chai'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import type { TransactionStream } from 'xrpl-local'
 
 import rippled from '../fixtures/rippled'
@@ -125,7 +125,7 @@ describe('client handling of tfPartialPayments', () => {
   })
 
   it('transaction_entry with XRP tfPartialPayment', async () => {
-    const mockResponse = _.cloneDeep(rippled.transaction_entry)
+    const mockResponse = cloneDeep(rippled.transaction_entry)
     mockResponse.result.tx_json.Amount = '1000'
     testContext.mockRippled?.addResponse('transaction_entry', mockResponse)
     const resp = await testContext.client.request({

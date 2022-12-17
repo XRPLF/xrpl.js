@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import _ from 'lodash'
+import omit from 'lodash/omit'
 
 import serverUrl from '../serverUrl'
 import {
@@ -30,7 +30,7 @@ describe('Utility method integration tests', () => {
           result: { role: 'admin', unlimited: true },
           type: 'response',
         }
-        assert.deepEqual(_.omit(response, 'id'), expected)
+        assert.deepEqual(omit(response, 'id'), expected)
       } catch (error) {
         // eslint-disable-next-line no-console -- console.log is fine for tests
         console.error(error)

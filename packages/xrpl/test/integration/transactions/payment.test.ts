@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { Payment } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'

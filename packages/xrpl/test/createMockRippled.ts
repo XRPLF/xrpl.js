@@ -1,5 +1,4 @@
 import { EventEmitter2 } from 'eventemitter2'
-import _ from 'lodash'
 import { Server as WebSocketServer, type WebSocket } from 'ws'
 import type { Request } from 'xrpl-local'
 import { XrplError } from 'xrpl-local/errors'

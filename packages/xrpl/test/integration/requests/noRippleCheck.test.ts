@@ -1,5 +1,4 @@
 import { assert } from 'chai'
-import _ from 'lodash'
 import { NoRippleCheckRequest, type AccountSet } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'

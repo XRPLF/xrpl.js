@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises -- supposed to return a promise here */
 /* eslint-disable no-restricted-syntax -- not sure why this rule is here, definitely not needed here */
 import { assert } from 'chai'
-import _ from 'lodash'
 import { AccountSet, convertStringToHex, ValidationError } from 'xrpl-local'
 
 import { assertRejects } from '../testUtils'

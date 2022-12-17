@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import _ from 'lodash'
+import omit from 'lodash/omit'
 import {
   PathFindRequest,
   PathFindResponse,
@@ -89,10 +89,7 @@ describe('path_find', () => {
       const pathFindPromise = new Promise<void>((resolve) => {
         client.on('path_find', (path) => {
           assert.equal(path.type, 'path_find')
-          assert.deepEqual(
-            _.omit(path, 'id'),
-            _.omit(expectedStreamResult, 'id'),
-          )
+          assert.deepEqual(omit(path, 'id'), omit(expectedStreamResult, 'id'))
           subscribeDone(testContext.client)
           resolve()
         })

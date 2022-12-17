@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import _ from 'lodash'
+import omit from 'lodash/omit'
 import { decode } from 'ripple-binary-codec'
 import {
   Client,
@@ -124,7 +124,7 @@ export async function fundAccount(
     assert.fail(`Response not successful, ${response.result.engine_result}`)
   }
   await ledgerAccept(client)
-  const signedTx = _.omit(response.result.tx_json, 'hash')
+  const signedTx = omit(response.result.tx_json, 'hash')
   await verifySubmittedTransaction(client, signedTx as Transaction)
   return response
 }
@@ -148,7 +148,7 @@ export async function verifySubmittedTransaction(
 
   assert(data.result)
   assert.deepEqual(
-    _.omit(data.result, [
+    omit(data.result, [
       'date',
       'hash',
       'inLedger',
@@ -210,7 +210,7 @@ export async function testTransaction(
   )
 
   // check that the transaction is on the ledger
-  const signedTx = _.omit(response.result.tx_json, 'hash')
+  const signedTx = omit(response.result.tx_json, 'hash')
   await ledgerAccept(client)
   await verifySubmittedTransaction(client, signedTx as Transaction)
   return response
