@@ -123,7 +123,7 @@ npm uninstall abbrev -w xrpl
 
 * Your changes should have unit and/or integration tests.
 * Your changes should pass the linter.
-* Your code should pass all the tests on Github (which check the linter, unit and integration tests on Node 14/16/18, and browser tests).
+* Your code should pass all the tests on Github (which check the linter, unit and integration tests on Node 12/14/16, and browser tests).
 * Open a PR against `main` and ensure that all CI passes.
 * Get a full code review from one of the maintainers.
 * Merge your changes.

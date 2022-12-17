@@ -25,7 +25,7 @@ What is `xrpl.js` used for? The applications on the list linked above use `xrpl.
 
 ### Requirements
 
-+ **[Node.js v14](https://nodejs.org/)** is recommended. We also support v16 and v18. Other versions may work but are not frequently tested.
++ **[Node.js v14](https://nodejs.org/)** is recommended. We also support v12 and v16. Other versions may work but are not frequently tested.
 
 ## Getting Started
 
@@ -82,7 +82,7 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
    ```
 2. Modify your webpack configuration
     1. Install `react-app-rewired`
-   
+
        ````shell
        npm install --save-dev react-app-rewired
        ````
@@ -91,7 +91,7 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
 
        ```javascript
        const webpack = require('webpack');
-       
+
        module.exports = function override(config) {
            const fallback = config.resolve.fallback || {};
            Object.assign(fallback, {
@@ -111,7 +111,7 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
                    Buffer: ['buffer', 'Buffer']
                })
            ])
-       
+
            // This is deprecated in webpack 5 but alias false does not seem to work
            config.module.rules.push({
                test: /node_modules[\\\/]https-proxy-agent[\\\/]/,
@@ -120,11 +120,11 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
            return config;
        }
        ```
-       
+
     3. Update package.json scripts section with
 
         ```
-        "start": "react-app-rewired start", 
+        "start": "react-app-rewired start",
         "build": "react-app-rewired build",
         "test": "react-app-rewired test",
         ```
@@ -171,7 +171,7 @@ If you want to use `xrpl.js` with React Native you will need to install shims fo
   ```
 ### Using xrpl.js with Vite React
 
-Similar to above, to get xrpl.js to work with Vite you need to set up a couple aliases in the vite.config.ts file. 
+Similar to above, to get xrpl.js to work with Vite you need to set up a couple aliases in the vite.config.ts file.
 
 1. If it's a fresh project you can use `npm create vite@latest` then choose the React and TypeScript options.
 
