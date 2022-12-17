@@ -34,7 +34,7 @@ describe('EscrowFinish', () => {
       ).result.ledger.close_time
 
       // Attempt to get the time after which we can check for the escrow to be finished.
-      // Sometimes thel edger close_time is in the future, so we need to wait for it to catch up.
+      // Sometimes the ledger close_time is in the future, so we need to wait for it to catch up.
       const currentTimeUnix = Math.floor(new Date().getTime())
       const currentTimeRipple = unixTimeToRippleTime(currentTimeUnix)
       const closeTimeCurrentTimeDiff = currentTimeRipple - CLOSE_TIME

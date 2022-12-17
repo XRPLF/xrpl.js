@@ -62,6 +62,7 @@ async function runCommand({
   try {
     response = await client.submit(transaction, { wallet })
 
+    // Retry if another transaction finished before this one
     while (
       ['tefPAST_SEQ', 'tefMAX_LEDGER'].includes(
         response.result.engine_result,

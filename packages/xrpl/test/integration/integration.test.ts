@@ -85,6 +85,7 @@ describe('integration tests', () => {
       await ledgerAccept(client)
       let retryCount = 20
 
+      // Retry if another transaction finished before this one
       while (
         ['tefPAST_SEQ', 'tefMAX_LEDGER'].includes(
           response.result.engine_result,

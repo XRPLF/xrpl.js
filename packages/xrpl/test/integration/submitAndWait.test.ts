@@ -53,18 +53,12 @@ describe('client.submitAndWait', () => {
           assert.equal(response.result.validated, true)
           retries = 0
         } catch (err) {
-          // From submit.ts
-          // if (lastLedger < latestLedger && submissionResult !== 'tesSUCCESS') {
-          //   throw new XrplError(
-          // eslint-disable-next-line max-len -- long error message
-          //     `The latest ledger sequence ${latestLedger} is greater than the transaction's LastLedgerSequence (${lastLedger}).\n` +
-          //       `Preliminary result: ${submissionResult}`,
-          //   )
-          // }
           const errorCodeRegex = /(?:Preliminary result:\s)(?<errorCode>.*)$/gu
           const message = err.message as string
           const matches = errorCodeRegex.exec(message)
           const errorCode = matches?.groups?.errorCode
+
+          // Retry if another transaction finished before this one
           // eslint-disable-next-line max-depth -- Testing
           if (['tefPAST_SEQ', 'tefMAX_LEDGER'].includes(errorCode || '')) {
             // eslint-disable-next-line no-await-in-loop, no-promise-executor-return -- We are waiting on retries

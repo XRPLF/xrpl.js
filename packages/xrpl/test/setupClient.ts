@@ -72,17 +72,6 @@ async function teardownClient(
           resolve()
         }
       })
-      // // eslint-disable-next-line no-negated-condition -- Easier to read with negation
-      // if (incomingContext.mockRippled != null) {
-      //   incomingContext.mockRippled.close()
-      // } else {
-      //   incomingContext.mocks?.forEach((mock: { close: () => void }) =>
-      //     mock.close(),
-      //   )
-      // }
-      // if (done) {
-      //   setImmediate(done)
-      // }
     })
     .then(async () => {
       await Promise.all(

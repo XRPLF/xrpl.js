@@ -9,28 +9,6 @@ import {
 } from '../setup'
 import { generateFundedWallet, getXRPBalance, testTransaction } from '../utils'
 
-// function debugPrintLedgerTime(closeTime: number) {
-//   const closeTimeUnix = rippleTimeToUnixTime(closeTime)
-//   const closeTimeDate = new Date()
-//   closeTimeDate.setTime(closeTimeUnix * 1000)
-//   const currentTimeUnix = Math.floor(new Date().getTime())
-//   const currentTimeRipple = unixTimeToRippleTime(currentTimeUnix)
-//   const currentTimeDate = new Date()
-//   currentTimeDate.setTime(currentTimeUnix * 1000)
-//   console.error(
-//     `closeTime (ripple): ${closeTime}\n`,
-//     `closeTime (unix): ${closeTimeUnix}\n`,
-//     `closeTime (date): ${closeTimeDate}\n`,
-//     `currentTime (ripple): ${currentTimeRipple}\n`,
-//     `currentTime (unix): ${currentTimeUnix}\n`,
-//     `currentTime (date): ${currentTimeDate}\n`,
-//     `diff (current - close) (unix): ${currentTimeUnix - closeTimeUnix}`,
-//     `diff (current - close) (ripple): ${currentTimeRipple - closeTime}`,
-//   )
-
-//   return currentTimeRipple - closeTime
-// }
-
 // how long before each test case times out
 const TIMEOUT = 30000
 
@@ -57,7 +35,7 @@ describe('EscrowCancel', () => {
       ).result.ledger.close_time
 
       // Attempt to get the time after which we can check for the escrow to be finished.
-      // Sometimes thel edger close_time is in the future, so we need to wait for it to catch up.
+      // Sometimes the ledger close_time is in the future, so we need to wait for it to catch up.
       const currentTimeUnix = Math.floor(new Date().getTime())
       const currentTimeRipple = unixTimeToRippleTime(currentTimeUnix)
       const closeTimeCurrentTimeDiff = currentTimeRipple - CLOSE_TIME
