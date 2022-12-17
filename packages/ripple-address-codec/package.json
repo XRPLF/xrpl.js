@@ -21,7 +21,7 @@
   "prepublishOnly": "tslint -b ./ && jest",
   "scripts": {
     "build": "tsc -b",
-    "test": "",
+    "test": "jest --verbose false --silent=false --runInBand --detectOpenHandles ./src/*.test.js",
     "lint": "eslint . --ext .ts",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo"
   },

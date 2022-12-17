@@ -4,7 +4,7 @@
   "description": "Cryptographic key pairs for the XRP Ledger",
   "scripts": {
     "build": "tsc -b",
-    "test": "",
+    "test": "jest --verbose false --silent=false --runInBand --detectOpenHandles ./test/*.test.ts",
     "clean": "rm -rf ./dist .nyc_output && rm -rf tsconfig.tsbuildinfo",
     "lint": "eslint . --ext .ts",
     "prepublish": "npm run lint && npm test"
