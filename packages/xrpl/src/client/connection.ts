@@ -273,7 +273,6 @@ export class Connection extends EventEmitter {
           `Error: connect() timed out after ${this.config.connectionTimeout} ms. If your internet connection is working, the ` +
             `rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.`,
         ),
-        'connection timeout',
       )
     }, this.config.connectionTimeout) as unknown as NodeJS.Timeout
     // Connection listeners: these stay attached only until a connection is done/open.
@@ -283,11 +282,9 @@ export class Connection extends EventEmitter {
       throw new XrplError('Connect: created null websocket')
     }
 
-    this.ws.on('error', (error) =>
-      this.onConnectionFailed(error, 'ws on error'),
-    )
+    this.ws.on('error', (error) => this.onConnectionFailed(error))
     this.ws.on('error', () => clearTimeout(connectionTimeoutID))
-    this.ws.on('close', (code) => this.onConnectionFailed(code, 'ws on close'))
+    this.ws.on('close', (code) => this.onConnectionFailed(code))
     this.ws.on('close', () => clearTimeout(connectionTimeoutID))
     this.ws.once('open', () => {
       void this.onceOpen(connectionTimeoutID)
@@ -581,12 +578,7 @@ export class Connection extends EventEmitter {
    * @param errorOrCode - (Optional) Error or code for connection failure.
    * @param reason - (Optional) Reason for connection failure.
    */
-  private onConnectionFailed(
-    errorOrCode: Error | number | null,
-    reason?: string,
-  ): void {
-    // eslint-disable-next-line no-console -- Testing
-    console.error('onConnectionFailed: ', reason, ' errorOrCode: ', errorOrCode)
+  private onConnectionFailed(errorOrCode: Error | number | null): void {
     if (this.ws) {
       this.ws.removeAllListeners()
       this.ws.on('error', () => {

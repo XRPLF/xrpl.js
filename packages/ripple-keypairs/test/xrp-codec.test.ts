@@ -1,11 +1,11 @@
 import assert from 'assert'
 import * as api from 'ripple-address-codec'
 
-function toHex(bytes) {
+function toHex(bytes: Buffer) {
   return Buffer.from(bytes).toString('hex').toUpperCase()
 }
 
-function toBytes(hex) {
+function toBytes(hex: string) {
   return Buffer.from(hex, 'hex').toJSON().data
 }
 

@@ -30,8 +30,7 @@
     "ripple-address-codec": "^4.2.4",
     "ripple-binary-codec": "^1.4.2",
     "ripple-keypairs": "^1.1.4",
-    "ws": "^8.2.2",
-    "xrpl-local": "file:./src"
+    "ws": "^8.2.2"
   },
   "resolutions": {
     "elliptic": "^6.5.4"
@@ -73,6 +72,7 @@
     "@types/node": "^18.11.9",
     "assert-browserify": "^2.0.0",
     "browserify-fs": "^1.0.0",
-    "constants-browserify": "^1.0.0"
+    "constants-browserify": "^1.0.0",
+    "xrpl-local": "file:./src"
   }
 }

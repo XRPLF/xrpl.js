@@ -1,5 +1,4 @@
 // the jest.fn() API
-// process.stdout = {}
 import * as jest from 'jest-mock'
 // The matchers API
 import expect from 'expect'
