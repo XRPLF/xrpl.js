@@ -1,3 +1,4 @@
+/* eslint-disable max-len -- Some large lines necessary */
 /* eslint-disable max-statements -- test has a lot of statements */
 import net from 'net'
 
@@ -32,11 +33,9 @@ type Global = GlobalThis & {
 declare const global: Global
 
 if (typeof TextDecoder === 'undefined') {
-  // eslint-dsiable-next-line max-len -- necessary to disable all the rules
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, node/global-require, @typescript-eslint/no-require-imports, node/prefer-global/text-encoder, @typescript-eslint/no-unsafe-member-access, global-require, @typescript-eslint/no-var-requires -- Needed for Jest
+  // eslint-disable-next-line node/global-require, @typescript-eslint/no-require-imports, node/prefer-global/text-encoder, global-require, @typescript-eslint/no-var-requires -- Needed for Jest
   global.TextEncoder = require('util').TextEncoder
-  // eslint-dsiable-next-line max-len -- necessary to disable all the rules
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, node/global-require, @typescript-eslint/no-require-imports, node/prefer-global/text-decoder, @typescript-eslint/no-unsafe-member-access, global-require, @typescript-eslint/no-var-requires -- Needed for Jest
+  // eslint-disable-next-line node/global-require, @typescript-eslint/no-require-imports, node/prefer-global/text-decoder, global-require, @typescript-eslint/no-var-requires -- Needed for Jest
   global.TextDecoder = require('util').TextDecoder
 }
 
