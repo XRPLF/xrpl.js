@@ -196,7 +196,8 @@ const testCases = [
     ]
 
     highAndLowAccounts.forEach((accountId) => {
-      ;[false, 0, 1, MAX_32_BIT_UNSIGNED_INT].forEach((t) => {
+      const testCases = [false, 0, 1, MAX_32_BIT_UNSIGNED_INT]
+      testCases.forEach((t) => {
         const tag = t | false
         const xAddress = encodeXAddress(accountId, tag, isTestAddress)
         test(`Encoding ${accountId.toString('hex')}${

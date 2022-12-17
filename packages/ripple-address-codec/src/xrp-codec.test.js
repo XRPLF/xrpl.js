@@ -253,11 +253,11 @@ test('empty payload should throw', () => {
 })
 
 test('decode data', () => {
-  const result = api.codec.decode('rnaC7gW34M77Kneb78s', {
-    versions: [0],
-  })
-  result.bytes = Buffer.from(result.bytes)
-  expect(result).toStrictEqual({
+  expect(
+    api.codec.decode('rnaC7gW34M77Kneb78s', {
+      versions: [0],
+    }),
+  ).toStrictEqual({
     version: [0],
     bytes: Buffer.from('123456789'),
     type: null,
@@ -265,12 +265,12 @@ test('decode data', () => {
 })
 
 test('decode data with expected length', function () {
-  const result = api.codec.decode('rnaC7gW34M77Kneb78s', {
-    versions: [0],
-    expectedLength: 9,
-  })
-  result.bytes = Buffer.from(result.bytes)
-  expect(result).toStrictEqual({
+  expect(
+    api.codec.decode('rnaC7gW34M77Kneb78s', {
+      versions: [0],
+      expectedLength: 9,
+    }),
+  ).toStrictEqual({
     version: [0],
     bytes: Buffer.from('123456789'),
     type: null,
