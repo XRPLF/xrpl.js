@@ -104,7 +104,7 @@ jobs:
       rippled:
         image: natenichols/rippled-standalone:latest
         ports:
-          - 6006:6006
+        - 6006:6006
         options:
           --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
@@ -156,8 +156,8 @@ jobs:
       rippled:
         image: natenichols/rippled-standalone:latest
         ports:
-          - 6006:6006
-        options: 
+        - 6006:6006
+        options:
           --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
     steps:
