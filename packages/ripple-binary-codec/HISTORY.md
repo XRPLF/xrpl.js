@@ -1,7 +1,6 @@
 # ripple-binary-codec Release History
 
 ## Unreleased
-- Small typing refactor in Shamap to match newer version of TypeScript.
 
 ## 1.4.2 (2022-06-27)
 - Fixed standard currency codes with lowercase and allowed symbols not decoding into standard codes.
