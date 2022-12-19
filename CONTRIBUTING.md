@@ -1,5 +1,13 @@
 # Contributing
 
+### High Level Process to Contribute Code
+
+- You should open a PR against `main` and ensure that all CI passes.
+- Your changes should have [unit](#unit-tests) and/or [integration tests](#integration-tests).
+- Your changes should [pass the linter](#run-the-linter).
+- You should get a full code review from two of the maintainers.
+- Then you can merge your changes. (Which will then be included in the next release)
+
 ## Set up your dev environment
 
 ### Requirements
@@ -38,6 +46,7 @@ npm run lint
 ```
 
 ## Running Tests
+
 For integration and browser tests, we use a `rippled` node in standalone mode to test xrpl.js code against. To set this up, you can either run `rippled` locally, or set up the Docker container `natenichols/rippled-standalone:latest` for this purpose. The latter will require you to [install Docker](https://docs.docker.com/get-docker/).
 
 ### Unit Tests
@@ -73,6 +82,50 @@ docker run -p 6006:6006 -it natenichols/rippled-standalone:latest
 npm run test:browser
 ```
 
+## High Level Architecture
+
+This is a monorepo, which means that there are multiple packages in a single GitHub repository using [Lerna](https://lerna.js.org/).
+
+The 4 packages currently here are:
+
+1. xrpl.js - The client library for interacting with the ledger.
+2. ripple-binary-codec - A library for serializing and deserializing transactions for the ledger.
+3. ripple-keypairs - A library for generating and using cryptographic keypairs.
+4. ripple-address-codec - A library for encoding and decoding XRP Ledger addresses and seeds.
+
+Each package has it's own README which dives deeper into what it's main purpose is, and the core functionality it offers.
+They also run tests independently as they were originally in separate repositories.
+
+These are managed in a monorepo because often a change in a lower-level library will also require a change in xrpl.js, and so it makes sense to be able to allow for modifications of all packages at once without coordinating versions across multiple repositories.
+
+Let's dive a bit into how xrpl.js is structured!
+
+### The File Structure
+
+Within the xrpl package, each folder has a specific purpose:
+
+**Client** - This contains logic for handling the websocket connection to rippled servers.
+**Models** - These types model LedgerObjects, Requests/Methods, and Transactions in order to give type hints and nice errors for users.
+**Sugar** - This is where handy helper functions end up, like `submit`, `autofill`, and `getXRPBalance` amongst others.
+**Utils** - These are shared functions which are useful for conversions, or internal implementation details within the library.
+**Wallet** - This logic handles managing keys, addresses, and signing within xrpl.js
+
+### Writing Tests for xrpl.js
+
+For every file in `src`, we try to have a corresponding file in `test` with unit tests.
+
+The goal is to maintain above 80% code coverage, and generally any new feature or bug fix should be accompanied by unit tests, and integration tests if applicable.
+
+For an example of a unit test, check out the [autofill tests here](./packages/xrpl/test/client/autofill.ts).
+
+If your code connects to the ledger (ex. Adding a new transaction type) it's handy to write integration tests to ensure that you can successfully interact with the ledger. Integration tests are generally run against a docker instance of rippled which contains the latest updates. Since standalone mode allows us to manually close ledgers, this allows us to run integration tests at a much faster rate than if we had to wait 4-5 seconds per transaction for the ledger to validate the transaction. [See above](#running-tests) for how to start up the docker container to run integration tests.
+
+All integration tests should be written in the `test/integration` folder, with new `Requests` and `Transactions` tests being in their respective folders.
+
+One last note for integration tests is that all imports from `xrpl.js` should be from `xrpl-local` instead of `../../src`. This is required for the integraiton tests to run in the browser.
+
+For an example of how to write an integration test for `xrpl.js`, you can look at the [Payment integration test](./packages/xrpl/test/integration/transactions/payment.ts).
+
 ## Generate reference docs
 
 You can see the complete reference documentation at [`xrpl.js` docs](https://js.xrpl.org). You can also generate them locally using `typedoc`:
@@ -84,6 +137,7 @@ npm run docgen
 This updates `docs/` at the top level, where GitHub Pages looks for the docs.
 
 ## Update `definitions.json`
+
 Use [this repo](https://github.com/RichardAH/xrpl-codec-gen) to generate a new `definitions.json` file from the rippled source code. Instructions are available in that README.
 
 ## Adding and removing packages
@@ -119,21 +173,12 @@ npm uninstall abbrev -w xrpl
 
 ## Release process
 
-### Editing the Code
-
-* Your changes should have unit and/or integration tests.
-* Your changes should pass the linter.
-* Your code should pass all the tests on Github (which check the linter, unit and integration tests on Node 12/14/16, and browser tests).
-* Open a PR against `main` and ensure that all CI passes.
-* Get a full code review from one of the maintainers.
-* Merge your changes.
-
 ### Release
 
 1. Ensure that all tests passed on the last CI that ran on `main`.
-___
+
 NOW WE ARE READY TO PUBLISH! No new code changes happen manually now.
-___
+
 2. Checkout `main` and `git pull`.
 3. Create a new branch to capture updates that take place during this process. `git checkout -b <BRANCH_NAME>`
 4. Update `HISTORY.md` to reflect release changes.
@@ -149,9 +194,8 @@ ___
 14. Create a new branch to capture the updated packages from the release (`git checkout -b <BRANCH_NAME>`)
 15. Make a PR to merge those changes into `main`
 
-___
 NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
-___
+
 16. Pull the most recent changes to main locally.
 17. Run `git tag <tagname> -m <tagname>`, where `<tagname>` is the new package and version (e.g. `xrpl@2.1.1`), for each version released.
 18. Run `git push --follow-tags`, to push the tags to Github.
@@ -163,6 +207,7 @@ ___
 24. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
 
 ## Mailing Lists
+
 We have a low-traffic mailing list for announcements of new `xrpl.js` releases. (About 1 email every couple of weeks)
 
 + [Subscribe to xrpl-announce](https://groups.google.com/g/xrpl-announce)
