@@ -5,7 +5,7 @@ name: Node.js CI
 
 on:
   push:
-    branches: [main, 1.x]
+    branches: [ main, 1.x ]
   pull_request:
   workflow_dispatch:
 
@@ -39,10 +39,10 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: ${{ runner.os }}-deps-v2-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-deps-v2-${{ matrix.node-version }}-
-            ${{ runner.os }}-deps-v2-
+            ${{ runner.os }}-deps-${{ matrix.node-version }}-
+            ${{ runner.os }}-deps-
 
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
@@ -80,10 +80,10 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: ${{ runner.os }}-deps-v2-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-deps-v2-${{ matrix.node-version }}-
-            ${{ runner.os }}-deps-v2-
+            ${{ runner.os }}-deps-${{ matrix.node-version }}-
+            ${{ runner.os }}-deps-
 
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
@@ -105,7 +105,8 @@ jobs:
         image: natenichols/rippled-standalone:latest
         ports:
           - 6006:6006
-        options: --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
+        options:
+          --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
     steps:
       - uses: actions/checkout@v3
@@ -128,10 +129,10 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: ${{ runner.os }}-deps-v2-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-deps-v2-${{ matrix.node-version }}-
-            ${{ runner.os }}-deps-v2-
+            ${{ runner.os }}-deps-${{ matrix.node-version }}-
+            ${{ runner.os }}-deps-
 
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
@@ -156,7 +157,8 @@ jobs:
         image: natenichols/rippled-standalone:latest
         ports:
           - 6006:6006
-        options: --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
+        options: 
+          --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
     steps:
       - uses: actions/checkout@v3
@@ -179,10 +181,10 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: ${{ runner.os }}-deps-v2-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-deps-v2-${{ matrix.node-version }}-
-            ${{ runner.os }}-deps-v2-
+            ${{ runner.os }}-deps-${{ matrix.node-version }}-
+            ${{ runner.os }}-deps-
 
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
