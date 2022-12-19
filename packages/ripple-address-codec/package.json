@@ -21,13 +21,12 @@
   "prepublishOnly": "tslint -b ./ && jest",
   "scripts": {
     "build": "tsc -b",
-    "test": "jest --verbose false --silent=false --runInBand --detectOpenHandles ./src/*.test.js",
+    "test": "jest --verbose false --silent=false --runInBand ./src/*.test.js",
     "lint": "eslint . --ext .ts",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo"
   },
   "prettier": "@xrplf/prettier-config",
   "engines": {
-    "node": ">=14",
-    "npm": ">=7.0.0 < 8.0.0"
+    "node": ">=14"
   }
 }

@@ -22,8 +22,8 @@
   "scripts": {
     "build": "tsc -b && copyfiles ./src/enums/definitions.json ./dist/enums/",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
-    "prepare-OLD": "npm run build && npm test",
-    "test": "jest --verbose false --silent=false --runInBand --detectOpenHandles ./test/*.test.js",
+    "prepare": "npm run build && npm test",
+    "test": "jest --verbose false --silent=false --runInBand ./test/*.test.js",
     "lint": "eslint . --ext .ts --ext .test.js"
   },
   "repository": {

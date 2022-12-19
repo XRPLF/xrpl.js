@@ -57,7 +57,5 @@ module.exports = {
     'no-shadow': 'off',
     'multiline-comment-style': 'off',
     '@typescript-eslint/no-require-imports': 'off',
-    'import/no-commonjs': 'off',
-    '@typescript-eslint/no-var-requires': 'off',
   },
 }

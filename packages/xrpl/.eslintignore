@@ -2,6 +2,3 @@ dist
 node_modules
 .github
 .vscode
-jestSetup.ts
-karma-setup.js
-karma.config.js

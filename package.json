@@ -19,7 +19,7 @@
     "xrpl": "file:packages/xrpl"
   },
   "devDependencies": {
-    "@jest/types": "^29.3.1",
+    "@types/brorand": "^1.0.30",
     "@types/chai": "^4.2.21",
     "@types/create-hash": "^1.2.2",
     "@types/jest": "^29.2.2",
