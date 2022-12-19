@@ -177,11 +177,7 @@ npm uninstall abbrev -w xrpl
 
 1. Ensure that all tests passed on the last CI that ran on `main`.
 
----
-
 NOW WE ARE READY TO PUBLISH! No new code changes happen manually now.
-
----
 
 2. Checkout `main` and `git pull`.
 3. Create a new branch to capture updates that take place during this process. `git checkout -b <BRANCH_NAME>`
@@ -198,11 +194,7 @@ NOW WE ARE READY TO PUBLISH! No new code changes happen manually now.
 14. Create a new branch to capture the updated packages from the release (`git checkout -b <BRANCH_NAME>`)
 15. Make a PR to merge those changes into `main`
 
----
-
 NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
-
----
 
 16. Pull the most recent changes to main locally.
 17. Run `git tag <tagname> -m <tagname>`, where `<tagname>` is the new package and version (e.g. `xrpl@2.1.1`), for each version released.
