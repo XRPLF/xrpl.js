@@ -1,4 +1,5 @@
-import { Client, Payment } from '../../dist/npm'
+import { Client, Payment } from '../../src'
+// Replace this import with "from 'xrpl'" if you copy and paste this code
 
 /**
  * When implementing Reliable Transaction Submission, there are many potential solutions, each with different trade-offs.
