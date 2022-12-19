@@ -210,8 +210,8 @@ NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
 
 We have a low-traffic mailing list for announcements of new `xrpl.js` releases. (About 1 email every couple of weeks)
 
-- [Subscribe to xrpl-announce](https://groups.google.com/g/xrpl-announce)
++ [Subscribe to xrpl-announce](https://groups.google.com/g/xrpl-announce)
 
 If you're using the XRP Ledger in production, you should run a [rippled server](https://github.com/ripple/rippled) and subscribe to the ripple-server mailing list as well.
 
-- [Subscribe to ripple-server](https://groups.google.com/g/ripple-server)
++ [Subscribe to ripple-server](https://groups.google.com/g/ripple-server)
