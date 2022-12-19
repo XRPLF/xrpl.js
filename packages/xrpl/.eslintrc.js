@@ -52,6 +52,7 @@ module.exports = {
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
     'multiline-comment-style': ['error', 'starred-block'],
+    // jsdoc/check-examples is not implemented in eslint 8
     'jsdoc/check-examples': 'off',
 
     'tsdoc/syntax': 'off',
