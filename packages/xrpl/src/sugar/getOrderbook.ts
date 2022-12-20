@@ -74,9 +74,12 @@ async function getOrderbook(
   }
 
   if (
-    options.ledger_index && 
-    !(typeof options.ledger_index === 'number' 
-    || (typeof options.ledger_index === 'string' && ['validated', 'closed', 'current'].includes(options.ledger_index))
+    options.ledger_index &&
+    !(
+      typeof options.ledger_index === 'number' ||
+      (typeof options.ledger_index === 'string' &&
+        ['validated', 'closed', 'current'].includes(options.ledger_index))
+    )
   ) {
     throw new ValidationError(
       'ledger_index must be a number or a string of "validated", "closed", or "current"',
