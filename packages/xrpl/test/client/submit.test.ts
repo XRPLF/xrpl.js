@@ -41,16 +41,16 @@ describe('client.submit', () => {
 
       const wallet = new Wallet(publicKey, privateKey)
 
-      testContext.mockRippled?.addResponse(
+      testContext.mockRippled!.addResponse(
         'account_info',
         rippled.account_info.normal,
       )
-      testContext.mockRippled?.addResponse('ledger', rippled.ledger.normal)
-      testContext.mockRippled?.addResponse(
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+      testContext.mockRippled!.addResponse(
         'server_info',
         rippled.server_info.normal,
       )
-      testContext.mockRippled?.addResponse('submit', rippled.submit.success)
+      testContext.mockRippled!.addResponse('submit', rippled.submit.success)
 
       try {
         const response = await testContext.client.submit(tx, { wallet })
@@ -66,7 +66,7 @@ describe('client.submit', () => {
       delete tx.SigningPubKey
       delete tx.TxnSignature
 
-      testContext.mockRippled?.addResponse('submit', rippled.submit.success)
+      testContext.mockRippled!.addResponse('submit', rippled.submit.success)
 
       await assertRejects(
         testContext.client.submit(tx),
@@ -94,7 +94,7 @@ describe('client.submit', () => {
     it('should submit a signed transaction', async () => {
       const signedTx = { ...signedTransaction }
 
-      testContext.mockRippled?.addResponse('submit', rippled.submit.success)
+      testContext.mockRippled!.addResponse('submit', rippled.submit.success)
 
       try {
         const response = await testContext.client.submit(signedTx)
@@ -108,7 +108,7 @@ describe('client.submit', () => {
       const signedTxEncoded =
         '1200002400000001201B00003018614000000001312D0068400000000000000C7321030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D74473045022100B3D311371EDAB371CD8F2B661A04B800B61D4B132E09B7B0712D3B2F11B1758302203906B44C4A150311D74FF6A35B146763C0B5B40AC30BD815113F058AA17B3E6381142AF1861DEC1316AEEC995C94FF9E2165B1B784608314FDB08D07AAA0EB711793A3027304D688E10C3648'
 
-      testContext.mockRippled?.addResponse('submit', rippled.submit.success)
+      testContext.mockRippled!.addResponse('submit', rippled.submit.success)
 
       try {
         const response = await testContext.client.submit(signedTxEncoded)

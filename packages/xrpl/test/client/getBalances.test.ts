@@ -24,15 +24,15 @@ describe('client.getBalances', () => {
   addressTests.forEach(function (testcase) {
     describe(testcase.type, () => {
       it('getBalances - base', async () => {
-        testContext.mockRippled?.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_info',
           rippled.account_info.normal,
         )
-        testContext.mockRippled?.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_lines',
           rippledAccountLines.normal,
         )
-        testContext.mockRippled?.addResponse('ledger', rippled.ledger.normal)
+        testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
         const result = await testContext.client.getBalances(testcase.address)
         assertResultMatch(result, responses.getBalances, 'getBalances')
       })
@@ -44,15 +44,15 @@ describe('client.getBalances', () => {
             limit: 10,
           },
         }
-        testContext.mockRippled?.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_info',
           rippled.account_info.normal,
         )
-        testContext.mockRippled?.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_lines',
           rippledAccountLines.normal,
         )
-        testContext.mockRippled?.addResponse('ledger', rippled.ledger.normal)
+        testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
         const expectedResponse = responses.getBalances.slice(
           0,
           request.options.limit,
@@ -68,15 +68,15 @@ describe('client.getBalances', () => {
         const options = {
           peer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
         }
-        testContext.mockRippled?.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_info',
           rippled.account_info.normal,
         )
-        testContext.mockRippled?.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_lines',
           rippledAccountLines.normal,
         )
-        testContext.mockRippled?.addResponse('ledger', rippled.ledger.normal)
+        testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
 
         const expectedResponse = responses.getBalances.filter(
           (item) => item.issuer === options.peer,
@@ -93,15 +93,15 @@ describe('client.getBalances', () => {
           peer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
           limit: 10,
         }
-        testContext.mockRippled?.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_info',
           rippled.account_info.normal,
         )
-        testContext.mockRippled?.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_lines',
           rippledAccountLines.normal,
         )
-        testContext.mockRippled?.addResponse('ledger', rippled.ledger.normal)
+        testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
 
         const expectedResponse = responses.getBalances
           .filter((item) => item.issuer === options.peer)

@@ -40,14 +40,14 @@ describe('Client', () => {
     TIMEOUT,
   )
 
-  it(
-    'Client connect() times out after 2 seconds',
-    () => {
-      /*
-       * TODO: Use a timer mock like https://jestjs.io/docs/en/timer-mocks
-       *       to test that connect() times out after 2 seconds.
-       */
-    },
-    TIMEOUT,
-  )
+  // it(
+  //   'Client connect() times out after 2 seconds',
+  //   () => {
+  //     /*
+  //      * TODO: Use a timer mock like https://jestjs.io/docs/en/timer-mocks
+  //      *       to test that connect() times out after 2 seconds.
+  //      */
+  //   },
+  //   TIMEOUT,
+  // )
 })

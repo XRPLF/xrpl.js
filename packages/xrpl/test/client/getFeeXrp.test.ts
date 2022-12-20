@@ -17,7 +17,7 @@ describe('getFeeXrp', () => {
   afterEach(async () => teardownClient(testContext))
 
   it('getFeeXrp', async () => {
-    testContext.mockRippled?.addResponse(
+    testContext.mockRippled!.addResponse(
       'server_info',
       rippled.server_info.normal,
     )
@@ -26,7 +26,7 @@ describe('getFeeXrp', () => {
   })
 
   it('getFeeXrp - high load_factor', async () => {
-    testContext.mockRippled?.addResponse(
+    testContext.mockRippled!.addResponse(
       'server_info',
       rippled.server_info.highLoadFactor,
     )
@@ -35,7 +35,7 @@ describe('getFeeXrp', () => {
   })
 
   it('getFeeXrp - high load_factor with custom maxFeeXRP', async () => {
-    testContext.mockRippled?.addResponse(
+    testContext.mockRippled!.addResponse(
       'server_info',
       rippled.server_info.highLoadFactor,
     )
@@ -51,7 +51,7 @@ describe('getFeeXrp', () => {
   })
 
   it('getFeeXrp custom cushion', async () => {
-    testContext.mockRippled?.addResponse(
+    testContext.mockRippled!.addResponse(
       'server_info',
       rippled.server_info.normal,
     )
@@ -66,7 +66,7 @@ describe('getFeeXrp', () => {
    * less than the base fee. However, this test verifies the existing behavior.
    */
   it('getFeeXrp cushion less than 1.0', async () => {
-    testContext.mockRippled?.addResponse(
+    testContext.mockRippled!.addResponse(
       'server_info',
       rippled.server_info.normal,
     )
@@ -77,7 +77,7 @@ describe('getFeeXrp', () => {
   })
 
   it('getFeeXrp reporting', async () => {
-    testContext.mockRippled?.addResponse(
+    testContext.mockRippled!.addResponse(
       'server_info',
       rippled.server_info.normal,
     )

@@ -82,7 +82,7 @@ describe('client.getOrderbook', () => {
   afterEach(async () => teardownClient(testContext))
 
   it('normal', async () => {
-    testContext.mockRippled?.addResponse('book_offers', normalRippledResponse)
+    testContext.mockRippled!.addResponse('book_offers', normalRippledResponse)
     const request = {
       takerPays: requests.getOrderbook.normal.takerPays,
       takerGets: requests.getOrderbook.normal.takerGets,
@@ -121,7 +121,7 @@ describe('client.getOrderbook', () => {
       },
     ]
 
-    testContext.mockRippled?.addResponse('book_offers', normalRippledResponse)
+    testContext.mockRippled!.addResponse('book_offers', normalRippledResponse)
     await Promise.all(
       invalidOptions.map(
         async (options) =>
@@ -146,7 +146,7 @@ describe('client.getOrderbook', () => {
   })
 
   it('with XRP', async () => {
-    testContext.mockRippled?.addResponse('book_offers', xrpRippledResponse)
+    testContext.mockRippled!.addResponse('book_offers', xrpRippledResponse)
     const response = await testContext.client.getOrderbook(
       requests.getOrderbook.withXRP.takerPays,
       requests.getOrderbook.withXRP.takerGets,
@@ -155,7 +155,7 @@ describe('client.getOrderbook', () => {
   })
 
   it('sample USD/XRP book has orders sorted correctly', async () => {
-    testContext.mockRippled?.addResponse('book_offers', xrpRippledResponse)
+    testContext.mockRippled!.addResponse('book_offers', xrpRippledResponse)
     const response = await testContext.client.getOrderbook(
       requests.getOrderbook.withXRP.takerPays,
       requests.getOrderbook.withXRP.takerGets,
@@ -165,7 +165,7 @@ describe('client.getOrderbook', () => {
   })
 
   it('sorted so that best deals come first [failure test]', async () => {
-    testContext.mockRippled?.addResponse('book_offers', normalRippledResponse)
+    testContext.mockRippled!.addResponse('book_offers', normalRippledResponse)
     const response = await testContext.client.getOrderbook(
       requests.getOrderbook.normal.takerPays,
       requests.getOrderbook.normal.takerGets,
@@ -184,7 +184,7 @@ describe('client.getOrderbook', () => {
   })
 
   it('sorted so that best deals come first [bad test](XRP)', async () => {
-    testContext.mockRippled?.addResponse('book_offers', xrpRippledResponse)
+    testContext.mockRippled!.addResponse('book_offers', xrpRippledResponse)
     const response = await testContext.client.getOrderbook(
       requests.getOrderbook.withXRP.takerPays,
       requests.getOrderbook.withXRP.takerGets,
@@ -203,7 +203,7 @@ describe('client.getOrderbook', () => {
   })
 
   it('direction is correct for buy and sell', async () => {
-    testContext.mockRippled?.addResponse('book_offers', normalRippledResponse)
+    testContext.mockRippled!.addResponse('book_offers', normalRippledResponse)
     const response = await testContext.client.getOrderbook(
       requests.getOrderbook.normal.takerPays,
       requests.getOrderbook.normal.takerGets,
@@ -219,7 +219,7 @@ describe('client.getOrderbook', () => {
   })
 
   it('getOrderbook - limit', async () => {
-    testContext.mockRippled?.addResponse('book_offers', normalRippledResponse)
+    testContext.mockRippled!.addResponse('book_offers', normalRippledResponse)
     const LIMIT = 3
     const response = await testContext.client.getOrderbook(
       requests.getOrderbook.normal.takerPays,

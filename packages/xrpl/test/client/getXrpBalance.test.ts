@@ -24,11 +24,11 @@ describe('client.getXrpBalance', () => {
   addressTests.forEach(function (testcase) {
     describe(testcase.type, () => {
       it('getXrpBalance', async () => {
-        testContext.mockRippled?.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_info',
           rippled.account_info.normal,
         )
-        testContext.mockRippled?.addResponse('ledger', rippled.ledger.normal)
+        testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
         const result = await testContext.client.getXrpBalance(testcase.address)
         assert.equal(result, '922.913243')
       })

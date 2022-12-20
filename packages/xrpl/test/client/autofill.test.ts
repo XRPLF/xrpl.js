@@ -50,15 +50,15 @@ describe('client.autofill', () => {
       Amount: '1234',
       Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
     }
-    testContext.mockRippled?.addResponse(
+    testContext.mockRippled!.addResponse(
       'account_info',
       rippled.account_info.normal,
     )
-    testContext.mockRippled?.addResponse(
+    testContext.mockRippled!.addResponse(
       'server_info',
       rippled.server_info.normal,
     )
-    testContext.mockRippled?.addResponse('ledger', rippled.ledger.normal)
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
 
     const txResult = await testContext.client.autofill(tx)
 
@@ -77,7 +77,7 @@ describe('client.autofill', () => {
       Fee,
       LastLedgerSequence,
     }
-    testContext.mockRippled?.addResponse('account_info', {
+    testContext.mockRippled!.addResponse('account_info', {
       status: 'success',
       type: 'response',
       result: {
@@ -92,16 +92,16 @@ describe('client.autofill', () => {
   })
 
   it('should throw error if account deletion blockers exist', async () => {
-    testContext.mockRippled?.addResponse(
+    testContext.mockRippled!.addResponse(
       'account_info',
       rippled.account_info.normal,
     )
-    testContext.mockRippled?.addResponse('ledger', rippled.ledger.normal)
-    testContext.mockRippled?.addResponse(
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+    testContext.mockRippled!.addResponse(
       'server_info',
       rippled.server_info.normal,
     )
-    testContext.mockRippled?.addResponse(
+    testContext.mockRippled!.addResponse(
       'account_objects',
       rippled.account_objects.normal,
     )
@@ -127,7 +127,7 @@ describe('client.autofill', () => {
         Sequence,
         LastLedgerSequence,
       }
-      testContext.mockRippled?.addResponse(
+      testContext.mockRippled!.addResponse(
         'server_info',
         rippled.server_info.normal,
       )
@@ -146,12 +146,12 @@ describe('client.autofill', () => {
           'A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100',
         Fulfillment: 'A0028000',
       }
-      testContext.mockRippled?.addResponse(
+      testContext.mockRippled!.addResponse(
         'account_info',
         rippled.account_info.normal,
       )
-      testContext.mockRippled?.addResponse('ledger', rippled.ledger.normal)
-      testContext.mockRippled?.addResponse(
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+      testContext.mockRippled!.addResponse(
         'server_info',
         rippled.server_info.normal,
       )
@@ -166,12 +166,12 @@ describe('client.autofill', () => {
         TransactionType: 'AccountDelete',
         Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
       }
-      testContext.mockRippled?.addResponse(
+      testContext.mockRippled!.addResponse(
         'account_info',
         rippled.account_info.normal,
       )
-      testContext.mockRippled?.addResponse('ledger', rippled.ledger.normal)
-      testContext.mockRippled?.addResponse('server_state', {
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+      testContext.mockRippled!.addResponse('server_state', {
         status: 'success',
         type: 'response',
         result: {
@@ -182,11 +182,11 @@ describe('client.autofill', () => {
           },
         },
       })
-      testContext.mockRippled?.addResponse(
+      testContext.mockRippled!.addResponse(
         'server_info',
         rippled.server_info.normal,
       )
-      testContext.mockRippled?.addResponse(
+      testContext.mockRippled!.addResponse(
         'account_objects',
         rippled.account_objects.empty,
       )
@@ -205,12 +205,12 @@ describe('client.autofill', () => {
           'A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100',
         Fulfillment: 'A0028000',
       }
-      testContext.mockRippled?.addResponse(
+      testContext.mockRippled!.addResponse(
         'account_info',
         rippled.account_info.normal,
       )
-      testContext.mockRippled?.addResponse('ledger', rippled.ledger.normal)
-      testContext.mockRippled?.addResponse(
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+      testContext.mockRippled!.addResponse(
         'server_info',
         rippled.server_info.normal,
       )
@@ -228,7 +228,7 @@ describe('client.autofill', () => {
       Fee,
       Sequence,
     }
-    testContext.mockRippled?.addResponse('ledger', {
+    testContext.mockRippled!.addResponse('ledger', {
       status: 'success',
       type: 'response',
       result: {
@@ -245,7 +245,7 @@ describe('client.autofill', () => {
       Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
       Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
     }
-    testContext.mockRippled?.addResponse('account_info', {
+    testContext.mockRippled!.addResponse('account_info', {
       status: 'success',
       type: 'response',
       result: {
@@ -254,14 +254,14 @@ describe('client.autofill', () => {
         },
       },
     })
-    testContext.mockRippled?.addResponse('ledger', {
+    testContext.mockRippled!.addResponse('ledger', {
       status: 'success',
       type: 'response',
       result: {
         ledger_index: 9038214,
       },
     })
-    testContext.mockRippled?.addResponse('server_info', {
+    testContext.mockRippled!.addResponse('server_info', {
       status: 'success',
       type: 'response',
       result: {

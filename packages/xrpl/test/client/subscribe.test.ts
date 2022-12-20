@@ -26,7 +26,7 @@ describe('Client subscription', () => {
   afterEach(async () => teardownClient(testContext))
 
   it('Successfully Subscribes', async () => {
-    testContext.mockRippled?.addResponse('subscribe', rippled.subscribe.success)
+    testContext.mockRippled!.addResponse('subscribe', rippled.subscribe.success)
 
     await assertDoesNotThrow(
       testContext.client.request({ command: 'subscribe' }),
@@ -34,7 +34,7 @@ describe('Client subscription', () => {
   })
 
   it('Successfully Unsubscribes', async () => {
-    testContext.mockRippled?.addResponse('unsubscribe', rippled.unsubscribe)
+    testContext.mockRippled!.addResponse('unsubscribe', rippled.unsubscribe)
 
     await assertDoesNotThrow(
       testContext.client.request({

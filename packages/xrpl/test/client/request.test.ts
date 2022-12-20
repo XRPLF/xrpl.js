@@ -18,7 +18,7 @@ describe('client.request', () => {
   addressTests.forEach(function (testcase) {
     describe(testcase.type, () => {
       it('request account_objects', async () => {
-        testContext.mockRippled?.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_objects',
           rippled.account_objects.normal,
         )
@@ -35,7 +35,7 @@ describe('client.request', () => {
       })
 
       it('request account_objects - invalid options', async () => {
-        testContext.mockRippled?.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_objects',
           rippled.account_objects.normal,
         )

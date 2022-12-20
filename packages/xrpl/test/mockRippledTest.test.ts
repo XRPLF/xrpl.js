@@ -28,7 +28,7 @@ describe('mock rippled tests', () => {
 
   it('provide bad response shape', async () => {
     try {
-      testContext.mockRippled?.addResponse('account_info', { data: {} })
+      testContext.mockRippled!.addResponse('account_info', { data: {} })
       assert.fail('Should have errored')
     } catch (err) {
       if (!(err instanceof Error)) {
@@ -41,7 +41,7 @@ describe('mock rippled tests', () => {
     if (testContext.mockRippled) {
       testContext.mockRippled.suppressOutput = true
     }
-    testContext.mockRippled?.addResponse('account_info', (request) => {
+    testContext.mockRippled!.addResponse('account_info', (request) => {
       return { data: request }
     })
     await assertRejects(
