@@ -114,5 +114,3 @@ describe('api', () => {
     assert(address.startsWith('r'))
   })
 })
-
-export {}
