@@ -25,7 +25,7 @@ module.exports = function (config) {
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
       'karma-setup.js': ['webpack'],
-      // Use webpack to bundle our tests files
+      // Use webpack to bundle our test files
       'test/integration/index.ts': ['webpack'],
     },
 
