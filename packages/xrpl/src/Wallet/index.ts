@@ -351,11 +351,6 @@ class Wallet {
     const txToSignAndEncode = { ...tx }
 
     txToSignAndEncode.SigningPubKey = multisignAddress ? '' : this.publicKey
-    if (tx.SigningPubKey && txToSignAndEncode.SigningPubKey === '') {
-      throw new ValidationError(
-        `When multisigning, SigningPubKey should not be set, but it was set to ${tx.SigningPubKey}`,
-      )
-    }
 
     if (multisignAddress) {
       const signer = {
