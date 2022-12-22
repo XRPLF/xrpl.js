@@ -55,7 +55,9 @@ function encode(json: object, definitions?: XrplDefinitions): string {
  */
 function encodeForSigning(json: object, definitions?: XrplDefinitions): string {
   assert.ok(typeof json === 'object')
-  return signingData(json as JsonObject, HashPrefix.transactionSig, definitions)
+  return signingData(json as JsonObject, HashPrefix.transactionSig, {
+    definitions,
+  })
     .toString('hex')
     .toUpperCase()
 }
@@ -73,7 +75,8 @@ function encodeForSigningClaim(
   definitions?: XrplDefinitions,
 ): string {
   assert.ok(typeof json === 'object')
-  return signingClaimData(json as ClaimObject, definitions)
+  const definitionsOpt = definitions ? { definitions } : undefined
+  return signingClaimData(json as ClaimObject, definitionsOpt)
     .toString('hex')
     .toUpperCase()
 }
@@ -93,7 +96,8 @@ function encodeForMultisigning(
 ): string {
   assert.ok(typeof json === 'object')
   assert.equal(json['SigningPubKey'], '')
-  return multiSigningData(json as JsonObject, signer, definitions)
+  const definitionsOpt = definitions ? { definitions } : undefined
+  return multiSigningData(json as JsonObject, signer, definitionsOpt)
     .toString('hex')
     .toUpperCase()
 }

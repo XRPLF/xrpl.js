@@ -106,18 +106,18 @@ function serializeObject(object: JsonObject, opts: OptionObject = {}): Buffer {
  *
  * @param transaction Transaction to serialize
  * @param prefix Prefix bytes to put before the serialized object
- * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @param opts.definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A Buffer with the serialized object
  */
 function signingData(
   transaction: JsonObject,
   prefix: Buffer = HashPrefix.transactionSig,
-  definitions?: XrplDefinitions,
+  opts: { definitions?: XrplDefinitions },
 ): Buffer {
   return serializeObject(transaction, {
     prefix,
     signingFieldsOnly: true,
-    definitions,
+    definitions: opts.definitions,
   })
 }
 
@@ -133,16 +133,16 @@ interface ClaimObject extends JsonObject {
  * Serialize a signingClaim
  *
  * @param claim A claim object to serialize
- * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @param opts.definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns the serialized object with appropriate prefix
  */
 function signingClaimData(
   claim: ClaimObject,
-  definitions: XrplDefinitions = DEFAULT_DEFINITIONS,
+  opts: { definitions: XrplDefinitions } = { definitions: DEFAULT_DEFINITIONS },
 ): Buffer {
   const num = bigInt(String(claim.amount))
   const prefix = HashPrefix.paymentChannelClaim
-  const types = definitions.getAssociatedTypes()
+  const types = opts.definitions.getAssociatedTypes()
   const channel = types.Hash256.from(claim.channel).toBytes()
   const amount = types.UInt64.from(num).toBytes()
 
@@ -159,16 +159,16 @@ function signingClaimData(
  *
  * @param transaction transaction to serialize
  * @param signingAccount Account to sign the transaction with
- * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @param opts.definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns serialized transaction with appropriate prefix and suffix
  */
 function multiSigningData(
   transaction: JsonObject,
   signingAccount: string | AccountID,
-  definitions: XrplDefinitions = DEFAULT_DEFINITIONS,
+  opts: { definitions: XrplDefinitions } = { definitions: DEFAULT_DEFINITIONS },
 ): Buffer {
   const prefix = HashPrefix.transactionMultiSig
-  const suffix = definitions
+  const suffix = opts.definitions
     .getAssociatedTypes()
     .AccountID.from(signingAccount)
     .toBytes()
@@ -176,7 +176,7 @@ function multiSigningData(
     prefix,
     suffix,
     signingFieldsOnly: true,
-    definitions,
+    definitions: opts.definitions,
   })
 }
 
