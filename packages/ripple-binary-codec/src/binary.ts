@@ -112,7 +112,7 @@ function serializeObject(object: JsonObject, opts: OptionObject = {}): Buffer {
 function signingData(
   transaction: JsonObject,
   prefix: Buffer = HashPrefix.transactionSig,
-  opts: { definitions?: XrplDefinitions },
+  opts: { definitions?: XrplDefinitions } = {},
 ): Buffer {
   return serializeObject(transaction, {
     prefix,
