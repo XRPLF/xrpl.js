@@ -72,7 +72,7 @@ To do that there are a couple things you need to do:
 1. Generate your own `definitions.json` file from rippled source code using [this tool](https://github.com/RichardAH/xrpl-codec-gen) (The default `definitions.json` for mainnet can be found [here](https://github.com/XRPLF/xrpl.js/blob/main/packages/ripple-binary-codec/src/enums/definitions.json))
 2. Create new SerializedType classes for any new Types (So that encode/decode behavior is defined)
 
-- For examples of how to implement that you can look at objects in the `types` folder, such as `Amount`, `UInt8`, or `STArray`.
+- For examples of how to implement that you can look at objects in the [`types` folder](../types/), such as `Amount`, `UInt8`, or `STArray`.
 
 3. Import your `definitions.json` file and `coreTypes` from the `types` folder, then use them to construct your own `XrplDefinitions` object.
 4. Pass the `XrplDefinitions` object whenever you `encode` or `decode` a transaction.
