@@ -33,10 +33,6 @@ describe('EscrowCreate', () => {
         })
       ).result.ledger.close_time
 
-      const finishAfterPromise = new Promise<void>((resolve) => {
-        setTimeout(resolve, 3000)
-      })
-
       const tx: EscrowCreate = {
         Account: testContext.wallet.classicAddress,
         TransactionType: 'EscrowCreate',
@@ -46,8 +42,6 @@ describe('EscrowCreate', () => {
       }
 
       await testTransaction(testContext.client, tx, testContext.wallet)
-
-      await finishAfterPromise
 
       // check that the object was actually created
       assert.equal(

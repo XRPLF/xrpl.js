@@ -95,9 +95,9 @@ describe('integration tests', () => {
         retryCount -= 1
         // eslint-disable-next-line no-await-in-loop, no-promise-executor-return -- We are waiting on retries
         await new Promise((resolve) => setTimeout(resolve, 1000))
-        // eslint-disable-next-line no-await-in-loop -- We are retryhing in a loop on purpose
+        // eslint-disable-next-line no-await-in-loop -- We are retrying in a loop on purpose
         response = await client.submit(multisignedTx)
-        // eslint-disable-next-line no-await-in-loop -- We are retryhing in a loop on purpose
+        // eslint-disable-next-line no-await-in-loop -- We are retrying in a loop on purpose
         await ledgerAccept(client)
       }
 

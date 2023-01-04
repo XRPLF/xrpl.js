@@ -22,19 +22,14 @@ describe('Utility method integration tests', () => {
   it(
     'ping',
     async () => {
-      try {
-        const response = await testContext.client.request({
-          command: 'ping',
-        })
-        const expected: unknown = {
-          result: { role: 'admin', unlimited: true },
-          type: 'response',
-        }
-        assert.deepEqual(omit(response, 'id'), expected)
-      } catch (error) {
-        // eslint-disable-next-line no-console -- console.log is fine for tests
-        console.error(error)
+      const response = await testContext.client.request({
+        command: 'ping',
+      })
+      const expected: unknown = {
+        result: { role: 'admin', unlimited: true },
+        type: 'response',
       }
+      assert.deepEqual(omit(response, 'id'), expected)
     },
     TIMEOUT,
   )

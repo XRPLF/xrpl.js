@@ -57,6 +57,7 @@ describe('CheckCash', () => {
       }
 
       await testTransaction(testContext.client, tx, wallet2, {
+        // Need to retry when running tests concurrently
         count: 5,
         delayMs: 1000,
       })

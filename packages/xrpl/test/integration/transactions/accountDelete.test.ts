@@ -24,7 +24,7 @@ describe('AccountDelete', () => {
     async () => {
       const wallet2 = await generateFundedWallet(testContext.client)
       // to the satisfy the condition that account sequence and current ledger_index should be 256 apart.
-      const promises: Array<Promise<void>> = []
+      const promises: Array<Promise<void> | Promise<unknown>> = []
       for (let iter = 0; iter < 256; iter += 1) {
         promises.push(ledgerAccept(testContext.client))
       }
@@ -36,6 +36,7 @@ describe('AccountDelete', () => {
         Destination: wallet2.classicAddress,
       }
       await testTransaction(testContext.client, tx, testContext.wallet, {
+        // Need to retry when running tests concurrently
         count: 5,
         delayMs: 1000,
       })

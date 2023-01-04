@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-misused-promises -- supposed to return a promise here */
-/* eslint-disable no-restricted-syntax -- not sure why this rule is here, definitely not needed here */
 import { assert } from 'chai'
 import { AccountSet, convertStringToHex, ValidationError } from 'xrpl-local'
 
@@ -24,6 +23,15 @@ describe('client.submitAndWait', () => {
   })
   afterEach(async () => teardownClient(testContext))
 
+  async function delayedLedgerAccept(
+    context: XrplIntegrationTestContext,
+  ): Promise<unknown> {
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 1000)
+    })
+    return ledgerAccept(context.client)
+  }
+
   it(
     'submitAndWait an unsigned transaction',
     async () => {
@@ -40,7 +48,7 @@ describe('client.submitAndWait', () => {
         const responsePromise = testContext.client.submitAndWait(accountSet, {
           wallet: testContext.wallet,
         })
-        const ledgerPromise = setTimeout(ledgerAccept, 1000, testContext.client)
+        const ledgerPromise = delayedLedgerAccept(testContext)
 
         try {
           // eslint-disable-next-line no-await-in-loop -- Testing purposes
@@ -52,6 +60,7 @@ describe('client.submitAndWait', () => {
           assert.equal(response.type, 'response')
           assert.equal(response.result.validated, true)
           retries = 0
+          break
         } catch (err) {
           const errorCodeRegex = /(?:Preliminary result:\s)(?<errorCode>.*)$/gu
           const message = err.message as string
@@ -65,6 +74,7 @@ describe('client.submitAndWait', () => {
             await new Promise((resolve) => setTimeout(resolve, 1000))
           } else {
             retries = 0
+            break
           }
         }
       }
@@ -102,7 +112,7 @@ describe('client.submitAndWait', () => {
         await testContext.client.autofill(accountSet),
       )
       const responsePromise = testContext.client.submitAndWait(signedAccountSet)
-      const ledgerPromise = setTimeout(ledgerAccept, 1000, testContext.client)
+      const ledgerPromise = delayedLedgerAccept(testContext)
       return Promise.all([responsePromise, ledgerPromise]).then(
         ([response, _ledger]) => {
           assert.equal(response.type, 'response')
@@ -125,7 +135,7 @@ describe('client.submitAndWait', () => {
         await testContext.client.autofill(accountSet),
       )
       const responsePromise = testContext.client.submitAndWait(signedAccountSet)
-      const ledgerPromise = setTimeout(ledgerAccept, 5000, testContext.client)
+      const ledgerPromise = delayedLedgerAccept(testContext)
       return Promise.all([responsePromise, ledgerPromise]).then(
         ([response, _ledger]) => {
           assert.equal(response.type, 'response')

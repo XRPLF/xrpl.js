@@ -8,6 +8,7 @@ import {
   type SubmitResponse,
   TimeoutError,
   NotConnectedError,
+  unixTimeToRippleTime,
 } from 'xrpl-local'
 import { Payment, Transaction } from 'xrpl-local/models/transactions'
 import { hashSignedTx } from 'xrpl-local/utils/hashes'
@@ -15,29 +16,55 @@ import { hashSignedTx } from 'xrpl-local/utils/hashes'
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
 
-// let ledgerAcceptMutex = false
-
 export async function ledgerAccept(
   client: Client,
   retries?: number,
-): Promise<void> {
-  const request = { command: 'ledger_accept' }
+): Promise<unknown> {
+  return new Promise<unknown>((resolve, reject) => {
+    client.connection
+      .request({ command: 'ledger_accept' })
+      .then(resolve)
+      .catch((error) => {
+        if (retries === undefined) {
+          setTimeout(() => {
+            resolve(ledgerAccept(client, 10))
+          }, 1000)
+        } else if (retries > 0) {
+          setTimeout(() => {
+            resolve(ledgerAccept(client, retries - 1))
+          }, 1000)
+        } else {
+          reject(error)
+        }
+      })
+  })
+}
 
-  try {
-    await client.connection.request(request)
-  } catch (error) {
-    if (retries === undefined) {
-      setTimeout(() => {
-        ledgerAccept(client, 10)
-      }, 1000)
-    } else if (retries > 0) {
-      setTimeout(() => {
-        ledgerAccept(client, retries - 1)
-      }, 1000)
-    } else {
-      throw error
-    }
-  }
+/**
+ * Attempt to get the time after which we can check for the escrow to be finished.
+ * Sometimes the ledger close_time is in the future, so we need to wait for it to catch up.
+ *
+ * @param targetTime - The target wait time, before accounting for current ledger time.
+ * @param minimumWaitTimeInMs - The minimum wait time in milliseconds.
+ * @param maximumWaitTimeInMs - The maximum wait time in milliseconds.
+ * @returns The wait time in milliseconds.
+ */
+export function calculateWaitTimeForTransaction(
+  targetTime: number,
+  minimumWaitTimeInMs = 5000,
+  maximumWaitTimeInMs = 20000,
+): number {
+  const currentTimeUnix = Math.floor(new Date().getTime())
+  const currentTimeRipple = unixTimeToRippleTime(currentTimeUnix)
+  const closeTimeCurrentTimeDiff = currentTimeRipple - targetTime
+  return Math.max(
+    minimumWaitTimeInMs,
+    Math.min(
+      Math.abs(closeTimeCurrentTimeDiff) * 1000 + minimumWaitTimeInMs,
+      // Maximum wait time of 20 seconds
+      maximumWaitTimeInMs,
+    ),
+  )
 }
 
 export function subscribeDone(client: Client): void {
@@ -73,7 +100,7 @@ async function runCommand({
       retry.count -= 1
       // eslint-disable-next-line no-await-in-loop, no-promise-executor-return -- We are waiting on retries
       await new Promise((resolve) => setTimeout(resolve, retry.delayMs))
-      // eslint-disable-next-line no-await-in-loop -- We are retryhing in a loop on purpose
+      // eslint-disable-next-line no-await-in-loop -- We are retrying in a loop on purpose
       response = await client.submit(transaction, { wallet })
     }
   } catch (error) {
