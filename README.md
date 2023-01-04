@@ -63,6 +63,16 @@ main()
 
 For more examples, see the [documentation](#documentation).
 
+## Try it out now!
+
+If you just want to try xrpl.js, you can fork this Code Sandbox template:
+https://codesandbox.io/s/xrpl-intro-pxgdjr?file=/src/App.js
+
+It goes through:
+1. Creating a new test account
+2. Sending a payment transaction 
+3. And sending requests to see your account balance
+
 ### Using xrpl.js with `create-react-app`
 To use `xrpl.js` with React, you need to install shims for core NodeJS modules. Starting with version 5, Webpack stopped including shims by default, so you must modify your Webpack configuration to add the shims you need. Either you can eject your config and modify it, or you can use a library such as `react-app-rewired`. The example below uses `react-app-rewired`.
 
