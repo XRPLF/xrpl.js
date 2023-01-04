@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises -- supposed to return a promise here */
 import { assert } from 'chai'
 import { AccountSet, convertStringToHex, ValidationError } from 'xrpl-local'
 
