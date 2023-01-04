@@ -74,8 +74,8 @@ To do that there are a couple things you need to do:
 
 - For examples of how to implement that you can look at objects in the [`types` folder](../types/), such as `Amount`, `UInt8`, or `STArray`.
 
-3. Import your `definitions.json` file and `coreTypes` from the `types` folder, then use them to construct your own `XrplDefinitions` object.
-4. Pass the `XrplDefinitions` object whenever you `encode` or `decode` a transaction.
+3. Import your `definitions.json` file and `coreTypes` from the `types` folder, then use them to construct your own `UpdatedXrplDefinitions` object.
+4. Pass the `UpdatedXrplDefinitions` object whenever you `encode` or `decode` a transaction.
 5. If you added any new transaction types, you should create an `interface` for the transaction that extends `BaseTransaction` from the `xrpl` repo to use it with the functions on `Client` (See the below example of adding a new transaction type)
 
 ## Example of adding a new Transaction type
@@ -83,9 +83,9 @@ To do that there are a couple things you need to do:
 ```
 // newTypeDefs is where you can import your custom defined definitions.json file
 const newTypeDefs = require('./new-type.json')
-const { XrplDefinitions, coreTypes, Client } = require('xrpl')
+const { UpdatedXrplDefinitions, Client } = require('xrpl')
 
-const newDefs = new XrplDefinitions(newTxDefinitions, coreTypes)
+const newDefs = new UpdatedXrplDefinitions(newTxDefinitions)
 
 // Change to point at the server you care about
 const serverAddress = 'wss://s.devnet.rippletest.net:51233'
@@ -115,7 +115,7 @@ const result = await client.submitAndWait(tx, {
 ## Example of adding a new serializable Type
 
 ```
-const { type XrplDefinitions } = require('../dist/coretypes')
+const { UpdatedXrplDefinitions } = require('../dist/coretypes')
 
 // coreTypes is the default list of serialized Types that are defined in xrpl.js
 const { coreTypes } = require('../dist/types')
@@ -135,7 +135,7 @@ class NewType extends UInt32 {
 const extendedCoreTypes = { ...coreTypes }
 extendedCoreTypes['NewType'] = NewType
 
-const newDefs = new XrplDefinitions(newDefinitionsJson, extendedCoreTypes)
+const newDefs = new UpdatedXrplDefinitions(newDefinitionsJson, extendedCoreTypes)
 
 // From this point on, we should be able to serialize / deserialize Transactions with fields that have 'NewType' as their Type.
 

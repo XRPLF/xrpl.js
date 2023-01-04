@@ -1,5 +1,7 @@
 const { encode, decode } = require('../dist')
-const { XrplDefinitions } = require('../dist/coretypes')
+const {
+  UpdatedXrplDefinitions,
+} = require('../dist/enums/default-xrpl-definitions')
 const { coreTypes } = require('../dist/types')
 const newTypeDefs = require('./fixtures/new-type.json')
 const newFieldDefs = require('./fixtures/new-field.json')
@@ -24,7 +26,7 @@ describe('encode and decode using new types as a parameter', function () {
     // Before updating the types, this should not be encodable
     expect(() => encode(tx)).toThrow()
 
-    const newDefs = new XrplDefinitions(newTransactionDefs, coreTypes)
+    const newDefs = new UpdatedXrplDefinitions(newTransactionDefs)
 
     const encoded = encode(tx, newDefs)
     expect(() => decode(encoded)).toThrow()
@@ -40,7 +42,7 @@ describe('encode and decode using new types as a parameter', function () {
     // Before updating the types, undefined fields will be ignored on encode
     expect(decode(encode(tx))).not.toStrictEqual(tx)
 
-    const newDefs = new XrplDefinitions(newFieldDefs, coreTypes)
+    const newDefs = new UpdatedXrplDefinitions(newFieldDefs)
 
     const encoded = encode(tx, newDefs)
     expect(() => decode(encoded)).toThrow()
@@ -63,7 +65,7 @@ describe('encode and decode using new types as a parameter', function () {
     const extendedCoreTypes = { ...coreTypes }
     extendedCoreTypes['NewType'] = NewType
 
-    const newDefs = new XrplDefinitions(newTypeDefs, extendedCoreTypes)
+    const newDefs = new UpdatedXrplDefinitions(newTypeDefs, extendedCoreTypes)
 
     const encoded = encode(tx, newDefs)
     expect(() => decode(encoded)).toThrow()

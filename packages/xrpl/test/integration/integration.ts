@@ -1,7 +1,7 @@
 import assert from 'assert'
 
 import _ from 'lodash'
-import { XrplDefinitions, coreTypes } from 'ripple-binary-codec'
+import { UpdatedXrplDefinitions } from 'ripple-binary-codec'
 import { Amount, Client, RippledError } from 'xrpl-local'
 import {
   AccountSet,
@@ -93,7 +93,7 @@ describe('integration tests', function () {
       Fee: '12',
     }
 
-    const newDefs = new XrplDefinitions(newPaymentDefinitions, coreTypes)
+    const newDefs = new UpdatedXrplDefinitions(newPaymentDefinitions)
 
     // It should successfully submit, but fail once rippled sees it since the new type definition is not on-ledger.
     await assertRejects(
@@ -117,7 +117,7 @@ describe('integration tests', function () {
   })
 
   it('Defining a new TransactionType should compile and run', async function () {
-    const newDefs = new XrplDefinitions(newTxDefinitions, coreTypes)
+    const newDefs = new UpdatedXrplDefinitions(newTxDefinitions)
 
     const client: Client = this.client
     const wallet1 = await generateFundedWallet(client)

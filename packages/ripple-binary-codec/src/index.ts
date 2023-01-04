@@ -8,6 +8,7 @@ import {
   TRANSACTION_TYPES,
   DEFAULT_DEFINITIONS,
 } from './enums'
+import { UpdatedXrplDefinitions } from './enums/default-xrpl-definitions'
 import { coreTypes } from './types'
 
 const {
@@ -134,6 +135,7 @@ export = {
   decodeQuality,
   decodeLedgerData,
   TRANSACTION_TYPES,
+  UpdatedXrplDefinitions,
   XrplDefinitions,
   DEFAULT_DEFINITIONS,
   coreTypes,

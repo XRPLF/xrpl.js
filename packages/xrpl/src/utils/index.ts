@@ -178,7 +178,12 @@ function hasNextPage(response: Response): boolean {
 }
 
 // Extracting to export the values
-const { XrplDefinitions, DEFAULT_DEFINITIONS, coreTypes } = rbc
+const {
+  UpdatedXrplDefinitions,
+  XrplDefinitions,
+  DEFAULT_DEFINITIONS,
+  coreTypes,
+} = rbc
 
 /**
  * @category Utilities
@@ -246,6 +251,6 @@ export {
   createCrossChainPayment,
   parseNFTokenID,
   coreTypes,
-  XrplDefinitions,
+  UpdatedXrplDefinitions,
   DEFAULT_DEFINITIONS,
 }

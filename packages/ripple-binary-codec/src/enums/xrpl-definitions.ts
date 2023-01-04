@@ -102,6 +102,7 @@ class XrplDefinitions {
 }
 
 export {
+  DefinitionsData,
   XrplDefinitions,
   FieldLookup,
   FieldInfo,
