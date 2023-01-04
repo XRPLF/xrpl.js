@@ -120,8 +120,8 @@ const { type XrplDefinitions } = require('../dist/coretypes')
 // coreTypes is the default list of serialized Types that are defined in xrpl.js
 const { coreTypes } = require('../dist/types')
 
-// newTypeDefs is where you can import your custom defined definitions.json file
-const newTypeDefs = require('./fixtures/new-type.json')
+// newDefinitionsJson is where you can import your custom defined definitions.json file
+const newDefinitionsJson = require('./fixtures/new-type.json')
 
 
 // For any new Types you create, you'll need to make a class with the same name which extends a SerializedType object
@@ -135,7 +135,7 @@ class NewType extends UInt32 {
 const extendedCoreTypes = { ...coreTypes }
 extendedCoreTypes['NewType'] = NewType
 
-const newDefs = new XrplDefinitions(newTypeDefs, extendedCoreTypes)
+const newDefs = new XrplDefinitions(newDefinitionsJson, extendedCoreTypes)
 
 // From this point on, we should be able to serialize / deserialize Transactions with fields that have 'NewType' as their Type.
 
