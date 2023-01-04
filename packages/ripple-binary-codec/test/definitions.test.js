@@ -24,7 +24,7 @@ describe('encode and decode using new types as a parameter', function () {
     // Before updating the types, this should not be encodable
     expect(() => encode(tx)).toThrow()
 
-    const newDefs = new XrplDefinitions(newTransactionDefs, coreTypes)
+    const newDefs = new XrplDefinitions(newTransactionDefs)
 
     const encoded = encode(tx, newDefs)
     expect(() => decode(encoded)).toThrow()
@@ -40,7 +40,7 @@ describe('encode and decode using new types as a parameter', function () {
     // Before updating the types, undefined fields will be ignored on encode
     expect(decode(encode(tx))).not.toStrictEqual(tx)
 
-    const newDefs = new XrplDefinitions(newFieldDefs, coreTypes)
+    const newDefs = new XrplDefinitions(newFieldDefs)
 
     const encoded = encode(tx, newDefs)
     expect(() => decode(encoded)).toThrow()

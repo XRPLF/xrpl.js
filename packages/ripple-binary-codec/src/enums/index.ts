@@ -3,7 +3,7 @@ import { XrplDefinitions, FieldInstance, Bytes } from './xrpl-definitions'
 /**
  * By default, coreTypes from the `types` folder is where known type definitions are initialized to avoid import cycles.
  */
-const DEFAULT_DEFINITIONS = new XrplDefinitions(enums, {})
+const DEFAULT_DEFINITIONS = new XrplDefinitions(enums)
 
 const Type = DEFAULT_DEFINITIONS.type
 const LedgerEntryType = DEFAULT_DEFINITIONS.ledgerEntryType

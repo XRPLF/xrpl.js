@@ -7,6 +7,7 @@ import {
   TRANSACTION_TYPE_WIDTH,
   TRANSACTION_RESULT_WIDTH,
 } from './constants'
+import { coreTypes } from '../types'
 
 interface DefinitionsData {
   TYPES: Record<string, number>
@@ -42,16 +43,8 @@ class XrplDefinitions {
    */
   constructor(
     enums: DefinitionsData,
-    types: Record<string, typeof SerializedType>,
+    types: Record<string, typeof SerializedType> = coreTypes,
   ) {
-    // Helps catch errors early in JavaScript code.
-    if (types == undefined) {
-      throw new TypeError(
-        'You passed in an undefined `types` parameter, but `types` must be defined since it contains logic for encoding/decoding transaction data.' +
-          ' If you have NOT added/modified any data types, you can import and use `coreTypes` from the types folder.',
-      )
-    }
-
     this.type = new BytesLookup(enums.TYPES, TYPE_WIDTH)
     this.ledgerEntryType = new BytesLookup(
       enums.LEDGER_ENTRY_TYPES,
