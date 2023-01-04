@@ -139,6 +139,9 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
         "test": "react-app-rewired test",
         ```
 
+This online template uses these steps to run xrpl.js with React in the browser:
+https://codesandbox.io/s/xrpl-intro-pxgdjr?file=/src/App.js
+
 ### Using xrpl.js with React Native
 
 If you want to use `xrpl.js` with React Native you will need to install shims for core NodeJS modules. To help with this you can use a module like [rn-nodeify](https://github.com/tradle/rn-nodeify).
