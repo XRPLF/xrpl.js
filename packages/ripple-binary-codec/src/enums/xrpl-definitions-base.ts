@@ -18,7 +18,7 @@ interface DefinitionsData {
 
 /**
  * Stores the various types and fields for rippled to be used to encode/decode information later on.
- *
+ * XrplDefinitions should be instantiated instead of this class.
  */
 class XrplDefinitionsBase {
   field: FieldLookup
