@@ -3,13 +3,13 @@ import { EventEmitter } from 'events'
 
 // Define the global WebSocket class found on the native browser
 declare class WebSocket {
-  public onclose?: () => void
-  public onopen?: () => void
+  public onclose?: (closeEvent: CloseEvent) => void
+  public onopen?: (openEvent: Event) => void
   public onerror?: (error: Error) => void
   public onmessage?: (message: MessageEvent) => void
   public readyState: number
   public constructor(url: string)
-  public close(code?: number): void
+  public close(code?: number, reason?: Buffer): void
   public send(message: string): void
 }
 
@@ -52,8 +52,13 @@ export default class WSWrapper extends EventEmitter {
 
     this.ws = new WebSocket(url)
 
-    this.ws.onclose = (): void => {
-      this.emit('close')
+    this.ws.onclose = (closeEvent: CloseEvent): void => {
+      let reason: Uint8Array | undefined
+      if (closeEvent.reason) {
+        const enc = new TextEncoder()
+        reason = enc.encode(closeEvent.reason)
+      }
+      this.emit('close', closeEvent.code, reason)
     }
 
     this.ws.onopen = (): void => {
@@ -71,10 +76,13 @@ export default class WSWrapper extends EventEmitter {
 
   /**
    * Closes the websocket.
+   *
+   * @param code - Close code.
+   * @param reason - Close reason.
    */
-  public close(): void {
+  public close(code?: number, reason?: Buffer): void {
     if (this.readyState === 1) {
-      this.ws.close()
+      this.ws.close(code, reason)
     }
   }
 
