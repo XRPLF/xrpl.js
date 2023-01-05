@@ -251,6 +251,7 @@ export {
   createCrossChainPayment,
   parseNFTokenID,
   coreTypes,
+  XrplDefinitions,
   UpdatedXrplDefinitions,
   DEFAULT_DEFINITIONS,
 }
