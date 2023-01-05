@@ -2,7 +2,7 @@
 /* eslint-disable max-lines-per-function -- need to work with a lot of Tx verifications */
 
 import _ from 'lodash'
-import { encode, decode, XrplDefinitions } from 'ripple-binary-codec'
+import { encode, decode, XrplDefinitionsBase } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
 import { setTransactionFlagsToNumber } from '../utils/flags'
@@ -108,7 +108,7 @@ export interface TransactionAndMetadata<
  */
 export function validate(
   transaction: Record<string, unknown>,
-  definitions?: InstanceType<typeof XrplDefinitions>,
+  definitions?: InstanceType<typeof XrplDefinitionsBase>,
 ): void {
   const tx = { ...transaction }
   if (tx.TransactionType == null) {

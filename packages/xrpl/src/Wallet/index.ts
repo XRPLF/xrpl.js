@@ -16,7 +16,7 @@ import {
   encodeForSigning,
   encodeForMultisigning,
   encode,
-  XrplDefinitions,
+  XrplDefinitionsBase,
 } from 'ripple-binary-codec'
 import {
   deriveAddress,
@@ -319,7 +319,7 @@ class Wallet {
     this: Wallet,
     transaction: T,
     multisign?: boolean | string,
-    definitions?: InstanceType<typeof XrplDefinitions>,
+    definitions?: InstanceType<typeof XrplDefinitionsBase>,
   ): {
     tx_blob: string
     hash: string
@@ -384,7 +384,7 @@ class Wallet {
    */
   public verifyTransaction(
     signedTransaction: Transaction | string,
-    definitions?: InstanceType<typeof XrplDefinitions>,
+    definitions?: InstanceType<typeof XrplDefinitionsBase>,
   ): boolean {
     const tx =
       typeof signedTransaction === 'string'
@@ -422,7 +422,7 @@ class Wallet {
   private checkTxSerialization(
     serialized: string,
     tx: BaseTransaction,
-    definitions?: InstanceType<typeof XrplDefinitions>,
+    definitions?: InstanceType<typeof XrplDefinitionsBase>,
   ): void {
     // Decode the serialized transaction:
     const decoded = decode(serialized, definitions)
@@ -551,7 +551,7 @@ function computeSignature(
   tx: BaseTransaction,
   privateKey: string,
   signAs?: string,
-  definitions?: InstanceType<typeof XrplDefinitions>,
+  definitions?: InstanceType<typeof XrplDefinitionsBase>,
 ): string {
   if (signAs) {
     const classicAddress = isValidXAddress(signAs)

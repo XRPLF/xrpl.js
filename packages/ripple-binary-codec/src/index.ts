@@ -4,11 +4,11 @@ import { decodeLedgerData } from './ledger-hashes'
 import { ClaimObject } from './binary'
 import { JsonObject } from './types/serialized-type'
 import {
-  XrplDefinitions,
+  XrplDefinitionsBase,
   TRANSACTION_TYPES,
   DEFAULT_DEFINITIONS,
 } from './enums'
-import { UpdatedXrplDefinitions } from './enums/default-xrpl-definitions'
+import { XrplDefinitions } from './enums/default-xrpl-definitions'
 import { coreTypes } from './types'
 
 const {
@@ -26,7 +26,7 @@ const {
  * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns the JSON representation of the transaction
  */
-function decode(binary: string, definitions?: XrplDefinitions): JsonObject {
+function decode(binary: string, definitions?: XrplDefinitionsBase): JsonObject {
   assert.ok(typeof binary === 'string', 'binary must be a hex string')
   return binaryToJSON(binary, definitions)
 }
@@ -39,7 +39,7 @@ function decode(binary: string, definitions?: XrplDefinitions): JsonObject {
  *
  * @returns A hex-string of the encoded transaction
  */
-function encode(json: object, definitions?: XrplDefinitions): string {
+function encode(json: object, definitions?: XrplDefinitionsBase): string {
   assert.ok(typeof json === 'object')
   return serializeObject(json as JsonObject, { definitions })
     .toString('hex')
@@ -54,7 +54,10 @@ function encode(json: object, definitions?: XrplDefinitions): string {
  * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns a hex string of the encoded transaction
  */
-function encodeForSigning(json: object, definitions?: XrplDefinitions): string {
+function encodeForSigning(
+  json: object,
+  definitions?: XrplDefinitionsBase,
+): string {
   assert.ok(typeof json === 'object')
   return signingData(json as JsonObject, HashPrefix.transactionSig, {
     definitions,
@@ -73,7 +76,7 @@ function encodeForSigning(json: object, definitions?: XrplDefinitions): string {
  */
 function encodeForSigningClaim(
   json: object,
-  definitions?: XrplDefinitions,
+  definitions?: XrplDefinitionsBase,
 ): string {
   assert.ok(typeof json === 'object')
   const definitionsOpt = definitions ? { definitions } : undefined
@@ -93,7 +96,7 @@ function encodeForSigningClaim(
 function encodeForMultisigning(
   json: object,
   signer: string,
-  definitions?: XrplDefinitions,
+  definitions?: XrplDefinitionsBase,
 ): string {
   assert.ok(typeof json === 'object')
   assert.equal(json['SigningPubKey'], '')
@@ -135,8 +138,8 @@ export = {
   decodeQuality,
   decodeLedgerData,
   TRANSACTION_TYPES,
-  UpdatedXrplDefinitions,
   XrplDefinitions,
+  XrplDefinitionsBase,
   DEFAULT_DEFINITIONS,
   coreTypes,
 }

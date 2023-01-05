@@ -85,7 +85,7 @@ function isValidSecret(secret: string): boolean {
  */
 function encode(
   object: Transaction | LedgerEntry,
-  definitions?: InstanceType<typeof XrplDefinitions>,
+  definitions?: InstanceType<typeof XrplDefinitionsBase>,
 ): string {
   return rbc.encode(object, definitions)
 }
@@ -99,7 +99,7 @@ function encode(
  */
 function encodeForSigning(
   object: Transaction,
-  definitions?: InstanceType<typeof XrplDefinitions>,
+  definitions?: InstanceType<typeof XrplDefinitionsBase>,
 ): string {
   return rbc.encodeForSigning(object, definitions)
 }
@@ -113,7 +113,7 @@ function encodeForSigning(
  */
 function encodeForSigningClaim(
   object: PaymentChannelClaim,
-  definitions?: InstanceType<typeof XrplDefinitions>,
+  definitions?: InstanceType<typeof XrplDefinitionsBase>,
 ): string {
   return rbc.encodeForSigningClaim(object, definitions)
 }
@@ -129,7 +129,7 @@ function encodeForSigningClaim(
 function encodeForMultiSigning(
   object: Transaction,
   signer: string,
-  definitions?: InstanceType<typeof XrplDefinitions>,
+  definitions?: InstanceType<typeof XrplDefinitionsBase>,
 ): string {
   return rbc.encodeForMultisigning(object, signer, definitions)
 }
@@ -143,7 +143,7 @@ function encodeForMultiSigning(
  */
 function decode(
   hex: string,
-  definitions?: InstanceType<typeof XrplDefinitions>,
+  definitions?: InstanceType<typeof XrplDefinitionsBase>,
 ): Record<string, unknown> {
   return rbc.decode(hex, definitions)
 }
@@ -178,12 +178,8 @@ function hasNextPage(response: Response): boolean {
 }
 
 // Extracting to export the values
-const {
-  UpdatedXrplDefinitions,
-  XrplDefinitions,
-  DEFAULT_DEFINITIONS,
-  coreTypes,
-} = rbc
+const { XrplDefinitions, XrplDefinitionsBase, DEFAULT_DEFINITIONS, coreTypes } =
+  rbc
 
 /**
  * @category Utilities
@@ -251,7 +247,7 @@ export {
   createCrossChainPayment,
   parseNFTokenID,
   coreTypes,
+  XrplDefinitionsBase,
   XrplDefinitions,
-  UpdatedXrplDefinitions,
   DEFAULT_DEFINITIONS,
 }

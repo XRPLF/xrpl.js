@@ -20,7 +20,7 @@ interface DefinitionsData {
  * Stores the various types and fields for rippled to be used to encode/decode information later on.
  *
  */
-class XrplDefinitions {
+class XrplDefinitionsBase {
   field: FieldLookup
   ledgerEntryType: BytesLookup
   type: BytesLookup
@@ -103,7 +103,7 @@ class XrplDefinitions {
 
 export {
   DefinitionsData,
-  XrplDefinitions,
+  XrplDefinitionsBase,
   FieldLookup,
   FieldInfo,
   FieldInstance,

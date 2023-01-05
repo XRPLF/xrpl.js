@@ -7,7 +7,7 @@ import { HashPrefix } from './hash-prefixes'
 import { BinarySerializer, BytesList } from './serdes/binary-serializer'
 import { sha512Half, transactionID } from './hashes'
 import {
-  type XrplDefinitions,
+  type XrplDefinitionsBase,
   DEFAULT_DEFINITIONS,
   type FieldInstance,
 } from './enums'
@@ -26,7 +26,7 @@ import * as bigInt from 'big-integer'
  */
 const makeParser = (
   bytes: string,
-  definitions?: XrplDefinitions,
+  definitions?: XrplDefinitionsBase,
 ): BinaryParser => new BinaryParser(bytes, definitions)
 
 /**
@@ -39,7 +39,7 @@ const makeParser = (
  */
 const readJSON = (
   parser: BinaryParser,
-  definitions: XrplDefinitions = DEFAULT_DEFINITIONS,
+  definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
 ): JsonObject =>
   (
     parser.readType(definitions.getAssociatedTypes().STObject) as STObject
@@ -55,7 +55,7 @@ const readJSON = (
  */
 const binaryToJSON = (
   bytes: string,
-  definitions?: XrplDefinitions,
+  definitions?: XrplDefinitionsBase,
 ): JsonObject => readJSON(makeParser(bytes, definitions), definitions)
 
 /**
@@ -67,7 +67,7 @@ interface OptionObject {
   prefix?: Buffer
   suffix?: Buffer
   signingFieldsOnly?: boolean
-  definitions?: XrplDefinitions
+  definitions?: XrplDefinitionsBase
 }
 
 /**
@@ -112,7 +112,7 @@ function serializeObject(object: JsonObject, opts: OptionObject = {}): Buffer {
 function signingData(
   transaction: JsonObject,
   prefix: Buffer = HashPrefix.transactionSig,
-  opts: { definitions?: XrplDefinitions } = {},
+  opts: { definitions?: XrplDefinitionsBase } = {},
 ): Buffer {
   return serializeObject(transaction, {
     prefix,
@@ -138,7 +138,9 @@ interface ClaimObject extends JsonObject {
  */
 function signingClaimData(
   claim: ClaimObject,
-  opts: { definitions: XrplDefinitions } = { definitions: DEFAULT_DEFINITIONS },
+  opts: { definitions: XrplDefinitionsBase } = {
+    definitions: DEFAULT_DEFINITIONS,
+  },
 ): Buffer {
   const num = bigInt(String(claim.amount))
   const prefix = HashPrefix.paymentChannelClaim
@@ -165,7 +167,9 @@ function signingClaimData(
 function multiSigningData(
   transaction: JsonObject,
   signingAccount: string | AccountID,
-  opts: { definitions: XrplDefinitions } = { definitions: DEFAULT_DEFINITIONS },
+  opts: { definitions: XrplDefinitionsBase } = {
+    definitions: DEFAULT_DEFINITIONS,
+  },
 ): Buffer {
   const prefix = HashPrefix.transactionMultiSig
   const suffix = opts.definitions

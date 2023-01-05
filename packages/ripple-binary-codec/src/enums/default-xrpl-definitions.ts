@@ -1,8 +1,8 @@
-import { type DefinitionsData, XrplDefinitions } from './xrpl-definitions'
+import { type DefinitionsData, XrplDefinitionsBase } from './xrpl-definitions'
 import { coreTypes } from '../types'
 import { SerializedType } from '../types/serialized-type'
 
-export class UpdatedXrplDefinitions extends XrplDefinitions {
+export class XrplDefinitions extends XrplDefinitionsBase {
   /**
    * Present rippled types in a typed and updatable format.
    * For an example of the input format see `definitions.json`

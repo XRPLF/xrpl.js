@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { decode, encode, UpdatedXrplDefinitions } from 'ripple-binary-codec'
+import { decode, encode, XrplDefinitions } from 'ripple-binary-codec'
 import { Transaction, ValidationError } from 'xrpl-local'
 import Wallet from 'xrpl-local/Wallet'
 import {
@@ -212,7 +212,7 @@ describe('Signer', function () {
   })
 
   it('authorizeChannel succeeds with unrelated custom definitions', function () {
-    const newDefs = new UpdatedXrplDefinitions(definitions)
+    const newDefs = new XrplDefinitions(definitions)
     const secpWallet = Wallet.fromSeed('snGHNrPbHrdUcszeuDEigMdC1Lyyd')
     const channelId =
       '5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3'
@@ -251,7 +251,7 @@ describe('Signer', function () {
   })
 
   it('should validly sign a transaction with custom defs', async function () {
-    const newDefs = new UpdatedXrplDefinitions(definitions)
+    const newDefs = new XrplDefinitions(definitions)
     const signedTx = verifyWallet.sign(tx, false, newDefs)
 
     const decodedTx = decode(
@@ -267,7 +267,7 @@ describe('Signer', function () {
   })
 
   it('should be able to multisign a transaction with custom defs', async function () {
-    const newDefs = new UpdatedXrplDefinitions(definitions)
+    const newDefs = new XrplDefinitions(definitions)
     const wallet1 = Wallet.fromSeed('sEdTqWgUWAqvrL3AZyJDhVVa4V6LX3E')
     const wallet2 = Wallet.fromSeed('sEdTco3Gx6dQzzdPovjGAMjU3v5SJ4S')
 

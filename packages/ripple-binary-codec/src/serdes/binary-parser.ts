@@ -1,5 +1,9 @@
 import * as assert from 'assert'
-import { XrplDefinitions, DEFAULT_DEFINITIONS, FieldInstance } from '../enums'
+import {
+  XrplDefinitionsBase,
+  DEFAULT_DEFINITIONS,
+  FieldInstance,
+} from '../enums'
 import { type SerializedType } from '../types/serialized-type'
 import { Buffer } from 'buffer/'
 
@@ -18,7 +22,7 @@ class BinaryParser {
    */
   constructor(
     hexBytes: string,
-    readonly definitions: XrplDefinitions = DEFAULT_DEFINITIONS,
+    readonly definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
   ) {
     this.bytes = Buffer.from(hexBytes, 'hex')
   }
