@@ -94,7 +94,10 @@ describe('EscrowCancel', () => {
       // Make sure we waited at least 3 seconds before canceling the escrow.
       await threeSecondCancelAfterTimerPromise
 
-      await testTransaction(testContext.client, cancelTx, testContext.wallet)
+      await testTransaction(testContext.client, cancelTx, testContext.wallet, {
+        count: 5,
+        delayMs: 2000,
+      })
 
       // Make sure the Destination wallet did not receive any XRP.
       assert.equal(
