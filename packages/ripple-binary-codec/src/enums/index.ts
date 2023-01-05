@@ -1,5 +1,9 @@
 import * as enums from './definitions.json'
-import { XrplDefinitionsBase, FieldInstance, Bytes } from './xrpl-definitions'
+import {
+  XrplDefinitionsBase,
+  FieldInstance,
+  Bytes,
+} from './xrpl-definitions-base'
 /**
  * By default, coreTypes from the `types` folder is where known type definitions are initialized to avoid import cycles.
  */

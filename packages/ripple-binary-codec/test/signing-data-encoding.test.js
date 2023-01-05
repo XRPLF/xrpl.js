@@ -4,7 +4,7 @@ const {
   encodeForSigningClaim,
   encodeForMultisigning,
 } = require('../dist')
-const { XrplDefinitions } = require('../dist/enums/default-xrpl-definitions')
+const { XrplDefinitions } = require('../dist/enums/xrpl-definitions')
 
 // This changes the Payment TransactionType from being 0 to being 30 (aka 0x001F when encoded)
 const definitions = require('./fixtures/definitions-with-diff-payment.json')

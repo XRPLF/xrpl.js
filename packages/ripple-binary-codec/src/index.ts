@@ -8,7 +8,7 @@ import {
   TRANSACTION_TYPES,
   DEFAULT_DEFINITIONS,
 } from './enums'
-import { XrplDefinitions } from './enums/default-xrpl-definitions'
+import { XrplDefinitions } from './enums/xrpl-definitions'
 import { coreTypes } from './types'
 
 const {

@@ -1,5 +1,5 @@
 const { encode, decode } = require('../dist')
-const { XrplDefinitions } = require('../dist/enums/default-xrpl-definitions')
+const { XrplDefinitions } = require('../dist/enums/xrpl-definitions')
 const { coreTypes } = require('../dist/types')
 const newTypeDefs = require('./fixtures/new-type.json')
 const newFieldDefs = require('./fixtures/new-field.json')
