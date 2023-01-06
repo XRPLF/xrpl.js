@@ -21,7 +21,7 @@ See the full reference documentation for all classes, methods, and utilities.
 
 All of which works in Node.js (tested for v14+) & web browsers.
 
-## Quickstart
+# Quickstart
 
 ### Requirements
 
@@ -29,13 +29,13 @@ All of which works in Node.js (tested for v14+) & web browsers.
 
 ### Installing xrpl.js
 
-You can install `xrpl.js` with `npm` or `yarn` using:
+In an existing project (with package.json), install xrpl.js with:
 
 ```
 $ npm install --save xrpl
 ```
 
-or
+Or with `yarn`:
 
 ```
 $ yarn add xrpl
@@ -62,7 +62,7 @@ main();
 ```
 
 For a more in-depth example, you can copy/forking this Code Sandbox template!
-https://codesandbox.io/s/xrpl-intro-pxgdjr?file=/src/App.js
+<br>https://codesandbox.io/s/xrpl-intro-pxgdjr?file=/src/App.js
 
 It goes through:
 
@@ -84,17 +84,11 @@ If you're using xrpl.js with React or Deno, you'll need to do a couple extra ste
 As you develop with xrpl.js, there's two sites you'll use extensively:
 
 1. [xrpl.org](https://xrpl.org/references.html) is the primary source for:
-   a. How the ledger works ([See Concepts](https://xrpl.org/concepts.html#main-page-header))
-   b. What kinds of transactions there are ([Transaction Types](https://xrpl.org/transaction-types.html#transaction-types))
-   c. Requests you can send ([Public API Methods](https://xrpl.org/public-api-methods.html))
-   d. Tutorials for interacting with various features of the ledger ([Tutorials](https://xrpl.org/tutorials.html#main-page-header))
+   - How the ledger works ([See Concepts](https://xrpl.org/concepts.html#main-page-header))
+   - What kinds of transactions there are ([Transaction Types](https://xrpl.org/transaction-types.html#transaction-types))
+   - Requests you can send ([Public API Methods](https://xrpl.org/public-api-methods.html))
+   - Tutorials for interacting with various features of the ledger ([Tutorials](https://xrpl.org/tutorials.html#main-page-header))
 2. [js.xrpl.org](https://js.xrpl.org/) has the reference docs for this library
-
-## Asking for help
-
-One of the best spots to ask for help is in the [XRPL Developer Discord](https://xrpldevs.org) - There's a channel for xrpl.js where other community members can help you figure out how to accomplish your goals.
-
-You are also welcome to create an [issue](https://github.com/XRPLF/xrpl.js/issues) here and we'll do our best to respond within 3 days.
 
 ### Mailing Lists
 
@@ -106,7 +100,13 @@ If you're using the XRP Ledger in production, you should run a [rippled server](
 
 - [Subscribe to ripple-server](https://groups.google.com/g/ripple-server)
 
-### Key Links
+## Asking for help
+
+One of the best spots to ask for help is in the [XRPL Developer Discord](https://xrpldevs.org) - There's a channel for xrpl.js where other community members can help you figure out how to accomplish your goals.
+
+You are also welcome to create an [issue](https://github.com/XRPLF/xrpl.js/issues) here and we'll do our best to respond within 3 days.
+
+## Key Links
 
 - [xrpl.js Reference Docs](https://js.xrpl.org/)
 - [xrpl.org (Detailed docs on how the XRPL works)](https://xrpl.org/references.html)
