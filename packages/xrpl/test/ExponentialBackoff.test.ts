@@ -1,5 +1,4 @@
 import { assert } from 'chai'
-
 import ExponentialBackoff from 'xrpl-local/client/ExponentialBackoff'
 
 describe('ExponentialBackoff', function () {
