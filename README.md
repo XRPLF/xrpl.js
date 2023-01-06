@@ -19,7 +19,7 @@ See the full reference documentation for all classes, methods, and utilities.
 4. Subscribing to changes in the ledger ([Ex. ledger, transactions, & more...](https://xrpl.org/subscribe.html))
 5. Helper functions to parse ledger data (Ex. [`xrpToDrops`](https://js.xrpl.org/functions/xrpToDrops.html))
 
-All of which works in Node.js (tested for v14+) & web browsers.
+All of which works in Node.js (tested for v14+) & web browsers (tested for Chrome).
 
 # Quickstart
 
