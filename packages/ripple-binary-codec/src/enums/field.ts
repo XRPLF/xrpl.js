@@ -72,14 +72,11 @@ export class FieldLookup {
     fields: Array<[string, FieldInfo]>,
     types: Record<string, number>,
   ) {
-    fields.forEach(([k, v]) => {
-      this.add(k, v, types[v.type])
+    fields.forEach(([name, field_info]) => {
+      const typeOrdinal = types[field_info.type]
+      this[name] = buildField([name, field_info], typeOrdinal)
+      this[this[name].ordinal.toString()] = this[name]
     })
-  }
-
-  public add(name: string, field_info: FieldInfo, typeOrdinal: number): void {
-    this[name] = buildField([name, field_info], typeOrdinal)
-    this[this[name].ordinal.toString()] = this[name]
   }
 
   fromString(value: string): FieldInstance {
