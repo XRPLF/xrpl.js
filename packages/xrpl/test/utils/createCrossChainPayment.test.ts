@@ -5,7 +5,7 @@ import {
   Payment,
 } from 'xrpl-local'
 
-describe('createCrossChainPayment', () => {
+describe('createCrossChainPayment', function () {
   it('successful xchain payment creation', () => {
     const payment: Payment = {
       TransactionType: 'Payment',

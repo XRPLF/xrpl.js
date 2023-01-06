@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import { isValidAddress } from 'xrpl-local'
 
-describe('isValidAddress', () => {
+describe('isValidAddress', function () {
   it('Validates valid classic address', () => {
     const classic = 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W'
     assert(isValidAddress(classic))

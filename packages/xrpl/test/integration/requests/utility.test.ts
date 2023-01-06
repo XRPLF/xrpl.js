@@ -11,7 +11,7 @@ import {
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('Utility method integration tests', () => {
+describe('Utility method integration tests', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {

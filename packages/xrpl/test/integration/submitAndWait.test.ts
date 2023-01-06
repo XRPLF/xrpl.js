@@ -14,7 +14,7 @@ import { ledgerAccept } from './utils'
 // how long before each test case times out
 const TIMEOUT = 60000
 
-describe('client.submitAndWait', () => {
+describe('client.submitAndWait', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {

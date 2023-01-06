@@ -7,7 +7,7 @@ import { validateSignerListSet } from 'xrpl-local/models/transactions/signerList
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('SignerListSet', () => {
+describe('SignerListSet', function () {
   let signerListSetTx
 
   beforeEach(() => {

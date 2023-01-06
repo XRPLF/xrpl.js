@@ -93,7 +93,7 @@ async function createServer(): Promise<net.Server> {
   })
 }
 
-describe('Connection', () => {
+describe('Connection', function () {
   let clientContext: XrplTestContext
 
   beforeEach(async () => {
@@ -118,7 +118,7 @@ describe('Connection', () => {
     TIMEOUT,
   )
 
-  describe('trace', () => {
+  describe('trace', function () {
     let mockedRequestData
     let mockedResponse
     let expectedMessages
@@ -486,7 +486,7 @@ describe('Connection', () => {
     TIMEOUT,
   )
 
-  describe('reconnection test', () => {
+  describe('reconnection test', function () {
     it('reconnect on several unexpected close', async () => {
       if (isBrowser) {
         if (navigator.userAgent.includes('PhantomJS')) {

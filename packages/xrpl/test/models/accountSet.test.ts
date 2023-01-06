@@ -7,7 +7,7 @@ import { validateAccountSet } from 'xrpl-local/models/transactions/accountSet'
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('AccountSet', () => {
+describe('AccountSet', function () {
   let account
 
   beforeEach(() => {

@@ -19,7 +19,7 @@ const Fee = '10'
 const Sequence = 1432
 const LastLedgerSequence = 2908734
 
-describe('client.autofill', () => {
+describe('client.autofill', function () {
   let testContext: XrplTestContext
 
   beforeEach(async () => {
@@ -118,7 +118,7 @@ describe('client.autofill', () => {
     await assertRejects(testContext.client.autofill(tx), XrplError)
   })
 
-  describe('when autofill Fee is missing', () => {
+  describe('when autofill Fee is missing', function () {
     it('should autofill Fee of a Transaction', async () => {
       const tx: Transaction = {
         TransactionType: 'DepositPreauth',

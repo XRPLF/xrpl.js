@@ -6,7 +6,7 @@ import serverUrl from './serverUrl'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('on handlers', () => {
+describe('on handlers', function () {
   it(
     'on connect',
     async () => {

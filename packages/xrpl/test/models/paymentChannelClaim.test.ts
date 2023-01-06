@@ -7,7 +7,7 @@ import { validatePaymentChannelClaim } from 'xrpl-local/models/transactions/paym
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('PaymentChannelClaim', () => {
+describe('PaymentChannelClaim', function () {
   let channel
 
   beforeEach(() => {

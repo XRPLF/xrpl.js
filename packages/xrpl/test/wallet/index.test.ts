@@ -15,8 +15,8 @@ const { sign: RESPONSE_FIXTURES } = responses
  *
  * Provides tests for Wallet class.
  */
-describe('Wallet', () => {
-  describe('constructor', () => {
+describe('Wallet', function () {
+  describe('constructor', function () {
     it('initializes a wallet using a Regular Key Pair', () => {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
@@ -38,7 +38,7 @@ describe('Wallet', () => {
     })
   })
 
-  describe('generate', () => {
+  describe('generate', function () {
     const classicAddressPrefix = 'r'
     const ed25519KeyPrefix = 'ED'
     const secp256k1PrivateKeyPrefix = '00'
@@ -87,7 +87,7 @@ describe('Wallet', () => {
     })
   })
 
-  describe('fromSeed', () => {
+  describe('fromSeed', function () {
     const seed = 'ssL9dv2W5RK8L3tuzQxYY6EaZhSxW'
     const publicKey =
       '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
@@ -196,7 +196,7 @@ describe('Wallet', () => {
     })
   })
 
-  describe('fromSecret', () => {
+  describe('fromSecret', function () {
     const seed = 'ssL9dv2W5RK8L3tuzQxYY6EaZhSxW'
     const publicKey =
       '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
@@ -244,7 +244,7 @@ describe('Wallet', () => {
     })
   })
 
-  describe('fromMnemonic', () => {
+  describe('fromMnemonic', function () {
     const mnemonic =
       'assault rare scout seed design extend noble drink talk control guitar quote'
     const publicKey =
@@ -288,7 +288,7 @@ describe('Wallet', () => {
     })
   })
 
-  describe('fromEntropy', () => {
+  describe('fromEntropy', function () {
     let entropy: number[]
     const publicKey =
       '0390A196799EE412284A5D80BF78C3E84CBB80E1437A0AECD9ADF94D7FEAAFA284'
@@ -338,7 +338,7 @@ describe('Wallet', () => {
   })
 
   // eslint-disable-next-line max-statements -- Required for test coverage.
-  describe('sign', () => {
+  describe('sign', function () {
     let wallet: Wallet
 
     beforeEach(() => {
@@ -919,7 +919,7 @@ describe('Wallet', () => {
     })
   })
 
-  describe('verifyTransaction', () => {
+  describe('verifyTransaction', function () {
     const publicKey =
       '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
     const privateKey =
@@ -963,7 +963,7 @@ describe('Wallet', () => {
     })
   })
 
-  describe('getXAddress', () => {
+  describe('getXAddress', function () {
     const publicKey =
       '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
     const privateKey =

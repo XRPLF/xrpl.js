@@ -73,7 +73,7 @@ function xrpRippledResponse(request: Request): Record<string, unknown> {
   throw new Error('unexpected end')
 }
 
-describe('client.getOrderbook', () => {
+describe('client.getOrderbook', function () {
   let testContext: XrplTestContext
 
   beforeEach(async () => {

@@ -12,7 +12,7 @@ import { generateFundedWallet } from '../utils'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('deposit_authorized', () => {
+describe('deposit_authorized', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {

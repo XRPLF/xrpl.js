@@ -8,7 +8,7 @@ import {
   type XrplTestContext,
 } from '../setupClient'
 
-describe('getFeeXrp', () => {
+describe('getFeeXrp', function () {
   let testContext: XrplTestContext
 
   beforeEach(async () => {

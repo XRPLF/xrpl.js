@@ -3,7 +3,7 @@ import { ValidationError } from 'xrpl-local'
 
 import { decimalToQuality, percentToQuality, qualityToDecimal } from '../../src'
 
-describe('Quality utils', () => {
+describe('Quality utils', function () {
   it('converts 101 percent to valid Quality', () => {
     const billionths = percentToQuality('101%')
 

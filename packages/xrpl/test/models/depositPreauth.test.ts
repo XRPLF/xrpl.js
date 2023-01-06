@@ -7,7 +7,7 @@ import { validateDepositPreauth } from 'xrpl-local/models/transactions/depositPr
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('DepositPreauth', () => {
+describe('DepositPreauth', function () {
   let depositPreauth
 
   beforeEach(() => {

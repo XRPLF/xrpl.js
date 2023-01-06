@@ -4,7 +4,7 @@ import { Client } from 'xrpl-local'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('Client', () => {
+describe('Client', function () {
   it(
     'Client - implicit server port',
     () => {

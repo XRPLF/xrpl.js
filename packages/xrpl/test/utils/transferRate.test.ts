@@ -7,7 +7,7 @@ import {
   transferRateToDecimal,
 } from '../../src'
 
-describe('TransferRate utils', () => {
+describe('TransferRate utils', function () {
   it('converts 1 percent to valid TransferRate', () => {
     const billionths = percentToTransferRate('1%')
 

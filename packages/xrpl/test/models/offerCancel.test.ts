@@ -7,7 +7,7 @@ import { validateOfferCancel } from 'xrpl-local/models/transactions/offerCancel'
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('OfferCancel', () => {
+describe('OfferCancel', function () {
   let offer
 
   beforeEach(() => {

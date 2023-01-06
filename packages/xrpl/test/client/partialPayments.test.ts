@@ -13,7 +13,7 @@ import {
 const partialPaymentIOU = rippled.partial_payments.iou
 const partialPaymentXRP = rippled.partial_payments.xrp
 
-describe('client handling of tfPartialPayments', () => {
+describe('client handling of tfPartialPayments', function () {
   let testContext: XrplTestContext
 
   beforeEach(async () => {

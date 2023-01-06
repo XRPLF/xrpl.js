@@ -9,7 +9,7 @@ const BUY_OFFER =
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('NFTokenCancelOffer', () => {
+describe('NFTokenCancelOffer', function () {
   it(`verifies valid NFTokenCancelOffer`, () => {
     const validNFTokenCancelOffer = {
       TransactionType: 'NFTokenCancelOffer',

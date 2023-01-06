@@ -14,7 +14,7 @@ import trustlineSetLimit from '../fixtures/utils/trustlineSetLimit.json'
 import trustlineSetLimit2 from '../fixtures/utils/trustlineSetLimit2.json'
 import trustlineSetLimitZero from '../fixtures/utils/trustlineSetLimitZero.json'
 
-describe('getBalanceChanges', () => {
+describe('getBalanceChanges', function () {
   it('XRP create account', () => {
     const result = getBalanceChanges(paymentXrpCreateAccount.metadata)
     const expected = [

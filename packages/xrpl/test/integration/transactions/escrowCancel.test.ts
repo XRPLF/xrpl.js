@@ -18,7 +18,7 @@ import {
 // how long before each test case times out
 const TIMEOUT = 50000
 
-describe('EscrowCancel', () => {
+describe('EscrowCancel', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {

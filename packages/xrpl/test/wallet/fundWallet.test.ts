@@ -13,7 +13,7 @@ import {
   type XrplTestContext,
 } from '../setupClient'
 
-describe('Get Faucet host ', () => {
+describe('Get Faucet host ', function () {
   let testContext: XrplTestContext
 
   beforeEach(async () => {

@@ -11,7 +11,7 @@ import {
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('NFTokenMint', () => {
+describe('NFTokenMint', function () {
   it(`verifies valid NFTokenMint`, () => {
     const validNFTokenMint = {
       TransactionType: 'NFTokenMint',

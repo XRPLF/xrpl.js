@@ -9,7 +9,7 @@ const TOKEN_ID =
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('NFTokenBurn', () => {
+describe('NFTokenBurn', function () {
   it(`verifies valid NFTokenBurn`, () => {
     const validNFTokenBurn = {
       TransactionType: 'NFTokenBurn',

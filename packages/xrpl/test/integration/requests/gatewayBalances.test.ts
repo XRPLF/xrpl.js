@@ -12,7 +12,7 @@ import {
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('gateway_balances', () => {
+describe('gateway_balances', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {

@@ -7,7 +7,7 @@ import { validateOfferCreate } from 'xrpl-local/models/transactions/offerCreate'
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('OfferCreate', () => {
+describe('OfferCreate', function () {
   it(`verifies valid OfferCreate`, () => {
     const offer = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',

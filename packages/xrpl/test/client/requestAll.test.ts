@@ -15,7 +15,7 @@ const rippledResponse = function (request: Request): Record<string, unknown> {
   return rippled.ledger_data.first_page
 }
 
-describe('client.requestAll', () => {
+describe('client.requestAll', function () {
   let testContext: XrplTestContext
 
   beforeEach(async () => {

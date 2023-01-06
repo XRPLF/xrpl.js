@@ -7,7 +7,7 @@ import { validateTrustSet } from 'xrpl-local/models/transactions/trustSet'
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('TrustSet', () => {
+describe('TrustSet', function () {
   let trustSet
 
   beforeEach(() => {

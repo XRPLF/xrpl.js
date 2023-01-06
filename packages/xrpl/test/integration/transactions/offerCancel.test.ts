@@ -12,7 +12,7 @@ import { testTransaction } from '../utils'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('OfferCancel', () => {
+describe('OfferCancel', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {
@@ -52,7 +52,7 @@ describe('OfferCancel', () => {
       const tx: OfferCancel = {
         TransactionType: 'OfferCancel',
         Account: testContext.wallet.classicAddress,
-        OfferSequence: seq!,
+        OfferSequence: seq,
       }
 
       await testTransaction(testContext.client, tx, testContext.wallet)

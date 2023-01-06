@@ -50,7 +50,7 @@ async function generate_faucet_wallet_and_fund_again(
 // how long before each test case times out
 const TIMEOUT = 60000
 // This test is reliant on external networks, and as such may be flaky.
-describe('fundWallet', () => {
+describe('fundWallet', function () {
   it(
     'submit generates a testnet wallet',
     async function () {

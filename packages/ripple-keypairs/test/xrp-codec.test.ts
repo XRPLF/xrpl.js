@@ -9,8 +9,8 @@ function toBytes(hex: string) {
   return Buffer.from(hex, 'hex').toJSON().data
 }
 
-describe('ripple-address-codec', () => {
-  describe('encodeSeed', () => {
+describe('ripple-address-codec', function () {
+  describe('encodeSeed', function () {
     it('encodes a secp256k1 seed', () => {
       const result = api.encodeSeed(
         Buffer.from(toBytes('CF2DE378FBDD7E2EE87D486DFB5A7BFF')),
@@ -60,7 +60,7 @@ describe('ripple-address-codec', () => {
     })
   })
 
-  describe('decodeSeed', () => {
+  describe('decodeSeed', function () {
     it('can decode an Ed25519 seed', () => {
       const decoded = api.decodeSeed('sEdTM1uX8pu2do5XvTnutH6HsouMaM2')
       assert.equal(toHex(decoded.bytes), '4C3A1D213FBDFB14C7C28D609469B341')
@@ -74,7 +74,7 @@ describe('ripple-address-codec', () => {
     })
   })
 
-  describe('encodeAccountID', () => {
+  describe('encodeAccountID', function () {
     it('can encode an AccountID', () => {
       const encoded = api.encodeAccountID(
         Buffer.from(toBytes('BA8E78626EE42C41B46D46C3048DF3A1C3C87072')),
@@ -83,7 +83,7 @@ describe('ripple-address-codec', () => {
     })
   })
 
-  describe('decodeNodePublic', () => {
+  describe('decodeNodePublic', function () {
     it('can decode a NodePublic', () => {
       const decoded = api.decodeNodePublic(
         'n9MXXueo837zYH36DvMc13BwHcqtfAWNJY5czWVbp7uYTj7x17TH',

@@ -7,7 +7,7 @@ import { validateCheckCancel } from 'xrpl-local/models/transactions/checkCancel'
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('CheckCancel', () => {
+describe('CheckCancel', function () {
   it(`verifies valid CheckCancel`, () => {
     const validCheckCancel = {
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',

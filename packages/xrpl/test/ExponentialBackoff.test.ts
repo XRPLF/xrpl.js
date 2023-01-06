@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import ExponentialBackoff from 'xrpl-local/client/ExponentialBackoff'
 
-describe('ExponentialBackoff', () => {
+describe('ExponentialBackoff', function () {
   it('duration() return value starts with the min value', () => {
     // default: 100ms
     assert.equal(new ExponentialBackoff().duration(), 100)

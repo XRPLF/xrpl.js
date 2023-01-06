@@ -6,8 +6,8 @@ import {
   rippleTimeToUnixTime,
 } from 'xrpl-local'
 
-describe('time conversion', () => {
-  describe('rippleTimeToISOTime', () => {
+describe('time conversion', function () {
+  describe('rippleTimeToISOTime', function () {
     it('converts ripple time to ISO time', () => {
       const rippleTime = 0
       const isoTime = '2000-01-01T00:00:00.000Z'
@@ -15,7 +15,7 @@ describe('time conversion', () => {
     })
   })
 
-  describe('isoTimeToRippleTime', () => {
+  describe('isoTimeToRippleTime', function () {
     it('converts ISO time to ripple time', () => {
       const rippleTime = 0
       const isoTime = '2000-01-01T00:00:00.000Z'
@@ -29,7 +29,7 @@ describe('time conversion', () => {
     })
   })
 
-  describe('unixTimeToRippleTime', () => {
+  describe('unixTimeToRippleTime', function () {
     it('converts unix time to ripple time', () => {
       const unixTime = 946684801000
       const rippleTime = 1
@@ -37,7 +37,7 @@ describe('time conversion', () => {
     })
   })
 
-  describe('rippleTimeToUnixTime', () => {
+  describe('rippleTimeToUnixTime', function () {
     it('converts ripple time to unix time', () => {
       const unixTime = 946684801000
       const rippleTime = 1

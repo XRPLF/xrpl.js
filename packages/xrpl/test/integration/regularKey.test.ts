@@ -64,7 +64,7 @@ async function generateFundedWalletWithRegularKey(
   return { masterWallet, regularKeyWallet }
 }
 
-describe('regular key', () => {
+describe('regular key', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {

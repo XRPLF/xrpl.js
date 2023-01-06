@@ -7,7 +7,7 @@ import { validateTicketCreate } from 'xrpl-local/models/transactions/ticketCreat
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('TicketCreate', () => {
+describe('TicketCreate', function () {
   let ticketCreate
 
   beforeEach(() => {

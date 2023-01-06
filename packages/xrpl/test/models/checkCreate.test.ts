@@ -7,7 +7,7 @@ import { validateCheckCreate } from 'xrpl-local/models/transactions/checkCreate'
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('CheckCreate', () => {
+describe('CheckCreate', function () {
   it(`verifies valid CheckCreate`, () => {
     const validCheck = {
       TransactionType: 'CheckCreate',

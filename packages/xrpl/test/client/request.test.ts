@@ -7,7 +7,7 @@ import {
 } from '../setupClient'
 import { addressTests, assertResultMatch } from '../testUtils'
 
-describe('client.request', () => {
+describe('client.request', function () {
   let testContext: XrplTestContext
 
   beforeEach(async () => {

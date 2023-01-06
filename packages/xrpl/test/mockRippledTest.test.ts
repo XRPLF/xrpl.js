@@ -8,7 +8,7 @@ import {
 } from './setupClient'
 import { assertRejects } from './testUtils'
 
-describe('mock rippled tests', () => {
+describe('mock rippled tests', function () {
   let testContext: XrplTestContext
 
   beforeEach(async () => {

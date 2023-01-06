@@ -25,7 +25,7 @@ const tx: Transaction = {
   SigningPubKey: publicKey,
 }
 
-describe('Signer', () => {
+describe('Signer', function () {
   let multisignTxToCombine1
   let multisignTxToCombine2
   let multisignJSON

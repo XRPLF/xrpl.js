@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import { Client } from 'xrpl-local'
 
-describe('client constructor', () => {
+describe('client constructor', function () {
   it('Client - implicit server port', () => {
     // eslint-disable-next-line no-new -- Testing constructor
     new Client('wss://s1.ripple.com')

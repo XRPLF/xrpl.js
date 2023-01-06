@@ -7,7 +7,7 @@ import { validatePaymentChannelFund } from 'xrpl-local/models/transactions/payme
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('PaymentChannelFund', () => {
+describe('PaymentChannelFund', function () {
   let channel
 
   beforeEach(() => {

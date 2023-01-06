@@ -21,7 +21,7 @@ import { ledgerAccept, verifySubmittedTransaction } from '../utils'
 const TIMEOUT = 20000
 const { hashSignedTx } = hashes
 
-describe('submit', () => {
+describe('submit', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {

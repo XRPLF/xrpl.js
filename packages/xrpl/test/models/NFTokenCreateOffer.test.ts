@@ -9,7 +9,7 @@ const NFTOKEN_ID =
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('NFTokenCreateOffer', () => {
+describe('NFTokenCreateOffer', function () {
   it(`verifies valid NFTokenCreateOffer buyside`, () => {
     const validNFTokenCreateOffer = {
       TransactionType: 'NFTokenCreateOffer',

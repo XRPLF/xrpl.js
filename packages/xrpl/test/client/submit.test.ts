@@ -12,7 +12,7 @@ import {
 } from '../setupClient'
 import { assertRejects } from '../testUtils'
 
-describe('client.submit', () => {
+describe('client.submit', function () {
   let testContext: XrplTestContext
 
   beforeEach(async () => {
@@ -20,7 +20,7 @@ describe('client.submit', () => {
   })
   afterEach(async () => teardownClient(testContext))
 
-  describe('submit unsigned transactions', () => {
+  describe('submit unsigned transactions', function () {
     const publicKey =
       '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
     const privateKey =
@@ -76,7 +76,7 @@ describe('client.submit', () => {
     })
   })
 
-  describe('submit signed transactions', () => {
+  describe('submit signed transactions', function () {
     const signedTransaction: Transaction = {
       TransactionType: 'Payment',
       Sequence: 1,

@@ -11,7 +11,7 @@ import { fundAccount, testTransaction } from '../utils'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('DepositPreauth', () => {
+describe('DepositPreauth', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {

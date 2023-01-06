@@ -7,7 +7,7 @@ import { validateEscrowCreate } from 'xrpl-local/models/transactions/escrowCreat
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('EscrowCreate', () => {
+describe('EscrowCreate', function () {
   let escrow
 
   beforeEach(() => {

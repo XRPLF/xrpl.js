@@ -7,7 +7,7 @@ import { validateAccountDelete } from 'xrpl-local/models/transactions/accountDel
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('AccountDelete', () => {
+describe('AccountDelete', function () {
   it(`verifies valid AccountDelete`, () => {
     const validAccountDelete = {
       TransactionType: 'AccountDelete',

@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import { deriveXAddress } from 'xrpl-local'
 
-describe('deriveXAddress', () => {
+describe('deriveXAddress', function () {
   it('returns address for public key', () => {
     assert.equal(
       deriveXAddress({

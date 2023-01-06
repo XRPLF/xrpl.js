@@ -7,7 +7,7 @@ import { validateCheckCash } from 'xrpl-local/models/transactions/checkCash'
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('CheckCash', () => {
+describe('CheckCash', function () {
   it(`verifies valid CheckCash`, () => {
     const validCheckCash = {
       Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',

@@ -29,7 +29,7 @@ import {
 const TIMEOUT = 20000
 const { hashSignedTx } = hashes
 
-describe('submit_multisigned', () => {
+describe('submit_multisigned', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {

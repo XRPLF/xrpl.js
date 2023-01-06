@@ -12,7 +12,7 @@ import { generateFundedWallet, runCommand } from '../utils'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('AccountDelete', () => {
+describe('AccountDelete', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {

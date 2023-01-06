@@ -6,7 +6,7 @@ import {
   type XrplTestContext,
 } from '../setupClient'
 
-describe('client.isConnected', () => {
+describe('client.isConnected', function () {
   let testContext: XrplTestContext
 
   beforeEach(async () => {

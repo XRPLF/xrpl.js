@@ -59,7 +59,7 @@ function createLedgerTest(ledgerIndex: number): void {
   })
 }
 
-describe('Hashes', () => {
+describe('Hashes', function () {
   // This is the first recorded ledger with a non empty transaction set
   createLedgerTest(38129)
   // Because, why not.

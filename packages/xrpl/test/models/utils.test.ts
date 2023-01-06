@@ -23,8 +23,8 @@ import {
  *
  * Provides tests for utils used in models.
  */
-describe('Models Utils', () => {
-  describe('isFlagEnabled', () => {
+describe('Models Utils', function () {
+  describe('isFlagEnabled', function () {
     let flags: number
     const flag1 = 0x00010000
     const flag2 = 0x00020000
@@ -44,7 +44,7 @@ describe('Models Utils', () => {
     })
   })
 
-  describe('setTransactionFlagsToNumber', () => {
+  describe('setTransactionFlagsToNumber', function () {
     it('sets OfferCreateFlags to its numeric value', () => {
       const tx: OfferCreate = {
         Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',

@@ -17,7 +17,7 @@ async function assertDoesNotThrow(promise: Promise<unknown>): Promise<void> {
   }
 }
 
-describe('Client subscription', () => {
+describe('Client subscription', function () {
   let testContext: XrplTestContext
 
   beforeEach(async () => {

@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import { convertHexToString, convertStringToHex } from 'xrpl-local/utils'
 
-describe('convertHexToString and convertStringToHex', () => {
+describe('convertHexToString and convertStringToHex', function () {
   it('converts "example.com"', () => {
     const str = 'example.com'
     const hex = convertStringToHex(str)

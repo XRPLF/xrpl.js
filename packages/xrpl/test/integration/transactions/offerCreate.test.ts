@@ -12,7 +12,7 @@ import { testTransaction } from '../utils'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('OfferCreate', () => {
+describe('OfferCreate', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {

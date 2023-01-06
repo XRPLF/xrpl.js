@@ -7,7 +7,7 @@ import {
   type XrplTestContext,
 } from '../setupClient'
 
-describe('client.getLedgerIndex', () => {
+describe('client.getLedgerIndex', function () {
   let testContext: XrplTestContext
 
   beforeEach(async () => {

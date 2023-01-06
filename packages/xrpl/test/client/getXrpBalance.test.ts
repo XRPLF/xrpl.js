@@ -13,7 +13,7 @@ import { addressTests } from '../testUtils'
  * - Check out the "TestSuite" type for documentation on the interface.
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
-describe('client.getXrpBalance', () => {
+describe('client.getXrpBalance', function () {
   let testContext: XrplTestContext
 
   beforeEach(async () => {

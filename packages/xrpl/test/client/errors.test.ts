@@ -7,7 +7,7 @@ import {
   type XrplTestContext,
 } from '../setupClient'
 
-describe('client errors', () => {
+describe('client errors', function () {
   let testContext: XrplTestContext
 
   beforeEach(async () => {

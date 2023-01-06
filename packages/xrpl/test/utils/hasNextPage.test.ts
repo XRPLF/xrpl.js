@@ -3,7 +3,7 @@ import { hasNextPage } from 'xrpl-local'
 
 import fixtures from '../fixtures/rippled'
 
-describe('hasNextPage', () => {
+describe('hasNextPage', function () {
   it('returns true when response has marker', () => {
     const firstPage = fixtures.ledger_data.first_page
     assert.isTrue(hasNextPage(firstPage))

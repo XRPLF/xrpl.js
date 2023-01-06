@@ -7,7 +7,7 @@ import { validateSetRegularKey } from 'xrpl-local/models/transactions/setRegular
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('SetRegularKey', () => {
+describe('SetRegularKey', function () {
   let account
 
   beforeEach(() => {

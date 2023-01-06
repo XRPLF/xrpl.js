@@ -7,7 +7,7 @@ import { validatePayment } from 'xrpl-local/models/transactions/payment'
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('Payment', () => {
+describe('Payment', function () {
   let paymentTransaction
 
   beforeEach(() => {

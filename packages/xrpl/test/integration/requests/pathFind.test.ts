@@ -18,7 +18,7 @@ import { generateFundedWallet, ledgerAccept, subscribeDone } from '../utils'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('path_find', () => {
+describe('path_find', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {

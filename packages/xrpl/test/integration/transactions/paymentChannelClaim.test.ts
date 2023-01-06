@@ -12,7 +12,7 @@ import { generateFundedWallet, testTransaction } from '../utils'
 const TIMEOUT = 20000
 const { hashPaymentChannel } = hashes
 
-describe('PaymentChannelClaim', () => {
+describe('PaymentChannelClaim', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {

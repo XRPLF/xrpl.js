@@ -1,7 +1,7 @@
 import assert from 'assert'
 import * as utils from '../src/utils'
 
-describe('utils', () => {
+describe('utils', function () {
   it('hexToBytes - empty', () => {
     assert.deepEqual(utils.hexToBytes(''), [])
   })

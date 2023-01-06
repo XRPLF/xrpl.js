@@ -7,7 +7,7 @@ import { validateEscrowCancel } from 'xrpl-local/models/transactions/escrowCance
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('EscrowCancel', () => {
+describe('EscrowCancel', function () {
   let cancel
 
   beforeEach(() => {

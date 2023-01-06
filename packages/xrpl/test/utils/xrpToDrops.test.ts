@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import { xrpToDrops } from 'xrpl-local/utils'
 
-describe('xrpToDrops', () => {
+describe('xrpToDrops', function () {
   it('works with a typical amount', () => {
     const drops = xrpToDrops('2')
     assert.strictEqual(drops, '2000000', '2 XRP equals 2 million drops')

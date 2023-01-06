@@ -7,7 +7,7 @@ import { validateBaseTransaction } from 'xrpl-local/models/transactions/common'
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('BaseTransaction', () => {
+describe('BaseTransaction', function () {
   it(`Verifies all optional BaseTransaction`, () => {
     const txJson = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',

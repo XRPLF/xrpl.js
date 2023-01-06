@@ -8,7 +8,7 @@ import responses from '../fixtures/responses'
 const { hashLedger } = hashes
 const { hashLedger: REQUEST_FIXTURES } = requests
 
-describe('hashLedger', () => {
+describe('hashLedger', function () {
   let ledger
   beforeEach(() => {
     ledger = JSON.parse(JSON.stringify(responses.getLedger.full))

@@ -49,7 +49,7 @@ async function createTxHandlerTest(
   return { transactionPromise }
 }
 
-describe('subscribe', () => {
+describe('subscribe', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {
