@@ -50,7 +50,7 @@
     "docgen": "typedoc && echo js.xrpl.org >> ../../docs/CNAME",
     "prepublish": "run-s clean build",
     "test": "nyc mocha --config=test/.mocharc.json --exit",
-    "test:integration": "TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/integration/**/*.ts ./test/integration/*.ts",
+    "test:integration": "TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/integration/**/*.test.ts ./test/integration/*.test.ts",
     "test:browser": "npm run build:browserTests && TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/browser/*.ts",
     "test:watch": "TS_NODE_PROJECT=src/tsconfig.json mocha --config=test/.mocharc.json --watch --reporter dot",
     "format": "prettier --write '{src,test}/**/*.ts'",
