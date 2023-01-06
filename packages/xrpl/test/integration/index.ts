@@ -1,11 +1,10 @@
 /* eslint-disable import/export -- Tells webpack which files exist. */
-export * from './transactions/accountDelete.test'
+export * from './transactions/escrowCancel.test'
 export * from './transactions/accountSet.test'
 export * from './transactions/checkCancel.test'
 export * from './transactions/checkCash.test'
 export * from './transactions/checkCreate.test'
 export * from './transactions/depositPreauth.test'
-export * from './transactions/escrowCancel.test'
 export * from './transactions/escrowCreate.test'
 export * from './transactions/escrowFinish.test'
 export * from './transactions/offerCancel.test'
@@ -49,6 +48,8 @@ export * from './integration.test'
 export * from './onConnect.test'
 export * from './regularKey.test'
 export * from './submitAndWait.test'
+
+export * from './transactions/accountDelete.test'
 
 // Ensure you export all added tests above "export * from './finalTest'", otherwise they will not be run.
 export * from './finalTest.test'

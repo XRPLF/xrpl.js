@@ -1,5 +1,6 @@
 import { assert } from 'chai'
 import omit from 'lodash/omit'
+import throttle from 'lodash/throttle'
 import { decode } from 'ripple-binary-codec'
 import {
   Client,
@@ -16,13 +17,47 @@ import { hashSignedTx } from 'xrpl-local/utils/hashes'
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
 
+async function sendLedgerAccept(client: Client): Promise<unknown> {
+  return client.connection.request({ command: 'ledger_accept' })
+}
+
+/**
+ * Throttles an async function in a way that can be awaited.
+ * By default throttle doesn't return a promise for async functions unless it's invoking them immediately.
+ * See CUR-4769 for details.
+ *
+ * @param func - async function to throttle calls for.
+ * @param wait - same function as lodash.throttle's wait parameter. Call this function at most this often.
+ * @returns a promise which will be resolved/ rejected only if the function is executed, with the result of the underlying call.
+ */
+function asyncThrottle<F extends (...args: unknown[]) => Promise<unknown>>(
+  func: F,
+  wait?: number,
+): (...args: Parameters<F>) => ReturnType<F> {
+  const throttled = throttle((resolve, reject, args: Parameters<F>) => {
+    func(...args)
+      .then(resolve)
+      .catch(reject)
+  }, wait)
+  const ret = (...args: Parameters<F>): ReturnType<F> =>
+    new Promise((resolve, reject) => {
+      throttled(resolve, reject, args)
+    }) as ReturnType<F>
+  return ret
+}
+
+const throttledLedgerAccept = asyncThrottle(sendLedgerAccept, 1000)
+
 export async function ledgerAccept(
   client: Client,
   retries?: number,
+  shouldThrottle?: boolean,
 ): Promise<unknown> {
   return new Promise<unknown>((resolve, reject) => {
-    client.connection
-      .request({ command: 'ledger_accept' })
+    const ledgerAcceptFunc = shouldThrottle
+      ? throttledLedgerAccept
+      : sendLedgerAccept
+    ledgerAcceptFunc(client)
       .then(resolve)
       .catch((error) => {
         if (retries === undefined) {
@@ -54,13 +89,15 @@ export function calculateWaitTimeForTransaction(
   minimumWaitTimeInMs = 5000,
   maximumWaitTimeInMs = 20000,
 ): number {
-  const currentTimeUnix = Math.floor(new Date().getTime())
-  const currentTimeRipple = unixTimeToRippleTime(currentTimeUnix)
-  const closeTimeCurrentTimeDiff = currentTimeRipple - targetTime
+  const currentTimeUnixInMs = Math.floor(new Date().getTime())
+  const currentTimeRippleInSeconds = unixTimeToRippleTime(currentTimeUnixInMs)
+  const closeTimeCurrentTimeDiffInSeconds =
+    currentTimeRippleInSeconds - targetTime
+  const closeTimeCurrentTimeDiffInMs = closeTimeCurrentTimeDiffInSeconds * 1000
   return Math.max(
     minimumWaitTimeInMs,
     Math.min(
-      Math.abs(closeTimeCurrentTimeDiff) * 1000 + minimumWaitTimeInMs,
+      Math.abs(closeTimeCurrentTimeDiffInMs) + minimumWaitTimeInMs,
       // Maximum wait time of 20 seconds
       maximumWaitTimeInMs,
     ),
@@ -71,7 +108,7 @@ export function subscribeDone(client: Client): void {
   client.removeAllListeners()
 }
 
-async function runCommand({
+export async function runCommand({
   client,
   transaction,
   wallet,
@@ -226,9 +263,13 @@ export async function testTransaction(
 
   if (response.result.engine_result !== 'tesSUCCESS') {
     // eslint-disable-next-line no-console -- See output
-    console.error(transaction)
+    console.error(
+      `Transaction was not successful. Expected response.result.engine_result to be tesSUCCESS but got ${response.result.engine_result}`,
+    )
     // eslint-disable-next-line no-console -- See output
-    console.error(response)
+    console.error('The transaction was: ', transaction)
+    // eslint-disable-next-line no-console -- See output
+    console.error('The response was: ', JSON.stringify(response))
   }
 
   assert.equal(

@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { EscrowCancel, EscrowCreate } from 'xrpl-local'
+import { EscrowCancel, EscrowCreate, unixTimeToRippleTime } from 'xrpl-local'
 
 import serverUrl from '../serverUrl'
 import {
@@ -15,7 +15,7 @@ import {
 } from '../utils'
 
 // how long before each test case times out
-const TIMEOUT = 30000
+const TIMEOUT = 50000
 
 describe('EscrowCancel', () => {
   let testContext: XrplIntegrationTestContext
@@ -41,13 +41,17 @@ describe('EscrowCancel', () => {
 
       const waitTimeInMs = calculateWaitTimeForTransaction(CLOSE_TIME)
 
+      const currentTimeUnixInMs = Math.floor(new Date().getTime())
+      const currentTimeRippleInSeconds =
+        unixTimeToRippleTime(currentTimeUnixInMs)
+
       const createTx: EscrowCreate = {
         Account: testContext.wallet.classicAddress,
         TransactionType: 'EscrowCreate',
         Amount: '10000',
         Destination: wallet1.classicAddress,
-        CancelAfter: CLOSE_TIME + 3,
-        FinishAfter: CLOSE_TIME + 2,
+        CancelAfter: currentTimeRippleInSeconds + 3,
+        FinishAfter: currentTimeRippleInSeconds + 2,
       }
 
       await testTransaction(testContext.client, createTx, testContext.wallet)
@@ -87,15 +91,15 @@ describe('EscrowCancel', () => {
 
       // We set the CancelAfter timer to be 3 seconds after the last ledger close_time. We need to wait this long
       // before we can cancel the escrow.
-      const threeSecondCancelAfterTimerPromise = new Promise((resolve) => {
+      const cancelAfterTimerPromise = new Promise((resolve) => {
         setTimeout(resolve, waitTimeInMs)
       })
 
-      // Make sure we waited at least 3 seconds before canceling the escrow.
-      await threeSecondCancelAfterTimerPromise
+      // Make sure we wait long enough before canceling the escrow.
+      await cancelAfterTimerPromise
 
       await testTransaction(testContext.client, cancelTx, testContext.wallet, {
-        count: 5,
+        count: 20,
         delayMs: 2000,
       })
 
