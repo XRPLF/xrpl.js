@@ -36,6 +36,8 @@ describe('AccountDelete', () => {
         Destination: wallet2.classicAddress,
       }
 
+      // Since we are not testing the functionaity of rippled in this library, only that we are submitting commands
+      // properly, we can just test that the AccountDelete command was successfully received.
       try {
         await runCommand({
           client: testContext.client,
