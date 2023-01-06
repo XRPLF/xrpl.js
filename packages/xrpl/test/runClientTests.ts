@@ -92,8 +92,8 @@ function loadTestSuites(): LoadedTestSuite[] {
         return null
       }
       let methodName: string
-      if (filename.endsWith('.test.ts')) {
-        methodName = filename.slice(0, -8)
+      if (filename.endsWith('.ts')) {
+        methodName = filename.slice(0, -3)
       } else {
         methodName = filename
       }
