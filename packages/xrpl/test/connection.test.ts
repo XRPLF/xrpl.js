@@ -228,7 +228,7 @@ describe('Connection', function () {
       const server = await createServer()
       const port = (server.address() as net.AddressInfo).port
       const options = {
-        proxy: `ws://localhost:${port}`,
+        proxy: `ws://127.0.0.1:${port}`,
         authorization: 'authorization',
         trustedCertificates: ['path/to/pem'],
       }
