@@ -48,11 +48,13 @@ describe('OfferCancel', function () {
       )
       const seq = accountOffersResponse.result.offers?.[0].seq
 
+      assert.isNumber(seq)
+
       // actually test OfferCancel
       const tx: OfferCancel = {
         TransactionType: 'OfferCancel',
         Account: testContext.wallet.classicAddress,
-        OfferSequence: seq,
+        OfferSequence: seq!,
       }
 
       await testTransaction(testContext.client, tx, testContext.wallet)

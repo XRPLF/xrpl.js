@@ -43,94 +43,108 @@ describe('Client subscription', function () {
     )
   })
 
-  it('Emits transaction', (done) => {
-    testContext.client.on('transaction', (tx) => {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
-      assert(tx.type === 'transaction')
-      done()
-    })
+  it('Emits transaction', async () => {
+    await new Promise<void>(resolve => {
+      testContext.client.on('transaction', (tx) => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
+        assert(tx.type === 'transaction')
+        resolve()
+      })
 
-    // @ts-expect-error Using private method for testing
-    testContext.client.connection.onMessage(
-      JSON.stringify(rippled.streams.transaction),
-    )
+      // @ts-expect-error Using private method for testing
+      testContext.client.connection.onMessage(
+        JSON.stringify(rippled.streams.transaction),
+      )
+    })
   })
 
-  it('Emits ledger', (done) => {
-    testContext.client.on('ledgerClosed', (ledger) => {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
-      assert(ledger.type === 'ledgerClosed')
-      done()
-    })
+  it('Emits ledger', async () => {
+    await new Promise<void>(resolve => {
+      testContext.client.on('ledgerClosed', (ledger) => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
+        assert(ledger.type === 'ledgerClosed')
+        resolve()
+      })
 
-    // @ts-expect-error Using private method for testing
-    testContext.client.connection.onMessage(
-      JSON.stringify(rippled.streams.ledger),
-    )
+      // @ts-expect-error Using private method for testing
+      testContext.client.connection.onMessage(
+        JSON.stringify(rippled.streams.ledger),
+      )
+    })
   })
 
-  it('Emits peerStatusChange', (done) => {
-    testContext.client.on('peerStatusChange', (status) => {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
-      assert(status.type === 'peerStatusChange')
-      done()
-    })
+  it('Emits peerStatusChange', async () => {
+    await new Promise<void>(resolve => {
+      testContext.client.on('peerStatusChange', (status) => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
+        assert(status.type === 'peerStatusChange')
+        resolve()
+      })
 
-    // @ts-expect-error Using private method for testing
-    testContext.client.connection.onMessage(
-      JSON.stringify(rippled.streams.peerStatus),
-    )
+      // @ts-expect-error Using private method for testing
+      testContext.client.connection.onMessage(
+        JSON.stringify(rippled.streams.peerStatus),
+      )
+    })
   })
 
-  it('Emits consensusPhase', (done) => {
-    testContext.client.on('consensusPhase', (phase) => {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
-      assert(phase.type === 'consensusPhase')
-      done()
-    })
+  it('Emits consensusPhase', async () => {
+    await new Promise<void>(resolve => {
+      testContext.client.on('consensusPhase', (phase) => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
+        assert(phase.type === 'consensusPhase')
+        resolve()
+      })
 
-    // @ts-expect-error Using private method for testing
-    testContext.client.connection.onMessage(
-      JSON.stringify(rippled.streams.consensus),
-    )
+      // @ts-expect-error Using private method for testing
+      testContext.client.connection.onMessage(
+        JSON.stringify(rippled.streams.consensus),
+      )
+    })
   })
 
-  it('Emits path_find', (done) => {
-    testContext.client.on('path_find', (path) => {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
-      assert(path.type === 'path_find')
-      done()
-    })
+  it('Emits path_find', async () => {
+    await new Promise<void>(resolve => {
+      testContext.client.on('path_find', (path) => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
+        assert(path.type === 'path_find')
+        resolve()
+      })
 
-    // @ts-expect-error Using private method for testing
-    testContext.client.connection.onMessage(
-      JSON.stringify(rippled.streams.pathFind),
-    )
+      // @ts-expect-error Using private method for testing
+      testContext.client.connection.onMessage(
+        JSON.stringify(rippled.streams.pathFind),
+      )
+    })
   })
 
-  it('Emits validationReceived', (done) => {
-    testContext.client.on('validationReceived', (path) => {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
-      assert(path.type === 'validationReceived')
-      done()
-    })
+  it('Emits validationReceived', async () => {
+    await new Promise<void>(resolve => {
+      testContext.client.on('validationReceived', (path) => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
+        assert(path.type === 'validationReceived')
+        resolve()
+      })
 
-    // @ts-expect-error Using private method for testing
-    testContext.client.connection.onMessage(
-      JSON.stringify(rippled.streams.validation),
-    )
+      // @ts-expect-error Using private method for testing
+      testContext.client.connection.onMessage(
+        JSON.stringify(rippled.streams.validation),
+      )
+    })
   })
 
-  it('Emits manifestReceived', (done) => {
-    // @es-expect-error Seems like a valid method
-    testContext.client.on('manifestReceived', (path) => {
-      assert(path.type === 'manifestReceived')
-      done()
-    })
+  it('Emits manifestReceived', async () => {
+    await new Promise<void>(resolve => {
+      // @es-expect-error Seems like a valid method
+      testContext.client.on('manifestReceived', (path) => {
+        assert(path.type === 'manifestReceived')
+        resolve()
+      })
 
-    // @ts-expect-error Using private method for testing
-    testContext.client.connection.onMessage(
-      JSON.stringify(rippled.streams.manifest),
-    )
+      // @ts-expect-error Using private method for testing
+      testContext.client.connection.onMessage(
+        JSON.stringify(rippled.streams.manifest),
+      )
+    })
   })
 })
