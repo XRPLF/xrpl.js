@@ -44,7 +44,7 @@ describe('Client subscription', function () {
   })
 
   it('Emits transaction', async () => {
-    await new Promise<void>(resolve => {
+    await new Promise<void>((resolve) => {
       testContext.client.on('transaction', (tx) => {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
         assert(tx.type === 'transaction')
@@ -59,7 +59,7 @@ describe('Client subscription', function () {
   })
 
   it('Emits ledger', async () => {
-    await new Promise<void>(resolve => {
+    await new Promise<void>((resolve) => {
       testContext.client.on('ledgerClosed', (ledger) => {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
         assert(ledger.type === 'ledgerClosed')
@@ -74,7 +74,7 @@ describe('Client subscription', function () {
   })
 
   it('Emits peerStatusChange', async () => {
-    await new Promise<void>(resolve => {
+    await new Promise<void>((resolve) => {
       testContext.client.on('peerStatusChange', (status) => {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
         assert(status.type === 'peerStatusChange')
@@ -89,7 +89,7 @@ describe('Client subscription', function () {
   })
 
   it('Emits consensusPhase', async () => {
-    await new Promise<void>(resolve => {
+    await new Promise<void>((resolve) => {
       testContext.client.on('consensusPhase', (phase) => {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
         assert(phase.type === 'consensusPhase')
@@ -104,7 +104,7 @@ describe('Client subscription', function () {
   })
 
   it('Emits path_find', async () => {
-    await new Promise<void>(resolve => {
+    await new Promise<void>((resolve) => {
       testContext.client.on('path_find', (path) => {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
         assert(path.type === 'path_find')
@@ -119,7 +119,7 @@ describe('Client subscription', function () {
   })
 
   it('Emits validationReceived', async () => {
-    await new Promise<void>(resolve => {
+    await new Promise<void>((resolve) => {
       testContext.client.on('validationReceived', (path) => {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
         assert(path.type === 'validationReceived')
@@ -134,7 +134,7 @@ describe('Client subscription', function () {
   })
 
   it('Emits manifestReceived', async () => {
-    await new Promise<void>(resolve => {
+    await new Promise<void>((resolve) => {
       // @es-expect-error Seems like a valid method
       testContext.client.on('manifestReceived', (path) => {
         assert(path.type === 'manifestReceived')
