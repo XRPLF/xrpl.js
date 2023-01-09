@@ -25,17 +25,13 @@ export interface AMMInfoRequest extends BaseRequest {
 }
 
 interface AuthAccount {
-  AuthAccount: {
-    Account: string
-  }
+  account: string
 }
 
 interface VoteEntry {
-  VoteEntry: {
-    Account: string
-    TradingFee: number
-    VoteWeight: number
-  }
+  account: string
+  trading_fee: number
+  vote_weight: number
 }
 
 /**
@@ -49,52 +45,54 @@ export interface AMMInfoResponse extends BaseResponse {
       /**
        * The account that tracks the balance of LPTokens between the AMM instance via Trustline.
        */
-      AMMAccount: string
-
-      /**
-       * The AMM identifier that uniquely identifies an AMM instance.
-       */
-      AMMID: string
+      amm_account: string
 
       /**
        * One of the pool assets (XRP or token) of the AMM instance.
        */
-      Amount: Amount
+      amount: Amount
 
       /**
        * The other pool asset of the AMM instance.
        */
-      Amount2: Amount
+      amount2: Amount
+
+      /**
+       * Flag indicating whether asset2 is frozen.
+       */
+      asset2_frozen: boolean
 
       /**
        * Details of the current owner of the auction slot.
        */
-      AuctionSlot?: {
+      auction_slot?: {
         /**
          * The current owner of this auction slot.
          */
-        Account: string
+        account: string
 
         /**
          * A list of at most 4 additional accounts that are authorized to trade at the discounted fee for this AMM instance.
          */
-        AuthAccounts: AuthAccount[]
+        auth_accounts: AuthAccount[]
 
         /**
          * The trading fee to be charged to the auction owner, in the same format as TradingFee.
          * By default this is 0, meaning that the auction owner can trade at no fee instead of the standard fee for this AMM.
          */
-        DiscountedFee: number
+        discounted_fee: number
 
         /**
          * The time when this slot expires, in seconds since the Ripple Epoch.
          */
-        Expiration: string
+        expiration: string
 
         /**
          * The amount the auction owner paid to win this slot, in LPTokens.
          */
-        Price: Amount
+        price: Amount
+
+        time_interval: number
       }
 
       /**
@@ -102,7 +100,7 @@ export interface AMMInfoResponse extends BaseResponse {
        * The holders of these tokens can vote on the AMM's trading fee in proportion to their holdings,
        * or redeem the tokens for a share of the AMM's assets which grows with the trading fees collected.
        */
-      LPToken: IssuedCurrencyAmount
+      lp_token: IssuedCurrencyAmount
 
       /**
        * Specifies the fee, in basis point, to be charged to the traders for the trades
@@ -111,24 +109,31 @@ export interface AMMInfoResponse extends BaseResponse {
        * A value of 1 is equivalent to 1/10 bps or 0.001%, allowing trading fee
        * between 0% and 1%. This field is required.
        */
-      TradingFee: number
+      trading_fee: number
 
       /**
        * Keeps a track of up to eight active votes for the instance.
        */
-      VoteSlots?: VoteEntry[]
-
-      /**
-       * The ledger index of the current in-progress ledger, which was used when
-       * retrieving this information.
-       */
-      ledger_current_index?: number
-
-      /**
-       * True if this data is from a validated ledger version; if omitted or set
-       * to false, this data is not final.
-       */
-      validated?: boolean
+      vote_slots?: VoteEntry[]
     }
+
+    /**
+     * The identifying hash of the ledger that was used to generate this
+     * response.
+     */
+    ledger_hash?: string
+
+    /**
+     * The ledger index of the ledger version that was used to generate this
+     * response.
+     */
+    ledger_index?: number
+
+    /**
+     * If included and set to true, the information in this response comes from
+     * a validated ledger version. Otherwise, the information is subject to
+     * change.
+     */
+    validated?: boolean
   }
 }
