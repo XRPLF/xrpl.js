@@ -120,7 +120,7 @@ describe('Signing data', function () {
       ].join(''),
     )
   })
-  test('can create claim blob', function () {
+  test('can create native claim blob', function () {
     const channel =
       '43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1'
     const amount = '1000'
@@ -134,6 +134,29 @@ describe('Signing data', function () {
         '43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1',
         // amount as a uint64
         '00000000000003E8',
+      ].join(''),
+    )
+  })
+  test('can create ic claim blob', function () {
+    const channel =
+      '43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1'
+    const amount = {
+      issuer: 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN',
+      currency: 'USD',
+      value: '10',
+    }
+    const json = { channel, amount }
+    const actual = encodeForSigningClaim(json)
+    expect(actual).toBe(
+      [
+        // hash prefix
+        '434C4D00',
+        // channel ID
+        '43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1',
+        // amount as a uint64
+        'D4C38D7EA4C680000000000000000000000000005553440000000000C0A5ABEF',
+        // amount as a uint64
+        '242802EFED4B041E8F2D4A8CC86AE3D1',
       ].join(''),
     )
   })

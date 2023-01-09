@@ -1,5 +1,6 @@
 /* eslint-disable complexity -- Necessary for validateEscrowCreate */
 import { ValidationError } from '../../errors'
+import { Amount } from '../common'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
 
@@ -15,7 +16,7 @@ export interface EscrowCreate extends BaseTransaction {
    * Once escrowed, the XRP can either go to the Destination address (after the.
    * FinishAfter time) or returned to the sender (after the CancelAfter time).
    */
-  Amount: string
+  Amount: Amount
   /** Address to receive escrowed XRP. */
   Destination: string
   /**

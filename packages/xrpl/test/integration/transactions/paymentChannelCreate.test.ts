@@ -11,10 +11,10 @@ const TIMEOUT = 20000
 describe('PaymentChannelCreate', function () {
   this.timeout(TIMEOUT)
 
-  beforeEach(_.partial(setupClient, serverUrl))
+  beforeEach(_.partial(setupClient, serverUrl, true))
   afterEach(teardownClient)
 
-  it('base', async function () {
+  it('native', async function () {
     const wallet2 = await generateFundedWallet(this.client)
     const paymentChannelCreate: PaymentChannelCreate = {
       TransactionType: 'PaymentChannelCreate',
@@ -25,6 +25,21 @@ describe('PaymentChannelCreate', function () {
       PublicKey: this.wallet.publicKey,
     }
 
+    await testTransaction(this.client, paymentChannelCreate, this.wallet)
+  })
+  it('ic', async function () {
+    const paymentChannelCreate: PaymentChannelCreate = {
+      TransactionType: 'PaymentChannelCreate',
+      Account: this.wallet.classicAddress,
+      Amount: {
+        currency: 'USD',
+        issuer: this.gateway.classicAddress,
+        value: '100',
+      },
+      Destination: this.destination.classicAddress,
+      SettleDelay: 86400,
+      PublicKey: this.wallet.publicKey,
+    }
     await testTransaction(this.client, paymentChannelCreate, this.wallet)
   })
 })

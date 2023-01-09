@@ -11,6 +11,7 @@ import { STObject } from './types/st-object'
 import { JsonObject } from './types/serialized-type'
 import { Buffer } from 'buffer/'
 import * as bigInt from 'big-integer'
+import { Amount } from './types/amount'
 
 /**
  * Construct a BinaryParser
@@ -93,9 +94,9 @@ function signingData(
 /**
  * Interface describing fields required for a Claim
  */
-interface ClaimObject extends JsonObject {
+interface ClaimObject {
   channel: string
-  amount: string | number
+  amount: Amount
 }
 
 /**
@@ -105,13 +106,19 @@ interface ClaimObject extends JsonObject {
  * @returns the serialized object with appropriate prefix
  */
 function signingClaimData(claim: ClaimObject): Buffer {
-  const num = bigInt(String(claim.amount))
   const prefix = HashPrefix.paymentChannelClaim
   const channel = coreTypes.Hash256.from(claim.channel).toBytes()
-  const amount = coreTypes.UInt64.from(num).toBytes()
-
+  if (typeof claim.amount === 'object') {
+    const amount = coreTypes.Amount.from(claim.amount).toBytes()
+    const bytesList = new BytesList()
+    bytesList.put(prefix)
+    bytesList.put(channel)
+    bytesList.put(amount)
+    return bytesList.toBytes()
+  }
+  const num = bigInt(String(claim.amount))
   const bytesList = new BytesList()
-
+  const amount = coreTypes.UInt64.from(num).toBytes()
   bytesList.put(prefix)
   bytesList.put(channel)
   bytesList.put(amount)

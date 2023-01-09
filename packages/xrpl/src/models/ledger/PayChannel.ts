@@ -17,10 +17,10 @@ export default interface PayChannel extends BaseLedgerEntry {
    */
   Account: string
   /**
-   * The destination address for this payment channel. While the payment
-   * channel is open, this address is the only one that can receive XRP from the
-   * channel. This comes from the Destination field of the transaction that
-   * created the channel.
+   * Total XRP/FT, as drops/Amount, that has been allocated to this channel.
+   * This includes XRP/FT that has been paid to the destination address.
+   * This is initially set by the transaction that created the channel and can
+   * be increased if the source address sends a PaymentChannelFund transaction.
    */
   Destination: string
   /**
@@ -31,10 +31,11 @@ export default interface PayChannel extends BaseLedgerEntry {
    */
   Amount: string
   /**
-   * Total XRP, in drops, already paid out by the channel. The difference
-   * between this value and the Amount field is how much XRP can still be paid
-   * to the destination address with PaymentChannelClaim transactions. If the
-   * channel closes, the remaining difference is returned to the source address.
+   * Total XRP/FT, as drops/Amount, already paid out by the channel. The
+   * difference between this value and the Amount field is how much XRP/FT
+   * can still be paid to the destination address with PaymentChannelClaim
+   * transactions. If the channel closes, the remaining difference is returned
+   * to the source address.
    */
   Balance: string
   /**
@@ -104,4 +105,10 @@ export default interface PayChannel extends BaseLedgerEntry {
    * this object, in case the directory consists of multiple pages.
    */
   DestinationNode?: string
+  /**
+   * The fee to charge when users make claims on a payment channel, initially
+   * set on the creation of a payment channel and updated on subsequent funding
+   * or claim transactions.
+   */
+  TransferRate?: number
 }

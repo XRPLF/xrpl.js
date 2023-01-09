@@ -12,10 +12,10 @@ const { hashPaymentChannel } = hashes
 describe('PaymentChannelClaim', function () {
   this.timeout(TIMEOUT)
 
-  beforeEach(_.partial(setupClient, serverUrl))
+  beforeEach(_.partial(setupClient, serverUrl, true))
   afterEach(teardownClient)
 
-  it('base', async function () {
+  it('native', async function () {
     const wallet2 = await generateFundedWallet(this.client)
     const paymentChannelCreate: PaymentChannelCreate = {
       TransactionType: 'PaymentChannelCreate',
@@ -42,6 +42,45 @@ describe('PaymentChannelClaim', function () {
         paymentChannelResponse.result.tx_json.Sequence ?? 0,
       ),
       Amount: '100',
+    }
+
+    await testTransaction(this.client, paymentChannelClaim, this.wallet)
+  })
+
+  it('ic', async function () {
+    const paymentChannelCreate: PaymentChannelCreate = {
+      TransactionType: 'PaymentChannelCreate',
+      Account: this.wallet.classicAddress,
+      Amount: {
+        currency: 'USD',
+        issuer: this.gateway.classicAddress,
+        value: '100',
+      },
+      Destination: this.destination.classicAddress,
+      SettleDelay: 86400,
+      PublicKey: this.wallet.publicKey,
+    }
+
+    const paymentChannelResponse = await this.client.submit(
+      paymentChannelCreate,
+      { wallet: this.wallet },
+    )
+
+    await testTransaction(this.client, paymentChannelCreate, this.wallet)
+
+    const paymentChannelClaim: PaymentChannelClaim = {
+      Account: this.wallet.classicAddress,
+      TransactionType: 'PaymentChannelClaim',
+      Channel: hashPaymentChannel(
+        this.wallet.classicAddress,
+        this.destination.classicAddress,
+        paymentChannelResponse.result.tx_json.Sequence ?? 0,
+      ),
+      Amount: {
+        currency: 'USD',
+        issuer: this.gateway.classicAddress,
+        value: '100',
+      },
     }
 
     await testTransaction(this.client, paymentChannelClaim, this.wallet)

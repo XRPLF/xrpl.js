@@ -76,12 +76,12 @@ describe('PaymentChannelClaim', function () {
     assert.throws(
       () => validatePaymentChannelClaim(channel),
       ValidationError,
-      'PaymentChannelClaim: Balance must be a string',
+      'PaymentChannelClaim: invalid Balance',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelClaim: Balance must be a string',
+      'PaymentChannelClaim: invalid Balance',
     )
   })
 
@@ -91,12 +91,12 @@ describe('PaymentChannelClaim', function () {
     assert.throws(
       () => validatePaymentChannelClaim(channel),
       ValidationError,
-      'PaymentChannelClaim: Amount must be a string',
+      'PaymentChannelClaim: invalid Amount',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelClaim: Amount must be a string',
+      'PaymentChannelClaim: invalid Amount',
     )
   })
 

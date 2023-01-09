@@ -105,12 +105,12 @@ describe('PaymentChannelCreate', function () {
     assert.throws(
       () => validatePaymentChannelCreate(channel),
       ValidationError,
-      'PaymentChannelCreate: Amount must be a string',
+      'PaymentChannelCreate: invalid Amount',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelCreate: Amount must be a string',
+      'PaymentChannelCreate: invalid Amount',
     )
   })
 

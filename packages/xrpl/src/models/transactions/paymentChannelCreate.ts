@@ -1,7 +1,8 @@
 /* eslint-disable complexity -- Necessary for validatePaymentChannelCreate */
 import { ValidationError } from '../../errors'
+import { Amount } from '../common'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import { BaseTransaction, validateBaseTransaction, isAmount } from './common'
 
 /**
  * Create a unidirectional channel and fund it with XRP. The address sending
@@ -17,7 +18,7 @@ export interface PaymentChannelCreate extends BaseTransaction {
    * Destination address. When the channel closes, any unclaimed XRP is returned
    * to the source address's balance.
    */
-  Amount: string
+  Amount: Amount
   /**
    * Address to receive XRP claims against this channel. This is also known as
    * the "destination address" for the channel.
@@ -65,8 +66,8 @@ export function validatePaymentChannelCreate(
     throw new ValidationError('PaymentChannelCreate: missing Amount')
   }
 
-  if (typeof tx.Amount !== 'string') {
-    throw new ValidationError('PaymentChannelCreate: Amount must be a string')
+  if (typeof tx.Amount !== 'string' && !isAmount(tx.Amount)) {
+    throw new ValidationError('PaymentChannelCreate: invalid Amount')
   }
 
   if (tx.Destination === undefined) {

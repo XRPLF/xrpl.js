@@ -1,3 +1,5 @@
+import { Amount } from '../common'
+
 import BaseLedgerEntry from './BaseLedgerEntry'
 
 /**
@@ -19,8 +21,8 @@ export default interface Escrow extends BaseLedgerEntry {
    * successful.
    */
   Destination: string
-  /** The amount of XRP, in drops, to be delivered by the held payment. */
-  Amount: string
+  /** The amount of XRP/FT, as drops/Amount, to be delivered by the held payment. */
+  Amount: Amount
   /**
    * A PREIMAGE-SHA-256 crypto-condition, as hexadecimal. If present, the
    * EscrowFinish transaction must contain a fulfillment that satisfies this
@@ -71,4 +73,9 @@ export default interface Escrow extends BaseLedgerEntry {
    * modified this object.
    */
   PreviousTxnLgrSeq: number
+  /**
+   * The fee to charge when users finish an escrow, initially set on the
+   * creation of an escrow contract, and updated on subsequent finish transactions
+   */
+  TransferRate?: number
 }

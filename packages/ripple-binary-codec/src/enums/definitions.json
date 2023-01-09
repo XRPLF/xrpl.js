@@ -762,6 +762,16 @@
       }
     ],
     [
+      "LockCount",
+      {
+        "nth": 47,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "nth": 1,
@@ -1415,6 +1425,16 @@
       "NFTokenBrokerFee",
       {
         "nth": 19,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "LockedBalance",
+      {
+        "nth": 21,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2298,7 +2318,8 @@
     "tecCANT_ACCEPT_OWN_NFTOKEN_OFFER": 158,
     "tecINSUFFICIENT_FUNDS": 159,
     "tecOBJECT_NOT_FOUND": 160,
-    "tecINSUFFICIENT_PAYMENT": 161
+    "tecINSUFFICIENT_PAYMENT": 161,
+    "tecPRECISION_LOSS": 162
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,

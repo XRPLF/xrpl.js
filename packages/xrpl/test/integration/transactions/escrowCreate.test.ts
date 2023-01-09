@@ -15,7 +15,7 @@ describe('EscrowCreate', function () {
   beforeEach(_.partial(setupClient, serverUrl))
   afterEach(teardownClient)
 
-  it('base', async function () {
+  it('native', async function () {
     // get the most recent close_time from the standalone container for finish after.
     const CLOSE_TIME: number = (
       await this.client.request({
@@ -28,8 +28,43 @@ describe('EscrowCreate', function () {
     const tx: EscrowCreate = {
       Account: this.wallet.classicAddress,
       TransactionType: 'EscrowCreate',
-      Amount: '10000',
+      Amount: '1000',
       Destination: wallet1.classicAddress,
+      FinishAfter: CLOSE_TIME + 2,
+    }
+
+    await testTransaction(this.client, tx, this.wallet)
+
+    // check that the object was actually created
+    assert.equal(
+      (
+        await this.client.request({
+          command: 'account_objects',
+          account: this.wallet.classicAddress,
+        })
+      ).result.account_objects.length,
+      1,
+    )
+  })
+
+  it('ic', async function () {
+    // get the most recent close_time from the standalone container for finish after.
+    const CLOSE_TIME: number = (
+      await this.client.request({
+        command: 'ledger',
+        ledger_index: 'validated',
+      })
+    ).result.ledger.close_time
+
+    const tx: EscrowCreate = {
+      Account: this.wallet.classicAddress,
+      TransactionType: 'EscrowCreate',
+      Amount: {
+        currency: 'USD',
+        issuer: this.gateway.classicAddress,
+        value: '1000',
+      },
+      Destination: this.destination.classicAddress,
       FinishAfter: CLOSE_TIME + 2,
     }
 

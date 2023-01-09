@@ -1,6 +1,7 @@
 import { ValidationError } from '../../errors'
+import { Amount } from '../common'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import { BaseTransaction, validateBaseTransaction, isAmount } from './common'
 
 /**
  * Add additional XRP to an open payment channel, and optionally update the
@@ -20,7 +21,7 @@ export interface PaymentChannelFund extends BaseTransaction {
    * Amount of XRP in drops to add to the channel. Must be a positive amount
    * of XRP.
    */
-  Amount: string
+  Amount: Amount
   /**
    * New Expiration time to set for the channel in seconds since the Ripple
    * Epoch. This must be later than either the current time plus the SettleDelay
@@ -55,8 +56,8 @@ export function validatePaymentChannelFund(tx: Record<string, unknown>): void {
     throw new ValidationError('PaymentChannelFund: missing Amount')
   }
 
-  if (typeof tx.Amount !== 'string') {
-    throw new ValidationError('PaymentChannelFund: Amount must be a string')
+  if (typeof tx.Amount !== 'string' && !isAmount(tx.Amount)) {
+    throw new ValidationError('PaymentChannelFund: invalid Amount')
   }
 
   if (tx.Expiration !== undefined && typeof tx.Expiration !== 'number') {

@@ -1,7 +1,13 @@
 /* eslint-disable complexity -- Necessary for validatePaymentChannelClaim */
 import { ValidationError } from '../../errors'
+import { Amount } from '../common'
 
-import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  GlobalFlags,
+  validateBaseTransaction,
+  isAmount,
+} from './common'
 
 /**
  * Enum representing values for PaymentChannelClaim transaction flags.
@@ -108,13 +114,13 @@ export interface PaymentChannelClaim extends BaseTransaction {
    * delivered by the channel so far, but not greater than the Amount of the
    * signed claim. Must be provided except when closing the channel.
    */
-  Balance?: string
+  Balance?: Amount
   /**
    * The amount of XRP, in drops, authorized by the Signature. This must match
    * the amount in the signed message. This is the cumulative amount of XRP that
    * can be dispensed by the channel, including XRP previously redeemed.
    */
-  Amount?: string
+  Amount?: Amount
   /**
    * The signature of this claim, as hexadecimal. The signed message contains
    * the channel ID and the amount of the claim. Required unless the sender of
@@ -147,12 +153,20 @@ export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
     throw new ValidationError('PaymentChannelClaim: Channel must be a string')
   }
 
-  if (tx.Balance !== undefined && typeof tx.Balance !== 'string') {
-    throw new ValidationError('PaymentChannelClaim: Balance must be a string')
+  if (
+    tx.Balance !== undefined &&
+    typeof tx.Balance !== 'string' &&
+    !isAmount(tx.Balance)
+  ) {
+    throw new ValidationError('PaymentChannelClaim: invalid Balance')
   }
 
-  if (tx.Amount !== undefined && typeof tx.Amount !== 'string') {
-    throw new ValidationError('PaymentChannelClaim: Amount must be a string')
+  if (
+    tx.Amount !== undefined &&
+    typeof tx.Amount !== 'string' &&
+    !isAmount(tx.Amount)
+  ) {
+    throw new ValidationError('PaymentChannelClaim: invalid Amount')
   }
 
   if (tx.Signature !== undefined && typeof tx.Signature !== 'string') {
