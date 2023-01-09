@@ -1,6 +1,5 @@
 import { assert } from 'chai'
-
-import ExponentialBackoff from '../src/client/ExponentialBackoff'
+import ExponentialBackoff from 'xrpl-local/client/ExponentialBackoff'
 
 describe('ExponentialBackoff', function () {
   it('duration() return value starts with the min value', function () {
