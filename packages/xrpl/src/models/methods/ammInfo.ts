@@ -92,6 +92,9 @@ export interface AMMInfoResponse extends BaseResponse {
          */
         price: Amount
 
+        /**
+         * Total slot time of 24-hours is divided into 20 equal time intervals.
+         */
         time_interval: number
       }
 
