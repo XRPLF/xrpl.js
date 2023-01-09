@@ -21,7 +21,7 @@ export interface XChainAddAttestation extends BaseTransaction {
 
         AttestationRewardAccount: string
 
-        Destination: string
+        Destination?: string
 
         PublicKey: string
 
