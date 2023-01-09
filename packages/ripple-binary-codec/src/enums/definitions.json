@@ -2099,9 +2099,9 @@
       }
     ],
     [
-      "Asset",
+      "IssuingChainIssue",
       {
-        "nth": 3,
+        "nth": 2,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2109,9 +2109,9 @@
       }
     ],
     [
-      "IssuingChainIssue",
+      "Asset",
       {
-        "nth": 2,
+        "nth": 3,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,

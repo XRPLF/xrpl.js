@@ -61,6 +61,18 @@
 </code></pre>
 <p>For more examples, see the <a href="#documentation">documentation</a>.</p>
 
+<a href="#try-it-out-now" id="try-it-out-now" style="color: inherit; text-decoration: none;">
+  <h2>Try it out now!</h2>
+</a>
+<p>If you just want to try xrpl.js, you can fork this Code Sandbox template:
+<a href="https://codesandbox.io/s/xrpl-intro-pxgdjr?file=/src/App.js">https://codesandbox.io/s/xrpl-intro-pxgdjr?file=/src/App.js</a></p>
+<p>It goes through:</p>
+<ol>
+<li>Creating a new test account</li>
+<li>Sending a payment transaction </li>
+<li>And sending requests to see your account balance</li>
+</ol>
+
 <a href="#using-xrpljs-with-create-react-app" id="using-xrpljs-with-create-react-app" style="color: inherit; text-decoration: none;">
   <h3>Using xrpl.js with <code>create-react-app</code></h3>
 </a>
@@ -87,6 +99,8 @@
 </ol>
 </li>
 </ol>
+<p>This online template uses these steps to run xrpl.js with React in the browser:
+<a href="https://codesandbox.io/s/xrpl-intro-pxgdjr?file=/src/App.js">https://codesandbox.io/s/xrpl-intro-pxgdjr?file=/src/App.js</a></p>
 
 <a href="#using-xrpljs-with-react-native" id="using-xrpljs-with-react-native" style="color: inherit; text-decoration: none;">
   <h3>Using xrpl.js with React Native</h3>
@@ -111,6 +125,24 @@
 </li>
 </ol>
 <pre><code class="language-javascript"><span class="hl-6">import</span><span class="hl-1"> </span><span class="hl-5">&#39;./shim&#39;</span><br/><span class="hl-1">...</span>
+</code></pre>
+
+<a href="#using-xrpljs-with-vite-react" id="using-xrpljs-with-vite-react" style="color: inherit; text-decoration: none;">
+  <h3>Using xrpl.js with Vite React</h3>
+</a>
+<p>Similar to above, to get xrpl.js to work with Vite you need to set up a couple aliases in the vite.config.ts file. </p>
+<ol>
+<li><p>If it&#39;s a fresh project you can use <code>npm create vite@latest</code> then choose the React and TypeScript options.</p>
+</li>
+<li><p>Copy these settings into your <code>vite.config.ts</code> file.</p>
+</li>
+</ol>
+<pre><code><span class="hl-6">import</span><span class="hl-1"> { </span><span class="hl-0">defineConfig</span><span class="hl-1"> } </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-5">&#39;vite&#39;</span><br/><span class="hl-6">import</span><span class="hl-1"> </span><span class="hl-0">react</span><span class="hl-1"> </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-5">&#39;@vitejs/plugin-react&#39;</span><br/><span class="hl-6">import</span><span class="hl-1"> { </span><span class="hl-0">NodeGlobalsPolyfillPlugin</span><span class="hl-1"> } </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-5">&quot;@esbuild-plugins/node-globals-polyfill&quot;</span><span class="hl-1">;</span><br/><span class="hl-6">import</span><span class="hl-1"> </span><span class="hl-0">polyfillNode</span><span class="hl-1"> </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-5">&#39;rollup-plugin-polyfill-node&#39;</span><br/><br/><span class="hl-8">// https://vitejs.dev/config/</span><br/><span class="hl-6">export</span><span class="hl-1"> </span><span class="hl-6">default</span><span class="hl-1"> </span><span class="hl-4">defineConfig</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-0">plugins:</span><span class="hl-1"> [</span><span class="hl-4">react</span><span class="hl-1">()],</span><br/><span class="hl-1">  </span><span class="hl-0">define:</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-5">&#39;process.env&#39;</span><span class="hl-0">:</span><span class="hl-1"> {}</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">  </span><span class="hl-0">optimizeDeps:</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-0">esbuildOptions:</span><span class="hl-1"> {</span><br/><br/><span class="hl-1">        </span><span class="hl-0">define:</span><span class="hl-1"> {</span><br/><span class="hl-1">          </span><span class="hl-0">global:</span><span class="hl-1"> </span><span class="hl-5">&#39;globalThis&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">        },</span><br/><span class="hl-1">        </span><span class="hl-0">plugins:</span><span class="hl-1"> [</span><br/><span class="hl-1">            </span><span class="hl-4">NodeGlobalsPolyfillPlugin</span><span class="hl-1">({</span><br/><span class="hl-1">                </span><span class="hl-0">process:</span><span class="hl-1"> </span><span class="hl-2">true</span><span class="hl-1">,</span><br/><span class="hl-1">                </span><span class="hl-0">buffer:</span><span class="hl-1"> </span><span class="hl-2">true</span><span class="hl-1">,</span><br/><span class="hl-1">            }),</span><br/><span class="hl-1">        ],</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">},</span><br/><span class="hl-0">build:</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-0">rollupOptions:</span><span class="hl-1"> {</span><br/><span class="hl-1">      </span><span class="hl-0">plugins:</span><span class="hl-1"> [</span><br/><span class="hl-1">          </span><span class="hl-4">polyfillNode</span><span class="hl-1">(),</span><br/><span class="hl-1">      ]</span><br/><span class="hl-1">  }</span><br/><span class="hl-1">},</span><br/><span class="hl-0">resolve:</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-0">alias:</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-0">events:</span><span class="hl-1"> </span><span class="hl-5">&#39;events&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-0">crypto:</span><span class="hl-1"> </span><span class="hl-5">&#39;crypto-browserify&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-0">stream:</span><span class="hl-1"> </span><span class="hl-5">&#39;stream-browserify&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-0">http:</span><span class="hl-1"> </span><span class="hl-5">&#39;stream-http&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-0">https:</span><span class="hl-1"> </span><span class="hl-5">&#39;https-browserify&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-0">ws:</span><span class="hl-1"> </span><span class="hl-5">&#39;xrpl/dist/npm/client/WSWrapper&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">}})</span>
+</code></pre>
+<ol start="3">
+<li>Install the config dependencies and xrpl (e.g. using this command)</li>
+</ol>
+<pre><code><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">install</span><span class="hl-1"> --</span><span class="hl-0">save</span><span class="hl-1">-</span><span class="hl-0">dev</span><span class="hl-1"> @</span><span class="hl-0">esbuild</span><span class="hl-1">-</span><span class="hl-0">plugins</span><span class="hl-1">/</span><span class="hl-0">node</span><span class="hl-1">-</span><span class="hl-0">globals</span><span class="hl-1">-</span><span class="hl-0">polyfill</span><span class="hl-1"> \</span><br/><span class="hl-1">        </span><span class="hl-0">rollup</span><span class="hl-1">-</span><span class="hl-0">plugin</span><span class="hl-1">-</span><span class="hl-0">polyfill</span><span class="hl-1">-</span><span class="hl-0">node</span><span class="hl-1"> \</span><br/><span class="hl-1">        &amp;&amp; </span><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">install</span><br/><span class="hl-1">        </span><span class="hl-0">events</span><span class="hl-1"> \</span><br/><span class="hl-1">        </span><span class="hl-0">crypto</span><span class="hl-1">-</span><span class="hl-0">browserify</span><span class="hl-1"> \</span><br/><span class="hl-1">        </span><span class="hl-0">stream</span><span class="hl-1">-</span><span class="hl-0">browserify</span><span class="hl-1"> \</span><br/><span class="hl-1">        </span><span class="hl-0">stream</span><span class="hl-1">-</span><span class="hl-0">http</span><span class="hl-1"> \</span><br/><span class="hl-1">        </span><span class="hl-0">https</span><span class="hl-1">-</span><span class="hl-0">browserify</span><span class="hl-1"> \</span><br/><span class="hl-1">        </span><span class="hl-0">xrpl</span>
 </code></pre>
 
 <a href="#using-xrpljs-with-deno" id="using-xrpljs-with-deno" style="color: inherit; text-decoration: none;">
