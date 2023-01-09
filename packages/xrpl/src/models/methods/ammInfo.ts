@@ -115,18 +115,6 @@ export interface AMMInfoResponse extends BaseResponse {
        * Keeps a track of up to eight active votes for the instance.
        */
       vote_slots?: VoteEntry[]
-
-      /**
-       * The ledger index of the current in-progress ledger, which was used when
-       * retrieving this information.
-       */
-      ledger_current_index?: number
-
-      /**
-       * True if this data is from a validated ledger version; if omitted or set
-       * to false, this data is not final.
-       */
-      validated?: boolean
     }
 
     /**
