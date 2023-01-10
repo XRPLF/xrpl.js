@@ -63,6 +63,16 @@ main()
 
 For more examples, see the [documentation](#documentation).
 
+## Try it out now!
+
+If you just want to try xrpl.js, you can fork this Code Sandbox template:
+https://codesandbox.io/s/xrpl-intro-pxgdjr?file=/src/App.js
+
+It goes through:
+1. Creating a new test account
+2. Sending a payment transaction 
+3. And sending requests to see your account balance
+
 ### Using xrpl.js with `create-react-app`
 To use `xrpl.js` with React, you need to install shims for core NodeJS modules. Starting with version 5, Webpack stopped including shims by default, so you must modify your Webpack configuration to add the shims you need. Either you can eject your config and modify it, or you can use a library such as `react-app-rewired`. The example below uses `react-app-rewired`.
 
@@ -129,6 +139,9 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
         "test": "react-app-rewired test",
         ```
 
+This online template uses these steps to run xrpl.js with React in the browser:
+https://codesandbox.io/s/xrpl-intro-pxgdjr?file=/src/App.js
+
 ### Using xrpl.js with React Native
 
 If you want to use `xrpl.js` with React Native you will need to install shims for core NodeJS modules. To help with this you can use a module like [rn-nodeify](https://github.com/tradle/rn-nodeify).
@@ -169,6 +182,72 @@ If you want to use `xrpl.js` with React Native you will need to install shims fo
   import './shim'
   ...
   ```
+### Using xrpl.js with Vite React
+
+Similar to above, to get xrpl.js to work with Vite you need to set up a couple aliases in the vite.config.ts file. 
+
+1. If it's a fresh project you can use `npm create vite@latest` then choose the React and TypeScript options.
+
+2. Copy these settings into your `vite.config.ts` file.
+
+```
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
+import polyfillNode from 'rollup-plugin-polyfill-node'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  define: {
+    'process.env': {}
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+
+        define: {
+          global: 'globalThis',
+        },
+        plugins: [
+            NodeGlobalsPolyfillPlugin({
+                process: true,
+                buffer: true,
+            }),
+        ],
+    },
+},
+build: {
+  rollupOptions: {
+      plugins: [
+          polyfillNode(),
+      ]
+  }
+},
+resolve: {
+  alias: {
+    events: 'events',
+    crypto: 'crypto-browserify',
+    stream: 'stream-browserify',
+    http: 'stream-http',
+    https: 'https-browserify',
+    ws: 'xrpl/dist/npm/client/WSWrapper',
+  },
+}})
+```
+
+3. Install the config dependencies and xrpl (e.g. using this command)
+
+```
+npm install --save-dev @esbuild-plugins/node-globals-polyfill \
+		rollup-plugin-polyfill-node \
+		&& npm install
+		events \
+		crypto-browserify \
+		stream-browserify \
+		stream-http \
+		https-browserify \
+		xrpl
+```
 
 ### Using xrpl.js with Deno
 
