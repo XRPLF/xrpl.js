@@ -3,6 +3,11 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 
+## 2.8.0-beta.0 (2023-01-10)
+### Added
+* Updated amm_info response model
+
+## 2.7.0-beta.0 (2022-12-15)
 ### Added
 * Support for cross-chain bridge proposal
 * New AMM API signature changes
@@ -10,9 +15,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Deprecated
 Wallet.fromMmnemonic()
 
-
 ## 2.6.0 (2022-11-21)
-
 ### Fixed
 * Ignore `https-proxy-agent` in browsers for improved Vite integration
 

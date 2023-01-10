@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 1.6.0-beta.0 (2023-01-10)
+- Refactored AMM error code definitions
+
 ## 1.5.0-beta.2 (2022-11-17)
 - Added new Issue type
 
