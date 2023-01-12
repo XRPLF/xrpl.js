@@ -35,6 +35,8 @@ export interface ServerStateResponse extends BaseResponse {
       io_latency_ms: number
       jq_trans_overflow: string
       last_close: {
+        // coverage_time_s only exists for "human" api requests. We make "non human" api requests,
+        // therefore the type is coverage_time
         converge_time: number
         proposers: number
       }

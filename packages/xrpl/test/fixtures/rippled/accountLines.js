@@ -1,4 +1,4 @@
-const _ = require('lodash')
+const defaults = require('lodash/defaults')
 
 const BASE_LEDGER_INDEX = 8819951
 
@@ -37,7 +37,7 @@ function getMarkerAndLinesFromRequest(request) {
 }
 
 module.exports.normal = function (request, options = {}) {
-  _.defaults(options, {
+  defaults(options, {
     ledger: BASE_LEDGER_INDEX,
   })
 
@@ -292,7 +292,7 @@ module.exports.normal = function (request, options = {}) {
 }
 
 module.exports.counterparty = function (request, options = {}) {
-  _.defaults(options, {
+  defaults(options, {
     ledger: BASE_LEDGER_INDEX,
   })
 
@@ -359,7 +359,7 @@ module.exports.counterparty = function (request, options = {}) {
 }
 
 module.exports.manyItems = function (request, options = {}) {
-  _.defaults(options, {
+  defaults(options, {
     ledger: BASE_LEDGER_INDEX,
   })
 
@@ -380,7 +380,7 @@ module.exports.manyItems = function (request, options = {}) {
 }
 
 module.exports.ripplingDisabled = function (request, options = {}) {
-  _.defaults(options, {
+  defaults(options, {
     ledger: BASE_LEDGER_INDEX,
   })
 

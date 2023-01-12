@@ -41,6 +41,10 @@ type RequireAtLeastOne<T, Keys extends keyof T = keyof T> = Pick<
     [K in Keys]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<Keys, K>>>
   }[Keys]
 
+// https://xrpl.org/rippled-server-states.html
+// The distinction between full, validating, and proposing is based on synchronization with the rest of the global network,
+// and it is normal for a server to fluctuate between these states as a course of general operation.
+// Construct a type that requires at least one of these fields to be present.
 export type StateAccountingFinal = Record<
   Exclude<ServerState, 'full' | 'validating' | 'proposing'>,
   StateAccounting
@@ -178,6 +182,9 @@ export interface ServerInfoResponse extends BaseResponse {
        * cost.
        */
       load_factor_server?: number
+      /**
+       * The number of peer connections which were severed.
+       */
       peer_disconnects?: string
       peer_disconnects_resources?: string
       network_ledger?: 'waiting'

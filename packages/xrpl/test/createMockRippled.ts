@@ -181,7 +181,6 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
         }),
       )
     } else if (request.data.openOnOtherPort) {
-      // TODO: This promise is never awaited
       getFreePort().then(async (newPort) => {
         createMockRippled(port)
         conn.send(

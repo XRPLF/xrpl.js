@@ -1,4 +1,4 @@
-import * as binary from 'ripple-binary-codec'
+import { encodeForSigningClaim } from 'ripple-binary-codec'
 import * as keypairs from 'ripple-keypairs'
 
 import { xrpToDrops } from './xrpConversion'
@@ -17,7 +17,7 @@ function signPaymentChannelClaim(
   amount: string,
   privateKey: string,
 ): string {
-  const signingData = binary.encodeForSigningClaim({
+  const signingData = encodeForSigningClaim({
     channel,
     amount: xrpToDrops(amount),
   })
