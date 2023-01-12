@@ -1,5 +1,4 @@
-// Change to 'xrpl' if you are using this code outside of the xrpl.js repo
-import { Client, Payment } from 'xrpl-local'
+import { Client, Payment } from 'xrpl'
 
 /**
  * When implementing Reliable Transaction Submission, there are many potential solutions, each with different trade-offs.

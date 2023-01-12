@@ -1,11 +1,10 @@
-// Change to 'xrpl' if you are using this code outside of the xrpl.js repo
 import {
   AccountObjectsRequest,
   Client,
   EscrowCreate,
   EscrowFinish,
   isoTimeToRippleTime,
-} from 'xrpl-local'
+} from 'xrpl'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 

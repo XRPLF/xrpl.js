@@ -1,5 +1,4 @@
-// Change to 'xrpl' if you are using this code outside of the xrpl.js repo
-import { Client, Payment, SetRegularKey } from 'xrpl-local'
+import { Client, Payment, SetRegularKey } from 'xrpl'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 

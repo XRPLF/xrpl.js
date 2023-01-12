@@ -1,11 +1,10 @@
-// Change to 'xrpl' if you are using this code outside of the xrpl.js repo
 import {
   multisign,
   Client,
   AccountSet,
   convertStringToHex,
   SignerListSet,
-} from 'xrpl-local'
+} from 'xrpl'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
