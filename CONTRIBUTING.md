@@ -215,14 +215,3 @@ We have a low-traffic mailing list for announcements of new `xrpl.js` releases. 
 If you're using the XRP Ledger in production, you should run a [rippled server](https://github.com/ripple/rippled) and subscribe to the ripple-server mailing list as well.
 
 + [Subscribe to ripple-server](https://groups.google.com/g/ripple-server)
-
-# How to upgrade npm packages
-
-We use a package called [npm-check-updates](https://www.npmjs.com/package/npm-check-updates). We use a file called `.ncurc.json` in order to filter which packages are skipped during update.
-
-`npm run update:check`
-
-Make sure all look good.
-
-`npm run update:confirm`
-`npm install`
