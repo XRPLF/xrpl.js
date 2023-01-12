@@ -24,7 +24,6 @@ async function sendLedgerAccept(client: Client): Promise<unknown> {
 /**
  * Throttles an async function in a way that can be awaited.
  * By default throttle doesn't return a promise for async functions unless it's invoking them immediately.
- * See CUR-4769 for details.
  *
  * @param func - async function to throttle calls for.
  * @param wait - same function as lodash.throttle's wait parameter. Call this function at most this often.

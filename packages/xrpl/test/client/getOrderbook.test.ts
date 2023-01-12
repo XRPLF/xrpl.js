@@ -124,7 +124,7 @@ describe('client.getOrderbook', function () {
     testContext.mockRippled!.addResponse('book_offers', normalRippledResponse)
     await Promise.all(
       invalidOptions.map(
-        async (options) =>
+        async (invalidOptionObject) =>
           new Promise<void>((resolve) => {
             assertRejects(
               testContext.client
@@ -132,7 +132,7 @@ describe('client.getOrderbook', function () {
                   requests.getOrderbook.normal.takerPays,
                   requests.getOrderbook.normal.takerGets,
                   // @ts-expect-error Meant to be invalid for testing purposes
-                  options,
+                  invalidOptionObject,
                 )
                 .catch((error) => {
                   resolve()

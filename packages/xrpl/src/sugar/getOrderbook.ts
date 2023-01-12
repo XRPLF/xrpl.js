@@ -98,11 +98,7 @@ async function getOrderbook(
     )
   }
 
-  if (
-    options.taker !== undefined &&
-    options.taker !== null &&
-    typeof options.taker !== 'string'
-  ) {
+  if (options.taker !== undefined && typeof options.taker !== 'string') {
     throw new ValidationError('taker must be a string', options.taker)
   }
 

@@ -44,7 +44,7 @@ describe('getFeeXrp', function () {
      * Ensure that overriding with high maxFeeXRP of '51540' causes no errors.
      * (fee will actually be 51539.607552)
      */
-    // @ts-expect-error Manually setting this for the purposese of testing
+    // @ts-expect-error Manually setting this for the purpose of testing
     testContext.client.maxFeeXRP = '51540'
     const fee = await getFeeXrp(testContext.client)
     assert.strictEqual(fee, '51539.607552')
@@ -55,7 +55,7 @@ describe('getFeeXrp', function () {
       'server_info',
       rippled.server_info.normal,
     )
-    // @ts-expect-error Manually setting this for the purposese of testing
+    // @ts-expect-error Manually setting this for the purpose of testing
     testContext.client.feeCushion = 1.4
     const fee = await getFeeXrp(testContext.client)
     assert.strictEqual(fee, '0.000014')
@@ -70,7 +70,7 @@ describe('getFeeXrp', function () {
       'server_info',
       rippled.server_info.normal,
     )
-    // @ts-expect-error Manually setting this for the purposese of testing
+    // @ts-expect-error Manually setting this for the purpose of testing
     testContext.client.feeCushion = 0.9
     const fee = await getFeeXrp(testContext.client)
     assert.strictEqual(fee, '0.000009')

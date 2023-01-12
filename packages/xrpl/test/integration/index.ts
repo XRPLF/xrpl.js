@@ -37,6 +37,7 @@ export * from './requests/noRippleCheck.test'
 export * from './requests/pathFind.test'
 export * from './requests/ripplePathFind.test'
 export * from './requests/serverInfo.test'
+export * from './requests/serverState.test'
 export * from './requests/submit.test'
 export * from './requests/submitMultisigned.test'
 export * from './requests/subscribe.test'
@@ -48,7 +49,9 @@ export * from './integration.test'
 export * from './onConnect.test'
 export * from './regularKey.test'
 export * from './submitAndWait.test'
+export * from './wallet.test'
 
+// Because this does 256 ledger accepts, we do it last
 export * from './transactions/accountDelete.test'
 
 // Ensure you export all added tests above "export * from './finalTest'", otherwise they will not be run.

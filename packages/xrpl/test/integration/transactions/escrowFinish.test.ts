@@ -45,7 +45,7 @@ describe('EscrowFinish', function () {
       const createTx: EscrowCreate = {
         Account: testContext.wallet.classicAddress,
         TransactionType: 'EscrowCreate',
-        Amount: '10000',
+        Amount: AMOUNT.toString(),
         Destination: wallet1.classicAddress,
         FinishAfter: CLOSE_TIME + 2,
       }

@@ -32,6 +32,19 @@
     "ripple-keypairs": "^1.1.4",
     "ws": "^8.2.2"
   },
+  "devDependencies": {
+    "@geut/browser-node-core": "^2.0.13",
+    "@types/node": "^14.18.36",
+    "assert-browserify": "^2.0.0",
+    "browserify-fs": "^1.0.0",
+    "constants-browserify": "^1.0.0",
+    "karma": "^6.4.1",
+    "karma-chrome-launcher": "^3.1.1",
+    "karma-jasmine": "^5.1.0",
+    "karma-webpack": "^5.0.0",
+    "xrpl": "file:./src",
+    "xrpl-local": "file:./src"
+  },
   "resolutions": {
     "elliptic": "^6.5.4"
   },
@@ -65,14 +78,5 @@
   "readmeFilename": "README.md",
   "engines": {
     "node": ">=14"
-  },
-  "devDependencies": {
-    "@geut/browser-node-core": "^2.0.13",
-    "@types/node": "^14.18.36",
-    "assert-browserify": "^2.0.0",
-    "browserify-fs": "^1.0.0",
-    "constants-browserify": "^1.0.0",
-    "xrpl": "file:./src",
-    "xrpl-local": "file:./src"
   }
 }
