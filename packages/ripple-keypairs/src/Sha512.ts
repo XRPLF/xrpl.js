@@ -1,7 +1,6 @@
 /* eslint-disable no-bitwise --
  * lots of bitwise operators necessary for this */
 import * as hashjs from 'hash.js'
-// eslint-disable-next-line @typescript-eslint/no-require-import -- Correct syntax
 import BigNum = require('bn.js')
 
 export default class Sha512 {
