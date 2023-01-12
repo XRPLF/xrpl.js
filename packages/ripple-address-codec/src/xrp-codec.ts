@@ -205,7 +205,7 @@ export function decodeSeed(
 ): {
   version: number[]
   bytes: Buffer
-  type: string | null
+  type: 'ed25519' | 'secp256k1' | null
 } {
   return codecWithXrpAlphabet.decode(seed, opts)
 }
