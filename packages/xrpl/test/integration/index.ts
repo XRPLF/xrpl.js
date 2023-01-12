@@ -1,10 +1,10 @@
 /* eslint-disable import/export -- Tells webpack which files exist. */
-export * from './transactions/escrowCancel.test'
 export * from './transactions/accountSet.test'
 export * from './transactions/checkCancel.test'
 export * from './transactions/checkCash.test'
 export * from './transactions/checkCreate.test'
 export * from './transactions/depositPreauth.test'
+export * from './transactions/escrowCancel.test'
 export * from './transactions/escrowCreate.test'
 export * from './transactions/escrowFinish.test'
 export * from './transactions/offerCancel.test'

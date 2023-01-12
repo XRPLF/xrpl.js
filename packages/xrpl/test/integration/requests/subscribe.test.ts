@@ -41,10 +41,10 @@ async function createTxHandlerTest(
     accounts: [wallet.classicAddress],
   }
 
-  await client.request(request).then((response) => {
-    assert.equal(response.type, 'response')
-    assert.deepEqual(response.result, {})
-  })
+  const response = await client.request(request)
+
+  assert.equal(response.type, 'response')
+  assert.deepEqual(response.result, {})
 
   return { transactionPromise }
 }
