@@ -80,6 +80,7 @@ module.exports = {
         'max-statements': 'off',
         // Snippets have logs on console to better understand the working.
         'no-console': 'off',
+        'import/no-extraneous-dependencies': 'off',
       },
     },
     {

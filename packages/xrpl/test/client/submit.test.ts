@@ -2,8 +2,8 @@ import { assert } from 'chai'
 import cloneDeep from 'lodash/cloneDeep'
 import { ValidationError } from 'xrpl-local'
 import { Transaction } from 'xrpl-local/models/transactions'
-import Wallet from 'xrpl-local/Wallet'
 
+import Wallet from '../../src/Wallet'
 import rippled from '../fixtures/rippled'
 import {
   setupClient,

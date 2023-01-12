@@ -57,7 +57,7 @@ class Codec {
   ): {
     version: number[]
     bytes: Buffer
-    type: string | null
+    type: 'ed25519' | 'secp256k1' | null
   } {
     const versions = opts.versions
     const types = opts.versionTypes

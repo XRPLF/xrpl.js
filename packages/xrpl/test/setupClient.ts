@@ -1,4 +1,5 @@
-import { Client, BroadcastClient } from 'xrpl-local'
+import { Client } from '../src/client'
+import BroadcastClient from '../src/client/BroadcastClient'
 
 import createMockRippled, {
   type MockedWebSocketServer,

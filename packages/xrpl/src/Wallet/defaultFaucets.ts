@@ -1,5 +1,4 @@
-import { Client } from 'xrpl-local'
-
+import type { Client } from '../client'
 import { XRPLFaucetError } from '../errors'
 
 export interface FaucetWallet {

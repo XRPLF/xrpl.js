@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import type { Client } from 'xrpl-local'
 
+import type { Client } from '../../src/client'
 import {
   FaucetNetwork,
   FaucetNetworkPaths,

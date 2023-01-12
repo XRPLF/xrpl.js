@@ -48,7 +48,9 @@ describe('ripple-address-codec', function () {
     const decoded = api.decodeSeed(edSeed)
     assert.equal(toHex(decoded.bytes), '4C3A1D213FBDFB14C7C28D609469B341')
     assert.equal(decoded.type, 'ed25519')
-    // @ts-expect-error -- We are testing ed25519 here
+    if (decoded.type === null) {
+      assert.fail('decoded.type should not be null')
+    }
     assert.equal(api.encodeSeed(decoded.bytes, decoded.type), edSeed)
   })
 })
