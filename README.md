@@ -15,7 +15,7 @@ See the full reference documentation for all classes, methods, and utilities.
 
 1. Managing keys & creating test credentials ([`Wallet`](https://js.xrpl.org/classes/Wallet.html) && [`Client.fundWallet()`](https://js.xrpl.org/classes/Client.html#fundWallet))
 2. Submitting transactions to the XRP Ledger ([`Client.submit(...)`](https://js.xrpl.org/classes/Client.html#submit) & [transaction types](https://xrpl.org/transaction-types.html))
-3. Sending requests to observe the ledger ([`Client.request(...)`](https://js.xrpl.org/classes/Client.html#request) using [public api methods](https://xrpl.org/public-api-methods.html))
+3. Sending requests to observe the ledger ([`Client.request(...)`](https://js.xrpl.org/classes/Client.html#request) using [public API methods](https://xrpl.org/public-api-methods.html))
 4. Subscribing to changes in the ledger ([Ex. ledger, transactions, & more...](https://xrpl.org/subscribe.html))
 5. Helper functions to parse ledger data (Ex. [`xrpToDrops`](https://js.xrpl.org/functions/xrpToDrops.html))
 
