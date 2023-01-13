@@ -17,7 +17,7 @@ See the full reference documentation for all classes, methods, and utilities.
 2. Submitting transactions to the XRP Ledger ([`Client.submit(...)`](https://js.xrpl.org/classes/Client.html#submit) & [transaction types](https://xrpl.org/transaction-types.html))
 3. Sending requests to observe the ledger ([`Client.request(...)`](https://js.xrpl.org/classes/Client.html#request) using [public API methods](https://xrpl.org/public-api-methods.html))
 4. Subscribing to changes in the ledger ([Ex. ledger, transactions, & more...](https://xrpl.org/subscribe.html))
-5. Helper functions to parse ledger data (Ex. [`xrpToDrops`](https://js.xrpl.org/functions/xrpToDrops.html))
+5. Parsing ledger data into more convenient formats ([`xrpToDrops`](https://js.xrpl.org/functions/xrpToDrops.html) and [`rippleTimeToISOTime`](https://js.xrpl.org/functions/rippleTimeToISOTime.html))
 
 All of which works in Node.js (tested for v14+) & web browsers (tested for Chrome).
 
