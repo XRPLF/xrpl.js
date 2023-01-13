@@ -186,9 +186,9 @@ export interface ServerInfoResponse extends BaseResponse {
        * The number of peer connections which were severed.
        */
       peer_disconnects?: string
-     /*
-      * The number of peer connections which were severed due to excess resource consumption.
-      */
+      /**
+       * The number of peer connections which were severed due to excess resource consumption.
+       */
       peer_disconnects_resources?: string
       network_ledger?: 'waiting'
       /** How many other rippled servers this one is currently connected to. */
