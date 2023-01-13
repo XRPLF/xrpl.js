@@ -8,7 +8,8 @@ describe('Client', function () {
   it(
     'Client - implicit server port',
     () => {
-      const _ = new Client('wss://s1.ripple.com')
+      // eslint-disable-next-line no-new -- Need to test constructor
+      new Client('wss://s1.ripple.com')
     },
     TIMEOUT,
   )
