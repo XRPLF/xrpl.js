@@ -109,7 +109,7 @@ async function getOrderbook(
     ledger_index: options.ledger_index ?? 'validated',
     ledger_hash: options.ledger_hash === null ? undefined : options.ledger_hash,
     limit: options.limit ?? DEFAULT_LIMIT,
-    taker: options.taker === null ? undefined : options.taker,
+    taker: options.taker ? options.taker : undefined,
   }
   // 2. Make Request
   const directOfferResults = await this.requestAll(request)
