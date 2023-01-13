@@ -1,6 +1,6 @@
 {
   "diff": true,
-  "spec": ["./test/*.ts", "./test/models/**/*.ts", "./test/utils/**/*.ts", "./test/wallet/**/*.ts"],
+  "spec": ["./test/*.test.ts", "./test/models/**/*.test.ts", "./test/utils/**/*.test.ts", "./test/wallet/**/*.test.ts"],
   "extension": ["ts"],
   "package": "../package.json",
   "require": "ts-node/register",
@@ -12,7 +12,7 @@
   "ui": "bdd",
   "watch-files": [
     "src/**/*.ts",
-    "test/**/*.ts"
+    "test/**/*.test.ts"
   ],
   "watch-ignore": [
     "test/node_modules/**/*",
