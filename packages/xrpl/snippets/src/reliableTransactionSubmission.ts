@@ -1,4 +1,4 @@
-import { Client, Payment } from 'xrpl'
+import { Client, Payment } from 'xrpl-local'
 
 /**
  * When implementing Reliable Transaction Submission, there are many potential solutions, each with different trade-offs.

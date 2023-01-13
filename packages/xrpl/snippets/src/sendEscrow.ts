@@ -4,7 +4,7 @@ import {
   EscrowCreate,
   EscrowFinish,
   isoTimeToRippleTime,
-} from 'xrpl'
+} from 'xrpl-local'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 

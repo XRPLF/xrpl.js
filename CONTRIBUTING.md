@@ -122,8 +122,6 @@ If your code connects to the ledger (ex. Adding a new transaction type) it's han
 
 All integration tests should be written in the `test/integration` folder, with new `Requests` and `Transactions` tests being in their respective folders.
 
-One last note for integration tests is that all imports from `xrpl.js` should be from `xrpl-local` instead of `../../src`. This is required for the integraiton tests to run in the browser.
-
 For an example of how to write an integration test for `xrpl.js`, you can look at the [Payment integration test](./packages/xrpl/test/integration/transactions/payment.ts).
 
 ## Generate reference docs

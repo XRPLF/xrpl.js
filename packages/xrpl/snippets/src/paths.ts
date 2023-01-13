@@ -1,4 +1,4 @@
-import { Client, Payment, RipplePathFindResponse } from 'xrpl'
+import { Client, Payment, RipplePathFindResponse } from 'xrpl-local'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 

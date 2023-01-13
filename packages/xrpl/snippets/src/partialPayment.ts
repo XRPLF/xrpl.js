@@ -1,4 +1,4 @@
-import { Client, Payment, PaymentFlags, TrustSet } from 'xrpl'
+import { Client, Payment, PaymentFlags, TrustSet } from 'xrpl-local'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
