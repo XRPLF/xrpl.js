@@ -35,8 +35,9 @@ export interface ServerStateResponse extends BaseResponse {
       io_latency_ms: number
       jq_trans_overflow: string
       last_close: {
-        // coverage_time_s only exists for "human" api requests. We make "non human" api requests,
+        // coverage_time_s only exists for `server_info` requests. `server_state` is a "non human" api request,
         // therefore the type is coverage_time
+        // See https://github.com/XRPLF/rippled/blob/83faf43140e27e5d6d6779eaa0ffb75c33d98029/src/ripple/app/misc/NetworkOPs.cpp#L2458
         converge_time: number
         proposers: number
       }
