@@ -21,14 +21,14 @@ describe('client handling of tfPartialPayments', function () {
   })
   afterEach(async () => teardownClient(testContext))
 
-  it('Tx with no tfPartialPayment', async () => {
+  it('Tx with no tfPartialPayment', async function () {
     testContext.mockRippled!.addResponse('tx', rippled.tx.Payment)
     const resp = await testContext.client.request({ command: 'tx' })
 
     expect(resp.warnings).to.equal(undefined)
   })
 
-  it('Tx with IOU tfPartialPayment', async () => {
+  it('Tx with IOU tfPartialPayment', async function () {
     const mockResponse = { ...rippled.tx.Payment, result: partialPaymentIOU }
     testContext.mockRippled!.addResponse('tx', mockResponse)
     const resp = await testContext.client.request({ command: 'tx' })
@@ -41,7 +41,7 @@ describe('client handling of tfPartialPayments', function () {
     ])
   })
 
-  it('Tx with XRP tfPartialPayment', async () => {
+  it('Tx with XRP tfPartialPayment', async function () {
     const mockResponse = { ...rippled.tx.Payment, result: partialPaymentXRP }
     testContext.mockRippled!.addResponse('tx', mockResponse)
     const resp = await testContext.client.request({ command: 'tx' })
@@ -54,7 +54,7 @@ describe('client handling of tfPartialPayments', function () {
     ])
   })
 
-  it('account_tx with no tfPartialPayment', async () => {
+  it('account_tx with no tfPartialPayment', async function () {
     testContext.mockRippled!.addResponse(
       'account_tx',
       rippled.account_tx.normal,
@@ -64,7 +64,7 @@ describe('client handling of tfPartialPayments', function () {
     expect(resp.warnings).to.equal(undefined)
   })
 
-  it('account_tx with IOU tfPartialPayment', async () => {
+  it('account_tx with IOU tfPartialPayment', async function () {
     const partial = {
       ...rippled.tx.Payment,
       result: partialPaymentIOU,
@@ -89,7 +89,7 @@ describe('client handling of tfPartialPayments', function () {
     ])
   })
 
-  it('account_tx with XRP tfPartialPayment', async () => {
+  it('account_tx with XRP tfPartialPayment', async function () {
     // TODO: Create fixtues with partial payments instead of using ...
     const partial = { ...rippled.tx.Payment, result: partialPaymentXRP }
     const mockResponse = rippled.account_tx.normal
@@ -112,7 +112,7 @@ describe('client handling of tfPartialPayments', function () {
     ])
   })
 
-  it('transaction_entry with no tfPartialPayment', async () => {
+  it('transaction_entry with no tfPartialPayment', async function () {
     testContext.mockRippled!.addResponse(
       'transaction_entry',
       rippled.transaction_entry,
@@ -124,7 +124,7 @@ describe('client handling of tfPartialPayments', function () {
     expect(resp.warnings).to.equal(undefined)
   })
 
-  it('transaction_entry with XRP tfPartialPayment', async () => {
+  it('transaction_entry with XRP tfPartialPayment', async function () {
     const mockResponse = cloneDeep(rippled.transaction_entry)
     mockResponse.result.tx_json.Amount = '1000'
     testContext.mockRippled!.addResponse('transaction_entry', mockResponse)

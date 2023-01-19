@@ -25,7 +25,7 @@ describe('Client subscription', function () {
   })
   afterEach(async () => teardownClient(testContext))
 
-  it('Successfully Subscribes', async () => {
+  it('Successfully Subscribes', async function () {
     testContext.mockRippled!.addResponse('subscribe', rippled.subscribe.success)
 
     await assertDoesNotThrow(
@@ -33,7 +33,7 @@ describe('Client subscription', function () {
     )
   })
 
-  it('Successfully Unsubscribes', async () => {
+  it('Successfully Unsubscribes', async function () {
     testContext.mockRippled!.addResponse('unsubscribe', rippled.unsubscribe)
 
     await assertDoesNotThrow(
@@ -43,7 +43,7 @@ describe('Client subscription', function () {
     )
   })
 
-  it('Emits transaction', async () => {
+  it('Emits transaction', async function () {
     await new Promise<void>((resolve) => {
       testContext.client.on('transaction', (tx) => {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
@@ -58,7 +58,7 @@ describe('Client subscription', function () {
     })
   })
 
-  it('Emits ledger', async () => {
+  it('Emits ledger', async function () {
     await new Promise<void>((resolve) => {
       testContext.client.on('ledgerClosed', (ledger) => {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
@@ -73,7 +73,7 @@ describe('Client subscription', function () {
     })
   })
 
-  it('Emits peerStatusChange', async () => {
+  it('Emits peerStatusChange', async function () {
     await new Promise<void>((resolve) => {
       testContext.client.on('peerStatusChange', (status) => {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
@@ -88,7 +88,7 @@ describe('Client subscription', function () {
     })
   })
 
-  it('Emits consensusPhase', async () => {
+  it('Emits consensusPhase', async function () {
     await new Promise<void>((resolve) => {
       testContext.client.on('consensusPhase', (phase) => {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
@@ -103,7 +103,7 @@ describe('Client subscription', function () {
     })
   })
 
-  it('Emits path_find', async () => {
+  it('Emits path_find', async function () {
     await new Promise<void>((resolve) => {
       testContext.client.on('path_find', (path) => {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
@@ -118,7 +118,7 @@ describe('Client subscription', function () {
     })
   })
 
-  it('Emits validationReceived', async () => {
+  it('Emits validationReceived', async function () {
     await new Promise<void>((resolve) => {
       testContext.client.on('validationReceived', (path) => {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
@@ -133,7 +133,7 @@ describe('Client subscription', function () {
     })
   })
 
-  it('Emits manifestReceived', async () => {
+  it('Emits manifestReceived', async function () {
     await new Promise<void>((resolve) => {
       // @es-expect-error Seems like a valid method
       testContext.client.on('manifestReceived', (path) => {

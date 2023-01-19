@@ -15,7 +15,7 @@ describe('client.getLedgerIndex', function () {
   })
   afterEach(async () => teardownClient(testContext))
 
-  it('getLedgerIndex', async () => {
+  it('getLedgerIndex', async function () {
     testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
     const ledgerIndex = await testContext.client.getLedgerIndex()
     assert.strictEqual(ledgerIndex, 9038214)

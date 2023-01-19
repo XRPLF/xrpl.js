@@ -16,7 +16,7 @@ describe('client.isConnected', function () {
     await teardownClient(testContext)
   })
 
-  it('disconnect & isConnected', async () => {
+  it('disconnect & isConnected', async function () {
     assert.strictEqual(testContext.client.isConnected(), true)
     await testContext.client.disconnect()
     assert.strictEqual(testContext.client.isConnected(), false)

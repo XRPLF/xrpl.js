@@ -23,7 +23,7 @@ describe('client.getBalances', function () {
 
   addressTests.forEach(function (testcase) {
     describe(testcase.type, () => {
-      it('getBalances - base', async () => {
+      it('getBalances - base', async function () {
         testContext.mockRippled!.addResponse(
           'account_info',
           rippled.account_info.normal,
@@ -37,7 +37,7 @@ describe('client.getBalances', function () {
         assertResultMatch(result, responses.getBalances, 'getBalances')
       })
 
-      it('getBalances - limit', async () => {
+      it('getBalances - limit', async function () {
         const request = {
           account: testcase.address,
           options: {
@@ -64,7 +64,7 @@ describe('client.getBalances', function () {
         assertResultMatch(result, expectedResponse, 'getBalances')
       })
 
-      it('getBalances - peer', async () => {
+      it('getBalances - peer', async function () {
         const options = {
           peer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
         }
@@ -88,7 +88,7 @@ describe('client.getBalances', function () {
         assertResultMatch(result, expectedResponse, 'getBalances')
       })
 
-      it('getBalances - limit & peer', async () => {
+      it('getBalances - limit & peer', async function () {
         const options = {
           peer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
           limit: 10,

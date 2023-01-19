@@ -81,7 +81,7 @@ describe('subscribe', function () {
     TIMEOUT,
   )
 
-  it('Successfully Unsubscribes', async () => {
+  it('Successfully Unsubscribes', async function () {
     const response = await testContext.client.request({
       command: 'unsubscribe',
     })

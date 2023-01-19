@@ -487,7 +487,7 @@ describe('Connection', function () {
   )
 
   describe('reconnection test', function () {
-    it('reconnect on several unexpected close', async () => {
+    it('reconnect on several unexpected close', async function () {
       if (isBrowser) {
         if (navigator.userAgent.includes('PhantomJS')) {
           // inside PhantomJS this one just hangs, so skip as not very relevant
@@ -554,7 +554,7 @@ describe('Connection', function () {
     }, 70001)
   })
 
-  it('reconnect event on heartbeat failure', async () => {
+  it('reconnect event on heartbeat failure', async function () {
     if (isBrowser) {
       if (navigator.userAgent.includes('PhantomJS')) {
         // inside PhantomJS this one just hangs, so skip as not very relevant
@@ -584,7 +584,7 @@ describe('Connection', function () {
     await reconnectPromise
   }, 5000)
 
-  it('heartbeat failure and reconnect failure', async () => {
+  it('heartbeat failure and reconnect failure', async function () {
     if (isBrowser) {
       if (navigator.userAgent.includes('PhantomJS')) {
         // inside PhantomJS this one just hangs, so skip as not very relevant
@@ -913,7 +913,7 @@ describe('Connection', function () {
   //   }
   // })
 
-  it('should try to reconnect on empty subscribe response on reconnect', async () => {
+  it('should try to reconnect on empty subscribe response on reconnect', async function () {
     const errorPromise = new Promise<void>((resolve, reject) => {
       clientContext.client.on('error', (error) => {
         if (error) {

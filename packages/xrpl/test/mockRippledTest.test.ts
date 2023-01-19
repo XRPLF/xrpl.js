@@ -15,7 +15,7 @@ describe('mock rippled tests', function () {
     testContext = await setupClient()
   })
   afterEach(async () => teardownClient(testContext))
-  it('errors if a mock is not provided', async () => {
+  it('errors if a mock is not provided', async function () {
     if (testContext.mockRippled) {
       testContext.mockRippled.suppressOutput = true
     }
@@ -26,7 +26,7 @@ describe('mock rippled tests', function () {
     )
   })
 
-  it('provide bad response shape', async () => {
+  it('provide bad response shape', async function () {
     try {
       testContext.mockRippled!.addResponse('account_info', { data: {} })
       assert.fail('Should have errored')
@@ -37,7 +37,7 @@ describe('mock rippled tests', function () {
     }
   })
 
-  it('provide bad response shape in function', async () => {
+  it('provide bad response shape in function', async function () {
     if (testContext.mockRippled) {
       testContext.mockRippled.suppressOutput = true
     }

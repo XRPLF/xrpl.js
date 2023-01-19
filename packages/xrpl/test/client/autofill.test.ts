@@ -27,7 +27,7 @@ describe('client.autofill', function () {
   })
   afterEach(async () => teardownClient(testContext))
 
-  it('should not autofill if fields are present', async () => {
+  it('should not autofill if fields are present', async function () {
     const tx: Transaction = {
       TransactionType: 'DepositPreauth',
       Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
@@ -43,7 +43,7 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.LastLedgerSequence, LastLedgerSequence)
   })
 
-  it('converts Account & Destination X-address to their classic address', async () => {
+  it('converts Account & Destination X-address to their classic address', async function () {
     const tx: Payment = {
       TransactionType: 'Payment',
       Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
@@ -69,7 +69,7 @@ describe('client.autofill', function () {
     )
   })
 
-  it("should autofill Sequence when it's missing", async () => {
+  it("should autofill Sequence when it's missing", async function () {
     const tx: Transaction = {
       TransactionType: 'DepositPreauth',
       Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
@@ -91,7 +91,7 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.Sequence, 23)
   })
 
-  it('should throw error if account deletion blockers exist', async () => {
+  it('should throw error if account deletion blockers exist', async function () {
     testContext.mockRippled!.addResponse(
       'account_info',
       rippled.account_info.normal,
@@ -119,7 +119,7 @@ describe('client.autofill', function () {
   })
 
   describe('when autofill Fee is missing', function () {
-    it('should autofill Fee of a Transaction', async () => {
+    it('should autofill Fee of a Transaction', async function () {
       const tx: Transaction = {
         TransactionType: 'DepositPreauth',
         Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
@@ -136,7 +136,7 @@ describe('client.autofill', function () {
       assert.strictEqual(txResult.Fee, '12')
     })
 
-    it('should autofill Fee of an EscrowFinish transaction', async () => {
+    it('should autofill Fee of an EscrowFinish transaction', async function () {
       const tx: EscrowFinish = {
         Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
         TransactionType: 'EscrowFinish',
@@ -160,7 +160,7 @@ describe('client.autofill', function () {
       assert.strictEqual(txResult.Fee, '399')
     })
 
-    it('should autofill Fee of an AccountDelete transaction', async () => {
+    it('should autofill Fee of an AccountDelete transaction', async function () {
       const tx: AccountDelete = {
         Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
         TransactionType: 'AccountDelete',
@@ -195,7 +195,7 @@ describe('client.autofill', function () {
       assert.strictEqual(txResult.Fee, '2000000')
     })
 
-    it('should autofill Fee of an EscrowFinish transaction with signersCount', async () => {
+    it('should autofill Fee of an EscrowFinish transaction with signersCount', async function () {
       const tx: EscrowFinish = {
         Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
         TransactionType: 'EscrowFinish',
@@ -220,7 +220,7 @@ describe('client.autofill', function () {
     })
   })
 
-  it("should autofill LastLedgerSequence when it's missing", async () => {
+  it("should autofill LastLedgerSequence when it's missing", async function () {
     const tx: Transaction = {
       TransactionType: 'DepositPreauth',
       Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
@@ -239,7 +239,7 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.LastLedgerSequence, 9038234)
   })
 
-  it('should autofill fields when all are missing', async () => {
+  it('should autofill fields when all are missing', async function () {
     const tx: Transaction = {
       TransactionType: 'DepositPreauth',
       Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',

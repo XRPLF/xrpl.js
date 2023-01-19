@@ -22,7 +22,7 @@ describe('client.requestAll', function () {
     testContext = await setupClient()
   })
   afterEach(async () => teardownClient(testContext))
-  it('requests the next page', async () => {
+  it('requests the next page', async function () {
     testContext.mockRippled!.addResponse('ledger_data', rippledResponse)
     const allResponses = await testContext.client.requestAll({
       command: 'ledger_data',
@@ -34,7 +34,7 @@ describe('client.requestAll', function () {
     )
   })
 
-  it('rejects when there are no more pages', async () => {
+  it('rejects when there are no more pages', async function () {
     testContext.mockRippled!.addResponse(
       'ledger_data',
       rippled.ledger_data.last_page,

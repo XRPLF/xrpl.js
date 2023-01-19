@@ -16,7 +16,7 @@ describe('getFeeXrp', function () {
   })
   afterEach(async () => teardownClient(testContext))
 
-  it('getFeeXrp', async () => {
+  it('getFeeXrp', async function () {
     testContext.mockRippled!.addResponse(
       'server_info',
       rippled.server_info.normal,
@@ -25,7 +25,7 @@ describe('getFeeXrp', function () {
     assert.strictEqual(fee, '0.000012')
   })
 
-  it('getFeeXrp - high load_factor', async () => {
+  it('getFeeXrp - high load_factor', async function () {
     testContext.mockRippled!.addResponse(
       'server_info',
       rippled.server_info.highLoadFactor,
@@ -34,7 +34,7 @@ describe('getFeeXrp', function () {
     assert.strictEqual(fee, '2')
   })
 
-  it('getFeeXrp - high load_factor with custom maxFeeXRP', async () => {
+  it('getFeeXrp - high load_factor with custom maxFeeXRP', async function () {
     testContext.mockRippled!.addResponse(
       'server_info',
       rippled.server_info.highLoadFactor,
@@ -50,7 +50,7 @@ describe('getFeeXrp', function () {
     assert.strictEqual(fee, '51539.607552')
   })
 
-  it('getFeeXrp custom cushion', async () => {
+  it('getFeeXrp custom cushion', async function () {
     testContext.mockRippled!.addResponse(
       'server_info',
       rippled.server_info.normal,
@@ -65,7 +65,7 @@ describe('getFeeXrp', function () {
    * This is not recommended since it may result in attempting to pay
    * less than the base fee. However, this test verifies the existing behavior.
    */
-  it('getFeeXrp cushion less than 1.0', async () => {
+  it('getFeeXrp cushion less than 1.0', async function () {
     testContext.mockRippled!.addResponse(
       'server_info',
       rippled.server_info.normal,
@@ -76,7 +76,7 @@ describe('getFeeXrp', function () {
     assert.strictEqual(fee, '0.000009')
   })
 
-  it('getFeeXrp reporting', async () => {
+  it('getFeeXrp reporting', async function () {
     testContext.mockRippled!.addResponse(
       'server_info',
       rippled.server_info.normal,

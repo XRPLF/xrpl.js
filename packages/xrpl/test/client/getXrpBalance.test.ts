@@ -23,7 +23,7 @@ describe('client.getXrpBalance', function () {
 
   addressTests.forEach(function (testcase) {
     describe(testcase.type, () => {
-      it('getXrpBalance', async () => {
+      it('getXrpBalance', async function () {
         testContext.mockRippled!.addResponse(
           'account_info',
           rippled.account_info.normal,
