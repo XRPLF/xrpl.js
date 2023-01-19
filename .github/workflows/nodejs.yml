@@ -92,47 +92,6 @@ jobs:
       - run: npm run build
       - run: npm test
 
-  unit-12:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    strategy:
-      matrix:
-        node-version: [12.x]
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup npm version 7
-        run: |
-          npm i -g npm@7 --registry=https://registry.npmjs.org
-
-      - name: Cache node modules
-        id: cache-nodemodules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          # caching node_modules
-          path: |
-            node_modules
-            */*/node_modules
-          key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-deps-${{ matrix.node-version }}-
-            ${{ runner.os }}-deps-
-
-      - name: Install Dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci
-
-      - run: npm run build
-      - run: npm test12
-
   integration:
     runs-on: ubuntu-latest
     timeout-minutes: 10
