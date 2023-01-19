@@ -156,7 +156,7 @@ describe('client handling of tfPartialPayments', function () {
     )
   })
 
-  it('Transactions stream with XRP tfPartialPayment', async (done) => {
+  it('Transactions stream with XRP tfPartialPayment', (done) => {
     testContext.mockRippled!.addResponse(
       'transaction_entry',
       rippled.transaction_entry,
