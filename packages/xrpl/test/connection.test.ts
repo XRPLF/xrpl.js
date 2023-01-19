@@ -161,7 +161,7 @@ describe('Connection', function () {
         connection.onMessage(mockedResponse)
         assert.deepEqual(messages, [])
         await requestPromise.catch(() => {
-          // ignore error, we intetionally fail the promise
+          // ignore error, we intentionally fail the promise
         })
       },
       TIMEOUT,
@@ -187,7 +187,7 @@ describe('Connection', function () {
         connection.onMessage(mockedResponse)
         assert.deepEqual(messages, expectedMessages)
         await requestPromise.catch(() => {
-          // ignore error, we intetionally fail the promise
+          // ignore error, we intentionally fail the promise
         })
       },
       TIMEOUT,
@@ -212,7 +212,7 @@ describe('Connection', function () {
         connection.onMessage(mockedResponse)
         assert.deepEqual(messages, expectedMessages)
         await requestPromise.catch(() => {
-          // ignore error, we intetionally fail the promise
+          // ignore error, we intentionally fail the promise
         })
       },
       TIMEOUT,
