@@ -33,29 +33,13 @@ export interface JobType {
   in_progress?: number
 }
 
-type RequireAtLeastOne<T, Keys extends keyof T = keyof T> = Pick<
-  T,
-  Exclude<keyof T, Keys>
-> &
-  {
-    [K in Keys]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<Keys, K>>>
-  }[Keys]
-
-// https://xrpl.org/rippled-server-states.html
-// The distinction between full, validating, and proposing is based on synchronization with the rest of the global network,
-// and it is normal for a server to fluctuate between these states as a course of general operation.
-// Construct a type that requires at least one of these fields to be present.
+// The states for validating and proposing do not exist in the field state_accounting
+// See https://github.com/XRPLF/rippled/blob/develop/src/ripple/app/misc/NetworkOPs.cpp#L4545
+// https://github.com/XRPLF/rippled/blob/develop/src/ripple/app/misc/NetworkOPs.h#L66
 export type StateAccountingFinal = Record<
-  Exclude<ServerState, 'full' | 'validating' | 'proposing'>,
+  Exclude<ServerState, 'validating' | 'proposing'>,
   StateAccounting
-> &
-  RequireAtLeastOne<
-    Record<
-      Extract<ServerState, 'full' | 'validating' | 'proposing'>,
-      StateAccounting
-    >,
-    'full' | 'validating' | 'proposing'
-  >
+>
 
 /**
  * Response expected from a {@link ServerInfoRequest}.

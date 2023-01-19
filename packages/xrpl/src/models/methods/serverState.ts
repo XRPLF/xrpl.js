@@ -57,10 +57,6 @@ export interface ServerStateResponse extends BaseResponse {
       pubkey_validator?: string
       server_state: ServerState
       server_state_duration_us: number
-      // https://xrpl.org/rippled-server-states.html
-      // The distinction between full, validating, and proposing is based on synchronization with the rest of the global network,
-      // and it is normal for a server to fluctuate between these states as a course of general operation.
-      // Construct a type that requires at least one of these fields to be present.
       state_accounting: StateAccountingFinal
       time: string
       uptime: number
