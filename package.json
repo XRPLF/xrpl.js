@@ -3,7 +3,6 @@
   "private": true,
   "scripts": {
     "test": "lerna run test --stream",
-    "test12": "lerna run test --stream --scope ripple-*",
     "test:browser": "lerna run test:browser --stream",
     "test:integration": "lerna run test:integration --stream",
     "lint": "lerna run lint --stream",
