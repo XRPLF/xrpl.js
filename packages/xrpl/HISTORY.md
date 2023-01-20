@@ -4,6 +4,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Fixed
+* Code splitting improvements for lodash
 
 ### Added
 
@@ -12,7 +13,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * All tests now use the Jest test runner and have been refactored for consistency across all packages
 * Fix timeout error in request manager
 * Improved typescript typing
-* Code splitting improvements for lodash
 
 ### Deprecated
 Wallet.fromMmnemonic()
