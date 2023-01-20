@@ -26,18 +26,18 @@ describe('OfferCancel', function () {
     } as any
   })
 
-  it(`verifies valid OfferCancel`, () => {
+  it(`verifies valid OfferCancel`, function () {
     assert.doesNotThrow(() => validateOfferCancel(offer))
     assert.doesNotThrow(() => validate(offer))
   })
 
-  it(`verifies valid OfferCancel with flags`, () => {
+  it(`verifies valid OfferCancel with flags`, function () {
     offer.Flags = 2147483648
     assert.doesNotThrow(() => validateOfferCancel(offer))
     assert.doesNotThrow(() => validate(offer))
   })
 
-  it(`throws w/ OfferSequence must be a number`, () => {
+  it(`throws w/ OfferSequence must be a number`, function () {
     offer.OfferSequence = '99'
     assert.throws(
       () => validateOfferCancel(offer),
@@ -51,7 +51,7 @@ describe('OfferCancel', function () {
     )
   })
 
-  it(`throws w/ missing OfferSequence`, () => {
+  it(`throws w/ missing OfferSequence`, function () {
     delete offer.OfferSequence
     assert.throws(
       () => validateOfferCancel(offer),

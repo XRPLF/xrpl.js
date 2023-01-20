@@ -8,7 +8,7 @@ import { validateCheckCreate } from 'xrpl-local/models/transactions/checkCreate'
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('CheckCreate', function () {
-  it(`verifies valid CheckCreate`, () => {
+  it(`verifies valid CheckCreate`, function () {
     const validCheck = {
       TransactionType: 'CheckCreate',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
@@ -25,7 +25,7 @@ describe('CheckCreate', function () {
     assert.doesNotThrow(() => validate(validCheck))
   })
 
-  it(`throws w/ invalid Destination`, () => {
+  it(`throws w/ invalid Destination`, function () {
     const invalidDestination = {
       TransactionType: 'CheckCreate',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
@@ -50,7 +50,7 @@ describe('CheckCreate', function () {
     )
   })
 
-  it(`throws w/ invalid SendMax`, () => {
+  it(`throws w/ invalid SendMax`, function () {
     const invalidSendMax = {
       TransactionType: 'CheckCreate',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
@@ -75,7 +75,7 @@ describe('CheckCreate', function () {
     )
   })
 
-  it(`throws w/ invalid DestinationTag`, () => {
+  it(`throws w/ invalid DestinationTag`, function () {
     const invalidDestinationTag = {
       TransactionType: 'CheckCreate',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
@@ -100,7 +100,7 @@ describe('CheckCreate', function () {
     )
   })
 
-  it(`throws w/ invalid Expiration`, () => {
+  it(`throws w/ invalid Expiration`, function () {
     const invalidExpiration = {
       TransactionType: 'CheckCreate',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
@@ -125,7 +125,7 @@ describe('CheckCreate', function () {
     )
   })
 
-  it(`throws w/ invalid InvoiceID`, () => {
+  it(`throws w/ invalid InvoiceID`, function () {
     const invalidInvoiceID = {
       TransactionType: 'CheckCreate',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',

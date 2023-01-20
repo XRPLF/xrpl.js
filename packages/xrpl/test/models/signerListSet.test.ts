@@ -40,12 +40,12 @@ describe('SignerListSet', function () {
     } as any
   })
 
-  it(`verifies valid SignerListSet`, () => {
+  it(`verifies valid SignerListSet`, function () {
     assert.doesNotThrow(() => validateSignerListSet(signerListSetTx))
     assert.doesNotThrow(() => validate(signerListSetTx))
   })
 
-  it(`throws w/ missing SignerQuorum`, () => {
+  it(`throws w/ missing SignerQuorum`, function () {
     signerListSetTx.SignerQuorum = undefined
 
     assert.throws(
@@ -60,7 +60,7 @@ describe('SignerListSet', function () {
     )
   })
 
-  it(`throws w/ empty SignerEntries`, () => {
+  it(`throws w/ empty SignerEntries`, function () {
     signerListSetTx.SignerEntries = []
 
     assert.throws(
@@ -75,7 +75,7 @@ describe('SignerListSet', function () {
     )
   })
 
-  it(`throws w/ invalid SignerEntries`, () => {
+  it(`throws w/ invalid SignerEntries`, function () {
     signerListSetTx.SignerEntries = 'khgfgyhujk'
 
     assert.throws(

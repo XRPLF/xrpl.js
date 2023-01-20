@@ -10,7 +10,7 @@ const TOKEN_ID =
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('NFTokenBurn', function () {
-  it(`verifies valid NFTokenBurn`, () => {
+  it(`verifies valid NFTokenBurn`, function () {
     const validNFTokenBurn = {
       TransactionType: 'NFTokenBurn',
       NFTokenID: TOKEN_ID,
@@ -23,7 +23,7 @@ describe('NFTokenBurn', function () {
     assert.doesNotThrow(() => validate(validNFTokenBurn))
   })
 
-  it(`throws w/ missing NFTokenID`, () => {
+  it(`throws w/ missing NFTokenID`, function () {
     const invalid = {
       TransactionType: 'NFTokenBurn',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',

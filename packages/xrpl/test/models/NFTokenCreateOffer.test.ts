@@ -10,7 +10,7 @@ const NFTOKEN_ID =
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('NFTokenCreateOffer', function () {
-  it(`verifies valid NFTokenCreateOffer buyside`, () => {
+  it(`verifies valid NFTokenCreateOffer buyside`, function () {
     const validNFTokenCreateOffer = {
       TransactionType: 'NFTokenCreateOffer',
       NFTokenID: NFTOKEN_ID,
@@ -26,7 +26,7 @@ describe('NFTokenCreateOffer', function () {
     assert.doesNotThrow(() => validate(validNFTokenCreateOffer))
   })
 
-  it(`verifies valid NFTokenCreateOffer sellside`, () => {
+  it(`verifies valid NFTokenCreateOffer sellside`, function () {
     const validNFTokenCreateOffer = {
       TransactionType: 'NFTokenCreateOffer',
       NFTokenID: NFTOKEN_ID,
@@ -42,7 +42,7 @@ describe('NFTokenCreateOffer', function () {
     assert.doesNotThrow(() => validate(validNFTokenCreateOffer))
   })
 
-  it(`verifies w/ 0 Amount NFTokenCreateOffer sellside`, () => {
+  it(`verifies w/ 0 Amount NFTokenCreateOffer sellside`, function () {
     const validNFTokenCreateOffer = {
       TransactionType: 'NFTokenCreateOffer',
       NFTokenID: NFTOKEN_ID,
@@ -58,7 +58,7 @@ describe('NFTokenCreateOffer', function () {
     assert.doesNotThrow(() => validate(validNFTokenCreateOffer))
   })
 
-  it(`throws w/ Account === Owner`, () => {
+  it(`throws w/ Account === Owner`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
       NFTokenID: NFTOKEN_ID,
@@ -77,7 +77,7 @@ describe('NFTokenCreateOffer', function () {
     )
   })
 
-  it(`throws w/ Account === Destination`, () => {
+  it(`throws w/ Account === Destination`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
       NFTokenID: NFTOKEN_ID,
@@ -97,7 +97,7 @@ describe('NFTokenCreateOffer', function () {
     )
   })
 
-  it(`throws w/out NFTokenID`, () => {
+  it(`throws w/out NFTokenID`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
       Amount: '1',
@@ -116,7 +116,7 @@ describe('NFTokenCreateOffer', function () {
     )
   })
 
-  it(`throws w/ invalid Amount`, () => {
+  it(`throws w/ invalid Amount`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
       NFTokenID: NFTOKEN_ID,
@@ -136,7 +136,7 @@ describe('NFTokenCreateOffer', function () {
     )
   })
 
-  it(`throws w/ missing Amount`, () => {
+  it(`throws w/ missing Amount`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
       Owner: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXe',
@@ -155,7 +155,7 @@ describe('NFTokenCreateOffer', function () {
     )
   })
 
-  it(`throws w/ Owner for sell offer`, () => {
+  it(`throws w/ Owner for sell offer`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
       Expiration: 1000,
@@ -175,7 +175,7 @@ describe('NFTokenCreateOffer', function () {
     )
   })
 
-  it(`throws w/out Owner for buy offer`, () => {
+  it(`throws w/out Owner for buy offer`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
       Expiration: 1000,
@@ -193,7 +193,7 @@ describe('NFTokenCreateOffer', function () {
     )
   })
 
-  it(`throws w/ 0 Amount for buy offer`, () => {
+  it(`throws w/ 0 Amount for buy offer`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
       Expiration: 1000,

@@ -8,7 +8,7 @@ import { validateCheckCancel } from 'xrpl-local/models/transactions/checkCancel'
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('CheckCancel', function () {
-  it(`verifies valid CheckCancel`, () => {
+  it(`verifies valid CheckCancel`, function () {
     const validCheckCancel = {
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       TransactionType: 'CheckCancel',
@@ -20,7 +20,7 @@ describe('CheckCancel', function () {
     assert.doesNotThrow(() => validate(validCheckCancel))
   })
 
-  it(`throws w/ invalid CheckCancel`, () => {
+  it(`throws w/ invalid CheckCancel`, function () {
     const invalidCheckID = {
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       TransactionType: 'CheckCancel',

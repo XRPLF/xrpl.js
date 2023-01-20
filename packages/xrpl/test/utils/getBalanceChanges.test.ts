@@ -15,7 +15,7 @@ import trustlineSetLimit2 from '../fixtures/utils/trustlineSetLimit2.json'
 import trustlineSetLimitZero from '../fixtures/utils/trustlineSetLimitZero.json'
 
 describe('getBalanceChanges', function () {
-  it('XRP create account', () => {
+  it('XRP create account', function () {
     const result = getBalanceChanges(paymentXrpCreateAccount.metadata)
     const expected = [
       {
@@ -30,7 +30,7 @@ describe('getBalanceChanges', function () {
     assert.deepStrictEqual(result, expected)
   })
 
-  it('USD payment to account with no USD', () => {
+  it('USD payment to account with no USD', function () {
     const result = getBalanceChanges(paymentTokenDestinationNoBalance.metadata)
     const expected = [
       {
@@ -76,7 +76,7 @@ describe('getBalanceChanges', function () {
     assert.deepStrictEqual(result, expected)
   })
 
-  it('USD payment of all USD in source account', () => {
+  it('USD payment of all USD in source account', function () {
     const result = getBalanceChanges(paymentTokenSpendFullBalance.metadata)
     const expected = [
       {
@@ -123,7 +123,7 @@ describe('getBalanceChanges', function () {
     assert.deepStrictEqual(result, expected)
   })
 
-  it('USD payment to account with USD', () => {
+  it('USD payment to account with USD', function () {
     const result = getBalanceChanges(paymentToken.metadata)
     const expected = [
       {
@@ -169,7 +169,7 @@ describe('getBalanceChanges', function () {
     assert.deepStrictEqual(result, expected)
   })
 
-  it('Set trust limit to 0 with balance remaining', () => {
+  it('Set trust limit to 0 with balance remaining', function () {
     const result = getBalanceChanges(trustlineSetLimitZero.metadata)
     const expected = [
       {
@@ -185,7 +185,7 @@ describe('getBalanceChanges', function () {
     assert.deepStrictEqual(result, expected)
   })
 
-  it('Create trustline', () => {
+  it('Create trustline', function () {
     const result = getBalanceChanges(trustlineCreate.metadata)
     const expected = [
       {
@@ -216,7 +216,7 @@ describe('getBalanceChanges', function () {
     assert.deepStrictEqual(result, expected)
   })
 
-  it('Set trustline', () => {
+  it('Set trustline', function () {
     const result = getBalanceChanges(trustlineSetLimit.metadata)
     const expected = [
       {
@@ -232,7 +232,7 @@ describe('getBalanceChanges', function () {
     assert.deepStrictEqual(result, expected)
   })
 
-  it('Set trustline 2', () => {
+  it('Set trustline 2', function () {
     const result = getBalanceChanges(trustlineSetLimit2.metadata)
     const expected = [
       {
@@ -248,7 +248,7 @@ describe('getBalanceChanges', function () {
     assert.deepStrictEqual(result, expected)
   })
 
-  it('Delete trustline', () => {
+  it('Delete trustline', function () {
     const result = getBalanceChanges(trustlineDelete.metadata)
     const expected = [
       {
@@ -294,7 +294,7 @@ describe('getBalanceChanges', function () {
     assert.deepStrictEqual(result, expected)
   })
 
-  it('Redeem USD', () => {
+  it('Redeem USD', function () {
     const result = getBalanceChanges(paymentTokenRedeem.result.meta)
     const expected = [
       {
@@ -325,7 +325,7 @@ describe('getBalanceChanges', function () {
     assert.deepStrictEqual(result, expected)
   })
 
-  it('Redeem then issue USD', () => {
+  it('Redeem then issue USD', function () {
     const result = getBalanceChanges(paymentTokenRedeemThenIssue.result.meta)
     const expected = [
       {
@@ -356,7 +356,7 @@ describe('getBalanceChanges', function () {
     assert.deepStrictEqual(result, expected)
   })
 
-  it('Multipath USD payment', () => {
+  it('Multipath USD payment', function () {
     const result = getBalanceChanges(paymentTokenMultipath.result.meta)
     const expected = [
       {

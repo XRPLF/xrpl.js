@@ -4,7 +4,7 @@ import { parseNFTokenID } from 'xrpl-local'
 import { assertResultMatch } from '../testUtils'
 
 describe('parseNFTokenID', function () {
-  it('decode a valid NFTokenID', () => {
+  it('decode a valid NFTokenID', function () {
     const nftokenID =
       '000B0539C35B55AA096BA6D87A6E6C965A6534150DC56E5E12C5D09E0000000C'
     const result = parseNFTokenID(nftokenID)
@@ -19,7 +19,7 @@ describe('parseNFTokenID', function () {
     assertResultMatch(result, expected)
   })
 
-  it('fail when given invalid NFTokenID', () => {
+  it('fail when given invalid NFTokenID', function () {
     assert.throws(() => {
       parseNFTokenID('ABCD')
     })

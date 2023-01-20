@@ -24,12 +24,12 @@ describe('TrustSet', function () {
     } as any
   })
 
-  it('verifies valid TrustSet', () => {
+  it('verifies valid TrustSet', function () {
     assert.doesNotThrow(() => validateTrustSet(trustSet))
     assert.doesNotThrow(() => validate(trustSet))
   })
 
-  it('throws when LimitAmount is missing', () => {
+  it('throws when LimitAmount is missing', function () {
     delete trustSet.LimitAmount
     assert.throws(
       () => validateTrustSet(trustSet),
@@ -43,7 +43,7 @@ describe('TrustSet', function () {
     )
   })
 
-  it('throws when LimitAmount is invalid', () => {
+  it('throws when LimitAmount is invalid', function () {
     trustSet.LimitAmount = 1234
     assert.throws(
       () => validateTrustSet(trustSet),
@@ -57,7 +57,7 @@ describe('TrustSet', function () {
     )
   })
 
-  it('throws when QualityIn is not a number', () => {
+  it('throws when QualityIn is not a number', function () {
     trustSet.QualityIn = '1234'
     assert.throws(
       () => validateTrustSet(trustSet),
@@ -71,7 +71,7 @@ describe('TrustSet', function () {
     )
   })
 
-  it('throws when QualityOut is not a number', () => {
+  it('throws when QualityOut is not a number', function () {
     trustSet.QualityOut = '4321'
     assert.throws(
       () => validateTrustSet(trustSet),

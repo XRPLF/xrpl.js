@@ -42,7 +42,7 @@ function createLedgerTest(ledgerIndex: number): void {
   describe(`ledger hashes ${ledgerIndexString}`, () => {
     if (hasAccounts) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- known to be a string
-      it(`has account_hash of ${ledgerJSON.account_hash}`, () => {
+      it(`has account_hash of ${ledgerJSON.account_hash}`, function () {
         assert.equal(
           ledgerJSON.account_hash,
           hashStateTree(ledgerJSON.accountState),
@@ -50,7 +50,7 @@ function createLedgerTest(ledgerIndex: number): void {
       })
     }
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- known to be a string
-    it(`has transaction_hash of ${ledgerJSON.transaction_hash}`, () => {
+    it(`has transaction_hash of ${ledgerJSON.transaction_hash}`, function () {
       assert.equal(
         ledgerJSON.transaction_hash,
         hashTxTree(ledgerJSON.transactions),
@@ -67,7 +67,7 @@ describe('Hashes', function () {
   // 1311 AffectedNodes, no accounts
   createLedgerTest(7501326)
 
-  it('calcAccountRootEntryHash', () => {
+  it('calcAccountRootEntryHash', function () {
     const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
     const expectedEntryHash =
       '2B6AC232AA4C4BE41BF49D2459FA4A0347E1B543A4C92FCEE0821C0201E2E9A8'
@@ -76,7 +76,7 @@ describe('Hashes', function () {
     assert.equal(actualEntryHash, expectedEntryHash)
   })
 
-  it('calcRippleStateEntryHash', () => {
+  it('calcRippleStateEntryHash', function () {
     const account1 = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
     const account2 = 'rB5TihdPbKgMrkFqrqUC3yLdE8hhv4BdeY'
     const currency = 'USD'
@@ -90,7 +90,7 @@ describe('Hashes', function () {
     assert.equal(actualEntryHash2, expectedEntryHash)
   })
 
-  it('will calculate the RippleState entry hash for r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV and rUAMuQTfVhbfqUDuro7zzy4jj4Wq57MPTj in UAM', () => {
+  it('will calculate the RippleState entry hash for r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV and rUAMuQTfVhbfqUDuro7zzy4jj4Wq57MPTj in UAM', function () {
     const account1 = 'r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV'
     const account2 = 'rUAMuQTfVhbfqUDuro7zzy4jj4Wq57MPTj'
     const currency = 'UAM'
@@ -104,7 +104,7 @@ describe('Hashes', function () {
     assert.equal(actualEntryHash2, expectedEntryHash)
   })
 
-  it('calcOfferEntryHash', () => {
+  it('calcOfferEntryHash', function () {
     const account = 'r32UufnaCGL82HubijgJGDmdE5hac7ZvLw'
     const sequence = 137
     const expectedEntryHash =
@@ -114,7 +114,7 @@ describe('Hashes', function () {
     assert.equal(actualEntryHash, expectedEntryHash)
   })
 
-  it('hashSignerListId', () => {
+  it('hashSignerListId', function () {
     const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
     const expectedEntryHash =
       '778365D5180F5DF3016817D1F318527AD7410D83F8636CF48C43E8AF72AB49BF'
@@ -122,7 +122,7 @@ describe('Hashes', function () {
     assert.equal(actualEntryHash, expectedEntryHash)
   })
 
-  it('calcEscrowEntryHash', () => {
+  it('calcEscrowEntryHash', function () {
     const account = 'rDx69ebzbowuqztksVDmZXjizTd12BVr4x'
     const sequence = 84
     const expectedEntryHash =
@@ -132,7 +132,7 @@ describe('Hashes', function () {
     assert.equal(actualEntryHash, expectedEntryHash)
   })
 
-  it('calcPaymentChannelEntryHash', () => {
+  it('calcPaymentChannelEntryHash', function () {
     const account = 'rDx69ebzbowuqztksVDmZXjizTd12BVr4x'
     const dstAccount = 'rLFtVprxUEfsH54eCWKsZrEQzMDsx1wqso'
     const sequence = 82
@@ -143,7 +143,7 @@ describe('Hashes', function () {
     assert.equal(actualEntryHash, expectedEntryHash)
   })
 
-  it('Hash a signed transaction correctly', () => {
+  it('Hash a signed transaction correctly', function () {
     const expected_hash =
       '458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2'
 
@@ -153,7 +153,7 @@ describe('Hashes', function () {
     )
   })
 
-  it('Hash a signed transaction blob correctly', () => {
+  it('Hash a signed transaction blob correctly', function () {
     const expected_hash =
       '458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2'
 
@@ -163,7 +163,7 @@ describe('Hashes', function () {
     )
   })
 
-  it('Throw an error when hashing an unsigned transaction', () => {
+  it('Throw an error when hashing an unsigned transaction', function () {
     const offerCreateWithNoSignature: OfferCreate = {
       ...(fixtures.tx.OfferCreateSell.result as OfferCreate),
       TxnSignature: undefined,
@@ -175,7 +175,7 @@ describe('Hashes', function () {
     )
   })
 
-  it('Throw when hashing an unsigned transaction blob', () => {
+  it('Throw when hashing an unsigned transaction blob', function () {
     const encodedOfferCreateWithNoSignature: string = encode({
       ...fixtures.tx.OfferCreateSell.result,
       TxnSignature: undefined,

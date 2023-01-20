@@ -10,7 +10,7 @@ const BUY_OFFER =
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('NFTokenCancelOffer', function () {
-  it(`verifies valid NFTokenCancelOffer`, () => {
+  it(`verifies valid NFTokenCancelOffer`, function () {
     const validNFTokenCancelOffer = {
       TransactionType: 'NFTokenCancelOffer',
       NFTokenOffers: [BUY_OFFER],
@@ -23,7 +23,7 @@ describe('NFTokenCancelOffer', function () {
     assert.doesNotThrow(() => validate(validNFTokenCancelOffer))
   })
 
-  it(`throws w/ missing NFTokenOffers`, () => {
+  it(`throws w/ missing NFTokenOffers`, function () {
     const invalid = {
       TransactionType: 'NFTokenCancelOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -39,7 +39,7 @@ describe('NFTokenCancelOffer', function () {
     )
   })
 
-  it(`throws w/ empty NFTokenOffers`, () => {
+  it(`throws w/ empty NFTokenOffers`, function () {
     const invalid = {
       TransactionType: 'NFTokenCancelOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',

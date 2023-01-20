@@ -21,19 +21,19 @@ describe('PaymentChannelFund', function () {
     }
   })
 
-  it(`verifies valid PaymentChannelFund`, () => {
+  it(`verifies valid PaymentChannelFund`, function () {
     assert.doesNotThrow(() => validatePaymentChannelFund(channel))
     assert.doesNotThrow(() => validate(channel))
   })
 
-  it(`verifies valid PaymentChannelFund w/o optional`, () => {
+  it(`verifies valid PaymentChannelFund w/o optional`, function () {
     delete channel.Expiration
 
     assert.doesNotThrow(() => validatePaymentChannelFund(channel))
     assert.doesNotThrow(() => validate(channel))
   })
 
-  it(`throws w/ missing Amount`, () => {
+  it(`throws w/ missing Amount`, function () {
     delete channel.Amount
 
     assert.throws(
@@ -48,7 +48,7 @@ describe('PaymentChannelFund', function () {
     )
   })
 
-  it(`throws w/ missing Channel`, () => {
+  it(`throws w/ missing Channel`, function () {
     delete channel.Channel
 
     assert.throws(
@@ -63,7 +63,7 @@ describe('PaymentChannelFund', function () {
     )
   })
 
-  it(`throws w/ invalid Amount`, () => {
+  it(`throws w/ invalid Amount`, function () {
     channel.Amount = 100
 
     assert.throws(
@@ -78,7 +78,7 @@ describe('PaymentChannelFund', function () {
     )
   })
 
-  it(`throws w/ invalid Channel`, () => {
+  it(`throws w/ invalid Channel`, function () {
     channel.Channel = 1000
 
     assert.throws(
@@ -93,7 +93,7 @@ describe('PaymentChannelFund', function () {
     )
   })
 
-  it(`throws w/ invalid Expiration`, () => {
+  it(`throws w/ invalid Expiration`, function () {
     channel.Expiration = '1000'
 
     assert.throws(

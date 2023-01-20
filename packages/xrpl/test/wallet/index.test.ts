@@ -17,7 +17,7 @@ const { sign: RESPONSE_FIXTURES } = responses
  */
 describe('Wallet', function () {
   describe('constructor', function () {
-    it('initializes a wallet using a Regular Key Pair', () => {
+    it('initializes a wallet using a Regular Key Pair', function () {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
         publicKey: 'aBRNH5wUurfhZcoyR6nRwDSa95gMBkovBJ8V4cp1C1pM28H7EPL1',
@@ -43,7 +43,7 @@ describe('Wallet', function () {
     const ed25519KeyPrefix = 'ED'
     const secp256k1PrivateKeyPrefix = '00'
 
-    it('generates a new wallet using default algorithm', () => {
+    it('generates a new wallet using default algorithm', function () {
       const wallet = Wallet.generate()
 
       assert.isString(wallet.publicKey)
@@ -57,7 +57,7 @@ describe('Wallet', function () {
       assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
     })
 
-    it('generates a new wallet using algorithm ecdsa-secp256k1', () => {
+    it('generates a new wallet using algorithm ecdsa-secp256k1', function () {
       const algorithm = ECDSA.secp256k1
       const wallet = Wallet.generate(algorithm)
 
@@ -71,7 +71,7 @@ describe('Wallet', function () {
       assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
     })
 
-    it('generates a new wallet using algorithm ed25519', () => {
+    it('generates a new wallet using algorithm ed25519', function () {
       const algorithm = ECDSA.ed25519
       const wallet = Wallet.generate(algorithm)
 
@@ -94,14 +94,14 @@ describe('Wallet', function () {
     const privateKey =
       '00141BA006D3363D2FB2785E8DF4E44D3A49908780CB4FB51F6D217C08C021429F'
 
-    it('derives a wallet using default algorithm', () => {
+    it('derives a wallet using default algorithm', function () {
       const wallet = Wallet.fromSeed(seed)
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using algorithm ecdsa-secp256k1', () => {
+    it('derives a wallet using algorithm ecdsa-secp256k1', function () {
       const algorithm = ECDSA.secp256k1
       const wallet = Wallet.fromSeed(seed, { algorithm })
 
@@ -109,7 +109,7 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using algorithm ed25519', () => {
+    it('derives a wallet using algorithm ed25519', function () {
       const algorithm = ECDSA.ed25519
       const wallet = Wallet.fromSeed(seed, { algorithm })
 
@@ -117,7 +117,7 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using rfc1751 mnemonic with secp256k1 key', () => {
+    it('derives a wallet using rfc1751 mnemonic with secp256k1 key', function () {
       const algorithm = ECDSA.secp256k1
       const mnemonic =
         'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
@@ -130,7 +130,7 @@ describe('Wallet', function () {
       assert.equal(wallet.seed, expectedSeed)
     })
 
-    it('derives a wallet using rfc1751 mnemonic with ed25519 key', () => {
+    it('derives a wallet using rfc1751 mnemonic with ed25519 key', function () {
       const algorithm = ECDSA.ed25519
       const mnemonic =
         'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
@@ -143,7 +143,7 @@ describe('Wallet', function () {
       assert.equal(wallet.seed, expectedSeed)
     })
 
-    it('throws an error when using an RFC1751 mnemonic for bip39', () => {
+    it('throws an error when using an RFC1751 mnemonic for bip39', function () {
       const algorithm = ECDSA.ed25519
       const mnemonic =
         'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
@@ -155,7 +155,7 @@ describe('Wallet', function () {
       }, /^Unable to parse the given mnemonic using bip39 encoding$/u)
     })
 
-    it('throws an error when using an bip39 mnemonic for RFC1751', () => {
+    it('throws an error when using an bip39 mnemonic for RFC1751', function () {
       const mnemonic =
         'draw attack antique swing base employ blur above palace lucky glide clap pen use illegal'
       assert.throws(() => {
@@ -165,7 +165,7 @@ describe('Wallet', function () {
       }, /^Expected an RFC1751 word, but received 'attack'\. For the full list of words in the RFC1751 encoding see https:\/\/datatracker\.ietf\.org\/doc\/html\/rfc1/u)
     })
 
-    it('derives a wallet using rfc1751 mnemonic with lowercase words', () => {
+    it('derives a wallet using rfc1751 mnemonic with lowercase words', function () {
       const algorithm = ECDSA.ed25519
       const mnemonic =
         'cab beth hank bird mend sign gild any kern hyde chat stub'
@@ -178,7 +178,7 @@ describe('Wallet', function () {
       assert.equal(wallet.seed, expectedSeed)
     })
 
-    it('derives a wallet using a Regular Key Pair', () => {
+    it('derives a wallet using a Regular Key Pair', function () {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
         seed: 'sh8i92YRnEjJy3fpFkL8txQSCVo79',
@@ -203,14 +203,14 @@ describe('Wallet', function () {
     const privateKey =
       '00141BA006D3363D2FB2785E8DF4E44D3A49908780CB4FB51F6D217C08C021429F'
 
-    it('derives a wallet using default algorithm', () => {
+    it('derives a wallet using default algorithm', function () {
       const wallet = Wallet.fromSecret(seed)
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using algorithm ecdsa-secp256k1', () => {
+    it('derives a wallet using algorithm ecdsa-secp256k1', function () {
       const algorithm = ECDSA.secp256k1
       const wallet = Wallet.fromSecret(seed, { algorithm })
 
@@ -218,7 +218,7 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using algorithm ed25519', () => {
+    it('derives a wallet using algorithm ed25519', function () {
       const algorithm = ECDSA.ed25519
       const wallet = Wallet.fromSecret(seed, { algorithm })
 
@@ -226,7 +226,7 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using a Regular Key Pair', () => {
+    it('derives a wallet using a Regular Key Pair', function () {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
         seed: 'sh8i92YRnEjJy3fpFkL8txQSCVo79',
@@ -252,14 +252,14 @@ describe('Wallet', function () {
     const privateKey =
       '0013FC461CA5799F1357C8130AF703CBA7E9C28E072C6CA8F7DEF8601CDE98F394'
 
-    it('derives a wallet using default derivation path', () => {
+    it('derives a wallet using default derivation path', function () {
       const wallet = Wallet.fromMnemonic(mnemonic)
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using an input derivation path', () => {
+    it('derives a wallet using an input derivation path', function () {
       const derivationPath = "m/44'/144'/0'/0/0"
       const wallet = Wallet.fromMnemonic(mnemonic, { derivationPath })
 
@@ -267,7 +267,7 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using a Regular Key Pair', () => {
+    it('derives a wallet using a Regular Key Pair', function () {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
         mnemonic: 'I IRE BOND BOW TRIO LAID SEAT GOAL HEN IBIS IBIS DARE',
@@ -304,14 +304,14 @@ describe('Wallet', function () {
       entropy = new Array(entropySize).fill(0)
     })
 
-    it('derives a wallet using entropy', () => {
+    it('derives a wallet using entropy', function () {
       const wallet = Wallet.fromEntropy(entropy)
 
       assert.equal(wallet.publicKey, publicKeyED25519)
       assert.equal(wallet.privateKey, privateKeyED25519)
     })
 
-    it('derives a wallet using algorithm ecdsa-secp256k1', () => {
+    it('derives a wallet using algorithm ecdsa-secp256k1', function () {
       const algorithm = ECDSA.secp256k1
       const wallet = Wallet.fromEntropy(entropy, { algorithm })
 
@@ -319,7 +319,7 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    it('derives a wallet using algorithm ed25519', () => {
+    it('derives a wallet using algorithm ed25519', function () {
       const algorithm = ECDSA.ed25519
       const wallet = Wallet.fromEntropy(entropy, { algorithm })
 
@@ -327,7 +327,7 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, privateKeyED25519)
     })
 
-    it('derives a wallet using a regular key pair', () => {
+    it('derives a wallet using a regular key pair', function () {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const wallet = Wallet.fromEntropy(entropy, { masterAddress })
 
@@ -930,7 +930,7 @@ describe('Wallet', function () {
       id: '30D9ECA2A7FB568C5A8607E5850D9567572A9E7C6094C26BEFD4DC4C2CF2657A',
     }
 
-    it('returns true when verifying a transaction signed by the same wallet', () => {
+    it('returns true when verifying a transaction signed by the same wallet', function () {
       const wallet = new Wallet(publicKey, privateKey)
       const isVerified: boolean = wallet.verifyTransaction(
         prepared.signedTransaction,
@@ -939,7 +939,7 @@ describe('Wallet', function () {
       assert.equal(isVerified, true)
     })
 
-    it('returns false when verifying a transaction signed by a different wallet', () => {
+    it('returns false when verifying a transaction signed by a different wallet', function () {
       const diffPublicKey =
         '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8'
       const diffPrivateKey =
@@ -973,17 +973,17 @@ describe('Wallet', function () {
     const mainnetXAddress = 'X7gJ5YK8abHf2eTPWPFHAAot8Knck11QGqmQ7a6a3Z8PJvk'
     const testnetXAddress = 'T7bq3e7kxYq9pwDz8UZhqAZoEkcRGTXSNr5immvcj3DYRaV'
 
-    it('returns a Testnet X-address when test is true', () => {
+    it('returns a Testnet X-address when test is true', function () {
       const result = wallet.getXAddress(tag, true)
       assert.equal(result, testnetXAddress)
     })
 
-    it('returns a Mainnet X-address when test is false', () => {
+    it('returns a Mainnet X-address when test is false', function () {
       const result = wallet.getXAddress(tag, false)
       assert.equal(result, mainnetXAddress)
     })
 
-    it("returns a Mainnet X-address when test isn't provided", () => {
+    it("returns a Mainnet X-address when test isn't provided", function () {
       const result = wallet.getXAddress(tag)
       assert.equal(result, mainnetXAddress)
     })

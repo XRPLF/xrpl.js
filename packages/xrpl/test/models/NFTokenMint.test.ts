@@ -12,7 +12,7 @@ import {
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('NFTokenMint', function () {
-  it(`verifies valid NFTokenMint`, () => {
+  it(`verifies valid NFTokenMint`, function () {
     const validNFTokenMint = {
       TransactionType: 'NFTokenMint',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -28,7 +28,7 @@ describe('NFTokenMint', function () {
     assert.doesNotThrow(() => validate(validNFTokenMint))
   })
 
-  it(`throws w/ missing NFTokenTaxon`, () => {
+  it(`throws w/ missing NFTokenTaxon`, function () {
     const invalid = {
       TransactionType: 'NFTokenMint',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -47,7 +47,7 @@ describe('NFTokenMint', function () {
     )
   })
 
-  it(`throws w/ Account === Issuer`, () => {
+  it(`throws w/ Account === Issuer`, function () {
     const invalid = {
       TransactionType: 'NFTokenMint',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -67,7 +67,7 @@ describe('NFTokenMint', function () {
     )
   })
 
-  it(`throws w/ URI not in hex format`, () => {
+  it(`throws w/ URI not in hex format`, function () {
     const invalid = {
       TransactionType: 'NFTokenMint',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',

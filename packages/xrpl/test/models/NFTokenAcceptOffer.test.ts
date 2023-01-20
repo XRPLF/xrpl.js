@@ -12,7 +12,7 @@ const NFTOKEN_SELL_OFFER =
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('NFTokenAcceptOffer', function () {
-  it(`verifies valid NFTokenAcceptOffer with NFTokenBuyOffer`, () => {
+  it(`verifies valid NFTokenAcceptOffer with NFTokenBuyOffer`, function () {
     const validNFTokenAcceptOffer = {
       TransactionType: 'NFTokenAcceptOffer',
       NFTokenBuyOffer: NFTOKEN_BUY_OFFER,
@@ -25,7 +25,7 @@ describe('NFTokenAcceptOffer', function () {
     assert.doesNotThrow(() => validate(validNFTokenAcceptOffer))
   })
 
-  it(`verifies valid NFTokenAcceptOffer with NFTokenSellOffer`, () => {
+  it(`verifies valid NFTokenAcceptOffer with NFTokenSellOffer`, function () {
     const validNFTokenAcceptOffer = {
       TransactionType: 'NFTokenAcceptOffer',
       NFTokenSellOffer: NFTOKEN_SELL_OFFER,
@@ -38,7 +38,7 @@ describe('NFTokenAcceptOffer', function () {
     assert.doesNotThrow(() => validate(validNFTokenAcceptOffer))
   })
 
-  it(`throws w/ missing NFTokenSellOffer and NFTokenBuyOffer`, () => {
+  it(`throws w/ missing NFTokenSellOffer and NFTokenBuyOffer`, function () {
     const invalid = {
       TransactionType: 'NFTokenAcceptOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -54,7 +54,7 @@ describe('NFTokenAcceptOffer', function () {
     )
   })
 
-  it(`throws w/ missing NFTokenSellOffer and present NFTokenBrokerFee`, () => {
+  it(`throws w/ missing NFTokenSellOffer and present NFTokenBrokerFee`, function () {
     const invalid = {
       TransactionType: 'NFTokenAcceptOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -72,7 +72,7 @@ describe('NFTokenAcceptOffer', function () {
     )
   })
 
-  it(`throws w/ missing NFTokenBuyOffer and present NFTokenBrokerFee`, () => {
+  it(`throws w/ missing NFTokenBuyOffer and present NFTokenBrokerFee`, function () {
     const invalid = {
       TransactionType: 'NFTokenAcceptOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -90,7 +90,7 @@ describe('NFTokenAcceptOffer', function () {
     )
   })
 
-  it(`verifies valid NFTokenAcceptOffer with both offers and no NFTokenBrokerFee`, () => {
+  it(`verifies valid NFTokenAcceptOffer with both offers and no NFTokenBrokerFee`, function () {
     const validNFTokenAcceptOffer = {
       TransactionType: 'NFTokenAcceptOffer',
       NFTokenSellOffer: NFTOKEN_SELL_OFFER,
@@ -104,7 +104,7 @@ describe('NFTokenAcceptOffer', function () {
     assert.doesNotThrow(() => validate(validNFTokenAcceptOffer))
   })
 
-  it(`verifies valid NFTokenAcceptOffer with NFTokenBrokerFee`, () => {
+  it(`verifies valid NFTokenAcceptOffer with NFTokenBrokerFee`, function () {
     const validNFTokenAcceptOffer = {
       TransactionType: 'NFTokenAcceptOffer',
       NFTokenSellOffer: NFTOKEN_SELL_OFFER,
@@ -119,7 +119,7 @@ describe('NFTokenAcceptOffer', function () {
     assert.doesNotThrow(() => validate(validNFTokenAcceptOffer))
   })
 
-  it(`throws w/ NFTokenBrokerFee === 0`, () => {
+  it(`throws w/ NFTokenBrokerFee === 0`, function () {
     const invalid = {
       TransactionType: 'NFTokenAcceptOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -138,7 +138,7 @@ describe('NFTokenAcceptOffer', function () {
     )
   })
 
-  it(`throws w/ NFTokenBrokerFee < 0`, () => {
+  it(`throws w/ NFTokenBrokerFee < 0`, function () {
     const invalid = {
       TransactionType: 'NFTokenAcceptOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -157,7 +157,7 @@ describe('NFTokenAcceptOffer', function () {
     )
   })
 
-  it(`throws w/ invalid NFTokenBrokerFee`, () => {
+  it(`throws w/ invalid NFTokenBrokerFee`, function () {
     const invalid = {
       TransactionType: 'NFTokenAcceptOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',

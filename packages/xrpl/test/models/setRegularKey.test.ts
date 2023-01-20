@@ -20,18 +20,18 @@ describe('SetRegularKey', function () {
     } as any
   })
 
-  it(`verifies valid SetRegularKey`, () => {
+  it(`verifies valid SetRegularKey`, function () {
     assert.doesNotThrow(() => validateSetRegularKey(account))
     assert.doesNotThrow(() => validate(account))
   })
 
-  it(`verifies w/o SetRegularKey`, () => {
+  it(`verifies w/o SetRegularKey`, function () {
     account.RegularKey = undefined
     assert.doesNotThrow(() => validateSetRegularKey(account))
     assert.doesNotThrow(() => validate(account))
   })
 
-  it(`throws w/ invalid RegularKey`, () => {
+  it(`throws w/ invalid RegularKey`, function () {
     account.RegularKey = 12369846963
 
     assert.throws(

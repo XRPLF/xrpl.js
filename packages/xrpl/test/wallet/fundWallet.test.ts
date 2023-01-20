@@ -21,7 +21,7 @@ describe('Get Faucet host ', function () {
   })
   afterEach(async () => teardownClient(testContext))
 
-  it('returns the Devnet host', () => {
+  it('returns the Devnet host', function () {
     const expectedFaucet = FaucetNetwork.Devnet
     // @ts-expect-error Intentionally modifying private data for test
     testContext.client.connection.url = FaucetNetwork.Devnet
@@ -32,7 +32,7 @@ describe('Get Faucet host ', function () {
     )
   })
 
-  it('returns the Testnet host', () => {
+  it('returns the Testnet host', function () {
     const expectedFaucet = FaucetNetwork.Testnet
     // @ts-expect-error Intentionally modifying private data for test
     testContext.client.connection.url = FaucetNetwork.Testnet
@@ -43,7 +43,7 @@ describe('Get Faucet host ', function () {
     )
   })
 
-  it('returns the Testnet host with the XRPL Labs server', () => {
+  it('returns the Testnet host with the XRPL Labs server', function () {
     const expectedFaucet = FaucetNetwork.Testnet
     // @ts-expect-error Intentionally modifying private data for test
     testContext.client.connection.url = 'wss://testnet.xrpl-labs.com'
@@ -65,7 +65,7 @@ describe('Get Faucet host ', function () {
     )
   })
 
-  it('returns the correct faucetPath for Devnet host', () => {
+  it('returns the correct faucetPath for Devnet host', function () {
     const expectedFaucetPath = FaucetNetworkPaths[FaucetNetwork.Devnet]
     // @ts-expect-error Intentionally modifying private data for test
     testContext.client.connection.url = FaucetNetwork.Devnet
@@ -76,7 +76,7 @@ describe('Get Faucet host ', function () {
     )
   })
 
-  it('returns the correct faucetPath for Hooks V2 Testnet host', () => {
+  it('returns the correct faucetPath for Hooks V2 Testnet host', function () {
     const expectedFaucetPath = FaucetNetworkPaths[FaucetNetwork.HooksV2Testnet]
     // @ts-expect-error Intentionally modifying private data for test
     testContext.client.connection.url = FaucetNetwork.HooksV2Testnet
@@ -87,13 +87,13 @@ describe('Get Faucet host ', function () {
     )
   })
 
-  it('returns the correct faucetPath for undefined host', () => {
+  it('returns the correct faucetPath for undefined host', function () {
     const expectedFaucetPath = '/accounts'
 
     assert.strictEqual(getDefaultFaucetPath(undefined), expectedFaucetPath)
   })
 
-  it('throws if not connected to a known faucet host', () => {
+  it('throws if not connected to a known faucet host', function () {
     // Info: setupClient.setup creates a connection to 'localhost'
     assert.throws(() => getFaucetHost(testContext.client))
   })

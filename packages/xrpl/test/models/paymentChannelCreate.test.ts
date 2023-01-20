@@ -25,12 +25,12 @@ describe('PaymentChannelCreate', function () {
     }
   })
 
-  it(`verifies valid PaymentChannelCreate`, () => {
+  it(`verifies valid PaymentChannelCreate`, function () {
     assert.doesNotThrow(() => validatePaymentChannelCreate(channel))
     assert.doesNotThrow(() => validate(channel))
   })
 
-  it(`verifies valid PaymentChannelCreate w/o optional`, () => {
+  it(`verifies valid PaymentChannelCreate w/o optional`, function () {
     delete channel.CancelAfter
     delete channel.DestinationTag
     delete channel.SourceTag
@@ -39,7 +39,7 @@ describe('PaymentChannelCreate', function () {
     assert.doesNotThrow(() => validate(channel))
   })
 
-  it(`missing Amount`, () => {
+  it(`missing Amount`, function () {
     delete channel.Amount
 
     assert.throws(
@@ -54,7 +54,7 @@ describe('PaymentChannelCreate', function () {
     )
   })
 
-  it(`missing Destination`, () => {
+  it(`missing Destination`, function () {
     delete channel.Destination
 
     assert.throws(
@@ -69,7 +69,7 @@ describe('PaymentChannelCreate', function () {
     )
   })
 
-  it(`missing SettleDelay`, () => {
+  it(`missing SettleDelay`, function () {
     delete channel.SettleDelay
 
     assert.throws(
@@ -84,7 +84,7 @@ describe('PaymentChannelCreate', function () {
     )
   })
 
-  it(`missing PublicKey`, () => {
+  it(`missing PublicKey`, function () {
     delete channel.PublicKey
 
     assert.throws(
@@ -99,7 +99,7 @@ describe('PaymentChannelCreate', function () {
     )
   })
 
-  it(`invalid Amount`, () => {
+  it(`invalid Amount`, function () {
     channel.Amount = 1000
 
     assert.throws(
@@ -114,7 +114,7 @@ describe('PaymentChannelCreate', function () {
     )
   })
 
-  it(`invalid Destination`, () => {
+  it(`invalid Destination`, function () {
     channel.Destination = 10
 
     assert.throws(
@@ -129,7 +129,7 @@ describe('PaymentChannelCreate', function () {
     )
   })
 
-  it(`invalid SettleDelay`, () => {
+  it(`invalid SettleDelay`, function () {
     channel.SettleDelay = '10'
 
     assert.throws(
@@ -144,7 +144,7 @@ describe('PaymentChannelCreate', function () {
     )
   })
 
-  it(`invalid PublicKey`, () => {
+  it(`invalid PublicKey`, function () {
     channel.PublicKey = 10
 
     assert.throws(
@@ -159,7 +159,7 @@ describe('PaymentChannelCreate', function () {
     )
   })
 
-  it(`invalid DestinationTag`, () => {
+  it(`invalid DestinationTag`, function () {
     channel.DestinationTag = '10'
 
     assert.throws(
@@ -174,7 +174,7 @@ describe('PaymentChannelCreate', function () {
     )
   })
 
-  it(`invalid CancelAfter`, () => {
+  it(`invalid CancelAfter`, function () {
     channel.CancelAfter = '100'
 
     assert.throws(

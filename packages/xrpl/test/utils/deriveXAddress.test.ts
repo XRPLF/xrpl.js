@@ -2,7 +2,7 @@ import { assert } from 'chai'
 import { deriveXAddress } from 'xrpl-local'
 
 describe('deriveXAddress', function () {
-  it('returns address for public key', () => {
+  it('returns address for public key', function () {
     assert.equal(
       deriveXAddress({
         publicKey:
@@ -23,7 +23,7 @@ describe('deriveXAddress', function () {
     )
   })
 
-  it('does not include tag when null', () => {
+  it('does not include tag when null', function () {
     assert.equal(
       deriveXAddress({
         publicKey:
@@ -36,7 +36,7 @@ describe('deriveXAddress', function () {
     )
   })
 
-  it('does not include tag when undefined', () => {
+  it('does not include tag when undefined', function () {
     assert.equal(
       deriveXAddress({
         publicKey:

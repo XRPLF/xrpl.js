@@ -8,7 +8,7 @@ import { validateBaseTransaction } from 'xrpl-local/models/transactions/common'
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('BaseTransaction', function () {
-  it(`Verifies all optional BaseTransaction`, () => {
+  it(`Verifies all optional BaseTransaction`, function () {
     const txJson = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
@@ -58,7 +58,7 @@ describe('BaseTransaction', function () {
     assert.doesNotThrow(() => validateBaseTransaction(txJson))
   })
 
-  it(`Verifies only required BaseTransaction`, () => {
+  it(`Verifies only required BaseTransaction`, function () {
     const txJson = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
@@ -67,7 +67,7 @@ describe('BaseTransaction', function () {
     assert.doesNotThrow(() => validateBaseTransaction(txJson))
   })
 
-  it(`Handles invalid Fee`, () => {
+  it(`Handles invalid Fee`, function () {
     const invalidFee = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
@@ -81,7 +81,7 @@ describe('BaseTransaction', function () {
     )
   })
 
-  it(`Handles invalid Sequence`, () => {
+  it(`Handles invalid Sequence`, function () {
     const invalidSeq = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
@@ -95,7 +95,7 @@ describe('BaseTransaction', function () {
     )
   })
 
-  it(`Handles invalid AccountTxnID`, () => {
+  it(`Handles invalid AccountTxnID`, function () {
     const invalidID = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
@@ -109,7 +109,7 @@ describe('BaseTransaction', function () {
     )
   })
 
-  it(`Handles invalid LastLedgerSequence`, () => {
+  it(`Handles invalid LastLedgerSequence`, function () {
     const invalidLastLedgerSequence = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
@@ -123,7 +123,7 @@ describe('BaseTransaction', function () {
     )
   })
 
-  it(`Handles invalid SourceTag`, () => {
+  it(`Handles invalid SourceTag`, function () {
     const invalidSourceTag = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
@@ -137,7 +137,7 @@ describe('BaseTransaction', function () {
     )
   })
 
-  it(`Handles invalid SigningPubKey`, () => {
+  it(`Handles invalid SigningPubKey`, function () {
     const invalidSigningPubKey = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
@@ -151,7 +151,7 @@ describe('BaseTransaction', function () {
     )
   })
 
-  it(`Handles invalid TicketSequence`, () => {
+  it(`Handles invalid TicketSequence`, function () {
     const invalidTicketSequence = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
@@ -165,7 +165,7 @@ describe('BaseTransaction', function () {
     )
   })
 
-  it(`Handles invalid TxnSignature`, () => {
+  it(`Handles invalid TxnSignature`, function () {
     const invalidTxnSignature = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
@@ -179,7 +179,7 @@ describe('BaseTransaction', function () {
     )
   })
 
-  it(`Handles invalid Signers`, () => {
+  it(`Handles invalid Signers`, function () {
     const invalidSigners = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
@@ -211,7 +211,7 @@ describe('BaseTransaction', function () {
     )
   })
 
-  it(`Handles invalid Memo`, () => {
+  it(`Handles invalid Memo`, function () {
     const invalidMemo = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',

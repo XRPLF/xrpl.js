@@ -33,19 +33,19 @@ describe('Models Utils', function () {
       flags = 0x00000000
     })
 
-    it('verifies a flag is enabled', () => {
+    it('verifies a flag is enabled', function () {
       flags |= flag1 | flag2
       assert.isTrue(isFlagEnabled(flags, flag1))
     })
 
-    it('verifies a flag is not enabled', () => {
+    it('verifies a flag is not enabled', function () {
       flags |= flag2
       assert.isFalse(isFlagEnabled(flags, flag1))
     })
   })
 
   describe('setTransactionFlagsToNumber', function () {
-    it('sets OfferCreateFlags to its numeric value', () => {
+    it('sets OfferCreateFlags to its numeric value', function () {
       const tx: OfferCreate = {
         Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
         Fee: '10',
@@ -73,7 +73,7 @@ describe('Models Utils', function () {
       assert.strictEqual(tx.Flags, expected)
     })
 
-    it('sets PaymentChannelClaimFlags to its numeric value', () => {
+    it('sets PaymentChannelClaimFlags to its numeric value', function () {
       const tx: PaymentChannelClaim = {
         Account: 'r...',
         TransactionType: 'PaymentChannelClaim',
@@ -92,7 +92,7 @@ describe('Models Utils', function () {
       assert.strictEqual(tx.Flags, expected)
     })
 
-    it('sets PaymentTransactionFlags to its numeric value', () => {
+    it('sets PaymentTransactionFlags to its numeric value', function () {
       const tx: Payment = {
         TransactionType: 'Payment',
         Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
@@ -112,7 +112,7 @@ describe('Models Utils', function () {
       assert.strictEqual(tx.Flags, expected)
     })
 
-    it('sets TrustSetFlags to its numeric value', () => {
+    it('sets TrustSetFlags to its numeric value', function () {
       const tx: TrustSet = {
         TransactionType: 'TrustSet',
         Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
@@ -139,7 +139,7 @@ describe('Models Utils', function () {
       assert.strictEqual(tx.Flags, expected)
     })
 
-    it('sets other transaction types flags to its numeric value', () => {
+    it('sets other transaction types flags to its numeric value', function () {
       const tx: DepositPreauth = {
         TransactionType: 'DepositPreauth',
         Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
@@ -150,7 +150,7 @@ describe('Models Utils', function () {
       assert.strictEqual(tx.Flags, 0)
     })
 
-    it('parseAccountRootFlags all enabled', () => {
+    it('parseAccountRootFlags all enabled', function () {
       const accountRootFlags =
         AccountRootFlags.lsfDefaultRipple |
         AccountRootFlags.lsfDepositAuth |
@@ -177,7 +177,7 @@ describe('Models Utils', function () {
       )
     })
 
-    it('parseAccountFlags all false', () => {
+    it('parseAccountFlags all false', function () {
       const parsed = parseAccountRootFlags(0)
 
       assert.isUndefined(parsed.lsfDefaultRipple)

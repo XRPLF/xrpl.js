@@ -6,7 +6,7 @@ import {
 } from 'xrpl-local'
 
 describe('createCrossChainPayment', function () {
-  it('successful xchain payment creation', () => {
+  it('successful xchain payment creation', function () {
     const payment: Payment = {
       TransactionType: 'Payment',
       Account: 'rRandom',
@@ -33,7 +33,7 @@ describe('createCrossChainPayment', function () {
     assert.notDeepEqual(resultPayment, payment)
   })
 
-  it('successful xchain payment creation with memo', () => {
+  it('successful xchain payment creation with memo', function () {
     const memo = {
       Memo: {
         MemoData: 'deadbeef',
@@ -67,7 +67,7 @@ describe('createCrossChainPayment', function () {
     assert.notDeepEqual(resultPayment, payment)
   })
 
-  it('removes TxnSignature', () => {
+  it('removes TxnSignature', function () {
     const payment: Payment = {
       TransactionType: 'Payment',
       Account: 'rRandom',
@@ -96,7 +96,7 @@ describe('createCrossChainPayment', function () {
     assert.notDeepEqual(resultPayment, payment)
   })
 
-  it('fails with 3 memos', () => {
+  it('fails with 3 memos', function () {
     const payment: Payment = {
       TransactionType: 'Payment',
       Account: 'rRandom',

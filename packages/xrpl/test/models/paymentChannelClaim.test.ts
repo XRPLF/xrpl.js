@@ -25,12 +25,12 @@ describe('PaymentChannelClaim', function () {
     }
   })
 
-  it(`verifies valid PaymentChannelClaim`, () => {
+  it(`verifies valid PaymentChannelClaim`, function () {
     assert.doesNotThrow(() => validatePaymentChannelClaim(channel))
     assert.doesNotThrow(() => validate(channel))
   })
 
-  it(`verifies valid PaymentChannelClaim w/o optional`, () => {
+  it(`verifies valid PaymentChannelClaim w/o optional`, function () {
     delete channel.Balance
     delete channel.Amount
     delete channel.Signature
@@ -40,7 +40,7 @@ describe('PaymentChannelClaim', function () {
     assert.doesNotThrow(() => validate(channel))
   })
 
-  it(`throws w/ missing Channel`, () => {
+  it(`throws w/ missing Channel`, function () {
     delete channel.Channel
 
     assert.throws(
@@ -55,7 +55,7 @@ describe('PaymentChannelClaim', function () {
     )
   })
 
-  it(`throws w/ invalid Channel`, () => {
+  it(`throws w/ invalid Channel`, function () {
     channel.Channel = 100
 
     assert.throws(
@@ -70,7 +70,7 @@ describe('PaymentChannelClaim', function () {
     )
   })
 
-  it(`throws w/ invalid Balance`, () => {
+  it(`throws w/ invalid Balance`, function () {
     channel.Balance = 100
 
     assert.throws(
@@ -85,7 +85,7 @@ describe('PaymentChannelClaim', function () {
     )
   })
 
-  it(`throws w/ invalid Amount`, () => {
+  it(`throws w/ invalid Amount`, function () {
     channel.Amount = 1000
 
     assert.throws(
@@ -100,7 +100,7 @@ describe('PaymentChannelClaim', function () {
     )
   })
 
-  it(`throws w/ invalid Signature`, () => {
+  it(`throws w/ invalid Signature`, function () {
     channel.Signature = 1000
 
     assert.throws(
@@ -115,7 +115,7 @@ describe('PaymentChannelClaim', function () {
     )
   })
 
-  it(`throws w/ invalid PublicKey`, () => {
+  it(`throws w/ invalid PublicKey`, function () {
     channel.PublicKey = ['100000']
 
     assert.throws(

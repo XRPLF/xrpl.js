@@ -23,12 +23,12 @@ describe('AccountSet', function () {
     } as any
   })
 
-  it(`verifies valid AccountSet`, () => {
+  it(`verifies valid AccountSet`, function () {
     assert.doesNotThrow(() => validateAccountSet(account))
     assert.doesNotThrow(() => validate(account))
   })
 
-  it(`throws w/ invalid SetFlag (out of range)`, () => {
+  it(`throws w/ invalid SetFlag (out of range)`, function () {
     account.SetFlag = 12
 
     assert.throws(
@@ -43,7 +43,7 @@ describe('AccountSet', function () {
     )
   })
 
-  it(`throws w/ invalid SetFlag (incorrect type)`, () => {
+  it(`throws w/ invalid SetFlag (incorrect type)`, function () {
     account.SetFlag = 'abc'
 
     assert.throws(
@@ -58,7 +58,7 @@ describe('AccountSet', function () {
     )
   })
 
-  it(`throws w/ invalid ClearFlag`, () => {
+  it(`throws w/ invalid ClearFlag`, function () {
     account.ClearFlag = 12
 
     assert.throws(
@@ -73,7 +73,7 @@ describe('AccountSet', function () {
     )
   })
 
-  it(`throws w/ invalid Domain`, () => {
+  it(`throws w/ invalid Domain`, function () {
     account.Domain = 6578616
 
     assert.throws(
@@ -88,7 +88,7 @@ describe('AccountSet', function () {
     )
   })
 
-  it(`throws w/ invalid EmailHash`, () => {
+  it(`throws w/ invalid EmailHash`, function () {
     account.EmailHash = 6578656789876543
 
     assert.throws(
@@ -103,7 +103,7 @@ describe('AccountSet', function () {
     )
   })
 
-  it(`throws w/ invalid MessageKey`, () => {
+  it(`throws w/ invalid MessageKey`, function () {
     account.MessageKey = 6578656789876543
 
     assert.throws(
@@ -118,7 +118,7 @@ describe('AccountSet', function () {
     )
   })
 
-  it(`throws w/ invalid TransferRate`, () => {
+  it(`throws w/ invalid TransferRate`, function () {
     account.TransferRate = '1000000001'
 
     assert.throws(
@@ -133,7 +133,7 @@ describe('AccountSet', function () {
     )
   })
 
-  it(`throws w/ invalid TickSize`, () => {
+  it(`throws w/ invalid TickSize`, function () {
     account.TickSize = 20
 
     assert.throws(

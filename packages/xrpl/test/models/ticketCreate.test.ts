@@ -18,12 +18,12 @@ describe('TicketCreate', function () {
     } as any
   })
 
-  it('verifies valid TicketCreate', () => {
+  it('verifies valid TicketCreate', function () {
     assert.doesNotThrow(() => validateTicketCreate(ticketCreate))
     assert.doesNotThrow(() => validate(ticketCreate))
   })
 
-  it('throws when TicketCount is missing', () => {
+  it('throws when TicketCount is missing', function () {
     delete ticketCreate.TicketCount
     assert.throws(
       () => validateTicketCreate(ticketCreate),
@@ -37,7 +37,7 @@ describe('TicketCreate', function () {
     )
   })
 
-  it('throws when TicketCount is not a number', () => {
+  it('throws when TicketCount is not a number', function () {
     ticketCreate.TicketCount = '150'
     assert.throws(
       () => validateTicketCreate(ticketCreate),
@@ -51,7 +51,7 @@ describe('TicketCreate', function () {
     )
   })
 
-  it('throws when TicketCount is not an integer', () => {
+  it('throws when TicketCount is not an integer', function () {
     ticketCreate.TicketCount = 12.5
     assert.throws(
       () => validateTicketCreate(ticketCreate),
@@ -65,7 +65,7 @@ describe('TicketCreate', function () {
     )
   })
 
-  it('throws when TicketCount is < 1', () => {
+  it('throws when TicketCount is < 1', function () {
     ticketCreate.TicketCount = 0
     assert.throws(
       () => validateTicketCreate(ticketCreate),
@@ -79,7 +79,7 @@ describe('TicketCreate', function () {
     )
   })
 
-  it('throws when TicketCount is > 250', () => {
+  it('throws when TicketCount is > 250', function () {
     ticketCreate.TicketCount = 251
     assert.throws(
       () => validateTicketCreate(ticketCreate),

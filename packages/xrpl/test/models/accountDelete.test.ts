@@ -8,7 +8,7 @@ import { validateAccountDelete } from 'xrpl-local/models/transactions/accountDel
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('AccountDelete', function () {
-  it(`verifies valid AccountDelete`, () => {
+  it(`verifies valid AccountDelete`, function () {
     const validAccountDelete = {
       TransactionType: 'AccountDelete',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -22,7 +22,7 @@ describe('AccountDelete', function () {
     assert.doesNotThrow(() => validateAccountDelete(validAccountDelete))
   })
 
-  it(`throws w/ missing Destination`, () => {
+  it(`throws w/ missing Destination`, function () {
     const invalidDestination = {
       TransactionType: 'AccountDelete',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -44,7 +44,7 @@ describe('AccountDelete', function () {
     )
   })
 
-  it(`throws w/ invalid Destination`, () => {
+  it(`throws w/ invalid Destination`, function () {
     const invalidDestination = {
       TransactionType: 'AccountDelete',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -66,7 +66,7 @@ describe('AccountDelete', function () {
     )
   })
 
-  it(`throws w/ invalid DestinationTag`, () => {
+  it(`throws w/ invalid DestinationTag`, function () {
     const invalidDestinationTag = {
       TransactionType: 'AccountDelete',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',

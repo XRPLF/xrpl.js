@@ -19,12 +19,12 @@ describe('EscrowCancel', function () {
     }
   })
 
-  it(`Valid EscrowCancel`, () => {
+  it(`Valid EscrowCancel`, function () {
     assert.doesNotThrow(() => validateEscrowCancel(cancel))
     assert.doesNotThrow(() => validate(cancel))
   })
 
-  it(`Invalid EscrowCancel missing owner`, () => {
+  it(`Invalid EscrowCancel missing owner`, function () {
     delete cancel.Owner
 
     assert.throws(
@@ -39,7 +39,7 @@ describe('EscrowCancel', function () {
     )
   })
 
-  it(`Invalid EscrowCancel missing offerSequence`, () => {
+  it(`Invalid EscrowCancel missing offerSequence`, function () {
     delete cancel.OfferSequence
 
     assert.throws(
@@ -54,7 +54,7 @@ describe('EscrowCancel', function () {
     )
   })
 
-  it(`Invalid OfferSequence`, () => {
+  it(`Invalid OfferSequence`, function () {
     cancel.Owner = 10
 
     assert.throws(
@@ -69,7 +69,7 @@ describe('EscrowCancel', function () {
     )
   })
 
-  it(`Invalid owner`, () => {
+  it(`Invalid owner`, function () {
     cancel.OfferSequence = '10'
 
     assert.throws(

@@ -2,7 +2,7 @@ import { assert } from 'chai'
 import { convertHexToString, convertStringToHex } from 'xrpl-local/utils'
 
 describe('convertHexToString and convertStringToHex', function () {
-  it('converts "example.com"', () => {
+  it('converts "example.com"', function () {
     const str = 'example.com'
     const hex = convertStringToHex(str)
     assert.strictEqual(
@@ -18,7 +18,7 @@ describe('convertHexToString and convertStringToHex', function () {
     )
   })
 
-  it('converts "你好"', () => {
+  it('converts "你好"', function () {
     const str = '你好'
     const hex = convertStringToHex(str)
     assert.strictEqual(hex, 'E4BDA0E5A5BD', 'should convert to hex equivalent')

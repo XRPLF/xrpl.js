@@ -118,13 +118,13 @@ describe('Signer', function () {
     expectedMultisign = encode(multisignJSON)
   })
 
-  it('multisign runs successfully with Transaction objects', () => {
+  it('multisign runs successfully with Transaction objects', function () {
     const transactions = [multisignTxToCombine1, multisignTxToCombine2]
 
     assert.deepEqual(multisign(transactions), expectedMultisign)
   })
 
-  it('multisign runs successfully with X-address', () => {
+  it('multisign runs successfully with X-address', function () {
     multisignTxToCombine1.Account =
       'XVJfK5FpouB7gtk3kaZHqbgV4Bswir4ccz3rsJw9oMf71tc'
     multisignTxToCombine2.Account =
@@ -135,7 +135,7 @@ describe('Signer', function () {
     assert.deepEqual(multisign(transactions), expectedMultisign)
   })
 
-  it('multisign runs successfully with tx_blobs', () => {
+  it('multisign runs successfully with tx_blobs', function () {
     const transactions = [multisignTxToCombine1, multisignTxToCombine2]
 
     const encodedTransactions: string[] = transactions.map(encode)
@@ -143,12 +143,12 @@ describe('Signer', function () {
     assert.deepEqual(multisign(encodedTransactions), expectedMultisign)
   })
 
-  it('multisign throws a validation error when there are no transactions', () => {
+  it('multisign throws a validation error when there are no transactions', function () {
     const transactions = []
     assert.throws(() => multisign(transactions), ValidationError)
   })
 
-  it('multisign throws when trying to combine two different transactions', () => {
+  it('multisign throws when trying to combine two different transactions', function () {
     const differentMultisignedTx: Transaction = {
       TransactionType: 'Payment',
       Sequence: 1,
@@ -175,7 +175,7 @@ describe('Signer', function () {
     assert.throws(() => multisign(transactions))
   })
 
-  it('multisign throws when trying to combine transaction with normal signature', () => {
+  it('multisign throws when trying to combine transaction with normal signature', function () {
     const signedTxBlob =
       '120000228000000024013A0F74201B013A0FC36140000000014FB18068400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F544744730450221009ECB5324717E14DD6970126271F05BC2626D2A8FA9F3797555D417F8257C1E6002206BDD74A0F30425F2BA9DB69C90F21B3E27735C190FB4F3A640F066ACBBF06AD98114B3263BD0A9BF9DFDBBBBD07F536355FF477BF0E98314F667B0CA50CC7709A220B0561B85E53A48461FA8'
 
@@ -184,7 +184,7 @@ describe('Signer', function () {
     assert.throws(() => multisign(transactions), /forMultisign/u)
   })
 
-  it('authorizeChannel succeeds with secp256k1 seed', () => {
+  it('authorizeChannel succeeds with secp256k1 seed', function () {
     const secpWallet = Wallet.fromSeed('snGHNrPbHrdUcszeuDEigMdC1Lyyd')
     const channelId =
       '5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3'
@@ -196,7 +196,7 @@ describe('Signer', function () {
     )
   })
 
-  it('authorizeChannel succeeds with ed25519 seed', () => {
+  it('authorizeChannel succeeds with ed25519 seed', function () {
     const edWallet = Wallet.fromSeed('sEdSuqBPSQaood2DmNYVkwWTn1oQTj2')
     const channelId =
       '5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3'
@@ -207,13 +207,13 @@ describe('Signer', function () {
     )
   })
 
-  it('verifySignature succeeds for valid signed transaction blob', () => {
+  it('verifySignature succeeds for valid signed transaction blob', function () {
     const signedTx = verifyWallet.sign(tx)
 
     assert.isTrue(verifySignature(signedTx.tx_blob))
   })
 
-  it('verify succeeds for valid signed transaction object', () => {
+  it('verify succeeds for valid signed transaction object', function () {
     const signedTx = verifyWallet.sign(tx)
 
     assert.isTrue(
@@ -221,7 +221,7 @@ describe('Signer', function () {
     )
   })
 
-  it('verify throws for invalid signing key', () => {
+  it('verify throws for invalid signing key', function () {
     const signedTx = verifyWallet.sign(tx)
 
     const decodedTx = decode(signedTx.tx_blob) as unknown as Transaction
