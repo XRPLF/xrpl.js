@@ -57,7 +57,7 @@ export interface ServerStateResponse extends BaseResponse {
       pubkey_node: string
       pubkey_validator?: string
       server_state: ServerState
-      server_state_duration_us: number
+      server_state_duration_us: string
       state_accounting: StateAccountingFinal
       time: string
       uptime: number

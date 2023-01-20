@@ -59,7 +59,7 @@ describe('server_info (rippled)', function () {
             pubkey_node: 'n9K6DaaReKkCjb9sEfXh5xP3BV9JisrJ9biKB3CSSFXancBnv5cW',
             pubkey_validator: 'none',
             server_state: 'full',
-            server_state_duration_us: 8752395105,
+            server_state_duration_us: '8752395105',
             state_accounting: {
               connected: { duration_us: '0', transitions: 0 },
               disconnected: { duration_us: '41860', transitions: 1 },

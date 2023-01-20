@@ -195,7 +195,7 @@ export interface ServerInfoResponse extends BaseResponse {
        * The number of consecutive microseconds the server has been in the
        * current state.
        */
-      server_state_duration_us: number
+      server_state_duration_us: string
       /**
        * A map of various server states with information about the time the
        * server spends in each. This can be useful for tracking the long-term
