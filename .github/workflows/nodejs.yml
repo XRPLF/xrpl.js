@@ -138,7 +138,7 @@ jobs:
         run: npm ci
 
       - run: npm run build
-      - run: npm run test:integration:submitandwaitbatch
+      - run: cd packages/xrpl && npm run test:integration:submitandwaitbatch
       - run: npm run test:integration
         env:
           HOST: localhost
