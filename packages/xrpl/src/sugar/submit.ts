@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- necessary */
 import { decode, encode } from 'ripple-binary-codec'
 
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
@@ -81,30 +82,65 @@ async function submitAndWait(
  * See [Reliable Transaction Submission](https://xrpl.org/reliable-transaction-submission.html).
  *
  * @param this - A Client.
- * @param transactions - A batch of transactions to autofill, sign & encode, and submit synchronously.
- * @param opts - (Optional) Options used to sign and submit a transaction.
- * @param opts.autofill - If true, autofill a transaction.
- * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
- * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+ * @param transactions - A batch of transactions with opts to autofill, sign & encode, and submit synchronously.
  * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
  */
+// eslint-disable-next-line max-lines-per-function -- necessary
 async function submitAndWaitBatch(
   this: Client,
-  transactions: Array<Transaction | string>,
-  opts?: {
-    // If true, autofill a transaction.
-    autofill?: boolean
-    // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
-    failHard?: boolean
-    // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
-    wallet?: Wallet
-  },
-): Promise<TxResponse[]> {
-  const result: TxResponse[] = []
-  for (const tx of transactions) {
-    // eslint-disable-next-line no-await-in-loop -- necessary
-    result.push(await submitAndWaitHelper(this, tx, opts))
+  transactions: Array<{
+    transaction: Transaction
+    opts?: {
+      // If true, autofill a transaction.
+      autofill?: boolean
+      // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+      failHard?: boolean
+      // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+      wallet?: Wallet
+    }
+  }>,
+): Promise<{ success: TxResponse[]; error: Error[] }> {
+  const result: { success: TxResponse[]; error: Error[] } = {
+    success: [],
+    error: [],
   }
+
+  // Account to transactions map
+  const batchMap: Map<
+    string,
+    Array<{
+      transaction: Transaction
+      opts?: {
+        autofill?: boolean
+        failHard?: boolean
+        wallet?: Wallet
+      }
+    }>
+  > = new Map()
+  for (const tx of transactions) {
+    const account = tx.transaction.Account
+    if (!batchMap.has(account)) {
+      batchMap.set(account, [])
+    }
+    batchMap.get(account)?.push(tx)
+  }
+
+  console.log('batchMap:')
+  console.log(batchMap)
+
+  const accounts = batchMap.keys()
+  // Create a promise for each account so sequence number increments appropriately after each transaction submission
+  console.log('accounts:')
+  console.log(accounts)
+  const promises: Array<Promise<void>> = []
+  for (const account of accounts) {
+    promises.push(submitAndWaitBatchHelper(this, account, batchMap, result))
+  }
+
+  console.log('promises:')
+  console.log(promises)
+
+  await Promise.all(promises)
   return result
 }
 
@@ -222,6 +258,51 @@ async function submitAndWaitHelper(
     lastLedger,
     response.result.engine_result,
   )
+}
+
+// eslint-disable-next-line max-params, max-lines-per-function -- necessary
+async function submitAndWaitBatchHelper(
+  client: Client,
+  account: string,
+  batchMap: Map<
+    string,
+    Array<{
+      transaction: Transaction
+      opts?: {
+        autofill?: boolean
+        failHard?: boolean
+        wallet?: Wallet
+      }
+    }>
+  >,
+  result: { success: TxResponse[]; error: Error[] },
+): Promise<void> {
+  const transactions = batchMap.get(account)
+  if (transactions == null) {
+    throw Error(`transaction is undefined`)
+  }
+  for (const tx of transactions) {
+    try {
+      // eslint-disable-next-line no-await-in-loop -- necessary
+      const txResponse = await submitAndWaitHelper(
+        client,
+        tx.transaction,
+        tx.opts,
+      )
+      result.success.push(txResponse)
+    } catch (err) {
+      // eslint-disable-next-line max-depth -- for unit tests & build to pass
+      if (!(err instanceof Error)) {
+        console.log('not an xrpl.js recognizable Error')
+        throw err
+      }
+      result.error.push(err)
+      // Mode 1: don't send remaining transactions
+      break
+    }
+  }
+
+  batchMap.delete(account)
 }
 
 // checks if the transaction has been signed
