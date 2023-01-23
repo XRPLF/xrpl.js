@@ -18,10 +18,6 @@ describe('client.submitAndWaitBatch', function () {
   it('submitAndWaitBatch a set of payment transactions', async function () {
     const receiverWallet = await generateFundedWallet(this.client)
     const receiverWallet2 = await generateFundedWallet(this.client)
-    console.log('receiverWallet:')
-    console.log(receiverWallet)
-    console.log('receiverWallet2:')
-    console.log(receiverWallet)
 
     const paymentTx: Payment = {
       TransactionType: 'Payment',
@@ -47,7 +43,6 @@ describe('client.submitAndWaitBatch', function () {
     ]
 
     const result = await this.client.submitAndWaitBatch(txList)
-    console.log('after invoking submitAndWaitBatch')
     assert.equal(result.success.length, 2)
 
     /*

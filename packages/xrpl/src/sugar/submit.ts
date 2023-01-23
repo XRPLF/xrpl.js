@@ -125,20 +125,12 @@ async function submitAndWaitBatch(
     batchMap.get(account)?.push(tx)
   }
 
-  console.log('batchMap:')
-  console.log(batchMap)
-
   const accounts = batchMap.keys()
   // Create a promise for each account so sequence number increments appropriately after each transaction submission
-  console.log('accounts:')
-  console.log(accounts)
   const promises: Array<Promise<void>> = []
   for (const account of accounts) {
     promises.push(submitAndWaitBatchHelper(this, account, batchMap, result))
   }
-
-  console.log('promises:')
-  console.log(promises)
 
   await Promise.all(promises)
   return result
@@ -260,7 +252,7 @@ async function submitAndWaitHelper(
   )
 }
 
-// eslint-disable-next-line max-params, max-lines-per-function -- necessary
+// eslint-disable-next-line max-params -- necessary
 async function submitAndWaitBatchHelper(
   client: Client,
   account: string,
@@ -293,7 +285,6 @@ async function submitAndWaitBatchHelper(
     } catch (err) {
       // eslint-disable-next-line max-depth -- for unit tests & build to pass
       if (!(err instanceof Error)) {
-        console.log('not an xrpl.js recognizable Error')
         throw err
       }
       result.error.push(err)
