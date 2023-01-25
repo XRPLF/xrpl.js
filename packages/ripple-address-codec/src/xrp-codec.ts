@@ -3,7 +3,7 @@
  */
 
 import * as baseCodec from 'base-x'
-import * as hashjs from 'hash.js';
+import * as hashjs from 'hash.js'
 
 import { seqEqual, concatArgs } from './utils'
 
@@ -161,7 +161,7 @@ const ED25519_SEED = [0x01, 0xe1, 0x4b]
 
 const codecOptions = {
   sha256(bytes: Uint8Array): Buffer {
-    return Buffer.from(hashjs.sha256().update(bytes).digest());
+    return Buffer.from(hashjs.sha256().update(bytes).digest())
   },
   alphabet: 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz',
 }
