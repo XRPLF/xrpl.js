@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "base-x": "3.0.9",
-    "create-hash": "^1.1.2"
+    "hash.js": "^1.1.7"
   },
   "repository": {
     "type": "git",
