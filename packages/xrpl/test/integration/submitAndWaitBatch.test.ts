@@ -1,13 +1,15 @@
+/* eslint-disable @typescript-eslint/no-misused-promises -- supposed to return a promise here */
+/* eslint-disable no-restricted-syntax -- not sure why this rule is here, definitely not needed here */
 import { assert } from 'chai'
 import _ from 'lodash'
 import { Payment } from 'xrpl-local'
 
 import serverUrl from './serverUrl'
 import { setupClient, teardownClient } from './setup'
-import { generateFundedWallet } from './utils'
+import { generateFundedWallet, ledgerAccept } from './utils'
 
 // how long before each test case times out
-const TIMEOUT = 1200000
+const TIMEOUT = 60000
 
 describe('client.submitAndWaitBatch', function () {
   this.timeout(TIMEOUT)
@@ -42,38 +44,19 @@ describe('client.submitAndWaitBatch', function () {
       },
     ]
 
-    const result = await this.client.submitAndWaitBatch(txList)
-    assert.equal(result.success.length, 2)
+    const responsePromise = this.client.submitAndWaitBatch(txList)
 
-    /*
-     * for (const response of result) {
-     *   // check that the transaction was successful
-     *   assert.equal(response.type, 'response')
-     *   assert.equal(
-     *     response.result.engine_result,
-     *     'tesSUCCESS',
-     *     response.result.engine_result_message,
-     *   )
-     * }
-     */
+    const ledgerPromise = setTimeout(ledgerAccept, 1000, this.client)
+    const ledgerPromise2 = setTimeout(ledgerAccept, 3000, this.client)
+    return Promise.all([responsePromise, ledgerPromise, ledgerPromise2]).then(
+      ([result, _ledger, _ledger2]) => {
+        assert.equal(result.success.length, 2)
+        assert.equal(result.error.length, 0)
+        for (const response of result.success) {
+          assert.equal(response.type, 'response')
+          assert.equal(response.result.validated, true)
+        }
+      },
+    )
   })
-
-  /*
-   * it('should throw a ValidationError when submitting an unsigned transaction without a wallet', async function () {
-   *   const accountSet: AccountSet = {
-   *     TransactionType: 'AccountSet',
-   *     Account: this.wallet.classicAddress,
-   *     Domain: convertStringToHex('example.com'),
-   *   }
-   *   const txList = [accountSet]
-   */
-
-  /*
-   *   await assertRejects(
-   *     this.client.submitAndWaitBatch(txList),
-   *     ValidationError,
-   *     'Wallet must be provided when submitting an unsigned transaction',
-   *   )
-   * })
-   */
 })
