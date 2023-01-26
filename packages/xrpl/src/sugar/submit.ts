@@ -99,10 +99,36 @@ async function submitAndWaitBatch(
       wallet?: Wallet
     }
   }>,
-): Promise<{ success: TxResponse[]; error: Error[] }> {
-  const result: { success: TxResponse[]; error: Error[] } = {
+): Promise<{
+  success: TxResponse[]
+  error: Error[]
+  unsubmitted: Array<{
+    transaction: Transaction
+    opts?: {
+      // If true, autofill a transaction.
+      autofill?: boolean
+      // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+      failHard?: boolean
+      // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+      wallet?: Wallet
+    }
+  }>
+}> {
+  const result: {
+    success: TxResponse[]
+    error: Error[]
+    unsubmitted: Array<{
+      transaction: Transaction
+      opts?: {
+        autofill?: boolean
+        failHard?: boolean
+        wallet?: Wallet
+      }
+    }>
+  } = {
     success: [],
     error: [],
+    unsubmitted: [],
   }
 
   // Account to transactions map
@@ -252,7 +278,7 @@ async function submitAndWaitHelper(
   )
 }
 
-// eslint-disable-next-line max-params -- necessary
+// eslint-disable-next-line max-params, max-lines-per-function -- necessary
 async function submitAndWaitBatchHelper(
   client: Client,
   account: string,
@@ -267,13 +293,25 @@ async function submitAndWaitBatchHelper(
       }
     }>
   >,
-  result: { success: TxResponse[]; error: Error[] },
+  result: {
+    success: TxResponse[]
+    error: Error[]
+    unsubmitted: Array<{
+      transaction: Transaction
+      opts?: {
+        autofill?: boolean
+        failHard?: boolean
+        wallet?: Wallet
+      }
+    }>
+  },
 ): Promise<void> {
   const transactions = batchMap.get(account)
   if (transactions == null) {
     throw Error(`transaction is undefined`)
   }
-  for (const tx of transactions) {
+  for (let idx = 0; idx < transactions.length; idx++) {
+    const tx = transactions[idx]
     try {
       // eslint-disable-next-line no-await-in-loop -- necessary
       const txResponse = await submitAndWaitHelper(
@@ -289,6 +327,8 @@ async function submitAndWaitBatchHelper(
       }
       result.error.push(err)
       // Mode 1: don't send remaining transactions
+      const remainingTransactions = transactions.slice(idx + 1)
+      result.unsubmitted.push(...remainingTransactions)
       break
     }
   }

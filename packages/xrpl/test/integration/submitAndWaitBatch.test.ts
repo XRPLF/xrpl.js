@@ -40,6 +40,7 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger]) => {
         assert.equal(result.success.length, 1)
         assert.equal(result.error.length, 0)
+        assert.equal(result.unsubmitted.length, 0)
         assert.equal(result.success[0].type, 'response')
         assert.equal(result.success[0].result.validated, true)
       },
@@ -67,6 +68,7 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger]) => {
         assert.equal(result.success.length, 0)
         assert.equal(result.error.length, 1)
+        assert.equal(result.unsubmitted.length, 0)
         assert.equal(result.error[0].data.error, 'invalidTransaction')
         assert.equal(result.error[0].data.status, 'error')
       },
@@ -108,6 +110,7 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger, _ledger2]) => {
         assert.equal(result.success.length, 2)
         assert.equal(result.error.length, 0)
+        assert.equal(result.unsubmitted.length, 0)
         for (const response of result.success) {
           assert.equal(response.type, 'response')
           assert.equal(response.result.validated, true)
@@ -150,6 +153,7 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger, _ledger2]) => {
         assert.equal(result.success.length, 1)
         assert.equal(result.error.length, 1)
+        assert.equal(result.unsubmitted.length, 0)
         assert.equal(result.success[0].type, 'response')
         assert.equal(result.success[0].result.validated, true)
         assert.equal(result.error[0].data.error, 'invalidTransaction')
@@ -194,6 +198,7 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger, _ledger2]) => {
         assert.equal(result.success.length, 2)
         assert.equal(result.error.length, 0)
+        assert.equal(result.unsubmitted.length, 0)
         for (const response of result.success) {
           assert.equal(response.type, 'response')
           assert.equal(response.result.validated, true)
@@ -236,6 +241,7 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger, _ledger2]) => {
         assert.equal(result.success.length, 0)
         assert.equal(result.error.length, 2)
+        assert.equal(result.unsubmitted.length, 0)
         for (const response of result.error) {
           assert.equal(response.data.error, 'invalidTransaction')
           assert.equal(response.data.status, 'error')
@@ -302,6 +308,7 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger, _ledger2]) => {
         assert.equal(result.success.length, 4)
         assert.equal(result.error.length, 0)
+        assert.equal(result.unsubmitted.length, 0)
         for (const response of result.success) {
           assert.equal(response.type, 'response')
           assert.equal(response.result.validated, true)
@@ -366,6 +373,7 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger, _ledger2]) => {
         assert.equal(result.success.length, 2)
         assert.equal(result.error.length, 2)
+        assert.equal(result.unsubmitted.length, 0)
         for (const response of result.success) {
           assert.equal(response.type, 'response')
           assert.equal(response.result.validated, true)
@@ -378,7 +386,7 @@ describe('client.submitAndWaitBatch', function () {
     )
   })
 
-  it("submitAndWaitBatch multiple accounts submit multiple payment transactions with one erroneous and doesn't invoke subsequent transactions", async function () {
+  it("submitAndWaitBatch multiple accounts submit multiple payment transactions with one erroneous and doesn't submit subsequent transactions", async function () {
     const receiverWallet = await generateFundedWallet(this.client)
     const receiverWallet2 = await generateFundedWallet(this.client)
     const senderWallet2 = await generateFundedWallet(this.client)
@@ -456,6 +464,7 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger, _ledger2]) => {
         assert.equal(result.success.length, 2)
         assert.equal(result.error.length, 2)
+        assert.equal(result.unsubmitted.length, 2)
         for (const response of result.success) {
           assert.equal(response.type, 'response')
           assert.equal(response.result.validated, true)
@@ -464,6 +473,8 @@ describe('client.submitAndWaitBatch', function () {
           assert.equal(response.data.error, 'invalidTransaction')
           assert.equal(response.data.status, 'error')
         }
+        assert.equal(result.unsubmitted[0].transaction, paymentTx2)
+        assert.equal(result.unsubmitted[1].transaction, paymentTx4)
       },
     )
   })
