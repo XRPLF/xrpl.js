@@ -5,6 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Fixed
 * Code splitting improvements for lodash
+* Fixed missing reason code in websocket implemntation on websocket disconnect
 
 ### Added
 
