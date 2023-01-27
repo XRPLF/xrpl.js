@@ -33,13 +33,6 @@ describe('Get Faucet host ', function () {
     assert.strictEqual(getFaucetHost(this.client), expectedFaucet)
   })
 
-  it('returns the NFT-Devnet host with the XLS-20 Sandbox server', function () {
-    const expectedFaucet = FaucetNetwork.NFTDevnet
-    this.client.connection.url = 'ws://xls20-sandbox.rippletest.net:51233'
-
-    assert.strictEqual(getFaucetHost(this.client), expectedFaucet)
-  })
-
   it('returns the Hooks V2 Testnet host', function () {
     const expectedFaucet = FaucetNetwork.HooksV2Testnet
     this.client.connection.url = FaucetNetwork.HooksV2Testnet
