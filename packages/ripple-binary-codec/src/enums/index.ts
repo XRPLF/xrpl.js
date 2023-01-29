@@ -1,7 +1,9 @@
-import * as enums from './definitions.json'
+import { getDefinitions } from './definitions'
 import { SerializedType } from '../types/serialized-type'
 import { Buffer } from 'buffer/'
 import { BytesList } from '../binary'
+
+const enums = getDefinitions()
 
 /*
  * @brief: All valid transaction types

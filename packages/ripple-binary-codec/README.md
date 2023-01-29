@@ -105,3 +105,20 @@ Use `--coverage` to generate and display code coverage information:
     npm test --coverage
 
 This tells jest to output code coverage info in the `./coverage` directory, in addition to showing it on the command line.
+
+## Custom definitions
+If you want to use this lib. on e.g. a side chain, where different (new) transaction
+types, fields, etc. are supported, you can load a
+[custom `definitions.json`](https://github.com/RichardAH/xrpl-codec-gen).
+
+Loading a custom `definitions.json` file with the `setDefinitions` method needs
+to happen **before** any of the other methods of this lib. are called.
+
+```js
+// First only import the definitions methods
+const { encode, decode, setDefinitions } = require('ripple-binary-codec')
+setDefinitions(require('./my-custom-definitions.json'))
+
+// Now enjoy your custom definitions:
+const encoded = encode({ TransactionType: 'SomeNewTxtype' })
+```
