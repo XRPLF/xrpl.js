@@ -116,9 +116,13 @@ to happen **before** any of the other methods of this lib. are called.
 
 ```js
 // First only import the definitions methods
-const { encode, decode, setDefinitions } = require('ripple-binary-codec')
+const { setDefinitions } = require('ripple-binary-codec/dist/enums/definitions')
 setDefinitions(require('./my-custom-definitions.json'))
+
+const { encode, decode } = require('ripple-binary-codec')
 
 // Now enjoy your custom definitions:
 const encoded = encode({ TransactionType: 'SomeNewTxtype' })
+
+console.log(encoded)
 ```
