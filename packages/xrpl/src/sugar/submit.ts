@@ -11,7 +11,7 @@ import { hashes } from '../utils'
 /** Approximate time for a ledger to close, in milliseconds */
 const LEDGER_CLOSE_TIME = 1000
 
-interface SubmitAndWaitBatchResponse {
+interface SubmitAndWaitBatchResult {
   // Successfully submitted transactions
   success: TxResponse[]
   // Failed submitted transactions
@@ -122,19 +122,8 @@ async function submitAndWaitBatch(
       wallet?: Wallet
     }
   }>,
-): Promise<SubmitAndWaitBatchResponse> {
-  const result: {
-    success: TxResponse[]
-    error: Error[]
-    unsubmitted: Array<{
-      transaction: Transaction
-      opts?: {
-        autofill?: boolean
-        failHard?: boolean
-        wallet?: Wallet
-      }
-    }>
-  } = {
+): Promise<SubmitAndWaitBatchResult> {
+  const result = {
     success: [],
     error: [],
     unsubmitted: [],
@@ -305,7 +294,7 @@ async function submitAndWaitBatchHelper(
       }
     }>
   >,
-  result: SubmitAndWaitBatchResponse,
+  result: SubmitAndWaitBatchResult,
 ): Promise<void> {
   const transactions = batchMap.get(account)
   if (transactions == null) {
