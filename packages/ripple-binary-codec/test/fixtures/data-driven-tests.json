@@ -485,13 +485,6 @@
         },
         {
             "type_name": "Hash256",
-            "name": "TicketID",
-            "nth_of_type": 20,
-            "type": 5,
-            "expected_hex": "5014"
-        },
-        {
-            "type_name": "Hash256",
             "name": "Digest",
             "nth_of_type": 21,
             "type": 5,
@@ -720,13 +713,6 @@
             "nth_of_type": 4,
             "type": 8,
             "expected_hex": "84"
-        },
-        {
-            "type_name": "AccountID",
-            "name": "Target",
-            "nth_of_type": 7,
-            "type": 8,
-            "expected_hex": "87"
         },
         {
             "type_name": "AccountID",

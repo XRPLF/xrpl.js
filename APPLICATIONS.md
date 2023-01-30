@@ -14,7 +14,7 @@ Warning: Use at your own risk.
 
 - **[The World Exchange](https://www.theworldexchange.net/)**
 
-  Trade, issue, and send directly on the XRP Ledger. A user interface for the XRPL's decentralized exchange.
+  Trade, issue, and send directly on the XRP Ledger. A user interface for the XRPL's decentralized exchange. Includes an implementation of an autobridged order book for token-to-token trading pairs in the [source code](https://github.com/pftq/TheWorldExchange).
 
 - **[Bitso](https://bitso.com/)**
 
@@ -68,7 +68,7 @@ Warning: Use at your own risk.
 
   Attempts to detect RippleNet on-demand liquidity (ODL) transactions through known fiat corridors and report these transactions in real time.
 
-- **[XRPL Rosetta](https://xrpl-rosetta-oepox.ondigitalocean.app)**
+- **[XRPL Rosetta](https://threexrp.dev/)**
 
   3D Globe written in three.js connected to a Node.js websocket server that is listening to exchanges and the XRPL. The visualization aims to show trading, ODL, and liquidity at exchanges, intra-exchange volume, and flows.
 

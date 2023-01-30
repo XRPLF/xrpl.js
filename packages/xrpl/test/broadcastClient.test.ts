@@ -1,7 +1,6 @@
 import { assert } from 'chai'
 import _ from 'lodash'
-
-import { ServerInfoResponse } from '../src'
+import { ServerInfoResponse } from 'xrpl-local'
 
 import responses from './fixtures/responses'
 import rippled from './fixtures/rippled'

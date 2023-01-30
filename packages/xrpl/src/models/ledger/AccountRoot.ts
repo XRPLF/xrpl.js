@@ -115,7 +115,7 @@ export interface AccountRootFlagsInterface {
    */
   lsfGlobalFreeze?: boolean
   /**
-   * Enable rippling on this addresses's trust lines by default. Required for issuing addresses; discouraged for others.
+   * Enable rippling on this address's trust lines by default. Required for issuing addresses; discouraged for others.
    */
   lsfDefaultRipple?: boolean
   /**
@@ -155,7 +155,7 @@ export enum AccountRootFlags {
    */
   lsfGlobalFreeze = 0x00400000,
   /**
-   * Enable rippling on this addresses's trust lines by default. Required for issuing addresses; discouraged for others.
+   * Enable rippling on this address's trust lines by default. Required for issuing addresses; discouraged for others.
    */
   lsfDefaultRipple = 0x00800000,
   /**

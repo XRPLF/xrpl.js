@@ -1,6 +1,6 @@
 {
   "name": "xrpl",
-  "version": "2.3.0",
+  "version": "2.6.0",
   "license": "ISC",
   "description": "A TypeScript/JavaScript API for interacting with the XRP Ledger in Node.js and the browser",
   "files": [
@@ -18,7 +18,8 @@
     "test": "test"
   },
   "browser": {
-    "ws": "./dist/npm/client/WSWrapper.js"
+    "ws": "./dist/npm/client/WSWrapper.js",
+    "https-proxy-agent": false
   },
   "dependencies": {
     "bignumber.js": "^9.0.0",
@@ -27,7 +28,7 @@
     "https-proxy-agent": "^5.0.0",
     "lodash": "^4.17.4",
     "ripple-address-codec": "^4.2.4",
-    "ripple-binary-codec": "^1.4.1",
+    "ripple-binary-codec": "^1.4.2",
     "ripple-keypairs": "^1.1.4",
     "ws": "^8.2.2"
   },
@@ -49,7 +50,7 @@
     "docgen": "typedoc && echo js.xrpl.org >> ../../docs/CNAME",
     "prepublish": "run-s clean build",
     "test": "nyc mocha --config=test/.mocharc.json --exit",
-    "test:integration": "TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/integration/**/*.ts ./test/integration/*.ts",
+    "test:integration": "TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/integration/**/*.test.ts ./test/integration/*.test.ts",
     "test:browser": "npm run build:browserTests && TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/browser/*.ts",
     "test:watch": "TS_NODE_PROJECT=src/tsconfig.json mocha --config=test/.mocharc.json --watch --reporter dot",
     "format": "prettier --write '{src,test}/**/*.ts'",

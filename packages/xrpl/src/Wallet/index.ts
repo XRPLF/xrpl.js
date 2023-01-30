@@ -1,7 +1,7 @@
 /* eslint-disable max-lines -- There are lots of equivalent constructors which make sense to have here. */
 import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
-import { mnemonicToSeedSync } from 'bip39'
+import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
 import _ from 'lodash'
 import {
   classicAddressToXAddress,
@@ -24,8 +24,10 @@ import {
 } from 'ripple-keypairs'
 
 import ECDSA from '../ECDSA'
-import { ValidationError } from '../errors'
+import { ValidationError, XrplError } from '../errors'
+import { IssuedCurrencyAmount } from '../models/common'
 import { Transaction } from '../models/transactions'
+import { isIssuedCurrency } from '../models/transactions/common'
 import { isHex } from '../models/utils'
 import { ensureClassicAddress } from '../sugar/utils'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
@@ -46,17 +48,6 @@ function hexFromBuffer(buffer: Buffer): string {
  *
  * @example
  * ```typescript
- * // Derive a wallet from a bip39 Mnemonic
- * const wallet = Wallet.fromMnemonic(
- *   'jewel insect retreat jump claim horse second chef west gossip bone frown exotic embark laundry'
- * )
- * console.log(wallet)
- * // Wallet {
- * // publicKey: '02348F89E9A6A3615BA317F8474A3F51D66221562D3CA32BFA8D21348FF67012B2',
- * // privateKey: '00A8F2E77FC0E05890C1B5088AFE0ECF9D96466A4419B897B1AB383E336E1735A2',
- * // classicAddress: 'rwZiksrExmVkR64pf87Jor4cYbmff47SUm',
- * // seed: undefined
- * // }.
  *
  * // Derive a wallet from a base58 encoded seed.
  * const seedWallet = Wallet.fromSeed('ssZkdwURFMBXenJPbrpE14b6noJSu')
@@ -199,6 +190,11 @@ class Wallet {
   /**
    * Derives a wallet from a bip39 or RFC1751 mnemonic (Defaults to bip39).
    *
+   * @deprecated since version 2.6.1.
+   * Will be deleted in version 3.0.0.
+   * This representation is currently deprecated in rippled.
+   * You should use another method to represent your keys such as a seed or public/private keypair.
+   *
    * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
    * @param opts - (Optional) Options to derive a Wallet.
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
@@ -227,6 +223,12 @@ class Wallet {
       })
     }
     // Otherwise decode using bip39's mnemonic standard
+    if (!validateMnemonic(mnemonic)) {
+      throw new ValidationError(
+        'Unable to parse the given mnemonic using bip39 encoding',
+      )
+    }
+
     const seed = mnemonicToSeedSync(mnemonic)
     const masterNode = fromSeed(seed)
     const node = masterNode.derivePath(
@@ -303,6 +305,7 @@ class Wallet {
    * @param multisign - Specify true/false to use multisign or actual address (classic/x-address) to make multisign tx request.
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
+   * @throws XrplError if the issued currency being signed is XRP ignoring case.
    */
   // eslint-disable-next-line max-lines-per-function -- introduced more checks to support both string and boolean inputs.
   public sign(
@@ -351,6 +354,7 @@ class Wallet {
         this.privateKey,
       )
     }
+
     const serialized = encode(txToSignAndEncode)
     this.checkTxSerialization(serialized, tx)
     return {
@@ -365,8 +369,11 @@ class Wallet {
    * @param signedTransaction - A signed transaction (hex string of signTransaction result) to be verified offline.
    * @returns Returns true if a signedTransaction is valid.
    */
-  public verifyTransaction(signedTransaction: string): boolean {
-    const tx = decode(signedTransaction)
+  public verifyTransaction(signedTransaction: Transaction | string): boolean {
+    const tx =
+      typeof signedTransaction === 'string'
+        ? decode(signedTransaction)
+        : signedTransaction
     const messageHex: string = encodeForSigning(tx)
     const signature = tx.TxnSignature
     return verify(messageHex, signature, this.publicKey)
@@ -392,6 +399,7 @@ class Wallet {
    * @param tx - The transaction prior to signing.
    * @throws A ValidationError if the transaction does not have a TxnSignature/Signers property, or if
    * the serialized Transaction desn't match the original transaction.
+   * @throws XrplError if the transaction includes an issued currency which is equivalent to XRP ignoring case.
    */
   // eslint-disable-next-line class-methods-use-this, max-lines-per-function -- Helper for organization purposes
   private checkTxSerialization(serialized: string, tx: Transaction): void {
@@ -428,14 +436,23 @@ class Wallet {
     txCopy.Memos?.map((memo) => {
       const memoCopy = { ...memo }
       if (memo.Memo.MemoData) {
+        if (!isHex(memo.Memo.MemoData)) {
+          throw new ValidationError('MemoData field must be a hex value')
+        }
         memoCopy.Memo.MemoData = memo.Memo.MemoData.toUpperCase()
       }
 
       if (memo.Memo.MemoType) {
+        if (!isHex(memo.Memo.MemoType)) {
+          throw new ValidationError('MemoType field must be a hex value')
+        }
         memoCopy.Memo.MemoType = memo.Memo.MemoType.toUpperCase()
       }
 
       if (memo.Memo.MemoFormat) {
+        if (!isHex(memo.Memo.MemoFormat)) {
+          throw new ValidationError('MemoFormat field must be a hex value')
+        }
         memoCopy.Memo.MemoFormat = memo.Memo.MemoFormat.toUpperCase()
       }
 
@@ -448,6 +465,38 @@ class Wallet {
       }
       txCopy.URI = txCopy.URI.toUpperCase()
     }
+
+    /* eslint-disable @typescript-eslint/consistent-type-assertions -- We check at runtime that this is safe */
+    Object.keys(txCopy).forEach((key) => {
+      const standard_currency_code_len = 3
+      if (txCopy[key] && isIssuedCurrency(txCopy[key])) {
+        const decodedAmount = decoded[key] as unknown as IssuedCurrencyAmount
+        const decodedCurrency = decodedAmount.currency
+        const txCurrency = (txCopy[key] as IssuedCurrencyAmount).currency
+
+        if (
+          txCurrency.length === standard_currency_code_len &&
+          txCurrency.toUpperCase() === 'XRP'
+        ) {
+          throw new XrplError(
+            `Trying to sign an issued currency with a similar standard code to XRP (received '${txCurrency}'). XRP is not an issued currency.`,
+          )
+        }
+
+        // Standardize the format of currency codes to the 40 byte hex string for comparison
+        const amount = txCopy[key] as IssuedCurrencyAmount
+        if (amount.currency.length !== decodedCurrency.length) {
+          /* eslint-disable-next-line max-depth -- Easier to read with two if-statements */
+          if (decodedCurrency.length === standard_currency_code_len) {
+            decodedAmount.currency = isoToHex(decodedCurrency)
+          } else {
+            /* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- We need to update txCopy directly */
+            txCopy[key].currency = isoToHex(txCopy[key].currency)
+          }
+        }
+      }
+    })
+    /* eslint-enable @typescript-eslint/consistent-type-assertions -- Done with dynamic checking */
 
     if (!_.isEqual(decoded, txCopy)) {
       const data = {
@@ -508,5 +557,21 @@ function removeTrailingZeros(tx: Transaction): void {
     tx.Amount.value = new BigNumber(tx.Amount.value).toString()
   }
 }
+
+/**
+ * Convert an ISO code to a hex string representation
+ *
+ * @param iso - A 3 letter standard currency code
+ */
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Magic numbers are from rippleds of currency code encoding */
+function isoToHex(iso: string): string {
+  const bytes = Buffer.alloc(20)
+  if (iso !== 'XRP') {
+    const isoBytes = iso.split('').map((chr) => chr.charCodeAt(0))
+    bytes.set(isoBytes, 12)
+  }
+  return bytes.toString('hex').toUpperCase()
+}
+/* eslint-enable @typescript-eslint/no-magic-numbers -- Only needed in this function */
 
 export default Wallet

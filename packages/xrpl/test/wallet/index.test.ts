@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { decode } from 'ripple-binary-codec/dist'
-import { NFTokenMint, Transaction } from 'xrpl-local'
+import { decode } from 'ripple-binary-codec'
+import { NFTokenMint, Payment, Transaction } from 'xrpl-local'
 import ECDSA from 'xrpl-local/ECDSA'
 import Wallet from 'xrpl-local/Wallet'
 
@@ -143,6 +143,41 @@ describe('Wallet', function () {
       assert.equal(wallet.seed, expectedSeed)
     })
 
+    it('throws an error when using an RFC1751 mnemonic for bip39', function () {
+      const algorithm = ECDSA.ed25519
+      const mnemonic =
+        'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
+      assert.throws(() => {
+        Wallet.fromMnemonic(mnemonic, {
+          mnemonicEncoding: 'bip39',
+          algorithm,
+        })
+      }, /^Unable to parse the given mnemonic using bip39 encoding$/u)
+    })
+
+    it('throws an error when using an bip39 mnemonic for RFC1751', function () {
+      const mnemonic =
+        'draw attack antique swing base employ blur above palace lucky glide clap pen use illegal'
+      assert.throws(() => {
+        Wallet.fromMnemonic(mnemonic, {
+          mnemonicEncoding: 'rfc1751',
+        })
+      }, /^Expected an RFC1751 word, but received 'attack'\. For the full list of words in the RFC1751 encoding see https:\/\/datatracker\.ietf\.org\/doc\/html\/rfc1/u)
+    })
+
+    it('derives a wallet using rfc1751 mnemonic with lowercase words', function () {
+      const algorithm = ECDSA.ed25519
+      const mnemonic =
+        'cab beth hank bird mend sign gild any kern hyde chat stub'
+      const expectedSeed = 'sEdVaw4m9W3H3ou3VnyvDwvPAP5BEz1'
+      const wallet = Wallet.fromMnemonic(mnemonic, {
+        mnemonicEncoding: 'rfc1751',
+        algorithm,
+      })
+
+      assert.equal(wallet.seed, expectedSeed)
+    })
+
     it('derives a wallet using a Regular Key Pair', function () {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
@@ -211,11 +246,11 @@ describe('Wallet', function () {
 
   describe('fromMnemonic', function () {
     const mnemonic =
-      'try milk link drift aware pass obtain again music stick pluck fold'
+      'assault rare scout seed design extend noble drink talk control guitar quote'
     const publicKey =
-      '0257B550BA2FDCCF0ADDA3DEB2A5411700F3ADFDCC7C68E1DCD1E2B63E6B0C63E6'
+      '035953FCD81D001CF634EB44A87940F3F98ADF2483D09C914BAED0539BE50F385D'
     const privateKey =
-      '008F942B6E229C0E9CEE47E7A94253DABB6A9855F4BA2D8A741FA31851A1D423C3'
+      '0013FC461CA5799F1357C8130AF703CBA7E9C28E072C6CA8F7DEF8601CDE98F394'
 
     it('derives a wallet using default derivation path', function () {
       const wallet = Wallet.fromMnemonic(mnemonic)
@@ -235,15 +270,16 @@ describe('Wallet', function () {
     it('derives a wallet using a Regular Key Pair', function () {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
       const regularKeyPair = {
-        mnemonic: 'KNEW BENT LYNN LED GAD BEN KENT SHAM HOBO RINK WALT ALLY',
+        mnemonic: 'I IRE BOND BOW TRIO LAID SEAT GOAL HEN IBIS IBIS DARE',
         publicKey:
-          '02FBC77338A52D9733641437A77369ACB0D89D52642740A008509F7A3A7450C841',
+          '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
         privateKey:
-          '007A10DF756751129060DD29C9BB6733ADB92507B7DD83BB0795CAA09FB815BE22',
+          '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
       }
 
       const wallet = Wallet.fromMnemonic(regularKeyPair.mnemonic, {
         masterAddress,
+        mnemonicEncoding: 'rfc1751',
       })
 
       assert.equal(wallet.publicKey, regularKeyPair.publicKey)
@@ -253,7 +289,7 @@ describe('Wallet', function () {
   })
 
   describe('fromEntropy', function () {
-    let entropy
+    let entropy: number[]
     const publicKey =
       '0390A196799EE412284A5D80BF78C3E84CBB80E1437A0AECD9ADF94D7FEAAFA284'
     const privateKey =
@@ -301,6 +337,7 @@ describe('Wallet', function () {
     })
   })
 
+  // eslint-disable-next-line max-statements -- Required for test coverage.
   describe('sign', function () {
     let wallet: Wallet
 
@@ -346,6 +383,83 @@ describe('Wallet', function () {
           '120000228000000023000022B8240000000C2E0000270F201B00D5A36761400000000098968068400000000000000C73210305E09ED602D40AB1AF65646A4007C2DAC17CB6CDACDE301E74FB2D728EA057CF744730450221009C00E8439E017CA622A5A1EE7643E26B4DE9C808DE2ABE45D33479D49A4CEC66022062175BE8733442FA2A4D9A35F85A57D58252AE7B19A66401FE238B36FA28E5A081146C1856D0E36019EA75C56D7E8CBA6E35F9B3F71583147FB49CD110A1C46838788CD12764E3B0F837E0DDF9EA7C1F687474703A2F2F6578616D706C652E636F6D2F6D656D6F2F67656E657269637D0472656E74E1F1',
         hash: '41B9CB78D8E18A796CDD4B0BC6FB0EA19F64C4F25FDE23049197852CAB71D10D',
       })
+    })
+
+    it('sign throws when MemoType is not a hex value', async function () {
+      const secret = 'shd2nxpFD6iBRKWsRss2P4tKMWyy9'
+      const lowercaseMemoTx: Transaction = {
+        TransactionType: 'Payment',
+        Flags: 2147483648,
+        Account: 'rwiZ3q3D3QuG4Ga2HyGdq3kPKJRGctVG8a',
+        Amount: '10000000',
+        LastLedgerSequence: 14000999,
+        Destination: 'rUeEBYXHo8vF86Rqir3zWGRQ84W9efdAQd',
+        Fee: '12',
+        Sequence: 12,
+        SourceTag: 8888,
+        DestinationTag: 9999,
+        Memos: [
+          {
+            Memo: {
+              MemoType: 'not hex value',
+              MemoData: '72656e74',
+            },
+          },
+        ],
+      }
+      assert.throws(() => {
+        Wallet.fromSeed(secret).sign(lowercaseMemoTx)
+      }, /MemoType field must be a hex value/u)
+    })
+    it('sign throws when MemoData is not a hex value', async function () {
+      const secret = 'shd2nxpFD6iBRKWsRss2P4tKMWyy9'
+      const lowercaseMemoTx: Transaction = {
+        TransactionType: 'Payment',
+        Flags: 2147483648,
+        Account: 'rwiZ3q3D3QuG4Ga2HyGdq3kPKJRGctVG8a',
+        Amount: '10000000',
+        LastLedgerSequence: 14000999,
+        Destination: 'rUeEBYXHo8vF86Rqir3zWGRQ84W9efdAQd',
+        Fee: '12',
+        Sequence: 12,
+        SourceTag: 8888,
+        DestinationTag: 9999,
+        Memos: [
+          {
+            Memo: {
+              MemoData: 'not hex value',
+            },
+          },
+        ],
+      }
+      assert.throws(() => {
+        Wallet.fromSeed(secret).sign(lowercaseMemoTx)
+      }, /MemoData field must be a hex value/u)
+    })
+    it('sign throws when MemoFormat is not a hex value', async function () {
+      const secret = 'shd2nxpFD6iBRKWsRss2P4tKMWyy9'
+      const lowercaseMemoTx: Transaction = {
+        TransactionType: 'Payment',
+        Flags: 2147483648,
+        Account: 'rwiZ3q3D3QuG4Ga2HyGdq3kPKJRGctVG8a',
+        Amount: '10000000',
+        LastLedgerSequence: 14000999,
+        Destination: 'rUeEBYXHo8vF86Rqir3zWGRQ84W9efdAQd',
+        Fee: '12',
+        Sequence: 12,
+        SourceTag: 8888,
+        DestinationTag: 9999,
+        Memos: [
+          {
+            Memo: {
+              MemoFormat: 'not hex value',
+            },
+          },
+        ],
+      }
+      assert.throws(() => {
+        Wallet.fromSeed(secret).sign(lowercaseMemoTx)
+      }, /MemoFormat field must be a hex value/u)
     })
 
     it('sign with EscrowFinish', async function () {
@@ -590,6 +704,114 @@ describe('Wallet', function () {
       }, /^1.1234567 is an illegal amount/u)
     })
 
+    const issuedCurrencyPayment: Transaction = {
+      TransactionType: 'Payment',
+      Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+      Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+      Amount: {
+        currency: 'foo',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      },
+      Flags: 2147483648,
+      Sequence: 23,
+      LastLedgerSequence: 8819954,
+      Fee: '12',
+    }
+
+    it('lowercase standard currency code signs successfully', async function () {
+      const payment: Payment = { ...issuedCurrencyPayment }
+      payment.Amount = {
+        currency: 'foo',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+
+      assert.deepEqual(wallet.sign(payment), {
+        tx_blob:
+          '12000022800000002400000017201B008694F261D504625103A72000000000000000000000000000666F6F00000000002E099DD75FDD96EB4A603037844F964832FED86B68400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F54474473045022100D32EBD44F86FB6D0BE239A410B62A73A8B0C26CE3767321913D6FB7BE6FAC2410220430C011C25091DA9CD75E7C99BE406572FBB57B92132E39B4BF873863E744E2E81145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
+        hash: 'F822EA1D7B2A3026E4654A9152896652C3843B5690F8A56C4217CB4690C5C95A',
+      })
+    })
+
+    it('issued currency in standard or hex format signs to the same transaction', async function () {
+      const payment: Payment = { ...issuedCurrencyPayment }
+      payment.Amount = {
+        currency: '***',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+
+      const payment2: Payment = { ...issuedCurrencyPayment }
+      payment2.Amount = {
+        currency: '0000000000000000000000002A2A2A0000000000',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+
+      assert.deepEqual(wallet.sign(payment), wallet.sign(payment2))
+    })
+
+    it('sign throws when a payment contains an issued currency like XRP', async function () {
+      const payment: Payment = { ...issuedCurrencyPayment }
+      payment.Amount = {
+        currency: 'xrp',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+      assert.throws(() => {
+        wallet.sign(payment)
+      }, /^Trying to sign an issued currency with a similar standard code to XRP \(received 'xrp'\)\. XRP is not an issued currency\./u)
+    })
+
+    it('sign does NOT throw when a payment contains an issued currency like xrp in hex string format', async function () {
+      const payment: Payment = { ...issuedCurrencyPayment }
+      payment.Amount = {
+        currency: '0000000000000000000000007872700000000000',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+      assert.deepEqual(wallet.sign(payment), {
+        tx_blob:
+          '12000022800000002400000017201B008694F261D504625103A7200000000000000000000000000078727000000000002E099DD75FDD96EB4A603037844F964832FED86B68400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F5447446304402202CD2BE27480860765B1B8DB6C499D299734C533F4FFA66317E46D1ADE5181EB7022066D2C65B975A6A9FEE56AB55211D5F2F65D6F988C8280019211874D11771A05D81145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
+        hash: '1FEAA7894E507E36D73F60DED89852CE28994366879BC7D3D806E4C50D10B1EE',
+      })
+    })
+
+    it('sign succeeds with standard currency code with symbols', async function () {
+      const payment: Payment = { ...issuedCurrencyPayment }
+      payment.Amount = {
+        currency: '***',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+      const result = wallet.sign(payment)
+      const expectedResult = {
+        tx_blob:
+          '12000022800000002400000017201B008694F261D504625103A720000000000000000000000000002A2A2A00000000002E099DD75FDD96EB4A603037844F964832FED86B68400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F54474463044022073E71588750C3D47D7D9A541F00FB897823DA67ED198D0A74404B6FE6D5E4AB5022021BE798D4159F375EBE13D0545F50EE864DF834D5A9F9A31504212156A57934C81145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
+        hash: '95BF9931C1EA164960FE13A504D5FBAEB1E072C1D291D75B85BA3F22A50346DF',
+      }
+
+      assert.deepEqual(result, expectedResult)
+    })
+
+    it('sign succeeds with non-standard 3 digit currency code', async function () {
+      const payment: Payment = { ...issuedCurrencyPayment }
+      payment.Amount = {
+        currency: ':::',
+        issuer: 'rnURbz5HLbvqEq69b1B4TX6cUTNMmcrBqi',
+        value: '123.40',
+      }
+      const result = wallet.sign(payment)
+      const expectedResult = {
+        tx_blob:
+          '12000022800000002400000017201B008694F261D504625103A720000000000000000000000000003A3A3A00000000002E099DD75FDD96EB4A603037844F964832FED86B68400000000000000C732102A8A44DB3D4C73EEEE11DFE54D2029103B776AA8A8D293A91D645977C9DF5F5447446304402205952993DB235D3A6398E2CB5F91D7F0AD9067F02CB8E62FD335C516B64130F4702206777746CC516F95F39ADDD62CD395AF2F6BAFCCA355B5D23B9B4D9358474A11281145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
+        hash: 'CE80072E6D70932BC7AA698B931BCF97B6CC3DD3984E08DF284B74E8CB4E543A',
+      }
+
+      assert.deepEqual(result, expectedResult)
+    })
+
     it('sign handles non-XRP amount with a trailing zero', async function () {
       const payment: Transaction = {
         TransactionType: 'Payment',
@@ -726,6 +948,16 @@ describe('Wallet', function () {
       )
 
       assert.equal(isVerified, false)
+    })
+
+    it('returns true when verifying a deserialized Transaction object', function () {
+      const wallet = new Wallet(publicKey, privateKey)
+      const decodedTransaction = decode(
+        prepared.signedTransaction,
+      ) as unknown as Transaction
+      const isVerified: boolean = wallet.verifyTransaction(decodedTransaction)
+
+      assert.equal(isVerified, true)
     })
   })
 

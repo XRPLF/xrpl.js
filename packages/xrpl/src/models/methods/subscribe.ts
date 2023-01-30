@@ -136,7 +136,6 @@ export interface LedgerStream extends BaseStream {
 /**
  * This response mirrors the LedgerStream, except it does NOT include the 'type' nor 'txn_count' fields.
  */
-// eslint-disable-next-line import/no-unused-modules -- Detailed enough to be worth exporting for end users.
 export interface LedgerStreamResponse {
   /**
    * The reference transaction cost as of this ledger version, in drops of XRP.
@@ -189,6 +188,18 @@ export interface ValidationStream extends BaseStream {
   amendments?: string[]
   /** The amendments this server wants to be added to the protocol. */
   base_fee?: number
+  /**
+   * An arbitrary value chosen by the server at startup.
+   *
+   * If the same validation key pair signs validations with different cookies
+   * concurrently, that usually indicates that multiple servers are incorrectly
+   * configured to use the same validation key pair.
+   */
+  cookie?: string
+  /**
+   * The contents of the validation message in its canonical binary form
+   */
+  data?: string
   /**
    * The unscaled transaction cost (reference_fee value) this server wants to
    * set by Fee voting.

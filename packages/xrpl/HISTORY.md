@@ -1,8 +1,53 @@
 # xrpl.js (ripple-lib) Release History
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
-
 ## Unreleased
+
+### Fixed
+
+### Added
+
+
+### Changed
+
+### Deprecated
+Wallet.fromMmnemonic()
+
+
+## 2.6.0 (2022-11-21)
+
+### Fixed
+* Ignore `https-proxy-agent` in browsers for improved Vite integration
+
+### Added
+* Optional custom amount field to `fundWallet`.
+
+### Changed
+* Add support for Transaction objects in `verifyTransaction`
+* When connected to hooks v2 testnet or amm devnet, Client.fundWallet now defaults to using the faucet instead of requiring specification.
+* Ability to specify faucet url for wallet generation/funding purposes
+
+## 2.5.0 (2022-10-13)
+### Added
+* Support for ExpandedSignerList amendment that expands the maximum signer list to 32 entries.
+* Add `cookie` and `data` to `ValidationStream` interface
+* Additional check for memos field format, provide more detailed error messages.
+
+## 2.4.0 (2022-09-01)
+### Added
+* Export `verify` from ripple-keypairs as `verifyKeypairSignature` for use in web-apps.
+
+### Fixed
+* `Wallet.fromMnemonic` now allows lowercase for RFC1751 mnemonics (#2046)
+* `Wallet.fromMnemonic` detects when an invalid encoding is provided, and throws an error
+* Made unexpected errors in `submitAndWait` more verbose to make them easier to debug.
+
+## 2.3.1 (2022-06-27)
+### Fixed
+* Signing tx with standard currency codes with lowercase and allowed symbols causing an error on decode.
+
+### Added
+* When connected to nft-devnet, Client.fundWallet now defaults to using the nft-devnet faucet instead of requiring specification.
 
 ## 2.3.0 (2022-06-02)
 ### Added
