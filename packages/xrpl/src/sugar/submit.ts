@@ -330,7 +330,13 @@ async function submitAndWaitBatchHelper(
         throw err
       }
       result.error.push(err)
-      // Mode 1: don't send remaining transactions
+      /*
+       * TODO: add a Mode flag to check if Mode 1 or 2 is enabled.
+       * Mode 1: don't send remaining transactions
+       * Mode 2: continue to submit remaining transactions
+       *
+       * For now, Mode 1 is enabled by default.
+       */
       const remainingTransactions = transactions.slice(idx + 1)
       result.unsubmitted.push(...remainingTransactions)
       break
