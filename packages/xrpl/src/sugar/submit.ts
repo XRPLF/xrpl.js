@@ -150,7 +150,7 @@ async function submitAndWaitBatch(
   }
 
   /*
-   * Each Sender account will submit transactions synchronously so sequence number increments appropriately.
+   * Each Sender account will submit transactions synchronously so sequence number increments consecutively.
    * Thus, we create a promise for each Sender account.
    */
   const accounts = batchMap.keys()
