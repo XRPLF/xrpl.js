@@ -96,6 +96,12 @@ async function submitAndWait(
 /**
  * An extension of submitAndWait where it takes in an array of transactions with options
  * and asynchronously submits them for each different Sender account.
+ *
+ * TODO: add a flag to check if Mode 1 or 2 is enabled. For now, Mode 1 is enabled by default.
+ * The mode flag determines what happens after a transaction submission fails for a Sender account:
+ * - Mode 1: Sender account won't send its remaining transactions and put them in result.unsubmitted list.
+ * - Mode 2: Sender account will continue to submit its remaining transactions.
+ *
  * See [Reliable Transaction Submission](https://xrpl.org/reliable-transaction-submission.html).
  *
  * @param this - A Client.
@@ -330,13 +336,7 @@ async function submitAndWaitBatchHelper(
         throw err
       }
       result.error.push(err)
-      /*
-       * TODO: add a Mode flag to check if Mode 1 or 2 is enabled.
-       * Mode 1: don't send remaining transactions
-       * Mode 2: continue to submit remaining transactions
-       *
-       * For now, Mode 1 is enabled by default.
-       */
+      // TODO: add a flag to check if Mode 1 or 2 is enabled. For now, Mode 1 is enabled by default
       const remainingTransactions = transactions.slice(idx + 1)
       result.unsubmitted.push(...remainingTransactions)
       break
