@@ -386,7 +386,7 @@ describe('client.submitAndWaitBatch', function () {
     )
   })
 
-  it("submitAndWaitBatch multiple accounts submit multiple payment transactions with one failed transaction and doesn't submit subsequent transactions", async function () {
+  it("submitAndWaitBatch multiple accounts submit multiple payment transactions with one failed transaction and don't submit subsequent transactions", async function () {
     const receiverWallet = await generateFundedWallet(this.client)
     const receiverWallet2 = await generateFundedWallet(this.client)
     const senderWallet2 = await generateFundedWallet(this.client)
