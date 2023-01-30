@@ -1,3 +1,4 @@
+/* eslint-disable max-depth -- necessary */
 /* eslint-disable max-lines -- necessary */
 import { decode, encode } from 'ripple-binary-codec'
 
@@ -320,8 +321,17 @@ async function submitAndWaitBatchHelper(
         tx.opts,
       )
       result.success.push(txResponse)
+
+      // Set next valid Sequence number for next Transaction
+      const nextTxIndex = idx + 1
+      if (
+        nextTxIndex < transactions.length &&
+        txResponse.result.Sequence != null
+      ) {
+        transactions[nextTxIndex].transaction.Sequence =
+          txResponse.result.Sequence + 1
+      }
     } catch (err) {
-      // eslint-disable-next-line max-depth -- for unit tests & build to pass
       if (!(err instanceof Error)) {
         throw err
       }
