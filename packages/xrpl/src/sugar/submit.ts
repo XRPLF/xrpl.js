@@ -106,7 +106,7 @@ async function submitAndWait(
  *
  * @param this - A Client.
  * @param transactions - A batch of transactions with opts to autofill, sign & encode, and submit synchronously.
- * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
+ * @returns A promise that returns SubmitAndWaitBatchResult when all transactions have been resolved.
  */
 // eslint-disable-next-line max-lines-per-function -- necessary
 async function submitAndWaitBatch(
