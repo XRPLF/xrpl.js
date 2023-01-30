@@ -132,7 +132,7 @@ async function submitAndWaitBatch(
     unsubmitted: [],
   }
 
-  // Account to transactions map
+  // Maps sender account to its transaction(s)
   const batchMap: Map<
     string,
     Array<{
@@ -152,8 +152,11 @@ async function submitAndWaitBatch(
     batchMap.get(account)?.push(tx)
   }
 
+  /*
+   * Each Sender account will submit transactions synchronously so sequence number increments appropriately.
+   * Thus, we create a promise for each Sender account.
+   */
   const accounts = batchMap.keys()
-  // Create a promise for each account so sequence number increments appropriately after each transaction submission
   const promises: Array<Promise<void>> = []
   for (const account of accounts) {
     promises.push(submitAndWaitBatchHelper(this, account, batchMap, result))
