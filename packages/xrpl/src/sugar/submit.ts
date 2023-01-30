@@ -11,6 +11,22 @@ import { hashes } from '../utils'
 /** Approximate time for a ledger to close, in milliseconds */
 const LEDGER_CLOSE_TIME = 1000
 
+interface SubmitAndWaitBatchResponse {
+  // Successfully submitted transactions
+  success: TxResponse[]
+  // Failed submitted transactions
+  error: Error[]
+  // Unsubmitted transactions
+  unsubmitted: Array<{
+    transaction: Transaction
+    opts?: {
+      autofill?: boolean
+      failHard?: boolean
+      wallet?: Wallet
+    }
+  }>
+}
+
 async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms)
@@ -100,21 +116,7 @@ async function submitAndWaitBatch(
       wallet?: Wallet
     }
   }>,
-): Promise<{
-  success: TxResponse[]
-  error: Error[]
-  unsubmitted: Array<{
-    transaction: Transaction
-    opts?: {
-      // If true, autofill a transaction.
-      autofill?: boolean
-      // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
-      failHard?: boolean
-      // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
-      wallet?: Wallet
-    }
-  }>
-}> {
+): Promise<SubmitAndWaitBatchResponse> {
   const result: {
     success: TxResponse[]
     error: Error[]
@@ -132,7 +134,7 @@ async function submitAndWaitBatch(
     unsubmitted: [],
   }
 
-  // Maps sender account to its transaction(s)
+  // Maps Sender account to its transaction(s)
   const batchMap: Map<
     string,
     Array<{
@@ -297,18 +299,7 @@ async function submitAndWaitBatchHelper(
       }
     }>
   >,
-  result: {
-    success: TxResponse[]
-    error: Error[]
-    unsubmitted: Array<{
-      transaction: Transaction
-      opts?: {
-        autofill?: boolean
-        failHard?: boolean
-        wallet?: Wallet
-      }
-    }>
-  },
+  result: SubmitAndWaitBatchResponse,
 ): Promise<void> {
   const transactions = batchMap.get(account)
   if (transactions == null) {
@@ -325,7 +316,7 @@ async function submitAndWaitBatchHelper(
       )
       result.success.push(txResponse)
 
-      // Set next valid Sequence number for next Transaction
+      // Set next valid Sequence number for next transaction
       const nextTxIndex = idx + 1
       if (
         nextTxIndex < transactions.length &&
