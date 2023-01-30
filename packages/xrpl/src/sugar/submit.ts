@@ -94,8 +94,8 @@ async function submitAndWait(
 }
 
 /**
- * Asynchronously submits a transaction and verifies that it has been included in a
- * validated ledger (or has errored/will not be included for some reason).
+ * An extension of submitAndWait where it takes in an array of transactions with options
+ * and asynchronously submits them for each different Sender account.
  * See [Reliable Transaction Submission](https://xrpl.org/reliable-transaction-submission.html).
  *
  * @param this - A Client.
