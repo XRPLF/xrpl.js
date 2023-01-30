@@ -1,5 +1,5 @@
 import { LedgerIndex } from '../common'
-import { AccountRoot, SignerList } from '../ledger'
+import { AccountRoot } from '../ledger'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
