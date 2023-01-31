@@ -71,6 +71,15 @@ describe('fundWallet', function () {
     TIMEOUT,
   )
 
+  // TODO: Investigate why this test is timing out on the browser
+  // it('can generate and fund wallets using a custom host and path', async function () {
+  //   await generate_faucet_wallet_and_fund_again(
+  //     'wss://s.devnet.rippletest.net:51233/',
+  //     'faucet.devnet.rippletest.net',
+  //     '/accounts',
+  //   )
+  // })
+
   it(
     'can generate and fund wallets on AMM devnet',
     async function () {

@@ -54,6 +54,7 @@ export function getFaucetHost(client: Client): FaucetNetwork | undefined {
     return FaucetNetwork.Devnet
   }
 
+  // TODO: Remove this once the sandbox is fully decomissioned.
   if (connectionUrl.includes('xls20-sandbox')) {
     return FaucetNetwork.NFTDevnet
   }
