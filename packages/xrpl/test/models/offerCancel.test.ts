@@ -10,7 +10,7 @@ import { validateOfferCancel } from 'xrpl-local/models/transactions/offerCancel'
 describe('OfferCancel', function () {
   let offer
 
-  beforeEach(() => {
+  beforeEach(function () {
     offer = {
       Account: 'rnKiczmiQkZFiDES8THYyLA2pQohC5C6EF',
       Fee: '10',

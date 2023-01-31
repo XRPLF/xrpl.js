@@ -38,9 +38,7 @@ describe('mock rippled tests', function () {
   })
 
   it('provide bad response shape in function', async function () {
-    if (testContext.mockRippled) {
-      testContext.mockRippled.suppressOutput = true
-    }
+    testContext.mockRippled!.suppressOutput = true
     testContext.mockRippled!.addResponse('account_info', (request) => {
       return { data: request }
     })

@@ -15,6 +15,13 @@ import {
   runCommand,
 } from '../utils'
 
+// NOTE: Because ledger accept is called among multiple tests, the actual ledger close time is not
+// accurate. It can end up very far into the future. This means that the CancelAfter timer can potentially
+// need to wait for several minutes to be able to properly complete. Since we are not testing the functionaity
+// of rippled in this library, only that we are submitting commands properly, we can just test that the EscrowCancel
+// command was successfully received. If in the future we isolate tests to run on their own rippled instance,
+// we can uncomment the code in this file to test that the escrow was actually cancelled.
+
 // how long before each test case times out
 const TIMEOUT = 50000
 
@@ -107,6 +114,9 @@ describe('EscrowCancel', function () {
           wallet: testContext.wallet,
         })
       } catch (error) {
+        if (!(error instanceof Error)) {
+          assert.fail('EscrowCancel failed with unknown error')
+        }
         assert.ok(
           false,
           `EscrowCancel failed with error: ${
@@ -114,13 +124,6 @@ describe('EscrowCancel', function () {
           }`,
         )
       }
-
-      // NOTE: Because ledger accept is called among multiple tests, the actual ledger close time is not
-      // accurate. It can end up very far into the future. This means that the CancelAfter timer can potentially
-      // need to wait for several minutes to be able to properly complete. Since we are not testing the functionaity
-      // of rippled in this library, only that we are submitting commands properly, we can just test that the EscrowCancel
-      // command was successfully received. If in the future we isolate tests to run on their own rippled instance,
-      // we can uncomment the code in this file to test that the escrow was actually cancelled.
 
       // Make sure the Destination wallet did not receive any XRP.
       // assert.equal(

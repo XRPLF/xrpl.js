@@ -31,10 +31,7 @@ describe('CheckCreate', function () {
         SendMax: '50',
       }
 
-      await testTransaction(testContext.client, tx, testContext.wallet, {
-        count: 1,
-        delayMs: 1000,
-      })
+      await testTransaction(testContext.client, tx, testContext.wallet)
 
       // confirm that the check actually went through
       const accountOffersResponse = await testContext.client.request({

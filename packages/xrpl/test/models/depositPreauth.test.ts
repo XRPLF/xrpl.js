@@ -10,7 +10,7 @@ import { validateDepositPreauth } from 'xrpl-local/models/transactions/depositPr
 describe('DepositPreauth', function () {
   let depositPreauth
 
-  beforeEach(() => {
+  beforeEach(function () {
     depositPreauth = {
       TransactionType: 'DepositPreauth',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',

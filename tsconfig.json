@@ -5,7 +5,7 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "sourceMap": true,
-    "strict": false
+    "strict": true
   },
   "exclude": [
     "node_modules",

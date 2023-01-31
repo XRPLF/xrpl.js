@@ -299,7 +299,7 @@ describe('Wallet', function () {
     const privateKeyED25519 =
       'ED0B6CBAC838DFE7F47EA1BD0DF00EC282FDF45510C92161072CCFB84035390C4D'
 
-    beforeEach(() => {
+    beforeEach(function () {
       const entropySize = 16
       entropy = new Array(entropySize).fill(0)
     })
@@ -341,7 +341,7 @@ describe('Wallet', function () {
   describe('sign', function () {
     let wallet: Wallet
 
-    beforeEach(() => {
+    beforeEach(function () {
       wallet = Wallet.fromSeed('ss1x3KLrSvfg7irFc1D929WXZ7z9H')
     })
 

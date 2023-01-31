@@ -10,7 +10,7 @@ import { validateSignerListSet } from 'xrpl-local/models/transactions/signerList
 describe('SignerListSet', function () {
   let signerListSetTx
 
-  beforeEach(() => {
+  beforeEach(function () {
     signerListSetTx = {
       Flags: 0,
       TransactionType: 'SignerListSet',

@@ -10,7 +10,7 @@ import { validateEscrowCancel } from 'xrpl-local/models/transactions/escrowCance
 describe('EscrowCancel', function () {
   let cancel
 
-  beforeEach(() => {
+  beforeEach(function () {
     cancel = {
       TransactionType: 'EscrowCancel',
       Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',

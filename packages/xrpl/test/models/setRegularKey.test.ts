@@ -10,7 +10,7 @@ import { validateSetRegularKey } from 'xrpl-local/models/transactions/setRegular
 describe('SetRegularKey', function () {
   let account
 
-  beforeEach(() => {
+  beforeEach(function () {
     account = {
       TransactionType: 'SetRegularKey',
       Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',

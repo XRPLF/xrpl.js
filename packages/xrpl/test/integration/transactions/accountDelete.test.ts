@@ -45,6 +45,9 @@ describe('AccountDelete', function () {
           wallet: testContext.wallet,
         })
       } catch (error) {
+        if (!(error instanceof Error)) {
+          assert.fail('AccountDelete failed with unknown error')
+        }
         assert.ok(
           false,
           `AccountDelete should not fail. Error was: ${
@@ -53,6 +56,7 @@ describe('AccountDelete', function () {
         )
       }
 
+      // TODO: Re-enable this test once we can test the `engine_result` without waiting a significant amount of time.
       // Note, we can't test the `engine_result` without waiting a significant
       // amount of time because accounts can't be deleted until some number of
       // ledgers have closed since its creation.

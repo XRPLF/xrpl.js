@@ -56,11 +56,7 @@ describe('CheckCash', function () {
         Amount: amount,
       }
 
-      await testTransaction(testContext.client, tx, wallet2, {
-        // Need to retry when running tests concurrently
-        count: 5,
-        delayMs: 1000,
-      })
+      await testTransaction(testContext.client, tx, wallet2)
 
       // confirm that the check no longer exists
       const accountOffersResponse = await testContext.client.request({

@@ -10,7 +10,7 @@ import { validateAccountSet } from 'xrpl-local/models/transactions/accountSet'
 describe('AccountSet', function () {
   let account
 
-  beforeEach(() => {
+  beforeEach(function () {
     account = {
       TransactionType: 'AccountSet',
       Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',

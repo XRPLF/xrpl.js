@@ -7,5 +7,5 @@
     "./src/**/*.json",
     "./snippets/src/**/*.ts",
     ".eslintrc.js"
-  ]
+  ],
 }

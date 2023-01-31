@@ -10,7 +10,7 @@ import { validateTrustSet } from 'xrpl-local/models/transactions/trustSet'
 describe('TrustSet', function () {
   let trustSet
 
-  beforeEach(() => {
+  beforeEach(function () {
     trustSet = {
       TransactionType: 'TrustSet',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',

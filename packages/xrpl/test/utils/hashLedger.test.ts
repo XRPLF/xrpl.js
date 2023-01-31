@@ -10,7 +10,7 @@ const { hashLedger: REQUEST_FIXTURES } = requests
 
 describe('hashLedger', function () {
   let ledger
-  beforeEach(() => {
+  beforeEach(function () {
     ledger = JSON.parse(JSON.stringify(responses.getLedger.full))
 
     if (ledger.rawState != null) {

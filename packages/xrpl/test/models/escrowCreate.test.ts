@@ -10,7 +10,7 @@ import { validateEscrowCreate } from 'xrpl-local/models/transactions/escrowCreat
 describe('EscrowCreate', function () {
   let escrow
 
-  beforeEach(() => {
+  beforeEach(function () {
     escrow = {
       Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
       TransactionType: 'EscrowCreate',

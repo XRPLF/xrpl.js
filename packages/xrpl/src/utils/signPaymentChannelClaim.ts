@@ -1,5 +1,5 @@
 import { encodeForSigningClaim } from 'ripple-binary-codec'
-import * as keypairs from 'ripple-keypairs'
+import { sign } from 'ripple-keypairs'
 
 import { xrpToDrops } from './xrpConversion'
 
@@ -21,7 +21,7 @@ function signPaymentChannelClaim(
     channel,
     amount: xrpToDrops(amount),
   })
-  return keypairs.sign(signingData, privateKey)
+  return sign(signingData, privateKey)
 }
 
 export default signPaymentChannelClaim

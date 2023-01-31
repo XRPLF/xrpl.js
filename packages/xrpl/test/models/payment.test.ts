@@ -10,7 +10,7 @@ import { validatePayment } from 'xrpl-local/models/transactions/payment'
 describe('Payment', function () {
   let paymentTransaction
 
-  beforeEach(() => {
+  beforeEach(function () {
     paymentTransaction = {
       TransactionType: 'Payment',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',

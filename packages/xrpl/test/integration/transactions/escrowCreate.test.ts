@@ -23,7 +23,7 @@ describe('EscrowCreate', function () {
   it(
     'base',
     async () => {
-      const wallet1 = await generateFundedWallet(testContext.client)
+      const wallet2 = await generateFundedWallet(testContext.client)
 
       // get the most recent close_time from the standalone container for finish after.
       const CLOSE_TIME: number = (
@@ -37,7 +37,7 @@ describe('EscrowCreate', function () {
         Account: testContext.wallet.classicAddress,
         TransactionType: 'EscrowCreate',
         Amount: '10000',
-        Destination: wallet1.classicAddress,
+        Destination: wallet2.classicAddress,
         FinishAfter: CLOSE_TIME + 2,
       }
 

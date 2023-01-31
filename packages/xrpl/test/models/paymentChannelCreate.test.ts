@@ -10,7 +10,7 @@ import { validatePaymentChannelCreate } from 'xrpl-local/models/transactions/pay
 describe('PaymentChannelCreate', function () {
   let channel
 
-  beforeEach(() => {
+  beforeEach(function () {
     channel = {
       Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
       TransactionType: 'PaymentChannelCreate',

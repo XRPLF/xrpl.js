@@ -10,7 +10,7 @@ import { validateTicketCreate } from 'xrpl-local/models/transactions/ticketCreat
 describe('TicketCreate', function () {
   let ticketCreate
 
-  beforeEach(() => {
+  beforeEach(function () {
     ticketCreate = {
       TransactionType: 'TicketCreate',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',

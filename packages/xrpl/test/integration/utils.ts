@@ -29,7 +29,8 @@ async function sendLedgerAccept(client: Client): Promise<unknown> {
  * @param wait - same function as lodash.throttle's wait parameter. Call this function at most this often.
  * @returns a promise which will be resolved/ rejected only if the function is executed, with the result of the underlying call.
  */
-function asyncThrottle<F extends (...args: unknown[]) => Promise<unknown>>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Proper
+function asyncThrottle<F extends (...args: any[]) => Promise<unknown>>(
   func: F,
   wait?: number,
 ): (...args: Parameters<F>) => ReturnType<F> {

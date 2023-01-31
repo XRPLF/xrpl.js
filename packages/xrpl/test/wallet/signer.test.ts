@@ -31,7 +31,7 @@ describe('Signer', function () {
   let multisignJSON
   let expectedMultisign
 
-  beforeEach(() => {
+  beforeEach(function () {
     multisignTxToCombine1 = {
       Account: 'rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC',
       Fee: '30000',

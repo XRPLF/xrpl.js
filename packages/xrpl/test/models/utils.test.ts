@@ -29,7 +29,7 @@ describe('Models Utils', function () {
     const flag1 = 0x00010000
     const flag2 = 0x00020000
 
-    beforeEach(() => {
+    beforeEach(function () {
       flags = 0x00000000
     })
 

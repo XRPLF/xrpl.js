@@ -61,8 +61,12 @@ describe('client.submitAndWait', function () {
           retries = 0
           break
         } catch (err) {
+          // eslint-disable-next-line max-depth -- Necessary
+          if (!(err instanceof Error)) {
+            throw err
+          }
           const errorCodeRegex = /(?:Preliminary result:\s)(?<errorCode>.*)$/gu
-          const message = err.message as string
+          const message = err.message
           const matches = errorCodeRegex.exec(message)
           const errorCode = matches?.groups?.errorCode
 
