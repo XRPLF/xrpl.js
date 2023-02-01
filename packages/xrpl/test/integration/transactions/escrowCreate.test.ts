@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { EscrowCreate } from 'xrpl-local'
 
+import { EscrowCreate } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

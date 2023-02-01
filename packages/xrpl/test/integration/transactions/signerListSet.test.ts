@@ -1,5 +1,4 @@
-import { SignerListSet } from 'xrpl-local'
-
+import { SignerListSet } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

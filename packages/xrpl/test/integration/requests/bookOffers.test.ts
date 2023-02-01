@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { BookOffersRequest, BookOffersResponse } from 'xrpl-local'
 
+import { BookOffersRequest, BookOffersResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

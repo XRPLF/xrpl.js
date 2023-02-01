@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { ChannelVerifyRequest, ChannelVerifyResponse } from 'xrpl-local'
 
+import { ChannelVerifyRequest, ChannelVerifyResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

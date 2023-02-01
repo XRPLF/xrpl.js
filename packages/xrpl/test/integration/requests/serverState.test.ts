@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import omit from 'lodash/omit'
-import { type ServerStateRequest, type ServerStateResponse } from 'xrpl-local'
 
+import { type ServerStateRequest, type ServerStateResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

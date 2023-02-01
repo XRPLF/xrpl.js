@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { RipplePathFindRequest, RipplePathFindResponse } from 'xrpl-local'
 
+import { RipplePathFindRequest, RipplePathFindResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

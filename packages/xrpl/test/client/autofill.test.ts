@@ -1,12 +1,12 @@
 import { assert } from 'chai'
+
 import {
   XrplError,
   AccountDelete,
   EscrowFinish,
   Payment,
   Transaction,
-} from 'xrpl-local'
-
+} from '../../src'
 import rippled from '../fixtures/rippled'
 import {
   setupClient,

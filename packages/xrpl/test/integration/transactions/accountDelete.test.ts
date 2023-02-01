@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { AccountDelete } from 'xrpl-local/models/transactions'
 
+import { AccountDelete } from '../../../src/models/transactions'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

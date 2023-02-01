@@ -3,7 +3,8 @@ import path from 'path'
 
 import { assert } from 'chai'
 import { encode } from 'ripple-binary-codec'
-import { OfferCreate, Transaction, ValidationError } from 'xrpl-local'
+
+import { OfferCreate, Transaction, ValidationError } from '../../src'
 import {
   hashStateTree,
   hashTxTree,
@@ -14,8 +15,7 @@ import {
   hashAccountRoot,
   hashOfferId,
   hashSignerListId,
-} from 'xrpl-local/utils/hashes'
-
+} from '../../src/utils/hashes'
 import fixtures from '../fixtures/rippled'
 import { assertResultMatch } from '../testUtils'
 
@@ -39,7 +39,7 @@ function createLedgerTest(ledgerIndex: number): void {
   const hasAccounts =
     Array.isArray(ledgerJSON.accountState) && ledgerJSON.accountState.length > 0
 
-  describe(`ledger hashes ${ledgerIndexString}`, () => {
+  describe(`ledger hashes ${ledgerIndexString}`, function () {
     if (hasAccounts) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- known to be a string
       it(`has account_hash of ${ledgerJSON.account_hash}`, function () {

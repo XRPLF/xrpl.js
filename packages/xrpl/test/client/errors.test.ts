@@ -1,5 +1,6 @@
 import { assert } from 'chai'
-import { XrplError, NotFoundError } from 'xrpl-local'
+
+import { XrplError, NotFoundError } from '../../src'
 
 describe('client errors', function () {
   it('XrplError with data', async function () {

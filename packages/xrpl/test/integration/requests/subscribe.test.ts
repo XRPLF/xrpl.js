@@ -1,14 +1,14 @@
 import { assert } from 'chai'
+
 import {
   Client,
   OfferCreate,
   SubscribeRequest,
   Wallet,
   SubscribeResponse,
-} from 'xrpl-local'
-import { StreamType } from 'xrpl-local/models/common'
-import type { LedgerStreamResponse } from 'xrpl-local/models/methods/subscribe'
-
+} from '../../../src'
+import { StreamType } from '../../../src/models/common'
+import type { LedgerStreamResponse } from '../../../src/models/methods/subscribe'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -24,7 +24,7 @@ async function createTxHandlerTest(
   client: Client,
   wallet: Wallet,
   subscriptionStream: StreamType,
-): Promise<{ transactionPromise: Promise<void> }> {
+): Promise<void> {
   const txStream = 'transaction'
 
   const transactionPromise = new Promise<void>((resolve) => {
@@ -46,7 +46,7 @@ async function createTxHandlerTest(
   assert.equal(response.type, 'response')
   assert.deepEqual(response.result, {})
 
-  return { transactionPromise }
+  return transactionPromise
 }
 
 describe('subscribe', function () {
@@ -94,7 +94,7 @@ describe('subscribe', function () {
     'Emits transaction',
     async () => {
       const streamType = 'transactions'
-      const { transactionPromise } = await createTxHandlerTest(
+      const transactionPromise = createTxHandlerTest(
         testContext.client,
         testContext.wallet,
         streamType,
@@ -119,7 +119,7 @@ describe('subscribe', function () {
   it(
     'Emits transaction on transactions_proposed',
     async () => {
-      const { transactionPromise } = await createTxHandlerTest(
+      const transactionPromise = createTxHandlerTest(
         testContext.client,
         testContext.wallet,
         'transactions_proposed',
@@ -153,18 +153,18 @@ describe('subscribe', function () {
       }
 
       await testContext.client.request(request).then(async (response) => {
-        const ledgetResponse: LedgerStreamResponse =
+        const ledgerResponse: LedgerStreamResponse =
           response.result as LedgerStreamResponse
         // Explicitly checking that there are only known fields in the return
         const expectedResult = {
-          fee_base: ledgetResponse.fee_base,
-          fee_ref: ledgetResponse.fee_ref,
-          ledger_hash: ledgetResponse.ledger_hash,
-          ledger_index: ledgetResponse.ledger_index,
-          ledger_time: ledgetResponse.ledger_time,
-          reserve_base: ledgetResponse.reserve_base,
-          reserve_inc: ledgetResponse.reserve_inc,
-          validated_ledgers: ledgetResponse.validated_ledgers,
+          fee_base: ledgerResponse.fee_base,
+          fee_ref: ledgerResponse.fee_ref,
+          ledger_hash: ledgerResponse.ledger_hash,
+          ledger_index: ledgerResponse.ledger_index,
+          ledger_time: ledgerResponse.ledger_time,
+          reserve_base: ledgerResponse.reserve_base,
+          reserve_inc: ledgerResponse.reserve_inc,
+          validated_ledgers: ledgerResponse.validated_ledgers,
         }
 
         assert.equal(response.type, 'response')

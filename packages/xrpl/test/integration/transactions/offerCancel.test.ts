@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { OfferCreate, OfferCancel } from 'xrpl-local'
 
+import { OfferCreate, OfferCancel } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

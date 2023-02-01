@@ -1,14 +1,14 @@
 import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec'
+
 import {
   AccountSet,
   SubmitRequest,
   SubmitResponse,
   hashes,
   Transaction,
-} from 'xrpl-local'
-import { convertStringToHex } from 'xrpl-local/utils'
-
+} from '../../../src'
+import { convertStringToHex } from '../../../src/utils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

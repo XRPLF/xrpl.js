@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { NoRippleCheckRequest, type AccountSet } from 'xrpl-local'
 
+import { NoRippleCheckRequest, type AccountSet } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

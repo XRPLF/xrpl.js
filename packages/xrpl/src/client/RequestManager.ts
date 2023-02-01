@@ -20,7 +20,7 @@ export default class RequestManager {
     {
       resolve: (value: Response | PromiseLike<Response>) => void
       reject: (value: Error) => void
-      timer: NodeJS.Timeout
+      timer: ReturnType<typeof setTimeout>
     }
   >()
 
@@ -113,9 +113,14 @@ export default class RequestManager {
      * Node.js won't exit if a timer is still running, so we tell Node to ignore.
      * (Node will still wait for the request to complete).
      */
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Reason above.
-    if (timer.unref) {
-      timer.unref()
+    // The following type assertions are required to get this code to pass in browser environments
+    // where setTimeout has a different type
+    // eslint-disable-next-line max-len -- Necessary to disable both rules.
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- Reason above.
+    if ((timer as unknown as any).unref) {
+      // eslint-disable-next-line max-len -- Necessary to disable both rules.
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call -- Reason above.
+      ;(timer as unknown as any).unref()
     }
     if (this.promisesAwaitingResponse.has(newId)) {
       clearTimeout(timer)

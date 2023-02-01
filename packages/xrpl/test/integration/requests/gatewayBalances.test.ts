@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import omit from 'lodash/omit'
-import { GatewayBalancesRequest } from 'xrpl-local'
 
+import { GatewayBalancesRequest } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

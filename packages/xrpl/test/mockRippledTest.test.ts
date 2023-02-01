@@ -1,5 +1,6 @@
 import { assert } from 'chai'
-import { RippledError } from 'xrpl-local'
+
+import { RippledError } from '../src'
 
 import {
   setupClient,

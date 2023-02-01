@@ -1,7 +1,7 @@
 import { assert } from 'chai'
-import { LedgerRequest, LedgerResponse } from 'xrpl-local'
-import { Ledger } from 'xrpl-local/models/ledger'
 
+import { LedgerRequest, LedgerResponse } from '../../../src'
+import { Ledger } from '../../../src/models/ledger'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

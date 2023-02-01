@@ -1,12 +1,12 @@
 import { assert } from 'chai'
 import omit from 'lodash/omit'
+
 import {
   PathFindRequest,
   PathFindResponse,
   Client,
   PathFindStream,
-} from 'xrpl-local'
-
+} from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

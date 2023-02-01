@@ -1,4 +1,4 @@
-import { Client, LedgerResponse, TxResponse } from 'xrpl-local'
+import { Client, LedgerResponse, TxResponse } from '../../src'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 

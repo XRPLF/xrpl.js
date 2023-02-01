@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { hasNextPage } from 'xrpl-local'
 
+import { hasNextPage } from '../../src'
 import fixtures from '../fixtures/rippled'
 
 describe('hasNextPage', function () {

@@ -1,5 +1,4 @@
-import { DepositPreauth, Wallet } from 'xrpl-local'
-
+import { DepositPreauth, Wallet } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

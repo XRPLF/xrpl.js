@@ -1,9 +1,9 @@
 import assert from 'assert'
 
-import { Client, SubmitResponse } from 'xrpl-local'
-import { AccountSet, SignerListSet } from 'xrpl-local/models/transactions'
-import { convertStringToHex } from 'xrpl-local/utils'
-import { multisign } from 'xrpl-local/Wallet/signer'
+import { Client, SubmitResponse } from '../../src'
+import { AccountSet, SignerListSet } from '../../src/models/transactions'
+import { convertStringToHex } from '../../src/utils'
+import { multisign } from '../../src/Wallet/signer'
 
 import serverUrl from './serverUrl'
 import {

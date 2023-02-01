@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import omit from 'lodash/omit'
-import { AccountLinesRequest } from 'xrpl-local'
 
+import { AccountLinesRequest } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

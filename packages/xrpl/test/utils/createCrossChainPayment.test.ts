@@ -1,9 +1,6 @@
 import { assert } from 'chai'
-import {
-  createCrossChainPayment,
-  convertStringToHex,
-  Payment,
-} from 'xrpl-local'
+
+import { createCrossChainPayment, convertStringToHex, Payment } from '../../src'
 
 describe('createCrossChainPayment', function () {
   it('successful xchain payment creation', function () {

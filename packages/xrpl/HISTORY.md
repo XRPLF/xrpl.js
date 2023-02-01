@@ -6,14 +6,14 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Fixed
 * Code splitting improvements for lodash
 * Fixed missing reason code in websocket implemntation on websocket disconnect
+* Fix timeout error in request manager
+* Improved typescript typing
 
 ### Added
 
 
 ### Changed
 * All tests now use the Jest test runner and have been refactored for consistency across all packages
-* Fix timeout error in request manager
-* Improved typescript typing
 
 ### Deprecated
 Wallet.fromMmnemonic()

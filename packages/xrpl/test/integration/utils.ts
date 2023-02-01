@@ -2,6 +2,7 @@ import { assert } from 'chai'
 import omit from 'lodash/omit'
 import throttle from 'lodash/throttle'
 import { decode } from 'ripple-binary-codec'
+
 import {
   Client,
   Wallet,
@@ -10,9 +11,9 @@ import {
   TimeoutError,
   NotConnectedError,
   unixTimeToRippleTime,
-} from 'xrpl-local'
-import { Payment, Transaction } from 'xrpl-local/models/transactions'
-import { hashSignedTx } from 'xrpl-local/utils/hashes'
+} from '../../src'
+import { Payment, Transaction } from '../../src/models/transactions'
+import { hashSignedTx } from '../../src/utils/hashes'
 
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'

@@ -4,7 +4,8 @@ import net from 'net'
 
 import { assert } from 'chai'
 import omit from 'lodash/omit'
-import { rippleTimeToUnixTime, unixTimeToRippleTime } from 'xrpl-local'
+
+import { rippleTimeToUnixTime, unixTimeToRippleTime } from '../src'
 
 import addresses from './fixtures/addresses.json'
 
@@ -168,9 +169,9 @@ export function ignoreWebSocketDisconnect(error: Error): void {
 }
 
 /**
- * Attmepts to log information about how far off the current time is from the last ledger close time.
+ * Attempts to log information about how far off the current time is from the last ledger close time.
  * This is useful for debugging ledger close time issues when sending multiple ledgerAccept requests too quickly.
- * If you send multiple requests in the span of a single second, the ledger can end up with a closed time well into the future.
+ * If you send multiple requests in the span of a single second, the ledger can end up with a close time well into the future.
  * See https://xrpl.org/ledgers.html#ledger-close-times for more information.
  * The time that a ledger version closed is recorded at the close_time field of the ledger header. To make it easier for
  * the network to reach a consensus on an exact close time, this value is rounded to a number of seconds based on the

@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import type { Request } from 'xrpl-local'
 
+import type { Request } from '../../src'
 import rippled from '../fixtures/rippled'
 import {
   setupClient,

@@ -1,5 +1,4 @@
-import { Payment } from 'xrpl-local'
-
+import { Payment } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

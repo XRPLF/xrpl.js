@@ -1,6 +1,6 @@
 # ripple-address-codec
 
-## Unreleased
+## Changed
 - All tests now use the Jest test runner and have been refactored for consistency across all packages
 
 ## 4.2.4 (2022-04-21)

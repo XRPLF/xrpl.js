@@ -1,4 +1,4 @@
-import { Client, Payment, SetRegularKey } from 'xrpl-local'
+import { Client, Payment, SetRegularKey } from '../../src'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 

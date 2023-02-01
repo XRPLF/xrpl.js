@@ -28,7 +28,6 @@ function webpackForTest(testFileName) {
     },
     externals: [
       {
-        'xrpl-local': 'xrpl',
         net: 'null',
       },
     ],
@@ -39,6 +38,7 @@ function webpackForTest(testFileName) {
       filename: match[1] + '.js',
     },
     plugins: [
+      new webpack.NormalModuleReplacementPlugin(/^ws$/, './WSWrapper'),
       new webpack.ProvidePlugin({
         process: 'process/browser',
       }),
@@ -110,6 +110,7 @@ function webpackForTest(testFileName) {
         crypto: require.resolve('crypto-browserify'),
         path: require.resolve('path-browserify'),
         http: require.resolve('stream-http'),
+        https: require.resolve('https-browserify'),
       },
     },
   }

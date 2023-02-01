@@ -1,11 +1,12 @@
 import { EventEmitter2 } from 'eventemitter2'
 import { Server as WebSocketServer, type WebSocket } from 'ws'
-import type { Request } from 'xrpl-local'
-import { XrplError } from 'xrpl-local/errors'
+
+import type { Request } from '../src'
+import { XrplError } from '../src/errors'
 import type {
   BaseResponse,
   ErrorResponse,
-} from 'xrpl-local/models/methods/baseMethod'
+} from '../src/models/methods/baseMethod'
 
 import { destroyServer, getFreePort } from './testUtils'
 

@@ -1,5 +1,4 @@
-import { PaymentChannelCreate, hashes, PaymentChannelFund } from 'xrpl-local'
-
+import { PaymentChannelCreate, hashes, PaymentChannelFund } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

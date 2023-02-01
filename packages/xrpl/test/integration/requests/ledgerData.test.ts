@@ -1,7 +1,7 @@
 import { assert } from 'chai'
-import { LedgerDataRequest } from 'xrpl-local'
-import type { BinaryLedgerEntry } from 'xrpl-local/models/methods/ledgerData'
 
+import { LedgerDataRequest } from '../../../src'
+import type { BinaryLedgerEntry } from '../../../src/models/methods/ledgerData'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

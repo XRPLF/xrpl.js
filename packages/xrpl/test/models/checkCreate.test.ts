@@ -1,6 +1,7 @@
 import { assert } from 'chai'
-import { validate, ValidationError } from 'xrpl-local'
-import { validateCheckCreate } from 'xrpl-local/models/transactions/checkCreate'
+
+import { validate, ValidationError } from '../../src'
+import { validateCheckCreate } from '../../src/models/transactions/checkCreate'
 
 /**
  * CheckCreate Transaction Verification Testing.

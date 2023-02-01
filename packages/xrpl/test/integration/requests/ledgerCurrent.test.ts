@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { LedgerCurrentResponse, LedgerCurrentRequest } from 'xrpl-local'
 
+import { LedgerCurrentResponse, LedgerCurrentRequest } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

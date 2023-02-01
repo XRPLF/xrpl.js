@@ -1,5 +1,4 @@
-import { TrustSet, percentToQuality } from 'xrpl-local'
-
+import { TrustSet, percentToQuality } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

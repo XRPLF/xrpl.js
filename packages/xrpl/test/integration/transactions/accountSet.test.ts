@@ -1,5 +1,4 @@
-import { AccountSet } from 'xrpl-local/models/transactions'
-
+import { AccountSet } from '../../../src/models/transactions'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

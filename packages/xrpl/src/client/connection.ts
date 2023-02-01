@@ -436,7 +436,9 @@ export class Connection extends EventEmitter {
    * @throws Error if the websocket initialized is somehow null.
    */
   // eslint-disable-next-line max-lines-per-function -- Many error code conditionals to check.
-  private async onceOpen(connectionTimeoutID: NodeJS.Timeout): Promise<void> {
+  private async onceOpen(
+    connectionTimeoutID: ReturnType<typeof setTimeout>,
+  ): Promise<void> {
     if (this.ws == null) {
       throw new XrplError('onceOpen: ws is null')
     }

@@ -1,4 +1,5 @@
 import { assert } from 'chai'
+
 import {
   AccountSet,
   Client,
@@ -7,9 +8,9 @@ import {
   Wallet,
   AccountSetAsfFlags,
   OfferCreate,
-} from 'xrpl-local'
-import { convertStringToHex } from 'xrpl-local/utils'
-import { multisign } from 'xrpl-local/Wallet/signer'
+} from '../../src'
+import { convertStringToHex } from '../../src/utils'
+import { multisign } from '../../src/Wallet/signer'
 
 import serverUrl from './serverUrl'
 import {

@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { CheckCreate } from 'xrpl-local'
 
+import { CheckCreate } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

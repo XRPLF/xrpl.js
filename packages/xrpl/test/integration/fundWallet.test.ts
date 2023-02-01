@@ -5,7 +5,7 @@ import {
   isValidClassicAddress,
   isValidXAddress,
   dropsToXrp,
-} from 'xrpl-local'
+} from '../../src'
 
 async function generate_faucet_wallet_and_fund_again(
   client: string,

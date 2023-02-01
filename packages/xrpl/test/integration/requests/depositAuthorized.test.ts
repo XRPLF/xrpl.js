@@ -1,6 +1,9 @@
 import { assert } from 'chai'
-import { DepositAuthorizedRequest, DepositAuthorizedResponse } from 'xrpl-local'
 
+import {
+  DepositAuthorizedRequest,
+  DepositAuthorizedResponse,
+} from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

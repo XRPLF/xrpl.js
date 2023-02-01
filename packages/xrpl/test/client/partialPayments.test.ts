@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- required for formatting transactions */
 import { expect } from 'chai'
 import cloneDeep from 'lodash/cloneDeep'
-import type { TransactionStream } from 'xrpl-local'
 
+import type { TransactionStream } from '../../src'
 import rippled from '../fixtures/rippled'
 import {
   setupClient,

@@ -1,6 +1,10 @@
 import { assert } from 'chai'
-import { AccountTxRequest, Payment, type TransactionMetadata } from 'xrpl-local'
 
+import {
+  AccountTxRequest,
+  Payment,
+  type TransactionMetadata,
+} from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -49,7 +53,6 @@ describe('account_tx', function () {
                   '30440220693D244BC13967E3DA67BDC974096784ED03DD4ACE6F36645E5176988452AFCF02200F8AB172432913899F27EC5523829AEDAD00CC2445690400E294EDF652A85945',
                 date: 685747005,
                 hash: '2E68BC15813B4A836FAC4D80E42E6FDA6410E99AB973937DEA5E6C2E9A116BAB',
-                inLedger: 1734,
                 ledger_index: 1734,
               },
             },
@@ -82,10 +85,6 @@ describe('account_tx', function () {
       )
       assert.equal(typeof response.result.transactions[0].tx?.Fee, 'string')
       assert.equal(typeof response.result.transactions[0].tx?.hash, 'string')
-      assert.equal(
-        typeof response.result.transactions[0].tx?.inLedger,
-        'number',
-      )
       assert.equal(
         typeof response.result.transactions[0].tx?.ledger_index,
         'number',

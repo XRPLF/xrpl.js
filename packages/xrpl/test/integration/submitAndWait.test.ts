@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { AccountSet, convertStringToHex, ValidationError } from 'xrpl-local'
 
+import { AccountSet, convertStringToHex, ValidationError } from '../../src'
 import { assertRejects } from '../testUtils'
 
 import serverUrl from './serverUrl'
@@ -22,13 +22,11 @@ describe('client.submitAndWait', function () {
   })
   afterEach(async () => teardownClient(testContext))
 
-  async function delayedLedgerAccept(
-    context: XrplIntegrationTestContext,
-  ): Promise<unknown> {
+  async function delayedLedgerAccept(): Promise<unknown> {
     await new Promise<void>((resolve) => {
       setTimeout(resolve, 1000)
     })
-    return ledgerAccept(context.client)
+    return ledgerAccept(testContext.client)
   }
 
   it(
@@ -47,7 +45,7 @@ describe('client.submitAndWait', function () {
         const responsePromise = testContext.client.submitAndWait(accountSet, {
           wallet: testContext.wallet,
         })
-        const ledgerPromise = delayedLedgerAccept(testContext)
+        const ledgerPromise = delayedLedgerAccept()
 
         try {
           // eslint-disable-next-line no-await-in-loop -- Testing purposes
@@ -115,7 +113,7 @@ describe('client.submitAndWait', function () {
         await testContext.client.autofill(accountSet),
       )
       const responsePromise = testContext.client.submitAndWait(signedAccountSet)
-      const ledgerPromise = delayedLedgerAccept(testContext)
+      const ledgerPromise = delayedLedgerAccept()
       return Promise.all([responsePromise, ledgerPromise]).then(
         ([response, _ledger]) => {
           assert.equal(response.type, 'response')
@@ -138,7 +136,7 @@ describe('client.submitAndWait', function () {
         await testContext.client.autofill(accountSet),
       )
       const responsePromise = testContext.client.submitAndWait(signedAccountSet)
-      const ledgerPromise = delayedLedgerAccept(testContext)
+      const ledgerPromise = delayedLedgerAccept()
       return Promise.all([responsePromise, ledgerPromise]).then(
         ([response, _ledger]) => {
           assert.equal(response.type, 'response')

@@ -1,7 +1,7 @@
 import { assert } from 'chai'
-import { AccountSet, hashes, SubmitResponse, TxResponse } from 'xrpl-local'
-import { convertStringToHex } from 'xrpl-local/utils'
 
+import { AccountSet, hashes, SubmitResponse, TxResponse } from '../../../src'
+import { convertStringToHex } from '../../../src/utils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

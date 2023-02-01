@@ -1,9 +1,9 @@
 import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec'
-import { NFTokenMint, Payment, Transaction } from 'xrpl-local'
-import ECDSA from 'xrpl-local/ECDSA'
-import Wallet from 'xrpl-local/Wallet'
 
+import { NFTokenMint, Payment, Transaction } from '../../src'
+import ECDSA from '../../src/ECDSA'
+import Wallet from '../../src/Wallet'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 

@@ -3,6 +3,7 @@
 import net from 'net'
 
 import { assert } from 'chai'
+
 import {
   Client,
   ConnectionError,
@@ -11,8 +12,8 @@ import {
   ResponseFormatError,
   XrplError,
   TimeoutError,
-} from 'xrpl-local'
-import { Connection } from 'xrpl-local/client/connection'
+} from '../src'
+import { Connection } from '../src/client/connection'
 
 import rippled from './fixtures/rippled'
 import {

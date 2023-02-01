@@ -1,10 +1,11 @@
 import { assert } from 'chai'
+
 import {
   rippleTimeToISOTime,
   isoTimeToRippleTime,
   unixTimeToRippleTime,
   rippleTimeToUnixTime,
-} from 'xrpl-local'
+} from '../../src'
 
 describe('time conversion', function () {
   describe('rippleTimeToISOTime', function () {
