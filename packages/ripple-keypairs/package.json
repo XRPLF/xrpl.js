@@ -20,7 +20,7 @@
     "bn.js": "^5.1.1",
     "brorand": "^1.0.5",
     "elliptic": "^6.5.4",
-    "hash.js": "^1.0.3",
+    "hash.js": "^1.1.7",
     "ripple-address-codec": "^4.2.4"
   },
   "repository": {
