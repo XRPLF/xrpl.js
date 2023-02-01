@@ -70,7 +70,9 @@ If you're building your own sidechain or writing an amendment for the XRPL, you 
 To do that there are a couple things you need to do:
 
 1. Generate your own `definitions.json` file from rippled source code using [this tool](https://github.com/RichardAH/xrpl-codec-gen) (The default `definitions.json` for mainnet can be found [here](https://github.com/XRPLF/xrpl.js/blob/main/packages/ripple-binary-codec/src/enums/definitions.json))
-2. Create new SerializedType classes for any new Types (So that encode/decode behavior is defined)
+2. Create new SerializedType classes for any new Types (So that encode/decode behavior is defined).
+
+- Note: This is very rarely required. The SerializedType classes correspond to "ST..." classes in Rippled.
 
 - For examples of how to implement that you can look at objects in the [`types` folder](../types/), such as `Amount`, `UInt8`, or `STArray`.
 
