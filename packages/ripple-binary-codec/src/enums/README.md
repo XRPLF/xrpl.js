@@ -81,11 +81,11 @@ To do that there are a couple things you need to do:
 ## Example of adding a new Transaction type
 
 ```
-// newTypeDefs is where you can import your custom defined definitions.json file
-const newTypeDefs = require('./new-type.json')
+// newDefinitionsJson is where you can import your custom defined definitions.json file
+const newDefinitionsJson = require('./new-type.json')
 const { XrplDefinitions, Client } = require('xrpl')
 
-const newDefs = new XrplDefinitions(newTxDefinitions)
+const newDefs = new XrplDefinitions(newDefinitionsJson)
 
 // Change to point at the server you care about
 const serverAddress = 'wss://s.devnet.rippletest.net:51233'
@@ -98,7 +98,7 @@ interface NewTx extends BaseTransaction {
 }
 
 const tx: NewTx = {
-    // The TransactionType here needs to match what you added in your newTxDefinitions file
+    // The TransactionType here needs to match what you added in your newDefinitionsJson file
     TransactionType: 'NewTx',
     Account: wallet1.address,
     Amount: '100',

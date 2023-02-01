@@ -1,7 +1,7 @@
 const { encode, decode } = require('../dist')
 const { XrplDefinitions } = require('../dist/enums/xrpl-definitions')
 const { coreTypes } = require('../dist/types')
-const newTypeDefs = require('./fixtures/new-type.json')
+const newDefinitionsJson = require('./fixtures/new-type.json')
 const newFieldDefs = require('./fixtures/new-field.json')
 const { UInt32 } = require('../dist/types/uint-32')
 const newTransactionDefs = require('./fixtures/new-transaction-type.json')
@@ -63,7 +63,7 @@ describe('encode and decode using new types as a parameter', function () {
     const extendedCoreTypes = { ...coreTypes }
     extendedCoreTypes['NewType'] = NewType
 
-    const newDefs = new XrplDefinitions(newTypeDefs, extendedCoreTypes)
+    const newDefs = new XrplDefinitions(newDefinitionsJson, extendedCoreTypes)
 
     const encoded = encode(tx, newDefs)
     expect(() => decode(encoded)).toThrow()
