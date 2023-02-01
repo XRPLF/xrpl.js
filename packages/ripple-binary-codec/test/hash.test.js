@@ -1,7 +1,33 @@
 const { coreTypes } = require('../dist/types')
-const { Hash160, Hash256, AccountID, Currency } = coreTypes
+const { Hash128, Hash160, Hash256, AccountID, Currency } = coreTypes
 const { Buffer } = require('buffer/')
 
+describe('Hash128', function () {
+  test('has a static width member', function () {
+    expect(Hash128.width).toBe(16)
+  })
+  test('can be unset', function () {
+    const h1 = Hash128.from('')
+    expect(h1.toJSON()).toBe('')
+  })
+  test('can be compared against another', function () {
+    const h1 = Hash128.from('100000000000000000000000000000000')
+    const h2 = Hash128.from('200000000000000000000000000000000')
+    const h3 = Hash128.from('000000000000000000000000000000003')
+    expect(h1.lt(h2)).toBe(true)
+    expect(h3.lt(h2)).toBe(true)
+    expect(h2.gt(h1)).toBe(true)
+    expect(h1.gt(h3)).toBe(true)
+  })
+  test('throws when constructed from invalid hash length', () => {
+    expect(() => Hash128.from('1000000000000000000000000000000')).toThrow(
+      'Invalid Hash length 15',
+    )
+    expect(() => Hash128.from('10000000000000000000000000000000000')).toThrow(
+      'Invalid Hash length 17',
+    )
+  })
+})
 describe('Hash160', function () {
   test('has a static width member', function () {
     expect(Hash160.width).toBe(20)
