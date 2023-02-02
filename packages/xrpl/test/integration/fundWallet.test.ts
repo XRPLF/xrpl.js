@@ -26,16 +26,10 @@ describe('fundWallet', function () {
     )
   })
 
-  it('can generate and fund wallets on nft-devnet', async function () {
-    await generate_faucet_wallet_and_fund_again(
-      'ws://xls20-sandbox.rippletest.net:51233',
-    )
-  })
-
   it('can generate and fund wallets using a custom host and path', async function () {
     await generate_faucet_wallet_and_fund_again(
-      'ws://xls20-sandbox.rippletest.net:51233',
-      'faucet-nft.ripple.com',
+      'wss://s.devnet.rippletest.net:51233/',
+      'faucet.devnet.rippletest.net',
       '/accounts',
     )
   })

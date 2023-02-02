@@ -5,7 +5,7 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ main, 1.x ]
+    branches: [main, 1.x]
   pull_request:
   workflow_dispatch:
 
@@ -57,7 +57,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
+        node-version: [12.x, 14.x, 16.x, 18.x]
 
     steps:
       - uses: actions/checkout@v3
@@ -98,15 +98,14 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
+        node-version: [12.x, 14.x, 16.x, 18.x]
 
     services:
       rippled:
         image: natenichols/rippled-standalone:latest
         ports:
-        - 6006:6006
-        options:
-          --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
+          - 6006:6006
+        options: --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
     steps:
       - uses: actions/checkout@v3
@@ -156,9 +155,8 @@ jobs:
       rippled:
         image: natenichols/rippled-standalone:latest
         ports:
-        - 6006:6006
-        options:
-          --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
+          - 6006:6006
+        options: --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
     steps:
       - uses: actions/checkout@v3
