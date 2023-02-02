@@ -2665,8 +2665,10 @@
     "XChainCommit": 42,
     "XChainClaim": 43,
     "XChainAccountCreateCommit": 44,
-    "XChainAddAttestation": 45,
-    "XChainModifyBridge": 46,
+    "XChainAddAttestationBatch": 45,
+    "XChainAddClaimAttestation": 46,
+    "XChainAddAccountCreateAttestation": 47,
+    "XChainModifyBridge": 48,
     "EnableAmendment": 100,
     "SetFee": 101,
     "UNLModify": 102
