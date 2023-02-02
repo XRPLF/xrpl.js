@@ -1,13 +1,13 @@
 import { assert } from 'chai'
 import { validate, ValidationError } from 'xrpl-local'
-import { validateXChainAddAttestation } from 'xrpl-local/models/transactions/XChainAddAttestation'
+import { validateXChainAddAttestationBatch } from 'xrpl-local/models/transactions/XChainAddAttestationBatch'
 
 /**
- * XChainAddAttestation Transaction Verification Testing.
+ * XChainAddAttestationBatch Transaction Verification Testing.
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('XChainAddAttestation', function () {
+describe('XChainAddAttestationBatch', function () {
   let tx
 
   beforeEach(function () {
@@ -18,7 +18,7 @@ describe('XChainAddAttestation', function () {
       Sequence: 1,
       SigningPubKey:
         '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
-      TransactionType: 'XChainAddAttestation',
+      TransactionType: 'XChainAddAttestationBatch',
       TxnSignature:
         '304502210098F47661D8EF89CC2DFF3EAA92AF3843CEFD398EAD1E7496FAEAC269DE688FB80220143EBE519FC1936E884B1AFA047D4CB7CD2E2A28F0B27EC982D1BB3E63FC9535',
       XChainAttestationBatch: {
@@ -50,8 +50,8 @@ describe('XChainAddAttestation', function () {
     }
   })
 
-  it(`verifies valid XChainAddAttestation`, function () {
-    assert.doesNotThrow(() => validateXChainAddAttestation(tx))
+  it(`verifies valid XChainAddAttestationBatch`, function () {
+    assert.doesNotThrow(() => validateXChainAddAttestationBatch(tx))
     assert.doesNotThrow(() => validate(tx))
   })
 
@@ -59,14 +59,14 @@ describe('XChainAddAttestation', function () {
     delete tx.XChainAttestationBatch
 
     assert.throws(
-      () => validateXChainAddAttestation(tx),
+      () => validateXChainAddAttestationBatch(tx),
       ValidationError,
-      'XChainAddAttestation: missing field XChainAttestationBatch',
+      'XChainAddAttestationBatch: missing field XChainAttestationBatch',
     )
     assert.throws(
       () => validate(tx),
       ValidationError,
-      'XChainAddAttestation: missing field XChainAttestationBatch',
+      'XChainAddAttestationBatch: missing field XChainAttestationBatch',
     )
   })
 
@@ -74,14 +74,14 @@ describe('XChainAddAttestation', function () {
     delete tx.XChainAttestationBatch.XChainBridge
 
     assert.throws(
-      () => validateXChainAddAttestation(tx),
+      () => validateXChainAddAttestationBatch(tx),
       ValidationError,
-      'XChainAddAttestation: missing field XChainAttestationBatch.XChainBridge',
+      'XChainAddAttestationBatch: missing field XChainAttestationBatch.XChainBridge',
     )
     assert.throws(
       () => validate(tx),
       ValidationError,
-      'XChainAddAttestation: missing field XChainAttestationBatch.XChainBridge',
+      'XChainAddAttestationBatch: missing field XChainAttestationBatch.XChainBridge',
     )
   })
 
@@ -89,14 +89,14 @@ describe('XChainAddAttestation', function () {
     delete tx.XChainAttestationBatch.XChainClaimAttestationBatch
 
     assert.throws(
-      () => validateXChainAddAttestation(tx),
+      () => validateXChainAddAttestationBatch(tx),
       ValidationError,
-      'XChainAddAttestation: missing field XChainAttestationBatch.XChainClaimAttestationBatch',
+      'XChainAddAttestationBatch: missing field XChainAttestationBatch.XChainClaimAttestationBatch',
     )
     assert.throws(
       () => validate(tx),
       ValidationError,
-      'XChainAddAttestation: missing field XChainAttestationBatch.XChainClaimAttestationBatch',
+      'XChainAddAttestationBatch: missing field XChainAttestationBatch.XChainClaimAttestationBatch',
     )
   })
 
@@ -104,14 +104,14 @@ describe('XChainAddAttestation', function () {
     delete tx.XChainAttestationBatch.XChainCreateAccountAttestationBatch
 
     assert.throws(
-      () => validateXChainAddAttestation(tx),
+      () => validateXChainAddAttestationBatch(tx),
       ValidationError,
-      'XChainAddAttestation: missing field XChainAttestationBatch.XChainCreateAccountAttestationBatch',
+      'XChainAddAttestationBatch: missing field XChainAttestationBatch.XChainCreateAccountAttestationBatch',
     )
     assert.throws(
       () => validate(tx),
       ValidationError,
-      'XChainAddAttestation: missing field XChainAttestationBatch.XChainCreateAccountAttestationBatch',
+      'XChainAddAttestationBatch: missing field XChainAttestationBatch.XChainCreateAccountAttestationBatch',
     )
   })
 })
