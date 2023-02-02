@@ -58,6 +58,10 @@ import {
   XChainAddAttestationBatch,
   validateXChainAddAttestationBatch,
 } from './XChainAddAttestationBatch'
+import {
+  XChainAddClaimAttestation,
+  validateXChainAddClaimAttestation,
+} from './XChainAddClaimAttestation'
 import { XChainClaim, validateXChainClaim } from './XChainClaim'
 import { XChainCommit, validateXChainCommit } from './XChainCommit'
 import {
@@ -102,6 +106,7 @@ export type Transaction =
   | TicketCreate
   | TrustSet
   | XChainAddAttestationBatch
+  | XChainAddClaimAttestation
   | XChainClaim
   | XChainCommit
   | XChainCreateBridge
@@ -234,6 +239,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'XChainAddAttestationBatch':
       validateXChainAddAttestationBatch(tx)
+      break
+
+    case 'XChainAddClaimAttestation':
+      validateXChainAddClaimAttestation(tx)
       break
 
     case 'XChainClaim':
