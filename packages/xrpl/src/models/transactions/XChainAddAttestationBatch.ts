@@ -7,8 +7,8 @@ import { BaseTransaction, validateBaseTransaction } from './common'
  *
  * @category Transaction Models
  */
-export interface XChainAddAttestation extends BaseTransaction {
-  TransactionType: 'XChainAddAttestation'
+export interface XChainAddAttestationBatch extends BaseTransaction {
+  TransactionType: 'XChainAddAttestationBatch'
 
   XChainAttestationBatch: {
     XChainBridge: XChainBridge
@@ -56,25 +56,25 @@ export interface XChainAddAttestation extends BaseTransaction {
 }
 
 /**
- * Verify the form and type of a XChainAddAttestation at runtime.
+ * Verify the form and type of a XChainAddAttestationBatch at runtime.
  *
- * @param tx - A XChainAddAttestation Transaction.
- * @throws When the XChainAddAttestation is malformed.
+ * @param tx - A XChainAddAttestationBatch Transaction.
+ * @throws When the XChainAddAttestationBatch is malformed.
  */
-export function validateXChainAddAttestation(
+export function validateXChainAddAttestationBatch(
   tx: Record<string, unknown>,
 ): void {
   validateBaseTransaction(tx)
 
   if (tx.XChainAttestationBatch == null) {
     throw new ValidationError(
-      'XChainAddAttestation: missing field XChainAttestationBatch',
+      'XChainAddAttestationBatch: missing field XChainAttestationBatch',
     )
   }
 
   if (typeof tx.XChainAttestationBatch !== 'object') {
     throw new ValidationError(
-      'XChainAddAttestation: XChainAttestationBatch must be an object',
+      'XChainAddAttestationBatch: XChainAttestationBatch must be an object',
     )
   }
 
@@ -83,19 +83,19 @@ export function validateXChainAddAttestation(
 
   if (attestationBatch.XChainBridge == null) {
     throw new ValidationError(
-      'XChainAddAttestation: missing field XChainAttestationBatch.XChainBridge',
+      'XChainAddAttestationBatch: missing field XChainAttestationBatch.XChainBridge',
     )
   }
 
   if (attestationBatch.XChainClaimAttestationBatch == null) {
     throw new ValidationError(
-      'XChainAddAttestation: missing field XChainAttestationBatch.XChainClaimAttestationBatch',
+      'XChainAddAttestationBatch: missing field XChainAttestationBatch.XChainClaimAttestationBatch',
     )
   }
 
   if (attestationBatch.XChainCreateAccountAttestationBatch == null) {
     throw new ValidationError(
-      'XChainAddAttestation: missing field XChainAttestationBatch.XChainCreateAccountAttestationBatch',
+      'XChainAddAttestationBatch: missing field XChainAttestationBatch.XChainCreateAccountAttestationBatch',
     )
   }
 }
