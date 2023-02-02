@@ -18,6 +18,8 @@ export interface XChainAddClaimAttestation extends BaseTransaction {
 
   Destination?: string
 
+  OtherChainSource: string
+
   PublicKey: string
 
   Signature: string
