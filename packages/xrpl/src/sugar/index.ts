@@ -1,4 +1,4 @@
-export { default as autofill } from './autofill'
+export { autofill, autofillBatch } from './autofill'
 
 export { getBalances, getXrpBalance } from './balances'
 

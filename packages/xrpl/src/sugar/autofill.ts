@@ -57,6 +57,50 @@ async function autofill<T extends Transaction>(
   return Promise.all(promises).then(() => tx)
 }
 
+/**
+ * Autofills fields in a transaction. This will set `Sequence`, `Fee`,
+ * `lastLedgerSequence` according to the current state of the server this Client
+ * is connected to. It also converts all X-Addresses to classic addresses and
+ * flags interfaces into numbers.
+ *
+ * @param this - A client.
+ * @param transactions - A {@link Transaction} in JSON format
+ * Only used for multisigned transactions.
+ * @returns The autofilled transaction.
+ */
+async function autofillBatch<T extends Transaction>(
+  this: Client,
+  transactions: Array<{ transaction: T; signersCount?: number }>,
+): Promise<T[]> {
+  // Sender Account to Sequence map
+  const map: Map<string, number> = new Map()
+  const promises: Array<Promise<T>> = []
+  for (const txn of transactions) {
+    const { transaction, signersCount } = txn
+    const account = transaction.Account
+
+    if (transaction.Sequence == null) {
+      // eslint-disable-next-line max-depth -- necessary
+      if (map.has(account)) {
+        transaction.Sequence = map.get(account)
+      } else {
+        // eslint-disable-next-line no-await-in-loop -- necessary
+        await setNextValidSequenceNumber(this, transaction)
+      }
+    }
+
+    if (transaction.Sequence == null) {
+      throw Error(`Sequence number is null`)
+    }
+
+    promises.push(this.autofill(transaction, signersCount))
+
+    map.set(account, transaction.Sequence + 1)
+  }
+
+  return Promise.all(promises)
+}
+
 function setValidAddresses(tx: Transaction): void {
   validateAccountAddress(tx, 'Account', 'SourceTag')
   // eslint-disable-next-line @typescript-eslint/dot-notation -- Destination can exist on Transaction
@@ -233,4 +277,4 @@ async function checkAccountDeleteBlockers(
   })
 }
 
-export default autofill
+export { autofill, autofillBatch }

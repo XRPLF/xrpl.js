@@ -40,7 +40,6 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger]) => {
         assert.equal(result.success.length, 1)
         assert.equal(result.error.length, 0)
-        assert.equal(result.unsubmitted.length, 0)
         assert.equal(result.success[0].type, 'response')
         assert.equal(result.success[0].result.validated, true)
       },
@@ -68,7 +67,6 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger]) => {
         assert.equal(result.success.length, 0)
         assert.equal(result.error.length, 1)
-        assert.equal(result.unsubmitted.length, 0)
         assert.equal(result.error[0].data.error, 'invalidTransaction')
         assert.equal(result.error[0].data.status, 'error')
       },
@@ -110,7 +108,6 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger, _ledger2]) => {
         assert.equal(result.success.length, 2)
         assert.equal(result.error.length, 0)
-        assert.equal(result.unsubmitted.length, 0)
         for (const response of result.success) {
           assert.equal(response.type, 'response')
           assert.equal(response.result.validated, true)
@@ -153,7 +150,6 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger, _ledger2]) => {
         assert.equal(result.success.length, 1)
         assert.equal(result.error.length, 1)
-        assert.equal(result.unsubmitted.length, 0)
         assert.equal(result.success[0].type, 'response')
         assert.equal(result.success[0].result.validated, true)
         assert.equal(result.error[0].data.error, 'invalidTransaction')
@@ -198,7 +194,6 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger, _ledger2]) => {
         assert.equal(result.success.length, 2)
         assert.equal(result.error.length, 0)
-        assert.equal(result.unsubmitted.length, 0)
         for (const response of result.success) {
           assert.equal(response.type, 'response')
           assert.equal(response.result.validated, true)
@@ -241,7 +236,6 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger, _ledger2]) => {
         assert.equal(result.success.length, 0)
         assert.equal(result.error.length, 2)
-        assert.equal(result.unsubmitted.length, 0)
         for (const response of result.error) {
           assert.equal(response.data.error, 'invalidTransaction')
           assert.equal(response.data.status, 'error')
@@ -308,7 +302,6 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger, _ledger2]) => {
         assert.equal(result.success.length, 4)
         assert.equal(result.error.length, 0)
-        assert.equal(result.unsubmitted.length, 0)
         for (const response of result.success) {
           assert.equal(response.type, 'response')
           assert.equal(response.result.validated, true)
@@ -373,7 +366,6 @@ describe('client.submitAndWaitBatch', function () {
       ([result, _ledger, _ledger2]) => {
         assert.equal(result.success.length, 2)
         assert.equal(result.error.length, 2)
-        assert.equal(result.unsubmitted.length, 0)
         for (const response of result.success) {
           assert.equal(response.type, 'response')
           assert.equal(response.result.validated, true)
@@ -386,7 +378,20 @@ describe('client.submitAndWaitBatch', function () {
     )
   })
 
-  it("submitAndWaitBatch multiple accounts submit multiple payment transactions with one failed transaction and don't submit subsequent transactions", async function () {
+  /*
+   * TODO: blocked on this test case failing by timing out.
+   *
+   * Investigatin this, it looks like the promise doesn't resolve transactions that fail with XrplError.
+   * I logged the error to see what outputs after it times out and it's an XrplError:
+   *      XrplError: The latest ledger sequence 35060782 is greater than the transaction's LastLedgerSequence (35060781).
+   *      Preliminary result: terPRE_SEQ never resolves
+   *
+   * I tried setting opts.failHard to true but it didn't make a difference.
+   *
+   * Is there an example where we handle XrplError similar error in integ tests?
+   */
+
+  it('submitAndWaitBatch multiple accounts submit multiple payment transactions with one failed transaction that causes subsequent transactions to fail too', async function () {
     const receiverWallet = await generateFundedWallet(this.client)
     const receiverWallet2 = await generateFundedWallet(this.client)
     const senderWallet2 = await generateFundedWallet(this.client)
@@ -463,18 +468,19 @@ describe('client.submitAndWaitBatch', function () {
     return Promise.all([responsePromise, ledgerPromise, ledgerPromise2]).then(
       ([result, _ledger, _ledger2]) => {
         assert.equal(result.success.length, 2)
-        assert.equal(result.error.length, 2)
-        assert.equal(result.unsubmitted.length, 2)
+        assert.equal(result.error.length, 4)
         for (const response of result.success) {
           assert.equal(response.type, 'response')
           assert.equal(response.result.validated, true)
         }
-        for (const response of result.error) {
-          assert.equal(response.data.error, 'invalidTransaction')
-          assert.equal(response.data.status, 'error')
-        }
-        assert.equal(result.unsubmitted[0].transaction, paymentTx2)
-        assert.equal(result.unsubmitted[1].transaction, paymentTx4)
+        assert.equal(result.error[0].data.error, 'invalidTransaction')
+        assert.equal(result.error[0].data.status, 'error')
+        assert.equal(result.error[1].data.error, 'terPRE_SEQ')
+        assert.equal(result.error[1].data.status, 'error')
+        assert.equal(result.error[2].data.error, 'invalidTransaction')
+        assert.equal(result.error[2].data.status, 'error')
+        assert.equal(result.error[3].data.error, 'terPRE_SEQ')
+        assert.equal(result.error[3].data.status, 'error')
       },
     )
   })

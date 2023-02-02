@@ -93,6 +93,7 @@ import {
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 import {
   autofill,
+  autofillBatch,
   ensureClassicAddress,
   getLedgerIndex,
   getOrderbook,
@@ -595,6 +596,11 @@ class Client extends EventEmitter {
    * @category Core
    */
   public autofill = autofill
+
+  /**
+   * @category Core
+   */
+  public autofillBatch = autofillBatch
 
   /**
    * @category Core

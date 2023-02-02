@@ -1,5 +1,3 @@
-/* eslint-disable max-depth -- necessary */
-/* eslint-disable max-lines -- necessary */
 import { decode, encode } from 'ripple-binary-codec'
 
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
@@ -16,15 +14,6 @@ interface SubmitAndWaitBatchResult {
   success: TxResponse[]
   // Failed submitted transactions
   error: Error[]
-  // Unsubmitted transactions
-  unsubmitted: Array<{
-    transaction: Transaction
-    opts?: {
-      autofill?: boolean
-      failHard?: boolean
-      wallet?: Wallet
-    }
-  }>
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -90,7 +79,24 @@ async function submitAndWait(
     wallet?: Wallet
   },
 ): Promise<TxResponse> {
-  return submitAndWaitHelper(this, transaction, opts)
+  const signedTx = await getSignedTx(this, transaction, opts)
+
+  const lastLedger = getLastLedgerSequence(signedTx)
+  if (lastLedger == null) {
+    throw new ValidationError(
+      'Transaction must contain a LastLedgerSequence value for reliable submission.',
+    )
+  }
+
+  const response = await submitRequest(this, signedTx, opts?.failHard)
+
+  const txHash = hashes.hashSignedTx(signedTx)
+  return waitForFinalTransactionOutcome(
+    this,
+    txHash,
+    lastLedger,
+    response.result.engine_result,
+  )
 }
 
 /**
@@ -108,7 +114,6 @@ async function submitAndWait(
  * @param transactions - A batch of transactions with opts to autofill, sign & encode, and submit synchronously.
  * @returns A promise that returns SubmitAndWaitBatchResult when all transactions have been resolved.
  */
-// eslint-disable-next-line max-lines-per-function -- necessary
 async function submitAndWaitBatch(
   this: Client,
   transactions: Array<{
@@ -123,40 +128,26 @@ async function submitAndWaitBatch(
     }
   }>,
 ): Promise<SubmitAndWaitBatchResult> {
-  const result = {
+  const result: SubmitAndWaitBatchResult = {
     success: [],
     error: [],
-    unsubmitted: [],
   }
 
-  // Maps Sender account to its transaction(s)
-  const batchMap: Map<
-    string,
-    Array<{
-      transaction: Transaction
-      opts?: {
-        autofill?: boolean
-        failHard?: boolean
-        wallet?: Wallet
-      }
-    }>
-  > = new Map()
-  for (const tx of transactions) {
-    const account = tx.transaction.Account
-    if (!batchMap.has(account)) {
-      batchMap.set(account, [])
-    }
-    batchMap.get(account)?.push(tx)
-  }
+  const autofilledTxs = await this.autofillBatch(transactions)
 
-  /*
-   * Each Sender account will submit transactions synchronously so sequence number increments consecutively.
-   * Thus, we create a promise for each Sender account.
-   */
-  const accounts = batchMap.keys()
   const promises: Array<Promise<void>> = []
-  for (const account of accounts) {
-    promises.push(submitAndWaitBatchHelper(this, account, batchMap, result))
+  for (let idx = 0; idx < autofilledTxs.length; idx++) {
+    const tx = autofilledTxs[idx]
+    const { opts } = transactions[idx]
+    promises.push(
+      this.submitAndWait(tx, opts)
+        .then((txResponse) => {
+          result.success.push(txResponse)
+        })
+        .catch((error) => {
+          result.error.push(error)
+        }),
+    )
   }
 
   await Promise.all(promises)
@@ -245,94 +236,6 @@ async function waitForFinalTransactionOutcome(
     lastLedger,
     submissionResult,
   )
-}
-
-async function submitAndWaitHelper(
-  client: Client,
-  transaction: Transaction | string,
-  opts?: {
-    // If true, autofill a transaction.
-    autofill?: boolean
-    // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
-    failHard?: boolean
-    // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
-    wallet?: Wallet
-  },
-): Promise<TxResponse> {
-  const signedTx = await getSignedTx(client, transaction, opts)
-
-  const lastLedger = getLastLedgerSequence(signedTx)
-  if (lastLedger == null) {
-    throw new ValidationError(
-      'Transaction must contain a LastLedgerSequence value for reliable submission.',
-    )
-  }
-
-  const response = await submitRequest(client, signedTx, opts?.failHard)
-
-  const txHash = hashes.hashSignedTx(signedTx)
-  return waitForFinalTransactionOutcome(
-    client,
-    txHash,
-    lastLedger,
-    response.result.engine_result,
-  )
-}
-
-// eslint-disable-next-line max-params, max-lines-per-function -- necessary
-async function submitAndWaitBatchHelper(
-  client: Client,
-  account: string,
-  batchMap: Map<
-    string,
-    Array<{
-      transaction: Transaction
-      opts?: {
-        autofill?: boolean
-        failHard?: boolean
-        wallet?: Wallet
-      }
-    }>
-  >,
-  result: SubmitAndWaitBatchResult,
-): Promise<void> {
-  const transactions = batchMap.get(account)
-  if (transactions == null) {
-    throw Error(`transaction is undefined`)
-  }
-  for (let idx = 0; idx < transactions.length; idx++) {
-    const tx = transactions[idx]
-    try {
-      // eslint-disable-next-line no-await-in-loop -- necessary
-      const txResponse = await submitAndWaitHelper(
-        client,
-        tx.transaction,
-        tx.opts,
-      )
-      result.success.push(txResponse)
-
-      // Set next valid Sequence number for next transaction
-      const nextTxIndex = idx + 1
-      if (
-        nextTxIndex < transactions.length &&
-        txResponse.result.Sequence != null
-      ) {
-        transactions[nextTxIndex].transaction.Sequence =
-          txResponse.result.Sequence + 1
-      }
-    } catch (err) {
-      if (!(err instanceof Error)) {
-        throw err
-      }
-      result.error.push(err)
-      // TODO: add a flag to check if Mode 1 or 2 is enabled. For now, Mode 1 is enabled by default
-      const remainingTransactions = transactions.slice(idx + 1)
-      result.unsubmitted.push(...remainingTransactions)
-      break
-    }
-  }
-
-  batchMap.delete(account)
 }
 
 // checks if the transaction has been signed
