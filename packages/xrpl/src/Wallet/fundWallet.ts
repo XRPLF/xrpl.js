@@ -3,7 +3,7 @@ import { request as httpsRequest, RequestOptions } from 'https'
 
 import { isValidClassicAddress } from 'ripple-address-codec'
 
-import type { Client } from '..'
+import type { Client } from '../client'
 import { RippledError, XRPLFaucetError } from '../errors'
 
 import {

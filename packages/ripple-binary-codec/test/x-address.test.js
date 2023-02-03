@@ -1,4 +1,4 @@
-const { encode, decode } = require('./../dist/index')
+const { encode, decode } = require('./../src/index')
 const fixtures = require('./fixtures/x-codec-fixtures.json')
 
 let json_x1 = {

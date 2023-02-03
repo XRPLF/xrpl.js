@@ -1,14 +1,24 @@
 import { assert } from 'chai'
 
-import { setupClient, teardownClient } from '../setupClient'
+import {
+  setupClient,
+  teardownClient,
+  type XrplTestContext,
+} from '../setupClient'
 
 describe('client.isConnected', function () {
-  beforeEach(setupClient)
-  afterEach(teardownClient)
+  let testContext: XrplTestContext
+
+  beforeEach(async () => {
+    testContext = await setupClient()
+  })
+  afterEach(async () => {
+    await teardownClient(testContext)
+  })
 
   it('disconnect & isConnected', async function () {
-    assert.strictEqual(this.client.isConnected(), true)
-    await this.client.disconnect()
-    assert.strictEqual(this.client.isConnected(), false)
+    assert.strictEqual(testContext.client.isConnected(), true)
+    await testContext.client.disconnect()
+    assert.strictEqual(testContext.client.isConnected(), false)
   })
 })

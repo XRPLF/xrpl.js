@@ -1,6 +1,6 @@
 import { UInt } from './uint'
 import { BinaryParser } from '../serdes/binary-parser'
-import * as bigInt from 'big-integer'
+import bigInt = require('big-integer')
 import { isInstance } from 'big-integer'
 import { Buffer } from 'buffer/'
 

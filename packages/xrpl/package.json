@@ -33,9 +33,19 @@
     "ws": "^8.2.2"
   },
   "devDependencies": {
+    "@geut/browser-node-core": "^2.0.13",
+    "@types/node": "^14.18.36",
+    "assert-browserify": "^2.0.0",
+    "browserify-fs": "^1.0.0",
+    "constants-browserify": "^1.0.0",
+    "https-browserify": "^1.0.0",
+    "karma": "^6.4.1",
+    "karma-chrome-launcher": "^3.1.1",
+    "karma-jasmine": "^5.1.0",
+    "karma-webpack": "^5.0.0",
+    "node-polyfill-webpack-plugin": "^2.0.1",
     "react": "^18.2.0",
-    "typedoc": "^0.23.24",
-    "xrpl-local": "file:./src"
+    "typedoc": "^0.23.24"
   },
   "resolutions": {
     "elliptic": "^6.5.4"
@@ -48,13 +58,13 @@
     "build:browserTests": "webpack --config ./test/webpack.config.js",
     "analyze": "run-s build:web --analyze",
     "watch": "run-s build:lib --watch",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist build coverage",
     "docgen": "tsc --build tsconfig.docs.json && typedoc && echo js.xrpl.org >> ../../docs/CNAME",
     "prepublish": "run-s clean build",
-    "test": "nyc mocha --config=test/.mocharc.json --exit",
-    "test:integration": "TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/integration/**/*.test.ts ./test/integration/*.test.ts",
-    "test:browser": "npm run build:browserTests && TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/browser/*.ts",
-    "test:watch": "TS_NODE_PROJECT=src/tsconfig.json mocha --config=test/.mocharc.json --watch --reporter dot",
+    "test": "jest --verbose false --silent=false ./test/**/*.test.ts --testPathIgnorePatterns=./test/integration --testPathIgnorePatterns=./test/fixtures",
+    "test:integration": "TS_NODE_PROJECT=tsconfig.build.json jest --verbose false --silent=false --runInBand ./test/integration/**/*.test.ts",
+    "test:browser": "npm run build && npm run build:browserTests && karma start ./karma.config.js --single-run",
+    "test:watch": "jest --watch --verbose false --silent=false --runInBand ./test/**/*.test.ts --testPathIgnorePatterns=./test/integration --testPathIgnorePatterns=./test/fixtures",
     "format": "prettier --write '{src,test}/**/*.ts'",
     "lint": "eslint . --ext .ts --max-warnings 0",
     "perf": "./scripts/perf_test.sh",

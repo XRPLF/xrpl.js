@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { parseNFTokenID } from 'xrpl-local'
 
+import { parseNFTokenID } from '../../src'
 import { assertResultMatch } from '../testUtils'
 
 describe('parseNFTokenID', function () {

@@ -1,5 +1,5 @@
 import * as assert from 'assert'
-import * as brorand from 'brorand'
+import brorand = require('brorand')
 import * as hashjs from 'hash.js'
 import * as elliptic from 'elliptic'
 
@@ -157,7 +157,7 @@ function deriveNodeAddress(publicKey): string {
 
 const { decodeSeed } = addressCodec
 
-export = {
+export {
   generateSeed,
   deriveKeypair,
   sign,

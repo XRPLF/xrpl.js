@@ -454,6 +454,10 @@ class Client extends EventEmitter {
     event: 'consensusPhase',
     listener: (phase: ConsensusStream) => void,
   ): this
+  public on(
+    event: 'manifestReceived',
+    listener: (manifest: ManifestResponse) => void,
+  ): this
   public on(event: 'path_find', listener: (path: PathFindStream) => void): this
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
   public on(event: 'error', listener: (...err: any[]) => void): this

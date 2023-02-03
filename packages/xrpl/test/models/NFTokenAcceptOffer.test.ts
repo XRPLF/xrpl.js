@@ -1,5 +1,6 @@
 import { assert } from 'chai'
-import { validate, ValidationError } from 'xrpl-local'
+
+import { validate, ValidationError } from '../../src'
 
 const NFTOKEN_BUY_OFFER =
   'AED08CC1F50DD5F23A1948AF86153A3F3B7593E5EC77D65A02BB1B29E05AB6AF'

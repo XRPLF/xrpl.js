@@ -1,29 +1,37 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- required for formatting transactions */
 import { expect } from 'chai'
-import _ from 'lodash'
-import type { TransactionStream } from 'xrpl-local'
+import cloneDeep from 'lodash/cloneDeep'
 
+import type { TransactionStream } from '../../src'
 import rippled from '../fixtures/rippled'
-import { setupClient, teardownClient } from '../setupClient'
+import {
+  setupClient,
+  teardownClient,
+  type XrplTestContext,
+} from '../setupClient'
 
 const partialPaymentIOU = rippled.partial_payments.iou
 const partialPaymentXRP = rippled.partial_payments.xrp
 
 describe('client handling of tfPartialPayments', function () {
-  beforeEach(setupClient)
-  afterEach(teardownClient)
+  let testContext: XrplTestContext
+
+  beforeEach(async () => {
+    testContext = await setupClient()
+  })
+  afterEach(async () => teardownClient(testContext))
 
   it('Tx with no tfPartialPayment', async function () {
-    this.mockRippled.addResponse('tx', rippled.tx.Payment)
-    const resp = await this.client.request({ command: 'tx' })
+    testContext.mockRippled!.addResponse('tx', rippled.tx.Payment)
+    const resp = await testContext.client.request({ command: 'tx' })
 
     expect(resp.warnings).to.equal(undefined)
   })
 
   it('Tx with IOU tfPartialPayment', async function () {
     const mockResponse = { ...rippled.tx.Payment, result: partialPaymentIOU }
-    this.mockRippled.addResponse('tx', mockResponse)
-    const resp = await this.client.request({ command: 'tx' })
+    testContext.mockRippled!.addResponse('tx', mockResponse)
+    const resp = await testContext.client.request({ command: 'tx' })
 
     expect(resp.warnings).to.deep.equal([
       {
@@ -35,8 +43,8 @@ describe('client handling of tfPartialPayments', function () {
 
   it('Tx with XRP tfPartialPayment', async function () {
     const mockResponse = { ...rippled.tx.Payment, result: partialPaymentXRP }
-    this.mockRippled.addResponse('tx', mockResponse)
-    const resp = await this.client.request({ command: 'tx' })
+    testContext.mockRippled!.addResponse('tx', mockResponse)
+    const resp = await testContext.client.request({ command: 'tx' })
 
     expect(resp.warnings).to.deep.equal([
       {
@@ -47,8 +55,11 @@ describe('client handling of tfPartialPayments', function () {
   })
 
   it('account_tx with no tfPartialPayment', async function () {
-    this.mockRippled.addResponse('account_tx', rippled.account_tx.normal)
-    const resp = await this.client.request({ command: 'account_tx' })
+    testContext.mockRippled!.addResponse(
+      'account_tx',
+      rippled.account_tx.normal,
+    )
+    const resp = await testContext.client.request({ command: 'account_tx' })
 
     expect(resp.warnings).to.equal(undefined)
   })
@@ -64,8 +75,8 @@ describe('client handling of tfPartialPayments', function () {
       meta: partial.result.meta,
     } as any)
 
-    this.mockRippled.addResponse('account_tx', mockResponse)
-    const resp = await this.client.request({
+    testContext.mockRippled!.addResponse('account_tx', mockResponse)
+    const resp = await testContext.client.request({
       command: 'account_tx',
       account: mockResponse.result.account,
     })
@@ -87,8 +98,8 @@ describe('client handling of tfPartialPayments', function () {
       meta: partial.result.meta,
     } as any)
 
-    this.mockRippled.addResponse('account_tx', mockResponse)
-    const resp = await this.client.request({
+    testContext.mockRippled!.addResponse('account_tx', mockResponse)
+    const resp = await testContext.client.request({
       command: 'account_tx',
       account: mockResponse.result.account,
     })
@@ -102,17 +113,24 @@ describe('client handling of tfPartialPayments', function () {
   })
 
   it('transaction_entry with no tfPartialPayment', async function () {
-    this.mockRippled.addResponse('transaction_entry', rippled.transaction_entry)
-    const resp = await this.client.request({ command: 'transaction_entry' })
+    testContext.mockRippled!.addResponse(
+      'transaction_entry',
+      rippled.transaction_entry,
+    )
+    const resp = await testContext.client.request({
+      command: 'transaction_entry',
+    })
 
     expect(resp.warnings).to.equal(undefined)
   })
 
   it('transaction_entry with XRP tfPartialPayment', async function () {
-    const mockResponse = _.cloneDeep(rippled.transaction_entry)
+    const mockResponse = cloneDeep(rippled.transaction_entry)
     mockResponse.result.tx_json.Amount = '1000'
-    this.mockRippled.addResponse('transaction_entry', mockResponse)
-    const resp = await this.client.request({ command: 'transaction_entry' })
+    testContext.mockRippled!.addResponse('transaction_entry', mockResponse)
+    const resp = await testContext.client.request({
+      command: 'transaction_entry',
+    })
 
     expect(resp.warnings).to.deep.equal([
       {
@@ -122,21 +140,28 @@ describe('client handling of tfPartialPayments', function () {
     ])
   })
 
-  it('Transactions stream with no tfPartialPayment', async function (done) {
-    this.mockRippled.addResponse('transaction_entry', rippled.transaction_entry)
-    this.client.on('transaction', (tx: TransactionStream) => {
+  it('Transactions stream with no tfPartialPayment', (done) => {
+    testContext.mockRippled!.addResponse(
+      'transaction_entry',
+      rippled.transaction_entry,
+    )
+    testContext.client.on('transaction', (tx: TransactionStream) => {
       expect(tx.warnings).to.equal(undefined)
       done()
     })
 
-    this.client.connection.onMessage(
+    // @ts-expect-error Using private method for testing
+    testContext.client.connection.onMessage(
       JSON.stringify(rippled.streams.transaction),
     )
   })
 
-  it('Transactions stream with XRP tfPartialPayment', async function (done) {
-    this.mockRippled.addResponse('transaction_entry', rippled.transaction_entry)
-    this.client.on('transaction', (tx: TransactionStream) => {
+  it('Transactions stream with XRP tfPartialPayment', (done) => {
+    testContext.mockRippled!.addResponse(
+      'transaction_entry',
+      rippled.transaction_entry,
+    )
+    testContext.client.on('transaction', (tx: TransactionStream) => {
       expect(tx.warnings).to.deep.equal([
         {
           id: 2001,
@@ -146,7 +171,8 @@ describe('client handling of tfPartialPayments', function () {
       done()
     })
 
-    this.client.connection.onMessage(
+    // @ts-expect-error Using private method for testing
+    testContext.client.connection.onMessage(
       JSON.stringify(rippled.streams.partialPaymentTransaction),
     )
   })

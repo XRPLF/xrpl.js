@@ -1,7 +1,11 @@
 import { assert } from 'chai'
 
 import rippled from '../fixtures/rippled'
-import { setupClient, teardownClient } from '../setupClient'
+import {
+  setupClient,
+  teardownClient,
+  type XrplTestContext,
+} from '../setupClient'
 
 async function assertDoesNotThrow(promise: Promise<unknown>): Promise<void> {
   try {
@@ -14,87 +18,133 @@ async function assertDoesNotThrow(promise: Promise<unknown>): Promise<void> {
 }
 
 describe('Client subscription', function () {
-  beforeEach(setupClient)
-  afterEach(teardownClient)
+  let testContext: XrplTestContext
+
+  beforeEach(async () => {
+    testContext = await setupClient()
+  })
+  afterEach(async () => teardownClient(testContext))
 
   it('Successfully Subscribes', async function () {
-    this.mockRippled.addResponse('subscribe', rippled.subscribe.success)
+    testContext.mockRippled!.addResponse('subscribe', rippled.subscribe.success)
 
-    await assertDoesNotThrow(this.client.request({ command: 'subscribe' }))
+    await assertDoesNotThrow(
+      testContext.client.request({ command: 'subscribe' }),
+    )
   })
 
   it('Successfully Unsubscribes', async function () {
-    this.mockRippled.addResponse('unsubscribe', rippled.unsubscribe)
+    testContext.mockRippled!.addResponse('unsubscribe', rippled.unsubscribe)
 
     await assertDoesNotThrow(
-      this.client.request({
+      testContext.client.request({
         command: 'unsubscribe',
       }),
     )
   })
 
-  it('Emits transaction', async function (done) {
-    this.client.on('transaction', (tx) => {
-      assert(tx.type === 'transaction')
-      done()
-    })
+  it('Emits transaction', async function () {
+    await new Promise<void>((resolve) => {
+      testContext.client.on('transaction', (tx) => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
+        assert(tx.type === 'transaction')
+        resolve()
+      })
 
-    this.client.connection.onMessage(
-      JSON.stringify(rippled.streams.transaction),
-    )
+      // @ts-expect-error Using private method for testing
+      testContext.client.connection.onMessage(
+        JSON.stringify(rippled.streams.transaction),
+      )
+    })
   })
 
-  it('Emits ledger', async function (done) {
-    this.client.on('ledgerClosed', (ledger) => {
-      assert(ledger.type === 'ledgerClosed')
-      done()
-    })
+  it('Emits ledger', async function () {
+    await new Promise<void>((resolve) => {
+      testContext.client.on('ledgerClosed', (ledger) => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
+        assert(ledger.type === 'ledgerClosed')
+        resolve()
+      })
 
-    this.client.connection.onMessage(JSON.stringify(rippled.streams.ledger))
+      // @ts-expect-error Using private method for testing
+      testContext.client.connection.onMessage(
+        JSON.stringify(rippled.streams.ledger),
+      )
+    })
   })
 
-  it('Emits peerStatusChange', async function (done) {
-    this.client.on('peerStatusChange', (status) => {
-      assert(status.type === 'peerStatusChange')
-      done()
-    })
+  it('Emits peerStatusChange', async function () {
+    await new Promise<void>((resolve) => {
+      testContext.client.on('peerStatusChange', (status) => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
+        assert(status.type === 'peerStatusChange')
+        resolve()
+      })
 
-    this.client.connection.onMessage(JSON.stringify(rippled.streams.peerStatus))
+      // @ts-expect-error Using private method for testing
+      testContext.client.connection.onMessage(
+        JSON.stringify(rippled.streams.peerStatus),
+      )
+    })
   })
 
-  it('Emits consensusPhase', async function (done) {
-    this.client.on('consensusPhase', (phase) => {
-      assert(phase.type === 'consensusPhase')
-      done()
-    })
+  it('Emits consensusPhase', async function () {
+    await new Promise<void>((resolve) => {
+      testContext.client.on('consensusPhase', (phase) => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
+        assert(phase.type === 'consensusPhase')
+        resolve()
+      })
 
-    this.client.connection.onMessage(JSON.stringify(rippled.streams.consensus))
+      // @ts-expect-error Using private method for testing
+      testContext.client.connection.onMessage(
+        JSON.stringify(rippled.streams.consensus),
+      )
+    })
   })
 
-  it('Emits path_find', async function (done) {
-    this.client.on('path_find', (path) => {
-      assert(path.type === 'path_find')
-      done()
-    })
+  it('Emits path_find', async function () {
+    await new Promise<void>((resolve) => {
+      testContext.client.on('path_find', (path) => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
+        assert(path.type === 'path_find')
+        resolve()
+      })
 
-    this.client.connection.onMessage(JSON.stringify(rippled.streams.pathFind))
+      // @ts-expect-error Using private method for testing
+      testContext.client.connection.onMessage(
+        JSON.stringify(rippled.streams.pathFind),
+      )
+    })
   })
 
-  it('Emits validationReceived', async function (done) {
-    this.client.on('validationReceived', (path) => {
-      assert(path.type === 'validationReceived')
-      done()
-    })
+  it('Emits validationReceived', async function () {
+    await new Promise<void>((resolve) => {
+      testContext.client.on('validationReceived', (path) => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
+        assert(path.type === 'validationReceived')
+        resolve()
+      })
 
-    this.client.connection.onMessage(JSON.stringify(rippled.streams.validation))
+      // @ts-expect-error Using private method for testing
+      testContext.client.connection.onMessage(
+        JSON.stringify(rippled.streams.validation),
+      )
+    })
   })
 
-  it('Emits manifestReceived', async function (done) {
-    this.client.on('manifestReceived', (path) => {
-      assert(path.type === 'manifestReceived')
-      done()
-    })
+  it('Emits manifestReceived', async function () {
+    await new Promise<void>((resolve) => {
+      // @es-expect-error Seems like a valid method
+      testContext.client.on('manifestReceived', (path) => {
+        assert(path.type === 'manifestReceived')
+        resolve()
+      })
 
-    this.client.connection.onMessage(JSON.stringify(rippled.streams.manifest))
+      // @ts-expect-error Using private method for testing
+      testContext.client.connection.onMessage(
+        JSON.stringify(rippled.streams.manifest),
+      )
+    })
   })
 })

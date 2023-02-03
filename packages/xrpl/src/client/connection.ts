@@ -1,8 +1,9 @@
 /* eslint-disable max-lines -- Connection is a large file w/ lots of imports/exports */
+
 import { EventEmitter } from 'events'
 import { Agent } from 'http'
 
-import _ from 'lodash'
+import omitBy from 'lodash/omitBy'
 import WebSocket from 'ws'
 
 import {
@@ -63,7 +64,7 @@ function getAgent(url: string, config: ConnectionOptions): Agent | undefined {
   const parsedURL = new URL(url)
   const parsedProxyURL = new URL(config.proxy)
 
-  const proxyOptions = _.omitBy(
+  const proxyOptions = omitBy(
     {
       secureEndpoint: parsedURL.protocol === 'wss:',
       secureProxy: parsedProxyURL.protocol === 'https:',
@@ -125,7 +126,7 @@ function createWebSocket(
       Authorization: `Basic ${base64}`,
     }
   }
-  const optionsOverrides = _.omitBy(
+  const optionsOverrides = omitBy(
     {
       ca: config.trustedCertificates,
       key: config.key,
@@ -175,8 +176,10 @@ async function websocketSendAsync(
 export class Connection extends EventEmitter {
   private readonly url: string | undefined
   private ws: WebSocket | null = null
-  private reconnectTimeoutID: null | NodeJS.Timeout = null
-  private heartbeatIntervalID: null | NodeJS.Timeout = null
+  // Typing necessary for Jest tests running in browser
+  private reconnectTimeoutID: null | ReturnType<typeof setTimeout> = null
+  // Typing necessary for Jest tetsts running in browser
+  private heartbeatIntervalID: null | ReturnType<typeof setTimeout> = null
   private readonly retryConnectionBackoff = new ExponentialBackoff({
     min: 100,
     max: SECONDS_PER_MINUTE * 1000,
@@ -224,6 +227,7 @@ export class Connection extends EventEmitter {
    * @returns When the websocket is connected.
    * @throws ConnectionError if there is a connection error, RippleError if there is already a WebSocket in existence.
    */
+  // eslint-disable-next-line max-lines-per-function -- Necessary
   public async connect(): Promise<void> {
     if (this.isConnected()) {
       return Promise.resolve()
@@ -245,14 +249,17 @@ export class Connection extends EventEmitter {
     }
 
     // Create the connection timeout, in case the connection hangs longer than expected.
-    const connectionTimeoutID = setTimeout(() => {
-      this.onConnectionFailed(
-        new ConnectionError(
-          `Error: connect() timed out after ${this.config.connectionTimeout} ms. If your internet connection is working, the ` +
-            `rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.`,
-        ),
-      )
-    }, this.config.connectionTimeout)
+    const connectionTimeoutID: ReturnType<typeof setTimeout> = setTimeout(
+      () => {
+        this.onConnectionFailed(
+          new ConnectionError(
+            `Error: connect() timed out after ${this.config.connectionTimeout} ms. If your internet connection is working, the ` +
+              `rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.`,
+          ),
+        )
+      },
+      this.config.connectionTimeout,
+    )
     // Connection listeners: these stay attached only until a connection is done/open.
     this.ws = createWebSocket(this.url, this.config)
 
@@ -337,7 +344,7 @@ export class Connection extends EventEmitter {
     timeout?: number,
   ): Promise<unknown> {
     if (!this.shouldBeConnected || this.ws == null) {
-      throw new NotConnectedError()
+      throw new NotConnectedError(JSON.stringify(request), request)
     }
     const [id, message, responsePromise] = this.requestManager.createRequest(
       request,
@@ -429,7 +436,9 @@ export class Connection extends EventEmitter {
    * @throws Error if the websocket initialized is somehow null.
    */
   // eslint-disable-next-line max-lines-per-function -- Many error code conditionals to check.
-  private async onceOpen(connectionTimeoutID: NodeJS.Timeout): Promise<void> {
+  private async onceOpen(
+    connectionTimeoutID: ReturnType<typeof setTimeout>,
+  ): Promise<void> {
     if (this.ws == null) {
       throw new XrplError('onceOpen: ws is null')
     }
@@ -458,13 +467,14 @@ export class Connection extends EventEmitter {
       this.ws = null
 
       if (code === undefined) {
-        const reasonText = reason ? reason.toString() : 'undefined'
-        // eslint-disable-next-line no-console -- The error is helpful for debugging.
-        console.error(
-          `Disconnected but the disconnect code was undefined (The given reason was ${reasonText}).` +
-            `This could be caused by an exception being thrown during a 'connect' callback. ` +
-            `Disconnecting with code 1011 to indicate an internal error has occurred.`,
-        )
+        // Useful to keep this code for debugging purposes.
+        // const reasonText = reason ? reason.toString() : 'undefined'
+        // // eslint-disable-next-line no-console -- The error is helpful for debugging.
+        // console.error(
+        //   `Disconnected but the disconnect code was undefined (The given reason was ${reasonText}).` +
+        //     `This could be caused by an exception being thrown during a 'connect' callback. ` +
+        //     `Disconnecting with code 1011 to indicate an internal error has occurred.`,
+        // )
 
         /*
          * Error code 1011 represents an Internal Error according to

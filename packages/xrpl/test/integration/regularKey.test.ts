@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import _ from 'lodash'
+
 import {
   AccountSet,
   Client,
@@ -8,12 +8,16 @@ import {
   Wallet,
   AccountSetAsfFlags,
   OfferCreate,
-} from 'xrpl-local'
-import { convertStringToHex } from 'xrpl-local/utils'
-import { multisign } from 'xrpl-local/Wallet/signer'
+} from '../../src'
+import { convertStringToHex } from '../../src/utils'
+import { multisign } from '../../src/Wallet/signer'
 
 import serverUrl from './serverUrl'
-import { setupClient, teardownClient } from './setup'
+import {
+  setupClient,
+  teardownClient,
+  type XrplIntegrationTestContext,
+} from './setup'
 import {
   generateFundedWallet,
   ledgerAccept,
@@ -62,223 +66,270 @@ async function generateFundedWalletWithRegularKey(
 }
 
 describe('regular key', function () {
-  this.timeout(TIMEOUT)
+  let testContext: XrplIntegrationTestContext
 
-  beforeEach(_.partial(setupClient, serverUrl))
-  afterEach(teardownClient)
-
-  it('sign and submit with a regular key', async function () {
-    const regularKeyWallet = (
-      await generateFundedWalletWithRegularKey(this.client)
-    ).regularKeyWallet
-
-    const accountSet: AccountSet = {
-      TransactionType: 'AccountSet',
-      Account: regularKeyWallet.classicAddress,
-      Domain: convertStringToHex('example.com'),
-    }
-
-    testTransaction(this.client, accountSet, regularKeyWallet)
+  beforeEach(async () => {
+    testContext = await setupClient(serverUrl)
   })
+  afterEach(async () => teardownClient(testContext))
 
-  it('sign and submit using the master key of an account with a regular key', async function () {
-    const masterWallet = (await generateFundedWalletWithRegularKey(this.client))
-      .masterWallet
+  it(
+    'sign and submit with a regular key',
+    async () => {
+      const regularKeyWallet = (
+        await generateFundedWalletWithRegularKey(testContext.client)
+      ).regularKeyWallet
 
-    const accountSet: AccountSet = {
-      TransactionType: 'AccountSet',
-      Account: masterWallet.classicAddress,
-      Domain: convertStringToHex('example.com'),
-    }
+      const accountSet: AccountSet = {
+        TransactionType: 'AccountSet',
+        Account: regularKeyWallet.classicAddress,
+        Domain: convertStringToHex('example.com'),
+      }
 
-    testTransaction(this.client, accountSet, masterWallet)
-  })
+      await testTransaction(testContext.client, accountSet, regularKeyWallet)
+    },
+    TIMEOUT,
+  )
 
-  it('try to sign with master key after disabling', async function () {
-    const masterWallet = (
-      await generateFundedWalletWithRegularKey(this.client, true)
-    ).masterWallet
+  it(
+    'sign and submit using the master key of an account with a regular key',
+    async () => {
+      const masterWallet = (
+        await generateFundedWalletWithRegularKey(testContext.client)
+      ).masterWallet
 
-    const tx: OfferCreate = {
-      TransactionType: 'OfferCreate',
-      Account: masterWallet.classicAddress,
-      TakerGets: '13100000',
-      TakerPays: {
-        currency: 'USD',
-        issuer: masterWallet.classicAddress,
-        value: '10',
-      },
-    }
+      const accountSet: AccountSet = {
+        TransactionType: 'AccountSet',
+        Account: masterWallet.classicAddress,
+        Domain: convertStringToHex('example.com'),
+      }
 
-    const client: Client = this.client
-    const response = await client.submit(tx, { wallet: masterWallet })
-    assert.equal(
-      response.result.engine_result,
-      'tefMASTER_DISABLED',
-      'Master key was disabled, yet the master key still was able to sign and submit a transaction',
-    )
-  })
+      await testTransaction(testContext.client, accountSet, masterWallet)
+    },
+    TIMEOUT,
+  )
 
-  it('sign with regular key after disabling the master key', async function () {
-    const regularKeyWallet = (
-      await generateFundedWalletWithRegularKey(this.client, true)
-    ).regularKeyWallet
+  it(
+    'try to sign with master key after disabling',
+    async () => {
+      const masterWallet = (
+        await generateFundedWalletWithRegularKey(testContext.client, true)
+      ).masterWallet
 
-    const tx: OfferCreate = {
-      TransactionType: 'OfferCreate',
-      Account: regularKeyWallet.classicAddress,
-      TakerGets: '13100000',
-      TakerPays: {
-        currency: 'USD',
-        issuer: regularKeyWallet.classicAddress,
-        value: '10',
-      },
-    }
-
-    await testTransaction(this.client, tx, regularKeyWallet)
-  })
-
-  it('try to enable and disable a regular key', async function () {
-    const wallets = await generateFundedWalletWithRegularKey(this.client, true)
-    const masterWallet = wallets.masterWallet
-    const regularKeyWallet = wallets.regularKeyWallet
-
-    const enableMasterKey: AccountSet = {
-      TransactionType: 'AccountSet',
-      Account: masterWallet.classicAddress,
-      ClearFlag: AccountSetAsfFlags.asfDisableMaster,
-    }
-
-    const client: Client = this.client
-    const response = await client.submit(enableMasterKey, {
-      wallet: masterWallet,
-    })
-    assert.equal(
-      response.result.engine_result,
-      'tefMASTER_DISABLED',
-      'Master key was disabled, yet the master key still was able to sign and submit a transaction',
-    )
-
-    await testTransaction(client, enableMasterKey, regularKeyWallet)
-
-    const turnOffRegularKey: SetRegularKey = {
-      TransactionType: 'SetRegularKey',
-      Account: masterWallet.address,
-    }
-
-    await testTransaction(this.client, turnOffRegularKey, masterWallet)
-
-    const tx: OfferCreate = {
-      TransactionType: 'OfferCreate',
-      Account: regularKeyWallet.classicAddress,
-      TakerGets: '13100000',
-      TakerPays: {
-        currency: 'USD',
-        issuer: regularKeyWallet.classicAddress,
-        value: '10',
-      },
-    }
-
-    const response2 = await client.submit(tx, { wallet: regularKeyWallet })
-    assert.equal(
-      response2.result.engine_result,
-      'tefBAD_AUTH',
-      'Regular key should have been disabled, but somehow was still able to sign and submit a transaction.',
-    )
-  })
-
-  it('submit_multisigned transaction with regular keys set', async function () {
-    const client: Client = this.client
-
-    const regularKeyWallet = (await generateFundedWalletWithRegularKey(client))
-      .regularKeyWallet
-    const signerWallet2 = await generateFundedWallet(this.client)
-
-    // set up the multisigners for the account
-    const signerListSet: SignerListSet = {
-      TransactionType: 'SignerListSet',
-      Account: this.wallet.classicAddress,
-      SignerEntries: [
-        {
-          SignerEntry: {
-            Account: regularKeyWallet.classicAddress,
-            SignerWeight: 1,
-          },
+      const tx: OfferCreate = {
+        TransactionType: 'OfferCreate',
+        Account: masterWallet.classicAddress,
+        TakerGets: '13100000',
+        TakerPays: {
+          currency: 'USD',
+          issuer: masterWallet.classicAddress,
+          value: '10',
         },
-        {
-          SignerEntry: {
-            Account: signerWallet2.classicAddress,
-            SignerWeight: 1,
-          },
+      }
+
+      const client: Client = testContext.client
+      const response = await client.submit(tx, { wallet: masterWallet })
+      assert.equal(
+        response.result.engine_result,
+        'tefMASTER_DISABLED',
+        'Master key was disabled, yet the master key still was able to sign and submit a transaction',
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'sign with regular key after disabling the master key',
+    async () => {
+      const regularKeyWallet = (
+        await generateFundedWalletWithRegularKey(testContext.client, true)
+      ).regularKeyWallet
+
+      const tx: OfferCreate = {
+        TransactionType: 'OfferCreate',
+        Account: regularKeyWallet.classicAddress,
+        TakerGets: '13100000',
+        TakerPays: {
+          currency: 'USD',
+          issuer: regularKeyWallet.classicAddress,
+          value: '10',
         },
-      ],
-      SignerQuorum: 2,
-    }
-    await testTransaction(this.client, signerListSet, this.wallet)
+      }
 
-    // try to multisign
-    const accountSet: AccountSet = {
-      TransactionType: 'AccountSet',
-      Account: this.wallet.classicAddress,
-      Domain: convertStringToHex('example.com'),
-    }
-    const accountSetTx = await client.autofill(accountSet, 2)
-    const signed1 = regularKeyWallet.sign(accountSetTx, true)
-    const signed2 = signerWallet2.sign(accountSetTx, true)
-    const multisigned = multisign([signed1.tx_blob, signed2.tx_blob])
-    const submitResponse = await client.submit(multisigned)
-    await ledgerAccept(client)
+      await testTransaction(testContext.client, tx, regularKeyWallet)
+    },
+    TIMEOUT,
+  )
 
-    assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
-    await verifySubmittedTransaction(this.client, multisigned)
-  })
+  it(
+    'try to enable and disable a regular key',
+    async () => {
+      const wallets = await generateFundedWalletWithRegularKey(
+        testContext.client,
+        true,
+      )
+      const masterWallet = wallets.masterWallet
+      const regularKeyWallet = wallets.regularKeyWallet
 
-  it('try multisigning with the account address used to set up a regular key', async function () {
-    const client: Client = this.client
+      const enableMasterKey: AccountSet = {
+        TransactionType: 'AccountSet',
+        Account: masterWallet.classicAddress,
+        ClearFlag: AccountSetAsfFlags.asfDisableMaster,
+      }
 
-    const regularKeyWallet = (await generateFundedWalletWithRegularKey(client))
-      .regularKeyWallet
-    const signerWallet2 = await generateFundedWallet(this.client)
+      const client: Client = testContext.client
+      const response = await client.submit(enableMasterKey, {
+        wallet: masterWallet,
+      })
+      assert.equal(
+        response.result.engine_result,
+        'tefMASTER_DISABLED',
+        'Master key was disabled, yet the master key still was able to sign and submit a transaction',
+      )
 
-    const sameKeyDefaultAddressWallet = new Wallet(
-      regularKeyWallet.publicKey,
-      regularKeyWallet.privateKey,
-    )
+      await testTransaction(client, enableMasterKey, regularKeyWallet)
 
-    // set up the multisigners for the account
-    const signerListSet: SignerListSet = {
-      TransactionType: 'SignerListSet',
-      Account: this.wallet.classicAddress,
-      SignerEntries: [
-        {
-          SignerEntry: {
-            Account: regularKeyWallet.classicAddress,
-            SignerWeight: 1,
-          },
+      const turnOffRegularKey: SetRegularKey = {
+        TransactionType: 'SetRegularKey',
+        Account: masterWallet.address,
+      }
+
+      await testTransaction(testContext.client, turnOffRegularKey, masterWallet)
+
+      const tx: OfferCreate = {
+        TransactionType: 'OfferCreate',
+        Account: regularKeyWallet.classicAddress,
+        TakerGets: '13100000',
+        TakerPays: {
+          currency: 'USD',
+          issuer: regularKeyWallet.classicAddress,
+          value: '10',
         },
-        {
-          SignerEntry: {
-            Account: signerWallet2.classicAddress,
-            SignerWeight: 1,
-          },
-        },
-      ],
-      SignerQuorum: 2,
-    }
-    await testTransaction(this.client, signerListSet, this.wallet)
+      }
 
-    // try to multisign
-    const accountSet: AccountSet = {
-      TransactionType: 'AccountSet',
-      Account: this.wallet.classicAddress,
-      Domain: convertStringToHex('example.com'),
-    }
-    const accountSetTx = await client.autofill(accountSet, 2)
-    const signed1 = sameKeyDefaultAddressWallet.sign(accountSetTx, true)
-    const signed2 = signerWallet2.sign(accountSetTx, true)
-    const multisigned = multisign([signed1.tx_blob, signed2.tx_blob])
-    const submitResponse = await client.submit(multisigned)
-    await ledgerAccept(client)
-    assert.strictEqual(submitResponse.result.engine_result, 'tefBAD_SIGNATURE')
-  })
+      const response2 = await client.submit(tx, { wallet: regularKeyWallet })
+      assert.equal(
+        response2.result.engine_result,
+        'tefBAD_AUTH',
+        'Regular key should have been disabled, but somehow was still able to sign and submit a transaction.',
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'submit_multisigned transaction with regular keys set',
+    async () => {
+      const client: Client = testContext.client
+
+      const regularKeyWallet = (
+        await generateFundedWalletWithRegularKey(client)
+      ).regularKeyWallet
+      const signerWallet2 = await generateFundedWallet(testContext.client)
+
+      // set up the multisigners for the account
+      const signerListSet: SignerListSet = {
+        TransactionType: 'SignerListSet',
+        Account: testContext.wallet.classicAddress,
+        SignerEntries: [
+          {
+            SignerEntry: {
+              Account: regularKeyWallet.classicAddress,
+              SignerWeight: 1,
+            },
+          },
+          {
+            SignerEntry: {
+              Account: signerWallet2.classicAddress,
+              SignerWeight: 1,
+            },
+          },
+        ],
+        SignerQuorum: 2,
+      }
+      await testTransaction(
+        testContext.client,
+        signerListSet,
+        testContext.wallet,
+      )
+
+      // try to multisign
+      const accountSet: AccountSet = {
+        TransactionType: 'AccountSet',
+        Account: testContext.wallet.classicAddress,
+        Domain: convertStringToHex('example.com'),
+      }
+      const accountSetTx = await client.autofill(accountSet, 2)
+      const signed1 = regularKeyWallet.sign(accountSetTx, true)
+      const signed2 = signerWallet2.sign(accountSetTx, true)
+      const multisigned = multisign([signed1.tx_blob, signed2.tx_blob])
+      const submitResponse = await client.submit(multisigned)
+      await ledgerAccept(client)
+
+      assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
+      await verifySubmittedTransaction(testContext.client, multisigned)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'try multisigning with the account address used to set up a regular key',
+    async () => {
+      const client: Client = testContext.client
+
+      const regularKeyWallet = (
+        await generateFundedWalletWithRegularKey(client)
+      ).regularKeyWallet
+      const signerWallet2 = await generateFundedWallet(testContext.client)
+
+      const sameKeyDefaultAddressWallet = new Wallet(
+        regularKeyWallet.publicKey,
+        regularKeyWallet.privateKey,
+      )
+
+      // set up the multisigners for the account
+      const signerListSet: SignerListSet = {
+        TransactionType: 'SignerListSet',
+        Account: testContext.wallet.classicAddress,
+        SignerEntries: [
+          {
+            SignerEntry: {
+              Account: regularKeyWallet.classicAddress,
+              SignerWeight: 1,
+            },
+          },
+          {
+            SignerEntry: {
+              Account: signerWallet2.classicAddress,
+              SignerWeight: 1,
+            },
+          },
+        ],
+        SignerQuorum: 2,
+      }
+      await testTransaction(
+        testContext.client,
+        signerListSet,
+        testContext.wallet,
+      )
+
+      // try to multisign
+      const accountSet: AccountSet = {
+        TransactionType: 'AccountSet',
+        Account: testContext.wallet.classicAddress,
+        Domain: convertStringToHex('example.com'),
+      }
+      const accountSetTx = await client.autofill(accountSet, 2)
+      const signed1 = sameKeyDefaultAddressWallet.sign(accountSetTx, true)
+      const signed2 = signerWallet2.sign(accountSetTx, true)
+      const multisigned = multisign([signed1.tx_blob, signed2.tx_blob])
+      const submitResponse = await client.submit(multisigned)
+      await ledgerAccept(client)
+      assert.strictEqual(
+        submitResponse.result.engine_result,
+        'tefBAD_SIGNATURE',
+      )
+    },
+    TIMEOUT,
+  )
 })
