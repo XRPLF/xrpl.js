@@ -81,26 +81,25 @@ export async function ledgerAccept(
  * Sometimes the ledger close_time is in the future, so we need to wait for it to catch up.
  *
  * @param targetTime - The target wait time, before accounting for current ledger time.
- * @param minimumWaitTimeInMs - The minimum wait time in milliseconds.
- * @param maximumWaitTimeInMs - The maximum wait time in milliseconds.
+ * @param minimumWaitTimeMs - The minimum wait time in milliseconds.
+ * @param maximumWaitTimeMs - The maximum wait time in milliseconds.
  * @returns The wait time in milliseconds.
  */
 export function calculateWaitTimeForTransaction(
   targetTime: number,
-  minimumWaitTimeInMs = 5000,
-  maximumWaitTimeInMs = 20000,
+  minimumWaitTimeMs = 5000,
+  maximumWaitTimeMs = 20000,
 ): number {
-  const currentTimeUnixInMs = Math.floor(new Date().getTime())
-  const currentTimeRippleInSeconds = unixTimeToRippleTime(currentTimeUnixInMs)
-  const closeTimeCurrentTimeDiffInSeconds =
-    currentTimeRippleInSeconds - targetTime
-  const closeTimeCurrentTimeDiffInMs = closeTimeCurrentTimeDiffInSeconds * 1000
+  const currentTimeUnixMs = Math.floor(new Date().getTime())
+  const currentTimeRippleSeconds = unixTimeToRippleTime(currentTimeUnixMs)
+  const closeTimeCurrentTimeDiffSeconds = currentTimeRippleSeconds - targetTime
+  const closeTimeCurrentTimeDiffMs = closeTimeCurrentTimeDiffSeconds * 1000
   return Math.max(
-    minimumWaitTimeInMs,
+    minimumWaitTimeMs,
     Math.min(
-      Math.abs(closeTimeCurrentTimeDiffInMs) + minimumWaitTimeInMs,
+      Math.abs(closeTimeCurrentTimeDiffMs) + minimumWaitTimeMs,
       // Maximum wait time of 20 seconds
-      maximumWaitTimeInMs,
+      maximumWaitTimeMs,
     ),
   )
 }
