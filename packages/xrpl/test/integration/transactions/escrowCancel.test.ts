@@ -108,23 +108,11 @@ describe('EscrowCancel', function () {
       //   delayMs: 2000,
       // })
 
-      try {
-        await submitTransaction({
-          client: testContext.client,
-          transaction: cancelTx,
-          wallet: testContext.wallet,
-        })
-      } catch (error) {
-        if (!(error instanceof Error)) {
-          assert.fail('EscrowCancel failed with unknown error')
-        }
-        assert.ok(
-          false,
-          `EscrowCancel failed with error: ${
-            error.message as unknown as string
-          }`,
-        )
-      }
+      await submitTransaction({
+        client: testContext.client,
+        transaction: cancelTx,
+        wallet: testContext.wallet,
+      })
 
       // Make sure the Destination wallet did not receive any XRP.
       // assert.equal(
