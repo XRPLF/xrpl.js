@@ -43,7 +43,9 @@
     "karma-chrome-launcher": "^3.1.1",
     "karma-jasmine": "^5.1.0",
     "karma-webpack": "^5.0.0",
-    "node-polyfill-webpack-plugin": "^2.0.1"
+    "node-polyfill-webpack-plugin": "^2.0.1",
+    "react": "^18.2.0",
+    "typedoc": "^0.23.24"
   },
   "resolutions": {
     "elliptic": "^6.5.4"
@@ -57,7 +59,7 @@
     "analyze": "run-s build:web --analyze",
     "watch": "run-s build:lib --watch",
     "clean": "rm -rf dist build coverage",
-    "docgen": "typedoc && echo js.xrpl.org >> ../../docs/CNAME",
+    "docgen": "tsc --build tsconfig.docs.json && typedoc && echo js.xrpl.org >> ../../docs/CNAME",
     "prepublish": "run-s clean build",
     "test": "jest --verbose false --silent=false ./test/**/*.test.ts --testPathIgnorePatterns=./test/integration --testPathIgnorePatterns=./test/fixtures",
     "test:integration": "TS_NODE_PROJECT=tsconfig.build.json jest --verbose false --silent=false --runInBand ./test/integration/**/*.test.ts",
