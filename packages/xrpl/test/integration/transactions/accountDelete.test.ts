@@ -1,5 +1,3 @@
-import { assert } from 'chai'
-
 import { AccountDelete } from '../../../src/models/transactions'
 import serverUrl from '../serverUrl'
 import {
@@ -38,23 +36,11 @@ describe('AccountDelete', function () {
 
       // Since we are not testing the functionaity of rippled in this library, only that we are submitting commands
       // properly, we can just test that the AccountDelete command was successfully received.
-      try {
-        await submitTransaction({
-          client: testContext.client,
-          transaction: tx,
-          wallet: testContext.wallet,
-        })
-      } catch (error) {
-        if (!(error instanceof Error)) {
-          assert.fail('AccountDelete failed with unknown error')
-        }
-        assert.ok(
-          false,
-          `AccountDelete should not fail. Error was: ${
-            error.message as unknown as string
-          }`,
-        )
-      }
+      await submitTransaction({
+        client: testContext.client,
+        transaction: tx,
+        wallet: testContext.wallet,
+      })
 
       // TODO: Re-enable this test once we can test the `engine_result` without waiting a significant amount of time.
       // Note, we can't test the `engine_result` without waiting a significant
