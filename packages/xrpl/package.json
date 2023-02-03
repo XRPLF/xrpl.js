@@ -33,6 +33,8 @@
     "ws": "^8.2.2"
   },
   "devDependencies": {
+    "react": "^18.2.0",
+    "typedoc": "^0.23.24",
     "xrpl-local": "file:./src"
   },
   "resolutions": {
@@ -47,7 +49,7 @@
     "analyze": "run-s build:web --analyze",
     "watch": "run-s build:lib --watch",
     "clean": "rm -rf dist",
-    "docgen": "typedoc && echo js.xrpl.org >> ../../docs/CNAME",
+    "docgen": "tsc --build tsconfig.docs.json && typedoc && echo js.xrpl.org >> ../../docs/CNAME",
     "prepublish": "run-s clean build",
     "test": "nyc mocha --config=test/.mocharc.json --exit",
     "test:integration": "TS_NODE_PROJECT=tsconfig.build.json nyc mocha ./test/integration/**/*.test.ts ./test/integration/*.test.ts",
