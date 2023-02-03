@@ -109,7 +109,7 @@ export function subscribeDone(client: Client): void {
   client.removeAllListeners()
 }
 
-export async function runCommand({
+export async function submitTransaction({
   client,
   transaction,
   wallet,
@@ -144,7 +144,7 @@ export async function runCommand({
   } catch (error) {
     if (error instanceof TimeoutError || error instanceof NotConnectedError) {
       // retry
-      return runCommand({
+      return submitTransaction({
         client,
         transaction,
         wallet,
@@ -177,7 +177,7 @@ export async function fundAccount(
     Amount: '400000000',
   }
   const wal = Wallet.fromSeed(masterSecret)
-  const response = await runCommand({
+  const response = await submitTransaction({
     client,
     wallet: wal,
     transaction: payment,
@@ -257,7 +257,12 @@ export async function testTransaction(
   await ledgerAccept(client)
 
   // sign/submit the transaction
-  const response = await runCommand({ client, wallet, transaction, retry })
+  const response = await submitTransaction({
+    client,
+    wallet,
+    transaction,
+    retry,
+  })
 
   // check that the transaction was successful
   assert.equal(response.type, 'response')

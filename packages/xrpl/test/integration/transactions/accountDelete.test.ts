@@ -7,7 +7,7 @@ import {
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import { generateFundedWallet, runCommand } from '../utils'
+import { generateFundedWallet, submitTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -39,7 +39,7 @@ describe('AccountDelete', function () {
       // Since we are not testing the functionaity of rippled in this library, only that we are submitting commands
       // properly, we can just test that the AccountDelete command was successfully received.
       try {
-        await runCommand({
+        await submitTransaction({
           client: testContext.client,
           transaction: tx,
           wallet: testContext.wallet,

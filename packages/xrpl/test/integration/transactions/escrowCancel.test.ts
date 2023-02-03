@@ -12,7 +12,7 @@ import {
   generateFundedWallet,
   // getXRPBalance,
   testTransaction,
-  runCommand,
+  submitTransaction,
 } from '../utils'
 
 // TODO: Fix these tests
@@ -109,7 +109,7 @@ describe('EscrowCancel', function () {
       // })
 
       try {
-        await runCommand({
+        await submitTransaction({
           client: testContext.client,
           transaction: cancelTx,
           wallet: testContext.wallet,
