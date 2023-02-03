@@ -1,6 +1,7 @@
 # ripple-binary-codec Release History
 
-## Changed
+## Unreleased
+### Changed
 - All tests now use the Jest test runner and have been refactored for consistency across all packages
 
 ## 1.4.2 (2022-06-27)
