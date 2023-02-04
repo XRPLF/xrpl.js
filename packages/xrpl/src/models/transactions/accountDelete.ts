@@ -32,6 +32,10 @@ export interface AccountDelete extends BaseTransaction {
  */
 export function validateAccountDelete(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+  
+  if (tx.NFTokenMinter && tx.NFTokenMinter === "") {
+    throw new ValidationError('AccountDelete: invalid account ID in NFTokenMinter field')
+  }
 
   if (tx.Destination === undefined) {
     throw new ValidationError('AccountDelete: missing field Destination')
