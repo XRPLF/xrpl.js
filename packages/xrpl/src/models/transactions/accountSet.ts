@@ -158,6 +158,10 @@ const MAX_TICK_SIZE = 15
 // eslint-disable-next-line max-lines-per-function -- okay for this method, only a little over
 export function validateAccountSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+  
+  if (tx.NFTokenMinter && tx.NFTokenMinter === "") {
+    throw new ValidationError('AccountDelete: invalid account ID in NFTokenMinter field')
+  }
 
   if (tx.ClearFlag !== undefined) {
     if (typeof tx.ClearFlag !== 'number') {
