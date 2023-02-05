@@ -148,4 +148,19 @@ describe('AccountSet', function () {
       'AccountSet: invalid TickSize',
     )
   })
+
+  it(`throws w/ invalid NFTokenMinter`, function () {
+    account.NFTokenMinter = ''
+
+    assert.throws(
+      () => validateAccountSet(account),
+      ValidationError,
+      'AccountSet: invalid NFTokenMinter',
+    )
+    assert.throws(
+      () => validate(account),
+      ValidationError,
+      'AccountSet: invalid NFTokenMinter',
+    )
+  })
 })
