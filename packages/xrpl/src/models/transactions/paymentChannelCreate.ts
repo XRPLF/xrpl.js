@@ -13,10 +13,10 @@ import { BaseTransaction, validateBaseTransaction, isAmount } from './common'
 export interface PaymentChannelCreate extends BaseTransaction {
   TransactionType: 'PaymentChannelCreate'
   /**
-   * Amount of XRP, in drops, to deduct from the sender's balance and set aside
-   * in this channel. While the channel is open, the XRP can only go to the
-   * Destination address. When the channel closes, any unclaimed XRP is returned
-   * to the source address's balance.
+   * Amount to deduct from the sender's balance and set aside in this channel.
+   * While the channel is open, the amount can only go to the Destination
+   * address. When the channel closes, any unclaimed amount is returned to
+   * the source address's balance.
    */
   Amount: Amount
   /**

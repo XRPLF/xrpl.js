@@ -21,7 +21,7 @@ export default interface Escrow extends BaseLedgerEntry {
    * successful.
    */
   Destination: string
-  /** The amount of XRP/FT, as drops/Amount, to be delivered by the held payment. */
+  /** The amount to be delivered by the held payment. */
   Amount: Amount
   /**
    * A PREIMAGE-SHA-256 crypto-condition, as hexadecimal. If present, the

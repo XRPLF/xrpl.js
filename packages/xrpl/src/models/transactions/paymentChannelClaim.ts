@@ -109,16 +109,16 @@ export interface PaymentChannelClaim extends BaseTransaction {
   /** The unique ID of the channel as a 64-character hexadecimal string. */
   Channel: string
   /**
-   * Total amount of XRP, in drops, delivered by this channel after processing
-   * this claim. Required to deliver XRP. Must be more than the total amount
-   * delivered by the channel so far, but not greater than the Amount of the
-   * signed claim. Must be provided except when closing the channel.
+   * Total amount delivered by this channel after processing this claim. Required
+   * to deliver amount. Must be more than the total amount delivered by the channel
+   * so far, but not greater than the Amount of the signed claim. Must be provided
+   * except when closing the channel.
    */
   Balance?: Amount
   /**
-   * The amount of XRP, in drops, authorized by the Signature. This must match
-   * the amount in the signed message. This is the cumulative amount of XRP that
-   * can be dispensed by the channel, including XRP previously redeemed.
+   * The amount authorized by the Signature. This must match the amount in the
+   * signed message. This is the cumulative amount that can be dispensed by the
+   * channel, including amounts previously redeemed.
    */
   Amount?: Amount
   /**

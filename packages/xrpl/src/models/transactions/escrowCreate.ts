@@ -12,9 +12,9 @@ import { BaseTransaction, validateBaseTransaction } from './common'
 export interface EscrowCreate extends BaseTransaction {
   TransactionType: 'EscrowCreate'
   /**
-   * Amount of XRP, in drops, to deduct from the sender's balance and escrow.
-   * Once escrowed, the XRP can either go to the Destination address (after the.
-   * FinishAfter time) or returned to the sender (after the CancelAfter time).
+   * Amount to deduct from the sender's balance and escrow. Once escrowed, the
+   * amount can either go to the Destination address (after the FinishAfter time)
+   * or returned to the sender (after the CancelAfter time).
    */
   Amount: Amount
   /** Address to receive escrowed XRP. */
