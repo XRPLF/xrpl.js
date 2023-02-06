@@ -46,14 +46,6 @@ describe('fundWallet', function () {
     )
   })
 
-  it('can generate and fund wallets on vala net', async function () {
-    await generate_faucet_wallet_and_fund_again(
-      'wss://vala.ws.transia.co',
-      'vala.faucet.transia.co',
-      '/accounts',
-    )
-  })
-
   it('can generate wallet on hooks v2 testnet', async function () {
     const api = new Client('wss://hooks-testnet-v2.xrpl-labs.com')
 
