@@ -1,12 +1,13 @@
 import { assert } from 'chai'
-import { decode, encode } from 'ripple-binary-codec/dist'
-import { Transaction, ValidationError } from 'xrpl-local'
-import Wallet from 'xrpl-local/Wallet'
+import { decode, encode } from 'ripple-binary-codec'
+
+import { Transaction, ValidationError } from '../../src'
+import Wallet from '../../src/Wallet'
 import {
   authorizeChannel,
   multisign,
   verifySignature,
-} from 'xrpl-local/Wallet/signer'
+} from '../../src/Wallet/signer'
 
 const publicKey =
   '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
@@ -138,7 +139,7 @@ describe('Signer', function () {
   it('multisign runs successfully with tx_blobs', function () {
     const transactions = [multisignTxToCombine1, multisignTxToCombine2]
 
-    const encodedTransactions = transactions.map(encode)
+    const encodedTransactions: string[] = transactions.map(encode)
 
     assert.deepEqual(multisign(encodedTransactions), expectedMultisign)
   })

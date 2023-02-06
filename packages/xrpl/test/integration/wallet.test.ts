@@ -1,5 +1,4 @@
-/* eslint-disable consistent-default-export-name/default-export-match-filename -- This is a test file. */
-import { Wallet } from 'xrpl-local'
+import { Wallet } from '../../src'
 
 const walletSecret = 'shK6YXzwYfnFVn3YZSaMh5zuAddKx'
 

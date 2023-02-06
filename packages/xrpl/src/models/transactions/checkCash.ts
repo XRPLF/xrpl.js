@@ -53,12 +53,14 @@ export function validateCheckCash(tx: Record<string, unknown>): void {
     )
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Necessary check
   if (tx.Amount != null && tx.Amount !== undefined && !isAmount(tx.Amount)) {
     throw new ValidationError('CheckCash: invalid Amount')
   }
 
   if (
     tx.DeliverMin != null &&
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Necessary check
     tx.DeliverMin !== undefined &&
     !isAmount(tx.DeliverMin)
   ) {

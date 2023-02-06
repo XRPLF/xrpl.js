@@ -1,5 +1,6 @@
 import { assert } from 'chai'
-import { validate, ValidationError } from 'xrpl-local'
+
+import { validate, ValidationError } from '../../src'
 
 const TOKEN_ID =
   '00090032B5F762798A53D543A014CAF8B297CFF8F2F937E844B17C9E00000003'

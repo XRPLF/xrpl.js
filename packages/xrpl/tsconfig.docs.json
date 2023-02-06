@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/docs",
+    "jsx": "react",
+    "jsxFactory": "JSX.createElement",
+    "jsxFragmentFactory": "JSX.Fragment",
+    "lib": ["es2015", "dom"],
+    "module": "commonjs",
+    "esModuleInterop": true
+  },
+  "include": ["./typedoc.tsx"],
+}

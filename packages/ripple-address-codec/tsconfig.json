@@ -13,7 +13,8 @@
     "preserveConstEnums": false,
     "suppressImplicitAnyIndexErrors": false,
     "skipLibCheck": true,
-    "declaration": true
+    "declaration": true,
+    "strictNullChecks": true
   },
   "include": ["src/**/*.ts"]
 }

@@ -1,6 +1,6 @@
-const { ShaMap } = require('../dist/shamap.js')
-const { binary, HashPrefix } = require('../dist/coretypes')
-const { coreTypes } = require('../dist/types')
+const { ShaMap } = require('../src/shamap')
+const { binary, HashPrefix } = require('../src/coretypes')
+const { coreTypes } = require('../src/types')
 const { loadFixture } = require('./utils')
 const { Buffer } = require('buffer/')
 
