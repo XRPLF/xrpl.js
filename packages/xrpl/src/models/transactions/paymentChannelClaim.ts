@@ -153,19 +153,11 @@ export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
     throw new ValidationError('PaymentChannelClaim: Channel must be a string')
   }
 
-  if (
-    tx.Balance !== undefined &&
-    typeof tx.Balance !== 'string' &&
-    !isAmount(tx.Balance)
-  ) {
+  if (tx.Balance !== undefined && !isAmount(tx.Balance)) {
     throw new ValidationError('PaymentChannelClaim: invalid Balance')
   }
 
-  if (
-    tx.Amount !== undefined &&
-    typeof tx.Amount !== 'string' &&
-    !isAmount(tx.Amount)
-  ) {
+  if (tx.Amount !== undefined && !isAmount(tx.Amount)) {
     throw new ValidationError('PaymentChannelClaim: invalid Amount')
   }
 
