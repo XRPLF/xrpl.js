@@ -1,4 +1,5 @@
 import { assert } from 'chai'
+
 import { validate, ValidationError } from '../../src'
 import { validateXChainCommit } from '../../src/models/transactions/XChainCommit'
 

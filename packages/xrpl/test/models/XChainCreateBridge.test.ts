@@ -1,4 +1,5 @@
 import { assert } from 'chai'
+
 import { validate, ValidationError } from '../../src'
 import { validateXChainCreateBridge } from '../../src/models/transactions/XChainCreateBridge'
 
