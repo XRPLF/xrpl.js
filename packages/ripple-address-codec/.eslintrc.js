@@ -40,5 +40,6 @@ module.exports = {
     'jsdoc/require-jsdoc': 'off',
     'jsdoc/require-param': 'off',
     'tsdoc/syntax': 'off',
+    '@typescript-eslint/no-require-imports': 'off',
   },
 }

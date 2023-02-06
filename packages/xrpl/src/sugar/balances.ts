@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import flatMap from 'lodash/flatMap'
 
 import type { Client } from '..'
 import { LedgerIndex } from '../models/common'
@@ -111,7 +111,7 @@ async function getBalances(
   // combine results
   await Promise.all([xrpPromise, linesPromise]).then(
     ([xrpBalance, linesResponses]) => {
-      const accountLinesBalance = _.flatMap(linesResponses, (response) =>
+      const accountLinesBalance = flatMap(linesResponses, (response) =>
         formatBalances(response.result.lines),
       )
       if (xrpBalance !== '') {

@@ -1,6 +1,5 @@
 import { EventEmitter2 } from 'eventemitter2'
-import _ from 'lodash'
-import { Server as WebSocketServer } from 'ws'
+import { Server as WebSocketServer, type WebSocket } from 'ws'
 
 import type { Request } from '../src'
 import { XrplError } from '../src/errors'
@@ -9,7 +8,7 @@ import type {
   ErrorResponse,
 } from '../src/models/methods/baseMethod'
 
-import { getFreePort } from './testUtils'
+import { destroyServer, getFreePort } from './testUtils'
 
 function createResponse(
   request: { id: number | string },
@@ -47,10 +46,42 @@ export interface PortResponse extends BaseResponse {
  * We mock out WebSocketServer in these tests and add a lot of custom
  * properties not defined on the normal WebSocketServer object.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- typing is too complicated otherwise
-type MockedWebSocketServer = any
 
-// eslint-disable-next-line @typescript-eslint/promise-function-async -- Not a promise that's returned
+export type MockedWebSocketServer = WebSocketServer &
+  EventEmitter2 & {
+    responses: Record<string, unknown>
+    suppressOutput: boolean
+    socket: WebSocket
+    addResponse: (
+      command: string,
+      response:
+        | Response
+        | ErrorResponse
+        | ((r: Request) => Response | ErrorResponse | Record<string, unknown>)
+        | Record<string, unknown>,
+    ) => void
+    getResponse: (request: Request) => Record<string, unknown>
+    testCommand: (
+      conn: WebSocket,
+      request: {
+        id: string | number
+        data: {
+          closeServerAndReopen: number
+          disconnectIn: number
+          openOnOtherPort: boolean
+          unrecognizedResponse: boolean
+          closeServer: boolean
+          delayedResponseIn: number
+        }
+      },
+    ) => void
+  }
+
+export function destroyMockRippled(server: MockedWebSocketServer): void {
+  server.removeAllListeners()
+  server.close()
+}
+
 export default function createMockRippled(port: number): MockedWebSocketServer {
   const mock = new WebSocketServer({ port }) as MockedWebSocketServer
   Object.assign(mock, EventEmitter2.prototype)
@@ -58,18 +89,19 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
   mock.responses = {}
   mock.suppressOutput = false
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Typing is too complicated otherwise
-  mock.on('connection', function (this: MockedWebSocketServer, conn: any) {
+  mock.on('connection', function (this: MockedWebSocketServer, conn) {
     this.socket = conn
-    conn.on('message', function (requestJSON: string) {
+    conn.on('message', function (requestJSON) {
       let request
       try {
-        request = JSON.parse(requestJSON)
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string -- request is a string
+        const requestJsonString = requestJSON.toString()
+        request = JSON.parse(requestJsonString)
         if (request.id == null) {
-          throw new XrplError(`Request has no id: ${requestJSON}`)
+          throw new XrplError(`Request has no id: ${requestJsonString}`)
         }
         if (request.command == null) {
-          throw new XrplError(`Request has no id: ${requestJSON}`)
+          throw new XrplError(`Request has no id: ${requestJsonString}`)
         }
         if (request.command === 'ping') {
           ping(conn, request)
@@ -110,13 +142,7 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
    * If an object is passed in for `response`, then the response is static for the command
    * If a function is passed in for `response`, then the response can be determined by the exact request shape
    */
-  mock.addResponse = function (
-    command: string,
-    response:
-      | Response
-      | ErrorResponse
-      | ((r: Request) => Response | ErrorResponse),
-  ): void {
+  mock.addResponse = function (command, response): void {
     if (typeof command !== 'string') {
       throw new XrplError('command is not a string')
     }
@@ -134,7 +160,7 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
     mock.responses[command] = response
   }
 
-  mock.getResponse = (request: Request): Record<string, unknown> => {
+  mock.getResponse = (request): Record<string, unknown> => {
     if (!(request.command in mock.responses)) {
       throw new XrplError(`No handler for ${request.command}`)
     }
@@ -156,8 +182,8 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
         }),
       )
     } else if (request.data.openOnOtherPort) {
-      getFreePort().then((newPort) => {
-        createMockRippled(newPort)
+      getFreePort().then(async (newPort) => {
+        createMockRippled(port)
         conn.send(
           createResponse(request, {
             status: 'success',
@@ -165,6 +191,7 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
             result: { port: newPort },
           }),
         )
+        return destroyServer(newPort)
       })
     } else if (request.data.closeServerAndReopen) {
       setTimeout(() => {

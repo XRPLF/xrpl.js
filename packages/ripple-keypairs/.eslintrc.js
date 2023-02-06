@@ -5,7 +5,7 @@ module.exports = {
   parserOptions: {
     // Enable linting rules with type information from our tsconfig
     tsconfigRootDir: __dirname,
-    project: ['./tsconfig.json'],
+    project: ['./tsconfig.json', './tsconfig.eslint.json'],
 
     sourceType: 'module', // Allow the use of imports / ES modules
 
@@ -19,11 +19,11 @@ module.exports = {
     browser: true, // Enable browser global variables
     node: true, // Enable node global variables & Node.js scoping
     es2020: true, // Add all ECMAScript 2020 globals and automatically set the ecmaVersion parser option to ES2020
-    mocha: true, // Add Mocha testing global variables
+    jest: true, // Add Jest testing global variables
   },
 
   plugins: [],
-  extends: ['@xrplf/eslint-config/base', 'plugin:mocha/recommended'],
+  extends: ['@xrplf/eslint-config/base'],
 
   rules: {
     // ** TODO **
@@ -56,5 +56,6 @@ module.exports = {
     'eslint-comments/require-description': 'off',
     'no-shadow': 'off',
     'multiline-comment-style': 'off',
+    '@typescript-eslint/no-require-imports': 'off',
   },
 }

@@ -1,7 +1,11 @@
 import { assert } from 'chai'
 
 import rippled from '../fixtures/rippled'
-import { setupClient, teardownClient } from '../setupClient'
+import {
+  setupClient,
+  teardownClient,
+  type XrplTestContext,
+} from '../setupClient'
 import { addressTests } from '../testUtils'
 
 /**
@@ -10,18 +14,22 @@ import { addressTests } from '../testUtils'
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 describe('client.getXrpBalance', function () {
-  beforeEach(setupClient)
-  afterEach(teardownClient)
+  let testContext: XrplTestContext
+
+  beforeEach(async () => {
+    testContext = await setupClient()
+  })
+  afterEach(async () => teardownClient(testContext))
 
   addressTests.forEach(function (testcase) {
-    describe(testcase.type, function () {
+    describe(testcase.type, () => {
       it('getXrpBalance', async function () {
-        this.mockRippled.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_info',
           rippled.account_info.normal,
         )
-        this.mockRippled.addResponse('ledger', rippled.ledger.normal)
-        const result = await this.client.getXrpBalance(testcase.address)
+        testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+        const result = await testContext.client.getXrpBalance(testcase.address)
         assert.equal(result, '922.913243')
       })
     })

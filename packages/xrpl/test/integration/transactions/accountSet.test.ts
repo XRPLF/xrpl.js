@@ -1,24 +1,32 @@
-import _ from 'lodash'
-import { AccountSet } from 'xrpl-local/models/transactions'
-
+import { AccountSet } from '../../../src/models/transactions'
 import serverUrl from '../serverUrl'
-import { setupClient, teardownClient } from '../setup'
+import {
+  setupClient,
+  teardownClient,
+  type XrplIntegrationTestContext,
+} from '../setup'
 import { testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
 
 describe('AccountSet', function () {
-  this.timeout(TIMEOUT)
+  let testContext: XrplIntegrationTestContext
 
-  beforeEach(_.partial(setupClient, serverUrl))
-  afterEach(teardownClient)
-
-  it('base', async function () {
-    const tx: AccountSet = {
-      TransactionType: 'AccountSet',
-      Account: this.wallet.classicAddress,
-    }
-    await testTransaction(this.client, tx, this.wallet)
+  beforeEach(async () => {
+    testContext = await setupClient(serverUrl)
   })
+  afterEach(async () => teardownClient(testContext))
+
+  it(
+    'base',
+    async () => {
+      const tx: AccountSet = {
+        TransactionType: 'AccountSet',
+        Account: testContext.wallet.classicAddress,
+      }
+      await testTransaction(testContext.client, tx, testContext.wallet)
+    },
+    TIMEOUT,
+  )
 })

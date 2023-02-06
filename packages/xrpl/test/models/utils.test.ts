@@ -1,5 +1,6 @@
 /* eslint-disable no-bitwise -- flags require bitwise operations */
 import { assert } from 'chai'
+
 import {
   DepositPreauth,
   OfferCreate,
@@ -10,13 +11,13 @@ import {
   PaymentFlags,
   TrustSet,
   TrustSetFlags,
-} from 'xrpl-local'
-import { AccountRootFlags } from 'xrpl-local/models/ledger'
-import { isFlagEnabled } from 'xrpl-local/models/utils'
+} from '../../src'
+import { AccountRootFlags } from '../../src/models/ledger'
+import { isFlagEnabled } from '../../src/models/utils'
 import {
   setTransactionFlagsToNumber,
   parseAccountRootFlags,
-} from 'xrpl-local/models/utils/flags'
+} from '../../src/models/utils/flags'
 
 /**
  * Utils Testing.
