@@ -21,9 +21,13 @@ function webpackForTest(testFileName) {
   const test = {
     mode: 'production',
     cache: true,
+    performance: {
+      hints: false,
+      maxEntrypointSize: 512000,
+      maxAssetSize: 512000,
+    },
     externals: [
       {
-        'xrpl-local': 'xrpl',
         net: 'null',
       },
     ],
@@ -34,7 +38,13 @@ function webpackForTest(testFileName) {
       filename: match[1] + '.js',
     },
     plugins: [
-      new webpack.ProvidePlugin({ process: 'process/browser' }),
+      new webpack.NormalModuleReplacementPlugin(/^ws$/, './WSWrapper'),
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
+      }),
+      new webpack.DefinePlugin({
+        'process.stdout': {},
+      }),
       new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
       new webpack.IgnorePlugin({
         resourceRegExp: /^\.\/wordlists\/(?!english)/,
@@ -66,6 +76,7 @@ function webpackForTest(testFileName) {
               loader: 'ts-loader',
               options: {
                 compilerOptions: {
+                  lib: ['esnext', 'dom'],
                   composite: false,
                   declaration: false,
                   declarationMap: false,
@@ -88,6 +99,10 @@ function webpackForTest(testFileName) {
       },
       extensions: ['.ts', '.js', '.json'],
       fallback: {
+        module: false,
+        assert: require.resolve('assert-browserify'),
+        constants: require.resolve('constants-browserify'),
+        fs: require.resolve('browserify-fs'),
         buffer: require.resolve('buffer/'),
         assert: require.resolve('assert/'),
         url: require.resolve('url/'),
@@ -95,6 +110,7 @@ function webpackForTest(testFileName) {
         crypto: require.resolve('crypto-browserify'),
         path: require.resolve('path-browserify'),
         http: require.resolve('stream-http'),
+        https: require.resolve('https-browserify'),
       },
     },
   }

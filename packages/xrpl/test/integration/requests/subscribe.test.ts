@@ -1,34 +1,38 @@
 import { assert } from 'chai'
-import _ from 'lodash'
+
 import {
   Client,
   OfferCreate,
   SubscribeRequest,
   Wallet,
   SubscribeResponse,
-} from 'xrpl-local'
-import { StreamType } from 'xrpl-local/models/common'
-
+} from '../../../src'
+import { StreamType } from '../../../src/models/common'
+import type { LedgerStreamResponse } from '../../../src/models/methods/subscribe'
 import serverUrl from '../serverUrl'
-import { setupClient, teardownClient } from '../setup'
+import {
+  setupClient,
+  teardownClient,
+  type XrplIntegrationTestContext,
+} from '../setup'
 import { ledgerAccept, subscribeDone, testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
 
-// Note: This test use '.then' to avoid awaits in order to use 'done' style tests.
-// eslint-disable-next-line max-params -- Helps keep things well-typed
 async function createTxHandlerTest(
   client: Client,
   wallet: Wallet,
-  done: Mocha.Done,
   subscriptionStream: StreamType,
 ): Promise<void> {
   const txStream = 'transaction'
 
-  client.on(txStream, (tx) => {
-    assert.equal(tx.type, txStream)
-    subscribeDone(client, done)
+  const transactionPromise = new Promise<void>((resolve) => {
+    client.on(txStream, (tx) => {
+      assert.equal(tx.type, txStream)
+      subscribeDone(client)
+      resolve()
+    })
   })
 
   const request: SubscribeRequest = {
@@ -37,17 +41,21 @@ async function createTxHandlerTest(
     accounts: [wallet.classicAddress],
   }
 
-  client.request(request).then((response) => {
-    assert.equal(response.type, 'response')
-    assert.deepEqual(response.result, {})
-  })
+  const response = await client.request(request)
+
+  assert.equal(response.type, 'response')
+  assert.deepEqual(response.result, {})
+
+  return transactionPromise
 }
 
 describe('subscribe', function () {
-  this.timeout(TIMEOUT)
+  let testContext: XrplIntegrationTestContext
 
-  beforeEach(_.partial(setupClient, serverUrl))
-  afterEach(teardownClient)
+  beforeEach(async () => {
+    testContext = await setupClient(serverUrl)
+  })
+  afterEach(async () => teardownClient(testContext))
 
   /**
    * Subscribe streams which are not testable with just a standalone node:
@@ -60,17 +68,21 @@ describe('subscribe', function () {
    * 'server'.
    */
 
-  it('Successfully Subscribes', async function () {
-    const response: SubscribeResponse = await this.client.request({
-      command: 'subscribe',
-    })
+  it(
+    'Successfully Subscribes',
+    async () => {
+      const response: SubscribeResponse = await testContext.client.request({
+        command: 'subscribe',
+      })
 
-    assert.deepEqual(response.result, {})
-    assert.equal(response.type, 'response')
-  })
+      assert.deepEqual(response.result, {})
+      assert.equal(response.type, 'response')
+    },
+    TIMEOUT,
+  )
 
   it('Successfully Unsubscribes', async function () {
-    const response = await this.client.request({
+    const response = await testContext.client.request({
       command: 'unsubscribe',
     })
 
@@ -78,90 +90,111 @@ describe('subscribe', function () {
     assert.equal(response.type, 'response')
   })
 
-  it('Emits transaction', function (done) {
-    const streamType = 'transactions'
-    createTxHandlerTest(this.client, this.wallet, done, streamType).then(() => {
+  it(
+    'Emits transaction',
+    async () => {
+      const streamType = 'transactions'
+      const transactionPromise = createTxHandlerTest(
+        testContext.client,
+        testContext.wallet,
+        streamType,
+      )
       // Trigger the event
       const tx: OfferCreate = {
         TransactionType: 'OfferCreate',
-        Account: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
         TakerGets: '13100000',
         TakerPays: {
           currency: 'USD',
-          issuer: this.wallet.classicAddress,
+          issuer: testContext.wallet.classicAddress,
           value: '10',
         },
       }
+      await testTransaction(testContext.client, tx, testContext.wallet)
+      await transactionPromise
+    },
+    TIMEOUT,
+  )
 
-      testTransaction(this.client, tx, this.wallet)
-    })
-  })
+  it(
+    'Emits transaction on transactions_proposed',
+    async () => {
+      const transactionPromise = createTxHandlerTest(
+        testContext.client,
+        testContext.wallet,
+        'transactions_proposed',
+      )
 
-  it('Emits transaction on transactions_proposed', function (done) {
-    createTxHandlerTest(
-      this.client,
-      this.wallet,
-      done,
-      'transactions_proposed',
-    ).then(() => {
       const tx: OfferCreate = {
         TransactionType: 'OfferCreate',
-        Account: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
         TakerGets: '13100000',
         TakerPays: {
           currency: 'USD',
-          issuer: this.wallet.classicAddress,
+          issuer: testContext.wallet.classicAddress,
           value: '10',
         },
       }
 
       // The transactions_proposed stream should trigger the transaction handler WITHOUT ledgerAccept
-      const client: Client = this.client
-      client.submit(tx, { wallet: this.wallet })
-    })
-  })
+      await testContext.client.submit(tx, { wallet: testContext.wallet })
+      await transactionPromise
+    },
+    TIMEOUT,
+  )
 
-  // Note: This test use '.then' to avoid awaits in order to use 'done' style tests.
-  it('Emits ledger', function (done) {
-    const request: SubscribeRequest = {
-      command: 'subscribe',
-      streams: ['ledger'],
-      accounts: [this.wallet.classicAddress],
-    }
-
-    this.client.request(request).then((response) => {
-      // Explicitly checking that there are only known fields in the return
-      const expectedResult = {
-        fee_base: response.result.fee_base,
-        fee_ref: response.result.fee_ref,
-        ledger_hash: response.result.ledger_hash,
-        ledger_index: response.result.ledger_index,
-        ledger_time: response.result.ledger_time,
-        reserve_base: response.result.reserve_base,
-        reserve_inc: response.result.reserve_inc,
-        validated_ledgers: response.result.validated_ledgers,
+  it(
+    'Emits ledger',
+    async () => {
+      const request: SubscribeRequest = {
+        command: 'subscribe',
+        streams: ['ledger'],
+        accounts: [testContext.wallet.classicAddress],
       }
 
-      assert.equal(response.type, 'response')
-      assert.deepEqual(response.result, expectedResult)
+      await testContext.client.request(request).then(async (response) => {
+        const ledgerResponse: LedgerStreamResponse =
+          response.result as LedgerStreamResponse
+        // Explicitly checking that there are only known fields in the return
+        const expectedResult = {
+          fee_base: ledgerResponse.fee_base,
+          fee_ref: ledgerResponse.fee_ref,
+          ledger_hash: ledgerResponse.ledger_hash,
+          ledger_index: ledgerResponse.ledger_index,
+          ledger_time: ledgerResponse.ledger_time,
+          reserve_base: ledgerResponse.reserve_base,
+          reserve_inc: ledgerResponse.reserve_inc,
+          validated_ledgers: ledgerResponse.validated_ledgers,
+        }
 
-      const client: Client = this.client
-      client.on('ledgerClosed', (ledger) => {
-        // Fields that are expected to change between the initial test and now are updated
-        assert.deepEqual(ledger, {
-          ...expectedResult,
-          type: 'ledgerClosed',
-          txn_count: ledger.txn_count,
-          ledger_hash: ledger.ledger_hash,
-          ledger_index: parseInt(expectedResult.ledger_index, 10) + 1,
-          ledger_time: ledger.ledger_time,
-          validated_ledgers: ledger.validated_ledgers,
+        assert.equal(response.type, 'response')
+        assert.deepEqual(response.result, expectedResult)
+
+        const client: Client = testContext.client
+        const ledgerClosedPromise = new Promise<void>((resolve) => {
+          client.on('ledgerClosed', (ledger) => {
+            // Fields that are expected to change between the initial test and now are updated
+            assert.deepEqual(ledger, {
+              ...expectedResult,
+              type: 'ledgerClosed',
+              txn_count: ledger.txn_count,
+              ledger_hash: ledger.ledger_hash,
+              ledger_index:
+                parseInt(expectedResult.ledger_index.toString(), 10) + 1,
+              ledger_time: ledger.ledger_time,
+              validated_ledgers: ledger.validated_ledgers,
+            })
+            subscribeDone(testContext.client)
+            resolve()
+          })
         })
-        subscribeDone(this.client, done)
-      })
 
-      // Trigger the event
-      ledgerAccept(this.client)
-    })
-  })
+        // Trigger the event
+        await ledgerAccept(testContext.client)
+
+        await ledgerClosedPromise
+      })
+    },
+    TIMEOUT,
+  )
 })

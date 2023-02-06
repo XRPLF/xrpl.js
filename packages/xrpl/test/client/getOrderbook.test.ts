@@ -1,13 +1,17 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
-import { BookOffersRequest } from 'xrpl-local'
-import { ValidationError, XrplError } from 'xrpl-local/errors'
-import { OfferFlags } from 'xrpl-local/models/ledger'
 
+import { BookOffersRequest, type Request } from '../../src'
+import { ValidationError, XrplError } from '../../src/errors'
+import { OfferFlags } from '../../src/models/ledger'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
-import { setupClient, teardownClient } from '../setupClient'
+import {
+  setupClient,
+  teardownClient,
+  type XrplTestContext,
+} from '../setupClient'
 import { assertResultMatch, assertRejects } from '../testUtils'
 
 function checkSortingOfOrders(orders): void {
@@ -37,42 +41,48 @@ function isBTC(currency: string): boolean {
   )
 }
 
-function normalRippledResponse(
-  request: BookOffersRequest,
-): Record<string, unknown> {
+function normalRippledResponse(request: Request): Record<string, unknown> {
   if (
-    isBTC(request.taker_gets.currency) &&
-    isUSD(request.taker_pays.currency)
+    isBTC((request as BookOffersRequest).taker_gets.currency) &&
+    isUSD((request as BookOffersRequest).taker_pays.currency)
   ) {
     return rippled.book_offers.fabric.requestBookOffersBidsResponse(request)
   }
   if (
-    isUSD(request.taker_gets.currency) &&
-    isBTC(request.taker_pays.currency)
+    isUSD((request as BookOffersRequest).taker_gets.currency) &&
+    isBTC((request as BookOffersRequest).taker_pays.currency)
   ) {
     return rippled.book_offers.fabric.requestBookOffersAsksResponse(request)
   }
   throw new XrplError('unexpected end')
 }
 
-function xrpRippledResponse(
-  request: BookOffersRequest,
-): Record<string, unknown> {
-  if (request.taker_pays.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
+function xrpRippledResponse(request: Request): Record<string, unknown> {
+  if (
+    (request as BookOffersRequest).taker_pays.issuer ===
+    'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw'
+  ) {
     return rippled.book_offers.xrp_usd
   }
-  if (request.taker_gets.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
+  if (
+    (request as BookOffersRequest).taker_gets.issuer ===
+    'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw'
+  ) {
     return rippled.book_offers.usd_xrp
   }
   throw new Error('unexpected end')
 }
 
 describe('client.getOrderbook', function () {
-  beforeEach(setupClient)
-  afterEach(teardownClient)
+  let testContext: XrplTestContext
+
+  beforeEach(async () => {
+    testContext = await setupClient()
+  })
+  afterEach(async () => teardownClient(testContext))
 
   it('normal', async function () {
-    this.mockRippled.addResponse('book_offers', normalRippledResponse)
+    testContext.mockRippled!.addResponse('book_offers', normalRippledResponse)
     const request = {
       takerPays: requests.getOrderbook.normal.takerPays,
       takerGets: requests.getOrderbook.normal.takerGets,
@@ -80,7 +90,7 @@ describe('client.getOrderbook', function () {
         limit: 1,
       },
     }
-    const response = await this.client.getOrderbook(
+    const response = await testContext.client.getOrderbook(
       request.takerPays,
       request.takerGets,
       request.options,
@@ -93,22 +103,51 @@ describe('client.getOrderbook', function () {
   })
 
   it('invalid options', async function () {
-    this.mockRippled.addResponse('book_offers', normalRippledResponse)
-    assertRejects(
-      this.client.getOrderbook(
-        requests.getOrderbook.normal.takerPays,
-        requests.getOrderbook.normal.takerGets,
-        {
-          invalid: 'options',
-        },
+    const invalidOptions = [
+      {
+        option: 'invalid',
+      },
+      {
+        limit: 'invalid',
+      },
+      {
+        ledger_index: 'invalid',
+      },
+      {
+        ledger_hash: 0,
+      },
+      {
+        taker: 0,
+      },
+    ]
+
+    testContext.mockRippled!.addResponse('book_offers', normalRippledResponse)
+    await Promise.all(
+      invalidOptions.map(
+        async (invalidOptionObject) =>
+          new Promise<void>((resolve) => {
+            assertRejects(
+              testContext.client
+                .getOrderbook(
+                  requests.getOrderbook.normal.takerPays,
+                  requests.getOrderbook.normal.takerGets,
+                  // @ts-expect-error Meant to be invalid for testing purposes
+                  invalidOptionObject,
+                )
+                .catch((error) => {
+                  resolve()
+                  throw error
+                }),
+              ValidationError,
+            )
+          }),
       ),
-      ValidationError,
     )
   })
 
   it('with XRP', async function () {
-    this.mockRippled.addResponse('book_offers', xrpRippledResponse)
-    const response = await this.client.getOrderbook(
+    testContext.mockRippled!.addResponse('book_offers', xrpRippledResponse)
+    const response = await testContext.client.getOrderbook(
       requests.getOrderbook.withXRP.takerPays,
       requests.getOrderbook.withXRP.takerGets,
     )
@@ -116,8 +155,8 @@ describe('client.getOrderbook', function () {
   })
 
   it('sample USD/XRP book has orders sorted correctly', async function () {
-    this.mockRippled.addResponse('book_offers', xrpRippledResponse)
-    const response = await this.client.getOrderbook(
+    testContext.mockRippled!.addResponse('book_offers', xrpRippledResponse)
+    const response = await testContext.client.getOrderbook(
       requests.getOrderbook.withXRP.takerPays,
       requests.getOrderbook.withXRP.takerGets,
     )
@@ -126,13 +165,13 @@ describe('client.getOrderbook', function () {
   })
 
   it('sorted so that best deals come first [failure test]', async function () {
-    this.mockRippled.addResponse('book_offers', normalRippledResponse)
-    const response = await this.client.getOrderbook(
+    testContext.mockRippled!.addResponse('book_offers', normalRippledResponse)
+    const response = await testContext.client.getOrderbook(
       requests.getOrderbook.normal.takerPays,
       requests.getOrderbook.normal.takerGets,
     )
-    const buyRates = response.buy.map(async (item) => item.quality as number)
-    const sellRates = response.sell.map(async (item) => item.quality as number)
+    const buyRates = response.buy.map(async (item) => Number(item.quality))
+    const sellRates = response.sell.map(async (item) => Number(item.quality))
     // buy and sell orders should be sorted so that the best deals come first
     assert.deepEqual(
       buyRates.sort((item) => Number(item)),
@@ -145,13 +184,13 @@ describe('client.getOrderbook', function () {
   })
 
   it('sorted so that best deals come first [bad test](XRP)', async function () {
-    this.mockRippled.addResponse('book_offers', xrpRippledResponse)
-    const response = await this.client.getOrderbook(
+    testContext.mockRippled!.addResponse('book_offers', xrpRippledResponse)
+    const response = await testContext.client.getOrderbook(
       requests.getOrderbook.withXRP.takerPays,
       requests.getOrderbook.withXRP.takerGets,
     )
-    const buyRates = response.buy.map(async (item) => item.quality as number)
-    const sellRates = response.sell.map(async (item) => item.quality as number)
+    const buyRates = response.buy.map(async (item) => Number(item.quality))
+    const sellRates = response.sell.map(async (item) => Number(item.quality))
     // buy and sell orders should be sorted so that the best deals come first
     assert.deepEqual(
       buyRates.sort((item) => Number(item)),
@@ -164,8 +203,8 @@ describe('client.getOrderbook', function () {
   })
 
   it('direction is correct for buy and sell', async function () {
-    this.mockRippled.addResponse('book_offers', normalRippledResponse)
-    const response = await this.client.getOrderbook(
+    testContext.mockRippled!.addResponse('book_offers', normalRippledResponse)
+    const response = await testContext.client.getOrderbook(
       requests.getOrderbook.normal.takerPays,
       requests.getOrderbook.normal.takerGets,
     )
@@ -180,9 +219,9 @@ describe('client.getOrderbook', function () {
   })
 
   it('getOrderbook - limit', async function () {
-    this.mockRippled.addResponse('book_offers', normalRippledResponse)
+    testContext.mockRippled!.addResponse('book_offers', normalRippledResponse)
     const LIMIT = 3
-    const response = await this.client.getOrderbook(
+    const response = await testContext.client.getOrderbook(
       requests.getOrderbook.normal.takerPays,
       requests.getOrderbook.normal.takerGets,
       {

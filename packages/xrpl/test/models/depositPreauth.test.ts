@@ -1,6 +1,7 @@
 import { assert } from 'chai'
-import { validate, ValidationError } from 'xrpl-local'
-import { validateDepositPreauth } from 'xrpl-local/models/transactions/depositPreauth'
+
+import { validate, ValidationError } from '../../src'
+import { validateDepositPreauth } from '../../src/models/transactions/depositPreauth'
 
 /**
  * DepositPreauth Transaction Verification Testing.

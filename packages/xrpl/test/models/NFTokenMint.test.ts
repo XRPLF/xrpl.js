@@ -1,10 +1,11 @@
 import { assert } from 'chai'
+
 import {
   convertStringToHex,
   validate,
   ValidationError,
   NFTokenMintFlags,
-} from 'xrpl-local'
+} from '../../src'
 
 /**
  * NFTokenMint Transaction Verification Testing.
