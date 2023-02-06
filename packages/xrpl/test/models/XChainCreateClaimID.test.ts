@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { validate, ValidationError } from 'xrpl-local'
-import { validateXChainCreateClaimID } from 'xrpl-local/models/transactions/XChainCreateClaimID'
+import { validate, ValidationError } from '../../src'
+import { validateXChainCreateClaimID } from '../../src/models/transactions/XChainCreateClaimID'
 
 /**
  * XChainCreateClaimID Transaction Verification Testing.

@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { validate, ValidationError } from 'xrpl-local'
-import { validateXChainCommit } from 'xrpl-local/models/transactions/XChainCommit'
+import { validate, ValidationError } from '../../src'
+import { validateXChainCommit } from '../../src/models/transactions/XChainCommit'
 
 /**
  * XChainCommit Transaction Verification Testing.

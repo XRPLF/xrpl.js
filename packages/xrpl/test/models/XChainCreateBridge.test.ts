@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { validate, ValidationError } from 'xrpl-local'
-import { validateXChainCreateBridge } from 'xrpl-local/models/transactions/XChainCreateBridge'
+import { validate, ValidationError } from '../../src'
+import { validateXChainCreateBridge } from '../../src/models/transactions/XChainCreateBridge'
 
 /**
  * XChainCreateBridge Transaction Verification Testing.
