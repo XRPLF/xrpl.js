@@ -12,10 +12,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 export function load(app: Application) {
   app.renderer.hooks.on('head.begin', () => (
     <>
+      <script src="https://cmp.osano.com/AzyjT6TIZMlgyLyy8/ad2447d5-f101-40df-b92e-d6452b5ecac0/osano.js"></script>
       <script>
         <JSX.Raw html={GTMScript} />
       </script>
-      <script src="https://cmp.osano.com/AzyjT6TIZMlgyLyy8/ad2447d5-f101-40df-b92e-d6452b5ecac0/osano.js"></script>
     </>
   ))
 
