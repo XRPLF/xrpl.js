@@ -40,6 +40,7 @@ export * from './requests/utility.test'
 
 export * from './fundWallet.test'
 export * from './integration.test'
+export * from './getNFTokenID.test'
 export * from './regularKey.test'
 
 // Ensure you export all added tests above "export * from './finalTest'", otherwise they will not be run.

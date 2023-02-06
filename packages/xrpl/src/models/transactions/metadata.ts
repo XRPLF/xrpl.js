@@ -1,6 +1,6 @@
 import { Amount } from '../common'
 
-interface CreatedNode {
+export interface CreatedNode {
   CreatedNode: {
     LedgerEntryType: string
     LedgerIndex: string
@@ -8,7 +8,7 @@ interface CreatedNode {
   }
 }
 
-interface ModifiedNode {
+export interface ModifiedNode {
   ModifiedNode: {
     LedgerEntryType: string
     LedgerIndex: string
@@ -19,7 +19,7 @@ interface ModifiedNode {
   }
 }
 
-interface DeletedNode {
+export interface DeletedNode {
   DeletedNode: {
     LedgerEntryType: string
     LedgerIndex: string
