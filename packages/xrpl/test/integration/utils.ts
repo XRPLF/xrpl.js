@@ -78,28 +78,54 @@ export async function verifySubmittedTransaction(
   }
 }
 
+/**
+ * Submit a transaction and verify that it is received correctly, and actually exists
+ * on the ledger after the submission is completed.
+ *
+ * @param client - The client connection to the ledger.
+ * @param transaction - The transaction to submit and verify.
+ * @param wallet - The wallet to sign this transaction with.
+ * @param useLedgerAccept - Set to false if using this with a real ledger like Testnet / Devnet
+ */
+// eslint-disable-next-line max-params -- Useful optional param
 export async function testTransaction(
   client: Client,
   transaction: Transaction,
   wallet: Wallet,
+  useLedgerAccept = true,
 ): Promise<void> {
   // Accept any un-validated changes.
-  await ledgerAccept(client)
-
+  if (useLedgerAccept) {
+    await ledgerAccept(client)
+  }
   // sign/submit the transaction
-  const response = await client.submit(transaction, { wallet })
-
+  let response
+  if (useLedgerAccept) {
+    response = await client.submit(transaction, { wallet })
+  } else {
+    response = await client.submitAndWait(transaction, { wallet })
+  }
   // check that the transaction was successful
   assert.equal(response.type, 'response')
-  assert.equal(
-    response.result.engine_result,
-    'tesSUCCESS',
-    response.result.engine_result_message,
-  )
+  if (useLedgerAccept) {
+    assert.equal(
+      response.result.engine_result,
+      'tesSUCCESS',
+      response.result.engine_result_message,
+    )
+  } else {
+    assert.equal(
+      response.result.meta.engine_result,
+      'tesSUCCESS',
+      JSON.stringify(response),
+    )
+  }
 
   // check that the transaction is on the ledger
   const signedTx = _.omit(response.result.tx_json, 'hash')
-  await ledgerAccept(client)
+  if (useLedgerAccept) {
+    await ledgerAccept(client)
+  }
   await verifySubmittedTransaction(client, signedTx as Transaction)
 }
 
