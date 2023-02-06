@@ -9,7 +9,7 @@ export async function teardownClient(this: Mocha.Context): Promise<void> {
 }
 
 // eslint-disable-next-line max-params -- need comments
-async function initIC(
+async function initToken(
   client: Client,
   wallet: Wallet,
   destination: Wallet,
@@ -111,7 +111,7 @@ async function initIC(
 export async function setupClient(
   this: Mocha.Context,
   server = serverUrl,
-  ic?: boolean | false,
+  token?: boolean | false,
 ): Promise<void> {
   this.wallet = Wallet.generate()
   this.destination = Wallet.generate()
@@ -124,8 +124,13 @@ export async function setupClient(
         await fundAccount(this.client, this.wallet)
         await fundAccount(this.client, this.destination)
         await fundAccount(this.client, this.gateway)
-        if (ic) {
-          await initIC(this.client, this.wallet, this.destination, this.gateway)
+        if (token) {
+          await initToken(
+            this.client,
+            this.wallet,
+            this.destination,
+            this.gateway,
+          )
         }
         resolve()
       })

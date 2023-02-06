@@ -14,7 +14,7 @@ describe('PaymentChannelCreate', function () {
   beforeEach(_.partial(setupClient, serverUrl, true))
   afterEach(teardownClient)
 
-  it('native', async function () {
+  it('xrp test', async function () {
     const wallet2 = await generateFundedWallet(this.client)
     const paymentChannelCreate: PaymentChannelCreate = {
       TransactionType: 'PaymentChannelCreate',
@@ -27,7 +27,7 @@ describe('PaymentChannelCreate', function () {
 
     await testTransaction(this.client, paymentChannelCreate, this.wallet)
   })
-  it('ic', async function () {
+  it('token test', async function () {
     const paymentChannelCreate: PaymentChannelCreate = {
       TransactionType: 'PaymentChannelCreate',
       Account: this.wallet.classicAddress,

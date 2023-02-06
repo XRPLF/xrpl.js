@@ -12,10 +12,10 @@ const TIMEOUT = 20000
 describe('EscrowCreate', function () {
   this.timeout(TIMEOUT)
 
-  beforeEach(_.partial(setupClient, serverUrl))
+  beforeEach(_.partial(setupClient, serverUrl, true))
   afterEach(teardownClient)
 
-  it('native', async function () {
+  it('xrp test', async function () {
     // get the most recent close_time from the standalone container for finish after.
     const CLOSE_TIME: number = (
       await this.client.request({
@@ -47,7 +47,7 @@ describe('EscrowCreate', function () {
     )
   })
 
-  it('ic', async function () {
+  it('token test', async function () {
     // get the most recent close_time from the standalone container for finish after.
     const CLOSE_TIME: number = (
       await this.client.request({
