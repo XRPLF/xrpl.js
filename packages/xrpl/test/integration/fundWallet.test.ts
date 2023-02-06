@@ -46,10 +46,10 @@ describe('fundWallet', function () {
     )
   })
 
-  it('can generate and fund wallets on icv2 net', async function () {
+  it('can generate and fund wallets on vala net', async function () {
     await generate_faucet_wallet_and_fund_again(
-      'wss://icv2.ws.transia.co',
-      'icv2.faucet.transia.co',
+      'wss://vala.ws.transia.co',
+      'vala.faucet.transia.co',
       '/accounts',
     )
   })
