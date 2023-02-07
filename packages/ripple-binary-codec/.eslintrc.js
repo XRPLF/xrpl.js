@@ -80,6 +80,7 @@ module.exports = {
     'jsdoc/require-description-complete-sentence': 'off',
     'jsdoc/require-jsdoc': 'off',
     'jsdoc/check-tag-names': 'off',
+    'jsdoc/check-examples': 'off', // Not implemented in eslint 8
     'jsdoc/require-returns': 'off',
     'jsdoc/require-hyphen-before-param-description': 'off',
     'jsdoc/require-description': 'off',
