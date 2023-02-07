@@ -10,8 +10,6 @@ import { BaseTransaction, validateBaseTransaction } from './common'
 export interface XChainAddClaimAttestation extends BaseTransaction {
   TransactionType: 'XChainAddClaimAttestation'
 
-  Account: string
-
   Amount: Amount
 
   AttestationRewardAccount: string
