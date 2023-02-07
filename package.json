@@ -37,7 +37,7 @@
     "copyfiles": "^2.4.1",
     "crypto-browserify": "^3.12.0",
     "ejs": "^3.0.1",
-    "eslint": "^7.5.0",
+    "eslint": "^8.33.0",
     "eslint-plugin-array-func": "^3.1.7",
     "eslint-plugin-consistent-default-export-name": "^0.0.15",
     "eslint-plugin-eslint-comments": "^3.2.0",
