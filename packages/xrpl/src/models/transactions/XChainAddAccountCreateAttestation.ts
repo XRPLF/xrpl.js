@@ -37,6 +37,7 @@ export interface XChainAddAccountCreateAttestation extends BaseTransaction {
  * @param tx - A XChainAddAccountCreateAttestation Transaction.
  * @throws When the XChainAddAccountCreateAttestation is malformed.
  */
+// eslint-disable-next-line max-lines-per-function, complexity -- needed
 export function validateXChainAddAccountCreateAttestation(
   tx: Record<string, unknown>,
 ): void {
