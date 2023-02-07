@@ -41,5 +41,6 @@ module.exports = {
     'jsdoc/require-param': 'off',
     'jsdoc/check-examples': 'off', // Not implemented in eslint 8
     'tsdoc/syntax': 'off',
+    '@typescript-eslint/no-require-imports': 'off',
   },
 }

@@ -5,7 +5,7 @@ import { BinaryParser } from '../serdes/binary-parser'
 import { AccountID } from './account-id'
 import { Currency } from './currency'
 import { JsonObject, SerializedType } from './serialized-type'
-import * as bigInt from 'big-integer'
+import bigInt = require('big-integer')
 import { Buffer } from 'buffer/'
 
 /**

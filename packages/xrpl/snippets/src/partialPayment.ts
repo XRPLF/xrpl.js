@@ -1,5 +1,4 @@
 import { Client, Payment, PaymentFlags, TrustSet } from '../../src'
-// Replace this import with "from 'xrpl'" if you copy and paste this code
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 

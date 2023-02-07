@@ -1,6 +1,6 @@
 import { BytesList } from '../serdes/binary-serializer'
 import { BinaryParser } from '../serdes/binary-parser'
-import * as bigInt from 'big-integer'
+import bigInt = require('big-integer')
 import { Buffer } from 'buffer/'
 
 type JSON = string | number | boolean | null | undefined | JSON[] | JsonObject

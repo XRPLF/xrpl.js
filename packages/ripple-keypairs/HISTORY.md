@@ -1,6 +1,8 @@
 # ripple-keypairs Release History
 
 ## Unreleased
+### Changed
+- All tests now use the Jest test runner and have been refactored for consistency across all packages
 
 ## 1.1.4 (2022-05-02)
 - `hexToBytes` now produces empty output for empty input, rather than `[0]`.

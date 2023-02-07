@@ -108,6 +108,10 @@ export interface ResponseOnlyTxInfo {
    * The sequence number of the ledger that included this transaction.
    */
   ledger_index?: number
+  /**
+   * @deprecated Alias for ledger_index.
+   */
+  inLedger?: number
 }
 
 /**

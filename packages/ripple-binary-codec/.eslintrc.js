@@ -14,6 +14,8 @@ module.exports = {
     },
   },
 
+  ignorePatterns: ['jest.config.js', '.eslintrc.js'],
+
   // Specify global variables that are predefined
   env: {
     browser: true, // Enable browser global variables

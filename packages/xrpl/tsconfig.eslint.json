@@ -3,8 +3,9 @@
   "include": [
     "./src/**/*.ts",
     "./test/**/*.ts",
+    "./test/**/*.json",
     "./src/**/*.json",
     "./snippets/src/**/*.ts",
     ".eslintrc.js"
-  ]
+  ],
 }

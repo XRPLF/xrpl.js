@@ -53,7 +53,6 @@ export function validateCheckCash(tx: Record<string, unknown>): void {
     )
   }
 
-  /* eslint-disable @typescript-eslint/no-unnecessary-condition -- JavaScript may pass in undefined. */
   if (tx.Amount != null && tx.Amount !== undefined && !isAmount(tx.Amount)) {
     throw new ValidationError('CheckCash: invalid Amount')
   }
@@ -65,7 +64,6 @@ export function validateCheckCash(tx: Record<string, unknown>): void {
   ) {
     throw new ValidationError('CheckCash: invalid DeliverMin')
   }
-  /* eslint-enable @typescript-eslint/no-unnecessary-condition */
 
   if (tx.CheckID !== undefined && typeof tx.CheckID !== 'string') {
     throw new ValidationError('CheckCash: invalid CheckID')

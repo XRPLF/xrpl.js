@@ -1,4 +1,4 @@
-import * as bigInt from 'big-integer'
+import bigInt = require('big-integer')
 import { Comparable } from './serialized-type'
 import { Buffer } from 'buffer/'
 
