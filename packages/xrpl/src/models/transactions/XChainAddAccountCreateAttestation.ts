@@ -42,6 +42,60 @@ export function validateXChainAddAccountCreateAttestation(
 ): void {
   validateBaseTransaction(tx)
 
+  if (tx.Amount == null) {
+    throw new ValidationError(
+      'XChainAddAccountCreateAttestation: missing field tx.Amount',
+    )
+  }
+
+  if (tx.AttestationRewardAccount == null) {
+    throw new ValidationError(
+      'XChainAddAccountCreateAttestation: missing field tx.AttestationRewardAccount',
+    )
+  }
+
+  if (tx.Destination == null) {
+    throw new ValidationError(
+      'XChainAddAccountCreateAttestation: missing field tx.Destination',
+    )
+  }
+
+  if (tx.OtherChainSource == null) {
+    throw new ValidationError(
+      'XChainAddAccountCreateAttestation: missing field tx.OtherChainSource',
+    )
+  }
+
+  if (tx.PublicKey == null) {
+    throw new ValidationError(
+      'XChainAddAccountCreateAttestation: missing field tx.PublicKey',
+    )
+  }
+
+  if (tx.Signature == null) {
+    throw new ValidationError(
+      'XChainAddAccountCreateAttestation: missing field tx.Signature',
+    )
+  }
+
+  if (tx.SignatureReward == null) {
+    throw new ValidationError(
+      'XChainAddAccountCreateAttestation: missing field tx.SignatureReward',
+    )
+  }
+
+  if (tx.WasLockingChainSend == null) {
+    throw new ValidationError(
+      'XChainAddAccountCreateAttestation: missing field tx.WasLockingChainSend',
+    )
+  }
+
+  if (tx.XChainAccountCreateCount == null) {
+    throw new ValidationError(
+      'XChainAddAccountCreateAttestation: missing field tx.XChainAccountCreateCount',
+    )
+  }
+
   if (tx.XChainBridge == null) {
     throw new ValidationError(
       'XChainAddAccountCreateAttestation: missing field tx.XChainBridge',
