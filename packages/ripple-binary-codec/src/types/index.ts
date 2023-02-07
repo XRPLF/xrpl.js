@@ -20,7 +20,6 @@ import { UInt32 } from './uint-32'
 import { UInt64 } from './uint-64'
 import { UInt8 } from './uint-8'
 import { Vector256 } from './vector-256'
-import { XChainAttestationBatch } from './xchain-attestation-batch'
 import { XChainBridge } from './xchain-bridge'
 
 const coreTypes = {
@@ -40,7 +39,6 @@ const coreTypes = {
   UInt32,
   UInt64,
   Vector256,
-  XChainAttestationBatch,
   XChainBridge,
 }
 

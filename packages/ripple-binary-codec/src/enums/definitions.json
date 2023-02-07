@@ -23,7 +23,6 @@
     "UInt512": 23,
     "Issue": 24,
     "XChainBridge": 25,
-    "XChainAttestationBatch": 26,
     "Transaction": 10001,
     "LedgerEntry": 10002,
     "Validation": 10003,
@@ -1965,16 +1964,6 @@
         "isSerialized": true,
         "isSigningField": true,
         "type": "XChainBridge"
-      }
-    ],
-    [
-      "XChainAttestationBatch",
-      {
-        "nth": 1,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "XChainAttestationBatch"
       }
     ],
     [
