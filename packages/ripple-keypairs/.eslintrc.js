@@ -50,6 +50,7 @@ module.exports = {
     'jsdoc/require-returns': 'off',
     'jsdoc/require-description-complete-sentence': 'off',
     'jsdoc/check-tag-names': 'off',
+    'jsdoc/check-examples': 'off', // Not implemented in eslint 8
     'jsdoc/no-types': 'off',
     'tsdoc/syntax': 'off',
     'import/order': 'off',
