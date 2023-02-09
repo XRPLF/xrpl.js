@@ -6,7 +6,7 @@ import {
   encode,
   encodeForSigning,
   encodeForSigningClaim,
-  XrplDefinitionsBase,
+  XrplDefinitions,
 } from 'ripple-binary-codec'
 import { sign as signWithKeypair, verify } from 'ripple-keypairs'
 
@@ -35,7 +35,7 @@ import Wallet from '.'
  */
 function multisign<T extends BaseTransaction = Transaction>(
   transactions: Array<T | string>,
-  definitions?: InstanceType<typeof XrplDefinitionsBase>,
+  definitions?: InstanceType<typeof XrplDefinitions>,
 ): string {
   if (transactions.length === 0) {
     throw new ValidationError('There were 0 transactions to multisign')
@@ -86,7 +86,7 @@ function authorizeChannel(
   wallet: Wallet,
   channelId: string,
   amount: string,
-  definitions?: InstanceType<typeof XrplDefinitionsBase>,
+  definitions?: InstanceType<typeof XrplDefinitions>,
 ): string {
   const signingData = encodeForSigningClaim(
     {
@@ -109,7 +109,7 @@ function authorizeChannel(
  */
 function verifySignature<T extends BaseTransaction = Transaction>(
   tx: T | string,
-  definitions?: InstanceType<typeof XrplDefinitionsBase>,
+  definitions?: InstanceType<typeof XrplDefinitions>,
 ): boolean {
   const decodedTx = getDecodedTransaction(tx)
   return verify(
@@ -188,7 +188,7 @@ function addressToBigNumber(address: string): BigNumber {
  */
 function getDecodedTransaction<T extends BaseTransaction = Transaction>(
   txOrBlob: T | string,
-  definitions?: InstanceType<typeof XrplDefinitionsBase>,
+  definitions?: InstanceType<typeof XrplDefinitions>,
 ): T {
   if (typeof txOrBlob === 'object') {
     // We need this to handle X-addresses in multisigning

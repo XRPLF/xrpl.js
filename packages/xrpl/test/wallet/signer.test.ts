@@ -8,7 +8,6 @@ import {
   multisign,
   verifySignature,
 } from '../../src/Wallet/signer'
-
 import * as definitions from '../fixtures/rippled/definitions-with-diff-payment.json'
 
 const publicKey =
