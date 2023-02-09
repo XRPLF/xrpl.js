@@ -21,12 +21,19 @@ interface DefinitionsData {
  * XrplDefinitions should be instantiated instead of this class.
  */
 class XrplDefinitionsBase {
+  // A collection of fields that can be included in transactions
   field: FieldLookup
+  // A collection of ids corresponding to types of ledger objects
   ledgerEntryType: BytesLookup
+  // A collection of type flags used to determine how to serialize a field's data
   type: BytesLookup
+  // Errors and result codes for transactions
   transactionResult: BytesLookup
+  // Defined transactions that can be submitted to the ledger
   transactionType: BytesLookup
+  // Valid transaction names
   transactionNames: string[]
+  // Maps serializable types to their TypeScript class implementation
   dataTypes: Record<string, typeof SerializedType>
 
   /**
