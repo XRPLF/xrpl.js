@@ -12,6 +12,7 @@ import { Buffer } from 'buffer/'
  */
 class BinaryParser {
   private bytes: Buffer
+  definitions: XrplDefinitionsBase
 
   /**
    * Initialize bytes to a hex string
@@ -22,9 +23,10 @@ class BinaryParser {
    */
   constructor(
     hexBytes: string,
-    readonly definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
+    definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
   ) {
     this.bytes = Buffer.from(hexBytes, 'hex')
+    this.definitions = definitions
   }
 
   /**
