@@ -47,8 +47,8 @@ class XrplDefinitionsBase {
     // Helps catch errors early in JavaScript code.
     if (types == undefined) {
       throw new TypeError(
-        'You passed in an undefined `types` parameter, but `types` must be defined since it contains logic for encoding/decoding transaction data.' +
-          ' If you have NOT added/modified any data types, you can import and use `coreTypes` from the types folder.',
+        'You passed in an undefined `types` parameter, but `types` must be defined since it contains logic for encoding/decoding transaction data. ' +
+          'If you have NOT added/modified any data types, you can import and use `coreTypes` from the types folder.',
       )
     }
 
