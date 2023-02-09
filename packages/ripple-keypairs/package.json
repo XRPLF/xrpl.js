@@ -4,7 +4,7 @@
   "description": "Cryptographic key pairs for the XRP Ledger",
   "scripts": {
     "build": "tsc -b",
-    "test": "tsc -b && nyc mocha",
+    "test": "jest --verbose false --silent=false ./test/*.test.ts",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
     "lint": "eslint . --ext .ts",
     "prepublish": "npm run lint && npm test"

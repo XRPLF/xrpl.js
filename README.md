@@ -25,7 +25,7 @@ All of which works in Node.js (tested for v14+) & web browsers (tested for Chrom
 
 ### Requirements
 
-- **[Node.js v14](https://nodejs.org/)** is recommended. We also support v12 and v16. Other versions may work but are not frequently tested.
++ **[Node.js v14](https://nodejs.org/)** is recommended. We also support v16 and v18. Other versions may work but are not frequently tested.
 
 ### Installing xrpl.js
 
@@ -110,6 +110,7 @@ You are also welcome to create an [issue](https://github.com/XRPLF/xrpl.js/issue
 
 - [xrpl.js Reference Docs](https://js.xrpl.org/)
 - [xrpl.org (Detailed docs on how the XRPL works)](https://xrpl.org/references.html)
+- [XRPL Code Samples](https://github.com/XRPLF/xrpl-dev-portal/tree/master/content/_code-samples)
 - [#javascript in the XRPL Developer Discord for questions & support](https://xrpldevs.org)
 - [xrpl-announce (The mailing list for new xrpl.js versions)](https://groups.google.com/g/xrpl-announce)
 - [Applications that use xrpl.js](https://github.com/XRPLF/xrpl.js/blob/main/APPLICATIONS.md) (You can open a PR to add your project!)

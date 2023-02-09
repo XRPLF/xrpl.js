@@ -1,43 +1,52 @@
 import { assert } from 'chai'
-import _ from 'lodash'
-import { OfferCreate } from 'xrpl-local'
 
+import { OfferCreate } from '../../../src'
 import serverUrl from '../serverUrl'
-import { setupClient, teardownClient } from '../setup'
+import {
+  setupClient,
+  teardownClient,
+  type XrplIntegrationTestContext,
+} from '../setup'
 import { testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
 
 describe('OfferCreate', function () {
-  this.timeout(TIMEOUT)
+  let testContext: XrplIntegrationTestContext
 
-  beforeEach(_.partial(setupClient, serverUrl))
-  afterEach(teardownClient)
-
-  it('base', async function () {
-    const tx: OfferCreate = {
-      TransactionType: 'OfferCreate',
-      Account: this.wallet.classicAddress,
-      TakerGets: '13100000',
-      TakerPays: {
-        currency: 'USD',
-        issuer: this.wallet.classicAddress,
-        value: '10',
-      },
-    }
-
-    await testTransaction(this.client, tx, this.wallet)
-
-    // confirm that the offer actually went through
-    const accountOffersResponse = await this.client.request({
-      command: 'account_offers',
-      account: this.wallet.classicAddress,
-    })
-    assert.lengthOf(
-      accountOffersResponse.result.offers,
-      1,
-      'Should be exactly one offer on the ledger',
-    )
+  beforeEach(async () => {
+    testContext = await setupClient(serverUrl)
   })
+  afterEach(async () => teardownClient(testContext))
+
+  it(
+    'base',
+    async () => {
+      const tx: OfferCreate = {
+        TransactionType: 'OfferCreate',
+        Account: testContext.wallet.classicAddress,
+        TakerGets: '13100000',
+        TakerPays: {
+          currency: 'USD',
+          issuer: testContext.wallet.classicAddress,
+          value: '10',
+        },
+      }
+
+      await testTransaction(testContext.client, tx, testContext.wallet)
+
+      // confirm that the offer actually went through
+      const accountOffersResponse = await testContext.client.request({
+        command: 'account_offers',
+        account: testContext.wallet.classicAddress,
+      })
+      assert.lengthOf(
+        accountOffersResponse.result.offers!,
+        1,
+        'Should be exactly one offer on the ledger',
+      )
+    },
+    TIMEOUT,
+  )
 })

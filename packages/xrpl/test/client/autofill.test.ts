@@ -1,14 +1,18 @@
 import { assert } from 'chai'
+
 import {
   XrplError,
   AccountDelete,
   EscrowFinish,
   Payment,
   Transaction,
-} from 'xrpl-local'
-
+} from '../../src'
 import rippled from '../fixtures/rippled'
-import { setupClient, teardownClient } from '../setupClient'
+import {
+  setupClient,
+  teardownClient,
+  type XrplTestContext,
+} from '../setupClient'
 import { assertRejects } from '../testUtils'
 
 const Fee = '10'
@@ -16,8 +20,12 @@ const Sequence = 1432
 const LastLedgerSequence = 2908734
 
 describe('client.autofill', function () {
-  beforeEach(setupClient)
-  afterEach(teardownClient)
+  let testContext: XrplTestContext
+
+  beforeEach(async () => {
+    testContext = await setupClient()
+  })
+  afterEach(async () => teardownClient(testContext))
 
   it('should not autofill if fields are present', async function () {
     const tx: Transaction = {
@@ -28,7 +36,7 @@ describe('client.autofill', function () {
       Sequence,
       LastLedgerSequence,
     }
-    const txResult = await this.client.autofill(tx)
+    const txResult = await testContext.client.autofill(tx)
 
     assert.strictEqual(txResult.Fee, Fee)
     assert.strictEqual(txResult.Sequence, Sequence)
@@ -42,11 +50,17 @@ describe('client.autofill', function () {
       Amount: '1234',
       Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
     }
-    this.mockRippled.addResponse('account_info', rippled.account_info.normal)
-    this.mockRippled.addResponse('server_info', rippled.server_info.normal)
-    this.mockRippled.addResponse('ledger', rippled.ledger.normal)
+    testContext.mockRippled!.addResponse(
+      'account_info',
+      rippled.account_info.normal,
+    )
+    testContext.mockRippled!.addResponse(
+      'server_info',
+      rippled.server_info.normal,
+    )
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
 
-    const txResult = await this.client.autofill(tx)
+    const txResult = await testContext.client.autofill(tx)
 
     assert.strictEqual(txResult.Account, 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf')
     assert.strictEqual(
@@ -63,7 +77,7 @@ describe('client.autofill', function () {
       Fee,
       LastLedgerSequence,
     }
-    this.mockRippled.addResponse('account_info', {
+    testContext.mockRippled!.addResponse('account_info', {
       status: 'success',
       type: 'response',
       result: {
@@ -72,16 +86,22 @@ describe('client.autofill', function () {
         },
       },
     })
-    const txResult = await this.client.autofill(tx)
+    const txResult = await testContext.client.autofill(tx)
 
     assert.strictEqual(txResult.Sequence, 23)
   })
 
   it('should throw error if account deletion blockers exist', async function () {
-    this.mockRippled.addResponse('account_info', rippled.account_info.normal)
-    this.mockRippled.addResponse('ledger', rippled.ledger.normal)
-    this.mockRippled.addResponse('server_info', rippled.server_info.normal)
-    this.mockRippled.addResponse(
+    testContext.mockRippled!.addResponse(
+      'account_info',
+      rippled.account_info.normal,
+    )
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+    testContext.mockRippled!.addResponse(
+      'server_info',
+      rippled.server_info.normal,
+    )
+    testContext.mockRippled!.addResponse(
       'account_objects',
       rippled.account_objects.normal,
     )
@@ -95,7 +115,7 @@ describe('client.autofill', function () {
       LastLedgerSequence,
     }
 
-    await assertRejects(this.client.autofill(tx), XrplError)
+    await assertRejects(testContext.client.autofill(tx), XrplError)
   })
 
   describe('when autofill Fee is missing', function () {
@@ -107,8 +127,11 @@ describe('client.autofill', function () {
         Sequence,
         LastLedgerSequence,
       }
-      this.mockRippled.addResponse('server_info', rippled.server_info.normal)
-      const txResult = await this.client.autofill(tx)
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+      const txResult = await testContext.client.autofill(tx)
 
       assert.strictEqual(txResult.Fee, '12')
     })
@@ -123,11 +146,17 @@ describe('client.autofill', function () {
           'A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100',
         Fulfillment: 'A0028000',
       }
-      this.mockRippled.addResponse('account_info', rippled.account_info.normal)
-      this.mockRippled.addResponse('ledger', rippled.ledger.normal)
-      this.mockRippled.addResponse('server_info', rippled.server_info.normal)
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
 
-      const txResult = await this.client.autofill(tx)
+      const txResult = await testContext.client.autofill(tx)
       assert.strictEqual(txResult.Fee, '399')
     })
 
@@ -137,9 +166,12 @@ describe('client.autofill', function () {
         TransactionType: 'AccountDelete',
         Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
       }
-      this.mockRippled.addResponse('account_info', rippled.account_info.normal)
-      this.mockRippled.addResponse('ledger', rippled.ledger.normal)
-      this.mockRippled.addResponse('server_state', {
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+      testContext.mockRippled!.addResponse('server_state', {
         status: 'success',
         type: 'response',
         result: {
@@ -150,12 +182,15 @@ describe('client.autofill', function () {
           },
         },
       })
-      this.mockRippled.addResponse('server_info', rippled.server_info.normal)
-      this.mockRippled.addResponse(
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+      testContext.mockRippled!.addResponse(
         'account_objects',
         rippled.account_objects.empty,
       )
-      const txResult = await this.client.autofill(tx)
+      const txResult = await testContext.client.autofill(tx)
 
       assert.strictEqual(txResult.Fee, '2000000')
     })
@@ -170,10 +205,16 @@ describe('client.autofill', function () {
           'A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100',
         Fulfillment: 'A0028000',
       }
-      this.mockRippled.addResponse('account_info', rippled.account_info.normal)
-      this.mockRippled.addResponse('ledger', rippled.ledger.normal)
-      this.mockRippled.addResponse('server_info', rippled.server_info.normal)
-      const txResult = await this.client.autofill(tx, 4)
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+      const txResult = await testContext.client.autofill(tx, 4)
 
       assert.strictEqual(txResult.Fee, '459')
     })
@@ -187,14 +228,14 @@ describe('client.autofill', function () {
       Fee,
       Sequence,
     }
-    this.mockRippled.addResponse('ledger', {
+    testContext.mockRippled!.addResponse('ledger', {
       status: 'success',
       type: 'response',
       result: {
         ledger_index: 9038214,
       },
     })
-    const txResult = await this.client.autofill(tx)
+    const txResult = await testContext.client.autofill(tx)
     assert.strictEqual(txResult.LastLedgerSequence, 9038234)
   })
 
@@ -204,7 +245,7 @@ describe('client.autofill', function () {
       Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
       Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
     }
-    this.mockRippled.addResponse('account_info', {
+    testContext.mockRippled!.addResponse('account_info', {
       status: 'success',
       type: 'response',
       result: {
@@ -213,14 +254,14 @@ describe('client.autofill', function () {
         },
       },
     })
-    this.mockRippled.addResponse('ledger', {
+    testContext.mockRippled!.addResponse('ledger', {
       status: 'success',
       type: 'response',
       result: {
         ledger_index: 9038214,
       },
     })
-    this.mockRippled.addResponse('server_info', {
+    testContext.mockRippled!.addResponse('server_info', {
       status: 'success',
       type: 'response',
       result: {
@@ -231,7 +272,7 @@ describe('client.autofill', function () {
         },
       },
     })
-    const txResult = await this.client.autofill(tx)
+    const txResult = await testContext.client.autofill(tx)
     assert.strictEqual(txResult.Fee, '12')
     assert.strictEqual(txResult.Sequence, 23)
     assert.strictEqual(txResult.LastLedgerSequence, 9038234)

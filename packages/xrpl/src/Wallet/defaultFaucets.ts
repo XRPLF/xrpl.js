@@ -1,4 +1,4 @@
-import type { Client } from '..'
+import type { Client } from '../client'
 import { XRPLFaucetError } from '../errors'
 
 export interface FaucetWallet {

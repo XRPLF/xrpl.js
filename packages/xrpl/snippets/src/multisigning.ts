@@ -4,7 +4,7 @@ import {
   AccountSet,
   convertStringToHex,
   SignerListSet,
-} from '../../dist/npm'
+} from '../../src'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 

@@ -1,12 +1,13 @@
 import { assert } from 'chai'
 import { decode, encode, XrplDefinitions } from 'ripple-binary-codec'
-import { Transaction, ValidationError } from 'xrpl-local'
-import Wallet from 'xrpl-local/Wallet'
+
+import { Transaction, ValidationError } from '../../src'
+import Wallet from '../../src/Wallet'
 import {
   authorizeChannel,
   multisign,
   verifySignature,
-} from 'xrpl-local/Wallet/signer'
+} from '../../src/Wallet/signer'
 
 import * as definitions from '../fixtures/rippled/definitions-with-diff-payment.json'
 

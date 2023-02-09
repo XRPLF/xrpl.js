@@ -23,7 +23,7 @@
     "build": "tsc -b && copyfiles ./src/enums/definitions.json ./dist/enums/",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
     "prepare": "npm run build && npm test",
-    "test": "jest",
+    "test": "jest --verbose false --silent=false ./test/*.test.js",
     "lint": "eslint . --ext .ts --ext .test.js"
   },
   "repository": {
@@ -38,6 +38,6 @@
   "readmeFilename": "README.md",
   "prettier": "@xrplf/prettier-config",
   "engines": {
-    "node": ">=10.22.0"
+    "node": ">= 10"
   }
 }

@@ -1,5 +1,5 @@
 import { BaseRequest, BaseResponse } from './baseMethod'
-import { JobType, ServerState, StateAccounting } from './serverInfo'
+import { JobType, ServerState, StateAccountingFinal } from './serverInfo'
 
 /**
  * The `server_state` command asks the server for various machine-readable
@@ -35,7 +35,10 @@ export interface ServerStateResponse extends BaseResponse {
       io_latency_ms: number
       jq_trans_overflow: string
       last_close: {
-        converge_time_s: number
+        // coverage_time_s only exists for `server_info` requests. `server_state` is a "non human" api request,
+        // therefore the type is coverage_time
+        // See https://github.com/XRPLF/rippled/blob/83faf43140e27e5d6d6779eaa0ffb75c33d98029/src/ripple/app/misc/NetworkOPs.cpp#L2458
+        converge_time: number
         proposers: number
       }
       load?: {
@@ -48,24 +51,27 @@ export interface ServerStateResponse extends BaseResponse {
       load_factor_fee_queue?: number
       load_factor_fee_reference?: number
       load_factor_server?: number
+      peer_disconnects?: string
+      peer_disconnects_resources?: string
       peers: number
       pubkey_node: string
       pubkey_validator?: string
       server_state: ServerState
-      server_state_duration_us: number
-      state_accounting: Record<ServerState, StateAccounting>
+      server_state_duration_us: string
+      state_accounting: StateAccountingFinal
       time: string
       uptime: number
       validated_ledger?: {
-        age: number
+        age?: number
         base_fee: number
+        close_time: number
         hash: string
         reserve_base: number
         reserve_inc: number
         seq: number
       }
       validation_quorum: number
-      validator_list_expires?: string
+      validator_list_expires?: number
     }
   }
 }

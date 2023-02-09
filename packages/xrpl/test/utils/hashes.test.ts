@@ -3,7 +3,8 @@ import path from 'path'
 
 import { assert } from 'chai'
 import { encode } from 'ripple-binary-codec'
-import { OfferCreate, Transaction, ValidationError } from 'xrpl-local'
+
+import { OfferCreate, Transaction, ValidationError } from '../../src'
 import {
   hashStateTree,
   hashTxTree,
@@ -14,8 +15,7 @@ import {
   hashAccountRoot,
   hashOfferId,
   hashSignerListId,
-} from 'xrpl-local/utils/hashes'
-
+} from '../../src/utils/hashes'
 import fixtures from '../fixtures/rippled'
 import { assertResultMatch } from '../testUtils'
 
@@ -61,13 +61,10 @@ function createLedgerTest(ledgerIndex: number): void {
 
 describe('Hashes', function () {
   // This is the first recorded ledger with a non empty transaction set
-  // eslint-disable-next-line mocha/no-setup-in-describe -- runs tests
   createLedgerTest(38129)
   // Because, why not.
-  // eslint-disable-next-line mocha/no-setup-in-describe -- runs tests
   createLedgerTest(40000)
   // 1311 AffectedNodes, no accounts
-  // eslint-disable-next-line mocha/no-setup-in-describe -- runs tests
   createLedgerTest(7501326)
 
   it('calcAccountRootEntryHash', function () {
