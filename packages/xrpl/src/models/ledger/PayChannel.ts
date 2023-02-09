@@ -24,15 +24,15 @@ export default interface PayChannel extends BaseLedgerEntry {
    */
   Destination: string
   /**
-   * Total that has been allocated to this channel. This includes amounts that
-   * has been paid to the destination address. This is initially set by the
+   * Total amount that has been allocated to this channel. This includes amounts
+   * that have been paid to the destination address. This is initially set by the
    * transaction that created the channel and can be increased if the source
    * address sends a PaymentChannelFund transaction.
    */
   Amount: string
   /**
-   * Total already paid out by the channel. The difference between this value and
-   *  the Amount field is how much can still be paid to the destination address
+   * Total amount already paid out by the channel. The difference between this value
+   * and the Amount field is how much can still be paid to the destination address
    * with PaymentChannelClaim transactions. If the channel closes, the remaining
    * difference is returned to the source address.
    */
