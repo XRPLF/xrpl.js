@@ -1,10 +1,10 @@
 const { encode, decode } = require('../dist')
 const { XrplDefinitions } = require('../dist/enums/xrpl-definitions')
 const { coreTypes } = require('../dist/types')
-const newDefinitionsJson = require('./fixtures/new-type.json')
+const newDefinitionsJson = require('./fixtures/new-definitions.json')
 const newFieldDefs = require('./fixtures/new-field.json')
 const { UInt32 } = require('../dist/types/uint-32')
-const newTransactionDefs = require('./fixtures/new-transaction-type.json')
+const newTransactionDefs = require('./fixtures/new-transaction-type-definitions.json')
 
 const txJson = {
   Account: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',

@@ -70,9 +70,7 @@ If you're building your own sidechain or writing an amendment for the XRPL, you 
 To do that there are a couple things you need to do:
 
 1. Generate your own `definitions.json` file from rippled source code using [this tool](https://github.com/RichardAH/xrpl-codec-gen) (The default `definitions.json` for mainnet can be found [here](https://github.com/XRPLF/xrpl.js/blob/main/packages/ripple-binary-codec/src/enums/definitions.json))
-2. Create new SerializedType classes for any new Types (So that encode/decode behavior is defined).
-
-- Note: This is very rarely required. The SerializedType classes correspond to "ST..." classes in Rippled.
+2. Create new SerializedType classes for any new Types (So that encode/decode behavior is defined). The SerializedType classes correspond to "ST..." classes in Rippled. Note: This is very rarely required.
 
 - For examples of how to implement that you can look at objects in the [`types` folder](../types/), such as `Amount`, `UInt8`, or `STArray`.
 
@@ -84,7 +82,7 @@ To do that there are a couple things you need to do:
 
 ```
 // newDefinitionsJson is where you can import your custom defined definitions.json file
-const newDefinitionsJson = require('./new-type.json')
+const newDefinitionsJson = require('./new-transaction-type-definitions.json')
 const { XrplDefinitions, Client } = require('xrpl')
 
 const newDefs = new XrplDefinitions(newDefinitionsJson)
@@ -123,7 +121,7 @@ const { XrplDefinitions } = require('../dist/coretypes')
 const { coreTypes } = require('../dist/types')
 
 // newDefinitionsJson is where you can import your custom defined definitions.json file
-const newDefinitionsJson = require('./fixtures/new-type.json')
+const newDefinitionsJson = require('./fixtures/new-definitions.json')
 
 
 // For any new Types you create, you'll need to make a class with the same name which extends a SerializedType object
