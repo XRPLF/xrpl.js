@@ -108,20 +108,17 @@ interface ClaimObject {
 function signingClaimData(claim: ClaimObject): Buffer {
   const prefix = HashPrefix.paymentChannelClaim
   const channel = coreTypes.Hash256.from(claim.channel).toBytes()
-  if (typeof claim.amount === 'object') {
-    const amount = coreTypes.Amount.from(claim.amount).toBytes()
-    const bytesList = new BytesList()
-    bytesList.put(prefix)
-    bytesList.put(channel)
-    bytesList.put(amount)
-    return bytesList.toBytes()
-  }
-  const num = bigInt(String(claim.amount))
   const bytesList = new BytesList()
-  const amount = coreTypes.UInt64.from(num).toBytes()
   bytesList.put(prefix)
   bytesList.put(channel)
-  bytesList.put(amount)
+  if (typeof claim.amount === 'object') {
+    const amount = coreTypes.Amount.from(claim.amount).toBytes()
+    bytesList.put(amount)
+  } else {
+    const num = bigInt(String(claim.amount))
+    const amount = coreTypes.UInt64.from(num).toBytes()
+    bytesList.put(amount)
+  }
   return bytesList.toBytes()
 }
 
