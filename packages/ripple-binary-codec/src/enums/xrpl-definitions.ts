@@ -5,6 +5,11 @@ import {
 import { coreTypes } from '../types'
 import { SerializedType } from '../types/serialized-type'
 
+/**
+ * Stores the various types and fields for rippled to be used to encode/decode information later on.
+ * Should be used instead of XrplDefinitionsBase since this defines default `types` for serializing/deserializing
+ * ledger data.
+ */
 export class XrplDefinitions extends XrplDefinitionsBase {
   /**
    * Present rippled types in a typed and updatable format.
