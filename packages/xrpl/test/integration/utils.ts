@@ -92,40 +92,25 @@ export async function testTransaction(
   client: Client,
   transaction: Transaction,
   wallet: Wallet,
-  useLedgerAccept = true,
 ): Promise<void> {
   // Accept any un-validated changes.
-  if (useLedgerAccept) {
-    await ledgerAccept(client)
-  }
+  await ledgerAccept(client)
+  
   // sign/submit the transaction
   let response
-  if (useLedgerAccept) {
-    response = await client.submit(transaction, { wallet })
-  } else {
-    response = await client.submitAndWait(transaction, { wallet })
-  }
+  response = await client.submit(transaction, { wallet })
+  
   // check that the transaction was successful
   assert.equal(response.type, 'response')
-  if (useLedgerAccept) {
-    assert.equal(
-      response.result.engine_result,
-      'tesSUCCESS',
-      response.result.engine_result_message,
-    )
-  } else {
-    assert.equal(
-      response.result.meta.engine_result,
-      'tesSUCCESS',
-      JSON.stringify(response),
-    )
-  }
+  assert.equal(
+    response.result.engine_result,
+    'tesSUCCESS',
+    response.result.engine_result_message,
+  )
 
   // check that the transaction is on the ledger
   const signedTx = _.omit(response.result.tx_json, 'hash')
-  if (useLedgerAccept) {
-    await ledgerAccept(client)
-  }
+  await ledgerAccept(client)
   await verifySubmittedTransaction(client, signedTx as Transaction)
 }
 
