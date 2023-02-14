@@ -1,5 +1,6 @@
 import { assert } from 'chai'
 import _ from 'lodash'
+
 import {
   Client,
   convertStringToHex,
@@ -7,7 +8,6 @@ import {
   NFTokenMint,
   TransactionMetadata,
 } from '../../../src'
-
 import serverUrl from '../serverUrl'
 import { setupClient, teardownClient } from '../setup'
 

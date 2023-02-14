@@ -15,6 +15,7 @@ interface NFToken {
   }
 }
 
+/* eslint-disable max-lines-per-function -- simpler to have it in one function */
 /**
  * Gets the NFTokenID for an NFT recently minted with NFTokenMint.
  *
@@ -22,7 +23,6 @@ interface NFToken {
  * @returns The NFTokenID for the minted NFT.
  * @throws if meta is not TransactionMetadata.
  */
-/* eslint-disable-next-line @max-lines-per-function -- simpler to have it in one function */
 export default function getNFTokenID(
   meta: TransactionMetadata,
 ): string | undefined {
@@ -50,15 +50,17 @@ export default function getNFTokenID(
   const affectedNodes = meta.AffectedNodes.filter((node: Node) => {
     if (isCreatedNode(node)) {
       return node.CreatedNode.LedgerEntryType === 'NFTokenPage'
-    } else if (isModifiedNode(node)) {
+    }
+    if (isModifiedNode(node)) {
       return (
         node.ModifiedNode.LedgerEntryType === 'NFTokenPage' &&
-        Boolean(node.ModifiedNode?.PreviousFields?.NFTokens)
+        Boolean(node.ModifiedNode.PreviousFields?.NFTokens)
       )
     }
     return false
   })
 
+  /* eslint-disable @typescript-eslint/no-unnecessary-condition -- Doing conditional type checking */
   const previousTokenIDSet = new Set(
     affectedNodes
       .flatMap((node: Node) =>
@@ -70,16 +72,17 @@ export default function getNFTokenID(
       .filter((id: string) => id),
   )
 
-  const finalTokenIDs = (
-    affectedNodes.flatMap((node: Node) =>
+  const finalTokenIDs = affectedNodes
+    .flatMap((node) =>
       (
         (
           (node as ModifiedNode).ModifiedNode?.FinalFields ??
           (node as CreatedNode).CreatedNode?.NewFields
         ).NFTokens as NFToken[]
       ).map((token: NFToken) => token.NFToken.NFTokenID),
-    ) as string[]
-  ).filter((nftokenID: string) => nftokenID)
+    )
+    .filter((nftokenID: string) => nftokenID)
+  /* eslint-enable @typescript-eslint/no-unnecessary-condition -- Done with conditional type checking */
 
   const nftokenID = finalTokenIDs.find(
     (id: string) => !previousTokenIDSet.has(id),
@@ -87,3 +90,4 @@ export default function getNFTokenID(
 
   return nftokenID
 }
+/* eslint-enable max-lines-per-function -- done with long function */
