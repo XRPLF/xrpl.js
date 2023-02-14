@@ -14,6 +14,8 @@ export interface XChainAddAccountCreateAttestation extends BaseTransaction {
 
   AttestationRewardAccount: string
 
+  AttestationSignerAccount: string
+
   Destination: string
 
   OtherChainSource: string
