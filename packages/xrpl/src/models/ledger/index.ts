@@ -18,6 +18,7 @@ import PayChannel from './PayChannel'
 import RippleState, { RippleStateFlags } from './RippleState'
 import SignerList, { SignerListFlags } from './SignerList'
 import Ticket from './Ticket'
+import XChainOwnedClaimID from './XChainOwnedClaimID'
 
 export {
   AccountRoot,
@@ -42,4 +43,5 @@ export {
   SignerList,
   SignerListFlags,
   Ticket,
+  XChainOwnedClaimID,
 }

@@ -1,26 +1,25 @@
-import { Amount, XChainBridge } from '../common'
+import { XChainBridge } from '../common'
 
 import BaseLedgerEntry from './BaseLedgerEntry'
 
-export default interface Bridge extends BaseLedgerEntry {
-  LedgerEntryType: 'Bridge'
+export default interface XChainOwnedClaimID extends BaseLedgerEntry {
+  LedgerEntryType: 'XChainOwnedClaimID'
 
   Account: string
-
-  SignatureReward: Amount
-
-  MinAccountCreateAmount?: string
 
   XChainBridge: XChainBridge
 
   XChainClaimID: string
 
-  XChainAccountCreateCount: number
+  OtherChainSource: string
+  // TODO: type this better
+  XChainClaimAttestations: object[]
 
-  XChainAccountClaimCount: Amount
+  SignatureReward: string
+
   /**
-   * A bit-map of boolean flags. No flags are defined for Bridges, so this value
-   * is always 0.
+   * A bit-map of boolean flags. No flags are defined for XChainOwnedClaimIDs,
+   * so this value is always 0.
    */
   Flags: 0
   /**
