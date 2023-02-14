@@ -3,6 +3,7 @@ import AccountRoot, {
   AccountRootFlagsInterface,
 } from './AccountRoot'
 import Amendments from './Amendments'
+import Bridge from './Bridge'
 import Check from './Check'
 import DepositPreauth from './DepositPreauth'
 import DirectoryNode from './DirectoryNode'
@@ -23,6 +24,7 @@ export {
   AccountRootFlags,
   AccountRootFlagsInterface,
   Amendments,
+  Bridge,
   Check,
   DepositPreauth,
   DirectoryNode,
