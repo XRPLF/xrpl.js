@@ -1,5 +1,4 @@
-import { verifyPaymentChannelClaim } from 'xrpl-local'
-
+import { verifyPaymentChannelClaim } from '../../src'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 import { assertResultMatch } from '../testUtils'

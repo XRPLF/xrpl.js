@@ -1,42 +1,51 @@
 import { assert } from 'chai'
-import _ from 'lodash'
-import { BookOffersRequest, BookOffersResponse } from 'xrpl-local'
 
+import { BookOffersRequest, BookOffersResponse } from '../../../src'
 import serverUrl from '../serverUrl'
-import { setupClient, teardownClient } from '../setup'
+import {
+  setupClient,
+  teardownClient,
+  type XrplIntegrationTestContext,
+} from '../setup'
 
 // how long before each test case times out
 const TIMEOUT = 20000
 
 describe('book_offers', function () {
-  this.timeout(TIMEOUT)
+  let testContext: XrplIntegrationTestContext
 
-  beforeEach(_.partial(setupClient, serverUrl))
-  afterEach(teardownClient)
-
-  it('base', async function () {
-    const bookOffer: BookOffersRequest = {
-      command: 'book_offers',
-      taker_gets: {
-        currency: 'XRP',
-      },
-      taker_pays: {
-        currency: 'USD',
-        issuer: this.wallet.classicAddress,
-      },
-    }
-    const response = await this.client.request(bookOffer)
-
-    const expectedResponse: BookOffersResponse = {
-      id: response.id,
-      type: 'response',
-      result: {
-        ledger_current_index: response.result.ledger_current_index,
-        offers: response.result.offers,
-        validated: false,
-      },
-    }
-
-    assert.deepEqual(response, expectedResponse)
+  beforeEach(async () => {
+    testContext = await setupClient(serverUrl)
   })
+  afterEach(async () => teardownClient(testContext))
+
+  it(
+    'base',
+    async () => {
+      const bookOffer: BookOffersRequest = {
+        command: 'book_offers',
+        taker_gets: {
+          currency: 'XRP',
+        },
+        taker_pays: {
+          currency: 'USD',
+          issuer: testContext.wallet.classicAddress,
+        },
+      }
+      const response = await testContext.client.request(bookOffer)
+
+      const expectedResponse: BookOffersResponse = {
+        id: response.id,
+        type: 'response',
+        result: {
+          ledger_current_index: response.result.ledger_current_index,
+          offers: response.result.offers,
+          validated: false,
+        },
+      }
+
+      assert.deepEqual(response, expectedResponse)
+    },
+    TIMEOUT,
+  )
 })

@@ -9,6 +9,6 @@ export enum NodeType {
  * Abstract base class for SHAMapNode.
  */
 export abstract class Node {
-  public abstract addItem(_tag: string, _node: Node): void
   public abstract get hash(): string
+  public abstract addItem(_tag: string, _node: Node): void
 }

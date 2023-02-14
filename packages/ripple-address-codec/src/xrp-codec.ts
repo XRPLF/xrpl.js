@@ -2,15 +2,16 @@
  * Codec class
  */
 
-import * as baseCodec from 'base-x'
-import * as createHash from 'create-hash'
+import baseCodec = require('base-x')
+import type { BaseConverter } from 'base-x'
+import createHash = require('create-hash')
 
 import { seqEqual, concatArgs } from './utils'
 
 class Codec {
   private readonly _sha256: (bytes: Uint8Array) => Buffer
   private readonly _alphabet: string
-  private readonly _codec: baseCodec.BaseConverter
+  private readonly _codec: BaseConverter
 
   public constructor(options: {
     sha256: (bytes: Uint8Array) => Buffer
@@ -56,7 +57,7 @@ class Codec {
   ): {
     version: number[]
     bytes: Buffer
-    type: string | null
+    type: 'ed25519' | 'secp256k1' | null
   } {
     const versions = opts.versions
     const types = opts.versionTypes
@@ -204,7 +205,7 @@ export function decodeSeed(
 ): {
   version: number[]
   bytes: Buffer
-  type: string | null
+  type: 'ed25519' | 'secp256k1' | null
 } {
   return codecWithXrpAlphabet.decode(seed, opts)
 }

@@ -29,18 +29,6 @@ class LeafNode extends Node {
   }
 
   /**
-   * Add item to Leaf.
-   *
-   * @param tag - Index of the Node.
-   * @param node - Node to insert.
-   * @throws When called, because LeafNodes cannot addItem.
-   */
-  public addItem(tag: string, node: Node): void {
-    throw new XrplError('Cannot call addItem on a LeafNode')
-    this.addItem(tag, node)
-  }
-
-  /**
    * Get the hash of a LeafNode.
    *
    * @returns Hash or undefined.
@@ -63,6 +51,18 @@ class LeafNode extends Node {
       default:
         throw new XrplError('Tried to hash a SHAMap node of unknown type.')
     }
+  }
+
+  /**
+   * Add item to Leaf.
+   *
+   * @param tag - Index of the Node.
+   * @param node - Node to insert.
+   * @throws When called, because LeafNodes cannot addItem.
+   */
+  public addItem(tag: string, node: Node): void {
+    throw new XrplError('Cannot call addItem on a LeafNode')
+    this.addItem(tag, node)
   }
 }
 

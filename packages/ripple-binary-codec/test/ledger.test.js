@@ -3,7 +3,7 @@ const {
   transactionTreeHash,
   ledgerHash,
   accountStateHash,
-} = require('../dist/ledger-hashes')
+} = require('../src/ledger-hashes')
 
 describe('Ledger Hashes', function () {
   function testFactory(ledgerFixture) {

@@ -1,4 +1,4 @@
-const { encode, decode } = require('../dist')
+const { encode, decode } = require('../src')
 
 let json = {
   Account: 'rrrrrrrrrrrrrrrrrrrrrhoLvTp',

@@ -1,4 +1,4 @@
-const { encode, decode } = require('../dist')
+const { encode, decode } = require('../src')
 
 // Notice: no Amount or Fee
 const tx_json = {

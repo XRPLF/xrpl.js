@@ -1,5 +1,6 @@
 import { assert } from 'chai'
-import { isValidAddress } from 'xrpl-local'
+
+import { isValidAddress } from '../../src'
 
 describe('isValidAddress', function () {
   it('Validates valid classic address', function () {

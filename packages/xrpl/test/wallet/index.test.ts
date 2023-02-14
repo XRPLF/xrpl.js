@@ -1,9 +1,9 @@
 import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec'
-import { NFTokenMint, Payment, Transaction } from 'xrpl-local'
-import ECDSA from 'xrpl-local/ECDSA'
-import Wallet from 'xrpl-local/Wallet'
 
+import { NFTokenMint, Payment, Transaction } from '../../src'
+import ECDSA from '../../src/ECDSA'
+import Wallet from '../../src/Wallet'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 
@@ -411,6 +411,7 @@ describe('Wallet', function () {
         Wallet.fromSeed(secret).sign(lowercaseMemoTx)
       }, /MemoType field must be a hex value/u)
     })
+
     it('sign throws when MemoData is not a hex value', async function () {
       const secret = 'shd2nxpFD6iBRKWsRss2P4tKMWyy9'
       const lowercaseMemoTx: Transaction = {
@@ -436,6 +437,7 @@ describe('Wallet', function () {
         Wallet.fromSeed(secret).sign(lowercaseMemoTx)
       }, /MemoData field must be a hex value/u)
     })
+
     it('sign throws when MemoFormat is not a hex value', async function () {
       const secret = 'shd2nxpFD6iBRKWsRss2P4tKMWyy9'
       const lowercaseMemoTx: Transaction = {

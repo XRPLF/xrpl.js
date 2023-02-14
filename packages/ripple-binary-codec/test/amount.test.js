@@ -1,5 +1,5 @@
 const { loadFixture } = require('./utils')
-const { coreTypes } = require('../dist/types')
+const { coreTypes } = require('../src/types')
 const { Amount } = coreTypes
 const fixtures = loadFixture('data-driven-tests.json')
 

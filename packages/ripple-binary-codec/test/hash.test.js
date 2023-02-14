@@ -1,4 +1,4 @@
-const { coreTypes } = require('../dist/types')
+const { coreTypes } = require('../src/types')
 const { Hash128, Hash160, Hash256, AccountID, Currency } = coreTypes
 const { Buffer } = require('buffer/')
 

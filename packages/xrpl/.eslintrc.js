@@ -6,7 +6,12 @@ module.exports = {
   parserOptions: {
     // Enable linting rules with type information from our tsconfig
     tsconfigRootDir: __dirname,
-    project: ['./tsconfig.eslint.json'],
+    project: [
+      './tsconfig.eslint.json',
+      '../ripple-binary-codec/tsconfig.eslint.json',
+      '../ripple-address-codec/tsconfig.eslint.json',
+      '../ripple-keypairs/tsconfig.eslint.json',
+    ],
 
     // Allow the use of imports / ES modules
     sourceType: 'module',
@@ -23,11 +28,13 @@ module.exports = {
     node: true,
     // Add all ECMAScript 2020 globals and automatically set the ecmaVersion parser option to ES2020
     es2020: true,
+    jest: true,
   },
 
   plugins: [],
-  extends: ['@xrplf/eslint-config/base', 'plugin:mocha/recommended'],
+  extends: ['@xrplf/eslint-config/base'],
   rules: {
+    'multiline-comment-style': 'off',
     // Disabled until https://github.com/import-js/eslint-plugin-import/pull/2305 is resolved to
     // accomodate this change https://github.com/XRPLF/xrpl.js/pull/2133
     'import/no-unused-modules': 'off',
@@ -51,7 +58,6 @@ module.exports = {
     // no-shadow has false-positives for enum, @typescript-eslint version fixes that
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
-    'multiline-comment-style': ['error', 'starred-block'],
     'jsdoc/check-examples': 'off',
 
     'tsdoc/syntax': 'off',
@@ -74,13 +80,16 @@ module.exports = {
         'max-statements': 'off',
         // Snippets have logs on console to better understand the working.
         'no-console': 'off',
+        'import/no-extraneous-dependencies': 'off',
       },
     },
     {
       files: ['test/**/*.ts'],
       rules: {
-        // Because this project is managed by lerna, dev dependencies are
-        // hoisted and do not appear in the package.json.
+        /*
+         * Because this project is managed by lerna, dev dependencies are
+         * hoisted and do not appear in the package.json.
+         */
         'import/no-extraneous-dependencies': 'off',
         'node/no-extraneous-import': 'off',
 
@@ -102,19 +111,12 @@ module.exports = {
         // Tests are already in 2 callbacks, so max 3 is pretty restrictive
         'max-nested-callbacks': 'off',
 
-        // setup/teardown client is easier to do in before/after, even if there is only one testcase
-        'mocha/no-hooks-for-single-case': 'off',
-
         // messes with fixtures
         'consistent-default-export-name/default-import-match-filename': 'off',
       },
     },
     {
       files: ['test/client/*.ts'],
-      rules: {
-        // Rule does not work with dynamically generated tests.
-        'mocha/no-setup-in-describe': 'off',
-      },
     },
     {
       files: ['test/models/*.ts'],

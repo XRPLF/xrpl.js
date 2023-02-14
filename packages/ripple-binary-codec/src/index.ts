@@ -102,7 +102,7 @@ function decodeQuality(value: string): string {
   return quality.decode(value).toString()
 }
 
-export = {
+export {
   decode,
   encode,
   encodeForSigning,
