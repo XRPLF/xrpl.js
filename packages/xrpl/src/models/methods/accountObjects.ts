@@ -1,5 +1,6 @@
 import { AccountObjectType, LedgerIndex } from '../common'
 import {
+  Bridge,
   Check,
   DepositPreauth,
   Escrow,
@@ -8,6 +9,8 @@ import {
   RippleState,
   SignerList,
   Ticket,
+  XChainOwnedClaimID,
+  XChainOwnedCreateAccountClaimID,
 } from '../ledger'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
@@ -67,6 +70,8 @@ type AccountObject =
   | SignerList
   | Ticket
   | RippleState
+  | XChainOwnedClaimID
+  | XChainOwnedCreateAccountClaimID
 
 /**
  * Response expected from an {@link AccountObjectsRequest}.
