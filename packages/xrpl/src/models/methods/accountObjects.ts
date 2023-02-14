@@ -22,7 +22,6 @@ type AccountObjectType =
   | 'signer_list'
   | 'state'
   | 'ticket'
-  | 'bridge'
 
 /**
  * The account_objects command returns the raw ledger format for all objects
