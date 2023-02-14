@@ -16,7 +16,6 @@ interface NFToken {
   }
 }
 
-/* eslint-disable max-lines-per-function -- simpler to have it in one function */
 /**
  * Gets the NFTokenID for an NFT recently minted with NFTokenMint.
  *
@@ -65,18 +64,18 @@ export default function getNFTokenID(
   const previousTokenIDSet = new Set(
     flatMap(affectedNodes, (node) =>
       (
-        (node as ModifiedNode).ModifiedNode?.PreviousFields
-          ?.NFTokens as NFToken[]
+        ((node as ModifiedNode).ModifiedNode?.PreviousFields
+          ?.NFTokens as NFToken[]) ?? []
       ).map((token) => token.NFToken.NFTokenID),
     ).filter((id) => id),
   )
 
   const finalTokenIDs = flatMap(affectedNodes, (node) =>
     (
-      (
+      ((
         (node as ModifiedNode).ModifiedNode?.FinalFields ??
         (node as CreatedNode).CreatedNode?.NewFields
-      ).NFTokens as NFToken[]
+      )?.NFTokens as NFToken[]) ?? []
     ).map((token) => token.NFToken.NFTokenID),
   ).filter((nftokenID) => nftokenID)
   /* eslint-enable @typescript-eslint/no-unnecessary-condition -- Done with conditional type checking */
@@ -85,4 +84,3 @@ export default function getNFTokenID(
 
   return nftokenID
 }
-/* eslint-enable max-lines-per-function -- done with long function */
