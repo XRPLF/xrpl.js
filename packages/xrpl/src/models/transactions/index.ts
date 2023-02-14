@@ -52,4 +52,8 @@ export { XChainCommit } from './XChainCommit'
 export { XChainCreateBridge } from './XChainCreateBridge'
 export { XChainCreateClaimID } from './XChainCreateClaimID'
 export { XChainAccountCreateCommit } from './XChainAccountCreateCommit'
-export { XChainModifyBridge } from './XChainModifyBridge'
+export {
+  XChainModifyBridge,
+  XChainModifyBridgeFlags,
+  XChainModifyBridgeFlagsInterface,
+} from './XChainModifyBridge'

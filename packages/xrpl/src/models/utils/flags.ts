@@ -22,6 +22,10 @@ import {
 } from '../transactions/paymentChannelClaim'
 import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlagsInterface, TrustSetFlags } from '../transactions/trustSet'
+import {
+  XChainModifyBridgeFlags,
+  XChainModifyBridgeFlagsInterface,
+} from '../transactions/XChainModifyBridge'
 
 import { isFlagEnabled } from '.'
 
@@ -61,55 +65,30 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
 
   switch (tx.TransactionType) {
     case 'AccountSet':
-      tx.Flags = convertAccountSetFlagsToNumber(tx.Flags)
+      tx.Flags = convertFlagsToNumber(tx.Flags, AccountSetTfFlags)
       return
     case 'OfferCreate':
-      tx.Flags = convertOfferCreateFlagsToNumber(tx.Flags)
+      tx.Flags = convertFlagsToNumber(tx.Flags, OfferCreateFlags)
       return
     case 'PaymentChannelClaim':
-      tx.Flags = convertPaymentChannelClaimFlagsToNumber(tx.Flags)
+      tx.Flags = convertFlagsToNumber(tx.Flags, PaymentChannelClaimFlags)
       return
     case 'Payment':
-      tx.Flags = convertPaymentTransactionFlagsToNumber(tx.Flags)
+      tx.Flags = convertFlagsToNumber(tx.Flags, PaymentFlags)
       return
     case 'TrustSet':
-      tx.Flags = convertTrustSetFlagsToNumber(tx.Flags)
+      tx.Flags = convertFlagsToNumber(tx.Flags, TrustSetFlags)
+      return
+    case 'XChainModifyBridge':
+      tx.Flags = convertFlagsToNumber(tx.Flags, XChainModifyBridgeFlags)
       return
     default:
       tx.Flags = 0
   }
 }
 
-function convertAccountSetFlagsToNumber(
-  flags: AccountSetFlagsInterface,
-): number {
-  return reduceFlags(flags, AccountSetTfFlags)
-}
-
-function convertOfferCreateFlagsToNumber(
-  flags: OfferCreateFlagsInterface,
-): number {
-  return reduceFlags(flags, OfferCreateFlags)
-}
-
-function convertPaymentChannelClaimFlagsToNumber(
-  flags: PaymentChannelClaimFlagsInterface,
-): number {
-  return reduceFlags(flags, PaymentChannelClaimFlags)
-}
-
-function convertPaymentTransactionFlagsToNumber(
-  flags: PaymentFlagsInterface,
-): number {
-  return reduceFlags(flags, PaymentFlags)
-}
-
-function convertTrustSetFlagsToNumber(flags: TrustSetFlagsInterface): number {
-  return reduceFlags(flags, TrustSetFlags)
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- added ValidationError check for flagEnum
-function reduceFlags(flags: GlobalFlags, flagEnum: any): number {
+function convertFlagsToNumber(flags: GlobalFlags, flagEnum: any): number {
   return Object.keys(flags).reduce((resultFlags, flag) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
     if (flagEnum[flag] == null) {

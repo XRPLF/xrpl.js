@@ -1,7 +1,15 @@
 import { ValidationError } from '../../errors'
 import { Amount, XChainBridge } from '../common'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
+
+export enum XChainModifyBridgeFlags {
+  tfClearAccountCreateAmount = 0x00010000,
+}
+
+export interface XChainModifyBridgeFlagsInterface extends GlobalFlags {
+  tfClearAccountCreateAmount?: boolean
+}
 
 /**
  *
@@ -15,6 +23,8 @@ export interface XChainModifyBridge extends BaseTransaction {
   SignatureReward?: Amount
 
   MinAccountCreateAmount?: Amount
+
+  Flags?: number | XChainModifyBridgeFlagsInterface
 }
 
 /**
