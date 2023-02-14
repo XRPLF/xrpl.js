@@ -6,7 +6,6 @@ import {
   isCreatedNode,
   isModifiedNode,
   ModifiedNode,
-  Node,
   TransactionMetadata,
 } from '../models/transactions/metadata'
 
