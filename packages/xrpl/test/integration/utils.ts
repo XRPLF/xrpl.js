@@ -85,9 +85,7 @@ export async function verifySubmittedTransaction(
  * @param client - The client connection to the ledger.
  * @param transaction - The transaction to submit and verify.
  * @param wallet - The wallet to sign this transaction with.
- * @param useLedgerAccept - Set to false if using this with a real ledger like Testnet / Devnet
  */
-// eslint-disable-next-line max-params -- Useful optional param
 export async function testTransaction(
   client: Client,
   transaction: Transaction,
@@ -95,11 +93,10 @@ export async function testTransaction(
 ): Promise<void> {
   // Accept any un-validated changes.
   await ledgerAccept(client)
-  
+
   // sign/submit the transaction
-  let response
-  response = await client.submit(transaction, { wallet })
-  
+  const response = await client.submit(transaction, { wallet })
+
   // check that the transaction was successful
   assert.equal(response.type, 'response')
   assert.equal(

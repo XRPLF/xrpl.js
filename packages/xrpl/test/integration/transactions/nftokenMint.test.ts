@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { assert } from 'chai'
 import _ from 'lodash'
 import {
@@ -6,7 +5,7 @@ import {
   convertStringToHex,
   getNFTokenID,
   NFTokenMint,
-  TransactionMetadata
+  TransactionMetadata,
 } from '../../../src'
 
 import serverUrl from '../serverUrl'
@@ -57,9 +56,9 @@ describe('NFTokenMint', function () {
         `Expected to find an NFT with NFTokenID ${nftokenID} in account ${
           wallet.address
         } but did not find it.
-        \n\nHere's what was returned from 'account_nfts' for ${wallet.address}: ${JSON.stringify(
-          accountNFTs,
-        )}`,
+        \n\nHere's what was returned from 'account_nfts' for ${
+          wallet.address
+        }: ${JSON.stringify(accountNFTs)}`,
       )
     } finally {
       await client.disconnect()

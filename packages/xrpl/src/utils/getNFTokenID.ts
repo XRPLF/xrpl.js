@@ -1,26 +1,39 @@
-/* eslint-disable @typescript-eslint/promise-function-async */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/consistent-type-assertions */
+/* eslint-disable @typescript-eslint/consistent-type-assertions -- Necessary for parsing metadata */
 import {
   CreatedNode,
+  isCreatedNode,
+  isModifiedNode,
   ModifiedNode,
   Node,
   TransactionMetadata,
 } from '../models/transactions/metadata'
+
+interface NFToken {
+  NFToken: {
+    NFTokenID: string
+    URI: string
+  }
+}
 
 /**
  * Gets the NFTokenID for an NFT recently minted with NFTokenMint.
  *
  * @param meta - Metadata from the response to submitting an NFTokenMint transaction.
  * @returns The NFTokenID for the minted NFT.
+ * @throws if meta is not TransactionMetadata.
  */
+/* eslint-disable-next-line @max-lines-per-function -- simpler to have it in one function */
 export default function getNFTokenID(
   meta: TransactionMetadata,
 ): string | undefined {
+  /* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Provides a nicer error for js users */
+  if (meta.AffectedNodes === undefined) {
+    throw new TypeError(`Unable to parse the parameter given to getNFTokenID. 
+    'meta' must be the metadata from an NFTokenMint transaction. Received ${JSON.stringify(
+      meta,
+    )} instead.`)
+  }
+
   /*
    * When a mint results in splitting an existing page,
    * it results in a created page and a modified node. Sometimes,
@@ -33,41 +46,40 @@ export default function getNFTokenID(
    * not changed. Thus why we add the additional condition to check
    * if the PreviousFields contains NFTokens
    */
-  const affectedNodes = meta.AffectedNodes.filter(
-    (node: Node) =>
-      (node as CreatedNode)?.CreatedNode?.LedgerEntryType === 'NFTokenPage' ||
-      ((node as ModifiedNode)?.ModifiedNode?.LedgerEntryType ===
-        'NFTokenPage' &&
-        Boolean(
-          (node as ModifiedNode)?.ModifiedNode?.PreviousFields?.NFTokens,
-        )),
-  )
+
+  const affectedNodes = meta.AffectedNodes.filter((node: Node) => {
+    if (isCreatedNode(node)) {
+      return node.CreatedNode.LedgerEntryType === 'NFTokenPage'
+    } else if (isModifiedNode(node)) {
+      return (
+        node.ModifiedNode.LedgerEntryType === 'NFTokenPage' &&
+        Boolean(node.ModifiedNode?.PreviousFields?.NFTokens)
+      )
+    }
+    return false
+  })
 
   const previousTokenIDSet = new Set(
     affectedNodes
-      .flatMap(
-        (node: Node) =>
-          (
-            (node as ModifiedNode)?.ModifiedNode?.PreviousFields
-              ?.NFTokens as any[]
-          )?.map((token: any) => token.NFToken.NFTokenID), // Guessed that this was an AccountNFT, but incorrectly
+      .flatMap((node: Node) =>
+        (
+          (node as ModifiedNode).ModifiedNode?.PreviousFields
+            ?.NFTokens as NFToken[]
+        ).map((token: NFToken) => token.NFToken.NFTokenID),
       )
       .filter((id: string) => id),
   )
 
-  const step_1 = affectedNodes.flatMap(
-    (node: Node) =>
+  const finalTokenIDs = (
+    affectedNodes.flatMap((node: Node) =>
       (
         (
           (node as ModifiedNode).ModifiedNode?.FinalFields ??
           (node as CreatedNode).CreatedNode?.NewFields
-        )?.NFTokens as any[]
-      )?.map((token: any) => token.NFToken.NFTokenID), // Token was previously guessed to be AccountNFT
-  ) as string[]
-
-  const finalTokenIDs: string[] = step_1.filter(
-    (nftokenID: string) => nftokenID,
-  )
+        ).NFTokens as NFToken[]
+      ).map((token: NFToken) => token.NFToken.NFTokenID),
+    ) as string[]
+  ).filter((nftokenID: string) => nftokenID)
 
   const nftokenID = finalTokenIDs.find(
     (id: string) => !previousTokenIDSet.has(id),

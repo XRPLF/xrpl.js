@@ -29,6 +29,42 @@ export interface DeletedNode {
 
 export type Node = CreatedNode | ModifiedNode | DeletedNode
 
+/* eslint-disable @typescript-eslint/no-unnecessary-condition -- Typeguard requires checking if undefined */
+/* eslint-disable @typescript-eslint/consistent-type-assertions -- Type assertions needed for typeguard */
+
+/**
+ * A typeguard to check if a node is a CreatedNode.
+ *
+ * @param node - A node from metadata.
+ * @returns whether the given node is a CreatedNode.
+ */
+export function isCreatedNode(node: Node): node is CreatedNode {
+  return (node as CreatedNode).CreatedNode !== undefined
+}
+
+/**
+ * A typeguard to check if a node is a ModifiedNode.
+ *
+ * @param node - A node from metadata.
+ * @returns whether the given node is a ModifiedNode.
+ */
+export function isModifiedNode(node: Node): node is ModifiedNode {
+  return (node as ModifiedNode).ModifiedNode !== undefined
+}
+
+/**
+ * A typeguard to check if a node is a DeletedNode.
+ *
+ * @param node - A node from metadata.
+ * @returns whether the given node is a DeletedNode.
+ */
+export function isDeletedNode(node: Node): node is DeletedNode {
+  return (node as DeletedNode).DeletedNode !== undefined
+}
+
+/* eslint-enable @typescript-eslint/no-unnecessary-condition -- Done with typeguard functions */
+/* eslint-enable @typescript-eslint/consistent-type-assertions -- Done with typeguard functions */
+
 export interface TransactionMetadata {
   AffectedNodes: Node[]
   DeliveredAmount?: Amount
