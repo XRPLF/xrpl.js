@@ -159,20 +159,22 @@ class ShaMapInner extends ShaMapNode {
    */
   addItem(index?: Hash256, item?: ShaMapNode, leaf?: ShaMapLeaf): void {
     assert.ok(index !== undefined)
-    const nibble = index.nibblet(this.depth)
-    const existing = this.branches[nibble]
+    if (index !== undefined) {
+      const nibble = index.nibblet(this.depth)
+      const existing = this.branches[nibble]
 
-    if (existing === undefined) {
-      this.setBranch(nibble, leaf || new ShaMapLeaf(index, item))
-    } else if (existing instanceof ShaMapLeaf) {
-      const newInner = new ShaMapInner(this.depth + 1)
-      newInner.addItem(existing.index, undefined, existing)
-      newInner.addItem(index, item, leaf)
-      this.setBranch(nibble, newInner)
-    } else if (existing instanceof ShaMapInner) {
-      existing.addItem(index, item, leaf)
-    } else {
-      throw new Error('invalid ShaMap.addItem call')
+      if (existing === undefined) {
+        this.setBranch(nibble, leaf || new ShaMapLeaf(index, item))
+      } else if (existing instanceof ShaMapLeaf) {
+        const newInner = new ShaMapInner(this.depth + 1)
+        newInner.addItem(existing.index, undefined, existing)
+        newInner.addItem(index, item, leaf)
+        this.setBranch(nibble, newInner)
+      } else if (existing instanceof ShaMapInner) {
+        existing.addItem(index, item, leaf)
+      } else {
+        throw new Error('invalid ShaMap.addItem call')
+      }
     }
   }
 }

@@ -2,11 +2,35 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
+
+### Fixed
+* Code splitting improvements for lodash
+* Fixed missing reason code in websocket implemntation on websocket disconnect
+* Fix timeout error in request manager
+* Improved typescript typing
+
+### Added
+
+
+### Changed
+* All tests now use the Jest test runner and have been refactored for consistency across all packages
+
+### Deprecated
+Wallet.fromMmnemonic()
+
+
+## 2.6.0 (2022-11-21)
+
+### Fixed
+* Ignore `https-proxy-agent` in browsers for improved Vite integration
+
 ### Added
 * Optional custom amount field to `fundWallet`.
 
 ### Changed
 * Add support for Transaction objects in `verifyTransaction`
+* When connected to hooks v2 testnet or amm devnet, Client.fundWallet now defaults to using the faucet instead of requiring specification.
+* Ability to specify faucet url for wallet generation/funding purposes
 
 ### Removed
 * RPCs and utils related to the old sidechain design

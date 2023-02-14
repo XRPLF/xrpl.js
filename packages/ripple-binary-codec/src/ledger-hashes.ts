@@ -10,7 +10,7 @@ import { UInt32 } from './types/uint-32'
 import { UInt8 } from './types/uint-8'
 import { BinaryParser } from './serdes/binary-parser'
 import { JsonObject } from './types/serialized-type'
-import * as bigInt from 'big-integer'
+import bigInt = require('big-integer')
 
 /**
  * Computes the hash of a list of objects

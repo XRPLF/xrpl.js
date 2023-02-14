@@ -136,7 +136,6 @@ export interface LedgerStream extends BaseStream {
 /**
  * This response mirrors the LedgerStream, except it does NOT include the 'type' nor 'txn_count' fields.
  */
-// eslint-disable-next-line import/no-unused-modules -- Detailed enough to be worth exporting for end users.
 export interface LedgerStreamResponse {
   /**
    * The reference transaction cost as of this ledger version, in drops of XRP.

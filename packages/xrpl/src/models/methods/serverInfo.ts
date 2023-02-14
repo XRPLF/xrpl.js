@@ -33,6 +33,14 @@ export interface JobType {
   in_progress?: number
 }
 
+// The states for validating and proposing do not exist in the field state_accounting
+// See https://github.com/XRPLF/rippled/blob/develop/src/ripple/app/misc/NetworkOPs.cpp#L4545
+// https://github.com/XRPLF/rippled/blob/develop/src/ripple/app/misc/NetworkOPs.h#L66
+export type StateAccountingFinal = Record<
+  Exclude<ServerState, 'validating' | 'proposing'>,
+  StateAccounting
+>
+
 /**
  * Response expected from a {@link ServerInfoRequest}.
  *
@@ -158,6 +166,14 @@ export interface ServerInfoResponse extends BaseResponse {
        * cost.
        */
       load_factor_server?: number
+      /**
+       * The number of peer connections which were severed.
+       */
+      peer_disconnects?: string
+      /**
+       * The number of peer connections which were severed due to excess resource consumption.
+       */
+      peer_disconnects_resources?: string
       network_ledger?: 'waiting'
       /** How many other rippled servers this one is currently connected to. */
       peers: number
@@ -179,13 +195,13 @@ export interface ServerInfoResponse extends BaseResponse {
        * The number of consecutive microseconds the server has been in the
        * current state.
        */
-      server_state_duration_us: number
+      server_state_duration_us: string
       /**
        * A map of various server states with information about the time the
        * server spends in each. This can be useful for tracking the long-term
        * health of your server's connectivity to the network.
        */
-      state_accounting: Record<ServerState, StateAccounting>
+      state_accounting: StateAccountingFinal
       /** The current time in UTC, according to the server's clock. */
       time: string
       /** Number of consecutive seconds that the server has been operational. */
@@ -227,6 +243,11 @@ export interface ServerInfoResponse extends BaseResponse {
        * static validator list.
        */
       validator_list_expires?: string
+      validator_list?: {
+        count: number
+        expiration: 'never' | 'unknown' | string
+        status: 'active' | 'expired' | 'unknown'
+      }
     }
   }
 }
