@@ -9,59 +9,70 @@ import {
   TransactionMetadata,
 } from '../../../src'
 import serverUrl from '../serverUrl'
-import { setupClient, teardownClient } from '../setup'
+import {
+  setupClient,
+  teardownClient,
+  XrplIntegrationTestContext,
+} from '../setup'
 
 // how long before each test case times out
 const TIMEOUT = 20000
 
 describe('NFTokenMint', function () {
-  this.timeout(TIMEOUT)
+  let testContext: XrplIntegrationTestContext
 
-  beforeEach(_.partial(setupClient, serverUrl))
-  afterEach(teardownClient)
+  beforeEach(async () => {
+    testContext = await setupClient(serverUrl)
+  })
+  afterEach(async () => teardownClient(testContext))
 
-  it('get NFTokenID', async function () {
-    const client = new Client('wss://s.altnet.rippletest.net:51233/')
-    await client.connect()
+  it(
+    'get NFTokenID',
+    async function () {
+      const client = new Client('wss://s.altnet.rippletest.net:51233/')
+      await client.connect()
 
-    const { wallet, balance: _balance } = await client.fundWallet()
+      const { wallet, balance: _balance } = await client.fundWallet()
 
-    const tx: NFTokenMint = {
-      TransactionType: 'NFTokenMint',
-      Account: wallet.address,
-      URI: convertStringToHex('https://www.google.com'),
-      NFTokenTaxon: 0,
-    }
-    try {
-      const response = await client.submitAndWait(tx, { wallet })
-      assert.equal(response.type, 'response')
-      assert.equal(
-        (response.result.meta as TransactionMetadata).TransactionResult,
-        'tesSUCCESS',
-      )
+      const tx: NFTokenMint = {
+        TransactionType: 'NFTokenMint',
+        Account: wallet.address,
+        URI: convertStringToHex('https://www.google.com'),
+        NFTokenTaxon: 0,
+      }
+      try {
+        const response = await client.submitAndWait(tx, { wallet })
+        assert.equal(response.type, 'response')
+        assert.equal(
+          (response.result.meta as TransactionMetadata).TransactionResult,
+          'tesSUCCESS',
+        )
 
-      const accountNFTs = await client.request({
-        command: 'account_nfts',
-        account: wallet.address,
-      })
+        const accountNFTs = await client.request({
+          command: 'account_nfts',
+          account: wallet.address,
+        })
 
-      const nftokenID =
-        getNFTokenID(response.result.meta as TransactionMetadata) ?? 'undefined'
-      const accountHasNFT = accountNFTs.result.account_nfts.some(
-        (value) => value.NFTokenID === nftokenID,
-      )
+        const nftokenID =
+          getNFTokenID(response.result.meta as TransactionMetadata) ??
+          'undefined'
+        const accountHasNFT = accountNFTs.result.account_nfts.some(
+          (value) => value.NFTokenID === nftokenID,
+        )
 
-      assert.isTrue(
-        accountHasNFT,
-        `Expected to find an NFT with NFTokenID ${nftokenID} in account ${
-          wallet.address
-        } but did not find it.
+        assert.isTrue(
+          accountHasNFT,
+          `Expected to find an NFT with NFTokenID ${nftokenID} in account ${
+            wallet.address
+          } but did not find it.
         \n\nHere's what was returned from 'account_nfts' for ${
           wallet.address
         }: ${JSON.stringify(accountNFTs)}`,
-      )
-    } finally {
-      await client.disconnect()
-    }
-  })
+        )
+      } finally {
+        await client.disconnect()
+      }
+    },
+    TIMEOUT,
+  )
 })
