@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions -- Necessary for parsing metadata */
+import { flatMap } from 'lodash'
+
 import {
   CreatedNode,
   isCreatedNode,
@@ -47,7 +49,7 @@ export default function getNFTokenID(
    * if the PreviousFields contains NFTokens
    */
 
-  const affectedNodes = meta.AffectedNodes.filter((node: Node) => {
+  const affectedNodes = meta.AffectedNodes.filter((node) => {
     if (isCreatedNode(node)) {
       return node.CreatedNode.LedgerEntryType === 'NFTokenPage'
     }
@@ -62,31 +64,25 @@ export default function getNFTokenID(
 
   /* eslint-disable @typescript-eslint/no-unnecessary-condition -- Doing conditional type checking */
   const previousTokenIDSet = new Set(
-    affectedNodes
-      .flatMap((node: Node) =>
-        (
-          (node as ModifiedNode).ModifiedNode?.PreviousFields
-            ?.NFTokens as NFToken[]
-        ).map((token: NFToken) => token.NFToken.NFTokenID),
-      )
-      .filter((id: string) => id),
+    flatMap(affectedNodes, (node) =>
+      (
+        (node as ModifiedNode).ModifiedNode?.PreviousFields
+          ?.NFTokens as NFToken[]
+      ).map((token) => token.NFToken.NFTokenID),
+    ).filter((id) => id),
   )
 
-  const finalTokenIDs = affectedNodes
-    .flatMap((node) =>
+  const finalTokenIDs = flatMap(affectedNodes, (node) =>
+    (
       (
-        (
-          (node as ModifiedNode).ModifiedNode?.FinalFields ??
-          (node as CreatedNode).CreatedNode?.NewFields
-        ).NFTokens as NFToken[]
-      ).map((token: NFToken) => token.NFToken.NFTokenID),
-    )
-    .filter((nftokenID: string) => nftokenID)
+        (node as ModifiedNode).ModifiedNode?.FinalFields ??
+        (node as CreatedNode).CreatedNode?.NewFields
+      ).NFTokens as NFToken[]
+    ).map((token) => token.NFToken.NFTokenID),
+  ).filter((nftokenID) => nftokenID)
   /* eslint-enable @typescript-eslint/no-unnecessary-condition -- Done with conditional type checking */
 
-  const nftokenID = finalTokenIDs.find(
-    (id: string) => !previousTokenIDSet.has(id),
-  )
+  const nftokenID = finalTokenIDs.find((id) => !previousTokenIDSet.has(id))
 
   return nftokenID
 }
