@@ -138,14 +138,7 @@ export interface LedgerEntryRequest extends BaseRequest {
       }
     | string
 
-  xchain_bridge?:
-    | {
-        locking_chain_door: string
-        locking_chain_issue: Currency
-        issuing_chain_door: string
-        issuing_chain_issue: Currency
-      }
-    | string
+  bridge_account?: string
 
   xchain_claim_id?:
     | {
