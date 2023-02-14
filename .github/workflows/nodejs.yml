@@ -89,7 +89,6 @@ jobs:
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: npm ci
 
-      - run: npm run build
       - run: npm test
 
   integration:
@@ -137,7 +136,6 @@ jobs:
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: npm ci
 
-      - run: npm run build
       - run: npm run test:integration
         env:
           HOST: localhost
@@ -188,5 +186,4 @@ jobs:
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: npm ci
 
-      - run: npm run build
       - run: npm run test:browser
