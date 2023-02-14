@@ -1,4 +1,4 @@
-/* eslint-disable max-lines -- required complexity */
+/* eslint-disable max-lines -- Connection is a large file w/ lots of imports/exports */
 import { EventEmitter } from 'events'
 import { Agent } from 'http'
 
@@ -384,7 +384,7 @@ export class Connection extends EventEmitter {
     return this.url ?? ''
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function -- Does nothing on default
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, class-methods-use-this -- Does nothing on default
   public readonly trace: (id: string, message: string) => void = () => {}
 
   /**
