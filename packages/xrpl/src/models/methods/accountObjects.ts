@@ -1,6 +1,5 @@
 import { AccountObjectType, LedgerIndex } from '../common'
 import {
-  Bridge,
   Check,
   DepositPreauth,
   Escrow,
