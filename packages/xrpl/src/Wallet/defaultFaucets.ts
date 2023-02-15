@@ -16,8 +16,8 @@ export enum FaucetNetwork {
   Devnet = 'faucet.devnet.rippletest.net',
   AMMDevnet = 'ammfaucet.devnet.rippletest.net',
   NFTDevnet = 'faucet-nft.ripple.com',
-  Icv2 = 'icv2.faucet.transia.co',
   HooksV2Testnet = 'hooks-testnet-v2.xrpl-labs.com',
+  Vala = 'vala.faucet.transia.co',
 }
 
 export const FaucetNetworkPaths: Record<string, string> = {
@@ -25,8 +25,8 @@ export const FaucetNetworkPaths: Record<string, string> = {
   [FaucetNetwork.Devnet]: '/accounts',
   [FaucetNetwork.AMMDevnet]: '/accounts',
   [FaucetNetwork.NFTDevnet]: '/accounts',
-  [FaucetNetwork.Icv2]: '/accounts',
   [FaucetNetwork.HooksV2Testnet]: '/accounts',
+  [FaucetNetwork.Vala]: '/accounts',
 }
 
 /**
@@ -61,8 +61,8 @@ export function getFaucetHost(client: Client): FaucetNetwork | undefined {
     return FaucetNetwork.NFTDevnet
   }
 
-  if (connectionUrl.includes('icv2')) {
-    return FaucetNetwork.Icv2
+  if (connectionUrl.includes('vala')) {
+    return FaucetNetwork.Vala
   }
 
   throw new XRPLFaucetError('Faucet URL is not defined or inferrable.')
