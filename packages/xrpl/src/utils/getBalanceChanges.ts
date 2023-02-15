@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
-import _ from 'lodash'
+import flatten from 'lodash/flatten'
+import groupBy from 'lodash/groupBy'
 
 import { Amount, IssuedCurrencyAmount } from '../models/common'
 import { TransactionMetadata, Node } from '../models/transactions/metadata'
@@ -63,7 +64,7 @@ function groupByAccount(balanceChanges: BalanceChange[]): Array<{
   account: string
   balances: Balance[]
 }> {
-  const grouped = _.groupBy(balanceChanges, (node) => node.account)
+  const grouped = groupBy(balanceChanges, (node) => node.account)
   return Object.entries(grouped).map(([account, items]) => {
     return { account, balances: items.map((item) => item.balance) }
   })
@@ -186,5 +187,5 @@ export default function getBalanceChanges(
     }
     return []
   })
-  return groupByAccount(_.flatten(quantities))
+  return groupByAccount(flatten(quantities))
 }

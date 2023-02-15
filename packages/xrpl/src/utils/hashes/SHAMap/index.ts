@@ -2,6 +2,10 @@ import InnerNode from './InnerNode'
 import LeafNode from './LeafNode'
 import { NodeType } from './node'
 
+/**
+ * SHAMap is the hash structure used to model ledgers.
+ * If the root hash is equivalent, that means all nodes should be equivalent as well.
+ */
 class SHAMap {
   public root: InnerNode
 
@@ -13,6 +17,15 @@ class SHAMap {
   }
 
   /**
+   * Get the hash of the SHAMap.
+   *
+   * @returns The hash of the root of the SHAMap.
+   */
+  public get hash(): string {
+    return this.root.hash
+  }
+
+  /**
    * Add an item to the SHAMap.
    *
    * @param tag - Index of the Node to add.
@@ -21,15 +34,6 @@ class SHAMap {
    */
   public addItem(tag: string, data: string, type: NodeType): void {
     this.root.addItem(tag, new LeafNode(tag, data, type))
-  }
-
-  /**
-   * Get the hash of the SHAMap.
-   *
-   * @returns The hash of the root of the SHAMap.
-   */
-  public get hash(): string {
-    return this.root.hash
   }
 }
 

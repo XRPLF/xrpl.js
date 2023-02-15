@@ -10,7 +10,7 @@ import { FieldInstance } from './enums'
 import { STObject } from './types/st-object'
 import { JsonObject } from './types/serialized-type'
 import { Buffer } from 'buffer/'
-import * as bigInt from 'big-integer'
+import bigInt = require('big-integer')
 
 /**
  * Construct a BinaryParser

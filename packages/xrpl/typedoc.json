@@ -16,5 +16,6 @@
     "Errors"
   ],
   "categorizeByGroup": false,
-  "readme": "../../README.md"
+  "readme": "../../README.md",
+  "plugin": ["./dist/docs/typedoc.js"]
 }

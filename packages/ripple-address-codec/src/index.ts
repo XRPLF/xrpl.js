@@ -119,6 +119,7 @@ function isBufferForTestAddress(buf: Buffer): boolean {
   if (PREFIX_BYTES.test.equals(decodedPrefix)) {
     return true
   }
+
   throw new Error('Invalid X-address: bad prefix')
 }
 
