@@ -9,7 +9,7 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  */
 export interface ChannelVerifyRequest extends BaseRequest {
   command: 'channel_verify'
-  /** The amount of XRP, in drops, the provided signature authorizes. */
+  /** The amount the provided signature authorizes. */
   amount: string
   /**
    * The Channel ID of the channel that provides the XRP. This is a

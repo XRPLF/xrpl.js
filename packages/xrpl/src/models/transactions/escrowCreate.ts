@@ -1,22 +1,23 @@
 /* eslint-disable complexity -- Necessary for validateEscrowCreate */
 import { ValidationError } from '../../errors'
+import { Amount } from '../common'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import { BaseTransaction, isAmount, validateBaseTransaction } from './common'
 
 /**
- * Sequester XRP until the escrow process either finishes or is canceled.
+ * Sequester amount until the escrow process either finishes or is canceled.
  *
  * @category Transaction Models
  */
 export interface EscrowCreate extends BaseTransaction {
   TransactionType: 'EscrowCreate'
   /**
-   * Amount of XRP, in drops, to deduct from the sender's balance and escrow.
-   * Once escrowed, the XRP can either go to the Destination address (after the.
-   * FinishAfter time) or returned to the sender (after the CancelAfter time).
+   * Amount to deduct from the sender's balance and escrow. Once escrowed, the
+   * amount can either go to the Destination address (after the FinishAfter time)
+   * or returned to the sender (after the CancelAfter time).
    */
-  Amount: string
-  /** Address to receive escrowed XRP. */
+  Amount: Amount
+  /** Address to receive escrowed amount. */
   Destination: string
   /**
    * The time, in seconds since the Ripple Epoch, when this escrow expires.
@@ -25,7 +26,7 @@ export interface EscrowCreate extends BaseTransaction {
    */
   CancelAfter?: number
   /**
-   * The time, in seconds since the Ripple Epoch, when the escrowed XRP can be
+   * The time, in seconds since the Ripple Epoch, when the escrowed amount can be
    * released to the recipient. This value is immutable; the funds cannot move.
    * until this time is reached.
    */
@@ -55,8 +56,8 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('EscrowCreate: missing field Amount')
   }
 
-  if (typeof tx.Amount !== 'string') {
-    throw new ValidationError('EscrowCreate: Amount must be a string')
+  if (typeof tx.Amount !== 'string' && !isAmount(tx.Amount)) {
+    throw new ValidationError('EscrowCreate: Amount must be an Amount')
   }
 
   if (tx.Destination === undefined) {

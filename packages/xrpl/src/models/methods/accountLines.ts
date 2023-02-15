@@ -1,4 +1,4 @@
-import { LedgerIndex } from '../common'
+import { Amount, LedgerIndex } from '../common'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
@@ -64,6 +64,14 @@ export interface Trustline {
    * false.
    */
   freeze_peer?: boolean
+  /**
+   * The total amount of FT, in drops/Amount locked in payment channels or escrow.
+   */
+  locked_balance?: Amount
+  /**
+   * The total number of lock balances on a RippleState ledger object.
+   */
+  lock_count?: number
 }
 
 /**

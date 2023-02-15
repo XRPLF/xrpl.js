@@ -777,6 +777,16 @@
       }
     ],
     [
+      "LockCount",
+      {
+        "nth": 49,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "nth": 1,
@@ -1480,6 +1490,16 @@
       "MinAccountCreateAmount",
       {
         "nth": 30,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "LockedBalance",
+      {
+        "nth": 31,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2567,7 +2587,8 @@
     "tecXCHAIN_ACCOUNT_CREATE_TOO_MANY": 183,
     "tecXCHAIN_PAYMENT_FAILED": 184,
     "tecXCHAIN_SELF_COMMIT": 185,
-    "tecXCHAIN_BAD_PUBLIC_KEY_ACCOUNT_PAIR": 186
+    "tecXCHAIN_BAD_PUBLIC_KEY_ACCOUNT_PAIR": 186,
+    "tecPRECISION_LOSS": 187
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
