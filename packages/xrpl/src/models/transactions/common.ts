@@ -118,12 +118,6 @@ export function isAmount(amount: unknown): amount is Amount {
  * @returns Whether the XChainBridge is properly formed.
  */
 export function isXChainBridge(input: unknown): input is XChainBridge {
-  console.log(input)
-  console.log(
-    isRecord(input) &&
-      Object.keys(input).length === XCHAIN_BRIDGE_SIZE &&
-      typeof input.LockingChainDoor === 'string',
-  )
   return (
     isRecord(input) &&
     Object.keys(input).length === XCHAIN_BRIDGE_SIZE &&
