@@ -6,6 +6,7 @@ import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 import { ValidationError } from '../../errors'
 import {
   Amount,
+  IssuedCurrency,
   IssuedCurrencyAmount,
   Memo,
   Signer,
@@ -56,11 +57,30 @@ function isSigner(obj: unknown): boolean {
   )
 }
 
+const XRP_CURRENCY_SIZE = 1
+const ISSUE_SIZE = 2
 const ISSUED_CURRENCY_SIZE = 3
 const XCHAIN_BRIDGE_SIZE = 4
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object'
+}
+
+/**
+ * Verify the form and type of an IssuedCurrency at runtime.
+ *
+ * @param input - The input to check the form and type of.
+ * @returns Whether the IssuedCurrency is properly formed.
+ */
+export function isIssue(input: unknown): input is IssuedCurrency {
+  return (
+    isRecord(input) &&
+    ((Object.keys(input).length === ISSUE_SIZE &&
+      typeof input.issuer === 'string' &&
+      typeof input.currency === 'string') ||
+      (Object.keys(input).length === XRP_CURRENCY_SIZE &&
+        input.currency === 'XRP'))
+  )
 }
 
 /**
@@ -98,13 +118,19 @@ export function isAmount(amount: unknown): amount is Amount {
  * @returns Whether the XChainBridge is properly formed.
  */
 export function isXChainBridge(input: unknown): input is XChainBridge {
+  console.log(input)
+  console.log(
+    isRecord(input) &&
+      Object.keys(input).length === XCHAIN_BRIDGE_SIZE &&
+      typeof input.LockingChainDoor === 'string',
+  )
   return (
     isRecord(input) &&
     Object.keys(input).length === XCHAIN_BRIDGE_SIZE &&
     typeof input.LockingChainDoor === 'string' &&
-    typeof input.LockingChainIssue === 'string' &&
+    isIssue(input.LockingChainIssue) &&
     typeof input.IssuingChainDoor === 'string' &&
-    typeof input.IssuingChainIssue === 'string'
+    isIssue(input.IssuingChainIssue)
   )
 }
 
