@@ -56,7 +56,7 @@ export function validatePaymentChannelFund(tx: Record<string, unknown>): void {
   }
 
   if (typeof tx.Amount !== 'string' && !isAmount(tx.Amount)) {
-    throw new ValidationError('PaymentChannelFund: invalid Amount')
+    throw new ValidationError('PaymentChannelFund: Amount must be an Amount')
   }
 
   if (tx.Expiration !== undefined && typeof tx.Expiration !== 'number') {

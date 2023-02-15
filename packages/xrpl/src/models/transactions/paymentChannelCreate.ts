@@ -67,7 +67,7 @@ export function validatePaymentChannelCreate(
   }
 
   if (typeof tx.Amount !== 'string' && !isAmount(tx.Amount)) {
-    throw new ValidationError('PaymentChannelCreate: invalid Amount')
+    throw new ValidationError('PaymentChannelCreate: Amount must be an Amount')
   }
 
   if (tx.Destination === undefined) {

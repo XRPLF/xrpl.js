@@ -31,8 +31,8 @@ export enum PaymentChannelClaimFlags {
    * the channel to the close time of the previous ledger plus the channel's
    * SettleDelay time, unless the channel already has an earlier Expiration
    * time.) If the destination address uses this flag when the channel still
-   * holds an amount, any amount that remains after processing the claim is returned to
-   * the source address.
+   * holds an amount, any amount that remains after processing the claim is
+   * returned to the source address.
    */
   tfClose = 0x00020000,
 }
@@ -91,8 +91,8 @@ export interface PaymentChannelClaimFlagsInterface extends GlobalFlags {
    * the channel to the close time of the previous ledger plus the channel's
    * SettleDelay time, unless the channel already has an earlier Expiration
    * time.) If the destination address uses this flag when the channel still
-   * holds an amount, any amount that remains after processing the claim is returned to
-   * the source address.
+   * holds an amount, any amount that remains after processing the claim is
+   * returned to the source address.
    */
   tfClose?: boolean
 }
@@ -118,7 +118,7 @@ export interface PaymentChannelClaim extends BaseTransaction {
   /**
    * The amount authorized by the Signature. This must match the amount in the
    * signed message. This is the cumulative amount that can be dispensed by the
-   * channel, including amounts previously redeemed.
+   * channel, including amounts previously redeemed. Required unless closing the channel.
    */
   Amount?: Amount
   /**
@@ -154,11 +154,11 @@ export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
   }
 
   if (tx.Balance !== undefined && !isAmount(tx.Balance)) {
-    throw new ValidationError('PaymentChannelClaim: invalid Balance')
+    throw new ValidationError('PaymentChannelClaim: Balance must be an Amount')
   }
 
   if (tx.Amount !== undefined && !isAmount(tx.Amount)) {
-    throw new ValidationError('PaymentChannelClaim: invalid Amount')
+    throw new ValidationError('PaymentChannelClaim: Amount must be an Amount')
   }
 
   if (tx.Signature !== undefined && typeof tx.Signature !== 'string') {
