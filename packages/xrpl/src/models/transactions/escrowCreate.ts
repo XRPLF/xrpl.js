@@ -2,7 +2,7 @@
 import { ValidationError } from '../../errors'
 import { Amount } from '../common'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import { BaseTransaction, isAmount, validateBaseTransaction } from './common'
 
 /**
  * Sequester amount until the escrow process either finishes or is canceled.
@@ -56,8 +56,8 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('EscrowCreate: missing field Amount')
   }
 
-  if (typeof tx.Amount !== 'string') {
-    throw new ValidationError('EscrowCreate: Amount must be a string')
+  if (typeof tx.Amount !== 'string' && !isAmount(tx.Amount)) {
+    throw new ValidationError('EscrowCreate: Amount must be an Amount')
   }
 
   if (tx.Destination === undefined) {
