@@ -3,7 +3,7 @@ import { Amount } from '../common'
 import BaseLedgerEntry from './BaseLedgerEntry'
 
 /**
- * The Escrow object type represents a held payment of XRP waiting to be
+ * The Escrow object type represents a held payment waiting to be
  * executed or canceled.
  *
  * @category Ledger Entries
@@ -12,12 +12,12 @@ export default interface Escrow extends BaseLedgerEntry {
   LedgerEntryType: 'Escrow'
   /**
    * The address of the owner (sender) of this held payment. This is the
-   * account that provided the XRP, and gets it back if the held payment is
+   * account that provided the amounts, and gets it back if the held payment is
    * canceled.
    */
   Account: string
   /**
-   * The destination address where the XRP is paid if the held payment is
+   * The destination address where the amounts are paid if the held payment is
    * successful.
    */
   Destination: string

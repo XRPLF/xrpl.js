@@ -98,7 +98,7 @@ export interface PaymentChannelClaimFlagsInterface extends GlobalFlags {
 }
 
 /**
- * Claim XRP from a payment channel, adjust the payment channel's expiration,
+ * Claim amount from a payment channel, adjust the payment channel's expiration,
  * or both.
  *
  * @category Transaction Models

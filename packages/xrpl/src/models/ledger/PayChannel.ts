@@ -2,8 +2,8 @@ import BaseLedgerEntry from './BaseLedgerEntry'
 
 /**
  * The PayChannel object type represents a payment channel. Payment channels
- * enable small, rapid off-ledger payments of XRP that can be later reconciled
- * with the consensus ledger. A payment channel holds a balance of XRP that can
+ * enable small, rapid off-ledger payments that can be later reconciled
+ * with the consensus ledger. A payment channel holds a balance that can
  * only be paid out to a specific destination address until the channel is
  * closed.
  *
@@ -18,7 +18,7 @@ export default interface PayChannel extends BaseLedgerEntry {
   Account: string
   /**
    * The destination address for this payment channel. While the payment
-   * channel is open, this address is the only one that can receive XRP from the
+   * channel is open, this address is the only one that can receive amounts from the
    * channel. This comes from the Destination field of the transaction that
    * created the channel.
    */
@@ -42,13 +42,13 @@ export default interface PayChannel extends BaseLedgerEntry {
    * claims against this channel. This can be any valid secp256k1 or Ed25519
    * public key. This is set by the transaction that created the channel and
    * must match the public key used in claims against the channel. The channel
-   * source address can also send XRP from this channel to the destination
+   * source address can also send amounts from this channel to the destination
    * without signed claims.
    */
   PublicKey: string
   /**
    * Number of seconds the source address must wait to close the channel if
-   * it still has any XRP in it. Smaller values mean that the destination
+   * it still has any amount in it. Smaller values mean that the destination
    * address has less time to redeem any outstanding claims after the source
    * address requests to close the channel. Can be any value that fits in a
    * 32-bit unsigned integer (0 to 2^32-1). This is set by the transaction that
