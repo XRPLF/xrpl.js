@@ -1477,16 +1477,6 @@
       }
     ],
     [
-      "LockedBalance",
-      {
-        "nth": 31,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "Amount"
-      }
-    ],
-    [
       "SignatureReward",
       {
         "nth": 29,
@@ -1500,6 +1490,16 @@
       "MinAccountCreateAmount",
       {
         "nth": 30,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "LockedBalance",
+      {
+        "nth": 31,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
