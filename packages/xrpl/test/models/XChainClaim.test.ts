@@ -3,8 +3,6 @@ import { assert } from 'chai'
 import { validate, ValidationError } from '../../src'
 import { validateXChainClaim } from '../../src/models/transactions/XChainClaim'
 
-9
-
 /**
  * XChainClaim Transaction Verification Testing.
  *
