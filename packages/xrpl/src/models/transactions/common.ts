@@ -104,7 +104,7 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
     typeof input.LockingChainDoor === 'string' &&
     typeof input.LockingChainIssue === 'string' &&
     typeof input.IssuingChainDoor === 'string' &&
-    typeof input.IsusingChainIssue === 'string'
+    typeof input.IssuingChainIssue === 'string'
   )
 }
 

@@ -1,7 +1,12 @@
 import { ValidationError } from '../../errors'
 import { Amount, XChainBridge } from '../common'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isAmount,
+  isXChainBridge,
+  validateBaseTransaction,
+} from './common'
 
 /**
  *
@@ -30,15 +35,31 @@ export function validateXChainCreateClaimID(tx: Record<string, unknown>): void {
     throw new ValidationError('XChainCreateClaimID: missing field XChainBridge')
   }
 
+  if (!isXChainBridge(tx.XChainBridge)) {
+    throw new ValidationError('XChainCreateClaimID: invalid field XChainBridge')
+  }
+
   if (tx.SignatureReward == null) {
     throw new ValidationError(
       'XChainCreateClaimID: missing field SignatureReward',
     )
   }
 
+  if (!isAmount(tx.SignatureReward)) {
+    throw new ValidationError(
+      'XChainCreateClaimID: invalid field SignatureReward',
+    )
+  }
+
   if (tx.OtherChainSource == null) {
     throw new ValidationError(
       'XChainCreateClaimID: missing field OtherChainSource',
+    )
+  }
+
+  if (typeof tx.OtherChainSource !== 'string') {
+    throw new ValidationError(
+      'XChainCreateClaimID: invalid field OtherChainSource',
     )
   }
 }
