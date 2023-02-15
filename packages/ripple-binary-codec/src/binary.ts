@@ -111,12 +111,12 @@ function signingClaimData(claim: ClaimObject): Buffer {
   const bytesList = new BytesList()
   bytesList.put(prefix)
   bytesList.put(channel)
-  if (typeof claim.amount === 'object') {
-    const amount = coreTypes.Amount.from(claim.amount).toBytes()
-    bytesList.put(amount)
-  } else {
+  if (typeof claim.amount === 'string') {
     const num = bigInt(String(claim.amount))
     const amount = coreTypes.UInt64.from(num).toBytes()
+    bytesList.put(amount)
+  } else {
+    const amount = coreTypes.Amount.from(claim.amount).toBytes()
     bytesList.put(amount)
   }
   return bytesList.toBytes()
