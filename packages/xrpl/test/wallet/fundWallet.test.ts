@@ -65,17 +65,6 @@ describe('Get Faucet host ', function () {
     )
   })
 
-  it('returns the Vala host', function () {
-    const expectedFaucet = FaucetNetwork.Vala
-    // @ts-expect-error Intentionally modifying private data for test
-    testContext.client.connection.url = FaucetNetwork.Vala
-
-    assert.strictEqual(
-      getFaucetHost(testContext.client as Client),
-      expectedFaucet,
-    )
-  })
-
   it('returns the correct faucetPath for Devnet host', function () {
     const expectedFaucetPath = FaucetNetworkPaths[FaucetNetwork.Devnet]
     // @ts-expect-error Intentionally modifying private data for test
@@ -91,17 +80,6 @@ describe('Get Faucet host ', function () {
     const expectedFaucetPath = FaucetNetworkPaths[FaucetNetwork.HooksV2Testnet]
     // @ts-expect-error Intentionally modifying private data for test
     testContext.client.connection.url = FaucetNetwork.HooksV2Testnet
-
-    assert.strictEqual(
-      getDefaultFaucetPath(getFaucetHost(testContext.client as Client)),
-      expectedFaucetPath,
-    )
-  })
-
-  it('returns the correct faucetPath for Vala host', function () {
-    const expectedFaucetPath = FaucetNetworkPaths[FaucetNetwork.Vala]
-    // @ts-expect-error Intentionally modifying private data for test
-    testContext.client.connection.url = FaucetNetwork.Vala
 
     assert.strictEqual(
       getDefaultFaucetPath(getFaucetHost(testContext.client as Client)),
