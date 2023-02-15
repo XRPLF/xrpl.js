@@ -779,7 +779,7 @@
     [
       "LockCount",
       {
-        "nth": 47,
+        "nth": 49,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1479,7 +1479,7 @@
     [
       "LockedBalance",
       {
-        "nth": 21,
+        "nth": 31,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
