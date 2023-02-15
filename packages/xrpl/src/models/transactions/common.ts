@@ -4,7 +4,13 @@
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
-import { Amount, IssuedCurrencyAmount, Memo, Signer } from '../common'
+import {
+  Amount,
+  IssuedCurrencyAmount,
+  Memo,
+  Signer,
+  XChainBridge,
+} from '../common'
 import { onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
@@ -51,6 +57,7 @@ function isSigner(obj: unknown): boolean {
 }
 
 const ISSUED_CURRENCY_SIZE = 3
+const XCHAIN_BRIDGE_SIZE = 4
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object'
@@ -60,7 +67,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  * Verify the form and type of an IssuedCurrencyAmount at runtime.
  *
  * @param input - The input to check the form and type of.
- * @returns Whether the IssuedCurrencyAmount is malformed.
+ * @returns Whether the IssuedCurrencyAmount is properly formed.
  */
 export function isIssuedCurrency(
   input: unknown,
@@ -78,10 +85,27 @@ export function isIssuedCurrency(
  * Verify the form and type of an Amount at runtime.
  *
  * @param amount - The object to check the form and type of.
- * @returns Whether the Amount is malformed.
+ * @returns Whether the Amount is properly formed.
  */
 export function isAmount(amount: unknown): amount is Amount {
   return typeof amount === 'string' || isIssuedCurrency(amount)
+}
+
+/**
+ * Verify the form and type of an XChainBridge at runtime.
+ *
+ * @param input - The input to check the form and type of.
+ * @returns Whether the XChainBridge is properly formed.
+ */
+export function isXChainBridge(input: unknown): input is XChainBridge {
+  return (
+    isRecord(input) &&
+    Object.keys(input).length === XCHAIN_BRIDGE_SIZE &&
+    typeof input.LockingChainDoor === 'string' &&
+    typeof input.LockingChainIssue === 'string' &&
+    typeof input.IssuingChainDoor === 'string' &&
+    typeof input.IsusingChainIssue === 'string'
+  )
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface -- no global flags right now, so this is fine

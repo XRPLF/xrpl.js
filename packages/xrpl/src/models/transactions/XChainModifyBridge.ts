@@ -1,7 +1,13 @@
 import { ValidationError } from '../../errors'
 import { Amount, XChainBridge } from '../common'
 
-import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  GlobalFlags,
+  isAmount,
+  isXChainBridge,
+  validateBaseTransaction,
+} from './common'
 
 export enum XChainModifyBridgeFlags {
   tfClearAccountCreateAmount = 0x00010000,
@@ -38,5 +44,24 @@ export function validateXChainModifyBridge(tx: Record<string, unknown>): void {
 
   if (tx.XChainBridge == null) {
     throw new ValidationError('XChainModifyBridge: missing field XChainBridge')
+  }
+
+  if (!isXChainBridge(tx.XChainBridge)) {
+    throw new ValidationError('XChainModifyBridge: invalid field XChainBridge')
+  }
+
+  if (tx.SignatureReward !== undefined && !isAmount(tx.SignatureReward)) {
+    throw new ValidationError(
+      'XChainModifyBridge: invalid field SignatureReward',
+    )
+  }
+
+  if (
+    tx.MinAccountCreateAmount !== undefined &&
+    !isAmount(tx.MinAccountCreateAmount)
+  ) {
+    throw new ValidationError(
+      'XChainModifyBridge: invalid field MinAccountCreateAmount',
+    )
   }
 }
