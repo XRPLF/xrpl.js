@@ -6,26 +6,14 @@ import {
   AccountRootFlagsInterface,
   AccountRootFlags,
 } from '../ledger/AccountRoot'
-import {
-  AccountSetFlagsInterface,
-  AccountSetTfFlags,
-} from '../transactions/accountSet'
+import { AccountSetTfFlags } from '../transactions/accountSet'
 import { GlobalFlags } from '../transactions/common'
-import {
-  OfferCreateFlagsInterface,
-  OfferCreateFlags,
-} from '../transactions/offerCreate'
-import { PaymentFlagsInterface, PaymentFlags } from '../transactions/payment'
-import {
-  PaymentChannelClaimFlagsInterface,
-  PaymentChannelClaimFlags,
-} from '../transactions/paymentChannelClaim'
+import { OfferCreateFlags } from '../transactions/offerCreate'
+import { PaymentFlags } from '../transactions/payment'
+import { PaymentChannelClaimFlags } from '../transactions/paymentChannelClaim'
 import type { Transaction } from '../transactions/transaction'
-import { TrustSetFlagsInterface, TrustSetFlags } from '../transactions/trustSet'
-import {
-  XChainModifyBridgeFlags,
-  XChainModifyBridgeFlagsInterface,
-} from '../transactions/XChainModifyBridge'
+import { TrustSetFlags } from '../transactions/trustSet'
+import { XChainModifyBridgeFlags } from '../transactions/XChainModifyBridge'
 
 import { isFlagEnabled } from '.'
 
