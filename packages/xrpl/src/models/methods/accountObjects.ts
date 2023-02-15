@@ -8,6 +8,8 @@ import {
   RippleState,
   SignerList,
   Ticket,
+  XChainOwnedClaimID,
+  XChainOwnedCreateAccountClaimID,
 } from '../ledger'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
@@ -22,6 +24,8 @@ type AccountObjectType =
   | 'signer_list'
   | 'state'
   | 'ticket'
+  | 'xchain_create_account_claim_id'
+  | 'xchain_claim_id'
 
 /**
  * The account_objects command returns the raw ledger format for all objects
@@ -78,6 +82,8 @@ type AccountObject =
   | SignerList
   | RippleState
   | Ticket
+  | XChainOwnedClaimID
+  | XChainOwnedCreateAccountClaimID
 
 /**
  * Response expected from an {@link AccountObjectsRequest}.

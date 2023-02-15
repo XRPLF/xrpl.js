@@ -45,3 +45,15 @@ export { SetRegularKey } from './setRegularKey'
 export { SignerListSet } from './signerListSet'
 export { TicketCreate } from './ticketCreate'
 export { TrustSetFlagsInterface, TrustSetFlags, TrustSet } from './trustSet'
+export { XChainAddAccountCreateAttestation } from './XChainAddAccountCreateAttestation'
+export { XChainAddClaimAttestation } from './XChainAddClaimAttestation'
+export { XChainClaim } from './XChainClaim'
+export { XChainCommit } from './XChainCommit'
+export { XChainCreateBridge } from './XChainCreateBridge'
+export { XChainCreateClaimID } from './XChainCreateClaimID'
+export { XChainAccountCreateCommit } from './XChainAccountCreateCommit'
+export {
+  XChainModifyBridge,
+  XChainModifyBridgeFlags,
+  XChainModifyBridgeFlagsInterface,
+} from './XChainModifyBridge'
