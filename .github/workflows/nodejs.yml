@@ -89,8 +89,8 @@ jobs:
         run: npm ci
 
       - run: |
-        npm run build
-        npm test
+          npm run build
+          npm test
 
   integration:
     runs-on: ubuntu-latest
