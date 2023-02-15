@@ -5,7 +5,7 @@ import { Amount } from '../common'
 import { BaseTransaction, validateBaseTransaction, isAmount } from './common'
 
 /**
- * Create a unidirectional channel and fund it with XRP. The address sending
+ * Create a unidirectional channel and fund it. The address sending
  * this transaction becomes the "source address" of the payment channel.
  *
  * @category Transaction Models
@@ -20,13 +20,13 @@ export interface PaymentChannelCreate extends BaseTransaction {
    */
   Amount: Amount
   /**
-   * Address to receive XRP claims against this channel. This is also known as
+   * Address to receive claims against this channel. This is also known as
    * the "destination address" for the channel.
    */
   Destination: string
   /**
    * Amount of time the source address must wait before closing the channel if
-   * it has unclaimed XRP.
+   * it has unclaimed amount.
    */
   SettleDelay: number
   /**

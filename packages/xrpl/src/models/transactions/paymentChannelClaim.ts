@@ -24,14 +24,14 @@ export enum PaymentChannelClaimFlags {
   /**
    * Request to close the channel. Only the channel source and destination
    * addresses can use this flag. This flag closes the channel immediately if it
-   * has no more XRP allocated to it after processing the current claim, or if
+   * has no more funds allocated to it after processing the current claim, or if
    * the destination address uses it. If the source address uses this flag when
-   * the channel still holds XRP, this schedules the channel to close after
+   * the channel still holds an amount, this schedules the channel to close after
    * SettleDelay seconds have passed. (Specifically, this sets the Expiration of
    * the channel to the close time of the previous ledger plus the channel's
    * SettleDelay time, unless the channel already has an earlier Expiration
    * time.) If the destination address uses this flag when the channel still
-   * holds XRP, any XRP that remains after processing the claim is returned to
+   * holds an amount, any amount that remains after processing the claim is returned to
    * the source address.
    */
   tfClose = 0x00020000,
@@ -84,14 +84,14 @@ export interface PaymentChannelClaimFlagsInterface extends GlobalFlags {
   /**
    * Request to close the channel. Only the channel source and destination
    * addresses can use this flag. This flag closes the channel immediately if it
-   * has no more XRP allocated to it after processing the current claim, or if
+   * has no more funds allocated to it after processing the current claim, or if
    * the destination address uses it. If the source address uses this flag when
-   * the channel still holds XRP, this schedules the channel to close after
+   * the channel still holds an amount, this schedules the channel to close after
    * SettleDelay seconds have passed. (Specifically, this sets the Expiration of
    * the channel to the close time of the previous ledger plus the channel's
    * SettleDelay time, unless the channel already has an earlier Expiration
    * time.) If the destination address uses this flag when the channel still
-   * holds XRP, any XRP that remains after processing the claim is returned to
+   * holds an amount, any amount that remains after processing the claim is returned to
    * the source address.
    */
   tfClose?: boolean
