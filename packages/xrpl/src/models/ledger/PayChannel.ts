@@ -1,3 +1,5 @@
+import { Amount } from '../common'
+
 import BaseLedgerEntry from './BaseLedgerEntry'
 
 /**
@@ -29,14 +31,14 @@ export default interface PayChannel extends BaseLedgerEntry {
    * transaction that created the channel and can be increased if the source
    * address sends a PaymentChannelFund transaction.
    */
-  Amount: string
+  Amount: Amount
   /**
    * Total amount already paid out by the channel. The difference between this value
    * and the Amount field is how much can still be paid to the destination address
    * with PaymentChannelClaim transactions. If the channel closes, the remaining
    * difference is returned to the source address.
    */
-  Balance: string
+  Balance: Amount
   /**
    * Public key, in hexadecimal, of the key pair that can be used to sign
    * claims against this channel. This can be any valid secp256k1 or Ed25519
