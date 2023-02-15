@@ -58,7 +58,12 @@ export interface AMMInfoResponse extends BaseResponse {
       amount2: Amount
 
       /**
-       * Flag indicating whether asset2 is frozen.
+       * (Omitted for XRP) If true, the amount currency is currently frozen for asset.
+       */
+      asset_frozen: boolean
+
+      /**
+       * (Omitted for XRP) If true, the amount currency is currently frozen for asset2.
        */
       asset2_frozen: boolean
 
