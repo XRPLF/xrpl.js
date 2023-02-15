@@ -3,6 +3,8 @@ import { assert } from 'chai'
 import { validate, ValidationError } from '../../src'
 import { validateXChainCommit } from '../../src/models/transactions/XChainCommit'
 
+9
+
 /**
  * XChainCommit Transaction Verification Testing.
  *
@@ -17,23 +19,23 @@ describe('XChainCommit', function () {
       Amount: '10000',
       XChainBridge: {
         LockingChainDoor: 'rGzx83BVoqTYbGn7tiVAnFw7cbxjin13jL',
-        LockingChainIssue: { currency: 'XRP' },
+        LockingChainIssue: {
+          currency: 'XRP',
+        },
         IssuingChainDoor: 'r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV',
-        IssuingChainIssue: { currency: 'XRP' },
+        IssuingChainIssue: {
+          currency: 'XRP',
+        },
       },
       Fee: '10',
       Flags: 2147483648,
       Sequence: 1,
-      SigningPubKey:
-        '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020',
       TransactionType: 'XChainCommit',
-      TxnSignature:
-        '3043021F177323F0D93612C82A4393A99B23905A7E675753FD80C52997AFAB13F5F9D002203BFFAF457E90BDA65AABE8F8762BD96162FAD98A0C030CCD69B06EE9B12BBFFE',
       XChainClaimID: '0000000000000001',
-    }
+    } as any
   })
 
-  it(`verifies valid XChainCommit`, function () {
+  it('verifies valid XChainCommit', function () {
     assert.doesNotThrow(() => validateXChainCommit(tx))
     assert.doesNotThrow(() => validate(tx))
   })
@@ -53,6 +55,21 @@ describe('XChainCommit', function () {
     )
   })
 
+  it(`throws w/ invalid XChainBridge`, function () {
+    tx.XChainBridge = { XChainDoor: 'test' }
+
+    assert.throws(
+      () => validateXChainCommit(tx),
+      ValidationError,
+      'XChainCommit: invalid field XChainBridge',
+    )
+    assert.throws(
+      () => validate(tx),
+      ValidationError,
+      'XChainCommit: invalid field XChainBridge',
+    )
+  })
+
   it(`throws w/ missing XChainClaimID`, function () {
     delete tx.XChainClaimID
 
@@ -68,6 +85,36 @@ describe('XChainCommit', function () {
     )
   })
 
+  it(`throws w/ invalid XChainClaimID`, function () {
+    tx.XChainClaimID = { currency: 'ETH' }
+
+    assert.throws(
+      () => validateXChainCommit(tx),
+      ValidationError,
+      'XChainCommit: invalid field XChainClaimID',
+    )
+    assert.throws(
+      () => validate(tx),
+      ValidationError,
+      'XChainCommit: invalid field XChainClaimID',
+    )
+  })
+
+  it(`throws w/ invalid OtherChainDestination`, function () {
+    tx.OtherChainDestination = 123
+
+    assert.throws(
+      () => validateXChainCommit(tx),
+      ValidationError,
+      'XChainCommit: invalid field OtherChainDestination',
+    )
+    assert.throws(
+      () => validate(tx),
+      ValidationError,
+      'XChainCommit: invalid field OtherChainDestination',
+    )
+  })
+
   it(`throws w/ missing Amount`, function () {
     delete tx.Amount
 
@@ -80,6 +127,21 @@ describe('XChainCommit', function () {
       () => validate(tx),
       ValidationError,
       'XChainCommit: missing field Amount',
+    )
+  })
+
+  it(`throws w/ invalid Amount`, function () {
+    tx.Amount = { currency: 'ETH' }
+
+    assert.throws(
+      () => validateXChainCommit(tx),
+      ValidationError,
+      'XChainCommit: invalid field Amount',
+    )
+    assert.throws(
+      () => validate(tx),
+      ValidationError,
+      'XChainCommit: invalid field Amount',
     )
   })
 })
