@@ -11,7 +11,7 @@ import { STObject } from './types/st-object'
 import { JsonObject } from './types/serialized-type'
 import { Buffer } from 'buffer/'
 import bigInt = require('big-integer')
-import { Amount } from './types/amount'
+import { AmountObject } from './types/amount'
 
 /**
  * Construct a BinaryParser
@@ -94,9 +94,9 @@ function signingData(
 /**
  * Interface describing fields required for a Claim
  */
-interface ClaimObject {
+interface ClaimObject extends JsonObject {
   channel: string
-  amount: Amount
+  amount: AmountObject
 }
 
 /**
