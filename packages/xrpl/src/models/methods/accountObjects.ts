@@ -1,4 +1,4 @@
-import { AccountObjectType, LedgerIndex } from '../common'
+import { LedgerIndex } from '../common'
 import {
   Check,
   DepositPreauth,
@@ -13,6 +13,19 @@ import {
 } from '../ledger'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
+
+type AccountObjectType =
+  | 'check'
+  | 'deposit_preauth'
+  | 'escrow'
+  | 'nft_offer'
+  | 'offer'
+  | 'payment_channel'
+  | 'signer_list'
+  | 'state'
+  | 'ticket'
+  | 'xchain_create_account_claim_id'
+  | 'xchain_claim_id'
 
 /**
  * The account_objects command returns the raw ledger format for all objects
@@ -67,8 +80,8 @@ type AccountObject =
   | Offer
   | PayChannel
   | SignerList
-  | Ticket
   | RippleState
+  | Ticket
   | XChainOwnedClaimID
   | XChainOwnedCreateAccountClaimID
 

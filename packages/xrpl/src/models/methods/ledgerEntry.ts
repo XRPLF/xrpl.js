@@ -46,6 +46,23 @@ export interface LedgerEntryRequest extends BaseRequest {
    */
   account_root?: string
 
+  /** The object ID of a Check object to retrieve. */
+  check?: string
+
+  /**
+   * Specify a DepositPreauth object to retrieve. If a string, must be the
+   * object ID of the DepositPreauth object, as hexadecimal. If an object,
+   * requires owner and authorized sub-fields.
+   */
+  deposit_preauth?:
+    | {
+        /** The account that provided the preauthorization. */
+        owner: string
+        /** The account that received the preauthorization. */
+        authorized: string
+      }
+    | string
+
   /**
    * The DirectoryNode to retrieve. If a string, must be the object ID of the
    * directory, as hexadecimal. If an object, requires either `dir_root` o
@@ -63,6 +80,19 @@ export interface LedgerEntryRequest extends BaseRequest {
     | string
 
   /**
+   * The Escrow object to retrieve. If a string, must be the object ID of the
+   * escrow, as hexadecimal. If an object, requires owner and seq sub-fields.
+   */
+  escrow?:
+    | {
+        /** The owner (sender) of the Escrow object. */
+        owner: string
+        /** Sequence Number of the transaction that created the Escrow object. */
+        seq: number
+      }
+    | string
+
+  /**
    * The Offer object to retrieve. If a string, interpret as the unique object
    * ID to the Offer. If an object, requires the sub-fields `account` and `seq`
    * to uniquely identify the offer.
@@ -75,6 +105,9 @@ export interface LedgerEntryRequest extends BaseRequest {
         seq: number
       }
     | string
+
+  /** The object ID of a PayChannel object to retrieve. */
+  payment_channel?: string
 
   /**
    * Object specifying the RippleState (trust line) object to retrieve. The
@@ -90,39 +123,6 @@ export interface LedgerEntryRequest extends BaseRequest {
     /** Currency Code of the RippleState object to retrieve. */
     currency: string
   }
-
-  /** The object ID of a Check object to retrieve. */
-  check?: string
-
-  /**
-   * The Escrow object to retrieve. If a string, must be the object ID of the
-   * escrow, as hexadecimal. If an object, requires owner and seq sub-fields.
-   */
-  escrow?:
-    | {
-        /** The owner (sender) of the Escrow object. */
-        owner: string
-        /** Sequence Number of the transaction that created the Escrow object. */
-        seq: number
-      }
-    | string
-
-  /** The object ID of a PayChannel object to retrieve. */
-  payment_channel?: string
-
-  /**
-   * Specify a DepositPreauth object to retrieve. If a string, must be the
-   * object ID of the DepositPreauth object, as hexadecimal. If an object,
-   * requires owner and authorized sub-fields.
-   */
-  deposit_preauth?:
-    | {
-        /** The account that provided the preauthorization. */
-        owner: string
-        /** The account that received the preauthorization. */
-        authorized: string
-      }
-    | string
 
   /**
    * The Ticket object to retrieve. If a string, must be the object ID of the

@@ -1,18 +1,5 @@
 export type LedgerIndex = number | ('validated' | 'closed' | 'current')
 
-export type AccountObjectType =
-  | 'check'
-  | 'deposit_preauth'
-  | 'escrow'
-  | 'nft_offer'
-  | 'offer'
-  | 'payment_channel'
-  | 'signer_list'
-  | 'ticket'
-  | 'state'
-  | 'xchain_create_account_claim_id'
-  | 'xchain_claim_id'
-
 interface XRP {
   currency: 'XRP'
 }
