@@ -1,6 +1,7 @@
 /* eslint-disable no-bitwise -- bitwise necessary for enabling flags */
 import { assert } from 'chai'
-import { AMMDepositFlags, validate, ValidationError } from 'xrpl-local'
+
+import { AMMDepositFlags, validate, ValidationError } from '../../src'
 
 /**
  * AMMDeposit Transaction Verification Testing.

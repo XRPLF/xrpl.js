@@ -1,5 +1,6 @@
 import { assert } from 'chai'
-import { validate, ValidationError } from 'xrpl-local'
+
+import { validate, ValidationError } from '../../src'
 
 /**
  * AMMVote Transaction Verification Testing.
