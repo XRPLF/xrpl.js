@@ -2,13 +2,11 @@ import { assert } from 'chai'
 import _ from 'lodash'
 
 import {
-  Client,
   convertStringToHex,
   getNFTokenID,
   NFTokenMint,
   TransactionMetadata,
 } from '../../../src'
-import serverUrl from '../serverUrl'
 import {
   setupClient,
   teardownClient,
