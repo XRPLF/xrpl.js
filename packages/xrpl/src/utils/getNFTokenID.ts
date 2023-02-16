@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/consistent-type-assertions -- Necessary for parsing metadata */
-import { flatMap } from 'lodash'
+import flatMap from 'lodash/flatMap'
 
 import {
   CreatedNode,
@@ -59,26 +58,26 @@ export default function getNFTokenID(
     }
     return false
   })
-
-  /* eslint-disable @typescript-eslint/no-unnecessary-condition -- Doing conditional type checking */
+  /* eslint-disable @typescript-eslint/consistent-type-assertions -- Necessary for parsing metadata */
   const previousTokenIDSet = new Set(
-    flatMap(affectedNodes, (node) =>
-      (
-        ((node as ModifiedNode).ModifiedNode?.PreviousFields
-          ?.NFTokens as NFToken[]) ?? []
-      ).map((token) => token.NFToken.NFTokenID),
-    ).filter((id) => id),
+    flatMap(affectedNodes, (node) => {
+      const nftokens = isModifiedNode(node)
+        ? (node.ModifiedNode.PreviousFields?.NFTokens as NFToken[])
+        : []
+      return nftokens.map((token) => token.NFToken.NFTokenID)
+    }).filter((id) => Boolean(id)),
   )
 
+  /* eslint-disable @typescript-eslint/no-unnecessary-condition -- Cleaner to read */
   const finalTokenIDs = flatMap(affectedNodes, (node) =>
     (
-      ((
-        (node as ModifiedNode).ModifiedNode?.FinalFields ??
-        (node as CreatedNode).CreatedNode?.NewFields
-      )?.NFTokens as NFToken[]) ?? []
+      (((node as ModifiedNode).ModifiedNode?.FinalFields?.NFTokens ??
+        (node as CreatedNode).CreatedNode?.NewFields?.NFTokens) as NFToken[]) ??
+      []
     ).map((token) => token.NFToken.NFTokenID),
-  ).filter((nftokenID) => nftokenID)
-  /* eslint-enable @typescript-eslint/no-unnecessary-condition -- Done with conditional type checking */
+  ).filter((nftokenID) => Boolean(nftokenID))
+  /* eslint-enable @typescript-eslint/consistent-type-assertions -- Necessary for parsing metadata */
+  /* eslint-enable @typescript-eslint/no-unnecessary-condition -- Cleaner to read */
 
   const nftokenID = finalTokenIDs.find((id) => !previousTokenIDSet.has(id))
 
