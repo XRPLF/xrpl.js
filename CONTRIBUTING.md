@@ -188,6 +188,7 @@ NOW WE ARE READY TO PUBLISH! No new code changes happen manually now.
 9. Create a new PR from this branch into `main` and merge it (you can directly merge into the beta branch for a beta).
 10. Checkout `main` and `git pull` (you can skip this step for a beta since you already have the latest version of the beta branch).
 11. Run `npx lerna publish from-package --yes` - This will actually publish the packages.
+  * NOTE: if you're releasing a beta, run `npx lerna publish from-package --dist-tag beta --yes` instead.
   * If it asks for it, enter your [npmjs.com](https://npmjs.com) OTP (one-time password) to complete publication.
 12. Create a new branch (`git checkout -b <BRANCH_NAME>`)to capture the updated packages from the release. Merge those changes into `main`. (You can skip this step on a beta release).
 
