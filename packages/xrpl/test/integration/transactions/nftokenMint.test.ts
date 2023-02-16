@@ -1,5 +1,6 @@
 import { assert } from 'chai'
 import _ from 'lodash'
+import { Client } from 'xrpl'
 
 import {
   convertStringToHex,
@@ -7,35 +8,29 @@ import {
   NFTokenMint,
   TransactionMetadata,
 } from '../../../src'
-import {
-  setupClient,
-  teardownClient,
-  XrplIntegrationTestContext,
-} from '../setup'
 
 // how long before each test case times out
 const TIMEOUT = 20000
 
 describe('NFTokenMint', function () {
-  let testContext: XrplIntegrationTestContext
-
-  beforeEach(async () => {
-    testContext = await setupClient('wss://s.altnet.rippletest.net:51233/')
-  })
-  afterEach(async () => teardownClient(testContext))
-
+  // TODO: Once we update our integration tests to handle NFTs, replace this client with XrplIntegrationTestContext
   it(
     'get NFTokenID',
     async function () {
+      const client = new Client('wss://s.altnet.rippletest.net:51233/')
+      await client.connect()
+
+      const { wallet, balance: _balance } = await client.fundWallet()
+
       const tx: NFTokenMint = {
         TransactionType: 'NFTokenMint',
-        Account: testContext.wallet.address,
+        Account: wallet.address,
         URI: convertStringToHex('https://www.google.com'),
         NFTokenTaxon: 0,
       }
       try {
-        const response = await testContext.client.submitAndWait(tx, {
-          wallet: testContext.wallet,
+        const response = await client.submitAndWait(tx, {
+          wallet,
         })
         assert.equal(response.type, 'response')
         assert.equal(
@@ -43,9 +38,9 @@ describe('NFTokenMint', function () {
           'tesSUCCESS',
         )
 
-        const accountNFTs = await testContext.client.request({
+        const accountNFTs = await client.request({
           command: 'account_nfts',
-          account: testContext.wallet.address,
+          account: wallet.address,
         })
 
         const nftokenID =
@@ -58,14 +53,14 @@ describe('NFTokenMint', function () {
         assert.isTrue(
           accountHasNFT,
           `Expected to find an NFT with NFTokenID ${nftokenID} in account ${
-            testContext.wallet.address
+            wallet.address
           } but did not find it.
         \n\nHere's what was returned from 'account_nfts' for ${
-          testContext.wallet.address
+          wallet.address
         }: ${JSON.stringify(accountNFTs)}`,
         )
       } finally {
-        await testContext.client.disconnect()
+        await client.disconnect()
       }
     },
     TIMEOUT,
