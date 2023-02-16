@@ -11,7 +11,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 
-
 ### Changed
 * All tests now use the Jest test runner and have been refactored for consistency across all packages
 
@@ -25,7 +24,6 @@ Wallet.fromMmnemonic()
 * Ignore `https-proxy-agent` in browsers for improved Vite integration
 
 ### Added
-* Allow custom type definitions to be used for encoding/decoding transactions at runtime (e.g. for sidechains/new amendments)
 * Optional custom amount field to `fundWallet`.
 
 ### Changed
