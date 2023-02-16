@@ -10,6 +10,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Improved typescript typing
 
 ### Added
+* Allow custom type definitions to be used for encoding/decoding transactions at runtime (e.g. for sidechains/new amendments)
 
 
 ### Changed
