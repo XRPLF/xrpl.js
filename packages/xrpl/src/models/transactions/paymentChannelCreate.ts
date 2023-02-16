@@ -1,10 +1,11 @@
 /* eslint-disable complexity -- Necessary for validatePaymentChannelCreate */
 import { ValidationError } from '../../errors'
+import { Amount } from '../common'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import { BaseTransaction, validateBaseTransaction, isAmount } from './common'
 
 /**
- * Create a unidirectional channel and fund it with XRP. The address sending
+ * Create a unidirectional channel and fund it. The address sending
  * this transaction becomes the "source address" of the payment channel.
  *
  * @category Transaction Models
@@ -12,20 +13,20 @@ import { BaseTransaction, validateBaseTransaction } from './common'
 export interface PaymentChannelCreate extends BaseTransaction {
   TransactionType: 'PaymentChannelCreate'
   /**
-   * Amount of XRP, in drops, to deduct from the sender's balance and set aside
-   * in this channel. While the channel is open, the XRP can only go to the
-   * Destination address. When the channel closes, any unclaimed XRP is returned
-   * to the source address's balance.
+   * Amount to deduct from the sender's balance and set aside in this channel.
+   * While the channel is open, the amount can only go to the Destination
+   * address. When the channel closes, any unclaimed amount is returned to
+   * the source address's balance.
    */
-  Amount: string
+  Amount: Amount
   /**
-   * Address to receive XRP claims against this channel. This is also known as
+   * Address to receive claims against this channel. This is also known as
    * the "destination address" for the channel.
    */
   Destination: string
   /**
    * Amount of time the source address must wait before closing the channel if
-   * it has unclaimed XRP.
+   * it has unclaimed amount.
    */
   SettleDelay: number
   /**
@@ -65,8 +66,8 @@ export function validatePaymentChannelCreate(
     throw new ValidationError('PaymentChannelCreate: missing Amount')
   }
 
-  if (typeof tx.Amount !== 'string') {
-    throw new ValidationError('PaymentChannelCreate: Amount must be a string')
+  if (typeof tx.Amount !== 'string' && !isAmount(tx.Amount)) {
+    throw new ValidationError('PaymentChannelCreate: Amount must be an Amount')
   }
 
   if (tx.Destination === undefined) {

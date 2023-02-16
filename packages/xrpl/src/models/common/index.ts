@@ -4,7 +4,7 @@ interface XRP {
   currency: 'XRP'
 }
 
-interface IssuedCurrency {
+export interface IssuedCurrency {
   currency: string
   issuer: string
 }
@@ -116,4 +116,11 @@ export interface NFTOffer {
   owner: string
   destination?: string
   expiration?: number
+}
+
+export interface XChainBridge {
+  LockingChainDoor: string
+  LockingChainIssue: Currency
+  IssuingChainDoor: string
+  IssuingChainIssue: Currency
 }

@@ -11,6 +11,7 @@ import { Currency } from './currency'
 import { Hash128 } from './hash-128'
 import { Hash160 } from './hash-160'
 import { Hash256 } from './hash-256'
+import { Issue } from './issue'
 import { PathSet } from './path-set'
 import { STArray } from './st-array'
 import { STObject } from './st-object'
@@ -19,6 +20,7 @@ import { UInt32 } from './uint-32'
 import { UInt64 } from './uint-64'
 import { UInt8 } from './uint-8'
 import { Vector256 } from './vector-256'
+import { XChainBridge } from './xchain-bridge'
 
 const coreTypes = {
   AccountID,
@@ -28,6 +30,7 @@ const coreTypes = {
   Hash128,
   Hash160,
   Hash256,
+  Issue,
   PathSet,
   STArray,
   STObject,
@@ -36,6 +39,7 @@ const coreTypes = {
   UInt32,
   UInt64,
   Vector256,
+  XChainBridge,
 }
 
 Object.values(Field).forEach((field) => {

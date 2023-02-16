@@ -82,12 +82,12 @@ describe('EscrowCreate', function () {
     assert.throws(
       () => validateEscrowCreate(escrow),
       ValidationError,
-      'EscrowCreate: Amount must be a string',
+      'EscrowCreate: Amount must be an Amount',
     )
     assert.throws(
       () => validate(escrow),
       ValidationError,
-      'EscrowCreate: Amount must be a string',
+      'EscrowCreate: Amount must be an Amount',
     )
   })
 
