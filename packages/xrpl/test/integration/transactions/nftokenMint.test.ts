@@ -22,35 +22,32 @@ describe('NFTokenMint', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {
-    testContext = await setupClient(serverUrl)
+    testContext = await setupClient('wss://s.altnet.rippletest.net:51233/')
   })
   afterEach(async () => teardownClient(testContext))
 
   it(
     'get NFTokenID',
     async function () {
-      const client = new Client('wss://s.altnet.rippletest.net:51233/')
-      await client.connect()
-
-      const { wallet, balance: _balance } = await client.fundWallet()
-
       const tx: NFTokenMint = {
         TransactionType: 'NFTokenMint',
-        Account: wallet.address,
+        Account: testContext.wallet.address,
         URI: convertStringToHex('https://www.google.com'),
         NFTokenTaxon: 0,
       }
       try {
-        const response = await client.submitAndWait(tx, { wallet })
+        const response = await testContext.client.submitAndWait(tx, {
+          wallet: testContext.wallet,
+        })
         assert.equal(response.type, 'response')
         assert.equal(
           (response.result.meta as TransactionMetadata).TransactionResult,
           'tesSUCCESS',
         )
 
-        const accountNFTs = await client.request({
+        const accountNFTs = await testContext.client.request({
           command: 'account_nfts',
-          account: wallet.address,
+          account: testContext.wallet.address,
         })
 
         const nftokenID =
@@ -63,14 +60,14 @@ describe('NFTokenMint', function () {
         assert.isTrue(
           accountHasNFT,
           `Expected to find an NFT with NFTokenID ${nftokenID} in account ${
-            wallet.address
+            testContext.wallet.address
           } but did not find it.
         \n\nHere's what was returned from 'account_nfts' for ${
-          wallet.address
+          testContext.wallet.address
         }: ${JSON.stringify(accountNFTs)}`,
         )
       } finally {
-        await client.disconnect()
+        await testContext.client.disconnect()
       }
     },
     TIMEOUT,
