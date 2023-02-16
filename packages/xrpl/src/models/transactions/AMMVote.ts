@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { Issue } from '../common'
+import { IssuedCurrency } from '../common'
 
 import { AMM_MAX_TRADING_FEE } from './AMMCreate'
 import { BaseTransaction, isIssue, validateBaseTransaction } from './common'
@@ -16,12 +16,12 @@ export interface AMMVote extends BaseTransaction {
   /**
    * Specifies one of the pool assets (XRP or token) of the AMM instance.
    */
-  Asset: Issue
+  Asset: IssuedCurrency
 
   /**
    * Specifies the other pool asset of the AMM instance.
    */
-  Asset2: Issue
+  Asset2: IssuedCurrency
 
   /**
    * Specifies the fee, in basis point.

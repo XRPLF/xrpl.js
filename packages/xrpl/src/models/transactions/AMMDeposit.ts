@@ -1,6 +1,6 @@
 /* eslint-disable complexity -- required for validateAMMDeposit */
 import { ValidationError } from '../../errors'
-import { Amount, Issue, IssuedCurrencyAmount } from '../common'
+import { Amount, IssuedCurrency, IssuedCurrencyAmount } from '../common'
 
 import {
   BaseTransaction,
@@ -49,12 +49,12 @@ export interface AMMDeposit extends BaseTransaction {
   /**
    * Specifies one of the pool assets (XRP or token) of the AMM instance.
    */
-  Asset: Issue
+  Asset: IssuedCurrency
 
   /**
    * Specifies the other pool asset of the AMM instance.
    */
-  Asset2: Issue
+  Asset2: IssuedCurrency
 
   /**
    * Specifies the amount of shares of the AMM instance pools that the trader

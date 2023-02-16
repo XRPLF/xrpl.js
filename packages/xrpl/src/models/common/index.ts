@@ -4,14 +4,12 @@ interface XRP {
   currency: 'XRP'
 }
 
-interface IssuedCurrency {
+export interface IssuedCurrency {
   currency: string
   issuer: string
 }
 
 export type Currency = IssuedCurrency | XRP
-
-export type Issue = Currency
 
 export interface IssuedCurrencyAmount extends IssuedCurrency {
   value: string
