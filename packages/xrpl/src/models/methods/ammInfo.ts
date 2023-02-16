@@ -1,4 +1,4 @@
-import { Amount, Issue, IssuedCurrencyAmount } from '../common'
+import { Amount, IssuedCurrency, IssuedCurrencyAmount } from '../common'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
@@ -15,13 +15,13 @@ export interface AMMInfoRequest extends BaseRequest {
    * Specifies one of the pool assets (XRP or token) of the AMM instance.
    * Both asset and asset2 must be defined to specify an AMM instance.
    */
-  asset?: Issue
+  asset?: IssuedCurrency
 
   /**
    * Specifies the other pool asset of the AMM instance.
    * Both asset and asset2 must be defined to specify an AMM instance.
    */
-  asset2?: Issue
+  asset2?: IssuedCurrency
 }
 
 interface AuthAccount {
