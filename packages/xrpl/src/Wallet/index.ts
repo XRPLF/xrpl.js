@@ -1,6 +1,4 @@
-/* eslint-disable max-depth -- The depth helps readability */
 /* eslint-disable max-lines -- There are lots of equivalent constructors which make sense to have here. */
-/* eslint-disable max-params -- The function parameters are necessary */
 import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
@@ -16,7 +14,6 @@ import {
   encodeForSigning,
   encodeForMultisigning,
   encode,
-  XrplDefinitionsBase,
 } from 'ripple-binary-codec'
 import {
   deriveAddress,
@@ -29,11 +26,8 @@ import {
 import ECDSA from '../ECDSA'
 import { ValidationError, XrplError } from '../errors'
 import { IssuedCurrencyAmount } from '../models/common'
-import { NFTokenMint, Transaction } from '../models/transactions'
-import {
-  BaseTransaction,
-  isIssuedCurrency,
-} from '../models/transactions/common'
+import { Transaction } from '../models/transactions'
+import { isIssuedCurrency } from '../models/transactions/common'
 import { isHex } from '../models/utils'
 import { ensureClassicAddress } from '../sugar/utils'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
@@ -309,17 +303,15 @@ class Wallet {
    * @param this - Wallet instance.
    * @param transaction - A transaction to be signed offline.
    * @param multisign - Specify true/false to use multisign or actual address (classic/x-address) to make multisign tx request.
-   * @param definitions - Custom rippled type defintions used for sidechains and new amendments.
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    * @throws XrplError if the issued currency being signed is XRP ignoring case.
    */
   // eslint-disable-next-line max-lines-per-function -- introduced more checks to support both string and boolean inputs.
-  public sign<T extends BaseTransaction = Transaction>(
+  public sign(
     this: Wallet,
-    transaction: T,
+    transaction: Transaction,
     multisign?: boolean | string,
-    definitions?: InstanceType<typeof XrplDefinitionsBase>,
   ): {
     tx_blob: string
     hash: string
@@ -339,8 +331,7 @@ class Wallet {
       )
     }
 
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only modifies Payments
-    removeTrailingZeros(tx as Transaction)
+    removeTrailingZeros(tx)
 
     const txToSignAndEncode = { ...tx }
 
@@ -354,7 +345,6 @@ class Wallet {
           txToSignAndEncode,
           this.privateKey,
           multisignAddress,
-          definitions,
         ),
       }
       txToSignAndEncode.Signers = [{ Signer: signer }]
@@ -362,16 +352,14 @@ class Wallet {
       txToSignAndEncode.TxnSignature = computeSignature(
         txToSignAndEncode,
         this.privateKey,
-        undefined,
-        definitions,
       )
     }
 
-    const serialized = encode(txToSignAndEncode, definitions)
-    this.checkTxSerialization(serialized, tx, definitions)
+    const serialized = encode(txToSignAndEncode)
+    this.checkTxSerialization(serialized, tx)
     return {
       tx_blob: serialized,
-      hash: hashSignedTx(serialized, definitions),
+      hash: hashSignedTx(serialized),
     }
   }
 
@@ -379,18 +367,14 @@ class Wallet {
    * Verifies a signed transaction offline.
    *
    * @param signedTransaction - A signed transaction (hex string of signTransaction result) to be verified offline.
-   * @param definitions - Custom rippled type definitions. Used for sidechains and new amendments.
    * @returns Returns true if a signedTransaction is valid.
    */
-  public verifyTransaction(
-    signedTransaction: Transaction | string,
-    definitions?: InstanceType<typeof XrplDefinitionsBase>,
-  ): boolean {
+  public verifyTransaction(signedTransaction: Transaction | string): boolean {
     const tx =
       typeof signedTransaction === 'string'
-        ? decode(signedTransaction, definitions)
+        ? decode(signedTransaction)
         : signedTransaction
-    const messageHex: string = encodeForSigning(tx, definitions)
+    const messageHex: string = encodeForSigning(tx)
     const signature = tx.TxnSignature
     return verify(messageHex, signature, this.publicKey)
   }
@@ -413,19 +397,14 @@ class Wallet {
    *
    * @param serialized - A signed and serialized transaction.
    * @param tx - The transaction prior to signing.
-   * @param definitions - Custom rippled type definitions. Used for sidechains and new amendments.
    * @throws A ValidationError if the transaction does not have a TxnSignature/Signers property, or if
    * the serialized Transaction desn't match the original transaction.
    * @throws XrplError if the transaction includes an issued currency which is equivalent to XRP ignoring case.
    */
   // eslint-disable-next-line class-methods-use-this, max-lines-per-function -- Helper for organization purposes
-  private checkTxSerialization(
-    serialized: string,
-    tx: BaseTransaction,
-    definitions?: InstanceType<typeof XrplDefinitionsBase>,
-  ): void {
+  private checkTxSerialization(serialized: string, tx: Transaction): void {
     // Decode the serialized transaction:
-    const decoded = decode(serialized, definitions)
+    const decoded = decode(serialized)
     const txCopy = { ...tx }
 
     /*
@@ -480,16 +459,11 @@ class Wallet {
       return memo
     })
 
-    if (txCopy.TransactionType === 'NFTokenMint') {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We just checked that this was ok.
-      const uri = (txCopy as NFTokenMint).URI
-      if (uri) {
-        if (!isHex(uri)) {
-          throw new ValidationError('URI must be a hex value')
-        }
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We just checked that this was ok.
-        ;(txCopy as NFTokenMint).URI = uri.toUpperCase()
+    if (txCopy.TransactionType === 'NFTokenMint' && txCopy.URI) {
+      if (!isHex(txCopy.URI)) {
+        throw new ValidationError('URI must be a hex value')
       }
+      txCopy.URI = txCopy.URI.toUpperCase()
     }
 
     /* eslint-disable @typescript-eslint/consistent-type-assertions -- We check at runtime that this is safe */
@@ -512,6 +486,7 @@ class Wallet {
         // Standardize the format of currency codes to the 40 byte hex string for comparison
         const amount = txCopy[key] as IssuedCurrencyAmount
         if (amount.currency.length !== decodedCurrency.length) {
+          /* eslint-disable-next-line max-depth -- Easier to read with two if-statements */
           if (decodedCurrency.length === standard_currency_code_len) {
             decodedAmount.currency = isoToHex(decodedCurrency)
           } else {
@@ -544,26 +519,21 @@ class Wallet {
  * @param privateKey - A key to sign the transaction with.
  * @param signAs - Multisign only. An account address to include in the Signer field.
  * Can be either a classic address or an XAddress.
- * @param definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns A signed transaction in the proper format.
  */
 function computeSignature(
-  tx: BaseTransaction,
+  tx: Transaction,
   privateKey: string,
   signAs?: string,
-  definitions?: InstanceType<typeof XrplDefinitionsBase>,
 ): string {
   if (signAs) {
     const classicAddress = isValidXAddress(signAs)
       ? xAddressToClassicAddress(signAs).classicAddress
       : signAs
 
-    return sign(
-      encodeForMultisigning(tx, classicAddress, definitions),
-      privateKey,
-    )
+    return sign(encodeForMultisigning(tx, classicAddress), privateKey)
   }
-  return sign(encodeForSigning(tx, definitions), privateKey)
+  return sign(encodeForSigning(tx), privateKey)
 }
 
 /**
