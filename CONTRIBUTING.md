@@ -182,8 +182,9 @@ NOW WE ARE READY TO PUBLISH! No new code changes happen manually now.
 4. Update `HISTORY.md` to reflect release changes.
 5. Run `npm run docgen` if the docs were modified in this release to update them (skip this step for a beta).
 6. Run `npm run build` to triple check the build still works
-7. Run `npx lerna version --no-git-tag-version` - This creates a draft PR and release tags for the new version.
+7. Run `npx lerna version --no-git-tag-version` - This creates a draft PR and bumps the versions of the packages.
   * For each changed package, pick what the new version should be. Lerna will bump the versions, commit version bumps to `main`, and create a new git tag for each published package.
+  * If publishing a beta, make sure that the versions are all of the form `a.b.c-beta.d`, where `a`, `b`, and `c` are identical to the last normal release except for one, which has been incremented by 1.
 8. Run `npm i` to update the package-lock with the updated versions
 9. Create a new PR from this branch into `main` and merge it (you can directly merge into the beta branch for a beta).
 10. Checkout `main` and `git pull` (you can skip this step for a beta since you already have the latest version of the beta branch).
