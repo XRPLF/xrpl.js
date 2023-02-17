@@ -19,6 +19,17 @@ const INTERVAL_SECONDS = 1
 // Maximum attempts to retrieve a balance
 const MAX_ATTEMPTS = 20
 
+export const DEFAULT_MEMO = {
+  data: 'xrpl-js',
+  type: 'user-agent',
+  format: 'text',
+}
+interface memo {
+  data?: string
+  type?: string
+  format?: string
+}
+
 /**
  * Generates a random wallet with some amount of XRP (usually 1000 XRP).
  *
@@ -45,6 +56,8 @@ const MAX_ATTEMPTS = 20
  * Ex: client.fundWallet(null,{'faucet.altnet.rippletest.net', '/accounts'})
  * specifies a request to 'faucet.altnet.rippletest.net/accounts' to fund a new wallet.
  * @param options.amount - A custom amount to fund, if undefined or null, the default amount will be 1000.
+ * @param options.memo - A custom memo object to add for on-chain tracking purposes
+ * default memo is added as "xrpl-js".
  * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP,
  * and that wallet's balance in XRP.
  * @throws When either Client isn't connected or unable to fund wallet address.
@@ -57,6 +70,7 @@ async function fundWallet(
     faucetHost?: string
     faucetPath?: string
     amount?: string
+    memo?: memo
   },
 ): Promise<{
   wallet: Wallet
@@ -65,7 +79,10 @@ async function fundWallet(
   if (!this.isConnected()) {
     throw new RippledError('Client not connected, cannot call faucet')
   }
-
+  const memos: memo[] = [DEFAULT_MEMO]
+  if (options?.memo) {
+    memos.push(options.memo)
+  }
   // Generate a new Wallet if no existing Wallet is provided or its address is invalid to fund
   const walletToFund =
     wallet && isValidClassicAddress(wallet.classicAddress)
@@ -78,6 +95,7 @@ async function fundWallet(
       JSON.stringify({
         destination: walletToFund.classicAddress,
         xrpAmount: options?.amount,
+        memos,
       }),
     ),
   )
