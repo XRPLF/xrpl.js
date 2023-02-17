@@ -466,7 +466,19 @@ class Wallet {
       txCopy.URI = txCopy.URI.toUpperCase()
     }
 
-    if (txCopy.TransactionType === 'NFTokenMint' && txCopy.hasOwnProperty('URI') && txCopy.URI == undefined) {
+    if (
+      txCopy.TransactionType === 'NFTokenMint' &&
+      typeof txCopy.URI === 'string' &&
+      txCopy.URI === ''
+    ) {
+      throw new ValidationError('NFTokenMint: URI must not be empty string')
+    }
+
+    if (
+      txCopy.TransactionType === 'NFTokenMint' &&
+      txCopy.hasOwnProperty('URI') &&
+      txCopy.URI === undefined
+    ) {
       delete txCopy.URI
     }
 

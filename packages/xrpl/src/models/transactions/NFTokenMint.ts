@@ -109,7 +109,7 @@ export function validateNFTokenMint(tx: Record<string, unknown>): void {
     )
   }
 
-  if (typeof tx.URI === 'string' && '' == tx.URI) {
+  if (typeof tx.URI === 'string' && tx.URI === '') {
     throw new ValidationError('NFTokenMint: URI must not be empty string')
   }
 

@@ -864,6 +864,31 @@ describe('Wallet', function () {
       assert.deepEqual(result, expectedResult)
     })
 
+    it('sign throws when NFTokenMint.URI is empty string', async function () {
+      const tx: NFTokenMint = {
+        TransactionType: 'NFTokenMint',
+        Account: wallet.address,
+        TransferFee: 314,
+        NFTokenTaxon: 0,
+        Flags: 8,
+        Fee: '10',
+        URI: '',
+        Memos: [
+          {
+            Memo: {
+              MemoType:
+                '687474703a2f2f6578616d706c652e636f6d2f6d656d6f2f67656e65726963',
+              MemoData: '72656e74',
+            },
+          },
+        ],
+      }
+
+      assert.throws(() => {
+        wallet.sign(tx)
+      }, /URI must not be empty string/u)
+    })
+
     it('sign removes undefined NFTokenMint.URI property from transaction blob', async function () {
       const tx: NFTokenMint = {
         TransactionType: 'NFTokenMint',
