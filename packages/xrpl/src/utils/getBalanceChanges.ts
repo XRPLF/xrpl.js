@@ -40,7 +40,7 @@ interface NormalizedNode {
 
 function normalizeNode(affectedNode: Node): NormalizedNode {
   const diffType = Object.keys(affectedNode)[0]
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- not quite right, but close enough
+  // Not quite right, but close enough
   const node = affectedNode[diffType] as NormalizedNode
   return {
     ...node,
@@ -102,7 +102,6 @@ function getXRPQuantity(
   }
 
   return {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- okay here
     account: (node.FinalFields?.Account ?? node.NewFields?.Account) as string,
     balance: {
       currency: 'XRP',
@@ -114,7 +113,6 @@ function getXRPQuantity(
 function flipTrustlinePerspective(balanceChange: BalanceChange): BalanceChange {
   const negatedBalance = new BigNumber(balanceChange.balance.value).negated()
   return {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- we know this is true
     account: balanceChange.balance.issuer as string,
     balance: {
       issuer: balanceChange.account,
@@ -140,11 +138,9 @@ function getTrustlineQuantity(node: NormalizedNode): BalanceChange[] | null {
 
   // the balance is always from low node's perspective
   const result = {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- we know that this is true
     account: fields?.LowLimit?.issuer as string,
     balance: {
       issuer: fields?.HighLimit?.issuer,
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- we know that this is true
       currency: (fields?.Balance as IssuedCurrencyAmount).currency,
       value: value.toString(),
     },

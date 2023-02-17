@@ -147,7 +147,7 @@ async function waitForFinalTransactionOutcome(
     })
     .catch(async (error) => {
       // error is of an unknown type and hence we assert type to extract the value we need.
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-member-access -- ^
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- ^
       const message = error?.data?.error as string
       if (message === 'txnNotFound') {
         return waitForFinalTransactionOutcome(
@@ -213,8 +213,7 @@ async function getSignedTx(
 
   let tx =
     typeof transaction === 'string'
-      ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- converts JsonObject to correct Transaction type
-        (decode(transaction) as unknown as Transaction)
+      ? (decode(transaction) as unknown as Transaction)
       : transaction
 
   if (autofill) {
@@ -229,7 +228,6 @@ function getLastLedgerSequence(
   transaction: Transaction | string,
 ): number | null {
   const tx = typeof transaction === 'string' ? decode(transaction) : transaction
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- converts LastLedgSeq to number if present.
   return tx.LastLedgerSequence as number | null
 }
 

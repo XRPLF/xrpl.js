@@ -48,7 +48,6 @@ function isPartialPayment(
       return false
     }
 
-    /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- binary-codec typing */
     meta = decode(meta) as unknown as TransactionMetadata
   }
 
@@ -86,7 +85,6 @@ function accountTxHasPartialPayment(response: AccountTxResponse): boolean {
 }
 
 function hasPartialPayment(command: string, response: Response): boolean {
-  /* eslint-disable @typescript-eslint/consistent-type-assertions -- Request type is known at runtime from command */
   switch (command) {
     case 'tx':
       return txHasPartialPayment(response as TxResponse)
@@ -97,7 +95,6 @@ function hasPartialPayment(command: string, response: Response): boolean {
     default:
       return false
   }
-  /* eslint-enable @typescript-eslint/consistent-type-assertions */
 }
 
 /**

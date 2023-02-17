@@ -115,11 +115,10 @@ export default class RequestManager {
      */
     // The following type assertions are required to get this code to pass in browser environments
     // where setTimeout has a different type
-    // eslint-disable-next-line max-len -- Necessary to disable both rules.
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- Reason above.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- Reason above.
     if ((timer as unknown as any).unref) {
-      // eslint-disable-next-line max-len -- Necessary to disable both rules.
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call -- Reason above.
+      // eslint-disable-next-line max-len -- Necessary to disable all rules.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call -- Reason above.
       ;(timer as unknown as any).unref()
     }
     if (this.promisesAwaitingResponse.has(newId)) {
@@ -160,7 +159,6 @@ export default class RequestManager {
       this.reject(response.id, error)
     }
     if (response.status === 'error') {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We know this must be true
       const errorResponse = response as Partial<ErrorResponse>
       const error = new RippledError(
         errorResponse.error_message ?? errorResponse.error,
@@ -179,7 +177,6 @@ export default class RequestManager {
     }
     // status no longer needed because error is thrown if status is not "success"
     delete response.status
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be a valid Response here
     this.resolve(response.id, response as unknown as Response)
   }
 

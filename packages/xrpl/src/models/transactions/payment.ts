@@ -184,7 +184,6 @@ export function validatePayment(tx: Record<string, unknown>): void {
 
   if (
     tx.Paths !== undefined &&
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
     !isPaths(tx.Paths as Array<Array<Record<string, unknown>>>)
   ) {
     throw new ValidationError('PaymentTransaction: invalid Paths')
@@ -205,7 +204,6 @@ function checkPartialPayment(tx: Record<string, unknown>): void {
       )
     }
 
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
     const flags = tx.Flags as number | PaymentFlagsInterface
     const isTfPartialPayment =
       typeof flags === 'number'

@@ -166,7 +166,6 @@ function getSubKey(
 }
 
 function bufferToArray(buf: Buffer): number[] {
-  /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We know the end type */
   return Array.prototype.slice.call(buf) as number[]
 }
 

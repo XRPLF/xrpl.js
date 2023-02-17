@@ -105,7 +105,6 @@ export function validate(transaction: Record<string, unknown>): void {
   if (typeof tx.TransactionType !== 'string') {
     throw new ValidationError("Object's `TransactionType` is not a string")
   }
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- okay here
   setTransactionFlagsToNumber(tx as unknown as Transaction)
   switch (tx.TransactionType) {
     case 'AccountDelete':

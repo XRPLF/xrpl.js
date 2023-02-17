@@ -68,7 +68,6 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
   }
 
   for (const entry of tx.SignerEntries) {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be a SignerEntry
     const signerEntry = entry as SignerEntry
     const { WalletLocator } = signerEntry.SignerEntry
     if (

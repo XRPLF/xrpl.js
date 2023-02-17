@@ -38,7 +38,6 @@ function multisign(transactions: Array<Transaction | string>): string {
     /*
      * This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
      */
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
     validate(tx as unknown as Record<string, unknown>)
     if (tx.Signers == null || tx.Signers.length === 0) {
       throw new ValidationError(
@@ -163,11 +162,9 @@ function addressToBigNumber(address: string): BigNumber {
 function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
   if (typeof txOrBlob === 'object') {
     // We need this to handle X-addresses in multisigning
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
     return decode(encode(txOrBlob)) as unknown as Transaction
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
   return decode(txOrBlob) as unknown as Transaction
 }
 

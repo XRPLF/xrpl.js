@@ -411,7 +411,6 @@ export class Connection extends EventEmitter {
       return
     }
     if (data.type) {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
       this.emit(data.type as string, data)
     }
     if (data.type === 'response') {

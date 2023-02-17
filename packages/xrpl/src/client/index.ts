@@ -349,12 +349,10 @@ class Client extends EventEmitter {
   public async request<R extends Request, T extends Response>(
     req: R,
   ): Promise<T> {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
     const response = (await this.connection.request({
       ...req,
       account: req.account
-        ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be string
-          ensureClassicAddress(req.account as string)
+        ? ensureClassicAddress(req.account as string)
         : undefined,
     })) as T
 
@@ -408,7 +406,6 @@ class Client extends EventEmitter {
       )
     }
     const nextPageRequest = { ...req, marker: resp.result.marker }
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
     return this.request(nextPageRequest) as unknown as U
   }
 
@@ -540,7 +537,6 @@ class Client extends EventEmitter {
       }
       // eslint-disable-next-line no-await-in-loop -- Necessary for this, it really has to wait
       const singleResponse = await this.connection.request(repeatProps)
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
       const singleResult = (singleResponse as U).result
       if (!(collectKey in singleResult)) {
         throw new XrplError(`${collectKey} not in result`)
@@ -548,7 +544,6 @@ class Client extends EventEmitter {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Should be true
       const collectedData = singleResult[collectKey]
       marker = singleResult.marker
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
       results.push(singleResponse as U)
       // Make sure we handle when no data (not even an empty array) is returned.
       if (Array.isArray(collectedData)) {

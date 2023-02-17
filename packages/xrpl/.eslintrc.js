@@ -62,6 +62,12 @@ module.exports = {
 
     'tsdoc/syntax': 'off',
     'jsdoc/require-description-complete-sentence': 'off',
+
+    // Type assertions are occassionally necessary when dealing with very complex types
+    '@typescript-eslint/consistent-type-assertions': [
+      'warn',
+      { assertionStyle: 'as' },
+    ],
   },
   overrides: [
     {

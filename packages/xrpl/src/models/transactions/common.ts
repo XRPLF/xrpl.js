@@ -13,7 +13,6 @@ function isMemo(obj: { Memo?: unknown }): boolean {
   if (obj.Memo == null) {
     return false
   }
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
   const memo = obj.Memo as Record<string, unknown>
   const size = Object.keys(memo).length
   const validData = memo.MemoData == null || typeof memo.MemoData === 'string'
@@ -34,13 +33,11 @@ function isMemo(obj: { Memo?: unknown }): boolean {
 const SIGNER_SIZE = 3
 
 function isSigner(obj: unknown): boolean {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
   const signerWrapper = obj as Record<string, unknown>
 
   if (signerWrapper.Signer == null) {
     return false
   }
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS and Signer is previously unknown
   const signer = signerWrapper.Signer as Record<string, unknown>
   return (
     Object.keys(signer).length === SIGNER_SIZE &&
@@ -212,13 +209,11 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
     throw new ValidationError('BaseTransaction: invalid LastLedgerSequence')
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
   const memos = common.Memos as Array<{ Memo?: unknown }> | undefined
   if (memos !== undefined && !memos.every(isMemo)) {
     throw new ValidationError('BaseTransaction: invalid Memos')
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
   const signers = common.Signers as Array<Record<string, unknown>> | undefined
 
   if (

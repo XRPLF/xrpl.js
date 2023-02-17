@@ -466,7 +466,6 @@ class Wallet {
       txCopy.URI = txCopy.URI.toUpperCase()
     }
 
-    /* eslint-disable @typescript-eslint/consistent-type-assertions -- We check at runtime that this is safe */
     Object.keys(txCopy).forEach((key) => {
       const standard_currency_code_len = 3
       if (txCopy[key] && isIssuedCurrency(txCopy[key])) {
@@ -496,7 +495,6 @@ class Wallet {
         }
       }
     })
-    /* eslint-enable @typescript-eslint/consistent-type-assertions -- Done with dynamic checking */
 
     if (!isEqual(decoded, txCopy)) {
       const data = {
