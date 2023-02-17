@@ -1,9 +1,20 @@
 import assert from 'assert'
 
-import { Client, SubmitResponse } from '../../src'
-import { AccountSet, SignerListSet } from '../../src/models/transactions'
+import _ from 'lodash'
+import { XrplDefinitions } from 'ripple-binary-codec'
+
+import { Amount, Client, RippledError, SubmitResponse } from '../../src'
+import {
+  AccountSet,
+  BaseTransaction,
+  Payment,
+  SignerListSet,
+} from '../../src/models/transactions'
 import { convertStringToHex } from '../../src/utils'
 import { multisign } from '../../src/Wallet/signer'
+import * as newPaymentDefinitions from '../fixtures/rippled/definitions-with-massively-diff-payment.json'
+import * as newTxDefinitions from '../fixtures/rippled/definitions-with-new-tx-type.json'
+import { assertRejects } from '../testUtils'
 
 import serverUrl from './serverUrl'
 import {
@@ -106,4 +117,67 @@ describe('integration tests', function () {
     },
     TIMEOUT,
   )
+
+  it('submitting an invalid transaction with proper custom types should send, but be rejected by rippled', async function () {
+    const client: Client = this.client
+    const wallet1 = await generateFundedWallet(client)
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: wallet1.address,
+      Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+      Amount: '20000000',
+      Sequence: 1,
+      Fee: '12',
+    }
+
+    const newDefs = new XrplDefinitions(newPaymentDefinitions)
+
+    // It should successfully submit, but fail once rippled sees it since the new type definition is not on-ledger.
+    await assertRejects(
+      client.submit(tx, {
+        wallet: wallet1,
+        definitions: newDefs,
+      }),
+      RippledError,
+      'invalidTransaction',
+    )
+
+    // Same for submitAndWait
+    await assertRejects(
+      client.submitAndWait(tx, {
+        wallet: wallet1,
+        definitions: newDefs,
+      }),
+      RippledError,
+      'invalidTransaction',
+    )
+  })
+
+  it('Defining a new TransactionType should compile and run', async function () {
+    const newDefs = new XrplDefinitions(newTxDefinitions)
+
+    const client: Client = this.client
+    const wallet1 = await generateFundedWallet(client)
+
+    interface NewTx extends BaseTransaction {
+      Amount: Amount
+    }
+
+    const tx: NewTx = {
+      TransactionType: 'NewTx',
+      Account: wallet1.address,
+      Amount: '100',
+    }
+
+    client.fundWallet()
+
+    await assertRejects(
+      client.submitAndWait(tx, {
+        wallet: wallet1,
+        definitions: newDefs,
+      }),
+      RippledError,
+      'invalidTransaction',
+    )
+  })
 })

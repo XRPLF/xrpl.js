@@ -1,4 +1,4 @@
-import { Transaction } from '../transactions'
+import { type BaseTransaction, type Transaction } from '../transactions'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
@@ -25,7 +25,8 @@ export interface SubmitRequest extends BaseRequest {
  *
  * @category Responses
  */
-export interface SubmitResponse extends BaseResponse {
+export interface SubmitResponse<T extends BaseTransaction = Transaction>
+  extends BaseResponse {
   result: {
     /**
      * Text result code indicating the preliminary result of the transaction,
@@ -39,7 +40,7 @@ export interface SubmitResponse extends BaseResponse {
     /** The complete transaction in hex string format. */
     tx_blob: string
     /** The complete transaction in JSON format. */
-    tx_json: Transaction & { hash?: string }
+    tx_json: T & { hash?: string }
     /**
      * The value true indicates that the transaction was applied, queued,
      * broadcast, or kept for later. The value `false` indicates that none of
