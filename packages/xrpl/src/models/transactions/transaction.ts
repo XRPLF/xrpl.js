@@ -3,7 +3,7 @@
 
 import isEqual from 'lodash/isEqual'
 import omitBy from 'lodash/omitBy'
-import { encode, decode, XrplDefinitionsBase } from 'ripple-binary-codec'
+import { encode, decode } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
 import { setTransactionFlagsToNumber } from '../utils/flags'
@@ -13,7 +13,6 @@ import { AccountSet, validateAccountSet } from './accountSet'
 import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
-import { type BaseTransaction } from './common'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
@@ -54,12 +53,6 @@ import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
 
 /**
- * Records all transaction types in an interface that can be extended.
- * Transaction should be used instead of this for most purposes.
- * This is only for adding new TransactionType models to typescript via .d.ts files.
- */
-
-/**
  * @category Transaction Models
  */
 export type Transaction =
@@ -91,10 +84,8 @@ export type Transaction =
 /**
  * @category Transaction Models
  */
-export interface TransactionAndMetadata<
-  T extends BaseTransaction = Transaction,
-> {
-  transaction: T
+export interface TransactionAndMetadata {
+  transaction: Transaction
   metadata: TransactionMetadata
 }
 
@@ -103,14 +94,10 @@ export interface TransactionAndMetadata<
  * Encode/decode and individual type validation.
  *
  * @param transaction - A Transaction.
- * @param definitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @throws ValidationError When the Transaction is malformed.
  * @category Utilities
  */
-export function validate(
-  transaction: Record<string, unknown>,
-  definitions?: InstanceType<typeof XrplDefinitionsBase>,
-): void {
+export function validate(transaction: Record<string, unknown>): void {
   const tx = { ...transaction }
   if (tx.TransactionType == null) {
     throw new ValidationError('Object does not have a `TransactionType`')
@@ -225,7 +212,7 @@ export function validate(
 
   if (
     !isEqual(
-      decode(encode(tx, definitions), definitions),
+      decode(encode(tx)),
       omitBy(tx, (value) => value == null),
     )
   ) {

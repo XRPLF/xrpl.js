@@ -1,9 +1,9 @@
-import { decode, encode, XrplDefinitionsBase } from 'ripple-binary-codec'
+import { decode, encode } from 'ripple-binary-codec'
 
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { TxResponse } from '../models/methods'
-import { type BaseTransaction, type Transaction } from '../models/transactions'
+import { Transaction } from '../models/transactions'
 import { hashes } from '../utils'
 
 /** Approximate time for a ledger to close, in milliseconds */
@@ -28,13 +28,12 @@ async function sleep(ms: number): Promise<void> {
  * @param opts.autofill - If true, autofill a transaction.
  * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
  * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
- * @param opts.definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns A promise that contains SubmitResponse.
  * @throws RippledError if submit request fails.
  */
-async function submit<T extends BaseTransaction = Transaction>(
+async function submit(
   this: Client,
-  transaction: T | string,
+  transaction: Transaction | string,
   opts?: {
     // If true, autofill a transaction.
     autofill?: boolean
@@ -42,12 +41,10 @@ async function submit<T extends BaseTransaction = Transaction>(
     failHard?: boolean
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
     wallet?: Wallet
-    // Custom rippled types to use instead of the default. Used for sidechains and amendments.
-    definitions?: InstanceType<typeof XrplDefinitionsBase>
   },
 ): Promise<SubmitResponse> {
   const signedTx = await getSignedTx(this, transaction, opts)
-  return submitRequest(this, signedTx, opts?.failHard, opts?.definitions)
+  return submitRequest(this, signedTx, opts?.failHard)
 }
 
 /**
@@ -61,12 +58,11 @@ async function submit<T extends BaseTransaction = Transaction>(
  * @param opts.autofill - If true, autofill a transaction.
  * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
  * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
- * @param opts.definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
  */
-async function submitAndWait<T extends BaseTransaction = Transaction>(
+async function submitAndWait(
   this: Client,
-  transaction: T | string,
+  transaction: Transaction | string,
   opts?: {
     // If true, autofill a transaction.
     autofill?: boolean
@@ -74,25 +70,18 @@ async function submitAndWait<T extends BaseTransaction = Transaction>(
     failHard?: boolean
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
     wallet?: Wallet
-    // Custom rippled types to use instead of the default. Used for sidechains and amendments.
-    definitions?: InstanceType<typeof XrplDefinitionsBase>
   },
 ): Promise<TxResponse> {
   const signedTx = await getSignedTx(this, transaction, opts)
 
-  const lastLedger = getLastLedgerSequence(signedTx, opts?.definitions)
+  const lastLedger = getLastLedgerSequence(signedTx)
   if (lastLedger == null) {
     throw new ValidationError(
       'Transaction must contain a LastLedgerSequence value for reliable submission.',
     )
   }
 
-  const response = await submitRequest(
-    this,
-    signedTx,
-    opts?.failHard,
-    opts?.definitions,
-  )
+  const response = await submitRequest(this, signedTx, opts?.failHard)
 
   const txHash = hashes.hashSignedTx(signedTx)
   return waitForFinalTransactionOutcome(
@@ -106,25 +95,23 @@ async function submitAndWait<T extends BaseTransaction = Transaction>(
 // Helper functions
 
 // Encodes and submits a signed transaction.
-// eslint-disable-next-line max-params -- All params are required
-async function submitRequest<T extends BaseTransaction = Transaction>(
+async function submitRequest(
   client: Client,
-  signedTransaction: T | string,
+  signedTransaction: Transaction | string,
   failHard = false,
-  definitions?: InstanceType<typeof XrplDefinitionsBase>,
 ): Promise<SubmitResponse> {
-  if (!isSigned(signedTransaction, definitions)) {
+  if (!isSigned(signedTransaction)) {
     throw new ValidationError('Transaction must be signed')
   }
 
   const signedTxEncoded =
     typeof signedTransaction === 'string'
       ? signedTransaction
-      : encode(signedTransaction, definitions)
+      : encode(signedTransaction)
   const request: SubmitRequest = {
     command: 'submit',
     tx_blob: signedTxEncoded,
-    fail_hard: isAccountDelete(signedTransaction, definitions) || failHard,
+    fail_hard: isAccountDelete(signedTransaction) || failHard,
   }
   return client.request(request)
 }
@@ -190,14 +177,8 @@ async function waitForFinalTransactionOutcome(
 }
 
 // checks if the transaction has been signed
-function isSigned<T extends BaseTransaction = Transaction>(
-  transaction: T | string,
-  definitions?: InstanceType<typeof XrplDefinitionsBase>,
-): boolean {
-  const tx =
-    typeof transaction === 'string'
-      ? decode(transaction, definitions)
-      : transaction
+function isSigned(transaction: Transaction | string): boolean {
+  const tx = typeof transaction === 'string' ? decode(transaction) : transaction
   return (
     typeof tx !== 'string' &&
     (tx.SigningPubKey != null || tx.TxnSignature != null)
@@ -205,13 +186,12 @@ function isSigned<T extends BaseTransaction = Transaction>(
 }
 
 // initializes a transaction for a submit request
-async function getSignedTx<T extends BaseTransaction = Transaction>(
+async function getSignedTx(
   client: Client,
-  transaction: T | string,
+  transaction: Transaction | string,
   {
     autofill = true,
     wallet,
-    definitions,
   }: {
     // If true, autofill a transaction.
     autofill?: boolean
@@ -219,11 +199,9 @@ async function getSignedTx<T extends BaseTransaction = Transaction>(
     failHard?: boolean
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
     wallet?: Wallet
-    // Custom rippled types to use instead of the default. Used for sidechains and amendments.
-    definitions?: InstanceType<typeof XrplDefinitionsBase>
   } = {},
-): Promise<T | string> {
-  if (isSigned(transaction, definitions)) {
+): Promise<Transaction | string> {
+  if (isSigned(transaction)) {
     return transaction
   }
 
@@ -236,38 +214,28 @@ async function getSignedTx<T extends BaseTransaction = Transaction>(
   let tx =
     typeof transaction === 'string'
       ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- converts JsonObject to correct Transaction type
-        (decode(transaction, definitions) as unknown as Transaction)
+        (decode(transaction) as unknown as Transaction)
       : transaction
 
   if (autofill) {
     tx = await client.autofill(tx)
   }
 
-  return wallet.sign(tx, false, definitions).tx_blob
+  return wallet.sign(tx).tx_blob
 }
 
 // checks if there is a LastLedgerSequence as a part of the transaction
-function getLastLedgerSequence<T extends BaseTransaction = Transaction>(
-  transaction: T | string,
-  definitions?: InstanceType<typeof XrplDefinitionsBase>,
+function getLastLedgerSequence(
+  transaction: Transaction | string,
 ): number | null {
-  const tx =
-    typeof transaction === 'string'
-      ? decode(transaction, definitions)
-      : transaction
+  const tx = typeof transaction === 'string' ? decode(transaction) : transaction
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- converts LastLedgSeq to number if present.
   return tx.LastLedgerSequence as number | null
 }
 
 // checks if the transaction is an AccountDelete transaction
-function isAccountDelete<T extends BaseTransaction = Transaction>(
-  transaction: T | string,
-  definitions?: InstanceType<typeof XrplDefinitionsBase>,
-): boolean {
-  const tx =
-    typeof transaction === 'string'
-      ? decode(transaction, definitions)
-      : transaction
+function isAccountDelete(transaction: Transaction | string): boolean {
+  const tx = typeof transaction === 'string' ? decode(transaction) : transaction
   return tx.TransactionType === 'AccountDelete'
 }
 

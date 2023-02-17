@@ -7,10 +7,10 @@ import {
   AccountRootFlags,
 } from '../ledger/AccountRoot'
 import {
-  type AccountSetFlagsInterface,
+  AccountSetFlagsInterface,
   AccountSetTfFlags,
 } from '../transactions/accountSet'
-import { type BaseTransaction, type GlobalFlags } from '../transactions/common'
+import { GlobalFlags } from '../transactions/common'
 import {
   OfferCreateFlagsInterface,
   OfferCreateFlags,
@@ -20,6 +20,7 @@ import {
   PaymentChannelClaimFlagsInterface,
   PaymentChannelClaimFlags,
 } from '../transactions/paymentChannelClaim'
+import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlagsInterface, TrustSetFlags } from '../transactions/trustSet'
 
 import { isFlagEnabled } from '.'
@@ -49,7 +50,7 @@ export function parseAccountRootFlags(
  *
  * @param tx - A transaction to set its flags to its numeric representation.
  */
-export function setTransactionFlagsToNumber(tx: BaseTransaction): void {
+export function setTransactionFlagsToNumber(tx: Transaction): void {
   if (tx.Flags == null) {
     tx.Flags = 0
     return

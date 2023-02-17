@@ -14,7 +14,6 @@ import {
   isValidXAddress,
   xAddressToClassicAddress,
 } from 'ripple-address-codec'
-// Imported as rbc so we can type the functions via wrappers with the same name
 import * as rbc from 'ripple-binary-codec'
 import { verify as verifyKeypairSignature } from 'ripple-keypairs'
 
@@ -80,42 +79,30 @@ function isValidSecret(secret: string): boolean {
  * Encodes a LedgerEntry or Transaction into a hex string
  *
  * @param object - LedgerEntry or Transaction in JSON format.
- * @param definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns A hex string representing the encoded object.
  */
-function encode(
-  object: Transaction | LedgerEntry,
-  definitions?: InstanceType<typeof XrplDefinitionsBase>,
-): string {
-  return rbc.encode(object, definitions)
+function encode(object: Transaction | LedgerEntry): string {
+  return rbc.encode(object)
 }
 
 /**
  * Encodes a Transaction for signing
  *
  * @param object - LedgerEntry in JSON or Transaction format.
- * @param definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns A hex string representing the encoded object.
  */
-function encodeForSigning(
-  object: Transaction,
-  definitions?: InstanceType<typeof XrplDefinitionsBase>,
-): string {
-  return rbc.encodeForSigning(object, definitions)
+function encodeForSigning(object: Transaction): string {
+  return rbc.encodeForSigning(object)
 }
 
 /**
  * Encodes a PaymentChannelClaim for signing
  *
  * @param object - PaymentChannelClaim in JSON format.
- * @param definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns A hex string representing the encoded object.
  */
-function encodeForSigningClaim(
-  object: PaymentChannelClaim,
-  definitions?: InstanceType<typeof XrplDefinitionsBase>,
-): string {
-  return rbc.encodeForSigningClaim(object, definitions)
+function encodeForSigningClaim(object: PaymentChannelClaim): string {
+  return rbc.encodeForSigningClaim(object)
 }
 
 /**
@@ -123,29 +110,20 @@ function encodeForSigningClaim(
  *
  * @param object - Transaction in JSON format.
  * @param signer - The address of the account signing this transaction
- * @param definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns A hex string representing the encoded object.
  */
-function encodeForMultiSigning(
-  object: Transaction,
-  signer: string,
-  definitions?: InstanceType<typeof XrplDefinitionsBase>,
-): string {
-  return rbc.encodeForMultisigning(object, signer, definitions)
+function encodeForMultiSigning(object: Transaction, signer: string): string {
+  return rbc.encodeForMultisigning(object, signer)
 }
 
 /**
  * Decodes a hex string into a transaction | ledger entry
  *
  * @param hex - hex string in the XRPL serialization format.
- * @param definitions - Custom rippled type definitions. Used for sidechains and new amendments.
  * @returns The hex string decoded according to XRPL serialization format.
  */
-function decode(
-  hex: string,
-  definitions?: InstanceType<typeof XrplDefinitionsBase>,
-): Record<string, unknown> {
-  return rbc.decode(hex, definitions)
+function decode(hex: string): Record<string, unknown> {
+  return rbc.decode(hex)
 }
 
 /**
@@ -176,10 +154,6 @@ function hasNextPage(response: Response): boolean {
   // eslint-disable-next-line @typescript-eslint/dot-notation -- only checking if it exists
   return Boolean(response.result['marker'])
 }
-
-// Extracting to export the values
-const { XrplDefinitions, XrplDefinitionsBase, DEFAULT_DEFINITIONS, coreTypes } =
-  rbc
 
 /**
  * @category Utilities
@@ -246,8 +220,4 @@ export {
   encodeForSigningClaim,
   createCrossChainPayment,
   parseNFTokenID,
-  coreTypes,
-  XrplDefinitionsBase,
-  XrplDefinitions,
-  DEFAULT_DEFINITIONS,
 }

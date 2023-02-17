@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import omit from 'lodash/omit'
 import throttle from 'lodash/throttle'
-import { decode, XrplDefinitionsBase } from 'ripple-binary-codec'
+import { decode } from 'ripple-binary-codec'
 
 import {
   Client,
@@ -200,12 +200,10 @@ export async function generateFundedWallet(client: Client): Promise<Wallet> {
   return wallet
 }
 
-// eslint-disable-next-line max-params -- all parameters are necessary
 export async function verifySubmittedTransaction(
   client: Client,
   tx: Transaction | string,
   hashTx?: string,
-  definitions?: InstanceType<typeof XrplDefinitionsBase>,
 ): Promise<void> {
   const hash = hashTx ?? hashSignedTx(tx)
   const data = await client.request({
@@ -223,7 +221,7 @@ export async function verifySubmittedTransaction(
       'meta',
       'validated',
     ]),
-    typeof tx === 'string' ? decode(tx, definitions) : tx,
+    typeof tx === 'string' ? decode(tx) : tx,
   )
   if (typeof data.result.meta === 'object') {
     assert.strictEqual(data.result.meta.TransactionResult, 'tesSUCCESS')

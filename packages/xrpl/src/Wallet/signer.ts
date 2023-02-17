@@ -6,17 +6,12 @@ import {
   encode,
   encodeForSigning,
   encodeForSigningClaim,
-  XrplDefinitions,
 } from 'ripple-binary-codec'
 import { sign as signWithKeypair, verify } from 'ripple-keypairs'
 
 import { ValidationError } from '../errors'
 import { Signer } from '../models/common'
-import {
-  type BaseTransaction,
-  type Transaction,
-  validate,
-} from '../models/transactions'
+import { Transaction, validate } from '../models/transactions'
 
 import Wallet from '.'
 
@@ -25,7 +20,6 @@ import Wallet from '.'
  * single transaction with all Signers that then gets signed and returned.
  *
  * @param transactions - An array of signed Transactions (in object or blob form) to combine into a single signed Transaction.
- * @param definitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A single signed Transaction which has all Signers from transactions within it.
  * @throws ValidationError if:
  * - There were no transactions given to sign
@@ -33,22 +27,19 @@ import Wallet from '.'
  * - Any transaction is missing a Signers field.
  * @category Signing
  */
-function multisign<T extends BaseTransaction = Transaction>(
-  transactions: Array<T | string>,
-  definitions?: InstanceType<typeof XrplDefinitions>,
-): string {
+function multisign(transactions: Array<Transaction | string>): string {
   if (transactions.length === 0) {
     throw new ValidationError('There were 0 transactions to multisign')
   }
 
   transactions.forEach((txOrBlob) => {
-    const tx: BaseTransaction = getDecodedTransaction(txOrBlob, definitions)
+    const tx: Transaction = getDecodedTransaction(txOrBlob)
 
     /*
      * This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
      */
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
-    validate(tx as unknown as Record<string, unknown>, definitions)
+    validate(tx as unknown as Record<string, unknown>)
     if (tx.Signers == null || tx.Signers.length === 0) {
       throw new ValidationError(
         "For multisigning all transactions must include a Signers field containing an array of signatures. You may have forgotten to pass the 'forMultisign' parameter when signing.",
@@ -62,13 +53,15 @@ function multisign<T extends BaseTransaction = Transaction>(
     }
   })
 
-  const decodedTransactions = transactions.map((txOrBlob: string | T) => {
-    return getDecodedTransaction(txOrBlob, definitions)
-  })
+  const decodedTransactions: Transaction[] = transactions.map(
+    (txOrBlob: string | Transaction) => {
+      return getDecodedTransaction(txOrBlob)
+    },
+  )
 
   validateTransactionEquivalence(decodedTransactions)
 
-  return encode(getTransactionWithAllSigners(decodedTransactions), definitions)
+  return encode(getTransactionWithAllSigners(decodedTransactions))
 }
 
 /**
@@ -77,24 +70,18 @@ function multisign<T extends BaseTransaction = Transaction>(
  * @param wallet - The account that will sign for this payment channel.
  * @param channelId - An id for the payment channel to redeem XRP from.
  * @param amount - The amount in drops to redeem.
- * @param definitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A signature that can be used to redeem a specific amount of XRP from a payment channel.
  * @category Utilities
  */
-// eslint-disable-next-line max-params -- Parameters are necessary
 function authorizeChannel(
   wallet: Wallet,
   channelId: string,
   amount: string,
-  definitions?: InstanceType<typeof XrplDefinitions>,
 ): string {
-  const signingData = encodeForSigningClaim(
-    {
-      channel: channelId,
-      amount,
-    },
-    definitions,
-  )
+  const signingData = encodeForSigningClaim({
+    channel: channelId,
+    amount,
+  })
 
   return signWithKeypair(signingData, wallet.privateKey)
 }
@@ -103,17 +90,13 @@ function authorizeChannel(
  * Verifies that the given transaction has a valid signature based on public-key encryption.
  *
  * @param tx - A transaction to verify the signature of. (Can be in object or encoded string format).
- * @param definitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns Returns true if tx has a valid signature, and returns false otherwise.
  * @category Utilities
  */
-function verifySignature<T extends BaseTransaction = Transaction>(
-  tx: T | string,
-  definitions?: InstanceType<typeof XrplDefinitions>,
-): boolean {
-  const decodedTx = getDecodedTransaction(tx)
+function verifySignature(tx: Transaction | string): boolean {
+  const decodedTx: Transaction = getDecodedTransaction(tx)
   return verify(
-    encodeForSigning(decodedTx, definitions),
+    encodeForSigning(decodedTx),
     decodedTx.TxnSignature,
     decodedTx.SigningPubKey,
   )
@@ -125,9 +108,7 @@ function verifySignature<T extends BaseTransaction = Transaction>(
  * @param transactions - An array of Transactions which are expected to be equal other than 'Signers'.
  * @throws ValidationError if the transactions are not equal in any field other than 'Signers'.
  */
-function validateTransactionEquivalence<
-  T extends BaseTransaction = Transaction,
->(transactions: T[]): void {
+function validateTransactionEquivalence(transactions: Transaction[]): void {
   const exampleTransaction = JSON.stringify({
     ...transactions[0],
     Signers: null,
@@ -145,9 +126,9 @@ function validateTransactionEquivalence<
   }
 }
 
-function getTransactionWithAllSigners<T extends BaseTransaction = Transaction>(
-  transactions: T[],
-): T {
+function getTransactionWithAllSigners(
+  transactions: Transaction[],
+): Transaction {
   // Signers must be sorted in the combined transaction - See compareSigners' documentation for more details
   const sortedSigners: Signer[] = flatMap(
     transactions,
@@ -179,25 +160,15 @@ function addressToBigNumber(address: string): BigNumber {
   return new BigNumber(hex, numberOfBitsInHex)
 }
 
-/**
- * Normalizes txOrBlob to Transaction format.
- *
- * @param txOrBlob - the transaction either Transaction or blob format.
- * @param definitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
- * @returns txOrBlob in Transaction format.
- */
-function getDecodedTransaction<T extends BaseTransaction = Transaction>(
-  txOrBlob: T | string,
-  definitions?: InstanceType<typeof XrplDefinitions>,
-): T {
+function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
   if (typeof txOrBlob === 'object') {
     // We need this to handle X-addresses in multisigning
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
-    return decode(encode(txOrBlob, definitions), definitions) as unknown as T
+    return decode(encode(txOrBlob)) as unknown as Transaction
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
-  return decode(txOrBlob, definitions) as unknown as T
+  return decode(txOrBlob) as unknown as Transaction
 }
 
 export { authorizeChannel, verifySignature, multisign }
