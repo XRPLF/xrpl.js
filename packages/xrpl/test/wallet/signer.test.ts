@@ -139,7 +139,9 @@ describe('Signer', function () {
   it('multisign runs successfully with tx_blobs', function () {
     const transactions = [multisignTxToCombine1, multisignTxToCombine2]
 
-    const encodedTransactions: string[] = transactions.map(encode)
+    const encodedTransactions: string[] = transactions.map((transaction) =>
+      encode(transaction),
+    )
 
     assert.deepEqual(multisign(encodedTransactions), expectedMultisign)
   })
