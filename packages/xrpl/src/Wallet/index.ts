@@ -466,6 +466,10 @@ class Wallet {
       txCopy.URI = txCopy.URI.toUpperCase()
     }
 
+    if (txCopy.TransactionType === 'NFTokenMint' && txCopy.hasOwnProperty('URI') && txCopy.URI == undefined) {
+      delete txCopy.URI
+    }
+
     /* eslint-disable @typescript-eslint/consistent-type-assertions -- We check at runtime that this is safe */
     Object.keys(txCopy).forEach((key) => {
       const standard_currency_code_len = 3
