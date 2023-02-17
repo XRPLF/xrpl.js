@@ -48,7 +48,11 @@
     "Child": -2,
     "Nickname": 110,
     "Contract": 99,
-    "GeneratorMap": 103
+    "GeneratorMap": 103,
+    "Hook": 72,
+    "HookState": 118,
+    "HookDefinition": 68,
+    "EmittedTxn": 69
   },
   "FIELDS": [
     [
@@ -319,6 +323,16 @@
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt16"
+      }
+    ],
+    [
+      "NetworkID",
+      {
+        "nth": 1,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
       }
     ],
     [
@@ -892,16 +906,6 @@
       }
     ],
     [
-      "HookOn",
-      {
-        "nth": 16,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "UInt64"
-      }
-    ],
-    [
       "HookInstructionCount",
       {
         "nth": 17,
@@ -1145,6 +1149,16 @@
       "Amendment",
       {
         "nth": 19,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "HookOn",
+      {
+        "nth": 20,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1415,6 +1429,16 @@
       "NFTokenBrokerFee",
       {
         "nth": 19,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "HookCallbackFee",
+      {
+        "nth": 20,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1802,6 +1826,16 @@
       }
     ],
     [
+      "HookNamespaces",
+      {
+        "nth": 5,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Vector256"
+      }
+    ],
+    [
       "Paths",
       {
         "nth": 1,
@@ -2176,6 +2210,10 @@
     "telCAN_NOT_QUEUE_BLOCKED": -389,
     "telCAN_NOT_QUEUE_FEE": -388,
     "telCAN_NOT_QUEUE_FULL": -387,
+    "telWRONG_NETWORK": -386,
+    "telREQUIRES_NETWORK_ID": -385,
+    "telNETWORK_ID_MAKES_TX_NON_CANONICAL": -384,
+    "telNON_LOCAL_EMITTED_TXN": -383,
 
     "temMALFORMED": -299,
     "temBAD_AMOUNT": -298,
@@ -2211,10 +2249,12 @@
     "temINVALID_ACCOUNT_ID": -268,
     "temCANNOT_PREAUTH_SELF": -267,
     "temINVALID_COUNT": -266,
-    "temUNCERTAIN": -265,
-    "temUNKNOWN": -264,
-    "temSEQ_AND_TICKET": -263,
-    "temBAD_NFTOKEN_TRANSFER_FEE": -262,
+    "temHOOK_DATA_TOO_LARGE": -265,
+    "temHOOK_REJECTED": -264,
+    "temUNCERTAIN": -263,
+    "temUNKNOWN": -262,
+    "temSEQ_AND_TICKET": -261,
+    "temBAD_NFTOKEN_TRANSFER_FEE": -260,
 
     "tefFAILURE": -199,
     "tefALREADY": -198,
@@ -2250,6 +2290,7 @@
     "terNO_RIPPLE": -90,
     "terQUEUED": -89,
     "terPRE_TICKET": -88,
+    "terNO_HOOK": -87,
 
     "tesSUCCESS": 0,
 
@@ -2291,6 +2332,7 @@
     "tecKILLED": 150,
     "tecHAS_OBLIGATIONS": 151,
     "tecTOO_SOON": 152,
+    "tecHOOK_REJECTED": 153,
     "tecMAX_SEQUENCE_REACHED": 154,
     "tecNO_SUITABLE_NFTOKEN_PAGE": 155,
     "tecNFTOKEN_BUY_SELL_MISMATCH": 156,
@@ -2298,7 +2340,9 @@
     "tecCANT_ACCEPT_OWN_NFTOKEN_OFFER": 158,
     "tecINSUFFICIENT_FUNDS": 159,
     "tecOBJECT_NOT_FOUND": 160,
-    "tecINSUFFICIENT_PAYMENT": 161
+    "tecINSUFFICIENT_PAYMENT": 161,
+    "tecREQUIRES_FLAG": 162,
+    "tecPRECISION_LOSS": 187
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
@@ -2330,8 +2374,10 @@
     "NFTokenCreateOffer": 27,
     "NFTokenCancelOffer": 28,
     "NFTokenAcceptOffer": 29,
+    "Invoke": 99,
     "EnableAmendment": 100,
     "SetFee": 101,
-    "UNLModify": 102
+    "UNLModify": 102,
+    "EmitFailure": 103
   }
 }

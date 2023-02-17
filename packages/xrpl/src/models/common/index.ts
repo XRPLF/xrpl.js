@@ -52,6 +52,83 @@ interface PathStep {
 export type Path = PathStep[]
 
 /**
+ * The object that describes the grant in HookGrants.
+ */
+export interface HookGrant {
+  /**
+   * The object that describes the grant in HookGrants.
+   */
+  HookGrant: {
+    /**
+     *
+     */
+    HookHash: string
+    /**
+     *
+     */
+    Authorize?: string
+  }
+}
+
+/**
+ * The object that describes the parameter in HookParameters.
+ */
+export interface HookParameter {
+  /**
+   * The object that describes the parameter in HookParameters.
+   */
+  HookParameter: {
+    /**
+     *
+     */
+    HookParameterName: string
+    /**
+     *
+     */
+    HookParameterValue: number
+  }
+}
+
+/**
+ * The object that describes the hook in Hooks.
+ */
+export interface Hook {
+  /**
+   * The object that describes the hook in Hooks.
+   */
+  Hook: {
+    /**
+     *
+     */
+    CreateCode: string
+    /**
+     *
+     */
+    Flags: number
+    /**
+     *
+     */
+    HookOn?: string
+    /**
+     *
+     */
+    HookNamespace?: string
+    /**
+     *
+     */
+    HookApiVersion?: number
+    /**
+     *
+     */
+    HookParameters?: HookParameter[]
+    /**
+     *
+     */
+    HookGrants?: HookGrant[]
+  }
+}
+
+/**
  * The object that describes the signer in SignerEntries.
  */
 export interface SignerEntry {
