@@ -180,7 +180,6 @@ export enum AccountRootFlags {
    * Disallow incoming Checks from other accounts.
    */
   lsfDisallowIncomingCheck = 0x08000000,
-
   /**
    * Disallow incoming PayChannels from other accounts.
    */
