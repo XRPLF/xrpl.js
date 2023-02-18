@@ -124,7 +124,6 @@ export interface AccountRootFlagsInterface {
    * Disallow incoming Checks from other accounts.
    */
   lsfDisallowIncomingCheck?: boolean
-
   /**
    * Disallow incoming PayChannels from other accounts.
    */
