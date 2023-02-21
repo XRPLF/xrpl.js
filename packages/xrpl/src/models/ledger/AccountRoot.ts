@@ -116,6 +116,22 @@ export interface AccountRootFlagsInterface {
    * (It has DepositAuth enabled.)
    */
   lsfDepositAuth?: boolean
+  /**
+   * Disallow incoming NFTOffers from other accounts.
+   */
+  lsfDisallowIncomingNFTOffer?: boolean
+  /**
+   * Disallow incoming Checks from other accounts.
+   */
+  lsfDisallowIncomingCheck?: boolean
+  /**
+   * Disallow incoming PayChannels from other accounts.
+   */
+  lsfDisallowIncomingPayChan?: boolean
+  /**
+   * Disallow incoming Trustlines from other accounts.
+   */
+  lsfDisallowIncomingTrustline?: boolean
 }
 
 export enum AccountRootFlags {
@@ -156,4 +172,20 @@ export enum AccountRootFlags {
    * (It has DepositAuth enabled.)
    */
   lsfDepositAuth = 0x01000000,
+  /**
+   * Disallow incoming NFTOffers from other accounts.
+   */
+  lsfDisallowIncomingNFTOffer = 0x04000000,
+  /**
+   * Disallow incoming Checks from other accounts.
+   */
+  lsfDisallowIncomingCheck = 0x08000000,
+  /**
+   * Disallow incoming PayChannels from other accounts.
+   */
+  lsfDisallowIncomingPayChan = 0x10000000,
+  /**
+   * Disallow incoming Trustlines from other accounts.
+   */
+  lsfDisallowIncomingTrustline = 0x20000000,
 }

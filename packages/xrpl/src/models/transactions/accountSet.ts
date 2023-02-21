@@ -44,6 +44,15 @@ export enum AccountSetAsfFlags {
    * Allow another account to mint and burn tokens on behalf of this account.
    */
   asfAuthorizedNFTokenMinter = 10,
+  /** asf 11 is reserved for Hooks amendment */
+  /** Disallow other accounts from creating incoming NFTOffers */
+  asfDisallowIncomingNFTOffer = 12,
+  /** Disallow other accounts from creating incoming Checks */
+  asfDisallowIncomingCheck = 13,
+  /** Disallow other accounts from creating incoming PayChannels */
+  asfDisallowIncomingPayChan = 14,
+  /** Disallow other accounts from creating incoming Trustlines */
+  asfDisallowIncomingTrustline = 15,
 }
 
 /**
