@@ -151,6 +151,7 @@ describe('Models Utils', function () {
       assert.strictEqual(tx.Flags, 0)
     })
 
+    // eslint-disable-next-line complexity -- Simpler to list them all out at once.
     it('parseAccountRootFlags all enabled', function () {
       const accountRootFlags =
         AccountRootFlags.lsfDefaultRipple |
@@ -161,7 +162,11 @@ describe('Models Utils', function () {
         AccountRootFlags.lsfNoFreeze |
         AccountRootFlags.lsfPasswordSpent |
         AccountRootFlags.lsfRequireAuth |
-        AccountRootFlags.lsfRequireDestTag
+        AccountRootFlags.lsfRequireDestTag |
+        AccountRootFlags.lsfDisallowIncomingNFTOffer |
+        AccountRootFlags.lsfDisallowIncomingCheck |
+        AccountRootFlags.lsfDisallowIncomingPayChan |
+        AccountRootFlags.lsfDisallowIncomingTrustline
 
       const parsed = parseAccountRootFlags(accountRootFlags)
 
@@ -174,7 +179,11 @@ describe('Models Utils', function () {
           parsed.lsfNoFreeze &&
           parsed.lsfPasswordSpent &&
           parsed.lsfRequireAuth &&
-          parsed.lsfRequireDestTag,
+          parsed.lsfRequireDestTag &&
+          parsed.lsfDisallowIncomingNFTOffer &&
+          parsed.lsfDisallowIncomingCheck &&
+          parsed.lsfDisallowIncomingPayChan &&
+          parsed.lsfDisallowIncomingTrustline,
       )
     })
 
@@ -190,6 +199,10 @@ describe('Models Utils', function () {
       assert.isUndefined(parsed.lsfPasswordSpent)
       assert.isUndefined(parsed.lsfRequireAuth)
       assert.isUndefined(parsed.lsfRequireDestTag)
+      assert.isUndefined(parsed.lsfDisallowIncomingNFTOffer)
+      assert.isUndefined(parsed.lsfDisallowIncomingCheck)
+      assert.isUndefined(parsed.lsfDisallowIncomingPayChan)
+      assert.isUndefined(parsed.lsfDisallowIncomingTrustline)
     })
   })
 })

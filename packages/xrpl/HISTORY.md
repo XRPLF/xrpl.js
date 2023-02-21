@@ -26,6 +26,7 @@ Wallet.fromMmnemonic()
 
 ### Added
 * Optional custom amount field to `fundWallet`.
+* Support for `disallowIncoming` account set flags (e.g. `asfDisallowIncomingTrustline`)
 * Support for the cross-chain bridge feature.
 
 ### Changed
