@@ -4,13 +4,7 @@
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
-import {
-  Amount,
-  IssuedCurrency,
-  IssuedCurrencyAmount,
-  Memo,
-  Signer,
-} from '../common'
+import { Amount, Currency, IssuedCurrencyAmount, Memo, Signer } from '../common'
 import { onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
@@ -70,7 +64,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  * @param input - The input to check the form and type of.
  * @returns Whether the IssuedCurrency is properly formed.
  */
-export function isIssue(input: unknown): input is IssuedCurrency {
+export function isIssue(input: unknown): input is Currency {
   return (
     isRecord(input) &&
     ((Object.keys(input).length === ISSUE_SIZE &&

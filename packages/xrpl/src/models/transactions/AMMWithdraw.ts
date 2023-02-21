@@ -1,6 +1,6 @@
 /* eslint-disable complexity -- required for validateAMMWithdraw */
 import { ValidationError } from '../../errors'
-import { Amount, IssuedCurrency, IssuedCurrencyAmount } from '../common'
+import { Amount, Currency, IssuedCurrencyAmount } from '../common'
 
 import {
   BaseTransaction,
@@ -54,12 +54,12 @@ export interface AMMWithdraw extends BaseTransaction {
   /**
    * Specifies one of the pool assets (XRP or token) of the AMM instance.
    */
-  Asset: IssuedCurrency
+  Asset: Currency
 
   /**
    * Specifies the other pool asset of the AMM instance.
    */
-  Asset2: IssuedCurrency
+  Asset2: Currency
 
   /**
    * Specifies the amount of shares of the AMM instance pools that the trader

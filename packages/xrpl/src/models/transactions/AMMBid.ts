@@ -1,6 +1,6 @@
 /* eslint-disable complexity -- required for validateAMMBid */
 import { ValidationError } from '../../errors'
-import { Amount, IssuedCurrency } from '../common'
+import { Amount, Currency } from '../common'
 
 import {
   BaseTransaction,
@@ -29,12 +29,12 @@ export interface AMMBid extends BaseTransaction {
   /**
    * Specifies one of the pool assets (XRP or token) of the AMM instance.
    */
-  Asset: IssuedCurrency
+  Asset: Currency
 
   /**
    * Specifies the other pool asset of the AMM instance.
    */
-  Asset2: IssuedCurrency
+  Asset2: Currency
 
   /**
    * This field represents the minimum price that the bidder wants to pay for the slot.
