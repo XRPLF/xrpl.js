@@ -1,4 +1,7 @@
 /* eslint-disable complexity -- Necessary for validateAccountSet */
+
+import { isValidClassicAddress } from 'ripple-address-codec'
+
 import { ValidationError } from '../../errors'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
@@ -159,7 +162,12 @@ const MAX_TICK_SIZE = 15
 export function validateAccountSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.NFTokenMinter !== undefined && tx.NFTokenMinter === '') {
+  if (
+    tx.NFTokenMinter !== undefined &&
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Necessary for isValidClassicAddress ts-expect-error below
+    // @ts-expect-error
+    !isValidClassicAddress(tx.NFTokenMinter)
+  ) {
     throw new ValidationError('AccountSet: invalid NFTokenMinter')
   }
 
