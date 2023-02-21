@@ -164,9 +164,7 @@ export function validateAccountSet(tx: Record<string, unknown>): void {
 
   if (
     tx.NFTokenMinter !== undefined &&
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Necessary for isValidClassicAddress ts-expect-error below
-    // @ts-expect-error
-    !isValidClassicAddress(tx.NFTokenMinter)
+    !isValidClassicAddress(String(tx.NFTokenMinter))
   ) {
     throw new ValidationError('AccountSet: invalid NFTokenMinter')
   }
