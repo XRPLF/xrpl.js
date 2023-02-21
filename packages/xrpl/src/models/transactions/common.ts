@@ -6,7 +6,7 @@ import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 import { ValidationError } from '../../errors'
 import {
   Amount,
-  IssuedCurrency,
+  Currency,
   IssuedCurrencyAmount,
   Memo,
   Signer,
@@ -72,7 +72,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  * @param input - The input to check the form and type of.
  * @returns Whether the IssuedCurrency is properly formed.
  */
-export function isIssue(input: unknown): input is IssuedCurrency {
+export function isCurrency(input: unknown): input is Currency {
   return (
     isRecord(input) &&
     ((Object.keys(input).length === ISSUE_SIZE &&
@@ -122,9 +122,9 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
     isRecord(input) &&
     Object.keys(input).length === XCHAIN_BRIDGE_SIZE &&
     typeof input.LockingChainDoor === 'string' &&
-    isIssue(input.LockingChainIssue) &&
+    isCurrency(input.LockingChainIssue) &&
     typeof input.IssuingChainDoor === 'string' &&
-    isIssue(input.IssuingChainIssue)
+    isCurrency(input.IssuingChainIssue)
   )
 }
 
