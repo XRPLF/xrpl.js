@@ -9,6 +9,7 @@ import { setTransactionFlagsToNumber } from '../models/utils/flags'
 import { xrpToDrops } from '../utils'
 
 import getFeeXrp from './getFeeXrp'
+import getNetworkID from './getNetworkID'
 
 // Expire unconfirmed transactions after 20 ledger versions, approximately 1 minute, by default
 const LEDGER_OFFSET = 20
@@ -39,8 +40,10 @@ async function autofill<T extends Transaction>(
   setValidAddresses(tx)
 
   setTransactionFlagsToNumber(tx)
-
   const promises: Array<Promise<void>> = []
+  if (tx.NetworkID == null) {
+    promises.push(setNetworkID(this, tx))
+  }
   if (tx.Sequence == null) {
     promises.push(setNextValidSequenceNumber(this, tx))
   }
@@ -198,6 +201,12 @@ async function calculateFeePerTransactionType(
 
 function scaleValue(value, multiplier): string {
   return new BigNumber(value).times(multiplier).toString()
+}
+
+async function setNetworkID(client: Client, tx: Transaction): Promise<void> {
+  const id = await getNetworkID(client)
+  // eslint-disable-next-line no-param-reassign -- param reassign is safe
+  tx.NetworkID = id
 }
 
 async function setLatestValidatedLedgerSequence(
