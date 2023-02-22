@@ -10,6 +10,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Improved typescript typing
 
 ### Added
+- `getNFTokenID` lets you get the NFTokenID after minting an NFT
 
 
 ### Changed
@@ -26,6 +27,7 @@ Wallet.fromMmnemonic()
 
 ### Added
 * Optional custom amount field to `fundWallet`.
+* Support for `disallowIncoming` account set flags (e.g. `asfDisallowIncomingTrustline`)
 
 ### Changed
 * Add support for Transaction objects in `verifyTransaction`
