@@ -25,9 +25,11 @@ export const DEFAULT_MEMO = {
   format: 'text',
 }
 interface memo {
-  data?: string
-  type?: string
-  format?: string
+  Memo: {
+    data?: string
+    type?: string
+    format?: string
+  }
 }
 
 /**
