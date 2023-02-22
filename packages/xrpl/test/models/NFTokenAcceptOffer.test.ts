@@ -19,6 +19,7 @@ describe('NFTokenAcceptOffer', function () {
       NFTokenBuyOffer: NFTOKEN_BUY_OFFER,
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Fee: '5000000',
+      NetworkID: 21338,
       Sequence: 2470665,
       Flags: 2147483648,
     } as any
@@ -32,6 +33,7 @@ describe('NFTokenAcceptOffer', function () {
       NFTokenSellOffer: NFTOKEN_SELL_OFFER,
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Fee: '5000000',
+      NetworkID: 21338,
       Sequence: 2470665,
       Flags: 2147483648,
     } as any
@@ -44,6 +46,7 @@ describe('NFTokenAcceptOffer', function () {
       TransactionType: 'NFTokenAcceptOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Fee: '5000000',
+      NetworkID: 21338,
       Sequence: 2470665,
       Flags: 2147483648,
     } as any
@@ -62,6 +65,7 @@ describe('NFTokenAcceptOffer', function () {
       NFTokenBuyOffer: NFTOKEN_BUY_OFFER,
       NFTokenBrokerFee: '1',
       Fee: '5000000',
+      NetworkID: 21338,
       Sequence: 2470665,
       Flags: 2147483648,
     } as any
@@ -80,6 +84,7 @@ describe('NFTokenAcceptOffer', function () {
       NFTokenSellOffer: NFTOKEN_SELL_OFFER,
       NFTokenBrokerFee: '1',
       Fee: '5000000',
+      NetworkID: 21338,
       Sequence: 2470665,
       Flags: 2147483648,
     } as any
@@ -98,6 +103,7 @@ describe('NFTokenAcceptOffer', function () {
       NFTokenBuyOffer: NFTOKEN_BUY_OFFER,
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Fee: '5000000',
+      NetworkID: 21338,
       Sequence: 2470665,
       Flags: 2147483648,
     } as any
@@ -113,6 +119,7 @@ describe('NFTokenAcceptOffer', function () {
       NFTokenBrokerFee: '1',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Fee: '5000000',
+      NetworkID: 21338,
       Sequence: 2470665,
       Flags: 2147483648,
     } as any
@@ -128,6 +135,7 @@ describe('NFTokenAcceptOffer', function () {
       NFTokenBuyOffer: NFTOKEN_BUY_OFFER,
       NFTokenBrokerFee: '0',
       Fee: '5000000',
+      NetworkID: 21338,
       Sequence: 2470665,
       Flags: 2147483648,
     } as any
@@ -147,6 +155,7 @@ describe('NFTokenAcceptOffer', function () {
       NFTokenBuyOffer: NFTOKEN_BUY_OFFER,
       NFTokenBrokerFee: '-1',
       Fee: '5000000',
+      NetworkID: 21338,
       Sequence: 2470665,
       Flags: 2147483648,
     } as any
@@ -166,6 +175,7 @@ describe('NFTokenAcceptOffer', function () {
       NFTokenBuyOffer: NFTOKEN_BUY_OFFER,
       NFTokenBrokerFee: 1,
       Fee: '5000000',
+      NetworkID: 21338,
       Sequence: 2470665,
       Flags: 2147483648,
     } as any

@@ -13,6 +13,7 @@ describe('AccountDelete', function () {
     const validAccountDelete = {
       TransactionType: 'AccountDelete',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      NetworkID: 21338,
       Destination: 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe',
       DestinationTag: 13,
       Fee: '5000000',
@@ -27,6 +28,7 @@ describe('AccountDelete', function () {
     const invalidDestination = {
       TransactionType: 'AccountDelete',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      NetworkID: 21338,
       Fee: '5000000',
       Sequence: 2470665,
       Flags: 2147483648,
@@ -49,6 +51,7 @@ describe('AccountDelete', function () {
     const invalidDestination = {
       TransactionType: 'AccountDelete',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      NetworkID: 21338,
       Destination: 65478965,
       Fee: '5000000',
       Sequence: 2470665,
@@ -71,6 +74,7 @@ describe('AccountDelete', function () {
     const invalidDestinationTag = {
       TransactionType: 'AccountDelete',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      NetworkID: 21338,
       Destination: 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe',
       DestinationTag: 'gvftyujnbv',
       Fee: '5000000',

@@ -15,6 +15,7 @@ describe('OfferCancel', function () {
     offer = {
       Account: 'rnKiczmiQkZFiDES8THYyLA2pQohC5C6EF',
       Fee: '10',
+      NetworkID: 21338,
       LastLedgerSequence: 65477334,
       OfferSequence: 60797528,
       Sequence: 60797535,

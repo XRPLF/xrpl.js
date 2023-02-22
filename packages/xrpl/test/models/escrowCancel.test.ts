@@ -17,6 +17,7 @@ describe('EscrowCancel', function () {
       Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
       Owner: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
       OfferSequence: 7,
+      NetworkID: 21338,
     }
   })
 

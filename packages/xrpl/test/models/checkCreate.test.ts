@@ -20,6 +20,7 @@ describe('CheckCreate', function () {
         '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
       DestinationTag: 1,
       Fee: '12',
+      NetworkID: 21338,
     } as any
 
     assert.doesNotThrow(() => validateCheckCreate(validCheck))
@@ -37,6 +38,7 @@ describe('CheckCreate', function () {
         '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
       DestinationTag: 1,
       Fee: '12',
+      NetworkID: 21338,
     } as any
 
     assert.throws(
@@ -62,6 +64,7 @@ describe('CheckCreate', function () {
         '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
       DestinationTag: 1,
       Fee: '12',
+      NetworkID: 21338,
     } as any
 
     assert.throws(
@@ -80,6 +83,7 @@ describe('CheckCreate', function () {
     const invalidDestinationTag = {
       TransactionType: 'CheckCreate',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      NetworkID: 21338,
       Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       SendMax: '100000000',
       Expiration: 570113521,
@@ -112,6 +116,7 @@ describe('CheckCreate', function () {
         '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
       DestinationTag: 1,
       Fee: '12',
+      NetworkID: 21338,
     } as any
 
     assert.throws(
@@ -136,6 +141,7 @@ describe('CheckCreate', function () {
       InvoiceID: 789656963258531,
       DestinationTag: 1,
       Fee: '12',
+      NetworkID: 21338,
     } as any
 
     assert.throws(

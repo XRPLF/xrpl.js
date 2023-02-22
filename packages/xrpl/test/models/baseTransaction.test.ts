@@ -13,6 +13,7 @@ describe('BaseTransaction', function () {
     const txJson = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
+      NetworkID: 21338,
       Fee: '12',
       Sequence: 100,
       AccountTxnID: 'DEADBEEF',
@@ -63,6 +64,7 @@ describe('BaseTransaction', function () {
     const txJson = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
+      NetworkID: 21338,
     }
 
     assert.doesNotThrow(() => validateBaseTransaction(txJson))
@@ -72,6 +74,7 @@ describe('BaseTransaction', function () {
     const invalidFee = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
+      NetworkID: 21338,
       Fee: 1000,
     } as any
 
@@ -86,6 +89,7 @@ describe('BaseTransaction', function () {
     const invalidSeq = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
+      NetworkID: 21338,
       Sequence: '145',
     } as any
 
@@ -100,6 +104,7 @@ describe('BaseTransaction', function () {
     const invalidID = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
+      NetworkID: 21338,
       AccountTxnID: ['WRONG'],
     } as any
 
@@ -114,6 +119,7 @@ describe('BaseTransaction', function () {
     const invalidLastLedgerSequence = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
+      NetworkID: 21338,
       LastLedgerSequence: '1000',
     } as any
 
@@ -128,6 +134,7 @@ describe('BaseTransaction', function () {
     const invalidSourceTag = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
+      NetworkID: 21338,
       SourceTag: ['ARRAY'],
     } as any
 
@@ -142,6 +149,7 @@ describe('BaseTransaction', function () {
     const invalidSigningPubKey = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
+      NetworkID: 21338,
       SigningPubKey: 1000,
     } as any
 
@@ -156,6 +164,7 @@ describe('BaseTransaction', function () {
     const invalidTicketSequence = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
+      NetworkID: 21338,
       TicketSequence: '1000',
     } as any
 
@@ -170,6 +179,7 @@ describe('BaseTransaction', function () {
     const invalidTxnSignature = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
+      NetworkID: 21338,
       TxnSignature: 1000,
     } as any
 
@@ -180,10 +190,25 @@ describe('BaseTransaction', function () {
     )
   })
 
+  it(`Handles invalid NetworkID`, function () {
+    const invalidTxnSignature = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      NetworkID: '21338',
+    } as any
+
+    assert.throws(
+      () => validateBaseTransaction(invalidTxnSignature),
+      ValidationError,
+      'BaseTransaction: invalid NetworkID',
+    )
+  })
+
   it(`Handles invalid Signers`, function () {
     const invalidSigners = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
+      NetworkID: 21338,
       Signers: [],
     } as any
 
@@ -196,6 +221,7 @@ describe('BaseTransaction', function () {
     const invalidSigners2 = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
+      NetworkID: 21338,
       Signers: [
         {
           Signer: {
@@ -216,6 +242,7 @@ describe('BaseTransaction', function () {
     const invalidMemo = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
+      NetworkID: 21338,
       Memos: [
         {
           Memo: {

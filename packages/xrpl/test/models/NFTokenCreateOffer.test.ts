@@ -14,6 +14,7 @@ describe('NFTokenCreateOffer', function () {
   it(`verifies valid NFTokenCreateOffer buyside`, function () {
     const validNFTokenCreateOffer = {
       TransactionType: 'NFTokenCreateOffer',
+      NetworkID: 21338,
       NFTokenID: NFTOKEN_ID,
       Amount: '1',
       Owner: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
@@ -30,6 +31,7 @@ describe('NFTokenCreateOffer', function () {
   it(`verifies valid NFTokenCreateOffer sellside`, function () {
     const validNFTokenCreateOffer = {
       TransactionType: 'NFTokenCreateOffer',
+      NetworkID: 21338,
       NFTokenID: NFTOKEN_ID,
       Amount: '1',
       Flags: NFTokenCreateOfferFlags.tfSellNFToken,
@@ -46,6 +48,7 @@ describe('NFTokenCreateOffer', function () {
   it(`verifies w/ 0 Amount NFTokenCreateOffer sellside`, function () {
     const validNFTokenCreateOffer = {
       TransactionType: 'NFTokenCreateOffer',
+      NetworkID: 21338,
       NFTokenID: NFTOKEN_ID,
       Amount: '0',
       Flags: NFTokenCreateOfferFlags.tfSellNFToken,
@@ -62,6 +65,7 @@ describe('NFTokenCreateOffer', function () {
   it(`throws w/ Account === Owner`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
+      NetworkID: 21338,
       NFTokenID: NFTOKEN_ID,
       Amount: '1',
       Expiration: 1000,
@@ -81,6 +85,7 @@ describe('NFTokenCreateOffer', function () {
   it(`throws w/ Account === Destination`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
+      NetworkID: 21338,
       NFTokenID: NFTOKEN_ID,
       Amount: '1',
       Flags: NFTokenCreateOfferFlags.tfSellNFToken,
@@ -101,6 +106,7 @@ describe('NFTokenCreateOffer', function () {
   it(`throws w/out NFTokenID`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
+      NetworkID: 21338,
       Amount: '1',
       Owner: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXe',
       Expiration: 1000,
@@ -120,6 +126,7 @@ describe('NFTokenCreateOffer', function () {
   it(`throws w/ invalid Amount`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
+      NetworkID: 21338,
       NFTokenID: NFTOKEN_ID,
       Amount: 1,
       Owner: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXe',
@@ -140,6 +147,7 @@ describe('NFTokenCreateOffer', function () {
   it(`throws w/ missing Amount`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
+      NetworkID: 21338,
       Owner: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXe',
       Expiration: 1000,
       NFTokenID: NFTOKEN_ID,
@@ -159,6 +167,7 @@ describe('NFTokenCreateOffer', function () {
   it(`throws w/ Owner for sell offer`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
+      NetworkID: 21338,
       Expiration: 1000,
       Owner: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -179,6 +188,7 @@ describe('NFTokenCreateOffer', function () {
   it(`throws w/out Owner for buy offer`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
+      NetworkID: 21338,
       Expiration: 1000,
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Amount: '1',
@@ -197,6 +207,7 @@ describe('NFTokenCreateOffer', function () {
   it(`throws w/ 0 Amount for buy offer`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
+      NetworkID: 21338,
       Expiration: 1000,
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Owner: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',

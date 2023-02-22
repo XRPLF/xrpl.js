@@ -15,6 +15,7 @@ describe('PaymentChannelCreate', function () {
     channel = {
       Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
       TransactionType: 'PaymentChannelCreate',
+      NetworkID: 21338,
       Amount: '10000',
       Destination: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',
       SettleDelay: 86400,

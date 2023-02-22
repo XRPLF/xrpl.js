@@ -15,6 +15,7 @@ describe('TicketCreate', function () {
     ticketCreate = {
       TransactionType: 'TicketCreate',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      NetworkID: 21338,
       TicketCount: 150,
     } as any
   })

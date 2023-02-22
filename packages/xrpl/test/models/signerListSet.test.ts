@@ -17,6 +17,7 @@ describe('SignerListSet', function () {
       TransactionType: 'SignerListSet',
       Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
       Fee: '12',
+      NetworkID: 21338,
       SignerQuorum: 3,
       SignerEntries: [
         {

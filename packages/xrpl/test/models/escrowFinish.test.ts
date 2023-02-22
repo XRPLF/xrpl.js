@@ -15,6 +15,7 @@ describe('EscrowFinish', function () {
     escrow = {
       Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
       TransactionType: 'EscrowFinish',
+      NetworkID: 21338,
       Owner: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
       OfferSequence: 7,
       Condition:

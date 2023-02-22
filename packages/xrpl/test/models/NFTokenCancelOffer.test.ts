@@ -14,6 +14,7 @@ describe('NFTokenCancelOffer', function () {
   it(`verifies valid NFTokenCancelOffer`, function () {
     const validNFTokenCancelOffer = {
       TransactionType: 'NFTokenCancelOffer',
+      NetworkID: 21338,
       NFTokenOffers: [BUY_OFFER],
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Fee: '5000000',
@@ -28,6 +29,7 @@ describe('NFTokenCancelOffer', function () {
     const invalid = {
       TransactionType: 'NFTokenCancelOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      NetworkID: 21338,
       Fee: '5000000',
       Sequence: 2470665,
       Flags: 2147483648,
@@ -44,6 +46,7 @@ describe('NFTokenCancelOffer', function () {
     const invalid = {
       TransactionType: 'NFTokenCancelOffer',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      NetworkID: 21338,
       NFTokenOffers: [],
       Fee: '5000000',
       Sequence: 2470665,

@@ -15,6 +15,7 @@ describe('PaymentChannelClaim', function () {
     channel = {
       Account: 'rB5Ux4Lv2nRx6eeoAAsZmtctnBQ2LiACnk',
       TransactionType: 'PaymentChannelClaim',
+      NetworkID: 21338,
       Channel:
         'C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198',
       Balance: '1000000',

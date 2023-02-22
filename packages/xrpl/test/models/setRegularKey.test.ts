@@ -16,6 +16,7 @@ describe('SetRegularKey', function () {
       TransactionType: 'SetRegularKey',
       Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
       Fee: '12',
+      NetworkID: 21338,
       Flags: 0,
       RegularKey: 'rAR8rR8sUkBoCZFawhkWzY4Y5YoyuznwD',
     } as any
