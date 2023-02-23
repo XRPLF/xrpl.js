@@ -102,13 +102,13 @@ jobs:
 
     services:
       rippled:
-        image: xrpllabsofficial/xrpld:latest -a --start
+        image: xrpllabsofficial/xrpld:latest
         ports:
           - 6006:6006
         volumes: 
           - $GITHUB_WORKSPACE/ci-config:/config/
         options: --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
-
+        commands: -a --start
 
     steps:
       - uses: actions/checkout@v3
@@ -156,12 +156,13 @@ jobs:
 
     services:
       rippled:
-        image: xrpllabsofficial/xrpld:latest -a --start
+        image: xrpllabsofficial/xrpld:latest
         ports:
           - 6006:6006
         volumes: 
           - $GITHUB_WORKSPACE/ci-config:/config/
         options: --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
+        commands: -a --start
 
     steps:
       - uses: actions/checkout@v3
