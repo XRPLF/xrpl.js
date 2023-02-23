@@ -1,11 +1,11 @@
 /* eslint-disable complexity -- required for validateAMMBid */
 import { ValidationError } from '../../errors'
-import { Amount, IssuedCurrency } from '../common'
+import { Amount, Currency } from '../common'
 
 import {
   BaseTransaction,
   isAmount,
-  isIssue,
+  isCurrency,
   validateBaseTransaction,
 } from './common'
 
@@ -29,12 +29,12 @@ export interface AMMBid extends BaseTransaction {
   /**
    * Specifies one of the pool assets (XRP or token) of the AMM instance.
    */
-  Asset: IssuedCurrency
+  Asset: Currency
 
   /**
    * Specifies the other pool asset of the AMM instance.
    */
-  Asset2: IssuedCurrency
+  Asset2: Currency
 
   /**
    * This field represents the minimum price that the bidder wants to pay for the slot.
@@ -71,7 +71,7 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMBid: missing field Asset')
   }
 
-  if (!isIssue(tx.Asset)) {
+  if (!isCurrency(tx.Asset)) {
     throw new ValidationError('AMMBid: Asset must be an Issue')
   }
 
@@ -79,7 +79,7 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMBid: missing field Asset2')
   }
 
-  if (!isIssue(tx.Asset2)) {
+  if (!isCurrency(tx.Asset2)) {
     throw new ValidationError('AMMBid: Asset2 must be an Issue')
   }
 

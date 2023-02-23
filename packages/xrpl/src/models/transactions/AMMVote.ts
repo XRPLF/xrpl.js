@@ -1,8 +1,8 @@
 import { ValidationError } from '../../errors'
-import { IssuedCurrency } from '../common'
+import { Currency } from '../common'
 
 import { AMM_MAX_TRADING_FEE } from './AMMCreate'
-import { BaseTransaction, isIssue, validateBaseTransaction } from './common'
+import { BaseTransaction, isCurrency, validateBaseTransaction } from './common'
 
 /**
  * AMMVote is used for submitting a vote for the trading fee of an AMM Instance.
@@ -16,12 +16,12 @@ export interface AMMVote extends BaseTransaction {
   /**
    * Specifies one of the pool assets (XRP or token) of the AMM instance.
    */
-  Asset: IssuedCurrency
+  Asset: Currency
 
   /**
    * Specifies the other pool asset of the AMM instance.
    */
-  Asset2: IssuedCurrency
+  Asset2: Currency
 
   /**
    * Specifies the fee, in basis point.
@@ -45,7 +45,7 @@ export function validateAMMVote(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMVote: missing field Asset')
   }
 
-  if (!isIssue(tx.Asset)) {
+  if (!isCurrency(tx.Asset)) {
     throw new ValidationError('AMMVote: Asset must be an Issue')
   }
 
@@ -53,7 +53,7 @@ export function validateAMMVote(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMVote: missing field Asset2')
   }
 
-  if (!isIssue(tx.Asset2)) {
+  if (!isCurrency(tx.Asset2)) {
     throw new ValidationError('AMMVote: Asset2 must be an Issue')
   }
 

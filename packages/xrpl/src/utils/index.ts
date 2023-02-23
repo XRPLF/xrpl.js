@@ -25,6 +25,7 @@ import { Transaction } from '../models/transactions/transaction'
 import createCrossChainPayment from './createCrossChainPayment'
 import { deriveKeypair, deriveAddress, deriveXAddress } from './derive'
 import getBalanceChanges from './getBalanceChanges'
+import getNFTokenID from './getNFTokenID'
 import {
   hashSignedTx,
   hashTx,
@@ -218,6 +219,7 @@ export {
   encodeForMultiSigning,
   encodeForSigning,
   encodeForSigningClaim,
+  getNFTokenID,
   createCrossChainPayment,
   parseNFTokenID,
 }
