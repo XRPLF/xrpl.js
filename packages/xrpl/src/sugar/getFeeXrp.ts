@@ -14,7 +14,7 @@ const BASE_10 = 10
  * @param cushion - The fee cushion to use.
  * @returns The transaction fee.
  */
-export default async function getFeeXrp(
+export async function getFeeXrp(
   client: Client,
   cushion?: number,
 ): Promise<string> {
@@ -42,4 +42,23 @@ export default async function getFeeXrp(
   fee = BigNumber.min(fee, client.maxFeeXRP)
   // Round fee to 6 decimal places
   return new BigNumber(fee.toFixed(NUM_DECIMAL_PLACES)).toString(BASE_10)
+}
+
+/**
+ * Calculates the estimated transaction fee.
+ * Note: This is a public API that can be called directly.
+ *
+ * @param client - The Client used to connect to the ledger.
+ * @param txBlob - The encoded transaction to estimate the fee for.
+ * @returns The transaction fee.
+ */
+export async function getFeeEstimateXrp(
+  client: Client,
+  txBlob: string,
+): Promise<string> {
+  const response = await client.request({
+    command: 'fee',
+    tx_blob: txBlob,
+  })
+  return response.result.drops.base_fee
 }

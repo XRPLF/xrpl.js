@@ -60,11 +60,11 @@ export interface HookGrant {
    */
   HookGrant: {
     /**
-     *
+     * The hook hash of the grant.
      */
     HookHash: string
     /**
-     *
+     * The account authorized on the grant.
      */
     Authorize?: string
   }
@@ -79,13 +79,13 @@ export interface HookParameter {
    */
   HookParameter: {
     /**
-     *
+     * The name of the parameter.
      */
     HookParameterName: string
     /**
-     *
+     * The value of the parameter.
      */
-    HookParameterValue: number
+    HookParameterValue: string
   }
 }
 
@@ -98,31 +98,31 @@ export interface Hook {
    */
   Hook: {
     /**
-     *
+     * The code that is executed when the hook is triggered.
      */
     CreateCode: string
     /**
-     *
+     * The flags that are set on the hook.
      */
     Flags: number
     /**
-     *
+     * The transactions that triggers the hook. Represented as a 256Hash
      */
     HookOn?: string
     /**
-     *
+     * The namespace of the hook.
      */
     HookNamespace?: string
     /**
-     *
+     * The API version of the hook.
      */
     HookApiVersion?: number
     /**
-     *
+     * The parameters of the hook.
      */
     HookParameters?: HookParameter[]
     /**
-     *
+     * The grants of the hook.
      */
     HookGrants?: HookGrant[]
   }

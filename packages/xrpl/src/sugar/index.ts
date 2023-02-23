@@ -5,6 +5,7 @@ export { getBalances, getXrpBalance } from './balances'
 export { default as getLedgerIndex } from './getLedgerIndex'
 
 export { default as getOrderbook } from './getOrderbook'
+export { getFeeXrp, getFeeEstimateXrp } from './getFeeXrp'
 
 export * from './submit'
 
