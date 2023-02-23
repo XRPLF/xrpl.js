@@ -105,7 +105,7 @@ jobs:
         image: xrpllabsofficial/xrpld:latest
         ports:
           - 6006:6006
-        volume: 
+        volumes: 
           - $GITHUB_WORKSPACE/ci-config:/config/
         options: -a --start --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
@@ -159,7 +159,7 @@ jobs:
         image: xrpllabsofficial/xrpld:latest
         ports:
           - 6006:6006
-        volume: 
+        volumes: 
           - $GITHUB_WORKSPACE/ci-config:/config/
         options: -a --start --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
