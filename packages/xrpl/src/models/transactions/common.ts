@@ -64,7 +64,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  * @param input - The input to check the form and type of.
  * @returns Whether the IssuedCurrency is properly formed.
  */
-export function isIssue(input: unknown): input is Currency {
+export function isCurrency(input: unknown): input is Currency {
   return (
     isRecord(input) &&
     ((Object.keys(input).length === ISSUE_SIZE &&

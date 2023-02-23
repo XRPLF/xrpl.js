@@ -5,7 +5,7 @@ import { Amount, Currency } from '../common'
 import {
   BaseTransaction,
   isAmount,
-  isIssue,
+  isCurrency,
   validateBaseTransaction,
 } from './common'
 
@@ -71,7 +71,7 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMBid: missing field Asset')
   }
 
-  if (!isIssue(tx.Asset)) {
+  if (!isCurrency(tx.Asset)) {
     throw new ValidationError('AMMBid: Asset must be an Issue')
   }
 
@@ -79,7 +79,7 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMBid: missing field Asset2')
   }
 
-  if (!isIssue(tx.Asset2)) {
+  if (!isCurrency(tx.Asset2)) {
     throw new ValidationError('AMMBid: Asset2 must be an Issue')
   }
 
