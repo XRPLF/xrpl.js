@@ -15,7 +15,6 @@ describe('DepositPreauth', function () {
     depositPreauth = {
       TransactionType: 'DepositPreauth',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
-      NetworkID: 21338,
     } as any
   })
 

@@ -12,8 +12,8 @@
         "converge_time_s": 2.007,
         "proposers": 4
       },
-      "network_id": 21338,
       "load_factor": 1,
+      "network_id": 21338,
       "peers": 53,
       "pubkey_node": "n94wWvFUmaKGYrKUGgpv1DyYgDeXRGdACkNQaSe7zJiy5Znio7UC",
       "server_state": "full",

@@ -13,7 +13,6 @@ describe('CheckCash', function () {
     const validCheckCash = {
       Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       TransactionType: 'CheckCash',
-      NetworkID: 21338,
       Amount: '100000000',
       CheckID:
         '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
@@ -28,7 +27,6 @@ describe('CheckCash', function () {
     const invalidCheckID = {
       Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       TransactionType: 'CheckCash',
-      NetworkID: 21338,
       Amount: '100000000',
       CheckID: 83876645678567890,
     } as any
@@ -49,7 +47,6 @@ describe('CheckCash', function () {
     const invalidAmount = {
       Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       TransactionType: 'CheckCash',
-      NetworkID: 21338,
       Amount: 100000000,
       CheckID:
         '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
@@ -71,7 +68,6 @@ describe('CheckCash', function () {
     const invalidDeliverMin = {
       Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       TransactionType: 'CheckCash',
-      NetworkID: 21338,
       Amount: '100000000',
       DeliverMin: 852156963,
       CheckID:
@@ -94,7 +90,6 @@ describe('CheckCash', function () {
     const invalidDeliverMin = {
       Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       TransactionType: 'CheckCash',
-      NetworkID: 21338,
       DeliverMin: 852156963,
       CheckID:
         '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',

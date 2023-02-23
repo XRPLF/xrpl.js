@@ -15,7 +15,6 @@ describe('EscrowCreate', function () {
     escrow = {
       Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
       TransactionType: 'EscrowCreate',
-      NetworkID: 21338,
       Amount: '10000',
       Destination: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',
       CancelAfter: 533257958,

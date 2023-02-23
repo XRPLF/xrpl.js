@@ -18,7 +18,6 @@ import { assertRejects } from '../testUtils'
 const Fee = '10'
 const Sequence = 1432
 const LastLedgerSequence = 2908734
-const NetworkID = 21338
 
 describe('client.autofill', function () {
   let testContext: XrplTestContext
@@ -36,14 +35,12 @@ describe('client.autofill', function () {
       Fee,
       Sequence,
       LastLedgerSequence,
-      NetworkID,
     }
     const txResult = await testContext.client.autofill(tx)
 
     assert.strictEqual(txResult.Fee, Fee)
     assert.strictEqual(txResult.Sequence, Sequence)
     assert.strictEqual(txResult.LastLedgerSequence, LastLedgerSequence)
-    assert.strictEqual(txResult.NetworkID, NetworkID)
   })
 
   it('converts Account & Destination X-address to their classic address', async function () {
@@ -56,10 +53,6 @@ describe('client.autofill', function () {
     testContext.mockRippled!.addResponse(
       'account_info',
       rippled.account_info.normal,
-    )
-    testContext.mockRippled!.addResponse(
-      'server_info',
-      rippled.server_info.normal,
     )
     testContext.mockRippled!.addResponse(
       'server_info',
@@ -83,7 +76,6 @@ describe('client.autofill', function () {
       Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
       Fee,
       LastLedgerSequence,
-      NetworkID,
     }
     testContext.mockRippled!.addResponse('account_info', {
       status: 'success',
@@ -110,10 +102,6 @@ describe('client.autofill', function () {
       rippled.server_info.normal,
     )
     testContext.mockRippled!.addResponse(
-      'server_info',
-      rippled.server_info.normal,
-    )
-    testContext.mockRippled!.addResponse(
       'account_objects',
       rippled.account_objects.normal,
     )
@@ -125,7 +113,6 @@ describe('client.autofill', function () {
       Fee,
       Sequence,
       LastLedgerSequence,
-      NetworkID,
     }
 
     await assertRejects(testContext.client.autofill(tx), XrplError)
@@ -139,7 +126,6 @@ describe('client.autofill', function () {
         Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
         Sequence,
         LastLedgerSequence,
-        NetworkID,
       }
       testContext.mockRippled!.addResponse(
         'server_info',
@@ -169,10 +155,6 @@ describe('client.autofill', function () {
         'server_info',
         rippled.server_info.normal,
       )
-      testContext.mockRippled!.addResponse(
-        'server_info',
-        rippled.server_info.normal,
-      )
 
       const txResult = await testContext.client.autofill(tx)
       assert.strictEqual(txResult.Fee, '399')
@@ -189,10 +171,6 @@ describe('client.autofill', function () {
         rippled.account_info.normal,
       )
       testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
-      testContext.mockRippled!.addResponse(
-        'server_info',
-        rippled.server_info.normal,
-      )
       testContext.mockRippled!.addResponse('server_state', {
         status: 'success',
         type: 'response',
@@ -236,10 +214,6 @@ describe('client.autofill', function () {
         'server_info',
         rippled.server_info.normal,
       )
-      testContext.mockRippled!.addResponse(
-        'server_info',
-        rippled.server_info.normal,
-      )
       const txResult = await testContext.client.autofill(tx, 4)
 
       assert.strictEqual(txResult.Fee, '459')
@@ -253,7 +227,6 @@ describe('client.autofill', function () {
       Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
       Fee,
       Sequence,
-      NetworkID,
     }
     testContext.mockRippled!.addResponse('ledger', {
       status: 'success',
@@ -299,37 +272,9 @@ describe('client.autofill', function () {
         },
       },
     })
-    testContext.mockRippled!.addResponse(
-      'server_info',
-      rippled.server_info.normal,
-    )
     const txResult = await testContext.client.autofill(tx)
     assert.strictEqual(txResult.Fee, '12')
     assert.strictEqual(txResult.Sequence, 23)
     assert.strictEqual(txResult.LastLedgerSequence, 9038234)
-    assert.strictEqual(txResult.NetworkID, 21338)
-  })
-
-  it("should autofill NetworkID when it's missing", async function () {
-    const tx: Transaction = {
-      TransactionType: 'DepositPreauth',
-      Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
-      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
-      Fee,
-      LastLedgerSequence,
-      Sequence,
-    }
-    testContext.mockRippled!.addResponse('server_info', {
-      status: 'success',
-      type: 'response',
-      result: {
-        info: {
-          network_id: 21338,
-        },
-      },
-    })
-    const txResult = await testContext.client.autofill(tx)
-
-    assert.strictEqual(txResult.NetworkID, 21338)
   })
 })

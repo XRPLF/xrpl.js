@@ -34,7 +34,6 @@ describe('client.submit', function () {
       Sequence: 1,
       Fee: '12',
       LastLedgerSequence: 12312,
-      NetworkID: 21338,
     }
 
     it('should submit an unsigned transaction', async function () {
@@ -84,7 +83,6 @@ describe('client.submit', function () {
       LastLedgerSequence: 12312,
       Amount: '20000000',
       Fee: '12',
-      NetworkID: 21338,
       SigningPubKey:
         '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D',
       TxnSignature:

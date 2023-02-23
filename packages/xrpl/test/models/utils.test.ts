@@ -50,7 +50,6 @@ describe('Models Utils', function () {
       const tx: OfferCreate = {
         Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
         Fee: '10',
-        NetworkID: 21338,
         TakerGets: {
           currency: 'DSH',
           issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',

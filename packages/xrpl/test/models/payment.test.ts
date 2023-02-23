@@ -19,7 +19,6 @@ describe('Payment', function () {
       Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       DestinationTag: 1,
       Fee: '12',
-      NetworkID: 21338,
       Flags: 2147483648,
       LastLedgerSequence: 65953073,
       Sequence: 65923914,

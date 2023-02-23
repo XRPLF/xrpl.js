@@ -13,7 +13,6 @@ describe('OfferCreate', function () {
     const offer = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Fee: '10',
-      NetworkID: 21338,
       Flags: 0,
       LastLedgerSequence: 65453019,
       Sequence: 40949322,
@@ -38,7 +37,6 @@ describe('OfferCreate', function () {
     const offer2 = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Fee: '10',
-      NetworkID: 21338,
       Flags: 0,
       LastLedgerSequence: 65453019,
       Sequence: 40949322,
@@ -61,7 +59,6 @@ describe('OfferCreate', function () {
     const offer3 = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Fee: '10',
-      NetworkID: 21338,
       Flags: 0,
       LastLedgerSequence: 65453019,
       Sequence: 40949322,
@@ -90,7 +87,6 @@ describe('OfferCreate', function () {
     const offer = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Fee: '10',
-      NetworkID: 21338,
       Flags: 0,
       LastLedgerSequence: 65453019,
       Sequence: 40949322,
@@ -124,7 +120,6 @@ describe('OfferCreate', function () {
     const offer = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Fee: '10',
-      NetworkID: 21338,
       Flags: 0,
       LastLedgerSequence: 65453019,
       Sequence: 40949322,
@@ -158,7 +153,6 @@ describe('OfferCreate', function () {
     const offer = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Fee: '10',
-      NetworkID: 21338,
       Flags: 0,
       LastLedgerSequence: 65453019,
       Sequence: 40949322,
@@ -188,7 +182,6 @@ describe('OfferCreate', function () {
     const offer = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Fee: '10',
-      NetworkID: 21338,
       Flags: 0,
       LastLedgerSequence: 65453019,
       Sequence: 40949322,

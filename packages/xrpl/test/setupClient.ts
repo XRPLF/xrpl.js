@@ -5,6 +5,7 @@ import BroadcastClient from '../src/client/BroadcastClient'
 import createMockRippled, {
   type MockedWebSocketServer,
 } from './createMockRippled'
+import rippled from './fixtures/rippled'
 import { destroyServer, getFreePort } from './testUtils'
 
 export interface XrplTestContext {
@@ -30,7 +31,10 @@ async function setupMockRippledConnection(
     // We must have an error listener attached for reconnect errors
   })
 
-  return context.client.connect().then(() => context)
+  await context.client.connect()
+  context.mockRippled!.addResponse('server_info', rippled.server_info.normal)
+  await context.client.setNetworkID()
+  return context
 }
 
 async function setupMockRippledConnectionForBroadcast(
@@ -44,7 +48,10 @@ async function setupMockRippledConnectionForBroadcast(
     servers: ports,
   }
 
-  return context.client.connect().then(() => context)
+  await context.client.connect()
+  context.mockRippled!.addResponse('server_info', rippled.server_info.normal)
+  await context.client.setNetworkID()
+  return context
 }
 
 async function setupClient(): Promise<XrplTestContext> {

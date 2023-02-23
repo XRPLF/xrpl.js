@@ -15,7 +15,6 @@ describe('TrustSet', function () {
     trustSet = {
       TransactionType: 'TrustSet',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
-      NetworkID: 21338,
       LimitAmount: {
         currency: 'XRP',
         issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
