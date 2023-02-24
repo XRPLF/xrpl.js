@@ -29,7 +29,7 @@ export interface AccountNFTsRequest extends BaseRequest {
  *
  * @category Responses
  */
-interface AccountNFToken {
+export interface AccountNFToken {
   Flags: number
   Issuer: string
   NFTokenID: string
