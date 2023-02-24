@@ -106,7 +106,7 @@ jobs:
         ports:
           - 6006:6006
         volumes: 
-          - ${GITHUB_WORKSPACE}/ci-config:/config/
+          - ci-config:/config/
         options: --entrypoint ./config/custom-entrypoint --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
     steps:
@@ -159,7 +159,7 @@ jobs:
         ports:
           - 6006:6006
         volumes: 
-          - ${GITHUB_WORKSPACE}/ci-config:/config/
+          - ci-config:/config/
         options: --entrypoint ./config/custom-entrypoint --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
     steps:
