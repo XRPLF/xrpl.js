@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# This should mirror https://github.com/WietseWind/docker-rippled/blob/master/entrypoint
+# Except for the last line, which starts rippled in standalone mode using "-a --start"
+# Because we can't provide those commands to a Docker service in GitHub Actions.
+
+rippledconfig=`/bin/cat /config/rippled.cfg 2>/dev/null | wc -l`
+validatorstxt=`/bin/cat /config/validators.txt 2>/dev/null | wc -l`
+
+mkdir -p /config
+
+if [[ "$rippledconfig" -gt "0" && "$validatorstxt" -gt "0" ]]; then
+
+    echo "Existing rippled config at host /config/, using them."
+
+    /bin/cat /config/rippled.cfg > /etc/opt/ripple/rippled.cfg
+    /bin/cat /config/validators.txt > /etc/opt/ripple/validators.txt
+
+fi
+
+# Start rippled in standalone mode
+exec /opt/ripple/bin/rippled --conf /etc/opt/ripple/rippled.cfg -a --start
