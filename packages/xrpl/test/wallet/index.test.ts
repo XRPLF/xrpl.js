@@ -1010,7 +1010,7 @@ describe('Wallet', function () {
 
       assert.throws(() => {
         wallet.sign(tx)
-      }, /URI must be a hex value/u)
+      }, /URI must be in hex format/u)
     })
   })
 

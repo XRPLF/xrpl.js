@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
 import isEqual from 'lodash/isEqual'
+import omitBy from 'lodash/omitBy'
 import {
   classicAddressToXAddress,
   isValidXAddress,
@@ -26,7 +27,7 @@ import {
 import ECDSA from '../ECDSA'
 import { ValidationError, XrplError } from '../errors'
 import { IssuedCurrencyAmount } from '../models/common'
-import { Transaction } from '../models/transactions'
+import { Transaction, validate } from '../models/transactions'
 import { isIssuedCurrency } from '../models/transactions/common'
 import { isHex } from '../models/utils'
 import { ensureClassicAddress } from '../sugar/utils'
@@ -323,7 +324,11 @@ class Wallet {
       multisignAddress = this.classicAddress
     }
 
-    const tx = { ...transaction }
+    // clean null & undefined valued tx properties
+    const tx = omitBy(
+      { ...transaction },
+      (value) => value == null,
+    ) as unknown as Transaction
 
     if (tx.TxnSignature || tx.Signers) {
       throw new ValidationError(
@@ -332,6 +337,12 @@ class Wallet {
     }
 
     removeTrailingZeros(tx)
+
+    /*
+     * This will throw a more clear error for JS users if the supplied transaction has incorrect formatting
+     */
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
+    validate(tx as unknown as Record<string, unknown>)
 
     const txToSignAndEncode = { ...tx }
 
@@ -460,26 +471,7 @@ class Wallet {
     })
 
     if (txCopy.TransactionType === 'NFTokenMint' && txCopy.URI) {
-      if (!isHex(txCopy.URI)) {
-        throw new ValidationError('URI must be a hex value')
-      }
       txCopy.URI = txCopy.URI.toUpperCase()
-    }
-
-    if (
-      txCopy.TransactionType === 'NFTokenMint' &&
-      typeof txCopy.URI === 'string' &&
-      txCopy.URI === ''
-    ) {
-      throw new ValidationError('NFTokenMint: URI must not be empty string')
-    }
-
-    if (
-      txCopy.TransactionType === 'NFTokenMint' &&
-      txCopy.hasOwnProperty('URI') &&
-      txCopy.URI === undefined
-    ) {
-      delete txCopy.URI
     }
 
     /* eslint-disable @typescript-eslint/consistent-type-assertions -- We check at runtime that this is safe */

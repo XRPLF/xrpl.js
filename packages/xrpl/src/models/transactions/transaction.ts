@@ -213,7 +213,7 @@ export function validate(transaction: Record<string, unknown>): void {
   if (
     !isEqual(
       decode(encode(tx)),
-      omitBy(tx, (value) => value == null),
+      decode(encode(omitBy(tx, (value) => value == null))),
     )
   ) {
     throw new ValidationError(`Invalid Transaction: ${tx.TransactionType}`)

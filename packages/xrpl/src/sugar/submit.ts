@@ -217,10 +217,6 @@ async function getSignedTx(
         (decode(transaction) as unknown as Transaction)
       : transaction
 
-  if (tx.TransactionType === 'NFTokenMint' && tx.hasOwnProperty('URI') && tx.URI == undefined) {
-    delete tx.URI
-  }
-
   if (autofill) {
     tx = await client.autofill(tx)
   }
