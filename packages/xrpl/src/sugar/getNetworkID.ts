@@ -1,5 +1,5 @@
 import type { Client } from '..'
-import { XrplError } from '../errors'
+// import { XrplError } from '../errors'
 
 /**
  * Returns the network ID of the rippled server.
@@ -11,11 +11,5 @@ export default async function getNetworkID(this: Client): Promise<number> {
   const response = await this.request({
     command: 'server_info',
   })
-  const networkID = response.result.info.network_id
-  if (networkID == null) {
-    throw new XrplError(
-      'getNetworkID: Could not get network_id from server_info',
-    )
-  }
-  return networkID
+  return response.result.info.network_id ?? 1
 }
