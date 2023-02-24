@@ -292,17 +292,6 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Set the network id of the connected client.
-   *
-   * @category Network
-   * @returns The Network ID of the server this client is connected to.
-   */
-  public async setNetworkID(): Promise<number> {
-    this.networkID = await this.getNetworkID()
-    return this.networkID
-  }
-
-  /**
    * @category Network
    */
   public async request(
