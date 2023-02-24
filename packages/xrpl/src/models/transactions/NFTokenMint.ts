@@ -90,7 +90,7 @@ export interface NFTokenMint extends BaseTransaction {
    * This field must not be an empty string. Omit it from the transaction or
    * set to `undefined` value if you do not use it.
    */
-  URI?: string
+  URI?: string | null
   Flags?: number | NFTokenMintFlagsInterface
 }
 
