@@ -325,6 +325,7 @@ class Wallet {
     }
 
     // clean null & undefined valued tx properties
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- ensure Transaction flows through
     const tx = omitBy(
       { ...transaction },
       (value) => value == null,
