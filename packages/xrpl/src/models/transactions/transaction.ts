@@ -3,7 +3,6 @@
 
 import isEqual from 'lodash/isEqual'
 import omitBy from 'lodash/omitBy'
-import { encode, decode } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
 import { setTransactionFlagsToNumber } from '../utils/flags'
@@ -212,8 +211,8 @@ export function validate(transaction: Record<string, unknown>): void {
 
   if (
     !isEqual(
-      decode(encode(tx)),
-      decode(encode(omitBy(tx, (value) => value == null))),
+      tx,
+      omitBy(tx, (value) => value == null),
     )
   ) {
     throw new ValidationError(`Invalid Transaction: ${tx.TransactionType}`)
