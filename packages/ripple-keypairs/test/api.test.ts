@@ -1,5 +1,5 @@
 import assert from 'assert'
-import fixtures from './fixtures/api.json'
+import * as fixtures from './fixtures/api.json'
 import * as api from '../src'
 
 const decodeSeed = api.decodeSeed

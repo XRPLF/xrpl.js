@@ -30,7 +30,7 @@ describe('AccountSet', function () {
   })
 
   it(`throws w/ invalid SetFlag (out of range)`, function () {
-    account.SetFlag = 12
+    account.SetFlag = 20
 
     assert.throws(
       () => validateAccountSet(account),
@@ -60,7 +60,7 @@ describe('AccountSet', function () {
   })
 
   it(`throws w/ invalid ClearFlag`, function () {
-    account.ClearFlag = 12
+    account.ClearFlag = 20
 
     assert.throws(
       () => validateAccountSet(account),

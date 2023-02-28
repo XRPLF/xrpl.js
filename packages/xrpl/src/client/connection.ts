@@ -1,5 +1,4 @@
 /* eslint-disable max-lines -- Connection is a large file w/ lots of imports/exports */
-
 import { EventEmitter } from 'events'
 import { Agent } from 'http'
 
@@ -213,6 +212,24 @@ export class Connection extends EventEmitter {
   }
 
   /**
+   * Gets the state of the websocket.
+   *
+   * @returns The Websocket's ready state.
+   */
+  private get state(): WebsocketState {
+    return this.ws ? this.ws.readyState : WebSocket.CLOSED
+  }
+
+  /**
+   * Returns whether the server should be connected.
+   *
+   * @returns Whether the server should be connected.
+   */
+  private get shouldBeConnected(): boolean {
+    return this.ws !== null
+  }
+
+  /**
    * Returns whether the websocket is connected.
    *
    * @returns Whether the websocket connection is open.
@@ -367,7 +384,7 @@ export class Connection extends EventEmitter {
     return this.url ?? ''
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function -- Does nothing on default
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, class-methods-use-this -- Does nothing on default
   public readonly trace: (id: string, message: string) => void = () => {}
 
   /**
@@ -408,24 +425,6 @@ export class Connection extends EventEmitter {
         }
       }
     }
-  }
-
-  /**
-   * Gets the state of the websocket.
-   *
-   * @returns The Websocket's ready state.
-   */
-  private get state(): WebsocketState {
-    return this.ws ? this.ws.readyState : WebSocket.CLOSED
-  }
-
-  /**
-   * Returns whether the server should be connected.
-   *
-   * @returns Whether the server should be connected.
-   */
-  private get shouldBeConnected(): boolean {
-    return this.ws !== null
   }
 
   /**
