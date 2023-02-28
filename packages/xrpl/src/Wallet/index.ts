@@ -121,7 +121,31 @@ class Wallet {
   }
 
   /**
-   * Generates a new Wallet using a generated seed.
+   * The `generate` method is used to create a new random wallet object with a random seed. This method returns a Wallet
+   * object that includes a publicKey and secret value. The publicKey is a unique identifier for the wallet that can be
+   * shared publicly, while the secret is a secret value that must be kept confidential and is used for signing transactions.
+   *
+   * @example
+   * To use the generate() method, first, you need to import the Wallet class from the XRP Ledger JavaScript Library:
+   *
+   * ```ts
+   * const { Wallet } = require('xrpl')
+   * ```
+   *
+   * After that, you can call the generate() method on a new Wallet object:
+   *
+   * ```ts
+   * const newWallet = new Wallet()
+   * const walletData = newWallet.generate()
+   *
+   * console.log(walletData.publicKey)
+   * console.log(walletData.secret)
+   * ```
+   *
+   * This will create a new wallet object and log the publicKey and secret values to the console.
+   * It's important to note that the secret value should be kept confidential and never shared with anyone.
+   * Anyone with access to the secret value can sign transactions and transfer XRP from the wallet, so it's
+   * crucial to keep it secure.
    *
    * @param algorithm - The digital signature algorithm to generate an address for.
    * @returns A new Wallet derived from a generated seed.
@@ -299,6 +323,58 @@ class Wallet {
 
   /**
    * Signs a transaction offline.
+   *
+   * @example
+   *
+   * ```ts
+   * const { Client, Wallet } = require('xrpl')
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   *
+   * async function signTransaction() {
+   *   const { publicKey: sourcePublicKey } = Wallet.generate()
+   *   const { publicKey: destinationPublicKey } = Wallet.generate()
+   *
+   *   const transaction = {
+   *     TransactionType: 'Payment',
+   *     Account: sourcePublicKey,
+   *     Destination: destinationPublicKey,
+   *     Amount: '10'
+   *   }
+   *
+   *   try {
+   *     await client.autofill(transaction)
+   *     const signedTransaction = await Wallet.sign(transaction)
+   *     console.log(signedTransaction)
+   *   } catch (error) {
+   *     console.error(`Failed to sign transaction: ${error}`)
+   *   }
+   * }
+   *
+   * signTransaction()
+   * ```
+   * In this example, we create a new Client object using the wss://s.altnet.rippletest.net:51233
+   * endpoint for the XRP Ledger Testnet. We then use the generate() method of the Wallet class as
+   * static methods to generate two new random wallets with a private key and a public key. We then
+   * extract the publicKey property from each generated wallet object.
+   *
+   * Next we create a transaction object that represents a payment of 10 XRP from the sourcePublicKey
+   * account to the destinationPublicKey account. We set the Amount property to 10 XRP and leave the other properties empty.
+   *
+   * The transaction object is passed to the `autofill()` method of the `Client` class, which fills in
+   * the missing fields based on the current state of the XRP Ledger.
+   *
+   * We then pass the filled-in transaction object to the `sign()` method of the Wallet class using await
+   * to wait for the method to complete. If the signing is successful, the function logs the signed
+   * transaction object including `tx_blob` and `hash` to the console.
+   *
+   * `tx_blob` is a binary representation of a transaction on the XRP Ledger. It's essentially a byte array
+   * that encodes all of the data necessary to execute the transaction, including the source address, the destination
+   * address, the amount, and any additional fields required for the specific transaction type.
+   *
+   * `hash` is a unique identifier that's generated from the signed transaction data on the XRP Ledger. It's essentially
+   * a cryptographic digest of the signed transaction blob, created using a hash function. The signed transaction hash is
+   * useful for identifying and tracking specific transactions on the XRP Ledger. It can be used to query transaction
+   * information, verify the authenticity of a transaction, and detect any tampering with the transaction data.
    *
    * @param this - Wallet instance.
    * @param transaction - A transaction to be signed offline.

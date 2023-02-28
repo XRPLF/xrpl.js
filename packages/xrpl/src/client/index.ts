@@ -564,6 +564,50 @@ class Client extends EventEmitter {
   /**
    * Tells the Client instance to connect to its rippled server.
    *
+   * @example
+   *
+   * To use the connect() method, you first need to create a new Client object using the new Client() constructor:
+   *
+   * ```ts
+   * const { Client } = require('xrpl')
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   *
+   * This creates a new Client object and specifies the URL of the server to connect to. You can replace the URL
+   * with the URL of any other server that supports the XRP Ledger.
+   *
+   * After you've created the Client object, you can call the connect() method to connect the client to the server:
+   *
+   * ```ts
+   * client.connect().then(() => {
+   *  console.log('Connected to server')
+   * }).catch((error) => {
+   *  console.log(`Failed to connect to server: ${error}`)
+   * })
+   * ```
+   *
+   * This will connect the client to the server and log a message to the console when the connection is established.
+   * If there's an error connecting to the server, the catch() method will log an error message to the console.
+   *
+   * It's important to note that the connect() method returns a promise, which resolves when the connection is
+   * established and rejects if there's an error connecting to the server. This means you can use the async/await
+   * syntax to wait for the connection to be established before executing any further code:
+   *
+   * ```ts
+   * async function connectToServer() {
+   *   try {
+   *     await client.connect()
+   *     console.log('Connected to server')
+   *   } catch (error) {
+   *     console.log(`Failed to connect to server: ${error}`)
+   *   }
+   * }
+   *
+   * connectToServer()
+   * ```
+   *
+   * In this example, the connectToServer() function uses the async/await syntax to wait for the connection to
+   * be established before logging a message to the console.
+   *
    * @returns A promise that resolves with a void value when a connection is established.
    * @category Network
    */
@@ -572,7 +616,21 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Tells the Client instance to disconnect from it's rippled server.
+   * Disconnects the XRPL client from the server and cancels all pending requests and subscriptions. Call when
+   * you want to disconnect the client from the server, such as when you're finished using the client or when you
+   * need to switch to a different server.
+   *
+   * @example
+   *
+   * To use the disconnect() method, you first need to create a new Client object and connect it to a server:
+   *
+   * ```ts
+   * const { Client } = require('xrpl')
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   * await client.connect()
+   * // do something with the client
+   * await client.disconnect()
+   * ```
    *
    * @returns A promise that resolves with a void value when a connection is destroyed.
    * @category Network

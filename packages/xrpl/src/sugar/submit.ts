@@ -52,12 +52,73 @@ async function submit(
  * validated ledger (or has errored/will not be included for some reason).
  * See [Reliable Transaction Submission](https://xrpl.org/reliable-transaction-submission.html).
  *
+ * @example
+ *
+ * ```ts
+ * const { Client, Wallet } = require('xrpl')
+ * const client = new Client('wss://s.altnet.rippletest.net:51233')
+ *
+ * async function submitTransaction() {
+ *   const senderWallet = Wallet.generate()
+ *   const recipientWallet = Wallet.generate()
+ *
+ *   const transaction = {
+ *     TransactionType: 'Payment',
+ *     Account: senderWallet.publicKey,
+ *     Destination: recipientWallet.publicKey,
+ *     Amount: '10'
+ *   }
+ *
+ *   try {
+ *     await client.autofill(transaction)
+ *     const signedTransaction = await Wallet.sign(transaction)
+ *     const result = await client.submitAndWait(signedTransaction)
+ *     console.log(result)
+ *   } catch (error) {
+ *     console.error(`Failed to submit transaction: ${error}`)
+ *   }
+ * }
+ *
+ * submitTransaction()
+ * ```
+ *
+ * In this example, we create two new random wallets using the generate() method of the Wallet class,
+ * one for the sender and one for the recipient. We extract the publicKey property from the generated wallet
+ * objects to get the sender and recipient public keys.
+ *
+ * Next we create a transaction object that represents a payment of 10 XRP from the sender account to the
+ * recipient account. We set the Amount property to 10 XRP and leave the other properties empty.
+ *
+ * The transaction object is passed to the `autofill()` method of the `Client` class, which fills in the
+ * missing fields based on the current state of the XRP Ledger.
+ *
+ * Continuing on we then pass the filled-in transaction object to the `sign()` method of the `Wallet` class
+ * using `await` to wait for the method to complete. If the signing is successful, the resulting signed
+ * transaction blob is passed to the `submitAndWait()` method of the `Client` class.
+ *
+ * The `submitAndWait()` method submits the signed transaction blob to the XRP Ledger and waits for the transaction
+ * to be included in a validated ledger before resolving or rejecting the returned promise. If the transaction is
+ * successfully validated and included in a ledger, the promise resolves with the transaction result object. If there's
+ * an issue submitting or validating the transaction, the promise rejects with an error.
+ *
+ * If the promise resolves, the function logs a success message to the console that includes the transaction hash. If the
+ * promise rejects, the function logs an error message to the console using console.error().
+ *
  * @param this - A Client.
  * @param transaction - A transaction to autofill, sign & encode, and submit.
  * @param opts - (Optional) Options used to sign and submit a transaction.
  * @param opts.autofill - If true, autofill a transaction.
  * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
  * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+ * @throws Connection errors: If the `Client` object is unable to establish a connection to the specified WebSocket endpoint,
+ * an error will be thrown.
+ * @throws Transaction errors: If the submitted transaction is invalid or cannot be included in a validated ledger for any
+ * reason, the promise returned by `submitAndWait()` will be rejected with an error. This could include issues with insufficient
+ * balance, invalid transaction fields, or other issues specific to the transaction being submitted.
+ * @throws Ledger errors: If the ledger being used to submit the transaction is undergoing maintenance or otherwise unavailable,
+ * an error will be thrown.
+ * @throws Timeout errors: If the transaction takes longer than the specified timeout period to be included in a validated
+ * ledger, the promise returned by `submitAndWait()` will be rejected with an error.
  * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
  */
 async function submitAndWait(

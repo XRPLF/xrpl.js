@@ -20,14 +20,102 @@ const INTERVAL_SECONDS = 1
 const MAX_ATTEMPTS = 20
 
 /**
- * Generates a random wallet with some amount of XRP (usually 1000 XRP).
+ * The fundWallet() method is used to send an amount of XRP (usually 1000) to a new (randomly generated)
+ * or existing XRP Ledger wallet.
  *
  * @example
- * ```typescript
+ *
+ * Example 1: Fund a manually random generated wallet
+ * const { Client, Wallet } = require('xrpl')
+ *
+ * const client = new Client('wss://s.altnet.rippletest.net:51233')
+ *
+ * async function fundRandomWallet() {
+ *   const newWallet = new Wallet()
+ *   const walletData = newWallet.generate()
+ *
+ *   try {
+ *     const { balance } = await client.fundWallet(walletData.publicKey, { xrpAmount: '10' })
+ *     console.log(`Sent 10 XRP to wallet: ${wallet.publicKey}, balance: ${balance} XRP`)
+ *   } catch (error) {
+ *     console.error(`Failed to fund wallet: ${error}`)
+ *   }
+ * }
+ *
+ * fundRandomWallet()
+ *
+ * In this example, we use the generate() method of the Wallet class to create a new random wallet.
+ * The walletData object returned by the generate() method contains the publicKey and secret values for the new wallet.
+ *
+ * The fundWallet() method of the Client class is then called with the publicKey value of the new wallet as the first
+ * argument, and an object that specifies the amount of XRP to send in the xrpAmount parameter. In this case, the
+ * xrpAmount parameter is set to '10', which is equivalent to 10 XRP.
+ *
+ * If the transaction is successful, the function logs a message to the console with the wallet public key and balance of the
+ * new wallet. If there's an error funding XRP to the wallet, the function logs an error message to the console using
+ * console.error().
+ *
+ * ```ts
  * const api = new xrpl.Client("wss://s.altnet.rippletest.net:51233")
  * await api.connect()
  * const { wallet, balance } = await api.fundWallet()
  * ```
+ *
+ * Example 2: Fund wallet using a custom faucet host and known wallet address
+ *
+ * It's important to note that you can customize the faucetHost and faucetPath options to
+ * specify the endpoint that the fundWallet() method uses to send XRP to a wallet. The faucetHost option
+ * specifies the hostname of the server to connect to, and the faucetPath option specifies the path to the
+ * endpoint on the server. By default, the fundWallet() method uses the XRP Ledger Testnet
+ * faucet at https://faucet.altnet.rippletest.net/accounts.
+ *
+ * ```ts
+ * const walletAddress = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+ *
+ * async function fundWalletWithCustomfaucetHost(address) {
+ *   try {
+ *     const { balance } = await client.fundWallet(address, {
+ *       xrpAmount: '10',
+ *       faucetHost: 'https://custom-faucet.example.com',
+ *       faucetPath: '/accounts'
+ *     })
+ *     console.log(`Sent 10 XRP to wallet: ${address}, balance: ${balance} XRP`)
+ *   } catch (error) {
+ *     console.error(`Failed to fund wallet: ${error}`)
+ *   }
+ * }
+ *
+ * fundWalletWithCustomfaucetHost(walletAddress)
+ * ```
+ *
+ * Example 3: Call `fundWallet` with no parameters to generate a new wallet and fund it with testnet
+ *
+ * The easiest way to use the `fundWallet` method is with no parameters in order to generate a new wallet
+ * and fund it with the XRP Ledger Testnet:
+ *
+ * ```ts
+ * const { Client } = require('xrpl')
+ * const client = new Client('wss://s.altnet.rippletest.net:51233')
+ *
+ * async function fundNewWallet() {
+ *   try {
+ *     const { wallet, balance } = await client.fundWallet()
+ *     console.log(`Sent 10 XRP to wallet: ${wallet.publicKey}, balance: ${balance} XRP`)
+ *   } catch (error) {
+ *     console.error(`Failed to fund wallet: ${error}`)
+ *   }
+ * }
+ *
+ * fundNewWallet()
+ * ```
+ *
+ * In this example, we call the `fundWallet()` method with no parameters to generate a new
+ * wallet and fund it with the XRP Ledger Testnet. The wallet variable contains an object that has publicKey
+ * and secret properties for the new wallet, and the balance variable contains the balance of the new wallet.
+ *
+ * If the transaction is successful, the function logs a message to the console with the publicKey value of the
+ * new wallet and the balance of the wallet. If there's an error funding XRP to the wallet, the function logs an
+ * error message to the console using console.error().
  *
  * @param this - Client.
  * @param wallet - An existing XRPL Wallet to fund. If undefined or null, a new Wallet will be created.
