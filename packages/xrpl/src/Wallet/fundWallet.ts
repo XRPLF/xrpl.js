@@ -44,29 +44,23 @@ const MAX_ATTEMPTS = 20
  *
  * Example 2: Fund wallet using a custom faucet host and known wallet address
  *
- * It's important to note that you can customize the faucetHost and faucetPath options to
- * specify the endpoint that the fundWallet() method uses to send XRP to a wallet. The faucetHost option
- * specifies the hostname of the server to connect to, and the faucetPath option specifies the path to the
- * endpoint on the server. By default, the fundWallet() method uses the XRP Ledger Testnet
- * faucet at https://faucet.altnet.rippletest.net/accounts.
- *
+ * `fundWallet` will try to infer the url of a faucet API from the network your client is connected to. 
+ * There are hardcoded default faucets for popular test networks like testnet and devnet. 
+ * However, if you're working with a newer or more obscure network, you may have to specify the faucetHost
+ * And faucetPath so `fundWallet` can ask that faucet to fund your wallet.
+ * 
  * ```ts
- * const walletAddress = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
- *
- * async function fundWalletWithCustomfaucetHost(address) {
- *   try {
- *     const { balance } = await client.fundWallet(address, {
- *       xrpAmount: '10',
+ * const newWallet = Wallet.generate()
+ * const { balance, wallet  } = await client.fundWallet(newWallet, {
+ *       amount: '10',
  *       faucetHost: 'https://custom-faucet.example.com',
  *       faucetPath: '/accounts'
  *     })
- *     console.log(`Sent 10 XRP to wallet: ${address}, balance: ${balance} XRP`)
+ *     console.log(`Sent 10 XRP to wallet: ${address} from the given faucet. Resulting balance: ${balance} XRP`)
  *   } catch (error) {
  *     console.error(`Failed to fund wallet: ${error}`)
  *   }
  * }
- *
- * fundWalletWithCustomfaucetHost(walletAddress)
  * ```
  *
  * Example 3: Call `fundWallet` with no parameters to generate a new wallet and fund it with testnet
