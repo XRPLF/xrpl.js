@@ -157,5 +157,10 @@ describe('AccountSet', function () {
       ValidationError,
       'AccountSet: invalid NFTokenMinter',
     )
+    assert.throws(
+      () => validate(account),
+      ValidationError,
+      'AccountSet: invalid NFTokenMinter',
+    )
   })
 })
