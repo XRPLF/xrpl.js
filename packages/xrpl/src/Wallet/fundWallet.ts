@@ -25,36 +25,17 @@ const MAX_ATTEMPTS = 20
  *
  * @example
  *
- * Example 1: Fund a manually random generated wallet
+ * Example 1: Fund a randomly generated wallet
  * const { Client, Wallet } = require('xrpl')
  *
  * const client = new Client('wss://s.altnet.rippletest.net:51233')
+ * await client.connect()
+ * const { balance, wallet } = await client.fundWallet()
  *
- * async function fundRandomWallet() {
- *   const newWallet = new Wallet()
- *   const walletData = newWallet.generate()
- *
- *   try {
- *     const { balance } = await client.fundWallet(walletData.publicKey, { xrpAmount: '10' })
- *     console.log(`Sent 10 XRP to wallet: ${wallet.publicKey}, balance: ${balance} XRP`)
- *   } catch (error) {
- *     console.error(`Failed to fund wallet: ${error}`)
- *   }
- * }
- *
- * fundRandomWallet()
- *
- * In this example, we use the generate() method of the Wallet class to create a new random wallet.
- * The walletData object returned by the generate() method contains the publicKey and secret values for the new wallet.
- *
- * The fundWallet() method of the Client class is then called with the publicKey value of the new wallet as the first
- * argument, and an object that specifies the amount of XRP to send in the xrpAmount parameter. In this case, the
- * xrpAmount parameter is set to '10', which is equivalent to 10 XRP.
- *
- * If the transaction is successful, the function logs a message to the console with the wallet public key and balance of the
- * new wallet. If there's an error funding XRP to the wallet, the function logs an error message to the console using
- * console.error().
- *
+ * Under the hood, this will use `Wallet.generate()` to create a new random wallet, then ask a testnet faucet
+ * To send it XRP on ledger to make it a real account. If successful, this will return the new account balance in XRP
+ * Along with the Wallet object to track the keys for that account. If you'd like, you can also re-fill an existing 
+ * Account by passing in a Wallet you already have. 
  * ```ts
  * const api = new xrpl.Client("wss://s.altnet.rippletest.net:51233")
  * await api.connect()
