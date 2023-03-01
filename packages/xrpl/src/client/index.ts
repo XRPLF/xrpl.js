@@ -575,7 +575,7 @@ class Client extends EventEmitter {
    * // do something with the client
    * await client.disconnect()
    * ```
-   * If you open a client connection, be sure to close it with `await client.disconnect()` 
+   * If you open a client connection, be sure to close it with `await client.disconnect()`
    * before exiting your application.
    * @returns A promise that resolves with a void value when a connection is established.
    * @category Network

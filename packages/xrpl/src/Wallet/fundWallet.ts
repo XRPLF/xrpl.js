@@ -34,8 +34,8 @@ const MAX_ATTEMPTS = 20
  *
  * Under the hood, this will use `Wallet.generate()` to create a new random wallet, then ask a testnet faucet
  * To send it XRP on ledger to make it a real account. If successful, this will return the new account balance in XRP
- * Along with the Wallet object to track the keys for that account. If you'd like, you can also re-fill an existing 
- * Account by passing in a Wallet you already have. 
+ * Along with the Wallet object to track the keys for that account. If you'd like, you can also re-fill an existing
+ * Account by passing in a Wallet you already have.
  * ```ts
  * const api = new xrpl.Client("wss://s.altnet.rippletest.net:51233")
  * await api.connect()
@@ -44,11 +44,11 @@ const MAX_ATTEMPTS = 20
  *
  * Example 2: Fund wallet using a custom faucet host and known wallet address
  *
- * `fundWallet` will try to infer the url of a faucet API from the network your client is connected to. 
- * There are hardcoded default faucets for popular test networks like testnet and devnet. 
+ * `fundWallet` will try to infer the url of a faucet API from the network your client is connected to.
+ * There are hardcoded default faucets for popular test networks like testnet and devnet.
  * However, if you're working with a newer or more obscure network, you may have to specify the faucetHost
  * And faucetPath so `fundWallet` can ask that faucet to fund your wallet.
- * 
+ *
  * ```ts
  * const newWallet = Wallet.generate()
  * const { balance, wallet  } = await client.fundWallet(newWallet, {

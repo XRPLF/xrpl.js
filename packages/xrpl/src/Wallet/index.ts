@@ -121,9 +121,9 @@ class Wallet {
   }
 
   /**
-   * `generate()` creates a new random Wallet. In order to make this a valid account on ledger, you must 
+   * `generate()` creates a new random Wallet. In order to make this a valid account on ledger, you must
    * Send XRP to it. On test networks that can be done with "faucets" which send XRP to any account which asks
-   * For it. You can call `client.fundWallet()` in order to generate credentials and fund the account on test networks. 
+   * For it. You can call `client.fundWallet()` in order to generate credentials and fund the account on test networks.
    *
    * @example
    * ```ts
@@ -340,12 +340,12 @@ class Wallet {
    * signTransaction()
    * ```
    * In order for a transaction to be validated, it must be signed by the account sending the transaction to prove
-   * That the owner is actually the one deciding to take that action. 
-   * 
+   * That the owner is actually the one deciding to take that action.
+   *
    * In this example, we created, signed, and then submitted a transaction to testnet. You may notice that the
    * Output of `sign` includes a `tx_blob` and a `hash`, both of which are needed to submit & verify the results.
    * Note: If you pass a `Wallet` to `client.submit` or `client.submitAndWait` it will do signing like this under the hood.
-   * 
+   *
    * `tx_blob` is a binary representation of a transaction on the XRP Ledger. It's essentially a byte array
    * that encodes all of the data necessary to execute the transaction, including the source address, the destination
    * address, the amount, and any additional fields required for the specific transaction type.

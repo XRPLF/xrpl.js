@@ -80,11 +80,11 @@ async function submit(
  * submitTransaction()
  * ```
  *
- * In this example we submit a payment transaction between two newly created testnet accounts. 
- * 
+ * In this example we submit a payment transaction between two newly created testnet accounts.
+ *
  * Under the hood, `submit` will call `client.autofill` by default, and because we've passed in a `Wallet` it
- * Will also sign the transaction for us before submitting the signed transaction binary blob to the ledger. 
- * 
+ * Will also sign the transaction for us before submitting the signed transaction binary blob to the ledger.
+ *
  * This is similar to `submitAndWait` which does all of the above, but also waits to see if the transaction has been validated.
  * @param this - A Client.
  * @param transaction - A transaction to autofill, sign & encode, and submit.
