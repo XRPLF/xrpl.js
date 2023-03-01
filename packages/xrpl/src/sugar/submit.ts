@@ -59,8 +59,8 @@ async function submit(
  * const client = new Client('wss://s.altnet.rippletest.net:51233')
  *
  * async function submitTransaction() {
- *   const senderWallet = Wallet.generate()
- *   const recipientWallet = Wallet.generate()
+ *   const senderWallet = client.fundWallet()
+ *   const recipientWallet = client.fundWallet()
  *
  *   const transaction = {
  *     TransactionType: 'Payment',
