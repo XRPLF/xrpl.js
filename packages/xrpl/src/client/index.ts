@@ -571,12 +571,9 @@ class Client extends EventEmitter {
    * ```ts
    * const { Client } = require('xrpl')
    * const client = new Client('wss://s.altnet.rippletest.net:51233')
-   *   try {
-   *     await client.connect()
-   *     console.log('Connected to server')
-   *   } catch (error) {
-   *     console.log(`Failed to connect to server: ${error}`)
-   *   } 
+   * await client.connect()
+   * // do something with the client
+   * await client.disconnect()
    * ```
    * If you open a client connection, be sure to close it with `await client.disconnect()` 
    * before exiting your application.
