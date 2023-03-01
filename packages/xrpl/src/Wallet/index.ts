@@ -315,50 +315,45 @@ class Wallet {
    * const client = new Client('wss://s.altnet.rippletest.net:51233')
    *
    * async function signTransaction() {
-   *   const { publicKey: sourcePublicKey } = Wallet.generate()
-   *   const { publicKey: destinationPublicKey } = Wallet.generate()
+   *   await client.connect()
+   *   const { balance: balance1, wallet: wallet1 } = client.fundWallet()
+   *   const { balance: balance2, wallet: wallet2 } = client.fundWallet()
    *
    *   const transaction = {
    *     TransactionType: 'Payment',
-   *     Account: sourcePublicKey,
-   *     Destination: destinationPublicKey,
+   *     Account: wallet1.address,
+   *     Destination: wallet2.address,
    *     Amount: '10'
    *   }
    *
    *   try {
    *     await client.autofill(transaction)
-   *     const signedTransaction = await Wallet.sign(transaction)
-   *     console.log(signedTransaction)
+   *     const { tx_blob: signed_tx_blob, hash} = await wallet1.sign(transaction)
+   *     console.log(signed_tx_blob)
    *   } catch (error) {
    *     console.error(`Failed to sign transaction: ${error}`)
    *   }
+   *   const result = await client.submit(signed_tx_blob)
+   *   await client.disconnect()
    * }
    *
    * signTransaction()
    * ```
-   * In this example, we create a new Client object using the wss://s.altnet.rippletest.net:51233
-   * endpoint for the XRP Ledger Testnet. We then use the generate() method of the Wallet class as
-   * static methods to generate two new random wallets with a private key and a public key. We then
-   * extract the publicKey property from each generated wallet object.
-   *
-   * Next we create a transaction object that represents a payment of 10 XRP from the sourcePublicKey
-   * account to the destinationPublicKey account. We set the Amount property to 10 XRP and leave the other properties empty.
-   *
-   * The transaction object is passed to the `autofill()` method of the `Client` class, which fills in
-   * the missing fields based on the current state of the XRP Ledger.
-   *
-   * We then pass the filled-in transaction object to the `sign()` method of the Wallet class using await
-   * to wait for the method to complete. If the signing is successful, the function logs the signed
-   * transaction object including `tx_blob` and `hash` to the console.
-   *
+   * In order for a transaction to be validated, it must be signed by the account sending the transaction to prove
+   * That the owner is actually the one deciding to take that action. 
+   * 
+   * In this example, we created, signed, and then submitted a transaction to testnet. You may notice that the
+   * Output of `sign` includes a `tx_blob` and a `hash`, both of which are needed to submit & verify the results.
+   * Note: If you pass a `Wallet` to `client.submit` or `client.submitAndWait` it will do signing like this under the hood.
+   * 
    * `tx_blob` is a binary representation of a transaction on the XRP Ledger. It's essentially a byte array
    * that encodes all of the data necessary to execute the transaction, including the source address, the destination
    * address, the amount, and any additional fields required for the specific transaction type.
    *
    * `hash` is a unique identifier that's generated from the signed transaction data on the XRP Ledger. It's essentially
-   * a cryptographic digest of the signed transaction blob, created using a hash function. The signed transaction hash is
-   * useful for identifying and tracking specific transactions on the XRP Ledger. It can be used to query transaction
-   * information, verify the authenticity of a transaction, and detect any tampering with the transaction data.
+   * A cryptographic digest of the signed transaction blob, created using a hash function. The signed transaction hash is
+   * Useful for identifying and tracking specific transactions on the XRP Ledger. It can be used to query transaction
+   * Information, verify the authenticity of a transaction, and detect any tampering with the transaction data.
    *
    * @param this - Wallet instance.
    * @param transaction - A transaction to be signed offline.
