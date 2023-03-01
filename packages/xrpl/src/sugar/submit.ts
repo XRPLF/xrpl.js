@@ -82,9 +82,8 @@ async function submit(
  * submitTransaction()
  * ```
  *
- * In this example, we create two new random wallets using the generate() method of the Wallet class,
- * one for the sender and one for the recipient. We extract the publicKey property from the generated wallet
- * objects to get the sender and recipient public keys.
+ * In this example, we create two new test accounts, one for the sender and one for the recipient.
+ * We then use them as the account sending the payment, and the recipient of the funds.
  *
  * Next we create a transaction object that represents a payment of 10 XRP from the sender account to the
  * recipient account. We set the Amount property to 10 XRP and leave the other properties empty.
