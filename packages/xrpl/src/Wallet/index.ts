@@ -121,31 +121,15 @@ class Wallet {
   }
 
   /**
-   * The `generate` method is used to create a new random wallet object with a random seed. This method returns a Wallet
-   * object that includes a publicKey and secret value. The publicKey is a unique identifier for the wallet that can be
-   * shared publicly, while the secret is a secret value that must be kept confidential and is used for signing transactions.
+   * `generate()` creates a new random Wallet. In order to make this a valid account on ledger, you must 
+   * Send XRP to it. On test networks that can be done with "faucets" which send XRP to any account which asks
+   * For it. You can call `client.fundWallet()` in order to generate credentials and fund the account on test networks. 
    *
    * @example
-   * To use the generate() method, first, you need to import the Wallet class from the XRP Ledger JavaScript Library:
-   *
    * ```ts
    * const { Wallet } = require('xrpl')
+   * const wallet = Wallet.generate()
    * ```
-   *
-   * After that, you can call the generate() method on a new Wallet object:
-   *
-   * ```ts
-   * const newWallet = new Wallet()
-   * const walletData = newWallet.generate()
-   *
-   * console.log(walletData.publicKey)
-   * console.log(walletData.secret)
-   * ```
-   *
-   * This will create a new wallet object and log the publicKey and secret values to the console.
-   * It's important to note that the secret value should be kept confidential and never shared with anyone.
-   * Anyone with access to the secret value can sign transactions and transfer XRP from the wallet, so it's
-   * crucial to keep it secure.
    *
    * @param algorithm - The digital signature algorithm to generate an address for.
    * @returns A new Wallet derived from a generated seed.
