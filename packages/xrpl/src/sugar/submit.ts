@@ -70,7 +70,7 @@ async function submit(
  *   }
  *
  *   try {
- *     await client.submitAndWait(signedTransaction, { wallet: senderWallet })
+ *     await client.submit(signedTransaction, { wallet: senderWallet })
  *     console.log(result)
  *   } catch (error) {
  *     console.error(`Failed to submit transaction: ${error}`)
