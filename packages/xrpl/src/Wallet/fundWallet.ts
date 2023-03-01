@@ -63,35 +63,6 @@ const MAX_ATTEMPTS = 20
  * }
  * ```
  *
- * Example 3: Call `fundWallet` with no parameters to generate a new wallet and fund it with testnet
- *
- * The easiest way to use the `fundWallet` method is with no parameters in order to generate a new wallet
- * and fund it with the XRP Ledger Testnet:
- *
- * ```ts
- * const { Client } = require('xrpl')
- * const client = new Client('wss://s.altnet.rippletest.net:51233')
- *
- * async function fundNewWallet() {
- *   try {
- *     const { wallet, balance } = await client.fundWallet()
- *     console.log(`Sent 10 XRP to wallet: ${wallet.publicKey}, balance: ${balance} XRP`)
- *   } catch (error) {
- *     console.error(`Failed to fund wallet: ${error}`)
- *   }
- * }
- *
- * fundNewWallet()
- * ```
- *
- * In this example, we call the `fundWallet()` method with no parameters to generate a new
- * wallet and fund it with the XRP Ledger Testnet. The wallet variable contains an object that has publicKey
- * and secret properties for the new wallet, and the balance variable contains the balance of the new wallet.
- *
- * If the transaction is successful, the function logs a message to the console with the publicKey value of the
- * new wallet and the balance of the wallet. If there's an error funding XRP to the wallet, the function logs an
- * error message to the console using console.error().
- *
  * @param this - Client.
  * @param wallet - An existing XRPL Wallet to fund. If undefined or null, a new Wallet will be created.
  * @param options - See below.
