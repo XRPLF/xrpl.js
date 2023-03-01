@@ -49,16 +49,10 @@ interface ClassicAccountAndTag {
  * createAndAutofillTransaction()
  * ```
  *
- * In this example, we create a transaction object that represents a payment of 10 XRP
- * from the `rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh` account to the `r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59` account.
- * We do not set the Fee or Sequence properties of the transaction object since `autofill()` will do that for us.
- *
- * We then pass the transaction object to the `autofill()` method of the `Client` class. The `autofill()` method will
- * attempt to calculate the appropriate fee for the transaction based on the current state of the XRP Ledger and the sequence
- * based on the last validated ledger specific to this account. It will also convert the X-Addresses to classic addresses.
- *
- * If the autofill is successful, the function logs the autofilled transaction object to the console. If there's an error
- * autofilling the transaction, the function logs an error message to the console using console.error().
+ * Autofill helps fill in fields which should be included in a transaction, but can be determined automatically
+ * such as `LastLedgerSequence` and `Fee`. If you override one of the fields `autofill` changes, your explicit
+ * values will be used instead. By default, this is done as part of `submit` and `submitAndWait` when you pass
+ * in an unsigned transaction along with your wallet to be submitted.
  *
  * @param this - A client.
  * @param transaction - A {@link Transaction} in JSON format
