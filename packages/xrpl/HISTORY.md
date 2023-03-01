@@ -8,6 +8,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Fixed missing reason code in websocket implemntation on websocket disconnect
 * Fix timeout error in request manager
 * Improved typescript typing
+* Fixed empty value condition for NFTokenMinter field in AccountSet transaction
 
 ### Added
 - `getNFTokenID` lets you get the NFTokenID after minting an NFT
