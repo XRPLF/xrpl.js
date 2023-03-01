@@ -64,8 +64,8 @@ async function submit(
  *
  *   const transaction = {
  *     TransactionType: 'Payment',
- *     Account: senderWallet.publicKey,
- *     Destination: recipientWallet.publicKey,
+ *     Account: senderWallet.address,
+ *     Destination: recipientWallet.address,
  *     Amount: '10'
  *   }
  *
