@@ -1,4 +1,7 @@
 /* eslint-disable complexity -- Necessary for validateAccountSet */
+
+import { isValidClassicAddress } from 'ripple-address-codec'
+
 import { ValidationError } from '../../errors'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
@@ -164,9 +167,16 @@ const MAX_TICK_SIZE = 15
  * @param tx - An AccountSet Transaction.
  * @throws When the AccountSet is Malformed.
  */
-// eslint-disable-next-line max-lines-per-function -- okay for this method, only a little over
+// eslint-disable-next-line max-lines-per-function, max-statements -- okay for this method, only a little over
 export function validateAccountSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+
+  if (
+    tx.NFTokenMinter !== undefined &&
+    !isValidClassicAddress(String(tx.NFTokenMinter))
+  ) {
+    throw new ValidationError('AccountSet: invalid NFTokenMinter')
+  }
 
   if (tx.ClearFlag !== undefined) {
     if (typeof tx.ClearFlag !== 'number') {
