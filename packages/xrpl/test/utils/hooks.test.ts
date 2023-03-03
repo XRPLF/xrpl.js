@@ -8,6 +8,18 @@ import {
 } from '../../src'
 
 describe('test hook on', function () {
+  it('invalid', function () {
+    const invokeOn: Array<keyof TTS> = [1]
+    expect(() => {
+      calculateHookOn(invokeOn)
+    }).toThrow('HookOn transaction type must be string')
+  })
+  it('invalid', function () {
+    const invokeOn: Array<keyof TTS> = ['AccountSet1']
+    expect(() => {
+      calculateHookOn(invokeOn)
+    }).toThrow("invalid transaction type 'AccountSet1' in HookOn array")
+  })
   it('all', function () {
     const result = calculateHookOn([])
     assert.equal(
@@ -16,7 +28,7 @@ describe('test hook on', function () {
     )
   })
   it('one', function () {
-    const invokeOn: Array<keyof TTS> = ['ttACCOUNT_SET']
+    const invokeOn: Array<keyof TTS> = ['AccountSet']
     const result = calculateHookOn(invokeOn)
     assert.equal(
       result,

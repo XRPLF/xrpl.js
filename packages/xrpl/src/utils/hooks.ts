@@ -6,7 +6,9 @@
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports -- Required
 import createHash = require('create-hash')
+import { TRANSACTION_TYPE_MAP, TRANSACTION_TYPES } from 'ripple-binary-codec'
 
+import { XrplError } from '../errors'
 import { HookParameter } from '../models/common'
 
 /**
@@ -14,33 +16,8 @@ import { HookParameter } from '../models/common'
  * @description
  * Transaction types
  */
-export const tts = {
-  ttPAYMENT: 0,
-  ttESCROW_CREATE: 1,
-  ttESCROW_FINISH: 2,
-  ttACCOUNT_SET: 3,
-  ttESCROW_CANCEL: 4,
-  ttREGULAR_KEY_SET: 5,
-  ttOFFER_CREATE: 7,
-  ttOFFER_CANCEL: 8,
-  ttTICKET_CREATE: 10,
-  ttSIGNER_LIST_SET: 12,
-  ttPAYCHAN_CREATE: 13,
-  ttPAYCHAN_FUND: 14,
-  ttPAYCHAN_CLAIM: 15,
-  ttCHECK_CREATE: 16,
-  ttCHECK_CASH: 17,
-  ttCHECK_CANCEL: 18,
-  ttDEPOSIT_PREAUTH: 19,
-  ttTRUST_SET: 20,
-  ttACCOUNT_DELETE: 21,
-  ttHOOK_SET: 22,
-  ttNFTOKEN_MINT: 25,
-  ttNFTOKEN_BURN: 26,
-  ttNFTOKEN_CREATE_OFFER: 27,
-  ttNFTOKEN_CANCEL_OFFER: 28,
-  ttNFTOKEN_ACCEPT_OFFER: 29,
-}
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Required
+export const tts = TRANSACTION_TYPE_MAP
 
 /**
  * @typedef TTS
@@ -58,8 +35,16 @@ export type TTS = typeof tts
 export function calculateHookOn(arr: Array<keyof TTS>): string {
   let hash = '0x3e3ff5bf'
   arr.forEach((nth) => {
+    if (typeof nth !== 'string') {
+      throw new XrplError(`HookOn transaction type must be string`)
+    }
+    if (!TRANSACTION_TYPES.includes(String(nth))) {
+      throw new XrplError(
+        `invalid transaction type '${String(nth)}' in HookOn array`,
+      )
+    }
     let value = BigInt(hash)
-    // eslint-disable-next-line no-bitwise -- Required
+    // eslint-disable-next-line no-bitwise, @typescript-eslint/no-unsafe-member-access -- Required
     value ^= BigInt(1) << BigInt(tts[nth])
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- Required
     hash = `0x${value.toString(16)}`
