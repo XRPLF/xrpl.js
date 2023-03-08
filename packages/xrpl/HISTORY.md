@@ -17,7 +17,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Changed
 * All tests now use the Jest test runner and have been refactored for consistency across all packages
 * Updated faucet to for hooks to use v3 testnet
-* Removed nft-devnet faucet support as it has been decommissioned
+* Removed nft-devnet faucet support as it has been decommissioned ([Blog Post](https://xrpl.org/blog/2023/nft-devnet-decommission.html))
 
 ### Deprecated
 Wallet.fromMmnemonic()
