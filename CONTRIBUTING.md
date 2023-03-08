@@ -203,7 +203,7 @@ npm uninstall abbrev -w xrpl
 1. Actually publish the packages with one of the following:
 
    - Stable release: Run `npx lerna publish from-package --yes`
-   - Beta release: Run `npx lerna publish from-package --dist-tag beta --yes`
+   - Beta release: Run `npx lerna publish from-package --dist-tag beta --yes`  
      Notice this allows developers to install the package with `npm add xrpl@beta`
 
 1. If requested, enter your [npmjs.com](https://npmjs.com) OTP (one-time password) to complete publication.
