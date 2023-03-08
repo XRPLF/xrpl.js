@@ -222,7 +222,7 @@ npm uninstall abbrev -w xrpl
 1. Click "Choose a tag", and choose a tag that you just created.
 1. Edit the name of the release to match the tag (IE \<package\>@\<version\>) and edit the description as you see fit.
 
-   Lastly:
+Lastly:
 
 1. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
 
