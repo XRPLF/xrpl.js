@@ -188,25 +188,25 @@ npm uninstall abbrev -w xrpl
 1. Create a new branch (`git checkout -b <BRANCH_NAME>`) to capture updates that take place during this process.
 1. Update `HISTORY.md` to reflect release changes.
 
-- [ ] Update the version number and release date, and ensure it lists the changes since the previous release.
+   - [ ] Update the version number and release date, and ensure it lists the changes since the previous release.
 
 1. Run `npm run docgen` if the docs were modified in this release to update them (skip this step for a beta).
 1. Run `npm run build` to triple check the build still works
 1. Run `npx lerna version --no-git-tag-version` - This creates a draft PR and bumps the versions of the packages.
 
-- [ ] For each changed package, pick what the new version should be. Lerna will bump the versions, commit version bumps to `main`, and create a new git tag for each published package.
-- [ ] If publishing a beta, make sure that the versions are all of the form `a.b.c-beta.d`, where `a`, `b`, and `c` are identical to the last normal release except for one, which has been incremented by 1.
+   - For each changed package, pick what the new version should be. Lerna will bump the versions, commit version bumps to `main`, and create a new git tag for each published package.
+   - If publishing a beta, make sure that the versions are all of the form `a.b.c-beta.d`, where `a`, `b`, and `c` are identical to the last normal release except for one, which has been incremented by 1.
 
 1. Run `npm i` to update the package-lock with the updated versions.
 1. Create a new PR from this branch into `main` and merge it (you can directly merge into the beta branch for a beta).
 1. Checkout `main` and `git pull` (you can skip this step for a beta since you already have the latest version of the beta branch).
 1. Actually publish the packages with one of the following:
 
-- [ ] Stable release: Run `npx lerna publish from-package --yes`
-- [ ] Beta release: Run `npx lerna publish from-package --dist-tag beta --yes`
-      Notice this allows developers to install the package with `npm add xrpl@beta`
-- [ ] If requested, enter your [npmjs.com](https://npmjs.com) OTP (one-time password) to complete publication.
+   - Stable release: Run `npx lerna publish from-package --yes`
+   - Beta release: Run `npx lerna publish from-package --dist-tag beta --yes`
+     Notice this allows developers to install the package with `npm add xrpl@beta`
 
+1. If requested, enter your [npmjs.com](https://npmjs.com) OTP (one-time password) to complete publication.
 1. If not a beta release: Create a new branch (`git checkout -b <BRANCH_NAME>`) to capture the updated packages from the release. Merge those changes into `main`.
 
    NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
