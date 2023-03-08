@@ -216,15 +216,13 @@ npm uninstall abbrev -w xrpl
 1. Run `git push --follow-tags`, to push the tags to Github.
 1. On GitHub, click the "Releases" link on the right-hand side of the page.
 
-   Repeat for each release:
+1. Repeat for each release:
 
-1. Click "Draft a new release"
-1. Click "Choose a tag", and choose a tag that you just created.
-1. Edit the name of the release to match the tag (IE \<package\>@\<version\>) and edit the description as you see fit.
+   1. Click "Draft a new release"
+   1. Click "Choose a tag", and choose a tag that you just created.
+   1. Edit the name of the release to match the tag (IE \<package\>@\<version\>) and edit the description as you see fit.
 
-Lastly:
-
-1. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
+1. Lastly, send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
 
 # ripple-lib 1.x releases
 
