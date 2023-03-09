@@ -3,6 +3,9 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 
+### Added
+* Null and undefined values in transactions are now treated as though the field was not passed in.
+
 ## 2.7.0 (2023-03-08)
 
 ### Fixed
