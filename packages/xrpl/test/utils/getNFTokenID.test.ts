@@ -4,7 +4,7 @@ import { getNFTokenID } from '../../src'
 import * as NFTokenResponse from '../fixtures/rippled/mintNFTMeta.json'
 import * as NFTokenResponse2 from '../fixtures/rippled/mintNFTMeta2.json'
 
-describe('parseNFTokenID', function () {
+describe('getNFTokenID', function () {
   it('decode a valid NFTokenID', function () {
     const result = getNFTokenID(NFTokenResponse.meta)
     const expectedNFTokenID =
