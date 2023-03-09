@@ -1,3 +1,4 @@
+# This file is required for the docker container, but not actually used in standalone mode 
 [validator_list_sites]
     https://vl.ripple.com
 
