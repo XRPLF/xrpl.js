@@ -107,7 +107,7 @@ jobs:
           - 6006:6006
         volumes: 
           - ci-config:/config/
-        options: --entrypoint ./config/custom-entrypoint --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
+        options: -e ENV_ARGS="-a --start" --entrypoint ./config/custom-entrypoint --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
     steps:
       - uses: actions/checkout@v3
@@ -160,7 +160,7 @@ jobs:
           - 6006:6006
         volumes: 
           - ci-config:/config/
-        options: --entrypoint ./config/custom-entrypoint --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
+        options: -e ENV_ARGS="-a --start" --entrypoint ./config/custom-entrypoint --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
 
     steps:
       - uses: actions/checkout@v3
