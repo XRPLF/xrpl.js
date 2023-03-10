@@ -171,6 +171,14 @@ jobs:
         run: |
           ls -a
 
+      - name: pwd
+        run: |
+          pwd
+
+      - name: cat file
+        run: |
+          cat ${{ github.workspace }}/ci-config/rippled.cfg
+
       - name: Setup npm version 7
         run: |
           npm i -g npm@7 --registry=https://registry.npmjs.org
