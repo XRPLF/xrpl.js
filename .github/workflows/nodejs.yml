@@ -100,13 +100,13 @@ jobs:
       matrix:
         node-version: [14.x, 16.x, 18.x]
 
-    services:
-      rippled:
-        image: xrpllabsofficial/xrpld:latest
-        ports:
-          - 6006:6006
-        options: -v "${{ github.workspace }}/rippled/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
-        env: { ENV_ARGS: "-a --start" }
+    # services:
+    #   rippled:
+    #     image: xrpllabsofficial/xrpld:latest
+    #     ports:
+    #       - 6006:6006
+    #     options: -v "${{ github.workspace }}/rippled/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
+    #     env: { ENV_ARGS: "-a --start" }
 
     steps:
       - uses: actions/checkout@v3
@@ -114,6 +114,23 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: start rippled service
+        # Print version of docker
+        run:   /usr/bin/docker version --format '{{.Server.APIVersion}}'
+        run:   /usr/bin/docker version --format '{{.Client.APIVersion}}'
+        # Clean up old network
+        run:   /usr/bin/docker ps --all --quiet --no-trunc --filter "label=rippled-container"
+        run:   /usr/bin/docker network prune --force --filter "label=rippled-container"
+        # Create network
+        run:   /usr/bin/docker network create --label rippled-container rippled_container_network
+        # Start rippled service container
+        run:   /usr/bin/docker pull xrpllabsofficial/xrpld:latest
+        run:   /usr/bin/docker create --name rippled-service --label rippled-container --network rippled_container_network --network-alias rippled -p 6006:6006 -v "${{ github.workspace }}/ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s -e "ENV_ARGS=-a --start" -e GITHUB_ACTIONS=true -e CI=true xrpllabsofficial/xrpld:latest
+        run:   /usr/bin/docker start rippled-service
+        # Display data about the service
+        run:   /usr/bin/docker ps --all --filter id=rippled-service --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
+        run:   /usr/bin/docker port rippled-service
 
       - name: Setup npm version 7
         run: |
@@ -152,13 +169,6 @@ jobs:
       matrix:
         node-version: [14.x] # This just needs to be compatible w/ puppeteer
 
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-
     services:
       rippled:
         image: xrpllabsofficial/xrpld:latest
@@ -168,6 +178,7 @@ jobs:
         env: { ENV_ARGS: "-a --start" }
 
     steps:
+
       - name: ls
         run: |
           ls -a
