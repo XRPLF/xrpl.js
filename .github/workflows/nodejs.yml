@@ -117,20 +117,20 @@ jobs:
 
       - name: start rippled service
         # Print version of docker
-        run:   /usr/bin/docker version --format '{{.Server.APIVersion}}'
-        run:   /usr/bin/docker version --format '{{.Client.APIVersion}}'
+        - run:   /usr/bin/docker version --format '{{.Server.APIVersion}}'
+        - run:   /usr/bin/docker version --format '{{.Client.APIVersion}}'
         # Clean up old network
-        run:   /usr/bin/docker ps --all --quiet --no-trunc --filter "label=rippled-container"
-        run:   /usr/bin/docker network prune --force --filter "label=rippled-container"
+        - run:   /usr/bin/docker ps --all --quiet --no-trunc --filter "label=rippled-container"
+        - run:   /usr/bin/docker network prune --force --filter "label=rippled-container"
         # Create network
-        run:   /usr/bin/docker network create --label rippled-container rippled_container_network
+        - run:   /usr/bin/docker network create --label rippled-container rippled_container_network
         # Start rippled service container
-        run:   /usr/bin/docker pull xrpllabsofficial/xrpld:latest
-        run:   /usr/bin/docker create --name rippled-service --label rippled-container --network rippled_container_network --network-alias rippled -p 6006:6006 -v "${{ github.workspace }}/ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s -e "ENV_ARGS=-a --start" -e GITHUB_ACTIONS=true -e CI=true xrpllabsofficial/xrpld:latest
-        run:   /usr/bin/docker start rippled-service
+        - run:   /usr/bin/docker pull xrpllabsofficial/xrpld:latest
+        - run:   /usr/bin/docker create --name rippled-service --label rippled-container --network rippled_container_network --network-alias rippled -p 6006:6006 -v "${{ github.workspace }}/ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s -e "ENV_ARGS=-a --start" -e GITHUB_ACTIONS=true -e CI=true xrpllabsofficial/xrpld:latest
+        - run:   /usr/bin/docker start rippled-service
         # Display data about the service
-        run:   /usr/bin/docker ps --all --filter id=rippled-service --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
-        run:   /usr/bin/docker port rippled-service
+        - run:   /usr/bin/docker ps --all --filter id=rippled-service --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
+        - run:   /usr/bin/docker port rippled-service
 
       - name: Setup npm version 7
         run: |
