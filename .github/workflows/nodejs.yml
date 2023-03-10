@@ -167,6 +167,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: ls
+        run: |
+          ls -a
+
       - name: Setup npm version 7
         run: |
           npm i -g npm@7 --registry=https://registry.npmjs.org
