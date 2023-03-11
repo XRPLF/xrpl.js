@@ -120,7 +120,7 @@ jobs:
       - uses: addnab/docker-run-action@v3
         with:
           image: xrpllabsofficial/xrpld:latest
-          options: --network-alias rippled -p 6006:6006 -v "${{ github.workspace }}/ci-config/":"/config/"
+          options: --network-alias rippled -p 6006:6006 -v ${{ github.workspace }}/ci-config/:/config/
           run: |
             echo "Started docker container"
 
