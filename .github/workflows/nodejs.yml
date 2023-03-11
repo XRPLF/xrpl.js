@@ -120,8 +120,7 @@ jobs:
         run: |
           /usr/bin/docker version --format '{{.Server.APIVersion}}'
           /usr/bin/docker version --format '{{.Client.APIVersion}}' 
-        # # Clean up old network
-           /usr/bin/docker ps --all --quiet --no-trunc --filter "label=rippled-container"
+          /usr/bin/docker ps --all --quiet --no-trunc --filter "label=rippled-container"
         #    /usr/bin/docker network prune --force --filter "label=rippled-container"
         # # Create network
         #    /usr/bin/docker network create --label rippled-container rippled_container_network
