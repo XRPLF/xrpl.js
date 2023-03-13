@@ -124,15 +124,13 @@ jobs:
           env:
             HOST: localhost
             PORT: ${{ job.services.rippled.ports['6006'] }}
-          steps: 
-            - name: Log container rippled.cfg
-              run: |
-                echo "Started docker container with config:"
-                cat config/rippled.cfg
-                npm i -g npm@7 --registry=https://registry.npmjs.org
-                npm ci
-                npm run build
-                npm run test:integration
+            run: |
+              echo "Started docker container with config:"
+              cat config/rippled.cfg
+              npm i -g npm@7 --registry=https://registry.npmjs.org
+              npm ci
+              npm run build
+              npm run test:integration
       
 
       # - name: Setup npm version 7
