@@ -15,7 +15,6 @@ export enum FaucetNetwork {
   Testnet = 'faucet.altnet.rippletest.net',
   Devnet = 'faucet.devnet.rippletest.net',
   AMMDevnet = 'ammfaucet.devnet.rippletest.net',
-  NFTDevnet = 'faucet-nft.ripple.com',
   HooksV2Testnet = 'hooks-testnet-v2.xrpl-labs.com',
 }
 
@@ -23,7 +22,6 @@ export const FaucetNetworkPaths: Record<string, string> = {
   [FaucetNetwork.Testnet]: '/accounts',
   [FaucetNetwork.Devnet]: '/accounts',
   [FaucetNetwork.AMMDevnet]: '/accounts',
-  [FaucetNetwork.NFTDevnet]: '/accounts',
   [FaucetNetwork.HooksV2Testnet]: '/accounts',
 }
 
@@ -52,11 +50,6 @@ export function getFaucetHost(client: Client): FaucetNetwork | undefined {
 
   if (connectionUrl.includes('devnet')) {
     return FaucetNetwork.Devnet
-  }
-
-  // TODO: Remove this once the sandbox is fully decomissioned.
-  if (connectionUrl.includes('xls20-sandbox')) {
-    return FaucetNetwork.NFTDevnet
   }
 
   throw new XRPLFaucetError('Faucet URL is not defined or inferrable.')

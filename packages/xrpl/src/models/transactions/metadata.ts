@@ -1,6 +1,6 @@
 import { Amount } from '../common'
 
-interface CreatedNode {
+export interface CreatedNode {
   CreatedNode: {
     LedgerEntryType: string
     LedgerIndex: string
@@ -8,7 +8,7 @@ interface CreatedNode {
   }
 }
 
-interface ModifiedNode {
+export interface ModifiedNode {
   ModifiedNode: {
     LedgerEntryType: string
     LedgerIndex: string
@@ -19,7 +19,7 @@ interface ModifiedNode {
   }
 }
 
-interface DeletedNode {
+export interface DeletedNode {
   DeletedNode: {
     LedgerEntryType: string
     LedgerIndex: string
@@ -28,6 +28,36 @@ interface DeletedNode {
 }
 
 export type Node = CreatedNode | ModifiedNode | DeletedNode
+
+/**
+ * A typeguard to check if a node is a CreatedNode.
+ *
+ * @param node - A node from metadata.
+ * @returns whether the given node is a CreatedNode.
+ */
+export function isCreatedNode(node: Node): node is CreatedNode {
+  return Object.prototype.hasOwnProperty.call(node, `CreatedNode`)
+}
+
+/**
+ * A typeguard to check if a node is a ModifiedNode.
+ *
+ * @param node - A node from metadata.
+ * @returns whether the given node is a ModifiedNode.
+ */
+export function isModifiedNode(node: Node): node is ModifiedNode {
+  return Object.prototype.hasOwnProperty.call(node, `ModifiedNode`)
+}
+
+/**
+ * A typeguard to check if a node is a DeletedNode.
+ *
+ * @param node - A node from metadata.
+ * @returns whether the given node is a DeletedNode.
+ */
+export function isDeletedNode(node: Node): node is DeletedNode {
+  return Object.prototype.hasOwnProperty.call(node, `DeletedNode`)
+}
 
 export interface TransactionMetadata {
   AffectedNodes: Node[]
