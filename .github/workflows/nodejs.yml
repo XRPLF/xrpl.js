@@ -120,10 +120,7 @@ jobs:
       - uses: addnab/docker-run-action@v3
         with:
           image: xrpllabsofficial/xrpld:latest
-          options: --network-alias rippled -p 6006:6006 -v ${{ github.workspace }}/ci-config/:/config/
-          env:
-            HOST: localhost
-            PORT: ${{ job.services.rippled.ports['6006'] }}
+          options: --network-alias rippled -p 6006:6006 -v ${{ github.workspace }}/ci-config/:/config/ -e HOST=localhost -e PORT=${{ job.services.rippled.ports['6006'] }}
           run: |
             echo "Started docker container with config:"
             cat config/rippled.cfg
