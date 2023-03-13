@@ -122,8 +122,8 @@ jobs:
           image: xrpllabsofficial/xrpld:latest
           options: --network-alias rippled -p 6006:6006 -v ${{ github.workspace }}/ci-config/:/config/
           run: |
-            echo "Started docker container"
-            ls
+            echo "Started docker container with config:"
+            cat config/rippled.cfg
 
 
       # - name: start rippled service
