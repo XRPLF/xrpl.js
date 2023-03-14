@@ -74,7 +74,7 @@ To do that there are a couple things you need to do:
 
 - For examples of how to implement that you can look at objects in the [`types` folder](../types/), such as `Amount`, `UInt8`, or `STArray`.
 
-3. Import your `definitions.json` file and `coreTypes` from the `types` folder, then use them to construct your own `XrplDefinitions` object.
+3. Import your `definitions.json` file to construct your own `XrplDefinitions` object.
 4. Pass the `XrplDefinitions` object whenever you `encode` or `decode` a transaction.
 5. If you added any new transaction types, you should create an `interface` for the transaction that extends `BaseTransaction` from the `xrpl` repo to use it with the functions on `Client` (See the below example of adding a new transaction type)
 
@@ -117,9 +117,6 @@ const result = await client.submitAndWait(tx, {
 ```
 const { XrplDefinitions } = require('../dist/coretypes')
 
-// coreTypes is the default list of serialized Types that are defined in xrpl.js
-const { coreTypes } = require('../dist/types')
-
 // newDefinitionsJson is where you can import your custom defined definitions.json file
 const newDefinitionsJson = require('./fixtures/new-definitions.json')
 
@@ -132,8 +129,7 @@ class NewType extends UInt32 {
   // Should be the same as UInt32
 }
 
-const extendedCoreTypes = { ...coreTypes }
-extendedCoreTypes['NewType'] = NewType
+const extendedCoreTypes = { NewType }
 
 const newDefs = new XrplDefinitions(newDefinitionsJson, extendedCoreTypes)
 

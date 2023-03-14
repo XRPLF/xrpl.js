@@ -19,13 +19,14 @@ export class XrplDefinitions extends XrplDefinitionsBase {
    * See the definitions.test.js file for examples of how to create your own updated definitions.json.
    *
    * @param enums - A json encoding of the core types, transaction types, transaction results, transaction names, and fields.
-   * @param types - A list of type objects with the same name as the fields defined.
-   *              You can use the coreTypes object if you are not adding new types.
+   * @param additionalTypes - A list of SerializedType objects with the same name as the fields defined.
+   *              These types will be included in addition to the coreTypes used on mainnet.
    */
   constructor(
     enums: DefinitionsData,
-    types: Record<string, typeof SerializedType> = coreTypes,
+    additionalTypes?: Record<string, typeof SerializedType>,
   ) {
+    const types = Object.assign({}, coreTypes, additionalTypes)
     super(enums, types)
   }
 }
