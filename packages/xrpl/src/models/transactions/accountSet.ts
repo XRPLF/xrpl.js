@@ -1,4 +1,7 @@
 /* eslint-disable complexity -- Necessary for validateAccountSet */
+
+import { isValidClassicAddress } from 'ripple-address-codec'
+
 import { ValidationError } from '../../errors'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
@@ -44,6 +47,15 @@ export enum AccountSetAsfFlags {
    * Allow another account to mint and burn tokens on behalf of this account.
    */
   asfAuthorizedNFTokenMinter = 10,
+  /** asf 11 is reserved for Hooks amendment */
+  /** Disallow other accounts from creating incoming NFTOffers */
+  asfDisallowIncomingNFTokenOffer = 12,
+  /** Disallow other accounts from creating incoming Checks */
+  asfDisallowIncomingCheck = 13,
+  /** Disallow other accounts from creating incoming PayChannels */
+  asfDisallowIncomingPayChan = 14,
+  /** Disallow other accounts from creating incoming Trustlines */
+  asfDisallowIncomingTrustline = 15,
 }
 
 /**
@@ -155,9 +167,16 @@ const MAX_TICK_SIZE = 15
  * @param tx - An AccountSet Transaction.
  * @throws When the AccountSet is Malformed.
  */
-// eslint-disable-next-line max-lines-per-function -- okay for this method, only a little over
+// eslint-disable-next-line max-lines-per-function, max-statements -- okay for this method, only a little over
 export function validateAccountSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+
+  if (
+    tx.NFTokenMinter !== undefined &&
+    !isValidClassicAddress(String(tx.NFTokenMinter))
+  ) {
+    throw new ValidationError('AccountSet: invalid NFTokenMinter')
+  }
 
   if (tx.ClearFlag !== undefined) {
     if (typeof tx.ClearFlag !== 'number') {
