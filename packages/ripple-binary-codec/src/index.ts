@@ -76,11 +76,9 @@ function encodeForSigning(
  */
 function encodeForSigningClaim(
   json: object,
-  definitions?: XrplDefinitionsBase,
 ): string {
   assert.ok(typeof json === 'object')
-  const definitionsOpt = definitions ? { definitions } : undefined
-  return signingClaimData(json as ClaimObject, definitionsOpt)
+  return signingClaimData(json as ClaimObject)
     .toString('hex')
     .toUpperCase()
 }

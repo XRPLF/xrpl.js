@@ -230,24 +230,4 @@ describe('Signing data', function () {
       ].join(''),
     )
   })
-
-  test('can create claim blob with unrelated type changes', function () {
-    const newDefs = new XrplDefinitions(definitions)
-
-    const channel =
-      '43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1'
-    const amount = '1000'
-    const json = { channel, amount }
-    const actual = encodeForSigningClaim(json, newDefs)
-    expect(actual).toBe(
-      [
-        // hash prefix
-        '434C4D00',
-        // channel ID
-        '43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1',
-        // amount as a uint64
-        '00000000000003E8',
-      ].join(''),
-    )
-  })
 })

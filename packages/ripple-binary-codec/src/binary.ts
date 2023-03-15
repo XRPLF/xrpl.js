@@ -42,7 +42,7 @@ const readJSON = (
   definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
 ): JsonObject =>
   (
-    parser.readType(definitions.getAssociatedTypes().STObject) as STObject
+    parser.readType(coreTypes.STObject) as STObject
   ).toJSON(definitions)
 
 /**
@@ -85,12 +85,10 @@ function serializeObject(object: JsonObject, opts: OptionObject = {}): Buffer {
     bytesList.put(prefix)
   }
 
-  const types = definitions?.getAssociatedTypes() || coreTypes
-
   const filter = signingFieldsOnly
     ? (f: FieldInstance): boolean => f.isSigningField
     : undefined
-  ;(types.STObject as typeof STObject)
+  ;(coreTypes.STObject as typeof STObject)
     .from(object, filter, definitions)
     .toBytesSink(bytesList)
 
@@ -138,15 +136,11 @@ interface ClaimObject extends JsonObject {
  */
 function signingClaimData(
   claim: ClaimObject,
-  opts: { definitions: XrplDefinitionsBase } = {
-    definitions: DEFAULT_DEFINITIONS,
-  },
 ): Buffer {
   const num = bigInt(String(claim.amount))
   const prefix = HashPrefix.paymentChannelClaim
-  const types = opts.definitions.getAssociatedTypes()
-  const channel = types.Hash256.from(claim.channel).toBytes()
-  const amount = types.UInt64.from(num).toBytes()
+  const channel = coreTypes.Hash256.from(claim.channel).toBytes()
+  const amount = coreTypes.UInt64.from(num).toBytes()
 
   const bytesList = new BytesList()
 
