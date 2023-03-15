@@ -41,9 +41,7 @@ const readJSON = (
   parser: BinaryParser,
   definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
 ): JsonObject =>
-  (
-    parser.readType(coreTypes.STObject) as STObject
-  ).toJSON(definitions)
+  (parser.readType(coreTypes.STObject) as STObject).toJSON(definitions)
 
 /**
  * Parse a hex-string into its JSON interpretation
@@ -134,9 +132,7 @@ interface ClaimObject extends JsonObject {
  * @param opts.definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns the serialized object with appropriate prefix
  */
-function signingClaimData(
-  claim: ClaimObject,
-): Buffer {
+function signingClaimData(claim: ClaimObject): Buffer {
   const num = bigInt(String(claim.amount))
   const prefix = HashPrefix.paymentChannelClaim
   const channel = coreTypes.Hash256.from(claim.channel).toBytes()

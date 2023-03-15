@@ -74,9 +74,7 @@ function encodeForSigning(
  * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns a hex string of the encoded transaction
  */
-function encodeForSigningClaim(
-  json: object,
-): string {
+function encodeForSigningClaim(json: object): string {
   assert.ok(typeof json === 'object')
   return signingClaimData(json as ClaimObject)
     .toString('hex')
