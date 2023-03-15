@@ -1,5 +1,4 @@
 import {
-  XrplDefinitionsBase,
   DEFAULT_DEFINITIONS,
   Field,
   TransactionType,
@@ -19,7 +18,6 @@ export {
   hashes,
   binary,
   ledgerHashes,
-  XrplDefinitionsBase,
   DEFAULT_DEFINITIONS,
   Field,
   TransactionType,

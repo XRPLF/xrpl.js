@@ -162,10 +162,7 @@ function multiSigningData(
   },
 ): Buffer {
   const prefix = HashPrefix.transactionMultiSig
-  const suffix = opts.definitions
-    .getAssociatedTypes()
-    .AccountID.from(signingAccount)
-    .toBytes()
+  const suffix = coreTypes.AccountID.from(signingAccount).toBytes()
   return serializeObject(transaction, {
     prefix,
     suffix,
