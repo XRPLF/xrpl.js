@@ -252,16 +252,6 @@
       }
     ],
     [
-      "NewFieldDefinition",
-      {
-        "nth": 402,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "UInt16"
-      }
-    ],
-    [
       "SignerWeight",
       {
         "nth": 3,
@@ -2340,7 +2330,6 @@
     "NFTokenCreateOffer": 27,
     "NFTokenCancelOffer": 28,
     "NFTokenAcceptOffer": 29,
-    "NewTestTransaction": 30,
     "EnableAmendment": 100,
     "SetFee": 101,
     "UNLModify": 102
