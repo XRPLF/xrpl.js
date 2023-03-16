@@ -234,7 +234,11 @@ npm uninstall abbrev -w xrpl
 
     This prevents the release from taking the `latest` tag.
 
-For ripple-lib, push to both `ripple-lib` and `xrpl` (npm package names). For xrpl, use `--tag ripple-lib` for ripple-lib releases; [here's why](https://blog.greenkeeper.io/one-simple-trick-for-javascript-package-maintainers-to-avoid-breaking-their-user-s-software-and-to-6edf06dc5617).
+For ripple-lib:
+
+ - Have one of the ripple-lib package maintainers push to `ripple-lib` (npm package name). You can contact [@intelliot](https://github.com/intelliot) to request the npm publish.
+- For ripple-lib releases, cross-publish the package to `xrpl` with `--tag ripple-lib`
+  - [Here's why](https://blog.greenkeeper.io/one-simple-trick-for-javascript-package-maintainers-to-avoid-breaking-their-user-s-software-and-to-6edf06dc5617).
 
 - https://www.npmjs.com/package/ripple-lib
 - https://www.npmjs.com/package/xrpl
