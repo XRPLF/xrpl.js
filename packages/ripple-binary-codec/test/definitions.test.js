@@ -14,9 +14,7 @@ const txJson = {
 
 describe('encode and decode using new types as a parameter', function () {
   test('can encode and decode a new TransactionType', function () {
-    const tx = Object.assign({}, txJson, {
-      TransactionType: 'NewTestTransaction',
-    })
+    const tx = { ...txJson, TransactionType: 'NewTestTransaction' }
     // Before updating the types, this should not be encodable
     expect(() => encode(tx)).toThrow()
 
@@ -34,9 +32,7 @@ describe('encode and decode using new types as a parameter', function () {
   })
 
   test('can encode and decode a new Field', function () {
-    const tx = Object.assign({}, txJson, {
-      NewFieldDefinition: 10,
-    })
+    const tx = { ...txJson, NewFieldDefinition: 10 }
 
     // Before updating the types, undefined fields will be ignored on encode
     expect(decode(encode(tx))).not.toStrictEqual(tx)
@@ -65,9 +61,10 @@ describe('encode and decode using new types as a parameter', function () {
   })
 
   test('can encode and decode a new Type', function () {
-    const tx = Object.assign({}, txJson, {
+    const tx = {
+      ...txJson,
       TestField: 10, // Should work the same as a UInt32
-    })
+    }
 
     // Normally this would be generated directly from rippled with something like `server_definitions`.
     // Added here to make it easier to see what is actually changing in the definitions.json file.

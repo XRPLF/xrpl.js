@@ -128,7 +128,7 @@ describe('Signing data', function () {
 
   test('can create multi signing blobs', function () {
     const signingAccount = 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN'
-    const signingJson = Object.assign({}, tx_json, { SigningPubKey: '' })
+    const signingJson = { ...tx_json, SigningPubKey: '' }
     const actual = encodeForMultisigning(signingJson, signingAccount)
     expect(actual).toBe(
       [
@@ -179,7 +179,7 @@ describe('Signing data', function () {
 
     const newDefs = new XrplDefinitions(customPaymentDefinitions)
     const signingAccount = 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN'
-    const signingJson = Object.assign({}, tx_json, { SigningPubKey: '' })
+    const signingJson = { ...tx_json, SigningPubKey: '' }
     const actual = encodeForMultisigning(signingJson, signingAccount, newDefs)
     expect(actual).toBe(
       [
