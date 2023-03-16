@@ -1,5 +1,5 @@
 const { encode, decode, XrplDefinitions } = require('../src')
-const normalDefinitionsJson = require('./fixtures/normal-definitions.json')
+const normalDefinitionsJson = require('../src/enums/definitions.json')
 const { UInt32 } = require('../dist/types/uint-32')
 
 const txJson = {
