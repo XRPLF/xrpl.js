@@ -1,5 +1,4 @@
-const { encode, decode } = require('../dist')
-const { XrplDefinitions } = require('../dist/enums/xrpl-definitions')
+const { encode, decode, XrplDefinitions } = require('../src')
 const normalDefinitionsJson = require('./fixtures/normal-definitions.json')
 const { UInt32 } = require('../dist/types/uint-32')
 
