@@ -171,7 +171,7 @@ npm uninstall abbrev -w xrpl
 
 ## Release process + checklist
 
-## Pre-release
+## PR process
 
 - [ ] Your changes should be on a branch.
 - [ ] Your changes should have unit tests.
