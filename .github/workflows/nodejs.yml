@@ -102,7 +102,6 @@ jobs:
 
     services:
       rippled:
-        context: .
         image: xrpllabsofficial/xrpld:latest
         ports:
           - 6006:6006
