@@ -6,8 +6,7 @@ const {
 } = require('../src')
 const { XrplDefinitions } = require('../src/enums/xrpl-definitions')
 
-// This changes the Payment TransactionType from being 0 to being 30 (aka 0x001F when encoded)
-const definitions = require('./fixtures/definitions-with-diff-payment.json')
+const normalDefinitions = require('../src/enums/definitions.json')
 
 const tx_json = {
   Account: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
@@ -72,7 +71,12 @@ describe('Signing data', function () {
   })
 
   test('can create single signing blobs with modified type', function () {
-    const newDefs = new XrplDefinitions(definitions)
+    const customPaymentDefinitions = JSON.parse(
+      JSON.stringify(normalDefinitions),
+    )
+    customPaymentDefinitions.TRANSACTION_TYPES.Payment = 31
+
+    const newDefs = new XrplDefinitions(customPaymentDefinitions)
     const actual = encodeForSigning(tx_json, newDefs)
     expect(actual).toBe(
       [
@@ -168,7 +172,12 @@ describe('Signing data', function () {
   })
 
   test('can create multi signing blobs with custom definitions', function () {
-    const newDefs = new XrplDefinitions(definitions)
+    const customPaymentDefinitions = JSON.parse(
+      JSON.stringify(normalDefinitions),
+    )
+    customPaymentDefinitions.TRANSACTION_TYPES.Payment = 31
+
+    const newDefs = new XrplDefinitions(customPaymentDefinitions)
     const signingAccount = 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN'
     const signingJson = Object.assign({}, tx_json, { SigningPubKey: '' })
     const actual = encodeForMultisigning(signingJson, signingAccount, newDefs)
