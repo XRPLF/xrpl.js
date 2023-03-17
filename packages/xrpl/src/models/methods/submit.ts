@@ -1,4 +1,4 @@
-import { Transaction } from '../transactions'
+import { Transaction, TransactionMetadata } from '../transactions'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
@@ -90,5 +90,9 @@ export interface SubmitResponse extends BaseResponse {
      * transaction can appear in as a result of this request.
      */
     validated_ledger_index: number
+    /**
+     * Metadata about what changed as a result of the transaction.
+     */
+    meta: TransactionMetadata
   }
 }
