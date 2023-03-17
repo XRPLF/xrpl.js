@@ -1,6 +1,8 @@
 # ripple-binary-codec Release History
 
 ## Unreleased
+### Added
+- Allow custom type definitions to be used for encoding/decoding transactions at runtime (e.g. for sidechains/new amendments)
 
 ## 1.5.0 (2023-03-08)
 ### Changed
