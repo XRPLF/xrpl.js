@@ -115,49 +115,34 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      #     /usr/bin/docker create --name rippled-service --label rippled-container --network ${{ job.container.network }} --network-alias rippled -p 6006:6006 -v "${{ github.workspace }}/ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s -e "ENV_ARGS=-a --start" -e GITHUB_ACTIONS=true -e CI=true xrpllabsofficial/xrpld:latest
+      - name: Setup npm version 7
+        run: |
+          npm i -g npm@7 --registry=https://registry.npmjs.org
 
-      # - uses: addnab/docker-run-action@v3
-      #   with:
-      #     image: xrpllabsofficial/xrpld:latest
-      #     options: --network-alias rippled -p 6006:6006 -v ${{ github.workspace }}/ci-config/:/config/ -e HOST=localhost -e PORT=${{ job.services.rippled.ports['6006'] }}
-      #     run: |
-      #       echo "Started docker container with config:"
-      #       cat config/rippled.cfg
-      #       npm i -g npm@7 --registry=https://registry.npmjs.org
-      #       npm ci
-      #       npm run build
-      #       npm run test:integration
+      - name: Cache node modules
+        id: cache-nodemodules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # caching node_modules
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-${{ matrix.node-version }}-
+            ${{ runner.os }}-deps-
 
+      - name: Install Dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+        run: npm ci
 
-      # - name: Setup npm version 7
-      #   run: |
-      #     npm i -g npm@7 --registry=https://registry.npmjs.org
-
-      # - name: Cache node modules
-      #   id: cache-nodemodules
-      #   uses: actions/cache@v3
-      #   env:
-      #     cache-name: cache-node-modules
-      #   with:
-      #     # caching node_modules
-      #     path: |
-      #       node_modules
-      #       */*/node_modules
-      #     key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-deps-${{ matrix.node-version }}-
-      #       ${{ runner.os }}-deps-
-
-      # - name: Install Dependencies
-      #   if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-      #   run: npm ci
-
-      # - run: npm run build
-      # - run: npm run test:integration
-      #   env:
-      #     HOST: localhost
-      #     PORT: ${{ job.services.rippled.ports['6006'] }}
+      - run: npm run build
+      - run: npm run test:integration
+        env:
+          HOST: localhost
+          PORT: ${{ job.services.rippled.ports['6006'] }}
 
   browser:
     runs-on: ubuntu-latest
@@ -176,18 +161,6 @@ jobs:
         env: { ENV_ARGS: "-a --start" }
 
     steps:
-
-      - name: ls
-        run: |
-          ls -a
-
-      - name: pwd
-        run: |
-          pwd
-
-      - name: cat file
-        run: |
-          cat ${{ github.workspace }}/ci-config/rippled.cfg
 
       - name: Setup npm version 7
         run: |
