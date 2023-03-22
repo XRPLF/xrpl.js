@@ -1,6 +1,6 @@
 import { coreTypes } from './types'
 import { Decimal } from 'decimal.js'
-import * as bigInt from 'big-integer'
+import bigInt = require('big-integer')
 import { Buffer } from 'buffer/'
 
 /**

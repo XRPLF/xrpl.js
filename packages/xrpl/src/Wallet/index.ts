@@ -2,7 +2,8 @@
 import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
-import _ from 'lodash'
+import isEqual from 'lodash/isEqual'
+import omitBy from 'lodash/omitBy'
 import {
   classicAddressToXAddress,
   isValidXAddress,
@@ -26,7 +27,7 @@ import {
 import ECDSA from '../ECDSA'
 import { ValidationError, XrplError } from '../errors'
 import { IssuedCurrencyAmount } from '../models/common'
-import { Transaction } from '../models/transactions'
+import { Transaction, validate } from '../models/transactions'
 import { isIssuedCurrency } from '../models/transactions/common'
 import { isHex } from '../models/utils'
 import { ensureClassicAddress } from '../sugar/utils'
@@ -48,17 +49,6 @@ function hexFromBuffer(buffer: Buffer): string {
  *
  * @example
  * ```typescript
- * // Derive a wallet from a bip39 Mnemonic
- * const wallet = Wallet.fromMnemonic(
- *   'jewel insect retreat jump claim horse second chef west gossip bone frown exotic embark laundry'
- * )
- * console.log(wallet)
- * // Wallet {
- * // publicKey: '02348F89E9A6A3615BA317F8474A3F51D66221562D3CA32BFA8D21348FF67012B2',
- * // privateKey: '00A8F2E77FC0E05890C1B5088AFE0ECF9D96466A4419B897B1AB383E336E1735A2',
- * // classicAddress: 'rwZiksrExmVkR64pf87Jor4cYbmff47SUm',
- * // seed: undefined
- * // }.
  *
  * // Derive a wallet from a base58 encoded seed.
  * const seedWallet = Wallet.fromSeed('ssZkdwURFMBXenJPbrpE14b6noJSu')
@@ -98,15 +88,6 @@ class Wallet {
   public readonly seed?: string
 
   /**
-   * Alias for wallet.classicAddress.
-   *
-   * @returns The wallet's classic address.
-   */
-  public get address(): string {
-    return this.classicAddress
-  }
-
-  /**
    * Creates a new Wallet.
    *
    * @param publicKey - The public key for the account.
@@ -129,6 +110,15 @@ class Wallet {
       ? ensureClassicAddress(opts.masterAddress)
       : deriveAddress(publicKey)
     this.seed = opts.seed
+  }
+
+  /**
+   * Alias for wallet.classicAddress.
+   *
+   * @returns The wallet's classic address.
+   */
+  public get address(): string {
+    return this.classicAddress
   }
 
   /**
@@ -200,6 +190,11 @@ class Wallet {
 
   /**
    * Derives a wallet from a bip39 or RFC1751 mnemonic (Defaults to bip39).
+   *
+   * @deprecated since version 2.6.1.
+   * Will be deleted in version 3.0.0.
+   * This representation is currently deprecated in rippled.
+   * You should use another method to represent your keys such as a seed or public/private keypair.
    *
    * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
    * @param opts - (Optional) Options to derive a Wallet.
@@ -329,7 +324,12 @@ class Wallet {
       multisignAddress = this.classicAddress
     }
 
-    const tx = { ...transaction }
+    // clean null & undefined valued tx properties
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- ensure Transaction flows through
+    const tx = omitBy(
+      { ...transaction },
+      (value) => value == null,
+    ) as unknown as Transaction
 
     if (tx.TxnSignature || tx.Signers) {
       throw new ValidationError(
@@ -338,6 +338,12 @@ class Wallet {
     }
 
     removeTrailingZeros(tx)
+
+    /*
+     * This will throw a more clear error for JS users if the supplied transaction has incorrect formatting
+     */
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
+    validate(tx as unknown as Record<string, unknown>)
 
     const txToSignAndEncode = { ...tx }
 
@@ -466,9 +472,6 @@ class Wallet {
     })
 
     if (txCopy.TransactionType === 'NFTokenMint' && txCopy.URI) {
-      if (!isHex(txCopy.URI)) {
-        throw new ValidationError('URI must be a hex value')
-      }
       txCopy.URI = txCopy.URI.toUpperCase()
     }
 
@@ -504,7 +507,7 @@ class Wallet {
     })
     /* eslint-enable @typescript-eslint/consistent-type-assertions -- Done with dynamic checking */
 
-    if (!_.isEqual(decoded, txCopy)) {
+    if (!isEqual(decoded, txCopy)) {
       const data = {
         decoded,
         tx,

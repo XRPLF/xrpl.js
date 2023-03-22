@@ -1,9 +1,6 @@
 /* eslint-disable complexity -- verifies 19 tx types hence a lot of checks needed */
 /* eslint-disable max-lines-per-function -- need to work with a lot of Tx verifications */
 
-import _ from 'lodash'
-import { encode, decode } from 'ripple-binary-codec'
-
 import { ValidationError } from '../../errors'
 import { setTransactionFlagsToNumber } from '../utils/flags'
 
@@ -207,14 +204,5 @@ export function validate(transaction: Record<string, unknown>): void {
       throw new ValidationError(
         `Invalid field TransactionType: ${tx.TransactionType}`,
       )
-  }
-
-  if (
-    !_.isEqual(
-      decode(encode(tx)),
-      _.omitBy(tx, (value) => value == null),
-    )
-  ) {
-    throw new ValidationError(`Invalid Transaction: ${tx.TransactionType}`)
   }
 }

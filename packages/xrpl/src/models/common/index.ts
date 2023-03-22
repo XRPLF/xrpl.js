@@ -1,16 +1,5 @@
 export type LedgerIndex = number | ('validated' | 'closed' | 'current')
 
-export type AccountObjectType =
-  | 'check'
-  | 'deposit_preauth'
-  | 'escrow'
-  | 'nft_offer'
-  | 'offer'
-  | 'payment_channel'
-  | 'signer_list'
-  | 'ticket'
-  | 'state'
-
 interface XRP {
   currency: 'XRP'
 }
@@ -108,6 +97,10 @@ export interface ResponseOnlyTxInfo {
    * The sequence number of the ledger that included this transaction.
    */
   ledger_index?: number
+  /**
+   * @deprecated Alias for ledger_index.
+   */
+  inLedger?: number
 }
 
 /**

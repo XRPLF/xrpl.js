@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 4.2.5 (2023-03-08)
+### Changed
+- All tests now use the Jest test runner and have been refactored for consistency across all packages
+
 ## 4.2.4 (2022-04-21)
 ### Fixed
 - Fixed `encodeXAddress` to handle `null` equivalently to `false`.

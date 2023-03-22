@@ -49,7 +49,7 @@ export interface LedgerDataRequest extends BaseRequest {
 
 type LabeledLedgerEntry = { ledgerEntryType: string } & LedgerEntry
 
-interface BinaryLedgerEntry {
+export interface BinaryLedgerEntry {
   data: string
 }
 

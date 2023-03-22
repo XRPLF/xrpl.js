@@ -39,4 +39,12 @@
         "**/.git/subtree-cache/**": true,
         "**/.hg/store/**": true
     },
+    "search.exclude": {
+        "**/.git": true,
+        "**/node_modules": true,
+        "**/tmp": true,
+        "**/docs/**/*.html": true,
+        "**/fixtures/**/*.json": true,
+        "**/docs/assets": true
+    },
 }
