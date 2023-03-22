@@ -64,7 +64,7 @@ interface PathOption {
    */
   source_amount: Amount
   /**
-   * Destination Amount that the destination would receive along this path for the.
+   * Destination Amount that the destination would receive along this path.
    * If the `send_max` field is set, this field will be set.
    */
   destination_amount?: Amount
