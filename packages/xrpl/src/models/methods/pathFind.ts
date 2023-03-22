@@ -85,7 +85,7 @@ export interface PathFindResponse extends BaseResponse {
     alternatives: PathOption[]
     /** Unique address of the account that would receive a transaction. */
     destination_account: string
-    /** Currency amount that provided in the WebSocket request. */
+    /** Currency amount provided in the WebSocket request. */
     destination_amount: Amount
     /** Unique address that would send a transaction. */
     source_account: string
