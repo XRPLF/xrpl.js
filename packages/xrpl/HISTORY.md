@@ -3,18 +3,29 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 
+### Added
+* Null and undefined values in transactions are now treated as though the field was not passed in.
+
+### Fixed
+* Added `destination_amount` to `PathOption` which is returned as part of a `path_find` request
+
+## 2.7.0 (2023-03-08)
+
 ### Fixed
 * Code splitting improvements for lodash
-* Fixed missing reason code in websocket implemntation on websocket disconnect
+* Fixed missing reason code in websocket implementation on websocket disconnect
 * Fix timeout error in request manager
 * Improved typescript typing
+* Fixed empty value condition for NFTokenMinter field in AccountSet transaction
 
 ### Added
-- `getNFTokenID` lets you get the NFTokenID after minting an NFT
+* `getNFTokenID` lets you get the NFTokenID after minting an NFT
+* Support for `disallowIncoming` account set flags (e.g. `asfDisallowIncomingTrustline`)
 
 
 ### Changed
 * All tests now use the Jest test runner and have been refactored for consistency across all packages
+* Removed nft-devnet faucet support as it has been decommissioned ([Blog Post](https://xrpl.org/blog/2023/nft-devnet-decommission.html))
 
 ### Deprecated
 Wallet.fromMmnemonic()
@@ -27,7 +38,6 @@ Wallet.fromMmnemonic()
 
 ### Added
 * Optional custom amount field to `fundWallet`.
-* Support for `disallowIncoming` account set flags (e.g. `asfDisallowIncomingTrustline`)
 
 ### Changed
 * Add support for Transaction objects in `verifyTransaction`
