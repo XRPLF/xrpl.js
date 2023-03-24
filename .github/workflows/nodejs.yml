@@ -166,8 +166,11 @@ jobs:
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: npm ci
 
-      - run: npm run build and stop docker once tests are complete
-      - run: |
+      - run: npm run build
+
+      # Docker stop must be in same step as integration test so it doesn't get skipped if tests fail.
+      - name: Run integration test & stop docker once completed
+        run: |
           npm run test:integration
           docker stop rippled-service
 
