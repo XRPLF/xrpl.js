@@ -118,7 +118,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-          /usr/bin/docker create --name rippled-service --label rippled-container --network ${{ job.container.network }} --network-alias rippled -p 6006:6006 -v "${{ github.workspace }}/ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s -e "ENV_ARGS=-a --start" -e GITHUB_ACTIONS=true -e CI=true xrpllabsofficial/xrpld:latest
+          # /usr/bin/docker create --name rippled-service --label rippled-container --network ${{ job.container.network }} --network-alias rippled -p 6006:6006 -v "${{ github.workspace }}/ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s -e "ENV_ARGS=-a --start" -e GITHUB_ACTIONS=true -e CI=true xrpllabsofficial/xrpld:latest
 
       - uses: addnab/docker-run-action@v3
         with:
