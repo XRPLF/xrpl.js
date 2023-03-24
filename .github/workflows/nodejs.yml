@@ -98,7 +98,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]
+        node-version: [14, 16, 18]
 
     # services:
     #   rippled:
@@ -108,6 +108,9 @@ jobs:
     #     options: -v "${{ github.workspace }}/rippled/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
     #     env: { ENV_ARGS: "-a --start" }
 
+    build:
+      runs-on: ubuntu-latest
+      container: xrpllabsofficial/xrpld:latest
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -115,7 +118,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      #     /usr/bin/docker create --name rippled-service --label rippled-container --network ${{ job.container.network }} --network-alias rippled -p 6006:6006 -v "${{ github.workspace }}/ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s -e "ENV_ARGS=-a --start" -e GITHUB_ACTIONS=true -e CI=true xrpllabsofficial/xrpld:latest
+          /usr/bin/docker create --name rippled-service --label rippled-container --network ${{ job.container.network }} --network-alias rippled -p 6006:6006 -v "${{ github.workspace }}/ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s -e "ENV_ARGS=-a --start" -e GITHUB_ACTIONS=true -e CI=true xrpllabsofficial/xrpld:latest
 
       - uses: addnab/docker-run-action@v3
         with:
@@ -123,42 +126,51 @@ jobs:
           options: --network-alias rippled -p 6006:6006 -v ${{ github.workspace }}/ci-config/:/config/ -e HOST=localhost -e PORT=${{ job.services.rippled.ports['6006'] }}
           run: |
             echo "Started docker container with config:"
-            cat config/rippled.cfg
-            npm i -g npm@7 --registry=https://registry.npmjs.org
-            npm --version
-            npm ci
-            npm run build
-            npm run test:integration
+          # echo "Install nvm"
+          # curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+          # export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+          # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
+          # echo "Install proper version of node and npm"
+          # nvm install {{ matrix.node-version }}
+          # cat config/rippled.cfg
+          # npm i -g npm@7 --registry=https://registry.npmjs.org
+          # npm --version
+          # npm ci
+          # npm run build
+          # npm run test:integration
+      - name: See what ports are in use
+        run: |
+          netstat -ano -p tcp
 
-      # - name: Setup npm version 7
-      #   run: |
-      #     npm i -g npm@7 --registry=https://registry.npmjs.org
+      - name: Setup npm version 7
+        run: |
+          npm i -g npm@7 --registry=https://registry.npmjs.org
 
-      # - name: Cache node modules
-      #   id: cache-nodemodules
-      #   uses: actions/cache@v3
-      #   env:
-      #     cache-name: cache-node-modules
-      #   with:
-      #     # caching node_modules
-      #     path: |
-      #       node_modules
-      #       */*/node_modules
-      #     key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-deps-${{ matrix.node-version }}-
-      #       ${{ runner.os }}-deps-
+      - name: Cache node modules
+        id: cache-nodemodules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # caching node_modules
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-${{ matrix.node-version }}-
+            ${{ runner.os }}-deps-
 
-      # - name: Install Dependencies
-      #   if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-      #   run: npm ci
+      - name: Install Dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+        run: npm ci
 
-      # - run: npm run build
-      # - run: npm run test:integration
-      #   env:
-      #     HOST: localhost
-      #     PORT: ${{ job.services.rippled.ports['6006'] }}
+      - run: npm run build
+      - run: npm run test:integration
+        env:
+          HOST: localhost
+          PORT: ${{ job.services.rippled.ports['6006'] }}
 
   browser:
     runs-on: ubuntu-latest
