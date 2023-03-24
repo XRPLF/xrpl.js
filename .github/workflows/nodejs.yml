@@ -110,19 +110,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-
           # /usr/bin/docker create --name rippled-service --label rippled-container --network ${{ job.container.network }} --network-alias rippled -p 6006:6006 -v "${{ github.workspace }}/ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s -e "ENV_ARGS=-a --start" -e GITHUB_ACTIONS=true -e CI=true xrpllabsofficial/xrpld:latest
 
-      - uses: addnab/docker-run-action@v3
-        with:
-          image: xrpllabsofficial/xrpld:latest
-          options: --network-alias rippled -p 6006:6006 -v ${{ github.workspace }}/ci-config/:/config/ -e HOST=localhost -e PORT=${{ job.services.rippled.ports['6006'] }}
-          run: |
-            echo "Started docker container with config:"
+      - name: Run docker in background
+        run: |
+          docker run --rm --name rippled-service --label rippled-container --network ${{ job.container.network }} --network-alias rippled -p 6006:6006 -v "${{ github.workspace }}/ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s -e "ENV_ARGS=-a --start" -e GITHUB_ACTIONS=true -e CI=true xrpllabsofficial/xrpld:latest
+      # - uses: addnab/docker-run-action@v3
+      #   with:
+      #     image: xrpllabsofficial/xrpld:latest
+      #     options: --network-alias rippled -p 6006:6006 -v ${{ github.workspace }}/ci-config/:/config/ -e HOST=localhost -e PORT=${{ job.services.rippled.ports['6006'] }}
+      #     run: |
+      #       echo "Started docker container with config:"
           # echo "Install nvm"
           # curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
           # export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
@@ -139,6 +137,11 @@ jobs:
       - name: See what ports are in use
         run: |
           netstat -ano -p tcp
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
 
       - name: Setup npm version 7
         run: |
