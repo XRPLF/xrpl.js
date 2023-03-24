@@ -100,13 +100,13 @@ jobs:
       matrix:
         node-version: [14.x, 16.x, 18.x]
 
-    services:
-      rippled:
-        image: xrpllabsofficial/xrpld:latest
-        ports:
-          - 6006:6006
-        options: -v "${{ github.workspace }}/rippled/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
-        env: { ENV_ARGS: "-a --start" }
+    # services:
+    #   rippled:
+    #     image: xrpllabsofficial/xrpld:latest
+    #     ports:
+    #       - 6006:6006
+    #     options: -v "${{ github.workspace }}/rippled/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
+    #     env: { ENV_ARGS: "-a --start" }
 
     steps:
       - uses: actions/checkout@v3
@@ -123,11 +123,12 @@ jobs:
           options: --network-alias rippled -p 6006:6006 -v ${{ github.workspace }}/ci-config/:/config/ -e HOST=localhost -e PORT=${{ job.services.rippled.ports['6006'] }}
           run: |
             echo "Started docker container with config:"
-      # cat config/rippled.cfg
-      # npm i -g npm@7 --registry=https://registry.npmjs.org
-      # npm ci
-      # npm run build
-      # npm run test:integration
+            cat config/rippled.cfg
+            npm i -g npm@7 --registry=https://registry.npmjs.org
+            npm --version
+            npm ci
+            npm run build
+            npm run test:integration
 
 
       # - name: Setup npm version 7
