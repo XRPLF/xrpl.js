@@ -108,9 +108,6 @@ jobs:
     #     options: -v "${{ github.workspace }}/rippled/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
     #     env: { ENV_ARGS: "-a --start" }
 
-    build:
-      runs-on: ubuntu-latest
-      container: xrpllabsofficial/xrpld:latest
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
