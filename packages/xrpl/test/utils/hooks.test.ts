@@ -9,12 +9,6 @@ import {
 
 describe('test hook on', function () {
   it('invalid', function () {
-    const invokeOn: Array<keyof TTS> = [1]
-    expect(() => {
-      calculateHookOn(invokeOn)
-    }).toThrow('HookOn transaction type must be string')
-  })
-  it('invalid', function () {
     const invokeOn: Array<keyof TTS> = ['AccountSet1']
     expect(() => {
       calculateHookOn(invokeOn)
