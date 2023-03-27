@@ -22,7 +22,7 @@ import { HookParameter } from '../models/common'
  * @description
  * Transaction types
  */
-export type TTS = typeof tts
+export type TTS = typeof TRANSACTION_TYPE_MAP
 
 /**
  * Calculate the hook on
