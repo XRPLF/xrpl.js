@@ -1,8 +1,14 @@
 import { assert } from 'chai'
 import _ from 'lodash'
-import { Client } from 'xrpl'
+import { TxRequest } from 'xrpl'
 
-import { convertStringToHex, getNFTokenID, NFTokenMint } from '../../../src'
+import {
+  convertStringToHex,
+  ensureDecodedMeta,
+  getNFTokenID,
+  NFTokenMint,
+} from '../../../src'
+import { hashSignedTx } from '../../../src/utils/hashes'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -25,9 +31,6 @@ describe('NFTokenMint', function () {
   it(
     'get NFTokenID',
     async function () {
-      const client = new Client('wss://s.altnet.rippletest.net:51233/')
-      await client.connect()
-
       const tx: NFTokenMint = {
         TransactionType: 'NFTokenMint',
         Account: testContext.wallet.address,
@@ -41,14 +44,24 @@ describe('NFTokenMint', function () {
         testContext.wallet,
       )
       assert.equal(response.type, 'response')
-      assert.equal(response.result.meta.TransactionResult, 'tesSUCCESS')
+
+      const txRequest: TxRequest = {
+        command: 'tx',
+        transaction: hashSignedTx(response.result.tx_blob),
+      }
+      const txResponse = await testContext.client.request(txRequest)
+
+      assert.equal(
+        ensureDecodedMeta(txResponse.result.meta)?.TransactionResult,
+        'tesSUCCESS',
+      )
 
       const accountNFTs = await testContext.client.request({
         command: 'account_nfts',
         account: testContext.wallet.address,
       })
 
-      const nftokenID = getNFTokenID(response.result.meta) ?? 'undefined'
+      const nftokenID = getNFTokenID(txResponse.result.meta) ?? 'undefined'
       const accountHasNFT = accountNFTs.result.account_nfts.some(
         (value) => value.NFTokenID === nftokenID,
       )
