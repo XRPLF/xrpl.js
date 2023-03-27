@@ -1,6 +1,8 @@
 # ripple-keypairs Release History
 
 ## Unreleased
+
+## 1.1.5 (2023-03-08)
 ### Changed
 - All tests now use the Jest test runner and have been refactored for consistency across all packages
 

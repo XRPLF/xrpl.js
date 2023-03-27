@@ -119,7 +119,7 @@ export interface AccountRootFlagsInterface {
   /**
    * Disallow incoming NFTOffers from other accounts.
    */
-  lsfDisallowIncomingNFTOffer?: boolean
+  lsfDisallowIncomingNFTokenOffer?: boolean
   /**
    * Disallow incoming Checks from other accounts.
    */
@@ -175,7 +175,7 @@ export enum AccountRootFlags {
   /**
    * Disallow incoming NFTOffers from other accounts.
    */
-  lsfDisallowIncomingNFTOffer = 0x04000000,
+  lsfDisallowIncomingNFTokenOffer = 0x04000000,
   /**
    * Disallow incoming Checks from other accounts.
    */
