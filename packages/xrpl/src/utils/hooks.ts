@@ -6,7 +6,7 @@
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports -- Required
 import createHash = require('create-hash')
-import { TRANSACTION_TYPE_MAP, TRANSACTION_TYPES } from 'ripple-binary-codec'
+import { TRANSACTION_TYPES, TRANSACTION_TYPE_MAP } from 'ripple-binary-codec'
 
 import { XrplError } from '../errors'
 import { HookParameter } from '../models/common'
@@ -35,6 +35,9 @@ export type TTS = typeof tts
 export function calculateHookOn(arr: Array<keyof TTS>): string {
   let hash = '0x3e3ff5bf'
   arr.forEach((nth) => {
+    if (!TRANSACTION_TYPE_MAP) {
+      throw new XrplError(`TRANSACTION_TYPE_MAP malformed or undefined`)
+    }
     if (typeof nth !== 'string') {
       throw new XrplError(`HookOn transaction type must be string`)
     }
