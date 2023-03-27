@@ -7,8 +7,6 @@ export * from './models'
 
 export * from './utils'
 
-export * from './sugar'
-
 export * from './errors'
 
 export { default as Wallet } from './Wallet'
