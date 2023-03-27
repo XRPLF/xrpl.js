@@ -93,6 +93,6 @@ export interface SubmitResponse extends BaseResponse {
     /**
      * Metadata about what changed as a result of the transaction.
      */
-    meta: TransactionMetadata
+    meta?: TransactionMetadata
   }
 }
