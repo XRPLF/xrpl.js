@@ -31,7 +31,8 @@ export type TTS = typeof TRANSACTION_TYPE_MAP
  * @returns the hook on
  */
 export function calculateHookOn(arr: Array<keyof TTS>): string {
-  let hash = '0x3e3ff5bf'
+  let hash =
+    '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffbfffff'
   arr.forEach((nth) => {
     if (typeof nth !== 'string') {
       throw new XrplError(`HookOn transaction type must be string`)
