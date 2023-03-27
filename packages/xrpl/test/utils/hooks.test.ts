@@ -18,7 +18,7 @@ describe('test hook on', function () {
     const result = calculateHookOn([])
     assert.equal(
       result,
-      '000000000000000000000000000000000000000000000000000000003E3FF5BF',
+      'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBFFFFF',
     )
   })
   it('one', function () {
@@ -26,7 +26,7 @@ describe('test hook on', function () {
     const result = calculateHookOn(invokeOn)
     assert.equal(
       result,
-      '000000000000000000000000000000000000000000000000000000003E3FF5B7',
+      'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBFFFF7',
     )
   })
 })
