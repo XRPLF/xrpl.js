@@ -137,11 +137,12 @@ jobs:
 
       - run: npm run build
 
-      # Docker stop must be in same step as integration test so it doesn't get skipped if tests fail.
-      - name: Run integration test and stop docker once completed
-        run: |
-          npm run test:integration
-          docker stop rippled-service
+      - name: Run integration test
+        run: npm run test:integration
+
+      - name: Stop docker container
+        if: always()
+        run: docker stop rippled-service
 
   browser:
     runs-on: ubuntu-latest
@@ -188,8 +189,9 @@ jobs:
 
       - run: npm run build
 
-      # Docker stop must be in same step as integration test so it doesn't get skipped if tests fail.
-      - name: Run browser test and stop docker once completed
-        run: |
-          npm run test:browser
-          docker stop rippled-service
+      - name: Run integration test
+        run: npm run test:browser
+
+      - name: Stop docker container
+        if: always()
+        run: docker stop rippled-service
