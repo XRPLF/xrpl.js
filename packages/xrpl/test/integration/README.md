@@ -1,5 +1,5 @@
 To run integration tests:
-1. Run rippled-standalone node, either in a docker container (preferred) or by installing rippled.
+1. Run rippled in standalone node, either in a docker container (preferred) or by installing rippled.
   * Go to the top-level of the `xrpl.js` repo, just above the `packages` folder.
   * With docker, run `docker run -p 6006:6006 -it -v $PWD/ci-config:/config/ xrpllabsofficial/xrpld:latest -a --start`
   * Or [download and build rippled](https://xrpl.org/install-rippled.html) and run `./rippled -a --start`
