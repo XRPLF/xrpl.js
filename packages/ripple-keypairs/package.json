@@ -1,5 +1,5 @@
 {
-  "name": "ripple-keypairs",
+  "name": "@transia/ripple-keypairs",
   "version": "1.1.5",
   "description": "Cryptographic key pairs for the XRP Ledger",
   "scripts": {
@@ -25,7 +25,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:XRPLF/xrpl.js.git"
+    "url": "git@github.com:Transia-RnD/xrpl.js/tree/transia-beta"
   },
   "license": "ISC",
   "prettier": "@xrplf/prettier-config",
