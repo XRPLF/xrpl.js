@@ -3,13 +3,12 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 
-### Fixed
-* Fixed `ServerState.transitions` typing, it is now a string instead of a number. (Only used in return from `server_state` request)
-* Added `destination_amount` to `PathOption` which is returned as part of a `path_find` request
-
 ### Added
 * Null and undefined values in transactions are now treated as though the field was not passed in.
 
+### Fixed
+* Fixed `ServerState.transitions` typing, it is now a string instead of a number. (Only used in return from `server_state` request)
+* Added `destination_amount` to `PathOption` which is returned as part of a `path_find` request
 
 ## 2.7.0 (2023-03-08)
 
