@@ -1,6 +1,6 @@
 {
   "name": "@transia/ripple-binary-codec",
-  "version": "1.4.3-tbeta",
+  "version": "1.4.4-tbeta.0",
   "description": "XRP Ledger binary codec",
   "files": [
     "dist/*",
