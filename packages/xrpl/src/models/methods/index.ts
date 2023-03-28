@@ -16,6 +16,7 @@ import {
   AccountOffersResponse,
 } from './accountOffers'
 import { AccountTxRequest, AccountTxResponse } from './accountTx'
+import { AMMInfoRequest, AMMInfoResponse } from './ammInfo'
 import { ErrorResponse } from './baseMethod'
 import { BookOffersRequest, BookOffer, BookOffersResponse } from './bookOffers'
 import { ChannelVerifyRequest, ChannelVerifyResponse } from './channelVerify'
@@ -87,6 +88,7 @@ type Request =
   | AccountObjectsRequest
   | AccountOffersRequest
   | AccountTxRequest
+  | AMMInfoRequest
   | GatewayBalancesRequest
   | NoRippleCheckRequest
   // ledger methods
@@ -137,6 +139,7 @@ type Response =
   | AccountObjectsResponse
   | AccountOffersResponse
   | AccountTxResponse
+  | AMMInfoResponse
   | GatewayBalancesResponse
   | NoRippleCheckResponse
   // ledger methods
@@ -195,6 +198,8 @@ export {
   AccountOffersResponse,
   AccountTxRequest,
   AccountTxResponse,
+  AMMInfoRequest,
+  AMMInfoResponse,
   GatewayBalancesRequest,
   GatewayBalancesResponse,
   NoRippleCheckRequest,

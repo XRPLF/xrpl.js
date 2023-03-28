@@ -4,7 +4,7 @@ interface XRP {
   currency: 'XRP'
 }
 
-interface IssuedCurrency {
+export interface IssuedCurrency {
   currency: string
   issuer: string
 }
