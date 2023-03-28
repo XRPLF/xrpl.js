@@ -44,11 +44,16 @@
     "NegativeUNL": 78,
     "NFTokenPage": 80,
     "NFTokenOffer": 55,
+    "URIToken": 85,
     "Any": -3,
     "Child": -2,
     "Nickname": 110,
     "Contract": 99,
-    "GeneratorMap": 103
+    "GeneratorMap": 103,
+    "Hook": 72,
+    "HookState": 118,
+    "HookDefinition": 68,
+    "EmittedTxn": 69
   },
   "FIELDS": [
     [
@@ -772,6 +777,16 @@
       }
     ],
     [
+      "LockCount",
+      {
+        "nth": 49,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "nth": 1,
@@ -895,16 +910,6 @@
       "EmitBurden",
       {
         "nth": 13,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "UInt64"
-      }
-    ],
-    [
-      "HookOn",
-      {
-        "nth": 16,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1162,6 +1167,16 @@
       }
     ],
     [
+      "HookOn",
+      {
+        "nth": 20,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash256"
+      }
+    ],
+    [
       "Digest",
       {
         "nth": 21,
@@ -1285,6 +1300,36 @@
       "HookSetTxnID",
       {
         "nth": 33,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "OfferID",
+      {
+        "nth": 34,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "EscrowID",
+      {
+        "nth": 35,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "URITokenID",
+      {
+        "nth": 36,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1425,6 +1470,26 @@
       "NFTokenBrokerFee",
       {
         "nth": 19,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "HookCallbackFee",
+      {
+        "nth": 20,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "LockedBalance",
+      {
+        "nth": 21,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1672,6 +1737,16 @@
       }
     ],
     [
+      "Blob",
+      {
+        "nth": 26,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Blob"
+      }
+    ],
+    [
       "Account",
       {
         "nth": 1,
@@ -1805,6 +1880,16 @@
       "NFTokenOffers",
       {
         "nth": 4,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Vector256"
+      }
+    ],
+    [
+      "HookNamespaces",
+      {
+        "nth": 5,
         "isVLEncoded": true,
         "isSerialized": true,
         "isSigningField": true,
@@ -2189,6 +2274,7 @@
     "telWRONG_NETWORK": -386,
     "telREQUIRES_NETWORK_ID": -385,
     "telNETWORK_ID_MAKES_TX_NON_CANONICAL": -384,
+    "telNON_LOCAL_EMITTED_TXN": -383,
 
     "temMALFORMED": -299,
     "temBAD_AMOUNT": -298,
@@ -2228,6 +2314,16 @@
     "temUNKNOWN": -264,
     "temSEQ_AND_TICKET": -263,
     "temBAD_NFTOKEN_TRANSFER_FEE": -262,
+    "temAMM_BAD_TOKENS": -261,
+    "temXCHAIN_EQUAL_DOOR_ACCOUNTS": -260,
+    "temXCHAIN_BAD_PROOF": -259,
+    "temXCHAIN_BRIDGE_BAD_ISSUES": -258,
+    "temXCHAIN_BRIDGE_NONDOOR_OWNER": -257,
+    "temXCHAIN_BRIDGE_BAD_MIN_ACCOUNT_CREATE_AMOUNT": -256,
+    "temXCHAIN_BRIDGE_BAD_REWARD_AMOUNT": -255,
+    "temXCHAIN_TOO_MANY_ATTESTATIONS": -254,
+    "temHOOK_DATA_TOO_LARGE": -253,
+    "temHOOK_REJECTED": -252,
 
     "tefFAILURE": -199,
     "tefALREADY": -198,
@@ -2263,6 +2359,8 @@
     "terNO_RIPPLE": -90,
     "terQUEUED": -89,
     "terPRE_TICKET": -88,
+    "terNO_AMM": -87,
+    "terNO_HOOK": -86,
 
     "tesSUCCESS": 0,
 
@@ -2304,6 +2402,7 @@
     "tecKILLED": 150,
     "tecHAS_OBLIGATIONS": 151,
     "tecTOO_SOON": 152,
+    "tecHOOK_REJECTED": 153,
     "tecMAX_SEQUENCE_REACHED": 154,
     "tecNO_SUITABLE_NFTOKEN_PAGE": 155,
     "tecNFTOKEN_BUY_SELL_MISMATCH": 156,
@@ -2311,7 +2410,32 @@
     "tecCANT_ACCEPT_OWN_NFTOKEN_OFFER": 158,
     "tecINSUFFICIENT_FUNDS": 159,
     "tecOBJECT_NOT_FOUND": 160,
-    "tecINSUFFICIENT_PAYMENT": 161
+    "tecINSUFFICIENT_PAYMENT": 161,
+    "tecAMM_UNFUNDED": 162,
+    "tecAMM_BALANCE": 163,
+    "tecAMM_FAILED_DEPOSIT": 164,
+    "tecAMM_FAILED_WITHDRAW": 165,
+    "tecAMM_INVALID_TOKENS": 166,
+    "tecAMM_FAILED_BID": 167,
+    "tecAMM_FAILED_VOTE": 168,
+    "tecREQUIRES_FLAG": 169,
+    "tecPRECISION_LOSS": 170,
+    "tecBAD_XCHAIN_TRANSFER_ISSUE": 171,
+    "tecXCHAIN_NO_CLAIM_ID": 172,
+    "tecXCHAIN_BAD_CLAIM_ID": 173,
+    "tecXCHAIN_CLAIM_NO_QUORUM": 174,
+    "tecXCHAIN_PROOF_UNKNOWN_KEY": 175,
+    "tecXCHAIN_CREATE_ACCOUNT_NONXRP_ISSUE": 176,
+    "tecXCHAIN_WRONG_CHAIN": 177,
+    "tecXCHAIN_REWARD_MISMATCH": 178,
+    "tecXCHAIN_NO_SIGNERS_LIST": 179,
+    "tecXCHAIN_SENDING_ACCOUNT_MISMATCH": 180,
+    "tecXCHAIN_INSUFF_CREATE_AMOUNT": 181,
+    "tecXCHAIN_ACCOUNT_CREATE_PAST": 182,
+    "tecXCHAIN_ACCOUNT_CREATE_TOO_MANY": 183,
+    "tecXCHAIN_PAYMENT_FAILED": 184,
+    "tecXCHAIN_SELF_COMMIT": 185,
+    "tecXCHAIN_BAD_PUBLIC_KEY_ACCOUNT_PAIR": 186
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
@@ -2343,8 +2467,15 @@
     "NFTokenCreateOffer": 27,
     "NFTokenCancelOffer": 28,
     "NFTokenAcceptOffer": 29,
+    "URITokenMint": 45,
+    "URITokenBurn": 46,
+    "URITokenBuy": 47,
+    "URITokenCreateSellOffer": 48,
+    "URITokenCancelSellOffer": 49,
+    "Invoke": 99,
     "EnableAmendment": 100,
     "SetFee": 101,
-    "UNLModify": 102
+    "UNLModify": 102,
+    "EmitFailure": 103
   }
 }
