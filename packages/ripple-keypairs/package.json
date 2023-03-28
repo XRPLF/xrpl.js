@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.1.5",
+  "version": "1.1.6-alpha.0",
   "description": "Cryptographic key pairs for the XRP Ledger",
   "scripts": {
     "build": "tsc -b",

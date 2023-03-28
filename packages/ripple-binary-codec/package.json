@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.4.3",
+  "version": "1.4.4-alpha.0",
   "description": "XRP Ledger binary codec",
   "files": [
     "dist/*",
