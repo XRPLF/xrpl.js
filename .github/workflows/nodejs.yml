@@ -156,6 +156,12 @@ jobs:
         node-version: [14.x] # This just needs to be compatible w/ puppeteer
 
     steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
 
      - name: Run docker in background
         run: |
