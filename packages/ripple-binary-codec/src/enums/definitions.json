@@ -45,6 +45,7 @@
     "NegativeUNL": 78,
     "NFTokenPage": 80,
     "NFTokenOffer": 55,
+    "URIToken": 85,
     "AMM": 121,
     "Any": -3,
     "Child": -2,
@@ -1334,6 +1335,16 @@
       }
     ],
     [
+      "URITokenID",
+      {
+        "nth": 36,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash256"
+      }
+    ],
+    [
       "Amount",
       {
         "nth": 1,
@@ -2554,6 +2565,11 @@
     "NFTokenCreateOffer": 27,
     "NFTokenCancelOffer": 28,
     "NFTokenAcceptOffer": 29,
+    "URITokenMint": 45,
+    "URITokenBurn": 46,
+    "URITokenBuy": 47,
+    "URITokenCreateSellOffer": 48,
+    "URITokenCancelSellOffer": 49,
     "AMMCreate": 35,
     "AMMDeposit": 36,
     "AMMWithdraw": 37,
