@@ -4,9 +4,11 @@
  * This module contains the transaction types and the function to calculate the hook on
  */
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports -- Required
+import {
+  TRANSACTION_TYPES,
+  TRANSACTION_TYPE_MAP,
+} from '@transia/ripple-binary-codec'
 import createHash = require('create-hash')
-import { TRANSACTION_TYPES, TRANSACTION_TYPE_MAP } from 'ripple-binary-codec'
 
 import { XrplError } from '../errors'
 import { HookParameter } from '../models/common'
@@ -42,7 +44,7 @@ export function calculateHookOn(arr: Array<keyof TTS>): string {
         `invalid transaction type '${String(nth)}' in HookOn array`,
       )
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Required
+
     const tts: Record<string, number> = TRANSACTION_TYPE_MAP
     let value = BigInt(hash)
     // eslint-disable-next-line no-bitwise -- Required

@@ -1,4 +1,17 @@
 /* eslint-disable max-lines -- There are lots of equivalent constructors which make sense to have here. */
+import {
+  decode,
+  encodeForSigning,
+  encodeForMultisigning,
+  encode,
+} from '@transia/ripple-binary-codec'
+import {
+  deriveAddress,
+  deriveKeypair,
+  generateSeed,
+  verify,
+  sign,
+} from '@transia/ripple-keypairs'
 import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
@@ -9,20 +22,7 @@ import {
   isValidXAddress,
   xAddressToClassicAddress,
   encodeSeed,
-} from 'ripple-address-codec'
-import {
-  decode,
-  encodeForSigning,
-  encodeForMultisigning,
-  encode,
-} from 'ripple-binary-codec'
-import {
-  deriveAddress,
-  deriveKeypair,
-  generateSeed,
-  verify,
-  sign,
-} from 'ripple-keypairs'
+} from '@transia/ripple-address-codec'
 
 import ECDSA from '../ECDSA'
 import { ValidationError, XrplError } from '../errors'

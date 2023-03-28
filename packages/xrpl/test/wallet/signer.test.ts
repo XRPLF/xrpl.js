@@ -1,5 +1,5 @@
+import { decode, encode } from '@transia/ripple-binary-codec'
 import { assert } from 'chai'
-import { decode, encode } from 'ripple-binary-codec'
 
 import { Transaction, ValidationError } from '../../src'
 import Wallet from '../../src/Wallet'
