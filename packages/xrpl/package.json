@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "2.7.1-alpha.5",
+  "version": "2.7.1-alpha.6",
   "license": "ISC",
   "description": "A TypeScript/JavaScript API for interacting with the XRP Ledger in Node.js and the browser",
   "files": [
@@ -26,8 +26,8 @@
   },
   "dependencies": {
     "@transia/ripple-address-codec": "^4.2.6-alpha.0",
-    "@transia/ripple-binary-codec": "^1.4.4-alpha.2",
-    "@transia/ripple-keypairs": "^1.1.6-alpha.2",
+    "@transia/ripple-binary-codec": "^1.4.4-alpha.3",
+    "@transia/ripple-keypairs": "^1.1.6-alpha.3",
     "bignumber.js": "^9.0.0",
     "bip32": "^2.0.6",
     "bip39": "^3.0.4",
