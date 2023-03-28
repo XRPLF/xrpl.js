@@ -48,6 +48,17 @@ import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
+import { URITokenBurn, validateURITokenBurn } from './uriTokenBurn'
+import { URITokenBuy, validateURITokenBuy } from './uriTokenBuy'
+import {
+  URITokenCancelSellOffer,
+  validateURITokenCancelSellOffer,
+} from './uriTokenCancelSellOffer'
+import {
+  URITokenCreateSellOffer,
+  validateURITokenCreateSellOffer,
+} from './uriTokenCreateSellOffer'
+import { URITokenMint, validateURITokenMint } from './uriTokenMint'
 
 /**
  * @category Transaction Models
@@ -78,6 +89,11 @@ export type Transaction =
   | SignerListSet
   | TicketCreate
   | TrustSet
+  | URITokenBurn
+  | URITokenBuy
+  | URITokenCancelSellOffer
+  | URITokenMint
+  | URITokenCreateSellOffer
 
 /**
  * @category Transaction Models
@@ -204,6 +220,26 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'TrustSet':
       validateTrustSet(tx)
+      break
+
+    case 'URITokenMint':
+      validateURITokenMint(tx)
+      break
+
+    case 'URITokenBurn':
+      validateURITokenBurn(tx)
+      break
+
+    case 'URITokenCreateSellOffer':
+      validateURITokenCreateSellOffer(tx)
+      break
+
+    case 'URITokenBuy':
+      validateURITokenBuy(tx)
+      break
+
+    case 'URITokenCancelSellOffer':
+      validateURITokenCancelSellOffer(tx)
       break
 
     default:
