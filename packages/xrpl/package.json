@@ -1,5 +1,8 @@
 {
   "name": "@transia/xrpl",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "2.7.0",
   "license": "ISC",
   "description": "A TypeScript/JavaScript API for interacting with the XRP Ledger in Node.js and the browser",

@@ -1,5 +1,8 @@
 {
   "name": "@transia/ripple-keypairs",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "1.1.5",
   "description": "Cryptographic key pairs for the XRP Ledger",
   "scripts": {
