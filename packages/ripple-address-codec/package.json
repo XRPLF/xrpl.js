@@ -1,5 +1,5 @@
 {
-  "name": "ripple-address-codec",
+  "name": "@transia/ripple-address-codec",
   "version": "4.2.5",
   "description": "encodes/decodes base58 encoded XRP Ledger identifiers",
   "files": [
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:XRPLF/xrpl.js.git"
+    "url": "git@github.com/Transia-RnD/xrpl.js/tree/beta"
   },
   "prepublish": "tsc -b",
   "prepublishOnly": "tslint -b ./ && jest",
