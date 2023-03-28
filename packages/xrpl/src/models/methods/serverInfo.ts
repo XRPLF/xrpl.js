@@ -137,6 +137,10 @@ export interface ServerInfoResponse extends BaseResponse {
        */
       load_factor?: number
       /**
+       * The network id of the server.
+       */
+      network_id?: number
+      /**
        * Current multiplier to the transaction cost based on
        * load to this server.
        */

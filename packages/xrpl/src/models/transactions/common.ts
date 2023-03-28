@@ -159,6 +159,10 @@ export interface BaseTransaction {
    * account it says it is from.
    */
   TxnSignature?: string
+  /**
+   * The network id of the transaction.
+   */
+  NetworkID?: number
 }
 
 /**
@@ -251,6 +255,9 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
     typeof common.TxnSignature !== 'string'
   ) {
     throw new ValidationError('BaseTransaction: invalid TxnSignature')
+  }
+  if (common.NetworkID !== undefined && typeof common.NetworkID !== 'number') {
+    throw new ValidationError('BaseTransaction: invalid NetworkID')
   }
 }
 
