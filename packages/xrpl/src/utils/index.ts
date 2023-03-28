@@ -40,6 +40,7 @@ import {
   hashEscrow,
   hashPaymentChannel,
 } from './hashes'
+import { calculateHookOn, hexNamespace, hexHookParameters, TTS } from './hooks'
 import parseNFTokenID from './parseNFTokenID'
 import {
   percentToTransferRate,
@@ -222,4 +223,8 @@ export {
   getNFTokenID,
   createCrossChainPayment,
   parseNFTokenID,
+  calculateHookOn,
+  hexNamespace,
+  hexHookParameters,
+  TTS,
 }

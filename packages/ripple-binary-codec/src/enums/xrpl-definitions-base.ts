@@ -33,6 +33,8 @@ class XrplDefinitionsBase {
   transactionType: BytesLookup
   // Valid transaction names
   transactionNames: string[]
+  // Valid transaction names
+  transactionMap: Record<string, number>
   // Maps serializable types to their TypeScript class implementation
   dataTypes: Record<string, typeof SerializedType>
 
@@ -68,9 +70,19 @@ class XrplDefinitionsBase {
       enums.FIELDS as Array<[string, FieldInfo]>,
       enums.TYPES,
     )
+
     this.transactionNames = Object.entries(enums.TRANSACTION_TYPES)
       .filter(([_key, value]) => value >= 0)
       .map(([key, _value]) => key)
+
+    const ignoreList = ['EnableAmendment', 'SetFee', 'UNLModify', 'EmitFailure']
+    this.transactionMap = Object.assign(
+      {},
+      ...Object.entries(enums.TRANSACTION_TYPES)
+
+        .filter(([_key, _value]) => _value >= 0 || ignoreList.includes(_key))
+        .map(([key, value]) => ({ [key]: value })),
+    )
 
     this.dataTypes = {} // Filled in via associateTypes
     this.associateTypes(types)

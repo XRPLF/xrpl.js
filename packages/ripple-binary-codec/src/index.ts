@@ -6,6 +6,7 @@ import { JsonObject } from './types/serialized-type'
 import {
   XrplDefinitionsBase,
   TRANSACTION_TYPES,
+  TRANSACTION_TYPE_MAP,
   DEFAULT_DEFINITIONS,
 } from './enums'
 import { XrplDefinitions } from './enums/xrpl-definitions'
@@ -134,6 +135,7 @@ export {
   decodeQuality,
   decodeLedgerData,
   TRANSACTION_TYPES,
+  TRANSACTION_TYPE_MAP,
   XrplDefinitions,
   XrplDefinitionsBase,
   DEFAULT_DEFINITIONS,
