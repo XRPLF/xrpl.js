@@ -86,8 +86,11 @@ export interface NFTokenMint extends BaseTransaction {
    *
    * This field must be hex-encoded. You can use `convertStringToHex` to
    * convert this field to the proper encoding.
+   *
+   * This field must not be an empty string. Omit it from the transaction or
+   * set to `undefined` value if you do not use it.
    */
-  URI?: string
+  URI?: string | null
   Flags?: number | NFTokenMintFlagsInterface
 }
 
@@ -104,6 +107,10 @@ export function validateNFTokenMint(tx: Record<string, unknown>): void {
     throw new ValidationError(
       'NFTokenMint: Issuer must not be equal to Account',
     )
+  }
+
+  if (typeof tx.URI === 'string' && tx.URI === '') {
+    throw new ValidationError('NFTokenMint: URI must not be empty string')
   }
 
   if (typeof tx.URI === 'string' && !isHex(tx.URI)) {
