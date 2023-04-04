@@ -64,7 +64,7 @@ From the top-level xrpl.js folder (one level above `packages`), run the followin
 ```bash
 npm install
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run -p 6006:6006 -it -v $PWD/.ci-config:/config/ xrpllabsofficial/xrpld:latest -a --start
+docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/config/ xrpllabsofficial/xrpld:latest -a --start
 npm run build
 npm run test:integration
 ```
