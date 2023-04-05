@@ -1,9 +1,3 @@
-import {
-  Field,
-  TransactionResult,
-  TransactionType,
-  LedgerEntryType,
-} from '../enums'
 import { AccountID } from './account-id'
 import { Amount } from './amount'
 import { Blob } from './blob'
@@ -21,8 +15,10 @@ import { UInt64 } from './uint-64'
 import { UInt8 } from './uint-8'
 import { Vector256 } from './vector-256'
 import { XChainBridge } from './xchain-bridge'
+import { type SerializedType } from './serialized-type'
+import { DEFAULT_DEFINITIONS } from '../enums'
 
-const coreTypes = {
+const coreTypes: Record<string, typeof SerializedType> = {
   AccountID,
   Amount,
   Blob,
@@ -42,12 +38,26 @@ const coreTypes = {
   XChainBridge,
 }
 
-Object.values(Field).forEach((field) => {
-  field.associatedType = coreTypes[field.type.name]
-})
+// Ensures that the DEFAULT_DEFINITIONS object connects these types to fields for serializing/deserializing
+// This is done here instead of in enums/index.ts to avoid a circular dependency
+// because some of the above types depend on BinarySerailizer which depends on enums/index.ts.
+DEFAULT_DEFINITIONS.associateTypes(coreTypes)
 
-Field['TransactionType'].associatedType = TransactionType
-Field['TransactionResult'].associatedType = TransactionResult
-Field['LedgerEntryType'].associatedType = LedgerEntryType
-
-export { coreTypes }
+export {
+  coreTypes,
+  AccountID,
+  Amount,
+  Blob,
+  Currency,
+  Hash128,
+  Hash160,
+  Hash256,
+  PathSet,
+  STArray,
+  STObject,
+  UInt8,
+  UInt16,
+  UInt32,
+  UInt64,
+  Vector256,
+}

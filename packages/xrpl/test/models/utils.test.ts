@@ -163,7 +163,7 @@ describe('Models Utils', function () {
         AccountRootFlags.lsfPasswordSpent |
         AccountRootFlags.lsfRequireAuth |
         AccountRootFlags.lsfRequireDestTag |
-        AccountRootFlags.lsfDisallowIncomingNFTOffer |
+        AccountRootFlags.lsfDisallowIncomingNFTokenOffer |
         AccountRootFlags.lsfDisallowIncomingCheck |
         AccountRootFlags.lsfDisallowIncomingPayChan |
         AccountRootFlags.lsfDisallowIncomingTrustline
@@ -180,7 +180,7 @@ describe('Models Utils', function () {
           parsed.lsfPasswordSpent &&
           parsed.lsfRequireAuth &&
           parsed.lsfRequireDestTag &&
-          parsed.lsfDisallowIncomingNFTOffer &&
+          parsed.lsfDisallowIncomingNFTokenOffer &&
           parsed.lsfDisallowIncomingCheck &&
           parsed.lsfDisallowIncomingPayChan &&
           parsed.lsfDisallowIncomingTrustline,
@@ -199,7 +199,7 @@ describe('Models Utils', function () {
       assert.isUndefined(parsed.lsfPasswordSpent)
       assert.isUndefined(parsed.lsfRequireAuth)
       assert.isUndefined(parsed.lsfRequireDestTag)
-      assert.isUndefined(parsed.lsfDisallowIncomingNFTOffer)
+      assert.isUndefined(parsed.lsfDisallowIncomingNFTokenOffer)
       assert.isUndefined(parsed.lsfDisallowIncomingCheck)
       assert.isUndefined(parsed.lsfDisallowIncomingPayChan)
       assert.isUndefined(parsed.lsfDisallowIncomingTrustline)

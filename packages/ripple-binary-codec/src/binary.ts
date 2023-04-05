@@ -6,7 +6,11 @@ import { AccountID } from './types/account-id'
 import { HashPrefix } from './hash-prefixes'
 import { BinarySerializer, BytesList } from './serdes/binary-serializer'
 import { sha512Half, transactionID } from './hashes'
-import { FieldInstance } from './enums'
+import {
+  type XrplDefinitionsBase,
+  DEFAULT_DEFINITIONS,
+  type FieldInstance,
+} from './enums'
 import { STObject } from './types/st-object'
 import { JsonObject } from './types/serialized-type'
 import { Buffer } from 'buffer/'
@@ -16,26 +20,41 @@ import bigInt = require('big-integer')
  * Construct a BinaryParser
  *
  * @param bytes hex-string to construct BinaryParser from
+ * @param definitions rippled definitions used to parse the values of transaction types and such.
+ *                          Can be customized for sidechains and amendments.
  * @returns A BinaryParser
  */
-const makeParser = (bytes: string): BinaryParser => new BinaryParser(bytes)
+const makeParser = (
+  bytes: string,
+  definitions?: XrplDefinitionsBase,
+): BinaryParser => new BinaryParser(bytes, definitions)
 
 /**
  * Parse BinaryParser into JSON
  *
  * @param parser BinaryParser object
+ * @param definitions rippled definitions used to parse the values of transaction types and such.
+ *                          Can be customized for sidechains and amendments.
  * @returns JSON for the bytes in the BinaryParser
  */
-const readJSON = (parser: BinaryParser): JsonObject =>
-  (parser.readType(coreTypes.STObject) as STObject).toJSON()
+const readJSON = (
+  parser: BinaryParser,
+  definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
+): JsonObject =>
+  (parser.readType(coreTypes.STObject) as STObject).toJSON(definitions)
 
 /**
  * Parse a hex-string into its JSON interpretation
  *
  * @param bytes hex-string to parse into JSON
+ * @param definitions rippled definitions used to parse the values of transaction types and such.
+ *                          Can be customized for sidechains and amendments.
  * @returns JSON
  */
-const binaryToJSON = (bytes: string): JsonObject => readJSON(makeParser(bytes))
+const binaryToJSON = (
+  bytes: string,
+  definitions?: XrplDefinitionsBase,
+): JsonObject => readJSON(makeParser(bytes, definitions), definitions)
 
 /**
  * Interface for passing parameters to SerializeObject
@@ -46,17 +65,18 @@ interface OptionObject {
   prefix?: Buffer
   suffix?: Buffer
   signingFieldsOnly?: boolean
+  definitions?: XrplDefinitionsBase
 }
 
 /**
  * Function to serialize JSON object representing a transaction
  *
  * @param object JSON object to serialize
- * @param opts options for serializing, including optional prefix, suffix, and signingFieldOnly
+ * @param opts options for serializing, including optional prefix, suffix, signingFieldOnly, and definitions
  * @returns A Buffer containing the serialized object
  */
 function serializeObject(object: JsonObject, opts: OptionObject = {}): Buffer {
-  const { prefix, suffix, signingFieldsOnly = false } = opts
+  const { prefix, suffix, signingFieldsOnly = false, definitions } = opts
   const bytesList = new BytesList()
 
   if (prefix) {
@@ -66,8 +86,9 @@ function serializeObject(object: JsonObject, opts: OptionObject = {}): Buffer {
   const filter = signingFieldsOnly
     ? (f: FieldInstance): boolean => f.isSigningField
     : undefined
-
-  coreTypes.STObject.from(object, filter).toBytesSink(bytesList)
+  ;(coreTypes.STObject as typeof STObject)
+    .from(object, filter, definitions)
+    .toBytesSink(bytesList)
 
   if (suffix) {
     bytesList.put(suffix)
@@ -81,13 +102,19 @@ function serializeObject(object: JsonObject, opts: OptionObject = {}): Buffer {
  *
  * @param transaction Transaction to serialize
  * @param prefix Prefix bytes to put before the serialized object
+ * @param opts.definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A Buffer with the serialized object
  */
 function signingData(
   transaction: JsonObject,
   prefix: Buffer = HashPrefix.transactionSig,
+  opts: { definitions?: XrplDefinitionsBase } = {},
 ): Buffer {
-  return serializeObject(transaction, { prefix, signingFieldsOnly: true })
+  return serializeObject(transaction, {
+    prefix,
+    signingFieldsOnly: true,
+    definitions: opts.definitions,
+  })
 }
 
 /**
@@ -102,6 +129,7 @@ interface ClaimObject extends JsonObject {
  * Serialize a signingClaim
  *
  * @param claim A claim object to serialize
+ * @param opts.definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns the serialized object with appropriate prefix
  */
 function signingClaimData(claim: ClaimObject): Buffer {
@@ -123,11 +151,15 @@ function signingClaimData(claim: ClaimObject): Buffer {
  *
  * @param transaction transaction to serialize
  * @param signingAccount Account to sign the transaction with
+ * @param opts.definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns serialized transaction with appropriate prefix and suffix
  */
 function multiSigningData(
   transaction: JsonObject,
   signingAccount: string | AccountID,
+  opts: { definitions: XrplDefinitionsBase } = {
+    definitions: DEFAULT_DEFINITIONS,
+  },
 ): Buffer {
   const prefix = HashPrefix.transactionMultiSig
   const suffix = coreTypes.AccountID.from(signingAccount).toBytes()
@@ -135,6 +167,7 @@ function multiSigningData(
     prefix,
     suffix,
     signingFieldsOnly: true,
+    definitions: opts.definitions,
   })
 }
 
