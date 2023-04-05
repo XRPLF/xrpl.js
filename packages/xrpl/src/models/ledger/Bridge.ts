@@ -15,9 +15,9 @@ export default interface Bridge extends BaseLedgerEntry {
 
   XChainClaimID: string
 
-  XChainAccountCreateCount: number
+  XChainAccountCreateCount: string
 
-  XChainAccountClaimCount: Amount
+  XChainAccountClaimCount: string
   /**
    * A bit-map of boolean flags. No flags are defined for Bridges, so this value
    * is always 0.
