@@ -36,7 +36,7 @@ const coreTypes: Record<string, typeof SerializedType> = {
 
 // Ensures that the DEFAULT_DEFINITIONS object connects these types to fields for serializing/deserializing
 // This is done here instead of in enums/index.ts to avoid a circular dependency
-// because some of the above types depend on BinarySerailizer which depends on enums/index.ts.
+// because some of the above types depend on BinarySerializer which depends on enums/index.ts.
 DEFAULT_DEFINITIONS.associateTypes(coreTypes)
 
 export {
