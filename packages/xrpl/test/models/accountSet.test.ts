@@ -30,7 +30,7 @@ describe('AccountSet', function () {
   })
 
   it(`throws w/ invalid SetFlag (out of range)`, function () {
-    account.SetFlag = 12
+    account.SetFlag = 20
 
     assert.throws(
       () => validateAccountSet(account),
@@ -60,7 +60,7 @@ describe('AccountSet', function () {
   })
 
   it(`throws w/ invalid ClearFlag`, function () {
-    account.ClearFlag = 12
+    account.ClearFlag = 20
 
     assert.throws(
       () => validateAccountSet(account),
@@ -146,6 +146,21 @@ describe('AccountSet', function () {
       () => validate(account),
       ValidationError,
       'AccountSet: invalid TickSize',
+    )
+  })
+
+  it(`throws w/ invalid NFTokenMinter`, function () {
+    account.NFTokenMinter = ''
+
+    assert.throws(
+      () => validateAccountSet(account),
+      ValidationError,
+      'AccountSet: invalid NFTokenMinter',
+    )
+    assert.throws(
+      () => validate(account),
+      ValidationError,
+      'AccountSet: invalid NFTokenMinter',
     )
   })
 })

@@ -24,6 +24,7 @@ import { Transaction } from '../models/transactions/transaction'
 
 import { deriveKeypair, deriveAddress, deriveXAddress } from './derive'
 import getBalanceChanges from './getBalanceChanges'
+import getNFTokenID from './getNFTokenID'
 import {
   hashSignedTx,
   hashTx,
@@ -217,5 +218,6 @@ export {
   encodeForMultiSigning,
   encodeForSigning,
   encodeForSigningClaim,
+  getNFTokenID,
   parseNFTokenID,
 }

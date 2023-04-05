@@ -11,6 +11,7 @@ import { UInt8 } from './types/uint-8'
 import { BinaryParser } from './serdes/binary-parser'
 import { JsonObject } from './types/serialized-type'
 import bigInt = require('big-integer')
+import { XrplDefinitionsBase } from './enums'
 
 /**
  * Computes the hash of a list of objects
@@ -160,11 +161,16 @@ function ledgerHash(header: ledgerObject): Hash256 {
  * Decodes a serialized ledger header
  *
  * @param binary A serialized ledger header
+ * @param definitions Type definitions to parse the ledger objects.
+ *      Used if there are non-default ledger objects to decode.
  * @returns A JSON object describing a ledger header
  */
-function decodeLedgerData(binary: string): object {
+function decodeLedgerData(
+  binary: string,
+  definitions?: XrplDefinitionsBase,
+): object {
   assert.ok(typeof binary === 'string', 'binary must be a hex string')
-  const parser = new BinaryParser(binary)
+  const parser = new BinaryParser(binary, definitions)
   return {
     ledger_index: parser.readUInt32(),
     total_coins: parser.readType(UInt64).valueOf().toString(),
