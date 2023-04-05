@@ -9,16 +9,29 @@ import {
 } from './common'
 
 /**
+ * The XChainCreateClaimID transaction creates a new cross-chain claim ID that is
+ * used for a cross-chain transfer. A cross-chain claim ID represents one
+ * cross-chain transfer of value.
  *
  * @category Transaction Models
  */
 export interface XChainCreateClaimID extends BaseTransaction {
   TransactionType: 'XChainCreateClaimID'
 
+  /**
+   * The bridge to create the claim ID for.
+   */
   XChainBridge: XChainBridge
 
+  /**
+   * The amount, in XRP, to reward the witness servers for providing signatures.
+   * This must match the amount on the {@link Bridge} ledger object.
+   */
   SignatureReward: Amount
 
+  /**
+   * The account that must send the {@link XChainCommit} transaction on the source chain.
+   */
   OtherChainSource: string
 }
 
