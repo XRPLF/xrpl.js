@@ -5,7 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * Null and undefined values in transactions are now treated as though the field was not passed in.
-* Support for the cross-chain bridge feature.
+* Support for the XChainBridge amendment.
 
 ### Fixed
 * Added `destination_amount` to `PathOption` which is returned as part of a `path_find` request
