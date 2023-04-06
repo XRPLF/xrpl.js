@@ -22,7 +22,7 @@ export type ServerState =
 
 export interface StateAccounting {
   duration_us: string
-  transitions: number
+  transitions: string
 }
 
 export interface JobType {
