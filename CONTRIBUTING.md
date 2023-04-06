@@ -71,10 +71,12 @@ npm run test:integration
 
 Breaking down the command:
 * `docker run -p 6006:6006` starts a Docker container with an open port for admin WebSocket requests.
-* `-it` brings the terminal that calls this into the container, and allows you to interact with it from the console.
-* `-v $PWD/.ci-config:/config/` identifies the `rippled.cfg` and `validators.txt` to import. It must be an absolute path, so we use `$PWD` instead of `./`.
+* `--interactive` allows you to interact with the container.
+* `-t` starts a terminal in the container for you to send commands to.
+* `--volume $PWD/.ci-config:/config/` identifies the `rippled.cfg` and `validators.txt` to import. It must be an absolute path, so we use `$PWD` instead of `./`.
 * `xrpllabsofficial/xrpld:latest` is an image that is regularly updated with the latest `rippled` releases and can be found here: https://github.com/WietseWind/docker-rippled
-* `-a --start` signals to start `rippled` in standalone mode, using the specified amendments in `rippled.cfg` immediately instead of voting for 2 weeks on them.
+* `-a` starts `rippled` in standalone mode
+* `--start` signals to start `rippled` with the specified amendments in `rippled.cfg` enabled immediately instead of voting for 2 weeks on them.
 
 ### Browser Tests
 
