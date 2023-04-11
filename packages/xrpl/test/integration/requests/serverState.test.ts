@@ -68,11 +68,11 @@ describe('server_state', function () {
             server_state: 'full',
             server_state_duration_us: '8752487389',
             state_accounting: {
-              connected: { duration_us: '0', transitions: 0 },
-              disconnected: { duration_us: '41860', transitions: 1 },
-              full: { duration_us: '20723121268', transitions: 1 },
-              syncing: { duration_us: '0', transitions: 0 },
-              tracking: { duration_us: '0', transitions: 0 },
+              connected: { duration_us: '0', transitions: '0' },
+              disconnected: { duration_us: '41860', transitions: '1' },
+              full: { duration_us: '20723121268', transitions: '1' },
+              syncing: { duration_us: '0', transitions: '0' },
+              tracking: { duration_us: '0', transitions: '0' },
             },
             time: '2021-Sep-23 22:56:55.413151 UTC',
             uptime: 8752,
@@ -112,6 +112,9 @@ describe('server_state', function () {
         'server_state_duration_us',
         'validated_ledger',
         'io_latency_ms',
+        'build_version',
+        'node_size',
+        'initial_sync_duration_us',
       ]
       assert.deepEqual(
         omit(response.result.state, removeKeys),
@@ -133,7 +136,7 @@ describe('server_state', function () {
         )
         assert.equal(
           typeof response.result.state.state_accounting[key].transitions,
-          'number',
+          'string',
         )
       })
 

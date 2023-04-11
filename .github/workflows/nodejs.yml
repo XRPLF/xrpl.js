@@ -100,15 +100,13 @@ jobs:
       matrix:
         node-version: [14.x, 16.x, 18.x]
 
-    services:
-      rippled:
-        image: natenichols/rippled-standalone:latest
-        ports:
-          - 6006:6006
-        options: --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
-
     steps:
       - uses: actions/checkout@v3
+
+      - name: Run docker in background
+        run: |
+          docker run --detach --rm --name rippled-service -p 6006:6006 --volume "${{ github.workspace }}/.ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s --env "ENV_ARGS=-a --start" --env GITHUB_ACTIONS=true --env CI=true xrpllabsofficial/xrpld:latest
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
@@ -138,10 +136,13 @@ jobs:
         run: npm ci
 
       - run: npm run build
-      - run: npm run test:integration
-        env:
-          HOST: localhost
-          PORT: ${{ job.services.rippled.ports['6006'] }}
+
+      - name: Run integration test
+        run: npm run test:integration
+
+      - name: Stop docker container
+        if: always()
+        run: docker stop rippled-service
 
   browser:
     runs-on: ubuntu-latest
@@ -151,19 +152,17 @@ jobs:
       matrix:
         node-version: [14.x] # This just needs to be compatible w/ puppeteer
 
-    services:
-      rippled:
-        image: natenichols/rippled-standalone:latest
-        ports:
-          - 6006:6006
-        options: --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s
-
     steps:
       - uses: actions/checkout@v3
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Run docker in background
+        run: |
+          docker run --detach --rm --name rippled-service -p 6006:6006 --volume "${{ github.workspace }}/.ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s --env "ENV_ARGS=-a --start" --env GITHUB_ACTIONS=true --env CI=true xrpllabsofficial/xrpld:latest
 
       - name: Setup npm version 7
         run: |
@@ -189,4 +188,10 @@ jobs:
         run: npm ci
 
       - run: npm run build
-      - run: npm run test:browser
+
+      - name: Run integration test
+        run: npm run test:browser
+
+      - name: Stop docker container
+        if: always()
+        run: docker stop rippled-service
