@@ -1,4 +1,3 @@
-/* eslint-disable max-lines -- necessary to support all transactions */
 /* eslint-disable complexity -- verifies 19 tx types hence a lot of checks needed */
 /* eslint-disable max-lines-per-function -- need to work with a lot of Tx verifications */
 
