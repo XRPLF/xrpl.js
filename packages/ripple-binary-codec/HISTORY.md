@@ -1,6 +1,11 @@
 # ripple-binary-codec Release History
 
 ## Unreleased
+### Added
+- Allow custom type definitions to be used for encoding/decoding transactions at runtime (e.g. for sidechains/new amendments)
+* Support for the XChainBridge amendment.
+
+## 1.5.0 (2023-03-08)
 ### Changed
 - All tests now use the Jest test runner and have been refactored for consistency across all packages
 

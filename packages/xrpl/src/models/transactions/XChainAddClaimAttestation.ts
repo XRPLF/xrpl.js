@@ -9,30 +9,65 @@ import {
 } from './common'
 
 /**
+ * The XChainAddClaimAttestation transaction provides proof from a witness server,
+ * attesting to an {@link XChainCommit} transaction.
  *
  * @category Transaction Models
  */
 export interface XChainAddClaimAttestation extends BaseTransaction {
   TransactionType: 'XChainAddClaimAttestation'
 
+  /**
+   * The amount committed by the {@link XChainCommit} transaction on the source chain.
+   */
   Amount: Amount
 
+  /**
+   * The account that should receive this signer's share of the SignatureReward.
+   */
   AttestationRewardAccount: string
 
+  /**
+   * The account on the door account's signer list that is signing the transaction.
+   */
   AttestationSignerAccount: string
 
+  /**
+   * The destination account for the funds on the destination chain (taken from
+   * the {@link XChainCommit} transaction).
+   */
   Destination?: string
 
+  /**
+   * The account on the source chain that submitted the {@link XChainCommit}
+   * transaction that triggered the event associated with the attestation.
+   */
   OtherChainSource: string
 
+  /**
+   * The public key used to verify the attestation signature.
+   */
   PublicKey: string
 
+  /**
+   * The signature attesting to the event on the other chain.
+   */
   Signature: string
 
+  /**
+   * A boolean representing the chain where the event occurred.
+   */
   WasLockingChainSend: 0 | 1
 
+  /**
+   * The bridge to use to transfer funds.
+   */
   XChainBridge: XChainBridge
 
+  /**
+   * The XChainClaimID associated with the transfer, which was included in the
+   * {@link XChainCommit} transaction.
+   */
   XChainClaimID: string
 }
 
