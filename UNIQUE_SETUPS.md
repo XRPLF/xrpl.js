@@ -2,6 +2,15 @@
 
 For when you need to do more than just install `xrpl.js` for it to work (especially for React projects in the browser).
 
+### Using xrpl.js from a CDN
+
+You can avoid setting up your build system to handle `xrpl.js` by using a cdn version that is prebuilt for the browser.
+
+- unpkg `<script src="https://unpkg.com/xrpl@2.3.0/build/xrpl-latest-min.js"></script>`
+- jsdelivr `<script src="https://cdn.jsdelivr.net/npm/xrpl@2.3.0/build/xrpl-latest-min.js"></script>`
+
+Ensure that the full path is provided so the browser can find the sourcemaps.
+
 ### Using xrpl.js with `create-react-app`
 
 To use `xrpl.js` with React, you need to install shims for core NodeJS modules. Starting with version 5, Webpack stopped including shims by default, so you must modify your Webpack configuration to add the shims you need. Either you can eject your config and modify it, or you can use a library such as `react-app-rewired`. The example below uses `react-app-rewired`.
