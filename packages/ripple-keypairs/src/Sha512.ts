@@ -2,7 +2,6 @@
  * lots of bitwise operators necessary for this */
 
 // TODO: maybe use the custom class: sha512_256
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { sha512 } from '@noble/hashes/sha512'
 import { bytesToNumberBE } from '@noble/curves/abstract/utils'
 

@@ -4,8 +4,6 @@ import Sha512 from './Sha512'
 import * as nobleSecp256k1 from '@noble/curves/secp256k1'
 import * as nobleEd25519 from '@noble/curves/ed25519'
 import * as nobleUtils from '@noble/curves/abstract/utils'
-// TODO: why doesn't this work?
-// eslint-disable-next-line import/no-extraneous-dependencies
 import * as nobleHashesUtils from '@noble/hashes/utils'
 
 import * as addressCodec from 'ripple-address-codec'

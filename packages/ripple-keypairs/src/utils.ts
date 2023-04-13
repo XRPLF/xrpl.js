@@ -1,11 +1,11 @@
 import * as assert from 'assert'
 // TODO
-// eslint-disable-next-line import/no-extraneous-dependencies
+
 import { ripemd160 } from '@noble/hashes/ripemd160'
 // TODO
-// eslint-disable-next-line import/no-extraneous-dependencies
+
 import { sha256 } from '@noble/hashes/sha256'
-import { hexToBytes as nobleHexToBytes} from "@noble/curves/abstract/utils";
+import { hexToBytes as nobleHexToBytes } from '@noble/curves/abstract/utils'
 
 function bytesToHex(a: Iterable<number> | ArrayLike<number>): string {
   return Array.from(a, (byteValue) => {
