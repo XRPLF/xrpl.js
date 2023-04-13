@@ -1,6 +1,11 @@
 import * as assert from 'assert'
-import * as hashjs from 'hash.js'
-import BN = require('bn.js')
+// TODO
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { ripemd160 } from '@noble/hashes/ripemd160'
+// TODO
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { sha256 } from '@noble/hashes/sha256'
+import { hexToBytes as nobleHexToBytes} from "@noble/curves/abstract/utils";
 
 function bytesToHex(a: Iterable<number> | ArrayLike<number>): string {
   return Array.from(a, (byteValue) => {
@@ -9,18 +14,14 @@ function bytesToHex(a: Iterable<number> | ArrayLike<number>): string {
   }).join('')
 }
 
-function hexToBytes(a): number[] {
+function hexToBytes(a: string): number[] {
   assert.ok(a.length % 2 === 0)
-  // Special-case length zero to return [].
-  // BN.toArray intentionally returns [0] rather than [] for length zero,
-  // which may make sense for BigNum data, but not for byte strings.
-  return a.length === 0 ? [] : new BN(a, 16).toArray(null, a.length / 2)
+  return Array.from(nobleHexToBytes(a))
 }
 
 function computePublicKeyHash(publicKeyBytes: Buffer): Buffer {
-  const hash256 = hashjs.sha256().update(publicKeyBytes).digest()
-
-  const hash160 = hashjs.ripemd160().update(hash256).digest()
+  const hash256 = sha256(publicKeyBytes)
+  const hash160 = ripemd160(hash256)
   return Buffer.from(hash160)
 }
 
