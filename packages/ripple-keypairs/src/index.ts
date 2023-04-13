@@ -4,11 +4,11 @@ import Sha512 from './Sha512'
 import * as nobleSecp256k1 from '@noble/curves/secp256k1'
 import * as nobleEd25519 from '@noble/curves/ed25519'
 import * as nobleUtils from '@noble/curves/abstract/utils'
-import * as nobleHashesUtils from '@noble/hashes/utils'
 
 import * as addressCodec from 'ripple-address-codec'
 import { accountPublicFromPublicGenerator, derivePrivateKey } from './secp256k1'
 import * as utils from './utils'
+import randomBytes from './random'
 
 const { hexToBytes } = utils
 const { bytesToHex } = utils
@@ -25,7 +25,7 @@ function generateSeed(
   )
   const entropy = options.entropy
     ? options.entropy.slice(0, 16)
-    : nobleHashesUtils.randomBytes(16)
+    : randomBytes(16)
   const type = options.algorithm === 'ed25519' ? 'ed25519' : 'secp256k1'
   return addressCodec.encodeSeed(Buffer.from(entropy), type)
 }

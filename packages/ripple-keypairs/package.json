@@ -19,6 +19,7 @@
   "dependencies": {
     "@noble/curves": "^1.0.0",
     "@noble/hashes": "^1.0.0",
+    "brorand": "^1.1.0",
     "ripple-address-codec": "^4.2.5"
   },
   "repository": {
@@ -29,5 +30,8 @@
   "prettier": "@xrplf/prettier-config",
   "engines": {
     "node": ">= 10"
+  },
+  "devDependencies": {
+    "@types/brorand": "^1.0.30"
   }
 }
