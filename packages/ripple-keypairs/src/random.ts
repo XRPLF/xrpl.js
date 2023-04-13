@@ -1,5 +1,5 @@
-import Rand from 'brorand'
+import rand from 'brorand'
 
 export default function randomBytes(n: number) {
-    return Rand(n)
+  return rand(n)
 }
