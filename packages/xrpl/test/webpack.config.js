@@ -19,7 +19,8 @@ function webpackForTest(testFileName) {
   }
 
   const test = {
-    mode: 'production',
+    mode: 'development',
+    devtool: 'source-map',
     cache: true,
     performance: {
       hints: false,
