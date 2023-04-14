@@ -1,6 +1,6 @@
-import { createHash } from 'crypto'
+import { sha512 } from '@noble/hashes/sha512'
 
-const HASH_SIZE = 64
+const HASH_BYTES = 32
 
 /**
  * Compute a sha512Half Hash of a hex string.
@@ -9,11 +9,10 @@ const HASH_SIZE = 64
  * @returns Hash of hex.
  */
 function sha512Half(hex: string): string {
-  return createHash('sha512')
-    .update(Buffer.from(hex, 'hex'))
-    .digest('hex')
+  return Buffer.from(sha512(hex))
+    .slice(0, HASH_BYTES)
+    .toString('hex')
     .toUpperCase()
-    .slice(0, HASH_SIZE)
 }
 
 export default sha512Half
