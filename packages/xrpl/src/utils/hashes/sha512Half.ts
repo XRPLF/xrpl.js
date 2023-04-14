@@ -9,7 +9,7 @@ const HASH_BYTES = 32
  * @returns Hash of hex.
  */
 function sha512Half(hex: string): string {
-  return Buffer.from(sha512(hex))
+  return Buffer.from(sha512(Buffer.from(hex, 'hex')))
     .slice(0, HASH_BYTES)
     .toString('hex')
     .toUpperCase()
