@@ -5,6 +5,7 @@ import { Hash } from '@noble/hashes/utils'
 import { bytesToNumberBE } from '@noble/curves/abstract/utils'
 
 export default class Sha512 {
+  bump = 2
   hash: Hash<SHA512>
 
   constructor() {
