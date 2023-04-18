@@ -4,6 +4,7 @@ import { sha512 } from '@noble/hashes/sha512'
 import { bytesToNumberBE } from '@noble/curves/abstract/utils'
 
 export default class Sha512 {
+  // bump:5
   hash = sha512.create()
 
   add(bytes: Uint8Array | number[]): this {
