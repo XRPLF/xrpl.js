@@ -128,6 +128,11 @@ class Wallet {
    * @returns A new Wallet derived from a generated seed.
    */
   public static generate(algorithm: ECDSA = DEFAULT_ALGORITHM): Wallet {
+    if (algorithm !== DEFAULT_ALGORITHM || algorithm !== "ed25519" || algorithm !== "secp256k1") {
+      throw new ValidationError(
+        'Invalid cryptographic signing algorithm',
+      )
+    }
     const seed = generateSeed({ algorithm })
     return Wallet.fromSeed(seed)
   }
