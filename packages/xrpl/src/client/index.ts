@@ -90,6 +90,13 @@ import {
   NFTBuyOffersResponse,
   NFTSellOffersRequest,
   NFTSellOffersResponse,
+  // clio only methods
+  NFTInfoRequest,
+  NFTInfoResponse,
+  NFTHistoryRequest,
+  NFTHistoryResponse,
+  NFTsByIssuerRequest,
+  NFTsByIssuerResponse,
 } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 import {
@@ -316,6 +323,9 @@ class Client extends EventEmitter {
   public async request(r: ManifestRequest): Promise<ManifestResponse>
   public async request(r: NFTBuyOffersRequest): Promise<NFTBuyOffersResponse>
   public async request(r: NFTSellOffersRequest): Promise<NFTSellOffersResponse>
+  public async request(r: NFTInfoRequest): Promise<NFTInfoResponse>
+  public async request(r: NFTHistoryRequest): Promise<NFTHistoryResponse>
+  public async request(r: NFTsByIssuerRequest): Promise<NFTsByIssuerResponse>
   public async request(r: NoRippleCheckRequest): Promise<NoRippleCheckResponse>
   public async request(r: PathFindRequest): Promise<PathFindResponse>
   public async request(r: PingRequest): Promise<PingResponse>
