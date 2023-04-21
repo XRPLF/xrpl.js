@@ -46,7 +46,7 @@ export interface NFTsByIssuerResponse extends BaseResponse {
      */
     issuer: string
     /**
-     * A list of sell offers for the specified NFToken.
+     * A list of NFTokens
      */
     nfts: NFToken[]
     /**

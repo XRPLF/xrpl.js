@@ -29,10 +29,5 @@ export interface NFTInfoRequest extends BaseRequest {
  * @category Responses
  */
 export interface NFTInfoResponse extends BaseResponse {
-  result: {
-    /**
-     * The information of the NFToken.
-     */
-    NFToken
-  }
+  result: NFToken
 }
