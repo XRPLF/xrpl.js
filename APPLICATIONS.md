@@ -74,6 +74,10 @@ Warning: Use at your own risk.
 
 ## Wallets and wallet tools
 
+- **[GemWallet](https://gemwallet.app/)**
+
+  Users can use the GemWallet (non-custodial) web extension to interact with the XRPL from their browser. The documentation is available at [https://gemwallet.app/](https://gemwallet.app/docs/user-guide/introduction).
+
 - **[XUMM](https://xumm.app/)**
 
   Users can use the xumm application to track their accounts, balances and transactions. The true power of xumm is the platform available for developers.
@@ -109,7 +113,7 @@ Warning: Use at your own risk.
 - **[XRP Account Mnemonic Recovery](https://github.com/WietseWind/xrp-mnemonic-recovery)** (uses `ripple-keypairs`)
 
   Recover a 24 word mnemonic if one word is wrong or one word is missing.
-  
+
 - **[Trustline](https://trustline.co)**
 
   A decentralized stablecoin wallet that runs on the XRP Ledger.
