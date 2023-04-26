@@ -45,7 +45,7 @@
     "karma-webpack": "^5.0.0",
     "node-polyfill-webpack-plugin": "^2.0.1",
     "react": "^18.2.0",
-    "typedoc": "^0.23.24"
+    "typedoc": "^0.24.6"
   },
   "resolutions": {
     "elliptic": "^6.5.4"
