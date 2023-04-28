@@ -15,6 +15,7 @@ import {
 import { BaseRequest, BaseResponse } from './baseMethod'
 
 type AccountObjectType =
+  | 'bridge'
   | 'check'
   | 'deposit_preauth'
   | 'escrow'
