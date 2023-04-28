@@ -28,7 +28,6 @@ import { ValidationError, XrplError } from '../errors'
 import { IssuedCurrencyAmount } from '../models/common'
 import { Transaction, validate } from '../models/transactions'
 import { isIssuedCurrency } from '../models/transactions/common'
-import { isHex } from '../models/utils'
 import { ensureClassicAddress } from '../sugar/utils'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
 
@@ -367,7 +366,7 @@ class Wallet {
     }
 
     const serialized = encode(txToSignAndEncode)
-    this.checkTxSerialization(tx)
+    this.validateTx(tx)
     return {
       tx_blob: serialized,
       hash: hashSignedTx(serialized),
@@ -410,31 +409,7 @@ class Wallet {
    * @throws XrplError if the transaction includes an issued currency which is equivalent to XRP ignoring case.
    */
   // eslint-disable-next-line class-methods-use-this -- Helper for organization purposes
-  private checkTxSerialization(tx: Transaction): void {
-    /*
-     * - Memos have exclusively hex data which should ignore case.
-     *   Since decode goes to upper case, we set all tx memos to be uppercase for the comparison.
-     */
-    tx.Memos?.forEach((memo) => {
-      if (memo.Memo.MemoData) {
-        if (!isHex(memo.Memo.MemoData)) {
-          throw new ValidationError('MemoData field must be a hex value')
-        }
-      }
-
-      if (memo.Memo.MemoType) {
-        if (!isHex(memo.Memo.MemoType)) {
-          throw new ValidationError('MemoType field must be a hex value')
-        }
-      }
-
-      if (memo.Memo.MemoFormat) {
-        if (!isHex(memo.Memo.MemoFormat)) {
-          throw new ValidationError('MemoFormat field must be a hex value')
-        }
-      }
-    })
-
+  private validateTx(tx: Transaction): void {
     /* eslint-disable @typescript-eslint/consistent-type-assertions -- We check at runtime that this is safe */
     Object.keys(tx).forEach((key) => {
       const standard_currency_code_len = 3

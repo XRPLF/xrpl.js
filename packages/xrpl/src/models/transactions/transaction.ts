@@ -2,6 +2,8 @@
 /* eslint-disable max-lines-per-function -- need to work with a lot of Tx verifications */
 
 import { ValidationError } from '../../errors'
+import { Memo } from '../common'
+import { isHex } from '../utils'
 import { setTransactionFlagsToNumber } from '../utils/flags'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'
@@ -101,6 +103,37 @@ export function validate(transaction: Record<string, unknown>): void {
   if (typeof tx.TransactionType !== 'string') {
     throw new ValidationError("Object's `TransactionType` is not a string")
   }
+
+  /*
+   * - Memos have exclusively hex data.
+   */
+  if (tx.Memos != null && typeof tx.Memos !== 'object') {
+    throw new ValidationError('Memo must be array')
+  }
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed here
+  ;(tx.Memos as Array<Memo | null>).forEach((memo) => {
+    if (memo?.Memo == null) {
+      throw new ValidationError('Memo data must be in a `Memo` field')
+    }
+    if (memo.Memo.MemoData) {
+      if (!isHex(memo.Memo.MemoData)) {
+        throw new ValidationError('MemoData field must be a hex value')
+      }
+    }
+
+    if (memo.Memo.MemoType) {
+      if (!isHex(memo.Memo.MemoType)) {
+        throw new ValidationError('MemoType field must be a hex value')
+      }
+    }
+
+    if (memo.Memo.MemoFormat) {
+      if (!isHex(memo.Memo.MemoFormat)) {
+        throw new ValidationError('MemoFormat field must be a hex value')
+      }
+    }
+  })
+
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- okay here
   setTransactionFlagsToNumber(tx as unknown as Transaction)
   switch (tx.TransactionType) {
