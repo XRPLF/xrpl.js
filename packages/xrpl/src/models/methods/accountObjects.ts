@@ -25,8 +25,8 @@ type AccountObjectType =
   | 'signer_list'
   | 'state'
   | 'ticket'
-  | 'xchain_create_account_claim_id'
-  | 'xchain_claim_id'
+  | 'xchain_owned_create_account_claim_id'
+  | 'xchain_owned_claim_id'
 
 /**
  * The account_objects command returns the raw ledger format for all objects
