@@ -1,6 +1,11 @@
 import { assert } from 'chai'
 
-import { XChainCreateBridge, XChainCommit, XChainBridge } from '../../../src'
+import {
+  XChainCreateBridge,
+  XChainAccountCreateCommit,
+  XChainBridge,
+  Wallet,
+} from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -12,7 +17,7 @@ import { generateFundedWallet, testTransaction } from '../utils'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('XChainCommit', function () {
+describe('XChainAccountCreateCommit', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {
@@ -60,15 +65,17 @@ describe('XChainCommit', function () {
         accountInfoResponse.result.account_data.Balance,
       )
 
-      // actually test XChainCommit
+      // actually test XChainAccountCreateCommit
       const wallet2 = await generateFundedWallet(testContext.client)
+      const destination = Wallet.generate()
       const amount = 10000000
-      const tx: XChainCommit = {
-        TransactionType: 'XChainCommit',
+      const tx: XChainAccountCreateCommit = {
+        TransactionType: 'XChainAccountCreateCommit',
         Account: wallet2.classicAddress,
         XChainBridge: bridge,
-        XChainClaimID: '0000000000000001',
         Amount: amount.toString(),
+        SignatureReward: signatureReward,
+        Destination: destination.classicAddress,
       }
 
       await testTransaction(testContext.client, tx, wallet2)
@@ -81,7 +88,7 @@ describe('XChainCommit', function () {
         accountInfoResponse2.result.account_data.Balance,
       )
       assert.equal(
-        initialBalance + amount,
+        initialBalance + amount + Number(signatureReward),
         finalBalance,
         "The bridge door's balance should go up by the amount committed",
       )
