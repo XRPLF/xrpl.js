@@ -1,4 +1,3 @@
-/* eslint-disable max-lines -- There are lots of equivalent constructors which make sense to have here. */
 import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
@@ -24,10 +23,8 @@ import {
 } from 'ripple-keypairs'
 
 import ECDSA from '../ECDSA'
-import { ValidationError, XrplError } from '../errors'
-import { IssuedCurrencyAmount } from '../models/common'
+import { ValidationError } from '../errors'
 import { Transaction, validate } from '../models/transactions'
-import { isIssuedCurrency } from '../models/transactions/common'
 import { ensureClassicAddress } from '../sugar/utils'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
 
@@ -366,7 +363,6 @@ class Wallet {
     }
 
     const serialized = encode(txToSignAndEncode)
-    this.validateTx(tx)
     return {
       tx_blob: serialized,
       hash: hashSignedTx(serialized),
@@ -398,35 +394,6 @@ class Wallet {
    */
   public getXAddress(tag: number | false = false, isTestnet = false): string {
     return classicAddressToXAddress(this.classicAddress, tag, isTestnet)
-  }
-
-  /**
-   *  Verify validity of transaction for JS users. This gives the user a sanity check
-   *
-   * @param tx - The transaction prior to signing.
-   * @throws A ValidationError if the transaction does not have a TxnSignature/Signers property, or if
-   * the serialized Transaction doesn't match the original transaction.
-   * @throws XrplError if the transaction includes an issued currency which is equivalent to XRP ignoring case.
-   */
-  // eslint-disable-next-line class-methods-use-this -- Helper for organization purposes
-  private validateTx(tx: Transaction): void {
-    /* eslint-disable @typescript-eslint/consistent-type-assertions -- We check at runtime that this is safe */
-    Object.keys(tx).forEach((key) => {
-      const standard_currency_code_len = 3
-      if (tx[key] && isIssuedCurrency(tx[key])) {
-        const txCurrency = (tx[key] as IssuedCurrencyAmount).currency
-
-        if (
-          txCurrency.length === standard_currency_code_len &&
-          txCurrency.toUpperCase() === 'XRP'
-        ) {
-          throw new XrplError(
-            `Trying to sign an issued currency with a similar standard code to XRP (received '${txCurrency}'). XRP is not an issued currency.`,
-          )
-        }
-      }
-    })
-    /* eslint-enable @typescript-eslint/consistent-type-assertions -- Done with dynamic checking */
   }
 }
 
