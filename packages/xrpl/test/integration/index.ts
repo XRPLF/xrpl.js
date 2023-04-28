@@ -19,6 +19,7 @@ export * from './transactions/paymentChannelCreate.test'
 export * from './transactions/paymentChannelFund.test'
 export * from './transactions/signerListSet.test'
 export * from './transactions/trustSet.test'
+export * from './transactions/xchainCreateBridge.test'
 
 // Requests
 export * from './requests/accountChannels.test'
