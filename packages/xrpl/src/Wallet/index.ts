@@ -1,8 +1,6 @@
-/* eslint-disable max-lines -- There are lots of equivalent constructors which make sense to have here. */
 import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
-import isEqual from 'lodash/isEqual'
 import omitBy from 'lodash/omitBy'
 import {
   classicAddressToXAddress,
@@ -25,11 +23,8 @@ import {
 } from 'ripple-keypairs'
 
 import ECDSA from '../ECDSA'
-import { ValidationError, XrplError } from '../errors'
-import { IssuedCurrencyAmount } from '../models/common'
+import { ValidationError } from '../errors'
 import { Transaction, validate } from '../models/transactions'
-import { isIssuedCurrency } from '../models/transactions/common'
-import { isHex } from '../models/utils'
 import { ensureClassicAddress } from '../sugar/utils'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
 
@@ -367,6 +362,7 @@ class Wallet {
       )
     }
 
+    const serialized = encode(txToSignAndEncode)
     return {
       tx_blob: serialized,
       hash: hashSignedTx(serialized),
@@ -399,6 +395,7 @@ class Wallet {
   public getXAddress(tag: number | false = false, isTestnet = false): string {
     return classicAddressToXAddress(this.classicAddress, tag, isTestnet)
   }
+}
 
 /**
  * Signs a transaction with the proper signing encoding.
@@ -445,21 +442,5 @@ function removeTrailingZeros(tx: Transaction): void {
     tx.Amount.value = new BigNumber(tx.Amount.value).toString()
   }
 }
-
-/**
- * Convert an ISO code to a hex string representation
- *
- * @param iso - A 3 letter standard currency code
- */
-/* eslint-disable @typescript-eslint/no-magic-numbers -- Magic numbers are from rippleds of currency code encoding */
-function isoToHex(iso: string): string {
-  const bytes = Buffer.alloc(20)
-  if (iso !== 'XRP') {
-    const isoBytes = iso.split('').map((chr) => chr.charCodeAt(0))
-    bytes.set(isoBytes, 12)
-  }
-  return bytes.toString('hex').toUpperCase()
-}
-/* eslint-enable @typescript-eslint/no-magic-numbers -- Only needed in this function */
 
 export default Wallet
