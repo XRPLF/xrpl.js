@@ -23,6 +23,7 @@ export * from './transactions/xchainAccountCreateCommit.test'
 export * from './transactions/xchainCreateBridge.test'
 export * from './transactions/xchainCreateClaimID.test'
 export * from './transactions/xchainCommit.test'
+export * from './transactions/xchainModifyBridge.test'
 
 // Requests
 export * from './requests/accountChannels.test'
