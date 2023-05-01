@@ -1,4 +1,5 @@
-/* eslint-disable complexity -- verifies 19 tx types hence a lot of checks needed */
+/* eslint-disable max-lines -- need to work with a lot of transactions in a switch statement */
+/* eslint-disable complexity -- verifies many tx types hence a lot of checks needed */
 /* eslint-disable max-lines-per-function -- need to work with a lot of Tx verifications */
 
 import { ValidationError } from '../../errors'
