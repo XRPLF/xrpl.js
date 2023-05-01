@@ -335,7 +335,7 @@ describe('XChainAddAccountCreateAttestation', function () {
   })
 
   it(`throws w/ invalid XChainAccountCreateCount`, function () {
-    tx.XChainAccountCreateCount = 123
+    tx.XChainAccountCreateCount = true
 
     assert.throws(
       () => validateXChainAddAccountCreateAttestation(tx),

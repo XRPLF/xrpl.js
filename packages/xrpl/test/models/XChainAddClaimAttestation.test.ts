@@ -319,7 +319,7 @@ describe('XChainAddClaimAttestation', function () {
   })
 
   it(`throws w/ invalid XChainClaimID`, function () {
-    tx.XChainClaimID = 123
+    tx.XChainClaimID = ['123']
 
     assert.throws(
       () => validateXChainAddClaimAttestation(tx),
