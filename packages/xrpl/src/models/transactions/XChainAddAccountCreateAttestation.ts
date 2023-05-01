@@ -68,7 +68,7 @@ export interface XChainAddAccountCreateAttestation extends BaseTransaction {
   /**
    * The counter that represents the order that the claims must be processed in.
    */
-  XChainAccountCreateCount: string
+  XChainAccountCreateCount: number | string
 
   /**
    * The bridge associated with the attestation.
@@ -202,7 +202,10 @@ export function validateXChainAddAccountCreateAttestation(
     )
   }
 
-  if (typeof tx.XChainAccountCreateCount !== 'string') {
+  if (
+    typeof tx.XChainAccountCreateCount !== 'string' &&
+    typeof tx.XChainAccountCreateCount !== 'number'
+  ) {
     throw new ValidationError(
       'XChainAddAccountCreateAttestation: invalid field XChainAccountCreateCount',
     )

@@ -68,7 +68,7 @@ export interface XChainAddClaimAttestation extends BaseTransaction {
    * The XChainClaimID associated with the transfer, which was included in the
    * {@link XChainCommit} transaction.
    */
-  XChainClaimID: string
+  XChainClaimID: number | string
 }
 
 /**
@@ -187,7 +187,10 @@ export function validateXChainAddClaimAttestation(
     )
   }
 
-  if (typeof tx.XChainClaimID !== 'string') {
+  if (
+    typeof tx.XChainClaimID !== 'string' &&
+    typeof tx.XChainClaimID !== 'number'
+  ) {
     throw new ValidationError(
       'XChainAddClaimAttestation: invalid field XChainClaimID',
     )
