@@ -15,7 +15,7 @@ import { Payment, Transaction } from '../../src/models/transactions'
 import { hashSignedTx } from '../../src/utils/hashes'
 
 export const GENESIS_ACCOUNT = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
-const MASTER_SECRET = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
+const GENESIS_SECRET = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
 
 export async function sendLedgerAccept(client: Client): Promise<unknown> {
   return client.connection.request({ command: 'ledger_accept' })
@@ -146,7 +146,7 @@ export async function fundAccount(
     // 2 times the amount needed for a new account (20 XRP)
     Amount: '400000000',
   }
-  const wal = Wallet.fromSeed(MASTER_SECRET)
+  const wal = Wallet.fromSeed(GENESIS_SECRET)
   const response = await submitTransaction({
     client,
     wallet: wal,
