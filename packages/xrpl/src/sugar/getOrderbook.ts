@@ -44,8 +44,8 @@ const getOrderbookOptionsSet = new Set([
  * @param options.ledger_hash - Retrieve the orderbook at the ledger with a
  * given ledger_hash.
  * @param options.taker - Filter orders by taker.
- * @param options.limit - Limit number of order books to fetch for each side of
- * the order book. Defaults to 20.
+ * @param options.limit - The limit passed into each book_offers request.
+ * Can return more than this due to two calls being made. Defaults to 20.
  * @returns An object containing buy and sell objects.
  */
 // eslint-disable-next-line max-params, complexity -- Once bound to Client, getOrderbook only has 3 parameters.
