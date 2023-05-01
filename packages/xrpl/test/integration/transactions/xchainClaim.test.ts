@@ -8,6 +8,7 @@ import {
   Wallet,
   XChainAddClaimAttestation,
   XChainBridge,
+  XChainClaim,
   XChainCreateBridge,
   XChainCreateClaimID,
   xrpToDrops,
@@ -129,7 +130,6 @@ describe('XChainCreateBridge', function () {
         AttestationRewardAccount: witnessWallet.classicAddress,
         WasLockingChainSend: 0,
         XChainClaimID: 1,
-        Destination: destination.classicAddress,
       }
       const encodedAttestation = encode(attestationToSign)
       const attestationSignature = sign(
@@ -137,7 +137,7 @@ describe('XChainCreateBridge', function () {
         witnessWallet.privateKey,
       )
 
-      const tx: XChainAddClaimAttestation = {
+      const claimTx: XChainAddClaimAttestation = {
         TransactionType: 'XChainAddClaimAttestation',
         Account: testContext.wallet.classicAddress,
         XChainBridge: xchainBridge,
@@ -145,25 +145,47 @@ describe('XChainCreateBridge', function () {
         Amount: amount,
         WasLockingChainSend: 0,
         XChainClaimID: 1,
-        Destination: destination.classicAddress,
         PublicKey: witnessWallet.publicKey,
         Signature: attestationSignature,
         AttestationRewardAccount: witnessWallet.classicAddress,
         AttestationSignerAccount: witnessWallet.classicAddress,
       }
-      await testTransaction(testContext.client, tx, testContext.wallet)
+      await testTransaction(testContext.client, claimTx, testContext.wallet)
 
       const accountInfoResponse2 = await testContext.client.request({
         command: 'account_info',
         account: destination.classicAddress,
       })
-      const finalBalance = Number(
+      const intermediateBalance = Number(
         accountInfoResponse2.result.account_data.Balance,
       )
       assert.equal(
-        initialBalance + Number(amount),
+        initialBalance,
+        intermediateBalance,
+        "The destination's balance should not change yet",
+      )
+
+      const tx: XChainClaim = {
+        TransactionType: 'XChainClaim',
+        Account: destination.classicAddress,
+        XChainBridge: xchainBridge,
+        Destination: destination.classicAddress,
+        XChainClaimID: 1,
+        Amount: amount,
+      }
+      await testTransaction(testContext.client, tx, destination)
+
+      const accountInfoResponse3 = await testContext.client.request({
+        command: 'account_info',
+        account: destination.classicAddress,
+      })
+      const finalBalance = Number(
+        accountInfoResponse3.result.account_data.Balance,
+      )
+      assert.equal(
         finalBalance,
-        'The destination balance should go up by the amount transferred',
+        initialBalance + Number(amount) - 12,
+        "The destination's balance should not change yet",
       )
     },
     TIMEOUT,
