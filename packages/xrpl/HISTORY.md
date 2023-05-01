@@ -10,6 +10,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Fixed `ServerState.transitions` typing, it is now a string instead of a number. (Only used in return from `server_state` request)
 * Added `destination_amount` to `PathOption` which is returned as part of a `path_find` request
 * Removed the `decode(encode(tx)) == tx` check from the wallet signing process
+* Fixed the location of `signer_lists` in the `account_info` response so that it matches rippled
 
 ### Removed
 * RPCs and utils related to the old sidechain design
