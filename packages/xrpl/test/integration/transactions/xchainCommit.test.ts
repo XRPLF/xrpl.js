@@ -7,7 +7,11 @@ import {
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import { generateFundedWallet, testTransaction } from '../utils'
+import {
+  generateFundedWallet,
+  GENESIS_ACCOUNT,
+  testTransaction,
+} from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -26,7 +30,7 @@ describe('XChainCommit', function () {
       const bridge: XChainBridge = {
         LockingChainDoor: testContext.wallet.classicAddress,
         LockingChainIssue: { currency: 'XRP' },
-        IssuingChainDoor: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        IssuingChainDoor: GENESIS_ACCOUNT,
         IssuingChainIssue: { currency: 'XRP' },
       }
       const signatureReward = '200'
@@ -67,7 +71,7 @@ describe('XChainCommit', function () {
         TransactionType: 'XChainCommit',
         Account: wallet2.classicAddress,
         XChainBridge: bridge,
-        XChainClaimID: '0000000000000001',
+        XChainClaimID: 1,
         Amount: amount.toString(),
       }
 
