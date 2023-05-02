@@ -35,7 +35,7 @@ interface ClassicAccountAndTag {
  *     TransactionType: 'Payment',
  *     Account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
  *     Destination: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
- *     Amount: '10'
+ *     Amount: '10000000' // 10 XRP in drops (1/1,000,000th of an XRP)
  *   }
  *
  *   try {
