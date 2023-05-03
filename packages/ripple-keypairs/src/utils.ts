@@ -1,11 +1,9 @@
 import * as assert from 'assert'
 // TODO
-
 import { ripemd160 } from '@noble/hashes/ripemd160'
 // TODO
-
 import { sha256 } from '@noble/hashes/sha256'
-import { hexToBytes as nobleHexToBytes } from '@noble/curves/abstract/utils'
+import { hexToBytes } from '@noble/curves/abstract/utils'
 
 function bytesToHex(a: Iterable<number> | ArrayLike<number>): string {
   return Array.from(a, (byteValue) => {
@@ -14,15 +12,13 @@ function bytesToHex(a: Iterable<number> | ArrayLike<number>): string {
   }).join('')
 }
 
-function hexToBytes(a: string): number[] {
+function hexToNumberArray(a: string): number[] {
   assert.ok(a.length % 2 === 0)
-  return Array.from(nobleHexToBytes(a))
+  return Array.from(hexToBytes(a))
 }
 
-function computePublicKeyHash(publicKeyBytes: Buffer): Buffer {
-  const hash256 = sha256(publicKeyBytes)
-  const hash160 = ripemd160(hash256)
-  return Buffer.from(hash160)
+function computePublicKeyHash(publicKeyBytes: Uint8Array): Uint8Array {
+  return ripemd160(sha256(publicKeyBytes))
 }
 
-export { bytesToHex, hexToBytes, computePublicKeyHash }
+export { bytesToHex, hexToNumberArray, computePublicKeyHash }

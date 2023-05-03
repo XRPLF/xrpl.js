@@ -1,4 +1,4 @@
-type Sequence = number[] | Buffer | Uint8Array
+export type Sequence = number[] | Buffer | Uint8Array
 
 /**
  * Check whether two sequences (e.g. Arrays of numbers) are equal.

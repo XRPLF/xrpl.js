@@ -72,5 +72,5 @@ export function accountPublicFromPublicGenerator(publicGenBytes) {
   const scalar = deriveScalar(publicGenBytes, 0)
   const point = noble.secp256k1.ProjectivePoint.BASE.multiply(scalar)
   const offset = rootPubPoint.add(point)
-  return Buffer.from(offset.toRawBytes(true))
+  return offset.toRawBytes(true)
 }

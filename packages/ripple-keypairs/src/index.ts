@@ -9,8 +9,9 @@ import * as addressCodec from 'ripple-address-codec'
 import { accountPublicFromPublicGenerator, derivePrivateKey } from './secp256k1'
 import * as utils from './utils'
 import randomBytes from './random'
+import { hexToBytes } from '@noble/curves/abstract/utils'
 
-const { hexToBytes } = utils
+const { hexToNumberArray } = utils
 const { bytesToHex } = utils
 
 function generateSeed(
@@ -27,12 +28,17 @@ function generateSeed(
     ? options.entropy.slice(0, 16)
     : randomBytes(16)
   const type = options.algorithm === 'ed25519' ? 'ed25519' : 'secp256k1'
-  return addressCodec.encodeSeed(Buffer.from(entropy), type)
+  return addressCodec.encodeSeed(entropy, type)
 }
 
-function hash(message): Uint8Array {
+export type Bytes = number[] | Uint8Array
+export type HexString = string
+
+function hash(message: Bytes | string): Uint8Array {
   return new Sha512().add(message).first256()
 }
+
+const SECP256K1_PREFIX = '00'
 
 const secp256k1 = {
   deriveKeypair(
@@ -42,21 +48,27 @@ const secp256k1 = {
     privateKey: string
     publicKey: string
   } {
-    const prefix = '00'
-
     const derived = derivePrivateKey(entropy, options)
     const privateKey =
-      prefix + bytesToHex(nobleUtils.numberToBytesBE(derived, 32))
+      SECP256K1_PREFIX + bytesToHex(nobleUtils.numberToBytesBE(derived, 32))
 
     const publicKey = bytesToHex(
-      nobleSecp256k1.secp256k1.getPublicKey(privateKey.slice(2), true),
+      nobleSecp256k1.secp256k1.getPublicKey(derived, true),
     )
     return { privateKey, publicKey }
   },
 
-  sign(message, privateKey: string): string {
-    // TODO: some callers pass in 32 bytes, others 33 bytes (including the 0
-    // prefix )
+  sign(message: Bytes, privateKey: HexString): string {
+    // Some callers pass the privateKey with the prefix, others without.
+    // elliptic.js implementation ignored the prefix, interpreting it as a
+    // leading zero byte. @noble/curves will throw if the key is not exactly
+    // 32 bytes, so we normalize it before passing to the sign method.
+    // TODO: keep back compat like this, or simply always require prefix as
+    // the ed25519 sign method does.
+    assert.ok(
+      (privateKey.length === 66 && privateKey.startsWith(SECP256K1_PREFIX)) ||
+        privateKey.length === 64,
+    )
     const normed = privateKey.length === 66 ? privateKey.slice(2) : privateKey
     return nobleSecp256k1.secp256k1
       .sign(hash(message), normed)
@@ -71,7 +83,7 @@ const secp256k1 = {
 }
 
 const ed25519 = {
-  deriveKeypair(entropy: Uint8Array): {
+  deriveKeypair(entropy: Bytes): {
     privateKey: string
     publicKey: string
   } {
@@ -83,31 +95,34 @@ const ed25519 = {
     return { privateKey, publicKey }
   },
 
-  sign(message, privateKey: string): string {
-    // TODO: callers without 33 bytes (including 0xED prefix) ?
-    // TODO: this could be fixed
-    // caution: Ed25519.sign interprets all strings as hex, stripping
-    // any non-hex characters without warning
-    assert.ok(Array.isArray(message), 'message must be array of octets')
+  sign(message: Bytes, privateKey: HexString): string {
+    assert.ok(
+      Array.isArray(message) || message instanceof Uint8Array,
+      'message must be array of octets',
+    )
     assert.ok(
       privateKey.length === 66,
       'private key must be 33 bytes including prefix',
     )
     return bytesToHex(
-      nobleEd25519.ed25519.sign(Buffer.from(message), privateKey.slice(2)),
+      nobleEd25519.ed25519.sign(new Uint8Array(message), privateKey.slice(2)),
     )
   },
 
-  verify(message, signature, publicKey): boolean {
+  verify(
+    message: Bytes,
+    signature: HexString | Uint8Array,
+    publicKey: string,
+  ): boolean {
     return nobleEd25519.ed25519.verify(
       signature,
-      Buffer.from(message),
+      new Uint8Array(message),
       publicKey.slice(2),
     )
   },
 }
 
-function select(algorithm): any {
+function select(algorithm: 'ecdsa-secp256k1' | 'ed25519') {
   const methods = { 'ecdsa-secp256k1': secp256k1, ed25519 }
   return methods[algorithm]
 }
@@ -123,46 +138,50 @@ function deriveKeypair(
   const algorithm = decoded.type === 'ed25519' ? 'ed25519' : 'ecdsa-secp256k1'
   const method = select(algorithm)
   const keypair = method.deriveKeypair(decoded.bytes, options)
-  const messageToVerify = Array.from(hash('This test message should verify.'))
+  const messageToVerify = hash('This test message should verify.')
   const signature = method.sign(messageToVerify, keypair.privateKey)
   /* istanbul ignore if */
-  if (method.verify(messageToVerify, signature, keypair.publicKey) !== true) {
+  if (!method.verify(messageToVerify, signature, keypair.publicKey)) {
     throw new Error('derived keypair did not generate verifiable signature')
   }
   return keypair
 }
 
-function getAlgorithmFromKey(key): 'ed25519' | 'ecdsa-secp256k1' {
-  const bytes = hexToBytes(key)
+function getAlgorithmFromKey(key: HexString): 'ed25519' | 'ecdsa-secp256k1' {
+  const bytes = hexToNumberArray(key)
   return bytes.length === 33 && bytes[0] === 0xed
     ? 'ed25519'
     : 'ecdsa-secp256k1'
 }
 
-function sign(messageHex, privateKey): string {
+function sign(messageHex: HexString, privateKey: HexString): string {
   const algorithm = getAlgorithmFromKey(privateKey)
   return select(algorithm).sign(hexToBytes(messageHex), privateKey)
 }
 
-function verify(messageHex, signature, publicKey): boolean {
+function verify(
+  messageHex: HexString,
+  signature: HexString,
+  publicKey: HexString,
+): boolean {
   const algorithm = getAlgorithmFromKey(publicKey)
   return select(algorithm).verify(hexToBytes(messageHex), signature, publicKey)
 }
 
-function deriveAddressFromBytes(publicKeyBytes: Buffer): string {
+function deriveAddressFromBytes(publicKeyBytes: Uint8Array): string {
   return addressCodec.encodeAccountID(
     utils.computePublicKeyHash(publicKeyBytes),
   )
 }
 
-function deriveAddress(publicKey): string {
-  return deriveAddressFromBytes(Buffer.from(hexToBytes(publicKey)))
+function deriveAddress(publicKey: string): string {
+  return deriveAddressFromBytes(new Uint8Array(hexToNumberArray(publicKey)))
 }
 
-function deriveNodeAddress(publicKey): string {
+function deriveNodeAddress(publicKey: string): string {
   const generatorBytes = addressCodec.decodeNodePublic(publicKey)
   const accountPublicBytes = accountPublicFromPublicGenerator(generatorBytes)
-  return deriveAddressFromBytes(Buffer.from(accountPublicBytes))
+  return deriveAddressFromBytes(accountPublicBytes)
 }
 
 const { decodeSeed } = addressCodec

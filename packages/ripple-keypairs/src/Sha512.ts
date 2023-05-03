@@ -6,8 +6,9 @@ import { bytesToNumberBE } from '@noble/curves/abstract/utils'
 export default class Sha512 {
   hash = sha512.create()
 
-  add(bytes: Uint8Array | number[]): this {
-    this.hash.update(Buffer.from(bytes))
+  add(bytes: string | number[] | Uint8Array): this {
+    const normed = typeof bytes === 'string' ? bytes : new Uint8Array(bytes)
+    this.hash.update(normed)
     return this
   }
 
