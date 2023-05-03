@@ -1,18 +1,15 @@
 import * as assert from 'assert'
-import Sha512 from './Sha512'
-
-import * as nobleSecp256k1 from '@noble/curves/secp256k1'
-import * as nobleEd25519 from '@noble/curves/ed25519'
-import * as nobleUtils from '@noble/curves/abstract/utils'
 
 import * as addressCodec from 'ripple-address-codec'
-import { accountPublicFromPublicGenerator, derivePrivateKey } from './secp256k1'
-import * as utils from './utils'
-import { hexToBytes } from '@noble/curves/abstract/utils'
+
+import { secp256k1 as nobleSecp256k1 } from '@noble/curves/secp256k1'
+import { ed25519 as nobleEd25519 } from '@noble/curves/ed25519'
+import { hexToBytes, numberToBytesBE } from '@noble/curves/abstract/utils'
 import { randomBytes } from '@noble/hashes/utils'
 
-const { hexToNumberArray } = utils
-const { bytesToHex } = utils
+import { accountPublicFromPublicGenerator, derivePrivateKey } from './secp256k1'
+import { computePublicKeyHash, hexToNumberArray, bytesToHex } from './utils'
+import Sha512 from './Sha512'
 
 export type Bytes = number[] | Uint8Array
 export type HexString = string
@@ -50,11 +47,9 @@ const secp256k1 = {
   } {
     const derived = derivePrivateKey(entropy, options)
     const privateKey =
-      SECP256K1_PREFIX + bytesToHex(nobleUtils.numberToBytesBE(derived, 32))
+      SECP256K1_PREFIX + bytesToHex(numberToBytesBE(derived, 32))
 
-    const publicKey = bytesToHex(
-      nobleSecp256k1.secp256k1.getPublicKey(derived, true),
-    )
+    const publicKey = bytesToHex(nobleSecp256k1.getPublicKey(derived, true))
     return { privateKey, publicKey }
   },
 
@@ -70,15 +65,15 @@ const secp256k1 = {
         privateKey.length === 64,
     )
     const normed = privateKey.length === 66 ? privateKey.slice(2) : privateKey
-    return nobleSecp256k1.secp256k1
+    return nobleSecp256k1
       .sign(hash(message), normed)
       .toDERHex(true)
       .toUpperCase()
   },
 
   verify(message, signature, publicKey): boolean {
-    const decoded = nobleSecp256k1.secp256k1.Signature.fromDER(signature)
-    return nobleSecp256k1.secp256k1.verify(decoded, hash(message), publicKey)
+    const decoded = nobleSecp256k1.Signature.fromDER(signature)
+    return nobleSecp256k1.verify(decoded, hash(message), publicKey)
   },
 }
 
@@ -91,7 +86,7 @@ const ed25519 = {
     const rawPrivateKey = hash(entropy)
     const privateKey = prefix + bytesToHex(rawPrivateKey)
     const publicKey =
-      prefix + bytesToHex(nobleEd25519.ed25519.getPublicKey(rawPrivateKey))
+      prefix + bytesToHex(nobleEd25519.getPublicKey(rawPrivateKey))
     return { privateKey, publicKey }
   },
 
@@ -105,7 +100,7 @@ const ed25519 = {
       'private key must be 33 bytes including prefix',
     )
     return bytesToHex(
-      nobleEd25519.ed25519.sign(new Uint8Array(message), privateKey.slice(2)),
+      nobleEd25519.sign(new Uint8Array(message), privateKey.slice(2)),
     )
   },
 
@@ -114,7 +109,7 @@ const ed25519 = {
     signature: HexString | Uint8Array,
     publicKey: string,
   ): boolean {
-    return nobleEd25519.ed25519.verify(
+    return nobleEd25519.verify(
       signature,
       new Uint8Array(message),
       publicKey.slice(2),
@@ -169,13 +164,11 @@ function verify(
 }
 
 function deriveAddressFromBytes(publicKeyBytes: Uint8Array): string {
-  return addressCodec.encodeAccountID(
-    utils.computePublicKeyHash(publicKeyBytes),
-  )
+  return addressCodec.encodeAccountID(computePublicKeyHash(publicKeyBytes))
 }
 
 function deriveAddress(publicKey: string): string {
-  return deriveAddressFromBytes(new Uint8Array(hexToNumberArray(publicKey)))
+  return deriveAddressFromBytes(hexToBytes(publicKey))
 }
 
 function deriveNodeAddress(publicKey: string): string {
