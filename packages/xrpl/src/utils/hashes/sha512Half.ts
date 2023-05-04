@@ -8,7 +8,8 @@ const sha512Half = (() => {
     const { bytesToHex, hexToBytes } = require('@noble/hashes/utils')
 
     return function sha512Half(hex: string): string {
-      return bytesToHex(sha512(hexToBytes(hex)).slice(0, HASH_BYTES)).toUpperCase()
+      const digestHalf = sha512(hexToBytes(hex)).slice(0, HASH_BYTES)
+      return bytesToHex(digestHalf).toUpperCase()
     }
   } else {
     const crypto = require('crypto')
@@ -16,7 +17,8 @@ const sha512Half = (() => {
     return function sha512Half(hex: string): string {
       const hash = crypto.createHash('sha512')
       hash.update(Buffer.from(hex, 'hex'))
-      return hash.digest().slice(0, HASH_BYTES).toString('hex').toUpperCase()
+      const digestHalf = hash.digest().slice(0, HASH_BYTES)
+      return digestHalf.toString('hex').toUpperCase()
     }
   }
 })()

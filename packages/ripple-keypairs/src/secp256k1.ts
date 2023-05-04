@@ -67,7 +67,6 @@ export function derivePrivateKey(
 }
 
 export function accountPublicFromPublicGenerator(publicGenBytes) {
-  // throw new Error('unimpl')
   const rootPubPoint = secp256k1.ProjectivePoint.fromHex(publicGenBytes)
   const scalar = deriveScalar(publicGenBytes, 0)
   const point = secp256k1.ProjectivePoint.BASE.multiply(scalar)
