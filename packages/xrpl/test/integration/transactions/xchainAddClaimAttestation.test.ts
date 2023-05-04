@@ -21,6 +21,7 @@ import {
 import {
   generateFundedWallet,
   GENESIS_ACCOUNT,
+  getXRPBalance,
   testTransaction,
 } from '../utils'
 
@@ -67,7 +68,7 @@ describe('XChainCreateBridge', function () {
         'Should be exactly one bridge owned by the account',
       )
 
-      const witnessWallet = Wallet.generate()
+      const witnessWallet = await generateFundedWallet(testContext.client)
 
       const signerTx: SignerListSet = {
         TransactionType: 'SignerListSet',
@@ -114,12 +115,9 @@ describe('XChainCreateBridge', function () {
         OtherChainSource: otherChainSource.classicAddress,
       }
       await testTransaction(testContext.client, claimIdTx, destination)
-      const accountInfoResponse = await testContext.client.request({
-        command: 'account_info',
-        account: destination.classicAddress,
-      })
+
       const initialBalance = Number(
-        accountInfoResponse.result.account_data.Balance,
+        await getXRPBalance(testContext.client, destination),
       )
 
       const attestationToSign = {
@@ -139,7 +137,7 @@ describe('XChainCreateBridge', function () {
 
       const tx: XChainAddClaimAttestation = {
         TransactionType: 'XChainAddClaimAttestation',
-        Account: testContext.wallet.classicAddress,
+        Account: witnessWallet.classicAddress,
         XChainBridge: xchainBridge,
         OtherChainSource: otherChainSource.classicAddress,
         Amount: amount,
@@ -151,18 +149,14 @@ describe('XChainCreateBridge', function () {
         AttestationRewardAccount: witnessWallet.classicAddress,
         AttestationSignerAccount: witnessWallet.classicAddress,
       }
-      await testTransaction(testContext.client, tx, testContext.wallet)
+      await testTransaction(testContext.client, tx, witnessWallet)
 
-      const accountInfoResponse2 = await testContext.client.request({
-        command: 'account_info',
-        account: destination.classicAddress,
-      })
       const finalBalance = Number(
-        accountInfoResponse2.result.account_data.Balance,
+        await getXRPBalance(testContext.client, destination),
       )
       assert.equal(
-        initialBalance + Number(amount),
         finalBalance,
+        initialBalance + Number(amount) - Number(signatureReward),
         'The destination balance should go up by the amount transferred',
       )
     },

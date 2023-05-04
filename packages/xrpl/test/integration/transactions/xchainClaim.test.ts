@@ -22,6 +22,7 @@ import {
 import {
   generateFundedWallet,
   GENESIS_ACCOUNT,
+  getXRPBalance,
   testTransaction,
 } from '../utils'
 
@@ -39,7 +40,7 @@ describe('XChainCreateBridge', function () {
   it(
     'base',
     async () => {
-      const signatureReward = '200'
+      const signatureReward = '1000000'
       const xchainBridge: XChainBridge = {
         LockingChainDoor: testContext.wallet.classicAddress,
         LockingChainIssue: { currency: 'XRP' },
@@ -68,7 +69,7 @@ describe('XChainCreateBridge', function () {
         'Should be exactly one bridge owned by the account',
       )
 
-      const witnessWallet = Wallet.generate()
+      const witnessWallet = await generateFundedWallet(testContext.client)
 
       const signerTx: SignerListSet = {
         TransactionType: 'SignerListSet',
@@ -115,12 +116,9 @@ describe('XChainCreateBridge', function () {
         OtherChainSource: otherChainSource.classicAddress,
       }
       await testTransaction(testContext.client, claimIdTx, destination)
-      const accountInfoResponse = await testContext.client.request({
-        command: 'account_info',
-        account: destination.classicAddress,
-      })
+
       const initialBalance = Number(
-        accountInfoResponse.result.account_data.Balance,
+        await getXRPBalance(testContext.client, destination),
       )
 
       const attestationToSign = {
@@ -139,7 +137,7 @@ describe('XChainCreateBridge', function () {
 
       const claimTx: XChainAddClaimAttestation = {
         TransactionType: 'XChainAddClaimAttestation',
-        Account: testContext.wallet.classicAddress,
+        Account: witnessWallet.classicAddress,
         XChainBridge: xchainBridge,
         OtherChainSource: otherChainSource.classicAddress,
         Amount: amount,
@@ -150,14 +148,10 @@ describe('XChainCreateBridge', function () {
         AttestationRewardAccount: witnessWallet.classicAddress,
         AttestationSignerAccount: witnessWallet.classicAddress,
       }
-      await testTransaction(testContext.client, claimTx, testContext.wallet)
+      await testTransaction(testContext.client, claimTx, witnessWallet)
 
-      const accountInfoResponse2 = await testContext.client.request({
-        command: 'account_info',
-        account: destination.classicAddress,
-      })
       const intermediateBalance = Number(
-        accountInfoResponse2.result.account_data.Balance,
+        await getXRPBalance(testContext.client, destination),
       )
       assert.equal(
         initialBalance,
@@ -175,16 +169,12 @@ describe('XChainCreateBridge', function () {
       }
       await testTransaction(testContext.client, tx, destination)
 
-      const accountInfoResponse3 = await testContext.client.request({
-        command: 'account_info',
-        account: destination.classicAddress,
-      })
       const finalBalance = Number(
-        accountInfoResponse3.result.account_data.Balance,
+        await getXRPBalance(testContext.client, destination),
       )
       assert.equal(
         finalBalance,
-        initialBalance + Number(amount) - 12,
+        initialBalance + Number(amount) - Number(signatureReward) - 12,
         "The destination's balance should not change yet",
       )
     },

@@ -15,6 +15,7 @@ import {
 import {
   generateFundedWallet,
   GENESIS_ACCOUNT,
+  getXRPBalance,
   testTransaction,
 } from '../utils'
 
@@ -61,12 +62,9 @@ describe('XChainAccountCreateCommit', function () {
         1,
         'Should be exactly one bridge owned by the account',
       )
-      const accountInfoResponse = await testContext.client.request({
-        command: 'account_info',
-        account: testContext.wallet.classicAddress,
-      })
+
       const initialBalance = Number(
-        accountInfoResponse.result.account_data.Balance,
+        await getXRPBalance(testContext.client, testContext.wallet),
       )
 
       // actually test XChainAccountCreateCommit
