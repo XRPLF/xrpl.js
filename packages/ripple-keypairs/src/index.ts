@@ -11,7 +11,7 @@ import { accountPublicFromPublicGenerator, derivePrivateKey } from './secp256k1'
 import { computePublicKeyHash, hexToNumberArray, bytesToHex } from './utils'
 import Sha512 from './Sha512'
 
-export type Bytes = number[] | Uint8Array
+export type ByteArray = number[] | Uint8Array
 export type HexString = string
 
 const SECP256K1_PREFIX = '00'
@@ -55,7 +55,7 @@ const secp256k1 = {
     return { privateKey, publicKey }
   },
 
-  sign(message: Bytes, privateKey: HexString): string {
+  sign(message: ByteArray, privateKey: HexString): string {
     // Some callers pass the privateKey with the prefix, others without.
     // elliptic.js implementation ignored the prefix, interpreting it as a
     // leading zero byte. @noble/curves will throw if the key is not exactly
@@ -80,7 +80,7 @@ const secp256k1 = {
 }
 
 const ed25519 = {
-  deriveKeypair(entropy: Bytes): {
+  deriveKeypair(entropy: ByteArray): {
     privateKey: string
     publicKey: string
   } {
@@ -92,7 +92,7 @@ const ed25519 = {
     return { privateKey, publicKey }
   },
 
-  sign(message: Bytes, privateKey: HexString): string {
+  sign(message: ByteArray, privateKey: HexString): string {
     assert.ok(
       Array.isArray(message) || message instanceof Uint8Array,
       'message must be array of octets',
@@ -107,7 +107,7 @@ const ed25519 = {
   },
 
   verify(
-    message: Bytes,
+    message: ByteArray,
     signature: HexString | Uint8Array,
     publicKey: string,
   ): boolean {
