@@ -4,9 +4,9 @@
 
 import baseCodec = require('base-x')
 import type { BaseConverter } from 'base-x'
-import createHash = require('create-hash')
 
 import { seqEqual, concatArgs, Sequence } from './utils'
+import { sha256 } from './sha256'
 
 class Codec {
   private readonly _sha256: (bytes: Sequence) => Uint8Array
@@ -161,9 +161,7 @@ const NODE_PUBLIC = 0x1c
 const ED25519_SEED = [0x01, 0xe1, 0x4b]
 
 const codecOptions = {
-  sha256(bytes: Sequence): Uint8Array {
-    return createHash('sha256').update(Buffer.from(bytes)).digest()
-  },
+  sha256,
   alphabet: 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz',
 }
 
