@@ -1,7 +1,5 @@
 import * as assert from 'assert'
-// TODO
 import { ripemd160 } from '@noble/hashes/ripemd160'
-// TODO
 import { sha256 } from '@noble/hashes/sha256'
 import { hexToBytes } from '@noble/curves/abstract/utils'
 
