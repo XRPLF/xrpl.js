@@ -1,8 +1,9 @@
 import { HashPrefix } from './hash-prefixes'
-import createHash = require('create-hash')
-import { Hash256 } from './types/hash-256'
+
+import { Hash256 } from './types'
 import { BytesList } from './serdes/binary-serializer'
 import { Buffer } from 'buffer/'
+import { createHash } from './create-hash'
 
 /**
  * Class for hashing with SHA512

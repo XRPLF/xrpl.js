@@ -17,9 +17,6 @@ function getDefaultConfiguration() {
     cache: true,
     performance: { hints: false },
     stats: 'errors-only',
-    // optimization: {
-    //   usedExports: true
-    // },
     entry: './dist/npm/index.js',
     output: {
       library: 'xrpl',
@@ -58,6 +55,7 @@ function getDefaultConfiguration() {
     },
     resolve: {
       alias: {
+        crypto: false,
         ws: './dist/npm/client/WSWrapper.js',
         'https-proxy-agent': false,
       },
@@ -71,7 +69,6 @@ function getDefaultConfiguration() {
         assert: require.resolve('assert/'),
         url: require.resolve('url/'),
         stream: require.resolve('stream-browserify'),
-        // crypto: require.resolve('crypto-browserify'),
         https: require.resolve('https-browserify'),
         http: require.resolve('stream-http'),
       },
