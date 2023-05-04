@@ -1,3 +1,5 @@
+import { assert } from 'chai'
+
 import { TrustSet, percentToQuality, Wallet } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
@@ -12,11 +14,12 @@ const TIMEOUT = 20000
 
 describe('TrustSet', function () {
   let testContext: XrplIntegrationTestContext
-  let wallet2: Wallet
+  let wallet2: Wallet | undefined
 
   beforeEach(async () => {
     testContext = await setupClient(serverUrl)
     if (!wallet2) {
+      // eslint-disable-next-line require-atomic-updates -- race condition doesn't really matter
       wallet2 = await generateFundedWallet(testContext.client)
     }
   })
@@ -25,6 +28,7 @@ describe('TrustSet', function () {
   it(
     'base',
     async () => {
+      assert(wallet2 != null)
       const tx: TrustSet = {
         TransactionType: 'TrustSet',
         Account: testContext.wallet.classicAddress,
@@ -43,6 +47,7 @@ describe('TrustSet', function () {
   it(
     'Quality < 1',
     async () => {
+      assert(wallet2 != null)
       const tx: TrustSet = {
         TransactionType: 'TrustSet',
         Account: testContext.wallet.address,
@@ -63,6 +68,7 @@ describe('TrustSet', function () {
   it(
     'Quality > 1',
     async () => {
+      assert(wallet2 != null)
       const tx: TrustSet = {
         TransactionType: 'TrustSet',
         QualityIn: percentToQuality('101%'),
