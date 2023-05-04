@@ -1,24 +1,19 @@
-/* eslint-disable no-bitwise --
- * lots of bitwise operators necessary for this */
 import { sha512 } from '@noble/hashes/sha512'
 import { bytesToNumberBE } from '@noble/curves/abstract/utils'
+import { Input } from '@noble/hashes/utils'
 
 export default class Sha512 {
   hash = sha512.create()
 
-  add(bytes: string | number[] | Uint8Array): this {
-    const normed = typeof bytes === 'string' ? bytes : new Uint8Array(bytes)
-    this.hash.update(normed)
+  add(bytes: Input): this {
+    this.hash.update(bytes)
     return this
   }
 
   addU32(i: number): this {
-    return this.add([
-      (i >>> 24) & 0xff,
-      (i >>> 16) & 0xff,
-      (i >>> 8) & 0xff,
-      i & 0xff,
-    ])
+    const buffer = new Uint8Array(4)
+    new DataView(buffer.buffer).setUint32(0, i)
+    return this.add(buffer)
   }
 
   finish(): Uint8Array {

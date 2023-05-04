@@ -5,7 +5,7 @@ import * as addressCodec from 'ripple-address-codec'
 import { secp256k1 as nobleSecp256k1 } from '@noble/curves/secp256k1'
 import { ed25519 as nobleEd25519 } from '@noble/curves/ed25519'
 import { hexToBytes, numberToBytesBE } from '@noble/curves/abstract/utils'
-import { randomBytes } from '@noble/hashes/utils'
+import { Input, randomBytes } from '@noble/hashes/utils'
 
 import { accountPublicFromPublicGenerator, derivePrivateKey } from './secp256k1'
 import { computePublicKeyHash, hexToNumberArray, bytesToHex } from './utils'
@@ -16,8 +16,10 @@ export type HexString = string
 
 const SECP256K1_PREFIX = '00'
 
-function hash(message: Bytes | string): Uint8Array {
-  return new Sha512().add(message).first256()
+function hash(message: Input | number[]): Uint8Array {
+  return new Sha512()
+    .add(Array.isArray(message) ? new Uint8Array(message) : message)
+    .first256()
 }
 
 function generateSeed(
