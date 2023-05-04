@@ -95,6 +95,7 @@ describe('EscrowCancel', function () {
       // Make sure we wait long enough before canceling the escrow.
       await cancelAfterTimerPromise
 
+      // rippled uses the close time of the previous ledger
       await sendLedgerAccept(testContext.client)
       await testTransaction(testContext.client, cancelTx, testContext.wallet, {
         count: 20,
