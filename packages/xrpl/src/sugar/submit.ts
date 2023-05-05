@@ -224,7 +224,8 @@ function isSigned(transaction: Transaction | string): boolean {
   const tx = typeof transaction === 'string' ? decode(transaction) : transaction
   return (
     typeof tx !== 'string' &&
-    (tx.SigningPubKey != null || tx.TxnSignature != null)
+    tx.SigningPubKey != null &&
+    tx.TxnSignature != null
   )
 }
 
