@@ -9,6 +9,9 @@
       "path": "../ripple-address-codec/tsconfig.json"
     },
     {
+      "path": "../ripple-iso-crypto/tsconfig.json"
+    },
+    {
       "path": "../ripple-binary-codec/tsconfig.json"
     },
     {

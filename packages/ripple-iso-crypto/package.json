@@ -1,7 +1,7 @@
 {
-  "name": "ripple-keypairs",
-  "version": "1.1.5",
-  "description": "Cryptographic key pairs for the XRP Ledger",
+  "name": "ripple-iso-crypto",
+  "version": "1.0.0",
+  "description": "Isomorphic crypto hashes/utils for Ripple",
   "scripts": {
     "build": "tsc -b",
     "test": "jest --verbose false --silent=false ./test/*.test.ts",
@@ -10,16 +10,20 @@
     "prepublish": "npm run lint && npm test"
   },
   "files": [
-    "dist/*"
+    "dist/*",
+    "sha256/*",
+    "sha512/*",
+    "ripemd160/*",
+    "utils/*"
   ],
-  "main": "dist/",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "@noble/curves": "^1.0.0",
-    "ripple-iso-crypto": "1.0.0",
-    "ripple-address-codec": "^4.2.5"
+    "@noble/hashes": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14.18.35"
   },
   "repository": {
     "type": "git",

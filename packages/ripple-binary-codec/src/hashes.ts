@@ -2,14 +2,14 @@ import { HashPrefix } from './hash-prefixes'
 import { Hash256 } from './types'
 import { BytesList } from './serdes/binary-serializer'
 import { Buffer } from 'buffer/'
-import { createHash } from './create-hash'
+import { sha512 } from 'ripple-iso-crypto/sha512'
 
 /**
  * Class for hashing with SHA512
  * @extends BytesList So SerializedTypes can write bytes to a Sha512Half
  */
 class Sha512Half extends BytesList {
-  private hash = createHash('sha512')
+  private hash = sha512.create()
 
   /**
    * Construct a new Sha512Hash and write bytes this.hash

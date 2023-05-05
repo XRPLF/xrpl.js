@@ -1,5 +1,5 @@
 module.exports = {
-  root: true,
+  root: false,
 
   parser: '@typescript-eslint/parser', // Make ESLint compatible with TypeScript
   parserOptions: {

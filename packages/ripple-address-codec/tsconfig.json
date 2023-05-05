@@ -16,5 +16,12 @@
     "declaration": true,
     "strictNullChecks": true
   },
-  "include": ["src/**/*.ts"]
+  "references": [
+    {
+      "path": "../ripple-iso-crypto/tsconfig.json"
+    }
+  ],
+  "include": [
+    "src/**/*.ts"
+  ]
 }

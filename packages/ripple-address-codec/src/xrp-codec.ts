@@ -4,9 +4,9 @@
 
 import baseCodec = require('base-x')
 import type { BaseConverter } from 'base-x'
+import { sha256 } from 'ripple-iso-crypto/sha256'
 
 import { seqEqual, concatArgs, Sequence } from './utils'
-import { sha256 } from './sha256'
 
 class Codec {
   private readonly _sha256: (bytes: Sequence) => Uint8Array

@@ -97,8 +97,12 @@ function verifySignature(tx: Transaction | string): boolean {
   const decodedTx: Transaction = getDecodedTransaction(tx)
   return verify(
     encodeForSigning(decodedTx),
-    decodedTx.TxnSignature,
-    decodedTx.SigningPubKey,
+    // Need a SignedTransaction class where TxnSignature is not optional
+    // Verify signature used to be untyped
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- See above
+    decodedTx.TxnSignature!,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- See above
+    decodedTx.SigningPubKey!,
   )
 }
 

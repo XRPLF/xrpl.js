@@ -1,11 +1,10 @@
-import { sha512 } from '@noble/hashes/sha512'
+import { sha512 } from 'ripple-iso-crypto/sha512'
 import { bytesToNumberBE } from '@noble/curves/abstract/utils'
-import { Input } from '@noble/hashes/utils'
 
 export default class Sha512 {
   hash = sha512.create()
 
-  add(bytes: Input): this {
+  add(bytes: Uint8Array | number[] | string): this {
     this.hash.update(bytes)
     return this
   }

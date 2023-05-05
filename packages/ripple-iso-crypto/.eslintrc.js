@@ -45,6 +45,8 @@ module.exports = {
     '@typescript-eslint/prefer-nullish-coalescing': 'off',
     '@typescript-eslint/naming-convention': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/consistent-type-assertions': 'off',
+    'import/no-unused-modules': 'off',
     'jsdoc/require-jsdoc': 'off',
     'jsdoc/require-description': 'off',
     'jsdoc/require-returns': 'off',
