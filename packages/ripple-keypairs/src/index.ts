@@ -18,9 +18,7 @@ type Input = string | Uint8Array
 const SECP256K1_PREFIX = '00'
 
 function hash(message: Input | number[]): Uint8Array {
-  return new Sha512()
-    .add(Array.isArray(message) ? new Uint8Array(message) : message)
-    .first256()
+  return new Sha512().add(message).first256()
 }
 
 function generateSeed(

@@ -1,14 +1,14 @@
 import { createHash } from 'crypto'
-import { HashFn, Input } from './index'
+import { Input } from './index'
 import normInput from './normInput'
 
 export default function wrapCryptoCreateHash(
   type: string,
   fn: typeof createHash,
 ) {
-  const hashFn = ((input: Input) => {
-    return new Uint8Array(fn(type).update(normInput(input)).digest().buffer)
-  }) as HashFn
+  function hashFn(input: Input) {
+    return fn(type).update(normInput(input)).digest()
+  }
   hashFn.create = () => {
     const hash = fn(type)
     return {
@@ -17,7 +17,7 @@ export default function wrapCryptoCreateHash(
         return this
       },
       digest(): Uint8Array {
-        return new Uint8Array(hash.digest().buffer)
+        return hash.digest()
       },
     }
   }

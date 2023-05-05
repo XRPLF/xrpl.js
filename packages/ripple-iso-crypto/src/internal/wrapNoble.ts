@@ -3,9 +3,9 @@ import { HashFn, Input } from './index'
 import normInput from './normInput'
 
 export default function wrapNoble(chash: CHash): HashFn {
-  const wrapped = ((input: Input) => {
+  function wrapped(input: Input) {
     return chash(normInput(input))
-  }) as HashFn
+  }
   wrapped.create = () => {
     const hash = chash.create()
     return {
