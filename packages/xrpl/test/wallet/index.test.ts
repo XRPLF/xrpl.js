@@ -59,7 +59,8 @@ describe('Wallet', function () {
     
     it('generates a new wallet using an invalid/unknown algorithm', function () {
       const algorithm = "test"
-      
+
+      //@ts-expect-error
       assert.throws(() => { Wallet.generate(algorithm) }, /Invalid cryptographic signing algorithm/)
     })
     
