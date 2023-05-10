@@ -117,7 +117,15 @@ class Wallet {
   }
 
   /**
-   * Generates a new Wallet using a generated seed.
+   * `generate()` creates a new random Wallet. In order to make this a valid account on ledger, you must
+   * Send XRP to it. On test networks that can be done with "faucets" which send XRP to any account which asks
+   * For it. You can call `client.fundWallet()` in order to generate credentials and fund the account on test networks.
+   *
+   * @example
+   * ```ts
+   * const { Wallet } = require('xrpl')
+   * const wallet = Wallet.generate()
+   * ```
    *
    * @param algorithm - The digital signature algorithm to generate an address for.
    * @returns A new Wallet derived from a generated seed.
@@ -295,6 +303,53 @@ class Wallet {
 
   /**
    * Signs a transaction offline.
+   *
+   * @example
+   *
+   * ```ts
+   * const { Client, Wallet } = require('xrpl')
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   *
+   * async function signTransaction() {
+   *   await client.connect()
+   *   const { balance: balance1, wallet: wallet1 } = client.fundWallet()
+   *   const { balance: balance2, wallet: wallet2 } = client.fundWallet()
+   *
+   *   const transaction = {
+   *     TransactionType: 'Payment',
+   *     Account: wallet1.address,
+   *     Destination: wallet2.address,
+   *     Amount: '10'
+   *   }
+   *
+   *   try {
+   *     await client.autofill(transaction)
+   *     const { tx_blob: signed_tx_blob, hash} = await wallet1.sign(transaction)
+   *     console.log(signed_tx_blob)
+   *   } catch (error) {
+   *     console.error(`Failed to sign transaction: ${error}`)
+   *   }
+   *   const result = await client.submit(signed_tx_blob)
+   *   await client.disconnect()
+   * }
+   *
+   * signTransaction()
+   * ```
+   * In order for a transaction to be validated, it must be signed by the account sending the transaction to prove
+   * That the owner is actually the one deciding to take that action.
+   *
+   * In this example, we created, signed, and then submitted a transaction to testnet. You may notice that the
+   * Output of `sign` includes a `tx_blob` and a `hash`, both of which are needed to submit & verify the results.
+   * Note: If you pass a `Wallet` to `client.submit` or `client.submitAndWait` it will do signing like this under the hood.
+   *
+   * `tx_blob` is a binary representation of a transaction on the XRP Ledger. It's essentially a byte array
+   * that encodes all of the data necessary to execute the transaction, including the source address, the destination
+   * address, the amount, and any additional fields required for the specific transaction type.
+   *
+   * `hash` is a unique identifier that's generated from the signed transaction data on the XRP Ledger. It's essentially
+   * A cryptographic digest of the signed transaction blob, created using a hash function. The signed transaction hash is
+   * Useful for identifying and tracking specific transactions on the XRP Ledger. It can be used to query transaction
+   * Information, verify the authenticity of a transaction, and detect any tampering with the transaction data.
    *
    * @param this - Wallet instance.
    * @param transaction - A transaction to be signed offline.
