@@ -60,7 +60,7 @@
     "watch": "run-s build:lib --watch",
     "clean": "rm -rf dist build coverage",
     "docgen": "tsc --build tsconfig.docs.json && typedoc && echo js.xrpl.org >> ../../docs/CNAME",
-    "prepublish": "run-s clean build",
+    "prepublish": "npx run-s clean build",
     "test": "jest --verbose false --silent=false ./test/**/*.test.ts --testPathIgnorePatterns=./test/integration --testPathIgnorePatterns=./test/fixtures",
     "test:integration": "TS_NODE_PROJECT=tsconfig.build.json jest --verbose false --silent=false --runInBand ./test/integration/**/*.test.ts",
     "test:browser": "npm run build && npm run build:browserTests && karma start ./karma.config.js --single-run",
