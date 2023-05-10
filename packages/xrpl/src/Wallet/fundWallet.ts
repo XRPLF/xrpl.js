@@ -196,6 +196,7 @@ function getHTTPOptions(
     headers: {
       'Content-Type': 'application/json',
       'Content-Length': postBody.length,
+      'User-Agent': 'xrpl.js',
     },
   }
 }
