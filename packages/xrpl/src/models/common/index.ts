@@ -134,5 +134,5 @@ export interface NFToken {
   issuer: string
   nft_taxon: number
   nft_serial: number
-  uri?: string
+  uri: string
 }

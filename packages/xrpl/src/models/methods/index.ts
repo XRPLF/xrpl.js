@@ -37,7 +37,6 @@ import { ManifestRequest, ManifestResponse } from './manifest'
 import { NFTBuyOffersRequest, NFTBuyOffersResponse } from './nftBuyOffers'
 import { NFTHistoryRequest, NFTHistoryResponse } from './nftHistory'
 import { NFTInfoRequest, NFTInfoResponse } from './nftInfo'
-import { NFTsByIssuerRequest, NFTsByIssuerResponse } from './nftsByIssuer'
 import { NFTSellOffersRequest, NFTSellOffersResponse } from './nftSellOffers'
 import { NoRippleCheckRequest, NoRippleCheckResponse } from './norippleCheck'
 import {
@@ -125,7 +124,6 @@ type Request =
   // clio only methods
   | NFTInfoRequest
   | NFTHistoryRequest
-  | NFTsByIssuerRequest
 
 /**
  * @category Responses
@@ -278,6 +276,4 @@ export {
   NFTInfoResponse,
   NFTHistoryRequest,
   NFTHistoryResponse,
-  NFTsByIssuerRequest,
-  NFTsByIssuerResponse,
 }
