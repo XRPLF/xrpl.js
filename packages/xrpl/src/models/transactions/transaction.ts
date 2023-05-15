@@ -2,6 +2,8 @@
 /* eslint-disable max-lines-per-function -- need to work with a lot of Tx verifications */
 
 import { ValidationError } from '../../errors'
+import { IssuedCurrencyAmount, Memo } from '../common'
+import { isHex } from '../utils'
 import { setTransactionFlagsToNumber } from '../utils/flags'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'
@@ -9,6 +11,7 @@ import { AccountSet, validateAccountSet } from './accountSet'
 import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
+import { isIssuedCurrency } from './common'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
@@ -101,6 +104,56 @@ export function validate(transaction: Record<string, unknown>): void {
   if (typeof tx.TransactionType !== 'string') {
     throw new ValidationError("Object's `TransactionType` is not a string")
   }
+
+  /*
+   * - Memos have exclusively hex data.
+   */
+  if (tx.Memos != null && typeof tx.Memos !== 'object') {
+    throw new ValidationError('Memo must be array')
+  }
+  if (tx.Memos != null) {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed here
+    ;(tx.Memos as Array<Memo | null>).forEach((memo) => {
+      if (memo?.Memo == null) {
+        throw new ValidationError('Memo data must be in a `Memo` field')
+      }
+      if (memo.Memo.MemoData) {
+        if (!isHex(memo.Memo.MemoData)) {
+          throw new ValidationError('MemoData field must be a hex value')
+        }
+      }
+
+      if (memo.Memo.MemoType) {
+        if (!isHex(memo.Memo.MemoType)) {
+          throw new ValidationError('MemoType field must be a hex value')
+        }
+      }
+
+      if (memo.Memo.MemoFormat) {
+        if (!isHex(memo.Memo.MemoFormat)) {
+          throw new ValidationError('MemoFormat field must be a hex value')
+        }
+      }
+    })
+  }
+
+  Object.keys(tx).forEach((key) => {
+    const standard_currency_code_len = 3
+    if (tx[key] && isIssuedCurrency(tx[key])) {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed
+      const txCurrency = (tx[key] as IssuedCurrencyAmount).currency
+
+      if (
+        txCurrency.length === standard_currency_code_len &&
+        txCurrency.toUpperCase() === 'XRP'
+      ) {
+        throw new ValidationError(
+          `Cannot have an issued currency with a similar standard code to XRP (received '${txCurrency}'). XRP is not an issued currency.`,
+        )
+      }
+    }
+  })
+
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- okay here
   setTransactionFlagsToNumber(tx as unknown as Transaction)
   switch (tx.TransactionType) {
