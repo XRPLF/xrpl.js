@@ -12,7 +12,7 @@
 
 ### Requirements
 
-We use Node v14 for development - that is the version that our linters require.
+We use Node v16 for development - that is the version that our linters require.
 You must also use `npm` v7. You can check your `npm` version with:
 
 ```bash
