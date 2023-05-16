@@ -57,6 +57,15 @@ describe('Wallet', function () {
       assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
     })
 
+    it('generates a new wallet using an invalid/unknown algorithm', function () {
+      const algorithm = 'test'
+
+      assert.throws(() => {
+        // @ts-expect-error -- We know it is an invalid algorithm
+        Wallet.generate(algorithm)
+      }, /Invalid cryptographic signing algorithm/u)
+    })
+
     it('generates a new wallet using algorithm ecdsa-secp256k1', function () {
       const algorithm = ECDSA.secp256k1
       const wallet = Wallet.generate(algorithm)
@@ -763,7 +772,7 @@ describe('Wallet', function () {
       }
       assert.throws(() => {
         wallet.sign(payment)
-      }, /^Trying to sign an issued currency with a similar standard code to XRP \(received 'xrp'\)\. XRP is not an issued currency\./u)
+      }, /^Cannot have an issued currency with a similar standard code to XRP \(received 'xrp'\)\. XRP is not an issued currency\./u)
     })
 
     it('sign does NOT throw when a payment contains an issued currency like xrp in hex string format', async function () {
@@ -864,6 +873,171 @@ describe('Wallet', function () {
       assert.deepEqual(result, expectedResult)
     })
 
+    it('sign throws when NFTokenMint.URI is empty string', async function () {
+      const tx: NFTokenMint = {
+        TransactionType: 'NFTokenMint',
+        Account: wallet.address,
+        TransferFee: 314,
+        NFTokenTaxon: 0,
+        Flags: 8,
+        Fee: '10',
+        URI: '',
+        Memos: [
+          {
+            Memo: {
+              MemoType:
+                '687474703a2f2f6578616d706c652e636f6d2f6d656d6f2f67656e65726963',
+              MemoData: '72656e74',
+            },
+          },
+        ],
+      }
+
+      assert.throws(() => {
+        wallet.sign(tx)
+      }, /URI must not be empty string/u)
+    })
+
+    it('sign removes undefined NFTokenMint.URI property from transaction blob', async function () {
+      const tx: NFTokenMint = {
+        TransactionType: 'NFTokenMint',
+        Account: wallet.address,
+        TransferFee: 314,
+        NFTokenTaxon: 0,
+        Flags: 8,
+        Fee: '10',
+        URI: undefined,
+        Memos: [
+          {
+            Memo: {
+              MemoType:
+                '687474703a2f2f6578616d706c652e636f6d2f6d656d6f2f67656e65726963',
+              MemoData: '72656e74',
+            },
+          },
+        ],
+      }
+      const result = wallet.sign(tx)
+      const decodedTx = decode(result.tx_blob) as unknown as NFTokenMint
+
+      assert.notExists(decodedTx.URI)
+    })
+
+    it('sign removes nulled NFTokenMint.URI property from transaction blob', async function () {
+      const tx: NFTokenMint = {
+        TransactionType: 'NFTokenMint',
+        Account: wallet.address,
+        TransferFee: 314,
+        NFTokenTaxon: 0,
+        Flags: 8,
+        Fee: '10',
+        URI: null,
+        Memos: [
+          {
+            Memo: {
+              MemoType:
+                '687474703a2f2f6578616d706c652e636f6d2f6d656d6f2f67656e65726963',
+              MemoData: '72656e74',
+            },
+          },
+        ],
+      }
+      const result = wallet.sign(tx)
+      const decodedTx = decode(result.tx_blob) as unknown as NFTokenMint
+
+      assert.notExists(decodedTx.URI)
+    })
+
+    it('sign allows undefined value for NFTokenMint.URI', async function () {
+      // transaction with explicit URI: undefined
+      const tx_1: NFTokenMint = {
+        TransactionType: 'NFTokenMint',
+        Account: wallet.address,
+        TransferFee: 314,
+        NFTokenTaxon: 0,
+        Flags: 8,
+        Fee: '10',
+        URI: undefined,
+        Memos: [
+          {
+            Memo: {
+              MemoType:
+                '687474703a2f2f6578616d706c652e636f6d2f6d656d6f2f67656e65726963',
+              MemoData: '72656e74',
+            },
+          },
+        ],
+      }
+      const result_1 = wallet.sign(tx_1)
+
+      // transaction with no URI
+      const tx_2: NFTokenMint = {
+        TransactionType: 'NFTokenMint',
+        Account: wallet.address,
+        TransferFee: 314,
+        NFTokenTaxon: 0,
+        Flags: 8,
+        Fee: '10',
+        Memos: [
+          {
+            Memo: {
+              MemoType:
+                '687474703a2f2f6578616d706c652e636f6d2f6d656d6f2f67656e65726963',
+              MemoData: '72656e74',
+            },
+          },
+        ],
+      }
+      const result_2 = wallet.sign(tx_2)
+
+      assert.deepEqual(result_1, result_2)
+    })
+
+    it('sign allows nulled value for NFTokenMint.URI', async function () {
+      // transaction with explicit URI: null
+      const tx_1: NFTokenMint = {
+        TransactionType: 'NFTokenMint',
+        Account: wallet.address,
+        TransferFee: 314,
+        NFTokenTaxon: 0,
+        Flags: 8,
+        Fee: '10',
+        URI: null,
+        Memos: [
+          {
+            Memo: {
+              MemoType:
+                '687474703a2f2f6578616d706c652e636f6d2f6d656d6f2f67656e65726963',
+              MemoData: '72656e74',
+            },
+          },
+        ],
+      }
+      const result_1 = wallet.sign(tx_1)
+
+      // transaction with no URI
+      const tx_2: NFTokenMint = {
+        TransactionType: 'NFTokenMint',
+        Account: wallet.address,
+        TransferFee: 314,
+        NFTokenTaxon: 0,
+        Flags: 8,
+        Fee: '10',
+        Memos: [
+          {
+            Memo: {
+              MemoType:
+                '687474703a2f2f6578616d706c652e636f6d2f6d656d6f2f67656e65726963',
+              MemoData: '72656e74',
+            },
+          },
+        ],
+      }
+      const result_2 = wallet.sign(tx_2)
+
+      assert.deepEqual(result_1, result_2)
+    })
+
     it('sign allows lowercase hex value for NFTokenMint.URI', async function () {
       const tx: NFTokenMint = {
         TransactionType: 'NFTokenMint',
@@ -915,7 +1089,7 @@ describe('Wallet', function () {
 
       assert.throws(() => {
         wallet.sign(tx)
-      }, /URI must be a hex value/u)
+      }, /URI must be in hex format/u)
     })
   })
 
