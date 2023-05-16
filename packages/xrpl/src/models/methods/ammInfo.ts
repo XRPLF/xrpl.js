@@ -28,7 +28,7 @@ interface AuthAccount {
   account: string
 }
 
-interface VoteEntry {
+interface VoteSlot {
   account: string
   trading_fee: number
   vote_weight: number
@@ -122,7 +122,7 @@ export interface AMMInfoResponse extends BaseResponse {
       /**
        * Keeps a track of up to eight active votes for the instance.
        */
-      vote_slots?: VoteEntry[]
+      vote_slots?: VoteSlot[]
     }
 
     /**
