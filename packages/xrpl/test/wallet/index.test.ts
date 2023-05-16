@@ -56,14 +56,16 @@ describe('Wallet', function () {
       assert.isTrue(wallet.privateKey.startsWith(ed25519KeyPrefix))
       assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
     })
-    
-    it('generates a new wallet using an invalid/unknown algorithm', function () {
-      const algorithm = "test"
 
-      //@ts-expect-error
-      assert.throws(() => { Wallet.generate(algorithm) }, /Invalid cryptographic signing algorithm/)
+    it('generates a new wallet using an invalid/unknown algorithm', function () {
+      const algorithm = 'test'
+
+      assert.throws(() => {
+        // @ts-expect-error -- We know it is an invalid algorithm
+        Wallet.generate(algorithm)
+      }, /Invalid cryptographic signing algorithm/u)
     })
-    
+
     it('generates a new wallet using algorithm ecdsa-secp256k1', function () {
       const algorithm = ECDSA.secp256k1
       const wallet = Wallet.generate(algorithm)
