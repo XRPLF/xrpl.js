@@ -26,7 +26,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 A wallet can be derived from either a seed, mnemonic, or entropy (array of random numbers).
 It provides functionality to sign/verify transactions offline.</p>
 
-<h3>Example</h3><pre><code class="language-typescript"><br/><span class="hl-8">// Derive a wallet from a base58 encoded seed.</span><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">seedWallet</span><span class="hl-1"> = </span><span class="hl-0">Wallet</span><span class="hl-1">.</span><span class="hl-4">fromSeed</span><span class="hl-1">(</span><span class="hl-5">&#39;ssZkdwURFMBXenJPbrpE14b6noJSu&#39;</span><span class="hl-1">)</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-4">log</span><span class="hl-1">(</span><span class="hl-0">seedWallet</span><span class="hl-1">)</span><br/><span class="hl-8">// Wallet {</span><br/><span class="hl-8">// publicKey: &#39;02FE9932A9C4AA2AC9F0ED0F2B89302DE7C2C95F91D782DA3CF06E64E1C1216449&#39;,</span><br/><span class="hl-8">// privateKey: &#39;00445D0A16DD05EFAF6D5AF45E6B8A6DE4170D93C0627021A0B8E705786CBCCFF7&#39;,</span><br/><span class="hl-8">// classicAddress: &#39;rG88FVLjvYiQaGftSa1cKuE2qNx7aK5ivo&#39;,</span><br/><span class="hl-8">// seed: &#39;ssZkdwURFMBXenJPbrpE14b6noJSu&#39;</span><br/><span class="hl-8">// }.</span><br/><br/><span class="hl-8">// Sign a JSON Transaction</span><br/><span class="hl-1"> </span><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">signed</span><span class="hl-1"> = </span><span class="hl-0">seedWallet</span><span class="hl-1">.</span><span class="hl-4">signTransaction</span><span class="hl-1">({</span><br/><span class="hl-1">     </span><span class="hl-0">TransactionType:</span><span class="hl-1"> </span><span class="hl-5">&#39;Payment&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">     </span><span class="hl-0">Account:</span><span class="hl-1"> </span><span class="hl-5">&#39;rG88FVLjvYiQaGftSa1cKuE2qNx7aK5ivo&#39;</span><br/><span class="hl-1">     ...........</span><br/><span class="hl-1">}).</span><br/><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-4">log</span><span class="hl-1">(</span><span class="hl-0">signed</span><span class="hl-1">)</span><br/><span class="hl-8">// &#39;1200007321......B01BE1DFF3&#39;.</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-4">log</span><span class="hl-1">(</span><span class="hl-4">decode</span><span class="hl-1">(</span><span class="hl-0">signed</span><span class="hl-1">))</span><br/><span class="hl-8">// {</span><br/><span class="hl-8">//   TransactionType: &#39;Payment&#39;,</span><br/><span class="hl-8">//   SigningPubKey: &#39;02FE9932A9C4AA2AC9F0ED0F2B89302DE7C2C95F91D782DA3CF06E64E1C1216449&#39;,</span><br/><span class="hl-8">//   TxnSignature: &#39;3045022100AAD......5B631ABD21171B61B07D304&#39;,</span><br/><span class="hl-8">//   Account: &#39;rG88FVLjvYiQaGftSa1cKuE2qNx7aK5ivo&#39;</span><br/><span class="hl-8">//   ...........</span><br/><span class="hl-8">// }</span>
+<h3>Example</h3><pre><code class="language-typescript"><br/><span class="hl-7">// Derive a wallet from a base58 encoded seed.</span><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">seedWallet</span><span class="hl-1"> = </span><span class="hl-0">Wallet</span><span class="hl-1">.</span><span class="hl-4">fromSeed</span><span class="hl-1">(</span><span class="hl-5">&#39;ssZkdwURFMBXenJPbrpE14b6noJSu&#39;</span><span class="hl-1">)</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-4">log</span><span class="hl-1">(</span><span class="hl-0">seedWallet</span><span class="hl-1">)</span><br/><span class="hl-7">// Wallet {</span><br/><span class="hl-7">// publicKey: &#39;02FE9932A9C4AA2AC9F0ED0F2B89302DE7C2C95F91D782DA3CF06E64E1C1216449&#39;,</span><br/><span class="hl-7">// privateKey: &#39;00445D0A16DD05EFAF6D5AF45E6B8A6DE4170D93C0627021A0B8E705786CBCCFF7&#39;,</span><br/><span class="hl-7">// classicAddress: &#39;rG88FVLjvYiQaGftSa1cKuE2qNx7aK5ivo&#39;,</span><br/><span class="hl-7">// seed: &#39;ssZkdwURFMBXenJPbrpE14b6noJSu&#39;</span><br/><span class="hl-7">// }.</span><br/><br/><span class="hl-7">// Sign a JSON Transaction</span><br/><span class="hl-1"> </span><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">signed</span><span class="hl-1"> = </span><span class="hl-0">seedWallet</span><span class="hl-1">.</span><span class="hl-4">signTransaction</span><span class="hl-1">({</span><br/><span class="hl-1">     </span><span class="hl-0">TransactionType:</span><span class="hl-1"> </span><span class="hl-5">&#39;Payment&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">     </span><span class="hl-0">Account:</span><span class="hl-1"> </span><span class="hl-5">&#39;rG88FVLjvYiQaGftSa1cKuE2qNx7aK5ivo&#39;</span><br/><span class="hl-1">     ...........</span><br/><span class="hl-1">}).</span><br/><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-4">log</span><span class="hl-1">(</span><span class="hl-0">signed</span><span class="hl-1">)</span><br/><span class="hl-7">// &#39;1200007321......B01BE1DFF3&#39;.</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-4">log</span><span class="hl-1">(</span><span class="hl-4">decode</span><span class="hl-1">(</span><span class="hl-0">signed</span><span class="hl-1">))</span><br/><span class="hl-7">// {</span><br/><span class="hl-7">//   TransactionType: &#39;Payment&#39;,</span><br/><span class="hl-7">//   SigningPubKey: &#39;02FE9932A9C4AA2AC9F0ED0F2B89302DE7C2C95F91D782DA3CF06E64E1C1216449&#39;,</span><br/><span class="hl-7">//   TxnSignature: &#39;3045022100AAD......5B631ABD21171B61B07D304&#39;,</span><br/><span class="hl-7">//   Account: &#39;rG88FVLjvYiQaGftSa1cKuE2qNx7aK5ivo&#39;</span><br/><span class="hl-7">//   ...........</span><br/><span class="hl-7">// }</span>
 </code></pre>
 </div></section>
 <section class="tsd-panel tsd-hierarchy">
@@ -34,7 +34,7 @@ It provides functionality to sign/verify transactions offline.</p>
 <ul class="tsd-hierarchy">
 <li><span class="target">Wallet</span></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L83">packages/xrpl/src/Wallet/index.ts:83</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L79">packages/xrpl/src/Wallet/index.ts:79</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -58,8 +58,7 @@ It provides functionality to sign/verify transactions offline.</p>
 </div></section>
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Methods</h3>
-<div class="tsd-index-list"><a href="Wallet.html#checkTxSerialization" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-private"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-2048-path"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)" id="icon-2048-text"></path></svg><span>check<wbr/>Tx<wbr/>Serialization</span></a>
-<a href="Wallet.html#getXAddress" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>getXAddress</span></a>
+<div class="tsd-index-list"><a href="Wallet.html#getXAddress" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-2048-path"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)" id="icon-2048-text"></path></svg><span>getXAddress</span></a>
 <a href="Wallet.html#sign" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>sign</span></a>
 <a href="Wallet.html#verifyTransaction" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>verify<wbr/>Transaction</span></a>
 <a href="Wallet.html#deriveWallet" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-private"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>derive<wbr/>Wallet</span></a>
@@ -104,29 +103,29 @@ It provides functionality to sign/verify transactions offline.</p>
 </div></li></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L98">packages/xrpl/src/Wallet/index.ts:98</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L94">packages/xrpl/src/Wallet/index.ts:94</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="classicAddress" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagReadonly">Readonly</code> <span>classic<wbr/>Address</span><a href="#classicAddress" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">classic<wbr/>Address<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L86">packages/xrpl/src/Wallet/index.ts:86</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L82">packages/xrpl/src/Wallet/index.ts:82</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="privateKey" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagReadonly">Readonly</code> <span>private<wbr/>Key</span><a href="#privateKey" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">private<wbr/>Key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L85">packages/xrpl/src/Wallet/index.ts:85</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L81">packages/xrpl/src/Wallet/index.ts:81</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="publicKey" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagReadonly">Readonly</code> <span>public<wbr/>Key</span><a href="#publicKey" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">public<wbr/>Key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L84">packages/xrpl/src/Wallet/index.ts:84</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L80">packages/xrpl/src/Wallet/index.ts:80</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="seed" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>seed</span><a href="#seed" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">seed<span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L87">packages/xrpl/src/Wallet/index.ts:87</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L83">packages/xrpl/src/Wallet/index.ts:83</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="fromSecret" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>from<wbr/>Secret</span><a href="#fromSecret" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">from<wbr/>Secret<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>seed<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, opts<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>algorithm<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">ECDSA</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>masterAddress<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> = Wallet.fromSeed</span></div>
@@ -161,7 +160,7 @@ It provides functionality to sign/verify transactions offline.</p>
 </div></li></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a></h4></li></ul></li></ul></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L163">packages/xrpl/src/Wallet/index.ts:163</a></li></ul></aside></section></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L167">packages/xrpl/src/Wallet/index.ts:167</a></li></ul></aside></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Accessors</h2>
 <section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class"><a id="address" class="tsd-anchor"></a>
@@ -175,37 +174,9 @@ It provides functionality to sign/verify transactions offline.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L119">packages/xrpl/src/Wallet/index.ts:119</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L115">packages/xrpl/src/Wallet/index.ts:115</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
-<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private"><a id="checkTxSerialization" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>check<wbr/>Tx<wbr/>Serialization</span><a href="#checkTxSerialization" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
-<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
-<li class="tsd-signature tsd-anchor-link" id="checkTxSerialization.checkTxSerialization-1">check<wbr/>Tx<wbr/>Serialization<span class="tsd-signature-symbol">(</span>serialized<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, tx<span class="tsd-signature-symbol">: </span><a href="../types/Transaction.html" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#checkTxSerialization.checkTxSerialization-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
-<li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Decode a serialized transaction, remove the fields that are added during the signing process,
- and verify that it matches the transaction prior to signing. This gives the user a sanity check
- to ensure that what they try to encode matches the message that will be recieved by rippled.</p>
-
-<h3>Throws</h3><p>A ValidationError if the transaction does not have a TxnSignature/Signers property, or if
-the serialized Transaction desn&#39;t match the original transaction.</p>
-
-<h3>Throws</h3><p>XrplError if the transaction includes an issued currency which is equivalent to XRP ignoring case.</p>
-</div>
-<div class="tsd-parameters">
-<h4 class="tsd-parameters-title">Parameters</h4>
-<ul class="tsd-parameter-list">
-<li>
-<h5>serialized: <span class="tsd-signature-type">string</span></h5>
-<div class="tsd-comment tsd-typography"><p>A signed and serialized transaction.</p>
-</div></li>
-<li>
-<h5>tx: <a href="../types/Transaction.html" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a></h5>
-<div class="tsd-comment tsd-typography"><p>The transaction prior to signing.</p>
-</div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
-<ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L405">packages/xrpl/src/Wallet/index.ts:405</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getXAddress" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>getXAddress</span><a href="#getXAddress" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -228,13 +199,28 @@ the serialized Transaction desn&#39;t match the original transaction.</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L389">packages/xrpl/src/Wallet/index.ts:389</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L450">packages/xrpl/src/Wallet/index.ts:450</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="sign" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>sign</span><a href="#sign" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="sign.sign-1">sign<span class="tsd-signature-symbol">(</span>this<span class="tsd-signature-symbol">: </span><a href="Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a>, transaction<span class="tsd-signature-symbol">: </span><a href="../types/Transaction.html" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a>, multisign<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>hash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>tx_blob<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><a href="#sign.sign-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Signs a transaction offline.</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-2">const</span><span class="hl-1"> { </span><span class="hl-3">Client</span><span class="hl-1">, </span><span class="hl-3">Wallet</span><span class="hl-1"> } = </span><span class="hl-4">require</span><span class="hl-1">(</span><span class="hl-5">&#39;xrpl&#39;</span><span class="hl-1">)</span><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">client</span><span class="hl-1"> = </span><span class="hl-2">new</span><span class="hl-1"> </span><span class="hl-4">Client</span><span class="hl-1">(</span><span class="hl-5">&#39;wss://s.altnet.rippletest.net:51233&#39;</span><span class="hl-1">)</span><br/><br/><span class="hl-2">async</span><span class="hl-1"> </span><span class="hl-2">function</span><span class="hl-1"> </span><span class="hl-4">signTransaction</span><span class="hl-1">() {</span><br/><span class="hl-1">  </span><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-0">client</span><span class="hl-1">.</span><span class="hl-4">connect</span><span class="hl-1">()</span><br/><span class="hl-1">  </span><span class="hl-2">const</span><span class="hl-1"> { </span><span class="hl-0">balance</span><span class="hl-1">: </span><span class="hl-3">balance1</span><span class="hl-1">, </span><span class="hl-0">wallet</span><span class="hl-1">: </span><span class="hl-3">wallet1</span><span class="hl-1"> } = </span><span class="hl-0">client</span><span class="hl-1">.</span><span class="hl-4">fundWallet</span><span class="hl-1">()</span><br/><span class="hl-1">  </span><span class="hl-2">const</span><span class="hl-1"> { </span><span class="hl-0">balance</span><span class="hl-1">: </span><span class="hl-3">balance2</span><span class="hl-1">, </span><span class="hl-0">wallet</span><span class="hl-1">: </span><span class="hl-3">wallet2</span><span class="hl-1"> } = </span><span class="hl-0">client</span><span class="hl-1">.</span><span class="hl-4">fundWallet</span><span class="hl-1">()</span><br/><br/><span class="hl-1">  </span><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">transaction</span><span class="hl-1"> = {</span><br/><span class="hl-1">    </span><span class="hl-0">TransactionType:</span><span class="hl-1"> </span><span class="hl-5">&#39;Payment&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-0">Account:</span><span class="hl-1"> </span><span class="hl-0">wallet1</span><span class="hl-1">.</span><span class="hl-0">address</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-0">Destination:</span><span class="hl-1"> </span><span class="hl-0">wallet2</span><span class="hl-1">.</span><span class="hl-0">address</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-0">Amount:</span><span class="hl-1"> </span><span class="hl-5">&#39;10&#39;</span><br/><span class="hl-1">  }</span><br/><br/><span class="hl-1">  </span><span class="hl-6">try</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-0">client</span><span class="hl-1">.</span><span class="hl-4">autofill</span><span class="hl-1">(</span><span class="hl-0">transaction</span><span class="hl-1">)</span><br/><span class="hl-1">    </span><span class="hl-2">const</span><span class="hl-1"> { </span><span class="hl-0">tx_blob</span><span class="hl-1">: </span><span class="hl-3">signed_tx_blob</span><span class="hl-1">, </span><span class="hl-3">hash</span><span class="hl-1">} = </span><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-0">wallet1</span><span class="hl-1">.</span><span class="hl-4">sign</span><span class="hl-1">(</span><span class="hl-0">transaction</span><span class="hl-1">)</span><br/><span class="hl-1">    </span><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-4">log</span><span class="hl-1">(</span><span class="hl-0">signed_tx_blob</span><span class="hl-1">)</span><br/><span class="hl-1">  } </span><span class="hl-6">catch</span><span class="hl-1"> (</span><span class="hl-0">error</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-4">error</span><span class="hl-1">(</span><span class="hl-5">`Failed to sign transaction: </span><span class="hl-2">${</span><span class="hl-0">error</span><span class="hl-2">}</span><span class="hl-5">`</span><span class="hl-1">)</span><br/><span class="hl-1">  }</span><br/><span class="hl-1">  </span><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">result</span><span class="hl-1"> = </span><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-0">client</span><span class="hl-1">.</span><span class="hl-4">submit</span><span class="hl-1">(</span><span class="hl-0">signed_tx_blob</span><span class="hl-1">)</span><br/><span class="hl-1">  </span><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-0">client</span><span class="hl-1">.</span><span class="hl-4">disconnect</span><span class="hl-1">()</span><br/><span class="hl-1">}</span><br/><br/><span class="hl-4">signTransaction</span><span class="hl-1">()</span>
+</code></pre>
+<p>In order for a transaction to be validated, it must be signed by the account sending the transaction to prove
+That the owner is actually the one deciding to take that action.</p>
+<p>In this example, we created, signed, and then submitted a transaction to testnet. You may notice that the
+Output of <code>sign</code> includes a <code>tx_blob</code> and a <code>hash</code>, both of which are needed to submit &amp; verify the results.
+Note: If you pass a <code>Wallet</code> to <code>client.submit</code> or <code>client.submitAndWait</code> it will do signing like this under the hood.</p>
+<p><code>tx_blob</code> is a binary representation of a transaction on the XRP Ledger. It&#39;s essentially a byte array
+that encodes all of the data necessary to execute the transaction, including the source address, the destination
+address, the amount, and any additional fields required for the specific transaction type.</p>
+<p><code>hash</code> is a unique identifier that&#39;s generated from the signed transaction data on the XRP Ledger. It&#39;s essentially
+A cryptographic digest of the signed transaction blob, created using a hash function. The signed transaction hash is
+Useful for identifying and tracking specific transactions on the XRP Ledger. It can be used to query transaction
+Information, verify the authenticity of a transaction, and detect any tampering with the transaction data.</p>
 
 <h3>Returns</h3><p>A signed transaction.</p>
 
@@ -264,7 +250,7 @@ the serialized Transaction desn&#39;t match the original transaction.</p>
 <li class="tsd-parameter">
 <h5>tx_<wbr/>blob<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5></li></ul><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L311">packages/xrpl/src/Wallet/index.ts:311</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L362">packages/xrpl/src/Wallet/index.ts:362</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="verifyTransaction" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>verify<wbr/>Transaction</span><a href="#verifyTransaction" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -283,7 +269,7 @@ the serialized Transaction desn&#39;t match the original transaction.</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L372">packages/xrpl/src/Wallet/index.ts:372</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L433">packages/xrpl/src/Wallet/index.ts:433</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private"><a id="deriveWallet" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <code class="tsd-tag ts-flagPrivate">Private</code> <span>derive<wbr/>Wallet</span><a href="#deriveWallet" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
@@ -315,7 +301,7 @@ the serialized Transaction desn&#39;t match the original transaction.</p>
 </div></li></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L287">packages/xrpl/src/Wallet/index.ts:287</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L291">packages/xrpl/src/Wallet/index.ts:291</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="fromEntropy" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>from<wbr/>Entropy</span><a href="#fromEntropy" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -347,7 +333,7 @@ the serialized Transaction desn&#39;t match the original transaction.</p>
 </div></li></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L174">packages/xrpl/src/Wallet/index.ts:174</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L178">packages/xrpl/src/Wallet/index.ts:178</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="fromMnemonic" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>from<wbr/>Mnemonic</span><a href="#fromMnemonic" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -397,7 +383,7 @@ You should use another method to represent your keys such as a seed or public/pr
 </div></li></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L210">packages/xrpl/src/Wallet/index.ts:210</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L214">packages/xrpl/src/Wallet/index.ts:214</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private"><a id="fromRFC1751Mnemonic" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <code class="tsd-tag ts-flagPrivate">Private</code> <span>fromRFC1751<wbr/>Mnemonic</span><a href="#fromRFC1751Mnemonic" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
@@ -429,7 +415,7 @@ You should use another method to represent your keys such as a seed or public/pr
 </div></li></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L259">packages/xrpl/src/Wallet/index.ts:259</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L263">packages/xrpl/src/Wallet/index.ts:263</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="fromSeed" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>from<wbr/>Seed</span><a href="#fromSeed" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -461,13 +447,18 @@ You should use another method to represent your keys such as a seed or public/pr
 </div></li></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L143">packages/xrpl/src/Wallet/index.ts:143</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L147">packages/xrpl/src/Wallet/index.ts:147</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="generate" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>generate</span><a href="#generate" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="generate.generate-1">generate<span class="tsd-signature-symbol">(</span>algorithm<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">ECDSA</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a><a href="#generate.generate-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Generates a new Wallet using a generated seed.</p>
+<div class="tsd-comment tsd-typography"><p><code>generate()</code> creates a new random Wallet. In order to make this a valid account on ledger, you must
+Send XRP to it. On test networks that can be done with &quot;faucets&quot; which send XRP to any account which asks
+For it. You can call <code>client.fundWallet()</code> in order to generate credentials and fund the account on test networks.</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-2">const</span><span class="hl-1"> { </span><span class="hl-3">Wallet</span><span class="hl-1"> } = </span><span class="hl-4">require</span><span class="hl-1">(</span><span class="hl-5">&#39;xrpl&#39;</span><span class="hl-1">)</span><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">wallet</span><span class="hl-1"> = </span><span class="hl-0">Wallet</span><span class="hl-1">.</span><span class="hl-4">generate</span><span class="hl-1">()</span>
+</code></pre>
 
 <h3>Returns</h3><p>A new Wallet derived from a generated seed.</p>
 </div>
@@ -480,7 +471,7 @@ You should use another method to represent your keys such as a seed or public/pr
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/1a1d8087/packages/xrpl/src/Wallet/index.ts#L129">packages/xrpl/src/Wallet/index.ts:129</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/0f02e78d/packages/xrpl/src/Wallet/index.ts#L133">packages/xrpl/src/Wallet/index.ts:133</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -514,7 +505,6 @@ You should use another method to represent your keys such as a seed or public/pr
 <li class="tsd-kind-property tsd-parent-kind-class"><a href="Wallet.html#seed" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>seed?</a></li>
 <li class="tsd-kind-property tsd-parent-kind-class"><a href="Wallet.html#fromSecret" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>from<wbr/>Secret</a></li>
 <li class="tsd-kind-accessor tsd-parent-kind-class"><a href="Wallet.html#address" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>address</a></li>
-<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="Wallet.html#checkTxSerialization" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>check<wbr/>Tx<wbr/>Serialization</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="Wallet.html#getXAddress" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>getXAddress</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="Wallet.html#sign" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>sign</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="Wallet.html#verifyTransaction" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>verify<wbr/>Transaction</a></li>
