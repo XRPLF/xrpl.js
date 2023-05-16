@@ -129,8 +129,13 @@ class Wallet {
    *
    * @param algorithm - The digital signature algorithm to generate an address for.
    * @returns A new Wallet derived from a generated seed.
+   *
+   * @throws ValidationError when signing algorithm isn't valid
    */
   public static generate(algorithm: ECDSA = DEFAULT_ALGORITHM): Wallet {
+    if (!Object.values(ECDSA).includes(algorithm)) {
+      throw new ValidationError('Invalid cryptographic signing algorithm')
+    }
     const seed = generateSeed({ algorithm })
     return Wallet.fromSeed(seed)
   }
