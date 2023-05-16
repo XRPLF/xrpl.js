@@ -102,6 +102,7 @@ Wallet.fromMmnemonic()
 ## 2.2.1 (2022-04-21)
 ### Fixed
 * Fix return field of NFT offer
+* Updated `getOrderbook` docs and param names to reflect actual behavior of checking both sides of order book.
 
 ## 2.2.0 (2022-04-19)
 ### Added
