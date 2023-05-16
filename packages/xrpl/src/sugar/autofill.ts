@@ -23,6 +23,37 @@ interface ClassicAccountAndTag {
  * is connected to. It also converts all X-Addresses to classic addresses and
  * flags interfaces into numbers.
  *
+ * @example
+ *
+ * ```ts
+ * const { Client } = require('xrpl')
+ *
+ * const client = new Client('wss://s.altnet.rippletest.net:51233')
+ *
+ * async function createAndAutofillTransaction() {
+ *   const transaction = {
+ *     TransactionType: 'Payment',
+ *     Account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+ *     Destination: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+ *     Amount: '10000000' // 10 XRP in drops (1/1,000,000th of an XRP)
+ *   }
+ *
+ *   try {
+ *     const autofilledTransaction = await client.autofill(transaction)
+ *     console.log(autofilledTransaction)
+ *   } catch (error) {
+ *     console.error(`Failed to autofill transaction: ${error}`)
+ *   }
+ * }
+ *
+ * createAndAutofillTransaction()
+ * ```
+ *
+ * Autofill helps fill in fields which should be included in a transaction, but can be determined automatically
+ * such as `LastLedgerSequence` and `Fee`. If you override one of the fields `autofill` changes, your explicit
+ * values will be used instead. By default, this is done as part of `submit` and `submitAndWait` when you pass
+ * in an unsigned transaction along with your wallet to be submitted.
+ *
  * @param this - A client.
  * @param transaction - A {@link Transaction} in JSON format
  * @param signersCount - The expected number of signers for this transaction.
