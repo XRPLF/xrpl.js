@@ -13,9 +13,9 @@ import {
   isValidClassicAddress,
   isValidXAddress,
   xAddressToClassicAddress,
-} from 'ripple-address-codec'
-import * as rbc from 'ripple-binary-codec'
-import { verify as verifyKeypairSignature } from 'ripple-keypairs'
+} from '@transia/ripple-address-codec'
+import * as rbc from '@transia/ripple-binary-codec'
+import { verify as verifyKeypairSignature } from '@transia/ripple-keypairs'
 
 import { LedgerEntry } from '../models/ledger'
 import { Response } from '../models/methods'

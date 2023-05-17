@@ -6,7 +6,7 @@
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports -- Required
 import createHash = require('create-hash')
-import { TRANSACTION_TYPES, TRANSACTION_TYPE_MAP } from 'ripple-binary-codec'
+import { TRANSACTION_TYPES, TRANSACTION_TYPE_MAP } from '@transia/ripple-binary-codec'
 
 import { XrplError } from '../errors'
 import { HookParameter } from '../models/common'

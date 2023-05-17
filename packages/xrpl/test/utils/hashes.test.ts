@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 import { assert } from 'chai'
-import { encode } from 'ripple-binary-codec'
+import { encode } from '@transia/ripple-binary-codec'
 
 import { OfferCreate, Transaction, ValidationError } from '../../src'
 import {

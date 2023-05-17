@@ -9,20 +9,20 @@ import {
   isValidXAddress,
   xAddressToClassicAddress,
   encodeSeed,
-} from 'ripple-address-codec'
+} from '@transia/ripple-address-codec'
 import {
   decode,
   encodeForSigning,
   encodeForMultisigning,
   encode,
-} from 'ripple-binary-codec'
+} from '@transia/ripple-binary-codec'
 import {
   deriveAddress,
   deriveKeypair,
   generateSeed,
   verify,
   sign,
-} from 'ripple-keypairs'
+} from '@transia/ripple-keypairs'
 
 import ECDSA from '../ECDSA'
 import { ValidationError, XrplError } from '../errors'

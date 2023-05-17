@@ -1,5 +1,5 @@
-import { encodeForSigningClaim } from 'ripple-binary-codec'
-import { sign } from 'ripple-keypairs'
+import { encodeForSigningClaim } from '@transia/ripple-binary-codec'
+import { sign } from '@transia/ripple-keypairs'
 
 import { xrpToDrops } from './xrpConversion'
 

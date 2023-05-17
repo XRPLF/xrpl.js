@@ -5,7 +5,7 @@ import {
   XrplDefinitionsBase,
 } from '../enums'
 import { SerializedType, JsonObject } from './serialized-type'
-import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
+import { xAddressToClassicAddress, isValidXAddress } from '@transia/ripple-address-codec'
 import { BinaryParser } from '../serdes/binary-parser'
 import { BinarySerializer, BytesList } from '../serdes/binary-serializer'
 import { Buffer } from 'buffer/'

@@ -1,5 +1,5 @@
 import assert from 'assert'
-import * as api from 'ripple-address-codec'
+import * as api from '@transia/ripple-address-codec'
 
 function toHex(bytes) {
   return Buffer.from(bytes).toString('hex').toUpperCase()

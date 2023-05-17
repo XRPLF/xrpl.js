@@ -27,9 +27,9 @@
     "bip39": "^3.0.4",
     "https-proxy-agent": "^5.0.0",
     "lodash": "^4.17.4",
-    "ripple-address-codec": "^4.2.5",
-    "ripple-binary-codec": "^1.4.3",
-    "ripple-keypairs": "^1.1.5",
+    "@transia/ripple-address-codec": "^4.2.5",
+    "@transia/ripple-binary-codec": "^1.4.3",
+    "@transia/ripple-keypairs": "^1.1.5",
     "ws": "^8.2.2"
   },
   "devDependencies": {

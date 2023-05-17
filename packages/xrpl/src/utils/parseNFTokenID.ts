@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Doing hex string parsing. */
 import BigNumber from 'bignumber.js'
-import { encodeAccountID } from 'ripple-address-codec'
+import { encodeAccountID } from '@transia/ripple-address-codec'
 
 import { XrplError } from '../errors'
 
