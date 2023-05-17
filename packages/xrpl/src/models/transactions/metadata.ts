@@ -1,5 +1,19 @@
 import { Amount } from '../common'
 
+export interface HookExecution {
+  HookExecution: {
+    HookAccount: string
+    HookEmitCount: number
+    HookExecutionIndex: number
+    HookHash: string
+    HookInstructionCount: string
+    HookResult: number
+    HookReturnCode: number
+    HookReturnString: string
+    HookStateChangeCount: number
+  }
+}
+
 export interface CreatedNode {
   CreatedNode: {
     LedgerEntryType: string
@@ -60,6 +74,7 @@ export function isDeletedNode(node: Node): node is DeletedNode {
 }
 
 export interface TransactionMetadata {
+  HookExecutions: HookExecution[]
   AffectedNodes: Node[]
   DeliveredAmount?: Amount
   // "unavailable" possible for transactions before 2014-01-20
