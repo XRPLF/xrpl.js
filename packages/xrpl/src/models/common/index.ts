@@ -97,7 +97,7 @@ export interface Hook {
    * The object that describes the hook in Hooks.
    */
   Hook: {
-    HookHash: string
+    HookHash?: string
     /**
      * The code that is executed when the hook is triggered.
      */

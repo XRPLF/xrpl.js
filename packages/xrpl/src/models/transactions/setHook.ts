@@ -1,7 +1,30 @@
 import { ValidationError } from '../../errors'
 import { Hook } from '../common'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
+
+/**
+ * Enum representing values for Set Hook Transaction Flags.
+ *
+ * @category Transaction Flags
+ */
+export enum SetHookFlags {
+  /**
+   */
+  hsfOverride = 0x00000001,
+  /**
+   */
+  hsfNSDelete = 0x00000010,
+  /**
+   */
+  hsfCollect = 0x00000100,
+}
+
+export interface SetHookFlagsInterface extends GlobalFlags {
+  hsfOverride?: boolean
+  hsfNSDelete?: boolean
+  hsfCollect?: boolean
+}
 
 /**
  *
@@ -14,6 +37,8 @@ export interface SetHook extends BaseTransaction {
    *
    */
   Hooks: Hook[]
+
+  Flags?: number | SetHookFlagsInterface
 }
 
 const MAX_HOOKS = 4

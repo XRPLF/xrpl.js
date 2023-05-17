@@ -4,9 +4,11 @@
  * This module contains the transaction types and the function to calculate the hook on
  */
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports -- Required
+import {
+  TRANSACTION_TYPES,
+  TRANSACTION_TYPE_MAP,
+} from '@transia/ripple-binary-codec'
 import createHash = require('create-hash')
-import { TRANSACTION_TYPES, TRANSACTION_TYPE_MAP } from '@transia/ripple-binary-codec'
 
 import { XrplError } from '../errors'
 import { HookParameter } from '../models/common'
@@ -42,7 +44,7 @@ export function calculateHookOn(arr: Array<keyof TTS>): string {
         `invalid transaction type '${String(nth)}' in HookOn array`,
       )
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Required
+
     const tts: Record<string, number> = TRANSACTION_TYPE_MAP
     let value = BigInt(hash)
     // eslint-disable-next-line no-bitwise -- Required
@@ -84,6 +86,14 @@ export async function hexNamespace(namespace: string): Promise<string> {
   return (await sha256(namespace)).toUpperCase()
 }
 
+function isHex(value: string): boolean {
+  return /^[0-9A-F]+$/iu.test(value)
+}
+
+function hexValue(value: string): string {
+  return Buffer.from(value, 'utf8').toString('hex').toUpperCase()
+}
+
 /**
  * Calculate the hex of the hook parameters
  *
@@ -93,20 +103,21 @@ export async function hexNamespace(namespace: string): Promise<string> {
 export function hexHookParameters(data: HookParameter[]): HookParameter[] {
   const hookParameters: HookParameter[] = []
   for (const parameter of data) {
+    let hookPName = parameter.HookParameter.HookParameterName
+    let hookPValue = parameter.HookParameter.HookParameterValue
+
+    if (!isHex(hookPName)) {
+      hookPName = hexValue(hookPName)
+    }
+
+    if (!isHex(hookPValue)) {
+      hookPValue = hexValue(hookPValue)
+    }
+
     hookParameters.push({
       HookParameter: {
-        HookParameterName: Buffer.from(
-          parameter.HookParameter.HookParameterName,
-          'utf8',
-        )
-          .toString('hex')
-          .toUpperCase(),
-        HookParameterValue: Buffer.from(
-          parameter.HookParameter.HookParameterValue,
-          'utf8',
-        )
-          .toString('hex')
-          .toUpperCase(),
+        HookParameterName: hookPName,
+        HookParameterValue: hookPValue,
       },
     })
   }

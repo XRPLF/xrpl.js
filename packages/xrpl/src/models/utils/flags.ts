@@ -20,6 +20,7 @@ import {
   PaymentChannelClaimFlagsInterface,
   PaymentChannelClaimFlags,
 } from '../transactions/paymentChannelClaim'
+import { SetHookFlagsInterface, SetHookFlags } from '../transactions/setHook'
 import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlagsInterface, TrustSetFlags } from '../transactions/trustSet'
 
@@ -75,6 +76,15 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
     case 'TrustSet':
       tx.Flags = convertTrustSetFlagsToNumber(tx.Flags)
       return
+    case 'SetHook':
+      tx.Flags = convertSetHookFlagsToNumber(tx.Flags)
+      tx.Hooks.forEach((h) => {
+        h.Hook.Flags = convertSetHookFlagsToNumber(
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- idk
+          h.Hook.Flags as SetHookFlagsInterface,
+        )
+      })
+      return
     default:
       tx.Flags = 0
   }
@@ -106,6 +116,10 @@ function convertPaymentTransactionFlagsToNumber(
 
 function convertTrustSetFlagsToNumber(flags: TrustSetFlagsInterface): number {
   return reduceFlags(flags, TrustSetFlags)
+}
+
+function convertSetHookFlagsToNumber(flags: SetHookFlagsInterface): number {
+  return reduceFlags(flags, SetHookFlags)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- added ValidationError check for flagEnum

@@ -4,7 +4,13 @@
 import { TRANSACTION_TYPES } from '@transia/ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
-import { Amount, IssuedCurrencyAmount, Memo, Signer } from '../common'
+import {
+  Amount,
+  HookParameter,
+  IssuedCurrencyAmount,
+  Memo,
+  Signer,
+} from '../common'
 import { onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
@@ -163,6 +169,10 @@ export interface BaseTransaction {
    * The network id of the transaction.
    */
   NetworkID?: number
+  /**
+   * The hook parameters of the transaction.
+   */
+  HookParameters?: HookParameter[]
 }
 
 /**
