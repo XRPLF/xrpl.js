@@ -97,14 +97,15 @@ export interface Hook {
    * The object that describes the hook in Hooks.
    */
   Hook: {
+    HookHash: string
     /**
      * The code that is executed when the hook is triggered.
      */
-    CreateCode: string
+    CreateCode?: string
     /**
      * The flags that are set on the hook.
      */
-    Flags: number
+    Flags?: number
     /**
      * The transactions that triggers the hook. Represented as a 256Hash
      */

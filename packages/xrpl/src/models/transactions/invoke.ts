@@ -13,6 +13,10 @@ export interface Invoke extends BaseTransaction {
    * If present, invokes the Hook on the Destination account.
    */
   Destination?: string
+  /**
+   * Hex value representing a VL Blob.
+   */
+  Blob?: string
 }
 
 /**
