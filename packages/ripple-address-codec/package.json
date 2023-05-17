@@ -1,6 +1,6 @@
 {
   "name": "@transia/ripple-address-codec",
-  "version": "4.2.5",
+  "version": "4.2.6-alpha.0",
   "description": "encodes/decodes base58 encoded XRP Ledger identifiers",
   "files": [
     "dist/*",

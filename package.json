@@ -13,10 +13,10 @@
     "update:confirm": "npx npm-check-updates --configFileName .ncurc.json -u"
   },
   "dependencies": {
-    "ripple-address-codec": "file:packages/ripple-address-codec",
-    "ripple-binary-codec": "file:packages/ripple-binary-codec",
-    "ripple-keypairs": "file:packages/ripple-keypairs",
-    "xrpl": "file:packages/xrpl"
+    "@transia/ripple-address-codec": "file:packages/ripple-address-codec",
+    "@transia/ripple-binary-codec": "file:packages/ripple-binary-codec",
+    "@transia/ripple-keypairs": "file:packages/ripple-keypairs",
+    "@transia/xrpl": "file:packages/xrpl"
   },
   "devDependencies": {
     "@types/brorand": "^1.0.30",
