@@ -2,6 +2,7 @@ import { decode, encode } from 'ripple-binary-codec'
 
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
 import { ValidationError, XrplError } from '../errors'
+import { Signer } from '../models/common'
 import { TxResponse } from '../models/methods'
 import { Transaction } from '../models/transactions'
 import { hashes } from '../utils'
@@ -222,10 +223,26 @@ async function waitForFinalTransactionOutcome(
 // checks if the transaction has been signed
 function isSigned(transaction: Transaction | string): boolean {
   const tx = typeof transaction === 'string' ? decode(transaction) : transaction
-  return (
-    typeof tx !== 'string' &&
-    (tx.SigningPubKey != null || tx.TxnSignature != null)
-  )
+  if (typeof tx === 'string') {
+    return false
+  }
+  if (tx.Signers != null) {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- we know that tx.Signers is an array of Signers
+    const signers = tx.Signers as Signer[]
+    for (const signer of signers) {
+      // eslint-disable-next-line max-depth -- necessary for checking if signer is signed
+      if (
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- necessary check
+        signer.Signer.SigningPubKey == null ||
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- necessary check
+        signer.Signer.TxnSignature == null
+      ) {
+        return false
+      }
+    }
+    return true
+  }
+  return tx.SigningPubKey != null && tx.TxnSignature != null
 }
 
 // initializes a transaction for a submit request
