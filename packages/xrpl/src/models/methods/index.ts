@@ -175,7 +175,6 @@ type Response =
   // clio only methods
   | NFTInfoResponse
   | NFTHistoryResponse
-  | NFTsByIssuerResponse
 
 export {
   Request,
