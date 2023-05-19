@@ -21,7 +21,7 @@ describe('NFTokenMint', function () {
       await client.connect()
 
       const { wallet, balance: _balance } = await client.fundWallet(null, {
-        useCase: 'integration-test',
+        usageContext: 'integration-test',
       })
 
       const tx: NFTokenMint = {

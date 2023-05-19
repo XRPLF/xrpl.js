@@ -19,7 +19,7 @@ async function generate_faucet_wallet_and_fund_again(
   const { wallet, balance } = await api.fundWallet(null, {
     faucetHost,
     faucetPath,
-    useCase: 'integration-test',
+    usageContext: 'integration-test',
   })
   assert.notEqual(wallet, undefined)
   assert(isValidClassicAddress(wallet.classicAddress))
@@ -35,7 +35,7 @@ async function generate_faucet_wallet_and_fund_again(
   const { balance: newBalance } = await api.fundWallet(wallet, {
     faucetHost,
     faucetPath,
-    useCase: 'integration-test',
+    usageContext: 'integration-test',
   })
 
   const afterSent = await api.request({
@@ -100,7 +100,7 @@ describe('fundWallet', function () {
       await api.connect()
 
       const { wallet, balance } = await api.fundWallet(null, {
-        useCase: 'integration-test',
+        usageContext: 'integration-test',
       })
 
       assert.notEqual(wallet, undefined)
@@ -134,7 +134,7 @@ describe('fundWallet', function () {
       await api.connect()
       const { wallet, balance } = await api.fundWallet(null, {
         amount: '2000',
-        useCase: 'integration-test',
+        usageContext: 'integration-test',
       })
       assert.equal(balance, '2000')
       assert.notEqual(wallet, undefined)

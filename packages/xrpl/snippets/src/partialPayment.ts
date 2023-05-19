@@ -8,10 +8,10 @@ async function partialPayment(): Promise<void> {
 
   // creating wallets as prerequisite
   const { wallet: wallet1 } = await client.fundWallet(null, {
-    useCase: 'code snippets',
+    usageContext: 'code snippets',
   })
   const { wallet: wallet2 } = await client.fundWallet(null, {
-    useCase: 'code snippets',
+    usageContext: 'code snippets',
   })
 
   // create a trustline to issue an IOU `FOO` and set limit on it.

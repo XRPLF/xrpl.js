@@ -16,13 +16,13 @@ async function multisigning(): Promise<void> {
    * hence, users need to implement a way to get signatures.
    */
   const { wallet: wallet1 } = await client.fundWallet(null, {
-    useCase: 'code snippets',
+    usageContext: 'code snippets',
   })
   const { wallet: wallet2 } = await client.fundWallet(null, {
-    useCase: 'code snippets',
+    usageContext: 'code snippets',
   })
   const { wallet: walletMaster } = await client.fundWallet(null, {
-    useCase: 'code snippets',
+    usageContext: 'code snippets',
   })
   const signerListSet: SignerListSet = {
     TransactionType: 'SignerListSet',
