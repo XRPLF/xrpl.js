@@ -1,5 +1,6 @@
 /* eslint-disable no-bitwise -- flags require bitwise operations */
 import { assert } from 'chai'
+
 import {
   DepositPreauth,
   OfferCreate,
@@ -10,13 +11,13 @@ import {
   PaymentFlags,
   TrustSet,
   TrustSetFlags,
-} from 'xrpl-local'
-import { AccountRootFlags } from 'xrpl-local/models/ledger'
-import { isFlagEnabled } from 'xrpl-local/models/utils'
+} from '../../src'
+import { AccountRootFlags } from '../../src/models/ledger'
+import { isFlagEnabled } from '../../src/models/utils'
 import {
   setTransactionFlagsToNumber,
   parseAccountRootFlags,
-} from 'xrpl-local/models/utils/flags'
+} from '../../src/models/utils/flags'
 
 /**
  * Utils Testing.
@@ -150,6 +151,7 @@ describe('Models Utils', function () {
       assert.strictEqual(tx.Flags, 0)
     })
 
+    // eslint-disable-next-line complexity -- Simpler to list them all out at once.
     it('parseAccountRootFlags all enabled', function () {
       const accountRootFlags =
         AccountRootFlags.lsfDefaultRipple |
@@ -160,7 +162,11 @@ describe('Models Utils', function () {
         AccountRootFlags.lsfNoFreeze |
         AccountRootFlags.lsfPasswordSpent |
         AccountRootFlags.lsfRequireAuth |
-        AccountRootFlags.lsfRequireDestTag
+        AccountRootFlags.lsfRequireDestTag |
+        AccountRootFlags.lsfDisallowIncomingNFTokenOffer |
+        AccountRootFlags.lsfDisallowIncomingCheck |
+        AccountRootFlags.lsfDisallowIncomingPayChan |
+        AccountRootFlags.lsfDisallowIncomingTrustline
 
       const parsed = parseAccountRootFlags(accountRootFlags)
 
@@ -173,7 +179,11 @@ describe('Models Utils', function () {
           parsed.lsfNoFreeze &&
           parsed.lsfPasswordSpent &&
           parsed.lsfRequireAuth &&
-          parsed.lsfRequireDestTag,
+          parsed.lsfRequireDestTag &&
+          parsed.lsfDisallowIncomingNFTokenOffer &&
+          parsed.lsfDisallowIncomingCheck &&
+          parsed.lsfDisallowIncomingPayChan &&
+          parsed.lsfDisallowIncomingTrustline,
       )
     })
 
@@ -189,6 +199,10 @@ describe('Models Utils', function () {
       assert.isUndefined(parsed.lsfPasswordSpent)
       assert.isUndefined(parsed.lsfRequireAuth)
       assert.isUndefined(parsed.lsfRequireDestTag)
+      assert.isUndefined(parsed.lsfDisallowIncomingNFTokenOffer)
+      assert.isUndefined(parsed.lsfDisallowIncomingCheck)
+      assert.isUndefined(parsed.lsfDisallowIncomingPayChan)
+      assert.isUndefined(parsed.lsfDisallowIncomingTrustline)
     })
   })
 })

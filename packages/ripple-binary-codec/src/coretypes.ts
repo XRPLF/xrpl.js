@@ -1,4 +1,5 @@
 import {
+  DEFAULT_DEFINITIONS,
   Field,
   TransactionType,
   LedgerEntryType,
@@ -17,6 +18,7 @@ export {
   hashes,
   binary,
   ledgerHashes,
+  DEFAULT_DEFINITIONS,
   Field,
   TransactionType,
   LedgerEntryType,

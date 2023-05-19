@@ -1,11 +1,15 @@
 {
     "editor.tabSize": 2,
     "cSpell.words": [
-        "Multisigned",
-        "Setf",
         "hostid",
+        "keypair",
+        "keypairs",
+        "multisign",
+        "multisigned",
+        "multisigning",
         "preauthorization",
-        "secp256k1"
+        "secp256k1",
+        "Setf"
     ],
     "[javascript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -38,5 +42,13 @@
         "**/.git/objects/**": true,
         "**/.git/subtree-cache/**": true,
         "**/.hg/store/**": true
+    },
+    "search.exclude": {
+        "**/.git": true,
+        "**/node_modules": true,
+        "**/tmp": true,
+        "**/docs/**/*.html": true,
+        "**/fixtures/**/*.json": true,
+        "**/docs/assets": true
     },
 }

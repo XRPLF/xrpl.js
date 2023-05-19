@@ -1,5 +1,6 @@
 import { assert } from 'chai'
-import { Client } from 'xrpl-local'
+
+import { Client } from '../../src/client'
 
 describe('client constructor', function () {
   it('Client - implicit server port', function () {

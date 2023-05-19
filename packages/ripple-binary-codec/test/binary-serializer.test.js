@@ -1,7 +1,7 @@
-const { binary } = require('../dist/coretypes')
-const { encode, decode } = require('../dist')
+const { binary } = require('../src/coretypes')
+const { encode, decode } = require('../src')
 const { makeParser, BytesList, BinarySerializer } = binary
-const { coreTypes } = require('../dist/types')
+const { coreTypes } = require('../src/types')
 const { UInt8, UInt16, UInt32, UInt64, STObject } = coreTypes
 const bigInt = require('big-integer')
 const { Buffer } = require('buffer/')

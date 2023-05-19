@@ -1,7 +1,11 @@
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
 import rippledAccountLines from '../fixtures/rippled/accountLines'
-import { setupClient, teardownClient } from '../setupClient'
+import {
+  setupClient,
+  teardownClient,
+  type XrplTestContext,
+} from '../setupClient'
 import { assertResultMatch, addressTests } from '../testUtils'
 
 /**
@@ -10,22 +14,26 @@ import { assertResultMatch, addressTests } from '../testUtils'
  * - Check out "test/client/index.ts" for more information about the test runner.
  */
 describe('client.getBalances', function () {
-  beforeEach(setupClient)
-  afterEach(teardownClient)
+  let testContext: XrplTestContext
+
+  beforeEach(async () => {
+    testContext = await setupClient()
+  })
+  afterEach(async () => teardownClient(testContext))
 
   addressTests.forEach(function (testcase) {
-    describe(testcase.type, function () {
+    describe(testcase.type, () => {
       it('getBalances - base', async function () {
-        this.mockRippled.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_info',
           rippled.account_info.normal,
         )
-        this.mockRippled.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_lines',
           rippledAccountLines.normal,
         )
-        this.mockRippled.addResponse('ledger', rippled.ledger.normal)
-        const result = await this.client.getBalances(testcase.address)
+        testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+        const result = await testContext.client.getBalances(testcase.address)
         assertResultMatch(result, responses.getBalances, 'getBalances')
       })
 
@@ -36,20 +44,20 @@ describe('client.getBalances', function () {
             limit: 10,
           },
         }
-        this.mockRippled.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_info',
           rippled.account_info.normal,
         )
-        this.mockRippled.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_lines',
           rippledAccountLines.normal,
         )
-        this.mockRippled.addResponse('ledger', rippled.ledger.normal)
+        testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
         const expectedResponse = responses.getBalances.slice(
           0,
           request.options.limit,
         )
-        const result = await this.client.getBalances(
+        const result = await testContext.client.getBalances(
           request.account,
           request.options,
         )
@@ -60,20 +68,23 @@ describe('client.getBalances', function () {
         const options = {
           peer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
         }
-        this.mockRippled.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_info',
           rippled.account_info.normal,
         )
-        this.mockRippled.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_lines',
           rippledAccountLines.normal,
         )
-        this.mockRippled.addResponse('ledger', rippled.ledger.normal)
+        testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
 
         const expectedResponse = responses.getBalances.filter(
           (item) => item.issuer === options.peer,
         )
-        const result = await this.client.getBalances(testcase.address, options)
+        const result = await testContext.client.getBalances(
+          testcase.address,
+          options,
+        )
         assertResultMatch(result, expectedResponse, 'getBalances')
       })
 
@@ -82,20 +93,23 @@ describe('client.getBalances', function () {
           peer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
           limit: 10,
         }
-        this.mockRippled.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_info',
           rippled.account_info.normal,
         )
-        this.mockRippled.addResponse(
+        testContext.mockRippled!.addResponse(
           'account_lines',
           rippledAccountLines.normal,
         )
-        this.mockRippled.addResponse('ledger', rippled.ledger.normal)
+        testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
 
         const expectedResponse = responses.getBalances
           .filter((item) => item.issuer === options.peer)
           .slice(0, options.limit)
-        const result = await this.client.getBalances(testcase.address, options)
+        const result = await testContext.client.getBalances(
+          testcase.address,
+          options,
+        )
         assertResultMatch(result, expectedResponse, 'getBalances')
       })
     })

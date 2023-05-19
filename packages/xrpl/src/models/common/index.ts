@@ -1,16 +1,5 @@
 export type LedgerIndex = number | ('validated' | 'closed' | 'current')
 
-export type AccountObjectType =
-  | 'check'
-  | 'deposit_preauth'
-  | 'escrow'
-  | 'nft_offer'
-  | 'offer'
-  | 'payment_channel'
-  | 'signer_list'
-  | 'ticket'
-  | 'state'
-
 interface XRP {
   currency: 'XRP'
 }
@@ -108,6 +97,10 @@ export interface ResponseOnlyTxInfo {
    * The sequence number of the ledger that included this transaction.
    */
   ledger_index?: number
+  /**
+   * @deprecated Alias for ledger_index.
+   */
+  inLedger?: number
 }
 
 /**
@@ -123,4 +116,22 @@ export interface NFTOffer {
   owner: string
   destination?: string
   expiration?: number
+}
+
+/**
+ * One NFToken that might be returned from either an {@link NFTInfoResponse}
+ *
+ * @category Responses
+ */
+export interface NFToken {
+  nft_id: string
+  ledger_index: number
+  owner: string
+  is_burned: boolean
+  flags: number
+  transfer_fee: number
+  issuer: string
+  nft_taxon: number
+  nft_serial: number
+  uri: string
 }

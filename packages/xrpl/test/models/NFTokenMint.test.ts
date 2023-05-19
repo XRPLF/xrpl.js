@@ -1,10 +1,11 @@
 import { assert } from 'chai'
+
 import {
   convertStringToHex,
   validate,
   ValidationError,
   NFTokenMintFlags,
-} from 'xrpl-local'
+} from '../../src'
 
 /**
  * NFTokenMint Transaction Verification Testing.
@@ -64,6 +65,26 @@ describe('NFTokenMint', function () {
       () => validate(invalid),
       ValidationError,
       'NFTokenMint: Issuer must not be equal to Account',
+    )
+  })
+
+  it(`throws w/ URI being an empty string`, function () {
+    const invalid = {
+      TransactionType: 'NFTokenMint',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Fee: '5000000',
+      Sequence: 2470665,
+      Flags: NFTokenMintFlags.tfTransferable,
+      NFTokenTaxon: 0,
+      Issuer: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
+      TransferFee: 1,
+      URI: '',
+    } as any
+
+    assert.throws(
+      () => validate(invalid),
+      ValidationError,
+      'NFTokenMint: URI must not be empty string',
     )
   })
 

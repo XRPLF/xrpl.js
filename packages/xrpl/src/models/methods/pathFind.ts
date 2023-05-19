@@ -63,6 +63,11 @@ interface PathOption {
    * Destination to receive the desired amount.
    */
   source_amount: Amount
+  /**
+   * Destination Amount that the destination would receive along this path.
+   * If the `send_max` field is set, this field will be set.
+   */
+  destination_amount?: Amount
 }
 
 /**
@@ -80,7 +85,7 @@ export interface PathFindResponse extends BaseResponse {
     alternatives: PathOption[]
     /** Unique address of the account that would receive a transaction. */
     destination_account: string
-    /** Currency amount that the destination would receive in a transaction. */
+    /** Currency amount provided in the WebSocket request. */
     destination_amount: Amount
     /** Unique address that would send a transaction. */
     source_account: string

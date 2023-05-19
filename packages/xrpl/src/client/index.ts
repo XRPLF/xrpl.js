@@ -1,3 +1,4 @@
+/* eslint-disable jsdoc/require-jsdoc -- Request has many aliases, but they don't need unique docs */
 /* eslint-disable @typescript-eslint/member-ordering -- TODO: remove when instance methods aren't members */
 /* eslint-disable max-lines -- Client is a large file w/ lots of imports/exports */
 import * as assert from 'assert'
@@ -89,6 +90,11 @@ import {
   NFTBuyOffersResponse,
   NFTSellOffersRequest,
   NFTSellOffersResponse,
+  // clio only methods
+  NFTInfoRequest,
+  NFTInfoResponse,
+  NFTHistoryRequest,
+  NFTHistoryResponse,
 } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 import {
@@ -317,6 +323,8 @@ class Client extends EventEmitter {
   public async request(r: ManifestRequest): Promise<ManifestResponse>
   public async request(r: NFTBuyOffersRequest): Promise<NFTBuyOffersResponse>
   public async request(r: NFTSellOffersRequest): Promise<NFTSellOffersResponse>
+  public async request(r: NFTInfoRequest): Promise<NFTInfoResponse>
+  public async request(r: NFTHistoryRequest): Promise<NFTHistoryResponse>
   public async request(r: NoRippleCheckRequest): Promise<NoRippleCheckResponse>
   public async request(r: PathFindRequest): Promise<PathFindResponse>
   public async request(r: PingRequest): Promise<PingResponse>
@@ -456,6 +464,10 @@ class Client extends EventEmitter {
     event: 'consensusPhase',
     listener: (phase: ConsensusStream) => void,
   ): this
+  public on(
+    event: 'manifestReceived',
+    listener: (manifest: ManifestResponse) => void,
+  ): this
   public on(event: 'path_find', listener: (path: PathFindStream) => void): this
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
   public on(event: 'error', listener: (...err: any[]) => void): this
@@ -561,6 +573,19 @@ class Client extends EventEmitter {
   /**
    * Tells the Client instance to connect to its rippled server.
    *
+   * @example
+   *
+   * Client.connect() establishes a connection between a Client object and the server.
+   *
+   * ```ts
+   * const { Client } = require('xrpl')
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   * await client.connect()
+   * // do something with the client
+   * await client.disconnect()
+   * ```
+   * If you open a client connection, be sure to close it with `await client.disconnect()`
+   * before exiting your application.
    * @returns A promise that resolves with a void value when a connection is established.
    * @category Network
    */
@@ -569,7 +594,21 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Tells the Client instance to disconnect from it's rippled server.
+   * Disconnects the XRPL client from the server and cancels all pending requests and subscriptions. Call when
+   * you want to disconnect the client from the server, such as when you're finished using the client or when you
+   * need to switch to a different server.
+   *
+   * @example
+   *
+   * To use the disconnect() method, you first need to create a new Client object and connect it to a server:
+   *
+   * ```ts
+   * const { Client } = require('xrpl')
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   * await client.connect()
+   * // do something with the client
+   * await client.disconnect()
+   * ```
    *
    * @returns A promise that resolves with a void value when a connection is destroyed.
    * @category Network

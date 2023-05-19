@@ -1,7 +1,11 @@
 import { assert } from 'chai'
-import { ValidationError } from 'xrpl-local'
 
-import { decimalToQuality, percentToQuality, qualityToDecimal } from '../../src'
+import {
+  ValidationError,
+  decimalToQuality,
+  percentToQuality,
+  qualityToDecimal,
+} from '../../src'
 
 describe('Quality utils', function () {
   it('converts 101 percent to valid Quality', function () {

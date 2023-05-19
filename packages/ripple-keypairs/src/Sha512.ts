@@ -1,7 +1,7 @@
 /* eslint-disable no-bitwise --
  * lots of bitwise operators necessary for this */
 import * as hashjs from 'hash.js'
-import * as BigNum from 'bn.js'
+import BigNum = require('bn.js')
 
 export default class Sha512 {
   // TODO: type of `hash`?

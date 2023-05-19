@@ -14,10 +14,7 @@
     "esModuleInterop": true,
     "suppressImplicitAnyIndexErrors": false,
     "resolveJsonModule": true,
-    "preserveSymlinks": true,
+    "preserveSymlinks": true
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.json"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.json"]
 }

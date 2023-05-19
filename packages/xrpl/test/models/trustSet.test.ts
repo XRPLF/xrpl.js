@@ -1,6 +1,7 @@
 import { assert } from 'chai'
-import { validate, ValidationError } from 'xrpl-local'
-import { validateTrustSet } from 'xrpl-local/models/transactions/trustSet'
+
+import { validate, ValidationError } from '../../src'
+import { validateTrustSet } from '../../src/models/transactions/trustSet'
 
 /**
  * TrustSet Transaction Verification Testing.
@@ -15,7 +16,7 @@ describe('TrustSet', function () {
       TransactionType: 'TrustSet',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       LimitAmount: {
-        currency: 'XRP',
+        currency: 'USD',
         issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
         value: '4329.23',
       },
