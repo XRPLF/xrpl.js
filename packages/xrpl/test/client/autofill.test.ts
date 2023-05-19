@@ -15,6 +15,7 @@ import {
 } from '../setupClient'
 import { assertRejects } from '../testUtils'
 
+const NetworkID = 1025
 const Fee = '10'
 const Sequence = 1432
 const LastLedgerSequence = 2908734
@@ -32,15 +33,52 @@ describe('client.autofill', function () {
       TransactionType: 'DepositPreauth',
       Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
       Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      NetworkID,
       Fee,
       Sequence,
       LastLedgerSequence,
     }
     const txResult = await testContext.client.autofill(tx)
 
+    assert.strictEqual(txResult.NetworkID, NetworkID)
     assert.strictEqual(txResult.Fee, Fee)
     assert.strictEqual(txResult.Sequence, Sequence)
     assert.strictEqual(txResult.LastLedgerSequence, LastLedgerSequence)
+  })
+
+  it('ignores network ID if < 1024 and its missing', async function () {
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
+      Amount: '1234',
+      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+    const txResult = await testContext.client.autofill(tx)
+
+    assert.strictEqual(txResult.NetworkID, undefined)
+  })
+
+  it('override network ID if > 1024 and its missing', async function () {
+    testContext.client.networkID = 1025
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
+      Amount: '1234',
+      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+    const txResult = await testContext.client.autofill(tx)
+
+    assert.strictEqual(txResult.NetworkID, 1025)
   })
 
   it('converts Account & Destination X-address to their classic address', async function () {
