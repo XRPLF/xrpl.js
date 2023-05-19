@@ -117,3 +117,21 @@ export interface NFTOffer {
   destination?: string
   expiration?: number
 }
+
+/**
+ * One NFToken that might be returned from either an {@link NFTInfoResponse}
+ *
+ * @category Responses
+ */
+export interface NFToken {
+  nft_id: string
+  ledger_index: number
+  owner: string
+  is_burned: boolean
+  flags: number
+  transfer_fee: number
+  issuer: string
+  nft_taxon: number
+  nft_serial: number
+  uri: string
+}
