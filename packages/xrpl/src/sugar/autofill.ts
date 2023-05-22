@@ -104,7 +104,7 @@ async function autofillBatch<T extends Transaction>(
   transactions: Array<{ transaction: T; signersCount?: number }>,
 ): Promise<T[]> {
   // Sender Account to Sequence map
-  const map: Map<string, number> = new Map()
+  const accountSequenceMap: Map<string, number> = new Map()
   const promises: Array<Promise<T>> = []
   for (const txn of transactions) {
     const { transaction, signersCount } = txn
@@ -112,8 +112,8 @@ async function autofillBatch<T extends Transaction>(
 
     if (transaction.Sequence == null) {
       // eslint-disable-next-line max-depth -- necessary
-      if (map.has(account)) {
-        transaction.Sequence = map.get(account)
+      if (accountSequenceMap.has(account)) {
+        transaction.Sequence = accountSequenceMap.get(account)
       } else {
         // eslint-disable-next-line no-await-in-loop -- necessary
         await setNextValidSequenceNumber(this, transaction)
@@ -126,7 +126,7 @@ async function autofillBatch<T extends Transaction>(
 
     promises.push(this.autofill(transaction, signersCount))
 
-    map.set(account, transaction.Sequence + 1)
+    accountSequenceMap.set(account, transaction.Sequence + 1)
   }
 
   return Promise.all(promises)
