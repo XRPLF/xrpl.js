@@ -31,14 +31,14 @@ describe('client.submitAndWaitBatch', function () {
 
       const paymentTx: Payment = {
         TransactionType: 'Payment',
-        Account: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
         Destination: receiverWallet.classicAddress,
         Amount: '1000',
       }
       const txList = [
         {
           transaction: paymentTx,
-          opts: { wallet: this.wallet },
+          opts: { wallet: testContext.wallet },
         },
       ]
 
@@ -62,14 +62,14 @@ describe('client.submitAndWaitBatch', function () {
     async function () {
       const invalidAccountDeleteTx = {
         TransactionType: 'AccountDelete',
-        Account: this.wallet.classicAddress,
-        Destination: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
+        Destination: testContext.wallet.classicAddress,
         Amount: '1000',
       }
       const txList = [
         {
           transaction: invalidAccountDeleteTx,
-          opts: { wallet: this.wallet },
+          opts: { wallet: testContext.wallet },
         },
       ]
 
@@ -97,24 +97,24 @@ describe('client.submitAndWaitBatch', function () {
 
       const paymentTx: Payment = {
         TransactionType: 'Payment',
-        Account: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
         Destination: receiverWallet.classicAddress,
         Amount: '1000',
       }
       const paymentTx2: Payment = {
         TransactionType: 'Payment',
-        Account: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
         Destination: receiverWallet2.classicAddress,
         Amount: '1000',
       }
       const txList = [
         {
           transaction: paymentTx,
-          opts: { wallet: this.wallet },
+          opts: { wallet: testContext.wallet },
         },
         {
           transaction: paymentTx2,
-          opts: { wallet: this.wallet },
+          opts: { wallet: testContext.wallet },
         },
       ]
 
@@ -143,24 +143,24 @@ describe('client.submitAndWaitBatch', function () {
 
       const paymentTx: Payment = {
         TransactionType: 'Payment',
-        Account: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
         Destination: receiverWallet.classicAddress,
         Amount: '1000',
       }
       const invalidAccountDeleteTx = {
         TransactionType: 'AccountDelete',
-        Account: this.wallet.classicAddress,
-        Destination: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
+        Destination: testContext.wallet.classicAddress,
         Amount: '1000',
       }
       const txList = [
         {
           transaction: paymentTx,
-          opts: { wallet: this.wallet },
+          opts: { wallet: testContext.wallet },
         },
         {
           transaction: invalidAccountDeleteTx,
-          opts: { wallet: this.wallet },
+          opts: { wallet: testContext.wallet },
         },
       ]
 
@@ -192,7 +192,7 @@ describe('client.submitAndWaitBatch', function () {
 
       const paymentTx: Payment = {
         TransactionType: 'Payment',
-        Account: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
         Destination: receiverWallet.classicAddress,
         Amount: '1000',
       }
@@ -205,7 +205,7 @@ describe('client.submitAndWaitBatch', function () {
       const txList = [
         {
           transaction: paymentTx,
-          opts: { wallet: this.wallet },
+          opts: { wallet: testContext.wallet },
         },
         {
           transaction: paymentTx2,
@@ -238,8 +238,8 @@ describe('client.submitAndWaitBatch', function () {
 
       const invalidAccountDeleteTx = {
         TransactionType: 'AccountDelete',
-        Account: this.wallet.classicAddress,
-        Destination: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
+        Destination: testContext.wallet.classicAddress,
         Amount: '1000',
       }
       const invalidAccountDeleteTx2 = {
@@ -251,7 +251,7 @@ describe('client.submitAndWaitBatch', function () {
       const txList = [
         {
           transaction: invalidAccountDeleteTx,
-          opts: { wallet: this.wallet },
+          opts: { wallet: testContext.wallet },
         },
         {
           transaction: invalidAccountDeleteTx2,
@@ -289,13 +289,13 @@ describe('client.submitAndWaitBatch', function () {
 
       const paymentTx: Payment = {
         TransactionType: 'Payment',
-        Account: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
         Destination: receiverWallet.classicAddress,
         Amount: '1000',
       }
       const paymentTx2: Payment = {
         TransactionType: 'Payment',
-        Account: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
         Destination: receiverWallet2.classicAddress,
         Amount: '1000',
       }
@@ -314,11 +314,11 @@ describe('client.submitAndWaitBatch', function () {
       const txList = [
         {
           transaction: paymentTx,
-          opts: { wallet: this.wallet },
+          opts: { wallet: testContext.wallet },
         },
         {
           transaction: paymentTx2,
-          opts: { wallet: this.wallet },
+          opts: { wallet: testContext.wallet },
         },
         {
           transaction: paymentTx3,
@@ -357,14 +357,14 @@ describe('client.submitAndWaitBatch', function () {
 
       const paymentTx: Payment = {
         TransactionType: 'Payment',
-        Account: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
         Destination: receiverWallet.classicAddress,
         Amount: '1000',
       }
       const invalidAccountDeleteTx = {
         TransactionType: 'AccountDelete',
-        Account: this.wallet.classicAddress,
-        Destination: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
+        Destination: testContext.wallet.classicAddress,
         Amount: '1000',
       }
       const paymentTx2: Payment = {
@@ -382,11 +382,11 @@ describe('client.submitAndWaitBatch', function () {
       const txList = [
         {
           transaction: paymentTx,
-          opts: { wallet: this.wallet },
+          opts: { wallet: testContext.wallet },
         },
         {
           transaction: invalidAccountDeleteTx,
-          opts: { wallet: this.wallet },
+          opts: { wallet: testContext.wallet },
         },
         {
           transaction: paymentTx2,
@@ -445,19 +445,19 @@ describe('client.submitAndWaitBatch', function () {
 
       const paymentTx: Payment = {
         TransactionType: 'Payment',
-        Account: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
         Destination: receiverWallet.classicAddress,
         Amount: '1000',
       }
       const invalidAccountDeleteTx = {
         TransactionType: 'AccountDelete',
-        Account: this.wallet.classicAddress,
-        Destination: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
+        Destination: testContext.wallet.classicAddress,
         Amount: '1000',
       }
       const paymentTx2: Payment = {
         TransactionType: 'Payment',
-        Account: this.wallet.classicAddress,
+        Account: testContext.wallet.classicAddress,
         Destination: receiverWallet2.classicAddress,
         Amount: '1000',
       }
@@ -482,15 +482,15 @@ describe('client.submitAndWaitBatch', function () {
       const txList = [
         {
           transaction: paymentTx,
-          opts: { wallet: this.wallet },
+          opts: { wallet: testContext.wallet },
         },
         {
           transaction: invalidAccountDeleteTx,
-          opts: { wallet: this.wallet },
+          opts: { wallet: testContext.wallet },
         },
         {
           transaction: paymentTx2,
-          opts: { wallet: this.wallet },
+          opts: { wallet: testContext.wallet },
         },
         {
           transaction: paymentTx3,
