@@ -1,14 +1,23 @@
 import { assert } from 'chai'
-import { Transaction } from 'xrpl-local'
 
-import { setupClient, teardownClient } from '../setupClient'
+import { Transaction } from '../../src'
+import rippled from '../fixtures/rippled'
+import {
+  setupClient,
+  teardownClient,
+  type XrplTestContext,
+} from '../setupClient'
 
 const Fee = '10'
 const LastLedgerSequence = 2908734
 
 describe('client.autofillBatch', function () {
-  beforeEach(setupClient)
-  afterEach(teardownClient)
+  let testContext: XrplTestContext
+
+  beforeEach(async () => {
+    testContext = await setupClient()
+  })
+  afterEach(async () => teardownClient(testContext))
 
   it('should autofill missing Sequence numbers for single account with multiple transactions', async function () {
     const tx: Transaction = {
@@ -28,16 +37,11 @@ describe('client.autofillBatch', function () {
       LastLedgerSequence,
     }
     const transactions = [{ transaction: tx }, { transaction: tx2 }]
-    this.mockRippled.addResponse('account_info', {
-      status: 'success',
-      type: 'response',
-      result: {
-        account_data: {
-          Sequence: 23,
-        },
-      },
-    })
-    const result = await this.client.autofillBatch(transactions)
+    testContext.mockRippled!.addResponse(
+      'account_info',
+      rippled.account_info.normal,
+    )
+    const result = await testContext.client.autofillBatch(transactions)
     assert.equal(result.length, 2)
     assert.strictEqual(result[0].Sequence, 23)
     assert.strictEqual(result[1].Sequence, 24)
@@ -62,7 +66,7 @@ describe('client.autofillBatch', function () {
       LastLedgerSequence,
     }
     const transactions = [{ transaction: tx }, { transaction: tx2 }]
-    const result = await this.client.autofillBatch(transactions)
+    const result = await testContext.client.autofillBatch(transactions)
     assert.equal(result.length, 2)
     assert.strictEqual(result[0].Sequence, 1432)
     assert.strictEqual(result[1].Sequence, 1433)
@@ -109,16 +113,11 @@ describe('client.autofillBatch', function () {
       { transaction: tx3 },
       { transaction: tx4 },
     ]
-    this.mockRippled.addResponse('account_info', {
-      status: 'success',
-      type: 'response',
-      result: {
-        account_data: {
-          Sequence: 23,
-        },
-      },
-    })
-    const result = await this.client.autofillBatch(transactions)
+    testContext.mockRippled!.addResponse(
+      'account_info',
+      rippled.account_info.normal,
+    )
+    const result = await testContext.client.autofillBatch(transactions)
     assert.equal(result.length, 4)
     assert.strictEqual(result[0].Sequence, 23)
     assert.strictEqual(result[1].Sequence, 24)
@@ -169,7 +168,7 @@ describe('client.autofillBatch', function () {
       { transaction: tx3 },
       { transaction: tx4 },
     ]
-    const result = await this.client.autofillBatch(transactions)
+    const result = await testContext.client.autofillBatch(transactions)
     assert.equal(result.length, 4)
     assert.strictEqual(result[0].Sequence, 1432)
     assert.strictEqual(result[1].Sequence, 1433)
