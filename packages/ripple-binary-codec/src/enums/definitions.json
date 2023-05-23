@@ -1586,7 +1586,7 @@
     [
       "LPTokenBalance",
       {
-        "nth": 29,
+        "nth": 31,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
