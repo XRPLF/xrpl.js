@@ -112,7 +112,7 @@ describe('fundWallet', function () {
       assert.equal(balance, 10000)
 
       /*
-       * No test for fund given wallet because the hooks v2 testnet faucet
+       * No test for fund given wallet because the hooks v3 testnet faucet
        * requires 10 seconds between requests. Would significantly slow down
        * the test suite.
        */
