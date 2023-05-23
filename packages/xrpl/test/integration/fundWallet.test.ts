@@ -91,9 +91,9 @@ describe('fundWallet', function () {
   )
 
   it(
-    'can generate wallet on hooks v2 testnet',
+    'can generate wallet on hooks v3 testnet',
     async function () {
-      const api = new Client('wss://hooks-testnet-v2.xrpl-labs.com')
+      const api = new Client('wss://hooks-testnet-v3.xrpl-labs.com')
 
       await api.connect()
 
@@ -112,7 +112,7 @@ describe('fundWallet', function () {
       assert.equal(balance, 10000)
 
       /*
-       * No test for fund given wallet because the hooks v2 testnet faucet
+       * No test for fund given wallet because the hooks v3 testnet faucet
        * requires 10 seconds between requests. Would significantly slow down
        * the test suite.
        */
