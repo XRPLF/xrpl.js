@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions -- error type thrown can be any */
 import { assert } from 'chai'
 import cloneDeep from 'lodash/cloneDeep'
 
-import { ValidationError } from '../../src'
+import { multisign, ValidationError } from '../../src'
 import { Transaction } from '../../src/models/transactions'
 import Wallet from '../../src/Wallet'
 import rippled from '../fixtures/rippled'
@@ -56,7 +57,6 @@ describe('client.submit', function () {
         const response = await testContext.client.submit(tx, { wallet })
         assert(response.result.engine_result, 'tesSUCCESS')
       } catch (error) {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- error type thrown can be any
         assert(false, `Did not expect an error to be thrown: ${error}`)
       }
     })
@@ -114,7 +114,31 @@ describe('client.submit', function () {
         const response = await testContext.client.submit(signedTxEncoded)
         assert(response.result.engine_result, 'tesSUCCESS')
       } catch (error) {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- error type thrown can be any
+        assert(false, `Did not expect an error to be thrown: ${error}`)
+      }
+    })
+
+    it('should submit a multisigned transaction', async function () {
+      const signerWallet1 = Wallet.generate()
+      const signerWallet2 = Wallet.generate()
+      const accountSetTx: Transaction = {
+        TransactionType: 'AccountSet',
+        Account: 'rhvh5SrgBL5V8oeV9EpDuVszeJSSCEkbPc',
+        Sequence: 1,
+        Fee: '12',
+        LastLedgerSequence: 12312,
+      }
+
+      testContext.mockRippled!.addResponse('submit', rippled.submit.success)
+
+      const signed1 = signerWallet1.sign(accountSetTx, true)
+      const signed2 = signerWallet2.sign(accountSetTx, true)
+      const multisignedTxEncoded = multisign([signed1.tx_blob, signed2.tx_blob])
+
+      try {
+        const response = await testContext.client.submit(multisignedTxEncoded)
+        assert(response.result.engine_result, 'tesSUCCESS')
+      } catch (error) {
         assert(false, `Did not expect an error to be thrown: ${error}`)
       }
     })

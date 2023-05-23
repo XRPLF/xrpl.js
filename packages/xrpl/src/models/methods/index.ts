@@ -35,6 +35,8 @@ import { LedgerDataRequest, LedgerDataResponse } from './ledgerData'
 import { LedgerEntryRequest, LedgerEntryResponse } from './ledgerEntry'
 import { ManifestRequest, ManifestResponse } from './manifest'
 import { NFTBuyOffersRequest, NFTBuyOffersResponse } from './nftBuyOffers'
+import { NFTHistoryRequest, NFTHistoryResponse } from './nftHistory'
+import { NFTInfoRequest, NFTInfoResponse } from './nftInfo'
 import { NFTSellOffersRequest, NFTSellOffersResponse } from './nftSellOffers'
 import { NoRippleCheckRequest, NoRippleCheckResponse } from './norippleCheck'
 import {
@@ -72,7 +74,6 @@ import {
 } from './transactionEntry'
 import { TxRequest, TxResponse } from './tx'
 import { UnsubscribeRequest, UnsubscribeResponse } from './unsubscribe'
-
 /**
  * @category Requests
  */
@@ -120,6 +121,9 @@ type Request =
   // NFT methods
   | NFTBuyOffersRequest
   | NFTSellOffersRequest
+  // clio only methods
+  | NFTInfoRequest
+  | NFTHistoryRequest
 
 /**
  * @category Responses
@@ -168,6 +172,9 @@ type Response =
   // NFT methods
   | NFTBuyOffersResponse
   | NFTSellOffersResponse
+  // clio only methods
+  | NFTInfoResponse
+  | NFTHistoryResponse
 
 export {
   Request,
@@ -263,4 +270,9 @@ export {
   NFTBuyOffersResponse,
   NFTSellOffersRequest,
   NFTSellOffersResponse,
+  // clio only methods
+  NFTInfoRequest,
+  NFTInfoResponse,
+  NFTHistoryRequest,
+  NFTHistoryResponse,
 }
