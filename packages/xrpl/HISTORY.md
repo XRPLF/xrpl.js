@@ -8,6 +8,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Null and undefined values in transactions are now treated as though the field was not passed in.
 
 ### Fixed
+* `getNFTokenID` now also accepts metadata from `tx` in binary format
 * Fixed `ServerState.transitions` typing, it is now a string instead of a number. (Only used in return from `server_state` request)
 * Added `destination_amount` to `PathOption` which is returned as part of a `path_find` request
 * Removed the `decode(encode(tx)) == tx` check from the wallet signing process
