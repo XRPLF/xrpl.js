@@ -40,7 +40,7 @@ function ensureDecodedMeta(
  * @throws if meta is not TransactionMetadata.
  */
 export default function getNFTokenID(
-  meta: TransactionMetadata,
+  meta: TransactionMetadata | string | undefined,
 ): string | undefined {
   const decodedMeta = ensureDecodedMeta(meta)
 

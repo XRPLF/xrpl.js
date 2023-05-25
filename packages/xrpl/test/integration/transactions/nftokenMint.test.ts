@@ -57,6 +57,7 @@ describe('NFTokenMint', function () {
       const nftokenID =
         getNFTokenID(txResponse.result.meta as TransactionMetadata) ??
         'undefined'
+
       const accountHasNFT = accountNFTs.result.account_nfts.some(
         (value) => value.NFTokenID === nftokenID,
       )
@@ -69,6 +70,17 @@ describe('NFTokenMint', function () {
       \n\nHere's what was returned from 'account_nfts' for ${
         testContext.wallet.address
       }: ${JSON.stringify(accountNFTs)}`,
+      )
+
+      const binaryTxResponse = await testContext.client.request({
+        ...txRequest,
+        binary: true,
+      })
+
+      assert.equal(
+        nftokenID,
+        getNFTokenID(binaryTxResponse.result.meta) ?? 'undefined',
+        `getNFTokenID produced a different outcome when decoding the metadata in binary format.`,
       )
     },
     TIMEOUT,
