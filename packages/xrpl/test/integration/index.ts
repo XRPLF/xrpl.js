@@ -49,7 +49,6 @@ export * from './integration.test'
 export * from './onConnect.test'
 export * from './regularKey.test'
 export * from './submitAndWait.test'
-export * from './wallet.test'
 
 // Because this does 256 ledger accepts, we do it last
 export * from './transactions/accountDelete.test'
