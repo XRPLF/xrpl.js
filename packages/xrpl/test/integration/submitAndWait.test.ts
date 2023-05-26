@@ -9,7 +9,7 @@ import {
   teardownClient,
   type XrplIntegrationTestContext,
 } from './setup'
-import { ledgerAccept } from './utils'
+import { delayedLedgerAccept } from './utils'
 
 // how long before each test case times out
 const TIMEOUT = 60000
@@ -21,13 +21,6 @@ describe('client.submitAndWait', function () {
     testContext = await setupClient(serverUrl)
   })
   afterEach(async () => teardownClient(testContext))
-
-  async function delayedLedgerAccept(): Promise<unknown> {
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 1000)
-    })
-    return ledgerAccept(testContext.client)
-  }
 
   it(
     'submitAndWait an unsigned transaction',
@@ -45,7 +38,7 @@ describe('client.submitAndWait', function () {
         const responsePromise = testContext.client.submitAndWait(accountSet, {
           wallet: testContext.wallet,
         })
-        const ledgerPromise = delayedLedgerAccept()
+        const ledgerPromise = delayedLedgerAccept(testContext.client)
 
         try {
           // eslint-disable-next-line no-await-in-loop -- Testing purposes
@@ -113,7 +106,7 @@ describe('client.submitAndWait', function () {
         await testContext.client.autofill(accountSet),
       )
       const responsePromise = testContext.client.submitAndWait(signedAccountSet)
-      const ledgerPromise = delayedLedgerAccept()
+      const ledgerPromise = delayedLedgerAccept(testContext.client)
       return Promise.all([responsePromise, ledgerPromise]).then(
         ([response, _ledger]) => {
           assert.equal(response.type, 'response')
@@ -136,7 +129,7 @@ describe('client.submitAndWait', function () {
         await testContext.client.autofill(accountSet),
       )
       const responsePromise = testContext.client.submitAndWait(signedAccountSet)
-      const ledgerPromise = delayedLedgerAccept()
+      const ledgerPromise = delayedLedgerAccept(testContext.client)
       return Promise.all([responsePromise, ledgerPromise]).then(
         ([response, _ledger]) => {
           assert.equal(response.type, 'response')

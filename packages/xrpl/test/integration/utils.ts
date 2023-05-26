@@ -76,6 +76,16 @@ export async function ledgerAccept(
   })
 }
 
+export async function delayedLedgerAccept(
+  client: Client,
+  delayTimeMs = 1000,
+): Promise<unknown> {
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, delayTimeMs)
+  })
+  return ledgerAccept(client)
+}
+
 /**
  * Attempt to get the time after which we can check for the escrow to be finished.
  * Sometimes the ledger close_time is in the future, so we need to wait for it to catch up.
