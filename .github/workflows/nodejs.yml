@@ -25,9 +25,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Setup npm version 7
+      - name: Setup npm version 9
         run: |
-          npm i -g npm@7 --registry=https://registry.npmjs.org
+          npm i -g npm@9 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
@@ -66,9 +66,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Setup npm version 7
+      - name: Setup npm version 9
         run: |
-          npm i -g npm@7 --registry=https://registry.npmjs.org
+          npm i -g npm@9 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
@@ -112,9 +112,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Setup npm version 7
+      - name: Setup npm version 9
         run: |
-          npm i -g npm@7 --registry=https://registry.npmjs.org
+          npm i -g npm@9 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
@@ -164,9 +164,9 @@ jobs:
         run: |
           docker run --detach --rm --name rippled-service -p 6006:6006 --volume "${{ github.workspace }}/.ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s --env "ENV_ARGS=-a --start" --env GITHUB_ACTIONS=true --env CI=true xrpllabsofficial/xrpld:latest
 
-      - name: Setup npm version 7
+      - name: Setup npm version 9
         run: |
-          npm i -g npm@7 --registry=https://registry.npmjs.org
+          npm i -g npm@9 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
