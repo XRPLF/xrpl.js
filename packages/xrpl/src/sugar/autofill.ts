@@ -15,6 +15,7 @@ import { isEarlierVersion } from './utils'
 const LEDGER_OFFSET = 20
 const RESTRICTED_NETWORKS = 1024
 const REQUIRED_NETWORKID_VERSION = '1.11.0'
+const HOOKS_TESTNET_ID = 21338
 interface ClassicAccountAndTag {
   classicAccount: string
   tag: number | false | undefined
@@ -44,9 +45,11 @@ async function autofill<T extends Transaction>(
   setTransactionFlagsToNumber(tx)
   const promises: Array<Promise<void>> = []
   if (this.networkID !== undefined && this.networkID > RESTRICTED_NETWORKS) {
+    // autofill transaction's networkID if either the network is hooks testnet or build version is >= 1.11.0
     if (
-      this.buildVersion &&
-      isEarlierVersion(this.buildVersion, REQUIRED_NETWORKID_VERSION)
+      (this.buildVersion &&
+        isEarlierVersion(this.buildVersion, REQUIRED_NETWORKID_VERSION)) ||
+      this.networkID === HOOKS_TESTNET_ID
     ) {
       tx.NetworkID = undefined
     } else {
