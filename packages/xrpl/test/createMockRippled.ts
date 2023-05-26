@@ -36,6 +36,24 @@ function ping(conn, request): void {
   }, 1000 * 2)
 }
 
+function server_info(conn, request): void {
+  setTimeout(() => {
+    conn.send(
+      createResponse(request, {
+        id: 0,
+        result: {
+          info: {
+            build_version: '1.7.3',
+            network_id: '1.11.0',
+          },
+        },
+        status: 'success',
+        type: 'response',
+      }),
+    )
+  }, 1000 * 2)
+}
+
 export interface PortResponse extends BaseResponse {
   result: {
     port: number
@@ -91,6 +109,7 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
 
   mock.on('connection', function (this: MockedWebSocketServer, conn) {
     this.socket = conn
+    // eslint-disable-next-line complexity -- disable for testing.
     conn.on('message', function (requestJSON) {
       let request
       try {
@@ -109,6 +128,8 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
           mock.testCommand(conn, request)
         } else if (request.command in mock.responses) {
           conn.send(createResponse(request, mock.getResponse(request)))
+        } else if (request.command === 'server_info') {
+          server_info(conn, request)
         } else {
           throw new XrplError(
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- We know it's there

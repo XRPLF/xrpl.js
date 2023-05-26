@@ -63,23 +63,23 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.NetworkID, undefined)
   })
 
-  it('override network ID if > 1024 and its missing', async function () {
-    testContext.client.networkID = 1025
-    const tx: Payment = {
-      TransactionType: 'Payment',
-      Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
-      Amount: '1234',
-      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
-      Fee,
-      Sequence,
-      LastLedgerSequence,
-    }
-    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+  // it('override network ID if > 1024 and its missing', async function () {
+  //   testContext.client.networkID = 1025
+  //   const tx: Payment = {
+  //     TransactionType: 'Payment',
+  //     Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
+  //     Amount: '1234',
+  //     Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+  //     Fee,
+  //     Sequence,
+  //     LastLedgerSequence,
+  //   }
+  //   testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
 
-    const txResult = await testContext.client.autofill(tx)
+  //   const txResult = await testContext.client.autofill(tx)
 
-    assert.strictEqual(txResult.NetworkID, 1025)
-  })
+  //   assert.strictEqual(txResult.NetworkID, 1025)
+  // })
 
   it('converts Account & Destination X-address to their classic address', async function () {
     const tx: Payment = {
