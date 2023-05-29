@@ -48,12 +48,12 @@ async function autofill<T extends Transaction>(
     // autofill transaction's networkID if either the network is hooks testnet or build version is >= 1.11.0
     if (
       (this.buildVersion &&
-        isEarlierVersion(this.buildVersion, REQUIRED_NETWORKID_VERSION)) ||
+        isEarlierVersion(REQUIRED_NETWORKID_VERSION, this.buildVersion)) ||
       this.networkID === HOOKS_TESTNET_ID
     ) {
-      tx.NetworkID = undefined
-    } else {
       tx.NetworkID = this.networkID
+    } else {
+      tx.NetworkID = undefined
     }
   }
   if (tx.Sequence == null) {
