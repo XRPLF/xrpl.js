@@ -787,6 +787,26 @@
       }
     ],
     [
+      "FirstNFTokenSequence",
+      {
+        "nth": 50,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "ImportSequence",
+      {
+        "nth": 97,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "nth": 1,
@@ -1490,6 +1510,36 @@
       "LockedBalance",
       {
         "nth": 21,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "BaseFeeDrops",
+      {
+        "nth": 22,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "ReserveBaseDrops",
+      {
+        "nth": 23,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "ReserveIncrementDrops",
+      {
+        "nth": 24,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2275,6 +2325,8 @@
     "telREQUIRES_NETWORK_ID": -385,
     "telNETWORK_ID_MAKES_TX_NON_CANONICAL": -384,
     "telNON_LOCAL_EMITTED_TXN": -383,
+    "telIMPORT_VL_KEY_NOT_RECOGNISED": -382,
+    "telCAN_NOT_QUEUE_IMPORT": -381,
 
     "temMALFORMED": -299,
     "temBAD_AMOUNT": -298,
@@ -2346,6 +2398,7 @@
     "tefTOO_BIG": -181,
     "tefNO_TICKET": -180,
     "tefNFTOKEN_IS_NOT_TRANSFERABLE": -179,
+    "tefPAST_IMPORT_SEQ": -178,
 
     "terRETRY": -99,
     "terFUNDS_SPENT": -98,
@@ -2435,7 +2488,8 @@
     "tecXCHAIN_ACCOUNT_CREATE_TOO_MANY": 183,
     "tecXCHAIN_PAYMENT_FAILED": 184,
     "tecXCHAIN_SELF_COMMIT": 185,
-    "tecXCHAIN_BAD_PUBLIC_KEY_ACCOUNT_PAIR": 186
+    "tecXCHAIN_BAD_PUBLIC_KEY_ACCOUNT_PAIR": 186,
+    "tecLAST_POSSIBLE_ENTRY": 255
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
@@ -2472,6 +2526,7 @@
     "URITokenBuy": 47,
     "URITokenCreateSellOffer": 48,
     "URITokenCancelSellOffer": 49,
+    "Import": 97,
     "Invoke": 99,
     "EnableAmendment": 100,
     "SetFee": 101,
