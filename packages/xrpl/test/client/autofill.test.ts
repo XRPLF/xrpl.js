@@ -19,6 +19,7 @@ const NetworkID = 1025
 const Fee = '10'
 const Sequence = 1432
 const LastLedgerSequence = 2908734
+const HOOKS_TESTNET_ID = 21338
 
 describe('client.autofill', function () {
   let testContext: XrplTestContext
@@ -46,7 +47,7 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.LastLedgerSequence, LastLedgerSequence)
   })
 
-  it('ignores network ID if < 1024 and its missing', async function () {
+  it('ignores network ID if missing', async function () {
     const tx: Payment = {
       TransactionType: 'Payment',
       Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
@@ -63,23 +64,81 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.NetworkID, undefined)
   })
 
-  // it('override network ID if > 1024 and its missing', async function () {
-  //   testContext.client.networkID = 1025
-  //   const tx: Payment = {
-  //     TransactionType: 'Payment',
-  //     Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
-  //     Amount: '1234',
-  //     Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
-  //     Fee,
-  //     Sequence,
-  //     LastLedgerSequence,
-  //   }
-  //   testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+  it('overrides network ID if > 1024 and version is later than 1.11.0', async function () {
+    testContext.client.networkID = 1025
+    testContext.client.buildVersion = '1.11.1'
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
+      Amount: '1234',
+      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
 
-  //   const txResult = await testContext.client.autofill(tx)
+    const txResult = await testContext.client.autofill(tx)
 
-  //   assert.strictEqual(txResult.NetworkID, 1025)
-  // })
+    assert.strictEqual(txResult.NetworkID, 1025)
+  })
+
+  it('ignores network ID if > 1024 but version is earlier than 1.11.0', async function () {
+    testContext.client.networkID = 1025
+    testContext.client.buildVersion = '1.10.1'
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
+      Amount: '1234',
+      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+    const txResult = await testContext.client.autofill(tx)
+
+    assert.strictEqual(txResult.NetworkID, undefined)
+  })
+
+  it('ignores network ID if < 1024', async function () {
+    testContext.client.networkID = 1023
+    testContext.client.buildVersion = '1.11.1'
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
+      Amount: '1234',
+      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+    const txResult = await testContext.client.autofill(tx)
+
+    assert.strictEqual(txResult.NetworkID, undefined)
+  })
+
+  it('override network ID for hooks testnet', async function () {
+    testContext.client.networkID = HOOKS_TESTNET_ID
+    testContext.client.buildVersion = '1.10.1'
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
+      Amount: '1234',
+      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+    const txResult = await testContext.client.autofill(tx)
+
+    assert.strictEqual(txResult.NetworkID, HOOKS_TESTNET_ID)
+  })
 
   it('converts Account & Destination X-address to their classic address', async function () {
     const tx: Payment = {

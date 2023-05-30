@@ -6,10 +6,9 @@ import { ValidationError, XrplError } from '../errors'
 import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
 import { Transaction } from '../models/transactions'
 import { setTransactionFlagsToNumber } from '../models/utils/flags'
-import { xrpToDrops } from '../utils'
+import { isEarlierRippledVersion, xrpToDrops } from '../utils'
 
 import getFeeXrp from './getFeeXrp'
-import { isEarlierVersion } from './utils'
 
 // Expire unconfirmed transactions after 20 ledger versions, approximately 1 minute, by default
 const LEDGER_OFFSET = 20
@@ -48,7 +47,10 @@ async function autofill<T extends Transaction>(
     // autofill transaction's networkID if either the network is hooks testnet or build version is >= 1.11.0
     if (
       (this.buildVersion &&
-        isEarlierVersion(REQUIRED_NETWORKID_VERSION, this.buildVersion)) ||
+        isEarlierRippledVersion(
+          REQUIRED_NETWORKID_VERSION,
+          this.buildVersion,
+        )) ||
       this.networkID === HOOKS_TESTNET_ID
     ) {
       tx.NetworkID = this.networkID

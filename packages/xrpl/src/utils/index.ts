@@ -40,6 +40,7 @@ import {
   hashEscrow,
   hashPaymentChannel,
 } from './hashes'
+import isEarlierRippledVersion from './isEarlierRippledVersion'
 import parseNFTokenID from './parseNFTokenID'
 import {
   percentToTransferRate,
@@ -191,6 +192,7 @@ export {
   qualityToDecimal,
   isValidSecret,
   isValidAddress,
+  isEarlierRippledVersion,
   hashes,
   deriveKeypair,
   deriveAddress,
