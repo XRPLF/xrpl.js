@@ -588,9 +588,7 @@ class Client extends EventEmitter {
       })
       this.networkID = response.result.info.network_id ?? undefined
       this.buildVersion = response.result.info.build_version
-      return Promise.resolve()
     })
-    // return this.connection.connect()
   }
 
   /**
