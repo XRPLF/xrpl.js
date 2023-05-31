@@ -3,7 +3,8 @@
 ## Unreleased
 ### Added
 - Allow custom type definitions to be used for encoding/decoding transactions at runtime (e.g. for sidechains/new amendments)
-* Support for the XChainBridge amendment.
+- Adds support for npm v9
+- Support for the XChainBridge amendment.
 
 ## 1.5.0 (2023-03-08)
 ### Changed
