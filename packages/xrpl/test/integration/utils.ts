@@ -18,7 +18,7 @@ import { hashSignedTx } from '../../src/utils/hashes'
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
 
-async function sendLedgerAccept(client: Client): Promise<unknown> {
+export async function sendLedgerAccept(client: Client): Promise<unknown> {
   return client.connection.request({ command: 'ledger_accept' })
 }
 
@@ -253,7 +253,6 @@ export async function testTransaction(
   },
 ): Promise<SubmitResponse> {
   // Accept any un-validated changes.
-  await ledgerAccept(client)
 
   // sign/submit the transaction
   const response = await submitTransaction({
