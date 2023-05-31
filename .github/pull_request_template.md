@@ -31,13 +31,6 @@ Please check relevant options, delete irrelevant ones.
 - [ ] Documentation Updates
 - [ ] Release
 
-## Before / After
-
-<!--
-If just refactoring / back-end changes, this can be just an in-English description of the change at a technical level.
-If a UI change, screenshots should be included.
--->
-
 ## Test Plan
 
 <!--
