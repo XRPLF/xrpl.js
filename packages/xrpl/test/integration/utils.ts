@@ -10,6 +10,8 @@ import {
   type SubmitResponse,
   TimeoutError,
   NotConnectedError,
+  AccountLinesRequest,
+  IssuedCurrency,
 } from '../../src'
 import { Payment, Transaction } from '../../src/models/transactions'
 import { hashSignedTx } from '../../src/utils/hashes'
@@ -336,4 +338,17 @@ export async function waitForAndForceProgressLedgerTime(
   }
 
   throw new Error(`Ledger time not reached after ${retries} retries.`)
+}
+
+export async function getIOUBalance(
+  client: Client,
+  wallet: Wallet,
+  currency: IssuedCurrency,
+): Promise<string> {
+  const request: AccountLinesRequest = {
+    command: 'account_lines',
+    account: wallet.classicAddress,
+    peer: currency.issuer,
+  }
+  return (await client.request(request)).result.lines[0].balance
 }
