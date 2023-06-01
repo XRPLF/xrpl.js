@@ -12,7 +12,7 @@ import getFeeXrp from './getFeeXrp'
 
 // Expire unconfirmed transactions after 20 ledger versions, approximately 1 minute, by default
 const LEDGER_OFFSET = 20
-// Sidechains are expected to have network IDs above this. 
+// Sidechains are expected to have network IDs above this.
 // Mainnet and testnet are exceptions. More context: https://github.com/XRPLF/rippled/pull/4370
 const RESTRICTED_NETWORKS = 1024
 const REQUIRED_NETWORKID_VERSION = '1.11.0'
@@ -76,20 +76,8 @@ async function autofill<T extends Transaction>(
 
   setTransactionFlagsToNumber(tx)
   const promises: Array<Promise<void>> = []
-  if (this.networkID !== undefined && this.networkID > RESTRICTED_NETWORKS) {
-    // autofill transaction's networkID if either the network is hooks testnet or build version is >= 1.11.0
-    if (
-      (this.buildVersion &&
-        isEarlierRippledVersion(
-          REQUIRED_NETWORKID_VERSION,
-          this.buildVersion,
-        )) ||
-      this.networkID === HOOKS_TESTNET_ID
-    ) {
-      tx.NetworkID = this.networkID
-    } else {
-      tx.NetworkID = undefined
-    }
+  if (tx.NetworkID == null) {
+    tx.NetworkID = txNeedsNetworkID(this) ? this.networkID : undefined
   }
   if (tx.Sequence == null) {
     promises.push(setNextValidSequenceNumber(this, tx))
@@ -105,6 +93,26 @@ async function autofill<T extends Transaction>(
   }
 
   return Promise.all(promises).then(() => tx)
+}
+
+function txNeedsNetworkID(client: Client): boolean {
+  if (
+    client.networkID !== undefined &&
+    client.networkID > RESTRICTED_NETWORKS
+  ) {
+    // transaction needs networkID if either the network is hooks testnet or build version is >= 1.11.0
+    if (
+      (client.buildVersion &&
+        isEarlierRippledVersion(
+          REQUIRED_NETWORKID_VERSION,
+          client.buildVersion,
+        )) ||
+      client.networkID === HOOKS_TESTNET_ID
+    ) {
+      return true
+    }
+  }
+  return false
 }
 
 function setValidAddresses(tx: Transaction): void {
