@@ -12,6 +12,8 @@ import getFeeXrp from './getFeeXrp'
 
 // Expire unconfirmed transactions after 20 ledger versions, approximately 1 minute, by default
 const LEDGER_OFFSET = 20
+// Sidechains are expected to have network IDs above this. 
+// Mainnet and testnet are exceptions. More context: https://github.com/XRPLF/rippled/pull/4370
 const RESTRICTED_NETWORKS = 1024
 const REQUIRED_NETWORKID_VERSION = '1.11.0'
 const HOOKS_TESTNET_ID = 21338
