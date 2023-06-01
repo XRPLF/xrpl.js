@@ -2,6 +2,7 @@ import { decode, encode } from 'ripple-binary-codec'
 
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
 import { ValidationError, XrplError } from '../errors'
+import { Signer } from '../models/common'
 import { TxResponse } from '../models/methods'
 import { Transaction } from '../models/transactions'
 import { hashes } from '../utils'
@@ -52,12 +53,55 @@ async function submit(
  * validated ledger (or has errored/will not be included for some reason).
  * See [Reliable Transaction Submission](https://xrpl.org/reliable-transaction-submission.html).
  *
+ * @example
+ *
+ * ```ts
+ * const { Client, Wallet } = require('xrpl')
+ * const client = new Client('wss://s.altnet.rippletest.net:51233')
+ *
+ * async function submitTransaction() {
+ *   const senderWallet = client.fundWallet()
+ *   const recipientWallet = client.fundWallet()
+ *
+ *   const transaction = {
+ *     TransactionType: 'Payment',
+ *     Account: senderWallet.address,
+ *     Destination: recipientWallet.address,
+ *     Amount: '10'
+ *   }
+ *
+ *   try {
+ *     await client.submit(signedTransaction, { wallet: senderWallet })
+ *     console.log(result)
+ *   } catch (error) {
+ *     console.error(`Failed to submit transaction: ${error}`)
+ *   }
+ * }
+ *
+ * submitTransaction()
+ * ```
+ *
+ * In this example we submit a payment transaction between two newly created testnet accounts.
+ *
+ * Under the hood, `submit` will call `client.autofill` by default, and because we've passed in a `Wallet` it
+ * Will also sign the transaction for us before submitting the signed transaction binary blob to the ledger.
+ *
+ * This is similar to `submitAndWait` which does all of the above, but also waits to see if the transaction has been validated.
  * @param this - A Client.
  * @param transaction - A transaction to autofill, sign & encode, and submit.
  * @param opts - (Optional) Options used to sign and submit a transaction.
  * @param opts.autofill - If true, autofill a transaction.
  * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
  * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+ * @throws Connection errors: If the `Client` object is unable to establish a connection to the specified WebSocket endpoint,
+ * an error will be thrown.
+ * @throws Transaction errors: If the submitted transaction is invalid or cannot be included in a validated ledger for any
+ * reason, the promise returned by `submitAndWait()` will be rejected with an error. This could include issues with insufficient
+ * balance, invalid transaction fields, or other issues specific to the transaction being submitted.
+ * @throws Ledger errors: If the ledger being used to submit the transaction is undergoing maintenance or otherwise unavailable,
+ * an error will be thrown.
+ * @throws Timeout errors: If the transaction takes longer than the specified timeout period to be included in a validated
+ * ledger, the promise returned by `submitAndWait()` will be rejected with an error.
  * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
  */
 async function submitAndWait(
@@ -179,10 +223,26 @@ async function waitForFinalTransactionOutcome(
 // checks if the transaction has been signed
 function isSigned(transaction: Transaction | string): boolean {
   const tx = typeof transaction === 'string' ? decode(transaction) : transaction
-  return (
-    typeof tx !== 'string' &&
-    (tx.SigningPubKey != null || tx.TxnSignature != null)
-  )
+  if (typeof tx === 'string') {
+    return false
+  }
+  if (tx.Signers != null) {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- we know that tx.Signers is an array of Signers
+    const signers = tx.Signers as Signer[]
+    for (const signer of signers) {
+      // eslint-disable-next-line max-depth -- necessary for checking if signer is signed
+      if (
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- necessary check
+        signer.Signer.SigningPubKey == null ||
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- necessary check
+        signer.Signer.TxnSignature == null
+      ) {
+        return false
+      }
+    }
+    return true
+  }
+  return tx.SigningPubKey != null && tx.TxnSignature != null
 }
 
 // initializes a transaction for a submit request

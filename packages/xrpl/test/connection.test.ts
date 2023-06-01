@@ -437,6 +437,7 @@ describe('Connection', function () {
       try {
         await clientContext.client.connect()
       } catch (error) {
+        // @ts-expect-error -- error.message is expected to be defined
         expect(error.message).toEqual(
           "Error: connect() timed out after 5000 ms. If your internet connection is working, the rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.",
         )

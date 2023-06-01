@@ -25,7 +25,7 @@ All of which works in Node.js (tested for v14+) & web browsers (tested for Chrom
 
 ### Requirements
 
-+ **[Node.js v14](https://nodejs.org/)** is recommended. We also support v16 and v18. Other versions may work but are not frequently tested.
++ **[Node.js v16](https://nodejs.org/)** is recommended. We also support v14, v18 and v20. Other versions may work but are not frequently tested.
 
 ### Installing xrpl.js
 
@@ -74,6 +74,7 @@ It goes through:
 
 If you're using xrpl.js with React or Deno, you'll need to do a couple extra steps to set it up:
 
+- [Using xrpl.js with a CDN](./UNIQUE_SETUPS.md#using-xrpljs-from-a-cdn)
 - [Using xrpl.js with `create-react-app`](./UNIQUE_SETUPS.md#using-xrpljs-with-create-react-app)
 - [Using xrpl.js with `React Native`](./UNIQUE_SETUPS.md#using-xrpljs-with-react-native)
 - [Using xrpl.js with `Vite React`](./UNIQUE_SETUPS.md#using-xrpljs-with-vite-react)

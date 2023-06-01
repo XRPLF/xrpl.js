@@ -57,6 +57,15 @@ describe('Wallet', function () {
       assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
     })
 
+    it('generates a new wallet using an invalid/unknown algorithm', function () {
+      const algorithm = 'test'
+
+      assert.throws(() => {
+        // @ts-expect-error -- We know it is an invalid algorithm
+        Wallet.generate(algorithm)
+      }, /Invalid cryptographic signing algorithm/u)
+    })
+
     it('generates a new wallet using algorithm ecdsa-secp256k1', function () {
       const algorithm = ECDSA.secp256k1
       const wallet = Wallet.generate(algorithm)
@@ -763,7 +772,7 @@ describe('Wallet', function () {
       }
       assert.throws(() => {
         wallet.sign(payment)
-      }, /^Trying to sign an issued currency with a similar standard code to XRP \(received 'xrp'\)\. XRP is not an issued currency\./u)
+      }, /^Cannot have an issued currency with a similar standard code to XRP \(received 'xrp'\)\. XRP is not an issued currency\./u)
     })
 
     it('sign does NOT throw when a payment contains an issued currency like xrp in hex string format', async function () {
