@@ -1,6 +1,3 @@
-import { IncomingMessage } from 'http'
-import { request as httpsRequest, RequestOptions } from 'https'
-
 import { isValidClassicAddress } from 'ripple-address-codec'
 
 import type { Client } from '../client'
@@ -83,7 +80,7 @@ const MAX_ATTEMPTS = 20
  * and that wallet's balance in XRP.
  * @throws When either Client isn't connected or unable to fund wallet address.
  */
-// eslint-disable-next-line max-lines-per-function -- All lines necessary
+
 async function fundWallet(
   this: Client,
   wallet?: Wallet | null,
@@ -107,14 +104,10 @@ async function fundWallet(
       : Wallet.generate()
 
   // Create the POST request body
-  const postBody = Buffer.from(
-    new TextEncoder().encode(
-      JSON.stringify({
-        destination: walletToFund.classicAddress,
-        xrpAmount: options?.amount,
-      }),
-    ),
-  )
+  const postBody = {
+    destination: walletToFund.classicAddress,
+    xrpAmount: options?.amount,
+  }
 
   let startingBalance = 0
   try {
@@ -124,98 +117,59 @@ async function fundWallet(
   } catch {
     /* startingBalance remains '0' */
   }
-  // Options to pass to https.request
-  const httpOptions = getHTTPOptions(this, postBody, {
-    hostname: options?.faucetHost,
-    pathname: options?.faucetPath,
-  })
 
-  return returnPromise(
-    httpOptions,
-    this,
-    startingBalance,
-    walletToFund,
-    postBody,
-  )
+  return returnPromise(options, this, startingBalance, walletToFund, postBody)
 }
 
 // eslint-disable-next-line max-params -- Helper function created for organizational purposes
 async function returnPromise(
-  options: RequestOptions,
+  options: any,
   client: Client,
   startingBalance: number,
   walletToFund: Wallet,
-  postBody: Buffer,
+  postBody: any,
 ): Promise<{
   wallet: Wallet
   balance: number
 }> {
-  return new Promise((resolve, reject) => {
-    const request = httpsRequest(options, (response) => {
-      const chunks: Uint8Array[] = []
-      response.on('data', (data) => chunks.push(data))
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises -- not actually misused, different resolve/reject
-      response.on('end', async () =>
-        onEnd(
-          response,
-          chunks,
-          client,
-          startingBalance,
-          walletToFund,
-          resolve,
-          reject,
-        ),
+  return new Promise(async (resolve, reject) => {
+    const finalHostname = options.hostname ?? getFaucetHost(client)
+    const finalPathname =
+      options.pathname ?? getDefaultFaucetPath(finalHostname)
+    return fetch(`https://${finalHostname}/${finalPathname}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': `${postBody.length}`,
+      },
+      body: postBody,
+    }).then(async (response) => {
+      return onEnd(
+        response,
+        client,
+        startingBalance,
+        walletToFund,
+        resolve,
+        reject,
       )
     })
     // POST the body
-    request.write(postBody)
-
-    request.on('error', (error) => {
-      reject(error)
-    })
-
-    request.end()
   })
-}
-
-function getHTTPOptions(
-  client: Client,
-  postBody: Uint8Array,
-  options?: {
-    hostname?: string
-    pathname?: string
-  },
-): RequestOptions {
-  const finalHostname = options?.hostname ?? getFaucetHost(client)
-  const finalPathname = options?.pathname ?? getDefaultFaucetPath(finalHostname)
-  return {
-    hostname: finalHostname,
-    port: 443,
-    path: finalPathname,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': postBody.length,
-    },
-  }
 }
 
 // eslint-disable-next-line max-params -- Helper function created for organizational purposes
 async function onEnd(
-  response: IncomingMessage,
-  chunks: Uint8Array[],
+  response: Response,
   client: Client,
   startingBalance: number,
   walletToFund: Wallet,
   resolve: (response: { wallet: Wallet; balance: number }) => void,
   reject: (err: ErrorConstructor | Error | unknown) => void,
 ): Promise<void> {
-  const body = Buffer.concat(chunks).toString()
-
+  const body = await response.json()
   // "application/json; charset=utf-8"
   if (response.headers['content-type']?.startsWith('application/json')) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- We know this is safe and correct
-    const faucetWallet: FaucetWallet = JSON.parse(body)
+    const faucetWallet: FaucetWallet = body
     const classicAddress = faucetWallet.account.classicAddress
     await processSuccessfulResponse(
       client,
@@ -229,7 +183,7 @@ async function onEnd(
     reject(
       new XRPLFaucetError(
         `Content type is not \`application/json\`: ${JSON.stringify({
-          statusCode: response.statusCode,
+          statusCode: response.status,
           contentType: response.headers['content-type'],
           body,
         })}`,

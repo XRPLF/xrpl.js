@@ -1,6 +1,6 @@
 /* eslint-disable max-lines -- Connection is a large file w/ lots of imports/exports */
 import { EventEmitter } from 'events'
-import { Agent } from 'http'
+import { type Agent } from 'http'
 
 import omitBy from 'lodash/omitBy'
 import WebSocket from 'ws'
