@@ -101,6 +101,7 @@ function txNeedsNetworkID(client: Client): boolean {
     client.networkID > RESTRICTED_NETWORKS
   ) {
     // transaction needs networkID if either the network is hooks testnet or build version is >= 1.11.0
+    // TODO: remove the buildVersion logic when 1.11.0 is out and widely used.
     if (
       (client.buildVersion &&
         isEarlierRippledVersion(
