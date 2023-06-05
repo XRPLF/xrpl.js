@@ -91,7 +91,6 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
 
   mock.on('connection', function (this: MockedWebSocketServer, conn) {
     this.socket = conn
-    // eslint-disable-next-line complexity -- disable for testing.
     conn.on('message', function (requestJSON) {
       let request
       try {
