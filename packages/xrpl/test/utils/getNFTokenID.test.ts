@@ -18,4 +18,11 @@ describe('getNFTokenID', function () {
       '0008125CBE4B401B2F62ED35CC67362165AA813CCA06316FFA766254000003EE'
     assert.equal(result, expectedNFTokenID)
   })
+
+  it('fails with nice error when given raw response instead of meta', function () {
+    assert.throws(() => {
+      // @ts-expect-error - Validating error for javascript users
+      const _ = getNFTokenID(NFTokenResponse)
+    }, /^Unable to parse the parameter given to getNFTokenID.*/u)
+  })
 })

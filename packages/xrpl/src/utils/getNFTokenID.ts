@@ -42,6 +42,15 @@ function ensureDecodedMeta(
 export default function getNFTokenID(
   meta: TransactionMetadata | string,
 ): string | undefined {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Helpful for debugging in javascript.
+  // @ts-expect-error -- Users in JavaScript may accidentally pass in the whole transaction response instead of just meta.
+  if (meta.AffectedNodes === undefined) {
+    throw new TypeError(`Unable to parse the parameter given to getNFTokenID.
+      'meta' must be the metadata from an NFTokenMint transaction. Received ${JSON.stringify(
+        meta,
+      )} instead.`)
+  }
+
   const decodedMeta = ensureDecodedMeta(meta)
 
   /*
