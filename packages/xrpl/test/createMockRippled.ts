@@ -10,7 +10,7 @@ import type {
 
 import { destroyServer, getFreePort } from './testUtils'
 
-function createResponse(
+export function createResponse(
   request: { id: number | string },
   response: Record<string, unknown>,
 ): string {
@@ -29,24 +29,6 @@ function ping(conn, request): void {
     conn.send(
       createResponse(request, {
         result: {},
-        status: 'success',
-        type: 'response',
-      }),
-    )
-  }, 1000 * 2)
-}
-
-function server_info(conn, request): void {
-  setTimeout(() => {
-    conn.send(
-      createResponse(request, {
-        id: 0,
-        result: {
-          info: {
-            build_version: '1.7.3',
-            network_id: '1.11.0',
-          },
-        },
         status: 'success',
         type: 'response',
       }),
@@ -128,8 +110,6 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
           mock.testCommand(conn, request)
         } else if (request.command in mock.responses) {
           conn.send(createResponse(request, mock.getResponse(request)))
-        } else if (request.command === 'server_info') {
-          server_info(conn, request)
         } else {
           throw new XrplError(
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- We know it's there
