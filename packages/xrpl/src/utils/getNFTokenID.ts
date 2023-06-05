@@ -23,8 +23,8 @@ interface NFToken {
  * @returns the metadata in a deserialized format.
  */
 function ensureDecodedMeta(
-  meta: TransactionMetadata | string | undefined,
-): TransactionMetadata | undefined {
+  meta: TransactionMetadata | string,
+): TransactionMetadata {
   if (typeof meta === 'string') {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Meta is either metadata or serialized metadata.
     return decode(meta) as unknown as TransactionMetadata
@@ -40,16 +40,9 @@ function ensureDecodedMeta(
  * @throws if meta is not TransactionMetadata.
  */
 export default function getNFTokenID(
-  meta: TransactionMetadata | string | undefined,
+  meta: TransactionMetadata | string,
 ): string | undefined {
   const decodedMeta = ensureDecodedMeta(meta)
-
-  if (decodedMeta?.AffectedNodes === undefined) {
-    throw new TypeError(`Unable to parse the parameter given to getNFTokenID.
-    'meta' must be the metadata from an NFTokenMint transaction. Received ${JSON.stringify(
-      meta,
-    )} instead.`)
-  }
 
   /*
    * When a mint results in splitting an existing page,
