@@ -30,5 +30,15 @@ module.exports = function (config) {
     },
 
     browsers: ['ChromeHeadless'],
+    // runs only one browser at a time
+    concurrency: 1,
+    // CI mode
+    singleRun: true,
+    client: {
+      jasmine: {
+        // ensures that tests are run in order instead of a random order
+        random: false,
+      },
+    },
   })
 }
