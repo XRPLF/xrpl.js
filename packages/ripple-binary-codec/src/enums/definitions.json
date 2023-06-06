@@ -298,6 +298,16 @@
       }
     ],
     [
+      "DiscountedFee",
+      {
+        "nth": 6,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt16"
+      }
+    ],
+    [
       "Version",
       {
         "nth": 16,
