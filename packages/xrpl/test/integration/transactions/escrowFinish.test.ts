@@ -11,6 +11,7 @@ import {
   calculateWaitTimeForTransaction,
   generateFundedWallet,
   getXRPBalance,
+  sendLedgerAccept,
   testTransaction,
 } from '../utils'
 
@@ -84,6 +85,8 @@ describe('EscrowFinish', function () {
 
       await finishAfterPromise
 
+      // rippled uses the close time of the previous ledger
+      await sendLedgerAccept(testContext.client)
       await testTransaction(testContext.client, finishTx, testContext.wallet)
 
       const expectedBalance = String(Number(initialBalance) + Number(AMOUNT))

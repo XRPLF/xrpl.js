@@ -348,6 +348,16 @@
       }
     ],
     [
+      "NetworkID",
+      {
+        "nth": 1,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
       "Flags",
       {
         "nth": 2,
@@ -790,7 +800,7 @@
     [
       "VoteWeight",
       {
-        "nth": 47,
+        "nth": 48,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -800,7 +810,17 @@
     [
       "DiscountedFee",
       {
-        "nth": 48,
+        "nth": 49,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "FirstNFTokenSequence",
+      {
+        "nth": 50,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1548,17 +1568,7 @@
       }
     ],
     [
-      "LPTokenOut",
-      {
-        "nth": 20,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "Amount"
-      }
-    ],
-    [
-      "LPTokenIn",
+      "LockedBalance",
       {
         "nth": 21,
         "isVLEncoded": false,
@@ -1568,7 +1578,7 @@
       }
     ],
     [
-      "EPrice",
+      "BaseFeeDrops",
       {
         "nth": 22,
         "isVLEncoded": false,
@@ -1578,7 +1588,7 @@
       }
     ],
     [
-      "Price",
+      "ReserveBaseDrops",
       {
         "nth": 23,
         "isVLEncoded": false,
@@ -1588,9 +1598,49 @@
       }
     ],
     [
-      "LPTokenBalance",
+      "ReserveIncrementDrops",
       {
         "nth": 24,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "LPTokenOut",
+      {
+        "nth": 25,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "LPTokenIn",
+      {
+        "nth": 26,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "EPrice",
+      {
+        "nth": 27,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "Price",
+      {
+        "nth": 28,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1618,7 +1668,7 @@
       }
     ],
     [
-      "LockedBalance",
+      "LPTokenBalance",
       {
         "nth": 31,
         "isVLEncoded": false,
@@ -1951,16 +2001,6 @@
       "EmitCallback",
       {
         "nth": 10,
-        "isVLEncoded": true,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "AccountID"
-      }
-    ],
-    [
-      "AMMAccount",
-      {
-        "nth": 11,
         "isVLEncoded": true,
         "isSerialized": true,
         "isSigningField": true,
@@ -2360,7 +2400,7 @@
     [
       "AuctionSlot",
       {
-        "nth": 27,
+        "nth": 26,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2370,7 +2410,7 @@
     [
       "AuthAccount",
       {
-        "nth": 28,
+        "nth": 27,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2510,7 +2550,7 @@
     [
       "VoteSlots",
       {
-        "nth": 14,
+        "nth": 12,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2610,7 +2650,7 @@
     [
       "AuthAccounts",
       {
-        "nth": 26,
+        "nth": 21,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2632,6 +2672,9 @@
     "telCAN_NOT_QUEUE_BLOCKED": -389,
     "telCAN_NOT_QUEUE_FEE": -388,
     "telCAN_NOT_QUEUE_FULL": -387,
+    "telWRONG_NETWORK": -386,
+    "telREQUIRES_NETWORK_ID": -385,
+    "telNETWORK_ID_MAKES_TX_NON_CANONICAL": -384,
 
     "temMALFORMED": -299,
     "temBAD_AMOUNT": -298,
