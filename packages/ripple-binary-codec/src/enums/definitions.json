@@ -788,6 +788,16 @@
       }
     ],
     [
+      "LockCount",
+      {
+        "nth": 47,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
       "VoteWeight",
       {
         "nth": 47,
@@ -801,16 +811,6 @@
       "DiscountedFee",
       {
         "nth": 48,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "LockCount",
-      {
-        "nth": 49,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1558,6 +1558,16 @@
       }
     ],
     [
+      "LockedBalance",
+      {
+        "nth": 21,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
       "LPTokenIn",
       {
         "nth": 21,
@@ -1611,16 +1621,6 @@
       "MinAccountCreateAmount",
       {
         "nth": 30,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "Amount"
-      }
-    ],
-    [
-      "LockedBalance",
-      {
-        "nth": 31,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2787,7 +2787,8 @@
     "tecXCHAIN_PAYMENT_FAILED": 184,
     "tecXCHAIN_SELF_COMMIT": 185,
     "tecXCHAIN_BAD_PUBLIC_KEY_ACCOUNT_PAIR": 186,
-    "tecPRECISION_LOSS": 187
+    "tecREQUIRES_FLAG": 187,
+    "tecPRECISION_LOSS": 188
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
