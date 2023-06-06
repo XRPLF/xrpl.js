@@ -808,6 +808,16 @@
       }
     ],
     [
+      "LockCount",
+      {
+        "nth": 47,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
       "VoteWeight",
       {
         "nth": 48,
@@ -828,9 +838,9 @@
       }
     ],
     [
-      "LockCount",
+      "DiscountedFee",
       {
-        "nth": 49,
+        "nth": 48,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2830,7 +2840,8 @@
     "tecXCHAIN_PAYMENT_FAILED": 184,
     "tecXCHAIN_SELF_COMMIT": 185,
     "tecXCHAIN_BAD_PUBLIC_KEY_ACCOUNT_PAIR": 186,
-    "tecPRECISION_LOSS": 187
+    "tecREQUIRES_FLAG": 187,
+    "tecPRECISION_LOSS": 188
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
