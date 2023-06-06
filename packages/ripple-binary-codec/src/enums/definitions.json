@@ -284,6 +284,16 @@
       }
     ],
     [
+      "DiscountedFee",
+      {
+        "nth": 6,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt16"
+      }
+    ],
+    [
       "Version",
       {
         "nth": 16,
@@ -787,16 +797,6 @@
       "VoteWeight",
       {
         "nth": 48,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "DiscountedFee",
-      {
-        "nth": 49,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
