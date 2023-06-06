@@ -24,6 +24,23 @@ const HOOKS_TESTNET_ID = 21338
 describe('client.autofill', function () {
   let testContext: XrplTestContext
 
+  async function setupMockRippledVersionAndID(
+    buildVersion: string,
+    networkID: number,
+  ): Promise<void> {
+    await testContext.client.disconnect()
+    rippled.server_info.withNetworkId.result.info.build_version = buildVersion
+    rippled.server_info.withNetworkId.result.info.network_id = networkID
+    testContext.client.on('connected', () => {
+      testContext.mockRippled?.addResponse(
+        'server_info',
+        rippled.server_info.withNetworkId,
+      )
+    })
+
+    await testContext.client.connect()
+  }
+
   beforeEach(async () => {
     testContext = await setupClient()
   })
@@ -65,8 +82,7 @@ describe('client.autofill', function () {
   })
 
   it('overrides network ID if > 1024 and version is later than 1.11.0', async function () {
-    testContext.client.networkID = 1025
-    testContext.client.buildVersion = '1.11.1'
+    await setupMockRippledVersionAndID('1.11.1', 1025)
     const tx: Payment = {
       TransactionType: 'Payment',
       Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
@@ -84,8 +100,7 @@ describe('client.autofill', function () {
   })
 
   it('ignores network ID if > 1024 but version is earlier than 1.11.0', async function () {
-    testContext.client.networkID = 1025
-    testContext.client.buildVersion = '1.10.1'
+    await setupMockRippledVersionAndID('1.10.0', 1025)
     const tx: Payment = {
       TransactionType: 'Payment',
       Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
@@ -102,9 +117,8 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.NetworkID, undefined)
   })
 
-  it('ignores network ID if < 1024', async function () {
-    testContext.client.networkID = 1023
-    testContext.client.buildVersion = '1.11.1'
+  it('ignores network ID if <= 1024', async function () {
+    await setupMockRippledVersionAndID('1.11.1', 1023)
     const tx: Payment = {
       TransactionType: 'Payment',
       Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
@@ -122,8 +136,7 @@ describe('client.autofill', function () {
   })
 
   it('override network ID for hooks testnet', async function () {
-    testContext.client.networkID = HOOKS_TESTNET_ID
-    testContext.client.buildVersion = '1.10.1'
+    await setupMockRippledVersionAndID('1.10.1', HOOKS_TESTNET_ID)
     const tx: Payment = {
       TransactionType: 'Payment',
       Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
