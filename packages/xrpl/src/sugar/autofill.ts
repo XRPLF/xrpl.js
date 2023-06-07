@@ -95,7 +95,7 @@ async function autofill<T extends Transaction>(
   return Promise.all(promises).then(() => tx)
 }
 
-// eslint-disable-next-line max-lines-per-function, max-statements -- Disable for this helper functions.
+// eslint-disable-next-line max-lines-per-function, max-statements -- Disable for this helper function.
 function isEarlierRippledVersion(source: string, target: string): boolean {
   if (source === target) {
     return false
