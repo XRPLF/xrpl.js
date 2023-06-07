@@ -838,16 +838,6 @@
       }
     ],
     [
-      "DiscountedFee",
-      {
-        "nth": 48,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "UInt32"
-      }
-    ],
-    [
       "IndexNext",
       {
         "nth": 1,
