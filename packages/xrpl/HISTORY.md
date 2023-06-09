@@ -14,6 +14,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Guard check for signing algorithm used in `Wallet.generate()`
 * Null and undefined values in transactions are now treated as though the field was not passed in.
 * Improved the type definition of the return value of `submitAndWait()`
+
+### Changed
 * Added sidechain devnet support to faucet generation
 
 ### Removed
