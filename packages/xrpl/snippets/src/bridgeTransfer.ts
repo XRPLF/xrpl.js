@@ -80,6 +80,7 @@ async function bridgeTransfer(): Promise<void> {
       break
     } catch (_error) {
       ledgersWaited += 1
+      // eslint-disable-next-line max-depth -- needed here
       if (ledgersWaited === MAX_LEDGERS_WAITED) {
         throw Error('Destination account creation via the bridge failed.')
       }
