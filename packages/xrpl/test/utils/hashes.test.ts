@@ -1,6 +1,3 @@
-import fs from 'fs'
-import path from 'path'
-
 import { assert } from 'chai'
 import { encode } from 'ripple-binary-codec'
 
@@ -17,7 +14,16 @@ import {
   hashSignerListId,
 } from '../../src/utils/hashes'
 import fixtures from '../fixtures/rippled'
+import ledgerFull38129 from '../fixtures/rippled/ledgerFull38129.json'
+import ledgerFull40000 from '../fixtures/rippled/ledgerFull40000.json'
+import ledgerFull7501326 from '../fixtures/rippled/ledgerFull7501326.json'
 import { assertResultMatch } from '../testUtils'
+
+const ledgerFullMap = {
+  38129: ledgerFull38129,
+  40000: ledgerFull40000,
+  7501326: ledgerFull7501326,
+}
 
 /**
  * Expects a corresponding ledger dump in $repo/test/fixtures/rippled folder.
@@ -26,15 +32,7 @@ import { assertResultMatch } from '../testUtils'
  */
 function createLedgerTest(ledgerIndex: number): void {
   const ledgerIndexString = String(ledgerIndex)
-  const fileLocation = path.join(
-    __dirname,
-    '..',
-    `fixtures/rippled/ledgerFull${ledgerIndex}.json`,
-  )
-
-  // eslint-disable-next-line node/no-sync -- must be sync version when not in async method
-  const ledgerRaw = fs.readFileSync(fileLocation, { encoding: 'utf8' })
-  const ledgerJSON = JSON.parse(ledgerRaw)
+  const ledgerJSON = ledgerFullMap[ledgerIndex]
 
   const hasAccounts =
     Array.isArray(ledgerJSON.accountState) && ledgerJSON.accountState.length > 0
