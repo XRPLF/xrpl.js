@@ -153,17 +153,6 @@ export interface ClientOptions extends ConnectionUserOptions {
   timeout?: number
 }
 
-// interface RequestNextPageReturnMap {
-//   AccountChannelsRequest: AccountChannelsResponse
-//   AccountLinesRequest: AccountLinesResponse
-//   AccountObjectsRequest: AccountObjectsResponse
-//   AccountOffersRequest: AccountOffersResponse
-//   AccountTxRequest: AccountTxResponse
-//   LedgerDataRequest: LedgerDataResponse
-// }
-
-type ValueOf<T> = T[keyof T]
-
 type RequestNextPageType =
   | AccountChannelsRequest
   | AccountLinesRequest
@@ -432,34 +421,9 @@ class Client extends EventEmitter {
   }
 
   /**
-   * @category Network
-   */
-  // public async requestNextPage(
-  //   req: AccountChannelsRequest,
-  //   resp: AccountChannelsResponse,
-  // ): Promise<AccountChannelsResponse>
-  // public async requestNextPage(
-  //   req: AccountLinesRequest,
-  //   resp: AccountLinesResponse,
-  // ): Promise<AccountLinesResponse>
-  // public async requestNextPage(
-  //   req: AccountObjectsRequest,
-  //   resp: AccountObjectsResponse,
-  // ): Promise<AccountObjectsResponse>
-  // public async requestNextPage(
-  //   req: AccountOffersRequest,
-  //   resp: AccountOffersResponse,
-  // ): Promise<AccountOffersResponse>
-  // public async requestNextPage(
-  //   req: AccountTxRequest,
-  //   resp: AccountTxResponse,
-  // ): Promise<AccountTxResponse>
-  // public async requestNextPage(
-  //   req: LedgerDataRequest,
-  //   resp: LedgerDataResponse,
-  // ): Promise<LedgerDataResponse>
-  /**
    * Requests the next page of data.
+   *
+   * @category Network
    *
    * @param req - Request to send.
    * @param resp - Response with the marker to use in the request.
@@ -469,11 +433,6 @@ class Client extends EventEmitter {
     T extends RequestNextPageType,
     U extends RequestNextPageReturnMap<T>,
   >(req: T, resp: U): Promise<RequestNextPageReturnMap<T>> {
-    // RequestNextPageReturnMap
-    // public async requestNextPage<
-    //   T extends MarkerRequest,
-    //   U extends MarkerResponse,
-    // >(req: T, resp: U): Promise<U> {
     if (!resp.result.marker) {
       return Promise.reject(
         new NotFoundError('response does not have a next page'),
