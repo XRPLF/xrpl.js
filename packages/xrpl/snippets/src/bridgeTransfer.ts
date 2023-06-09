@@ -39,6 +39,7 @@ async function bridgeTransfer(): Promise<void> {
   const accountObjectsRequest: AccountObjectsRequest = {
     command: 'account_objects',
     account: lockingChainDoor,
+    type: 'bridge',
   }
   const bridgeData = (await lockingClient.request(accountObjectsRequest)).result
     .account_objects[0] as LedgerEntry.Bridge
