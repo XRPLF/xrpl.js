@@ -35,9 +35,7 @@
   "devDependencies": {
     "@geut/browser-node-core": "^2.0.13",
     "@types/node": "^14.18.36",
-    "assert-browserify": "^2.0.0",
     "browserify-fs": "^1.0.0",
-    "constants-browserify": "^1.0.0",
     "https-browserify": "^1.0.0",
     "karma": "^6.4.1",
     "karma-chrome-launcher": "^3.1.1",
