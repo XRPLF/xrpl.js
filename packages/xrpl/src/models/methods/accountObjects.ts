@@ -1,5 +1,6 @@
 import { LedgerIndex } from '../common'
 import {
+  Bridge,
   Check,
   DepositPreauth,
   Escrow,
@@ -75,6 +76,7 @@ export interface AccountObjectsRequest extends BaseRequest {
  * PayChannel, a SignerList, a Ticket, or a RippleState.
  */
 type AccountObject =
+  | Bridge
   | Check
   | DepositPreauth
   | Escrow

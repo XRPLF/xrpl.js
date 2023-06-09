@@ -32,7 +32,7 @@ export interface XChainAccountCreateCommit extends BaseTransaction {
    * The amount, in XRP, to be used to reward the witness servers for providing
    * signatures. This must match the amount on the {@link Bridge} ledger object.
    */
-  SignatureReward: number | string
+  SignatureReward: Amount
 
   /**
    * The destination account on the destination chain.
