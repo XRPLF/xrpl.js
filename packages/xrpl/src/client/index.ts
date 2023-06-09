@@ -4,7 +4,15 @@
 import * as assert from 'assert'
 import { EventEmitter } from 'events'
 
-import { NotFoundError, ValidationError, XrplError } from '../errors'
+import flatMap from 'lodash/flatMap'
+
+import {
+  RippledError,
+  NotFoundError,
+  ValidationError,
+  XrplError,
+} from '../errors'
+import type { LedgerIndex } from '../models/common'
 import {
   Request,
   Response,
@@ -97,17 +105,36 @@ import {
   NFTHistoryResponse,
 } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
+import type { BookOffer, TakerAmount } from '../models/methods/bookOffers'
+import type { Transaction } from '../models/transactions'
+import { setTransactionFlagsToNumber } from '../models/utils/flags'
+import { ensureClassicAddress, submit, submitAndWait } from '../sugar'
 import {
-  autofill,
-  ensureClassicAddress,
-  getLedgerIndex,
-  getOrderbook,
-  getBalances,
-  getXrpBalance,
-  submit,
-  submitAndWait,
-} from '../sugar'
-import fundWallet from '../Wallet/fundWallet'
+  setValidAddresses,
+  setNextValidSequenceNumber,
+  calculateFeePerTransactionType,
+  setLatestValidatedLedgerSequence,
+  checkAccountDeleteBlockers,
+} from '../sugar/autofill'
+import { type Balance, formatBalances } from '../sugar/balances'
+import {
+  validateOrderbookOptions,
+  createBookOffersRequest,
+  requestAllOffers,
+  reverseRequest,
+  extractOffers,
+  combineOrders,
+  separateBuySellOrders,
+  sortAndLimitOffers,
+} from '../sugar/getOrderbook'
+import { dropsToXrp } from '../utils'
+import Wallet from '../Wallet'
+import {
+  type FundWalletOptions,
+  generateWalletToFund,
+  getStartingBalance,
+  doFundWalletRequest,
+} from '../Wallet/fundWallet'
 
 import {
   Connection,
@@ -125,6 +152,39 @@ export interface ClientOptions extends ConnectionUserOptions {
   proxy?: string
   timeout?: number
 }
+
+// interface RequestNextPageReturnMap {
+//   AccountChannelsRequest: AccountChannelsResponse
+//   AccountLinesRequest: AccountLinesResponse
+//   AccountObjectsRequest: AccountObjectsResponse
+//   AccountOffersRequest: AccountOffersResponse
+//   AccountTxRequest: AccountTxResponse
+//   LedgerDataRequest: LedgerDataResponse
+// }
+
+type ValueOf<T> = T[keyof T]
+
+type RequestNextPageType =
+  | AccountChannelsRequest
+  | AccountLinesRequest
+  | AccountObjectsRequest
+  | AccountOffersRequest
+  | AccountTxRequest
+  | LedgerDataRequest
+
+type RequestNextPageReturnMap<T> = T extends AccountChannelsRequest
+  ? AccountChannelsResponse
+  : T extends AccountLinesRequest
+  ? AccountLinesResponse
+  : T extends AccountObjectsRequest
+  ? AccountObjectsResponse
+  : T extends AccountOffersRequest
+  ? AccountOffersResponse
+  : T extends AccountTxRequest
+  ? AccountTxResponse
+  : T extends LedgerDataRequest
+  ? LedgerDataResponse
+  : never
 
 /**
  * Get the response key / property name that contains the listed data for a
@@ -374,30 +434,30 @@ class Client extends EventEmitter {
   /**
    * @category Network
    */
-  public async requestNextPage(
-    req: AccountChannelsRequest,
-    resp: AccountChannelsResponse,
-  ): Promise<AccountChannelsResponse>
-  public async requestNextPage(
-    req: AccountLinesRequest,
-    resp: AccountLinesResponse,
-  ): Promise<AccountLinesResponse>
-  public async requestNextPage(
-    req: AccountObjectsRequest,
-    resp: AccountObjectsResponse,
-  ): Promise<AccountObjectsResponse>
-  public async requestNextPage(
-    req: AccountOffersRequest,
-    resp: AccountOffersResponse,
-  ): Promise<AccountOffersResponse>
-  public async requestNextPage(
-    req: AccountTxRequest,
-    resp: AccountTxResponse,
-  ): Promise<AccountTxResponse>
-  public async requestNextPage(
-    req: LedgerDataRequest,
-    resp: LedgerDataResponse,
-  ): Promise<LedgerDataResponse>
+  // public async requestNextPage(
+  //   req: AccountChannelsRequest,
+  //   resp: AccountChannelsResponse,
+  // ): Promise<AccountChannelsResponse>
+  // public async requestNextPage(
+  //   req: AccountLinesRequest,
+  //   resp: AccountLinesResponse,
+  // ): Promise<AccountLinesResponse>
+  // public async requestNextPage(
+  //   req: AccountObjectsRequest,
+  //   resp: AccountObjectsResponse,
+  // ): Promise<AccountObjectsResponse>
+  // public async requestNextPage(
+  //   req: AccountOffersRequest,
+  //   resp: AccountOffersResponse,
+  // ): Promise<AccountOffersResponse>
+  // public async requestNextPage(
+  //   req: AccountTxRequest,
+  //   resp: AccountTxResponse,
+  // ): Promise<AccountTxResponse>
+  // public async requestNextPage(
+  //   req: LedgerDataRequest,
+  //   resp: LedgerDataResponse,
+  // ): Promise<LedgerDataResponse>
   /**
    * Requests the next page of data.
    *
@@ -406,9 +466,14 @@ class Client extends EventEmitter {
    * @returns The response with the next page of data.
    */
   public async requestNextPage<
-    T extends MarkerRequest,
-    U extends MarkerResponse,
-  >(req: T, resp: U): Promise<U> {
+    T extends RequestNextPageType,
+    U extends RequestNextPageReturnMap<T>,
+  >(req: T, resp: U): Promise<RequestNextPageReturnMap<T>> {
+    // RequestNextPageReturnMap
+    // public async requestNextPage<
+    //   T extends MarkerRequest,
+    //   U extends MarkerResponse,
+    // >(req: T, resp: U): Promise<U> {
     if (!resp.result.marker) {
       return Promise.reject(
         new NotFoundError('response does not have a next page'),
@@ -630,9 +695,76 @@ class Client extends EventEmitter {
   }
 
   /**
+   * Autofills fields in a transaction. This will set `Sequence`, `Fee`,
+   * `lastLedgerSequence` according to the current state of the server this Client
+   * is connected to. It also converts all X-Addresses to classic addresses and
+   * flags interfaces into numbers.
+   *
    * @category Core
+   *
+   * @example
+   *
+   * ```ts
+   * const { Client } = require('xrpl')
+   *
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   *
+   * async function createAndAutofillTransaction() {
+   *   const transaction = {
+   *     TransactionType: 'Payment',
+   *     Account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+   *     Destination: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+   *     Amount: '10000000' // 10 XRP in drops (1/1,000,000th of an XRP)
+   *   }
+   *
+   *   try {
+   *     const autofilledTransaction = await client.autofill(transaction)
+   *     console.log(autofilledTransaction)
+   *   } catch (error) {
+   *     console.error(`Failed to autofill transaction: ${error}`)
+   *   }
+   * }
+   *
+   * createAndAutofillTransaction()
+   * ```
+   *
+   * Autofill helps fill in fields which should be included in a transaction, but can be determined automatically
+   * such as `LastLedgerSequence` and `Fee`. If you override one of the fields `autofill` changes, your explicit
+   * values will be used instead. By default, this is done as part of `submit` and `submitAndWait` when you pass
+   * in an unsigned transaction along with your wallet to be submitted.
+   *
+   * @template T
+   * @param transaction - A {@link Transaction} in JSON format
+   * @param signersCount - The expected number of signers for this transaction.
+   * Only used for multisigned transactions.
+   * @returns The autofilled transaction.
    */
-  public autofill = autofill
+  public async autofill<T extends Transaction>(
+    transaction: T,
+    signersCount?: number,
+  ): Promise<T> {
+    const tx = { ...transaction }
+
+    setValidAddresses(tx)
+
+    setTransactionFlagsToNumber(tx)
+
+    const promises: Array<Promise<void>> = []
+    if (tx.Sequence == null) {
+      promises.push(setNextValidSequenceNumber(this, tx))
+    }
+    if (tx.Fee == null) {
+      promises.push(calculateFeePerTransactionType(this, tx, signersCount))
+    }
+    if (tx.LastLedgerSequence == null) {
+      promises.push(setLatestValidatedLedgerSequence(this, tx))
+    }
+    if (tx.TransactionType === 'AccountDelete') {
+      promises.push(checkAccountDeleteBlockers(this, tx))
+    }
+
+    return Promise.all(promises).then(() => tx)
+  }
 
   /**
    * @category Core
@@ -644,34 +776,333 @@ class Client extends EventEmitter {
   public submitAndWait = submitAndWait
 
   /**
+   * Deprecated: Use autofill instead, provided for users familiar with v1
+   *
+   * @param transaction - A {@link Transaction} in JSON format
+   * @param signersCount - The expected number of signers for this transaction.
+   * Only used for multisigned transactions.
    * @deprecated Use autofill instead, provided for users familiar with v1
    */
-  public prepareTransaction = autofill
+  public async prepareTransaction(
+    transaction: Transaction,
+    signersCount?: number,
+  ): ReturnType<Client['autofill']> {
+    return this.autofill(transaction, signersCount)
+  }
 
   /**
+   * Retrieves the XRP balance of a given account address.
+   *
    * @category Abstraction
+   *
+   * @example
+   * ```ts
+   * const client = new Client(wss://s.altnet.rippletest.net:51233)
+   * await client.connect()
+   * const balance = await client.getXrpBalance('rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn')
+   * console.log(balance)
+   * await client.disconnect()
+   * /// '200'
+   * ```
+   *
+   * @param address - The XRP address to retrieve the balance for.
+   * @param [options] - Additional options for fetching the balance (optional).
+   * @param [options.ledger_hash] - The hash of the ledger to retrieve the balance from (optional).
+   * @param [options.ledger_index] - The index of the ledger to retrieve the balance from (optional).
+   * @returns A promise that resolves with the XRP balance as a string.
    */
-  public getXrpBalance = getXrpBalance
+  public async getXrpBalance(
+    address: string,
+    options: {
+      ledger_hash?: string
+      ledger_index?: LedgerIndex
+    } = {},
+  ): Promise<string> {
+    const xrpRequest: AccountInfoRequest = {
+      command: 'account_info',
+      account: address,
+      ledger_index: options.ledger_index ?? 'validated',
+      ledger_hash: options.ledger_hash,
+    }
+    const response = await this.request(xrpRequest)
+    return dropsToXrp(response.result.account_data.Balance)
+  }
 
   /**
+   * Get XRP/non-XRP balances for an account.
+   *
    * @category Abstraction
+   *
+   * @example
+   * ```ts
+   * const { Client } = require('xrpl')
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   * await client.connect()
+   *
+   * async function getAccountBalances(address) {
+   *   try {
+   *     const options = {
+   *       ledger_index: 'validated',
+   *       limit: 10
+   *     };
+   *
+   *     const balances = await xrplClient.getBalances(address, options);
+   *
+   *     console.log('Account Balances:');
+   *     balances.forEach((balance) => {
+   *       console.log(`Currency: ${balance.currency}`);
+   *       console.log(`Value: ${balance.value}`);
+   *       console.log(`Issuer: ${balance.issuer}`);
+   *       console.log('---');
+   *     });
+   *   } catch (error) {
+   *     console.error('Error retrieving account balances:', error);
+   *   }
+   * }
+   *
+   * const address = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh';
+   * await getAccountBalances(address);
+   * await client.disconnect();
+   * ```
+   *
+   * @param address - Address of the account to retrieve balances for.
+   * @param options - Allows the client to specify a ledger_hash, ledger_index,
+   * filter by peer, and/or limit number of balances.
+   * @param options.ledger_index - Retrieve the account balances at a given
+   * ledger_index.
+   * @param options.ledger_hash - Retrieve the account balances at the ledger with
+   * a given ledger_hash.
+   * @param options.peer - Filter balances by peer.
+   * @param options.limit - Limit number of balances to return.
+   * @returns An array of XRP/non-XRP balances for the given account.
    */
-  public getBalances = getBalances
+  // eslint-disable-next-line max-lines-per-function -- Longer definition is required for end users to see the definition.
+  public async getBalances(
+    address: string,
+    options: {
+      ledger_hash?: string
+      ledger_index?: LedgerIndex
+      peer?: string
+      limit?: number
+    } = {},
+  ): Promise<
+    Array<{ value: string; currency: string; issuer?: string | undefined }>
+  > {
+    const balances: Balance[] = []
+
+    // get XRP balance
+    let xrpPromise: Promise<string> = Promise.resolve('')
+    if (!options.peer) {
+      xrpPromise = this.getXrpBalance(address, {
+        ledger_hash: options.ledger_hash,
+        ledger_index: options.ledger_index,
+      })
+    }
+
+    // get non-XRP balances
+    const linesRequest: AccountLinesRequest = {
+      command: 'account_lines',
+      account: address,
+      ledger_index: options.ledger_index ?? 'validated',
+      ledger_hash: options.ledger_hash,
+      peer: options.peer,
+      limit: options.limit,
+    }
+    const linesPromise = this.requestAll(linesRequest)
+
+    // combine results
+    await Promise.all([xrpPromise, linesPromise]).then(
+      ([xrpBalance, linesResponses]) => {
+        const accountLinesBalance = flatMap(linesResponses, (response) =>
+          formatBalances(response.result.lines),
+        )
+        if (xrpBalance !== '') {
+          balances.push({ currency: 'XRP', value: xrpBalance })
+        }
+        balances.push(...accountLinesBalance)
+      },
+    )
+    return balances.slice(0, options.limit)
+  }
 
   /**
+   * Fetch orderbook (buy/sell orders) between two currency pairs. This checks both sides of the orderbook
+   * by making two `order_book` requests (with the second reversing takerPays and takerGets). Returned offers are
+   * not normalized in this function, so either currency could be takerGets or takerPays.
+   *
    * @category Abstraction
+   *
+   * @param currency1 - Specification of one currency involved. (With a currency code and optionally an issuer)
+   * @param currency2 - Specification of a second currency involved. (With a currency code and optionally an issuer)
+   * @param options - Options allowing the client to specify ledger_index,
+   * ledger_hash, filter by taker, and/or limit number of orders.
+   * @param options.ledger_index - Retrieve the orderbook at a given ledger_index.
+   * @param options.ledger_hash - Retrieve the orderbook at the ledger with a
+   * given ledger_hash.
+   * @param options.taker - Filter orders by taker.
+   * @param options.limit - The limit passed into each book_offers request.
+   * Can return more than this due to two calls being made. Defaults to 20.
+   * @returns An object containing buy and sell objects.
    */
-  public getOrderbook = getOrderbook
+
+  public async getOrderbook(
+    currency1: TakerAmount,
+    currency2: TakerAmount,
+    options: {
+      limit?: number
+      ledger_index?: LedgerIndex
+      ledger_hash?: string | null
+      taker?: string | null
+    } = {},
+  ): Promise<{
+    buy: BookOffer[]
+    sell: BookOffer[]
+  }> {
+    validateOrderbookOptions(options)
+
+    const request = createBookOffersRequest(currency1, currency2, options)
+
+    const directOfferResults = await requestAllOffers(this, request)
+    const reverseOfferResults = await requestAllOffers(
+      this,
+      reverseRequest(request),
+    )
+
+    const directOffers = extractOffers(directOfferResults)
+    const reverseOffers = extractOffers(reverseOfferResults)
+
+    const orders = combineOrders(directOffers, reverseOffers)
+
+    const { buy, sell } = separateBuySellOrders(orders)
+
+    /*
+     * Sort the orders
+     * for both buys and sells, lowest quality is closest to mid-market
+     * we sort the orders so that earlier orders are closer to mid-market
+     */
+    return {
+      buy: sortAndLimitOffers(buy, options.limit),
+      sell: sortAndLimitOffers(sell, options.limit),
+    }
+  }
 
   /**
+   * Returns the index of the most recently validated ledger.
+   *
    * @category Abstraction
+   *
+   * @returns The most recently validated ledger index.
    */
-  public getLedgerIndex = getLedgerIndex
+  public async getLedgerIndex(): Promise<number> {
+    const ledgerResponse = await this.request({
+      command: 'ledger',
+      ledger_index: 'validated',
+    })
+    return ledgerResponse.result.ledger_index
+  }
 
   /**
+   * The fundWallet() method is used to send an amount of XRP (usually 1000) to a new (randomly generated)
+   * or existing XRP Ledger wallet.
+   *
    * @category Faucet
+   *
+   * @example
+   *
+   * Example 1: Fund a randomly generated wallet
+   * const { Client, Wallet } = require('xrpl')
+   *
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   * await client.connect()
+   * const { balance, wallet } = await client.fundWallet()
+   *
+   * Under the hood, this will use `Wallet.generate()` to create a new random wallet, then ask a testnet faucet
+   * To send it XRP on ledger to make it a real account. If successful, this will return the new account balance in XRP
+   * Along with the Wallet object to track the keys for that account. If you'd like, you can also re-fill an existing
+   * Account by passing in a Wallet you already have.
+   * ```ts
+   * const api = new xrpl.Client("wss://s.altnet.rippletest.net:51233")
+   * await api.connect()
+   * const { wallet, balance } = await api.fundWallet()
+   * ```
+   *
+   * Example 2: Fund wallet using a custom faucet host and known wallet address
+   *
+   * `fundWallet` will try to infer the url of a faucet API from the network your client is connected to.
+   * There are hardcoded default faucets for popular test networks like testnet and devnet.
+   * However, if you're working with a newer or more obscure network, you may have to specify the faucetHost
+   * And faucetPath so `fundWallet` can ask that faucet to fund your wallet.
+   *
+   * ```ts
+   * const newWallet = Wallet.generate()
+   * const { balance, wallet  } = await client.fundWallet(newWallet, {
+   *       amount: '10',
+   *       faucetHost: 'https://custom-faucet.example.com',
+   *       faucetPath: '/accounts'
+   *     })
+   *     console.log(`Sent 10 XRP to wallet: ${address} from the given faucet. Resulting balance: ${balance} XRP`)
+   *   } catch (error) {
+   *     console.error(`Failed to fund wallet: ${error}`)
+   *   }
+   * }
+   * ```
+   *
+   * @param wallet - An existing XRPL Wallet to fund. If undefined or null, a new Wallet will be created.
+   * @param options - See below.
+   * @param options.faucetHost - A custom host for a faucet server. On devnet,
+   * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
+   * attempt to determine the correct server automatically. In other environments,
+   * or if you would like to customize the faucet host in devnet or testnet,
+   * you should provide the host using this option.
+   * @param options.faucetPath - A custom path for a faucet server. On devnet,
+   * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
+   * attempt to determine the correct path automatically. In other environments,
+   * or if you would like to customize the faucet path in devnet or testnet,
+   * you should provide the path using this option.
+   * Ex: client.fundWallet(null,{'faucet.altnet.rippletest.net', '/accounts'})
+   * specifies a request to 'faucet.altnet.rippletest.net/accounts' to fund a new wallet.
+   * @param options.amount - A custom amount to fund, if undefined or null, the default amount will be 1000.
+   * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP,
+   * and that wallet's balance in XRP.
+   * @throws When either Client isn't connected or unable to fund wallet address.
    */
-  public fundWallet = fundWallet
+  public async fundWallet(
+    wallet?: Wallet | null,
+    options?: FundWalletOptions,
+  ): Promise<{
+    wallet: Wallet
+    balance: number
+  }> {
+    if (!this.isConnected()) {
+      throw new RippledError('Client not connected, cannot call faucet')
+    }
+
+    // Generate a new Wallet if no existing Wallet is provided or its address is invalid to fund
+    const walletToFund = generateWalletToFund(wallet)
+
+    // Create the POST request body
+    const postBody = Buffer.from(
+      new TextEncoder().encode(
+        JSON.stringify({
+          destination: walletToFund.classicAddress,
+          xrpAmount: options?.amount,
+        }),
+      ),
+    )
+
+    const startingBalance = await getStartingBalance(
+      this,
+      walletToFund.classicAddress,
+    )
+
+    return doFundWalletRequest(
+      options,
+      this,
+      startingBalance,
+      walletToFund,
+      postBody,
+    )
+  }
 }
 
 export { Client }
