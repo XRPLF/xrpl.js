@@ -101,7 +101,6 @@ function webpackForTest(testFileName) {
       fallback: {
         module: false,
         assert: require.resolve('assert-browserify'),
-        constants: require.resolve('constants-browserify'),
         buffer: require.resolve('buffer/'),
         assert: require.resolve('assert/'),
         url: require.resolve('url/'),
