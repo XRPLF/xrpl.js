@@ -2,7 +2,7 @@ import { assert } from 'chai'
 import { decode, encode } from 'ripple-binary-codec'
 
 import { Transaction, ValidationError } from '../../src'
-import Wallet from '../../src/Wallet'
+import { Wallet } from '../../src/Wallet'
 import {
   authorizeChannel,
   multisign,

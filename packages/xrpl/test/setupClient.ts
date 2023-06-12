@@ -1,6 +1,6 @@
 import { Client } from '../src/client'
 // eslint-disable-next-line import/no-deprecated -- Will remove in 3.0.0
-import BroadcastClient from '../src/client/BroadcastClient'
+import { BroadcastClient } from '../src/client/BroadcastClient'
 
 import createMockRippled, {
   type MockedWebSocketServer,
