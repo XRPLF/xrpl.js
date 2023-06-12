@@ -81,6 +81,8 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.NetworkID, undefined)
   })
 
+  // NetworkID is required in transaction for network > 1024 and from version 1.11.0 or later.
+  // More context: https://github.com/XRPLF/rippled/pull/4370
   it('overrides network ID if > 1024 and version is later than 1.11.0', async function () {
     await setupMockRippledVersionAndID('1.11.1', 1025)
     const tx: Payment = {
@@ -99,6 +101,8 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.NetworkID, 1025)
   })
 
+  // NetworkID is only required in transaction for version 1.11.0 or later.
+  // More context: https://github.com/XRPLF/rippled/pull/4370
   it('ignores network ID if > 1024 but version is earlier than 1.11.0', async function () {
     await setupMockRippledVersionAndID('1.10.0', 1025)
     const tx: Payment = {
@@ -117,6 +121,8 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.NetworkID, undefined)
   })
 
+  // NetworkID <= 1024 does not require a newtorkID in transaction.
+  // More context: https://github.com/XRPLF/rippled/pull/4370
   it('ignores network ID if <= 1024', async function () {
     await setupMockRippledVersionAndID('1.11.1', 1023)
     const tx: Payment = {
@@ -135,7 +141,9 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.NetworkID, undefined)
   })
 
-  it('override network ID for hooks testnet', async function () {
+  // Hooks Testnet requires networkID in transaction regardless of version.
+  // More context: https://github.com/XRPLF/rippled/pull/4370
+  it('overrides network ID for hooks testnet', async function () {
     await setupMockRippledVersionAndID('1.10.1', HOOKS_TESTNET_ID)
     const tx: Payment = {
       TransactionType: 'Payment',

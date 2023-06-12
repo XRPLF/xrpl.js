@@ -13,6 +13,8 @@ import getFeeXrp from './getFeeXrp'
 // Expire unconfirmed transactions after 20 ledger versions, approximately 1 minute, by default
 const LEDGER_OFFSET = 20
 // Sidechains are expected to have network IDs above this.
+// Networks with ID above this restricted number are expected specify an accurate NetworkID field
+// in every transaction to that chain to prevent replay attacks.
 // Mainnet and testnet are exceptions. More context: https://github.com/XRPLF/rippled/pull/4370
 const RESTRICTED_NETWORKS = 1024
 const REQUIRED_NETWORKID_VERSION = '1.11.0'
@@ -95,6 +97,15 @@ async function autofill<T extends Transaction>(
   return Promise.all(promises).then(() => tx)
 }
 
+/**
+ * Determines whether the source rippled version is ealier than the target rippled version.
+ * Example usage: isEarlierRippledVersion('1.10.0', '1.11.0') returns true.
+ *                isEarlierRippledVersion('1.10.0', '1.10.0-b1') returns false.
+ *
+ * @param source -- The source rippled version.
+ * @param target -- The target rippled version.
+ * @returns True if source is earlier than target, false otherwise.
+ */
 // eslint-disable-next-line max-lines-per-function, max-statements -- Disable for this helper functions.
 function isEarlierRippledVersion(source: string, target: string): boolean {
   if (source === target) {
@@ -152,13 +163,21 @@ function isEarlierRippledVersion(source: string, target: string): boolean {
   return false
 }
 
+/**
+ * Determine if the transaction required a networkID to be valid.
+ * Transaction needs networkID if later than restricted ID and either the network is hooks testnet
+ * or build version is >= 1.11.0
+ *
+ * @param client -- The connected client.
+ * @returns True if required networkID, false otherwise.
+ */
 function txNeedsNetworkID(client: Client): boolean {
   if (
     client.networkID !== undefined &&
     client.networkID > RESTRICTED_NETWORKS
   ) {
-    // transaction needs networkID if either the network is hooks testnet or build version is >= 1.11.0
     // TODO: remove the buildVersion logic when 1.11.0 is out and widely used.
+    // Issue: https://github.com/XRPLF/xrpl.js/issues/2339
     if (
       (client.buildVersion &&
         isEarlierRippledVersion(

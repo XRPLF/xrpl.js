@@ -235,8 +235,6 @@ class Client extends EventEmitter {
 
     this.feeCushion = options.feeCushion ?? DEFAULT_FEE_CUSHION
     this.maxFeeXRP = options.maxFeeXRP ?? DEFAULT_MAX_FEE_XRP
-    this.networkID = undefined
-    this.buildVersion = undefined
 
     this.connection = new Connection(server, options)
 
