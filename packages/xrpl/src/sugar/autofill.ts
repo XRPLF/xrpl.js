@@ -98,18 +98,18 @@ async function autofill<T extends Transaction>(
 }
 
 /**
- * Determines whether the source rippled version is ealier than the target rippled version.
- * Example usage: isEarlierRippledVersion('1.10.0', '1.11.0') returns true.
- *                isEarlierRippledVersion('1.10.0', '1.10.0-b1') returns false.
+ * Determines whether the source rippled version is not later than the target rippled version.
+ * Example usage: isNotLaterRippledVersion('1.10.0', '1.11.0') returns true.
+ *                isNotLaterRippledVersion('1.10.0', '1.10.0-b1') returns false.
  *
  * @param source -- The source rippled version.
  * @param target -- The target rippled version.
  * @returns True if source is earlier than target, false otherwise.
  */
 // eslint-disable-next-line max-lines-per-function, max-statements -- Disable for this helper functions.
-function isEarlierRippledVersion(source: string, target: string): boolean {
+function isNotLaterRippledVersion(source: string, target: string): boolean {
   if (source === target) {
-    return false
+    return true
   }
   const sourceDecomp = source.split('.')
   const targetDecomp = target.split('.')
@@ -180,7 +180,7 @@ function txNeedsNetworkID(client: Client): boolean {
     // Issue: https://github.com/XRPLF/xrpl.js/issues/2339
     if (
       (client.buildVersion &&
-        isEarlierRippledVersion(
+        isNotLaterRippledVersion(
           REQUIRED_NETWORKID_VERSION,
           client.buildVersion,
         )) ||
