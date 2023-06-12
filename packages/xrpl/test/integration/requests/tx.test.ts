@@ -56,7 +56,6 @@ describe('tx', function () {
           SigningPubKey: testContext.wallet.publicKey,
           TxnSignature: txResponse.result.TxnSignature,
           hash: hashSignedTx(response.result.tx_blob),
-          meta: txResponse.result.meta,
           validated: false,
         },
       }
