@@ -123,6 +123,16 @@ describe('fundWallet', function () {
   )
 
   it(
+    'can generate and fund wallets on sidechain devnet',
+    async function () {
+      await generate_faucet_wallet_and_fund_again(
+        'wss://sidechain-net1.devnet.rippletest.net:51233',
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
     'submit funds wallet with custom amount',
     async function () {
       const api = new Client('wss://s.altnet.rippletest.net:51233')
