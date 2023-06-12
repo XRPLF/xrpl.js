@@ -47,7 +47,7 @@ export interface TxResponse<T extends BaseTransaction = Transaction>
     /** The ledger index of the ledger that includes this transaction. */
     ledger_index?: number
     /** Transaction metadata, which describes the results of the transaction. */
-    meta: TransactionMetadata | string
+    meta?: TransactionMetadata | string
     /**
      * If true, this data comes from a validated ledger version; if omitted or.
      * Set to false, this data is not final.
