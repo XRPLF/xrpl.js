@@ -603,11 +603,16 @@ class Client extends EventEmitter {
    */
   public async connect(): Promise<void> {
     return this.connection.connect().then(async () => {
-      const response = await this.request({
-        command: 'server_info',
-      })
-      this.networkID = response.result.info.network_id ?? undefined
-      this.buildVersion = response.result.info.build_version
+      try {
+        const response = await this.request({
+          command: 'server_info',
+        })
+        this.networkID = response.result.info.network_id ?? undefined
+        this.buildVersion = response.result.info.build_version
+      } catch (error) {
+        // eslint-disable-next-line no-console -- Print the error to console but allows client to be connected.
+        console.error(error)
+      }
     })
   }
 
