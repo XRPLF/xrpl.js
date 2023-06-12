@@ -60,7 +60,7 @@
     "watch": "run-s build:lib --watch",
     "clean": "rm -rf dist build coverage",
     "docgen": "tsc --build tsconfig.docs.json && typedoc && echo js.xrpl.org >> ../../docs/CNAME",
-    "prepublish": "npx run-s clean build",
+    "prepublish": "run-s clean build",
     "test": "jest --config=jest.config.unit.js --verbose false --silent=false",
     "test:integration": "TS_NODE_PROJECT=tsconfig.build.json jest --config=jest.config.integration.js --verbose false --silent=false --runInBand",
     "test:browser": "npm run build && npm run build:browserTests && karma start ./karma.config.js --single-run",
@@ -80,5 +80,6 @@
   "readmeFilename": "README.md",
   "engines": {
     "node": ">=10.13.0"
-  }
+  },
+  "gitHead": "f0831e807e8ed813597f7bd01f2989b2cd38a194"
 }
