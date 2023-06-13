@@ -3,6 +3,8 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 
+## 2.8.0 (2023-06-13)
+
 ### Added
 * Adds support for npm v9
 

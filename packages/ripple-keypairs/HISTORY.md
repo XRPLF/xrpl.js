@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+## 1.2.0 (2023-06-13)
 ### Added
 * Adds support for npm v9
 
