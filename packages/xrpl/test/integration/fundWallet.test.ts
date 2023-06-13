@@ -19,6 +19,7 @@ async function generate_faucet_wallet_and_fund_again(
   const { wallet, balance } = await api.fundWallet(null, {
     faucetHost,
     faucetPath,
+    usageContext: 'integration-test',
   })
   assert.notEqual(wallet, undefined)
   assert(isValidClassicAddress(wallet.classicAddress))
@@ -34,6 +35,7 @@ async function generate_faucet_wallet_and_fund_again(
   const { balance: newBalance } = await api.fundWallet(wallet, {
     faucetHost,
     faucetPath,
+    usageContext: 'integration-test',
   })
 
   const afterSent = await api.request({
@@ -97,7 +99,9 @@ describe('fundWallet', function () {
 
       await api.connect()
 
-      const { wallet, balance } = await api.fundWallet()
+      const { wallet, balance } = await api.fundWallet(null, {
+        usageContext: 'integration-test',
+      })
 
       assert.notEqual(wallet, undefined)
       assert(isValidClassicAddress(wallet.classicAddress))
@@ -138,7 +142,10 @@ describe('fundWallet', function () {
       const api = new Client('wss://s.altnet.rippletest.net:51233')
 
       await api.connect()
-      const { wallet, balance } = await api.fundWallet(null, { amount: '2000' })
+      const { wallet, balance } = await api.fundWallet(null, {
+        amount: '2000',
+        usageContext: 'integration-test',
+      })
       assert.equal(balance, '2000')
       assert.notEqual(wallet, undefined)
       assert(isValidClassicAddress(wallet.classicAddress))
