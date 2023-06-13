@@ -29,7 +29,7 @@
     "lodash": "^4.17.4",
     "ripple-address-codec": "^4.3.0",
     "ripple-binary-codec": "^1.6.0",
-    "ripple-keypairs": "^1.2.0",
+    "ripple-keypairs": "^1.1.5",
     "ws": "^8.2.2"
   },
   "devDependencies": {
