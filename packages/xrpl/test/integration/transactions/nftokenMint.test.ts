@@ -20,7 +20,9 @@ describe('NFTokenMint', function () {
       const client = new Client('wss://s.altnet.rippletest.net:51233/')
       await client.connect()
 
-      const { wallet, balance: _balance } = await client.fundWallet()
+      const { wallet, balance: _balance } = await client.fundWallet(null, {
+        usageContext: 'integration-test',
+      })
 
       const tx: NFTokenMint = {
         TransactionType: 'NFTokenMint',

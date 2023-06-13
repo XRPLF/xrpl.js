@@ -79,6 +79,8 @@ const MAX_ATTEMPTS = 20
  * Ex: client.fundWallet(null,{'faucet.altnet.rippletest.net', '/accounts'})
  * specifies a request to 'faucet.altnet.rippletest.net/accounts' to fund a new wallet.
  * @param options.amount - A custom amount to fund, if undefined or null, the default amount will be 1000.
+ * @param options.usageContext - An optional field to indicate the use case context of the faucet transaction
+ * Ex: integration test, code snippets.
  * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP,
  * and that wallet's balance in XRP.
  * @throws When either Client isn't connected or unable to fund wallet address.
@@ -91,6 +93,7 @@ async function fundWallet(
     faucetHost?: string
     faucetPath?: string
     amount?: string
+    usageContext?: string
   },
 ): Promise<{
   wallet: Wallet
@@ -112,6 +115,8 @@ async function fundWallet(
       JSON.stringify({
         destination: walletToFund.classicAddress,
         xrpAmount: options?.amount,
+        userAgent: 'xrpl.js',
+        usageContext: options?.usageContext,
       }),
     ),
   )
