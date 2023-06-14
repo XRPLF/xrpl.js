@@ -1,11 +1,6 @@
 import { assert } from 'chai'
 
-import {
-  calculateHookOn,
-  hexNamespace,
-  hexHookParameters,
-  TTS,
-} from '../../src'
+import { calculateHookOn, hexHookParameters, TTS } from '../../src'
 
 describe('test hook on', function () {
   it('invalid', function () {
@@ -27,16 +22,6 @@ describe('test hook on', function () {
     assert.equal(
       result,
       'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBFFFF7',
-    )
-  })
-})
-
-describe('test hook namespace', function () {
-  it('basic', async function () {
-    const result = await hexNamespace('starter')
-    assert.equal(
-      result,
-      '4FF9961269BF7630D32E15276569C94470174A5DA79FA567C0F62251AA9A36B9',
     )
   })
 })
