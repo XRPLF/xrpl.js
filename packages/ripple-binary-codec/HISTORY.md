@@ -1,9 +1,11 @@
 # ripple-binary-codec Release History
 
 ## Unreleased
+
+## 1.6.0 (2023-06-13)
 ### Added
 - Allow custom type definitions to be used for encoding/decoding transactions at runtime (e.g. for sidechains/new amendments)
-* Adds support for npm v9
+- Adds support for npm v9
 
 ## 1.5.0 (2023-03-08)
 ### Changed
