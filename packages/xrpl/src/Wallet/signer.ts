@@ -1,5 +1,3 @@
-import { BigNumber } from 'bignumber.js'
-import { flatMap } from 'lodash'
 import { decodeAccountID } from '@transia/ripple-address-codec'
 import {
   decode,
@@ -8,6 +6,8 @@ import {
   encodeForSigningClaim,
 } from '@transia/ripple-binary-codec'
 import { sign as signWithKeypair, verify } from '@transia/ripple-keypairs'
+import { BigNumber } from 'bignumber.js'
+import { flatMap } from 'lodash'
 
 import { ValidationError } from '../errors'
 import { Signer } from '../models/common'

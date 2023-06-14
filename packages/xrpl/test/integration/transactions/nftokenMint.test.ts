@@ -1,6 +1,6 @@
+import { Client } from '@transia/xrpl'
 import { assert } from 'chai'
 import _ from 'lodash'
-import { Client } from 'xrpl'
 
 import {
   convertStringToHex,

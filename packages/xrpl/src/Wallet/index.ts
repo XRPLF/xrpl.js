@@ -1,9 +1,4 @@
 /* eslint-disable max-lines -- There are lots of equivalent constructors which make sense to have here. */
-import BigNumber from 'bignumber.js'
-import { fromSeed } from 'bip32'
-import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
-import isEqual from 'lodash/isEqual'
-import omitBy from 'lodash/omitBy'
 import {
   classicAddressToXAddress,
   isValidXAddress,
@@ -23,6 +18,11 @@ import {
   verify,
   sign,
 } from '@transia/ripple-keypairs'
+import BigNumber from 'bignumber.js'
+import { fromSeed } from 'bip32'
+import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
+import isEqual from 'lodash/isEqual'
+import omitBy from 'lodash/omitBy'
 
 import ECDSA from '../ECDSA'
 import { ValidationError, XrplError } from '../errors'

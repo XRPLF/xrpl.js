@@ -8,7 +8,7 @@ import {
   TRANSACTION_TYPES,
   TRANSACTION_TYPE_MAP,
 } from '@transia/ripple-binary-codec'
-import createHash = require('create-hash')
+// import createHash = require('create-hash')
 
 import { XrplError } from '../errors'
 import { HookParameter } from '../models/common'
@@ -56,34 +56,6 @@ export function calculateHookOn(arr: Array<keyof TTS>): string {
   // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- Required
   hash = hash.padStart(64, '0')
   return hash.toUpperCase()
-}
-
-/**
- * Calculate the sha256 of a string
- *
- * @param string - the string to calculate the sha256
- * @returns the sha256
- */
-export async function sha256(string: string): Promise<string> {
-  const hash = createHash('sha256')
-  hash.update(string)
-  const hashBuffer = hash.digest()
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  const hashHex = hashArray
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- Required
-    .map((bytes) => bytes.toString(16).padStart(2, '0'))
-    .join('')
-  return hashHex
-}
-
-/**
- * Calculate the hex of a namespace
- *
- * @param namespace - the namespace to calculate the hex
- * @returns the hex
- */
-export async function hexNamespace(namespace: string): Promise<string> {
-  return (await sha256(namespace)).toUpperCase()
 }
 
 function isHex(value: string): boolean {

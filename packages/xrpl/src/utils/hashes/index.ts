@@ -3,8 +3,8 @@
 /* eslint-disable no-bitwise  -- this file mimics behavior in rippled. It uses
    bitwise operators for and-ing numbers with a mask and bit shifting. */
 
-import BigNumber from 'bignumber.js'
 import { decodeAccountID } from '@transia/ripple-address-codec'
+import BigNumber from 'bignumber.js'
 
 import hashLedger, {
   hashLedgerHeader,

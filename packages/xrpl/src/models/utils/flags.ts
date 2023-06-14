@@ -2,6 +2,7 @@
 /* eslint-disable no-bitwise -- flags require bitwise operations */
 
 import { ValidationError } from '../../errors'
+import { Hook } from '../common'
 import {
   AccountRootFlagsInterface,
   AccountRootFlags,
@@ -78,10 +79,10 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
       return
     case 'SetHook':
       tx.Flags = convertSetHookFlagsToNumber(tx.Flags)
-      tx.Hooks.forEach((h) => {
-        h.Hook.Flags = convertSetHookFlagsToNumber(
+      tx.Hooks.forEach((hook: Hook) => {
+        hook.Hook.Flags = convertSetHookFlagsToNumber(
           // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- idk
-          h.Hook.Flags as SetHookFlagsInterface,
+          hook.Hook.Flags as SetHookFlagsInterface,
         )
       })
       return

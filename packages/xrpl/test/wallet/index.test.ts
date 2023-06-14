@@ -1,5 +1,5 @@
-import { assert } from 'chai'
 import { decode } from '@transia/ripple-binary-codec'
+import { assert } from 'chai'
 
 import { NFTokenMint, Payment, Transaction } from '../../src'
 import ECDSA from '../../src/ECDSA'
