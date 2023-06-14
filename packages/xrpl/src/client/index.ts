@@ -206,6 +206,18 @@ class Client extends EventEmitter {
   public readonly maxFeeXRP: string
 
   /**
+   * Network ID of the server this client is connected to
+   *
+   */
+  public networkID: number | undefined
+
+  /**
+   * Rippled Version used by the server this client is connected to
+   *
+   */
+  public buildVersion: string | undefined
+
+  /**
    * Creates a new Client with a websocket connection to a rippled server.
    *
    * @param server - URL of the server to connect to.
@@ -230,8 +242,8 @@ class Client extends EventEmitter {
       this.emit('error', errorCode, errorMessage, data)
     })
 
-    this.connection.on('connected', () => {
-      this.emit('connected')
+    this.connection.on('reconnect', () => {
+      this.connection.on('connected', () => this.emit('connected'))
     })
 
     this.connection.on('disconnected', (code: number) => {
@@ -569,6 +581,22 @@ class Client extends EventEmitter {
   }
 
   /**
+   * Get networkID and buildVersion from server_info
+   */
+  public async getServerInfo(): Promise<void> {
+    try {
+      const response = await this.request({
+        command: 'server_info',
+      })
+      this.networkID = response.result.info.network_id ?? undefined
+      this.buildVersion = response.result.info.build_version
+    } catch (error) {
+      // eslint-disable-next-line no-console -- Print the error to console but allows client to be connected.
+      console.error(error)
+    }
+  }
+
+  /**
    * Tells the Client instance to connect to its rippled server.
    *
    * @example
@@ -588,7 +616,10 @@ class Client extends EventEmitter {
    * @category Network
    */
   public async connect(): Promise<void> {
-    return this.connection.connect()
+    return this.connection.connect().then(async () => {
+      await this.getServerInfo()
+      this.emit('connected')
+    })
   }
 
   /**
