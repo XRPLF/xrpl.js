@@ -31,7 +31,7 @@ describe('client.autofill', function () {
     await testContext.client.disconnect()
     rippled.server_info.withNetworkId.result.info.build_version = buildVersion
     rippled.server_info.withNetworkId.result.info.network_id = networkID
-    testContext.client.on('connected', () => {
+    testContext.client.connection.on('connected', () => {
       testContext.mockRippled?.addResponse(
         'server_info',
         rippled.server_info.withNetworkId,

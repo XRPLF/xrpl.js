@@ -12,11 +12,13 @@ describe('on handlers', function () {
     'on connect',
     async () => {
       const client = new Client(serverUrl)
-      client.on('connected', function () {
-        client.removeAllListeners()
+      return new Promise<void>(function (resolve) {
+        client.on('connected', function () {
+          client.removeAllListeners()
+          client.disconnect().then(() => resolve())
+        })
+        client.connect()
       })
-      await client.connect()
-      await client.disconnect()
     },
     TIMEOUT,
   )

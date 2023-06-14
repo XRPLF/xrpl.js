@@ -242,8 +242,8 @@ class Client extends EventEmitter {
       this.emit('error', errorCode, errorMessage, data)
     })
 
-    this.connection.on('connected', () => {
-      this.emit('connected')
+    this.connection.on('reconnect', () => {
+      this.connection.on('connected', () => this.emit('connected'))
     })
 
     this.connection.on('disconnected', (code: number) => {
@@ -581,6 +581,22 @@ class Client extends EventEmitter {
   }
 
   /**
+   * Get networkID and buildVersion from server_info
+   */
+  public async getServerInfo(): Promise<void> {
+    try {
+      const response = await this.request({
+        command: 'server_info',
+      })
+      this.networkID = response.result.info.network_id ?? undefined
+      this.buildVersion = response.result.info.build_version
+    } catch (error) {
+      // eslint-disable-next-line no-console -- Print the error to console but allows client to be connected.
+      console.error(error)
+    }
+  }
+
+  /**
    * Tells the Client instance to connect to its rippled server.
    *
    * @example
@@ -601,16 +617,8 @@ class Client extends EventEmitter {
    */
   public async connect(): Promise<void> {
     return this.connection.connect().then(async () => {
-      try {
-        const response = await this.request({
-          command: 'server_info',
-        })
-        this.networkID = response.result.info.network_id ?? undefined
-        this.buildVersion = response.result.info.build_version
-      } catch (error) {
-        // eslint-disable-next-line no-console -- Print the error to console but allows client to be connected.
-        console.error(error)
-      }
+      await this.getServerInfo()
+      this.emit('connected')
     })
   }
 

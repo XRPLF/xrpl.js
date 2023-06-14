@@ -30,13 +30,10 @@ async function setupMockRippledConnection(
   context.client.on('error', () => {
     // We must have an error listener attached for reconnect errors
   })
-
-  context.client.on('connected', () => {
-    context.mockRippled?.addResponse(
-      'server_info',
-      rippled.server_info.withNetworkId,
-    )
-  })
+  context.mockRippled?.addResponse(
+    'server_info',
+    rippled.server_info.withNetworkId,
+  )
 
   return context.client.connect().then(() => context)
 }
