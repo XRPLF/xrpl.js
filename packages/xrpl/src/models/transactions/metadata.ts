@@ -74,7 +74,7 @@ export function isDeletedNode(node: Node): node is DeletedNode {
 }
 
 export interface TransactionMetadata {
-  HookExecutions: HookExecution[]
+  HookExecutions?: HookExecution[]
   AffectedNodes: Node[]
   DeliveredAmount?: Amount
   // "unavailable" possible for transactions before 2014-01-20
