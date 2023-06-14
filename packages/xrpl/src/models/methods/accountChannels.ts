@@ -1,10 +1,10 @@
-import { LedgerIndex } from '../common'
+import { Amount, LedgerIndex } from '../common'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
 interface Channel {
   account: string
-  amount: string
+  amount: Amount
   balance: string
   channel_id: string
   destination_account: string
@@ -15,6 +15,7 @@ interface Channel {
   cancel_after?: number
   source_tab?: number
   destination_tag?: number
+  transfer_rate?: number
 }
 
 /**

@@ -170,59 +170,7 @@ describe('Signing data', function () {
       ].join(''),
     )
   })
-
-  test('can create multi signing blobs with custom definitions', function () {
-    const customPaymentDefinitions = JSON.parse(
-      JSON.stringify(normalDefinitions),
-    )
-    customPaymentDefinitions.TRANSACTION_TYPES.Payment = 31
-
-    const newDefs = new XrplDefinitions(customPaymentDefinitions)
-    const signingAccount = 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN'
-    const signingJson = { ...tx_json, SigningPubKey: '' }
-    const actual = encodeForMultisigning(signingJson, signingAccount, newDefs)
-    expect(actual).toBe(
-      [
-        '534D5400', // signingPrefix
-        // TransactionType
-        '12',
-        '001F',
-        // Flags
-        '22',
-        '80000000',
-        // Sequence
-        '24',
-        '00000001',
-        // Amount
-        '61',
-        // native amount
-        '40000000000003E8',
-        // Fee
-        '68',
-        // native amount
-        '400000000000000A',
-        // SigningPubKey
-        '73',
-        // VLLength
-        '00',
-        // '',
-        // Account
-        '81',
-        // VLLength
-        '14',
-        '5B812C9D57731E27A2DA8B1830195F88EF32A3B6',
-        // Destination
-        '83',
-        // VLLength
-        '14',
-        'B5F762798A53D543A014CAF8B297CFF8F2F937E8',
-        // signingAccount suffix
-        'C0A5ABEF242802EFED4B041E8F2D4A8CC86AE3D1',
-      ].join(''),
-    )
-  })
-
-  test('can create claim blob', function () {
+  test('can create native claim blob', function () {
     const channel =
       '43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1'
     const amount = '1000'
@@ -236,6 +184,29 @@ describe('Signing data', function () {
         '43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1',
         // amount as a uint64
         '00000000000003E8',
+      ].join(''),
+    )
+  })
+  test('can create ic claim blob', function () {
+    const channel =
+      '43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1'
+    const amount = {
+      issuer: 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN',
+      currency: 'USD',
+      value: '10',
+    }
+    const json = { channel, amount }
+    const actual = encodeForSigningClaim(json)
+    expect(actual).toBe(
+      [
+        // hash prefix
+        '434C4D00',
+        // channel ID
+        '43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1',
+        // amount as a uint64
+        'D4C38D7EA4C680000000000000000000000000005553440000000000C0A5ABEF',
+        // amount as a uint64
+        '242802EFED4B041E8F2D4A8CC86AE3D1',
       ].join(''),
     )
   })

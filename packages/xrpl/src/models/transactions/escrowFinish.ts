@@ -3,7 +3,7 @@ import { ValidationError } from '../../errors'
 import { BaseTransaction, validateBaseTransaction } from './common'
 
 /**
- * Deliver XRP from a held payment to the recipient.
+ * Deliver amount from a held payment to the recipient.
  *
  * @category Transaction Models
  */

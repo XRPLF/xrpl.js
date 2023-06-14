@@ -3,7 +3,7 @@ import { ValidationError } from '../../errors'
 import { BaseTransaction, validateBaseTransaction } from './common'
 
 /**
- * Return escrowed XRP to the sender.
+ * Return escrowed amount to the sender.
  *
  * @category Transaction Models
  */
