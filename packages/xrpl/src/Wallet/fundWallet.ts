@@ -56,6 +56,7 @@ export interface FundWalletOptions {
   faucetHost?: string
   faucetPath?: string
   amount?: string
+  usageContext?: string
 }
 
 /**

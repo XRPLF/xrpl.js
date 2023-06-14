@@ -1045,6 +1045,8 @@ class Client extends EventEmitter {
         JSON.stringify({
           destination: walletToFund.classicAddress,
           xrpAmount: options?.amount,
+          userAgent: 'xrpl.js',
+          usageContext: options?.usageContext,
         }),
       ),
     )
