@@ -322,6 +322,16 @@
       }
     ],
     [
+      "NetworkID",
+      {
+        "nth": 1,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
       "Flags",
       {
         "nth": 2,
@@ -2176,6 +2186,9 @@
     "telCAN_NOT_QUEUE_BLOCKED": -389,
     "telCAN_NOT_QUEUE_FEE": -388,
     "telCAN_NOT_QUEUE_FULL": -387,
+    "telWRONG_NETWORK": -386,
+    "telREQUIRES_NETWORK_ID": -385,
+    "telNETWORK_ID_MAKES_TX_NON_CANONICAL": -384,
 
     "temMALFORMED": -299,
     "temBAD_AMOUNT": -298,
