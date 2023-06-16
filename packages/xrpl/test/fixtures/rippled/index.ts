@@ -12,6 +12,7 @@ import iouPartialPayment from './partialPaymentIOU.json'
 import xrpPartialPayment from './partialPaymentXRP.json'
 import normalServerInfo from './serverInfo.json'
 import highLoadFactor from './serverInfoHighLoadFactor.json'
+import withNetworkIDServerInfo from './serverInfoNetworkID.json'
 import consensusStream from './streams/consensusPhase.json'
 import ledgerStream from './streams/ledger.json'
 import manifestStream from './streams/manifest.json'
@@ -84,6 +85,7 @@ const ledger_data = {
 const server_info = {
   normal: normalServerInfo,
   highLoadFactor,
+  withNetworkId: withNetworkIDServerInfo,
 }
 
 const tx = {

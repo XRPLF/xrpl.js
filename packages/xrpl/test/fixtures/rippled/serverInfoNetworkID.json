@@ -1,0 +1,31 @@
+{
+  "id": 0,
+  "status": "success",
+  "type": "response",
+  "result": {
+    "info": {
+      "build_version": "1.11.0-rc2",
+      "complete_ledgers": "37621036-38327626",
+      "hostid": "JANE",
+      "io_latency_ms": 1,
+      "last_close": {
+        "converge_time_s": 2,
+        "proposers": 6
+      },
+      "load_factor": 1,
+      "network_id": 1,
+      "peers": 113,
+      "pubkey_node": "n9L6MAkAvZKakewLSJPkCKLxuSQ9jrYXJBd2L4fouhpXauyFh6ZM",
+      "server_state": "full",
+      "validated_ledger": {
+        "age": 0,
+        "base_fee_xrp": 0.00001,
+        "hash": "A219F66BB8C9992E80A3C93A5EA408CD54B8F47F2AC1246C271C495F833752BA",
+        "reserve_base_xrp": 10,
+        "reserve_inc_xrp": 2,
+        "seq": 38327626
+      },
+      "validation_quorum": 5
+    }
+  }
+}
