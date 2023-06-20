@@ -1,4 +1,5 @@
 import { Transaction, TransactionMetadata } from '../transactions'
+import { BaseTransaction } from '../transactions/common'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
@@ -38,7 +39,8 @@ export interface TxRequest extends BaseRequest {
  *
  * @category Responses
  */
-export interface TxResponse extends BaseResponse {
+export interface TxResponse<T extends BaseTransaction = Transaction>
+  extends BaseResponse {
   result: {
     /** The SHA-512 hash of the transaction. */
     hash: string
@@ -55,7 +57,7 @@ export interface TxResponse extends BaseResponse {
      * This number measures the number of seconds since the "Ripple Epoch" of January 1, 2000 (00:00 UTC)
      */
     date?: number
-  } & Transaction
+  } & T
   /**
    * If true, the server was able to search all of the specified ledger
    * versions, and the transaction was in none of them. If false, the server did
