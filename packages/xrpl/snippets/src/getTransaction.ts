@@ -23,7 +23,6 @@ async function getTransaction(): Promise<void> {
     if (tx.result.meta == null) {
       throw new Error('meta not included in the response')
     }
-
     /*
      * delivered_amount is the amount actually received by the destination account.
      * Use this field to determine how much was delivered, regardless of whether the transaction is a partial payment.

@@ -117,6 +117,7 @@ export interface NFTOffer {
   destination?: string
   expiration?: number
 }
+
 /**
  * One NFToken that might be returned from either an {@link NFTInfoResponse}
  *
