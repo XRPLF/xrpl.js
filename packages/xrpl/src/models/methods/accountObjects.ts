@@ -1,4 +1,3 @@
-import { LedgerIndex } from '../common'
 import {
   Check,
   DepositPreauth,
@@ -10,7 +9,7 @@ import {
   Ticket,
 } from '../ledger'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 type AccountObjectType =
   | 'check'
@@ -31,7 +30,9 @@ type AccountObjectType =
  *
  * @category Requests
  */
-export interface AccountObjectsRequest extends BaseRequest {
+export interface AccountObjectsRequest
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'account_objects'
   /** A unique identifier for the account, most commonly the account's address. */
   account: string
@@ -46,13 +47,6 @@ export interface AccountObjectsRequest extends BaseRequest {
    * from being deleted. The default is false.
    */
   deletion_blockers_only?: boolean
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * Ledger automatically.
-   */
-  ledger_index?: LedgerIndex
   /**
    * The maximum number of objects to include in the results. Must be within
    * the inclusive range 10 to 400 on non-admin connections. The default is 200.

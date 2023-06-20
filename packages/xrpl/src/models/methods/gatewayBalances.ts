@@ -1,6 +1,4 @@
-import { LedgerIndex } from '../common'
-
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * The gateway_balances command calculates the total balances issued by a given
@@ -21,7 +19,9 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface GatewayBalancesRequest extends BaseRequest {
+export interface GatewayBalancesRequest
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'gateway_balances'
   /** The Address to check. This should be the issuing address. */
   account: string
@@ -35,13 +35,6 @@ export interface GatewayBalancesRequest extends BaseRequest {
    * Such addresses.
    */
   hotwallet?: string | string[]
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger version to use, or a shortcut string to
-   * choose a ledger automatically.
-   */
-  ledger_index?: LedgerIndex
 }
 
 interface Balance {

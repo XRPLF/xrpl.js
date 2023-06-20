@@ -3,6 +3,11 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 
+## Added
+* Add `ledger_hash` and `ledger_index` to `account_nfts`,
+  `nft_buy_offers`, and `nft_sell_offers` requests.
+* Add `nft_page` to `ledger_entry` request.
+
 ## 2.8.0 (2023-06-13)
 
 ### Added

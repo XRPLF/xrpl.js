@@ -1,6 +1,4 @@
-import { LedgerIndex } from '../common'
-
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 interface Channel {
   account: string
@@ -26,7 +24,9 @@ interface Channel {
  *
  * @category Requests
  */
-export interface AccountChannelsRequest extends BaseRequest {
+export interface AccountChannelsRequest
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'account_channels'
   /**
    * The unique identifier of an account, typically the account's address. The
@@ -40,13 +40,6 @@ export interface AccountChannelsRequest extends BaseRequest {
    * account.
    */
   destination_account?: string
-  /** 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * ledger automatically.
-   */
-  ledger_index?: LedgerIndex
   /**
    * Limit the number of transactions to retrieve. Cannot be less than 10 or
    * more than 400. The default is 200.

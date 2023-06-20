@@ -1,3 +1,5 @@
+import { LedgerIndex } from '../common'
+
 import type { Request } from '.'
 
 export interface BaseRequest {
@@ -12,6 +14,13 @@ export interface BaseRequest {
   command: string
   /** The API version to use. If omitted, use version 1. */
   api_version?: number
+}
+
+export interface LookupByLedgerRequest {
+  /** A 20-byte hex string for the ledger version to use. */
+  ledger_hash?: string
+  /** The ledger index of the ledger to use, or a shortcut string. */
+  ledger_index?: LedgerIndex
 }
 
 interface Warning {
