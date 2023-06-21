@@ -4,7 +4,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Added
-Add `BurnedNFTokens`, `FirstNFTSequence`, `MintedNFTokens`,
+* Add `BurnedNFTokens`, `FirstNFTSequence`, `MintedNFTokens`,
 `NFTokenMinter`, and `WalletLocator` to `AccountRoot`.
 
 ## 2.8.0 (2023-06-13)
