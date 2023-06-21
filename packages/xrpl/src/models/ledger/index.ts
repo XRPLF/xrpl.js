@@ -12,6 +12,8 @@ import Ledger from './Ledger'
 import LedgerEntry from './LedgerEntry'
 import LedgerHashes from './LedgerHashes'
 import NegativeUNL from './NegativeUNL'
+import { NFTokenOffer } from './NFTokenOffer'
+import { NFToken, NFTokenPage } from './NFTokenPage'
 import Offer, { OfferFlags } from './Offer'
 import PayChannel from './PayChannel'
 import RippleState, { RippleStateFlags } from './RippleState'
@@ -32,6 +34,9 @@ export {
   LedgerEntry,
   LedgerHashes,
   NegativeUNL,
+  NFTokenOffer,
+  NFTokenPage,
+  NFToken,
   Offer,
   OfferFlags,
   PayChannel,
