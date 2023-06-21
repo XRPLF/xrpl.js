@@ -4,6 +4,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Added
+* Add `BurnedNFTokens`, `FirstNFTSequence`, `MintedNFTokens`,
+`NFTokenMinter`, and `WalletLocator` to `AccountRoot`.
 * Add types for `NFTokenPage` and `NFTokenOffer` LedgerEntries.
 * Add type for NFToken object that is stored on a `NFTokenPage`.
 
