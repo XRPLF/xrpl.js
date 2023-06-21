@@ -4,6 +4,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ## Added
+* Add `BurnedNFTokens`, `FirstNFTSequence`, `MintedNFTokens`,
+`NFTokenMinter`, and `WalletLocator` to `AccountRoot`.
 * Add `ledger_hash` and `ledger_index` to `account_nfts`,
   `nft_buy_offers`, and `nft_sell_offers` requests.
 * Add `nft_page` to `ledger_entry` request.
