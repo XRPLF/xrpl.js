@@ -72,6 +72,16 @@ export default interface AccountRoot extends BaseLedgerEntry {
    * account to each other.
    */
   TransferRate?: number
+  /** An arbitrary 256-bit value that users can set. */
+  WalletLocator?: string
+  /** How many total of this account's issued NFTokens have been burned. This number is always equal or less than MintedNFTokens. */
+  BurnedNFTokens?: number
+  /** The sequence that the account first minted an NFToken */
+  FirstNFTSequence: number
+  /**	How many total NFToken have been minted by and on behalf of this account.  */
+  MintedNFTokens?: number
+  /** Another account that can mint NFTokens on behalf of this account. */
+  NFTokenMinter?: string
 }
 
 /**
