@@ -9,6 +9,7 @@ import {
   isAmount,
   parseAmountValue,
 } from './common'
+import { TransactionMetadata } from './metadata'
 
 /**
  * Transaction Flags for an NFTokenCreateOffer Transaction.
@@ -81,6 +82,10 @@ export interface NFTokenCreateOffer extends BaseTransaction {
    */
   Destination?: string
   Flags?: number | NFTokenCreateOfferFlagsInterface
+}
+
+export interface NFTokenCreateOfferMetadata extends TransactionMetadata {
+  offer_id?: string
 }
 
 function validateNFTokenSellOfferCases(tx: Record<string, unknown>): void {

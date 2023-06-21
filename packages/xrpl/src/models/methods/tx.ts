@@ -9,7 +9,7 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface TxRequest extends BaseRequest {
+export interface BaseTxRequest extends BaseRequest {
   command: 'tx'
   transaction: string
   /**
@@ -34,30 +34,60 @@ export interface TxRequest extends BaseRequest {
   max_ledger?: number
 }
 
+export interface TxRequestBinary extends BaseTxRequest {
+  binary: true
+}
+
+export interface TxRequestJSON extends BaseTxRequest {
+  binary?: false
+}
+
+export type TxRequest = TxRequestBinary | TxRequestJSON
+
+export interface BaseTxResponseResult {
+  /** The SHA-512 hash of the transaction. */
+  hash: string
+  /** The ledger index of the ledger that includes this transaction. */
+  ledger_index?: number
+
+  /**
+   * If true, this data comes from a validated ledger version; if omitted or.
+   * Set to false, this data is not final.
+   */
+  validated?: boolean
+  /**
+   * This number measures the number of seconds since the "Ripple Epoch" of January 1, 2000 (00:00 UTC)
+   */
+  date?: number
+}
+
+export type TxResponseResultBinary = BaseTxResponseResult & {
+  /** Transaction metadata, which describes the results of the transaction. */
+  meta: string
+  tx_blob: string
+}
+
+export type TxResponseResultObject<
+  T extends BaseTransaction = Transaction,
+  M extends TransactionMetadata = TransactionMetadata,
+> = BaseTxResponseResult & {
+  /** Transaction metadata, which describes the results of the transaction. */
+  meta?: M
+} & T
+
 /**
  * Response expected from a {@link TxRequest}.
  *
  * @category Responses
  */
-export interface TxResponse<T extends BaseTransaction = Transaction>
-  extends BaseResponse {
-  result: {
-    /** The SHA-512 hash of the transaction. */
-    hash: string
-    /** The ledger index of the ledger that includes this transaction. */
-    ledger_index?: number
-    /** Transaction metadata, which describes the results of the transaction. */
-    meta?: TransactionMetadata | string
-    /**
-     * If true, this data comes from a validated ledger version; if omitted or.
-     * Set to false, this data is not final.
-     */
-    validated?: boolean
-    /**
-     * This number measures the number of seconds since the "Ripple Epoch" of January 1, 2000 (00:00 UTC)
-     */
-    date?: number
-  } & T
+export interface TxResponse<
+  T extends BaseTransaction = Transaction,
+  M extends TransactionMetadata = TransactionMetadata,
+> extends BaseResponse {
+  result: M extends string
+    ? TxResponseResultBinary
+    : TxResponseResultObject<T, M>
+
   /**
    * If true, the server was able to search all of the specified ledger
    * versions, and the transaction was in none of them. If false, the server did

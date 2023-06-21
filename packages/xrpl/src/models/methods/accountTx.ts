@@ -1,5 +1,6 @@
 import { LedgerIndex, ResponseOnlyTxInfo } from '../common'
 import { Transaction, TransactionMetadata } from '../transactions'
+import { BaseTransaction } from '../transactions/common'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
@@ -53,7 +54,15 @@ export interface AccountTxRequest extends BaseRequest {
   marker?: unknown
 }
 
-interface AccountTransaction {
+export interface AccountTxRequestBinary extends AccountTxRequest {
+  binary: true
+}
+
+export interface AccountTxRequestJSON extends AccountTxRequest {
+  binary?: false
+}
+
+interface BaseAccountTransaction {
   /** The ledger index of the ledger version that included this transaction. */
   ledger_index: number
   /**
@@ -61,10 +70,6 @@ interface AccountTransaction {
    * Otherwise, the transaction metadata is included in JSON format.
    */
   meta: string | TransactionMetadata
-  /** JSON object defining the transaction. */
-  tx?: Transaction & ResponseOnlyTxInfo
-  /** Unique hashed String representing the transaction. */
-  tx_blob?: string
   /**
    * Whether or not the transaction is included in a validated ledger. Any
    * transaction not yet in a validated ledger is subject to change.
@@ -72,12 +77,32 @@ interface AccountTransaction {
   validated: boolean
 }
 
+export interface AccountTransactionBinary extends BaseAccountTransaction {
+  meta: string
+  /** Unique hashed String representing the transaction. */
+  tx_blob?: string
+}
+
+export interface AccountTransactionJSON<
+  T extends BaseTransaction = Transaction,
+  M extends TransactionMetadata = TransactionMetadata,
+> extends BaseAccountTransaction {
+  /**
+   * If binary is True, then this is a hex string of the transaction metadata.
+   * Otherwise, the transaction metadata is included in JSON format.
+   */
+  meta: M
+  tx: T & ResponseOnlyTxInfo
+}
+
 /**
  * Expected response from an {@link AccountTxRequest}.
  *
  * @category Responses
  */
-export interface AccountTxResponse extends BaseResponse {
+export interface AccountTxResponse<
+  T extends BaseAccountTransaction = AccountTransactionJSON,
+> extends BaseResponse {
   result: {
     /** Unique Address identifying the related account. */
     account: string
@@ -102,7 +127,7 @@ export interface AccountTxResponse extends BaseResponse {
      * Array of transactions matching the request's criteria, as explained
      * below.
      */
-    transactions: AccountTransaction[]
+    transactions: T[]
     /**
      * If included and set to true, the information in this response comes from
      * a validated ledger version. Otherwise, the information is subject to

@@ -2,6 +2,7 @@ import { ValidationError } from '../../errors'
 import { isHex } from '../utils'
 
 import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
+import { TransactionMetadata } from './metadata'
 
 /**
  * Transaction Flags for an NFTokenMint Transaction.
@@ -92,6 +93,10 @@ export interface NFTokenMint extends BaseTransaction {
    */
   URI?: string | null
   Flags?: number | NFTokenMintFlagsInterface
+}
+
+export interface NFTokenMintMetadata extends TransactionMetadata {
+  nftoken_id?: string
 }
 
 /**

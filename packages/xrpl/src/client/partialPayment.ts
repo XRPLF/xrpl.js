@@ -3,12 +3,12 @@ import { decode } from 'ripple-binary-codec'
 
 import type {
   AccountTxResponse,
-  Response,
   TransactionEntryResponse,
   TransactionStream,
   TxResponse,
 } from '..'
 import type { Amount } from '../models/common'
+import { BaseResponse } from '../models/methods/baseMethod'
 import { PaymentFlags, Transaction } from '../models/transactions'
 import type { TransactionMetadata } from '../models/transactions/metadata'
 import { isFlagEnabled } from '../models/utils'
@@ -85,7 +85,7 @@ function accountTxHasPartialPayment(response: AccountTxResponse): boolean {
   return foo
 }
 
-function hasPartialPayment(command: string, response: Response): boolean {
+function hasPartialPayment(command: string, response: BaseResponse): boolean {
   /* eslint-disable @typescript-eslint/consistent-type-assertions -- Request type is known at runtime from command */
   switch (command) {
     case 'tx':
@@ -108,7 +108,7 @@ function hasPartialPayment(command: string, response: Response): boolean {
  */
 export function handlePartialPayment(
   command: string,
-  response: Response,
+  response: BaseResponse,
 ): void {
   if (hasPartialPayment(command, response)) {
     const warnings = response.warnings ?? []

@@ -5,9 +5,8 @@ import * as assert from 'assert'
 import { EventEmitter } from 'events'
 
 import { NotFoundError, ValidationError, XrplError } from '../errors'
+import { Transaction, TransactionMetadata } from '../models'
 import {
-  Request,
-  Response,
   // account methods
   AccountChannelsRequest,
   AccountChannelsResponse,
@@ -47,7 +46,6 @@ import {
   SubmitMultisignedResponse,
   TransactionEntryRequest,
   TransactionEntryResponse,
-  TxRequest,
   TxResponse,
   // path and order book methods
   BookOffersRequest,
@@ -96,7 +94,14 @@ import {
   NFTHistoryRequest,
   NFTHistoryResponse,
 } from '../models/methods'
+import {
+  AccountTransactionBinary,
+  AccountTxRequestBinary,
+  AccountTxRequestJSON,
+} from '../models/methods/accountTx'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
+import { TxRequestBinary, TxRequestJSON } from '../models/methods/tx'
+import { BaseTransaction } from '../models/transactions/common'
 import {
   autofill,
   ensureClassicAddress,
@@ -315,7 +320,10 @@ class Client extends EventEmitter {
     r: AccountObjectsRequest,
   ): Promise<AccountObjectsResponse>
   public async request(r: AccountOffersRequest): Promise<AccountOffersResponse>
-  public async request(r: AccountTxRequest): Promise<AccountTxResponse>
+  public async request(r: AccountTxRequestJSON): Promise<AccountTxResponse>
+  public async request(
+    r: AccountTxRequestBinary,
+  ): Promise<AccountTxResponse<AccountTransactionBinary>>
   public async request(r: BookOffersRequest): Promise<BookOffersResponse>
   public async request(r: ChannelVerifyRequest): Promise<ChannelVerifyResponse>
   public async request(
@@ -353,7 +361,13 @@ class Client extends EventEmitter {
   public async request(
     r: TransactionEntryRequest,
   ): Promise<TransactionEntryResponse>
-  public async request(r: TxRequest): Promise<TxResponse>
+  public async request<
+    T extends BaseTransaction = Transaction,
+    M extends TransactionMetadata = TransactionMetadata,
+  >(r: TxRequestJSON): Promise<TxResponse<T, M>>
+  public async request<T extends BaseTransaction = Transaction>(
+    r: TxRequestBinary,
+  ): Promise<TxResponse<T>>
   public async request<R extends BaseRequest, T extends BaseResponse>(
     r: R,
   ): Promise<T>
@@ -365,7 +379,7 @@ class Client extends EventEmitter {
    * @returns The response from the server.
    * @category Network
    */
-  public async request<R extends Request, T extends Response>(
+  public async request<R extends BaseRequest, T extends BaseResponse>(
     req: R,
   ): Promise<T> {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
