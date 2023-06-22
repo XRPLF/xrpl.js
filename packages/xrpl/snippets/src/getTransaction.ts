@@ -1,6 +1,6 @@
 import { Client, LedgerResponse, TxResponse } from '../../src'
 
-const client = new Client('wss://s.altnet.rippletest.net:51233')
+const client = new Client('wss://s2.ripple.com:51233')
 
 async function getTransaction(): Promise<void> {
   await client.connect()
