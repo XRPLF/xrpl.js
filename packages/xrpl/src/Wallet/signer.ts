@@ -13,7 +13,7 @@ import { ValidationError } from '../errors'
 import { Signer } from '../models/common'
 import { Transaction, validate } from '../models/transactions'
 
-import Wallet from '.'
+import { Wallet } from '.'
 
 /**
  * Takes several transactions with Signer fields (in object or blob form) and creates a

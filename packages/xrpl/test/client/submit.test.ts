@@ -4,7 +4,7 @@ import cloneDeep from 'lodash/cloneDeep'
 
 import { multisign, ValidationError } from '../../src'
 import { Transaction } from '../../src/models/transactions'
-import Wallet from '../../src/Wallet'
+import { Wallet } from '../../src/Wallet'
 import rippled from '../fixtures/rippled'
 import {
   setupClient,
