@@ -6,6 +6,7 @@ class CustomSequencer extends Sequencer {
     // https://github.com/facebook/jest/blob/6b8b1404a1d9254e7d5d90a8934087a9c9899dab/packages/jest-runner/src/types.ts#L17-L21
     const copyTests = Array.from(tests)
     const sorted = copyTests.sort((testA, testB) => {
+      // We run escrow tests first because they rely on the ledger number via ledger_accept
       if (testA.path.includes('escrow') && testA.path.includes('escrow')) {
         return -1
       }
