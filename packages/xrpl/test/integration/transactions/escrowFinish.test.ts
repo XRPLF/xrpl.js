@@ -51,11 +51,11 @@ describe('EscrowFinish', function () {
         FinishAfter: CLOSE_TIME + 2,
       }
 
+      await testTransaction(testContext.client, createTx, testContext.wallet)
+
       const finishAfterPromise = new Promise((resolve) => {
         setTimeout(resolve, waitTimeInMs)
       })
-
-      await testTransaction(testContext.client, createTx, testContext.wallet)
 
       const initialBalance = await getXRPBalance(testContext.client, wallet1)
 
