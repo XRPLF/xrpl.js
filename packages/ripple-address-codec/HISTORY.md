@@ -2,10 +2,11 @@
 
 ## Unreleased
 
-## 4.2.5 (2023-03-08)
-
+## 4.3.0 (2023-06-13)
 ### Added
 * Adds support for npm v9
+
+## 4.2.5 (2023-03-08)
 ### Changed
 - All tests now use the Jest test runner and have been refactored for consistency across all packages
 

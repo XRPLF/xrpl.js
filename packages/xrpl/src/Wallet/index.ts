@@ -76,7 +76,7 @@ function hexFromBuffer(buffer: Buffer): string {
  *
  * @category Signing
  */
-class Wallet {
+export class Wallet {
   public readonly publicKey: string
   public readonly privateKey: string
   public readonly classicAddress: string
@@ -502,5 +502,3 @@ function removeTrailingZeros(tx: Transaction): void {
     tx.Amount.value = new BigNumber(tx.Amount.value).toString()
   }
 }
-
-export default Wallet

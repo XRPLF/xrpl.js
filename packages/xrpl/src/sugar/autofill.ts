@@ -12,6 +12,13 @@ import getFeeXrp from './getFeeXrp'
 
 // Expire unconfirmed transactions after 20 ledger versions, approximately 1 minute, by default
 const LEDGER_OFFSET = 20
+// Sidechains are expected to have network IDs above this.
+// Networks with ID above this restricted number are expected specify an accurate NetworkID field
+// in every transaction to that chain to prevent replay attacks.
+// Mainnet and testnet are exceptions. More context: https://github.com/XRPLF/rippled/pull/4370
+const RESTRICTED_NETWORKS = 1024
+const REQUIRED_NETWORKID_VERSION = '1.11.0'
+const HOOKS_TESTNET_ID = 21338
 interface ClassicAccountAndTag {
   classicAccount: string
   tag: number | false | undefined
@@ -70,8 +77,10 @@ async function autofill<T extends Transaction>(
   setValidAddresses(tx)
 
   setTransactionFlagsToNumber(tx)
-
   const promises: Array<Promise<void>> = []
+  if (tx.NetworkID == null) {
+    tx.NetworkID = txNeedsNetworkID(this) ? this.networkID : undefined
+  }
   if (tx.Sequence == null) {
     promises.push(setNextValidSequenceNumber(this, tx))
   }
@@ -86,6 +95,101 @@ async function autofill<T extends Transaction>(
   }
 
   return Promise.all(promises).then(() => tx)
+}
+
+/**
+ * Determines whether the source rippled version is not later than the target rippled version.
+ * Example usage: isNotLaterRippledVersion('1.10.0', '1.11.0') returns true.
+ *                isNotLaterRippledVersion('1.10.0', '1.10.0-b1') returns false.
+ *
+ * @param source -- The source rippled version.
+ * @param target -- The target rippled version.
+ * @returns True if source is earlier than target, false otherwise.
+ */
+// eslint-disable-next-line max-lines-per-function, max-statements -- Disable for this helper functions.
+function isNotLaterRippledVersion(source: string, target: string): boolean {
+  if (source === target) {
+    return true
+  }
+  const sourceDecomp = source.split('.')
+  const targetDecomp = target.split('.')
+  const sourceMajor = parseInt(sourceDecomp[0], 10)
+  const sourceMinor = parseInt(sourceDecomp[1], 10)
+  const targetMajor = parseInt(targetDecomp[0], 10)
+  const targetMinor = parseInt(targetDecomp[1], 10)
+  // Compare major version
+  if (sourceMajor !== targetMajor) {
+    return sourceMajor < targetMajor
+  }
+  // Compare minor version
+  if (sourceMinor !== targetMinor) {
+    return sourceMinor < targetMinor
+  }
+  const sourcePatch = sourceDecomp[2].split('-')
+  const targetPatch = targetDecomp[2].split('-')
+
+  const sourcePatchVersion = parseInt(sourcePatch[0], 10)
+  const targetPatchVersion = parseInt(targetPatch[0], 10)
+
+  // Compare patch version
+  if (sourcePatchVersion !== targetPatchVersion) {
+    return sourcePatchVersion < targetPatchVersion
+  }
+
+  // Compare release version
+  if (sourcePatch.length !== targetPatch.length) {
+    return sourcePatch.length > targetPatch.length
+  }
+
+  if (sourcePatch.length === 2) {
+    // Compare different release types
+    if (!sourcePatch[1][0].startsWith(targetPatch[1][0])) {
+      return sourcePatch[1] < targetPatch[1]
+    }
+    // Compare beta version
+    if (sourcePatch[1].startsWith('b')) {
+      return (
+        parseInt(sourcePatch[1].slice(1), 10) <
+        parseInt(targetPatch[1].slice(1), 10)
+      )
+    }
+    // Compare rc version
+    return (
+      parseInt(sourcePatch[1].slice(2), 10) <
+      parseInt(targetPatch[1].slice(2), 10)
+    )
+  }
+
+  return false
+}
+
+/**
+ * Determine if the transaction required a networkID to be valid.
+ * Transaction needs networkID if later than restricted ID and either the network is hooks testnet
+ * or build version is >= 1.11.0
+ *
+ * @param client -- The connected client.
+ * @returns True if required networkID, false otherwise.
+ */
+function txNeedsNetworkID(client: Client): boolean {
+  if (
+    client.networkID !== undefined &&
+    client.networkID > RESTRICTED_NETWORKS
+  ) {
+    // TODO: remove the buildVersion logic when 1.11.0 is out and widely used.
+    // Issue: https://github.com/XRPLF/xrpl.js/issues/2339
+    if (
+      (client.buildVersion &&
+        isNotLaterRippledVersion(
+          REQUIRED_NETWORKID_VERSION,
+          client.buildVersion,
+        )) ||
+      client.networkID === HOOKS_TESTNET_ID
+    ) {
+      return true
+    }
+  }
+  return false
 }
 
 function setValidAddresses(tx: Transaction): void {
