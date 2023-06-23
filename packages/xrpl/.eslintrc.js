@@ -62,6 +62,7 @@ module.exports = {
 
     'tsdoc/syntax': 'off',
     'jsdoc/require-description-complete-sentence': 'off',
+    'import/prefer-default-export': 'off',
   },
   overrides: [
     {

@@ -12,7 +12,7 @@ import {
   getDefaultFaucetPath,
 } from './defaultFaucets'
 
-import Wallet from '.'
+import { Wallet } from '.'
 
 // Interval to check an account balance
 const INTERVAL_SECONDS = 1
