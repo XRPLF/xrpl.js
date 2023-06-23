@@ -6,6 +6,8 @@
 import { decodeAccountID } from '@transia/ripple-address-codec'
 import BigNumber from 'bignumber.js'
 
+import { convertStringToHex } from '../stringConversion'
+
 import hashLedger, {
   hashLedgerHeader,
   hashSignedTx,
@@ -181,6 +183,20 @@ export function hashPaymentChannel(
       addressToHex(address) +
       addressToHex(dstAddress) +
       sequence.toString(HEX).padStart(BYTE_LENGTH * 2, '0'),
+  )
+}
+
+/**
+ * Compute the Hash of an URIToken LedgerEntry.
+ *
+ * @param issuer - Address of the issuer of the URIToken.
+ * @param uri - string uri of the URIToken (not the hex).
+ * @returns The hash of the URIToken LedgerEntry.
+ * @category Utilities
+ */
+export function hashURIToken(issuer: string, uri: string): string {
+  return sha512Half(
+    ledgerSpaceHex('uriToken') + addressToHex(issuer) + convertStringToHex(uri),
   )
 }
 

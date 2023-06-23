@@ -28,6 +28,7 @@ const ledgerSpaces = {
   signerList: 'S',
   paychan: 'x',
   check: 'C',
+  uriToken: 'U',
   depositPreauth: 'p',
 }
 

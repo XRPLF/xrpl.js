@@ -39,6 +39,7 @@ import {
   hashLedgerHeader,
   hashEscrow,
   hashPaymentChannel,
+  hashURIToken,
 } from './hashes'
 import { calculateHookOn, hexHookParameters, TTS } from './hooks'
 import parseNFTokenID from './parseNFTokenID'
@@ -173,6 +174,7 @@ const hashes = {
   hashLedgerHeader,
   hashEscrow,
   hashPaymentChannel,
+  hashURIToken,
 }
 
 export {

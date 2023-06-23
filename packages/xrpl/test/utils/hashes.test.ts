@@ -15,6 +15,7 @@ import {
   hashAccountRoot,
   hashOfferId,
   hashSignerListId,
+  hashURIToken,
 } from '../../src/utils/hashes'
 import fixtures from '../fixtures/rippled'
 import { assertResultMatch } from '../testUtils'
@@ -139,6 +140,16 @@ describe('Hashes', function () {
     const expectedEntryHash =
       'E35708503B3C3143FB522D749AAFCC296E8060F0FB371A9A56FAE0B1ED127366'
     const actualEntryHash = hashPaymentChannel(account, dstAccount, sequence)
+
+    assert.equal(actualEntryHash, expectedEntryHash)
+  })
+
+  it('calcURITokenEntryHash', function () {
+    const issuer = 'rDx69ebzbowuqztksVDmZXjizTd12BVr4x'
+    const uri = 'ipfs://cid'
+    const expectedEntryHash =
+      'AFC4233E5C4094952DEF5483DC41488C8744D1268F897C0CB25DE66399591399'
+    const actualEntryHash = hashURIToken(issuer, uri)
 
     assert.equal(actualEntryHash, expectedEntryHash)
   })
