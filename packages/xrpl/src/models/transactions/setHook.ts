@@ -41,7 +41,7 @@ export interface SetHook extends BaseTransaction {
   Flags?: number | SetHookFlagsInterface
 }
 
-const MAX_HOOKS = 4
+const MAX_HOOKS = 10
 const HEX_REGEX = /^[0-9A-Fa-f]{64}$/u
 
 /**
