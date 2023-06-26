@@ -1,7 +1,6 @@
-import { LedgerIndex } from '../common'
 import { LedgerEntry } from '../ledger'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * The `ledger_data` method retrieves contents of the specified ledger. You can
@@ -21,15 +20,8 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface LedgerDataRequest extends BaseRequest {
+export interface LedgerDataRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'ledger_data'
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * ledger automatically.
-   */
-  ledger_index?: LedgerIndex
   /**
    * If set to true, return ledger objects as hashed hex strings instead of
    * JSON.

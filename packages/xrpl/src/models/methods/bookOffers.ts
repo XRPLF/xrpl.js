@@ -1,7 +1,7 @@
-import { Amount, LedgerIndex } from '../common'
+import { Amount } from '../common'
 import { Offer } from '../ledger'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 export interface TakerAmount {
   currency: string
@@ -14,15 +14,8 @@ export interface TakerAmount {
  *
  * @category Requests
  */
-export interface BookOffersRequest extends BaseRequest {
+export interface BookOffersRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'book_offers'
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * ledger automatically.
-   */
-  ledger_index?: LedgerIndex
   /**
    * If provided, the server does not provide more than this many offers in the
    * results. The total number of results returned may be fewer than the limit,

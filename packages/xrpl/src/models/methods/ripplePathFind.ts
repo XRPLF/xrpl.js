@@ -1,6 +1,6 @@
-import { Amount, LedgerIndex, Path } from '../common'
+import { Amount, Path } from '../common'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 interface SourceCurrencyAmount {
   currency: string
@@ -14,7 +14,9 @@ interface SourceCurrencyAmount {
  *
  * @category Requests
  */
-export interface RipplePathFindRequest extends BaseRequest {
+export interface RipplePathFindRequest
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'ripple_path_find'
   /** Unique address of the account that would send funds in a transaction. */
   source_account: string
@@ -36,13 +38,6 @@ export interface RipplePathFindRequest extends BaseRequest {
    * and optional issuer field, like how currency amounts are specified.
    */
   source_currencies?: SourceCurrencyAmount
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * ledger automatically.
-   */
-  ledger_index?: LedgerIndex
 }
 
 interface PathOption {
