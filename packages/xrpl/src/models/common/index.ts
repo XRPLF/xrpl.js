@@ -195,3 +195,13 @@ export interface NFTOffer {
   destination?: string
   expiration?: number
 }
+
+/**
+ * This information is added to emitted Transactions.
+ */
+export interface EmitDetails {
+  EmitBurden: number
+  EmitGeneration: number
+  EmitHookHash: string
+  EmitParentTxnID: string
+}

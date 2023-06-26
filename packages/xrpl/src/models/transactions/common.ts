@@ -10,6 +10,7 @@ import {
   IssuedCurrencyAmount,
   Memo,
   Signer,
+  EmitDetails,
 } from '../common'
 import { onlyHasFields } from '../utils'
 
@@ -173,6 +174,10 @@ export interface BaseTransaction {
    * The hook parameters of the transaction.
    */
   HookParameters?: HookParameter[]
+  /**
+   * The hook parameters of the transaction.
+   */
+  EmitDetails?: EmitDetails
 }
 
 /**
