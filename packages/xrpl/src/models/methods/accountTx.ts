@@ -1,7 +1,7 @@
-import { LedgerIndex, ResponseOnlyTxInfo } from '../common'
+import { ResponseOnlyTxInfo } from '../common'
 import { Transaction, TransactionMetadata } from '../transactions'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * The account_tx method retrieves a list of transactions that involved the
@@ -10,7 +10,7 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface AccountTxRequest extends BaseRequest {
+export interface AccountTxRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'account_tx'
   /** A unique identifier for the account, most commonly the account's address. */
   account: string
@@ -26,10 +26,6 @@ export interface AccountTxRequest extends BaseRequest {
    * version available.
    */
   ledger_index_max?: number
-  /** Use to look for transactions from a single ledger only. */
-  ledger_hash?: string
-  /** Use to look for transactions from a single ledger only. */
-  ledger_index?: LedgerIndex
   /**
    * If true, return transactions as hex strings instead of JSON. The default is
    * false.

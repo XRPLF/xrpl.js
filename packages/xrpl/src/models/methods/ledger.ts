@@ -1,9 +1,8 @@
-import { LedgerIndex } from '../common'
 import { Ledger } from '../ledger'
 import { Transaction, TransactionAndMetadata } from '../transactions'
 import { TransactionMetadata } from '../transactions/metadata'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * Retrieve information about the public ledger. Expects a response in the form
@@ -25,15 +24,8 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface LedgerRequest extends BaseRequest {
+export interface LedgerRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'ledger'
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * ledger automatically.
-   */
-  ledger_index?: LedgerIndex
   /**
    * Admin required If true, return full information on the entire ledger.
    * Ignored if you did not specify a ledger version. Defaults to false.
