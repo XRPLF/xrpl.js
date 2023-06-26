@@ -3,8 +3,7 @@ import { NFToken } from '../common'
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
- * The `nft_info` method retrieves information about NFToken
- * NFToken.
+ * The `nft_info` method retrieves information about an NFToken.
  *
  * @category Requests
  */
