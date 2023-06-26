@@ -69,7 +69,7 @@ describe('SetHook', function () {
     )
   })
 
-  it(`throws w/ maximum of 4 members allowed in Hooks`, function () {
+  it(`throws w/ maximum of 10 members allowed in Hooks`, function () {
     setHookTx.Hooks = []
     const hook = {
       Hook: {
@@ -88,8 +88,14 @@ describe('SetHook', function () {
     setHookTx.Hooks.push(hook)
     setHookTx.Hooks.push(hook)
     setHookTx.Hooks.push(hook)
+    setHookTx.Hooks.push(hook)
+    setHookTx.Hooks.push(hook)
+    setHookTx.Hooks.push(hook)
+    setHookTx.Hooks.push(hook)
+    setHookTx.Hooks.push(hook)
+    setHookTx.Hooks.push(hook)
 
-    const errorMessage = 'SetHook: maximum of 4 hooks allowed in Hooks'
+    const errorMessage = 'SetHook: maximum of 10 hooks allowed in Hooks'
     assert.throws(
       () => validateSetHook(setHookTx),
       ValidationError,
