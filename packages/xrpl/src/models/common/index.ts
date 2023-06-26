@@ -119,7 +119,7 @@ export interface NFTOffer {
 }
 
 /**
- * One NFToken that might be returned from a {@link NFTInfoResponse}
+ * One NFToken that might be returned from an {@link NFTInfoResponse}
  *
  * @category Responses
  */
