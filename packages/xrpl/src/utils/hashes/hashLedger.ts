@@ -83,7 +83,7 @@ export function hashSignedTx(tx: Transaction | string): string {
     txObject = tx
   }
 
-  if (txObject.TxnSignature === undefined && txObject.Signers === undefined) {
+  if (!txObject.EmitDetails && txObject.TxnSignature === undefined && txObject.Signers === undefined) {
     throw new ValidationError('The transaction must be signed to hash it.')
   }
 
