@@ -1,16 +1,12 @@
 import { BaseTransaction } from './common'
 
-export interface SetFeeBase extends BaseTransaction {
-  TransactionType: 'SetFee'
-}
-
-export interface SetFeePreAmendment extends SetFeeBase {
+export interface SetFeePreAmendment extends BaseTransaction {
   /**
    * The charge, in drops of XRP, for the reference transaction, as hex. (This is the transaction cost before scaling for load.)
    */
   BaseFee: string
   /**
-   * The cost, in fee units, of the reference transaction
+   * The cost, in fee units, of the [reference transaction](https://xrpl.org/transaction-cost.html#reference-transaction-cost)
    */
   ReferenceFeeUnits: number
   /**
@@ -21,18 +17,9 @@ export interface SetFeePreAmendment extends SetFeeBase {
    * The incremental reserve, in drops
    */
   ReserveIncrement: number
-
-  BaseFeeDrops?: never
-  ReserveBaseDrops?: never
-  ReserveIncrementDrops?: never
 }
 
-export interface SetFeePostAmendment extends SetFeeBase {
-  BaseFee?: never
-  ReferenceFeeUnits?: never
-  ReserveBase?: never
-  ReserveIncrement?: never
-
+export interface SetFeePostAmendment extends BaseTransaction {
   /**
    * The charge, in drops of XRP, for the reference transaction. (This is the transaction cost before scaling for load.)
    */
@@ -50,8 +37,12 @@ export interface SetFeePostAmendment extends SetFeeBase {
 /**
  * Marks a change in transaction cost or reserve requirements as a result of Fee Voting.
  *
- * @interface
+ * The output will be based on the status of the `XRPFees` amendment at the time of this transaction.
+ * - Before: {@link SetFeePostAmendment}
+ * - After: {@link SetFeePostAmendment}
  *
  * @category Pseudo Transaction Models
  */
-export type SetFee = SetFeePreAmendment | SetFeePostAmendment
+export type SetFee = {
+  TransactionType: 'SetFee'
+} & (SetFeePreAmendment | SetFeePostAmendment)
