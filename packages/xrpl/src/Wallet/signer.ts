@@ -32,9 +32,13 @@ function multisign(transactions: Array<Transaction | string>): string {
     throw new ValidationError('There were 0 transactions to multisign')
   }
 
-  transactions.forEach((txOrBlob) => {
-    const tx: Transaction = getDecodedTransaction(txOrBlob)
+  const decodedTransactions: Transaction[] = transactions.map(
+    (txOrBlob: string | Transaction) => {
+      return getDecodedTransaction(txOrBlob)
+    },
+  )
 
+  decodedTransactions.forEach((tx) => {
     /*
      * This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
      */
@@ -52,12 +56,6 @@ function multisign(transactions: Array<Transaction | string>): string {
       )
     }
   })
-
-  const decodedTransactions: Transaction[] = transactions.map(
-    (txOrBlob: string | Transaction) => {
-      return getDecodedTransaction(txOrBlob)
-    },
-  )
 
   validateTransactionEquivalence(decodedTransactions)
 
@@ -154,10 +152,11 @@ function compareSigners(left: Signer, right: Signer): number {
   )
 }
 
+const NUM_BITS_IN_HEX = 16
+
 function addressToBigNumber(address: string): BigNumber {
   const hex = Buffer.from(decodeAccountID(address)).toString('hex')
-  const numberOfBitsInHex = 16
-  return new BigNumber(hex, numberOfBitsInHex)
+  return new BigNumber(hex, NUM_BITS_IN_HEX)
 }
 
 function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
