@@ -59,6 +59,9 @@ module.exports = {
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
     'jsdoc/check-examples': 'off',
+    // We want to use certain fields like "@interface" to make join types treated as interfaces.
+    'jsdoc/check-tag-names': 'off',
+    'jsdoc/require-hyphen-before-param-description': 'off',
 
     'tsdoc/syntax': 'off',
     'jsdoc/require-description-complete-sentence': 'off',

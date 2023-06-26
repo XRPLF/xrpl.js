@@ -6,6 +6,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Added
 * Add `BurnedNFTokens`, `FirstNFTSequence`, `MintedNFTokens`,
 `NFTokenMinter`, and `WalletLocator` to `AccountRoot`.
+* Add types for `EnableAmendment`, `SetFee`, and `UNLModify` transactions.
 
 ## 2.8.0 (2023-06-13)
 
