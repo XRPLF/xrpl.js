@@ -1,7 +1,6 @@
-import { LedgerIndex } from '../common'
 import { AccountRoot, SignerList } from '../ledger'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * The `account_info` command retrieves information about an account, its
@@ -10,17 +9,10 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface AccountInfoRequest extends BaseRequest {
+export interface AccountInfoRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'account_info'
   /** A unique identifier for the account, most commonly the account's address. */
   account: string
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * ledger automatically.
-   */
-  ledger_index?: LedgerIndex
   /**
    * Whether to get info about this account's queued transactions. Can only be
    * used when querying for the data from the current open ledger. Not available

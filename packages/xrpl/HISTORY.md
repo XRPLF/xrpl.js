@@ -3,9 +3,14 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 
-### Added
+## Added
 * Add `BurnedNFTokens`, `FirstNFTSequence`, `MintedNFTokens`,
 `NFTokenMinter`, and `WalletLocator` to `AccountRoot`.
+* Add `ledger_hash` and `ledger_index` to `account_nfts`,
+  `nft_buy_offers`, and `nft_sell_offers` requests.
+* Add `nft_page` to `ledger_entry` request.
+* Add types for `NFTokenPage` and `NFTokenOffer` LedgerEntries.
+* Add type for NFToken object that is stored on a `NFTokenPage`.
 
 ## 2.8.0 (2023-06-13)
 
@@ -15,6 +20,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Support for the XChainBridge amendment.
 
 ### Fixed
+* `getNFTokenID` now also accepts metadata from `tx` in binary format
 * Fixed `ServerState.transitions` typing, it is now a string instead of a number. (Only used in return from `server_state` request)
 * Added `destination_amount` to `PathOption` which is returned as part of a `path_find` request
 * Removed the `decode(encode(tx)) == tx` check from the wallet signing process
