@@ -6,7 +6,11 @@ import {
   AccountCurrenciesRequest,
   AccountCurrenciesResponse,
 } from './accountCurrencies'
-import { AccountInfoRequest, AccountInfoResponse } from './accountInfo'
+import {
+  AccountInfoAccountFlags,
+  AccountInfoRequest,
+  AccountInfoResponse,
+} from './accountInfo'
 import { AccountLinesRequest, AccountLinesResponse } from './accountLines'
 import { AccountNFTsRequest, AccountNFTsResponse } from './accountNFTs'
 import { AccountObjectsRequest, AccountObjectsResponse } from './accountObjects'
@@ -184,6 +188,7 @@ export {
   AccountChannelsResponse,
   AccountCurrenciesRequest,
   AccountCurrenciesResponse,
+  AccountInfoAccountFlags,
   AccountInfoRequest,
   AccountInfoResponse,
   AccountLinesRequest,

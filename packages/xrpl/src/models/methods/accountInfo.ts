@@ -73,6 +73,62 @@ interface QueueData {
   transactions?: QueueTransaction[]
 }
 
+export interface AccountInfoAccountFlags {
+  /**
+   * Enable rippling on this address's trust lines by default. Required for issuing addresses; discouraged for others.
+   */
+  defaultRipple: boolean
+  /**
+   * This account can only receive funds from transactions it sends, and from preauthorized accounts.
+   * (It has DepositAuth enabled.)
+   */
+  depositAuth: boolean
+  /**
+   * Disallows use of the master key to sign transactions for this account.
+   */
+  disableMasterKey: boolean
+  /**
+   * Disallow incoming Checks from other accounts.
+   */
+  disallowIncomingCheck?: boolean
+  /**
+   * Disallow incoming NFTOffers from other accounts. Part of the DisallowIncoming amendment.
+   */
+  disallowIncomingNFTokenOffer?: boolean
+  /**
+   * Disallow incoming PayChannels from other accounts. Part of the DisallowIncoming amendment.
+   */
+  disallowIncomingPayChan?: boolean
+  /**
+   * Disallow incoming Trustlines from other accounts. Part of the DisallowIncoming amendment.
+   */
+  disallowIncomingTrustline?: boolean
+  /**
+   * Client applications should not send XRP to this account. Not enforced by rippled.
+   */
+  disallowIncomingXRP: boolean
+  /**
+   * All assets issued by this address are frozen.
+   */
+  globalFreeze: boolean
+  /**
+   * This address cannot freeze trust lines connected to it. Once enabled, cannot be disabled.
+   */
+  noFreeze: boolean
+  /**
+   * The account has used its free SetRegularKey transaction.
+   */
+  passwordSpent: boolean
+  /**
+   * This account must individually approve other users for those users to hold this account's issued currencies.
+   */
+  requireAuthorization: boolean
+  /**
+   * Requires incoming payments to specify a Destination Tag.
+   */
+  requireDestinationTag: boolean
+}
+
 /**
  * Response expected from an {@link AccountInfoRequest}.
  *
@@ -89,6 +145,11 @@ export interface AccountInfoResponse extends BaseResponse {
      * present.
      */
     account_data: AccountRoot & { signer_lists?: SignerList[] }
+
+    /**
+     * A map of account flags parsed out.  This will only be available for rippled nodes 1.11.0 and higher.
+     */
+    account_flags?: AccountInfoAccountFlags
     /**
      * The ledger index of the current in-progress ledger, which was used when
      * retrieving this information.
