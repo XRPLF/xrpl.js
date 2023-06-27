@@ -2343,6 +2343,7 @@
     "NFTokenCreateOffer": 27,
     "NFTokenCancelOffer": 28,
     "NFTokenAcceptOffer": 29,
+    "Clawback": 30,
     "EnableAmendment": 100,
     "SetFee": 101,
     "UNLModify": 102
