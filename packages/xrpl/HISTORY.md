@@ -11,6 +11,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add `nft_page` to `ledger_entry` request.
 * Add types for `NFTokenPage` and `NFTokenOffer` LedgerEntries.
 * Add type for NFToken object that is stored on a `NFTokenPage`.
+* Add type for `account_info`'s `account_flags` property.
 
 ## 2.8.0 (2023-06-13)
 
