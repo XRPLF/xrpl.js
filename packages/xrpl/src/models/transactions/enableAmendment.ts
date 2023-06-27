@@ -21,8 +21,6 @@ export interface EnableAmendment extends BaseTransaction {
   TransactionType: 'EnableAmendment'
   /** A unique identifier for the amendment. */
   Amendment: string
-  /**
-   * The ledger index where this pseudo-transaction appears. This distinguishes the pseudo-transaction from other occurrences of the same change.
-   */
+  /** The ledger index where this pseudo-transaction appears. */
   LedgerSequence: number
 }
