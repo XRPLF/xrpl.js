@@ -1,7 +1,7 @@
-import { LedgerIndex, ResponseOnlyTxInfo } from '../common'
+import { ResponseOnlyTxInfo } from '../common'
 import { Transaction, TransactionMetadata } from '../transactions'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * The `transaction_entry` method retrieves information on a single transaction
@@ -10,15 +10,11 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface TransactionEntryRequest extends BaseRequest {
+export interface TransactionEntryRequest
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'transaction_entry'
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * ledger automatically.
-   */
-  ledger_index?: LedgerIndex
+
   /** Unique hash of the transaction you are looking up. */
   tx_hash: string
 }
