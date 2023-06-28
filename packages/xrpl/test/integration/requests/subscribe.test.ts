@@ -156,16 +156,7 @@ describe('subscribe', function () {
         const ledgerResponse: LedgerStreamResponse =
           response.result as LedgerStreamResponse
         // Explicitly checking that there are only known fields in the return
-        const expectedResult = {
-          fee_base: ledgerResponse.fee_base,
-          fee_ref: ledgerResponse.fee_ref,
-          ledger_hash: ledgerResponse.ledger_hash,
-          ledger_index: ledgerResponse.ledger_index,
-          ledger_time: ledgerResponse.ledger_time,
-          reserve_base: ledgerResponse.reserve_base,
-          reserve_inc: ledgerResponse.reserve_inc,
-          validated_ledgers: ledgerResponse.validated_ledgers,
-        }
+        const expectedResult = { ...ledgerResponse }
 
         assert.equal(response.type, 'response')
         assert.deepEqual(response.result, expectedResult)
