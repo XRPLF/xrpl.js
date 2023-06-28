@@ -4,7 +4,7 @@ import { ValidationError } from '../../errors'
 import { BaseTransaction, validateBaseTransaction } from './common'
 
 export interface DepositPreauthBase extends BaseTransaction {
-  TransactionType: 'EnableAmendment'
+  TransactionType: 'DepositPreauth'
 }
 
 export interface DepositPreauthWithAuthorize extends DepositPreauthBase {
