@@ -1,6 +1,4 @@
-import { LedgerIndex } from '../common'
-
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * The `account_currencies` command retrieves a list of currencies that an
@@ -9,17 +7,12 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface AccountCurrenciesRequest extends BaseRequest {
+export interface AccountCurrenciesRequest
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'account_currencies'
   /** A unique identifier for the account, most commonly the account's address. */
   account: string
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * ledger automatically.
-   */
-  ledger_index?: LedgerIndex
   /**
    * If true, then the account field only accepts a public key or XRP Ledger
    * address. Otherwise, account can be a secret or passphrase (not
