@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { Amount } from '../common'
+import { IssuedCurrencyAmount } from '../common'
 
 import { BaseTransaction, validateBaseTransaction, isAmount } from './common'
 
@@ -19,7 +19,7 @@ export interface Clawback extends BaseTransaction {
    * names MUST be lower-case. The `issuer` field MUST be the holder's address,
    * whom to be clawed back.
    */
-  Amount: Amount
+  Amount: IssuedCurrencyAmount
 }
 
 /**
