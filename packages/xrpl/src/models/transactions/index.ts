@@ -10,7 +10,11 @@ export { AccountDelete } from './accountDelete'
 export { CheckCancel } from './checkCancel'
 export { CheckCash } from './checkCash'
 export { CheckCreate } from './checkCreate'
-export { DepositPreauth } from './depositPreauth'
+export {
+  DepositPreauth,
+  DepositPreauthWithAuthorize,
+  DepositPreauthWithUnauthorize,
+} from './depositPreauth'
 export { EscrowCancel } from './escrowCancel'
 export { EscrowCreate } from './escrowCreate'
 export { EscrowFinish } from './escrowFinish'

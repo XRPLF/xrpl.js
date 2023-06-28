@@ -13,6 +13,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add type for NFToken object that is stored on a `NFTokenPage`.
 * Add type for `account_info`'s `account_flags` property.
 
+### Changed
+* `DeposityPreauth` has a new type definition that will not allow `Authorize` and `Unauthorize` on the same instance. This provides better guard support.
+
 ## 2.8.0 (2023-06-13)
 
 ### Added

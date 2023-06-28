@@ -3,23 +3,34 @@ import { ValidationError } from '../../errors'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
 
+export interface DepositPreauthBase extends BaseTransaction {
+  TransactionType: 'EnableAmendment'
+}
+
+export interface DepositPreauthWithAuthorize extends DepositPreauthBase {
+  /** The XRP Ledger address of the sender to preauthorize. */
+  Authorize: string
+  Unauthorize: never
+}
+
+export interface DepositPreauthWithUnauthorize extends DepositPreauthBase {
+  Authorize: never
+  /** The XRP Ledger address of a sender whose preauthorization should be revoked. */
+  Unauthorize: string
+}
+
 /**
  * A DepositPreauth transaction gives another account pre-approval to deliver
  * payments to the sender of this transaction. This is only useful if the sender
  * of this transaction is using (or plans to use) Deposit Authorization.
  *
  * @category Transaction Models
+ *
+ * @interface
  */
-export interface DepositPreauth extends BaseTransaction {
-  TransactionType: 'DepositPreauth'
-  /** The XRP Ledger address of the sender to preauthorize. */
-  Authorize?: string
-  /**
-   * The XRP Ledger address of a sender whose preauthorization should be.
-   * revoked.
-   */
-  Unauthorize?: string
-}
+export type DepositPreauth =
+  | DepositPreauthWithAuthorize
+  | DepositPreauthWithUnauthorize
 
 /**
  * Verify the form and type of a DepositPreauth at runtime.
