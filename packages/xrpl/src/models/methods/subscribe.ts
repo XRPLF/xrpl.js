@@ -102,8 +102,8 @@ export interface LedgerStream extends BaseStream {
    * Transaction cost applies starting with the following ledger version.
    */
   fee_base: number
-  /** The reference transaction cost in "fee units". */
-  fee_ref: number
+  /** The reference transaction cost in "fee units". This is not returned after the SetFees amendment is enabled. */
+  fee_ref?: number
   /** The identifying hash of the ledger version that was closed. */
   ledger_hash: string
   /** The ledger index of the ledger that was closed. */
@@ -143,8 +143,8 @@ export interface LedgerStreamResponse {
    * Transaction cost applies starting with the following ledger version.
    */
   fee_base: number
-  /** The reference transaction cost in "fee units". */
-  fee_ref: number
+  /** The reference transaction cost in "fee units". This is not returned after the SetFees amendment is enabled. */
+  fee_ref?: number
   /** The identifying hash of the ledger version that was closed. */
   ledger_hash: string
   /** The ledger index of the ledger that was closed. */
