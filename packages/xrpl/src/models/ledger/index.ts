@@ -2,7 +2,7 @@ import AccountRoot, {
   AccountRootFlags,
   AccountRootFlagsInterface,
 } from './AccountRoot'
-import Amendments from './Amendments'
+import Amendments, { AMENDMENTS_ID } from './Amendments'
 import Check from './Check'
 import DepositPreauth from './DepositPreauth'
 import DirectoryNode from './DirectoryNode'
@@ -15,7 +15,7 @@ import FeeSettings, {
 import Ledger from './Ledger'
 import LedgerEntry from './LedgerEntry'
 import LedgerHashes from './LedgerHashes'
-import NegativeUNL from './NegativeUNL'
+import NegativeUNL, { NEGATIVE_UNL_ID } from './NegativeUNL'
 import { NFTokenOffer } from './NFTokenOffer'
 import { NFToken, NFTokenPage } from './NFTokenPage'
 import Offer, { OfferFlags } from './Offer'
@@ -28,6 +28,7 @@ export {
   AccountRoot,
   AccountRootFlags,
   AccountRootFlagsInterface,
+  AMENDMENTS_ID,
   Amendments,
   Check,
   DepositPreauth,
@@ -40,6 +41,7 @@ export {
   Ledger,
   LedgerEntry,
   LedgerHashes,
+  NEGATIVE_UNL_ID,
   NegativeUNL,
   NFTokenOffer,
   NFTokenPage,
