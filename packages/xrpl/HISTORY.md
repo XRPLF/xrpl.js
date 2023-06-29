@@ -3,7 +3,7 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 
-## Added
+### Added
 * Add `BurnedNFTokens`, `FirstNFTSequence`, `MintedNFTokens`,
 `NFTokenMinter`, and `WalletLocator` to `AccountRoot`.
 * Add `ledger_hash` and `ledger_index` to `account_nfts`,
@@ -12,6 +12,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add types for `NFTokenPage` and `NFTokenOffer` LedgerEntries.
 * Add type for NFToken object that is stored on a `NFTokenPage`.
 * Add type for `account_info`'s `account_flags` property.
+* Add types for `EnableAmendment`, `SetFee`, and `UNLModify` transactions.
 
 ## 2.8.0 (2023-06-13)
 
