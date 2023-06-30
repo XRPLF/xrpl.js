@@ -15,6 +15,12 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add types for `EnableAmendment`, `SetFee`, and `UNLModify` transactions.
 * Add the new fields for `XRPFees` amendment and id for the `FeeSettings`
 * Add `FeeSettings` singleton ledger entry id.
+* Export many nested types and interfaces
+
+### Breaking
+* If you were deep importing these types previously you will need to import them from `xrpl` and rename them:
+  * `methods/bookOffers`: `TakerAmount` -> `BookOfferCurrency`
+  * `methods/accountLines`: `Trustline` -> `AccountLinesTrustline`
 
 ## 2.8.0 (2023-06-13)
 
