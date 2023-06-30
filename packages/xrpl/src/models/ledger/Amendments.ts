@@ -1,6 +1,6 @@
 import BaseLedgerEntry from './BaseLedgerEntry'
 
-interface Majority {
+export interface Majority {
   Majority: {
     /** The Amendment ID of the pending amendment. */
     Amendment: string

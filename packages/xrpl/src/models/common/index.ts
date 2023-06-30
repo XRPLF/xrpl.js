@@ -1,10 +1,10 @@
 export type LedgerIndex = number | ('validated' | 'closed' | 'current')
 
-interface XRP {
+export interface XRP {
   currency: 'XRP'
 }
 
-interface IssuedCurrency {
+export interface IssuedCurrency {
   currency: string
   issuer: string
 }
@@ -43,7 +43,7 @@ export type StreamType =
   | 'server'
   | 'validations'
 
-interface PathStep {
+export interface PathStep {
   account?: string
   currency?: string
   issuer?: string

@@ -2,7 +2,7 @@ import AccountRoot, {
   AccountRootFlags,
   AccountRootFlagsInterface,
 } from './AccountRoot'
-import Amendments from './Amendments'
+import Amendments, { Majority } from './Amendments'
 import Check from './Check'
 import DepositPreauth from './DepositPreauth'
 import DirectoryNode from './DirectoryNode'
@@ -40,6 +40,7 @@ export {
   Ledger,
   LedgerEntry,
   LedgerHashes,
+  Majority,
   NegativeUNL,
   NFTokenOffer,
   NFTokenPage,

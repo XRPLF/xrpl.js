@@ -1,6 +1,6 @@
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
-export interface Trustline {
+export interface AccountLinesTrustline {
   /** The unique Address of the counterparty to this trust line. */
   account: string
   /**
@@ -111,7 +111,7 @@ export interface AccountLinesResponse extends BaseResponse {
      * Array of trust line objects. If the number of trust lines is large, only
      * returns up to the limit at a time.
      */
-    lines: Trustline[]
+    lines: AccountLinesTrustline[]
     /**
      * The ledger index of the current open ledger, which was used when
      * retrieving this information.

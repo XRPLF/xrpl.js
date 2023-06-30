@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 
 import { LedgerDataRequest } from '../../../src'
-import type { BinaryLedgerEntry } from '../../../src/models/methods/ledgerData'
+import type { LedgerDataLBinaryLedgerEntry } from '../../../src/models/methods/ledgerData'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -58,7 +58,7 @@ describe('ledger_data', function () {
 
       assert.equal(ledgerDataResponse.result.state.length, 5)
       ledgerDataResponse.result.state.forEach((item) => {
-        assert.typeOf((item as BinaryLedgerEntry).data, 'string')
+        assert.typeOf((item as LedgerDataLBinaryLedgerEntry).data, 'string')
         assert.typeOf(item.index, 'string')
       })
     },

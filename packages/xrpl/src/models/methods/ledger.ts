@@ -67,20 +67,19 @@ export interface LedgerRequest extends BaseRequest, LookupByLedgerRequest {
   queue?: boolean
 }
 
-interface ModifiedMetadata extends TransactionMetadata {
-  owner_funds: string
-}
-
-interface ModifiedOfferCreateTransaction {
+/**
+ * Special case transaction definition when the request contains `owner_funds: true`.
+ */
+export interface LedgerModifiedOfferCreateTransaction {
   transaction: Transaction
-  metadata: ModifiedMetadata
+  metadata: TransactionMetadata & { owner_funds: string }
 }
 
-interface LedgerQueueData {
+export interface LedgerQueueData {
   account: string
   tx:
     | TransactionAndMetadata
-    | ModifiedOfferCreateTransaction
+    | LedgerModifiedOfferCreateTransaction
     | { tx_blob: string }
   retries_remaining: number
   preflight_result: string
@@ -91,7 +90,7 @@ interface LedgerQueueData {
   max_spend_drops?: string
 }
 
-interface BinaryLedger
+export interface LedgerBinary
   extends Omit<Omit<Ledger, 'transactions'>, 'accountState'> {
   accountState?: string[]
   transactions?: string[]
@@ -105,7 +104,7 @@ interface BinaryLedger
 export interface LedgerResponse extends BaseResponse {
   result: {
     /** The complete header data of this {@link Ledger}. */
-    ledger: Ledger | BinaryLedger
+    ledger: Ledger | LedgerBinary
     /** Unique identifying hash of the entire ledger. */
     ledger_hash: string
     /** The Ledger Index of this ledger. */
