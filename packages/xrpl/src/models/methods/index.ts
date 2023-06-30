@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- There is a lot to export */
 import {
   AccountChannelsRequest,
   AccountChannelsResponse,
