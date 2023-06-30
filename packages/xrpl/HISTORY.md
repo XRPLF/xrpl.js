@@ -19,8 +19,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Breaking
 * If you were deep importing these types previously you will need to import them from `xrpl` and rename them:
-  * `methods/bookOffers`: `TakerAmount` -> `BookOfferCurrency`
   * `methods/accountLines`: `Trustline` -> `AccountLinesTrustline`
+  * `methods/bookOffers`: `TakerAmount` -> `BookOfferCurrency`
+  * `methods/ledgerData`: `BinaryLedgerEntry` -> `LedgerDataBinaryLedgerEntry`
 
 ## 2.8.0 (2023-06-13)
 
