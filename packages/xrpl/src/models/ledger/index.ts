@@ -7,7 +7,11 @@ import Check from './Check'
 import DepositPreauth from './DepositPreauth'
 import DirectoryNode from './DirectoryNode'
 import Escrow from './Escrow'
-import FeeSettings from './FeeSettings'
+import FeeSettings, {
+  FeeSettingsPreAmendmentFields,
+  FeeSettingsPostAmendmentFields,
+  FEE_SETTINGS_ID,
+} from './FeeSettings'
 import Ledger from './Ledger'
 import LedgerEntry from './LedgerEntry'
 import LedgerHashes from './LedgerHashes'
@@ -29,7 +33,10 @@ export {
   DepositPreauth,
   DirectoryNode,
   Escrow,
+  FEE_SETTINGS_ID,
   FeeSettings,
+  FeeSettingsPreAmendmentFields,
+  FeeSettingsPostAmendmentFields,
   Ledger,
   LedgerEntry,
   LedgerHashes,
