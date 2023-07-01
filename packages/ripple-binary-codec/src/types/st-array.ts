@@ -79,6 +79,7 @@ class STArray extends SerializedType {
   /**
    * Return the JSON representation of this.bytes
    *
+   * @param definitions optional, types and values to use to encode/decode a transaction
    * @returns An Array of JSON objects
    */
   toJSON(
