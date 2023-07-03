@@ -1,5 +1,11 @@
 import BaseLedgerEntry from './BaseLedgerEntry'
 
+/**
+ * The unique id for the Amendments object https://xrpl.org/amendments-object.html#amendments-id-format
+ */
+export const AMENDMENTS_ID =
+  '7DB0788C020F02780A673DC74757F23823FA3014C1866E72CC4CD8B226CD6EF4'
+
 interface Majority {
   Majority: {
     /** The Amendment ID of the pending amendment. */
