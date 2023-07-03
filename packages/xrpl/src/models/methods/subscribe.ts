@@ -11,7 +11,7 @@ import { TransactionMetadata } from '../transactions/metadata'
 
 import type { BaseRequest, BaseResponse } from './baseMethod'
 
-interface Book {
+export interface SubscribeBook {
   /**
    * Specification of which currency the account taking the Offer would
    * receive, as a currency object with no amount.
@@ -60,7 +60,7 @@ export interface SubscribeRequest extends BaseRequest {
    * Array of objects defining order books  to monitor for updates, as detailed
    * Below.
    */
-  books?: Book[]
+  books?: SubscribeBook[]
   /**
    * URL where the server sends a JSON-RPC callbacks for each event.
    * Admin-only.
@@ -72,7 +72,7 @@ export interface SubscribeRequest extends BaseRequest {
   url_password?: string
 }
 
-type BooksSnapshot = Offer[]
+export type BooksSnapshot = Offer[]
 
 /**
  * Response expected from a {@link SubscribeRequest}.

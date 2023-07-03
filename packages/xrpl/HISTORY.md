@@ -16,6 +16,13 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add the new fields for `XRPFees` amendment and id for the `FeeSettings`
 * Add `FeeSettings`, `NegativeUNL`, and `Amendments` singleton ledger entry ids.
 * Add `WalletLocator` to `SignerEntry` on `SignerList` (LedgerEntry).
+* Export many nested types and interfaces
+
+### Breaking
+* If you were deep importing these types previously you will need to import them from `xrpl` and rename them:
+  * `methods/accountLines`: `Trustline` -> `AccountLinesTrustline`
+  * `methods/bookOffers`: `TakerAmount` -> `BookOfferCurrency`
+  * `methods/ledgerData`: `BinaryLedgerEntry` -> `LedgerDataBinaryLedgerEntry`
 
 ## 2.8.0 (2023-06-13)
 

@@ -1,9 +1,12 @@
 import flatMap from 'lodash/flatMap'
 
 import type { Client } from '..'
-import { LedgerIndex } from '../models/common'
-import { AccountInfoRequest } from '../models/methods'
-import { AccountLinesRequest, Trustline } from '../models/methods/accountLines'
+import {
+  AccountLinesRequest,
+  AccountLinesTrustline,
+  LedgerIndex,
+  AccountInfoRequest,
+} from '../models'
 import { dropsToXrp } from '../utils'
 
 interface Balance {
@@ -12,7 +15,7 @@ interface Balance {
   issuer?: string
 }
 
-function formatBalances(trustlines: Trustline[]): Balance[] {
+function formatBalances(trustlines: AccountLinesTrustline[]): Balance[] {
   return trustlines.map((trustline) => ({
     value: trustline.balance,
     currency: trustline.currency,

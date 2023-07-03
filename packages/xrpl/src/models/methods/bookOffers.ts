@@ -3,7 +3,7 @@ import { Offer } from '../ledger'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
-export interface TakerAmount {
+export interface BookOfferCurrency {
   currency: string
   issuer?: string
 }
@@ -32,13 +32,13 @@ export interface BookOffersRequest extends BaseRequest, LookupByLedgerRequest {
    * receive, as an object with currency and issuer fields (omit issuer for
    * XRP), like currency amounts.
    */
-  taker_gets: TakerAmount
+  taker_gets: BookOfferCurrency
   /**
    * Specification of which currency the account taking the offer would pay, as
    * an object with currency and issuer fields (omit issuer for XRP), like
    * currency amounts.
    */
-  taker_pays: TakerAmount
+  taker_pays: BookOfferCurrency
 }
 
 export interface BookOffer extends Offer {

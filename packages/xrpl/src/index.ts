@@ -7,6 +7,8 @@ export * from './models'
 
 export * from './utils'
 
+export { default as ECDSA } from './ECDSA'
+
 export * from './errors'
 
 export { Wallet } from './Wallet'

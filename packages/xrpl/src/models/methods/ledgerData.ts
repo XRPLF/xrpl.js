@@ -39,13 +39,18 @@ export interface LedgerDataRequest extends BaseRequest, LookupByLedgerRequest {
   marker?: unknown
 }
 
-type LabeledLedgerEntry = { ledgerEntryType: string } & LedgerEntry
+export type LedgerDataLabeledLedgerEntry = {
+  ledgerEntryType: string
+} & LedgerEntry
 
-export interface BinaryLedgerEntry {
+export interface LedgerDataBinaryLedgerEntry {
   data: string
 }
 
-type State = { index: string } & (BinaryLedgerEntry | LabeledLedgerEntry)
+export type LedgerDataLedgerState = { index: string } & (
+  | LedgerDataBinaryLedgerEntry
+  | LedgerDataLabeledLedgerEntry
+)
 
 /**
  * The response expected from a {@link LedgerDataRequest}.
@@ -62,7 +67,7 @@ export interface LedgerDataResponse extends BaseResponse {
      * Array of JSON objects containing data from the ledger's state tree,
      * as defined below.
      */
-    state: State[]
+    state: LedgerDataLedgerState[]
     /**
      * Server-defined value indicating the response is paginated. Pass this to
      * the next call to resume where this call left off.

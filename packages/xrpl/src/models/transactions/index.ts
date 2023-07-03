@@ -1,5 +1,6 @@
+export { BaseTransaction } from './common'
 export { validate, TransactionAndMetadata, Transaction } from './transaction'
-export { TransactionMetadata } from './metadata'
+export * from './metadata'
 export {
   AccountSetAsfFlags,
   AccountSetTfFlags,
