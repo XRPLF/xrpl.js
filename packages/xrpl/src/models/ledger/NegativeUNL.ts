@@ -1,10 +1,10 @@
 import BaseLedgerEntry from './BaseLedgerEntry'
 
 /**
- * The unique id for the Amendments object https://xrpl.org/amendments-object.html#amendments-id-format
+ * The unique id for the nUNL object https://xrpl.org/negativeunl.html#negativeunl-id-format
  */
-export const AMENDMENTS_ID =
-  '7DB0788C020F02780A673DC74757F23823FA3014C1866E72CC4CD8B226CD6EF4'
+export const NEGATIVE_UNL_ID =
+  '2E8A59AA9D3B5B186B0B9E0F62E6C02587CA74A4D778938E957B6357D364B244'
 
 /**
  * The NegativeUNL object type contains the current status of the Negative UNL,
