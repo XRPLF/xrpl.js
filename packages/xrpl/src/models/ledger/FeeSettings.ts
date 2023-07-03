@@ -1,5 +1,8 @@
 import BaseLedgerEntry from './BaseLedgerEntry'
 
+/**
+ * The unique id for the FeeSettings object https://xrpl.org/feesettings.html#feesettings-id-format
+ */
 export const FEE_SETTINGS_ID =
   '4BC50C9B0D8515D3EAAE1E74B29A95804346C491EE1A95BF25E4AAB854A6A651'
 

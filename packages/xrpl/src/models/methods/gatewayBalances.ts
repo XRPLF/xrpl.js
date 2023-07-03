@@ -37,7 +37,7 @@ export interface GatewayBalancesRequest
   hotwallet?: string | string[]
 }
 
-interface Balance {
+export interface GatewayBalance {
   currency: string
   value: string
 }
@@ -60,12 +60,12 @@ export interface GatewayBalancesResponse extends BaseResponse {
      * Amounts issued to the hotwallet addresses from the request. The keys are
      * addresses and the values are arrays of currency amounts they hold.
      */
-    balances?: { [address: string]: Balance[] }
+    balances?: { [address: string]: GatewayBalance[] }
     /**
      * Total amounts held that are issued by others. In the recommended
      * configuration, the issuing address should have none.
      */
-    assets?: { [address: string]: Balance[] }
+    assets?: { [address: string]: GatewayBalance[] }
     /**
      * The identifying hash of the ledger version that was used to generate
      * this response.

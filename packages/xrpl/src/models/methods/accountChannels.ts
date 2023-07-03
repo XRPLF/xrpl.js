@@ -1,6 +1,6 @@
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
-interface Channel {
+export interface Channel {
   account: string
   amount: string
   balance: string
