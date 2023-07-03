@@ -15,6 +15,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add types for `EnableAmendment`, `SetFee`, and `UNLModify` transactions.
 * Add the new fields for `XRPFees` amendment and id for the `FeeSettings`
 * Add `FeeSettings` singleton ledger entry id.
+* Add `WalletLocator` to `SignerEntry` on `SignerList` (LedgerEntry).
 
 ## 2.8.0 (2023-06-13)
 
