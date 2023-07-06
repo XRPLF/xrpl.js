@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "declarationDir": "dts",
+    "outDir": "dts",
+    "rootDir": "src",
+    "emitDeclarationOnly": true,
+    "jsx": "react",
+    "verbatimModuleSyntax": false
+  },
+  "exclude": [
+    "dts",
+    "tests"
+  ],
+  "include": [
+    "src/**/*",
+    "types/**/*",
+    "../types/**/*"
+  ],
+  "references": []
+}
