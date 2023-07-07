@@ -178,7 +178,7 @@ export interface LedgerEntryRequest extends BaseRequest {
    * URIToken, as hexadecimal. If an object, the `issuer` and `uri`
    * sub-fields are required to uniquely specify the URIToken entry.
    */
-  uritoken?:
+  uri_token?:
     | {
         /** The issuer of the URIToken object. */
         issuer: string
