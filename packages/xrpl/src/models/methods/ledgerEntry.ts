@@ -80,6 +80,11 @@ export interface LedgerEntryRequest extends BaseRequest {
     | string
 
   /**
+   * The object ID of a transaction emitted by the ledger entry.
+   */
+  emitted_txn?: string
+
+  /**
    * The Escrow object to retrieve. If a string, must be the object ID of the
    * escrow, as hexadecimal. If an object, requires owner and seq sub-fields.
    */
@@ -91,6 +96,36 @@ export interface LedgerEntryRequest extends BaseRequest {
         seq: number
       }
     | string
+
+  /**
+   * The hash of the Hook object to retrieve.
+   */
+  hook_definition?: string
+
+  /**
+   * The Hook object to retrieve. If a string, must be the object ID of the Hook.
+   * If an object, requires `account` sub-field.
+   */
+  hook?:
+    | {
+        /** The account of the Hook object. */
+        account: string
+      }
+    | string
+
+  /**
+   * Object specifying the HookState object to retrieve. Requires the sub-fields
+   * `account`, `key`, and `namespace_id` to uniquely specify the HookState entry
+   * to retrieve.
+   */
+  hook_state?: {
+    /** The account of the Hook object. */
+    account: string
+    /** The key of the state. */
+    key: string
+    /** The namespace of the state. */
+    namespace_id: string
+  }
 
   /**
    * The Offer object to retrieve. If a string, interpret as the unique object
@@ -137,40 +172,20 @@ export interface LedgerEntryRequest extends BaseRequest {
         ticket_sequence: number
       }
     | string
-  /**
-   * The object ID of a transaction emitted by the ledger entry.
-   */
-  emitted_txn?: string
 
   /**
-   * The hash of the Hook object to retrieve.
+   * The URIToken object to retrieve. If a string, must be the object ID of the
+   * URIToken, as hexadecimal. If an object, the `issuer` and `uri`
+   * sub-fields are required to uniquely specify the URIToken entry.
    */
-  hook_definition?: string
-
-  /**
-   * The Hook object to retrieve. If a string, must be the object ID of the Hook.
-   * If an object, requires `account` sub-field.
-   */
-  hook?:
+  uritoken?:
     | {
-        /** The account of the Hook object. */
-        account: string
+        /** The issuer of the URIToken object. */
+        issuer: string
+        /** The URIToken uri string (ascii). */
+        uri: string
       }
     | string
-
-  /**
-   * Object specifying the HookState object to retrieve. Requires the sub-fields
-   * `account`, `key`, and `namespace_id` to uniquely specify the HookState entry
-   * to retrieve.
-   */
-  hook_state?: {
-    /** The account of the Hook object. */
-    account: string
-    /** The key of the state. */
-    key: string
-    /** The namespace of the state. */
-    namespace_id: string
-  }
 }
 
 /**

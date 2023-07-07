@@ -8,6 +8,7 @@ import {
   RippleState,
   SignerList,
   Ticket,
+  URIToken,
 } from '../ledger'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
@@ -22,6 +23,7 @@ type AccountObjectType =
   | 'signer_list'
   | 'state'
   | 'ticket'
+  | 'uritoken'
 
 /**
  * The account_objects command returns the raw ledger format for all objects
@@ -78,6 +80,7 @@ type AccountObject =
   | SignerList
   | RippleState
   | Ticket
+  | URIToken
 
 /**
  * Response expected from an {@link AccountObjectsRequest}.
