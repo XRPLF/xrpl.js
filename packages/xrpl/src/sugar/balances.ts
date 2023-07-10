@@ -1,6 +1,6 @@
 import flatMap from 'lodash/flatMap'
 
-import type { Client } from '..'
+import type { Balance, Client } from '..'
 import {
   AccountLinesRequest,
   AccountLinesTrustline,
@@ -8,12 +8,6 @@ import {
   AccountInfoRequest,
 } from '../models'
 import { dropsToXrp } from '../utils'
-
-interface Balance {
-  value: string
-  currency: string
-  issuer?: string
-}
 
 function formatBalances(trustlines: AccountLinesTrustline[]): Balance[] {
   return trustlines.map((trustline) => ({
