@@ -49,7 +49,7 @@ export interface AccountTxRequest extends BaseRequest, LookupByLedgerRequest {
   marker?: unknown
 }
 
-interface AccountTransaction {
+export interface AccountTxTransaction {
   /** The ledger index of the ledger version that included this transaction. */
   ledger_index: number
   /**
@@ -98,7 +98,7 @@ export interface AccountTxResponse extends BaseResponse {
      * Array of transactions matching the request's criteria, as explained
      * below.
      */
-    transactions: AccountTransaction[]
+    transactions: AccountTxTransaction[]
     /**
      * If included and set to true, the information in this response comes from
      * a validated ledger version. Otherwise, the information is subject to

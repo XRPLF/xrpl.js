@@ -1,7 +1,7 @@
 import flatMap from 'lodash/flatMap'
 import { decode } from 'ripple-binary-codec'
 
-import { NFTokenWrapper } from '../models/ledger/NFTokenPage'
+import { NFToken } from '../models/ledger/NFTokenPage'
 import {
   CreatedNode,
   isCreatedNode,
@@ -74,7 +74,7 @@ export default function getNFTokenID(
   const previousTokenIDSet = new Set(
     flatMap(affectedNodes, (node) => {
       const nftokens = isModifiedNode(node)
-        ? (node.ModifiedNode.PreviousFields?.NFTokens as NFTokenWrapper[])
+        ? (node.ModifiedNode.PreviousFields?.NFTokens as NFToken[])
         : []
       return nftokens.map((token) => token.NFToken.NFTokenID)
     }).filter((id) => Boolean(id)),
@@ -84,8 +84,8 @@ export default function getNFTokenID(
   const finalTokenIDs = flatMap(affectedNodes, (node) =>
     (
       (((node as ModifiedNode).ModifiedNode?.FinalFields?.NFTokens ??
-        (node as CreatedNode).CreatedNode?.NewFields
-          ?.NFTokens) as NFTokenWrapper[]) ?? []
+        (node as CreatedNode).CreatedNode?.NewFields?.NFTokens) as NFToken[]) ??
+      []
     ).map((token) => token.NFToken.NFTokenID),
   ).filter((nftokenID) => Boolean(nftokenID))
   /* eslint-enable @typescript-eslint/consistent-type-assertions -- Necessary for parsing metadata */

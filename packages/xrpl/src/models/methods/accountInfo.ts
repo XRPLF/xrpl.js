@@ -31,7 +31,7 @@ export interface AccountInfoRequest extends BaseRequest, LookupByLedgerRequest {
   strict?: boolean
 }
 
-interface QueueTransaction {
+export interface AccountQueueTransaction {
   /**
    * Whether this transaction changes this address's ways of authorizing
    * transactions.
@@ -50,7 +50,7 @@ interface QueueTransaction {
   seq: number
 }
 
-interface QueueData {
+export interface AccountQueueData {
   /** Number of queued transactions from this address. */
   txn_count: number
   /**
@@ -70,7 +70,7 @@ interface QueueData {
    */
   max_spend_drops_total?: string
   /** Information about each queued transaction from this address. */
-  transactions?: QueueTransaction[]
+  transactions?: AccountQueueTransaction[]
 }
 
 export interface AccountInfoAccountFlags {
@@ -168,7 +168,7 @@ export interface AccountInfoResponse extends BaseResponse {
      * fields may be omitted because the values are calculated "lazily" by the
      * queuing mechanism.
      */
-    queue_data?: QueueData
+    queue_data?: AccountQueueData
     /**
      * True if this data is from a validated ledger version; if omitted or set
      * to false, this data is not final.

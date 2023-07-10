@@ -2,7 +2,7 @@ import { Amount, Path } from '../common'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
-interface SourceCurrencyAmount {
+export interface SourceCurrencyAmount {
   currency: string
   issuer?: string
 }
@@ -37,10 +37,10 @@ export interface RipplePathFindRequest
    * entry in the array should be a JSON object with a mandatory currency field
    * and optional issuer field, like how currency amounts are specified.
    */
-  source_currencies?: SourceCurrencyAmount
+  source_currencies?: SourceCurrencyAmount[]
 }
 
-interface PathOption {
+export interface RipplePathFindPathOption {
   /** Array of arrays of objects defining payment paths. */
   paths_computed: Path[]
   /**
@@ -62,7 +62,7 @@ export interface RipplePathFindResponse extends BaseResponse {
      * empty, then there are no paths connecting the source and destination
      * accounts.
      */
-    alternatives: PathOption[]
+    alternatives: RipplePathFindPathOption[]
     /** Unique address of the account that would receive a payment transaction. */
     destination_account: string
     /**

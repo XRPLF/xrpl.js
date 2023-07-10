@@ -14,7 +14,7 @@ import {
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
-type AccountObjectType =
+export type AccountObjectType =
   | 'bridge'
   | 'check'
   | 'deposit_preauth'
@@ -69,7 +69,7 @@ export interface AccountObjectsRequest
  * Account Objects can be a Check, a DepositPreauth, an Escrow, an Offer, a
  * PayChannel, a SignerList, a Ticket, or a RippleState.
  */
-type AccountObject =
+export type AccountObject =
   | Bridge
   | Check
   | DepositPreauth

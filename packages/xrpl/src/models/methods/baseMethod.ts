@@ -23,7 +23,7 @@ export interface LookupByLedgerRequest {
   ledger_index?: LedgerIndex
 }
 
-interface Warning {
+export interface ResponseWarning {
   id: number
   message: string
   details?: { [key: string]: string }
@@ -35,7 +35,7 @@ export interface BaseResponse {
   type: 'response' | string
   result: unknown
   warning?: 'load'
-  warnings?: Warning[]
+  warnings?: ResponseWarning[]
   forwarded?: boolean
   api_version?: number
 }

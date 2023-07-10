@@ -11,7 +11,7 @@ import { TransactionMetadata } from '../transactions/metadata'
 
 import type { BaseRequest, BaseResponse } from './baseMethod'
 
-interface Book {
+export interface SubscribeBook {
   /**
    * Specification of which currency the account taking the Offer would
    * receive, as a currency object with no amount.
@@ -60,7 +60,7 @@ export interface SubscribeRequest extends BaseRequest {
    * Array of objects defining order books  to monitor for updates, as detailed
    * Below.
    */
-  books?: Book[]
+  books?: SubscribeBook[]
   /**
    * URL where the server sends a JSON-RPC callbacks for each event.
    * Admin-only.
@@ -72,7 +72,7 @@ export interface SubscribeRequest extends BaseRequest {
   url_password?: string
 }
 
-type BooksSnapshot = Offer[]
+export type BooksSnapshot = Offer[]
 
 /**
  * Response expected from a {@link SubscribeRequest}.
@@ -102,8 +102,8 @@ export interface LedgerStream extends BaseStream {
    * Transaction cost applies starting with the following ledger version.
    */
   fee_base: number
-  /** The reference transaction cost in "fee units". */
-  fee_ref: number
+  /** The reference transaction cost in "fee units". This is not returned after the SetFees amendment is enabled. */
+  fee_ref?: number
   /** The identifying hash of the ledger version that was closed. */
   ledger_hash: string
   /** The ledger index of the ledger that was closed. */
@@ -143,8 +143,8 @@ export interface LedgerStreamResponse {
    * Transaction cost applies starting with the following ledger version.
    */
   fee_base: number
-  /** The reference transaction cost in "fee units". */
-  fee_ref: number
+  /** The reference transaction cost in "fee units". This is not returned after the SetFees amendment is enabled. */
+  fee_ref?: number
   /** The identifying hash of the ledger version that was closed. */
   ledger_hash: string
   /** The ledger index of the ledger that was closed. */
