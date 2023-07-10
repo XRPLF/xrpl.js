@@ -1,9 +1,8 @@
-import { LedgerIndex } from '../common'
 import { Ledger } from '../ledger'
 import { Transaction, TransactionAndMetadata } from '../transactions'
 import { TransactionMetadata } from '../transactions/metadata'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * Retrieve information about the public ledger. Expects a response in the form
@@ -25,15 +24,8 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface LedgerRequest extends BaseRequest {
+export interface LedgerRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'ledger'
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * ledger automatically.
-   */
-  ledger_index?: LedgerIndex
   /**
    * Admin required If true, return full information on the entire ledger.
    * Ignored if you did not specify a ledger version. Defaults to false.
@@ -75,20 +67,19 @@ export interface LedgerRequest extends BaseRequest {
   queue?: boolean
 }
 
-interface ModifiedMetadata extends TransactionMetadata {
-  owner_funds: string
-}
-
-interface ModifiedOfferCreateTransaction {
+/**
+ * Special case transaction definition when the request contains `owner_funds: true`.
+ */
+export interface LedgerModifiedOfferCreateTransaction {
   transaction: Transaction
-  metadata: ModifiedMetadata
+  metadata: TransactionMetadata & { owner_funds: string }
 }
 
-interface LedgerQueueData {
+export interface LedgerQueueData {
   account: string
   tx:
     | TransactionAndMetadata
-    | ModifiedOfferCreateTransaction
+    | LedgerModifiedOfferCreateTransaction
     | { tx_blob: string }
   retries_remaining: number
   preflight_result: string
@@ -99,7 +90,7 @@ interface LedgerQueueData {
   max_spend_drops?: string
 }
 
-interface BinaryLedger
+export interface LedgerBinary
   extends Omit<Omit<Ledger, 'transactions'>, 'accountState'> {
   accountState?: string[]
   transactions?: string[]
@@ -113,7 +104,7 @@ interface BinaryLedger
 export interface LedgerResponse extends BaseResponse {
   result: {
     /** The complete header data of this {@link Ledger}. */
-    ledger: Ledger | BinaryLedger
+    ledger: Ledger | LedgerBinary
     /** Unique identifying hash of the entire ledger. */
     ledger_hash: string
     /** The Ledger Index of this ledger. */

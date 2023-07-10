@@ -1,8 +1,8 @@
-import { Amount, LedgerIndex, Path } from '../common'
+import { Amount, Path } from '../common'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
-interface SourceCurrencyAmount {
+export interface SourceCurrencyAmount {
   currency: string
   issuer?: string
 }
@@ -14,7 +14,9 @@ interface SourceCurrencyAmount {
  *
  * @category Requests
  */
-export interface RipplePathFindRequest extends BaseRequest {
+export interface RipplePathFindRequest
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'ripple_path_find'
   /** Unique address of the account that would send funds in a transaction. */
   source_account: string
@@ -35,17 +37,10 @@ export interface RipplePathFindRequest extends BaseRequest {
    * entry in the array should be a JSON object with a mandatory currency field
    * and optional issuer field, like how currency amounts are specified.
    */
-  source_currencies?: SourceCurrencyAmount
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * ledger automatically.
-   */
-  ledger_index?: LedgerIndex
+  source_currencies?: SourceCurrencyAmount[]
 }
 
-interface PathOption {
+export interface RipplePathFindPathOption {
   /** Array of arrays of objects defining payment paths. */
   paths_computed: Path[]
   /**
@@ -67,7 +62,7 @@ export interface RipplePathFindResponse extends BaseResponse {
      * empty, then there are no paths connecting the source and destination
      * accounts.
      */
-    alternatives: PathOption[]
+    alternatives: RipplePathFindPathOption[]
     /** Unique address of the account that would receive a payment transaction. */
     destination_account: string
     /**

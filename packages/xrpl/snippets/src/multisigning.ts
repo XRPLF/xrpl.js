@@ -4,6 +4,7 @@ import {
   AccountSet,
   convertStringToHex,
   SignerListSet,
+  Wallet,
 } from '../../src'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
@@ -15,9 +16,11 @@ async function multisigning(): Promise<void> {
    * In practice, users generally will not have all keys in one spot,
    * hence, users need to implement a way to get signatures.
    */
-  const { wallet: wallet1 } = await client.fundWallet()
-  const { wallet: wallet2 } = await client.fundWallet()
-  const { wallet: walletMaster } = await client.fundWallet()
+  const wallet1 = Wallet.generate()
+  const wallet2 = Wallet.generate()
+  const { wallet: walletMaster } = await client.fundWallet(null, {
+    usageContext: 'code snippets',
+  })
   const signerListSet: SignerListSet = {
     TransactionType: 'SignerListSet',
     Account: walletMaster.classicAddress,

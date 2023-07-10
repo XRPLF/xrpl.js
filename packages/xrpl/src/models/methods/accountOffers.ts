@@ -1,6 +1,6 @@
-import { Amount, LedgerIndex } from '../common'
+import { Amount } from '../common'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * The account_offers method retrieves a list of offers made by a given account
@@ -9,17 +9,12 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface AccountOffersRequest extends BaseRequest {
+export interface AccountOffersRequest
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'account_offers'
   /** A unique identifier for the account, most commonly the account's Address. */
   account: string
-  /** A 20-byte hex string identifying the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or "current", "closed", or
-   * "validated" to select a ledger dynamically.
-   */
-  ledger_index?: LedgerIndex
   /**
    * Limit the number of transactions to retrieve. The server is not required
    * to honor this value. Must be within the inclusive range 10 to 400.

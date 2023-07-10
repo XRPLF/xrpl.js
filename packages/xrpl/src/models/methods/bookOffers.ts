@@ -1,9 +1,9 @@
-import { Amount, LedgerIndex } from '../common'
+import { Amount } from '../common'
 import { Offer } from '../ledger'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
-export interface TakerAmount {
+export interface BookOfferCurrency {
   currency: string
   issuer?: string
 }
@@ -14,15 +14,8 @@ export interface TakerAmount {
  *
  * @category Requests
  */
-export interface BookOffersRequest extends BaseRequest {
+export interface BookOffersRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'book_offers'
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * ledger automatically.
-   */
-  ledger_index?: LedgerIndex
   /**
    * If provided, the server does not provide more than this many offers in the
    * results. The total number of results returned may be fewer than the limit,
@@ -39,13 +32,13 @@ export interface BookOffersRequest extends BaseRequest {
    * receive, as an object with currency and issuer fields (omit issuer for
    * XRP), like currency amounts.
    */
-  taker_gets: TakerAmount
+  taker_gets: BookOfferCurrency
   /**
    * Specification of which currency the account taking the offer would pay, as
    * an object with currency and issuer fields (omit issuer for XRP), like
    * currency amounts.
    */
-  taker_pays: TakerAmount
+  taker_pays: BookOfferCurrency
 }
 
 export interface BookOffer extends Offer {

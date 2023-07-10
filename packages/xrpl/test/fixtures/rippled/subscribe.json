@@ -4,7 +4,6 @@
   "type": "response",
   "result": {
     "fee_base": 10,
-    "fee_ref": 10,
     "hostid": "NAP",
     "ledger_hash": "60EBABF55F6AB58864242CADA0B24FBEA027F2426917F39CA56576B335C0065A",
     "ledger_index": 8819951,

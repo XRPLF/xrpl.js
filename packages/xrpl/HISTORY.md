@@ -4,9 +4,33 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Added
+* Add `BurnedNFTokens`, `FirstNFTSequence`, `MintedNFTokens`,
+`NFTokenMinter`, and `WalletLocator` to `AccountRoot`.
+* Add `ledger_hash` and `ledger_index` to `account_nfts`,
+  `nft_buy_offers`, and `nft_sell_offers` requests.
+* Add `nft_page` to `ledger_entry` request.
+* Add types for `NFTokenPage` and `NFTokenOffer` LedgerEntries.
+* Add type for NFToken object that is stored on a `NFTokenPage`.
+* Add type for `account_info`'s `account_flags` property.
+* Add types for `EnableAmendment`, `SetFee`, and `UNLModify` transactions.
+* Add the new fields for `XRPFees` amendment and id for the `FeeSettings`
+* Add `FeeSettings`, `NegativeUNL`, and `Amendments` singleton ledger entry ids.
+* Add `WalletLocator` to `SignerEntry` on `SignerList` (LedgerEntry).
+* Export many nested types and interfaces
+
+### Breaking
+* If you were deep importing these types previously you will need to import them from `xrpl` and rename them:
+  * `methods/accountLines`: `Trustline` -> `AccountLinesTrustline`
+  * `methods/bookOffers`: `TakerAmount` -> `BookOfferCurrency`
+  * `methods/ledgerData`: `BinaryLedgerEntry` -> `LedgerDataBinaryLedgerEntry`
+
+## 2.8.0 (2023-06-13)
+
+### Added
 * Adds support for npm v9
 
 ### Fixed
+* `getNFTokenID` now also accepts metadata from `tx` in binary format
 * Fixed `ServerState.transitions` typing, it is now a string instead of a number. (Only used in return from `server_state` request)
 * Added `destination_amount` to `PathOption` which is returned as part of a `path_find` request
 * Removed the `decode(encode(tx)) == tx` check from the wallet signing process

@@ -55,7 +55,7 @@ export type PathFindRequest =
   | PathFindCloseRequest
   | PathFindStatusRequest
 
-interface PathOption {
+export interface PathFindPathOption {
   /** Array of arrays of objects defining payment paths. */
   paths_computed: Path[]
   /**
@@ -82,7 +82,7 @@ export interface PathFindResponse extends BaseResponse {
      * empty, then no paths were found connecting the source and destination
      * accounts.
      */
-    alternatives: PathOption[]
+    alternatives: PathFindPathOption[]
     /** Unique address of the account that would receive a transaction. */
     destination_account: string
     /** Currency amount provided in the WebSocket request. */
