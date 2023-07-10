@@ -1,10 +1,12 @@
+import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
-import { mnemonicToSeedSync } from 'bip39'
-import _ from 'lodash'
+import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
+import omitBy from 'lodash/omitBy'
 import {
   classicAddressToXAddress,
   isValidXAddress,
   xAddressToClassicAddress,
+  encodeSeed,
 } from 'ripple-address-codec'
 import {
   decode,
@@ -23,9 +25,11 @@ import { Utils } from 'xrpl-secret-numbers'
 
 import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
-import { Transaction } from '../models/transactions'
+import { Transaction, validate } from '../models/transactions'
 import { ensureClassicAddress } from '../sugar/utils'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
+
+import { rfc1751MnemonicToKey } from './rfc1751'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
@@ -41,17 +45,6 @@ function hexFromBuffer(buffer: Buffer): string {
  *
  * @example
  * ```typescript
- * // Derive a wallet from a bip38 Mnemonic
- * const wallet = Wallet.fromMnemonic(
- *   'jewel insect retreat jump claim horse second chef west gossip bone frown exotic embark laundry'
- * )
- * console.log(wallet)
- * // Wallet {
- * // publicKey: '02348F89E9A6A3615BA317F8474A3F51D66221562D3CA32BFA8D21348FF67012B2',
- * // privateKey: '00A8F2E77FC0E05890C1B5088AFE0ECF9D96466A4419B897B1AB383E336E1735A2',
- * // classicAddress: 'rwZiksrExmVkR64pf87Jor4cYbmff47SUm',
- * // seed: undefined
- * // }.
  *
  * // Derive a wallet from a base58 encoded seed.
  * const seedWallet = Wallet.fromSeed('ssZkdwURFMBXenJPbrpE14b6noJSu')
@@ -84,20 +77,11 @@ function hexFromBuffer(buffer: Buffer): string {
  *
  * @category Signing
  */
-class Wallet {
+export class Wallet {
   public readonly publicKey: string
   public readonly privateKey: string
   public readonly classicAddress: string
   public readonly seed?: string
-
-  /**
-   * Alias for wallet.classicAddress.
-   *
-   * @returns The wallet's classic address.
-   */
-  public get address(): string {
-    return this.classicAddress
-  }
 
   /**
    * Creates a new Wallet.
@@ -125,12 +109,34 @@ class Wallet {
   }
 
   /**
-   * Generates a new Wallet using a generated seed.
+   * Alias for wallet.classicAddress.
+   *
+   * @returns The wallet's classic address.
+   */
+  public get address(): string {
+    return this.classicAddress
+  }
+
+  /**
+   * `generate()` creates a new random Wallet. In order to make this a valid account on ledger, you must
+   * Send XRP to it. On test networks that can be done with "faucets" which send XRP to any account which asks
+   * For it. You can call `client.fundWallet()` in order to generate credentials and fund the account on test networks.
+   *
+   * @example
+   * ```ts
+   * const { Wallet } = require('xrpl')
+   * const wallet = Wallet.generate()
+   * ```
    *
    * @param algorithm - The digital signature algorithm to generate an address for.
    * @returns A new Wallet derived from a generated seed.
+   *
+   * @throws ValidationError when signing algorithm isn't valid
    */
   public static generate(algorithm: ECDSA = DEFAULT_ALGORITHM): Wallet {
+    if (!Object.values(ECDSA).includes(algorithm)) {
+      throw new ValidationError('Invalid cryptographic signing algorithm')
+    }
     const seed = generateSeed({ algorithm })
     return Wallet.fromSeed(seed)
   }
@@ -165,38 +171,6 @@ class Wallet {
    */
   // eslint-disable-next-line @typescript-eslint/member-ordering -- Member is used as a function here
   public static fromSecret = Wallet.fromSeed
-
-  /**
-   * Derives a wallet from a mnemonic.
-   *
-   * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
-   * @param opts - (Optional) Options to derive a Wallet.
-   * @param opts.derivationPath - The path to derive a keypair (publicKey/privateKey) used for mnemonic-to-seed conversion.
-   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
-   * @returns A Wallet derived from a mnemonic.
-   * @throws ValidationError if unable to derive private key from mnemonic input.
-   */
-  public static fromMnemonic(
-    mnemonic: string,
-    opts: { masterAddress?: string; derivationPath?: string } = {},
-  ): Wallet {
-    const seed = mnemonicToSeedSync(mnemonic)
-    const masterNode = fromSeed(seed)
-    const node = masterNode.derivePath(
-      opts.derivationPath ?? DEFAULT_DERIVATION_PATH,
-    )
-    if (node.privateKey === undefined) {
-      throw new ValidationError(
-        'Unable to derive privateKey from mnemonic input',
-      )
-    }
-
-    const publicKey = hexFromBuffer(node.publicKey)
-    const privateKey = hexFromBuffer(node.privateKey)
-    return new Wallet(publicKey, `00${privateKey}`, {
-      masterAddress: opts.masterAddress,
-    })
-  }
 
   /**
    * Derives a wallet from secret numbers.
@@ -253,6 +227,94 @@ class Wallet {
   }
 
   /**
+   * Derives a wallet from a bip39 or RFC1751 mnemonic (Defaults to bip39).
+   *
+   * @deprecated since version 2.6.1.
+   * Will be deleted in version 3.0.0.
+   * This representation is currently deprecated in rippled.
+   * You should use another method to represent your keys such as a seed or public/private keypair.
+   *
+   * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
+   * @param opts - (Optional) Options to derive a Wallet.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
+   * @param opts.derivationPath - The path to derive a keypair (publicKey/privateKey). Only used for bip39 conversions.
+   * @param opts.mnemonicEncoding - If set to 'rfc1751', this interprets the mnemonic as a rippled RFC1751 mnemonic like
+   *                          `wallet_propose` generates in rippled. Otherwise the function defaults to bip39 decoding.
+   * @param opts.algorithm - Only used if opts.mnemonicEncoding is 'rfc1751'. Allows the mnemonic to generate its
+   *                         secp256k1 seed, or its ed25519 seed. By default, it will generate the secp256k1 seed
+   *                         to match the rippled `wallet_propose` default algorithm.
+   * @returns A Wallet derived from a mnemonic.
+   * @throws ValidationError if unable to derive private key from mnemonic input.
+   */
+  public static fromMnemonic(
+    mnemonic: string,
+    opts: {
+      masterAddress?: string
+      derivationPath?: string
+      mnemonicEncoding?: 'bip39' | 'rfc1751'
+      algorithm?: ECDSA
+    } = {},
+  ): Wallet {
+    if (opts.mnemonicEncoding === 'rfc1751') {
+      return Wallet.fromRFC1751Mnemonic(mnemonic, {
+        masterAddress: opts.masterAddress,
+        algorithm: opts.algorithm,
+      })
+    }
+    // Otherwise decode using bip39's mnemonic standard
+    if (!validateMnemonic(mnemonic)) {
+      throw new ValidationError(
+        'Unable to parse the given mnemonic using bip39 encoding',
+      )
+    }
+
+    const seed = mnemonicToSeedSync(mnemonic)
+    const masterNode = fromSeed(seed)
+    const node = masterNode.derivePath(
+      opts.derivationPath ?? DEFAULT_DERIVATION_PATH,
+    )
+    if (node.privateKey === undefined) {
+      throw new ValidationError(
+        'Unable to derive privateKey from mnemonic input',
+      )
+    }
+
+    const publicKey = hexFromBuffer(node.publicKey)
+    const privateKey = hexFromBuffer(node.privateKey)
+    return new Wallet(publicKey, `00${privateKey}`, {
+      masterAddress: opts.masterAddress,
+    })
+  }
+
+  /**
+   * Derives a wallet from a RFC1751 mnemonic, which is how `wallet_propose` encodes mnemonics.
+   *
+   * @param mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
+   * @param opts - (Optional) Options to derive a Wallet.
+   * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @returns A Wallet derived from a mnemonic.
+   */
+  private static fromRFC1751Mnemonic(
+    mnemonic: string,
+    opts: { masterAddress?: string; algorithm?: ECDSA },
+  ): Wallet {
+    const seed = rfc1751MnemonicToKey(mnemonic)
+    let encodeAlgorithm: 'ed25519' | 'secp256k1'
+    if (opts.algorithm === ECDSA.ed25519) {
+      encodeAlgorithm = 'ed25519'
+    } else {
+      // Defaults to secp256k1 since that's the default for `wallet_propose`
+      encodeAlgorithm = 'secp256k1'
+    }
+    const encodedSeed = encodeSeed(seed, encodeAlgorithm)
+    return Wallet.fromSeed(encodedSeed, {
+      masterAddress: opts.masterAddress,
+      algorithm: opts.algorithm,
+    })
+  }
+
+  /**
    * Derive a Wallet from a seed.
    *
    * @param seed - The seed used to derive the wallet.
@@ -277,11 +339,59 @@ class Wallet {
   /**
    * Signs a transaction offline.
    *
+   * @example
+   *
+   * ```ts
+   * const { Client, Wallet } = require('xrpl')
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   *
+   * async function signTransaction() {
+   *   await client.connect()
+   *   const { balance: balance1, wallet: wallet1 } = client.fundWallet()
+   *   const { balance: balance2, wallet: wallet2 } = client.fundWallet()
+   *
+   *   const transaction = {
+   *     TransactionType: 'Payment',
+   *     Account: wallet1.address,
+   *     Destination: wallet2.address,
+   *     Amount: '10'
+   *   }
+   *
+   *   try {
+   *     await client.autofill(transaction)
+   *     const { tx_blob: signed_tx_blob, hash} = await wallet1.sign(transaction)
+   *     console.log(signed_tx_blob)
+   *   } catch (error) {
+   *     console.error(`Failed to sign transaction: ${error}`)
+   *   }
+   *   const result = await client.submit(signed_tx_blob)
+   *   await client.disconnect()
+   * }
+   *
+   * signTransaction()
+   * ```
+   * In order for a transaction to be validated, it must be signed by the account sending the transaction to prove
+   * That the owner is actually the one deciding to take that action.
+   *
+   * In this example, we created, signed, and then submitted a transaction to testnet. You may notice that the
+   * Output of `sign` includes a `tx_blob` and a `hash`, both of which are needed to submit & verify the results.
+   * Note: If you pass a `Wallet` to `client.submit` or `client.submitAndWait` it will do signing like this under the hood.
+   *
+   * `tx_blob` is a binary representation of a transaction on the XRP Ledger. It's essentially a byte array
+   * that encodes all of the data necessary to execute the transaction, including the source address, the destination
+   * address, the amount, and any additional fields required for the specific transaction type.
+   *
+   * `hash` is a unique identifier that's generated from the signed transaction data on the XRP Ledger. It's essentially
+   * A cryptographic digest of the signed transaction blob, created using a hash function. The signed transaction hash is
+   * Useful for identifying and tracking specific transactions on the XRP Ledger. It can be used to query transaction
+   * Information, verify the authenticity of a transaction, and detect any tampering with the transaction data.
+   *
    * @param this - Wallet instance.
    * @param transaction - A transaction to be signed offline.
    * @param multisign - Specify true/false to use multisign or actual address (classic/x-address) to make multisign tx request.
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
+   * @throws XrplError if the issued currency being signed is XRP ignoring case.
    */
   // eslint-disable-next-line max-lines-per-function -- introduced more checks to support both string and boolean inputs.
   public sign(
@@ -299,13 +409,28 @@ class Wallet {
       multisignAddress = this.classicAddress
     }
 
-    if (transaction.TxnSignature || transaction.Signers) {
+    // clean null & undefined valued tx properties
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- ensure Transaction flows through
+    const tx = omitBy(
+      { ...transaction },
+      (value) => value == null,
+    ) as unknown as Transaction
+
+    if (tx.TxnSignature || tx.Signers) {
       throw new ValidationError(
         'txJSON must not contain "TxnSignature" or "Signers" properties',
       )
     }
 
-    const txToSignAndEncode = { ...transaction }
+    removeTrailingZeros(tx)
+
+    /*
+     * This will throw a more clear error for JS users if the supplied transaction has incorrect formatting
+     */
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
+    validate(tx as unknown as Record<string, unknown>)
+
+    const txToSignAndEncode = { ...tx }
 
     txToSignAndEncode.SigningPubKey = multisignAddress ? '' : this.publicKey
 
@@ -326,8 +451,8 @@ class Wallet {
         this.privateKey,
       )
     }
+
     const serialized = encode(txToSignAndEncode)
-    this.checkTxSerialization(serialized, transaction)
     return {
       tx_blob: serialized,
       hash: hashSignedTx(serialized),
@@ -340,8 +465,11 @@ class Wallet {
    * @param signedTransaction - A signed transaction (hex string of signTransaction result) to be verified offline.
    * @returns Returns true if a signedTransaction is valid.
    */
-  public verifyTransaction(signedTransaction: string): boolean {
-    const tx = decode(signedTransaction)
+  public verifyTransaction(signedTransaction: Transaction | string): boolean {
+    const tx =
+      typeof signedTransaction === 'string'
+        ? decode(signedTransaction)
+        : signedTransaction
     const messageHex: string = encodeForSigning(tx)
     const signature = tx.TxnSignature
     return verify(messageHex, signature, this.publicKey)
@@ -356,77 +484,6 @@ class Wallet {
    */
   public getXAddress(tag: number | false = false, isTestnet = false): string {
     return classicAddressToXAddress(this.classicAddress, tag, isTestnet)
-  }
-
-  /**
-   *  Decode a serialized transaction, remove the fields that are added during the signing process,
-   *  and verify that it matches the transaction prior to signing. This gives the user a sanity check
-   *  to ensure that what they try to encode matches the message that will be recieved by rippled.
-   *
-   * @param serialized - A signed and serialized transaction.
-   * @param tx - The transaction prior to signing.
-   * @throws A ValidationError if the transaction does not have a TxnSignature/Signers property, or if
-   * the serialized Transaction desn't match the original transaction.
-   */
-  // eslint-disable-next-line class-methods-use-this -- Helper for organization purposes
-  private checkTxSerialization(serialized: string, tx: Transaction): void {
-    // Decode the serialized transaction:
-    const decoded = decode(serialized)
-    const txCopy = { ...tx }
-
-    /*
-     * And ensure it is equal to the original tx, except:
-     * - It must have a TxnSignature or Signers (multisign).
-     */
-    if (!decoded.TxnSignature && !decoded.Signers) {
-      throw new ValidationError(
-        'Serialized transaction must have a TxnSignature or Signers property',
-      )
-    }
-    // - We know that the original tx did not have TxnSignature, so we should delete it:
-    delete decoded.TxnSignature
-    // - We know that the original tx did not have Signers, so if it exists, we should delete it:
-    delete decoded.Signers
-
-    /*
-     * - If SigningPubKey was not in the original tx, then we should delete it.
-     *   But if it was in the original tx, then we should ensure that it has not been changed.
-     */
-    if (!tx.SigningPubKey) {
-      delete decoded.SigningPubKey
-    }
-
-    /*
-     * - Memos have exclusively hex data which should ignore case.
-     *   Since decode goes to upper case, we set all tx memos to be uppercase for the comparison.
-     */
-    txCopy.Memos?.map((memo) => {
-      const memoCopy = { ...memo }
-      if (memo.Memo.MemoData) {
-        memoCopy.Memo.MemoData = memo.Memo.MemoData.toUpperCase()
-      }
-
-      if (memo.Memo.MemoType) {
-        memoCopy.Memo.MemoType = memo.Memo.MemoType.toUpperCase()
-      }
-
-      if (memo.Memo.MemoFormat) {
-        memoCopy.Memo.MemoFormat = memo.Memo.MemoFormat.toUpperCase()
-      }
-
-      return memo
-    })
-    if (!_.isEqual(decoded, tx)) {
-      const data = {
-        decoded,
-        tx,
-      }
-      const error = new ValidationError(
-        'Serialized transaction does not match original txJSON. See error.data',
-        data,
-      )
-      throw error
-    }
   }
 }
 
@@ -454,4 +511,24 @@ function computeSignature(
   return sign(encodeForSigning(tx), privateKey)
 }
 
-export default Wallet
+/**
+ * Remove trailing insignificant zeros for non-XRP Payment amount.
+ * This resolves the serialization mismatch bug when encoding/decoding a non-XRP Payment transaction
+ * with an amount that contains trailing insignificant zeros; for example, '123.4000' would serialize
+ * to '123.4' and cause a mismatch.
+ *
+ * @param tx - The transaction prior to signing.
+ */
+function removeTrailingZeros(tx: Transaction): void {
+  if (
+    tx.TransactionType === 'Payment' &&
+    typeof tx.Amount !== 'string' &&
+    tx.Amount.value.includes('.') &&
+    tx.Amount.value.endsWith('0')
+  ) {
+    // eslint-disable-next-line no-param-reassign -- Required to update Transaction.Amount.value
+    tx.Amount = { ...tx.Amount }
+    // eslint-disable-next-line no-param-reassign -- Required to update Transaction.Amount.value
+    tx.Amount.value = new BigNumber(tx.Amount.value).toString()
+  }
+}

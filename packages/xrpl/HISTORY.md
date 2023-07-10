@@ -1,6 +1,157 @@
 # xrpl.js (ripple-lib) Release History
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
+## Unreleased
+
+### Added
+* Add `BurnedNFTokens`, `FirstNFTSequence`, `MintedNFTokens`,
+`NFTokenMinter`, and `WalletLocator` to `AccountRoot`.
+* Add `ledger_hash` and `ledger_index` to `account_nfts`,
+  `nft_buy_offers`, and `nft_sell_offers` requests.
+* Add `nft_page` to `ledger_entry` request.
+* Add types for `NFTokenPage` and `NFTokenOffer` LedgerEntries.
+* Add type for NFToken object that is stored on a `NFTokenPage`.
+* Add type for `account_info`'s `account_flags` property.
+* Add types for `EnableAmendment`, `SetFee`, and `UNLModify` transactions.
+* Add the new fields for `XRPFees` amendment and id for the `FeeSettings`
+* Add `FeeSettings`, `NegativeUNL`, and `Amendments` singleton ledger entry ids.
+* Add `WalletLocator` to `SignerEntry` on `SignerList` (LedgerEntry).
+* Export many nested types and interfaces
+
+### Breaking
+* If you were deep importing these types previously you will need to import them from `xrpl` and rename them:
+  * `methods/accountLines`: `Trustline` -> `AccountLinesTrustline`
+  * `methods/bookOffers`: `TakerAmount` -> `BookOfferCurrency`
+  * `methods/ledgerData`: `BinaryLedgerEntry` -> `LedgerDataBinaryLedgerEntry`
+
+## 2.8.0 (2023-06-13)
+
+### Added
+* Adds support for npm v9
+
+### Fixed
+* `getNFTokenID` now also accepts metadata from `tx` in binary format
+* Fixed `ServerState.transitions` typing, it is now a string instead of a number. (Only used in return from `server_state` request)
+* Added `destination_amount` to `PathOption` which is returned as part of a `path_find` request
+* Removed the `decode(encode(tx)) == tx` check from the wallet signing process
+* Fixed the location of `signer_lists` in the `account_info` response so that it matches rippled
+* Guard check for signing algorithm used in `Wallet.generate()`
+* Null and undefined values in transactions are now treated as though the field was not passed in.
+* Improved the type definition of the return value of `submitAndWait()`
+
+### Changed
+* Added sidechain devnet support to faucet generation
+
+### Removed
+* RPCs and utils related to the old sidechain design
+
+## 2.7.0 (2023-03-08)
+
+### Fixed
+* Code splitting improvements for lodash
+* Fixed missing reason code in websocket implementation on websocket disconnect
+* Fix timeout error in request manager
+* Improved typescript typing
+* Fixed empty value condition for NFTokenMinter field in AccountSet transaction
+
+### Added
+* `getNFTokenID` lets you get the NFTokenID after minting an NFT
+* Support for `disallowIncoming` account set flags (e.g. `asfDisallowIncomingTrustline`)
+
+
+### Changed
+* All tests now use the Jest test runner and have been refactored for consistency across all packages
+* Removed nft-devnet faucet support as it has been decommissioned ([Blog Post](https://xrpl.org/blog/2023/nft-devnet-decommission.html))
+
+### Deprecated
+Wallet.fromMmnemonic()
+
+
+## 2.6.0 (2022-11-21)
+
+### Fixed
+* Ignore `https-proxy-agent` in browsers for improved Vite integration
+
+### Added
+* Optional custom amount field to `fundWallet`.
+
+### Changed
+* Add support for Transaction objects in `verifyTransaction`
+* When connected to hooks v2 testnet or amm devnet, Client.fundWallet now defaults to using the faucet instead of requiring specification.
+* Ability to specify faucet url for wallet generation/funding purposes
+
+## 2.5.0 (2022-10-13)
+### Added
+* Support for ExpandedSignerList amendment that expands the maximum signer list to 32 entries.
+* Add `cookie` and `data` to `ValidationStream` interface
+* Additional check for memos field format, provide more detailed error messages.
+
+## 2.4.0 (2022-09-01)
+### Added
+* Export `verify` from ripple-keypairs as `verifyKeypairSignature` for use in web-apps.
+
+### Fixed
+* `Wallet.fromMnemonic` now allows lowercase for RFC1751 mnemonics (#2046)
+* `Wallet.fromMnemonic` detects when an invalid encoding is provided, and throws an error
+* Made unexpected errors in `submitAndWait` more verbose to make them easier to debug.
+
+## 2.3.1 (2022-06-27)
+### Fixed
+* Signing tx with standard currency codes with lowercase and allowed symbols causing an error on decode.
+
+### Added
+* When connected to nft-devnet, Client.fundWallet now defaults to using the nft-devnet faucet instead of requiring specification.
+
+## 2.3.0 (2022-06-02)
+### Added
+* Sourcemap generation for browser bundle
+* Exported the AccountOffer interface
+
+### Fixed
+* Client.disconnect() now stops the heartbeat health check as well
+* Updated dependencies which had a warning when running `npm audit`
+* Infinite error/reconnect in browser if an exception was raised during the initial websocket connection event
+* Errors during reliable submission with no error message now properly show the preliminary result instead of a type error
+* Fixed serialize/deserialize verification bug in `Wallet.sign()` when signing a non-XRP Payment with an amount that contains trailing insignificant zeros
+* Allow lowercase hex values for `NFTokenMint.URI`
+
+## 2.2.3 (2022-05-04)
+### Fixed
+* Fixed fromMnemonic having no way to decode mnemonics from rippled's `wallet_propose` method
+
+## 2.2.2 (2022-05-02)
+### Added
+* Export deriveAddress from ripple-keypairs in xrpl.js
+* Deprecated BroadcastClient as it does not solve the reliable connection problem
+
+### Fixed
+* Added missing `Owner` field to NFTokenBurn type definition
+* Changed `tfSellToken` to `tfSellNFToken` to match the 1.9.0 naming for NFTokenSellOffers
+* Add missing filter types in AccountObjectType
+
+## 2.2.1 (2022-04-21)
+### Fixed
+* Fix return field of NFT offer
+* Updated `getOrderbook` docs and param names to reflect actual behavior of checking both sides of order book.
+
+## 2.2.0 (2022-04-19)
+### Added
+* `federator_info` RPC support
+* Helper method for creating a cross-chain payment to/from a sidechain
+* Helper method for parsing an NFTokenID
+
+### Fixed
+* Type of TrustSet transaction edited, specifically LimitAmount property type (fixed typescript issue)
+* Remove unnecessary console.warn for partial payments (#1783, #1784, #1896)
+* Matched 1.9.0's breaking changes to NFT fields
+
+## 2.1.1 (2021-12-23)
+### Fixed
+* A bug in submitAndWait function where the transaction could still be in queue and the server returns `txnNotFound`.
+
+## 2.1.0 (2021-12-17)
+### Added
+* Support for the [XLS-20 NFT proposal](https://github.com/XRPLF/XRPL-Standards/discussions/46)
 
 ## 2.0.3 (2021-12-1)
 * Removes requirement for npm version > 7 for non-contributors

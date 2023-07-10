@@ -34,6 +34,26 @@ class InnerNode extends Node {
   }
 
   /**
+   * Get the hash of a LeafNode.
+   *
+   * @returns Hash of the LeafNode.
+   */
+  public get hash(): string {
+    if (this.empty) {
+      return HEX_ZERO
+    }
+    let hex = ''
+    for (let iter = 0; iter <= SLOT_MAX; iter++) {
+      const child = this.leaves[iter]
+      const hash: string = child == null ? HEX_ZERO : child.hash
+      hex += hash
+    }
+
+    const prefix = HashPrefix.INNER_NODE.toString(HEX)
+    return sha512Half(prefix + hex)
+  }
+
+  /**
    * Adds an item to the InnerNode.
    *
    * @param tag - Equates to a ledger entry `index`.
@@ -98,26 +118,6 @@ class InnerNode extends Node {
       throw new XrplError('Invalid slot: slot must be between 0-15.')
     }
     return this.leaves[slot]
-  }
-
-  /**
-   * Get the hash of a LeafNode.
-   *
-   * @returns Hash of the LeafNode.
-   */
-  public get hash(): string {
-    if (this.empty) {
-      return HEX_ZERO
-    }
-    let hex = ''
-    for (let iter = 0; iter <= SLOT_MAX; iter++) {
-      const child = this.leaves[iter]
-      const hash: string = child == null ? HEX_ZERO : child.hash
-      hex += hash
-    }
-
-    const prefix = HashPrefix.INNER_NODE.toString(HEX)
-    return sha512Half(prefix + hex)
   }
 }
 

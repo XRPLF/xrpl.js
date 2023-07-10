@@ -39,8 +39,6 @@ db/*.db
 db/*.db-*
 
 # Ignore customized configs
-rippled.cfg
-validators.txt
 test/config.js
 
 # Ignore coverage files
@@ -51,6 +49,7 @@ test/config.js
 
 # Ignore IntelliJ files
 .idea
+*.iml
 
 # Ignore npm-debug
 npm-debug.log

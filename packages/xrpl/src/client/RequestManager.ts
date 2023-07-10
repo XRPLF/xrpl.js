@@ -20,7 +20,7 @@ export default class RequestManager {
     {
       resolve: (value: Response | PromiseLike<Response>) => void
       reject: (value: Error) => void
-      timer: NodeJS.Timeout
+      timer: ReturnType<typeof setTimeout>
     }
   >()
 
@@ -34,7 +34,10 @@ export default class RequestManager {
   public resolve(id: string | number, response: Response): void {
     const promise = this.promisesAwaitingResponse.get(id)
     if (promise == null) {
-      throw new XrplError(`No existing promise with id ${id}`)
+      throw new XrplError(`No existing promise with id ${id}`, {
+        type: 'resolve',
+        response,
+      })
     }
     clearTimeout(promise.timer)
     promise.resolve(response)
@@ -51,7 +54,10 @@ export default class RequestManager {
   public reject(id: string | number, error: Error): void {
     const promise = this.promisesAwaitingResponse.get(id)
     if (promise == null) {
-      throw new XrplError(`No existing promise with id ${id}`)
+      throw new XrplError(`No existing promise with id ${id}`, {
+        type: 'reject',
+        error,
+      })
     }
     clearTimeout(promise.timer)
     // TODO: figure out how to have a better stack trace for an error
@@ -93,20 +99,35 @@ export default class RequestManager {
       newId = request.id
     }
     const newRequest = JSON.stringify({ ...request, id: newId })
-    const timer = setTimeout(
-      () => this.reject(newId, new TimeoutError()),
-      timeout,
-    )
+    // Typing required for Jest running in browser
+    const timer: ReturnType<typeof setTimeout> = setTimeout(() => {
+      this.reject(
+        newId,
+        new TimeoutError(
+          `Timeout for request: ${JSON.stringify(request)} with id ${newId}`,
+          request,
+        ),
+      )
+    }, timeout)
     /*
      * Node.js won't exit if a timer is still running, so we tell Node to ignore.
      * (Node will still wait for the request to complete).
      */
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Reason above.
-    if (timer.unref) {
-      timer.unref()
+    // The following type assertions are required to get this code to pass in browser environments
+    // where setTimeout has a different type
+    // eslint-disable-next-line max-len -- Necessary to disable both rules.
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- Reason above.
+    if ((timer as unknown as any).unref) {
+      // eslint-disable-next-line max-len -- Necessary to disable both rules.
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call -- Reason above.
+      ;(timer as unknown as any).unref()
     }
     if (this.promisesAwaitingResponse.has(newId)) {
-      throw new XrplError(`Response with id '${newId}' is already pending`)
+      clearTimeout(timer)
+      throw new XrplError(
+        `Response with id '${newId}' is already pending`,
+        request,
+      )
     }
     const newPromise = new Promise<Response>(
       (resolve: (value: Response | PromiseLike<Response>) => void, reject) => {

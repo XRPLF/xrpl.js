@@ -1,11 +1,17 @@
-import type { Amount, Currency, Path, StreamType } from '../common'
+import type {
+  Amount,
+  Currency,
+  Path,
+  StreamType,
+  ResponseOnlyTxInfo,
+} from '../common'
 import { Offer } from '../ledger'
 import { OfferCreate, Transaction } from '../transactions'
 import { TransactionMetadata } from '../transactions/metadata'
 
 import type { BaseRequest, BaseResponse } from './baseMethod'
 
-interface Book {
+export interface SubscribeBook {
   /**
    * Specification of which currency the account taking the Offer would
    * receive, as a currency object with no amount.
@@ -54,7 +60,7 @@ export interface SubscribeRequest extends BaseRequest {
    * Array of objects defining order books  to monitor for updates, as detailed
    * Below.
    */
-  books?: Book[]
+  books?: SubscribeBook[]
   /**
    * URL where the server sends a JSON-RPC callbacks for each event.
    * Admin-only.
@@ -66,7 +72,7 @@ export interface SubscribeRequest extends BaseRequest {
   url_password?: string
 }
 
-type BooksSnapshot = Offer[]
+export type BooksSnapshot = Offer[]
 
 /**
  * Response expected from a {@link SubscribeRequest}.
@@ -96,8 +102,8 @@ export interface LedgerStream extends BaseStream {
    * Transaction cost applies starting with the following ledger version.
    */
   fee_base: number
-  /** The reference transaction cost in "fee units". */
-  fee_ref: number
+  /** The reference transaction cost in "fee units". This is not returned after the SetFees amendment is enabled. */
+  fee_ref?: number
   /** The identifying hash of the ledger version that was closed. */
   ledger_hash: string
   /** The ledger index of the ledger that was closed. */
@@ -130,7 +136,6 @@ export interface LedgerStream extends BaseStream {
 /**
  * This response mirrors the LedgerStream, except it does NOT include the 'type' nor 'txn_count' fields.
  */
-// eslint-disable-next-line import/no-unused-modules -- Detailed enough to be worth exporting for end users.
 export interface LedgerStreamResponse {
   /**
    * The reference transaction cost as of this ledger version, in drops of XRP.
@@ -138,8 +143,8 @@ export interface LedgerStreamResponse {
    * Transaction cost applies starting with the following ledger version.
    */
   fee_base: number
-  /** The reference transaction cost in "fee units". */
-  fee_ref: number
+  /** The reference transaction cost in "fee units". This is not returned after the SetFees amendment is enabled. */
+  fee_ref?: number
   /** The identifying hash of the ledger version that was closed. */
   ledger_hash: string
   /** The ledger index of the ledger that was closed. */
@@ -183,6 +188,18 @@ export interface ValidationStream extends BaseStream {
   amendments?: string[]
   /** The amendments this server wants to be added to the protocol. */
   base_fee?: number
+  /**
+   * An arbitrary value chosen by the server at startup.
+   *
+   * If the same validation key pair signs validations with different cookies
+   * concurrently, that usually indicates that multiple servers are incorrectly
+   * configured to use the same validation key pair.
+   */
+  cookie?: string
+  /**
+   * The contents of the validation message in its canonical binary form
+   */
+  data?: string
   /**
    * The unscaled transaction cost (reference_fee value) this server wants to
    * set by Fee voting.
@@ -268,7 +285,7 @@ export interface TransactionStream extends BaseStream {
    */
   meta?: TransactionMetadata
   /** The definition of the transaction in JSON format. */
-  transaction: Transaction
+  transaction: Transaction & ResponseOnlyTxInfo
   /**
    * If true, this transaction is included in a validated ledger and its
    * outcome is final. Responses from the transaction stream should always be
@@ -336,7 +353,17 @@ export interface OrderBookStream extends BaseStream {
   ledger_hash?: string
   ledger_index?: number
   meta: TransactionMetadata
-  transaction: Transaction | ModifiedOfferCreateTransaction
+  transaction: (Transaction | ModifiedOfferCreateTransaction) & {
+    /**
+     * This number measures the number of seconds since the "Ripple Epoch" of January 1, 2000 (00:00 UTC)
+     */
+    date?: number
+    /**
+     * Every signed transaction has a unique "hash" that identifies it.
+     * The transaction hash can be used to look up its final status, which may serve as a "proof of payment"
+     */
+    hash?: string
+  }
   validated: boolean
 }
 

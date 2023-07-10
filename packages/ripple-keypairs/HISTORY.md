@@ -1,5 +1,20 @@
 # ripple-keypairs Release History
 
+## Unreleased
+
+## 1.3.0 (2023-06-13)
+### Added
+* Adds support for npm v9
+
+## 1.1.5 (2023-03-08)
+### Changed
+- All tests now use the Jest test runner and have been refactored for consistency across all packages
+
+## 1.1.4 (2022-05-02)
+- `hexToBytes` now produces empty output for empty input, rather than `[0]`.
+- Extend `bytesToHex` to work correctly with any input type accepted by `Array.from`.
+  In particular, it now produces correct output for typed arrays such as `UInt8Array`.
+
 ## 1.1.1 (2021-12-1)
 - Fix issue where npm < 7 was not allowed to install the library
 

@@ -1,5 +1,5 @@
 const fixtures = require('./fixtures/codec-fixtures.json')
-const { decode, encode, decodeLedgerData } = require('../dist')
+const { decode, encode, decodeLedgerData } = require('../src')
 
 function json(object) {
   return JSON.stringify(object)

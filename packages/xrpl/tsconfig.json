@@ -15,5 +15,6 @@
     "suppressImplicitAnyIndexErrors": false,
     "resolveJsonModule": true,
     "preserveSymlinks": true
-  }
+  },
+  "include": ["src/**/*.ts", "src/**/*.json"]
 }

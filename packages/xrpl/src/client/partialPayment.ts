@@ -4,6 +4,7 @@ import { decode } from 'ripple-binary-codec'
 import type {
   AccountTxResponse,
   Response,
+  ResponseWarning,
   TransactionEntryResponse,
   TransactionStream,
   TxResponse,
@@ -111,7 +112,7 @@ export function handlePartialPayment(
   response: Response,
 ): void {
   if (hasPartialPayment(command, response)) {
-    const warnings = response.warnings ?? []
+    const warnings: ResponseWarning[] = response.warnings ?? []
 
     const warning = {
       id: WARN_PARTIAL_PAYMENT_CODE,
@@ -148,7 +149,5 @@ export function handleStreamPartialPayment(
     stream.warnings = warnings
 
     log('Partial payment received', JSON.stringify(stream))
-    // eslint-disable-next-line no-console -- we want to warn here when there's a partial payment
-    console.warn('Partial payment received', stream)
   }
 }

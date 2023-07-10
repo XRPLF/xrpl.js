@@ -72,6 +72,16 @@ export default interface AccountRoot extends BaseLedgerEntry {
    * account to each other.
    */
   TransferRate?: number
+  /** An arbitrary 256-bit value that users can set. */
+  WalletLocator?: string
+  /** Total NFTokens this account's issued that have been burned. This number is always equal or less than MintedNFTokens. */
+  BurnedNFTokens?: number
+  /** The sequence that the account first minted an NFToken */
+  FirstNFTSequence: number
+  /** Total NFTokens have been minted by and on behalf of this account. */
+  MintedNFTokens?: number
+  /** Another account that can mint NFTokens on behalf of this account. */
+  NFTokenMinter?: string
 }
 
 /**
@@ -108,7 +118,7 @@ export interface AccountRootFlagsInterface {
    */
   lsfGlobalFreeze?: boolean
   /**
-   * Enable rippling on this addresses's trust lines by default. Required for issuing addresses; discouraged for others.
+   * Enable rippling on this address's trust lines by default. Required for issuing addresses; discouraged for others.
    */
   lsfDefaultRipple?: boolean
   /**
@@ -116,6 +126,22 @@ export interface AccountRootFlagsInterface {
    * (It has DepositAuth enabled.)
    */
   lsfDepositAuth?: boolean
+  /**
+   * Disallow incoming NFTOffers from other accounts.
+   */
+  lsfDisallowIncomingNFTokenOffer?: boolean
+  /**
+   * Disallow incoming Checks from other accounts.
+   */
+  lsfDisallowIncomingCheck?: boolean
+  /**
+   * Disallow incoming PayChannels from other accounts.
+   */
+  lsfDisallowIncomingPayChan?: boolean
+  /**
+   * Disallow incoming Trustlines from other accounts.
+   */
+  lsfDisallowIncomingTrustline?: boolean
 }
 
 export enum AccountRootFlags {
@@ -148,7 +174,7 @@ export enum AccountRootFlags {
    */
   lsfGlobalFreeze = 0x00400000,
   /**
-   * Enable rippling on this addresses's trust lines by default. Required for issuing addresses; discouraged for others.
+   * Enable rippling on this address's trust lines by default. Required for issuing addresses; discouraged for others.
    */
   lsfDefaultRipple = 0x00800000,
   /**
@@ -156,4 +182,20 @@ export enum AccountRootFlags {
    * (It has DepositAuth enabled.)
    */
   lsfDepositAuth = 0x01000000,
+  /**
+   * Disallow incoming NFTOffers from other accounts.
+   */
+  lsfDisallowIncomingNFTokenOffer = 0x04000000,
+  /**
+   * Disallow incoming Checks from other accounts.
+   */
+  lsfDisallowIncomingCheck = 0x08000000,
+  /**
+   * Disallow incoming PayChannels from other accounts.
+   */
+  lsfDisallowIncomingPayChan = 0x10000000,
+  /**
+   * Disallow incoming Trustlines from other accounts.
+   */
+  lsfDisallowIncomingTrustline = 0x20000000,
 }

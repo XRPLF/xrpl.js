@@ -1,4 +1,4 @@
-import { Client, Payment } from '../../dist/npm'
+import { Client, Payment } from '../../src'
 
 /**
  * When implementing Reliable Transaction Submission, there are many potential solutions, each with different trade-offs.
@@ -45,8 +45,12 @@ async function sendReliableTx(): Promise<void> {
   await client.connect()
 
   // creating wallets as prerequisite
-  const { wallet: wallet1 } = await client.fundWallet()
-  const { wallet: wallet2 } = await client.fundWallet()
+  const { wallet: wallet1 } = await client.fundWallet(null, {
+    usageContext: 'code snippets',
+  })
+  const { wallet: wallet2 } = await client.fundWallet(null, {
+    usageContext: 'code snippets',
+  })
 
   console.log('Balances of wallets before Payment tx')
   console.log(

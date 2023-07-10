@@ -1,7 +1,33 @@
-const { coreTypes } = require('../dist/types')
-const { Hash160, Hash256, AccountID, Currency } = coreTypes
+const { coreTypes } = require('../src/types')
+const { Hash128, Hash160, Hash256, AccountID, Currency } = coreTypes
 const { Buffer } = require('buffer/')
 
+describe('Hash128', function () {
+  test('has a static width member', function () {
+    expect(Hash128.width).toBe(16)
+  })
+  test('can be unset', function () {
+    const h1 = Hash128.from('')
+    expect(h1.toJSON()).toBe('')
+  })
+  test('can be compared against another', function () {
+    const h1 = Hash128.from('100000000000000000000000000000000')
+    const h2 = Hash128.from('200000000000000000000000000000000')
+    const h3 = Hash128.from('000000000000000000000000000000003')
+    expect(h1.lt(h2)).toBe(true)
+    expect(h3.lt(h2)).toBe(true)
+    expect(h2.gt(h1)).toBe(true)
+    expect(h1.gt(h3)).toBe(true)
+  })
+  test('throws when constructed from invalid hash length', () => {
+    expect(() => Hash128.from('1000000000000000000000000000000')).toThrow(
+      'Invalid Hash length 15',
+    )
+    expect(() => Hash128.from('10000000000000000000000000000000000')).toThrow(
+      'Invalid Hash length 17',
+    )
+  })
+})
 describe('Hash160', function () {
   test('has a static width member', function () {
     expect(Hash160.width).toBe(20)
@@ -50,24 +76,39 @@ describe('Hash256', function () {
 })
 
 describe('Currency', function () {
-  test('Will throw an error for dodgy XRP ', function () {
-    expect(() =>
-      Currency.from('0000000000000000000000005852500000000000'),
-    ).toThrow()
+  test('Decoding allows dodgy XRP without throwing', function () {
+    const currencyCode = '0000000000000000000000005852500000000000'
+    expect(Currency.from(currencyCode).toJSON()).toBe(currencyCode)
   })
-  test('Currency with lowercase letters decode to hex', () => {
-    expect(Currency.from('xRp').toJSON()).toBe(
-      '0000000000000000000000007852700000000000',
+  test('Currency code with lowercase letters decodes to ISO code', () => {
+    expect(Currency.from('xRp').toJSON()).toBe('xRp')
+  })
+  test('Currency codes with symbols decodes to ISO code', () => {
+    expect(Currency.from('x|p').toJSON()).toBe('x|p')
+  })
+  test('Currency code with non-standard symbols decodes to hex', () => {
+    expect(Currency.from(':::').toJSON()).toBe(
+      '0000000000000000000000003A3A3A0000000000',
     )
   })
-  test('Currency codes with symbols decode to hex', () => {
-    expect(Currency.from('x|p').toJSON()).toBe(
-      '000000000000000000000000787C700000000000',
-    )
+  test('Currency codes can be exclusively standard symbols', () => {
+    expect(Currency.from('![]').toJSON()).toBe('![]')
   })
   test('Currency codes with uppercase and 0-9 decode to ISO codes', () => {
     expect(Currency.from('X8P').toJSON()).toBe('X8P')
     expect(Currency.from('USD').toJSON()).toBe('USD')
+  })
+
+  test('Currency codes with no contiguous zeroes in first 96 type code & reserved bits', function () {
+    expect(
+      Currency.from('0000000023410000000000005852520000000000').iso(),
+    ).toBe(null)
+  })
+
+  test('Currency codes with no contiguous zeroes in last 40 reserved bits', function () {
+    expect(
+      Currency.from('0000000000000000000000005852527570656500').iso(),
+    ).toBe(null)
   })
 
   test('can be constructed from a Buffer', function () {

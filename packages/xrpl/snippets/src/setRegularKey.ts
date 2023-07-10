@@ -1,4 +1,4 @@
-import { Client, Payment, SetRegularKey } from '../../dist/npm'
+import { Client, Payment, SetRegularKey } from '../../src'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
@@ -8,9 +8,15 @@ const client = new Client('wss://s.altnet.rippletest.net:51233')
  */
 async function setRegularKey(): Promise<void> {
   await client.connect()
-  const { wallet: wallet1 } = await client.fundWallet()
-  const { wallet: wallet2 } = await client.fundWallet()
-  const { wallet: regularKeyWallet } = await client.fundWallet()
+  const { wallet: wallet1 } = await client.fundWallet(null, {
+    usageContext: 'code snippets',
+  })
+  const { wallet: wallet2 } = await client.fundWallet(null, {
+    usageContext: 'code snippets',
+  })
+  const { wallet: regularKeyWallet } = await client.fundWallet(null, {
+    usageContext: 'code snippets',
+  })
 
   console.log('Balances before payment')
   console.log(await client.getXrpBalance(wallet1.classicAddress))
@@ -41,7 +47,7 @@ async function setRegularKey(): Promise<void> {
   }
 
   const submitTx = await client.submit(payment, {
-    wallet: wallet1,
+    wallet: regularKeyWallet,
   })
   console.log('Response for tx signed using Regular Key:')
   console.log(submitTx)

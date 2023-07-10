@@ -14,6 +14,8 @@ module.exports = {
     },
   },
 
+  ignorePatterns: ['jest.config.js', '.eslintrc.js'],
+
   // Specify global variables that are predefined
   env: {
     browser: true, // Enable browser global variables
@@ -86,6 +88,7 @@ module.exports = {
     'jsdoc/require-description-complete-sentence': 'off',
     'jsdoc/require-jsdoc': 'off',
     'jsdoc/check-tag-names': 'off',
+    'jsdoc/check-examples': 'off', // Not implemented in eslint 8
     'jsdoc/require-returns': 'off',
     'jsdoc/require-hyphen-before-param-description': 'off',
     'jsdoc/require-description': 'off',
@@ -111,19 +114,19 @@ module.exports = {
     'max-lines-per-function': 'off',
     'require-unicode-regexp': 'off',
     'no-undef-init': 'off',
-    'curly': 'off',
-    'eqeqeq': 'off',
+    curly: 'off',
+    eqeqeq: 'off',
     'no-console': 'off',
     'max-classes-per-file': 'off',
     'operator-assignment': 'off',
     'class-methods-use-this': 'off',
     'no-else-return': 'off',
-    'yoda': 'off',
+    yoda: 'off',
     'max-depth': 'off',
     'multiline-comment-style': 'off',
     'one-var': 'off',
     'no-negated-condition': 'off',
-    'radix': 'off',
+    radix: 'off',
     'no-nested-ternary': 'off',
     'no-useless-concat': 'off',
     'object-shorthand': 'off',

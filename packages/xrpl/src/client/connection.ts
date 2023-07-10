@@ -2,7 +2,7 @@
 import { EventEmitter } from 'events'
 import { Agent } from 'http'
 
-import _ from 'lodash'
+import omitBy from 'lodash/omitBy'
 import WebSocket from 'ws'
 
 import {
@@ -36,6 +36,7 @@ interface ConnectionOptions {
   // request timeout
   timeout: number
   connectionTimeout: number
+  headers?: { [key: string]: string }
 }
 
 /**
@@ -62,7 +63,7 @@ function getAgent(url: string, config: ConnectionOptions): Agent | undefined {
   const parsedURL = new URL(url)
   const parsedProxyURL = new URL(config.proxy)
 
-  const proxyOptions = _.omitBy(
+  const proxyOptions = omitBy(
     {
       secureEndpoint: parsedURL.protocol === 'wss:',
       secureProxy: parsedProxyURL.protocol === 'https:',
@@ -114,11 +115,17 @@ function createWebSocket(
 ): WebSocket | null {
   const options: WebSocket.ClientOptions = {}
   options.agent = getAgent(url, config)
+  if (config.headers) {
+    options.headers = config.headers
+  }
   if (config.authorization != null) {
     const base64 = Buffer.from(config.authorization).toString('base64')
-    options.headers = { Authorization: `Basic ${base64}` }
+    options.headers = {
+      ...options.headers,
+      Authorization: `Basic ${base64}`,
+    }
   }
-  const optionsOverrides = _.omitBy(
+  const optionsOverrides = omitBy(
     {
       ca: config.trustedCertificates,
       key: config.key,
@@ -168,8 +175,10 @@ async function websocketSendAsync(
 export class Connection extends EventEmitter {
   private readonly url: string | undefined
   private ws: WebSocket | null = null
-  private reconnectTimeoutID: null | NodeJS.Timeout = null
-  private heartbeatIntervalID: null | NodeJS.Timeout = null
+  // Typing necessary for Jest tests running in browser
+  private reconnectTimeoutID: null | ReturnType<typeof setTimeout> = null
+  // Typing necessary for Jest tetsts running in browser
+  private heartbeatIntervalID: null | ReturnType<typeof setTimeout> = null
   private readonly retryConnectionBackoff = new ExponentialBackoff({
     min: 100,
     max: SECONDS_PER_MINUTE * 1000,
@@ -203,6 +212,24 @@ export class Connection extends EventEmitter {
   }
 
   /**
+   * Gets the state of the websocket.
+   *
+   * @returns The Websocket's ready state.
+   */
+  private get state(): WebsocketState {
+    return this.ws ? this.ws.readyState : WebSocket.CLOSED
+  }
+
+  /**
+   * Returns whether the server should be connected.
+   *
+   * @returns Whether the server should be connected.
+   */
+  private get shouldBeConnected(): boolean {
+    return this.ws !== null
+  }
+
+  /**
    * Returns whether the websocket is connected.
    *
    * @returns Whether the websocket connection is open.
@@ -217,6 +244,7 @@ export class Connection extends EventEmitter {
    * @returns When the websocket is connected.
    * @throws ConnectionError if there is a connection error, RippleError if there is already a WebSocket in existence.
    */
+  // eslint-disable-next-line max-lines-per-function -- Necessary
   public async connect(): Promise<void> {
     if (this.isConnected()) {
       return Promise.resolve()
@@ -238,14 +266,17 @@ export class Connection extends EventEmitter {
     }
 
     // Create the connection timeout, in case the connection hangs longer than expected.
-    const connectionTimeoutID = setTimeout(() => {
-      this.onConnectionFailed(
-        new ConnectionError(
-          `Error: connect() timed out after ${this.config.connectionTimeout} ms. If your internet connection is working, the ` +
-            `rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.`,
-        ),
-      )
-    }, this.config.connectionTimeout)
+    const connectionTimeoutID: ReturnType<typeof setTimeout> = setTimeout(
+      () => {
+        this.onConnectionFailed(
+          new ConnectionError(
+            `Error: connect() timed out after ${this.config.connectionTimeout} ms. If your internet connection is working, the ` +
+              `rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.`,
+          ),
+        )
+      },
+      this.config.connectionTimeout,
+    )
     // Connection listeners: these stay attached only until a connection is done/open.
     this.ws = createWebSocket(this.url, this.config)
 
@@ -273,6 +304,7 @@ export class Connection extends EventEmitter {
    * @returns A promise containing either `undefined` or a disconnected code, that resolves when the connection is destroyed.
    */
   public async disconnect(): Promise<number | undefined> {
+    this.clearHeartbeatInterval()
     if (this.reconnectTimeoutID !== null) {
       clearTimeout(this.reconnectTimeoutID)
       this.reconnectTimeoutID = null
@@ -329,7 +361,7 @@ export class Connection extends EventEmitter {
     timeout?: number,
   ): Promise<unknown> {
     if (!this.shouldBeConnected || this.ws == null) {
-      throw new NotConnectedError()
+      throw new NotConnectedError(JSON.stringify(request), request)
     }
     const [id, message, responsePromise] = this.requestManager.createRequest(
       request,
@@ -352,7 +384,7 @@ export class Connection extends EventEmitter {
     return this.url ?? ''
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function -- Does nothing on default
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, class-methods-use-this -- Does nothing on default
   public readonly trace: (id: string, message: string) => void = () => {}
 
   /**
@@ -396,31 +428,16 @@ export class Connection extends EventEmitter {
   }
 
   /**
-   * Gets the state of the websocket.
-   *
-   * @returns The Websocket's ready state.
-   */
-  private get state(): WebsocketState {
-    return this.ws ? this.ws.readyState : WebSocket.CLOSED
-  }
-
-  /**
-   * Returns whether the server should be connected.
-   *
-   * @returns Whether the server should be connected.
-   */
-  private get shouldBeConnected(): boolean {
-    return this.ws !== null
-  }
-
-  /**
    * Handler for what to do once the connection to the server is open.
    *
    * @param connectionTimeoutID - Timeout in case the connection hangs longer than expected.
    * @returns A promise that resolves to void when the connection is fully established.
    * @throws Error if the websocket initialized is somehow null.
    */
-  private async onceOpen(connectionTimeoutID: NodeJS.Timeout): Promise<void> {
+  // eslint-disable-next-line max-lines-per-function -- Many error code conditionals to check.
+  private async onceOpen(
+    connectionTimeoutID: ReturnType<typeof setTimeout>,
+  ): Promise<void> {
     if (this.ws == null) {
       throw new XrplError('onceOpen: ws is null')
     }
@@ -434,7 +451,7 @@ export class Connection extends EventEmitter {
       this.emit('error', 'websocket', error.message, error),
     )
     // Handle a closed connection: reconnect if it was unexpected
-    this.ws.once('close', (code, reason) => {
+    this.ws.once('close', (code?: number, reason?: Buffer) => {
       if (this.ws == null) {
         throw new XrplError('onceClose: ws is null')
       }
@@ -447,9 +464,32 @@ export class Connection extends EventEmitter {
       )
       this.ws.removeAllListeners()
       this.ws = null
-      this.emit('disconnected', code)
-      // If this wasn't a manual disconnect, then lets reconnect ASAP.
-      if (code !== INTENTIONAL_DISCONNECT_CODE) {
+
+      if (code === undefined) {
+        // Useful to keep this code for debugging purposes.
+        // const reasonText = reason ? reason.toString() : 'undefined'
+        // // eslint-disable-next-line no-console -- The error is helpful for debugging.
+        // console.error(
+        //   `Disconnected but the disconnect code was undefined (The given reason was ${reasonText}).` +
+        //     `This could be caused by an exception being thrown during a 'connect' callback. ` +
+        //     `Disconnecting with code 1011 to indicate an internal error has occurred.`,
+        // )
+
+        /*
+         * Error code 1011 represents an Internal Error according to
+         * https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
+         */
+        const internalErrorCode = 1011
+        this.emit('disconnected', internalErrorCode)
+      } else {
+        this.emit('disconnected', code)
+      }
+
+      /*
+       * If this wasn't a manual disconnect, then lets reconnect ASAP.
+       * Code can be undefined if there's an exception while connecting.
+       */
+      if (code !== INTENTIONAL_DISCONNECT_CODE && code !== undefined) {
         this.intentionalDisconnect()
       }
     })

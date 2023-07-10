@@ -1,6 +1,6 @@
 import * as assert from 'assert'
 import { FieldInstance } from '../enums'
-import { SerializedType } from '../types/serialized-type'
+import { type SerializedType } from '../types/serialized-type'
 import { Buffer } from 'buffer/'
 
 /**

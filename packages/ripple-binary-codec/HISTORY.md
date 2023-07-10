@@ -1,10 +1,55 @@
 # ripple-binary-codec Release History
 
-## 1.2.2 (2021-12-2)
+## Unreleased
+
+## 1.6.0 (2023-06-13)
+### Added
+- Allow custom type definitions to be used for encoding/decoding transactions at runtime (e.g. for sidechains/new amendments)
+- Adds support for npm v9
+
+## 1.5.0 (2023-03-08)
+### Changed
+- All tests now use the Jest test runner and have been refactored for consistency across all packages
+
+## 1.4.2 (2022-06-27)
+- Fixed standard currency codes with lowercase and allowed symbols not decoding into standard codes.
+
+## 1.4.1 (2022-06-02)
+- Added a clearer error message for trying to encode an invalid transaction. (Ex. With an incorrect TransactionType)
+
+## 1.4.0 (2022-04-18)
+- Updated NFT definitions to match 1.9.0's breaking naming changes
+
+## 1.3.2 (2022-02-02)
+- Fixed error being raised when decoding issued currencies in non-standard formats that decode to XRP (#1920)
+- Fix ISO when parsing currency code (#1921)
+- Internal - build(deps-dev):
+  - bump webpack from 5.66.0 to 5.68.0 (#1910)
+  - bump webpack-cli from 4.9.1 to 4.9.2 (#1911)
+  - bump eslint-plugin-mocha from 9.0.0 to 10.0.3 (#1912)
+  - bump @types/node from 16.11.11 to 17.0.14 (#1913)
+  - bump @types/mocha from 9.0.0 to 9.1.0 (#1914)
+  - bump typescript from 4.5.2 to 4.5.5 (#1918)
+  - bump typedoc from 0.22.10 to 0.22.11 (#1916)
+  - bump chai from 4.3.4 to 4.3.6 (#1915)
+
+## 1.3.1 (2022-01-28)
+- Fix "homepage" field in package.json
+
+## 1.3.0 (2021-12-17)
+### Added
+- Exported `TRANSACTION_TYPES` value
+### Fixed
+- Adds missing fields from XLS-20 NFT implementation
+
+## 1.2.3 (2022-2-2)
+- Fix issue where ISO is invalid when parsing currency code
+
+## 1.2.2 (2021-12-02)
 - Fix issue where unsupported currency codes weren't being correctly processed
 - Added a workaround for rippled UNLModify encoding bug (#1830)
 
-## 1.2.1 (2021-12-1)
+## 1.2.1 (2021-12-01)
 - Fix issue where npm < 7 could not install the library
 
 ## 1.2.0 (2021-11-15)

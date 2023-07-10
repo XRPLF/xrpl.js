@@ -1,4 +1,4 @@
-import { LedgerIndex } from '../common'
+import { LedgerIndex, ResponseOnlyTxInfo } from '../common'
 import { Transaction } from '../transactions'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
@@ -77,6 +77,6 @@ export interface NoRippleCheckResponse extends BaseResponse {
      * the problems array, and each entry is intended to fix the problem
      * described at the same index into that array.
      */
-    transactions: Transaction[]
+    transactions: Array<Transaction & ResponseOnlyTxInfo>
   }
 }

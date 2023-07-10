@@ -23,6 +23,7 @@ function getDefaultConfiguration() {
       path: path.join(__dirname, 'build/'),
       filename: `xrpl.default.js`,
     },
+    devtool: 'source-map',
     plugins: [
       new webpack.NormalModuleReplacementPlugin(/^ws$/, './WSWrapper'),
       new webpack.ProvidePlugin({ process: 'process/browser' }),
@@ -45,7 +46,12 @@ function getDefaultConfiguration() {
       }),
     ],
     module: {
-      rules: [],
+      rules: [
+        {
+          test: /\.js$/,
+          use: ['source-map-loader'],
+        },
+      ],
     },
     resolve: {
       alias: {

@@ -1,7 +1,6 @@
-import { LedgerIndex } from '../common'
 import { LedgerEntry } from '../ledger'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * The `ledger_entry` method returns a single ledger object from the XRP Ledger
@@ -19,7 +18,7 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface LedgerEntryRequest extends BaseRequest {
+export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'ledger_entry'
   /**
    * If true, return the requested ledger object's contents as a hex string in
@@ -27,10 +26,6 @@ export interface LedgerEntryRequest extends BaseRequest {
    * default is false.
    */
   binary?: boolean
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /** The ledger index of the ledger to use, or a shortcut string. */
-  ledger_index?: LedgerIndex
 
   /*
    * Only one of the following properties should be defined in a single request
@@ -45,6 +40,23 @@ export interface LedgerEntryRequest extends BaseRequest {
    * to the an {@link AccountInfoRequest}.
    */
   account_root?: string
+
+  /** The object ID of a Check object to retrieve. */
+  check?: string
+
+  /**
+   * Specify a DepositPreauth object to retrieve. If a string, must be the
+   * object ID of the DepositPreauth object, as hexadecimal. If an object,
+   * requires owner and authorized sub-fields.
+   */
+  deposit_preauth?:
+    | {
+        /** The account that provided the preauthorization. */
+        owner: string
+        /** The account that received the preauthorization. */
+        authorized: string
+      }
+    | string
 
   /**
    * The DirectoryNode to retrieve. If a string, must be the object ID of the
@@ -63,6 +75,19 @@ export interface LedgerEntryRequest extends BaseRequest {
     | string
 
   /**
+   * The Escrow object to retrieve. If a string, must be the object ID of the
+   * escrow, as hexadecimal. If an object, requires owner and seq sub-fields.
+   */
+  escrow?:
+    | {
+        /** The owner (sender) of the Escrow object. */
+        owner: string
+        /** Sequence Number of the transaction that created the Escrow object. */
+        seq: number
+      }
+    | string
+
+  /**
    * The Offer object to retrieve. If a string, interpret as the unique object
    * ID to the Offer. If an object, requires the sub-fields `account` and `seq`
    * to uniquely identify the offer.
@@ -75,6 +100,9 @@ export interface LedgerEntryRequest extends BaseRequest {
         seq: number
       }
     | string
+
+  /** The object ID of a PayChannel object to retrieve. */
+  payment_channel?: string
 
   /**
    * Object specifying the RippleState (trust line) object to retrieve. The
@@ -91,39 +119,6 @@ export interface LedgerEntryRequest extends BaseRequest {
     currency: string
   }
 
-  /** The object ID of a Check object to retrieve. */
-  check?: string
-
-  /**
-   * The Escrow object to retrieve. If a string, must be the object ID of the
-   * escrow, as hexadecimal. If an object, requires owner and seq sub-fields.
-   */
-  escrow?:
-    | {
-        /** The owner (sender) of the Escrow object. */
-        owner: string
-        /** Sequence Number of the transaction that created the Escrow object. */
-        seq: number
-      }
-    | string
-
-  /** The object ID of a PayChannel object to retrieve. */
-  payment_channel?: string
-
-  /**
-   * Specify a DepositPreauth object to retrieve. If a string, must be the
-   * object ID of the DepositPreauth object, as hexadecimal. If an object,
-   * requires owner and authorized sub-fields.
-   */
-  deposit_preauth?:
-    | {
-        /** The account that provided the preauthorization. */
-        owner: string
-        /** The account that received the preauthorization. */
-        authorized: string
-      }
-    | string
-
   /**
    * The Ticket object to retrieve. If a string, must be the object ID of the
    * Ticket, as hexadecimal. If an object, the `owner` and `ticket_sequence`
@@ -137,6 +132,11 @@ export interface LedgerEntryRequest extends BaseRequest {
         ticket_sequence: number
       }
     | string
+
+  /**
+   * Must be the object ID of the NFToken page, as hexadecimal
+   */
+  nft_page?: string
 }
 
 /**

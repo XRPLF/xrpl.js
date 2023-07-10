@@ -3,25 +3,16 @@ import { request as httpsRequest, RequestOptions } from 'https'
 
 import { isValidClassicAddress } from 'ripple-address-codec'
 
-import type { Client } from '..'
+import type { Client } from '../client'
 import { RippledError, XRPLFaucetError } from '../errors'
 
-import Wallet from '.'
+import {
+  FaucetWallet,
+  getFaucetHost,
+  getDefaultFaucetPath,
+} from './defaultFaucets'
 
-interface FaucetWallet {
-  account: {
-    xAddress: string
-    classicAddress?: string
-    secret: string
-  }
-  amount: number
-  balance: number
-}
-
-enum FaucetNetwork {
-  Testnet = 'faucet.altnet.rippletest.net',
-  Devnet = 'faucet.devnet.rippletest.net',
-}
+import { Wallet } from '.'
 
 // Interval to check an account balance
 const INTERVAL_SECONDS = 1
@@ -29,24 +20,81 @@ const INTERVAL_SECONDS = 1
 const MAX_ATTEMPTS = 20
 
 /**
- * Generates a random wallet with some amount of XRP (usually 1000 XRP).
+ * The fundWallet() method is used to send an amount of XRP (usually 1000) to a new (randomly generated)
+ * or existing XRP Ledger wallet.
  *
  * @example
- * ```typescript
+ *
+ * Example 1: Fund a randomly generated wallet
+ * const { Client, Wallet } = require('xrpl')
+ *
+ * const client = new Client('wss://s.altnet.rippletest.net:51233')
+ * await client.connect()
+ * const { balance, wallet } = await client.fundWallet()
+ *
+ * Under the hood, this will use `Wallet.generate()` to create a new random wallet, then ask a testnet faucet
+ * To send it XRP on ledger to make it a real account. If successful, this will return the new account balance in XRP
+ * Along with the Wallet object to track the keys for that account. If you'd like, you can also re-fill an existing
+ * Account by passing in a Wallet you already have.
+ * ```ts
  * const api = new xrpl.Client("wss://s.altnet.rippletest.net:51233")
  * await api.connect()
  * const { wallet, balance } = await api.fundWallet()
  * ```
  *
+ * Example 2: Fund wallet using a custom faucet host and known wallet address
+ *
+ * `fundWallet` will try to infer the url of a faucet API from the network your client is connected to.
+ * There are hardcoded default faucets for popular test networks like testnet and devnet.
+ * However, if you're working with a newer or more obscure network, you may have to specify the faucetHost
+ * And faucetPath so `fundWallet` can ask that faucet to fund your wallet.
+ *
+ * ```ts
+ * const newWallet = Wallet.generate()
+ * const { balance, wallet  } = await client.fundWallet(newWallet, {
+ *       amount: '10',
+ *       faucetHost: 'https://custom-faucet.example.com',
+ *       faucetPath: '/accounts'
+ *     })
+ *     console.log(`Sent 10 XRP to wallet: ${address} from the given faucet. Resulting balance: ${balance} XRP`)
+ *   } catch (error) {
+ *     console.error(`Failed to fund wallet: ${error}`)
+ *   }
+ * }
+ * ```
+ *
  * @param this - Client.
- * @param wallet - An existing XRPL Wallet to fund, if undefined, a new Wallet will be created.
+ * @param wallet - An existing XRPL Wallet to fund. If undefined or null, a new Wallet will be created.
+ * @param options - See below.
+ * @param options.faucetHost - A custom host for a faucet server. On devnet,
+ * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
+ * attempt to determine the correct server automatically. In other environments,
+ * or if you would like to customize the faucet host in devnet or testnet,
+ * you should provide the host using this option.
+ * @param options.faucetPath - A custom path for a faucet server. On devnet,
+ * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
+ * attempt to determine the correct path automatically. In other environments,
+ * or if you would like to customize the faucet path in devnet or testnet,
+ * you should provide the path using this option.
+ * Ex: client.fundWallet(null,{'faucet.altnet.rippletest.net', '/accounts'})
+ * specifies a request to 'faucet.altnet.rippletest.net/accounts' to fund a new wallet.
+ * @param options.amount - A custom amount to fund, if undefined or null, the default amount will be 1000.
+ * @param options.usageContext - An optional field to indicate the use case context of the faucet transaction
+ * Ex: integration test, code snippets.
  * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP,
  * and that wallet's balance in XRP.
  * @throws When either Client isn't connected or unable to fund wallet address.
  */
+// eslint-disable-next-line max-lines-per-function -- All lines necessary
 async function fundWallet(
   this: Client,
-  wallet?: Wallet,
+  wallet?: Wallet | null,
+  options?: {
+    faucetHost?: string
+    faucetPath?: string
+    amount?: string
+    usageContext?: string
+  },
 ): Promise<{
   wallet: Wallet
   balance: number
@@ -66,6 +114,9 @@ async function fundWallet(
     new TextEncoder().encode(
       JSON.stringify({
         destination: walletToFund.classicAddress,
+        xrpAmount: options?.amount,
+        userAgent: 'xrpl.js',
+        usageContext: options?.usageContext,
       }),
     ),
   )
@@ -78,11 +129,19 @@ async function fundWallet(
   } catch {
     /* startingBalance remains '0' */
   }
-
   // Options to pass to https.request
-  const options = getOptions(this, postBody)
+  const httpOptions = getHTTPOptions(this, postBody, {
+    hostname: options?.faucetHost,
+    pathname: options?.faucetPath,
+  })
 
-  return returnPromise(options, this, startingBalance, walletToFund, postBody)
+  return returnPromise(
+    httpOptions,
+    this,
+    startingBalance,
+    walletToFund,
+    postBody,
+  )
 }
 
 // eslint-disable-next-line max-params -- Helper function created for organizational purposes
@@ -124,11 +183,20 @@ async function returnPromise(
   })
 }
 
-function getOptions(client: Client, postBody: Uint8Array): RequestOptions {
+function getHTTPOptions(
+  client: Client,
+  postBody: Uint8Array,
+  options?: {
+    hostname?: string
+    pathname?: string
+  },
+): RequestOptions {
+  const finalHostname = options?.hostname ?? getFaucetHost(client)
+  const finalPathname = options?.pathname ?? getDefaultFaucetPath(finalHostname)
   return {
-    hostname: getFaucetUrl(client),
+    hostname: finalHostname,
     port: 443,
-    path: '/accounts',
+    path: finalPathname,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -151,11 +219,14 @@ async function onEnd(
 
   // "application/json; charset=utf-8"
   if (response.headers['content-type']?.startsWith('application/json')) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- We know this is safe and correct
+    const faucetWallet: FaucetWallet = JSON.parse(body)
+    const classicAddress = faucetWallet.account.classicAddress
     await processSuccessfulResponse(
       client,
-      body,
-      startingBalance,
+      classicAddress,
       walletToFund,
+      startingBalance,
       resolve,
       reject,
     )
@@ -175,16 +246,12 @@ async function onEnd(
 // eslint-disable-next-line max-params, max-lines-per-function -- Only used as a helper function, lines inc due to added balance.
 async function processSuccessfulResponse(
   client: Client,
-  body: string,
-  startingBalance: number,
+  classicAddress: string | undefined,
   walletToFund: Wallet,
+  startingBalance: number,
   resolve: (response: { wallet: Wallet; balance: number }) => void,
   reject: (err: ErrorConstructor | Error | unknown) => void,
 ): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- We know this is safe and correct
-  const faucetWallet: FaucetWallet = JSON.parse(body)
-  const classicAddress = faucetWallet.account.classicAddress
-
   if (!classicAddress) {
     reject(new XRPLFaucetError(`The faucet account is undefined`))
     return
@@ -274,33 +341,4 @@ async function getUpdatedBalance(
   })
 }
 
-/**
- * Get the faucet URL based on the Client connection.
- *
- * @param client - Client.
- * @returns A {@link FaucetNetwork}.
- * @throws When the client url is not on altnet or devnet.
- */
-function getFaucetUrl(client: Client): FaucetNetwork | undefined {
-  const connectionUrl = client.url
-
-  // 'altnet' for Ripple Testnet server and 'testnet' for XRPL Labs Testnet server
-  if (connectionUrl.includes('altnet') || connectionUrl.includes('testnet')) {
-    return FaucetNetwork.Testnet
-  }
-
-  if (connectionUrl.includes('devnet')) {
-    return FaucetNetwork.Devnet
-  }
-
-  throw new XRPLFaucetError('Faucet URL is not defined or inferrable.')
-}
-
 export default fundWallet
-
-const _private = {
-  FaucetNetwork,
-  getFaucetUrl,
-}
-
-export { _private }

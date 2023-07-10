@@ -41,23 +41,14 @@ module.exports = {
     // all of the below are turned off for now during the migration to a
     // monorepo. They need to actually be addressed!
     // **
-    '@typescript-eslint/consistent-type-assertions': 'off',
-    '@typescript-eslint/no-unnecessary-condition': 'off',
-    '@typescript-eslint/no-unsafe-call': 'off',
     '@typescript-eslint/no-magic-numbers': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/no-unsafe-return': 'off',
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/explicit-member-accessibility': 'off',
-    '@typescript-eslint/promise-function-async': 'off',
-    '@typescript-eslint/prefer-nullish-coalescing': 'off',
-    '@typescript-eslint/naming-convention': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
     'jsdoc/require-returns': 'off',
     'jsdoc/check-param-names': 'off',
     'jsdoc/require-throws': 'off',
     'jsdoc/require-jsdoc': 'off',
     'jsdoc/require-param': 'off',
+    'jsdoc/check-examples': 'off', // Not implemented in eslint 8
     'tsdoc/syntax': 'off',
+    '@typescript-eslint/no-require-imports': 'off',
   },
 }

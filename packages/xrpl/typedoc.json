@@ -1,7 +1,7 @@
 {
   "entryPoints": ["./src/index.ts"],
   "tsconfig": "./tsconfig.build.json",
-  "out": "./docs",
+  "out": "../../docs",
   "categoryOrder": [
     "Constructor",
     "Clients",
@@ -15,5 +15,7 @@
     "Streams",
     "Errors"
   ],
-  "categorizeByGroup": false
+  "categorizeByGroup": false,
+  "readme": "../../README.md",
+  "plugin": ["./dist/docs/typedoc.js"]
 }

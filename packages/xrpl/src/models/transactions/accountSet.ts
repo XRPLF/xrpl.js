@@ -1,4 +1,7 @@
 /* eslint-disable complexity -- Necessary for validateAccountSet */
+
+import { isValidClassicAddress } from 'ripple-address-codec'
+
 import { ValidationError } from '../../errors'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
@@ -40,6 +43,19 @@ export enum AccountSetAsfFlags {
   asfDefaultRipple = 8,
   /** Enable Deposit Authorization on this account. */
   asfDepositAuth = 9,
+  /**
+   * Allow another account to mint and burn tokens on behalf of this account.
+   */
+  asfAuthorizedNFTokenMinter = 10,
+  /** asf 11 is reserved for Hooks amendment */
+  /** Disallow other accounts from creating incoming NFTOffers */
+  asfDisallowIncomingNFTokenOffer = 12,
+  /** Disallow other accounts from creating incoming Checks */
+  asfDisallowIncomingCheck = 13,
+  /** Disallow other accounts from creating incoming PayChannels */
+  asfDisallowIncomingPayChan = 14,
+  /** Disallow other accounts from creating incoming Trustlines */
+  asfDisallowIncomingTrustline = 15,
 }
 
 /**
@@ -135,6 +151,11 @@ export interface AccountSet extends BaseTransaction {
    * digits. Valid values are 3 to 15 inclusive, or 0 to disable.
    */
   TickSize?: number
+  /**
+   * Sets an alternate account that is allowed to mint NFTokens on this
+   * account's behalf using NFTokenMint's `Issuer` field.
+   */
+  NFTokenMinter?: string
 }
 
 const MIN_TICK_SIZE = 3
@@ -146,9 +167,16 @@ const MAX_TICK_SIZE = 15
  * @param tx - An AccountSet Transaction.
  * @throws When the AccountSet is Malformed.
  */
-// eslint-disable-next-line max-lines-per-function -- okay for this method, only a little over
+// eslint-disable-next-line max-lines-per-function, max-statements -- okay for this method, only a little over
 export function validateAccountSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+
+  if (
+    tx.NFTokenMinter !== undefined &&
+    !isValidClassicAddress(String(tx.NFTokenMinter))
+  ) {
+    throw new ValidationError('AccountSet: invalid NFTokenMinter')
+  }
 
   if (tx.ClearFlag !== undefined) {
     if (typeof tx.ClearFlag !== 'number') {
