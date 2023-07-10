@@ -4,6 +4,7 @@ import { decode } from 'ripple-binary-codec'
 import type {
   AccountTxResponse,
   Response,
+  ResponseWarning,
   TransactionEntryResponse,
   TransactionStream,
   TxResponse,
@@ -111,7 +112,7 @@ export function handlePartialPayment(
   response: Response,
 ): void {
   if (hasPartialPayment(command, response)) {
-    const warnings = response.warnings ?? []
+    const warnings: ResponseWarning[] = response.warnings ?? []
 
     const warning = {
       id: WARN_PARTIAL_PAYMENT_CODE,
