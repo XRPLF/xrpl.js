@@ -48,4 +48,22 @@ describe('Clawback', function () {
       'Clawback: invalid Amount',
     )
   })
+
+  it(`throws w/ invalid holder Account`, function () {
+    const invalidAccount = {
+      TransactionType: 'Clawback',
+      Amount: {
+        currency: 'DSH',
+        issuer: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        value: '43.11584856965009',
+      },
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+    } as any
+
+    assert.throws(
+      () => validate(invalidAccount),
+      ValidationError,
+      'Clawback: invalid holder Account',
+    )
+  })
 })

@@ -1,7 +1,11 @@
 import { ValidationError } from '../../errors'
 import { IssuedCurrencyAmount } from '../common'
 
-import { BaseTransaction, validateBaseTransaction, isAmount } from './common'
+import {
+  BaseTransaction,
+  validateBaseTransaction,
+  isIssuedCurrency,
+} from './common'
 
 /**
  * The Clawback transaction is used by the token issuer to claw back
@@ -35,7 +39,11 @@ export function validateClawback(tx: Record<string, unknown>): void {
     throw new ValidationError('Clawback: missing field Amount')
   }
 
-  if (!isAmount(tx.Amount)) {
+  if (!isIssuedCurrency(tx.Amount)) {
     throw new ValidationError('Clawback: invalid Amount')
+  }
+
+  if (isIssuedCurrency(tx.Amount) && tx.Account == tx.Amount.issuer) {
+    throw new ValidationError('Clawback: invalid holder Account')
   }
 }
