@@ -36,8 +36,12 @@ export function parseAccountRootFlags(
 ): AccountRootFlagsInterface {
   const flagsInterface: AccountRootFlagsInterface = {}
 
-  Object.keys(AccountRootFlags).forEach((flag) => {
-    if (isFlagEnabled(flags, AccountRootFlags[flag])) {
+  // If we use keys all will be strings and enums are reversed during transpilation
+  Object.values(AccountRootFlags).forEach((flag) => {
+    if (
+      typeof flag === 'string' &&
+      isFlagEnabled(flags, AccountRootFlags[flag])
+    ) {
       flagsInterface[flag] = true
     }
   })
