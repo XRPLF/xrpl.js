@@ -47,6 +47,18 @@ describe('Clawback', function () {
       ValidationError,
       'Clawback: invalid Amount',
     )
+
+    const invalidStrAmount = {
+      TransactionType: 'Clawback',
+      Amount: '1234',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+    } as any
+
+    assert.throws(
+      () => validate(invalidStrAmount),
+      ValidationError,
+      'Clawback: invalid Amount',
+    )
   })
 
   it(`throws w/ invalid holder Account`, function () {
