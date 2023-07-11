@@ -21,7 +21,7 @@ import {
   verify,
   sign,
 } from 'ripple-keypairs'
-import { Utils } from 'xrpl-secret-numbers'
+import { Account } from 'xrpl-secret-numbers'
 
 import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
@@ -174,6 +174,9 @@ export class Wallet {
 
   /**
    * Derives a wallet from secret numbers.
+   * NOTE: This uses a default encoding algorithm of secp256k1 to match the popular wallet
+   * [Xumm (aka Xaman)]'s behavior.
+   * This may be different from the DEFAULT_ALGORITHM for other ways to generate a Wallet.
    *
    * @param secretNumbers - A string consisting of 8 times 6 numbers (whitespace delimited) used to derive a wallet.
    * @param opts - (Optional) Options to derive a Wallet.
@@ -186,19 +189,12 @@ export class Wallet {
     secretNumbers: string[] | string,
     opts: { masterAddress?: string; algorithm?: ECDSA } = {},
   ): Wallet {
-    const numbersArray: string[] = []
-
-    if (typeof secretNumbers === 'string') {
-      numbersArray.concat(Utils.parseSecretString(secretNumbers))
-    } else if (Array.isArray(secretNumbers)) {
-      numbersArray.concat(secretNumbers)
-    } else {
-      throw new ValidationError('Unable to parse the given secret numbers.')
+    const updatedOpts = { ...opts }
+    if (opts.algorithm === undefined) {
+      updatedOpts.algorithm = ECDSA.secp256k1
     }
-
-    const entropy = Utils.secretToEntropy(numbersArray)
-
-    return Wallet.fromEntropy(entropy, opts)
+    const secret = new Account(secretNumbers).getFamilySeed()
+    return Wallet.fromSecret(secret, updatedOpts)
   }
 
   /**
