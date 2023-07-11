@@ -8,8 +8,8 @@ import { LedgerIndex } from '../models/common'
 import { OfferFlags } from '../models/ledger/Offer'
 import {
   BookOffer,
+  BookOfferCurrency,
   BookOffersRequest,
-  TakerAmount,
 } from '../models/methods/bookOffers'
 
 const DEFAULT_LIMIT = 20
@@ -51,8 +51,8 @@ const getOrderbookOptionsSet = new Set([
 // eslint-disable-next-line max-params, complexity -- Once bound to Client, getOrderbook only has 3 parameters.
 async function getOrderbook(
   this: Client,
-  currency1: TakerAmount,
-  currency2: TakerAmount,
+  currency1: BookOfferCurrency,
+  currency2: BookOfferCurrency,
   options: {
     limit?: number
     ledger_index?: LedgerIndex

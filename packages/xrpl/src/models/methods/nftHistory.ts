@@ -51,7 +51,7 @@ export interface NFTHistoryRequest extends BaseRequest, LookupByLedgerRequest {
   marker?: unknown
 }
 
-interface NFTokenTransaction {
+export interface NFTHistoryTransaction {
   /** The ledger index of the ledger version that included this transaction. */
   ledger_index: number
   /**
@@ -102,7 +102,7 @@ export interface NFTHistoryResponse extends BaseResponse {
      * Array of transactions matching the request's criteria, as explained
      * below.
      */
-    transactions: NFTokenTransaction[]
+    transactions: NFTHistoryTransaction[]
     /**
      * If included and set to true, the information in this response comes from
      * a validated ledger version. Otherwise, the information is subject to
