@@ -143,9 +143,9 @@ export interface AccountRootFlagsInterface {
    */
   lsfDisallowIncomingTrustline?: boolean
   /**
-   * This address can claw back issued currencies. Once enabled, cannot be disabled.
+   * This address can claw back issued IOUs. Once enabled, cannot be disabled.
    */
-  lsfAllowClawback?: boolean
+  lsfAllowTrustLineClawback?: boolean
 }
 
 export enum AccountRootFlags {
@@ -203,7 +203,7 @@ export enum AccountRootFlags {
    */
   lsfDisallowIncomingTrustline = 0x20000000,
   /**
-   * This address can claw back issued currencies. Once enabled, cannot be disabled.
+   * This address can claw back issued IOUs. Once enabled, cannot be disabled.
    */
-  lsfAllowClawback = 0x80000000,
+  lsfAllowTrustLineClawback = 0x80000000,
 }

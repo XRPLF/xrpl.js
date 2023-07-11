@@ -43,7 +43,7 @@ export function validateClawback(tx: Record<string, unknown>): void {
     throw new ValidationError('Clawback: invalid Amount')
   }
 
-  if (isIssuedCurrency(tx.Amount) && tx.Account == tx.Amount.issuer) {
+  if (isIssuedCurrency(tx.Amount) && tx.Account === tx.Amount.issuer) {
     throw new ValidationError('Clawback: invalid holder Account')
   }
 }

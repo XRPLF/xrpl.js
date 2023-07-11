@@ -34,7 +34,7 @@ describe('Clawback', function () {
       const setupAccountSetTx: AccountSet = {
         TransactionType: 'AccountSet',
         Account: testContext.wallet.classicAddress,
-        SetFlag: AccountSetAsfFlags.asfAllowClawback,
+        SetFlag: AccountSetAsfFlags.asfAllowTrustLineClawback,
       }
       await testTransaction(
         testContext.client,
