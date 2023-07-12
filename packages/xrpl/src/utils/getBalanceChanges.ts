@@ -1,6 +1,4 @@
 import BigNumber from 'bignumber.js'
-import flatten from 'lodash/flatten'
-import groupBy from 'lodash/groupBy'
 
 import {
   Amount,
@@ -10,6 +8,7 @@ import {
   Node,
 } from '../models'
 
+import { groupBy } from './collections'
 import { dropsToXrp } from './xrpConversion'
 
 interface BalanceChange {
@@ -182,5 +181,5 @@ export default function getBalanceChanges(
     }
     return []
   })
-  return groupByAccount(flatten(quantities))
+  return groupByAccount(quantities.flat())
 }
