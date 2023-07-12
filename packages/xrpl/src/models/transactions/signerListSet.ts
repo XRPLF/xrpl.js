@@ -23,7 +23,7 @@ export interface SignerListSet extends BaseTransaction {
    * more than 32 members. No address may appear more than once in the list, nor
    * may the Account submitting the transaction appear in the list.
    */
-  SignerEntries: SignerEntry[]
+  SignerEntries?: SignerEntry[]
 }
 
 const MAX_SIGNERS = 32
