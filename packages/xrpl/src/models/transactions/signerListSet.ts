@@ -46,27 +46,27 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
   if (typeof tx.SignerQuorum !== 'number') {
     throw new ValidationError('SignerListSet: invalid SignerQuorum')
   }
-
-  if (tx.SignerEntries === undefined) {
-    throw new ValidationError('SignerListSet: missing field SignerEntries')
+  if (tx.SignerQuorum > 0) {
+    if (tx.SignerEntries === undefined) {
+      throw new ValidationError('SignerListSet: missing field SignerEntries')
+    }
+  
+    if (!Array.isArray(tx.SignerEntries)) {
+      throw new ValidationError('SignerListSet: invalid SignerEntries')
+    }
+  
+    if (tx.SignerEntries.length === 0) {
+      throw new ValidationError(
+        'SignerListSet: need at least 1 member in SignerEntries',
+      )
+    }
+  
+    if (tx.SignerEntries.length > MAX_SIGNERS) {
+      throw new ValidationError(
+        `SignerListSet: maximum of ${MAX_SIGNERS} members allowed in SignerEntries`,
+      )
+    }
   }
-
-  if (!Array.isArray(tx.SignerEntries)) {
-    throw new ValidationError('SignerListSet: invalid SignerEntries')
-  }
-
-  if (tx.SignerEntries.length === 0) {
-    throw new ValidationError(
-      'SignerListSet: need at least 1 member in SignerEntries',
-    )
-  }
-
-  if (tx.SignerEntries.length > MAX_SIGNERS) {
-    throw new ValidationError(
-      `SignerListSet: maximum of ${MAX_SIGNERS} members allowed in SignerEntries`,
-    )
-  }
-
   for (const entry of tx.SignerEntries) {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be a SignerEntry
     const signerEntry = entry as SignerEntry
