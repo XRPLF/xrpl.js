@@ -1,3 +1,4 @@
+import fetch from 'cross-fetch'
 import { isValidClassicAddress } from 'ripple-address-codec'
 
 import type { Client } from '../client'
@@ -16,6 +17,16 @@ const INTERVAL_SECONDS = 1
 // Maximum attempts to retrieve a balance
 const MAX_ATTEMPTS = 20
 
+interface FundingOptions {
+  faucetHost?: string
+  faucetPath?: string
+  amount?: string
+}
+
+interface FaucetRequestBody {
+  destination?: string
+  xrpAmount?: string
+}
 /**
  * The fundWallet() method is used to send an amount of XRP (usually 1000) to a new (randomly generated)
  * or existing XRP Ledger wallet.
@@ -80,15 +91,10 @@ const MAX_ATTEMPTS = 20
  * and that wallet's balance in XRP.
  * @throws When either Client isn't connected or unable to fund wallet address.
  */
-
 async function fundWallet(
   this: Client,
   wallet?: Wallet | null,
-  options?: {
-    faucetHost?: string
-    faucetPath?: string
-    amount?: string
-  },
+  options: FundingOptions = {},
 ): Promise<{
   wallet: Wallet
   balance: number
@@ -96,146 +102,123 @@ async function fundWallet(
   if (!this.isConnected()) {
     throw new RippledError('Client not connected, cannot call faucet')
   }
+  const createWallet = wallet === null
 
   // Generate a new Wallet if no existing Wallet is provided or its address is invalid to fund
-  const walletToFund =
+  const walletToFund: Wallet =
     wallet && isValidClassicAddress(wallet.classicAddress)
       ? wallet
       : Wallet.generate()
 
   // Create the POST request body
-  const postBody = {
+  const postBody: FaucetRequestBody = {
     destination: walletToFund.classicAddress,
-    xrpAmount: options?.amount,
+    xrpAmount: options.amount,
   }
 
   let startingBalance = 0
-  try {
-    startingBalance = Number(
-      await this.getXrpBalance(walletToFund.classicAddress),
-    )
-  } catch {
-    /* startingBalance remains '0' */
+  if (!createWallet) {
+    try {
+      startingBalance = Number(
+        await this.getXrpBalance(walletToFund.classicAddress),
+      )
+    } catch {
+      /* startingBalance remains '0' */
+    }
   }
 
-  return returnPromise(options, this, startingBalance, walletToFund, postBody)
+  return requestFunding(options, this, startingBalance, walletToFund, postBody)
 }
 
 // eslint-disable-next-line max-params -- Helper function created for organizational purposes
-async function returnPromise(
-  options: any,
+async function requestFunding(
+  options: FundingOptions,
   client: Client,
   startingBalance: number,
   walletToFund: Wallet,
-  postBody: any,
+  postBody: FaucetRequestBody,
 ): Promise<{
   wallet: Wallet
   balance: number
 }> {
-  return new Promise(async (resolve, reject) => {
-    const finalHostname = options.hostname ?? getFaucetHost(client)
-    const finalPathname =
-      options.pathname ?? getDefaultFaucetPath(finalHostname)
-    return fetch(`https://${finalHostname}/${finalPathname}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': `${postBody.length}`,
-      },
-      body: postBody,
-    }).then(async (response) => {
-      return onEnd(
-        response,
-        client,
-        startingBalance,
-        walletToFund,
-        resolve,
-        reject,
-      )
-    })
-    // POST the body
+  const hostname = options.faucetHost ?? getFaucetHost(client)
+  if (!hostname) {
+    throw new XRPLFaucetError('No faucet hostname could be derived')
+  }
+  const pathname = options.faucetPath ?? getDefaultFaucetPath(hostname)
+  const response = await fetch(`https://${hostname}${pathname}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(postBody),
   })
-}
 
-// eslint-disable-next-line max-params -- Helper function created for organizational purposes
-async function onEnd(
-  response: Response,
-  client: Client,
-  startingBalance: number,
-  walletToFund: Wallet,
-  resolve: (response: { wallet: Wallet; balance: number }) => void,
-  reject: (err: ErrorConstructor | Error | unknown) => void,
-): Promise<void> {
-  const body = await response.json()
+  const body = (await response.json()) as FaucetWallet
   // "application/json; charset=utf-8"
-  if (response.headers['content-type']?.startsWith('application/json')) {
-    const faucetWallet: FaucetWallet = body
-    const classicAddress = faucetWallet.account.classicAddress
-    await processSuccessfulResponse(
+  if (
+    response.ok &&
+    response.headers.get('Content-Type')?.startsWith('application/json')
+  ) {
+    const classicAddress = body.account.classicAddress
+    return processSuccessfulResponse(
       client,
       classicAddress,
       walletToFund,
       startingBalance,
-      resolve,
-      reject,
-    )
-  } else {
-    reject(
-      new XRPLFaucetError(
-        `Content type is not \`application/json\`: ${JSON.stringify({
-          statusCode: response.status,
-          contentType: response.headers['content-type'],
-          body,
-        })}`,
-      ),
     )
   }
+  return Promise.reject(
+    new XRPLFaucetError(
+      `Content type is not \`application/json\`: ${JSON.stringify({
+        body,
+        contentType: response.headers.get('Content-Type'),
+        statusCode: response.status,
+      })}`,
+    ),
+  )
+
+  // POST the body
 }
 
-// eslint-disable-next-line max-params, max-lines-per-function -- Only used as a helper function, lines inc due to added balance.
+// eslint-disable-next-line max-params -- Only used as a helper function, lines inc due to added balance.
 async function processSuccessfulResponse(
   client: Client,
   classicAddress: string | undefined,
   walletToFund: Wallet,
   startingBalance: number,
-  resolve: (response: { wallet: Wallet; balance: number }) => void,
-  reject: (err: ErrorConstructor | Error | unknown) => void,
-): Promise<void> {
+): Promise<{
+  wallet: Wallet
+  balance: number
+}> {
   if (!classicAddress) {
-    reject(new XRPLFaucetError(`The faucet account is undefined`))
-    return
+    return Promise.reject(
+      new XRPLFaucetError(`The faucet account is undefined`),
+    )
   }
   try {
     // Check at regular interval if the address is enabled on the XRPL and funded
-    const updatedBalance = await getUpdatedBalance(
+    const balance = await getUpdatedBalance(
       client,
       classicAddress,
       startingBalance,
     )
 
-    if (updatedBalance > startingBalance) {
-      resolve({
-        wallet: walletToFund,
-        balance: await getUpdatedBalance(
-          client,
-          walletToFund.classicAddress,
-          startingBalance,
-        ),
-      })
-    } else {
-      reject(
-        new XRPLFaucetError(
-          `Unable to fund address with faucet after waiting ${
-            INTERVAL_SECONDS * MAX_ATTEMPTS
-          } seconds`,
-        ),
-      )
+    return {
+      wallet: walletToFund,
+      balance,
     }
+
+    throw new XRPLFaucetError(
+      `Unable to fund address with faucet after waiting ${
+        INTERVAL_SECONDS * MAX_ATTEMPTS
+      } seconds`,
+    )
   } catch (err) {
     if (err instanceof Error) {
-      reject(new XRPLFaucetError(err.message))
+      throw new XRPLFaucetError(err.message)
     }
-    reject(err)
+    throw err
   }
 }
 
