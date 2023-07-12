@@ -20,7 +20,7 @@ describe('SignerListSet', function () {
 
   // Add signerlist
   it(
-    'base',
+    'add',
     async () => {
       const tx: SignerListSet = {
         TransactionType: 'SignerListSet',
@@ -48,7 +48,7 @@ describe('SignerListSet', function () {
 
   // Remove signerlist
   it(
-    'base',
+    'remove',
     async () => {
       const tx: SignerListSet = {
         TransactionType: 'SignerListSet',
