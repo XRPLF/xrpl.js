@@ -1,6 +1,5 @@
 import { IncomingMessage } from 'http'
 import { request as httpsRequest, RequestOptions } from 'https'
-import { TextEncoder } from 'util'
 
 import { isValidClassicAddress } from 'ripple-address-codec'
 

@@ -1,7 +1,6 @@
 /* eslint-disable max-lines -- Connection is a large file w/ lots of imports/exports */
 import { EventEmitter } from 'events'
 import { Agent } from 'http'
-import { TextDecoder } from 'util'
 
 import WebSocket from 'ws'
 
