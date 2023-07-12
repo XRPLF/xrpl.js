@@ -1,3 +1,5 @@
+import { Response } from '..'
+
 import {
   AccountChannelsRequest,
   AccountChannelsResponse,
@@ -16,7 +18,7 @@ import {
   AccountOffersResponse,
 } from './accountOffers'
 import { AccountTxRequest, AccountTxResponse } from './accountTx'
-import { ErrorResponse } from './baseMethod'
+import { BaseRequest, ErrorResponse, BaseResponse } from './baseMethod'
 import { BookOffersRequest, BookOffer, BookOffersResponse } from './bookOffers'
 import { ChannelVerifyRequest, ChannelVerifyResponse } from './channelVerify'
 import {
@@ -175,6 +177,82 @@ type Response =
   // clio only methods
   | NFTInfoResponse
   | NFTHistoryResponse
+
+export type RequestResponseMap<T> = T extends AccountChannelsRequest
+  ? AccountChannelsResponse
+  : T extends AccountCurrenciesRequest
+  ? AccountCurrenciesResponse
+  : T extends AccountInfoRequest
+  ? AccountInfoResponse
+  : T extends AccountLinesRequest
+  ? AccountLinesResponse
+  : T extends AccountNFTsRequest
+  ? AccountNFTsResponse
+  : T extends AccountObjectsRequest
+  ? AccountObjectsResponse
+  : T extends AccountOffersRequest
+  ? AccountOffersResponse
+  : T extends AccountTxRequest
+  ? AccountTxResponse
+  : T extends GatewayBalancesRequest
+  ? GatewayBalancesResponse
+  : T extends NoRippleCheckRequest
+  ? NoRippleCheckResponse
+  : T extends LedgerRequest
+  ? LedgerResponse
+  : T extends LedgerClosedRequest
+  ? LedgerClosedResponse
+  : T extends LedgerCurrentRequest
+  ? LedgerCurrentResponse
+  : T extends LedgerDataRequest
+  ? LedgerDataResponse
+  : T extends LedgerEntryRequest
+  ? LedgerEntryResponse
+  : T extends SubmitRequest
+  ? SubmitResponse
+  : T extends SubmitMultisignedRequest
+  ? SubmitMultisignedResponse
+  : T extends TransactionEntryRequest
+  ? TransactionEntryResponse
+  : T extends TxRequest
+  ? TxResponse
+  : T extends BookOffersRequest
+  ? BookOffersResponse
+  : T extends DepositAuthorizedRequest
+  ? DepositAuthorizedResponse
+  : T extends PathFindRequest
+  ? PathFindResponse
+  : T extends RipplePathFindRequest
+  ? RipplePathFindResponse
+  : T extends ChannelVerifyRequest
+  ? ChannelVerifyResponse
+  : T extends SubscribeRequest
+  ? SubscribeResponse
+  : T extends UnsubscribeRequest
+  ? UnsubscribeResponse
+  : T extends FeeRequest
+  ? FeeResponse
+  : T extends ManifestRequest
+  ? ManifestResponse
+  : T extends ServerInfoRequest
+  ? ServerInfoResponse
+  : T extends ServerStateRequest
+  ? ServerStateResponse
+  : T extends PingRequest
+  ? PingResponse
+  : T extends RandomRequest
+  ? RandomResponse
+  : T extends NFTBuyOffersRequest
+  ? NFTBuyOffersResponse
+  : T extends NFTSellOffersRequest
+  ? NFTSellOffersResponse
+  : T extends NFTInfoRequest
+  ? NFTInfoResponse
+  : T extends NFTHistoryRequest
+  ? NFTHistoryResponse
+  : T extends BaseRequest
+  ? BaseResponse
+  : Response
 
 export {
   Request,

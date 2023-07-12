@@ -11,6 +11,7 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  */
 export interface TxRequest extends BaseRequest {
   command: 'tx'
+  /** The 256-bit hash of the transaction, as hex. */
   transaction: string
   /**
    * If true, return transaction data and metadata as binary serialized to

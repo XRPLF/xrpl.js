@@ -23,7 +23,10 @@ describe('client handling of tfPartialPayments', function () {
 
   it('Tx with no tfPartialPayment', async function () {
     testContext.mockRippled!.addResponse('tx', rippled.tx.Payment)
-    const resp = await testContext.client.request({ command: 'tx' })
+    const resp = await testContext.client.request({
+      command: 'tx',
+      transaction: rippled.tx.Payment.result.hash,
+    })
 
     expect(resp.warnings).to.equal(undefined)
   })
@@ -31,7 +34,10 @@ describe('client handling of tfPartialPayments', function () {
   it('Tx with IOU tfPartialPayment', async function () {
     const mockResponse = { ...rippled.tx.Payment, result: partialPaymentIOU }
     testContext.mockRippled!.addResponse('tx', mockResponse)
-    const resp = await testContext.client.request({ command: 'tx' })
+    const resp = await testContext.client.request({
+      command: 'tx',
+      transaction: mockResponse.result.hash,
+    })
 
     expect(resp.warnings).to.deep.equal([
       {
@@ -44,7 +50,10 @@ describe('client handling of tfPartialPayments', function () {
   it('Tx with XRP tfPartialPayment', async function () {
     const mockResponse = { ...rippled.tx.Payment, result: partialPaymentXRP }
     testContext.mockRippled!.addResponse('tx', mockResponse)
-    const resp = await testContext.client.request({ command: 'tx' })
+    const resp = await testContext.client.request({
+      command: 'tx',
+      transaction: mockResponse.result.hash,
+    })
 
     expect(resp.warnings).to.deep.equal([
       {
@@ -59,7 +68,10 @@ describe('client handling of tfPartialPayments', function () {
       'account_tx',
       rippled.account_tx.normal,
     )
-    const resp = await testContext.client.request({ command: 'account_tx' })
+    const resp = await testContext.client.request({
+      command: 'account_tx',
+      account: rippled.account_tx.normal.result.account,
+    })
 
     expect(resp.warnings).to.equal(undefined)
   })
@@ -119,6 +131,7 @@ describe('client handling of tfPartialPayments', function () {
     )
     const resp = await testContext.client.request({
       command: 'transaction_entry',
+      tx_hash: rippled.transaction_entry.result.tx_json.hash,
     })
 
     expect(resp.warnings).to.equal(undefined)
@@ -130,6 +143,7 @@ describe('client handling of tfPartialPayments', function () {
     testContext.mockRippled!.addResponse('transaction_entry', mockResponse)
     const resp = await testContext.client.request({
       command: 'transaction_entry',
+      tx_hash: mockResponse.result.tx_json.hash,
     })
 
     expect(resp.warnings).to.deep.equal([

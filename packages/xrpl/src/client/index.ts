@@ -15,95 +15,36 @@ import {
 import type { LedgerIndex } from '../models/common'
 import {
   Request,
-  Response,
   // account methods
   AccountChannelsRequest,
   AccountChannelsResponse,
-  AccountCurrenciesRequest,
-  AccountCurrenciesResponse,
   AccountInfoRequest,
-  AccountInfoResponse,
   AccountLinesRequest,
   AccountLinesResponse,
-  AccountNFTsRequest,
-  AccountNFTsResponse,
   AccountObjectsRequest,
   AccountObjectsResponse,
   AccountOffersRequest,
   AccountOffersResponse,
   AccountTxRequest,
   AccountTxResponse,
-  GatewayBalancesRequest,
-  GatewayBalancesResponse,
-  NoRippleCheckRequest,
-  NoRippleCheckResponse,
   // ledger methods
-  LedgerRequest,
-  LedgerResponse,
-  LedgerClosedRequest,
-  LedgerClosedResponse,
-  LedgerCurrentRequest,
-  LedgerCurrentResponse,
   LedgerDataRequest,
   LedgerDataResponse,
-  LedgerEntryRequest,
-  LedgerEntryResponse,
   // transaction methods
-  SubmitRequest,
-  SubmitResponse,
-  SubmitMultisignedRequest,
-  SubmitMultisignedResponse,
-  TransactionEntryRequest,
-  TransactionEntryResponse,
-  TxRequest,
-  TxResponse,
   // path and order book methods
   BookOffersRequest,
   BookOffersResponse,
-  DepositAuthorizedRequest,
-  DepositAuthorizedResponse,
-  PathFindRequest,
-  PathFindResponse,
-  RipplePathFindRequest,
-  RipplePathFindResponse,
-  // payment channel methods
-  ChannelVerifyRequest,
-  ChannelVerifyResponse,
   // server info methods
-  FeeRequest,
-  FeeResponse,
-  ManifestRequest,
   ManifestResponse,
-  ServerInfoRequest,
-  ServerInfoResponse,
-  ServerStateRequest,
-  ServerStateResponse,
   // utility methods
-  PingRequest,
-  PingResponse,
-  RandomRequest,
-  RandomResponse,
   LedgerStream,
   ValidationStream,
   TransactionStream,
   PathFindStream,
   PeerStatusStream,
   ConsensusStream,
-  SubscribeRequest,
-  SubscribeResponse,
-  UnsubscribeRequest,
-  UnsubscribeResponse,
-  // NFT methods
-  NFTBuyOffersRequest,
-  NFTBuyOffersResponse,
-  NFTSellOffersRequest,
-  NFTSellOffersResponse,
-  // clio only methods
-  NFTInfoRequest,
-  NFTInfoResponse,
-  NFTHistoryRequest,
-  NFTHistoryResponse,
 } from '../models/methods'
+import type { RequestResponseMap } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 import type { BookOffer, TakerAmount } from '../models/methods/bookOffers'
 import type { Transaction } from '../models/transactions'
@@ -129,7 +70,7 @@ import {
   sortAndLimitOffers,
 } from '../sugar/getOrderbook'
 import { dropsToXrp } from '../utils'
-import Wallet from '../Wallet'
+import { Wallet } from '../Wallet'
 import {
   type FundWalletOptions,
   generateWalletToFund,
@@ -350,82 +291,24 @@ class Client extends EventEmitter {
   }
 
   /**
-   * @category Network
-   */
-  public async request(
-    r: AccountChannelsRequest,
-  ): Promise<AccountChannelsResponse>
-  public async request(
-    r: AccountCurrenciesRequest,
-  ): Promise<AccountCurrenciesResponse>
-  public async request(r: AccountInfoRequest): Promise<AccountInfoResponse>
-  public async request(r: AccountLinesRequest): Promise<AccountLinesResponse>
-  public async request(r: AccountNFTsRequest): Promise<AccountNFTsResponse>
-  public async request(
-    r: AccountObjectsRequest,
-  ): Promise<AccountObjectsResponse>
-  public async request(r: AccountOffersRequest): Promise<AccountOffersResponse>
-  public async request(r: AccountTxRequest): Promise<AccountTxResponse>
-  public async request(r: BookOffersRequest): Promise<BookOffersResponse>
-  public async request(r: ChannelVerifyRequest): Promise<ChannelVerifyResponse>
-  public async request(
-    r: DepositAuthorizedRequest,
-  ): Promise<DepositAuthorizedResponse>
-  public async request(r: FeeRequest): Promise<FeeResponse>
-  public async request(
-    r: GatewayBalancesRequest,
-  ): Promise<GatewayBalancesResponse>
-  public async request(r: LedgerRequest): Promise<LedgerResponse>
-  public async request(r: LedgerClosedRequest): Promise<LedgerClosedResponse>
-  public async request(r: LedgerCurrentRequest): Promise<LedgerCurrentResponse>
-  public async request(r: LedgerDataRequest): Promise<LedgerDataResponse>
-  public async request(r: LedgerEntryRequest): Promise<LedgerEntryResponse>
-  public async request(r: ManifestRequest): Promise<ManifestResponse>
-  public async request(r: NFTBuyOffersRequest): Promise<NFTBuyOffersResponse>
-  public async request(r: NFTSellOffersRequest): Promise<NFTSellOffersResponse>
-  public async request(r: NFTInfoRequest): Promise<NFTInfoResponse>
-  public async request(r: NFTHistoryRequest): Promise<NFTHistoryResponse>
-  public async request(r: NoRippleCheckRequest): Promise<NoRippleCheckResponse>
-  public async request(r: PathFindRequest): Promise<PathFindResponse>
-  public async request(r: PingRequest): Promise<PingResponse>
-  public async request(r: RandomRequest): Promise<RandomResponse>
-  public async request(
-    r: RipplePathFindRequest,
-  ): Promise<RipplePathFindResponse>
-  public async request(r: ServerInfoRequest): Promise<ServerInfoResponse>
-  public async request(r: ServerStateRequest): Promise<ServerStateResponse>
-  public async request(r: SubmitRequest): Promise<SubmitResponse>
-  public async request(
-    r: SubmitMultisignedRequest,
-  ): Promise<SubmitMultisignedResponse>
-  public request(r: SubscribeRequest): Promise<SubscribeResponse>
-  public request(r: UnsubscribeRequest): Promise<UnsubscribeResponse>
-  public async request(
-    r: TransactionEntryRequest,
-  ): Promise<TransactionEntryResponse>
-  public async request(r: TxRequest): Promise<TxResponse>
-  public async request<R extends BaseRequest, T extends BaseResponse>(
-    r: R,
-  ): Promise<T>
-  /**
    * Makes a request to the client with the given command and
    * additional request body parameters.
    *
+   * @category Network
+   *
    * @param req - Request to send to the server.
    * @returns The response from the server.
-   * @category Network
    */
-  public async request<R extends Request, T extends Response>(
+  public async request<R extends Request, T = RequestResponseMap<R>>(
     req: R,
   ): Promise<T> {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
-    const response = (await this.connection.request({
+    const response = await this.connection.request<R, T>({
       ...req,
       account: req.account
         ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be string
           ensureClassicAddress(req.account as string)
         : undefined,
-    })) as T
+    })
 
     // mutates `response` to add warnings
     handlePartialPayment(req.command, response)
