@@ -86,7 +86,6 @@ describe('Wallet', function () {
       assert.isString(wallet.address)
       assert.equal(wallet.classicAddress, wallet.address)
       assert.isString(wallet.seed)
-      console.log('Jackson', wallet.privateKey)
       assert.isTrue(wallet.privateKey.startsWith(secp256k1PrivateKeyPrefix))
       assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
     })

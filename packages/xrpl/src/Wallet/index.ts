@@ -1,4 +1,3 @@
-/* eslint-disable max-lines -- The length is due to necessary complexity */
 import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
