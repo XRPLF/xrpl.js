@@ -36,6 +36,7 @@ const HEX_WALLET_LOCATOR_REGEX = /^[0-9A-Fa-f]{64}$/u
  * @param tx - An SignerListSet Transaction.
  * @throws When the SignerListSet is Malformed.
  */
+// eslint-disable-next-line complexity -- validation can be complex
 export function validateSignerListSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
@@ -46,7 +47,7 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
   if (typeof tx.SignerQuorum !== 'number') {
     throw new ValidationError('SignerListSet: invalid SignerQuorum')
   }
-  
+
   // All other checks are for if SignerQuorum is greater than 0
   if (tx.SignerQuorum === 0) {
     return
