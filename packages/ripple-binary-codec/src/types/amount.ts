@@ -5,7 +5,6 @@ import { BinaryParser } from '../serdes/binary-parser'
 import { AccountID } from './account-id'
 import { Currency } from './currency'
 import { JsonObject, SerializedType } from './serialized-type'
-import bigInt = require('big-integer')
 import { Buffer } from 'buffer/'
 
 /**
@@ -16,7 +15,7 @@ const MAX_IOU_EXPONENT = 80
 const MAX_IOU_PRECISION = 16
 const MAX_DROPS = new Decimal('1e17')
 const MIN_XRP = new Decimal('1e-6')
-const mask = bigInt(0x00000000ffffffff)
+const mask = BigInt(0x00000000ffffffff)
 
 /**
  * decimal.js configuration for Amount IOUs
@@ -76,11 +75,11 @@ class Amount extends SerializedType {
     if (typeof value === 'string') {
       Amount.assertXrpIsValid(value)
 
-      const number = bigInt(value)
+      const number = BigInt(value)
 
       const intBuf = [Buffer.alloc(4), Buffer.alloc(4)]
-      intBuf[0].writeUInt32BE(Number(number.shiftRight(32)), 0)
-      intBuf[1].writeUInt32BE(Number(number.and(mask)), 0)
+      intBuf[0].writeUInt32BE(Number(number >> BigInt(32)), 0)
+      intBuf[1].writeUInt32BE(Number(number & BigInt(mask)), 0)
 
       amount = Buffer.concat(intBuf)
 
@@ -101,10 +100,10 @@ class Amount extends SerializedType {
           .abs()
           .toString()
 
-        const num = bigInt(integerNumberString)
+        const num = BigInt(integerNumberString)
         const intBuf = [Buffer.alloc(4), Buffer.alloc(4)]
-        intBuf[0].writeUInt32BE(Number(num.shiftRight(32)), 0)
-        intBuf[1].writeUInt32BE(Number(num.and(mask)), 0)
+        intBuf[0].writeUInt32BE(Number(num >> BigInt(32)), 0)
+        intBuf[1].writeUInt32BE(Number(num & BigInt(mask)), 0)
 
         amount = Buffer.concat(intBuf)
 
@@ -152,9 +151,9 @@ class Amount extends SerializedType {
       const sign = isPositive ? '' : '-'
       bytes[0] &= 0x3f
 
-      const msb = bigInt(bytes.slice(0, 4).readUInt32BE(0))
-      const lsb = bigInt(bytes.slice(4).readUInt32BE(0))
-      const num = msb.shiftLeft(32).or(lsb)
+      const msb = BigInt(bytes.slice(0, 4).readUInt32BE(0))
+      const lsb = BigInt(bytes.slice(4).readUInt32BE(0))
+      const num = (msb << BigInt(32)) | lsb
 
       return `${sign}${num.toString()}`
     } else {

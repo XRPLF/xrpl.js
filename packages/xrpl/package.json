@@ -56,7 +56,7 @@
     "build:lib": "tsc --build tsconfig.build.json",
     "build:web": "webpack",
     "build:browserTests": "webpack --config ./test/webpack.config.js",
-    "analyze": "run-s build:web --analyze",
+    "analyze": "webpack --analyze",
     "watch": "run-s build:lib --watch",
     "clean": "rm -rf dist build coverage",
     "docgen": "tsc --build tsconfig.docs.json && typedoc && echo js.xrpl.org >> ../../docs/CNAME",

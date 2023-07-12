@@ -1,6 +1,5 @@
 import { coreTypes } from './types'
 import { Decimal } from 'decimal.js'
-import bigInt = require('big-integer')
 import { Buffer } from 'buffer/'
 
 /**
@@ -17,7 +16,7 @@ class quality {
     const decimal = new Decimal(quality)
     const exponent = decimal.e - 15
     const qualityString = decimal.times(`1e${-exponent}`).abs().toString()
-    const bytes = coreTypes.UInt64.from(bigInt(qualityString)).toBytes()
+    const bytes = coreTypes.UInt64.from(BigInt(qualityString)).toBytes()
     bytes[0] = exponent + 100
     return bytes
   }
