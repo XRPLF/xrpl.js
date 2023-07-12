@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- The length is due to necessary complexity */
 import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
@@ -137,7 +138,7 @@ export class Wallet {
       throw new ValidationError('Invalid cryptographic signing algorithm')
     }
     const seed = generateSeed({ algorithm })
-    return Wallet.fromSeed(seed)
+    return Wallet.fromSeed(seed, { algorithm })
   }
 
   /**

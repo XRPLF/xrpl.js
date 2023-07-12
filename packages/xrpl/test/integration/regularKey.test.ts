@@ -8,6 +8,7 @@ import {
   Wallet,
   AccountSetAsfFlags,
   OfferCreate,
+  ECDSA,
 } from '../../src'
 import { convertStringToHex } from '../../src/utils'
 import { multisign } from '../../src/Wallet/signer'
@@ -41,6 +42,7 @@ async function generateFundedWalletWithRegularKey(
 
   const regularKeyWallet = Wallet.fromSeed(regularKeyInfo.seed, {
     masterAddress: masterWallet.address,
+    algorithm: ECDSA.secp256k1,
   })
 
   const setRegularTx: SetRegularKey = {

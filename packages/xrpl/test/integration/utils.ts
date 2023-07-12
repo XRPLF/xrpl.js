@@ -11,6 +11,7 @@ import {
   TimeoutError,
   NotConnectedError,
   unixTimeToRippleTime,
+  ECDSA,
 } from '../../src'
 import { Payment, Transaction } from '../../src/models/transactions'
 import { hashSignedTx } from '../../src/utils/hashes'
@@ -175,7 +176,7 @@ export async function fundAccount(
     // 2 times the amount needed for a new account (20 XRP)
     Amount: '400000000',
   }
-  const wal = Wallet.fromSeed(masterSecret)
+  const wal = Wallet.fromSeed(masterSecret, { algorithm: ECDSA.secp256k1 })
   const response = await submitTransaction({
     client,
     wallet: wal,

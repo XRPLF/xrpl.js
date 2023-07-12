@@ -3,6 +3,9 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 
+### Fixed
+* Fixed Wallet.generate() ignoring the `algorithm` parameter (Only a problem once binary-codec fix for `derive_keypair` is added)
+
 ### Added
 * Add `BurnedNFTokens`, `FirstNFTSequence`, `MintedNFTokens`,
 `NFTokenMinter`, and `WalletLocator` to `AccountRoot`.
