@@ -25,7 +25,6 @@
     "@types/jest": "^29.2.2",
     "@types/lodash": "^4.14.136",
     "@types/node": "^14.18.35",
-    "@types/puppeteer": "5.4.6",
     "@types/ws": "^8.2.0",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28 .0",
