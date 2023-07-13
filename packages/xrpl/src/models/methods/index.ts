@@ -1,5 +1,4 @@
-import { Response } from '..'
-
+/* eslint-disable max-lines -- Necessary here */
 import {
   AccountChannelsRequest,
   AccountChannelsResponse,
@@ -18,7 +17,7 @@ import {
   AccountOffersResponse,
 } from './accountOffers'
 import { AccountTxRequest, AccountTxResponse } from './accountTx'
-import { BaseRequest, ErrorResponse, BaseResponse } from './baseMethod'
+import { ErrorResponse } from './baseMethod'
 import { BookOffersRequest, BookOffer, BookOffersResponse } from './bookOffers'
 import { ChannelVerifyRequest, ChannelVerifyResponse } from './channelVerify'
 import {
@@ -250,9 +249,36 @@ export type RequestResponseMap<T> = T extends AccountChannelsRequest
   ? NFTInfoResponse
   : T extends NFTHistoryRequest
   ? NFTHistoryResponse
-  : T extends BaseRequest
-  ? BaseResponse
   : Response
+
+export type MarkerRequest = Request & {
+  limit?: number
+  marker?: unknown
+}
+
+export type MarkerResponse = Response & {
+  result: {
+    marker?: unknown
+  }
+}
+
+export type RequestAllResponseMap<T> = T extends AccountChannelsRequest
+  ? AccountChannelsResponse
+  : T extends AccountLinesRequest
+  ? AccountLinesResponse
+  : T extends AccountObjectsRequest
+  ? AccountObjectsResponse
+  : T extends AccountOffersRequest
+  ? AccountOffersResponse
+  : T extends AccountTxRequest
+  ? AccountTxResponse
+  : T extends LedgerDataRequest
+  ? LedgerDataResponse
+  : T extends AccountTxRequest
+  ? AccountTxResponse
+  : T extends BookOffersRequest
+  ? BookOffersResponse
+  : MarkerResponse
 
 export {
   Request,

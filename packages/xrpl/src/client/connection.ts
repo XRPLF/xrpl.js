@@ -11,7 +11,7 @@ import {
   ConnectionError,
   XrplError,
 } from '../errors'
-import type { Response, RequestResponseMap } from '../models'
+import type { RequestResponseMap } from '../models'
 import { BaseRequest } from '../models/methods/baseMethod'
 
 import ConnectionManager from './ConnectionManager'

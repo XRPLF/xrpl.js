@@ -31,9 +31,6 @@ import {
   LedgerDataRequest,
   LedgerDataResponse,
   // transaction methods
-  // path and order book methods
-  BookOffersRequest,
-  BookOffersResponse,
   // server info methods
   ManifestResponse,
   // utility methods
@@ -44,8 +41,12 @@ import {
   PeerStatusStream,
   ConsensusStream,
 } from '../models/methods'
-import type { RequestResponseMap } from '../models/methods'
-import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
+import type {
+  RequestResponseMap,
+  RequestAllResponseMap,
+  MarkerRequest,
+  MarkerResponse,
+} from '../models/methods'
 import type { BookOffer, TakerAmount } from '../models/methods/bookOffers'
 import type { Transaction } from '../models/transactions'
 import { setTransactionFlagsToNumber } from '../models/utils/flags'
@@ -148,17 +149,6 @@ function getCollectKeyFromCommand(command: string): string | null {
 function clamp(value: number, min: number, max: number): number {
   assert.ok(min <= max, 'Illegal clamp bounds')
   return Math.min(Math.max(value, min), max)
-}
-
-interface MarkerRequest extends BaseRequest {
-  limit?: number
-  marker?: unknown
-}
-
-interface MarkerResponse extends BaseResponse {
-  result: {
-    marker?: unknown
-  }
 }
 
 const DEFAULT_FEE_CUSHION = 1.2
@@ -402,24 +392,6 @@ class Client extends EventEmitter {
   }
 
   /**
-   * @category Network
-   */
-  public async requestAll(
-    req: AccountChannelsRequest,
-  ): Promise<AccountChannelsResponse[]>
-  public async requestAll(
-    req: AccountLinesRequest,
-  ): Promise<AccountLinesResponse[]>
-  public async requestAll(
-    req: AccountObjectsRequest,
-  ): Promise<AccountObjectsResponse[]>
-  public async requestAll(
-    req: AccountOffersRequest,
-  ): Promise<AccountOffersResponse[]>
-  public async requestAll(req: AccountTxRequest): Promise<AccountTxResponse[]>
-  public async requestAll(req: BookOffersRequest): Promise<BookOffersResponse[]>
-  public async requestAll(req: LedgerDataRequest): Promise<LedgerDataResponse[]>
-  /**
    * Makes multiple paged requests to the client to return a given number of
    * resources. Multiple paged requests will be made until the `limit`
    * number of resources is reached (if no `limit` is provided, a single request
@@ -432,15 +404,27 @@ class Client extends EventEmitter {
    * general use. Instead, use rippled's built-in pagination and make multiple
    * requests as needed.
    *
+   * @category Network
+   *
    * @param request - The initial request to send to the server.
    * @param collect - (Optional) the param to use to collect the array of resources (only needed if command is unknown).
    * @returns The array of all responses.
    * @throws ValidationError if there is no collection key (either from a known command or for the unknown command).
+   *
+   * @example
+   * // Request all ledger data pages
+   * const allResponses = await client.requestAll({ command: 'ledger_data' });
+   * console.log(allResponses);
+   *
+   * @example
+   * // Request all transaction data pages
+   * const allResponses = await client.requestAll({ command: 'transaction_data' });
+   * console.log(allResponses);
    */
-  public async requestAll<T extends MarkerRequest, U extends MarkerResponse>(
-    request: T,
-    collect?: string,
-  ): Promise<U[]> {
+  public async requestAll<
+    T extends MarkerRequest,
+    U = RequestAllResponseMap<T>,
+  >(request: T, collect?: string): Promise<U[]> {
     /*
      * The data under collection is keyed based on the command. Fail if command
      * not recognized and collection key not provided.
@@ -468,7 +452,7 @@ class Client extends EventEmitter {
       // eslint-disable-next-line no-await-in-loop -- Necessary for this, it really has to wait
       const singleResponse = await this.connection.request(repeatProps)
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
-      const singleResult = (singleResponse as U).result
+      const singleResult = (singleResponse as MarkerResponse).result
       if (!(collectKey in singleResult)) {
         throw new XrplError(`${collectKey} not in result`)
       }
