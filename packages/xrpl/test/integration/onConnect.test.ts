@@ -28,7 +28,7 @@ describe('on handlers', function () {
     async () => {
       const client = new Client(serverUrl)
       return new Promise<void>(function (resolve) {
-        client.on('disconnected', function (code: number) {
+        client.on('disconnected', function (code) {
           // should be the normal disconnect code
           assert.equal(code, 1000)
           client.removeAllListeners()

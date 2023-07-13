@@ -30,16 +30,6 @@ import {
   // ledger methods
   LedgerDataRequest,
   LedgerDataResponse,
-  // transaction methods
-  // server info methods
-  ManifestResponse,
-  // utility methods
-  LedgerStream,
-  ValidationStream,
-  TransactionStream,
-  PathFindStream,
-  PeerStatusStream,
-  ConsensusStream,
 } from '../models/methods'
 import type {
   RequestResponseMap,
@@ -48,6 +38,7 @@ import type {
   MarkerResponse,
 } from '../models/methods'
 import type { BookOffer, TakerAmount } from '../models/methods/bookOffers'
+import type { OnEventToListenerMap } from '../models/methods/subscribe'
 import type { Transaction } from '../models/transactions'
 import { setTransactionFlagsToNumber } from '../models/utils/flags'
 import { ensureClassicAddress, submit, submitAndWait } from '../sugar'
@@ -332,7 +323,13 @@ class Client extends EventEmitter {
   /**
    * Event handler for subscription streams.
    *
-   * @example
+   * @category Network
+   *
+   * @param eventName - Name of the event. Only forwards streams.
+   * @param listener - Function to run on event.
+   * @returns This, because it inherits from EventEmitter.
+   *
+   * * @example
    * ```ts
    * const api = new Client('wss://s.altnet.rippletest.net:51233')
    *
@@ -347,48 +344,13 @@ class Client extends EventEmitter {
    *     streams: ['transactions_proposed']
    * })
    * ```
-   *
-   * @category Network
    */
-  public on(event: 'connected', listener: () => void): this
-  public on(event: 'disconnected', listener: (code: number) => void): this
-  public on(
-    event: 'ledgerClosed',
-    listener: (ledger: LedgerStream) => void,
-  ): this
-  public on(
-    event: 'validationReceived',
-    listener: (validation: ValidationStream) => void,
-  ): this
-  public on(
-    event: 'transaction',
-    listener: (tx: TransactionStream) => void,
-  ): this
-  public on(
-    event: 'peerStatusChange',
-    listener: (status: PeerStatusStream) => void,
-  ): this
-  public on(
-    event: 'consensusPhase',
-    listener: (phase: ConsensusStream) => void,
-  ): this
-  public on(
-    event: 'manifestReceived',
-    listener: (manifest: ManifestResponse) => void,
-  ): this
-  public on(event: 'path_find', listener: (path: PathFindStream) => void): this
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
-  public on(event: 'error', listener: (...err: any[]) => void): this
-  /**
-   * Event handler for subscription streams.
-   *
-   * @param eventName - Name of the event. Only forwards streams.
-   * @param listener - Function to run on event.
-   * @returns This, because it inherits from EventEmitter.
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
-  public on(eventName: string, listener: (...args: any[]) => void): this {
-    return super.on(eventName, listener)
+  public on<T extends string, U = OnEventToListenerMap<T>>(
+    eventName: T,
+    listener: U,
+  ): this {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any -- Compatible
+    return super.on(eventName, listener as (...args: any[]) => void)
   }
 
   /**

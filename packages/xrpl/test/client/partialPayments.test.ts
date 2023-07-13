@@ -2,7 +2,6 @@
 import { expect } from 'chai'
 import cloneDeep from 'lodash/cloneDeep'
 
-import type { TransactionStream } from '../../src'
 import rippled from '../fixtures/rippled'
 import {
   setupClient,
@@ -159,7 +158,7 @@ describe('client handling of tfPartialPayments', function () {
       'transaction_entry',
       rippled.transaction_entry,
     )
-    testContext.client.on('transaction', (tx: TransactionStream) => {
+    testContext.client.on('transaction', (tx) => {
       expect(tx.warnings).to.equal(undefined)
       done()
     })
@@ -175,7 +174,7 @@ describe('client handling of tfPartialPayments', function () {
       'transaction_entry',
       rippled.transaction_entry,
     )
-    testContext.client.on('transaction', (tx: TransactionStream) => {
+    testContext.client.on('transaction', (tx) => {
       expect(tx.warnings).to.deep.equal([
         {
           id: 2001,
