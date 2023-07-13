@@ -1,4 +1,4 @@
-import type { Trustline } from '../models/methods/accountLines'
+import { AccountLinesTrustline } from '../models'
 
 export interface Balance {
   value: string
@@ -12,7 +12,7 @@ export interface Balance {
  * @param trustlines - The array of trustlines to format.
  * @returns An array of balances, each containing the value, currency, and issuer.
  */
-export function formatBalances(trustlines: Trustline[]): Balance[] {
+export function formatBalances(trustlines: AccountLinesTrustline[]): Balance[] {
   return trustlines.map((trustline) => ({
     value: trustline.balance,
     currency: trustline.currency,

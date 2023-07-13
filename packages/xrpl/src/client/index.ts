@@ -37,7 +37,7 @@ import type {
   MarkerRequest,
   MarkerResponse,
 } from '../models/methods'
-import type { BookOffer, TakerAmount } from '../models/methods/bookOffers'
+import type { BookOffer, BookOfferCurrency } from '../models/methods/bookOffers'
 import type { OnEventToListenerMap } from '../models/methods/subscribe'
 import type { Transaction } from '../models/transactions'
 import { setTransactionFlagsToNumber } from '../models/utils/flags'
@@ -769,8 +769,8 @@ class Client extends EventEmitter {
    */
 
   public async getOrderbook(
-    currency1: TakerAmount,
-    currency2: TakerAmount,
+    currency1: BookOfferCurrency,
+    currency2: BookOfferCurrency,
     options: {
       limit?: number
       ledger_index?: LedgerIndex

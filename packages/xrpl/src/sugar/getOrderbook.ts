@@ -7,8 +7,8 @@ import { LedgerIndex } from '../models/common'
 import { OfferFlags } from '../models/ledger/Offer'
 import {
   BookOffer,
+  BookOfferCurrency,
   BookOffersRequest,
-  TakerAmount,
 } from '../models/methods/bookOffers'
 
 const DEFAULT_LIMIT = 20
@@ -97,8 +97,8 @@ export function validateOrderbookOptions(options: GetOrderBookOptions): void {
  * @returns The created request object.
  */
 export function createBookOffersRequest(
-  currency1: TakerAmount,
-  currency2: TakerAmount,
+  currency1: BookOfferCurrency,
+  currency2: BookOfferCurrency,
   options: {
     limit?: number
     ledger_index?: LedgerIndex

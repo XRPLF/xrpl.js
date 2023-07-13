@@ -23,7 +23,7 @@ export interface SignerListSet extends BaseTransaction {
    * more than 32 members. No address may appear more than once in the list, nor
    * may the Account submitting the transaction appear in the list.
    */
-  SignerEntries: SignerEntry[]
+  SignerEntries?: SignerEntry[]
 }
 
 const MAX_SIGNERS = 32
@@ -36,6 +36,7 @@ const HEX_WALLET_LOCATOR_REGEX = /^[0-9A-Fa-f]{64}$/u
  * @param tx - An SignerListSet Transaction.
  * @throws When the SignerListSet is Malformed.
  */
+// eslint-disable-next-line complexity -- validation can be complex
 export function validateSignerListSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
@@ -45,6 +46,11 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
 
   if (typeof tx.SignerQuorum !== 'number') {
     throw new ValidationError('SignerListSet: invalid SignerQuorum')
+  }
+
+  // All other checks are for if SignerQuorum is greater than 0
+  if (tx.SignerQuorum === 0) {
+    return
   }
 
   if (tx.SignerEntries === undefined) {

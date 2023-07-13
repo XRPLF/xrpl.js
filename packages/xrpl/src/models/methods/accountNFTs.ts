@@ -1,4 +1,4 @@
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * The `account_nfts` method retrieves all of the NFTs currently owned by the
@@ -6,7 +6,7 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface AccountNFTsRequest extends BaseRequest {
+export interface AccountNFTsRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'account_nfts'
   /**
    * The unique identifier of an account, typically the account's address. The
