@@ -68,6 +68,30 @@ export interface LedgerRequest extends BaseRequest, LookupByLedgerRequest {
 }
 
 /**
+ * Retrieve information about the public ledger. Expects a response in the form
+ * of a {@link LedgerResponseExpanded}. Will return expanded transaction data instead of string hashes.
+ *
+ * @example
+ * ```ts
+ * const ledger: LedgerRequest = {
+ *  "id": 14,
+ *  "command": "ledger",
+ *  "ledger_index": "validated",
+ *  "full": false,
+ *  "accounts": false,
+ *  "transactions": false,
+ *  "expand": true,
+ *  "owner_funds": false
+ * }
+ * ```
+ *
+ * @category Requests
+ */
+export interface LedgerRequestExpanded extends LedgerRequest {
+  expand: true
+}
+
+/**
  * Special case transaction definition when the request contains `owner_funds: true`.
  */
 export interface LedgerModifiedOfferCreateTransaction {
@@ -104,7 +128,7 @@ export interface LedgerBinary
 export interface LedgerResponse extends BaseResponse {
   result: {
     /** The complete header data of this {@link Ledger}. */
-    ledger: Ledger | LedgerBinary
+    ledger: LedgerBinary
     /** Unique identifying hash of the entire ledger. */
     ledger_hash: string
     /** The Ledger Index of this ledger. */
@@ -122,4 +146,14 @@ export interface LedgerResponse extends BaseResponse {
      */
     validated?: boolean
   }
+}
+
+/**
+ * Response expected from a {@link LedgerRequest} when the request contains expanded: true.
+ *
+ * @category Responses
+ */
+export interface LedgerResponseExpanded extends LedgerResponse {
+  /** The complete header data of this {@link Ledger}. */
+  ledger: Ledger
 }

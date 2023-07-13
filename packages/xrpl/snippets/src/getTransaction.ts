@@ -1,10 +1,10 @@
-import { Client, LedgerResponse, TxResponse } from '../../src'
+import { Client } from '../../src'
 
 const client = new Client('wss://s2.ripple.com:51233')
 
 async function getTransaction(): Promise<void> {
   await client.connect()
-  const ledger: LedgerResponse = await client.request({
+  const ledger = await client.request({
     command: 'ledger',
     transactions: true,
     ledger_index: 'validated',
@@ -12,8 +12,8 @@ async function getTransaction(): Promise<void> {
   console.log(ledger)
 
   const transactions = ledger.result.ledger.transactions
-  if (transactions) {
-    const tx: TxResponse = await client.request({
+  if (transactions && transactions.length > 0) {
+    const tx = await client.request({
       command: 'tx',
       transaction: transactions[0],
     })

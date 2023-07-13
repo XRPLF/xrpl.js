@@ -70,6 +70,8 @@ import {
   LedgerQueueData,
   LedgerRequest,
   LedgerResponse,
+  LedgerRequestExpanded,
+  LedgerResponseExpanded,
 } from './ledger'
 import { LedgerClosedRequest, LedgerClosedResponse } from './ledgerClosed'
 import { LedgerCurrentRequest, LedgerCurrentResponse } from './ledgerCurrent'
@@ -270,6 +272,8 @@ export type RequestResponseMap<T> = T extends AccountChannelsRequest
   ? NoRippleCheckResponse
   : T extends LedgerRequest
   ? LedgerResponse
+  : T extends LedgerRequestExpanded
+  ? LedgerResponseExpanded
   : T extends LedgerClosedRequest
   ? LedgerClosedResponse
   : T extends LedgerCurrentRequest
