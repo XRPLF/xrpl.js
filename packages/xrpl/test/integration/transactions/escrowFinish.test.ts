@@ -8,11 +8,12 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import {
-  calculateWaitTimeForTransaction,
   generateFundedWallet,
   getXRPBalance,
   sendLedgerAccept,
   testTransaction,
+  getLedgerCloseTime,
+  waitForAndForceProgressLedgerTime,
 } from '../utils'
 
 // how long before each test case times out
@@ -32,14 +33,7 @@ describe('EscrowFinish', function () {
       const wallet1 = await generateFundedWallet(testContext.client)
 
       // get the most recent close_time from the standalone container for cancel & finish after.
-      const CLOSE_TIME: number = (
-        await testContext.client.request({
-          command: 'ledger',
-          ledger_index: 'validated',
-        })
-      ).result.ledger.close_time
-
-      const waitTimeInMs = calculateWaitTimeForTransaction(CLOSE_TIME)
+      const CLOSE_TIME = await getLedgerCloseTime(testContext.client)
 
       const AMOUNT = 10000
 
@@ -50,10 +44,6 @@ describe('EscrowFinish', function () {
         Destination: wallet1.classicAddress,
         FinishAfter: CLOSE_TIME + 2,
       }
-
-      const finishAfterPromise = new Promise((resolve) => {
-        setTimeout(resolve, waitTimeInMs)
-      })
 
       await testTransaction(testContext.client, createTx, testContext.wallet)
 
@@ -83,7 +73,11 @@ describe('EscrowFinish', function () {
         OfferSequence: sequence!,
       }
 
-      await finishAfterPromise
+      // wait for the escrow to be ready to finish
+      await waitForAndForceProgressLedgerTime(
+        testContext.client,
+        CLOSE_TIME + 2,
+      )
 
       // rippled uses the close time of the previous ledger
       await sendLedgerAccept(testContext.client)

@@ -8,7 +8,7 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import {
-  calculateWaitTimeForTransaction,
+  waitForAndForceProgressLedgerTime,
   generateFundedWallet,
   getXRPBalance,
   testTransaction,
@@ -39,8 +39,6 @@ describe('EscrowCancel', function () {
           ledger_index: 'validated',
         })
       ).result.ledger.close_time
-
-      const waitTimeInMs = calculateWaitTimeForTransaction(CLOSE_TIME)
 
       const createTx: EscrowCreate = {
         Account: testContext.wallet.classicAddress,
@@ -86,14 +84,10 @@ describe('EscrowCancel', function () {
         OfferSequence: sequence,
       }
 
-      // We set the CancelAfter timer to be 3 seconds after the last ledger close_time. We need to wait this long
-      // before we can cancel the escrow.
-      const cancelAfterTimerPromise = new Promise((resolve) => {
-        setTimeout(resolve, waitTimeInMs)
-      })
-
-      // Make sure we wait long enough before canceling the escrow.
-      await cancelAfterTimerPromise
+      await waitForAndForceProgressLedgerTime(
+        testContext.client,
+        CLOSE_TIME + 3,
+      )
 
       // rippled uses the close time of the previous ledger
       await sendLedgerAccept(testContext.client)
