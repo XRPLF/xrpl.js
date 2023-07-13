@@ -5,7 +5,6 @@ import {
   AccountSet,
   Client,
   SignerListSet,
-  SubmitMultisignedRequest,
   Transaction,
   SubmitMultisignedResponse,
   hashes,

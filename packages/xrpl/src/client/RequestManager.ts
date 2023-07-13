@@ -111,7 +111,6 @@ export default class RequestManager {
    * @returns Request ID, new request form, and the promise for resolving the request.
    * @throws XrplError if request with the same ID is already pending.
    */
-
   public createRequest<R extends BaseRequest, T = RequestResponseMap<R>>(
     request: R,
     timeout: number,
