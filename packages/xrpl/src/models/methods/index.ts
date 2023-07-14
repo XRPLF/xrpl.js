@@ -76,7 +76,6 @@ import {
   LedgerRequestExpandedAccountsAndTransactions,
   LedgerRequestExpandedAccountsOnly,
   LedgerRequestExpandedTransactionsBinary,
-  LedgerResponseExpandedBinary,
 } from './ledger'
 import { LedgerClosedRequest, LedgerClosedResponse } from './ledgerClosed'
 import { LedgerCurrentRequest, LedgerCurrentResponse } from './ledgerCurrent'
