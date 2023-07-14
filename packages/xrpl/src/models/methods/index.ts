@@ -1,3 +1,4 @@
+/* eslint-disable no-inline-comments -- Necessary for important note */
 /* eslint-disable max-lines -- There is a lot to export */
 import {
   AccountChannelsRequest,
@@ -70,8 +71,12 @@ import {
   LedgerQueueData,
   LedgerRequest,
   LedgerResponse,
-  LedgerRequestExpanded,
+  LedgerRequestExpandedTransactionsOnly,
   LedgerResponseExpanded,
+  LedgerRequestExpandedAccountsAndTransactions,
+  LedgerRequestExpandedAccountsOnly,
+  LedgerRequestExpandedTransactionsBinary,
+  LedgerResponseExpandedBinary,
 } from './ledger'
 import { LedgerClosedRequest, LedgerClosedResponse } from './ledgerClosed'
 import { LedgerCurrentRequest, LedgerCurrentResponse } from './ledgerCurrent'
@@ -270,10 +275,19 @@ export type RequestResponseMap<T> = T extends AccountChannelsRequest
   ? GatewayBalancesResponse
   : T extends NoRippleCheckRequest
   ? NoRippleCheckResponse
+  : // NOTE: The order of these LedgerRequest types is important
+  // to get the proper type matching overrides based on parameters set
+  // in the request.
+  T extends LedgerRequestExpandedTransactionsBinary
+  ? LedgerResponse
+  : T extends LedgerRequestExpandedAccountsAndTransactions
+  ? LedgerResponseExpanded
+  : T extends LedgerRequestExpandedTransactionsOnly
+  ? LedgerResponseExpanded
+  : T extends LedgerRequestExpandedAccountsOnly
+  ? LedgerResponseExpanded
   : T extends LedgerRequest
   ? LedgerResponse
-  : T extends LedgerRequestExpanded
-  ? LedgerResponseExpanded
   : T extends LedgerClosedRequest
   ? LedgerClosedResponse
   : T extends LedgerCurrentRequest
