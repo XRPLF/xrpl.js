@@ -324,7 +324,7 @@ function scaleValue(value, multiplier): string {
  *
  * @param client - The client object.
  * @param tx - The transaction object.
- * @returns A promise that resolves with void.
+ * @returns A promise that resolves with void. Modifies the `tx` parameter setting `LastLedgerSequence`.
  */
 export async function setLatestValidatedLedgerSequence(
   client: Client,
