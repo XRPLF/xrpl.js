@@ -58,7 +58,7 @@ describe('client.requestNextPage', function () {
     )
   })
 
-  // TODO: Write this test to verify multiple types of commands can be run
+  // TODO: Write this test to verify multiple types of commands can be run - https://github.com/XRPLF/xrpl.js/issues/2384
   // it('requests different types of commands', async function () {
   //   testContext.mockRippled!.addResponse('account_channels', {
   //     id: 0,

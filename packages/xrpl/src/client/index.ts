@@ -203,6 +203,12 @@ class Client extends EventEmitter {
    * @param server - URL of the server to connect to.
    * @param options - Options for client settings.
    * @category Constructor
+   *
+   * @example
+   * ```ts
+   * import { Client } from "xrpl"
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   * ```
    */
   // eslint-disable-next-line max-lines-per-function -- okay because we have to set up all the connection handlers
   public constructor(server: string, options: ClientOptions = {}) {
@@ -287,6 +293,15 @@ class Client extends EventEmitter {
    *
    * @param req - Request to send to the server.
    * @returns The response from the server.
+   *
+   * @example
+   * ```ts
+   * const response = await client.request({
+   *   command: 'account_info',
+   *   account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+   * })
+   * console.log(response)
+   * ```
    */
   public async request<R extends Request, T = RequestResponseMap<R>>(
     req: R,
@@ -313,6 +328,21 @@ class Client extends EventEmitter {
    * @param req - Request to send.
    * @param resp - Response with the marker to use in the request.
    * @returns The response with the next page of data.
+   *
+   * @example
+   * ```ts
+   * const response = await client.request({
+   *  command: 'account_tx',
+   *  account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+   * })
+   * console.log(response)
+   * const nextResponse = await client.requestNextPage({
+   *   command: 'account_tx',
+   *   account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+   * },
+   * response)
+   * console.log(nextResponse)
+   * ```
    */
   public async requestNextPage<
     T extends RequestNextPageType,
@@ -444,6 +474,16 @@ class Client extends EventEmitter {
 
   /**
    * Get networkID and buildVersion from server_info
+   *
+   * @returns void
+   * @example
+   * ```ts
+   * const { Client } = require('xrpl')
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   * await client.getServerInfo()
+   * console.log(client.networkID)
+   * console.log(client.buildVersion)
+   * ```
    */
   public async getServerInfo(): Promise<void> {
     try {
@@ -476,6 +516,15 @@ class Client extends EventEmitter {
    * before exiting your application.
    * @returns A promise that resolves with a void value when a connection is established.
    * @category Network
+   *
+   * @example
+   * ```ts
+   * const { Client } = require('xrpl')
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   * await client.connect()
+   * // do something with the client
+   * await client.disconnect()
+   * ```
    */
   public async connect(): Promise<void> {
     return this.connection.connect().then(async () => {
@@ -517,6 +566,17 @@ class Client extends EventEmitter {
    *
    * @returns Whether the client instance is connected.
    * @category Network
+   * @example
+   * ```ts
+   * const { Client } = require('xrpl')
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   * await client.connect()
+   * console.log(client.isConnected())
+   * // true
+   * await client.disconnect()
+   * console.log(client.isConnected())
+   * // false
+   * ```
    */
   public isConnected(): boolean {
     return this.connection.isConnected()
@@ -611,8 +671,25 @@ class Client extends EventEmitter {
    * @param opts.autofill - If true, autofill a transaction.
    * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
    * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+   *
    * @returns A promise that contains SubmitResponse.
    * @throws RippledError if submit request fails.
+   *
+   * @example
+   * ```ts
+   * const { Client, Wallet } = require('xrpl')
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   * await client.connect()
+   * const wallet = Wallet.generate()
+   * const transaction = {
+   *   TransactionType: 'Payment',
+   *   Account: wallet.classicAddress,
+   *   Destination: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+   *   Amount: '10000000' // 10 XRP in drops (1/1,000,000th of an XRP)
+   * }
+   * const submitResponse = await client.submit(transaction, { wallet })
+   * console.log(submitResponse)
+   * ```
    */
   public async submit(
     transaction: Transaction | string,
@@ -934,6 +1011,16 @@ class Client extends EventEmitter {
    * @category Abstraction
    *
    * @returns The most recently validated ledger index.
+   *
+   * @example
+   * ```ts
+   * const { Client } = require('xrpl')
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   * await client.connect()
+   * const ledgerIndex = await client.getLedgerIndex()
+   * console.log(ledgerIndex)
+   * // 884039
+   * ```
    */
   public async getLedgerIndex(): Promise<number> {
     const ledgerResponse = await this.request({
