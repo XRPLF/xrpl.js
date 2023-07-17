@@ -3,7 +3,7 @@ import { Amount, Currency, IssuedCurrencyAmount } from '../common'
 import { BaseRequest, BaseResponse } from './baseMethod'
 
 /**
- * The `amm_info` command retrieves information about an AMM instance.
+ * The `amm_info` method gets information about an Automated Market Maker (AMM) instance.
  * Returns an {@link AMMInfoResponse}.
  *
  * @category Requests
@@ -47,13 +47,13 @@ export interface AMMInfoResponse extends BaseResponse {
 
       /**
        * The total amount of one asset in the AMM's pool.
-       * Note: This could be asset or asset2 from the request.
+       * (Note: This could be asset or asset2 from the request)
        */
       amount: Amount
 
       /**
        * The total amount of the other asset in the AMM's pool.
-       * Note: This could be asset or asset2 from the request.
+       * (Note: This could be asset or asset2 from the request)
        */
       amount2: Amount
 
