@@ -160,7 +160,6 @@ type Request =
   | AccountObjectsRequest
   | AccountOffersRequest
   | AccountTxRequest
-  | AMMInfoRequest
   | GatewayBalancesRequest
   | NoRippleCheckRequest
   // ledger methods
@@ -198,6 +197,8 @@ type Request =
   // clio only methods
   | NFTInfoRequest
   | NFTHistoryRequest
+  // AMM methods
+  | AMMInfoRequest
 
 /**
  * @category Responses
@@ -212,7 +213,6 @@ type Response =
   | AccountObjectsResponse
   | AccountOffersResponse
   | AccountTxResponse
-  | AMMInfoResponse
   | GatewayBalancesResponse
   | NoRippleCheckResponse
   // ledger methods
@@ -250,6 +250,8 @@ type Response =
   // clio only methods
   | NFTInfoResponse
   | NFTHistoryResponse
+  // AMM methods
+  | AMMInfoResponse
 
 export {
   // Allow users to define their own requests and responses.  This is useful for releasing experimental versions
@@ -285,8 +287,6 @@ export {
   AccountTxRequest,
   AccountTxResponse,
   AccountTxTransaction,
-  AMMInfoRequest,
-  AMMInfoResponse,
   GatewayBalance,
   GatewayBalancesRequest,
   GatewayBalancesResponse,
@@ -385,4 +385,7 @@ export {
   NFTHistoryRequest,
   NFTHistoryResponse,
   NFTHistoryTransaction,
+  // AMM methods
+  AMMInfoRequest,
+  AMMInfoResponse,
 }

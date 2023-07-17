@@ -25,9 +25,6 @@ import {
   AccountOffersResponse,
   AccountTxRequest,
   AccountTxResponse,
-  // AMM methods
-  AMMInfoRequest,
-  AMMInfoResponse,
   GatewayBalancesRequest,
   GatewayBalancesResponse,
   NoRippleCheckRequest,
@@ -98,6 +95,9 @@ import {
   NFTInfoResponse,
   NFTHistoryRequest,
   NFTHistoryResponse,
+  // AMM methods
+  AMMInfoRequest,
+  AMMInfoResponse,
 } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 import {
