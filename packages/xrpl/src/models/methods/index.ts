@@ -276,7 +276,60 @@ export type RequestResponseMap<T> = T extends AccountChannelsRequest
   ? NoRippleCheckResponse
   : // NOTE: The order of these LedgerRequest types is important
   // to get the proper type matching overrides based on parameters set
-  // in the request.
+  // in the request. For example LedgerRequestExpandedTransactionsBinary
+  // should match LedgerRequestExpandedTransactionsOnly, but not
+  // LedgerRequestExpandedAccountsOnly. This is because the
+  // LedgerRequestExpandedTransactionsBinary type is a superset of
+  // LedgerRequestExpandedTransactionsOnly, but not of the other.
+  // This is why LedgerRequestExpandedTransactionsBinary is listed
+  // first in the type list.
+  //
+  // Here is an example using real data:
+  // LedgerRequestExpandedTransactionsBinary = {
+  //   command: 'ledger',
+  //   ledger_index: 'validated',
+  //   expand: true,
+  //   transactions: true,
+  //   binary: true,
+  // }
+  // LedgerRequestExpandedTransactionsOnly = {
+  //   command: 'ledger',
+  //   ledger_index: 'validated',
+  //   expand: true,
+  //   transactions: true,
+  // }
+  // LedgerRequestExpandedAccountsOnly = {
+  //   command: 'ledger',
+  //   ledger_index: 'validated',
+  //   accounts: true,
+  //   expand: true,
+  // }
+  // LedgerRequest = {
+  //   command: 'ledger',
+  //   ledger_index: 'validated',
+  // }
+  //
+  // The type with the most parameters set should be listed first. In this
+  // case LedgerRequestExpandedTransactionsBinary has the most parameters (`expand`, `transactions`, and `binary`)
+  // set, so it is listed first. When TypeScript tries to match the type of
+  // a request to a response, it will try to match the request type to the
+  // response type in the order they are listed. So, if we have a request
+  // with the following parameters:
+  // {
+  //   command: 'ledger',
+  //   ledger_index: 'validated',
+  //   expand: true,
+  //   transactions: true,
+  //   binary: true,
+  // }
+  // TypeScript will first try to match the request type to
+  // LedgerRequestExpandedTransactionsBinary, which will succeed. It will
+  // then try to match the response type to LedgerResponseExpanded, which
+  // will also succeed. If we had listed LedgerRequestExpandedTransactionsOnly
+  // first, TypeScript would have tried to match the request type to
+  // LedgerRequestExpandedTransactionsOnly, which would have succeeded, but
+  // then we'd get the wrong response type, LedgerResponse, instead of
+  // LedgerResponseExpanded.
   T extends LedgerRequestExpandedTransactionsBinary
   ? LedgerResponse
   : T extends LedgerRequestExpandedAccountsAndTransactions
