@@ -45,7 +45,7 @@ export interface AMMInfoResponse extends BaseResponse {
       /**
        * The account that tracks the balance of LPTokens between the AMM instance via Trustline.
        */
-      amm_account: string
+      account: string
 
       /**
        * One of the pool assets (XRP or token) of the AMM instance.
