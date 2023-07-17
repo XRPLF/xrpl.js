@@ -10,6 +10,7 @@ export * from './utils'
 export * from './errors'
 
 export { default as Wallet } from './Wallet'
+export { default as fundWallet, FundingOptions } from './wallet/fundWallet'
 
 export { keyToRFC1751Mnemonic, rfc1751MnemonicToKey } from './Wallet/rfc1751'
 

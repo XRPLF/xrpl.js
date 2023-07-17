@@ -17,15 +17,39 @@ const INTERVAL_SECONDS = 1
 // Maximum attempts to retrieve a balance
 const MAX_ATTEMPTS = 20
 
-interface FundingOptions {
-  faucetHost?: string
-  faucetPath?: string
+
+export interface FundingOptions {
+  /**
+   *  A custom amount to fund, if undefined or null, the default amount will be 1000.
+   */
   amount?: string
+  /**
+   * A custom host for a faucet server. On devnet, testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
+   * attempt to determine the correct server automatically. In other environments, or if you would like to customize
+   * the faucet host in devnet or testnet, you should provide the host using this option.
+   */
+  faucetHost?: string
+  /**
+   * A custom path for a faucet server. On devnet,
+   * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
+   * attempt to determine the correct path automatically. In other environments,
+   * or if you would like to customize the faucet path in devnet or testnet,
+   * you should provide the path using this option.
+   * Ex: client.fundWallet(null,{'faucet.altnet.rippletest.net', '/accounts'})
+   * specifies a request to 'faucet.altnet.rippletest.net/accounts' to fund a new wallet.
+   */
+  faucetPath?: string
+  /**
+   * An optional field to indicate the use case context of the faucet transaction
+   * Ex: integration test, code snippets.
+   */
+  usageContext?: string
 }
 
 interface FaucetRequestBody {
   destination?: string
   xrpAmount?: string
+  usageContext?: string
 }
 /**
  * The fundWallet() method is used to send an amount of XRP (usually 1000) to a new (randomly generated)
@@ -74,26 +98,14 @@ interface FaucetRequestBody {
  * @param this - Client.
  * @param wallet - An existing XRPL Wallet to fund. If undefined or null, a new Wallet will be created.
  * @param options - See below.
- * @param options.faucetHost - A custom host for a faucet server. On devnet,
- * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
- * attempt to determine the correct server automatically. In other environments,
- * or if you would like to customize the faucet host in devnet or testnet,
- * you should provide the host using this option.
- * @param options.faucetPath - A custom path for a faucet server. On devnet,
- * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
- * attempt to determine the correct path automatically. In other environments,
- * or if you would like to customize the faucet path in devnet or testnet,
- * you should provide the path using this option.
- * Ex: client.fundWallet(null,{'faucet.altnet.rippletest.net', '/accounts'})
- * specifies a request to 'faucet.altnet.rippletest.net/accounts' to fund a new wallet.
- * @param options.amount - A custom amount to fund, if undefined or null, the default amount will be 1000.
+
  * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP,
  * and that wallet's balance in XRP.
  * @throws When either Client isn't connected or unable to fund wallet address.
  */
 async function fundWallet(
   this: Client,
-  wallet?: Wallet | null,
+  wallet?: Wallet,
   options: FundingOptions = {},
 ): Promise<{
   wallet: Wallet
@@ -102,10 +114,10 @@ async function fundWallet(
   if (!this.isConnected()) {
     throw new RippledError('Client not connected, cannot call faucet')
   }
-  const createWallet = wallet === null
+  const createWallet = Boolean(wallet)
 
   // Generate a new Wallet if no existing Wallet is provided or its address is invalid to fund
-  const walletToFund: Wallet =
+  const walletToFund =
     wallet && isValidClassicAddress(wallet.classicAddress)
       ? wallet
       : Wallet.generate()
@@ -114,6 +126,7 @@ async function fundWallet(
   const postBody: FaucetRequestBody = {
     destination: walletToFund.classicAddress,
     xrpAmount: options.amount,
+    usageContext: options.usageContext,
   }
 
   let startingBalance = 0
@@ -170,15 +183,13 @@ async function requestFunding(
   }
   return Promise.reject(
     new XRPLFaucetError(
-      `Content type is not \`application/json\`: ${JSON.stringify({
+      `Request failed: ${JSON.stringify({
         body,
         contentType: response.headers.get('Content-Type'),
         statusCode: response.status,
       })}`,
     ),
   )
-
-  // POST the body
 }
 
 // eslint-disable-next-line max-params -- Only used as a helper function, lines inc due to added balance.
