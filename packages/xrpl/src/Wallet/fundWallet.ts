@@ -49,6 +49,7 @@ interface FaucetRequestBody {
   destination?: string
   xrpAmount?: string
   usageContext?: string
+  userAgent: string
 }
 /**
  * The fundWallet() method is used to send an amount of XRP (usually 1000) to a new (randomly generated)
@@ -126,6 +127,7 @@ async function fundWallet(
     destination: walletToFund.classicAddress,
     xrpAmount: options.amount,
     usageContext: options.usageContext,
+    userAgent: 'xrpl.js',
   }
 
   let startingBalance = 0
