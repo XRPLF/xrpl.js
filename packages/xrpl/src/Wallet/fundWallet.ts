@@ -17,7 +17,6 @@ const INTERVAL_SECONDS = 1
 // Maximum attempts to retrieve a balance
 const MAX_ATTEMPTS = 20
 
-
 export interface FundingOptions {
   /**
    *  A custom amount to fund, if undefined or null, the default amount will be 1000.
@@ -114,7 +113,7 @@ async function fundWallet(
   if (!this.isConnected()) {
     throw new RippledError('Client not connected, cannot call faucet')
   }
-  const createWallet = Boolean(wallet)
+  const existingWallet = Boolean(wallet)
 
   // Generate a new Wallet if no existing Wallet is provided or its address is invalid to fund
   const walletToFund =
@@ -130,7 +129,7 @@ async function fundWallet(
   }
 
   let startingBalance = 0
-  if (!createWallet) {
+  if (existingWallet) {
     try {
       startingBalance = Number(
         await this.getXrpBalance(walletToFund.classicAddress),
@@ -167,6 +166,7 @@ async function requestFunding(
     body: JSON.stringify(postBody),
   })
 
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Its a FaucetWallet
   const body = (await response.json()) as FaucetWallet
   // "application/json; charset=utf-8"
   if (
@@ -181,15 +181,7 @@ async function requestFunding(
       startingBalance,
     )
   }
-  return Promise.reject(
-    new XRPLFaucetError(
-      `Request failed: ${JSON.stringify({
-        body,
-        contentType: response.headers.get('Content-Type'),
-        statusCode: response.status,
-      })}`,
-    ),
-  )
+  return processError(response)
 }
 
 // eslint-disable-next-line max-params -- Only used as a helper function, lines inc due to added balance.
@@ -209,17 +201,18 @@ async function processSuccessfulResponse(
   }
   try {
     // Check at regular interval if the address is enabled on the XRPL and funded
-    const balance = await getUpdatedBalance(
+    const updatedBalance = await getUpdatedBalance(
       client,
       classicAddress,
       startingBalance,
     )
 
-    return {
-      wallet: walletToFund,
-      balance,
+    if (updatedBalance > startingBalance) {
+      return {
+        wallet: walletToFund,
+        balance: updatedBalance,
+      }
     }
-
     throw new XRPLFaucetError(
       `Unable to fund address with faucet after waiting ${
         INTERVAL_SECONDS * MAX_ATTEMPTS
@@ -231,6 +224,18 @@ async function processSuccessfulResponse(
     }
     throw err
   }
+}
+
+async function processError(response: Response) {
+  return Promise.reject(
+    new XRPLFaucetError(
+      `Request failed: ${JSON.stringify({
+        body: await response.json(),
+        contentType: response.headers.get('Content-Type'),
+        statusCode: response.status,
+      })}`,
+    ),
+  )
 }
 
 /**
