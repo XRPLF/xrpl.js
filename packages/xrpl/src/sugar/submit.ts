@@ -183,7 +183,7 @@ function isSigned(transaction: Transaction | string): boolean {
 }
 
 /**
- * Retrieves the signed transaction from the client.
+ * Updates a transaction with `autofill` then signs it if it is unsigned.
  *
  * @param client - The client from which to retrieve the signed transaction.
  * @param transaction - The transaction to retrieve. It can be either a Transaction object or
