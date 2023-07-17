@@ -10,7 +10,7 @@ import type {
 
 import { destroyServer, getFreePort } from './testUtils'
 
-function createResponse(
+export function createResponse(
   request: { id: number | string },
   response: Record<string, unknown>,
 ): string {

@@ -10,7 +10,7 @@ import {
   getDefaultFaucetPath,
 } from './defaultFaucets'
 
-import Wallet from '.'
+import { Wallet } from '.'
 
 // Interval to check an account balance
 const INTERVAL_SECONDS = 1
@@ -97,7 +97,7 @@ interface FaucetRequestBody {
  *
  * @param this - Client.
  * @param wallet - An existing XRPL Wallet to fund. If undefined or null, a new Wallet will be created.
- * @param options - See below.
+ * @param options - FundingOptions
 
  * @returns A Wallet on the Testnet or Devnet that contains some amount of XRP,
  * and that wallet's balance in XRP.
@@ -105,7 +105,7 @@ interface FaucetRequestBody {
  */
 async function fundWallet(
   this: Client,
-  wallet?: Wallet,
+  wallet?: Wallet | null,
   options: FundingOptions = {},
 ): Promise<{
   wallet: Wallet

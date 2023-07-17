@@ -1,7 +1,6 @@
-import { LedgerIndex } from '../common'
 import { LedgerEntry } from '../ledger'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * The `ledger_data` method retrieves contents of the specified ledger. You can
@@ -21,15 +20,8 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface LedgerDataRequest extends BaseRequest {
+export interface LedgerDataRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'ledger_data'
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * ledger automatically.
-   */
-  ledger_index?: LedgerIndex
   /**
    * If set to true, return ledger objects as hashed hex strings instead of
    * JSON.
@@ -47,13 +39,18 @@ export interface LedgerDataRequest extends BaseRequest {
   marker?: unknown
 }
 
-type LabeledLedgerEntry = { ledgerEntryType: string } & LedgerEntry
+export type LedgerDataLabeledLedgerEntry = {
+  ledgerEntryType: string
+} & LedgerEntry
 
-export interface BinaryLedgerEntry {
+export interface LedgerDataBinaryLedgerEntry {
   data: string
 }
 
-type State = { index: string } & (BinaryLedgerEntry | LabeledLedgerEntry)
+export type LedgerDataLedgerState = { index: string } & (
+  | LedgerDataBinaryLedgerEntry
+  | LedgerDataLabeledLedgerEntry
+)
 
 /**
  * The response expected from a {@link LedgerDataRequest}.
@@ -70,7 +67,7 @@ export interface LedgerDataResponse extends BaseResponse {
      * Array of JSON objects containing data from the ledger's state tree,
      * as defined below.
      */
-    state: State[]
+    state: LedgerDataLedgerState[]
     /**
      * Server-defined value indicating the response is paginated. Pass this to
      * the next call to resume where this call left off.

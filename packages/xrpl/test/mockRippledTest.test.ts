@@ -22,7 +22,7 @@ describe('mock rippled tests', function () {
     }
 
     await assertRejects(
-      testContext.client.request({ command: 'server_info' }),
+      testContext.client.request({ command: 'account_info' }),
       RippledError,
     )
   })

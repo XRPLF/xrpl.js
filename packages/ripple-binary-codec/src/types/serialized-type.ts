@@ -2,6 +2,7 @@ import { BytesList } from '../serdes/binary-serializer'
 import { BinaryParser } from '../serdes/binary-parser'
 import bigInt = require('big-integer')
 import { Buffer } from 'buffer/'
+import { XrplDefinitionsBase } from '../enums'
 
 type JSON = string | number | boolean | null | undefined | JSON[] | JsonObject
 
@@ -64,9 +65,12 @@ class SerializedType {
   /**
    * Return the JSON representation of a SerializedType
    *
+   * @param _definitions rippled definitions used to parse the values of transaction types and such.
+   *                          Unused in default, but used in STObject, STArray
+   *                          Can be customized for sidechains and amendments.
    * @returns any type, if not overloaded returns hexString representation of bytes
    */
-  toJSON(): JSON {
+  toJSON(_definitions?: XrplDefinitionsBase): JSON {
     return this.toHex()
   }
 

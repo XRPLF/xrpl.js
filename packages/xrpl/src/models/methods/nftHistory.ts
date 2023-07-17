@@ -1,7 +1,7 @@
-import { LedgerIndex, ResponseOnlyTxInfo } from '../common'
+import { ResponseOnlyTxInfo } from '../common'
 import { Transaction, TransactionMetadata } from '../transactions'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * The nft_history method retrieves a list of transactions that involved the
@@ -10,7 +10,7 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface NFTHistoryRequest extends BaseRequest {
+export interface NFTHistoryRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'nft_history'
   /**
    * The unique identifier of an NFToken.
@@ -28,10 +28,6 @@ export interface NFTHistoryRequest extends BaseRequest {
    * version available.
    */
   ledger_index_max?: number
-  /** Use to look for transactions from a single ledger only. */
-  ledger_hash?: string
-  /** Use to look for transactions from a single ledger only. */
-  ledger_index?: LedgerIndex
   /**
    * If true, return transactions as hex strings instead of JSON. The default is
    * false.
@@ -55,7 +51,7 @@ export interface NFTHistoryRequest extends BaseRequest {
   marker?: unknown
 }
 
-interface NFTokenTransaction {
+export interface NFTHistoryTransaction {
   /** The ledger index of the ledger version that included this transaction. */
   ledger_index: number
   /**
@@ -106,7 +102,7 @@ export interface NFTHistoryResponse extends BaseResponse {
      * Array of transactions matching the request's criteria, as explained
      * below.
      */
-    transactions: NFTokenTransaction[]
+    transactions: NFTHistoryTransaction[]
     /**
      * If included and set to true, the information in this response comes from
      * a validated ledger version. Otherwise, the information is subject to

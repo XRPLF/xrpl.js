@@ -3,8 +3,9 @@ import { decode, encode } from 'ripple-binary-codec'
 import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { Signer } from '../models/common'
-import { TxResponse } from '../models/methods'
+import { TxRequest, TxResponse } from '../models/methods'
 import { Transaction } from '../models/transactions'
+import { BaseTransaction } from '../models/transactions/common'
 import { hashes } from '../utils'
 
 /** Approximate time for a ledger to close, in milliseconds */
@@ -104,9 +105,9 @@ async function submit(
  * ledger, the promise returned by `submitAndWait()` will be rejected with an error.
  * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
  */
-async function submitAndWait(
+async function submitAndWait<T extends Transaction = Transaction>(
   this: Client,
-  transaction: Transaction | string,
+  transaction: T | string,
   opts?: {
     // If true, autofill a transaction.
     autofill?: boolean
@@ -115,7 +116,7 @@ async function submitAndWait(
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
     wallet?: Wallet
   },
-): Promise<TxResponse> {
+): Promise<TxResponse<T>> {
   const signedTx = await getSignedTx(this, transaction, opts)
 
   const lastLedger = getLastLedgerSequence(signedTx)
@@ -167,12 +168,14 @@ async function submitRequest(
  * latest ledger sequence (meaning it will never be included in a validated ledger).
  */
 // eslint-disable-next-line max-params, max-lines-per-function -- this function needs to display and do with more information.
-async function waitForFinalTransactionOutcome(
+async function waitForFinalTransactionOutcome<
+  T extends BaseTransaction = Transaction,
+>(
   client: Client,
   txHash: string,
   lastLedger: number,
   submissionResult: string,
-): Promise<TxResponse> {
+): Promise<TxResponse<T>> {
   await sleep(LEDGER_CLOSE_TIME)
 
   const latestLedger = await client.getLedgerIndex()
@@ -185,7 +188,7 @@ async function waitForFinalTransactionOutcome(
   }
 
   const txResponse = await client
-    .request({
+    .request<TxRequest, TxResponse<T>>({
       command: 'tx',
       transaction: txHash,
     })
@@ -194,7 +197,7 @@ async function waitForFinalTransactionOutcome(
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-member-access -- ^
       const message = error?.data?.error as string
       if (message === 'txnNotFound') {
-        return waitForFinalTransactionOutcome(
+        return waitForFinalTransactionOutcome<T>(
           client,
           txHash,
           lastLedger,
@@ -212,7 +215,7 @@ async function waitForFinalTransactionOutcome(
     return txResponse
   }
 
-  return waitForFinalTransactionOutcome(
+  return waitForFinalTransactionOutcome<T>(
     client,
     txHash,
     lastLedger,

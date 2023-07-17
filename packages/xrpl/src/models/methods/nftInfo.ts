@@ -1,26 +1,18 @@
-import { LedgerIndex, NFToken } from '../common'
+import { NFToken } from '../common'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
- * The `nft_info` method retrieves information about NFToken
- * NFToken.
+ * The `nft_info` method retrieves information about an NFToken.
  *
  * @category Requests
  */
-export interface NFTInfoRequest extends BaseRequest {
+export interface NFTInfoRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'nft_info'
   /**
    * The unique identifier of an NFToken.
    */
   nft_id: string
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * ledger automatically.
-   */
-  ledger_index?: LedgerIndex
 }
 
 /**

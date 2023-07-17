@@ -91,13 +91,11 @@ export interface GlobalFlags {}
  * Every transaction has the same set of common fields.
  */
 export interface BaseTransaction {
-  /** The unique address of the account that initiated the transaction. */
+  /** The unique address of the transaction sender. */
   Account: string
   /**
    * The type of transaction. Valid types include: `Payment`, `OfferCreate`,
-   * `SignerListSet`, `EscrowCreate`, `EscrowFinish`, `EscrowCancel`,
-   * `PaymentChannelCreate`, `PaymentChannelFund`, `PaymentChannelClaim`, and
-   * `DepositPreauth`.
+   * `TrustSet`, and many others.
    */
   TransactionType: string
   /**
@@ -159,6 +157,10 @@ export interface BaseTransaction {
    * account it says it is from.
    */
   TxnSignature?: string
+  /**
+   * The network id of the transaction.
+   */
+  NetworkID?: number
 }
 
 /**
@@ -251,6 +253,9 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
     typeof common.TxnSignature !== 'string'
   ) {
     throw new ValidationError('BaseTransaction: invalid TxnSignature')
+  }
+  if (common.NetworkID !== undefined && typeof common.NetworkID !== 'number') {
+    throw new ValidationError('BaseTransaction: invalid NetworkID')
   }
 }
 
