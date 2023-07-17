@@ -102,7 +102,7 @@ export async function submitRequest(
  *   response.result.engine_result,
  * )
  */
-// eslint-disable-next-line max-params -- this function needs to display and do with more information.
+// eslint-disable-next-line max-params, max-lines-per-function -- this function needs to display and do with more information.
 export async function waitForFinalTransactionOutcome<
   T extends BaseTransaction = Transaction,
 >(
@@ -122,28 +122,29 @@ export async function waitForFinalTransactionOutcome<
     )
   }
 
-  const txResponse = await client.request<TxRequest, TxResponse<T>>({
-    command: 'tx',
-    transaction: txHash,
-  })
-  // .catch(async (error) => {
-  //   // error is of an unknown type and hence we assert type to extract the value we need.
-  //   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-member-access -- ^
-  //   const message = error?.data?.error as string
-  //   if (message === 'txnNotFound') {
-  //     return waitForFinalTransactionOutcome<T>(
-  //       client,
-  //       txHash,
-  //       lastLedger,
-  //       submissionResult,
-  //     )
-  //   }
-  //   throw new Error(
-  //     `${message} \n Preliminary result: ${submissionResult}.\nFull error details: ${String(
-  //       error,
-  //     )}`,
-  //   )
-  // })
+  const txResponse = await client
+    .request<TxRequest, TxResponse<T>>({
+      command: 'tx',
+      transaction: txHash,
+    })
+    .catch(async (error) => {
+      // error is of an unknown type and hence we assert type to extract the value we need.
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-member-access -- ^
+      const message = error?.data?.error as string
+      if (message === 'txnNotFound') {
+        return waitForFinalTransactionOutcome<T>(
+          client,
+          txHash,
+          lastLedger,
+          submissionResult,
+        )
+      }
+      throw new Error(
+        `${message} \n Preliminary result: ${submissionResult}.\nFull error details: ${String(
+          error,
+        )}`,
+      )
+    })
 
   if (txResponse.result.validated) {
     return txResponse
