@@ -261,7 +261,7 @@ async function fetchAccountDeleteFee(client: Client): Promise<BigNumber> {
  * @param client - The client object.
  * @param tx - The transaction object.
  * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
- * @returns A promise that resolves with void.
+ * @returns A promise that resolves with void. Modifies the `tx` parameter to give it the calculated fee.
  */
 export async function calculateFeePerTransactionType(
   client: Client,
