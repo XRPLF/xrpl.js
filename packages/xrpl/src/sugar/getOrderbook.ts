@@ -123,7 +123,6 @@ async function getOrderbook(
   const directOffers = directOfferResults.flatMap(
     (directOfferResult: BookOffersResponse) => directOfferResult.result.offers,
   )
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   const reverseOffers = reverseOfferResults.flatMap(
     (reverseOfferResult) => reverseOfferResult.result.offers,
   )

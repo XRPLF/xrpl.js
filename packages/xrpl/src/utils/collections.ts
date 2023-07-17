@@ -16,13 +16,17 @@ export function groupBy<T>(
   array: T[],
   iteratee: (value: T, index: number, array: T[]) => string,
 ): { [p: string]: T[] } {
-  return array.reduce<{ [key: string]: T[] }>(
-    (acc, value, index, arrayReference) => {
-      ;(acc[iteratee(value, index, arrayReference)] ||= []).push(value)
-      return acc
-    },
-    {},
-  )
+  // eslint-disable-next-line max-params -- need all the params for the fallback
+  return array.reduce<{ [key: string]: T[] }>(function predicate(
+    acc,
+    value,
+    index,
+    arrayReference,
+  ) {
+    ;(acc[iteratee(value, index, arrayReference)] ||= []).push(value)
+    return acc
+  },
+  {})
 }
 
 /**

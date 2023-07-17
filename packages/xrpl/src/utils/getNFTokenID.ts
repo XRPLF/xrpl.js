@@ -32,6 +32,7 @@ function ensureDecodedMeta(
  * @returns The NFTokenID for the minted NFT.
  * @throws if meta is not TransactionMetadata.
  */
+// eslint-disable-next-line max-lines-per-function -- This function has a lot of documentation
 export default function getNFTokenID(
   meta: TransactionMetadata | string | undefined,
 ): string | undefined {
@@ -56,7 +57,6 @@ export default function getNFTokenID(
    * not changed. Thus why we add the additional condition to check
    * if the PreviousFields contains NFTokens
    */
-
   const affectedNodes = decodedMeta.AffectedNodes.filter((node) => {
     if (isCreatedNode(node)) {
       return node.CreatedNode.LedgerEntryType === 'NFTokenPage'
@@ -93,7 +93,6 @@ export default function getNFTokenID(
     .filter((nftokenID) => Boolean(nftokenID))
   /* eslint-enable @typescript-eslint/consistent-type-assertions -- Necessary for parsing metadata */
   /* eslint-enable @typescript-eslint/no-unnecessary-condition -- Cleaner to read */
-
   const nftokenID = finalTokenIDs.find((id) => !previousTokenIDSet.has(id))
 
   return nftokenID
