@@ -226,7 +226,7 @@ async function processSuccessfulResponse(
   }
 }
 
-async function processError(response: Response): Promise<void> {
+async function processError(response: Response): Promise<never> {
   return Promise.reject(
     new XRPLFaucetError(
       `Request failed: ${JSON.stringify({
