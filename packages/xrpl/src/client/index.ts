@@ -95,6 +95,7 @@ export interface ClientOptions extends ConnectionUserOptions {
   timeout?: number
 }
 
+// Make sure to update both this and `RequestNextPageReturnMap` at the same time
 type RequestNextPageType =
   | AccountChannelsRequest
   | AccountLinesRequest
