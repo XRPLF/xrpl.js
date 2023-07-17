@@ -191,8 +191,6 @@ function isSigned(transaction: Transaction | string): boolean {
  * @param [options={}] - Optional. Additional options for retrieving the signed transaction.
  * @param [options.autofill=true] - Optional. Determines whether the transaction should be autofilled (true)
  * or not (false). Default is true.
- * @param [options.failHard] - Optional. If true, and the transaction fails locally, do not retry or relay the
- * transaction to other servers. Default is undefined.
  * @param [options.wallet] - Optional. A wallet to sign the transaction. It must be provided when submitting
  * an unsigned transaction. Default is undefined.
  * @returns A promise that resolves with the signed transaction.
@@ -226,8 +224,6 @@ export async function getSignedTx(
   }: {
     // If true, autofill a transaction.
     autofill?: boolean
-    // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
-    failHard?: boolean
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
     wallet?: Wallet
   } = {},
