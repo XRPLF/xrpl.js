@@ -3,11 +3,11 @@ import { Amount } from '../common'
 import BaseLedgerEntry from './BaseLedgerEntry'
 
 /**
- * The HookState object type contains the
+ * The URIToken object type contains the
  *
  * @category Ledger Entries
  */
-export default interface HookState extends BaseLedgerEntry {
+export default interface URIToken extends BaseLedgerEntry {
   LedgerEntryType: 'URIToken'
 
   /**
