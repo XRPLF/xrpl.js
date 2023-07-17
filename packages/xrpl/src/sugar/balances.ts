@@ -1,10 +1,4 @@
-import { AccountLinesTrustline } from '../models'
-
-export interface Balance {
-  value: string
-  currency: string
-  issuer?: string
-}
+import { AccountLinesTrustline, Balance } from '../models'
 
 /**
  * Formats an array of trustlines into an array of balances.
