@@ -1,5 +1,5 @@
 /* eslint-disable jsdoc/require-jsdoc -- Request has many aliases, but they don't need unique docs */
-/* eslint-disable @typescript-eslint/member-ordering -- TODO: remove when instance methods aren't members */
+
 /* eslint-disable max-lines -- Client is a large file w/ lots of imports/exports */
 import * as assert from 'assert'
 import { EventEmitter } from 'events'
@@ -30,18 +30,26 @@ import {
   // ledger methods
   LedgerDataRequest,
   LedgerDataResponse,
+  TxResponse,
 } from '../models/methods'
 import type {
   RequestResponseMap,
   RequestAllResponseMap,
   MarkerRequest,
   MarkerResponse,
+  SubmitResponse,
 } from '../models/methods'
 import type { BookOffer, BookOfferCurrency } from '../models/methods/bookOffers'
 import type { OnEventToListenerMap } from '../models/methods/subscribe'
 import type { Transaction } from '../models/transactions'
 import { setTransactionFlagsToNumber } from '../models/utils/flags'
-import { ensureClassicAddress, submit, submitAndWait } from '../sugar'
+import {
+  ensureClassicAddress,
+  submitRequest,
+  getSignedTx,
+  getLastLedgerSequence,
+  waitForFinalTransactionOutcome,
+} from '../sugar'
 import {
   setValidAddresses,
   setNextValidSequenceNumber,
@@ -61,7 +69,7 @@ import {
   separateBuySellOrders,
   sortAndLimitOffers,
 } from '../sugar/getOrderbook'
-import { dropsToXrp } from '../utils'
+import { dropsToXrp, hashes } from '../utils'
 import { Wallet } from '../Wallet'
 import {
   type FundWalletOptions,
@@ -590,13 +598,124 @@ class Client extends EventEmitter {
   }
 
   /**
+   * Submits a signed/unsigned transaction.
+   * Steps performed on a transaction:
+   *    1. Autofill.
+   *    2. Sign & Encode.
+   *    3. Submit.
+   *
    * @category Core
+   *
+   * @param transaction - A transaction to autofill, sign & encode, and submit.
+   * @param opts - (Optional) Options used to sign and submit a transaction.
+   * @param opts.autofill - If true, autofill a transaction.
+   * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+   * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+   * @returns A promise that contains SubmitResponse.
+   * @throws RippledError if submit request fails.
    */
-  public submit = submit
+  public async submit(
+    transaction: Transaction | string,
+    opts?: {
+      // If true, autofill a transaction.
+      autofill?: boolean
+      // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+      failHard?: boolean
+      // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+      wallet?: Wallet
+    },
+  ): Promise<SubmitResponse> {
+    const signedTx = await getSignedTx(this, transaction, opts)
+    return submitRequest(this, signedTx, opts?.failHard)
+  }
+
   /**
+   * Asynchronously submits a transaction and verifies that it has been included in a
+   * validated ledger (or has errored/will not be included for some reason).
+   * See [Reliable Transaction Submission](https://xrpl.org/reliable-transaction-submission.html).
+   *
    * @category Core
+   *
+   * @example
+   *
+   * ```ts
+   * const { Client, Wallet } = require('xrpl')
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   *
+   * async function submitTransaction() {
+   *   const senderWallet = client.fundWallet()
+   *   const recipientWallet = client.fundWallet()
+   *
+   *   const transaction = {
+   *     TransactionType: 'Payment',
+   *     Account: senderWallet.address,
+   *     Destination: recipientWallet.address,
+   *     Amount: '10'
+   *   }
+   *
+   *   try {
+   *     await client.submit(signedTransaction, { wallet: senderWallet })
+   *     console.log(result)
+   *   } catch (error) {
+   *     console.error(`Failed to submit transaction: ${error}`)
+   *   }
+   * }
+   *
+   * submitTransaction()
+   * ```
+   *
+   * In this example we submit a payment transaction between two newly created testnet accounts.
+   *
+   * Under the hood, `submit` will call `client.autofill` by default, and because we've passed in a `Wallet` it
+   * Will also sign the transaction for us before submitting the signed transaction binary blob to the ledger.
+   *
+   * This is similar to `submitAndWait` which does all of the above, but also waits to see if the transaction has been validated.
+   * @param transaction - A transaction to autofill, sign & encode, and submit.
+   * @param opts - (Optional) Options used to sign and submit a transaction.
+   * @param opts.autofill - If true, autofill a transaction.
+   * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+   * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+   * @throws Connection errors: If the `Client` object is unable to establish a connection to the specified WebSocket endpoint,
+   * an error will be thrown.
+   * @throws Transaction errors: If the submitted transaction is invalid or cannot be included in a validated ledger for any
+   * reason, the promise returned by `submitAndWait()` will be rejected with an error. This could include issues with insufficient
+   * balance, invalid transaction fields, or other issues specific to the transaction being submitted.
+   * @throws Ledger errors: If the ledger being used to submit the transaction is undergoing maintenance or otherwise unavailable,
+   * an error will be thrown.
+   * @throws Timeout errors: If the transaction takes longer than the specified timeout period to be included in a validated
+   * ledger, the promise returned by `submitAndWait()` will be rejected with an error.
+   * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
    */
-  public submitAndWait = submitAndWait
+  public async submitAndWait<T extends Transaction = Transaction>(
+    transaction: T | string,
+    opts?: {
+      // If true, autofill a transaction.
+      autofill?: boolean
+      // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
+      failHard?: boolean
+      // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+      wallet?: Wallet
+    },
+  ): Promise<TxResponse<T>> {
+    const signedTx = await getSignedTx(this, transaction, opts)
+
+    const lastLedger = getLastLedgerSequence(signedTx)
+    if (lastLedger == null) {
+      throw new ValidationError(
+        'Transaction must contain a LastLedgerSequence value for reliable submission.',
+      )
+    }
+
+    const response = await submitRequest(this, signedTx, opts?.failHard)
+
+    const txHash = hashes.hashSignedTx(signedTx)
+    return waitForFinalTransactionOutcome(
+      this,
+      txHash,
+      lastLedger,
+      response.result.engine_result,
+    )
+  }
 
   /**
    * Deprecated: Use autofill instead, provided for users familiar with v1
