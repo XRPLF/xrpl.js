@@ -18,42 +18,43 @@ interface AuthAccount {
 }
 
 /**
- * AMMBid is used for submitting a vote for the trading fee of an AMM Instance.
+ * Bid on an Automated Market Maker's (AMM's) auction slot.
  *
- * Any XRPL account that holds LPToken for an AMM instance may submit this
- * transaction to vote for the trading fee for that instance.
+ * If you win, you can trade against the AMM at a discounted fee until you are outbid or 24 hours have passed.
+ * If you are outbid before 24 hours have passed, you are refunded part of the cost of your bid based on how much time remains.
+ * You bid using the AMM's LP Tokens; the amount of a winning bid is returned to the AMM,
+ * decreasing the outstanding balance of LP Tokens.
  */
 export interface AMMBid extends BaseTransaction {
   TransactionType: 'AMMBid'
 
   /**
-   * Specifies one of the pool assets (XRP or token) of the AMM instance.
+   * The definition for one of the assets in the AMM's pool.
    */
   Asset: Currency
 
   /**
-   * Specifies the other pool asset of the AMM instance.
+   * The definition for the other asset in the AMM's pool.
    */
   Asset2: Currency
 
   /**
-   * This field represents the minimum price that the bidder wants to pay for the slot.
-   * It is specified in units of LPToken. If specified let BidMin be X and let
-   * the slot-price computed by price scheduling algorithm be Y, then bidder always pays
-   * the max(X, Y).
+   * Pay at least this amount for the slot.
+   * Setting this value higher makes it harder for others to outbid you.
+   * If omitted, pay the minimum necessary to win the bid.
    */
   BidMin?: Amount
 
   /**
-   * This field represents the maximum price that the bidder wants to pay for the slot.
-   * It is specified in units of LPToken.
+   * Pay at most this amount for the slot.
+   * If the cost to win the bid is higher than this amount, the transaction fails.
+   * If omitted, pay as much as necessary to win the bid.
    */
   BidMax?: Amount
 
   /**
-   * This field represents an array of XRPL account IDs that are authorized to trade
-   * at the discounted fee against the AMM instance.
-   * A maximum of four accounts can be provided.
+   * A list of up to 4 additional accounts that you allow to trade at the discounted fee.
+   * This cannot include the address of the transaction sender.
    */
   AuthAccounts?: AuthAccount[]
 }

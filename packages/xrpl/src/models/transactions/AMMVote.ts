@@ -5,29 +5,27 @@ import { AMM_MAX_TRADING_FEE } from './AMMCreate'
 import { BaseTransaction, isCurrency, validateBaseTransaction } from './common'
 
 /**
- * AMMVote is used for submitting a vote for the trading fee of an AMM Instance.
+ * Vote on the trading fee for an Automated Market Maker (AMM) instance.
  *
- * Any XRPL account that holds LPToken for an AMM instance may submit this
- * transaction to vote for the trading fee for that instance.
+ * Up to 8 accounts can vote in proportion to the amount of the AMM's LP Tokens they hold.
+ * Each new vote re-calculates the AMM's trading fee based on a weighted average of the votes.
  */
 export interface AMMVote extends BaseTransaction {
   TransactionType: 'AMMVote'
 
   /**
-   * Specifies one of the pool assets (XRP or token) of the AMM instance.
+   * The definition for one of the assets in the AMM's pool.
    */
   Asset: Currency
 
   /**
-   * Specifies the other pool asset of the AMM instance.
+   * The definition for the other asset in the AMM's pool.
    */
   Asset2: Currency
 
   /**
-   * Specifies the fee, in basis point.
-   * Valid values for this field are between 0 and 1000 inclusive.
-   * A value of 1 is equivalent to 1/10 bps or 0.001%, allowing trading fee
-   * between 0% and 1%. This field is required.
+   * The proposed fee to vote for, in units of 1/100,000; a value of 1 is equivalent to 0.001%.
+   * The maximum value is 1000, indicating a 1% fee.
    */
   TradingFee: number
 }

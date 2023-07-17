@@ -33,51 +33,46 @@ export interface AMMDepositFlagsInterface extends GlobalFlags {
 }
 
 /**
- * AMMDeposit is the deposit transaction used to add liquidity to the AMM instance pool,
- * thus obtaining some share of the instance's pools in the form of LPTokenOut.
+ * Deposit funds into an Automated Market Maker (AMM) instance
+ * and receive the AMM's liquidity provider tokens (LP Tokens) in exchange.
  *
- * The following are the recommended valid combinations:
- * - LPTokenOut
- * - Amount
- * - Amount and Amount2
- * - Amount and LPTokenOut
- * - Amount and EPrice
+ * You can deposit one or both of the assets in the AMM's pool.
+ * If successful, this transaction creates a trust line to the AMM Account (limit 0) to hold the LP Tokens.
  */
 export interface AMMDeposit extends BaseTransaction {
   TransactionType: 'AMMDeposit'
 
   /**
-   * Specifies one of the pool assets (XRP or token) of the AMM instance.
+   * The definition for one of the assets in the AMM's pool.
    */
   Asset: Currency
 
   /**
-   * Specifies the other pool asset of the AMM instance.
+   * The definition for the other asset in the AMM's pool.
    */
   Asset2: Currency
 
   /**
-   * Specifies the amount of shares of the AMM instance pools that the trader
-   * wants to redeem or trade in.
-   */
-  LPTokenOut?: IssuedCurrencyAmount
-
-  /**
-   * Specifies one of the pool assets (XRP or token) of the AMM instance to
-   * deposit more of its value.
+   * The amount of one asset to deposit to the AMM.
+   * If present, this must match the type of one of the assets (tokens or XRP) in the AMM's pool.
    */
   Amount?: Amount
 
   /**
-   * Specifies the other pool asset of the AMM instance to deposit more of
-   * its value.
+   * The amount of another asset to add to the AMM.
+   * If present, this must match the type of the other asset in the AMM's pool and cannot be the same asset as Amount.
    */
   Amount2?: Amount
 
   /**
-   * Specifies the maximum effective-price that LPTokenOut can be traded out.
+   * The maximum effective price, in the deposit asset, to pay for each LP Token received.
    */
   EPrice?: Amount
+
+  /**
+   * How many of the AMM's LP Tokens to buy.
+   */
+  LPTokenOut?: IssuedCurrencyAmount
 }
 
 /**

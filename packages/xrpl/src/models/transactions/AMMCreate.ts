@@ -6,31 +6,35 @@ import { BaseTransaction, isAmount, validateBaseTransaction } from './common'
 export const AMM_MAX_TRADING_FEE = 1000
 
 /**
- * AMMCreate is used to create AccountRoot and the corresponding
- * AMM ledger entries.
+ * Create a new Automated Market Maker (AMM) instance for trading a pair of assets (fungible tokens or XRP).
  *
- * This allows for the creation of only one AMM instance per unique asset pair.
+ * Creates both an AMM object and a special AccountRoot object to represent the AMM.
+ * Also transfers ownership of the starting balance of both assets from the sender to the created AccountRoot
+ * and issues an initial balance of liquidity provider tokens (LP Tokens) from the AMM account to the sender.
+ *
+ * Caution: When you create the AMM, you should fund it with (approximately) equal-value amounts of each asset.
+ * Otherwise, other users can profit at your expense by trading with this AMM (performing arbitrage).
+ * The currency risk that liquidity providers take on increases with the volatility (potential for imbalance) of the asset pair.
+ * The higher the trading fee, the more it offsets this risk,
+ * so it's best to set the trading fee based on the volatility of the asset pair.
  */
 export interface AMMCreate extends BaseTransaction {
   TransactionType: 'AMMCreate'
 
   /**
-   * Specifies one of the pool assets (XRP or token) of the AMM instance.
+   * The first of the two assets to fund this AMM with. This must be a positive amount.
    */
   Amount: Amount
 
   /**
-   * Specifies the other pool asset of the AMM instance.
+   * The second of the two assets to fund this AMM with. This must be a positive amount.
    */
   Amount2: Amount
 
   /**
-   * Specifies the fee, in basis point, to be charged
-   * to the traders for the trades executed against the AMM instance.
-   * Trading fee is a percentage of the trading volume.
-   * Valid values for this field are between 0 and 1000 inclusive.
-   * A value of 1 is equivalent to 1/10 bps or 0.001%, allowing trading fee
-   * between 0% and 1%.
+   * The fee to charge for trades against this AMM instance, in units of 1/100,000; a value of 1 is equivalent to 0.001%.
+   * The maximum value is 1000, indicating a 1% fee.
+   * The minimum value is 0.
    */
   TradingFee: number
 }
