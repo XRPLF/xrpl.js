@@ -226,12 +226,9 @@ interface LedgerResponseResult extends LedgerResponseBase {
   ledger: LedgerBinary
 }
 
-// This is the default
-// expand = false
-// binary = false
-// Matches basic LedgerRequest
 /**
  * Response expected from a {@link LedgerRequest}.
+ * This is the default request response, triggered when `expand` and `binary` are both false.
  *
  * @category Responses
  */
@@ -244,12 +241,11 @@ interface LedgerResponseExpandedResult extends LedgerResponseBase {
   ledger: Ledger
 }
 
-// expand = true
-// accounts OR transactions OR both
-// binary missing altogether
-// matches LedgerRequestExpanded
 /**
- * Response expected from a {@link LedgerRequest} when the request contains expanded: true. See {@link LedgerRequestExpanded}.
+ * Response expected from a {@link LedgerRequest} when the request contains `expanded` is true. See {@link LedgerRequestExpanded}.
+ * This response will contain full JSON-formatted data instead of string hashes.
+ * The response will contain either `accounts` or `transactions` or both.
+ * `binary` will be missing altogether.
  *
  * @category Responses
  */
