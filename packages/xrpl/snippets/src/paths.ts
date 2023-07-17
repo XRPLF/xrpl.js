@@ -16,6 +16,7 @@ async function createTxWithPaths(): Promise<void> {
   }
 
   const resp = await client.request({
+    // TOOD: Replace with path_find - https://github.com/XRPLF/xrpl.js/issues/2385
     command: 'ripple_path_find',
     source_account: wallet.classicAddress,
     source_currencies: [
