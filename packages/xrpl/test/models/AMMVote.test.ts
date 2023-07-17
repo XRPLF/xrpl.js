@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 
 import { validate, ValidationError } from '../../src'
+import { validateAMMVote } from '../../src/models/transactions/AMMVote'
 
 /**
  * AMMVote Transaction Verification Testing.
@@ -27,78 +28,63 @@ describe('AMMVote', function () {
   })
 
   it(`verifies valid AMMVote`, function () {
+    assert.doesNotThrow(() => validateAMMVote(vote))
     assert.doesNotThrow(() => validate(vote))
   })
 
   it(`throws w/ missing field Asset`, function () {
     delete vote.Asset
-    assert.throws(
-      () => validate(vote),
-      ValidationError,
-      'AMMVote: missing field Asset',
-    )
+    const errorMessage = 'AMMVote: missing field Asset'
+    assert.throws(() => validateAMMVote(vote), ValidationError, errorMessage)
+    assert.throws(() => validate(vote), ValidationError, errorMessage)
   })
 
   it(`throws w/ Asset must be an Issue`, function () {
     vote.Asset = 1234
-    assert.throws(
-      () => validate(vote),
-      ValidationError,
-      'AMMVote: Asset must be an Issue',
-    )
+    const errorMessage = 'AMMVote: Asset must be an Issue'
+    assert.throws(() => validateAMMVote(vote), ValidationError, errorMessage)
+    assert.throws(() => validate(vote), ValidationError, errorMessage)
   })
 
   it(`throws w/ missing field Asset2`, function () {
     delete vote.Asset2
-    assert.throws(
-      () => validate(vote),
-      ValidationError,
-      'AMMVote: missing field Asset2',
-    )
+    const errorMessage = 'AMMVote: missing field Asset2'
+    assert.throws(() => validateAMMVote(vote), ValidationError, errorMessage)
+    assert.throws(() => validate(vote), ValidationError, errorMessage)
   })
 
   it(`throws w/ Asset2 must be an Issue`, function () {
     vote.Asset2 = 1234
-    assert.throws(
-      () => validate(vote),
-      ValidationError,
-      'AMMVote: Asset2 must be an Issue',
-    )
+    const errorMessage = 'AMMVote: Asset2 must be an Issue'
+    assert.throws(() => validateAMMVote(vote), ValidationError, errorMessage)
+    assert.throws(() => validate(vote), ValidationError, errorMessage)
   })
 
   it(`throws w/ missing field TradingFee`, function () {
     delete vote.TradingFee
-    assert.throws(
-      () => validate(vote),
-      ValidationError,
-      'AMMVote: missing field TradingFee',
-    )
+    const errorMessage = 'AMMVote: missing field TradingFee'
+    assert.throws(() => validateAMMVote(vote), ValidationError, errorMessage)
+    assert.throws(() => validate(vote), ValidationError, errorMessage)
   })
 
   it(`throws w/ TradingFee must be a number`, function () {
     vote.TradingFee = '25'
-    assert.throws(
-      () => validate(vote),
-      ValidationError,
-      'AMMVote: TradingFee must be a number',
-    )
+    const errorMessage = 'AMMVote: TradingFee must be a number'
+    assert.throws(() => validateAMMVote(vote), ValidationError, errorMessage)
+    assert.throws(() => validate(vote), ValidationError, errorMessage)
   })
 
   it(`throws when TradingFee is greater than AMM_MAX_TRADING_FEE`, function () {
     vote.TradingFee = 1001
-    assert.throws(
-      () => validate(vote),
-      ValidationError,
-      'AMMVote: TradingFee must be between 0 and 1000',
-    )
+    const errorMessage = 'AMMVote: TradingFee must be between 0 and 1000'
+    assert.throws(() => validateAMMVote(vote), ValidationError, errorMessage)
+    assert.throws(() => validate(vote), ValidationError, errorMessage)
   })
 
   it(`throws when TradingFee is a negative number`, function () {
     vote.TradingFee = -1
-    assert.throws(
-      () => validate(vote),
-      ValidationError,
-      'AMMVote: TradingFee must be between 0 and 1000',
-    )
+    const errorMessage = 'AMMVote: TradingFee must be between 0 and 1000'
+    assert.throws(() => validateAMMVote(vote), ValidationError, errorMessage)
+    assert.throws(() => validate(vote), ValidationError, errorMessage)
   })
 })

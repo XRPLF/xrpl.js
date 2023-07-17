@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 
 import { validate, ValidationError } from '../../src'
+import { validateAMMBid } from '../../src/models/transactions/AMMBid'
 
 /**
  * AMMBid Transaction Verification Testing.
@@ -50,61 +51,50 @@ describe('AMMBid', function () {
   })
 
   it(`verifies valid AMMBid`, function () {
+    assert.doesNotThrow(() => validateAMMBid(bid))
     assert.doesNotThrow(() => validate(bid))
   })
 
   it(`throws w/ missing field Asset`, function () {
     delete bid.Asset
-    assert.throws(
-      () => validate(bid),
-      ValidationError,
-      'AMMBid: missing field Asset',
-    )
+    const errorMessage = 'AMMBid: missing field Asset'
+    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
+    assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
 
   it(`throws w/ Asset must be an Issue`, function () {
     bid.Asset = 1234
-    assert.throws(
-      () => validate(bid),
-      ValidationError,
-      'AMMBid: Asset must be an Issue',
-    )
+    const errorMessage = 'AMMBid: Asset must be an Issue'
+    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
+    assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
 
   it(`throws w/ missing field Asset2`, function () {
     delete bid.Asset2
-    assert.throws(
-      () => validate(bid),
-      ValidationError,
-      'AMMBid: missing field Asset2',
-    )
+    const errorMessage = 'AMMBid: missing field Asset2'
+    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
+    assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
 
   it(`throws w/ Asset2 must be an Issue`, function () {
     bid.Asset2 = 1234
-    assert.throws(
-      () => validate(bid),
-      ValidationError,
-      'AMMBid: Asset2 must be an Issue',
-    )
+    const errorMessage = 'AMMBid: Asset2 must be an Issue'
+    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
+    assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
 
   it(`throws w/ BidMin must be an Amount`, function () {
     bid.BidMin = 5
-    assert.throws(
-      () => validate(bid),
-      ValidationError,
-      'AMMBid: BidMin must be an Amount',
-    )
+    const errorMessage = 'AMMBid: BidMin must be an Amount'
+    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
+    assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
 
   it(`throws w/ BidMax must be an Amount`, function () {
     bid.BidMax = 10
-    assert.throws(
-      () => validate(bid),
-      ValidationError,
-      'AMMBid: BidMax must be an Amount',
-    )
+    const errorMessage = 'AMMBid: BidMax must be an Amount'
+    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
+    assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
 
   it(`throws w/ AuthAccounts length must not be greater than 4`, function () {
@@ -113,11 +103,9 @@ describe('AMMBid', function () {
         Account: 'r3X6noRsvaLapAKCG78zAtWcbhB3sggS1s',
       },
     })
-
-    assert.throws(
-      () => validate(bid),
-      ValidationError,
-      'AMMBid: AuthAccounts length must not be greater than 4',
-    )
+    const errorMessage =
+      'AMMBid: AuthAccounts length must not be greater than 4'
+    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
+    assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
 })
