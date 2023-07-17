@@ -12,14 +12,12 @@ export interface AMMInfoRequest extends BaseRequest {
   command: 'amm_info'
 
   /**
-   * Specifies one of the pool assets (XRP or token) of the AMM instance.
-   * Both asset and asset2 must be defined to specify an AMM instance.
+   * One of the assets of the AMM pool to look up.
    */
   asset: Currency
 
   /**
-   * Specifies the other pool asset of the AMM instance.
-   * Both asset and asset2 must be defined to specify an AMM instance.
+   * The other asset of the AMM pool.
    */
   asset2: Currency
 }
@@ -43,17 +41,19 @@ export interface AMMInfoResponse extends BaseResponse {
   result: {
     amm: {
       /**
-       * The account that tracks the balance of LPTokens between the AMM instance via Trustline.
+       * The address of the AMM Account.
        */
       account: string
 
       /**
-       * One of the pool assets (XRP or token) of the AMM instance.
+       * The total amount of one asset in the AMM's pool.
+       * Note: This could be asset or asset2 from the request.
        */
       amount: Amount
 
       /**
-       * The other pool asset of the AMM instance.
+       * The total amount of the other asset in the AMM's pool.
+       * Note: This could be asset or asset2 from the request.
        */
       amount2: Amount
 
@@ -68,59 +68,61 @@ export interface AMMInfoResponse extends BaseResponse {
       asset2_frozen: boolean
 
       /**
-       * Details of the current owner of the auction slot.
+       * (May be omitted) An Auction Slot Object describing the current auction slot holder, if there is one.
        */
       auction_slot?: {
         /**
-         * The current owner of this auction slot.
+         * The address of the account that owns the auction slot.
          */
         account: string
 
         /**
-         * A list of at most 4 additional accounts that are authorized to trade at the discounted fee for this AMM instance.
+         * A list of additional accounts that the auction slot holder has designated as being eligible
+         * of the discounted trading fee.
+         * Each member of this array is an object with one field, account, containing the address of the designated account.
          */
         auth_accounts: AuthAccount[]
 
         /**
-         * The trading fee to be charged to the auction owner, in the same format as TradingFee.
-         * By default this is 0, meaning that the auction owner can trade at no fee instead of the standard fee for this AMM.
+         * The discounted trading fee that applies to the auction slot holder, and any eligible accounts
+         * when trading against this AMM.
+         * This is always 0.
          */
         discounted_fee: number
 
         /**
-         * The time when this slot expires, in seconds since the Ripple Epoch.
+         * The ISO 8601 UTC timestamp after which this auction slot expires.
+         * After expired, the auction slot does not apply (but the data can remain in the ledger
+         * until another transaction replaces it or cleans it up).
          */
         expiration: string
 
         /**
-         * The amount the auction owner paid to win this slot, in LPTokens.
+         * The amount, in LP Tokens, that the auction slot holder paid to win the auction slot.
+         * This affects the price to outbid the current slot holder.
          */
         price: Amount
 
         /**
-         * Total slot time of 24-hours is divided into 20 equal time intervals.
+         * The current 72-minute time interval this auction slot is in, from 0 to 19.
+         * The auction slot expires after 24 hours (20 intervals of 72 minutes)
+         * and affects the cost to outbid the current holder and how much the current holder is refunded if someone outbids them.
          */
         time_interval: number
       }
 
       /**
-       * The total outstanding balance of liquidity provider tokens from this AMM instance.
-       * The holders of these tokens can vote on the AMM's trading fee in proportion to their holdings,
-       * or redeem the tokens for a share of the AMM's assets which grows with the trading fees collected.
+       * The total amount of this AMM's LP Tokens outstanding.
        */
       lp_token: IssuedCurrencyAmount
 
       /**
-       * Specifies the fee, in basis point, to be charged to the traders for the trades
-       * executed against the AMM instance. Trading fee is a percentage of the trading volume.
-       * Valid values for this field are between 0 and 1000 inclusive.
-       * A value of 1 is equivalent to 1/10 bps or 0.001%, allowing trading fee
-       * between 0% and 1%. This field is required.
+       * The AMM's current trading fee, in units of 1/100,000; a value of 1 is equivalent to a 0.001% fee.
        */
       trading_fee: number
 
       /**
-       * Keeps a track of up to eight active votes for the instance.
+       * (May be omitted) The current votes for the AMM's trading fee, as Vote Slot Objects.
        */
       vote_slots?: VoteSlot[]
     }
