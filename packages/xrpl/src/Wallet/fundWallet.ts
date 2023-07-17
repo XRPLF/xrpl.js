@@ -226,11 +226,12 @@ async function processSuccessfulResponse(
   }
 }
 
-async function processError(response: Response) {
+async function processError(response: Response): Promise<void> {
   return Promise.reject(
     new XRPLFaucetError(
       `Request failed: ${JSON.stringify({
-        body: await response.json(),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- json response could be anything
+        body: (await response.json()) || {},
         contentType: response.headers.get('Content-Type'),
         statusCode: response.status,
       })}`,
