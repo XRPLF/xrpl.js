@@ -29,10 +29,25 @@ const getOrderbookOptionsSet = new Set([
   'taker',
 ])
 
+/**
+ * Represents the options for retrieving the order book.
+ */
 export interface GetOrderBookOptions {
+  /**
+   * The limit on the number of offers to return.
+   */
   limit?: number
+  /**
+   * The ledger index of the ledger to use.
+   */
   ledger_index?: LedgerIndex
+  /**
+   * The ledger hash of the ledger to use.
+   */
   ledger_hash?: string | null
+  /**
+   * The account that takes the offers.
+   */
   taker?: string | null
 }
 
