@@ -110,8 +110,8 @@ describe('Wallet', function () {
     it('derives a wallet using default algorithm', function () {
       const wallet = Wallet.fromSeed(knownSecret)
 
-      assert.equal(wallet.publicKey, publicKeyED25519)
-      assert.equal(wallet.privateKey, privateKeyED25519)
+      assert.equal(wallet.publicKey, publicKeySecp256k1)
+      assert.equal(wallet.privateKey, privateKeySecp256k1)
     })
 
     it('derives a wallet using algorithm ecdsa-secp256k1', function () {
@@ -216,8 +216,8 @@ describe('Wallet', function () {
     it('derives a wallet using default algorithm', function () {
       const wallet = Wallet.fromSecret(knownSecret)
 
-      assert.equal(wallet.publicKey, publicKeyED25519)
-      assert.equal(wallet.privateKey, privateKeyED25519)
+      assert.equal(wallet.publicKey, publicKeySecp256k1)
+      assert.equal(wallet.privateKey, privateKeySecp256k1)
     })
 
     it('derives a wallet using algorithm ecdsa-secp256k1', function () {
