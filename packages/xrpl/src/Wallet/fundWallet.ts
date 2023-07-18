@@ -71,11 +71,11 @@ export interface FundWalletOptions {
  */
 // eslint-disable-next-line max-params -- Helper function created for organizational purposes
 export async function doFundWalletRequest(
-  options: FundWalletOptions | undefined,
   client: Client,
   startingBalance: number,
   walletToFund: Wallet,
   postBody: Buffer,
+  options?: FundWalletOptions,
 ): Promise<{
   wallet: Wallet
   balance: number

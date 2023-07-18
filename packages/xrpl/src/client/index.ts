@@ -1128,11 +1128,11 @@ class Client extends EventEmitter {
     )
 
     return doFundWalletRequest(
-      options,
       this,
       startingBalance,
       walletToFund,
       postBody,
+      options,
     )
   }
 }
