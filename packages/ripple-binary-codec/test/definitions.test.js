@@ -60,6 +60,66 @@ describe('encode and decode using new types as a parameter', function () {
     expect(decoded).toStrictEqual(tx)
   })
 
+  test('can encode and decode a new Field nested in STObject in STArray in STObject', function () {
+    const tx = {
+      ...txJson,
+      NewFieldArray: [
+        {
+          NewField: {
+            NewFieldValue: 10,
+          },
+        },
+      ],
+    }
+
+    // Before updating the types, undefined fields will be ignored on encode
+    expect(decode(encode(tx))).not.toStrictEqual(tx)
+
+    // Normally this would be generated directly from rippled with something like `server_definitions`.
+    // Added here to make it easier to see what is actually changing in the definitions.json file.
+    const definitions = JSON.parse(JSON.stringify(normalDefinitionsJson))
+
+    definitions.FIELDS.push([
+      'NewFieldArray',
+      {
+        nth: 100,
+        isVLEncoded: false,
+        isSerialized: true,
+        isSigningField: true,
+        type: 'STArray',
+      },
+    ])
+
+    definitions.FIELDS.push([
+      'NewField',
+      {
+        nth: 101,
+        isVLEncoded: false,
+        isSerialized: true,
+        isSigningField: true,
+        type: 'STObject',
+      },
+    ])
+
+    definitions.FIELDS.push([
+      'NewFieldValue',
+      {
+        nth: 102,
+        isVLEncoded: false,
+        isSerialized: true,
+        isSigningField: true,
+        type: 'UInt32',
+      },
+    ])
+
+    const newDefs = new XrplDefinitions(definitions)
+
+    const encoded = encode(tx, newDefs)
+    expect(() => decode(encoded)).toThrow()
+    const decoded = decode(encoded, newDefs)
+    expect(decoded).toStrictEqual(tx)
+  })
+
   test('can encode and decode a new Type', function () {
     const tx = {
       ...txJson,

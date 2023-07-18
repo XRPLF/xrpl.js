@@ -17,6 +17,12 @@ export interface IssuedCurrencyAmount extends IssuedCurrency {
 
 export type Amount = IssuedCurrencyAmount | string
 
+export interface Balance {
+  currency: string
+  issuer?: string
+  value: string
+}
+
 export interface Signer {
   Signer: {
     Account: string
