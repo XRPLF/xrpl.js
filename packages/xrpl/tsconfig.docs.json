@@ -6,7 +6,8 @@
     "jsxFragmentFactory": "JSX.Fragment",
     "lib": ["es2015", "dom"],
     "module": "commonjs",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "target": "ES2015"
   },
-  "include": ["./typedoc.tsx"],
+  "include": ["./typedoc.tsx"]
 }
