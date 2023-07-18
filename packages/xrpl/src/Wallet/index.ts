@@ -1,4 +1,4 @@
-/* eslint-disable max-lines -- The interface is simpler in one file */
+/* eslint-disable max-lines -- All functions are necessary */
 import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
@@ -176,7 +176,7 @@ export class Wallet {
   /**
    * Derives a wallet from secret numbers.
    * NOTE: This uses a default encoding algorithm of secp256k1 to match the popular wallet
-   * [Xumm (aka Xaman)]'s behavior.
+   * [Xumm (aka Xaman)](https://xumm.app/)'s behavior.
    * This may be different from the DEFAULT_ALGORITHM for other ways to generate a Wallet.
    *
    * @param secretNumbers - A string consisting of 8 times 6 numbers (whitespace delimited) used to derive a wallet.
@@ -188,14 +188,12 @@ export class Wallet {
    */
   public static fromSecretNumbers(
     secretNumbers: string[] | string,
-    opts: { masterAddress?: string; algorithm?: ECDSA } = {},
+    opts: { masterAddress?: string; algorithm?: ECDSA } = {
+      algorithm: ECDSA.secp256k1,
+    },
   ): Wallet {
-    const updatedOpts = { ...opts }
-    if (opts.algorithm === undefined) {
-      updatedOpts.algorithm = ECDSA.secp256k1
-    }
     const secret = new Account(secretNumbers).getFamilySeed()
-    return Wallet.fromSecret(secret, updatedOpts)
+    return Wallet.fromSecret(secret, opts)
   }
 
   /**
