@@ -5,6 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Fixed
 * Fixed Wallet.generate() ignoring the `algorithm` parameter (Only a problem once binary-codec fix for `derive_keypair` is added)
+* Fixed Wallet.fromSeed() ignoring the `algorithm` parameter
 
 ### Added
 * Add `BurnedNFTokens`, `FirstNFTSequence`, `MintedNFTokens`,
