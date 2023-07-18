@@ -12,7 +12,6 @@
     "removeComments": true,
     "preserveConstEnums": false,
     "esModuleInterop": true,
-    "suppressImplicitAnyIndexErrors": false,
     "resolveJsonModule": true,
     "preserveSymlinks": true
   },
