@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.7.0 (2023-07-12)
+### Added
+* `NetworkId` field support
+
 ## 1.6.0 (2023-06-13)
 ### Added
 - Allow custom type definitions to be used for encoding/decoding transactions at runtime (e.g. for sidechains/new amendments)
