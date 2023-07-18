@@ -55,7 +55,7 @@ export type MockedWebSocketServer = WebSocketServer &
     addResponse: (
       command: string,
       response:
-        | Response
+        | BaseResponse
         | ErrorResponse
         | ((r: Request) => Response | ErrorResponse | Record<string, unknown>)
         | Record<string, unknown>,
