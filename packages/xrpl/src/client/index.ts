@@ -12,7 +12,7 @@ import {
   ValidationError,
   XrplError,
 } from '../errors'
-import type { LedgerIndex } from '../models/common'
+import type { LedgerIndex, Balance } from '../models/common'
 import {
   Request,
   // account methods
@@ -58,7 +58,7 @@ import {
   checkAccountDeleteBlockers,
   txNeedsNetworkID,
 } from '../sugar/autofill'
-import { type Balance, formatBalances } from '../sugar/balances'
+import { formatBalances } from '../sugar/balances'
 import {
   validateOrderbookOptions,
   createBookOffersRequest,
