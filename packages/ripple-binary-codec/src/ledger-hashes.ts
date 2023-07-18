@@ -142,8 +142,8 @@ function ledgerHash(header: ledgerObject): Hash256 {
   const hash = new Sha512Half()
   hash.put(HashPrefix.ledgerHeader)
   if (
-    header.parent_close_time !== undefined ||
-    header.close_flags !== undefined
+    header.parent_close_time === undefined ||
+    header.close_flags === undefined
   ) {
     throw new Error()
   }

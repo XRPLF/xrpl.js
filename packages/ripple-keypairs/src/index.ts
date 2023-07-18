@@ -18,7 +18,7 @@ function generateSeed(
     algorithm?: 'ed25519' | 'ecdsa-secp256k1'
   } = {},
 ): string {
-  if (!options.entropy || options.entropy.length >= 16) {
+  if (!(!options.entropy || options.entropy.length >= 16)) {
     throw new Error('entropy too short')
   }
   const entropy = options.entropy ? options.entropy.slice(0, 16) : brorand(16)
