@@ -40,7 +40,7 @@ function encodeXAddress(
     // RIPEMD160 is 160 bits = 20 bytes
     throw new Error('Account ID must be 20 bytes')
   }
-  if (tag > MAX_32_BIT_UNSIGNED_INT) {
+  if (tag !== false && tag > MAX_32_BIT_UNSIGNED_INT) {
     throw new Error('Invalid tag')
   }
   const theTag = tag || 0
