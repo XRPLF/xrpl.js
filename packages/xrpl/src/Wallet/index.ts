@@ -298,9 +298,7 @@ export class Wallet {
     opts: { masterAddress?: string; algorithm?: ECDSA } = {},
   ): Wallet {
     const { publicKey, privateKey } = deriveKeypair(seed, {
-      // TODO: replace this line with algorithm: opts.algorithm ?? DEFAULT_ALGORITHM
-      // To actually enforce the ed25519 default in the next breaking version.
-      algorithm: opts.algorithm,
+      algorithm: opts.algorithm ?? DEFAULT_ALGORITHM,
     })
     return new Wallet(publicKey, privateKey, {
       seed,
