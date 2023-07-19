@@ -1,8 +1,6 @@
-/* eslint-disable max-lines -- There are lots of equivalent constructors which make sense to have here. */
 import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
-import isEqual from 'lodash/isEqual'
 import omitBy from 'lodash/omitBy'
 import {
   classicAddressToXAddress,
@@ -25,11 +23,8 @@ import {
 } from 'ripple-keypairs'
 
 import ECDSA from '../ECDSA'
-import { ValidationError, XrplError } from '../errors'
-import { IssuedCurrencyAmount } from '../models/common'
+import { ValidationError } from '../errors'
 import { Transaction, validate } from '../models/transactions'
-import { isIssuedCurrency } from '../models/transactions/common'
-import { isHex } from '../models/utils'
 import { ensureClassicAddress } from '../sugar/utils'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
 
@@ -81,7 +76,7 @@ function hexFromBuffer(buffer: Buffer): string {
  *
  * @category Signing
  */
-class Wallet {
+export class Wallet {
   public readonly publicKey: string
   public readonly privateKey: string
   public readonly classicAddress: string
@@ -122,12 +117,25 @@ class Wallet {
   }
 
   /**
-   * Generates a new Wallet using a generated seed.
+   * `generate()` creates a new random Wallet. In order to make this a valid account on ledger, you must
+   * Send XRP to it. On test networks that can be done with "faucets" which send XRP to any account which asks
+   * For it. You can call `client.fundWallet()` in order to generate credentials and fund the account on test networks.
+   *
+   * @example
+   * ```ts
+   * const { Wallet } = require('xrpl')
+   * const wallet = Wallet.generate()
+   * ```
    *
    * @param algorithm - The digital signature algorithm to generate an address for.
    * @returns A new Wallet derived from a generated seed.
+   *
+   * @throws ValidationError when signing algorithm isn't valid
    */
   public static generate(algorithm: ECDSA = DEFAULT_ALGORITHM): Wallet {
+    if (!Object.values(ECDSA).includes(algorithm)) {
+      throw new ValidationError('Invalid cryptographic signing algorithm')
+    }
     const seed = generateSeed({ algorithm })
     return Wallet.fromSeed(seed)
   }
@@ -301,6 +309,53 @@ class Wallet {
   /**
    * Signs a transaction offline.
    *
+   * @example
+   *
+   * ```ts
+   * const { Client, Wallet } = require('xrpl')
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   *
+   * async function signTransaction() {
+   *   await client.connect()
+   *   const { balance: balance1, wallet: wallet1 } = client.fundWallet()
+   *   const { balance: balance2, wallet: wallet2 } = client.fundWallet()
+   *
+   *   const transaction = {
+   *     TransactionType: 'Payment',
+   *     Account: wallet1.address,
+   *     Destination: wallet2.address,
+   *     Amount: '10'
+   *   }
+   *
+   *   try {
+   *     await client.autofill(transaction)
+   *     const { tx_blob: signed_tx_blob, hash} = await wallet1.sign(transaction)
+   *     console.log(signed_tx_blob)
+   *   } catch (error) {
+   *     console.error(`Failed to sign transaction: ${error}`)
+   *   }
+   *   const result = await client.submit(signed_tx_blob)
+   *   await client.disconnect()
+   * }
+   *
+   * signTransaction()
+   * ```
+   * In order for a transaction to be validated, it must be signed by the account sending the transaction to prove
+   * That the owner is actually the one deciding to take that action.
+   *
+   * In this example, we created, signed, and then submitted a transaction to testnet. You may notice that the
+   * Output of `sign` includes a `tx_blob` and a `hash`, both of which are needed to submit & verify the results.
+   * Note: If you pass a `Wallet` to `client.submit` or `client.submitAndWait` it will do signing like this under the hood.
+   *
+   * `tx_blob` is a binary representation of a transaction on the XRP Ledger. It's essentially a byte array
+   * that encodes all of the data necessary to execute the transaction, including the source address, the destination
+   * address, the amount, and any additional fields required for the specific transaction type.
+   *
+   * `hash` is a unique identifier that's generated from the signed transaction data on the XRP Ledger. It's essentially
+   * A cryptographic digest of the signed transaction blob, created using a hash function. The signed transaction hash is
+   * Useful for identifying and tracking specific transactions on the XRP Ledger. It can be used to query transaction
+   * Information, verify the authenticity of a transaction, and detect any tampering with the transaction data.
+   *
    * @param this - Wallet instance.
    * @param transaction - A transaction to be signed offline.
    * @param multisign - Specify true/false to use multisign or actual address (classic/x-address) to make multisign tx request.
@@ -368,7 +423,6 @@ class Wallet {
     }
 
     const serialized = encode(txToSignAndEncode)
-    this.checkTxSerialization(serialized, tx)
     return {
       tx_blob: serialized,
       hash: hashSignedTx(serialized),
@@ -400,124 +454,6 @@ class Wallet {
    */
   public getXAddress(tag: number | false = false, isTestnet = false): string {
     return classicAddressToXAddress(this.classicAddress, tag, isTestnet)
-  }
-
-  /**
-   *  Decode a serialized transaction, remove the fields that are added during the signing process,
-   *  and verify that it matches the transaction prior to signing. This gives the user a sanity check
-   *  to ensure that what they try to encode matches the message that will be recieved by rippled.
-   *
-   * @param serialized - A signed and serialized transaction.
-   * @param tx - The transaction prior to signing.
-   * @throws A ValidationError if the transaction does not have a TxnSignature/Signers property, or if
-   * the serialized Transaction desn't match the original transaction.
-   * @throws XrplError if the transaction includes an issued currency which is equivalent to XRP ignoring case.
-   */
-  // eslint-disable-next-line class-methods-use-this, max-lines-per-function -- Helper for organization purposes
-  private checkTxSerialization(serialized: string, tx: Transaction): void {
-    // Decode the serialized transaction:
-    const decoded = decode(serialized)
-    const txCopy = { ...tx }
-
-    /*
-     * And ensure it is equal to the original tx, except:
-     * - It must have a TxnSignature or Signers (multisign).
-     */
-    if (!decoded.TxnSignature && !decoded.Signers) {
-      throw new ValidationError(
-        'Serialized transaction must have a TxnSignature or Signers property',
-      )
-    }
-    // - We know that the original tx did not have TxnSignature, so we should delete it:
-    delete decoded.TxnSignature
-    // - We know that the original tx did not have Signers, so if it exists, we should delete it:
-    delete decoded.Signers
-
-    /*
-     * - If SigningPubKey was not in the original tx, then we should delete it.
-     *   But if it was in the original tx, then we should ensure that it has not been changed.
-     */
-    if (!tx.SigningPubKey) {
-      delete decoded.SigningPubKey
-    }
-
-    /*
-     * - Memos have exclusively hex data which should ignore case.
-     *   Since decode goes to upper case, we set all tx memos to be uppercase for the comparison.
-     */
-    txCopy.Memos?.map((memo) => {
-      const memoCopy = { ...memo }
-      if (memo.Memo.MemoData) {
-        if (!isHex(memo.Memo.MemoData)) {
-          throw new ValidationError('MemoData field must be a hex value')
-        }
-        memoCopy.Memo.MemoData = memo.Memo.MemoData.toUpperCase()
-      }
-
-      if (memo.Memo.MemoType) {
-        if (!isHex(memo.Memo.MemoType)) {
-          throw new ValidationError('MemoType field must be a hex value')
-        }
-        memoCopy.Memo.MemoType = memo.Memo.MemoType.toUpperCase()
-      }
-
-      if (memo.Memo.MemoFormat) {
-        if (!isHex(memo.Memo.MemoFormat)) {
-          throw new ValidationError('MemoFormat field must be a hex value')
-        }
-        memoCopy.Memo.MemoFormat = memo.Memo.MemoFormat.toUpperCase()
-      }
-
-      return memo
-    })
-
-    if (txCopy.TransactionType === 'NFTokenMint' && txCopy.URI) {
-      txCopy.URI = txCopy.URI.toUpperCase()
-    }
-
-    /* eslint-disable @typescript-eslint/consistent-type-assertions -- We check at runtime that this is safe */
-    Object.keys(txCopy).forEach((key) => {
-      const standard_currency_code_len = 3
-      if (txCopy[key] && isIssuedCurrency(txCopy[key])) {
-        const decodedAmount = decoded[key] as unknown as IssuedCurrencyAmount
-        const decodedCurrency = decodedAmount.currency
-        const txCurrency = (txCopy[key] as IssuedCurrencyAmount).currency
-
-        if (
-          txCurrency.length === standard_currency_code_len &&
-          txCurrency.toUpperCase() === 'XRP'
-        ) {
-          throw new XrplError(
-            `Trying to sign an issued currency with a similar standard code to XRP (received '${txCurrency}'). XRP is not an issued currency.`,
-          )
-        }
-
-        // Standardize the format of currency codes to the 40 byte hex string for comparison
-        const amount = txCopy[key] as IssuedCurrencyAmount
-        if (amount.currency.length !== decodedCurrency.length) {
-          /* eslint-disable-next-line max-depth -- Easier to read with two if-statements */
-          if (decodedCurrency.length === standard_currency_code_len) {
-            decodedAmount.currency = isoToHex(decodedCurrency)
-          } else {
-            /* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- We need to update txCopy directly */
-            txCopy[key].currency = isoToHex(txCopy[key].currency)
-          }
-        }
-      }
-    })
-    /* eslint-enable @typescript-eslint/consistent-type-assertions -- Done with dynamic checking */
-
-    if (!isEqual(decoded, txCopy)) {
-      const data = {
-        decoded,
-        tx,
-      }
-      const error = new ValidationError(
-        'Serialized transaction does not match original txJSON. See error.data',
-        data,
-      )
-      throw error
-    }
   }
 }
 
@@ -566,21 +502,3 @@ function removeTrailingZeros(tx: Transaction): void {
     tx.Amount.value = new BigNumber(tx.Amount.value).toString()
   }
 }
-
-/**
- * Convert an ISO code to a hex string representation
- *
- * @param iso - A 3 letter standard currency code
- */
-/* eslint-disable @typescript-eslint/no-magic-numbers -- Magic numbers are from rippleds of currency code encoding */
-function isoToHex(iso: string): string {
-  const bytes = Buffer.alloc(20)
-  if (iso !== 'XRP') {
-    const isoBytes = iso.split('').map((chr) => chr.charCodeAt(0))
-    bytes.set(isoBytes, 12)
-  }
-  return bytes.toString('hex').toUpperCase()
-}
-/* eslint-enable @typescript-eslint/no-magic-numbers -- Only needed in this function */
-
-export default Wallet

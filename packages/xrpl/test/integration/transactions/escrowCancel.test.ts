@@ -8,20 +8,12 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import {
-  // calculateWaitTimeForTransaction,
+  waitForAndForceProgressLedgerTime,
   generateFundedWallet,
-  // getXRPBalance,
+  getXRPBalance,
   testTransaction,
-  submitTransaction,
+  sendLedgerAccept,
 } from '../utils'
-
-// TODO: Fix these tests
-// NOTE: Because ledger accept is called among multiple tests, the actual ledger close time is not
-// accurate. It can end up very far into the future. This means that the CancelAfter timer can potentially
-// need to wait for several minutes to be able to properly complete. Since we are not testing the functionaity
-// of rippled in this library, only that we are submitting commands properly, we can just test that the EscrowCancel
-// command was successfully received. If in the future we isolate tests to run on their own rippled instance,
-// we can uncomment the code in this file to test that the escrow was actually cancelled.
 
 // how long before each test case times out
 const TIMEOUT = 50000
@@ -48,8 +40,6 @@ describe('EscrowCancel', function () {
         })
       ).result.ledger.close_time
 
-      // const waitTimeInMs = calculateWaitTimeForTransaction(CLOSE_TIME)
-
       const createTx: EscrowCreate = {
         Account: testContext.wallet.classicAddress,
         TransactionType: 'EscrowCreate',
@@ -61,10 +51,10 @@ describe('EscrowCancel', function () {
 
       await testTransaction(testContext.client, createTx, testContext.wallet)
 
-      // const initialBalanceWallet1 = await getXRPBalance(
-      //   testContext.client,
-      //   wallet1,
-      // )
+      const initialBalanceWallet1 = await getXRPBalance(
+        testContext.client,
+        wallet1,
+      )
 
       // check that the object was actually created
       const accountObjects = (
@@ -94,31 +84,23 @@ describe('EscrowCancel', function () {
         OfferSequence: sequence,
       }
 
-      // We set the CancelAfter timer to be 3 seconds after the last ledger close_time. We need to wait this long
-      // before we can cancel the escrow.
-      // const cancelAfterTimerPromise = new Promise((resolve) => {
-      //   setTimeout(resolve, waitTimeInMs)
-      // })
+      await waitForAndForceProgressLedgerTime(
+        testContext.client,
+        CLOSE_TIME + 3,
+      )
 
-      // Make sure we wait long enough before canceling the escrow.
-      // await cancelAfterTimerPromise
-
-      // await testTransaction(testContext.client, cancelTx, testContext.wallet, {
-      //   count: 20,
-      //   delayMs: 2000,
-      // })
-
-      await submitTransaction({
-        client: testContext.client,
-        transaction: cancelTx,
-        wallet: testContext.wallet,
+      // rippled uses the close time of the previous ledger
+      await sendLedgerAccept(testContext.client)
+      await testTransaction(testContext.client, cancelTx, testContext.wallet, {
+        count: 20,
+        delayMs: 2000,
       })
 
       // Make sure the Destination wallet did not receive any XRP.
-      // assert.equal(
-      //   await getXRPBalance(testContext.client, wallet1),
-      //   initialBalanceWallet1,
-      // )
+      assert.equal(
+        await getXRPBalance(testContext.client, wallet1),
+        initialBalanceWallet1,
+      )
     },
     TIMEOUT,
   )

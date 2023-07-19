@@ -1,6 +1,4 @@
-import { LedgerIndex } from '../common'
-
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * The deposit_authorized command indicates whether one account is authorized to
@@ -9,19 +7,14 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface DepositAuthorizedRequest extends BaseRequest {
+export interface DepositAuthorizedRequest
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'deposit_authorized'
   /** The sender of a possible payment. */
   source_account: string
   /** The recipient of a possible payment. */
   destination_account: string
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * ledger automatically.
-   */
-  ledger_index?: LedgerIndex
 }
 
 /**

@@ -15,7 +15,7 @@ import { Client, ClientOptions } from '.'
  *
  * @category Clients
  */
-export default class BroadcastClient extends Client {
+export class BroadcastClient extends Client {
   private readonly clients: Client[]
 
   /**

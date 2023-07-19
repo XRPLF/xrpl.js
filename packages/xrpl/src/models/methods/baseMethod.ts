@@ -1,3 +1,5 @@
+import { LedgerIndex } from '../common'
+
 import type { Request } from '.'
 
 export interface BaseRequest {
@@ -14,7 +16,14 @@ export interface BaseRequest {
   api_version?: number
 }
 
-interface Warning {
+export interface LookupByLedgerRequest {
+  /** A 20-byte hex string for the ledger version to use. */
+  ledger_hash?: string
+  /** The ledger index of the ledger to use, or a shortcut string. */
+  ledger_index?: LedgerIndex
+}
+
+export interface ResponseWarning {
   id: number
   message: string
   details?: { [key: string]: string }
@@ -26,7 +35,7 @@ export interface BaseResponse {
   type: 'response' | string
   result: unknown
   warning?: 'load'
-  warnings?: Warning[]
+  warnings?: ResponseWarning[]
   forwarded?: boolean
   api_version?: number
 }

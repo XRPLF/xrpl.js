@@ -7,7 +7,6 @@ import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
  * @returns The account's classic address.
  * @throws Error if the X-Address has an associated tag.
  */
-// eslint-disable-next-line import/prefer-default-export -- okay for a utils file - there could be more exports later
 export function ensureClassicAddress(account: string): string {
   if (isValidXAddress(account)) {
     const { classicAddress, tag } = xAddressToClassicAddress(account)

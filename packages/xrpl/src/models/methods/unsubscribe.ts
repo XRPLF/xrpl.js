@@ -2,7 +2,7 @@ import { Currency, StreamType } from '../common'
 
 import type { BaseRequest, BaseResponse } from './baseMethod'
 
-interface Book {
+export interface UnsubscribeBook {
   taker_gets: Currency
   taker_pays: Currency
   both?: boolean
@@ -36,7 +36,7 @@ export interface UnsubscribeRequest extends BaseRequest {
    * Array of objects defining order books to unsubscribe from, as explained
    * below.
    */
-  books?: Book[]
+  books?: UnsubscribeBook[]
 }
 
 /**

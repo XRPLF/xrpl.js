@@ -14,7 +14,7 @@ export interface SubmitMultisignedRequest extends BaseRequest {
   /**
    * Transaction in JSON format with an array of Signers. To be successful, the
    * weights of the signatures must be equal or higher than the quorum of the.
-   * {@link SignerList}.
+   * {@link Transaction Type/SignerList}.
    */
   tx_json: Transaction
   /**

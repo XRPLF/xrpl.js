@@ -1,11 +1,6 @@
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { SignerEntry } from '../common'
 
-interface SignerEntry {
-  SignerEntry: {
-    Account: string
-    SignerWeight: number
-  }
-}
+import BaseLedgerEntry from './BaseLedgerEntry'
 
 /**
  * The SignerList object type represents a list of parties that, as a group,

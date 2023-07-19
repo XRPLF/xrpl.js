@@ -1,10 +1,10 @@
 export type LedgerIndex = number | ('validated' | 'closed' | 'current')
 
-interface XRP {
+export interface XRP {
   currency: 'XRP'
 }
 
-interface IssuedCurrency {
+export interface IssuedCurrency {
   currency: string
   issuer: string
 }
@@ -16,6 +16,12 @@ export interface IssuedCurrencyAmount extends IssuedCurrency {
 }
 
 export type Amount = IssuedCurrencyAmount | string
+
+export interface Balance {
+  currency: string
+  issuer?: string
+  value: string
+}
 
 export interface Signer {
   Signer: {
@@ -43,7 +49,7 @@ export type StreamType =
   | 'server'
   | 'validations'
 
-interface PathStep {
+export interface PathStep {
   account?: string
   currency?: string
   issuer?: string
@@ -116,4 +122,22 @@ export interface NFTOffer {
   owner: string
   destination?: string
   expiration?: number
+}
+
+/**
+ * One NFToken that might be returned from an {@link NFTInfoResponse}
+ *
+ * @category Responses
+ */
+export interface NFToken {
+  nft_id: string
+  ledger_index: number
+  owner: string
+  is_burned: boolean
+  flags: number
+  transfer_fee: number
+  issuer: string
+  nft_taxon: number
+  nft_serial: number
+  uri: string
 }
