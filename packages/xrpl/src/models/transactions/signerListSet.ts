@@ -48,7 +48,6 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
     throw new ValidationError('SignerListSet: invalid SignerQuorum')
   }
 
-  // All other checks are for if SignerQuorum is greater than 0
   if (tx.SignerQuorum === 0) {
     return
   }
