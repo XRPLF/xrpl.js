@@ -70,13 +70,13 @@ describe('Clawback', function () {
       )
 
       // verify that line is created
-      const response1 = await testContext.client.request({
+      const objectsResponse = await testContext.client.request({
         command: 'account_objects',
         account: wallet2.classicAddress,
         type: 'state',
       })
       assert.lengthOf(
-        response1.result.account_objects,
+        objectsResponse.result.account_objects,
         1,
         'Should be exactly one line on the ledger',
       )
@@ -88,10 +88,27 @@ describe('Clawback', function () {
         Amount: {
           currency: 'USD',
           issuer: wallet2.classicAddress,
-          value: '1000',
+          value: '500',
         },
       }
       await testTransaction(testContext.client, tx, testContext.wallet)
+
+      // verify amount clawed back
+      const linesResponse = await testContext.client.request({
+        command: 'account_lines',
+        account: wallet2.classicAddress,
+      })
+
+      assert.lengthOf(
+        linesResponse.result.lines,
+        1,
+        'Should be exactly one line on the ledger',
+      )
+      assert.equal(
+        '500',
+        linesResponse.result.lines[0].balance,
+        `Holder balance incorrect after Clawback`,
+      )
     },
     TIMEOUT,
   )
