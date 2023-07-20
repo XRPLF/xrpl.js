@@ -56,7 +56,7 @@
     "path-browserify": "1.0.1",
     "prettier": "^2.3.2",
     "process": "^0.11.10",
-    "source-map-loader": "^3.0.1",
+    "source-map-loader": "^4.0.1",
     "source-map-support": "^0.5.16",
     "stream-browserify": "^3.0.0",
     "stream-http": "3.2.0",
