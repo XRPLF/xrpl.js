@@ -6,7 +6,6 @@ module.exports = {
   roots: [...base.roots, '<rootDir>/test'],
   testMatch: ['<rootDir>/test/**/*.test.ts'],
   testPathIgnorePatterns: [
-    '<rootDir>/node_modules/(?!lodash-es)',
     '<rootDir>/test/integration',
     '<rootDir>/test/fixtures',
   ],
