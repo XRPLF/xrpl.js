@@ -33,6 +33,6 @@
   },
   "prettier": "@xrplf/prettier-config",
   "engines": {
-    "node": ">= 10"
+    "node": ">= 16"
   }
 }
