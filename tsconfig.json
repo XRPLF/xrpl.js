@@ -2,6 +2,7 @@
   "compilerOptions": {
     "composite": true,
     "module": "commonjs",
+    "lib": ["es2019", "dom"],
     "moduleResolution": "node",
     "esModuleInterop": true,
     "sourceMap": true,

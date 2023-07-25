@@ -1,5 +1,3 @@
-import flatMap from 'lodash/flatMap'
-
 import type { Balance, Client } from '..'
 import {
   AccountLinesRequest,
@@ -108,7 +106,7 @@ async function getBalances(
   // combine results
   await Promise.all([xrpPromise, linesPromise]).then(
     ([xrpBalance, linesResponses]) => {
-      const accountLinesBalance = flatMap(linesResponses, (response) =>
+      const accountLinesBalance = linesResponses.flatMap((response) =>
         formatBalances(response.result.lines),
       )
       if (xrpBalance !== '') {
