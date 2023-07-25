@@ -1,7 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { fromSeed } from 'bip32'
 import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
-import omitBy from 'lodash/omitBy'
 import {
   classicAddressToXAddress,
   isValidXAddress,
@@ -26,6 +25,7 @@ import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
 import { Transaction, validate } from '../models/transactions'
 import { ensureClassicAddress } from '../sugar/utils'
+import { omitBy } from '../utils/collections'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
 
 import { rfc1751MnemonicToKey } from './rfc1751'
