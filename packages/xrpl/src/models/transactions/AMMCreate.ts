@@ -12,7 +12,7 @@ export const AMM_MAX_TRADING_FEE = 1000
  * Also transfers ownership of the starting balance of both assets from the sender to the created AccountRoot
  * and issues an initial balance of liquidity provider tokens (LP Tokens) from the AMM account to the sender.
  *
- * Caution: When you create the AMM, you should fund it with (approximately) equal-value amounts of each asset.
+ * CAUTION: When you create the AMM, you should fund it with (approximately) equal-value amounts of each asset.
  * Otherwise, other users can profit at your expense by trading with this AMM (performing arbitrage).
  * The currency risk that liquidity providers take on increases with the volatility (potential for imbalance) of the asset pair.
  * The higher the trading fee, the more it offsets this risk,
