@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.7.1 (2023-07-18)
+### Fixed
+* Passing Definitions from `STObject` to `STArray` back to `STObject`, both for signing & decoding (to JSON)
+
 ## 1.7.0 (2023-07-12)
 ### Added
 * `NetworkId` field support

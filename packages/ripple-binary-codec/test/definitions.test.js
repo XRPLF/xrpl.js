@@ -21,7 +21,7 @@ describe('encode and decode using new types as a parameter', function () {
     // Normally this would be generated directly from rippled with something like `server_definitions`.
     // Added here to make it easier to see what is actually changing in the definitions.json file.
     const definitions = JSON.parse(JSON.stringify(normalDefinitionsJson))
-    definitions.TRANSACTION_TYPES['NewTestTransaction'] = 30
+    definitions.TRANSACTION_TYPES['NewTestTransaction'] = 75
 
     const newDefs = new XrplDefinitions(definitions)
 
