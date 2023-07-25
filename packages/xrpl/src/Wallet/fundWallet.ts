@@ -62,11 +62,11 @@ export interface FundWalletOptions {
 /**
  * Perform the fund wallet request.
  *
- * @param options - Optional additional options.
  * @param client - The client object.
  * @param startingBalance - The starting balance of the wallet.
  * @param walletToFund - The wallet to fund.
  * @param postBody - The body of the POST request.
+ * @param options - Optional additional options.
  * @returns A promise that resolves to the funded wallet and balance.
  */
 // eslint-disable-next-line max-params -- Helper function created for organizational purposes
