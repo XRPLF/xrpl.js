@@ -166,7 +166,8 @@ describe('Models Utils', function () {
         AccountRootFlags.lsfDisallowIncomingNFTokenOffer |
         AccountRootFlags.lsfDisallowIncomingCheck |
         AccountRootFlags.lsfDisallowIncomingPayChan |
-        AccountRootFlags.lsfDisallowIncomingTrustline
+        AccountRootFlags.lsfDisallowIncomingTrustline |
+        AccountRootFlags.lsfAllowTrustLineClawback
 
       const parsed = parseAccountRootFlags(accountRootFlags)
 
@@ -183,7 +184,8 @@ describe('Models Utils', function () {
           parsed.lsfDisallowIncomingNFTokenOffer &&
           parsed.lsfDisallowIncomingCheck &&
           parsed.lsfDisallowIncomingPayChan &&
-          parsed.lsfDisallowIncomingTrustline,
+          parsed.lsfDisallowIncomingTrustline &&
+          parsed.lsfAllowTrustLineClawback,
       )
     })
 
@@ -203,6 +205,7 @@ describe('Models Utils', function () {
       assert.isUndefined(parsed.lsfDisallowIncomingCheck)
       assert.isUndefined(parsed.lsfDisallowIncomingPayChan)
       assert.isUndefined(parsed.lsfDisallowIncomingTrustline)
+      assert.isUndefined(parsed.lsfAllowTrustLineClawback)
     })
   })
 })
