@@ -1,5 +1,4 @@
 import { BigNumber } from 'bignumber.js'
-import { flatMap } from 'lodash'
 import { decodeAccountID } from 'ripple-address-codec'
 import {
   decode,
@@ -128,10 +127,9 @@ function getTransactionWithAllSigners(
   transactions: Transaction[],
 ): Transaction {
   // Signers must be sorted in the combined transaction - See compareSigners' documentation for more details
-  const sortedSigners: Signer[] = flatMap(
-    transactions,
-    (tx) => tx.Signers ?? [],
-  ).sort(compareSigners)
+  const sortedSigners: Signer[] = transactions
+    .flatMap((tx) => tx.Signers ?? [])
+    .sort(compareSigners)
 
   return { ...transactions[0], Signers: sortedSigners }
 }
