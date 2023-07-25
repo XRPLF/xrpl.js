@@ -2,7 +2,6 @@
 import { EventEmitter } from 'events'
 import { Agent } from 'http'
 
-import omitBy from 'lodash/omitBy'
 import WebSocket from 'ws'
 
 import {
@@ -12,6 +11,7 @@ import {
   XrplError,
 } from '../errors'
 import { BaseRequest } from '../models/methods/baseMethod'
+import { omitBy } from '../utils/collections'
 
 import ConnectionManager from './ConnectionManager'
 import ExponentialBackoff from './ExponentialBackoff'
