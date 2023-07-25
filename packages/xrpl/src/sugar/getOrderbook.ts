@@ -1,6 +1,5 @@
 /* eslint-disable max-lines-per-function -- Needs to process orderbooks. */
 import BigNumber from 'bignumber.js'
-import flatMap from 'lodash/flatMap'
 
 import type { Client } from '../client'
 import { ValidationError } from '../errors'
@@ -10,6 +9,7 @@ import {
   BookOffer,
   BookOfferCurrency,
   BookOffersRequest,
+  BookOffersResponse,
 } from '../models/methods/bookOffers'
 
 const DEFAULT_LIMIT = 20
@@ -112,17 +112,18 @@ async function getOrderbook(
     taker: options.taker ? options.taker : undefined,
   }
   // 2. Make Request
-  const directOfferResults = await this.requestAll(request)
+  const directOfferResults: BookOffersResponse[] = await this.requestAll(
+    request,
+  )
   request.taker_gets = currency1
   request.taker_pays = currency2
   const reverseOfferResults = await this.requestAll(request)
   // 3. Return Formatted Response
-  const directOffers = flatMap(
-    directOfferResults,
-    (directOfferResult) => directOfferResult.result.offers,
+
+  const directOffers = directOfferResults.flatMap(
+    (directOfferResult: BookOffersResponse) => directOfferResult.result.offers,
   )
-  const reverseOffers = flatMap(
-    reverseOfferResults,
+  const reverseOffers = reverseOfferResults.flatMap(
     (reverseOfferResult) => reverseOfferResult.result.offers,
   )
 
