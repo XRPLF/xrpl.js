@@ -11,6 +11,7 @@ export { default as ECDSA } from './ECDSA'
 
 export * from './errors'
 
+export { default as fundWallet, FundingOptions } from './Wallet/fundWallet'
 export { Wallet } from './Wallet'
 
 export { walletFromSecretNumbers } from './Wallet/walletFromSecretNumbers'
