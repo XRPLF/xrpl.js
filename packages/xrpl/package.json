@@ -19,8 +19,7 @@
     "test": "test"
   },
   "browser": {
-    "ws": "./dist/npm/client/WSWrapper.js",
-    "https-proxy-agent": false
+    "ws": "./dist/npm/client/WSWrapper.js"
   },
   "dependencies": {
     "bignumber.js": "^9.0.0",
@@ -40,6 +39,7 @@
     "browserify-fs": "^1.0.0",
     "constants-browserify": "^1.0.0",
     "https-browserify": "^1.0.0",
+    "https-proxy-agent": "^7.0.1",
     "karma": "^6.4.1",
     "karma-chrome-launcher": "^3.1.1",
     "karma-jasmine": "^5.1.0",
