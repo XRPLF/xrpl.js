@@ -1,4 +1,3 @@
-import { strict as assert } from 'assert'
 import { coreTypes } from './types'
 import { HashPrefix } from './hash-prefixes'
 import { Sha512Half } from './hashes'
@@ -160,7 +159,9 @@ class ShaMapInner extends ShaMapNode {
    * @param leaf Leaf node to insert when branch doesn't exist
    */
   addItem(index?: Hash256, item?: ShaMapNode, leaf?: ShaMapLeaf): void {
-    assert.ok(index !== undefined)
+    if (index === undefined) {
+      throw new Error()
+    }
     if (index !== undefined) {
       const nibble = index.nibblet(this.depth)
       const existing = this.branches[nibble]
