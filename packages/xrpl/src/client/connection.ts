@@ -11,6 +11,7 @@ import {
   XrplError,
 } from '../errors'
 import { BaseRequest } from '../models/methods/baseMethod'
+import { omitBy } from '../utils/collections'
 
 import ConnectionManager from './ConnectionManager'
 import ExponentialBackoff from './ExponentialBackoff'
