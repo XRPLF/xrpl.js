@@ -9,7 +9,6 @@ import { UInt32 } from './types/uint-32'
 import { UInt8 } from './types/uint-8'
 import { BinaryParser } from './serdes/binary-parser'
 import { JsonObject } from './types/serialized-type'
-import bigInt = require('big-integer')
 import { XrplDefinitionsBase } from './enums'
 
 /**
@@ -122,7 +121,7 @@ function accountStateHash(param: Array<JsonObject>): Hash256 {
  */
 interface ledgerObject {
   ledger_index: number
-  total_coins: string | number | bigInt.BigInteger
+  total_coins: string | number | bigint
   parent_hash: string
   transaction_hash: string
   account_hash: string
@@ -149,9 +148,7 @@ function ledgerHash(header: ledgerObject): Hash256 {
   }
 
   UInt32.from<number>(header.ledger_index).toBytesSink(hash)
-  UInt64.from<bigInt.BigInteger>(
-    bigInt(String(header.total_coins)),
-  ).toBytesSink(hash)
+  UInt64.from<bigint>(BigInt(String(header.total_coins))).toBytesSink(hash)
   Hash256.from<string>(header.parent_hash).toBytesSink(hash)
   Hash256.from<string>(header.transaction_hash).toBytesSink(hash)
   Hash256.from<string>(header.account_hash).toBytesSink(hash)
