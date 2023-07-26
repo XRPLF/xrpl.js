@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import * as hashjs from 'hash.js'
 import BN = require('bn.js')
 
@@ -10,7 +9,9 @@ function bytesToHex(a: Iterable<number> | ArrayLike<number>): string {
 }
 
 function hexToBytes(a): number[] {
-  assert.ok(a.length % 2 === 0)
+  if (a.length % 2 !== 0) {
+    throw new Error()
+  }
   // Special-case length zero to return [].
   // BN.toArray intentionally returns [0] rather than [] for length zero,
   // which may make sense for BigNum data, but not for byte strings.
