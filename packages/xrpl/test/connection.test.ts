@@ -389,7 +389,7 @@ describe('Connection', function () {
         _ignore,
         sendCallback,
       ): void {
-        sendCallback({ message: 'not connected' })
+        sendCallback(new Error('not connected'))
       }
       await clientContext.client
         .request({ command: 'server_info' })

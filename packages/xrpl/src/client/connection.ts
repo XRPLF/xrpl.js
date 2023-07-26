@@ -2,7 +2,7 @@
 import { EventEmitter } from 'events'
 import type { Agent } from 'http'
 
-import WebSocket from 'ws'
+import WebSocket from 'isomorphic-ws'
 
 import {
   DisconnectedError,

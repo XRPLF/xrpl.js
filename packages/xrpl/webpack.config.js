@@ -25,7 +25,6 @@ function getDefaultConfiguration() {
     },
     devtool: 'source-map',
     plugins: [
-      new webpack.NormalModuleReplacementPlugin(/^ws$/, './WSWrapper'),
       new webpack.ProvidePlugin({ process: 'process/browser' }),
       new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
       new webpack.IgnorePlugin({
@@ -54,9 +53,6 @@ function getDefaultConfiguration() {
       ],
     },
     resolve: {
-      alias: {
-        ws: './dist/npm/client/WSWrapper.js',
-      },
       extensions: ['.js', '.json'],
       // We don't want to webpack any of the local dependencies:
       // ripple-address-codec, ripple-binary-codec, ripple-keypairs, which are

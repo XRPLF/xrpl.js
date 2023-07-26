@@ -38,7 +38,6 @@ function webpackForTest(testFileName) {
       filename: match[1] + '.js',
     },
     plugins: [
-      new webpack.NormalModuleReplacementPlugin(/^ws$/, './WSWrapper'),
       new webpack.ProvidePlugin({
         process: 'process/browser',
       }),
@@ -93,9 +92,6 @@ function webpackForTest(testFileName) {
       __dirname: true,
     },
     resolve: {
-      alias: {
-        ws: './dist/npm/client/WSWrapper.js',
-      },
       extensions: ['.ts', '.js', '.json'],
       fallback: {
         module: false,

@@ -45,7 +45,6 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
           assert: require.resolve("assert"),
           crypto: require.resolve("crypto-browserify"),
           stream: require.resolve("stream-browserify"),
-          ws: require.resolve("xrpl/dist/npm/client/WSWrapper"),
         });
         config.resolve.fallback = fallback;
         config.plugins = (config.plugins || []).concat([
@@ -156,7 +155,6 @@ resolve: {
     events: 'events',
     crypto: 'crypto-browserify',
     stream: 'stream-browserify',
-    ws: 'xrpl/dist/npm/client/WSWrapper',
   },
 }})
 ```
