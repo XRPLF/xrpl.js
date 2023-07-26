@@ -1,5 +1,3 @@
-import * as assert from 'assert'
-
 import {
   codec,
   encodeSeed,
@@ -133,11 +131,12 @@ function tagFromBuffer(buf: Buffer): number | false {
     // Little-endian to big-endian
     return buf[23] + buf[24] * 0x100 + buf[25] * 0x10000 + buf[26] * 0x1000000
   }
-  assert.strictEqual(flag, 0, 'flag must be zero to indicate no tag')
-  assert.ok(
-    Buffer.from('0000000000000000', 'hex').equals(buf.slice(23, 23 + 8)),
-    'remaining bytes must be zero',
-  )
+  if (flag !== 0) {
+    throw new Error('flag must be zero to indicate no tag')
+  }
+  if (!Buffer.from('0000000000000000', 'hex').equals(buf.slice(23, 23 + 8))) {
+    throw new Error('remaining bytes must be zero')
+  }
   return false
 }
 
