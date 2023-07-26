@@ -11,10 +11,12 @@
     "test": "test"
   },
   "dependencies": {
-    "assert": "^2.0.0",
     "buffer": "6.0.3",
     "create-hash": "^1.2.0",
     "ripple-address-codec": "^4.3.1"
+  },
+  "devDependencies": {
+    "assert": "^2.0.0"
   },
   "scripts": {
     "build": "tsc -b && copyfiles ./src/enums/definitions.json ./dist/enums/",
