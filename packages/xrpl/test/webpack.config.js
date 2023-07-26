@@ -104,12 +104,9 @@ function webpackForTest(testFileName) {
         fs: require.resolve('browserify-fs'),
         buffer: require.resolve('buffer/'),
         assert: require.resolve('assert/'),
-        url: require.resolve('url/'),
         stream: require.resolve('stream-browserify'),
         crypto: require.resolve('crypto-browserify'),
         path: require.resolve('path-browserify'),
-        http: require.resolve('stream-http'),
-        https: require.resolve('https-browserify'),
       },
     },
   }
