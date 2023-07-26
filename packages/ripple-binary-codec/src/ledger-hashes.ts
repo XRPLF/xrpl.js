@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import { ShaMap, ShaMapNode, ShaMapLeaf } from './shamap'
 import { HashPrefix } from './hash-prefixes'
 import { Sha512Half } from './hashes'
@@ -45,7 +44,9 @@ interface transactionItemObject extends JsonObject {
 function transactionItemizer(
   json: transactionItemObject,
 ): [Hash256, ShaMapNode, undefined] {
-  assert.ok(json.hash)
+  if (!json.hash) {
+    throw new Error()
+  }
   const index = Hash256.from(json.hash)
   const item = {
     hashPrefix() {
@@ -139,8 +140,12 @@ interface ledgerObject {
 function ledgerHash(header: ledgerObject): Hash256 {
   const hash = new Sha512Half()
   hash.put(HashPrefix.ledgerHeader)
-  assert.ok(header.parent_close_time !== undefined)
-  assert.ok(header.close_flags !== undefined)
+  if (
+    header.parent_close_time === undefined ||
+    header.close_flags === undefined
+  ) {
+    throw new Error()
+  }
 
   UInt32.from<number>(header.ledger_index).toBytesSink(hash)
   UInt64.from<bigint>(BigInt(String(header.total_coins))).toBytesSink(hash)
@@ -166,7 +171,9 @@ function decodeLedgerData(
   binary: string,
   definitions?: XrplDefinitionsBase,
 ): object {
-  assert.ok(typeof binary === 'string', 'binary must be a hex string')
+  if (typeof binary !== 'string') {
+    throw new Error('binary must be a hex string')
+  }
   const parser = new BinaryParser(binary, definitions)
   return {
     ledger_index: parser.readUInt32(),

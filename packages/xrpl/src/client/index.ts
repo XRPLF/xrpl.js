@@ -1,7 +1,6 @@
 /* eslint-disable jsdoc/require-jsdoc -- Request has many aliases, but they don't need unique docs */
 /* eslint-disable @typescript-eslint/member-ordering -- TODO: remove when instance methods aren't members */
 /* eslint-disable max-lines -- Client is a large file w/ lots of imports/exports */
-import * as assert from 'assert'
 import { EventEmitter } from 'events'
 
 import { NotFoundError, ValidationError, XrplError } from '../errors'
@@ -159,7 +158,9 @@ function getCollectKeyFromCommand(command: string): string | null {
 }
 
 function clamp(value: number, min: number, max: number): number {
-  assert.ok(min <= max, 'Illegal clamp bounds')
+  if (min > max) {
+    throw new Error('Illegal clamp bounds')
+  }
   return Math.min(Math.max(value, min), max)
 }
 
