@@ -1,5 +1,5 @@
 const { coreTypes } = require('../src/types')
-const Decimal = require('decimal.js')
+const BigNumber = require('bignumber.js')
 
 const { encodeAccountID } = require('ripple-address-codec')
 const { binary } = require('../src/coretypes')
@@ -26,7 +26,7 @@ function assertEqualAmountJSON(actual, expected) {
   expect(actual.issuer).toEqual(expected.issuer)
   expect(
     actual.value === expected.value ||
-      new Decimal(actual.value).equals(new Decimal(expected.value)),
+      new BigNumber(actual.value).eq(new BigNumber(expected.value)),
   ).toBe(true)
 }
 
@@ -208,7 +208,7 @@ function amountParsingTests() {
         const json = toJSON(value)
         assertEqualAmountJSON(json, f.test_json)
         if (f.exponent) {
-          const exponent = new Decimal(json.value)
+          const exponent = new BigNumber(json.value)
           expect(exponent.e - 15).toEqual(f.exponent)
         }
       })
