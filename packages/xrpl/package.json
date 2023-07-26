@@ -18,14 +18,12 @@
     "test": "test"
   },
   "browser": {
-    "ws": "./dist/npm/client/WSWrapper.js",
-    "https-proxy-agent": false
+    "ws": "./dist/npm/client/WSWrapper.js"
   },
   "dependencies": {
     "bignumber.js": "^9.0.0",
     "bip32": "^2.0.6",
     "bip39": "^3.0.4",
-    "https-proxy-agent": "^5.0.0",
     "ripple-address-codec": "^4.3.0",
     "ripple-binary-codec": "^1.7.1",
     "ripple-keypairs": "^1.3.0",
@@ -37,6 +35,7 @@
     "browserify-fs": "^1.0.0",
     "constants-browserify": "^1.0.0",
     "https-browserify": "^1.0.0",
+    "https-proxy-agent": "^7.0.1",
     "karma": "^6.4.1",
     "karma-chrome-launcher": "^3.1.1",
     "karma-jasmine": "^5.1.0",

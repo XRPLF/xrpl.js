@@ -62,12 +62,7 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
             Buffer: ["buffer", "Buffer"],
           }),
         ]);
-
-        // This is deprecated in webpack 5 but alias false does not seem to work
-        config.module.rules.push({
-          test: /node_modules[\\\/]https-proxy-agent[\\\/]/,
-          use: "null-loader",
-        });
+        
         return config;
       };
       ```

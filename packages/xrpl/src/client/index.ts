@@ -121,7 +121,6 @@ import {
 export interface ClientOptions extends ConnectionUserOptions {
   feeCushion?: number
   maxFeeXRP?: string
-  proxy?: string
   timeout?: number
 }
 

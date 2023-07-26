@@ -56,7 +56,6 @@ function getDefaultConfiguration() {
     resolve: {
       alias: {
         ws: './dist/npm/client/WSWrapper.js',
-        'https-proxy-agent': false,
       },
       extensions: ['.js', '.json'],
       // We don't want to webpack any of the local dependencies:
