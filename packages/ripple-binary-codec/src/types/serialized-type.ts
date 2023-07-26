@@ -1,6 +1,5 @@
 import { BytesList } from '../serdes/binary-serializer'
 import { BinaryParser } from '../serdes/binary-parser'
-import bigInt = require('big-integer')
 import { Buffer } from 'buffer/'
 import { XrplDefinitionsBase } from '../enums'
 
@@ -23,9 +22,7 @@ class SerializedType {
     return this.fromParser(parser, hint)
   }
 
-  static from(
-    value: SerializedType | JSON | bigInt.BigInteger,
-  ): SerializedType {
+  static from(value: SerializedType | JSON | bigint): SerializedType {
     throw new Error('from not implemented')
     return this.from(value)
   }
