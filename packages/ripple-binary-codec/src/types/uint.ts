@@ -1,4 +1,3 @@
-import bigInt = require('big-integer')
 import { Comparable } from './serialized-type'
 import { Buffer } from 'buffer/'
 
@@ -9,10 +8,7 @@ import { Buffer } from 'buffer/'
  * @param n2 Second object to compare
  * @returns -1, 0, or 1, depending on how the two objects compare
  */
-function compare(
-  n1: number | bigInt.BigInteger,
-  n2: number | bigInt.BigInteger,
-): number {
+function compare(n1: number | bigint, n2: number | bigint): number {
   return n1 < n2 ? -1 : n1 == n2 ? 0 : 1
 }
 
@@ -51,7 +47,7 @@ abstract class UInt extends Comparable {
    *
    * @returns the value
    */
-  abstract valueOf(): number | bigInt.BigInteger
+  abstract valueOf(): number | bigint
 }
 
 export { UInt }
