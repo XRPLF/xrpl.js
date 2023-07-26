@@ -64,11 +64,8 @@ function getDefaultConfiguration() {
       symlinks: false,
       fallback: {
         buffer: require.resolve('buffer/'),
-        url: require.resolve('url/'),
         stream: require.resolve('stream-browserify'),
         crypto: require.resolve('crypto-browserify'),
-        https: require.resolve('https-browserify'),
-        http: require.resolve('stream-http'),
       },
     },
   }
