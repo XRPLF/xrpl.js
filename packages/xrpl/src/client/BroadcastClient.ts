@@ -6,7 +6,7 @@ import { Client, ClientOptions } from '.'
  * @deprecated since version 2.2.0.
  * Will be deleted in version 3.0.0.
  *
- * Currently this implementation does not provide better reliability.
+ * Currently, this implementation does not provide better reliability.
  * To get better reliability, implement reconnect/error handling logic
  * and choose a reliable endpoint.
  *
