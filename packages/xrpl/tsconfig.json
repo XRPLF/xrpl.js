@@ -3,6 +3,7 @@
   "compilerOptions": {
     "pretty": true,
     "target": "es6",
+    "lib": ["es2019", "dom"],
     "outDir": "./dist/npm",
     "declaration": true,
     "declarationMap": true,
@@ -12,7 +13,6 @@
     "removeComments": true,
     "preserveConstEnums": false,
     "esModuleInterop": true,
-    "suppressImplicitAnyIndexErrors": false,
     "resolveJsonModule": true,
     "preserveSymlinks": true
   },
