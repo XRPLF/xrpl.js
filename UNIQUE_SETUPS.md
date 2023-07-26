@@ -22,12 +22,8 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
        assert \
        buffer \
        crypto-browserify \
-       https-browserify \
-       os-browserify \
        process \
-       stream-browserify \
-       stream-http \
-       url
+       stream-browserify
    ```
 
 2. Modify your webpack configuration
@@ -48,11 +44,7 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
         Object.assign(fallback, {
           assert: require.resolve("assert"),
           crypto: require.resolve("crypto-browserify"),
-          http: require.resolve("stream-http"),
-          https: require.resolve("https-browserify"),
-          os: require.resolve("os-browserify"),
           stream: require.resolve("stream-browserify"),
-          url: require.resolve("url"),
           ws: require.resolve("xrpl/dist/npm/client/WSWrapper"),
         });
         config.resolve.fallback = fallback;
@@ -141,7 +133,6 @@ export default defineConfig({
   },
   optimizeDeps: {
     esbuildOptions: {
-
         define: {
           global: 'globalThis',
         },
@@ -165,8 +156,6 @@ resolve: {
     events: 'events',
     crypto: 'crypto-browserify',
     stream: 'stream-browserify',
-    http: 'stream-http',
-    https: 'https-browserify',
     ws: 'xrpl/dist/npm/client/WSWrapper',
   },
 }})
@@ -181,8 +170,6 @@ npm install --save-dev @esbuild-plugins/node-globals-polyfill \
 		events \
 		crypto-browserify \
 		stream-browserify \
-		stream-http \
-		https-browserify \
 		xrpl
 ```
 
