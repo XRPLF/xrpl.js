@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import {
   XrplDefinitionsBase,
   DEFAULT_DEFINITIONS,
@@ -35,7 +34,9 @@ class BinaryParser {
    * @returns The first byte of the BinaryParser
    */
   peek(): number {
-    assert.ok(this.bytes.byteLength !== 0)
+    if (this.bytes.byteLength === 0) {
+      throw new Error()
+    }
     return this.bytes[0]
   }
 
@@ -45,7 +46,9 @@ class BinaryParser {
    * @param n the number of bytes to skip
    */
   skip(n: number): void {
-    assert.ok(n <= this.bytes.byteLength)
+    if (n > this.bytes.byteLength) {
+      throw new Error()
+    }
     this.bytes = this.bytes.slice(n)
   }
 
@@ -56,7 +59,9 @@ class BinaryParser {
    * @return The bytes
    */
   read(n: number): Buffer {
-    assert.ok(n <= this.bytes.byteLength)
+    if (n > this.bytes.byteLength) {
+      throw new Error()
+    }
 
     const slice = this.bytes.slice(0, n)
     this.skip(n)
@@ -70,7 +75,9 @@ class BinaryParser {
    * @return The number represented by those bytes
    */
   readUIntN(n: number): number {
-    assert.ok(0 < n && n <= 4, 'invalid n')
+    if (0 >= n && n > 4) {
+      throw new Error('invalid n')
+    }
     return this.read(n).reduce((a, b) => (a << 8) | b) >>> 0
   }
 
