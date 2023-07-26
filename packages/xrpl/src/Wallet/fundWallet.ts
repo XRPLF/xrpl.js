@@ -137,7 +137,7 @@ async function fundWallet(
         await this.getXrpBalance(walletToFund.classicAddress),
       )
     } catch {
-      /* startingBalance remains '0' */
+      /* startingBalance remains what it was previously */
     }
   }
 
@@ -168,7 +168,7 @@ async function requestFunding(
     body: JSON.stringify(postBody),
   })
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Its a FaucetWallet
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- It's a FaucetWallet
   const body = (await response.json()) as FaucetWallet
   // "application/json; charset=utf-8"
   if (
