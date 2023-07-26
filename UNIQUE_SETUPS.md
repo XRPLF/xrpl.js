@@ -19,7 +19,6 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
 
    ```shell
    npm install --save-dev \
-       assert \
        buffer \
        crypto-browserify \
        https-browserify \
@@ -46,7 +45,6 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
       module.exports = function override(config) {
         const fallback = config.resolve.fallback || {};
         Object.assign(fallback, {
-          assert: require.resolve("assert"),
           crypto: require.resolve("crypto-browserify"),
           http: require.resolve("stream-http"),
           https: require.resolve("https-browserify"),
@@ -127,7 +125,7 @@ Similar to above, to get xrpl.js to work with Vite you need to set up a couple a
 
 2. Copy these settings into your `vite.config.ts` file.
 
-```
+```javascript
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
@@ -141,7 +139,6 @@ export default defineConfig({
   },
   optimizeDeps: {
     esbuildOptions: {
-
         define: {
           global: 'globalThis',
         },
@@ -174,7 +171,7 @@ resolve: {
 
 3. Install the config dependencies and xrpl (e.g. using this command)
 
-```
+```shell
 npm install --save-dev @esbuild-plugins/node-globals-polyfill \
 		rollup-plugin-polyfill-node \
 		&& npm install
