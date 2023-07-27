@@ -1,6 +1,6 @@
 /* eslint-disable complexity -- required for validateAMMBid */
 import { ValidationError } from '../../errors'
-import { Amount, Currency } from '../common'
+import { Amount, AuthAccount, Currency } from '../common'
 
 import {
   BaseTransaction,
@@ -10,12 +10,6 @@ import {
 } from './common'
 
 const MAX_AUTH_ACCOUNTS = 4
-
-interface AuthAccount {
-  AuthAccount: {
-    Account: string
-  }
-}
 
 /**
  * Bid on an Automated Market Maker's (AMM's) auction slot.

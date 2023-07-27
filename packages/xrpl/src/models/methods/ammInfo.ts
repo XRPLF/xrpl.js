@@ -22,16 +22,6 @@ export interface AMMInfoRequest extends BaseRequest {
   asset2: Currency
 }
 
-interface AuthAccount {
-  account: string
-}
-
-interface VoteSlot {
-  account: string
-  trading_fee: number
-  vote_weight: number
-}
-
 /**
  * Response expected from an {@link AMMInfoRequest}.
  *
@@ -81,7 +71,9 @@ export interface AMMInfoResponse extends BaseResponse {
          * of the discounted trading fee.
          * Each member of this array is an object with one field, account, containing the address of the designated account.
          */
-        auth_accounts: AuthAccount[]
+        auth_accounts: Array<{
+          account: string
+        }>
 
         /**
          * The discounted trading fee that applies to the auction slot holder, and any eligible accounts
@@ -124,7 +116,11 @@ export interface AMMInfoResponse extends BaseResponse {
       /**
        * (May be omitted) The current votes for the AMM's trading fee, as Vote Slot Objects.
        */
-      vote_slots?: VoteSlot[]
+      vote_slots?: Array<{
+        account: string
+        trading_fee: number
+        vote_weight: number
+      }>
     }
 
     /**

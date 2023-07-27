@@ -1,14 +1,8 @@
-import { Currency } from '../common'
+import { AuthAccount, Currency } from '../common'
 
 import BaseLedgerEntry from './BaseLedgerEntry'
 
-interface AuthAccount {
-  AuthAccount: {
-    account: string
-  }
-}
-
-interface VoteSlot {
+export interface VoteSlot {
   VoteEntry: {
     Account: string
     TradingFee: number
