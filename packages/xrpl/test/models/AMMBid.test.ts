@@ -108,4 +108,61 @@ describe('AMMBid', function () {
     assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
     assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
+
+  it(`throws w/ AuthAccounts must be an AuthAccount array`, function () {
+    bid.AuthAccounts = 1234
+    const errorMessage = 'AMMBid: AuthAccounts must be an AuthAccount array'
+    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
+    assert.throws(() => validate(bid), ValidationError, errorMessage)
+  })
+
+  it(`throws w/ invalid AuthAccounts when AuthAccount is null`, function () {
+    bid.AuthAccounts[0] = {
+      AuthAccount: null,
+    }
+    const errorMessage = 'AMMBid: invalid AuthAccounts'
+    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
+    assert.throws(() => validate(bid), ValidationError, errorMessage)
+  })
+
+  it(`throws w/ invalid AuthAccounts when AuthAccount is undefined`, function () {
+    bid.AuthAccounts[0] = {
+      AuthAccount: undefined,
+    }
+    const errorMessage = 'AMMBid: invalid AuthAccounts'
+    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
+    assert.throws(() => validate(bid), ValidationError, errorMessage)
+  })
+
+  it(`throws w/ invalid AuthAccounts when AuthAccount is not an object`, function () {
+    bid.AuthAccounts[0] = {
+      AuthAccount: 1234,
+    }
+    const errorMessage = 'AMMBid: invalid AuthAccounts'
+    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
+    assert.throws(() => validate(bid), ValidationError, errorMessage)
+  })
+
+  it(`throws w/ invalid AuthAccounts when AuthAccount.Account is not a string`, function () {
+    bid.AuthAccounts[0] = {
+      AuthAccount: {
+        Account: 1234,
+      },
+    }
+    const errorMessage = 'AMMBid: invalid AuthAccounts'
+    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
+    assert.throws(() => validate(bid), ValidationError, errorMessage)
+  })
+
+  it(`throws w/ AuthAccounts must not include sender's address`, function () {
+    bid.AuthAccounts[0] = {
+      AuthAccount: {
+        Account: bid.Account,
+      },
+    }
+    const errorMessage =
+      "AMMBid: AuthAccounts must not include sender's address"
+    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
+    assert.throws(() => validate(bid), ValidationError, errorMessage)
+  })
 })
