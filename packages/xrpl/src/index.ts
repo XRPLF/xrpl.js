@@ -1,6 +1,3 @@
-// Broadcast client is experimental
-export { BroadcastClient } from './client/BroadcastClient'
-
 export { Client, ClientOptions } from './client'
 
 export * from './models'

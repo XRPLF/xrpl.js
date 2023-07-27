@@ -1,6 +1,4 @@
 import { Client } from '../src/client'
-// eslint-disable-next-line import/no-deprecated -- Will remove in 3.0.0
-import { BroadcastClient } from '../src/client/BroadcastClient'
 
 import createMockRippled, {
   type MockedWebSocketServer,
@@ -9,8 +7,7 @@ import rippled from './fixtures/rippled'
 import { destroyServer, getFreePort } from './testUtils'
 
 export interface XrplTestContext {
-  // eslint-disable-next-line import/no-deprecated -- Will remove in 3.0.0
-  client: Client | BroadcastClient
+  client: Client
   _mockedServerPort?: number
   mockRippled?: MockedWebSocketServer
   mocks?: MockedWebSocketServer[]
@@ -38,29 +35,9 @@ async function setupMockRippledConnection(
   return context.client.connect().then(() => context)
 }
 
-async function setupMockRippledConnectionForBroadcast(
-  ports: number[],
-): Promise<XrplTestContext> {
-  const servers = ports.map((port) => `ws://localhost:${port}`)
-  const context: XrplTestContext = {
-    mocks: ports.map((port) => createMockRippled(port)),
-    // eslint-disable-next-line import/no-deprecated -- Will remove in 3.0.0
-    client: new BroadcastClient(servers),
-    servers: ports,
-  }
-
-  return context.client.connect().then(() => context)
-}
-
 async function setupClient(): Promise<XrplTestContext> {
   return getFreePort().then(async (port) => {
     return setupMockRippledConnection(port)
-  })
-}
-
-async function setupBroadcast(): Promise<XrplTestContext> {
-  return Promise.all([getFreePort(), getFreePort()]).then(async (ports) => {
-    return setupMockRippledConnectionForBroadcast(ports)
   })
 }
 
@@ -98,4 +75,4 @@ async function teardownClient(
     })
 }
 
-export { setupClient, teardownClient, setupBroadcast, createMockRippled }
+export { setupClient, teardownClient, createMockRippled }
