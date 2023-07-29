@@ -10,7 +10,6 @@ import {
   type SubmitResponse,
   TimeoutError,
   NotConnectedError,
-  unixTimeToRippleTime,
 } from '../../src'
 import { Payment, Transaction } from '../../src/models/transactions'
 import { hashSignedTx } from '../../src/utils/hashes'
@@ -74,34 +73,6 @@ export async function ledgerAccept(
         }
       })
   })
-}
-
-/**
- * Attempt to get the time after which we can check for the escrow to be finished.
- * Sometimes the ledger close_time is in the future, so we need to wait for it to catch up.
- *
- * @param targetTime - The target wait time, before accounting for current ledger time.
- * @param minimumWaitTimeMs - The minimum wait time in milliseconds.
- * @param maximumWaitTimeMs - The maximum wait time in milliseconds.
- * @returns The wait time in milliseconds.
- */
-export function calculateWaitTimeForTransaction(
-  targetTime: number,
-  minimumWaitTimeMs = 5000,
-  maximumWaitTimeMs = 20000,
-): number {
-  const currentTimeUnixMs = Math.floor(new Date().getTime())
-  const currentTimeRippleSeconds = unixTimeToRippleTime(currentTimeUnixMs)
-  const closeTimeCurrentTimeDiffSeconds = currentTimeRippleSeconds - targetTime
-  const closeTimeCurrentTimeDiffMs = closeTimeCurrentTimeDiffSeconds * 1000
-  return Math.max(
-    minimumWaitTimeMs,
-    Math.min(
-      Math.abs(closeTimeCurrentTimeDiffMs) + minimumWaitTimeMs,
-      // Maximum wait time of 20 seconds
-      maximumWaitTimeMs,
-    ),
-  )
 }
 
 export function subscribeDone(client: Client): void {
@@ -298,4 +269,71 @@ export async function getXRPBalance(
     account: wallet.classicAddress,
   }
   return (await client.request(request)).result.account_data.Balance
+}
+
+/**
+ * Retrieves the close time of the ledger.
+ *
+ * @param client - The client object.
+ * @returns - A promise that resolves to the close time of the ledger.
+ *
+ * @example
+ * const closeTime = await getLedgerCloseTime(client);
+ * console.log(closeTime); // Output: 1626424978
+ */
+export async function getLedgerCloseTime(client: Client): Promise<number> {
+  const CLOSE_TIME: number = (
+    await client.request({
+      command: 'ledger',
+      ledger_index: 'validated',
+    })
+  ).result.ledger.close_time
+
+  return CLOSE_TIME
+}
+
+/**
+ * Waits for the ledger time to reach a specific value and forces ledger progress if necessary.
+ *
+ * @param client - The client object.
+ * @param ledgerTime - The target ledger time.
+ * @param [retries=20] - The number of retries before throwing an error.
+ * @returns - A promise that resolves when the ledger time reaches the target value.
+ *
+ * @example
+ * try {
+ *   await waitForAndForceProgressLedgerTime(client, 1626424978, 10);
+ *   console.log('Ledger time reached.'); // Output: Ledger time reached.
+ * } catch (error) {
+ *   console.error(error);
+ * }
+ */
+export async function waitForAndForceProgressLedgerTime(
+  client: Client,
+  ledgerTime: number,
+  retries = 20,
+): Promise<void> {
+  async function getCloseTime(): Promise<boolean> {
+    const CLOSE_TIME: number = await getLedgerCloseTime(client)
+    if (CLOSE_TIME >= ledgerTime) {
+      return true
+    }
+
+    return false
+  }
+
+  let retryCounter = retries || 0
+
+  while (retryCounter > 0) {
+    // eslint-disable-next-line no-await-in-loop -- Necessary for retries
+    if (await getCloseTime()) {
+      return
+    }
+
+    // eslint-disable-next-line no-await-in-loop -- Necessary for retries
+    await ledgerAccept(client)
+    retryCounter -= 1
+  }
+
+  throw new Error(`Ledger time not reached after ${retries} retries.`)
 }

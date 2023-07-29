@@ -127,6 +127,10 @@ export interface AccountInfoAccountFlags {
    * Requires incoming payments to specify a Destination Tag.
    */
   requireDestinationTag: boolean
+  /**
+   * This address can claw back issued IOUs. Once enabled, cannot be disabled.
+   */
+  allowTrustLineClawback: boolean
 }
 
 /**

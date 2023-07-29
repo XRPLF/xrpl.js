@@ -3,6 +3,10 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 
+## 2.9.1 (2023-07-18)
+### Fixed
+* Passing Definitions from `STObject` to `STArray` back to `STObject`, both for signing & decoding (to JSON)
+
 ## 2.9.0 (2023-07-12)
 
 ### Added
@@ -23,7 +27,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Fixed
 * `getNFTokenID` now also accepts metadata from `tx` in binary format
-* Passing Definitions from `STObject` to `STArray` back to `STObject`, both for signing & decoding (to JSON)
 * Allowing the removal of a signer list
 * Importing `Wallet` as a named import.
 
