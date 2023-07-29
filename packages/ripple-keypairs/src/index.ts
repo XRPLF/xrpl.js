@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import brorand = require('brorand')
 import * as hashjs from 'hash.js'
 import * as elliptic from 'elliptic'
@@ -19,10 +18,9 @@ function generateSeed(
     algorithm?: 'ed25519' | 'ecdsa-secp256k1'
   } = {},
 ): string {
-  assert.ok(
-    !options.entropy || options.entropy.length >= 16,
-    'entropy too short',
-  )
+  if (!(!options.entropy || options.entropy.length >= 16)) {
+    throw new Error('entropy too short')
+  }
   const entropy = options.entropy ? options.entropy.slice(0, 16) : brorand(16)
   const type = options.algorithm === 'ed25519' ? 'ed25519' : 'secp256k1'
   return addressCodec.encodeSeed(Buffer.from(entropy), type)
@@ -82,7 +80,9 @@ const ed25519 = {
   sign(message, privateKey): string {
     // caution: Ed25519.sign interprets all strings as hex, stripping
     // any non-hex characters without warning
-    assert.ok(Array.isArray(message), 'message must be array of octets')
+    if (!Array.isArray(message)) {
+      throw new Error('message must be array of octets')
+    }
     return bytesToHex(
       Ed25519.sign(message, hexToBytes(privateKey).slice(1)).toBytes(),
     )
