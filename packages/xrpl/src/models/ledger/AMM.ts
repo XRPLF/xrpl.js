@@ -24,17 +24,11 @@ export default interface AMM extends BaseLedgerEntry {
   /**
    * The definition for one of the two assets this AMM holds.
    */
-  Asset: {
-    currency: string
-    issuer?: string
-  }
+  Asset: Currency
   /**
    * The definition for the other asset this AMM holds.
    */
-  Asset2: {
-    currency: string
-    issuer?: string
-  }
+  Asset2: Currency
   /**
    * Details of the current owner of the auction slot.
    */
