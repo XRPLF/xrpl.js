@@ -1,4 +1,4 @@
-import * as assert from 'assert'
+import assert from './assert'
 import { ripemd160 } from 'ripple-iso-crypto/ripemd160'
 import { sha256 } from 'ripple-iso-crypto/sha256'
 import { hexToBytes } from 'ripple-iso-crypto/utils'

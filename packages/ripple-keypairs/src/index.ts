@@ -1,5 +1,3 @@
-import * as assert from 'assert'
-
 import * as addressCodec from 'ripple-address-codec'
 
 import { secp256k1 as nobleSecp256k1 } from '@noble/curves/secp256k1'
@@ -8,8 +6,9 @@ import { hexToBytes, numberToBytesBE } from '@noble/curves/abstract/utils'
 import { randomBytes } from 'ripple-iso-crypto/utils'
 
 import { accountPublicFromPublicGenerator, derivePrivateKey } from './secp256k1'
-import { computePublicKeyHash, hexToNumberArray, bytesToHex } from './utils'
+import { bytesToHex, computePublicKeyHash, hexToNumberArray } from './utils'
 import Sha512 from './Sha512'
+import assert from './assert'
 
 export type ByteArray = number[] | Uint8Array
 export type HexString = string

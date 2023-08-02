@@ -1,7 +1,6 @@
-import { LedgerIndex } from '../common'
 import { LedgerEntry } from '../ledger'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * The `ledger_entry` method returns a single ledger object from the XRP Ledger
@@ -19,7 +18,7 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface LedgerEntryRequest extends BaseRequest {
+export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'ledger_entry'
   /**
    * If true, return the requested ledger object's contents as a hex string in
@@ -27,10 +26,6 @@ export interface LedgerEntryRequest extends BaseRequest {
    * default is false.
    */
   binary?: boolean
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /** The ledger index of the ledger to use, or a shortcut string. */
-  ledger_index?: LedgerIndex
 
   /*
    * Only one of the following properties should be defined in a single request
@@ -137,6 +132,11 @@ export interface LedgerEntryRequest extends BaseRequest {
         ticket_sequence: number
       }
     | string
+
+  /**
+   * Must be the object ID of the NFToken page, as hexadecimal
+   */
+  nft_page?: string
 }
 
 /**

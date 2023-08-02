@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [16.x]
 
     steps:
       - uses: actions/checkout@v3
@@ -25,9 +25,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Setup npm version 7
+      - name: Setup npm version 9
         run: |
-          npm i -g npm@7 --registry=https://registry.npmjs.org
+          npm i -g npm@9 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
@@ -57,7 +57,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x, 20.x]
+        node-version: [16.x, 18.x, 20.x]
 
     steps:
       - uses: actions/checkout@v3
@@ -66,9 +66,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Setup npm version 7
+      - name: Setup npm version 9
         run: |
-          npm i -g npm@7 --registry=https://registry.npmjs.org
+          npm i -g npm@9 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
@@ -98,23 +98,23 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x, 20.x]
+        node-version: [16.x, 18.x, 20.x]
 
     steps:
       - uses: actions/checkout@v3
 
       - name: Run docker in background
         run: |
-          docker run --detach --rm --name rippled-service -p 6006:6006 --volume "${{ github.workspace }}/.ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s --env "ENV_ARGS=-a --start" --env GITHUB_ACTIONS=true --env CI=true xrpllabsofficial/xrpld:latest
+          docker run --detach --rm --name rippled-service -p 6006:6006 --volume "${{ github.workspace }}/.ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s --env "ENV_ARGS=-a --start" --env GITHUB_ACTIONS=true --env CI=true xrpllabsofficial/xrpld:1.12.0-b1
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Setup npm version 7
+      - name: Setup npm version 9
         run: |
-          npm i -g npm@7 --registry=https://registry.npmjs.org
+          npm i -g npm@9 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
@@ -150,7 +150,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x] # This just needs to be compatible w/ puppeteer
+        node-version: [16.x]
 
     steps:
       - uses: actions/checkout@v3
@@ -162,11 +162,11 @@ jobs:
 
       - name: Run docker in background
         run: |
-          docker run --detach --rm --name rippled-service -p 6006:6006 --volume "${{ github.workspace }}/.ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s --env "ENV_ARGS=-a --start" --env GITHUB_ACTIONS=true --env CI=true xrpllabsofficial/xrpld:latest
+          docker run --detach --rm --name rippled-service -p 6006:6006 --volume "${{ github.workspace }}/.ci-config/":"/config/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s --env "ENV_ARGS=-a --start" --env GITHUB_ACTIONS=true --env CI=true xrpllabsofficial/xrpld:1.12.0-b1
 
-      - name: Setup npm version 7
+      - name: Setup npm version 9
         run: |
-          npm i -g npm@7 --registry=https://registry.npmjs.org
+          npm i -g npm@9 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
@@ -195,3 +195,45 @@ jobs:
       - name: Stop docker container
         if: always()
         run: docker stop rippled-service
+
+  snippets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x, 20.x]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Setup npm version 9
+        run: |
+          npm i -g npm@9 --registry=https://registry.npmjs.org
+
+      - name: Cache node modules
+        id: cache-nodemodules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # caching node_modules
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-${{ matrix.node-version }}-
+            ${{ runner.os }}-deps-
+
+      - name: Install Dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - run: npm run build
+      - name: Run Snippets
+        run: (for i in packages/xrpl/snippets/src/*.ts; do echo "Running $i" && npx ts-node $i || exit 1; done)

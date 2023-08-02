@@ -1,17 +1,15 @@
 import BigNumber from 'bignumber.js'
-import flatten from 'lodash/flatten'
-import groupBy from 'lodash/groupBy'
 
-import { Amount, IssuedCurrencyAmount } from '../models/common'
-import { TransactionMetadata, Node } from '../models/transactions/metadata'
+import {
+  Amount,
+  Balance,
+  IssuedCurrencyAmount,
+  TransactionMetadata,
+  Node,
+} from '../models'
 
+import { groupBy } from './collections'
 import { dropsToXrp } from './xrpConversion'
-
-interface Balance {
-  currency: string
-  issuer?: string
-  value: string
-}
 
 interface BalanceChange {
   account: string
@@ -164,11 +162,7 @@ export default function getBalanceChanges(
   metadata: TransactionMetadata,
 ): Array<{
   account: string
-  balances: Array<{
-    currency: string
-    issuer?: string
-    value: string
-  }>
+  balances: Balance[]
 }> {
   const quantities = normalizeNodes(metadata).map((node) => {
     if (node.LedgerEntryType === 'AccountRoot') {
@@ -187,5 +181,5 @@ export default function getBalanceChanges(
     }
     return []
   })
-  return groupByAccount(flatten(quantities))
+  return groupByAccount(quantities.flat())
 }

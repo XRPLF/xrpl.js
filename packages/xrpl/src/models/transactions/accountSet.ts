@@ -56,6 +56,8 @@ export enum AccountSetAsfFlags {
   asfDisallowIncomingPayChan = 14,
   /** Disallow other accounts from creating incoming Trustlines */
   asfDisallowIncomingTrustline = 15,
+  /** Permanently gain the ability to claw back issued IOUs */
+  asfAllowTrustLineClawback = 16,
 }
 
 /**

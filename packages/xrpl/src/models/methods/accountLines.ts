@@ -1,8 +1,6 @@
-import { LedgerIndex } from '../common'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
-
-export interface Trustline {
+export interface AccountLinesTrustline {
   /** The unique Address of the counterparty to this trust line. */
   account: string
   /**
@@ -74,17 +72,12 @@ export interface Trustline {
  *
  * @category Requests
  */
-export interface AccountLinesRequest extends BaseRequest {
+export interface AccountLinesRequest
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'account_lines'
   /** A unique identifier for the account, most commonly the account's Address. */
   account: string
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * ledger automatically.
-   */
-  ledger_index?: LedgerIndex
   /**
    * The Address of a second account. If provided, show only lines of trust
    * connecting the two accounts.
@@ -118,7 +111,7 @@ export interface AccountLinesResponse extends BaseResponse {
      * Array of trust line objects. If the number of trust lines is large, only
      * returns up to the limit at a time.
      */
-    lines: Trustline[]
+    lines: AccountLinesTrustline[]
     /**
      * The ledger index of the current open ledger, which was used when
      * retrieving this information.

@@ -3,14 +3,60 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 
+## 2.9.1 (2023-07-18)
+### Fixed
+* Passing Definitions from `STObject` to `STArray` back to `STObject`, both for signing & decoding (to JSON)
+
+## 2.9.0 (2023-07-12)
+
 ### Added
-* Null and undefined values in transactions are now treated as though the field was not passed in.
+* `NetworkId` field support including auto-filling and to `server_info` response
+* Add `BurnedNFTokens`, `FirstNFTSequence`, `MintedNFTokens`,
+`NFTokenMinter`, and `WalletLocator` to `AccountRoot`
+* Add `ledger_hash` and `ledger_index` to `account_nfts`,
+  `nft_buy_offers`, and `nft_sell_offers` requests
+* Add `nft_page` to `ledger_entry` request
+* Add types for `NFTokenPage` and `NFTokenOffer` LedgerEntries.
+* Add type for NFToken object that is stored on a `NFTokenPage`
+* Add type for `account_info`'s `account_flags` property
+* Add types for `EnableAmendment`, `SetFee`, and `UNLModify` transactions
+* Add the new fields for `XRPFees` amendment and id for the `FeeSettings`
+* Add `FeeSettings`, `NegativeUNL`, and `Amendments` singleton ledger entry ids
+* Add `WalletLocator` to `SignerEntry` on `SignerList` (LedgerEntry)
+* Export many nested types and interfaces
+
+### Fixed
+* `getNFTokenID` now also accepts metadata from `tx` in binary format
+* Allowing the removal of a signer list
+* Importing `Wallet` as a named import.
+
+### Breaking
+* If you were deep importing these types previously you will need to import them from `xrpl` and rename them:
+  * `methods/accountLines`: `Trustline` -> `AccountLinesTrustline`
+  * `methods/bookOffers`: `TakerAmount` -> `BookOfferCurrency`
+  * `methods/ledgerData`: `BinaryLedgerEntry` -> `LedgerDataBinaryLedgerEntry`
+
+## 2.8.1 (2023-06-13)
+
+### Fixed
+* Points to latest version of `ripple-keypairs` instead of a beta release
+
+## 2.8.0 (2023-06-13)
+
+### Added
+* Adds support for npm v9
 
 ### Fixed
 * Fixed `ServerState.transitions` typing, it is now a string instead of a number. (Only used in return from `server_state` request)
 * Added `destination_amount` to `PathOption` which is returned as part of a `path_find` request
 * Removed the `decode(encode(tx)) == tx` check from the wallet signing process
 * Fixed the location of `signer_lists` in the `account_info` response so that it matches rippled
+* Guard check for signing algorithm used in `Wallet.generate()`
+* Null and undefined values in transactions are now treated as though the field was not passed in.
+* Improved the type definition of the return value of `submitAndWait()`
+
+### Changed
+* Added sidechain devnet support to faucet generation
 
 ### Removed
 * RPCs and utils related to the old sidechain design
@@ -102,6 +148,7 @@ Wallet.fromMmnemonic()
 ## 2.2.1 (2022-04-21)
 ### Fixed
 * Fix return field of NFT offer
+* Updated `getOrderbook` docs and param names to reflect actual behavior of checking both sides of order book.
 
 ## 2.2.0 (2022-04-19)
 ### Added

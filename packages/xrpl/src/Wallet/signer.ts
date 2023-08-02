@@ -1,5 +1,4 @@
 import { BigNumber } from 'bignumber.js'
-import { flatMap } from 'lodash'
 import { decodeAccountID } from 'ripple-address-codec'
 import {
   decode,
@@ -13,7 +12,7 @@ import { ValidationError } from '../errors'
 import { Signer } from '../models/common'
 import { Transaction, validate } from '../models/transactions'
 
-import Wallet from '.'
+import { Wallet } from '.'
 
 /**
  * Takes several transactions with Signer fields (in object or blob form) and creates a
@@ -32,9 +31,13 @@ function multisign(transactions: Array<Transaction | string>): string {
     throw new ValidationError('There were 0 transactions to multisign')
   }
 
-  transactions.forEach((txOrBlob) => {
-    const tx: Transaction = getDecodedTransaction(txOrBlob)
+  const decodedTransactions: Transaction[] = transactions.map(
+    (txOrBlob: string | Transaction) => {
+      return getDecodedTransaction(txOrBlob)
+    },
+  )
 
+  decodedTransactions.forEach((tx) => {
     /*
      * This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
      */
@@ -52,12 +55,6 @@ function multisign(transactions: Array<Transaction | string>): string {
       )
     }
   })
-
-  const decodedTransactions: Transaction[] = transactions.map(
-    (txOrBlob: string | Transaction) => {
-      return getDecodedTransaction(txOrBlob)
-    },
-  )
 
   validateTransactionEquivalence(decodedTransactions)
 
@@ -134,10 +131,9 @@ function getTransactionWithAllSigners(
   transactions: Transaction[],
 ): Transaction {
   // Signers must be sorted in the combined transaction - See compareSigners' documentation for more details
-  const sortedSigners: Signer[] = flatMap(
-    transactions,
-    (tx) => tx.Signers ?? [],
-  ).sort(compareSigners)
+  const sortedSigners: Signer[] = transactions
+    .flatMap((tx) => tx.Signers ?? [])
+    .sort(compareSigners)
 
   return { ...transactions[0], Signers: sortedSigners }
 }
@@ -158,10 +154,11 @@ function compareSigners(left: Signer, right: Signer): number {
   )
 }
 
+const NUM_BITS_IN_HEX = 16
+
 function addressToBigNumber(address: string): BigNumber {
   const hex = Buffer.from(decodeAccountID(address)).toString('hex')
-  const numberOfBitsInHex = 16
-  return new BigNumber(hex, numberOfBitsInHex)
+  return new BigNumber(hex, NUM_BITS_IN_HEX)
 }
 
 function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {

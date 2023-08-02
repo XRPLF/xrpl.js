@@ -232,4 +232,17 @@ describe('BaseTransaction', function () {
       'BaseTransaction: invalid Memos',
     )
   })
+
+  it(`Handles invalid NetworkID`, function () {
+    const invalidNetworkID = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      NetworkID: '1024',
+    }
+    assert.throws(
+      () => validateBaseTransaction(invalidNetworkID),
+      ValidationError,
+      'BaseTransaction: invalid NetworkID',
+    )
+  })
 })

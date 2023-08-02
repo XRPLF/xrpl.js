@@ -1,18 +1,13 @@
-import flatMap from 'lodash/flatMap'
-
-import type { Client } from '..'
-import { LedgerIndex } from '../models/common'
-import { AccountInfoRequest } from '../models/methods'
-import { AccountLinesRequest, Trustline } from '../models/methods/accountLines'
+import type { Balance, Client } from '..'
+import {
+  AccountLinesRequest,
+  AccountLinesTrustline,
+  LedgerIndex,
+  AccountInfoRequest,
+} from '../models'
 import { dropsToXrp } from '../utils'
 
-interface Balance {
-  value: string
-  currency: string
-  issuer?: string
-}
-
-function formatBalances(trustlines: Trustline[]): Balance[] {
+function formatBalances(trustlines: AccountLinesTrustline[]): Balance[] {
   return trustlines.map((trustline) => ({
     value: trustline.balance,
     currency: trustline.currency,
@@ -111,7 +106,7 @@ async function getBalances(
   // combine results
   await Promise.all([xrpPromise, linesPromise]).then(
     ([xrpBalance, linesResponses]) => {
-      const accountLinesBalance = flatMap(linesResponses, (response) =>
+      const accountLinesBalance = linesResponses.flatMap((response) =>
         formatBalances(response.result.lines),
       )
       if (xrpBalance !== '') {

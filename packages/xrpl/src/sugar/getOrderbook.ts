@@ -1,6 +1,5 @@
 /* eslint-disable max-lines-per-function -- Needs to process orderbooks. */
 import BigNumber from 'bignumber.js'
-import flatMap from 'lodash/flatMap'
 
 import type { Client } from '../client'
 import { ValidationError } from '../errors'
@@ -8,8 +7,9 @@ import { LedgerIndex } from '../models/common'
 import { OfferFlags } from '../models/ledger/Offer'
 import {
   BookOffer,
+  BookOfferCurrency,
   BookOffersRequest,
-  TakerAmount,
+  BookOffersResponse,
 } from '../models/methods/bookOffers'
 
 const DEFAULT_LIMIT = 20
@@ -31,28 +31,28 @@ const getOrderbookOptionsSet = new Set([
 ])
 
 /**
- * Fetch orderbook (buy/sell orders) between two accounts.
+ * Fetch orderbook (buy/sell orders) between two currency pairs. This checks both sides of the orderbook
+ * by making two `order_book` requests (with the second reversing takerPays and takerGets). Returned offers are
+ * not normalized in this function, so either currency could be takerGets or takerPays.
  *
  * @param this - Client.
- * @param takerPays - Specification of which currency the account taking the
- * offer would pay, as an object with `currency` and `issuer` fields.
- * @param takerGets - Specification of which currency the account taking the
- * offer would receive, as an object with `currency` and `issuer` fields.
+ * @param currency1 - Specification of one currency involved. (With a currency code and optionally an issuer)
+ * @param currency2 - Specification of a second currency involved. (With a currency code and optionally an issuer)
  * @param options - Options allowing the client to specify ledger_index,
  * ledger_hash, filter by taker, and/or limit number of orders.
  * @param options.ledger_index - Retrieve the orderbook at a given ledger_index.
  * @param options.ledger_hash - Retrieve the orderbook at the ledger with a
  * given ledger_hash.
  * @param options.taker - Filter orders by taker.
- * @param options.limit - Limit number of order books to fetch for each side of
- * the order book. Defaults to 20.
+ * @param options.limit - The limit passed into each book_offers request.
+ * Can return more than this due to two calls being made. Defaults to 20.
  * @returns An object containing buy and sell objects.
  */
 // eslint-disable-next-line max-params, complexity -- Once bound to Client, getOrderbook only has 3 parameters.
 async function getOrderbook(
   this: Client,
-  takerPays: TakerAmount,
-  takerGets: TakerAmount,
+  currency1: BookOfferCurrency,
+  currency2: BookOfferCurrency,
   options: {
     limit?: number
     ledger_index?: LedgerIndex
@@ -104,25 +104,26 @@ async function getOrderbook(
 
   const request: BookOffersRequest = {
     command: 'book_offers',
-    taker_pays: takerPays,
-    taker_gets: takerGets,
+    taker_pays: currency1,
+    taker_gets: currency2,
     ledger_index: options.ledger_index ?? 'validated',
     ledger_hash: options.ledger_hash === null ? undefined : options.ledger_hash,
     limit: options.limit ?? DEFAULT_LIMIT,
     taker: options.taker ? options.taker : undefined,
   }
   // 2. Make Request
-  const directOfferResults = await this.requestAll(request)
-  request.taker_gets = takerPays
-  request.taker_pays = takerGets
+  const directOfferResults: BookOffersResponse[] = await this.requestAll(
+    request,
+  )
+  request.taker_gets = currency1
+  request.taker_pays = currency2
   const reverseOfferResults = await this.requestAll(request)
   // 3. Return Formatted Response
-  const directOffers = flatMap(
-    directOfferResults,
-    (directOfferResult) => directOfferResult.result.offers,
+
+  const directOffers = directOfferResults.flatMap(
+    (directOfferResult: BookOffersResponse) => directOfferResult.result.offers,
   )
-  const reverseOffers = flatMap(
-    reverseOfferResults,
+  const reverseOffers = reverseOfferResults.flatMap(
     (reverseOfferResult) => reverseOfferResult.result.offers,
   )
 

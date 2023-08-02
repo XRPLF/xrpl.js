@@ -14,7 +14,6 @@
     "noImplicitAny": false,
     "removeComments": false,
     "preserveConstEnums": false,
-    "suppressImplicitAnyIndexErrors": true,
     "skipLibCheck": true,
     "declaration": true
   },

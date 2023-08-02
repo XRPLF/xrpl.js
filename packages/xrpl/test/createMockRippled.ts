@@ -10,7 +10,7 @@ import type {
 
 import { destroyServer, getFreePort } from './testUtils'
 
-function createResponse(
+export function createResponse(
   request: { id: number | string },
   response: Record<string, unknown>,
 ): string {
@@ -55,7 +55,7 @@ export type MockedWebSocketServer = WebSocketServer &
     addResponse: (
       command: string,
       response:
-        | Response
+        | BaseResponse
         | ErrorResponse
         | ((r: Request) => Response | ErrorResponse | Record<string, unknown>)
         | Record<string, unknown>,

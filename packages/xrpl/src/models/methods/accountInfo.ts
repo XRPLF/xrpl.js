@@ -1,7 +1,6 @@
-import { LedgerIndex } from '../common'
 import { AccountRoot, SignerList } from '../ledger'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * The `account_info` command retrieves information about an account, its
@@ -10,17 +9,10 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface AccountInfoRequest extends BaseRequest {
+export interface AccountInfoRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'account_info'
   /** A unique identifier for the account, most commonly the account's address. */
   account: string
-  /** A 20-byte hex string for the ledger version to use. */
-  ledger_hash?: string
-  /**
-   * The ledger index of the ledger to use, or a shortcut string to choose a
-   * ledger automatically.
-   */
-  ledger_index?: LedgerIndex
   /**
    * Whether to get info about this account's queued transactions. Can only be
    * used when querying for the data from the current open ledger. Not available
@@ -39,7 +31,7 @@ export interface AccountInfoRequest extends BaseRequest {
   strict?: boolean
 }
 
-interface QueueTransaction {
+export interface AccountQueueTransaction {
   /**
    * Whether this transaction changes this address's ways of authorizing
    * transactions.
@@ -58,7 +50,7 @@ interface QueueTransaction {
   seq: number
 }
 
-interface QueueData {
+export interface AccountQueueData {
   /** Number of queued transactions from this address. */
   txn_count: number
   /**
@@ -78,7 +70,67 @@ interface QueueData {
    */
   max_spend_drops_total?: string
   /** Information about each queued transaction from this address. */
-  transactions?: QueueTransaction[]
+  transactions?: AccountQueueTransaction[]
+}
+
+export interface AccountInfoAccountFlags {
+  /**
+   * Enable rippling on this address's trust lines by default. Required for issuing addresses; discouraged for others.
+   */
+  defaultRipple: boolean
+  /**
+   * This account can only receive funds from transactions it sends, and from preauthorized accounts.
+   * (It has DepositAuth enabled.)
+   */
+  depositAuth: boolean
+  /**
+   * Disallows use of the master key to sign transactions for this account.
+   */
+  disableMasterKey: boolean
+  /**
+   * Disallow incoming Checks from other accounts.
+   */
+  disallowIncomingCheck?: boolean
+  /**
+   * Disallow incoming NFTOffers from other accounts. Part of the DisallowIncoming amendment.
+   */
+  disallowIncomingNFTokenOffer?: boolean
+  /**
+   * Disallow incoming PayChannels from other accounts. Part of the DisallowIncoming amendment.
+   */
+  disallowIncomingPayChan?: boolean
+  /**
+   * Disallow incoming Trustlines from other accounts. Part of the DisallowIncoming amendment.
+   */
+  disallowIncomingTrustline?: boolean
+  /**
+   * Client applications should not send XRP to this account. Not enforced by rippled.
+   */
+  disallowIncomingXRP: boolean
+  /**
+   * All assets issued by this address are frozen.
+   */
+  globalFreeze: boolean
+  /**
+   * This address cannot freeze trust lines connected to it. Once enabled, cannot be disabled.
+   */
+  noFreeze: boolean
+  /**
+   * The account has used its free SetRegularKey transaction.
+   */
+  passwordSpent: boolean
+  /**
+   * This account must individually approve other users for those users to hold this account's issued currencies.
+   */
+  requireAuthorization: boolean
+  /**
+   * Requires incoming payments to specify a Destination Tag.
+   */
+  requireDestinationTag: boolean
+  /**
+   * This address can claw back issued IOUs. Once enabled, cannot be disabled.
+   */
+  allowTrustLineClawback: boolean
 }
 
 /**
@@ -97,6 +149,11 @@ export interface AccountInfoResponse extends BaseResponse {
      * present.
      */
     account_data: AccountRoot & { signer_lists?: SignerList[] }
+
+    /**
+     * A map of account flags parsed out.  This will only be available for rippled nodes 1.11.0 and higher.
+     */
+    account_flags?: AccountInfoAccountFlags
     /**
      * The ledger index of the current in-progress ledger, which was used when
      * retrieving this information.
@@ -115,7 +172,7 @@ export interface AccountInfoResponse extends BaseResponse {
      * fields may be omitted because the values are calculated "lazily" by the
      * queuing mechanism.
      */
-    queue_data?: QueueData
+    queue_data?: AccountQueueData
     /**
      * True if this data is from a validated ledger version; if omitted or set
      * to false, this data is not final.

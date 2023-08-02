@@ -1,12 +1,16 @@
 /* eslint-disable import/export -- Tells webpack which files exist. */
+
+// These go first because they're affected by the `ledger_accept`s
+export * from './transactions/escrowFinish.test'
+export * from './transactions/escrowCancel.test'
+
+// Transactions
 export * from './transactions/accountSet.test'
 export * from './transactions/checkCancel.test'
 export * from './transactions/checkCash.test'
 export * from './transactions/checkCreate.test'
 export * from './transactions/depositPreauth.test'
-export * from './transactions/escrowCancel.test'
 export * from './transactions/escrowCreate.test'
-export * from './transactions/escrowFinish.test'
 export * from './transactions/offerCancel.test'
 export * from './transactions/offerCreate.test'
 export * from './transactions/payment.test'
@@ -16,6 +20,7 @@ export * from './transactions/paymentChannelFund.test'
 export * from './transactions/signerListSet.test'
 export * from './transactions/trustSet.test'
 
+// Requests
 export * from './requests/accountChannels.test'
 export * from './requests/accountCurrencies.test'
 export * from './requests/accountInfo.test'
@@ -49,7 +54,6 @@ export * from './integration.test'
 export * from './onConnect.test'
 export * from './regularKey.test'
 export * from './submitAndWait.test'
-export * from './wallet.test'
 
 // Because this does 256 ledger accepts, we do it last
 export * from './transactions/accountDelete.test'

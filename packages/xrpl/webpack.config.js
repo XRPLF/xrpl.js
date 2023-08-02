@@ -57,7 +57,6 @@ function getDefaultConfiguration() {
       alias: {
         crypto: false,
         ws: './dist/npm/client/WSWrapper.js',
-        'https-proxy-agent': false,
       },
       extensions: ['.js', '.json'],
       // We don't want to webpack any of the local dependencies:
@@ -66,11 +65,7 @@ function getDefaultConfiguration() {
       symlinks: false,
       fallback: {
         buffer: require.resolve('buffer/'),
-        assert: require.resolve('assert/'),
-        url: require.resolve('url/'),
-        stream: require.resolve('stream-browserify'),
-        https: require.resolve('https-browserify'),
-        http: require.resolve('stream-http'),
+        stream: require.resolve('stream-browserify')
       },
     },
   }

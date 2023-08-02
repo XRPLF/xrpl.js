@@ -15,12 +15,31 @@ import {
 } from '../setupClient'
 import { assertRejects } from '../testUtils'
 
+const NetworkID = 1025
 const Fee = '10'
 const Sequence = 1432
 const LastLedgerSequence = 2908734
+const HOOKS_TESTNET_ID = 21338
 
 describe('client.autofill', function () {
   let testContext: XrplTestContext
+
+  async function setupMockRippledVersionAndID(
+    buildVersion: string,
+    networkID: number,
+  ): Promise<void> {
+    await testContext.client.disconnect()
+    rippled.server_info.withNetworkId.result.info.build_version = buildVersion
+    rippled.server_info.withNetworkId.result.info.network_id = networkID
+    testContext.client.connection.on('connected', () => {
+      testContext.mockRippled?.addResponse(
+        'server_info',
+        rippled.server_info.withNetworkId,
+      )
+    })
+
+    await testContext.client.connect()
+  }
 
   beforeEach(async () => {
     testContext = await setupClient()
@@ -32,15 +51,114 @@ describe('client.autofill', function () {
       TransactionType: 'DepositPreauth',
       Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
       Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      NetworkID,
       Fee,
       Sequence,
       LastLedgerSequence,
     }
     const txResult = await testContext.client.autofill(tx)
 
+    assert.strictEqual(txResult.NetworkID, NetworkID)
     assert.strictEqual(txResult.Fee, Fee)
     assert.strictEqual(txResult.Sequence, Sequence)
     assert.strictEqual(txResult.LastLedgerSequence, LastLedgerSequence)
+  })
+
+  it('ignores network ID if missing', async function () {
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
+      Amount: '1234',
+      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+    const txResult = await testContext.client.autofill(tx)
+
+    assert.strictEqual(txResult.NetworkID, undefined)
+  })
+
+  // NetworkID is required in transaction for network > 1024 and from version 1.11.0 or later.
+  // More context: https://github.com/XRPLF/rippled/pull/4370
+  it('overrides network ID if > 1024 and version is later than 1.11.0', async function () {
+    await setupMockRippledVersionAndID('1.11.1', 1025)
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
+      Amount: '1234',
+      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+    const txResult = await testContext.client.autofill(tx)
+
+    assert.strictEqual(txResult.NetworkID, 1025)
+  })
+
+  // NetworkID is only required in transaction for version 1.11.0 or later.
+  // More context: https://github.com/XRPLF/rippled/pull/4370
+  it('ignores network ID if > 1024 but version is earlier than 1.11.0', async function () {
+    await setupMockRippledVersionAndID('1.10.0', 1025)
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
+      Amount: '1234',
+      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+    const txResult = await testContext.client.autofill(tx)
+
+    assert.strictEqual(txResult.NetworkID, undefined)
+  })
+
+  // NetworkID <= 1024 does not require a newtorkID in transaction.
+  // More context: https://github.com/XRPLF/rippled/pull/4370
+  it('ignores network ID if <= 1024', async function () {
+    await setupMockRippledVersionAndID('1.11.1', 1023)
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
+      Amount: '1234',
+      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+    const txResult = await testContext.client.autofill(tx)
+
+    assert.strictEqual(txResult.NetworkID, undefined)
+  })
+
+  // Hooks Testnet requires networkID in transaction regardless of version.
+  // More context: https://github.com/XRPLF/rippled/pull/4370
+  it('overrides network ID for hooks testnet', async function () {
+    await setupMockRippledVersionAndID('1.10.1', HOOKS_TESTNET_ID)
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
+      Amount: '1234',
+      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+    const txResult = await testContext.client.autofill(tx)
+
+    assert.strictEqual(txResult.NetworkID, HOOKS_TESTNET_ID)
   })
 
   it('converts Account & Destination X-address to their classic address', async function () {

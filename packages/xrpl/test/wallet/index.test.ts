@@ -3,7 +3,7 @@ import { decode } from 'ripple-binary-codec'
 
 import { NFTokenMint, Payment, Transaction } from '../../src'
 import ECDSA from '../../src/ECDSA'
-import Wallet from '../../src/Wallet'
+import { Wallet } from '../../src/Wallet'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 
@@ -55,6 +55,15 @@ describe('Wallet', function () {
       assert.isTrue(wallet.publicKey.startsWith(ed25519KeyPrefix))
       assert.isTrue(wallet.privateKey.startsWith(ed25519KeyPrefix))
       assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
+    })
+
+    it('generates a new wallet using an invalid/unknown algorithm', function () {
+      const algorithm = 'test'
+
+      assert.throws(() => {
+        // @ts-expect-error -- We know it is an invalid algorithm
+        Wallet.generate(algorithm)
+      }, /Invalid cryptographic signing algorithm/u)
     })
 
     it('generates a new wallet using algorithm ecdsa-secp256k1', function () {

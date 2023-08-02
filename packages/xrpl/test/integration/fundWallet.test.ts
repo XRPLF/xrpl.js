@@ -19,6 +19,7 @@ async function generate_faucet_wallet_and_fund_again(
   const { wallet, balance } = await api.fundWallet(null, {
     faucetHost,
     faucetPath,
+    usageContext: 'integration-test',
   })
   assert.notEqual(wallet, undefined)
   assert(isValidClassicAddress(wallet.classicAddress))
@@ -34,6 +35,7 @@ async function generate_faucet_wallet_and_fund_again(
   const { balance: newBalance } = await api.fundWallet(wallet, {
     faucetHost,
     faucetPath,
+    usageContext: 'integration-test',
   })
 
   const afterSent = await api.request({
@@ -41,8 +43,8 @@ async function generate_faucet_wallet_and_fund_again(
     account: wallet.classicAddress,
   })
 
-  assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
   assert(newBalance > balance)
+  assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
 
   await api.disconnect()
 }
@@ -91,13 +93,15 @@ describe('fundWallet', function () {
   )
 
   it(
-    'can generate wallet on hooks v2 testnet',
+    'can generate wallet on hooks v3 testnet',
     async function () {
-      const api = new Client('wss://hooks-testnet-v2.xrpl-labs.com')
+      const api = new Client('wss://hooks-testnet-v3.xrpl-labs.com')
 
       await api.connect()
 
-      const { wallet, balance } = await api.fundWallet()
+      const { wallet, balance } = await api.fundWallet(null, {
+        usageContext: 'integration-test',
+      })
 
       assert.notEqual(wallet, undefined)
       assert(isValidClassicAddress(wallet.classicAddress))
@@ -112,7 +116,7 @@ describe('fundWallet', function () {
       assert.equal(balance, 10000)
 
       /*
-       * No test for fund given wallet because the hooks v2 testnet faucet
+       * No test for fund given wallet because the hooks v3 testnet faucet
        * requires 10 seconds between requests. Would significantly slow down
        * the test suite.
        */
@@ -123,12 +127,25 @@ describe('fundWallet', function () {
   )
 
   it(
+    'can generate and fund wallets on sidechain devnet',
+    async function () {
+      await generate_faucet_wallet_and_fund_again(
+        'wss://sidechain-net1.devnet.rippletest.net:51233',
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
     'submit funds wallet with custom amount',
     async function () {
       const api = new Client('wss://s.altnet.rippletest.net:51233')
 
       await api.connect()
-      const { wallet, balance } = await api.fundWallet(null, { amount: '2000' })
+      const { wallet, balance } = await api.fundWallet(null, {
+        amount: '2000',
+        usageContext: 'integration-test',
+      })
       assert.equal(balance, '2000')
       assert.notEqual(wallet, undefined)
       assert(isValidClassicAddress(wallet.classicAddress))

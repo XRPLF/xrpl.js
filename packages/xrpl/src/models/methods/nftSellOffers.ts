@@ -1,6 +1,6 @@
 import { NFTOffer } from '../common'
 
-import { BaseRequest, BaseResponse } from './baseMethod'
+import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
  * The `nft_sell_offers` method retrieves all of sell offers for the specified
@@ -8,7 +8,9 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface NFTSellOffersRequest extends BaseRequest {
+export interface NFTSellOffersRequest
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'nft_sell_offers'
   /**
    * The unique identifier of an NFToken. The request returns sell offers for this NFToken.

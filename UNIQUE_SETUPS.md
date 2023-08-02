@@ -19,15 +19,10 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
 
    ```shell
    npm install --save-dev \
-       assert \
        buffer \
        crypto-browserify \
-       https-browserify \
-       os-browserify \
        process \
-       stream-browserify \
-       stream-http \
-       url
+       stream-browserify
    ```
 
 2. Modify your webpack configuration
@@ -46,13 +41,8 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
       module.exports = function override(config) {
         const fallback = config.resolve.fallback || {};
         Object.assign(fallback, {
-          assert: require.resolve("assert"),
           crypto: require.resolve("crypto-browserify"),
-          http: require.resolve("stream-http"),
-          https: require.resolve("https-browserify"),
-          os: require.resolve("os-browserify"),
           stream: require.resolve("stream-browserify"),
-          url: require.resolve("url"),
           ws: require.resolve("xrpl/dist/npm/client/WSWrapper"),
         });
         config.resolve.fallback = fallback;
@@ -62,12 +52,7 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
             Buffer: ["buffer", "Buffer"],
           }),
         ]);
-
-        // This is deprecated in webpack 5 but alias false does not seem to work
-        config.module.rules.push({
-          test: /node_modules[\\\/]https-proxy-agent[\\\/]/,
-          use: "null-loader",
-        });
+        
         return config;
       };
       ```
@@ -132,7 +117,7 @@ Similar to above, to get xrpl.js to work with Vite you need to set up a couple a
 
 2. Copy these settings into your `vite.config.ts` file.
 
-```
+```javascript
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
@@ -146,7 +131,6 @@ export default defineConfig({
   },
   optimizeDeps: {
     esbuildOptions: {
-
         define: {
           global: 'globalThis',
         },
@@ -170,8 +154,6 @@ resolve: {
     events: 'events',
     crypto: 'crypto-browserify',
     stream: 'stream-browserify',
-    http: 'stream-http',
-    https: 'https-browserify',
     ws: 'xrpl/dist/npm/client/WSWrapper',
   },
 }})
@@ -179,15 +161,13 @@ resolve: {
 
 3. Install the config dependencies and xrpl (e.g. using this command)
 
-```
+```shell
 npm install --save-dev @esbuild-plugins/node-globals-polyfill \
 		rollup-plugin-polyfill-node \
 		&& npm install
 		events \
 		crypto-browserify \
 		stream-browserify \
-		stream-http \
-		https-browserify \
 		xrpl
 ```
 
