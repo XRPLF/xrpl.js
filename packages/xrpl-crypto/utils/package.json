@@ -1,5 +1,5 @@
 {
-  "name": "ripple-iso-crypto/utils",
+  "name": "@xrpl/crypto/utils",
   "private": true,
   "main": "../dist/utils",
   "types": "../dist/utils",

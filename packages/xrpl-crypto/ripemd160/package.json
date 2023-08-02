@@ -1,5 +1,5 @@
 {
-  "name": "ripple-iso-crypto/ripemd160",
+  "name": "@xrpl/crypto/ripemd160",
   "private": true,
   "main": "../dist/ripemd160",
   "types": "../dist/ripemd160",

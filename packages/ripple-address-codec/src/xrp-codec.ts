@@ -4,7 +4,7 @@
 
 import baseCodec = require('base-x')
 import type { BaseConverter } from 'base-x'
-import { sha256 } from 'ripple-iso-crypto/sha256'
+import { sha256 } from '@xrpl/crypto/sha256'
 
 import { seqEqual, concatArgs, Sequence } from './utils'
 

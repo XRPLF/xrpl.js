@@ -17,7 +17,7 @@
     "ripple-address-codec": "file:packages/ripple-address-codec",
     "ripple-binary-codec": "file:packages/ripple-binary-codec",
     "ripple-keypairs": "file:packages/ripple-keypairs",
-    "ripple-iso-crypto": "file:packages/ripple-iso-crypto",
+    "@xrpl/crypto": "file:packages/xrpl-crypto",
     "xrpl": "file:packages/xrpl"
   },
   "devDependencies": {

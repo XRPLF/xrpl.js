@@ -10,7 +10,7 @@
   "types": "dist/index.d.ts",
   "license": "ISC",
   "dependencies": {
-    "ripple-iso-crypto": "1.0.0",
+    "@xrpl/crypto": "1.0.0",
     "base-x": "^3.0.9"
   },
   "repository": {

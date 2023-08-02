@@ -1,5 +1,5 @@
-import { sha512 } from 'ripple-iso-crypto/sha512'
-import { bytesToHex, hexToBytes } from 'ripple-iso-crypto/utils'
+import { sha512 } from '@xrpl/crypto/sha512'
+import { bytesToHex, hexToBytes } from '@xrpl/crypto/utils'
 
 const HASH_BYTES = 32
 

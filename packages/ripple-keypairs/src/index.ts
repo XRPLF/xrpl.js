@@ -3,7 +3,7 @@ import * as addressCodec from 'ripple-address-codec'
 import { secp256k1 as nobleSecp256k1 } from '@noble/curves/secp256k1'
 import { ed25519 as nobleEd25519 } from '@noble/curves/ed25519'
 import { hexToBytes, numberToBytesBE } from '@noble/curves/abstract/utils'
-import { randomBytes } from 'ripple-iso-crypto/utils'
+import { randomBytes } from '@xrpl/crypto/utils'
 
 import { accountPublicFromPublicGenerator, derivePrivateKey } from './secp256k1'
 import { bytesToHex, computePublicKeyHash, hexToNumberArray } from './utils'

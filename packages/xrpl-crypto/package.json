@@ -1,7 +1,7 @@
 {
-  "name": "ripple-iso-crypto",
+  "name": "@xrpl/crypto",
   "version": "1.0.0",
-  "description": "Isomorphic crypto hashes/utils for Ripple",
+  "description": "Isomorphic crypto hashes/utils for XRPL",
   "scripts": {
     "build": "tsc -b",
     "test": "jest --verbose false --silent=false ./test/*.test.ts",
@@ -32,6 +32,6 @@
   "license": "ISC",
   "prettier": "@xrplf/prettier-config",
   "engines": {
-    "node": ">= 10"
+    "node": ">=16.0.0"
   }
 }

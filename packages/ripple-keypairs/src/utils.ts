@@ -1,7 +1,7 @@
 import assert from './assert'
-import { ripemd160 } from 'ripple-iso-crypto/ripemd160'
-import { sha256 } from 'ripple-iso-crypto/sha256'
-import { hexToBytes } from 'ripple-iso-crypto/utils'
+import { ripemd160 } from '@xrpl/crypto/ripemd160'
+import { sha256 } from '@xrpl/crypto/sha256'
+import { hexToBytes } from '@xrpl/crypto/utils'
 
 function bytesToHex(a: Iterable<number> | ArrayLike<number>): string {
   return Array.from(a, (byteValue) => {

@@ -1,5 +1,5 @@
 {
-  "name": "ripple-iso-crypto/sha512",
+  "name": "@xrpl/crypto/sha512",
   "private": true,
   "main": "../dist/sha512",
   "types": "../dist/sha512",

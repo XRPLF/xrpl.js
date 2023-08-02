@@ -1,4 +1,4 @@
-import { sha512 } from 'ripple-iso-crypto/sha512'
+import { sha512 } from '@xrpl/crypto/sha512'
 import { bytesToNumberBE } from '@noble/curves/abstract/utils'
 
 export default class Sha512 {
