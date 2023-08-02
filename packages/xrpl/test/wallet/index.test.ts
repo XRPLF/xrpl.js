@@ -1,7 +1,12 @@
 import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec'
 
-import { NFTokenMint, Payment, Transaction } from '../../src'
+import {
+  NFTokenMint,
+  Payment,
+  Transaction,
+  walletFromSecretNumbers,
+} from '../../src'
 import ECDSA from '../../src/ECDSA'
 import { Wallet } from '../../src/Wallet'
 import requests from '../fixtures/requests'
@@ -322,14 +327,14 @@ describe('Wallet', function () {
     //   'EDD2AF6288A903DED9860FC62E778600A985BDF804E40BD8266505553E3222C3DA'
 
     it('derives a wallet using default algorithm', function () {
-      const wallet = Wallet.fromSecretNumbers(secretNumbersString)
+      const wallet = walletFromSecretNumbers(secretNumbersString)
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
     })
 
     it('derives a wallet from secret numbers as an array using default algorithm', function () {
-      const wallet = Wallet.fromSecretNumbers(secretNumbersArray)
+      const wallet = walletFromSecretNumbers(secretNumbersArray)
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
@@ -337,7 +342,7 @@ describe('Wallet', function () {
 
     it('derives a wallet using algorithm ecdsa-secp256k1', function () {
       const algorithm = ECDSA.secp256k1
-      const wallet = Wallet.fromSecretNumbers(secretNumbersString, {
+      const wallet = walletFromSecretNumbers(secretNumbersString, {
         algorithm,
       })
 
@@ -367,7 +372,7 @@ describe('Wallet', function () {
           '00B6FE8507D977E46E988A8A94DB3B8B35E404B60F8B11AC5213FA8B5ABC8A8D19',
       }
 
-      const wallet = Wallet.fromSecretNumbers(regularKeyPair.secretNumbers, {
+      const wallet = walletFromSecretNumbers(regularKeyPair.secretNumbers, {
         masterAddress,
       })
 
