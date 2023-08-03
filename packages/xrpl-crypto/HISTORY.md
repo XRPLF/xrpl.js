@@ -1,1 +1,1 @@
-# ripple-hashes Release History
+# @xrpl/crypto Release History
