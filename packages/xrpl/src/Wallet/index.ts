@@ -1,6 +1,8 @@
+import { HDKey } from '@scure/bip32'
+import { mnemonicToSeedSync, validateMnemonic } from '@scure/bip39'
+import { wordlist } from '@scure/bip39/wordlists/english'
+import { bytesToHex } from '@xrpl/crypto/utils'
 import BigNumber from 'bignumber.js'
-import { fromSeed } from 'bip32'
-import { mnemonicToSeedSync, validateMnemonic } from 'bip39'
 import {
   classicAddressToXAddress,
   isValidXAddress,
@@ -32,10 +34,6 @@ import { rfc1751MnemonicToKey } from './rfc1751'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
-
-function hexFromBuffer(buffer: Buffer): string {
-  return buffer.toString('hex').toUpperCase()
-}
 
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
@@ -232,25 +230,31 @@ export class Wallet {
       })
     }
     // Otherwise decode using bip39's mnemonic standard
-    if (!validateMnemonic(mnemonic)) {
+    if (!validateMnemonic(mnemonic, wordlist)) {
       throw new ValidationError(
         'Unable to parse the given mnemonic using bip39 encoding',
       )
     }
 
     const seed = mnemonicToSeedSync(mnemonic)
-    const masterNode = fromSeed(seed)
-    const node = masterNode.derivePath(
+    const masterNode = HDKey.fromMasterSeed(seed)
+    const node = masterNode.derive(
       opts.derivationPath ?? DEFAULT_DERIVATION_PATH,
     )
-    if (node.privateKey === undefined) {
+    if (node.privateKey === null) {
       throw new ValidationError(
         'Unable to derive privateKey from mnemonic input',
       )
     }
 
-    const publicKey = hexFromBuffer(node.publicKey)
-    const privateKey = hexFromBuffer(node.privateKey)
+    if (node.publicKey === null) {
+      throw new ValidationError(
+        'Unable to derive publicKey from mnemonic input',
+      )
+    }
+
+    const publicKey = bytesToHex(node.publicKey)
+    const privateKey = bytesToHex(node.privateKey)
     return new Wallet(publicKey, `00${privateKey}`, {
       masterAddress: opts.masterAddress,
     })
