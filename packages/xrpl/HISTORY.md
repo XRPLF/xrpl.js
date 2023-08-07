@@ -3,6 +3,13 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 
+## 2.10.0 (2023-08-07)
+
+### Added
+* Add a new Clawback transaction
+* Add account flag lsfAllowTrustLineClawback
+* Add support for bitwise flag checking of 64 bit flags
+
 ## 2.9.1 (2023-07-18)
 ### Fixed
 * Passing Definitions from `STObject` to `STArray` back to `STObject`, both for signing & decoding (to JSON)

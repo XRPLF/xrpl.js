@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 1.8.0 (2023-08-07)
+* Added Clawback transaction type
+
 ## 1.7.1 (2023-07-18)
 ### Fixed
 * Passing Definitions from `STObject` to `STArray` back to `STObject`, both for signing & decoding (to JSON)
