@@ -220,7 +220,6 @@ npm uninstall abbrev -w xrpl
      Notice this allows developers to install the package with `npm add xrpl@beta`
 
 1. If requested, enter your [npmjs.com](https://npmjs.com) OTP (one-time password) to complete publication.
-1. If not a beta release: Create a new branch (`git checkout -b <BRANCH_NAME>`) to capture the updated packages from the release. Merge those changes into `main`.
 
    NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
 
