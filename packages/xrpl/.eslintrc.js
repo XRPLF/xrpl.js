@@ -34,13 +34,6 @@ module.exports = {
   plugins: [],
   extends: ['@xrplf/eslint-config/base'],
   rules: {
-    // Maintain existing line endings
-    'prettier/prettier': [
-      'error',
-      {
-        endOfLine: 'auto',
-      },
-    ],
     'multiline-comment-style': 'off',
     // Disabled until https://github.com/import-js/eslint-plugin-import/pull/2305 is resolved to
     // accomodate this change https://github.com/XRPLF/xrpl.js/pull/2133

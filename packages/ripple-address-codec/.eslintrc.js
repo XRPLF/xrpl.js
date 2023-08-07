@@ -25,14 +25,6 @@ module.exports = {
   extends: ['@xrplf/eslint-config/base'],
 
   rules: {
-    // Maintain existing line endings
-    'prettier/prettier': [
-      'error',
-      {
-        'endOfLine': 'auto',
-      }
-    ],
-
     // This creates a lot of false positives. We should turn this off in our
     // general config.
     'jsdoc/require-description-complete-sentence': 'off',

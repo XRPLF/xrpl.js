@@ -26,14 +26,6 @@ module.exports = {
   extends: ['@xrplf/eslint-config/base'],
 
   rules: {
-    // Maintain existing line endings
-    'prettier/prettier': [
-      'error',
-      {
-        'endOfLine': 'auto',
-      }
-    ],
-
     // ** TODO **
     // all of the below are turned off for now during the migration to a
     // monorepo. They need to actually be addressed!
