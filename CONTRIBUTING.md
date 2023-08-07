@@ -223,7 +223,6 @@ npm uninstall abbrev -w xrpl
 
    NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
 
-1. Pull the most recent changes to `main` locally.
 1. Run `git tag <tagname> -m <tagname>`, where `<tagname>` is the new package and version (e.g. `xrpl@2.1.1`), for each version released.
 1. Run `git push --follow-tags`, to push the tags to Github.
 1. On GitHub, click the "Releases" link on the right-hand side of the page.
