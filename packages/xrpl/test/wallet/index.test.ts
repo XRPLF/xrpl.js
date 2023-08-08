@@ -21,6 +21,16 @@ const { sign: RESPONSE_FIXTURES } = responses
  * Provides tests for Wallet class.
  */
 describe('Wallet', function () {
+  const knownSecret = 'sh1HiK7SwjS1VxFdXi7qeMHRedrYX'
+  const publicKeySecp256k1 =
+    '03BFC2F7AE242C3493187FA0B72BE97B2DF71194FB772E507FF9DEA0AD13CA1625'
+  const privateKeySecp256k1 =
+    '00B6FE8507D977E46E988A8A94DB3B8B35E404B60F8B11AC5213FA8B5ABC8A8D19'
+  const publicKeyED25519 =
+    'ED8079E575450E256C496578480020A33E19B579D58A2DB8FF13FC6B05B9229DE3'
+  const privateKeyED25519 =
+    'EDD2AF6288A903DED9860FC62E778600A985BDF804E40BD8266505553E3222C3DA'
+
   describe('constructor', function () {
     it('initializes a wallet using a Regular Key Pair', function () {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
@@ -102,33 +112,27 @@ describe('Wallet', function () {
   })
 
   describe('fromSeed', function () {
-    const seed = 'ssL9dv2W5RK8L3tuzQxYY6EaZhSxW'
-    const publicKey =
-      '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
-    const privateKey =
-      '00141BA006D3363D2FB2785E8DF4E44D3A49908780CB4FB51F6D217C08C021429F'
-
     it('derives a wallet using default algorithm', function () {
-      const wallet = Wallet.fromSeed(seed)
+      const wallet = Wallet.fromSeed(knownSecret)
 
-      assert.equal(wallet.publicKey, publicKey)
-      assert.equal(wallet.privateKey, privateKey)
+      assert.equal(wallet.publicKey, publicKeyED25519)
+      assert.equal(wallet.privateKey, privateKeyED25519)
     })
 
     it('derives a wallet using algorithm ecdsa-secp256k1', function () {
       const algorithm = ECDSA.secp256k1
-      const wallet = Wallet.fromSeed(seed, { algorithm })
+      const wallet = Wallet.fromSeed(knownSecret, { algorithm })
 
-      assert.equal(wallet.publicKey, publicKey)
-      assert.equal(wallet.privateKey, privateKey)
+      assert.equal(wallet.publicKey, publicKeySecp256k1)
+      assert.equal(wallet.privateKey, privateKeySecp256k1)
     })
 
     it('derives a wallet using algorithm ed25519', function () {
       const algorithm = ECDSA.ed25519
-      const wallet = Wallet.fromSeed(seed, { algorithm })
+      const wallet = Wallet.fromSeed(knownSecret, { algorithm })
 
-      assert.equal(wallet.publicKey, publicKey)
-      assert.equal(wallet.privateKey, privateKey)
+      assert.equal(wallet.publicKey, publicKeyED25519)
+      assert.equal(wallet.privateKey, privateKeyED25519)
     })
 
     it('derives a wallet using rfc1751 mnemonic with secp256k1 key', function () {
@@ -202,7 +206,10 @@ describe('Wallet', function () {
           '004265A28F3E18340A490421D47B2EB8DBC2C0BF2C24CEFEA971B61CED2CABD233',
       }
 
-      const wallet = Wallet.fromSeed(regularKeyPair.seed, { masterAddress })
+      const wallet = Wallet.fromSeed(regularKeyPair.seed, {
+        masterAddress,
+        algorithm: ECDSA.secp256k1,
+      })
 
       assert.equal(wallet.publicKey, regularKeyPair.publicKey)
       assert.equal(wallet.privateKey, regularKeyPair.privateKey)
@@ -211,33 +218,27 @@ describe('Wallet', function () {
   })
 
   describe('fromSecret', function () {
-    const seed = 'ssL9dv2W5RK8L3tuzQxYY6EaZhSxW'
-    const publicKey =
-      '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
-    const privateKey =
-      '00141BA006D3363D2FB2785E8DF4E44D3A49908780CB4FB51F6D217C08C021429F'
-
     it('derives a wallet using default algorithm', function () {
-      const wallet = Wallet.fromSecret(seed)
+      const wallet = Wallet.fromSecret(knownSecret)
 
-      assert.equal(wallet.publicKey, publicKey)
-      assert.equal(wallet.privateKey, privateKey)
+      assert.equal(wallet.publicKey, publicKeyED25519)
+      assert.equal(wallet.privateKey, privateKeyED25519)
     })
 
     it('derives a wallet using algorithm ecdsa-secp256k1', function () {
       const algorithm = ECDSA.secp256k1
-      const wallet = Wallet.fromSecret(seed, { algorithm })
+      const wallet = Wallet.fromSecret(knownSecret, { algorithm })
 
-      assert.equal(wallet.publicKey, publicKey)
-      assert.equal(wallet.privateKey, privateKey)
+      assert.equal(wallet.publicKey, publicKeySecp256k1)
+      assert.equal(wallet.privateKey, privateKeySecp256k1)
     })
 
     it('derives a wallet using algorithm ed25519', function () {
       const algorithm = ECDSA.ed25519
-      const wallet = Wallet.fromSecret(seed, { algorithm })
+      const wallet = Wallet.fromSecret(knownSecret, { algorithm })
 
-      assert.equal(wallet.publicKey, publicKey)
-      assert.equal(wallet.privateKey, privateKey)
+      assert.equal(wallet.publicKey, publicKeyED25519)
+      assert.equal(wallet.privateKey, privateKeyED25519)
     })
 
     it('derives a wallet using a Regular Key Pair', function () {
@@ -250,7 +251,10 @@ describe('Wallet', function () {
           '004265A28F3E18340A490421D47B2EB8DBC2C0BF2C24CEFEA971B61CED2CABD233',
       }
 
-      const wallet = Wallet.fromSecret(regularKeyPair.seed, { masterAddress })
+      const wallet = Wallet.fromSecret(regularKeyPair.seed, {
+        masterAddress,
+        algorithm: ECDSA.secp256k1,
+      })
 
       assert.equal(wallet.publicKey, regularKeyPair.publicKey)
       assert.equal(wallet.privateKey, regularKeyPair.privateKey)
@@ -267,7 +271,9 @@ describe('Wallet', function () {
       '0013FC461CA5799F1357C8130AF703CBA7E9C28E072C6CA8F7DEF8601CDE98F394'
 
     it('derives a wallet using default derivation path', function () {
-      const wallet = Wallet.fromMnemonic(mnemonic)
+      const wallet = Wallet.fromMnemonic(mnemonic, {
+        algorithm: ECDSA.secp256k1,
+      })
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
@@ -275,7 +281,10 @@ describe('Wallet', function () {
 
     it('derives a wallet using an input derivation path', function () {
       const derivationPath = "m/44'/144'/0'/0/0"
-      const wallet = Wallet.fromMnemonic(mnemonic, { derivationPath })
+      const wallet = Wallet.fromMnemonic(mnemonic, {
+        derivationPath,
+        algorithm: ECDSA.secp256k1,
+      })
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
@@ -294,6 +303,7 @@ describe('Wallet', function () {
       const wallet = Wallet.fromMnemonic(regularKeyPair.mnemonic, {
         masterAddress,
         mnemonicEncoding: 'rfc1751',
+        algorithm: ECDSA.secp256k1,
       })
 
       assert.equal(wallet.publicKey, regularKeyPair.publicKey)
@@ -384,13 +394,13 @@ describe('Wallet', function () {
 
   describe('fromEntropy', function () {
     let entropy: number[]
-    const publicKey =
+    const entropyPublicKeySecp256k1 =
       '0390A196799EE412284A5D80BF78C3E84CBB80E1437A0AECD9ADF94D7FEAAFA284'
-    const privateKey =
+    const entropyPrivateKeySecp256k1 =
       '002512BBDFDBB77510883B7DCCBEF270B86DEAC8B64AC762873D75A1BEE6298665'
-    const publicKeyED25519 =
+    const entropyPublicKeyED25519 =
       'ED1A7C082846CFF58FF9A892BA4BA2593151CCF1DBA59F37714CC9ED39824AF85F'
-    const privateKeyED25519 =
+    const entropyPrivateKeyED25519 =
       'ED0B6CBAC838DFE7F47EA1BD0DF00EC282FDF45510C92161072CCFB84035390C4D'
 
     beforeEach(function () {
@@ -401,32 +411,34 @@ describe('Wallet', function () {
     it('derives a wallet using entropy', function () {
       const wallet = Wallet.fromEntropy(entropy)
 
-      assert.equal(wallet.publicKey, publicKeyED25519)
-      assert.equal(wallet.privateKey, privateKeyED25519)
+      assert.equal(wallet.publicKey, entropyPublicKeyED25519)
+      assert.equal(wallet.privateKey, entropyPrivateKeyED25519)
     })
 
     it('derives a wallet using algorithm ecdsa-secp256k1', function () {
       const algorithm = ECDSA.secp256k1
       const wallet = Wallet.fromEntropy(entropy, { algorithm })
 
-      assert.equal(wallet.publicKey, publicKey)
-      assert.equal(wallet.privateKey, privateKey)
+      assert.equal(wallet.publicKey, entropyPublicKeySecp256k1)
+      assert.equal(wallet.privateKey, entropyPrivateKeySecp256k1)
     })
 
     it('derives a wallet using algorithm ed25519', function () {
       const algorithm = ECDSA.ed25519
       const wallet = Wallet.fromEntropy(entropy, { algorithm })
 
-      assert.equal(wallet.publicKey, publicKeyED25519)
-      assert.equal(wallet.privateKey, privateKeyED25519)
+      assert.equal(wallet.publicKey, entropyPublicKeyED25519)
+      assert.equal(wallet.privateKey, entropyPrivateKeyED25519)
     })
 
     it('derives a wallet using a regular key pair', function () {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
-      const wallet = Wallet.fromEntropy(entropy, { masterAddress })
+      const wallet = Wallet.fromEntropy(entropy, {
+        masterAddress,
+      })
 
-      assert.equal(wallet.publicKey, publicKeyED25519)
-      assert.equal(wallet.privateKey, privateKeyED25519)
+      assert.equal(wallet.publicKey, entropyPublicKeyED25519)
+      assert.equal(wallet.privateKey, entropyPrivateKeyED25519)
       assert.equal(wallet.classicAddress, masterAddress)
     })
   })
@@ -436,7 +448,9 @@ describe('Wallet', function () {
     let wallet: Wallet
 
     beforeEach(function () {
-      wallet = Wallet.fromSeed('ss1x3KLrSvfg7irFc1D929WXZ7z9H')
+      wallet = Wallet.fromSeed('ss1x3KLrSvfg7irFc1D929WXZ7z9H', {
+        algorithm: ECDSA.secp256k1,
+      })
     })
 
     it('sign successfully', async function () {
@@ -471,7 +485,9 @@ describe('Wallet', function () {
         ],
       }
 
-      const result = Wallet.fromSeed(secret).sign(lowercaseMemoTx)
+      const result = Wallet.fromSeed(secret, {
+        algorithm: ECDSA.secp256k1,
+      }).sign(lowercaseMemoTx)
       assert.deepEqual(result, {
         tx_blob:
           '120000228000000023000022B8240000000C2E0000270F201B00D5A36761400000000098968068400000000000000C73210305E09ED602D40AB1AF65646A4007C2DAC17CB6CDACDE301E74FB2D728EA057CF744730450221009C00E8439E017CA622A5A1EE7643E26B4DE9C808DE2ABE45D33479D49A4CEC66022062175BE8733442FA2A4D9A35F85A57D58252AE7B19A66401FE238B36FA28E5A081146C1856D0E36019EA75C56D7E8CBA6E35F9B3F71583147FB49CD110A1C46838788CD12764E3B0F837E0DDF9EA7C1F687474703A2F2F6578616D706C652E636F6D2F6D656D6F2F67656E657269637D0472656E74E1F1',
