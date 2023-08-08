@@ -137,7 +137,7 @@ export class Wallet {
       throw new ValidationError('Invalid cryptographic signing algorithm')
     }
     const seed = generateSeed({ algorithm })
-    return Wallet.fromSeed(seed)
+    return Wallet.fromSeed(seed, { algorithm })
   }
 
   /**
