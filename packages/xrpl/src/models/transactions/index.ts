@@ -9,6 +9,7 @@ export {
 } from './accountSet'
 export { AccountDelete } from './accountDelete'
 export { AMMBid } from './AMMBid'
+export { AMMDelete } from './AMMDelete'
 export {
   AMMDepositFlags,
   AMMDepositFlagsInterface,

@@ -10,6 +10,7 @@ import { AccountDelete, validateAccountDelete } from './accountDelete'
 import { AccountSet, validateAccountSet } from './accountSet'
 import { AMMBid, validateAMMBid } from './AMMBid'
 import { AMMCreate, validateAMMCreate } from './AMMCreate'
+import { AMMDelete, validateAMMDelete } from './AMMDelete'
 import { AMMDeposit, validateAMMDeposit } from './AMMDeposit'
 import { AMMVote, validateAMMVote } from './AMMVote'
 import { AMMWithdraw, validateAMMWithdraw } from './AMMWithdraw'
@@ -64,6 +65,7 @@ export type Transaction =
   | AccountDelete
   | AccountSet
   | AMMBid
+  | AMMDelete
   | AMMDeposit
   | AMMCreate
   | AMMVote
@@ -179,6 +181,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'AMMBid':
       validateAMMBid(tx)
+      break
+
+    case 'AMMDelete':
+      validateAMMDelete(tx)
       break
 
     case 'AMMDeposit':
