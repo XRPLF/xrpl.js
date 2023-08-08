@@ -10,6 +10,7 @@ import {
   type SubmitResponse,
   TimeoutError,
   NotConnectedError,
+  ECDSA,
   AccountLinesRequest,
   IssuedCurrency,
   Currency,
@@ -157,7 +158,7 @@ export async function fundAccount(
     // 2 times the amount needed for a new account (20 XRP)
     Amount: '400000000',
   }
-  const wal = Wallet.fromSeed(GENESIS_SECRET)
+  const wal = Wallet.fromSeed(GENESIS_SECRET, { algorithm: ECDSA.secp256k1 })
   const response = await submitTransaction({
     client,
     wallet: wal,
