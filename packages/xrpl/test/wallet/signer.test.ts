@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import { decode, encode } from 'ripple-binary-codec'
 
-import { Transaction, ValidationError } from '../../src'
+import { ECDSA, Transaction, ValidationError } from '../../src'
 import { Wallet } from '../../src/Wallet'
 import {
   authorizeChannel,
@@ -188,7 +188,9 @@ describe('Signer', function () {
   })
 
   it('authorizeChannel succeeds with secp256k1 seed', function () {
-    const secpWallet = Wallet.fromSeed('snGHNrPbHrdUcszeuDEigMdC1Lyyd')
+    const secpWallet = Wallet.fromSeed('snGHNrPbHrdUcszeuDEigMdC1Lyyd', {
+      algorithm: ECDSA.secp256k1,
+    })
     const channelId =
       '5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3'
     const amount = '1000000'
