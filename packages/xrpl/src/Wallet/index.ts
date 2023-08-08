@@ -35,6 +35,16 @@ import { rfc1751MnemonicToKey } from './rfc1751'
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
 
+function validateNode(node: HDKey): void {
+  if (node.privateKey === null) {
+    throw new ValidationError('Unable to derive privateKey from mnemonic input')
+  }
+
+  if (node.publicKey === null) {
+    throw new ValidationError('Unable to derive publicKey from mnemonic input')
+  }
+}
+
 /**
  * A utility for deriving a wallet composed of a keypair (publicKey/privateKey).
  * A wallet can be derived from either a seed, mnemonic, or entropy (array of random numbers).
@@ -241,17 +251,7 @@ export class Wallet {
     const node = masterNode.derive(
       opts.derivationPath ?? DEFAULT_DERIVATION_PATH,
     )
-    if (node.privateKey === null) {
-      throw new ValidationError(
-        'Unable to derive privateKey from mnemonic input',
-      )
-    }
-
-    if (node.publicKey === null) {
-      throw new ValidationError(
-        'Unable to derive publicKey from mnemonic input',
-      )
-    }
+    validateNode(node)
 
     const publicKey = bytesToHex(node.publicKey)
     const privateKey = bytesToHex(node.privateKey)
