@@ -35,12 +35,17 @@ import { rfc1751MnemonicToKey } from './rfc1751'
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
 
-function validateNode(node: HDKey): void {
-  if (node.privateKey === null) {
+type ValidHDKey = HDKey & {
+  privateKey: Uint8Array
+  publicKey: Uint8Array
+}
+
+function validateKey(node: HDKey): asserts node is ValidHDKey {
+  if (!(node.privateKey instanceof Uint8Array)) {
     throw new ValidationError('Unable to derive privateKey from mnemonic input')
   }
 
-  if (node.publicKey === null) {
+  if (!(node.publicKey instanceof Uint8Array)) {
     throw new ValidationError('Unable to derive publicKey from mnemonic input')
   }
 }
@@ -251,7 +256,7 @@ export class Wallet {
     const node = masterNode.derive(
       opts.derivationPath ?? DEFAULT_DERIVATION_PATH,
     )
-    validateNode(node)
+    validateKey(node)
 
     const publicKey = bytesToHex(node.publicKey)
     const privateKey = bytesToHex(node.privateKey)
