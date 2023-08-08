@@ -104,13 +104,19 @@ function select(algorithm): any {
 
 function deriveKeypair(
   seed: string,
-  options?: object,
+  options?: {
+    algorithm?: 'ed25519' | 'ecdsa-secp256k1'
+    validator?: boolean
+    accountIndex?: number
+  },
 ): {
   publicKey: string
   privateKey: string
 } {
   const decoded = addressCodec.decodeSeed(seed)
-  const algorithm = decoded.type === 'ed25519' ? 'ed25519' : 'ecdsa-secp256k1'
+  const proposedAlgorithm = options?.algorithm ?? decoded.type
+  const algorithm =
+    proposedAlgorithm === 'ed25519' ? 'ed25519' : 'ecdsa-secp256k1'
   const method = select(algorithm)
   const keypair = method.deriveKeypair(decoded.bytes, options)
   const messageToVerify = hash('This test message should verify.')
