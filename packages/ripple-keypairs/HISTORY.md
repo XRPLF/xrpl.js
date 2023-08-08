@@ -1,6 +1,7 @@
 # ripple-keypairs Release History
 
 ## Unreleased
+* Fix `deriveKeypair` ignoring manual decoding algorithm. (Specifying algorithm=`ed25519` in `opts` now works on secrets like `sNa1...`)
 
 ## 1.3.1 (2023-09-27)
 ### Fixed
