@@ -75,7 +75,7 @@ class BinaryParser {
    * @return The number represented by those bytes
    */
   readUIntN(n: number): number {
-    if (0 >= n && n > 4) {
+    if (0 >= n || n > 4) {
       throw new Error('invalid n')
     }
     return this.read(n).reduce((a, b) => (a << 8) | b) >>> 0
