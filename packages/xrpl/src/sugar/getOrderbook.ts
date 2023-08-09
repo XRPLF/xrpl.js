@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js'
-import flatMap from 'lodash/flatMap'
 
 import type { Client } from '../client'
 import { ValidationError } from '../errors'
@@ -172,7 +171,7 @@ export function reverseRequest(request: BookOffersRequest): BookOffersRequest {
  * @returns The extracted offers.
  */
 export function extractOffers(offerResults: BookOfferResult[]): BookOffer[] {
-  return flatMap(offerResults, (offerResult) => offerResult)
+  return offerResults.flatMap((offerResult) => offerResult)
 }
 
 /**

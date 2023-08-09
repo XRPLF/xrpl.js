@@ -1,10 +1,7 @@
 /* eslint-disable jsdoc/require-jsdoc -- Request has many aliases, but they don't need unique docs */
 
 /* eslint-disable max-lines -- Client is a large file w/ lots of imports/exports */
-import * as assert from 'assert'
 import { EventEmitter } from 'events'
-
-import flatMap from 'lodash/flatMap'
 
 import {
   RippledError,
@@ -69,13 +66,12 @@ import {
   separateBuySellOrders,
   sortAndLimitOffers,
 } from '../sugar/getOrderbook'
-import { dropsToXrp, hashes } from '../utils'
+import { dropsToXrp, hashes, isValidClassicAddress } from '../utils'
 import { Wallet } from '../Wallet'
 import {
-  type FundWalletOptions,
-  generateWalletToFund,
-  getStartingBalance,
-  doFundWalletRequest,
+  type FaucetRequestBody,
+  FundingOptions,
+  requestFunding,
 } from '../Wallet/fundWallet'
 
 import {
@@ -91,7 +87,6 @@ import {
 export interface ClientOptions extends ConnectionUserOptions {
   feeCushion?: number
   maxFeeXRP?: string
-  proxy?: string
   timeout?: number
 }
 
@@ -147,7 +142,9 @@ function getCollectKeyFromCommand(command: string): string | null {
 }
 
 function clamp(value: number, min: number, max: number): number {
-  assert.ok(min <= max, 'Illegal clamp bounds')
+  if (min > max) {
+    throw new Error('Illegal clamp bounds')
+  }
   return Math.min(Math.max(value, min), max)
 }
 
@@ -933,7 +930,7 @@ class Client extends EventEmitter {
     // combine results
     await Promise.all([xrpPromise, linesPromise]).then(
       ([xrpBalance, linesResponses]) => {
-        const accountLinesBalance = flatMap(linesResponses, (response) =>
+        const accountLinesBalance = linesResponses.flatMap((response) =>
           formatBalances(response.result.lines),
         )
         if (xrpBalance !== '') {
@@ -1097,8 +1094,9 @@ class Client extends EventEmitter {
    * @throws When either Client isn't connected or unable to fund wallet address.
    */
   public async fundWallet(
+    this: Client,
     wallet?: Wallet | null,
-    options?: FundWalletOptions,
+    options: FundingOptions = {},
   ): Promise<{
     wallet: Wallet
     balance: number
@@ -1106,33 +1104,39 @@ class Client extends EventEmitter {
     if (!this.isConnected()) {
       throw new RippledError('Client not connected, cannot call faucet')
     }
+    const existingWallet = Boolean(wallet)
 
     // Generate a new Wallet if no existing Wallet is provided or its address is invalid to fund
-    const walletToFund = generateWalletToFund(wallet)
+    const walletToFund =
+      wallet && isValidClassicAddress(wallet.classicAddress)
+        ? wallet
+        : Wallet.generate()
 
     // Create the POST request body
-    const postBody = Buffer.from(
-      new TextEncoder().encode(
-        JSON.stringify({
-          destination: walletToFund.classicAddress,
-          xrpAmount: options?.amount,
-          userAgent: 'xrpl.js',
-          usageContext: options?.usageContext,
-        }),
-      ),
-    )
+    const postBody: FaucetRequestBody = {
+      destination: walletToFund.classicAddress,
+      xrpAmount: options.amount,
+      usageContext: options.usageContext,
+      userAgent: 'xrpl.js',
+    }
 
-    const startingBalance = await getStartingBalance(
-      this,
-      walletToFund.classicAddress,
-    )
+    let startingBalance = 0
+    if (existingWallet) {
+      try {
+        startingBalance = Number(
+          await this.getXrpBalance(walletToFund.classicAddress),
+        )
+      } catch {
+        /* startingBalance remains what it was previously */
+      }
+    }
 
-    return doFundWalletRequest(
+    return requestFunding(
+      options,
       this,
       startingBalance,
       walletToFund,
       postBody,
-      options,
     )
   }
 }

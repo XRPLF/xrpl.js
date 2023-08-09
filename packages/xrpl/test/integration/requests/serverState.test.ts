@@ -115,6 +115,7 @@ describe('server_state', function () {
         'build_version',
         'node_size',
         'initial_sync_duration_us',
+        'ports',
       ]
       assert.deepEqual(
         omit(response.result.state, removeKeys),

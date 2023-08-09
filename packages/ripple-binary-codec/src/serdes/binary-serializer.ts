@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import { FieldInstance } from '../enums'
 import { type SerializedType } from '../types/serialized-type'
 import { Buffer } from 'buffer/'
@@ -132,8 +131,9 @@ class BinarySerializer {
     isUnlModifyWorkaround = false,
   ): void {
     const associatedValue = field.associatedType.from(value)
-    assert.ok(associatedValue.toBytesSink !== undefined)
-    assert.ok(field.name !== undefined)
+    if (associatedValue.toBytesSink === undefined || field.name === undefined) {
+      throw new Error()
+    }
 
     this.sink.put(field.header)
 
