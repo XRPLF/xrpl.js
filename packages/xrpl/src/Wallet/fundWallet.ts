@@ -150,15 +150,14 @@ export async function requestFunding(
     throw new XRPLFaucetError('No faucet hostname could be derived')
   }
   const pathname = options.faucetPath ?? getDefaultFaucetPath(hostname)
-  // eslint-disable-next-line max-len -- Needed to disable multiple rules.
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-call -- Known return type
-  const response = (await fetch(`https://${hostname}${pathname}`, {
+
+  const response = await fetch(`https://${hostname}${pathname}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(postBody),
-  })) as Response
+  })
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- It's a FaucetWallet
   const body = (await response.json()) as FaucetWallet
