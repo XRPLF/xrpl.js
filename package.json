@@ -21,9 +21,7 @@
     "xrpl": "file:packages/xrpl"
   },
   "devDependencies": {
-    "@types/brorand": "^1.0.30",
     "@types/chai": "^4.2.21",
-    "@types/create-hash": "^1.2.2",
     "@types/jest": "^29.2.2",
     "@types/lodash": "^4.14.136",
     "@types/node": "^16.18.38",
@@ -36,7 +34,6 @@
     "buffer": "^6.0.2",
     "chai": "^4.3.4",
     "copyfiles": "^2.4.1",
-    "crypto-browserify": "^3.12.0",
     "ejs": "^3.0.1",
     "eslint": "^8.18.0",
     "eslint-plugin-array-func": "^3.1.7",

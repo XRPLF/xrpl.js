@@ -3,5 +3,5 @@
   "private": true,
   "main": "../dist/utils",
   "types": "../dist/utils",
-  "browser": "../dist/sha512/utils.js"
+  "browser": "../dist/utils/browser.js"
 }
