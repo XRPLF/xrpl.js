@@ -31,7 +31,6 @@
     "ws": "^8.2.2"
   },
   "devDependencies": {
-    "@geut/browser-node-core": "^2.0.13",
     "@types/node": "^16.18.38",
     "https-proxy-agent": "^7.0.1",
     "karma": "^6.4.1",
