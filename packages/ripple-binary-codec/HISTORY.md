@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### Added
-* Updated to include latest updates to `definitions.json` including changes for the `fixNFTokenRemint` amendment.
+* Updated to include latest updates to `definitions.json` including changes for the `fixNFTokenRemint` and `AMM` amendments.
 
 ## 1.8.0 (2023-08-07)
 * Added Clawback transaction type
