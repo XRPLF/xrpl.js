@@ -7,6 +7,10 @@ const existingConfig = fs.readFileSync(filePath, "utf-8");
 
 const networkToEmulate = "wss://s.devnet.rippletest.net:51233/";
 
+const amendmentsToIgnore = [
+  "86E83A7D2ECE3AD5FA87AB2195AE015C950469ABF0B72EAACED318F74886AE90", // CryptoConditionsSuite is obsolete
+];
+
 async function main() {
   const client = new xrpl.Client(networkToEmulate);
   await client.connect();
@@ -23,7 +27,10 @@ async function main() {
 
   const newAmendments = [];
   amendments.forEach((amendment) => {
-    if (!existingConfig.includes(amendment)) {
+    if (
+      !existingConfig.includes(amendment) &&
+      !amendmentsToIgnore.includes(amendment)
+    ) {
       newAmendments.push(amendment);
     }
   });
