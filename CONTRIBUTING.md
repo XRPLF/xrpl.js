@@ -187,7 +187,7 @@ npm uninstall abbrev -w xrpl
 In order to test the library, we need to enable the latest amendments in the docker container.
 This requires updating the `/.ci-config/rippled.cfg` file with the hashes and names of new amendments.
 
-In order to update the list, follow these steps:
+In order to update the list, follow these steps from the top level of the library:
 1. Run `node ./.ci-config/getNewAmendments.js`
 2. If there are any new amendment hashes, add a comment to the end of `/.ci-config/rippled.cfg` with the date
    - `Ex. "# Added August 9th, 2023"`
@@ -197,6 +197,17 @@ In order to update the list, follow these steps:
 4. Push your changes
 
 Note: The same updated config can be used to update xrpl-py's CI as well.
+
+## Updating `definitions.json`
+
+This should almost always be done using the [`xrpl-codec-gen`](https://github.com/RichardAH/xrpl-codec-gen) script - if the output needs manual intervention afterwards, consider updating the script instead.
+
+1. Clone / pull the latest changes from [rippled](https://github.com/XRPLF/rippled) - Specifically the `develop` branch is usually the right one.
+2. Clone / pull the latest changes from [`xrpl-codec-gen`](https://github.com/RichardAH/xrpl-codec-gen)
+3. From the `xrpl-codec-gen` tool, follow the steps in the `README.md` to generate a new `definitions.json` file.
+4. Replace the `definitions.json` file in the `ripple-binary-codec` with the newly generated file.
+5. Verify that the changes make sense by inspection before submitting, as there may be updates required for the `xrpl-codec-gen` tool depending on the latest amendments we're updating to match.
+
 
 ## Release process + checklist
 
