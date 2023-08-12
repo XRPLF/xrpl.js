@@ -33,18 +33,13 @@
     "xrpl-secret-numbers": "^0.3.3"
   },
   "devDependencies": {
-    "@geut/browser-node-core": "^2.0.13",
     "@types/node": "^16.18.38",
-    "browserify-fs": "^1.0.0",
-    "constants-browserify": "^1.0.0",
-    "https-browserify": "^1.0.0",
     "https-proxy-agent": "^7.0.1",
     "karma": "^6.4.1",
     "karma-chrome-launcher": "^3.1.1",
     "karma-jasmine": "^5.1.0",
     "karma-webpack": "^5.0.0",
     "lodash": "^4.17.4",
-    "node-polyfill-webpack-plugin": "^2.0.1",
     "react": "^18.2.0",
     "typedoc": "0.25.0"
   },
