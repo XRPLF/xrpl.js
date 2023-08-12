@@ -1,7 +1,6 @@
 import { Bytes } from './bytes'
 import { SerializedType } from '../types/serialized-type'
 import { TYPE_WIDTH } from './constants'
-import { Buffer } from 'buffer/'
 
 /**
  * Encoding information for a rippled field, often used in transactions.
@@ -23,14 +22,14 @@ export interface FieldInstance {
   readonly type: Bytes
   readonly ordinal: number
   readonly name: string
-  readonly header: Buffer
+  readonly header: Uint8Array
   readonly associatedType: typeof SerializedType
 }
 
 /*
  * @brief: Serialize a field based on type_code and Field.nth
  */
-function fieldHeader(type: number, nth: number): Buffer {
+function fieldHeader(type: number, nth: number): Uint8Array {
   const header: Array<number> = []
   if (type < 16) {
     if (nth < 16) {
@@ -43,7 +42,7 @@ function fieldHeader(type: number, nth: number): Buffer {
   } else {
     header.push(0, type, nth)
   }
-  return Buffer.from(header)
+  return Uint8Array.from(header)
 }
 
 function buildField(

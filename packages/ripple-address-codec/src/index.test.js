@@ -4,6 +4,7 @@ const {
   isValidXAddress,
   encodeXAddress,
 } = require('./index')
+const { hexToBytes } = require('@noble/hashes/utils')
 
 const testCases = [
   [
@@ -189,10 +190,10 @@ const testCases = [
 
   {
     const highAndLowAccounts = [
-      Buffer.from('00'.repeat(20), 'hex'),
-      Buffer.from(`${'00'.repeat(19)}01`, 'hex'),
-      Buffer.from('01'.repeat(20), 'hex'),
-      Buffer.from('FF'.repeat(20), 'hex'),
+      hexToBytes('00'.repeat(20)),
+      hexToBytes(`${'00'.repeat(19)}01`),
+      hexToBytes('01'.repeat(20)),
+      hexToBytes('FF'.repeat(20)),
     ]
 
     highAndLowAccounts.forEach((accountId) => {
@@ -241,7 +242,7 @@ test(`Invalid X-address (64-bit tag) throws`, () => {
 
 test(`Invalid Account ID throws`, () => {
   expect(() => {
-    encodeXAddress(Buffer.from('00'.repeat(19), 'hex'), false, false)
+    encodeXAddress(hexToBytes('00'.repeat(19)), false, false)
   }).toThrowError('Account ID must be 20 bytes')
 })
 

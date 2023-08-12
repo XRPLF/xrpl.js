@@ -1,11 +1,17 @@
 const api = require('./xrp-codec')
+const { bytesToHex } = require('@xrpl/crypto/utils')
+const { hexToBytes } = require('@noble/hashes/utils')
 
 function toHex(bytes) {
-  return Buffer.from(bytes).toString('hex').toUpperCase()
+  return bytesToHex(bytes)
 }
 
 function toBytes(hex) {
-  return Buffer.from(hex, 'hex')
+  return hexToBytes(hex)
+}
+
+function stringToBytes(str) {
+  return new TextEncoder('utf-8').encode('123456789')
 }
 
 /**
@@ -92,7 +98,7 @@ test('isValidClassicAddress - empty', function () {
 describe('encodeSeed', function () {
   it('encodes a secp256k1 seed', function () {
     const result = api.encodeSeed(
-      Buffer.from('CF2DE378FBDD7E2EE87D486DFB5A7BFF', 'hex'),
+      hexToBytes('CF2DE378FBDD7E2EE87D486DFB5A7BFF'),
       'secp256k1',
     )
     expect(result).toBe('sn259rEFXrQrWyx3Q7XneWcwV6dfL')
@@ -100,7 +106,7 @@ describe('encodeSeed', function () {
 
   it('encodes low secp256k1 seed', function () {
     const result = api.encodeSeed(
-      Buffer.from('00000000000000000000000000000000', 'hex'),
+      hexToBytes('00000000000000000000000000000000'),
       'secp256k1',
     )
     expect(result).toBe('sp6JS7f14BuwFY8Mw6bTtLKWauoUs')
@@ -108,7 +114,7 @@ describe('encodeSeed', function () {
 
   it('encodes high secp256k1 seed', function () {
     const result = api.encodeSeed(
-      Buffer.from('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', 'hex'),
+      hexToBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'),
       'secp256k1',
     )
     expect(result).toBe('saGwBRReqUNKuWNLpUAq8i8NkXEPN')
@@ -116,7 +122,7 @@ describe('encodeSeed', function () {
 
   it('encodes an ed25519 seed', function () {
     const result = api.encodeSeed(
-      Buffer.from('4C3A1D213FBDFB14C7C28D609469B341', 'hex'),
+      hexToBytes('4C3A1D213FBDFB14C7C28D609469B341'),
       'ed25519',
     )
     expect(result).toBe('sEdTM1uX8pu2do5XvTnutH6HsouMaM2')
@@ -124,7 +130,7 @@ describe('encodeSeed', function () {
 
   it('encodes low ed25519 seed', function () {
     const result = api.encodeSeed(
-      Buffer.from('00000000000000000000000000000000', 'hex'),
+      hexToBytes('00000000000000000000000000000000'),
       'ed25519',
     )
     expect(result).toBe('sEdSJHS4oiAdz7w2X2ni1gFiqtbJHqE')
@@ -132,7 +138,7 @@ describe('encodeSeed', function () {
 
   it('encodes high ed25519 seed', function () {
     const result = api.encodeSeed(
-      Buffer.from('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', 'hex'),
+      hexToBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', 'hex'),
       'ed25519',
     )
     expect(result).toBe('sEdV19BLfeQeKdEXyYA4NhjPJe6XBfG')
@@ -140,17 +146,14 @@ describe('encodeSeed', function () {
 
   test('attempting to encode a seed with less than 16 bytes of entropy throws', function () {
     expect(() => {
-      api.encodeSeed(
-        Buffer.from('CF2DE378FBDD7E2EE87D486DFB5A7B', 'hex'),
-        'secp256k1',
-      )
+      api.encodeSeed(hexToBytes('CF2DE378FBDD7E2EE87D486DFB5A7B'), 'secp256k1')
     }).toThrow('entropy must have length 16')
   })
 
   test('attempting to encode a seed with more than 16 bytes of entropy throws', function () {
     expect(() => {
       api.encodeSeed(
-        Buffer.from('CF2DE378FBDD7E2EE87D486DFB5A7BFFFF', 'hex'),
+        hexToBytes('CF2DE378FBDD7E2EE87D486DFB5A7BFFFF'),
         'secp256k1',
       )
     }).toThrow('entropy must have length 16')
@@ -174,14 +177,14 @@ describe('decodeSeed', function () {
 describe('encodeAccountID', function () {
   it('can encode an AccountID', function () {
     const encoded = api.encodeAccountID(
-      Buffer.from('BA8E78626EE42C41B46D46C3048DF3A1C3C87072', 'hex'),
+      hexToBytes('BA8E78626EE42C41B46D46C3048DF3A1C3C87072'),
     )
     expect(encoded).toBe('rJrRMgiRgrU6hDF4pgu5DXQdWyPbY35ErN')
   })
 
   test('unexpected length should throw', function () {
     expect(() => {
-      api.encodeAccountID(Buffer.from('ABCDEF', 'hex'))
+      api.encodeAccountID(hexToBytes('ABCDEF'))
     }).toThrow(
       'unexpected_payload_length: bytes.length does not match expectedLength',
     )
@@ -199,9 +202,19 @@ describe('decodeNodePublic', function () {
   })
 })
 
+function stringToUint(string) {
+  ;(string = btoa(unescape(encodeURIComponent(string)))),
+    (charList = string.split('')),
+    (uintArray = [])
+  for (var i = 0; i < charList.length; i++) {
+    uintArray.push(charList[i].charCodeAt(0))
+  }
+  return new Uint8Array(uintArray)
+}
+
 test('encodes 123456789 with version byte of 0', () => {
   expect(
-    api.codec.encode(Buffer.from('123456789'), {
+    api.codec.encode(new TextEncoder('utf-8').encode('123456789'), {
       versions: [0],
       expectedLength: 9,
     }),
@@ -259,7 +272,7 @@ test('decode data', () => {
     }),
   ).toStrictEqual({
     version: [0],
-    bytes: Buffer.from('123456789'),
+    bytes: stringToBytes('123456789'),
     type: null,
   })
 })
@@ -272,7 +285,7 @@ test('decode data with expected length', function () {
     }),
   ).toStrictEqual({
     version: [0],
-    bytes: Buffer.from('123456789'),
+    bytes: stringToBytes('123456789'),
     type: null,
   })
 })

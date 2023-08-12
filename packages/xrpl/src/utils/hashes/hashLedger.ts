@@ -3,6 +3,7 @@
 /* eslint-disable no-bitwise  -- this file mimics behavior in rippled. It uses
    bitwise operators for and-ing numbers with a mask and bit shifting. */
 
+import { bytesToHex } from '@noble/hashes/utils'
 import BigNumber from 'bignumber.js'
 import { decode, encode } from 'ripple-binary-codec'
 
@@ -29,8 +30,8 @@ function intToHex(integer: number, byteLength: number): string {
   return foo
 }
 
-function bytesToHex(bytes: number[]): string {
-  return Buffer.from(bytes).toString('hex')
+function simpleBytesToHex(bytes: number[]): string {
+  return bytesToHex(new Uint8Array(bytes))
 }
 
 function bigintToHex(
@@ -44,16 +45,16 @@ function bigintToHex(
 function addLengthPrefix(hex: string): string {
   const length = hex.length / 2
   if (length <= 192) {
-    return bytesToHex([length]) + hex
+    return simpleBytesToHex([length]) + hex
   }
   if (length <= 12480) {
     const prefix = length - 193
-    return bytesToHex([193 + (prefix >>> 8), prefix & 0xff]) + hex
+    return simpleBytesToHex([193 + (prefix >>> 8), prefix & 0xff]) + hex
   }
   if (length <= 918744) {
     const prefix = length - 12481
     return (
-      bytesToHex([
+      simpleBytesToHex([
         241 + (prefix >>> 16),
         (prefix >>> 8) & 0xff,
         prefix & 0xff,

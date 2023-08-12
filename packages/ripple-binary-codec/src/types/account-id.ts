@@ -5,7 +5,7 @@ import {
   xAddressToClassicAddress,
 } from 'ripple-address-codec'
 import { Hash160 } from './hash-160'
-import { Buffer } from 'buffer/'
+import { hexToBytes } from '@xrpl/crypto/utils'
 
 const HEX_REGEX = /^[A-F0-9]{40}$/
 
@@ -13,9 +13,11 @@ const HEX_REGEX = /^[A-F0-9]{40}$/
  * Class defining how to encode and decode an AccountID
  */
 class AccountID extends Hash160 {
-  static readonly defaultAccountID: AccountID = new AccountID(Buffer.alloc(20))
+  static readonly defaultAccountID: AccountID = new AccountID(
+    new Uint8Array(20),
+  )
 
-  constructor(bytes?: Buffer) {
+  constructor(bytes?: Uint8Array) {
     super(bytes ?? AccountID.defaultAccountID.bytes)
   }
 
@@ -36,7 +38,7 @@ class AccountID extends Hash160 {
       }
 
       return HEX_REGEX.test(value)
-        ? new AccountID(Buffer.from(value, 'hex'))
+        ? new AccountID(hexToBytes(value))
         : this.fromBase58(value)
     }
 
@@ -59,7 +61,7 @@ class AccountID extends Hash160 {
       value = classic.classicAddress
     }
 
-    return new AccountID(Buffer.from(decodeAccountID(value)))
+    return new AccountID(Uint8Array.from(decodeAccountID(value)))
   }
 
   /**

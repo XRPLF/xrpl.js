@@ -1,4 +1,4 @@
-export type Sequence = number[] | Buffer | Uint8Array
+export type Sequence = number[] | Uint8Array
 
 /**
  * Check whether two sequences (e.g. Arrays of numbers) are equal.
@@ -33,7 +33,7 @@ function isSequence(val: Sequence | number): val is Sequence {
  * a single element or a sequence, which has a `length` property and supports
  * element retrieval via sequence[ix].
  *
- * > concatArgs(1, [2, 3], Buffer.from([4,5]), new Uint8Array([6, 7]));
+ * > concatArgs(1, [2, 3], Uint8Array.from([4,5]), new Uint8Array([6, 7]));
  * [1,2,3,4,5,6,7]
  *
  * @param args - Concatenate of these args into a single array.

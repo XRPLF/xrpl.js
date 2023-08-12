@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@xrpl/crypto": "1.0.0",
-    "base-x": "^3.0.9"
+    "@scure/base": "^1.1.1"
   },
   "repository": {
     "type": "git",

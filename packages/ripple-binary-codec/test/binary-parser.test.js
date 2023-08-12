@@ -9,7 +9,7 @@ const { Field, TransactionType } = require('./../src/enums')
 const { parseHexOnly, hexOnly, loadFixture } = require('./utils')
 const fixtures = loadFixture('data-driven-tests.json')
 const { BytesList } = require('../src/serdes/binary-serializer')
-const { Buffer } = require('buffer/')
+const { bytesToHex, hexToBytes } = require('@xrpl/crypto/utils')
 
 const __ = hexOnly
 function toJSON(v) {
@@ -31,15 +31,14 @@ function assertEqualAmountJSON(actual, expected) {
 }
 
 function basicApiTests() {
-  const bytes = parseHexOnly('00,01020304,0506', Uint8Array)
   test('can read slices of bytes', () => {
-    const parser = makeParser(bytes)
-    expect(parser.bytes instanceof Buffer).toBe(true)
+    const parser = makeParser('00010203040506')
+    expect(parser.bytes instanceof Uint8Array).toBe(true)
     const read1 = parser.read(1)
-    expect(read1 instanceof Buffer).toBe(true)
-    expect(read1).toEqual(Buffer.from([0]))
-    expect(parser.read(4)).toEqual(Buffer.from([1, 2, 3, 4]))
-    expect(parser.read(2)).toEqual(Buffer.from([5, 6]))
+    expect(read1 instanceof Uint8Array).toBe(true)
+    expect(read1).toEqual(Uint8Array.from([0]))
+    expect(parser.read(4)).toEqual(Uint8Array.from([1, 2, 3, 4]))
+    expect(parser.read(2)).toEqual(Uint8Array.from([5, 6]))
     expect(() => parser.read(1)).toThrow()
   })
   test('can read a Uint32 at full', () => {
@@ -104,11 +103,9 @@ function transactionParsingTests() {
     expect(parser.read(8)).not.toEqual([])
     expect(parser.readField()).toEqual(Field.SigningPubKey)
     expect(parser.readVariableLengthLength()).toBe(33)
-    expect(parser.read(33).toString('hex').toUpperCase()).toEqual(
-      tx_json.SigningPubKey,
-    )
+    expect(bytesToHex(parser.read(33))).toEqual(tx_json.SigningPubKey)
     expect(parser.readField()).toEqual(Field.TxnSignature)
-    expect(parser.readVariableLength().toString('hex').toUpperCase()).toEqual(
+    expect(bytesToHex(parser.readVariableLength())).toEqual(
       tx_json.TxnSignature,
     )
     expect(parser.readField()).toEqual(Field.Account)

@@ -36,7 +36,6 @@ function webpackForTest(testFileName) {
       new webpack.DefinePlugin({
         'process.stdout': {},
       }),
-      new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
     ],
     module: {
       rules: [
@@ -74,7 +73,6 @@ function webpackForTest(testFileName) {
       extensions: ['.ts', '.js', '.json'],
       fallback: {
         module: false,
-        buffer: require.resolve('buffer/'),
       },
     },
   }

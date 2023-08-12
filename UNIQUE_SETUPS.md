@@ -18,9 +18,7 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
 1. Install shims (you can use `yarn` as well):
 
    ```shell
-   npm install --save-dev \
-       buffer \
-       process
+   npm install --save-dev process
    ```
 
 2. Modify your webpack configuration
@@ -45,7 +43,6 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
         config.plugins = (config.plugins || []).concat([
           new webpack.ProvidePlugin({
             process: "process/browser",
-            Buffer: ["buffer", "Buffer"],
           }),
         ]);
         
@@ -133,7 +130,6 @@ export default defineConfig({
         plugins: [
             NodeGlobalsPolyfillPlugin({
                 process: true,
-                buffer: true,
             }),
         ],
     },

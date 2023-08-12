@@ -1,5 +1,4 @@
 import { Comparable } from './serialized-type'
-import { Buffer } from 'buffer/'
 
 /**
  * Compare numbers and bigInts n1 and n2
@@ -18,7 +17,7 @@ function compare(n1: number | bigint, n2: number | bigint): number {
 abstract class UInt extends Comparable {
   protected static width: number
 
-  constructor(bytes: Buffer) {
+  constructor(bytes: Uint8Array) {
     super(bytes)
   }
 
@@ -48,6 +47,14 @@ abstract class UInt extends Comparable {
    * @returns the value
    */
   abstract valueOf(): number | bigint
+
+  static checkUintRange(val: number, min: number, max: number): void {
+    if (val < min || val > max) {
+      throw new Error(
+        `Invalid ${this.constructor.name}: ${val} must be >= ${min} and <= ${max}`,
+      )
+    }
+  }
 }
 
 export { UInt }

@@ -1,12 +1,12 @@
 import { SerializedType } from './serialized-type'
 import { BinaryParser } from '../serdes/binary-parser'
-import { Buffer } from 'buffer/'
+import { hexToBytes } from '@xrpl/crypto/utils'
 
 /**
  * Variable length encoded type
  */
 class Blob extends SerializedType {
-  constructor(bytes: Buffer) {
+  constructor(bytes: Uint8Array) {
     super(bytes)
   }
 
@@ -33,7 +33,7 @@ class Blob extends SerializedType {
     }
 
     if (typeof value === 'string') {
-      return new Blob(Buffer.from(value, 'hex'))
+      return new Blob(hexToBytes(value))
     }
 
     throw new Error('Cannot construct Blob from value given')
