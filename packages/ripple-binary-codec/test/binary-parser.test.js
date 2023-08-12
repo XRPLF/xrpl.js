@@ -242,6 +242,12 @@ function fieldParsingTests() {
       new Error('Cannot read FieldOrdinal, type_code out of range'),
     )
   })
+  test('readUIntN', () => {
+    const parser = makeParser('0009')
+    expect(parser.readUIntN(2)).toEqual(9)
+    expect(() => parser.readUIntN(-1)).toThrow(new Error('invalid n'))
+    expect(() => parser.readUIntN(5)).toThrow(new Error('invalid n'))
+  })
 }
 
 function assertRecyclable(json, forField) {

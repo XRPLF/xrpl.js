@@ -438,7 +438,7 @@ class Client extends EventEmitter {
    * ```ts
    * const api = new Client('wss://s.altnet.rippletest.net:51233')
    *
-   * api.on('transactions', (tx: TransactionStream) => {
+   * api.on('transaction', (tx: TransactionStream) => {
    *  console.log("Received Transaction")
    *  console.log(tx)
    * })
