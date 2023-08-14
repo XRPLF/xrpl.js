@@ -79,9 +79,7 @@ class AccountID extends Hash160 {
    * @returns the base58 string defined by this.bytes
    */
   toBase58(): string {
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    return encodeAccountID(this.bytes as any)
-    /* eslint-enable @typescript-eslint/no-explicit-any */
+    return encodeAccountID(this.bytes)
   }
 }
 

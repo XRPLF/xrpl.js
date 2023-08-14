@@ -6,10 +6,10 @@ const { binary } = require('../src/coretypes')
 const { Amount, Hash160 } = coreTypes
 const { makeParser, readJSON } = binary
 const { Field, TransactionType } = require('./../src/enums')
-const { parseHexOnly, hexOnly, loadFixture } = require('./utils')
+const { hexOnly, loadFixture } = require('./utils')
 const fixtures = loadFixture('data-driven-tests.json')
 const { BytesList } = require('../src/serdes/binary-serializer')
-const { bytesToHex, hexToBytes } = require('@xrpl/crypto/utils')
+const { bytesToHex } = require('@xrpl/crypto/utils')
 
 const __ = hexOnly
 function toJSON(v) {
