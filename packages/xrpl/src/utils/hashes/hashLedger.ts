@@ -3,7 +3,7 @@
 /* eslint-disable no-bitwise  -- this file mimics behavior in rippled. It uses
    bitwise operators for and-ing numbers with a mask and bit shifting. */
 
-import { bytesToHex } from '@noble/hashes/utils'
+import { bytesToHex } from '@xrpl/crypto/utils'
 import BigNumber from 'bignumber.js'
 import { decode, encode } from 'ripple-binary-codec'
 

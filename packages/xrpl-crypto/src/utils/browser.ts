@@ -6,4 +6,7 @@ export function bytesToHex(bytes: Uint8Array) {
   return nobleBytesToHex(bytes).toUpperCase()
 }
 
+export const TextDecoder = window.TextDecoder
+export const TextEncoder = window.TextEncoder
+
 export * from './shared'

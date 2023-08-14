@@ -1,5 +1,9 @@
-import { utf8ToBytes } from '@noble/hashes/utils'
-import { hexToBytes, bytesToHex } from '@xrpl/crypto/utils'
+import {
+  bytesToHex,
+  hexToBytes,
+  TextDecoder,
+  TextEncoder,
+} from '@xrpl/crypto/utils'
 
 /**
  * Converts a string to its hex equivalent. Useful for Memos.
@@ -9,7 +13,7 @@ import { hexToBytes, bytesToHex } from '@xrpl/crypto/utils'
  * @category Utilities
  */
 function convertStringToHex(string: string): string {
-  return bytesToHex(utf8ToBytes(string))
+  return bytesToHex(new TextEncoder().encode(string))
 }
 
 /**
@@ -21,7 +25,7 @@ function convertStringToHex(string: string): string {
  * @category Utilities
  */
 function convertHexToString(hex: string, encoding = 'utf8'): string {
-  return new TextDecoder().decode(hexToBytes(hex))
+  return new TextDecoder(encoding).decode(hexToBytes(hex))
 }
 
 export { convertHexToString, convertStringToHex }

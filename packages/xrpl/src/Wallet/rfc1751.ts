@@ -185,7 +185,7 @@ function swap128(buf: Uint8Array): Uint8Array {
   return concat([reversedBytes.slice(8, 16), reversedBytes.slice(0, 8)])
 }
 
-function swap(b: Uint8Array, n: number, m: number) {
+function swap(b: Uint8Array, n: number, m: number): void {
   const i = b[n]
   // eslint-disable-next-line no-param-reassign -- we have to swap
   b[n] = b[m]
@@ -193,7 +193,7 @@ function swap(b: Uint8Array, n: number, m: number) {
   b[m] = i
 }
 
-function swap64(arr: Uint8Array) {
+function swap64(arr: Uint8Array): Uint8Array {
   const len = arr.length
 
   if (len < 192) {

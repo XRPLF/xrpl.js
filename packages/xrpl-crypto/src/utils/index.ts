@@ -8,7 +8,6 @@ export function bytesToHex(buffer: Uint8Array): string {
   return nobleBytesToHex(buffer).toUpperCase()
 }
 
-
 export function hexToBytes(hex: string): Uint8Array {
   if (typeof hex !== 'string') {
     throw new Error(`hex string expected, got ${typeof hex}`)
@@ -31,4 +30,6 @@ export function randomBytes(n: number): Uint8Array {
   return cryptoRandomBytes(n)
 }
 
+// eslint-disable-next-line node/prefer-global/text-encoder, node/prefer-global/text-decoder
+export { TextDecoder, TextEncoder } from 'util'
 export * from './shared'

@@ -4,7 +4,7 @@ const {
   isValidXAddress,
   encodeXAddress,
 } = require('./index')
-const { hexToBytes } = require('@noble/hashes/utils')
+const { hexToBytes } = require('@xrpl/crypto/utils')
 
 const testCases = [
   [

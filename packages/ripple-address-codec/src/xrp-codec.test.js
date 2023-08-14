@@ -1,6 +1,5 @@
 const api = require('./xrp-codec')
-const { bytesToHex } = require('@xrpl/crypto/utils')
-const { hexToBytes } = require('@noble/hashes/utils')
+const { bytesToHex, hexToBytes } = require('@xrpl/crypto/utils')
 
 function toHex(bytes) {
   return bytesToHex(bytes)

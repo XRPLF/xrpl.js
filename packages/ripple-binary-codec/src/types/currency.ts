@@ -1,5 +1,5 @@
 import { Hash160 } from './hash-160'
-import { hexToBytes, bytesToHex } from '@xrpl/crypto/utils'
+import { bytesToHex, hexToBytes, TextDecoder } from '@xrpl/crypto/utils'
 
 const XRP_HEX_REGEX = /^0{40}$/
 const ISO_REGEX = /^[A-Z0-9a-z?!@#$%^&*(){}[\]|]{3}$/
@@ -27,7 +27,6 @@ function isIsoCode(iso: string): boolean {
 }
 
 function isoCodeFromHex(code: Uint8Array): string | null {
-  // @ts-expect-error
   const utf8decoder = new TextDecoder()
   const iso = utf8decoder.decode(code)
   if (iso === 'XRP') {

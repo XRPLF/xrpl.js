@@ -1,5 +1,4 @@
-import { hexToBytes } from '@noble/hashes/utils'
-import { concat, equal } from '@xrpl/crypto/utils'
+import { concat, equal, hexToBytes } from '@xrpl/crypto/utils'
 
 import {
   codec,
