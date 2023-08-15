@@ -10,6 +10,7 @@ import {
   ConnectionError,
   XrplError,
 } from '../errors'
+import type { RequestResponseMap } from '../models'
 import { BaseRequest } from '../models/methods/baseMethod'
 
 import ConnectionManager from './ConnectionManager'
@@ -295,17 +296,17 @@ export class Connection extends EventEmitter {
    * @returns The response from the rippled server.
    * @throws NotConnectedError if the Connection isn't connected to a server.
    */
-  public async request<T extends BaseRequest>(
-    request: T,
+  public async request<R extends BaseRequest, T = RequestResponseMap<R>>(
+    request: R,
     timeout?: number,
-  ): Promise<unknown> {
+  ): Promise<T> {
     if (!this.shouldBeConnected || this.ws == null) {
       throw new NotConnectedError(JSON.stringify(request), request)
     }
-    const [id, message, responsePromise] = this.requestManager.createRequest(
-      request,
-      timeout ?? this.config.timeout,
-    )
+    const [id, message, responsePromise] = this.requestManager.createRequest<
+      R,
+      T
+    >(request, timeout ?? this.config.timeout)
     this.trace('send', message)
     websocketSendAsync(this.ws, message).catch((error) => {
       this.requestManager.reject(id, error)
