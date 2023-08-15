@@ -5,7 +5,6 @@ import {
   AccountSet,
   Client,
   SignerListSet,
-  SubmitMultisignedRequest,
   Transaction,
   SubmitMultisignedResponse,
   hashes,
@@ -80,11 +79,10 @@ describe('submit_multisigned', function () {
       const signed1 = signerWallet1.sign(accountSetTx, true)
       const signed2 = signerWallet2.sign(accountSetTx, true)
       const multisigned = multisign([signed1.tx_blob, signed2.tx_blob])
-      const multisignedRequest: SubmitMultisignedRequest = {
+      const submitResponse = await client.request({
         command: 'submit_multisigned',
         tx_json: decode(multisigned) as unknown as Transaction,
-      }
-      const submitResponse = await client.request(multisignedRequest)
+      })
       await ledgerAccept(client)
       assert.strictEqual(submitResponse.result.engine_result, 'tesSUCCESS')
       await verifySubmittedTransaction(testContext.client, multisigned)
