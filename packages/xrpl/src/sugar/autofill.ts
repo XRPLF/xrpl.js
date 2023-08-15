@@ -5,7 +5,6 @@ import type { Client } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
 import { Transaction } from '../models/transactions'
-import { setTransactionFlagsToNumber } from '../models/utils/flags'
 import { xrpToDrops } from '../utils'
 
 import getFeeXrp from './getFeeXrp'
@@ -19,83 +18,6 @@ const LEDGER_OFFSET = 20
 const RESTRICTED_NETWORKS = 1024
 const REQUIRED_NETWORKID_VERSION = '1.11.0'
 const HOOKS_TESTNET_ID = 21338
-interface ClassicAccountAndTag {
-  classicAccount: string
-  tag: number | false | undefined
-}
-
-/**
- * Autofills fields in a transaction. This will set `Sequence`, `Fee`,
- * `lastLedgerSequence` according to the current state of the server this Client
- * is connected to. It also converts all X-Addresses to classic addresses and
- * flags interfaces into numbers.
- *
- * @example
- *
- * ```ts
- * const { Client } = require('xrpl')
- *
- * const client = new Client('wss://s.altnet.rippletest.net:51233')
- *
- * async function createAndAutofillTransaction() {
- *   const transaction = {
- *     TransactionType: 'Payment',
- *     Account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
- *     Destination: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
- *     Amount: '10000000' // 10 XRP in drops (1/1,000,000th of an XRP)
- *   }
- *
- *   try {
- *     const autofilledTransaction = await client.autofill(transaction)
- *     console.log(autofilledTransaction)
- *   } catch (error) {
- *     console.error(`Failed to autofill transaction: ${error}`)
- *   }
- * }
- *
- * createAndAutofillTransaction()
- * ```
- *
- * Autofill helps fill in fields which should be included in a transaction, but can be determined automatically
- * such as `LastLedgerSequence` and `Fee`. If you override one of the fields `autofill` changes, your explicit
- * values will be used instead. By default, this is done as part of `submit` and `submitAndWait` when you pass
- * in an unsigned transaction along with your wallet to be submitted.
- *
- * @param this - A client.
- * @param transaction - A {@link Transaction} in JSON format
- * @param signersCount - The expected number of signers for this transaction.
- * Only used for multisigned transactions.
- * @returns The autofilled transaction.
- */
-async function autofill<T extends Transaction>(
-  this: Client,
-  transaction: T,
-  signersCount?: number,
-): Promise<T> {
-  const tx = { ...transaction }
-
-  setValidAddresses(tx)
-
-  setTransactionFlagsToNumber(tx)
-  const promises: Array<Promise<void>> = []
-  if (tx.NetworkID == null) {
-    tx.NetworkID = txNeedsNetworkID(this) ? this.networkID : undefined
-  }
-  if (tx.Sequence == null) {
-    promises.push(setNextValidSequenceNumber(this, tx))
-  }
-  if (tx.Fee == null) {
-    promises.push(calculateFeePerTransactionType(this, tx, signersCount))
-  }
-  if (tx.LastLedgerSequence == null) {
-    promises.push(setLatestValidatedLedgerSequence(this, tx))
-  }
-  if (tx.TransactionType === 'AccountDelete') {
-    promises.push(checkAccountDeleteBlockers(this, tx))
-  }
-
-  return Promise.all(promises).then(() => tx)
-}
 
 /**
  * Determines whether the source rippled version is not later than the target rippled version.
@@ -171,7 +93,7 @@ function isNotLaterRippledVersion(source: string, target: string): boolean {
  * @param client -- The connected client.
  * @returns True if required networkID, false otherwise.
  */
-function txNeedsNetworkID(client: Client): boolean {
+export function txNeedsNetworkID(client: Client): boolean {
   if (
     client.networkID !== undefined &&
     client.networkID > RESTRICTED_NETWORKS
@@ -190,7 +112,17 @@ function txNeedsNetworkID(client: Client): boolean {
   return false
 }
 
-function setValidAddresses(tx: Transaction): void {
+interface ClassicAccountAndTag {
+  classicAccount: string
+  tag: number | false | undefined
+}
+
+/**
+ * Sets valid addresses for the transaction.
+ *
+ * @param tx - The transaction object.
+ */
+export function setValidAddresses(tx: Transaction): void {
   validateAccountAddress(tx, 'Account', 'SourceTag')
   // eslint-disable-next-line @typescript-eslint/dot-notation -- Destination can exist on Transaction
   if (tx['Destination'] != null) {
@@ -206,6 +138,14 @@ function setValidAddresses(tx: Transaction): void {
   convertToClassicAddress(tx, 'RegularKey')
 }
 
+/**
+ * Validates the account address in a transaction object.
+ *
+ * @param tx - The transaction object.
+ * @param accountField - The field name for the account address in the transaction object.
+ * @param tagField - The field name for the tag in the transaction object.
+ * @throws {ValidationError} If the tag field does not match the tag of the account address.
+ */
 function validateAccountAddress(
   tx: Transaction,
   accountField: string,
@@ -227,6 +167,14 @@ function validateAccountAddress(
   }
 }
 
+/**
+ * Retrieves the classic account and tag from an account address.
+ *
+ * @param Account - The account address.
+ * @param [expectedTag] - The expected tag for the account address.
+ * @returns The classic account and tag.
+ * @throws {ValidationError} If the address includes a tag that does not match the tag specified in the transaction.
+ */
 function getClassicAccountAndTag(
   Account: string,
   expectedTag?: number,
@@ -249,6 +197,12 @@ function getClassicAccountAndTag(
   }
 }
 
+/**
+ * Converts the specified field of a transaction object to a classic address format.
+ *
+ * @param tx - The transaction object.
+ * @param fieldName - The name of the field to convert.export
+ */
 function convertToClassicAddress(tx: Transaction, fieldName: string): void {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- assignment is safe
   const account = tx[fieldName]
@@ -259,7 +213,15 @@ function convertToClassicAddress(tx: Transaction, fieldName: string): void {
   }
 }
 
-async function setNextValidSequenceNumber(
+/**
+ * Sets the next valid sequence number for a transaction.
+ *
+ * @param client - The client object used for making requests.
+ * @param tx - The transaction object for which the sequence number needs to be set.
+ * @returns A Promise that resolves when the sequence number is set.
+ * @throws {Error} If there is an error retrieving the account information.
+ */
+export async function setNextValidSequenceNumber(
   client: Client,
   tx: Transaction,
 ): Promise<void> {
@@ -273,7 +235,14 @@ async function setNextValidSequenceNumber(
   tx.Sequence = data.result.account_data.Sequence
 }
 
-async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
+/**
+ * Fetches the account deletion fee from the server state using the provided client.
+ *
+ * @param client - The client object used to make the request.
+ * @returns A Promise that resolves to the account deletion fee as a BigNumber.
+ * @throws {Error} Throws an error if the account deletion fee cannot be fetched.
+ */
+async function fetchAccountDeleteFee(client: Client): Promise<BigNumber> {
   const response = await client.request({ command: 'server_state' })
   const fee = response.result.state.validated_ledger?.reserve_inc
 
@@ -284,7 +253,15 @@ async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
   return new BigNumber(fee)
 }
 
-async function calculateFeePerTransactionType(
+/**
+ * Calculates the fee per transaction type.
+ *
+ * @param client - The client object.
+ * @param tx - The transaction object.
+ * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
+ * @returns A promise that resolves with void. Modifies the `tx` parameter to give it the calculated fee.
+ */
+export async function calculateFeePerTransactionType(
   client: Client,
   tx: Transaction,
   signersCount = 0,
@@ -309,7 +286,7 @@ async function calculateFeePerTransactionType(
     tx.TransactionType === 'AccountDelete' ||
     tx.TransactionType === 'AMMCreate'
   ) {
-    baseFee = await fetchOwnerReserveFee(client)
+    baseFee = await fetchAccountDeleteFee(client)
   }
 
   /*
@@ -331,11 +308,25 @@ async function calculateFeePerTransactionType(
   tx.Fee = totalFee.dp(0, BigNumber.ROUND_CEIL).toString(10)
 }
 
+/**
+ * Scales the given value by multiplying it with the provided multiplier.
+ *
+ * @param value - The value to be scaled.
+ * @param multiplier - The multiplier to scale the value.
+ * @returns The scaled value as a string.
+ */
 function scaleValue(value, multiplier): string {
   return new BigNumber(value).times(multiplier).toString()
 }
 
-async function setLatestValidatedLedgerSequence(
+/**
+ * Sets the latest validated ledger sequence for the transaction.
+ *
+ * @param client - The client object.
+ * @param tx - The transaction object.
+ * @returns A promise that resolves with void. Modifies the `tx` parameter setting `LastLedgerSequence`.
+ */
+export async function setLatestValidatedLedgerSequence(
   client: Client,
   tx: Transaction,
 ): Promise<void> {
@@ -344,7 +335,14 @@ async function setLatestValidatedLedgerSequence(
   tx.LastLedgerSequence = ledgerSequence + LEDGER_OFFSET
 }
 
-async function checkAccountDeleteBlockers(
+/**
+ * Checks for any blockers that prevent the deletion of an account.
+ *
+ * @param client - The client object.
+ * @param tx - The transaction object.
+ * @returns A promise that resolves with void if there are no blockers, or rejects with an XrplError if there are blockers.
+ */
+export async function checkAccountDeleteBlockers(
   client: Client,
   tx: Transaction,
 ): Promise<void> {
@@ -367,5 +365,3 @@ async function checkAccountDeleteBlockers(
     resolve()
   })
 }
-
-export default autofill
