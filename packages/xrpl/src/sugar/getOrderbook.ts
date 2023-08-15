@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function -- Needs to process orderbooks. */
 import BigNumber from 'bignumber.js'
 
 import type { Client } from '../client'
@@ -9,7 +8,6 @@ import {
   BookOffer,
   BookOfferCurrency,
   BookOffersRequest,
-  BookOffersResponse,
 } from '../models/methods/bookOffers'
 
 const DEFAULT_LIMIT = 20
@@ -31,43 +29,40 @@ const getOrderbookOptionsSet = new Set([
 ])
 
 /**
- * Fetch orderbook (buy/sell orders) between two currency pairs. This checks both sides of the orderbook
- * by making two `order_book` requests (with the second reversing takerPays and takerGets). Returned offers are
- * not normalized in this function, so either currency could be takerGets or takerPays.
- *
- * @param this - Client.
- * @param currency1 - Specification of one currency involved. (With a currency code and optionally an issuer)
- * @param currency2 - Specification of a second currency involved. (With a currency code and optionally an issuer)
- * @param options - Options allowing the client to specify ledger_index,
- * ledger_hash, filter by taker, and/or limit number of orders.
- * @param options.ledger_index - Retrieve the orderbook at a given ledger_index.
- * @param options.ledger_hash - Retrieve the orderbook at the ledger with a
- * given ledger_hash.
- * @param options.taker - Filter orders by taker.
- * @param options.limit - The limit passed into each book_offers request.
- * Can return more than this due to two calls being made. Defaults to 20.
- * @returns An object containing buy and sell objects.
+ * Represents the options for retrieving the order book.
  */
-// eslint-disable-next-line max-params, complexity -- Once bound to Client, getOrderbook only has 3 parameters.
-async function getOrderbook(
-  this: Client,
-  currency1: BookOfferCurrency,
-  currency2: BookOfferCurrency,
-  options: {
-    limit?: number
-    ledger_index?: LedgerIndex
-    ledger_hash?: string | null
-    taker?: string | null
-  } = {},
-): Promise<{
-  buy: BookOffer[]
-  sell: BookOffer[]
-}> {
-  Object.keys(options).forEach((key) => {
+export interface GetOrderBookOptions {
+  /**
+   * The limit on the number of offers to return.
+   */
+  limit?: number
+  /**
+   * The ledger index of the ledger to use.
+   */
+  ledger_index?: LedgerIndex
+  /**
+   * The ledger hash of the ledger to use.
+   */
+  ledger_hash?: string | null
+  /**
+   * The account that takes the offers.
+   */
+  taker?: string | null
+}
+
+/**
+ * Validates the options for retrieving the order book.
+ *
+ * @param options - The options to validate.
+ * @throws {ValidationError} If any validation errors occur.
+ */
+// eslint-disable-next-line complexity -- Necessary for validation.
+export function validateOrderbookOptions(options: GetOrderBookOptions): void {
+  for (const key of Object.keys(options)) {
     if (!getOrderbookOptionsSet.has(key)) {
       throw new ValidationError(`Unexpected option: ${key}`, options)
     }
-  })
+  }
 
   if (options.limit && typeof options.limit !== 'number') {
     throw new ValidationError('limit must be a number', options.limit)
@@ -101,7 +96,30 @@ async function getOrderbook(
   if (options.taker !== undefined && typeof options.taker !== 'string') {
     throw new ValidationError('taker must be a string', options.taker)
   }
+}
 
+/**
+ * Creates a request object for retrieving book offers.
+ *
+ * @param currency1 - The first currency in the pair.
+ * @param currency2 - The second currency in the pair.
+ * @param options - Additional options for the request.
+ * @param [options.limit] - The maximum number of offers to retrieve.
+ * @param [options.ledger_index] - The ledger index to use for retrieval.
+ * @param [options.ledger_hash] - The ledger hash to use for retrieval.
+ * @param [options.taker] - The taker address for retrieval.
+ * @returns The created request object.
+ */
+export function createBookOffersRequest(
+  currency1: BookOfferCurrency,
+  currency2: BookOfferCurrency,
+  options: {
+    limit?: number
+    ledger_index?: LedgerIndex
+    ledger_hash?: string | null
+    taker?: string | null
+  },
+): BookOffersRequest {
   const request: BookOffersRequest = {
     command: 'book_offers',
     taker_pays: currency1,
@@ -111,26 +129,78 @@ async function getOrderbook(
     limit: options.limit ?? DEFAULT_LIMIT,
     taker: options.taker ? options.taker : undefined,
   }
-  // 2. Make Request
-  const directOfferResults: BookOffersResponse[] = await this.requestAll(
-    request,
-  )
-  request.taker_gets = currency1
-  request.taker_pays = currency2
-  const reverseOfferResults = await this.requestAll(request)
-  // 3. Return Formatted Response
 
-  const directOffers = directOfferResults.flatMap(
-    (directOfferResult: BookOffersResponse) => directOfferResult.result.offers,
-  )
-  const reverseOffers = reverseOfferResults.flatMap(
-    (reverseOfferResult) => reverseOfferResult.result.offers,
-  )
+  return request
+}
 
-  const orders = [...directOffers, ...reverseOffers]
-  // separate out the buy and sell orders
+type BookOfferResult = BookOffer[]
+
+/**
+ * Retrieves all book offer results using the given request.
+ *
+ * @param client - The Ripple client.
+ * @param request - The request object.
+ * @returns The array of book offer results.
+ */
+export async function requestAllOffers(
+  client: Client,
+  request: BookOffersRequest,
+): Promise<BookOfferResult[]> {
+  const results = await client.requestAll(request)
+  return results.map((result) => result.result.offers)
+}
+
+/**
+ * Creates a reverse request object by swapping the taker pays and taker gets amounts.
+ *
+ * @param request - The original request object.
+ * @returns The reverse request object.
+ */
+export function reverseRequest(request: BookOffersRequest): BookOffersRequest {
+  return {
+    ...request,
+    taker_pays: request.taker_gets,
+    taker_gets: request.taker_pays,
+  }
+}
+
+/**
+ * Extracts the offers from the book offer results.
+ *
+ * @param offerResults - The array of book offer results.
+ * @returns The extracted offers.
+ */
+export function extractOffers(offerResults: BookOfferResult[]): BookOffer[] {
+  return offerResults.flatMap((offerResult) => offerResult)
+}
+
+/**
+ * Combines the direct and reverse offers into a single array.
+ *
+ * @param directOffers - The direct offers.
+ * @param reverseOffers - The reverse offers.
+ * @returns The combined array of offers.
+ */
+export function combineOrders(
+  directOffers: BookOffer[],
+  reverseOffers: BookOffer[],
+): BookOffer[] {
+  return [...directOffers, ...reverseOffers]
+}
+
+/**
+ * Separates the buy and sell orders from the given array of orders.
+ *
+ * @param orders - The array of orders.
+ * @returns The separated buy and sell orders.
+ */
+export function separateBuySellOrders(orders: BookOffer[]): {
+  buy: BookOffer[]
+  sell: BookOffer[]
+} {
   const buy: BookOffer[] = []
   const sell: BookOffer[] = []
+
   orders.forEach((order) => {
     // eslint-disable-next-line no-bitwise -- necessary for flags check
     if ((order.Flags & OfferFlags.lsfSell) === 0) {
@@ -139,15 +209,21 @@ async function getOrderbook(
       sell.push(order)
     }
   })
-  /*
-   * Sort the orders
-   * for both buys and sells, lowest quality is closest to mid-market
-   * we sort the orders so that earlier orders are closer to mid-market
-   */
-  return {
-    buy: sortOffers(buy).slice(0, options.limit),
-    sell: sortOffers(sell).slice(0, options.limit),
-  }
+
+  return { buy, sell }
 }
 
-export default getOrderbook
+/**
+ * Sorts and limits the given array of offers.
+ *
+ * @param offers - The array of offers to sort and limit.
+ * @param [limit] - The maximum number of offers to include.
+ * @returns The sorted and limited array of offers.
+ */
+export function sortAndLimitOffers(
+  offers: BookOffer[],
+  limit?: number,
+): BookOffer[] {
+  const sortedOffers = sortOffers(offers)
+  return sortedOffers.slice(0, limit)
+}
