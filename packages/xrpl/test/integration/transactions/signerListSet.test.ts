@@ -18,8 +18,9 @@ describe('SignerListSet', function () {
   })
   afterEach(async () => teardownClient(testContext))
 
+  // Add signerlist
   it(
-    'base',
+    'add',
     async () => {
       const tx: SignerListSet = {
         TransactionType: 'SignerListSet',
@@ -39,6 +40,20 @@ describe('SignerListSet', function () {
           },
         ],
         SignerQuorum: 2,
+      }
+      await testTransaction(testContext.client, tx, testContext.wallet)
+    },
+    TIMEOUT,
+  )
+
+  // Remove signerlist
+  it(
+    'remove',
+    async () => {
+      const tx: SignerListSet = {
+        TransactionType: 'SignerListSet',
+        Account: testContext.wallet.classicAddress,
+        SignerQuorum: 0,
       }
       await testTransaction(testContext.client, tx, testContext.wallet)
     },

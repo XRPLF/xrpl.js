@@ -47,7 +47,7 @@ npm run lint
 
 ## Running Tests
 
-For integration and browser tests, we use a `rippled` node in standalone mode to test xrpl.js code against. To set this up, you can either configure and run `rippled` locally, or set up the Docker container `xrpllabsofficial/xrpld:latest` by [following these instructions](#integration-tests). The latter will require you to [install Docker](https://docs.docker.com/get-docker/).
+For integration and browser tests, we use a `rippled` node in standalone mode to test xrpl.js code against. To set this up, you can either configure and run `rippled` locally, or set up the Docker container `xrpllabsofficial/1.12.0-b1` by [following these instructions](#integration-tests). The latter will require you to [install Docker](https://docs.docker.com/get-docker/).
 
 ### Unit Tests
 
@@ -64,7 +64,7 @@ From the top-level xrpl.js folder (one level above `packages`), run the followin
 ```bash
 npm install
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/config/ xrpllabsofficial/xrpld:latest -a --start
+docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/config/ xrpllabsofficial/1.12.0-b1 -a --start
 npm run build
 npm run test:integration
 ```
@@ -74,7 +74,7 @@ Breaking down the command:
 * `--interactive` allows you to interact with the container.
 * `-t` starts a terminal in the container for you to send commands to.
 * `--volume $PWD/.ci-config:/config/` identifies the `rippled.cfg` and `validators.txt` to import. It must be an absolute path, so we use `$PWD` instead of `./`.
-* `xrpllabsofficial/xrpld:latest` is an image that is regularly updated with the latest `rippled` releases and can be found here: https://github.com/WietseWind/docker-rippled
+* `xrpllabsofficial/1.12.0-b1` is an image that is regularly updated with the latest `rippled` releases and can be found here: https://github.com/WietseWind/docker-rippled
 * `-a` starts `rippled` in standalone mode
 * `--start` signals to start `rippled` with the specified amendments in `rippled.cfg` enabled immediately instead of voting for 2 weeks on them.
 
@@ -91,7 +91,7 @@ This should be run from the `xrpl.js` top level folder (one above the `packages`
 ```bash
 npm run build
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run -p 6006:6006 -it -v $PWD/.ci-config:/config/ xrpllabsofficial/xrpld:latest -a --start
+docker run -p 6006:6006 -it -v $PWD/.ci-config:/config/ xrpllabsofficial/1.12.0-b1 -a --start
 npm run test:browser
 ```
 
@@ -220,11 +220,9 @@ npm uninstall abbrev -w xrpl
      Notice this allows developers to install the package with `npm add xrpl@beta`
 
 1. If requested, enter your [npmjs.com](https://npmjs.com) OTP (one-time password) to complete publication.
-1. If not a beta release: Create a new branch (`git checkout -b <BRANCH_NAME>`) to capture the updated packages from the release. Merge those changes into `main`.
 
    NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
 
-1. Pull the most recent changes to `main` locally.
 1. Run `git tag <tagname> -m <tagname>`, where `<tagname>` is the new package and version (e.g. `xrpl@2.1.1`), for each version released.
 1. Run `git push --follow-tags`, to push the tags to Github.
 1. On GitHub, click the "Releases" link on the right-hand side of the page.

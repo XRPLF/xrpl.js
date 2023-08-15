@@ -1,3 +1,4 @@
+import { DEFAULT_DEFINITIONS, XrplDefinitionsBase } from '../enums'
 import { SerializedType, JsonObject } from './serialized-type'
 import { STObject } from './st-object'
 import { BinaryParser } from '../serdes/binary-parser'
@@ -51,9 +52,13 @@ class STArray extends SerializedType {
    * Construct an STArray from an Array of JSON Objects
    *
    * @param value STArray or Array of Objects to parse into an STArray
+   * @param definitions optional, types and values to use to encode/decode a transaction
    * @returns An STArray object
    */
-  static from<T extends STArray | Array<JsonObject>>(value: T): STArray {
+  static from<T extends STArray | Array<JsonObject>>(
+    value: T,
+    definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
+  ): STArray {
     if (value instanceof STArray) {
       return value
     }
@@ -61,7 +66,7 @@ class STArray extends SerializedType {
     if (isObjects(value)) {
       const bytes: Array<Buffer> = []
       value.forEach((obj) => {
-        bytes.push(STObject.from(obj).toBytes())
+        bytes.push(STObject.from(obj, undefined, definitions).toBytes())
       })
 
       bytes.push(ARRAY_END_MARKER)
@@ -74,12 +79,15 @@ class STArray extends SerializedType {
   /**
    * Return the JSON representation of this.bytes
    *
+   * @param definitions optional, types and values to use to encode/decode a transaction
    * @returns An Array of JSON objects
    */
-  toJSON(): Array<JsonObject> {
+  toJSON(
+    definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
+  ): Array<JsonObject> {
     const result: Array<JsonObject> = []
 
-    const arrayParser = new BinaryParser(this.toString())
+    const arrayParser = new BinaryParser(this.toString(), definitions)
 
     while (!arrayParser.end()) {
       const field = arrayParser.readField()
@@ -88,7 +96,7 @@ class STArray extends SerializedType {
       }
 
       const outer = {}
-      outer[field.name] = STObject.fromParser(arrayParser).toJSON()
+      outer[field.name] = STObject.fromParser(arrayParser).toJSON(definitions)
       result.push(outer)
     }
 

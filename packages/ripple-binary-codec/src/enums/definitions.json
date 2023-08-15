@@ -2612,6 +2612,7 @@
     "NFTokenCreateOffer": 27,
     "NFTokenCancelOffer": 28,
     "NFTokenAcceptOffer": 29,
+    "Clawback": 30,
     "XChainCreateBridge": 40,
     "XChainCreateClaimID": 41,
     "XChainCommit": 42,

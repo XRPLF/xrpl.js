@@ -12,6 +12,7 @@ import { AccountSet, validateAccountSet } from './accountSet'
 import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
+import { Clawback, validateClawback } from './clawback'
 import { isIssuedCurrency } from './common'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
@@ -87,6 +88,7 @@ export type Transaction =
   | CheckCancel
   | CheckCash
   | CheckCreate
+  | Clawback
   | DepositPreauth
   | EscrowCancel
   | EscrowCreate
@@ -210,6 +212,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'CheckCreate':
       validateCheckCreate(tx)
+      break
+
+    case 'Clawback':
+      validateClawback(tx)
       break
 
     case 'DepositPreauth':
