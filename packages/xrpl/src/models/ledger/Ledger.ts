@@ -15,7 +15,7 @@ import { LedgerEntry } from './LedgerEntry'
 export default interface Ledger {
   /** The SHA-512Half of this ledger's state tree information. */
   account_hash: string
-  /** All the state information in this ledger. */
+  /** All the state information in this ledger. Admin only. */
   accountState?: LedgerEntry[]
   /** A bit-map of flags relating to the closing of this ledger. */
   close_flags: number

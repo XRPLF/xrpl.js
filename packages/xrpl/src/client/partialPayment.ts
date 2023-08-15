@@ -3,13 +3,13 @@ import { decode } from 'ripple-binary-codec'
 
 import type {
   AccountTxResponse,
-  Response,
-  ResponseWarning,
   TransactionEntryResponse,
   TransactionStream,
   TxResponse,
 } from '..'
 import type { Amount } from '../models/common'
+import type { RequestResponseMap } from '../models/methods'
+import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 import {
   PaymentFlags,
   PseudoTransaction,
@@ -90,7 +90,10 @@ function accountTxHasPartialPayment(response: AccountTxResponse): boolean {
   return foo
 }
 
-function hasPartialPayment(command: string, response: Response): boolean {
+function hasPartialPayment<R extends BaseRequest, T = RequestResponseMap<R>>(
+  command: string,
+  response: T,
+): boolean {
   /* eslint-disable @typescript-eslint/consistent-type-assertions -- Request type is known at runtime from command */
   switch (command) {
     case 'tx':
@@ -111,12 +114,13 @@ function hasPartialPayment(command: string, response: Response): boolean {
  * @param command - Command from the request, tells us what response to expect.
  * @param response - Response to check for a partial payment.
  */
-export function handlePartialPayment(
-  command: string,
-  response: Response,
-): void {
+export function handlePartialPayment<
+  R extends BaseRequest,
+  T = RequestResponseMap<R>,
+>(command: string, response: T): void {
   if (hasPartialPayment(command, response)) {
-    const warnings: ResponseWarning[] = response.warnings ?? []
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are checking dynamically and safely.
+    const warnings = (response as BaseResponse).warnings ?? []
 
     const warning = {
       id: WARN_PARTIAL_PAYMENT_CODE,
@@ -125,6 +129,8 @@ export function handlePartialPayment(
 
     warnings.push(warning)
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- We are checking dynamically and safely.
+    // @ts-expect-error -- We are checking dynamically and safely.
     response.warnings = warnings
   }
 }
