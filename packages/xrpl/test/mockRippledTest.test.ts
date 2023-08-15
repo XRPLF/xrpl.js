@@ -2,6 +2,7 @@ import { assert } from 'chai'
 
 import { RippledError } from '../src'
 
+import rippledFixtures from './fixtures/rippled'
 import {
   setupClient,
   teardownClient,
@@ -22,7 +23,11 @@ describe('mock rippled tests', function () {
     }
 
     await assertRejects(
-      testContext.client.request({ command: 'account_info' }),
+      testContext.client.request({
+        command: 'account_info',
+        account:
+          rippledFixtures.account_info.normal.result.account_data.Account,
+      }),
       RippledError,
     )
   })
@@ -44,7 +49,11 @@ describe('mock rippled tests', function () {
       return { data: request }
     })
     await assertRejects(
-      testContext.client.request({ command: 'account_info', account: '' }),
+      testContext.client.request({
+        command: 'account_info',
+        account:
+          rippledFixtures.account_info.normal.result.account_data.Account,
+      }),
       RippledError,
     )
   })
