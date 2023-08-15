@@ -73,6 +73,112 @@ export interface LedgerRequest extends BaseRequest, LookupByLedgerRequest {
 }
 
 /**
+ * Retrieve information about the public ledger. Expects a response in the form
+ * of a {@link LedgerResponseExpanded}. Will return full JSON-formatted transaction data instead of string hashes.
+ *
+ * @example
+ * ```ts
+ * const ledger: LedgerRequest = {
+ *  "id": 14,
+ *  "command": "ledger",
+ *  "ledger_index": "validated",
+ *  "full": false,
+ *  "accounts": false,
+ *  "transactions": false,
+ *  "expand": true,
+ *  "owner_funds": false
+ * }
+ * ```
+ *
+ * @category Requests
+ */
+export interface LedgerRequestExpandedTransactionsOnly extends LedgerRequest {
+  expand: true
+  transactions: true
+}
+
+/**
+ * Retrieve information about the public ledger. Expects a response in the form
+ * of a {@link LedgerResponseExpanded}. Will return full JSON-formatted `accountState` data instead of string hashes.
+ *
+ * @example
+ * ```ts
+ * const ledger: LedgerRequest = {
+ *  "id": 14,
+ *  "command": "ledger",
+ *  "ledger_index": "validated",
+ *  "full": false,
+ *  "accounts": true,
+ *  "transactions": false,
+ *  "expand": true,
+ *  "owner_funds": false
+ * }
+ * ```
+ *
+ * @category Requests
+ */
+export interface LedgerRequestExpandedAccountsOnly extends LedgerRequest {
+  expand: true
+  accounts: true
+}
+
+/**
+ * Retrieve information about the public ledger. Expects a response in the form
+ * of a {@link LedgerResponseExpanded}. Will return full JSON-formatted `accountState` and `transactions`
+ * data instead of string hashes.
+ *
+ * @example
+ * ```ts
+ * const ledger: LedgerRequest = {
+ *  "id": 14,
+ *  "command": "ledger",
+ *  "ledger_index": "validated",
+ *  "full": false,
+ *  "accounts": true,
+ *  "transactions": true,
+ *  "expand": true,
+ *  "owner_funds": false
+ * }
+ * ```
+ *
+ * @category Requests
+ */
+export interface LedgerRequestExpandedAccountsAndTransactions
+  extends LedgerRequest {
+  expand: true
+  accounts: true
+  transactions: true
+}
+
+/**
+ * Retrieve information about the public ledger. Expects a response in the form
+ * of a {@link LedgerResponse}. Will return binary (hexadecimal string) format
+ * instead of JSON or string hashes for `transactions` data.
+ *
+ * @example
+ * ```ts
+ * const ledger: LedgerRequest = {
+ *  "id": 14,
+ *  "command": "ledger",
+ *  "ledger_index": "validated",
+ *  "full": false,
+ *  "accounts": true,
+ *  "transactions": true,
+ *  "expand": true,
+ *  "owner_funds": false,
+ *  "binary": true
+ * }
+ * ```
+ *
+ * @category Requests
+ */
+export interface LedgerRequestExpandedTransactionsBinary extends LedgerRequest {
+  expand: true
+  transactions: true
+  binary: true
+}
+
+/**
  * Special case transaction definition when the request contains `owner_funds: true`.
  */
 export interface LedgerModifiedOfferCreateTransaction {
@@ -101,30 +207,53 @@ export interface LedgerBinary
   transactions?: string[]
 }
 
+interface LedgerResponseBase {
+  /** Unique identifying hash of the entire ledger. */
+  ledger_hash: string
+  /** The Ledger Index of this ledger. */
+  ledger_index: number
+  /**
+   * If true, this is a validated ledger version. If omitted or set to false,
+   * this ledger's data is not final.
+   */
+  queue_data?: Array<LedgerQueueData | string>
+  /**
+   * Array of objects describing queued transactions, in the same order as
+   * the queue. If the request specified expand as true, members contain full
+   * representations of the transactions, in either JSON or binary depending
+   * on whether the request specified binary as true.
+   */
+  validated?: boolean
+}
+
+interface LedgerResponseResult extends LedgerResponseBase {
+  /** The complete header data of this {@link Ledger}. */
+  ledger: LedgerBinary
+}
+
 /**
  * Response expected from a {@link LedgerRequest}.
+ * This is the default request response, triggered when `expand` and `binary` are both false.
  *
  * @category Responses
  */
 export interface LedgerResponse extends BaseResponse {
-  result: {
-    /** The complete header data of this {@link Ledger}. */
-    ledger: Ledger | LedgerBinary
-    /** Unique identifying hash of the entire ledger. */
-    ledger_hash: string
-    /** The Ledger Index of this ledger. */
-    ledger_index: number
-    /**
-     * If true, this is a validated ledger version. If omitted or set to false,
-     * this ledger's data is not final.
-     */
-    queue_data?: Array<LedgerQueueData | string>
-    /**
-     * Array of objects describing queued transactions, in the same order as
-     * the queue. If the request specified expand as true, members contain full
-     * representations of the transactions, in either JSON or binary depending
-     * on whether the request specified binary as true.
-     */
-    validated?: boolean
-  }
+  result: LedgerResponseResult
+}
+
+interface LedgerResponseExpandedResult extends LedgerResponseBase {
+  /** The complete header data of this {@link Ledger}. */
+  ledger: Ledger
+}
+
+/**
+ * Response expected from a {@link LedgerRequest} when the request contains `expanded` is true. See {@link LedgerRequestExpanded}.
+ * This response will contain full JSON-formatted data instead of string hashes.
+ * The response will contain either `accounts` or `transactions` or both.
+ * `binary` will be missing altogether.
+ *
+ * @category Responses
+ */
+export interface LedgerResponseExpanded extends BaseResponse {
+  result: LedgerResponseExpandedResult
 }

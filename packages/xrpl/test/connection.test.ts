@@ -13,6 +13,7 @@ import {
   ResponseFormatError,
   XrplError,
   TimeoutError,
+  SubscribeRequest,
 } from '../src'
 import { Connection } from '../src/client/connection'
 
@@ -347,6 +348,7 @@ describe('Connection', function () {
     'DisconnectedError',
     async () => {
       await clientContext.client
+        // @ts-expect-error -- Intentionally invalid command
         .request({ command: 'test_command', data: { closeServer: true } })
         .then(() => {
           assert.fail('Should throw DisconnectedError')
@@ -438,7 +440,7 @@ describe('Connection', function () {
       try {
         await clientContext.client.connect()
       } catch (error) {
-        // @ts-expect-error -- error.message is expected to be defined
+        // @ts-expect-error -- Error has a message
         expect(error.message).toEqual(
           "Error: connect() timed out after 5000 ms. If your internet connection is working, the rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.",
         )
@@ -457,6 +459,7 @@ describe('Connection', function () {
     async () => {
       await clientContext.client
         .request({
+          // @ts-expect-error -- Intentionally invalid command
           command: 'test_command',
           data: { unrecognizedResponse: true },
         })
@@ -847,7 +850,10 @@ describe('Connection', function () {
   it(
     'propagates RippledError data',
     async () => {
-      const request = { command: 'subscribe', streams: 'validations' }
+      const request: SubscribeRequest = {
+        command: 'subscribe',
+        streams: ['validations'],
+      }
       clientContext.mockRippled?.addResponse(
         request.command,
         rippled.subscribe.error,
