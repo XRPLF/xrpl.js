@@ -13,6 +13,8 @@ export * from './errors'
 
 export { Wallet } from './Wallet'
 
+export { walletFromSecretNumbers } from './Wallet/walletFromSecretNumbers'
+
 export { keyToRFC1751Mnemonic, rfc1751MnemonicToKey } from './Wallet/rfc1751'
 
 export * from './Wallet/signer'
