@@ -57,4 +57,31 @@ describe('client.requestNextPage', function () {
       'response does not have a next page',
     )
   })
+
+  // TODO: Write this test to verify multiple types of commands can be run - https://github.com/XRPLF/xrpl.js/issues/2384
+  // it('requests different types of commands', async function () {
+  //   testContext.mockRippled!.addResponse('account_channels', {
+  //     id: 0,
+  //     result: {
+  //       account: testContext.wallet.classicAddress,
+  //       channels: [],
+  //       ledger_hash:
+  //         'C8BFA74A740AA22AD9BD724781589319052398B0C6C817B88D55628E07B7B4A1',
+  //       ledger_index: 150,
+  //       validated: true,
+  //     },
+  //     type: 'response',
+  //   })
+  //   const response = await testContext.client.request({
+  //     command: 'ledger_data',
+  //   })
+  //   const responseNextPage = await testContext.client.requestNextPage(
+  //     { command: 'ledger_data' },
+  //     response,
+  //   )
+  //   assert.equal(
+  //     responseNextPage.result.state[0].index,
+  //     '000B714B790C3C79FEE00D17C4DEB436B375466F29679447BA64F265FD63D731',
+  //   )
+  // })
 })

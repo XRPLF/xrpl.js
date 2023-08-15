@@ -4,8 +4,14 @@ import {
   TimeoutError,
   XrplError,
 } from '../errors'
-import { Response } from '../models/methods'
+import { Response, RequestResponseMap } from '../models/methods'
 import { BaseRequest, ErrorResponse } from '../models/methods/baseMethod'
+
+interface PromiseEntry<T> {
+  resolve: (value: T | PromiseLike<T>) => void
+  reject: (value: Error) => void
+  timer: ReturnType<typeof setTimeout>
+}
 
 /**
  * Manage all the requests made to the websocket, and their async responses
@@ -17,12 +23,30 @@ export default class RequestManager {
   private nextId = 0
   private readonly promisesAwaitingResponse = new Map<
     string | number,
-    {
-      resolve: (value: Response | PromiseLike<Response>) => void
-      reject: (value: Error) => void
-      timer: ReturnType<typeof setTimeout>
-    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Necessary and typed wrapper in addPromise method
+    PromiseEntry<any>
   >()
+
+  /**
+   * Adds a promise to the collection of promises awaiting response. Handles typing with generics.
+   *
+   * @template T The generic type parameter representing the resolved value type.
+   * @param newId - The identifier for the new promise.
+   * @param timer - The timer associated with the promise.
+   * @returns A promise that resolves to the specified generic type.
+   */
+  public async addPromise<R extends BaseRequest, T = RequestResponseMap<R>>(
+    newId: string | number,
+    timer: ReturnType<typeof setTimeout>,
+  ): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      this.promisesAwaitingResponse.set(newId, {
+        resolve,
+        reject,
+        timer,
+      })
+    })
+  }
 
   /**
    * Successfully resolves a request.
@@ -87,10 +111,10 @@ export default class RequestManager {
    * @returns Request ID, new request form, and the promise for resolving the request.
    * @throws XrplError if request with the same ID is already pending.
    */
-  public createRequest<T extends BaseRequest>(
-    request: T,
+  public createRequest<R extends BaseRequest, T = RequestResponseMap<R>>(
+    request: R,
     timeout: number,
-  ): [string | number, string, Promise<Response>] {
+  ): [string | number, string, Promise<T>] {
     let newId: string | number
     if (request.id == null) {
       newId = this.nextId
@@ -129,11 +153,13 @@ export default class RequestManager {
         request,
       )
     }
-    const newPromise = new Promise<Response>(
-      (resolve: (value: Response | PromiseLike<Response>) => void, reject) => {
-        this.promisesAwaitingResponse.set(newId, { resolve, reject, timer })
-      },
-    )
+    const newPromise = new Promise<T>((resolve, reject) => {
+      this.promisesAwaitingResponse.set(newId, {
+        resolve,
+        reject,
+        timer,
+      })
+    })
 
     return [newId, newRequest, newPromise]
   }
