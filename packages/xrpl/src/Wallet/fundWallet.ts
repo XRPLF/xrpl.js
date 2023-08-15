@@ -150,7 +150,6 @@ export async function requestFunding(
     throw new XRPLFaucetError('No faucet hostname could be derived')
   }
   const pathname = options.faucetPath ?? getDefaultFaucetPath(hostname)
-
   const response = await fetch(`https://${hostname}${pathname}`, {
     method: 'POST',
     headers: {

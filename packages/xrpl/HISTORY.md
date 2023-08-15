@@ -7,6 +7,13 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Fixed Wallet.generate() ignoring the `algorithm` parameter (Only a problem once binary-codec fix for `derive_keypair` is added)
 * Fixed Wallet.fromSeed() ignoring the `algorithm` parameter
 
+## 2.10.0 (2023-08-07)
+
+### Added
+* Add a new Clawback transaction
+* Add account flag lsfAllowTrustLineClawback
+* Add support for bitwise flag checking of 64 bit flags
+
 ## 2.9.1 (2023-07-18)
 ### Fixed
 * Passing Definitions from `STObject` to `STArray` back to `STObject`, both for signing & decoding (to JSON)

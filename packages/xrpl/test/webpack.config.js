@@ -99,12 +99,9 @@ function webpackForTest(testFileName) {
       extensions: ['.ts', '.js', '.json'],
       fallback: {
         module: false,
-        constants: require.resolve('constants-browserify'),
-        fs: require.resolve('browserify-fs'),
         buffer: require.resolve('buffer/'),
         stream: require.resolve('stream-browserify'),
         crypto: require.resolve('crypto-browserify'),
-        path: require.resolve('path-browserify'),
       },
     },
   }

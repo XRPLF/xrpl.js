@@ -220,11 +220,9 @@ npm uninstall abbrev -w xrpl
      Notice this allows developers to install the package with `npm add xrpl@beta`
 
 1. If requested, enter your [npmjs.com](https://npmjs.com) OTP (one-time password) to complete publication.
-1. If not a beta release: Create a new branch (`git checkout -b <BRANCH_NAME>`) to capture the updated packages from the release. Merge those changes into `main`.
 
    NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
 
-1. Pull the most recent changes to `main` locally.
 1. Run `git tag <tagname> -m <tagname>`, where `<tagname>` is the new package and version (e.g. `xrpl@2.1.1`), for each version released.
 1. Run `git push --follow-tags`, to push the tags to Github.
 1. On GitHub, click the "Releases" link on the right-hand side of the page.
