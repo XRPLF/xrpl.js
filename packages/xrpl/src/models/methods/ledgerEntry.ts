@@ -1,4 +1,4 @@
-import { Currency } from '../common'
+import { Currency, XChainBridge } from '../common'
 import { LedgerEntry } from '../ledger'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
@@ -140,6 +140,8 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
   nft_page?: string
 
   bridge_account?: string
+
+  bridge?: XChainBridge
 
   xchain_claim_id?:
     | {
