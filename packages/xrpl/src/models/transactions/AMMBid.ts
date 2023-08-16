@@ -59,7 +59,6 @@ export interface AMMBid extends BaseTransaction {
  * @param tx - An AMMBid Transaction.
  * @throws When the AMMBid is Malformed.
  */
-// eslint-disable-next-line max-lines-per-function -- necessary for validateAMMBid
 export function validateAMMBid(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
@@ -98,16 +97,12 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
         `AMMBid: AuthAccounts length must not be greater than ${MAX_AUTH_ACCOUNTS}`,
       )
     }
-    if (
-      !isAuthAccounts(
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-        tx.Account as string,
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-        tx.AuthAccounts as Array<Record<string, unknown>>,
-      )
-    ) {
-      throw new ValidationError(`AMMBid: invalid AuthAccounts`)
-    }
+    isAuthAccounts(
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
+      tx.Account as string,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
+      tx.AuthAccounts as Array<Record<string, unknown>>,
+    )
   }
 }
 
@@ -120,17 +115,17 @@ function isAuthAccounts(
       authAccount.AuthAccount == null ||
       typeof authAccount.AuthAccount !== 'object'
     ) {
-      return false
+      throw new ValidationError(`AMMBid: invalid AuthAccounts`)
     }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- used for null check
     // @ts-expect-error -- used for null check
     if (authAccount.AuthAccount.Account == null) {
-      return false
+      throw new ValidationError(`AMMBid: invalid AuthAccounts`)
     }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- used for null check
     // @ts-expect-error -- used for null check
     if (typeof authAccount.AuthAccount.Account !== 'string') {
-      return false
+      throw new ValidationError(`AMMBid: invalid AuthAccounts`)
     }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- used for null check
     // @ts-expect-error -- used for null check
