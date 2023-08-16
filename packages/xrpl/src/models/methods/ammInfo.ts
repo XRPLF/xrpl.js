@@ -50,12 +50,12 @@ export interface AMMInfoResponse extends BaseResponse {
       /**
        * (Omitted for XRP) If true, the amount currency is currently frozen for asset.
        */
-      asset_frozen: boolean
+      asset_frozen?: boolean
 
       /**
        * (Omitted for XRP) If true, the amount currency is currently frozen for asset2.
        */
-      asset2_frozen: boolean
+      asset2_frozen?: boolean
 
       /**
        * (May be omitted) An Auction Slot Object describing the current auction slot holder, if there is one.
