@@ -99,9 +99,9 @@ describe('AMMWithdraw', function () {
     assert.throws(() => validate(withdraw), ValidationError, errorMessage)
   })
 
-  it(`throws w/ Asset must be an Issue`, function () {
+  it(`throws w/ Asset must be a Currency`, function () {
     withdraw.Asset = 1234
-    const errorMessage = 'AMMWithdraw: Asset must be an Issue'
+    const errorMessage = 'AMMWithdraw: Asset must be a Currency'
     assert.throws(
       () => validateAMMWithdraw(withdraw),
       ValidationError,
@@ -121,9 +121,9 @@ describe('AMMWithdraw', function () {
     assert.throws(() => validate(withdraw), ValidationError, errorMessage)
   })
 
-  it(`throws w/ Asset2 must be an Issue`, function () {
+  it(`throws w/ Asset2 must be a Currency`, function () {
     withdraw.Asset2 = 1234
-    const errorMessage = 'AMMWithdraw: Asset2 must be an Issue'
+    const errorMessage = 'AMMWithdraw: Asset2 must be a Currency'
     assert.throws(
       () => validateAMMWithdraw(withdraw),
       ValidationError,

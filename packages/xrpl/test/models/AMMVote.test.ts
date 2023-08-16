@@ -39,9 +39,9 @@ describe('AMMVote', function () {
     assert.throws(() => validate(vote), ValidationError, errorMessage)
   })
 
-  it(`throws w/ Asset must be an Issue`, function () {
+  it(`throws w/ Asset must be a Currency`, function () {
     vote.Asset = 1234
-    const errorMessage = 'AMMVote: Asset must be an Issue'
+    const errorMessage = 'AMMVote: Asset must be a Currency'
     assert.throws(() => validateAMMVote(vote), ValidationError, errorMessage)
     assert.throws(() => validate(vote), ValidationError, errorMessage)
   })
@@ -53,9 +53,9 @@ describe('AMMVote', function () {
     assert.throws(() => validate(vote), ValidationError, errorMessage)
   })
 
-  it(`throws w/ Asset2 must be an Issue`, function () {
+  it(`throws w/ Asset2 must be a Currency`, function () {
     vote.Asset2 = 1234
-    const errorMessage = 'AMMVote: Asset2 must be an Issue'
+    const errorMessage = 'AMMVote: Asset2 must be a Currency'
     assert.throws(() => validateAMMVote(vote), ValidationError, errorMessage)
     assert.throws(() => validate(vote), ValidationError, errorMessage)
   })

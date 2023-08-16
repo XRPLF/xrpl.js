@@ -86,9 +86,9 @@ describe('AMMDeposit', function () {
     assert.throws(() => validate(deposit), ValidationError, errorMessage)
   })
 
-  it(`throws w/ Asset must be an Issue`, function () {
+  it(`throws w/ Asset must be a Currency`, function () {
     deposit.Asset = 1234
-    const errorMessage = 'AMMDeposit: Asset must be an Issue'
+    const errorMessage = 'AMMDeposit: Asset must be a Currency'
     assert.throws(
       () => validateAMMDeposit(deposit),
       ValidationError,
@@ -108,9 +108,9 @@ describe('AMMDeposit', function () {
     assert.throws(() => validate(deposit), ValidationError, errorMessage)
   })
 
-  it(`throws w/ Asset2 must be an Issue`, function () {
+  it(`throws w/ Asset2 must be a Currency`, function () {
     deposit.Asset2 = 1234
-    const errorMessage = 'AMMDeposit: Asset2 must be an Issue'
+    const errorMessage = 'AMMDeposit: Asset2 must be a Currency'
     assert.throws(
       () => validateAMMDeposit(deposit),
       ValidationError,

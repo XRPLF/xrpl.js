@@ -89,7 +89,7 @@ export function validateAMMDeposit(tx: Record<string, unknown>): void {
   }
 
   if (!isCurrency(tx.Asset)) {
-    throw new ValidationError('AMMDeposit: Asset must be an Issue')
+    throw new ValidationError('AMMDeposit: Asset must be a Currency')
   }
 
   if (tx.Asset2 == null) {
@@ -97,7 +97,7 @@ export function validateAMMDeposit(tx: Record<string, unknown>): void {
   }
 
   if (!isCurrency(tx.Asset2)) {
-    throw new ValidationError('AMMDeposit: Asset2 must be an Issue')
+    throw new ValidationError('AMMDeposit: Asset2 must be a Currency')
   }
 
   if (tx.Amount2 != null && tx.Amount == null) {

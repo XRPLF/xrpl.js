@@ -44,7 +44,7 @@ export function validateAMMVote(tx: Record<string, unknown>): void {
   }
 
   if (!isCurrency(tx.Asset)) {
-    throw new ValidationError('AMMVote: Asset must be an Issue')
+    throw new ValidationError('AMMVote: Asset must be a Currency')
   }
 
   if (tx.Asset2 == null) {
@@ -52,7 +52,7 @@ export function validateAMMVote(tx: Record<string, unknown>): void {
   }
 
   if (!isCurrency(tx.Asset2)) {
-    throw new ValidationError('AMMVote: Asset2 must be an Issue')
+    throw new ValidationError('AMMVote: Asset2 must be a Currency')
   }
 
   if (tx.TradingFee == null) {

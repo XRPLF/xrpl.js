@@ -68,7 +68,7 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
   }
 
   if (!isCurrency(tx.Asset)) {
-    throw new ValidationError('AMMBid: Asset must be an Issue')
+    throw new ValidationError('AMMBid: Asset must be a Currency')
   }
 
   if (tx.Asset2 == null) {
@@ -76,7 +76,7 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
   }
 
   if (!isCurrency(tx.Asset2)) {
-    throw new ValidationError('AMMBid: Asset2 must be an Issue')
+    throw new ValidationError('AMMBid: Asset2 must be a Currency')
   }
 
   if (tx.BidMin != null && !isAmount(tx.BidMin)) {

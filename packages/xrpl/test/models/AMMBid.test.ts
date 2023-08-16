@@ -62,9 +62,9 @@ describe('AMMBid', function () {
     assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
 
-  it(`throws w/ Asset must be an Issue`, function () {
+  it(`throws w/ Asset must be a Currency`, function () {
     bid.Asset = 1234
-    const errorMessage = 'AMMBid: Asset must be an Issue'
+    const errorMessage = 'AMMBid: Asset must be a Currency'
     assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
     assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
@@ -76,9 +76,9 @@ describe('AMMBid', function () {
     assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
 
-  it(`throws w/ Asset2 must be an Issue`, function () {
+  it(`throws w/ Asset2 must be a Currency`, function () {
     bid.Asset2 = 1234
-    const errorMessage = 'AMMBid: Asset2 must be an Issue'
+    const errorMessage = 'AMMBid: Asset2 must be a Currency'
     assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
     assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
