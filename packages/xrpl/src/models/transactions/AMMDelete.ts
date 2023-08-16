@@ -4,7 +4,15 @@ import { Currency } from '../common'
 import { BaseTransaction, isCurrency, validateBaseTransaction } from './common'
 
 /**
- * TODO: Fill in when docs are ready.
+ * Delete an empty Automated Market Maker (AMM) instance that could not be fully deleted automatically.
+ *
+ * Tip: The AMMWithdraw transaction automatically tries to delete an AMM, along with associated ledger
+ * entries such as empty trust lines, if it withdrew all the assets from the AMM's pool.
+ * However, if there are too many trust lines to the AMM account to remove in one transaction,
+ * it may stop before fully removing the AMM. Similarly, an AMMDelete transaction removes up to
+ * a maximum number of trust lines; in extreme cases, it may take several AMMDelete transactions
+ * to fully delete the trust lines and the associated AMM.
+ * In all cases, the AMM ledger entry and AMM account are deleted by the last such transaction.
  */
 export interface AMMDelete extends BaseTransaction {
   TransactionType: 'AMMDelete'
