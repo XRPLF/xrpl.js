@@ -1,7 +1,7 @@
 import Sha512 from './Sha512'
 import { secp256k1 } from '@noble/curves/secp256k1'
 
-const Zero = BigInt(0)
+const ZERO = BigInt(0)
 
 function deriveScalar(bytes, discrim?: number): bigint {
   const order = secp256k1.CURVE.n
