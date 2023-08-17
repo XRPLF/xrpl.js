@@ -1,0 +1,8 @@
+{
+  "label": "Unique Setup Steps for xrpl.js",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "For when you need to do more than just install 'xrpl.js' for it to work (especially for React projects in the browser)."
+  }
+}

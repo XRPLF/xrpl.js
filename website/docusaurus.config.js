@@ -7,10 +7,9 @@ const path = require("path");
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "My Site",
-  tagline: "Dinosaurs are cool",
-  favicon: "img/favicon.ico",
-
+  title: "xrpl.js documentation",
+  tagline:
+    "This is the recommended library for integrating a JavaScript/TypeScript app with the XRP Ledger, especially if you intend to use advanced functionality such as IOUs, payment paths, the decentralized exchange, account settings, payment channels, escrows, multi-signing, and more.",
   // Set the production url of your site here
   url: "https://your-docusaurus-test-site.com",
   // Set the /<baseUrl>/ pathname under which your site is served
@@ -130,21 +129,16 @@ const config = {
       // Replace with your project's social card
       image: "img/docusaurus-social-card.jpg",
       navbar: {
-        title: "My Site",
-        logo: {
-          alt: "My Site Logo",
-          src: "img/logo.svg",
-        },
+        title: "XRPL.JS",
         items: [
           {
             type: "docSidebar",
             sidebarId: "tutorialSidebar",
             position: "left",
-            label: "Tutorial",
+            label: "Setup",
           },
-          { to: "/blog", label: "Blog", position: "left" },
           {
-            href: "https://github.com/facebook/docusaurus",
+            href: "https://github.com/XRPLF/xrpl.js",
             label: "GitHub",
             position: "right",
           },
@@ -162,8 +156,24 @@ const config = {
             title: "Docs",
             items: [
               {
-                label: "Tutorial",
+                label: "xrpl.org",
+                to: "https://xrpl.org ",
+              },
+              {
+                label: "Quickstart",
                 to: "/docs/intro",
+              },
+              {
+                label: "xrpl.js",
+                to: "/api/xrpl",
+              },
+              {
+                label: "ripple-address-codec",
+                to: "/api/ripple-address-codec",
+              },
+              {
+                label: "ripple-keypairs",
+                to: "/api/ripple-keypairs",
               },
             ],
           },
@@ -171,16 +181,12 @@ const config = {
             title: "Community",
             items: [
               {
-                label: "Stack Overflow",
-                href: "https://stackoverflow.com/questions/tagged/docusaurus",
-              },
-              {
                 label: "Discord",
-                href: "https://discordapp.com/invite/docusaurus",
+                href: "htpps://bit.ly/3TPCWon",
               },
               {
                 label: "Twitter",
-                href: "https://twitter.com/docusaurus",
+                href: "https://twitter.com/RippleXDev",
               },
             ],
           },
@@ -188,12 +194,24 @@ const config = {
             title: "More",
             items: [
               {
-                label: "Blog",
-                to: "/blog",
+                label: "npm",
+                to: "https://www.npmjs.com/package/xrpl",
               },
               {
                 label: "GitHub",
-                href: "https://github.com/facebook/docusaurus",
+                href: "https://github.com/XRPLF/xrpl.js",
+              },
+              {
+                label: "XRPL Code Samples",
+                href: "https://github.com/XRPLF/xrpl-dev-portal/tree/master/content/_code-samples",
+              },
+              {
+                label: "Subscribe to xrpl-announce",
+                href: "https://groups.google.com/g/xrpl-announce",
+              },
+              {
+                label: "Subscribe to ripple-server",
+                href: "https://groups.google.com/g/ripple-server",
               },
             ],
           },
