@@ -10,7 +10,8 @@
     "prepublish": "npm run lint && npm test"
   },
   "files": [
-    "dist/*"
+    "dist/*",
+    "src/*"
   ],
   "main": "dist/",
   "directories": {

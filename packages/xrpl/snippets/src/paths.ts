@@ -1,4 +1,4 @@
-import { Client, Payment, RipplePathFindResponse } from '../../src'
+import { Client, Payment } from '../../src'
 
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
@@ -15,7 +15,8 @@ async function createTxWithPaths(): Promise<void> {
     issuer: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc',
   }
 
-  const request = {
+  const resp = await client.request({
+    // TOOD: Replace with path_find - https://github.com/XRPLF/xrpl.js/issues/2385
     command: 'ripple_path_find',
     source_account: wallet.classicAddress,
     source_currencies: [
@@ -25,9 +26,7 @@ async function createTxWithPaths(): Promise<void> {
     ],
     destination_account,
     destination_amount,
-  }
-
-  const resp: RipplePathFindResponse = await client.request(request)
+  })
   console.log(resp)
 
   const paths = resp.result.alternatives[0].paths_computed

@@ -4,7 +4,7 @@
   "description": "encodes/decodes base58 encoded XRP Ledger identifiers",
   "files": [
     "dist/*",
-    "build/*"
+    "src/*"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

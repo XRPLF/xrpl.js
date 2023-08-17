@@ -4,8 +4,7 @@
   "description": "XRP Ledger binary codec",
   "files": [
     "dist/*",
-    "bin/*",
-    "test/*"
+    "src/*"
   ],
   "main": "dist/",
   "directories": {

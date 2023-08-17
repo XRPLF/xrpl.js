@@ -3,9 +3,11 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 
+### Added
+* Add `walletFromSecretNumbers` to derive a wallet from [XLS-12](https://github.com/XRPLF/XRPL-Standards/issues/15). Currently only works with `secp256k1` keys, but will work with `ED25519` keys as part of 3.0 via [#2376](https://github.com/XRPLF/xrpl.js/pull/2376).
+
 ### Fixed
 * Fixed Wallet.generate() ignoring the `algorithm` parameter (Only a problem once binary-codec fix for `derive_keypair` is added)
-* Fixed Wallet.fromSeed() ignoring the `algorithm` parameter
 
 ## 2.10.0 (2023-08-07)
 
