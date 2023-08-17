@@ -42,7 +42,7 @@ export function validateAMMDelete(tx: Record<string, unknown>): void {
   }
 
   if (!isCurrency(tx.Asset)) {
-    throw new ValidationError('AMMDelete: Asset must be an Currency')
+    throw new ValidationError('AMMDelete: Asset must be a Currency')
   }
 
   if (tx.Asset2 == null) {
@@ -50,6 +50,6 @@ export function validateAMMDelete(tx: Record<string, unknown>): void {
   }
 
   if (!isCurrency(tx.Asset2)) {
-    throw new ValidationError('AMMDelete: Asset2 must be an Currency')
+    throw new ValidationError('AMMDelete: Asset2 must be a Currency')
   }
 }
