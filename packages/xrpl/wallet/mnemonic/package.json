@@ -1,0 +1,7 @@
+{
+  "name": "xrpl/wallet/mnemonic",
+  "private": true,
+  "main":
+  "../../dist/npm/Wallet/walletFromMnemonic.js"
+}
+

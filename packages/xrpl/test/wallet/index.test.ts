@@ -1,14 +1,11 @@
 import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec'
 
-import {
-  NFTokenMint,
-  Payment,
-  Transaction,
-  walletFromSecretNumbers,
-} from '../../src'
+import { NFTokenMint, Payment, Transaction } from '../../src'
 import ECDSA from '../../src/ECDSA'
 import { Wallet } from '../../src/Wallet'
+import { walletFromMnemonic } from '../../src/Wallet/walletFromMnemonic'
+import { walletFromSecretNumbers } from '../../src/Wallet/walletFromSecretNumbers'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 
@@ -140,7 +137,7 @@ describe('Wallet', function () {
       const mnemonic =
         'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
       const expectedSeed = 'snVB4iTWYqsWZaj1hkvAy1QzqNbAg'
-      const wallet = Wallet.fromMnemonic(mnemonic, {
+      const wallet = walletFromMnemonic(mnemonic, {
         mnemonicEncoding: 'rfc1751',
         algorithm,
       })
@@ -153,7 +150,7 @@ describe('Wallet', function () {
       const mnemonic =
         'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
       const expectedSeed = 'sEdVaw4m9W3H3ou3VnyvDwvPAP5BEz1'
-      const wallet = Wallet.fromMnemonic(mnemonic, {
+      const wallet = walletFromMnemonic(mnemonic, {
         mnemonicEncoding: 'rfc1751',
         algorithm,
       })
@@ -166,7 +163,7 @@ describe('Wallet', function () {
       const mnemonic =
         'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
       assert.throws(() => {
-        Wallet.fromMnemonic(mnemonic, {
+        walletFromMnemonic(mnemonic, {
           mnemonicEncoding: 'bip39',
           algorithm,
         })
@@ -177,7 +174,7 @@ describe('Wallet', function () {
       const mnemonic =
         'draw attack antique swing base employ blur above palace lucky glide clap pen use illegal'
       assert.throws(() => {
-        Wallet.fromMnemonic(mnemonic, {
+        walletFromMnemonic(mnemonic, {
           mnemonicEncoding: 'rfc1751',
         })
       }, /^Expected an RFC1751 word, but received 'attack'\. For the full list of words in the RFC1751 encoding see https:\/\/datatracker\.ietf\.org\/doc\/html\/rfc1/u)
@@ -188,7 +185,7 @@ describe('Wallet', function () {
       const mnemonic =
         'cab beth hank bird mend sign gild any kern hyde chat stub'
       const expectedSeed = 'sEdVaw4m9W3H3ou3VnyvDwvPAP5BEz1'
-      const wallet = Wallet.fromMnemonic(mnemonic, {
+      const wallet = walletFromMnemonic(mnemonic, {
         mnemonicEncoding: 'rfc1751',
         algorithm,
       })
@@ -271,7 +268,7 @@ describe('Wallet', function () {
       '0013FC461CA5799F1357C8130AF703CBA7E9C28E072C6CA8F7DEF8601CDE98F394'
 
     it('derives a wallet using default derivation path', function () {
-      const wallet = Wallet.fromMnemonic(mnemonic, {
+      const wallet = walletFromMnemonic(mnemonic, {
         algorithm: ECDSA.secp256k1,
       })
 
@@ -281,7 +278,7 @@ describe('Wallet', function () {
 
     it('derives a wallet using an input derivation path', function () {
       const derivationPath = "m/44'/144'/0'/0/0"
-      const wallet = Wallet.fromMnemonic(mnemonic, {
+      const wallet = walletFromMnemonic(mnemonic, {
         derivationPath,
         algorithm: ECDSA.secp256k1,
       })
@@ -300,7 +297,7 @@ describe('Wallet', function () {
           '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
       }
 
-      const wallet = Wallet.fromMnemonic(regularKeyPair.mnemonic, {
+      const wallet = walletFromMnemonic(regularKeyPair.mnemonic, {
         masterAddress,
         mnemonicEncoding: 'rfc1751',
         algorithm: ECDSA.secp256k1,

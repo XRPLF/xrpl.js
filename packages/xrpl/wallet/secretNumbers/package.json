@@ -1,0 +1,7 @@
+{
+  "name": "xrpl/wallet/secretNumbers",
+  "private": true,
+  "main":
+    "../../dist/npm/Wallet/walletFromSecretNumbers.js"
+}
+

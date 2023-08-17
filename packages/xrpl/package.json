@@ -9,7 +9,8 @@
     "build/xrpl-latest.js",
     "build/xrpl-latest.js.map",
     "dist/npm/*",
-    "src/*"
+    "src/*",
+    "wallet/*"
   ],
   "main": "dist/npm/",
   "unpkg": "build/xrpl-latest-min.js",
