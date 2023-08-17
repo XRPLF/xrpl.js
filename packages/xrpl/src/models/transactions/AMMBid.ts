@@ -97,7 +97,7 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
         `AMMBid: AuthAccounts length must not be greater than ${MAX_AUTH_ACCOUNTS}`,
       )
     }
-    isAuthAccounts(
+    validateAuthAccounts(
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
       tx.Account as string,
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
@@ -106,7 +106,7 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
   }
 }
 
-function isAuthAccounts(
+function validateAuthAccounts(
   senderAddress: string,
   authAccounts: Array<Record<string, unknown>>,
 ): boolean {
