@@ -31,8 +31,6 @@ function validateKey(node: HDKey): asserts node is ValidHDKey {
 /**
  * Derives a wallet from a bip39 or RFC1751 mnemonic (Defaults to bip39).
  *
- * @deprecated since version 2.6.1.
- * Will be deleted in version 3.0.0.
  * This representation is currently deprecated in rippled.
  * You should use another method to represent your keys such as a seed or public/private keypair.
  *

@@ -1,10 +1,10 @@
 import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec'
+import { walletFromMnemonic } from 'xrpl/wallet/mnemonic'
 
 import { NFTokenMint, Payment, Transaction } from '../../src'
 import ECDSA from '../../src/ECDSA'
 import { Wallet } from '../../src/Wallet'
-import { walletFromMnemonic } from '../../src/Wallet/walletFromMnemonic'
 import { walletFromSecretNumbers } from '../../src/Wallet/walletFromSecretNumbers'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
