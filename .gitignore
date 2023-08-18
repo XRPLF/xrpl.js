@@ -22,6 +22,7 @@ npm-shrinkwrap.json
 # Ignore object files.
 *.o
 build/
+coverage/
 tags
 bin/rippled
 Debug/*.*

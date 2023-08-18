@@ -141,3 +141,9 @@ export interface NFToken {
   nft_serial: number
   uri: string
 }
+
+export interface AuthAccount {
+  AuthAccount: {
+    account: string
+  }
+}

@@ -3,6 +3,9 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 
+### Added
+* Add `walletFromSecretNumbers` to derive a wallet from [XLS-12](https://github.com/XRPLF/XRPL-Standards/issues/15). Currently only works with `secp256k1` keys, but will work with `ED25519` keys as part of 3.0 via [#2376](https://github.com/XRPLF/xrpl.js/pull/2376).
+
 ## 2.10.0 (2023-08-07)
 
 ### Added
@@ -117,6 +120,9 @@ Wallet.fromMmnemonic()
 * `Wallet.fromMnemonic` now allows lowercase for RFC1751 mnemonics (#2046)
 * `Wallet.fromMnemonic` detects when an invalid encoding is provided, and throws an error
 * Made unexpected errors in `submitAndWait` more verbose to make them easier to debug.
+
+### Added
+* Support for Automated Market Maker (AMM) transactions and requests as defined in XLS-30.
 
 ## 2.3.1 (2022-06-27)
 ### Fixed
