@@ -95,6 +95,9 @@ import {
   NFTInfoResponse,
   NFTHistoryRequest,
   NFTHistoryResponse,
+  // AMM methods
+  AMMInfoRequest,
+  AMMInfoResponse,
 } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 import {
@@ -316,6 +319,7 @@ class Client extends EventEmitter {
   ): Promise<AccountObjectsResponse>
   public async request(r: AccountOffersRequest): Promise<AccountOffersResponse>
   public async request(r: AccountTxRequest): Promise<AccountTxResponse>
+  public async request(r: AMMInfoRequest): Promise<AMMInfoResponse>
   public async request(r: BookOffersRequest): Promise<BookOffersResponse>
   public async request(r: ChannelVerifyRequest): Promise<ChannelVerifyResponse>
   public async request(

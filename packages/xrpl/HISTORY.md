@@ -121,6 +121,9 @@ Wallet.fromMmnemonic()
 * `Wallet.fromMnemonic` detects when an invalid encoding is provided, and throws an error
 * Made unexpected errors in `submitAndWait` more verbose to make them easier to debug.
 
+### Added
+* Support for Automated Market Maker (AMM) transactions and requests as defined in XLS-30.
+
 ## 2.3.1 (2022-06-27)
 ### Fixed
 * Signing tx with standard currency codes with lowercase and allowed symbols causing an error on decode.

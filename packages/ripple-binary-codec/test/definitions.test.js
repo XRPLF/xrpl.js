@@ -129,7 +129,7 @@ describe('encode and decode using new types as a parameter', function () {
     // Normally this would be generated directly from rippled with something like `server_definitions`.
     // Added here to make it easier to see what is actually changing in the definitions.json file.
     const definitions = JSON.parse(JSON.stringify(normalDefinitionsJson))
-    definitions.TYPES.NewType = 24
+    definitions.TYPES.NewType = 31
     definitions.FIELDS.push([
       'TestField',
       {

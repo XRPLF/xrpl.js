@@ -21,6 +21,21 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'ledger_entry'
   /**
+   * Retrieve an Automated Market Maker (AMM) object from the ledger.
+   * This is similar to amm_info method, but the ledger_entry version returns only the ledger entry as stored.
+   */
+  amm?: {
+    asset: {
+      currency: string
+      issuer?: string
+    }
+    asset2: {
+      currency: string
+      issuer?: string
+    }
+  }
+
+  /**
    * If true, return the requested ledger object's contents as a hex string in
    * the XRP Ledger's binary format. Otherwise, return data in JSON format. The
    * default is false.
