@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+* Updated to include latest updates to `definitions.json`.
+
 ## 1.8.0 (2023-08-07)
 * Added Clawback transaction type
 
