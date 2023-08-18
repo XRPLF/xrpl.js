@@ -6,6 +6,7 @@ export * from './transactions/escrowCancel.test'
 
 // Transactions
 export * from './transactions/accountSet.test'
+export * from './transactions/ammCreate.test'
 export * from './transactions/checkCancel.test'
 export * from './transactions/checkCash.test'
 export * from './transactions/checkCreate.test'
