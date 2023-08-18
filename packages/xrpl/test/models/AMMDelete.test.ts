@@ -43,9 +43,9 @@ describe('AMMDelete', function () {
     assert.throws(() => validate(ammDelete), ValidationError, errorMessage)
   })
 
-  it(`throws w/ Asset must be an Currency`, function () {
+  it(`throws w/ Asset must be a Currency`, function () {
     ammDelete.Asset = 1234
-    const errorMessage = 'AMMDelete: Asset must be an Currency'
+    const errorMessage = 'AMMDelete: Asset must be a Currency'
     assert.throws(
       () => validateAMMDelete(ammDelete),
       ValidationError,
@@ -65,9 +65,9 @@ describe('AMMDelete', function () {
     assert.throws(() => validate(ammDelete), ValidationError, errorMessage)
   })
 
-  it(`throws w/ Asset2 must be an Currency`, function () {
+  it(`throws w/ Asset2 must be a Currency`, function () {
     ammDelete.Asset2 = 1234
-    const errorMessage = 'AMMDelete: Asset2 must be an Currency'
+    const errorMessage = 'AMMDelete: Asset2 must be a Currency'
     assert.throws(
       () => validateAMMDelete(ammDelete),
       ValidationError,
