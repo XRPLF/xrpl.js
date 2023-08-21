@@ -1,6 +1,10 @@
 # ripple-keypairs Release History
 
 ## Unreleased
+### Breaking Changes
+* Bump typescript to 5.x
+* Remove Node 14 support
+* Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`.
 * Fix `deriveKeypair` ignoring manual decoding algorithm. (Specifying algorithm=`ed25519` in `opts` now works on secrets like `sNa1...`)
 
 ## 1.3.1 (2023-09-27)
