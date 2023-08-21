@@ -330,11 +330,6 @@ describe('Wallet', function () {
       '03BFC2F7AE242C3493187FA0B72BE97B2DF71194FB772E507FF9DEA0AD13CA1625'
     const privateKey =
       '00B6FE8507D977E46E988A8A94DB3B8B35E404B60F8B11AC5213FA8B5ABC8A8D19'
-    // TODO: Uncomment when the `deriveKeypair` fix is merged so `deriveSecretNumbers` with ed25519 works.
-    // const publicKeyED25519 =
-    //   'ED8079E575450E256C496578480020A33E19B579D58A2DB8FF13FC6B05B9229DE3'
-    // const privateKeyED25519 =
-    //   'EDD2AF6288A903DED9860FC62E778600A985BDF804E40BD8266505553E3222C3DA'
 
     it('derives a wallet using default algorithm', function () {
       const wallet = walletFromSecretNumbers(secretNumbersString)
@@ -360,16 +355,15 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, privateKey)
     })
 
-    // TODO: Uncomment this test when the `deriveKeypair` fix is merged
-    // it('derives a wallet using algorithm ed25519', function () {
-    //   const algorithm = ECDSA.ed25519
-    //   const wallet = Wallet.fromSecretNumbers(secretNumbersString, {
-    //     algorithm,
-    //   })
+    it('derives a wallet using algorithm ed25519', function () {
+      const algorithm = ECDSA.ed25519
+      const wallet = walletFromSecretNumbers(secretNumbersString, {
+        algorithm,
+      })
 
-    //   assert.equal(wallet.publicKey, publicKeyED25519)
-    //   assert.equal(wallet.privateKey, privateKeyED25519)
-    // })
+      assert.equal(wallet.publicKey, publicKeyED25519)
+      assert.equal(wallet.privateKey, privateKeyED25519)
+    })
 
     it('derives a wallet using a Regular Key Pair', function () {
       const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
