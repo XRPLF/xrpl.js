@@ -1,6 +1,12 @@
 # ripple-binary-codec Release History
 
 ## Unreleased
+### Breaking Changes
+* Bump typescript to 5.x
+* Remove Node 14 support
+* Remove decimal.js and big-integer. Use `BigNumber` from `bignumber.js` instead of `Decimal` and the native `BigInt` instead of `bigInt`.
+* Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`.
+
 
 ## 1.11.0 (2023-11-30)
 ### Added
