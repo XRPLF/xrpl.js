@@ -1,6 +1,10 @@
 # ripple-address-codec
 
 ## Unreleased
+### Breaking Changes
+* Bump typescript to 5.x
+* Remove Node 14 support
+* Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`.
 
 ## 4.3.1 (2023-09-27)
 ### Fixed
