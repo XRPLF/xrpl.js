@@ -6,10 +6,13 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prepublish": "npm run clean && npm run lint && npm run test && npm run build",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist build coverage",
     "test": "jest --verbose",
-    "build": "tsc -b && browserify -r .:xrpl-secret-numbers -o dist/browserified.js",
-    "lint": "tslint -p ./"
+    "build": "run-s build:lib build:web",
+    "build:lib": "tsc -b --force",
+    "build:web": "webpack",
+    "lint": "tslint -p ./",
+    "analyze": "webpack --analyze"
   },
   "files": [
     "dist/**/*.js",

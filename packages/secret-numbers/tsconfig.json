@@ -2,25 +2,18 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "es6",
-    "declaration": true,
-    "declarationMap": true,
-    "outDir": "./dist",
+    "lib": [
+      "es2017"
+    ],
     "rootDir": "./src",
-    "noImplicitAny": false,
+    "outDir": "./dist",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true,
-    "strictNullChecks": true,
-    "resolveJsonModule": true
+    "removeComments": false,
+    "preserveConstEnums": false,
+    "skipLibCheck": true,
+    "declaration": true,
+    "strictNullChecks": true
   },
-  "references": [
-    {
-      "path": "../ripple-address-codec/tsconfig.json"
-    },
-  ],
-  "include": [
-    "src/**/*.ts"
-  ]
+  "include": ["src/**/*.ts"]
 }
