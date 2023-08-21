@@ -1,6 +1,4 @@
 /* eslint-disable max-classes-per-file -- Errors can be defined in the same file */
-import { inspect } from 'util'
-
 /**
  * Base Error class for xrpl.js. All Errors thrown by xrpl.js should throw
  * XrplErrors.
@@ -38,7 +36,7 @@ class XrplError extends Error {
   public toString(): string {
     let result = `[${this.name}(${this.message}`
     if (this.data) {
-      result += `, ${inspect(this.data)}`
+      result += `, ${JSON.stringify(this.data)}`
     }
     result += ')]'
     return result
