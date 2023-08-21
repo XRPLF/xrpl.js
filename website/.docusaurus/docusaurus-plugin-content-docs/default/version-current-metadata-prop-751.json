@@ -1,0 +1,85 @@
+{
+  "pluginId": "default",
+  "version": "current",
+  "label": "Next",
+  "banner": null,
+  "badge": false,
+  "noIndex": false,
+  "className": "docs-version-current",
+  "isLast": true,
+  "docsSidebars": {
+    "tutorialSidebar": [
+      {
+        "type": "link",
+        "label": "Quickstart",
+        "href": "/docs/intro",
+        "docId": "intro"
+      },
+      {
+        "type": "category",
+        "label": "Unique Setup Steps for xrpl.js",
+        "collapsible": true,
+        "collapsed": true,
+        "items": [
+          {
+            "type": "link",
+            "label": "Using xrpl.js from a CDN",
+            "href": "/docs/setup/CDN",
+            "docId": "setup/CDN"
+          },
+          {
+            "type": "link",
+            "label": "Using xrpl.js with create-react-app",
+            "href": "/docs/setup/create-react-app",
+            "docId": "setup/create-react-app"
+          },
+          {
+            "type": "link",
+            "label": "Using xrpl.js with React Native",
+            "href": "/docs/setup/react-native",
+            "docId": "setup/react-native"
+          },
+          {
+            "type": "link",
+            "label": "Using xrpl.js with Vite React",
+            "href": "/docs/setup/vite-react",
+            "docId": "setup/vite-react"
+          }
+        ],
+        "href": "/docs/category/unique-setup-steps-for-xrpljs"
+      }
+    ]
+  },
+  "docs": {
+    "intro": {
+      "id": "intro",
+      "title": "Quickstart",
+      "description": "Requirements",
+      "sidebar": "tutorialSidebar"
+    },
+    "setup/CDN": {
+      "id": "setup/CDN",
+      "title": "Using xrpl.js from a CDN",
+      "description": "You can avoid setting up your build system to handle xrpl.js by using a cdn version that is prebuilt for the browser.",
+      "sidebar": "tutorialSidebar"
+    },
+    "setup/create-react-app": {
+      "id": "setup/create-react-app",
+      "title": "Using xrpl.js with create-react-app",
+      "description": "To use xrpl.js with React, you need to install shims for core NodeJS modules. Starting with version 5, Webpack stopped including shims by default, so you must modify your Webpack configuration to add the shims you need. Either you can eject your config and modify it, or you can use a library such as react-app-rewired. The example below uses react-app-rewired.",
+      "sidebar": "tutorialSidebar"
+    },
+    "setup/react-native": {
+      "id": "setup/react-native",
+      "title": "Using xrpl.js with React Native",
+      "description": "If you want to use xrpl.js with React Native you will need to install shims for core NodeJS modules. To help with this you can use a module like rn-nodeify.",
+      "sidebar": "tutorialSidebar"
+    },
+    "setup/vite-react": {
+      "id": "setup/vite-react",
+      "title": "Using xrpl.js with Vite React",
+      "description": "Similar to above, to get xrpl.js to work with Vite you need to set up a couple aliases in the vite.config.ts file.",
+      "sidebar": "tutorialSidebar"
+    }
+  }
+}

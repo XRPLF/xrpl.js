@@ -1,0 +1,42 @@
+{
+  "name": "@xrpl/secret-numbers",
+  "version": "1.0.0",
+  "description": "Generate XRPL Accounts with a number-based secret: 8 chunks of 6 digits",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepublish": "npm run clean && npm run lint && npm run test && npm run build",
+    "clean": "rm -rf dist",
+    "test": "jest --verbose",
+    "build": "tsc -b && browserify -r .:xrpl-secret-numbers -o dist/browserified.js",
+    "lint": "tslint -p ./"
+  },
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.js.map",
+    "dist/**/*.d.ts"
+  ],
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "brorand": "^1.1.0",
+    "ripple-keypairs": "^1.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/WietseWind/xrpl-secret-numbers.git"
+  },
+  "bugs": {
+    "url": "https://github.com/WietseWind/xrpl-secret-numbers/issues"
+  },
+  "homepage": "https://github.com/WietseWind/xrpl-secret-numbers#readme",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "keywords": [
+    "xrp",
+    "xrpl-ledger",
+    "multi sign",
+    "sign"
+  ]
+}
