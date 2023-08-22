@@ -87,7 +87,7 @@ describe("API: XRPL Secret Numbers", () => {
     it("Should throw an Checksum Error", () => {
       expect(() => {
         new Account(secret);
-      }).toThrowError("Invalid secret part: checksum invalid");
+      }).toThrow("Invalid secret part: checksum invalid");
     });
   });
 });
