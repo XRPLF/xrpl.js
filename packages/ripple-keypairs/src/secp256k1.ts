@@ -16,7 +16,7 @@ function deriveScalar(bytes, discrim?: number): bigint {
     hasher.addU32(i)
     const key = hasher.first256BN()
     /* istanbul ignore else */
-    if (key > Zero && key < order) {
+    if (key > ZERO && key < order) {
       return key
     }
   }
