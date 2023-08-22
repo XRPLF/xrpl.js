@@ -1,5 +1,4 @@
 "use strict";
-const path = require("path");
 const webpack = require("webpack");
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const { merge } = require("webpack-merge");
@@ -16,7 +15,11 @@ const bnJsReplaces = [
 function getDefaultConfiguration() {
   return {
     cache: true,
-    performance: { hints: false },
+    performance: {
+      hints: false,
+      maxEntrypointSize: 512000,
+      maxAssetSize: 512000,
+    },
     stats: "errors-only",
     devtool: "source-map",
     plugins: [
