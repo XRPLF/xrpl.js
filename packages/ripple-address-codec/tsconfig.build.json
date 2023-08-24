@@ -3,10 +3,5 @@
   "compilerOptions": {
     "rootDir": "./src",
   },
-  "include": ["./src/**/*.ts", "./src/**/*.json"],
-  "references": [
-    {
-      "path": "../ripple-keypairs/tsconfig.json"
-    }
-  ]
+  "include": ["./src/**/*.ts", "./src/**/*.json"]
 }
