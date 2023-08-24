@@ -51,6 +51,7 @@ const config = {
           // },
         ],
         debug: true,
+        minimal: false,
         readmes: true,
         changelogs: true,
         changelogName: "HISTORY.md",
