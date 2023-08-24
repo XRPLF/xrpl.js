@@ -22,6 +22,9 @@ function HomepageHeader() {
           >
             QuickStart
           </Link>
+          <Link className="button button--secondary button--lg" to="/api">
+            Documentation
+          </Link>
         </div>
       </div>
     </header>
