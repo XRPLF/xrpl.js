@@ -4,7 +4,7 @@ For more background information, please read the [proposed Standard](https://git
 
 A tool to convert Secret Nubmers to the widely used Family Seed `s...` format is [available here](https://github.com/WietseWind/secret-numbers-to-family-seed/releases)
 
-A Browserified version of this lib. is available at NPM (dist-folder, `browserified.js`), CDN: https://cdn.jsdelivr.net/npm/xrpl-secret-numbers/dist/browserified.js. Sample:
+A Browserified version of this lib. is available at NPM (`build/xrpl-secret-numbers-latest.js`), CDN: https://cdn.jsdelivr.net/npm/xrpl-secret-numbers. Sample:
 https://jsfiddle.net/WietseWind/uo1zy0q7/
 
 #### Generate XRPL Accounts with a number-based secret: 8 chunks of 6 digits.
