@@ -2,9 +2,9 @@
 
 For more background information, please read the [proposed Standard](https://github.com/xrp-community/standards-drafts/issues/15).
 
-A tool to convert Secret Nubmers to the widely used Family Seed `s...` format is [available here](https://github.com/WietseWind/secret-numbers-to-family-seed/releases)
+A tool to convert Secret Numbers to the widely used Family Seed `s...` format is [available here](https://github.com/WietseWind/secret-numbers-to-family-seed/releases)
 
-A Browserified version of this lib. is available at NPM (`build/xrpl-secret-numbers-latest.js`), CDN: https://cdn.jsdelivr.net/npm/xrpl-secret-numbers. Sample:
+A bundled version of this lib is available at NPM (`build/xrplf-secret-numbers-latest.js`), CDN: https://cdn.jsdelivr.net/npm/@xrplf/secret-numbers. You can access the library as `xrplf_secret_numbers`. Sample:
 https://jsfiddle.net/WietseWind/uo1zy0q7/
 
 #### Generate XRPL Accounts with a number-based secret: 8 chunks of 6 digits.

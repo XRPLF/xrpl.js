@@ -4,5 +4,5 @@ const base = require("../../jest.config.base.js");
 module.exports = {
   ...base,
   roots: [...base.roots, "<rootDir>/test"],
-  displayName: "@xrpl/secret-numbers",
+  displayName: "@xrplf/secret-numbers",
 };

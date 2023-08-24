@@ -10,4 +10,5 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### BREAKING CHANGES:
 - `xrpl-secret-numbers` is now `@xrplf/secret-numbers`.
-- The bundled file produced changed from  `dist/browerified.js` to `build/xrpl-secret-numbers-latest.js`.
+- The bundled file produced changed from  `dist/browerified.js` to `build/xrplf-secret-numbers-latest.js`.
+- Bundle variable is `xrplf_secret_numbers` instead of using browserify's loader.

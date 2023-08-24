@@ -22,7 +22,7 @@
     "ws": "./dist/npm/client/WSWrapper.js"
   },
   "dependencies": {
-    "@xrpl/secret-numbers": "^1.0.0",
+    "@xrplf/secret-numbers": "^1.0.0",
     "bignumber.js": "^9.0.0",
     "bip32": "^2.0.6",
     "bip39": "^3.0.4",
@@ -33,7 +33,6 @@
     "ws": "^8.2.2"
   },
   "devDependencies": {
-
     "@types/node": "^16.18.38",
     "https-proxy-agent": "^7.0.1",
     "karma": "^6.4.1",
