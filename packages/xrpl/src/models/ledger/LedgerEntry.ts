@@ -1,5 +1,6 @@
 import AccountRoot from './AccountRoot'
 import Amendments from './Amendments'
+import AMM from './AMM'
 import Bridge from './Bridge'
 import Check from './Check'
 import DepositPreauth from './DepositPreauth'
@@ -19,6 +20,7 @@ import XChainOwnedCreateAccountClaimID from './XChainOwnedCreateAccountClaimID'
 type LedgerEntry =
   | AccountRoot
   | Amendments
+  | AMM
   | Bridge
   | Check
   | DepositPreauth

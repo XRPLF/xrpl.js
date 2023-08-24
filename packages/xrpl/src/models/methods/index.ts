@@ -41,6 +41,7 @@ import {
   AccountTxResponse,
   AccountTxTransaction,
 } from './accountTx'
+import { AMMInfoRequest, AMMInfoResponse } from './ammInfo'
 import {
   BaseRequest,
   BaseResponse,
@@ -196,6 +197,8 @@ type Request =
   // clio only methods
   | NFTInfoRequest
   | NFTHistoryRequest
+  // AMM methods
+  | AMMInfoRequest
 
 /**
  * @category Responses
@@ -247,6 +250,8 @@ type Response =
   // clio only methods
   | NFTInfoResponse
   | NFTHistoryResponse
+  // AMM methods
+  | AMMInfoResponse
 
 export {
   // Allow users to define their own requests and responses.  This is useful for releasing experimental versions
@@ -380,4 +385,7 @@ export {
   NFTHistoryRequest,
   NFTHistoryResponse,
   NFTHistoryTransaction,
+  // AMM methods
+  AMMInfoRequest,
+  AMMInfoResponse,
 }

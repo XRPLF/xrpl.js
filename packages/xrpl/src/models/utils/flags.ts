@@ -7,6 +7,8 @@ import {
   AccountRootFlags,
 } from '../ledger/AccountRoot'
 import { AccountSetTfFlags } from '../transactions/accountSet'
+import { AMMDepositFlags } from '../transactions/AMMDeposit'
+import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
 import { GlobalFlags } from '../transactions/common'
 import { OfferCreateFlags } from '../transactions/offerCreate'
 import { PaymentFlags } from '../transactions/payment'
@@ -46,6 +48,7 @@ export function parseAccountRootFlags(
  *
  * @param tx - A transaction to set its flags to its numeric representation.
  */
+// eslint-disable-next-line complexity -- there's a lot of txs with flags
 export function setTransactionFlagsToNumber(tx: Transaction): void {
   if (tx.Flags == null) {
     tx.Flags = 0
@@ -58,6 +61,12 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
   switch (tx.TransactionType) {
     case 'AccountSet':
       tx.Flags = convertFlagsToNumber(tx.Flags, AccountSetTfFlags)
+      return
+    case 'AMMDeposit':
+      tx.Flags = convertFlagsToNumber(tx.Flags, AMMDepositFlags)
+      return
+    case 'AMMWithdraw':
+      tx.Flags = convertFlagsToNumber(tx.Flags, AMMWithdrawFlags)
       return
     case 'OfferCreate':
       tx.Flags = convertFlagsToNumber(tx.Flags, OfferCreateFlags)

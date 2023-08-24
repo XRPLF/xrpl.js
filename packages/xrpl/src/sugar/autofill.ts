@@ -275,7 +275,7 @@ async function setNextValidSequenceNumber(
   tx.Sequence = data.result.account_data.Sequence
 }
 
-async function fetchAccountDeleteFee(client: Client): Promise<BigNumber> {
+async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
   const response = await client.request({ command: 'server_state' })
   const fee = response.result.state.validated_ledger?.reserve_inc
 
@@ -307,9 +307,11 @@ async function calculateFeePerTransactionType(
     baseFee = product.dp(0, BigNumber.ROUND_CEIL)
   }
 
-  // AccountDelete Transaction
-  if (tx.TransactionType === 'AccountDelete') {
-    baseFee = await fetchAccountDeleteFee(client)
+  if (
+    tx.TransactionType === 'AccountDelete' ||
+    tx.TransactionType === 'AMMCreate'
+  ) {
+    baseFee = await fetchOwnerReserveFee(client)
   }
 
   /*

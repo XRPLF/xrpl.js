@@ -142,6 +142,12 @@ export interface NFToken {
   uri: string
 }
 
+export interface AuthAccount {
+  AuthAccount: {
+    account: string
+  }
+}
+
 export interface XChainBridge {
   LockingChainDoor: string
   LockingChainIssue: Currency
