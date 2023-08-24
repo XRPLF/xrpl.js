@@ -1,4 +1,4 @@
-const { seqEqual, concatArgs } = require('../src/utils')
+import { seqEqual, concatArgs } from '../src/utils'
 
 test('two sequences are equal', () => {
   expect(seqEqual([1, 2, 3], [1, 2, 3])).toBe(true)

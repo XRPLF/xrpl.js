@@ -144,7 +144,6 @@ const testCases: Array<[string, false | number, string, string]> = [
   const MAX_32_BIT_UNSIGNED_INT = 4294967295
   const network = isTestAddress ? ' (test)' : ' (main)'
 
-  // eslint-disable-next-line @typescript-eslint/no-for-in-array,guard-for-in,no-restricted-syntax -- why not?
   testCases.forEach((testCase) => {
     const classicAddress = testCase[0]
     const tag = testCase[1] === false ? false : testCase[1]

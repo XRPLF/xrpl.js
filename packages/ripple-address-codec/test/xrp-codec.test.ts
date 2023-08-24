@@ -27,12 +27,13 @@ function toBytes(hex: string): Buffer {
  * @param base58 - Base58-encoded string to decode
  * @param hex - Hexadecimal representation of expected decoded data
  */
+// eslint-disable-next-line max-params -- needs them
 function makeEncodeDecodeTest(
   encoder: (val: Buffer) => string,
   decoder: (val: string) => Buffer,
   base58: string,
   hex: string,
-) {
+): void {
   test(`can translate between ${hex} and ${base58}`, function () {
     const actual = encoder(toBytes(hex))
     expect(actual).toBe(base58)

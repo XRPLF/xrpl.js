@@ -20,9 +20,9 @@
   "prepublish": "tsc -b",
   "prepublishOnly": "tslint -b ./ && jest",
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsc --build tsconfig.build.json",
     "test": "jest --verbose false --silent=false ./test/*.test.ts",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint . --ext .ts --fix",
     "clean": "rm -rf ./dist && rm -rf ./coverage && rm -rf tsconfig.tsbuildinfo"
   },
   "prettier": "@xrplf/prettier-config",
