@@ -1,4 +1,4 @@
-const { Client } = require("xrpl");
+const { Client, AccountSetAsfFlags } = require("xrpl");
 
 // The snippet walks us through creating and finishing escrows.
 async function sendTx() {
@@ -27,6 +27,19 @@ async function sendTx() {
   });
 
   console.log("TrustSet Response:\n", trustset_response);
+
+  // TODO: Check what error we get without this to ensure it's debuggable after resolving "Unknown TransactionType" error
+  const accountSet = {
+    TransactionType: "AccountSet",
+    Account: wallet1.address,
+    SetFlag: AccountSetAsfFlags.asfDefaultRipple,
+  };
+
+  const accountSetResponse = await client.submitAndWait(accountSet, {
+    wallet: wallet1,
+  });
+
+  console.log(accountSetResponse);
 
   const ammCreate = {
     TransactionType: "AMMCreate",
