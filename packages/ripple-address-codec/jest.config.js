@@ -3,5 +3,6 @@ const base = require('../../jest.config.base.js')
 
 module.exports = {
   ...base,
-  displayName: 'ripple-address-codec',
+  roots: [...base.roots, '<rootDir>/test'],
+  displayName: 'ripple-binary-codec',
 }
