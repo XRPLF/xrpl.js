@@ -33,16 +33,13 @@ function checkChecksum(
 }
 
 function entropyToSecret(entropy: Buffer): string[] {
-  const len = Array(Math.ceil(entropy.length / 2));
-  const chunks = new Array(len)
-    .map((_a, chunk) => {
-      return entropy.slice(chunk * 2, (chunk + 1) * 2);
-    })
-    .map((chunk, i) => {
-      const no = parseInt(chunk.toString("hex"), 16);
-      const fill = "0".repeat(5 - String(no).length);
-      return fill + String(no) + String(calculateChecksum(i, no));
-    });
+  const len = new Array(Math.ceil(entropy.length / 2));
+  const chunks = Array.from(len, (_a, chunk) => {
+    const buffChunk = entropy.slice(chunk * 2, (chunk + 1) * 2);
+    const no = parseInt(buffChunk.toString("hex"), 16);
+    const fill = "0".repeat(5 - String(no).length);
+    return fill + String(no) + String(calculateChecksum(chunk, no));
+  });
   if (chunks.length !== 8) {
     throw new Error("Chucks must have 8 digits");
   }
@@ -77,8 +74,8 @@ function parseSecretString(secret: string): string[] {
       "Invalid secret string (should contain 8 blocks of 6 digits"
     );
   }
-  return new Array(8).map((_a, i) => {
-    return normalizedSecret.slice(i * 6, (i + 1) * 6);
+  return Array.from(new Array(8), (_a, index) => {
+    return normalizedSecret.slice(index * 6, (index + 1) * 6);
   });
 }
 
