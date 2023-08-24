@@ -1,24 +1,26 @@
 import * as keypairs from "ripple-keypairs";
+
 import * as utils from "../utils";
 
 /* Types ==================================================================== */
 
-export type Keypair = {
+// eslint-disable-next-line import/no-unused-modules -- it is returned by Account.getKeypair
+export interface Keypair {
   publicKey: string;
   privateKey: string;
-};
+}
 
-export type AccountData = {
+interface AccountData {
   familySeed: string;
   address: string;
   keypair: Keypair;
-};
+}
 
 /* Class ==================================================================== */
 
 export default class Account {
-  private secret: Array<string>;
-  private account: AccountData = {
+  private readonly _secret: string[];
+  private readonly _account: AccountData = {
     familySeed: "",
     address: "",
     keypair: {
@@ -27,69 +29,71 @@ export default class Account {
     },
   };
 
-  constructor(SecretNumbers?: Array<string> | string | Buffer) {
-    const asserts = (): void => {
-      if (this.secret.length !== 8) {
-        throw new Error("Secret must have 8 numbers");
-      }
-      this.secret.forEach((r) => {
-        if (r.length !== 6) {
-          throw new Error("Each secret number must be 6 digits");
-        }
-      });
-    };
-
-    const derive = (): void => {
-      try {
-        const entropy = utils.secretToEntropy(this.secret);
-        this.account.familySeed = keypairs.generateSeed({ entropy: entropy });
-        this.account.keypair = keypairs.deriveKeypair(this.account.familySeed);
-        this.account.address = keypairs.deriveAddress(
-          this.account.keypair.publicKey
-        );
-      } catch (e) {
-        let message = "Unknown Error";
-        if (e instanceof Error) message = e.message;
-        // we'll proceed, but let's report it
-        throw message;
-      }
-    };
-
-    if (typeof SecretNumbers === "string") {
-      this.secret = utils.parseSecretString(SecretNumbers);
-    } else if (Array.isArray(SecretNumbers)) {
-      this.secret = SecretNumbers;
-    } else if (Buffer.isBuffer(SecretNumbers)) {
-      this.secret = utils.entropyToSecret(SecretNumbers);
+  constructor(secretNumbers?: string[] | string | Buffer) {
+    if (typeof secretNumbers === "string") {
+      this._secret = utils.parseSecretString(secretNumbers);
+    } else if (Array.isArray(secretNumbers)) {
+      this._secret = secretNumbers;
+    } else if (Buffer.isBuffer(secretNumbers)) {
+      this._secret = utils.entropyToSecret(secretNumbers);
     } else {
-      this.secret = utils.randomSecret();
+      this._secret = utils.randomSecret();
     }
 
-    asserts();
-    derive();
+    validateLengths(this._secret);
+    this.derive();
   }
 
-  getSecret(): Array<string> {
-    return this.secret;
+  getSecret(): string[] {
+    return this._secret;
   }
 
   getSecretString(): string {
-    return this.secret.join(" ");
+    return this._secret.join(" ");
   }
 
   getAddress(): string {
-    return this.account.address;
+    return this._account.address;
   }
 
   getFamilySeed(): string {
-    return this.account.familySeed;
+    return this._account.familySeed;
   }
 
   getKeypair(): Keypair {
-    return this.account.keypair;
+    return this._account.keypair;
   }
 
-  toString() {
+  toString(): string {
     return this.getSecretString();
   }
+
+  private derive(): void {
+    try {
+      const entropy = utils.secretToEntropy(this._secret);
+      this._account.familySeed = keypairs.generateSeed({ entropy });
+      this._account.keypair = keypairs.deriveKeypair(this._account.familySeed);
+      this._account.address = keypairs.deriveAddress(
+        this._account.keypair.publicKey
+      );
+    } catch (error) {
+      let message = "Unknown Error";
+      if (error instanceof Error) {
+        message = error.message;
+      }
+      // we'll proceed, but let's report it
+      throw new Error(message);
+    }
+  }
+}
+
+function validateLengths(secretNumbers: string[]): void {
+  if (secretNumbers.length !== 8) {
+    throw new Error("Secret must have 8 numbers");
+  }
+  secretNumbers.forEach((num) => {
+    if (num.length !== 6) {
+      throw new Error("Each secret number must be 6 digits");
+    }
+  });
 }

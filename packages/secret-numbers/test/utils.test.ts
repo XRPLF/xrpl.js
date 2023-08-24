@@ -7,7 +7,7 @@ describe("Utils", () => {
     expect(data instanceof Buffer).toBeTruthy();
     expect(data.length).toEqual(16);
     expect(data.toString("hex").length).toEqual(32);
-    expect(data.toString("hex")).toMatch(/^[a-f0-9]+$/);
+    expect(data.toString("hex")).toMatch(/^[a-f0-9]+$/u);
   });
 
   it("calculateChecksum: 1st position", () => {

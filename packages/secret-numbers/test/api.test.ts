@@ -1,13 +1,14 @@
 import * as keypairs from "ripple-keypairs";
+
 import { Account, Utils } from "../src";
 
 describe("API: XRPL Secret Numbers", () => {
   describe("Generate new account", () => {
     const account = new Account();
     it("Output sanity checks", () => {
-      expect(account.getAddress()).toMatch(/^r[a-zA-Z0-9]{19,}$/);
-      const entropy = Utils.secretToEntropy(`${account}`.split(" "));
-      const familySeed = keypairs.generateSeed({ entropy: entropy });
+      expect(account.getAddress()).toMatch(/^r[a-zA-Z0-9]{19,}$/u);
+      const entropy = Utils.secretToEntropy(`${account.toString()}`.split(" "));
+      const familySeed = keypairs.generateSeed({ entropy });
       const keypair = keypairs.deriveKeypair(familySeed);
       const address = keypairs.deriveAddress(keypair.publicKey);
       expect(address).toEqual(account.getAddress());
@@ -30,7 +31,7 @@ describe("API: XRPL Secret Numbers", () => {
     it("Account object to string as expected", () => {
       const accountAsStr =
         "002913 177673 352434 527196 002910 177672 352435 527190";
-      expect(`${account}`).toEqual(accountAsStr);
+      expect(`${account.toString()}`).toEqual(accountAsStr);
     });
   });
 
@@ -69,7 +70,7 @@ describe("API: XRPL Secret Numbers", () => {
     it("Account object to string as expected", () => {
       const accountAsStr =
         "084677 005323 580272 282388 626800 105300 560913 071783";
-      expect(`${account}`).toEqual(accountAsStr);
+      expect(`${account.toString()}`).toEqual(accountAsStr);
     });
   });
 
@@ -86,6 +87,7 @@ describe("API: XRPL Secret Numbers", () => {
     ];
     it("Should throw an Checksum Error", () => {
       expect(() => {
+        // eslint-disable-next-line no-new -- Don't want unused variable
         new Account(secret);
       }).toThrow("Invalid secret part: checksum invalid");
     });
