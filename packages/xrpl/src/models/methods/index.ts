@@ -42,6 +42,7 @@ import {
   AccountTxResponse,
   AccountTxTransaction,
 } from './accountTx'
+import { AMMInfoRequest, AMMInfoResponse } from './ammInfo'
 import {
   BaseRequest,
   BaseResponse,
@@ -202,6 +203,8 @@ type Request =
   // clio only methods
   | NFTInfoRequest
   | NFTHistoryRequest
+  // AMM methods
+  | AMMInfoRequest
 
 /**
  * @category Responses
@@ -253,6 +256,8 @@ type Response =
   // clio only methods
   | NFTInfoResponse
   | NFTHistoryResponse
+  // AMM methods
+  | AMMInfoResponse
 
 export type RequestResponseMap<T> = T extends AccountChannelsRequest
   ? AccountChannelsResponse
@@ -270,6 +275,8 @@ export type RequestResponseMap<T> = T extends AccountChannelsRequest
   ? AccountOffersResponse
   : T extends AccountTxRequest
   ? AccountTxResponse
+  : T extends AMMInfoRequest
+  ? AMMInfoResponse
   : T extends GatewayBalancesRequest
   ? GatewayBalancesResponse
   : T extends NoRippleCheckRequest
@@ -553,4 +560,7 @@ export {
   NFTHistoryRequest,
   NFTHistoryResponse,
   NFTHistoryTransaction,
+  // AMM methods
+  AMMInfoRequest,
+  AMMInfoResponse,
 }
