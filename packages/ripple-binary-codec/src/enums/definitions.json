@@ -21,6 +21,7 @@
     "UInt192": 21,
     "UInt384": 22,
     "UInt512": 23,
+    "Issue": 24,
     "Transaction": 10001,
     "LedgerEntry": 10002,
     "Validation": 10003,
@@ -44,6 +45,7 @@
     "NegativeUNL": 78,
     "NFTokenPage": 80,
     "NFTokenOffer": 55,
+    "AMM": 121,
     "Any": -3,
     "Child": -2,
     "Nickname": 110,
@@ -265,6 +267,26 @@
       "TransferFee",
       {
         "nth": 4,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt16"
+      }
+    ],
+    [
+      "TradingFee",
+      {
+        "nth": 5,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt16"
+      }
+    ],
+    [
+      "DiscountedFee",
+      {
+        "nth": 6,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -772,6 +794,26 @@
       }
     ],
     [
+      "VoteWeight",
+      {
+        "nth": 48,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "FirstNFTokenSequence",
+      {
+        "nth": 50,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "nth": 1,
@@ -1122,6 +1164,16 @@
       }
     ],
     [
+      "AMMID",
+      {
+        "nth": 14,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash256"
+      }
+    ],
+    [
       "BookDirectory",
       {
         "nth": 16,
@@ -1392,6 +1444,36 @@
       }
     ],
     [
+      "Amount2",
+      {
+        "nth": 11,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "BidMin",
+      {
+        "nth": 12,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "BidMax",
+      {
+        "nth": 13,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
       "MinimumOffer",
       {
         "nth": 16,
@@ -1425,6 +1507,86 @@
       "NFTokenBrokerFee",
       {
         "nth": 19,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "BaseFeeDrops",
+      {
+        "nth": 22,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "ReserveBaseDrops",
+      {
+        "nth": 23,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "ReserveIncrementDrops",
+      {
+        "nth": 24,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "LPTokenOut",
+      {
+        "nth": 25,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "LPTokenIn",
+      {
+        "nth": 26,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "EPrice",
+      {
+        "nth": 27,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "Price",
+      {
+        "nth": 28,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
+      "LPTokenBalance",
+      {
+        "nth": 31,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1822,6 +1984,26 @@
       }
     ],
     [
+      "Asset",
+      {
+        "nth": 3,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Issue"
+      }
+    ],
+    [
+      "Asset2",
+      {
+        "nth": 4,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Issue"
+      }
+    ],
+    [
       "TransactionMetaData",
       {
         "nth": 2,
@@ -2032,6 +2214,36 @@
       }
     ],
     [
+      "VoteEntry",
+      {
+        "nth": 25,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
+      "AuctionSlot",
+      {
+        "nth": 26,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
+      "AuthAccount",
+      {
+        "nth": 27,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
       "Signers",
       {
         "nth": 3,
@@ -2122,6 +2334,16 @@
       }
     ],
     [
+      "VoteSlots",
+      {
+        "nth": 12,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
       "Majorities",
       {
         "nth": 16,
@@ -2165,6 +2387,16 @@
       "HookGrants",
       {
         "nth": 20,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "AuthAccounts",
+      {
+        "nth": 25,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2228,6 +2460,7 @@
     "temUNKNOWN": -264,
     "temSEQ_AND_TICKET": -263,
     "temBAD_NFTOKEN_TRANSFER_FEE": -262,
+    "temBAD_AMM_TOKENS": -261,
 
     "tefFAILURE": -199,
     "tefALREADY": -198,
@@ -2263,6 +2496,7 @@
     "terNO_RIPPLE": -90,
     "terQUEUED": -89,
     "terPRE_TICKET": -88,
+    "terNO_AMM": -87,
 
     "tesSUCCESS": 0,
 
@@ -2311,7 +2545,15 @@
     "tecCANT_ACCEPT_OWN_NFTOKEN_OFFER": 158,
     "tecINSUFFICIENT_FUNDS": 159,
     "tecOBJECT_NOT_FOUND": 160,
-    "tecINSUFFICIENT_PAYMENT": 161
+    "tecINSUFFICIENT_PAYMENT": 161,
+    "tecUNFUNDED_AMM": 162,
+    "tecAMM_BALANCE": 163,
+    "tecAMM_FAILED": 164,
+    "tecAMM_INVALID_TOKENS": 165,
+    "tecAMM_EMPTY": 166,
+    "tecAMM_NOT_EMPTY": 167,
+    "tecAMM_ACCOUNT": 168,
+    "tecINCOMPLETE": 169
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
@@ -2344,6 +2586,12 @@
     "NFTokenCancelOffer": 28,
     "NFTokenAcceptOffer": 29,
     "Clawback": 30,
+    "AMMCreate": 35,
+    "AMMDeposit": 36,
+    "AMMWithdraw": 37,
+    "AMMVote": 38,
+    "AMMBid": 39,
+    "AMMDelete": 40,
     "EnableAmendment": 100,
     "SetFee": 101,
     "UNLModify": 102
