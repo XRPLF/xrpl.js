@@ -4,7 +4,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Breaking Changes
-
 * Bump typescript to 5.x
 * Remove Node 14 support
 * Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`
@@ -12,6 +11,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
   * Instead of passing various parameters on the `ConnectionsOptions` you know specify the `agent` parameter. This object can use be created by libraries such as `https-proxy-agent` or any that implements the `http.Agent`.
   * This was changed to both support the latest `https-proxy-agent` and to remove the need to include the package in bundlers.   Tests will still be done using `https-proxy-agent` and only tested in a node environment which was the only way it was previously supported anyway
 * Remove `BroadcastClient` which was deprecated
+* Use `@xrplf/secret-numbers`
 
 ### Bundling Changes
 * Bundler configurations are much more simplified.
@@ -28,7 +28,19 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
     * `ws` to `WsWrapper`
     * Excluding `https-proxy-agent`
 
+### Changed
+* Remove `lodash` as a dependency
+* Remove many polyfills that were only used for testing in the browser
+* Remove `util` from bundle by switching `inspect` to `JSON.stringify`
+
+### Fixed
+* Fixed Wallet.generate() ignoring the `algorithm` parameter (Only a problem once binary-codec fix for `derive_keypair` is added)
+* Fixed Wallet.fromSeed() ignoring the `algorithm` parameter
+
+## 2.11.0 (2023-08-24)
+
 ### Added
+* Add AMM support [XLS-30](https://github.com/XRPLF/XRPL-Standards/discussions/78)
 * Add `walletFromSecretNumbers` to derive a wallet from [XLS-12](https://github.com/XRPLF/XRPL-Standards/issues/15). Currently only works with `secp256k1` keys, but will work with `ED25519` keys as part of 3.0 via [#2376](https://github.com/XRPLF/xrpl.js/pull/2376).
 
 ### Changed
@@ -153,6 +165,9 @@ Wallet.fromMmnemonic()
 * `Wallet.fromMnemonic` now allows lowercase for RFC1751 mnemonics (#2046)
 * `Wallet.fromMnemonic` detects when an invalid encoding is provided, and throws an error
 * Made unexpected errors in `submitAndWait` more verbose to make them easier to debug.
+
+### Added
+* Support for Automated Market Maker (AMM) transactions and requests as defined in XLS-30.
 
 ## 2.3.1 (2022-06-27)
 ### Fixed

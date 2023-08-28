@@ -127,6 +127,10 @@ export interface AccountRootFlagsInterface {
    */
   lsfDepositAuth?: boolean
   /**
+   * This account is an Automated Market Maker (AMM) instance.
+   */
+  lsfAMM?: boolean
+  /**
    * Disallow incoming NFTOffers from other accounts.
    */
   lsfDisallowIncomingNFTokenOffer?: boolean
@@ -186,6 +190,10 @@ export enum AccountRootFlags {
    * (It has DepositAuth enabled.)
    */
   lsfDepositAuth = 0x01000000,
+  /**
+   * This account is an Automated Market Maker (AMM) instance.
+   */
+  lsfAMM = 0x02000000,
   /**
    * Disallow incoming NFTOffers from other accounts.
    */

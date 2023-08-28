@@ -4,7 +4,7 @@
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
-import { Amount, IssuedCurrencyAmount, Memo, Signer } from '../common'
+import { Amount, Currency, IssuedCurrencyAmount, Memo, Signer } from '../common'
 import { onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
@@ -50,6 +50,8 @@ function isSigner(obj: unknown): boolean {
   )
 }
 
+const XRP_CURRENCY_SIZE = 1
+const ISSUE_SIZE = 2
 const ISSUED_CURRENCY_SIZE = 3
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -57,10 +59,27 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 /**
+ * Verify the form and type of an IssuedCurrency at runtime.
+ *
+ * @param input - The input to check the form and type of.
+ * @returns Whether the IssuedCurrency is properly formed.
+ */
+export function isCurrency(input: unknown): input is Currency {
+  return (
+    isRecord(input) &&
+    ((Object.keys(input).length === ISSUE_SIZE &&
+      typeof input.issuer === 'string' &&
+      typeof input.currency === 'string') ||
+      (Object.keys(input).length === XRP_CURRENCY_SIZE &&
+        input.currency === 'XRP'))
+  )
+}
+
+/**
  * Verify the form and type of an IssuedCurrencyAmount at runtime.
  *
  * @param input - The input to check the form and type of.
- * @returns Whether the IssuedCurrencyAmount is malformed.
+ * @returns Whether the IssuedCurrencyAmount is properly formed.
  */
 export function isIssuedCurrency(
   input: unknown,
@@ -78,7 +97,7 @@ export function isIssuedCurrency(
  * Verify the form and type of an Amount at runtime.
  *
  * @param amount - The object to check the form and type of.
- * @returns Whether the Amount is malformed.
+ * @returns Whether the Amount is properly formed.
  */
 export function isAmount(amount: unknown): amount is Amount {
   return typeof amount === 'string' || isIssuedCurrency(amount)

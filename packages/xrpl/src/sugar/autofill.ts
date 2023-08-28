@@ -284,8 +284,10 @@ export async function calculateFeePerTransactionType(
     baseFee = product.dp(0, BigNumber.ROUND_CEIL)
   }
 
-  // AccountDelete Transaction
-  if (tx.TransactionType === 'AccountDelete') {
+  if (
+    tx.TransactionType === 'AccountDelete' ||
+    tx.TransactionType === 'AMMCreate'
+  ) {
     baseFee = await fetchAccountDeleteFee(client)
   }
 
