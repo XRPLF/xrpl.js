@@ -4,6 +4,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Breaking Changes
+
 * Bump typescript to 5.x
 * Remove Node 14 support
 * Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`
@@ -11,7 +12,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
   * Instead of passing various parameters on the `ConnectionsOptions` you know specify the `agent` parameter. This object can use be created by libraries such as `https-proxy-agent` or any that implements the `http.Agent`.
   * This was changed to both support the latest `https-proxy-agent` and to remove the need to include the package in bundlers.   Tests will still be done using `https-proxy-agent` and only tested in a node environment which was the only way it was previously supported anyway
 * Remove `BroadcastClient` which was deprecated
-* Use `@xrplf/secret-numbers`
 
 ### Bundling Changes
 * Bundler configurations are much more simplified.
