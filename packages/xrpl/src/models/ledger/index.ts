@@ -3,6 +3,7 @@ import AccountRoot, {
   AccountRootFlagsInterface,
 } from './AccountRoot'
 import Amendments, { Majority, AMENDMENTS_ID } from './Amendments'
+import AMM from './AMM'
 import Check from './Check'
 import DepositPreauth from './DepositPreauth'
 import DirectoryNode from './DirectoryNode'
@@ -30,6 +31,7 @@ export {
   AccountRootFlagsInterface,
   AMENDMENTS_ID,
   Amendments,
+  AMM,
   Check,
   DepositPreauth,
   DirectoryNode,
