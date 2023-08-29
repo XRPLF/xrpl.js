@@ -70,29 +70,29 @@ async function sendTx() {
 
   // TODO: Give a better error message for if you accidentally use `Asset` as an `AMOUNT` instead of a "Currency"!!! (Very easy to confuse)
 
-  const ammWithdrawResponse = await client.submitAndWait(ammWithdraw, {
-    wallet: wallet1,
-  });
+  // const ammWithdrawResponse = await client.submitAndWait(ammWithdraw, {
+  //   wallet: wallet1,
+  // });
 
-  console.log("ammWithdrawResponse Response:\n", ammWithdrawResponse);
+  // console.log("ammWithdrawResponse Response:\n", ammWithdrawResponse);
 
-  // const ammDelete = {
-  //   Account: wallet1.address,
-  //   TransactionType: "AMMDelete",
-  //   Asset: {
-  //     currency: "XRP",
-  //   },
-  //   Asset2: {
-  //     currency: currencyAmount.currency,
-  //     issuer: currencyAmount.issuer,
-  //   },
-  // };
-  // try {
-  //   const response = await client.submitAndWait(ammDelete, { wallet: wallet1 });
-  //   console.log("AMMDelete Response: ", response);
-  // } catch (error) {
-  //   console.log(JSON.stringify(error), error?.message);
-  // }
+  const ammDelete = {
+    Account: wallet1.address,
+    TransactionType: "AMMDelete",
+    Asset: {
+      currency: "XRP",
+    },
+    Asset2: {
+      currency: currencyAmount.currency,
+      issuer: currencyAmount.issuer,
+    },
+  };
+  try {
+    const response = await client.submitAndWait(ammDelete, { wallet: wallet1 });
+    console.log("AMMDelete Response: ", response);
+  } catch (error) {
+    console.log(JSON.stringify(error), error?.message);
+  }
 
   await client.disconnect();
 }
