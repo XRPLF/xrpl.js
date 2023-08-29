@@ -1,5 +1,13 @@
 import { Amount } from '../common'
 
+import { BaseTransaction } from './common'
+import { NFTokenAcceptOffer } from './NFTokenAcceptOffer'
+import { NFTokenCancelOffer } from './NFTokenCancelOffer'
+import { NFTokenCreateOffer } from './NFTokenCreateOffer'
+import { NFTokenMint } from './NFTokenMint'
+import { Payment } from './payment'
+import type { Transaction } from './transaction'
+
 export interface CreatedNode {
   CreatedNode: {
     LedgerEntryType: string
@@ -59,11 +67,35 @@ export function isDeletedNode(node: Node): node is DeletedNode {
   return Object.prototype.hasOwnProperty.call(node, `DeletedNode`)
 }
 
-export interface TransactionMetadata {
+export type TransactionMetadata<T extends BaseTransaction = Transaction> = {
   AffectedNodes: Node[]
   DeliveredAmount?: Amount
   // "unavailable" possible for transactions before 2014-01-20
   delivered_amount?: Amount | 'unavailable'
   TransactionIndex: number
   TransactionResult: string
-}
+} & (T extends Payment
+  ? {
+      delivered_amount?: Amount | 'unavailable'
+    }
+  : T extends NFTokenMint
+  ? {
+      // rippled 1.11.0 or later
+      nftoken_id?: string
+    }
+  : T extends NFTokenCreateOffer
+  ? {
+      // rippled 1.11.0 or later
+      offer_id?: string
+    }
+  : T extends NFTokenAcceptOffer
+  ? {
+      // rippled 1.11.0 or later
+      nftoken_id?: string
+    }
+  : T extends NFTokenCancelOffer
+  ? {
+      // rippled 1.11.0 or later
+      nftoken_ids?: string[]
+    }
+  : Record<string, never>)
