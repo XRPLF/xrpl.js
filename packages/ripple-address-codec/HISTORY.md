@@ -4,7 +4,8 @@
 ### Breaking Changes
 * Bump typescript to 5.x
 * Remove Node 14 support
-* Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`.
+* Remove `create-hash` in favor of `@noble/hashes`
+* Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`
 
 ## 4.3.0 (2023-06-13)
 ### Added

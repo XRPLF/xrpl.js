@@ -19,10 +19,10 @@
   },
   "references": [
     {
-      "path": "../ripple-address-codec/tsconfig.json"
+      "path": "../isomorphic/tsconfig.json"
     },
     {
-      "path": "../xrpl-crypto/tsconfig.json"
+      "path": "../ripple-address-codec/tsconfig.json"
     }
   ],
   "include": [

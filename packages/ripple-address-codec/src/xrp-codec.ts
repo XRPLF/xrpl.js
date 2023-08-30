@@ -2,7 +2,7 @@
  * Codec class
  */
 
-import { sha256 } from '@xrpl/crypto/sha256'
+import { sha256 } from '@xrplf/isomorphic/sha256'
 import baseCodec = require('base-x')
 import type { BaseConverter } from 'base-x'
 

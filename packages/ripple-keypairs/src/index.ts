@@ -2,11 +2,12 @@ import * as addressCodec from 'ripple-address-codec'
 
 import { secp256k1 as nobleSecp256k1 } from '@noble/curves/secp256k1'
 import { ed25519 as nobleEd25519 } from '@noble/curves/ed25519'
-import { hexToBytes, numberToBytesBE } from '@noble/curves/abstract/utils'
-import { randomBytes } from '@xrpl/crypto/utils'
+import { numberToBytesBE } from '@noble/curves/abstract/utils'
+import { ripemd160 } from '@xrplf/isomorphic/ripemd160'
+import { sha256 } from '@xrplf/isomorphic/sha256'
+import { bytesToHex, hexToBytes, randomBytes } from '@xrplf/isomorphic/utils'
 
 import { accountPublicFromPublicGenerator, derivePrivateKey } from './secp256k1'
-import { bytesToHex, computePublicKeyHash, hexToNumberArray } from './utils'
 import Sha512 from './Sha512'
 import assert from './assert'
 
@@ -149,7 +150,7 @@ function deriveKeypair(
 }
 
 function getAlgorithmFromKey(key: HexString): 'ed25519' | 'ecdsa-secp256k1' {
-  const bytes = hexToNumberArray(key)
+  const bytes = hexToBytes(key)
   return bytes.length === 33 && bytes[0] === 0xed
     ? 'ed25519'
     : 'ecdsa-secp256k1'
@@ -167,6 +168,10 @@ function verify(
 ): boolean {
   const algorithm = getAlgorithmFromKey(publicKey)
   return select(algorithm).verify(hexToBytes(messageHex), signature, publicKey)
+}
+
+function computePublicKeyHash(publicKeyBytes: Uint8Array): Uint8Array {
+  return ripemd160(sha256(publicKeyBytes))
 }
 
 function deriveAddressFromBytes(publicKeyBytes: Uint8Array): string {

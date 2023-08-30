@@ -17,7 +17,7 @@
   },
   "references": [
     {
-      "path": "../xrpl-crypto/tsconfig.json"
+      "path": "../isomorphic/tsconfig.json"
     }
   ],
   "include": [

@@ -7,6 +7,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 * Bump typescript to 5.x
 * Remove Node 14 support
+* Remove `crypto` polyfills, `create-hash`, `elliptic`, `hash.js`, and their many dependencies in favor of `@noble/hashes` and `@nobel/curves`
+* Remove `bip32` and `bip39` in favor of `@scure/bip32` and `@scure/bip39`
 * Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`
 * Configuring a proxy:
   * Instead of passing various parameters on the `ConnectionsOptions` you know specify the `agent` parameter. This object can use be created by libraries such as `https-proxy-agent` or any that implements the `http.Agent`.
@@ -17,7 +19,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Bundler configurations are much more simplified.
   * removed the following polyfills:
     * `assert`
-    * `buffer`
+    * `crypto-browserify`
     * `https-browserify`
     * `os-browserify`
     * `stream-browserify`
@@ -25,12 +27,11 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
     * `url`
     * `util` - previously added automatically by `webpack`
   * Removed mappings for:
-    * `ws` to `WsWrapper`
     * Excluding `https-proxy-agent`
 
 ### Changed
 * Remove `lodash` as a dependency
-* Remove many polyfills that were only used for testing in the browser
+* Remove many polyfills that were only used for testing in the browser like `browserify-fs`
 * Remove `util` from bundle by switching `inspect` to `JSON.stringify`
 
 ### Fixed

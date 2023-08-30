@@ -1,7 +1,7 @@
 import { HDKey } from '@scure/bip32'
 import { mnemonicToSeedSync, validateMnemonic } from '@scure/bip39'
 import { wordlist } from '@scure/bip39/wordlists/english'
-import { bytesToHex } from '@xrpl/crypto/utils'
+import { bytesToHex } from '@xrplf/isomorphic/utils'
 import BigNumber from 'bignumber.js'
 import {
   classicAddressToXAddress,

@@ -4,8 +4,10 @@
 ### Breaking Changes
 * Bump typescript to 5.x
 * Remove Node 14 support
+* Remove `crypto` polyfills, `create-hash`, `elliptic`, `hash.js`, and their many dependencies in favor of `@noble/hashes` and `@nobel/curves`
 * Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`.
 * Fix `deriveKeypair` ignoring manual decoding algorithm. (Specifying algorithm=`ed25519` in `opts` now works on secrets like `sNa1...`)
+* Remove `bytesToHex` and `hexToBytes`.  They can now be found in `@xrplf/isomorphic/utils`
 
 ## 1.3.0 (2023-06-13)
 ### Added
