@@ -62,4 +62,15 @@ module.exports = {
     'multiline-comment-style': 'off',
     '@typescript-eslint/no-require-imports': 'off',
   },
+
+  overrides: [
+    {
+      files: ['test/*.test.ts'],
+      // tests are importing through full module name to test in an isomorphic way
+      rules: {
+        'node/no-extraneous-import': 'off',
+        'import/no-extraneous-dependencies': 'off',
+      },
+    },
+  ],
 }

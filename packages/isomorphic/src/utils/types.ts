@@ -3,7 +3,7 @@
  *
  * @param bytes - {Uint8Array} to covert to hex
  */
-export declare function BytesToHexFn(bytes: Uint8Array): string
+export declare function BytesToHexFn(bytes: Uint8Array | number[]): string
 /**
  * Convert hex to a Uint8Array.
  *

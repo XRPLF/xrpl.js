@@ -8,8 +8,9 @@
     "xrpl"
   ],
   "scripts": {
-    "build": "tsc -b",
-    "test": "jest --verbose false --silent=false ./test/*.test.ts",
+    "build": "tsc --build ./tsconfig.build.json --force",
+    "test": "npm run build && jest --verbose false --silent=false ./test/*.test.ts",
+    "test:browser": "npm run build && karma start ./karma.config.js --single-run",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
     "lint": "eslint . --ext .ts",
     "prepublish": "npm run lint && npm test"
