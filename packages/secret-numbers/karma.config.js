@@ -15,7 +15,7 @@ module.exports = function (config) {
     frameworks: ["jasmine"],
 
     // list of files / patterns to load in the browser
-    files: ["build/xrpl-secret-numbers-latest.js", "test/*.test.ts"],
+    files: ["build/xrplf-secret-numbers-latest.js", "test/*.test.ts"],
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor

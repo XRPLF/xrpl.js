@@ -13,11 +13,6 @@ function webpackForTest(testFileName) {
   const test = merge(require("../webpack.base.config"), {
     mode: "production",
     cache: true,
-    externals: [
-      {
-        net: "null", // net is used in one spot in only the tests
-      },
-    ],
     entry: testFileName,
     output: {
       library: match[1].replace(/-/g, "_"),

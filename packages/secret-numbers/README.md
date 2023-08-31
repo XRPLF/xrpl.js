@@ -1,4 +1,4 @@
-# XRPL Secret Numbers [![npm version](https://badge.fury.io/js/xrpl-secret-numbers.svg)](https://www.npmjs.com/xrpl-secret-numbers)
+# XRPL Secret Numbers [![npm version](https://badge.fury.io/js/@xrplf%2Fsecret-numbers.svg)](https://www.npmjs.com/@xrplf/secret-numbers)
 
 For more background information, please read the [proposed Standard](https://github.com/xrp-community/standards-drafts/issues/15).
 
@@ -29,19 +29,19 @@ For compatibility with existing clients, this library supports exporting the fam
 
 ## API
 
-The JS code to use resides in `./dist/`. See the `./samples/` folder for some simple JS samples.
+The typescript code to use resides in `./src/` and the compiled js in `./dist/` of the package. See the `./samples/` folder for some simple JS samples.
 
 ##### Generating a new account:
 
 ```
-const {Account} = require('xrpl-secret-numbers')
+const {Account} = require('@xrplf/secret-numbers')
 const account = new Account()
 ```
 
 ##### Importing an existing account:
 
 ```
-const {Account} = require('xrpl-secret-numbers')
+const {Account} = require('@xrplf/secret-numbers')
 const secret = '399150 474506 009147 088773 432160 282843 253738 605430'
 const account = new Account(secret)
 ```
@@ -49,7 +49,7 @@ const account = new Account(secret)
 Or importing with custom entropy (buffer, 16):
 
 ```
-const {Account} = require('xrpl-secret-numbers')
+const {Account} = require('@xrplf/secret-numbers')
 const entropy = Buffer.from('0123456789ABCDEF0123456789ABCDEF', 'hex')
 const account = new Account(entropy)
 ```
@@ -76,7 +76,7 @@ console.log(account.getSecret())
 There's a `Utils` export as well:
 
 ```
-const {Account, Utils} = require('xrpl-secret-numbers')
+const {Account, Utils} = require('@xrplf/secret-numbers')
 ```
 
 Some Utils methods (that you may want to use in your UI / ... before using the Account constructor):

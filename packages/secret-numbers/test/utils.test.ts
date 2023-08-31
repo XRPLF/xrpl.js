@@ -22,7 +22,7 @@ describe("Utils", () => {
     expect(utils.checkChecksum(1, 55450, 3)).toBeTruthy();
   });
 
-  it("checkChecksum: 7nd position, split numbers", () => {
+  it("checkChecksum: 7th position, split numbers", () => {
     expect(utils.checkChecksum(6, 18373, 7)).toBeTruthy();
   });
 

@@ -15,7 +15,7 @@ function webpackForTest(testFileName) {
     cache: true,
     externals: [
       {
-        net: 'null', // net is used in one spot in only the tests
+        net: 'null', // net is used in tests to setup mock server
       },
     ],
     entry: testFileName,

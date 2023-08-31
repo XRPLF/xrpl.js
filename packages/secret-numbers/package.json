@@ -34,13 +34,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/WietseWind/xrpl-secret-numbers.git"
+    "url": "git@github.com:XRPLF/xrpl.js.git"
   },
-  "bugs": {
-    "url": "https://github.com/WietseWind/xrpl-secret-numbers/issues"
-  },
-  "homepage": "https://github.com/WietseWind/xrpl-secret-numbers#readme",
-  "license": "MIT",
+  "license": "ISC",
   "readmeFilename": "README.md",
   "keywords": [
     "xrp",
