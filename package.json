@@ -14,7 +14,7 @@
     "update:confirm": "npx npm-check-updates --configFileName .ncurc.json -u"
   },
   "dependencies": {
-    "@xrplf/isomoprhic": "file:packages/isomorphic",
+    "@xrplf/isomorphic": "file:packages/isomorphic",
     "ripple-address-codec": "file:packages/ripple-address-codec",
     "ripple-binary-codec": "file:packages/ripple-binary-codec",
     "ripple-keypairs": "file:packages/ripple-keypairs",
