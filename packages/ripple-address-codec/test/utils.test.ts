@@ -1,4 +1,4 @@
-const {seqEqual, concatArgs} = require('./utils')
+import { seqEqual, concatArgs } from '../src/utils'
 
 test('two sequences are equal', () => {
   expect(seqEqual([1, 2, 3], [1, 2, 3])).toBe(true)
@@ -28,7 +28,9 @@ test('plain numbers are concatenated', () => {
 })
 
 test('a variety of values are concatenated', () => {
-  expect(concatArgs(1, [2, 3], Buffer.from([4,5]), new Uint8Array([6, 7]))).toStrictEqual([1,2,3,4,5,6,7])
+  expect(
+    concatArgs(1, [2, 3], Buffer.from([4, 5]), new Uint8Array([6, 7])),
+  ).toStrictEqual([1, 2, 3, 4, 5, 6, 7])
 })
 
 test('a single value is returned as an array', () => {
