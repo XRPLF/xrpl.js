@@ -1,11 +1,22 @@
-const {
+import {
   classicAddressToXAddress,
   xAddressToClassicAddress,
   isValidXAddress,
   encodeXAddress,
-} = require('./index')
+} from '../src'
 
-const testCases = [
+interface AddressTestCase {
+  // classicAddress
+  [0]: string
+  // tag
+  [1]: false | number
+  // mainnetAddress
+  [2]: string
+  // testnetAddress
+  [3]: string
+}
+
+const testCases: AddressTestCase[] = [
   [
     'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
     false,
@@ -144,10 +155,9 @@ const testCases = [
   const MAX_32_BIT_UNSIGNED_INT = 4294967295
   const network = isTestAddress ? ' (test)' : ' (main)'
 
-  for (const i in testCases) {
-    const testCase = testCases[i]
+  testCases.forEach((testCase) => {
     const classicAddress = testCase[0]
-    const tag = testCase[1] !== false ? testCase[1] : false
+    const tag = testCase[1] === false ? false : testCase[1]
     const xAddress = isTestAddress ? testCase[3] : testCase[2]
     test(`Converts ${classicAddress}${
       tag ? `:${tag}` : ''
@@ -163,7 +173,7 @@ const testCases = [
       })
       expect(isValidXAddress(xAddress)).toBe(true)
     })
-  }
+  })
 
   {
     const classicAddress = 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf'
@@ -196,9 +206,14 @@ const testCases = [
     ]
 
     highAndLowAccounts.forEach((accountId) => {
-      const testCases = [false, 0, 1, MAX_32_BIT_UNSIGNED_INT]
-      testCases.forEach((t) => {
-        const tag = t | false
+      const tagTestCases: Array<false | number> = [
+        false,
+        0,
+        1,
+        MAX_32_BIT_UNSIGNED_INT,
+      ]
+      tagTestCases.forEach((testCase) => {
+        const tag = testCase || false
         const xAddress = encodeXAddress(accountId, tag, isTestAddress)
         test(`Encoding ${accountId.toString('hex')}${
           tag ? `:${tag}` : ''
@@ -253,6 +268,7 @@ test(`isValidXAddress returns false for invalid X-address`, () => {
 
 test(`Converts X7AcgcsBL6XDcUb... to r9cZA1mLK5R5A... and tag: false`, () => {
   const classicAddress = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59'
+  // eslint-disable-next-line @typescript-eslint/naming-convention -- tag can be false or a number
   const tag = false
   const xAddress = 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ'
   const isTestAddress = false

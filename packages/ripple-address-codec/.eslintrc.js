@@ -5,7 +5,7 @@ module.exports = {
   parserOptions: {
     // Enable linting rules with type information from our tsconfig
     tsconfigRootDir: __dirname,
-    project: ['./tsconfig.json'],
+    project: ['./tsconfig.eslint.json'],
 
     sourceType: 'module', // Allow the use of imports / ES modules
 
