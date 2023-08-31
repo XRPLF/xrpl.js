@@ -7,12 +7,13 @@
 * Remove decimal.js and big-integer. Use `BigNumber` from `bignumber.js` instead of `Decimal` and the native `BigInt` instead of `bigInt`.
 * Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`.
 
+
 ## 1.9.0 (2023-08-24)
 
 ### Added
 * Add AMM support [XLS-30](https://github.com/XRPLF/XRPL-Standards/discussions/78)
 * Updated to include latest updates to `definitions.json`.
-* 
+
 ## 1.8.0 (2023-08-07)
 
 ### Added

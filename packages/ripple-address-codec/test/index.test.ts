@@ -5,7 +5,18 @@ import {
   encodeXAddress,
 } from '../src'
 
-const testCases: Array<[string, false | number, string, string]> = [
+interface AddressTestCase {
+  // classicAddress
+  [0]: string
+  // tag
+  [1]: false | number
+  // mainnetAddress
+  [2]: string
+  // testnetAddress
+  [3]: string
+}
+
+const testCases: AddressTestCase[] = [
   [
     'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
     false,
