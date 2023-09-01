@@ -8,6 +8,7 @@ import {
   GlobalFlags,
   validateBaseTransaction,
 } from './common'
+import type { TransactionMetadataBase } from './metadata'
 
 /**
  * Enum representing values for Payment Transaction Flags.
@@ -144,6 +145,11 @@ export interface Payment extends BaseTransaction {
    */
   DeliverMin?: Amount
   Flags?: number | PaymentFlagsInterface
+}
+
+export interface PaymentMetadata extends TransactionMetadataBase {
+  DeliveredAmount?: Amount
+  delivered_amount?: Amount | 'unavailable'
 }
 
 /**
