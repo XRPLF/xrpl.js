@@ -1,7 +1,7 @@
 'use strict'
+const assert = require('assert')
 const path = require('path')
 const webpack = require('webpack')
-const assert = require('assert')
 
 function webpackForTest(testFileName) {
   const match = testFileName.match(/\/?([^\/]*)\.ts$/)
@@ -9,17 +9,12 @@ function webpackForTest(testFileName) {
     assert(false, 'wrong filename:' + testFileName)
   }
 
-  const test = {
+  return merge(require('../webpack.base.config'), {
     mode: 'production',
     cache: true,
-    performance: {
-      hints: false,
-      maxEntrypointSize: 512000,
-      maxAssetSize: 512000,
-    },
     externals: [
       {
-        net: 'null',
+        net: 'null', // net is used in tests to setup mock server
       },
     ],
     entry: testFileName,
@@ -29,10 +24,6 @@ function webpackForTest(testFileName) {
       filename: match[1] + '.js',
     },
     plugins: [
-      new webpack.NormalModuleReplacementPlugin(/^ws$/, './WSWrapper'),
-      new webpack.ProvidePlugin({
-        process: 'process/browser',
-      }),
       new webpack.DefinePlugin({
         'process.stdout': {},
       }),
@@ -40,10 +31,7 @@ function webpackForTest(testFileName) {
     ],
     module: {
       rules: [
-        {
-          test: /jayson/,
-          use: 'null',
-        },
+        // Compile the tests
         {
           test: /\.ts$/,
           use: [
@@ -77,8 +65,7 @@ function webpackForTest(testFileName) {
         buffer: require.resolve('buffer/'),
       },
     },
-  }
-  return test
+  })
 }
 
 module.exports = [(env, argv) => webpackForTest('./test/integration/index.ts')]

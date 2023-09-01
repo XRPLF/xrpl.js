@@ -63,7 +63,7 @@ describe('account_tx', function () {
       assert.equal(response.type, expected.type)
       assert.equal(response.result.account, expected.result.account)
       assert.equal(
-        (response.result.transactions[0].meta as TransactionMetadata)
+        (response.result.transactions[0].meta as TransactionMetadata<Payment>)
           .TransactionResult,
         'tesSUCCESS',
       )

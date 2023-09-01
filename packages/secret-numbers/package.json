@@ -1,0 +1,47 @@
+{
+  "name": "@xrplf/secret-numbers",
+  "version": "1.0.0",
+  "description": "Generate XRPL Accounts with a number-based secret: 8 chunks of 6 digits",
+  "main": "dist/index.js",
+  "unpkg": "build/xrplf-secret-numbers-latest-min.js",
+  "jsdelivr": "build/xrplf-secret-numbers-latest-min.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepublish": "npm run clean && npm run lint && npm run test && npm run test:browser && npm run build",
+    "clean": "rm -rf dist build coverage",
+    "test": "jest --verbose",
+    "test:browser": "npm run build && npm run build:browserTests && karma start ./karma.config.js --single-run",
+    "build": "run-s build:lib build:web",
+    "build:lib": "tsc --build tsconfig.build.json --force",
+    "build:web": "webpack",
+    "build:browserTests": "webpack --config ./test/webpack.config.js",
+    "lint": "eslint . --ext .ts --ext .test.ts --fix",
+    "analyze": "webpack --analyze"
+  },
+  "files": [
+    "build/*",
+    "dist/**/*.js",
+    "dist/**/*.js.map",
+    "dist/**/*.d.ts",
+    "src/*"
+  ],
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "brorand": "^1.1.0",
+    "ripple-keypairs": "^1.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:XRPLF/xrpl.js.git"
+  },
+  "license": "ISC",
+  "readmeFilename": "README.md",
+  "keywords": [
+    "xrp",
+    "xrpl-ledger",
+    "multi sign",
+    "sign"
+  ]
+}
