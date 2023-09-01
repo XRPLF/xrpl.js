@@ -9,6 +9,7 @@ import {
   validateBaseTransaction,
   validateOptionalField,
 } from './common'
+import type { TransactionMetadataBase } from './metadata'
 
 /**
  * Transaction Flags for an NFTokenMint Transaction.
@@ -99,6 +100,11 @@ export interface NFTokenMint extends BaseTransaction {
    */
   URI?: string | null
   Flags?: number | NFTokenMintFlagsInterface
+}
+
+export interface NFTokenMintMetadata extends TransactionMetadataBase {
+  // rippled 1.11.0 or later
+  nftoken_id?: string
 }
 
 /**
