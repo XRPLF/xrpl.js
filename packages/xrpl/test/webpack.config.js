@@ -2,6 +2,7 @@
 const assert = require('assert')
 const path = require('path')
 const webpack = require('webpack')
+const { merge } = require('webpack-merge')
 
 function webpackForTest(testFileName) {
   const match = testFileName.match(/\/?([^\/]*)\.ts$/)
