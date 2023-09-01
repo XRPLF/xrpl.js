@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "pretty": true,
+    "target": "es6",
+    "lib": ["es2019", "dom"],
+    "outDir": "./dist",
+    "declaration": true,
+    "declarationMap": true,
+    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "noUnusedLocals": true,
+    "removeComments": true,
+    "preserveConstEnums": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "preserveSymlinks": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.json"]
+}

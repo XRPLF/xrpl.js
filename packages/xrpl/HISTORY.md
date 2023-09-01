@@ -12,6 +12,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
     * Instead of passing various parameters on the `ConnectionsOptions` you know specify the `agent` parameter. This object can use be created by libraries such as `https-proxy-agent` or any that implements the `http.Agent`.
     * This was changed to both support the latest `https-proxy-agent` and to remove the need to include the package in bundlers.   Tests will still be done using `https-proxy-agent` and only tested in a node environment which was the only way it was previously supported anyway
 * Remove `BroadcastClient` which was deprecated
+* Uses `@xrplf/secret-numbers` instead of `xrpl-secret-numbers`
 
 ### Bundling Changes
 * Bundler configurations are much more simplified.
@@ -206,9 +207,6 @@ Wallet.fromMmnemonic()
 * `Wallet.fromMnemonic` now allows lowercase for RFC1751 mnemonics (#2046)
 * `Wallet.fromMnemonic` detects when an invalid encoding is provided, and throws an error
 * Made unexpected errors in `submitAndWait` more verbose to make them easier to debug.
-
-### Added
-* Support for Automated Market Maker (AMM) transactions and requests as defined in XLS-30.
 
 ## 2.3.1 (2022-06-27)
 ### Fixed
