@@ -31,7 +31,7 @@ function webpackForTest(testFileName) {
     ],
     module: {
       rules: [
-        // Compile compile the tests
+        // Compile the tests
         {
           test: /\.ts$/,
           use: [
