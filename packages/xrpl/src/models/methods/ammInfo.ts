@@ -14,17 +14,17 @@ export interface AMMInfoRequest extends BaseRequest {
   /**
    * The address of the AMM Account to look up.
    */
-  amm_account: string
+  amm_account?: string
 
   /**
    * One of the assets of the AMM pool to look up.
    */
-  asset: Currency
+  asset?: Currency
 
   /**
    * The other asset of the AMM pool.
    */
-  asset2: Currency
+  asset2?: Currency
 }
 
 /**
