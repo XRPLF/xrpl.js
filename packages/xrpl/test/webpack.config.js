@@ -1,16 +1,8 @@
 'use strict'
+const assert = require('assert')
 const path = require('path')
 const webpack = require('webpack')
-const assert = require('assert')
-
-const bnJsReplaces = [
-  'tiny-secp256k1',
-  'asn1.js',
-  'create-ecdh',
-  'miller-rabin',
-  'public-encrypt',
-  'elliptic',
-]
+const { merge } = require('webpack-merge')
 
 function webpackForTest(testFileName) {
   const match = testFileName.match(/\/?([^\/]*)\.ts$/)
@@ -18,17 +10,12 @@ function webpackForTest(testFileName) {
     assert(false, 'wrong filename:' + testFileName)
   }
 
-  const test = {
+  return merge(require('../webpack.base.config'), {
     mode: 'production',
     cache: true,
-    performance: {
-      hints: false,
-      maxEntrypointSize: 512000,
-      maxAssetSize: 512000,
-    },
     externals: [
       {
-        net: 'null',
+        net: 'null', // net is used in tests to setup mock server
       },
     ],
     entry: testFileName,
@@ -38,37 +25,13 @@ function webpackForTest(testFileName) {
       filename: match[1] + '.js',
     },
     plugins: [
-      new webpack.NormalModuleReplacementPlugin(/^ws$/, './WSWrapper'),
-      new webpack.ProvidePlugin({
-        process: 'process/browser',
-      }),
       new webpack.DefinePlugin({
         'process.stdout': {},
-      }),
-      new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
-      new webpack.IgnorePlugin({
-        resourceRegExp: /^\.\/wordlists\/(?!english)/,
-        contextRegExp: /bip39\/src$/,
-      }),
-      // this is a bit of a hack to prevent 'bn.js' from being installed 6 times
-      // TODO: any package that is updated to use bn.js 5.x needs to be removed from `bnJsReplaces` above
-      // https://github.com/webpack/webpack/issues/5593#issuecomment-390356276
-      new webpack.NormalModuleReplacementPlugin(/^bn.js$/, (resource) => {
-        if (
-          bnJsReplaces.some((pkg) =>
-            resource.context.includes(`node_modules/${pkg}`),
-          )
-        ) {
-          resource.request = 'diffie-hellman/node_modules/bn.js'
-        }
       }),
     ],
     module: {
       rules: [
-        {
-          test: /jayson/,
-          use: 'null',
-        },
+        // Compile the tests
         {
           test: /\.ts$/,
           use: [
@@ -93,19 +56,9 @@ function webpackForTest(testFileName) {
       __dirname: true,
     },
     resolve: {
-      alias: {
-        ws: './dist/npm/client/WSWrapper.js',
-      },
       extensions: ['.ts', '.js', '.json'],
-      fallback: {
-        module: false,
-        buffer: require.resolve('buffer/'),
-        stream: require.resolve('stream-browserify'),
-        crypto: require.resolve('crypto-browserify'),
-      },
     },
-  }
-  return test
+  })
 }
 
 module.exports = [(env, argv) => webpackForTest('./test/integration/index.ts')]
