@@ -6,6 +6,7 @@ import {
   parseAmountValue,
   validateBaseTransaction,
 } from './common'
+import type { TransactionMetadataBase } from './metadata'
 
 /**
  *  The NFTokenOfferAccept transaction is used to accept offers
@@ -62,6 +63,11 @@ export interface NFTokenAcceptOffer extends BaseTransaction {
    * both must be for the same NFToken.
    */
   NFTokenBrokerFee?: Amount
+}
+
+export interface NFTokenAcceptOfferMetadata extends TransactionMetadataBase {
+  // rippled 1.11.0 or later
+  nftoken_id?: string
 }
 
 function validateNFTokenBrokerFee(tx: Record<string, unknown>): void {
