@@ -33,6 +33,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Remove `lodash` as a dependency
 * Remove many polyfills that were only used for testing in the browser
 * Remove `util` from bundle by switching `inspect` to `JSON.stringify`
+* Add type for metadata for specific transactions(`Payment`, `NFTokenMint`, `NFTokenCreateOffer`, `NFTokenAcceptOffer`, `NFTokenCancelOffer`)
 
 ### Fixed
 * Fixed Wallet.generate() ignoring the `algorithm` parameter (Only a problem once binary-codec fix for `derive_keypair` is added)
