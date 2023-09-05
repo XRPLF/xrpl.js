@@ -6,10 +6,10 @@
   "include": ["./src/**/*.ts", "./src/**/*.json"],
   "references": [
     {
-      "path": "../isomorphic/tsconfig.json"
+      "path": "../isomorphic/tsconfig.build.json"
     },
     {
-      "path": "../ripple-address-codec/tsconfig.json"
+      "path": "../ripple-address-codec/tsconfig.build.json"
     },
     {
       "path": "../ripple-binary-codec/tsconfig.json"
