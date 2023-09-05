@@ -20,7 +20,7 @@
     "assert": "^2.0.0"
   },
   "scripts": {
-    "build": "tsc -b && copyfiles ./src/enums/definitions.json ./dist/enums/",
+    "build": "tsc -b --force && copyfiles ./src/enums/definitions.json ./dist/enums/",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
     "prepublishOnly": "npm test",
     "test": "npm run build && jest --verbose false --silent=false ./test/*.test.js",
