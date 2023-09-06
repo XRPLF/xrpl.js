@@ -1,6 +1,8 @@
 # ripple-keypairs Release History
 
 ## Unreleased
+
+### Fixed
 * Fix source-maps not finding their designated source
 
 ## 1.3.0 (2023-06-13)

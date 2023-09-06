@@ -7,6 +7,8 @@
 ### Added
 * Add AMM support [XLS-30](https://github.com/XRPLF/XRPL-Standards/discussions/78)
 * Updated to include latest updates to `definitions.json`.
+
+### Fixed
 * Fix source-maps not finding their designated source
 
 ## 1.8.0 (2023-08-07)
