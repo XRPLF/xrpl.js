@@ -28,7 +28,7 @@ function toBytes(hex: string): Buffer {
  * @param hex - Hexadecimal representation of expected decoded data
  */
 // eslint-disable-next-line max-params -- needs them
-function makeEncodeDecodeit(
+function makeEncodeDecodeTest(
   encoder: (val: Buffer) => string,
   decoder: (val: string) => Buffer,
   base58: string,
@@ -44,21 +44,21 @@ function makeEncodeDecodeit(
   })
 }
 
-makeEncodeDecodeit(
+makeEncodeDecodeTest(
   encodeAccountID,
   decodeAccountID,
   'rJrRMgiRgrU6hDF4pgu5DXQdWyPbY35ErN',
   'BA8E78626EE42C41B46D46C3048DF3A1C3C87072',
 )
 
-makeEncodeDecodeit(
+makeEncodeDecodeTest(
   encodeNodePublic,
   decodeNodePublic,
   'n9MXXueo837zYH36DvMc13BwHcqtfAWNJY5czWVbp7uYTj7x17TH',
   '0388E5BA87A000CB807240DF8C848EB0B5FFA5C8E5A521BC8E105C0F0A44217828',
 )
 
-makeEncodeDecodeit(
+makeEncodeDecodeTest(
   encodeAccountPublic,
   decodeAccountPublic,
   'aB44YfzW24VDEJQ2UuLPV2PvqcPCSoLnL7y5M1EzhdW4LnK5xMS3',
