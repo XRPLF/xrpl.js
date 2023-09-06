@@ -1,6 +1,7 @@
 # ripple-address-codec
 
 ## Unreleased
+* Fix source-maps not finding their designated source
 
 ## 4.3.0 (2023-06-13)
 ### Added
