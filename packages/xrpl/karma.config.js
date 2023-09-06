@@ -1,5 +1,5 @@
 const baseKarmaConfig = require('../../karma.config')
-const webpackConfig = require('./test/webpack.config')[0]()
+const webpackConfig = require('./test/webpack.config')
 delete webpackConfig.entry
 
 module.exports = function (config) {

@@ -10,7 +10,7 @@ module.exports = function (config) {
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
       // Use webpack to bundle our test files
-      "test/*.test.ts": ["webpack"],
+      "test/**/*.test.ts": ["webpack"],
     },
 
     browsers: ["ChromeHeadless"],
