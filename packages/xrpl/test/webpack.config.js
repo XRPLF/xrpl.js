@@ -7,7 +7,7 @@ module.exports = merge(
   {
     externals: [
       {
-        net: 'null', // net is used in one spot in only the tests
+        net: 'null', // net is used in tests to setup mock server
       },
     ],
   },
