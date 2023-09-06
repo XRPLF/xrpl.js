@@ -6,6 +6,9 @@
 * Remove Node 14 support
 * Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`.
 
+### Changes
+* Execute test in a browser in addition to node
+
 ## 4.3.0 (2023-06-13)
 ### Added
 * Adds support for npm v9
