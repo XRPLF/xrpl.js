@@ -39,6 +39,12 @@ export default interface AccountRoot extends BaseLedgerEntry {
    */
   AccountTxnID?: string
   /**
+   * The ledger entry ID of the corresponding AMM ledger entry.
+   * Set during account creation; cannot be modified.
+   * If present, indicates that this is a special AMM AccountRoot; always omitted on non-AMM accounts.
+   */
+  AMMID?: string
+  /**
    * A domain associated with this account. In JSON, this is the hexadecimal
    * for the ASCII representation of the domain.
    */
