@@ -20,7 +20,7 @@
   },
   "scripts": {
     "build": "tsc -b && copyfiles ./src/enums/definitions.json ./dist/enums/",
-    "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
+    "clean": "rm -rf ./dist ./coverage tsconfig.tsbuildinfo",
     "prepublishOnly": "npm test",
     "test": "npm run build && jest --verbose false --silent=false ./test/*.test.js",
     "lint": "eslint . --ext .ts --ext .test.js"
