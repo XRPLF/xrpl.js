@@ -55,7 +55,7 @@
     "build:browserTests": "webpack --config ./test/webpack.config.js",
     "analyze": "webpack --analyze",
     "watch": "run-s build:lib --watch",
-    "clean": "rm -rf dist build coverage",
+    "clean": "rm -rf ./dist ./coverage ./test/testCompiledForWeb tsconfig.build.tsbuildinfo",
     "docgen": "tsc --build tsconfig.docs.json && typedoc && echo js.xrpl.org >> ../../docs/CNAME",
     "prepare": "copyfiles ../../README.md xrpl/README.md",
     "prepublish": "run-s clean build",
