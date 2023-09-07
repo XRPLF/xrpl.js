@@ -8,11 +8,11 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prepublish": "npm run clean && npm run lint && npm run test && npm run test:browser && npm run build",
-    "clean": "rm -rf dist build coverage",
+    "clean": "rm -rf ./dist ./coverage ./test/testCompiledForWeb tsconfig.build.tsbuildinfo",
     "test": "jest --verbose",
     "test:browser": "npm run build && npm run build:browserTests && karma start ./karma.config.js --single-run",
     "build": "run-s build:lib build:web",
-    "build:lib": "tsc --build tsconfig.build.json --force",
+    "build:lib": "tsc --build tsconfig.build.json",
     "build:web": "webpack",
     "build:browserTests": "webpack --config ./test/webpack.config.js",
     "lint": "eslint . --ext .ts --ext .test.ts --fix",
