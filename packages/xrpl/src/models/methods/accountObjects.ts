@@ -1,4 +1,5 @@
 import {
+  AMM,
   Check,
   DepositPreauth,
   Escrow,
@@ -12,6 +13,7 @@ import {
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 export type AccountObjectType =
+  | 'amm'
   | 'check'
   | 'deposit_preauth'
   | 'escrow'
@@ -64,6 +66,7 @@ export interface AccountObjectsRequest
  * PayChannel, a SignerList, a Ticket, or a RippleState.
  */
 export type AccountObject =
+  | AMM
   | Check
   | DepositPreauth
   | Escrow
