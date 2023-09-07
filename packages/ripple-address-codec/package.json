@@ -29,7 +29,7 @@
     "build": "tsc --build tsconfig.build.json",
     "test": "jest --verbose false --silent=false ./test/*.test.ts",
     "lint": "eslint . --ext .ts",
-    "clean": "rm -rf ./dist && rm -rf ./coverage && rm -rf tsconfig.tsbuildinfo"
+    "clean": "rm -rf ./dist ./coverage ./test/testCompiledForWeb tsconfig.build.tsbuildinfo"
   },
   "prettier": "@xrplf/prettier-config",
   "engines": {
