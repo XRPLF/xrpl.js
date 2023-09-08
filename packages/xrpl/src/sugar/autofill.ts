@@ -176,8 +176,6 @@ function txNeedsNetworkID(client: Client): boolean {
     client.networkID !== undefined &&
     client.networkID > RESTRICTED_NETWORKS
   ) {
-    // TODO: remove the buildVersion logic when 1.11.0 is out and widely used.
-    // Issue: https://github.com/XRPLF/xrpl.js/issues/2339
     if (
       (client.buildVersion &&
         isNotLaterRippledVersion(
