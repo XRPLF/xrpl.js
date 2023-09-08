@@ -75,4 +75,12 @@ export default interface AMM extends BaseLedgerEntry {
    * type, so this value is always 0.
    */
   Flags: 0
+  /**
+   * This field is missing on AMM but is present on all other account_object returned objects.
+   */
+  PreviousTxnID: never
+  /**
+   * This field is missing on AMM but is present on all other account_object returned objects.
+   */
+  PreviousTxnLgrSeq: never
 }
