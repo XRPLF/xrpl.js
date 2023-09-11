@@ -1,6 +1,6 @@
 /* eslint-disable complexity -- required for validateAMMBid */
 import { ValidationError } from '../../errors'
-import { Amount, AuthAccount, Currency } from '../common'
+import { AuthAccount, Currency, IssuedCurrencyAmount } from '../common'
 
 import {
   BaseTransaction,
@@ -37,14 +37,14 @@ export interface AMMBid extends BaseTransaction {
    * Setting this value higher makes it harder for others to outbid you.
    * If omitted, pay the minimum necessary to win the bid.
    */
-  BidMin?: Amount
+  BidMin?: IssuedCurrencyAmount
 
   /**
    * Pay at most this amount for the slot.
    * If the cost to win the bid is higher than this amount, the transaction fails.
    * If omitted, pay as much as necessary to win the bid.
    */
-  BidMax?: Amount
+  BidMax?: IssuedCurrencyAmount
 
   /**
    * A list of up to 4 additional accounts that you allow to trade at the discounted fee.
