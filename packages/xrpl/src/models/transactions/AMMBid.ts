@@ -33,14 +33,14 @@ export interface AMMBid extends BaseTransaction {
   Asset2: Currency
 
   /**
-   * Pay at least this amount for the slot.
+   * Pay at least this LPToken amount for the slot.
    * Setting this value higher makes it harder for others to outbid you.
    * If omitted, pay the minimum necessary to win the bid.
    */
   BidMin?: IssuedCurrencyAmount
 
   /**
-   * Pay at most this amount for the slot.
+   * Pay at most this LPToken amount for the slot.
    * If the cost to win the bid is higher than this amount, the transaction fails.
    * If omitted, pay as much as necessary to win the bid.
    */

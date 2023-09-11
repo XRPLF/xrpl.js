@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 * Add AMM integration tests
 
+## Fixed
+* Fix request model fields related to AMM
+
 ## 2.11.0 (2023-08-24)
 
 ### Added
