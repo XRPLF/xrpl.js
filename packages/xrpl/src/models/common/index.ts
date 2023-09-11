@@ -145,6 +145,6 @@ export interface NFToken {
 
 export interface AuthAccount {
   AuthAccount: {
-    account: string
+    Account: string
   }
 }

@@ -3,6 +3,9 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 
+## Fixed
+* Fix request model fields related to AMM
+
 ## 2.11.0 (2023-08-24)
 
 ### Added

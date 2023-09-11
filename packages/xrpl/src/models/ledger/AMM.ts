@@ -1,4 +1,4 @@
-import { AuthAccount, Currency } from '../common'
+import { AuthAccount, Currency, IssuedCurrencyAmount } from '../common'
 
 import BaseLedgerEntry from './BaseLedgerEntry'
 
@@ -53,7 +53,7 @@ export default interface AMM extends BaseLedgerEntry {
     /**
      * The amount the auction owner paid to win this slot, in LP Tokens.
      */
-    Price: Currency
+    Price: IssuedCurrencyAmount
   }
   /**
    * The total outstanding balance of liquidity provider tokens from this AMM instance.
