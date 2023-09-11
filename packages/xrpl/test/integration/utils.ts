@@ -194,6 +194,7 @@ export async function verifySubmittedTransaction(
   assert(data.result)
   assert.deepEqual(
     omit(data.result, [
+      // eslint-disable-next-line no-inline-comments -- TODO: Figure out what ctid is?
       'ctid', // TODO: Figure out what ctid is?
       'date',
       'hash',
