@@ -129,6 +129,12 @@ module.exports = {
       },
     },
     {
+      files: ['src/models/**/*.ts'],
+      rules: {
+        complexity: ['warn', 15],
+      },
+    },
+    {
       files: ['.eslintrc.js', 'jest.config.js'],
       rules: {
         // Removed no-commonjs requirement as eslint must be in common js format
