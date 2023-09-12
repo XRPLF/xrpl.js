@@ -28,16 +28,8 @@ describe('EscrowCancel', function () {
   it(`Valid EscrowCancel with string OfferSequence`, function () {
     cancel.OfferSequence = '7'
 
-    assert.throws(
-      () => validateEscrowCancel(cancel),
-      ValidationError,
-      'EscrowCancel: missing Owner',
-    )
-    assert.throws(
-      () => validate(cancel),
-      ValidationError,
-      'EscrowCancel: missing Owner',
-    )
+    assert.doesNotThrow(() => validateEscrowCancel(cancel))
+    assert.doesNotThrow(() => validate(cancel))
   })
 
   it(`Invalid EscrowCancel missing owner`, function () {

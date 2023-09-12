@@ -27,7 +27,7 @@ export interface EscrowCancel extends BaseTransaction {
 export function validateEscrowCancel(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Owner === undefined) {
+  if (tx.Owner == null) {
     throw new ValidationError('EscrowCancel: missing Owner')
   }
 
@@ -35,11 +35,11 @@ export function validateEscrowCancel(tx: Record<string, unknown>): void {
     throw new ValidationError('EscrowCancel: Owner must be a string')
   }
 
-  if (tx.OfferSequence === undefined) {
+  if (tx.OfferSequence == null) {
     throw new ValidationError('EscrowCancel: missing OfferSequence')
   }
 
-  if (isNaN(tx.OfferSequence)) {
+  if (Number.isNaN(tx.OfferSequence)) {
     throw new ValidationError('EscrowCancel: OfferSequence must be a number')
   }
 }
