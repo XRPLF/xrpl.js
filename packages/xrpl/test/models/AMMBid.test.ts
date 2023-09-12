@@ -22,8 +22,16 @@ describe('AMMBid', function () {
         currency: 'ETH',
         issuer: 'rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd',
       },
-      BidMin: '5',
-      BidMax: '10',
+      BidMin: {
+        currency: '039C99CD9AB0B70B32ECDA51EAAE471625608EA2',
+        issuer: 'rE54zDvgnghAoPopCgvtiqWNq3dU5y836S',
+        value: '50',
+      },
+      BidMax: {
+        currency: '039C99CD9AB0B70B32ECDA51EAAE471625608EA2',
+        issuer: 'rE54zDvgnghAoPopCgvtiqWNq3dU5y836S',
+        value: '100',
+      },
       AuthAccounts: [
         {
           AuthAccount: {
