@@ -78,7 +78,7 @@ describe('EscrowCancel', function () {
   })
 
   it(`Invalid OfferSequence`, function () {
-    cancel.OfferSequence = 'ten'
+    cancel.OfferSequence = 'random'
 
     assert.throws(
       () => validateEscrowCancel(cancel),
