@@ -131,7 +131,7 @@ module.exports = {
     {
       files: ['src/models/**/*.ts'],
       rules: {
-        complexity: ['warn', 15],
+        complexity: ['off'],
       },
     },
     {

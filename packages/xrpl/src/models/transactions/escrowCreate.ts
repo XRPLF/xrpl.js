@@ -1,4 +1,3 @@
-/* eslint-disable complexity -- Necessary for validateEscrowCreate */
 import { ValidationError } from '../../errors'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
