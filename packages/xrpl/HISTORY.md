@@ -3,6 +3,9 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
 
+### Added
+* Add support for Concise Transaction Identifier (ctid) as defined in [XLS-37](https://github.com/XRPLF/XRPL-Standards/discussions/91)
+
 ## Fixed
 * Fix request model fields related to AMM
 
