@@ -58,7 +58,7 @@ describe('EscrowFinish', function () {
   })
 
   it(`throws w/ invalid OfferSequence`, function () {
-    escrow.OfferSequence = '10'
+    escrow.OfferSequence = 'ten'
 
     assert.throws(
       () => validateEscrowFinish(escrow),
