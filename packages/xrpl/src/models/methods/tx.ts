@@ -11,7 +11,14 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  */
 export interface TxRequest extends BaseRequest {
   command: 'tx'
-  transaction: string
+  /**
+   * The transaction hash to look up. Exactly one of `transaction` or `ctid` must be specified for a TxRequest.
+   */
+  transaction?: string
+  /**
+   * The Concise Transaction ID to look up. Exactly one of `transaction` or `ctid` must be specified for a TxRequest.
+   */
+  ctid?: string
   /**
    * If true, return transaction data and metadata as binary serialized to
    * hexadecimal strings. If false, return transaction data and metadata as.
