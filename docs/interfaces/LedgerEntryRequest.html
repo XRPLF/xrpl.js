@@ -37,7 +37,7 @@ in its raw format. Expects a response in the form of a <a href="LedgerEntryRespo
 <ul class="tsd-hierarchy">
 <li><span class="target">LedgerEntryRequest</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/ledgerEntry.ts#L21">packages/xrpl/src/models/methods/ledgerEntry.ts:21</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/ledgerEntry.ts#L21">packages/xrpl/src/models/methods/ledgerEntry.ts:21</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -46,6 +46,7 @@ in its raw format. Expects a response in the form of a <a href="LedgerEntryRespo
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Properties</h3>
 <div class="tsd-index-list"><a href="LedgerEntryRequest.html#account_root" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-1024"><rect fill="var(--color-icon-background)" stroke="#FF984D" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M9.354 16V7.24H12.174C12.99 7.24 13.638 7.476 14.118 7.948C14.606 8.412 14.85 9.036 14.85 9.82C14.85 10.604 14.606 11.232 14.118 11.704C13.638 12.168 12.99 12.4 12.174 12.4H10.434V16H9.354ZM10.434 11.428H12.174C12.646 11.428 13.022 11.284 13.302 10.996C13.59 10.7 13.734 10.308 13.734 9.82C13.734 9.324 13.59 8.932 13.302 8.644C13.022 8.356 12.646 8.212 12.174 8.212H10.434V11.428Z" fill="var(--color-text)"></path></g></svg><span>account_<wbr/>root?</span></a>
+<a href="LedgerEntryRequest.html#amm" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>amm?</span></a>
 <a href="LedgerEntryRequest.html#api_version" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>api_<wbr/>version?</span></a>
 <a href="LedgerEntryRequest.html#binary" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>binary?</span></a>
 <a href="LedgerEntryRequest.html#check" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>check?</span></a>
@@ -73,7 +74,33 @@ to the an <a href="AccountInfoRequest.html" class="tsd-kind-interface">AccountIn
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/ledgerEntry.ts#L42">packages/xrpl/src/models/methods/ledgerEntry.ts:42</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/ledgerEntry.ts#L57">packages/xrpl/src/models/methods/ledgerEntry.ts:57</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="amm" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>amm</span><a href="#amm" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">amm</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">asset</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span><br/><span>        </span><span class="tsd-kind-property">currency</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>        </span><span class="tsd-kind-property">issuer</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">asset2</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span><br/><span>        </span><span class="tsd-kind-property">currency</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>        </span><span class="tsd-kind-property">issuer</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
+<div class="tsd-comment tsd-typography"><p>Retrieve an Automated Market Maker (AMM) object from the ledger.
+This is similar to amm_info method, but the ledger_entry version returns only the ledger entry as stored.</p>
+</div>
+<div class="tsd-type-declaration">
+<h4>Type declaration</h4>
+<ul class="tsd-parameters">
+<li class="tsd-parameter">
+<h5><span class="tsd-kind-property">asset</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">currency</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">issuer</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></h5>
+<ul class="tsd-parameters">
+<li class="tsd-parameter">
+<h5><span class="tsd-kind-property">currency</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5></li>
+<li class="tsd-parameter">
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-property">issuer</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span></h5></li></ul></li>
+<li class="tsd-parameter">
+<h5><span class="tsd-kind-property">asset2</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">currency</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">issuer</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></h5>
+<ul class="tsd-parameters">
+<li class="tsd-parameter">
+<h5><span class="tsd-kind-property">currency</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5></li>
+<li class="tsd-parameter">
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-property">issuer</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span></h5></li></ul></li></ul></div>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/ledgerEntry.ts#L27">packages/xrpl/src/models/methods/ledgerEntry.ts:27</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="api_version" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>api_<wbr/>version</span><a href="#api_version" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">api_<wbr/>version</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
@@ -82,7 +109,7 @@ to the an <a href="AccountInfoRequest.html" class="tsd-kind-interface">AccountIn
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from <a href="BaseRequest.html">BaseRequest</a>.<a href="BaseRequest.html#api_version">api_version</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/baseMethod.ts#L16">packages/xrpl/src/models/methods/baseMethod.ts:16</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/baseMethod.ts#L16">packages/xrpl/src/models/methods/baseMethod.ts:16</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="binary" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>binary</span><a href="#binary" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">binary</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
@@ -92,7 +119,7 @@ default is false.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/ledgerEntry.ts#L28">packages/xrpl/src/models/methods/ledgerEntry.ts:28</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/ledgerEntry.ts#L43">packages/xrpl/src/models/methods/ledgerEntry.ts:43</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="check" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>check</span><a href="#check" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">check</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
@@ -100,7 +127,7 @@ default is false.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/ledgerEntry.ts#L45">packages/xrpl/src/models/methods/ledgerEntry.ts:45</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/ledgerEntry.ts#L60">packages/xrpl/src/models/methods/ledgerEntry.ts:60</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="command" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>command</span><a href="#command" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">command</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;ledger_entry&quot;</span></div>
@@ -109,7 +136,7 @@ default is false.</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides <a href="BaseRequest.html">BaseRequest</a>.<a href="BaseRequest.html#command">command</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/ledgerEntry.ts#L22">packages/xrpl/src/models/methods/ledgerEntry.ts:22</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/ledgerEntry.ts#L22">packages/xrpl/src/models/methods/ledgerEntry.ts:22</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="deposit_preauth" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>deposit_<wbr/>preauth</span><a href="#deposit_preauth" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">deposit_<wbr/>preauth</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">authorized</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">owner</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
@@ -132,7 +159,7 @@ requires owner and authorized sub-fields.</p>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/ledgerEntry.ts#L52">packages/xrpl/src/models/methods/ledgerEntry.ts:52</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/ledgerEntry.ts#L67">packages/xrpl/src/models/methods/ledgerEntry.ts:67</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="directory" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>directory</span><a href="#directory" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">directory</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">dir_root</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">owner</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">sub_index</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
@@ -160,7 +187,7 @@ Owner as a sub-field, plus optionally a <code>sub_index</code> sub-field.</p>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/ledgerEntry.ts#L66">packages/xrpl/src/models/methods/ledgerEntry.ts:66</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/ledgerEntry.ts#L81">packages/xrpl/src/models/methods/ledgerEntry.ts:81</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="escrow" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>escrow</span><a href="#escrow" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">escrow</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">owner</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">seq</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
@@ -182,7 +209,7 @@ escrow, as hexadecimal. If an object, requires owner and seq sub-fields.</p>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/ledgerEntry.ts#L81">packages/xrpl/src/models/methods/ledgerEntry.ts:81</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/ledgerEntry.ts#L96">packages/xrpl/src/models/methods/ledgerEntry.ts:96</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="id" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>id</span><a href="#id" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">id</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
@@ -193,12 +220,12 @@ know which request prompted which response.</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from <a href="BaseRequest.html">BaseRequest</a>.<a href="BaseRequest.html#id">id</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/baseMethod.ts#L12">packages/xrpl/src/models/methods/baseMethod.ts:12</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/baseMethod.ts#L12">packages/xrpl/src/models/methods/baseMethod.ts:12</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="index" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>index</span><a href="#index" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">index</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/ledgerEntry.ts#L36">packages/xrpl/src/models/methods/ledgerEntry.ts:36</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/ledgerEntry.ts#L51">packages/xrpl/src/models/methods/ledgerEntry.ts:51</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="ledger_hash" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>ledger_<wbr/>hash</span><a href="#ledger_hash" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">ledger_<wbr/>hash</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
@@ -207,7 +234,7 @@ know which request prompted which response.</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from LookupByLedgerRequest.ledger_hash</p>
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/baseMethod.ts#L21">packages/xrpl/src/models/methods/baseMethod.ts:21</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/baseMethod.ts#L21">packages/xrpl/src/models/methods/baseMethod.ts:21</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="ledger_index" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>ledger_<wbr/>index</span><a href="#ledger_index" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">ledger_<wbr/>index</span><span class="tsd-signature-symbol">?:</span> <a href="../types/LedgerIndex.html" class="tsd-signature-type tsd-kind-type-alias">LedgerIndex</a></div>
@@ -216,7 +243,7 @@ know which request prompted which response.</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from LookupByLedgerRequest.ledger_index</p>
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/baseMethod.ts#L23">packages/xrpl/src/models/methods/baseMethod.ts:23</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/baseMethod.ts#L23">packages/xrpl/src/models/methods/baseMethod.ts:23</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="nft_page" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>nft_<wbr/>page</span><a href="#nft_page" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">nft_<wbr/>page</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
@@ -224,7 +251,7 @@ know which request prompted which response.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/ledgerEntry.ts#L139">packages/xrpl/src/models/methods/ledgerEntry.ts:139</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/ledgerEntry.ts#L154">packages/xrpl/src/models/methods/ledgerEntry.ts:154</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="offer" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>offer</span><a href="#offer" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">offer</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">account</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">seq</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
@@ -247,7 +274,7 @@ to uniquely identify the offer.</p>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/ledgerEntry.ts#L95">packages/xrpl/src/models/methods/ledgerEntry.ts:95</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/ledgerEntry.ts#L110">packages/xrpl/src/models/methods/ledgerEntry.ts:110</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="payment_channel" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>payment_<wbr/>channel</span><a href="#payment_channel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">payment_<wbr/>channel</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
@@ -255,7 +282,7 @@ to uniquely identify the offer.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/ledgerEntry.ts#L105">packages/xrpl/src/models/methods/ledgerEntry.ts:105</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/ledgerEntry.ts#L120">packages/xrpl/src/models/methods/ledgerEntry.ts:120</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="ripple_state" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>ripple_<wbr/>state</span><a href="#ripple_state" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">ripple_<wbr/>state</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">accounts</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">currency</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
@@ -279,7 +306,7 @@ this RippleState object.</p>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/ledgerEntry.ts#L112">packages/xrpl/src/models/methods/ledgerEntry.ts:112</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/ledgerEntry.ts#L127">packages/xrpl/src/models/methods/ledgerEntry.ts:127</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="ticket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>ticket</span><a href="#ticket" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">ticket</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">owner</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">ticket_sequence</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
@@ -302,7 +329,7 @@ sub-fields are required to uniquely specify the Ticket entry.</p>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/7361eb52/packages/xrpl/src/models/methods/ledgerEntry.ts#L127">packages/xrpl/src/models/methods/ledgerEntry.ts:127</a></li></ul></aside></section></section></div>
+<li>Defined in <a href="https://github.com/XRPLF/xrpl.js/blob/49447a9be/packages/xrpl/src/models/methods/ledgerEntry.ts#L142">packages/xrpl/src/models/methods/ledgerEntry.ts:142</a></li></ul></aside></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -323,6 +350,7 @@ sub-fields are required to uniquely specify the Ticket entry.</p>
 <div class="tsd-accordion-details">
 <ul>
 <li><a href="#account_root" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>account_<wbr/>root</span></a></li>
+<li><a href="#amm" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>amm</span></a></li>
 <li><a href="#api_version" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>api_<wbr/>version</span></a></li>
 <li><a href="#binary" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>binary</span></a></li>
 <li><a href="#check" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>check</span></a></li>
@@ -343,7 +371,9 @@ sub-fields are required to uniquely specify the Ticket entry.</p>
 <nav class="tsd-navigation"><a href="../modules.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)"></path></g></svg><span>xrpl</span></a>
 <ul class="tsd-small-nested-navigation">
 <li><a href="../modules/LedgerEntry.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Ledger<wbr/>Entry</span></a></li>
-<li><a href="../enums/AccountSetAsfFlags.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-8"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-enum)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.45 16V7.24H14.49V8.224H10.518V10.936H14.07V11.908H10.518V15.016H14.49V16H9.45Z" fill="var(--color-text)"></path></g></svg><span>Account<wbr/>Set<wbr/>Asf<wbr/>Flags</span></a></li>
+<li><a href="../enums/AMMDepositFlags.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-8"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-enum)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.45 16V7.24H14.49V8.224H10.518V10.936H14.07V11.908H10.518V15.016H14.49V16H9.45Z" fill="var(--color-text)"></path></g></svg><span>AMMDeposit<wbr/>Flags</span></a></li>
+<li><a href="../enums/AMMWithdrawFlags.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg><span>AMMWithdraw<wbr/>Flags</span></a></li>
+<li><a href="../enums/AccountSetAsfFlags.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg><span>Account<wbr/>Set<wbr/>Asf<wbr/>Flags</span></a></li>
 <li><a href="../enums/AccountSetTfFlags.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg><span>Account<wbr/>Set<wbr/>Tf<wbr/>Flags</span></a></li>
 <li><a href="../enums/ECDSA.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg><span>ECDSA</span></a></li>
 <li><a href="../enums/EnableAmendmentFlags.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg><span>Enable<wbr/>Amendment<wbr/>Flags</span></a></li>
@@ -368,7 +398,17 @@ sub-fields are required to uniquely specify the Ticket entry.</p>
 <li><a href="../classes/Wallet.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Wallet</span></a></li>
 <li><a href="../classes/XRPLFaucetError.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>XRPLFaucet<wbr/>Error</span></a></li>
 <li><a href="../classes/XrplError.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Xrpl<wbr/>Error</span></a></li>
-<li><a href="AccountChannelsRequest.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-256"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-interface)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.51 16V15.016H11.298V8.224H9.51V7.24H14.19V8.224H12.402V15.016H14.19V16H9.51Z" fill="var(--color-text)"></path></g></svg><span>Account<wbr/>Channels<wbr/>Request</span></a></li>
+<li><a href="AMMBid.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-256"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-interface)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.51 16V15.016H11.298V8.224H9.51V7.24H14.19V8.224H12.402V15.016H14.19V16H9.51Z" fill="var(--color-text)"></path></g></svg><span>AMMBid</span></a></li>
+<li><a href="AMMCreate.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>AMMCreate</span></a></li>
+<li><a href="AMMDelete.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>AMMDelete</span></a></li>
+<li><a href="AMMDeposit.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>AMMDeposit</span></a></li>
+<li><a href="AMMDepositFlagsInterface.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>AMMDeposit<wbr/>Flags<wbr/>Interface</span></a></li>
+<li><a href="AMMInfoRequest.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>AMMInfo<wbr/>Request</span></a></li>
+<li><a href="AMMInfoResponse.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>AMMInfo<wbr/>Response</span></a></li>
+<li><a href="AMMVote.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>AMMVote</span></a></li>
+<li><a href="AMMWithdraw.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>AMMWithdraw</span></a></li>
+<li><a href="AMMWithdrawFlagsInterface.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>AMMWithdraw<wbr/>Flags<wbr/>Interface</span></a></li>
+<li><a href="AccountChannelsRequest.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Account<wbr/>Channels<wbr/>Request</span></a></li>
 <li><a href="AccountChannelsResponse.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Account<wbr/>Channels<wbr/>Response</span></a></li>
 <li><a href="AccountCurrenciesRequest.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Account<wbr/>Currencies<wbr/>Request</span></a></li>
 <li><a href="AccountCurrenciesResponse.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Account<wbr/>Currencies<wbr/>Response</span></a></li>
@@ -394,6 +434,7 @@ sub-fields are required to uniquely specify the Ticket entry.</p>
 <li><a href="AccountTxRequest.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Account<wbr/>Tx<wbr/>Request</span></a></li>
 <li><a href="AccountTxResponse.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Account<wbr/>Tx<wbr/>Response</span></a></li>
 <li><a href="AccountTxTransaction.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Account<wbr/>Tx<wbr/>Transaction</span></a></li>
+<li><a href="AuthAccount.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Auth<wbr/>Account</span></a></li>
 <li><a href="Balance.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Balance</span></a></li>
 <li><a href="BaseRequest.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Base<wbr/>Request</span></a></li>
 <li><a href="BaseResponse.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Base<wbr/>Response</span></a></li>
@@ -605,6 +646,7 @@ sub-fields are required to uniquely specify the Ticket entry.</p>
 <li><a href="../functions/verifyKeypairSignature.html" class="tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>verify<wbr/>Keypair<wbr/>Signature</span></a></li>
 <li><a href="../functions/verifyPaymentChannelClaim.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>verify<wbr/>Payment<wbr/>Channel<wbr/>Claim</span></a></li>
 <li><a href="../functions/verifySignature.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>verify<wbr/>Signature</span></a></li>
+<li><a href="../functions/walletFromSecretNumbers.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>wallet<wbr/>From<wbr/>Secret<wbr/>Numbers</span></a></li>
 <li><a href="../functions/xAddressToClassicAddress.html" class="tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>x<wbr/>Address<wbr/>To<wbr/>Classic<wbr/>Address</span></a></li>
 <li><a href="../functions/xrpToDrops.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>xrp<wbr/>To<wbr/>Drops</span></a></li></ul></nav></div></div></div>
 <div class="tsd-generator">

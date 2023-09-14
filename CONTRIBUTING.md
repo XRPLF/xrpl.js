@@ -232,9 +232,10 @@ This should almost always be done using the [`xrpl-codec-gen`](https://github.co
 
 1. Run `npm run docgen` if the docs were modified in this release to update them (skip this step for a beta).
 1. Run `npm run build` to triple check the build still works
-1. Run `npx lerna version --no-git-tag-version` - This creates a draft PR and bumps the versions of the packages.
+1. Run `npx lerna version --no-git-tag-version` - This bumps the package versions.
 
    - For each changed package, pick what the new version should be. Lerna will bump the versions, commit version bumps to `main`, and create a new git tag for each published package.
+   - If you do NOT want to update the package number, choose "Custom Version" and set the version to be the same as the existing version. Lerna will not publish any changes in this case.
    - If publishing a beta, make sure that the versions are all of the form `a.b.c-beta.d`, where `a`, `b`, and `c` are identical to the last normal release except for one, which has been incremented by 1.
 
 1. Run `npm i` to update the package-lock with the updated versions.
@@ -260,7 +261,12 @@ This should almost always be done using the [`xrpl-codec-gen`](https://github.co
    1. Click "Choose a tag", and choose a tag that you just created.
    1. Edit the name of the release to match the tag (IE \<package\>@\<version\>) and edit the description as you see fit.
 
-1. Lastly, send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
+1. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
+1. Lastly, send a similar message to the XRPL Discord in the [`javascript` channel](https://discord.com/channels/886050993802985492/886053111179915295). The message should include:
+   1. The version changes for xrpl libraries
+   1. A link to the more detailed changes
+   1. Highlights of important changes
+
 
 # ripple-lib 1.x releases
 

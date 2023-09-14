@@ -3,6 +3,7 @@ import AccountRoot, {
   AccountRootFlagsInterface,
 } from './AccountRoot'
 import Amendments, { Majority, AMENDMENTS_ID } from './Amendments'
+import AMM, { VoteSlot } from './AMM'
 import Bridge from './Bridge'
 import Check from './Check'
 import DepositPreauth from './DepositPreauth'
@@ -33,6 +34,7 @@ export {
   AccountRootFlagsInterface,
   AMENDMENTS_ID,
   Amendments,
+  AMM,
   Bridge,
   Check,
   DepositPreauth,
@@ -61,4 +63,5 @@ export {
   Ticket,
   XChainOwnedClaimID,
   XChainOwnedCreateAccountClaimID,
+  VoteSlot,
 }
