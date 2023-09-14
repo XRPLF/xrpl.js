@@ -2,8 +2,10 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 ## Unreleased
+### Added
+* Support for the XChainBridge amendment.
 
-## Fixed
+### Fixed
 * Fix request model fields related to AMM
 
 ## 2.11.0 (2023-08-24)
@@ -63,9 +65,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## 2.8.0 (2023-06-13)
 
 ### Added
-* Null and undefined values in transactions are now treated as though the field was not passed in.
 * Adds support for npm v9
-* Support for the XChainBridge amendment.
 
 ### Fixed
 * Fixed `ServerState.transitions` typing, it is now a string instead of a number. (Only used in return from `server_state` request)
