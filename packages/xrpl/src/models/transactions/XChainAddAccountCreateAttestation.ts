@@ -203,8 +203,8 @@ export function validateXChainAddAccountCreateAttestation(
   }
 
   if (
-    typeof tx.XChainAccountCreateCount !== 'string' &&
-    typeof tx.XChainAccountCreateCount !== 'number'
+    typeof tx.XChainAccountCreateCount !== 'number' &&
+    typeof tx.XChainAccountCreateCount !== 'string'
   ) {
     throw new ValidationError(
       'XChainAddAccountCreateAttestation: invalid field XChainAccountCreateCount',

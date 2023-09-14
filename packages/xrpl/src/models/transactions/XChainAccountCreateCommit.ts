@@ -52,7 +52,7 @@ export interface XChainAccountCreateCommit extends BaseTransaction {
  * @param tx - A XChainAccountCreateCommit Transaction.
  * @throws When the XChainAccountCreateCommit is malformed.
  */
-// eslint-disable-next-line max-lines-per-function --  okay for this function, there's a lot of things to check
+// eslint-disable-next-line max-lines-per-function -- okay for this function, there's a lot of things to check
 export function validateXChainAccountCreateCommit(
   tx: Record<string, unknown>,
 ): void {
@@ -76,10 +76,7 @@ export function validateXChainAccountCreateCommit(
     )
   }
 
-  if (
-    typeof tx.SignatureReward !== 'number' &&
-    typeof tx.SignatureReward !== 'string'
-  ) {
+  if (!isAmount(tx.SignatureReward)) {
     throw new ValidationError(
       'XChainAccountCreateCommit: invalid field SignatureReward',
     )

@@ -188,8 +188,8 @@ export function validateXChainAddClaimAttestation(
   }
 
   if (
-    typeof tx.XChainClaimID !== 'string' &&
-    typeof tx.XChainClaimID !== 'number'
+    typeof tx.XChainClaimID !== 'number' &&
+    typeof tx.XChainClaimID !== 'string'
   ) {
     throw new ValidationError(
       'XChainAddClaimAttestation: invalid field XChainClaimID',
