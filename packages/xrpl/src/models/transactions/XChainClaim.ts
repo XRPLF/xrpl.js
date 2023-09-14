@@ -55,7 +55,6 @@ export interface XChainClaim extends BaseTransaction {
  * @param tx - A XChainClaim Transaction.
  * @throws When the XChainClaim is malformed.
  */
-// eslint-disable-next-line complexity -- okay for this function, lots of things to check
 export function validateXChainClaim(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 

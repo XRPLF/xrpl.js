@@ -48,7 +48,6 @@ export function parseAccountRootFlags(
  *
  * @param tx - A transaction to set its flags to its numeric representation.
  */
-// eslint-disable-next-line complexity -- there's a lot of txs with flags
 export function setTransactionFlagsToNumber(tx: Transaction): void {
   if (tx.Flags == null) {
     tx.Flags = 0
