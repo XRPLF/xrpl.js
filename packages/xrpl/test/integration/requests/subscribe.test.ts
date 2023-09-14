@@ -158,6 +158,7 @@ describe('subscribe', function () {
         // Explicitly checking that there are only known fields in the return
         const expectedResult = {
           fee_base: ledgerResponse.fee_base,
+          fee_ref: ledgerResponse.fee_ref,
           ledger_hash: ledgerResponse.ledger_hash,
           ledger_index: ledgerResponse.ledger_index,
           ledger_time: ledgerResponse.ledger_time,
