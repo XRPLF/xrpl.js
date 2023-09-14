@@ -1,4 +1,3 @@
-/* eslint-disable complexity -- required for validateAMMDeposit */
 import { ValidationError } from '../../errors'
 import { Amount, Currency, IssuedCurrencyAmount } from '../common'
 

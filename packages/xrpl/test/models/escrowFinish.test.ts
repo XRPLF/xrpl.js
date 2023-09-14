@@ -35,6 +35,13 @@ describe('EscrowFinish', function () {
     assert.doesNotThrow(() => validate(escrow))
   })
 
+  it(`verifies valid EscrowFinish w/string OfferSequence`, function () {
+    escrow.OfferSequence = '7'
+
+    assert.doesNotThrow(() => validateEscrowFinish(escrow))
+    assert.doesNotThrow(() => validate(escrow))
+  })
+
   it(`throws w/ invalid Owner`, function () {
     escrow.Owner = 0x15415253
 
@@ -51,7 +58,7 @@ describe('EscrowFinish', function () {
   })
 
   it(`throws w/ invalid OfferSequence`, function () {
-    escrow.OfferSequence = '10'
+    escrow.OfferSequence = 'random'
 
     assert.throws(
       () => validateEscrowFinish(escrow),

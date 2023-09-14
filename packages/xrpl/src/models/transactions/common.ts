@@ -1,5 +1,4 @@
 /* eslint-disable max-lines-per-function -- Necessary for validateBaseTransaction */
-/* eslint-disable complexity -- Necessary for validateBaseTransaction */
 /* eslint-disable max-statements -- Necessary for validateBaseTransaction */
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
