@@ -39,7 +39,7 @@ describe('XChainAccountCreateCommit', function () {
     assert.doesNotThrow(() => validate(tx))
   })
 
-  it(`throws w/ missing XChainBridge`, function () {
+  it('throws w/ missing XChainBridge', function () {
     delete tx.XChainBridge
 
     assert.throws(
@@ -54,7 +54,7 @@ describe('XChainAccountCreateCommit', function () {
     )
   })
 
-  it(`throws w/ invalid XChainBridge`, function () {
+  it('throws w/ invalid XChainBridge', function () {
     tx.XChainBridge = { XChainDoor: 'test' }
 
     assert.throws(
@@ -69,7 +69,7 @@ describe('XChainAccountCreateCommit', function () {
     )
   })
 
-  it(`throws w/ missing SignatureReward`, function () {
+  it('throws w/ missing SignatureReward', function () {
     delete tx.SignatureReward
 
     assert.throws(
@@ -84,7 +84,7 @@ describe('XChainAccountCreateCommit', function () {
     )
   })
 
-  it(`throws w/ invalid SignatureReward`, function () {
+  it('throws w/ invalid SignatureReward', function () {
     tx.SignatureReward = { currency: 'ETH' }
 
     assert.throws(
@@ -99,7 +99,7 @@ describe('XChainAccountCreateCommit', function () {
     )
   })
 
-  it(`throws w/ missing Destination`, function () {
+  it('throws w/ missing Destination', function () {
     delete tx.Destination
 
     assert.throws(
@@ -114,7 +114,7 @@ describe('XChainAccountCreateCommit', function () {
     )
   })
 
-  it(`throws w/ invalid Destination`, function () {
+  it('throws w/ invalid Destination', function () {
     tx.Destination = 123
 
     assert.throws(
@@ -129,7 +129,7 @@ describe('XChainAccountCreateCommit', function () {
     )
   })
 
-  it(`throws w/ missing Amount`, function () {
+  it('throws w/ missing Amount', function () {
     delete tx.Amount
 
     assert.throws(
@@ -144,7 +144,7 @@ describe('XChainAccountCreateCommit', function () {
     )
   })
 
-  it(`throws w/ invalid Amount`, function () {
+  it('throws w/ invalid Amount', function () {
     tx.Amount = { currency: 'ETH' }
 
     assert.throws(

@@ -25,8 +25,7 @@ describe('XChainAddClaimAttestation', function () {
         'ED7541DEC700470F54276C90C333A13CDBB5D341FD43C60CEA12170F6D6D4E1136',
       Sequence: 9,
       Signature:
-        '7C175050B08000AD35EEB2D87E16CD3F95A0AEEBF2A049474275153D9D4DD445' +
-        '28FE99AA50E71660A15B0B768E1B90E609BBD5DC7AFAFD45D9705D72D40EA10C',
+        '7C175050B08000AD35EEB2D87E16CD3F95A0AEEBF2A049474275153D9D4DD44528FE99AA50E71660A15B0B768E1B90E609BBD5DC7AFAFD45D9705D72D40EA10C',
       TransactionType: 'XChainAddClaimAttestation',
       WasLockingChainSend: 1,
       XChainBridge: {
@@ -48,7 +47,7 @@ describe('XChainAddClaimAttestation', function () {
     assert.doesNotThrow(() => validate(tx))
   })
 
-  it(`throws w/ missing Amount`, function () {
+  it('throws w/ missing Amount', function () {
     delete tx.Amount
 
     assert.throws(
@@ -63,7 +62,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ invalid Amount`, function () {
+  it('throws w/ invalid Amount', function () {
     tx.Amount = { currency: 'ETH' }
 
     assert.throws(
@@ -78,7 +77,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ missing AttestationRewardAccount`, function () {
+  it('throws w/ missing AttestationRewardAccount', function () {
     delete tx.AttestationRewardAccount
 
     assert.throws(
@@ -93,7 +92,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ invalid AttestationRewardAccount`, function () {
+  it('throws w/ invalid AttestationRewardAccount', function () {
     tx.AttestationRewardAccount = 123
 
     assert.throws(
@@ -108,7 +107,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ missing AttestationSignerAccount`, function () {
+  it('throws w/ missing AttestationSignerAccount', function () {
     delete tx.AttestationSignerAccount
 
     assert.throws(
@@ -123,7 +122,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ invalid AttestationSignerAccount`, function () {
+  it('throws w/ invalid AttestationSignerAccount', function () {
     tx.AttestationSignerAccount = 123
 
     assert.throws(
@@ -138,7 +137,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ invalid Destination`, function () {
+  it('throws w/ invalid Destination', function () {
     tx.Destination = 123
 
     assert.throws(
@@ -153,7 +152,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ missing OtherChainSource`, function () {
+  it('throws w/ missing OtherChainSource', function () {
     delete tx.OtherChainSource
 
     assert.throws(
@@ -168,7 +167,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ invalid OtherChainSource`, function () {
+  it('throws w/ invalid OtherChainSource', function () {
     tx.OtherChainSource = 123
 
     assert.throws(
@@ -183,7 +182,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ missing PublicKey`, function () {
+  it('throws w/ missing PublicKey', function () {
     delete tx.PublicKey
 
     assert.throws(
@@ -198,7 +197,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ invalid PublicKey`, function () {
+  it('throws w/ invalid PublicKey', function () {
     tx.PublicKey = 123
 
     assert.throws(
@@ -213,7 +212,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ missing Signature`, function () {
+  it('throws w/ missing Signature', function () {
     delete tx.Signature
 
     assert.throws(
@@ -228,7 +227,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ invalid Signature`, function () {
+  it('throws w/ invalid Signature', function () {
     tx.Signature = 123
 
     assert.throws(
@@ -243,7 +242,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ missing WasLockingChainSend`, function () {
+  it('throws w/ missing WasLockingChainSend', function () {
     delete tx.WasLockingChainSend
 
     assert.throws(
@@ -258,7 +257,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ invalid WasLockingChainSend`, function () {
+  it('throws w/ invalid WasLockingChainSend', function () {
     tx.WasLockingChainSend = 2
 
     assert.throws(
@@ -273,7 +272,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ missing XChainBridge`, function () {
+  it('throws w/ missing XChainBridge', function () {
     delete tx.XChainBridge
 
     assert.throws(
@@ -288,7 +287,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ invalid XChainBridge`, function () {
+  it('throws w/ invalid XChainBridge', function () {
     tx.XChainBridge = { XChainDoor: 'test' }
 
     assert.throws(
@@ -303,7 +302,7 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ missing XChainClaimID`, function () {
+  it('throws w/ missing XChainClaimID', function () {
     delete tx.XChainClaimID
 
     assert.throws(
@@ -318,8 +317,8 @@ describe('XChainAddClaimAttestation', function () {
     )
   })
 
-  it(`throws w/ invalid XChainClaimID`, function () {
-    tx.XChainClaimID = ['123']
+  it('throws w/ invalid XChainClaimID', function () {
+    tx.XChainClaimID = { currency: 'ETH' }
 
     assert.throws(
       () => validateXChainAddClaimAttestation(tx),

@@ -38,7 +38,7 @@ describe('XChainModifyBridge', function () {
     assert.doesNotThrow(() => validate(tx))
   })
 
-  it(`throws w/ missing XChainBridge`, function () {
+  it('throws w/ missing XChainBridge', function () {
     delete tx.XChainBridge
 
     assert.throws(
@@ -53,7 +53,7 @@ describe('XChainModifyBridge', function () {
     )
   })
 
-  it(`throws w/ invalid XChainBridge`, function () {
+  it('throws w/ invalid XChainBridge', function () {
     tx.XChainBridge = { XChainDoor: 'test' }
 
     assert.throws(
@@ -68,7 +68,7 @@ describe('XChainModifyBridge', function () {
     )
   })
 
-  it(`throws w/ invalid SignatureReward`, function () {
+  it('throws w/ invalid SignatureReward', function () {
     tx.SignatureReward = { currency: 'ETH' }
 
     assert.throws(
@@ -83,7 +83,7 @@ describe('XChainModifyBridge', function () {
     )
   })
 
-  it(`throws w/ invalid MinAccountCreateAmount`, function () {
+  it('throws w/ invalid MinAccountCreateAmount', function () {
     tx.MinAccountCreateAmount = { currency: 'ETH' }
 
     assert.throws(

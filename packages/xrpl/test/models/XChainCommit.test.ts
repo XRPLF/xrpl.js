@@ -38,7 +38,7 @@ describe('XChainCommit', function () {
     assert.doesNotThrow(() => validate(tx))
   })
 
-  it(`throws w/ missing XChainBridge`, function () {
+  it('throws w/ missing XChainBridge', function () {
     delete tx.XChainBridge
 
     assert.throws(
@@ -53,7 +53,7 @@ describe('XChainCommit', function () {
     )
   })
 
-  it(`throws w/ invalid XChainBridge`, function () {
+  it('throws w/ invalid XChainBridge', function () {
     tx.XChainBridge = { XChainDoor: 'test' }
 
     assert.throws(
@@ -68,7 +68,7 @@ describe('XChainCommit', function () {
     )
   })
 
-  it(`throws w/ missing XChainClaimID`, function () {
+  it('throws w/ missing XChainClaimID', function () {
     delete tx.XChainClaimID
 
     assert.throws(
@@ -83,7 +83,7 @@ describe('XChainCommit', function () {
     )
   })
 
-  it(`throws w/ invalid XChainClaimID`, function () {
+  it('throws w/ invalid XChainClaimID', function () {
     tx.XChainClaimID = { currency: 'ETH' }
 
     assert.throws(
@@ -98,7 +98,7 @@ describe('XChainCommit', function () {
     )
   })
 
-  it(`throws w/ invalid OtherChainDestination`, function () {
+  it('throws w/ invalid OtherChainDestination', function () {
     tx.OtherChainDestination = 123
 
     assert.throws(
@@ -113,7 +113,7 @@ describe('XChainCommit', function () {
     )
   })
 
-  it(`throws w/ missing Amount`, function () {
+  it('throws w/ missing Amount', function () {
     delete tx.Amount
 
     assert.throws(
@@ -128,7 +128,7 @@ describe('XChainCommit', function () {
     )
   })
 
-  it(`throws w/ invalid Amount`, function () {
+  it('throws w/ invalid Amount', function () {
     tx.Amount = { currency: 'ETH' }
 
     assert.throws(
