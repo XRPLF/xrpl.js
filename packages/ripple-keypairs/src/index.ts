@@ -180,7 +180,7 @@ function getAlgorithmFromKey(key: HexString): 'ed25519' | 'ecdsa-secp256k1' {
   if (len === 33 && tag === 0xed) {
     return 'ed25519'
   }
-  if (len === 33 && (tag === 0x02 || tag === 0x03 || tag === 0x00)) {
+  if (len === 33 && (tag === 0x00 || tag === 0x02 || tag === 0x03)) {
     return 'ecdsa-secp256k1'
   }
   if (len === 65 && tag === 0x04) {
