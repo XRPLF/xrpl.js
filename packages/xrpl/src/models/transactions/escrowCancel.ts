@@ -15,7 +15,7 @@ export interface EscrowCancel extends BaseTransaction {
    * Transaction sequence (or Ticket  number) of EscrowCreate transaction that.
    * created the escrow to cancel.
    */
-  OfferSequence: number
+  OfferSequence: number | string
 }
 
 /**
@@ -27,7 +27,7 @@ export interface EscrowCancel extends BaseTransaction {
 export function validateEscrowCancel(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Owner === undefined) {
+  if (tx.Owner == null) {
     throw new ValidationError('EscrowCancel: missing Owner')
   }
 
@@ -35,11 +35,15 @@ export function validateEscrowCancel(tx: Record<string, unknown>): void {
     throw new ValidationError('EscrowCancel: Owner must be a string')
   }
 
-  if (tx.OfferSequence === undefined) {
+  if (tx.OfferSequence == null) {
     throw new ValidationError('EscrowCancel: missing OfferSequence')
   }
 
-  if (typeof tx.OfferSequence !== 'number') {
+  if (
+    (typeof tx.OfferSequence !== 'number' &&
+      typeof tx.OfferSequence !== 'string') ||
+    Number.isNaN(Number(tx.OfferSequence))
+  ) {
     throw new ValidationError('EscrowCancel: OfferSequence must be a number')
   }
 }

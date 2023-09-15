@@ -1,5 +1,3 @@
-/* eslint-disable complexity -- Necessary for validateAccountSet */
-
 import { isValidClassicAddress } from 'ripple-address-codec'
 
 import { ValidationError } from '../../errors'
