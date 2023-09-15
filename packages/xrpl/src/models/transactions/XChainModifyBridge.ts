@@ -60,9 +60,9 @@ export interface XChainModifyBridge extends BaseTransaction {
 }
 
 /**
- * Verify the form and type of a XChainModifyBridge at runtime.
+ * Verify the form and type of an XChainModifyBridge at runtime.
  *
- * @param tx - A XChainModifyBridge Transaction.
+ * @param tx - An XChainModifyBridge Transaction.
  * @throws When the XChainModifyBridge is malformed.
  */
 export function validateXChainModifyBridge(tx: Record<string, unknown>): void {

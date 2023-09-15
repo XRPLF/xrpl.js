@@ -1,3 +1,5 @@
+import { Amount } from 'ripple-binary-codec/dist/types'
+
 import { XChainBridge } from '../common'
 
 import BaseLedgerEntry from './BaseLedgerEntry'
@@ -35,14 +37,28 @@ export default interface XChainOwnedClaimID extends BaseLedgerEntry {
    */
   OtherChainSource: string
 
-  // TODO: type this better
   /**
    * Attestations collected from the witness servers. This includes the parameters
    * needed to recreate the message that was signed, including the amount, which
    * chain (locking or issuing), optional destination, and reward account for that
    * signature.
    */
-  XChainClaimAttestations: object[]
+  XChainClaimAttestations: Array<{
+    // TODO: add docs
+    XChainClaimProofSig: {
+      Amount: Amount
+
+      AttestationRewardAccount: string
+
+      AttestationSignerAccount: string
+
+      Destination?: string
+
+      PublicKey: string
+
+      WasLockingChainSend: 0 | 1
+    }
+  }>
 
   /**
    * The total amount to pay the witness servers for their signatures. It must be at

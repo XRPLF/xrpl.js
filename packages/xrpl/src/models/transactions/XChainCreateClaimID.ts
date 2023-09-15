@@ -36,9 +36,9 @@ export interface XChainCreateClaimID extends BaseTransaction {
 }
 
 /**
- * Verify the form and type of a XChainCreateClaimID at runtime.
+ * Verify the form and type of an XChainCreateClaimID at runtime.
  *
- * @param tx - A XChainCreateClaimID Transaction.
+ * @param tx - An XChainCreateClaimID Transaction.
  * @throws When the XChainCreateClaimID is malformed.
  */
 export function validateXChainCreateClaimID(tx: Record<string, unknown>): void {

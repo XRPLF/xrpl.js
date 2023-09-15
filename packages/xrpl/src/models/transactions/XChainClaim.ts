@@ -50,9 +50,9 @@ export interface XChainClaim extends BaseTransaction {
 }
 
 /**
- * Verify the form and type of a XChainClaim at runtime.
+ * Verify the form and type of an XChainClaim at runtime.
  *
- * @param tx - A XChainClaim Transaction.
+ * @param tx - An XChainClaim Transaction.
  * @throws When the XChainClaim is malformed.
  */
 export function validateXChainClaim(tx: Record<string, unknown>): void {

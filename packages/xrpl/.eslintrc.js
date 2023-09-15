@@ -147,5 +147,17 @@ module.exports = {
         'import/no-unused-modules': 'off',
       },
     },
+    {
+      files: ['tools/*.ts', 'tools/*.js'],
+      rules: {
+        'no-console': ['off'],
+        'node/no-process-exit': ['off'],
+        '@typescript-eslint/no-magic-numbers': ['off'],
+        'max-lines-per-function': ['off'],
+        'max-statements': ['off'],
+        complexity: ['off'],
+        'max-depth': ['warn', 3],
+      },
+    },
   ],
 }

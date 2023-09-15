@@ -46,7 +46,9 @@ async function bridgeTransfer(): Promise<void> {
   const bridge: XChainBridge = bridgeData.XChainBridge
   console.log(bridge)
 
+  console.log('Creating wallet on the locking chain via the faucet...')
   const { wallet: wallet1 } = await lockingClient.fundWallet()
+  console.log(wallet1)
   const wallet2 = Wallet.generate()
 
   console.log(
@@ -68,7 +70,9 @@ async function bridgeTransfer(): Promise<void> {
   })
   console.log(fundResponse)
 
-  // wait for the attestation to go through
+  console.log(
+    'Waiting for the attestation to go through... (usually 8-12 seconds)',
+  )
   let ledgersWaited = 0
   let initialBalance = '0'
   while (ledgersWaited < MAX_LEDGERS_WAITED) {
@@ -83,6 +87,7 @@ async function bridgeTransfer(): Promise<void> {
       ledgersWaited += 1
       // eslint-disable-next-line max-depth -- needed here
       if (ledgersWaited === MAX_LEDGERS_WAITED) {
+        // This error should never be hit if the bridge is running
         throw Error('Destination account creation via the bridge failed.')
       }
     }
@@ -106,7 +111,7 @@ async function bridgeTransfer(): Promise<void> {
     wallet: wallet2,
   })
 
-  // extract new claim ID from metadata
+  // Extract new claim ID from metadata
   const nodes = (claimIdResult.result.meta as TransactionMetadata).AffectedNodes
   const createdNodes = nodes.filter((node) =>
     Object.keys(node).includes('CreatedNode'),
@@ -123,9 +128,9 @@ async function bridgeTransfer(): Promise<void> {
 
   console.log(`Claim ID for the transfer: ${xchainClaimId}`)
 
-  // XChainCommit
-  console.log('Step 2: Locking the funds on the locking chain...')
-
+  console.log(
+    'Step 2: Locking the funds on the locking chain with an XChainCommit transaction...',
+  )
   const commitTx: XChainCommit = {
     TransactionType: 'XChainCommit',
     Account: wallet1.classicAddress,
@@ -139,7 +144,9 @@ async function bridgeTransfer(): Promise<void> {
   })
   console.log(commitResult)
 
-  // wait for the attestations to go through
+  console.log(
+    'Waiting for the attestation to go through... (usually 8-12 seconds)',
+  )
   ledgersWaited = 0
   while (ledgersWaited < MAX_LEDGERS_WAITED) {
     await sleep(LEDGER_CLOSE_TIME)

@@ -77,9 +77,9 @@ export interface XChainAddAccountCreateAttestation extends BaseTransaction {
 }
 
 /**
- * Verify the form and type of a XChainAddAccountCreateAttestation at runtime.
+ * Verify the form and type of an XChainAddAccountCreateAttestation at runtime.
  *
- * @param tx - A XChainAddAccountCreateAttestation Transaction.
+ * @param tx - An XChainAddAccountCreateAttestation Transaction.
  * @throws When the XChainAddAccountCreateAttestation is malformed.
  */
 // eslint-disable-next-line max-lines-per-function, max-statements -- okay for this function, lots of things to check

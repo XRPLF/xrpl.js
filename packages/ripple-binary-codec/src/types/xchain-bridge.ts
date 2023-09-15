@@ -57,8 +57,8 @@ class XChainBridge extends SerializedType {
   /**
    * Construct a cross-chain bridge from a JSON
    *
-   * @param value XChainBridge or JSON to parse into a XChainBridge
-   * @returns A XChainBridge object
+   * @param value XChainBridge or JSON to parse into an XChainBridge
+   * @returns An XChainBridge object
    */
   static from<T extends XChainBridge | XChainBridgeObject>(
     value: T,
@@ -80,14 +80,14 @@ class XChainBridge extends SerializedType {
       return new XChainBridge(Buffer.concat(bytes))
     }
 
-    throw new Error('Invalid type to construct a XChainBridge')
+    throw new Error('Invalid type to construct an XChainBridge')
   }
 
   /**
-   * Read a XChainBridge from a BinaryParser
+   * Read an XChainBridge from a BinaryParser
    *
    * @param parser BinaryParser to read the XChainBridge from
-   * @returns A XChainBridge object
+   * @returns An XChainBridge object
    */
   static fromParser(parser: BinaryParser): XChainBridge {
     const bytes: Array<Buffer> = []

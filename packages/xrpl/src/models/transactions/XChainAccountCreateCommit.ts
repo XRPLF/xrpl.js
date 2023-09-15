@@ -47,9 +47,9 @@ export interface XChainAccountCreateCommit extends BaseTransaction {
 }
 
 /**
- * Verify the form and type of a XChainAccountCreateCommit at runtime.
+ * Verify the form and type of an XChainAccountCreateCommit at runtime.
  *
- * @param tx - A XChainAccountCreateCommit Transaction.
+ * @param tx - An XChainAccountCreateCommit Transaction.
  * @throws When the XChainAccountCreateCommit is malformed.
  */
 // eslint-disable-next-line max-lines-per-function -- okay for this function, there's a lot of things to check

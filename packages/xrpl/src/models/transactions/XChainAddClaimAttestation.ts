@@ -72,9 +72,9 @@ export interface XChainAddClaimAttestation extends BaseTransaction {
 }
 
 /**
- * Verify the form and type of a XChainAddClaimAttestation at runtime.
+ * Verify the form and type of an XChainAddClaimAttestation at runtime.
  *
- * @param tx - A XChainAddClaimAttestation Transaction.
+ * @param tx - An XChainAddClaimAttestation Transaction.
  * @throws When the XChainAddClaimAttestation is malformed.
  */
 // eslint-disable-next-line max-lines-per-function, max-statements -- okay for this function, lots of things to check

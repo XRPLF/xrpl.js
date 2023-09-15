@@ -27,7 +27,6 @@ export default interface XChainOwnedCreateAccountClaimID
    */
   XChainAccountCreateCount: number
 
-  // TODO: type this better
   /**
    * Attestations collected from the witness servers. This includes the parameters
    * needed to recreate the message that was signed, including the amount, destination,
@@ -35,7 +34,22 @@ export default interface XChainOwnedCreateAccountClaimID
    * exception of the reward account, all signatures must sign the message created with
    * common parameters.
    */
-  XChainCreateAccountAttestations: object[]
+  XChainCreateAccountAttestations: Array<{
+    // TODO: add docs
+    XChainCreateAccountProofSig: {
+      Amount: string
+
+      AttestationRewardAccount: string
+
+      AttestationSignerAccount: string
+
+      Destination: string
+
+      PublicKey: string
+
+      WasLockingChainSend: 0 | 1
+    }
+  }>
 
   /**
    * A bit-map of boolean flags. No flags are defined for,

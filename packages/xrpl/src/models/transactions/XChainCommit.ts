@@ -49,9 +49,9 @@ export interface XChainCommit extends BaseTransaction {
 }
 
 /**
- * Verify the form and type of a XChainCommit at runtime.
+ * Verify the form and type of an XChainCommit at runtime.
  *
- * @param tx - A XChainCommit Transaction.
+ * @param tx - An XChainCommit Transaction.
  * @throws When the XChainCommit is malformed.
  */
 export function validateXChainCommit(tx: Record<string, unknown>): void {
