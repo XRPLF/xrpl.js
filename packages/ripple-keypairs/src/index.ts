@@ -174,18 +174,19 @@ function getAlgorithmFromKey(key: HexString): 'ed25519' | 'ecdsa-secp256k1' {
   const tag = bytes[0]
   const len = bytes.length
 
-  switch (true) {
-    case len === 32:
-      return 'ecdsa-secp256k1'
-    case len === 33 && tag === 0xed:
-      return 'ed25519'
-    case len === 33 && (tag === 0x02 || tag === 0x03 || tag === 0x00):
-      return 'ecdsa-secp256k1'
-    case len === 65 && tag === 0x04:
-      return 'ecdsa-secp256k1'
-    default:
-      throw new Error('invalid key format')
+  if (len === 32) {
+    return 'ecdsa-secp256k1'
   }
+  if (len === 33 && tag === 0xed) {
+    return 'ed25519'
+  }
+  if (len === 33 && (tag === 0x02 || tag === 0x03 || tag === 0x00)) {
+    return 'ecdsa-secp256k1'
+  }
+  if (len === 65 && tag === 0x04) {
+    return 'ecdsa-secp256k1'
+  }
+  throw new Error('invalid key format')
 }
 
 function sign(messageHex: HexString, privateKey: HexString): string {
