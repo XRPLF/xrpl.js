@@ -4,7 +4,10 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
-## Fixed
+### Added
+* Added `ports` field to `ServerInfoResponse`
+
+### Fixed
 * Fix request model fields related to AMM
 * Fixed `EscrowCancel` and `EscrowFinish` validation
 
