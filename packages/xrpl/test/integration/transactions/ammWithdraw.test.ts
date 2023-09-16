@@ -64,7 +64,6 @@ describe('AMMWithdraw', function () {
         Flags: AMMDepositFlags.tfSingleAsset,
       }
 
-      // @ts-expect-error: ammDepositTx is valid
       await testTransaction(testContext.client, ammDepositTx, wallet3)
 
       const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
@@ -95,7 +94,6 @@ describe('AMMWithdraw', function () {
         Flags: AMMWithdrawFlags.tfSingleAsset,
       }
 
-      // @ts-expect-error: ammWithdrawTx is valid
       await testTransaction(testContext.client, ammWithdrawTx, wallet3)
 
       const ammInfoRes: AMMInfoResponse = await testContext.client.request({
@@ -147,7 +145,6 @@ describe('AMMWithdraw', function () {
         Flags: AMMDepositFlags.tfTwoAsset,
       }
 
-      // @ts-expect-error: ammDepositTx is valid
       await testTransaction(testContext.client, ammDepositTx, wallet2)
 
       const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
@@ -187,7 +184,6 @@ describe('AMMWithdraw', function () {
         Flags: AMMWithdrawFlags.tfTwoAsset,
       }
 
-      // @ts-expect-error: ammWithdrawTx is valid
       await testTransaction(testContext.client, ammWithdrawTx, wallet2)
 
       const ammInfoRes: AMMInfoResponse = await testContext.client.request({
@@ -266,7 +262,6 @@ describe('AMMWithdraw', function () {
       Flags: AMMWithdrawFlags.tfOneAssetLPToken,
     }
 
-    // @ts-expect-error: ammWithdrawTx is valid
     await testTransaction(testContext.client, ammWithdrawTx, wallet)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
@@ -321,7 +316,6 @@ describe('AMMWithdraw', function () {
       Flags: AMMDepositFlags.tfLPToken,
     }
 
-    // @ts-expect-error: ammDepositTx is valid
     await testTransaction(testContext.client, ammDepositTx, wallet2)
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
@@ -357,7 +351,6 @@ describe('AMMWithdraw', function () {
       Flags: AMMWithdrawFlags.tfLPToken,
     }
 
-    // @ts-expect-error: ammWithdrawTx is valid
     await testTransaction(testContext.client, ammWithdrawTx, wallet2)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({

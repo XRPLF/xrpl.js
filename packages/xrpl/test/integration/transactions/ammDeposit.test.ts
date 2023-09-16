@@ -71,7 +71,6 @@ describe('AMMDeposit', function () {
         Flags: AMMDepositFlags.tfSingleAsset,
       }
 
-      // @ts-expect-error: ammDepositTx is valid
       await testTransaction(testContext.client, ammDepositTx, wallet3)
 
       const ammInfoRes: AMMInfoResponse = await testContext.client.request({
@@ -136,7 +135,6 @@ describe('AMMDeposit', function () {
         Flags: AMMDepositFlags.tfTwoAsset,
       }
 
-      // @ts-expect-error: ammDepositTx is valid
       await testTransaction(testContext.client, ammDepositTx, wallet2)
 
       const ammInfoRes: AMMInfoResponse = await testContext.client.request({
@@ -210,7 +208,6 @@ describe('AMMDeposit', function () {
       Flags: AMMDepositFlags.tfOneAssetLPToken,
     }
 
-    // @ts-expect-error: ammDepositTx is valid
     await testTransaction(testContext.client, ammDepositTx, wallet2)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
@@ -283,7 +280,6 @@ describe('AMMDeposit', function () {
       Flags: AMMDepositFlags.tfLPToken,
     }
 
-    // @ts-expect-error: ammDepositTx is valid
     await testTransaction(testContext.client, ammDepositTx, wallet2)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({

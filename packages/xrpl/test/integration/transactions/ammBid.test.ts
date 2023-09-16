@@ -57,7 +57,6 @@ describe('AMMBid', function () {
         Flags: AMMDepositFlags.tfSingleAsset,
       }
 
-      // @ts-expect-error: ammDepositTx is valid
       await testTransaction(testContext.client, ammDepositTx, wallet3)
 
       const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
@@ -89,7 +88,6 @@ describe('AMMBid', function () {
         },
       }
 
-      // @ts-expect-error: ammBidTx is valid
       await testTransaction(testContext.client, ammBidTx, wallet3)
 
       const ammInfoRes: AMMInfoResponse = await testContext.client.request({
@@ -132,7 +130,6 @@ describe('AMMBid', function () {
         Flags: AMMDepositFlags.tfSingleAsset,
       }
 
-      // @ts-expect-error: ammDepositTx is valid
       await testTransaction(testContext.client, ammDepositTx, wallet3)
 
       const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
@@ -165,7 +162,6 @@ describe('AMMBid', function () {
         AuthAccounts: [
           {
             AuthAccount: {
-              // @ts-expect-error: wallet3 is valid
               Account: wallet.classicAddress,
             },
           },
@@ -174,7 +170,6 @@ describe('AMMBid', function () {
         BidMax: { ...lptoken, value: '10' },
       }
 
-      // @ts-expect-error: ammBidTx is valid
       await testTransaction(testContext.client, ammBidTx, wallet3)
 
       const ammInfoRes: AMMInfoResponse = await testContext.client.request({

@@ -48,7 +48,6 @@ describe('AMMVote', function () {
         Flags: AMMDepositFlags.tfSingleAsset,
       }
 
-      // @ts-expect-error: ammDepositTx is valid
       await testTransaction(testContext.client, ammDepositTx, wallet3)
 
       const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
@@ -89,7 +88,6 @@ describe('AMMVote', function () {
         TradingFee: 150,
       }
 
-      // @ts-expect-error: ammVoteTx is valid
       await testTransaction(testContext.client, ammVoteTx, wallet3)
 
       const ammInfoRes: AMMInfoResponse = await testContext.client.request({
