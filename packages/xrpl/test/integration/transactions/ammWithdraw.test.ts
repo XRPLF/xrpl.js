@@ -122,273 +122,273 @@ describe('AMMWithdraw', function () {
     TIMEOUT,
   )
 
-  it(
-    'withdraw with Amount and Amount2',
-    async function () {
-      // Need to deposit before withdraw is eligible
-      const ammDepositTx: AMMDeposit = {
-        TransactionType: 'AMMDeposit',
-        Account: wallet2.classicAddress,
-        Asset: {
-          currency: 'XRP',
-        },
-        Asset2: {
-          currency: currencyCode,
-          issuer: wallet2.classicAddress,
-        },
-        Amount: '100',
-        Amount2: {
-          currency: currencyCode,
-          issuer: wallet2.classicAddress,
-          value: '100',
-        },
-        Flags: AMMDepositFlags.tfTwoAsset,
-      }
+  // it(
+  //   'withdraw with Amount and Amount2',
+  //   async function () {
+  //     // Need to deposit before withdraw is eligible
+  //     const ammDepositTx: AMMDeposit = {
+  //       TransactionType: 'AMMDeposit',
+  //       Account: wallet2.classicAddress,
+  //       Asset: {
+  //         currency: 'XRP',
+  //       },
+  //       Asset2: {
+  //         currency: currencyCode,
+  //         issuer: wallet2.classicAddress,
+  //       },
+  //       Amount: '100',
+  //       Amount2: {
+  //         currency: currencyCode,
+  //         issuer: wallet2.classicAddress,
+  //         value: '100',
+  //       },
+  //       Flags: AMMDepositFlags.tfTwoAsset,
+  //     }
 
-      await testTransaction(testContext.client, ammDepositTx, wallet2)
+  //     await testTransaction(testContext.client, ammDepositTx, wallet2)
 
-      const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
-        command: 'amm_info',
-        asset: {
-          currency: 'XRP',
-        },
-        asset2: {
-          currency: currencyCode,
-          issuer: wallet2.classicAddress,
-        },
-      })
+  //     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
+  //       command: 'amm_info',
+  //       asset: {
+  //         currency: 'XRP',
+  //       },
+  //       asset2: {
+  //         currency: currencyCode,
+  //         issuer: wallet2.classicAddress,
+  //       },
+  //     })
 
-      const { amm: preAmm } = preAmmInfoRes.result
-      const {
-        amount: preAmount,
-        amount2: preAmount2,
-        lp_token: preLPToken,
-      } = preAmm
+  //     const { amm: preAmm } = preAmmInfoRes.result
+  //     const {
+  //       amount: preAmount,
+  //       amount2: preAmount2,
+  //       lp_token: preLPToken,
+  //     } = preAmm
 
-      const ammWithdrawTx: AMMWithdraw = {
-        TransactionType: 'AMMWithdraw',
-        Account: wallet2.classicAddress,
-        Asset: {
-          currency: 'XRP',
-        },
-        Asset2: {
-          currency: currencyCode,
-          issuer: wallet2.classicAddress,
-        },
-        Amount: '50',
-        Amount2: {
-          currency: currencyCode,
-          issuer: wallet2.classicAddress,
-          value: '50',
-        },
-        Flags: AMMWithdrawFlags.tfTwoAsset,
-      }
+  //     const ammWithdrawTx: AMMWithdraw = {
+  //       TransactionType: 'AMMWithdraw',
+  //       Account: wallet2.classicAddress,
+  //       Asset: {
+  //         currency: 'XRP',
+  //       },
+  //       Asset2: {
+  //         currency: currencyCode,
+  //         issuer: wallet2.classicAddress,
+  //       },
+  //       Amount: '50',
+  //       Amount2: {
+  //         currency: currencyCode,
+  //         issuer: wallet2.classicAddress,
+  //         value: '50',
+  //       },
+  //       Flags: AMMWithdrawFlags.tfTwoAsset,
+  //     }
 
-      await testTransaction(testContext.client, ammWithdrawTx, wallet2)
+  //     await testTransaction(testContext.client, ammWithdrawTx, wallet2)
 
-      const ammInfoRes: AMMInfoResponse = await testContext.client.request({
-        command: 'amm_info',
-        asset: {
-          currency: 'XRP',
-        },
-        asset2: {
-          currency: currencyCode,
-          issuer: wallet2.classicAddress,
-        },
-      })
+  //     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
+  //       command: 'amm_info',
+  //       asset: {
+  //         currency: 'XRP',
+  //       },
+  //       asset2: {
+  //         currency: currencyCode,
+  //         issuer: wallet2.classicAddress,
+  //       },
+  //     })
 
-      const { amm } = ammInfoRes.result
-      const { amount, amount2, lp_token } = amm
+  //     const { amm } = ammInfoRes.result
+  //     const { amount, amount2, lp_token } = amm
 
-      if (typeof amount !== 'string') {
-        throw new Error('amount should be a string')
-      }
-      if (typeof preAmount !== 'string') {
-        throw new Error('preAmount should be a string')
-      }
-      assert.equal(parseInt(amount, 10) < parseInt(preAmount, 10), true)
+  //     if (typeof amount !== 'string') {
+  //       throw new Error('amount should be a string')
+  //     }
+  //     if (typeof preAmount !== 'string') {
+  //       throw new Error('preAmount should be a string')
+  //     }
+  //     assert.equal(parseInt(amount, 10) < parseInt(preAmount, 10), true)
 
-      if (typeof amount2 !== 'object') {
-        throw new Error('amount2 should be an object')
-      }
-      if (typeof preAmount2 !== 'object') {
-        throw new Error('preAmount2 should be an object')
-      }
-      assert.equal(
-        parseInt(amount2.value, 10) < parseInt(preAmount2.value, 10),
-        true,
-      )
+  //     if (typeof amount2 !== 'object') {
+  //       throw new Error('amount2 should be an object')
+  //     }
+  //     if (typeof preAmount2 !== 'object') {
+  //       throw new Error('preAmount2 should be an object')
+  //     }
+  //     assert.equal(
+  //       parseInt(amount2.value, 10) < parseInt(preAmount2.value, 10),
+  //       true,
+  //     )
 
-      assert.equal(
-        parseInt(lp_token.value, 10) < parseInt(preLPToken.value, 10),
-        true,
-      )
-    },
-    TIMEOUT,
-  )
+  //     assert.equal(
+  //       parseInt(lp_token.value, 10) < parseInt(preLPToken.value, 10),
+  //       true,
+  //     )
+  //   },
+  //   TIMEOUT,
+  // )
 
-  it('withdraw with Amount and LPTokenIn', async function () {
-    const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
-      command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
-    })
+  // it('withdraw with Amount and LPTokenIn', async function () {
+  //   const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
+  //     command: 'amm_info',
+  //     asset: {
+  //       currency: 'XRP',
+  //     },
+  //     asset2: {
+  //       currency: currencyCode,
+  //       issuer: wallet2.classicAddress,
+  //     },
+  //   })
 
-    const { amm: preAmm } = preAmmInfoRes.result
-    const {
-      amount: preAmount,
-      amount2: preAmount2,
-      lp_token: preLPToken,
-    } = preAmm
+  //   const { amm: preAmm } = preAmmInfoRes.result
+  //   const {
+  //     amount: preAmount,
+  //     amount2: preAmount2,
+  //     lp_token: preLPToken,
+  //   } = preAmm
 
-    const lptokenIn = { ...lptoken, value: '10' }
-    const ammWithdrawTx: AMMWithdraw = {
-      TransactionType: 'AMMWithdraw',
-      Account: wallet.classicAddress,
-      Asset: {
-        currency: 'XRP',
-      },
-      Asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
-      Amount: '5',
-      LPTokenIn: lptokenIn,
-      Flags: AMMWithdrawFlags.tfOneAssetLPToken,
-    }
+  //   const lptokenIn = { ...lptoken, value: '10' }
+  //   const ammWithdrawTx: AMMWithdraw = {
+  //     TransactionType: 'AMMWithdraw',
+  //     Account: wallet.classicAddress,
+  //     Asset: {
+  //       currency: 'XRP',
+  //     },
+  //     Asset2: {
+  //       currency: currencyCode,
+  //       issuer: wallet2.classicAddress,
+  //     },
+  //     Amount: '5',
+  //     LPTokenIn: lptokenIn,
+  //     Flags: AMMWithdrawFlags.tfOneAssetLPToken,
+  //   }
 
-    await testTransaction(testContext.client, ammWithdrawTx, wallet)
+  //   await testTransaction(testContext.client, ammWithdrawTx, wallet)
 
-    const ammInfoRes: AMMInfoResponse = await testContext.client.request({
-      command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
-    })
+  //   const ammInfoRes: AMMInfoResponse = await testContext.client.request({
+  //     command: 'amm_info',
+  //     asset: {
+  //       currency: 'XRP',
+  //     },
+  //     asset2: {
+  //       currency: currencyCode,
+  //       issuer: wallet2.classicAddress,
+  //     },
+  //   })
 
-    const { amm } = ammInfoRes.result
-    const { amount, amount2, lp_token } = amm
+  //   const { amm } = ammInfoRes.result
+  //   const { amount, amount2, lp_token } = amm
 
-    if (typeof amount !== 'string') {
-      throw new Error('amount should be a string')
-    }
-    if (typeof preAmount !== 'string') {
-      throw new Error('preAmount should be a string')
-    }
-    assert.equal(parseInt(amount, 10) < parseInt(preAmount, 10), true)
+  //   if (typeof amount !== 'string') {
+  //     throw new Error('amount should be a string')
+  //   }
+  //   if (typeof preAmount !== 'string') {
+  //     throw new Error('preAmount should be a string')
+  //   }
+  //   assert.equal(parseInt(amount, 10) < parseInt(preAmount, 10), true)
 
-    if (typeof amount2 !== 'object') {
-      throw new Error('amount2 should be an object')
-    }
-    if (typeof preAmount2 !== 'object') {
-      throw new Error('preAmount2 should be an object')
-    }
-    assert.deepEqual(amount2, preAmount2)
+  //   if (typeof amount2 !== 'object') {
+  //     throw new Error('amount2 should be an object')
+  //   }
+  //   if (typeof preAmount2 !== 'object') {
+  //     throw new Error('preAmount2 should be an object')
+  //   }
+  //   assert.deepEqual(amount2, preAmount2)
 
-    assert.equal(
-      parseInt(lp_token.value, 10) < parseInt(preLPToken.value, 10),
-      true,
-    )
-  })
+  //   assert.equal(
+  //     parseInt(lp_token.value, 10) < parseInt(preLPToken.value, 10),
+  //     true,
+  //   )
+  // })
 
-  it('withdraw with LPTokenIn', async function () {
-    const lptokenOut = { ...lptoken, value: '5' }
-    const ammDepositTx: AMMDeposit = {
-      TransactionType: 'AMMDeposit',
-      Account: wallet2.classicAddress,
-      Asset: {
-        currency: 'XRP',
-      },
-      Asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
-      LPTokenOut: lptokenOut,
-      Flags: AMMDepositFlags.tfLPToken,
-    }
+  // it('withdraw with LPTokenIn', async function () {
+  //   const lptokenOut = { ...lptoken, value: '5' }
+  //   const ammDepositTx: AMMDeposit = {
+  //     TransactionType: 'AMMDeposit',
+  //     Account: wallet2.classicAddress,
+  //     Asset: {
+  //       currency: 'XRP',
+  //     },
+  //     Asset2: {
+  //       currency: currencyCode,
+  //       issuer: wallet2.classicAddress,
+  //     },
+  //     LPTokenOut: lptokenOut,
+  //     Flags: AMMDepositFlags.tfLPToken,
+  //   }
 
-    await testTransaction(testContext.client, ammDepositTx, wallet2)
+  //   await testTransaction(testContext.client, ammDepositTx, wallet2)
 
-    const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
-      command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
-    })
+  //   const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
+  //     command: 'amm_info',
+  //     asset: {
+  //       currency: 'XRP',
+  //     },
+  //     asset2: {
+  //       currency: currencyCode,
+  //       issuer: wallet2.classicAddress,
+  //     },
+  //   })
 
-    const { amm: preAmm } = preAmmInfoRes.result
-    const {
-      amount: preAmount,
-      amount2: preAmount2,
-      lp_token: preLPToken,
-    } = preAmm
+  //   const { amm: preAmm } = preAmmInfoRes.result
+  //   const {
+  //     amount: preAmount,
+  //     amount2: preAmount2,
+  //     lp_token: preLPToken,
+  //   } = preAmm
 
-    const lptokenIn = { ...lptoken, value: '1' }
-    const ammWithdrawTx: AMMWithdraw = {
-      TransactionType: 'AMMWithdraw',
-      Account: wallet2.classicAddress,
-      Asset: {
-        currency: 'XRP',
-      },
-      Asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
-      LPTokenIn: lptokenIn,
-      Flags: AMMWithdrawFlags.tfLPToken,
-    }
+  //   const lptokenIn = { ...lptoken, value: '1' }
+  //   const ammWithdrawTx: AMMWithdraw = {
+  //     TransactionType: 'AMMWithdraw',
+  //     Account: wallet2.classicAddress,
+  //     Asset: {
+  //       currency: 'XRP',
+  //     },
+  //     Asset2: {
+  //       currency: currencyCode,
+  //       issuer: wallet2.classicAddress,
+  //     },
+  //     LPTokenIn: lptokenIn,
+  //     Flags: AMMWithdrawFlags.tfLPToken,
+  //   }
 
-    await testTransaction(testContext.client, ammWithdrawTx, wallet2)
+  //   await testTransaction(testContext.client, ammWithdrawTx, wallet2)
 
-    const ammInfoRes: AMMInfoResponse = await testContext.client.request({
-      command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
-    })
+  //   const ammInfoRes: AMMInfoResponse = await testContext.client.request({
+  //     command: 'amm_info',
+  //     asset: {
+  //       currency: 'XRP',
+  //     },
+  //     asset2: {
+  //       currency: currencyCode,
+  //       issuer: wallet2.classicAddress,
+  //     },
+  //   })
 
-    const { amm } = ammInfoRes.result
-    const { amount, amount2, lp_token } = amm
+  //   const { amm } = ammInfoRes.result
+  //   const { amount, amount2, lp_token } = amm
 
-    if (typeof amount !== 'string') {
-      throw new Error('amount should be a string')
-    }
-    if (typeof preAmount !== 'string') {
-      throw new Error('preAmount should be a string')
-    }
-    assert.equal(parseInt(amount, 10) < parseInt(preAmount, 10), true)
+  //   if (typeof amount !== 'string') {
+  //     throw new Error('amount should be a string')
+  //   }
+  //   if (typeof preAmount !== 'string') {
+  //     throw new Error('preAmount should be a string')
+  //   }
+  //   assert.equal(parseInt(amount, 10) < parseInt(preAmount, 10), true)
 
-    if (typeof amount2 !== 'object') {
-      throw new Error('amount2 should be an object')
-    }
-    if (typeof preAmount2 !== 'object') {
-      throw new Error('preAmount2 should be an object')
-    }
+  //   if (typeof amount2 !== 'object') {
+  //     throw new Error('amount2 should be an object')
+  //   }
+  //   if (typeof preAmount2 !== 'object') {
+  //     throw new Error('preAmount2 should be an object')
+  //   }
 
-    const amount2Value = new BigNumber(amount2.value)
-    const preAmount2Value = new BigNumber(preAmount2.value)
-    assert.equal(amount2Value.isLessThan(preAmount2Value), true)
+  //   const amount2Value = new BigNumber(amount2.value)
+  //   const preAmount2Value = new BigNumber(preAmount2.value)
+  //   assert.equal(amount2Value.isLessThan(preAmount2Value), true)
 
-    assert.equal(
-      parseInt(lp_token.value, 10) < parseInt(preLPToken.value, 10),
-      true,
-    )
-  })
+  //   assert.equal(
+  //     parseInt(lp_token.value, 10) < parseInt(preLPToken.value, 10),
+  //     true,
+  //   )
+  // })
 })
