@@ -33,15 +33,16 @@ describe('AMMWithdraw', function () {
     wallet3 = await generateFundedWallet(testContext.client)
     currencyCode = 'USD'
 
-    const ammInfoRes = await setupAMMPool(
-      testContext.client,
-      wallet,
-      wallet2,
-      currencyCode,
-    )
+    await setupAMMPool(testContext.client, wallet, wallet2, currencyCode)
+    // const ammInfoRes = await setupAMMPool(
+    //   testContext.client,
+    //   wallet,
+    //   wallet2,
+    //   currencyCode,
+    // )
 
-    const { amm } = ammInfoRes.result
-    lptoken = amm.lp_token
+    // const { amm } = ammInfoRes.result
+    // lptoken = amm.lp_token
   })
   afterAll(async () => teardownClient(testContext))
 
