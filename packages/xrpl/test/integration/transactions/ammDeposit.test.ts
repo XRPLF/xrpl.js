@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { AMMDeposit, AMMDepositFlags, IssuedCurrencyAmount } from 'xrpl'
+import { AMMDeposit, AMMDepositFlags } from 'xrpl'
 
 import { AMMInfoResponse, Wallet } from '../../../src'
 import serverUrl from '../serverUrl'
@@ -19,7 +19,7 @@ describe('AMMDeposit', function () {
   let wallet2: Wallet
   let wallet3: Wallet
   let currencyCode: string
-  let lptoken: IssuedCurrencyAmount
+  // let lptoken: IssuedCurrencyAmount
 
   beforeAll(async () => {
     testContext = await setupClient(serverUrl)
@@ -28,15 +28,16 @@ describe('AMMDeposit', function () {
     wallet3 = await generateFundedWallet(testContext.client)
     currencyCode = 'USD'
 
-    const ammInfoRes = await setupAMMPool(
-      testContext.client,
-      wallet,
-      wallet2,
-      currencyCode,
-    )
+    await setupAMMPool(testContext.client, wallet, wallet2, currencyCode)
+    // const ammInfoRes = await setupAMMPool(
+    //   testContext.client,
+    //   wallet,
+    //   wallet2,
+    //   currencyCode,
+    // )
 
-    const { amm } = ammInfoRes.result
-    lptoken = amm.lp_token
+    // const { amm } = ammInfoRes.result
+    // lptoken = amm.lp_token
   })
   afterAll(async () => teardownClient(testContext))
 

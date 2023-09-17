@@ -1,11 +1,9 @@
-import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import {
   AMMDeposit,
   AMMDepositFlags,
   AMMWithdraw,
   AMMWithdrawFlags,
-  IssuedCurrencyAmount,
 } from 'xrpl'
 
 import { AMMInfoResponse, Wallet } from '../../../src'
@@ -26,7 +24,7 @@ describe('AMMWithdraw', function () {
   let wallet2: Wallet
   let wallet3: Wallet
   let currencyCode: string
-  let lptoken: IssuedCurrencyAmount
+  // let lptoken: IssuedCurrencyAmount
 
   beforeAll(async () => {
     testContext = await setupClient(serverUrl)
