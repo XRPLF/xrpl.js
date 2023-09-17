@@ -47,7 +47,7 @@ npm run lint
 
 ## Running Tests
 
-For integration and browser tests, we use a `rippled` node in standalone mode to test xrpl.js code against. To set this up, you can either configure and run `rippled` locally, or set up the Docker container `xrpllabsofficial/1.12.0-b1` by [following these instructions](#integration-tests). The latter will require you to [install Docker](https://docs.docker.com/get-docker/).
+For integration and browser tests, we use a `rippled` node in standalone mode to test xrpl.js code against. To set this up, you can either configure and run `rippled` locally, or set up the Docker container `xrpllabsofficial/xrpld:1.12.0-b1` by [following these instructions](#integration-tests). The latter will require you to [install Docker](https://docs.docker.com/get-docker/).
 
 ### Unit Tests
 
@@ -64,7 +64,7 @@ From the top-level xrpl.js folder (one level above `packages`), run the followin
 ```bash
 npm install
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/config/ xrpllabsofficial/1.12.0-b1 -a --start
+docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/config/ xrpllabsofficial/xrpld:1.12.0-b1 -a --start
 npm run build
 npm run test:integration
 ```
