@@ -1,11 +1,16 @@
 # xrpl.js (ripple-lib) Release History
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
+
 ## Unreleased
 * Add AMM integration tests
 
-## Fixed
+### Added
+* Added `ports` field to `ServerInfoResponse`
+
+### Fixed
 * Fix request model fields related to AMM
+* Fixed `EscrowCancel` and `EscrowFinish` validation
 
 ## 2.11.0 (2023-08-24)
 

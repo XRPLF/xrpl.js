@@ -56,6 +56,20 @@ describe('server_info (rippled)', function () {
             peer_disconnects: '0',
             peer_disconnects_resources: '0',
             peers: 0,
+            ports: [
+              {
+                port: '5005',
+                protocol: ['http'],
+              },
+              {
+                port: '80',
+                protocol: ['ws'],
+              },
+              {
+                port: '6006',
+                protocol: ['ws'],
+              },
+            ],
             pubkey_node: 'n9K6DaaReKkCjb9sEfXh5xP3BV9JisrJ9biKB3CSSFXancBnv5cW',
             pubkey_validator: 'none',
             server_state: 'full',
@@ -111,7 +125,6 @@ describe('server_info (rippled)', function () {
         'build_version',
         'node_size',
         'initial_sync_duration_us',
-        'ports',
       ]
       assert.deepEqual(
         omit(response.result.info, removeKeys),

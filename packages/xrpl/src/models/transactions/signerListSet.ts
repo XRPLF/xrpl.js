@@ -36,7 +36,6 @@ const HEX_WALLET_LOCATOR_REGEX = /^[0-9A-Fa-f]{64}$/u
  * @param tx - An SignerListSet Transaction.
  * @throws When the SignerListSet is Malformed.
  */
-// eslint-disable-next-line complexity -- validation can be complex
 export function validateSignerListSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 

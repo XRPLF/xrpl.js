@@ -1,4 +1,3 @@
-/* eslint-disable complexity -- required for validateAMMWithdraw */
 import { ValidationError } from '../../errors'
 import { Amount, Currency, IssuedCurrencyAmount } from '../common'
 
