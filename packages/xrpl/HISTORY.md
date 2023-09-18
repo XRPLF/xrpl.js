@@ -4,6 +4,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 ### Added
+* Added `ports` field to `ServerInfoResponse`
 * Support for the XChainBridge amendment.
 
 ### Fixed
