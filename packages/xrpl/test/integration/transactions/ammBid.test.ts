@@ -10,9 +10,6 @@ import {
 } from '../setup'
 import { generateFundedWallet, setupAMMPool, testTransaction } from '../utils'
 
-// how long before each test case times out
-const TIMEOUT = 20000
-
 describe('AMMBid', function () {
   let testContext: XrplIntegrationTestContext
   let wallet: Wallet
@@ -40,163 +37,155 @@ describe('AMMBid', function () {
   })
   afterAll(async () => teardownClient(testContext))
 
-  it(
-    'bid',
-    async function () {
-      const ammDepositTx: AMMDeposit = {
-        TransactionType: 'AMMDeposit',
-        Account: wallet3.classicAddress,
-        Asset: {
-          currency: 'XRP',
-        },
-        Asset2: {
-          currency: currencyCode,
-          issuer: wallet2.classicAddress,
-        },
-        Amount: '1000',
-        Flags: AMMDepositFlags.tfSingleAsset,
-      }
+  it('bid', async function () {
+    const ammDepositTx: AMMDeposit = {
+      TransactionType: 'AMMDeposit',
+      Account: wallet3.classicAddress,
+      Asset: {
+        currency: 'XRP',
+      },
+      Asset2: {
+        currency: currencyCode,
+        issuer: wallet2.classicAddress,
+      },
+      Amount: '1000',
+      Flags: AMMDepositFlags.tfSingleAsset,
+    }
 
-      await testTransaction(testContext.client, ammDepositTx, wallet3)
+    await testTransaction(testContext.client, ammDepositTx, wallet3)
 
-      const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
-        command: 'amm_info',
-        asset: {
-          currency: 'XRP',
-        },
-        asset2: {
-          currency: currencyCode,
-          issuer: wallet2.classicAddress,
-        },
-      })
+    const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
+      command: 'amm_info',
+      asset: {
+        currency: 'XRP',
+      },
+      asset2: {
+        currency: currencyCode,
+        issuer: wallet2.classicAddress,
+      },
+    })
 
-      const { amm: preAmm } = preAmmInfoRes.result
-      const { auction_slot: preAuctionSlot, lp_token: preLPToken } = preAmm
-      if (preAuctionSlot === undefined) {
-        throw new Error('preAuctionSlot should not be undefined')
-      }
+    const { amm: preAmm } = preAmmInfoRes.result
+    const { auction_slot: preAuctionSlot, lp_token: preLPToken } = preAmm
+    if (preAuctionSlot === undefined) {
+      throw new Error('preAuctionSlot should not be undefined')
+    }
 
-      const ammBidTx: AMMBid = {
-        TransactionType: 'AMMBid',
-        Account: wallet3.classicAddress,
-        Asset: {
-          currency: 'XRP',
-        },
-        Asset2: {
-          currency: currencyCode,
-          issuer: wallet2.classicAddress,
-        },
-      }
+    const ammBidTx: AMMBid = {
+      TransactionType: 'AMMBid',
+      Account: wallet3.classicAddress,
+      Asset: {
+        currency: 'XRP',
+      },
+      Asset2: {
+        currency: currencyCode,
+        issuer: wallet2.classicAddress,
+      },
+    }
 
-      await testTransaction(testContext.client, ammBidTx, wallet3)
+    await testTransaction(testContext.client, ammBidTx, wallet3)
 
-      const ammInfoRes: AMMInfoResponse = await testContext.client.request({
-        command: 'amm_info',
-        asset: {
-          currency: 'XRP',
-        },
-        asset2: {
-          currency: currencyCode,
-          issuer: wallet2.classicAddress,
-        },
-      })
+    const ammInfoRes: AMMInfoResponse = await testContext.client.request({
+      command: 'amm_info',
+      asset: {
+        currency: 'XRP',
+      },
+      asset2: {
+        currency: currencyCode,
+        issuer: wallet2.classicAddress,
+      },
+    })
 
-      const { amm } = ammInfoRes.result
-      const { auction_slot, lp_token } = amm
+    const { amm } = ammInfoRes.result
+    const { auction_slot, lp_token } = amm
 
-      if (auction_slot === undefined) {
-        throw new Error('auction_slot should not be undefined')
-      }
-      assert.equal(auction_slot.price.value > preAuctionSlot.price.value, true)
-      assert.equal(lp_token.value < preLPToken.value, true)
-    },
-    TIMEOUT,
-  )
+    if (auction_slot === undefined) {
+      throw new Error('auction_slot should not be undefined')
+    }
+    assert.equal(auction_slot.price.value > preAuctionSlot.price.value, true)
+    assert.equal(lp_token.value < preLPToken.value, true)
+  })
 
-  it(
-    'vote with AuthAccounts, BidMin, BidMax',
-    async function () {
-      const ammDepositTx: AMMDeposit = {
-        TransactionType: 'AMMDeposit',
-        Account: wallet3.classicAddress,
-        Asset: {
-          currency: 'XRP',
-        },
-        Asset2: {
-          currency: currencyCode,
-          issuer: wallet2.classicAddress,
-        },
-        Amount: '1000',
-        Flags: AMMDepositFlags.tfSingleAsset,
-      }
+  it('vote with AuthAccounts, BidMin, BidMax', async function () {
+    const ammDepositTx: AMMDeposit = {
+      TransactionType: 'AMMDeposit',
+      Account: wallet3.classicAddress,
+      Asset: {
+        currency: 'XRP',
+      },
+      Asset2: {
+        currency: currencyCode,
+        issuer: wallet2.classicAddress,
+      },
+      Amount: '1000',
+      Flags: AMMDepositFlags.tfSingleAsset,
+    }
 
-      await testTransaction(testContext.client, ammDepositTx, wallet3)
+    await testTransaction(testContext.client, ammDepositTx, wallet3)
 
-      const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
-        command: 'amm_info',
-        asset: {
-          currency: 'XRP',
-        },
-        asset2: {
-          currency: currencyCode,
-          issuer: wallet2.classicAddress,
-        },
-      })
+    const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
+      command: 'amm_info',
+      asset: {
+        currency: 'XRP',
+      },
+      asset2: {
+        currency: currencyCode,
+        issuer: wallet2.classicAddress,
+      },
+    })
 
-      const { amm: preAmm } = preAmmInfoRes.result
-      const { auction_slot: preAuctionSlot, lp_token: preLPToken } = preAmm
-      if (preAuctionSlot === undefined) {
-        throw new Error('preAuctionSlot should not be undefined')
-      }
+    const { amm: preAmm } = preAmmInfoRes.result
+    const { auction_slot: preAuctionSlot, lp_token: preLPToken } = preAmm
+    if (preAuctionSlot === undefined) {
+      throw new Error('preAuctionSlot should not be undefined')
+    }
 
-      const ammBidTx: AMMBid = {
-        TransactionType: 'AMMBid',
-        Account: wallet3.classicAddress,
-        Asset: {
-          currency: 'XRP',
-        },
-        Asset2: {
-          currency: currencyCode,
-          issuer: wallet2.classicAddress,
-        },
-        AuthAccounts: [
-          {
-            AuthAccount: {
-              Account: wallet.classicAddress,
-            },
-          },
-        ],
-        BidMin: { ...lptoken, value: '5' },
-        BidMax: { ...lptoken, value: '10' },
-      }
-
-      await testTransaction(testContext.client, ammBidTx, wallet3)
-
-      const ammInfoRes: AMMInfoResponse = await testContext.client.request({
-        command: 'amm_info',
-        asset: {
-          currency: 'XRP',
-        },
-        asset2: {
-          currency: currencyCode,
-          issuer: wallet2.classicAddress,
-        },
-      })
-
-      const { amm } = ammInfoRes.result
-      const { auction_slot, lp_token } = amm
-
-      if (auction_slot === undefined) {
-        throw new Error('auction_slot should not be undefined')
-      }
-      assert.equal(auction_slot.price.value > preAuctionSlot.price.value, true)
-      assert.equal(lp_token.value < preLPToken.value, true)
-      assert.deepEqual(auction_slot.auth_accounts, [
+    const ammBidTx: AMMBid = {
+      TransactionType: 'AMMBid',
+      Account: wallet3.classicAddress,
+      Asset: {
+        currency: 'XRP',
+      },
+      Asset2: {
+        currency: currencyCode,
+        issuer: wallet2.classicAddress,
+      },
+      AuthAccounts: [
         {
-          account: wallet.classicAddress,
+          AuthAccount: {
+            Account: wallet.classicAddress,
+          },
         },
-      ])
-    },
-    TIMEOUT,
-  )
+      ],
+      BidMin: { ...lptoken, value: '5' },
+      BidMax: { ...lptoken, value: '10' },
+    }
+
+    await testTransaction(testContext.client, ammBidTx, wallet3)
+
+    const ammInfoRes: AMMInfoResponse = await testContext.client.request({
+      command: 'amm_info',
+      asset: {
+        currency: 'XRP',
+      },
+      asset2: {
+        currency: currencyCode,
+        issuer: wallet2.classicAddress,
+      },
+    })
+
+    const { amm } = ammInfoRes.result
+    const { auction_slot, lp_token } = amm
+
+    if (auction_slot === undefined) {
+      throw new Error('auction_slot should not be undefined')
+    }
+    assert.equal(auction_slot.price.value > preAuctionSlot.price.value, true)
+    assert.equal(lp_token.value < preLPToken.value, true)
+    assert.deepEqual(auction_slot.auth_accounts, [
+      {
+        account: wallet.classicAddress,
+      },
+    ])
+  })
 })

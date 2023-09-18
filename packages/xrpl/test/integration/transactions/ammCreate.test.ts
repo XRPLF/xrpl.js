@@ -10,9 +10,6 @@ import {
 } from '../setup'
 import { generateFundedWallet, setupAMMPool } from '../utils'
 
-// how long before each test case times out
-const TIMEOUT = 20000
-
 describe('AMMCreate', function () {
   let testContext: XrplIntegrationTestContext
   let wallet: Wallet
@@ -35,20 +32,16 @@ describe('AMMCreate', function () {
   })
   afterAll(async () => teardownClient(testContext))
 
-  it(
-    'base',
-    async function () {
-      const { amm } = ammInfoRes.result
+  it('base', async function () {
+    const { amm } = ammInfoRes.result
 
-      assert.isTrue(isValidClassicAddress(amm.account))
-      assert.equal(amm.amount, '250')
-      assert.deepEqual(amm.amount2, {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-        value: '250',
-      })
-      assert.equal(amm.trading_fee, 12)
-    },
-    TIMEOUT,
-  )
+    assert.isTrue(isValidClassicAddress(amm.account))
+    assert.equal(amm.amount, '250')
+    assert.deepEqual(amm.amount2, {
+      currency: currencyCode,
+      issuer: wallet2.classicAddress,
+      value: '250',
+    })
+    assert.equal(amm.trading_fee, 12)
+  })
 })
