@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { AMMBid, AMMDeposit, AMMDepositFlags } from 'xrpl'
+import { AMMBid, AMMDeposit, AMMDepositFlags, IssuedCurrencyAmount } from 'xrpl'
 
 import { AMMInfoResponse, Wallet } from '../../../src'
 import serverUrl from '../serverUrl'
@@ -19,6 +19,7 @@ describe('AMMBid', function () {
   let wallet2: Wallet
   let wallet3: Wallet
   let currencyCode: string
+  let lptoken: IssuedCurrencyAmount
 
   beforeAll(async () => {
     testContext = await setupClient(serverUrl)
@@ -27,16 +28,15 @@ describe('AMMBid', function () {
     wallet3 = await generateFundedWallet(testContext.client)
     currencyCode = 'USD'
 
-    await setupAMMPool(testContext.client, wallet, wallet2, currencyCode)
-    // const ammInfoRes = await setupAMMPool(
-    //   testContext.client,
-    //   wallet,
-    //   wallet2,
-    //   currencyCode,
-    // )
+    const ammInfoRes = await setupAMMPool(
+      testContext.client,
+      wallet,
+      wallet2,
+      currencyCode,
+    )
 
-    // const { amm } = ammInfoRes.result
-    // lptoken = amm.lp_token
+    const { amm } = ammInfoRes.result
+    lptoken = amm.lp_token
   })
   afterAll(async () => teardownClient(testContext))
 
@@ -113,90 +113,90 @@ describe('AMMBid', function () {
     TIMEOUT,
   )
 
-  // it(
-  //   'vote with AuthAccounts, BidMin, BidMax',
-  //   async function () {
-  //     const ammDepositTx: AMMDeposit = {
-  //       TransactionType: 'AMMDeposit',
-  //       Account: wallet3.classicAddress,
-  //       Asset: {
-  //         currency: 'XRP',
-  //       },
-  //       Asset2: {
-  //         currency: currencyCode,
-  //         issuer: wallet2.classicAddress,
-  //       },
-  //       Amount: '1000',
-  //       Flags: AMMDepositFlags.tfSingleAsset,
-  //     }
+  it(
+    'vote with AuthAccounts, BidMin, BidMax',
+    async function () {
+      const ammDepositTx: AMMDeposit = {
+        TransactionType: 'AMMDeposit',
+        Account: wallet3.classicAddress,
+        Asset: {
+          currency: 'XRP',
+        },
+        Asset2: {
+          currency: currencyCode,
+          issuer: wallet2.classicAddress,
+        },
+        Amount: '1000',
+        Flags: AMMDepositFlags.tfSingleAsset,
+      }
 
-  //     await testTransaction(testContext.client, ammDepositTx, wallet3)
+      await testTransaction(testContext.client, ammDepositTx, wallet3)
 
-  //     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
-  //       command: 'amm_info',
-  //       asset: {
-  //         currency: 'XRP',
-  //       },
-  //       asset2: {
-  //         currency: currencyCode,
-  //         issuer: wallet2.classicAddress,
-  //       },
-  //     })
+      const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
+        command: 'amm_info',
+        asset: {
+          currency: 'XRP',
+        },
+        asset2: {
+          currency: currencyCode,
+          issuer: wallet2.classicAddress,
+        },
+      })
 
-  //     const { amm: preAmm } = preAmmInfoRes.result
-  //     const { auction_slot: preAuctionSlot, lp_token: preLPToken } = preAmm
-  //     if (preAuctionSlot === undefined) {
-  //       throw new Error('preAuctionSlot should not be undefined')
-  //     }
+      const { amm: preAmm } = preAmmInfoRes.result
+      const { auction_slot: preAuctionSlot, lp_token: preLPToken } = preAmm
+      if (preAuctionSlot === undefined) {
+        throw new Error('preAuctionSlot should not be undefined')
+      }
 
-  //     const ammBidTx: AMMBid = {
-  //       TransactionType: 'AMMBid',
-  //       Account: wallet3.classicAddress,
-  //       Asset: {
-  //         currency: 'XRP',
-  //       },
-  //       Asset2: {
-  //         currency: currencyCode,
-  //         issuer: wallet2.classicAddress,
-  //       },
-  //       AuthAccounts: [
-  //         {
-  //           AuthAccount: {
-  //             Account: wallet.classicAddress,
-  //           },
-  //         },
-  //       ],
-  //       BidMin: { ...lptoken, value: '5' },
-  //       BidMax: { ...lptoken, value: '10' },
-  //     }
+      const ammBidTx: AMMBid = {
+        TransactionType: 'AMMBid',
+        Account: wallet3.classicAddress,
+        Asset: {
+          currency: 'XRP',
+        },
+        Asset2: {
+          currency: currencyCode,
+          issuer: wallet2.classicAddress,
+        },
+        AuthAccounts: [
+          {
+            AuthAccount: {
+              Account: wallet.classicAddress,
+            },
+          },
+        ],
+        BidMin: { ...lptoken, value: '5' },
+        BidMax: { ...lptoken, value: '10' },
+      }
 
-  //     await testTransaction(testContext.client, ammBidTx, wallet3)
+      await testTransaction(testContext.client, ammBidTx, wallet3)
 
-  //     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
-  //       command: 'amm_info',
-  //       asset: {
-  //         currency: 'XRP',
-  //       },
-  //       asset2: {
-  //         currency: currencyCode,
-  //         issuer: wallet2.classicAddress,
-  //       },
-  //     })
+      const ammInfoRes: AMMInfoResponse = await testContext.client.request({
+        command: 'amm_info',
+        asset: {
+          currency: 'XRP',
+        },
+        asset2: {
+          currency: currencyCode,
+          issuer: wallet2.classicAddress,
+        },
+      })
 
-  //     const { amm } = ammInfoRes.result
-  //     const { auction_slot, lp_token } = amm
+      const { amm } = ammInfoRes.result
+      const { auction_slot, lp_token } = amm
 
-  //     if (auction_slot === undefined) {
-  //       throw new Error('auction_slot should not be undefined')
-  //     }
-  //     assert.equal(auction_slot.price.value > preAuctionSlot.price.value, true)
-  //     assert.equal(lp_token.value < preLPToken.value, true)
-  //     assert.deepEqual(auction_slot.auth_accounts, [
-  //       {
-  //         account: wallet.classicAddress,
-  //       },
-  //     ])
-  //   },
-  //   TIMEOUT,
-  // )
+      if (auction_slot === undefined) {
+        throw new Error('auction_slot should not be undefined')
+      }
+      assert.equal(auction_slot.price.value > preAuctionSlot.price.value, true)
+      assert.equal(lp_token.value < preLPToken.value, true)
+      assert.deepEqual(auction_slot.auth_accounts, [
+        {
+          account: wallet.classicAddress,
+        },
+      ])
+    },
+    TIMEOUT,
+  )
 })
