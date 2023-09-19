@@ -3,12 +3,13 @@ const webpackConfig = require('./test/webpack.config')
 delete webpackConfig.entry
 
 module.exports = function (config) {
+  baseKarmaConfig(config)
+
   config.set({
+    base: '',
     webpack: webpackConfig,
 
     // list of files / patterns to load in the browser
-    files: ['build/xrpl-latest.js', 'test/integration/**/*.test.ts'],
+    files: ['test/**/*.test.ts'],
   })
-
-  baseKarmaConfig(config)
 }

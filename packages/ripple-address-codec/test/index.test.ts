@@ -159,7 +159,7 @@ const testCases: AddressTestCase[] = [
     const classicAddress = testCase[0]
     const tag = testCase[1] === false ? false : testCase[1]
     const xAddress = isTestAddress ? testCase[3] : testCase[2]
-    test(`Converts ${classicAddress}${
+    it(`Converts ${classicAddress}${
       tag ? `:${tag}` : ''
     } to ${xAddress}${network}`, () => {
       expect(classicAddressToXAddress(classicAddress, tag, isTestAddress)).toBe(
@@ -179,19 +179,19 @@ const testCases: AddressTestCase[] = [
     const classicAddress = 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf'
     const tag = MAX_32_BIT_UNSIGNED_INT + 1
 
-    test(`Converting ${classicAddress}:${tag}${network} throws`, () => {
+    it(`Converting ${classicAddress}:${tag}${network} throws`, () => {
       expect(() => {
         classicAddressToXAddress(classicAddress, tag, isTestAddress)
-      }).toThrowError(new Error('Invalid tag'))
+      }).toThrow(new Error('Invalid tag'))
     })
   }
 
   {
     const classicAddress = 'r'
-    test(`Invalid classic address: Converting ${classicAddress}${network} throws`, () => {
+    it(`Invalid classic address: Converting ${classicAddress}${network} throws`, () => {
       expect(() => {
         classicAddressToXAddress(classicAddress, false, isTestAddress)
-      }).toThrowError(
+      }).toThrow(
         new Error('invalid_input_size: decoded data must have length >= 5'),
       )
     })
@@ -215,7 +215,7 @@ const testCases: AddressTestCase[] = [
       tagTestCases.forEach((testCase) => {
         const tag = testCase || false
         const xAddress = encodeXAddress(accountId, tag, isTestAddress)
-        test(`Encoding ${accountId.toString('hex')}${
+        it(`Encoding ${accountId.toString('hex')}${
           tag ? `:${tag}` : ''
         } to ${xAddress} has expected length`, () => {
           expect(xAddress.length).toBe(47)
@@ -227,23 +227,23 @@ const testCases: AddressTestCase[] = [
 
 {
   const xAddress = 'XVLhHMPHU98es4dbozjVtdWzVrDjtV5fdx1mHp98tDMoQXa'
-  test(`Invalid X-address (bad checksum): Converting ${xAddress} throws`, () => {
+  it(`Invalid X-address (bad checksum): Converting ${xAddress} throws`, () => {
     expect(() => {
       xAddressToClassicAddress(xAddress)
-    }).toThrowError(new Error('checksum_invalid'))
+    }).toThrow(new Error('checksum_invalid'))
   })
 }
 
 {
   const xAddress = 'dGzKGt8CVpWoa8aWL1k18tAdy9Won3PxynvbbpkAqp3V47g'
-  test(`Invalid X-address (bad prefix): Converting ${xAddress} throws`, () => {
+  it(`Invalid X-address (bad prefix): Converting ${xAddress} throws`, () => {
     expect(() => {
       xAddressToClassicAddress(xAddress)
-    }).toThrowError(new Error('Invalid X-address: bad prefix'))
+    }).toThrow(new Error('Invalid X-address: bad prefix'))
   })
 }
 
-test(`Invalid X-address (64-bit tag) throws`, () => {
+it(`Invalid X-address (64-bit tag) throws`, () => {
   expect(() => {
     // Encoded from:
     // {
@@ -251,22 +251,22 @@ test(`Invalid X-address (64-bit tag) throws`, () => {
     //   tag: MAX_32_BIT_UNSIGNED_INT + 1
     // }
     xAddressToClassicAddress('XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8zeUygYrCgrPh')
-  }).toThrowError('Unsupported X-address')
+  }).toThrow(new Error('Unsupported X-address'))
 })
 
-test(`Invalid Account ID throws`, () => {
+it(`Invalid Account ID throws`, () => {
   expect(() => {
     encodeXAddress(Buffer.from('00'.repeat(19), 'hex'), false, false)
-  }).toThrowError('Account ID must be 20 bytes')
+  }).toThrow(new Error('Account ID must be 20 bytes'))
 })
 
-test(`isValidXAddress returns false for invalid X-address`, () => {
+it(`isValidXAddress returns false for invalid X-address`, () => {
   expect(
     isValidXAddress('XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8zeUygYrCgrPh'),
   ).toBe(false)
 })
 
-test(`Converts X7AcgcsBL6XDcUb... to r9cZA1mLK5R5A... and tag: false`, () => {
+it(`Converts X7AcgcsBL6XDcUb... to r9cZA1mLK5R5A... and tag: false`, () => {
   const classicAddress = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59'
   // eslint-disable-next-line @typescript-eslint/naming-convention -- tag can be false or a number
   const tag = false
