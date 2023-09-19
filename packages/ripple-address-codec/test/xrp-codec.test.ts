@@ -34,11 +34,11 @@ function makeEncodeDecodeTest(
   base58: string,
   hex: string,
 ): void {
-  test(`can translate between ${hex} and ${base58}`, function () {
+  it(`can translate between ${hex} and ${base58}`, function () {
     const actual = encoder(toBytes(hex))
     expect(actual).toBe(base58)
   })
-  test(`can translate between ${base58} and ${hex})`, function () {
+  it(`can translate between ${base58} and ${hex})`, function () {
     const buf = decoder(base58)
     expect(toHex(buf)).toBe(hex)
   })
@@ -65,7 +65,7 @@ makeEncodeDecodeTest(
   '023693F15967AE357D0327974AD46FE3C127113B1110D6044FD41E723689F81CC6',
 )
 
-test('can decode arbitrary seeds', function () {
+it('can decode arbitrary seeds', function () {
   const decoded = decodeSeed('sEdTM1uX8pu2do5XvTnutH6HsouMaM2')
   expect(toHex(decoded.bytes)).toBe('4C3A1D213FBDFB14C7C28D609469B341')
   expect(decoded.type).toBe('ed25519')
@@ -75,7 +75,7 @@ test('can decode arbitrary seeds', function () {
   expect(decoded2.type).toBe('secp256k1')
 })
 
-test('can pass a type as second arg to encodeSeed', function () {
+it('can pass a type as second arg to encodeSeed', function () {
   const edSeed = 'sEdTM1uX8pu2do5XvTnutH6HsouMaM2'
   const decoded = decodeSeed(edSeed)
   const type = 'ed25519'
@@ -84,21 +84,21 @@ test('can pass a type as second arg to encodeSeed', function () {
   expect(encodeSeed(decoded.bytes, type)).toBe(edSeed)
 })
 
-test('isValidClassicAddress - secp256k1 address valid', function () {
+it('isValidClassicAddress - secp256k1 address valid', function () {
   expect(isValidClassicAddress('rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1')).toBe(true)
 })
 
-test('isValidClassicAddress - ed25519 address valid', function () {
+it('isValidClassicAddress - ed25519 address valid', function () {
   expect(isValidClassicAddress('rLUEXYuLiQptky37CqLcm9USQpPiz5rkpD')).toBe(true)
 })
 
-test('isValidClassicAddress - invalid', function () {
+it('isValidClassicAddress - invalid', function () {
   expect(isValidClassicAddress('rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw2')).toBe(
     false,
   )
 })
 
-test('isValidClassicAddress - empty', function () {
+it('isValidClassicAddress - empty', function () {
   expect(isValidClassicAddress('')).toBe(false)
 })
 
@@ -151,22 +151,22 @@ describe('encodeSeed', function () {
     expect(result).toBe('sEdV19BLfeQeKdEXyYA4NhjPJe6XBfG')
   })
 
-  test('attempting to encode a seed with less than 16 bytes of entropy throws', function () {
+  it('attempting to encode a seed with less than 16 bytes of entropy throws', function () {
     expect(() => {
       encodeSeed(
         Buffer.from('CF2DE378FBDD7E2EE87D486DFB5A7B', 'hex'),
         'secp256k1',
       )
-    }).toThrow('entropy must have length 16')
+    }).toThrow(new Error('entropy must have length 16'))
   })
 
-  test('attempting to encode a seed with more than 16 bytes of entropy throws', function () {
+  it('attempting to encode a seed with more than 16 bytes of entropy throws', function () {
     expect(() => {
       encodeSeed(
         Buffer.from('CF2DE378FBDD7E2EE87D486DFB5A7BFFFF', 'hex'),
         'secp256k1',
       )
-    }).toThrow('entropy must have length 16')
+    }).toThrow(new Error('entropy must have length 16'))
   })
 })
 
@@ -192,11 +192,13 @@ describe('encodeAccountID', function () {
     expect(encoded).toBe('rJrRMgiRgrU6hDF4pgu5DXQdWyPbY35ErN')
   })
 
-  test('unexpected length should throw', function () {
+  it('unexpected length should throw', function () {
     expect(() => {
       encodeAccountID(Buffer.from('ABCDEF', 'hex'))
     }).toThrow(
-      'unexpected_payload_length: bytes.length does not match expectedLength',
+      new Error(
+        'unexpected_payload_length: bytes.length does not match expectedLength. Ensure that the bytes are a Buffer.',
+      ),
     )
   })
 })
@@ -212,7 +214,7 @@ describe('decodeNodePublic', function () {
   })
 })
 
-test('encodes 123456789 with version byte of 0', () => {
+it('encodes 123456789 with version byte of 0', () => {
   expect(
     codec.encode(Buffer.from('123456789'), {
       versions: [0],
@@ -221,83 +223,93 @@ test('encodes 123456789 with version byte of 0', () => {
   ).toBe('rnaC7gW34M77Kneb78s')
 })
 
-test('multiple versions with no expected length should throw', () => {
+it('multiple versions with no expected length should throw', () => {
   expect(() => {
     codec.decode('rnaC7gW34M77Kneb78s', {
       versions: [0, 1],
     })
   }).toThrow(
-    'expectedLength is required because there are >= 2 possible versions',
+    new Error(
+      'expectedLength is required because there are >= 2 possible versions',
+    ),
   )
 })
 
-test('attempting to decode data with length < 5 should throw', () => {
+it('attempting to decode data with length < 5 should throw', () => {
   expect(() => {
     codec.decode('1234', {
       versions: [0],
     })
-  }).toThrow('invalid_input_size: decoded data must have length >= 5')
+  }).toThrow(
+    new Error('invalid_input_size: decoded data must have length >= 5'),
+  )
 })
 
-test('attempting to decode data with unexpected version should throw', () => {
+it('attempting to decode data with unexpected version should throw', () => {
   expect(() => {
     codec.decode('rnaC7gW34M77Kneb78s', {
       versions: [2],
     })
   }).toThrow(
-    'version_invalid: version bytes do not match any of the provided version(s)',
+    new Error(
+      'version_invalid: version bytes do not match any of the provided version(s)',
+    ),
   )
 })
 
-test('invalid checksum should throw', () => {
+it('invalid checksum should throw', () => {
   expect(() => {
     codec.decode('123456789', {
       versions: [0, 1],
     })
-  }).toThrow('checksum_invalid')
+  }).toThrow(new Error('checksum_invalid'))
 })
 
-test('empty payload should throw', () => {
+it('empty payload should throw', () => {
   expect(() => {
     codec.decode('', {
       versions: [0, 1],
     })
-  }).toThrow('invalid_input_size: decoded data must have length >= 5')
+  }).toThrow(
+    new Error('invalid_input_size: decoded data must have length >= 5'),
+  )
 })
 
-test('decode data', () => {
+it('decode data', () => {
   expect(
     codec.decode('rnaC7gW34M77Kneb78s', {
       versions: [0],
     }),
-  ).toStrictEqual({
+  ).toEqual({
     version: [0],
     bytes: Buffer.from('123456789'),
     type: null,
   })
 })
 
-test('decode data with expected length', function () {
+it('decode data with expected length', function () {
   expect(
     codec.decode('rnaC7gW34M77Kneb78s', {
       versions: [0],
       expectedLength: 9,
     }),
-  ).toStrictEqual({
+  ).toEqual({
     version: [0],
     bytes: Buffer.from('123456789'),
     type: null,
   })
 })
 
-test('decode data with wrong expected length should throw', function () {
+it('decode data with wrong expected length should throw', function () {
   expect(() => {
     codec.decode('rnaC7gW34M77Kneb78s', {
       versions: [0],
       expectedLength: 8,
     })
   }).toThrow(
-    'version_invalid: version bytes do not match any of the provided version(s)',
+    new Error(
+      'version_invalid: version bytes do not match any of the provided version(s)',
+    ),
   )
   expect(() => {
     codec.decode('rnaC7gW34M77Kneb78s', {
@@ -305,6 +317,8 @@ test('decode data with wrong expected length should throw', function () {
       expectedLength: 10,
     })
   }).toThrow(
-    'version_invalid: version bytes do not match any of the provided version(s)',
+    new Error(
+      'version_invalid: version bytes do not match any of the provided version(s)',
+    ),
   )
 })
