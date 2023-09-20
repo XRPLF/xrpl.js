@@ -451,11 +451,11 @@ export class Wallet {
         : signedTransaction
     const messageHex: string = encodeForSigning(tx)
     // Need a SignedTransaction class where TxnSignature is not optional.
-    // verify signature used to be untyped. `tx` is union of Transaction and
-    // JsonObject. Maybe decode should take a type parameter?
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- See above
-    const signature = tx.TxnSignature as string
-    return verify(messageHex, signature, this.publicKey)
+    if (typeof tx.TxnSignature !== 'string') {
+      throw new Error('Transaction is missing a signature TxnSignature')
+    }
+
+    return verify(messageHex, tx.TxnSignature, this.publicKey)
   }
 
   /**
