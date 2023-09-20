@@ -20,7 +20,7 @@
   "prepublish": "tsc -b",
   "prepublishOnly": "tslint -b ./ && jest",
   "scripts": {
-    "build": "tsc --build tsconfig.build.json --force",
+    "build": "tsc --build tsconfig.build.json",
     "test": "jest --verbose false --silent=false ./test/*.test.ts",
     "test:browser": "npm run build && karma start ./karma.config.js",
     "lint": "eslint . --ext .ts",
