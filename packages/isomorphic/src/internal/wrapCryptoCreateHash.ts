@@ -2,6 +2,12 @@ import { createHash } from 'crypto'
 import { Hash, HashFn, Input } from './index'
 import normInput from './normInput'
 
+/**
+ * Wrap createHash from node to provide an interface that is isomorphic
+ *
+ * @param type - the hash name
+ * @param fn - {createHash} the hash factory
+ */
 export default function wrapCryptoCreateHash(
   type: string,
   fn: typeof createHash,
@@ -13,7 +19,7 @@ export default function wrapCryptoCreateHash(
   hashFn.create = (): Hash => {
     const hash = fn(type)
     return {
-      update(input: Input) {
+      update(input: Input): Hash {
         hash.update(normInput(input))
         return this
       },

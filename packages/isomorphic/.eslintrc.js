@@ -36,7 +36,6 @@ module.exports = {
     '@typescript-eslint/no-magic-numbers': 'off',
     '@typescript-eslint/ban-types': 'off',
     '@typescript-eslint/restrict-plus-operands': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-unsafe-return': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/explicit-member-accessibility': 'off',
