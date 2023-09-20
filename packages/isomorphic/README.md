@@ -32,20 +32,19 @@ hash
 ### `@xrplf/isomorphic/ripemd160`
 ```typescript
 import { ripemd160 } from '@xrplf/isomorphic/ripemd160';
-const hash8 = ripemd160('abc');
-const hash9 = ripemd160()
+const hashA = ripemd160('abc');
+const hashB = ripemd160
   .create()
   .update(Uint8Array.from([1, 2, 3]))
   .digest();
 ```
 
-
 ### `@xrplf/isomorphic/sha256`
 
 ```typescript
 import { sha256 } from '@xrplf/isomorphic/sha256';
-const h1a = sha256('abc');
-const h1b = sha256
+const hashA = sha256('abc');
+const hashB = sha256
   .create()
   .update(Uint8Array.from([1, 2, 3]))
   .digest();
@@ -55,8 +54,8 @@ const h1b = sha256
 
 ```typescript
 import { sha512 } from '@xrplf/isomorphic/sha512';
-const h2a = sha512('abc');
-const h2b = sha512
+const hashA = sha512('abc');
+const hashB = sha512
   .create()
   .update(Uint8Array.from([1, 2, 3]))
   .digest();

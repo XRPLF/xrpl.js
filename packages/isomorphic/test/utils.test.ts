@@ -21,7 +21,7 @@ describe('utils', function () {
     expect(bytesToHex([222, 173, 190, 239])).toEqual('DEADBEEF')
   })
 
-  it('bytesToHex - DEADBEEF', () => {
+  it('bytesToHex - 010203', () => {
     expect(bytesToHex([1, 2, 3])).toEqual('010203')
   })
 
