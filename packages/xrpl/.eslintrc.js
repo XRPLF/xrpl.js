@@ -84,7 +84,8 @@ module.exports = {
         'max-statements': 'off',
         // Snippets have logs on console to better understand the working.
         'no-console': 'off',
-        'import/no-extraneous-dependencies': 'off',
+        '@typescript-eslint/no-unsafe-member-access': 'off',
+        '@typescript-eslint/no-unsafe-assignment': 'off',
       },
     },
     {

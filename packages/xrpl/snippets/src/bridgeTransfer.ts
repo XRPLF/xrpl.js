@@ -1,3 +1,4 @@
+/* eslint-disable max-depth --  needed for attestation checking */
 /* eslint-disable @typescript-eslint/consistent-type-assertions -- needed here */
 /* eslint-disable no-await-in-loop -- needed here */
 import {
@@ -41,8 +42,15 @@ async function bridgeTransfer(): Promise<void> {
     account: lockingChainDoor,
     type: 'bridge',
   }
-  const bridgeData = (await lockingClient.request(accountObjectsRequest)).result
-    .account_objects[0] as LedgerEntry.Bridge
+  const lockingAccountObjects = (
+    await lockingClient.request(accountObjectsRequest)
+  ).result.account_objects
+  // There will only be one here - a door account can only have one bridge per currency
+  const bridgeData = lockingAccountObjects.filter(
+    (obj) =>
+      obj.LedgerEntryType === 'Bridge' &&
+      obj.XChainBridge.LockingChainIssue.currency === 'XRP',
+  )[0] as LedgerEntry.Bridge
   const bridge: XChainBridge = bridgeData.XChainBridge
   console.log(bridge)
 
@@ -85,7 +93,6 @@ async function bridgeTransfer(): Promise<void> {
       break
     } catch (_error) {
       ledgersWaited += 1
-      // eslint-disable-next-line max-depth -- needed here
       if (ledgersWaited === MAX_LEDGERS_WAITED) {
         // This error should never be hit if the bridge is running
         throw Error('Destination account creation via the bridge failed.')
