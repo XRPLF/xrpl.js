@@ -1240,7 +1240,7 @@ describe('Wallet', function () {
 
       assert.throws(() => {
         wallet.verifyTransaction(decodedTransaction)
-      }, `Transaction is missing a signature TxnSignature`)
+      }, `Transaction is missing a signature, TxnSignature`)
     })
   })
 

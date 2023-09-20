@@ -2,6 +2,7 @@ import { sha512 } from '@xrplf/isomorphic/sha512'
 import { bytesToNumberBE } from '@noble/curves/abstract/utils'
 
 export default class Sha512 {
+  // instantiate empty sha512 hash
   hash = sha512.create()
 
   add(bytes: Uint8Array | number[] | string): this {

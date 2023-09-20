@@ -443,6 +443,7 @@ export class Wallet {
    *
    * @param signedTransaction - A signed transaction (hex string of signTransaction result) to be verified offline.
    * @returns Returns true if a signedTransaction is valid.
+   * @throws {Error} Transaction is missing a signature, TxnSignature
    */
   public verifyTransaction(signedTransaction: Transaction | string): boolean {
     const tx =
@@ -452,7 +453,7 @@ export class Wallet {
     const messageHex: string = encodeForSigning(tx)
     // Need a SignedTransaction class where TxnSignature is not optional.
     if (typeof tx.TxnSignature !== 'string') {
-      throw new Error('Transaction is missing a signature TxnSignature')
+      throw new Error('Transaction is missing a signature, TxnSignature')
     }
 
     return verify(messageHex, tx.TxnSignature, this.publicKey)

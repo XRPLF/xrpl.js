@@ -8,6 +8,10 @@
 * Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`.
 * Fix `deriveKeypair` ignoring manual decoding algorithm. (Specifying algorithm=`ed25519` in `opts` now works on secrets like `sNa1...`)
 * Remove `bytesToHex` and `hexToBytes`.  They can now be found in `@xrplf/isomorphic/utils`
+* `verifyTransaction` will throw an error if there is no signature
+
+### Changes
+* Remove `brorand` as a dependency and use `@xrplf/isomorphic` instead.
 
 ## 1.3.0 (2023-06-13)
 ### Added

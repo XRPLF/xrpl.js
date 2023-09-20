@@ -59,8 +59,6 @@ const secp256k1 = {
     // elliptic.js implementation ignored the prefix, interpreting it as a
     // leading zero byte. @noble/curves will throw if the key is not exactly
     // 32 bytes, so we normalize it before passing to the sign method.
-    // TODO: keep back compat like this, or simply always require prefix as
-    // the ed25519 sign method does.
     assert.ok(
       (privateKey.length === 66 && privateKey.startsWith(SECP256K1_PREFIX)) ||
         privateKey.length === 64,

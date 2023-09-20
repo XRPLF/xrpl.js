@@ -7,6 +7,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 - Add `xrpl-secret-numbers` by @WietseWind  to the mono repo.
 - `unpkg` and `jsdelivr` support was simplified.
 - Unit tests run in a browser and node.
+- Remove `brorand` as a dependency and use `@xrplf/isomorphic` instead.
 
 ### BREAKING CHANGES:
 - `xrpl-secret-numbers` is now `@xrplf/secret-numbers`.
