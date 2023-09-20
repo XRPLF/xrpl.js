@@ -6,11 +6,10 @@ Browser implementations of cryptographic functions use `@noble/hashes` and `cryp
 
 ### Hashes
 
-All hash functions (similar to `@noble/hashes`):
+All hash functions operate similarly to `@noble/hashes` and have the following properties:
 
-- can be called directly, with Uint8Array.
-- return Uint8Array
-- can receive string, which is automatically converted to Uint8Array via utf8 encoding (not hex)
+- They can be called directly by providing a Uint8Array or string which will be converted into a UInt8Array via UTF-8 encoding (not hex).
+- They all return a UInt8Array.
 
 ```
 function hash(message: Uint8Array | string): Uint8Array;
@@ -20,7 +19,7 @@ hash('string') == hash(new TextEncoder().encode('string'));
 
 All hash functions can be constructed via `hash.create()` method:
 
-- the result is `Hash` subclass instance, which has `update()` and `digest()` methods
+- The result is `Hash` subclass instance, which has `update()` and `digest()` methods.
 - `digest()` finalizes the hash and makes it no longer usable
 
 ```typescript
