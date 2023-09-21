@@ -11,10 +11,8 @@ import {
   XChainCreateClaimID,
   xrpToDrops,
   Wallet,
-  TransactionMetadata,
   getXChainClaimID,
 } from '../../src'
-import { CreatedNode } from '../../src/models/transactions/metadata'
 
 async function sleep(sec: number): Promise<void> {
   return new Promise((resolve) => {
