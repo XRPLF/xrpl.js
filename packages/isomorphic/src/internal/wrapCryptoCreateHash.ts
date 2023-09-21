@@ -1,6 +1,6 @@
 import { createHash } from 'crypto'
 import { Hash, HashFn, Input } from './types'
-import normInput from './normInput'
+import normalizeInput from './normalizeInput'
 
 /**
  * Wrap createHash from node to provide an interface that is isomorphic
@@ -13,14 +13,14 @@ export default function wrapCryptoCreateHash(
   fn: typeof createHash,
 ): HashFn {
   function hashFn(input: Input): Uint8Array {
-    return fn(type).update(normInput(input)).digest()
+    return fn(type).update(normalizeInput(input)).digest()
   }
 
   hashFn.create = (): Hash => {
     const hash = fn(type)
     return {
       update(input: Input): Hash {
-        hash.update(normInput(input))
+        hash.update(normalizeInput(input))
         return this
       },
       digest(): Uint8Array {

@@ -6,6 +6,6 @@ import { Input } from './types'
  *
  * @param input - value to normalize
  */
-export default function normInput(input: Input): string | Uint8Array {
+export default function normalizeInput(input: Input): string | Uint8Array {
   return Array.isArray(input) ? new Uint8Array(input) : input
 }

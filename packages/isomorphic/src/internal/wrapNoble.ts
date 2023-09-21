@@ -1,6 +1,6 @@
 import { CHash } from '@noble/hashes/utils'
 import { Hash, HashFn, Input } from './types'
-import normInput from './normInput'
+import normalizeInput from './normalizeInput'
 
 /**
  * Wrap a CHash object from @noble/hashes to provide a interface that is isomorphic
@@ -9,14 +9,14 @@ import normInput from './normInput'
  */
 export default function wrapNoble(chash: CHash): HashFn {
   function wrapped(input: Input): Uint8Array {
-    return chash(normInput(input))
+    return chash(normalizeInput(input))
   }
 
   wrapped.create = (): Hash => {
     const hash = chash.create()
     return {
       update(input: Input): Hash {
-        hash.update(normInput(input))
+        hash.update(normalizeInput(input))
         return this
       },
       digest(): Uint8Array {

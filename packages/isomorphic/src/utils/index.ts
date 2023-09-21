@@ -8,11 +8,11 @@ const OriginalBuffer = Symbol('OriginalBuffer')
  *
  * When converting a Node.js Buffer to a Uint8Array, there's an optimization that shares
  * the memory of the original Buffer with the resulting Uint8Array instead of copying data.
- * The WithReference interface is used to attach a reference to the original Buffer, ensuring
+ * The Uint8ArrayWithReference interface is used to attach a reference to the original Buffer, ensuring
  * its persistence in memory (preventing garbage collection) as long as the Uint8Array exists.
  * This strategy upholds the ownership semantics of the slice of the ArrayBuffer.
  */
-interface WithReference extends Uint8Array {
+interface Uint8ArrayWithReference extends Uint8Array {
   [OriginalBuffer]: Buffer
 }
 
@@ -52,7 +52,7 @@ function toUint8Array(buffer: Buffer): Uint8Array {
       buffer.byteOffset,
       buffer.byteOffset + buffer.byteLength,
     ),
-  ) as WithReference
+  ) as Uint8ArrayWithReference
   u8Array[OriginalBuffer] = buffer
   return u8Array
 }
