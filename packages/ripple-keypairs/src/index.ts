@@ -10,21 +10,17 @@ import { bytesToHex, hexToBytes, randomBytes } from '@xrplf/isomorphic/utils'
 import { accountPublicFromPublicGenerator, derivePrivateKey } from './secp256k1'
 import Sha512 from './Sha512'
 import assert from './assert'
+import { Algorithm, ByteArray, HexString } from './types'
+import getAlgorithmFromKey from './getAlgorithmFromKey'
 
-export type ByteArray = number[] | Uint8Array
-export type HexString = string
-type Input = string | Uint8Array
+const hash = Sha512.half
 
 const SECP256K1_PREFIX = '00'
-
-function hash(message: Input | number[]): Uint8Array {
-  return new Sha512().add(message).first256()
-}
 
 function generateSeed(
   options: {
     entropy?: Uint8Array
-    algorithm?: 'ed25519' | 'ecdsa-secp256k1'
+    algorithm?: Algorithm
   } = {},
 ): string {
   assert.ok(
@@ -56,8 +52,7 @@ const secp256k1 = {
 
   sign(message: ByteArray, privateKey: HexString): string {
     // Some callers pass the privateKey with the prefix, others without.
-    // elliptic.js implementation ignored the prefix, interpreting it as a
-    // leading zero byte. @noble/curves will throw if the key is not exactly
+    // @noble/curves will throw if the key is not exactly
     // 32 bytes, so we normalize it before passing to the sign method.
     assert.ok(
       (privateKey.length === 66 && privateKey.startsWith(SECP256K1_PREFIX)) ||
@@ -116,7 +111,7 @@ const ed25519 = {
   },
 }
 
-function select(algorithm: 'ecdsa-secp256k1' | 'ed25519') {
+function select(algorithm: Algorithm) {
   const methods = { 'ecdsa-secp256k1': secp256k1, ed25519 }
   return methods[algorithm]
 }
@@ -124,7 +119,7 @@ function select(algorithm: 'ecdsa-secp256k1' | 'ed25519') {
 function deriveKeypair(
   seed: string,
   options?: {
-    algorithm?: 'ed25519' | 'ecdsa-secp256k1'
+    algorithm?: Algorithm
     validator?: boolean
     accountIndex?: number
   },
@@ -147,48 +142,8 @@ function deriveKeypair(
   return keypair
 }
 
-/**
- * Determines the algorithm associated with a given key (public/private).
- *
- * | Curve     | Type        | Prefix | Length | Description                                           | Algorithm       |
- * |-----------|-------------|:------:|:------:|-------------------------------------------------------|----------------:|
- * | ed25519   | Private     |  0xED  |   33   | prefix + Uint256LE (0 < n < order )                   |         ed25519 |
- * | ed25519   | Public      |  0xED  |   33   | prefix + 32 y-bytes                                   |         ed25519 |
- * | secp256k1 | Public (1)  |  0x02  |   33   | prefix + 32 x-bytes                                   | ecdsa-secp256k1 |
- * | secp256k1 | Public (2)  |  0x03  |   33   | prefix + 32 x-bytes (y is odd)                        | ecdsa-secp256k1 |
- * | secp256k1 | Public (3)  |  0x04  |   65   | prefix + 32 x-bytes + 32 y-bytes                      | ecdsa-secp256k1 |
- * | secp256k1 | Private (1) |  None  |   32   | Uint256BE (0 < n < order)                             | ecdsa-secp256k1 |
- * | secp256k1 | Private (2) |  0x00  |   33   | prefix + Uint256BE (0 < n < order)                    | ecdsa-secp256k1 |
- *
- * Note: The 0x00 prefix for secpk256k1 Private (2) essentially 0 pads the number
- *       and the interpreted number is the same as 32 bytes.
- *
- * @param key - hexadecimal string representation of the key.
- * @returns {'ed25519' | 'ecdsa-secp256k1'} algorithm for signing/verifying
- * @throws Error when key is invalid
- */
-function getAlgorithmFromKey(key: HexString): 'ed25519' | 'ecdsa-secp256k1' {
-  const bytes = hexToBytes(key)
-  const tag = bytes[0]
-  const len = bytes.length
-
-  if (len === 32) {
-    return 'ecdsa-secp256k1'
-  }
-  if (len === 33 && tag === 0xed) {
-    return 'ed25519'
-  }
-  if (len === 33 && (tag === 0x00 || tag === 0x02 || tag === 0x03)) {
-    return 'ecdsa-secp256k1'
-  }
-  if (len === 65 && tag === 0x04) {
-    return 'ecdsa-secp256k1'
-  }
-  throw new Error('invalid key format')
-}
-
 function sign(messageHex: HexString, privateKey: HexString): string {
-  const algorithm = getAlgorithmFromKey(privateKey)
+  const algorithm = getAlgorithmFromKey(privateKey, 'private')
   return select(algorithm).sign(hexToBytes(messageHex), privateKey)
 }
 
@@ -197,7 +152,7 @@ function verify(
   signature: HexString,
   publicKey: HexString,
 ): boolean {
-  const algorithm = getAlgorithmFromKey(publicKey)
+  const algorithm = getAlgorithmFromKey(publicKey, 'public')
   return select(algorithm).verify(hexToBytes(messageHex), signature, publicKey)
 }
 

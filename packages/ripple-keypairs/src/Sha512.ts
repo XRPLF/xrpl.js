@@ -1,11 +1,17 @@
 import { sha512 } from '@xrplf/isomorphic/sha512'
 import { bytesToNumberBE } from '@noble/curves/abstract/utils'
 
+type Input = Uint8Array | number[] | string
+
 export default class Sha512 {
   // instantiate empty sha512 hash
   hash = sha512.create()
 
-  add(bytes: Uint8Array | number[] | string): this {
+  static half(input: Input): Uint8Array {
+    return new Sha512().add(input).first256()
+  }
+
+  add(bytes: Input): this {
     this.hash.update(bytes)
     return this
   }
