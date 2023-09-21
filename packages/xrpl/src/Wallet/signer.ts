@@ -1,18 +1,11 @@
 import { BigNumber } from 'bignumber.js'
 import { decodeAccountID } from 'ripple-address-codec'
-import {
-  decode,
-  encode,
-  encodeForSigning,
-  encodeForSigningClaim,
-} from 'ripple-binary-codec'
-import { sign as signWithKeypair, verify } from 'ripple-keypairs'
+import { decode, encode, encodeForSigning } from 'ripple-binary-codec'
+import { verify } from 'ripple-keypairs'
 
 import { ValidationError } from '../errors'
 import { Signer } from '../models/common'
 import { Transaction, validate } from '../models/transactions'
-
-import { Wallet } from '.'
 
 /**
  * Takes several transactions with Signer fields (in object or blob form) and creates a
@@ -62,33 +55,13 @@ function multisign(transactions: Array<Transaction | string>): string {
 }
 
 /**
- * Creates a signature that can be used to redeem a specific amount of XRP from a payment channel.
- *
- * @param wallet - The account that will sign for this payment channel.
- * @param channelId - An id for the payment channel to redeem XRP from.
- * @param amount - The amount in drops to redeem.
- * @returns A signature that can be used to redeem a specific amount of XRP from a payment channel.
- * @category Utilities
- */
-function authorizeChannel(
-  wallet: Wallet,
-  channelId: string,
-  amount: string,
-): string {
-  const signingData = encodeForSigningClaim({
-    channel: channelId,
-    amount,
-  })
-
-  return signWithKeypair(signingData, wallet.privateKey)
-}
-
-/**
  * Verifies that the given transaction has a valid signature based on public-key encryption.
  *
  * @param tx - A transaction to verify the signature of. (Can be in object or encoded string format).
  * @param [publicKey] Specific public key to use to verify. If not specified the `SigningPublicKey` of tx will be used.
  * @returns Returns true if tx has a valid signature, and returns false otherwise.
+ * @throws Error when transaction is missing TxnSignature
+ * @throws Error when publicKey is not provided and transaction is missing SigningPubKey
  * @category Utilities
  */
 function verifySignature(
@@ -186,4 +159,4 @@ function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
   return decode(txOrBlob) as unknown as Transaction
 }
 
-export { authorizeChannel, verifySignature, multisign }
+export { verifySignature, multisign }

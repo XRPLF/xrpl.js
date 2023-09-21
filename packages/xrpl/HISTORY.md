@@ -15,7 +15,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
   * This was changed to both support the latest `https-proxy-agent` and to remove the need to include the package in bundlers.   Tests will still be done using `https-proxy-agent` and only tested in a node environment which was the only way it was previously supported anyway
 * Remove `BroadcastClient` which was deprecated
 * Uses `@xrplf/secret-numbers` instead of `xrpl-secret-numbers`
-* Improved key algorithm detection. It will now throw Errors with helpful messages
+* Improve key algorithm detection. It will now throw Errors with helpful messages
+* Move `authorizeChannel` from `wallet/signer` to `wallet/authorizeChannel` to solve a circular dependency issue.
 
 ### Bundling Changes
 * Bundler configurations are much more simplified.
