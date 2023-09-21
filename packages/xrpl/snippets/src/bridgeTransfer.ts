@@ -12,6 +12,7 @@ import {
   xrpToDrops,
   Wallet,
   TransactionMetadata,
+  getXChainClaimID,
 } from '../../src'
 import { CreatedNode } from '../../src/models/transactions/metadata'
 
@@ -117,21 +118,14 @@ async function bridgeTransfer(): Promise<void> {
   const claimIdResult = await issuingClient.submitAndWait(claimIdTx, {
     wallet: wallet2,
   })
+  console.log(claimIdResult)
 
   // Extract new claim ID from metadata
-  const nodes = (claimIdResult.result.meta as TransactionMetadata).AffectedNodes
-  const createdNodes = nodes.filter((node) =>
-    Object.keys(node).includes('CreatedNode'),
-  )
-  const claimIdsLedgerEntries = (createdNodes as CreatedNode[]).filter(
-    (node) => node.CreatedNode.LedgerEntryType === 'XChainOwnedClaimID',
-  )
-  if (claimIdsLedgerEntries.length !== 1) {
-    // This error should never hit and is just a sanity check
-    throw Error('Wallet has more than one claim ID')
+  const xchainClaimId = getXChainClaimID(claimIdResult.result.meta)
+  if (xchainClaimId == null) {
+    // This shouldn't trigger assuming the transaction succeeded
+    throw Error('Could not extract XChainClaimID')
   }
-  const xchainClaimId = claimIdsLedgerEntries[0].CreatedNode.NewFields
-    .XChainClaimID as string
 
   console.log(`Claim ID for the transfer: ${xchainClaimId}`)
 

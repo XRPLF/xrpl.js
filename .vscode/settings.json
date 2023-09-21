@@ -2,6 +2,7 @@
     "editor.tabSize": 2,
     "cSpell.words": [
         "altnet",
+        "Autofills",
         "Clawback",
         "hostid",
         "keypair",
@@ -13,6 +14,7 @@
         "rippletest",
         "secp256k1",
         "Setf",
+        "Sidechains",
         "xchain"
     ],
     "[javascript]": {
