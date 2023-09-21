@@ -49,9 +49,7 @@ export default function getXChainClaimID(
   }
 
   if (decodedMeta.TransactionResult !== 'tesSUCCESS') {
-    throw new TypeError(
-      'Cannot get XChainClaimID from unsuccessful transaction',
-    )
+    return undefined
   }
 
   const createdNode = decodedMeta.AffectedNodes.find(
