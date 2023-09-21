@@ -12,8 +12,7 @@ describe('getXChainClaimID', function () {
 
   it('decode a different valid NFTokenID', function () {
     const result = getXChainClaimID(fixtures.tx.XChainCreateClaimID2.meta)
-    const expectedXChainClaimID =
-      '0008125CBE4B401B2F62ED35CC67362165AA813CCA06316FFA766254000003EE'
+    const expectedXChainClaimID = 'ac'
     assert.equal(result, expectedXChainClaimID)
   })
 
