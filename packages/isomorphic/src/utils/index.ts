@@ -1,28 +1,31 @@
 import { randomBytes as cryptoRandomBytes } from 'crypto'
-import { BytesToHexFn, HexToBytesFn, RandomBytesFn } from './types'
+import { Utils } from './types'
 
-// Typed to ensure uniformity between node and browser implementations and docs
-/* eslint-disable func-style, eslint-comments/disable-enable-pair -- see above */
-const bytesToHex: typeof BytesToHexFn = (bytes: Uint8Array | number[]) => {
-  return Buffer.from(
-    bytes instanceof Uint8Array ? bytes : Uint8Array.from(bytes),
-  )
-    .toString('hex')
-    .toUpperCase()
+/**
+ * Converts a Node.js Buffer to a Uint8Array for strict uniformity with browser implementations.
+ *
+ * Although a Buffer is a subclass of Uint8Array in Node.js, this function ensures an explicit
+ * representation as a Uint8Array without copying underlying bytes, offering an efficient conversion.
+ *
+ * @param {Buffer} buffer - The Node.js Buffer to convert.
+ * @returns {Uint8Array} Resulting Uint8Array sharing the same memory as the Buffer.
+ */
+function normalize(buffer: Buffer): Uint8Array {
+  // different copying semantics to Uint8Array.from
+  return new Uint8Array(buffer)
 }
 
-const hexToBytes: typeof HexToBytesFn = (hex: string): Uint8Array => {
-  return toUintArray(Buffer.from(hex, 'hex'))
+const utils: Utils = {
+  bytesToHex(bytes) {
+    const buf = Buffer.from(bytes)
+    return buf.toString('hex').toUpperCase()
+  },
+  hexToBytes(hex) {
+    return normalize(Buffer.from(hex, 'hex'))
+  },
+  randomBytes(size) {
+    return normalize(cryptoRandomBytes(size))
+  },
 }
 
-const randomBytes: typeof RandomBytesFn = (size: number): Uint8Array => {
-  return new Uint8Array(cryptoRandomBytes(size).buffer)
-}
-
-function toUintArray(buf: Buffer): Uint8Array {
-  return new Uint8Array(
-    buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength),
-  )
-}
-
-export { bytesToHex, hexToBytes, randomBytes }
+export const { bytesToHex, hexToBytes, randomBytes } = utils

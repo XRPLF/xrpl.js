@@ -1,5 +1,5 @@
 import { createHash } from 'crypto'
-import { Hash, HashFn, Input } from './index'
+import { Hash, HashFn, Input } from './types'
 import normInput from './normInput'
 
 /**

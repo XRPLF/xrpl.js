@@ -1,5 +1,5 @@
 import { CHash } from '@noble/hashes/utils'
-import { Hash, HashFn, Input } from './index'
+import { Hash, HashFn, Input } from './types'
 import normInput from './normInput'
 
 /**

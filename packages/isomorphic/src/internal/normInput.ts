@@ -1,4 +1,4 @@
-import { Input } from './index'
+import { Input } from './types'
 
 /**
  * Normalize a string, number array, or Uint8Array to a string or Uint8Array.
