@@ -4,13 +4,13 @@ import { getXChainClaimID } from '../../src'
 import fixtures from '../fixtures/rippled'
 
 describe('getXChainClaimID', function () {
-  it('decode a valid NFTokenID', function () {
+  it('decode a valid XChainClaimID', function () {
     const result = getXChainClaimID(fixtures.tx.XChainCreateClaimID.meta)
     const expectedXChainClaimID = 'b0'
     assert.equal(result, expectedXChainClaimID)
   })
 
-  it('decode a different valid NFTokenID', function () {
+  it('decode a different valid XChainClaimID', function () {
     const result = getXChainClaimID(fixtures.tx.XChainCreateClaimID2.meta)
     const expectedXChainClaimID = 'ac'
     assert.equal(result, expectedXChainClaimID)
