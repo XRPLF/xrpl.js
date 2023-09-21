@@ -6,15 +6,15 @@ import { sha256 } from '@xrplf/isomorphic/sha256'
 import baseCodec = require('base-x')
 import type { BaseConverter } from 'base-x'
 
-import { seqEqual, concatArgs, Sequence } from './utils'
+import { arrayEqual, concatArgs, ByteArray } from './utils'
 
 class Codec {
-  private readonly _sha256: (bytes: Sequence) => Uint8Array
+  private readonly _sha256: (bytes: ByteArray) => Uint8Array
   private readonly _alphabet: string
   private readonly _codec: BaseConverter
 
   public constructor(options: {
-    sha256: (bytes: Sequence) => Uint8Array
+    sha256: (bytes: ByteArray) => Uint8Array
     alphabet: string
   }) {
     this._sha256 = options.sha256
@@ -29,7 +29,7 @@ class Codec {
    * @param opts - Options object including the version bytes and the expected length of the data to encode.
    */
   public encode(
-    bytes: Sequence,
+    bytes: ByteArray,
     opts: {
       versions: number[]
       expectedLength: number
@@ -82,7 +82,7 @@ class Codec {
       const version: number[] = Array.isArray(versions[i])
         ? (versions[i] as number[])
         : [versions[i] as number]
-      if (seqEqual(versionBytes, version)) {
+      if (arrayEqual(versionBytes, version)) {
         return {
           version,
           bytes: payload,
@@ -97,7 +97,7 @@ class Codec {
     )
   }
 
-  public encodeChecked(buffer: Sequence): string {
+  public encodeChecked(buffer: ByteArray): string {
     const check = this._sha256(this._sha256(buffer)).slice(0, 4)
     return this._encodeRaw(Buffer.from(concatArgs(buffer, check)))
   }
@@ -114,7 +114,7 @@ class Codec {
   }
 
   private _encodeVersioned(
-    bytes: Sequence,
+    bytes: ByteArray,
     versions: number[],
     expectedLength: number,
   ): string {
@@ -127,7 +127,7 @@ class Codec {
     return this.encodeChecked(concatArgs(versions, bytes))
   }
 
-  private _encodeRaw(bytes: Sequence): string {
+  private _encodeRaw(bytes: ByteArray): string {
     return this._codec.encode(bytes)
   }
   /* eslint-enable max-lines-per-function */
@@ -136,10 +136,10 @@ class Codec {
     return this._codec.decode(base58string)
   }
 
-  private _verifyCheckSum(bytes: Sequence): boolean {
+  private _verifyCheckSum(bytes: ByteArray): boolean {
     const computed = this._sha256(this._sha256(bytes.slice(0, -4))).slice(0, 4)
     const checksum = bytes.slice(-4)
-    return seqEqual(computed, checksum)
+    return arrayEqual(computed, checksum)
   }
 }
 
@@ -172,7 +172,7 @@ export const codec = codecWithXrpAlphabet
 // entropy is a Buffer of size 16
 // type is 'ed25519' or 'secp256k1'
 export function encodeSeed(
-  entropy: Sequence,
+  entropy: ByteArray,
   type: 'ed25519' | 'secp256k1',
 ): string {
   if (entropy.length !== 16) {
@@ -208,7 +208,7 @@ export function decodeSeed(
   return codecWithXrpAlphabet.decode(seed, opts)
 }
 
-export function encodeAccountID(bytes: Sequence): string {
+export function encodeAccountID(bytes: ByteArray): string {
   const opts = { versions: [ACCOUNT_ID], expectedLength: 20 }
   return codecWithXrpAlphabet.encode(bytes, opts)
 }
@@ -235,12 +235,12 @@ export function decodeNodePublic(base58string: string): Buffer {
   return codecWithXrpAlphabet.decode(base58string, opts).bytes
 }
 
-export function encodeNodePublic(bytes: Sequence): string {
+export function encodeNodePublic(bytes: ByteArray): string {
   const opts = { versions: [NODE_PUBLIC], expectedLength: 33 }
   return codecWithXrpAlphabet.encode(bytes, opts)
 }
 
-export function encodeAccountPublic(bytes: Sequence): string {
+export function encodeAccountPublic(bytes: ByteArray): string {
   const opts = { versions: [ACCOUNT_PUBLIC_KEY], expectedLength: 33 }
   return codecWithXrpAlphabet.encode(bytes, opts)
 }
