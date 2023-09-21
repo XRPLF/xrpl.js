@@ -9,6 +9,7 @@
 * Fix `deriveKeypair` ignoring manual decoding algorithm. (Specifying algorithm=`ed25519` in `opts` now works on secrets like `sNa1...`)
 * Remove `bytesToHex` and `hexToBytes`.  They can now be found in `@xrplf/isomorphic/utils`
 * `verifyTransaction` will throw an error if there is no signature
+* Improved key algorithm detection. It will now throw Errors with helpful messages
 
 ### Changes
 * Remove `brorand` as a dependency and use `@xrplf/isomorphic` instead.
