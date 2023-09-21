@@ -10,7 +10,6 @@ import {
   encodeSeed,
 } from 'ripple-address-codec'
 import {
-  decode,
   encodeForSigning,
   encodeForMultisigning,
   encode,
@@ -19,7 +18,6 @@ import {
   deriveAddress,
   deriveKeypair,
   generateSeed,
-  verify,
   sign,
 } from 'ripple-keypairs'
 
@@ -31,6 +29,7 @@ import { omitBy } from '../utils/collections'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
 
 import { rfc1751MnemonicToKey } from './rfc1751'
+import { verifySignature } from './signer'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
@@ -446,17 +445,7 @@ export class Wallet {
    * @throws {Error} Transaction is missing a signature, TxnSignature
    */
   public verifyTransaction(signedTransaction: Transaction | string): boolean {
-    const tx =
-      typeof signedTransaction === 'string'
-        ? decode(signedTransaction)
-        : signedTransaction
-    const messageHex: string = encodeForSigning(tx)
-    // Need a SignedTransaction class where TxnSignature is not optional.
-    if (typeof tx.TxnSignature !== 'string') {
-      throw new Error('Transaction is missing a signature, TxnSignature')
-    }
-
-    return verify(messageHex, tx.TxnSignature, this.publicKey)
+    return verifySignature(signedTransaction, this.publicKey)
   }
 
   /**

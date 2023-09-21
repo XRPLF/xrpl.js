@@ -218,7 +218,7 @@ describe('Signer', function () {
     assert.isTrue(verifySignature(signedTx.tx_blob))
   })
 
-  it('verify succeeds for valid signed transaction object', function () {
+  it('verifySignature succeeds for valid signed transaction object', function () {
     const signedTx = verifyWallet.sign(tx)
 
     assert.isTrue(
@@ -226,7 +226,7 @@ describe('Signer', function () {
     )
   })
 
-  it('verify throws for invalid signing key', function () {
+  it('verifySignature returns false for invalid signing key', function () {
     const signedTx = verifyWallet.sign(tx)
 
     const decodedTx = decode(signedTx.tx_blob) as unknown as Transaction
@@ -236,5 +236,18 @@ describe('Signer', function () {
       '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020'
 
     assert.isFalse(verifySignature(decodedTx))
+  })
+
+  it('verifySignature throws for a missing public key', function () {
+    const signedTx = verifyWallet.sign(tx)
+
+    const decodedTx = decode(signedTx.tx_blob) as unknown as Transaction
+
+    // Use a different key for validation
+    delete decodedTx.SigningPubKey
+
+    assert.throws(() => {
+      verifySignature(decodedTx)
+    }, `Transaction is missing a public key, SigningPubKey`)
   })
 })
