@@ -190,7 +190,8 @@ export function validateOptionalField(
 ): void {
   if (tx[paramName] !== undefined && !checkValidity(tx[paramName])) {
     throw new ValidationError(
-      'XChainAddClaimAttestation: invalid field Destination',
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- checked before
+      `${tx.TransactionType}: invalid field ${paramName}`,
     )
   }
 }
