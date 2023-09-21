@@ -50,18 +50,36 @@ async function getModel(filename) {
   return [model, txName]
 }
 
-function getIfLineParamPart(param, paramType) {
+function getValidationFunction(paramType) {
   if (NORMAL_TYPES.includes(paramType)) {
-    return `typeof tx.${param} !== "${paramType}"`
+    const paramTypeCapitalized =
+      paramType.substring(0, 1).toUpperCase() + paramType.substring(1)
+    return `is${paramTypeCapitalized}(inp)`
   }
   if (NUMBERS.includes(paramType)) {
-    return `tx.${param} !== ${paramType}`
+    return `inp === ${paramType}`
   }
-  return `!is${paramType}(tx.${param})`
+  return `is${paramType}(inp)`
+}
+
+function getValidationLine(validationFns) {
+  if (validationFns.length === 1) {
+    if (!validationFns[0].includes('===')) {
+      // Example: `validateRequiredFields(tx, 'Amount', isAmount)`
+      const validationFn = validationFns[0]
+      // strip the `(inp)` in e.g. `isAmount(inp)`
+      return validationFn.substring(0, validationFn.length - 5)
+    }
+  }
+  // Example:
+  // `validateRequiredFields(tx, 'XChainAccountCreateCount',
+  //    (inp) => isNumber(inp) || isString(inp)))`
+  return `(inp) => ${validationFns.join(' || ')}`
 }
 
 function processModel(model, txName) {
   let output = ''
+  // process the TS model and get the types of each parameter
   for (let line of model.split('\n')) {
     if (line === '') {
       continue
@@ -85,38 +103,33 @@ function processModel(model, txName) {
     if (line.startsWith('*')) {
       continue
     }
+
+    // process the line with a type
     const split = line.split(' ')
     const param = split[0].replace('?:', '').replace(':', '').trim()
     const paramTypes = split.slice(1)
     const optional = split[0].endsWith('?:')
-    if (optional) {
-      output += `  if (tx.${param} !== undefined && `
-    } else {
-      output += `  if (tx.${param} == null) {\n`
-      output += `    throw new ValidationError('${txName}: missing field ${param}')\n`
-      output += `  }\n\n`
-      output += `  if (`
+    const functionName = optional
+      ? 'validateOptionalField'
+      : 'validateRequiredField'
+
+    // process the types and turn them into a validation function
+    let idx = 0
+    const if_outputs = []
+    while (idx < paramTypes.length) {
+      const paramType = paramTypes[idx]
+      if_outputs.push(getValidationFunction(paramType))
+      idx += 2
     }
-    if (paramTypes.length === 1) {
-      const paramType = paramTypes[0]
-      output += getIfLineParamPart(param, paramType)
-    } else {
-      let idx = 0
-      const if_outputs = []
-      while (idx < paramTypes.length) {
-        const paramType = paramTypes[idx]
-        if_outputs.push(getIfLineParamPart(param, paramType))
-        idx += 2
-      }
-      output += `(${if_outputs.join(' && ')})`
-    }
-    output += ') {\n'
-    output += `    throw new ValidationError('${txName}: invalid field ${param}')\n`
-    output += `  }\n\n`
+
+    output += `  ${functionName}(tx, '${param}', ${getValidationLine(
+      if_outputs,
+    )})\n\n`
   }
   output = output.substring(0, output.length - 1)
   output += '}\n'
 
+  // initial output content
   output = `/**
  * Verify the form and type of a ${txName} at runtime.
  *

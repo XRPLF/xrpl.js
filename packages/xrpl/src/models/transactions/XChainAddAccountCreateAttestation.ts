@@ -1,11 +1,13 @@
-import { ValidationError } from '../../errors'
 import { Amount, XChainBridge } from '../common'
 
 import {
   BaseTransaction,
   isAmount,
+  isNumber,
+  isString,
   isXChainBridge,
   validateBaseTransaction,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -82,144 +84,38 @@ export interface XChainAddAccountCreateAttestation extends BaseTransaction {
  * @param tx - An XChainAddAccountCreateAttestation Transaction.
  * @throws When the XChainAddAccountCreateAttestation is malformed.
  */
-// eslint-disable-next-line max-lines-per-function, max-statements -- okay for this function, lots of things to check
 export function validateXChainAddAccountCreateAttestation(
   tx: Record<string, unknown>,
 ): void {
   validateBaseTransaction(tx)
 
-  if (tx.Amount == null) {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: missing field Amount',
-    )
-  }
+  validateRequiredField(tx, 'Amount', isAmount)
 
-  if (!isAmount(tx.Amount)) {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: invalid field Amount',
-    )
-  }
+  validateRequiredField(tx, 'AttestationRewardAccount', isString)
 
-  if (tx.AttestationRewardAccount == null) {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: missing field AttestationRewardAccount',
-    )
-  }
+  validateRequiredField(tx, 'AttestationSignerAccount', isString)
 
-  if (typeof tx.AttestationRewardAccount !== 'string') {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: invalid field AttestationRewardAccount',
-    )
-  }
+  validateRequiredField(tx, 'Destination', isString)
 
-  if (tx.AttestationSignerAccount == null) {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: missing field AttestationSignerAccount',
-    )
-  }
+  validateRequiredField(tx, 'OtherChainSource', isString)
 
-  if (typeof tx.AttestationSignerAccount !== 'string') {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: invalid field AttestationSignerAccount',
-    )
-  }
+  validateRequiredField(tx, 'PublicKey', isString)
 
-  if (tx.Destination == null) {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: missing field Destination',
-    )
-  }
+  validateRequiredField(tx, 'Signature', isString)
 
-  if (typeof tx.Destination !== 'string') {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: invalid field Destination',
-    )
-  }
+  validateRequiredField(tx, 'SignatureReward', isAmount)
 
-  if (tx.OtherChainSource == null) {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: missing field OtherChainSource',
-    )
-  }
+  validateRequiredField(
+    tx,
+    'WasLockingChainSend',
+    (inp) => inp === 0 || inp === 1,
+  )
 
-  if (typeof tx.OtherChainSource !== 'string') {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: invalid field OtherChainSource',
-    )
-  }
+  validateRequiredField(
+    tx,
+    'XChainAccountCreateCount',
+    (inp) => isNumber(inp) || isString(inp),
+  )
 
-  if (tx.PublicKey == null) {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: missing field PublicKey',
-    )
-  }
-
-  if (typeof tx.PublicKey !== 'string') {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: invalid field PublicKey',
-    )
-  }
-
-  if (tx.Signature == null) {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: missing field Signature',
-    )
-  }
-
-  if (typeof tx.Signature !== 'string') {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: invalid field Signature',
-    )
-  }
-
-  if (tx.SignatureReward == null) {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: missing field SignatureReward',
-    )
-  }
-
-  if (!isAmount(tx.SignatureReward)) {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: invalid field SignatureReward',
-    )
-  }
-
-  if (tx.WasLockingChainSend == null) {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: missing field WasLockingChainSend',
-    )
-  }
-
-  if (tx.WasLockingChainSend !== 0 && tx.WasLockingChainSend !== 1) {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: invalid field WasLockingChainSend',
-    )
-  }
-
-  if (tx.XChainAccountCreateCount == null) {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: missing field XChainAccountCreateCount',
-    )
-  }
-
-  if (
-    typeof tx.XChainAccountCreateCount !== 'number' &&
-    typeof tx.XChainAccountCreateCount !== 'string'
-  ) {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: invalid field XChainAccountCreateCount',
-    )
-  }
-
-  if (tx.XChainBridge == null) {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: missing field XChainBridge',
-    )
-  }
-
-  if (!isXChainBridge(tx.XChainBridge)) {
-    throw new ValidationError(
-      'XChainAddAccountCreateAttestation: invalid field XChainBridge',
-    )
-  }
+  validateRequiredField(tx, 'XChainBridge', isXChainBridge)
 }

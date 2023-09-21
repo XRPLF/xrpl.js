@@ -1,4 +1,5 @@
-import { ValidationError } from '../../errors'
+import { isString } from 'lodash'
+
 import { Amount, XChainBridge } from '../common'
 
 import {
@@ -6,6 +7,7 @@ import {
   isAmount,
   isXChainBridge,
   validateBaseTransaction,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -52,53 +54,16 @@ export interface XChainAccountCreateCommit extends BaseTransaction {
  * @param tx - An XChainAccountCreateCommit Transaction.
  * @throws When the XChainAccountCreateCommit is malformed.
  */
-// eslint-disable-next-line max-lines-per-function -- okay for this function, there's a lot of things to check
 export function validateXChainAccountCreateCommit(
   tx: Record<string, unknown>,
 ): void {
   validateBaseTransaction(tx)
 
-  if (tx.XChainBridge == null) {
-    throw new ValidationError(
-      'XChainAccountCreateCommit: missing field XChainBridge',
-    )
-  }
+  validateRequiredField(tx, 'XChainBridge', isXChainBridge)
 
-  if (!isXChainBridge(tx.XChainBridge)) {
-    throw new ValidationError(
-      'XChainAccountCreateCommit: invalid field XChainBridge',
-    )
-  }
+  validateRequiredField(tx, 'SignatureReward', isAmount)
 
-  if (tx.SignatureReward == null) {
-    throw new ValidationError(
-      'XChainAccountCreateCommit: missing field SignatureReward',
-    )
-  }
+  validateRequiredField(tx, 'Destination', isString)
 
-  if (!isAmount(tx.SignatureReward)) {
-    throw new ValidationError(
-      'XChainAccountCreateCommit: invalid field SignatureReward',
-    )
-  }
-
-  if (tx.Destination == null) {
-    throw new ValidationError(
-      'XChainAccountCreateCommit: missing field Destination',
-    )
-  }
-
-  if (typeof tx.Destination !== 'string') {
-    throw new ValidationError(
-      'XChainAccountCreateCommit: invalid field Destination',
-    )
-  }
-
-  if (tx.Amount == null) {
-    throw new ValidationError('XChainAccountCreateCommit: missing field Amount')
-  }
-
-  if (!isAmount(tx.Amount)) {
-    throw new ValidationError('XChainAccountCreateCommit: invalid field Amount')
-  }
+  validateRequiredField(tx, 'Amount', isAmount)
 }

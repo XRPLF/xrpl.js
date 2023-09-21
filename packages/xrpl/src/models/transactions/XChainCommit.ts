@@ -1,11 +1,14 @@
-import { ValidationError } from '../../errors'
 import { Amount, XChainBridge } from '../common'
 
 import {
   BaseTransaction,
   isAmount,
+  isNumber,
+  isString,
   isXChainBridge,
   validateBaseTransaction,
+  validateOptionalField,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -57,39 +60,15 @@ export interface XChainCommit extends BaseTransaction {
 export function validateXChainCommit(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.XChainBridge == null) {
-    throw new ValidationError('XChainCommit: missing field XChainBridge')
-  }
+  validateRequiredField(tx, 'XChainBridge', isXChainBridge)
 
-  if (!isXChainBridge(tx.XChainBridge)) {
-    throw new ValidationError('XChainCommit: invalid field XChainBridge')
-  }
+  validateRequiredField(
+    tx,
+    'XChainClaimID',
+    (inp) => isNumber(inp) || isString(inp),
+  )
 
-  if (tx.XChainClaimID == null) {
-    throw new ValidationError('XChainCommit: missing field XChainClaimID')
-  }
+  validateOptionalField(tx, 'OtherChainDestination', isString)
 
-  if (
-    typeof tx.XChainClaimID !== 'number' &&
-    typeof tx.XChainClaimID !== 'string'
-  ) {
-    throw new ValidationError('XChainCommit: invalid field XChainClaimID')
-  }
-
-  if (
-    tx.OtherChainDestination !== undefined &&
-    typeof tx.OtherChainDestination !== 'string'
-  ) {
-    throw new ValidationError(
-      'XChainCommit: invalid field OtherChainDestination',
-    )
-  }
-
-  if (tx.Amount == null) {
-    throw new ValidationError('XChainCommit: missing field Amount')
-  }
-
-  if (!isAmount(tx.Amount)) {
-    throw new ValidationError('XChainCommit: invalid field Amount')
-  }
+  validateRequiredField(tx, 'Amount', isAmount)
 }

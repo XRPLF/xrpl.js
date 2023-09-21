@@ -1,11 +1,14 @@
-import { ValidationError } from '../../errors'
 import { Amount, XChainBridge } from '../common'
 
 import {
   BaseTransaction,
   isAmount,
+  isNumber,
+  isString,
   isXChainBridge,
   validateBaseTransaction,
+  validateOptionalField,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -58,45 +61,17 @@ export interface XChainClaim extends BaseTransaction {
 export function validateXChainClaim(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.XChainBridge == null) {
-    throw new ValidationError('XChainClaim: missing field XChainBridge')
-  }
+  validateRequiredField(tx, 'XChainBridge', isXChainBridge)
 
-  if (!isXChainBridge(tx.XChainBridge)) {
-    throw new ValidationError('XChainClaim: invalid field XChainBridge')
-  }
+  validateRequiredField(
+    tx,
+    'XChainClaimID',
+    (inp) => isNumber(inp) || isString(inp),
+  )
 
-  if (tx.XChainClaimID == null) {
-    throw new ValidationError('XChainClaim: missing field XChainClaimID')
-  }
+  validateRequiredField(tx, 'Destination', isString)
 
-  if (
-    typeof tx.XChainClaimID !== 'number' &&
-    typeof tx.XChainClaimID !== 'string'
-  ) {
-    throw new ValidationError('XChainClaim: invalid field XChainClaimID')
-  }
+  validateOptionalField(tx, 'DestinationTag', isNumber)
 
-  if (tx.Destination == null) {
-    throw new ValidationError('XChainClaim: missing field Destination')
-  }
-
-  if (typeof tx.Destination !== 'string') {
-    throw new ValidationError('XChainClaim: invalid field Destination')
-  }
-
-  if (
-    tx.DestinationTag !== undefined &&
-    typeof tx.DestinationTag !== 'number'
-  ) {
-    throw new ValidationError('XChainClaim: invalid field DestinationTag')
-  }
-
-  if (tx.Amount == null) {
-    throw new ValidationError('XChainClaim: missing field Amount')
-  }
-
-  if (!isAmount(tx.Amount)) {
-    throw new ValidationError('XChainClaim: invalid field Amount')
-  }
+  validateRequiredField(tx, 'Amount', isAmount)
 }

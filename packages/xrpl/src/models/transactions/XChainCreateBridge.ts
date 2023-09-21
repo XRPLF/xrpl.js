@@ -1,4 +1,3 @@
-import { ValidationError } from '../../errors'
 import { Amount, XChainBridge } from '../common'
 
 import {
@@ -6,6 +5,8 @@ import {
   isAmount,
   isXChainBridge,
   validateBaseTransaction,
+  validateOptionalField,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -47,32 +48,9 @@ export interface XChainCreateBridge extends BaseTransaction {
 export function validateXChainCreateBridge(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.XChainBridge == null) {
-    throw new ValidationError('XChainCreateBridge: missing field XChainBridge')
-  }
+  validateRequiredField(tx, 'XChainBridge', isXChainBridge)
 
-  if (!isXChainBridge(tx.XChainBridge)) {
-    throw new ValidationError('XChainCreateBridge: invalid field XChainBridge')
-  }
+  validateRequiredField(tx, 'SignatureReward', isAmount)
 
-  if (tx.SignatureReward == null) {
-    throw new ValidationError(
-      'XChainCreateBridge: missing field SignatureReward',
-    )
-  }
-
-  if (!isAmount(tx.SignatureReward)) {
-    throw new ValidationError(
-      'XChainCreateBridge: invalid field SignatureReward',
-    )
-  }
-
-  if (
-    tx.MinAccountCreateAmount !== undefined &&
-    !isAmount(tx.MinAccountCreateAmount)
-  ) {
-    throw new ValidationError(
-      'XChainCreateBridge: invalid field MinAccountCreateAmount',
-    )
-  }
+  validateOptionalField(tx, 'MinAccountCreateAmount', isAmount)
 }

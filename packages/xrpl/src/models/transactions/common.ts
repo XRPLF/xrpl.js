@@ -66,6 +66,26 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 /**
+ * Verify the form and type of a string at runtime.
+ *
+ * @param str - The object to check the form and type of.
+ * @returns Whether the string is properly formed.
+ */
+export function isString(str: unknown): str is string {
+  return typeof str === 'string'
+}
+
+/**
+ * Verify the form and type of a number at runtime.
+ *
+ * @param num - The object to check the form and type of.
+ * @returns Whether the number is properly formed.
+ */
+export function isNumber(num: unknown): num is number {
+  return typeof num === 'number'
+}
+
+/**
  * Verify the form and type of an IssuedCurrency at runtime.
  *
  * @param input - The input to check the form and type of.
@@ -125,6 +145,54 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
     typeof input.IssuingChainDoor === 'string' &&
     isCurrency(input.IssuingChainIssue)
   )
+}
+
+/**
+ * Verify the form and type of a required type for a transaction at runtime.
+ *
+ * @param tx - The transaction input to check the form and type of.
+ * @param paramName - The name of the transaction parameter.
+ * @param checkValidity - The function to use to check the type.
+ * @throws
+ */
+export function validateRequiredField(
+  tx: Record<string, unknown>,
+  paramName: string,
+  checkValidity: (inp: unknown) => boolean,
+): void {
+  if (tx[paramName] == null) {
+    throw new ValidationError(
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- checked before
+      `${tx.TransactionType}: missing field ${paramName}`,
+    )
+  }
+
+  if (!checkValidity(tx[paramName])) {
+    throw new ValidationError(
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- checked before
+      `${tx.TransactionType}: invalid field ${paramName}`,
+    )
+  }
+}
+
+/**
+ * Verify the form and type of an optional type for a transaction at runtime.
+ *
+ * @param tx - The transaction input to check the form and type of.
+ * @param paramName - The name of the transaction parameter.
+ * @param checkValidity - The function to use to check the type.
+ * @throws
+ */
+export function validateOptionalField(
+  tx: Record<string, unknown>,
+  paramName: string,
+  checkValidity: (inp: unknown) => boolean,
+): void {
+  if (tx[paramName] !== undefined && !checkValidity(tx[paramName])) {
+    throw new ValidationError(
+      'XChainAddClaimAttestation: invalid field Destination',
+    )
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface -- no global flags right now, so this is fine
