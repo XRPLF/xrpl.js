@@ -16,9 +16,14 @@ export interface DeriveKeyPairOptions {
 export interface SigningMethod {
   deriveKeypair: (entropy: ByteArray, options?: DeriveKeyPairOptions) => KeyPair
 
-  sign: (message: Uint8Array, privateKey: HexString) => HexString
+  sign: (
+    // TODO: HexString?
+    message: Uint8Array,
+    privateKey: HexString,
+  ) => HexString
 
   verify: (
+    // TODO: HexString?
     message: Uint8Array,
     signature: HexString,
     publicKey: HexString,
