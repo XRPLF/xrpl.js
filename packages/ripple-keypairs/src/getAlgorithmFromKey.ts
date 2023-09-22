@@ -48,16 +48,17 @@ function prefixRepr(prefix: Prefix): string {
     : `0x${prefix.toString(16).padStart(2, '0')}`
 }
 
-function getValidFormats(type: 'public' | 'private') {
+function getValidFormatsTable(type: 'public' | 'private') {
+  const firstColumnWidth = 'ecdsa-secp256k1'.length + 2
+  const secondColumnWidth = 6
+
   return Object.entries(KEYS)
     .filter(([key]) => key.startsWith(type))
     .map(([key, alg]) => {
       const [, parsedPrefix, parsedLen] = key.split('_')
-      return `${alg.padEnd(
-        'ecdsa-secp256k1'.length + 2,
-      )} - Prefix: ${prefixRepr(Number(parsedPrefix)).padEnd(
-        6,
-      )} Length: ${parsedLen} bytes`
+      return `${alg.padEnd(firstColumnWidth)} - Prefix: ${prefixRepr(
+        Number(parsedPrefix),
+      ).padEnd(secondColumnWidth)} Length: ${parsedLen} bytes`
     })
     .join('\n')
 }
@@ -73,7 +74,7 @@ function keyError({
   prefix: number
   len: number
 }) {
-  const validFormats = getValidFormats(type)
+  const validFormats = getValidFormatsTable(type)
 
   return `invalid_key:
 
