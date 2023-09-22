@@ -13,7 +13,7 @@ export interface DeriveKeyPairOptions {
   accountIndex?: number
 }
 
-export interface Method {
+export interface SigningMethod {
   deriveKeypair: (entropy: ByteArray, options?: DeriveKeyPairOptions) => KeyPair
 
   sign: (message: Uint8Array, privateKey: HexString) => HexString

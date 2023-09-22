@@ -3,7 +3,7 @@ import {
   ByteArray,
   DeriveKeyPairOptions,
   HexString,
-  Method,
+  SigningMethod,
 } from './types'
 import { derivePrivateKey } from './secp256k1'
 import { bytesToHex } from '@xrplf/isomorphic/dist/utils'
@@ -17,7 +17,7 @@ const ED_PREFIX = 'ED'
 const SECP256K1_PREFIX = '00'
 const hash = Sha512.half
 
-export const secp256k1: Method = {
+export const secp256k1: SigningMethod = {
   deriveKeypair(
     entropy: ByteArray,
     options?: DeriveKeyPairOptions,
@@ -58,7 +58,7 @@ export const secp256k1: Method = {
   },
 }
 
-const ed25519: Method = {
+const ed25519: SigningMethod = {
   deriveKeypair(entropy: ByteArray): {
     privateKey: string
     publicKey: string
@@ -97,7 +97,7 @@ const ed25519: Method = {
   },
 }
 
-export function selectMethod(algorithm: Algorithm): Method {
+export function selectMethod(algorithm: Algorithm): SigningMethod {
   const methods = { 'ecdsa-secp256k1': secp256k1, ed25519 }
   return methods[algorithm]
 }
