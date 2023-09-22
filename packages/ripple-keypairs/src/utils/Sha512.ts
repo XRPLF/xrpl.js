@@ -30,7 +30,7 @@ export default class Sha512 {
     return this.finish().slice(0, 32)
   }
 
-  first256BN(): bigint {
+  first256BigInt(): bigint {
     return bytesToNumberBE(this.first256())
   }
 }
