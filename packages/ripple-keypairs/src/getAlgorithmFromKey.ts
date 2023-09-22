@@ -96,7 +96,7 @@ ${validFormats}
  * @returns Algorithm algorithm for signing/verifying
  * @throws Error when key is invalid
  */
-export default function getAlgorithmFromKey(
+export function getAlgorithmFromKey(
   key: HexString,
   type: KeyType,
 ): Algorithm {
@@ -109,4 +109,12 @@ export default function getAlgorithmFromKey(
     throw new Error(keyError({ key, type, len, prefix: usedPrefix }))
   }
   return algorithm
+}
+
+export function getAlgorithmFromPublicKey(key: HexString): Algorithm {
+  return getAlgorithmFromKey(key, 'public')
+}
+
+export function getAlgorithmFromPrivateKey(key: HexString): Algorithm {
+  return getAlgorithmFromKey(key, 'private')
 }

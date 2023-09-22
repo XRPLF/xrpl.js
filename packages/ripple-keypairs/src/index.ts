@@ -1,21 +1,17 @@
 import * as addressCodec from 'ripple-address-codec'
-
-import { secp256k1 as nobleSecp256k1 } from '@noble/curves/secp256k1'
-import { ed25519 as nobleEd25519 } from '@noble/curves/ed25519'
-import { numberToBytesBE } from '@noble/curves/abstract/utils'
 import { ripemd160 } from '@xrplf/isomorphic/ripemd160'
 import { sha256 } from '@xrplf/isomorphic/sha256'
-import { bytesToHex, hexToBytes, randomBytes } from '@xrplf/isomorphic/utils'
+import { hexToBytes, randomBytes } from '@xrplf/isomorphic/utils'
 
-import { accountPublicFromPublicGenerator, derivePrivateKey } from './secp256k1'
+import { accountPublicFromPublicGenerator } from './secp256k1'
 import Sha512 from './Sha512'
 import assert from './assert'
-import { Algorithm, ByteArray, HexString } from './types'
-import getAlgorithmFromKey from './getAlgorithmFromKey'
-
-const hash = Sha512.half
-
-const SECP256K1_PREFIX = '00'
+import { Algorithm, HexString, KeyPair } from './types'
+import {
+  getAlgorithmFromPrivateKey,
+  getAlgorithmFromPublicKey,
+} from './getAlgorithmFromKey'
+import { selectMethod } from './selectMethod'
 
 function generateSeed(
   options: {
@@ -34,88 +30,6 @@ function generateSeed(
   return addressCodec.encodeSeed(entropy, type)
 }
 
-const secp256k1 = {
-  deriveKeypair(
-    entropy: Uint8Array,
-    options?: object,
-  ): {
-    privateKey: string
-    publicKey: string
-  } {
-    const derived = derivePrivateKey(entropy, options)
-    const privateKey =
-      SECP256K1_PREFIX + bytesToHex(numberToBytesBE(derived, 32))
-
-    const publicKey = bytesToHex(nobleSecp256k1.getPublicKey(derived, true))
-    return { privateKey, publicKey }
-  },
-
-  sign(message: ByteArray, privateKey: HexString): string {
-    // Some callers pass the privateKey with the prefix, others without.
-    // @noble/curves will throw if the key is not exactly
-    // 32 bytes, so we normalize it before passing to the sign method.
-    assert.ok(
-      (privateKey.length === 66 && privateKey.startsWith(SECP256K1_PREFIX)) ||
-        privateKey.length === 64,
-    )
-    const normed = privateKey.length === 66 ? privateKey.slice(2) : privateKey
-    return nobleSecp256k1
-      .sign(hash(message), normed)
-      .toDERHex(true)
-      .toUpperCase()
-  },
-
-  verify(message, signature, publicKey): boolean {
-    const decoded = nobleSecp256k1.Signature.fromDER(signature)
-    return nobleSecp256k1.verify(decoded, hash(message), publicKey)
-  },
-}
-
-const ed25519 = {
-  deriveKeypair(entropy: ByteArray): {
-    privateKey: string
-    publicKey: string
-  } {
-    const prefix = 'ED'
-    const rawPrivateKey = hash(entropy)
-    const privateKey = prefix + bytesToHex(rawPrivateKey)
-    const publicKey =
-      prefix + bytesToHex(nobleEd25519.getPublicKey(rawPrivateKey))
-    return { privateKey, publicKey }
-  },
-
-  sign(message: ByteArray, privateKey: HexString): string {
-    assert.ok(
-      Array.isArray(message) || message instanceof Uint8Array,
-      'message must be array of octets',
-    )
-    assert.ok(
-      privateKey.length === 66,
-      'private key must be 33 bytes including prefix',
-    )
-    return bytesToHex(
-      nobleEd25519.sign(new Uint8Array(message), privateKey.slice(2)),
-    )
-  },
-
-  verify(
-    message: ByteArray,
-    signature: HexString | Uint8Array,
-    publicKey: string,
-  ): boolean {
-    return nobleEd25519.verify(
-      signature,
-      new Uint8Array(message),
-      publicKey.slice(2),
-    )
-  },
-}
-
-function select(algorithm: Algorithm) {
-  const methods = { 'ecdsa-secp256k1': secp256k1, ed25519 }
-  return methods[algorithm]
-}
-
 function deriveKeypair(
   seed: string,
   options?: {
@@ -123,17 +37,14 @@ function deriveKeypair(
     validator?: boolean
     accountIndex?: number
   },
-): {
-  publicKey: string
-  privateKey: string
-} {
+): KeyPair {
   const decoded = addressCodec.decodeSeed(seed)
   const proposedAlgorithm = options?.algorithm ?? decoded.type
   const algorithm =
     proposedAlgorithm === 'ed25519' ? 'ed25519' : 'ecdsa-secp256k1'
-  const method = select(algorithm)
+  const method = selectMethod(algorithm)
   const keypair = method.deriveKeypair(decoded.bytes, options)
-  const messageToVerify = hash('This test message should verify.')
+  const messageToVerify = Sha512.half('This test message should verify.')
   const signature = method.sign(messageToVerify, keypair.privateKey)
   /* istanbul ignore if */
   if (!method.verify(messageToVerify, signature, keypair.publicKey)) {
@@ -142,9 +53,9 @@ function deriveKeypair(
   return keypair
 }
 
-function sign(messageHex: HexString, privateKey: HexString): string {
-  const algorithm = getAlgorithmFromKey(privateKey, 'private')
-  return select(algorithm).sign(hexToBytes(messageHex), privateKey)
+function sign(messageHex: HexString, privateKey: HexString): HexString {
+  const algorithm = getAlgorithmFromPrivateKey(privateKey)
+  return selectMethod(algorithm).sign(hexToBytes(messageHex), privateKey)
 }
 
 function verify(
@@ -152,8 +63,12 @@ function verify(
   signature: HexString,
   publicKey: HexString,
 ): boolean {
-  const algorithm = getAlgorithmFromKey(publicKey, 'public')
-  return select(algorithm).verify(hexToBytes(messageHex), signature, publicKey)
+  const algorithm = getAlgorithmFromPublicKey(publicKey)
+  return selectMethod(algorithm).verify(
+    hexToBytes(messageHex),
+    signature,
+    publicKey,
+  )
 }
 
 function computePublicKeyHash(publicKeyBytes: Uint8Array): Uint8Array {

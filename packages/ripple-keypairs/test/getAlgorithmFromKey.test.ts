@@ -1,4 +1,4 @@
-import getAlgorithmFromKey from '../src/getAlgorithmFromKey'
+import { getAlgorithmFromKey } from '../src/getAlgorithmFromKey'
 
 function hexData(count: number) {
   // for our purposes any hex will do
