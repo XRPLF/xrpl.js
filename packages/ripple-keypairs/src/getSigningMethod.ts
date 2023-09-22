@@ -50,7 +50,7 @@ export const secp256k1: SigningMethod = {
 
   verify(
     message: ByteArray,
-    signature: HexString | Uint8Array,
+    signature: HexString,
     publicKey: HexString,
   ): boolean {
     const decoded = nobleSecp256k1.Signature.fromDER(signature)
@@ -84,11 +84,7 @@ const ed25519: SigningMethod = {
     )
   },
 
-  verify(
-    message: ByteArray,
-    signature: HexString | Uint8Array,
-    publicKey: string,
-  ): boolean {
+  verify(message: ByteArray, signature: HexString, publicKey: string): boolean {
     return nobleEd25519.verify(
       signature,
       new Uint8Array(message),
@@ -97,7 +93,7 @@ const ed25519: SigningMethod = {
   },
 }
 
-export function selectMethod(algorithm: Algorithm): SigningMethod {
+export function getSigningMethod(algorithm: Algorithm): SigningMethod {
   const methods = { 'ecdsa-secp256k1': secp256k1, ed25519 }
   return methods[algorithm]
 }

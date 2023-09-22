@@ -11,7 +11,7 @@ import {
   getAlgorithmFromPrivateKey,
   getAlgorithmFromPublicKey,
 } from './getAlgorithmFromKey'
-import { selectMethod } from './selectMethod'
+import { getSigningMethod } from './getSigningMethod'
 
 function generateSeed(
   options: {
@@ -42,7 +42,7 @@ function deriveKeypair(
   const proposedAlgorithm = options?.algorithm ?? decoded.type
   const algorithm =
     proposedAlgorithm === 'ed25519' ? 'ed25519' : 'ecdsa-secp256k1'
-  const method = selectMethod(algorithm)
+  const method = getSigningMethod(algorithm)
   const keypair = method.deriveKeypair(decoded.bytes, options)
   const messageToVerify = Sha512.half('This test message should verify.')
   const signature = method.sign(messageToVerify, keypair.privateKey)
@@ -55,7 +55,7 @@ function deriveKeypair(
 
 function sign(messageHex: HexString, privateKey: HexString): HexString {
   const algorithm = getAlgorithmFromPrivateKey(privateKey)
-  return selectMethod(algorithm).sign(hexToBytes(messageHex), privateKey)
+  return getSigningMethod(algorithm).sign(hexToBytes(messageHex), privateKey)
 }
 
 function verify(
@@ -64,7 +64,7 @@ function verify(
   publicKey: HexString,
 ): boolean {
   const algorithm = getAlgorithmFromPublicKey(publicKey)
-  return selectMethod(algorithm).verify(
+  return getSigningMethod(algorithm).verify(
     hexToBytes(messageHex),
     signature,
     publicKey,
