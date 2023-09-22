@@ -96,10 +96,7 @@ ${validFormats}
  * @returns Algorithm algorithm for signing/verifying
  * @throws Error when key is invalid
  */
-export function getAlgorithmFromKey(
-  key: HexString,
-  type: KeyType,
-): Algorithm {
+export function getAlgorithmFromKey(key: HexString, type: KeyType): Algorithm {
   const { prefix, len } = getKeyInfo(key)
   // Special case back compat support for no prefix
   const usedPrefix = type === 'private' && len === 32 ? Prefix.NONE : prefix
