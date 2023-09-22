@@ -3,15 +3,22 @@ import { ripemd160 } from '@xrplf/isomorphic/ripemd160'
 import { sha256 } from '@xrplf/isomorphic/sha256'
 import { hexToBytes, randomBytes } from '@xrplf/isomorphic/utils'
 
-import { accountPublicFromPublicGenerator } from './methods/secp256k1/utils'
+import { accountPublicFromPublicGenerator } from './signing-methods/secp256k1/utils'
 import Sha512 from './utils/Sha512'
 import assert from './utils/assert'
-import { Algorithm, HexString, KeyPair } from './types'
+import { Algorithm, HexString, KeyPair, SigningMethod } from './types'
 import {
   getAlgorithmFromPrivateKey,
   getAlgorithmFromPublicKey,
 } from './utils/getAlgorithmFromKey'
-import getSigningMethod from './methods/getSigningMethod'
+
+import secp256k1 from './signing-methods/secp256k1'
+import ed25519 from './signing-methods/ed25519'
+
+function getSigningMethod(algorithm: Algorithm): SigningMethod {
+  const methods = { 'ecdsa-secp256k1': secp256k1, ed25519 }
+  return methods[algorithm]
+}
 
 function generateSeed(
   options: {
