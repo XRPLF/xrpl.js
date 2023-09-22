@@ -34,9 +34,10 @@ const secp256k1: SigningMethod = {
       (privateKey.length === 66 && privateKey.startsWith(SECP256K1_PREFIX)) ||
         privateKey.length === 64,
     )
-    const normed = privateKey.length === 66 ? privateKey.slice(2) : privateKey
+    const normedPrivateKey =
+      privateKey.length === 66 ? privateKey.slice(2) : privateKey
     return nobleSecp256k1
-      .sign(Sha512.half(message), normed)
+      .sign(Sha512.half(message), normedPrivateKey)
       .toDERHex(true)
       .toUpperCase()
   },
