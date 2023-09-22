@@ -18,9 +18,3 @@ export declare function HexToBytesFn(hex: string): Uint8Array
  * @param size - number of bytes to generate
  */
 export declare function RandomBytesFn(size: number): Uint8Array
-
-export interface Utils {
-  bytesToHex: typeof BytesToHexFn
-  hexToBytes: typeof HexToBytesFn
-  randomBytes: typeof RandomBytesFn
-}

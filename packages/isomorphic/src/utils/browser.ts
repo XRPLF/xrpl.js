@@ -3,17 +3,15 @@ import {
   hexToBytes as nobleHexToBytes,
   randomBytes as nobleRandomBytes,
 } from '@noble/hashes/utils'
-import { Utils } from './types'
+import { BytesToHexFn, HexToBytesFn, RandomBytesFn } from './types'
 
-const utils: Utils = {
-  bytesToHex(bytes) {
-    const hex = nobleBytesToHex(
-      bytes instanceof Uint8Array ? bytes : Uint8Array.from(bytes),
-    )
-    return hex.toUpperCase()
-  },
-  hexToBytes: nobleHexToBytes,
-  randomBytes: nobleRandomBytes,
+// eslint-disable-next-line func-style
+export const bytesToHex: typeof BytesToHexFn = (bytes) => {
+  const hex = nobleBytesToHex(
+    bytes instanceof Uint8Array ? bytes : Uint8Array.from(bytes),
+  )
+  return hex.toUpperCase()
 }
 
-export const { bytesToHex, hexToBytes, randomBytes } = utils
+export const hexToBytes: typeof HexToBytesFn = nobleHexToBytes
+export const randomBytes: typeof RandomBytesFn = nobleRandomBytes

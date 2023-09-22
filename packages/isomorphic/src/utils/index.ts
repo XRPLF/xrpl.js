@@ -1,5 +1,5 @@
 import { randomBytes as cryptoRandomBytes } from 'crypto'
-import { Utils } from './types'
+import { BytesToHexFn, HexToBytesFn, RandomBytesFn } from './types'
 
 const OriginalBuffer = Symbol('OriginalBuffer')
 
@@ -46,7 +46,6 @@ interface Uint8ArrayWithReference extends Uint8Array {
  * @returns {Uint8Array} Resulting Uint8Array sharing the same memory as the Buffer and maintaining a reference to it.
  */
 function toUint8Array(buffer: Buffer): Uint8Array {
-  // TODO: are we sure this will work? why not just return Buffer and document it?
   const u8Array = new Uint8Array(
     buffer.buffer.slice(
       buffer.byteOffset,
@@ -57,17 +56,18 @@ function toUint8Array(buffer: Buffer): Uint8Array {
   return u8Array
 }
 
-const utils: Utils = {
-  bytesToHex(bytes) {
-    const buf = Buffer.from(bytes)
-    return buf.toString('hex').toUpperCase()
-  },
-  hexToBytes(hex) {
-    return toUint8Array(Buffer.from(hex, 'hex'))
-  },
-  randomBytes(size) {
-    return toUint8Array(cryptoRandomBytes(size))
-  },
+// eslint-disable-next-line func-style
+export const bytesToHex: typeof BytesToHexFn = (bytes) => {
+  const buf = Buffer.from(bytes)
+  return buf.toString('hex').toUpperCase()
 }
 
-export const { bytesToHex, hexToBytes, randomBytes } = utils
+// eslint-disable-next-line func-style
+export const hexToBytes: typeof HexToBytesFn = (hex) => {
+  return toUint8Array(Buffer.from(hex, 'hex'))
+}
+
+// eslint-disable-next-line func-style
+export const randomBytes: typeof RandomBytesFn = (size) => {
+  return toUint8Array(cryptoRandomBytes(size))
+}
