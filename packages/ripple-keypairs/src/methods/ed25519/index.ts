@@ -1,14 +1,14 @@
 import { ed25519 as nobleEd25519 } from '@noble/curves/ed25519'
 import { bytesToHex } from '@xrplf/isomorphic/utils'
 
-import { ByteArray, HexString, SigningMethod } from '../../types'
+import { HexString, SigningMethod } from '../../types'
 import assert from '../../utils/assert'
 import Sha512 from '../../utils/Sha512'
 
 const ED_PREFIX = 'ED'
 
 const ed25519: SigningMethod = {
-  deriveKeypair(entropy: ByteArray): {
+  deriveKeypair(entropy: Uint8Array): {
     privateKey: string
     publicKey: string
   } {
@@ -19,7 +19,7 @@ const ed25519: SigningMethod = {
     return { privateKey, publicKey }
   },
 
-  sign(message: ByteArray, privateKey: HexString): string {
+  sign(message: Uint8Array, privateKey: HexString): string {
     assert.ok(
       Array.isArray(message) || message instanceof Uint8Array,
       'message must be array of octets',
@@ -33,7 +33,11 @@ const ed25519: SigningMethod = {
     )
   },
 
-  verify(message: ByteArray, signature: HexString, publicKey: string): boolean {
+  verify(
+    message: Uint8Array,
+    signature: HexString,
+    publicKey: string,
+  ): boolean {
     return nobleEd25519.verify(
       signature,
       new Uint8Array(message),

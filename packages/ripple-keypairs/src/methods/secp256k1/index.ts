@@ -2,12 +2,7 @@ import { numberToBytesBE } from '@noble/curves/abstract/utils'
 import { secp256k1 as nobleSecp256k1 } from '@noble/curves/secp256k1'
 import { bytesToHex } from '@xrplf/isomorphic/utils'
 
-import {
-  ByteArray,
-  DeriveKeyPairOptions,
-  HexString,
-  SigningMethod,
-} from '../../types'
+import { DeriveKeyPairOptions, HexString, SigningMethod } from '../../types'
 
 import { derivePrivateKey } from './utils'
 import assert from '../../utils/assert'
@@ -17,7 +12,7 @@ const SECP256K1_PREFIX = '00'
 
 const secp256k1: SigningMethod = {
   deriveKeypair(
-    entropy: ByteArray,
+    entropy: Uint8Array,
     options?: DeriveKeyPairOptions,
   ): {
     privateKey: string
@@ -31,7 +26,7 @@ const secp256k1: SigningMethod = {
     return { privateKey, publicKey }
   },
 
-  sign(message: ByteArray, privateKey: HexString): string {
+  sign(message: Uint8Array, privateKey: HexString): string {
     // Some callers pass the privateKey with the prefix, others without.
     // @noble/curves will throw if the key is not exactly 32 bytes, so we
     // normalize it before passing to the sign method.
@@ -47,7 +42,7 @@ const secp256k1: SigningMethod = {
   },
 
   verify(
-    message: ByteArray,
+    message: Uint8Array,
     signature: HexString,
     publicKey: HexString,
   ): boolean {

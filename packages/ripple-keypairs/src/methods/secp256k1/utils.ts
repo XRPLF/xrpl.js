@@ -1,11 +1,10 @@
 import { secp256k1 } from '@noble/curves/secp256k1'
 
 import Sha512 from '../../utils/Sha512'
-import { ByteArray } from '../../types'
 
 const ZERO = BigInt(0)
 
-function deriveScalar(bytes: ByteArray, discrim?: number): bigint {
+function deriveScalar(bytes: Uint8Array, discrim?: number): bigint {
   const order = secp256k1.CURVE.n
   for (let i = 0; i <= 0xffff_ffff; i++) {
     // We hash the bytes to find a 256-bit number, looping until we are sure it
@@ -44,7 +43,7 @@ function deriveScalar(bytes: ByteArray, discrim?: number): bigint {
  *
  */
 export function derivePrivateKey(
-  seed: ByteArray,
+  seed: Uint8Array,
   opts: {
     validator?: boolean
     accountIndex?: number
