@@ -1,6 +1,6 @@
 import { numberToBytesBE } from '@noble/curves/abstract/utils'
 import { secp256k1 as nobleSecp256k1 } from '@noble/curves/secp256k1'
-import { bytesToHex } from '@xrplf/isomorphic/dist/utils'
+import { bytesToHex } from '@xrplf/isomorphic/utils'
 
 import {
   ByteArray,
