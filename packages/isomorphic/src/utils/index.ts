@@ -56,18 +56,17 @@ function toUint8Array(buffer: Buffer): Uint8Array {
   return u8Array
 }
 
-// eslint-disable-next-line func-style
+/* eslint-disable func-style -- Typed to ensure uniformity between node and browser implementations and docs */
 export const bytesToHex: typeof BytesToHexFn = (bytes) => {
   const buf = Buffer.from(bytes)
   return buf.toString('hex').toUpperCase()
 }
 
-// eslint-disable-next-line func-style
 export const hexToBytes: typeof HexToBytesFn = (hex) => {
   return toUint8Array(Buffer.from(hex, 'hex'))
 }
 
-// eslint-disable-next-line func-style
 export const randomBytes: typeof RandomBytesFn = (size) => {
   return toUint8Array(cryptoRandomBytes(size))
 }
+/* eslint-enable func-style */
