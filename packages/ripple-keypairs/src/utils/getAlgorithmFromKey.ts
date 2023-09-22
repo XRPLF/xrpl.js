@@ -1,4 +1,4 @@
-import { Algorithm, HexString, KeyType } from './types'
+import { Algorithm, HexString, KeyType } from '../types'
 
 enum Prefix {
   NONE = -1,
