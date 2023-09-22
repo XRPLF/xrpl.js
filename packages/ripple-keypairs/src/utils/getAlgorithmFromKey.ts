@@ -25,7 +25,7 @@ type CompositeKey = `${KeyType}_${Prefix}_${number}`
  * Note: The 0x00 prefix for secpk256k1 Private (2) essentially 0 pads the number
  *       and the interpreted number is the same as 32 bytes.
  */
-const KEYS: Record<CompositeKey, Algorithm> = {
+const KEY_TYPES: Record<CompositeKey, Algorithm> = {
   [`private_${Prefix.NONE}_32`]: 'ecdsa-secp256k1',
   [`private_${Prefix.SECP256K1_PRIVATE}_33`]: 'ecdsa-secp256k1',
   [`private_${Prefix.ED25519}_33`]: 'ed25519',
@@ -48,17 +48,21 @@ function prefixRepr(prefix: Prefix): string {
     : `0x${prefix.toString(16).padStart(2, '0')}`
 }
 
-function getValidFormatsTable(type: 'public' | 'private') {
-  const firstColumnWidth = 'ecdsa-secp256k1'.length + 2
-  const secondColumnWidth = 6
+function getValidFormatsTable(type: KeyType) {
+  // No need overkill with renderTable method
+  const padding = 2
+  const colWidth = {
+    algorithm: 'ecdsa-secp256k1'.length + padding,
+    prefix: '0x00'.length + padding,
+  }
 
-  return Object.entries(KEYS)
+  return Object.entries(KEY_TYPES)
     .filter(([key]) => key.startsWith(type))
-    .map(([key, alg]) => {
-      const [, parsedPrefix, parsedLen] = key.split('_')
-      return `${alg.padEnd(firstColumnWidth)} - Prefix: ${prefixRepr(
-        Number(parsedPrefix),
-      ).padEnd(secondColumnWidth)} Length: ${parsedLen} bytes`
+    .map(([key, algorithm]) => {
+      const [, prefix, length] = key.split('_')
+      const paddedAlgo = algorithm.padEnd(colWidth.algorithm)
+      const paddedPrefix = prefixRepr(Number(prefix)).padEnd(colWidth.prefix)
+      return `${paddedAlgo} - Prefix: ${paddedPrefix} Length: ${length} bytes`
     })
     .join('\n')
 }
@@ -100,7 +104,7 @@ export function getAlgorithmFromKey(key: HexString, type: KeyType): Algorithm {
   const { prefix, len } = getKeyInfo(key)
   // Special case back compat support for no prefix
   const usedPrefix = type === 'private' && len === 32 ? Prefix.NONE : prefix
-  const algorithm = KEYS[`${type}_${usedPrefix}_${len}`]
+  const algorithm = KEY_TYPES[`${type}_${usedPrefix}_${len}`]
 
   if (!algorithm) {
     throw new Error(keyError({ key, type, len, prefix: usedPrefix }))
