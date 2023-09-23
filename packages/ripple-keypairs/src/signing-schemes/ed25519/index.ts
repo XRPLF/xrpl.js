@@ -37,7 +37,7 @@ const ed25519: SigningScheme = {
   ): boolean {
     // Unlikely to be triggered as these are internal and guarded by getAlgorithmFromKey
     assert.ok(
-      publicKey.length == 66,
+      publicKey.length === 66,
       'public key must be 33 bytes including prefix',
     )
     return nobleEd25519.verify(
