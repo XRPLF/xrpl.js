@@ -12,7 +12,7 @@ export interface DeriveKeyPairOptions {
   accountIndex?: number
 }
 
-export interface SigningMethod {
+export interface SigningScheme {
   deriveKeypair: (
     entropy: Uint8Array,
     options?: DeriveKeyPairOptions,

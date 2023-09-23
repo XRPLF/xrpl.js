@@ -2,7 +2,7 @@ import { numberToBytesBE } from '@noble/curves/abstract/utils'
 import { secp256k1 as nobleSecp256k1 } from '@noble/curves/secp256k1'
 import { bytesToHex } from '@xrplf/isomorphic/utils'
 
-import { DeriveKeyPairOptions, HexString, SigningMethod } from '../../types'
+import { DeriveKeyPairOptions, HexString, SigningScheme } from '../../types'
 
 import { derivePrivateKey } from './utils'
 import assert from '../../utils/assert'
@@ -10,7 +10,7 @@ import Sha512 from '../../utils/Sha512'
 
 const SECP256K1_PREFIX = '00'
 
-const secp256k1: SigningMethod = {
+const secp256k1: SigningScheme = {
   deriveKeypair(
     entropy: Uint8Array,
     options?: DeriveKeyPairOptions,

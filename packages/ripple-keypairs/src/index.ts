@@ -3,21 +3,21 @@ import { ripemd160 } from '@xrplf/isomorphic/ripemd160'
 import { sha256 } from '@xrplf/isomorphic/sha256'
 import { hexToBytes, randomBytes } from '@xrplf/isomorphic/utils'
 
-import { accountPublicFromPublicGenerator } from './signing-methods/secp256k1/utils'
+import { accountPublicFromPublicGenerator } from './signing-schemes/secp256k1/utils'
 import Sha512 from './utils/Sha512'
 import assert from './utils/assert'
-import { Algorithm, HexString, KeyPair, SigningMethod } from './types'
+import { Algorithm, HexString, KeyPair, SigningScheme } from './types'
 import {
   getAlgorithmFromPrivateKey,
   getAlgorithmFromPublicKey,
 } from './utils/getAlgorithmFromKey'
 
-import secp256k1 from './signing-methods/secp256k1'
-import ed25519 from './signing-methods/ed25519'
+import secp256k1 from './signing-schemes/secp256k1'
+import ed25519 from './signing-schemes/ed25519'
 
-function getSigningMethod(algorithm: Algorithm): SigningMethod {
-  const methods = { 'ecdsa-secp256k1': secp256k1, ed25519 }
-  return methods[algorithm]
+function getSigningScheme(algorithm: Algorithm): SigningScheme {
+  const schemes = { 'ecdsa-secp256k1': secp256k1, ed25519 }
+  return schemes[algorithm]
 }
 
 function generateSeed(
@@ -49,12 +49,12 @@ function deriveKeypair(
   const proposedAlgorithm = options?.algorithm ?? decoded.type
   const algorithm =
     proposedAlgorithm === 'ed25519' ? 'ed25519' : 'ecdsa-secp256k1'
-  const method = getSigningMethod(algorithm)
-  const keypair = method.deriveKeypair(decoded.bytes, options)
+  const scheme = getSigningScheme(algorithm)
+  const keypair = scheme.deriveKeypair(decoded.bytes, options)
   const messageToVerify = Sha512.half('This test message should verify.')
-  const signature = method.sign(messageToVerify, keypair.privateKey)
+  const signature = scheme.sign(messageToVerify, keypair.privateKey)
   /* istanbul ignore if */
-  if (!method.verify(messageToVerify, signature, keypair.publicKey)) {
+  if (!scheme.verify(messageToVerify, signature, keypair.publicKey)) {
     throw new Error('derived keypair did not generate verifiable signature')
   }
   return keypair
@@ -62,7 +62,7 @@ function deriveKeypair(
 
 function sign(messageHex: HexString, privateKey: HexString): HexString {
   const algorithm = getAlgorithmFromPrivateKey(privateKey)
-  return getSigningMethod(algorithm).sign(hexToBytes(messageHex), privateKey)
+  return getSigningScheme(algorithm).sign(hexToBytes(messageHex), privateKey)
 }
 
 function verify(
@@ -71,7 +71,7 @@ function verify(
   publicKey: HexString,
 ): boolean {
   const algorithm = getAlgorithmFromPublicKey(publicKey)
-  return getSigningMethod(algorithm).verify(
+  return getSigningScheme(algorithm).verify(
     hexToBytes(messageHex),
     signature,
     publicKey,

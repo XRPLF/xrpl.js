@@ -1,13 +1,13 @@
 import { ed25519 as nobleEd25519 } from '@noble/curves/ed25519'
 import { bytesToHex } from '@xrplf/isomorphic/utils'
 
-import { HexString, SigningMethod } from '../../types'
+import { HexString, SigningScheme } from '../../types'
 import assert from '../../utils/assert'
 import Sha512 from '../../utils/Sha512'
 
 const ED_PREFIX = 'ED'
 
-const ed25519: SigningMethod = {
+const ed25519: SigningScheme = {
   deriveKeypair(entropy: Uint8Array): {
     privateKey: string
     publicKey: string
