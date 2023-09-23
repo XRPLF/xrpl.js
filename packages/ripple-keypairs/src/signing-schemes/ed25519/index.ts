@@ -7,6 +7,7 @@ import Sha512 from '../../utils/Sha512'
 
 const ED_PREFIX = 'ED'
 
+// noinspection SuspiciousTypeOfGuard
 const ed25519: SigningScheme = {
   deriveKeypair(entropy: Uint8Array): {
     privateKey: string
@@ -20,17 +21,13 @@ const ed25519: SigningScheme = {
   },
 
   sign(message: Uint8Array, privateKey: HexString): string {
-    assert.ok(
-      Array.isArray(message) || message instanceof Uint8Array,
-      'message must be array of octets',
-    )
+    // noinspection SuspiciousTypeOfGuard
+    assert.ok(message instanceof Uint8Array, 'message must be array of octets')
     assert.ok(
       privateKey.length === 66,
       'private key must be 33 bytes including prefix',
     )
-    return bytesToHex(
-      nobleEd25519.sign(new Uint8Array(message), privateKey.slice(2)),
-    )
+    return bytesToHex(nobleEd25519.sign(message, privateKey.slice(2)))
   },
 
   verify(
@@ -38,9 +35,15 @@ const ed25519: SigningScheme = {
     signature: HexString,
     publicKey: string,
   ): boolean {
+    // Unlikely to be triggered as these are internal and guarded by getAlgorithmFromKey
+    assert.ok(
+      publicKey.length == 66,
+      'public key must be 33 bytes including prefix',
+    )
     return nobleEd25519.verify(
       signature,
       new Uint8Array(message),
+      // Remove the 0xED prefix
       publicKey.slice(2),
       // TODO: @noble/curves sets zcash friendly defaults
       // By default, set zip215 to false for compatibility reasons.
