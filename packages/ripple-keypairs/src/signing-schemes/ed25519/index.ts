@@ -44,12 +44,11 @@ const ed25519: SigningScheme = {
       new Uint8Array(message),
       // Remove the 0xED prefix
       publicKey.slice(2),
-      // TODO: @noble/curves sets zcash friendly defaults
       // By default, set zip215 to false for compatibility reasons.
       // ZIP 215 is a stricter Ed25519 signature verification scheme.
       // However, setting it to false adheres to the more commonly used
       // RFC8032 / NIST186-5 standards, making it compatible with systems
-      // like the Ripple XRP blockchain.
+      // like the XRP Ledger.
       { zip215: false },
     )
   },
