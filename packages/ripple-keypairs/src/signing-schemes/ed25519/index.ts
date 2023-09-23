@@ -7,7 +7,6 @@ import Sha512 from '../../utils/Sha512'
 
 const ED_PREFIX = 'ED'
 
-// noinspection SuspiciousTypeOfGuard
 const ed25519: SigningScheme = {
   deriveKeypair(entropy: Uint8Array): {
     privateKey: string
