@@ -37,11 +37,11 @@ abstract class ShaMapNode {
 /**
  * Returns a function to hash a given Hashable variant of ShaMapItem and its index when called.
  *
- * @param index - Hash256 key/index for the item in the SHAMap.
  * @param item - Hashable The item to be hashed.
+ * @param index - Hash256 key/index for the item in the SHAMap.
  * @returns A function that computes and returns the hash when called.
  */
-function itemHasher(index: Hash256, item: Hashable): () => Hash256 {
+function hashableItemHasher(item: Hashable, index: Hash256): () => Hash256 {
   return () => {
     const hash = Sha512Half.put(item.hashPrefix())
     item.toBytesSink(hash)
@@ -61,7 +61,7 @@ class ShaMapLeaf extends ShaMapNode {
     if ('prehashed' in item) {
       this.makeHash = () => item.prehashed
     } else if ('hashPrefix' in item && 'toBytesSink' in item) {
-      this.makeHash = itemHasher(index, item)
+      this.makeHash = hashableItemHasher(item, index)
     } else {
       throw new Error('invalid_item: must be either Hashable or Prehashed')
     }
@@ -70,7 +70,7 @@ class ShaMapLeaf extends ShaMapNode {
   /**
    * Hash the bytes representation of this
    *
-   * @returns hash of item Hashable or Prehashed
+   * @returns hash of Hashable or Prehashed item
    */
   hash(): Hash256 {
     return this.makeHash()

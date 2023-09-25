@@ -38,12 +38,10 @@ describe('ShaMap', () => {
       const [index, item] = entryItemizer(entry)
       fullMap.addItem(index, item)
     })
-    fullMap.hash()
     const shortMap = new ShaMap()
     fullMap.walkLeaves((leaf) => {
       shortMap.addItem(leaf.index, { prehashed: leaf.hash() })
     })
-    shortMap.hash()
     expect(fullMap.hash().toHex()).toBe(shortMap.hash().toHex())
   })
 
