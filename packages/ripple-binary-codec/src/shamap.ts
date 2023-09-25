@@ -38,20 +38,35 @@ abstract class ShaMapNode implements Hashable {
   abstract hash(): Hash256
 }
 
+function assert(cond: boolean, message = '') {
+  if (!cond) {
+    throw new Error(message)
+  }
+}
+
+function assertIsHashable(item: ShaMapItem): asserts item is Hashable {
+  const hashable = item as Hashable
+  assert(
+    hashable &&
+      typeof hashable.hashPrefix === 'function' &&
+      typeof hashable.toBytesSink === 'function',
+  )
+}
+
 /**
  * Class describing a Leaf of SHAMap
  */
 class ShaMapLeaf extends ShaMapNode {
-  constructor(public index: Hash256, public item: ShaMapItem) {
+  private prehashed?: Hash256
+  private hashable: Hashable
+
+  constructor(public index: Hash256, item: ShaMapItem) {
     super()
-  }
-
-  private get hashable(): Hashable {
-    return this.item as Hashable
-  }
-
-  private get precomputed(): Prehashed {
-    return this.item as Prehashed
+    this.prehashed = (item as Prehashed).prehashed ?? undefined
+    if (!this.prehashed) {
+      assertIsHashable(item)
+    }
+    this.hashable = item as Hashable
   }
 
   /**
@@ -74,6 +89,7 @@ class ShaMapLeaf extends ShaMapNode {
    * @returns The hash prefix
    */
   hashPrefix(): Buffer {
+    assert(!this.prehashed)
     return this.hashable.hashPrefix()
   }
 
@@ -83,8 +99,8 @@ class ShaMapLeaf extends ShaMapNode {
    * @returns hash of this.item concatenated with this.index
    */
   hash(): Hash256 {
-    if (this.precomputed.prehashed) {
-      return this.precomputed.prehashed
+    if (this.prehashed) {
+      return this.prehashed
     }
     const hash = Sha512Half.put(this.hashPrefix())
     this.toBytesSink(hash)
@@ -96,6 +112,7 @@ class ShaMapLeaf extends ShaMapNode {
    * @param list BytesList to write bytes to
    */
   toBytesSink(list: BytesList): void {
+    assert(!this.prehashed)
     this.hashable.toBytesSink(list)
     this.index.toBytesSink(list)
   }
