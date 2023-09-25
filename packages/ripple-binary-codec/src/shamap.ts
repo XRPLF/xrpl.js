@@ -35,10 +35,10 @@ abstract class ShaMapNode {
 }
 
 /**
- * Returns a function to hash a given Hashable ShaMapItem and its index when called.
+ * Returns a function to hash a given Hashable variant of ShaMapItem and its index when called.
  *
- * @param index - The index (Hash256) for the item in the SHAMap.
- * @param item - The item (Hashable) to be hashed.
+ * @param index - Hash256 key/index for the item in the SHAMap.
+ * @param item - Hashable The item to be hashed.
  * @returns A function that computes and returns the hash when called.
  */
 function itemHasher(index: Hash256, item: Hashable): () => Hash256 {
