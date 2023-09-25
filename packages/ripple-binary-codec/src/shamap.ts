@@ -34,35 +34,38 @@ abstract class ShaMapNode {
   abstract hash(): Hash256
 }
 
-function assert(cond: boolean, message = '') {
-  if (!cond) {
-    throw new Error(message)
-  }
-}
-
-function assertIsHashable(item: ShaMapItem): asserts item is Hashable {
-  const hashable = item as Hashable
-  assert(
-    hashable &&
-      typeof hashable.hashPrefix === 'function' &&
-      typeof hashable.toBytesSink === 'function',
-  )
-}
-
 /**
  * Class describing a Leaf of SHAMap
  */
 class ShaMapLeaf extends ShaMapNode {
   private prehashed?: Hash256
-  private hashable: Hashable
+  private hashable?: Hashable
 
   constructor(public index: Hash256, item: ShaMapItem) {
     super()
-    this.prehashed = (item as Prehashed).prehashed ?? undefined
-    if (!this.prehashed) {
-      assertIsHashable(item)
+    if ('prehashed' in item) {
+      this.prehashed = item.prehashed
+    } else if ('hashPrefix' in item && 'toBytesSink' in item) {
+      this.hashable = item
     }
-    this.hashable = item as Hashable
+  }
+
+  /**
+   * Hash the bytes representation of this
+   *
+   * @returns hash of this.item concatenated with this.index
+   */
+  hash(): Hash256 {
+    if (this.prehashed) {
+      return this.prehashed
+    } else if (!this.hashable) {
+      throw new Error('Invalid item: must be either Hashable or Prehashed')
+    }
+
+    const hash = Sha512Half.put(this.hashable.hashPrefix())
+    this.hashable.toBytesSink(hash)
+    this.index.toBytesSink(hash)
+    return hash.finish()
   }
 
   /**
@@ -77,21 +80,6 @@ class ShaMapLeaf extends ShaMapNode {
    */
   isInner(): boolean {
     return false
-  }
-
-  /**
-   * Hash the bytes representation of this
-   *
-   * @returns hash of this.item concatenated with this.index
-   */
-  hash(): Hash256 {
-    if (this.prehashed) {
-      return this.prehashed
-    }
-    const hash = Sha512Half.put(this.hashable.hashPrefix())
-    this.hashable.toBytesSink(hash)
-    this.index.toBytesSink(hash)
-    return hash.finish()
   }
 }
 
