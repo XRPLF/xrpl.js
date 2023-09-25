@@ -26,14 +26,10 @@ export type ShaMapItem = Hashable | Prehashed
 /**
  * Abstract class describing a SHAMapNode
  */
-abstract class ShaMapNode implements Hashable {
-  abstract hashPrefix(): Buffer
-
+abstract class ShaMapNode {
   abstract isLeaf(): boolean
 
   abstract isInner(): boolean
-
-  abstract toBytesSink(list: BytesList): void
 
   abstract hash(): Hash256
 }
@@ -84,16 +80,6 @@ class ShaMapLeaf extends ShaMapNode {
   }
 
   /**
-   * Get the prefix of the this.item
-   *
-   * @returns The hash prefix
-   */
-  hashPrefix(): Buffer {
-    assert(!this.prehashed)
-    return this.hashable.hashPrefix()
-  }
-
-  /**
    * Hash the bytes representation of this
    *
    * @returns hash of this.item concatenated with this.index
@@ -102,26 +88,17 @@ class ShaMapLeaf extends ShaMapNode {
     if (this.prehashed) {
       return this.prehashed
     }
-    const hash = Sha512Half.put(this.hashPrefix())
-    this.toBytesSink(hash)
+    const hash = Sha512Half.put(this.hashable.hashPrefix())
+    this.hashable.toBytesSink(hash)
+    this.index.toBytesSink(hash)
     return hash.finish()
-  }
-
-  /**
-   * Write the bytes representation of this to a BytesList
-   * @param list BytesList to write bytes to
-   */
-  toBytesSink(list: BytesList): void {
-    assert(!this.prehashed)
-    this.hashable.toBytesSink(list)
-    this.index.toBytesSink(list)
   }
 }
 
 /**
  * Class defining an Inner Node of a SHAMap
  */
-class ShaMapInner extends ShaMapNode {
+class ShaMapInner extends ShaMapNode implements Hashable {
   private slotBits = 0
   private branches: Array<ShaMapNode> = Array(16)
 
