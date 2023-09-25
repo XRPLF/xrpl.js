@@ -25,6 +25,7 @@ describe('account_tx', function () {
 
   it('this does nothing', () => {
     assert.isTrue(true)
+    assert.isTrue(true)
   })
 
   it(
