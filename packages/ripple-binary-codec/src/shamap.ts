@@ -27,9 +27,9 @@ export type ShaMapItem = Hashable | Prehashed
  * Abstract class describing a SHAMapNode
  */
 abstract class ShaMapNode {
-  abstract isLeaf(): boolean
+  abstract isLeaf(): this is ShaMapLeaf
 
-  abstract isInner(): boolean
+  abstract isInner(): this is ShaMapInner
 
   abstract hash(): Hash256
 }
@@ -79,7 +79,7 @@ class ShaMapLeaf extends ShaMapNode {
   /**
    * @returns false as ShaMapLeaf is not an inner node
    */
-  isInner(): boolean {
+  isInner(): this is ShaMapInner {
     return false
   }
 }
@@ -87,7 +87,7 @@ class ShaMapLeaf extends ShaMapNode {
 /**
  * Class defining an Inner Node of a SHAMap
  */
-class ShaMapInner extends ShaMapNode implements Hashable {
+class ShaMapInner extends ShaMapNode {
   private slotBits = 0
   private branches: Array<ShaMapNode> = Array(16)
 
@@ -174,7 +174,7 @@ class ShaMapInner extends ShaMapNode implements Hashable {
     const existing = this.branches[nibble]
     if (existing === undefined) {
       this.setBranch(nibble, new ShaMapLeaf(index, item))
-    } else if (existing instanceof ShaMapLeaf) {
+    } else if (existing.isLeaf()) {
       const deeper = this.depth + 1
       const newInner = new ShaMapInner(deeper)
       // Set this first in empty inner so addItem can recursively
@@ -182,7 +182,7 @@ class ShaMapInner extends ShaMapNode implements Hashable {
       newInner.setBranch(existing.index.nibblet(deeper), existing)
       newInner.addItem(index, item)
       this.setBranch(nibble, newInner)
-    } else if (existing instanceof ShaMapInner) {
+    } else if (existing.isInner()) {
       existing.addItem(index, item)
     } else {
       throw new Error('invalid ShaMap.addItem call')
@@ -195,9 +195,9 @@ class ShaMapInner extends ShaMapNode implements Hashable {
    */
   walkLeaves(onLeaf: (leaf: ShaMapLeaf) => void) {
     this.branches.forEach((b) => {
-      if (b instanceof ShaMapLeaf) {
+      if (b.isLeaf()) {
         onLeaf(b)
-      } else if (b instanceof ShaMapInner) {
+      } else if (b.isInner()) {
         b.walkLeaves(onLeaf)
       }
     })
