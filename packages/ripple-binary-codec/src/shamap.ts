@@ -15,6 +15,15 @@ export interface Hashable {
 }
 
 /**
+ * A prehashed item where you only have the hash, not the contents
+ */
+export interface Prehashed {
+  prehashed: Hash256
+}
+
+export type ShaMapItem = Hashable | Prehashed
+
+/**
  * Abstract class describing a SHAMapNode
  */
 abstract class ShaMapNode implements Hashable {
@@ -33,8 +42,16 @@ abstract class ShaMapNode implements Hashable {
  * Class describing a Leaf of SHAMap
  */
 class ShaMapLeaf extends ShaMapNode {
-  constructor(public index: Hash256, public item?: Hashable) {
+  constructor(public index: Hash256, public item: ShaMapItem) {
     super()
+  }
+
+  private get hashable(): Hashable {
+    return this.item as Hashable
+  }
+
+  private get precomputed(): Prehashed {
+    return this.item as Prehashed
   }
 
   /**
@@ -54,10 +71,10 @@ class ShaMapLeaf extends ShaMapNode {
   /**
    * Get the prefix of the this.item
    *
-   * @returns The hash prefix, unless this.item is undefined, then it returns an empty Buffer
+   * @returns The hash prefix
    */
   hashPrefix(): Buffer {
-    return this.item === undefined ? Buffer.alloc(0) : this.item.hashPrefix()
+    return this.hashable.hashPrefix()
   }
 
   /**
@@ -66,6 +83,9 @@ class ShaMapLeaf extends ShaMapNode {
    * @returns hash of this.item concatenated with this.index
    */
   hash(): Hash256 {
+    if (this.precomputed.prehashed) {
+      return this.precomputed.prehashed
+    }
     const hash = Sha512Half.put(this.hashPrefix())
     this.toBytesSink(hash)
     return hash.finish()
@@ -76,9 +96,7 @@ class ShaMapLeaf extends ShaMapNode {
    * @param list BytesList to write bytes to
    */
   toBytesSink(list: BytesList): void {
-    if (this.item !== undefined) {
-      this.item.toBytesSink(list)
-    }
+    this.hashable.toBytesSink(list)
     this.index.toBytesSink(list)
   }
 }
@@ -123,7 +141,7 @@ class ShaMapInner extends ShaMapNode {
    * @param slot Slot to add branch to this.branches
    * @param branch Branch to add
    */
-  setBranch(slot: number, branch: ShaMapNode): void {
+  private setBranch(slot: number, branch: ShaMapNode): void {
     this.slotBits = this.slotBits | (1 << slot)
     this.branches[slot] = branch
   }
@@ -168,7 +186,7 @@ class ShaMapInner extends ShaMapNode {
    * @param index Hash of the index of the item being inserted
    * @param item Item to insert in the map
    */
-  addItem(index: Hash256, item: Hashable): void {
+  addItem(index: Hash256, item: ShaMapItem): void {
     const nibble = index.nibblet(this.depth)
     const existing = this.branches[nibble]
     if (existing === undefined) {
@@ -186,6 +204,20 @@ class ShaMapInner extends ShaMapNode {
     } else {
       throw new Error('invalid ShaMap.addItem call')
     }
+  }
+
+  /**
+   * Depth first walking of ShaMap
+   * @param onLeaf callback to be executed for each leaf
+   */
+  walkLeaves(onLeaf: (leaf: ShaMapLeaf) => void) {
+    this.branches.forEach((b) => {
+      if (b instanceof ShaMapLeaf) {
+        onLeaf(b)
+      } else if (b instanceof ShaMapInner) {
+        b.walkLeaves(onLeaf)
+      }
+    })
   }
 }
 

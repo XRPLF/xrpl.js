@@ -3,6 +3,9 @@ const { binary, HashPrefix } = require('../src/coretypes')
 const { coreTypes } = require('../src/types')
 const { loadFixture } = require('./utils')
 const { Buffer } = require('buffer/')
+const { entryItemizer } = require('../src/ledger-hashes')
+
+const log = () => undefined
 
 function now() {
   return Number(Date.now()) / 1000
@@ -28,7 +31,21 @@ function makeItem(indexArg) {
 }
 
 describe('ShaMap', () => {
-  now()
+  test('you can add prehashed items to trees', () => {
+    const fixture = loadFixture('ledger-full-40000.json')
+    const fullMap = new ShaMap()
+    fixture.accountState.forEach((entry) => {
+      const [index, item] = entryItemizer(entry)
+      fullMap.addItem(index, item)
+    })
+    fullMap.hash()
+    const shortMap = new ShaMap()
+    fullMap.walkLeaves((leaf) => {
+      shortMap.addItem(leaf.index, { prehashed: leaf.hash() })
+    })
+    shortMap.hash()
+    expect(fullMap.hash().toHex()).toBe(shortMap.hash().toHex())
+  })
 
   test('hashes to zero when empty', () => {
     const map = new ShaMap()
@@ -54,17 +71,18 @@ describe('ShaMap', () => {
     items.reverse().forEach((i) => map.addItem(...makeItem(i)))
     expect(map.hash()).toStrictEqual(h1)
   })
+
   function factory(fixture) {
     test(`recreate account state hash from ${fixture}`, () => {
       const map = new ShaMap()
       const ledger = loadFixture(fixture)
-      // const t = now();
+      const t = now()
       const leafNodePrefix = HashPrefix.accountStateEntry
       ledger.accountState
         .map((e, i) => {
-          if ((i > 1000) & (i % 1000 === 0)) {
-            console.log(e.index)
-            console.log(i)
+          if (i > 1000 && i % 1000 === 0) {
+            log(e.index)
+            log(i)
           }
           const bytes = binary.serializeObject(e)
           return {
@@ -79,11 +97,12 @@ describe('ShaMap', () => {
         })
         .forEach((so) => map.addItem(so.index, so))
       expect(map.hash().toHex()).toBe(ledger.account_hash)
-      // console.log('took seconds: ', (now() - t));
+      log('took seconds: ', now() - t)
     })
   }
+
   factory('ledger-full-38129.json')
   factory('ledger-full-40000.json')
-  // factory('ledger-4320277.json');
-  // factory('14280680.json');
+  // factory('ledger-4320277.json')
+  // factory('14280680.json')
 })

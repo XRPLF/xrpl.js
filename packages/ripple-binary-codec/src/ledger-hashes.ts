@@ -72,7 +72,7 @@ interface LedgerEntryItem extends JsonObject {
  * @param json JSON describing a ledger entry item
  * @returns a tuple of index and item to be added to SHAMap
  */
-function entryItemizer(json: LedgerEntryItem): [Hash256, Hashable] {
+export function entryItemizer(json: LedgerEntryItem): [Hash256, Hashable] {
   const index = Hash256.from(json.index)
   const bytes = serializeObject(json)
   const item = {
