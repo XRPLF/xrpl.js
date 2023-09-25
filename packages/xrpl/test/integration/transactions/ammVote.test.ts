@@ -1,59 +1,43 @@
 import { assert } from 'chai'
 import { AMMDeposit, AMMDepositFlags, AMMVote } from 'xrpl'
 
-import { AMMInfoResponse, Wallet } from '../../../src'
+import { AMMInfoResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import { generateFundedWallet, setupAMMPool, testTransaction } from '../utils'
+import { testTransaction } from '../utils'
 
 describe('AMMVote', function () {
   let testContext: XrplIntegrationTestContext
-  let wallet: Wallet
-  let wallet2: Wallet
-  let wallet3: Wallet
-  let currencyCode: string
 
   beforeAll(async () => {
     testContext = await setupClient(serverUrl)
-    wallet = testContext.wallet
-    wallet2 = await generateFundedWallet(testContext.client)
-    wallet3 = await generateFundedWallet(testContext.client)
-    currencyCode = 'USD'
-
-    await setupAMMPool(testContext.client, wallet, wallet2, currencyCode)
   })
   afterAll(async () => teardownClient(testContext))
 
   it('vote', async function () {
+    const { asset, asset2 } = testContext.amm
+    const { wallet } = testContext
+
+    // Need to deposit (be an LP) before voting is eligible
     const ammDepositTx: AMMDeposit = {
       TransactionType: 'AMMDeposit',
-      Account: wallet3.classicAddress,
-      Asset: {
-        currency: 'XRP',
-      },
-      Asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      Account: wallet.classicAddress,
+      Asset: asset,
+      Asset2: asset2,
       Amount: '1000',
       Flags: AMMDepositFlags.tfSingleAsset,
     }
 
-    await testTransaction(testContext.client, ammDepositTx, wallet3)
+    await testTransaction(testContext.client, ammDepositTx, wallet)
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      asset,
+      asset2,
     })
 
     const { amm: preAmm } = preAmmInfoRes.result
@@ -72,28 +56,18 @@ describe('AMMVote', function () {
 
     const ammVoteTx: AMMVote = {
       TransactionType: 'AMMVote',
-      Account: wallet3.classicAddress,
-      Asset: {
-        currency: 'XRP',
-      },
-      Asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      Account: wallet.classicAddress,
+      Asset: asset,
+      Asset2: asset2,
       TradingFee: 150,
     }
 
-    await testTransaction(testContext.client, ammVoteTx, wallet3)
+    await testTransaction(testContext.client, ammVoteTx, wallet)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      asset,
+      asset2,
     })
 
     const { amm } = ammInfoRes.result

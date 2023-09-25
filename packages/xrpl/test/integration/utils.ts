@@ -10,7 +10,7 @@ import {
   type SubmitResponse,
   TimeoutError,
   NotConnectedError,
-  AMMInfoResponse,
+  Currency,
 } from '../../src'
 import {
   AMMCreate,
@@ -25,6 +25,13 @@ import { hashSignedTx } from '../../src/utils/hashes'
 
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
+
+export interface SetupAMMPool {
+  issuerWallet: Wallet
+  lpWallet: Wallet
+  asset: Currency
+  asset2: Currency
+}
 
 export async function sendLedgerAccept(client: Client): Promise<unknown> {
   return client.connection.request({ command: 'ledger_accept' })
@@ -357,13 +364,12 @@ export async function waitForAndForceProgressLedgerTime(
  * @param currencyCode - The currency code of the new token to be an asset in the AMM pool.
  * @returns - A promise that resolves to the amm_info response of the AMM pool.
  */
-// eslint-disable-next-line max-params -- Test function, many params are needed
-export async function setupAMMPool(
-  client: Client,
-  lpWallet: Wallet,
-  issuerWallet: Wallet,
-  currencyCode: string,
-): Promise<AMMInfoResponse> {
+
+export async function setupAMMPool(client: Client): Promise<SetupAMMPool> {
+  const lpWallet = await generateFundedWallet(client)
+  const issuerWallet = await generateFundedWallet(client)
+  const currencyCode = 'USD'
+
   const accountSetTx: AccountSet = {
     TransactionType: 'AccountSet',
     Account: issuerWallet.classicAddress,
@@ -412,8 +418,9 @@ export async function setupAMMPool(
 
   await testTransaction(client, ammCreateTx, lpWallet)
 
-  return client.request({
-    command: 'amm_info',
+  return {
+    issuerWallet,
+    lpWallet,
     asset: {
       currency: 'XRP',
     },
@@ -421,5 +428,5 @@ export async function setupAMMPool(
       currency: currencyCode,
       issuer: issuerWallet.classicAddress,
     },
-  })
+  }
 }

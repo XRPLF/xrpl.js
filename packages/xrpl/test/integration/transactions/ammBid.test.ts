@@ -1,68 +1,43 @@
 import { assert } from 'chai'
-import { AMMBid, AMMDeposit, AMMDepositFlags, IssuedCurrencyAmount } from 'xrpl'
+import { AMMBid, AMMDeposit, AMMDepositFlags } from 'xrpl'
 
-import { AMMInfoResponse, Wallet } from '../../../src'
+import { AMMInfoResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import { generateFundedWallet, setupAMMPool, testTransaction } from '../utils'
+import { testTransaction } from '../utils'
 
 describe('AMMBid', function () {
   let testContext: XrplIntegrationTestContext
-  let wallet: Wallet
-  let wallet2: Wallet
-  let wallet3: Wallet
-  let currencyCode: string
-  let lptoken: IssuedCurrencyAmount
 
   beforeAll(async () => {
     testContext = await setupClient(serverUrl)
-    wallet = testContext.wallet
-    wallet2 = await generateFundedWallet(testContext.client)
-    wallet3 = await generateFundedWallet(testContext.client)
-    currencyCode = 'USD'
-
-    const ammInfoRes = await setupAMMPool(
-      testContext.client,
-      wallet,
-      wallet2,
-      currencyCode,
-    )
-
-    const { amm } = ammInfoRes.result
-    lptoken = amm.lp_token
   })
   afterAll(async () => teardownClient(testContext))
 
   it('bid', async function () {
+    const { asset, asset2 } = testContext.amm
+    const { wallet } = testContext
+
+    // Need to deposit (be an LP) before bidding is eligible
     const ammDepositTx: AMMDeposit = {
       TransactionType: 'AMMDeposit',
-      Account: wallet3.classicAddress,
-      Asset: {
-        currency: 'XRP',
-      },
-      Asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      Account: wallet.classicAddress,
+      Asset: asset,
+      Asset2: asset2,
       Amount: '1000',
       Flags: AMMDepositFlags.tfSingleAsset,
     }
 
-    await testTransaction(testContext.client, ammDepositTx, wallet3)
+    await testTransaction(testContext.client, ammDepositTx, wallet)
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      asset,
+      asset2,
     })
 
     const { amm: preAmm } = preAmmInfoRes.result
@@ -73,27 +48,17 @@ describe('AMMBid', function () {
 
     const ammBidTx: AMMBid = {
       TransactionType: 'AMMBid',
-      Account: wallet3.classicAddress,
-      Asset: {
-        currency: 'XRP',
-      },
-      Asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      Account: wallet.classicAddress,
+      Asset: asset,
+      Asset2: asset2,
     }
 
-    await testTransaction(testContext.client, ammBidTx, wallet3)
+    await testTransaction(testContext.client, ammBidTx, wallet)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      asset,
+      asset2,
     })
 
     const { amm } = ammInfoRes.result
@@ -107,31 +72,25 @@ describe('AMMBid', function () {
   })
 
   it('vote with AuthAccounts, BidMin, BidMax', async function () {
+    const { asset, asset2, issuerWallet } = testContext.amm
+    const { wallet } = testContext
+
+    // Need to deposit (be an LP) before bidding is eligible
     const ammDepositTx: AMMDeposit = {
       TransactionType: 'AMMDeposit',
-      Account: wallet3.classicAddress,
-      Asset: {
-        currency: 'XRP',
-      },
-      Asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      Account: wallet.classicAddress,
+      Asset: asset,
+      Asset2: asset2,
       Amount: '1000',
       Flags: AMMDepositFlags.tfSingleAsset,
     }
 
-    await testTransaction(testContext.client, ammDepositTx, wallet3)
+    await testTransaction(testContext.client, ammDepositTx, wallet)
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      asset,
+      asset2,
     })
 
     const { amm: preAmm } = preAmmInfoRes.result
@@ -142,36 +101,26 @@ describe('AMMBid', function () {
 
     const ammBidTx: AMMBid = {
       TransactionType: 'AMMBid',
-      Account: wallet3.classicAddress,
-      Asset: {
-        currency: 'XRP',
-      },
-      Asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      Account: wallet.classicAddress,
+      Asset: asset,
+      Asset2: asset2,
       AuthAccounts: [
         {
           AuthAccount: {
-            Account: wallet.classicAddress,
+            Account: issuerWallet.classicAddress,
           },
         },
       ],
-      BidMin: { ...lptoken, value: '5' },
-      BidMax: { ...lptoken, value: '10' },
+      BidMin: { ...preLPToken, value: '5' },
+      BidMax: { ...preLPToken, value: '10' },
     }
 
-    await testTransaction(testContext.client, ammBidTx, wallet3)
+    await testTransaction(testContext.client, ammBidTx, wallet)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      asset,
+      asset2,
     })
 
     const { amm } = ammInfoRes.result
@@ -184,7 +133,7 @@ describe('AMMBid', function () {
     assert.equal(lp_token.value < preLPToken.value, true)
     assert.deepEqual(auction_slot.auth_accounts, [
       {
-        account: wallet.classicAddress,
+        account: issuerWallet.classicAddress,
       },
     ])
   })

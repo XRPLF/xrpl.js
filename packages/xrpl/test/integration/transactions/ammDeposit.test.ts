@@ -1,52 +1,30 @@
 import { assert } from 'chai'
-import { AMMDeposit, AMMDepositFlags, IssuedCurrencyAmount } from 'xrpl'
+import { AMMDeposit, AMMDepositFlags } from 'xrpl'
 
-import { AMMInfoResponse, Wallet } from '../../../src'
+import { AMMInfoResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import { generateFundedWallet, setupAMMPool, testTransaction } from '../utils'
+import { testTransaction } from '../utils'
 
 describe('AMMDeposit', function () {
   let testContext: XrplIntegrationTestContext
-  let wallet: Wallet
-  let wallet2: Wallet
-  let wallet3: Wallet
-  let currencyCode: string
-  let lptoken: IssuedCurrencyAmount
 
   beforeAll(async () => {
     testContext = await setupClient(serverUrl)
-    wallet = testContext.wallet
-    wallet2 = await generateFundedWallet(testContext.client)
-    wallet3 = await generateFundedWallet(testContext.client)
-    currencyCode = 'USD'
-
-    const ammInfoRes = await setupAMMPool(
-      testContext.client,
-      wallet,
-      wallet2,
-      currencyCode,
-    )
-
-    const { amm } = ammInfoRes.result
-    lptoken = amm.lp_token
   })
   afterAll(async () => teardownClient(testContext))
 
   it('deposit with Amount', async function () {
+    const { asset, asset2 } = testContext.amm
+
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      asset: testContext.amm.asset,
+      asset2: testContext.amm.asset2,
     })
 
     const { amm: preAmm } = preAmmInfoRes.result
@@ -54,29 +32,19 @@ describe('AMMDeposit', function () {
 
     const ammDepositTx: AMMDeposit = {
       TransactionType: 'AMMDeposit',
-      Account: wallet3.classicAddress,
-      Asset: {
-        currency: 'XRP',
-      },
-      Asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      Account: testContext.wallet.classicAddress,
+      Asset: asset,
+      Asset2: asset2,
       Amount: '1000',
       Flags: AMMDepositFlags.tfSingleAsset,
     }
 
-    await testTransaction(testContext.client, ammDepositTx, wallet3)
+    await testTransaction(testContext.client, ammDepositTx, testContext.wallet)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      asset,
+      asset2,
     })
 
     const { amm } = ammInfoRes.result
@@ -93,50 +61,41 @@ describe('AMMDeposit', function () {
   })
 
   it('deposit with Amount and Amount2', async function () {
+    const { asset, asset2, issuerWallet } = testContext.amm
+
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      asset,
+      asset2,
     })
 
     const { amm: preAmm } = preAmmInfoRes.result
     const { amount: preAmount, amount2: preAmount2 } = preAmm
 
+    if (asset2.issuer == null) {
+      throw new Error('asset2.issuer should not be null')
+    }
+
     const ammDepositTx: AMMDeposit = {
       TransactionType: 'AMMDeposit',
-      Account: wallet2.classicAddress,
-      Asset: {
-        currency: 'XRP',
-      },
-      Asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      Account: issuerWallet.classicAddress,
+      Asset: asset,
+      Asset2: asset2,
       Amount: '100',
       Amount2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
+        currency: asset2.currency,
+        issuer: asset2.issuer,
         value: '100',
       },
       Flags: AMMDepositFlags.tfTwoAsset,
     }
 
-    await testTransaction(testContext.client, ammDepositTx, wallet2)
+    await testTransaction(testContext.client, ammDepositTx, issuerWallet)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      asset,
+      asset2,
     })
 
     const { amm } = ammInfoRes.result
@@ -163,15 +122,12 @@ describe('AMMDeposit', function () {
   })
 
   it('deposit with Amount and LPTokenOut', async function () {
+    const { asset, asset2, issuerWallet } = testContext.amm
+
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      asset,
+      asset2,
     })
 
     const { amm: preAmm } = preAmmInfoRes.result
@@ -181,33 +137,23 @@ describe('AMMDeposit', function () {
       lp_token: preLPToken,
     } = preAmm
 
-    const lptokenOut = { ...lptoken, value: '5' }
+    const lptokenOut = { ...preLPToken, value: '5' }
     const ammDepositTx: AMMDeposit = {
       TransactionType: 'AMMDeposit',
-      Account: wallet2.classicAddress,
-      Asset: {
-        currency: 'XRP',
-      },
-      Asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      Account: issuerWallet.classicAddress,
+      Asset: asset,
+      Asset2: asset2,
       Amount: '100',
       LPTokenOut: lptokenOut,
       Flags: AMMDepositFlags.tfOneAssetLPToken,
     }
 
-    await testTransaction(testContext.client, ammDepositTx, wallet2)
+    await testTransaction(testContext.client, ammDepositTx, issuerWallet)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      asset,
+      asset2,
     })
 
     const { amm } = ammInfoRes.result
@@ -236,15 +182,12 @@ describe('AMMDeposit', function () {
   })
 
   it('deposit with LPTokenOut', async function () {
+    const { asset, asset2, issuerWallet } = testContext.amm
+
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      asset,
+      asset2,
     })
 
     const { amm: preAmm } = preAmmInfoRes.result
@@ -254,32 +197,22 @@ describe('AMMDeposit', function () {
       lp_token: preLPToken,
     } = preAmm
 
-    const lptokenOut = { ...lptoken, value: '5' }
+    const lptokenOut = { ...preLPToken, value: '5' }
     const ammDepositTx: AMMDeposit = {
       TransactionType: 'AMMDeposit',
-      Account: wallet2.classicAddress,
-      Asset: {
-        currency: 'XRP',
-      },
-      Asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      Account: issuerWallet.classicAddress,
+      Asset: asset,
+      Asset2: asset2,
       LPTokenOut: lptokenOut,
       Flags: AMMDepositFlags.tfLPToken,
     }
 
-    await testTransaction(testContext.client, ammDepositTx, wallet2)
+    await testTransaction(testContext.client, ammDepositTx, issuerWallet)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
-      asset: {
-        currency: 'XRP',
-      },
-      asset2: {
-        currency: currencyCode,
-        issuer: wallet2.classicAddress,
-      },
+      asset,
+      asset2,
     })
 
     const { amm } = ammInfoRes.result

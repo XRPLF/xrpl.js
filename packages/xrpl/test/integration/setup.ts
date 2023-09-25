@@ -1,9 +1,10 @@
 import { Client, Wallet } from '../../src'
 
 import serverUrl from './serverUrl'
-import { fundAccount } from './utils'
+import { SetupAMMPool, fundAccount, setupAMMPool } from './utils'
 
 export interface XrplIntegrationTestContext {
+  amm: SetupAMMPool
   client: Client
   wallet: Wallet
 }
@@ -32,15 +33,18 @@ async function connectWithRetry(client: Client, tries = 0): Promise<void> {
 export async function setupClient(
   server = serverUrl,
 ): Promise<XrplIntegrationTestContext> {
-  const context: XrplIntegrationTestContext = {
-    client: new Client(server, { timeout: 200000 }),
-    wallet: Wallet.generate(),
-  }
-  return connectWithRetry(context.client).then(async () => {
-    await fundAccount(context.client, context.wallet, {
+  const client = new Client(server, { timeout: 200000 })
+  const wallet = Wallet.generate()
+  return connectWithRetry(client).then(async () => {
+    await fundAccount(client, wallet, {
       count: 20,
       delayMs: 1000,
     })
+    const context: XrplIntegrationTestContext = {
+      amm: await setupAMMPool(client),
+      client,
+      wallet,
+    }
     return context
   })
 }
