@@ -10,12 +10,28 @@ import {
   type SubmitResponse,
   TimeoutError,
   NotConnectedError,
+  Currency,
 } from '../../src'
-import { Payment, Transaction } from '../../src/models/transactions'
+import {
+  AMMCreate,
+  AccountSet,
+  AccountSetAsfFlags,
+  Payment,
+  Transaction,
+  TrustSet,
+  TrustSetFlags,
+} from '../../src/models/transactions'
 import { hashSignedTx } from '../../src/utils/hashes'
 
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
+
+export interface SetupAMMPool {
+  issuerWallet: Wallet
+  lpWallet: Wallet
+  asset: Currency
+  asset2: Currency
+}
 
 export async function sendLedgerAccept(client: Client): Promise<unknown> {
   return client.connection.request({ command: 'ledger_accept' })
@@ -185,6 +201,7 @@ export async function verifySubmittedTransaction(
   assert(data.result)
   assert.deepEqual(
     omit(data.result, [
+      'ctid',
       'date',
       'hash',
       'inLedger',
@@ -336,4 +353,80 @@ export async function waitForAndForceProgressLedgerTime(
   }
 
   throw new Error(`Ledger time not reached after ${retries} retries.`)
+}
+
+/**
+ * Sets up an AMM pool for integration testing.
+ *
+ * @param client - The client object.
+ * @param lpWallet - The liquidity provider wallet that creates the AMM pool.
+ * @param issuerWallet - The issuer wallet of the new token (using currencyCode) to be as asset in the AMM pool.
+ * @param currencyCode - The currency code of the new token to be an asset in the AMM pool.
+ * @returns - A promise that resolves to the amm_info response of the AMM pool.
+ */
+
+export async function setupAMMPool(client: Client): Promise<SetupAMMPool> {
+  const lpWallet = await generateFundedWallet(client)
+  const issuerWallet = await generateFundedWallet(client)
+  const currencyCode = 'USD'
+
+  const accountSetTx: AccountSet = {
+    TransactionType: 'AccountSet',
+    Account: issuerWallet.classicAddress,
+    SetFlag: AccountSetAsfFlags.asfDefaultRipple,
+  }
+
+  await testTransaction(client, accountSetTx, issuerWallet)
+
+  const trustSetTx: TrustSet = {
+    TransactionType: 'TrustSet',
+    Flags: TrustSetFlags.tfClearNoRipple,
+    Account: lpWallet.classicAddress,
+    LimitAmount: {
+      currency: currencyCode,
+      issuer: issuerWallet.classicAddress,
+      value: '1000',
+    },
+  }
+
+  await testTransaction(client, trustSetTx, lpWallet)
+
+  const paymentTx: Payment = {
+    TransactionType: 'Payment',
+    Account: issuerWallet.classicAddress,
+    Destination: lpWallet.classicAddress,
+    Amount: {
+      currency: currencyCode,
+      issuer: issuerWallet.classicAddress,
+      value: '500',
+    },
+  }
+
+  await testTransaction(client, paymentTx, issuerWallet)
+
+  const ammCreateTx: AMMCreate = {
+    TransactionType: 'AMMCreate',
+    Account: lpWallet.classicAddress,
+    Amount: '250',
+    Amount2: {
+      currency: currencyCode,
+      issuer: issuerWallet.classicAddress,
+      value: '250',
+    },
+    TradingFee: 12,
+  }
+
+  await testTransaction(client, ammCreateTx, lpWallet)
+
+  return {
+    issuerWallet,
+    lpWallet,
+    asset: {
+      currency: 'XRP',
+    },
+    asset2: {
+      currency: currencyCode,
+      issuer: issuerWallet.classicAddress,
+    },
+  }
 }
