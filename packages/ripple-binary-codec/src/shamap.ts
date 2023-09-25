@@ -34,19 +34,29 @@ abstract class ShaMapNode {
   abstract hash(): Hash256
 }
 
+function makeHasher(index: Hash256, item: Hashable): () => Hash256 {
+  return () => {
+    const hash = Sha512Half.put(item.hashPrefix())
+    item.toBytesSink(hash)
+    index.toBytesSink(hash)
+    return hash.finish()
+  }
+}
+
 /**
  * Class describing a Leaf of SHAMap
  */
 class ShaMapLeaf extends ShaMapNode {
-  private prehashed?: Hash256
-  private hashable?: Hashable
+  private readonly makeHash: () => Hash256
 
   constructor(public index: Hash256, item: ShaMapItem) {
     super()
     if ('prehashed' in item) {
-      this.prehashed = item.prehashed
+      this.makeHash = () => item.prehashed
     } else if ('hashPrefix' in item && 'toBytesSink' in item) {
-      this.hashable = item
+      this.makeHash = makeHasher(index, item)
+    } else {
+      throw new Error('invalid_item: must be either Hashable or Prehashed')
     }
   }
 
@@ -56,16 +66,7 @@ class ShaMapLeaf extends ShaMapNode {
    * @returns hash of this.item concatenated with this.index
    */
   hash(): Hash256 {
-    if (this.prehashed) {
-      return this.prehashed
-    } else if (!this.hashable) {
-      throw new Error('Invalid item: must be either Hashable or Prehashed')
-    }
-
-    const hash = Sha512Half.put(this.hashable.hashPrefix())
-    this.hashable.toBytesSink(hash)
-    this.index.toBytesSink(hash)
-    return hash.finish()
+    return this.makeHash()
   }
 
   /**
