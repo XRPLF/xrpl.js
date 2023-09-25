@@ -23,6 +23,10 @@ describe('account_tx', function () {
   })
   afterEach(async () => teardownClient(testContext))
 
+  it('this does nothing', () => {
+    assert.isTrue(true)
+  })
+
   it(
     'base',
     async () => {
