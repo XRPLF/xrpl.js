@@ -1,19 +1,31 @@
-import { strict as assert } from 'assert'
-import { coreTypes } from './types'
 import { HashPrefix } from './hash-prefixes'
 import { Sha512Half } from './hashes'
-import { Hash256 } from './types/hash-256'
+import { Hash256 } from './types'
 import { BytesList } from './serdes/binary-serializer'
 import { Buffer } from 'buffer/'
 
 /**
+ * Represents an object which can be hashed.
+ * e.g. transaction/ledger entry items, ShaMap nodes
+ */
+export interface Hashable {
+  hashPrefix: () => Buffer
+
+  toBytesSink: (list: BytesList) => void
+}
+
+/**
  * Abstract class describing a SHAMapNode
  */
-abstract class ShaMapNode {
+abstract class ShaMapNode implements Hashable {
   abstract hashPrefix(): Buffer
+
   abstract isLeaf(): boolean
+
   abstract isInner(): boolean
+
   abstract toBytesSink(list: BytesList): void
+
   abstract hash(): Hash256
 }
 
@@ -21,7 +33,7 @@ abstract class ShaMapNode {
  * Class describing a Leaf of SHAMap
  */
 class ShaMapLeaf extends ShaMapNode {
-  constructor(public index: Hash256, public item?: ShaMapNode) {
+  constructor(public index: Hash256, public item?: Hashable) {
     super()
   }
 
@@ -130,7 +142,7 @@ class ShaMapInner extends ShaMapNode {
    */
   hash(): Hash256 {
     if (this.empty()) {
-      return (coreTypes.Hash256 as typeof Hash256).ZERO_256
+      return Hash256.ZERO_256
     }
     const hash = Sha512Half.put(this.hashPrefix())
     this.toBytesSink(hash)
@@ -145,9 +157,7 @@ class ShaMapInner extends ShaMapNode {
   toBytesSink(list: BytesList): void {
     for (let i = 0; i < this.branches.length; i++) {
       const branch = this.branches[i]
-      const hash = branch
-        ? branch.hash()
-        : (coreTypes.Hash256 as typeof Hash256).ZERO_256
+      const hash = branch ? branch.hash() : Hash256.ZERO_256
       hash.toBytesSink(list)
     }
   }
@@ -157,26 +167,24 @@ class ShaMapInner extends ShaMapNode {
    *
    * @param index Hash of the index of the item being inserted
    * @param item Item to insert in the map
-   * @param leaf Leaf node to insert when branch doesn't exist
    */
-  addItem(index?: Hash256, item?: ShaMapNode, leaf?: ShaMapLeaf): void {
-    assert.ok(index !== undefined)
-    if (index !== undefined) {
-      const nibble = index.nibblet(this.depth)
-      const existing = this.branches[nibble]
-
-      if (existing === undefined) {
-        this.setBranch(nibble, leaf || new ShaMapLeaf(index, item))
-      } else if (existing instanceof ShaMapLeaf) {
-        const newInner = new ShaMapInner(this.depth + 1)
-        newInner.addItem(existing.index, undefined, existing)
-        newInner.addItem(index, item, leaf)
-        this.setBranch(nibble, newInner)
-      } else if (existing instanceof ShaMapInner) {
-        existing.addItem(index, item, leaf)
-      } else {
-        throw new Error('invalid ShaMap.addItem call')
-      }
+  addItem(index: Hash256, item: Hashable): void {
+    const nibble = index.nibblet(this.depth)
+    const existing = this.branches[nibble]
+    if (existing === undefined) {
+      this.setBranch(nibble, new ShaMapLeaf(index, item))
+    } else if (existing instanceof ShaMapLeaf) {
+      const deeper = this.depth + 1
+      const newInner = new ShaMapInner(deeper)
+      // Set this first in empty inner so addItem can recursively
+      // add many inners until indexes diverge.
+      newInner.setBranch(existing.index.nibblet(deeper), existing)
+      newInner.addItem(index, item)
+      this.setBranch(nibble, newInner)
+    } else if (existing instanceof ShaMapInner) {
+      existing.addItem(index, item)
+    } else {
+      throw new Error('invalid ShaMap.addItem call')
     }
   }
 }

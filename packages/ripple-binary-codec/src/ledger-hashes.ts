@@ -1,5 +1,5 @@
 import * as assert from 'assert'
-import { ShaMap, ShaMapNode, ShaMapLeaf } from './shamap'
+import { Hashable, ShaMap } from './shamap'
 import { HashPrefix } from './hash-prefixes'
 import { Sha512Half } from './hashes'
 import { BinarySerializer, serializeObject } from './binary'
@@ -20,9 +20,9 @@ import { XrplDefinitionsBase } from './enums'
  * @param itemsJson Array of items to add to a SHAMap
  * @returns the hash of the SHAMap
  */
-function computeHash(
-  itemizer: (item: JsonObject) => [Hash256?, ShaMapNode?, ShaMapLeaf?],
-  itemsJson: Array<JsonObject>,
+function computeHash<T extends JsonObject>(
+  itemizer: (item: T) => [Hash256, Hashable],
+  itemsJson: Array<T>,
 ): Hash256 {
   const map = new ShaMap()
   itemsJson.forEach((item) => map.addItem(...itemizer(item)))
@@ -32,7 +32,7 @@ function computeHash(
 /**
  * Interface describing a transaction item
  */
-interface transactionItemObject extends JsonObject {
+interface TransactionResultItem extends JsonObject {
   hash: string
   metaData: JsonObject
 }
@@ -43,9 +43,7 @@ interface transactionItemObject extends JsonObject {
  * @param json transaction with metadata
  * @returns a tuple of index and item to be added to SHAMap
  */
-function transactionItemizer(
-  json: transactionItemObject,
-): [Hash256, ShaMapNode, undefined] {
+function transactionItemizer(json: TransactionResultItem): [Hash256, Hashable] {
   assert.ok(json.hash)
   const index = Hash256.from(json.hash)
   const item = {
@@ -57,14 +55,14 @@ function transactionItemizer(
       serializer.writeLengthEncoded(STObject.from(json))
       serializer.writeLengthEncoded(STObject.from(json.metaData))
     },
-  } as ShaMapNode
-  return [index, item, undefined]
+  }
+  return [index, item]
 }
 
 /**
  * Interface describing an entry item
  */
-interface entryItemObject extends JsonObject {
+interface LedgerEntryItem extends JsonObject {
   index: string
 }
 
@@ -74,9 +72,7 @@ interface entryItemObject extends JsonObject {
  * @param json JSON describing a ledger entry item
  * @returns a tuple of index and item to be added to SHAMap
  */
-function entryItemizer(
-  json: entryItemObject,
-): [Hash256, ShaMapNode, undefined] {
+function entryItemizer(json: LedgerEntryItem): [Hash256, Hashable] {
   const index = Hash256.from(json.index)
   const bytes = serializeObject(json)
   const item = {
@@ -86,8 +82,8 @@ function entryItemizer(
     toBytesSink(sink) {
       sink.put(bytes)
     },
-  } as ShaMapNode
-  return [index, item, undefined]
+  }
+  return [index, item]
 }
 
 /**
@@ -97,10 +93,7 @@ function entryItemizer(
  * @returns A Hash256 object
  */
 function transactionTreeHash(param: Array<JsonObject>): Hash256 {
-  const itemizer = transactionItemizer as (
-    json: JsonObject,
-  ) => [Hash256, ShaMapNode, undefined]
-  return computeHash(itemizer, param)
+  return computeHash(transactionItemizer, param as TransactionResultItem[])
 }
 
 /**
@@ -110,10 +103,7 @@ function transactionTreeHash(param: Array<JsonObject>): Hash256 {
  * @returns A Hash256 object
  */
 function accountStateHash(param: Array<JsonObject>): Hash256 {
-  const itemizer = entryItemizer as (
-    json: JsonObject,
-  ) => [Hash256, ShaMapNode, undefined]
-  return computeHash(itemizer, param)
+  return computeHash(entryItemizer, param as LedgerEntryItem[])
 }
 
 /**
