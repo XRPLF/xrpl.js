@@ -9,6 +9,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Fixed
 * Fix request model fields related to AMM
+* Rename `AMMAccount` to `Account` on `AMM` ledger objects
 * Fixed `EscrowCancel` and `EscrowFinish` validation
 
 ## 2.11.0 (2023-08-24)
