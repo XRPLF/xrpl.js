@@ -84,7 +84,6 @@ module.exports = {
         'max-statements': 'off',
         // Snippets have logs on console to better understand the working.
         'no-console': 'off',
-        'import/no-extraneous-dependencies': 'off',
       },
     },
     {
@@ -145,6 +144,18 @@ module.exports = {
 
         // Javascript files have CommonJS exports
         'import/no-unused-modules': 'off',
+      },
+    },
+    {
+      files: ['tools/*.ts', 'tools/*.js'],
+      rules: {
+        'no-console': ['off'],
+        'node/no-process-exit': ['off'],
+        '@typescript-eslint/no-magic-numbers': ['off'],
+        'max-lines-per-function': ['off'],
+        'max-statements': ['off'],
+        complexity: ['off'],
+        'max-depth': ['warn', 3],
       },
     },
   ],

@@ -1,9 +1,14 @@
-/* eslint-disable max-lines-per-function -- Necessary for validateBaseTransaction */
-/* eslint-disable max-statements -- Necessary for validateBaseTransaction */
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
-import { Amount, Currency, IssuedCurrencyAmount, Memo, Signer } from '../common'
+import {
+  Amount,
+  Currency,
+  IssuedCurrencyAmount,
+  Memo,
+  Signer,
+  XChainBridge,
+} from '../common'
 import { onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
@@ -52,9 +57,30 @@ function isSigner(obj: unknown): boolean {
 const XRP_CURRENCY_SIZE = 1
 const ISSUE_SIZE = 2
 const ISSUED_CURRENCY_SIZE = 3
+const XCHAIN_BRIDGE_SIZE = 4
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object'
+}
+
+/**
+ * Verify the form and type of a string at runtime.
+ *
+ * @param str - The object to check the form and type of.
+ * @returns Whether the string is properly formed.
+ */
+export function isString(str: unknown): str is string {
+  return typeof str === 'string'
+}
+
+/**
+ * Verify the form and type of a number at runtime.
+ *
+ * @param num - The object to check the form and type of.
+ * @returns Whether the number is properly formed.
+ */
+export function isNumber(num: unknown): num is number {
+  return typeof num === 'number'
 }
 
 /**
@@ -101,6 +127,73 @@ export function isIssuedCurrency(
 export function isAmount(amount: unknown): amount is Amount {
   return typeof amount === 'string' || isIssuedCurrency(amount)
 }
+
+/**
+ * Verify the form and type of an XChainBridge at runtime.
+ *
+ * @param input - The input to check the form and type of.
+ * @returns Whether the XChainBridge is properly formed.
+ */
+export function isXChainBridge(input: unknown): input is XChainBridge {
+  return (
+    isRecord(input) &&
+    Object.keys(input).length === XCHAIN_BRIDGE_SIZE &&
+    typeof input.LockingChainDoor === 'string' &&
+    isCurrency(input.LockingChainIssue) &&
+    typeof input.IssuingChainDoor === 'string' &&
+    isCurrency(input.IssuingChainIssue)
+  )
+}
+
+/* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
+
+/**
+ * Verify the form and type of a required type for a transaction at runtime.
+ *
+ * @param tx - The transaction input to check the form and type of.
+ * @param paramName - The name of the transaction parameter.
+ * @param checkValidity - The function to use to check the type.
+ * @throws
+ */
+export function validateRequiredField(
+  tx: Record<string, unknown>,
+  paramName: string,
+  checkValidity: (inp: unknown) => boolean,
+): void {
+  if (tx[paramName] == null) {
+    throw new ValidationError(
+      `${tx.TransactionType}: missing field ${paramName}`,
+    )
+  }
+
+  if (!checkValidity(tx[paramName])) {
+    throw new ValidationError(
+      `${tx.TransactionType}: invalid field ${paramName}`,
+    )
+  }
+}
+
+/**
+ * Verify the form and type of an optional type for a transaction at runtime.
+ *
+ * @param tx - The transaction input to check the form and type of.
+ * @param paramName - The name of the transaction parameter.
+ * @param checkValidity - The function to use to check the type.
+ * @throws
+ */
+export function validateOptionalField(
+  tx: Record<string, unknown>,
+  paramName: string,
+  checkValidity: (inp: unknown) => boolean,
+): void {
+  if (tx[paramName] !== undefined && !checkValidity(tx[paramName])) {
+    throw new ValidationError(
+      `${tx.TransactionType}: invalid field ${paramName}`,
+    )
+  }
+}
+
+/* eslint-enable @typescript-eslint/restrict-template-expressions -- checked before */
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface -- no global flags right now, so this is fine
 export interface GlobalFlags {}
@@ -190,14 +283,6 @@ export interface BaseTransaction {
  * @throws When the common param is malformed.
  */
 export function validateBaseTransaction(common: Record<string, unknown>): void {
-  if (common.Account === undefined) {
-    throw new ValidationError('BaseTransaction: missing field Account')
-  }
-
-  if (typeof common.Account !== 'string') {
-    throw new ValidationError('BaseTransaction: Account not string')
-  }
-
   if (common.TransactionType === undefined) {
     throw new ValidationError('BaseTransaction: missing field TransactionType')
   }
@@ -210,27 +295,15 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
     throw new ValidationError('BaseTransaction: Unknown TransactionType')
   }
 
-  if (common.Fee !== undefined && typeof common.Fee !== 'string') {
-    throw new ValidationError('BaseTransaction: invalid Fee')
-  }
+  validateRequiredField(common, 'Account', isString)
 
-  if (common.Sequence !== undefined && typeof common.Sequence !== 'number') {
-    throw new ValidationError('BaseTransaction: invalid Sequence')
-  }
+  validateOptionalField(common, 'Fee', isString)
 
-  if (
-    common.AccountTxnID !== undefined &&
-    typeof common.AccountTxnID !== 'string'
-  ) {
-    throw new ValidationError('BaseTransaction: invalid AccountTxnID')
-  }
+  validateOptionalField(common, 'Sequence', isNumber)
 
-  if (
-    common.LastLedgerSequence !== undefined &&
-    typeof common.LastLedgerSequence !== 'number'
-  ) {
-    throw new ValidationError('BaseTransaction: invalid LastLedgerSequence')
-  }
+  validateOptionalField(common, 'AccountTxnID', isString)
+
+  validateOptionalField(common, 'LastLedgerSequence', isNumber)
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
   const memos = common.Memos as Array<{ Memo?: unknown }> | undefined
@@ -248,33 +321,15 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
     throw new ValidationError('BaseTransaction: invalid Signers')
   }
 
-  if (common.SourceTag !== undefined && typeof common.SourceTag !== 'number') {
-    throw new ValidationError('BaseTransaction: invalid SourceTag')
-  }
+  validateOptionalField(common, 'SourceTag', isNumber)
 
-  if (
-    common.SigningPubKey !== undefined &&
-    typeof common.SigningPubKey !== 'string'
-  ) {
-    throw new ValidationError('BaseTransaction: invalid SigningPubKey')
-  }
+  validateOptionalField(common, 'SigningPubKey', isString)
 
-  if (
-    common.TicketSequence !== undefined &&
-    typeof common.TicketSequence !== 'number'
-  ) {
-    throw new ValidationError('BaseTransaction: invalid TicketSequence')
-  }
+  validateOptionalField(common, 'TicketSequence', isNumber)
 
-  if (
-    common.TxnSignature !== undefined &&
-    typeof common.TxnSignature !== 'string'
-  ) {
-    throw new ValidationError('BaseTransaction: invalid TxnSignature')
-  }
-  if (common.NetworkID !== undefined && typeof common.NetworkID !== 'number') {
-    throw new ValidationError('BaseTransaction: invalid NetworkID')
-  }
+  validateOptionalField(common, 'TxnSignature', isString)
+
+  validateOptionalField(common, 'NetworkID', isNumber)
 }
 
 /**

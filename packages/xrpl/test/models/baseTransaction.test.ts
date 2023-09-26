@@ -78,7 +78,7 @@ describe('BaseTransaction', function () {
     assert.throws(
       () => validateBaseTransaction(invalidFee),
       ValidationError,
-      'BaseTransaction: invalid Fee',
+      'Payment: invalid field Fee',
     )
   })
 
@@ -92,7 +92,7 @@ describe('BaseTransaction', function () {
     assert.throws(
       () => validateBaseTransaction(invalidSeq),
       ValidationError,
-      'BaseTransaction: invalid Sequence',
+      'Payment: invalid field Sequence',
     )
   })
 
@@ -106,7 +106,7 @@ describe('BaseTransaction', function () {
     assert.throws(
       () => validateBaseTransaction(invalidID),
       ValidationError,
-      'BaseTransaction: invalid AccountTxnID',
+      'Payment: invalid field AccountTxnID',
     )
   })
 
@@ -120,7 +120,7 @@ describe('BaseTransaction', function () {
     assert.throws(
       () => validateBaseTransaction(invalidLastLedgerSequence),
       ValidationError,
-      'BaseTransaction: invalid LastLedgerSequence',
+      'Payment: invalid field LastLedgerSequence',
     )
   })
 
@@ -134,7 +134,7 @@ describe('BaseTransaction', function () {
     assert.throws(
       () => validateBaseTransaction(invalidSourceTag),
       ValidationError,
-      'BaseTransaction: invalid SourceTag',
+      'Payment: invalid field SourceTag',
     )
   })
 
@@ -148,7 +148,7 @@ describe('BaseTransaction', function () {
     assert.throws(
       () => validateBaseTransaction(invalidSigningPubKey),
       ValidationError,
-      'BaseTransaction: invalid SigningPubKey',
+      'Payment: invalid field SigningPubKey',
     )
   })
 
@@ -162,7 +162,7 @@ describe('BaseTransaction', function () {
     assert.throws(
       () => validateBaseTransaction(invalidTicketSequence),
       ValidationError,
-      'BaseTransaction: invalid TicketSequence',
+      'Payment: invalid field TicketSequence',
     )
   })
 
@@ -176,7 +176,7 @@ describe('BaseTransaction', function () {
     assert.throws(
       () => validateBaseTransaction(invalidTxnSignature),
       ValidationError,
-      'BaseTransaction: invalid TxnSignature',
+      'Payment: invalid field TxnSignature',
     )
   })
 
@@ -242,7 +242,7 @@ describe('BaseTransaction', function () {
     assert.throws(
       () => validateBaseTransaction(invalidNetworkID),
       ValidationError,
-      'BaseTransaction: invalid NetworkID',
+      'Payment: invalid field NetworkID',
     )
   })
 })

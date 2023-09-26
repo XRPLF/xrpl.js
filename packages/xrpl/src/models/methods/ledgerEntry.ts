@@ -1,3 +1,4 @@
+import { Currency, XChainBridge } from '../common'
 import { LedgerEntry } from '../ledger'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
@@ -152,6 +153,30 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
    * Must be the object ID of the NFToken page, as hexadecimal
    */
   nft_page?: string
+
+  bridge_account?: string
+
+  bridge?: XChainBridge
+
+  xchain_owned_claim_id?:
+    | {
+        locking_chain_door: string
+        locking_chain_issue: Currency
+        issuing_chain_door: string
+        issuing_chain_issue: Currency
+        xchain_owned_claim_id: string | number
+      }
+    | string
+
+  xchain_owned_create_account_claim_id?:
+    | {
+        locking_chain_door: string
+        locking_chain_issue: Currency
+        issuing_chain_door: string
+        issuing_chain_issue: Currency
+        xchain_owned_create_account_claim_id: string | number
+      }
+    | string
 }
 
 /**

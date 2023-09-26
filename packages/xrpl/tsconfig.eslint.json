@@ -6,6 +6,7 @@
     "./test/**/*.json",
     "./src/**/*.json",
     "./snippets/src/**/*.ts",
-    ".eslintrc.js"
+    ".eslintrc.js",
   ],
+  "exclude": ["./tools/*.js"]
 }
