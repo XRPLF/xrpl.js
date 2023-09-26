@@ -3,7 +3,7 @@ import { Amount, XChainBridge } from '../common'
 import BaseLedgerEntry from './BaseLedgerEntry'
 
 /**
- * A Bridge objects represents a cross-chain bridge and includes information about
+ * A Bridge object represents a cross-chain bridge and includes information about
  * the door accounts, assets, signature rewards, and the minimum account create
  * amount.
  *
