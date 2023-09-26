@@ -3,9 +3,11 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
+
+## 2.12.0 (2023-09-26)
 ### Added
 * Added `ports` field to `ServerInfoResponse`
-* Support for the XChainBridge amendment.
+* Support for the XChainBridge amendment ([XLS-38d](https://github.com/XRPLF/XRPL-Standards/tree/master/XLS-38d-XChainBridge)).
 
 ### Fixed
 * Fix request model fields related to AMM
