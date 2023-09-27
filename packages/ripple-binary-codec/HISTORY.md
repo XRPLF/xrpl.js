@@ -1,6 +1,8 @@
 # ripple-binary-codec Release History
 
 ## Unreleased
+
+## 1.10.0 (2023-09-27)
 ### Added
 - Support for the XChainBridge amendment.
 
