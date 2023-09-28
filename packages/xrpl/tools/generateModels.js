@@ -142,6 +142,20 @@ import {
   jsTransactionFile = newJsTxFile
 }
 
+function updateIndexFile(tx) {
+  const filename = path.join(
+    path.dirname(__filename),
+    '../src/models/transactions/index.ts',
+  )
+  let indexFile = readFile(filename)
+  indexFile = indexFile.replace(
+    `} from './XChainModifyBridge'`,
+    `} from './XChainModifyBridge'
+export { ${tx} } from './${tx}'`,
+  )
+  fs.writeFileSync(filename, indexFile)
+}
+
 function generateParamLine(param, isRequired) {
   const paramName = param.slice(2)
   const paramType = sfields[paramName][0]
@@ -151,8 +165,6 @@ function generateParamLine(param, isRequired) {
 
 async function main() {
   txsToAdd.forEach(async (tx) => {
-    updateTransactionFile(tx)
-
     const txFormat = txFormats[tx]
     const paramLines = txFormat
       .filter((param) => param[0] !== '')
@@ -226,6 +238,10 @@ ${validationImportLine}`
       path.join(path.dirname(__filename), `../test/models/${tx}.test.ts`),
       validateTests,
     )
+
+    updateTransactionFile(tx)
+
+    updateIndexFile(tx)
 
     console.log('Added ' + tx)
   })
