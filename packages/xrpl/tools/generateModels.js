@@ -37,13 +37,13 @@ for (const hit of txFormatsHits) {
   txFormats[matches[1]] = formatTxFormat(matches[2])
 }
 
-const jsTransactionFile = readFile(
+let jsTransactionFile = readFile(
   path.join(
     path.dirname(__filename),
     '../src/models/transactions/transaction.ts',
   ),
 )
-const transactionMatch = jsTransactionFile.match(
+let transactionMatch = jsTransactionFile.match(
   /export type Transaction =([| \nA-Za-z]+)/,
 )[0]
 const existingLibraryTxs = transactionMatch
@@ -67,15 +67,6 @@ for (const tx in txFormats) {
   }
 }
 
-console.log(txsToAdd)
-
-// for (const [tx, name] of txsToAdd) {
-//   fs.appendFileSync(
-//     '../src/models/transactions/types/transaction_type.py',
-//     `    ${name.toUpperCase()} = "${tx}"\n`,
-//   )
-// }
-
 const typeMap = {
   UINT8: 'number',
   UINT16: 'number',
@@ -98,6 +89,59 @@ const typeMap = {
 const allCommonImports = ['Amount', 'Currency', 'Path', 'XChainBridge']
 const additionalValidationImports = ['string', 'number']
 
+function updateTransactionFile(tx) {
+  const transactionMatchSplit = transactionMatch.split('\n  | ')
+  const firstLine = transactionMatchSplit[0]
+  const allTransactions = transactionMatchSplit.slice(1)
+  allTransactions.push(tx)
+  allTransactions.sort()
+  const newTransactionMatch =
+    firstLine + '\n  | ' + allTransactions.join('\n  | ')
+  let newJsTxFile = jsTransactionFile.replace(
+    transactionMatch,
+    newTransactionMatch,
+  )
+
+  newJsTxFile = newJsTxFile.replace(
+    `import {
+  XChainModifyBridge,
+  validateXChainModifyBridge,
+} from './XChainModifyBridge'`,
+    `import {
+  XChainModifyBridge,
+  validateXChainModifyBridge,
+} from './XChainModifyBridge'
+import {
+  ${tx},
+  validate${tx},
+} from './${tx}'`,
+  )
+
+  const validationMatch = newJsTxFile.match(
+    /switch \(tx.TransactionType\) {\n([ \nA-Za-z':()]+)default/,
+  )[1]
+  const caseValidations = validationMatch.split('\n\n')
+  caseValidations.push(
+    `    case '${tx}':\n      validate${tx}(tx)\n      break`,
+  )
+  caseValidations.sort()
+  newJsTxFile = newJsTxFile.replace(
+    validationMatch,
+    caseValidations.join('\n\n') + '\n\n    ',
+  )
+
+  fs.writeFileSync(
+    path.join(
+      path.dirname(__filename),
+      '../src/models/transactions/transaction.ts',
+    ),
+    newJsTxFile,
+  )
+
+  transactionMatch = newTransactionMatch
+  jsTransactionFile = newJsTxFile
+}
+
 function generateParamLine(param, isRequired) {
   const paramName = param.slice(2)
   const paramType = sfields[paramName][0]
@@ -107,6 +151,8 @@ function generateParamLine(param, isRequired) {
 
 async function main() {
   txsToAdd.forEach(async (tx) => {
+    updateTransactionFile(tx)
+
     const txFormat = txFormats[tx]
     const paramLines = txFormat
       .filter((param) => param[0] !== '')
