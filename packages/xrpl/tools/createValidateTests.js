@@ -11,7 +11,7 @@ function getTx(txName) {
     .filter((tx) => tx.json.TransactionType === txName)
     .map((tx) => tx.json)
   if (validTxs.length == 0) {
-    throw new Error('Must have ripple-binary-codec fixture')
+    throw new Error(`Must have ripple-binary-codec fixture for ${txName}`)
   }
   const validTx = validTxs[0]
   delete validTx.TxnSignature
@@ -66,6 +66,8 @@ function getInvalidValue(paramTypes) {
     } else if (paramType == 'string') {
       return 123
     } else if (paramType == 'IssuedCurrency') {
+      return JSON.stringify({ test: 'test' })
+    } else if (paramType == 'Currency') {
       return JSON.stringify({ test: 'test' })
     } else if (paramType == 'Amount') {
       return JSON.stringify({ currency: 'ETH' })
