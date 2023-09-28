@@ -3,7 +3,7 @@ import {
   hexToBytes as nobleHexToBytes,
   randomBytes as nobleRandomBytes,
 } from '@noble/hashes/utils'
-import { BytesToHexFn, HexToBytesFn, RandomBytesFn } from './types'
+import type { BytesToHexFn, HexToBytesFn, RandomBytesFn } from './types'
 
 /* eslint-disable-next-line func-style -- Typed to ensure uniformity between node and browser implementations and docs */
 export const bytesToHex: typeof BytesToHexFn = (bytes) => {
