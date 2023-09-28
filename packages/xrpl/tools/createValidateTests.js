@@ -1,120 +1,126 @@
-const fs = require("fs");
-const fixtures = require("../packages/ripple-binary-codec/test/fixtures/codec-fixtures.json");
+const fs = require('fs')
+const path = require('path')
+const fixtures = require('../../ripple-binary-codec/test/fixtures/codec-fixtures.json')
 
-const NORMAL_TYPES = ["number", "string"];
-const NUMBERS = ["0", "1"];
+const NORMAL_TYPES = ['number', 'string']
+const NUMBERS = ['0', '1']
 
 function getTx(txName) {
-  transactions = fixtures.transactions;
+  transactions = fixtures.transactions
   const validTxs = fixtures.transactions
     .filter((tx) => tx.json.TransactionType === txName)
-    .map((tx) => tx.json);
-  const validTx = validTxs[0];
-  delete validTx.TxnSignature;
-  delete validTx.SigningPubKey;
-  return JSON.stringify(validTx, null, 2);
+    .map((tx) => tx.json)
+  if (validTxs.length == 0) {
+    throw new Error('Must have ripple-binary-codec fixture')
+  }
+  const validTx = validTxs[0]
+  delete validTx.TxnSignature
+  delete validTx.SigningPubKey
+  return JSON.stringify(validTx, null, 2)
 }
 
-function main() {
-  const modelName = process.argv[2];
-  const filename = `./packages/xrpl/src/models/transactions/${modelName}.ts`;
-  const [model, txName] = getModel(filename);
-  return processModel(model, txName);
+function main(modelName) {
+  const filename = path.join(
+    path.dirname(__filename),
+    `../src/models/transactions/${modelName}.ts`,
+  )
+  const [model, txName] = getModel(filename)
+  return processModel(model, txName)
 }
 
 // Extract just the model from the file
 function getModel(filename) {
-  let model = "";
-  let started = false;
-  let ended = false;
-  const data = fs.readFileSync(filename, "utf8");
-  const lines = data.split("\n");
+  let model = ''
+  let started = false
+  let ended = false
+  const data = fs.readFileSync(filename, 'utf8')
+  const lines = data.split('\n')
   for (let line of lines) {
     if (ended) {
-      continue;
+      continue
     }
-    if (!started && !line.startsWith("export")) {
-      continue;
+    if (!started && !line.startsWith('export')) {
+      continue
     }
-    if (!started && line.includes("Flags")) {
-      continue;
+    if (!started && line.includes('Flags')) {
+      continue
     }
     if (!started) {
-      started = true;
+      started = true
     }
-    model += line + "\n";
-    if (line === "}") {
-      ended = true;
+    model += line + '\n'
+    if (line === '}') {
+      ended = true
     }
   }
-  const name_line = model.split("\n")[0].split(" ");
-  const txName = name_line[2];
-  return [model, txName];
+  const name_line = model.split('\n')[0].split(' ')
+  const txName = name_line[2]
+  return [model, txName]
 }
 
 function getInvalidValue(paramTypes) {
   if (paramTypes.length === 1) {
-    const paramType = paramTypes[0];
-    if (paramType == "number") {
-      return "'number'";
-    } else if (paramType == "string") {
-      return 123;
-    } else if (paramType == "IssuedCurrency") {
-      return JSON.stringify({ test: "test" });
-    } else if (paramType == "Amount") {
-      return JSON.stringify({ currency: "ETH" });
-    } else if (paramType == "XChainBridge") {
-      return JSON.stringify({ XChainDoor: "test" });
+    const paramType = paramTypes[0]
+    if (paramType == 'number') {
+      return "'number'"
+    } else if (paramType == 'string') {
+      return 123
+    } else if (paramType == 'IssuedCurrency') {
+      return JSON.stringify({ test: 'test' })
+    } else if (paramType == 'Amount') {
+      return JSON.stringify({ currency: 'ETH' })
+    } else if (paramType == 'XChainBridge') {
+      return JSON.stringify({ XChainDoor: 'test' })
     } else {
-      throw Error(`${paramType} not supported yet`);
+      throw Error(`${paramType} not supported yet`)
     }
   }
 
   const simplifiedParamTypes = paramTypes.filter(
-    (_paramType, index) => index % 2 == 0
-  );
+    (_paramType, index) => index % 2 == 0,
+  )
   if (JSON.stringify(simplifiedParamTypes) === '["0","1"]') {
-    return 2;
+    return 2
   } else if (JSON.stringify(simplifiedParamTypes) === '["number","string"]') {
-    return JSON.stringify({ currency: "ETH" });
+    return JSON.stringify({ currency: 'ETH' })
   } else {
-    throw Error(`${simplifiedParamTypes} not supported yet`);
+    throw Error(`${simplifiedParamTypes} not supported yet`)
   }
 }
 
 // Process the model and build the tests
 
 function processModel(model, txName) {
-  let output = "";
-  for (let line of model.split("\n")) {
-    if (line == "") {
-      continue;
+  let output = ''
+  for (let line of model.split('\n')) {
+    if (line == '') {
+      continue
     }
-    if (line.startsWith("export")) {
-      continue;
+    if (line.startsWith('export')) {
+      continue
     }
-    if (line == "}") {
-      continue;
+    if (line == '}') {
+      continue
     }
-    line = line.trim();
-    if (line.startsWith("TransactionType")) {
-      continue;
+    line = line.trim()
+    if (line.startsWith('TransactionType')) {
+      continue
     }
-    if (line.startsWith("Flags")) {
+    if (line.startsWith('Flags')) {
       // TODO: support flag checking
-      continue;
+      continue
     }
-    if (line.startsWith("/**")) {
-      continue;
+    if (line.startsWith('/**')) {
+      continue
     }
-    if (line.startsWith("*")) {
-      continue;
+    if (line.startsWith('*')) {
+      continue
     }
 
-    const split = line.split(" ");
-    const param = split[0].replace("?:", "").replace(":", "").trim();
-    const paramTypes = split.slice(1);
-    const optional = split[0].endsWith("?:");
+    const split = line.split(' ')
+    const param = split[0].replace('?:', '').replace(':', '').trim()
+    const paramTypes = split.slice(1)
+    const optional = split[0].endsWith('?:')
 
     if (!optional) {
       output += `  it("throws w/ missing ${param}", function () {
@@ -132,10 +138,10 @@ function processModel(model, txName) {
     )
   })
 
-`;
+`
     }
 
-    const fakeValue = getInvalidValue(paramTypes);
+    const fakeValue = getInvalidValue(paramTypes)
     output += `  it('throws w/ invalid ${param}', function () {
     tx.${param} = ${fakeValue}
 
@@ -151,11 +157,11 @@ function processModel(model, txName) {
     )
   })
 
-`;
+`
   }
 
-  output = output.substring(0, output.length - 2);
-  output += "\n})\n";
+  output = output.substring(0, output.length - 2)
+  output += '\n})\n'
   output =
     `import { assert } from 'chai'
 
@@ -179,9 +185,13 @@ describe('${txName}', function () {
     assert.doesNotThrow(() => validate(tx))
   })
 
-` + output;
+` + output
 
-  return output;
+  return output
 }
 
-console.log(main());
+if (require.main === module) {
+  console.log(main(process.argv[2]))
+}
+
+module.exports = main
