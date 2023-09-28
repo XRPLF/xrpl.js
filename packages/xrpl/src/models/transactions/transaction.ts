@@ -20,6 +20,8 @@ import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
 import { isIssuedCurrency } from './common'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
+import { DIDDelete, validateDIDDelete } from './DIDDelete'
+import { DIDSet, validateDIDSet } from './DIDSet'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
@@ -88,18 +90,20 @@ import {
  * @category Transaction Models
  */
 export type Transaction =
-  | AccountDelete
-  | AccountSet
   | AMMBid
+  | AMMCreate
   | AMMDelete
   | AMMDeposit
-  | AMMCreate
   | AMMVote
   | AMMWithdraw
+  | AccountDelete
+  | AccountSet
   | CheckCancel
   | CheckCash
   | CheckCreate
   | Clawback
+  | DIDDelete
+  | DIDSet
   | DepositPreauth
   | EscrowCancel
   | EscrowCreate
@@ -119,13 +123,13 @@ export type Transaction =
   | SignerListSet
   | TicketCreate
   | TrustSet
+  | XChainAccountCreateCommit
   | XChainAddAccountCreateAttestation
   | XChainAddClaimAttestation
   | XChainClaim
   | XChainCommit
   | XChainCreateBridge
   | XChainCreateClaimID
-  | XChainAccountCreateCommit
   | XChainModifyBridge
 
 /**
@@ -205,16 +209,12 @@ export function validate(transaction: Record<string, unknown>): void {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- okay here
   setTransactionFlagsToNumber(tx as unknown as Transaction)
   switch (tx.TransactionType) {
-    case 'AccountDelete':
-      validateAccountDelete(tx)
-      break
-
-    case 'AccountSet':
-      validateAccountSet(tx)
-      break
-
     case 'AMMBid':
       validateAMMBid(tx)
+      break
+
+    case 'AMMCreate':
+      validateAMMCreate(tx)
       break
 
     case 'AMMDelete':
@@ -225,16 +225,20 @@ export function validate(transaction: Record<string, unknown>): void {
       validateAMMDeposit(tx)
       break
 
-    case 'AMMCreate':
-      validateAMMCreate(tx)
-      break
-
     case 'AMMVote':
       validateAMMVote(tx)
       break
 
     case 'AMMWithdraw':
       validateAMMWithdraw(tx)
+      break
+
+    case 'AccountDelete':
+      validateAccountDelete(tx)
+      break
+
+    case 'AccountSet':
+      validateAccountSet(tx)
       break
 
     case 'CheckCancel':
@@ -251,6 +255,14 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'Clawback':
       validateClawback(tx)
+      break
+
+    case 'DIDDelete':
+      validateDIDDelete(tx)
+      break
+
+    case 'DIDSet':
+      validateDIDSet(tx)
       break
 
     case 'DepositPreauth':
@@ -329,6 +341,10 @@ export function validate(transaction: Record<string, unknown>): void {
       validateTrustSet(tx)
       break
 
+    case 'XChainAccountCreateCommit':
+      validateXChainAccountCreateCommit(tx)
+      break
+
     case 'XChainAddAccountCreateAttestation':
       validateXChainAddAccountCreateAttestation(tx)
       break
@@ -351,10 +367,6 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'XChainCreateClaimID':
       validateXChainCreateClaimID(tx)
-      break
-
-    case 'XChainAccountCreateCommit':
-      validateXChainAccountCreateCommit(tx)
       break
 
     case 'XChainModifyBridge':
