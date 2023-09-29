@@ -1,6 +1,7 @@
 import { secp256k1 } from '@noble/curves/secp256k1'
 
 import Sha512 from '../../utils/Sha512'
+import { DeriveKeyPairOptions } from '../../types'
 
 const ZERO = BigInt(0)
 
@@ -44,10 +45,7 @@ function deriveScalar(bytes: Uint8Array, discrim?: number): bigint {
  */
 export function derivePrivateKey(
   seed: Uint8Array,
-  opts: {
-    validator?: boolean
-    accountIndex?: number
-  } = {},
+  opts: DeriveKeyPairOptions = {},
 ): bigint {
   const root = opts.validator
   const order = secp256k1.CURVE.n
