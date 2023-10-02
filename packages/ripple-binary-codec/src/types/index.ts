@@ -14,6 +14,7 @@ import { UInt32 } from './uint-32'
 import { UInt64 } from './uint-64'
 import { UInt8 } from './uint-8'
 import { Vector256 } from './vector-256'
+import { XChainBridge } from './xchain-bridge'
 import { type SerializedType } from './serialized-type'
 import { DEFAULT_DEFINITIONS } from '../enums'
 
@@ -34,6 +35,7 @@ const coreTypes: Record<string, typeof SerializedType> = {
   UInt32,
   UInt64,
   Vector256,
+  XChainBridge,
 }
 
 // Ensures that the DEFAULT_DEFINITIONS object connects these types to fields for serializing/deserializing

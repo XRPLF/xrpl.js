@@ -25,8 +25,12 @@ import successSubmit from './submit.json'
 import successSubscribe from './subscribe.json'
 import errorSubscribe from './subscribeError.json'
 import transaction_entry from './transactionEntry.json'
+import NFTokenMint from './tx/NFTokenMint.json'
+import NFTokenMint2 from './tx/NFTokenMint2.json'
 import OfferCreateSell from './tx/offerCreateSell.json'
 import Payment from './tx/payment.json'
+import XChainCreateClaimID from './tx/XChainCreateClaimID.json'
+import XChainCreateClaimID2 from './tx/XChainCreateClaimID2.json'
 import unsubscribe from './unsubscribe.json'
 
 const submit = {
@@ -89,8 +93,12 @@ const server_info = {
 }
 
 const tx = {
+  NFTokenMint,
+  NFTokenMint2,
   Payment,
   OfferCreateSell,
+  XChainCreateClaimID,
+  XChainCreateClaimID2,
 }
 
 const rippled = {

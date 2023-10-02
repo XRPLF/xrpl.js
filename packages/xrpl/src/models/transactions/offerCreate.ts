@@ -1,4 +1,3 @@
-/* eslint-disable complexity -- Necessary for validateOfferCreate */
 import { ValidationError } from '../../errors'
 import { Amount } from '../common'
 

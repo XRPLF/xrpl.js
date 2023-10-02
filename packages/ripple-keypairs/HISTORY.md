@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+## 1.3.1 (2023-09-27)
 ### Fixed
 * Fix source-maps not finding their designated source
 

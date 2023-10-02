@@ -25,6 +25,7 @@ export {
 export { CheckCancel } from './checkCancel'
 export { CheckCash } from './checkCash'
 export { CheckCreate } from './checkCreate'
+export { Clawback } from './clawback'
 export { DepositPreauth } from './depositPreauth'
 export { EscrowCancel } from './escrowCancel'
 export { EscrowCreate } from './escrowCreate'
@@ -63,4 +64,15 @@ export { SignerListSet } from './signerListSet'
 export { TicketCreate } from './ticketCreate'
 export { TrustSetFlagsInterface, TrustSetFlags, TrustSet } from './trustSet'
 export { UNLModify } from './UNLModify'
-export { Clawback } from './clawback'
+export { XChainAddAccountCreateAttestation } from './XChainAddAccountCreateAttestation'
+export { XChainAddClaimAttestation } from './XChainAddClaimAttestation'
+export { XChainClaim } from './XChainClaim'
+export { XChainCommit } from './XChainCommit'
+export { XChainCreateBridge } from './XChainCreateBridge'
+export { XChainCreateClaimID } from './XChainCreateClaimID'
+export { XChainAccountCreateCommit } from './XChainAccountCreateCommit'
+export {
+  XChainModifyBridge,
+  XChainModifyBridgeFlags,
+  XChainModifyBridgeFlagsInterface,
+} from './XChainModifyBridge'

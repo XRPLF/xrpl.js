@@ -15,6 +15,7 @@ import { PaymentFlags } from '../transactions/payment'
 import { PaymentChannelClaimFlags } from '../transactions/paymentChannelClaim'
 import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlags } from '../transactions/trustSet'
+import { XChainModifyBridgeFlags } from '../transactions/XChainModifyBridge'
 
 import { isFlagEnabled } from '.'
 
@@ -77,6 +78,9 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
       return
     case 'TrustSet':
       tx.Flags = convertFlagsToNumber(tx.Flags, TrustSetFlags)
+      return
+    case 'XChainModifyBridge':
+      tx.Flags = convertFlagsToNumber(tx.Flags, XChainModifyBridgeFlags)
       return
     default:
       tx.Flags = 0

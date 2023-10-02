@@ -15,7 +15,7 @@ export interface EscrowFinish extends BaseTransaction {
    * Transaction sequence of EscrowCreate transaction that created the held.
    * payment to finish.
    */
-  OfferSequence: number
+  OfferSequence: number | string
   /**
    * Hex value matching the previously-supplied PREIMAGE-SHA-256.
    * crypto-condition of the held payment.
@@ -37,7 +37,7 @@ export interface EscrowFinish extends BaseTransaction {
 export function validateEscrowFinish(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Owner === undefined) {
+  if (tx.Owner == null) {
     throw new ValidationError('EscrowFinish: missing field Owner')
   }
 
@@ -45,11 +45,15 @@ export function validateEscrowFinish(tx: Record<string, unknown>): void {
     throw new ValidationError('EscrowFinish: Owner must be a string')
   }
 
-  if (tx.OfferSequence === undefined) {
+  if (tx.OfferSequence == null) {
     throw new ValidationError('EscrowFinish: missing field OfferSequence')
   }
 
-  if (typeof tx.OfferSequence !== 'number') {
+  if (
+    (typeof tx.OfferSequence !== 'number' &&
+      typeof tx.OfferSequence !== 'string') ||
+    Number.isNaN(Number(tx.OfferSequence))
+  ) {
     throw new ValidationError('EscrowFinish: OfferSequence must be a number')
   }
 
