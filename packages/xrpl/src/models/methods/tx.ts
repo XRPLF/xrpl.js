@@ -53,7 +53,6 @@ export interface TxResponse<T extends BaseTransaction = Transaction>
     hash: string
     /**
      * The Concise Transaction Identifier of the transaction (16-byte hex string)
-     * Not included in responses from reporting mode servers.
      */
     ctid?: string
     /** The ledger index of the ledger that includes this transaction. */
