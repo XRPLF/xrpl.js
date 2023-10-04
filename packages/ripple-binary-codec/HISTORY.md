@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.10.0 (2023-09-27)
+### Added
+- Support for the XChainBridge amendment.
+
 ## 1.9.0 (2023-08-24)
 
 ### Added

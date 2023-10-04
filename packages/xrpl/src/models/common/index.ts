@@ -148,3 +148,10 @@ export interface AuthAccount {
     Account: string
   }
 }
+
+export interface XChainBridge {
+  LockingChainDoor: string
+  LockingChainIssue: Currency
+  IssuingChainDoor: string
+  IssuingChainIssue: Currency
+}
