@@ -80,6 +80,13 @@
     "url": "git@github.com:XRPLF/xrpl.js.git"
   },
   "readmeFilename": "README.md",
+  "keywords": [
+    "ripple-lib",
+    "ripple",
+    "xrp",
+    "xrp ledger",
+    "xrpl"
+  ],
   "engines": {
     "node": ">=10.13.0"
   }

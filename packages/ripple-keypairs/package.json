@@ -24,6 +24,12 @@
     "hash.js": "^1.0.3",
     "ripple-address-codec": "^4.3.1"
   },
+  "keywords": [
+    "ripple",
+    "xrp",
+    "xrp ledger",
+    "xrpl"
+  ],
   "repository": {
     "type": "git",
     "url": "git@github.com:XRPLF/xrpl.js.git"
