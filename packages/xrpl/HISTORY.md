@@ -17,20 +17,23 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Uses `@xrplf/secret-numbers` instead of `xrpl-secret-numbers`
 * Improve key algorithm detection. It will now throw Errors with helpful messages
 * Move `authorizeChannel` from `wallet/signer` to `wallet/authorizeChannel` to solve a circular dependency issue.
+* When using a bundler you must remove the mapping of `ws` to `WSWrapper`. ex. `ws: 'xrpl/dist/npm/client/WSWrapper'`. See [../UNIQUE_STEPS](Unique Steps) for the new, much smaller, configs.
 
 ### Bundling Changes
-* Bundler configurations are much more simplified.
-    * removed the following polyfills:
-        * `assert`
-        * `crypto-browserify`
-        * `https-browserify`
-        * `os-browserify`
-        * `stream-browserify`
-        * `stream-http`
-        * `url`
-        * `util` - previously added automatically by `webpack`
-    * Removed mappings for:
-        * Excluding `https-proxy-agent`
+Bundler configurations are much more simplified. See [../UNIQUE_STEPS](Unique Steps) for the new, much smaller, configs.
+* removed the following polyfills:
+    * `assert`
+    * `crypto-browserify`
+    * `https-browserify`
+    * `os-browserify`
+    * `stream-browserify`
+    * `stream-http`
+    * `url`
+    * `util` - previously added automatically by `webpack`
+    * `events` - previously added automatically by `webpack` but manual for `vite`
+* Removed mappings for:
+    * `ws` to `WsWrapper`
+    * Excluding `https-proxy-agent`
 
 ### Changed
 * Remove `lodash` as a dependency

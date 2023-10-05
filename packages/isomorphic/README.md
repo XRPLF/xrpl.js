@@ -97,4 +97,8 @@ console.log(hexToBytes('DEADBEEF')) // [222, 173, 190, 239]
 
 ### `@xrplf/isomorphic/ws`
 
-// TODO: Websocket Wrapper and `ws`
+```typescript
+import WebSocket from '@xrplf/isomorphic/ws'
+
+const socket = new WebSocket('wss://localhost:8080')
+```
