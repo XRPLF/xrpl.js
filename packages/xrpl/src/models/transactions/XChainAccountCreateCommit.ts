@@ -1,11 +1,10 @@
-import { isString } from 'lodash'
-
 import { Amount, XChainBridge } from '../common'
 
 import {
   BaseTransaction,
   isAmount,
   isXChainBridge,
+  isString,
   validateBaseTransaction,
   validateRequiredField,
 } from './common'

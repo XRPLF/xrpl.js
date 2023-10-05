@@ -32,7 +32,9 @@ describe('NFTokenCreateOffer', function () {
       TransactionType: 'NFTokenCreateOffer',
       NFTokenID: NFTOKEN_ID,
       Amount: '1',
-      Flags: NFTokenCreateOfferFlags.tfSellNFToken,
+      Flags: {
+        tfSellNFToken: true,
+      },
       Expiration: 1000,
       Destination: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',

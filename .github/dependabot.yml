@@ -3,6 +3,6 @@ updates:
 - package-ecosystem: npm
   directory: "/"
   schedule:
-    interval: monthly
+    interval: weekly
     time: "15:00"
   open-pull-requests-limit: 10

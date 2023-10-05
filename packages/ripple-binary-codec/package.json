@@ -25,6 +25,12 @@
     "test": "npm run build && jest --verbose false --silent=false ./test/*.test.js",
     "lint": "eslint . --ext .ts --ext .test.js"
   },
+  "keywords": [
+    "ripple",
+    "xrp",
+    "xrp ledger",
+    "xrpl"
+  ],
   "repository": {
     "type": "git",
     "url": "git@github.com:XRPLF/xrpl.js.git"
