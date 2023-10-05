@@ -12,14 +12,19 @@ export interface AMMInfoRequest extends BaseRequest {
   command: 'amm_info'
 
   /**
+   * The address of the AMM Account to look up.
+   */
+  amm_account?: string
+
+  /**
    * One of the assets of the AMM pool to look up.
    */
-  asset: Currency
+  asset?: Currency
 
   /**
    * The other asset of the AMM pool.
    */
-  asset2: Currency
+  asset2?: Currency
 }
 
 /**
@@ -93,7 +98,7 @@ export interface AMMInfoResponse extends BaseResponse {
          * The amount, in LP Tokens, that the auction slot holder paid to win the auction slot.
          * This affects the price to outbid the current slot holder.
          */
-        price: Amount
+        price: IssuedCurrencyAmount
 
         /**
          * The current 72-minute time interval this auction slot is in, from 0 to 19.

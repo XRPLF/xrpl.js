@@ -4,11 +4,15 @@
 ### Breaking Changes
 * Bump typescript to 5.x
 * Remove Node 14 support
+* Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`.
 * Remove `create-hash` in favor of `@noble/hashes`
-* Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`
 
 ### Changes
 * Execute test in a browser in addition to node
+
+## 4.3.1 (2023-09-27)
+### Fixed
+* Fix source-maps not finding their designated source
 
 ## 4.3.0 (2023-06-13)
 ### Added

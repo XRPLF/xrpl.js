@@ -1,4 +1,4 @@
-import { AuthAccount, Currency } from '../common'
+import { AuthAccount, Currency, IssuedCurrencyAmount } from '../common'
 
 import BaseLedgerEntry from './BaseLedgerEntry'
 
@@ -20,7 +20,7 @@ export default interface AMM extends BaseLedgerEntry {
   /**
    * The address of the special account that holds this AMM's assets.
    */
-  AMMAccount: string
+  Account: string
   /**
    * The definition for one of the two assets this AMM holds.
    */
@@ -53,7 +53,7 @@ export default interface AMM extends BaseLedgerEntry {
     /**
      * The amount the auction owner paid to win this slot, in LP Tokens.
      */
-    Price: Currency
+    Price: IssuedCurrencyAmount
   }
   /**
    * The total outstanding balance of liquidity provider tokens from this AMM instance.
@@ -75,4 +75,12 @@ export default interface AMM extends BaseLedgerEntry {
    * type, so this value is always 0.
    */
   Flags: 0
+  /**
+   * This field is missing on AMM but is present on all other account_object returned objects.
+   */
+  PreviousTxnID: never
+  /**
+   * This field is missing on AMM but is present on all other account_object returned objects.
+   */
+  PreviousTxnLgrSeq: never
 }

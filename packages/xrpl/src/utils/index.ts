@@ -25,6 +25,7 @@ import { Transaction } from '../models/transactions/transaction'
 import { deriveKeypair, deriveAddress, deriveXAddress } from './derive'
 import getBalanceChanges from './getBalanceChanges'
 import getNFTokenID from './getNFTokenID'
+import getXChainClaimID from './getXChainClaimID'
 import {
   hashSignedTx,
   hashTx,
@@ -220,4 +221,5 @@ export {
   encodeForSigningClaim,
   getNFTokenID,
   parseNFTokenID,
+  getXChainClaimID,
 }

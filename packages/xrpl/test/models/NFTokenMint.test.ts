@@ -19,7 +19,9 @@ describe('NFTokenMint', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Fee: '5000000',
       Sequence: 2470665,
-      Flags: NFTokenMintFlags.tfTransferable,
+      Flags: {
+        tfTransferable: true,
+      },
       NFTokenTaxon: 0,
       Issuer: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       TransferFee: 1,

@@ -1,0 +1,118 @@
+{
+  "tx": {
+    "Account": "rLVUz66tawieqTPAHuTyFTN6pLbHcXiTzd",
+    "Fee": "20",
+    "Flags": 2147483648,
+    "NetworkID": 2552,
+    "OtherChainSource": "rL5Zd9m5XEoGPddMwYY5H5C8ARcR47b6oM",
+    "Sequence": 1007784,
+    "SignatureReward": "100",
+    "SigningPubKey": "039E925058C740A5B73E49300FC205D058520DE37F2C63C4EE3A0D1B50C4E44080",
+    "TransactionType": "XChainCreateClaimID",
+    "TxnSignature": "304402201C6F95B9997FB63DCD9854664707C58C46AA3207612FE32366B77DA084786CAF02205752C58821D7FAFAE26F77DC10AC0AFDDCBCCF4FCBED90E6B8C4523A0EB3E008",
+    "XChainBridge": {
+      "IssuingChainDoor": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+      "IssuingChainIssue": {
+        "currency": "XRP"
+      },
+      "LockingChainDoor": "rMAXACCrp3Y8PpswXcg3bKggHX76V3F8M4",
+      "LockingChainIssue": {
+        "currency": "XRP"
+      }
+    },
+    "date": 1695324353000
+  },
+  "meta": {
+    "AffectedNodes": [
+      {
+        "ModifiedNode": {
+          "FinalFields": {
+            "Account": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+            "Flags": 0,
+            "MinAccountCreateAmount": "10000000",
+            "OwnerNode": "0",
+            "SignatureReward": "100",
+            "XChainAccountClaimCount": "e3",
+            "XChainAccountCreateCount": "0",
+            "XChainBridge": {
+              "IssuingChainDoor": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+              "IssuingChainIssue": {
+                "currency": "XRP"
+              },
+              "LockingChainDoor": "rMAXACCrp3Y8PpswXcg3bKggHX76V3F8M4",
+              "LockingChainIssue": {
+                "currency": "XRP"
+              }
+            },
+            "XChainClaimID": "b0"
+          },
+          "LedgerEntryType": "Bridge",
+          "LedgerIndex": "114C0DC89656D1B0FB1F4A3426034C3FCE75BCE65D9574B5D96ABC2B24D6C8F1",
+          "PreviousFields": {
+            "XChainClaimID": "af"
+          },
+          "PreviousTxnID": "3F6F3BBE584115D1A575AB24BA32B47184F2323B65DE5C8C8EE144A55115E0B9",
+          "PreviousTxnLgrSeq": 1027822
+        }
+      },
+      {
+        "ModifiedNode": {
+          "FinalFields": {
+            "Flags": 0,
+            "Owner": "rLVUz66tawieqTPAHuTyFTN6pLbHcXiTzd",
+            "RootIndex": "6C1EA1A93D590E831CCC0EE2CBE26C146A3A6FD36F5854DC5E5AB5CE78FAE49C"
+          },
+          "LedgerEntryType": "DirectoryNode",
+          "LedgerIndex": "6C1EA1A93D590E831CCC0EE2CBE26C146A3A6FD36F5854DC5E5AB5CE78FAE49C"
+        }
+      },
+      {
+        "CreatedNode": {
+          "LedgerEntryType": "XChainOwnedClaimID",
+          "LedgerIndex": "A00BD77AE864509D796B39041AD48E9DEFEC9AF20E5C09CEF2F5DA41D6CFEB1E",
+          "NewFields": {
+            "Account": "rLVUz66tawieqTPAHuTyFTN6pLbHcXiTzd",
+            "OtherChainSource": "rL5Zd9m5XEoGPddMwYY5H5C8ARcR47b6oM",
+            "SignatureReward": "100",
+            "XChainBridge": {
+              "IssuingChainDoor": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+              "IssuingChainIssue": {
+                "currency": "XRP"
+              },
+              "LockingChainDoor": "rMAXACCrp3Y8PpswXcg3bKggHX76V3F8M4",
+              "LockingChainIssue": {
+                "currency": "XRP"
+              }
+            },
+            "XChainClaimID": "b0"
+          }
+        }
+      },
+      {
+        "ModifiedNode": {
+          "FinalFields": {
+            "Account": "rLVUz66tawieqTPAHuTyFTN6pLbHcXiTzd",
+            "Balance": "39999940",
+            "Flags": 0,
+            "OwnerCount": 3,
+            "Sequence": 1007785
+          },
+          "LedgerEntryType": "AccountRoot",
+          "LedgerIndex": "FD919D0BAA90C759DA4C7130AEEF6AE7FA2AF074F5E867D40BCBE1ECD8D8D0EA",
+          "PreviousFields": {
+            "Balance": "39999960",
+            "OwnerCount": 2,
+            "Sequence": 1007784
+          },
+          "PreviousTxnID": "3F6F3BBE584115D1A575AB24BA32B47184F2323B65DE5C8C8EE144A55115E0B9",
+          "PreviousTxnLgrSeq": 1027822
+        }
+      }
+    ],
+    "TransactionIndex": 0,
+    "TransactionResult": "tesSUCCESS"
+  },
+  "hash": "998E76B9840DA5A6009592A2674D0166A9C4862193193AA46EA6B77A64781FB4",
+  "ledger_index": 1027837,
+  "date": 1695324353000
+}

@@ -1,4 +1,6 @@
 import {
+  AMM,
+  Bridge,
   Check,
   DepositPreauth,
   Escrow,
@@ -7,11 +9,15 @@ import {
   RippleState,
   SignerList,
   Ticket,
+  XChainOwnedClaimID,
+  XChainOwnedCreateAccountClaimID,
 } from '../ledger'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 export type AccountObjectType =
+  | 'amm'
+  | 'bridge'
   | 'check'
   | 'deposit_preauth'
   | 'escrow'
@@ -21,6 +27,8 @@ export type AccountObjectType =
   | 'signer_list'
   | 'state'
   | 'ticket'
+  | 'xchain_owned_create_account_claim_id'
+  | 'xchain_owned_claim_id'
 
 /**
  * The account_objects command returns the raw ledger format for all objects
@@ -64,6 +72,8 @@ export interface AccountObjectsRequest
  * PayChannel, a SignerList, a Ticket, or a RippleState.
  */
 export type AccountObject =
+  | AMM
+  | Bridge
   | Check
   | DepositPreauth
   | Escrow
@@ -72,6 +82,8 @@ export type AccountObject =
   | SignerList
   | RippleState
   | Ticket
+  | XChainOwnedClaimID
+  | XChainOwnedCreateAccountClaimID
 
 /**
  * Response expected from an {@link AccountObjectsRequest}.

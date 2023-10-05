@@ -1,18 +1,18 @@
 # xrpl.js (ripple-lib) Release History
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
+
 ## Unreleased
 
 ### Breaking Changes
-
 * Bump typescript to 5.x
 * Remove Node 14 support
 * Remove `crypto` polyfills, `create-hash`, `elliptic`, `hash.js`, and their many dependencies in favor of `@noble/hashes` and `@nobel/curves`
 * Remove `bip32` and `bip39` in favor of `@scure/bip32` and `@scure/bip39`
 * Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`
 * Configuring a proxy:
-  * Instead of passing various parameters on the `ConnectionsOptions` you know specify the `agent` parameter. This object can use be created by libraries such as `https-proxy-agent` or any that implements the `http.Agent`.
-  * This was changed to both support the latest `https-proxy-agent` and to remove the need to include the package in bundlers.   Tests will still be done using `https-proxy-agent` and only tested in a node environment which was the only way it was previously supported anyway
+    * Instead of passing various parameters on the `ConnectionsOptions` you know specify the `agent` parameter. This object can use be created by libraries such as `https-proxy-agent` or any that implements the `http.Agent`.
+    * This was changed to both support the latest `https-proxy-agent` and to remove the need to include the package in bundlers.   Tests will still be done using `https-proxy-agent` and only tested in a node environment which was the only way it was previously supported anyway
 * Remove `BroadcastClient` which was deprecated
 * Uses `@xrplf/secret-numbers` instead of `xrpl-secret-numbers`
 * Improve key algorithm detection. It will now throw Errors with helpful messages
@@ -20,21 +20,21 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Bundling Changes
 * Bundler configurations are much more simplified.
-  * removed the following polyfills:
-    * `assert`
-    * `crypto-browserify`
-    * `https-browserify`
-    * `os-browserify`
-    * `stream-browserify`
-    * `stream-http`
-    * `url`
-    * `util` - previously added automatically by `webpack`
-  * Removed mappings for:
-    * Excluding `https-proxy-agent`
+    * removed the following polyfills:
+        * `assert`
+        * `crypto-browserify`
+        * `https-browserify`
+        * `os-browserify`
+        * `stream-browserify`
+        * `stream-http`
+        * `url`
+        * `util` - previously added automatically by `webpack`
+    * Removed mappings for:
+        * Excluding `https-proxy-agent`
 
 ### Changed
 * Remove `lodash` as a dependency
-* Remove many polyfills that were only used for testing in the browser like `browserify-fs`
+* Remove many polyfills that were only used for testing in the browser
 * Remove `util` from bundle by switching `inspect` to `JSON.stringify`
 * Add type for metadata for specific transactions(`Payment`, `NFTokenMint`, `NFTokenCreateOffer`, `NFTokenAcceptOffer`, `NFTokenCancelOffer`)
 
@@ -42,11 +42,29 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Fixed Wallet.generate() ignoring the `algorithm` parameter (Only a problem once binary-codec fix for `derive_keypair` is added)
 * Fixed Wallet.fromSeed() ignoring the `algorithm` parameter
 
+### Unreleased 2.x
+
+### Fixed
+- Allow flag maps when submitting `NFTokenMint` and `NFTokenCreateOffer` transactions like others with flags
+
+## 2.12.0 (2023-09-27)
+### Added
+* Added `ports` field to `ServerInfoResponse`
+* Support for the XChainBridge amendment.
+
+### Fixed
+* Fix request model fields related to AMM
+* Rename `AMMAccount` to `Account` on `AMM` ledger objects
+* Fixed `EscrowCancel` and `EscrowFinish` validation
+
 ## 2.11.0 (2023-08-24)
 
 ### Added
 * Add AMM support [XLS-30](https://github.com/XRPLF/XRPL-Standards/discussions/78)
 * Add `walletFromSecretNumbers` to derive a wallet from [XLS-12](https://github.com/XRPLF/XRPL-Standards/issues/15). Currently only works with `secp256k1` keys, but will work with `ED25519` keys as part of 3.0 via [#2376](https://github.com/XRPLF/xrpl.js/pull/2376).
+
+### Fixed
+* Fix source-maps not finding their designated source
 
 ## 2.10.0 (2023-08-07)
 

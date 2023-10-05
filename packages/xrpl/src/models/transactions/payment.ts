@@ -1,4 +1,3 @@
-/* eslint-disable complexity -- Necessary for validatePayment */
 import { ValidationError } from '../../errors'
 import { Amount, Path } from '../common'
 import { isFlagEnabled } from '../utils'

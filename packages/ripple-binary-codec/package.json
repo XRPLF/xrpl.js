@@ -1,6 +1,6 @@
 {
   "name": "ripple-binary-codec",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "XRP Ledger binary codec",
   "files": [
     "dist/*",
@@ -14,7 +14,7 @@
     "buffer": "6.0.3",
     "@xrplf/isomorphic": "1.0.0",
     "bignumber.js": "^9.0.0",
-    "ripple-address-codec": "^4.3.0"
+    "ripple-address-codec": "^4.3.1"
   },
   "devDependencies": {
     "assert": "^2.0.0"
@@ -26,6 +26,12 @@
     "test": "npm run build && jest --verbose false --silent=false ./test/*.test.js",
     "lint": "eslint . --ext .ts --ext .test.js"
   },
+  "keywords": [
+    "ripple",
+    "xrp",
+    "xrp ledger",
+    "xrpl"
+  ],
   "repository": {
     "type": "git",
     "url": "git@github.com:XRPLF/xrpl.js.git"

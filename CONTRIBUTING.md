@@ -47,7 +47,7 @@ npm run lint
 
 ## Running Tests
 
-For integration and browser tests, we use a `rippled` node in standalone mode to test xrpl.js code against. To set this up, you can either configure and run `rippled` locally, or set up the Docker container `xrpllabsofficial/1.12.0-b1` by [following these instructions](#integration-tests). The latter will require you to [install Docker](https://docs.docker.com/get-docker/).
+For integration and browser tests, we use a `rippled` node in standalone mode to test xrpl.js code against. To set this up, you can either configure and run `rippled` locally, or set up the Docker container `xrpllabsofficial/xrpld:1.12.0-b1` by [following these instructions](#integration-tests). The latter will require you to [install Docker](https://docs.docker.com/get-docker/).
 
 ### Unit Tests
 
@@ -64,7 +64,7 @@ From the top-level xrpl.js folder (one level above `packages`), run the followin
 ```bash
 npm install
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/config/ xrpllabsofficial/1.12.0-b1 -a --start
+docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/config/ xrpllabsofficial/xrpld:1.12.0-b1 -a --start
 npm run build
 npm run test:integration
 ```
@@ -261,7 +261,12 @@ This should almost always be done using the [`xrpl-codec-gen`](https://github.co
    1. Click "Choose a tag", and choose a tag that you just created.
    1. Edit the name of the release to match the tag (IE \<package\>@\<version\>) and edit the description as you see fit.
 
-1. Lastly, send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
+1. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
+1. Lastly, send a similar message to the XRPL Discord in the [`javascript` channel](https://discord.com/channels/886050993802985492/886053111179915295). The message should include:
+   1. The version changes for xrpl libraries
+   1. A link to the more detailed changes
+   1. Highlights of important changes
+
 
 # ripple-lib 1.x releases
 
