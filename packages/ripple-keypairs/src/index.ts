@@ -6,7 +6,7 @@ import { hexToBytes, randomBytes } from '@xrplf/isomorphic/utils'
 import { accountPublicFromPublicGenerator } from './signing-schemes/secp256k1/utils'
 import Sha512 from './utils/Sha512'
 import assert from './utils/assert'
-import { Algorithm, HexString, KeyPair, SigningScheme } from './types'
+import type { Algorithm, HexString, KeyPair, SigningScheme } from './types'
 import {
   getAlgorithmFromPrivateKey,
   getAlgorithmFromPublicKey,

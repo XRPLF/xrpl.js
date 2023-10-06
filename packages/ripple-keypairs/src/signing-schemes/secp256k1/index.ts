@@ -2,7 +2,11 @@ import { numberToBytesBE } from '@noble/curves/abstract/utils'
 import { secp256k1 as nobleSecp256k1 } from '@noble/curves/secp256k1'
 import { bytesToHex } from '@xrplf/isomorphic/utils'
 
-import { DeriveKeyPairOptions, HexString, SigningScheme } from '../../types'
+import type {
+  DeriveKeyPairOptions,
+  HexString,
+  SigningScheme,
+} from '../../types'
 
 import { derivePrivateKey } from './utils'
 import assert from '../../utils/assert'

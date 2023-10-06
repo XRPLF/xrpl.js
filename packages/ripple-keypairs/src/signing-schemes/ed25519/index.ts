@@ -1,7 +1,7 @@
 import { ed25519 as nobleEd25519 } from '@noble/curves/ed25519'
 import { bytesToHex } from '@xrplf/isomorphic/utils'
 
-import { HexString, SigningScheme } from '../../types'
+import type { HexString, SigningScheme } from '../../types'
 import assert from '../../utils/assert'
 import Sha512 from '../../utils/Sha512'
 
@@ -20,7 +20,6 @@ const ed25519: SigningScheme = {
   },
 
   sign(message: Uint8Array, privateKey: HexString): string {
-    // noinspection SuspiciousTypeOfGuard
     assert.ok(message instanceof Uint8Array, 'message must be array of octets')
     assert.ok(
       privateKey.length === 66,
