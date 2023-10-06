@@ -1,6 +1,9 @@
+export const PRIVATE = 'private'
+export const PUBLIC = 'public'
+
 export type HexString = string
 export type Algorithm = 'ecdsa-secp256k1' | 'ed25519'
-export type KeyType = 'public' | 'private'
+export type KeyType = typeof PRIVATE | typeof PUBLIC
 
 export interface KeyPair {
   privateKey: HexString
@@ -19,7 +22,6 @@ export interface SigningScheme {
   ) => KeyPair
 
   sign: (
-    // TODO: HexString?
     // deriveKeyPair creates a Sha512.half as Uint8Array so that's why it takes this
     // though it /COULD/ take HexString as well
     // for consistency it should be Uint8Array | HexString everywhere,
@@ -29,7 +31,6 @@ export interface SigningScheme {
   ) => HexString
 
   verify: (
-    // TODO: HexString?
     message: Uint8Array,
     signature: HexString,
     publicKey: HexString,

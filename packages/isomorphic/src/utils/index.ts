@@ -1,5 +1,5 @@
 import { randomBytes as cryptoRandomBytes } from 'crypto'
-import { BytesToHexFn, HexToBytesFn, RandomBytesFn } from './types'
+import type { BytesToHexFn, HexToBytesFn, RandomBytesFn } from './types'
 
 const OriginalBuffer = Symbol('OriginalBuffer')
 

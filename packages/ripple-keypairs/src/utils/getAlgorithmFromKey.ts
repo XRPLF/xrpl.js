@@ -1,4 +1,5 @@
 import type { Algorithm, HexString, KeyType } from '../types'
+import { PRIVATE, PUBLIC } from '../types'
 
 enum Prefix {
   NONE = -1,
@@ -26,13 +27,13 @@ type CompositeKey = `${KeyType}_${Prefix}_${number}`
  *       and the interpreted number is the same as 32 bytes.
  */
 const KEY_TYPES: Record<CompositeKey, Algorithm> = {
-  [`private_${Prefix.NONE}_32`]: 'ecdsa-secp256k1',
-  [`private_${Prefix.SECP256K1_PRIVATE}_33`]: 'ecdsa-secp256k1',
-  [`private_${Prefix.ED25519}_33`]: 'ed25519',
-  [`public_${Prefix.ED25519}_33`]: 'ed25519',
-  [`public_${Prefix.SECP256K1_PUB_X}_33`]: 'ecdsa-secp256k1',
-  [`public_${Prefix.SECP256K1_PUB_X_ODD_Y}_33`]: 'ecdsa-secp256k1',
-  [`public_${Prefix.SECP256K1_PUB_XY}_65`]: 'ecdsa-secp256k1',
+  [`${PRIVATE}_${Prefix.NONE}_32`]: 'ecdsa-secp256k1',
+  [`${PRIVATE}_${Prefix.SECP256K1_PRIVATE}_33`]: 'ecdsa-secp256k1',
+  [`${PRIVATE}_${Prefix.ED25519}_33`]: 'ed25519',
+  [`${PUBLIC}_${Prefix.ED25519}_33`]: 'ed25519',
+  [`${PUBLIC}_${Prefix.SECP256K1_PUB_X}_33`]: 'ecdsa-secp256k1',
+  [`${PUBLIC}_${Prefix.SECP256K1_PUB_X_ODD_Y}_33`]: 'ecdsa-secp256k1',
+  [`${PUBLIC}_${Prefix.SECP256K1_PUB_XY}_65`]: 'ecdsa-secp256k1',
 }
 
 function getKeyInfo(key: HexString) {
@@ -113,9 +114,9 @@ export function getAlgorithmFromKey(key: HexString, type: KeyType): Algorithm {
 }
 
 export function getAlgorithmFromPublicKey(key: HexString): Algorithm {
-  return getAlgorithmFromKey(key, 'public')
+  return getAlgorithmFromKey(key, PUBLIC)
 }
 
 export function getAlgorithmFromPrivateKey(key: HexString): Algorithm {
-  return getAlgorithmFromKey(key, 'private')
+  return getAlgorithmFromKey(key, PRIVATE)
 }
