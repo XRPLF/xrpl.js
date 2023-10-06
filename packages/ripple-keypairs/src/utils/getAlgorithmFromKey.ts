@@ -104,7 +104,7 @@ ${validFormats}
 export function getAlgorithmFromKey(key: HexString, type: KeyType): Algorithm {
   const { prefix, len } = getKeyInfo(key)
   // Special case back compat support for no prefix
-  const usedPrefix = type === 'private' && len === 32 ? Prefix.NONE : prefix
+  const usedPrefix = type === PRIVATE && len === 32 ? Prefix.NONE : prefix
   const algorithm = KEY_TYPES[`${type}_${usedPrefix}_${len}`]
 
   if (!algorithm) {
