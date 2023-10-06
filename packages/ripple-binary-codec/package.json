@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "buffer": "6.0.3",
+    "bignumber.js": "^9.0.0",
     "create-hash": "^1.2.0",
     "ripple-address-codec": "^4.3.1"
   },
