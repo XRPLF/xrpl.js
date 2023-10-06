@@ -17,7 +17,7 @@ const MIN_XRP = new BigNumber('1e-6')
 const mask = BigInt(0x00000000ffffffff)
 
 /**
- * decimal.js configuration for Amount IOUs
+ * BigNumber configuration for Amount IOUs
  */
 BigNumber.config({
   EXPONENTIAL_AT: [
@@ -207,7 +207,7 @@ class Amount extends SerializedType {
   /**
    * Validate IOU.value amount
    *
-   * @param decimal Decimal.js object representing IOU.value
+   * @param decimal BigNumber object representing IOU.value
    * @returns void, but will throw if invalid amount
    */
   private static assertIouIsValid(decimal: BigNumber): void {
