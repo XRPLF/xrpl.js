@@ -1,9 +1,6 @@
-export const PRIVATE = 'private'
-export const PUBLIC = 'public'
-
 export type HexString = string
 export type Algorithm = 'ecdsa-secp256k1' | 'ed25519'
-export type KeyType = typeof PRIVATE | typeof PUBLIC
+export type KeyType = 'private' | 'public'
 
 export interface KeyPair {
   privateKey: HexString
