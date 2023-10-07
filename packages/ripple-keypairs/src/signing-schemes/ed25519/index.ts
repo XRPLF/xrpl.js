@@ -40,7 +40,7 @@ const ed25519: SigningScheme = {
     )
     return nobleEd25519.verify(
       signature,
-      new Uint8Array(message),
+      message,
       // Remove the 0xED prefix
       publicKey.slice(2),
       // By default, set zip215 to false for compatibility reasons.
