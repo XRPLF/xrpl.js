@@ -1,0 +1,7 @@
+{
+  "name": "@xrplf/isomorphic/ripemd160",
+  "private": true,
+  "main": "../dist/ripemd160",
+  "types": "../dist/ripemd160",
+  "browser": "../dist/ripemd160/browser.js"
+}

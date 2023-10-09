@@ -1,18 +1,11 @@
 import { BigNumber } from 'bignumber.js'
 import { decodeAccountID } from 'ripple-address-codec'
-import {
-  decode,
-  encode,
-  encodeForSigning,
-  encodeForSigningClaim,
-} from 'ripple-binary-codec'
-import { sign as signWithKeypair, verify } from 'ripple-keypairs'
+import { decode, encode, encodeForSigning } from 'ripple-binary-codec'
+import { verify } from 'ripple-keypairs'
 
 import { ValidationError } from '../errors'
 import { Signer } from '../models/common'
 import { Transaction, validate } from '../models/transactions'
-
-import { Wallet } from '.'
 
 /**
  * Takes several transactions with Signer fields (in object or blob form) and creates a
@@ -62,41 +55,39 @@ function multisign(transactions: Array<Transaction | string>): string {
 }
 
 /**
- * Creates a signature that can be used to redeem a specific amount of XRP from a payment channel.
- *
- * @param wallet - The account that will sign for this payment channel.
- * @param channelId - An id for the payment channel to redeem XRP from.
- * @param amount - The amount in drops to redeem.
- * @returns A signature that can be used to redeem a specific amount of XRP from a payment channel.
- * @category Utilities
- */
-function authorizeChannel(
-  wallet: Wallet,
-  channelId: string,
-  amount: string,
-): string {
-  const signingData = encodeForSigningClaim({
-    channel: channelId,
-    amount,
-  })
-
-  return signWithKeypair(signingData, wallet.privateKey)
-}
-
-/**
  * Verifies that the given transaction has a valid signature based on public-key encryption.
  *
  * @param tx - A transaction to verify the signature of. (Can be in object or encoded string format).
+ * @param [publicKey] Specific public key to use to verify. If not specified the `SigningPublicKey` of tx will be used.
  * @returns Returns true if tx has a valid signature, and returns false otherwise.
+ * @throws Error when transaction is missing TxnSignature
+ * @throws Error when publicKey is not provided and transaction is missing SigningPubKey
  * @category Utilities
  */
-function verifySignature(tx: Transaction | string): boolean {
+function verifySignature(
+  tx: Transaction | string,
+  publicKey?: string,
+): boolean {
   const decodedTx: Transaction = getDecodedTransaction(tx)
-  return verify(
-    encodeForSigning(decodedTx),
-    decodedTx.TxnSignature,
-    decodedTx.SigningPubKey,
-  )
+  let key = publicKey
+
+  // Need a SignedTransaction class where TxnSignature is not optional.
+  if (typeof decodedTx.TxnSignature !== 'string' || !decodedTx.TxnSignature) {
+    throw new Error('Transaction is missing a signature, TxnSignature')
+  }
+
+  if (!key) {
+    // Need a SignedTransaction class where TxnSignature is not optional.
+    if (
+      typeof decodedTx.SigningPubKey !== 'string' ||
+      !decodedTx.SigningPubKey
+    ) {
+      throw new Error('Transaction is missing a public key, SigningPubKey')
+    }
+    key = decodedTx.SigningPubKey
+  }
+
+  return verify(encodeForSigning(decodedTx), decodedTx.TxnSignature, key)
 }
 
 /**
@@ -168,4 +159,4 @@ function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
   return decode(txOrBlob) as unknown as Transaction
 }
 
-export { authorizeChannel, verifySignature, multisign }
+export { verifySignature, multisign }
