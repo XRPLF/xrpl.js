@@ -1,4 +1,9 @@
-import * as addressCodec from 'ripple-address-codec'
+import {
+  decodeNodePublic,
+  decodeSeed,
+  encodeAccountID,
+  encodeSeed,
+} from 'ripple-address-codec'
 import { ripemd160 } from '@xrplf/isomorphic/ripemd160'
 import { sha256 } from '@xrplf/isomorphic/sha256'
 import { hexToBytes, randomBytes } from '@xrplf/isomorphic/utils'
@@ -34,7 +39,7 @@ function generateSeed(
     ? options.entropy.slice(0, 16)
     : randomBytes(16)
   const type = options.algorithm === 'ed25519' ? 'ed25519' : 'secp256k1'
-  return addressCodec.encodeSeed(entropy, type)
+  return encodeSeed(entropy, type)
 }
 
 function deriveKeypair(
@@ -45,7 +50,7 @@ function deriveKeypair(
     accountIndex?: number
   },
 ): KeyPair {
-  const decoded = addressCodec.decodeSeed(seed)
+  const decoded = decodeSeed(seed)
   const proposedAlgorithm = options?.algorithm ?? decoded.type
   const algorithm =
     proposedAlgorithm === 'ed25519' ? 'ed25519' : 'ecdsa-secp256k1'
@@ -83,7 +88,7 @@ function computePublicKeyHash(publicKeyBytes: Uint8Array): Uint8Array {
 }
 
 function deriveAddressFromBytes(publicKeyBytes: Uint8Array): string {
-  return addressCodec.encodeAccountID(computePublicKeyHash(publicKeyBytes))
+  return encodeAccountID(computePublicKeyHash(publicKeyBytes))
 }
 
 function deriveAddress(publicKey: string): string {
@@ -91,12 +96,10 @@ function deriveAddress(publicKey: string): string {
 }
 
 function deriveNodeAddress(publicKey: string): string {
-  const generatorBytes = addressCodec.decodeNodePublic(publicKey)
+  const generatorBytes = decodeNodePublic(publicKey)
   const accountPublicBytes = accountPublicFromPublicGenerator(generatorBytes)
   return deriveAddressFromBytes(accountPublicBytes)
 }
-
-const { decodeSeed } = addressCodec
 
 export {
   generateSeed,
