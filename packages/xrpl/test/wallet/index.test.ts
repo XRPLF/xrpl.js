@@ -1230,6 +1230,18 @@ describe('Wallet', function () {
 
       assert.equal(isVerified, true)
     })
+
+    it('should throw an error when not signed', () => {
+      const wallet = new Wallet(publicKey, privateKey)
+      const decodedTransaction = decode(
+        prepared.signedTransaction,
+      ) as unknown as Transaction
+      delete decodedTransaction.TxnSignature
+
+      assert.throws(() => {
+        wallet.verifyTransaction(decodedTransaction)
+      }, `Transaction is missing a signature, TxnSignature`)
+    })
   })
 
   describe('getXAddress', function () {

@@ -18,10 +18,8 @@
     "test": "test"
   },
   "dependencies": {
-    "bn.js": "^5.1.1",
-    "brorand": "^1.0.5",
-    "elliptic": "^6.5.4",
-    "hash.js": "^1.0.3",
+    "@noble/curves": "^1.0.0",
+    "@xrplf/isomorphic": "1.0.0",
     "ripple-address-codec": "^4.3.1"
   },
   "keywords": [

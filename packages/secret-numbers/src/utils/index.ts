@@ -1,7 +1,7 @@
-import brorand from "brorand";
+import { randomBytes } from "@xrplf/isomorphic/utils";
 
 function randomEntropy(): Buffer {
-  return Buffer.from(brorand(16));
+  return Buffer.from(randomBytes(16));
 }
 
 function calculateChecksum(position: number, value: number): number {

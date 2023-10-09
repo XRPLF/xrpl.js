@@ -26,6 +26,9 @@ module.exports = {
   extends: ['@xrplf/eslint-config/base'],
 
   rules: {
+    // TODO: put in @xrplf/eslint-config/base ?
+    '@typescript-eslint/consistent-type-imports': 'error',
+
     // ** TODO **
     // all of the below are turned off for now during the migration to a
     // monorepo. They need to actually be addressed!

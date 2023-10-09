@@ -1,13 +1,9 @@
 import { assert } from 'chai'
 import { decode, encode } from 'ripple-binary-codec'
 
-import { ECDSA, Transaction, ValidationError } from '../../src'
+import { Transaction, ValidationError } from '../../src'
 import { Wallet } from '../../src/Wallet'
-import {
-  authorizeChannel,
-  multisign,
-  verifySignature,
-} from '../../src/Wallet/signer'
+import { multisign, verifySignature } from '../../src/Wallet/signer'
 
 const publicKey =
   '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D'
@@ -187,38 +183,13 @@ describe('Signer', function () {
     assert.throws(() => multisign(transactions), /forMultisign/u)
   })
 
-  it('authorizeChannel succeeds with secp256k1 seed', function () {
-    const secpWallet = Wallet.fromSeed('snGHNrPbHrdUcszeuDEigMdC1Lyyd', {
-      algorithm: ECDSA.secp256k1,
-    })
-    const channelId =
-      '5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3'
-    const amount = '1000000'
-
-    assert.equal(
-      authorizeChannel(secpWallet, channelId, amount),
-      '304402204E7052F33DDAFAAA55C9F5B132A5E50EE95B2CF68C0902F61DFE77299BC893740220353640B951DCD24371C16868B3F91B78D38B6F3FD1E826413CDF891FA8250AAC',
-    )
-  })
-
-  it('authorizeChannel succeeds with ed25519 seed', function () {
-    const edWallet = Wallet.fromSeed('sEdSuqBPSQaood2DmNYVkwWTn1oQTj2')
-    const channelId =
-      '5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3'
-    const amount = '1000000'
-    assert.equal(
-      authorizeChannel(edWallet, channelId, amount),
-      '7E1C217A3E4B3C107B7A356E665088B4FBA6464C48C58267BEF64975E3375EA338AE22E6714E3F5E734AE33E6B97AAD59058E1E196C1F92346FC1498D0674404',
-    )
-  })
-
   it('verifySignature succeeds for valid signed transaction blob', function () {
     const signedTx = verifyWallet.sign(tx)
 
     assert.isTrue(verifySignature(signedTx.tx_blob))
   })
 
-  it('verify succeeds for valid signed transaction object', function () {
+  it('verifySignature succeeds for valid signed transaction object', function () {
     const signedTx = verifyWallet.sign(tx)
 
     assert.isTrue(
@@ -226,7 +197,7 @@ describe('Signer', function () {
     )
   })
 
-  it('verify throws for invalid signing key', function () {
+  it('verifySignature returns false for invalid signing key', function () {
     const signedTx = verifyWallet.sign(tx)
 
     const decodedTx = decode(signedTx.tx_blob) as unknown as Transaction
@@ -236,5 +207,18 @@ describe('Signer', function () {
       '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020'
 
     assert.isFalse(verifySignature(decodedTx))
+  })
+
+  it('verifySignature throws for a missing public key', function () {
+    const signedTx = verifyWallet.sign(tx)
+
+    const decodedTx = decode(signedTx.tx_blob) as unknown as Transaction
+
+    // Use a different key for validation
+    delete decodedTx.SigningPubKey
+
+    assert.throws(() => {
+      verifySignature(decodedTx)
+    }, `Transaction is missing a public key, SigningPubKey`)
   })
 })
