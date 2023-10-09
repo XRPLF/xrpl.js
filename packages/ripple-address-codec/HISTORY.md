@@ -5,6 +5,7 @@
 * Bump typescript to 5.x
 * Remove Node 14 support
 * Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`.
+* Remove `create-hash` in favor of `@noble/hashes`
 
 ### Changes
 * Execute test in a browser in addition to node

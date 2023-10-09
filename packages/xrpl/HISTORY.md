@@ -7,18 +7,22 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Breaking Changes
 * Bump typescript to 5.x
 * Remove Node 14 support
+* Remove `crypto` polyfills, `create-hash`, `elliptic`, `hash.js`, and their many dependencies in favor of `@noble/hashes` and `@nobel/curves`
+* Remove `bip32` and `bip39` in favor of `@scure/bip32` and `@scure/bip39`
 * Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`
 * Configuring a proxy:
     * Instead of passing various parameters on the `ConnectionsOptions` you know specify the `agent` parameter. This object can use be created by libraries such as `https-proxy-agent` or any that implements the `http.Agent`.
     * This was changed to both support the latest `https-proxy-agent` and to remove the need to include the package in bundlers.   Tests will still be done using `https-proxy-agent` and only tested in a node environment which was the only way it was previously supported anyway
 * Remove `BroadcastClient` which was deprecated
 * Uses `@xrplf/secret-numbers` instead of `xrpl-secret-numbers`
+* Improve key algorithm detection. It will now throw Errors with helpful messages
+* Move `authorizeChannel` from `wallet/signer` to `wallet/authorizeChannel` to solve a circular dependency issue.
 
 ### Bundling Changes
 * Bundler configurations are much more simplified.
     * removed the following polyfills:
         * `assert`
-        * `buffer`
+        * `crypto-browserify`
         * `https-browserify`
         * `os-browserify`
         * `stream-browserify`
@@ -26,7 +30,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
         * `url`
         * `util` - previously added automatically by `webpack`
     * Removed mappings for:
-        * `ws` to `WsWrapper`
         * Excluding `https-proxy-agent`
 
 ### Changed

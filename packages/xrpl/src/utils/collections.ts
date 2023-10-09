@@ -23,6 +23,7 @@ export function groupBy<T>(
     index,
     arrayReference,
   ) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- being safe for js users
     ;(acc[iteratee(value, index, arrayReference)] ||= []).push(value)
     return acc
   },

@@ -11,13 +11,7 @@ module.exports = merge(getDefaultConfiguration(), {
     path: path.join(__dirname, 'build/'),
     filename: `xrpl.default.js`,
   },
-  plugins: [
-    new webpack.NormalModuleReplacementPlugin(/^ws$/, './WSWrapper'),
-    new webpack.IgnorePlugin({
-      resourceRegExp: /^\.\/wordlists\/(?!english)/,
-      contextRegExp: /bip39\/src$/,
-    }),
-  ],
+  plugins: [new webpack.NormalModuleReplacementPlugin(/^ws$/, './WSWrapper')],
   resolve: {
     alias: {
       ws: './dist/npm/client/WSWrapper.js',

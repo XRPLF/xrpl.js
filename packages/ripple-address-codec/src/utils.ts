@@ -1,4 +1,6 @@
-type Sequence = number[] | Buffer | Uint8Array
+// Buffer is technically not needed, as a Buffer IS a Uint8Array.
+// However, for communication purposes it's listed here
+export type ByteArray = number[] | Uint8Array | Buffer
 
 /**
  * Check whether two sequences (e.g. Arrays of numbers) are equal.
@@ -6,26 +8,20 @@ type Sequence = number[] | Buffer | Uint8Array
  * @param arr1 - One of the arrays to compare.
  * @param arr2 - The other array to compare.
  */
-export function seqEqual(arr1: Sequence, arr2: Sequence): boolean {
+export function arrayEqual(arr1: ByteArray, arr2: ByteArray): boolean {
   if (arr1.length !== arr2.length) {
     return false
   }
-
-  for (let i = 0; i < arr1.length; i++) {
-    if (arr1[i] !== arr2[i]) {
-      return false
-    }
-  }
-  return true
+  return arr1.every((value, index) => value === arr2[index])
 }
 
 /**
- * Check whether a value is a sequence (e.g. Array of numbers).
+ * Check whether a value is a scalar
  *
  * @param val - The value to check.
  */
-function isSequence(val: Sequence | number): val is Sequence {
-  return typeof val !== 'number'
+function isScalar(val: ByteArray | number): val is number {
+  return typeof val === 'number'
 }
 
 /**
@@ -39,17 +35,9 @@ function isSequence(val: Sequence | number): val is Sequence {
  * @param args - Concatenate of these args into a single array.
  * @returns Array of concatenated arguments
  */
-export function concatArgs(...args: Array<number | Sequence>): number[] {
-  const ret: number[] = []
 
-  args.forEach((arg) => {
-    if (isSequence(arg)) {
-      for (const j of arg) {
-        ret.push(j)
-      }
-    } else {
-      ret.push(arg)
-    }
+export function concatArgs(...args: Array<number | ByteArray>): number[] {
+  return args.flatMap((arg) => {
+    return isScalar(arg) ? [arg] : Array.from(arg)
   })
-  return ret
 }
