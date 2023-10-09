@@ -1,0 +1,44 @@
+{
+  "name": "@xrplf/isomorphic",
+  "version": "1.0.0",
+  "description": "A collection of isomorphic and tree-shakeable crypto hashes and utils for xrpl.js",
+  "keywords": [
+    "crypto",
+    "isomorphic",
+    "xrpl"
+  ],
+  "scripts": {
+    "build": "tsc --build ./tsconfig.build.json",
+    "test": "npm run build && jest --verbose false --silent=false ./test/*.test.ts",
+    "test:browser": "npm run build && karma start ./karma.config.js",
+    "clean": "rm -rf ./dist ./coverage ./test/testCompiledForWeb tsconfig.build.tsbuildinfo",
+    "lint": "eslint . --ext .ts",
+    "prepublish": "npm run lint && npm test"
+  },
+  "files": [
+    "dist/*",
+    "sha256/*",
+    "sha512/*",
+    "ripemd160/*",
+    "src/*",
+    "utils/*"
+  ],
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "@noble/hashes": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^16.18.38"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:XRPLF/xrpl.js.git"
+  },
+  "license": "ISC",
+  "prettier": "@xrplf/prettier-config",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

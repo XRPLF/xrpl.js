@@ -1,26 +1,28 @@
-import { seqEqual, concatArgs } from '../src/utils'
+import { arrayEqual, concatArgs } from '../src/utils'
 
 it('two sequences are equal', () => {
-  expect(seqEqual([1, 2, 3], [1, 2, 3])).toBe(true)
+  expect(arrayEqual([1, 2, 3], [1, 2, 3])).toBe(true)
 })
 
 it('elements must be in the same order', () => {
-  expect(seqEqual([3, 2, 1], [1, 2, 3])).toBe(false)
+  expect(arrayEqual([3, 2, 1], [1, 2, 3])).toBe(false)
 })
 
 it('sequences do not need to be the same type', () => {
-  expect(seqEqual(Buffer.from([1, 2, 3]), [1, 2, 3])).toBe(true)
-  expect(seqEqual(Buffer.from([1, 2, 3]), new Uint8Array([1, 2, 3]))).toBe(true)
+  expect(arrayEqual(Buffer.from([1, 2, 3]), [1, 2, 3])).toBe(true)
+  expect(arrayEqual(Buffer.from([1, 2, 3]), new Uint8Array([1, 2, 3]))).toBe(
+    true,
+  )
 })
 
 it('sequences with a single element', () => {
-  expect(seqEqual(Buffer.from([1]), [1])).toBe(true)
-  expect(seqEqual(Buffer.from([1]), new Uint8Array([1]))).toBe(true)
+  expect(arrayEqual(Buffer.from([1]), [1])).toBe(true)
+  expect(arrayEqual(Buffer.from([1]), new Uint8Array([1]))).toBe(true)
 })
 
 it('empty sequences', () => {
-  expect(seqEqual(Buffer.from([]), [])).toBe(true)
-  expect(seqEqual(Buffer.from([]), new Uint8Array([]))).toBe(true)
+  expect(arrayEqual(Buffer.from([]), [])).toBe(true)
+  expect(arrayEqual(Buffer.from([]), new Uint8Array([]))).toBe(true)
 })
 
 it('plain numbers are concatenated', () => {

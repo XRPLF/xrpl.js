@@ -14,5 +14,13 @@
     "declaration": true,
     "strictNullChecks": true
   },
-  "include": ["src/**/*.ts"]
+  "references": [
+    {
+      "path": "../isomorphic/tsconfig.build.json"
+    }
+  ],
+  "files": [],
+  "include": [
+    "src/**/*.ts"
+  ]
 }

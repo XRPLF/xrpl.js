@@ -15,8 +15,15 @@
     "strictNullChecks": true,
     "resolveJsonModule": true
   },
-  "references": [{
-    "path": "../ripple-address-codec/tsconfig.json"
-  }],
-  "include": ["src/**/*.ts"]
+  "references": [
+    {
+      "path": "../isomorphic/tsconfig.build.json"
+    },
+    {
+      "path": "../ripple-address-codec/tsconfig.build.json"
+    }
+  ],
+  "include": [
+    "src/**/*.ts"
+  ]
 }

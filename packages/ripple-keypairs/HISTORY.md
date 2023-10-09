@@ -6,6 +6,13 @@
 * Remove Node 14 support
 * Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`.
 * Fix `deriveKeypair` ignoring manual decoding algorithm. (Specifying algorithm=`ed25519` in `opts` now works on secrets like `sNa1...`)
+* Remove `crypto` polyfills, `create-hash`, `elliptic`, `hash.js`, and their many dependencies in favor of `@noble/hashes` and `@nobel/curves`
+* Remove `bytesToHex` and `hexToBytes`.  They can now be found in `@xrplf/isomorphic/utils`
+* `verifyTransaction` will throw an error if there is no signature
+* Improved key algorithm detection. It will now throw Errors with helpful messages
+
+### Changes
+* Remove `brorand` as a dependency and use `@xrplf/isomorphic` instead.
 
 ## 1.3.1 (2023-09-27)
 ### Fixed

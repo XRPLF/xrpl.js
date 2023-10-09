@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "buffer": "6.0.3",
+    "@xrplf/isomorphic": "1.0.0",
     "bignumber.js": "^9.0.0",
-    "create-hash": "^1.2.0",
     "ripple-address-codec": "^4.3.1"
   },
   "devDependencies": {
