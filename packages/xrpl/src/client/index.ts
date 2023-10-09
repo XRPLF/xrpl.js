@@ -37,7 +37,10 @@ import type {
   SubmitResponse,
 } from '../models/methods'
 import type { BookOffer, BookOfferCurrency } from '../models/methods/bookOffers'
-import type { EventTypes, OnEventToListenerMap } from '../models/methods/subscribe'
+import type {
+  EventTypes,
+  OnEventToListenerMap,
+} from '../models/methods/subscribe'
 import type { Transaction } from '../models/transactions'
 import { setTransactionFlagsToNumber } from '../models/utils/flags'
 import {
