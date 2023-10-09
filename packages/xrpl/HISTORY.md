@@ -7,6 +7,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Added
 * Add support for Concise Transaction Identifier (ctid) as defined in [XLS-37](https://github.com/XRPLF/XRPL-Standards/discussions/91)
 
+### Fixed
+* Allow flag maps when submitting `NFTokenMint` and `NFTokenCreateOffer` transactions like others with flags
+
 ## 2.12.0 (2023-09-27)
 ### Added
 * Added `ports` field to `ServerInfoResponse`
