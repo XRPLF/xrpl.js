@@ -6,6 +6,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Fixed
 - Allow flag maps when submitting `NFTokenMint` and `NFTokenCreateOffer` transactions like others with flags
+- Add pseudo transaction types to `tx` and `ledger` methods responses.
 
 ## 2.12.0 (2023-09-27)
 ### Added
