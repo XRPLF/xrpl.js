@@ -67,7 +67,7 @@ class XChainBridge extends SerializedType {
       return value
     }
 
-    if (!isXChainBridgeObject) {
+    if (!isXChainBridgeObject(value)) {
       throw new Error('Invalid type to construct an XChainBridge')
     }
 
