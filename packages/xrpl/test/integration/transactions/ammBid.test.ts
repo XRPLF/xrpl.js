@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { AMMBid, AMMDeposit, AMMDepositFlags } from 'xrpl'
+import { AMMBid } from 'xrpl'
 
 import { AMMInfoResponse } from '../../../src'
 import serverUrl from '../serverUrl'
@@ -21,18 +21,6 @@ describe('AMMBid', function () {
   it('bid', async function () {
     const { asset, asset2 } = testContext.amm
     const { wallet } = testContext
-
-    // Need to deposit (be an LP) before bidding is eligible
-    const ammDepositTx: AMMDeposit = {
-      TransactionType: 'AMMDeposit',
-      Account: wallet.classicAddress,
-      Asset: asset,
-      Asset2: asset2,
-      Amount: '1000',
-      Flags: AMMDepositFlags.tfSingleAsset,
-    }
-
-    await testTransaction(testContext.client, ammDepositTx, wallet)
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -74,18 +62,6 @@ describe('AMMBid', function () {
   it('vote with AuthAccounts, BidMin, BidMax', async function () {
     const { asset, asset2, issuerWallet } = testContext.amm
     const { wallet } = testContext
-
-    // Need to deposit (be an LP) before bidding is eligible
-    const ammDepositTx: AMMDeposit = {
-      TransactionType: 'AMMDeposit',
-      Account: wallet.classicAddress,
-      Asset: asset,
-      Asset2: asset2,
-      Amount: '1000',
-      Flags: AMMDepositFlags.tfSingleAsset,
-    }
-
-    await testTransaction(testContext.client, ammDepositTx, wallet)
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',

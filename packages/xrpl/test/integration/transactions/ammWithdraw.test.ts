@@ -1,11 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
-import {
-  AMMDeposit,
-  AMMDepositFlags,
-  AMMWithdraw,
-  AMMWithdrawFlags,
-} from 'xrpl'
+import { AMMWithdraw, AMMWithdrawFlags } from 'xrpl'
 
 import { AMMInfoResponse } from '../../../src'
 import serverUrl from '../serverUrl'
@@ -27,17 +22,6 @@ describe('AMMWithdraw', function () {
   it('withdraw with Amount', async function () {
     const { asset, asset2 } = testContext.amm
     const { wallet } = testContext
-
-    const ammDepositTx: AMMDeposit = {
-      TransactionType: 'AMMDeposit',
-      Account: wallet.classicAddress,
-      Asset: asset,
-      Asset2: asset2,
-      Amount: '1000',
-      Flags: AMMDepositFlags.tfSingleAsset,
-    }
-
-    await testTransaction(testContext.client, ammDepositTx, wallet)
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -81,18 +65,6 @@ describe('AMMWithdraw', function () {
   it('withdraw with Amount and Amount2', async function () {
     const { asset, asset2 } = testContext.amm
     const { wallet } = testContext
-
-    // Need to deposit before withdraw is eligible
-    const ammDepositTx: AMMDeposit = {
-      TransactionType: 'AMMDeposit',
-      Account: wallet.classicAddress,
-      Asset: asset,
-      Asset2: asset2,
-      Amount: '1000',
-      Flags: AMMDepositFlags.tfSingleAsset,
-    }
-
-    await testTransaction(testContext.client, ammDepositTx, wallet)
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -165,18 +137,6 @@ describe('AMMWithdraw', function () {
     const { asset, asset2 } = testContext.amm
     const { wallet } = testContext
 
-    // Need to deposit before withdraw is eligible
-    const ammDepositTx: AMMDeposit = {
-      TransactionType: 'AMMDeposit',
-      Account: wallet.classicAddress,
-      Asset: asset,
-      Asset2: asset2,
-      Amount: '1000',
-      Flags: AMMDepositFlags.tfSingleAsset,
-    }
-
-    await testTransaction(testContext.client, ammDepositTx, wallet)
-
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
       asset,
@@ -234,22 +194,9 @@ describe('AMMWithdraw', function () {
     )
   })
 
-  // eslint-disable-next-line max-statements -- Necessary for testing
   it('withdraw with LPTokenIn', async function () {
     const { asset, asset2 } = testContext.amm
     const { wallet } = testContext
-
-    // Need to deposit before withdraw is eligible
-    const ammDepositTx: AMMDeposit = {
-      TransactionType: 'AMMDeposit',
-      Account: wallet.classicAddress,
-      Asset: asset,
-      Asset2: asset2,
-      Amount: '1000',
-      Flags: AMMDepositFlags.tfSingleAsset,
-    }
-
-    await testTransaction(testContext.client, ammDepositTx, wallet)
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
