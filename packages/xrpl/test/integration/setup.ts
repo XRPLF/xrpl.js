@@ -5,6 +5,7 @@ import {
   AccountSet,
   AccountSetAsfFlags,
   Client,
+  Currency,
   Payment,
   TrustSet,
   TrustSetFlags,
@@ -121,8 +122,8 @@ async function setupAMMPool(
 
   await testTransaction(client, ammCreateTx, lpWallet)
 
-  const asset = { currency: 'XRP' }
-  const asset2 = {
+  const asset: Currency = { currency: 'XRP' }
+  const asset2: Currency = {
     currency: currencyCode,
     issuer: issuerWallet.classicAddress,
   }
