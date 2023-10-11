@@ -5,7 +5,10 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Fixed
-- Allow flag maps when submitting `NFTokenMint` and `NFTokenCreateOffer` transactions like others with flags
+* Allow flag maps when submitting `NFTokenMint` and `NFTokenCreateOffer` transactions like others with flags
+
+### Changed
+* Removed sidechain-devnet faucet support as it is being moved to Devnet
 
 ## 2.12.0 (2023-09-27)
 ### Added

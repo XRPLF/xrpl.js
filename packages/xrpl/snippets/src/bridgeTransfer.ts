@@ -20,9 +20,7 @@ async function sleep(sec: number): Promise<void> {
   })
 }
 
-const lockingClient = new Client(
-  'wss://sidechain-net1.devnet.rippletest.net:51233',
-)
+const lockingClient = new Client('wss://s.devnet.rippletest.net:51233')
 const issuingClient = new Client(
   'wss://sidechain-net2.devnet.rippletest.net:51233',
 )
