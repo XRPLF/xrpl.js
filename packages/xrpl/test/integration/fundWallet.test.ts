@@ -21,7 +21,7 @@ async function generate_faucet_wallet_and_fund_again(
     faucetPath,
     usageContext: 'integration-test',
   })
-  assert.notEqual(wallet, undefined)
+  assert.notStrictEqual(wallet, undefined)
   assert(isValidClassicAddress(wallet.classicAddress))
   assert(isValidXAddress(wallet.getXAddress()))
 
@@ -103,7 +103,7 @@ describe('fundWallet', function () {
         usageContext: 'integration-test',
       })
 
-      assert.notEqual(wallet, undefined)
+      assert.notStrictEqual(wallet, undefined)
       assert(isValidClassicAddress(wallet.classicAddress))
       assert(isValidXAddress(wallet.getXAddress()))
 
@@ -137,7 +137,7 @@ describe('fundWallet', function () {
         usageContext: 'integration-test',
       })
       assert.equal(balance, '2000')
-      assert.notEqual(wallet, undefined)
+      assert.notStrictEqual(wallet, undefined)
       assert(isValidClassicAddress(wallet.classicAddress))
       assert(isValidXAddress(wallet.getXAddress()))
 

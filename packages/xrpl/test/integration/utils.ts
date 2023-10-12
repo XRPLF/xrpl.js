@@ -264,11 +264,13 @@ export async function testTransaction(
 
 export async function getXRPBalance(
   client: Client,
-  wallet: Wallet,
+  account: string | Wallet,
 ): Promise<string> {
+  const address: string =
+    typeof account === 'string' ? account : account.classicAddress
   const request: AccountInfoRequest = {
     command: 'account_info',
-    account: wallet.classicAddress,
+    account: address,
   }
   return (await client.request(request)).result.account_data.Balance
 }

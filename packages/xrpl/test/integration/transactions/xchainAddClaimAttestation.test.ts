@@ -25,7 +25,6 @@ import {
 } from '../setup'
 import {
   generateFundedWallet,
-  GENESIS_ACCOUNT,
   getIOUBalance,
   getXRPBalance,
   testTransaction,
@@ -45,124 +44,61 @@ describe('XChainCreateBridge', function () {
   it(
     'base',
     async () => {
-      const signatureReward = '200'
-      const xchainBridge: XChainBridge = {
-        LockingChainDoor: testContext.wallet.classicAddress,
-        LockingChainIssue: { currency: 'XRP' },
-        IssuingChainDoor: GENESIS_ACCOUNT,
-        IssuingChainIssue: { currency: 'XRP' },
-      }
-      const setupTx: XChainCreateBridge = {
-        TransactionType: 'XChainCreateBridge',
-        Account: testContext.wallet.classicAddress,
-        XChainBridge: xchainBridge,
-        SignatureReward: signatureReward,
-        MinAccountCreateAmount: '10000000',
-      }
-
-      await testTransaction(testContext.client, setupTx, testContext.wallet)
-
-      // confirm that the transaction actually went through
-      const accountObjectsResponse = await testContext.client.request({
-        command: 'account_objects',
-        account: testContext.wallet.classicAddress,
-        type: 'bridge',
-      })
-      assert.lengthOf(
-        accountObjectsResponse.result.account_objects,
-        1,
-        'Should be exactly one bridge owned by the account',
-      )
-
-      const witnessWallet = await generateFundedWallet(testContext.client)
-
-      const signerTx: SignerListSet = {
-        TransactionType: 'SignerListSet',
-        Account: testContext.wallet.classicAddress,
-        SignerEntries: [
-          {
-            SignerEntry: {
-              Account: witnessWallet.classicAddress,
-              SignerWeight: 1,
-            },
-          },
-        ],
-        SignerQuorum: 1,
-      }
-      await testTransaction(testContext.client, signerTx, testContext.wallet)
-
-      const signerAccountInfoResponse = await testContext.client.request({
-        command: 'account_info',
-        account: testContext.wallet.classicAddress,
-        signer_lists: true,
-      })
-      const signerListInfo =
-        signerAccountInfoResponse.result.account_data.signer_lists?.[0]
-      assert.deepEqual(
-        signerListInfo?.SignerEntries,
-        signerTx.SignerEntries,
-        'SignerEntries were not set properly',
-      )
-      assert.equal(
-        signerListInfo?.SignerQuorum,
-        signerTx.SignerQuorum,
-        'SignerQuorum was not set properly',
-      )
-
-      const destination = await generateFundedWallet(testContext.client)
       const otherChainSource = Wallet.generate()
       const amount = xrpToDrops(10)
 
       const claimIdTx: XChainCreateClaimID = {
         TransactionType: 'XChainCreateClaimID',
-        Account: destination.classicAddress,
-        XChainBridge: xchainBridge,
-        SignatureReward: signatureReward,
+        Account: testContext.wallet.classicAddress,
+        XChainBridge: testContext.bridge.xchainBridge,
+        SignatureReward: testContext.bridge.signatureReward,
         OtherChainSource: otherChainSource.classicAddress,
       }
-      await testTransaction(testContext.client, claimIdTx, destination)
+      await testTransaction(testContext.client, claimIdTx, testContext.wallet)
 
       const initialBalance = Number(
-        await getXRPBalance(testContext.client, destination),
+        await getXRPBalance(testContext.client, testContext.wallet),
       )
 
       const attestationToSign = {
-        XChainBridge: xchainBridge,
+        XChainBridge: testContext.bridge.xchainBridge,
         OtherChainSource: otherChainSource.classicAddress,
         Amount: amount,
-        AttestationRewardAccount: witnessWallet.classicAddress,
+        AttestationRewardAccount: testContext.bridge.witness.classicAddress,
         WasLockingChainSend: 0,
         XChainClaimID: 1,
-        Destination: destination.classicAddress,
+        Destination: testContext.wallet.classicAddress,
       }
       const encodedAttestation = encode(attestationToSign)
       const attestationSignature = sign(
         encodedAttestation,
-        witnessWallet.privateKey,
+        testContext.bridge.witness.privateKey,
       )
 
       const tx: XChainAddClaimAttestation = {
         TransactionType: 'XChainAddClaimAttestation',
-        Account: witnessWallet.classicAddress,
-        XChainBridge: xchainBridge,
+        Account: testContext.bridge.witness.classicAddress,
+        XChainBridge: testContext.bridge.xchainBridge,
         OtherChainSource: otherChainSource.classicAddress,
         Amount: amount,
         WasLockingChainSend: 0,
         XChainClaimID: 1,
-        Destination: destination.classicAddress,
-        PublicKey: witnessWallet.publicKey,
+        Destination: testContext.wallet.classicAddress,
+        PublicKey: testContext.bridge.witness.publicKey,
         Signature: attestationSignature,
-        AttestationRewardAccount: witnessWallet.classicAddress,
-        AttestationSignerAccount: witnessWallet.classicAddress,
+        AttestationRewardAccount: testContext.bridge.witness.classicAddress,
+        AttestationSignerAccount: testContext.bridge.witness.classicAddress,
       }
-      await testTransaction(testContext.client, tx, witnessWallet)
+      await testTransaction(testContext.client, tx, testContext.bridge.witness)
 
       const finalBalance = Number(
-        await getXRPBalance(testContext.client, destination),
+        await getXRPBalance(testContext.client, testContext.wallet),
       )
       assert.equal(
         finalBalance,
-        initialBalance + Number(amount) - Number(signatureReward),
+        initialBalance +
+          Number(amount) -
+          Number(testContext.bridge.signatureReward),
         'The destination balance should go up by the amount transferred',
       )
     },
@@ -235,15 +171,13 @@ describe('XChainCreateBridge', function () {
         'Should be exactly one bridge owned by the account',
       )
 
-      const witnessWallet = await generateFundedWallet(testContext.client)
-
       const signerTx: SignerListSet = {
         TransactionType: 'SignerListSet',
         Account: testContext.wallet.classicAddress,
         SignerEntries: [
           {
             SignerEntry: {
-              Account: witnessWallet.classicAddress,
+              Account: testContext.bridge.witness.classicAddress,
               SignerWeight: 1,
             },
           },
@@ -298,7 +232,7 @@ describe('XChainCreateBridge', function () {
         XChainBridge: xchainBridge,
         OtherChainSource: otherChainSource.classicAddress,
         Amount: amount,
-        AttestationRewardAccount: witnessWallet.classicAddress,
+        AttestationRewardAccount: testContext.bridge.witness.classicAddress,
         WasLockingChainSend: 1,
         XChainClaimID: 1,
         Destination: destination.classicAddress,
@@ -306,24 +240,24 @@ describe('XChainCreateBridge', function () {
       const encodedAttestation = encode(attestationToSign)
       const attestationSignature = sign(
         encodedAttestation,
-        witnessWallet.privateKey,
+        testContext.bridge.witness.privateKey,
       )
 
       const tx: XChainAddClaimAttestation = {
         TransactionType: 'XChainAddClaimAttestation',
-        Account: witnessWallet.classicAddress,
+        Account: testContext.bridge.witness.classicAddress,
         XChainBridge: xchainBridge,
         OtherChainSource: otherChainSource.classicAddress,
         Amount: amount,
         WasLockingChainSend: 1,
         XChainClaimID: 1,
         Destination: destination.classicAddress,
-        PublicKey: witnessWallet.publicKey,
+        PublicKey: testContext.bridge.witness.publicKey,
         Signature: attestationSignature,
-        AttestationRewardAccount: witnessWallet.classicAddress,
-        AttestationSignerAccount: witnessWallet.classicAddress,
+        AttestationRewardAccount: testContext.bridge.witness.classicAddress,
+        AttestationSignerAccount: testContext.bridge.witness.classicAddress,
       }
-      await testTransaction(testContext.client, tx, witnessWallet)
+      await testTransaction(testContext.client, tx, testContext.bridge.witness)
 
       const finalBalance = Number(
         await getIOUBalance(
