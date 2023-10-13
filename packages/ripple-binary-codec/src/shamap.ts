@@ -41,7 +41,7 @@ abstract class ShaMapNode {
  * @param index - Hash256 key/index for the item in the SHAMap.
  * @returns A function that computes and returns the hash when called.
  */
-function hashableItemHasher(item: Hashable, index: Hash256): () => Hash256 {
+function hashableItemHashGetter(item: Hashable, index: Hash256): () => Hash256 {
   return () => {
     const hash = Sha512Half.put(item.hashPrefix())
     item.toBytesSink(hash)
@@ -54,26 +54,26 @@ function hashableItemHasher(item: Hashable, index: Hash256): () => Hash256 {
  * Class describing a Leaf of SHAMap
  */
 class ShaMapLeaf extends ShaMapNode {
-  private readonly makeHash: () => Hash256
+  private readonly getHash: () => Hash256
 
   constructor(public index: Hash256, item: ShaMapItem) {
     super()
     if ('preHashed' in item) {
-      this.makeHash = () => item.preHashed
+      this.getHash = () => item.preHashed
     } else if ('hashPrefix' in item && 'toBytesSink' in item) {
-      this.makeHash = hashableItemHasher(item, index)
+      this.getHash = hashableItemHashGetter(item, index)
     } else {
       throw new Error('invalid_item: must be either Hashable or PreHashed')
     }
   }
 
   /**
-   * Hash the bytes representation of this
+   * Get the hash for this node
    *
    * @returns hash of Hashable or PreHashed item
    */
   hash(): Hash256 {
-    return this.makeHash()
+    return this.getHash()
   }
 
   /**
