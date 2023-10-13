@@ -15,7 +15,7 @@ export interface Hashable {
 }
 
 /**
- * A prehashed item where you only have the hash, not the contents
+ * A pre-hashed item where you only have the hash, not the contents
  */
 export interface PreHashed {
   preHashed: Hash256
