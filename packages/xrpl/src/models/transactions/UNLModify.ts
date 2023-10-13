@@ -1,9 +1,11 @@
+import { BaseTransaction } from './common'
+
 /**
  * Mark a change to the Negative UNL.
  *
  * @category Pseudo Transaction Models
  */
-export interface UNLModify {
+export interface UNLModify extends BaseTransaction {
   TransactionType: 'UNLModify'
   /**
    * The ledger index where this pseudo-transaction appears.

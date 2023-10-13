@@ -41,7 +41,7 @@ export interface TxRequest extends BaseRequest {
  * @category Responses
  */
 export interface TxResponse<
-  T extends BaseTransaction | PseudoTransaction = Transaction,
+  T extends BaseTransaction = Transaction | PseudoTransaction,
 > extends BaseResponse {
   result: {
     /** The SHA-512 hash of the transaction. */
