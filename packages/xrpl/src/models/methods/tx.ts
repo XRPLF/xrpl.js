@@ -1,6 +1,5 @@
-import { Transaction, TransactionMetadata } from '../transactions'
+import { AnyTransaction, TransactionMetadata } from '../transactions'
 import { BaseTransaction } from '../transactions/common'
-import { PseudoTransaction } from '../transactions/transaction'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
@@ -40,9 +39,8 @@ export interface TxRequest extends BaseRequest {
  *
  * @category Responses
  */
-export interface TxResponse<
-  T extends BaseTransaction = Transaction | PseudoTransaction,
-> extends BaseResponse {
+export interface TxResponse<T extends BaseTransaction = AnyTransaction>
+  extends BaseResponse {
   result: {
     /** The SHA-512 hash of the transaction. */
     hash: string

@@ -3,13 +3,16 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
+### Added
+* New type `PseudoTransaction` which equates to `EnableAmendment | SetFee | UNLModify`
+* New type `AnyTransaction` which equates to `Transaction | PseudoTransaction`
 
 ### Fixed
-- Allow flag maps when submitting `NFTokenMint` and `NFTokenCreateOffer` transactions like others with flags
-- Add pseudo transaction types to `tx` and `ledger` methods responses.
+* Allow flag maps when submitting `NFTokenMint` and `NFTokenCreateOffer` transactions like others with flags
+* Add pseudo transaction types to `tx` and `ledger` methods responses.
 
 ### Updated
-- Make `LedgerEntryResponse` a generic so it can be used like `LedgerEntryResponse<Escrow>`
+* Make `LedgerEntryResponse` a generic so it can be used like `LedgerEntryResponse<Escrow>`
 
 ## 2.12.0 (2023-09-27)
 ### Added

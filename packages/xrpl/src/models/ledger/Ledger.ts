@@ -1,5 +1,4 @@
-import { Transaction, TransactionMetadata } from '../transactions'
-import { PseudoTransaction } from '../transactions/transaction'
+import { AnyTransaction, TransactionMetadata } from '../transactions'
 
 import LedgerEntry from './LedgerEntry'
 
@@ -62,7 +61,5 @@ export default interface Ledger {
    * either JSON or binary depending on whether the request specified binary
    * as true.
    */
-  transactions?: Array<
-    (Transaction | PseudoTransaction) & { metaData?: TransactionMetadata }
-  >
+  transactions?: Array<AnyTransaction & { metaData?: TransactionMetadata }>
 }
