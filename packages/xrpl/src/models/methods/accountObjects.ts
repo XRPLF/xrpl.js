@@ -1,5 +1,6 @@
 import { Amendments, FeeSettings, LedgerHashes } from '../ledger'
 import { LedgerEntry, LedgerEntryFilter } from '../ledger/LedgerEntry'
+
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 export type AccountObjectType = Exclude<
