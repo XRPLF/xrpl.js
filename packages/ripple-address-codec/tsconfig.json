@@ -5,16 +5,22 @@
     "lib": [
       "es2017"
     ],
-    "rootDir": "./src",
     "outDir": "./dist",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": false,
     "preserveConstEnums": false,
-    "suppressImplicitAnyIndexErrors": false,
     "skipLibCheck": true,
     "declaration": true,
     "strictNullChecks": true
   },
-  "include": ["src/**/*.ts"]
+  "references": [
+    {
+      "path": "../isomorphic/tsconfig.build.json"
+    }
+  ],
+  "files": [],
+  "include": [
+    "src/**/*.ts"
+  ]
 }

@@ -2,6 +2,7 @@
   "name": "xrpl.js",
   "private": true,
   "scripts": {
+    "analyze": "lerna run analyze --stream",
     "test": "lerna run test --stream",
     "test:browser": "lerna run test:browser --stream",
     "test:integration": "lerna run test:integration --stream",
@@ -13,18 +14,18 @@
     "update:confirm": "npx npm-check-updates --configFileName .ncurc.json -u"
   },
   "dependencies": {
+    "@xrplf/isomorphic": "file:packages/isomorphic",
+    "@xrplf/secret-numbers": "file:packages/secret-numbers",
     "ripple-address-codec": "file:packages/ripple-address-codec",
     "ripple-binary-codec": "file:packages/ripple-binary-codec",
     "ripple-keypairs": "file:packages/ripple-keypairs",
     "xrpl": "file:packages/xrpl"
   },
   "devDependencies": {
-    "@types/brorand": "^1.0.30",
     "@types/chai": "^4.2.21",
-    "@types/create-hash": "^1.2.2",
     "@types/jest": "^29.2.2",
     "@types/lodash": "^4.14.136",
-    "@types/node": "^14.18.35",
+    "@types/node": "^16.18.38",
     "@types/ws": "^8.2.0",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
@@ -34,8 +35,6 @@
     "buffer": "^6.0.2",
     "chai": "^4.3.4",
     "copyfiles": "^2.4.1",
-    "crypto-browserify": "^3.12.0",
-    "ejs": "^3.0.1",
     "eslint": "^8.18.0",
     "eslint-plugin-array-func": "^3.1.7",
     "eslint-plugin-consistent-default-export-name": "^0.0.15",
@@ -47,23 +46,19 @@
     "eslint-plugin-tsdoc": "^0.2.16",
     "eventemitter2": "^6.0.0",
     "expect": "^29.3.1",
-    "https-browserify": "^1.0.0",
     "jest": "^29.3.1",
     "jest-mock": "^29.3.1",
     "lerna": "^4.0.0",
+    "lodash": "^4.17.21",
     "npm-run-all": "^4.1.5",
-    "path-browserify": "1.0.1",
     "prettier": "^2.3.2",
     "process": "^0.11.10",
     "source-map-loader": "^4.0.1",
     "source-map-support": "^0.5.16",
-    "stream-browserify": "^3.0.0",
-    "stream-http": "3.2.0",
     "ts-jest": "^29.0.3",
     "ts-loader": "^9.2.5",
     "ts-node": "^10.2.1",
-    "typescript": "^4.4.2",
-    "url": "^0.11.0",
+    "typescript": "^5.1.6",
     "webpack": "^5.81.0",
     "webpack-bundle-analyzer": "^4.1.0",
     "webpack-cli": "^5.0.1"
@@ -72,7 +67,7 @@
     "./packages/*"
   ],
   "engines": {
-    "node": ">=12.0.0",
-    "npm": ">=7.0.0 < 10.0.0"
+    "node": ">=16.0.0",
+    "npm": ">=7.10.0 < 10.0.0"
   }
 }

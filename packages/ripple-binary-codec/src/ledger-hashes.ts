@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import { Hashable, ShaMap } from './shamap'
 import { HashPrefix } from './hash-prefixes'
 import { Sha512Half } from './hashes'
@@ -10,7 +9,6 @@ import { UInt32 } from './types/uint-32'
 import { UInt8 } from './types/uint-8'
 import { BinaryParser } from './serdes/binary-parser'
 import { JsonObject } from './types/serialized-type'
-import bigInt = require('big-integer')
 import { XrplDefinitionsBase } from './enums'
 
 /**
@@ -44,7 +42,6 @@ interface TransactionResultItem extends JsonObject {
  * @returns a tuple of index and item to be added to SHAMap
  */
 function transactionItemizer(json: TransactionResultItem): [Hash256, Hashable] {
-  assert.ok(json.hash)
   const index = Hash256.from(json.hash)
   const item = {
     hashPrefix() {
@@ -111,7 +108,7 @@ function accountStateHash(param: Array<JsonObject>): Hash256 {
  */
 interface ledgerObject {
   ledger_index: number
-  total_coins: string | number | bigInt.BigInteger
+  total_coins: string | number | bigint
   parent_hash: string
   transaction_hash: string
   account_hash: string
@@ -130,13 +127,15 @@ interface ledgerObject {
 function ledgerHash(header: ledgerObject): Hash256 {
   const hash = new Sha512Half()
   hash.put(HashPrefix.ledgerHeader)
-  assert.ok(header.parent_close_time !== undefined)
-  assert.ok(header.close_flags !== undefined)
+  if (
+    header.parent_close_time === undefined ||
+    header.close_flags === undefined
+  ) {
+    throw new Error()
+  }
 
   UInt32.from<number>(header.ledger_index).toBytesSink(hash)
-  UInt64.from<bigInt.BigInteger>(
-    bigInt(String(header.total_coins)),
-  ).toBytesSink(hash)
+  UInt64.from<bigint>(BigInt(String(header.total_coins))).toBytesSink(hash)
   Hash256.from<string>(header.parent_hash).toBytesSink(hash)
   Hash256.from<string>(header.transaction_hash).toBytesSink(hash)
   Hash256.from<string>(header.account_hash).toBytesSink(hash)
@@ -159,7 +158,9 @@ function decodeLedgerData(
   binary: string,
   definitions?: XrplDefinitionsBase,
 ): object {
-  assert.ok(typeof binary === 'string', 'binary must be a hex string')
+  if (typeof binary !== 'string') {
+    throw new Error('binary must be a hex string')
+  }
   const parser = new BinaryParser(binary, definitions)
   return {
     ledger_index: parser.readUInt32(),

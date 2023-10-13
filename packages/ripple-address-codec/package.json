@@ -1,6 +1,6 @@
 {
   "name": "ripple-address-codec",
-  "version": "4.3.0",
+  "version": "4.3.1",
   "description": "encodes/decodes base58 encoded XRP Ledger identifiers",
   "files": [
     "dist/*",
@@ -10,9 +10,15 @@
   "types": "dist/index.d.ts",
   "license": "ISC",
   "dependencies": {
-    "base-x": "^3.0.9",
-    "create-hash": "^1.1.2"
+    "@xrplf/isomorphic": "1.0.0",
+    "base-x": "^3.0.9"
   },
+  "keywords": [
+    "ripple",
+    "xrp",
+    "xrp ledger",
+    "xrpl"
+  ],
   "repository": {
     "type": "git",
     "url": "git@github.com:XRPLF/xrpl.js.git"
@@ -20,13 +26,14 @@
   "prepublish": "tsc -b",
   "prepublishOnly": "tslint -b ./ && jest",
   "scripts": {
-    "build": "tsc -b",
-    "test": "jest --verbose false --silent=false ./src/*.test.js",
+    "build": "tsc --build tsconfig.build.json",
+    "test": "jest --verbose false --silent=false ./test/*.test.ts",
+    "test:browser": "npm run build && karma start ./karma.config.js",
     "lint": "eslint . --ext .ts",
-    "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo"
+    "clean": "rm -rf ./dist ./coverage ./test/testCompiledForWeb tsconfig.build.tsbuildinfo"
   },
   "prettier": "@xrplf/prettier-config",
   "engines": {
-    "node": ">= 10"
+    "node": ">= 16"
   }
 }

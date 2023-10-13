@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- need to work with a lot of transactions in a switch statement */
 /* eslint-disable max-lines-per-function -- need to work with a lot of Tx verifications */
 
 import { ValidationError } from '../../errors'
@@ -17,7 +18,7 @@ import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
-import { isIssuedCurrency } from './common'
+import { BaseTransaction, isIssuedCurrency } from './common'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
@@ -56,6 +57,32 @@ import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
+import {
+  XChainAccountCreateCommit,
+  validateXChainAccountCreateCommit,
+} from './XChainAccountCreateCommit'
+import {
+  XChainAddAccountCreateAttestation,
+  validateXChainAddAccountCreateAttestation,
+} from './XChainAddAccountCreateAttestation'
+import {
+  XChainAddClaimAttestation,
+  validateXChainAddClaimAttestation,
+} from './XChainAddClaimAttestation'
+import { XChainClaim, validateXChainClaim } from './XChainClaim'
+import { XChainCommit, validateXChainCommit } from './XChainCommit'
+import {
+  XChainCreateBridge,
+  validateXChainCreateBridge,
+} from './XChainCreateBridge'
+import {
+  XChainCreateClaimID,
+  validateXChainCreateClaimID,
+} from './XChainCreateClaimID'
+import {
+  XChainModifyBridge,
+  validateXChainModifyBridge,
+} from './XChainModifyBridge'
 
 /**
  * @category Transaction Models
@@ -92,13 +119,23 @@ export type Transaction =
   | SignerListSet
   | TicketCreate
   | TrustSet
+  | XChainAddAccountCreateAttestation
+  | XChainAddClaimAttestation
+  | XChainClaim
+  | XChainCommit
+  | XChainCreateBridge
+  | XChainCreateClaimID
+  | XChainAccountCreateCommit
+  | XChainModifyBridge
 
 /**
  * @category Transaction Models
  */
-export interface TransactionAndMetadata {
-  transaction: Transaction
-  metadata: TransactionMetadata
+export interface TransactionAndMetadata<
+  T extends BaseTransaction = Transaction,
+> {
+  transaction: T
+  metadata: TransactionMetadata<T>
 }
 
 /**
@@ -292,6 +329,38 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'TrustSet':
       validateTrustSet(tx)
+      break
+
+    case 'XChainAddAccountCreateAttestation':
+      validateXChainAddAccountCreateAttestation(tx)
+      break
+
+    case 'XChainAddClaimAttestation':
+      validateXChainAddClaimAttestation(tx)
+      break
+
+    case 'XChainClaim':
+      validateXChainClaim(tx)
+      break
+
+    case 'XChainCommit':
+      validateXChainCommit(tx)
+      break
+
+    case 'XChainCreateBridge':
+      validateXChainCreateBridge(tx)
+      break
+
+    case 'XChainCreateClaimID':
+      validateXChainCreateClaimID(tx)
+      break
+
+    case 'XChainAccountCreateCommit':
+      validateXChainAccountCreateCommit(tx)
+      break
+
+    case 'XChainModifyBridge':
+      validateXChainModifyBridge(tx)
       break
 
     default:

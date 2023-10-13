@@ -10,11 +10,14 @@ import { AccountSetTfFlags } from '../transactions/accountSet'
 import { AMMDepositFlags } from '../transactions/AMMDeposit'
 import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
 import { GlobalFlags } from '../transactions/common'
+import { NFTokenCreateOfferFlags } from '../transactions/NFTokenCreateOffer'
+import { NFTokenMintFlags } from '../transactions/NFTokenMint'
 import { OfferCreateFlags } from '../transactions/offerCreate'
 import { PaymentFlags } from '../transactions/payment'
 import { PaymentChannelClaimFlags } from '../transactions/paymentChannelClaim'
 import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlags } from '../transactions/trustSet'
+import { XChainModifyBridgeFlags } from '../transactions/XChainModifyBridge'
 
 import { isFlagEnabled } from '.'
 
@@ -42,6 +45,19 @@ export function parseAccountRootFlags(
   return flagsInterface
 }
 
+const txToFlag = {
+  AccountSet: AccountSetTfFlags,
+  AMMDeposit: AMMDepositFlags,
+  AMMWithdraw: AMMWithdrawFlags,
+  NFTokenCreateOffer: NFTokenCreateOfferFlags,
+  NFTokenMint: NFTokenMintFlags,
+  OfferCreate: OfferCreateFlags,
+  PaymentChannelClaim: PaymentChannelClaimFlags,
+  Payment: PaymentFlags,
+  TrustSet: TrustSetFlags,
+  XChainModifyBridge: XChainModifyBridgeFlags,
+}
+
 /**
  * Sets a transaction's flags to its numeric representation.
  *
@@ -56,31 +72,9 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
     return
   }
 
-  switch (tx.TransactionType) {
-    case 'AccountSet':
-      tx.Flags = convertFlagsToNumber(tx.Flags, AccountSetTfFlags)
-      return
-    case 'AMMDeposit':
-      tx.Flags = convertFlagsToNumber(tx.Flags, AMMDepositFlags)
-      return
-    case 'AMMWithdraw':
-      tx.Flags = convertFlagsToNumber(tx.Flags, AMMWithdrawFlags)
-      return
-    case 'OfferCreate':
-      tx.Flags = convertFlagsToNumber(tx.Flags, OfferCreateFlags)
-      return
-    case 'PaymentChannelClaim':
-      tx.Flags = convertFlagsToNumber(tx.Flags, PaymentChannelClaimFlags)
-      return
-    case 'Payment':
-      tx.Flags = convertFlagsToNumber(tx.Flags, PaymentFlags)
-      return
-    case 'TrustSet':
-      tx.Flags = convertFlagsToNumber(tx.Flags, TrustSetFlags)
-      return
-    default:
-      tx.Flags = 0
-  }
+  tx.Flags = txToFlag[tx.TransactionType]
+    ? convertFlagsToNumber(tx.Flags, txToFlag[tx.TransactionType])
+    : 0
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- added ValidationError check for flagEnum

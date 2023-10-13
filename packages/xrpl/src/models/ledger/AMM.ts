@@ -20,7 +20,7 @@ export default interface AMM extends BaseLedgerEntry {
   /**
    * The address of the special account that holds this AMM's assets.
    */
-  AMMAccount: string
+  Account: string
   /**
    * The definition for one of the two assets this AMM holds.
    */

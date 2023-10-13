@@ -86,7 +86,7 @@ class ShaMapLeaf extends ShaMapNode {
   /**
    * @returns false as ShaMapLeaf is not an inner node
    */
-  isInner(): this is ShaMapInner {
+  isInner(): boolean {
     return false
   }
 }

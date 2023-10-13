@@ -4,11 +4,57 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Breaking Changes
+* Bump typescript to 5.x
+* Remove Node 14 support
+* Remove `crypto` polyfills, `create-hash`, `elliptic`, `hash.js`, and their many dependencies in favor of `@noble/hashes` and `@nobel/curves`
+* Remove `bip32` and `bip39` in favor of `@scure/bip32` and `@scure/bip39`
+* Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`
+* Configuring a proxy:
+    * Instead of passing various parameters on the `ConnectionsOptions` you know specify the `agent` parameter. This object can use be created by libraries such as `https-proxy-agent` or any that implements the `http.Agent`.
+    * This was changed to both support the latest `https-proxy-agent` and to remove the need to include the package in bundlers.   Tests will still be done using `https-proxy-agent` and only tested in a node environment which was the only way it was previously supported anyway
+* Remove `BroadcastClient` which was deprecated
+* Uses `@xrplf/secret-numbers` instead of `xrpl-secret-numbers`
+* Improve key algorithm detection. It will now throw Errors with helpful messages
+* Move `authorizeChannel` from `wallet/signer` to `wallet/authorizeChannel` to solve a circular dependency issue.
+
+### Bundling Changes
+* Bundler configurations are much more simplified.
+    * removed the following polyfills:
+        * `assert`
+        * `crypto-browserify`
+        * `https-browserify`
+        * `os-browserify`
+        * `stream-browserify`
+        * `stream-http`
+        * `url`
+        * `util` - previously added automatically by `webpack`
+    * Removed mappings for:
+        * Excluding `https-proxy-agent`
+
+### Changed
+* Remove `lodash` as a dependency
+* Remove many polyfills that were only used for testing in the browser
+* Remove `util` from bundle by switching `inspect` to `JSON.stringify`
+* Add type for metadata for specific transactions(`Payment`, `NFTokenMint`, `NFTokenCreateOffer`, `NFTokenAcceptOffer`, `NFTokenCancelOffer`)
+
+### Fixed
+* Fixed Wallet.generate() ignoring the `algorithm` parameter (Only a problem once binary-codec fix for `derive_keypair` is added)
+* Fixed Wallet.fromSeed() ignoring the `algorithm` parameter
+
+### Unreleased 2.x
+
+### Fixed
+- Allow flag maps when submitting `NFTokenMint` and `NFTokenCreateOffer` transactions like others with flags
+
+## 2.12.0 (2023-09-27)
 ### Added
 * Added `ports` field to `ServerInfoResponse`
+* Support for the XChainBridge amendment.
 
 ### Fixed
 * Fix request model fields related to AMM
+* Rename `AMMAccount` to `Account` on `AMM` ledger objects
 * Fixed `EscrowCancel` and `EscrowFinish` validation
 
 ## 2.11.0 (2023-08-24)
@@ -134,9 +180,6 @@ Wallet.fromMmnemonic()
 * `Wallet.fromMnemonic` now allows lowercase for RFC1751 mnemonics (#2046)
 * `Wallet.fromMnemonic` detects when an invalid encoding is provided, and throws an error
 * Made unexpected errors in `submitAndWait` more verbose to make them easier to debug.
-
-### Added
-* Support for Automated Market Maker (AMM) transactions and requests as defined in XLS-30.
 
 ## 2.3.1 (2022-06-27)
 ### Fixed

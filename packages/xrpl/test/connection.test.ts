@@ -3,6 +3,7 @@
 import net from 'net'
 
 import { assert } from 'chai'
+import { HttpsProxyAgent } from 'https-proxy-agent'
 
 import {
   Client,
@@ -12,6 +13,7 @@ import {
   ResponseFormatError,
   XrplError,
   TimeoutError,
+  SubscribeRequest,
 } from '../src'
 import { Connection } from '../src/client/connection'
 
@@ -229,9 +231,9 @@ describe('Connection', function () {
       const server = await createServer()
       const port = (server.address() as net.AddressInfo).port
       const options = {
-        proxy: `ws://127.0.0.1:${port}`,
-        authorization: 'authorization',
-        trustedCertificates: ['path/to/pem'],
+        agent: new HttpsProxyAgent<string>(`ws://127.0.0.1:${port}`, {
+          ca: ['path/to/pem'],
+        }),
       }
       const connection = new Connection(
         // @ts-expect-error -- Testing private member
@@ -346,6 +348,7 @@ describe('Connection', function () {
     'DisconnectedError',
     async () => {
       await clientContext.client
+        // @ts-expect-error -- Intentionally invalid command
         .request({ command: 'test_command', data: { closeServer: true } })
         .then(() => {
           assert.fail('Should throw DisconnectedError')
@@ -421,7 +424,7 @@ describe('Connection', function () {
           spy = jest
             // @ts-expect-error -- Testing private member
             .spyOn(clientContext.client.connection.ws, 'send')
-            // @ts-expect-error -- Testing private member
+            // @ts-expect-error -- Typescript doesnt like the mock
             .mockImplementation((_0, _1, _2) => {
               return 0
             })
@@ -437,7 +440,7 @@ describe('Connection', function () {
       try {
         await clientContext.client.connect()
       } catch (error) {
-        // @ts-expect-error -- error.message is expected to be defined
+        // @ts-expect-error -- Error has a message
         expect(error.message).toEqual(
           "Error: connect() timed out after 5000 ms. If your internet connection is working, the rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.",
         )
@@ -456,6 +459,7 @@ describe('Connection', function () {
     async () => {
       await clientContext.client
         .request({
+          // @ts-expect-error -- Intentionally invalid command
           command: 'test_command',
           data: { unrecognizedResponse: true },
         })
@@ -846,7 +850,10 @@ describe('Connection', function () {
   it(
     'propagates RippledError data',
     async () => {
-      const request = { command: 'subscribe', streams: 'validations' }
+      const request: SubscribeRequest = {
+        command: 'subscribe',
+        streams: ['validations'],
+      }
       clientContext.mockRippled?.addResponse(
         request.command,
         rippled.subscribe.error,

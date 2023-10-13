@@ -1,5 +1,3 @@
-import * as assert from 'assert'
-
 import {
   codec,
   encodeSeed,
@@ -40,7 +38,7 @@ function encodeXAddress(
     // RIPEMD160 is 160 bits = 20 bytes
     throw new Error('Account ID must be 20 bytes')
   }
-  if (tag > MAX_32_BIT_UNSIGNED_INT) {
+  if (tag !== false && tag > MAX_32_BIT_UNSIGNED_INT) {
     throw new Error('Invalid tag')
   }
   const theTag = tag || 0
@@ -133,11 +131,12 @@ function tagFromBuffer(buf: Buffer): number | false {
     // Little-endian to big-endian
     return buf[23] + buf[24] * 0x100 + buf[25] * 0x10000 + buf[26] * 0x1000000
   }
-  assert.strictEqual(flag, 0, 'flag must be zero to indicate no tag')
-  assert.ok(
-    Buffer.from('0000000000000000', 'hex').equals(buf.slice(23, 23 + 8)),
-    'remaining bytes must be zero',
-  )
+  if (flag !== 0) {
+    throw new Error('flag must be zero to indicate no tag')
+  }
+  if (!Buffer.from('0000000000000000', 'hex').equals(buf.slice(23, 23 + 8))) {
+    throw new Error('remaining bytes must be zero')
+  }
   return false
 }
 

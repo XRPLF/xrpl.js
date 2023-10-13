@@ -1,6 +1,6 @@
 {
   "name": "xrpl",
-  "version": "2.11.0",
+  "version": "2.12.0",
   "license": "ISC",
   "description": "A TypeScript/JavaScript API for interacting with the XRP Ledger in Node.js and the browser",
   "files": [
@@ -19,33 +19,29 @@
     "test": "test"
   },
   "browser": {
-    "ws": "./dist/npm/client/WSWrapper.js",
-    "https-proxy-agent": false
+    "ws": "./dist/npm/client/WSWrapper.js"
   },
   "dependencies": {
+    "@scure/bip32": "^1.3.1",
+    "@scure/bip39": "^1.2.1",
+    "@xrplf/isomorphic": "1.0.0",
+    "@xrplf/secret-numbers": "^1.0.0",
     "bignumber.js": "^9.0.0",
-    "bip32": "^2.0.6",
-    "bip39": "^3.0.4",
-    "https-proxy-agent": "^5.0.0",
-    "lodash": "^4.17.4",
-    "ripple-address-codec": "^4.3.0",
-    "ripple-binary-codec": "^1.9.0",
-    "ripple-keypairs": "^1.3.0",
-    "ws": "^8.2.2",
-    "xrpl-secret-numbers": "^0.3.3"
+    "cross-fetch": "^4.0.0",
+    "ripple-address-codec": "^4.3.1",
+    "ripple-binary-codec": "^1.10.0",
+    "ripple-keypairs": "^1.3.1",
+    "ws": "^8.2.2"
   },
   "devDependencies": {
-    "@geut/browser-node-core": "^2.0.13",
-    "@types/node": "^14.18.36",
-    "assert-browserify": "^2.0.0",
-    "browserify-fs": "^1.0.0",
-    "constants-browserify": "^1.0.0",
-    "https-browserify": "^1.0.0",
+    "@types/node": "^16.18.38",
+    "https-proxy-agent": "^7.0.1",
     "karma": "^6.4.1",
     "karma-chrome-launcher": "^3.1.1",
     "karma-jasmine": "^5.1.0",
     "karma-webpack": "^5.0.0",
-    "node-polyfill-webpack-plugin": "^2.0.1",
+    "lodash": "^4.17.4",
+    "run-s": "^0.0.0",
     "react": "^18.2.0",
     "typedoc": "^0.25.0"
   },
@@ -58,14 +54,14 @@
     "build:lib": "tsc --build tsconfig.build.json",
     "build:web": "webpack",
     "build:browserTests": "webpack --config ./test/webpack.config.js",
-    "analyze": "run-s build:web --analyze",
+    "analyze": "webpack --analyze",
     "watch": "run-s build:lib --watch",
-    "clean": "rm -rf dist build coverage",
+    "clean": "rm -rf ./dist ./coverage ./test/testCompiledForWeb tsconfig.build.tsbuildinfo",
     "docgen": "tsc --build tsconfig.docs.json && typedoc && echo js.xrpl.org >> ../../docs/CNAME",
     "prepublish": "run-s clean build",
     "test": "jest --config=jest.config.unit.js --verbose false --silent=false",
     "test:integration": "TS_NODE_PROJECT=tsconfig.build.json jest --config=jest.config.integration.js --verbose false --silent=false --runInBand",
-    "test:browser": "npm run build && npm run build:browserTests && karma start ./karma.config.js --single-run",
+    "test:browser": "npm run build && npm run build:browserTests && karma start ./karma.config.js",
     "test:watch": "jest --watch --verbose false --silent=false --runInBand ./test/**/*.test.ts --testPathIgnorePatterns=./test/integration --testPathIgnorePatterns=./test/fixtures",
     "format": "prettier --write '{src,test}/**/*.ts'",
     "lint": "eslint . --ext .ts --max-warnings 0",
@@ -80,7 +76,14 @@
     "url": "git@github.com:XRPLF/xrpl.js.git"
   },
   "readmeFilename": "README.md",
+  "keywords": [
+    "ripple-lib",
+    "ripple",
+    "xrp",
+    "xrp ledger",
+    "xrpl"
+  ],
   "engines": {
-    "node": ">=10.13.0"
+    "node": ">=16.0.0"
   }
 }

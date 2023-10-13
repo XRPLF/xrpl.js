@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import { quality, binary, HashPrefix } from './coretypes'
 import { decodeLedgerData } from './ledger-hashes'
 import { ClaimObject } from './binary'
@@ -27,7 +26,9 @@ const {
  * @returns the JSON representation of the transaction
  */
 function decode(binary: string, definitions?: XrplDefinitionsBase): JsonObject {
-  assert.ok(typeof binary === 'string', 'binary must be a hex string')
+  if (typeof binary !== 'string') {
+    throw new Error('binary must be a hex string')
+  }
   return binaryToJSON(binary, definitions)
 }
 
@@ -40,7 +41,9 @@ function decode(binary: string, definitions?: XrplDefinitionsBase): JsonObject {
  * @returns A hex-string of the encoded transaction
  */
 function encode(json: object, definitions?: XrplDefinitionsBase): string {
-  assert.ok(typeof json === 'object')
+  if (typeof json !== 'object') {
+    throw new Error()
+  }
   return serializeObject(json as JsonObject, { definitions })
     .toString('hex')
     .toUpperCase()
@@ -58,7 +61,9 @@ function encodeForSigning(
   json: object,
   definitions?: XrplDefinitionsBase,
 ): string {
-  assert.ok(typeof json === 'object')
+  if (typeof json !== 'object') {
+    throw new Error()
+  }
   return signingData(json as JsonObject, HashPrefix.transactionSig, {
     definitions,
   })
@@ -75,7 +80,9 @@ function encodeForSigning(
  * @returns a hex string of the encoded transaction
  */
 function encodeForSigningClaim(json: object): string {
-  assert.ok(typeof json === 'object')
+  if (typeof json !== 'object') {
+    throw new Error()
+  }
   return signingClaimData(json as ClaimObject)
     .toString('hex')
     .toUpperCase()
@@ -94,8 +101,12 @@ function encodeForMultisigning(
   signer: string,
   definitions?: XrplDefinitionsBase,
 ): string {
-  assert.ok(typeof json === 'object')
-  assert.equal(json['SigningPubKey'], '')
+  if (typeof json !== 'object') {
+    throw new Error()
+  }
+  if (json['SigningPubKey'] !== '') {
+    throw new Error()
+  }
   const definitionsOpt = definitions ? { definitions } : undefined
   return multiSigningData(json as JsonObject, signer, definitionsOpt)
     .toString('hex')
@@ -109,7 +120,9 @@ function encodeForMultisigning(
  * @returns a hex-string representing the quality
  */
 function encodeQuality(value: string): string {
-  assert.ok(typeof value === 'string')
+  if (typeof value !== 'string') {
+    throw new Error()
+  }
   return quality.encode(value).toString('hex').toUpperCase()
 }
 
@@ -120,7 +133,9 @@ function encodeQuality(value: string): string {
  * @returns a string representing the quality
  */
 function decodeQuality(value: string): string {
-  assert.ok(typeof value === 'string')
+  if (typeof value !== 'string') {
+    throw new Error()
+  }
   return quality.decode(value).toString()
 }
 

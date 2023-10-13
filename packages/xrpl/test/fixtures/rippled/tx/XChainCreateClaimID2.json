@@ -1,0 +1,118 @@
+{
+  "tx": {
+    "Account": "rwmUSzi5Xp31AjMTEdbvxgWqLETcVNU6Fv",
+    "Fee": "12",
+    "Flags": 0,
+    "LastLedgerSequence": 1027798,
+    "NetworkID": 2552,
+    "OtherChainSource": "rBXdfZ7NVpdjRfYajPMpviGgq7HLDeuBdR",
+    "Sequence": 1027778,
+    "SignatureReward": "100",
+    "SigningPubKey": "EDDDD69DF802B8DB82D644EF92E2C1F06AC128A275CDFF86F013180D104ED39D3B",
+    "TransactionType": "XChainCreateClaimID",
+    "TxnSignature": "67BE63527EC8A0C872F23E2C4EB97C1F3E7D3FED6D10C8310B9235D3891B6B9343768A080E258F6C3687BFC4B7C5FD429ABB33654C99DE46471FD6F2A7035303",
+    "XChainBridge": {
+      "IssuingChainDoor": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+      "IssuingChainIssue": {
+        "currency": "XRP"
+      },
+      "LockingChainDoor": "rMAXACCrp3Y8PpswXcg3bKggHX76V3F8M4",
+      "LockingChainIssue": {
+        "currency": "XRP"
+      }
+    },
+    "date": 1695324182000
+  },
+  "meta": {
+    "AffectedNodes": [
+      {
+        "ModifiedNode": {
+          "FinalFields": {
+            "Account": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+            "Flags": 0,
+            "MinAccountCreateAmount": "10000000",
+            "OwnerNode": "0",
+            "SignatureReward": "100",
+            "XChainAccountClaimCount": "e2",
+            "XChainAccountCreateCount": "0",
+            "XChainBridge": {
+              "IssuingChainDoor": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+              "IssuingChainIssue": {
+                "currency": "XRP"
+              },
+              "LockingChainDoor": "rMAXACCrp3Y8PpswXcg3bKggHX76V3F8M4",
+              "LockingChainIssue": {
+                "currency": "XRP"
+              }
+            },
+            "XChainClaimID": "ac"
+          },
+          "LedgerEntryType": "Bridge",
+          "LedgerIndex": "114C0DC89656D1B0FB1F4A3426034C3FCE75BCE65D9574B5D96ABC2B24D6C8F1",
+          "PreviousFields": {
+            "XChainClaimID": "ab"
+          },
+          "PreviousTxnID": "80C33D1FB349D698CFDB1A85E8368557C5B7219B74DFCB2B05E0B10E2667F902",
+          "PreviousTxnLgrSeq": 1027779
+        }
+      },
+      {
+        "ModifiedNode": {
+          "FinalFields": {
+            "Account": "rwmUSzi5Xp31AjMTEdbvxgWqLETcVNU6Fv",
+            "Balance": "19999988",
+            "Flags": 0,
+            "OwnerCount": 1,
+            "Sequence": 1027779
+          },
+          "LedgerEntryType": "AccountRoot",
+          "LedgerIndex": "33442CE111B258424548888D8999F6D064A0866B1300C44AB72E1C5A09765D9D",
+          "PreviousFields": {
+            "Balance": "20000000",
+            "OwnerCount": 0,
+            "Sequence": 1027778
+          },
+          "PreviousTxnID": "7C9ACA230488547B4F39EBCE332447FB90AE59B64C1B03BBF474B509B43739EC",
+          "PreviousTxnLgrSeq": 1027778
+        }
+      },
+      {
+        "CreatedNode": {
+          "LedgerEntryType": "DirectoryNode",
+          "LedgerIndex": "439684B06C22596B5B86D2F50903B6AA6F68BD07BED636FC6325704B09DE5D61",
+          "NewFields": {
+            "Owner": "rwmUSzi5Xp31AjMTEdbvxgWqLETcVNU6Fv",
+            "RootIndex": "439684B06C22596B5B86D2F50903B6AA6F68BD07BED636FC6325704B09DE5D61"
+          }
+        }
+      },
+      {
+        "CreatedNode": {
+          "LedgerEntryType": "XChainOwnedClaimID",
+          "LedgerIndex": "8097863E1200B0174006541763AA8F604782DA10C1BD37190D753C699D69C678",
+          "NewFields": {
+            "Account": "rwmUSzi5Xp31AjMTEdbvxgWqLETcVNU6Fv",
+            "OtherChainSource": "rBXdfZ7NVpdjRfYajPMpviGgq7HLDeuBdR",
+            "SignatureReward": "100",
+            "XChainBridge": {
+              "IssuingChainDoor": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+              "IssuingChainIssue": {
+                "currency": "XRP"
+              },
+              "LockingChainDoor": "rMAXACCrp3Y8PpswXcg3bKggHX76V3F8M4",
+              "LockingChainIssue": {
+                "currency": "XRP"
+              }
+            },
+            "XChainClaimID": "ac"
+          }
+        }
+      }
+    ],
+    "TransactionIndex": 0,
+    "TransactionResult": "tesSUCCESS"
+  },
+  "hash": "A42C4E7F5BAF8A9BEB56853114EE686D554F15F400B8DA885A344B13C32D07BC",
+  "ledger_index": 1027780,
+  "date": 1695324182000
+}

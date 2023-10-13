@@ -4,6 +4,7 @@ import AccountRoot, {
 } from './AccountRoot'
 import Amendments, { Majority, AMENDMENTS_ID } from './Amendments'
 import AMM, { VoteSlot } from './AMM'
+import Bridge from './Bridge'
 import Check from './Check'
 import DepositPreauth from './DepositPreauth'
 import DirectoryNode from './DirectoryNode'
@@ -24,6 +25,8 @@ import PayChannel from './PayChannel'
 import RippleState, { RippleStateFlags } from './RippleState'
 import SignerList, { SignerListFlags } from './SignerList'
 import Ticket from './Ticket'
+import XChainOwnedClaimID from './XChainOwnedClaimID'
+import XChainOwnedCreateAccountClaimID from './XChainOwnedCreateAccountClaimID'
 
 export {
   AccountRoot,
@@ -32,6 +35,7 @@ export {
   AMENDMENTS_ID,
   Amendments,
   AMM,
+  Bridge,
   Check,
   DepositPreauth,
   DirectoryNode,
@@ -57,5 +61,7 @@ export {
   SignerList,
   SignerListFlags,
   Ticket,
+  XChainOwnedClaimID,
+  XChainOwnedCreateAccountClaimID,
   VoteSlot,
 }
