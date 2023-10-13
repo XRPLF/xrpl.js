@@ -21,6 +21,9 @@ export interface PreHashed {
   preHashed: Hash256
 }
 
+/**
+ *  Either Hashable or PreHashed
+ */
 export type ShaMapItem = Hashable | PreHashed
 
 /**
@@ -35,33 +38,22 @@ abstract class ShaMapNode {
 }
 
 /**
- * Returns a function to hash a given Hashable variant of ShaMapItem and its index when called.
- *
- * @param item - Hashable The item to be hashed.
- * @param index - Hash256 key/index for the item in the SHAMap.
- * @returns A function that computes and returns the hash when called.
- */
-function hashableItemHashGetter(item: Hashable, index: Hash256): () => Hash256 {
-  return () => {
-    const hash = Sha512Half.put(item.hashPrefix())
-    item.toBytesSink(hash)
-    index.toBytesSink(hash)
-    return hash.finish()
-  }
-}
-
-/**
  * Class describing a Leaf of SHAMap
  */
 class ShaMapLeaf extends ShaMapNode {
-  private readonly getHash: () => Hash256
+  private readonly itemHash: () => Hash256
 
   constructor(public index: Hash256, item: ShaMapItem) {
     super()
     if ('preHashed' in item) {
-      this.getHash = () => item.preHashed
+      this.itemHash = () => item.preHashed
     } else if ('hashPrefix' in item && 'toBytesSink' in item) {
-      this.getHash = hashableItemHashGetter(item, index)
+      this.itemHash = () => {
+        const hash = Sha512Half.put(item.hashPrefix())
+        item.toBytesSink(hash)
+        index.toBytesSink(hash)
+        return hash.finish()
+      }
     } else {
       throw new Error('invalid_item: must be either Hashable or PreHashed')
     }
@@ -73,7 +65,7 @@ class ShaMapLeaf extends ShaMapNode {
    * @returns hash of Hashable or PreHashed item
    */
   hash(): Hash256 {
-    return this.getHash()
+    return this.itemHash()
   }
 
   /**
