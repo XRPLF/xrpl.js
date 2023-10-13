@@ -17,11 +17,11 @@ export interface Hashable {
 /**
  * A prehashed item where you only have the hash, not the contents
  */
-export interface Prehashed {
-  prehashed: Hash256
+export interface PreHashed {
+  preHashed: Hash256
 }
 
-export type ShaMapItem = Hashable | Prehashed
+export type ShaMapItem = Hashable | PreHashed
 
 /**
  * Abstract class describing a SHAMapNode
@@ -58,19 +58,19 @@ class ShaMapLeaf extends ShaMapNode {
 
   constructor(public index: Hash256, item: ShaMapItem) {
     super()
-    if ('prehashed' in item) {
-      this.makeHash = () => item.prehashed
+    if ('preHashed' in item) {
+      this.makeHash = () => item.preHashed
     } else if ('hashPrefix' in item && 'toBytesSink' in item) {
       this.makeHash = hashableItemHasher(item, index)
     } else {
-      throw new Error('invalid_item: must be either Hashable or Prehashed')
+      throw new Error('invalid_item: must be either Hashable or PreHashed')
     }
   }
 
   /**
    * Hash the bytes representation of this
    *
-   * @returns hash of Hashable or Prehashed item
+   * @returns hash of Hashable or PreHashed item
    */
   hash(): Hash256 {
     return this.makeHash()
