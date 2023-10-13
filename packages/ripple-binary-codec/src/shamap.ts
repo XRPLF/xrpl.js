@@ -131,7 +131,7 @@ class ShaMapInner extends ShaMapNode {
    * @param slot Slot to add branch to this.branches
    * @param branch Branch to add
    */
-  private setBranch(slot: number, branch: ShaMapNode): void {
+  setBranch(slot: number, branch: ShaMapNode): void {
     this.slotBits = this.slotBits | (1 << slot)
     this.branches[slot] = branch
   }
