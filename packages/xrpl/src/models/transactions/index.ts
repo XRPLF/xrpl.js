@@ -1,7 +1,6 @@
 export { BaseTransaction } from './common'
 export {
   validate,
-  AnyTransaction,
   PseudoTransaction,
   TransactionAndMetadata,
   Transaction,

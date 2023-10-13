@@ -133,8 +133,6 @@ export type Transaction =
 
 export type PseudoTransaction = EnableAmendment | SetFee | UNLModify
 
-export type AnyTransaction = Transaction | PseudoTransaction
-
 /**
  * @category Transaction Models
  */
