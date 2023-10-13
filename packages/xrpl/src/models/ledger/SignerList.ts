@@ -1,6 +1,6 @@
 import { SignerEntry } from '../common'
 
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * The SignerList object type represents a list of parties that, as a group,
@@ -10,23 +10,13 @@ import BaseLedgerEntry from './BaseLedgerEntry'
  *
  * @category Ledger Entries
  */
-export default interface SignerList extends BaseLedgerEntry {
+export default interface SignerList extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'SignerList'
   /**
    * A bit-map of Boolean flags enabled for this signer list. For more
    * information, see SignerList Flags.
    */
   Flags: number
-  /**
-   * The identifying hash of the transaction that most recently modified this
-   * object.
-   */
-  PreviousTxnID: string
-  /**
-   * The index of the ledger that contains the transaction that most recently
-   * modified this object.
-   */
-  PreviousTxnLgrSeq: number
   /**
    * A hint indicating which page of the owner directory links to this object,
    * in case the directory consists of multiple pages.

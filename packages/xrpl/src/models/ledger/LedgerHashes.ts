@@ -1,4 +1,4 @@
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, MissingPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * The LedgerHashes objects exist to make it possible to look up a previous
@@ -7,7 +7,9 @@ import BaseLedgerEntry from './BaseLedgerEntry'
  *
  * @category Ledger Entries
  */
-export default interface LedgerHashes extends BaseLedgerEntry {
+export default interface LedgerHashes
+  extends BaseLedgerEntry,
+    MissingPreviousTxnID {
   LedgerEntryType: 'LedgerHashes'
   /** The Ledger Index of the last entry in this object's Hashes array. */
   LastLedgerSequence?: number

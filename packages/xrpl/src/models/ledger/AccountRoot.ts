@@ -1,4 +1,4 @@
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * The AccountRoot object type describes a single account, its settings, and
@@ -6,7 +6,7 @@ import BaseLedgerEntry from './BaseLedgerEntry'
  *
  * @category Ledger Entries
  */
-export default interface AccountRoot extends BaseLedgerEntry {
+export default interface AccountRoot extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'AccountRoot'
   /** The identifying (classic) address of this account. */
   Account: string
@@ -19,16 +19,6 @@ export default interface AccountRoot extends BaseLedgerEntry {
    * to its owner reserve.
    */
   OwnerCount: number
-  /**
-   * The identifying hash of the transaction that most recently modified this
-   * object.
-   */
-  PreviousTxnID: string
-  /**
-   * The index of the ledger that contains the transaction that most recently
-   * modified this object.
-   */
-  PreviousTxnLgrSeq: number
   /** The sequence number of the next valid transaction for this account. */
   Sequence: number
   /**

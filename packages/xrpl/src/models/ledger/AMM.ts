@@ -1,6 +1,6 @@
 import { AuthAccount, Currency, IssuedCurrencyAmount } from '../common'
 
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, MissingPreviousTxnID } from './BaseLedgerEntry'
 
 export interface VoteSlot {
   VoteEntry: {
@@ -15,7 +15,7 @@ export interface VoteSlot {
  *
  * @category Ledger Entries
  */
-export default interface AMM extends BaseLedgerEntry {
+export default interface AMM extends BaseLedgerEntry, MissingPreviousTxnID {
   LedgerEntryType: 'AMM'
   /**
    * The address of the special account that holds this AMM's assets.
@@ -75,12 +75,4 @@ export default interface AMM extends BaseLedgerEntry {
    * type, so this value is always 0.
    */
   Flags: 0
-  /**
-   * This field is missing on AMM but is present on all other account_object returned objects.
-   */
-  PreviousTxnID: never
-  /**
-   * This field is missing on AMM but is present on all other account_object returned objects.
-   */
-  PreviousTxnLgrSeq: never
 }
