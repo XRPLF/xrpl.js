@@ -1,6 +1,11 @@
-import { ValidationError } from '../../errors'
-
-import { BaseTransaction, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isAccount,
+  isString,
+  validateBaseTransaction,
+  validateOptionalField,
+  validateRequiredField,
+} from './common'
 
 /**
  * The NFTokenBurn transaction is used to remove an NFToken object from the
@@ -41,8 +46,6 @@ export interface NFTokenBurn extends BaseTransaction {
  */
 export function validateNFTokenBurn(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-
-  if (tx.NFTokenID == null) {
-    throw new ValidationError('NFTokenBurn: missing field NFTokenID')
-  }
+  validateRequiredField(tx, 'NFTokenID', isString)
+  validateOptionalField(tx, 'Owner', isAccount)
 }

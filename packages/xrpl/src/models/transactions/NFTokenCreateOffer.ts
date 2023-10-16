@@ -8,6 +8,8 @@ import {
   validateBaseTransaction,
   isAmount,
   parseAmountValue,
+  isAccount,
+  validateOptionalField,
 } from './common'
 
 /**
@@ -125,6 +127,9 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
       'NFTokenCreateOffer: Destination and Account must not be equal',
     )
   }
+
+  validateOptionalField(tx, 'Destination', isAccount)
+  validateOptionalField(tx, 'Owner', isAccount)
 
   if (tx.NFTokenID == null) {
     throw new ValidationError('NFTokenCreateOffer: missing field NFTokenID')

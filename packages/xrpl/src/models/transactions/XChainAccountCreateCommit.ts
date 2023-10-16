@@ -4,9 +4,9 @@ import {
   BaseTransaction,
   isAmount,
   isXChainBridge,
-  isString,
   validateBaseTransaction,
   validateRequiredField,
+  isAccount,
 } from './common'
 
 /**
@@ -62,7 +62,7 @@ export function validateXChainAccountCreateCommit(
 
   validateRequiredField(tx, 'SignatureReward', isAmount)
 
-  validateRequiredField(tx, 'Destination', isString)
+  validateRequiredField(tx, 'Destination', isAccount)
 
   validateRequiredField(tx, 'Amount', isAmount)
 }

@@ -5,6 +5,10 @@ import {
   BaseTransaction,
   validateBaseTransaction,
   isIssuedCurrency,
+  isAccount,
+  validateRequiredField,
+  validateOptionalField,
+  isNumber,
 } from './common'
 
 /**
@@ -56,9 +60,8 @@ export function validateCheckCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('CheckCreate: missing field SendMax')
   }
 
-  if (tx.Destination === undefined) {
-    throw new ValidationError('CheckCreate: missing field Destination')
-  }
+  validateRequiredField(tx, 'Destination', isAccount)
+  validateOptionalField(tx, 'DestinationTag', isNumber)
 
   if (
     typeof tx.SendMax !== 'string' &&
@@ -66,17 +69,6 @@ export function validateCheckCreate(tx: Record<string, unknown>): void {
     !isIssuedCurrency(tx.SendMax as Record<string, unknown>)
   ) {
     throw new ValidationError('CheckCreate: invalid SendMax')
-  }
-
-  if (typeof tx.Destination !== 'string') {
-    throw new ValidationError('CheckCreate: invalid Destination')
-  }
-
-  if (
-    tx.DestinationTag !== undefined &&
-    typeof tx.DestinationTag !== 'number'
-  ) {
-    throw new ValidationError('CheckCreate: invalid DestinationTag')
   }
 
   if (tx.Expiration !== undefined && typeof tx.Expiration !== 'number') {

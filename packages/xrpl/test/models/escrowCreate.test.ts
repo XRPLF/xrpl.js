@@ -67,12 +67,12 @@ describe('EscrowCreate', function () {
     assert.throws(
       () => validateEscrowCreate(escrow),
       ValidationError,
-      'EscrowCreate: Destination must be a string',
+      'EscrowCreate: invalid field Destination',
     )
     assert.throws(
       () => validate(escrow),
       ValidationError,
-      'EscrowCreate: Destination must be a string',
+      'EscrowCreate: invalid field Destination',
     )
   })
 
@@ -137,12 +137,12 @@ describe('EscrowCreate', function () {
     assert.throws(
       () => validateEscrowCreate(escrow),
       ValidationError,
-      'EscrowCreate: DestinationTag must be a number',
+      'EscrowCreate: invalid field DestinationTag',
     )
     assert.throws(
       () => validate(escrow),
       ValidationError,
-      'EscrowCreate: DestinationTag must be a number',
+      'EscrowCreate: invalid field DestinationTag',
     )
   })
 

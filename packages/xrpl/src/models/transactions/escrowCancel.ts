@@ -1,6 +1,11 @@
 import { ValidationError } from '../../errors'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isAccount,
+  validateBaseTransaction,
+  validateRequiredField,
+} from './common'
 
 /**
  * Return escrowed XRP to the sender.
@@ -27,13 +32,7 @@ export interface EscrowCancel extends BaseTransaction {
 export function validateEscrowCancel(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Owner == null) {
-    throw new ValidationError('EscrowCancel: missing Owner')
-  }
-
-  if (typeof tx.Owner !== 'string') {
-    throw new ValidationError('EscrowCancel: Owner must be a string')
-  }
+  validateRequiredField(tx, 'Owner', isAccount)
 
   if (tx.OfferSequence == null) {
     throw new ValidationError('EscrowCancel: missing OfferSequence')

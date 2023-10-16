@@ -2,6 +2,7 @@ import { Amount, XChainBridge } from '../common'
 
 import {
   BaseTransaction,
+  isAccount,
   isAmount,
   isNumber,
   isString,
@@ -68,7 +69,7 @@ export function validateXChainCommit(tx: Record<string, unknown>): void {
     (inp) => isNumber(inp) || isString(inp),
   )
 
-  validateOptionalField(tx, 'OtherChainDestination', isString)
+  validateOptionalField(tx, 'OtherChainDestination', isAccount)
 
   validateRequiredField(tx, 'Amount', isAmount)
 }

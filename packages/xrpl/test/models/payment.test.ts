@@ -102,12 +102,12 @@ describe('Payment', function () {
     assert.throws(
       () => validatePayment(paymentTransaction),
       ValidationError,
-      'PaymentTransaction: missing field Destination',
+      'Payment: missing field Destination',
     )
     assert.throws(
       () => validate(paymentTransaction),
       ValidationError,
-      'PaymentTransaction: missing field Destination',
+      'Payment: missing field Destination',
     )
   })
 
@@ -116,12 +116,26 @@ describe('Payment', function () {
     assert.throws(
       () => validatePayment(paymentTransaction),
       ValidationError,
-      'PaymentTransaction: invalid Destination',
+      'Payment: invalid field Destination',
     )
     assert.throws(
       () => validate(paymentTransaction),
       ValidationError,
-      'PaymentTransaction: invalid Destination',
+      'Payment: invalid field Destination',
+    )
+  })
+
+  it(`throws when Destination is invalid classic address`, function () {
+    paymentTransaction.Destination = 'rABCD'
+    assert.throws(
+      () => validatePayment(paymentTransaction),
+      ValidationError,
+      'Payment: invalid field Destination',
+    )
+    assert.throws(
+      () => validate(paymentTransaction),
+      ValidationError,
+      'Payment: invalid field Destination',
     )
   })
 
@@ -130,12 +144,12 @@ describe('Payment', function () {
     assert.throws(
       () => validatePayment(paymentTransaction),
       ValidationError,
-      'PaymentTransaction: DestinationTag must be a number',
+      'Payment: invalid field DestinationTag',
     )
     assert.throws(
       () => validate(paymentTransaction),
       ValidationError,
-      'PaymentTransaction: DestinationTag must be a number',
+      'Payment: invalid field DestinationTag',
     )
   })
 

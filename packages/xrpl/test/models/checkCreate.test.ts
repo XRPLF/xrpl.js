@@ -42,12 +42,12 @@ describe('CheckCreate', function () {
     assert.throws(
       () => validateCheckCreate(invalidDestination),
       ValidationError,
-      'CheckCreate: invalid Destination',
+      'CheckCreate: invalid field Destination',
     )
     assert.throws(
       () => validate(invalidDestination),
       ValidationError,
-      'CheckCreate: invalid Destination',
+      'CheckCreate: invalid field Destination',
     )
   })
 
@@ -92,12 +92,12 @@ describe('CheckCreate', function () {
     assert.throws(
       () => validateCheckCreate(invalidDestinationTag),
       ValidationError,
-      'CheckCreate: invalid DestinationTag',
+      'CheckCreate: invalid field DestinationTag',
     )
     assert.throws(
       () => validate(invalidDestinationTag),
       ValidationError,
-      'CheckCreate: invalid DestinationTag',
+      'CheckCreate: invalid field DestinationTag',
     )
   })
 

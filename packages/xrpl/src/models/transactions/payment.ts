@@ -7,6 +7,10 @@ import {
   isAmount,
   GlobalFlags,
   validateBaseTransaction,
+  isAccount,
+  validateRequiredField,
+  validateOptionalField,
+  isNumber,
 } from './common'
 
 /**
@@ -163,19 +167,8 @@ export function validatePayment(tx: Record<string, unknown>): void {
     throw new ValidationError('PaymentTransaction: invalid Amount')
   }
 
-  if (tx.Destination === undefined) {
-    throw new ValidationError('PaymentTransaction: missing field Destination')
-  }
-
-  if (!isAmount(tx.Destination)) {
-    throw new ValidationError('PaymentTransaction: invalid Destination')
-  }
-
-  if (tx.DestinationTag != null && typeof tx.DestinationTag !== 'number') {
-    throw new ValidationError(
-      'PaymentTransaction: DestinationTag must be a number',
-    )
-  }
+  validateRequiredField(tx, 'Destination', isAccount)
+  validateOptionalField(tx, 'DestinationTag', isNumber)
 
   if (tx.InvoiceID !== undefined && typeof tx.InvoiceID !== 'string') {
     throw new ValidationError('PaymentTransaction: InvoiceID must be a string')

@@ -2,6 +2,7 @@ import { Amount, XChainBridge } from '../common'
 
 import {
   BaseTransaction,
+  isAccount,
   isAmount,
   isNumber,
   isString,
@@ -69,7 +70,7 @@ export function validateXChainClaim(tx: Record<string, unknown>): void {
     (inp) => isNumber(inp) || isString(inp),
   )
 
-  validateRequiredField(tx, 'Destination', isString)
+  validateRequiredField(tx, 'Destination', isAccount)
 
   validateOptionalField(tx, 'DestinationTag', isNumber)
 

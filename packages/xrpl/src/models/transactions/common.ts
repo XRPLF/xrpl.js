@@ -1,3 +1,4 @@
+import { isValidClassicAddress } from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
@@ -116,6 +117,16 @@ export function isIssuedCurrency(
     typeof input.issuer === 'string' &&
     typeof input.currency === 'string'
   )
+}
+
+/**
+ * Verify a string is in fact a valid account.
+ *
+ * @param account - The object to check the form and type of.
+ * @returns Whether the account is properly formed account for a transaction.
+ */
+export function isAccount(account: unknown): boolean {
+  return typeof account === 'string' && isValidClassicAddress(account)
 }
 
 /**

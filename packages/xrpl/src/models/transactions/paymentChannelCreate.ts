@@ -1,6 +1,13 @@
 import { ValidationError } from '../../errors'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isAccount,
+  isNumber,
+  validateBaseTransaction,
+  validateOptionalField,
+  validateRequiredField,
+} from './common'
 
 /**
  * Create a unidirectional channel and fund it with XRP. The address sending
@@ -54,7 +61,6 @@ export interface PaymentChannelCreate extends BaseTransaction {
  * @param tx - An PaymentChannelCreate Transaction.
  * @throws When the PaymentChannelCreate is Malformed.
  */
-// eslint-disable-next-line max-lines-per-function -- okay for this function, there's a lot of things to check
 export function validatePaymentChannelCreate(
   tx: Record<string, unknown>,
 ): void {
@@ -68,15 +74,8 @@ export function validatePaymentChannelCreate(
     throw new ValidationError('PaymentChannelCreate: Amount must be a string')
   }
 
-  if (tx.Destination === undefined) {
-    throw new ValidationError('PaymentChannelCreate: missing Destination')
-  }
-
-  if (typeof tx.Destination !== 'string') {
-    throw new ValidationError(
-      'PaymentChannelCreate: Destination must be a string',
-    )
-  }
+  validateRequiredField(tx, 'Destination', isAccount)
+  validateOptionalField(tx, 'DestinationTag', isNumber)
 
   if (tx.SettleDelay === undefined) {
     throw new ValidationError('PaymentChannelCreate: missing SettleDelay')
@@ -101,15 +100,6 @@ export function validatePaymentChannelCreate(
   if (tx.CancelAfter !== undefined && typeof tx.CancelAfter !== 'number') {
     throw new ValidationError(
       'PaymentChannelCreate: CancelAfter must be a number',
-    )
-  }
-
-  if (
-    tx.DestinationTag !== undefined &&
-    typeof tx.DestinationTag !== 'number'
-  ) {
-    throw new ValidationError(
-      'PaymentChannelCreate: DestinationTag must be a number',
     )
   }
 }

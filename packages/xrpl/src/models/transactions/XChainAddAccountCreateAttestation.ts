@@ -2,6 +2,7 @@ import { Amount, XChainBridge } from '../common'
 
 import {
   BaseTransaction,
+  isAccount,
   isAmount,
   isNumber,
   isString,
@@ -91,13 +92,13 @@ export function validateXChainAddAccountCreateAttestation(
 
   validateRequiredField(tx, 'Amount', isAmount)
 
-  validateRequiredField(tx, 'AttestationRewardAccount', isString)
+  validateRequiredField(tx, 'AttestationRewardAccount', isAccount)
 
-  validateRequiredField(tx, 'AttestationSignerAccount', isString)
+  validateRequiredField(tx, 'AttestationSignerAccount', isAccount)
 
-  validateRequiredField(tx, 'Destination', isString)
+  validateRequiredField(tx, 'Destination', isAccount)
 
-  validateRequiredField(tx, 'OtherChainSource', isString)
+  validateRequiredField(tx, 'OtherChainSource', isAccount)
 
   validateRequiredField(tx, 'PublicKey', isString)
 
