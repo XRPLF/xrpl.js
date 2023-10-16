@@ -2,8 +2,8 @@
  * Codec class
  */
 
-import { sha256 } from '@xrplf/isomorphic/sha256'
 import { base58xrp, BytesCoder } from '@scure/base'
+import { sha256 } from '@xrplf/isomorphic/sha256'
 
 import { arrayEqual, concatArgs, ByteArray } from './utils'
 
