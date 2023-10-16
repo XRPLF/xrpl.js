@@ -1,4 +1,4 @@
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, MissingPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * The unique id for the Amendments object https://xrpl.org/amendments-object.html#amendments-id-format
@@ -24,7 +24,9 @@ export interface Majority {
  *
  * @category Ledger Entries
  */
-export default interface Amendments extends BaseLedgerEntry {
+export default interface Amendments
+  extends BaseLedgerEntry,
+    MissingPreviousTxnID {
   LedgerEntryType: 'Amendments'
   /**
    * Array of 256-bit amendment IDs for all currently-enabled amendments. If

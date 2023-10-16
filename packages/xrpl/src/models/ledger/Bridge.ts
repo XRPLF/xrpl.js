@@ -1,6 +1,6 @@
 import { Amount, XChainBridge } from '../common'
 
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * A Bridge objects represents a cross-chain bridge and includes information about
@@ -9,7 +9,7 @@ import BaseLedgerEntry from './BaseLedgerEntry'
  *
  * @category Ledger Entries
  */
-export default interface Bridge extends BaseLedgerEntry {
+export default interface Bridge extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'Bridge'
 
   /** The door account that owns the bridge. */
@@ -69,16 +69,4 @@ export default interface Bridge extends BaseLedgerEntry {
    * object, in case the directory consists of multiple pages.
    */
   OwnerNode: string
-
-  /**
-   * The identifying hash of the transaction that most recently modified this
-   * object.
-   */
-  PreviousTxnID: string
-
-  /**
-   * The index of the ledger that contains the transaction that most recently
-   * modified this object.
-   */
-  PreviousTxnLgrSeq: number
 }
