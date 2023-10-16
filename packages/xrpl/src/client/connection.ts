@@ -68,10 +68,10 @@ function createWebSocket(
     options.headers = config.headers
   }
   if (config.authorization != null) {
-    const base64 = Buffer.from(config.authorization).toString('base64')
+    // const base64 = Buffer.from(config.authorization).toString('base64')
     options.headers = {
       ...options.headers,
-      Authorization: `Basic ${base64}`,
+      // Authorization: `Basic ${base64}`,
     }
   }
   const websocketOptions = { ...options }
@@ -391,7 +391,7 @@ export class Connection extends EventEmitter {
       this.emit('error', 'websocket', error.message, error),
     )
     // Handle a closed connection: reconnect if it was unexpected
-    this.ws.once('close', (code?: number, reason?: Buffer) => {
+    this.ws.once('close', (code?: number, reason?: ArrayBufferLike) => {
       if (this.ws == null) {
         throw new XrplError('onceClose: ws is null')
       }

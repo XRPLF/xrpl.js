@@ -3,7 +3,6 @@ const { encode, decode } = require('../src')
 const { makeParser, BytesList, BinarySerializer } = binary
 const { coreTypes } = require('../src/types')
 const { UInt8, UInt16, UInt32, UInt64, STObject } = coreTypes
-const { Buffer } = require('buffer/')
 
 const { loadFixture } = require('./utils')
 const fixtures = loadFixture('data-driven-tests.json')
@@ -107,12 +106,12 @@ const NegativeUNL = require('./fixtures/negative-unl.json')
 
 function bytesListTest() {
   const list = new BytesList()
-    .put(Buffer.from([0]))
-    .put(Buffer.from([2, 3]))
-    .put(Buffer.from([4, 5]))
-  test('is an Array<Buffer>', function () {
+    .put(Uint8Array.from([0]))
+    .put(Uint8Array.from([2, 3]))
+    .put(Uint8Array.from([4, 5]))
+  test('is an Array<Uint8Array>', function () {
     expect(Array.isArray(list.bytesArray)).toBe(true)
-    expect(list.bytesArray[0] instanceof Buffer).toBe(true)
+    expect(list.bytesArray[0] instanceof Uint8Array).toBe(true)
   })
   test('keeps track of the length itself', function () {
     expect(list.getLength()).toBe(5)
@@ -120,7 +119,7 @@ function bytesListTest() {
   test('can join all arrays into one via toBytes', function () {
     const joined = list.toBytes()
     expect(joined).toHaveLength(5)
-    expect(joined).toEqual(Buffer.from([0, 2, 3, 4, 5]))
+    expect(joined).toEqual(Uint8Array.from([0, 2, 3, 4, 5]))
   })
 }
 
@@ -151,9 +150,17 @@ function check(type, n, expected) {
       return
     }
     serializer.writeType(type, n)
-    expect(bl.toBytes()).toEqual(Buffer.from(expected))
+    expect(bl.toBytes()).toEqual(Uint8Array.from(expected))
   })
 }
+
+test(`Uint16 serializes 5 as 0,5`, function () {
+  const bl = new BytesList()
+  const serializer = new BinarySerializer(bl)
+  const expected = [0, 5]
+  serializer.writeType(UInt16, 5)
+  expect(bl.toBytes()).toEqual(Uint8Array.from(expected))
+})
 
 check(UInt8, 5, [5])
 check(UInt16, 5, [0, 5])

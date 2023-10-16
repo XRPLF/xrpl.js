@@ -2,7 +2,6 @@ const { ShaMap } = require('../src/shamap')
 const { binary, HashPrefix } = require('../src/coretypes')
 const { coreTypes } = require('../src/types')
 const { loadFixture } = require('./utils')
-const { Buffer } = require('buffer/')
 
 function now() {
   return Number(Date.now()) / 1000
@@ -21,7 +20,7 @@ function makeItem(indexArg) {
       index.toBytesSink(sink)
     },
     hashPrefix() {
-      return Buffer.from([1, 3, 3, 7])
+      return Uint8Array.from([1, 3, 3, 7])
     },
   }
   return [index, item]

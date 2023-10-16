@@ -11,7 +11,6 @@
     "test": "test"
   },
   "dependencies": {
-    "buffer": "6.0.3",
     "@xrplf/isomorphic": "1.0.0",
     "bignumber.js": "^9.0.0",
     "ripple-address-codec": "^4.3.1"

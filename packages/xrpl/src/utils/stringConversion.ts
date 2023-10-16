@@ -1,3 +1,10 @@
+import {
+  bytesToHex,
+  hexToBytes,
+  TextDecoder,
+  TextEncoder,
+} from '@xrplf/isomorphic/utils'
+
 /**
  * Converts a string to its hex equivalent. Useful for Memos.
  *
@@ -6,7 +13,7 @@
  * @category Utilities
  */
 function convertStringToHex(string: string): string {
-  return Buffer.from(string, 'utf8').toString('hex').toUpperCase()
+  return bytesToHex(new TextEncoder().encode(string))
 }
 
 /**
@@ -17,11 +24,8 @@ function convertStringToHex(string: string): string {
  * @returns The converted string.
  * @category Utilities
  */
-function convertHexToString(
-  hex: string,
-  encoding: BufferEncoding = 'utf8',
-): string {
-  return Buffer.from(hex, 'hex').toString(encoding)
+function convertHexToString(hex: string, encoding = 'utf8'): string {
+  return new TextDecoder(encoding).decode(hexToBytes(hex))
 }
 
 export { convertHexToString, convertStringToHex }

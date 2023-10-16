@@ -1,6 +1,5 @@
 const { coreTypes } = require('../src/types')
 const { Hash128, Hash160, Hash256, AccountID, Currency } = coreTypes
-const { Buffer } = require('buffer/')
 
 describe('Hash128', function () {
   test('has a static width member', function () {
@@ -20,11 +19,11 @@ describe('Hash128', function () {
     expect(h1.gt(h3)).toBe(true)
   })
   test('throws when constructed from invalid hash length', () => {
-    expect(() => Hash128.from('1000000000000000000000000000000')).toThrow(
+    expect(() => Hash128.from('100000000000000000000000000000')).toThrow(
       'Invalid Hash length 15',
     )
-    expect(() => Hash128.from('10000000000000000000000000000000000')).toThrow(
-      'Invalid Hash length 17',
+    expect(() => Hash128.from('100000000000000000000000000000000000')).toThrow(
+      'Invalid Hash length 18',
     )
   })
 })
@@ -111,8 +110,8 @@ describe('Currency', function () {
     ).toBe(null)
   })
 
-  test('can be constructed from a Buffer', function () {
-    const xrp = new Currency(Buffer.alloc(20))
+  test('can be constructed from a Uint8Array', function () {
+    const xrp = new Currency(new Uint8Array(20))
     expect(xrp.iso()).toBe('XRP')
   })
   test('Can handle non-standard currency codes', () => {
@@ -126,7 +125,7 @@ describe('Currency', function () {
   })
 
   test('throws on invalid reprs', function () {
-    expect(() => Currency.from(Buffer.alloc(19))).toThrow()
+    expect(() => Currency.from(Uint8Array(19))).toThrow()
     expect(() => Currency.from(1)).toThrow()
     expect(() =>
       Currency.from('00000000000000000000000000000000000000m'),

@@ -2,7 +2,7 @@ import { SerializedType } from './serialized-type'
 import { BinaryParser } from '../serdes/binary-parser'
 import { Hash256 } from './hash-256'
 import { BytesList } from '../serdes/binary-serializer'
-import { Buffer } from 'buffer/'
+import { bytesToHex } from '@xrplf/isomorphic/utils'
 
 /**
  * TypeGuard for Array<string>
@@ -15,7 +15,7 @@ function isStrings(arg): arg is Array<string> {
  * Class for serializing and deserializing vectors of Hash256
  */
 class Vector256 extends SerializedType {
-  constructor(bytes: Buffer) {
+  constructor(bytes: Uint8Array) {
     super(bytes)
   }
 
@@ -70,12 +70,7 @@ class Vector256 extends SerializedType {
 
     const result: Array<string> = []
     for (let i = 0; i < this.bytes.byteLength; i += 32) {
-      result.push(
-        this.bytes
-          .slice(i, i + 32)
-          .toString('hex')
-          .toUpperCase(),
-      )
+      result.push(bytesToHex(this.bytes.slice(i, i + 32)))
     }
     return result
   }

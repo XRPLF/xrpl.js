@@ -29,12 +29,12 @@ export default class Account {
     },
   };
 
-  constructor(secretNumbers?: string[] | string | Buffer) {
+  constructor(secretNumbers?: string[] | string | Uint8Array) {
     if (typeof secretNumbers === "string") {
       this._secret = utils.parseSecretString(secretNumbers);
     } else if (Array.isArray(secretNumbers)) {
       this._secret = secretNumbers;
-    } else if (Buffer.isBuffer(secretNumbers)) {
+    } else if (secretNumbers instanceof Uint8Array) {
       this._secret = utils.entropyToSecret(secretNumbers);
     } else {
       this._secret = utils.randomSecret();

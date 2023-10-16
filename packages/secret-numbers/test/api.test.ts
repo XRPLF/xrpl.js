@@ -1,3 +1,4 @@
+import { hexToBytes } from "@xrplf/isomorphic/utils";
 import * as keypairs from "ripple-keypairs";
 
 import { Account, Utils } from "../src";
@@ -17,7 +18,7 @@ describe("API: XRPL Secret Numbers", () => {
   });
 
   describe("Account based on entropy", () => {
-    const entropy = Buffer.from("0123456789ABCDEF0123456789ABCDEF", "hex");
+    const entropy = hexToBytes("0123456789ABCDEF0123456789ABCDEF");
     const account = new Account(entropy);
 
     it("familySeed as expected", () => {

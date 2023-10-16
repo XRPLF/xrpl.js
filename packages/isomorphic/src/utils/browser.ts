@@ -15,3 +15,6 @@ export const bytesToHex: typeof BytesToHexFn = (bytes) => {
 
 export const hexToBytes: typeof HexToBytesFn = nobleHexToBytes
 export const randomBytes: typeof RandomBytesFn = nobleRandomBytes
+export * from './shared'
+export const TextDecoder = window.TextDecoder
+export const TextEncoder = window.TextEncoder
