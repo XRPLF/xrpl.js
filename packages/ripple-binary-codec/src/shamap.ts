@@ -87,7 +87,7 @@ class ShaMapLeaf extends ShaMapNode {
  */
 class ShaMapInner extends ShaMapNode {
   private slotBits = 0
-  private branches: Array<ShaMapNode> = Array(16)
+  private branches: Array<ShaMapNode | undefined> = Array(16)
 
   constructor(private depth: number = 0) {
     super()
@@ -170,7 +170,7 @@ class ShaMapInner extends ShaMapNode {
   addItem(index: Hash256, item: ShaMapItem): void {
     const nibble = index.nibblet(this.depth)
     const existing = this.branches[nibble]
-    if (existing === undefined) {
+    if (!existing) {
       this.setBranch(nibble, new ShaMapLeaf(index, item))
     } else if (existing.isLeaf()) {
       const deeper = this.depth + 1
@@ -193,7 +193,9 @@ class ShaMapInner extends ShaMapNode {
    */
   walkLeaves(onLeaf: (leaf: ShaMapLeaf) => void) {
     this.branches.forEach((b) => {
-      if (b.isLeaf()) {
+      if (!b) {
+        /* empty branch */
+      } else if (b.isLeaf()) {
         onLeaf(b)
       } else if (b.isInner()) {
         b.walkLeaves(onLeaf)
