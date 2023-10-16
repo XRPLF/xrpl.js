@@ -2,14 +2,13 @@ import { HashPrefix } from './hash-prefixes'
 import { Sha512Half } from './hashes'
 import { Hash256 } from './types'
 import { BytesSink } from './serdes/binary-serializer'
-import { Buffer } from 'buffer/'
 
 /**
  * Represents an object which can be hashed.
  * e.g. transaction/ledger entry items, ShaMap nodes
  */
 export interface Hashable {
-  hashPrefix: () => Buffer
+  hashPrefix: () => Uint8Array
 
   toBytesSink: (list: BytesSink) => void
 }
@@ -43,7 +42,7 @@ abstract class ShaMapNode {
 class ShaMapLeaf extends ShaMapNode {
   private readonly itemHash: () => Hash256
 
-  constructor(public index: Hash256, item: ShaMapItem) {
+  constructor(public index: Hash256, public item: ShaMapItem) {
     super()
     if ('preHashed' in item) {
       this.itemHash = () => item.preHashed
@@ -113,7 +112,7 @@ class ShaMapInner extends ShaMapNode {
    *
    * @returns hash prefix describing an inner node
    */
-  hashPrefix(): Buffer {
+  hashPrefix(): Uint8Array {
     return HashPrefix.innerNode
   }
 

@@ -17,7 +17,7 @@ class Sha512Half implements BytesSink {
    * @param bytes bytes to write to this.hash
    * @returns the new Sha512Hash object
    */
-  static put(bytes: Buffer): Sha512Half {
+  static put(bytes: Uint8Array): Sha512Half {
     return new Sha512Half().put(bytes)
   }
 
