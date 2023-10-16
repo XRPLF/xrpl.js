@@ -1,7 +1,7 @@
 import { HashPrefix } from './hash-prefixes'
 import { Sha512Half } from './hashes'
 import { Hash256 } from './types'
-import { BytesList } from './serdes/binary-serializer'
+import { BytesSink } from './serdes/binary-serializer'
 import { Buffer } from 'buffer/'
 
 /**
@@ -11,7 +11,7 @@ import { Buffer } from 'buffer/'
 export interface Hashable {
   hashPrefix: () => Buffer
 
-  toBytesSink: (list: BytesList) => void
+  toBytesSink: (list: BytesSink) => void
 }
 
 /**
@@ -154,7 +154,7 @@ class ShaMapInner extends ShaMapNode {
    *
    * @param list BytesList to write bytes to
    */
-  toBytesSink(list: BytesList): void {
+  toBytesSink(list: BytesSink): void {
     for (let i = 0; i < this.branches.length; i++) {
       const branch = this.branches[i]
       const hash = branch ? branch.hash() : Hash256.ZERO_256

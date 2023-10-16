@@ -1,6 +1,6 @@
 import { HashPrefix } from './hash-prefixes'
 import { Hash256 } from './types'
-import { BytesList } from './serdes/binary-serializer'
+import { BytesSink } from './serdes/binary-serializer'
 import { Buffer } from 'buffer/'
 import { sha512 } from '@xrplf/isomorphic/sha512'
 
@@ -8,7 +8,7 @@ import { sha512 } from '@xrplf/isomorphic/sha512'
  * Class for hashing with SHA512
  * @extends BytesList So SerializedTypes can write bytes to a Sha512Half
  */
-class Sha512Half extends BytesList {
+class Sha512Half implements BytesSink {
   private hash = sha512.create()
 
   /**
@@ -27,7 +27,7 @@ class Sha512Half extends BytesList {
    * @param bytes bytes to write to object
    * @returns the Sha512 object
    */
-  put(bytes: Buffer): Sha512Half {
+  put(bytes: Uint8Array): Sha512Half {
     this.hash.update(bytes)
     return this
   }

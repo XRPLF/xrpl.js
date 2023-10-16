@@ -1,4 +1,8 @@
-import { BytesList } from '../serdes/binary-serializer'
+import {
+  BytesList,
+  BytesSink,
+  BytesSinkable,
+} from '../serdes/binary-serializer'
 import { BinaryParser } from '../serdes/binary-parser'
 import { Buffer } from 'buffer/'
 import { XrplDefinitionsBase } from '../enums'
@@ -10,7 +14,7 @@ type JsonObject = { [key: string]: JSON }
 /**
  * The base class for all binary-codec types
  */
-class SerializedType {
+class SerializedType implements BytesSinkable {
   protected readonly bytes: Buffer = Buffer.alloc(0)
 
   constructor(bytes: Buffer) {
@@ -30,10 +34,10 @@ class SerializedType {
   /**
    * Write the bytes representation of a SerializedType to a BytesList
    *
-   * @param list The BytesList to write SerializedType bytes to
+   * @param sink The BytesSink to write SerializedType bytes to
    */
-  toBytesSink(list: BytesList): void {
-    list.put(this.bytes)
+  toBytesSink(sink: BytesSink): void {
+    sink.put(this.bytes)
   }
 
   /**

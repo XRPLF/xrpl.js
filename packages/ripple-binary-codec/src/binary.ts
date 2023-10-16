@@ -85,9 +85,7 @@ function serializeObject(object: JsonObject, opts: OptionObject = {}): Buffer {
   const filter = signingFieldsOnly
     ? (f: FieldInstance): boolean => f.isSigningField
     : undefined
-  ;(coreTypes.STObject as typeof STObject)
-    .from(object, filter, definitions)
-    .toBytesSink(bytesList)
+  STObject.from(object, filter, definitions).toBytesSink(bytesList)
 
   if (suffix) {
     bytesList.put(suffix)

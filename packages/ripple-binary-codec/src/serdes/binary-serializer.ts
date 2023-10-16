@@ -2,10 +2,18 @@ import { FieldInstance } from '../enums'
 import { type SerializedType } from '../types/serialized-type'
 import { Buffer } from 'buffer/'
 
+export interface BytesSink {
+  put: (buf: Uint8Array) => void
+}
+
+export interface BytesSinkable {
+  toBytesSink: (sink: BytesSink) => void
+}
+
 /**
  * Bytes list is a collection of buffer objects
  */
-class BytesList {
+class BytesList implements BytesSink, BytesSinkable {
   private bytesArray: Array<Buffer> = []
 
   /**
@@ -23,19 +31,19 @@ class BytesList {
    * @param bytesArg A Buffer
    * @return this BytesList
    */
-  public put(bytesArg: Buffer): BytesList {
+  public put(bytesArg: Uint8Array): BytesList {
     const bytes = Buffer.from(bytesArg) // Temporary, to catch instances of Uint8Array being passed in
     this.bytesArray.push(bytes)
     return this
   }
 
   /**
-   * Write this BytesList to the back of another bytes list
+   * Put all bytes in this BytesList to another bytes sink
    *
-   *  @param list The BytesList to write to
+   *  @param sink The BytesSink to write to
    */
-  public toBytesSink(list: BytesList): void {
-    list.put(this.toBytes())
+  public toBytesSink(sink: BytesSink): void {
+    this.bytesArray.forEach((buf) => sink.put(buf))
   }
 
   public toBytes(): Buffer {
@@ -50,10 +58,10 @@ class BytesList {
 /**
  * BinarySerializer is used to write fields and values to buffers
  */
-class BinarySerializer {
-  private sink: BytesList = new BytesList()
+class BinarySerializer implements BytesSink {
+  private readonly sink: BytesSink
 
-  constructor(sink: BytesList) {
+  constructor(sink: BytesSink) {
     this.sink = sink
   }
 
@@ -71,7 +79,7 @@ class BinarySerializer {
    *
    * @param bytes the bytes to write
    */
-  put(bytes: Buffer): void {
+  put(bytes: Uint8Array): void {
     this.sink.put(bytes)
   }
 
