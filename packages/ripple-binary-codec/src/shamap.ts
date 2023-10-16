@@ -193,12 +193,12 @@ class ShaMapInner extends ShaMapNode {
    */
   walkLeaves(onLeaf: (leaf: ShaMapLeaf) => void) {
     this.branches.forEach((b) => {
-      if (!b) {
-        /* empty branch */
-      } else if (b.isLeaf()) {
-        onLeaf(b)
-      } else if (b.isInner()) {
-        b.walkLeaves(onLeaf)
+      if (b) {
+        if (b.isLeaf()) {
+          onLeaf(b)
+        } else if (b.isInner()) {
+          b.walkLeaves(onLeaf)
+        }
       }
     })
   }
