@@ -26,7 +26,7 @@
     "bignumber.js": "^9.0.0",
     "bip32": "^2.0.6",
     "bip39": "^3.0.4",
-    "https-proxy-agent": "^5.0.0",
+    "https-proxy-agent": "^6.2.1",
     "lodash": "^4.17.4",
     "ripple-address-codec": "^4.3.1",
     "ripple-binary-codec": "^1.10.0",
