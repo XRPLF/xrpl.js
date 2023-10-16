@@ -1,4 +1,4 @@
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * A DepositPreauth object tracks a preauthorization from one account to
@@ -6,7 +6,9 @@ import BaseLedgerEntry from './BaseLedgerEntry'
  *
  * @category Ledger Entries
  */
-export default interface DepositPreauth extends BaseLedgerEntry {
+export default interface DepositPreauth
+  extends BaseLedgerEntry,
+    HasPreviousTxnID {
   LedgerEntryType: 'DepositPreauth'
   /** The account that granted the preauthorization. */
   Account: string
@@ -22,14 +24,4 @@ export default interface DepositPreauth extends BaseLedgerEntry {
    * object, in case the directory consists of multiple pages.
    */
   OwnerNode: string
-  /**
-   * The identifying hash of the transaction that most recently modified this
-   * object.
-   */
-  PreviousTxnID: string
-  /**
-   * The index of the ledger that contains the transaction that most recently
-   * modified this object.
-   */
-  PreviousTxnLgrSeq: number
 }
