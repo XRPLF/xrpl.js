@@ -32,7 +32,7 @@ void bridgeTransfer()
 async function bridgeTransfer(): Promise<void> {
   await lockingClient.connect()
   await issuingClient.connect()
-  const lockingChainDoor = 'rMAXACCrp3Y8PpswXcg3bKggHX76V3F8M4'
+  const lockingChainDoor = 'rNQQyL2bJqbtgP5zXHJyQXamtrKYpgsbzV'
 
   const accountObjectsRequest: AccountObjectsRequest = {
     command: 'account_objects',
@@ -70,6 +70,7 @@ async function bridgeTransfer(): Promise<void> {
       parseInt(bridgeData.MinAccountCreateAmount as string, 10) * 2
     ).toString(),
   }
+  console.log(fundTx)
   const fundResponse = await lockingClient.submitAndWait(fundTx, {
     wallet: wallet1,
   })
