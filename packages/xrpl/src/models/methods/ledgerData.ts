@@ -1,4 +1,4 @@
-import { LedgerEntry } from '../ledger'
+import { LedgerEntry, LedgerEntryFilter } from '../ledger'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
@@ -37,6 +37,10 @@ export interface LedgerDataRequest extends BaseRequest, LookupByLedgerRequest {
    * that response left off.
    */
   marker?: unknown
+  /**
+   * If included, filter results to include only this type of ledger object.
+   */
+  type?: LedgerEntryFilter
 }
 
 export type LedgerDataLabeledLedgerEntry = {

@@ -1,4 +1,4 @@
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 export interface NFToken {
   NFToken: {
@@ -10,11 +10,9 @@ export interface NFToken {
   }
 }
 
-export interface NFTokenPage extends BaseLedgerEntry {
+export interface NFTokenPage extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'NFTokenPage'
   NextPageMin?: string
   NFTokens: NFToken[]
   PreviousPageMin?: string
-  PreviousTxnID?: string
-  PreviousTxnLgrSeq?: number
 }

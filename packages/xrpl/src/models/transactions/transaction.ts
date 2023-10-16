@@ -20,6 +20,7 @@ import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
 import { isIssuedCurrency } from './common'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
+import { EnableAmendment } from './enableAmendment'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
@@ -53,10 +54,12 @@ import {
   PaymentChannelFund,
   validatePaymentChannelFund,
 } from './paymentChannelFund'
+import { SetFee } from './setFee'
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
+import { UNLModify } from './UNLModify'
 import {
   XChainAccountCreateCommit,
   validateXChainAccountCreateCommit,
@@ -127,6 +130,8 @@ export type Transaction =
   | XChainCreateClaimID
   | XChainAccountCreateCommit
   | XChainModifyBridge
+
+export type PseudoTransaction = EnableAmendment | SetFee | UNLModify
 
 /**
  * @category Transaction Models

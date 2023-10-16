@@ -1,4 +1,5 @@
 import { Ledger } from '../ledger'
+import { LedgerEntryFilter } from '../ledger/LedgerEntry'
 import { Transaction, TransactionAndMetadata } from '../transactions'
 import { TransactionMetadata } from '../transactions/metadata'
 
@@ -65,6 +66,10 @@ export interface LedgerRequest extends BaseRequest, LookupByLedgerRequest {
    * array of queued transactions in the results.
    */
   queue?: boolean
+  /**
+   * If included, filter results to include only this type of ledger object.
+   */
+  type?: LedgerEntryFilter
 }
 
 /**

@@ -6,6 +6,13 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Fixed
 * Allow flag maps when submitting `NFTokenMint` and `NFTokenCreateOffer` transactions like others with flags
+* Add pseudo transaction types to `tx` and `ledger` method responses.
+* Add missing `type` param to `ledger_data` and `ledger` requests
+* Type assertions around `PreviousTxnID` and `PreviousTxnLgrSeq` missing on some ledger objects
+
+### Updated
+* Make `LedgerEntryResponse` a generic so it can be used like `LedgerEntryResponse<Escrow>`
+* Clean up typing of `type` param and the response property `account_objects` of the `account_objects` request.
 
 ### Changed
 * Removed sidechain-devnet faucet support as it is being moved to Devnet
