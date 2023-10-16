@@ -75,15 +75,7 @@ function createWebSocket(
     }
   }
   const websocketOptions = { ...options }
-  const websocket = new WebSocket(url, websocketOptions)
-  /*
-   * we will have a listener for each outstanding request,
-   * so we have to raise the limit (the default is 10)
-   */
-  if (typeof websocket.setMaxListeners === 'function') {
-    websocket.setMaxListeners(Infinity)
-  }
-  return websocket
+  return new WebSocket(url, websocketOptions)
 }
 
 /**

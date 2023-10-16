@@ -16,7 +16,6 @@
   "dependencies": {
     "@xrplf/isomorphic": "file:packages/isomorphic",
     "@xrplf/secret-numbers": "file:packages/secret-numbers",
-    "eventemitter3": "^5.0.1",
     "ripple-address-codec": "file:packages/ripple-address-codec",
     "ripple-binary-codec": "file:packages/ripple-binary-codec",
     "ripple-keypairs": "file:packages/ripple-keypairs",

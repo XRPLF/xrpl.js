@@ -83,8 +83,8 @@ export function destroyMockRippled(server: MockedWebSocketServer): void {
 }
 
 export default function createMockRippled(port: number): MockedWebSocketServer {
+  Object.assign(WebSocketServer.prototype, EventEmitter.prototype)
   const mock = new WebSocketServer({ port }) as MockedWebSocketServer
-  Object.assign(mock, EventEmitter.prototype)
 
   mock.responses = {}
   mock.suppressOutput = false
