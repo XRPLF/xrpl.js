@@ -13,6 +13,12 @@
     "base-x": "^3.0.9",
     "create-hash": "^1.1.2"
   },
+  "keywords": [
+    "ripple",
+    "xrp",
+    "xrp ledger",
+    "xrpl"
+  ],
   "repository": {
     "type": "git",
     "url": "git@github.com:XRPLF/xrpl.js.git"

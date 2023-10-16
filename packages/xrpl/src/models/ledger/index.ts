@@ -15,7 +15,7 @@ import FeeSettings, {
   FEE_SETTINGS_ID,
 } from './FeeSettings'
 import Ledger from './Ledger'
-import LedgerEntry from './LedgerEntry'
+import { LedgerEntry, LedgerEntryFilter } from './LedgerEntry'
 import LedgerHashes from './LedgerHashes'
 import NegativeUNL, { NEGATIVE_UNL_ID } from './NegativeUNL'
 import { NFTokenOffer } from './NFTokenOffer'
@@ -45,6 +45,7 @@ export {
   FeeSettingsPreAmendmentFields,
   FeeSettingsPostAmendmentFields,
   Ledger,
+  LedgerEntryFilter,
   LedgerEntry,
   LedgerHashes,
   Majority,

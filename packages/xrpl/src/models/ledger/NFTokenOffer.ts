@@ -1,8 +1,8 @@
 import { Amount } from '../common'
 
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
-export interface NFTokenOffer extends BaseLedgerEntry {
+export interface NFTokenOffer extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'NFTokenOffer'
   Amount: Amount
   Destination?: string
@@ -11,6 +11,4 @@ export interface NFTokenOffer extends BaseLedgerEntry {
   NFTokenOfferNode?: string
   Owner: string
   OwnerNode?: string
-  PreviousTxnID: string
-  PreviousTxnLgrSeq: number
 }

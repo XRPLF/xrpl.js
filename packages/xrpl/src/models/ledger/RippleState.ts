@@ -1,13 +1,13 @@
 import { IssuedCurrencyAmount } from '../common'
 
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * The RippleState object type connects two accounts in a single currency.
  *
  * @category Ledger Entries
  */
-export default interface RippleState extends BaseLedgerEntry {
+export default interface RippleState extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'RippleState'
   /** A bit-map of boolean options enabled for this object. */
   Flags: number
@@ -27,16 +27,6 @@ export default interface RippleState extends BaseLedgerEntry {
    * the address of the high account that set this limit.
    */
   HighLimit: IssuedCurrencyAmount
-  /**
-   * The identifying hash of the transaction that most recently modified this
-   * object.
-   */
-  PreviousTxnID: string
-  /**
-   * The index of the ledger that contains the transaction that most recently
-   * modified this object.
-   */
-  PreviousTxnLgrSeq: number
   /**
    * A hint indicating which page of the low account's owner directory links to
    * this object, in case the directory consists of multiple pages.

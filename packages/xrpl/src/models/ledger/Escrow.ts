@@ -1,4 +1,4 @@
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * The Escrow object type represents a held payment of XRP waiting to be
@@ -6,7 +6,7 @@ import BaseLedgerEntry from './BaseLedgerEntry'
  *
  * @category Ledger Entries
  */
-export default interface Escrow extends BaseLedgerEntry {
+export default interface Escrow extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'Escrow'
   /**
    * The address of the owner (sender) of this held payment. This is the
@@ -61,14 +61,4 @@ export default interface Escrow extends BaseLedgerEntry {
    * this object, in case the directory consists of multiple pages.
    */
   DestinationNode?: string
-  /**
-   * The identifying hash of the transaction that most recently modified this
-   * object.
-   */
-  PreviousTxnID: string
-  /**
-   * The index of the ledger that contains the transaction that most recently
-   * modified this object.
-   */
-  PreviousTxnLgrSeq: number
 }

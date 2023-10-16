@@ -1,6 +1,6 @@
 import { Amount } from '../common'
 
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * A Check object describes a check, similar to a paper personal check, which
@@ -8,7 +8,7 @@ import BaseLedgerEntry from './BaseLedgerEntry'
  *
  * @category Ledger Entries
  */
-export default interface Check extends BaseLedgerEntry {
+export default interface Check extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'Check'
   /** The sender of the Check. Cashing the Check debits this address's balance. */
   Account: string

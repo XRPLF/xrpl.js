@@ -1,35 +1,12 @@
-import {
-  AMM,
-  Bridge,
-  Check,
-  DepositPreauth,
-  Escrow,
-  Offer,
-  PayChannel,
-  RippleState,
-  SignerList,
-  Ticket,
-  XChainOwnedClaimID,
-  XChainOwnedCreateAccountClaimID,
-} from '../ledger'
+import { Amendments, FeeSettings, LedgerHashes } from '../ledger'
+import { LedgerEntry, LedgerEntryFilter } from '../ledger/LedgerEntry'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
-export type AccountObjectType =
-  | 'amm'
-  | 'bridge'
-  | 'check'
-  | 'deposit_preauth'
-  | 'escrow'
-  | 'nft_offer'
-  | 'offer'
-  | 'payment_channel'
-  | 'signer_list'
-  | 'state'
-  | 'ticket'
-  | 'xchain_owned_create_account_claim_id'
-  | 'xchain_owned_claim_id'
-
+export type AccountObjectType = Exclude<
+  LedgerEntryFilter,
+  'amendments' | 'fee' | 'hashes'
+>
 /**
  * The account_objects command returns the raw ledger format for all objects
  * owned by an account. For a higher-level view of an account's trust lines and
@@ -46,8 +23,6 @@ export interface AccountObjectsRequest
   account: string
   /**
    * If included, filter results to include only this type of ledger object.
-   * The valid types are: Check , DepositPreauth, Escrow, Offer, PayChannel,
-   * SignerList, Ticket, and RippleState (trust line).
    */
   type?: AccountObjectType
   /**
@@ -71,19 +46,10 @@ export interface AccountObjectsRequest
  * Account Objects can be a Check, a DepositPreauth, an Escrow, an Offer, a
  * PayChannel, a SignerList, a Ticket, or a RippleState.
  */
-export type AccountObject =
-  | AMM
-  | Bridge
-  | Check
-  | DepositPreauth
-  | Escrow
-  | Offer
-  | PayChannel
-  | SignerList
-  | RippleState
-  | Ticket
-  | XChainOwnedClaimID
-  | XChainOwnedCreateAccountClaimID
+export type AccountObject = Exclude<
+  LedgerEntry,
+  Amendments | FeeSettings | LedgerHashes
+>
 
 /**
  * Response expected from an {@link AccountObjectsRequest}.

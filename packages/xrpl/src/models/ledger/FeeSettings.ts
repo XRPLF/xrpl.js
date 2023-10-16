@@ -1,4 +1,4 @@
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, MissingPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * The unique id for the FeeSettings object https://xrpl.org/feesettings.html#feesettings-id-format
@@ -26,7 +26,7 @@ export interface FeeSettingsPostAmendmentFields {
   ReserveIncrementDrops: string
 }
 
-export interface FeeSettingsBase extends BaseLedgerEntry {
+export interface FeeSettingsBase extends BaseLedgerEntry, MissingPreviousTxnID {
   LedgerEntryType: 'FeeSettings'
   /**
    * A bit-map of boolean flags for this object. No flags are defined for this type.

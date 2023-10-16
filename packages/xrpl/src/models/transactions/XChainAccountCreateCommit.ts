@@ -5,6 +5,7 @@ import {
   isAmount,
   isString,
   isXChainBridge,
+  isString,
   validateBaseTransaction,
   validateRequiredField,
 } from './common'
