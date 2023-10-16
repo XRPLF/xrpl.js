@@ -7,9 +7,11 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Fixed
 - Allow flag maps when submitting `NFTokenMint` and `NFTokenCreateOffer` transactions like others with flags
 - Add pseudo transaction types to `tx` and `ledger` methods responses.
+- Transaction fields that equate to an address no longer allow an empty string `''`. If you want to specify the genesis account you must manually specify `rrrrrrrrrrrrrrrrrrrrrhoLvTp`
 
 ### Updated
 - Make `LedgerEntryResponse` a generic so it can be used like `LedgerEntryResponse<Escrow>`
+- Error messages for fields that equate to an address, `DestinationTag`, or `NFTokenID`.  They will still be of type `ValidationError`.
 
 ## 2.12.0 (2023-09-27)
 ### Added
