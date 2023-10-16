@@ -22,7 +22,7 @@ async function sleep(sec: number): Promise<void> {
 
 const lockingClient = new Client('wss://s.devnet.rippletest.net:51233')
 const issuingClient = new Client(
-  'wss://sidechain-net2.devnet.rippletest.net:51233',
+  'wss://devnetsidechain2.devnet.rippletest.net:51233',
 )
 const MAX_LEDGERS_WAITED = 5
 const LEDGER_CLOSE_TIME = 4
