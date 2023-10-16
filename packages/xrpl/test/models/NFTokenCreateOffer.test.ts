@@ -36,7 +36,7 @@ describe('NFTokenCreateOffer', function () {
         tfSellNFToken: true,
       },
       Expiration: 1000,
-      Destination: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+      Destination: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Fee: '5000000',
       Sequence: 2470665,

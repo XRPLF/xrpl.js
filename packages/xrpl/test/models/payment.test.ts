@@ -139,6 +139,20 @@ describe('Payment', function () {
     )
   })
 
+  it(`throws when Destination is an empty string`, function () {
+    paymentTransaction.Destination = ''
+    assert.throws(
+      () => validatePayment(paymentTransaction),
+      ValidationError,
+      'Payment: invalid field Destination',
+    )
+    assert.throws(
+      () => validate(paymentTransaction),
+      ValidationError,
+      'Payment: invalid field Destination',
+    )
+  })
+
   it(`throws when DestinationTag is not a number`, function () {
     paymentTransaction.DestinationTag = '1'
     assert.throws(
