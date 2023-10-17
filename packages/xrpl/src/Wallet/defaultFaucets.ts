@@ -50,10 +50,6 @@ export function getFaucetHost(client: Client): FaucetNetwork | undefined {
     return FaucetNetwork.AMMDevnet
   }
 
-  if (connectionUrl.includes('sidechain-net1')) {
-    return FaucetNetwork.SidechainDevnet
-  }
-
   if (connectionUrl.includes('sidechain-net2')) {
     throw new XRPLFaucetError(
       'Cannot fund an account on an issuing chain. Accounts must be created via the bridge.',

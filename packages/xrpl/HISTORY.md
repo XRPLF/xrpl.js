@@ -16,6 +16,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Clean up typing of `type` param and the response property `account_objects` of the `account_objects` request.
 * Error messages for fields that equate to an address, `DestinationTag`, or `NFTokenID`.  They will still be of type `ValidationError`.
 
+### Changed
+* Removed sidechain-devnet faucet support as it is being moved to Devnet
+
 ## 2.12.0 (2023-09-27)
 ### Added
 * Added `ports` field to `ServerInfoResponse`
