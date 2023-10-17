@@ -1,3 +1,4 @@
+/* eslint-disable max-statements -- necessary for readibility */
 import { assert } from 'chai'
 import { AMMDeposit, AMMDepositFlags } from 'xrpl'
 
@@ -48,7 +49,7 @@ describe('AMMDeposit', function () {
     })
 
     const { amm } = ammInfoRes.result
-    const { amount, amount2 } = amm
+    const { amount, amount2, lp_token } = amm
 
     if (typeof amount !== 'string') {
       throw new Error('amount should be a string')
@@ -56,8 +57,25 @@ describe('AMMDeposit', function () {
     if (typeof preAmount !== 'string') {
       throw new Error('preAmount should be a string')
     }
-    assert.equal(parseInt(amount, 10) > parseInt(preAmount, 10), true)
-    assert.deepEqual(amount2, preAmount2)
+
+    const afterAmountDrops = parseInt(amount, 10)
+    const beforeAmountDrops = parseInt(preAmount, 10)
+    const diffAmountDrops = 1000
+    const expectedAmountDrops = beforeAmountDrops + diffAmountDrops
+
+    const afterAmount2 = amount2
+    const beforeAmount2 = preAmount2
+
+    const afterLPToken = lp_token
+    const beforeLPToken = preAmm.lp_token
+    const afterLPTokenValue = parseInt(afterLPToken.value, 10)
+    const beforeLPTokenValue = parseInt(beforeLPToken.value, 10)
+    const diffLPTokenValue = 191
+    const expectedLPTokenValue = beforeLPTokenValue + diffLPTokenValue
+
+    assert.equal(afterAmountDrops, expectedAmountDrops)
+    assert.deepEqual(afterAmount2, beforeAmount2)
+    assert.equal(afterLPTokenValue, expectedLPTokenValue)
   })
 
   it('deposit with Amount and Amount2', async function () {
@@ -99,7 +117,7 @@ describe('AMMDeposit', function () {
     })
 
     const { amm } = ammInfoRes.result
-    const { amount, amount2 } = amm
+    const { amount, amount2, lp_token } = amm
 
     if (typeof amount !== 'string') {
       throw new Error('amount should be a string')
@@ -107,18 +125,35 @@ describe('AMMDeposit', function () {
     if (typeof preAmount !== 'string') {
       throw new Error('preAmount should be a string')
     }
-    assert.equal(parseInt(amount, 10) > parseInt(preAmount, 10), true)
-
     if (typeof amount2 !== 'object') {
       throw new Error('amount2 should be an object')
     }
     if (typeof preAmount2 !== 'object') {
       throw new Error('preAmount2 should be an object')
     }
-    assert.equal(
-      parseInt(amount2.value, 10) > parseInt(preAmount2.value, 10),
-      true,
-    )
+
+    const afterAmountDrops = parseInt(amount, 10)
+    const beforeAmountDrops = parseInt(preAmount, 10)
+    const diffAmountDrops = 100
+    const expectedAmountDrops = beforeAmountDrops + diffAmountDrops
+
+    const afterAmount2 = amount2
+    const beforeAmount2 = preAmount2
+    const afterAmount2Value = parseInt(afterAmount2.value, 10)
+    const beforeAmount2Value = parseInt(beforeAmount2.value, 10)
+    const diffAmount2Value = 11
+    const expectedAmount2Value = beforeAmount2Value + diffAmount2Value
+
+    const afterLPToken = lp_token
+    const beforeLPToken = preAmm.lp_token
+    const afterLPTokenValue = parseInt(afterLPToken.value, 10)
+    const beforeLPTokenValue = parseInt(beforeLPToken.value, 10)
+    const diffLPTokenValue = 34
+    const expectedLPTokenValue = beforeLPTokenValue + diffLPTokenValue
+
+    assert.equal(afterAmountDrops, expectedAmountDrops)
+    assert.equal(afterAmount2Value, expectedAmount2Value)
+    assert.equal(afterLPTokenValue, expectedLPTokenValue)
   })
 
   it('deposit with Amount and LPTokenOut', async function () {
@@ -165,20 +200,31 @@ describe('AMMDeposit', function () {
     if (typeof preAmount !== 'string') {
       throw new Error('preAmount should be a string')
     }
-    assert.equal(parseInt(amount, 10) > parseInt(preAmount, 10), true)
-
     if (typeof amount2 !== 'object') {
       throw new Error('amount2 should be an object')
     }
     if (typeof preAmount2 !== 'object') {
       throw new Error('preAmount2 should be an object')
     }
-    assert.deepEqual(amount2, preAmount2)
 
-    assert.equal(
-      parseInt(lp_token.value, 10) > parseInt(preLPToken.value, 10),
-      true,
-    )
+    const afterAmountDrops = parseInt(amount, 10)
+    const beforeAmountDrops = parseInt(preAmount, 10)
+    const diffAmountDrops = 30
+    const expectedAmountDrops = beforeAmountDrops + diffAmountDrops
+
+    const afterAmount2 = amount2
+    const beforeAmount2 = preAmount2
+
+    const afterLPToken = lp_token
+    const beforeLPToken = preLPToken
+    const afterLPTokenValue = parseInt(afterLPToken.value, 10)
+    const beforeLPTokenValue = parseInt(beforeLPToken.value, 10)
+    const diffLPTokenValue = 5
+    const expectedLPTokenValue = beforeLPTokenValue + diffLPTokenValue
+
+    assert.equal(afterAmountDrops, expectedAmountDrops)
+    assert.deepEqual(afterAmount2, beforeAmount2)
+    assert.equal(afterLPTokenValue, expectedLPTokenValue)
   })
 
   it('deposit with LPTokenOut', async function () {
@@ -224,22 +270,34 @@ describe('AMMDeposit', function () {
     if (typeof preAmount !== 'string') {
       throw new Error('preAmount should be a string')
     }
-    assert.equal(parseInt(amount, 10) > parseInt(preAmount, 10), true)
-
     if (typeof amount2 !== 'object') {
       throw new Error('amount2 should be an object')
     }
     if (typeof preAmount2 !== 'object') {
       throw new Error('preAmount2 should be an object')
     }
-    assert.deepEqual(
-      parseInt(amount2.value, 10) > parseInt(preAmount2.value, 10),
-      true,
-    )
 
-    assert.equal(
-      parseInt(lp_token.value, 10) > parseInt(preLPToken.value, 10),
-      true,
-    )
+    const afterAmountDrops = parseInt(amount, 10)
+    const beforeAmountDrops = parseInt(preAmount, 10)
+    const diffAmountDrops = 15
+    const expectedAmountDrops = beforeAmountDrops + diffAmountDrops
+
+    const afterAmount2 = amount2
+    const beforeAmount2 = preAmount2
+    const afterAmount2Value = parseInt(afterAmount2.value, 10)
+    const beforeAmount2Value = parseInt(beforeAmount2.value, 10)
+    const diffAmount2Value = 1
+    const expectedAmount2Value = beforeAmount2Value + diffAmount2Value
+
+    const afterLPToken = lp_token
+    const beforeLPToken = preLPToken
+    const afterLPTokenValue = parseInt(afterLPToken.value, 10)
+    const beforeLPTokenValue = parseInt(beforeLPToken.value, 10)
+    const diffLPTokenValue = 5
+    const expectedLPTokenValue = beforeLPTokenValue + diffLPTokenValue
+
+    assert.equal(afterAmountDrops, expectedAmountDrops)
+    assert.equal(afterAmount2Value, expectedAmount2Value)
+    assert.equal(afterLPTokenValue, expectedLPTokenValue)
   })
 })

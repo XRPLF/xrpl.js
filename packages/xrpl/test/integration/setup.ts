@@ -13,15 +13,17 @@ import {
 } from '../../src'
 
 import serverUrl from './serverUrl'
-import {
-  SetupAMMPool,
-  fundAccount,
-  generateFundedWallet,
-  testTransaction,
-} from './utils'
+import { fundAccount, generateFundedWallet, testTransaction } from './utils'
+
+export interface AMMPool {
+  issuerWallet: Wallet
+  lpWallet: Wallet
+  asset: Currency
+  asset2: Currency
+}
 
 export interface XrplIntegrationTestContext {
-  amm: SetupAMMPool
+  amm: AMMPool
   client: Client
   wallet: Wallet
 }
@@ -66,10 +68,7 @@ export async function setupClient(
   })
 }
 
-async function setupAMMPool(
-  client: Client,
-  wallet: Wallet,
-): Promise<SetupAMMPool> {
+async function setupAMMPool(client: Client, wallet: Wallet): Promise<AMMPool> {
   const lpWallet = await generateFundedWallet(client)
   const issuerWallet = await generateFundedWallet(client)
   const currencyCode = 'USD'

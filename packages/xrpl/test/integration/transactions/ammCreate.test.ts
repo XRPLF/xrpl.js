@@ -31,7 +31,7 @@ describe('AMMCreate', function () {
     }
 
     assert.isTrue(isValidClassicAddress(amm.account))
-    assert.equal(amm.amount, '250')
+    assert.equal(amm.amount, '1250')
     assert.deepEqual(amm.amount2, {
       currency: asset2.currency,
       issuer: asset2.issuer,

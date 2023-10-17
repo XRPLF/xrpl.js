@@ -10,20 +10,12 @@ import {
   type SubmitResponse,
   TimeoutError,
   NotConnectedError,
-  Currency,
 } from '../../src'
 import { Payment, Transaction } from '../../src/models/transactions'
 import { hashSignedTx } from '../../src/utils/hashes'
 
 const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
-
-export interface SetupAMMPool {
-  issuerWallet: Wallet
-  lpWallet: Wallet
-  asset: Currency
-  asset2: Currency
-}
 
 export async function sendLedgerAccept(client: Client): Promise<unknown> {
   return client.connection.request({ command: 'ledger_accept' })
@@ -346,13 +338,3 @@ export async function waitForAndForceProgressLedgerTime(
 
   throw new Error(`Ledger time not reached after ${retries} retries.`)
 }
-
-/**
- * Sets up an AMM pool for integration testing.
- *
- * @param client - The client object.
- * @param lpWallet - The liquidity provider wallet that creates the AMM pool.
- * @param issuerWallet - The issuer wallet of the new token (using currencyCode) to be as asset in the AMM pool.
- * @param currencyCode - The currency code of the new token to be an asset in the AMM pool.
- * @returns - A promise that resolves to the amm_info response of the AMM pool.
- */

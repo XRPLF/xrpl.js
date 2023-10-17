@@ -55,8 +55,19 @@ describe('AMMBid', function () {
     if (auction_slot === undefined) {
       throw new Error('auction_slot should not be undefined')
     }
-    assert.equal(auction_slot.price.value > preAuctionSlot.price.value, true)
-    assert.equal(lp_token.value < preLPToken.value, true)
+
+    const afterPriceValue = parseFloat(auction_slot.price.value)
+    const beforePriceValue = parseFloat(preAuctionSlot.price.value)
+    const diffPriceValue = 0.00268319257224121
+    const expectedPriceValue = beforePriceValue + diffPriceValue
+
+    const afterLPTokenValue = parseFloat(lp_token.value)
+    const beforeLPTokenValue = parseFloat(preLPToken.value)
+    const diffLPTokenValue = -0.0026831925721
+    const expectedLPTokenValue = beforeLPTokenValue + diffLPTokenValue
+
+    assert.equal(afterPriceValue, expectedPriceValue)
+    assert.equal(afterLPTokenValue, expectedLPTokenValue)
   })
 
   it('vote with AuthAccounts, BidMin, BidMax', async function () {
@@ -105,8 +116,19 @@ describe('AMMBid', function () {
     if (auction_slot === undefined) {
       throw new Error('auction_slot should not be undefined')
     }
-    assert.equal(auction_slot.price.value > preAuctionSlot.price.value, true)
-    assert.equal(lp_token.value < preLPToken.value, true)
+
+    const afterPriceValue = parseFloat(auction_slot.price.value)
+    const beforePriceValue = parseFloat(preAuctionSlot.price.value)
+    const diffPriceValue = 4.997316807427759
+    const expectedPriceValue = beforePriceValue + diffPriceValue
+
+    const afterLPTokenValue = parseFloat(lp_token.value)
+    const beforeLPTokenValue = parseFloat(preLPToken.value)
+    const diffLPTokenValue = -4.9974509670563
+    const expectedLPTokenValue = beforeLPTokenValue + diffLPTokenValue
+
+    assert.equal(afterPriceValue, expectedPriceValue)
+    assert.equal(afterLPTokenValue, expectedLPTokenValue)
     assert.deepEqual(auction_slot.auth_accounts, [
       {
         account: issuerWallet.classicAddress,

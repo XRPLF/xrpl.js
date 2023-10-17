@@ -1,3 +1,4 @@
+/* eslint-disable max-statements -- necessary for readibility */
 import { assert } from 'chai'
 import { AMMVote } from 'xrpl'
 
@@ -61,17 +62,27 @@ describe('AMMVote', function () {
     const { amm } = ammInfoRes.result
     const { auction_slot, trading_fee, vote_slots } = amm
 
-    assert.equal(trading_fee > preTradingFee, true)
-
     if (auction_slot === undefined) {
       throw new Error('auction_slot should not be undefined')
     }
     const { discounted_fee } = auction_slot
-    assert.equal(discounted_fee > preDiscountedFee, true)
 
     if (vote_slots === undefined) {
       throw new Error('vote_slots should not be undefined')
     }
+
+    const afterTradingFee = trading_fee
+    const beforeTradingFee = preTradingFee
+    const diffTradingFee = 76
+    const expectedTradingFee = beforeTradingFee + diffTradingFee
+
+    const afterDiscountedFee = discounted_fee
+    const beforeDiscountedFee = preDiscountedFee
+    const diffDiscountedFee = 7
+    const expectedDiscountedFee = beforeDiscountedFee + diffDiscountedFee
+
+    assert.equal(afterTradingFee, expectedTradingFee)
+    assert.equal(afterDiscountedFee, expectedDiscountedFee)
     assert.equal(vote_slots.length - preVoteSlots.length, 1)
   })
 })
