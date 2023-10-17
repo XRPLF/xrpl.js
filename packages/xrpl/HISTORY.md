@@ -9,7 +9,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add pseudo transaction types to `tx` and `ledger` method responses.
 * Add missing `type` param to `ledger_data` and `ledger` requests
 * Type assertions around `PreviousTxnID` and `PreviousTxnLgrSeq` missing on some ledger objects
-* Transaction fields that equate to an address no longer allow an empty string `''`. If you want to specify the genesis account you must manually specify `rrrrrrrrrrrrrrrrrrrrrhoLvTp`
+* Transaction fields that represent an address no longer allow an empty string (`''`). If you want to specify [ACCOUNT_ZERO](https://xrpl.org/addresses.html#special-addresses), you can specify `rrrrrrrrrrrrrrrrrrrrrhoLvTp`. ⚠️ **WARNING:** `rrrrrrrrrrrrrrrrrrrrrhoLvTp` is a black hole address, with no corresponding private key. Accounts/funds controlled by this address are not accessible.
 
 ### Updated
 * Make `LedgerEntryResponse` a generic so it can be used like `LedgerEntryResponse<Escrow>`
