@@ -14,6 +14,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Make `LedgerEntryResponse` a generic so it can be used like `LedgerEntryResponse<Escrow>`
 * Clean up typing of `type` param and the response property `account_objects` of the `account_objects` request.
 
+### Changed
+* Removed sidechain-devnet faucet support as it is being moved to Devnet
+
 ## 2.12.0 (2023-09-27)
 ### Added
 * Added `ports` field to `ServerInfoResponse`
