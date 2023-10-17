@@ -1,8 +1,8 @@
 import { Amount } from '../common'
 
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
-export default interface Offer extends BaseLedgerEntry {
+export default interface Offer extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'Offer'
   /** A bit-map of boolean flags enabled for this Offer. */
   Flags: number
@@ -32,16 +32,6 @@ export default interface Offer extends BaseLedgerEntry {
    * in case the directory consists of multiple pages.
    */
   OwnerNode: string
-  /**
-   * The identifying hash of the transaction that most recently modified this
-   * object.
-   */
-  PreviousTxnID: string
-  /**
-   * The index of the ledger that contains the transaction that most recently
-   * modified this object.
-   */
-  PreviousTxnLgrSeq: number
   /** The time this Offer expires, in seconds since the Ripple Epoch. */
   Expiration?: number
 }

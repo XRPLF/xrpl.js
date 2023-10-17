@@ -37,4 +37,25 @@ type LedgerEntry =
   | XChainOwnedClaimID
   | XChainOwnedCreateAccountClaimID
 
-export default LedgerEntry
+type LedgerEntryFilter =
+  | 'account'
+  | 'amendments'
+  | 'amm'
+  | 'bridge'
+  | 'check'
+  | 'deposit_preauth'
+  | 'directory'
+  | 'escrow'
+  | 'fee'
+  | 'hashes'
+  | 'nft_offer'
+  | 'nft_page'
+  | 'offer'
+  | 'payment_channel'
+  | 'signer_list'
+  | 'state'
+  | 'ticket'
+  | 'xchain_owned_create_account_claim_id'
+  | 'xchain_owned_claim_id'
+
+export { LedgerEntry, LedgerEntryFilter }

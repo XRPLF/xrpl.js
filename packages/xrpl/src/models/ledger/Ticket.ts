@@ -1,4 +1,4 @@
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * The Ticket object type represents a Ticket, which tracks an account sequence
@@ -7,7 +7,7 @@ import BaseLedgerEntry from './BaseLedgerEntry'
  *
  * @category Ledger Entries
  */
-export default interface Ticket extends BaseLedgerEntry {
+export default interface Ticket extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'Ticket'
   /** The account that owns this Ticket. */
   Account: string
@@ -21,16 +21,6 @@ export default interface Ticket extends BaseLedgerEntry {
    * in case the directory consists of multiple pages.
    */
   OwnerNode: string
-  /**
-   * The identifying hash of the transaction that most recently modified this
-   * object.
-   */
-  PreviousTxnID: string
-  /**
-   * The index of the ledger that contains the transaction that most recently
-   * modified this object.
-   */
-  PreviousTxnLgrSeq: number
   /** The Sequence Number this Ticket sets aside. */
   TicketSequence: number
 }
