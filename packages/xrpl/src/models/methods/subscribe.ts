@@ -435,7 +435,19 @@ export type Stream =
   | OrderBookStream
   | ConsensusStream
 
-export type OnEventToListenerMap<T> = T extends 'connected'
+export type EventTypes =
+  | 'connected'
+  | 'disconnected'
+  | 'ledgerClosed'
+  | 'validationReceived'
+  | 'transaction'
+  | 'peerStatusChange'
+  | 'consensusPhase'
+  | 'manifestReceived'
+  | 'path_find'
+  | 'error'
+
+export type OnEventToListenerMap<T extends EventTypes> = T extends 'connected'
   ? () => void
   : T extends 'disconnected'
   ? (code: number) => void
@@ -456,7 +468,4 @@ export type OnEventToListenerMap<T> = T extends 'connected'
   : T extends 'error'
   ? // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
     (...err: any[]) => void
-  : T extends string
-  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
-    (...args: any[]) => void
-  : never
+  : (...args: never[]) => void
