@@ -1,6 +1,7 @@
 import { ValidationError } from '../../errors'
 
 import {
+  Account,
   BaseTransaction,
   isAccount,
   isNumber,
@@ -23,7 +24,7 @@ export interface EscrowCreate extends BaseTransaction {
    */
   Amount: string
   /** Address to receive escrowed XRP. */
-  Destination: string
+  Destination: Account
   /**
    * The time, in seconds since the Ripple Epoch, when this escrow expires.
    * This value is immutable; the funds can only be returned the sender after.

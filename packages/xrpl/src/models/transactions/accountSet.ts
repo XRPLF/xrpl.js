@@ -1,6 +1,7 @@
 import { ValidationError } from '../../errors'
 
 import {
+  Account,
   BaseTransaction,
   isAccount,
   validateBaseTransaction,
@@ -158,7 +159,7 @@ export interface AccountSet extends BaseTransaction {
    * Sets an alternate account that is allowed to mint NFTokens on this
    * account's behalf using NFTokenMint's `Issuer` field.
    */
-  NFTokenMinter?: string
+  NFTokenMinter?: Account
 }
 
 const MIN_TICK_SIZE = 3

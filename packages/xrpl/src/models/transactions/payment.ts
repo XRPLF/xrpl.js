@@ -11,6 +11,7 @@ import {
   validateRequiredField,
   validateOptionalField,
   isNumber,
+  Account,
 } from './common'
 
 /**
@@ -116,7 +117,7 @@ export interface Payment extends BaseTransaction {
    */
   Amount: Amount
   /** The unique address of the account receiving the payment. */
-  Destination: string
+  Destination: Account
   /**
    * Arbitrary tag that identifies the reason for the payment to the
    * destination, or a hosted recipient to pay.

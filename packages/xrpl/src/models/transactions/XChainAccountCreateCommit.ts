@@ -7,6 +7,7 @@ import {
   validateBaseTransaction,
   validateRequiredField,
   isAccount,
+  Account,
 } from './common'
 
 /**
@@ -38,7 +39,7 @@ export interface XChainAccountCreateCommit extends BaseTransaction {
   /**
    * The destination account on the destination chain.
    */
-  Destination: string
+  Destination: Account
 
   /**
    * The amount, in XRP, to use for account creation. This must be greater than or

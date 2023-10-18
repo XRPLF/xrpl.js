@@ -1,6 +1,7 @@
 import { Amount, XChainBridge } from '../common'
 
 import {
+  Account,
   BaseTransaction,
   isAccount,
   isAmount,
@@ -33,7 +34,7 @@ export interface XChainCreateClaimID extends BaseTransaction {
   /**
    * The account that must send the {@link XChainCommit} transaction on the source chain.
    */
-  OtherChainSource: string
+  OtherChainSource: Account
 }
 
 /**

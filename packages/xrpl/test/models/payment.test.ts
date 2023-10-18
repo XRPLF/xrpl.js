@@ -139,6 +139,13 @@ describe('Payment', function () {
     )
   })
 
+  it(`does not throw when Destination is a valid x-address`, function () {
+    paymentTransaction.Destination =
+      'X7WZKEeNVS2p9Tire9DtNFkzWBZbFtSiS2eDBib7svZXuc2'
+    assert.doesNotThrow(() => validatePayment(paymentTransaction))
+    assert.doesNotThrow(() => validate(paymentTransaction))
+  })
+
   it(`throws when Destination is an empty string`, function () {
     paymentTransaction.Destination = ''
     assert.throws(

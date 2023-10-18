@@ -1,6 +1,7 @@
 import { Amount, XChainBridge } from '../common'
 
 import {
+  Account,
   BaseTransaction,
   isAccount,
   isAmount,
@@ -42,7 +43,7 @@ export interface XChainCommit extends BaseTransaction {
    * destination chain will need to submit a {@link XChainClaim} transaction to
    * claim the funds.
    */
-  OtherChainDestination?: string
+  OtherChainDestination?: Account
 
   /**
    * The asset to commit, and the quantity. This must match the door account's

@@ -1,4 +1,5 @@
 import {
+  Account,
   BaseTransaction,
   isAccount,
   isString,
@@ -25,7 +26,7 @@ export interface NFTokenBurn extends BaseTransaction {
    * in the NFToken, either the issuer account or an account authorized by the
    * issuer, i.e. MintAccount.
    */
-  Account: string
+  Account: Account
   /**
    * Identifies the NFToken object to be removed by the transaction.
    */
@@ -35,7 +36,7 @@ export interface NFTokenBurn extends BaseTransaction {
    * Account. Only used to burn tokens which have the lsfBurnable flag enabled
    * and are not owned by the signing account.
    */
-  Owner?: string
+  Owner?: Account
 }
 
 /**

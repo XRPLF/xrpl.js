@@ -2,6 +2,7 @@ import { ValidationError } from '../../errors'
 import { isHex } from '../utils'
 
 import {
+  Account,
   BaseTransaction,
   GlobalFlags,
   isAccount,
@@ -74,7 +75,7 @@ export interface NFTokenMint extends BaseTransaction {
    * present, the `MintAccount` field in the `AccountRoot` of the `Issuer`
    * field must match the `Account`, otherwise the transaction will fail.
    */
-  Issuer?: string
+  Issuer?: Account
   /**
    * Specifies the fee charged by the issuer for secondary sales of the Token,
    * if such sales are allowed. Valid values for this field are between 0 and

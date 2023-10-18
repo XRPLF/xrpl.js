@@ -1,6 +1,7 @@
 import { ValidationError } from '../../errors'
 
 import {
+  Account,
   BaseTransaction,
   isAccount,
   isNumber,
@@ -28,7 +29,7 @@ export interface PaymentChannelCreate extends BaseTransaction {
    * Address to receive XRP claims against this channel. This is also known as
    * the "destination address" for the channel.
    */
-  Destination: string
+  Destination: Account
   /**
    * Amount of time the source address must wait before closing the channel if
    * it has unclaimed XRP.

@@ -1,6 +1,7 @@
 import { Amount, XChainBridge } from '../common'
 
 import {
+  Account,
   BaseTransaction,
   isAccount,
   isAmount,
@@ -30,23 +31,23 @@ export interface XChainAddAccountCreateAttestation extends BaseTransaction {
   /**
    * The account that should receive this signer's share of the SignatureReward.
    */
-  AttestationRewardAccount: string
+  AttestationRewardAccount: Account
 
   /**
    * The account on the door account's signer list that is signing the transaction.
    */
-  AttestationSignerAccount: string
+  AttestationSignerAccount: Account
 
   /**
    * The destination account for the funds on the destination chain.
    */
-  Destination: string
+  Destination: Account
 
   /**
    * The account on the source chain that submitted the {@link XChainAccountCreateCommit}
    * transaction that triggered the event associated with the attestation.
    */
-  OtherChainSource: string
+  OtherChainSource: Account
 
   /**
    * The public key used to verify the signature.

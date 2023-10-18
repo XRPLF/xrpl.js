@@ -1,6 +1,7 @@
 import { ValidationError } from '../../errors'
 
 import {
+  Account,
   BaseTransaction,
   isAccount,
   validateBaseTransaction,
@@ -15,7 +16,7 @@ import {
 export interface EscrowFinish extends BaseTransaction {
   TransactionType: 'EscrowFinish'
   /** Address of the source account that funded the held payment. */
-  Owner: string
+  Owner: Account
   /**
    * Transaction sequence of EscrowCreate transaction that created the held.
    * payment to finish.

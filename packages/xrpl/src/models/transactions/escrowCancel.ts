@@ -1,6 +1,7 @@
 import { ValidationError } from '../../errors'
 
 import {
+  Account,
   BaseTransaction,
   isAccount,
   validateBaseTransaction,
@@ -15,7 +16,7 @@ import {
 export interface EscrowCancel extends BaseTransaction {
   TransactionType: 'EscrowCancel'
   /** Address of the source account that funded the escrow payment. */
-  Owner: string
+  Owner: Account
   /**
    * Transaction sequence (or Ticket  number) of EscrowCreate transaction that.
    * created the escrow to cancel.

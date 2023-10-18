@@ -1,4 +1,4 @@
-import { isValidClassicAddress } from 'ripple-address-codec'
+import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
@@ -120,13 +120,21 @@ export function isIssuedCurrency(
 }
 
 /**
- * Verify a string is in fact a valid account.
+ * Must be a valid account address
+ */
+export type Account = string
+
+/**
+ * Verify a string is in fact a valid account address.
  *
  * @param account - The object to check the form and type of.
  * @returns Whether the account is properly formed account for a transaction.
  */
-export function isAccount(account: unknown): boolean {
-  return typeof account === 'string' && isValidClassicAddress(account)
+export function isAccount(account: unknown): account is Account {
+  return (
+    typeof account === 'string' &&
+    (isValidClassicAddress(account) || isValidXAddress(account))
+  )
 }
 
 /**
@@ -214,7 +222,7 @@ export interface GlobalFlags {}
  */
 export interface BaseTransaction {
   /** The unique address of the transaction sender. */
-  Account: string
+  Account: Account
   /**
    * The type of transaction. Valid types include: `Payment`, `OfferCreate`,
    * `TrustSet`, and many others.

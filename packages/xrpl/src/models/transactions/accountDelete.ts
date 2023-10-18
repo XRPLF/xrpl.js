@@ -1,4 +1,5 @@
 import {
+  Account,
   BaseTransaction,
   isAccount,
   isNumber,
@@ -21,7 +22,7 @@ export interface AccountDelete extends BaseTransaction {
    * sending account. Must be a funded account in the ledger, and must not be.
    * the sending account.
    */
-  Destination: string
+  Destination: Account
   /**
    * Arbitrary destination tag that identifies a hosted recipient or other.
    * information for the recipient of the deleted account's leftover XRP.

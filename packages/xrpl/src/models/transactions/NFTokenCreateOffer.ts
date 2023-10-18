@@ -10,6 +10,7 @@ import {
   parseAmountValue,
   isAccount,
   validateOptionalField,
+  Account,
 } from './common'
 
 /**
@@ -69,7 +70,7 @@ export interface NFTokenCreateOffer extends BaseTransaction {
    * (since an offer to sell a token one doesn't already hold
    * is meaningless).
    */
-  Owner?: string
+  Owner?: Account
   /**
    * Indicates the time after which the offer will no longer
    * be valid. The value is the number of seconds since the
@@ -81,7 +82,7 @@ export interface NFTokenCreateOffer extends BaseTransaction {
    * accepted by the specified account. Attempts by other
    * accounts to accept this offer MUST fail.
    */
-  Destination?: string
+  Destination?: Account
   Flags?: number | NFTokenCreateOfferFlagsInterface
 }
 
