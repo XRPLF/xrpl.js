@@ -38,12 +38,12 @@ describe('EscrowCancel', function () {
     assert.throws(
       () => validateEscrowCancel(cancel),
       ValidationError,
-      'EscrowCancel: missing Owner',
+      'EscrowCancel: missing field Owner',
     )
     assert.throws(
       () => validate(cancel),
       ValidationError,
-      'EscrowCancel: missing Owner',
+      'EscrowCancel: missing field Owner',
     )
   })
 
@@ -68,12 +68,12 @@ describe('EscrowCancel', function () {
     assert.throws(
       () => validateEscrowCancel(cancel),
       ValidationError,
-      'EscrowCancel: Owner must be a string',
+      'EscrowCancel: invalid field Owner',
     )
     assert.throws(
       () => validate(cancel),
       ValidationError,
-      'EscrowCancel: Owner must be a string',
+      'EscrowCancel: invalid field Owner',
     )
   })
 

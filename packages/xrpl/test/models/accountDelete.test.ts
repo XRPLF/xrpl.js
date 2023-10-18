@@ -58,12 +58,12 @@ describe('AccountDelete', function () {
     assert.throws(
       () => validateAccountDelete(invalidDestination),
       ValidationError,
-      'AccountDelete: invalid Destination',
+      'AccountDelete: invalid field Destination',
     )
     assert.throws(
       () => validate(invalidDestination),
       ValidationError,
-      'AccountDelete: invalid Destination',
+      'AccountDelete: invalid field Destination',
     )
   })
 
@@ -81,13 +81,13 @@ describe('AccountDelete', function () {
     assert.throws(
       () => validateAccountDelete(invalidDestinationTag),
       ValidationError,
-      'AccountDelete: invalid DestinationTag',
+      'AccountDelete: invalid field DestinationTag',
     )
 
     assert.throws(
       () => validate(invalidDestinationTag),
       ValidationError,
-      'AccountDelete: invalid DestinationTag',
+      'AccountDelete: invalid field DestinationTag',
     )
   })
 })
