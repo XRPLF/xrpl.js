@@ -62,6 +62,7 @@
     "watch": "run-s build:lib --watch",
     "clean": "rm -rf dist build coverage",
     "docgen": "tsc --build tsconfig.docs.json && typedoc && echo js.xrpl.org >> ../../docs/CNAME",
+    "prepare": "copyfiles ../../README.md xrpl/README.md",
     "prepublish": "run-s clean build",
     "test": "jest --config=jest.config.unit.js --verbose false --silent=false",
     "test:integration": "TS_NODE_PROJECT=tsconfig.build.json jest --config=jest.config.integration.js --verbose false --silent=false --runInBand",
