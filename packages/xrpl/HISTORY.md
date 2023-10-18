@@ -4,6 +4,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+## 2.13.0 (2023-10-18)
+
 ### Fixed
 * Allow flag maps when submitting `NFTokenMint` and `NFTokenCreateOffer` transactions like others with flags
 * Add pseudo transaction types to `tx` and `ledger` method responses.
@@ -12,13 +14,11 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Transaction fields that represent an address no longer allow an empty string (`''`). If you want to specify [ACCOUNT_ZERO](https://xrpl.org/addresses.html#special-addresses), you can specify `rrrrrrrrrrrrrrrrrrrrrhoLvTp`. ⚠️ **WARNING:** `rrrrrrrrrrrrrrrrrrrrrhoLvTp` is a black hole address, with no corresponding private key. Accounts/funds controlled by this address are not accessible.
 * Invalid addresses on a transaction now throws a `ValidationError` when submitting a transaction instead of `Error('checksum_invalid')`
 
-### Updated
+### Changed
 * Make `LedgerEntryResponse` a generic so it can be used like `LedgerEntryResponse<Escrow>`
 * Clean up typing of `type` param and the response property `account_objects` of the `account_objects` request.
 * Error messages for fields that equate to an address, `DestinationTag`, or `NFTokenID`.  They will still be of type `ValidationError`.
 * Add alias type of `Account` to improve intellisense for Transaction fields that equate to an address.
-
-### Changed
 * Removed sidechain-devnet faucet support as it is being moved to Devnet
 
 ## 2.12.0 (2023-09-27)
