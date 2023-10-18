@@ -3,8 +3,6 @@ const path = require('path')
 const createValidate = require('./createValidate')
 const createValidateTests = require('./createValidateTests')
 
-const folder = '../rippled-all/did'
-
 function readFile(filename) {
   return fs.readFileSync(filename, 'utf-8')
 }
@@ -44,8 +42,8 @@ function processRippledSource(folder) {
       '../src/models/transactions/transaction.ts',
     ),
   )
-  let transactionMatch = jsTransactionFile.match(
-    /export type Transaction =([| \nA-Za-z]+)/,
+  const transactionMatch = jsTransactionFile.match(
+    /export type Transaction =([| \nA-Za-z]+)\nexport/,
   )[0]
   const existingLibraryTxs = transactionMatch
     .split('\n  | ')
@@ -60,6 +58,8 @@ function processRippledSource(folder) {
       txsToAdd.push(tx)
     }
   }
+
+  return [txsToAdd, txFormats, sfields, transactionMatch]
 }
 
 function formatTxFormat(rawTxFormat) {
@@ -91,7 +91,7 @@ const typeMap = {
 const allCommonImports = ['Amount', 'Currency', 'Path', 'XChainBridge']
 const additionalValidationImports = ['string', 'number']
 
-function updateTransactionFile(tx) {
+function updateTransactionFile(transactionMatch, tx) {
   const transactionMatchSplit = transactionMatch.split('\n  | ')
   const firstLine = transactionMatchSplit[0]
   const allTransactions = transactionMatchSplit.slice(1)
@@ -158,20 +158,24 @@ export { ${tx} } from './${tx}'`,
   fs.writeFileSync(filename, indexFile)
 }
 
-function generateParamLine(param, isRequired) {
+function generateParamLine(sfields, param, isRequired) {
   const paramName = param.slice(2)
   const paramType = sfields[paramName][0]
   const paramTypeOutput = typeMap[paramType]
   return `  ${paramName}${isRequired ? '' : '?'}: ${paramTypeOutput}\n`
 }
 
-async function main(txsToAdd) {
+async function main(folder) {
+  const [txsToAdd, txFormats, sfields, transactionMatch] =
+    processRippledSource(folder)
   txsToAdd.forEach(async (tx) => {
     const txFormat = txFormats[tx]
     const paramLines = txFormat
       .filter((param) => param[0] !== '')
       .sort((a, b) => a[0].localeCompare(b[0]))
-      .map((param) => generateParamLine(param[0], param[1] === 'soeREQUIRED'))
+      .map((param) =>
+        generateParamLine(sfields, param[0], param[1] === 'soeREQUIRED'),
+      )
     paramLines.sort((a, b) => !a.includes('REQUIRED'))
     const params = paramLines.join('\n')
     let model = `/**
@@ -241,7 +245,7 @@ ${validationImportLine}`
       validateTests,
     )
 
-    updateTransactionFile(tx)
+    updateTransactionFile(transactionMatch, tx)
 
     updateIndexFile(tx)
 
@@ -250,5 +254,5 @@ ${validationImportLine}`
 }
 
 if (require.main === module) {
-  main()
+  main(process.argv[2])
 }
