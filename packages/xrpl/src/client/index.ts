@@ -1,7 +1,7 @@
 /* eslint-disable jsdoc/require-jsdoc -- Request has many aliases, but they don't need unique docs */
 
 /* eslint-disable max-lines -- Client is a large file w/ lots of imports/exports */
-import { EventEmitter } from 'events'
+import { EventEmitter } from 'eventemitter3'
 
 import {
   RippledError,
@@ -37,7 +37,10 @@ import type {
   SubmitResponse,
 } from '../models/methods'
 import type { BookOffer, BookOfferCurrency } from '../models/methods/bookOffers'
-import type { OnEventToListenerMap } from '../models/methods/subscribe'
+import type {
+  EventTypes,
+  OnEventToListenerMap,
+} from '../models/methods/subscribe'
 import type { Transaction } from '../models/transactions'
 import { setTransactionFlagsToNumber } from '../models/utils/flags'
 import {
@@ -161,7 +164,7 @@ const NORMAL_DISCONNECT_CODE = 1000
  *
  * @category Clients
  */
-class Client extends EventEmitter {
+class Client extends EventEmitter<EventTypes> {
   /*
    * Underlying connection to rippled.
    */
@@ -381,12 +384,12 @@ class Client extends EventEmitter {
    * })
    * ```
    */
-  public on<T extends string, U = OnEventToListenerMap<T>>(
-    eventName: T,
-    listener: U,
-  ): this {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any -- Compatible
-    return super.on(eventName, listener as (...args: any[]) => void)
+  public on<
+    T extends EventTypes,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
+    U extends (...args: any[]) => void = OnEventToListenerMap<T>,
+  >(eventName: T, listener: U): this {
+    return super.on(eventName, listener)
   }
 
   /**

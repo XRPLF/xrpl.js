@@ -10,3 +10,4 @@ Initial release providing isomorphic and tree-shakable implementations of:
 - bytesToHash
 - hashToBytes
 - randomBytes
+- ws
