@@ -1,8 +1,8 @@
 /* eslint-disable max-lines -- Connection is a large file w/ lots of imports/exports */
-import { EventEmitter } from 'events'
 import type { Agent } from 'http'
 
-import WebSocket from 'ws'
+import WebSocket, { ClientOptions } from '@xrplf/isomorphic/ws'
+import { EventEmitter } from 'eventemitter3'
 
 import {
   DisconnectedError,
@@ -61,7 +61,7 @@ function createWebSocket(
   url: string,
   config: ConnectionOptions,
 ): WebSocket | null {
-  const options: WebSocket.ClientOptions = {
+  const options: ClientOptions = {
     agent: config.agent,
   }
   if (config.headers) {
@@ -75,15 +75,7 @@ function createWebSocket(
     }
   }
   const websocketOptions = { ...options }
-  const websocket = new WebSocket(url, websocketOptions)
-  /*
-   * we will have a listener for each outstanding request,
-   * so we have to raise the limit (the default is 10)
-   */
-  if (typeof websocket.setMaxListeners === 'function') {
-    websocket.setMaxListeners(Infinity)
-  }
-  return websocket
+  return new WebSocket(url, websocketOptions)
 }
 
 /**
@@ -136,7 +128,6 @@ export class Connection extends EventEmitter {
    */
   public constructor(url?: string, options: ConnectionUserOptions = {}) {
     super()
-    this.setMaxListeners(Infinity)
     this.url = url
     this.config = {
       timeout: TIMEOUT * 1000,

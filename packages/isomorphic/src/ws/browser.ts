@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file -- Needs to be a wrapper for ws */
-import { EventEmitter } from 'events'
+import { EventEmitter } from 'eventemitter3'
 
 // Define the global WebSocket class found on the native browser
 declare class WebSocket {
@@ -31,7 +31,7 @@ export default class WSWrapper extends EventEmitter {
   public static CONNECTING = 0
   public static OPEN = 1
   public static CLOSING = 2
-  // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- magic number is being defined here
+
   public static CLOSED = 3
   private readonly ws: WebSocket
 
@@ -48,7 +48,6 @@ export default class WSWrapper extends EventEmitter {
     _websocketOptions: WSWrapperOptions,
   ) {
     super()
-    this.setMaxListeners(Infinity)
 
     this.ws = new WebSocket(url)
 
