@@ -1,7 +1,9 @@
 import { Amount, XChainBridge } from '../common'
 
 import {
+  Account,
   BaseTransaction,
+  isAccount,
   isAmount,
   isNumber,
   isString,
@@ -28,24 +30,24 @@ export interface XChainAddClaimAttestation extends BaseTransaction {
   /**
    * The account that should receive this signer's share of the SignatureReward.
    */
-  AttestationRewardAccount: string
+  AttestationRewardAccount: Account
 
   /**
    * The account on the door account's signer list that is signing the transaction.
    */
-  AttestationSignerAccount: string
+  AttestationSignerAccount: Account
 
   /**
    * The destination account for the funds on the destination chain (taken from
    * the {@link XChainCommit} transaction).
    */
-  Destination?: string
+  Destination?: Account
 
   /**
    * The account on the source chain that submitted the {@link XChainCommit}
    * transaction that triggered the event associated with the attestation.
    */
-  OtherChainSource: string
+  OtherChainSource: Account
 
   /**
    * The public key used to verify the attestation signature.
@@ -87,13 +89,13 @@ export function validateXChainAddClaimAttestation(
 
   validateRequiredField(tx, 'Amount', isAmount)
 
-  validateRequiredField(tx, 'AttestationRewardAccount', isString)
+  validateRequiredField(tx, 'AttestationRewardAccount', isAccount)
 
-  validateRequiredField(tx, 'AttestationSignerAccount', isString)
+  validateRequiredField(tx, 'AttestationSignerAccount', isAccount)
 
-  validateOptionalField(tx, 'Destination', isString)
+  validateOptionalField(tx, 'Destination', isAccount)
 
-  validateRequiredField(tx, 'OtherChainSource', isString)
+  validateRequiredField(tx, 'OtherChainSource', isAccount)
 
   validateRequiredField(tx, 'PublicKey', isString)
 

@@ -48,12 +48,12 @@ describe('EscrowFinish', function () {
     assert.throws(
       () => validateEscrowFinish(escrow),
       ValidationError,
-      'EscrowFinish: Owner must be a string',
+      'EscrowFinish: invalid field Owner',
     )
     assert.throws(
       () => validate(escrow),
       ValidationError,
-      'EscrowFinish: Owner must be a string',
+      'EscrowFinish: invalid field Owner',
     )
   })
 

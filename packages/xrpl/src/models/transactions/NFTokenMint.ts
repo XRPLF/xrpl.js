@@ -1,7 +1,14 @@
 import { ValidationError } from '../../errors'
 import { isHex } from '../utils'
 
-import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
+import {
+  Account,
+  BaseTransaction,
+  GlobalFlags,
+  isAccount,
+  validateBaseTransaction,
+  validateOptionalField,
+} from './common'
 
 /**
  * Transaction Flags for an NFTokenMint Transaction.
@@ -68,7 +75,7 @@ export interface NFTokenMint extends BaseTransaction {
    * present, the `MintAccount` field in the `AccountRoot` of the `Issuer`
    * field must match the `Account`, otherwise the transaction will fail.
    */
-  Issuer?: string
+  Issuer?: Account
   /**
    * Specifies the fee charged by the issuer for secondary sales of the Token,
    * if such sales are allowed. Valid values for this field are between 0 and
@@ -108,6 +115,8 @@ export function validateNFTokenMint(tx: Record<string, unknown>): void {
       'NFTokenMint: Issuer must not be equal to Account',
     )
   }
+
+  validateOptionalField(tx, 'Issuer', isAccount)
 
   if (typeof tx.URI === 'string' && tx.URI === '') {
     throw new ValidationError('NFTokenMint: URI must not be empty string')

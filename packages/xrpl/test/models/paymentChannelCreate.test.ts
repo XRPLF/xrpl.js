@@ -61,12 +61,12 @@ describe('PaymentChannelCreate', function () {
     assert.throws(
       () => validatePaymentChannelCreate(channel),
       ValidationError,
-      'PaymentChannelCreate: missing Destination',
+      'PaymentChannelCreate: missing field Destination',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelCreate: missing Destination',
+      'PaymentChannelCreate: missing field Destination',
     )
   })
 
@@ -121,12 +121,12 @@ describe('PaymentChannelCreate', function () {
     assert.throws(
       () => validatePaymentChannelCreate(channel),
       ValidationError,
-      'PaymentChannelCreate: Destination must be a string',
+      'PaymentChannelCreate: invalid field Destination',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelCreate: Destination must be a string',
+      'PaymentChannelCreate: invalid field Destination',
     )
   })
 
@@ -166,12 +166,12 @@ describe('PaymentChannelCreate', function () {
     assert.throws(
       () => validatePaymentChannelCreate(channel),
       ValidationError,
-      'PaymentChannelCreate: DestinationTag must be a number',
+      'PaymentChannelCreate: invalid field DestinationTag',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelCreate: DestinationTag must be a number',
+      'PaymentChannelCreate: invalid field DestinationTag',
     )
   })
 

@@ -1,9 +1,10 @@
 import { Amount, XChainBridge } from '../common'
 
 import {
+  Account,
   BaseTransaction,
+  isAccount,
   isAmount,
-  isString,
   isXChainBridge,
   validateBaseTransaction,
   validateRequiredField,
@@ -33,7 +34,7 @@ export interface XChainCreateClaimID extends BaseTransaction {
   /**
    * The account that must send the {@link XChainCommit} transaction on the source chain.
    */
-  OtherChainSource: string
+  OtherChainSource: Account
 }
 
 /**
@@ -49,5 +50,5 @@ export function validateXChainCreateClaimID(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'SignatureReward', isAmount)
 
-  validateRequiredField(tx, 'OtherChainSource', isString)
+  validateRequiredField(tx, 'OtherChainSource', isAccount)
 }
