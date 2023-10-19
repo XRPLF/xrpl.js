@@ -49,8 +49,6 @@ async function connectWithRetry(client: Client, tries = 0): Promise<void> {
   })
 }
 
-const bridge: TestBridge | undefined = undefined
-
 export async function setupClient(
   server = serverUrl,
 ): Promise<XrplIntegrationTestContext> {
@@ -62,7 +60,7 @@ export async function setupClient(
       delayMs: 1000,
     })
     const context: XrplIntegrationTestContext = {
-      bridge: await setupBridge(client, wallet),
+      bridge: await setupBridge(client),
       client,
       wallet,
     }
@@ -70,13 +68,7 @@ export async function setupClient(
   })
 }
 
-async function setupBridge(
-  client: Client,
-  wallet: Wallet,
-): Promise<TestBridge> {
-  if (bridge != null) {
-    return bridge
-  }
+async function setupBridge(client: Client): Promise<TestBridge> {
   const doorAccount = await generateFundedWallet(client)
   const signatureReward = '200'
   const xchainBridge: XChainBridge = {
