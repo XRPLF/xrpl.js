@@ -4,6 +4,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+## 3.0.0 Beta 1 (2023-10-19)
+
 ### Breaking Changes
 * Bump typescript to 5.x
 * Remove Node 14 support
