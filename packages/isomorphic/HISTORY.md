@@ -1,6 +1,6 @@
 # @xrplf/isomorphic Release History
 
-## Unreleased
+## 1.0.0 Beta 1 (2023-10-19)
 
 Initial release providing isomorphic and tree-shakable implementations of:
 
