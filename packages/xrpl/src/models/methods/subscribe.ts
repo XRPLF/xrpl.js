@@ -38,7 +38,7 @@ export interface SubscribeBook {
 
 /**
  * The subscribe method requests periodic notifications from the server when
- * certain events happen. Expects a response in the form of a.
+ * certain events happen. Expects a response in the form of a
  * {@link SubscribeResponse}.
  *
  * @category Requests
