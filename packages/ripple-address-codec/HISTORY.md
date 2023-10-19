@@ -1,6 +1,9 @@
 # ripple-address-codec
 
 ## Unreleased
+
+## 5.0.0 Beta 1
+
 ### Breaking Changes
 * Bump typescript to 5.x
 * Remove Node 14 support

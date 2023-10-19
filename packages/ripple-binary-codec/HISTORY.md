@@ -1,6 +1,9 @@
 # ripple-binary-codec Release History
 
 ## Unreleased
+
+## 2.0.0 Beta 1 (2023-10-19)
+
 ### Breaking Changes
 * Bump typescript to 5.x
 * Remove Node 14 support
