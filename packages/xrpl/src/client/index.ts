@@ -98,6 +98,8 @@ import {
   // AMM methods
   AMMInfoRequest,
   AMMInfoResponse,
+  ServerDefinitionsRequest,
+  ServerDefinitionsResponse,
 } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 import {
@@ -346,6 +348,9 @@ class Client extends EventEmitter {
   public async request(
     r: RipplePathFindRequest,
   ): Promise<RipplePathFindResponse>
+  public async request(
+    r: ServerDefinitionsRequest,
+  ): Promise<ServerDefinitionsResponse>
   public async request(r: ServerInfoRequest): Promise<ServerInfoResponse>
   public async request(r: ServerStateRequest): Promise<ServerStateResponse>
   public async request(r: SubmitRequest): Promise<SubmitResponse>
