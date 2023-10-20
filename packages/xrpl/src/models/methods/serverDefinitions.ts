@@ -15,8 +15,6 @@ export interface ServerDefinitionsRequest extends BaseRequest {
   hash?: string
 }
 
-interface
-
 /**
  * Response expected from an {@link ServerDefinitionsRequest}.
  *
@@ -60,10 +58,4 @@ export interface ServerDefinitionsResponse extends BaseResponse {
         TYPES?: never
       }
   )
-}
-
-const test: ServerDefinitionsResponse = {
-  result: {
-    hash: 'asodfjaosdijf',
-  },
 }
