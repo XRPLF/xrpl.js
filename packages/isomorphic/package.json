@@ -44,5 +44,8 @@
   "prettier": "@xrplf/prettier-config",
   "engines": {
     "node": ">=16.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
