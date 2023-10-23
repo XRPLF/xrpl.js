@@ -1,10 +1,12 @@
 # ripple-binary-codec Release History
 
 ## Unreleased
+### Added
+- Support for the DID amendment (XLS-40).
 
 ## 1.10.0 (2023-09-27)
 ### Added
-- Support for the XChainBridge amendment.
+- Support for the XChainBridge amendment (XLS-38).
 
 ## 1.9.0 (2023-08-24)
 
