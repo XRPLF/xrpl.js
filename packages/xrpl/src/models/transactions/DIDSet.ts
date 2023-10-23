@@ -11,7 +11,7 @@ import {
 export interface DIDSet extends BaseTransaction {
   TransactionType: 'DIDSet'
 
-  Attestation?: string
+  Data?: string
 
   DIDDocument?: string
 
@@ -27,7 +27,7 @@ export interface DIDSet extends BaseTransaction {
 export function validateDIDSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateOptionalField(tx, 'Attestation', isString)
+  validateOptionalField(tx, 'Data', isString)
 
   validateOptionalField(tx, 'DIDDocument', isString)
 

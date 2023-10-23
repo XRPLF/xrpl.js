@@ -14,7 +14,7 @@ describe('DIDSet', function () {
   beforeEach(function () {
     tx = {
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
-      Attestation: '617474657374',
+      Data: '617474657374',
       DIDDocument: '646F63',
       Fee: '10',
       Flags: 2147483648,
@@ -29,18 +29,18 @@ describe('DIDSet', function () {
     assert.doesNotThrow(() => validate(tx))
   })
 
-  it('throws w/ invalid Attestation', function () {
-    tx.Attestation = 123
+  it('throws w/ invalid Data', function () {
+    tx.Data = 123
 
     assert.throws(
       () => validateDIDSet(tx),
       ValidationError,
-      'DIDSet: invalid field Attestation',
+      'DIDSet: invalid field Data',
     )
     assert.throws(
       () => validate(tx),
       ValidationError,
-      'DIDSet: invalid field Attestation',
+      'DIDSet: invalid field Data',
     )
   })
 
