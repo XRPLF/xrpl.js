@@ -7,6 +7,8 @@ function readFile(filename) {
   return fs.readFileSync(filename, 'utf-8')
 }
 
+let jsTransactionFile
+
 function processRippledSource(folder) {
   const sfieldCpp = readFile(
     path.join(folder, 'src/ripple/protocol/impl/SField.cpp'),
@@ -36,7 +38,7 @@ function processRippledSource(folder) {
     txFormats[matches[1]] = formatTxFormat(matches[2])
   }
 
-  let jsTransactionFile = readFile(
+  jsTransactionFile = readFile(
     path.join(
       path.dirname(__filename),
       '../src/models/transactions/transaction.ts',
@@ -46,6 +48,7 @@ function processRippledSource(folder) {
     /export type Transaction =([| \nA-Za-z]+)\nexport/,
   )[0]
   const existingLibraryTxs = transactionMatch
+    .replace('\n\nexport', '')
     .split('\n  | ')
     .filter((value) => !value.includes('export type'))
     .map((value) => value.trim())
@@ -254,5 +257,9 @@ ${validationImportLine}`
 }
 
 if (require.main === module) {
+  if (process.argv.length < 3) {
+    console.log(`Usage: ${process.argv[0]} ${process.argv[1]} path/to/rippled`)
+    process.exit(1)
+  }
   main(process.argv[2])
 }
