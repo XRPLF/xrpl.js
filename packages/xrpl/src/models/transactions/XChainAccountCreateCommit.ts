@@ -3,7 +3,6 @@ import { Amount, XChainBridge } from '../common'
 import {
   BaseTransaction,
   isAmount,
-  isString,
   isXChainBridge,
   validateBaseTransaction,
   validateRequiredField,
