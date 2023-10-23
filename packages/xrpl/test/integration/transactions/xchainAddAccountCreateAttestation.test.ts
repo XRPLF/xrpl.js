@@ -8,6 +8,7 @@ import {
 } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
+  setupBridge,
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
@@ -28,39 +29,39 @@ describe('XChainCreateBridge', function () {
   it(
     'base',
     async () => {
+      const { xchainBridge, witness, signatureReward } = await setupBridge(
+        testContext.client,
+      )
       const destination = Wallet.generate()
       const otherChainSource = Wallet.generate()
 
       const attestationToSign = {
-        XChainBridge: testContext.bridge.xchainBridge,
+        XChainBridge: xchainBridge,
         OtherChainSource: otherChainSource.classicAddress,
         Amount: xrpToDrops(300),
-        AttestationRewardAccount: testContext.bridge.witness.classicAddress,
+        AttestationRewardAccount: witness.classicAddress,
         WasLockingChainSend: 0,
         XChainAccountCreateCount: 1,
         Destination: destination.classicAddress,
-        SignatureReward: testContext.bridge.signatureReward,
+        SignatureReward: signatureReward,
       }
       const encodedAttestation = encode(attestationToSign)
-      const attestationSignature = sign(
-        encodedAttestation,
-        testContext.bridge.witness.privateKey,
-      )
+      const attestationSignature = sign(encodedAttestation, witness.privateKey)
 
       const tx: XChainAddAccountCreateAttestation = {
         TransactionType: 'XChainAddAccountCreateAttestation',
         Account: testContext.wallet.classicAddress,
-        XChainBridge: testContext.bridge.xchainBridge,
+        XChainBridge: xchainBridge,
         OtherChainSource: otherChainSource.classicAddress,
         Amount: xrpToDrops(300),
         WasLockingChainSend: 0,
         XChainAccountCreateCount: 1,
         Destination: destination.classicAddress,
-        SignatureReward: testContext.bridge.signatureReward,
-        PublicKey: testContext.bridge.witness.publicKey,
+        SignatureReward: signatureReward,
+        PublicKey: witness.publicKey,
         Signature: attestationSignature,
-        AttestationRewardAccount: testContext.bridge.witness.classicAddress,
-        AttestationSignerAccount: testContext.bridge.witness.classicAddress,
+        AttestationRewardAccount: witness.classicAddress,
+        AttestationSignerAccount: witness.classicAddress,
       }
       await testTransaction(testContext.client, tx, testContext.wallet)
 

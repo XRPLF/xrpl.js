@@ -6,6 +6,7 @@ import {
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
+  setupBridge,
 } from '../setup'
 import { generateFundedWallet, getXRPBalance, testTransaction } from '../utils'
 
@@ -23,11 +24,11 @@ describe('XChainAccountCreateCommit', function () {
   it(
     'base',
     async () => {
+      const { xchainBridge, signatureReward } = await setupBridge(
+        testContext.client,
+      )
       const initialBalance = Number(
-        await getXRPBalance(
-          testContext.client,
-          testContext.bridge.xchainBridge.LockingChainDoor,
-        ),
+        await getXRPBalance(testContext.client, xchainBridge.LockingChainDoor),
       )
 
       // actually test XChainAccountCreateCommit
@@ -37,9 +38,9 @@ describe('XChainAccountCreateCommit', function () {
       const tx: XChainAccountCreateCommit = {
         TransactionType: 'XChainAccountCreateCommit',
         Account: wallet2.classicAddress,
-        XChainBridge: testContext.bridge.xchainBridge,
+        XChainBridge: xchainBridge,
         Amount: amount.toString(),
-        SignatureReward: testContext.bridge.signatureReward,
+        SignatureReward: signatureReward,
         Destination: destination.classicAddress,
       }
 
@@ -47,14 +48,14 @@ describe('XChainAccountCreateCommit', function () {
 
       const accountInfoResponse2 = await testContext.client.request({
         command: 'account_info',
-        account: testContext.wallet.classicAddress,
+        account: xchainBridge.LockingChainDoor,
       })
       const finalBalance = Number(
         accountInfoResponse2.result.account_data.Balance,
       )
       assert.equal(
-        initialBalance + amount + Number(testContext.bridge.signatureReward),
         finalBalance,
+        initialBalance + amount + Number(signatureReward),
         "The bridge door's balance should go up by the amount committed",
       )
     },

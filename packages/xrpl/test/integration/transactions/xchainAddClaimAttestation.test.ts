@@ -19,6 +19,7 @@ import {
 } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
+  setupBridge,
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
@@ -44,14 +45,17 @@ describe('XChainCreateBridge', function () {
   it(
     'base',
     async () => {
+      const { xchainBridge, witness, signatureReward } = await setupBridge(
+        testContext.client,
+      )
       const otherChainSource = Wallet.generate()
       const amount = xrpToDrops(10)
 
       const claimIdTx: XChainCreateClaimID = {
         TransactionType: 'XChainCreateClaimID',
         Account: testContext.wallet.classicAddress,
-        XChainBridge: testContext.bridge.xchainBridge,
-        SignatureReward: testContext.bridge.signatureReward,
+        XChainBridge: xchainBridge,
+        SignatureReward: signatureReward,
         OtherChainSource: otherChainSource.classicAddress,
       }
       await testTransaction(testContext.client, claimIdTx, testContext.wallet)
@@ -61,44 +65,39 @@ describe('XChainCreateBridge', function () {
       )
 
       const attestationToSign = {
-        XChainBridge: testContext.bridge.xchainBridge,
+        XChainBridge: xchainBridge,
         OtherChainSource: otherChainSource.classicAddress,
         Amount: amount,
-        AttestationRewardAccount: testContext.bridge.witness.classicAddress,
+        AttestationRewardAccount: witness.classicAddress,
         WasLockingChainSend: 0,
         XChainClaimID: 1,
         Destination: testContext.wallet.classicAddress,
       }
       const encodedAttestation = encode(attestationToSign)
-      const attestationSignature = sign(
-        encodedAttestation,
-        testContext.bridge.witness.privateKey,
-      )
+      const attestationSignature = sign(encodedAttestation, witness.privateKey)
 
       const tx: XChainAddClaimAttestation = {
         TransactionType: 'XChainAddClaimAttestation',
-        Account: testContext.bridge.witness.classicAddress,
-        XChainBridge: testContext.bridge.xchainBridge,
+        Account: witness.classicAddress,
+        XChainBridge: xchainBridge,
         OtherChainSource: otherChainSource.classicAddress,
         Amount: amount,
         WasLockingChainSend: 0,
         XChainClaimID: 1,
         Destination: testContext.wallet.classicAddress,
-        PublicKey: testContext.bridge.witness.publicKey,
+        PublicKey: witness.publicKey,
         Signature: attestationSignature,
-        AttestationRewardAccount: testContext.bridge.witness.classicAddress,
-        AttestationSignerAccount: testContext.bridge.witness.classicAddress,
+        AttestationRewardAccount: witness.classicAddress,
+        AttestationSignerAccount: witness.classicAddress,
       }
-      await testTransaction(testContext.client, tx, testContext.bridge.witness)
+      await testTransaction(testContext.client, tx, witness)
 
       const finalBalance = Number(
         await getXRPBalance(testContext.client, testContext.wallet),
       )
       assert.equal(
         finalBalance,
-        initialBalance +
-          Number(amount) -
-          Number(testContext.bridge.signatureReward),
+        initialBalance + Number(amount) - Number(signatureReward),
         'The destination balance should go up by the amount transferred',
       )
     },
@@ -108,6 +107,7 @@ describe('XChainCreateBridge', function () {
   it(
     'IOU',
     async () => {
+      const witness = await generateFundedWallet(testContext.client)
       // we are on the "issuing chain" for this test
       const lockingDoor = Wallet.generate()
       const issuer = Wallet.generate()
@@ -177,7 +177,7 @@ describe('XChainCreateBridge', function () {
         SignerEntries: [
           {
             SignerEntry: {
-              Account: testContext.bridge.witness.classicAddress,
+              Account: witness.classicAddress,
               SignerWeight: 1,
             },
           },
@@ -232,32 +232,29 @@ describe('XChainCreateBridge', function () {
         XChainBridge: xchainBridge,
         OtherChainSource: otherChainSource.classicAddress,
         Amount: amount,
-        AttestationRewardAccount: testContext.bridge.witness.classicAddress,
+        AttestationRewardAccount: witness.classicAddress,
         WasLockingChainSend: 1,
         XChainClaimID: 1,
         Destination: destination.classicAddress,
       }
       const encodedAttestation = encode(attestationToSign)
-      const attestationSignature = sign(
-        encodedAttestation,
-        testContext.bridge.witness.privateKey,
-      )
+      const attestationSignature = sign(encodedAttestation, witness.privateKey)
 
       const tx: XChainAddClaimAttestation = {
         TransactionType: 'XChainAddClaimAttestation',
-        Account: testContext.bridge.witness.classicAddress,
+        Account: witness.classicAddress,
         XChainBridge: xchainBridge,
         OtherChainSource: otherChainSource.classicAddress,
         Amount: amount,
         WasLockingChainSend: 1,
         XChainClaimID: 1,
         Destination: destination.classicAddress,
-        PublicKey: testContext.bridge.witness.publicKey,
+        PublicKey: witness.publicKey,
         Signature: attestationSignature,
-        AttestationRewardAccount: testContext.bridge.witness.classicAddress,
-        AttestationSignerAccount: testContext.bridge.witness.classicAddress,
+        AttestationRewardAccount: witness.classicAddress,
+        AttestationSignerAccount: witness.classicAddress,
       }
-      await testTransaction(testContext.client, tx, testContext.bridge.witness)
+      await testTransaction(testContext.client, tx, witness)
 
       const finalBalance = Number(
         await getIOUBalance(

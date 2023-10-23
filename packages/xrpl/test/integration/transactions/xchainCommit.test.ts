@@ -1,18 +1,14 @@
 import { assert } from 'chai'
 
-import { XChainCreateBridge, XChainCommit, XChainBridge } from '../../../src'
+import { XChainCommit } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
+  setupBridge,
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import {
-  generateFundedWallet,
-  GENESIS_ACCOUNT,
-  getXRPBalance,
-  testTransaction,
-} from '../utils'
+import { generateFundedWallet, getXRPBalance, testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -28,38 +24,10 @@ describe('XChainCommit', function () {
   it(
     'base',
     async () => {
-      const bridge: XChainBridge = {
-        LockingChainDoor: testContext.wallet.classicAddress,
-        LockingChainIssue: { currency: 'XRP' },
-        IssuingChainDoor: GENESIS_ACCOUNT,
-        IssuingChainIssue: { currency: 'XRP' },
-      }
-      const signatureReward = '200'
-      // set up a bridge
-      const setupTx: XChainCreateBridge = {
-        TransactionType: 'XChainCreateBridge',
-        Account: testContext.wallet.classicAddress,
-        XChainBridge: bridge,
-        SignatureReward: signatureReward,
-        MinAccountCreateAmount: '10000000',
-      }
-
-      await testTransaction(testContext.client, setupTx, testContext.wallet)
-
-      // confirm that the transaction actually went through
-      const accountObjectsResponse = await testContext.client.request({
-        command: 'account_objects',
-        account: testContext.wallet.classicAddress,
-        type: 'bridge',
-      })
-      assert.lengthOf(
-        accountObjectsResponse.result.account_objects,
-        1,
-        'Should be exactly one bridge owned by the account',
-      )
+      const { xchainBridge } = await setupBridge(testContext.client)
 
       const initialBalance = Number(
-        await getXRPBalance(testContext.client, testContext.wallet),
+        await getXRPBalance(testContext.client, xchainBridge.LockingChainDoor),
       )
 
       // actually test XChainCommit
@@ -68,7 +36,7 @@ describe('XChainCommit', function () {
       const tx: XChainCommit = {
         TransactionType: 'XChainCommit',
         Account: wallet2.classicAddress,
-        XChainBridge: bridge,
+        XChainBridge: xchainBridge,
         XChainClaimID: 1,
         Amount: amount.toString(),
       }
@@ -77,7 +45,7 @@ describe('XChainCommit', function () {
 
       const accountInfoResponse2 = await testContext.client.request({
         command: 'account_info',
-        account: testContext.wallet.classicAddress,
+        account: xchainBridge.LockingChainDoor,
       })
       const finalBalance = Number(
         accountInfoResponse2.result.account_data.Balance,

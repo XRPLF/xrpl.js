@@ -1,22 +1,14 @@
 import { assert } from 'chai'
 
-import {
-  XChainCreateBridge,
-  XChainCreateClaimID,
-  XChainBridge,
-  Wallet,
-} from '../../../src'
+import { XChainCreateClaimID, Wallet } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
+  setupBridge,
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import {
-  generateFundedWallet,
-  GENESIS_ACCOUNT,
-  testTransaction,
-} from '../utils'
+import { generateFundedWallet, testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -32,34 +24,8 @@ describe('XChainCreateClaimID', function () {
   it(
     'base',
     async () => {
-      const bridge: XChainBridge = {
-        LockingChainDoor: testContext.wallet.classicAddress,
-        LockingChainIssue: { currency: 'XRP' },
-        IssuingChainDoor: GENESIS_ACCOUNT,
-        IssuingChainIssue: { currency: 'XRP' },
-      }
-      const signatureReward = '200'
-      // set up a bridge
-      const setupTx: XChainCreateBridge = {
-        TransactionType: 'XChainCreateBridge',
-        Account: testContext.wallet.classicAddress,
-        XChainBridge: bridge,
-        SignatureReward: signatureReward,
-        MinAccountCreateAmount: '10000000',
-      }
-
-      await testTransaction(testContext.client, setupTx, testContext.wallet)
-
-      // confirm that the transaction actually went through
-      const accountObjectsResponse = await testContext.client.request({
-        command: 'account_objects',
-        account: testContext.wallet.classicAddress,
-        type: 'bridge',
-      })
-      assert.lengthOf(
-        accountObjectsResponse.result.account_objects,
-        1,
-        'Should be exactly one bridge owned by the account',
+      const { xchainBridge, signatureReward } = await setupBridge(
+        testContext.client,
       )
 
       // actually test XChainCreateClaimID
@@ -68,7 +34,7 @@ describe('XChainCreateClaimID', function () {
       const tx: XChainCreateClaimID = {
         TransactionType: 'XChainCreateClaimID',
         Account: wallet2.classicAddress,
-        XChainBridge: bridge,
+        XChainBridge: xchainBridge,
         SignatureReward: signatureReward,
         OtherChainSource: otherChainSource.classicAddress,
       }

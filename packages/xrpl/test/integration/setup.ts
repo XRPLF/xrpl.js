@@ -25,7 +25,6 @@ interface TestBridge {
 export interface XrplIntegrationTestContext {
   client: Client
   wallet: Wallet
-  bridge: TestBridge
 }
 
 export async function teardownClient(
@@ -60,7 +59,6 @@ export async function setupClient(
       delayMs: 1000,
     })
     const context: XrplIntegrationTestContext = {
-      bridge: await setupBridge(client),
       client,
       wallet,
     }
@@ -68,7 +66,7 @@ export async function setupClient(
   })
 }
 
-async function setupBridge(client: Client): Promise<TestBridge> {
+export async function setupBridge(client: Client): Promise<TestBridge> {
   const doorAccount = await generateFundedWallet(client)
   const signatureReward = '200'
   const xchainBridge: XChainBridge = {
