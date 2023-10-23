@@ -1,7 +1,9 @@
 import { Amount, XChainBridge } from '../common'
 
 import {
+  Account,
   BaseTransaction,
+  isAccount,
   isAmount,
   isNumber,
   isString,
@@ -38,7 +40,7 @@ export interface XChainClaim extends BaseTransaction {
    * sequence number and collected signatures won't be destroyed, and the
    * transaction can be rerun with a different destination.
    */
-  Destination: string
+  Destination: Account
 
   /**
    * An integer destination tag.
@@ -69,7 +71,7 @@ export function validateXChainClaim(tx: Record<string, unknown>): void {
     (inp) => isNumber(inp) || isString(inp),
   )
 
-  validateRequiredField(tx, 'Destination', isString)
+  validateRequiredField(tx, 'Destination', isAccount)
 
   validateOptionalField(tx, 'DestinationTag', isNumber)
 

@@ -5,6 +5,11 @@ import {
   BaseTransaction,
   validateBaseTransaction,
   isIssuedCurrency,
+  isAccount,
+  validateRequiredField,
+  validateOptionalField,
+  isNumber,
+  Account,
 } from './common'
 
 /**
@@ -17,7 +22,7 @@ import {
 export interface CheckCreate extends BaseTransaction {
   TransactionType: 'CheckCreate'
   /** The unique address of the account that can cash the Check. */
-  Destination: string
+  Destination: Account
   /**
    * Maximum amount of source currency the Check is allowed to debit the
    * sender, including transfer fees on non-XRP currencies. The Check can only
@@ -56,9 +61,8 @@ export function validateCheckCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('CheckCreate: missing field SendMax')
   }
 
-  if (tx.Destination === undefined) {
-    throw new ValidationError('CheckCreate: missing field Destination')
-  }
+  validateRequiredField(tx, 'Destination', isAccount)
+  validateOptionalField(tx, 'DestinationTag', isNumber)
 
   if (
     typeof tx.SendMax !== 'string' &&
@@ -66,17 +70,6 @@ export function validateCheckCreate(tx: Record<string, unknown>): void {
     !isIssuedCurrency(tx.SendMax as Record<string, unknown>)
   ) {
     throw new ValidationError('CheckCreate: invalid SendMax')
-  }
-
-  if (typeof tx.Destination !== 'string') {
-    throw new ValidationError('CheckCreate: invalid Destination')
-  }
-
-  if (
-    tx.DestinationTag !== undefined &&
-    typeof tx.DestinationTag !== 'number'
-  ) {
-    throw new ValidationError('CheckCreate: invalid DestinationTag')
   }
 
   if (tx.Expiration !== undefined && typeof tx.Expiration !== 'number') {

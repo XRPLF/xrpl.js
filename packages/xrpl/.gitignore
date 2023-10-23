@@ -1,0 +1,3 @@
+# Replaced by root README during the prepare lifecycle phase because npm does not allow symlinking README files
+# https://docs.npmjs.com/cli/v7/using-npm/scripts#npm-publish
+README.md

@@ -5,9 +5,10 @@ import {
   isAmount,
   isString,
   isXChainBridge,
-  isString,
   validateBaseTransaction,
   validateRequiredField,
+  isAccount,
+  Account,
 } from './common'
 
 /**
@@ -39,7 +40,7 @@ export interface XChainAccountCreateCommit extends BaseTransaction {
   /**
    * The destination account on the destination chain.
    */
-  Destination: string
+  Destination: Account
 
   /**
    * The amount, in XRP, to use for account creation. This must be greater than or
@@ -63,7 +64,7 @@ export function validateXChainAccountCreateCommit(
 
   validateRequiredField(tx, 'SignatureReward', isAmount)
 
-  validateRequiredField(tx, 'Destination', isString)
+  validateRequiredField(tx, 'Destination', isAccount)
 
   validateRequiredField(tx, 'Amount', isAmount)
 }

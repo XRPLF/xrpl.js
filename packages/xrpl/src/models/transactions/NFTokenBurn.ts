@@ -1,6 +1,12 @@
-import { ValidationError } from '../../errors'
-
-import { BaseTransaction, validateBaseTransaction } from './common'
+import {
+  Account,
+  BaseTransaction,
+  isAccount,
+  isString,
+  validateBaseTransaction,
+  validateOptionalField,
+  validateRequiredField,
+} from './common'
 
 /**
  * The NFTokenBurn transaction is used to remove an NFToken object from the
@@ -20,7 +26,7 @@ export interface NFTokenBurn extends BaseTransaction {
    * in the NFToken, either the issuer account or an account authorized by the
    * issuer, i.e. MintAccount.
    */
-  Account: string
+  Account: Account
   /**
    * Identifies the NFToken object to be removed by the transaction.
    */
@@ -30,7 +36,7 @@ export interface NFTokenBurn extends BaseTransaction {
    * Account. Only used to burn tokens which have the lsfBurnable flag enabled
    * and are not owned by the signing account.
    */
-  Owner?: string
+  Owner?: Account
 }
 
 /**
@@ -41,8 +47,6 @@ export interface NFTokenBurn extends BaseTransaction {
  */
 export function validateNFTokenBurn(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-
-  if (tx.NFTokenID == null) {
-    throw new ValidationError('NFTokenBurn: missing field NFTokenID')
-  }
+  validateRequiredField(tx, 'NFTokenID', isString)
+  validateOptionalField(tx, 'Owner', isAccount)
 }

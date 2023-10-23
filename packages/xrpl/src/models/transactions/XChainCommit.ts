@@ -1,7 +1,9 @@
 import { Amount, XChainBridge } from '../common'
 
 import {
+  Account,
   BaseTransaction,
+  isAccount,
   isAmount,
   isNumber,
   isString,
@@ -41,7 +43,7 @@ export interface XChainCommit extends BaseTransaction {
    * destination chain will need to submit a {@link XChainClaim} transaction to
    * claim the funds.
    */
-  OtherChainDestination?: string
+  OtherChainDestination?: Account
 
   /**
    * The asset to commit, and the quantity. This must match the door account's
@@ -68,7 +70,7 @@ export function validateXChainCommit(tx: Record<string, unknown>): void {
     (inp) => isNumber(inp) || isString(inp),
   )
 
-  validateOptionalField(tx, 'OtherChainDestination', isString)
+  validateOptionalField(tx, 'OtherChainDestination', isAccount)
 
   validateRequiredField(tx, 'Amount', isAmount)
 }

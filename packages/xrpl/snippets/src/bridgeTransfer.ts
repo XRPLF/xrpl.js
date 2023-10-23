@@ -54,7 +54,10 @@ async function bridgeTransfer(): Promise<void> {
   console.log(bridge)
 
   console.log('Creating wallet on the locking chain via the faucet...')
-  const { wallet: wallet1 } = await lockingClient.fundWallet()
+  const { wallet: wallet1 } = await lockingClient.fundWallet(null, {
+    faucetHost: 'sidechain-faucet.devnet.rippletest.net',
+    faucetPath: '/accounts',
+  })
   console.log(wallet1)
   const wallet2 = Wallet.generate()
 
