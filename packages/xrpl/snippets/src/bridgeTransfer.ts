@@ -20,9 +20,7 @@ async function sleep(sec: number): Promise<void> {
   })
 }
 
-const lockingClient = new Client(
-  'wss://sidechain-net1.devnet.rippletest.net:51233',
-)
+const lockingClient = new Client('wss://s.devnet.rippletest.net:51233')
 const issuingClient = new Client(
   'wss://sidechain-net2.devnet.rippletest.net:51233',
 )
@@ -34,7 +32,7 @@ void bridgeTransfer()
 async function bridgeTransfer(): Promise<void> {
   await lockingClient.connect()
   await issuingClient.connect()
-  const lockingChainDoor = 'rMAXACCrp3Y8PpswXcg3bKggHX76V3F8M4'
+  const lockingChainDoor = 'rNQQyL2bJqbtgP5zXHJyQXamtrKYpgsbzV'
 
   const accountObjectsRequest: AccountObjectsRequest = {
     command: 'account_objects',
@@ -54,10 +52,7 @@ async function bridgeTransfer(): Promise<void> {
   console.log(bridge)
 
   console.log('Creating wallet on the locking chain via the faucet...')
-  const { wallet: wallet1 } = await lockingClient.fundWallet(null, {
-    faucetHost: 'sidechain-faucet.devnet.rippletest.net',
-    faucetPath: '/accounts',
-  })
+  const { wallet: wallet1 } = await lockingClient.fundWallet()
   console.log(wallet1)
   const wallet2 = Wallet.generate()
 
