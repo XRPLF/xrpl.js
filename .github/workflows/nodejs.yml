@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  RIPPLED_DOCKER_IMAGE: rippleci/rippled:2.0.0-b3
+  RIPPLED_DOCKER_IMAGE: rippleci/rippled:2.0.0-b4
 
 jobs:
   build-and-lint:
