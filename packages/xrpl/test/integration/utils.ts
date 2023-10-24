@@ -193,6 +193,7 @@ export async function verifySubmittedTransaction(
       'ledger_index',
       'meta',
       'validated',
+      'ctid',
     ]),
     typeof tx === 'string' ? decode(tx) : tx,
   )
