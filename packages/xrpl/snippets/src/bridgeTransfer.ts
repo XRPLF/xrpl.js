@@ -70,7 +70,6 @@ async function bridgeTransfer(): Promise<void> {
       parseInt(bridgeData.MinAccountCreateAmount as string, 10) * 2
     ).toString(),
   }
-  console.log(fundTx)
   const fundResponse = await lockingClient.submitAndWait(fundTx, {
     wallet: wallet1,
   })
