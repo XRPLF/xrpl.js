@@ -86,7 +86,7 @@ describe('server_definitions', function () {
   )
 
   it(
-    'base',
+    'with same hash',
     async () => {
       const initialRequest: ServerDefinitionsRequest = {
         command: 'server_definitions',
