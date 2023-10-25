@@ -1,8 +1,8 @@
 /* Methods  ==================================================================== */
-import Account from "./schema/Account";
-import * as Utils from "./utils";
+import Account from './schema/Account'
+import * as Utils from './utils'
 
 /* Types ==================================================================== */
 
 /* Export ==================================================================== */
-export { Account, Utils };
+export { Account, Utils }
