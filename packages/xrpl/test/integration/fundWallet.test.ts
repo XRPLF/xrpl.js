@@ -156,6 +156,7 @@ describe('fundWallet', function () {
     const api = new Client('wss://s.altnet.rippletest.net:51233')
     await api.connect()
 
+    // jasmine and jest handle async differently so need to use try catch approach instead of `expect.rejects` or `expectAsync`
     try {
       await api.fundWallet(null, {
         amount: '-1000',
@@ -164,6 +165,7 @@ describe('fundWallet', function () {
 
       throw new Error('Error not thrown')
     } catch (error) {
+      await api.disconnect()
       expect(error).toEqual(
         new XRPLFaucetError(
           'Request failed: {"body":{"error":"Invalid amount","detail":"Must be an integer"},"contentType":"application/json; charset=utf-8","statusCode":400}',
