@@ -67,20 +67,20 @@ class XChainBridge extends SerializedType {
       return value
     }
 
-    if (isXChainBridgeObject(value)) {
-      const bytes: Array<Buffer> = []
-      this.TYPE_ORDER.forEach((item) => {
-        const { name, type } = item
-        if (type === AccountID) {
-          bytes.push(Buffer.from([0x14]))
-        }
-        const object = type.from(value[name])
-        bytes.push(object.toBytes())
-      })
-      return new XChainBridge(Buffer.concat(bytes))
+    if (!isXChainBridgeObject(value)) {
+      throw new Error('Invalid type to construct an XChainBridge')
     }
 
-    throw new Error('Invalid type to construct an XChainBridge')
+    const bytes: Array<Buffer> = []
+    this.TYPE_ORDER.forEach((item) => {
+      const { name, type } = item
+      if (type === AccountID) {
+        bytes.push(Buffer.from([0x14]))
+      }
+      const object = type.from(value[name])
+      bytes.push(object.toBytes())
+    })
+    return new XChainBridge(Buffer.concat(bytes))
   }
 
   /**
