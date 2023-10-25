@@ -1,3 +1,5 @@
+import { assert } from 'chai'
+
 import { SignerListSet } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
@@ -42,6 +44,24 @@ describe('SignerListSet', function () {
         SignerQuorum: 2,
       }
       await testTransaction(testContext.client, tx, testContext.wallet)
+
+      const accountInfoResponse = await testContext.client.request({
+        command: 'account_info',
+        account: testContext.wallet.classicAddress,
+        signer_lists: true,
+      })
+      const signerListInfo =
+        accountInfoResponse.result.account_data.signer_lists?.[0]
+      assert.deepEqual(
+        signerListInfo?.SignerEntries,
+        tx.SignerEntries,
+        'SignerEntries were not set properly',
+      )
+      assert.equal(
+        signerListInfo?.SignerQuorum,
+        tx.SignerQuorum,
+        'SignerQuorum was not set properly',
+      )
     },
     TIMEOUT,
   )
