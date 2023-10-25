@@ -184,7 +184,7 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
  *
  * @category Responses
  */
-export interface LedgerEntryResponse extends BaseResponse {
+export interface LedgerEntryResponse<T = LedgerEntry> extends BaseResponse {
   result: {
     /** The unique ID of this ledger object. */
     index: string
@@ -194,7 +194,7 @@ export interface LedgerEntryResponse extends BaseResponse {
      * Object containing the data of this ledger object, according to the
      * ledger format.
      */
-    node?: LedgerEntry
+    node?: T
     /** The binary representation of the ledger object, as hexadecimal. */
     node_binary?: string
     validated?: boolean

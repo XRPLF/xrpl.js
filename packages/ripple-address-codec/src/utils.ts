@@ -1,5 +1,3 @@
-// Buffer is technically not needed, as a Buffer IS a Uint8Array.
-// However, for communication purposes it's listed here
 export type ByteArray = number[] | Uint8Array
 
 /**

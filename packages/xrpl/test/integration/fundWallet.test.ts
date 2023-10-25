@@ -21,7 +21,7 @@ async function generate_faucet_wallet_and_fund_again(
     faucetPath,
     usageContext: 'integration-test',
   })
-  assert.notEqual(wallet, undefined)
+  assert.notStrictEqual(wallet, undefined)
   assert(isValidClassicAddress(wallet.classicAddress))
   assert(isValidXAddress(wallet.getXAddress()))
 
@@ -103,7 +103,7 @@ describe('fundWallet', function () {
         usageContext: 'integration-test',
       })
 
-      assert.notEqual(wallet, undefined)
+      assert.notStrictEqual(wallet, undefined)
       assert(isValidClassicAddress(wallet.classicAddress))
       assert(isValidXAddress(wallet.getXAddress()))
 
@@ -127,16 +127,6 @@ describe('fundWallet', function () {
   )
 
   it(
-    'can generate and fund wallets on sidechain devnet',
-    async function () {
-      await generate_faucet_wallet_and_fund_again(
-        'wss://sidechain-net1.devnet.rippletest.net:51233',
-      )
-    },
-    TIMEOUT,
-  )
-
-  it(
     'submit funds wallet with custom amount',
     async function () {
       const api = new Client('wss://s.altnet.rippletest.net:51233')
@@ -147,7 +137,7 @@ describe('fundWallet', function () {
         usageContext: 'integration-test',
       })
       assert.equal(balance, '2000')
-      assert.notEqual(wallet, undefined)
+      assert.notStrictEqual(wallet, undefined)
       assert(isValidClassicAddress(wallet.classicAddress))
       assert(isValidXAddress(wallet.getXAddress()))
 

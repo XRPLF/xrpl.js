@@ -1,4 +1,5 @@
 import { Ledger } from '../ledger'
+import { LedgerEntryFilter } from '../ledger/LedgerEntry'
 import { Transaction, TransactionAndMetadata } from '../transactions'
 import { TransactionMetadata } from '../transactions/metadata'
 
@@ -65,6 +66,116 @@ export interface LedgerRequest extends BaseRequest, LookupByLedgerRequest {
    * array of queued transactions in the results.
    */
   queue?: boolean
+  /**
+   * If included, filter results to include only this type of ledger object.
+   */
+  type?: LedgerEntryFilter
+}
+
+/**
+ * Retrieve information about the public ledger. Expects a response in the form
+ * of a {@link LedgerResponseExpanded}. Will return full JSON-formatted transaction data instead of string hashes.
+ *
+ * @example
+ * ```ts
+ * const ledger: LedgerRequest = {
+ *  "id": 14,
+ *  "command": "ledger",
+ *  "ledger_index": "validated",
+ *  "full": false,
+ *  "accounts": false,
+ *  "transactions": false,
+ *  "expand": true,
+ *  "owner_funds": false
+ * }
+ * ```
+ *
+ * @category Requests
+ */
+export interface LedgerRequestExpandedTransactionsOnly extends LedgerRequest {
+  expand: true
+  transactions: true
+}
+
+/**
+ * Retrieve information about the public ledger. Expects a response in the form
+ * of a {@link LedgerResponseExpanded}. Will return full JSON-formatted `accountState` data instead of string hashes.
+ *
+ * @example
+ * ```ts
+ * const ledger: LedgerRequest = {
+ *  "id": 14,
+ *  "command": "ledger",
+ *  "ledger_index": "validated",
+ *  "full": false,
+ *  "accounts": true,
+ *  "transactions": false,
+ *  "expand": true,
+ *  "owner_funds": false
+ * }
+ * ```
+ *
+ * @category Requests
+ */
+export interface LedgerRequestExpandedAccountsOnly extends LedgerRequest {
+  expand: true
+  accounts: true
+}
+
+/**
+ * Retrieve information about the public ledger. Expects a response in the form
+ * of a {@link LedgerResponseExpanded}. Will return full JSON-formatted `accountState` and `transactions`
+ * data instead of string hashes.
+ *
+ * @example
+ * ```ts
+ * const ledger: LedgerRequest = {
+ *  "id": 14,
+ *  "command": "ledger",
+ *  "ledger_index": "validated",
+ *  "full": false,
+ *  "accounts": true,
+ *  "transactions": true,
+ *  "expand": true,
+ *  "owner_funds": false
+ * }
+ * ```
+ *
+ * @category Requests
+ */
+export interface LedgerRequestExpandedAccountsAndTransactions
+  extends LedgerRequest {
+  expand: true
+  accounts: true
+  transactions: true
+}
+
+/**
+ * Retrieve information about the public ledger. Expects a response in the form
+ * of a {@link LedgerResponse}. Will return binary (hexadecimal string) format
+ * instead of JSON or string hashes for `transactions` data.
+ *
+ * @example
+ * ```ts
+ * const ledger: LedgerRequest = {
+ *  "id": 14,
+ *  "command": "ledger",
+ *  "ledger_index": "validated",
+ *  "full": false,
+ *  "accounts": true,
+ *  "transactions": true,
+ *  "expand": true,
+ *  "owner_funds": false,
+ *  "binary": true
+ * }
+ * ```
+ *
+ * @category Requests
+ */
+export interface LedgerRequestExpandedTransactionsBinary extends LedgerRequest {
+  expand: true
+  transactions: true
+  binary: true
 }
 
 /**

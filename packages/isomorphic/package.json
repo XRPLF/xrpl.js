@@ -1,6 +1,6 @@
 {
   "name": "@xrplf/isomorphic",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.0",
   "description": "A collection of isomorphic and tree-shakeable crypto hashes and utils for xrpl.js",
   "keywords": [
     "crypto",
@@ -21,16 +21,20 @@
     "sha512/*",
     "ripemd160/*",
     "src/*",
-    "utils/*"
+    "utils/*",
+    "ws/*"
   ],
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "@noble/hashes": "^1.0.0"
+    "@noble/hashes": "^1.0.0",
+    "eventemitter3": "5.0.1",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
-    "@types/node": "^16.18.38"
+    "@types/node": "^16.18.38",
+    "@types/ws": "^8.5.6"
   },
   "repository": {
     "type": "git",
@@ -40,5 +44,8 @@
   "prettier": "@xrplf/prettier-config",
   "engines": {
     "node": ">=16.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

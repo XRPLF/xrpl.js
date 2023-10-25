@@ -1,6 +1,10 @@
-import { Transaction, TransactionMetadata } from '../transactions'
+import {
+  PseudoTransaction,
+  Transaction,
+  TransactionMetadata,
+} from '../transactions'
 
-import LedgerEntry from './LedgerEntry'
+import { LedgerEntry } from './LedgerEntry'
 
 /**
  * A ledger is a block of transactions and shared state data. It has a unique
@@ -61,5 +65,7 @@ export default interface Ledger {
    * either JSON or binary depending on whether the request specified binary
    * as true.
    */
-  transactions?: Array<Transaction & { metaData?: TransactionMetadata }>
+  transactions?: Array<
+    (Transaction | PseudoTransaction) & { metaData?: TransactionMetadata }
+  >
 }

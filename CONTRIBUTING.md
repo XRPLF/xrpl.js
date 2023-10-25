@@ -47,7 +47,7 @@ npm run lint
 
 ## Running Tests
 
-For integration and browser tests, we use a `rippled` node in standalone mode to test xrpl.js code against. To set this up, you can either configure and run `rippled` locally, or set up the Docker container `xrpllabsofficial/xrpld:1.12.0-b1` by [following these instructions](#integration-tests). The latter will require you to [install Docker](https://docs.docker.com/get-docker/).
+For integration and browser tests, we use a `rippled` node in standalone mode to test xrpl.js code against. To set this up, you can either configure and run `rippled` locally, or set up the Docker container `rippleci/rippled` by [following these instructions](#integration-tests). The latter will require you to [install Docker](https://docs.docker.com/get-docker/).
 
 ### Unit Tests
 
@@ -64,7 +64,7 @@ From the top-level xrpl.js folder (one level above `packages`), run the followin
 ```bash
 npm install
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/config/ xrpllabsofficial/xrpld:1.12.0-b1 -a --start
+docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/opt/ripple/etc/ --platform linux/amd64 rippleci/rippled:2.0.0-b3 /opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg
 npm run build
 npm run test:integration
 ```
@@ -74,9 +74,8 @@ Breaking down the command:
 * `--interactive` allows you to interact with the container.
 * `-t` starts a terminal in the container for you to send commands to.
 * `--volume $PWD/.ci-config:/config/` identifies the `rippled.cfg` and `validators.txt` to import. It must be an absolute path, so we use `$PWD` instead of `./`.
-* `xrpllabsofficial/1.12.0-b1` is an image that is regularly updated with the latest `rippled` releases and can be found here: https://github.com/WietseWind/docker-rippled
-* `-a` starts `rippled` in standalone mode
-* `--start` signals to start `rippled` with the specified amendments in `rippled.cfg` enabled immediately instead of voting for 2 weeks on them.
+* `rippleci/rippled` is an image that is regularly updated with the latest `rippled` releases
+* `/opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg` starts `rippled` in standalone mode
 
 ### Browser Tests
 
@@ -91,7 +90,7 @@ This should be run from the `xrpl.js` top level folder (one above the `packages`
 ```bash
 npm run build
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run -p 6006:6006 -it -v $PWD/.ci-config:/config/ xrpllabsofficial/1.12.0-b1 -a --start
+docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/opt/ripple/etc/ --platform linux/amd64 rippleci/rippled:2.0.0-b3 /opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg
 npm run test:browser
 ```
 
@@ -267,25 +266,6 @@ This should almost always be done using the [`xrpl-codec-gen`](https://github.co
    1. A link to the more detailed changes
    1. Highlights of important changes
 
-
-# ripple-lib 1.x releases
-
-- [ ] Publish the release to npm.
-
-  - [ ] If you are publishing a 1.x release to the `xrpl` package, use:
-
-        npm publish --tag ripple-lib
-
-    This prevents the release from taking the `latest` tag.
-
-For ripple-lib:
-
- - Have one of the ripple-lib package maintainers push to `ripple-lib` (npm package name). You can contact [@intelliot](https://github.com/intelliot) to request the npm publish.
-- For ripple-lib releases, cross-publish the package to `xrpl` with `--tag ripple-lib`
-  - [Here's why](https://blog.greenkeeper.io/one-simple-trick-for-javascript-package-maintainers-to-avoid-breaking-their-user-s-software-and-to-6edf06dc5617).
-
-- https://www.npmjs.com/package/ripple-lib
-- https://www.npmjs.com/package/xrpl
 
 ## Mailing Lists
 

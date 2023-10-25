@@ -35,11 +35,6 @@ To use `xrpl.js` with React, you need to install shims for core NodeJS modules. 
       const webpack = require("webpack");
 
       module.exports = function override(config) {
-        const fallback = config.resolve.fallback || {};
-        Object.assign(fallback, {
-          ws: require.resolve("xrpl/dist/npm/client/WSWrapper"),
-        });
-        config.resolve.fallback = fallback;
         config.plugins = (config.plugins || []).concat([
           new webpack.ProvidePlugin({
             process: "process/browser",
@@ -133,20 +128,15 @@ export default defineConfig({
             }),
         ],
     },
-},
-build: {
-  rollupOptions: {
+  }, 
+  build: { 
+    rollupOptions: {
       plugins: [
-          polyfillNode(),
+        polyfillNode(),
       ]
-  }
-},
-resolve: {
-  alias: {
-    events: 'events',
-    ws: 'xrpl/dist/npm/client/WSWrapper',
+    } 
   },
-}})
+})
 ```
 
 3. Install the config dependencies and xrpl (e.g. using this command)
@@ -154,9 +144,7 @@ resolve: {
 ```shell
 npm install --save-dev @esbuild-plugins/node-globals-polyfill \
 		rollup-plugin-polyfill-node \
-		&& npm install
-		events \
-		xrpl
+		&& npm install xrpl
 ```
 
 ### Using xrpl.js with Deno

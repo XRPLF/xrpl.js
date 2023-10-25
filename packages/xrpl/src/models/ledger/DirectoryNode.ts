@@ -1,4 +1,4 @@
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, MissingPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * The DirectoryNode object type provides a list of links to other objects in
@@ -6,7 +6,9 @@ import BaseLedgerEntry from './BaseLedgerEntry'
  *
  * @category Ledger Entries
  */
-export default interface DirectoryNode extends BaseLedgerEntry {
+export default interface DirectoryNode
+  extends BaseLedgerEntry,
+    MissingPreviousTxnID {
   LedgerEntryType: 'DirectoryNode'
   /**
    * A bit-map of boolean flags enabled for this directory. Currently, the

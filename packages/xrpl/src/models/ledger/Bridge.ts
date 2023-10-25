@@ -1,6 +1,6 @@
 import { Amount, XChainBridge } from '../common'
 
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * A Bridge objects represents a cross-chain bridge and includes information about
@@ -9,7 +9,7 @@ import BaseLedgerEntry from './BaseLedgerEntry'
  *
  * @category Ledger Entries
  */
-export default interface Bridge extends BaseLedgerEntry {
+export default interface Bridge extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'Bridge'
 
   /** The door account that owns the bridge. */
@@ -21,13 +21,6 @@ export default interface Bridge extends BaseLedgerEntry {
    * will be split among the signers.
    */
   SignatureReward: Amount
-
-  /**
-   * The minimum amount, in XRP, required for an {@link XChainAccountCreateCommit}
-   * transaction. If this isn't present, the {@link XChainAccountCreateCommit}
-   * transaction will fail. This field can only be present on XRP-XRP bridges.
-   */
-  MinAccountCreateAmount?: string
 
   /**
    * The door accounts and assets of the bridge this object correlates to.
@@ -59,6 +52,13 @@ export default interface Bridge extends BaseLedgerEntry {
   XChainAccountClaimCount: string
 
   /**
+   * The minimum amount, in XRP, required for an {@link XChainAccountCreateCommit}
+   * transaction. If this isn't present, the {@link XChainAccountCreateCommit}
+   * transaction will fail. This field can only be present on XRP-XRP bridges.
+   */
+  MinAccountCreateAmount?: string
+
+  /**
    * A bit-map of boolean flags. No flags are defined for Bridges, so this value
    * is always 0.
    */
@@ -69,16 +69,4 @@ export default interface Bridge extends BaseLedgerEntry {
    * object, in case the directory consists of multiple pages.
    */
   OwnerNode: string
-
-  /**
-   * The identifying hash of the transaction that most recently modified this
-   * object.
-   */
-  PreviousTxnID: string
-
-  /**
-   * The index of the ledger that contains the transaction that most recently
-   * modified this object.
-   */
-  PreviousTxnLgrSeq: number
 }
