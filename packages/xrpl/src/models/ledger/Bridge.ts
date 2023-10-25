@@ -23,13 +23,6 @@ export default interface Bridge extends BaseLedgerEntry, HasPreviousTxnID {
   SignatureReward: Amount
 
   /**
-   * The minimum amount, in XRP, required for an {@link XChainAccountCreateCommit}
-   * transaction. If this isn't present, the {@link XChainAccountCreateCommit}
-   * transaction will fail. This field can only be present on XRP-XRP bridges.
-   */
-  MinAccountCreateAmount?: string
-
-  /**
    * The door accounts and assets of the bridge this object correlates to.
    */
   XChainBridge: XChainBridge
@@ -57,6 +50,13 @@ export default interface Bridge extends BaseLedgerEntry, HasPreviousTxnID {
    * to prevent transaction replay.
    */
   XChainAccountClaimCount: string
+
+  /**
+   * The minimum amount, in XRP, required for an {@link XChainAccountCreateCommit}
+   * transaction. If this isn't present, the {@link XChainAccountCreateCommit}
+   * transaction will fail. This field can only be present on XRP-XRP bridges.
+   */
+  MinAccountCreateAmount?: string
 
   /**
    * A bit-map of boolean flags. No flags are defined for Bridges, so this value
