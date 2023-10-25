@@ -153,20 +153,22 @@ describe('fundWallet', function () {
   )
 
   it('handles errors', async () => {
-    expect.assertions(1)
     const api = new Client('wss://s.altnet.rippletest.net:51233')
-
     await api.connect()
 
-    await expect(
-      api.fundWallet(null, {
+    try {
+      await api.fundWallet(null, {
         amount: '-1000',
         usageContext: 'integration-test',
-      }),
-    ).rejects.toEqual(
-      new XRPLFaucetError(
-        'Request failed: {"body":{"error":"Invalid amount","detail":"Must be an integer"},"contentType":"application/json; charset=utf-8","statusCode":400}',
-      ),
-    )
+      })
+
+      throw new Error('Error not thrown')
+    } catch (error) {
+      expect(error).toEqual(
+        new XRPLFaucetError(
+          'Request failed: {"body":{"error":"Invalid amount","detail":"Must be an integer"},"contentType":"application/json; charset=utf-8","statusCode":400}',
+        ),
+      )
+    }
   })
 })
