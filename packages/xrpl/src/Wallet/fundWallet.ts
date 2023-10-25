@@ -158,14 +158,14 @@ export async function requestFunding(
     body: JSON.stringify(postBody),
   })
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- It's a FaucetWallet
-  const body = (await response.json()) as FaucetWallet
-  // "application/json; charset=utf-8"
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- it can be anything
+  const body = await response.json()
   if (
     response.ok &&
     response.headers.get('Content-Type')?.startsWith('application/json')
   ) {
-    const classicAddress = body.account.classicAddress
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- It's a FaucetWallet
+    const classicAddress = (body as FaucetWallet).account.classicAddress
     return processSuccessfulResponse(
       client,
       classicAddress,
@@ -173,7 +173,7 @@ export async function requestFunding(
       startingBalance,
     )
   }
-  return processError(response)
+  return processError(response, body)
 }
 
 // eslint-disable-next-line max-params -- Only used as a helper function, lines inc due to added balance.
@@ -218,12 +218,12 @@ async function processSuccessfulResponse(
   }
 }
 
-async function processError(response: Response): Promise<never> {
+async function processError(response: Response, body): Promise<never> {
   return Promise.reject(
     new XRPLFaucetError(
       `Request failed: ${JSON.stringify({
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- json response could be anything
-        body: (await response.json()) || {},
+        body: body || {},
         contentType: response.headers.get('Content-Type'),
         statusCode: response.status,
       })}`,
