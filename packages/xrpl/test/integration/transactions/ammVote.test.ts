@@ -20,8 +20,7 @@ describe('AMMVote', function () {
   afterAll(async () => teardownClient(testContext))
 
   it('vote', async function () {
-    const { asset, asset2 } = testContext.amm
-    const { wallet } = testContext
+    const { asset, asset2, testWallet } = testContext.amm
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -45,13 +44,13 @@ describe('AMMVote', function () {
 
     const ammVoteTx: AMMVote = {
       TransactionType: 'AMMVote',
-      Account: wallet.classicAddress,
+      Account: testWallet.classicAddress,
       Asset: asset,
       Asset2: asset2,
       TradingFee: 150,
     }
 
-    await testTransaction(testContext.client, ammVoteTx, wallet)
+    await testTransaction(testContext.client, ammVoteTx, testWallet)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',

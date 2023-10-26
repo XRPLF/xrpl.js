@@ -20,8 +20,7 @@ describe('AMMWithdraw', function () {
   afterAll(async () => teardownClient(testContext))
 
   it('withdraw with Amount', async function () {
-    const { asset, asset2 } = testContext.amm
-    const { wallet } = testContext
+    const { asset, asset2, testWallet } = testContext.amm
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -38,14 +37,14 @@ describe('AMMWithdraw', function () {
 
     const ammWithdrawTx: AMMWithdraw = {
       TransactionType: 'AMMWithdraw',
-      Account: wallet.classicAddress,
+      Account: testWallet.classicAddress,
       Asset: asset,
       Asset2: asset2,
       Amount: '500',
       Flags: AMMWithdrawFlags.tfSingleAsset,
     }
 
-    await testTransaction(testContext.client, ammWithdrawTx, wallet)
+    await testTransaction(testContext.client, ammWithdrawTx, testWallet)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -84,8 +83,7 @@ describe('AMMWithdraw', function () {
   })
 
   it('withdraw with Amount and Amount2', async function () {
-    const { asset, asset2 } = testContext.amm
-    const { wallet } = testContext
+    const { asset, asset2, testWallet } = testContext.amm
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -106,7 +104,7 @@ describe('AMMWithdraw', function () {
 
     const ammWithdrawTx: AMMWithdraw = {
       TransactionType: 'AMMWithdraw',
-      Account: wallet.classicAddress,
+      Account: testWallet.classicAddress,
       Asset: asset,
       Asset2: asset2,
       Amount: '50',
@@ -118,7 +116,7 @@ describe('AMMWithdraw', function () {
       Flags: AMMWithdrawFlags.tfTwoAsset,
     }
 
-    await testTransaction(testContext.client, ammWithdrawTx, wallet)
+    await testTransaction(testContext.client, ammWithdrawTx, testWallet)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -167,8 +165,7 @@ describe('AMMWithdraw', function () {
   })
 
   it('withdraw with Amount and LPTokenIn', async function () {
-    const { asset, asset2 } = testContext.amm
-    const { wallet } = testContext
+    const { asset, asset2, testWallet } = testContext.amm
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -186,7 +183,7 @@ describe('AMMWithdraw', function () {
     const lptokenIn = { ...preLPToken, value: '5' }
     const ammWithdrawTx: AMMWithdraw = {
       TransactionType: 'AMMWithdraw',
-      Account: wallet.classicAddress,
+      Account: testWallet.classicAddress,
       Asset: asset,
       Asset2: asset2,
       Amount: '5',
@@ -194,7 +191,7 @@ describe('AMMWithdraw', function () {
       Flags: AMMWithdrawFlags.tfOneAssetLPToken,
     }
 
-    await testTransaction(testContext.client, ammWithdrawTx, wallet)
+    await testTransaction(testContext.client, ammWithdrawTx, testWallet)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -239,8 +236,7 @@ describe('AMMWithdraw', function () {
   })
 
   it('withdraw with LPTokenIn', async function () {
-    const { asset, asset2 } = testContext.amm
-    const { wallet } = testContext
+    const { asset, asset2, testWallet } = testContext.amm
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -258,14 +254,14 @@ describe('AMMWithdraw', function () {
     const lptokenIn = { ...preLPToken, value: '5' }
     const ammWithdrawTx: AMMWithdraw = {
       TransactionType: 'AMMWithdraw',
-      Account: wallet.classicAddress,
+      Account: testWallet.classicAddress,
       Asset: asset,
       Asset2: asset2,
       LPTokenIn: lptokenIn,
       Flags: AMMWithdrawFlags.tfLPToken,
     }
 
-    await testTransaction(testContext.client, ammWithdrawTx, wallet)
+    await testTransaction(testContext.client, ammWithdrawTx, testWallet)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',

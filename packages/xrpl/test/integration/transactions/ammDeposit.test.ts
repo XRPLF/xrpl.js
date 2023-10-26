@@ -20,12 +20,12 @@ describe('AMMDeposit', function () {
   afterAll(async () => teardownClient(testContext))
 
   it('deposit with Amount', async function () {
-    const { asset, asset2 } = testContext.amm
+    const { asset, asset2, testWallet } = testContext.amm
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
-      asset: testContext.amm.asset,
-      asset2: testContext.amm.asset2,
+      asset,
+      asset2,
     })
 
     const { amm: preAmm } = preAmmInfoRes.result
@@ -33,14 +33,14 @@ describe('AMMDeposit', function () {
 
     const ammDepositTx: AMMDeposit = {
       TransactionType: 'AMMDeposit',
-      Account: testContext.wallet.classicAddress,
+      Account: testWallet.classicAddress,
       Asset: asset,
       Asset2: asset2,
       Amount: '1000',
       Flags: AMMDepositFlags.tfSingleAsset,
     }
 
-    await testTransaction(testContext.client, ammDepositTx, testContext.wallet)
+    await testTransaction(testContext.client, ammDepositTx, testWallet)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',

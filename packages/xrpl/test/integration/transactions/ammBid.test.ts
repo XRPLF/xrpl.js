@@ -19,8 +19,7 @@ describe('AMMBid', function () {
   afterAll(async () => teardownClient(testContext))
 
   it('bid', async function () {
-    const { asset, asset2 } = testContext.amm
-    const { wallet } = testContext
+    const { asset, asset2, testWallet } = testContext.amm
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -36,12 +35,12 @@ describe('AMMBid', function () {
 
     const ammBidTx: AMMBid = {
       TransactionType: 'AMMBid',
-      Account: wallet.classicAddress,
+      Account: testWallet.classicAddress,
       Asset: asset,
       Asset2: asset2,
     }
 
-    await testTransaction(testContext.client, ammBidTx, wallet)
+    await testTransaction(testContext.client, ammBidTx, testWallet)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -71,8 +70,7 @@ describe('AMMBid', function () {
   })
 
   it('vote with AuthAccounts, BidMin, BidMax', async function () {
-    const { asset, asset2, issuerWallet } = testContext.amm
-    const { wallet } = testContext
+    const { asset, asset2, issuerWallet, testWallet } = testContext.amm
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -88,7 +86,7 @@ describe('AMMBid', function () {
 
     const ammBidTx: AMMBid = {
       TransactionType: 'AMMBid',
-      Account: wallet.classicAddress,
+      Account: testWallet.classicAddress,
       Asset: asset,
       Asset2: asset2,
       AuthAccounts: [
@@ -102,7 +100,7 @@ describe('AMMBid', function () {
       BidMax: { ...preLPToken, value: '10' },
     }
 
-    await testTransaction(testContext.client, ammBidTx, wallet)
+    await testTransaction(testContext.client, ammBidTx, testWallet)
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
