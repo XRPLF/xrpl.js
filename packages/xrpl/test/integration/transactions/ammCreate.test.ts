@@ -4,6 +4,8 @@ import { isValidClassicAddress } from 'xrpl'
 import { AMMInfoResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
+  AMMPool,
+  setupAMMPool,
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
@@ -11,14 +13,16 @@ import {
 
 describe('AMMCreate', function () {
   let testContext: XrplIntegrationTestContext
+  let ammPool: AMMPool
 
   beforeAll(async () => {
     testContext = await setupClient(serverUrl)
+    ammPool = await setupAMMPool(testContext.client)
   })
   afterAll(async () => teardownClient(testContext))
 
   it('base', async function () {
-    const { asset, asset2 } = testContext.amm
+    const { asset, asset2 } = ammPool
 
     const ammInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',

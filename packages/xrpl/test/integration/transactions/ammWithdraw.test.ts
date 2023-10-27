@@ -5,6 +5,8 @@ import { AMMWithdraw, AMMWithdrawFlags } from 'xrpl'
 import { AMMInfoResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
+  AMMPool,
+  setupAMMPool,
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
@@ -13,19 +15,21 @@ import { testTransaction } from '../utils'
 
 describe('AMMWithdraw', function () {
   let testContext: XrplIntegrationTestContext
+  let ammPool: AMMPool
 
   beforeAll(async () => {
     testContext = await setupClient(serverUrl)
+    ammPool = await setupAMMPool(testContext.client)
   })
   afterAll(async () => teardownClient(testContext))
 
   it('withdraw with Amount', async function () {
-    const { asset, asset2, testWallet } = testContext.amm
+    const { asset, asset2, testWallet } = ammPool
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
-      asset: testContext.amm.asset,
-      asset2: testContext.amm.asset2,
+      asset,
+      asset2,
     })
 
     const { amm: preAmm } = preAmmInfoRes.result
@@ -83,7 +87,7 @@ describe('AMMWithdraw', function () {
   })
 
   it('withdraw with Amount and Amount2', async function () {
-    const { asset, asset2, testWallet } = testContext.amm
+    const { asset, asset2, testWallet } = ammPool
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -165,7 +169,7 @@ describe('AMMWithdraw', function () {
   })
 
   it('withdraw with Amount and LPTokenIn', async function () {
-    const { asset, asset2, testWallet } = testContext.amm
+    const { asset, asset2, testWallet } = ammPool
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -236,7 +240,7 @@ describe('AMMWithdraw', function () {
   })
 
   it('withdraw with LPTokenIn', async function () {
-    const { asset, asset2, testWallet } = testContext.amm
+    const { asset, asset2, testWallet } = ammPool
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',

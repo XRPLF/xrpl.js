@@ -5,6 +5,8 @@ import { AMMVote } from 'xrpl'
 import { AMMInfoResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
+  AMMPool,
+  setupAMMPool,
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
@@ -13,14 +15,16 @@ import { testTransaction } from '../utils'
 
 describe('AMMVote', function () {
   let testContext: XrplIntegrationTestContext
+  let ammPool: AMMPool
 
   beforeAll(async () => {
     testContext = await setupClient(serverUrl)
+    ammPool = await setupAMMPool(testContext.client)
   })
   afterAll(async () => teardownClient(testContext))
 
   it('vote', async function () {
-    const { asset, asset2, testWallet } = testContext.amm
+    const { asset, asset2, testWallet } = ammPool
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',

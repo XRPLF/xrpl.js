@@ -40,7 +40,6 @@ interface TestBridge {
 }
 
 export interface XrplIntegrationTestContext {
-  amm: AMMPool
   client: Client
   wallet: Wallet
 }
@@ -77,7 +76,6 @@ export async function setupClient(
       delayMs: 1000,
     })
     const context: XrplIntegrationTestContext = {
-      amm: await setupAMMPool(client),
       client,
       wallet,
     }
@@ -85,7 +83,7 @@ export async function setupClient(
   })
 }
 
-async function setupAMMPool(client: Client): Promise<AMMPool> {
+export async function setupAMMPool(client: Client): Promise<AMMPool> {
   const lpWallet = await generateFundedWallet(client)
   const issuerWallet = await generateFundedWallet(client)
   const testWallet = await generateFundedWallet(client)

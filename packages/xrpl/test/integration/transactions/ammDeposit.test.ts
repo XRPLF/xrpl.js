@@ -5,6 +5,8 @@ import { AMMDeposit, AMMDepositFlags } from 'xrpl'
 import { AMMInfoResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
+  AMMPool,
+  setupAMMPool,
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
@@ -13,14 +15,16 @@ import { testTransaction } from '../utils'
 
 describe('AMMDeposit', function () {
   let testContext: XrplIntegrationTestContext
+  let ammPool: AMMPool
 
   beforeAll(async () => {
     testContext = await setupClient(serverUrl)
+    ammPool = await setupAMMPool(testContext.client)
   })
   afterAll(async () => teardownClient(testContext))
 
   it('deposit with Amount', async function () {
-    const { asset, asset2, testWallet } = testContext.amm
+    const { asset, asset2, testWallet } = ammPool
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -79,7 +83,7 @@ describe('AMMDeposit', function () {
   })
 
   it('deposit with Amount and Amount2', async function () {
-    const { asset, asset2, issuerWallet } = testContext.amm
+    const { asset, asset2, issuerWallet } = ammPool
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -157,7 +161,7 @@ describe('AMMDeposit', function () {
   })
 
   it('deposit with Amount and LPTokenOut', async function () {
-    const { asset, asset2, issuerWallet } = testContext.amm
+    const { asset, asset2, issuerWallet } = ammPool
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
@@ -228,7 +232,7 @@ describe('AMMDeposit', function () {
   })
 
   it('deposit with LPTokenOut', async function () {
-    const { asset, asset2, issuerWallet } = testContext.amm
+    const { asset, asset2, issuerWallet } = ammPool
 
     const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
       command: 'amm_info',
