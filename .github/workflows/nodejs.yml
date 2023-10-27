@@ -4,16 +4,13 @@
 name: Node.js CI
 
 env:
-  RIPPLED_DOCKER_IMAGE: xrpllabsofficial/xrpld:1.12.0
+  RIPPLED_DOCKER_IMAGE: rippleci/rippled:2.0.0-b3
 
 on:
   push:
     branches: [main, 1.x]
   pull_request:
   workflow_dispatch:
-
-env:
-  RIPPLED_DOCKER_IMAGE: rippleci/rippled:2.0.0-b3
 
 jobs:
   build-and-lint:
