@@ -55,10 +55,9 @@ describe('AMMBid', function () {
     const { amm } = ammInfoRes.result
     const { auction_slot, lp_token } = amm
 
-    if (auction_slot === undefined) {
-      throw new Error('auction_slot should not be undefined')
-    }
+    assert.ok(auction_slot)
 
+    // @ts-expect-error: auction_slot should be defined at this point
     const afterPriceValue = parseFloat(auction_slot.price.value)
     const beforePriceValue = parseFloat(preAuctionSlot.price.value)
     const diffPriceValue = 0.00268319257224121
@@ -84,9 +83,8 @@ describe('AMMBid', function () {
 
     const { amm: preAmm } = preAmmInfoRes.result
     const { auction_slot: preAuctionSlot, lp_token: preLPToken } = preAmm
-    if (preAuctionSlot === undefined) {
-      throw new Error('preAuctionSlot should not be undefined')
-    }
+
+    assert.ok(preAuctionSlot)
 
     const ammBidTx: AMMBid = {
       TransactionType: 'AMMBid',
@@ -120,6 +118,7 @@ describe('AMMBid', function () {
     }
 
     const afterPriceValue = parseFloat(auction_slot.price.value)
+    // @ts-expect-error: auction_slot should be defined at this point
     const beforePriceValue = parseFloat(preAuctionSlot.price.value)
     const diffPriceValue = 4.997316807427759
     const expectedPriceValue = beforePriceValue + diffPriceValue

@@ -29,14 +29,14 @@ describe('AMMCreate', function () {
       asset2,
     })
     const { amm } = ammInfoRes.result
-    if (asset2.issuer == null) {
-      throw new Error('issuer is null')
-    }
+
+    assert.ok(asset2.issuer)
 
     assert.isTrue(isValidClassicAddress(amm.account))
     assert.equal(amm.amount, '250')
     assert.deepEqual(amm.amount2, {
       currency: asset2.currency,
+      // @ts-expect-error: asset2.issuer should be defined at this point
       issuer: asset2.issuer,
       value: '250',
     })

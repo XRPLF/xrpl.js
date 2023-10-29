@@ -94,9 +94,7 @@ describe('AMMDeposit', function () {
     const { amm: preAmm } = preAmmInfoRes.result
     const { amount: preAmount, amount2: preAmount2 } = preAmm
 
-    if (asset2.issuer == null) {
-      throw new Error('asset2.issuer should not be null')
-    }
+    assert.ok(asset2.issuer)
 
     const ammDepositTx: AMMDeposit = {
       TransactionType: 'AMMDeposit',
@@ -106,6 +104,7 @@ describe('AMMDeposit', function () {
       Amount: '100',
       Amount2: {
         currency: asset2.currency,
+        // @ts-expect-error: asset2.issuer should be defined at this point
         issuer: asset2.issuer,
         value: '100',
       },

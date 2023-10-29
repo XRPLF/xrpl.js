@@ -38,13 +38,12 @@ describe('AMMVote', function () {
       trading_fee: preTradingFee,
       vote_slots: preVoteSlots,
     } = preAmm
-    if (preAuctionSlot === undefined) {
-      throw new Error('preAuctionSlot should not be undefined')
-    }
+
+    assert.ok(preAuctionSlot)
+    assert.ok(preVoteSlots)
+
+    // @ts-expect-error: preAuctionSlot should be defined at this point
     const { discounted_fee: preDiscountedFee } = preAuctionSlot
-    if (preVoteSlots === undefined) {
-      throw new Error('preVoteSlots should not be undefined')
-    }
 
     const ammVoteTx: AMMVote = {
       TransactionType: 'AMMVote',
@@ -65,14 +64,12 @@ describe('AMMVote', function () {
     const { amm } = ammInfoRes.result
     const { auction_slot, trading_fee, vote_slots } = amm
 
-    if (auction_slot === undefined) {
-      throw new Error('auction_slot should not be undefined')
-    }
+    assert.ok(auction_slot)
+
+    // @ts-expect-error: auction_slot should be defined at this point
     const { discounted_fee } = auction_slot
 
-    if (vote_slots === undefined) {
-      throw new Error('vote_slots should not be undefined')
-    }
+    assert.ok(vote_slots)
 
     const afterTradingFee = trading_fee
     const beforeTradingFee = preTradingFee
@@ -82,10 +79,12 @@ describe('AMMVote', function () {
     const afterDiscountedFee = discounted_fee
     const beforeDiscountedFee = preDiscountedFee
     const diffDiscountedFee = 7
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands -- this is valid
     const expectedDiscountedFee = beforeDiscountedFee + diffDiscountedFee
 
     assert.equal(afterTradingFee, expectedTradingFee)
     assert.equal(afterDiscountedFee, expectedDiscountedFee)
+    // @ts-expect-error: preVoteSlots should be defined at this point
     assert.equal(vote_slots.length - preVoteSlots.length, 1)
   })
 })

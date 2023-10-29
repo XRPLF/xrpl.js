@@ -102,9 +102,7 @@ describe('AMMWithdraw', function () {
       lp_token: preLPToken,
     } = preAmm
 
-    if (asset2.issuer == null) {
-      throw new Error('asset2.issuer should not be null')
-    }
+    assert.ok(asset2.issuer)
 
     const ammWithdrawTx: AMMWithdraw = {
       TransactionType: 'AMMWithdraw',
@@ -114,6 +112,7 @@ describe('AMMWithdraw', function () {
       Amount: '50',
       Amount2: {
         currency: asset2.currency,
+        // @ts-expect-error: asset2.issuer should be defined at this point
         issuer: asset2.issuer,
         value: '50',
       },
