@@ -1,17 +1,11 @@
 import { assert } from 'chai'
 
 import {
-  AMMCreate,
   AMMDeposit,
   AMMDepositFlags,
-  AccountSet,
-  AccountSetAsfFlags,
   Client,
   Currency,
-  Payment,
   SignerListSet,
-  TrustSet,
-  TrustSetFlags,
   Wallet,
   XChainBridge,
   XChainCreateBridge,
@@ -20,12 +14,13 @@ import {
 import serverUrl from './serverUrl'
 import {
   GENESIS_ACCOUNT,
+  createAMMPool,
   fundAccount,
   generateFundedWallet,
   testTransaction,
 } from './utils'
 
-export interface AMMPool {
+export interface TestAMMPool {
   issuerWallet: Wallet
   lpWallet: Wallet
   testWallet: Wallet
@@ -83,65 +78,11 @@ export async function setupClient(
   })
 }
 
-export async function setupAMMPool(client: Client): Promise<AMMPool> {
-  const lpWallet = await generateFundedWallet(client)
-  const issuerWallet = await generateFundedWallet(client)
+export async function setupAMMPool(client: Client): Promise<TestAMMPool> {
+  const testAMMPool = await createAMMPool(client)
+  const { issuerWallet, lpWallet, asset, asset2 } = testAMMPool
+
   const testWallet = await generateFundedWallet(client)
-  const currencyCode = 'USD'
-
-  const accountSetTx: AccountSet = {
-    TransactionType: 'AccountSet',
-    Account: issuerWallet.classicAddress,
-    SetFlag: AccountSetAsfFlags.asfDefaultRipple,
-  }
-
-  await testTransaction(client, accountSetTx, issuerWallet)
-
-  const trustSetTx: TrustSet = {
-    TransactionType: 'TrustSet',
-    Flags: TrustSetFlags.tfClearNoRipple,
-    Account: lpWallet.classicAddress,
-    LimitAmount: {
-      currency: currencyCode,
-      issuer: issuerWallet.classicAddress,
-      value: '1000',
-    },
-  }
-
-  await testTransaction(client, trustSetTx, lpWallet)
-
-  const paymentTx: Payment = {
-    TransactionType: 'Payment',
-    Account: issuerWallet.classicAddress,
-    Destination: lpWallet.classicAddress,
-    Amount: {
-      currency: currencyCode,
-      issuer: issuerWallet.classicAddress,
-      value: '500',
-    },
-  }
-
-  await testTransaction(client, paymentTx, issuerWallet)
-
-  const ammCreateTx: AMMCreate = {
-    TransactionType: 'AMMCreate',
-    Account: lpWallet.classicAddress,
-    Amount: '250',
-    Amount2: {
-      currency: currencyCode,
-      issuer: issuerWallet.classicAddress,
-      value: '250',
-    },
-    TradingFee: 12,
-  }
-
-  await testTransaction(client, ammCreateTx, lpWallet)
-
-  const asset: Currency = { currency: 'XRP' }
-  const asset2: Currency = {
-    currency: currencyCode,
-    issuer: issuerWallet.classicAddress,
-  }
 
   // Need to deposit (be an LP) to make bid/vote/withdraw eligible in tests for testContext.wallet
   const ammDepositTx: AMMDeposit = {

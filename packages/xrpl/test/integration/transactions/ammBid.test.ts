@@ -4,17 +4,17 @@ import { AMMBid } from 'xrpl'
 import { AMMInfoResponse } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
-  AMMPool,
   setupAMMPool,
   setupClient,
   teardownClient,
+  type TestAMMPool,
   type XrplIntegrationTestContext,
 } from '../setup'
 import { testTransaction } from '../utils'
 
 describe('AMMBid', function () {
   let testContext: XrplIntegrationTestContext
-  let ammPool: AMMPool
+  let ammPool: TestAMMPool
 
   beforeAll(async () => {
     testContext = await setupClient(serverUrl)
