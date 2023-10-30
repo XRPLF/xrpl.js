@@ -55,14 +55,12 @@ describe('AMMDeposit', function () {
     const { amm } = ammInfoRes.result
     const { amount, amount2, lp_token } = amm
 
-    if (typeof amount !== 'string') {
-      throw new Error('amount should be a string')
-    }
-    if (typeof preAmount !== 'string') {
-      throw new Error('preAmount should be a string')
-    }
+    expect(typeof amount).toBe('string')
+    expect(typeof preAmount).toBe('string')
 
+    // @ts-expect-error: amount should be a string
     const afterAmountDrops = parseInt(amount, 10)
+    // @ts-expect-error: preAmount should be a string
     const beforeAmountDrops = parseInt(preAmount, 10)
     const diffAmountDrops = 1000
     const expectedAmountDrops = beforeAmountDrops + diffAmountDrops
@@ -122,27 +120,23 @@ describe('AMMDeposit', function () {
     const { amm } = ammInfoRes.result
     const { amount, amount2, lp_token } = amm
 
-    if (typeof amount !== 'string') {
-      throw new Error('amount should be a string')
-    }
-    if (typeof preAmount !== 'string') {
-      throw new Error('preAmount should be a string')
-    }
-    if (typeof amount2 !== 'object') {
-      throw new Error('amount2 should be an object')
-    }
-    if (typeof preAmount2 !== 'object') {
-      throw new Error('preAmount2 should be an object')
-    }
+    expect(typeof amount).toBe('string')
+    expect(typeof preAmount).toBe('string')
+    expect(typeof amount2).toBe('object')
+    expect(typeof preAmount2).toBe('object')
 
+    // @ts-expect-error: amount should be a string
     const afterAmountDrops = parseInt(amount, 10)
+    // @ts-expect-error: preAmount should be a string
     const beforeAmountDrops = parseInt(preAmount, 10)
     const diffAmountDrops = 100
     const expectedAmountDrops = beforeAmountDrops + diffAmountDrops
 
     const afterAmount2 = amount2
     const beforeAmount2 = preAmount2
+    // @ts-expect-error: afterAmount2 should be an object
     const afterAmount2Value = parseInt(afterAmount2.value, 10)
+    // @ts-expect-error: beforeAmount2 should be an object
     const beforeAmount2Value = parseInt(beforeAmount2.value, 10)
     const diffAmount2Value = 11
     const expectedAmount2Value = beforeAmount2Value + diffAmount2Value
@@ -197,20 +191,14 @@ describe('AMMDeposit', function () {
     const { amm } = ammInfoRes.result
     const { amount, amount2, lp_token } = amm
 
-    if (typeof amount !== 'string') {
-      throw new Error('amount should be a string')
-    }
-    if (typeof preAmount !== 'string') {
-      throw new Error('preAmount should be a string')
-    }
-    if (typeof amount2 !== 'object') {
-      throw new Error('amount2 should be an object')
-    }
-    if (typeof preAmount2 !== 'object') {
-      throw new Error('preAmount2 should be an object')
-    }
+    expect(typeof amount).toBe('string')
+    expect(typeof preAmount).toBe('string')
+    expect(typeof amount2).toBe('object')
+    expect(typeof preAmount2).toBe('object')
 
+    // @ts-expect-error: amount should be a string
     const afterAmountDrops = parseInt(amount, 10)
+    // @ts-expect-error: preAmount should be a string
     const beforeAmountDrops = parseInt(preAmount, 10)
     const diffAmountDrops = 30
     const expectedAmountDrops = beforeAmountDrops + diffAmountDrops
@@ -267,27 +255,23 @@ describe('AMMDeposit', function () {
     const { amm } = ammInfoRes.result
     const { amount, amount2, lp_token } = amm
 
-    if (typeof amount !== 'string') {
-      throw new Error('amount should be a string')
-    }
-    if (typeof preAmount !== 'string') {
-      throw new Error('preAmount should be a string')
-    }
-    if (typeof amount2 !== 'object') {
-      throw new Error('amount2 should be an object')
-    }
-    if (typeof preAmount2 !== 'object') {
-      throw new Error('preAmount2 should be an object')
-    }
+    expect(typeof amount).toBe('string')
+    expect(typeof preAmount).toBe('string')
+    expect(typeof amount2).toBe('object')
+    expect(typeof preAmount2).toBe('object')
 
+    // @ts-expect-error: amount should be a string
     const afterAmountDrops = parseInt(amount, 10)
+    // @ts-expect-error: preAmount should be a string
     const beforeAmountDrops = parseInt(preAmount, 10)
     const diffAmountDrops = 15
     const expectedAmountDrops = beforeAmountDrops + diffAmountDrops
 
     const afterAmount2 = amount2
     const beforeAmount2 = preAmount2
+    // @ts-expect-error: afterAmount2 should be an object
     const afterAmount2Value = parseInt(afterAmount2.value, 10)
+    // @ts-expect-error: beforeAmount2 should be an object
     const beforeAmount2Value = parseInt(beforeAmount2.value, 10)
     const diffAmount2Value = 1
     const expectedAmount2Value = beforeAmount2Value + diffAmount2Value
