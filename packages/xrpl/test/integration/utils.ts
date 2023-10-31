@@ -183,6 +183,11 @@ export async function verifySubmittedTransaction(
     command: 'tx',
     transaction: hash,
   })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: handle this API change for 2.0.0
+  const decodedTx: any = typeof tx === 'string' ? decode(tx) : tx
+  if (decodedTx.TransactionType === 'Payment') {
+    decodedTx.DeliverMax = decodedTx.Amount
+  }
 
   assert(data.result)
   assert.deepEqual(
@@ -195,7 +200,7 @@ export async function verifySubmittedTransaction(
       'validated',
       'ctid',
     ]),
-    typeof tx === 'string' ? decode(tx) : tx,
+    decodedTx,
   )
   if (typeof data.result.meta === 'object') {
     assert.strictEqual(data.result.meta.TransactionResult, 'tesSUCCESS')

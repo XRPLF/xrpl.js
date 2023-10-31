@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Support for `server_definitions` RPC
+
 ## 2.13.0 (2023-10-18)
 
 ### Fixed
