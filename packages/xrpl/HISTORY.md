@@ -4,6 +4,15 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Breaking Changes
+* `Transaction` type has been redefined to include all transactions and `SubmittableTransaction` was created to define the old value. The following functions which only handle transactions to be submitted now use `SubmittableTransaction`:
+  * `Client.autofill`
+  * `Client.submit`
+  * `Client.submitAndWait`
+  * `Client.prepareTransaction`
+  * `getSignedTx`
+  * `isAccountDelete`
+
 ## 3.0.0 Beta 1 (2023-10-19)
 
 ### Breaking Changes
