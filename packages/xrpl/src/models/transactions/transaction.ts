@@ -90,9 +90,11 @@ import {
 } from './XChainModifyBridge'
 
 /**
+ * Transactions that can be submitted by clients
+ *
  * @category Transaction Models
  */
-export type Transaction =
+export type SubmittableTransaction =
   | AMMBid
   | AMMCreate
   | AMMDelete
@@ -135,7 +137,19 @@ export type Transaction =
   | XChainCreateClaimID
   | XChainModifyBridge
 
+/**
+ * Transactions that can only be created by validators.
+ *
+ * @category Transaction Models
+ */
 export type PseudoTransaction = EnableAmendment | SetFee | UNLModify
+
+/**
+ * All transactions that can live on the XRPL
+ *
+ * @category Transaction Models
+ */
+export type Transaction = SubmittableTransaction | PseudoTransaction
 
 /**
  * @category Transaction Models

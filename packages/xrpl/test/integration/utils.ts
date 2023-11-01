@@ -20,6 +20,7 @@ import {
   AccountSet,
   AccountSetAsfFlags,
   Payment,
+  SubmittableTransaction,
   Transaction,
   TrustSet,
   TrustSetFlags,
@@ -98,7 +99,7 @@ export async function submitTransaction({
   retry = { count: 5, delayMs: 1000 },
 }: {
   client: Client
-  transaction: Transaction
+  transaction: SubmittableTransaction
   wallet: Wallet
   retry?: {
     count: number
@@ -234,7 +235,7 @@ export async function verifySubmittedTransaction(
 // eslint-disable-next-line max-params -- Test function, many params are needed
 export async function testTransaction(
   client: Client,
-  transaction: Transaction,
+  transaction: SubmittableTransaction,
   wallet: Wallet,
   retry?: {
     count: number
