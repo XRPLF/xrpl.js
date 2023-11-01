@@ -2,6 +2,11 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that `@xrplf/secret-numbers` users stay up-to-date with the latest stable release.
 
+## Unreleased
+
+### BREAKING CHANGES:
+- Moved all methods that were on `Utils` are now individually exported.
+
 ## 1.0.0 Beta 1 (2023-10-19)
 
 * Add `xrpl-secret-numbers` by @WietseWind  to the mono repo.
