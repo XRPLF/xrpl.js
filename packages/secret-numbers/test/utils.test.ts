@@ -1,8 +1,16 @@
-import * as utils from '../src/utils'
+import {
+  calculateChecksum,
+  checkChecksum,
+  entropyToSecret,
+  parseSecretString,
+  randomEntropy,
+  randomSecret,
+  secretToEntropy,
+} from '../src/utils'
 
 describe('Utils', () => {
   it('randomEntropy: valid output', () => {
-    const data = utils.randomEntropy()
+    const data = randomEntropy()
     expect(typeof data).toEqual('object')
     expect(data instanceof Buffer).toBeTruthy()
     expect(data.length).toEqual(16)
@@ -11,32 +19,32 @@ describe('Utils', () => {
   })
 
   it('calculateChecksum: 1st position', () => {
-    expect(utils.calculateChecksum(0, 55988)).toEqual(8)
+    expect(calculateChecksum(0, 55988)).toEqual(8)
   })
 
   it('calculateChecksum: 8th position', () => {
-    expect(utils.calculateChecksum(7, 49962)).toEqual(0)
+    expect(calculateChecksum(7, 49962)).toEqual(0)
   })
 
   it('checkChecksum: 2nd position, split numbers', () => {
-    expect(utils.checkChecksum(1, 55450, 3)).toBeTruthy()
+    expect(checkChecksum(1, 55450, 3)).toBeTruthy()
   })
 
   it('checkChecksum: 7th position, split numbers', () => {
-    expect(utils.checkChecksum(6, 18373, 7)).toBeTruthy()
+    expect(checkChecksum(6, 18373, 7)).toBeTruthy()
   })
 
   it('checkChecksum: 4th position, as string', () => {
-    expect(utils.checkChecksum(3, '391566')).toBeTruthy()
+    expect(checkChecksum(3, '391566')).toBeTruthy()
   })
 
   it('randomSecret: valid checksums', () => {
-    utils.randomSecret()
+    randomSecret()
     expect(0).toEqual(0)
   })
 
   it('randomSecret: valid output', () => {
-    const data = utils.randomSecret()
+    const data = randomSecret()
     expect(Array.isArray(data)).toBeTruthy()
     expect(data.length).toEqual(8)
     expect(typeof data[0]).toEqual('string')
@@ -56,7 +64,7 @@ describe('Utils', () => {
       '076618',
       '024286',
     ]
-    expect(utils.entropyToSecret(entropy)).toEqual(secret)
+    expect(entropyToSecret(entropy)).toEqual(secret)
   })
 
   it('secretToEntropy', () => {
@@ -71,7 +79,7 @@ describe('Utils', () => {
       '024286',
     ]
     const entropy = Buffer.from('76ebb2d06879b45b7568fb9c1ded097c', 'hex')
-    expect(utils.secretToEntropy(secret)).toEqual(entropy)
+    expect(secretToEntropy(secret)).toEqual(entropy)
   })
 
   it('parseSecretString with spaces valid', () => {
@@ -86,17 +94,15 @@ describe('Utils', () => {
       '024286',
     ]
     expect(
-      utils.parseSecretString(
+      parseSecretString(
         '304435 457766 267453 461717 300560 644127 076618 024286',
       ),
     ).toEqual(secret)
     expect(
-      utils.parseSecretString(
-        '304435457766267453461717300560644127076618024286',
-      ),
+      parseSecretString('304435457766267453461717300560644127076618024286'),
     ).toEqual(secret)
     expect(
-      utils.parseSecretString(`
+      parseSecretString(`
       304435 457766
       267453 461717
       300560 644127
