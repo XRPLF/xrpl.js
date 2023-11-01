@@ -1,10 +1,14 @@
-import * as keypairs from 'ripple-keypairs'
+import { deriveAddress, deriveKeypair, generateSeed } from 'ripple-keypairs'
 
-import * as utils from '../utils'
+import {
+  entropyToSecret,
+  parseSecretString,
+  randomSecret,
+  secretToEntropy,
+} from '../utils'
 
 /* Types ==================================================================== */
 
-// eslint-disable-next-line import/no-unused-modules -- it is returned by Account.getKeypair
 export interface Keypair {
   publicKey: string
   privateKey: string
@@ -18,7 +22,7 @@ interface AccountData {
 
 /* Class ==================================================================== */
 
-export default class Account {
+export class Account {
   private readonly _secret: string[]
   private readonly _account: AccountData = {
     familySeed: '',
@@ -31,13 +35,13 @@ export default class Account {
 
   constructor(secretNumbers?: string[] | string | Buffer) {
     if (typeof secretNumbers === 'string') {
-      this._secret = utils.parseSecretString(secretNumbers)
+      this._secret = parseSecretString(secretNumbers)
     } else if (Array.isArray(secretNumbers)) {
       this._secret = secretNumbers
     } else if (Buffer.isBuffer(secretNumbers)) {
-      this._secret = utils.entropyToSecret(secretNumbers)
+      this._secret = entropyToSecret(secretNumbers)
     } else {
-      this._secret = utils.randomSecret()
+      this._secret = randomSecret()
     }
 
     validateLengths(this._secret)
@@ -70,12 +74,10 @@ export default class Account {
 
   private derive(): void {
     try {
-      const entropy = utils.secretToEntropy(this._secret)
-      this._account.familySeed = keypairs.generateSeed({ entropy })
-      this._account.keypair = keypairs.deriveKeypair(this._account.familySeed)
-      this._account.address = keypairs.deriveAddress(
-        this._account.keypair.publicKey,
-      )
+      const entropy = secretToEntropy(this._secret)
+      this._account.familySeed = generateSeed({ entropy })
+      this._account.keypair = deriveKeypair(this._account.familySeed)
+      this._account.address = deriveAddress(this._account.keypair.publicKey)
     } catch (error) {
       let message = 'Unknown Error'
       if (error instanceof Error) {

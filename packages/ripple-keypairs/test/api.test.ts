@@ -1,19 +1,26 @@
 import assert from 'assert'
 import * as fixtures from './fixtures/api.json'
-import * as api from '../src'
+import {
+  decodeSeed,
+  deriveAddress,
+  deriveKeypair,
+  deriveNodeAddress,
+  generateSeed,
+  sign,
+  verify,
+} from '../src'
 
-const decodeSeed = api.decodeSeed
 const entropy = new Uint8Array([
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 ])
 
 describe('api', () => {
   it('generateSeed - secp256k1', () => {
-    assert.strictEqual(api.generateSeed({ entropy }), fixtures.secp256k1.seed)
+    assert.strictEqual(generateSeed({ entropy }), fixtures.secp256k1.seed)
   })
 
   it('generateSeed - secp256k1, random', () => {
-    const seed = api.generateSeed()
+    const seed = generateSeed()
     assert(seed.startsWith('s'))
     const { type, bytes } = decodeSeed(seed)
     assert(type === 'secp256k1')
@@ -22,13 +29,13 @@ describe('api', () => {
 
   it('generateSeed - ed25519', () => {
     assert.strictEqual(
-      api.generateSeed({ entropy, algorithm: 'ed25519' }),
+      generateSeed({ entropy, algorithm: 'ed25519' }),
       fixtures.ed25519.seed,
     )
   })
 
   it('generateSeed - ed25519, random', () => {
-    const seed = api.generateSeed({ algorithm: 'ed25519' })
+    const seed = generateSeed({ algorithm: 'ed25519' })
     assert(seed.startsWith('sEd'))
     const { type, bytes } = decodeSeed(seed)
     assert(type === 'ed25519')
@@ -36,36 +43,36 @@ describe('api', () => {
   })
 
   it('deriveKeypair - secp256k1', () => {
-    const keypair = api.deriveKeypair(fixtures.secp256k1.seed)
+    const keypair = deriveKeypair(fixtures.secp256k1.seed)
     assert.deepEqual(keypair, fixtures.secp256k1.keypair)
   })
 
   it('deriveKeypair - ed25519', () => {
-    const keypair = api.deriveKeypair(fixtures.ed25519.seed)
+    const keypair = deriveKeypair(fixtures.ed25519.seed)
     assert.deepEqual(keypair, fixtures.ed25519.keypair)
   })
 
   it('deriveKeypair - secp256k1 - validator', () => {
-    const keypair = api.deriveKeypair(fixtures.secp256k1.seed, {
+    const keypair = deriveKeypair(fixtures.secp256k1.seed, {
       validator: true,
     })
     assert.deepEqual(keypair, fixtures.secp256k1.validatorKeypair)
   })
 
   it('deriveKeypair - ed25519 - validator', () => {
-    const keypair = api.deriveKeypair(fixtures.ed25519.seed, {
+    const keypair = deriveKeypair(fixtures.ed25519.seed, {
       validator: true,
     })
     assert.deepEqual(keypair, fixtures.ed25519.validatorKeypair)
   })
 
   it('deriveAddress - secp256k1 public key', () => {
-    const address = api.deriveAddress(fixtures.secp256k1.keypair.publicKey)
+    const address = deriveAddress(fixtures.secp256k1.keypair.publicKey)
     assert.strictEqual(address, fixtures.secp256k1.address)
   })
 
   it('deriveAddress - ed25519 public key', () => {
-    const address = api.deriveAddress(fixtures.ed25519.keypair.publicKey)
+    const address = deriveAddress(fixtures.ed25519.keypair.publicKey)
     assert.strictEqual(address, fixtures.ed25519.address)
   })
 
@@ -73,7 +80,7 @@ describe('api', () => {
     const privateKey = fixtures.secp256k1.keypair.privateKey
     const message = fixtures.secp256k1.message
     const messageHex = Buffer.from(message, 'utf8').toString('hex')
-    const signature = api.sign(messageHex, privateKey)
+    const signature = sign(messageHex, privateKey)
     assert.strictEqual(signature, fixtures.secp256k1.signature)
   })
 
@@ -82,14 +89,14 @@ describe('api', () => {
     const publicKey = fixtures.secp256k1.keypair.publicKey
     const message = fixtures.secp256k1.message
     const messageHex = Buffer.from(message, 'utf8').toString('hex')
-    assert(api.verify(messageHex, signature, publicKey))
+    assert(verify(messageHex, signature, publicKey))
   })
 
   it('sign - ed25519', () => {
     const privateKey = fixtures.ed25519.keypair.privateKey
     const message = fixtures.ed25519.message
     const messageHex = Buffer.from(message, 'utf8').toString('hex')
-    const signature = api.sign(messageHex, privateKey)
+    const signature = sign(messageHex, privateKey)
     assert.strictEqual(signature, fixtures.ed25519.signature)
   })
 
@@ -98,19 +105,19 @@ describe('api', () => {
     const publicKey = fixtures.ed25519.keypair.publicKey
     const message = fixtures.ed25519.message
     const messageHex = Buffer.from(message, 'utf8').toString('hex')
-    assert(api.verify(messageHex, signature, publicKey))
+    assert(verify(messageHex, signature, publicKey))
   })
 
   it('deriveNodeAddress', () => {
     const addrX = 'n9KHn8NfbBsZV5q8bLfS72XyGqwFt5mgoPbcTV4c6qKiuPTAtXYk'
     const addrY = 'rU7bM9ENDkybaxNrefAVjdLTyNLuue1KaJ'
-    assert.strictEqual(api.deriveNodeAddress(addrX), addrY)
+    assert.strictEqual(deriveNodeAddress(addrX), addrY)
   })
 
   it('Random Address', () => {
-    const seed = api.generateSeed()
-    const keypair = api.deriveKeypair(seed)
-    const address = api.deriveAddress(keypair.publicKey)
+    const seed = generateSeed()
+    const keypair = deriveKeypair(seed)
+    const address = deriveAddress(keypair.publicKey)
     assert(address.startsWith('r'))
   })
 })
