@@ -1,4 +1,4 @@
-import * as enums from './definitions.json'
+import enums from './definitions.json'
 import {
   XrplDefinitionsBase,
   FieldInstance,
