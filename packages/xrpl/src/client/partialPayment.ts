@@ -10,11 +10,7 @@ import type {
 import type { Amount } from '../models/common'
 import type { RequestResponseMap } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
-import {
-  PaymentFlags,
-  PseudoTransaction,
-  Transaction,
-} from '../models/transactions'
+import { PaymentFlags, Transaction } from '../models/transactions'
 import type { TransactionMetadata } from '../models/transactions/metadata'
 import { isFlagEnabled } from '../models/utils'
 
@@ -40,7 +36,7 @@ function amountsEqual(amt1: Amount, amt2: Amount): boolean {
 }
 
 function isPartialPayment(
-  tx?: Transaction | PseudoTransaction,
+  tx?: Transaction,
   metadata?: TransactionMetadata | string,
 ): boolean {
   if (tx == null || metadata == null || tx.TransactionType !== 'Payment') {

@@ -1,10 +1,16 @@
 import { decode, encode } from 'ripple-binary-codec'
 
-import type { Client, SubmitRequest, SubmitResponse, Wallet } from '..'
+import type {
+  Client,
+  SubmitRequest,
+  SubmitResponse,
+  SubmittableTransaction,
+  Transaction,
+  Wallet,
+} from '..'
 import { ValidationError, XrplError } from '../errors'
 import { Signer } from '../models/common'
 import { TxRequest, TxResponse } from '../models/methods'
-import { Transaction } from '../models/transactions'
 import { BaseTransaction } from '../models/transactions/common'
 
 /** Approximate time for a ledger to close, in milliseconds */
@@ -42,7 +48,7 @@ async function sleep(ms: number): Promise<void> {
  */
 export async function submitRequest(
   client: Client,
-  signedTransaction: Transaction | string,
+  signedTransaction: SubmittableTransaction | string,
   failHard = false,
 ): Promise<SubmitResponse> {
   if (!isSigned(signedTransaction)) {
@@ -104,7 +110,7 @@ export async function submitRequest(
  */
 // eslint-disable-next-line max-params, max-lines-per-function -- this function needs to display and do with more information.
 export async function waitForFinalTransactionOutcome<
-  T extends BaseTransaction = Transaction,
+  T extends BaseTransaction = SubmittableTransaction,
 >(
   client: Client,
   txHash: string,
@@ -159,7 +165,7 @@ export async function waitForFinalTransactionOutcome<
 }
 
 // checks if the transaction has been signed
-function isSigned(transaction: Transaction | string): boolean {
+function isSigned(transaction: SubmittableTransaction | string): boolean {
   const tx = typeof transaction === 'string' ? decode(transaction) : transaction
   if (typeof tx === 'string') {
     return false
@@ -218,7 +224,7 @@ function isSigned(transaction: Transaction | string): boolean {
  */
 export async function getSignedTx(
   client: Client,
-  transaction: Transaction | string,
+  transaction: SubmittableTransaction | string,
   {
     autofill = true,
     wallet,
@@ -228,7 +234,7 @@ export async function getSignedTx(
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
     wallet?: Wallet
   } = {},
-): Promise<Transaction | string> {
+): Promise<SubmittableTransaction | string> {
   if (isSigned(transaction)) {
     return transaction
   }
@@ -242,7 +248,7 @@ export async function getSignedTx(
   let tx =
     typeof transaction === 'string'
       ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- converts JsonObject to correct Transaction type
-        (decode(transaction) as unknown as Transaction)
+        (decode(transaction) as unknown as SubmittableTransaction)
       : transaction
 
   if (autofill) {

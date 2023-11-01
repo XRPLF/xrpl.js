@@ -14,7 +14,11 @@ import {
   AccountLinesRequest,
   IssuedCurrency,
 } from '../../src'
-import { Payment, Transaction } from '../../src/models/transactions'
+import {
+  Payment,
+  SubmittableTransaction,
+  Transaction,
+} from '../../src/models/transactions'
 import { hashSignedTx } from '../../src/utils/hashes'
 
 export const GENESIS_ACCOUNT = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
@@ -89,7 +93,7 @@ export async function submitTransaction({
   retry = { count: 5, delayMs: 1000 },
 }: {
   client: Client
-  transaction: Transaction
+  transaction: SubmittableTransaction
   wallet: Wallet
   retry?: {
     count: number
@@ -225,7 +229,7 @@ export async function verifySubmittedTransaction(
 // eslint-disable-next-line max-params -- Test function, many params are needed
 export async function testTransaction(
   client: Client,
-  transaction: Transaction,
+  transaction: SubmittableTransaction,
   wallet: Wallet,
   retry?: {
     count: number
