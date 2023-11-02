@@ -208,7 +208,6 @@ export async function verifySubmittedTransaction(
       'ledger_index',
       'meta',
       'validated',
-      'ctid',
     ]),
     decodedTx,
   )
