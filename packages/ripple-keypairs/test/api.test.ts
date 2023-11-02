@@ -1,4 +1,4 @@
-import * as fixtures from './fixtures/json'
+import fixtures from './fixtures/api.json'
 import {
   decodeSeed,
   deriveAddress,
