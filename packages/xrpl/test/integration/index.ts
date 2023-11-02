@@ -58,6 +58,7 @@ export * from './requests/tx.test'
 export * from './requests/utility.test'
 
 export * from './fundWallet.test'
+export * from './globalTestDataUtils.test'
 export * from './integration.test'
 export * from './onConnect.test'
 export * from './regularKey.test'

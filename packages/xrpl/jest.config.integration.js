@@ -9,4 +9,6 @@ module.exports = {
     '<rootDir>/test/integration/*.test.ts',
   ],
   displayName: 'xrpl.js',
+  globalSetup: '<rootDir>/globalSetup.js',
+  globalTeardown: '<rootDir>/globalTeardown.js',
 }
