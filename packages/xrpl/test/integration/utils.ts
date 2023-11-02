@@ -14,7 +14,11 @@ import {
   AccountLinesRequest,
   IssuedCurrency,
 } from '../../src'
-import { Payment, Transaction } from '../../src/models/transactions'
+import {
+  Payment,
+  SubmittableTransaction,
+  Transaction,
+} from '../../src/models/transactions'
 import { hashSignedTx } from '../../src/utils/hashes'
 
 export const GENESIS_ACCOUNT = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
@@ -89,7 +93,7 @@ export async function submitTransaction({
   retry = { count: 5, delayMs: 1000 },
 }: {
   client: Client
-  transaction: Transaction
+  transaction: SubmittableTransaction
   wallet: Wallet
   retry?: {
     count: number
@@ -184,6 +188,11 @@ export async function verifySubmittedTransaction(
     command: 'tx',
     transaction: hash,
   })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: handle this API change for 2.0.0
+  const decodedTx: any = typeof tx === 'string' ? decode(tx) : tx
+  if (decodedTx.TransactionType === 'Payment') {
+    decodedTx.DeliverMax = decodedTx.Amount
+  }
 
   assert(data.result)
   assert.deepEqual(
@@ -196,7 +205,7 @@ export async function verifySubmittedTransaction(
       'validated',
       'ctid',
     ]),
-    typeof tx === 'string' ? decode(tx) : tx,
+    decodedTx,
   )
   if (typeof data.result.meta === 'object') {
     assert.strictEqual(data.result.meta.TransactionResult, 'tesSUCCESS')
@@ -220,7 +229,7 @@ export async function verifySubmittedTransaction(
 // eslint-disable-next-line max-params -- Test function, many params are needed
 export async function testTransaction(
   client: Client,
-  transaction: Transaction,
+  transaction: SubmittableTransaction,
   wallet: Wallet,
   retry?: {
     count: number

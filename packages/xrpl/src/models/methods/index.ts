@@ -115,6 +115,10 @@ import {
   SourceCurrencyAmount,
 } from './ripplePathFind'
 import {
+  ServerDefinitionsRequest,
+  ServerDefinitionsResponse,
+} from './serverDefinitions'
+import {
   JobType,
   ServerInfoRequest,
   ServerInfoResponse,
@@ -192,6 +196,7 @@ type Request =
   // server info methods
   | FeeRequest
   | ManifestRequest
+  | ServerDefinitionsRequest
   | ServerInfoRequest
   | ServerStateRequest
   // utility methods
@@ -245,6 +250,7 @@ type Response =
   // server info methods
   | FeeResponse
   | ManifestResponse
+  | ServerDefinitionsResponse
   | ServerInfoResponse
   | ServerStateResponse
   // utility methods
@@ -385,6 +391,8 @@ export type RequestResponseMap<T> = T extends AccountChannelsRequest
   ? ServerInfoResponse
   : T extends ServerStateRequest
   ? ServerStateResponse
+  : T extends ServerDefinitionsRequest
+  ? ServerDefinitionsResponse
   : T extends PingRequest
   ? PingResponse
   : T extends RandomRequest
@@ -535,6 +543,8 @@ export {
   FeeResponse,
   ManifestRequest,
   ManifestResponse,
+  ServerDefinitionsRequest,
+  ServerDefinitionsResponse,
   ServerInfoRequest,
   ServerInfoResponse,
   ServerStateRequest,

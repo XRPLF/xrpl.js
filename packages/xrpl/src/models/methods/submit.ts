@@ -1,4 +1,4 @@
-import { Transaction } from '../transactions'
+import { SubmittableTransaction } from '../transactions'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
@@ -39,7 +39,7 @@ export interface SubmitResponse extends BaseResponse {
     /** The complete transaction in hex string format. */
     tx_blob: string
     /** The complete transaction in JSON format. */
-    tx_json: Transaction & { hash?: string }
+    tx_json: SubmittableTransaction & { hash?: string }
     /**
      * The value true indicates that the transaction was applied, queued,
      * broadcast, or kept for later. The value `false` indicates that none of

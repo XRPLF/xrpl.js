@@ -2,6 +2,7 @@ export { BaseTransaction } from './common'
 export {
   validate,
   PseudoTransaction,
+  SubmittableTransaction,
   TransactionAndMetadata,
   Transaction,
 } from './transaction'
