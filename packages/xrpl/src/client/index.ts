@@ -41,7 +41,7 @@ import type {
   EventTypes,
   OnEventToListenerMap,
 } from '../models/methods/subscribe'
-import type { Transaction } from '../models/transactions'
+import type { SubmittableTransaction } from '../models/transactions'
 import { setTransactionFlagsToNumber } from '../models/utils/flags'
 import {
   ensureClassicAddress,
@@ -623,12 +623,12 @@ class Client extends EventEmitter<EventTypes> {
    * in an unsigned transaction along with your wallet to be submitted.
    *
    * @template T
-   * @param transaction - A {@link Transaction} in JSON format
+   * @param transaction - A {@link SubmittableTransaction} in JSON format
    * @param signersCount - The expected number of signers for this transaction.
    * Only used for multisigned transactions.
    * @returns The autofilled transaction.
    */
-  public async autofill<T extends Transaction>(
+  public async autofill<T extends SubmittableTransaction>(
     transaction: T,
     signersCount?: number,
   ): Promise<T> {
@@ -693,7 +693,7 @@ class Client extends EventEmitter<EventTypes> {
    * ```
    */
   public async submit(
-    transaction: Transaction | string,
+    transaction: SubmittableTransaction | string,
     opts?: {
       // If true, autofill a transaction.
       autofill?: boolean
@@ -764,7 +764,9 @@ class Client extends EventEmitter<EventTypes> {
    * ledger, the promise returned by `submitAndWait()` will be rejected with an error.
    * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
    */
-  public async submitAndWait<T extends Transaction = Transaction>(
+  public async submitAndWait<
+    T extends SubmittableTransaction = SubmittableTransaction,
+  >(
     transaction: T | string,
     opts?: {
       // If true, autofill a transaction.
@@ -804,7 +806,7 @@ class Client extends EventEmitter<EventTypes> {
    * @deprecated Use autofill instead, provided for users familiar with v1
    */
   public async prepareTransaction(
-    transaction: Transaction,
+    transaction: SubmittableTransaction,
     signersCount?: number,
   ): ReturnType<Client['autofill']> {
     return this.autofill(transaction, signersCount)

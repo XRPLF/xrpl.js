@@ -1,16 +1,16 @@
-import * as keypairs from 'ripple-keypairs'
+import { deriveAddress, deriveKeypair, generateSeed } from 'ripple-keypairs'
 
-import { Account, Utils } from '../src'
+import { Account, secretToEntropy } from '../src'
 
 describe('API: XRPL Secret Numbers', () => {
   describe('Generate new account', () => {
     const account = new Account()
     it('Output sanity checks', () => {
       expect(account.getAddress()).toMatch(/^r[a-zA-Z0-9]{19,}$/u)
-      const entropy = Utils.secretToEntropy(`${account.toString()}`.split(' '))
-      const familySeed = keypairs.generateSeed({ entropy })
-      const keypair = keypairs.deriveKeypair(familySeed)
-      const address = keypairs.deriveAddress(keypair.publicKey)
+      const entropy = secretToEntropy(`${account.toString()}`.split(' '))
+      const familySeed = generateSeed({ entropy })
+      const keypair = deriveKeypair(familySeed)
+      const address = deriveAddress(keypair.publicKey)
       expect(address).toEqual(account.getAddress())
       expect(familySeed).toEqual(account.getFamilySeed())
     })

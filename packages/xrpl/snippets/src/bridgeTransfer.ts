@@ -32,7 +32,7 @@ void bridgeTransfer()
 async function bridgeTransfer(): Promise<void> {
   await lockingClient.connect()
   await issuingClient.connect()
-  const lockingChainDoor = 'rNQQyL2bJqbtgP5zXHJyQXamtrKYpgsbzV'
+  const lockingChainDoor = 'rnQAXXWoFNN6PEqwqsdTngCtFPCrmfuqFJ'
 
   const accountObjectsRequest: AccountObjectsRequest = {
     command: 'account_objects',
