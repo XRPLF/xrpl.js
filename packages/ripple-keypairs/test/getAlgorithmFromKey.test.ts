@@ -5,6 +5,11 @@ function hexData(count: number) {
   return 'a'.repeat(count)
 }
 
+// Remove leading tabs
+function dedent(str) {
+  return `${str}`.replace(/(?<tabs>\n)\s+/gu, '$1')
+}
+
 describe('getAlgorithmFromKey', () => {
   it('should return ed25519 for valid ed25519 private key', () => {
     const privateKey = `ed${hexData(64)}`
@@ -41,29 +46,37 @@ describe('getAlgorithmFromKey', () => {
   it('should throw error for invalid private key format', () => {
     // Invalid tag and length
     const privateKey = `ff${hexData(60)}`
-    expect(() => getAlgorithmFromKey(privateKey, 'private'))
-      .toThrowErrorMatchingInlineSnapshot(`
-      "invalid_key:
-
-      Type: private
-      Key: ffaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-      Prefix: 0xff 
-      Length: 31 bytes
-
-      Acceptable private formats are:
-      ecdsa-secp256k1   - Prefix: None   Length: 32 bytes
-      ecdsa-secp256k1   - Prefix: 0x00   Length: 33 bytes
-      ed25519           - Prefix: 0xed   Length: 33 bytes
-      "
-    `)
+    try {
+      getAlgorithmFromKey(privateKey, 'private')
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        expect(dedent(error.message)).toEqual(
+          dedent(`invalid_key:
+  
+        Type: private
+        Key: ffaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        Prefix: 0xff 
+        Length: 31 bytes
+  
+        Acceptable private formats are:
+        ecdsa-secp256k1   - Prefix: None   Length: 32 bytes
+        ecdsa-secp256k1   - Prefix: 0x00   Length: 33 bytes
+        ed25519           - Prefix: 0xed   Length: 33 bytes
+    `),
+        )
+      }
+    }
   })
 
   it('should throw error for invalid public key format', () => {
     // Invalid tag and length
     const publicKey = `ff${hexData(60)}`
-    expect(() => getAlgorithmFromKey(publicKey, 'public'))
-      .toThrowErrorMatchingInlineSnapshot(`
-      "invalid_key:
+    try {
+      getAlgorithmFromKey(publicKey, 'public')
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        expect(dedent(error.message)).toEqual(
+          dedent(`invalid_key:
 
       Type: public
       Key: ffaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
@@ -75,7 +88,9 @@ describe('getAlgorithmFromKey', () => {
       ecdsa-secp256k1   - Prefix: 0x02   Length: 33 bytes
       ecdsa-secp256k1   - Prefix: 0x03   Length: 33 bytes
       ecdsa-secp256k1   - Prefix: 0x04   Length: 65 bytes
-      "
-    `)
+    `),
+        )
+      }
+    }
   })
 })
