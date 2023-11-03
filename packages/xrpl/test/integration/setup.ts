@@ -1,7 +1,10 @@
 import { assert } from 'chai'
 
 import {
+  AMMDeposit,
+  AMMDepositFlags,
   Client,
+  Currency,
   SignerListSet,
   Wallet,
   XChainBridge,
@@ -11,10 +14,19 @@ import {
 import serverUrl from './serverUrl'
 import {
   GENESIS_ACCOUNT,
+  createAMMPool,
   fundAccount,
   generateFundedWallet,
   testTransaction,
 } from './utils'
+
+export interface TestAMMPool {
+  issuerWallet: Wallet
+  lpWallet: Wallet
+  testWallet: Wallet
+  asset: Currency
+  asset2: Currency
+}
 
 interface TestBridge {
   xchainBridge: XChainBridge
@@ -64,6 +76,33 @@ export async function setupClient(
     }
     return context
   })
+}
+
+export async function setupAMMPool(client: Client): Promise<TestAMMPool> {
+  const testAMMPool = await createAMMPool(client)
+  const { issuerWallet, lpWallet, asset, asset2 } = testAMMPool
+
+  const testWallet = await generateFundedWallet(client)
+
+  // Need to deposit (be an LP) to make bid/vote/withdraw eligible in tests for testContext.wallet
+  const ammDepositTx: AMMDeposit = {
+    TransactionType: 'AMMDeposit',
+    Account: testWallet.classicAddress,
+    Asset: asset,
+    Asset2: asset2,
+    Amount: '1000',
+    Flags: AMMDepositFlags.tfSingleAsset,
+  }
+
+  await testTransaction(client, ammDepositTx, testWallet)
+
+  return {
+    issuerWallet,
+    lpWallet,
+    testWallet,
+    asset,
+    asset2,
+  }
 }
 
 export async function setupBridge(client: Client): Promise<TestBridge> {

@@ -12,8 +12,17 @@ import {
   NotConnectedError,
   AccountLinesRequest,
   IssuedCurrency,
+  Currency,
 } from '../../src'
-import { Payment, Transaction } from '../../src/models/transactions'
+import {
+  AMMCreate,
+  AccountSet,
+  AccountSetAsfFlags,
+  Payment,
+  Transaction,
+  TrustSet,
+  TrustSetFlags,
+} from '../../src/models/transactions'
 import { hashSignedTx } from '../../src/utils/hashes'
 
 export const GENESIS_ACCOUNT = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
@@ -192,13 +201,13 @@ export async function verifySubmittedTransaction(
   assert(data.result)
   assert.deepEqual(
     omit(data.result, [
+      'ctid',
       'date',
       'hash',
       'inLedger',
       'ledger_index',
       'meta',
       'validated',
-      'ctid',
     ]),
     decodedTx,
   )
@@ -359,4 +368,76 @@ export async function getIOUBalance(
     peer: currency.issuer,
   }
   return (await client.request(request)).result.lines[0].balance
+}
+
+export async function createAMMPool(client: Client): Promise<{
+  issuerWallet: Wallet
+  lpWallet: Wallet
+  asset: Currency
+  asset2: Currency
+}> {
+  const lpWallet = await generateFundedWallet(client)
+  const issuerWallet = await generateFundedWallet(client)
+  const currencyCode = 'USD'
+
+  const accountSetTx: AccountSet = {
+    TransactionType: 'AccountSet',
+    Account: issuerWallet.classicAddress,
+    SetFlag: AccountSetAsfFlags.asfDefaultRipple,
+  }
+
+  await testTransaction(client, accountSetTx, issuerWallet)
+
+  const trustSetTx: TrustSet = {
+    TransactionType: 'TrustSet',
+    Flags: TrustSetFlags.tfClearNoRipple,
+    Account: lpWallet.classicAddress,
+    LimitAmount: {
+      currency: currencyCode,
+      issuer: issuerWallet.classicAddress,
+      value: '1000',
+    },
+  }
+
+  await testTransaction(client, trustSetTx, lpWallet)
+
+  const paymentTx: Payment = {
+    TransactionType: 'Payment',
+    Account: issuerWallet.classicAddress,
+    Destination: lpWallet.classicAddress,
+    Amount: {
+      currency: currencyCode,
+      issuer: issuerWallet.classicAddress,
+      value: '500',
+    },
+  }
+
+  await testTransaction(client, paymentTx, issuerWallet)
+
+  const ammCreateTx: AMMCreate = {
+    TransactionType: 'AMMCreate',
+    Account: lpWallet.classicAddress,
+    Amount: '250',
+    Amount2: {
+      currency: currencyCode,
+      issuer: issuerWallet.classicAddress,
+      value: '250',
+    },
+    TradingFee: 12,
+  }
+
+  await testTransaction(client, ammCreateTx, lpWallet)
+
+  const asset: Currency = { currency: 'XRP' }
+  const asset2: Currency = {
+    currency: currencyCode,
+    issuer: issuerWallet.classicAddress,
+  }
+
+  return {
+    issuerWallet,
+    lpWallet,
+    asset,
+    asset2,
+  }
 }
