@@ -1,4 +1,4 @@
-import assert from 'assert'
+import { assert } from 'chai'
 
 import { Client, SubmitResponse } from '../../src'
 import { AccountSet, SignerListSet } from '../../src/models/transactions'
