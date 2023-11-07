@@ -14,20 +14,14 @@ type ValueOf<T> = T[keyof T]
  */
 export function groupBy<T>(
   array: T[],
-  iteratee: (value: T, index: number, array: T[]) => string,
-): { [p: string]: T[] } {
+  iteratee: (value: T, index: number, array: T[]) => string | number,
+): Record<string | number, T[]> {
   // eslint-disable-next-line max-params -- need all the params for the fallback
-  return array.reduce<{ [key: string]: T[] }>(function predicate(
-    acc,
-    value,
-    index,
-    arrayReference,
-  ) {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- being safe for js users
-    ;(acc[iteratee(value, index, arrayReference)] ||= []).push(value)
+  return array.reduce(function predicate(acc, value, index, arrayReference) {
+    // If there isn't a group already initialize to an empty array. Regardless add new entry to the array.
+    ;(acc[iteratee(value, index, arrayReference)] ??= []).push(value)
     return acc
-  },
-  {})
+  }, {})
 }
 
 /**
