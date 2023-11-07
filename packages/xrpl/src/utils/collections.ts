@@ -17,11 +17,21 @@ export function groupBy<T>(
   iteratee: (value: T, index: number, array: T[]) => string | number,
 ): Record<string | number, T[]> {
   // eslint-disable-next-line max-params -- need all the params for the fallback
-  return array.reduce(function predicate(acc, value, index, arrayReference) {
-    // If there isn't a group already initialize to an empty array. Regardless add new entry to the array.
-    ;(acc[iteratee(value, index, arrayReference)] ??= []).push(value)
+  function predicate(
+    acc: Record<string | number, T[]>,
+    value: T,
+    index: number,
+    arrayReference: T[],
+  ): Record<string | number, T[]> {
+    const key = iteratee(value, index, arrayReference) || 0
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Find existing group or create a new one
+    const group = acc[key] || []
+    group.push(value)
+    acc[key] = group
     return acc
-  }, {})
+  }
+
+  return array.reduce(predicate, {})
 }
 
 /**

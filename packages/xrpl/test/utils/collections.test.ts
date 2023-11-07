@@ -19,11 +19,9 @@ describe('Collection Utils:', () => {
   // Taken from https://github.com/lodash/lodash/blob/main/test/omitBy.spec.js
   describe('omitBy', () => {
     it('should work with a predicate argument', () => {
-      const object = { a: 1, b: 2, c: 3, d: 4 }
-
-      const actual = omitBy(object, (n) => n != 2 && n != 4)
-
-      expect(actual).toEqual({ b: 2, d: 4 })
+      const object = { aa: 1, bb: 2, cc: 3, dd: 4 }
+      const actual = omitBy(object, (num) => num !== 2 && num !== 4)
+      expect(actual).toEqual({ bb: 2, dd: 4 })
     })
   })
 })
