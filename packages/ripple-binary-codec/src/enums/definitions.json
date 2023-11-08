@@ -141,7 +141,7 @@
     [
       "LedgerEntry",
       {
-        "nth": 1,
+        "nth": 257,
         "isVLEncoded": false,
         "isSerialized": false,
         "isSigningField": true,
@@ -151,7 +151,7 @@
     [
       "Transaction",
       {
-        "nth": 1,
+        "nth": 257,
         "isVLEncoded": false,
         "isSerialized": false,
         "isSigningField": true,
@@ -161,7 +161,7 @@
     [
       "Validation",
       {
-        "nth": 1,
+        "nth": 257,
         "isVLEncoded": false,
         "isSerialized": false,
         "isSigningField": true,
@@ -171,9 +171,9 @@
     [
       "Metadata",
       {
-        "nth": 1,
+        "nth": 257,
         "isVLEncoded": false,
-        "isSerialized": true,
+        "isSerialized": false,
         "isSigningField": true,
         "type": "Metadata"
       }
