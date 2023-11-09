@@ -1,7 +1,6 @@
-const { loadFixture } = require('./utils')
-const { coreTypes } = require('../src/types')
+import { coreTypes } from '../src/types'
 const { Amount } = coreTypes
-const fixtures = loadFixture('data-driven-tests.json')
+import fixtures from './fixtures/data-driven-tests.json'
 
 function amountErrorTests() {
   fixtures.values_tests

@@ -1,4 +1,4 @@
-const { encode, decode } = require('../src')
+import { encode, decode } from '../src'
 
 // Notice: no Amount or Fee
 const tx_json = {
@@ -19,12 +19,12 @@ const tx_json = {
 }
 
 describe('encoding and decoding tx_json', function () {
-  test('can encode tx_json without Amount or Fee', function () {
+  it('can encode tx_json without Amount or Fee', function () {
     const encoded = encode(tx_json)
     const decoded = decode(encoded)
     expect(tx_json).toEqual(decoded)
   })
-  test('can encode tx_json with Amount and Fee', function () {
+  it('can encode tx_json with Amount and Fee', function () {
     const my_tx = Object.assign({}, tx_json, {
       Amount: '1000',
       Fee: '10',
@@ -33,7 +33,7 @@ describe('encoding and decoding tx_json', function () {
     const decoded = decode(encoded)
     expect(my_tx).toEqual(decoded)
   })
-  test('can encode tx_json with TicketCount', function () {
+  it('can encode tx_json with TicketCount', function () {
     const my_tx = Object.assign({}, tx_json, {
       TicketCount: 2,
     })
@@ -41,7 +41,7 @@ describe('encoding and decoding tx_json', function () {
     const decoded = decode(encoded)
     expect(my_tx).toEqual(decoded)
   })
-  test('can encode tx_json with TicketSequence', function () {
+  it('can encode tx_json with TicketSequence', function () {
     const my_tx = Object.assign({}, tx_json, {
       Sequence: 0,
       TicketSequence: 2,
@@ -50,7 +50,7 @@ describe('encoding and decoding tx_json', function () {
     const decoded = decode(encoded)
     expect(my_tx).toEqual(decoded)
   })
-  test('can decode a transaction with an issued currency that evaluates to XRP', function () {
+  it('can decode a transaction with an issued currency that evaluates to XRP', function () {
     // Encoding is done prior, because this is disallowed during encoding with client libraries to avoid scam XRP tokens.
     const expectedTx = {
       TransactionType: 'TrustSet',
@@ -72,7 +72,7 @@ describe('encoding and decoding tx_json', function () {
     const decoded = decode(encoded)
     expect(expectedTx).toEqual(decoded)
   })
-  test('throws when Amount is invalid', function () {
+  it('throws when Amount is invalid', function () {
     const my_tx = Object.assign({}, tx_json, {
       Amount: '1000.001',
       Fee: '10',
@@ -81,7 +81,7 @@ describe('encoding and decoding tx_json', function () {
       encode(my_tx)
     }).toThrow()
   })
-  test('throws when Fee is invalid', function () {
+  it('throws when Fee is invalid', function () {
     const my_tx = Object.assign({}, tx_json, {
       Amount: '1000',
       Fee: '10.123',
@@ -90,7 +90,7 @@ describe('encoding and decoding tx_json', function () {
       encode(my_tx)
     }).toThrow()
   })
-  test('throws when Amount and Fee are invalid', function () {
+  it('throws when Amount and Fee are invalid', function () {
     const my_tx = Object.assign({}, tx_json, {
       Amount: '1000.789',
       Fee: '10.123',
@@ -99,7 +99,7 @@ describe('encoding and decoding tx_json', function () {
       encode(my_tx)
     }).toThrow()
   })
-  test('throws when Amount is a number instead of a string-encoded integer', function () {
+  it('throws when Amount is a number instead of a string-encoded integer', function () {
     const my_tx = Object.assign({}, tx_json, {
       Amount: 1000.789,
     })
@@ -108,7 +108,7 @@ describe('encoding and decoding tx_json', function () {
     }).toThrow()
   })
 
-  test('throws when Fee is a number instead of a string-encoded integer', function () {
+  it('throws when Fee is a number instead of a string-encoded integer', function () {
     const my_tx = Object.assign({}, tx_json, {
       Amount: 1234.56,
     })

@@ -1,8 +1,9 @@
 const { ShaMap } = require('../src/shamap')
 const { binary, HashPrefix } = require('../src/coretypes')
 const { coreTypes } = require('../src/types')
-const { loadFixture } = require('./utils')
-const { Buffer } = require('buffer/')
+
+import ledgerFull38129 from './fixtures/ledger-full-38129.json'
+import ledgerFull40000 from './fixtures/ledger-full-40000.json'
 
 function now() {
   return Number(Date.now()) / 1000
@@ -10,14 +11,14 @@ function now() {
 
 const ZERO = '0000000000000000000000000000000000000000000000000000000000000000'
 
-function makeItem(indexArg) {
+function makeItem(indexArg: any) {
   let str = indexArg
   while (str.length < 64) {
     str += '0'
   }
   const index = coreTypes.Hash256.from(str)
   const item = {
-    toBytesSink(sink) {
+    toBytesSink(sink: any) {
       index.toBytesSink(sink)
     },
     hashPrefix() {
@@ -30,11 +31,11 @@ function makeItem(indexArg) {
 describe('ShaMap', () => {
   now()
 
-  test('hashes to zero when empty', () => {
+  it('hashes to zero when empty', () => {
     const map = new ShaMap()
     expect(map.hash().toHex()).toBe(ZERO)
   })
-  test('creates the same hash no matter which order items are added', () => {
+  it('creates the same hash no matter which order items are added', () => {
     let map = new ShaMap()
     const items = [
       '0',
@@ -52,17 +53,16 @@ describe('ShaMap', () => {
     expect(h1.eq(h1)).toBe(true)
     map = new ShaMap()
     items.reverse().forEach((i) => map.addItem(...makeItem(i)))
-    expect(map.hash()).toStrictEqual(h1)
+    expect(map.hash()).toEqual(h1)
   })
-  function factory(fixture) {
-    test(`recreate account state hash from ${fixture}`, () => {
+  function factory(ledger: any) {
+    it(`recreate account state hash from ${ledger}`, () => {
       const map = new ShaMap()
-      const ledger = loadFixture(fixture)
       // const t = now();
       const leafNodePrefix = HashPrefix.accountStateEntry
       ledger.accountState
-        .map((e, i) => {
-          if ((i > 1000) & (i % 1000 === 0)) {
+        .map((e: any, i: any) => {
+          if (i > 1000 && i % 1000 === 0) {
             console.log(e.index)
             console.log(i)
           }
@@ -72,18 +72,18 @@ describe('ShaMap', () => {
             hashPrefix() {
               return leafNodePrefix
             },
-            toBytesSink(sink) {
+            toBytesSink(sink: any) {
               sink.put(bytes)
             },
           }
         })
-        .forEach((so) => map.addItem(so.index, so))
+        .forEach((so: any) => map.addItem(so.index, so))
       expect(map.hash().toHex()).toBe(ledger.account_hash)
       // console.log('took seconds: ', (now() - t));
     })
   }
-  factory('ledger-full-38129.json')
-  factory('ledger-full-40000.json')
+  factory(ledgerFull38129)
+  factory(ledgerFull40000)
   // factory('ledger-4320277.json');
   // factory('14280680.json');
 })

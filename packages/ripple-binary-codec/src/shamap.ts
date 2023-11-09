@@ -3,7 +3,6 @@ import { HashPrefix } from './hash-prefixes'
 import { Sha512Half } from './hashes'
 import { Hash256 } from './types/hash-256'
 import { BytesList } from './serdes/binary-serializer'
-import { Buffer } from 'buffer/'
 
 /**
  * Abstract class describing a SHAMapNode
@@ -20,7 +19,10 @@ abstract class ShaMapNode {
  * Class describing a Leaf of SHAMap
  */
 class ShaMapLeaf extends ShaMapNode {
-  constructor(public index: Hash256, public item?: ShaMapNode) {
+  constructor(
+    public index: Hash256,
+    public item?: ShaMapNode,
+  ) {
     super()
   }
 

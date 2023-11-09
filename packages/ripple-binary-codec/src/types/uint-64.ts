@@ -1,6 +1,5 @@
 import { UInt } from './uint'
 import { BinaryParser } from '../serdes/binary-parser'
-import { Buffer } from 'buffer/'
 
 const HEX_REGEX = /^[a-fA-F0-9]{1,16}$/
 const mask = BigInt(0x00000000ffffffff)
