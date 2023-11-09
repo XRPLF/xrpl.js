@@ -144,7 +144,7 @@
         "nth": 257,
         "isVLEncoded": false,
         "isSerialized": false,
-        "isSigningField": true,
+        "isSigningField": false,
         "type": "LedgerEntry"
       }
     ],
@@ -154,7 +154,7 @@
         "nth": 257,
         "isVLEncoded": false,
         "isSerialized": false,
-        "isSigningField": true,
+        "isSigningField": false,
         "type": "Transaction"
       }
     ],
@@ -164,7 +164,7 @@
         "nth": 257,
         "isVLEncoded": false,
         "isSerialized": false,
-        "isSigningField": true,
+        "isSigningField": false,
         "type": "Validation"
       }
     ],
@@ -174,7 +174,7 @@
         "nth": 257,
         "isVLEncoded": false,
         "isSerialized": false,
-        "isSigningField": true,
+        "isSigningField": false,
         "type": "Metadata"
       }
     ],
@@ -2781,7 +2781,7 @@
     "tecKILLED": 150,
     "tecHAS_OBLIGATIONS": 151,
     "tecTOO_SOON": 152,
-    "tecHOOK_ERROR": 153,
+    "tecHOOK_REJECTED": 153,
     "tecMAX_SEQUENCE_REACHED": 154,
     "tecNO_SUITABLE_NFTOKEN_PAGE": 155,
     "tecNFTOKEN_BUY_SELL_MISMATCH": 156,
