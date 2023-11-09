@@ -1,4 +1,4 @@
-import assert from 'assert'
+import { assert } from 'chai'
 
 import {
   Client,
@@ -31,7 +31,7 @@ async function generate_faucet_wallet_and_fund_again(
     account: wallet.classicAddress,
   })
 
-  assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
+  assert.equal(dropsToXrp(info.result.account_data.Balance), balance.toString())
 
   const { balance: newBalance } = await api.fundWallet(wallet, {
     faucetHost,
@@ -45,7 +45,10 @@ async function generate_faucet_wallet_and_fund_again(
   })
 
   assert(newBalance > balance)
-  assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
+  assert.equal(
+    dropsToXrp(afterSent.result.account_data.Balance),
+    newBalance.toString(),
+  )
 
   await api.disconnect()
 }
@@ -103,7 +106,10 @@ describe('fundWallet', function () {
         account: wallet.classicAddress,
       })
 
-      assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
+      assert.equal(
+        dropsToXrp(info.result.account_data.Balance),
+        balance.toString(),
+      )
       assert.equal(balance, 10000)
 
       /*
@@ -127,7 +133,7 @@ describe('fundWallet', function () {
         amount: '2000',
         usageContext: 'integration-test',
       })
-      assert.equal(balance, '2000')
+      assert.equal(balance, 2000)
       assert.notStrictEqual(wallet, undefined)
       assert(isValidClassicAddress(wallet.classicAddress))
       assert(isValidXAddress(wallet.getXAddress()))
@@ -136,7 +142,10 @@ describe('fundWallet', function () {
         command: 'account_info',
         account: wallet.classicAddress,
       })
-      assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
+      assert.equal(
+        dropsToXrp(info.result.account_data.Balance),
+        balance.toString(),
+      )
       await api.disconnect()
     },
     TIMEOUT,

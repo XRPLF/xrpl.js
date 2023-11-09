@@ -1,4 +1,3 @@
-const { throws } = require('assert')
 const {
   encodeForSigning,
   encodeForSigningClaim,
@@ -123,7 +122,9 @@ describe('Signing data', function () {
       TransactionType: 'NotAPayment',
     }
 
-    throws(() => encodeForSigning(invalidTransactionType), /NotAPayment/u)
+    expect(() => encodeForSigning(invalidTransactionType)).toThrow(
+      /NotAPayment/u,
+    )
   })
 
   test('can create multi signing blobs', function () {
