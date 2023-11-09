@@ -1,4 +1,4 @@
-import assert from 'assert'
+import { assert } from 'chai'
 
 // how long before each test case times out
 const TIMEOUT = 20000
