@@ -31,10 +31,9 @@ function basicApiTests() {
   const bytes = parseHexOnly('00,01020304,0506')
   it('can read slices of bytes', () => {
     const parser = makeParser(bytes)
-    // @ts-ignore -- checking private variable type
+    // @ts-expect-error -- checking private variable type
     expect(parser.bytes instanceof Buffer).toBe(true)
     const read1 = parser.read(1)
-    // @ts-ignore -- checking private variable type
     expect(read1 instanceof Buffer).toBe(true)
     expect(read1).toEqual(Buffer.from([0]))
     expect(parser.read(4)).toEqual(Buffer.from([1, 2, 3, 4]))
@@ -140,21 +139,21 @@ function transactionParsingTests() {
     {
       const [field, value] = readField()
       expect(field).toEqual(Field['TakerPays'])
-      // @ts-ignore -- checking private variable type
+      // @ts-expect-error -- checking private variable type
       expect((value as Amount).isNative()).toEqual(true)
       expect(value.toJSON()).toEqual('98957503520')
     }
     {
       const [field, value] = readField()
       expect(field).toEqual(Field['TakerGets'])
-      // @ts-ignore -- checking private function
+      // @ts-expect-error -- checking private function
       expect((value as Amount).isNative()).toEqual(false)
       expect(value.toJSON()?.['issuer']).toEqual(tx_json.TakerGets.issuer)
     }
     {
       const [field, value] = readField()
       expect(field).toEqual(Field['Fee'])
-      // @ts-ignore -- checking private function
+      // @ts-expect-error -- checking private function
       expect((value as Amount).isNative()).toEqual(true)
     }
     {
@@ -190,10 +189,22 @@ function transactionParsingTests() {
   })
 }
 
+interface AmountTest {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- it is json
+  test_json: any
+  type_id: number
+  is_native: boolean
+  type: string
+  expected_hex: string
+  is_negative?: boolean
+  exponent?: number
+  error?: string
+}
+
 function amountParsingTests() {
-  fixtures.values_tests
+  ;(fixtures.values_tests as AmountTest[])
     .filter((obj) => obj.type === 'Amount')
-    .forEach((f: any, i) => {
+    .forEach((f, i) => {
       if (f.error) {
         return
       }
@@ -272,6 +283,7 @@ function nestedObjectTests() {
       let ix = 0
       while (!parser.end()) {
         const [field, value] = parser.readFieldAndValue()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- this is a json object
         const expected: any = f.fields[ix]
         const expectedJSON = expected[1].json
         const expectedField = expected[0]

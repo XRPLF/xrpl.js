@@ -1,6 +1,6 @@
 import { coreTypes } from '../src/types'
-const { Amount } = coreTypes
 import fixtures from './fixtures/data-driven-tests.json'
+const { Amount } = coreTypes
 
 function amountErrorTests() {
   fixtures.values_tests

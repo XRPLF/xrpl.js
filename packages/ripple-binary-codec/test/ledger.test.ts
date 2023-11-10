@@ -1,14 +1,17 @@
+import ledgerFull38129 from './fixtures/ledger-full-38129.json'
+import ledgerFull40000 from './fixtures/ledger-full-40000.json'
+
 const {
   transactionTreeHash,
   ledgerHash,
   accountStateHash,
 } = require('../src/ledger-hashes')
 
-import ledgerFull38129 from './fixtures/ledger-full-38129.json'
-import ledgerFull40000 from './fixtures/ledger-full-40000.json'
-
 describe('Ledger Hashes', function () {
-  function testFactory(ledgerIndex: number, ledger: any) {
+  function testFactory(
+    ledgerIndex: number,
+    ledger: typeof ledgerFull38129 | typeof ledgerFull40000,
+  ) {
     describe(`can calculate hashes for ledger ${ledgerIndex}`, function () {
       it('computes correct account state hash', function () {
         expect(accountStateHash(ledger.accountState).toHex()).toBe(

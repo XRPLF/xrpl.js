@@ -165,9 +165,9 @@ describe('Invalid X-Address behavior', () => {
 })
 
 describe('ripple-binary-codec x-address test', function () {
-  function makeSuite(name: any, entries: any) {
+  function makeSuite(name: string, entries: typeof fixtures.transactions) {
     describe(name, function () {
-      entries.forEach((t: any, testN: any) => {
+      entries.forEach((t, testN) => {
         it(`${name}[${testN}] encodes X-address json equivalent to classic address json`, () => {
           expect(encode(t.rjson)).toEqual(encode(t.xjson))
         })

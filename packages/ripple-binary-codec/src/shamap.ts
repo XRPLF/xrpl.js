@@ -19,10 +19,7 @@ abstract class ShaMapNode {
  * Class describing a Leaf of SHAMap
  */
 class ShaMapLeaf extends ShaMapNode {
-  constructor(
-    public index: Hash256,
-    public item?: ShaMapNode,
-  ) {
+  constructor(public index: Hash256, public item?: ShaMapNode) {
     super()
   }
 

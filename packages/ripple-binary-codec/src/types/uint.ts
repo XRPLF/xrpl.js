@@ -27,7 +27,7 @@ abstract class UInt extends Comparable<UInt | number> {
    * @param other other UInt to compare this to
    * @returns -1, 0, or 1 depending on how the objects relate to each other
    */
-  compareTo(other): number {
+  compareTo(other: UInt | number): number {
     return compare(this.valueOf(), other.valueOf())
   }
 

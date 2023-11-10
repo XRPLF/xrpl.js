@@ -1,9 +1,9 @@
+import { XrplDefinitions } from '../src/enums/xrpl-definitions'
 const {
   encodeForSigning,
   encodeForSigningClaim,
   encodeForMultisigning,
 } = require('../src')
-import { XrplDefinitions } from '../src/enums/xrpl-definitions'
 
 const normalDefinitions = require('../src/enums/definitions.json')
 
