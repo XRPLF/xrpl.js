@@ -15,7 +15,7 @@ const SANITY_CHECK = /^-?[0-9.]+$/u
  * @throws When drops amount is invalid.
  * @category Utilities
  */
-export function dropsToXrp(dropsToConvert: BigNumber.Value): string {
+export function dropsToXrp(dropsToConvert: BigNumber.Value): number {
   /*
    * Converting to BigNumber and then back to string should remove any
    * decimal point followed by zeros, e.g. '1.00'.
@@ -50,7 +50,7 @@ export function dropsToXrp(dropsToConvert: BigNumber.Value): string {
     )
   }
 
-  return new BigNumber(drops).dividedBy(DROPS_PER_XRP).toString(BASE_TEN)
+  return new BigNumber(drops).dividedBy(DROPS_PER_XRP).toNumber()
 }
 
 /**

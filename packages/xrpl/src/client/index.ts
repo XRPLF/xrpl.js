@@ -831,7 +831,7 @@ class Client extends EventEmitter<EventTypes> {
    * @param [options] - Additional options for fetching the balance (optional).
    * @param [options.ledger_hash] - The hash of the ledger to retrieve the balance from (optional).
    * @param [options.ledger_index] - The index of the ledger to retrieve the balance from (optional).
-   * @returns A promise that resolves with the XRP balance as a string.
+   * @returns A promise that resolves with the XRP balance as a number.
    */
   public async getXrpBalance(
     address: string,
@@ -839,7 +839,7 @@ class Client extends EventEmitter<EventTypes> {
       ledger_hash?: string
       ledger_index?: LedgerIndex
     } = {},
-  ): Promise<string> {
+  ): Promise<number> {
     const xrpRequest: AccountInfoRequest = {
       command: 'account_info',
       account: address,
@@ -913,7 +913,7 @@ class Client extends EventEmitter<EventTypes> {
     const balances: Balance[] = []
 
     // get XRP balance
-    let xrpPromise: Promise<string> = Promise.resolve('')
+    let xrpPromise: Promise<number> = Promise.resolve(0)
     if (!options.peer) {
       xrpPromise = this.getXrpBalance(address, {
         ledger_hash: options.ledger_hash,
@@ -938,8 +938,8 @@ class Client extends EventEmitter<EventTypes> {
         const accountLinesBalance = linesResponses.flatMap((response) =>
           formatBalances(response.result.lines),
         )
-        if (xrpBalance !== '') {
-          balances.push({ currency: 'XRP', value: xrpBalance })
+        if (xrpBalance !== 0) {
+          balances.push({ currency: 'XRP', value: xrpBalance.toString() })
         }
         balances.push(...accountLinesBalance)
       },
