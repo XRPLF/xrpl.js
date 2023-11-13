@@ -195,6 +195,10 @@ npm install --save-dev @esbuild-plugins/node-globals-polyfill \
 
 Until official support for [Deno](https://deno.land) is added, you can use the following work-around to use `xrpl.js` with Deno:
 
+> [!NOTE]
+> The following is currently broken due to https://github.com/denoland/deno/issues/20516.
+> Once that is fixed there could be other issues as well.
+
 ```javascript
 import xrpl from 'https://dev.jspm.io/npm:xrpl';
 
