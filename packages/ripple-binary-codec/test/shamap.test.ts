@@ -92,6 +92,4 @@ describe('ShaMap', () => {
   }
   factory(ledgerFull38129)
   factory(ledgerFull40000)
-  // factory('ledger-4320277.json');
-  // factory('14280680.json');
 })
