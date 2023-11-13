@@ -31,7 +31,7 @@ async function generate_faucet_wallet_and_fund_again(
     account: wallet.classicAddress,
   })
 
-  assert.equal(dropsToXrp(info.result.account_data.Balance), balance.toString())
+  assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
 
   const { balance: newBalance } = await api.fundWallet(wallet, {
     faucetHost,
@@ -45,10 +45,7 @@ async function generate_faucet_wallet_and_fund_again(
   })
 
   assert(newBalance > balance)
-  assert.equal(
-    dropsToXrp(afterSent.result.account_data.Balance),
-    newBalance.toString(),
-  )
+  assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
 
   await api.disconnect()
 }
@@ -106,10 +103,7 @@ describe('fundWallet', function () {
         account: wallet.classicAddress,
       })
 
-      assert.equal(
-        dropsToXrp(info.result.account_data.Balance),
-        balance.toString(),
-      )
+      assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
       assert.equal(balance, 10000)
 
       /*
@@ -142,10 +136,7 @@ describe('fundWallet', function () {
         command: 'account_info',
         account: wallet.classicAddress,
       })
-      assert.equal(
-        dropsToXrp(info.result.account_data.Balance),
-        balance.toString(),
-      )
+      assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
       await api.disconnect()
     },
     TIMEOUT,

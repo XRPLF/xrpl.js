@@ -79,7 +79,7 @@ async function bridgeTransfer(): Promise<void> {
     'Waiting for the attestation to go through... (usually 8-12 seconds)',
   )
   let ledgersWaited = 0
-  let initialBalance = '0'
+  let initialBalance = 0
   while (ledgersWaited < MAX_LEDGERS_WAITED) {
     await sleep(LEDGER_CLOSE_TIME)
     try {
@@ -151,7 +151,7 @@ async function bridgeTransfer(): Promise<void> {
       wallet2.classicAddress,
     )
     console.log(initialBalance, currentBalance)
-    if (parseFloat(currentBalance) > parseFloat(initialBalance)) {
+    if (currentBalance > initialBalance) {
       console.log('Transfer is complete')
       console.log(
         `New balance of ${wallet2.classicAddress} is ${currentBalance} XRP`,
