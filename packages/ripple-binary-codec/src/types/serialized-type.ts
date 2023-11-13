@@ -82,7 +82,7 @@ class SerializedType {
 /**
  * Base class for SerializedTypes that are comparable.
  *
- * @template T - What types you want to allow comparisons between. You must specify all types.
+ * @template T - What types you want to allow comparisons between. You must specify all types. Primarily used to allow comparisons between built-in types (like `string`) and SerializedType subclasses (like `Hash`). 
  *
  * Ex. `class Hash extends Comparable<Hash | string>`
  */
