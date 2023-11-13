@@ -12,7 +12,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
   * `Client.prepareTransaction`
   * `getSignedTx`
   * `isAccountDelete`
-* BREAKING CHANGE: `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string`
+* `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string`
 
 ## 3.0.0 Beta 1 (2023-10-19)
 
