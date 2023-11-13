@@ -30,7 +30,7 @@ describe('client.getXrpBalance', function () {
         )
         testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
         const result = await testContext.client.getXrpBalance(testcase.address)
-        assert.equal(result, '922.913243')
+        assert.equal(result, 922.913243)
       })
     })
   })
