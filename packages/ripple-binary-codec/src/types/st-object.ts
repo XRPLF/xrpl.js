@@ -8,7 +8,7 @@ import { SerializedType, JsonObject } from './serialized-type'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { BinaryParser } from '../serdes/binary-parser'
 import { BinarySerializer, BytesList } from '../serdes/binary-serializer'
-import { Buffer } from 'buffer/'
+
 import { STArray } from './st-array'
 
 const OBJECT_END_MARKER_BYTE = Buffer.from([0xe1])

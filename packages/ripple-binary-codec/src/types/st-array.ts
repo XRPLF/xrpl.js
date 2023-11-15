@@ -2,7 +2,6 @@ import { DEFAULT_DEFINITIONS, XrplDefinitionsBase } from '../enums'
 import { SerializedType, JsonObject } from './serialized-type'
 import { STObject } from './st-object'
 import { BinaryParser } from '../serdes/binary-parser'
-import { Buffer } from 'buffer/'
 
 const ARRAY_END_MARKER = Buffer.from([0xf1])
 const ARRAY_END_MARKER_NAME = 'ArrayEndMarker'

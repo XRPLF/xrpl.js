@@ -1,5 +1,4 @@
 import { Comparable } from './serialized-type'
-import { Buffer } from 'buffer/'
 
 /**
  * Compare numbers and bigInts n1 and n2
@@ -15,7 +14,7 @@ function compare(n1: number | bigint, n2: number | bigint): number {
 /**
  * Base class for serializing and deserializing unsigned integers.
  */
-abstract class UInt extends Comparable {
+abstract class UInt extends Comparable<UInt | number> {
   protected static width: number
 
   constructor(bytes: Buffer) {
@@ -28,7 +27,7 @@ abstract class UInt extends Comparable {
    * @param other other UInt to compare this to
    * @returns -1, 0, or 1 depending on how the objects relate to each other
    */
-  compareTo(other: UInt): number {
+  compareTo(other: UInt | number): number {
     return compare(this.valueOf(), other.valueOf())
   }
 

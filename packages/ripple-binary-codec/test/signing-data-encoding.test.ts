@@ -1,9 +1,9 @@
+import { XrplDefinitions } from '../src/enums/xrpl-definitions'
 const {
   encodeForSigning,
   encodeForSigningClaim,
   encodeForMultisigning,
 } = require('../src')
-const { XrplDefinitions } = require('../src/enums/xrpl-definitions')
 
 const normalDefinitions = require('../src/enums/definitions.json')
 
@@ -28,7 +28,7 @@ const tx_json = {
 }
 
 describe('Signing data', function () {
-  test('can create single signing blobs', function () {
+  it('can create single signing blobs', function () {
     const actual = encodeForSigning(tx_json)
     expect(actual).toBe(
       [
@@ -69,7 +69,7 @@ describe('Signing data', function () {
     )
   })
 
-  test('can create single signing blobs with modified type', function () {
+  it('can create single signing blobs with modified type', function () {
     const customPaymentDefinitions = JSON.parse(
       JSON.stringify(normalDefinitions),
     )
@@ -116,18 +116,18 @@ describe('Signing data', function () {
     )
   })
 
-  test('can fail gracefully for invalid TransactionType', function () {
+  it('can fail gracefully for invalid TransactionType', function () {
     const invalidTransactionType = {
       ...tx_json,
       TransactionType: 'NotAPayment',
     }
 
-    expect(() => encodeForSigning(invalidTransactionType)).toThrow(
+    expect(() => encodeForSigning(invalidTransactionType)).toThrowError(
       /NotAPayment/u,
     )
   })
 
-  test('can create multi signing blobs', function () {
+  it('can create multi signing blobs', function () {
     const signingAccount = 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN'
     const signingJson = { ...tx_json, SigningPubKey: '' }
     const actual = encodeForMultisigning(signingJson, signingAccount)
@@ -172,7 +172,7 @@ describe('Signing data', function () {
     )
   })
 
-  test('can create multi signing blobs with custom definitions', function () {
+  it('can create multi signing blobs with custom definitions', function () {
     const customPaymentDefinitions = JSON.parse(
       JSON.stringify(normalDefinitions),
     )
@@ -223,7 +223,7 @@ describe('Signing data', function () {
     )
   })
 
-  test('can create claim blob', function () {
+  it('can create claim blob', function () {
     const channel =
       '43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1'
     const amount = '1000'
