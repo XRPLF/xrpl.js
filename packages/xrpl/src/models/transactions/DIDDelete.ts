@@ -1,5 +1,7 @@
 import { BaseTransaction, validateBaseTransaction } from './common'
 
+// TODO: add docs
+
 /**
  * @category Transaction Models
  */

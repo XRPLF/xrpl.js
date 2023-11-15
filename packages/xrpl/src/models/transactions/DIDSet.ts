@@ -5,6 +5,8 @@ import {
   validateOptionalField,
 } from './common'
 
+// TODO: add docs
+
 /**
  * @category Transaction Models
  */

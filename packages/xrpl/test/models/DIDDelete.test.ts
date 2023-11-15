@@ -25,4 +25,10 @@ describe('DIDDelete', function () {
     assert.doesNotThrow(() => validateDIDDelete(tx))
     assert.doesNotThrow(() => validate(tx))
   })
+
+  it('throws on invalid DIDDelete', function () {
+    tx.FakeField = 'blah'
+    assert.doesNotThrow(() => validateDIDDelete(tx))
+    assert.doesNotThrow(() => validate(tx))
+  })
 })

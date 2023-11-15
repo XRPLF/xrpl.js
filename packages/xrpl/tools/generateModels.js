@@ -1,3 +1,7 @@
+/**
+ * A script that generates models and model unit tests.
+ * To run it, clone the rippled branch with the source code and run this script against that repo.
+ */
 const fs = require('fs')
 const path = require('path')
 const createValidate = require('./createValidate')
@@ -107,6 +111,7 @@ function updateTransactionFile(transactionMatch, tx) {
     newTransactionMatch,
   )
 
+  // Adds the imports to the end of the imports
   newJsTxFile = newJsTxFile.replace(
     `import {
   XChainModifyBridge,
@@ -252,8 +257,11 @@ ${validationImportLine}`
 
     updateIndexFile(tx)
 
-    console.log('Added ' + tx)
+    console.log(`Added ${tx}`)
   })
+  console.log(
+    'Future steps: Adding docstrings to the models and adding integration tests',
+  )
 }
 
 if (require.main === module) {

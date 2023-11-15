@@ -42,7 +42,7 @@ describe('DIDSet', function () {
       assert.lengthOf(
         accountOffersResponse.result.account_objects,
         1,
-        'Should be exactly one DID on the ledger',
+        'Should be exactly one DID on the ledger after a DIDSet transaction',
       )
     },
     TIMEOUT,

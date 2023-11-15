@@ -25,7 +25,7 @@ describe('DIDDelete', function () {
     async () => {
       const setupTx: DIDSet = {
         TransactionType: 'DIDSet',
-        Account: testContext.wallet.classicAddress,
+        Account: testContext.wallet.address,
         Data: '617474657374',
         DIDDocument: '646F63',
         URI: '6469645F6578616D706C65',
@@ -36,19 +36,19 @@ describe('DIDDelete', function () {
       // double check the DID was properly created
       const initialAccountOffersResponse = await testContext.client.request({
         command: 'account_objects',
-        account: testContext.wallet.classicAddress,
+        account: testContext.wallet.address,
         type: 'did',
       })
       assert.lengthOf(
         initialAccountOffersResponse.result.account_objects,
         1,
-        'Should be exactly one DID on the ledger',
+        'Should be exactly one DID on the ledger after a DIDSet transaction',
       )
 
       // actual test - cancel the check
       const tx: DIDDelete = {
         TransactionType: 'DIDDelete',
-        Account: testContext.wallet.classicAddress,
+        Account: testContext.wallet.address,
       }
 
       await testTransaction(testContext.client, tx, testContext.wallet)
@@ -56,13 +56,13 @@ describe('DIDDelete', function () {
       // confirm that the DID no longer exists
       const accountOffersResponse = await testContext.client.request({
         command: 'account_objects',
-        account: testContext.wallet.classicAddress,
+        account: testContext.wallet.address,
         type: 'did',
       })
       assert.lengthOf(
         accountOffersResponse.result.account_objects,
         0,
-        'Should be no DID on the ledger',
+        'Should be no DID on the ledger after a DIDDelete transaction',
       )
     },
     TIMEOUT,
