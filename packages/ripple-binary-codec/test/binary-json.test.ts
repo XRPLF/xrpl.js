@@ -1,5 +1,5 @@
-const fixtures = require('./fixtures/codec-fixtures.json')
-const { decode, encode, decodeLedgerData } = require('../src')
+import fixtures from './fixtures/codec-fixtures.json'
+import { decode, encode, decodeLedgerData } from '../src'
 
 function json(object) {
   return JSON.stringify(object)
@@ -13,12 +13,12 @@ describe('ripple-binary-codec', function () {
   function makeSuite(name, entries) {
     describe(name, function () {
       entries.forEach((t, testN) => {
-        test(`${name}[${testN}] can encode ${truncateForDisplay(
+        it(`${name}[${testN}] can encode ${truncateForDisplay(
           json(t.json),
         )} to ${truncateForDisplay(t.binary)}`, () => {
           expect(encode(t.json)).toEqual(t.binary)
         })
-        test(`${name}[${testN}] can decode ${truncateForDisplay(
+        it(`${name}[${testN}] can decode ${truncateForDisplay(
           t.binary,
         )} to ${truncateForDisplay(json(t.json))}`, () => {
           const decoded = decode(t.binary)
@@ -33,7 +33,7 @@ describe('ripple-binary-codec', function () {
   describe('ledgerData', function () {
     if (fixtures.ledgerData) {
       fixtures.ledgerData.forEach((t, testN) => {
-        test(`ledgerData[${testN}] can decode ${t.binary} to ${json(
+        it(`ledgerData[${testN}] can decode ${t.binary} to ${json(
           t.json,
         )}`, () => {
           const decoded = decodeLedgerData(t.binary)

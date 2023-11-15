@@ -4,7 +4,6 @@ import {
   FieldInstance,
 } from '../enums'
 import { type SerializedType } from '../types/serialized-type'
-import { Buffer } from 'buffer/'
 
 /**
  * BinaryParser is used to compute fields and values from a HexString
