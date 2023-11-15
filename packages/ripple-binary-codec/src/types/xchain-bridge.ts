@@ -2,7 +2,7 @@ import { BinaryParser } from '../serdes/binary-parser'
 
 import { AccountID } from './account-id'
 import { JsonObject, SerializedType } from './serialized-type'
-import { Buffer } from 'buffer/'
+
 import { Issue, IssueObject } from './issue'
 
 /**

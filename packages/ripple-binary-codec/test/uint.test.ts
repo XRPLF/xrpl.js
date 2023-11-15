@@ -1,7 +1,5 @@
-const { coreTypes } = require('../src/types')
-const { UInt8, UInt64 } = coreTypes
-
-const { encode } = require('../src')
+import { UInt8, UInt64 } from '../src/types'
+import { encode } from '../src'
 
 const binary =
   '11007222000300003700000000000000003800000000000000006280000000000000000000000000000000000000005553440000000000000000000000000000000000000000000000000166D5438D7EA4C680000000000000000000000000005553440000000000AE123A8556F3CF91154711376AFB0F894F832B3D67D5438D7EA4C680000000000000000000000000005553440000000000F51DFC2A09D62CBBA1DFBDD4691DAC96AD98B90F'
@@ -98,51 +96,51 @@ const jsonEntry2 = {
   index: '0000041EFD027808D3F78C8352F97E324CB816318E00B977C74ECDDC7CD975B2',
 }
 
-test('compareToTests[0]', () => {
+it('compareToTests[0]', () => {
   expect(UInt8.from(124).compareTo(UInt64.from(124))).toBe(0)
 })
 
-test('compareToTest[1]', () => {
+it('compareToTest[1]', () => {
   expect(UInt64.from(124).compareTo(UInt8.from(124))).toBe(0)
 })
 
-test('compareToTest[2]', () => {
+it('compareToTest[2]', () => {
   expect(UInt64.from(124).compareTo(UInt8.from(123))).toBe(1)
 })
 
-test('compareToTest[3]', () => {
+it('compareToTest[3]', () => {
   expect(UInt8.from(124).compareTo(UInt8.from(13))).toBe(1)
 })
 
-test('compareToTest[4]', () => {
+it('compareToTest[4]', () => {
   expect(UInt8.from(124).compareTo(124)).toBe(0)
 })
 
-test('compareToTest[5]', () => {
+it('compareToTest[5]', () => {
   expect(UInt64.from(124).compareTo(124)).toBe(0)
 })
 
-test('compareToTest[6]', () => {
+it('compareToTest[6]', () => {
   expect(UInt64.from(124).compareTo(123)).toBe(1)
 })
 
-test('compareToTest[7]', () => {
+it('compareToTest[7]', () => {
   expect(UInt8.from(124).compareTo(13)).toBe(1)
 })
 
-test('UInt64 from string zero', () => {
+it('UInt64 from string zero', () => {
   expect(UInt64.from('0')).toEqual(UInt64.from(0))
   expect(encode(json)).toEqual(binary)
 })
 
-test('UInt64 from non 16 length hex', () => {
+it('UInt64 from non 16 length hex', () => {
   expect(encode(jsonEntry0)).toEqual(binaryEntry0)
   expect(encode(jsonEntry1)).toEqual(binaryEntry1)
   expect(encode(jsonEntry2)).toEqual(binaryEntry2)
 })
 
-test('valueOfTests', () => {
+it('valueOf tests', () => {
   let val = UInt8.from(1)
-  val |= 0x2
-  expect(val).toBe(3)
+
+  expect(val.valueOf() | 0x2).toBe(3)
 })

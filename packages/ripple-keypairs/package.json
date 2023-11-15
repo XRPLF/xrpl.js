@@ -6,7 +6,7 @@
     "build": "tsc --build tsconfig.build.json",
     "test": "jest --verbose false --silent=false ./test/*.test.ts",
     "test:browser": "npm run build && karma start ./karma.config.js",
-    "clean": "rm -rf ./dist ./coverage tsconfig.tsbuildinfo",
+    "clean": "rm -rf ./dist ./coverage ./test/testCompiledForWeb tsconfig.build.tsbuildinfo",
     "lint": "eslint . --ext .ts",
     "prepublish": "npm run lint && npm test"
   },

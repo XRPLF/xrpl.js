@@ -1,5 +1,5 @@
 import { coreTypes } from './types'
-import { Buffer } from 'buffer/'
+
 import BigNumber from 'bignumber.js'
 
 /**

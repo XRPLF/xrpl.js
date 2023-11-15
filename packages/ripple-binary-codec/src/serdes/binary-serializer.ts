@@ -1,6 +1,5 @@
 import { FieldInstance } from '../enums'
 import { type SerializedType } from '../types/serialized-type'
-import { Buffer } from 'buffer/'
 
 /**
  * Bytes list is a collection of buffer objects
