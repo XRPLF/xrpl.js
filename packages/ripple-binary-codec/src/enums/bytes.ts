@@ -1,5 +1,4 @@
 import { BytesList, BinaryParser } from '../binary'
-import { Buffer } from 'buffer/'
 
 /*
  * @brief: Bytes, name, and ordinal representing one type, ledger_type, transaction type, or result

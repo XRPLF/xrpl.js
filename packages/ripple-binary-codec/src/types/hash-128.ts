@@ -1,5 +1,4 @@
 import { Hash } from './hash'
-import { Buffer } from 'buffer/'
 
 /**
  * Hash with a width of 128 bits

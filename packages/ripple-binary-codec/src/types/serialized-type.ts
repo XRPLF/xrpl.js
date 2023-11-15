@@ -1,6 +1,6 @@
 import { BytesList } from '../serdes/binary-serializer'
 import { BinaryParser } from '../serdes/binary-parser'
-import { Buffer } from 'buffer/'
+
 import { XrplDefinitionsBase } from '../enums'
 
 type JSON = string | number | boolean | null | undefined | JSON[] | JsonObject
@@ -13,7 +13,7 @@ type JsonObject = { [key: string]: JSON }
 class SerializedType {
   protected readonly bytes: Buffer = Buffer.alloc(0)
 
-  constructor(bytes: Buffer) {
+  constructor(bytes?: Buffer) {
     this.bytes = bytes ?? Buffer.alloc(0)
   }
 
@@ -80,26 +80,31 @@ class SerializedType {
 }
 
 /**
- * Base class for SerializedTypes that are comparable
+ * Base class for SerializedTypes that are comparable.
+ *
+ * @template T - What types you want to allow comparisons between. You must specify all types. Primarily used to allow
+ * comparisons between built-in types (like `string`) and SerializedType subclasses (like `Hash`).
+ *
+ * Ex. `class Hash extends Comparable<Hash | string>`
  */
-class Comparable extends SerializedType {
-  lt(other: Comparable): boolean {
+class Comparable<T extends Object> extends SerializedType {
+  lt(other: T): boolean {
     return this.compareTo(other) < 0
   }
 
-  eq(other: Comparable): boolean {
+  eq(other: T): boolean {
     return this.compareTo(other) === 0
   }
 
-  gt(other: Comparable): boolean {
+  gt(other: T): boolean {
     return this.compareTo(other) > 0
   }
 
-  gte(other: Comparable): boolean {
+  gte(other: T): boolean {
     return this.compareTo(other) > -1
   }
 
-  lte(other: Comparable): boolean {
+  lte(other: T): boolean {
     return this.compareTo(other) < 1
   }
 
@@ -109,7 +114,7 @@ class Comparable extends SerializedType {
    * @param other The comparable object to compare this to
    * @returns A number denoting the relationship of this and other
    */
-  compareTo(other: Comparable): number {
+  compareTo(other: T): number {
     throw new Error(`cannot compare ${this.toString()} and ${other.toString()}`)
   }
 }

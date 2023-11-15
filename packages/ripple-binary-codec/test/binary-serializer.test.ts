@@ -1,12 +1,10 @@
+import fixtures from './fixtures/data-driven-tests.json'
+
 const { binary } = require('../src/coretypes')
 const { encode, decode } = require('../src')
 const { makeParser, BytesList, BinarySerializer } = binary
 const { coreTypes } = require('../src/types')
 const { UInt8, UInt16, UInt32, UInt64, STObject } = coreTypes
-const { Buffer } = require('buffer/')
-
-const { loadFixture } = require('./utils')
-const fixtures = loadFixture('data-driven-tests.json')
 const deliverMinTx = require('./fixtures/delivermin-tx.json')
 const deliverMinTxBinary = require('./fixtures/delivermin-tx-binary.json')
 const SignerListSet = {
@@ -110,16 +108,16 @@ function bytesListTest() {
     .put(Buffer.from([0]))
     .put(Buffer.from([2, 3]))
     .put(Buffer.from([4, 5]))
-  test('is an Array<Buffer>', function () {
+  it('is an Array<Buffer>', function () {
     expect(Array.isArray(list.bytesArray)).toBe(true)
     expect(list.bytesArray[0] instanceof Buffer).toBe(true)
   })
-  test('keeps track of the length itself', function () {
+  it('keeps track of the length itself', function () {
     expect(list.getLength()).toBe(5)
   })
-  test('can join all arrays into one via toBytes', function () {
+  it('can join all arrays into one via toBytes', function () {
     const joined = list.toBytes()
-    expect(joined).toHaveLength(5)
+    expect(joined.length).toEqual(5)
     expect(joined).toEqual(Buffer.from([0, 2, 3, 4, 5]))
   })
 }
@@ -136,14 +134,14 @@ function assertRecycles(blob) {
 
 function nestedObjectTests() {
   fixtures.whole_objects.forEach((f, i) => {
-    test(`whole_objects[${i}]: can parse blob and dump out same blob`, () => {
+    it(`whole_objects[${i}]: can parse blob and dump out same blob`, () => {
       assertRecycles(f.blob_with_no_signing)
     })
   })
 }
 
 function check(type, n, expected) {
-  test(`Uint${type.width * 8} serializes ${n} as ${expected}`, function () {
+  it(`Uint${type.width * 8} serializes ${n} as ${expected}`, function () {
     const bl = new BytesList()
     const serializer = new BinarySerializer(bl)
     if (expected === 'throws') {
@@ -169,67 +167,67 @@ check(UInt64, 1, [0, 0, 0, 0, 0, 0, 0, 1])
 check(UInt64, BigInt(1), [0, 0, 0, 0, 0, 0, 0, 1])
 
 function deliverMinTest() {
-  test('can serialize DeliverMin', () => {
+  it('can serialize DeliverMin', () => {
     expect(encode(deliverMinTx)).toEqual(deliverMinTxBinary)
   })
 }
 
 function SignerListSetTest() {
-  test('can serialize SignerListSet', () => {
+  it('can serialize SignerListSet', () => {
     expect(encode(SignerListSet.tx)).toEqual(SignerListSet.binary)
   })
-  test('can serialize SignerListSet metadata', () => {
+  it('can serialize SignerListSet metadata', () => {
     expect(encode(SignerListSet.tx.meta)).toEqual(SignerListSet.meta)
   })
 }
 
 function DepositPreauthTest() {
-  test('can serialize DepositPreauth', () => {
+  it('can serialize DepositPreauth', () => {
     expect(encode(DepositPreauth.tx)).toEqual(DepositPreauth.binary)
   })
-  test('can serialize DepositPreauth metadata', () => {
+  it('can serialize DepositPreauth metadata', () => {
     expect(encode(DepositPreauth.tx.meta)).toEqual(DepositPreauth.meta)
   })
 }
 
 function EscrowTest() {
-  test('can serialize EscrowCreate', () => {
+  it('can serialize EscrowCreate', () => {
     expect(encode(Escrow.create.tx)).toEqual(Escrow.create.binary)
   })
-  test('can serialize EscrowFinish', () => {
+  it('can serialize EscrowFinish', () => {
     expect(encode(Escrow.finish.tx)).toEqual(Escrow.finish.binary)
     expect(encode(Escrow.finish.tx.meta)).toEqual(Escrow.finish.meta)
   })
-  test('can serialize EscrowCancel', () => {
+  it('can serialize EscrowCancel', () => {
     expect(encode(Escrow.cancel.tx)).toEqual(Escrow.cancel.binary)
   })
 }
 
 function PaymentChannelTest() {
-  test('can serialize PaymentChannelCreate', () => {
+  it('can serialize PaymentChannelCreate', () => {
     expect(encode(PaymentChannel.create.tx)).toEqual(
       PaymentChannel.create.binary,
     )
   })
-  test('can serialize PaymentChannelFund', () => {
+  it('can serialize PaymentChannelFund', () => {
     expect(encode(PaymentChannel.fund.tx)).toEqual(PaymentChannel.fund.binary)
   })
-  test('can serialize PaymentChannelClaim', () => {
+  it('can serialize PaymentChannelClaim', () => {
     expect(encode(PaymentChannel.claim.tx)).toEqual(PaymentChannel.claim.binary)
   })
 }
 
 function NegativeUNLTest() {
-  test('can serialize NegativeUNL', () => {
+  it('can serialize NegativeUNL', () => {
     expect(encode(NegativeUNL.tx)).toEqual(NegativeUNL.binary)
   })
-  test('can deserialize NegativeUNL', () => {
+  it('can deserialize NegativeUNL', () => {
     expect(decode(NegativeUNL.binary)).toEqual(NegativeUNL.tx)
   })
 }
 
 function omitUndefinedTest() {
-  test('omits fields with undefined value', () => {
+  it('omits fields with undefined value', () => {
     let encodedOmitted = encode(json_omitted)
     let encodedUndefined = encode(json_undefined)
     expect(encodedOmitted).toEqual(encodedUndefined)
@@ -238,7 +236,7 @@ function omitUndefinedTest() {
 }
 
 function ticketTest() {
-  test('can serialize TicketCreate', () => {
+  it('can serialize TicketCreate', () => {
     expect(encode(Ticket.create.tx)).toEqual(Ticket.create.binary)
   })
 }
@@ -247,25 +245,25 @@ function nfTokenTest() {
   const fixtures = require('./fixtures/nf-token.json')
 
   for (const txName of Object.keys(fixtures)) {
-    test(`can serialize transaction ${txName}`, () => {
+    it(`can serialize transaction ${txName}`, () => {
       expect(encode(fixtures[txName].tx.json)).toEqual(
         fixtures[txName].tx.binary,
       )
     })
 
-    test(`can deserialize transaction ${txName}`, () => {
+    it(`can deserialize transaction ${txName}`, () => {
       expect(decode(fixtures[txName].tx.binary)).toEqual(
         fixtures[txName].tx.json,
       )
     })
 
-    test(`can serialize meta ${txName}`, () => {
+    it(`can serialize meta ${txName}`, () => {
       expect(encode(fixtures[txName].meta.json)).toEqual(
         fixtures[txName].meta.binary,
       )
     })
 
-    test(`can deserialize meta ${txName}`, () => {
+    it(`can deserialize meta ${txName}`, () => {
       expect(decode(fixtures[txName].meta.binary)).toEqual(
         fixtures[txName].meta.json,
       )
