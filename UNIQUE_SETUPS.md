@@ -61,42 +61,37 @@ https://codesandbox.io/s/xrpl-intro-pxgdjr?file=/src/App.js
 
 ### Using xrpl.js with React Native
 
-If you want to use `xrpl.js` with React Native you will need to install shims for core NodeJS modules. To help with this you can use a module like [rn-nodeify](https://github.com/tradle/rn-nodeify).
+If you want to use `xrpl.js` with React Native you will need to install polyfills for core NodeJS modules.
 
 1. Install dependencies (you can use `yarn` as well):
 
    ```shell
-   npm install react-native-crypto
-   npm install xrpl
-   # install peer deps
-   npm install react-native-randombytes
-   # install latest rn-nodeify
-   npm install rn-nodeify@latest --dev
+   npm install xrpl \
+       fast-text-encoding \
+       react-native-get-random-values
    ```
 
-2. After that, run the following command:
+2. After that, run the following commands:
 
    ```shell
-   # install node core shims and recursively hack package.json files
-   # in ./node_modules to add/update the "browser"/"react-native" field with relevant mappings
-   ./node_modules/.bin/rn-nodeify --hack --install
+   # compile `react-native-get-random-values` pods see https://www.npmjs.com/package/react-native-get-random-values#installation
+   npx pod-install
    ```
-
-3. Enable `crypto`:
-
-   `rn-nodeify` will create a `shim.js` file in the project root directory.
-   Open it and uncomment the line that requires the crypto module:
-
-   ```javascript
-   // If using the crypto shim, uncomment the following line to ensure
-   // crypto is loaded first, so it can populate global.crypto
-   require("crypto");
-   ```
-
-4. Import `shim` in your project (it must be the first line):
+   
+3. Create `polyfills.js` and add
 
 ```javascript
-import './shim'
+if (typeof Buffer === 'undefined') global.Buffer = require('buffer').Buffer
+// Required for TextEncoder/TextDecoder
+import 'fast-text-encoding'
+// Required for `crypto.getRandomValues`
+import 'react-native-get-random-values'
+```
+
+4. Import `polyfills` in index file your project (it must be the first line):
+
+```javascript
+import './polyfills'
 ...
 ```
 
