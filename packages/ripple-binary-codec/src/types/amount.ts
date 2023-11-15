@@ -3,7 +3,7 @@ import { BinaryParser } from '../serdes/binary-parser'
 import { AccountID } from './account-id'
 import { Currency } from './currency'
 import { JsonObject, SerializedType } from './serialized-type'
-import { Buffer } from 'buffer/'
+
 import BigNumber from 'bignumber.js'
 
 /**

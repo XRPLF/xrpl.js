@@ -1,7 +1,7 @@
 import { HashPrefix } from './hash-prefixes'
 import { Hash256 } from './types'
 import { BytesList } from './serdes/binary-serializer'
-import { Buffer } from 'buffer/'
+
 import { sha512 } from '@xrplf/isomorphic/sha512'
 
 /**

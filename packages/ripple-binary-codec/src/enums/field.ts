@@ -1,7 +1,6 @@
 import { Bytes } from './bytes'
 import { SerializedType } from '../types/serialized-type'
 import { TYPE_WIDTH } from './constants'
-import { Buffer } from 'buffer/'
 
 /**
  * Encoding information for a rippled field, often used in transactions.

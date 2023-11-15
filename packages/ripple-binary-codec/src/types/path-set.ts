@@ -2,7 +2,6 @@ import { AccountID } from './account-id'
 import { Currency } from './currency'
 import { BinaryParser } from '../serdes/binary-parser'
 import { SerializedType, JsonObject } from './serialized-type'
-import { Buffer } from 'buffer/'
 
 /**
  * Constants for separating Paths in a PathSet

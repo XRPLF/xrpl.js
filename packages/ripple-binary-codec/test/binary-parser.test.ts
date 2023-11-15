@@ -1,15 +1,12 @@
-const { coreTypes } = require('../src/types')
-const BigNumber = require('bignumber.js')
+import { coreTypes, Amount, Hash160 } from '../src/types'
+import BigNumber from 'bignumber.js'
 
-const { encodeAccountID } = require('ripple-address-codec')
-const { binary } = require('../src/coretypes')
-const { Amount, Hash160 } = coreTypes
-const { makeParser, readJSON } = binary
-const { Field, TransactionType } = require('./../src/enums')
-const { parseHexOnly, hexOnly, loadFixture } = require('./utils')
-const fixtures = loadFixture('data-driven-tests.json')
-const { BytesList } = require('../src/serdes/binary-serializer')
-const { Buffer } = require('buffer/')
+import { encodeAccountID } from 'ripple-address-codec'
+import { Field, TransactionType } from '../src/enums'
+import { makeParser, readJSON } from '../src/binary'
+import { parseHexOnly, hexOnly } from './utils'
+import { BytesList } from '../src/serdes/binary-serializer'
+import fixtures from './fixtures/data-driven-tests.json'
 
 const __ = hexOnly
 function toJSON(v) {
@@ -31,9 +28,10 @@ function assertEqualAmountJSON(actual, expected) {
 }
 
 function basicApiTests() {
-  const bytes = parseHexOnly('00,01020304,0506', Uint8Array)
-  test('can read slices of bytes', () => {
+  const bytes = parseHexOnly('00,01020304,0506')
+  it('can read slices of bytes', () => {
     const parser = makeParser(bytes)
+    // @ts-expect-error -- checking private variable type
     expect(parser.bytes instanceof Buffer).toBe(true)
     const read1 = parser.read(1)
     expect(read1 instanceof Buffer).toBe(true)
@@ -42,7 +40,7 @@ function basicApiTests() {
     expect(parser.read(2)).toEqual(Buffer.from([5, 6]))
     expect(() => parser.read(1)).toThrow()
   })
-  test('can read a Uint32 at full', () => {
+  it('can read a Uint32 at full', () => {
     const parser = makeParser('FFFFFFFF')
     expect(parser.readUInt32()).toEqual(0xffffffff)
   })
@@ -83,103 +81,106 @@ function transactionParsingTests() {
   const tx_json = transaction.json
   // These tests are basically development logs
 
-  test('can be done with low level apis', () => {
+  it('can be done with low level apis', () => {
     const parser = makeParser(transaction.binary)
 
-    expect(parser.readField()).toEqual(Field.TransactionType)
+    expect(parser.readField()).toEqual(Field['TransactionType'])
     expect(parser.readUInt16()).toEqual(7)
-    expect(parser.readField()).toEqual(Field.Flags)
+    expect(parser.readField()).toEqual(Field['Flags'])
     expect(parser.readUInt32()).toEqual(0)
-    expect(parser.readField()).toEqual(Field.Sequence)
+    expect(parser.readField()).toEqual(Field['Sequence'])
     expect(parser.readUInt32()).toEqual(103929)
-    expect(parser.readField()).toEqual(Field.TakerPays)
+    expect(parser.readField()).toEqual(Field['TakerPays'])
     parser.read(8)
-    expect(parser.readField()).toEqual(Field.TakerGets)
+    expect(parser.readField()).toEqual(Field['TakerGets'])
     // amount value
     expect(parser.read(8)).not.toBe([])
     // amount currency
     expect(Hash160.fromParser(parser)).not.toBe([])
     expect(encodeAccountID(parser.read(20))).toEqual(tx_json.TakerGets.issuer)
-    expect(parser.readField()).toEqual(Field.Fee)
+    expect(parser.readField()).toEqual(Field['Fee'])
     expect(parser.read(8)).not.toEqual([])
-    expect(parser.readField()).toEqual(Field.SigningPubKey)
+    expect(parser.readField()).toEqual(Field['SigningPubKey'])
     expect(parser.readVariableLengthLength()).toBe(33)
     expect(parser.read(33).toString('hex').toUpperCase()).toEqual(
       tx_json.SigningPubKey,
     )
-    expect(parser.readField()).toEqual(Field.TxnSignature)
+    expect(parser.readField()).toEqual(Field['TxnSignature'])
     expect(parser.readVariableLength().toString('hex').toUpperCase()).toEqual(
       tx_json.TxnSignature,
     )
-    expect(parser.readField()).toEqual(Field.Account)
+    expect(parser.readField()).toEqual(Field['Account'])
     expect(encodeAccountID(parser.readVariableLength())).toEqual(
       tx_json.Account,
     )
     expect(parser.end()).toBe(true)
   })
 
-  test('can be done with high level apis', () => {
+  it('can be done with high level apis', () => {
     const parser = makeParser(transaction.binary)
     function readField() {
       return parser.readFieldAndValue()
     }
     {
       const [field, value] = readField()
-      expect(field).toEqual(Field.TransactionType)
-      expect(value).toEqual(TransactionType.OfferCreate)
+      expect(field).toEqual(Field['TransactionType'])
+      expect(value).toEqual(TransactionType['OfferCreate'])
     }
     {
       const [field, value] = readField()
-      expect(field).toEqual(Field.Flags)
+      expect(field).toEqual(Field['Flags'])
       expect(value.valueOf()).toEqual(0)
     }
     {
       const [field, value] = readField()
-      expect(field).toEqual(Field.Sequence)
+      expect(field).toEqual(Field['Sequence'])
       expect(value.valueOf()).toEqual(103929)
     }
     {
       const [field, value] = readField()
-      expect(field).toEqual(Field.TakerPays)
-      expect(value.isNative()).toEqual(true)
+      expect(field).toEqual(Field['TakerPays'])
+      // @ts-expect-error -- checking private variable type
+      expect((value as Amount).isNative()).toEqual(true)
       expect(value.toJSON()).toEqual('98957503520')
     }
     {
       const [field, value] = readField()
-      expect(field).toEqual(Field.TakerGets)
-      expect(value.isNative()).toEqual(false)
-      expect(value.toJSON().issuer).toEqual(tx_json.TakerGets.issuer)
+      expect(field).toEqual(Field['TakerGets'])
+      // @ts-expect-error -- checking private function
+      expect((value as Amount).isNative()).toEqual(false)
+      expect(value.toJSON()?.['issuer']).toEqual(tx_json.TakerGets.issuer)
     }
     {
       const [field, value] = readField()
-      expect(field).toEqual(Field.Fee)
-      expect(value.isNative()).toEqual(true)
+      expect(field).toEqual(Field['Fee'])
+      // @ts-expect-error -- checking private function
+      expect((value as Amount).isNative()).toEqual(true)
     }
     {
       const [field, value] = readField()
-      expect(field).toEqual(Field.SigningPubKey)
+      expect(field).toEqual(Field['SigningPubKey'])
       expect(value.toJSON()).toEqual(tx_json.SigningPubKey)
     }
     {
       const [field, value] = readField()
-      expect(field).toEqual(Field.TxnSignature)
+      expect(field).toEqual(Field['TxnSignature'])
       expect(value.toJSON()).toEqual(tx_json.TxnSignature)
     }
     {
       const [field, value] = readField()
-      expect(field).toEqual(Field.Account)
+      expect(field).toEqual(Field['Account'])
       expect(value.toJSON()).toEqual(tx_json.Account)
     }
     expect(parser.end()).toBe(true)
   })
 
-  test('can be done with higher level apis', () => {
+  it('can be done with higher level apis', () => {
     const parser = makeParser(transaction.binary)
     const jsonFromBinary = readJSON(parser)
     expect(jsonFromBinary).toEqual(tx_json)
   })
 
-  test('readJSON (binary.decode) does not return STObject ', () => {
+  it('readJSON (binary.decode) does not return STObject ', () => {
     const parser = makeParser(transaction.binary)
     const jsonFromBinary = readJSON(parser)
     expect(jsonFromBinary instanceof coreTypes.STObject).toBe(false)
@@ -188,8 +189,20 @@ function transactionParsingTests() {
   })
 }
 
+interface AmountTest {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- it is json
+  test_json: any
+  type_id: number
+  is_native: boolean
+  type: string
+  expected_hex: string
+  is_negative?: boolean
+  exponent?: number
+  error?: string
+}
+
 function amountParsingTests() {
-  fixtures.values_tests
+  ;(fixtures.values_tests as AmountTest[])
     .filter((obj) => obj.type === 'Amount')
     .forEach((f, i) => {
       if (f.error) {
@@ -201,7 +214,7 @@ function amountParsingTests() {
         16,
       )}...
           as ${JSON.stringify(f.test_json)}`
-      test(testName, () => {
+      it(testName, () => {
         const value = parser.readType(Amount)
         // May not actually be in canonical form. The fixtures are to be used
         // also for json -> binary;
@@ -209,7 +222,7 @@ function amountParsingTests() {
         assertEqualAmountJSON(json, f.test_json)
         if (f.exponent) {
           const exponent = new BigNumber(json.value)
-          expect(exponent.e - 15).toEqual(f.exponent)
+          expect((exponent.e ?? 0) - 15).toEqual(f?.exponent)
         }
       })
     })
@@ -218,31 +231,31 @@ function amountParsingTests() {
 function fieldParsingTests() {
   fixtures.fields_tests.forEach((f, i) => {
     const parser = makeParser(f.expected_hex)
-    test(`fields[${i}]: parses ${f.expected_hex} as ${f.name}`, () => {
+    it(`fields[${i}]: parses ${f.expected_hex} as ${f.name}`, () => {
       const field = parser.readField()
       expect(field.name).toEqual(f.name)
       expect(field.type.name).toEqual(f.type_name)
     })
   })
-  test('Field throws when type code out of range', () => {
+  it('Field throws when type code out of range', () => {
     const parser = makeParser('0101')
     expect(() => parser.readField()).toThrow(
       new Error('Cannot read FieldOrdinal, type_code out of range'),
     )
   })
-  test('Field throws when field code out of range', () => {
+  it('Field throws when field code out of range', () => {
     const parser = makeParser('1001')
-    expect(() => parser.readFieldOrdinal()).toThrowError(
+    expect(() => parser.readFieldOrdinal()).toThrow(
       new Error('Cannot read FieldOrdinal, field_code out of range'),
     )
   })
-  test('Field throws when both type and field code out of range', () => {
+  it('Field throws when both type and field code out of range', () => {
     const parser = makeParser('000101')
-    expect(() => parser.readFieldOrdinal()).toThrowError(
+    expect(() => parser.readFieldOrdinal()).toThrow(
       new Error('Cannot read FieldOrdinal, type_code out of range'),
     )
   })
-  test('readUIntN', () => {
+  it('readUIntN', () => {
     const parser = makeParser('0009')
     expect(parser.readUIntN(2)).toEqual(9)
     expect(() => parser.readUIntN(-1)).toThrow(new Error('invalid n'))
@@ -262,7 +275,7 @@ function assertRecyclable(json, forField) {
 
 function nestedObjectTests() {
   fixtures.whole_objects.forEach((f, i) => {
-    test(`whole_objects[${i}]: can parse blob into
+    it(`whole_objects[${i}]: can parse blob into
           ${JSON.stringify(
             f.tx_json,
           )}`, /*                                              */ () => {
@@ -270,7 +283,8 @@ function nestedObjectTests() {
       let ix = 0
       while (!parser.end()) {
         const [field, value] = parser.readFieldAndValue()
-        const expected = f.fields[ix]
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- this is a json object
+        const expected: any = f.fields[ix]
         const expectedJSON = expected[1].json
         const expectedField = expected[0]
         const actual = toJSON(value)
@@ -383,7 +397,7 @@ function pathSetBinaryTests() {
     ],
   ]
 
-  test('works with long paths', () => {
+  it('works with long paths', () => {
     const parser = makeParser(bytes)
     const txn = readJSON(parser)
     expect(txn.Paths).toEqual(expectedJSON)

@@ -1,4 +1,4 @@
-const { encode, decode } = require('../src')
+import { encode, decode } from '../src'
 
 let str =
   '1100612200000000240000000125000068652D0000000055B6632D6376A2D9319F20A1C6DCCB486432D1E4A79951229D4C3DE2946F51D56662400009184E72A00081140DD319918CD5AE792BF7EC80D63B0F01B4573BBC'
@@ -31,16 +31,16 @@ let jsonUpper = {
 }
 
 describe('Lowercase hex test', () => {
-  test('Correctly decodes', () => {
+  it('Correctly decodes', () => {
     expect(decode(lower)).toEqual(decode(str))
   })
-  test('Re-encodes to uppercase hex', () => {
+  it('Re-encodes to uppercase hex', () => {
     expect(encode(decode(lower))).toEqual(str)
   })
-  test('Encode when hex field lowercase', () => {
+  it('Encode when hex field lowercase', () => {
     expect(encode(json)).toBe(bin)
   })
-  test('Re-decodes to uppercase hex', () => {
+  it('Re-decodes to uppercase hex', () => {
     expect(decode(encode(json))).toEqual(jsonUpper)
   })
 })
