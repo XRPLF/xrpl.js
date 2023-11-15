@@ -1,5 +1,6 @@
 const fs = require('fs')
-const fixtures = require('ripple-binary-codec/test/fixtures/codec-fixtures.json')
+const path = require('path')
+const fixtures = require('../../ripple-binary-codec/test/fixtures/codec-fixtures.json')
 
 const NORMAL_TYPES = ['number', 'string']
 const NUMBERS = ['0', '1']
@@ -9,15 +10,20 @@ function getTx(txName) {
   const validTxs = fixtures.transactions
     .filter((tx) => tx.json.TransactionType === txName)
     .map((tx) => tx.json)
+  if (validTxs.length == 0) {
+    throw new Error(`Must have ripple-binary-codec fixture for ${txName}`)
+  }
   const validTx = validTxs[0]
   delete validTx.TxnSignature
   delete validTx.SigningPubKey
   return JSON.stringify(validTx, null, 2)
 }
 
-function main() {
-  const modelName = process.argv[2]
-  const filename = `./packages/xrpl/src/models/transactions/${modelName}.ts`
+function main(modelName) {
+  const filename = path.join(
+    path.dirname(__filename),
+    `../src/models/transactions/${modelName}.ts`,
+  )
   const [model, txName] = getModel(filename)
   return processModel(model, txName)
 }
@@ -60,6 +66,8 @@ function getInvalidValue(paramTypes) {
     } else if (paramType == 'string') {
       return 123
     } else if (paramType == 'IssuedCurrency') {
+      return JSON.stringify({ test: 'test' })
+    } else if (paramType == 'Currency') {
       return JSON.stringify({ test: 'test' })
     } else if (paramType == 'Amount') {
       return JSON.stringify({ currency: 'ETH' })
@@ -184,4 +192,12 @@ describe('${txName}', function () {
   return output
 }
 
-console.log(main())
+if (require.main === module) {
+  if (process.argv.length < 3) {
+    console.log(`Usage: ${process.argv[0]} ${process.argv[1]} TxName`)
+    process.exit(1)
+  }
+  console.log(main(process.argv[2]))
+}
+
+module.exports = main

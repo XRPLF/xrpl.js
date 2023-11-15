@@ -4,19 +4,18 @@
  * folder.
  */
 const fs = require('fs')
+const path = require('path')
 
 const NORMAL_TYPES = ['number', 'string']
 const NUMBERS = ['0', '1']
 
 // TODO: rewrite this to use regex
 
-async function main() {
-  if (process.argv.length < 3) {
-    console.log(`Usage: ${process.argv[0]} ${process.argv[1]} TxName`)
-    process.exit(1)
-  }
-  const modelName = process.argv[2]
-  const filename = `./src/models/transactions/${modelName}.ts`
+async function main(modelName) {
+  const filename = path.join(
+    path.dirname(__filename),
+    `../src/models/transactions/${modelName}.ts`,
+  )
   const [model, txName] = await getModel(filename)
   return processModel(model, txName)
 }
@@ -144,4 +143,12 @@ ${output}`
   return output
 }
 
-main().then(console.log)
+if (require.main === module) {
+  if (process.argv.length < 3) {
+    console.log(`Usage: ${process.argv[0]} ${process.argv[1]} TxName`)
+    process.exit(1)
+  }
+  main(process.argv[2]).then(console.log)
+}
+
+module.exports = main

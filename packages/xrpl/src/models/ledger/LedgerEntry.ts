@@ -44,6 +44,7 @@ type LedgerEntryFilter =
   | 'bridge'
   | 'check'
   | 'deposit_preauth'
+  | 'did'
   | 'directory'
   | 'escrow'
   | 'fee'
