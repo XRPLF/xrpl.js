@@ -73,4 +73,21 @@ describe('DIDSet', function () {
       'DIDSet: invalid field URI',
     )
   })
+
+  it('throws w/ empty DID', function () {
+    delete tx.Data
+    delete tx.DIDDocument
+    delete tx.URI
+
+    assert.throws(
+      () => validateDIDSet(tx),
+      ValidationError,
+      'DIDSet: Must have at least one of `Data`, `DIDDocument`, and `URI`',
+    )
+    assert.throws(
+      () => validate(tx),
+      ValidationError,
+      'DIDSet: Must have at least one of `Data`, `DIDDocument`, and `URI`',
+    )
+  })
 })
