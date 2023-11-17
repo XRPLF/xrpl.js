@@ -1,3 +1,5 @@
+import { ValidationError } from '../../errors'
+
 import {
   BaseTransaction,
   isString,
@@ -34,4 +36,14 @@ export function validateDIDSet(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'DIDDocument', isString)
 
   validateOptionalField(tx, 'URI', isString)
+
+  if (
+    tx.Data === undefined &&
+    tx.DIDDocument === undefined &&
+    tx.URI === undefined
+  ) {
+    throw new ValidationError(
+      'DIDSet: Must have at least one of `Data`, `DIDDocument`, and `URI`',
+    )
+  }
 }

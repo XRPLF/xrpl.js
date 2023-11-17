@@ -7,6 +7,7 @@ import AMM, { VoteSlot } from './AMM'
 import Bridge from './Bridge'
 import Check from './Check'
 import DepositPreauth from './DepositPreauth'
+import DID from './DID'
 import DirectoryNode from './DirectoryNode'
 import Escrow from './Escrow'
 import FeeSettings, {
@@ -39,6 +40,7 @@ export {
   Check,
   DepositPreauth,
   DirectoryNode,
+  DID,
   Escrow,
   FEE_SETTINGS_ID,
   FeeSettings,
