@@ -5,6 +5,14 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Breaking Changes
+* `Transaction` type has been redefined to include all transactions and `SubmittableTransaction` was created to define the old value. The following functions which only handle transactions to be submitted now use `SubmittableTransaction`:
+  * `Client.autofill`
+  * `Client.submit`
+  * `Client.submitAndWait`
+  * `Client.prepareTransaction`
+  * `getSignedTx`
+  * `isAccountDelete`
+* `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string`
 * `Buffer` has been replaced with `UInt8Array` for both params and return values.  `Buffer` may continue to work with params since they extend `UInt8Arrays`.
 
 ### Bundling Changes
@@ -52,6 +60,11 @@ Bundler configurations are much more simplified. See [../UNIQUE_STEPS](Unique St
 ### Fixed
 * Fixed Wallet.generate() ignoring the `algorithm` parameter (Only a problem once binary-codec fix for `derive_keypair` is added)
 * Fixed Wallet.fromSeed() ignoring the `algorithm` parameter
+
+## Unreleased 2.x
+
+### Added
+* Support for `server_definitions` RPC
 
 ## 2.13.0 (2023-10-18)
 

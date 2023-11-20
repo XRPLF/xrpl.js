@@ -41,7 +41,7 @@ import type {
   EventTypes,
   OnEventToListenerMap,
 } from '../models/methods/subscribe'
-import type { Transaction } from '../models/transactions'
+import type { SubmittableTransaction } from '../models/transactions'
 import { setTransactionFlagsToNumber } from '../models/utils/flags'
 import {
   ensureClassicAddress,
@@ -590,45 +590,8 @@ class Client extends EventEmitter<EventTypes> {
    * flags interfaces into numbers.
    *
    * @category Core
-   *
-   * @example
-   *
-   * ```ts
-   * const { Client } = require('xrpl')
-   *
-   * const client = new Client('wss://s.altnet.rippletest.net:51233')
-   *
-   * async function createAndAutofillTransaction() {
-   *   const transaction = {
-   *     TransactionType: 'Payment',
-   *     Account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
-   *     Destination: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
-   *     Amount: '10000000' // 10 XRP in drops (1/1,000,000th of an XRP)
-   *   }
-   *
-   *   try {
-   *     const autofilledTransaction = await client.autofill(transaction)
-   *     console.log(autofilledTransaction)
-   *   } catch (error) {
-   *     console.error(`Failed to autofill transaction: ${error}`)
-   *   }
-   * }
-   *
-   * createAndAutofillTransaction()
-   * ```
-   *
-   * Autofill helps fill in fields which should be included in a transaction, but can be determined automatically
-   * such as `LastLedgerSequence` and `Fee`. If you override one of the fields `autofill` changes, your explicit
-   * values will be used instead. By default, this is done as part of `submit` and `submitAndWait` when you pass
-   * in an unsigned transaction along with your wallet to be submitted.
-   *
-   * @template T
-   * @param transaction - A {@link Transaction} in JSON format
-   * @param signersCount - The expected number of signers for this transaction.
-   * Only used for multisigned transactions.
-   * @returns The autofilled transaction.
    */
-  public async autofill<T extends Transaction>(
+  public async autofill<T extends SubmittableTransaction>(
     transaction: T,
     signersCount?: number,
   ): Promise<T> {
@@ -693,7 +656,7 @@ class Client extends EventEmitter<EventTypes> {
    * ```
    */
   public async submit(
-    transaction: Transaction | string,
+    transaction: SubmittableTransaction | string,
     opts?: {
       // If true, autofill a transaction.
       autofill?: boolean
@@ -764,7 +727,9 @@ class Client extends EventEmitter<EventTypes> {
    * ledger, the promise returned by `submitAndWait()` will be rejected with an error.
    * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
    */
-  public async submitAndWait<T extends Transaction = Transaction>(
+  public async submitAndWait<
+    T extends SubmittableTransaction = SubmittableTransaction,
+  >(
     transaction: T | string,
     opts?: {
       // If true, autofill a transaction.
@@ -804,7 +769,7 @@ class Client extends EventEmitter<EventTypes> {
    * @deprecated Use autofill instead, provided for users familiar with v1
    */
   public async prepareTransaction(
-    transaction: Transaction,
+    transaction: SubmittableTransaction,
     signersCount?: number,
   ): ReturnType<Client['autofill']> {
     return this.autofill(transaction, signersCount)
@@ -829,7 +794,7 @@ class Client extends EventEmitter<EventTypes> {
    * @param [options] - Additional options for fetching the balance (optional).
    * @param [options.ledger_hash] - The hash of the ledger to retrieve the balance from (optional).
    * @param [options.ledger_index] - The index of the ledger to retrieve the balance from (optional).
-   * @returns A promise that resolves with the XRP balance as a string.
+   * @returns A promise that resolves with the XRP balance as a number.
    */
   public async getXrpBalance(
     address: string,
@@ -837,7 +802,7 @@ class Client extends EventEmitter<EventTypes> {
       ledger_hash?: string
       ledger_index?: LedgerIndex
     } = {},
-  ): Promise<string> {
+  ): Promise<number> {
     const xrpRequest: AccountInfoRequest = {
       command: 'account_info',
       account: address,
@@ -911,7 +876,7 @@ class Client extends EventEmitter<EventTypes> {
     const balances: Balance[] = []
 
     // get XRP balance
-    let xrpPromise: Promise<string> = Promise.resolve('')
+    let xrpPromise: Promise<number> = Promise.resolve(0)
     if (!options.peer) {
       xrpPromise = this.getXrpBalance(address, {
         ledger_hash: options.ledger_hash,
@@ -936,8 +901,8 @@ class Client extends EventEmitter<EventTypes> {
         const accountLinesBalance = linesResponses.flatMap((response) =>
           formatBalances(response.result.lines),
         )
-        if (xrpBalance !== '') {
-          balances.push({ currency: 'XRP', value: xrpBalance })
+        if (xrpBalance !== 0) {
+          balances.push({ currency: 'XRP', value: xrpBalance.toString() })
         }
         balances.push(...accountLinesBalance)
       },

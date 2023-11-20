@@ -27,7 +27,7 @@ function getDefaultConfiguration() {
       // We don't want to webpack any of the local dependencies:
       // ripple-address-codec, ripple-binary-codec, ripple-keypairs, which are
       // symlinked together via lerna
-      symlinks: false,
+      symlinks: false
     },
   };
 }

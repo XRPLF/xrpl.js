@@ -1,4 +1,4 @@
-const { encode, decode } = require('../src')
+import { encode, decode } from '../src'
 
 let json = {
   Account: 'rrrrrrrrrrrrrrrrrrrrrhoLvTp',
@@ -20,19 +20,19 @@ let binary =
   '24000000006840000000000000007300760081140000000000000000000000000000000000000000'
 
 describe('Can encode Pseudo Transactions', () => {
-  test('Correctly encodes Pseudo Transaciton', () => {
+  it('Correctly encodes Pseudo Transaciton', () => {
     expect(encode(json)).toEqual(binary)
   })
 
-  test('Can decode account objects', () => {
+  it('Can decode account objects', () => {
     expect(decode(encode(json))).toEqual(json)
   })
 
-  test('Blank AccountID is ACCOUNT_ZERO', () => {
+  it('Blank AccountID is ACCOUNT_ZERO', () => {
     expect(encode(json_blank_acct)).toEqual(binary)
   })
 
-  test('Decodes Blank AccountID', () => {
+  it('Decodes Blank AccountID', () => {
     expect(decode(encode(json_blank_acct))).toEqual(json)
   })
 })

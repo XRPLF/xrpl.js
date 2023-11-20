@@ -17,15 +17,19 @@ import { JsonObject } from './types/serialized-type'
 /**
  * Construct a BinaryParser
  *
- * @param bytes hex-string to construct BinaryParser from
+ * @param bytes hex-string or Buffer to construct BinaryParser from
  * @param definitions rippled definitions used to parse the values of transaction types and such.
  *                          Can be customized for sidechains and amendments.
- * @returns A BinaryParser
+ * @returns BinaryParser
  */
 const makeParser = (
-  bytes: string,
+  bytes: string | Buffer,
   definitions?: XrplDefinitionsBase,
-): BinaryParser => new BinaryParser(bytes, definitions)
+): BinaryParser =>
+  new BinaryParser(
+    bytes instanceof Buffer ? bytes.toString('hex') : bytes,
+    definitions,
+  )
 
 /**
  * Parse BinaryParser into JSON

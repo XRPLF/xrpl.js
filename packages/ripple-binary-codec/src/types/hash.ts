@@ -6,7 +6,7 @@ import { compare } from '../utils'
 /**
  * Base class defining how to encode and decode hashes
  */
-class Hash extends Comparable {
+class Hash extends Comparable<Hash | string> {
   static readonly width: number
 
   constructor(bytes: Uint8Array) {

@@ -70,6 +70,7 @@ export const randomBytes: typeof RandomBytesFn = (size) => {
   return toUint8Array(cryptoRandomBytes(size))
 }
 /* eslint-enable func-style */
+
 export * from './shared'
 // eslint-disable-next-line node/prefer-global/text-encoder, node/prefer-global/text-decoder
 export { TextDecoder, TextEncoder } from 'util'
