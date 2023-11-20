@@ -1,4 +1,4 @@
-import { hexToBytes } from "@xrplf/isomorphic/utils";
+import { hexToBytes } from '@xrplf/isomorphic/utils'
 import { deriveAddress, deriveKeypair, generateSeed } from 'ripple-keypairs'
 
 import { Account, secretToEntropy } from '../src'

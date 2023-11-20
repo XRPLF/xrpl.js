@@ -1,6 +1,4 @@
 import { hexOnly } from './utils'
-
-const { bytesToHex } = require('@xrplf/isomorphic/utils')
 import { coreTypes, Amount, Hash160 } from '../src/types'
 import BigNumber from 'bignumber.js'
 
@@ -9,6 +7,8 @@ import { Field, TransactionType } from '../src/enums'
 import { makeParser, readJSON } from '../src/binary'
 import { BytesList } from '../src/serdes/binary-serializer'
 import fixtures from './fixtures/data-driven-tests.json'
+
+const { bytesToHex } = require('@xrplf/isomorphic/utils')
 
 function toJSON(v) {
   return v.toJSON ? v.toJSON() : v
