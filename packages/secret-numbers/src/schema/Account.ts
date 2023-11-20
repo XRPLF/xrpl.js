@@ -38,7 +38,7 @@ export class Account {
       this._secret = parseSecretString(secretNumbers)
     } else if (Array.isArray(secretNumbers)) {
       this._secret = secretNumbers
-    } else if (Buffer.isBuffer(secretNumbers)) {
+    } else if (secretNumbers instanceof Uint8Array) {
       this._secret = entropyToSecret(secretNumbers)
     } else {
       this._secret = randomSecret()

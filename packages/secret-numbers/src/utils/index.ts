@@ -1,4 +1,9 @@
-import { bytesToHex, randomBytes } from '@xrplf/isomorphic/utils'
+import {
+  bytesToHex,
+  concat,
+  hexToBytes,
+  randomBytes,
+} from '@xrplf/isomorphic/utils'
 
 function randomEntropy(): Uint8Array {
   return randomBytes(16)
@@ -50,8 +55,8 @@ function randomSecret(): string[] {
   return entropyToSecret(randomEntropy())
 }
 
-function secretToEntropy(secret: string[]): Buffer {
-  return Buffer.concat(
+function secretToEntropy(secret: string[]): Uint8Array {
+  return concat(
     secret.map((chunk, i) => {
       const no = Number(chunk.slice(0, 5))
       const checksum = Number(chunk.slice(5))
@@ -62,7 +67,7 @@ function secretToEntropy(secret: string[]): Buffer {
         throw new Error('Invalid secret part: checksum invalid')
       }
       const hex = `0000${no.toString(16)}`.slice(-4)
-      return Buffer.from(hex, 'hex')
+      return hexToBytes(hex)
     }),
   )
 }

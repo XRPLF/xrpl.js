@@ -70,7 +70,7 @@ class Issue extends SerializedType {
       return new Issue(currency)
     }
     const currencyAndIssuer = [currency, parser.read(20)]
-    return new Issue(Buffer.concat(currencyAndIssuer))
+    return new Issue(concat(currencyAndIssuer))
   }
 
   /**

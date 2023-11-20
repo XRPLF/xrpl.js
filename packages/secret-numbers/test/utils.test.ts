@@ -1,4 +1,4 @@
-import { bytesToHex } from '@xrplf/isomorphic/utils'
+import { bytesToHex, hexToBytes } from '@xrplf/isomorphic/utils'
 
 import {
   calculateChecksum,
@@ -55,7 +55,7 @@ describe('Utils', () => {
   })
 
   it('entropyToSecret', () => {
-    const entropy = Buffer.from('76ebb2d06879b45b7568fb9c1ded097c', 'hex')
+    const entropy = hexToBytes('76ebb2d06879b45b7568fb9c1ded097c')
     const secret = [
       '304435',
       '457766',
@@ -80,7 +80,7 @@ describe('Utils', () => {
       '076618',
       '024286',
     ]
-    const entropy = Buffer.from('76ebb2d06879b45b7568fb9c1ded097c', 'hex')
+    const entropy = hexToBytes('76ebb2d06879b45b7568fb9c1ded097c')
     expect(secretToEntropy(secret)).toEqual(entropy)
   })
 

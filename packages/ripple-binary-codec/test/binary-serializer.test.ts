@@ -118,7 +118,7 @@ function bytesListTest() {
   })
   it('can join all arrays into one via toBytes', function () {
     const joined = list.toBytes()
-    expect(joined).toHaveLength(5)
+    expect(joined.length).toEqual(5)
     expect(joined).toEqual(Uint8Array.from([0, 2, 3, 4, 5]))
   })
 }
