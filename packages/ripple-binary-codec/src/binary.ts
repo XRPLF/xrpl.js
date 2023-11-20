@@ -1,5 +1,6 @@
 /* eslint-disable func-style */
 
+import { bytesToHex } from '@xrplf/isomorphic/utils'
 import { coreTypes } from './types'
 import { BinaryParser } from './serdes/binary-parser'
 import { AccountID } from './types/account-id'
@@ -23,11 +24,11 @@ import { JsonObject } from './types/serialized-type'
  * @returns BinaryParser
  */
 const makeParser = (
-  bytes: string | Buffer,
+  bytes: string | Uint8Array,
   definitions?: XrplDefinitionsBase,
 ): BinaryParser =>
   new BinaryParser(
-    bytes instanceof Buffer ? bytes.toString('hex') : bytes,
+    bytes instanceof Uint8Array ? bytesToHex(bytes) : bytes,
     definitions,
   )
 
