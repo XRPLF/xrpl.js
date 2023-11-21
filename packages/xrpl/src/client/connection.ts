@@ -68,10 +68,9 @@ function createWebSocket(
     options.headers = config.headers
   }
   if (config.authorization != null) {
-    // const base64 = Buffer.from(config.authorization).toString('base64')
     options.headers = {
       ...options.headers,
-      // Authorization: `Basic ${base64}`,
+      Authorization: `Basic ${btoa(config.authorization)}`,
     }
   }
   const websocketOptions = { ...options }
