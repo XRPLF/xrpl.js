@@ -13,10 +13,6 @@ import {
   isValidClassicAddress,
 } from '../src'
 
-function toBytes(hex: string): Uint8Array {
-  return hexToBytes(hex)
-}
-
 function stringToBytes(str: string): Uint8Array {
   return new TextEncoder().encode(str)
 }
@@ -37,7 +33,7 @@ function makeEncodeDecodeTest(
   hex: string,
 ): void {
   it(`can translate between ${hex} and ${base58}`, function () {
-    const actual = encoder(toBytes(hex))
+    const actual = encoder(hexToBytes(hex))
     expect(actual).toBe(base58)
   })
   it(`can translate between ${base58} and ${hex})`, function () {

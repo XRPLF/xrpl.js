@@ -48,7 +48,7 @@ class SerializedType {
   /**
    * Get the bytes representation of a SerializedType
    *
-   * @returns A buffer of the bytes
+   * @returns A Uint8Array of the bytes
    */
   toBytes(): Uint8Array {
     if (this.bytes) {

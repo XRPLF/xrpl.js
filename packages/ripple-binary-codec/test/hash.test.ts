@@ -109,7 +109,7 @@ describe('Currency', function () {
     ).toBe(null)
   })
 
-  it('can be constructed from a Buffer', function () {
+  it('can be constructed from a Uint8Array', function () {
     const xrp = new Currency(new Uint8Array(20))
     expect(xrp.iso()).toBe('XRP')
   })

@@ -3,7 +3,7 @@ import { type SerializedType } from '../types/serialized-type'
 import { bytesToHex, concat } from '@xrplf/isomorphic/utils'
 
 /**
- * Bytes list is a collection of buffer objects
+ * Bytes list is a collection of Uint8Array objects
  */
 class BytesList {
   private bytesArray: Array<Uint8Array> = []
@@ -48,7 +48,7 @@ class BytesList {
 }
 
 /**
- * BinarySerializer is used to write fields and values to buffers
+ * BinarySerializer is used to write fields and values to Uint8Arrays
  */
 class BinarySerializer {
   private sink: BytesList = new BytesList()

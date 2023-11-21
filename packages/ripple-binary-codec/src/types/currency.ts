@@ -69,7 +69,7 @@ function isValidRepresentation(input: Uint8Array | string): boolean {
 }
 
 /**
- * Generate bytes from a string or buffer representation of a currency
+ * Generate bytes from a string or UInt8Array representation of a currency
  */
 function bytesFromRepresentation(input: string): Uint8Array {
   if (!isValidRepresentation(input)) {

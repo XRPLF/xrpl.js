@@ -91,20 +91,20 @@ class Codec {
     )
   }
 
-  public encodeChecked(buffer: ByteArray): string {
-    const check = this._sha256(this._sha256(buffer)).slice(0, 4)
-    return this._encodeRaw(Uint8Array.from(concatArgs(buffer, check)))
+  public encodeChecked(bytes: ByteArray): string {
+    const check = this._sha256(this._sha256(bytes)).slice(0, 4)
+    return this._encodeRaw(Uint8Array.from(concatArgs(bytes, check)))
   }
 
   public decodeChecked(base58string: string): Uint8Array {
-    const buffer = this._decodeRaw(base58string)
-    if (buffer.byteLength < 5) {
+    const intArray = this._decodeRaw(base58string)
+    if (intArray.byteLength < 5) {
       throw new Error('invalid_input_size: decoded data must have length >= 5')
     }
-    if (!this._verifyCheckSum(buffer)) {
+    if (!this._verifyCheckSum(intArray)) {
       throw new Error('checksum_invalid')
     }
-    return buffer.slice(0, -4)
+    return intArray.slice(0, -4)
   }
 
   private _encodeVersioned(
