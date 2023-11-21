@@ -30,10 +30,6 @@ function intToHex(integer: number, byteLength: number): string {
   return foo
 }
 
-function simpleBytesToHex(bytes: number[]): string {
-  return bytesToHex(new Uint8Array(bytes))
-}
-
 function bigintToHex(
   integerString: string | number | BigNumber,
   byteLength: number,
@@ -45,16 +41,16 @@ function bigintToHex(
 function addLengthPrefix(hex: string): string {
   const length = hex.length / 2
   if (length <= 192) {
-    return simpleBytesToHex([length]) + hex
+    return bytesToHex([length]) + hex
   }
   if (length <= 12480) {
     const prefix = length - 193
-    return simpleBytesToHex([193 + (prefix >>> 8), prefix & 0xff]) + hex
+    return bytesToHex([193 + (prefix >>> 8), prefix & 0xff]) + hex
   }
   if (length <= 918744) {
     const prefix = length - 12481
     return (
-      simpleBytesToHex([
+      bytesToHex([
         241 + (prefix >>> 16),
         (prefix >>> 8) & 0xff,
         prefix & 0xff,

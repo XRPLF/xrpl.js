@@ -139,12 +139,6 @@ it('UInt64 from non 16 length hex', () => {
   expect(encode(jsonEntry2)).toEqual(binaryEntry2)
 })
 
-it('UInt16 from non 16 length hex', () => {
-  expect(encode(jsonEntry0)).toEqual(binaryEntry0)
-  expect(encode(jsonEntry1)).toEqual(binaryEntry1)
-  expect(encode(jsonEntry2)).toEqual(binaryEntry2)
-})
-
 it('valueOf tests', () => {
   let val = UInt8.from(1)
 

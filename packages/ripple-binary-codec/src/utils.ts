@@ -3,7 +3,7 @@ import TypedArray = NodeJS.TypedArray
 
 //
 /**
- * Writes value to array at the specified offset. The value must be a valid unsigned 8-bit integer. Lifted from Buffer.writeUInt8
+ * Writes value to array at the specified offset. The value must be a valid unsigned 8-bit integer.
  * @param array Uint8Array to be written to
  * @param value Number to be written to array.
  * @param offset plus the number of bytes written.
@@ -18,7 +18,7 @@ export function writeUInt8(
 }
 
 /**
- * Writes value to array at the specified offset as big-endian. The value must be a valid unsigned 16-bit integer.  Lifted from Buffer.writeUInt16BE
+ * Writes value to array at the specified offset as big-endian. The value must be a valid unsigned 16-bit integer.
  * @param array Uint8Array to be written to
  * @param value Number to be written to array.
  * @param offset plus the number of bytes written.
@@ -35,7 +35,7 @@ export function writeUInt16BE(
 }
 
 /**
- * Writes value to array at the specified offset as big-endian. The value must be a valid unsigned 32-bit integer.  Lifted from Buffer.writeUInt32BE
+ * Writes value to array at the specified offset as big-endian. The value must be a valid unsigned 32-bit integer.
  * @param array Uint8Array to be written to
  * @param value Number to be written to array.
  * @param offset plus the number of bytes written.
@@ -121,8 +121,8 @@ function equal32(a: Uint8Array, b: Uint8Array) {
 
 /**
  * Compare two TypedArrays
- * @param a
- * @param b
+ * @param a first array to compare
+ * @param b second array to compare
  */
 export function compare(a: TypedArray, b: TypedArray): 1 | -1 | 0 {
   for (let i = 0; i < a.length - 1; i += 1) {
@@ -134,16 +134,16 @@ export function compare(a: TypedArray, b: TypedArray): 1 | -1 | 0 {
 
 /**
  * Determine if TypedArray is 16 bit aligned
- * @param a
+ * @param array The array to check
  */
-function aligned16(a: TypedArray) {
-  return a.byteOffset % 2 === 0 && a.byteLength % 2 === 0
+function aligned16(array: TypedArray) {
+  return array.byteOffset % 2 === 0 && array.byteLength % 2 === 0
 }
 
 /**
  * Determine if TypedArray is 32 bit aligned
- * @param a
+ * @param array The array to check
  */
-function aligned32(a: TypedArray) {
-  return a.byteOffset % 4 === 0 && a.byteLength % 4 === 0
+function aligned32(array: TypedArray) {
+  return array.byteOffset % 4 === 0 && array.byteLength % 4 === 0
 }
