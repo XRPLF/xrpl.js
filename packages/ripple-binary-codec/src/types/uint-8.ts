@@ -29,13 +29,7 @@ class UInt8 extends UInt {
     }
 
     if (typeof val === 'number') {
-      const min = 0,
-        max = 0xff
-
       UInt8.checkUintRange(val, 0, 0xff)
-      if (val < min || val > max) {
-        throw new Error(`Invalid UInt8: ${val} must be >= ${min} and <= ${max}`)
-      }
 
       const buf = new Uint8Array(UInt8.width)
       writeUInt8(buf, val, 0)
