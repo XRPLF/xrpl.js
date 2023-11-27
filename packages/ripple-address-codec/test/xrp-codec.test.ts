@@ -1,4 +1,4 @@
-import { bytesToHex, hexToBytes } from '@xrplf/isomorphic/utils'
+import { bytesToHex, hexToBytes, stringToHex } from '@xrplf/isomorphic/utils'
 
 import {
   codec,
@@ -14,7 +14,7 @@ import {
 } from '../src'
 
 function stringToBytes(str: string): Uint8Array {
-  return new TextEncoder().encode(str)
+  return hexToBytes(stringToHex(str))
 }
 
 /**
@@ -208,7 +208,7 @@ describe('decodeNodePublic', function () {
 
 it('encodes 123456789 with version byte of 0', () => {
   expect(
-    codec.encode(new TextEncoder().encode('123456789'), {
+    codec.encode(stringToBytes('123456789'), {
       versions: [0],
       expectedLength: 9,
     }),

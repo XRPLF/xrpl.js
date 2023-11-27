@@ -16,7 +16,12 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * `Buffer` has been replaced with `UInt8Array` for both params and return values.  `Buffer` may continue to work with params since they extend `UInt8Arrays`.
 
 ### Bundling Changes
-* `Buffer` polyfills are no longer required.
+* `Buffer` and `process` polyfills are no longer required.
+
+### Changes
+* Deprecated:
+  * `convertHexToString` in favor of `@xrplf/isomorphic/utils`'s `hexToString`
+  * `convertStringToHex` in favor of `@xrplf/isomorphic/utils`'s `stringToHex`
 
 ## 3.0.0 Beta 1 (2023-10-19)
 

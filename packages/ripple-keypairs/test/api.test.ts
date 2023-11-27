@@ -8,15 +8,11 @@ import {
   sign,
   verify,
 } from '../src'
-import { bytesToHex } from '@noble/curves/abstract/utils'
+import { stringToHex } from '@xrplf/isomorphic/utils'
 
 const entropy = new Uint8Array([
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 ])
-
-function utf8toHex(text: string): string {
-  return bytesToHex(new TextEncoder().encode(text))
-}
 
 describe('api', () => {
   it('generateSeed - secp256k1', () => {
@@ -82,7 +78,7 @@ describe('api', () => {
   it('sign - secp256k1', () => {
     const privateKey = fixtures.secp256k1.keypair.privateKey
     const message = fixtures.secp256k1.message
-    const messageHex = utf8toHex(message)
+    const messageHex = stringToHex(message)
     const signature = sign(messageHex, privateKey)
     expect(signature).toEqual(fixtures.secp256k1.signature)
   })
@@ -91,14 +87,14 @@ describe('api', () => {
     const signature = fixtures.secp256k1.signature
     const publicKey = fixtures.secp256k1.keypair.publicKey
     const message = fixtures.secp256k1.message
-    const messageHex = utf8toHex(message)
+    const messageHex = stringToHex(message)
     expect(verify(messageHex, signature, publicKey)).toBeTruthy()
   })
 
   it('sign - ed25519', () => {
     const privateKey = fixtures.ed25519.keypair.privateKey
     const message = fixtures.ed25519.message
-    const messageHex = utf8toHex(message)
+    const messageHex = stringToHex(message)
     const signature = sign(messageHex, privateKey)
     expect(signature).toEqual(fixtures.ed25519.signature)
   })
@@ -107,7 +103,7 @@ describe('api', () => {
     const signature = fixtures.ed25519.signature
     const publicKey = fixtures.ed25519.keypair.publicKey
     const message = fixtures.ed25519.message
-    const messageHex = utf8toHex(message)
+    const messageHex = stringToHex(message)
     expect(verify(messageHex, signature, publicKey)).toBeTruthy()
   })
 

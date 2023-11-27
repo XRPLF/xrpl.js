@@ -2,9 +2,15 @@ import {
   bytesToHex as nobleBytesToHex,
   randomBytes as nobleRandomBytes,
 } from '@noble/hashes/utils'
-import type { BytesToHexFn, HexToBytesFn, RandomBytesFn } from './types'
+import type {
+  BytesToHexFn,
+  HexToBytesFn,
+  HexToStringFn,
+  RandomBytesFn,
+  StringToHexFn,
+} from './types'
 
-/* eslint-disable-next-line func-style -- Typed to ensure uniformity between node and browser implementations and docs */
+/* eslint-disable func-style -- Typed to ensure uniformity between node and browser implementations and docs */
 export const bytesToHex: typeof BytesToHexFn = (bytes) => {
   const hex = nobleBytesToHex(
     bytes instanceof Uint8Array ? bytes : Uint8Array.from(bytes),
@@ -13,7 +19,6 @@ export const bytesToHex: typeof BytesToHexFn = (bytes) => {
 }
 
 // A clone of hexToBytes from @noble/hashes without the length checks. This allows us to do our own checks.
-/* eslint-disable-next-line func-style -- Typed to ensure uniformity between node and browser implementations and docs */
 export const hexToBytes: typeof HexToBytesFn = (hex): Uint8Array => {
   const len = hex.length
   const array = new Uint8Array(len / 2)
@@ -29,7 +34,17 @@ export const hexToBytes: typeof HexToBytesFn = (hex): Uint8Array => {
   return array
 }
 
+export const hexToString: typeof HexToStringFn = (
+  hex: string,
+  encoding = 'utf8',
+): string => {
+  return new TextDecoder(encoding).decode(hexToBytes(hex))
+}
+
+export const stringToHex: typeof StringToHexFn = (string: string): string => {
+  return bytesToHex(new TextEncoder().encode(string))
+}
+/* eslint-enable func-style */
+
 export const randomBytes: typeof RandomBytesFn = nobleRandomBytes
 export * from './shared'
-export const TextDecoder = window.TextDecoder
-export const TextEncoder = window.TextEncoder

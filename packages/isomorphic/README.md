@@ -95,6 +95,16 @@ import { hexToBytes } from @xrplf/isomorphic/utils
 console.log(hexToBytes('DEADBEEF')) // [222, 173, 190, 239]
 ```
 
+#### hexToString
+
+Convert hex to an UInt8Array.
+
+```typescript
+import { hexToString } from @xrplf/isomorphic/utils
+
+console.log(hexToString('DEADBEEF')) // [222, 173, 190, 239]
+```
+
 ### `@xrplf/isomorphic/ws`
 
 ```typescript

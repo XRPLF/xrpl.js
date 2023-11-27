@@ -1,5 +1,5 @@
 import { Hash160 } from './hash-160'
-import { bytesToHex, hexToBytes, TextDecoder } from '@xrplf/isomorphic/utils'
+import { bytesToHex, hexToBytes, hexToString } from '@xrplf/isomorphic/utils'
 
 const XRP_HEX_REGEX = /^0{40}$/
 const ISO_REGEX = /^[A-Z0-9a-z?!@#$%^&*(){}[\]|]{3}$/
@@ -27,8 +27,7 @@ function isIsoCode(iso: string): boolean {
 }
 
 function isoCodeFromHex(code: Uint8Array): string | null {
-  const utf8decoder = new TextDecoder()
-  const iso = utf8decoder.decode(code)
+  const iso = hexToString(bytesToHex(code))
   if (iso === 'XRP') {
     return null
   }
