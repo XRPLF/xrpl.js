@@ -1,7 +1,6 @@
-// Don't know why this comes from NodeJS as it is valid in the browser
+// Even though this comes from NodeJS it is valid in the browser
 import TypedArray = NodeJS.TypedArray
 
-//
 /**
  * Writes value to array at the specified offset. The value must be a valid unsigned 8-bit integer.
  * @param array Uint8Array to be written to
@@ -52,7 +51,7 @@ export function writeUInt32BE(
 }
 
 /**
- * Reads an unsigned, big-endian 16-bit integer from buf at the specified offset.
+ * Reads an unsigned, big-endian 16-bit integer from the array at the specified offset.
  * @param array Uint8Array to read
  * @param offset Number of bytes to skip before starting to read. Must satisfy 0 <= offset <= buf.length - 2
  */
@@ -61,7 +60,7 @@ export function readUInt16BE(array: Uint8Array, offset: number): string {
 }
 
 /**
- * Reads an unsigned, big-endian 16-bit integer from buf at the specified offset.
+ * Reads an unsigned, big-endian 16-bit integer from the array at the specified offset.
  * @param array Uint8Array to read
  * @param offset Number of bytes to skip before starting to read. Must satisfy 0 <= offset <= buf.length - 4
  */
