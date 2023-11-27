@@ -97,12 +97,22 @@ console.log(hexToBytes('DEADBEEF')) // [222, 173, 190, 239]
 
 #### hexToString
 
-Convert hex to an UInt8Array.
+Converts hex to its string equivalent. Useful to read the Domain field and some Memos.
 
 ```typescript
 import { hexToString } from @xrplf/isomorphic/utils
 
-console.log(hexToString('DEADBEEF')) // [222, 173, 190, 239]
+console.log(hexToString('6465616462656566D68D')) // "deadbeef֍"
+```
+
+#### stringToHex
+
+Converts a utf-8 to its hex equivalent. Useful for Memos.
+
+```typescript
+import { stringToHex } from @xrplf/isomorphic/utils
+
+console.log(stringToHex('deadbeef֍')) // "6465616462656566D68D"
 ```
 
 ### `@xrplf/isomorphic/ws`
