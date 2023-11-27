@@ -172,25 +172,12 @@ function bufferToArray(buf: Uint8Array): number[] {
   return Array.prototype.slice.call(buf) as number[]
 }
 
-/**
- * Swap the byte order of a 128-bit buffer.
- *
- * @param buf - A 128-bit (16 byte) buffer
- * @returns A buffer containing the same data with reversed endianness
- */
-function swap128(buf: Uint8Array): Uint8Array {
-  // // Interprets buffer as an array of (two, in this case) 64-bit numbers and swaps byte order in-place.
-  const reversedBytes = swap64(buf)
-  // // Swap the two 64-bit numbers since our buffer is 128 bits.
-  return concat([reversedBytes.slice(8, 16), reversedBytes.slice(0, 8)])
-}
-
-function swap(b: Uint8Array, n: number, m: number): void {
-  const i = b[n]
+function swap(arr: Uint8Array, n: number, m: number): void {
+  const i = arr[n]
   // eslint-disable-next-line no-param-reassign -- we have to swap
-  b[n] = b[m]
+  arr[n] = arr[m]
   // eslint-disable-next-line no-param-reassign -- see above
-  b[m] = i
+  arr[m] = i
 }
 
 function swap64(arr: Uint8Array): Uint8Array {
@@ -206,6 +193,20 @@ function swap64(arr: Uint8Array): Uint8Array {
     return arr
   }
   return arr
+}
+
+/**
+ * Swap the byte order of a 128-bit buffer.
+ *
+ * @param buf - A 128-bit (16 byte) buffer
+ * @param arr
+ * @returns A buffer containing the same data with reversed endianness
+ */
+function swap128(arr: Uint8Array): Uint8Array {
+  // // Interprets buffer as an array of (two, in this case) 64-bit numbers and swaps byte order in-place.
+  const reversedBytes = swap64(arr)
+  // // Swap the two 64-bit numbers since our buffer is 128 bits.
+  return concat([reversedBytes.slice(8, 16), reversedBytes.slice(0, 8)])
 }
 
 export { rfc1751MnemonicToKey, keyToRFC1751Mnemonic }
