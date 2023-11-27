@@ -198,8 +198,7 @@ function swap64(arr: Uint8Array): Uint8Array {
 /**
  * Swap the byte order of a 128-bit buffer.
  *
- * @param buf - A 128-bit (16 byte) buffer
- * @param arr
+ * @param arr - A 128-bit (16 byte) buffer
  * @returns A buffer containing the same data with reversed endianness
  */
 function swap128(arr: Uint8Array): Uint8Array {
