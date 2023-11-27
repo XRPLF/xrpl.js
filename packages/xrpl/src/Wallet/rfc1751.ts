@@ -180,31 +180,39 @@ function swap(arr: Uint8Array, n: number, m: number): void {
   arr[m] = i
 }
 
+/**
+ * Interprets arr as an array of 64-bit numbers and swaps byte order in 64 bit chunks.
+ * Example of two 64 bit numbers 0000000100000002 => 1000000020000000
+ *
+ * @param arr A Uint8Array representation of one or more 64 bit numbers
+ * @returns Uint8Array An array containing the bytes of 64 bit numbers each with reversed endianness
+ */
 function swap64(arr: Uint8Array): Uint8Array {
   const len = arr.length
 
-  if (len < 192) {
-    for (let i = 0; i < len; i += 8) {
-      swap(arr, i, i + 7)
-      swap(arr, i + 1, i + 6)
-      swap(arr, i + 2, i + 5)
-      swap(arr, i + 3, i + 4)
-    }
-    return arr
+  for (let i = 0; i < len; i += 8) {
+    swap(arr, i, i + 7)
+    swap(arr, i + 1, i + 6)
+    swap(arr, i + 2, i + 5)
+    swap(arr, i + 3, i + 4)
   }
+
   return arr
 }
 
 /**
- * Swap the byte order of a 128-bit buffer.
+ * Swap the byte order of a 128-bit array.
+ * Ex. 0000000100000002 => 2000000010000000
  *
- * @param arr - A 128-bit (16 byte) buffer
- * @returns A buffer containing the same data with reversed endianness
+ * @param arr - A 128-bit (16 byte) array
+ * @returns An array containing the same data with reversed endianness
  */
 function swap128(arr: Uint8Array): Uint8Array {
-  // // Interprets buffer as an array of (two, in this case) 64-bit numbers and swaps byte order in-place.
+  // Interprets arr as an array of (two, in this case) 64-bit numbers and swaps byte order in 64 bit chunks.
+  // Ex. 0000000100000002 => 1000000020000000
   const reversedBytes = swap64(arr)
-  // // Swap the two 64-bit numbers since our buffer is 128 bits.
+  // Further swap the two 64-bit numbers since our buffer is 128 bits.
+  // Ex. 1000000020000000 => 2000000010000000
   return concat([reversedBytes.slice(8, 16), reversedBytes.slice(0, 8)])
 }
 
