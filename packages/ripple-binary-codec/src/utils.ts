@@ -81,9 +81,9 @@ export function equal(
   const aUInt = a instanceof ArrayBuffer ? new Uint8Array(a, 0) : a
   const bUInt = b instanceof ArrayBuffer ? new Uint8Array(b, 0) : b
   if (aUInt.byteLength != bUInt.byteLength) return false
-  if (aligned32(aUInt) && aligned32(bUInt)) return equal32(aUInt, bUInt) === 0
-  if (aligned16(aUInt) && aligned16(bUInt)) return equal16(aUInt, bUInt) === 0
-  return equal8(aUInt, bUInt) === 0
+  if (aligned32(aUInt) && aligned32(bUInt)) return compare32(aUInt, bUInt) === 0
+  if (aligned16(aUInt) && aligned16(bUInt)) return compare16(aUInt, bUInt) === 0
+  return compare8(aUInt, bUInt) === 0
 }
 
 /**
@@ -91,7 +91,7 @@ export function equal(
  * @param a first array to compare
  * @param b second array to compare
  */
-function equal8(a, b) {
+function compare8(a, b) {
   const ua = new Uint8Array(a.buffer, a.byteOffset, a.byteLength)
   const ub = new Uint8Array(b.buffer, b.byteOffset, b.byteLength)
   return compare(ua, ub)
@@ -102,7 +102,7 @@ function equal8(a, b) {
  * @param a first array to compare
  * @param b second array to compare
  */
-function equal16(a: Uint8Array, b: Uint8Array) {
+function compare16(a: Uint8Array, b: Uint8Array) {
   const ua = new Uint16Array(a.buffer, a.byteOffset, a.byteLength / 2)
   const ub = new Uint16Array(b.buffer, b.byteOffset, b.byteLength / 2)
   return compare(ua, ub)
@@ -113,7 +113,7 @@ function equal16(a: Uint8Array, b: Uint8Array) {
  * @param a first array to compare
  * @param b second array to compare
  */
-function equal32(a: Uint8Array, b: Uint8Array) {
+function compare32(a: Uint8Array, b: Uint8Array) {
   const ua = new Uint32Array(a.buffer, a.byteOffset, a.byteLength / 4)
   const ub = new Uint32Array(b.buffer, b.byteOffset, b.byteLength / 4)
   return compare(ua, ub)
