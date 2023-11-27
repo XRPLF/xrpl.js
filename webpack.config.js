@@ -13,7 +13,6 @@ function getDefaultConfiguration() {
     },
     stats: "errors-only",
     devtool: "source-map",
-    plugins: [new webpack.ProvidePlugin({ process: "process/browser" })],
     module: {
       rules: [
         {
@@ -27,7 +26,7 @@ function getDefaultConfiguration() {
       // We don't want to webpack any of the local dependencies:
       // ripple-address-codec, ripple-binary-codec, ripple-keypairs, which are
       // symlinked together via lerna
-      symlinks: false
+      symlinks: false,
     },
   };
 }
@@ -58,7 +57,7 @@ module.exports = {
             new BundleAnalyzerPlugin({
               analyzerPort: `auto`,
               analyzerMode: "static",
-            })
+            }),
           );
         }
         return localConfig;

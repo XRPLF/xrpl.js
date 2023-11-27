@@ -22,6 +22,7 @@ function webpackForTest(testFileName, basePath) {
       new webpack.DefinePlugin({
         "process.stdout": {},
       }),
+      new webpack.ProvidePlugin({ process: "process/browser" }),
     ],
     module: {
       rules: [
