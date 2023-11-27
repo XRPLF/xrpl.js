@@ -29,8 +29,8 @@ export function writeUInt16BE(
 ): void {
   value = Number(value)
 
-  array[offset++] = value >>> 8
-  array[offset++] = value
+  array[offset] = value >>> 8
+  array[offset + 1] = value
 }
 
 /**
@@ -124,6 +124,10 @@ function compare32(a: Uint8Array, b: Uint8Array) {
  * @param b second array to compare
  */
 export function compare(a: TypedArray, b: TypedArray): 1 | -1 | 0 {
+  if (a.byteLength !== b.byteLength) {
+    throw new Error('Cannot compare arrays of different length')
+  }
+
   for (let i = 0; i < a.length - 1; i += 1) {
     if (a[i] > b[i]) return 1
     if (a[i] < b[i]) return -1
