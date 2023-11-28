@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { EnableAmendment, ValidationError, XrplError } from '../../src'
+import { ValidationError, XrplError } from '../../src'
 import { hashes } from '../../src/utils'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'

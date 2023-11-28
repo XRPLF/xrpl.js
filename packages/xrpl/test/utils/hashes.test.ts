@@ -171,6 +171,7 @@ describe('Hashes', function () {
   it('Throw an error when hashing an unsigned transaction', function () {
     const offerCreateWithNoSignature: OfferCreate = {
       ...(fixtures.tx.OfferCreateSell.result as OfferCreate),
+      SigningPubKey: undefined,
       TxnSignature: undefined,
     }
 
@@ -183,7 +184,7 @@ describe('Hashes', function () {
   it('Throw when hashing an unsigned transaction blob', function () {
     const encodedOfferCreateWithNoSignature: string = encode({
       ...fixtures.tx.OfferCreateSell.result,
-      SigningPublicKey: undefined,
+      SigningPubKey: undefined,
       TxnSignature: undefined,
     })
 
