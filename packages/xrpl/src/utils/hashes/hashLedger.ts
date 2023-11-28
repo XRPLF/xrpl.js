@@ -71,19 +71,25 @@ function addLengthPrefix(hex: string): string {
  * @throws ValidationError if the Transaction is unsigned.\
  * @category Utilities
  */
-export function hashSignedTx(tx: Transaction | string): string {
+export function hashSignedTx(
+  tx: Transaction | PseudoTransaction | string,
+): string {
   let txBlob: string
-  let txObject: Transaction
+  let txObject: Transaction | PseudoTransaction
   if (typeof tx === 'string') {
     txBlob = tx
     /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required until updated in binary codec. */
-    txObject = decode(tx) as unknown as Transaction
+    txObject = decode(tx) as unknown as Transaction | PseudoTransaction
   } else {
     txBlob = encode(tx)
     txObject = tx
   }
 
-  if (txObject.TxnSignature === undefined && txObject.Signers === undefined) {
+  if (
+    txObject.TxnSignature === undefined &&
+    txObject.Signers === undefined &&
+    txObject.SigningPubKey === undefined
+  ) {
     throw new ValidationError('The transaction must be signed to hash it.')
   }
 

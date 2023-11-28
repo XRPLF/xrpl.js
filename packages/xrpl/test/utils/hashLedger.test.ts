@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { ValidationError, XrplError } from '../../src'
+import { EnableAmendment, ValidationError, XrplError } from '../../src'
 import { hashes } from '../../src/utils'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
@@ -148,6 +148,24 @@ describe('hashLedger', function () {
       () => hashLedger(header, { computeTreeHashes: true }),
       ValidationError,
       'transactionHash in header does not match computed hash of transactions',
+    )
+  })
+
+  it('hashSignedTx - pseudo-transaction', function () {
+    const transaction: EnableAmendment = {
+      Account: 'rrrrrrrrrrrrrrrrrrrrrhoLvTp',
+      Amendment:
+        'AE35ABDEFBDE520372B31C957020B34A7A4A9DC3115A69803A44016477C84D6E',
+      Fee: '0',
+      LedgerSequence: 84206081,
+      Sequence: 0,
+      SigningPubKey: '',
+      TransactionType: 'EnableAmendment',
+    }
+
+    assert.equal(
+      hashes.hashSignedTx(transaction),
+      'CA4562711E4679FE9317DD767871E90A404C7A8B84FAFD35EC2CF0231F1F6DAF',
     )
   })
 })
