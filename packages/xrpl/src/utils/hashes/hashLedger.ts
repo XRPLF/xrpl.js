@@ -71,15 +71,13 @@ function addLengthPrefix(hex: string): string {
  * @throws ValidationError if the Transaction is unsigned.\
  * @category Utilities
  */
-export function hashSignedTx(
-  tx: Transaction | PseudoTransaction | string,
-): string {
+export function hashSignedTx(tx: Transaction | string): string {
   let txBlob: string
-  let txObject: Transaction | PseudoTransaction
+  let txObject: Transaction
   if (typeof tx === 'string') {
     txBlob = tx
     /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required until updated in binary codec. */
-    txObject = decode(tx) as unknown as Transaction | PseudoTransaction
+    txObject = decode(tx) as unknown as Transaction
   } else {
     txBlob = encode(tx)
     txObject = tx
