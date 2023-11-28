@@ -56,6 +56,7 @@ Bundler configurations are much more simplified. See [../UNIQUE_STEPS](Unique St
 ### Fixed
 * Fixed Wallet.generate() ignoring the `algorithm` parameter (Only a problem once binary-codec fix for `derive_keypair` is added)
 * Fixed Wallet.fromSeed() ignoring the `algorithm` parameter
+* Added pseudo-transaction support to hash functions and response types
 
 ## 2.14.1 (2024-02-01)
 
