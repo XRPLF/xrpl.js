@@ -83,16 +83,6 @@ describe('fundWallet', function () {
   // })
 
   it(
-    'can generate and fund wallets on AMM devnet',
-    async function () {
-      await generate_faucet_wallet_and_fund_again(
-        'wss://amm.devnet.rippletest.net:51233',
-      )
-    },
-    TIMEOUT,
-  )
-
-  it(
     'can generate wallet on hooks v3 testnet',
     async function () {
       const api = new Client('wss://hooks-testnet-v3.xrpl-labs.com')

@@ -14,14 +14,12 @@ export interface FaucetWallet {
 export enum FaucetNetwork {
   Testnet = 'faucet.altnet.rippletest.net',
   Devnet = 'faucet.devnet.rippletest.net',
-  AMMDevnet = 'ammfaucet.devnet.rippletest.net',
   HooksV3Testnet = 'hooks-testnet-v3.xrpl-labs.com',
 }
 
 export const FaucetNetworkPaths: Record<string, string> = {
   [FaucetNetwork.Testnet]: '/accounts',
   [FaucetNetwork.Devnet]: '/accounts',
-  [FaucetNetwork.AMMDevnet]: '/accounts',
   [FaucetNetwork.HooksV3Testnet]: '/accounts',
 }
 
@@ -42,10 +40,6 @@ export function getFaucetHost(client: Client): FaucetNetwork | undefined {
   // 'altnet' for Ripple Testnet server and 'testnet' for XRPL Labs Testnet server
   if (connectionUrl.includes('altnet') || connectionUrl.includes('testnet')) {
     return FaucetNetwork.Testnet
-  }
-
-  if (connectionUrl.includes('amm')) {
-    return FaucetNetwork.AMMDevnet
   }
 
   if (connectionUrl.includes('sidechain-net2')) {

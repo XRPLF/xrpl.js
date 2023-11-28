@@ -6,6 +6,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Added
 - Support for the DID amendment (XLS-40).
 
+### Changed
+- Remove AMM devnet which is being decommissioned
+
 ### Added
 * Support for `server_definitions` RPC
 
