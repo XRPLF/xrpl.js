@@ -75,6 +75,12 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
     | string
 
   /**
+   * Specify a DID object to retrieve. If a string, must be the
+   * object ID of the DID object, as hexadecimal, or the account ID.
+   */
+  did?: string
+
+  /**
    * The DirectoryNode to retrieve. If a string, must be the object ID of the
    * directory, as hexadecimal. If an object, requires either `dir_root` o
    * Owner as a sub-field, plus optionally a `sub_index` sub-field.
@@ -184,7 +190,7 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
  *
  * @category Responses
  */
-export interface LedgerEntryResponse extends BaseResponse {
+export interface LedgerEntryResponse<T = LedgerEntry> extends BaseResponse {
   result: {
     /** The unique ID of this ledger object. */
     index: string
@@ -194,7 +200,7 @@ export interface LedgerEntryResponse extends BaseResponse {
      * Object containing the data of this ledger object, according to the
      * ledger format.
      */
-    node?: LedgerEntry
+    node?: T
     /** The binary representation of the ledger object, as hexadecimal. */
     node_binary?: string
     validated?: boolean

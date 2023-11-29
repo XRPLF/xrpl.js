@@ -1,6 +1,12 @@
 import { ValidationError } from '../../errors'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import {
+  Account,
+  BaseTransaction,
+  isAccount,
+  validateBaseTransaction,
+  validateRequiredField,
+} from './common'
 
 /**
  * Deliver XRP from a held payment to the recipient.
@@ -10,7 +16,7 @@ import { BaseTransaction, validateBaseTransaction } from './common'
 export interface EscrowFinish extends BaseTransaction {
   TransactionType: 'EscrowFinish'
   /** Address of the source account that funded the held payment. */
-  Owner: string
+  Owner: Account
   /**
    * Transaction sequence of EscrowCreate transaction that created the held.
    * payment to finish.
@@ -37,13 +43,7 @@ export interface EscrowFinish extends BaseTransaction {
 export function validateEscrowFinish(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Owner == null) {
-    throw new ValidationError('EscrowFinish: missing field Owner')
-  }
-
-  if (typeof tx.Owner !== 'string') {
-    throw new ValidationError('EscrowFinish: Owner must be a string')
-  }
+  validateRequiredField(tx, 'Owner', isAccount)
 
   if (tx.OfferSequence == null) {
     throw new ValidationError('EscrowFinish: missing field OfferSequence')

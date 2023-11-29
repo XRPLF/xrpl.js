@@ -4,16 +4,17 @@ import {
   BaseTransaction,
   isAmount,
   isXChainBridge,
-  isString,
   validateBaseTransaction,
   validateRequiredField,
+  isAccount,
+  Account,
 } from './common'
 
 /**
  * The XChainAccountCreateCommit transaction creates a new account on one of the
  * chains a bridge connects, which serves as the bridge entrance for that chain.
  *
- * Warning: This transaction should only be executed if the witness attestations
+ * WARNING: This transaction should only be executed if the witness attestations
  * will be reliably delivered to the destination chain. If the signatures aren't
  * delivered, then account creation will be blocked until attestations are received.
  * This can be used maliciously; to disable this transaction on XRP-XRP bridges,
@@ -38,7 +39,7 @@ export interface XChainAccountCreateCommit extends BaseTransaction {
   /**
    * The destination account on the destination chain.
    */
-  Destination: string
+  Destination: Account
 
   /**
    * The amount, in XRP, to use for account creation. This must be greater than or
@@ -62,7 +63,7 @@ export function validateXChainAccountCreateCommit(
 
   validateRequiredField(tx, 'SignatureReward', isAmount)
 
-  validateRequiredField(tx, 'Destination', isString)
+  validateRequiredField(tx, 'Destination', isAccount)
 
   validateRequiredField(tx, 'Amount', isAmount)
 }

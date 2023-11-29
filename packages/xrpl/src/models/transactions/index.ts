@@ -1,5 +1,10 @@
 export { BaseTransaction } from './common'
-export { validate, TransactionAndMetadata, Transaction } from './transaction'
+export {
+  validate,
+  PseudoTransaction,
+  TransactionAndMetadata,
+  Transaction,
+} from './transaction'
 export * from './metadata'
 export {
   AccountSetAsfFlags,
@@ -26,6 +31,8 @@ export { CheckCancel } from './checkCancel'
 export { CheckCash } from './checkCash'
 export { CheckCreate } from './checkCreate'
 export { Clawback } from './clawback'
+export { DIDDelete } from './DIDDelete'
+export { DIDSet } from './DIDSet'
 export { DepositPreauth } from './depositPreauth'
 export { EscrowCancel } from './escrowCancel'
 export { EscrowCreate } from './escrowCreate'

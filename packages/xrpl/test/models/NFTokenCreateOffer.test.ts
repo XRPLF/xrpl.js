@@ -16,7 +16,7 @@ describe('NFTokenCreateOffer', function () {
       TransactionType: 'NFTokenCreateOffer',
       NFTokenID: NFTOKEN_ID,
       Amount: '1',
-      Owner: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
+      Owner: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
       Expiration: 1000,
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Destination: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
@@ -104,7 +104,7 @@ describe('NFTokenCreateOffer', function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
       Amount: '1',
-      Owner: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXe',
+      Owner: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
       Expiration: 1000,
       Destination: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -124,7 +124,7 @@ describe('NFTokenCreateOffer', function () {
       TransactionType: 'NFTokenCreateOffer',
       NFTokenID: NFTOKEN_ID,
       Amount: 1,
-      Owner: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXe',
+      Owner: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
       Expiration: 1000,
       Destination: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -142,7 +142,7 @@ describe('NFTokenCreateOffer', function () {
   it(`throws w/ missing Amount`, function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
-      Owner: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXe',
+      Owner: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
       Expiration: 1000,
       NFTokenID: NFTOKEN_ID,
       Destination: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
@@ -162,7 +162,7 @@ describe('NFTokenCreateOffer', function () {
     const invalid = {
       TransactionType: 'NFTokenCreateOffer',
       Expiration: 1000,
-      Owner: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
+      Owner: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       NFTokenID: NFTOKEN_ID,
       Flags: NFTokenCreateOfferFlags.tfSellNFToken,

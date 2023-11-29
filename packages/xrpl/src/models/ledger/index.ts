@@ -7,6 +7,7 @@ import AMM, { VoteSlot } from './AMM'
 import Bridge from './Bridge'
 import Check from './Check'
 import DepositPreauth from './DepositPreauth'
+import DID from './DID'
 import DirectoryNode from './DirectoryNode'
 import Escrow from './Escrow'
 import FeeSettings, {
@@ -15,7 +16,7 @@ import FeeSettings, {
   FEE_SETTINGS_ID,
 } from './FeeSettings'
 import Ledger from './Ledger'
-import LedgerEntry from './LedgerEntry'
+import { LedgerEntry, LedgerEntryFilter } from './LedgerEntry'
 import LedgerHashes from './LedgerHashes'
 import NegativeUNL, { NEGATIVE_UNL_ID } from './NegativeUNL'
 import { NFTokenOffer } from './NFTokenOffer'
@@ -39,12 +40,14 @@ export {
   Check,
   DepositPreauth,
   DirectoryNode,
+  DID,
   Escrow,
   FEE_SETTINGS_ID,
   FeeSettings,
   FeeSettingsPreAmendmentFields,
   FeeSettingsPostAmendmentFields,
   Ledger,
+  LedgerEntryFilter,
   LedgerEntry,
   LedgerHashes,
   Majority,

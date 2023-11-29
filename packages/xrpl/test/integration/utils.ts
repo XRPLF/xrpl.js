@@ -10,12 +10,23 @@ import {
   type SubmitResponse,
   TimeoutError,
   NotConnectedError,
+  AccountLinesRequest,
+  IssuedCurrency,
+  Currency,
 } from '../../src'
-import { Payment, Transaction } from '../../src/models/transactions'
+import {
+  AMMCreate,
+  AccountSet,
+  AccountSetAsfFlags,
+  Payment,
+  Transaction,
+  TrustSet,
+  TrustSetFlags,
+} from '../../src/models/transactions'
 import { hashSignedTx } from '../../src/utils/hashes'
 
-const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
-const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
+export const GENESIS_ACCOUNT = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+const GENESIS_SECRET = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb'
 
 export async function sendLedgerAccept(client: Client): Promise<unknown> {
   return client.connection.request({ command: 'ledger_accept' })
@@ -141,12 +152,12 @@ export async function fundAccount(
 ): Promise<SubmitResponse> {
   const payment: Payment = {
     TransactionType: 'Payment',
-    Account: masterAccount,
+    Account: GENESIS_ACCOUNT,
     Destination: wallet.classicAddress,
     // 2 times the amount needed for a new account (20 XRP)
     Amount: '400000000',
   }
-  const wal = Wallet.fromSeed(masterSecret)
+  const wal = Wallet.fromSeed(GENESIS_SECRET)
   const response = await submitTransaction({
     client,
     wallet: wal,
@@ -181,10 +192,16 @@ export async function verifySubmittedTransaction(
     command: 'tx',
     transaction: hash,
   })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: handle this API change for 2.0.0
+  const decodedTx: any = typeof tx === 'string' ? decode(tx) : tx
+  if (decodedTx.TransactionType === 'Payment') {
+    decodedTx.DeliverMax = decodedTx.Amount
+  }
 
   assert(data.result)
   assert.deepEqual(
     omit(data.result, [
+      'ctid',
       'date',
       'hash',
       'inLedger',
@@ -192,7 +209,7 @@ export async function verifySubmittedTransaction(
       'meta',
       'validated',
     ]),
-    typeof tx === 'string' ? decode(tx) : tx,
+    decodedTx,
   )
   if (typeof data.result.meta === 'object') {
     assert.strictEqual(data.result.meta.TransactionResult, 'tesSUCCESS')
@@ -262,11 +279,13 @@ export async function testTransaction(
 
 export async function getXRPBalance(
   client: Client,
-  wallet: Wallet,
+  account: string | Wallet,
 ): Promise<string> {
+  const address: string =
+    typeof account === 'string' ? account : account.classicAddress
   const request: AccountInfoRequest = {
     command: 'account_info',
-    account: wallet.classicAddress,
+    account: address,
   }
   return (await client.request(request)).result.account_data.Balance
 }
@@ -336,4 +355,89 @@ export async function waitForAndForceProgressLedgerTime(
   }
 
   throw new Error(`Ledger time not reached after ${retries} retries.`)
+}
+
+export async function getIOUBalance(
+  client: Client,
+  wallet: Wallet,
+  currency: IssuedCurrency,
+): Promise<string> {
+  const request: AccountLinesRequest = {
+    command: 'account_lines',
+    account: wallet.classicAddress,
+    peer: currency.issuer,
+  }
+  return (await client.request(request)).result.lines[0].balance
+}
+
+export async function createAMMPool(client: Client): Promise<{
+  issuerWallet: Wallet
+  lpWallet: Wallet
+  asset: Currency
+  asset2: Currency
+}> {
+  const lpWallet = await generateFundedWallet(client)
+  const issuerWallet = await generateFundedWallet(client)
+  const currencyCode = 'USD'
+
+  const accountSetTx: AccountSet = {
+    TransactionType: 'AccountSet',
+    Account: issuerWallet.classicAddress,
+    SetFlag: AccountSetAsfFlags.asfDefaultRipple,
+  }
+
+  await testTransaction(client, accountSetTx, issuerWallet)
+
+  const trustSetTx: TrustSet = {
+    TransactionType: 'TrustSet',
+    Flags: TrustSetFlags.tfClearNoRipple,
+    Account: lpWallet.classicAddress,
+    LimitAmount: {
+      currency: currencyCode,
+      issuer: issuerWallet.classicAddress,
+      value: '1000',
+    },
+  }
+
+  await testTransaction(client, trustSetTx, lpWallet)
+
+  const paymentTx: Payment = {
+    TransactionType: 'Payment',
+    Account: issuerWallet.classicAddress,
+    Destination: lpWallet.classicAddress,
+    Amount: {
+      currency: currencyCode,
+      issuer: issuerWallet.classicAddress,
+      value: '500',
+    },
+  }
+
+  await testTransaction(client, paymentTx, issuerWallet)
+
+  const ammCreateTx: AMMCreate = {
+    TransactionType: 'AMMCreate',
+    Account: lpWallet.classicAddress,
+    Amount: '250',
+    Amount2: {
+      currency: currencyCode,
+      issuer: issuerWallet.classicAddress,
+      value: '250',
+    },
+    TradingFee: 12,
+  }
+
+  await testTransaction(client, ammCreateTx, lpWallet)
+
+  const asset: Currency = { currency: 'XRP' }
+  const asset2: Currency = {
+    currency: currencyCode,
+    issuer: issuerWallet.classicAddress,
+  }
+
+  return {
+    issuerWallet,
+    lpWallet,
+    asset,
+    asset2,
+  }
 }

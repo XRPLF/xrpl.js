@@ -1,6 +1,6 @@
 import { XChainBridge } from '../common'
 
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * The XChainOwnedCreateAccountClaimID ledger object is used to collect attestations
@@ -9,7 +9,8 @@ import BaseLedgerEntry from './BaseLedgerEntry'
  * @category Ledger Entries
  */
 export default interface XChainOwnedCreateAccountClaimID
-  extends BaseLedgerEntry {
+  extends BaseLedgerEntry,
+    HasPreviousTxnID {
   LedgerEntryType: 'XChainOwnedCreateAccountClaimID'
 
   /** The account that owns this object. */
@@ -61,14 +62,4 @@ export default interface XChainOwnedCreateAccountClaimID
    * object, in case the directory consists of multiple pages.
    */
   OwnerNode: string
-  /**
-   * The identifying hash of the transaction that most recently modified this
-   * object.
-   */
-  PreviousTxnID: string
-  /**
-   * The index of the ledger that contains the transaction that most recently
-   * modified this object.
-   */
-  PreviousTxnLgrSeq: number
 }

@@ -3,12 +3,38 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
+### Added
+- Support for the DID amendment (XLS-40).
+
+### Changed
+- Remove AMM devnet which is being decommissioned
+
+### Added
+* Support for `server_definitions` RPC
 
 ### Added
 * Add support for Concise Transaction Identifier (ctid) as defined in [XLS-37](https://github.com/XRPLF/XRPL-Standards/discussions/91)
 
 ### Fixed
 * Allow flag maps when submitting `NFTokenMint` and `NFTokenCreateOffer` transactions like others with flags
+* Fix parseNFTokenID to return the correct taxon if large serial and (or) taxon were used
+
+## 2.13.0 (2023-10-18)
+
+### Fixed
+* Allow flag maps when submitting `NFTokenMint` and `NFTokenCreateOffer` transactions like others with flags
+* Add pseudo transaction types to `tx` and `ledger` method responses.
+* Add missing `type` param to `ledger_data` and `ledger` requests
+* Type assertions around `PreviousTxnID` and `PreviousTxnLgrSeq` missing on some ledger objects
+* Transaction fields that represent an address no longer allow an empty string (`''`). If you want to specify [ACCOUNT_ZERO](https://xrpl.org/addresses.html#special-addresses), you can specify `rrrrrrrrrrrrrrrrrrrrrhoLvTp`. ⚠️ **WARNING:** `rrrrrrrrrrrrrrrrrrrrrhoLvTp` is a black hole address, with no corresponding private key. Accounts/funds controlled by this address are not accessible.
+* Invalid addresses on a transaction now throws a `ValidationError` when submitting a transaction instead of `Error('checksum_invalid')`
+
+### Changed
+* Make `LedgerEntryResponse` a generic so it can be used like `LedgerEntryResponse<Escrow>`
+* Clean up typing of `type` param and the response property `account_objects` of the `account_objects` request.
+* Error messages for fields that equate to an address, `DestinationTag`, or `NFTokenID`.  They will still be of type `ValidationError`.
+* Add alias type of `Account` to improve intellisense for Transaction fields that equate to an address.
+* Removed sidechain-devnet faucet support as it is being moved to Devnet
 
 ## 2.12.0 (2023-09-27)
 ### Added

@@ -16,7 +16,7 @@ export interface NFTInfoRequest extends BaseRequest, LookupByLedgerRequest {
 }
 
 /**
- * Response expected from an {@link NFTInfoResponse}.
+ * Response expected from an {@link NFTInfoRequest}.
  *
  * @category Responses
  */

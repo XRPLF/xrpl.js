@@ -24,7 +24,17 @@ import { XrplError } from '../errors'
  */
 function unscrambleTaxon(taxon: number, tokenSeq: number): number {
   /* eslint-disable no-bitwise -- XOR is part of the encode/decode scheme. */
-  return (taxon ^ (384160001 * tokenSeq + 2459)) % 4294967296
+  const seed = 384160001
+  const increment = 2459
+  const max = 4294967296
+
+  const scramble = new BigNumber(seed)
+    .multipliedBy(tokenSeq)
+    .modulo(max)
+    .plus(increment)
+    .modulo(max)
+    .toNumber()
+  return (taxon ^ scramble) >>> 0
   /* eslint-enable no-bitwise */
 }
 

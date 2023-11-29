@@ -2,7 +2,7 @@ import { Amount } from 'ripple-binary-codec/dist/types'
 
 import { XChainBridge } from '../common'
 
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * An XChainOwnedClaimID object represents one cross-chain transfer of value
@@ -11,7 +11,9 @@ import BaseLedgerEntry from './BaseLedgerEntry'
  *
  * @category Ledger Entries
  */
-export default interface XChainOwnedClaimID extends BaseLedgerEntry {
+export default interface XChainOwnedClaimID
+  extends BaseLedgerEntry,
+    HasPreviousTxnID {
   LedgerEntryType: 'XChainOwnedClaimID'
 
   /** The account that checked out this unique claim ID value. */
@@ -76,14 +78,4 @@ export default interface XChainOwnedClaimID extends BaseLedgerEntry {
    * object, in case the directory consists of multiple pages.
    */
   OwnerNode: string
-  /**
-   * The identifying hash of the transaction that most recently modified this
-   * object.
-   */
-  PreviousTxnID: string
-  /**
-   * The index of the ledger that contains the transaction that most recently
-   * modified this object.
-   */
-  PreviousTxnLgrSeq: number
 }

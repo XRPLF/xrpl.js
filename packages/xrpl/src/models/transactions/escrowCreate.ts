@@ -1,6 +1,14 @@
 import { ValidationError } from '../../errors'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import {
+  Account,
+  BaseTransaction,
+  isAccount,
+  isNumber,
+  validateBaseTransaction,
+  validateOptionalField,
+  validateRequiredField,
+} from './common'
 
 /**
  * Sequester XRP until the escrow process either finishes or is canceled.
@@ -16,7 +24,7 @@ export interface EscrowCreate extends BaseTransaction {
    */
   Amount: string
   /** Address to receive escrowed XRP. */
-  Destination: string
+  Destination: Account
   /**
    * The time, in seconds since the Ripple Epoch, when this escrow expires.
    * This value is immutable; the funds can only be returned the sender after.
@@ -58,13 +66,8 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('EscrowCreate: Amount must be a string')
   }
 
-  if (tx.Destination === undefined) {
-    throw new ValidationError('EscrowCreate: missing field Destination')
-  }
-
-  if (typeof tx.Destination !== 'string') {
-    throw new ValidationError('EscrowCreate: Destination must be a string')
-  }
+  validateRequiredField(tx, 'Destination', isAccount)
+  validateOptionalField(tx, 'DestinationTag', isNumber)
 
   if (tx.CancelAfter === undefined && tx.FinishAfter === undefined) {
     throw new ValidationError(
@@ -88,12 +91,5 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
 
   if (tx.Condition !== undefined && typeof tx.Condition !== 'string') {
     throw new ValidationError('EscrowCreate: Condition must be a string')
-  }
-
-  if (
-    tx.DestinationTag !== undefined &&
-    typeof tx.DestinationTag !== 'number'
-  ) {
-    throw new ValidationError('EscrowCreate: DestinationTag must be a number')
   }
 }

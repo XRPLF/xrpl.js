@@ -1,4 +1,4 @@
-import BaseLedgerEntry from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * The PayChannel object type represents a payment channel. Payment channels
@@ -9,7 +9,7 @@ import BaseLedgerEntry from './BaseLedgerEntry'
  *
  * @category Ledger Entries
  */
-export default interface PayChannel extends BaseLedgerEntry {
+export default interface PayChannel extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'PayChannel'
   /**
    * The source address that owns this payment channel. This comes from the
@@ -60,16 +60,6 @@ export default interface PayChannel extends BaseLedgerEntry {
    * to this object, in case the directory consists of multiple pages.
    */
   OwnerNode: string
-  /**
-   * The identifying hash of the transaction that most recently modified this
-   * object.
-   */
-  PreviousTxnID: string
-  /**
-   * The index of the ledger that contains the transaction that most recently
-   * modified this object.
-   */
-  PreviousTxnLgrSeq: number
   /**
    * A bit-map of boolean flags enabled for this payment channel. Currently,
    * the protocol defines no flags for PayChannel objects.
