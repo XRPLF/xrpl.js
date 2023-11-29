@@ -27,7 +27,7 @@ describe('parseNFTokenID', function () {
       NFTokenID: nftokenID,
       Flags: 0,
       TransferFee: 0,
-      Issuer: "r9ewzMXVRAD9CjZQ6LTQ4P21vUUucDuqd4",
+      Issuer: 'r9ewzMXVRAD9CjZQ6LTQ4P21vUUucDuqd4',
       Taxon: 2147483649,
       Sequence: 30,
     }
@@ -42,7 +42,7 @@ describe('parseNFTokenID', function () {
       NFTokenID: nftokenID,
       Flags: 8,
       TransferFee: 5000,
-      Issuer: "rJ4urHeGPr69TsC9TY9u8N965AdD7S3XEY",
+      Issuer: 'rJ4urHeGPr69TsC9TY9u8N965AdD7S3XEY',
       Taxon: 96,
       Sequence: 81343403,
     }
