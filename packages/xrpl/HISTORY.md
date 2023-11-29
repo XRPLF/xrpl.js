@@ -12,6 +12,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Added
 * Support for `server_definitions` RPC
 
+### Fixed
+* Fix parseNFTokenID to return the correct taxon if large serial and (or) taxon were used
+
 ## 2.13.0 (2023-10-18)
 
 ### Fixed
