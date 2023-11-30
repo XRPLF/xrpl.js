@@ -12,7 +12,11 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Added
 * Support for `server_definitions` RPC
 
+### Added
+* Add support for Concise Transaction Identifier (ctid) as defined in [XLS-37](https://github.com/XRPLF/XRPL-Standards/discussions/91)
+
 ### Fixed
+* Allow flag maps when submitting `NFTokenMint` and `NFTokenCreateOffer` transactions like others with flags
 * Fix parseNFTokenID to return the correct taxon if large serial and (or) taxon were used
 
 ## 2.13.0 (2023-10-18)

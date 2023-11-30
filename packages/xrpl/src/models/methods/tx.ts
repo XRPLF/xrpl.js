@@ -12,7 +12,14 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  */
 export interface TxRequest extends BaseRequest {
   command: 'tx'
-  transaction: string
+  /**
+   * The transaction hash to look up. Exactly one of `transaction` or `ctid` must be specified for a TxRequest.
+   */
+  transaction?: string
+  /**
+   * The Concise Transaction ID to look up. Exactly one of `transaction` or `ctid` must be specified for a TxRequest.
+   */
+  ctid?: string
   /**
    * If true, return transaction data and metadata as binary serialized to
    * hexadecimal strings. If false, return transaction data and metadata as.
@@ -46,6 +53,10 @@ export interface TxResponse<
   result: {
     /** The SHA-512 hash of the transaction. */
     hash: string
+    /**
+     * The Concise Transaction Identifier of the transaction (16-byte hex string)
+     */
+    ctid?: string
     /** The ledger index of the ledger that includes this transaction. */
     ledger_index?: number
     /** Transaction metadata, which describes the results of the transaction.
