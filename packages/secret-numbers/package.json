@@ -1,6 +1,6 @@
 {
   "name": "@xrplf/secret-numbers",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "description": "Generate XRPL Accounts with a number-based secret: 8 chunks of 6 digits",
   "main": "dist/index.js",
   "unpkg": "build/xrplf-secret-numbers-latest-min.js",
@@ -29,8 +29,8 @@
     "test": "test"
   },
   "dependencies": {
-    "@xrplf/isomorphic": "^1.0.0-beta.0",
-    "ripple-keypairs": "^2.0.0-beta.0"
+    "@xrplf/isomorphic": "^1.0.0-beta.1",
+    "ripple-keypairs": "^2.0.0-beta.1"
   },
   "prettier": "@xrplf/prettier-config",
   "repository": {
