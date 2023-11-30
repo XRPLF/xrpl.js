@@ -4,6 +4,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+## 3.0.0 Beta 1 (2023-11-30)
+
 ### Breaking Changes
 * `Transaction` type has been redefined to include all transactions and `SubmittableTransaction` was created to define the old value. The following functions which only handle transactions to be submitted now use `SubmittableTransaction`:
   * `Client.autofill`
@@ -23,7 +25,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
   * `convertHexToString` in favor of `@xrplf/isomorphic/utils`'s `hexToString`
   * `convertStringToHex` in favor of `@xrplf/isomorphic/utils`'s `stringToHex`
 
-## 3.0.0 Beta 1 (2023-10-19)
+## 3.0.0 Beta 0 (2023-10-19)
 
 ### Breaking Changes
 * Bump typescript to 5.x
