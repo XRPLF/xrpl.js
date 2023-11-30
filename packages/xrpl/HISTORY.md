@@ -3,21 +3,20 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
-### Added
-- Support for the DID amendment (XLS-40).
 
-### Changed
-- Remove AMM devnet which is being decommissioned
+## 2.14.0 (2023-11-30)
 
 ### Added
+* Support for the DID amendment (XLS-40).
 * Support for `server_definitions` RPC
-
-### Added
-* Add support for Concise Transaction Identifier (ctid) as defined in [XLS-37](https://github.com/XRPLF/XRPL-Standards/discussions/91)
+* Support for Concise Transaction Identifier (ctid) as defined in [XLS-37](https://github.com/XRPLF/XRPL-Standards/discussions/91)
 
 ### Fixed
 * Allow flag maps when submitting `NFTokenMint` and `NFTokenCreateOffer` transactions like others with flags
 * Fix parseNFTokenID to return the correct taxon if large serial and (or) taxon were used
+
+### Removed
+* Remove AMM devnet which is being decommissioned
 
 ## 2.13.0 (2023-10-18)
 

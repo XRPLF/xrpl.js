@@ -1,6 +1,8 @@
 # ripple-binary-codec Release History
 
 ## Unreleased
+
+## 1.11.0 (2023-11-30)
 ### Added
 - Support for the DID amendment (XLS-40).
 
