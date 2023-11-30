@@ -1,5 +1,7 @@
 import { UInt } from './uint'
 import { BinaryParser } from '../serdes/binary-parser'
+import { bytesToHex, concat, hexToBytes } from '@xrplf/isomorphic/utils'
+import { readUInt32BE, writeUInt32BE } from '../utils'
 
 const HEX_REGEX = /^[a-fA-F0-9]{1,16}$/
 const mask = BigInt(0x00000000ffffffff)
@@ -9,9 +11,11 @@ const mask = BigInt(0x00000000ffffffff)
  */
 class UInt64 extends UInt {
   protected static readonly width: number = 64 / 8 // 8
-  static readonly defaultUInt64: UInt64 = new UInt64(Buffer.alloc(UInt64.width))
+  static readonly defaultUInt64: UInt64 = new UInt64(
+    new Uint8Array(UInt64.width),
+  )
 
-  constructor(bytes: Buffer) {
+  constructor(bytes: Uint8Array) {
     super(bytes ?? UInt64.defaultUInt64.bytes)
   }
 
@@ -30,7 +34,7 @@ class UInt64 extends UInt {
       return val
     }
 
-    let buf = Buffer.alloc(UInt64.width)
+    let buf = new Uint8Array(UInt64.width)
 
     if (typeof val === 'number') {
       if (val < 0) {
@@ -39,11 +43,11 @@ class UInt64 extends UInt {
 
       const number = BigInt(val)
 
-      const intBuf = [Buffer.alloc(4), Buffer.alloc(4)]
-      intBuf[0].writeUInt32BE(Number(number >> BigInt(32)), 0)
-      intBuf[1].writeUInt32BE(Number(number & BigInt(mask)), 0)
+      const intBuf = [new Uint8Array(4), new Uint8Array(4)]
+      writeUInt32BE(intBuf[0], Number(number >> BigInt(32)), 0)
+      writeUInt32BE(intBuf[1], Number(number & BigInt(mask)), 0)
 
-      return new UInt64(Buffer.concat(intBuf))
+      return new UInt64(concat(intBuf))
     }
 
     if (typeof val === 'string') {
@@ -52,16 +56,16 @@ class UInt64 extends UInt {
       }
 
       const strBuf = val.padStart(16, '0')
-      buf = Buffer.from(strBuf, 'hex')
+      buf = hexToBytes(strBuf)
       return new UInt64(buf)
     }
 
     if (typeof val === 'bigint') {
-      const intBuf = [Buffer.alloc(4), Buffer.alloc(4)]
-      intBuf[0].writeUInt32BE(Number(val >> BigInt(32)), 0)
-      intBuf[1].writeUInt32BE(Number(val & BigInt(mask)), 0)
+      const intBuf = [new Uint8Array(4), new Uint8Array(4)]
+      writeUInt32BE(intBuf[0], Number(Number(val >> BigInt(32))), 0)
+      writeUInt32BE(intBuf[1], Number(val & BigInt(mask)), 0)
 
-      return new UInt64(Buffer.concat(intBuf))
+      return new UInt64(concat(intBuf))
     }
 
     throw new Error('Cannot construct UInt64 from given value')
@@ -73,7 +77,7 @@ class UInt64 extends UInt {
    * @returns a hex-string
    */
   toJSON(): string {
-    return this.bytes.toString('hex').toUpperCase()
+    return bytesToHex(this.bytes)
   }
 
   /**
@@ -82,8 +86,8 @@ class UInt64 extends UInt {
    * @returns the number represented buy this.bytes
    */
   valueOf(): bigint {
-    const msb = BigInt(this.bytes.slice(0, 4).readUInt32BE(0))
-    const lsb = BigInt(this.bytes.slice(4).readUInt32BE(0))
+    const msb = BigInt(readUInt32BE(this.bytes.slice(0, 4), 0))
+    const lsb = BigInt(readUInt32BE(this.bytes.slice(4), 0))
     return (msb << BigInt(32)) | lsb
   }
 
@@ -92,7 +96,7 @@ class UInt64 extends UInt {
    *
    * @returns 8 bytes representing the UInt64
    */
-  toBytes(): Buffer {
+  toBytes(): Uint8Array {
     return this.bytes
   }
 }

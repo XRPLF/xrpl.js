@@ -1,5 +1,6 @@
 import { randomBytes as cryptoRandomBytes } from 'crypto'
 import type { BytesToHexFn, HexToBytesFn, RandomBytesFn } from './types'
+import { HexToStringFn, StringToHexFn } from './types'
 
 const OriginalBuffer = Symbol('OriginalBuffer')
 
@@ -69,4 +70,17 @@ export const hexToBytes: typeof HexToBytesFn = (hex) => {
 export const randomBytes: typeof RandomBytesFn = (size) => {
   return toUint8Array(cryptoRandomBytes(size))
 }
+
+export const hexToString: typeof HexToStringFn = (
+  hex: string,
+  encoding = 'utf8',
+): string => {
+  return new TextDecoder(encoding).decode(hexToBytes(hex))
+}
+
+export const stringToHex: typeof StringToHexFn = (string: string): string => {
+  return bytesToHex(new TextEncoder().encode(string))
+}
 /* eslint-enable func-style */
+
+export * from './shared'

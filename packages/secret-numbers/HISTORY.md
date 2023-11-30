@@ -6,6 +6,10 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### BREAKING CHANGES:
 - Moved all methods that were on `Utils` are now individually exported.
+* `Buffer` has been replaced with `UInt8Array` for both params and return values. `Buffer` may continue to work with params since they extend `UInt8Arrays`.
+
+### Changes
+* Eliminates 4 runtime dependencies: `base-x`, `base64-js`, `buffer`, and `ieee754`.
 
 ## 1.0.0 Beta 1 (2023-10-19)
 

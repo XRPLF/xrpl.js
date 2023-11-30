@@ -1,4 +1,5 @@
 const { quality } = require('../src/coretypes')
+const { bytesToHex } = require('@xrplf/isomorphic/utils')
 
 describe('Quality encode/decode', function () {
   const bookDirectory =
@@ -10,6 +11,6 @@ describe('Quality encode/decode', function () {
   })
   it('can encode', function () {
     const bytes = quality.encode(expectedQuality)
-    expect(bytes.toString('hex').toUpperCase()).toBe(bookDirectory.slice(-16))
+    expect(bytesToHex(bytes)).toBe(bookDirectory.slice(-16))
   })
 })

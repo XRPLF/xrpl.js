@@ -2,11 +2,12 @@ import { DEFAULT_DEFINITIONS, XrplDefinitionsBase } from '../enums'
 import { SerializedType, JsonObject } from './serialized-type'
 import { STObject } from './st-object'
 import { BinaryParser } from '../serdes/binary-parser'
+import { concat } from '@xrplf/isomorphic/utils'
 
-const ARRAY_END_MARKER = Buffer.from([0xf1])
+const ARRAY_END_MARKER = Uint8Array.from([0xf1])
 const ARRAY_END_MARKER_NAME = 'ArrayEndMarker'
 
-const OBJECT_END_MARKER = Buffer.from([0xe1])
+const OBJECT_END_MARKER = Uint8Array.from([0xe1])
 
 /**
  * TypeGuard for Array<JsonObject>
@@ -28,7 +29,7 @@ class STArray extends SerializedType {
    * @returns An STArray Object
    */
   static fromParser(parser: BinaryParser): STArray {
-    const bytes: Array<Buffer> = []
+    const bytes: Array<Uint8Array> = []
 
     while (!parser.end()) {
       const field = parser.readField()
@@ -44,7 +45,7 @@ class STArray extends SerializedType {
     }
 
     bytes.push(ARRAY_END_MARKER)
-    return new STArray(Buffer.concat(bytes))
+    return new STArray(concat(bytes))
   }
 
   /**
@@ -63,13 +64,13 @@ class STArray extends SerializedType {
     }
 
     if (isObjects(value)) {
-      const bytes: Array<Buffer> = []
+      const bytes: Array<Uint8Array> = []
       value.forEach((obj) => {
         bytes.push(STObject.from(obj, undefined, definitions).toBytes())
       })
 
       bytes.push(ARRAY_END_MARKER)
-      return new STArray(Buffer.concat(bytes))
+      return new STArray(concat(bytes))
     }
 
     throw new Error('Cannot construct STArray from value given')

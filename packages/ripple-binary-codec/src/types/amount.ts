@@ -3,8 +3,9 @@ import { BinaryParser } from '../serdes/binary-parser'
 import { AccountID } from './account-id'
 import { Currency } from './currency'
 import { JsonObject, SerializedType } from './serialized-type'
-
 import BigNumber from 'bignumber.js'
+import { bytesToHex, concat, hexToBytes } from '@xrplf/isomorphic/utils'
+import { readUInt32BE, writeUInt32BE } from '../utils'
 
 /**
  * Constants for validating amounts
@@ -52,11 +53,9 @@ function isAmountObject(arg): arg is AmountObject {
  * Class for serializing/Deserializing Amounts
  */
 class Amount extends SerializedType {
-  static defaultAmount: Amount = new Amount(
-    Buffer.from('4000000000000000', 'hex'),
-  )
+  static defaultAmount: Amount = new Amount(hexToBytes('4000000000000000'))
 
-  constructor(bytes: Buffer) {
+  constructor(bytes: Uint8Array) {
     super(bytes ?? Amount.defaultAmount.bytes)
   }
 
@@ -72,17 +71,17 @@ class Amount extends SerializedType {
       return value
     }
 
-    let amount = Buffer.alloc(8)
+    let amount = new Uint8Array(8)
     if (typeof value === 'string') {
       Amount.assertXrpIsValid(value)
 
       const number = BigInt(value)
 
-      const intBuf = [Buffer.alloc(4), Buffer.alloc(4)]
-      intBuf[0].writeUInt32BE(Number(number >> BigInt(32)), 0)
-      intBuf[1].writeUInt32BE(Number(number & BigInt(mask)), 0)
+      const intBuf = [new Uint8Array(4), new Uint8Array(4)]
+      writeUInt32BE(intBuf[0], Number(number >> BigInt(32)), 0)
+      writeUInt32BE(intBuf[1], Number(number & BigInt(mask)), 0)
 
-      amount = Buffer.concat(intBuf)
+      amount = concat(intBuf)
 
       amount[0] |= 0x40
 
@@ -102,11 +101,11 @@ class Amount extends SerializedType {
           .toString()
 
         const num = BigInt(integerNumberString)
-        const intBuf = [Buffer.alloc(4), Buffer.alloc(4)]
-        intBuf[0].writeUInt32BE(Number(num >> BigInt(32)), 0)
-        intBuf[1].writeUInt32BE(Number(num & BigInt(mask)), 0)
+        const intBuf = [new Uint8Array(4), new Uint8Array(4)]
+        writeUInt32BE(intBuf[0], Number(num >> BigInt(32)), 0)
+        writeUInt32BE(intBuf[1], Number(num & BigInt(mask)), 0)
 
-        amount = Buffer.concat(intBuf)
+        amount = concat(intBuf)
 
         amount[0] |= 0x80
 
@@ -122,7 +121,7 @@ class Amount extends SerializedType {
 
       const currency = Currency.from(value.currency).toBytes()
       const issuer = AccountID.from(value.issuer).toBytes()
-      return new Amount(Buffer.concat([amount, currency, issuer]))
+      return new Amount(concat([amount, currency, issuer]))
     }
 
     throw new Error('Invalid type to construct an Amount')
@@ -152,8 +151,8 @@ class Amount extends SerializedType {
       const sign = isPositive ? '' : '-'
       bytes[0] &= 0x3f
 
-      const msb = BigInt(bytes.slice(0, 4).readUInt32BE(0))
-      const lsb = BigInt(bytes.slice(4).readUInt32BE(0))
+      const msb = BigInt(readUInt32BE(bytes.slice(0, 4), 0))
+      const lsb = BigInt(readUInt32BE(bytes.slice(4), 0))
       const num = (msb << BigInt(32)) | lsb
 
       return `${sign}${num.toString()}`
@@ -172,7 +171,7 @@ class Amount extends SerializedType {
 
       mantissa[0] = 0
       mantissa[1] &= 0x3f
-      const value = new BigNumber(`${sign}0x${mantissa.toString('hex')}`).times(
+      const value = new BigNumber(`${sign}0x${bytesToHex(mantissa)}`).times(
         `1e${exponent}`,
       )
       Amount.assertIouIsValid(value)

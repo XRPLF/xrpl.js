@@ -1,7 +1,7 @@
 import { BytesList } from '../serdes/binary-serializer'
 import { BinaryParser } from '../serdes/binary-parser'
-
 import { XrplDefinitionsBase } from '../enums'
+import { bytesToHex } from '@xrplf/isomorphic/utils'
 
 type JSON = string | number | boolean | null | undefined | JSON[] | JsonObject
 
@@ -11,10 +11,10 @@ type JsonObject = { [key: string]: JSON }
  * The base class for all binary-codec types
  */
 class SerializedType {
-  protected readonly bytes: Buffer = Buffer.alloc(0)
+  protected readonly bytes: Uint8Array = new Uint8Array(0)
 
-  constructor(bytes?: Buffer) {
-    this.bytes = bytes ?? Buffer.alloc(0)
+  constructor(bytes?: Uint8Array) {
+    this.bytes = bytes ?? new Uint8Array(0)
   }
 
   static fromParser(parser: BinaryParser, hint?: number): SerializedType {
@@ -42,15 +42,15 @@ class SerializedType {
    * @returns hex String of this.bytes
    */
   toHex(): string {
-    return this.toBytes().toString('hex').toUpperCase()
+    return bytesToHex(this.toBytes())
   }
 
   /**
    * Get the bytes representation of a SerializedType
    *
-   * @returns A buffer of the bytes
+   * @returns A Uint8Array of the bytes
    */
-  toBytes(): Buffer {
+  toBytes(): Uint8Array {
     if (this.bytes) {
       return this.bytes
     }

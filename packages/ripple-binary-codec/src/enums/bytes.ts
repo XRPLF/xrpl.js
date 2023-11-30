@@ -4,14 +4,14 @@ import { BytesList, BinaryParser } from '../binary'
  * @brief: Bytes, name, and ordinal representing one type, ledger_type, transaction type, or result
  */
 export class Bytes {
-  readonly bytes: Buffer
+  readonly bytes: Uint8Array
 
   constructor(
     readonly name: string,
     readonly ordinal: number,
     readonly ordinalWidth: number,
   ) {
-    this.bytes = Buffer.alloc(ordinalWidth)
+    this.bytes = new Uint8Array(ordinalWidth)
     for (let i = 0; i < ordinalWidth; i++) {
       this.bytes[ordinalWidth - i - 1] = (ordinal >>> (i * 8)) & 0xff
     }

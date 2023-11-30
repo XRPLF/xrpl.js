@@ -1,6 +1,6 @@
 # Unique Setup Steps for Xrpl.js
 
-For when you need to do more than just install `xrpl.js` for it to work (especially for React projects in the browser).
+Starting in 3.0 xrpl and all the packages in this repo no longer require custom configurations (ex. polyfills) to run.
 
 ### Using xrpl.js from a CDN
 
@@ -13,48 +13,7 @@ Ensure that the full path is provided so the browser can find the sourcemaps.
 
 ### Using xrpl.js with `create-react-app`
 
-To use `xrpl.js` with React, you need to install shims for core NodeJS modules. Starting with version 5, Webpack stopped including shims by default, so you must modify your Webpack configuration to add the shims you need. Either you can eject your config and modify it, or you can use a library such as `react-app-rewired`. The example below uses `react-app-rewired`.
-
-1. Install shims (you can use `yarn` as well):
-
-   ```shell
-   npm install --save-dev \
-       buffer \
-       process
-   ```
-
-2. Modify your webpack configuration
-
-   1. Install `react-app-rewired`
-
-      ```shell
-      npm install --save-dev react-app-rewired
-      ```
-
-   2. At the project root, add a file named `config-overrides.js` with the following content:
-
-      ```javascript
-      const webpack = require("webpack");
-
-      module.exports = function override(config) {
-        config.plugins = (config.plugins || []).concat([
-          new webpack.ProvidePlugin({
-            process: "process/browser",
-            Buffer: ["buffer", "Buffer"],
-          }),
-        ]);
-        
-        return config;
-      };
-      ```
-
-   3. Update package.json scripts section with
-
-      ```
-      "start": "react-app-rewired start",
-      "build": "react-app-rewired build",
-      "test": "react-app-rewired test",
-      ```
+Starting in 3.0 xrpl and its related packages no longer require custom configurations (ex. polyfills) to run.
 
 This online template uses these steps to run xrpl.js with React in the browser:
 https://codesandbox.io/s/xrpl-intro-pxgdjr?file=/src/App.js
@@ -97,54 +56,7 @@ import './polyfills'
 
 ### Using xrpl.js with Vite React
 
-Similar to above, to get xrpl.js to work with Vite you need to set up a couple aliases in the vite.config.ts file.
-
-1. If it's a fresh project you can use `npm create vite@latest` then choose the React and TypeScript options.
-
-2. Copy these settings into your `vite.config.ts` file.
-
-```javascript
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
-import polyfillNode from 'rollup-plugin-polyfill-node'
-
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  define: {
-    'process.env': {}
-  },
-  optimizeDeps: {
-    esbuildOptions: {
-      define: {
-       global: 'globalThis',
-      },
-      plugins: [
-        NodeGlobalsPolyfillPlugin({ 
-          process: true, 
-          buffer: true, 
-        }),
-      ],
-    },
-  }, 
-  build: { 
-    rollupOptions: {
-      plugins: [
-        polyfillNode(),
-      ]
-    } 
-  },
-})
-```
-
-3. Install the config dependencies and xrpl (e.g. using this command)
-
-```shell
-npm install --save-dev @esbuild-plugins/node-globals-polyfill \
-		rollup-plugin-polyfill-node \
-		&& npm install xrpl
-```
+Starting in 3.0 xrpl and all the packages in this repo no longer require custom configurations (ex. polyfills) to run.
 
 ### Using xrpl.js with Deno
 

@@ -11,7 +11,7 @@ import { BinarySerializer, BytesList } from '../serdes/binary-serializer'
 
 import { STArray } from './st-array'
 
-const OBJECT_END_MARKER_BYTE = Buffer.from([0xe1])
+const OBJECT_END_MARKER_BYTE = Uint8Array.from([0xe1])
 const OBJECT_END_MARKER = 'ObjectEndMarker'
 const ST_OBJECT = 'STObject'
 const DESTINATION = 'Destination'
