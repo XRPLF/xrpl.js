@@ -16,7 +16,7 @@ function makeItem(
   indexArg: string,
 ): [
   Hash256,
-  { toBytesSink: (sink: BytesList) => void; hashPrefix: () => Buffer },
+  { toBytesSink: (sink: BytesList) => void; hashPrefix: () => Uint8Array },
 ] {
   let str = indexArg
   while (str.length < 64) {
@@ -28,7 +28,7 @@ function makeItem(
       index.toBytesSink(sink)
     },
     hashPrefix() {
-      return Buffer.from([1, 3, 3, 7])
+      return Uint8Array.from([1, 3, 3, 7])
     },
   }
   return [index, item]

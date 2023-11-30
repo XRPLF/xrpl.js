@@ -13,10 +13,6 @@ function getDefaultConfiguration() {
     },
     stats: "errors-only",
     devtool: "source-map",
-    plugins: [
-      new webpack.ProvidePlugin({ process: "process/browser" }),
-      new webpack.ProvidePlugin({ Buffer: ["buffer", "Buffer"] }),
-    ],
     module: {
       rules: [
         {
@@ -31,9 +27,6 @@ function getDefaultConfiguration() {
       // ripple-address-codec, ripple-binary-codec, ripple-keypairs, which are
       // symlinked together via lerna
       symlinks: false,
-      fallback: {
-        buffer: require.resolve("buffer"),
-      },
     },
   };
 }
@@ -64,7 +57,7 @@ module.exports = {
             new BundleAnalyzerPlugin({
               analyzerPort: `auto`,
               analyzerMode: "static",
-            })
+            }),
           );
         }
         return localConfig;

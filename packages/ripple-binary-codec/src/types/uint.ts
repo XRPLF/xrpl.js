@@ -17,7 +17,7 @@ function compare(n1: number | bigint, n2: number | bigint): number {
 abstract class UInt extends Comparable<UInt | number> {
   protected static width: number
 
-  constructor(bytes: Buffer) {
+  constructor(bytes: Uint8Array) {
     super(bytes)
   }
 
@@ -47,6 +47,14 @@ abstract class UInt extends Comparable<UInt | number> {
    * @returns the value
    */
   abstract valueOf(): number | bigint
+
+  static checkUintRange(val: number, min: number, max: number): void {
+    if (val < min || val > max) {
+      throw new Error(
+        `Invalid ${this.constructor.name}: ${val} must be >= ${min} and <= ${max}`,
+      )
+    }
+  }
 }
 
 export { UInt }

@@ -2,30 +2,24 @@
  * Codec class
  */
 
+import { base58xrp, BytesCoder } from '@scure/base'
 import { sha256 } from '@xrplf/isomorphic/sha256'
-import baseCodec = require('base-x')
-import type { BaseConverter } from 'base-x'
 
 import { arrayEqual, concatArgs, ByteArray } from './utils'
 
 class Codec {
   private readonly _sha256: (bytes: ByteArray) => Uint8Array
-  private readonly _alphabet: string
-  private readonly _codec: BaseConverter
+  private readonly _codec: BytesCoder
 
-  public constructor(options: {
-    sha256: (bytes: ByteArray) => Uint8Array
-    alphabet: string
-  }) {
+  public constructor(options: { sha256: (bytes: ByteArray) => Uint8Array }) {
     this._sha256 = options.sha256
-    this._alphabet = options.alphabet
-    this._codec = baseCodec(this._alphabet)
+    this._codec = base58xrp
   }
 
   /**
    * Encoder.
    *
-   * @param bytes - Buffer of data to encode.
+   * @param bytes - Uint8Array of data to encode.
    * @param opts - Options object including the version bytes and the expected length of the data to encode.
    */
   public encode(
@@ -56,7 +50,7 @@ class Codec {
     },
   ): {
     version: number[]
-    bytes: Buffer
+    bytes: Uint8Array
     type: 'ed25519' | 'secp256k1' | null
   } {
     const versions = opts.versions
@@ -97,20 +91,20 @@ class Codec {
     )
   }
 
-  public encodeChecked(buffer: ByteArray): string {
-    const check = this._sha256(this._sha256(buffer)).slice(0, 4)
-    return this._encodeRaw(Buffer.from(concatArgs(buffer, check)))
+  public encodeChecked(bytes: ByteArray): string {
+    const check = this._sha256(this._sha256(bytes)).slice(0, 4)
+    return this._encodeRaw(Uint8Array.from(concatArgs(bytes, check)))
   }
 
-  public decodeChecked(base58string: string): Buffer {
-    const buffer = this._decodeRaw(base58string)
-    if (buffer.length < 5) {
+  public decodeChecked(base58string: string): Uint8Array {
+    const intArray = this._decodeRaw(base58string)
+    if (intArray.byteLength < 5) {
       throw new Error('invalid_input_size: decoded data must have length >= 5')
     }
-    if (!this._verifyCheckSum(buffer)) {
+    if (!this._verifyCheckSum(intArray)) {
       throw new Error('checksum_invalid')
     }
-    return buffer.slice(0, -4)
+    return intArray.slice(0, -4)
   }
 
   private _encodeVersioned(
@@ -118,21 +112,21 @@ class Codec {
     versions: number[],
     expectedLength: number,
   ): string {
-    if (expectedLength && bytes.length !== expectedLength) {
+    if (!checkByteLength(bytes, expectedLength)) {
       throw new Error(
         'unexpected_payload_length: bytes.length does not match expectedLength.' +
-          ' Ensure that the bytes are a Buffer.',
+          ' Ensure that the bytes are a Uint8Array.',
       )
     }
     return this.encodeChecked(concatArgs(versions, bytes))
   }
 
   private _encodeRaw(bytes: ByteArray): string {
-    return this._codec.encode(bytes)
+    return this._codec.encode(Uint8Array.from(bytes))
   }
   /* eslint-enable max-lines-per-function */
 
-  private _decodeRaw(base58string: string): Buffer {
+  private _decodeRaw(base58string: string): Uint8Array {
     return this._codec.decode(base58string)
   }
 
@@ -162,20 +156,19 @@ const ED25519_SEED = [0x01, 0xe1, 0x4b]
 
 const codecOptions = {
   sha256,
-  alphabet: 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz',
 }
 
 const codecWithXrpAlphabet = new Codec(codecOptions)
 
 export const codec = codecWithXrpAlphabet
 
-// entropy is a Buffer of size 16
+// entropy is a Uint8Array of size 16
 // type is 'ed25519' or 'secp256k1'
 export function encodeSeed(
   entropy: ByteArray,
   type: 'ed25519' | 'secp256k1',
 ): string {
-  if (entropy.length !== 16) {
+  if (!checkByteLength(entropy, 16)) {
     throw new Error('entropy must have length 16')
   }
   const opts = {
@@ -202,7 +195,7 @@ export function decodeSeed(
   },
 ): {
   version: number[]
-  bytes: Buffer
+  bytes: Uint8Array
   type: 'ed25519' | 'secp256k1' | null
 } {
   return codecWithXrpAlphabet.decode(seed, opts)
@@ -219,7 +212,7 @@ export function encodeAccountID(bytes: ByteArray): string {
 export const encodeAddress = encodeAccountID
 /* eslint-enable import/no-unused-modules */
 
-export function decodeAccountID(accountId: string): Buffer {
+export function decodeAccountID(accountId: string): Uint8Array {
   const opts = { versions: [ACCOUNT_ID], expectedLength: 20 }
   return codecWithXrpAlphabet.decode(accountId, opts).bytes
 }
@@ -230,7 +223,7 @@ export function decodeAccountID(accountId: string): Buffer {
 export const decodeAddress = decodeAccountID
 /* eslint-enable import/no-unused-modules */
 
-export function decodeNodePublic(base58string: string): Buffer {
+export function decodeNodePublic(base58string: string): Uint8Array {
   const opts = { versions: [NODE_PUBLIC], expectedLength: 33 }
   return codecWithXrpAlphabet.decode(base58string, opts).bytes
 }
@@ -245,7 +238,7 @@ export function encodeAccountPublic(bytes: ByteArray): string {
   return codecWithXrpAlphabet.encode(bytes, opts)
 }
 
-export function decodeAccountPublic(base58string: string): Buffer {
+export function decodeAccountPublic(base58string: string): Uint8Array {
   const opts = { versions: [ACCOUNT_PUBLIC_KEY], expectedLength: 33 }
   return codecWithXrpAlphabet.decode(base58string, opts).bytes
 }
@@ -257,4 +250,10 @@ export function isValidClassicAddress(address: string): boolean {
     return false
   }
   return true
+}
+
+function checkByteLength(bytes: ByteArray, expectedLength: number): boolean {
+  return 'byteLength' in bytes
+    ? bytes.byteLength === expectedLength
+    : bytes.length === expectedLength
 }

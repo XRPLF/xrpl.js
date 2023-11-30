@@ -1,3 +1,4 @@
+import { bytesToHex } from '@xrplf/isomorphic/utils'
 import { BigNumber } from 'bignumber.js'
 import { decodeAccountID } from 'ripple-address-codec'
 import { decode, encode, encodeForSigning } from 'ripple-binary-codec'
@@ -144,7 +145,7 @@ function compareSigners(left: Signer, right: Signer): number {
 const NUM_BITS_IN_HEX = 16
 
 function addressToBigNumber(address: string): BigNumber {
-  const hex = Buffer.from(decodeAccountID(address)).toString('hex')
+  const hex = bytesToHex(decodeAccountID(address))
   return new BigNumber(hex, NUM_BITS_IN_HEX)
 }
 

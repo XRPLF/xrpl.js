@@ -1,7 +1,6 @@
 import { HashPrefix } from './hash-prefixes'
 import { Hash256 } from './types'
 import { BytesList } from './serdes/binary-serializer'
-
 import { sha512 } from '@xrplf/isomorphic/sha512'
 
 /**
@@ -17,7 +16,7 @@ class Sha512Half extends BytesList {
    * @param bytes bytes to write to this.hash
    * @returns the new Sha512Hash object
    */
-  static put(bytes: Buffer): Sha512Half {
+  static put(bytes: Uint8Array): Sha512Half {
     return new Sha512Half().put(bytes)
   }
 
@@ -27,7 +26,7 @@ class Sha512Half extends BytesList {
    * @param bytes bytes to write to object
    * @returns the Sha512 object
    */
-  put(bytes: Buffer): Sha512Half {
+  put(bytes: Uint8Array): Sha512Half {
     this.hash.update(bytes)
     return this
   }
@@ -37,8 +36,8 @@ class Sha512Half extends BytesList {
    *
    * @returns half of a SHA512 hash
    */
-  finish256(): Buffer {
-    return Buffer.from(this.hash.digest().slice(0, 32))
+  finish256(): Uint8Array {
+    return Uint8Array.from(this.hash.digest().slice(0, 32))
   }
 
   /**
@@ -57,7 +56,7 @@ class Sha512Half extends BytesList {
  * @param args zero or more arguments to hash
  * @returns the sha512half hash of the arguments.
  */
-function sha512Half(...args: Buffer[]): Buffer {
+function sha512Half(...args: Uint8Array[]): Uint8Array {
   const hash = new Sha512Half()
   args.forEach((a) => hash.put(a))
   return hash.finish256()
@@ -69,7 +68,7 @@ function sha512Half(...args: Buffer[]): Buffer {
  * @param serialized bytes to hash
  * @returns a Hash256 object
  */
-function transactionID(serialized: Buffer): Hash256 {
+function transactionID(serialized: Uint8Array): Hash256 {
   return new Hash256(sha512Half(HashPrefix.transactionID, serialized))
 }
 

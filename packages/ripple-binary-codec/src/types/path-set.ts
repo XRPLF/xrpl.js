@@ -2,6 +2,7 @@ import { AccountID } from './account-id'
 import { Currency } from './currency'
 import { BinaryParser } from '../serdes/binary-parser'
 import { SerializedType, JsonObject } from './serialized-type'
+import { bytesToHex, concat } from '@xrplf/isomorphic/utils'
 
 /**
  * Constants for separating Paths in a PathSet
@@ -62,7 +63,7 @@ class Hop extends SerializedType {
       return value
     }
 
-    const bytes: Array<Buffer> = [Buffer.from([0])]
+    const bytes: Array<Uint8Array> = [Uint8Array.from([0])]
 
     if (value.account) {
       bytes.push(AccountID.from(value.account).toBytes())
@@ -79,7 +80,7 @@ class Hop extends SerializedType {
       bytes[0][0] |= TYPE_ISSUER
     }
 
-    return new Hop(Buffer.concat(bytes))
+    return new Hop(concat(bytes))
   }
 
   /**
@@ -90,7 +91,7 @@ class Hop extends SerializedType {
    */
   static fromParser(parser: BinaryParser): Hop {
     const type = parser.readUInt8()
-    const bytes: Array<Buffer> = [Buffer.from([type])]
+    const bytes: Array<Uint8Array> = [Uint8Array.from([type])]
 
     if (type & TYPE_ACCOUNT) {
       bytes.push(parser.read(AccountID.width))
@@ -104,7 +105,7 @@ class Hop extends SerializedType {
       bytes.push(parser.read(AccountID.width))
     }
 
-    return new Hop(Buffer.concat(bytes))
+    return new Hop(concat(bytes))
   }
 
   /**
@@ -113,7 +114,7 @@ class Hop extends SerializedType {
    * @returns a HopObject, an JS object with optional account, issuer, and currency
    */
   toJSON(): HopObject {
-    const hopParser = new BinaryParser(this.bytes.toString('hex'))
+    const hopParser = new BinaryParser(bytesToHex(this.bytes))
     const type = hopParser.readUInt8()
 
     let account, currency, issuer
@@ -170,12 +171,12 @@ class Path extends SerializedType {
       return value
     }
 
-    const bytes: Array<Buffer> = []
+    const bytes: Array<Uint8Array> = []
     value.forEach((hop: HopObject) => {
       bytes.push(Hop.from(hop).toBytes())
     })
 
-    return new Path(Buffer.concat(bytes))
+    return new Path(concat(bytes))
   }
 
   /**
@@ -185,7 +186,7 @@ class Path extends SerializedType {
    * @returns the Path represented by the bytes read from the BinaryParser
    */
   static fromParser(parser: BinaryParser): Path {
-    const bytes: Array<Buffer> = []
+    const bytes: Array<Uint8Array> = []
     while (!parser.end()) {
       bytes.push(Hop.fromParser(parser).toBytes())
 
@@ -196,7 +197,7 @@ class Path extends SerializedType {
         break
       }
     }
-    return new Path(Buffer.concat(bytes))
+    return new Path(concat(bytes))
   }
 
   /**
@@ -232,16 +233,16 @@ class PathSet extends SerializedType {
     }
 
     if (isPathSet(value)) {
-      const bytes: Array<Buffer> = []
+      const bytes: Array<Uint8Array> = []
 
       value.forEach((path: Array<HopObject>) => {
         bytes.push(Path.from(path).toBytes())
-        bytes.push(Buffer.from([PATH_SEPARATOR_BYTE]))
+        bytes.push(Uint8Array.from([PATH_SEPARATOR_BYTE]))
       })
 
-      bytes[bytes.length - 1] = Buffer.from([PATHSET_END_BYTE])
+      bytes[bytes.length - 1] = Uint8Array.from([PATHSET_END_BYTE])
 
-      return new PathSet(Buffer.concat(bytes))
+      return new PathSet(concat(bytes))
     }
 
     throw new Error('Cannot construct PathSet from given value')
@@ -254,7 +255,7 @@ class PathSet extends SerializedType {
    * @returns the PathSet read from parser
    */
   static fromParser(parser: BinaryParser): PathSet {
-    const bytes: Array<Buffer> = []
+    const bytes: Array<Uint8Array> = []
 
     while (!parser.end()) {
       bytes.push(Path.fromParser(parser).toBytes())
@@ -265,7 +266,7 @@ class PathSet extends SerializedType {
       }
     }
 
-    return new PathSet(Buffer.concat(bytes))
+    return new PathSet(concat(bytes))
   }
 
   /**

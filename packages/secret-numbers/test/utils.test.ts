@@ -1,3 +1,5 @@
+import { bytesToHex, hexToBytes } from '@xrplf/isomorphic/utils'
+
 import {
   calculateChecksum,
   checkChecksum,
@@ -12,10 +14,10 @@ describe('Utils', () => {
   it('randomEntropy: valid output', () => {
     const data = randomEntropy()
     expect(typeof data).toEqual('object')
-    expect(data instanceof Buffer).toBeTruthy()
+    expect(data instanceof Uint8Array).toBeTruthy()
     expect(data.length).toEqual(16)
-    expect(data.toString('hex').length).toEqual(32)
-    expect(data.toString('hex')).toMatch(/^[a-f0-9]+$/u)
+    expect(bytesToHex(data).length).toEqual(32)
+    expect(bytesToHex(data)).toMatch(/^[A-F0-9]+$/u)
   })
 
   it('calculateChecksum: 1st position', () => {
@@ -53,7 +55,7 @@ describe('Utils', () => {
   })
 
   it('entropyToSecret', () => {
-    const entropy = Buffer.from('76ebb2d06879b45b7568fb9c1ded097c', 'hex')
+    const entropy = hexToBytes('76ebb2d06879b45b7568fb9c1ded097c')
     const secret = [
       '304435',
       '457766',
@@ -78,7 +80,7 @@ describe('Utils', () => {
       '076618',
       '024286',
     ]
-    const entropy = Buffer.from('76ebb2d06879b45b7568fb9c1ded097c', 'hex')
+    const entropy = hexToBytes('76ebb2d06879b45b7568fb9c1ded097c')
     expect(secretToEntropy(secret)).toEqual(entropy)
   })
 

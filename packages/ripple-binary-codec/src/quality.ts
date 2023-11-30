@@ -1,6 +1,6 @@
 import { coreTypes } from './types'
-
 import BigNumber from 'bignumber.js'
+import { bytesToHex, hexToBytes } from '@xrplf/isomorphic/utils'
 
 /**
  * class for encoding and decoding quality
@@ -12,7 +12,7 @@ class quality {
    * @param arg string representation of an amount
    * @returns Serialized quality
    */
-  static encode(quality: string): Buffer {
+  static encode(quality: string): Uint8Array {
     const decimal = BigNumber(quality)
     const exponent = (decimal?.e || 0) - 15
     const qualityString = decimal.times(`1e${-exponent}`).abs().toString()
@@ -28,9 +28,9 @@ class quality {
    * @returns deserialized quality
    */
   static decode(quality: string): BigNumber {
-    const bytes = Buffer.from(quality, 'hex').slice(-8)
+    const bytes = hexToBytes(quality).slice(-8)
     const exponent = bytes[0] - 100
-    const mantissa = new BigNumber(`0x${bytes.slice(1).toString('hex')}`)
+    const mantissa = new BigNumber(`0x${bytesToHex(bytes.slice(1))}`)
     return mantissa.times(`1e${exponent}`)
   }
 }
