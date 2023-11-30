@@ -1,14 +1,15 @@
+import { hexOnly } from './utils'
 import { coreTypes, Amount, Hash160 } from '../src/types'
 import BigNumber from 'bignumber.js'
 
 import { encodeAccountID } from 'ripple-address-codec'
 import { Field, TransactionType } from '../src/enums'
 import { makeParser, readJSON } from '../src/binary'
-import { parseHexOnly, hexOnly } from './utils'
 import { BytesList } from '../src/serdes/binary-serializer'
 import fixtures from './fixtures/data-driven-tests.json'
 
-const __ = hexOnly
+const { bytesToHex } = require('@xrplf/isomorphic/utils')
+
 function toJSON(v) {
   return v.toJSON ? v.toJSON() : v
 }
@@ -28,16 +29,15 @@ function assertEqualAmountJSON(actual, expected) {
 }
 
 function basicApiTests() {
-  const bytes = parseHexOnly('00,01020304,0506')
   it('can read slices of bytes', () => {
-    const parser = makeParser(bytes)
+    const parser = makeParser('00010203040506')
     // @ts-expect-error -- checking private variable type
-    expect(parser.bytes instanceof Buffer).toBe(true)
+    expect(parser.bytes instanceof Uint8Array).toBe(true)
     const read1 = parser.read(1)
-    expect(read1 instanceof Buffer).toBe(true)
-    expect(read1).toEqual(Buffer.from([0]))
-    expect(parser.read(4)).toEqual(Buffer.from([1, 2, 3, 4]))
-    expect(parser.read(2)).toEqual(Buffer.from([5, 6]))
+    expect(read1 instanceof Uint8Array).toBe(true)
+    expect(read1).toEqual(Uint8Array.from([0]))
+    expect(parser.read(4)).toEqual(Uint8Array.from([1, 2, 3, 4]))
+    expect(parser.read(2)).toEqual(Uint8Array.from([5, 6]))
     expect(() => parser.read(1)).toThrow()
   })
   it('can read a Uint32 at full', () => {
@@ -62,12 +62,12 @@ function transactionParsingTests() {
       },
       TakerPays: '98957503520',
       TransactionType: 'OfferCreate',
-      TxnSignature: __(`
+      TxnSignature: hexOnly(`
           304502202ABE08D5E78D1E74A4C18F2714F64E87B8BD57444AF
           A5733109EB3C077077520022100DB335EE97386E4C0591CAC02
           4D50E9230D8F171EEB901B5E5E4BD6D1E0AEF98C`),
     },
-    binary: __(`
+    binary: hexOnly(`
       120007220000000024000195F964400000170A53AC2065D5460561E
       C9DE000000000000000000000000000494C53000000000092D70596
       8936C419CE614BF264B5EEB1CEA47FF468400000000000000A73210
@@ -102,11 +102,9 @@ function transactionParsingTests() {
     expect(parser.read(8)).not.toEqual([])
     expect(parser.readField()).toEqual(Field['SigningPubKey'])
     expect(parser.readVariableLengthLength()).toBe(33)
-    expect(parser.read(33).toString('hex').toUpperCase()).toEqual(
-      tx_json.SigningPubKey,
-    )
+    expect(bytesToHex(parser.read(33))).toEqual(tx_json.SigningPubKey)
     expect(parser.readField()).toEqual(Field['TxnSignature'])
-    expect(parser.readVariableLength().toString('hex').toUpperCase()).toEqual(
+    expect(bytesToHex(parser.readVariableLength())).toEqual(
       tx_json.TxnSignature,
     )
     expect(parser.readField()).toEqual(Field['Account'])
@@ -303,7 +301,7 @@ function nestedObjectTests() {
 }
 
 function pathSetBinaryTests() {
-  const bytes = __(
+  const bytes = hexOnly(
     `1200002200000000240000002E2E00004BF161D4C71AFD498D00000000000000
      0000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA0
      6594D168400000000000000A69D446F8038585E9400000000000000000000000

@@ -2,8 +2,8 @@ import { BinaryParser } from '../serdes/binary-parser'
 
 import { AccountID } from './account-id'
 import { JsonObject, SerializedType } from './serialized-type'
-
 import { Issue, IssueObject } from './issue'
+import { concat } from '@xrplf/isomorphic/utils'
 
 /**
  * Interface for JSON objects that represent cross-chain bridges
@@ -34,11 +34,11 @@ function isXChainBridgeObject(arg): arg is XChainBridgeObject {
  */
 class XChainBridge extends SerializedType {
   static readonly ZERO_XCHAIN_BRIDGE: XChainBridge = new XChainBridge(
-    Buffer.concat([
-      Buffer.from([0x14]),
-      Buffer.alloc(40),
-      Buffer.from([0x14]),
-      Buffer.alloc(40),
+    concat([
+      Uint8Array.from([0x14]),
+      new Uint8Array(40),
+      Uint8Array.from([0x14]),
+      new Uint8Array(40),
     ]),
   )
 
@@ -50,7 +50,7 @@ class XChainBridge extends SerializedType {
       { name: 'IssuingChainIssue', type: Issue },
     ]
 
-  constructor(bytes: Buffer) {
+  constructor(bytes: Uint8Array) {
     super(bytes ?? XChainBridge.ZERO_XCHAIN_BRIDGE.bytes)
   }
 
@@ -71,16 +71,16 @@ class XChainBridge extends SerializedType {
       throw new Error('Invalid type to construct an XChainBridge')
     }
 
-    const bytes: Array<Buffer> = []
+    const bytes: Array<Uint8Array> = []
     this.TYPE_ORDER.forEach((item) => {
       const { name, type } = item
       if (type === AccountID) {
-        bytes.push(Buffer.from([0x14]))
+        bytes.push(Uint8Array.from([0x14]))
       }
       const object = type.from(value[name])
       bytes.push(object.toBytes())
     })
-    return new XChainBridge(Buffer.concat(bytes))
+    return new XChainBridge(concat(bytes))
   }
 
   /**
@@ -90,19 +90,19 @@ class XChainBridge extends SerializedType {
    * @returns An XChainBridge object
    */
   static fromParser(parser: BinaryParser): XChainBridge {
-    const bytes: Array<Buffer> = []
+    const bytes: Array<Uint8Array> = []
 
     this.TYPE_ORDER.forEach((item) => {
       const { type } = item
       if (type === AccountID) {
         parser.skip(1)
-        bytes.push(Buffer.from([0x14]))
+        bytes.push(Uint8Array.from([0x14]))
       }
       const object = type.fromParser(parser)
       bytes.push(object.toBytes())
     })
 
-    return new XChainBridge(Buffer.concat(bytes))
+    return new XChainBridge(concat(bytes))
   }
 
   /**

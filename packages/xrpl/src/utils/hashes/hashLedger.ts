@@ -3,6 +3,7 @@
 /* eslint-disable no-bitwise  -- this file mimics behavior in rippled. It uses
    bitwise operators for and-ing numbers with a mask and bit shifting. */
 
+import { bytesToHex } from '@xrplf/isomorphic/utils'
 import BigNumber from 'bignumber.js'
 import { decode, encode } from 'ripple-binary-codec'
 
@@ -27,10 +28,6 @@ function intToHex(integer: number, byteLength: number): string {
     .padStart(byteLength * 2, '0')
 
   return foo
-}
-
-function bytesToHex(bytes: number[]): string {
-  return Buffer.from(bytes).toString('hex')
 }
 
 function bigintToHex(

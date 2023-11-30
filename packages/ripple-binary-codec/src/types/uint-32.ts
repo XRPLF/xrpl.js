@@ -1,14 +1,17 @@
 import { UInt } from './uint'
 import { BinaryParser } from '../serdes/binary-parser'
+import { readUInt32BE, writeUInt32BE } from '../utils'
 
 /**
  * Derived UInt class for serializing/deserializing 32 bit UInt
  */
 class UInt32 extends UInt {
   protected static readonly width: number = 32 / 8 // 4
-  static readonly defaultUInt32: UInt32 = new UInt32(Buffer.alloc(UInt32.width))
+  static readonly defaultUInt32: UInt32 = new UInt32(
+    new Uint8Array(UInt32.width),
+  )
 
-  constructor(bytes: Buffer) {
+  constructor(bytes: Uint8Array) {
     super(bytes ?? UInt32.defaultUInt32.bytes)
   }
 
@@ -26,16 +29,17 @@ class UInt32 extends UInt {
       return val
     }
 
-    const buf = Buffer.alloc(UInt32.width)
+    const buf = new Uint8Array(UInt32.width)
 
     if (typeof val === 'string') {
       const num = Number.parseInt(val)
-      buf.writeUInt32BE(num, 0)
+      writeUInt32BE(buf, num, 0)
       return new UInt32(buf)
     }
 
     if (typeof val === 'number') {
-      buf.writeUInt32BE(val, 0)
+      UInt32.checkUintRange(val, 0, 0xffffffff)
+      writeUInt32BE(buf, val, 0)
       return new UInt32(buf)
     }
 
@@ -48,7 +52,7 @@ class UInt32 extends UInt {
    * @returns the number represented by this.bytes
    */
   valueOf(): number {
-    return this.bytes.readUInt32BE(0)
+    return parseInt(readUInt32BE(this.bytes, 0), 10)
   }
 }
 

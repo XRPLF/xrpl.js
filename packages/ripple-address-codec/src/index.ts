@@ -1,3 +1,5 @@
+import { concat, equal, hexToBytes } from '@xrplf/isomorphic/utils'
+
 import {
   codec,
   encodeSeed,
@@ -13,9 +15,9 @@ import {
 
 const PREFIX_BYTES = {
   // 5, 68
-  main: Buffer.from([0x05, 0x44]),
+  main: Uint8Array.from([0x05, 0x44]),
   // 4, 147
-  test: Buffer.from([0x04, 0x93]),
+  test: Uint8Array.from([0x04, 0x93]),
 }
 
 const MAX_32_BIT_UNSIGNED_INT = 4294967295
@@ -30,7 +32,7 @@ function classicAddressToXAddress(
 }
 
 function encodeXAddress(
-  accountId: Buffer,
+  accountId: Uint8Array,
   tag: number | false,
   test: boolean,
 ): string {
@@ -46,10 +48,10 @@ function encodeXAddress(
   const flag = tag === false || tag == null ? 0 : 1
   /* eslint-disable no-bitwise ---
    * need to use bitwise operations here */
-  const bytes = Buffer.concat([
+  const bytes = concat([
     test ? PREFIX_BYTES.test : PREFIX_BYTES.main,
     accountId,
-    Buffer.from([
+    Uint8Array.from([
       // 0x00 if no tag, 0x01 if 32-bit tag
       flag,
       // first byte
@@ -90,7 +92,7 @@ function xAddressToClassicAddress(xAddress: string): {
 }
 
 function decodeXAddress(xAddress: string): {
-  accountId: Buffer
+  accountId: Uint8Array
   tag: number | false
   test: boolean
 } {
@@ -98,10 +100,10 @@ function decodeXAddress(xAddress: string): {
   /* eslint-disable @typescript-eslint/naming-convention --
    * TODO 'test' should be something like 'isTest', do this later
    */
-  const test = isBufferForTestAddress(decoded)
+  const test = isUint8ArrayForTestAddress(decoded)
   /* eslint-enable @typescript-eslint/naming-convention */
   const accountId = decoded.slice(2, 22)
-  const tag = tagFromBuffer(decoded)
+  const tag = tagFromUint8Array(decoded)
   return {
     accountId,
     tag,
@@ -109,19 +111,19 @@ function decodeXAddress(xAddress: string): {
   }
 }
 
-function isBufferForTestAddress(buf: Buffer): boolean {
+function isUint8ArrayForTestAddress(buf: Uint8Array): boolean {
   const decodedPrefix = buf.slice(0, 2)
-  if (PREFIX_BYTES.main.equals(decodedPrefix)) {
+  if (equal(PREFIX_BYTES.main, decodedPrefix)) {
     return false
   }
-  if (PREFIX_BYTES.test.equals(decodedPrefix)) {
+  if (equal(PREFIX_BYTES.test, decodedPrefix)) {
     return true
   }
 
   throw new Error('Invalid X-address: bad prefix')
 }
 
-function tagFromBuffer(buf: Buffer): number | false {
+function tagFromUint8Array(buf: Uint8Array): number | false {
   const flag = buf[22]
   if (flag >= 2) {
     // No support for 64-bit tags at this time
@@ -134,7 +136,7 @@ function tagFromBuffer(buf: Buffer): number | false {
   if (flag !== 0) {
     throw new Error('flag must be zero to indicate no tag')
   }
-  if (!Buffer.from('0000000000000000', 'hex').equals(buf.slice(23, 23 + 8))) {
+  if (!equal(hexToBytes('0000000000000000'), buf.slice(23, 23 + 8))) {
     throw new Error('remaining bytes must be zero')
   }
   return false

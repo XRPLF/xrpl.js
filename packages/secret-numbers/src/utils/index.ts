@@ -1,7 +1,12 @@
-import { randomBytes } from '@xrplf/isomorphic/utils'
+import {
+  bytesToHex,
+  concat,
+  hexToBytes,
+  randomBytes,
+} from '@xrplf/isomorphic/utils'
 
-function randomEntropy(): Buffer {
-  return Buffer.from(randomBytes(16))
+function randomEntropy(): Uint8Array {
+  return randomBytes(16)
 }
 
 function calculateChecksum(position: number, value: number): number {
@@ -32,11 +37,11 @@ function checkChecksum(
   return (normalizedValue * (position * 2 + 1)) % 9 === normalizedChecksum
 }
 
-function entropyToSecret(entropy: Buffer): string[] {
+function entropyToSecret(entropy: Uint8Array): string[] {
   const len = new Array(Math.ceil(entropy.length / 2))
   const chunks = Array.from(len, (_a, chunk) => {
     const buffChunk = entropy.slice(chunk * 2, (chunk + 1) * 2)
-    const no = parseInt(buffChunk.toString('hex'), 16)
+    const no = parseInt(bytesToHex(buffChunk), 16)
     const fill = '0'.repeat(5 - String(no).length)
     return fill + String(no) + String(calculateChecksum(chunk, no))
   })
@@ -50,8 +55,8 @@ function randomSecret(): string[] {
   return entropyToSecret(randomEntropy())
 }
 
-function secretToEntropy(secret: string[]): Buffer {
-  return Buffer.concat(
+function secretToEntropy(secret: string[]): Uint8Array {
+  return concat(
     secret.map((chunk, i) => {
       const no = Number(chunk.slice(0, 5))
       const checksum = Number(chunk.slice(5))
@@ -62,7 +67,7 @@ function secretToEntropy(secret: string[]): Buffer {
         throw new Error('Invalid secret part: checksum invalid')
       }
       const hex = `0000${no.toString(16)}`.slice(-4)
-      return Buffer.from(hex, 'hex')
+      return hexToBytes(hex)
     }),
   )
 }

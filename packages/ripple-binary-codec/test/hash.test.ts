@@ -1,5 +1,4 @@
-const { coreTypes } = require('../src/types')
-const { Hash128, Hash160, Hash256, AccountID, Currency } = coreTypes
+import { Hash128, Hash160, Hash256, AccountID, Currency } from '../src/types'
 
 describe('Hash128', function () {
   it('has a static width member', function () {
@@ -110,8 +109,8 @@ describe('Currency', function () {
     ).toBe(null)
   })
 
-  it('can be constructed from a Buffer', function () {
-    const xrp = new Currency(Buffer.alloc(20))
+  it('can be constructed from a Uint8Array', function () {
+    const xrp = new Currency(new Uint8Array(20))
     expect(xrp.iso()).toBe('XRP')
   })
   it('Can handle non-standard currency codes', () => {
@@ -125,7 +124,9 @@ describe('Currency', function () {
   })
 
   it('throws on invalid reprs', function () {
-    expect(() => Currency.from(Buffer.alloc(19))).toThrow()
+    // @ts-expect-error -- invalid type check
+    expect(() => Currency.from(new Uint8Array(19))).toThrow()
+    // @ts-expect-error -- invalid type check
     expect(() => Currency.from(1)).toThrow()
     expect(() =>
       Currency.from('00000000000000000000000000000000000000m'),

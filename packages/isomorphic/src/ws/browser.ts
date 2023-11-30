@@ -9,7 +9,7 @@ declare class WebSocket {
   public onmessage?: (message: MessageEvent) => void
   public readyState: number
   public constructor(url: string)
-  public close(code?: number, reason?: Buffer): void
+  public close(code?: number, reason?: Uint8Array): void
   public send(message: string): void
 }
 

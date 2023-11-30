@@ -1,6 +1,7 @@
 /* eslint-disable max-lines -- Connection is a large file w/ lots of imports/exports */
 import type { Agent } from 'http'
 
+import { bytesToHex, hexToString } from '@xrplf/isomorphic/utils'
 import WebSocket, { ClientOptions } from '@xrplf/isomorphic/ws'
 import { EventEmitter } from 'eventemitter3'
 
@@ -68,10 +69,9 @@ function createWebSocket(
     options.headers = config.headers
   }
   if (config.authorization != null) {
-    const base64 = Buffer.from(config.authorization).toString('base64')
     options.headers = {
       ...options.headers,
-      Authorization: `Basic ${base64}`,
+      Authorization: `Basic ${btoa(config.authorization)}`,
     }
   }
   const websocketOptions = { ...options }
@@ -382,7 +382,7 @@ export class Connection extends EventEmitter {
       this.emit('error', 'websocket', error.message, error),
     )
     // Handle a closed connection: reconnect if it was unexpected
-    this.ws.once('close', (code?: number, reason?: Buffer) => {
+    this.ws.once('close', (code?: number, reason?: Uint8Array) => {
       if (this.ws == null) {
         throw new XrplError('onceClose: ws is null')
       }
@@ -390,7 +390,9 @@ export class Connection extends EventEmitter {
       this.clearHeartbeatInterval()
       this.requestManager.rejectAll(
         new DisconnectedError(
-          `websocket was closed, ${new TextDecoder('utf-8').decode(reason)}`,
+          `websocket was closed, ${
+            reason ? hexToString(bytesToHex(reason)) : ''
+          }`,
         ),
       )
       this.ws.removeAllListeners()

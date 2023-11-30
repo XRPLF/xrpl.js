@@ -1,3 +1,5 @@
+import { bytesToHex, hexToBytes, stringToHex } from '@xrplf/isomorphic/utils'
+
 import {
   codec,
   decodeAccountID,
@@ -11,12 +13,8 @@ import {
   isValidClassicAddress,
 } from '../src'
 
-function toHex(bytes: Buffer): string {
-  return Buffer.from(bytes).toString('hex').toUpperCase()
-}
-
-function toBytes(hex: string): Buffer {
-  return Buffer.from(hex, 'hex')
+function stringToBytes(str: string): Uint8Array {
+  return hexToBytes(stringToHex(str))
 }
 
 /**
@@ -29,18 +27,18 @@ function toBytes(hex: string): Buffer {
  */
 // eslint-disable-next-line max-params -- needs them
 function makeEncodeDecodeTest(
-  encoder: (val: Buffer) => string,
-  decoder: (val: string) => Buffer,
+  encoder: (val: Uint8Array) => string,
+  decoder: (val: string) => Uint8Array,
   base58: string,
   hex: string,
 ): void {
   it(`can translate between ${hex} and ${base58}`, function () {
-    const actual = encoder(toBytes(hex))
+    const actual = encoder(hexToBytes(hex))
     expect(actual).toBe(base58)
   })
   it(`can translate between ${base58} and ${hex})`, function () {
     const buf = decoder(base58)
-    expect(toHex(buf)).toBe(hex)
+    expect(bytesToHex(buf)).toBe(hex)
   })
 }
 
@@ -67,11 +65,11 @@ makeEncodeDecodeTest(
 
 it('can decode arbitrary seeds', function () {
   const decoded = decodeSeed('sEdTM1uX8pu2do5XvTnutH6HsouMaM2')
-  expect(toHex(decoded.bytes)).toBe('4C3A1D213FBDFB14C7C28D609469B341')
+  expect(bytesToHex(decoded.bytes)).toBe('4C3A1D213FBDFB14C7C28D609469B341')
   expect(decoded.type).toBe('ed25519')
 
   const decoded2 = decodeSeed('sn259rEFXrQrWyx3Q7XneWcwV6dfL')
-  expect(toHex(decoded2.bytes)).toBe('CF2DE378FBDD7E2EE87D486DFB5A7BFF')
+  expect(bytesToHex(decoded2.bytes)).toBe('CF2DE378FBDD7E2EE87D486DFB5A7BFF')
   expect(decoded2.type).toBe('secp256k1')
 })
 
@@ -79,7 +77,7 @@ it('can pass a type as second arg to encodeSeed', function () {
   const edSeed = 'sEdTM1uX8pu2do5XvTnutH6HsouMaM2'
   const decoded = decodeSeed(edSeed)
   const type = 'ed25519'
-  expect(toHex(decoded.bytes)).toBe('4C3A1D213FBDFB14C7C28D609469B341')
+  expect(bytesToHex(decoded.bytes)).toBe('4C3A1D213FBDFB14C7C28D609469B341')
   expect(decoded.type).toBe(type)
   expect(encodeSeed(decoded.bytes, type)).toBe(edSeed)
 })
@@ -105,7 +103,7 @@ it('isValidClassicAddress - empty', function () {
 describe('encodeSeed', function () {
   it('encodes a secp256k1 seed', function () {
     const result = encodeSeed(
-      Buffer.from('CF2DE378FBDD7E2EE87D486DFB5A7BFF', 'hex'),
+      hexToBytes('CF2DE378FBDD7E2EE87D486DFB5A7BFF'),
       'secp256k1',
     )
     expect(result).toBe('sn259rEFXrQrWyx3Q7XneWcwV6dfL')
@@ -113,7 +111,7 @@ describe('encodeSeed', function () {
 
   it('encodes low secp256k1 seed', function () {
     const result = encodeSeed(
-      Buffer.from('00000000000000000000000000000000', 'hex'),
+      hexToBytes('00000000000000000000000000000000'),
       'secp256k1',
     )
     expect(result).toBe('sp6JS7f14BuwFY8Mw6bTtLKWauoUs')
@@ -121,7 +119,7 @@ describe('encodeSeed', function () {
 
   it('encodes high secp256k1 seed', function () {
     const result = encodeSeed(
-      Buffer.from('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', 'hex'),
+      hexToBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'),
       'secp256k1',
     )
     expect(result).toBe('saGwBRReqUNKuWNLpUAq8i8NkXEPN')
@@ -129,7 +127,7 @@ describe('encodeSeed', function () {
 
   it('encodes an ed25519 seed', function () {
     const result = encodeSeed(
-      Buffer.from('4C3A1D213FBDFB14C7C28D609469B341', 'hex'),
+      hexToBytes('4C3A1D213FBDFB14C7C28D609469B341'),
       'ed25519',
     )
     expect(result).toBe('sEdTM1uX8pu2do5XvTnutH6HsouMaM2')
@@ -137,7 +135,7 @@ describe('encodeSeed', function () {
 
   it('encodes low ed25519 seed', function () {
     const result = encodeSeed(
-      Buffer.from('00000000000000000000000000000000', 'hex'),
+      hexToBytes('00000000000000000000000000000000'),
       'ed25519',
     )
     expect(result).toBe('sEdSJHS4oiAdz7w2X2ni1gFiqtbJHqE')
@@ -145,7 +143,7 @@ describe('encodeSeed', function () {
 
   it('encodes high ed25519 seed', function () {
     const result = encodeSeed(
-      Buffer.from('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', 'hex'),
+      hexToBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'),
       'ed25519',
     )
     expect(result).toBe('sEdV19BLfeQeKdEXyYA4NhjPJe6XBfG')
@@ -153,19 +151,13 @@ describe('encodeSeed', function () {
 
   it('attempting to encode a seed with less than 16 bytes of entropy throws', function () {
     expect(() => {
-      encodeSeed(
-        Buffer.from('CF2DE378FBDD7E2EE87D486DFB5A7B', 'hex'),
-        'secp256k1',
-      )
+      encodeSeed(hexToBytes('CF2DE378FBDD7E2EE87D486DFB5A7B'), 'secp256k1')
     }).toThrow(new Error('entropy must have length 16'))
   })
 
   it('attempting to encode a seed with more than 16 bytes of entropy throws', function () {
     expect(() => {
-      encodeSeed(
-        Buffer.from('CF2DE378FBDD7E2EE87D486DFB5A7BFFFF', 'hex'),
-        'secp256k1',
-      )
+      encodeSeed(hexToBytes('CF2DE378FBDD7E2EE87D486DFB5A7BFFFF'), 'secp256k1')
     }).toThrow(new Error('entropy must have length 16'))
   })
 })
@@ -173,13 +165,13 @@ describe('encodeSeed', function () {
 describe('decodeSeed', function () {
   it('can decode an Ed25519 seed', function () {
     const decoded = decodeSeed('sEdTM1uX8pu2do5XvTnutH6HsouMaM2')
-    expect(toHex(decoded.bytes)).toBe('4C3A1D213FBDFB14C7C28D609469B341')
+    expect(bytesToHex(decoded.bytes)).toBe('4C3A1D213FBDFB14C7C28D609469B341')
     expect(decoded.type).toBe('ed25519')
   })
 
   it('can decode a secp256k1 seed', function () {
     const decoded = decodeSeed('sn259rEFXrQrWyx3Q7XneWcwV6dfL')
-    expect(toHex(decoded.bytes)).toBe('CF2DE378FBDD7E2EE87D486DFB5A7BFF')
+    expect(bytesToHex(decoded.bytes)).toBe('CF2DE378FBDD7E2EE87D486DFB5A7BFF')
     expect(decoded.type).toBe('secp256k1')
   })
 })
@@ -187,17 +179,17 @@ describe('decodeSeed', function () {
 describe('encodeAccountID', function () {
   it('can encode an AccountID', function () {
     const encoded = encodeAccountID(
-      Buffer.from('BA8E78626EE42C41B46D46C3048DF3A1C3C87072', 'hex'),
+      hexToBytes('BA8E78626EE42C41B46D46C3048DF3A1C3C87072'),
     )
     expect(encoded).toBe('rJrRMgiRgrU6hDF4pgu5DXQdWyPbY35ErN')
   })
 
   it('unexpected length should throw', function () {
     expect(() => {
-      encodeAccountID(Buffer.from('ABCDEF', 'hex'))
+      encodeAccountID(hexToBytes('ABCDEF'))
     }).toThrow(
       new Error(
-        'unexpected_payload_length: bytes.length does not match expectedLength. Ensure that the bytes are a Buffer.',
+        'unexpected_payload_length: bytes.length does not match expectedLength. Ensure that the bytes are a Uint8Array.',
       ),
     )
   })
@@ -208,7 +200,7 @@ describe('decodeNodePublic', function () {
     const decoded = decodeNodePublic(
       'n9MXXueo837zYH36DvMc13BwHcqtfAWNJY5czWVbp7uYTj7x17TH',
     )
-    expect(toHex(decoded)).toBe(
+    expect(bytesToHex(decoded)).toBe(
       '0388E5BA87A000CB807240DF8C848EB0B5FFA5C8E5A521BC8E105C0F0A44217828',
     )
   })
@@ -216,7 +208,7 @@ describe('decodeNodePublic', function () {
 
 it('encodes 123456789 with version byte of 0', () => {
   expect(
-    codec.encode(Buffer.from('123456789'), {
+    codec.encode(stringToBytes('123456789'), {
       versions: [0],
       expectedLength: 9,
     }),
@@ -282,7 +274,7 @@ it('decode data', () => {
     }),
   ).toEqual({
     version: [0],
-    bytes: Buffer.from('123456789'),
+    bytes: stringToBytes('123456789'),
     type: null,
   })
 })
@@ -295,7 +287,7 @@ it('decode data with expected length', function () {
     }),
   ).toEqual({
     version: [0],
-    bytes: Buffer.from('123456789'),
+    bytes: stringToBytes('123456789'),
     type: null,
   })
 })

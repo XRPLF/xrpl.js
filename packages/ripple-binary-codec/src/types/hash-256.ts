@@ -5,9 +5,9 @@ import { Hash } from './hash'
  */
 class Hash256 extends Hash {
   static readonly width = 32
-  static readonly ZERO_256 = new Hash256(Buffer.alloc(Hash256.width))
+  static readonly ZERO_256 = new Hash256(new Uint8Array(Hash256.width))
 
-  constructor(bytes: Buffer) {
+  constructor(bytes: Uint8Array) {
     super(bytes ?? Hash256.ZERO_256.bytes)
   }
 }

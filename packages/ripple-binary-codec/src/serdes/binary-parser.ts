@@ -4,12 +4,13 @@ import {
   FieldInstance,
 } from '../enums'
 import { type SerializedType } from '../types/serialized-type'
+import { hexToBytes } from '@xrplf/isomorphic/utils'
 
 /**
  * BinaryParser is used to compute fields and values from a HexString
  */
 class BinaryParser {
-  private bytes: Buffer
+  private bytes: Uint8Array
   definitions: XrplDefinitionsBase
 
   /**
@@ -23,7 +24,7 @@ class BinaryParser {
     hexBytes: string,
     definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
   ) {
-    this.bytes = Buffer.from(hexBytes, 'hex')
+    this.bytes = hexToBytes(hexBytes)
     this.definitions = definitions
   }
 
@@ -57,7 +58,7 @@ class BinaryParser {
    * @param n The number of bytes to read
    * @return The bytes
    */
-  read(n: number): Buffer {
+  read(n: number): Uint8Array {
     if (n > this.bytes.byteLength) {
       throw new Error()
     }
@@ -106,7 +107,7 @@ class BinaryParser {
    *
    * @return The variable length bytes
    */
-  readVariableLength(): Buffer {
+  readVariableLength(): Uint8Array {
     return this.read(this.readVariableLengthLength())
   }
 

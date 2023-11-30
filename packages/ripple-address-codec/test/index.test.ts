@@ -1,3 +1,5 @@
+import { bytesToHex, hexToBytes } from '@xrplf/isomorphic/utils'
+
 import {
   classicAddressToXAddress,
   xAddressToClassicAddress,
@@ -199,10 +201,10 @@ const testCases: AddressTestCase[] = [
 
   {
     const highAndLowAccounts = [
-      Buffer.from('00'.repeat(20), 'hex'),
-      Buffer.from(`${'00'.repeat(19)}01`, 'hex'),
-      Buffer.from('01'.repeat(20), 'hex'),
-      Buffer.from('FF'.repeat(20), 'hex'),
+      hexToBytes('00'.repeat(20)),
+      hexToBytes(`${'00'.repeat(19)}01`),
+      hexToBytes('01'.repeat(20)),
+      hexToBytes('FF'.repeat(20)),
     ]
 
     highAndLowAccounts.forEach((accountId) => {
@@ -215,7 +217,7 @@ const testCases: AddressTestCase[] = [
       tagTestCases.forEach((testCase) => {
         const tag = testCase || false
         const xAddress = encodeXAddress(accountId, tag, isTestAddress)
-        it(`Encoding ${accountId.toString('hex')}${
+        it(`Encoding ${bytesToHex(accountId)}${
           tag ? `:${tag}` : ''
         } to ${xAddress} has expected length`, () => {
           expect(xAddress.length).toBe(47)
@@ -256,8 +258,8 @@ it(`Invalid X-address (64-bit tag) throws`, () => {
 
 it(`Invalid Account ID throws`, () => {
   expect(() => {
-    encodeXAddress(Buffer.from('00'.repeat(19), 'hex'), false, false)
-  }).toThrow(new Error('Account ID must be 20 bytes'))
+    encodeXAddress(hexToBytes('00'.repeat(19)), false, false)
+  }).toThrowError('Account ID must be 20 bytes')
 })
 
 it(`isValidXAddress returns false for invalid X-address`, () => {

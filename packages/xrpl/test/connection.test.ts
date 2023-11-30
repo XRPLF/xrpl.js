@@ -1,4 +1,3 @@
-/* eslint-disable max-len -- Some large lines necessary */
 /* eslint-disable max-statements -- test has a lot of statements */
 import net from 'net'
 
@@ -24,22 +23,6 @@ import {
   type XrplTestContext,
 } from './setupClient'
 import { assertRejects, ignoreWebSocketDisconnect } from './testUtils'
-
-type GlobalThis = typeof globalThis
-type Global = GlobalThis & {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Necessary for Jest in browser
-  TextEncoder: any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Necessary for Jest in browser
-  TextDecoder: any
-}
-declare const global: Global
-
-if (typeof TextDecoder === 'undefined') {
-  // eslint-disable-next-line node/global-require, @typescript-eslint/no-require-imports, node/prefer-global/text-encoder, global-require, @typescript-eslint/no-var-requires -- Needed for Jest
-  global.TextEncoder = require('util').TextEncoder
-  // eslint-disable-next-line node/global-require, @typescript-eslint/no-require-imports, node/prefer-global/text-decoder, global-require, @typescript-eslint/no-var-requires -- Needed for Jest
-  global.TextDecoder = require('util').TextDecoder
-}
 
 // how long before each test case times out
 const TIMEOUT = 20000

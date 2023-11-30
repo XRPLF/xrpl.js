@@ -9,6 +9,7 @@ import {
 } from './enums'
 import { XrplDefinitions } from './enums/xrpl-definitions'
 import { coreTypes } from './types'
+import { bytesToHex } from '@xrplf/isomorphic/utils'
 
 const {
   signingData,
@@ -44,9 +45,7 @@ function encode(json: object, definitions?: XrplDefinitionsBase): string {
   if (typeof json !== 'object') {
     throw new Error()
   }
-  return serializeObject(json as JsonObject, { definitions })
-    .toString('hex')
-    .toUpperCase()
+  return bytesToHex(serializeObject(json as JsonObject, { definitions }))
 }
 
 /**
@@ -64,11 +63,11 @@ function encodeForSigning(
   if (typeof json !== 'object') {
     throw new Error()
   }
-  return signingData(json as JsonObject, HashPrefix.transactionSig, {
-    definitions,
-  })
-    .toString('hex')
-    .toUpperCase()
+  return bytesToHex(
+    signingData(json as JsonObject, HashPrefix.transactionSig, {
+      definitions,
+    }),
+  )
 }
 
 /**
@@ -83,9 +82,7 @@ function encodeForSigningClaim(json: object): string {
   if (typeof json !== 'object') {
     throw new Error()
   }
-  return signingClaimData(json as ClaimObject)
-    .toString('hex')
-    .toUpperCase()
+  return bytesToHex(signingClaimData(json as ClaimObject))
 }
 
 /**
@@ -108,9 +105,9 @@ function encodeForMultisigning(
     throw new Error()
   }
   const definitionsOpt = definitions ? { definitions } : undefined
-  return multiSigningData(json as JsonObject, signer, definitionsOpt)
-    .toString('hex')
-    .toUpperCase()
+  return bytesToHex(
+    multiSigningData(json as JsonObject, signer, definitionsOpt),
+  )
 }
 
 /**
@@ -123,7 +120,7 @@ function encodeQuality(value: string): string {
   if (typeof value !== 'string') {
     throw new Error()
   }
-  return quality.encode(value).toString('hex').toUpperCase()
+  return bytesToHex(quality.encode(value))
 }
 
 /**
