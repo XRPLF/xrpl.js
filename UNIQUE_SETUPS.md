@@ -40,7 +40,6 @@ If you want to use `xrpl.js` with React Native you will need to install polyfill
 3. Create `polyfills.js` and add
 
 ```javascript
-if (typeof Buffer === 'undefined') global.Buffer = require('buffer').Buffer
 // Required for TextEncoder/TextDecoder
 import 'fast-text-encoding'
 // Required for `crypto.getRandomValues`
