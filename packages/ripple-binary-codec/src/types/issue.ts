@@ -5,6 +5,8 @@ import { Currency } from './currency'
 import { JsonObject, SerializedType } from './serialized-type'
 import { Buffer } from 'buffer/'
 
+import { nativeAsset } from '../nativeasset'
+
 /**
  * Interface for JSON objects that represent amounts
  */
@@ -66,7 +68,7 @@ class Issue extends SerializedType {
    */
   static fromParser(parser: BinaryParser): Issue {
     const currency = parser.read(20)
-    if (new Currency(currency).toJSON() === 'XRP') {
+    if (new Currency(currency).toJSON() === nativeAsset.get()) {
       return new Issue(currency)
     }
     const currencyAndIssuer = [currency, parser.read(20)]
@@ -81,7 +83,7 @@ class Issue extends SerializedType {
   toJSON(): IssueObject {
     const parser = new BinaryParser(this.toString())
     const currency = Currency.fromParser(parser) as Currency
-    if (currency.toJSON() === 'XRP') {
+    if (currency.toJSON() === nativeAsset.get()) {
       return { currency: currency.toJSON() }
     }
     const issuer = AccountID.fromParser(parser) as AccountID

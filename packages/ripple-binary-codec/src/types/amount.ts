@@ -15,7 +15,7 @@ const MIN_IOU_EXPONENT = -96
 const MAX_IOU_EXPONENT = 80
 const MAX_IOU_PRECISION = 16
 const MAX_DROPS = new Decimal('1e17')
-const MIN_XRP = new Decimal('1e-6')
+const MIN_NATIVE_ASSET = new Decimal('1e-6')
 const mask = bigInt(0x00000000ffffffff)
 
 /**
@@ -74,7 +74,7 @@ class Amount extends SerializedType {
 
     let amount = Buffer.alloc(8)
     if (typeof value === 'string') {
-      Amount.assertXrpIsValid(value)
+      Amount.assertNativeAssetIsValid(value)
 
       const number = bigInt(value)
 
@@ -135,8 +135,8 @@ class Amount extends SerializedType {
    * @returns An Amount object
    */
   static fromParser(parser: BinaryParser): Amount {
-    const isXRP = parser.peek() & 0x80
-    const numBytes = isXRP ? 48 : 8
+    const isNativeAsset = parser.peek() & 0x80
+    const numBytes = isNativeAsset ? 48 : 8
     return new Amount(parser.read(numBytes))
   }
 
@@ -186,19 +186,19 @@ class Amount extends SerializedType {
   }
 
   /**
-   * Validate XRP amount
+   * Validate Native Asset amount
    *
-   * @param amount String representing XRP amount
+   * @param amount String representing Native Asset amount
    * @returns void, but will throw if invalid amount
    */
-  private static assertXrpIsValid(amount: string): void {
+  private static assertNativeAssetIsValid(amount: string): void {
     if (amount.indexOf('.') !== -1) {
       throw new Error(`${amount.toString()} is an illegal amount`)
     }
 
     const decimal = new Decimal(amount)
     if (!decimal.isZero()) {
-      if (decimal.lt(MIN_XRP) || decimal.gt(MAX_DROPS)) {
+      if (decimal.lt(MIN_NATIVE_ASSET) || decimal.gt(MAX_DROPS)) {
         throw new Error(`${amount.toString()} is an illegal amount`)
       }
     }
@@ -244,9 +244,9 @@ class Amount extends SerializedType {
   }
 
   /**
-   * Test if this amount is in units of Native Currency(XRP)
+   * Test if this amount is in units of Native Currency(Native Asset)
    *
-   * @returns true if Native (XRP)
+   * @returns true if Native (Native Asset)
    */
   private isNative(): boolean {
     return (this.bytes[0] & 0x80) === 0
