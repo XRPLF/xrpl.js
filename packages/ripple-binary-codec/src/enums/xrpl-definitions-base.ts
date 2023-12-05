@@ -14,6 +14,8 @@ interface DefinitionsData {
   FIELDS: (string | FieldInfo)[][]
   TRANSACTION_RESULTS: Record<string, number>
   TRANSACTION_TYPES: Record<string, number>
+  native_currency_code?: string
+  hash?: string
 }
 
 /**
@@ -35,6 +37,10 @@ class XrplDefinitionsBase {
   transactionNames: string[]
   // Maps serializable types to their TypeScript class implementation
   dataTypes: Record<string, typeof SerializedType>
+  // Native asset code (native_currency_code)
+  nativeAsset?: string
+  // Hash for the Definitions, can be passed fetching again & suppress output if equal
+  hash?: string
 
   /**
    * Present rippled types in a typed and updatable format.
@@ -52,6 +58,8 @@ class XrplDefinitionsBase {
     types: Record<string, typeof SerializedType>,
   ) {
     this.type = new BytesLookup(enums.TYPES, TYPE_WIDTH)
+    this.nativeAsset = enums?.native_currency_code
+    this.hash = enums?.hash
     this.ledgerEntryType = new BytesLookup(
       enums.LEDGER_ENTRY_TYPES,
       LEDGER_ENTRY_WIDTH,
@@ -97,6 +105,17 @@ class XrplDefinitionsBase {
 
   public getAssociatedTypes(): Record<string, typeof SerializedType> {
     return this.dataTypes
+  }
+
+  public getNativeAsset(): string {
+    return this?.nativeAsset || 'XRP'
+  }
+
+  public getHash(): string | null {
+    return (
+      this?.hash ||
+      '0000000000000000000000000000000000000000000000000000000000000000'
+    )
   }
 }
 
