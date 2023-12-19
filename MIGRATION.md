@@ -6,7 +6,7 @@ There were five main goals for xrpl.js 3.0 package suite:
 
 - Remove polyfills as dependencies for non node.js projects
 - Reduce the bundle size for client side applications
-- Execute unit tests in a browser enviroment
+- Execute unit tests in a browser environment
 - Few breaking changes
 - Improve docs
 
@@ -121,9 +121,9 @@ Not a breaking change but there is now a much more descriptive error message whe
 
 For `vite` and `create-react-app` you can remove all xrpl.js polyfills/configurations this also includes the custom mappings for `ws` to `WsWrapper` and the exclusion of `https-proxy-agent`. These improves should extend to using the libraries with other bundlers or frameworks but has only been tested in those noted above.
 
-### React Native
+#### React Native
 
-Neither `react-native-crypto` nor `rn-nodeify` are required.  Instead `fast-text-encoding` and `react-native-get-random-values` are as well as a small polyfills file to wire them up. You can find the new guide at `TODO: Link to setup guide`
+Neither `react-native-crypto` nor `rn-nodeify` are required.  Instead `fast-text-encoding` and `react-native-get-random-values` are as well as a small polyfills file to wire them up. You can find the new guide at [UNIQUE_SETUPS.md](./UNIQUE_SETUPS.md).
 
 ### `xrpl-secret-numbers`
 
