@@ -13,7 +13,7 @@ At a high level:
 3. Increased reliability
 
 <aside>
-💡 Also, with 3.0, the (reference docs)[https://js.xrpl.org/] have received a massive update to include examples, more readable type information, and properly display documentation on functions which are part of the `Client` class.
+💡 Also, with 3.0, the [reference docs](https://js.xrpl.org/) have received a massive update to include examples, more readable type information, and properly display documentation on functions which are part of the `Client` class.
 </aside>
 
 ## 1. 60% size reduction
@@ -62,7 +62,7 @@ Here’s a high-level overview of the breaking changes.
 
 </aside>
 
-1. The largest change is that all instances of `Buffer` have been replaced by `Uint8Array` **[Link](#1-buffer-→-uint8array)**
+1. The largest change is that all instances of `Buffer` have been replaced by `Uint8Array` **[Link](#1-buffer-to-uint8array)**
 2. All “large number” types have been consolidated to either `bigint` or `BigNumber` **[Link](#2-large-number-handling)**
 3. Polyfill configuration changes **[Link](#3-polyfill-configuration-changes)**
 4. `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string` **[Link](#4-dropstoxrp-and-clientgetxrpbalance-now-return-a-number-instead-of-a-string)**
@@ -78,7 +78,7 @@ Here’s a high-level overview of the breaking changes.
 
 Without further ado, here’s the detailed changes and how to migrate:
 
-### 1. **Buffer** → **Uint8Array**
+### 1. `Buffer` to `Uint8Array`
 
 In most cases, `Uint8Array` can act as a drop-in replacement for `Buffer` data since `Buffer` is a subclass of `Uint8Array`. The main differences are that `Uint8Array` has fewer helper methods, and slightly different syntax for converting from other data types. This difference primarily affects methods whose return type is changed. (For functions whose parameters were changed to `Uint8Array`, `Buffer` should still be a valid parameter as it’s a subclass of `Uint8Array`)
 
@@ -146,7 +146,7 @@ Below is a list of every method affected. 
 
 - `rfc1751MnemonicToKey`
 
-### 2. **Large Number Handling**
+### 2. Large Number Handling
 
 `bn.js`, `decimal.js` and `big-integer` were removed as dependencies. They usages were replaced with `BigNumber` from `big-number.js` (was already a dependency) and the native javascript object `BigInt`.
 
@@ -231,7 +231,7 @@ If you use the pre bundled version of the library you will need to make the fo
 - Change any references to `dist/browerified.js` to `build/xrplf-secret-numbers-latest.js`.
 - Access any methods as properties of `xrplf_secret_numbers` instead of using browserify's loader.
 
-### 11. **Transaction` type**
+### 11. Transaction` type
 
 `Transaction` has been updated to include `PsuedoTransaction`s. To get the equivalent of the old `Transaction` type which only included transactions users could submit, please use `SubmittableTransaction`.
 
