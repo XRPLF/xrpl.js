@@ -62,7 +62,7 @@ Here’s a high-level overview of the breaking changes.
 
 </aside>
 
-1. The largest change is that all instances of `Buffer` have been replaced by `Uint8Array` **[Link](./Buffer** → **Uint8Array)**
+1. The largest change is that all instances of `Buffer` have been replaced by `Uint8Array` **[Link](./1. Buffer → Uint8Array)**
 2. All “large number” types have been consolidated to either `bigint` or `BigNumber` **[Link](./Large Number Handling)**
 3. Polyfill configuration changes **[Link](…)**
 4. `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string` **[Link](…)**
