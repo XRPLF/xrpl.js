@@ -62,19 +62,19 @@ Here’s a high-level overview of the breaking changes.
 
 </aside>
 
-1. The largest change is that all instances of `Buffer` have been replaced by `Uint8Array` **[Link](./1. Buffer → Uint8Array)**
-2. All “large number” types have been consolidated to either `bigint` or `BigNumber` **[Link](./Large Number Handling)**
-3. Polyfill configuration changes **[Link](…)**
-4. `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string` **[Link](…)**
-1. `xrpl-secret-numbers` has been moved into the mono-repo as `@xrplf/secret-numbers`  **[Link](…)**
-2. Support for Node 14 has been dropped **[Link](…)**
-3. Configuring proxies with the Client  **[Link](…)**
-4. Bug fix: Setting an explicit `algorithm` when generating a wallet works now **[Link](…)**
-5. `AssertionError` → `Error` **[Link](…)**
-6. Pre-bundle browser builds **[Link](…)**
-7. We’ve updated the `Transaction` type to include psuedotransactions ********[Link](…)********
-8. `authorizeChannel` was moved ****[Link](…)****
-9. Removed the deprecated `BroadcastClient` **[Link](…)**
+1. The largest change is that all instances of `Buffer` have been replaced by `Uint8Array` **[Link](#1-buffer-→-uint8array)**
+2. All “large number” types have been consolidated to either `bigint` or `BigNumber` **[Link](#2-large-number-handling)**
+3. Polyfill configuration changes **[Link](#3-polyfill-configuration-changes)**
+4. `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string` **[Link](#4-dropstoxrp-and-clientgetxrpbalance-now-return-a-number-instead-of-a-string)**
+5. `xrpl-secret-numbers` has been moved into the mono-repo as `@xrplf/secret-numbers`  **[Link](#5-xrpl-secret-numbers-has-been-moved-into-the-mono-repo-as-xrplfsecret-numbers)**
+6. Support for Node 14 has been dropped **[Link](#6-support-for-node-14-has-been-dropped)**
+7. Configuring proxies with the Client  **[Link](#7-configuring-proxies-with-the-client)**
+8. Bug fix: Setting an explicit `algorithm` when generating a wallet works now **[Link](#8-bug-fix-setting-an-explicit-algorithm-when-generating-a-wallet-works-now)**
+9. `AssertionError` → `Error` **[Link](#9-assertionerror-→-error)**
+10. Pre-bundle browser builds **[Link](#10-pre-bundle-browser-builds)**
+11. We’ve updated the `Transaction` type to include psuedotransactions **[Link](#11-transaction-type)**
+12. `authorizeChannel` was moved **[Link](#12-authorizechannel-was-moved)**
+13. Removed the deprecated `BroadcastClient` **[Link](#13-weve-removed-the-deprecated-broadcastclient)**
 
 Without further ado, here’s the detailed changes and how to migrate:
 
