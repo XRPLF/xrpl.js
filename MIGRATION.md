@@ -4,6 +4,11 @@ Xrpl.js 3.0 reduces bundle size by 60% and completely removes the need for polyf
 
 The primary breaking change is updating all `Buffer` types to `Uint8Array` since `Buffer` is not supported in the browser. `Buffer` objects can usually be directly replaced with `UInt8Array` as `Buffer` extends `Uint8Array`. The primary difference in functionality is that `Buffer` has additional helper functions. We've listed all functions affected by this change below in the `Uint8Array` section.
 
+This migration guide also applies to:
+`ripple-address-codec` 4.3.1 -> 5.0.0
+`ripple-binary-codec` 1.11.0 -> 2.0.0
+`ripple-keypairs` 1.3.1 -> 2.0.0
+
 # Why update to 3.0?
 
 At a high level:
