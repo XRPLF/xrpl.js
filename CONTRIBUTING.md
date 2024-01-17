@@ -90,7 +90,7 @@ This should be run from the `xrpl.js` top level folder (one above the `packages`
 ```bash
 npm run build
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/opt/ripple/etc/ --platform linux/amd64 rippleci/rippled:2.0.0-b3 /opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg
+docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/opt/ripple/etc/ --platform linux/amd64 rippleci/rippled:2.0.0-b4 /opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg
 npm run test:browser
 ```
 
@@ -128,7 +128,7 @@ For every file in `src`, we try to have a corresponding file in `test` with unit
 
 The goal is to maintain above 80% code coverage, and generally any new feature or bug fix should be accompanied by unit tests, and integration tests if applicable.
 
-For an example of a unit test, check out the [autofill tests here](./packages/xrpl/test/client/autofill.ts).
+For an example of a unit test, check out the [autofill tests here](./packages/xrpl/test/client/autofill.test.ts).
 
 If your code connects to the ledger (ex. Adding a new transaction type) it's handy to write integration tests to ensure that you can successfully interact with the ledger. Integration tests are generally run against a docker instance of rippled which contains the latest updates. Since standalone mode allows us to manually close ledgers, this allows us to run integration tests at a much faster rate than if we had to wait 4-5 seconds per transaction for the ledger to validate the transaction. [See above](#running-tests) for how to start up the docker container to run integration tests.
 
