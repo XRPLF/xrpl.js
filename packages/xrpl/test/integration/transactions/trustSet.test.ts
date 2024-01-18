@@ -1,6 +1,8 @@
 import { assert } from 'chai'
+import omit from 'lodash/omit'
 
 import { TrustSet, percentToQuality, Wallet } from '../../../src'
+import { AccountObjectsRequest } from '../../../src/models/methods/accountObjects'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -82,6 +84,73 @@ describe('TrustSet', function () {
       }
 
       await testTransaction(testContext.client, tx, testContext.wallet)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'verify the deletion of trust lines',
+    async () => {
+      assert(wallet2 != null)
+      const trustLineCreatetx: TrustSet = {
+        TransactionType: 'TrustSet',
+        Account: testContext.wallet.classicAddress,
+        LimitAmount: {
+          currency: 'USD',
+          issuer: wallet2.classicAddress,
+          value: '100',
+        },
+      }
+
+      await testTransaction(
+        testContext.client,
+        trustLineCreatetx,
+        testContext.wallet,
+      )
+
+      const trustLineDeletetx: TrustSet = {
+        TransactionType: 'TrustSet',
+        Account: testContext.wallet.classicAddress,
+        LimitAmount: {
+          currency: 'USD',
+          issuer: wallet2.classicAddress,
+          value: '0',
+        },
+      }
+
+      await testTransaction(
+        testContext.client,
+        trustLineDeletetx,
+        testContext.wallet,
+      )
+
+      // verify the contents of account objects
+      const request: AccountObjectsRequest = {
+        command: 'account_objects',
+        account: testContext.wallet.classicAddress,
+        ledger_index: 'validated',
+      }
+      const response = await testContext.client.request(request)
+      const expected = {
+        id: 0,
+        result: {
+          account: testContext.wallet.classicAddress,
+          account_objects: [],
+          validated: true,
+        },
+        type: 'response',
+      }
+
+      assert.lengthOf(
+        response.result.account_objects,
+        0,
+        'There must be no trust lines after the reset-to-default TrustSet operation\n',
+      )
+      assert.equal(response.type, expected.type)
+      assert.deepEqual(
+        omit(response.result, ['ledger_hash', 'ledger_index']),
+        expected.result,
+      )
     },
     TIMEOUT,
   )
