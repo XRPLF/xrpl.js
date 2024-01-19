@@ -1,8 +1,8 @@
 # Migration Guide
 
-Xrpl.js 3.0 reduces bundle size by 60% and completely removes the need for polyfills for browser applications. It does this with minimal breaking changes. It accomplished this by replacing node specific dependencies with ones which would work in the browser.
+In Xrpl.js 3.0, we've made significant improvements that result in a 60% reduction in bundle size for browser applications. We've also eliminated the need for polyfills with minimal disruption to existing code. This was achieved by replacing node-specific dependencies with ones that are compatible with browsers.
 
-The primary breaking change is updating all `Buffer` types to `Uint8Array` since `Buffer` is not supported in the browser. `Buffer` objects can usually be directly replaced with `UInt8Array` as `Buffer` extends `Uint8Array`. The primary difference in functionality is that `Buffer` has additional helper functions. We've listed all functions affected by this change below in the `Uint8Array` section.
+The main change you'll notice is the update replacing `Buffer` with `Uint8Array` across the board. This was done since browsers don't support `Buffer`. Fortunately, this transition is relatively straightforward, as `Buffer` is a subclass of `Uint8Array`, meaning in many circumstances `Buffer` can be directly replaced by `Uint8Array`. The primary difference is that `Buffer` has additional helper functions. We've listed the affected client library functions below in the `Uint8Array` section for your reference.
 
 This migration guide also applies to:
 `ripple-address-codec` 4.3.1 -> 5.0.0
