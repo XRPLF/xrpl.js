@@ -77,7 +77,7 @@ Here’s a high-level overview of the breaking changes.
 8. Bug fix: Setting an explicit `algorithm` when generating a wallet works now **[Link](#8-bug-fix-setting-an-explicit-algorithm-when-generating-a-wallet-works-now)**
 9. `AssertionError` → `Error` **[Link](#9-assertionerror-→-error)**
 10. Pre-bundle browser builds **[Link](#10-pre-bundle-browser-builds)**
-11. We’ve updated the `Transaction` type to include psuedotransactions **[Link](#11-transaction-type)**
+11. We’ve updated the `Transaction` type to include pseudotransactions **[Link](#11-transaction-type)**
 12. `authorizeChannel` was moved **[Link](#12-authorizechannel-was-moved)**
 13. Removed the deprecated `BroadcastClient` **[Link](#13-weve-removed-the-deprecated-broadcastclient)**
 
@@ -238,7 +238,7 @@ If you use the pre bundled version of the library you will need to make the fo
 
 ### 11. Transaction` type
 
-`Transaction` has been updated to include `PsuedoTransaction`s. To get the equivalent of the old `Transaction` type which only included transactions users could submit, please use `SubmittableTransaction`.
+`Transaction` has been updated to include `PseudoTransaction`s. To get the equivalent of the old `Transaction` type which only included transactions users could submit, please use `SubmittableTransaction`.
 
 This effectively changes the signature of the following methods:
 
