@@ -51,7 +51,7 @@ The easiest to replace were `assert` (which was replaced by simple conditions & 
 
 Lastly, the `buffer` polyfill turned out to be the trickiest to remove, resulting in the largest number of breaking changes. Since the `Buffer` object is not native to the browser all apis were migrated to the superclass of `Buffer` → `Uint8Arrays`. For a detailed write up of why we and many libraries are choosing to make this transition, check out this [blog post](https://sindresorhus.com/blog/goodbye-nodejs-buffer) by Sindre Sorhus.
 
-## 3. Increased Reliability
+## 3. Increased Reliability Through More Browser Testing
 
 With xrpl.js 3.0, we improved our test coverage in the browser. Specifically, we added browser unit testing to all packages in the monorepo other than the `xrpl` package. Note that the `xrpl` package has browser coverage through our integration tests.
 
