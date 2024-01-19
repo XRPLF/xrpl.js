@@ -43,7 +43,6 @@ For the cryptography libraries, we switched from using `elliptic`, `create-hash`
 
 <aside>
 💡 The `@noble` suite of packages includes `@noble/hashes`, `@noble/curves`, `@scure/bip32`, `@scure/bip39`, and `@scure/base`
-
 </aside>
 
 We eliminated the polyfills for `http`, `https`, and `url` by using the native `fetch` in the browser.
@@ -64,7 +63,6 @@ Here’s a high-level overview of the breaking changes.
 
 <aside>
 💡 Note that the vast majority of these changes are very small typing changes, which should have direct 1-line replacements.
-
 </aside>
 
 1. The largest change is that all instances of `Buffer` have been replaced by `Uint8Array` **[Link](#1-buffer-to-uint8array)**
