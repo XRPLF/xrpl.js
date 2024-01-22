@@ -1,6 +1,6 @@
 # Migration Guide
 
-In Xrpl.js 3.0, we've made significant improvements that result in a 60% reduction in bundle size for browser applications. We've also eliminated the need for polyfills with minimal disruption to existing code. This was achieved by replacing node-specific dependencies with ones that are compatible with browsers.
+In xrpl.js 3.0, we've made significant improvements that result in a 60% reduction in bundle size for browser applications. We've also eliminated the need for polyfills with minimal disruption to existing code. This was achieved by replacing node-specific dependencies with ones that are compatible with browsers.
 
 The main change you'll notice is the update replacing `Buffer` with `Uint8Array` across the board. This was done since browsers don't support `Buffer`. Fortunately, this transition is relatively straightforward, as `Buffer` is a subclass of `Uint8Array`, meaning in many circumstances `Buffer` can be directly replaced by `Uint8Array`. The primary difference is that `Buffer` has additional helper functions. We've listed the affected client library functions below in the `Uint8Array` section for your reference.
 
@@ -23,7 +23,7 @@ At a high level:
 
 ## 1. 60% size reduction
 
-Through simplifying 3rd party dependencies, xrpl.js is now a much ligher-weight library.
+Through simplifying 3rd party dependencies, xrpl.js is now a much lighter-weight library.
 
 One major source of the project’s large bundle size was polyfills, code that replicated Node specific features in the browser. Instead, we shifted to using 3rd party packages which worked in both Node and the browser by default.
 
@@ -37,7 +37,7 @@ After, we used `@noble` to replace `elliptic` to have just one version of `bn.js
 
 ## 2. No more polyfills required (simplified install)
 
-Polyfills made it hard to setup xrpl.js in the browser as they required custom bundler configs. By using dependencies and browser-native features, xrpl.js can now work just by installing from `npm` in most cases.
+Polyfills made it hard to setup xrpl.js in the browser as they required custom bundler configs. By using dependencies and browser-native features, xrpl.js can now work just by installing from `npm` in most cases other than react-native.
 
 For the cryptography libraries, we switched from using `elliptic`, `create-hash`, and other crypto polyfills to using the `@noble` suite of packages. For situations where node-specific crypto functions performed better, we created `@xrplf/isomorphic` to dynamically choose which implementation to use depending on the runtime environment.
 
@@ -49,13 +49,13 @@ We eliminated the polyfills for `http`, `https`, and `url` by using the native `
 
 The easiest to replace were `assert` (which was replaced by simple conditions & exceptions) and `utils` (which used `JSON.stringify` instead of `inspect`).
 
-Lastly, the `buffer` polyfill turned out to be the trickiest to remove, resulting in the largest number of breaking changes. Since the `Buffer` object is not native to the browser all apis were migrated to the superclass of `Buffer` → `Uint8Arrays`. For a detailed write up of why we and many libraries are choosing to make this transition, check out this [blog post](https://sindresorhus.com/blog/goodbye-nodejs-buffer) by Sindre Sorhus.
+Lastly, the `buffer` polyfill turned out to be the trickiest to remove, resulting in the largest number of breaking changes. Since the `Buffer` object is not native to the browser all apis were migrated to the superclass of `Buffer` → `Uint8Array`s. For a detailed write up of why we and many libraries are choosing to make this transition, check out this [blog post](https://sindresorhus.com/blog/goodbye-nodejs-buffer) by Sindre Sorhus.
 
 ## 3. Increased Reliability Through More Browser Testing
 
 With xrpl.js 3.0, we improved our test coverage in the browser. Specifically, we added browser unit testing to all packages in the monorepo other than the `xrpl` package. Note that the `xrpl` package has browser coverage through our integration tests.
 
-We achieved this by adding a `karma` config to every project that uses webpack to bundle each lib, then run the tests in Chrome. Hopefully soon we’ll also be able to add support for the `xrpl` package to run it’s unit tests in Chrome as part of our CI process.
+To implement this enhancement, we included a karma configuration in every project utilizing webpack to bundle each library. This allowed us to execute tests in Chrome. We are actively working towards extending this support to include running unit tests for the xrpl package in Chrome as an integral part of our continuous integration (CI) process in the near future.
 
 # Breaking Changes Detailed Migration Guide
 
