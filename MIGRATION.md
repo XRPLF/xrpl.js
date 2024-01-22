@@ -23,17 +23,15 @@ At a high level:
 
 ## 1. 60% size reduction
 
-Through simplifying 3rd party dependencies, xrpl.js is now a much lighter-weight library.
+Through simplifying 3rd party dependencies, we were able to reduce the size of xrpl.js by 60%.
 
-One major source of the project’s large bundle size was polyfills, code that replicated Node specific features in the browser. Instead, we shifted to using 3rd party packages which worked in both Node and the browser by default.
+A major contributor to the project's large bundle size was the use of polyfills, which replicated Node-specific features in the browser. To address this, we transitioned to using 3rd party packages that inherently supported both Node and browser environments.
 
-A simple fix was removing `lodash` by using es6 array methods and porting over simple helper utilities.
+Another simple fix was removing `lodash` by using es6 array methods and porting over simple helper utilities.
 
-The last main source of the reduction was simplifying the 5 large number libraries down to one.
+Another substantial reduction came from simplifying five large number libraries xrpl.js depended on down to just one. Previously, we relied on `decimal.js`, `big-integer`, `bignumber.js`, and two versions of `bn.js` due to elliptic's transitive dependency tree.
 
-Before, we had `decimal.js`, `bit-integer`, `bitnumber.js`, and two versions of `bn.js` due to `elliptic`'s transitive dependency tree.
-
-After, we used `@noble` to replace `elliptic` to have just one version of `bn.js`, and normalized our library to just use `bignumber.js` across the board.
+We were able to streamline this by adopting `@noble` to replace `elliptic`, resulting in the use of just one version of `bn.js`. Within our library we also switched to using `bignumber.js` consistently across the board.
 
 ## 2. No more polyfills required (simplified install)
 
