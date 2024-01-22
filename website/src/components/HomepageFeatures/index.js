@@ -4,8 +4,8 @@ import styles from "./styles.module.css";
 
 const FeatureList = [
   {
-    title: "keys & testing",
-    Svg: require("@site/static/img/undraw_docusaurus_mountain.svg").default,
+    title: "Keys & Testing",
+    Svg: require("@site/static/img/keys_and_testing.svg").default,
     description: (
       <>
         Managing keys & creating test credentials (<code>Wallet</code>&&
@@ -15,7 +15,7 @@ const FeatureList = [
   },
   {
     title: "Transaction Submission",
-    Svg: require("@site/static/img/undraw_docusaurus_tree.svg").default,
+    Svg: require("@site/static/img/transaction_submission.svg").default,
     description: (
       <>
         Submitting transactions to the XRPL (<code> Client.submit(...)</code> &{" "}
@@ -25,7 +25,7 @@ const FeatureList = [
   },
   {
     title: "Subscription to Ledger Changes",
-    Svg: require("@site/static/img/undraw_docusaurus_react.svg").default,
+    Svg: require("@site/static/img/subscription_to_ledger.svg").default,
     description: (
       <>
         Parsing ledger data into more convenient formats (

@@ -7,7 +7,7 @@ const path = require("path");
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "xrpl.js documentation",
+  title: "xrpl.js Documentation",
   tagline:
     "This is the recommended library for integrating a JavaScript/TypeScript app with the XRP Ledger, especially if you intend to use advanced functionality such as IOUs, payment paths, the decentralized exchange, account settings, payment channels, escrows, multi-signing, and more.",
   // Set the production url of your site here

@@ -15,6 +15,7 @@
   --ifm-color-primary-lightest: #a02aff;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-code-background: #0A2E1B;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -28,6 +29,70 @@
   --ifm-color-primary-lightest: #bb8bff;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
 .button{
   margin-left: 10px;
+}
+
+.hero--primary {
+  --ifm-hero-background-color: #232325;
+}
+
+.hero__title {
+  color: #FFFFFF;
+  font-size: 3.5rem;
+  font-family: 'Work Sans';
+}
+
+.hero__subtitle {
+  color: #FFFFFF;
+  display: inline-flex;
+  font-size: 1.125rem;
+  gap: 2rem;
+  font-family: 'Work Sans';
+  width: 54rem;
+}
+
+
+.button.button--secondary {
+  color: #FFFFFF;
+  background: #7919FF;
+  border: none;
+  font-family: 'Work Sans';
+  font-size: 1rem;
+}
+
+.button--lg {
+  --ifm-button-size-multiplier: 1;
+}
+
+
+.featureSvg_src-components-HomepageFeatures-styles-module{
+  height: 2.5rem!important;
+  width: 2.5rem!important;
+}
+
+code {
+  --ifm-code-background:#0A2E1B;
+  color: #5BEB9D;
+  font-family: 'Work Sans';
+}
+
+h3{
+  --ifm-h3-font-size: 1.3rem;
+  font-family: 'Work Sans';
+  font-weight: 700;
+}
+
+p {
+  font-size: 0.875rem;
+}
+
+.features_src-components-HomepageFeatures-styles-module{
+  padding: 10rem 0 !important;
+  background:#111112;
+}
+
+.footer--dark {
+  --ifm-footer-background-color: #232325;
 }
