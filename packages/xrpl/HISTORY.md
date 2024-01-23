@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Fixed
+* Fix `AMM` ledger object's `LPTokenBalance` type to `IssuedCurrencyAmount`.
+
 ## 2.14.0 (2023-11-30)
 
 ### Added
