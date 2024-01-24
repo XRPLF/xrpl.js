@@ -274,7 +274,7 @@ async function setNextValidSequenceNumber(
 }
 
 async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
-  const response = await client.request({ command: 'server_state' })
+  const response = await client.request({ command: 'server_state', ledger_index: 'current' })
   const fee = response.result.state.validated_ledger?.reserve_inc
 
   if (fee == null) {
