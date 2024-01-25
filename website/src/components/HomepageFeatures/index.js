@@ -5,7 +5,8 @@ import styles from "./styles.module.css";
 const FeatureList = [
   {
     title: "Keys & Testing",
-    Svg: require("@site/static/img/keys_and_testing.svg").default,
+    img: "/img/keys_and_testing.svg",
+    className: "keys_and_testing",
     description: (
       <>
         Managing keys & creating test credentials (<code>Wallet</code>&&
@@ -15,7 +16,8 @@ const FeatureList = [
   },
   {
     title: "Transaction Submission",
-    Svg: require("@site/static/img/transaction_submission.svg").default,
+    img: "/img/transaction_submission.svg",
+    className: "transaction_submission",
     description: (
       <>
         Submitting transactions to the XRPL (<code> Client.submit(...)</code> &{" "}
@@ -25,7 +27,8 @@ const FeatureList = [
   },
   {
     title: "Subscription to Ledger Changes",
-    Svg: require("@site/static/img/subscription_to_ledger.svg").default,
+    img: "/img/subscription_to_ledger.svg",
+    className: "subscription_to_ledger",
     description: (
       <>
         Parsing ledger data into more convenient formats (
@@ -35,11 +38,11 @@ const FeatureList = [
   },
 ];
 
-function Feature({ Svg, title, description }) {
+function Feature({ title, img, className, description }) {
   return (
     <div className={clsx("col col--4")}>
       <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
+        <img src={img} className={className} />
       </div>
       <div className="text--center padding-horiz--md">
         <h3>{title}</h3>

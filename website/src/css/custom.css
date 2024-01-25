@@ -167,3 +167,17 @@ p {
 .navbar__link svg {
   display: none;
 }
+
+
+[data-theme="light"] .transaction_submission {
+  content:url("/img/transaction_submission_light.svg");
+}
+
+
+[data-theme="light"] .keys_and_testing {
+  content:url("/img/keys_and_testing_light.svg");
+}
+
+[data-theme="light"] .subscription_to_ledger {
+  content:url("/img/subscription_to_ledger_light.svg");
+}
