@@ -181,3 +181,12 @@ p {
 [data-theme="light"] .subscription_to_ledger {
   content:url("/img/subscription_to_ledger_light.svg");
 }
+
+
+.text--center {
+  text-align: left;
+}
+
+.text--center img{
+    padding-left: 0.8rem;
+}
