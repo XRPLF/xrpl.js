@@ -77,7 +77,7 @@ Here’s a high-level overview of the breaking changes.
 1. The largest change is that all instances of `Buffer` have been replaced by `Uint8Array` **[Link](#1-buffer-to-uint8array)**
 2. All “large number” types have been consolidated to either `bigint` or `BigNumber` **[Link](#2-large-number-handling)**
 3. Polyfill configuration changes **[Link](#3-polyfill-configuration-changes)**
-4. `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string` **[Link](#4-dropstoxrp-and-clientgetxrpbalance-now-return-a-number-instead-of-a-string)**
+4. `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string` (`xrpToDrops` is UNCHANGED) **[Link](#4-dropstoxrp-and-clientgetxrpbalance-now-return-a-number-instead-of-a-string)**
 5. `xrpl-secret-numbers` has been moved into the mono-repo as `@xrplf/secret-numbers`  **[Link](#5-xrpl-secret-numbers-has-been-moved-into-the-mono-repo-as-xrplfsecret-numbers)**
 6. Support for Node 14 has been dropped **[Link](#6-support-for-node-14-has-been-dropped)**
 7. Configuring proxies with the Client  **[Link](#7-configuring-proxies-with-the-client)**
@@ -177,9 +177,11 @@ For `vite` and `create-react-app` you can remove all xrpl.js polyfills/confi
 
 Please follow the updated guide at UNIQUE_SETUPS.md (Many polyfills are no longer required, but not all are eliminated for this environment).
 
-### 4. `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string`
+### 4. `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string` (`xrpToDrops` is UNCHANGED)
 
 This should make it easier to work with the numbers. Because the max size of XRP is 100 billion, we can use a `number` instead of a larger type like `bigint` (which is normally needed when working with issued tokens on the XRPL).
+
+Please note that `xrpToDrops`, which was commonly used to set the amount of XRP that is in a transaction is UNCHANGED as an `Amount` type in a `Transaction` needs a `string` input.
 
 ### 5. `xrpl-secret-numbers` has been moved into the mono-repo as `@xrplf/secret-numbers`
 
