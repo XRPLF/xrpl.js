@@ -49,6 +49,18 @@ The easiest to replace were `assert` (which was replaced by simple conditions & 
 
 Lastly, the `buffer` polyfill turned out to be the trickiest to remove, resulting in the largest number of breaking changes. Since the `Buffer` object is not native to the browser all apis were migrated to the superclass of `Buffer` → `Uint8Array`s. For a detailed write up of why we and many libraries are choosing to make this transition, check out this [blog post](https://sindresorhus.com/blog/goodbye-nodejs-buffer) by Sindre Sorhus.
 
+List of all replaced polyfills that can potentially be removed from your webpack.config.js / vite.config.js / other bundling config files as they are no longer needed in xrpl.js. **Note that you may still need these for other libraries you depend on / code you have written.**
+ - `assert`
+ - `buffer`
+ - `crypto`
+ - `events`
+ - `http`
+ - `https`
+ - `os`
+ - `stream`
+ - `url`
+ - `ws`
+
 ## 3. Increased Reliability Through More Browser Testing
 
 With xrpl.js 3.0, we improved our test coverage in the browser. Specifically, we added browser unit testing to all packages in the monorepo other than the `xrpl` package. Note that the `xrpl` package has browser coverage through our integration tests.
@@ -66,7 +78,7 @@ Here’s a high-level overview of the breaking changes.
 1. The largest change is that all instances of `Buffer` have been replaced by `Uint8Array` **[Link](#1-buffer-to-uint8array)**
 2. All “large number” types have been consolidated to either `bigint` or `BigNumber` **[Link](#2-large-number-handling)**
 3. Polyfill configuration changes **[Link](#3-polyfill-configuration-changes)**
-4. `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string` **[Link](#4-dropstoxrp-and-clientgetxrpbalance-now-return-a-number-instead-of-a-string)**
+4. `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string` (`xrpToDrops` is UNCHANGED) **[Link](#4-dropstoxrp-and-clientgetxrpbalance-now-return-a-number-instead-of-a-string)**
 5. `xrpl-secret-numbers` has been moved into the mono-repo as `@xrplf/secret-numbers`  **[Link](#5-xrpl-secret-numbers-has-been-moved-into-the-mono-repo-as-xrplfsecret-numbers)**
 6. Support for Node 14 has been dropped **[Link](#6-support-for-node-14-has-been-dropped)**
 7. Configuring proxies with the Client  **[Link](#7-configuring-proxies-with-the-client)**
@@ -166,9 +178,11 @@ For `vite` and `create-react-app` you can remove all xrpl.js polyfills/confi
 
 Please follow the updated guide at UNIQUE_SETUPS.md (Many polyfills are no longer required, but not all are eliminated for this environment).
 
-### 4. `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string`
+### 4. `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string` (`xrpToDrops` is UNCHANGED)
 
 This should make it easier to work with the numbers. Because the max size of XRP is 100 billion, we can use a `number` instead of a larger type like `bigint` (which is normally needed when working with issued tokens on the XRPL).
+
+Please note that `xrpToDrops`, which was commonly used to set the amount of XRP that is in a transaction is UNCHANGED as an `Amount` type in a `Transaction` needs a `string` input.
 
 ### 5. `xrpl-secret-numbers` has been moved into the mono-repo as `@xrplf/secret-numbers`
 
