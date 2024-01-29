@@ -49,10 +49,11 @@ The easiest to replace were `assert` (which was replaced by simple conditions & 
 
 Lastly, the `buffer` polyfill turned out to be the trickiest to remove, resulting in the largest number of breaking changes. Since the `Buffer` object is not native to the browser all apis were migrated to the superclass of `Buffer` → `Uint8Array`s. For a detailed write up of why we and many libraries are choosing to make this transition, check out this [blog post](https://sindresorhus.com/blog/goodbye-nodejs-buffer) by Sindre Sorhus.
 
-List of all replaced polyfills that can be removed from your webpack.config.js / vite.config.js / other bundling config files:
+List of all replaced polyfills that can potentially be removed from your webpack.config.js / vite.config.js / other bundling config files as they are no longer needed in xrpl.js. **Note that you may still need these for other libraries you depend on / code you have written.**
  - `assert`
  - `buffer`
  - `crypto`
+ - `events`
  - `http`
  - `https`
  - `os`
