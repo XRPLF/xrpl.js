@@ -148,7 +148,7 @@ export interface AccountInfoResponse extends BaseResponse {
      * at most one SignerList, this array must have exactly one member if it is
      * present.
      */
-    account_data: AccountRoot & { signer_lists?: SignerList[] }
+    account_data: AccountRoot
 
     /**
      * A map of account flags parsed out.  This will only be available for rippled nodes 1.11.0 and higher.
@@ -173,6 +173,14 @@ export interface AccountInfoResponse extends BaseResponse {
      * queuing mechanism.
      */
     queue_data?: AccountQueueData
+    /**
+     * Array of SignerList ledger objects associated with this account for Multi-Signing.
+     * Since an account can own at most one SignerList, this array must have exactly one
+     * member if it is present.
+     * Quirk: In API version 1, this field is nested under account_data. For this method,
+     * Clio implements the API version 2 behavior where is field is not nested under account_data.
+     */
+    signer_lists?: SignerList[]
     /**
      * True if this data is from a validated ledger version; if omitted or set
      * to false, this data is not final.
