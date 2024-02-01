@@ -1,6 +1,6 @@
 {
   "name": "@xrplf/isomorphic",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0",
   "description": "A collection of isomorphic and tree-shakeable crypto hashes and utils for xrpl.js",
   "keywords": [
     "crypto",
