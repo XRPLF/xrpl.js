@@ -1,6 +1,6 @@
 {
   "name": "ripple-keypairs",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0",
   "description": "Cryptographic key pairs for the XRP Ledger",
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
@@ -20,8 +20,8 @@
   },
   "dependencies": {
     "@noble/curves": "^1.0.0",
-    "@xrplf/isomorphic": "^1.0.0-beta.1",
-    "ripple-address-codec": "^5.0.0-beta.1"
+    "@xrplf/isomorphic": "^1.0.0",
+    "ripple-address-codec": "^5.0.0"
   },
   "keywords": [
     "ripple",

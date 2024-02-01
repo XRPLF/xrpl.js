@@ -1,6 +1,6 @@
 {
   "name": "ripple-address-codec",
-  "version": "5.0.0-beta.1",
+  "version": "5.0.0",
   "description": "encodes/decodes base58 encoded XRP Ledger identifiers",
   "files": [
     "dist/*",
@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@scure/base": "^1.1.3",
-    "@xrplf/isomorphic": "^1.0.0-beta.1"
+    "@xrplf/isomorphic": "^1.0.0"
   },
   "keywords": [
     "ripple",
