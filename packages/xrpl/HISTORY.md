@@ -5,7 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Added
-* For rippled v2, in `AccountInfo` response, move `signer_lists` out from `account_data` and put it on the same root level.
+* For rippled v2 migration, in `AccountInfo` response, move `signer_lists` out from `account_data` and put it on the same root level.
 
 ## 3.0.0 Beta 1 (2023-11-30)
 
