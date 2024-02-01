@@ -1,7 +1,8 @@
 import { Hash160 } from './hash-160'
 import { Buffer } from 'buffer/'
+import { nativeAsset } from '../nativeasset'
 
-const XRP_HEX_REGEX = /^0{40}$/
+const NATIVE_ASSET_HEX_REGEX = /^0{40}$/
 const ISO_REGEX = /^[A-Z0-9a-z?!@#$%^&*(){}[\]|]{3}$/
 const HEX_REGEX = /^[A-F0-9]{40}$/
 // eslint-disable-next-line no-control-regex
@@ -12,7 +13,7 @@ const STANDARD_FORMAT_HEX_REGEX = /^0{24}[\x00-\x7F]{6}0{10}$/
  */
 function isoToBytes(iso: string): Buffer {
   const bytes = Buffer.alloc(20)
-  if (iso !== 'XRP') {
+  if (iso !== nativeAsset.get()) {
     const isoBytes = iso.split('').map((c) => c.charCodeAt(0))
     bytes.set(isoBytes, 12)
   }
@@ -28,7 +29,7 @@ function isIsoCode(iso: string): boolean {
 
 function isoCodeFromHex(code: Buffer): string | null {
   const iso = code.toString()
-  if (iso === 'XRP') {
+  if (iso === nativeAsset.get()) {
     return null
   }
   if (isIsoCode(iso)) {
@@ -81,15 +82,15 @@ function bytesFromRepresentation(input: string): Buffer {
  * Class defining how to encode and decode Currencies
  */
 class Currency extends Hash160 {
-  static readonly XRP = new Currency(Buffer.alloc(20))
+  static readonly NATIVE_ASSET = new Currency(Buffer.alloc(20))
   private readonly _iso: string | null
 
   constructor(byteBuf: Buffer) {
-    super(byteBuf ?? Currency.XRP.bytes)
+    super(byteBuf ?? Currency.NATIVE_ASSET.bytes)
     const hex = this.bytes.toString('hex')
 
-    if (XRP_HEX_REGEX.test(hex)) {
-      this._iso = 'XRP'
+    if (NATIVE_ASSET_HEX_REGEX.test(hex)) {
+      this._iso = nativeAsset.get()
     } else if (STANDARD_FORMAT_HEX_REGEX.test(hex)) {
       this._iso = isoCodeFromHex(this.bytes.slice(12, 15))
     } else {
