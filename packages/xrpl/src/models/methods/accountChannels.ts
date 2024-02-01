@@ -1,18 +1,111 @@
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
+/**
+ * Represents a payment channel.
+ */
 export interface Channel {
-  account: string
-  amount: string
-  balance: string
-  channel_id: string
-  destination_account: string
-  settle_delay: number
-  public_key?: string
-  public_key_hex?: string
-  expiration?: number
-  cancel_after?: number
-  source_tab?: number
-  destination_tag?: number
+  // Required Fields
+  /**
+   * The source address that owns this payment channel.
+   * This comes from the sending address of the transaction that created the channel.
+   */
+  Account: string
+
+  /**
+   * Total XRP, in drops, that has been allocated to this channel.
+   * This includes XRP that has been paid to the destination address.
+   * This is initially set by the transaction that created the channel
+   * and can be increased if the source address sends a PaymentChannelFund transaction.
+   */
+  Amount: string
+
+  /**
+   * Total XRP, in drops, already paid out by the channel.
+   * The difference between this value and the Amount field is how much XRP
+   * can still be paid to the destination address with PaymentChannelClaim transactions.
+   * If the channel closes, the remaining difference is returned to the source address.
+   */
+  Balance: string
+
+  /**
+   * The destination address for this payment channel.
+   * While the payment channel is open, this address is the only one that can receive XRP from the channel.
+   * This comes from the Destination field of the transaction that created the channel.
+   */
+  Destination: string
+
+  /**
+   * The value 0x0078, mapped to the string PayChannel,
+   * indicates that this is a payment channel entry.
+   */
+  LedgerEntryType: string
+
+  /**
+   * A hint indicating which page of the source address's owner directory links to this entry,
+   * in case the directory consists of multiple pages.
+   */
+  OwnerNode: string
+
+  /**
+   * The identifying hash of the transaction that most recently modified this entry.
+   */
+  PreviousTxnID: string
+
+  /**
+   * The index of the ledger that contains the transaction that most recently modified this entry.
+   */
+  PreviousTxnLgrSeq: number
+
+  /**
+   * Public key, in hexadecimal, of the key pair that can be used to sign claims against this channel.
+   * This can be any valid secp256k1 or Ed25519 public key.
+   * This is set by the transaction that created the channel and must match the public key used in claims against the channel.
+   * The channel source address can also send XRP from this channel to the destination without signed claims.
+   */
+  PublicKey: string
+
+  /**
+   * Number of seconds the source address must wait to close the channel if it still has any XRP in it.
+   * Smaller values mean that the destination address has less time to redeem any outstanding claims
+   * after the source address requests to close the channel.
+   * Can be any value that fits in a 32-bit unsigned integer (0 to 2^32-1).
+   * This is set by the transaction that creates the channel.
+   */
+  SettleDelay: number
+
+  // Optional Fields
+  /**
+   * The immutable expiration time for this payment channel, in seconds since the Ripple Epoch.
+   * This channel is expired if this value is present and smaller than the previous ledger's close_time field.
+   * This is optionally set by the transaction that created the channel and cannot be changed.
+   */
+  CancelAfter?: number
+
+  /**
+   * An arbitrary tag to further specify the destination for this payment channel,
+   * such as a hosted recipient at the destination address.
+   */
+  DestinationTag?: number
+
+  /**
+   * A hint indicating which page of the destination's owner directory links to this entry,
+   * in case the directory consists of multiple pages.
+   * Omitted on payment channels created before enabling the fixPayChanRecipientOwnerDir amendment.
+   */
+  DestinationNode?: string
+
+  /**
+   * The mutable expiration time for this payment channel, in seconds since the Ripple Epoch.
+   * The channel is expired if this value is present and smaller than the previous ledger's close_time field.
+   * See Channel Expiration for more details.
+   */
+  Expiration?: number
+
+  /**
+   * An arbitrary tag to further specify the source for this payment channel,
+   * such as a hosted recipient at the owner's address.
+   */
+  SourceTag?: number
 }
 
 /**

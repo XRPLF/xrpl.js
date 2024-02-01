@@ -33,8 +33,13 @@ interface ConnectionOptions {
   key?: string
   passphrase?: string
   certificate?: string
-  // request timeout
+  /**
+   * Milliseconds to wait to timeout requests and how long to wait between heartbeat connection checks.
+   */
   timeout: number
+  /**
+   * Milliseconds until Client.connect() will timeout in case the connection hangs.
+   */
   connectionTimeout: number
   headers?: { [key: string]: string }
 }
