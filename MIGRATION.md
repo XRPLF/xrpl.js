@@ -5,9 +5,10 @@ In xrpl.js 3.0, we've made significant improvements that result in a 60% reducti
 The main change you'll notice is the update replacing `Buffer` with `Uint8Array` across the board. This was done since browsers don't support `Buffer`. Fortunately, this transition is relatively straightforward, as `Buffer` is a subclass of `Uint8Array`, meaning in many circumstances `Buffer` can be directly replaced by `Uint8Array`. The primary difference is that `Buffer` has additional helper functions. We've listed the affected client library functions below in the `Uint8Array` section for your reference.
 
 This migration guide also applies to:
-`ripple-address-codec` 4.3.1 -> 5.0.0
-`ripple-binary-codec` 1.11.0 -> 2.0.0
-`ripple-keypairs` 1.3.1 -> 2.0.0
+- `ripple-address-codec` 4.3.1 -> 5.0.0
+- `ripple-binary-codec` 1.11.0 -> 2.0.0
+- `ripple-keypairs` 1.3.1 -> 2.0.0
+- `xrpl-secret-numbers` 0.3.4 -> `@xrplf/secret-numbers` 1.0.0
 
 # Why update to 3.0?
 
