@@ -62,7 +62,7 @@ main();
 ```
 
 For a more in-depth example, you can copy/forking this Code Sandbox template!
-<br>https://codesandbox.io/s/xrpl-intro-pxgdjr?file=/src/App.js
+<br/>https://codesandbox.io/s/xrpl-intro-pxgdjr?file=/src/App.js
 
 It goes through:
 
