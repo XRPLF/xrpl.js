@@ -1,10 +1,11 @@
-import assert from 'assert'
+import { assert } from 'chai'
 
 import {
   Client,
   isValidClassicAddress,
   isValidXAddress,
   dropsToXrp,
+  XRPLFaucetError,
 } from '../../src'
 
 async function generate_faucet_wallet_and_fund_again(
@@ -43,8 +44,8 @@ async function generate_faucet_wallet_and_fund_again(
     account: wallet.classicAddress,
   })
 
-  assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
   assert(newBalance > balance)
+  assert.equal(dropsToXrp(afterSent.result.account_data.Balance), newBalance)
 
   await api.disconnect()
 }
@@ -126,7 +127,7 @@ describe('fundWallet', function () {
         amount: '2000',
         usageContext: 'integration-test',
       })
-      assert.equal(balance, '2000')
+      assert.equal(balance, 2000)
       assert.notStrictEqual(wallet, undefined)
       assert(isValidClassicAddress(wallet.classicAddress))
       assert(isValidXAddress(wallet.getXAddress()))
@@ -140,4 +141,26 @@ describe('fundWallet', function () {
     },
     TIMEOUT,
   )
+
+  it('handles errors', async () => {
+    const api = new Client('wss://s.altnet.rippletest.net:51233')
+    await api.connect()
+
+    // jasmine and jest handle async differently so need to use try catch approach instead of `expect.rejects` or `expectAsync`
+    try {
+      await api.fundWallet(null, {
+        amount: '-1000',
+        usageContext: 'integration-test',
+      })
+
+      throw new Error('Error not thrown')
+    } catch (error) {
+      await api.disconnect()
+      expect(error).toEqual(
+        new XRPLFaucetError(
+          'Request failed: {"body":{"error":"Invalid amount","detail":"Must be an integer"},"contentType":"application/json; charset=utf-8","statusCode":400}',
+        ),
+      )
+    }
+  })
 })

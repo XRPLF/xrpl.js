@@ -1,6 +1,7 @@
 import { ValidationError } from '../../errors'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
+import type { TransactionMetadataBase } from './metadata'
 
 /**
  * The NFTokenCancelOffer transaction deletes existing NFTokenOffer objects.
@@ -24,6 +25,11 @@ export interface NFTokenCancelOffer extends BaseTransaction {
    * does not exist. This field is required.
    */
   NFTokenOffers: string[]
+}
+
+export interface NFTokenCancelOfferMetadata extends TransactionMetadataBase {
+  // rippled 1.11.0  or  later
+  nftoken_ids?: string[]
 }
 
 /**

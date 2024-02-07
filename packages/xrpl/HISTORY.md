@@ -1,8 +1,133 @@
-# xrpl.js (ripple-lib) Release History
+# xrpl.js Release History
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
+
+## 3.0.0 (2024-02-01)
+
+### BREAKING CHANGES
+* Bump typescript to 5.x
+* Remove Node 14 support
+* Remove `crypto` polyfills, `create-hash`, `elliptic`, `hash.js`, and their many dependencies in favor of `@noble/hashes` and `@nobel/curves`
+* Remove `bip32` and `bip39` in favor of `@scure/bip32` and `@scure/bip39`
+* Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`
+* Configuring a proxy:
+  * Instead of passing various parameters on the `ConnectionsOptions` you know specify the `agent` parameter. This object can use be created by libraries such as `https-proxy-agent` or any that implements the `http.Agent`.
+  * This was changed to both support the latest `https-proxy-agent` and to remove the need to include the package in bundlers.   Tests will still be done using `https-proxy-agent` and only tested in a node environment which was the only way it was previously supported anyway
+* Remove `BroadcastClient` which was deprecated
+* Uses `@xrplf/secret-numbers` instead of `xrpl-secret-numbers`
+* Improve key algorithm detection. It will now throw Errors with helpful messages
+* Move `authorizeChannel` from `wallet/signer` to `wallet/authorizeChannel` to solve a circular dependency issue.
+* When using a bundler you must remove the mapping of `ws` to `WSWrapper`. ex. `ws: 'xrpl/dist/npm/client/WSWrapper'`. See [../UNIQUE_STEPS](Unique Steps) for the new, much smaller, configs.
+* `Transaction` type has been redefined to include all transactions and `SubmittableTransaction` was created to define the old value. The following functions which only handle transactions to be submitted now use `SubmittableTransaction`:
+  * `Client.autofill`
+  * `Client.submit`
+  * `Client.submitAndWait`
+  * `Client.prepareTransaction`
+  * `getSignedTx`
+  * `isAccountDelete`
+* `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string`
+* `Buffer` has been replaced with `UInt8Array` for both params and return values.  `Buffer` may continue to work with params since they extend `UInt8Arrays`.
+
+### Bundling Changes
+Bundler configurations are much more simplified. See [../UNIQUE_STEPS](Unique Steps) for the new, much smaller, configs.
+* removed the following polyfills:
+  * `buffer`
+  * `assert`
+  * `crypto-browserify`
+  * `https-browserify`
+  * `os-browserify`
+  * `process`
+  * `stream-browserify`
+  * `stream-http`
+  * `url`
+  * `util` - previously added automatically by `webpack`
+  * `events` - previously added automatically by `webpack` but manual for `vite`**
+* Removed mappings for:
+  * `ws` to `WsWrapper`
+  * Excluding `https-proxy-agent`
+
+### Non-Breaking Changes
+* Deprecated:
+  * `convertHexToString` in favor of `@xrplf/isomorphic/utils`'s `hexToString`
+  * `convertStringToHex` in favor of `@xrplf/isomorphic/utils`'s `stringToHex`
+  
+## 3.0.0 Beta 1 (2023-11-30)
+
+### Breaking Changes
+* `Transaction` type has been redefined to include all transactions and `SubmittableTransaction` was created to define the old value. The following functions which only handle transactions to be submitted now use `SubmittableTransaction`:
+  * `Client.autofill`
+  * `Client.submit`
+  * `Client.submitAndWait`
+  * `Client.prepareTransaction`
+  * `getSignedTx`
+  * `isAccountDelete`
+* `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string`
+* `Buffer` has been replaced with `UInt8Array` for both params and return values.  `Buffer` may continue to work with params since they extend `UInt8Arrays`.
+
+### Bundling Changes
+* `Buffer` and `process` polyfills are no longer required.
+
+### Changes
+* Deprecated:
+  * `convertHexToString` in favor of `@xrplf/isomorphic/utils`'s `hexToString`
+  * `convertStringToHex` in favor of `@xrplf/isomorphic/utils`'s `stringToHex`
+* Remove `lodash` as a dependency
+* Remove many polyfills that were only used for testing in the browser
+* Remove `util` from bundle by switching `inspect` to `JSON.stringify`
+* Add type for metadata for specific transactions(`Payment`, `NFTokenMint`, `NFTokenCreateOffer`, `NFTokenAcceptOffer`, `NFTokenCancelOffer`)
+
+### Fixed
+* Fixed Wallet.generate() ignoring the `algorithm` parameter (Only a problem once binary-codec fix for `derive_keypair` is added)
+* Fixed Wallet.fromSeed() ignoring the `algorithm` parameter
+* Added pseudo-transaction support to hash functions and response types
+
+## 3.0.0 Beta 0 (2023-10-19)
+
+### Breaking Changes
+* Bump typescript to 5.x
+* Remove Node 14 support
+* Remove `crypto` polyfills, `create-hash`, `elliptic`, `hash.js`, and their many dependencies in favor of `@noble/hashes` and `@nobel/curves`
+* Remove `bip32` and `bip39` in favor of `@scure/bip32` and `@scure/bip39`
+* Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`
+* Configuring a proxy:
+    * Instead of passing various parameters on the `ConnectionsOptions` you know specify the `agent` parameter. This object can use be created by libraries such as `https-proxy-agent` or any that implements the `http.Agent`.
+    * This was changed to both support the latest `https-proxy-agent` and to remove the need to include the package in bundlers.   Tests will still be done using `https-proxy-agent` and only tested in a node environment which was the only way it was previously supported anyway
+* Remove `BroadcastClient` which was deprecated
+* Uses `@xrplf/secret-numbers` instead of `xrpl-secret-numbers`
+* Improve key algorithm detection. It will now throw Errors with helpful messages
+* Move `authorizeChannel` from `wallet/signer` to `wallet/authorizeChannel` to solve a circular dependency issue.
+* When using a bundler you must remove the mapping of `ws` to `WSWrapper`. ex. `ws: 'xrpl/dist/npm/client/WSWrapper'`. See [../UNIQUE_STEPS](Unique Steps) for the new, much smaller, configs.
+
+### Bundling Changes
+Bundler configurations are much more simplified. See [../UNIQUE_STEPS](Unique Steps) for the new, much smaller, configs.
+* removed the following polyfills:
+    * `assert`
+    * `crypto-browserify`
+    * `https-browserify`
+    * `os-browserify`
+    * `stream-browserify`
+    * `stream-http`
+    * `url`
+    * `util` - previously added automatically by `webpack`
+    * `events` - previously added automatically by `webpack` but manual for `vite`
+* Removed mappings for:
+    * `ws` to `WsWrapper`
+    * Excluding `https-proxy-agent`
+
+### Changed
+* Remove `lodash` as a dependency
+* Remove many polyfills that were only used for testing in the browser
+* Remove `util` from bundle by switching `inspect` to `JSON.stringify`
+* Add type for metadata for specific transactions(`Payment`, `NFTokenMint`, `NFTokenCreateOffer`, `NFTokenAcceptOffer`, `NFTokenCancelOffer`)
+
+### Fixed
+* Fixed Wallet.generate() ignoring the `algorithm` parameter (Only a problem once binary-codec fix for `derive_keypair` is added)
+* Fixed Wallet.fromSeed() ignoring the `algorithm` parameter
+* Added pseudo-transaction support to hash functions and response types
+
+## 2.14.1 (2024-02-01)
 
 ### Fixed
 * Fix `AMM` ledger object's `LPTokenBalance` type to `IssuedCurrencyAmount`.
@@ -171,9 +296,6 @@ Wallet.fromMmnemonic()
 * `Wallet.fromMnemonic` now allows lowercase for RFC1751 mnemonics (#2046)
 * `Wallet.fromMnemonic` detects when an invalid encoding is provided, and throws an error
 * Made unexpected errors in `submitAndWait` more verbose to make them easier to debug.
-
-### Added
-* Support for Automated Market Maker (AMM) transactions and requests as defined in XLS-30.
 
 ## 2.3.1 (2022-06-27)
 ### Fixed

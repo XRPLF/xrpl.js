@@ -18,7 +18,7 @@ import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
-import { isIssuedCurrency } from './common'
+import { BaseTransaction, isIssuedCurrency } from './common'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { DIDDelete, validateDIDDelete } from './DIDDelete'
 import { DIDSet, validateDIDSet } from './DIDSet'
@@ -90,9 +90,11 @@ import {
 } from './XChainModifyBridge'
 
 /**
+ * Transactions that can be submitted by clients
+ *
  * @category Transaction Models
  */
-export type Transaction =
+export type SubmittableTransaction =
   | AMMBid
   | AMMCreate
   | AMMDelete
@@ -135,14 +137,28 @@ export type Transaction =
   | XChainCreateClaimID
   | XChainModifyBridge
 
+/**
+ * Transactions that can only be created by validators.
+ *
+ * @category Transaction Models
+ */
 export type PseudoTransaction = EnableAmendment | SetFee | UNLModify
+
+/**
+ * All transactions that can live on the XRPL
+ *
+ * @category Transaction Models
+ */
+export type Transaction = SubmittableTransaction | PseudoTransaction
 
 /**
  * @category Transaction Models
  */
-export interface TransactionAndMetadata {
-  transaction: Transaction
-  metadata: TransactionMetadata
+export interface TransactionAndMetadata<
+  T extends BaseTransaction = Transaction,
+> {
+  transaction: T
+  metadata: TransactionMetadata<T>
 }
 
 /**

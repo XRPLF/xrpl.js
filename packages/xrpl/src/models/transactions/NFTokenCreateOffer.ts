@@ -12,6 +12,7 @@ import {
   validateOptionalField,
   Account,
 } from './common'
+import type { TransactionMetadataBase } from './metadata'
 
 /**
  * Transaction Flags for an NFTokenCreateOffer Transaction.
@@ -84,6 +85,11 @@ export interface NFTokenCreateOffer extends BaseTransaction {
    */
   Destination?: Account
   Flags?: number | NFTokenCreateOfferFlagsInterface
+}
+
+export interface NFTokenCreateOfferMetadata extends TransactionMetadataBase {
+  // rippled 1.11.0 or later
+  offer_id?: string
 }
 
 function validateNFTokenSellOfferCases(tx: Record<string, unknown>): void {

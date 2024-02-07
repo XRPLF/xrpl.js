@@ -1,8 +1,4 @@
-import {
-  PseudoTransaction,
-  Transaction,
-  TransactionMetadata,
-} from '../transactions'
+import { Transaction, TransactionMetadata } from '../transactions'
 
 import { LedgerEntry } from './LedgerEntry'
 
@@ -15,7 +11,7 @@ import { LedgerEntry } from './LedgerEntry'
 export default interface Ledger {
   /** The SHA-512Half of this ledger's state tree information. */
   account_hash: string
-  /** All the state information in this ledger. */
+  /** All the state information in this ledger. Admin only. */
   accountState?: LedgerEntry[]
   /** A bit-map of flags relating to the closing of this ledger. */
   close_flags: number
@@ -65,7 +61,5 @@ export default interface Ledger {
    * either JSON or binary depending on whether the request specified binary
    * as true.
    */
-  transactions?: Array<
-    (Transaction | PseudoTransaction) & { metaData?: TransactionMetadata }
-  >
+  transactions?: Array<Transaction & { metaData?: TransactionMetadata }>
 }

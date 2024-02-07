@@ -1,4 +1,4 @@
-import { EventEmitter2 } from 'eventemitter2'
+import { EventEmitter } from 'eventemitter3'
 import { Server as WebSocketServer, type WebSocket } from 'ws'
 
 import type { Request } from '../src'
@@ -48,14 +48,14 @@ export interface PortResponse extends BaseResponse {
  */
 
 export type MockedWebSocketServer = WebSocketServer &
-  EventEmitter2 & {
+  EventEmitter & {
     responses: Record<string, unknown>
     suppressOutput: boolean
     socket: WebSocket
     addResponse: (
       command: string,
       response:
-        | Response
+        | BaseResponse
         | ErrorResponse
         | ((r: Request) => Response | ErrorResponse | Record<string, unknown>)
         | Record<string, unknown>,
@@ -83,8 +83,8 @@ export function destroyMockRippled(server: MockedWebSocketServer): void {
 }
 
 export default function createMockRippled(port: number): MockedWebSocketServer {
+  Object.assign(WebSocketServer.prototype, EventEmitter.prototype)
   const mock = new WebSocketServer({ port }) as MockedWebSocketServer
-  Object.assign(mock, EventEmitter2.prototype)
 
   mock.responses = {}
   mock.suppressOutput = false

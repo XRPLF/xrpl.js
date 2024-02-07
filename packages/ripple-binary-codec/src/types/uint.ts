@@ -1,6 +1,4 @@
-import bigInt = require('big-integer')
 import { Comparable } from './serialized-type'
-import { Buffer } from 'buffer/'
 
 /**
  * Compare numbers and bigInts n1 and n2
@@ -9,20 +7,17 @@ import { Buffer } from 'buffer/'
  * @param n2 Second object to compare
  * @returns -1, 0, or 1, depending on how the two objects compare
  */
-function compare(
-  n1: number | bigInt.BigInteger,
-  n2: number | bigInt.BigInteger,
-): number {
+function compare(n1: number | bigint, n2: number | bigint): number {
   return n1 < n2 ? -1 : n1 == n2 ? 0 : 1
 }
 
 /**
  * Base class for serializing and deserializing unsigned integers.
  */
-abstract class UInt extends Comparable {
+abstract class UInt extends Comparable<UInt | number> {
   protected static width: number
 
-  constructor(bytes: Buffer) {
+  constructor(bytes: Uint8Array) {
     super(bytes)
   }
 
@@ -32,7 +27,7 @@ abstract class UInt extends Comparable {
    * @param other other UInt to compare this to
    * @returns -1, 0, or 1 depending on how the objects relate to each other
    */
-  compareTo(other: UInt): number {
+  compareTo(other: UInt | number): number {
     return compare(this.valueOf(), other.valueOf())
   }
 
@@ -51,7 +46,15 @@ abstract class UInt extends Comparable {
    *
    * @returns the value
    */
-  abstract valueOf(): number | bigInt.BigInteger
+  abstract valueOf(): number | bigint
+
+  static checkUintRange(val: number, min: number, max: number): void {
+    if (val < min || val > max) {
+      throw new Error(
+        `Invalid ${this.constructor.name}: ${val} must be >= ${min} and <= ${max}`,
+      )
+    }
+  }
 }
 
 export { UInt }

@@ -3,6 +3,7 @@
 /* eslint-disable no-bitwise  -- this file mimics behavior in rippled. It uses
    bitwise operators for and-ing numbers with a mask and bit shifting. */
 
+import { bytesToHex } from '@xrplf/isomorphic/utils'
 import BigNumber from 'bignumber.js'
 import { decode, encode } from 'ripple-binary-codec'
 
@@ -10,7 +11,6 @@ import { ValidationError, XrplError } from '../../errors'
 import type { Ledger } from '../../models/ledger'
 import { LedgerEntry } from '../../models/ledger'
 import { Transaction, TransactionMetadata } from '../../models/transactions'
-import { PseudoTransaction } from '../../models/transactions/transaction'
 
 import HashPrefix from './HashPrefix'
 import sha512Half from './sha512Half'
@@ -28,10 +28,6 @@ function intToHex(integer: number, byteLength: number): string {
     .padStart(byteLength * 2, '0')
 
   return foo
-}
-
-function bytesToHex(bytes: number[]): string {
-  return Buffer.from(bytes).toString('hex')
 }
 
 function bigintToHex(
@@ -84,7 +80,11 @@ export function hashSignedTx(tx: Transaction | string): string {
     txObject = tx
   }
 
-  if (txObject.TxnSignature === undefined && txObject.Signers === undefined) {
+  if (
+    txObject.TxnSignature === undefined &&
+    txObject.Signers === undefined &&
+    txObject.SigningPubKey === undefined
+  ) {
     throw new ValidationError('The transaction must be signed to hash it.')
   }
 
@@ -125,9 +125,7 @@ export function hashLedgerHeader(ledgerHeader: Ledger): string {
  * @category Utilities
  */
 export function hashTxTree(
-  transactions: Array<
-    (Transaction | PseudoTransaction) & { metaData?: TransactionMetadata }
-  >,
+  transactions: Array<Transaction & { metaData?: TransactionMetadata }>,
 ): string {
   const shamap = new SHAMap()
   for (const txJSON of transactions) {

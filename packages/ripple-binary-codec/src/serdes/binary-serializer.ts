@@ -1,13 +1,12 @@
-import * as assert from 'assert'
 import { FieldInstance } from '../enums'
 import { type SerializedType } from '../types/serialized-type'
-import { Buffer } from 'buffer/'
+import { bytesToHex, concat } from '@xrplf/isomorphic/utils'
 
 /**
- * Bytes list is a collection of buffer objects
+ * Bytes list is a collection of Uint8Array objects
  */
 class BytesList {
-  private bytesArray: Array<Buffer> = []
+  private bytesArray: Array<Uint8Array> = []
 
   /**
    * Get the total number of bytes in the BytesList
@@ -15,17 +14,17 @@ class BytesList {
    * @return the number of bytes
    */
   public getLength(): number {
-    return Buffer.concat(this.bytesArray).byteLength
+    return concat(this.bytesArray).byteLength
   }
 
   /**
    * Put bytes in the BytesList
    *
-   * @param bytesArg A Buffer
+   * @param bytesArg A Uint8Array
    * @return this BytesList
    */
-  public put(bytesArg: Buffer): BytesList {
-    const bytes = Buffer.from(bytesArg) // Temporary, to catch instances of Uint8Array being passed in
+  public put(bytesArg: Uint8Array): BytesList {
+    const bytes = Uint8Array.from(bytesArg) // Temporary, to catch instances of Uint8Array being passed in
     this.bytesArray.push(bytes)
     return this
   }
@@ -39,17 +38,17 @@ class BytesList {
     list.put(this.toBytes())
   }
 
-  public toBytes(): Buffer {
-    return Buffer.concat(this.bytesArray)
+  public toBytes(): Uint8Array {
+    return concat(this.bytesArray)
   }
 
   toHex(): string {
-    return this.toBytes().toString('hex').toUpperCase()
+    return bytesToHex(this.toBytes())
   }
 }
 
 /**
- * BinarySerializer is used to write fields and values to buffers
+ * BinarySerializer is used to write fields and values to Uint8Arrays
  */
 class BinarySerializer {
   private sink: BytesList = new BytesList()
@@ -72,7 +71,7 @@ class BinarySerializer {
    *
    * @param bytes the bytes to write
    */
-  put(bytes: Buffer): void {
+  put(bytes: Uint8Array): void {
     this.sink.put(bytes)
   }
 
@@ -100,8 +99,8 @@ class BinarySerializer {
    *
    * @param length the length of the bytes
    */
-  private encodeVariableLength(length: number): Buffer {
-    const lenBytes = Buffer.alloc(3)
+  private encodeVariableLength(length: number): Uint8Array {
+    const lenBytes = new Uint8Array(3)
     if (length <= 192) {
       lenBytes[0] = length
       return lenBytes.slice(0, 1)
@@ -132,8 +131,9 @@ class BinarySerializer {
     isUnlModifyWorkaround = false,
   ): void {
     const associatedValue = field.associatedType.from(value)
-    assert.ok(associatedValue.toBytesSink !== undefined)
-    assert.ok(field.name !== undefined)
+    if (associatedValue.toBytesSink === undefined || field.name === undefined) {
+      throw new Error()
+    }
 
     this.sink.put(field.header)
 
