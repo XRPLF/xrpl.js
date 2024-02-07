@@ -126,7 +126,7 @@ import {
 
 export interface ClientOptions extends ConnectionUserOptions {
   /**
-   * Factor to multiply estimated fee by to provide a cushion in case the
+   * Multiplication factor to multiply estimated fee by to provide a cushion in case the
    * required fee rises during submission of a transaction. Defaults to 1.2.
    *
    * @category Fee
