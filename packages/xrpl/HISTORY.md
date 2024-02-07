@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Fixed
+* Typo in `Channel` type `source_tab` -> `source_tag`
+
 ## 3.0.0 (2024-02-01)
 
 ### BREAKING CHANGES
@@ -52,7 +55,7 @@ Bundler configurations are much more simplified. See [../UNIQUE_STEPS](Unique St
 * Deprecated:
   * `convertHexToString` in favor of `@xrplf/isomorphic/utils`'s `hexToString`
   * `convertStringToHex` in favor of `@xrplf/isomorphic/utils`'s `stringToHex`
-  
+
 ## 3.0.0 Beta 1 (2023-11-30)
 
 ### Breaking Changes
