@@ -3,7 +3,7 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 /**
  * Represents a payment channel in the XRP Ledger.
  */
-interface Channel {
+export interface Channel {
   /** The owner of the channel, as an Address. */
   account: string
 
