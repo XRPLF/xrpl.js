@@ -10,6 +10,7 @@ import { OfferCreate, Transaction } from '../transactions'
 import { TransactionMetadata } from '../transactions/metadata'
 
 import type { BaseRequest, BaseResponse } from './baseMethod'
+import { ManifestRequest } from './manifest'
 
 export interface SubscribeBook {
   /**
@@ -433,3 +434,38 @@ export type Stream =
   | PeerStatusStream
   | OrderBookStream
   | ConsensusStream
+
+export type EventTypes =
+  | 'connected'
+  | 'disconnected'
+  | 'ledgerClosed'
+  | 'validationReceived'
+  | 'transaction'
+  | 'peerStatusChange'
+  | 'consensusPhase'
+  | 'manifestReceived'
+  | 'path_find'
+  | 'error'
+
+export type OnEventToListenerMap<T extends EventTypes> = T extends 'connected'
+  ? () => void
+  : T extends 'disconnected'
+  ? (code: number) => void
+  : T extends 'ledgerClosed'
+  ? (ledger: LedgerStream) => void
+  : T extends 'validationReceived'
+  ? (validation: ValidationStream) => void
+  : T extends 'transaction'
+  ? (transaction: TransactionStream) => void
+  : T extends 'peerStatusChange'
+  ? (peerStatus: PeerStatusStream) => void
+  : T extends 'consensusPhase'
+  ? (consensus: ConsensusStream) => void
+  : T extends 'manifestReceived'
+  ? (manifest: ManifestRequest) => void
+  : T extends 'path_find'
+  ? (path: PathFindStream) => void
+  : T extends 'error'
+  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
+    (...err: any[]) => void
+  : (...args: never[]) => void

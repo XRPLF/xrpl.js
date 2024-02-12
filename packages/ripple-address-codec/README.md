@@ -67,7 +67,7 @@ Check whether a classic address (starting with `r`...) is valid.
 
 Returns `false` for X-addresses (extended addresses). To validate an X-address, use `isValidXAddress`.
 
-### encodeSeed(entropy: Buffer, type: 'ed25519' | 'secp256k1'): string
+### encodeSeed(entropy: UInt8Array, type: 'ed25519' | 'secp256k1'): string
 
 Encode the given entropy as an XRP Ledger seed (secret). The entropy must be exactly 16 bytes (128 bits). The encoding includes which elliptic curve digital signature algorithm (ECDSA) the seed is intended to be used with. The seed is used to produce the private key.
 
@@ -79,38 +79,38 @@ Return object type:
 ```
 {
   version: number[],
-  bytes: Buffer,
+  bytes: UInt8Array,
   type: string | null
 }
 ```
 
-### encodeAccountID(bytes: Buffer): string
+### encodeAccountID(bytes: UInt8Array): string
 
 Encode bytes as a classic address (starting with `r`...).
 
-### decodeAccountID(accountId: string): Buffer
+### decodeAccountID(accountId: string): UInt8Array
 
 Decode a classic address (starting with `r`...) to its raw bytes.
 
-### encodeNodePublic(bytes: Buffer): string
+### encodeNodePublic(bytes: UInt8Array): string
 
 Encode bytes to the XRP Ledger "node public key" format (base58).
 
 This is useful for rippled validators.
 
-### decodeNodePublic(base58string: string): Buffer
+### decodeNodePublic(base58string: string): UInt8Array
 
 Decode an XRP Ledger "node public key" (in base58 format) into its raw bytes.
 
-### encodeAccountPublic(bytes: Buffer): string
+### encodeAccountPublic(bytes: UInt8Array): string
 
 Encode a public key, as for payment channels.
 
-### decodeAccountPublic(base58string: string): Buffer
+### decodeAccountPublic(base58string: string): UInt8Array
 
 Decode a public key, as for payment channels.
 
-### encodeXAddress(accountId: Buffer, tag: number | false, test: boolean): string
+### encodeXAddress(accountId: UInt8Array, tag: number | false, test: boolean): string
 
 Encode account ID, tag, and network ID to X-address.
 
@@ -120,7 +120,7 @@ At this time, `tag` must be <= MAX_32_BIT_UNSIGNED_INT (4294967295) as the XRP L
 
 If `test` is `true`, this address is intended for use with a test network such as Testnet or Devnet.
 
-### decodeXAddress(xAddress: string): {accountId: Buffer, tag: number | false, test: boolean}
+### decodeXAddress(xAddress: string): {accountId: UInt8Array, tag: number | false, test: boolean}
 
 Convert an X-address to its classic address, tag, and network ID.
 

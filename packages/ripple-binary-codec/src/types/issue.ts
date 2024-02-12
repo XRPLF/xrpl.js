@@ -1,9 +1,9 @@
+import { concat } from '@xrplf/isomorphic/utils'
 import { BinaryParser } from '../serdes/binary-parser'
 
 import { AccountID } from './account-id'
 import { Currency } from './currency'
 import { JsonObject, SerializedType } from './serialized-type'
-import { Buffer } from 'buffer/'
 
 /**
  * Interface for JSON objects that represent amounts
@@ -28,9 +28,9 @@ function isIssueObject(arg): arg is IssueObject {
  * Class for serializing/Deserializing Amounts
  */
 class Issue extends SerializedType {
-  static readonly ZERO_ISSUED_CURRENCY: Issue = new Issue(Buffer.alloc(20))
+  static readonly ZERO_ISSUED_CURRENCY: Issue = new Issue(new Uint8Array(20))
 
-  constructor(bytes: Buffer) {
+  constructor(bytes: Uint8Array) {
     super(bytes ?? Issue.ZERO_ISSUED_CURRENCY.bytes)
   }
 
@@ -52,7 +52,7 @@ class Issue extends SerializedType {
         return new Issue(currency)
       }
       const issuer = AccountID.from(value.issuer).toBytes()
-      return new Issue(Buffer.concat([currency, issuer]))
+      return new Issue(concat([currency, issuer]))
     }
 
     throw new Error('Invalid type to construct an Amount')
@@ -70,7 +70,7 @@ class Issue extends SerializedType {
       return new Issue(currency)
     }
     const currencyAndIssuer = [currency, parser.read(20)]
-    return new Issue(Buffer.concat(currencyAndIssuer))
+    return new Issue(concat(currencyAndIssuer))
   }
 
   /**

@@ -1,4 +1,4 @@
-import { Account } from 'xrpl-secret-numbers'
+import { Account } from '@xrplf/secret-numbers'
 
 import ECDSA from '../ECDSA'
 

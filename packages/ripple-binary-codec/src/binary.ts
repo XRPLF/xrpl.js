@@ -1,5 +1,6 @@
 /* eslint-disable func-style */
 
+import { bytesToHex } from '@xrplf/isomorphic/utils'
 import { coreTypes } from './types'
 import { BinaryParser } from './serdes/binary-parser'
 import { AccountID } from './types/account-id'
@@ -13,21 +14,23 @@ import {
 } from './enums'
 import { STObject } from './types/st-object'
 import { JsonObject } from './types/serialized-type'
-import { Buffer } from 'buffer/'
-import bigInt = require('big-integer')
 
 /**
  * Construct a BinaryParser
  *
- * @param bytes hex-string to construct BinaryParser from
+ * @param bytes hex-string or Uint8Array to construct BinaryParser from
  * @param definitions rippled definitions used to parse the values of transaction types and such.
  *                          Can be customized for sidechains and amendments.
- * @returns A BinaryParser
+ * @returns BinaryParser
  */
 const makeParser = (
-  bytes: string,
+  bytes: string | Uint8Array,
   definitions?: XrplDefinitionsBase,
-): BinaryParser => new BinaryParser(bytes, definitions)
+): BinaryParser =>
+  new BinaryParser(
+    bytes instanceof Uint8Array ? bytesToHex(bytes) : bytes,
+    definitions,
+  )
 
 /**
  * Parse BinaryParser into JSON
@@ -62,8 +65,8 @@ const binaryToJSON = (
  * @field set signingFieldOnly to true if you want to serialize only signing fields
  */
 interface OptionObject {
-  prefix?: Buffer
-  suffix?: Buffer
+  prefix?: Uint8Array
+  suffix?: Uint8Array
   signingFieldsOnly?: boolean
   definitions?: XrplDefinitionsBase
 }
@@ -73,9 +76,12 @@ interface OptionObject {
  *
  * @param object JSON object to serialize
  * @param opts options for serializing, including optional prefix, suffix, signingFieldOnly, and definitions
- * @returns A Buffer containing the serialized object
+ * @returns A Uint8Array containing the serialized object
  */
-function serializeObject(object: JsonObject, opts: OptionObject = {}): Buffer {
+function serializeObject(
+  object: JsonObject,
+  opts: OptionObject = {},
+): Uint8Array {
   const { prefix, suffix, signingFieldsOnly = false, definitions } = opts
   const bytesList = new BytesList()
 
@@ -103,13 +109,13 @@ function serializeObject(object: JsonObject, opts: OptionObject = {}): Buffer {
  * @param transaction Transaction to serialize
  * @param prefix Prefix bytes to put before the serialized object
  * @param opts.definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
- * @returns A Buffer with the serialized object
+ * @returns A Uint8Array with the serialized object
  */
 function signingData(
   transaction: JsonObject,
-  prefix: Buffer = HashPrefix.transactionSig,
+  prefix: Uint8Array = HashPrefix.transactionSig,
   opts: { definitions?: XrplDefinitionsBase } = {},
-): Buffer {
+): Uint8Array {
   return serializeObject(transaction, {
     prefix,
     signingFieldsOnly: true,
@@ -132,8 +138,8 @@ interface ClaimObject extends JsonObject {
  * @param opts.definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns the serialized object with appropriate prefix
  */
-function signingClaimData(claim: ClaimObject): Buffer {
-  const num = bigInt(String(claim.amount))
+function signingClaimData(claim: ClaimObject): Uint8Array {
+  const num = BigInt(String(claim.amount))
   const prefix = HashPrefix.paymentChannelClaim
   const channel = coreTypes.Hash256.from(claim.channel).toBytes()
   const amount = coreTypes.UInt64.from(num).toBytes()
@@ -160,7 +166,7 @@ function multiSigningData(
   opts: { definitions: XrplDefinitionsBase } = {
     definitions: DEFAULT_DEFINITIONS,
   },
-): Buffer {
+): Uint8Array {
   const prefix = HashPrefix.transactionMultiSig
   const suffix = coreTypes.AccountID.from(signingAccount).toBytes()
   return serializeObject(transaction, {

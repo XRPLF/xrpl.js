@@ -10,6 +10,8 @@
  *is part of the public domain.
  */
 
+import { hexToBytes, concat } from '@xrplf/isomorphic/utils'
+
 import rfc1751Words from './rfc1751Words.json'
 
 const rfc1751WordList: string[] = rfc1751Words
@@ -59,7 +61,7 @@ function extract(key: string, start: number, length: number): number {
  */
 function keyToRFC1751Mnemonic(hex_key: string): string {
   // Remove whitespace and interpret hex
-  const buf = Buffer.from(hex_key.replace(/\s+/gu, ''), 'hex')
+  const buf = hexToBytes(hex_key.replace(/\s+/gu, ''))
   // Swap byte order and use rfc1751
   let key: number[] = bufferToArray(swap128(buf))
 
@@ -97,7 +99,7 @@ function keyToRFC1751Mnemonic(hex_key: string): string {
  * @throws Error if the parity after decoding does not match.
  * @returns A Buffer containing an encoded secret.
  */
-function rfc1751MnemonicToKey(english: string): Buffer {
+function rfc1751MnemonicToKey(english: string): Uint8Array {
   const words = english.split(' ')
   let key: number[] = []
 
@@ -123,7 +125,7 @@ function rfc1751MnemonicToKey(english: string): Buffer {
   }
 
   // This is a step specific to the XRPL's implementation
-  const bufferKey = swap128(Buffer.from(key))
+  const bufferKey = swap128(Uint8Array.from(key))
   return bufferKey
 }
 
@@ -165,26 +167,53 @@ function getSubKey(
   return { subKey, word }
 }
 
-function bufferToArray(buf: Buffer): number[] {
+function bufferToArray(buf: Uint8Array): number[] {
   /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We know the end type */
   return Array.prototype.slice.call(buf) as number[]
 }
 
-/**
- * Swap the byte order of a 128-bit buffer.
- *
- * @param buf - A 128-bit (16 byte) buffer
- * @returns A buffer containing the same data with reversed endianness
- */
-function swap128(buf: Buffer): Buffer {
-  // Interprets buffer as an array of (two, in this case) 64-bit numbers and swaps byte order in-place.
-  const reversedBytes = buf.swap64()
+function swap(arr: Uint8Array, n: number, m: number): void {
+  const i = arr[n]
+  // eslint-disable-next-line no-param-reassign -- we have to swap
+  arr[n] = arr[m]
+  // eslint-disable-next-line no-param-reassign -- see above
+  arr[m] = i
+}
 
-  // Swap the two 64-bit numbers since our buffer is 128 bits.
-  return Buffer.concat(
-    [reversedBytes.slice(8, 16), reversedBytes.slice(0, 8)],
-    16,
-  )
+/**
+ * Interprets arr as an array of 64-bit numbers and swaps byte order in 64 bit chunks.
+ * Example of two 64 bit numbers 0000000100000002 => 1000000020000000
+ *
+ * @param arr A Uint8Array representation of one or more 64 bit numbers
+ * @returns Uint8Array An array containing the bytes of 64 bit numbers each with reversed endianness
+ */
+function swap64(arr: Uint8Array): Uint8Array {
+  const len = arr.length
+
+  for (let i = 0; i < len; i += 8) {
+    swap(arr, i, i + 7)
+    swap(arr, i + 1, i + 6)
+    swap(arr, i + 2, i + 5)
+    swap(arr, i + 3, i + 4)
+  }
+
+  return arr
+}
+
+/**
+ * Swap the byte order of a 128-bit array.
+ * Ex. 0000000100000002 => 2000000010000000
+ *
+ * @param arr - A 128-bit (16 byte) array
+ * @returns An array containing the same data with reversed endianness
+ */
+function swap128(arr: Uint8Array): Uint8Array {
+  // Interprets arr as an array of (two, in this case) 64-bit numbers and swaps byte order in 64 bit chunks.
+  // Ex. 0000000100000002 => 1000000020000000
+  const reversedBytes = swap64(arr)
+  // Further swap the two 64-bit numbers since our buffer is 128 bits.
+  // Ex. 1000000020000000 => 2000000010000000
+  return concat([reversedBytes.slice(8, 16), reversedBytes.slice(0, 8)])
 }
 
 export { rfc1751MnemonicToKey, keyToRFC1751Mnemonic }

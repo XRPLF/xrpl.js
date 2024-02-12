@@ -267,25 +267,6 @@ This should almost always be done using the [`xrpl-codec-gen`](https://github.co
    1. Highlights of important changes
 
 
-# ripple-lib 1.x releases
-
-- [ ] Publish the release to npm.
-
-  - [ ] If you are publishing a 1.x release to the `xrpl` package, use:
-
-        npm publish --tag ripple-lib
-
-    This prevents the release from taking the `latest` tag.
-
-For ripple-lib:
-
- - Have one of the ripple-lib package maintainers push to `ripple-lib` (npm package name). You can contact [@intelliot](https://github.com/intelliot) to request the npm publish.
-- For ripple-lib releases, cross-publish the package to `xrpl` with `--tag ripple-lib`
-  - [Here's why](https://blog.greenkeeper.io/one-simple-trick-for-javascript-package-maintainers-to-avoid-breaking-their-user-s-software-and-to-6edf06dc5617).
-
-- https://www.npmjs.com/package/ripple-lib
-- https://www.npmjs.com/package/xrpl
-
 ## Mailing Lists
 
 We have a low-traffic mailing list for announcements of new `xrpl.js` releases. (About 1 email every couple of weeks)

@@ -1,4 +1,4 @@
-import assert from 'assert'
+import { assert } from 'chai'
 
 import SHAMap, { NodeType } from '../src/utils/hashes/SHAMap'
 

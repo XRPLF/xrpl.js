@@ -1,0 +1,11 @@
+{
+  "name": "@xrplf/isomorphic/ws",
+  "private": true,
+  "main": "../dist/ws",
+  "types": "../dist/ws",
+  "browser": "../dist/ws/browser.js",
+  "dependencies": {
+    "ws": "^8.13.0",
+    "eventemitter3": "^5.0.1"
+  }
+}
