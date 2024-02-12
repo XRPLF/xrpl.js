@@ -3,6 +3,7 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
+* Rectify the flag name `tfNoDirectRipple` into `tfNoRippleDirect` to adhere to documentation.
 
 ## 3.0.0 (2024-02-01)
 
@@ -52,7 +53,7 @@ Bundler configurations are much more simplified. See [../UNIQUE_STEPS](Unique St
 * Deprecated:
   * `convertHexToString` in favor of `@xrplf/isomorphic/utils`'s `hexToString`
   * `convertStringToHex` in favor of `@xrplf/isomorphic/utils`'s `stringToHex`
-  
+
 ## 3.0.0 Beta 1 (2023-11-30)
 
 ### Breaking Changes
