@@ -6,6 +6,7 @@ import { JsonObject, SerializedType } from './serialized-type'
 import BigNumber from 'bignumber.js'
 import { bytesToHex, concat, hexToBytes } from '@xrplf/isomorphic/utils'
 import { readUInt32BE, writeUInt32BE } from '../utils'
+import { Hash192 } from './hash-192'
 
 /**
  * Constants for validating amounts
@@ -16,7 +17,7 @@ const MAX_IOU_PRECISION = 16
 const MAX_DROPS = new BigNumber('1e17')
 const MIN_XRP = new BigNumber('1e-6')
 const mask = BigInt(0x00000000ffffffff)
-
+const MAX_MPT = new BigNumber(9223372036854775807)
 /**
  * BigNumber configuration for Amount IOUs
  */
@@ -27,26 +28,43 @@ BigNumber.config({
   ],
 })
 
-/**
- * Interface for JSON objects that represent amounts
- */
-interface AmountObject extends JsonObject {
+interface AmountObjectWithCurrency extends JsonObject {
   value: string
   currency: string
   issuer: string
 }
 
+interface AmountObjectWithID extends JsonObject {
+  value: string
+  mptIssuanceID: string
+}
+
 /**
- * Type guard for AmountObject
+ * Interface for JSON objects that represent amounts
  */
-function isAmountObject(arg): arg is AmountObject {
+type AmountObject = AmountObjectWithCurrency | AmountObjectWithID
+
+/**
+ * Type guard for AmountObjectWithCurrency
+ */
+function isAmountObjectWithCurrency(arg): arg is AmountObjectWithCurrency {
   const keys = Object.keys(arg).sort()
+
   return (
     keys.length === 3 &&
     keys[0] === 'currency' &&
     keys[1] === 'issuer' &&
     keys[2] === 'value'
   )
+}
+
+/**
+ * Type guard for AmountObjectWithID
+ */
+function isAmountObjectWithID(arg): arg is AmountObjectWithID {
+  const keys = Object.keys(arg).sort()
+
+  return keys.length === 2 && keys[0] === 'mptIssuanceID' && keys[1] === 'value'
 }
 
 /**
@@ -88,7 +106,7 @@ class Amount extends SerializedType {
       return new Amount(amount)
     }
 
-    if (isAmountObject(value)) {
+    if (isAmountObjectWithCurrency(value)) {
       const number = new BigNumber(value.value)
       Amount.assertIouIsValid(number)
 
@@ -122,6 +140,29 @@ class Amount extends SerializedType {
       const currency = Currency.from(value.currency).toBytes()
       const issuer = AccountID.from(value.issuer).toBytes()
       return new Amount(concat([amount, currency, issuer]))
+    }
+
+    if (isAmountObjectWithID(value)) {
+      amount = new Uint8Array(9)
+      const number = new BigNumber(value.value)
+      Amount.assertMptIsValid(number)
+
+      if (number.isZero()) {
+        amount[0] |= 0x60
+      } else {
+        const num = BigInt(value.value)
+
+        const intBuf = [new Uint8Array(1), new Uint8Array(4), new Uint8Array(4)]
+        writeUInt32BE(intBuf[1], Number(num >> BigInt(32)), 0)
+        writeUInt32BE(intBuf[2], Number(num & BigInt(mask)), 0)
+
+        amount = concat(intBuf)
+
+        amount[0] |= 0x60
+
+        const mptIssuanceID = Hash192.from(value.mptIssuanceID).toBytes()
+        return new Amount(concat([amount, mptIssuanceID]))
+      }
     }
 
     throw new Error('Invalid type to construct an Amount')
@@ -220,6 +261,20 @@ class Amount extends SerializedType {
       ) {
         throw new Error('Decimal precision out of range')
       }
+      this.verifyNoDecimal(decimal)
+    }
+  }
+
+  /**
+   * Validate MPT.value amount
+   *
+   * @param decimal BigNumber object representing MPT.value
+   * @returns void, but will throw if invalid amount
+   */
+  private static assertMptIsValid(decimal: BigNumber): void {
+    if (!decimal.isZero()) {
+      if (decimal.gt(MAX_MPT))
+        throw new Error(`${decimal.toString()} is an illegal amount`)
       this.verifyNoDecimal(decimal)
     }
   }
