@@ -3,7 +3,8 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
-* Rectify the flag name `tfNoDirectRipple` into `tfNoRippleDirect` to adhere to documentation.
+### BREAKING CHANGES
+* Small fix in the API to use `tfNoDirectRipple` instead of `tfNoRippleDirect`
 
 ## 3.0.0 (2024-02-01)
 
