@@ -18,6 +18,8 @@ const MAX_DROPS = new BigNumber('1e17')
 const MIN_XRP = new BigNumber('1e-6')
 const mask = BigInt(0x00000000ffffffff)
 const MAX_MPT = new BigNumber(9223372036854775807)
+
+const mptMask = BigInt(0x7fffffffffffffff)
 /**
  * BigNumber configuration for Amount IOUs
  */
@@ -28,13 +30,13 @@ BigNumber.config({
   ],
 })
 
-interface AmountObjectWithCurrency extends JsonObject {
+interface AmountObjectIOU extends JsonObject {
   value: string
   currency: string
   issuer: string
 }
 
-interface AmountObjectWithID extends JsonObject {
+interface AmountObjectMPT extends JsonObject {
   value: string
   mptIssuanceID: string
 }
@@ -42,12 +44,12 @@ interface AmountObjectWithID extends JsonObject {
 /**
  * Interface for JSON objects that represent amounts
  */
-type AmountObject = AmountObjectWithCurrency | AmountObjectWithID
+type AmountObject = AmountObjectIOU | AmountObjectMPT
 
 /**
- * Type guard for AmountObjectWithCurrency
+ * Type guard for AmountObjectIOU
  */
-function isAmountObjectWithCurrency(arg): arg is AmountObjectWithCurrency {
+function isAmountObjectIOU(arg): arg is AmountObjectIOU {
   const keys = Object.keys(arg).sort()
 
   return (
@@ -59,9 +61,9 @@ function isAmountObjectWithCurrency(arg): arg is AmountObjectWithCurrency {
 }
 
 /**
- * Type guard for AmountObjectWithID
+ * Type guard for AmountObjectMPT
  */
-function isAmountObjectWithID(arg): arg is AmountObjectWithID {
+function isAmountObjectMPT(arg): arg is AmountObjectMPT {
   const keys = Object.keys(arg).sort()
 
   return keys.length === 2 && keys[0] === 'mptIssuanceID' && keys[1] === 'value'
@@ -106,13 +108,13 @@ class Amount extends SerializedType {
       return new Amount(amount)
     }
 
-    if (isAmountObjectWithCurrency(value)) {
+    if (isAmountObjectIOU(value)) {
       const number = new BigNumber(value.value)
       Amount.assertIouIsValid(number)
 
-      if (number.isZero()) {
-        amount[0] |= 0x80
-      } else {
+      amount[0] |= 0x80
+
+      if (!number.isZero()) {
         const integerNumberString = number
           .times(`1e${-((number.e || 0) - 15)}`)
           .abs()
@@ -124,8 +126,6 @@ class Amount extends SerializedType {
         writeUInt32BE(intBuf[1], Number(num & BigInt(mask)), 0)
 
         amount = concat(intBuf)
-
-        amount[0] |= 0x80
 
         if (number.gt(new BigNumber(0))) {
           amount[0] |= 0x40
@@ -142,27 +142,22 @@ class Amount extends SerializedType {
       return new Amount(concat([amount, currency, issuer]))
     }
 
-    if (isAmountObjectWithID(value)) {
-      amount = new Uint8Array(9)
-      const number = new BigNumber(value.value)
-      Amount.assertMptIsValid(number)
+    if (isAmountObjectMPT(value)) {
+      Amount.assertMptIsValid(value.value)
 
-      if (number.isZero()) {
-        amount[0] |= 0x60
-      } else {
-        const num = BigInt(value.value)
+      let leadingByte = new Uint8Array(1)
+      leadingByte[0] |= 0x60
 
-        const intBuf = [new Uint8Array(1), new Uint8Array(4), new Uint8Array(4)]
-        writeUInt32BE(intBuf[1], Number(num >> BigInt(32)), 0)
-        writeUInt32BE(intBuf[2], Number(num & BigInt(mask)), 0)
+      const num = BigInt(value.value)
 
-        amount = concat(intBuf)
+      const intBuf = [new Uint8Array(4), new Uint8Array(4)]
+      writeUInt32BE(intBuf[0], Number(num >> BigInt(32)), 0)
+      writeUInt32BE(intBuf[1], Number(num & BigInt(mask)), 0)
 
-        amount[0] |= 0x60
+      amount = concat(intBuf)
 
-        const mptIssuanceID = Hash192.from(value.mptIssuanceID).toBytes()
-        return new Amount(concat([amount, mptIssuanceID]))
-      }
+      const mptIssuanceID = Hash192.from(value.mptIssuanceID).toBytes()
+      return new Amount(concat([leadingByte, amount, mptIssuanceID]))
     }
 
     throw new Error('Invalid type to construct an Amount')
@@ -175,8 +170,12 @@ class Amount extends SerializedType {
    * @returns An Amount object
    */
   static fromParser(parser: BinaryParser): Amount {
-    const isXRP = parser.peek() & 0x80
-    const numBytes = isXRP ? 48 : 8
+    const isIOU = parser.peek() & 0x80
+    if (isIOU) return new Amount(parser.read(48))
+
+    // the amount can be either MPT or XRP at this point
+    const isMPT = parser.peek() & 0x20
+    const numBytes = isMPT ? 33 : 8
     return new Amount(parser.read(numBytes))
   }
 
@@ -197,7 +196,9 @@ class Amount extends SerializedType {
       const num = (msb << BigInt(32)) | lsb
 
       return `${sign}${num.toString()}`
-    } else {
+    }
+
+    if (this.isIOU()) {
       const parser = new BinaryParser(this.toString())
       const mantissa = parser.read(8)
       const currency = Currency.fromParser(parser) as Currency
@@ -223,6 +224,27 @@ class Amount extends SerializedType {
         issuer: issuer.toJSON(),
       }
     }
+
+    if (this.isMPT()) {
+      const parser = new BinaryParser(this.toString())
+      const leadingByte = parser.read(1)
+      const amount = parser.read(8)
+      const mptID = Hash192.fromParser(parser) as Hash192
+
+      const isPositive = leadingByte[0] & 0x40
+      const sign = isPositive ? '' : '-'
+
+      const msb = BigInt(readUInt32BE(amount.slice(0, 4), 0))
+      const lsb = BigInt(readUInt32BE(amount.slice(4), 0))
+      const num = (msb << BigInt(32)) | lsb
+
+      return {
+        value: `${sign}${num.toString()}`,
+        mptIssuanceID: mptID.toString(),
+      }
+    }
+
+    throw new Error('Invalid amount to construct JSON')
   }
 
   /**
@@ -271,11 +293,16 @@ class Amount extends SerializedType {
    * @param decimal BigNumber object representing MPT.value
    * @returns void, but will throw if invalid amount
    */
-  private static assertMptIsValid(decimal: BigNumber): void {
+  private static assertMptIsValid(amount: string): void {
+    if (amount.indexOf('.') !== -1) {
+      throw new Error(`${amount.toString()} is an illegal amount`)
+    }
+
+    const decimal = new BigNumber(amount)
     if (!decimal.isZero()) {
-      if (decimal.gt(MAX_MPT))
-        throw new Error(`${decimal.toString()} is an illegal amount`)
-      this.verifyNoDecimal(decimal)
+      if (Number(BigInt(amount) & ~BigInt(mptMask)) != 0) {
+        throw new Error(`${amount.toString()} is an illegal amount`)
+      }
     }
   }
 
@@ -303,7 +330,25 @@ class Amount extends SerializedType {
    * @returns true if Native (XRP)
    */
   private isNative(): boolean {
-    return (this.bytes[0] & 0x80) === 0
+    return (this.bytes[0] & 0x80) === 0 && (this.bytes[0] | 0x20) === 0
+  }
+
+  /**
+   * Test if this amount is in units of MPT
+   *
+   * @returns true if MPT
+   */
+  private isMPT(): boolean {
+    return (this.bytes[0] & 0x80) === 0 && (this.bytes[0] & 0x20) !== 0
+  }
+
+  /**
+   * Test if this amount is in units of IOU
+   *
+   * @returns true if IOU
+   */
+  private isIOU(): boolean {
+    return (this.bytes[0] & 0x80) !== 0
   }
 }
 
