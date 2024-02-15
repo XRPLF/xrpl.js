@@ -54,7 +54,7 @@ describe('client.requestAll', function () {
     assert.equal(allResponses.length, 1)
   })
 
-  it('handles when the first page has no resuts', async function () {
+  it('handles when the first page has no results', async function () {
     testContext.mockRippled!.addResponse(
       'ledger_data',
       rippledResponseFirstEmpty,
