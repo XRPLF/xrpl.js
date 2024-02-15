@@ -17,9 +17,8 @@ const MAX_IOU_PRECISION = 16
 const MAX_DROPS = new BigNumber('1e17')
 const MIN_XRP = new BigNumber('1e-6')
 const mask = BigInt(0x00000000ffffffff)
-const MAX_MPT = new BigNumber(9223372036854775807)
-
 const mptMask = BigInt(0x7fffffffffffffff)
+
 /**
  * BigNumber configuration for Amount IOUs
  */
@@ -112,9 +111,9 @@ class Amount extends SerializedType {
       const number = new BigNumber(value.value)
       Amount.assertIouIsValid(number)
 
-      amount[0] |= 0x80
-
-      if (!number.isZero()) {
+      if (number.isZero()) {
+        amount[0] |= 0x80
+      } else {
         const integerNumberString = number
           .times(`1e${-((number.e || 0) - 15)}`)
           .abs()
@@ -126,6 +125,8 @@ class Amount extends SerializedType {
         writeUInt32BE(intBuf[1], Number(num & BigInt(mask)), 0)
 
         amount = concat(intBuf)
+
+        amount[0] |= 0x80
 
         if (number.gt(new BigNumber(0))) {
           amount[0] |= 0x40
