@@ -1,0 +1,14 @@
+{
+  "id": 0,
+  "status": "success",
+  "type": "response",
+  "result": {
+    "ledger_hash":
+      "102A6E70FFB18C18E97BB56E3047B0E45EA1BCC90BFCCB8CBB0D07BF0E2AB449",
+    "ledger_index": 38202000,
+    "marker":
+      "000B714B790C3C79FEE00D17C4DEB436B375466F29679447BA64F265FD63D730",
+    "state": [],
+    "validated": true
+  }
+}
