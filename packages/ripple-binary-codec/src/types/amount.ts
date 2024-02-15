@@ -79,7 +79,7 @@ class Amount extends SerializedType {
   }
 
   /**
-   * Construct an amount from an IOU or string amount
+   * Construct an amount from an IOU, MPT or string amount
    *
    * @param value An Amount, object representing an IOU, or a string
    *     representing an integer amount
