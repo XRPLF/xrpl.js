@@ -4,7 +4,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 ### BREAKING CHANGES
-* Small fix in the API to use `tfNoDirectRipple` instead of `tfNoRippleDirect`
+* Small fix in the API to use a new flag name `tfNoDirectRipple` instead of the existing flag name `tfNoRippleDirect`
 
 ## 3.0.0 (2024-02-01)
 
