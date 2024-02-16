@@ -39,6 +39,11 @@ export { EscrowCancel } from './escrowCancel'
 export { EscrowCreate } from './escrowCreate'
 export { EscrowFinish } from './escrowFinish'
 export { EnableAmendment, EnableAmendmentFlags } from './enableAmendment'
+export {
+  MPTokenIssuanceCreate,
+  MPTokenIssuanceCreateFlags,
+  MPTokenIssuanceCreateFlagsInterface,
+} from './MPTokenIssuanceCreate'
 export { NFTokenAcceptOffer } from './NFTokenAcceptOffer'
 export { NFTokenBurn } from './NFTokenBurn'
 export { NFTokenCancelOffer } from './NFTokenCancelOffer'
