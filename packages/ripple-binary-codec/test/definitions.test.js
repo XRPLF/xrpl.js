@@ -1,6 +1,6 @@
 const { encode, decode, XrplDefinitions } = require('../src')
 const normalDefinitionsJson = require('../src/enums/definitions.json')
-const xahauDefinitionsJson = require('../src/enums/definitions-xahau.json')
+const altDefinitions = require('xrpl-binary-codec-prerelease/dist/enums/definitions-xahau.json')
 const { UInt32 } = require('../dist/types/uint-32')
 
 const txJson = {
@@ -160,14 +160,14 @@ describe('encode and decode using new types as a parameter', function () {
   })
 })
 
-describe('xahau related tests', function () {
+describe('non-xrpl definition related tests', function () {
   const txWithNetworkId = { ...txJson, NetworkID: 1337 }
 
   const xrplDefs = new XrplDefinitions(
     JSON.parse(JSON.stringify(normalDefinitionsJson)),
   )
-  const xahauDefs = new XrplDefinitions(
-    JSON.parse(JSON.stringify(xahauDefinitionsJson)),
+  const altDefs = new XrplDefinitions(
+    JSON.parse(JSON.stringify(altDefinitions)),
   )
 
   test('hooks definitions support NetworkID', function () {
@@ -177,14 +177,14 @@ describe('xahau related tests', function () {
   test('xrpl definitions do not support NetworkID', function () {
     expect(decode(encode(txWithNetworkId))).not.toContain('NetworkID')
   })
-  test('xahau native asset from definitions', function () {
-    expect(xahauDefs.getNativeAsset()).toEqual('XAH')
+  test('alt native asset from definitions', function () {
+    expect(altDefs.getNativeAsset()).toEqual('XAH')
   })
   test('xrpl native asset from definitions', function () {
     expect(xrplDefs.getNativeAsset()).toEqual('XRP')
   })
   test('definition hash if present', function () {
-    expect(xahauDefs.getHash()).toEqual(
+    expect(altDefs.getHash()).toEqual(
       '5EFE8D2AD3531B7A166FDE52B2642F0266F2567158E5692386679E1D354BF8C7',
     )
   })
