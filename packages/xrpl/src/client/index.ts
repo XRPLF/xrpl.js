@@ -496,7 +496,6 @@ class Client extends EventEmitter<EventTypes> {
       })
       this.networkID = response.result.info.network_id ?? undefined
       this.buildVersion = response.result.info.build_version
-      // set this.apiVersion to 1 or 2 based on the buildVersion major version
       this.apiVersion = parseInt(this.buildVersion.split('.')[0], 10)
     } catch (error) {
       // eslint-disable-next-line no-console -- Print the error to console but allows client to be connected.
