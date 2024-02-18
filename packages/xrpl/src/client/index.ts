@@ -199,6 +199,12 @@ class Client extends EventEmitter<EventTypes> {
   public buildVersion: string | undefined
 
   /**
+   * API Version used by the server this client is connected to
+   *
+   */
+  public apiVersion: number | undefined
+
+  /**
    * Creates a new Client with a websocket connection to a rippled server.
    *
    * @param server - URL of the server to connect to.
@@ -313,6 +319,7 @@ class Client extends EventEmitter<EventTypes> {
         ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be string
           ensureClassicAddress(req.account as string)
         : undefined,
+      api_version: req.api_version ?? this.apiVersion,
     })
 
     // mutates `response` to add warnings
@@ -489,6 +496,8 @@ class Client extends EventEmitter<EventTypes> {
       })
       this.networkID = response.result.info.network_id ?? undefined
       this.buildVersion = response.result.info.build_version
+      // set this.apiVersion to 1 or 2 based on the buildVersion major version
+      this.apiVersion = parseInt(this.buildVersion.split('.')[0], 10)
     } catch (error) {
       // eslint-disable-next-line no-console -- Print the error to console but allows client to be connected.
       console.error(error)
