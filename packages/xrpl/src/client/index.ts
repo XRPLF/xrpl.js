@@ -2,6 +2,7 @@
 
 /* eslint-disable max-lines -- Client is a large file w/ lots of imports/exports */
 import { EventEmitter } from 'eventemitter3'
+import { XrplDefinitionsBase } from 'ripple-binary-codec/dist'
 
 import {
   RippledError,
@@ -41,7 +42,10 @@ import type {
   EventTypes,
   OnEventToListenerMap,
 } from '../models/methods/subscribe'
-import type { SubmittableTransaction } from '../models/transactions'
+import type {
+  BaseTransaction,
+  SubmittableTransaction,
+} from '../models/transactions'
 import { setTransactionFlagsToNumber } from '../models/utils/flags'
 import {
   ensureClassicAddress,
@@ -628,7 +632,7 @@ class Client extends EventEmitter<EventTypes> {
    * Only used for multisigned transactions.
    * @returns The autofilled transaction.
    */
-  public async autofill<T extends SubmittableTransaction>(
+  public async autofill<T extends BaseTransaction = SubmittableTransaction>(
     transaction: T,
     signersCount?: number,
   ): Promise<T> {
@@ -753,6 +757,7 @@ class Client extends EventEmitter<EventTypes> {
    * @param opts.autofill - If true, autofill a transaction.
    * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
    * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
+   * @param definitions - Optional. Custom rippled type definitions. Used for sidechains and new amendments.
    * @throws Connection errors: If the `Client` object is unable to establish a connection to the specified WebSocket endpoint,
    * an error will be thrown.
    * @throws Transaction errors: If the submitted transaction is invalid or cannot be included in a validated ledger for any
@@ -765,7 +770,7 @@ class Client extends EventEmitter<EventTypes> {
    * @returns A promise that contains TxResponse, that will return when the transaction has been validated.
    */
   public async submitAndWait<
-    T extends SubmittableTransaction = SubmittableTransaction,
+    T extends BaseTransaction = SubmittableTransaction,
   >(
     transaction: T | string,
     opts?: {
@@ -776,10 +781,12 @@ class Client extends EventEmitter<EventTypes> {
       // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
       wallet?: Wallet
     },
+    // Custom rippled types to use instead of the default. Used for sidechains and amendments.
+    definitions?: XrplDefinitionsBase,
   ): Promise<TxResponse<T>> {
-    const signedTx = await getSignedTx(this, transaction, opts)
+    const signedTx = await getSignedTx(this, transaction, opts, definitions)
 
-    const lastLedger = getLastLedgerSequence(signedTx)
+    const lastLedger = getLastLedgerSequence(signedTx, definitions)
     if (lastLedger == null) {
       throw new ValidationError(
         'Transaction must contain a LastLedgerSequence value for reliable submission.',

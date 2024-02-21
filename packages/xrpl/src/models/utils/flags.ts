@@ -9,13 +9,12 @@ import {
 import { AccountSetTfFlags } from '../transactions/accountSet'
 import { AMMDepositFlags } from '../transactions/AMMDeposit'
 import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
-import { GlobalFlags } from '../transactions/common'
+import { BaseTransaction, GlobalFlags } from '../transactions/common'
 import { NFTokenCreateOfferFlags } from '../transactions/NFTokenCreateOffer'
 import { NFTokenMintFlags } from '../transactions/NFTokenMint'
 import { OfferCreateFlags } from '../transactions/offerCreate'
 import { PaymentFlags } from '../transactions/payment'
 import { PaymentChannelClaimFlags } from '../transactions/paymentChannelClaim'
-import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlags } from '../transactions/trustSet'
 import { XChainModifyBridgeFlags } from '../transactions/XChainModifyBridge'
 
@@ -63,7 +62,7 @@ const txToFlag = {
  *
  * @param tx - A transaction to set its flags to its numeric representation.
  */
-export function setTransactionFlagsToNumber(tx: Transaction): void {
+export function setTransactionFlagsToNumber(tx: BaseTransaction): void {
   if (tx.Flags == null) {
     tx.Flags = 0
     return

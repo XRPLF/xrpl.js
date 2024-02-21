@@ -23,7 +23,12 @@ import {
 
 import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
-import { Transaction, validate } from '../models/transactions'
+import {
+  BaseTransaction,
+  SubmittableTransaction,
+  Transaction,
+  validate,
+} from '../models/transactions'
 import { ensureClassicAddress } from '../sugar/utils'
 import { omitBy } from '../utils/collections'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
@@ -372,9 +377,9 @@ export class Wallet {
    * @throws XrplError if the issued currency being signed is XRP ignoring case.
    */
   // eslint-disable-next-line max-lines-per-function -- introduced more checks to support both string and boolean inputs.
-  public sign(
+  public sign<T extends BaseTransaction = SubmittableTransaction>(
     this: Wallet,
-    transaction: Transaction,
+    transaction: T,
     multisign?: boolean | string,
   ): {
     tx_blob: string

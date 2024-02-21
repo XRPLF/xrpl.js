@@ -2,9 +2,10 @@ import BigNumber from 'bignumber.js'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 import type { Client } from '..'
+import { EscrowFinish } from '../../dist/npm'
 import { ValidationError, XrplError } from '../errors'
 import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
-import { Transaction } from '../models/transactions'
+import { BaseTransaction, SubmittableTransaction } from '../models/transactions'
 import { xrpToDrops } from '../utils'
 
 import getFeeXrp from './getFeeXrp'
@@ -122,7 +123,7 @@ interface ClassicAccountAndTag {
  *
  * @param tx - The transaction object.
  */
-export function setValidAddresses(tx: Transaction): void {
+export function setValidAddresses(tx: BaseTransaction): void {
   validateAccountAddress(tx, 'Account', 'SourceTag')
   // eslint-disable-next-line @typescript-eslint/dot-notation -- Destination can exist on Transaction
   if (tx['Destination'] != null) {
@@ -146,11 +147,9 @@ export function setValidAddresses(tx: Transaction): void {
  * @param tagField - The field name for the tag in the transaction object.
  * @throws {ValidationError} If the tag field does not match the tag of the account address.
  */
-function validateAccountAddress(
-  tx: Transaction,
-  accountField: string,
-  tagField: string,
-): void {
+function validateAccountAddress<
+  T extends BaseTransaction = SubmittableTransaction,
+>(tx: T, accountField: string, tagField: string): void {
   // if X-address is given, convert it to classic address
   const { classicAccount, tag } = getClassicAccountAndTag(tx[accountField])
   // eslint-disable-next-line no-param-reassign -- param reassign is safe
@@ -203,7 +202,9 @@ function getClassicAccountAndTag(
  * @param tx - The transaction object.
  * @param fieldName - The name of the field to convert.export
  */
-function convertToClassicAddress(tx: Transaction, fieldName: string): void {
+function convertToClassicAddress<
+  T extends BaseTransaction = SubmittableTransaction,
+>(tx: T, fieldName: string): void {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- assignment is safe
   const account = tx[fieldName]
   if (typeof account === 'string') {
@@ -223,7 +224,7 @@ function convertToClassicAddress(tx: Transaction, fieldName: string): void {
  */
 export async function setNextValidSequenceNumber(
   client: Client,
-  tx: Transaction,
+  tx: BaseTransaction,
 ): Promise<void> {
   const request: AccountInfoRequest = {
     command: 'account_info',
@@ -263,7 +264,7 @@ async function fetchAccountDeleteFee(client: Client): Promise<BigNumber> {
  */
 export async function calculateFeePerTransactionType(
   client: Client,
-  tx: Transaction,
+  tx: BaseTransaction,
   signersCount = 0,
 ): Promise<void> {
   // netFee is usually 0.00001 XRP (10 drops)
@@ -272,14 +273,22 @@ export async function calculateFeePerTransactionType(
   let baseFee = new BigNumber(netFeeDrops)
 
   // EscrowFinish Transaction with Fulfillment
-  if (tx.TransactionType === 'EscrowFinish' && tx.Fulfillment != null) {
-    const fulfillmentBytesSize: number = Math.ceil(tx.Fulfillment.length / 2)
-    // 10 drops × (33 + (Fulfillment size in bytes / 16))
-    const product = new BigNumber(
-      // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expected use of magic numbers
-      scaleValue(netFeeDrops, 33 + fulfillmentBytesSize / 16),
-    )
-    baseFee = product.dp(0, BigNumber.ROUND_CEIL)
+  if (
+    tx.TransactionType === 'EscrowFinish' &&
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- This has been checked.
+    (tx as EscrowFinish).Fulfillment != null
+  ) {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- This has been checked.
+    const fulfillment = (tx as EscrowFinish).Fulfillment
+    if (fulfillment != null) {
+      const fulfillmentBytesSize: number = Math.ceil(fulfillment.length / 2)
+      // 10 drops × (33 + (Fulfillment size in bytes / 16))
+      const product = new BigNumber(
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expected use of magic numbers
+        scaleValue(netFeeDrops, 33 + fulfillmentBytesSize / 16),
+      )
+      baseFee = product.dp(0, BigNumber.ROUND_CEIL)
+    }
   }
 
   if (
@@ -326,10 +335,9 @@ function scaleValue(value, multiplier): string {
  * @param tx - The transaction object.
  * @returns A promise that resolves with void. Modifies the `tx` parameter setting `LastLedgerSequence`.
  */
-export async function setLatestValidatedLedgerSequence(
-  client: Client,
-  tx: Transaction,
-): Promise<void> {
+export async function setLatestValidatedLedgerSequence<
+  T extends BaseTransaction = SubmittableTransaction,
+>(client: Client, tx: T): Promise<void> {
   const ledgerSequence = await client.getLedgerIndex()
   // eslint-disable-next-line no-param-reassign -- param reassign is safe
   tx.LastLedgerSequence = ledgerSequence + LEDGER_OFFSET
@@ -344,7 +352,7 @@ export async function setLatestValidatedLedgerSequence(
  */
 export async function checkAccountDeleteBlockers(
   client: Client,
-  tx: Transaction,
+  tx: BaseTransaction,
 ): Promise<void> {
   const request: AccountObjectsRequest = {
     command: 'account_objects',
