@@ -96,6 +96,10 @@ import {
   MPTokenIssuanceDestroy,
   validateMPTokenIssuanceDestroy,
 } from './MPTokenIssuanceDestroy'
+import {
+  MPTokenIssuanceSet,
+  validateMPTokenIssuanceSet,
+} from './MPTokenIssuanceSet'
 
 /**
  * Transactions that can be submitted by clients
@@ -123,6 +127,7 @@ export type SubmittableTransaction =
   | EscrowFinish
   | MPTokenIssuanceCreate
   | MPTokenIssuanceDestroy
+  | MPTokenIssuanceSet
   | NFTokenAcceptOffer
   | NFTokenBurn
   | NFTokenCancelOffer
@@ -318,6 +323,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'MPTokenIssuanceDestroy':
       validateMPTokenIssuanceDestroy(tx)
+      break
+
+    case 'MPTokenIssuanceSet':
+      validateMPTokenIssuanceSet(tx)
       break
 
     case 'NFTokenAcceptOffer':

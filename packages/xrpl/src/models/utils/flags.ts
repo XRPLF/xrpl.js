@@ -19,6 +19,7 @@ import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlags } from '../transactions/trustSet'
 import { XChainModifyBridgeFlags } from '../transactions/XChainModifyBridge'
 import { MPTokenIssuanceCreateFlags } from '../transactions/MPTokenIssuanceCreate'
+import { MPTokenIssuanceSetFlags } from '../transactions/MPTokenIssuanceSet'
 
 import { isFlagEnabled } from '.'
 
@@ -50,9 +51,10 @@ const txToFlag = {
   AccountSet: AccountSetTfFlags,
   AMMDeposit: AMMDepositFlags,
   AMMWithdraw: AMMWithdrawFlags,
+  MPTokenIssuanceCreate: MPTokenIssuanceCreateFlags,
+  MPTokenIssuanceSet: MPTokenIssuanceSetFlags,
   NFTokenCreateOffer: NFTokenCreateOfferFlags,
   NFTokenMint: NFTokenMintFlags,
-  MPTokenIssuanceCreate: MPTokenIssuanceCreateFlags,
   OfferCreate: OfferCreateFlags,
   PaymentChannelClaim: PaymentChannelClaimFlags,
   Payment: PaymentFlags,

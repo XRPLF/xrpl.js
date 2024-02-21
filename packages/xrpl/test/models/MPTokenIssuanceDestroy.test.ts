@@ -20,7 +20,7 @@ describe('MPTokenIssuanceDestroy', function () {
     assert.doesNotThrow(() => validate(validMPTokenIssuanceDestroy))
   })
 
-  it(`throws w/ missing MPTOkenIssuanceID`, function () {
+  it(`throws w/ missing MPTokenIssuanceID`, function () {
     const invalid = {
       TransactionType: 'MPTokenIssuanceDestroy',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
