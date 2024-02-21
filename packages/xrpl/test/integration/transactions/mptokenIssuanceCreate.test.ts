@@ -29,13 +29,10 @@ describe('MPTokenIssuanceCreate', function () {
         Account: testContext.wallet.classicAddress,
         MaximumAmount: mptDecimalToHex('9223372036854775807'), // 0x7fffffffffffffff
         AssetScale: 2,
-        TransferFee: 1,
-        Flags: 2,
       }
 
       await testTransaction(testContext.client, tx, testContext.wallet)
 
-      // confirm that the offer actually went through
       let accountObjectsResponse = await testContext.client.request({
         command: 'account_objects',
         account: testContext.wallet.classicAddress,

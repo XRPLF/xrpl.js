@@ -44,6 +44,7 @@ export {
   MPTokenIssuanceCreateFlags,
   MPTokenIssuanceCreateFlagsInterface,
 } from './MPTokenIssuanceCreate'
+export { MPTokenIssuanceDestroy } from './MPTokenIssuanceDestroy'
 export { NFTokenAcceptOffer } from './NFTokenAcceptOffer'
 export { NFTokenBurn } from './NFTokenBurn'
 export { NFTokenCancelOffer } from './NFTokenCancelOffer'

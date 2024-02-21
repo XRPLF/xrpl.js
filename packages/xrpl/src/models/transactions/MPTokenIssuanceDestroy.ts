@@ -17,7 +17,7 @@ export interface MPTokenIssuanceDestroy extends BaseTransaction {
   /**
    * Identifies the MPTokenIssuance object to be removed by the transaction.
    */
-  MPTokenIssuanceID?: string
+  MPTokenIssuanceID: string
 }
 
 /**
