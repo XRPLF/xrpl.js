@@ -10,11 +10,10 @@ import {
  * from the directory node in which it is being held, effectively removing the token
  * from the ledger. If this operation succeeds, the corresponding
  * MPTokenIssuance is removed and the owner’s reserve requirement is reduced by one.
- * This operation must fail if there are any holders of the MPT in question.
+ * This operation must fail if there are any holders who have non-zero balances.
  */
 export interface MPTokenIssuanceDestroy extends BaseTransaction {
   TransactionType: 'MPTokenIssuanceDestroy'
-
   /**
    * Identifies the MPTokenIssuance object to be removed by the transaction.
    */

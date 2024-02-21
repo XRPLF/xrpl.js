@@ -8,7 +8,7 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { testTransaction } from '../utils'
-import { mptToHex } from '../../../src/utils'
+import { mptDecimalToHex } from '../../../src/utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -27,7 +27,10 @@ describe('MPTokenIssuanceCreate', function () {
       const tx: MPTokenIssuanceCreate = {
         TransactionType: 'MPTokenIssuanceCreate',
         Account: testContext.wallet.classicAddress,
-        MaximumAmount: mptToHex('9223372036854775807'), // 0x7fffffffffffffff
+        MaximumAmount: mptDecimalToHex('9223372036854775807'), // 0x7fffffffffffffff
+        AssetScale: 2,
+        TransferFee: 1,
+        Flags: 2,
       }
 
       await testTransaction(testContext.client, tx, testContext.wallet)
@@ -40,25 +43,6 @@ describe('MPTokenIssuanceCreate', function () {
       assert.lengthOf(
         accountObjectsResponse.result.account_objects!,
         1,
-        'Should be exactly one issuance on the ledger',
-      )
-
-      const bigAmtTx: MPTokenIssuanceCreate = {
-        TransactionType: 'MPTokenIssuanceCreate',
-        Account: testContext.wallet.classicAddress,
-        MaximumAmount: mptToHex('9223372036854775808'),
-      }
-
-      await testTransaction(testContext.client, bigAmtTx, testContext.wallet)
-
-      // confirm that the offer actually went through
-      accountObjectsResponse = await testContext.client.request({
-        command: 'account_objects',
-        account: testContext.wallet.classicAddress,
-      })
-      assert.lengthOf(
-        accountObjectsResponse.result.account_objects!,
-        2,
         'Should be exactly one issuance on the ledger',
       )
     },

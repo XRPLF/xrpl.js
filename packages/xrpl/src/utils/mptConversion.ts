@@ -1,43 +1,51 @@
+import BigNumber from 'bignumber.js'
 import { ValidationError } from '../errors'
 
+const SANITY_CHECK = /^[0-9]+$/u
+
 /**
- * Convert an amount in XRP to an amount in drops.
+ * Convert an integer string to hex string.
  *
- * @param number - Amount in MPT.
- * @returns Amount in drops.
- * @throws When amount in xrp is invalid.
+ * @param numberToConvert - Non-negative number string.
+ * @returns Amount in hex string.
+ * @throws When amount is invalid.
  * @category Utilities
  */
-export function mptToHex(number: string): string {
-  // mpts are only whole units
-  if (number.includes('.')) {
+export function mptDecimalToHex(numberToConvert: string): string {
+  // convert to base 10 string first for inputs like scientific notation
+  const number = new BigNumber(numberToConvert).toString(10)
+
+  // check that the value is valid and actually a number
+  if (typeof numberToConvert === 'string' && number === 'NaN') {
     throw new ValidationError(
-      `mptToHex: value '${number}' has too many decimal places.`,
+      `mptDecimalToHex: invalid value '${numberToConvert}', should be a string-encoded number.`,
     )
   }
 
-  console.log(BigInt(number))
+  // mpts are only whole units
+  if (number.includes('.')) {
+    throw new ValidationError(
+      `mptDecimalToHex: value '${numberToConvert}' has too many decimal places.`,
+    )
+  }
+  if (number.includes('-')) {
+    throw new ValidationError(
+      `mptDecimalToHex: value '${numberToConvert}' cannot be negative.`,
+    )
+  }
+
+  if (!SANITY_CHECK.exec(number)) {
+    throw new ValidationError(
+      `mptDecimalToHex: failed sanity check -` +
+        ` value '${numberToConvert}',` +
+        ` does not match (^[0-9]+$).`,
+    )
+  }
 
   if (Number(BigInt(number) & BigInt('0x8000000000000000')) != 0)
     throw new ValidationError(
-      `mptToHex: invalid value '${number}', should be within 63-bit range.`,
+      `mptDecimalToHex: invalid value '${numberToConvert}', should be within 63-bit range.`,
     )
 
   return BigInt(number).toString(16)
 }
-// export function mptToHex(number: number): string {
-//   // mpts are only whole units
-//   if (number.toString().includes('.')) {
-//     throw new ValidationError(
-//       `mptToHex: value '${number}' has too many decimal places.`,
-//     )
-//   }
-
-//   console.log('printttttt', BigInt(number))
-//   if (Number(BigInt(number) & BigInt(0x8000000000000000)) != 0)
-//     throw new ValidationError(
-//       `mptToHex: invalid value '${number}', should be within 63-bit range.`,
-//     )
-
-//   return number.toString(16)
-// }

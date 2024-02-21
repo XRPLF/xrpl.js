@@ -109,6 +109,12 @@ export function validateMPTokenIssuanceCreate(
 ): void {
   validateBaseTransaction(tx)
 
+  if (typeof tx.MPTokenMetadata === 'string' && tx.MPTokenMetadata === '') {
+    throw new ValidationError(
+      'MPTokenIssuanceCreate: MPTokenMetadata must not be empty string',
+    )
+  }
+
   if (typeof tx.MPTokenMetadata === 'string' && !isHex(tx.MPTokenMetadata)) {
     throw new ValidationError(
       'MPTokenIssuanceCreate: MPTokenMetadata must be in hex format',
