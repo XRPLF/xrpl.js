@@ -84,9 +84,9 @@ describe('fundWallet', function () {
   // })
 
   it(
-    'can generate wallet on hooks v3 testnet',
+    'can generate wallet on hooks testnet',
     async function () {
-      const api = new Client('wss://hooks-testnet-v3.xrpl-labs.com')
+      const api = new Client('wss://xahau-test.net')
 
       await api.connect()
 

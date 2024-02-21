@@ -23,14 +23,14 @@ export interface FundingOptions {
    */
   amount?: string
   /**
-   * A custom host for a faucet server. On devnet, testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
+   * A custom host for a faucet server. On devnet, testnet, AMM devnet, and Hooks testnet, `fundWallet` will
    * attempt to determine the correct server automatically. In other environments, or if you would like to customize
    * the faucet host in devnet or testnet, you should provide the host using this option.
    */
   faucetHost?: string
   /**
    * A custom path for a faucet server. On devnet,
-   * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
+   * testnet, AMM devnet, and Hooks testnet, `fundWallet` will
    * attempt to determine the correct path automatically. In other environments,
    * or if you would like to customize the faucet path in devnet or testnet,
    * you should provide the path using this option.
@@ -115,12 +115,12 @@ export interface FundWalletOptions {
  *
  * @param options - See below
  * @param options.faucetHost - A custom host for a faucet server. On devnet,
- * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
+ * testnet, AMM devnet, and Hooks testnet, `fundWallet` will
  * attempt to determine the correct server automatically. In other environments,
  * or if you would like to customize the faucet host in devnet or testnet,
  * you should provide the host using this option.
  * @param options.faucetPath - A custom path for a faucet server. On devnet,
- * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
+ * testnet, AMM devnet, and Hooks testnet, `fundWallet` will
  * attempt to determine the correct path automatically. In other environments,
  * or if you would like to customize the faucet path in devnet or testnet,
  * you should provide the path using this option.
