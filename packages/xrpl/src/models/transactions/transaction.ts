@@ -88,6 +88,7 @@ import {
   XChainModifyBridge,
   validateXChainModifyBridge,
 } from './XChainModifyBridge'
+import { MPTokenAuthorize, validateMPTokenAuthorize } from './MPTokenAuthorize'
 import {
   MPTokenIssuanceCreate,
   validateMPTokenIssuanceCreate,
@@ -125,6 +126,7 @@ export type SubmittableTransaction =
   | EscrowCancel
   | EscrowCreate
   | EscrowFinish
+  | MPTokenAuthorize
   | MPTokenIssuanceCreate
   | MPTokenIssuanceDestroy
   | MPTokenIssuanceSet
@@ -315,6 +317,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'EscrowFinish':
       validateEscrowFinish(tx)
+      break
+
+    case 'MPTokenAuthorize':
+      validateMPTokenAuthorize(tx)
       break
 
     case 'MPTokenIssuanceCreate':

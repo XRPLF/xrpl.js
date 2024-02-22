@@ -40,6 +40,11 @@ export { EscrowCreate } from './escrowCreate'
 export { EscrowFinish } from './escrowFinish'
 export { EnableAmendment, EnableAmendmentFlags } from './enableAmendment'
 export {
+  MPTokenAuthorize,
+  MPTokenAuthorizeFlags,
+  MPTokenAuthorizeFlagsInterface,
+} from './MPTokenAuthorize'
+export {
   MPTokenIssuanceCreate,
   MPTokenIssuanceCreateFlags,
   MPTokenIssuanceCreateFlagsInterface,
