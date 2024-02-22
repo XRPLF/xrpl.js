@@ -44,10 +44,10 @@ describe('Get Faucet host ', function () {
     assert.strictEqual(getFaucetHost(testContext.client), expectedFaucet)
   })
 
-  it('returns the Hooks Testnet host', function () {
-    const expectedFaucet = FaucetNetwork.HooksTestnet
+  it('returns the Xahau Testnet host', function () {
+    const expectedFaucet = FaucetNetwork.XahauTestnet
     // @ts-expect-error Intentionally modifying private data for test
-    testContext.client.connection.url = FaucetNetwork.HooksTestnet
+    testContext.client.connection.url = FaucetNetwork.XahauTestnet
 
     assert.strictEqual(getFaucetHost(testContext.client), expectedFaucet)
   })
@@ -63,10 +63,10 @@ describe('Get Faucet host ', function () {
     )
   })
 
-  it('returns the correct faucetPath for Hooks Testnet host', function () {
-    const expectedFaucetPath = FaucetNetworkPaths[FaucetNetwork.HooksTestnet]
+  it('returns the correct faucetPath for Xahau Testnet host', function () {
+    const expectedFaucetPath = FaucetNetworkPaths[FaucetNetwork.XahauTestnet]
     // @ts-expect-error Intentionally modifying private data for test
-    testContext.client.connection.url = FaucetNetwork.HooksTestnet
+    testContext.client.connection.url = FaucetNetwork.XahauTestnet
 
     assert.strictEqual(
       getDefaultFaucetPath(getFaucetHost(testContext.client)),

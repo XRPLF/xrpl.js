@@ -19,7 +19,7 @@ const NetworkID = 1025
 const Fee = '10'
 const Sequence = 1432
 const LastLedgerSequence = 2908734
-const HOOKS_TESTNET_ID = 21338
+const XAHAU_TESTNET_ID = 21338
 
 describe('client.autofill', function () {
   let testContext: XrplTestContext
@@ -141,10 +141,10 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.NetworkID, undefined)
   })
 
-  // Hooks Testnet requires networkID in transaction regardless of version.
+  // Xahau Testnet requires networkID in transaction regardless of version.
   // More context: https://github.com/XRPLF/rippled/pull/4370
-  it('overrides network ID for hooks testnet', async function () {
-    await setupMockRippledVersionAndID('1.10.1', HOOKS_TESTNET_ID)
+  it('overrides network ID for Xahau testnet', async function () {
+    await setupMockRippledVersionAndID('1.10.1', XAHAU_TESTNET_ID)
     const tx: Payment = {
       TransactionType: 'Payment',
       Account: 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi',
@@ -158,7 +158,7 @@ describe('client.autofill', function () {
 
     const txResult = await testContext.client.autofill(tx)
 
-    assert.strictEqual(txResult.NetworkID, HOOKS_TESTNET_ID)
+    assert.strictEqual(txResult.NetworkID, XAHAU_TESTNET_ID)
   })
 
   it('converts Account & Destination X-address to their classic address', async function () {

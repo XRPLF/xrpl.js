@@ -14,13 +14,13 @@ export interface FaucetWallet {
 export enum FaucetNetwork {
   Testnet = 'faucet.altnet.rippletest.net',
   Devnet = 'faucet.devnet.rippletest.net',
-  HooksTestnet = 'xahau-test.net',
+  XahauTestnet = 'xahau-test.net',
 }
 
 export const FaucetNetworkPaths: Record<string, string> = {
   [FaucetNetwork.Testnet]: '/accounts',
   [FaucetNetwork.Devnet]: '/accounts',
-  [FaucetNetwork.HooksTestnet]: '/accounts',
+  [FaucetNetwork.XahauTestnet]: '/accounts',
 }
 
 /**
@@ -34,7 +34,7 @@ export function getFaucetHost(client: Client): FaucetNetwork | undefined {
   const connectionUrl = client.url
 
   if (connectionUrl.includes('xahau-test.net')) {
-    return FaucetNetwork.HooksTestnet
+    return FaucetNetwork.XahauTestnet
   }
 
   // 'altnet' for Ripple Testnet server and 'testnet' for XRPL Labs Testnet server
