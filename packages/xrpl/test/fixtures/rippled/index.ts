@@ -6,8 +6,9 @@ import fabric from './bookOffers'
 import usd_xrp from './bookOffersUsdXrp.json'
 import xrp_usd from './bookOffersXrpUsd.json'
 import normalLedger from './ledger.json'
-import first_page from './ledgerDataFirstPage.json'
-import last_page from './ledgerDataLastPage.json'
+import firstPage from './ledgerDataFirstPage.json'
+import firstPageEmpty from './ledgerDataFirstPageEmpty.json'
+import lastPage from './ledgerDataLastPage.json'
 import iouPartialPayment from './partialPaymentIOU.json'
 import xrpPartialPayment from './partialPaymentXRP.json'
 import normalServerInfo from './serverInfo.json'
@@ -82,8 +83,9 @@ const book_offers = {
 }
 
 const ledger_data = {
-  first_page,
-  last_page,
+  firstPage,
+  firstPageEmpty,
+  lastPage,
 }
 
 const server_info = {

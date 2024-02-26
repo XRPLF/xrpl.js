@@ -441,7 +441,6 @@ class Client extends EventEmitter<EventTypes> {
     const countTo: number = request.limit == null ? Infinity : request.limit
     let count = 0
     let marker: unknown = request.marker
-    let lastBatchLength: number
     const results: U[] = []
     do {
       const countRemaining = clamp(countTo - count, MIN_LIMIT, MAX_LIMIT)
@@ -465,11 +464,8 @@ class Client extends EventEmitter<EventTypes> {
       // Make sure we handle when no data (not even an empty array) is returned.
       if (Array.isArray(collectedData)) {
         count += collectedData.length
-        lastBatchLength = collectedData.length
-      } else {
-        lastBatchLength = 0
       }
-    } while (Boolean(marker) && count < countTo && lastBatchLength !== 0)
+    } while (Boolean(marker) && count < countTo)
     return results
   }
 
