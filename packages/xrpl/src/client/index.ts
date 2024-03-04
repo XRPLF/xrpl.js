@@ -88,8 +88,23 @@ import {
 } from './partialPayment'
 
 export interface ClientOptions extends ConnectionUserOptions {
+  /**
+   * Multiplication factor to multiply estimated fee by to provide a cushion in case the
+   * required fee rises during submission of a transaction. Defaults to 1.2.
+   *
+   * @category Fee
+   */
   feeCushion?: number
+  /**
+   * Maximum transaction cost to allow, in decimal XRP. Must be a string-encoded
+   * number. Defaults to '2'.
+   *
+   * @category Fee
+   */
   maxFeeXRP?: string
+  /**
+   * Duration to wait for a request to timeout.
+   */
   timeout?: number
 }
 
