@@ -783,15 +783,15 @@ class Client extends EventEmitter<EventTypes> {
     T extends SubmittableTransaction = SubmittableTransaction,
   >(
     transaction: T | string,
-    opts: {
-      apiVersion: APIVersion
+    opts?: {
+      apiVersion?: APIVersion
       // If true, autofill a transaction.
       autofill?: boolean
       // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
       failHard?: boolean
       // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
       wallet?: Wallet
-    } = { apiVersion: 1 },
+    },
   ): Promise<TxResponse<T>> {
     const signedTx = await getSignedTx(this, transaction, opts)
 
@@ -805,8 +805,8 @@ class Client extends EventEmitter<EventTypes> {
     const response = await submitRequest(
       this,
       signedTx,
-      opts.apiVersion,
-      opts.failHard,
+      opts?.apiVersion,
+      opts?.failHard,
     )
 
     const txHash = hashes.hashSignedTx(signedTx)
@@ -815,7 +815,7 @@ class Client extends EventEmitter<EventTypes> {
       txHash,
       lastLedger,
       response.result.engine_result,
-      opts.apiVersion,
+      opts?.apiVersion,
     )
   }
 
