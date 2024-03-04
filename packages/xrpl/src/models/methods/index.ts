@@ -1,5 +1,7 @@
 /* eslint-disable no-inline-comments -- Necessary for important note */
 /* eslint-disable max-lines -- There is a lot to export */
+import { APIVersion } from '../common'
+
 import {
   AccountChannelsRequest,
   AccountChannelsResponse,
@@ -214,11 +216,11 @@ type Request =
 /**
  * @category Responses
  */
-type Response =
+type Response<Version extends APIVersion> =
   // account methods
   | AccountChannelsResponse
   | AccountCurrenciesResponse
-  | AccountInfoResponse
+  | AccountInfoResponse<Version>
   | AccountLinesResponse
   | AccountNFTsResponse
   | AccountObjectsResponse
@@ -265,12 +267,15 @@ type Response =
   // AMM methods
   | AMMInfoResponse
 
-export type RequestResponseMap<T> = T extends AccountChannelsRequest
+export type RequestResponseMap<
+  T,
+  Version extends APIVersion,
+> = T extends AccountChannelsRequest
   ? AccountChannelsResponse
   : T extends AccountCurrenciesRequest
   ? AccountCurrenciesResponse
   : T extends AccountInfoRequest
-  ? AccountInfoResponse
+  ? AccountInfoResponse<Version>
   : T extends AccountLinesRequest
   ? AccountLinesResponse
   : T extends AccountNFTsRequest
@@ -405,20 +410,23 @@ export type RequestResponseMap<T> = T extends AccountChannelsRequest
   ? NFTInfoResponse
   : T extends NFTHistoryRequest
   ? NFTHistoryResponse
-  : Response
+  : Response<Version>
 
 export type MarkerRequest = Request & {
   limit?: number
   marker?: unknown
 }
 
-export type MarkerResponse = Response & {
+export type MarkerResponse<Version extends APIVersion> = Response<Version> & {
   result: {
     marker?: unknown
   }
 }
 
-export type RequestAllResponseMap<T> = T extends AccountChannelsRequest
+export type RequestAllResponseMap<
+  T,
+  Version extends APIVersion,
+> = T extends AccountChannelsRequest
   ? AccountChannelsResponse
   : T extends AccountLinesRequest
   ? AccountLinesResponse
@@ -434,7 +442,7 @@ export type RequestAllResponseMap<T> = T extends AccountChannelsRequest
   ? AccountTxResponse
   : T extends BookOffersRequest
   ? BookOffersResponse
-  : MarkerResponse
+  : MarkerResponse<Version>
 
 export {
   // Allow users to define their own requests and responses.  This is useful for releasing experimental versions

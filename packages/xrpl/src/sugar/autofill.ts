@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
-import type { Client } from '..'
+import type { APIVersion, Client } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
 import { Transaction } from '../models/transactions'
@@ -259,15 +259,18 @@ async function fetchAccountDeleteFee(client: Client): Promise<BigNumber> {
  * @param client - The client object.
  * @param tx - The transaction object.
  * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
+ * @param apiVersion - The rippled API version to use for the calculation.
  * @returns A promise that resolves with void. Modifies the `tx` parameter to give it the calculated fee.
  */
+// eslint-disable-next-line max-params -- necessary for the function
 export async function calculateFeePerTransactionType(
   client: Client,
   tx: Transaction,
   signersCount = 0,
+  apiVersion: APIVersion = 1,
 ): Promise<void> {
   // netFee is usually 0.00001 XRP (10 drops)
-  const netFeeXRP = await getFeeXrp(client)
+  const netFeeXRP = await getFeeXrp(client, apiVersion)
   const netFeeDrops = xrpToDrops(netFeeXRP)
   let baseFee = new BigNumber(netFeeDrops)
 
@@ -324,13 +327,15 @@ function scaleValue(value, multiplier): string {
  *
  * @param client - The client object.
  * @param tx - The transaction object.
+ * @param apiVersion - The rippled API version to use for the calculation.
  * @returns A promise that resolves with void. Modifies the `tx` parameter setting `LastLedgerSequence`.
  */
 export async function setLatestValidatedLedgerSequence(
   client: Client,
   tx: Transaction,
+  apiVersion: APIVersion = 1,
 ): Promise<void> {
-  const ledgerSequence = await client.getLedgerIndex()
+  const ledgerSequence = await client.getLedgerIndex(apiVersion)
   // eslint-disable-next-line no-param-reassign -- param reassign is safe
   tx.LastLedgerSequence = ledgerSequence + LEDGER_OFFSET
 }
@@ -340,17 +345,20 @@ export async function setLatestValidatedLedgerSequence(
  *
  * @param client - The client object.
  * @param tx - The transaction object.
+ * @param apiVersion - The rippled API version to use for the calculation.
  * @returns A promise that resolves with void if there are no blockers, or rejects with an XrplError if there are blockers.
  */
 export async function checkAccountDeleteBlockers(
   client: Client,
   tx: Transaction,
+  apiVersion: APIVersion = 1,
 ): Promise<void> {
   const request: AccountObjectsRequest = {
     command: 'account_objects',
     account: tx.Account,
     ledger_index: 'validated',
     deletion_blockers_only: true,
+    api_version: apiVersion,
   }
   const response = await client.request(request)
   return new Promise((resolve, reject) => {
