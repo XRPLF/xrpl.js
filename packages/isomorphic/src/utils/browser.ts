@@ -22,6 +22,9 @@ export const bytesToHex: typeof BytesToHexFn = (bytes) => {
 export const hexToBytes: typeof HexToBytesFn = (hex): Uint8Array => {
   const len = hex.length
   const array = new Uint8Array(len / 2)
+  if (!/^[A-F0-9]*$/iu.test(hex)) {
+    throw new Error('Invalid hex string')
+  }
   for (let i = 0; i < array.length; i++) {
     const j = i * 2
     const hexByte = hex.slice(j, j + 2)
