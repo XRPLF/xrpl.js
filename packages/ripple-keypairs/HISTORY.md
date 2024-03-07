@@ -1,6 +1,7 @@
 # ripple-keypairs Release History
 
 ## Unreleased
+- Update the default signing algorithm in `generateSeed` function to ed25519. This brings compatibility with the `fromSeed` function
 
 ## 2.0.0 (2024-02-01)
 
