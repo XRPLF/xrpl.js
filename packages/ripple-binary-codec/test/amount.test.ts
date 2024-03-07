@@ -38,5 +38,21 @@ describe('Amount', function () {
     }
     expect(amt.toJSON()).toEqual(rewritten)
   })
+
+  it('can be parsed from MPT', function () {
+    let fixture = {
+      value: '100',
+      mpt_issuance_id: '00002403C84A0A28E0190E208E982C352BBD5006600555CF',
+    }
+    let amt = Amount.from(fixture)
+    expect(amt.toJSON()).toEqual(fixture)
+
+    fixture = {
+      value: '9223372036854775807',
+      mpt_issuance_id: '00002403C84A0A28E0190E208E982C352BBD5006600555CF',
+    }
+    amt = Amount.from(fixture)
+    expect(amt.toJSON()).toEqual(fixture)
+  })
   amountErrorTests()
 })

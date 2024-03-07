@@ -37,7 +37,7 @@ interface AmountObjectIOU extends JsonObject {
 
 interface AmountObjectMPT extends JsonObject {
   value: string
-  mptIssuanceID: string
+  mpt_issuance_id: string
 }
 
 /**
@@ -65,7 +65,9 @@ function isAmountObjectIOU(arg): arg is AmountObjectIOU {
 function isAmountObjectMPT(arg): arg is AmountObjectMPT {
   const keys = Object.keys(arg).sort()
 
-  return keys.length === 2 && keys[0] === 'mptIssuanceID' && keys[1] === 'value'
+  return (
+    keys.length === 2 && keys[0] === 'mpt_issuance_id' && keys[1] === 'value'
+  )
 }
 
 /**
@@ -157,7 +159,7 @@ class Amount extends SerializedType {
 
       amount = concat(intBuf)
 
-      const mptIssuanceID = Hash192.from(value.mptIssuanceID).toBytes()
+      const mptIssuanceID = Hash192.from(value.mpt_issuance_id).toBytes()
       return new Amount(concat([leadingByte, amount, mptIssuanceID]))
     }
 
@@ -241,7 +243,7 @@ class Amount extends SerializedType {
 
       return {
         value: `${sign}${num.toString()}`,
-        mptIssuanceID: mptID.toString(),
+        mpt_issuance_id: mptID.toString(),
       }
     }
 
