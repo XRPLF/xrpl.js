@@ -6,6 +6,11 @@ import {
   TrustSet,
   Payment,
   Clawback,
+  MPTokenIssuanceCreate,
+  MPTokenIssuanceCreateFlags,
+  MPTokenAuthorize,
+  TransactionMetadata,
+  mptDecimalToHex,
 } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
@@ -109,6 +114,65 @@ describe('Clawback', function () {
         linesResponse.result.lines[0].balance,
         `Holder balance incorrect after Clawback`,
       )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'MPToken',
+    async () => {
+      const wallet2 = await generateFundedWallet(testContext.client)
+      const createTx: MPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: testContext.wallet.classicAddress,
+        Flags: MPTokenIssuanceCreateFlags.tfMPTCanClawback,
+      }
+
+      let mptCreateRes = await testTransaction(
+        testContext.client,
+        createTx,
+        testContext.wallet,
+      )
+      const txHash = mptCreateRes.result.tx_json.hash
+
+      let txResponse = await testContext.client.request({
+        command: 'tx',
+        transaction: txHash,
+      })
+
+      const meta = txResponse.result
+        .meta as TransactionMetadata<MPTokenIssuanceCreate>
+
+      const mptID = meta.mpt_issuance_id
+
+      const holderAuthTx: MPTokenAuthorize = {
+        TransactionType: 'MPTokenAuthorize',
+        Account: wallet2.classicAddress,
+        MPTokenIssuanceID: mptID!,
+      }
+
+      await testTransaction(testContext.client, holderAuthTx, wallet2)
+
+      const paymentTx: Payment = {
+        TransactionType: 'Payment',
+        Account: testContext.wallet.classicAddress,
+        Amount: { mpt_issuance_id: mptID!, value: mptDecimalToHex('10') },
+        Destination: wallet2.classicAddress,
+      }
+
+      await testTransaction(testContext.client, paymentTx, testContext.wallet)
+
+      // actual test - clawback
+      const clawTx: Clawback = {
+        TransactionType: 'Clawback',
+        Account: testContext.wallet.classicAddress,
+        Amount: {
+          mpt_issuance_id: mptID!,
+          issuer: wallet2.classicAddress,
+          value: '500',
+        },
+      }
+      await testTransaction(testContext.client, clawTx, testContext.wallet)
     },
     TIMEOUT,
   )

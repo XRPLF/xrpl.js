@@ -4,7 +4,8 @@ import { ValidationError } from '../errors'
 const SANITY_CHECK = /^[0-9]+$/u
 
 /**
- * Convert an integer string to hex string.
+ * Convert an 64-bit integer string to hex string. Mostly used for the MaximumAmount field
+ * in MPTokenIssuanceCreate.
  *
  * @param numberToConvert - Non-negative number string.
  * @returns Amount in hex string.

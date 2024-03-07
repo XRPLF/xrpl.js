@@ -1,11 +1,6 @@
 import { assert } from 'chai'
 
-import {
-  validate,
-  PaymentFlags,
-  ValidationError,
-  mptDecimalToHex,
-} from '../../src'
+import { validate, PaymentFlags, ValidationError } from '../../src'
 import { validatePayment } from '../../src/models/transactions/payment'
 
 /**
@@ -270,7 +265,7 @@ describe('Payment', function () {
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       Amount: {
         mpt_issuance_id: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
-        value: mptDecimalToHex('10'),
+        value: '10',
       },
       Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
     } as any
