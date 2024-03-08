@@ -2,7 +2,10 @@
 
 In xrpl.js 3.0, we've made significant improvements that result in a 60% reduction in bundle size for browser applications. We've also eliminated the need for polyfills with minimal disruption to existing code. This was achieved by replacing node-specific dependencies with ones that are compatible with browsers.
 
-The main change you'll notice is the update replacing `Buffer` with `Uint8Array` across the board. This was done since browsers don't support `Buffer`. Fortunately, this transition is relatively straightforward, as `Buffer` is a subclass of `Uint8Array`, meaning in many circumstances `Buffer` can be directly replaced by `Uint8Array`. The primary difference is that `Buffer` has additional helper functions. We've listed the affected client library functions below in the `Uint8Array` section for your reference.
+The two main changes you'll notice are: a breaking change to `Wallet` object creation, to use a more performanant algorithm by default and the update replacing `Buffer` with `Uint8Array` across the board. This was done since browsers don't support `Buffer`. Fortunately, this transition is relatively straightforward, as `Buffer` is a subclass of `Uint8Array`, meaning in many circumstances `Buffer` can be directly replaced by `Uint8Array`. The primary difference is that `Buffer` has additional helper functions. We've listed the affected client library functions below in the `Uint8Array` section for your reference.
+
+
+## Creation of a `Wallet` has breaking changes. See **[Link](#8-wallet-functions-default-to-ed25519-instead-of-secp256k1-signing-algorithm) for details
 
 This migration guide also applies to:
 - `ripple-address-codec` 4.3.1 -> 5.0.0
@@ -230,13 +233,27 @@ This was done to remove a hard dependency on `https-proxy-agent` when running 
    authorization: 'authorization'
  }`
 
-### 8. Bug fix: Setting an explicit `algorithm` when generating a wallet works now
+### 8. `Wallet` functions default to `ed25519` instead of `secp256k1` signing algorithm
 
-`Wallet.generate()` and `Wallet.fromSeed` were ignoring the `algorithm` parameter. This means that if you were manually specifying `algorithm` in any `Wallet` constructors, you may generate a different `Wallet` keypair when upgrading to 3.0. In that case to get the same generated wallets as before, don’t specify the `algorithm` parameter.
+With 3.0, we updated the default signing algorithm used by the Wallet object from secp256k1 to ed25519 in order to default to the higher-performance algorithm. This is a breaking change to all functions used to generate a Wallet, so if you have a pre-existing XRPL account that you're using to generate a specific Wallet using older versions of xrpl.js, you must specify that you are using secp256k1 as the algorithm to decode your private key / seed / etc to get the same behavior as before. See below for specifically how to update your code.
 
-NOTE: THE DEFAULT SIGNING ALGORITHM USED IN `Wallet.generate()` IS SECP256K1. If you do not specify any `algorithm` parameter, a `secp256k1` seed is generated. If you need the seed to be compliant with the `ed25519` signing algorithm, please use `algorithm=ed25519` parameter.
+If you are creating new accounts each time (ex. via `Client.fundWallet`), you do not need to specify the signing algorithm.
 
-This behavior is expected to change in future releases of xrpl.js. We intend to make `ed25519` as the default signing algorithm in `Wallet.generate()` function. This would improve compatibility with the `Wallet.fromSeed` method, because it's beneficial to have identical defaults in both the functions.
+**Before**
+
+`Wallet.fromSeed('s...')`
+`Wallet.generate()`
+`Wallet.fromEntropy(entropy)`
+`deriveKeyPair(seed="s...")`
+`generateSeed()`
+
+**After**
+
+`Wallet.fromSeed(seed='s...',algorithm: 'ecdsa-secp256k1')`
+`Wallet.generate(algorithm: 'ecdsa-secp256k1')`
+`Wallet.fromEntropy(entropy, opts={algorithm: 'ecdsa-secp256k1'})`
+`deriveKeypair(seed='s...', opts={ algorithm: 'ecdsa-secp256k1' }) (ripple-keypairs)`
+`generateSeed({ entropy, algorithm: 'ecdsa-secp256k1' } (ripple-keypairs)`
 
 ### 9. `AssertionError` → `Error`
 
