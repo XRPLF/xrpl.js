@@ -10,7 +10,6 @@ import {
   MPTokenIssuanceCreateFlags,
   MPTokenAuthorize,
   TransactionMetadata,
-  mptDecimalToHex,
 } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
@@ -156,7 +155,7 @@ describe('Clawback', function () {
       const paymentTx: Payment = {
         TransactionType: 'Payment',
         Account: testContext.wallet.classicAddress,
-        Amount: { mpt_issuance_id: mptID!, value: mptDecimalToHex('10') },
+        Amount: { mpt_issuance_id: mptID!, value: '10' },
         Destination: wallet2.classicAddress,
       }
 
@@ -168,7 +167,6 @@ describe('Clawback', function () {
         Account: testContext.wallet.classicAddress,
         Amount: {
           mpt_issuance_id: mptID!,
-          issuer: wallet2.classicAddress,
           value: '500',
         },
       }
