@@ -234,6 +234,10 @@ This was done to remove a hard dependency on `https-proxy-agent` when running 
 
 `Wallet.generate()` and `Wallet.fromSeed` were ignoring the `algorithm` parameter. This means that if you were manually specifying `algorithm` in any `Wallet` constructors, you may generate a different `Wallet` keypair when upgrading to 3.0. In that case to get the same generated wallets as before, don’t specify the `algorithm` parameter.
 
+NOTE: THE DEFAULT SIGNING ALGORITHM USED IN `Wallet.generate()` IS SECP256K1. If you do not specify any `algorithm` parameter, a `secp256k1` seed is generated. If you need the seed to be compliant with the `ed25519` signing algorithm, please use `algorithm=ed25519` parameter.
+
+This behavior is expected to change in future releases of xrpl.js. We intend to make `ed25519` as the default signing algorithm in `Wallet.generate()` function. This would improve compatibility with the `Wallet.fromSeed` method, because it's beneficial to have identical defaults in both the functions.
+
 ### 9. `AssertionError` → `Error`
 
 In order to get rid of the `assert` polyfill, we’ve replaced `AssertionError`s with `Error` exceptions. We’ve also updated the error messages to be more descriptive. If you were catching those specific errors, you will have to update your catch statements.
