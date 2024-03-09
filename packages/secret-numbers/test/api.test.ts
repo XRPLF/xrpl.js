@@ -9,7 +9,7 @@ describe('API: XRPL Secret Numbers', () => {
     it('Output sanity checks', () => {
       expect(account.getAddress()).toMatch(/^r[a-zA-Z0-9]{19,}$/u)
       const entropy = secretToEntropy(`${account.toString()}`.split(' '))
-      const familySeed = generateSeed({ entropy })
+      const familySeed = generateSeed({ entropy, algorithm: 'ed25519' })
       const keypair = deriveKeypair(familySeed)
       const address = deriveAddress(keypair.publicKey)
       expect(address).toEqual(account.getAddress())

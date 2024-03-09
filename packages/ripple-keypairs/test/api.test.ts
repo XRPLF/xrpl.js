@@ -41,6 +41,14 @@ describe('api', () => {
     expect(bytes.length).toEqual(16)
   })
 
+  it('generateSeed - seckp256k1, random', () => {
+    const seed = generateSeed({ algorithm: 'ecdsa-secp256k1' })
+    expect(seed.startsWith('s')).toBeTruthy()
+    const { type, bytes } = decodeSeed(seed)
+    expect(type).toEqual('secp256k1')
+    expect(bytes.length).toEqual(16)
+  })
+
   it('generateSeed, default algorithm used is ed25519', () => {
     const seed = generateSeed()
     expect(seed.startsWith('sEd')).toBeTruthy()

@@ -75,7 +75,10 @@ export class Account {
   private derive(): void {
     try {
       const entropy = secretToEntropy(this._secret)
-      this._account.familySeed = generateSeed({ entropy })
+      this._account.familySeed = generateSeed({
+        entropy,
+        algorithm: 'ed25519',
+      })
       this._account.keypair = deriveKeypair(this._account.familySeed)
       this._account.address = deriveAddress(this._account.keypair.publicKey)
     } catch (error) {
