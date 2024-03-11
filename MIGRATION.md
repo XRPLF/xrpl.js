@@ -235,7 +235,7 @@ This was done to remove a hard dependency on `https-proxy-agent` when running 
 
 ### 8. `Wallet` functions default to `ed25519` instead of `secp256k1` signing algorithm
 
-With 3.0, we updated the default signing algorithm used by the Wallet object from secp256k1 to ed25519 in order to default to the higher-performance algorithm. This is a breaking change to all functions used to generate a Wallet, so if you have a pre-existing XRPL account that you're using to generate a specific Wallet using older versions of xrpl.js, you must specify that you are using secp256k1 as the algorithm to decode your private key / seed / etc to get the same behavior as before. See below for specifically how to update your code.
+With 3.0, we updated the default signing algorithm used by the Wallet object from secp256k1 to ed25519 in order to default to the higher-performance algorithm. This is a breaking change to all functions used to generate a Wallet, so if you have a pre-existing XRPL account that you're using to generate a specific Wallet using older versions of xrpl.js, you may need to specify that you are using secp256k1 as the algorithm to decode your private key / seed / etc to get the same behavior as before. See below for specifically how to update your code.
 
 If you are creating new accounts each time (ex. via `Client.fundWallet` or `Wallet.generate`), you do not need to specify the signing algorithm.
 
