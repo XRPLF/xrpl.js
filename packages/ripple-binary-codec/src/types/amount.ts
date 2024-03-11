@@ -303,6 +303,10 @@ class Amount extends SerializedType {
 
     const decimal = new BigNumber(amount)
     if (!decimal.isZero()) {
+      if (decimal < BigNumber(0)) {
+        throw new Error(`${amount.toString()} is an illegal amount`)
+      }
+
       if (Number(BigInt(amount) & BigInt(mptMask)) != 0) {
         throw new Error(`${amount.toString()} is an illegal amount`)
       }
