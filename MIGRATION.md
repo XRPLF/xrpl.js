@@ -5,7 +5,7 @@ In xrpl.js 3.0, we've made significant improvements that result in a 60% reducti
 The two main changes you'll notice are: a breaking change to `Wallet` object creation, to use a more performanant algorithm by default and the update replacing `Buffer` with `Uint8Array` across the board. This was done since browsers don't support `Buffer`. Fortunately, this transition is relatively straightforward, as `Buffer` is a subclass of `Uint8Array`, meaning in many circumstances `Buffer` can be directly replaced by `Uint8Array`. The primary difference is that `Buffer` has additional helper functions. We've listed the affected client library functions below in the `Uint8Array` section for your reference.
 
 
-## Creation of a `Wallet` has breaking changes. See **[Link](#8-wallet-functions-default-to-ed25519-instead-of-secp256k1-signing-algorithm) for details
+**Creation of a `Wallet` has breaking changes. See **[Link](#8-wallet-functions-default-to-ed25519-instead-of-secp256k1-signing-algorithm) for details**
 
 This migration guide also applies to:
 - `ripple-address-codec` 4.3.1 -> 5.0.0
