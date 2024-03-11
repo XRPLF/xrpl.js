@@ -22,10 +22,10 @@ describe('API: XRPL Secret Numbers', () => {
     const account = new Account(entropy)
 
     it('familySeed as expected', () => {
-      expect(account.getFamilySeed()).toEqual('sp5DmDCut79BpgumfHhvRzdxXYQyU')
+      expect(account.getFamilySeed()).toEqual('sEdSKUm3MuTvN745ezpSM94Xw45BsbA')
     })
     it('address as expected', () => {
-      expect(account.getAddress()).toEqual('rMCcybKHfwCSkDHd3M36PAeUniEoygwjR3')
+      expect(account.getAddress()).toEqual('rMjDw1h3vQZUfYkQJV7PXeToajAA4JtkFJ')
     })
     it('Account object to string as expected', () => {
       const accountAsStr =
@@ -49,20 +49,20 @@ describe('API: XRPL Secret Numbers', () => {
     const account = new Account(secret)
 
     it('familySeed as expected', () => {
-      expect(account.getFamilySeed()).toEqual('sswpWwri7Y11dNCSmXdphgcoPZk3y')
+      expect(account.getFamilySeed()).toEqual('sEdSmrWh6iszywyGQCgguErD9DiuBY8')
     })
     it('publicKey as expected', () => {
       const pubkey =
-        '020526A0EDC9123F7FBB7588402518B80FCD2C8D8AB4C45F5A68A2F220098EA06F'
+        'EDBB1A131EA944C5D07D1DE39CAD2E128329CD1321F2F5759D2BB3EB94D5B8AB2F'
       expect(account.getKeypair().publicKey).toEqual(pubkey)
     })
     it('privateKey as expected', () => {
       const privkey =
-        '005122B2127B4635FEE7D242FA6EC9B02B611C04494D0D7D49764374D90C8BC8D3'
+        'EDB55E7518A732963CD444E6D1E682DCD6AD60DD53AA5743854D4C4AB52E2D6800'
       expect(account.getKeypair().privateKey).toEqual(privkey)
     })
     it('address as expected', () => {
-      expect(account.getAddress()).toEqual('rfqJsRLLmr7wdWnEzW1mP6AVaPSdzmso9Z')
+      expect(account.getAddress()).toEqual('rJmyR83BfJdRpJabbkBH2ES8mkR168bNVJ')
     })
     it('Account object to string as expected', () => {
       const accountAsStr =
