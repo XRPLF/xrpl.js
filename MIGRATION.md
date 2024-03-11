@@ -240,20 +240,20 @@ With 3.0, we updated the default signing algorithm used by the Wallet object fro
 If you are creating new accounts each time (ex. via `Client.fundWallet`), you do not need to specify the signing algorithm.
 
 **Before**
-
-`Wallet.fromSeed('s...')`
-`Wallet.generate()`
-`Wallet.fromEntropy(entropy)`
-`deriveKeyPair(seed="s...")`
-`generateSeed()`
+```
+Wallet.fromSeed('s...')
+Wallet.fromEntropy(entropy)
+deriveKeyPair(seed="s...")
+generateSeed()
+```
 
 **After**
-
-`Wallet.fromSeed(seed='s...',algorithm: 'ecdsa-secp256k1')`
-`Wallet.generate(algorithm: 'ecdsa-secp256k1')`
-`Wallet.fromEntropy(entropy, opts={algorithm: 'ecdsa-secp256k1'})`
-`deriveKeypair(seed='s...', opts={ algorithm: 'ecdsa-secp256k1' }) (ripple-keypairs)`
-`generateSeed({ entropy, algorithm: 'ecdsa-secp256k1' } (ripple-keypairs)`
+```
+Wallet.fromSeed(seed='s...',algorithm: 'ecdsa-secp256k1')
+Wallet.fromEntropy(entropy, opts={algorithm: 'ecdsa-secp256k1'})
+deriveKeypair(seed='s...', opts={ algorithm: 'ecdsa-secp256k1' }) (ripple-keypairs)
+generateSeed({ entropy, algorithm: 'ecdsa-secp256k1' }) (ripple-keypairs)
+```
 
 ### 9. `AssertionError` → `Error`
 
