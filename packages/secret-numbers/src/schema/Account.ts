@@ -52,7 +52,9 @@ export class Account {
       this._secret = randomSecret()
     }
 
-    if (algorithm) this._algorithm = algorithm
+    if (algorithm) {
+      this._algorithm = algorithm
+    }
 
     validateLengths(this._secret)
     this.derive()
