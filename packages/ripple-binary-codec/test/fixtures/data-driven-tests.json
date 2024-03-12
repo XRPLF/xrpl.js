@@ -2926,6 +2926,14 @@
         {
             "test_json": {
                 "mpt_issuance_id": "00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "18446744073709551615"
+            },
+            "type": "Amount",
+            "error": "Value is too large"
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id": "00002403C84A0A28E0190E208E982C352BBD5006600555CF",
                 "value": "-1"
             },
             "type": "Amount",
@@ -2991,6 +2999,22 @@
         },
         {
             "test_json": {
+                "mpt_issuance_id": "00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "0x8000000000000000"
+            },
+            "type": "Amount",
+            "error": "Hex value out of range"
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id": "00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "0xFFFFFFFFFFFFFFFF"
+            },
+            "type": "Amount",
+            "error": "Hex value out of range"
+        },
+        {
+            "test_json": {
                 "mpt_issuance_id":"00002403C84A0A28E0190E208E982C352BBD5006600555CF",
                 "value": "9223372036854775807"
             },
@@ -3042,6 +3066,17 @@
             "is_native": false,
             "type": "Amount",
             "expected_hex": "60000000000000000A00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+            "is_negative": false
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id":"00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "0x7FFFFFFFFFFFFFFF"
+            },
+            "type_id": 6,
+            "is_native": false,
+            "type": "Amount",
+            "expected_hex": "607FFFFFFFFFFFFFFF00002403C84A0A28E0190E208E982C352BBD5006600555CF",
             "is_negative": false
         }
     ]
