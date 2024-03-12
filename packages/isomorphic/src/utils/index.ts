@@ -1,6 +1,7 @@
 import { randomBytes as cryptoRandomBytes } from 'crypto'
 import type { BytesToHexFn, HexToBytesFn, RandomBytesFn } from './types'
 import { HexToStringFn, StringToHexFn } from './types'
+import { HEX_REGEX } from './shared'
 
 const OriginalBuffer = Symbol('OriginalBuffer')
 
@@ -64,7 +65,7 @@ export const bytesToHex: typeof BytesToHexFn = (bytes) => {
 }
 
 export const hexToBytes: typeof HexToBytesFn = (hex) => {
-  if (!/^[A-F0-9]*$/iu.test(hex)) {
+  if (!HEX_REGEX.test(hex)) {
     throw new Error('Invalid hex string')
   }
   return toUint8Array(Buffer.from(hex, 'hex'))
@@ -78,7 +79,7 @@ export const hexToString: typeof HexToStringFn = (
   hex: string,
   encoding = 'utf8',
 ): string => {
-  if (!/^[A-F0-9]*$/iu.test(hex)) {
+  if (!HEX_REGEX.test(hex)) {
     throw new Error('Invalid hex string')
   }
   return new TextDecoder(encoding).decode(hexToBytes(hex))

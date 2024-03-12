@@ -9,6 +9,7 @@ import type {
   RandomBytesFn,
   StringToHexFn,
 } from './types'
+import { HEX_REGEX } from './shared'
 
 /* eslint-disable func-style -- Typed to ensure uniformity between node and browser implementations and docs */
 export const bytesToHex: typeof BytesToHexFn = (bytes) => {
@@ -22,7 +23,7 @@ export const bytesToHex: typeof BytesToHexFn = (bytes) => {
 export const hexToBytes: typeof HexToBytesFn = (hex): Uint8Array => {
   const len = hex.length
   const array = new Uint8Array(len / 2)
-  if (!/^[A-F0-9]*$/iu.test(hex)) {
+  if (!HEX_REGEX.test(hex)) {
     throw new Error('Invalid hex string')
   }
   for (let i = 0; i < array.length; i++) {
