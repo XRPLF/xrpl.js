@@ -227,8 +227,8 @@ function amountParsingTests() {
 
       const jsonToHexTestName = `values_tests[${i}] parses ${JSON.stringify(
         f.test_json,
-      )} ${f.expected_hex!.slice(0, 16)}...
-          as ${JSON.stringify(f.test_json)}`
+      )}...
+          as ${f.expected_hex.slice(0, 16)}`
       it(jsonToHexTestName, () => {
         const amt = Amount.from(f.test_json)
         expect(amt.toHex()).toEqual(f.expected_hex)
