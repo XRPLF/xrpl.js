@@ -7,6 +7,9 @@ import {
   secretToEntropy,
 } from '../utils'
 
+// TODO: preferably import this type from ripple-keypairs
+// import type { Algorithm } from 'ripple-keypairs'
+type Algorithm = 'ecdsa-secp256k1' | 'ed25519'
 /* Types ==================================================================== */
 
 export interface Keypair {
@@ -33,7 +36,12 @@ export class Account {
     },
   }
 
-  constructor(secretNumbers?: string[] | string | Uint8Array) {
+  private readonly _algorithm: Algorithm = 'ed25519'
+
+  constructor(
+    secretNumbers?: string[] | string | Uint8Array,
+    algorithm?: Algorithm,
+  ) {
     if (typeof secretNumbers === 'string') {
       this._secret = parseSecretString(secretNumbers)
     } else if (Array.isArray(secretNumbers)) {
@@ -43,6 +51,8 @@ export class Account {
     } else {
       this._secret = randomSecret()
     }
+
+    if (algorithm) this._algorithm = algorithm
 
     validateLengths(this._secret)
     this.derive()
@@ -77,7 +87,7 @@ export class Account {
       const entropy = secretToEntropy(this._secret)
       this._account.familySeed = generateSeed({
         entropy,
-        algorithm: 'ed25519',
+        algorithm: this._algorithm,
       })
       this._account.keypair = deriveKeypair(this._account.familySeed)
       this._account.address = deriveAddress(this._account.keypair.publicKey)

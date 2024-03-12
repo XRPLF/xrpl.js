@@ -71,6 +71,63 @@ describe('API: XRPL Secret Numbers', () => {
     })
   })
 
+  describe('Validate the default signing algorithm', () => {
+    const secret = [
+      '084677',
+      '005323',
+      '580272',
+      '282388',
+      '626800',
+      '105300',
+      '560913',
+      '071783',
+    ]
+
+    const account1 = new Account(secret)
+    const account2 = new Account(secret, 'ed25519')
+
+    it('default signing algorithm is ed25519 in the Account class', () => {
+      expect(account1).toEqual(account2)
+    })
+  })
+
+  describe('Account based on existing secret, explicitly specify secp256k1 algorithm', () => {
+    const secret = [
+      '084677',
+      '005323',
+      '580272',
+      '282388',
+      '626800',
+      '105300',
+      '560913',
+      '071783',
+    ]
+
+    const account = new Account(secret, 'ecdsa-secp256k1')
+
+    it('familySeed as expected', () => {
+      expect(account.getFamilySeed()).toEqual('sswpWwri7Y11dNCSmXdphgcoPZk3y')
+    })
+    it('publicKey as expected', () => {
+      const pubkey =
+        '020526A0EDC9123F7FBB7588402518B80FCD2C8D8AB4C45F5A68A2F220098EA06F'
+      expect(account.getKeypair().publicKey).toEqual(pubkey)
+    })
+    it('privateKey as expected', () => {
+      const privkey =
+        '005122B2127B4635FEE7D242FA6EC9B02B611C04494D0D7D49764374D90C8BC8D3'
+      expect(account.getKeypair().privateKey).toEqual(privkey)
+    })
+    it('address as expected', () => {
+      expect(account.getAddress()).toEqual('rfqJsRLLmr7wdWnEzW1mP6AVaPSdzmso9Z')
+    })
+    it('Account object to string as expected', () => {
+      const accountAsStr =
+        '084677 005323 580272 282388 626800 105300 560913 071783'
+      expect(`${account.toString()}`).toEqual(accountAsStr)
+    })
+  })
+
   describe('Checksum error', () => {
     const secret = [
       '084677',
