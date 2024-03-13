@@ -7,9 +7,7 @@ import {
   secretToEntropy,
 } from '../utils'
 
-// TODO: preferably import this type from ripple-keypairs
-// import type { Algorithm } from 'ripple-keypairs'
-type Algorithm = 'ecdsa-secp256k1' | 'ed25519'
+import type { Algorithm } from 'ripple-keypairs'
 /* Types ==================================================================== */
 
 export interface Keypair {
