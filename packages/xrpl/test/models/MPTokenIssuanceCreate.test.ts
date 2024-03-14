@@ -5,7 +5,7 @@ import {
   validate,
   ValidationError,
   MPTokenIssuanceCreateFlags,
-  mptDecimalToHex,
+  mptUint64ToHex,
 } from '../../src'
 
 /**
@@ -18,7 +18,7 @@ describe('MPTokenIssuanceCreate', function () {
     const validMPTokenIssuanceCreate = {
       TransactionType: 'MPTokenIssuanceCreate',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MaximumAmount: mptDecimalToHex('9223372036854775807'), // 0x7fffffffffffffff
+      MaximumAmount: mptUint64ToHex('9223372036854775807'), // 0x7fffffffffffffff
       AssetScale: 2,
       TransferFee: 1,
       Flags: 2,

@@ -8,7 +8,7 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { testTransaction } from '../utils'
-import { mptDecimalToHex } from '../../../src/utils'
+import { mptUint64ToHex } from '../../../src/utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -27,7 +27,7 @@ describe('MPTokenIssuanceCreate', function () {
       const tx: MPTokenIssuanceCreate = {
         TransactionType: 'MPTokenIssuanceCreate',
         Account: testContext.wallet.classicAddress,
-        MaximumAmount: mptDecimalToHex('9223372036854775807'), // 0x7fffffffffffffff
+        MaximumAmount: mptUint64ToHex('9223372036854775807'), // 0x7fffffffffffffff
         AssetScale: 2,
       }
 

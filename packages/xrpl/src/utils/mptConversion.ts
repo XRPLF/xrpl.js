@@ -4,7 +4,7 @@ import { ValidationError } from '../errors'
 const SANITY_CHECK = /^[0-9]+$/u
 
 /**
- * Convert an 64-bit integer string to hex string. Mostly used for the MaximumAmount field
+ * Convert an unsigned 64-bit integer string to hex string. Mostly used for the MaximumAmount field
  * in MPTokenIssuanceCreate.
  *
  * @param numberToConvert - Non-negative number string.
@@ -12,32 +12,32 @@ const SANITY_CHECK = /^[0-9]+$/u
  * @throws When amount is invalid.
  * @category Utilities
  */
-export function mptDecimalToHex(numberToConvert: string): string {
+export function mptUint64ToHex(numberToConvert: string): string {
   // convert to base 10 string first for inputs like scientific notation
   const number = new BigNumber(numberToConvert).toString(10)
 
   // check that the value is valid and actually a number
   if (typeof numberToConvert === 'string' && number === 'NaN') {
     throw new ValidationError(
-      `mptDecimalToHex: invalid value '${numberToConvert}', should be a string-encoded number.`,
+      `mptUint64ToHex: invalid value '${numberToConvert}', should be a string-encoded number.`,
     )
   }
 
   // mpts are only whole units
   if (number.includes('.')) {
     throw new ValidationError(
-      `mptDecimalToHex: value '${numberToConvert}' has too many decimal places.`,
+      `mptUint64ToHex: value '${numberToConvert}' has too many decimal places.`,
     )
   }
   if (number.includes('-')) {
     throw new ValidationError(
-      `mptDecimalToHex: value '${numberToConvert}' cannot be negative.`,
+      `mptUint64ToHex: value '${numberToConvert}' cannot be negative.`,
     )
   }
 
   if (!SANITY_CHECK.exec(number)) {
     throw new ValidationError(
-      `mptDecimalToHex: failed sanity check -` +
+      `mptUint64ToHex: failed sanity check -` +
         ` value '${numberToConvert}',` +
         ` does not match (^[0-9]+$).`,
     )
@@ -45,7 +45,7 @@ export function mptDecimalToHex(numberToConvert: string): string {
 
   if (Number(BigInt(number) & BigInt('0x8000000000000000')) != 0)
     throw new ValidationError(
-      `mptDecimalToHex: invalid value '${numberToConvert}', should be within 63-bit range.`,
+      `mptUint64ToHex: invalid value '${numberToConvert}', should be within 63-bit range.`,
     )
 
   return BigInt(number).toString(16)
