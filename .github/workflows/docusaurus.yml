@@ -1,0 +1,30 @@
+name: Deploy Docusaurus Site
+
+on:
+  push:
+    branches:
+      - main  # Adjust this as necessary
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'  # Ensure this matches your project's requirements
+
+    - name: Install Dependencies
+      run: yarn install
+
+    - name: Build
+      run: yarn build
+
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@4.1.4
+      with:
+        branch: gh-pages  # The target branch for deployment
+        folder: build  # The folder where your build artifacts are located
+        token: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for authentication

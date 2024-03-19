@@ -31,72 +31,110 @@ const config = {
     defaultLocale: "en",
     locales: ["en"],
   },
+  // plugins: [
+  //   [
+  //     "docusaurus-plugin-typedoc-api",
+  //     {
+  //       id: "default",
+  //       projectRoot: path.join(__dirname, "../"),
+  //       // Monorepo
+  //       packages: [
+  //         "packages/xrpl",
+  //         "packages/ripple-keypairs",
+  //         "packages/ripple-address-codec",
+  //         "packages/ripple-binary-codec",
+  //         // {
+  //         //   path: "packages/xrpl",
+  //         //   entry: {
+  //         //     index: "src/index.ts",
+  //         //   },
+  //         // },
+  //       ],
+  //       debug: true,
+  //       minimal: false,
+  //       readmes: true,
+  //       changelogs: true,
+  //       changelogName: "HISTORY.md",
+  //       typedocOptions: {
+  //         categoryOrder: [
+  //           "Constructor",
+  //           "Clients",
+  //           "Signing",
+  //           "Transaction Models",
+  //           "Transaction Flags",
+  //           "Ledger Flags",
+  //           "Utilities",
+  //           "Requests",
+  //           "Responses",
+  //           "Streams",
+  //           "Errors",
+  //         ],
+  //         categorizeByGroup: false,
+  //         readme: "../../README.md",
+  //       },
+  //     },
+  //   ],
+  //   // [
+  //   //   "@docusaurus/plugin-content-pages",
+  //   //   {
+  //   //     id: "home",
+  //   //     path: "./",
+  //   //     routeBasePath: "/home",
+  //   //     include: ["*.md"],
+  //   //   },
+  //   // ],
+  //   () => ({
+  //     name: "resolve-react",
+  //     configureWebpack() {
+  //       return {
+  //         resolve: {
+  //           alias: {
+  //             // assuming root node_modules is up from "./packages/<your-docusaurus>
+  //             react: path.resolve("./node_modules/react"),
+  //           },
+  //         },
+  //       };
+  //     },
+  //   }),
+  //   "docusaurus-plugin-sass",
+  // ],
   plugins: [
     [
-      "docusaurus-plugin-typedoc-api",
+      "docusaurus-plugin-typedoc",
       {
-        id: "default",
-        projectRoot: path.join(__dirname, "../"),
-        // Monorepo
-        packages: [
-          "packages/xrpl",
-          "packages/ripple-keypairs",
-          "packages/ripple-address-codec",
-          "packages/ripple-binary-codec",
-          // {
-          //   path: "packages/xrpl",
-          //   entry: {
-          //     index: "src/index.ts",
-          //   },
-          // },
+        // Plugin/TypeDoc specific configuration
+        entryPoints: [
+          "../packages/xrpl/src/index.ts",
+          "../packages/ripple-keypairs/src/index.ts",
+          "../packages/ripple-address-codec/src/index.ts",
+          "../packages/ripple-binary-codec/src/index.ts",
         ],
+        tsconfig: "../tsconfig.json", // Path to your tsconfig.json
         debug: true,
-        minimal: false,
-        readmes: true,
-        changelogs: true,
-        changelogName: "HISTORY.md",
-        typedocOptions: {
-          categoryOrder: [
-            "Constructor",
-            "Clients",
-            "Signing",
-            "Transaction Models",
-            "Transaction Flags",
-            "Ledger Flags",
-            "Utilities",
-            "Requests",
-            "Responses",
-            "Streams",
-            "Errors",
-          ],
-          categorizeByGroup: false,
-          readme: "../../README.md",
+        watch: process.env.TYPEDOC_WATCH,
+        plugin: ["typedoc-plugin-markdown"], // Or other Typedoc plugins you are using
+        sidebar: {
+          categoryLabel: "API",
+          position: 0,
+          fullNames: true,
         },
+        readme: "none",
+        categorizeByGroup: false,
+        categoryOrder: [
+          "Constructor",
+          "Clients",
+          "Signing",
+          "Transaction Models",
+          "Transaction Flags",
+          "Ledger Flags",
+          "Utilities",
+          "Requests",
+          "Responses",
+          "Streams",
+          "Errors",
+        ],
       },
     ],
-    // [
-    //   "@docusaurus/plugin-content-pages",
-    //   {
-    //     id: "home",
-    //     path: "./",
-    //     routeBasePath: "/home",
-    //     include: ["*.md"],
-    //   },
-    // ],
-    () => ({
-      name: "resolve-react",
-      configureWebpack() {
-        return {
-          resolve: {
-            alias: {
-              // assuming root node_modules is up from "./packages/<your-docusaurus>
-              react: path.resolve("./node_modules/react"),
-            },
-          },
-        };
-      },
-    }),
-    "docusaurus-plugin-sass",
   ],
   presets: [
     [
@@ -107,8 +145,6 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.scss"),
