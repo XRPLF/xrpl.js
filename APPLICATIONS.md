@@ -58,6 +58,10 @@ Warning: Use at your own risk.
 
   XRP Ledger explorer, API, metrics, and analytics using a graph database that is synchronized live with the XRPL.
 
+- **[XRPLWin](https://xrplwin.com)**
+
+  XRP Ledger and Xahau explorer, Hooks explorer, metrics, and analytics using a XWA backend that is synchronized live with the XRPL and Xahau.
+
 ## Data monitoring
 
 - **[zerptracker](https://zerptracker.com)**
