@@ -21,6 +21,25 @@ export enum AMMDepositFlags {
   tfTwoAsset = 0x00100000,
   tfOneAssetLPToken = 0x00200000,
   tfLimitLPToken = 0x00400000,
+  tfWithdrawAll = 0x00020000,
+  tfOneAssetWithdrawAll = 0x00040000,
+  tfTwoAssetIfEmpty = 0x00800000,
+  tfWithdrawSubTx = tfLPToken |
+    tfSingleAsset |
+    tfTwoAsset |
+    tfOneAssetLPToken |
+    tfLimitLPToken |
+    tfWithdrawAll |
+    tfOneAssetWithdrawAll,
+  tfDepositSubTx = tfLPToken |
+    tfSingleAsset |
+    tfTwoAsset |
+    tfOneAssetLPToken |
+    tfLimitLPToken |
+    tfTwoAssetIfEmpty,
+  tfUniversal = 0x80000000,
+  tfWithdrawMask = ~(tfUniversal | tfWithdrawSubTx),
+  tfDepositMask = ~(tfUniversal | tfDepositSubTx),
 }
 
 export interface AMMDepositFlagsInterface extends GlobalFlags {
@@ -29,6 +48,14 @@ export interface AMMDepositFlagsInterface extends GlobalFlags {
   tfTwoAsset?: boolean
   tfOneAssetLPToken?: boolean
   tfLimitLPToken?: boolean
+  tfWithdrawAll?: boolean
+  tfOneAssetWithdrawAll?: boolean
+  tfTwoAssetIfEmpty?: boolean
+  tfWithdrawSubTx?: boolean
+  tfDepositSubTx?: boolean
+  tfUniversal?: boolean
+  tfWithdrawMask?: boolean
+  tfDepositMask?: boolean
 }
 
 /**
