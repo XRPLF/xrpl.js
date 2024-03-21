@@ -40,6 +40,7 @@ export interface DeletedNode {
   DeletedNode: {
     LedgerEntryType: string
     LedgerIndex: string
+    PreviousFields?: { [field: string]: unknown }
     FinalFields: { [field: string]: unknown }
   }
 }
