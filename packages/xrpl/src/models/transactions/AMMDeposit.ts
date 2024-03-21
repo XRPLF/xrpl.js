@@ -21,6 +21,7 @@ export enum AMMDepositFlags {
   tfTwoAsset = 0x00100000,
   tfOneAssetLPToken = 0x00200000,
   tfLimitLPToken = 0x00400000,
+  tfTwoAssetIfEmpty = 0x00800000,
 }
 
 export interface AMMDepositFlagsInterface extends GlobalFlags {
@@ -29,6 +30,7 @@ export interface AMMDepositFlagsInterface extends GlobalFlags {
   tfTwoAsset?: boolean
   tfOneAssetLPToken?: boolean
   tfLimitLPToken?: boolean
+  tfTwoAssetIfEmpty?: boolean
 }
 
 /**
