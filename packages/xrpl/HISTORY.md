@@ -7,6 +7,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Fixed
 * Typo in `Channel` type `source_tab` -> `source_tag`
 * Fix `client.requestAll` to handle filters better
+* Add `PreviousFields` to `DeletedNode` metadata type
 
 ## 3.0.0 (2024-02-01)
 
