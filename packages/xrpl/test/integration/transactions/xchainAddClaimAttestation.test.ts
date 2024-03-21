@@ -4,6 +4,7 @@ import { encode } from 'ripple-binary-codec'
 import { sign } from 'ripple-keypairs'
 
 import {
+  AccountInfoRequest,
   AccountSet,
   AccountSetAsfFlags,
   IssuedCurrency,
@@ -186,7 +187,10 @@ describe('XChainCreateBridge', function () {
       }
       await testTransaction(testContext.client, signerTx, testContext.wallet)
 
-      const signerAccountInfoResponse = await testContext.client.request({
+      const signerAccountInfoResponse = await testContext.client.request<
+        AccountInfoRequest,
+        1
+      >({
         command: 'account_info',
         account: testContext.wallet.classicAddress,
         signer_lists: true,
