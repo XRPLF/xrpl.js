@@ -27,6 +27,10 @@ describe('utils', function () {
     expect(hexToBytes('DEADBEEF')).toEqual(new Uint8Array([222, 173, 190, 239]))
   })
 
+  it('bytesToHex - DEADBEEF', () => {
+    expect(bytesToHex([222, 173, 190, 239])).toEqual('DEADBEEF')
+  })
+
   it('bytesToHex - bad hex', () => {
     expect(() => hexToBytes('hello')).toThrow(new Error('Invalid hex string'))
   })
