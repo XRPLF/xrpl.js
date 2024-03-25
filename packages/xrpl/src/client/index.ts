@@ -325,17 +325,14 @@ class Client extends EventEmitter<EventTypes> {
     T = RequestResponseMap<R, V>,
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
   >(req: R, apiVersion: V = 1 as V): Promise<T> {
-    const response = await this.connection.request<R, T>(
-      {
-        ...req,
-        account: req.account
-          ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be string
-            ensureClassicAddress(req.account as string)
-          : undefined,
-      },
-
+    const response = await this.connection.request<R, T>({
+      ...req,
+      account: req.account
+        ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be string
+          ensureClassicAddress(req.account as string)
+        : undefined,
       apiVersion,
-    )
+    })
 
     // mutates `response` to add warnings
     handlePartialPayment(req.command, response)
