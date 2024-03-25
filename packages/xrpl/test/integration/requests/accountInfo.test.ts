@@ -80,4 +80,43 @@ describe('account_info', function () {
     },
     TIMEOUT,
   )
+
+  it(
+    'signer_list using api_version 1',
+    async () => {
+      const request: AccountInfoRequest = {
+        command: 'account_info',
+        account: testContext.wallet.classicAddress,
+        strict: true,
+        ledger_index: 'validated',
+        signer_lists: true,
+      }
+      const response = await testContext.client.request<AccountInfoRequest, 1>(
+        request,
+      )
+      expect(response.result.account_data.signer_lists).toEqual([])
+      // @ts-expect-error -- signer_lists is expected to be undefined
+      expect(response.result.signer_lists).toBeUndefined()
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'signer_list using api_version 2',
+    async () => {
+      const request: AccountInfoRequest = {
+        command: 'account_info',
+        account: testContext.wallet.classicAddress,
+        strict: true,
+        ledger_index: 'validated',
+        signer_lists: true,
+        api_version: 2,
+      }
+      const response = await testContext.client.request(request, 2)
+      // @ts-expect-error -- signer_lists is expected to be undefined
+      expect(response.result.account_data.signer_lists).toBeUndefined()
+      expect(response.result.signer_lists).toEqual([])
+    },
+    TIMEOUT,
+  )
 })
