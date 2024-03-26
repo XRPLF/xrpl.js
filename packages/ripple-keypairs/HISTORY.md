@@ -19,29 +19,6 @@
 * Remove `brorand` as a dependency and use `@xrplf/isomorphic` instead.
 * Eliminates 4 runtime dependencies: `base-x`, `base64-js`, `buffer`, and `ieee754`.
 
-## 2.0.0 Beta 1 (2023-11-30)
-
-### Breaking Changes
-* `Buffer` has been replaced with `UInt8Array` for both params and return values. `Buffer` may continue to work with params since they extend `UInt8Arrays`.
-
-### Changes
-* Eliminates 4 runtime dependencies: `base-x`, `base64-js`, `buffer`, and `ieee754`.
-
-## 2.0.0 Beta 0 (2023-10-19)
-
-### Breaking Changes
-* Bump typescript to 5.x
-* Remove Node 14 support
-* Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`.
-* Fix `deriveKeypair` ignoring manual decoding algorithm. (Specifying algorithm=`ed25519` in `opts` now works on secrets like `sNa1...`)
-* Remove `crypto` polyfills, `create-hash`, `elliptic`, `hash.js`, and their many dependencies in favor of `@noble/hashes` and `@nobel/curves`
-* Remove `bytesToHex` and `hexToBytes`.  They can now be found in `@xrplf/isomorphic/utils`
-* `verifyTransaction` will throw an error if there is no signature
-* Improved key algorithm detection. It will now throw Errors with helpful messages
-
-### Changes
-* Remove `brorand` as a dependency and use `@xrplf/isomorphic` instead.
-
 ## 1.3.1 (2023-09-27)
 ### Fixed
 * Fix source-maps not finding their designated source

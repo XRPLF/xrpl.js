@@ -1,60 +1,60 @@
 {
-    "editor.tabSize": 2,
-    "cSpell.words": [
-        "altnet",
-        "Autofills",
-        "Clawback",
-        "hostid",
-        "keypair",
-        "keypairs",
-        "multisign",
-        "multisigned",
-        "multisigning",
-        "preauthorization",
-        "rippletest",
-        "secp256k1",
-        "Setf",
-        "Sidechains",
-        "xchain"
-    ],
-    "[javascript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": true
-    },
-    "[javascriptreact]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": true
-    },
-    "[typescript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": true
-    },
-    "[typescriptreact]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": true
-    },
-    "eslint.alwaysShowStatus": true,
-    "eslint.lintTask.enable": true,
-    "eslint.codeAction.showDocumentation": {
-        "enable": true
-    },
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
-    },
-    "files.insertFinalNewline": true,
-    "files.trimFinalNewlines": true,
-    "files.trimTrailingWhitespace": true,
-    "files.watcherExclude": {
-        "**/.git/objects/**": true,
-        "**/.git/subtree-cache/**": true,
-        "**/.hg/store/**": true
-    },
-    "search.exclude": {
-        "**/.git": true,
-        "**/node_modules": true,
-        "**/tmp": true,
-        "**/docs/**/*.html": true,
-        "**/fixtures/**/*.json": true,
-        "**/docs/assets": true
-    },
+  "editor.tabSize": 2,
+  "cSpell.words": [
+    "altnet",
+    "Autofills",
+    "Clawback",
+    "hostid",
+    "keypair",
+    "keypairs",
+    "multisign",
+    "multisigned",
+    "multisigning",
+    "preauthorization",
+    "rippletest",
+    "secp256k1",
+    "Setf",
+    "Sidechains",
+    "xchain"
+  ],
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "eslint.alwaysShowStatus": true,
+  "eslint.lintTask.enable": true,
+  "eslint.codeAction.showDocumentation": {
+    "enable": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/.hg/store/**": true
+  },
+  "search.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/tmp": true,
+    "**/docs/**/*.html": true,
+    "**/fixtures/**/*.json": true,
+    "**/docs/assets": true
+  }
 }
