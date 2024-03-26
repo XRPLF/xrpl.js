@@ -14,6 +14,10 @@ import {
   NFTokenCreateOfferMetadata,
 } from './NFTokenCreateOffer'
 import { NFTokenMint, NFTokenMintMetadata } from './NFTokenMint'
+import {
+  MPTokenIssuanceCreate,
+  MPTokenIssuanceCreateMetadata,
+} from './MPTokenIssuanceCreate'
 import { Payment, PaymentMetadata } from './payment'
 import type { Transaction } from './transaction'
 
@@ -96,4 +100,6 @@ export type TransactionMetadata<T extends BaseTransaction = Transaction> =
     ? NFTokenAcceptOfferMetadata
     : T extends NFTokenCancelOffer
     ? NFTokenCancelOfferMetadata
+    : T extends MPTokenIssuanceCreate
+    ? MPTokenIssuanceCreateMetadata
     : TransactionMetadataBase

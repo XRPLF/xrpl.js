@@ -65,6 +65,7 @@ import {
 } from './timeConversion'
 import verifyPaymentChannelClaim from './verifyPaymentChannelClaim'
 import { xrpToDrops, dropsToXrp } from './xrpConversion'
+import { mptUint64ToHex } from './mptConversion'
 
 /**
  * Check if a secret is valid.
@@ -228,4 +229,5 @@ export {
   getNFTokenID,
   parseNFTokenID,
   getXChainClaimID,
+  mptUint64ToHex,
 }

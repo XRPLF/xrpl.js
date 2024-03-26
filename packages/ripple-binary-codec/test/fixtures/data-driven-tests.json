@@ -2499,7 +2499,7 @@
             "type_id": 6,
             "is_native": true,
             "type": "Amount",
-            "expected_hex": "0000000000000001",
+            "error": "Value is negative",
             "is_negative": true
         },
         {
@@ -2914,6 +2914,170 @@
             "type": "Amount",
             "error": "10000000000000000000 absolute XRP is bigger than max native value 100000000000.0",
             "is_negative": true
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id": "00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "9223372036854775808"
+            },
+            "type": "Amount",
+            "error": "Value is too large"
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id": "00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "18446744073709551615"
+            },
+            "type": "Amount",
+            "error": "Value is too large"
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id": "00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "-1"
+            },
+            "type": "Amount",
+            "error": "Value is negative"
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id": "00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "10.1"
+            },
+            "type": "Amount",
+            "error": "Value has decimal point"
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id": "10",
+                "value": "10"
+            },
+            "type": "Amount",
+            "error": "mpt_issuance_id has invalid hash length"
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id": "00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "10",
+                "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji"
+            },
+            "type": "Amount",
+            "error": "Issuer not valid for MPT"
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id": "00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "10",
+                "currency": "USD"
+            },
+            "type": "Amount",
+            "error": "Currency not valid for MPT"
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id": "00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "a"
+            },
+            "type": "Amount",
+            "error": "Value has incorrect hex format"
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id": "00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "0xy"
+            },
+            "type": "Amount",
+            "error": "Value has bad hex character"
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id": "00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "/"
+            },
+            "type": "Amount",
+            "error": "Value has bad character"
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id": "00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "0x8000000000000000"
+            },
+            "type": "Amount",
+            "error": "Hex value out of range"
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id": "00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "0xFFFFFFFFFFFFFFFF"
+            },
+            "type": "Amount",
+            "error": "Hex value out of range"
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id":"00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "9223372036854775807"
+            },
+            "type_id": 6,
+            "is_native": false,
+            "type": "Amount",
+            "expected_hex": "607FFFFFFFFFFFFFFF00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+            "is_negative": false
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id":"00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "0"
+            },
+            "type_id": 6,
+            "is_native": false,
+            "type": "Amount",
+            "expected_hex": "60000000000000000000002403C84A0A28E0190E208E982C352BBD5006600555CF",
+            "is_negative": false
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id":"00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "-0"
+            },
+            "type_id": 6,
+            "is_native": false,
+            "type": "Amount",
+            "expected_hex": "60000000000000000000002403C84A0A28E0190E208E982C352BBD5006600555CF",
+            "is_negative": false
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id":"00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "100"
+            },
+            "type_id": 6,
+            "is_native": false,
+            "type": "Amount",
+            "expected_hex": "60000000000000006400002403C84A0A28E0190E208E982C352BBD5006600555CF",
+            "is_negative": false
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id":"00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "0xa"
+            },
+            "type_id": 6,
+            "is_native": false,
+            "type": "Amount",
+            "expected_hex": "60000000000000000A00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+            "is_negative": false
+        },
+        {
+            "test_json": {
+                "mpt_issuance_id":"00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+                "value": "0x7FFFFFFFFFFFFFFF"
+            },
+            "type_id": 6,
+            "is_native": false,
+            "type": "Amount",
+            "expected_hex": "607FFFFFFFFFFFFFFF00002403C84A0A28E0190E208E982C352BBD5006600555CF",
+            "is_negative": false
         }
     ]
 }
