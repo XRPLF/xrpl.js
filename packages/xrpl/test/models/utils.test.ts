@@ -100,7 +100,7 @@ describe('Models Utils', function () {
         Amount: '1234',
         Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
         Flags: {
-          tfNoDirectRipple: false,
+          tfNoRippleDirect: false,
           tfPartialPayment: true,
           tfLimitQuality: true,
         },
