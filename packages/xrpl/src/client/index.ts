@@ -307,7 +307,6 @@ class Client extends EventEmitter<EventTypes> {
    *
    * @category Network
    * @param req - Request to send to the server.
-   * @param apiVersion - The rippled API version to use for the request.
    * @returns The response from the server.
    *
    * @example
@@ -323,17 +322,13 @@ class Client extends EventEmitter<EventTypes> {
     R extends Request,
     V extends APIVersion,
     T = RequestResponseMap<R, V>,
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for overloading
-  >(req: R, apiVersion: V = 1 as V): Promise<T> {
+  >(req: R): Promise<T> {
     const request = {
       ...req,
       account: req.account
         ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be string
           ensureClassicAddress(req.account as string)
         : undefined,
-    }
-    if (apiVersion !== 1) {
-      request.api_version = apiVersion
     }
     const response = await this.connection.request<R, T>(request)
 

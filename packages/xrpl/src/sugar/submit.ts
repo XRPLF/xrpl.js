@@ -136,14 +136,11 @@ export async function waitForFinalTransactionOutcome<
   }
 
   const txResponse = await client
-    .request(
-      {
-        command: 'tx',
-        transaction: txHash,
-        api_version: apiVersion,
-      },
-      apiVersion,
-    )
+    .request({
+      command: 'tx',
+      transaction: txHash,
+      api_version: apiVersion,
+    })
     .catch(async (error) => {
       // error is of an unknown type and hence we assert type to extract the value we need.
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-member-access -- ^
