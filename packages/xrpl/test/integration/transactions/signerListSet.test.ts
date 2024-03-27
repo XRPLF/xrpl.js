@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { SignerListSet } from '../../../src'
+import { AccountInfoRequest, SignerListSet } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -45,7 +45,10 @@ describe('SignerListSet', function () {
       }
       await testTransaction(testContext.client, tx, testContext.wallet)
 
-      const accountInfoResponse = await testContext.client.request({
+      const accountInfoResponse = await testContext.client.request<
+        AccountInfoRequest,
+        1
+      >({
         command: 'account_info',
         account: testContext.wallet.classicAddress,
         signer_lists: true,

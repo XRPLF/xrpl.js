@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 
-import type { Client } from '..'
+import type { APIVersion, Client } from '..'
 import { XrplError } from '../errors'
 
 const NUM_DECIMAL_PLACES = 6
@@ -11,17 +11,23 @@ const BASE_10 = 10
  * Note: This is a public API that can be called directly.
  *
  * @param client - The Client used to connect to the ledger.
+ * @param apiVersion - The rippled API version to use.
  * @param cushion - The fee cushion to use.
  * @returns The transaction fee.
  */
 export default async function getFeeXrp(
   client: Client,
+  apiVersion: APIVersion = 1,
   cushion?: number,
 ): Promise<string> {
   const feeCushion = cushion ?? client.feeCushion
 
-  const serverInfo = (await client.request({ command: 'server_info' })).result
-    .info
+  const serverInfo = (
+    await client.request({
+      command: 'server_info',
+      api_version: apiVersion,
+    })
+  ).result.info
 
   const baseFee = serverInfo.validated_ledger?.base_fee_xrp
 

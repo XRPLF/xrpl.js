@@ -7,7 +7,7 @@ import type {
   TransactionStream,
   TxResponse,
 } from '..'
-import type { Amount } from '../models/common'
+import type { Amount, APIVersion } from '../models/common'
 import type { RequestResponseMap } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 import { PaymentFlags, Transaction } from '../models/transactions'
@@ -86,10 +86,10 @@ function accountTxHasPartialPayment(response: AccountTxResponse): boolean {
   return foo
 }
 
-function hasPartialPayment<R extends BaseRequest, T = RequestResponseMap<R>>(
-  command: string,
-  response: T,
-): boolean {
+function hasPartialPayment<
+  R extends BaseRequest,
+  T = RequestResponseMap<R, APIVersion>,
+>(command: string, response: T): boolean {
   /* eslint-disable @typescript-eslint/consistent-type-assertions -- Request type is known at runtime from command */
   switch (command) {
     case 'tx':
@@ -112,7 +112,7 @@ function hasPartialPayment<R extends BaseRequest, T = RequestResponseMap<R>>(
  */
 export function handlePartialPayment<
   R extends BaseRequest,
-  T = RequestResponseMap<R>,
+  T = RequestResponseMap<R, APIVersion>,
 >(command: string, response: T): void {
   if (hasPartialPayment(command, response)) {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are checking dynamically and safely.
