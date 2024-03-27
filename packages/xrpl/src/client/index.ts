@@ -444,7 +444,7 @@ class Client extends EventEmitter<EventTypes> {
   public async requestAll<
     T extends MarkerRequest,
     U = RequestAllResponseMap<T, APIVersion>,
-  >(request: T, apiVersion: APIVersion = 1, collect?: string): Promise<U[]> {
+  >(request: T, collect?: string): Promise<U[]> {
     /*
      * The data under collection is keyed based on the command. Fail if command
      * not recognized and collection key not provided.
@@ -469,10 +469,7 @@ class Client extends EventEmitter<EventTypes> {
         marker,
       }
       // eslint-disable-next-line no-await-in-loop -- Necessary for this, it really has to wait
-      const singleResponse = await this.connection.request(
-        repeatProps,
-        apiVersion,
-      )
+      const singleResponse = await this.connection.request(repeatProps)
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
       const singleResult = (singleResponse as MarkerResponse<APIVersion>).result
       if (!(collectKey in singleResult)) {
