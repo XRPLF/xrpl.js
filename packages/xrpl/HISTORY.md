@@ -8,6 +8,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Typo in `Channel` type `source_tab` -> `source_tag`
 * Fix `client.requestAll` to handle filters better
 * Add the missing `AMMDeposit` flag `tfTwoAssetIfEmpty`
+* Add missing `lsfAMMNode` flag to `RippleState` ledger object
 
 ## 3.0.0 (2024-02-01)
 
