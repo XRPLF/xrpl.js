@@ -171,11 +171,8 @@ export default class RequestManager {
    * @param response - The response to handle.
    * @throws ResponseFormatError if the response format is invalid, RippledError if rippled returns an error.
    */
-  public handleResponse(response: Partial<Response | ErrorResponse>): void {
-    if (
-      response.id == null ||
-      !(typeof response.id === 'string' || typeof response.id === 'number')
-    ) {
+  public handleResponse(response: Response | ErrorResponse): void {
+    if (!(typeof response.id === 'string' || typeof response.id === 'number')) {
       throw new ResponseFormatError('valid id not found in response', response)
     }
     if (!this.promisesAwaitingResponse.has(response.id)) {
@@ -185,12 +182,11 @@ export default class RequestManager {
       const error = new ResponseFormatError('Response has no status')
       this.reject(response.id, error)
     }
-    if (response.status === 'error') {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We know this must be true
-      const errorResponse = response as Partial<ErrorResponse>
+    // Error response type
+    if (!('result' in response)) {
       const error = new RippledError(
-        errorResponse.error_message ?? errorResponse.error,
-        errorResponse,
+        response.error_message ?? response.error,
+        response,
       )
       this.reject(response.id, error)
       return
@@ -205,8 +201,8 @@ export default class RequestManager {
     }
     // status no longer needed because error is thrown if status is not "success"
     delete response.status
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be a valid Response here
-    this.resolve(response.id, response as unknown as Response)
+
+    this.resolve(response.id, response)
   }
 
   /**

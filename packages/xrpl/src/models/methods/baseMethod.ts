@@ -30,9 +30,9 @@ export interface ResponseWarning {
 }
 
 export interface BaseResponse {
-  id: number | string
-  status?: 'success' | string
-  type: 'response' | string
+  id: number | string | null
+  status?: 'success' | string | null
+  type: 'response' | string | null
   result: unknown
   warning?: 'load'
   warnings?: ResponseWarning[]
@@ -47,9 +47,9 @@ export interface BaseResponse {
  * @category Responses
  */
 export interface ErrorResponse {
-  id: number | string
+  id: number | string | null
   status: 'error'
-  type: 'response' | string
+  type: 'response' | string | null
   error: string
   error_code?: string
   error_message?: string

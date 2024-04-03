@@ -138,7 +138,7 @@ export interface AccountInfoAccountFlags {
  *
  * @category Responses
  */
-export interface AccountInfoResponse extends BaseResponse {
+export interface BaseAccountInfoResponse extends BaseResponse {
   result: {
     /**
      * The AccountRoot ledger object with this account's information, as stored
@@ -148,7 +148,7 @@ export interface AccountInfoResponse extends BaseResponse {
      * at most one SignerList, this array must have exactly one member if it is
      * present.
      */
-    account_data: AccountRoot & { signer_lists?: SignerList[] }
+    account_data: AccountRoot
 
     /**
      * A map of account flags parsed out.  This will only be available for rippled nodes 1.11.0 and higher.
@@ -178,5 +178,41 @@ export interface AccountInfoResponse extends BaseResponse {
      * to false, this data is not final.
      */
     validated?: boolean
+  }
+}
+
+export interface AccountInfoV1Response extends BaseAccountInfoResponse {
+  result: BaseAccountInfoResponse['result'] & {
+    /**
+     * The AccountRoot ledger object with this account's information, as stored
+     * in the ledger.
+     * If requested, also includes Array of SignerList ledger objects
+     * associated with this account for Multi-Signing. Since an account can own
+     * at most one SignerList, this array must have exactly one member if it is
+     * present.
+     */
+    account_data: BaseAccountInfoResponse['result']['account_data'] & {
+      /**
+       * Array of SignerList ledger objects associated with this account for Multi-Signing.
+       * Since an account can own at most one SignerList, this array must have exactly one
+       * member if it is present.
+       * Quirk: In API version 1, this field is nested under account_data. For this method,
+       * Clio implements the API version 2 behavior where is field is not nested under account_data.
+       */
+      signer_lists?: SignerList[]
+    }
+  }
+}
+
+export interface AccountInfoV2Response extends BaseAccountInfoResponse {
+  result: BaseAccountInfoResponse['result'] & {
+    /**
+     * Array of SignerList ledger objects associated with this account for Multi-Signing.
+     * Since an account can own at most one SignerList, this array must have exactly one
+     * member if it is present.
+     * Quirk: In API version 1, this field is nested under account_data. For this method,
+     * Clio implements the API version 2 behavior where is field is not nested under account_data.
+     */
+    signer_lists?: SignerList[]
   }
 }

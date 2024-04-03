@@ -11,7 +11,8 @@ import {
   ConnectionError,
   XrplError,
 } from '../errors'
-import type { RequestResponseMap } from '../models'
+import { ErrorResponse } from '../models'
+import type { RequestResponseMap, Response } from '../models'
 import { BaseRequest } from '../models/methods/baseMethod'
 
 import ConnectionManager from './ConnectionManager'
@@ -323,26 +324,40 @@ export class Connection extends EventEmitter {
    *
    * @param message - The message received from the server.
    */
-  private onMessage(message): void {
+  // eslint-disable-next-line complexity -- It is fine to have a high complexity here.
+  private onMessage(message: string): void {
     this.trace('receive', message)
-    let data: Record<string, unknown>
+    let data: Response | ErrorResponse | null = null
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Typeguard function
+    function isResponseOrError(obj: any): obj is Response | ErrorResponse {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Made it safe with ?
+      return 'result' in obj || obj?.status === 'error'
+    }
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Must be a JSON dictionary
-      data = JSON.parse(message)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Only away to do a typeguard
+      const parsed = JSON.parse(message)
+
+      if (isResponseOrError(parsed)) {
+        data = parsed
+      }
     } catch (error) {
       if (error instanceof Error) {
         this.emit('error', 'badMessage', error.message, message)
       }
       return
     }
-    if (data.type == null && data.error) {
+    if (data === null) {
+      this.emit('error', 'badMessage', 'Invalid JSON', message)
+      return
+    }
+    if (!('result' in data) && data.type == null && data.error) {
       // e.g. slowDown
       this.emit('error', data.error, data.error_message, data)
       return
     }
     if (data.type) {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
-      this.emit(data.type as string, data)
+      this.emit(data.type, data)
     }
     if (data.type === 'response') {
       try {

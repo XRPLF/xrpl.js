@@ -331,7 +331,6 @@ describe('Connection', function () {
     'DisconnectedError',
     async () => {
       await clientContext.client
-        // @ts-expect-error -- Intentionally invalid command
         .request({ command: 'test_command', data: { closeServer: true } })
         .then(() => {
           assert.fail('Should throw DisconnectedError')
@@ -422,8 +421,8 @@ describe('Connection', function () {
 
       try {
         await clientContext.client.connect()
-      } catch (error) {
-        // @ts-expect-error -- Error has a message
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- This is correct for an error
+      } catch (error: any) {
         expect(error.message).toEqual(
           "Error: connect() timed out after 5000 ms. If your internet connection is working, the rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.",
         )
@@ -442,7 +441,6 @@ describe('Connection', function () {
     async () => {
       await clientContext.client
         .request({
-          // @ts-expect-error -- Intentionally invalid command
           command: 'test_command',
           data: { unrecognizedResponse: true },
         })

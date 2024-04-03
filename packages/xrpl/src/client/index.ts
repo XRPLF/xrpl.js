@@ -32,7 +32,6 @@ import {
 import type {
   RequestResponseMap,
   RequestAllResponseMap,
-  MarkerRequest,
   MarkerResponse,
   SubmitResponse,
 } from '../models/methods'
@@ -437,10 +436,11 @@ class Client extends EventEmitter<EventTypes> {
    * const allResponses = await client.requestAll({ command: 'transaction_data' });
    * console.log(allResponses);
    */
-  public async requestAll<
-    T extends MarkerRequest,
-    U = RequestAllResponseMap<T>,
-  >(request: T, collect?: string): Promise<U[]> {
+
+  public async requestAll<T extends Request, U = RequestAllResponseMap<T>>(
+    request: T,
+    collect?: string,
+  ): Promise<U[]> {
     /*
      * The data under collection is keyed based on the command. Fail if command
      * not recognized and collection key not provided.
@@ -453,7 +453,8 @@ class Client extends EventEmitter<EventTypes> {
      * If limit is not provided, fetches all data over multiple requests.
      * NOTE: This may return much more than needed. Set limit when possible.
      */
-    const countTo: number = request.limit == null ? Infinity : request.limit
+    const countTo: number =
+      typeof request.limit === 'number' ? request.limit : Infinity
     let count = 0
     let marker: unknown = request.marker
     const results: U[] = []

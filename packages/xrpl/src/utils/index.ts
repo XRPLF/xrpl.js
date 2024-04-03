@@ -24,7 +24,7 @@ import {
 import { verify as verifyKeypairSignature } from 'ripple-keypairs'
 
 import { LedgerEntry } from '../models/ledger'
-import { Response } from '../models/methods'
+import { MarkerResponse } from '../models/methods'
 import { PaymentChannelClaim } from '../models/transactions/paymentChannelClaim'
 import { Transaction } from '../models/transactions/transaction'
 
@@ -157,7 +157,7 @@ function isValidAddress(address: string): boolean {
  * @returns Whether the response has more pages of data.
  * @category Utilities
  */
-function hasNextPage(response: Response): boolean {
+function hasNextPage(response: MarkerResponse): boolean {
   // eslint-disable-next-line @typescript-eslint/dot-notation -- only checking if it exists
   return Boolean(response.result['marker'])
 }
