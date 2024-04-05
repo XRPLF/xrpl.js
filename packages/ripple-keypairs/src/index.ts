@@ -88,6 +88,9 @@ function computePublicKeyHash(publicKeyBytes: Uint8Array): Uint8Array {
 }
 
 function deriveAddressFromBytes(publicKeyBytes: Uint8Array): string {
+  if (publicKeyBytes.byteLength > 33) {
+    console.warn('publicKeyBytes should be compressed ed25519 or secp256k1 compressed point bytes, 32 bvytes prefixed with 02 or 03');
+  }
   return encodeAccountID(computePublicKeyHash(publicKeyBytes))
 }
 
