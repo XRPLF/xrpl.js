@@ -3,7 +3,7 @@
 In xrpl.js 3.0, we've made significant improvements that result in a 60% reduction in bundle size for browser applications. We've also eliminated the need for polyfills with minimal disruption to existing code. This was achieved by replacing node-specific dependencies with ones that are compatible with browsers.
 
 The two main changes you'll notice are:
-* A breaking change to `Wallet` object creation, to use a more performant algorithm by default. See [Link](#8-wallet-functions-default-to-ed25519-instead-of-secp256k1-signing-algorithm) for details.
+* A breaking change to `Wallet` object creation, to use a more performant algorithm by default. See [here](#8-wallet-functions-default-to-ed25519-instead-of-secp256k1-signing-algorithm) for details.
 * Replacing `Buffer` with `Uint8Array` across the board. This was done since browsers don't support `Buffer`. Fortunately, this transition is relatively straightforward, as `Buffer` is a subclass of `Uint8Array`, meaning in many circumstances `Buffer` can be directly replaced by `Uint8Array`. The primary difference is that `Buffer` has additional helper functions. We've listed the affected client library functions below in the `Uint8Array` section for your reference.
 
 This migration guide also applies to:
