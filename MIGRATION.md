@@ -236,7 +236,7 @@ This was done to remove a hard dependency on `https-proxy-agent` when running 
 
 In previous releases of this library, `Wallet.generate()` and `Wallet.fromSeed` were ignoring the `algorithm` parameter. Instead, the algorithm was assumed from the seed provided; if it started with `sEd`, it would use `ed25519`, and otherwise it would use `secp256k1`. However, seeds do not actually have algorithms; a seed starting with `s...` can still use the `ed25519` algorithm.
 
-With 3.0, we updated the default signing algorithm used by the `Wallet` object to always be `ed25519` in order to default to the higher-performance algorithm. This is a breaking change to all functions used to generate a Wallet, so if you have a pre-existing XRPL account that you're using to generate a specific Wallet using older versions of xrpl.js, you may need to specify that you are using secp256k1 as the algorithm to decode your private key / seed / etc to get the same behavior as before. See below for specifically how to update your code.
+With 3.0, we updated the default signing algorithm used by the `Wallet` object to always be `ed25519` in order to default to the higher-performance algorithm. This is a breaking change to all functions used to generate a Wallet, so if you have a pre-existing XRPL account that you're using to generate a specific Wallet using older versions of xrpl.js, you may need to specify that you are using `secp256k1` as the algorithm to decode your private key / seed / etc to get the same behavior as before. See below for specifically how to update your code.
 
 If you are creating new accounts each time (ex. via `Client.fundWallet` or `Wallet.generate`), you do not need to specify the signing algorithm.
 
