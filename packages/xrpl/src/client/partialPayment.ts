@@ -7,10 +7,10 @@ import type {
   TransactionStream,
   TxResponse,
 } from '..'
-import type { Amount } from '../models/common'
+import type { Amount, IssuedCurrency, MPTAmount } from '../models/common'
 import type { RequestResponseMap } from '../models/methods'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
-import { PaymentFlags, Transaction } from '../models/transactions'
+import { PaymentFlags, Transaction, isMPTAmount } from '../models/transactions'
 import type { TransactionMetadata } from '../models/transactions/metadata'
 import { isFlagEnabled } from '../models/utils'
 
@@ -25,12 +25,26 @@ function amountsEqual(amt1: Amount, amt2: Amount): boolean {
     return false
   }
 
+  if (isMPTAmount(amt1) && isMPTAmount(amt2)) {
+    const aValue = new BigNumber(amt1.value)
+    const bValue = new BigNumber(amt2.value)
+
+    return (
+      (amt1 as MPTAmount).mpt_issuance_id ===
+        (amt2 as MPTAmount).mpt_issuance_id && aValue.isEqualTo(bValue)
+    )
+  }
+
+  if (isMPTAmount(amt1) || isMPTAmount(amt2)) {
+    return false
+  }
+
   const aValue = new BigNumber(amt1.value)
   const bValue = new BigNumber(amt2.value)
 
   return (
-    amt1.currency === amt2.currency &&
-    amt1.issuer === amt2.issuer &&
+    (amt1 as IssuedCurrency).currency === (amt2 as IssuedCurrency).currency &&
+    (amt1 as IssuedCurrency).issuer === (amt2 as IssuedCurrency).issuer &&
     aValue.isEqualTo(bValue)
   )
 }
