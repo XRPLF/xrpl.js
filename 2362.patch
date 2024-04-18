@@ -1,0 +1,232 @@
+From 5f477135760a63f04325a32322ec44473b774a17 Mon Sep 17 00:00:00 2001
+From: Wietse Wind <mail@wietse.com>
+Date: Sat, 1 Jul 2023 03:26:47 +0200
+Subject: [PATCH 1/2] =?UTF-8?q?Fix=20#2361=20-=20Custom=20definitions=20in?=
+ =?UTF-8?q?=20STArray=C2=BBSTObject?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../src/types/serialized-type.ts              |  6 +-
+ .../ripple-binary-codec/src/types/st-array.ts | 17 ++++--
+ .../src/types/st-object.ts                    | 15 +++--
+ .../test/definitions.test.js                  | 60 +++++++++++++++++++
+ 4 files changed, 88 insertions(+), 10 deletions(-)
+
+diff --git a/packages/ripple-binary-codec/src/types/serialized-type.ts b/packages/ripple-binary-codec/src/types/serialized-type.ts
+index 68048f26e3..e7bf4aaaa2 100644
+--- a/packages/ripple-binary-codec/src/types/serialized-type.ts
++++ b/packages/ripple-binary-codec/src/types/serialized-type.ts
+@@ -2,6 +2,7 @@ import { BytesList } from '../serdes/binary-serializer'
+ import { BinaryParser } from '../serdes/binary-parser'
+ import bigInt = require('big-integer')
+ import { Buffer } from 'buffer/'
++import { XrplDefinitionsBase } from '../enums'
+ 
+ type JSON = string | number | boolean | null | undefined | JSON[] | JsonObject
+ 
+@@ -64,9 +65,12 @@ class SerializedType {
+   /**
+    * Return the JSON representation of a SerializedType
+    *
++   * @param _definitions rippled definitions used to parse the values of transaction types and such.
++   *                          Unused in default, but used in STObject, STArray
++   *                          Can be customized for sidechains and amendments.
+    * @returns any type, if not overloaded returns hexString representation of bytes
+    */
+-  toJSON(): JSON {
++  toJSON(_definitions?: XrplDefinitionsBase): JSON {
+     return this.toHex()
+   }
+ 
+diff --git a/packages/ripple-binary-codec/src/types/st-array.ts b/packages/ripple-binary-codec/src/types/st-array.ts
+index 10dab9b9a5..f5cd7e852b 100644
+--- a/packages/ripple-binary-codec/src/types/st-array.ts
++++ b/packages/ripple-binary-codec/src/types/st-array.ts
+@@ -1,3 +1,4 @@
++import { DEFAULT_DEFINITIONS, XrplDefinitionsBase } from '../enums'
+ import { SerializedType, JsonObject } from './serialized-type'
+ import { STObject } from './st-object'
+ import { BinaryParser } from '../serdes/binary-parser'
+@@ -51,9 +52,13 @@ class STArray extends SerializedType {
+    * Construct an STArray from an Array of JSON Objects
+    *
+    * @param value STArray or Array of Objects to parse into an STArray
++   * @param definitions optional, types and values to use to encode/decode a transaction
+    * @returns An STArray object
+    */
+-  static from<T extends STArray | Array<JsonObject>>(value: T): STArray {
++  static from<T extends STArray | Array<JsonObject>>(
++    value: T,
++    definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
++  ): STArray {
+     if (value instanceof STArray) {
+       return value
+     }
+@@ -61,7 +66,7 @@ class STArray extends SerializedType {
+     if (isObjects(value)) {
+       const bytes: Array<Buffer> = []
+       value.forEach((obj) => {
+-        bytes.push(STObject.from(obj).toBytes())
++        bytes.push(STObject.from(obj, undefined, definitions).toBytes())
+       })
+ 
+       bytes.push(ARRAY_END_MARKER)
+@@ -76,10 +81,12 @@ class STArray extends SerializedType {
+    *
+    * @returns An Array of JSON objects
+    */
+-  toJSON(): Array<JsonObject> {
++  toJSON(
++    definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
++  ): Array<JsonObject> {
+     const result: Array<JsonObject> = []
+ 
+-    const arrayParser = new BinaryParser(this.toString())
++    const arrayParser = new BinaryParser(this.toString(), definitions)
+ 
+     while (!arrayParser.end()) {
+       const field = arrayParser.readField()
+@@ -88,7 +95,7 @@ class STArray extends SerializedType {
+       }
+ 
+       const outer = {}
+-      outer[field.name] = STObject.fromParser(arrayParser).toJSON()
++      outer[field.name] = STObject.fromParser(arrayParser).toJSON(definitions)
+       result.push(outer)
+     }
+ 
+diff --git a/packages/ripple-binary-codec/src/types/st-object.ts b/packages/ripple-binary-codec/src/types/st-object.ts
+index 8cd631fca5..03ecf13b8a 100644
+--- a/packages/ripple-binary-codec/src/types/st-object.ts
++++ b/packages/ripple-binary-codec/src/types/st-object.ts
+@@ -9,6 +9,7 @@ import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
+ import { BinaryParser } from '../serdes/binary-parser'
+ import { BinarySerializer, BytesList } from '../serdes/binary-serializer'
+ import { Buffer } from 'buffer/'
++import { STArray } from './st-array'
+ 
+ const OBJECT_END_MARKER_BYTE = Buffer.from([0xe1])
+ const OBJECT_END_MARKER = 'ObjectEndMarker'
+@@ -131,9 +132,12 @@ class STObject extends SerializedType {
+     }
+ 
+     sorted.forEach((field) => {
+-      const associatedValue = field.associatedType.from(
+-        xAddressDecoded[field.name],
+-      )
++      const associatedValue =
++        field.type.name === ST_OBJECT
++          ? this.from(xAddressDecoded[field.name], undefined, definitions)
++          : field.type.name === 'STArray'
++          ? STArray.from(xAddressDecoded[field.name], definitions)
++          : field.associatedType.from(xAddressDecoded[field.name])
+ 
+       if (associatedValue == undefined) {
+         throw new TypeError(
+@@ -175,7 +179,10 @@ class STObject extends SerializedType {
+       if (field.name === OBJECT_END_MARKER) {
+         break
+       }
+-      accumulator[field.name] = objectParser.readFieldValue(field).toJSON()
++
++      accumulator[field.name] = objectParser
++        .readFieldValue(field)
++        .toJSON(definitions)
+     }
+ 
+     return accumulator
+diff --git a/packages/ripple-binary-codec/test/definitions.test.js b/packages/ripple-binary-codec/test/definitions.test.js
+index 3ac575b3a9..390bec4166 100644
+--- a/packages/ripple-binary-codec/test/definitions.test.js
++++ b/packages/ripple-binary-codec/test/definitions.test.js
+@@ -60,6 +60,66 @@ describe('encode and decode using new types as a parameter', function () {
+     expect(decoded).toStrictEqual(tx)
+   })
+ 
++  test('can encode and decode a new Field nested in STObject in STArray in STObject', function () {
++    const tx = {
++      ...txJson,
++      NewFieldArray: [
++        {
++          NewField: {
++            NewFieldValue: 10,
++          },
++        },
++      ],
++    }
++
++    // Before updating the types, undefined fields will be ignored on encode
++    expect(decode(encode(tx))).not.toStrictEqual(tx)
++
++    // Normally this would be generated directly from rippled with something like `server_definitions`.
++    // Added here to make it easier to see what is actually changing in the definitions.json file.
++    const definitions = JSON.parse(JSON.stringify(normalDefinitionsJson))
++
++    definitions.FIELDS.push([
++      'NewFieldArray',
++      {
++        nth: 100,
++        isVLEncoded: false,
++        isSerialized: true,
++        isSigningField: true,
++        type: 'STArray',
++      },
++    ])
++
++    definitions.FIELDS.push([
++      'NewField',
++      {
++        nth: 101,
++        isVLEncoded: false,
++        isSerialized: true,
++        isSigningField: true,
++        type: 'STObject',
++      },
++    ])
++
++    definitions.FIELDS.push([
++      'NewFieldValue',
++      {
++        nth: 102,
++        isVLEncoded: false,
++        isSerialized: true,
++        isSigningField: true,
++        type: 'UInt32',
++      },
++    ])
++
++    const newDefs = new XrplDefinitions(definitions)
++
++    const encoded = encode(tx, newDefs)
++    expect(() => decode(encoded)).toThrow()
++    const decoded = decode(encoded, newDefs)
++    expect(decoded).toStrictEqual(tx)
++  })
++
+   test('can encode and decode a new Type', function () {
+     const tx = {
+       ...txJson,
+
+From c343efc78a099ad3949471f32c96983712748a3e Mon Sep 17 00:00:00 2001
+From: Wietse Wind <mail@wietse.com>
+Date: Sat, 1 Jul 2023 04:10:12 +0200
+Subject: [PATCH 2/2] Custom binary codec fixes xrpl.js#2361 - missed param def
+
+---
+ packages/ripple-binary-codec/src/types/st-array.ts | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/packages/ripple-binary-codec/src/types/st-array.ts b/packages/ripple-binary-codec/src/types/st-array.ts
+index f5cd7e852b..25a7e4ecc4 100644
+--- a/packages/ripple-binary-codec/src/types/st-array.ts
++++ b/packages/ripple-binary-codec/src/types/st-array.ts
+@@ -79,6 +79,7 @@ class STArray extends SerializedType {
+   /**
+    * Return the JSON representation of this.bytes
+    *
++   * @param definitions optional, types and values to use to encode/decode a transaction
+    * @returns An Array of JSON objects
+    */
+   toJSON(
