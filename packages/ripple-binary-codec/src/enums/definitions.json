@@ -2890,66 +2890,66 @@
   },
   "TRANSACTION_FLAGS": {
     "Universal": {
-      "FullyCanonicalSig": 2147483648
+      "tfFullyCanonicalSig": 2147483648
     },
     "AccountSet": {
-      "RequireDestTag": 65536,
-      "OptionalDestTag": 131072,
-      "RequireAuth": 262144,
-      "OptionalAuth": 524288,
-      "DisallowXRP": 1048576,
-      "AllowXRP": 2097152
+      "tfRequireDestTag": 65536,
+      "tfOptionalDestTag": 131072,
+      "tfRequireAuth": 262144,
+      "tfOptionalAuth": 524288,
+      "tfDisallowXRP": 1048576,
+      "tfAllowXRP": 2097152
     },
     "TrustSet": {
-      "SetAuth": 65536,
-      "SetNoRipple": 131072,
-      "ClearNoRipple": 262144,
-      "SetFreeze": 1048576,
-      "ClearFreeze": 2097152
+      "tfSetAuth": 65536,
+      "tfSetNoRipple": 131072,
+      "tfClearNoRipple": 262144,
+      "tfSetFreeze": 1048576,
+      "tfClearFreeze": 2097152
     },
     "OfferCreate": {
-      "Passive": 65536,
-      "ImmediateOrCancel": 131072,
-      "FillOrKill": 262144,
-      "Sell": 524288
+      "tfPassive": 65536,
+      "tfImmediateOrCancel": 131072,
+      "tfFillOrKill": 262144,
+      "tfSell": 524288
     },
     "Payment": {
-      "NoRippleDirect": 65536,
-      "PartialPayment": 131072,
-      "LimitQuality": 262144
+      "tfNoRippleDirect": 65536,
+      "tfPartialPayment": 131072,
+      "tfLimitQuality": 262144
     },
     "PaymentChannelClaim": {
-      "Renew": 65536,
-      "Close": 131072
+      "tfRenew": 65536,
+      "tfClose": 131072
     },
     "NFTokenMint": {
-      "Burnable": 1,
-      "OnlyXRP": 2,
-      "TrustLine": 4,
-      "Transferable": 8,
-      "ApproveTransfers": 16,
-      "IssuerCanCancelOffers": 16,
-      "IssuerApprovalRequired": 32
+      "tfBurnable": 1,
+      "tfOnlyXRP": 2,
+      "tfTrustLine": 4,
+      "tfTransferable": 8,
+      "tfApproveTransfers": 16,
+      "tfIssuerCanCancelOffers": 16,
+      "tfIssuerApprovalRequired": 32
     },
     "NFTokenCreateOffer": {
-      "SellToken": 1,
-      "Approved": 2
+      "tfSellToken": 1,
+      "tfApproved": 2
     },
     "AMMDeposit": {
-      "LPToken": 65536,
-      "SingleAsset": 524288,
-      "TwoAsset": 1048576,
-      "OneAssetLPToken": 2097152,
-      "LimitLPToken": 4194304
+      "tfLPToken": 65536,
+      "tfSingleAsset": 524288,
+      "tfTwoAsset": 1048576,
+      "tfOneAssetLPToken": 2097152,
+      "tfLimitLPToken": 4194304
     },
     "AMMWithdraw": {
-      "LPToken": 65536,
-      "WithdrawAll": 131072,
-      "OneAssetWithdrawAll": 262144,
-      "SingleAsset": 524288,
-      "TwoAsset": 1048576,
-      "OneAssetLPToken": 2097152,
-      "LimitLPToken": 4194304
+      "tfLPToken": 65536,
+      "tfWithdrawAll": 131072,
+      "tfOneAssetWithdrawAll": 262144,
+      "tfSingleAsset": 524288,
+      "tfTwoAsset": 1048576,
+      "tfOneAssetLPToken": 2097152,
+      "tfLimitLPToken": 4194304
     }
   }
 }
