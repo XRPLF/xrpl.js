@@ -1,7 +1,7 @@
 {
-  "name": "ripple-binary-codec",
-  "version": "1.11.0",
-  "description": "XRP Ledger binary codec",
+  "name": "xrpl-binary-codec-prerelease",
+  "version": "8.0.0",
+  "description": "XRP Ledger Protocol Binary Codec - For XRPL, Xahau and other networks (with dynamic definitions)",
   "files": [
     "dist/*",
     "src/*"
@@ -26,19 +26,19 @@
     "lint": "eslint . --ext .ts --ext .test.js"
   },
   "keywords": [
-    "ripple",
     "xrp",
     "xrp ledger",
-    "xrpl"
+    "xrpl",
+    "xahau"
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:XRPLF/xrpl.js.git"
+    "url": "git@github.com:WietseWind/xrpl.js.git"
   },
   "bugs": {
-    "url": "https://github.com/XRPLF/xrpl.js/issues"
+    "url": "https://github.com/WietseWind/xrpl.js/issues"
   },
-  "homepage": "https://github.com/XRPLF/xrpl.js/tree/main/packages/ripple-binary-codec#readme",
+  "homepage": "https://github.com/WietseWind/xrpl.js/tree/main/packages/ripple-binary-codec#readme",
   "license": "ISC",
   "readmeFilename": "README.md",
   "prettier": "@xrplf/prettier-config",
