@@ -2734,6 +2734,82 @@
     "Validation": 10003,
     "Vector256": 19
   },
+  "TRANSACTION_FLAGS_INDICES": {
+    "AccountSet": {
+        "asfAccountTxnID": 5,
+        "asfAuthorizedNFTokenMinter": 10,
+        "asfDefaultRipple": 8,
+        "asfDepositAuth": 9,
+        "asfDisableMaster": 4,
+        "asfDisallowIncomingCheck": 13,
+        "asfDisallowIncomingNFTokenOffer": 12,
+        "asfDisallowIncomingPayChan": 14,
+        "asfDisallowIncomingRemit": 16,
+        "asfDisallowIncomingTrustline": 15,
+        "asfDisallowXRP": 3,
+        "asfGlobalFreeze": 7,
+        "asfNoFreeze": 6,
+        "asfRequireAuth": 2,
+        "asfRequireDest": 1,
+        "asfTshCollect": 11
+    }
+  },
+  "TRANSACTION_FLAGS": {
+    "AccountSet": {
+        "tfAllowXRP": 2097152,
+        "tfDisallowXRP": 1048576,
+        "tfOptionalAuth": 524288,
+        "tfOptionalDestTag": 131072,
+        "tfRequireAuth": 262144,
+        "tfRequireDestTag": 65536
+    },
+    "ClaimReward": {
+        "tfOptOut": 1
+    },
+    "EnableAmendment": {
+        "tfGotMajority": 65536,
+        "tfLostMajority": 131072,
+        "tfTestSuite": 2147483648
+    },
+    "NFTokenCreateOffer": {
+        "tfSellNFToken": 1
+    },
+    "NFTokenMint": {
+        "tfBurnable": 1,
+        "tfOnlyXRP": 2,
+        "tfStrongTSH": 32768,
+        "tfTransferable": 8,
+        "tfTrustLine": 4
+    },
+    "OfferCreate": {
+        "tfFillOrKill": 262144,
+        "tfImmediateOrCancel": 131072,
+        "tfPassive": 65536,
+        "tfSell": 524288
+    },
+    "Payment": {
+        "tfLimitQuality": 262144,
+        "tfNoRippleDirect": 65536,
+        "tfPartialPayment": 131072
+    },
+    "PaymentChannelClaim": {
+        "tfClose": 131072,
+        "tfRenew": 65536
+    },
+    "TrustSet": {
+        "tfClearFreeze": 2097152,
+        "tfClearNoRipple": 262144,
+        "tfSetFreeze": 1048576,
+        "tfSetNoRipple": 131072,
+        "tfSetfAuth": 65536
+    },
+    "URITokenMint": {
+        "tfBurnable": 1
+    },
+    "Universal": {
+        "tfFullyCanonicalSig": 2147483648
+    }
+  },
   "hash": "5EFE8D2AD3531B7A166FDE52B2642F0266F2567158E5692386679E1D354BF8C7",
   "native_currency_code": "XAH",
   "status": "success"

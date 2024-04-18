@@ -2867,5 +2867,89 @@
     "EnableAmendment": 100,
     "SetFee": 101,
     "UNLModify": 102
+  },
+  "TRANSACTION_FLAGS_INDICES": {
+    "AccountSet": {
+        "asfAccountTxnID": 5,
+        "asfAuthorizedNFTokenMinter": 10,
+        "asfDefaultRipple": 8,
+        "asfDepositAuth": 9,
+        "asfDisableMaster": 4,
+        "asfDisallowIncomingCheck": 13,
+        "asfDisallowIncomingNFTokenOffer": 12,
+        "asfDisallowIncomingPayChan": 14,
+        "asfAllowTrustLineClawback": 16,
+        "asfDisallowIncomingTrustline": 15,
+        "asfDisallowXRP": 3,
+        "asfGlobalFreeze": 7,
+        "asfNoFreeze": 6,
+        "asfRequireAuth": 2,
+        "asfRequireDest": 1,
+        "asfTshCollect": 11
+    }
+  },
+  "TRANSACTION_FLAGS": {
+    "Universal": {
+      "FullyCanonicalSig": 2147483648
+    },
+    "AccountSet": {
+      "RequireDestTag": 65536,
+      "OptionalDestTag": 131072,
+      "RequireAuth": 262144,
+      "OptionalAuth": 524288,
+      "DisallowXRP": 1048576,
+      "AllowXRP": 2097152
+    },
+    "TrustSet": {
+      "SetAuth": 65536,
+      "SetNoRipple": 131072,
+      "ClearNoRipple": 262144,
+      "SetFreeze": 1048576,
+      "ClearFreeze": 2097152
+    },
+    "OfferCreate": {
+      "Passive": 65536,
+      "ImmediateOrCancel": 131072,
+      "FillOrKill": 262144,
+      "Sell": 524288
+    },
+    "Payment": {
+      "NoRippleDirect": 65536,
+      "PartialPayment": 131072,
+      "LimitQuality": 262144
+    },
+    "PaymentChannelClaim": {
+      "Renew": 65536,
+      "Close": 131072
+    },
+    "NFTokenMint": {
+      "Burnable": 1,
+      "OnlyXRP": 2,
+      "TrustLine": 4,
+      "Transferable": 8,
+      "ApproveTransfers": 16,
+      "IssuerCanCancelOffers": 16,
+      "IssuerApprovalRequired": 32
+    },
+    "NFTokenCreateOffer": {
+      "SellToken": 1,
+      "Approved": 2
+    },
+    "AMMDeposit": {
+      "LPToken": 65536,
+      "SingleAsset": 524288,
+      "TwoAsset": 1048576,
+      "OneAssetLPToken": 2097152,
+      "LimitLPToken": 4194304
+    },
+    "AMMWithdraw": {
+      "LPToken": 65536,
+      "WithdrawAll": 131072,
+      "OneAssetWithdrawAll": 262144,
+      "SingleAsset": 524288,
+      "TwoAsset": 1048576,
+      "OneAssetLPToken": 2097152,
+      "LimitLPToken": 4194304
+    }
   }
 }
