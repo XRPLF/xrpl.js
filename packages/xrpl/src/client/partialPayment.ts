@@ -16,7 +16,10 @@ import { isFlagEnabled } from '../models/utils'
 
 const WARN_PARTIAL_PAYMENT_CODE = 2001
 
-function amountsEqual(amt1: Amount, amt2: Amount): boolean {
+function amountsEqual(
+  amt1: Amount | MPTAmount,
+  amt2: Amount | MPTAmount,
+): boolean {
   if (typeof amt1 === 'string' && typeof amt2 === 'string') {
     return amt1 === amt2
   }

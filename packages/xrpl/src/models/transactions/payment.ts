@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { Amount, Path } from '../common'
+import { Amount, Path, MPTAmount } from '../common'
 import { isFlagEnabled } from '../utils'
 
 import {
@@ -116,7 +116,7 @@ export interface Payment extends BaseTransaction {
    * names MUST be lower-case. If the tfPartialPayment flag is set, deliver up
    * to this amount instead.
    */
-  Amount: Amount
+  Amount: Amount | MPTAmount
   /** The unique address of the account receiving the payment. */
   Destination: Account
   /**
@@ -153,8 +153,8 @@ export interface Payment extends BaseTransaction {
 }
 
 export interface PaymentMetadata extends TransactionMetadataBase {
-  DeliveredAmount?: Amount
-  delivered_amount?: Amount | 'unavailable'
+  DeliveredAmount?: Amount | MPTAmount
+  delivered_amount?: Amount | MPTAmount | 'unavailable'
 }
 
 /**

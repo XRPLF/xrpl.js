@@ -21,7 +21,7 @@ export interface MPTAmount {
   value: string
 }
 
-export type Amount = IssuedCurrencyAmount | MPTAmount | string
+export type Amount = IssuedCurrencyAmount | string
 
 export interface Balance {
   currency: string
