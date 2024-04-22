@@ -4,6 +4,11 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+## 1.0.0-mpt-beta (2024-04-22)
+### Non-Breaking Changes
+* Added new MPT transaction models
+* New `MPTAmount` type support for `Payment` and `Clawback` transactions
+
 ## 3.0.0 (2024-02-01)
 
 ### BREAKING CHANGES
@@ -52,7 +57,7 @@ Bundler configurations are much more simplified. See [../UNIQUE_STEPS](Unique St
 * Deprecated:
   * `convertHexToString` in favor of `@xrplf/isomorphic/utils`'s `hexToString`
   * `convertStringToHex` in favor of `@xrplf/isomorphic/utils`'s `stringToHex`
-  
+
 ## 3.0.0 Beta 1 (2023-11-30)
 
 ### Breaking Changes
