@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.1-mpt-beta (2024-04-22)
+
 ## 1.0.0-mpt-beta (2024-04-22)
 ### Non-Breaking Changes
 * Added support for `MPTAmount` in `Amount`

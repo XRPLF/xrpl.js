@@ -4,6 +4,10 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+## 1.0.1-mpt-beta (2024-04-22)
+### Non-Breaking Changes
+* Add `MPTAmount` check for transactions that are not `Payment` or `Clawback`
+
 ## 1.0.0-mpt-beta (2024-04-22)
 ### Non-Breaking Changes
 * Added new MPT transaction models
