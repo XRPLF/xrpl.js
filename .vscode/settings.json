@@ -39,7 +39,7 @@
         "enable": true
     },
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "explicit"
+        "source.fixAll.eslint": true
     },
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
