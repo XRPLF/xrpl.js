@@ -13,6 +13,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add missing `lsfAMMNode` flag to `RippleState` ledger object
 * Add `PreviousFields` to `DeletedNode` metadata type
 
+### Added
+* Custom definitions support for `util.encode`, `util.decode`, `util.encodeForSignning` and `Wallet.sign`.
+
 ## 3.0.0 (2024-02-01)
 
 ### BREAKING CHANGES
