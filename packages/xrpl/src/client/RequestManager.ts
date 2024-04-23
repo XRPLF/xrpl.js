@@ -4,7 +4,7 @@ import {
   TimeoutError,
   XrplError,
 } from '../errors'
-import { APIVersion } from '../models'
+import type { APIVersion } from '../models'
 import { Response, RequestResponseMap } from '../models/methods'
 import { BaseRequest, ErrorResponse } from '../models/methods/baseMethod'
 

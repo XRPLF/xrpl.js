@@ -1,6 +1,6 @@
 /* eslint-disable no-inline-comments -- Necessary for important note */
 /* eslint-disable max-lines -- There is a lot to export */
-import { APIVersion } from '../common'
+import type { APIVersion } from '../common'
 
 import {
   AccountChannelsRequest,

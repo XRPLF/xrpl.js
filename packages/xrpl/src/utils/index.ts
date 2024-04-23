@@ -23,7 +23,7 @@ import {
 } from 'ripple-binary-codec'
 import { verify as verifyKeypairSignature } from 'ripple-keypairs'
 
-import { APIVersion } from '../models'
+import type { APIVersion } from '../models'
 import { LedgerEntry } from '../models/ledger'
 import { Response } from '../models/methods'
 import { PaymentChannelClaim } from '../models/transactions/paymentChannelClaim'
