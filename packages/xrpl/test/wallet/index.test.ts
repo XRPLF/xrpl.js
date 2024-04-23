@@ -1188,7 +1188,7 @@ describe('Wallet', function () {
       }, /URI must be in hex format/u)
     })
 
-    it('sign succeeds with a custom definition is passed', async function () {
+    it('sign succeeds when a custom definition is passed', async function () {
       const customDefinition = new XrplDefinitions(
         rippled.definitions.customDefinition,
       )
@@ -1218,7 +1218,7 @@ describe('Wallet', function () {
       })
     })
 
-    it('multisign succeeds with a custom definition is passed', async function () {
+    it('multisign succeeds when a custom definition is passed', async function () {
       const customDefinition = new XrplDefinitions(
         rippled.definitions.customDefinition,
       )
