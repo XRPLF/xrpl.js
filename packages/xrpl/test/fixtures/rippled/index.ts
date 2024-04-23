@@ -33,6 +33,7 @@ import Payment from './tx/payment.json'
 import XChainCreateClaimID from './tx/XChainCreateClaimID.json'
 import XChainCreateClaimID2 from './tx/XChainCreateClaimID2.json'
 import unsubscribe from './unsubscribe.json'
+import customDefinition from './customDefinition.json'
 
 const submit = {
   success: successSubmit,
@@ -94,6 +95,10 @@ const server_info = {
   withNetworkId: withNetworkIDServerInfo,
 }
 
+const definitions = {
+  customDefinition,
+}
+
 const tx = {
   NFTokenMint,
   NFTokenMint2,
@@ -118,6 +123,7 @@ const rippled = {
   transaction_entry,
   tx,
   unsubscribe,
+  definitions,
 }
 
 export default rippled

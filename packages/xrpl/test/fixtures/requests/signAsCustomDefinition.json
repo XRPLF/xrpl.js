@@ -1,0 +1,19 @@
+{
+  "Account": "rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC",
+  "TransactionType": "TokenSwapPropose",
+  "AccountOther": "rJyZ28c179hKg7Gwt4P2S8zgzUTmMUMmzs",
+  "Expiration": 773819038,
+  "Flags": 2147483648,
+  "Sequence": 33626,
+  "Fee": "10",
+  "Amount": {
+      "currency": "AAA",
+      "issuer": "rDCcTxoALtAryzk4TE3mxU9hpjRm5vQcxT",
+      "value": "1"
+  },
+  "AmountOther": {
+      "currency": "BBB",
+      "issuer": "rDCcTxoALtAryzk4TE3mxU9hpjRm5vQcxT",
+      "value": "1"
+  }
+}

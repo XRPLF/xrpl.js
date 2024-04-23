@@ -123,7 +123,6 @@ class Amount extends SerializedType {
       const issuer = AccountID.from(value.issuer).toBytes()
       return new Amount(concat([amount, currency, issuer]))
     }
-
     throw new Error('Invalid type to construct an Amount')
   }
 

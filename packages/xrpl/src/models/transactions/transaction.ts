@@ -169,7 +169,10 @@ export interface TransactionAndMetadata<
  * @throws ValidationError When the Transaction is malformed.
  * @category Utilities
  */
-export function validate(transaction: Record<string, unknown>): void {
+export function validate(
+  transaction: Record<string, unknown>,
+  customDefinition?: boolean,
+): void {
   const tx = { ...transaction }
   if (tx.TransactionType == null) {
     throw new ValidationError('Object does not have a `TransactionType`')
@@ -395,8 +398,9 @@ export function validate(transaction: Record<string, unknown>): void {
       break
 
     default:
-      throw new ValidationError(
-        `Invalid field TransactionType: ${tx.TransactionType}`,
-      )
+      if (!customDefinition)
+        throw new ValidationError(
+          `Invalid field TransactionType: ${tx.TransactionType}`,
+        )
   }
 }
