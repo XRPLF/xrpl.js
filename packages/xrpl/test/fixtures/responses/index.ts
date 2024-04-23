@@ -11,6 +11,8 @@ import signAsSign from './signAs.json'
 import escrowSign from './signEscrow.json'
 import signPaymentChannelClaim from './signPaymentChannelClaim.json'
 import ticketSign from './signTicket.json'
+import signCustomDefinition from './signCustomDefinition.json'
+import signAsCustomDefinition from './signAsCustomDefinition.json'
 
 const getOrderbook = {
   normal: normalOrderBook,
@@ -26,6 +28,8 @@ const sign = {
   ticket: ticketSign,
   escrow: escrowSign,
   signAs: signAsSign,
+  signCustomDefinition,
+  signAsCustomDefinition,
 }
 
 const responses = {

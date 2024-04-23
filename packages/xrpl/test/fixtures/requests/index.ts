@@ -7,12 +7,14 @@ import signAsSign from './signAs.json'
 import escrowSign from './signEscrow.json'
 import signPaymentChannelClaim from './signPaymentChannelClaim.json'
 import ticketSign from './signTicket.json'
+import signAsCustomDefinition from './signAsCustomDefinition.json'
 
 const sign = {
   normal: normalSign,
   ticket: ticketSign,
   escrow: escrowSign,
   signAs: signAsSign,
+  signAsCustomDefinition,
 }
 
 const getOrderbook = {

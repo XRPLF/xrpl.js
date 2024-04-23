@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { decode } from 'ripple-binary-codec'
+import { XrplDefinitions, decode } from 'ripple-binary-codec'
 
 import {
   NFTokenMint,
@@ -11,6 +11,7 @@ import ECDSA from '../../src/ECDSA'
 import { Wallet } from '../../src/Wallet'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
+import rippled from '../fixtures/rippled'
 
 const { sign: REQUEST_FIXTURES } = requests
 const { sign: RESPONSE_FIXTURES } = responses
@@ -1185,6 +1186,51 @@ describe('Wallet', function () {
       assert.throws(() => {
         wallet.sign(tx)
       }, /URI must be in hex format/u)
+    })
+
+    it('sign succeeds with a custom definition is passed', async function () {
+      const customDefinition = new XrplDefinitions(
+        rippled.definitions.customDefinition,
+      )
+      const tx = {
+        Account: wallet.address,
+        TransactionType: 'TokenSwapPropose',
+        Flags: 2147483648,
+        Sequence: 33626,
+        Fee: '10',
+        AccountOther: 'rJyZ28c179hKg7Gwt4P2S8zgzUTmMUMmzs',
+        Expiration: 773819038,
+        Amount: {
+          currency: 'AAA',
+          issuer: 'rDCcTxoALtAryzk4TE3mxU9hpjRm5vQcxT',
+          value: '1',
+        },
+        AmountOther: {
+          currency: 'BBB',
+          issuer: 'rDCcTxoALtAryzk4TE3mxU9hpjRm5vQcxT',
+          value: '1',
+        },
+      }
+      const result = wallet.sign(tx as any, false, customDefinition)
+      assert.deepEqual(result, {
+        tx_blob: RESPONSE_FIXTURES.signCustomDefinition.signedTransaction,
+        hash: RESPONSE_FIXTURES.signCustomDefinition.id,
+      })
+    })
+
+    it('multisign succeeds with a custom definition is passed', async function () {
+      const customDefinition = new XrplDefinitions(
+        rippled.definitions.customDefinition,
+      )
+      const result = wallet.sign(
+        REQUEST_FIXTURES.signAsCustomDefinition as any,
+        true,
+        customDefinition,
+      )
+      assert.deepEqual(result, {
+        tx_blob: RESPONSE_FIXTURES.signAsCustomDefinition.signedTransaction,
+        hash: RESPONSE_FIXTURES.signAsCustomDefinition.id,
+      })
     })
   })
 
