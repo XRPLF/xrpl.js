@@ -167,6 +167,24 @@ export function validatePayment(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   if (tx.Amount === undefined) {
+    // If only DeliverMax is provided, use it to populate the Amount field
+    if (tx.DeliverMax !== undefined) {
+      tx.Amount = tx.DeliverMax
+    }
+  }
+
+  // If Amount is not identical to DeliverMax, throw an error
+  if (
+    tx.DeliverMax !== undefined &&
+    tx.Amount !== undefined &&
+    tx.Amount !== tx.DeliverMax
+  ) {
+    throw new ValidationError(
+      'PaymentTransaction: Amount and DeliverMax fields must be identical',
+    )
+  }
+
+  if (tx.Amount === undefined) {
     throw new ValidationError('PaymentTransaction: missing field Amount')
   }
 
