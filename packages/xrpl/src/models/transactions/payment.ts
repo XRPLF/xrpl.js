@@ -175,8 +175,8 @@ export function validatePayment(tx: Record<string, unknown>): void {
 
   // If Amount is not identical to DeliverMax, throw an error
   if (
-    tx.DeliverMax !== undefined &&
-    tx.Amount !== undefined &&
+    tx.DeliverMax != null &&
+    tx.Amount != null &&
     tx.Amount !== tx.DeliverMax
   ) {
     throw new ValidationError(
