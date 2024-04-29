@@ -168,7 +168,7 @@ export function validatePayment(tx: Record<string, unknown>): void {
 
   if (tx.Amount == null) {
     // If only DeliverMax is provided, use it to populate the Amount field
-    if (tx.DeliverMax !== undefined) {
+    if (tx.DeliverMax != null) {
       tx.Amount = tx.DeliverMax
     }
   }
