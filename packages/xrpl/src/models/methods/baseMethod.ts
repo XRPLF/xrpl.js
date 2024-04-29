@@ -12,7 +12,7 @@ export interface BaseRequest {
   id?: number | string
   /** The name of the API method. */
   command: string
-  /** The API version to use. If omitted, use version 1. */
+  /** The API version to use. If omitted, use version 2. */
   api_version?: number
 }
 

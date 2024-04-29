@@ -28,6 +28,7 @@ describe('account_info', function () {
         account: testContext.wallet.classicAddress,
         strict: true,
         ledger_index: 'validated',
+        signer_lists: true,
       }
       const response = await testContext.client.request(request)
       const expected = {
@@ -49,6 +50,7 @@ describe('account_info', function () {
           ledger_hash:
             'F0DEEC46A7185BBB535517EE38CF2025973022D5B0532B36407F492521FDB0C6',
           ledger_index: 582,
+          signer_lists: [],
           validated: true,
         },
         type: 'response',
@@ -77,6 +79,7 @@ describe('account_info', function () {
           'index',
         ]),
       )
+      expect(response.result.signer_lists).toEqual([])
     },
     TIMEOUT,
   )

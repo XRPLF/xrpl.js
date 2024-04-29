@@ -324,6 +324,7 @@ class Client extends EventEmitter<EventTypes> {
   ): Promise<T> {
     const response = await this.connection.request<R, T>({
       ...req,
+      api_version: req.api_version ?? 2,
       account: req.account
         ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be string
           ensureClassicAddress(req.account as string)
