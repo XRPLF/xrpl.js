@@ -4,6 +4,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 ### BREAKING CHANGES
+* Default requests to use rippled API version 2
 * Small fix in the API to use a new flag name `tfNoDirectRipple` instead of the existing flag name `tfNoRippleDirect`
 
 ### Fixed
