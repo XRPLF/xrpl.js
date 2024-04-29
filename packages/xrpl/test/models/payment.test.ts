@@ -376,19 +376,27 @@ describe('Payment', function () {
     )
   })
 
-  it(`verifies deliver_max alias in PaymentTransactions`, function () {
+  it(`Payment Transaction: Specify Only Amount field`, function () {
     assert.doesNotThrow(() => validatePayment(paytxn1))
     assert.doesNotThrow(() => validate(paytxn1))
+  })
 
+  it(`Payment Transaction: Specify Only DeliverMax field`, function () {
     assert.doesNotThrow(() => validatePayment(paytxn2))
     assert.doesNotThrow(() => validate(paytxn2))
+  })
 
+  it(`Payment Transaction: identical DeliverMax and Amount fields`, function () {
     assert.doesNotThrow(() => validatePayment(paytxn3))
     assert.doesNotThrow(() => validate(paytxn3))
+  })
 
+  it(`Payment Transaction: different DeliverMax and Amount fields`, function () {
     assert.throws(() => validatePayment(paytxn4))
     assert.throws(() => validate(paytxn4))
+  })
 
+  it(`Payment Transaction: DeliverMax and Amount fields are absent`, function () {
     assert.throws(() => validatePayment(paytxn5))
     assert.throws(() => validate(paytxn5))
   })
