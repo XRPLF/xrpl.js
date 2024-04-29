@@ -166,17 +166,17 @@ export interface PaymentMetadata extends TransactionMetadataBase {
 export function validatePayment(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Amount === undefined) {
+  if (tx.Amount == null) {
     // If only DeliverMax is provided, use it to populate the Amount field
-    if (tx.DeliverMax !== undefined) {
+    if (tx.DeliverMax != null) {
       tx.Amount = tx.DeliverMax
     }
   }
 
   // If Amount is not identical to DeliverMax, throw an error
   if (
-    tx.DeliverMax !== undefined &&
-    tx.Amount !== undefined &&
+    tx.DeliverMax != null &&
+    tx.Amount != null &&
     tx.Amount !== tx.DeliverMax
   ) {
     throw new ValidationError(
