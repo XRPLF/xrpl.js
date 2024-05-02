@@ -676,22 +676,22 @@ class Client extends EventEmitter<EventTypes> {
           tx.Amount = tx.DeliverMax
         }
       }
-    }
 
-    // If Amount is not identical to DeliverMax, throw an error
-    if (
-      tx.DeliverMax != null &&
-      tx.Amount != null &&
-      tx.Amount !== tx.DeliverMax
-    ) {
-      throw new ValidationError(
-        'PaymentTransaction: Amount and DeliverMax fields must be identical',
-      )
-    }
+      // If Amount is not identical to DeliverMax, throw an error
+      if (
+        tx.DeliverMax != null &&
+        tx.Amount != null &&
+        tx.Amount !== tx.DeliverMax
+      ) {
+        throw new ValidationError(
+          'PaymentTransaction: Amount and DeliverMax fields must be identical',
+        )
+      }
 
-    // remove the DeliverMax field
-    if (tx.DeliverMax != null) {
-      delete tx.DeliverMax
+      // remove the DeliverMax field
+      if (tx.DeliverMax != null) {
+        delete tx.DeliverMax
+      }
     }
 
     return Promise.all(promises).then(() => tx)
