@@ -10,129 +10,13 @@ import { validatePayment } from '../../src/models/transactions/payment'
  */
 describe('Payment', function () {
   let paymentTransaction
-  let paytxn1, paytxn2, paytxn3, paytxn4, paytxn5
+  // let paytxn1, paytxn2, paytxn3, paytxn4, paytxn5
 
   beforeEach(function () {
     paymentTransaction = {
       TransactionType: 'Payment',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       Amount: '1234',
-      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
-      DestinationTag: 1,
-      Fee: '12',
-      Flags: 2147483648,
-      LastLedgerSequence: 65953073,
-      Sequence: 65923914,
-      SigningPubKey:
-        '02F9E33F16DF9507705EC954E3F94EB5F10D1FC4A354606DBE6297DBB1096FE654',
-      TxnSignature:
-        '3045022100E3FAE0EDEC3D6A8FF6D81BC9CF8288A61B7EEDE8071E90FF9314CB4621058D10022043545CF631706D700CEE65A1DB83EFDD185413808292D9D90F14D87D3DC2D8CB',
-      InvoiceID:
-        '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
-      Paths: [
-        [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
-      ],
-      SendMax: '100000000',
-    } as any
-
-    // JSON contains only Amount field
-    paytxn1 = {
-      TransactionType: 'Payment',
-      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
-      Amount: '1234',
-      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
-      DestinationTag: 1,
-      Fee: '12',
-      Flags: 2147483648,
-      LastLedgerSequence: 65953073,
-      Sequence: 65923914,
-      SigningPubKey:
-        '02F9E33F16DF9507705EC954E3F94EB5F10D1FC4A354606DBE6297DBB1096FE654',
-      TxnSignature:
-        '3045022100E3FAE0EDEC3D6A8FF6D81BC9CF8288A61B7EEDE8071E90FF9314CB4621058D10022043545CF631706D700CEE65A1DB83EFDD185413808292D9D90F14D87D3DC2D8CB',
-      InvoiceID:
-        '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
-      Paths: [
-        [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
-      ],
-      SendMax: '100000000',
-    } as any
-
-    // JSON contains only DeliverMax field
-    paytxn2 = {
-      TransactionType: 'Payment',
-      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
-      DeliverMax: '1234',
-      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
-      DestinationTag: 1,
-      Fee: '12',
-      Flags: 2147483648,
-      LastLedgerSequence: 65953073,
-      Sequence: 65923914,
-      SigningPubKey:
-        '02F9E33F16DF9507705EC954E3F94EB5F10D1FC4A354606DBE6297DBB1096FE654',
-      TxnSignature:
-        '3045022100E3FAE0EDEC3D6A8FF6D81BC9CF8288A61B7EEDE8071E90FF9314CB4621058D10022043545CF631706D700CEE65A1DB83EFDD185413808292D9D90F14D87D3DC2D8CB',
-      InvoiceID:
-        '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
-      Paths: [
-        [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
-      ],
-      SendMax: '100000000',
-    } as any
-
-    // JSON contains identical DeliverMax and Amount fields
-    paytxn3 = {
-      TransactionType: 'Payment',
-      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
-      DeliverMax: '1234',
-      Amount: '1234',
-      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
-      DestinationTag: 1,
-      Fee: '12',
-      Flags: 2147483648,
-      LastLedgerSequence: 65953073,
-      Sequence: 65923914,
-      SigningPubKey:
-        '02F9E33F16DF9507705EC954E3F94EB5F10D1FC4A354606DBE6297DBB1096FE654',
-      TxnSignature:
-        '3045022100E3FAE0EDEC3D6A8FF6D81BC9CF8288A61B7EEDE8071E90FF9314CB4621058D10022043545CF631706D700CEE65A1DB83EFDD185413808292D9D90F14D87D3DC2D8CB',
-      InvoiceID:
-        '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
-      Paths: [
-        [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
-      ],
-      SendMax: '100000000',
-    } as any
-
-    // JSON contains different DeliverMax and Amount fields
-    paytxn4 = {
-      TransactionType: 'Payment',
-      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
-      DeliverMax: '1234',
-      Amount: '321',
-      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
-      DestinationTag: 1,
-      Fee: '12',
-      Flags: 2147483648,
-      LastLedgerSequence: 65953073,
-      Sequence: 65923914,
-      SigningPubKey:
-        '02F9E33F16DF9507705EC954E3F94EB5F10D1FC4A354606DBE6297DBB1096FE654',
-      TxnSignature:
-        '3045022100E3FAE0EDEC3D6A8FF6D81BC9CF8288A61B7EEDE8071E90FF9314CB4621058D10022043545CF631706D700CEE65A1DB83EFDD185413808292D9D90F14D87D3DC2D8CB',
-      InvoiceID:
-        '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
-      Paths: [
-        [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
-      ],
-      SendMax: '100000000',
-    } as any
-
-    // JSON does not contain either DeliverMax or Amount field
-    paytxn5 = {
-      TransactionType: 'Payment',
-      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       DestinationTag: 1,
       Fee: '12',
@@ -377,27 +261,138 @@ describe('Payment', function () {
   })
 
   it(`Payment Transaction: Specify Only Amount field`, function () {
-    assert.doesNotThrow(() => validatePayment(paytxn1))
-    assert.doesNotThrow(() => validate(paytxn1))
+    let paytxn = {
+      TransactionType: 'Payment',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      Amount: '1234',
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      DestinationTag: 1,
+      Fee: '12',
+      Flags: 2147483648,
+      LastLedgerSequence: 65953073,
+      Sequence: 65923914,
+      SigningPubKey:
+        '02F9E33F16DF9507705EC954E3F94EB5F10D1FC4A354606DBE6297DBB1096FE654',
+      TxnSignature:
+        '3045022100E3FAE0EDEC3D6A8FF6D81BC9CF8288A61B7EEDE8071E90FF9314CB4621058D10022043545CF631706D700CEE65A1DB83EFDD185413808292D9D90F14D87D3DC2D8CB',
+      InvoiceID:
+        '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
+      Paths: [
+        [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
+      ],
+      SendMax: '100000000',
+    } as any
+
+    assert.doesNotThrow(() => validatePayment(paytxn))
+    assert.doesNotThrow(() => validate(paytxn))
   })
 
   it(`Payment Transaction: Specify Only DeliverMax field`, function () {
-    assert.doesNotThrow(() => validatePayment(paytxn2))
-    assert.doesNotThrow(() => validate(paytxn2))
+    // JSON contains only DeliverMax field
+    let paytxn = {
+      TransactionType: 'Payment',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      DeliverMax: '1234',
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      DestinationTag: 1,
+      Fee: '12',
+      Flags: 2147483648,
+      LastLedgerSequence: 65953073,
+      Sequence: 65923914,
+      SigningPubKey:
+        '02F9E33F16DF9507705EC954E3F94EB5F10D1FC4A354606DBE6297DBB1096FE654',
+      TxnSignature:
+        '3045022100E3FAE0EDEC3D6A8FF6D81BC9CF8288A61B7EEDE8071E90FF9314CB4621058D10022043545CF631706D700CEE65A1DB83EFDD185413808292D9D90F14D87D3DC2D8CB',
+      InvoiceID:
+        '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
+      Paths: [
+        [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
+      ],
+      SendMax: '100000000',
+    } as any
+
+    assert.doesNotThrow(() => validatePayment(paytxn))
+    assert.doesNotThrow(() => validate(paytxn))
   })
 
   it(`Payment Transaction: identical DeliverMax and Amount fields`, function () {
-    assert.doesNotThrow(() => validatePayment(paytxn3))
-    assert.doesNotThrow(() => validate(paytxn3))
+    let paytxn = {
+      TransactionType: 'Payment',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      DeliverMax: '1234',
+      Amount: '1234',
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      DestinationTag: 1,
+      Fee: '12',
+      Flags: 2147483648,
+      LastLedgerSequence: 65953073,
+      Sequence: 65923914,
+      SigningPubKey:
+        '02F9E33F16DF9507705EC954E3F94EB5F10D1FC4A354606DBE6297DBB1096FE654',
+      TxnSignature:
+        '3045022100E3FAE0EDEC3D6A8FF6D81BC9CF8288A61B7EEDE8071E90FF9314CB4621058D10022043545CF631706D700CEE65A1DB83EFDD185413808292D9D90F14D87D3DC2D8CB',
+      InvoiceID:
+        '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
+      Paths: [
+        [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
+      ],
+      SendMax: '100000000',
+    } as any
+
+    assert.doesNotThrow(() => validatePayment(paytxn))
+    assert.doesNotThrow(() => validate(paytxn))
   })
 
   it(`Payment Transaction: different DeliverMax and Amount fields`, function () {
-    assert.throws(() => validatePayment(paytxn4))
-    assert.throws(() => validate(paytxn4))
+    let paytxn = {
+      TransactionType: 'Payment',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      DeliverMax: '1234',
+      Amount: '321',
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      DestinationTag: 1,
+      Fee: '12',
+      Flags: 2147483648,
+      LastLedgerSequence: 65953073,
+      Sequence: 65923914,
+      SigningPubKey:
+        '02F9E33F16DF9507705EC954E3F94EB5F10D1FC4A354606DBE6297DBB1096FE654',
+      TxnSignature:
+        '3045022100E3FAE0EDEC3D6A8FF6D81BC9CF8288A61B7EEDE8071E90FF9314CB4621058D10022043545CF631706D700CEE65A1DB83EFDD185413808292D9D90F14D87D3DC2D8CB',
+      InvoiceID:
+        '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
+      Paths: [
+        [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
+      ],
+      SendMax: '100000000',
+    } as any
+
+    assert.throws(() => validatePayment(paytxn))
+    assert.throws(() => validate(paytxn))
   })
 
   it(`Payment Transaction: DeliverMax and Amount fields are absent`, function () {
-    assert.throws(() => validatePayment(paytxn5))
-    assert.throws(() => validate(paytxn5))
+    let paytxn = {
+      TransactionType: 'Payment',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      DestinationTag: 1,
+      Fee: '12',
+      Flags: 2147483648,
+      LastLedgerSequence: 65953073,
+      Sequence: 65923914,
+      SigningPubKey:
+        '02F9E33F16DF9507705EC954E3F94EB5F10D1FC4A354606DBE6297DBB1096FE654',
+      TxnSignature:
+        '3045022100E3FAE0EDEC3D6A8FF6D81BC9CF8288A61B7EEDE8071E90FF9314CB4621058D10022043545CF631706D700CEE65A1DB83EFDD185413808292D9D90F14D87D3DC2D8CB',
+      InvoiceID:
+        '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
+      Paths: [
+        [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
+      ],
+      SendMax: '100000000',
+    } as any
+    assert.throws(() => validatePayment(paytxn))
+    assert.throws(() => validate(paytxn))
   })
 })
