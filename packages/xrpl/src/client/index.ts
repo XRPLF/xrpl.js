@@ -643,14 +643,11 @@ class Client extends EventEmitter<EventTypes> {
     transaction: T,
     signersCount?: number,
   ): Promise<T> {
-    const tx_ = { ...transaction }
+    const tx = { ...transaction }
 
     // the below two functions accept only Transaction objects.
-    setValidAddresses(tx_)
-    setTransactionFlagsToNumber(tx_)
-
-    // further manipulation of tx_ uses non-SubmittableTransaction types, hence we need a typecast to any
-    let tx = tx_ as any
+    setValidAddresses(tx)
+    setTransactionFlagsToNumber(tx)
 
     const promises: Array<Promise<void>> = []
     if (tx.NetworkID == null) {
@@ -669,19 +666,22 @@ class Client extends EventEmitter<EventTypes> {
       promises.push(checkAccountDeleteBlockers(this, tx))
     }
 
-    if (tx.TransactionType === 'Payment') {
-      if (tx.Amount == null) {
+    // further manipulation of tx_ uses non-SubmittableTransaction types, hence we need a typecast to any
+    let tx_ = tx as any
+
+    if (tx_.TransactionType === 'Payment') {
+      if (tx_.Amount == null) {
         // If only DeliverMax is provided, use it to populate the Amount field
-        if (tx.DeliverMax != null) {
-          tx.Amount = tx.DeliverMax
+        if (tx_.DeliverMax != null) {
+          tx_.Amount = tx_.DeliverMax
         }
       }
 
       // If Amount is not identical to DeliverMax, throw an error
       if (
-        tx.DeliverMax != null &&
-        tx.Amount != null &&
-        tx.Amount !== tx.DeliverMax
+        tx_.DeliverMax != null &&
+        tx_.Amount != null &&
+        tx_.Amount !== tx_.DeliverMax
       ) {
         throw new ValidationError(
           'PaymentTransaction: Amount and DeliverMax fields must be identical',
@@ -689,12 +689,12 @@ class Client extends EventEmitter<EventTypes> {
       }
 
       // remove the DeliverMax field
-      if (tx.DeliverMax != null) {
-        delete tx.DeliverMax
+      if (tx_.DeliverMax != null) {
+        delete tx_.DeliverMax
       }
     }
 
-    return Promise.all(promises).then(() => tx)
+    return Promise.all(promises).then(() => tx_)
   }
 
   /**
