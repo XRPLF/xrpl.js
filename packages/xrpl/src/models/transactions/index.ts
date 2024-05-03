@@ -58,6 +58,7 @@ export {
   OfferCreateFlagsInterface,
   OfferCreate,
 } from './offerCreate'
+export { OracleSet } from './oracleSet'
 export { PaymentFlags, PaymentFlagsInterface, Payment } from './payment'
 export {
   PaymentChannelClaimFlags,

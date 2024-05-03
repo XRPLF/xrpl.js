@@ -43,6 +43,7 @@ import {
 import { NFTokenMint, validateNFTokenMint } from './NFTokenMint'
 import { OfferCancel, validateOfferCancel } from './offerCancel'
 import { OfferCreate, validateOfferCreate } from './offerCreate'
+import { validateOracleSet } from './oracleSet'
 import { Payment, validatePayment } from './payment'
 import {
   PaymentChannelClaim,
@@ -328,6 +329,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'OfferCreate':
       validateOfferCreate(tx)
+      break
+
+    case 'OracleSet':
+      validateOracleSet(tx)
       break
 
     case 'Payment':
