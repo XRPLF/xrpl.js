@@ -49,10 +49,10 @@ function processRippledSource(folder) {
     ),
   )
   const transactionMatch = jsTransactionFile.match(
-    /export type Transaction =([| \nA-Za-z]+)\nexport/,
+    /export type SubmittableTransaction =([| \nA-Za-z]+)\n\/\*\*/,
   )[0]
   const existingLibraryTxs = transactionMatch
-    .replace('\n\nexport', '')
+    .replace('\n\n/**', '')
     .split('\n  | ')
     .filter((value) => !value.includes('export type'))
     .map((value) => value.trim())
@@ -248,10 +248,11 @@ ${validationImportLine}`
     )
 
     const validateTests = createValidateTests(tx)
-    fs.writeFileSync(
-      path.join(path.dirname(__filename), `../test/models/${tx}.test.ts`),
-      validateTests,
-    )
+    if (validateTests !== '')
+      fs.writeFileSync(
+        path.join(path.dirname(__filename), `../test/models/${tx}.test.ts`),
+        validateTests,
+      )
 
     updateTransactionFile(transactionMatch, tx)
 
@@ -259,9 +260,7 @@ ${validationImportLine}`
 
     console.log(`Added ${tx}`)
   })
-  console.log(
-    'Future steps: Adding docstrings to the models and adding integration tests',
-  )
+  // TODO: add docstrings to the models and add integration tests
 }
 
 if (require.main === module) {
