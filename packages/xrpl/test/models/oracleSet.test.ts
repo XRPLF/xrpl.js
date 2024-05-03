@@ -16,7 +16,7 @@ describe('OracleSet', function () {
       TransactionType: 'OracleSet',
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
       OracleDocumentID: 1234,
-      LastUpdateTime: 1234,
+      LastUpdateTime: 768062172,
       Provider: 'chainlink',
       URI: '6469645F6578616D706C65',
       AssetClass: 'currency',
@@ -24,8 +24,8 @@ describe('OracleSet', function () {
         {
           BaseAsset: 'XRP',
           QuoteAsset: 'USD',
-          AssetPrice: 0.5,
-          Scale: 6,
+          AssetPrice: 740,
+          Scale: 3,
         },
       ],
     } as any
@@ -58,7 +58,7 @@ describe('OracleSet', function () {
   })
 
   it(`throws w/ invalid LastUpdateTime`, function () {
-    tx.LastUpdateTime = '1234'
+    tx.LastUpdateTime = '768062172'
     const errorMessage = 'OracleSet: invalid field LastUpdateTime'
     assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
