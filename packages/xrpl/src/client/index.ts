@@ -667,7 +667,7 @@ class Client extends EventEmitter<EventTypes> {
     }
 
     // further manipulation of tx_ uses non-SubmittableTransaction types, hence we need a typecast to any
-    let tx_ = tx as any
+    const tx_ = tx as any
 
     if (tx_.TransactionType === 'Payment') {
       if (tx_.Amount == null) {
