@@ -13,14 +13,14 @@ const OBJECT_END_MARKER = Uint8Array.from([0xe1])
  * TypeGuard for Array<JsonObject>
  */
 function isObjects(args): args is Array<JsonObject> {
-  if (!Array.isArray(args)) {
-    return false
-  }
-  return args.every(
-    (arg) =>
-      typeof arg === 'object' &&
-      Object.keys(arg).length === 1 &&
-      typeof Object.values(arg)[0] === 'object',
+  return (
+    Array.isArray(args) &&
+    args.every(
+      (arg) =>
+        typeof arg === 'object' &&
+        Object.keys(arg).length === 1 &&
+        typeof Object.values(arg)[0] === 'object',
+    )
   )
 }
 
