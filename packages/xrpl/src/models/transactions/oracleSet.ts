@@ -25,10 +25,10 @@ export interface OracleSet extends BaseTransaction {
   TransactionType: 'OracleSet'
   OracleDocumentID: number
   LastUpdateTime: number
+  PriceDataSeries: PriceData[]
   Provider?: string
   URI?: string
   AssetClass?: string
-  PriceDataSeries?: PriceData[]
 }
 
 /**
