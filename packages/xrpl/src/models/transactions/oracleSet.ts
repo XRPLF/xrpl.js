@@ -12,10 +12,12 @@ import {
 // TODO: add docs
 
 export interface PriceData {
-  BaseAsset: string
-  QuoteAsset: string
-  AssetPrice?: number
-  Scale?: number
+  PriceData: {
+    BaseAsset: string
+    QuoteAsset: string
+    AssetPrice?: number
+    Scale?: number
+  }
 }
 
 /**
@@ -37,6 +39,7 @@ export interface OracleSet extends BaseTransaction {
  * @param tx - A OracleSet Transaction.
  * @throws When the OracleSet is malformed.
  */
+// eslint-disable-next-line max-lines-per-function -- necessary to validate many fields
 export function validateOracleSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
@@ -44,13 +47,7 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'LastUpdateTime', isNumber)
 
-  validateOptionalField(tx, 'Provider', isString)
-
-  validateOptionalField(tx, 'URI', isString)
-
-  validateOptionalField(tx, 'AssetClass', isString)
-
-  validateOptionalField(tx, 'PriceDataSeries', (value) => {
+  validateRequiredField(tx, 'PriceDataSeries', (value) => {
     if (!Array.isArray(value)) {
       throw new ValidationError('OracleSet: PriceDataSeries must be an array')
     }
@@ -63,29 +60,50 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
       }
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-      if (typeof priceData.BaseAsset !== 'string') {
+      if (priceData.PriceData == null) {
+        throw new ValidationError(
+          'OracleSet: PriceDataSeries must have a `PriceData` object',
+        )
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
+      if (typeof priceData.PriceData.BaseAsset !== 'string') {
         throw new ValidationError(
           'OracleSet: PriceDataSeries must have a `BaseAsset` string',
         )
       }
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-      if (typeof priceData.QuoteAsset !== 'string') {
+      if (typeof priceData.PriceData.QuoteAsset !== 'string') {
         throw new ValidationError(
           'OracleSet: PriceDataSeries must have a `QuoteAsset` string',
         )
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-      if ('AssetPrice' in priceData && !isNumber(priceData.AssetPrice)) {
+      if (
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
+        'AssetPrice' in priceData.PriceData &&
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
+        !isNumber(priceData.PriceData.AssetPrice)
+      ) {
         throw new ValidationError('OracleSet: invalid field AssetPrice')
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-      if ('Scale' in priceData && !isNumber(priceData.Scale)) {
+      if (
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
+        'Scale' in priceData.PriceData &&
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
+        !isNumber(priceData.PriceData.Scale)
+      ) {
         throw new ValidationError('OracleSet: invalid field Scale')
       }
     }
     return true
   })
+
+  validateOptionalField(tx, 'Provider', isString)
+
+  validateOptionalField(tx, 'URI', isString)
+
+  validateOptionalField(tx, 'AssetClass', isString)
 }

@@ -30,10 +30,12 @@ describe('OracleSet', function () {
         LastUpdateTime: 4294967295, // Date.now() - 946684800,
         PriceDataSeries: [
           {
-            BaseAsset: 'XRP',
-            QuoteAsset: 'USD',
-            AssetPrice: 740,
-            Scale: 3,
+            PriceData: {
+              BaseAsset: 'XRP',
+              QuoteAsset: 'USD',
+              AssetPrice: 740,
+              Scale: 3,
+            },
           },
         ],
         // Provider: '70726F7669646572',
