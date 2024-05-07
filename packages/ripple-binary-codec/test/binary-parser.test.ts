@@ -238,19 +238,19 @@ function fieldParsingTests() {
   it('Field throws when type code out of range', () => {
     const parser = makeParser('0101')
     expect(() => parser.readField()).toThrow(
-      new Error('Cannot read FieldOrdinal, type_code out of range'),
+      new Error('Cannot read FieldOrdinal, type_code 1 out of range'),
     )
   })
   it('Field throws when field code out of range', () => {
     const parser = makeParser('1001')
     expect(() => parser.readFieldOrdinal()).toThrow(
-      new Error('Cannot read FieldOrdinal, field_code out of range'),
+      new Error('Cannot read FieldOrdinal, field_code 1 out of range'),
     )
   })
   it('Field throws when both type and field code out of range', () => {
     const parser = makeParser('000101')
     expect(() => parser.readFieldOrdinal()).toThrow(
-      new Error('Cannot read FieldOrdinal, type_code out of range'),
+      new Error('Cannot read FieldOrdinal, type_code 1 out of range'),
     )
   })
   it('readUIntN', () => {
