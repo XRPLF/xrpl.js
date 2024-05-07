@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### Added
-* Support for the Price Oracle amendment (XLS-47).
+* Support for the Price Oracles amendment (XLS-47).
 
 ## 2.0.0 (2024-02-01)
 
