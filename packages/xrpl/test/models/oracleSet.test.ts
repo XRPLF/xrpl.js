@@ -17,7 +17,7 @@ describe('OracleSet', function () {
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
       OracleDocumentID: 1234,
       LastUpdateTime: 768062172,
-      Provider: 'chainlink',
+      Provider: '70726F7669646572',
       URI: '6469645F6578616D706C65',
       AssetClass: 'currency',
       PriceDataSeries: [
