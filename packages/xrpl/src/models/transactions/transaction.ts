@@ -171,7 +171,7 @@ export interface TransactionAndMetadata<
  */
 export function validate(
   transaction: Record<string, unknown>,
-  customDefinition?: boolean,
+  hasCustomDefinition?: boolean,
 ): void {
   const tx = { ...transaction }
   if (tx.TransactionType == null) {
