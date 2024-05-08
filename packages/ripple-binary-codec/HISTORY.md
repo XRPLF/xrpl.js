@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Fixed
+* Better error handling/error messages for serialization/deserialization errors.
+
 ## 2.0.0 (2024-02-01)
 
 ### BREAKING CHANGES
