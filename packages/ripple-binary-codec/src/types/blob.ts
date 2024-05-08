@@ -33,6 +33,9 @@ class Blob extends SerializedType {
     }
 
     if (typeof value === 'string') {
+      if (!/^[A-F0-9]*$/iu.test(value)) {
+        throw new Error('Cannot construct Blob from a non-hex string')
+      }
       return new Blob(hexToBytes(value))
     }
 

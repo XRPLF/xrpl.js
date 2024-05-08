@@ -144,14 +144,18 @@ class BinaryParser {
     if (type === 0) {
       type = this.readUInt8()
       if (type === 0 || type < 16) {
-        throw new Error('Cannot read FieldOrdinal, type_code out of range')
+        throw new Error(
+          `Cannot read FieldOrdinal, type_code ${type} out of range`,
+        )
       }
     }
 
     if (nth === 0) {
       nth = this.readUInt8()
       if (nth === 0 || nth < 16) {
-        throw new Error('Cannot read FieldOrdinal, field_code out of range')
+        throw new Error(
+          `Cannot read FieldOrdinal, field_code ${nth} out of range`,
+        )
       }
     }
 
