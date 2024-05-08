@@ -27,7 +27,7 @@ describe('OracleSet', function () {
         TransactionType: 'OracleSet',
         Account: testContext.wallet.classicAddress,
         OracleDocumentID: 1234,
-        LastUpdateTime: 4294967295, // Date.now() - 946684800,
+        LastUpdateTime: Date.now(),
         PriceDataSeries: [
           {
             PriceData: {
