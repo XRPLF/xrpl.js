@@ -109,5 +109,6 @@ export {
   deriveAddress,
   deriveNodeAddress,
   decodeSeed,
-  Algorithm,
 }
+
+export type { Algorithm }

@@ -1,4 +1,7 @@
 import { deriveAddress, deriveKeypair, generateSeed } from 'ripple-keypairs'
+// Use an import alias to avoid name-conflict with the Algorithm type
+// defined in extensions/node_modules/typescript/lib/lib.dom.d.ts
+import type { Algorithm as _Algorithm } from 'ripple-keypairs'
 
 import {
   entropyToSecret,
@@ -7,7 +10,6 @@ import {
   secretToEntropy,
 } from '../utils'
 
-import type { Algorithm } from 'ripple-keypairs'
 /* Types ==================================================================== */
 
 export interface Keypair {
@@ -34,11 +36,11 @@ export class Account {
     },
   }
 
-  private readonly _algorithm: Algorithm = 'ed25519'
+  private readonly _algorithm: _Algorithm = 'ed25519'
 
   constructor(
     secretNumbers?: string[] | string | Uint8Array,
-    algorithm?: Algorithm,
+    algorithm?: _Algorithm,
   ) {
     if (typeof secretNumbers === 'string') {
       this._secret = parseSecretString(secretNumbers)
