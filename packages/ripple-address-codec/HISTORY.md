@@ -15,25 +15,6 @@
 * Eliminates 4 runtime dependencies: `base-x`, `base64-js`, `buffer`, and `ieee754`.
 * Execute test in a browser in addition to node
 
-## 5.0.0 Beta 1 (2023-11-30)
-
-### Breaking Changes
-* `Buffer` has been replaced with `UInt8Array` for both params and return values. `Buffer` may continue to work with params since they extend `UInt8Arrays`.
-
-### Changes
-* Eliminates 4 runtime dependencies: `base-x`, `base64-js`, `buffer`, and `ieee754`.
-
-## 5.0.0 Beta 0 (2023-10-19)
-
-### Breaking Changes
-* Bump typescript to 5.x
-* Remove Node 14 support
-* Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`.
-* Remove `create-hash` in favor of `@noble/hashes`
-
-### Changes
-* Execute test in a browser in addition to node
-
 ## 4.3.1 (2023-09-27)
 ### Fixed
 * Fix source-maps not finding their designated source

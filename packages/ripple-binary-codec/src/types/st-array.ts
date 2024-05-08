@@ -14,7 +14,13 @@ const OBJECT_END_MARKER = Uint8Array.from([0xe1])
  */
 function isObjects(args): args is Array<JsonObject> {
   return (
-    Array.isArray(args) && (args.length === 0 || typeof args[0] === 'object')
+    Array.isArray(args) &&
+    args.every(
+      (arg) =>
+        typeof arg === 'object' &&
+        Object.keys(arg).length === 1 &&
+        typeof Object.values(arg)[0] === 'object',
+    )
   )
 }
 
