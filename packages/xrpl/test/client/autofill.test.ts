@@ -69,6 +69,7 @@ describe('client.autofill', function () {
         [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
       ],
       SendMax: '100000000',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Represent transaction JSON with `any` type
     } as any
     const txResult = await testContext.client.autofill(paytxn)
 
@@ -97,6 +98,7 @@ describe('client.autofill', function () {
         [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
       ],
       SendMax: '100000000',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Represent transaction JSON with `any` type
     } as any
     const txResult = await testContext.client.autofill(paytxn)
 
@@ -126,6 +128,7 @@ describe('client.autofill', function () {
         [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
       ],
       SendMax: '100000000',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Represent transaction JSON with `any` type
     } as any
     const txResult = await testContext.client.autofill(paytxn)
 
@@ -157,6 +160,7 @@ describe('client.autofill', function () {
         [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
       ],
       SendMax: '100000000',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Represent transaction JSON with `any` type
     } as any
 
     await assertRejects(testContext.client.autofill(paytxn), ValidationError)
