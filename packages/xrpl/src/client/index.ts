@@ -639,7 +639,7 @@ class Client extends EventEmitter<EventTypes> {
    * Only used for multisigned transactions.
    * @returns The autofilled transaction.
    */
-  // eslint-disable @typescript-eslint/max-lines-per-function
+  // eslint-disable-next-line max-lines-per-function, complexity -- handling v2 Payment transaction API requires more logic
   public async autofill<T extends SubmittableTransaction>(
     transaction: T,
     signersCount?: number,
@@ -668,16 +668,21 @@ class Client extends EventEmitter<EventTypes> {
     }
 
     // further manipulation of tx_ uses non-SubmittableTransaction types, hence we need a typecast to any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment -- `any` type is required to perform non-protocol modifications to the JSON object
+    // eslint-disable-next-line max-len -- elaborate comment
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/consistent-type-assertions -- `any` type is required to perform non-protocol modifications to the JSON object
     const tx_ = tx as any
 
+    // eslint-disable-next-line max-len -- elaborate comment
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- A transaction JSON must contain TransactionType field
     if (tx_.TransactionType === 'Payment') {
+      // eslint-disable-next-line max-len -- elaborate comment
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- A Payment transaction JSON must contain Amount field
       if (tx_.Amount == null) {
         // If only DeliverMax is provided, use it to populate the Amount field
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- A Payment transaction JSON might contain Amount field
+        // eslint-disable-next-line max-len -- elaborate comment
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, max-depth -- A Payment transaction JSON might contain Amount field
         if (tx_.DeliverMax != null) {
+          // eslint-disable-next-line max-len -- elaborate comment
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access -- ensure that the aliased fields are identical
           tx_.Amount = tx_.DeliverMax
         }
@@ -685,10 +690,13 @@ class Client extends EventEmitter<EventTypes> {
 
       // If Amount is not identical to DeliverMax, throw an error
       if (
+        // eslint-disable-next-line max-len -- elaborate comment
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- v2 rippled Payment-transaction JSON could contain these fields
         tx_.DeliverMax != null &&
+        // eslint-disable-next-line max-len -- elaborate comment
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- v2 rippled Payment-transaction JSON could contain these fields
         tx_.Amount != null &&
+        // eslint-disable-next-line max-len -- elaborate comment
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- v2 rippled Payment-transaction JSON could contain these fields
         tx_.Amount !== tx_.DeliverMax
       ) {
@@ -698,13 +706,16 @@ class Client extends EventEmitter<EventTypes> {
       }
 
       // remove the DeliverMax field
+      // eslint-disable-next-line max-len -- elaborate comment
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- v2 rippled Payment-transaction could contain DeliverMax field
       if (tx_.DeliverMax != null) {
+        // eslint-disable-next-line max-len -- elaborate comment
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- v2 rippled Payment-transaction could contain DeliverMax field
         delete tx_.DeliverMax
       }
     }
 
+    // eslint-disable-next-line max-len -- elaborate comment
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/promise-function-async -- Please ensure that tx_ is a serializable transaction
     return Promise.all(promises).then(() => tx_)
   }
