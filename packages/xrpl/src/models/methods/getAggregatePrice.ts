@@ -36,13 +36,13 @@ export interface GetAggregatePriceResponse extends BaseResponse {
     entire_set: {
       mean: string
       size: number
-      standard_deviation: number
+      standard_deviation: string
     }
 
     trimmed_set: {
       mean: string
       size: number
-      standard_deviation: number
+      standard_deviation: string
     }
 
     time: number
