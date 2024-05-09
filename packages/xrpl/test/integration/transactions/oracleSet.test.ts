@@ -1,5 +1,7 @@
 // import { assert } from 'chai'
 
+import { stringToHex } from '@xrplf/isomorphic/dist/utils'
+
 import { OracleSet } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
@@ -38,17 +40,9 @@ describe('OracleSet', function () {
             },
           },
         ],
-        // Provider: '70726F7669646572',
-        // URI: '6469645F6578616D706C65',
-        // AssetClass: 'currency',
-        // PriceDataSeries: [
-        //   {
-        //     BaseAsset: 'XRP',
-        //     QuoteAsset: 'USD',
-        //     AssetPrice: 740,
-        //     Scale: 3,
-        //   },
-        // ],
+        Provider: stringToHex('70726F7669646572'),
+        URI: '6469645F6578616D706C65',
+        AssetClass: stringToHex('currency'),
       }
 
       await testTransaction(testContext.client, tx, testContext.wallet)
