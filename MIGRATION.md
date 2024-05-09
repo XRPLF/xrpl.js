@@ -2,7 +2,9 @@
 
 In xrpl.js 3.0, we've made significant improvements that result in a 60% reduction in bundle size for browser applications. We've also eliminated the need for polyfills with minimal disruption to existing code. This was achieved by replacing node-specific dependencies with ones that are compatible with browsers.
 
-The main change you'll notice is the update replacing `Buffer` with `Uint8Array` across the board. This was done since browsers don't support `Buffer`. Fortunately, this transition is relatively straightforward, as `Buffer` is a subclass of `Uint8Array`, meaning in many circumstances `Buffer` can be directly replaced by `Uint8Array`. The primary difference is that `Buffer` has additional helper functions. We've listed the affected client library functions below in the `Uint8Array` section for your reference.
+The two main changes you'll notice are:
+* A breaking change to `Wallet` object creation, to use a more performant algorithm by default. See [here](#8-wallet-functions-default-to-ed25519-instead-of-secp256k1-signing-algorithm) for details.
+* Replacing `Buffer` with `Uint8Array` across the board. This was done since browsers don't support `Buffer`. Fortunately, this transition is relatively straightforward, as `Buffer` is a subclass of `Uint8Array`, meaning in many circumstances `Buffer` can be directly replaced by `Uint8Array`. The primary difference is that `Buffer` has additional helper functions. We've listed the affected client library functions below in the `Uint8Array` section for your reference.
 
 This migration guide also applies to:
 - `ripple-address-codec` 4.3.1 -> 5.0.0
@@ -230,9 +232,27 @@ This was done to remove a hard dependency on `https-proxy-agent` when running 
    authorization: 'authorization'
  }`
 
-### 8. Bug fix: Setting an explicit `algorithm` when generating a wallet works now
+### 8. `Wallet` functions default to `ed25519` instead of `secp256k1` signing algorithm
 
-`Wallet.generate()` and `Wallet.fromSeed` were ignoring the `algorithm` parameter. This means that if you were manually specifying `algorithm` in any `Wallet` constructors, you may generate a different `Wallet` keypair when upgrading to 3.0. In that case to get the same generated wallets as before, don’t specify the `algorithm` parameter.
+In previous releases of this library, `Wallet.generate()` and `Wallet.fromSeed` were ignoring the `algorithm` parameter. Instead, the algorithm was assumed from the seed provided; if it started with `sEd`, it would use `ed25519`, and otherwise it would use `secp256k1`. However, seeds do not actually have algorithms; a seed starting with `s...` can still use the `ed25519` algorithm.
+
+With 3.0, we updated the default signing algorithm used by the `Wallet` object to always be `ed25519` in order to default to the higher-performance algorithm. This is a breaking change to all functions used to generate a Wallet, so if you have a pre-existing XRPL account that you're using to generate a specific Wallet using older versions of xrpl.js, you may need to specify that you are using `secp256k1` as the algorithm to decode your private key / seed / etc to get the same behavior as before. See below for specifically how to update your code.
+
+If you are creating new accounts each time (ex. via `Client.fundWallet` or `Wallet.generate`), you do not need to specify the signing algorithm.
+
+**Before**
+```
+Wallet.fromSeed('s...')
+Wallet.fromEntropy(entropy)
+deriveKeyPair(seed="s...")
+```
+
+**After**
+```
+Wallet.fromSeed(seed='s...',algorithm: 'ecdsa-secp256k1')
+Wallet.fromEntropy(entropy, opts={algorithm: 'ecdsa-secp256k1'})
+deriveKeypair(seed='s...', opts={ algorithm: 'ecdsa-secp256k1' }) (ripple-keypairs)
+```
 
 ### 9. `AssertionError` → `Error`
 
