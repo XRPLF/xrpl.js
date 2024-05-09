@@ -40,7 +40,7 @@ describe('OracleSet', function () {
             },
           },
         ],
-        Provider: stringToHex('70726F7669646572'),
+        Provider: stringToHex('chainlink'),
         URI: '6469645F6578616D706C65',
         AssetClass: stringToHex('currency'),
       }

@@ -1,3 +1,4 @@
+import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 import { assert } from 'chai'
 
 import { validate, ValidationError } from '../../src'
@@ -17,17 +18,19 @@ describe('OracleSet', function () {
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
       OracleDocumentID: 1234,
       LastUpdateTime: 768062172,
-      Provider: '70726F7669646572',
-      URI: '6469645F6578616D706C65',
-      AssetClass: 'currency',
       PriceDataSeries: [
         {
-          BaseAsset: 'XRP',
-          QuoteAsset: 'USD',
-          AssetPrice: 740,
-          Scale: 3,
+          PriceData: {
+            BaseAsset: 'XRP',
+            QuoteAsset: 'USD',
+            AssetPrice: 740,
+            Scale: 3,
+          },
         },
       ],
+      Provider: stringToHex('chainlink'),
+      URI: '6469645F6578616D706C65',
+      AssetClass: stringToHex('currency'),
     } as any
   })
 
@@ -100,31 +103,31 @@ describe('OracleSet', function () {
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
-  it(`throws w/ missing PriceDataSeries[0].BaseAsset`, function () {
-    delete tx.PriceDataSeries[0].BaseAsset
+  it(`throws w/ missing BaseAsset of PriceDataSeries`, function () {
+    delete tx.PriceDataSeries[0].PriceData.BaseAsset
     const errorMessage =
       'OracleSet: PriceDataSeries must have a `BaseAsset` string'
     assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
-  it(`throws w/ missing PriceDataSeries[0].QuoteAsset`, function () {
-    delete tx.PriceDataSeries[0].QuoteAsset
+  it(`throws w/ missing QuoteAsset of PriceDataSeries`, function () {
+    delete tx.PriceDataSeries[0].PriceData.QuoteAsset
     const errorMessage =
       'OracleSet: PriceDataSeries must have a `QuoteAsset` string'
     assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
-  it(`throws w/ invalid PriceDataSeries[0].AssetPrice`, function () {
-    tx.PriceDataSeries[0].AssetPrice = '1234'
+  it(`throws w/ invalid AssetPrice of PriceDataSeries`, function () {
+    tx.PriceDataSeries[0].PriceData.AssetPrice = '1234'
     const errorMessage = 'OracleSet: invalid field AssetPrice'
     assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
-  it(`throws w/ invalid PriceDataSeries[0].Scale`, function () {
-    tx.PriceDataSeries[0].Scale = '1234'
+  it(`throws w/ invalid Scale of PriceDataSeries`, function () {
+    tx.PriceDataSeries[0].PriceData.Scale = '1234'
     const errorMessage = 'OracleSet: invalid field Scale'
     assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
