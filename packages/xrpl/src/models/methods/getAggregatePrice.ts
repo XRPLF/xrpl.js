@@ -1,10 +1,5 @@
 import { BaseRequest, BaseResponse } from './baseMethod'
 
-export interface Oracle {
-  account: string
-  oracle_document_id: number
-}
-
 /**
  * The `get_aggregate_price` method retrieves the aggregate price of specified Oracle objects,
  * returning three price statistics: mean, median, and trimmed mean.
@@ -19,7 +14,10 @@ export interface GetAggregatePriceRequest extends BaseRequest {
 
   quote_asset: string
 
-  oracles: Oracle[]
+  oracles: Array<{
+    account: string
+    oracle_document_id: number
+  }>
 
   trim?: number
 
