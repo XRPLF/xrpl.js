@@ -5,13 +5,17 @@ import {
   validateRequiredField,
 } from './common'
 
-// TODO: add docs
-
 /**
+ * Delete an Oracle ledger entry.
+ *
  * @category Transaction Models
  */
 export interface OracleDelete extends BaseTransaction {
   TransactionType: 'OracleDelete'
+
+  /**
+   * A unique identifier of the price oracle for the Account.
+   */
   OracleDocumentID: number
 }
 
