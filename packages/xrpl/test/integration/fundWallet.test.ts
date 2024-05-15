@@ -104,7 +104,7 @@ describe('fundWallet', function () {
       })
 
       assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
-      assert.equal(balance, 10000)
+      assert.equal(balance, 1000)
 
       /*
        * No test for fund given wallet because the hooks v3 testnet faucet
