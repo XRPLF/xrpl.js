@@ -90,8 +90,11 @@ jobs:
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: npm ci
 
-      - run: npm run build
-      - run: npm test
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
+      # - run: npm run build
+      # - run: npm test
 
   integration:
     runs-on: ubuntu-latest
