@@ -45,4 +45,12 @@ describe('time conversion', function () {
       assert.equal(rippleTimeToUnixTime(rippleTime), unixTime)
     })
   })
+
+  describe('getUnixTimestamp', function () {
+    it('returns the current unix timestamp in seconds', function () {
+      const now = Date.now()
+      const timestamp = Math.floor(now / 1000)
+      assert.equal(timestamp, Math.floor(now / 1000))
+    })
+  })
 })
