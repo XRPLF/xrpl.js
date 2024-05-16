@@ -107,6 +107,12 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'LastUpdateTime', isNumber)
 
+  validateOptionalField(tx, 'Provider', isString)
+
+  validateOptionalField(tx, 'URI', isString)
+
+  validateOptionalField(tx, 'AssetClass', isString)
+
   // eslint-disable-next-line max-lines-per-function -- necessary to validate many fields
   validateRequiredField(tx, 'PriceDataSeries', (value) => {
     if (!Array.isArray(value)) {
@@ -168,10 +174,4 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
     }
     return true
   })
-
-  validateOptionalField(tx, 'Provider', isString)
-
-  validateOptionalField(tx, 'URI', isString)
-
-  validateOptionalField(tx, 'AssetClass', isString)
 }
