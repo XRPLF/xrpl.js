@@ -99,22 +99,16 @@ export interface GetAggregatePriceResponse extends BaseResponse {
     time: number
 
     /**
-     * The identifying hash of the ledger that was used to generate this
-     * response.
-     */
-    ledger_hash?: string
-
-    /**
      * The ledger index of the ledger version that was used to generate this
      * response.
      */
-    ledger_index?: number
+    ledger_index: number
 
     /**
      * If included and set to true, the information in this response comes from
      * a validated ledger version. Otherwise, the information is subject to
      * change.
      */
-    validated?: boolean
+    validated: boolean
   }
 }
