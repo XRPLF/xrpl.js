@@ -76,7 +76,7 @@ export interface GetAggregatePriceResponse extends BaseResponse {
     /**
      * The trimmed statistics from the collected oracle prices. Only appears if the trim field was specified in the request.
      */
-    trimmed_set: {
+    trimmed_set?: {
       /**
        * The simple mean of the trimmed data.
        */
