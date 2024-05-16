@@ -32,7 +32,7 @@ export interface GetAggregatePriceRequest extends BaseRequest {
     /**
      * A unique identifier of the price oracle for the Account
      */
-    oracle_document_id: number
+    oracle_document_id: string | number
   }>
 
   /**
