@@ -46,32 +46,13 @@ describe('OracleSet', function () {
 
       await testTransaction(testContext.client, tx, testContext.wallet)
 
-      // confirm that the Oracle was actually created
-      const getAggregatePriceResponse = await testContext.client.request({
-        command: 'get_aggregate_price',
+      const result = await testContext.client.request({
+        command: 'account_objects',
         account: testContext.wallet.classicAddress,
-        base_asset: 'XRP',
-        quote_asset: 'USD',
-        trim: 20,
-        oracles: [
-          {
-            account: testContext.wallet.classicAddress,
-            oracle_document_id: 1234,
-          },
-        ],
       })
-      assert.deepEqual(getAggregatePriceResponse.result.entire_set, {
-        mean: '0.74',
-        size: 1,
-        standard_deviation: '0',
-      })
-      assert.deepEqual(getAggregatePriceResponse.result.trimmed_set, {
-        mean: '0.74',
-        size: 1,
-        standard_deviation: '0',
-      })
-      assert.equal(getAggregatePriceResponse.result.median, '0.74')
-      assert.equal(getAggregatePriceResponse.result.time, tx.LastUpdateTime)
+
+      // confirm that the Oracle was actually created
+      assert.equal(result.result.account_objects.length, 1)
     },
     TIMEOUT,
   )

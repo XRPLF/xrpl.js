@@ -1,12 +1,7 @@
 import { stringToHex } from '@xrplf/isomorphic/dist/utils'
+import { assert } from 'chai'
 
-import {
-  OracleSet,
-  OracleDelete,
-  RippledError,
-  getCurrentUnixTimestamp,
-} from '../../../src'
-import { assertRejects } from '../../testUtils'
+import { OracleSet, OracleDelete, getCurrentUnixTimestamp } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -59,24 +54,13 @@ describe('OracleDelete', function () {
 
       await testTransaction(testContext.client, deleteTx, testContext.wallet)
 
+      const result = await testContext.client.request({
+        command: 'account_objects',
+        account: testContext.wallet.classicAddress,
+      })
+
       // confirm that the Oracle was actually deleted
-      await assertRejects(
-        testContext.client.request({
-          command: 'get_aggregate_price',
-          account: testContext.wallet.classicAddress,
-          base_asset: 'XRP',
-          quote_asset: 'USD',
-          trim: 20,
-          oracles: [
-            {
-              account: testContext.wallet.classicAddress,
-              oracle_document_id: 1234,
-            },
-          ],
-        }),
-        RippledError,
-        'The requested object was not found.',
-      )
+      assert.equal(result.result.account_objects.length, 0)
     },
     TIMEOUT,
   )
