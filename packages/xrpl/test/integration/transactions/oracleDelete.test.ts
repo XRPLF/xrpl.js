@@ -1,7 +1,11 @@
 import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 
-import { OracleSet, OracleDelete, RippledError } from '../../../src'
-import { getUnixTimestamp } from '../../../src/utils/timeConversion'
+import {
+  OracleSet,
+  OracleDelete,
+  RippledError,
+  getCurrentUnixTimestamp,
+} from '../../../src'
 import { assertRejects } from '../../testUtils'
 import serverUrl from '../serverUrl'
 import {
@@ -29,7 +33,7 @@ describe('OracleDelete', function () {
         TransactionType: 'OracleSet',
         Account: testContext.wallet.classicAddress,
         OracleDocumentID: 1234,
-        LastUpdateTime: getUnixTimestamp(),
+        LastUpdateTime: getCurrentUnixTimestamp(),
         PriceDataSeries: [
           {
             PriceData: {

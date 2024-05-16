@@ -58,6 +58,7 @@ import {
 import signPaymentChannelClaim from './signPaymentChannelClaim'
 import { convertHexToString, convertStringToHex } from './stringConversion'
 import {
+  getCurrentUnixTimestamp,
   rippleTimeToISOTime,
   isoTimeToRippleTime,
   rippleTimeToUnixTime,
@@ -185,6 +186,7 @@ export {
   dropsToXrp,
   xrpToDrops,
   hasNextPage,
+  getCurrentUnixTimestamp,
   rippleTimeToISOTime,
   isoTimeToRippleTime,
   rippleTimeToUnixTime,

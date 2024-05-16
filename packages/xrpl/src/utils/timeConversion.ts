@@ -50,12 +50,12 @@ function isoTimeToRippleTime(iso8601: string | Date): number {
  *
  * @returns The current unix timestamp in seconds.
  */
-function getUnixTimestamp(): number {
+function getCurrentUnixTimestamp(): number {
   return Math.floor(Date.now() / 1000)
 }
 
 export {
-  getUnixTimestamp,
+  getCurrentUnixTimestamp,
   rippleTimeToUnixTime,
   unixTimeToRippleTime,
   rippleTimeToISOTime,
