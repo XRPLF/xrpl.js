@@ -155,4 +155,18 @@ describe('OracleSet', function () {
     assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
+
+  it(`throws w/ Scale must be in range 0-10 when above max`, function () {
+    tx.PriceDataSeries[0].PriceData.Scale = 11
+    const errorMessage = 'OracleSet: Scale must be in range 0-10'
+    assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
+    assert.throws(() => validate(tx), ValidationError, errorMessage)
+  })
+
+  it(`throws w/ Scale must be in range 0-10 when below min`, function () {
+    tx.PriceDataSeries[0].PriceData.Scale = -1
+    const errorMessage = 'OracleSet: Scale must be in range 0-10'
+    assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
+    assert.throws(() => validate(tx), ValidationError, errorMessage)
+  })
 })

@@ -10,6 +10,7 @@ import {
 } from './common'
 
 const PRICE_DATA_SERIES_MAX_LENGTH = 10
+const SCALE_MAX = 10
 
 /**
  * A PriceData object represents the price information for a token pair.
@@ -170,6 +171,17 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
         !isNumber(priceData.PriceData.Scale)
       ) {
         throw new ValidationError('OracleSet: invalid field Scale')
+      }
+
+      if (
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
+        priceData.PriceData.Scale < 0 ||
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
+        priceData.PriceData.Scale > SCALE_MAX
+      ) {
+        throw new ValidationError(
+          `OracleSet: Scale must be in range 0-${SCALE_MAX}`,
+        )
       }
     }
     return true
