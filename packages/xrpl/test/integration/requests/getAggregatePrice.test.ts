@@ -13,7 +13,7 @@ import { testTransaction } from '../utils'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('OracleSet', function () {
+describe('get_aggregate_price', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {

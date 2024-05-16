@@ -94,6 +94,11 @@ export interface GetAggregatePriceResponse extends BaseResponse {
     }
 
     /**
+     * The median of the collected oracle prices.
+     */
+    median: string
+
+    /**
      * The most recent timestamp out of all LastUpdateTime values.
      */
     time: number
