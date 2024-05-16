@@ -102,7 +102,7 @@ export interface GetAggregatePriceResponse extends BaseResponse {
      * The ledger index of the ledger version that was used to generate this
      * response.
      */
-    ledger_index: number
+    ledger_current_index: number
 
     /**
      * If included and set to true, the information in this response comes from
