@@ -119,6 +119,7 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
       )
     }
 
+    // TODO: add support for handling inner objects easier (similar to validateRequiredField/validateOptionalField)
     for (const priceData of value) {
       if (typeof priceData !== 'object') {
         throw new ValidationError(
