@@ -54,7 +54,7 @@ describe('OracleDelete', function () {
 
       await testTransaction(testContext.client, deleteTx, testContext.wallet)
 
-      // confirm that the Oracle was actually delete
+      // confirm that the Oracle was actually deleted
       await assertRejects(
         testContext.client.request({
           command: 'get_aggregate_price',

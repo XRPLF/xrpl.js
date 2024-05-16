@@ -103,6 +103,29 @@ describe('OracleSet', function () {
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
+  it(`throws w/ PriceDataSeries must have at most 10 PriceData objects`, function () {
+    tx.PriceDataSeries = new Array(11).fill({
+      PriceData: {
+        BaseAsset: 'XRP',
+        QuoteAsset: 'USD',
+        AssetPrice: 740,
+        Scale: 3,
+      },
+    })
+    const errorMessage =
+      'OracleSet: PriceDataSeries must have at most 10 PriceData objects'
+    assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
+    assert.throws(() => validate(tx), ValidationError, errorMessage)
+  })
+
+  it(`throws w/ PriceDataSeries must have a PriceData object`, function () {
+    delete tx.PriceDataSeries[0].PriceData
+    const errorMessage =
+      'OracleSet: PriceDataSeries must have a `PriceData` object'
+    assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
+    assert.throws(() => validate(tx), ValidationError, errorMessage)
+  })
+
   it(`throws w/ missing BaseAsset of PriceDataSeries`, function () {
     delete tx.PriceDataSeries[0].PriceData.BaseAsset
     const errorMessage =

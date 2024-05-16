@@ -9,6 +9,8 @@ import {
   validateRequiredField,
 } from './common'
 
+const PRICE_DATA_SERIES_MAX_LENGTH = 10
+
 /**
  * A PriceData object represents the price information for a token pair.
  *
@@ -105,9 +107,16 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'LastUpdateTime', isNumber)
 
+  // eslint-disable-next-line max-lines-per-function -- necessary to validate many fields
   validateRequiredField(tx, 'PriceDataSeries', (value) => {
     if (!Array.isArray(value)) {
       throw new ValidationError('OracleSet: PriceDataSeries must be an array')
+    }
+
+    if (value.length > PRICE_DATA_SERIES_MAX_LENGTH) {
+      throw new ValidationError(
+        `OracleSet: PriceDataSeries must have at most ${PRICE_DATA_SERIES_MAX_LENGTH} PriceData objects`,
+      )
     }
 
     for (const priceData of value) {
