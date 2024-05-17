@@ -36,19 +36,12 @@ export default interface Oracle extends BaseLedgerEntry, HasPreviousTxnID {
       /**
        * The quote asset in a trading pair. The quote asset denotes the price of one unit of the base asset.
        */
-      QuoteAsset: {
-        currency: string
-      }
+      QuoteAsset: string
 
       /**
-       * The primary asset in a trading pair.
+       * The primary asset in a trading pair. The base asset currency code, conformant to the XRPL currency codes format.
        */
-      BaseAsset: {
-        /**
-         * The base asset currency code, conformant to the XRPL currency codes format.
-         */
-        currency: string
-      }
+      BaseAsset: string
 
       /**
        * The scaling factor to apply to an asset price. For example, if Scale is 6

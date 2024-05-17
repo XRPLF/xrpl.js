@@ -46,6 +46,15 @@ describe('OracleDelete', function () {
 
       await testTransaction(testContext.client, setTx, testContext.wallet)
 
+      const aoResult = await testContext.client.request({
+        command: 'account_objects',
+        account: testContext.wallet.classicAddress,
+      })
+
+      // confirm that the Oracle was created
+      assert.equal(aoResult.result.account_objects.length, 1)
+      assert.equal(aoResult.result.account_objects[0].LedgerEntryType, 'Oracle')
+
       const deleteTx: OracleDelete = {
         TransactionType: 'OracleDelete',
         Account: testContext.wallet.classicAddress,
@@ -54,13 +63,13 @@ describe('OracleDelete', function () {
 
       await testTransaction(testContext.client, deleteTx, testContext.wallet)
 
-      const result = await testContext.client.request({
+      const aoResult2 = await testContext.client.request({
         command: 'account_objects',
         account: testContext.wallet.classicAddress,
       })
 
       // confirm that the Oracle was actually deleted
-      assert.equal(result.result.account_objects.length, 0)
+      assert.equal(aoResult2.result.account_objects.length, 0)
     },
     TIMEOUT,
   )
