@@ -96,6 +96,7 @@ import {
   NFTHistoryTransaction,
 } from './nftHistory'
 import { NFTInfoRequest, NFTInfoResponse } from './nftInfo'
+import { NFTsByIssuerRequest, NFTsByIssuerResponse } from './nftsByIssuer'
 import { NFTSellOffersRequest, NFTSellOffersResponse } from './nftSellOffers'
 import { NoRippleCheckRequest, NoRippleCheckResponse } from './norippleCheck'
 import {
@@ -208,6 +209,7 @@ type Request =
   // clio only methods
   | NFTInfoRequest
   | NFTHistoryRequest
+  | NFTsByIssuerRequest
   // AMM methods
   | AMMInfoRequest
 
@@ -262,6 +264,7 @@ type Response =
   // clio only methods
   | NFTInfoResponse
   | NFTHistoryResponse
+  | NFTsByIssuerResponse
   // AMM methods
   | AMMInfoResponse
 
@@ -403,6 +406,8 @@ export type RequestResponseMap<T> = T extends AccountChannelsRequest
   ? NFTSellOffersResponse
   : T extends NFTInfoRequest
   ? NFTInfoResponse
+  : T extends NFTsByIssuerRequest
+  ? NFTsByIssuerResponse
   : T extends NFTHistoryRequest
   ? NFTHistoryResponse
   : Response
@@ -570,6 +575,8 @@ export {
   NFTHistoryRequest,
   NFTHistoryResponse,
   NFTHistoryTransaction,
+  NFTsByIssuerRequest,
+  NFTsByIssuerResponse,
   // AMM methods
   AMMInfoRequest,
   AMMInfoResponse,
