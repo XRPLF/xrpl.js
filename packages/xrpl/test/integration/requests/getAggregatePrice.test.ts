@@ -1,7 +1,7 @@
 import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 import { assert } from 'chai'
 
-import { OracleSet, getCurrentUnixTimestamp } from '../../../src'
+import { OracleSet } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -28,7 +28,7 @@ describe('get_aggregate_price', function () {
         TransactionType: 'OracleSet',
         Account: testContext.wallet.classicAddress,
         OracleDocumentID: 1234,
-        LastUpdateTime: getCurrentUnixTimestamp(),
+        LastUpdateTime: Math.floor(Date.now() / 1000),
         PriceDataSeries: [
           {
             PriceData: {

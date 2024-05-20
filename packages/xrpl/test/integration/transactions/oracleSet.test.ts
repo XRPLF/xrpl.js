@@ -1,7 +1,7 @@
 import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 import { assert } from 'chai'
 
-import { OracleSet, getCurrentUnixTimestamp } from '../../../src'
+import { OracleSet } from '../../../src'
 import { Oracle } from '../../../src/models/ledger'
 import serverUrl from '../serverUrl'
 import {
@@ -29,7 +29,7 @@ describe('OracleSet', function () {
         TransactionType: 'OracleSet',
         Account: testContext.wallet.classicAddress,
         OracleDocumentID: 1234,
-        LastUpdateTime: getCurrentUnixTimestamp(),
+        LastUpdateTime: Math.floor(Date.now() / 1000),
         PriceDataSeries: [
           {
             PriceData: {

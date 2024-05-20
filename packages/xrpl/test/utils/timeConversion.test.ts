@@ -1,7 +1,6 @@
 import { assert } from 'chai'
 
 import {
-  getCurrentUnixTimestamp,
   rippleTimeToISOTime,
   isoTimeToRippleTime,
   unixTimeToRippleTime,
@@ -44,14 +43,6 @@ describe('time conversion', function () {
       const unixTime = 946684801000
       const rippleTime = 1
       assert.equal(rippleTimeToUnixTime(rippleTime), unixTime)
-    })
-  })
-
-  describe('getCurrentUnixTimestamp', function () {
-    it('returns the current unix timestamp in seconds', function () {
-      const now = Date.now()
-      const timestamp = Math.floor(now / 1000)
-      assert.equal(timestamp, getCurrentUnixTimestamp())
     })
   })
 })
