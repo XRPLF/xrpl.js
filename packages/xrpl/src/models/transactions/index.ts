@@ -59,7 +59,7 @@ export {
   OfferCreate,
 } from './offerCreate'
 export { OracleDelete } from './oracleDelete'
-export { OracleSet } from './oracleSet'
+export { OracleSet, PriceData } from './oracleSet'
 export { PaymentFlags, PaymentFlagsInterface, Payment } from './payment'
 export {
   PaymentChannelClaimFlags,

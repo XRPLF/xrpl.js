@@ -1,3 +1,5 @@
+import { PriceData } from '../transactions'
+
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
@@ -31,30 +33,7 @@ export default interface Oracle extends BaseLedgerEntry, HasPreviousTxnID {
   /**
    * An array of up to 10 PriceData objects.
    */
-  PriceDataSeries: Array<{
-    PriceData: {
-      /**
-       * The quote asset in a trading pair. The quote asset denotes the price of one unit of the base asset.
-       */
-      QuoteAsset: string
-
-      /**
-       * The primary asset in a trading pair. The base asset currency code, conformant to the XRPL currency codes format.
-       */
-      BaseAsset: string
-
-      /**
-       * The scaling factor to apply to an asset price. For example, if Scale is 6
-       * and original price is 0.155, then the scaled price is 155000.
-       */
-      Scale: number
-
-      /**
-       * The asset price after applying the Scale precision level.
-       */
-      AssetPrice: string
-    }
-  }>
+  PriceDataSeries: PriceData[]
 
   /**
    * A bit-map of boolean flags. No flags are defined for the Oracle object
