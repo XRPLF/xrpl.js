@@ -1,8 +1,7 @@
 import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
-import { OracleSet } from '../../../src'
-import { Oracle } from '../../../src/models/ledger'
+import { OracleSet, OracleDelete } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -14,7 +13,7 @@ import { testTransaction } from '../utils'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('OracleSet', function () {
+describe('OracleDelete', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {
@@ -25,7 +24,7 @@ describe('OracleSet', function () {
   it(
     'base',
     async () => {
-      const tx: OracleSet = {
+      const setTx: OracleSet = {
         TransactionType: 'OracleSet',
         Account: testContext.wallet.classicAddress,
         OracleDocumentID: 1234,
@@ -45,29 +44,32 @@ describe('OracleSet', function () {
         AssetClass: stringToHex('currency'),
       }
 
-      await testTransaction(testContext.client, tx, testContext.wallet)
+      await testTransaction(testContext.client, setTx, testContext.wallet)
 
-      const result = await testContext.client.request({
+      const aoResult = await testContext.client.request({
         command: 'account_objects',
         account: testContext.wallet.classicAddress,
         type: 'oracle',
       })
 
-      // confirm that the Oracle was actually created
-      assert.equal(result.result.account_objects.length, 1)
+      // confirm that the Oracle was created
+      assert.equal(aoResult.result.account_objects.length, 1)
 
-      // confirm details of Oracle ledger entry object
-      const oracle = result.result.account_objects[0] as Oracle
-      assert.equal(oracle.LastUpdateTime, tx.LastUpdateTime)
-      assert.equal(oracle.Owner, testContext.wallet.classicAddress)
-      assert.equal(oracle.AssetClass, tx.AssetClass)
-      assert.equal(oracle.Provider, tx.Provider)
-      assert.equal(oracle.PriceDataSeries.length, 1)
-      assert.equal(oracle.PriceDataSeries[0].PriceData.BaseAsset, 'XRP')
-      assert.equal(oracle.PriceDataSeries[0].PriceData.QuoteAsset, 'USD')
-      assert.equal(oracle.PriceDataSeries[0].PriceData.AssetPrice, '2e4')
-      assert.equal(oracle.PriceDataSeries[0].PriceData.Scale, 3)
-      assert.equal(oracle.Flags, 0)
+      const deleteTx: OracleDelete = {
+        TransactionType: 'OracleDelete',
+        Account: testContext.wallet.classicAddress,
+        OracleDocumentID: 1234,
+      }
+
+      await testTransaction(testContext.client, deleteTx, testContext.wallet)
+
+      const aoResult2 = await testContext.client.request({
+        command: 'account_objects',
+        account: testContext.wallet.classicAddress,
+      })
+
+      // confirm that the Oracle was actually deleted
+      assert.equal(aoResult2.result.account_objects.length, 0)
     },
     TIMEOUT,
   )
