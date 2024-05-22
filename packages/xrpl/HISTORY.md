@@ -4,7 +4,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
-### NEW FEATURES
+### Added
 * Add nfts_by_issuer data type
 
 ### BREAKING CHANGES
