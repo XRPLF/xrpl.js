@@ -49,11 +49,11 @@ describe('OracleDelete', function () {
       const aoResult = await testContext.client.request({
         command: 'account_objects',
         account: testContext.wallet.classicAddress,
+        type: 'oracle',
       })
 
       // confirm that the Oracle was created
       assert.equal(aoResult.result.account_objects.length, 1)
-      assert.equal(aoResult.result.account_objects[0].LedgerEntryType, 'Oracle')
 
       const deleteTx: OracleDelete = {
         TransactionType: 'OracleDelete',

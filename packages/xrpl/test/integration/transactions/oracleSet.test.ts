@@ -50,6 +50,7 @@ describe('OracleSet', function () {
       const result = await testContext.client.request({
         command: 'account_objects',
         account: testContext.wallet.classicAddress,
+        type: 'oracle',
       })
 
       // confirm that the Oracle was actually created
@@ -57,7 +58,6 @@ describe('OracleSet', function () {
 
       // confirm details of Oracle ledger entry object
       const oracle = result.result.account_objects[0] as Oracle
-      assert.equal(oracle.LedgerEntryType, 'Oracle')
       assert.equal(oracle.LastUpdateTime, tx.LastUpdateTime)
       assert.equal(oracle.Owner, testContext.wallet.classicAddress)
       assert.equal(oracle.AssetClass, tx.AssetClass)
