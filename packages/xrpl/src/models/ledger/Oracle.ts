@@ -1,4 +1,4 @@
-import { PriceData } from '../transactions'
+import { PriceData } from '../common'
 
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
