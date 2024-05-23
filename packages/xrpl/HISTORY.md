@@ -6,6 +6,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### BREAKING CHANGES
 * Small fix in the API to use a new flag name `tfNoDirectRipple` instead of the existing flag name `tfNoRippleDirect`
 
+### Added
+* Support for the Price Oracles amendment (XLS-47).
+
 ### Fixed
 * Typo in `Channel` type `source_tab` -> `source_tag`
 * Fix `client.requestAll` to handle filters better
