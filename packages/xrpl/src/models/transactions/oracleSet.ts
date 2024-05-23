@@ -133,13 +133,13 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
       // Either AssetPrice and Scale are both present or both excluded
       if (
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-        ('AssetPrice' in priceData.PriceData &&
+        (priceData.PriceData.AssetPrice != null &&
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-          !('Scale' in priceData.PriceData)) ||
+          priceData.PriceData.Scale == null) ||
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-        ('Scale' in priceData.PriceData &&
+        (priceData.PriceData.Scale != null &&
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-          !('AssetPrice' in priceData.PriceData))
+          priceData.PriceData.AssetPrice == null)
       ) {
         throw new ValidationError(
           'OracleSet: PriceDataSeries must have both `AssetPrice` and `Scale` if any are present',
