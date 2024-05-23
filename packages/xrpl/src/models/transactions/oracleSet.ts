@@ -109,6 +109,13 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
         )
       }
 
+      // check if priceData only has PriceData
+      if (Object.keys(priceData).length !== 1) {
+        throw new ValidationError(
+          'OracleSet: PriceDataSeries must only have a single PriceData object',
+        )
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
       if (typeof priceData.PriceData.BaseAsset !== 'string') {
         throw new ValidationError(

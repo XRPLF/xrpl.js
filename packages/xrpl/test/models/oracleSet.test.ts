@@ -126,6 +126,14 @@ describe('OracleSet', function () {
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
+  it(`throws w/ PriceDataSeries must only have a single PriceData object`, function () {
+    tx.PriceDataSeries[0].ExtraProp = 'extraprop'
+    const errorMessage =
+      'OracleSet: PriceDataSeries must only have a single PriceData object'
+    assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
+    assert.throws(() => validate(tx), ValidationError, errorMessage)
+  })
+
   it(`throws w/ missing BaseAsset of PriceDataSeries`, function () {
     delete tx.PriceDataSeries[0].PriceData.BaseAsset
     const errorMessage =
