@@ -10,6 +10,7 @@ import FeeSettings from './FeeSettings'
 import LedgerHashes from './LedgerHashes'
 import NegativeUNL from './NegativeUNL'
 import Offer from './Offer'
+import Oracle from './Oracle'
 import PayChannel from './PayChannel'
 import RippleState from './RippleState'
 import SignerList from './SignerList'
@@ -30,6 +31,7 @@ type LedgerEntry =
   | LedgerHashes
   | NegativeUNL
   | Offer
+  | Oracle
   | PayChannel
   | RippleState
   | SignerList
@@ -52,6 +54,7 @@ type LedgerEntryFilter =
   | 'nft_offer'
   | 'nft_page'
   | 'offer'
+  | 'oracle'
   | 'payment_channel'
   | 'signer_list'
   | 'state'

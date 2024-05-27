@@ -67,6 +67,10 @@ import {
   GatewayBalancesResponse,
 } from './gatewayBalances'
 import {
+  GetAggregatePriceRequest,
+  GetAggregatePriceResponse,
+} from './getAggregatePrice'
+import {
   LedgerBinary,
   LedgerModifiedOfferCreateTransaction,
   LedgerQueueData,
@@ -212,6 +216,8 @@ type Request =
   | NFTsByIssuerRequest
   // AMM methods
   | AMMInfoRequest
+  // Price Oracle methods
+  | GetAggregatePriceRequest
 
 /**
  * @category Responses
@@ -267,6 +273,8 @@ type Response =
   | NFTsByIssuerResponse
   // AMM methods
   | AMMInfoResponse
+  // Price Oracle methods
+  | GetAggregatePriceResponse
 
 export type RequestResponseMap<T> = T extends AccountChannelsRequest
   ? AccountChannelsResponse
@@ -288,6 +296,8 @@ export type RequestResponseMap<T> = T extends AccountChannelsRequest
   ? AMMInfoResponse
   : T extends GatewayBalancesRequest
   ? GatewayBalancesResponse
+  : T extends GetAggregatePriceRequest
+  ? GetAggregatePriceResponse
   : T extends NoRippleCheckRequest
   ? NoRippleCheckResponse
   : // NOTE: The order of these LedgerRequest types is important
@@ -478,6 +488,8 @@ export {
   GatewayBalance,
   GatewayBalancesRequest,
   GatewayBalancesResponse,
+  GetAggregatePriceRequest,
+  GetAggregatePriceResponse,
   NoRippleCheckRequest,
   NoRippleCheckResponse,
   // ledger methods

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+* Support for the Price Oracles amendment (XLS-47).
+
 ### Fixed
 * Better error handling/error messages for serialization/deserialization errors.
 
