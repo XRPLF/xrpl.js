@@ -1,6 +1,6 @@
 {
   "name": "ripple-binary-codec",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "XRP Ledger binary codec",
   "files": [
     "dist/*",
@@ -11,7 +11,7 @@
     "test": "test"
   },
   "dependencies": {
-    "@xrplf/isomorphic": "^1.0.0",
+    "@xrplf/isomorphic": "^1.0.1",
     "bignumber.js": "^9.0.0",
     "ripple-address-codec": "^5.0.0"
   },
