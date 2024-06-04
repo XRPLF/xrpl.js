@@ -1,5 +1,7 @@
 import { concatBytes } from '@noble/hashes/utils'
 
+export const HEX_REGEX = /^[A-F0-9]*$/iu
+
 export function concat(views: Uint8Array[]): Uint8Array {
   return concatBytes(...views)
 }

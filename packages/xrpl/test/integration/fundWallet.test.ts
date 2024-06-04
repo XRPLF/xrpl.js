@@ -104,7 +104,7 @@ describe('fundWallet', function () {
       })
 
       assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
-      assert.equal(balance, 10000)
+      assert.equal(balance, 1000)
 
       /*
        * No test for fund given wallet because the hooks v3 testnet faucet
@@ -124,10 +124,10 @@ describe('fundWallet', function () {
 
       await api.connect()
       const { wallet, balance } = await api.fundWallet(null, {
-        amount: '2000',
+        amount: '1000',
         usageContext: 'integration-test',
       })
-      assert.equal(balance, 2000)
+      assert.equal(balance, 1000)
       assert.notStrictEqual(wallet, undefined)
       assert(isValidClassicAddress(wallet.classicAddress))
       assert(isValidXAddress(wallet.getXAddress()))
