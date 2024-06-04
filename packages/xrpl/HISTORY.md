@@ -4,11 +4,16 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Non-Breaking Changes
+* Use rippled api_version v2 as default while maintaining support for v1.
+
+## 3.1.0 (2024-06-03)
+
 ### BREAKING CHANGES
 * Small fix in the API to use a new flag name `tfNoDirectRipple` instead of the existing flag name `tfNoRippleDirect`
 
-### Non-Breaking Changes
-* Add rippled apiVersion support for requests and AccountInfoResponse type
+### Added
+* Support for the Price Oracles amendment (XLS-47).
 
 ### Fixed
 * Typo in `Channel` type `source_tab` -> `source_tag`
