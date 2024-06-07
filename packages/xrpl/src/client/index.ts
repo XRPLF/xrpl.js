@@ -692,8 +692,6 @@ class Client extends EventEmitter<EventTypes> {
         )
       }
 
-      // remove the DeliverMax field
-
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- v2 rippled Payment-transaction could contain DeliverMax field
       delete tx_.DeliverMax
     }

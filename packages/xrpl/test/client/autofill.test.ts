@@ -24,6 +24,8 @@ const HOOKS_TESTNET_ID = 21338
 
 describe('client.autofill', function () {
   let testContext: XrplTestContext
+  let paytxn
+  let amount_: string
 
   async function setupMockRippledVersionAndID(
     buildVersion: string,
@@ -44,12 +46,8 @@ describe('client.autofill', function () {
 
   beforeEach(async () => {
     testContext = await setupClient()
-  })
-  afterEach(async () => teardownClient(testContext))
-
-  it('Validate Payment transaction v2 API: Payment Transaction: Specify Only Amount field', async function () {
-    const amount_ = '1234'
-    const paytxn = {
+    amount_ = '1234'
+    paytxn = {
       TransactionType: 'Payment',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       Amount: amount_,
@@ -71,99 +69,43 @@ describe('client.autofill', function () {
       SendMax: '100000000',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Represent transaction JSON with `any` type
     } as any
+  })
+  afterEach(async () => teardownClient(testContext))
+
+  it('Validate Payment transaction v2 API: Payment Transaction: Specify Only Amount field', async function () {
     const txResult = await testContext.client.autofill(paytxn)
 
     assert.strictEqual(txResult.Amount, amount_)
   })
 
   it('Validate Payment transaction v2 API: Payment Transaction: Specify Only DeliverMax field', async function () {
-    const amount_ = '1234'
-    const paytxn = {
-      TransactionType: 'Payment',
-      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
-      DeliverMax: amount_,
-      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
-      DestinationTag: 1,
-      Fee: '12',
-      Flags: 2147483648,
-      LastLedgerSequence: 65953073,
-      Sequence: 65923914,
-      SigningPubKey:
-        '02F9E33F16DF9507705EC954E3F94EB5F10D1FC4A354606DBE6297DBB1096FE654',
-      TxnSignature:
-        '3045022100E3FAE0EDEC3D6A8FF6D81BC9CF8288A61B7EEDE8071E90FF9314CB4621058D10022043545CF631706D700CEE65A1DB83EFDD185413808292D9D90F14D87D3DC2D8CB',
-      InvoiceID:
-        '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
-      Paths: [
-        [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
-      ],
-      SendMax: '100000000',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Represent transaction JSON with `any` type
-    } as any
-    const txResult = await testContext.client.autofill(paytxn)
+    const payment_txn = paytxn
+    payment_txn.DeliverMax = payment_txn.Amount
+    delete payment_txn.Amount
+    const txResult = await testContext.client.autofill(payment_txn)
 
     assert.strictEqual(txResult.Amount, amount_)
   })
 
   it('Validate Payment transaction v2 API: Payment Transaction: identical DeliverMax and Amount fields', async function () {
-    const amount_ = '1234'
-    const paytxn = {
-      TransactionType: 'Payment',
-      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
-      DeliverMax: amount_,
-      Amount: amount_,
-      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
-      DestinationTag: 1,
-      Fee: '12',
-      Flags: 2147483648,
-      LastLedgerSequence: 65953073,
-      Sequence: 65923914,
-      SigningPubKey:
-        '02F9E33F16DF9507705EC954E3F94EB5F10D1FC4A354606DBE6297DBB1096FE654',
-      TxnSignature:
-        '3045022100E3FAE0EDEC3D6A8FF6D81BC9CF8288A61B7EEDE8071E90FF9314CB4621058D10022043545CF631706D700CEE65A1DB83EFDD185413808292D9D90F14D87D3DC2D8CB',
-      InvoiceID:
-        '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
-      Paths: [
-        [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
-      ],
-      SendMax: '100000000',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Represent transaction JSON with `any` type
-    } as any
-    const txResult = await testContext.client.autofill(paytxn)
+    const payment_txn = paytxn
+    payment_txn.DeliverMax = payment_txn.Amount
+
+    const txResult = await testContext.client.autofill(payment_txn)
 
     assert.strictEqual(txResult.Amount, amount_)
     assert.strictEqual('DeliverMax' in txResult, false)
   })
 
   it('Validate Payment transaction v2 API: Payment Transaction: differing DeliverMax and Amount fields', async function () {
-    const amount_ = '1234'
-    const deliverMax_ = '5678'
-    const paytxn = {
-      TransactionType: 'Payment',
-      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
-      DeliverMax: deliverMax_,
-      Amount: amount_,
-      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
-      DestinationTag: 1,
-      Fee: '12',
-      Flags: 2147483648,
-      LastLedgerSequence: 65953073,
-      Sequence: 65923914,
-      SigningPubKey:
-        '02F9E33F16DF9507705EC954E3F94EB5F10D1FC4A354606DBE6297DBB1096FE654',
-      TxnSignature:
-        '3045022100E3FAE0EDEC3D6A8FF6D81BC9CF8288A61B7EEDE8071E90FF9314CB4621058D10022043545CF631706D700CEE65A1DB83EFDD185413808292D9D90F14D87D3DC2D8CB',
-      InvoiceID:
-        '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
-      Paths: [
-        [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
-      ],
-      SendMax: '100000000',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Represent transaction JSON with `any` type
-    } as any
+    const payment_txn = paytxn
+    payment_txn.DeliverMax = '6789'
+    payment_txn.Amount = '1234'
 
-    await assertRejects(testContext.client.autofill(paytxn), ValidationError)
+    await assertRejects(
+      testContext.client.autofill(payment_txn),
+      ValidationError,
+    )
   })
 
   it('should not autofill if fields are present', async function () {
