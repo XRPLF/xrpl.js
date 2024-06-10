@@ -680,7 +680,6 @@ class Client extends EventEmitter<EventTypes> {
         tx.Amount = tx.DeliverMax
       }
 
-      // If Amount is not identical to DeliverMax, throw an error
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
       // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- This is a valid null check for Amount
