@@ -226,7 +226,7 @@ class Client extends EventEmitter<EventTypes> {
    * const client = new Client('wss://s.altnet.rippletest.net:51233')
    * ```
    */
-  // eslint-disable-next-line max-lines-per-function -- okay because we have to set up all the connection handlers
+  /* eslint-disable max-lines-per-function -- the constructor requires more lines to implement the logic */
   public constructor(server: string, options: ClientOptions = {}) {
     super()
     if (typeof server !== 'string' || !/wss?(?:\+unix)?:\/\//u.exec(server)) {
@@ -290,6 +290,7 @@ class Client extends EventEmitter<EventTypes> {
       this.emit('path_find', path)
     })
   }
+  /* eslint-enable max-lines-per-function */
 
   /**
    * Get the url that the client is connected to.
@@ -639,7 +640,7 @@ class Client extends EventEmitter<EventTypes> {
    * Only used for multisigned transactions.
    * @returns The autofilled transaction.
    */
-  /* eslint-disable max-len -- Long linter directives are needed to perform type-erasure in this function */
+
   // eslint-disable-next-line complexity -- handling v2 Payment transaction API requires more logic
   public async autofill<T extends SubmittableTransaction>(
     transaction: T,
@@ -667,39 +668,35 @@ class Client extends EventEmitter<EventTypes> {
       promises.push(checkAccountDeleteBlockers(this, tx))
     }
 
-    // further manipulation of tx_ uses non-SubmittableTransaction types, hence we need a typecast to any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/consistent-type-assertions -- `any` type is required to perform non-protocol modifications to the JSON object
-    const tx_ = tx as any
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- A transaction JSON must contain TransactionType field
-    if (tx_.TransactionType === 'Payment' && tx_.DeliverMax != null) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- A Payment transaction JSON must contain Amount field
-      if (tx_.Amount == null) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+    // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+    if (tx.TransactionType === 'Payment' && tx.DeliverMax != null) {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- This is a valid null check for Amount
+      if (tx.Amount == null) {
         // If only DeliverMax is provided, use it to populate the Amount field
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access -- ensure that the aliased fields are identical
-        tx_.Amount = tx_.DeliverMax
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+        // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- DeliverMax is a known RPC-level property
+        tx.Amount = tx.DeliverMax
       }
 
       // If Amount is not identical to DeliverMax, throw an error
-      if (
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- v2 rippled Payment-transaction JSON could contain these fields
-        tx_.Amount != null &&
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- v2 rippled Payment-transaction JSON could contain these fields
-        tx_.Amount !== tx_.DeliverMax
-      ) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+      // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- This is a valid null check for Amount
+      if (tx.Amount != null && tx.Amount !== tx.DeliverMax) {
         throw new ValidationError(
           'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
         )
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- v2 rippled Payment-transaction could contain DeliverMax field
-      delete tx_.DeliverMax
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+      // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+      delete tx.DeliverMax
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/promise-function-async -- Please ensure that tx_ is a serializable transaction
-    return Promise.all(promises).then(() => tx_)
+    return Promise.all(promises).then(() => tx)
   }
-  /* eslint-enable max-len */
 
   /**
    * Submits a signed/unsigned transaction.
@@ -941,7 +938,7 @@ class Client extends EventEmitter<EventTypes> {
    * @param options.limit - Limit number of balances to return.
    * @returns An array of XRP/non-XRP balances for the given account.
    */
-  // eslint-disable-next-line max-lines-per-function -- Longer definition is required for end users to see the definition.
+  /* eslint-disable max-lines-per-function -- getBalances requires more lines to implement logic */
   public async getBalances(
     address: string,
     options: {
@@ -989,6 +986,7 @@ class Client extends EventEmitter<EventTypes> {
     )
     return balances.slice(0, options.limit)
   }
+  /* eslint-enable max-lines-per-function */
 
   /**
    * Fetch orderbook (buy/sell orders) between two currency pairs. This checks both sides of the orderbook
