@@ -100,20 +100,4 @@ describe('Payment', function () {
     },
     TIMEOUT,
   )
-
-  // it(
-  //   'Validate Payment transaction v2 API: Payment Transaction: differing DeliverMax and Amount fields',
-  //   async () => {
-  //     const payment_txn = payment_txn_example
-  //     // Different from the Amount field
-  //     payment_txn.DeliverMax = '9999'
-
-  //     await assertRejects(
-  //       testTransaction(testContext.client, payment_txn, payment_txn_wallet),
-  //       ValidationError,
-  //       'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
-  //     )
-  //   },
-  //   TIMEOUT,
-  // )
 })
