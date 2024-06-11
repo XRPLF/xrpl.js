@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.1 (2024-06-03)
+
 ### Fixed
 
 * Throw error if `hexToBytes` or `hexToString` is provided a string that is not in hex
