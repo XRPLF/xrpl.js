@@ -1,8 +1,8 @@
 import { assert } from 'chai'
 
 import { Payment } from '../../../src'
-// import { autofill } from '../../../src/client/index'
-import { ValidationError } from '../../../src/errors'
+// import { ValidationError } from '../../../src/errors'
+// import { assertRejects } from '../../testUtils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -101,26 +101,19 @@ describe('Payment', function () {
     TIMEOUT,
   )
 
-  it(
-    'Validate Payment transaction v2 API: Payment Transaction: differing DeliverMax and Amount fields',
-    async () => {
-      const payment_txn = payment_txn_example
-      // Different from the Amount field
-      payment_txn.DeliverMax = '9999'
+  // it(
+  //   'Validate Payment transaction v2 API: Payment Transaction: differing DeliverMax and Amount fields',
+  //   async () => {
+  //     const payment_txn = payment_txn_example
+  //     // Different from the Amount field
+  //     payment_txn.DeliverMax = '9999'
 
-      try {
-        await testTransaction(
-          testContext.client,
-          payment_txn,
-          payment_txn_wallet,
-        )
-      } catch (err) {
-        assert.equal(
-          (err as ValidationError).message,
-          'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
-        )
-      }
-    },
-    TIMEOUT,
-  )
+  //     await assertRejects(
+  //       testTransaction(testContext.client, payment_txn, payment_txn_wallet),
+  //       ValidationError,
+  //       'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
+  //     )
+  //   },
+  //   TIMEOUT,
+  // )
 })

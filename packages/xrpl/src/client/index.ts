@@ -639,6 +639,7 @@ class Client extends EventEmitter<EventTypes> {
    * @param signersCount - The expected number of signers for this transaction.
    * Only used for multisigned transactions.
    * @returns The autofilled transaction.
+   * @throws ValidationError If Amount and DeliverMax fields are not identical in a Payment Transaction
    */
 
   // eslint-disable-next-line complexity -- handling v2 Payment transaction API requires more logic
