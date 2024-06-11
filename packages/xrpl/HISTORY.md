@@ -4,6 +4,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Add `nfts_by_issuer` clio-only API definition
 ## 3.1.0 (2024-06-03)
 
 ### BREAKING CHANGES
