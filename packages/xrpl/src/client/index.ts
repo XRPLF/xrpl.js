@@ -9,7 +9,12 @@ import {
   ValidationError,
   XrplError,
 } from '../errors'
-import type { APIVersion, LedgerIndex, Balance } from '../models/common'
+import {
+  APIVersion,
+  LedgerIndex,
+  Balance,
+  DEFAULT_API_VERSION,
+} from '../models/common'
 import {
   Request,
   // account methods
@@ -28,6 +33,7 @@ import {
   LedgerDataRequest,
   LedgerDataResponse,
   TxResponse,
+  LedgerRequest,
 } from '../models/methods'
 import type {
   RequestResponseMap,
@@ -320,7 +326,7 @@ class Client extends EventEmitter<EventTypes> {
    */
   public async request<
     R extends Request,
-    V extends APIVersion,
+    V extends APIVersion = typeof DEFAULT_API_VERSION,
     T = RequestResponseMap<R, V>,
   >(req: R): Promise<T> {
     const request = {
@@ -329,6 +335,7 @@ class Client extends EventEmitter<EventTypes> {
         ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be string
           ensureClassicAddress(req.account as string)
         : undefined,
+      api_version: req.api_version ?? DEFAULT_API_VERSION,
     }
     const response = await this.connection.request<R, T>(request)
 
@@ -647,7 +654,7 @@ class Client extends EventEmitter<EventTypes> {
   public async autofill<T extends SubmittableTransaction>(
     transaction: T,
     signersCount?: number,
-    apiVersion: APIVersion = 1,
+    apiVersion: APIVersion = DEFAULT_API_VERSION,
   ): Promise<T> {
     const tx = { ...transaction }
 
@@ -838,7 +845,7 @@ class Client extends EventEmitter<EventTypes> {
   public async prepareTransaction(
     transaction: SubmittableTransaction,
     signersCount?: number,
-    apiVersion: APIVersion = 1,
+    apiVersion: APIVersion = DEFAULT_API_VERSION,
   ): ReturnType<Client['autofill']> {
     return this.autofill(transaction, signersCount, apiVersion)
   }
@@ -1057,12 +1064,16 @@ class Client extends EventEmitter<EventTypes> {
    * // 884039
    * ```
    */
-  public async getLedgerIndex(apiVersion: APIVersion = 1): Promise<number> {
-    const ledgerResponse = await this.request({
-      command: 'ledger',
-      ledger_index: 'validated',
-      api_version: apiVersion,
-    })
+  public async getLedgerIndex(
+    apiVersion: APIVersion = DEFAULT_API_VERSION,
+  ): Promise<number> {
+    const ledgerResponse = await this.request<LedgerRequest, typeof apiVersion>(
+      {
+        command: 'ledger',
+        ledger_index: 'validated',
+        api_version: apiVersion,
+      },
+    )
     return ledgerResponse.result.ledger_index
   }
 

@@ -1,4 +1,4 @@
-import { RIPPLED_API_V1 } from '../common'
+import { APIVersion, RIPPLED_API_V1 } from '../common'
 import { AccountRoot, SignerList } from '../ledger'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
@@ -176,7 +176,30 @@ interface BaseAccountInfoResponse extends BaseResponse {
   }
 }
 
-interface AccountInfoV1Response extends BaseAccountInfoResponse {
+/**
+ * Response expected from a {@link AccountInfoRequest}.
+ *
+ * @category Responses
+ */
+export interface AccountInfoResponse extends BaseAccountInfoResponse {
+  result: BaseAccountInfoResponse['result'] & {
+    /**
+     * Array of SignerList ledger objects associated with this account for Multi-Signing.
+     * Since an account can own at most one SignerList, this array must have exactly one
+     * member if it is present.
+     * Quirk: In API version 1, this field is nested under account_data. For this method,
+     * Clio implements the API version 2 behavior where is field is not nested under account_data.
+     */
+    signer_lists?: SignerList[]
+  }
+}
+
+/**
+ * Response expected from a {@link AccountInfoRequest} using API version 1.
+ *
+ * @category Responses
+ */
+export interface AccountInfoV1Response extends BaseAccountInfoResponse {
   result: BaseAccountInfoResponse['result'] & {
     /**
      * The AccountRoot ledger object with this account's information, as stored
@@ -199,25 +222,12 @@ interface AccountInfoV1Response extends BaseAccountInfoResponse {
   }
 }
 
-interface AccountInfoV2Response extends BaseAccountInfoResponse {
-  result: BaseAccountInfoResponse['result'] & {
-    /**
-     * Array of SignerList ledger objects associated with this account for Multi-Signing.
-     * Since an account can own at most one SignerList, this array must have exactly one
-     * member if it is present.
-     * Quirk: In API version 1, this field is nested under account_data. For this method,
-     * Clio implements the API version 2 behavior where is field is not nested under account_data.
-     */
-    signer_lists?: SignerList[]
-  }
-}
-
 /**
- * Response expected from an {@link AccountInfoRequest}.
+ * Type to map between the API version and the response type.
  *
  * @category Responses
  */
-export type AccountInfoResponse<Version extends number> =
+export type AccountInfoVersionResponseMap<Version extends APIVersion> =
   Version extends typeof RIPPLED_API_V1
     ? AccountInfoV1Response
-    : AccountInfoV2Response
+    : AccountInfoResponse

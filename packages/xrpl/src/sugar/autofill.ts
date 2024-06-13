@@ -1,7 +1,8 @@
 import BigNumber from 'bignumber.js'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
-import type { APIVersion, Client } from '..'
+// eslint-disable-next-line import/no-cycle -- Not an issue for DEFAULT_API_VERSION
+import { DEFAULT_API_VERSION, type APIVersion, type Client } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
 import { Transaction } from '../models/transactions'
@@ -267,7 +268,7 @@ export async function calculateFeePerTransactionType(
   client: Client,
   tx: Transaction,
   signersCount = 0,
-  apiVersion: APIVersion = 1,
+  apiVersion: APIVersion = DEFAULT_API_VERSION,
 ): Promise<void> {
   // netFee is usually 0.00001 XRP (10 drops)
   const netFeeXRP = await getFeeXrp(client, apiVersion)
@@ -333,7 +334,7 @@ function scaleValue(value, multiplier): string {
 export async function setLatestValidatedLedgerSequence(
   client: Client,
   tx: Transaction,
-  apiVersion: APIVersion = 1,
+  apiVersion: APIVersion = DEFAULT_API_VERSION,
 ): Promise<void> {
   const ledgerSequence = await client.getLedgerIndex(apiVersion)
   // eslint-disable-next-line no-param-reassign -- param reassign is safe
@@ -351,7 +352,7 @@ export async function setLatestValidatedLedgerSequence(
 export async function checkAccountDeleteBlockers(
   client: Client,
   tx: Transaction,
-  apiVersion: APIVersion = 1,
+  apiVersion: APIVersion = DEFAULT_API_VERSION,
 ): Promise<void> {
   const request: AccountObjectsRequest = {
     command: 'account_objects',

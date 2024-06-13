@@ -1,5 +1,6 @@
 export const RIPPLED_API_V1 = 1
 export const RIPPLED_API_V2 = 2
+export const DEFAULT_API_VERSION = RIPPLED_API_V2
 export type APIVersion = typeof RIPPLED_API_V1 | typeof RIPPLED_API_V2
 export type LedgerIndex = number | ('validated' | 'closed' | 'current')
 

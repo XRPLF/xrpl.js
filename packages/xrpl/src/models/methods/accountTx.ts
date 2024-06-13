@@ -1,4 +1,9 @@
-import { ResponseOnlyTxInfo } from '../common'
+import {
+  APIVersion,
+  RIPPLED_API_V1,
+  RIPPLED_API_V2,
+  ResponseOnlyTxInfo,
+} from '../common'
 import { Transaction, TransactionMetadata } from '../transactions'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
@@ -49,7 +54,7 @@ export interface AccountTxRequest extends BaseRequest, LookupByLedgerRequest {
   marker?: unknown
 }
 
-export interface AccountTxTransaction {
+export interface AccountTxTransaction<Version extends APIVersion> {
   /** The ledger index of the ledger version that included this transaction. */
   ledger_index: number
   /**
@@ -58,7 +63,15 @@ export interface AccountTxTransaction {
    */
   meta: string | TransactionMetadata
   /** JSON object defining the transaction. */
-  tx?: Transaction & ResponseOnlyTxInfo
+  tx_json?: Version extends typeof RIPPLED_API_V2
+    ? Transaction & ResponseOnlyTxInfo
+    : never
+  /** JSON object defining the transaction. */
+  tx?: Version extends typeof RIPPLED_API_V1
+    ? Transaction & ResponseOnlyTxInfo
+    : never
+  /** The hash of the transaction. */
+  hash?: Version extends typeof RIPPLED_API_V2 ? string : never
   /** Unique hashed String representing the transaction. */
   tx_blob?: string
   /**
@@ -69,41 +82,41 @@ export interface AccountTxTransaction {
 }
 
 /**
+ * Base interface for account transaction responses.
+ */
+interface AccountTxResponseBase<Version extends APIVersion>
+  extends BaseResponse {
+  result: {
+    account: string
+    ledger_index_min: number
+    ledger_index_max: number
+    limit: number
+    marker?: unknown
+    transactions: Array<AccountTxTransaction<Version>>
+    validated?: boolean
+  }
+}
+
+/**
  * Expected response from an {@link AccountTxRequest}.
  *
  * @category Responses
  */
-export interface AccountTxResponse extends BaseResponse {
-  result: {
-    /** Unique Address identifying the related account. */
-    account: string
-    /**
-     * The ledger index of the earliest ledger actually searched for
-     * transactions.
-     */
-    ledger_index_min: number
-    /**
-     * The ledger index of the most recent ledger actually searched for
-     * transactions.
-     */
-    ledger_index_max: number
-    /** The limit value used in the request. */
-    limit: number
-    /**
-     * Server-defined value indicating the response is paginated. Pass this
-     * to the next call to resume where this call left off.
-     */
-    marker?: unknown
-    /**
-     * Array of transactions matching the request's criteria, as explained
-     * below.
-     */
-    transactions: AccountTxTransaction[]
-    /**
-     * If included and set to true, the information in this response comes from
-     * a validated ledger version. Otherwise, the information is subject to
-     * change.
-     */
-    validated?: boolean
-  }
-}
+export type AccountTxResponse = AccountTxResponseBase<typeof RIPPLED_API_V2>
+
+/**
+ * Expected response from an {@link AccountTxRequest} with `api_version` set to 1.
+ *
+ * @category Responses
+ */
+export type AccountTxV1Response = AccountTxResponseBase<typeof RIPPLED_API_V1>
+
+/**
+ * Type to map between the API version and the response type.
+ *
+ * @category Responses
+ */
+export type AccountTxVersionResponseMap<Version extends APIVersion> =
+  Version extends typeof RIPPLED_API_V1
+    ? AccountTxV1Response
+    : AccountTxResponse

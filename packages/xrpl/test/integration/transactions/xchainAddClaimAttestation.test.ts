@@ -4,7 +4,6 @@ import { encode } from 'ripple-binary-codec'
 import { sign } from 'ripple-keypairs'
 
 import {
-  AccountInfoRequest,
   AccountSet,
   AccountSetAsfFlags,
   IssuedCurrency,
@@ -187,16 +186,12 @@ describe('XChainCreateBridge', function () {
       }
       await testTransaction(testContext.client, signerTx, testContext.wallet)
 
-      const signerAccountInfoResponse = await testContext.client.request<
-        AccountInfoRequest,
-        1
-      >({
+      const signerAccountInfoResponse = await testContext.client.request({
         command: 'account_info',
         account: testContext.wallet.classicAddress,
         signer_lists: true,
       })
-      const signerListInfo =
-        signerAccountInfoResponse.result.account_data.signer_lists?.[0]
+      const signerListInfo = signerAccountInfoResponse.result.signer_lists?.[0]
       assert.deepEqual(
         signerListInfo?.SignerEntries,
         signerTx.SignerEntries,

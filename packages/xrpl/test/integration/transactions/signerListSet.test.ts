@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { AccountInfoRequest, SignerListSet } from '../../../src'
+import { SignerListSet } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -45,16 +45,12 @@ describe('SignerListSet', function () {
       }
       await testTransaction(testContext.client, tx, testContext.wallet)
 
-      const accountInfoResponse = await testContext.client.request<
-        AccountInfoRequest,
-        1
-      >({
+      const accountInfoResponse = await testContext.client.request({
         command: 'account_info',
         account: testContext.wallet.classicAddress,
         signer_lists: true,
       })
-      const signerListInfo =
-        accountInfoResponse.result.account_data.signer_lists?.[0]
+      const signerListInfo = accountInfoResponse.result.signer_lists?.[0]
       assert.deepEqual(
         signerListInfo?.SignerEntries,
         tx.SignerEntries,

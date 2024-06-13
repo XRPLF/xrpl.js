@@ -3,7 +3,6 @@ import { assert } from 'chai'
 import {
   AMMDeposit,
   AMMDepositFlags,
-  AccountInfoRequest,
   Client,
   Currency,
   SignerListSet,
@@ -154,15 +153,12 @@ export async function setupBridge(client: Client): Promise<TestBridge> {
   }
   await testTransaction(client, signerTx, doorAccount)
 
-  const signerAccountInfoResponse = await client.request<AccountInfoRequest, 1>(
-    {
-      command: 'account_info',
-      account: doorAccount.classicAddress,
-      signer_lists: true,
-    },
-  )
-  const signerListInfo =
-    signerAccountInfoResponse.result.account_data.signer_lists?.[0]
+  const signerAccountInfoResponse = await client.request({
+    command: 'account_info',
+    account: doorAccount.classicAddress,
+    signer_lists: true,
+  })
+  const signerListInfo = signerAccountInfoResponse.result.signer_lists?.[0]
   assert.deepEqual(
     signerListInfo?.SignerEntries,
     signerTx.SignerEntries,

@@ -15,6 +15,8 @@ import {
   AccountInfoAccountFlags,
   AccountInfoRequest,
   AccountInfoResponse,
+  AccountInfoV1Response,
+  AccountInfoVersionResponseMap,
   AccountQueueData,
   AccountQueueTransaction,
 } from './accountInfo'
@@ -42,6 +44,8 @@ import {
 import {
   AccountTxRequest,
   AccountTxResponse,
+  AccountTxV1Response,
+  AccountTxVersionResponseMap,
   AccountTxTransaction,
 } from './accountTx'
 import { AMMInfoRequest, AMMInfoResponse } from './ammInfo'
@@ -78,11 +82,13 @@ import {
   LedgerQueueData,
   LedgerRequest,
   LedgerResponse,
+  LedgerV1Response,
   LedgerRequestExpandedTransactionsOnly,
   LedgerResponseExpanded,
   LedgerRequestExpandedAccountsAndTransactions,
   LedgerRequestExpandedAccountsOnly,
   LedgerRequestExpandedTransactionsBinary,
+  LedgerVersionResponseMap,
 } from './ledger'
 import { LedgerClosedRequest, LedgerClosedResponse } from './ledgerClosed'
 import { LedgerCurrentRequest, LedgerCurrentResponse } from './ledgerCurrent'
@@ -137,6 +143,8 @@ import { SubmitRequest, SubmitResponse } from './submit'
 import {
   SubmitMultisignedRequest,
   SubmitMultisignedResponse,
+  SubmitMultisignedV1Response,
+  SubmitMultisignedVersionResponseMap,
 } from './submitMultisigned'
 import {
   BooksSnapshot,
@@ -157,7 +165,7 @@ import {
   TransactionEntryRequest,
   TransactionEntryResponse,
 } from './transactionEntry'
-import { TxRequest, TxResponse } from './tx'
+import { TxRequest, TxResponse, TxV1Response, TxVersionResponseMap } from './tx'
 import {
   UnsubscribeBook,
   UnsubscribeRequest,
@@ -226,23 +234,23 @@ type Response<Version extends APIVersion> =
   // account methods
   | AccountChannelsResponse
   | AccountCurrenciesResponse
-  | AccountInfoResponse<Version>
+  | AccountInfoVersionResponseMap<Version>
   | AccountLinesResponse
   | AccountNFTsResponse
   | AccountObjectsResponse
   | AccountOffersResponse
-  | AccountTxResponse
+  | AccountTxVersionResponseMap<Version>
   | GatewayBalancesResponse
   | NoRippleCheckResponse
   // ledger methods
-  | LedgerResponse
+  | LedgerVersionResponseMap<Version>
   | LedgerClosedResponse
   | LedgerCurrentResponse
   | LedgerDataResponse
   | LedgerEntryResponse
   // transaction methods
   | SubmitResponse
-  | SubmitMultisignedResponse
+  | SubmitMultisignedVersionResponseMap<Version>
   | TransactionEntryResponse
   | TxResponse
   // path and order book methods
@@ -283,7 +291,7 @@ export type RequestResponseMap<
   : T extends AccountCurrenciesRequest
   ? AccountCurrenciesResponse
   : T extends AccountInfoRequest
-  ? AccountInfoResponse<Version>
+  ? AccountInfoVersionResponseMap<Version>
   : T extends AccountLinesRequest
   ? AccountLinesResponse
   : T extends AccountNFTsRequest
@@ -293,7 +301,7 @@ export type RequestResponseMap<
   : T extends AccountOffersRequest
   ? AccountOffersResponse
   : T extends AccountTxRequest
-  ? AccountTxResponse
+  ? AccountTxVersionResponseMap<Version>
   : T extends AMMInfoRequest
   ? AMMInfoResponse
   : T extends GatewayBalancesRequest
@@ -359,15 +367,15 @@ export type RequestResponseMap<
   // then we'd get the wrong response type, LedgerResponse, instead of
   // LedgerResponseExpanded.
   T extends LedgerRequestExpandedTransactionsBinary
-  ? LedgerResponse
+  ? LedgerVersionResponseMap<Version>
   : T extends LedgerRequestExpandedAccountsAndTransactions
-  ? LedgerResponseExpanded
+  ? LedgerResponseExpanded<Version>
   : T extends LedgerRequestExpandedTransactionsOnly
-  ? LedgerResponseExpanded
+  ? LedgerResponseExpanded<Version>
   : T extends LedgerRequestExpandedAccountsOnly
-  ? LedgerResponseExpanded
+  ? LedgerResponseExpanded<Version>
   : T extends LedgerRequest
-  ? LedgerResponse
+  ? LedgerVersionResponseMap<Version>
   : T extends LedgerClosedRequest
   ? LedgerClosedResponse
   : T extends LedgerCurrentRequest
@@ -379,11 +387,11 @@ export type RequestResponseMap<
   : T extends SubmitRequest
   ? SubmitResponse
   : T extends SubmitMultisignedRequest
-  ? SubmitMultisignedResponse
+  ? SubmitMultisignedVersionResponseMap<Version>
   : T extends TransactionEntryRequest
   ? TransactionEntryResponse
   : T extends TxRequest
-  ? TxResponse
+  ? TxVersionResponseMap<Version>
   : T extends BookOffersRequest
   ? BookOffersResponse
   : T extends DepositAuthorizedRequest
@@ -445,7 +453,7 @@ export type RequestAllResponseMap<
   : T extends AccountOffersRequest
   ? AccountOffersResponse
   : T extends AccountTxRequest
-  ? AccountTxResponse
+  ? AccountTxVersionResponseMap<Version>
   : T extends LedgerDataRequest
   ? LedgerDataResponse
   : T extends AccountTxRequest
@@ -470,6 +478,7 @@ export {
   AccountInfoAccountFlags,
   AccountInfoRequest,
   AccountInfoResponse,
+  AccountInfoV1Response,
   AccountQueueData,
   AccountQueueTransaction,
   AccountLinesRequest,
@@ -487,6 +496,7 @@ export {
   AccountOffersResponse,
   AccountTxRequest,
   AccountTxResponse,
+  AccountTxV1Response,
   AccountTxTransaction,
   GatewayBalance,
   GatewayBalancesRequest,
@@ -498,6 +508,7 @@ export {
   // ledger methods
   LedgerRequest,
   LedgerResponse,
+  LedgerV1Response,
   LedgerQueueData,
   LedgerBinary,
   LedgerModifiedOfferCreateTransaction,
@@ -517,10 +528,12 @@ export {
   SubmitResponse,
   SubmitMultisignedRequest,
   SubmitMultisignedResponse,
+  SubmitMultisignedV1Response,
   TransactionEntryRequest,
   TransactionEntryResponse,
   TxRequest,
   TxResponse,
+  TxV1Response,
   // path and order book methods with types
   BookOffersRequest,
   BookOffer,

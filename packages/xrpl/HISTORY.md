@@ -4,7 +4,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
-### Non-Breaking Changes
+### BREAKING CHANGES
 * Use rippled api_version v2 as default while maintaining support for v1.
 
 ## 3.1.0 (2024-06-03)

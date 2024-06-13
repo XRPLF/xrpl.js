@@ -73,7 +73,7 @@ function isPartialPayment(
 }
 
 function txHasPartialPayment(response: TxResponse): boolean {
-  return isPartialPayment(response.result, response.result.meta)
+  return isPartialPayment(response.result.tx_json, response.result.meta)
 }
 
 function txEntryHasPartialPayment(response: TransactionEntryResponse): boolean {

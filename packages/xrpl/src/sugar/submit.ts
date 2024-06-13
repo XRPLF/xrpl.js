@@ -10,7 +10,7 @@ import type {
   Wallet,
 } from '..'
 import { ValidationError, XrplError } from '../errors'
-import { Signer } from '../models/common'
+import { DEFAULT_API_VERSION, Signer } from '../models/common'
 import { TxResponse } from '../models/methods'
 import { BaseTransaction } from '../models/transactions/common'
 
@@ -52,7 +52,7 @@ async function sleep(ms: number): Promise<void> {
 export async function submitRequest(
   client: Client,
   signedTransaction: SubmittableTransaction | string,
-  apiVersion: APIVersion = 1,
+  apiVersion: APIVersion = DEFAULT_API_VERSION,
   failHard = false,
 ): Promise<SubmitResponse> {
   if (!isSigned(signedTransaction)) {
@@ -122,11 +122,11 @@ export async function waitForFinalTransactionOutcome<
   txHash: string,
   lastLedger: number,
   submissionResult: string,
-  apiVersion: APIVersion = 1,
+  apiVersion: APIVersion = DEFAULT_API_VERSION,
 ): Promise<TxResponse<T>> {
   await sleep(LEDGER_CLOSE_TIME)
 
-  const latestLedger = await client.getLedgerIndex()
+  const latestLedger = await client.getLedgerIndex(apiVersion)
 
   if (lastLedger < latestLedger) {
     throw new XrplError(
@@ -238,7 +238,7 @@ export async function getSignedTx(
   client: Client,
   transaction: SubmittableTransaction | string,
   {
-    apiVersion = 1,
+    apiVersion = DEFAULT_API_VERSION,
     autofill = true,
     wallet,
   }: {

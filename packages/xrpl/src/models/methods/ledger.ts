@@ -1,4 +1,5 @@
-import { Ledger } from '../ledger'
+import { APIVersion, RIPPLED_API_V1 } from '../common'
+import { Ledger, LedgerV1, LedgerVersionMap } from '../ledger/Ledger'
 import { LedgerEntryFilter } from '../ledger/LedgerEntry'
 import { Transaction, TransactionAndMetadata } from '../transactions'
 import { TransactionMetadata } from '../transactions/metadata'
@@ -207,6 +208,12 @@ export interface LedgerBinary
   transactions?: string[]
 }
 
+export interface LedgerBinaryV1
+  extends Omit<Omit<LedgerV1, 'transactions'>, 'accountState'> {
+  accountState?: string[]
+  transactions?: string[]
+}
+
 interface LedgerResponseBase {
   /** Unique identifying hash of the entire ledger. */
   ledger_hash: string
@@ -231,6 +238,11 @@ interface LedgerResponseResult extends LedgerResponseBase {
   ledger: LedgerBinary
 }
 
+interface LedgerV1ResponseResult extends LedgerResponseBase {
+  /** The complete header data of this {@link Ledger}. */
+  ledger: LedgerBinaryV1
+}
+
 /**
  * Response expected from a {@link LedgerRequest}.
  * This is the default request response, triggered when `expand` and `binary` are both false.
@@ -241,9 +253,29 @@ export interface LedgerResponse extends BaseResponse {
   result: LedgerResponseResult
 }
 
-interface LedgerResponseExpandedResult extends LedgerResponseBase {
+/**
+ * Response expected from a {@link LedgerRequest}.
+ * This is the default request response, triggered when `expand` and `binary` are both false.
+ * This is the response for API version 1.
+ *
+ * @category Responses
+ */
+export interface LedgerV1Response extends BaseResponse {
+  result: LedgerV1ResponseResult
+}
+
+/**
+ * Type to map between the API version and the response type.
+ *
+ * @category Responses
+ */
+export type LedgerVersionResponseMap<Version extends APIVersion> =
+  Version extends typeof RIPPLED_API_V1 ? LedgerV1Response : LedgerResponse
+
+interface LedgerResponseExpandedResult<Version extends APIVersion>
+  extends LedgerResponseBase {
   /** The complete header data of this {@link Ledger}. */
-  ledger: Ledger
+  ledger: LedgerVersionMap<Version>
 }
 
 /**
@@ -254,6 +286,7 @@ interface LedgerResponseExpandedResult extends LedgerResponseBase {
  *
  * @category Responses
  */
-export interface LedgerResponseExpanded extends BaseResponse {
-  result: LedgerResponseExpandedResult
+export interface LedgerResponseExpanded<Version extends APIVersion>
+  extends BaseResponse {
+  result: LedgerResponseExpandedResult<Version>
 }

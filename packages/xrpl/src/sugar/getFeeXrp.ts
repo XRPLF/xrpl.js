@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js'
 
-import type { APIVersion, Client } from '..'
+// eslint-disable-next-line import/no-cycle -- Not an issue for DEFAULT_API_VERSION
+import { DEFAULT_API_VERSION, type APIVersion, type Client } from '..'
 import { XrplError } from '../errors'
 
 const NUM_DECIMAL_PLACES = 6
@@ -17,7 +18,7 @@ const BASE_10 = 10
  */
 export default async function getFeeXrp(
   client: Client,
-  apiVersion: APIVersion = 1,
+  apiVersion: APIVersion = DEFAULT_API_VERSION,
   cushion?: number,
 ): Promise<string> {
   const feeCushion = cushion ?? client.feeCushion
