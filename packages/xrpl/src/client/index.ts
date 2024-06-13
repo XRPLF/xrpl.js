@@ -685,8 +685,10 @@ class Client extends EventEmitter<EventTypes> {
       // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- This is a valid null check for Amount
       if (tx.Amount != null && tx.Amount !== tx.DeliverMax) {
-        throw new ValidationError(
-          'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
+        return Promise.reject(
+          new ValidationError(
+            'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
+          ),
         )
       }
 

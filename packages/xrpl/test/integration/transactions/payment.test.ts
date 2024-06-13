@@ -1,8 +1,6 @@
 import { assert } from 'chai'
 
-import { Payment } from '../../../src'
-import { ValidationError } from '../../../src/errors'
-// import { assertRejects } from '../../testUtils'
+import { Payment, Wallet } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -16,10 +14,10 @@ const TIMEOUT = 20000
 
 describe('Payment', function () {
   let testContext: XrplIntegrationTestContext
-  let payment_txn_example
+  let payment_txn_example: Payment
   let amount_: string
   // This wallet is used for DeliverMax related tests
-  let payment_txn_wallet
+  let payment_txn_wallet: Wallet
 
   beforeEach(async () => {
     testContext = await setupClient(serverUrl)
@@ -68,7 +66,9 @@ describe('Payment', function () {
     'Validate Payment transaction v2 API: Payment Transaction: Specify Only DeliverMax field',
     async () => {
       const payment_txn = payment_txn_example
+      // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
       payment_txn.DeliverMax = payment_txn.Amount
+      // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
       delete payment_txn.Amount
 
       const result = await testTransaction(
@@ -87,6 +87,7 @@ describe('Payment', function () {
     'Validate Payment transaction v2 API: Payment Transaction: identical DeliverMax and Amount fields',
     async () => {
       const payment_txn = payment_txn_example
+      // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
       payment_txn.DeliverMax = payment_txn.Amount
 
       const result = await testTransaction(
@@ -97,52 +98,6 @@ describe('Payment', function () {
 
       assert.equal(result.result.engine_result_code, 0)
       assert.equal((result.result.tx_json as Payment).Amount, amount_)
-    },
-    TIMEOUT,
-  )
-
-  // it('fails', () => {
-  //   try {
-  //     Promise.reject(new Error('No'))
-  //   } catch (error) {
-  //     assert(error instanceof Error)
-  //   }
-  // })
-
-  it(
-    'Payment transaction with differing DeliverMax and Amount fields',
-    async () => {
-      const payment_txn = payment_txn_example
-      payment_txn.DeliverMax = '7890'
-
-      // testTransaction(testContext.client, payment_txn, payment_txn_wallet)
-      //   .then((response) => {
-      //     throw Error(`A error is supposed to be thrown, but got ${response}`)
-      //   })
-      //   .catch((error) => {
-      //     console.log(`Error-v1! ${error}`) // error is printed correctly
-      //     assert(error instanceof ValidationError)
-      //     assert.equal(
-      //       error.message,
-      //       'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
-      //     )
-      //   })
-
-      try {
-        await testTransaction(
-          testContext.client,
-          payment_txn,
-          payment_txn_wallet,
-        )
-      } catch (error) {
-        await teardownClient(testContext)
-        console.log(`Error-v2! ${error}`) // error is printed correctly
-        assert(error instanceof ValidationError)
-        assert.equal(
-          error.message,
-          'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
-        )
-      }
     },
     TIMEOUT,
   )
