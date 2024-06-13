@@ -7,6 +7,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### BREAKING CHANGES
 * Use rippled api_version v2 as default while maintaining support for v1.
 
+### Added
+* Add `nfts_by_issuer` clio-only API definition
+
 ## 3.1.0 (2024-06-03)
 
 ### BREAKING CHANGES
