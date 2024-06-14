@@ -220,6 +220,12 @@ class Client extends EventEmitter<EventTypes> {
   public buildVersion: string | undefined
 
   /**
+   * API Version used by the server this client is connected to
+   *
+   */
+  public apiVersion: APIVersion = DEFAULT_API_VERSION
+
+  /**
    * Creates a new Client with a websocket connection to a rippled server.
    *
    * @param server - URL of the server to connect to.
@@ -335,7 +341,7 @@ class Client extends EventEmitter<EventTypes> {
         ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be string
           ensureClassicAddress(req.account as string)
         : undefined,
-      api_version: req.api_version ?? DEFAULT_API_VERSION,
+      api_version: req.api_version ?? this.apiVersion,
     }
     const response = await this.connection.request<R, T>(request)
 
@@ -432,7 +438,6 @@ class Client extends EventEmitter<EventTypes> {
    * @category Network
    *
    * @param request - The initial request to send to the server.
-   * @param apiVersion - The rippled API version to use for the request.
    * @param collect - (Optional) the param to use to collect the array of resources (only needed if command is unknown).
    * @returns The array of all responses.
    * @throws ValidationError if there is no collection key (either from a known command or for the unknown command).
@@ -647,14 +652,12 @@ class Client extends EventEmitter<EventTypes> {
    * @template T
    * @param transaction - A {@link SubmittableTransaction} in JSON format
    * @param signersCount - The expected number of signers for this transaction.
-   * @param apiVersion - The rippled API version to use for the request.
    * Only used for multisigned transactions.
    * @returns The autofilled transaction.
    */
   public async autofill<T extends SubmittableTransaction>(
     transaction: T,
     signersCount?: number,
-    apiVersion: APIVersion = DEFAULT_API_VERSION,
   ): Promise<T> {
     const tx = { ...transaction }
 
@@ -670,15 +673,13 @@ class Client extends EventEmitter<EventTypes> {
       promises.push(setNextValidSequenceNumber(this, tx))
     }
     if (tx.Fee == null) {
-      promises.push(
-        calculateFeePerTransactionType(this, tx, signersCount, apiVersion),
-      )
+      promises.push(calculateFeePerTransactionType(this, tx, signersCount))
     }
     if (tx.LastLedgerSequence == null) {
-      promises.push(setLatestValidatedLedgerSequence(this, tx, apiVersion))
+      promises.push(setLatestValidatedLedgerSequence(this, tx))
     }
     if (tx.TransactionType === 'AccountDelete') {
-      promises.push(checkAccountDeleteBlockers(this, tx, apiVersion))
+      promises.push(checkAccountDeleteBlockers(this, tx))
     }
 
     return Promise.all(promises).then(() => tx)
@@ -695,7 +696,6 @@ class Client extends EventEmitter<EventTypes> {
    *
    * @param transaction - A transaction to autofill, sign & encode, and submit.
    * @param opts - (Optional) Options used to sign and submit a transaction.
-   * @param opts.apiVersion - The rippled API version to use for the request.
    * @param opts.autofill - If true, autofill a transaction.
    * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
    * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
@@ -722,7 +722,6 @@ class Client extends EventEmitter<EventTypes> {
   public async submit(
     transaction: SubmittableTransaction | string,
     opts?: {
-      apiVersion?: APIVersion
       // If true, autofill a transaction.
       autofill?: boolean
       // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
@@ -732,7 +731,7 @@ class Client extends EventEmitter<EventTypes> {
     },
   ): Promise<SubmitResponse> {
     const signedTx = await getSignedTx(this, transaction, opts)
-    return submitRequest(this, signedTx, opts?.apiVersion, opts?.failHard)
+    return submitRequest(this, signedTx, opts?.failHard)
   }
 
   /**
@@ -778,7 +777,6 @@ class Client extends EventEmitter<EventTypes> {
    * This is similar to `submitAndWait` which does all of the above, but also waits to see if the transaction has been validated.
    * @param transaction - A transaction to autofill, sign & encode, and submit.
    * @param opts - (Optional) Options used to sign and submit a transaction.
-   * @param opts.apiVersion - The rippled API version to use for the request.
    * @param opts.autofill - If true, autofill a transaction.
    * @param opts.failHard - If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
    * @param opts.wallet - A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
@@ -798,7 +796,6 @@ class Client extends EventEmitter<EventTypes> {
   >(
     transaction: T | string,
     opts?: {
-      apiVersion?: APIVersion
       // If true, autofill a transaction.
       autofill?: boolean
       // If true, and the transaction fails locally, do not retry or relay the transaction to other servers.
@@ -816,12 +813,7 @@ class Client extends EventEmitter<EventTypes> {
       )
     }
 
-    const response = await submitRequest(
-      this,
-      signedTx,
-      opts?.apiVersion,
-      opts?.failHard,
-    )
+    const response = await submitRequest(this, signedTx, opts?.failHard)
 
     const txHash = hashes.hashSignedTx(signedTx)
     return waitForFinalTransactionOutcome(
@@ -829,7 +821,6 @@ class Client extends EventEmitter<EventTypes> {
       txHash,
       lastLedger,
       response.result.engine_result,
-      opts?.apiVersion,
     )
   }
 
@@ -838,16 +829,14 @@ class Client extends EventEmitter<EventTypes> {
    *
    * @param transaction - A {@link Transaction} in JSON format
    * @param signersCount - The expected number of signers for this transaction.
-   * @param apiVersion - The rippled API version to use for the request.
    * Only used for multisigned transactions.
    * @deprecated Use autofill instead, provided for users familiar with v1
    */
   public async prepareTransaction(
     transaction: SubmittableTransaction,
     signersCount?: number,
-    apiVersion: APIVersion = DEFAULT_API_VERSION,
   ): ReturnType<Client['autofill']> {
-    return this.autofill(transaction, signersCount, apiVersion)
+    return this.autofill(transaction, signersCount)
   }
 
   /**
@@ -1049,7 +1038,6 @@ class Client extends EventEmitter<EventTypes> {
   /**
    * Returns the index of the most recently validated ledger.
    *
-   * @param apiVersion - The rippled API version to use for the request.
    * @category Abstraction
    *
    * @returns The most recently validated ledger index.
@@ -1064,16 +1052,15 @@ class Client extends EventEmitter<EventTypes> {
    * // 884039
    * ```
    */
-  public async getLedgerIndex(
-    apiVersion: APIVersion = DEFAULT_API_VERSION,
-  ): Promise<number> {
-    const ledgerResponse = await this.request<LedgerRequest, typeof apiVersion>(
-      {
-        command: 'ledger',
-        ledger_index: 'validated',
-        api_version: apiVersion,
-      },
-    )
+  public async getLedgerIndex(): Promise<number> {
+    const ledgerResponse = await this.request<
+      LedgerRequest,
+      typeof this.apiVersion
+    >({
+      command: 'ledger',
+      ledger_index: 'validated',
+      api_version: this.apiVersion,
+    })
     return ledgerResponse.result.ledger_index
   }
 

@@ -1,7 +1,6 @@
 import { decode, encode } from 'ripple-binary-codec'
 
 import type {
-  APIVersion,
   Client,
   SubmitRequest,
   SubmitResponse,
@@ -10,7 +9,7 @@ import type {
   Wallet,
 } from '..'
 import { ValidationError, XrplError } from '../errors'
-import { DEFAULT_API_VERSION, Signer } from '../models/common'
+import { Signer } from '../models/common'
 import { TxResponse } from '../models/methods'
 import { BaseTransaction } from '../models/transactions/common'
 
@@ -31,7 +30,6 @@ async function sleep(ms: number): Promise<void> {
  * @param client - The client to submit the request to.
  * @param signedTransaction - The signed transaction to submit. It can be either a Transaction object or a
  * string (encode from ripple-binary-codec) representation of the transaction.
- * @param apiVersion - Optional. The rippled version to use for the submission. Default is 1.
  * @param [failHard=false] - Optional. Determines whether the submission should fail hard (true) or not (false). Default is false.
  * @returns A promise that resolves with the response from the client.
  * @throws {ValidationError} If the signed transaction is not valid (not signed).
@@ -48,11 +46,9 @@ async function sleep(ms: number): Promise<void> {
  * const signedTransactionString = encode(signedTransaction);
  * const response2 = await submitRequest(client, signedTransactionString, true);
  */
-// eslint-disable-next-line max-params -- necessary for the function to work
 export async function submitRequest(
   client: Client,
   signedTransaction: SubmittableTransaction | string,
-  apiVersion: APIVersion = DEFAULT_API_VERSION,
   failHard = false,
 ): Promise<SubmitResponse> {
   if (!isSigned(signedTransaction)) {
@@ -67,7 +63,6 @@ export async function submitRequest(
     command: 'submit',
     tx_blob: signedTxEncoded,
     fail_hard: isAccountDelete(signedTransaction) || failHard,
-    api_version: apiVersion,
   }
   return client.request(request)
 }
@@ -82,7 +77,6 @@ export async function submitRequest(
  * @param txHash - The hash of the transaction to wait for.
  * @param lastLedger - The last ledger sequence of the transaction.
  * @param submissionResult - The preliminary result of the transaction.
- * @param apiVersion - Optional. The rippled API version to use for the submission. Default is 1.
  * @returns A promise that resolves with the final transaction response.
  *
  * @throws {XrplError} If the latest ledger sequence surpasses the transaction's lastLedgerSequence.
@@ -122,11 +116,10 @@ export async function waitForFinalTransactionOutcome<
   txHash: string,
   lastLedger: number,
   submissionResult: string,
-  apiVersion: APIVersion = DEFAULT_API_VERSION,
 ): Promise<TxResponse<T>> {
   await sleep(LEDGER_CLOSE_TIME)
 
-  const latestLedger = await client.getLedgerIndex(apiVersion)
+  const latestLedger = await client.getLedgerIndex()
 
   if (lastLedger < latestLedger) {
     throw new XrplError(
@@ -139,7 +132,6 @@ export async function waitForFinalTransactionOutcome<
     .request({
       command: 'tx',
       transaction: txHash,
-      api_version: apiVersion,
     })
     .catch(async (error) => {
       // error is of an unknown type and hence we assert type to extract the value we need.
@@ -151,7 +143,6 @@ export async function waitForFinalTransactionOutcome<
           txHash,
           lastLedger,
           submissionResult,
-          apiVersion,
         )
       }
       throw new Error(
@@ -171,7 +162,6 @@ export async function waitForFinalTransactionOutcome<
     txHash,
     lastLedger,
     submissionResult,
-    apiVersion,
   )
 }
 
@@ -207,7 +197,6 @@ function isSigned(transaction: SubmittableTransaction | string): boolean {
  * @param transaction - The transaction to retrieve. It can be either a Transaction object or
  * a string (encode from ripple-binary-codec) representation of the transaction.
  * @param [options={}] - Optional. Additional options for retrieving the signed transaction.
- * @param [options.apiVersion=1] - Optional. The rippled API version to use for the submission. Default is 1.
  * @param [options.autofill=true] - Optional. Determines whether the transaction should be autofilled (true)
  * or not (false). Default is true.
  * @param [options.wallet] - Optional. A wallet to sign the transaction. It must be provided when submitting
@@ -238,11 +227,9 @@ export async function getSignedTx(
   client: Client,
   transaction: SubmittableTransaction | string,
   {
-    apiVersion = DEFAULT_API_VERSION,
     autofill = true,
     wallet,
   }: {
-    apiVersion?: APIVersion
     // If true, autofill a transaction.
     autofill?: boolean
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
@@ -266,7 +253,7 @@ export async function getSignedTx(
       : transaction
 
   if (autofill) {
-    tx = await client.autofill(tx, undefined, apiVersion)
+    tx = await client.autofill(tx, undefined)
   }
 
   return wallet.sign(tx).tx_blob

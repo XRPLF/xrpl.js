@@ -1,7 +1,6 @@
 import BigNumber from 'bignumber.js'
 
-// eslint-disable-next-line import/no-cycle -- Not an issue for DEFAULT_API_VERSION
-import { DEFAULT_API_VERSION, type APIVersion, type Client } from '..'
+import { type Client } from '..'
 import { XrplError } from '../errors'
 
 const NUM_DECIMAL_PLACES = 6
@@ -12,13 +11,11 @@ const BASE_10 = 10
  * Note: This is a public API that can be called directly.
  *
  * @param client - The Client used to connect to the ledger.
- * @param apiVersion - The rippled API version to use.
  * @param cushion - The fee cushion to use.
  * @returns The transaction fee.
  */
 export default async function getFeeXrp(
   client: Client,
-  apiVersion: APIVersion = DEFAULT_API_VERSION,
   cushion?: number,
 ): Promise<string> {
   const feeCushion = cushion ?? client.feeCushion
@@ -26,7 +23,7 @@ export default async function getFeeXrp(
   const serverInfo = (
     await client.request({
       command: 'server_info',
-      api_version: apiVersion,
+      api_version: client.apiVersion,
     })
   ).result.info
 
