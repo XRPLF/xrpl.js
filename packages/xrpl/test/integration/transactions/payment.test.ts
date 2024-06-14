@@ -47,7 +47,7 @@ describe('Payment', function () {
   )
 
   it(
-    'Validate Payment transaction v2 API: Payment Transaction: Specify Only Amount field',
+    'Validate Payment transaction API v2: Payment Transaction: Specify Only Amount field',
     async () => {
       const result = await testTransaction(
         testContext.client,
