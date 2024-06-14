@@ -14,7 +14,7 @@ const TIMEOUT = 20000
 
 describe('Payment', function () {
   let testContext: XrplIntegrationTestContext
-  let paymentTxExample: Payment
+  let paymentTx: Payment
   const AMOUNT = '200000000'
   // This wallet is used for DeliverMax related tests
   let paymentTxWallet: Wallet
@@ -22,7 +22,7 @@ describe('Payment', function () {
   beforeEach(async () => {
     testContext = await setupClient(serverUrl)
     paymentTxWallet = await generateFundedWallet(testContext.client)
-    paymentTxExample = {
+    paymentTx = {
       TransactionType: 'Payment',
       Account: paymentTxWallet.classicAddress,
       Amount: AMOUNT,
@@ -51,7 +51,7 @@ describe('Payment', function () {
     async () => {
       const result = await testTransaction(
         testContext.client,
-        paymentTxExample,
+        paymentTx,
         paymentTxWallet,
       )
 
@@ -64,7 +64,6 @@ describe('Payment', function () {
   it(
     'Validate Payment transaction v2 API: Payment Transaction: Specify Only DeliverMax field',
     async () => {
-      const paymentTx = paymentTxExample
       // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
       paymentTx.DeliverMax = paymentTx.Amount
       // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
@@ -85,7 +84,6 @@ describe('Payment', function () {
   it(
     'Validate Payment transaction v2 API: Payment Transaction: identical DeliverMax and Amount fields',
     async () => {
-      const paymentTx = paymentTxExample
       // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
       paymentTx.DeliverMax = paymentTx.Amount
 

@@ -24,8 +24,8 @@ const HOOKS_TESTNET_ID = 21338
 
 describe('client.autofill', function () {
   let testContext: XrplTestContext
-  let paytxn
-  let amount_: string
+  const AMOUNT = '1234'
+  let paymentTx: Payment
 
   async function setupMockRippledVersionAndID(
     buildVersion: string,
@@ -46,11 +46,10 @@ describe('client.autofill', function () {
 
   beforeEach(async () => {
     testContext = await setupClient()
-    amount_ = '1234'
-    paytxn = {
+    paymentTx = {
       TransactionType: 'Payment',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
-      Amount: amount_,
+      Amount: AMOUNT,
       Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       DestinationTag: 1,
       Fee: '12',
@@ -67,45 +66,42 @@ describe('client.autofill', function () {
         [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
       ],
       SendMax: '100000000',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Represent transaction JSON with `any` type
-    } as any
+    }
   })
   afterEach(async () => teardownClient(testContext))
 
   it('Validate Payment transaction v2 API: Payment Transaction: Specify Only Amount field', async function () {
-    const txResult = await testContext.client.autofill(paytxn)
+    const txResult = await testContext.client.autofill(paymentTx)
 
-    assert.strictEqual(txResult.Amount, amount_)
+    assert.strictEqual(txResult.Amount, AMOUNT)
   })
 
   it('Validate Payment transaction v2 API: Payment Transaction: Specify Only DeliverMax field', async function () {
-    const payment_txn = paytxn
-    payment_txn.DeliverMax = payment_txn.Amount
-    delete payment_txn.Amount
-    const txResult = await testContext.client.autofill(payment_txn)
+    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
+    paymentTx.DeliverMax = paymentTx.Amount
+    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
+    delete paymentTx.Amount
+    const txResult = await testContext.client.autofill(paymentTx)
 
-    assert.strictEqual(txResult.Amount, amount_)
+    assert.strictEqual(txResult.Amount, AMOUNT)
   })
 
   it('Validate Payment transaction v2 API: Payment Transaction: identical DeliverMax and Amount fields', async function () {
-    const payment_txn = paytxn
-    payment_txn.DeliverMax = payment_txn.Amount
+    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
+    paymentTx.DeliverMax = paymentTx.Amount
 
-    const txResult = await testContext.client.autofill(payment_txn)
+    const txResult = await testContext.client.autofill(paymentTx)
 
-    assert.strictEqual(txResult.Amount, amount_)
+    assert.strictEqual(txResult.Amount, AMOUNT)
     assert.strictEqual('DeliverMax' in txResult, false)
   })
 
   it('Validate Payment transaction v2 API: Payment Transaction: differing DeliverMax and Amount fields', async function () {
-    const payment_txn = paytxn
-    payment_txn.DeliverMax = '6789'
-    payment_txn.Amount = '1234'
+    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
+    paymentTx.DeliverMax = '6789'
+    paymentTx.Amount = '1234'
 
-    await assertRejects(
-      testContext.client.autofill(payment_txn),
-      ValidationError,
-    )
+    await assertRejects(testContext.client.autofill(paymentTx), ValidationError)
   })
 
   it('should not autofill if fields are present', async function () {
