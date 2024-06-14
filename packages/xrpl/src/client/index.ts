@@ -642,7 +642,7 @@ class Client extends EventEmitter<EventTypes> {
    * @throws ValidationError If Amount and DeliverMax fields are not identical in a Payment Transaction
    */
 
-  // eslint-disable-next-line complexity -- handling v2 Payment transaction API requires more logic
+  // eslint-disable-next-line complexity -- handling Payment transaction API v2 requires more logic
   public async autofill<T extends SubmittableTransaction>(
     transaction: T,
     signersCount?: number,
