@@ -44,8 +44,12 @@ describe('client.autofill', function () {
     await testContext.client.connect()
   }
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     testContext = await setupClient()
+  })
+  afterAll(async () => teardownClient(testContext))
+
+  beforeEach(async () => {
     paymentTx = {
       TransactionType: 'Payment',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
@@ -68,15 +72,14 @@ describe('client.autofill', function () {
       SendMax: '100000000',
     }
   })
-  afterEach(async () => teardownClient(testContext))
 
-  it('Validate Payment transaction v2 API: Payment Transaction: Specify Only Amount field', async function () {
+  it('Validate Payment transaction API v2: Payment Transaction: Specify Only Amount field', async function () {
     const txResult = await testContext.client.autofill(paymentTx)
 
     assert.strictEqual(txResult.Amount, AMOUNT)
   })
 
-  it('Validate Payment transaction v2 API: Payment Transaction: Specify Only DeliverMax field', async function () {
+  it('Validate Payment transaction API v2: Payment Transaction: Specify Only DeliverMax field', async function () {
     // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
     paymentTx.DeliverMax = paymentTx.Amount
     // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
@@ -86,7 +89,7 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.Amount, AMOUNT)
   })
 
-  it('Validate Payment transaction v2 API: Payment Transaction: identical DeliverMax and Amount fields', async function () {
+  it('Validate Payment transaction API v2: Payment Transaction: identical DeliverMax and Amount fields', async function () {
     // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
     paymentTx.DeliverMax = paymentTx.Amount
 
@@ -96,7 +99,7 @@ describe('client.autofill', function () {
     assert.strictEqual('DeliverMax' in txResult, false)
   })
 
-  it('Validate Payment transaction v2 API: Payment Transaction: differing DeliverMax and Amount fields', async function () {
+  it('Validate Payment transaction API v2: Payment Transaction: differing DeliverMax and Amount fields', async function () {
     // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
     paymentTx.DeliverMax = '6789'
     paymentTx.Amount = '1234'

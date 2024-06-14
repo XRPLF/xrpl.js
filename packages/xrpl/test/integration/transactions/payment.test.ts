@@ -15,30 +15,34 @@ const TIMEOUT = 20000
 describe('Payment', function () {
   let testContext: XrplIntegrationTestContext
   let paymentTx: Payment
-  const AMOUNT = '200000000'
+  const AMOUNT = '10000000'
   // This wallet is used for DeliverMax related tests
-  let paymentTxWallet: Wallet
+  let senderWallet: Wallet
 
   beforeEach(async () => {
-    testContext = await setupClient(serverUrl)
-    paymentTxWallet = await generateFundedWallet(testContext.client)
+    // this payment transaction JSON needs to be refreshed before every test.
+    // Because, we tinker with Amount and DeliverMax fields in the API v2 tests
     paymentTx = {
       TransactionType: 'Payment',
-      Account: paymentTxWallet.classicAddress,
+      Account: senderWallet.classicAddress,
       Amount: AMOUNT,
       Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
     }
   })
-  afterEach(async () => teardownClient(testContext))
+
+  beforeAll(async () => {
+    testContext = await setupClient(serverUrl)
+    senderWallet = await generateFundedWallet(testContext.client)
+  })
+  afterAll(async () => teardownClient(testContext))
 
   it(
     'base',
     async () => {
-      const wallet2 = await generateFundedWallet(testContext.client)
       const tx: Payment = {
         TransactionType: 'Payment',
         Account: testContext.wallet.classicAddress,
-        Destination: wallet2.classicAddress,
+        Destination: senderWallet.classicAddress,
         Amount: '1000',
       }
       await testTransaction(testContext.client, tx, testContext.wallet)
@@ -52,7 +56,7 @@ describe('Payment', function () {
       const result = await testTransaction(
         testContext.client,
         paymentTx,
-        paymentTxWallet,
+        senderWallet,
       )
 
       assert.equal(result.result.engine_result_code, 0)
@@ -72,7 +76,7 @@ describe('Payment', function () {
       const result = await testTransaction(
         testContext.client,
         paymentTx,
-        paymentTxWallet,
+        senderWallet,
       )
 
       assert.equal(result.result.engine_result_code, 0)
@@ -90,7 +94,7 @@ describe('Payment', function () {
       const result = await testTransaction(
         testContext.client,
         paymentTx,
-        paymentTxWallet,
+        senderWallet,
       )
 
       assert.equal(result.result.engine_result_code, 0)
