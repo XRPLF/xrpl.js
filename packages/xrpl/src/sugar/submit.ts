@@ -253,7 +253,7 @@ export async function getSignedTx(
       : transaction
 
   if (autofill) {
-    tx = await client.autofill(tx, undefined)
+    tx = await client.autofill(tx)
   }
 
   return wallet.sign(tx).tx_blob
