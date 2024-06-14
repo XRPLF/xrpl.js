@@ -82,7 +82,7 @@ describe('Payment', function () {
   )
 
   it(
-    'Validate Payment transaction v2 API: Payment Transaction: identical DeliverMax and Amount fields',
+    'Validate Payment transaction API v2: Payment Transaction: identical DeliverMax and Amount fields',
     async () => {
       // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
       paymentTx.DeliverMax = paymentTx.Amount
