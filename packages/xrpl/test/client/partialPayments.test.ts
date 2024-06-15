@@ -84,6 +84,7 @@ describe('client handling of tfPartialPayments', function () {
       tx_json: partial.result.tx_json,
       meta: partial.result.meta,
       validated: true,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- we are mocking the response
     } as any)
 
     testContext.mockRippled!.addResponse('account_tx', mockResponse)
@@ -108,6 +109,7 @@ describe('client handling of tfPartialPayments', function () {
       tx_json: partial.result.tx_json,
       meta: partial.result.meta,
       validated: true,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- we are mocking the response
     } as any)
 
     testContext.mockRippled!.addResponse('account_tx', mockResponse)
