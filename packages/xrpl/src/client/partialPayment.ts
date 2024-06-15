@@ -85,7 +85,10 @@ function txEntryHasPartialPayment(response: TransactionEntryResponse): boolean {
 
 function accountTxHasPartialPayment(response: AccountTxResponse): boolean {
   const { transactions } = response.result
-  const foo = transactions.some((tx) => isPartialPayment(tx.tx_json, tx.meta))
+  const foo = transactions.some((tx) =>
+    // API v2 returns tx_json, API v1 returns tx
+    isPartialPayment(tx.tx_json ?? tx.tx, tx.meta),
+  )
   return foo
 }
 
