@@ -66,7 +66,7 @@ export interface AccountTxTransaction<Version extends APIVersion> {
   tx_json?: Version extends typeof RIPPLED_API_V2
     ? Transaction & ResponseOnlyTxInfo
     : never
-  /** JSON object defining the transaction. */
+  /** JSON object defining the transaction in rippled API v1. */
   tx?: Version extends typeof RIPPLED_API_V1
     ? Transaction & ResponseOnlyTxInfo
     : never
