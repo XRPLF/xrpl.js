@@ -87,12 +87,35 @@ export interface AccountTxTransaction<Version extends APIVersion> {
 interface AccountTxResponseBase<Version extends APIVersion>
   extends BaseResponse {
   result: {
+    /** Unique Address identifying the related account. */
     account: string
+    /**
+     * The ledger index of the earliest ledger actually searched for
+     * transactions.
+     */
     ledger_index_min: number
+    /**
+     * The ledger index of the most recent ledger actually searched for
+     * transactions.
+     */
     ledger_index_max: number
+    /** The limit value used in the request. */
     limit: number
+    /**
+     * Server-defined value indicating the response is paginated. Pass this
+     * to the next call to resume where this call left off.
+     */
     marker?: unknown
+    /**
+     * Array of transactions matching the request's criteria, as explained
+     * below.
+     */
     transactions: Array<AccountTxTransaction<Version>>
+    /**
+     * If included and set to true, the information in this response comes from
+     * a validated ledger version. Otherwise, the information is subject to
+     * change.
+     */
     validated?: boolean
   }
 }
