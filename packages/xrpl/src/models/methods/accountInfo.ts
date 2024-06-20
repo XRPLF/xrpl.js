@@ -139,10 +139,6 @@ interface BaseAccountInfoResponse extends BaseResponse {
     /**
      * The AccountRoot ledger object with this account's information, as stored
      * in the ledger.
-     * If requested, also includes Array of SignerList ledger objects
-     * associated with this account for Multi-Signing. Since an account can own
-     * at most one SignerList, this array must have exactly one member if it is
-     * present.
      */
     account_data: AccountRoot
     /**
@@ -184,7 +180,7 @@ interface BaseAccountInfoResponse extends BaseResponse {
 export interface AccountInfoResponse extends BaseAccountInfoResponse {
   result: BaseAccountInfoResponse['result'] & {
     /**
-     * Array of SignerList ledger objects associated with this account for Multi-Signing.
+     * If requested, array of SignerList ledger objects associated with this account for Multi-Signing.
      * Since an account can own at most one SignerList, this array must have exactly one
      * member if it is present.
      * Quirk: In API version 1, this field is nested under account_data. For this method,
