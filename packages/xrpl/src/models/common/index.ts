@@ -109,6 +109,10 @@ export interface ResponseOnlyTxInfo {
    */
   ledger_index?: number
   /**
+   * The hash of the ledger included this transaction.
+   */
+  ledger_hash?: string
+  /**
    * @deprecated Alias for ledger_index.
    */
   inLedger?: number
