@@ -345,7 +345,6 @@ export async function checkAccountDeleteBlockers(
     account: tx.Account,
     ledger_index: 'validated',
     deletion_blockers_only: true,
-    api_version: client.apiVersion,
   }
   const response = await client.request(request)
   return new Promise((resolve, reject) => {

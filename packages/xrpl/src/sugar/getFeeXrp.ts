@@ -23,7 +23,6 @@ export default async function getFeeXrp(
   const serverInfo = (
     await client.request({
       command: 'server_info',
-      api_version: client.apiVersion,
     })
   ).result.info
 
