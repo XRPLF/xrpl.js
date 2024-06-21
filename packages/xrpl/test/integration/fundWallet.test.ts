@@ -84,40 +84,6 @@ describe('fundWallet', function () {
   // })
 
   it(
-    'can generate wallet on hooks v3 testnet',
-    async function () {
-      const api = new Client('wss://hooks-testnet-v3.xrpl-labs.com')
-
-      await api.connect()
-
-      const { wallet, balance } = await api.fundWallet(null, {
-        usageContext: 'integration-test',
-      })
-
-      assert.notStrictEqual(wallet, undefined)
-      assert(isValidClassicAddress(wallet.classicAddress))
-      assert(isValidXAddress(wallet.getXAddress()))
-
-      const info = await api.request({
-        command: 'account_info',
-        account: wallet.classicAddress,
-      })
-
-      assert.equal(dropsToXrp(info.result.account_data.Balance), balance)
-      assert.equal(balance, 1000)
-
-      /*
-       * No test for fund given wallet because the hooks v3 testnet faucet
-       * requires 10 seconds between requests. Would significantly slow down
-       * the test suite.
-       */
-
-      await api.disconnect()
-    },
-    TIMEOUT,
-  )
-
-  it(
     'submit funds wallet with custom amount',
     async function () {
       const api = new Client('wss://s.altnet.rippletest.net:51233')
