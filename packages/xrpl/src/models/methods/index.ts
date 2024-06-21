@@ -461,8 +461,6 @@ export type RequestAllResponseMap<
   ? AccountTxVersionResponseMap<Version>
   : T extends LedgerDataRequest
   ? LedgerDataResponse
-  : T extends AccountTxRequest
-  ? AccountTxResponse
   : T extends BookOffersRequest
   ? BookOffersResponse
   : MarkerResponse<Version>
