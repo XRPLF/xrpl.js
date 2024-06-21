@@ -60,7 +60,8 @@ interface BaseTxResult<
   /** The ledger index of the ledger that includes this transaction. */
   ledger_index?: number
   /** Unique hashed string Transaction metadata blob, which describes the results of the transaction.
-   *  Can be undefined if a transaction has not been validated yet. */
+   *  Can be undefined if a transaction has not been validated yet. This field is omitted if binary
+   *  binary format is not requested. */
   meta_blob?: Version extends typeof RIPPLED_API_V2
     ? TransactionMetadata<T> | string
     : never
