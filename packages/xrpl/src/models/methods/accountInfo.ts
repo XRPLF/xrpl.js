@@ -183,8 +183,6 @@ export interface AccountInfoResponse extends BaseAccountInfoResponse {
      * If requested, array of SignerList ledger objects associated with this account for Multi-Signing.
      * Since an account can own at most one SignerList, this array must have exactly one
      * member if it is present.
-     * Quirk: In API version 1, this field is nested under account_data. For this method,
-     * Clio implements the API version 2 behavior where is field is not nested under account_data.
      */
     signer_lists?: SignerList[]
   }
