@@ -38,7 +38,6 @@ export interface BaseResponse {
   warnings?: ResponseWarning[]
   forwarded?: boolean
   api_version?: number
-  meta_blob?: string
 }
 
 /**
