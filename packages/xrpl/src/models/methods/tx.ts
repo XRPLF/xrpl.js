@@ -74,6 +74,10 @@ interface BaseTxResult<
    */
   validated?: boolean
   /**
+   * The time the transaction was closed, in seconds since the Ripple Epoch.
+   */
+  close_time_iso: string
+  /**
    * This number measures the number of seconds since the "Ripple Epoch" of January 1, 2000 (00:00 UTC)
    */
   date?: number
