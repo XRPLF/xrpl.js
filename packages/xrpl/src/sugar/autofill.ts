@@ -17,7 +17,6 @@ const LEDGER_OFFSET = 20
 // Mainnet and testnet are exceptions. More context: https://github.com/XRPLF/rippled/pull/4370
 const RESTRICTED_NETWORKS = 1024
 const REQUIRED_NETWORKID_VERSION = '1.11.0'
-const HOOKS_TESTNET_ID = 21338
 
 /**
  * Determines whether the source rippled version is not later than the target rippled version.
@@ -87,8 +86,7 @@ function isNotLaterRippledVersion(source: string, target: string): boolean {
 
 /**
  * Determine if the transaction required a networkID to be valid.
- * Transaction needs networkID if later than restricted ID and either the network is hooks testnet
- * or build version is >= 1.11.0
+ * Transaction needs networkID if later than restricted ID and build version is >= 1.11.0
  *
  * @param client -- The connected client.
  * @returns True if required networkID, false otherwise.
@@ -99,12 +97,8 @@ export function txNeedsNetworkID(client: Client): boolean {
     client.networkID > RESTRICTED_NETWORKS
   ) {
     if (
-      (client.buildVersion &&
-        isNotLaterRippledVersion(
-          REQUIRED_NETWORKID_VERSION,
-          client.buildVersion,
-        )) ||
-      client.networkID === HOOKS_TESTNET_ID
+      client.buildVersion &&
+      isNotLaterRippledVersion(REQUIRED_NETWORKID_VERSION, client.buildVersion)
     ) {
       return true
     }
