@@ -1,4 +1,4 @@
-import { APIVersion, RIPPLED_API_V1 } from '../common'
+import { APIVersion, DEFAULT_API_VERSION, RIPPLED_API_V1 } from '../common'
 import { Transaction } from '../transactions'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
@@ -76,7 +76,8 @@ export interface SubmitMultisignedV1Response extends BaseResponse {
  *
  * @category Responses
  */
-export type SubmitMultisignedVersionResponseMap<Version extends APIVersion> =
-  Version extends typeof RIPPLED_API_V1
-    ? SubmitMultisignedV1Response
-    : SubmitMultisignedResponse
+export type SubmitMultisignedVersionResponseMap<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> = Version extends typeof RIPPLED_API_V1
+  ? SubmitMultisignedV1Response
+  : SubmitMultisignedResponse

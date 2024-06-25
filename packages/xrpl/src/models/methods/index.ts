@@ -1,6 +1,6 @@
 /* eslint-disable no-inline-comments -- Necessary for important note */
 /* eslint-disable max-lines -- There is a lot to export */
-import type { APIVersion } from '../common'
+import type { APIVersion, DEFAULT_API_VERSION } from '../common'
 
 import {
   AccountChannelsRequest,
@@ -232,7 +232,7 @@ type Request =
 /**
  * @category Responses
  */
-type Response<Version extends APIVersion> =
+type Response<Version extends APIVersion = typeof DEFAULT_API_VERSION> =
   // account methods
   | AccountChannelsResponse
   | AccountCurrenciesResponse
@@ -288,7 +288,7 @@ type Response<Version extends APIVersion> =
 
 export type RequestResponseMap<
   T,
-  Version extends APIVersion,
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
 > = T extends AccountChannelsRequest
   ? AccountChannelsResponse
   : T extends AccountCurrenciesRequest
@@ -440,7 +440,9 @@ export type MarkerRequest = Request & {
   marker?: unknown
 }
 
-export type MarkerResponse<Version extends APIVersion> = Response<Version> & {
+export type MarkerResponse<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> = Response<Version> & {
   result: {
     marker?: unknown
   }
@@ -448,7 +450,7 @@ export type MarkerResponse<Version extends APIVersion> = Response<Version> & {
 
 export type RequestAllResponseMap<
   T,
-  Version extends APIVersion,
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
 > = T extends AccountChannelsRequest
   ? AccountChannelsResponse
   : T extends AccountLinesRequest

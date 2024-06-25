@@ -1,5 +1,6 @@
 import {
   APIVersion,
+  DEFAULT_API_VERSION,
   RIPPLED_API_V1,
   RIPPLED_API_V2,
   ResponseOnlyTxInfo,
@@ -54,7 +55,9 @@ export interface AccountTxRequest extends BaseRequest, LookupByLedgerRequest {
   marker?: unknown
 }
 
-export interface AccountTxTransaction<Version extends APIVersion> {
+export interface AccountTxTransaction<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> {
   /** The ledger index of the ledger version that included this transaction. */
   ledger_index: number
   /**
@@ -84,8 +87,9 @@ export interface AccountTxTransaction<Version extends APIVersion> {
 /**
  * Base interface for account transaction responses.
  */
-interface AccountTxResponseBase<Version extends APIVersion>
-  extends BaseResponse {
+interface AccountTxResponseBase<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> extends BaseResponse {
   result: {
     /** Unique Address identifying the related account. */
     account: string
@@ -125,7 +129,7 @@ interface AccountTxResponseBase<Version extends APIVersion>
  *
  * @category Responses
  */
-export type AccountTxResponse = AccountTxResponseBase<typeof RIPPLED_API_V2>
+export type AccountTxResponse = AccountTxResponseBase
 
 /**
  * Expected response from an {@link AccountTxRequest} with `api_version` set to 1.
@@ -139,7 +143,8 @@ export type AccountTxV1Response = AccountTxResponseBase<typeof RIPPLED_API_V1>
  *
  * @category Responses
  */
-export type AccountTxVersionResponseMap<Version extends APIVersion> =
-  Version extends typeof RIPPLED_API_V1
-    ? AccountTxV1Response
-    : AccountTxResponse
+export type AccountTxVersionResponseMap<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> = Version extends typeof RIPPLED_API_V1
+  ? AccountTxV1Response
+  : AccountTxResponse

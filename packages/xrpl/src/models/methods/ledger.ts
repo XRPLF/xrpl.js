@@ -1,4 +1,4 @@
-import { APIVersion, RIPPLED_API_V1 } from '../common'
+import { APIVersion, DEFAULT_API_VERSION, RIPPLED_API_V1 } from '../common'
 import { Ledger, LedgerV1, LedgerVersionMap } from '../ledger/Ledger'
 import { LedgerEntryFilter } from '../ledger/LedgerEntry'
 import { Transaction, TransactionAndMetadata } from '../transactions'
@@ -269,11 +269,13 @@ export interface LedgerV1Response extends BaseResponse {
  *
  * @category Responses
  */
-export type LedgerVersionResponseMap<Version extends APIVersion> =
-  Version extends typeof RIPPLED_API_V1 ? LedgerV1Response : LedgerResponse
+export type LedgerVersionResponseMap<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> = Version extends typeof RIPPLED_API_V1 ? LedgerV1Response : LedgerResponse
 
-interface LedgerResponseExpandedResult<Version extends APIVersion>
-  extends LedgerResponseBase {
+interface LedgerResponseExpandedResult<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> extends LedgerResponseBase {
   /** The complete header data of this {@link Ledger}. */
   ledger: LedgerVersionMap<Version>
 }
@@ -286,7 +288,8 @@ interface LedgerResponseExpandedResult<Version extends APIVersion>
  *
  * @category Responses
  */
-export interface LedgerResponseExpanded<Version extends APIVersion>
-  extends BaseResponse {
+export interface LedgerResponseExpanded<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> extends BaseResponse {
   result: LedgerResponseExpandedResult<Version>
 }

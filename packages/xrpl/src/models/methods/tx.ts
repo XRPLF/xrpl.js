@@ -1,4 +1,9 @@
-import { APIVersion, RIPPLED_API_V1, RIPPLED_API_V2 } from '../common'
+import {
+  APIVersion,
+  DEFAULT_API_VERSION,
+  RIPPLED_API_V1,
+  RIPPLED_API_V2,
+} from '../common'
 import { Transaction, TransactionMetadata } from '../transactions'
 import { BaseTransaction } from '../transactions/common'
 
@@ -48,7 +53,7 @@ export interface TxRequest extends BaseRequest {
  * @category Responses
  */
 interface BaseTxResult<
-  Version extends APIVersion,
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
   T extends BaseTransaction = Transaction,
 > {
   /** The SHA-512 hash of the transaction. */
@@ -122,5 +127,6 @@ export interface TxV1Response<T extends BaseTransaction = Transaction>
  *
  * @category Responses
  */
-export type TxVersionResponseMap<Version extends APIVersion> =
-  Version extends typeof RIPPLED_API_V1 ? TxV1Response : TxResponse
+export type TxVersionResponseMap<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> = Version extends typeof RIPPLED_API_V1 ? TxV1Response : TxResponse

@@ -1,4 +1,4 @@
-import { APIVersion, RIPPLED_API_V1 } from '../common'
+import { APIVersion, DEFAULT_API_VERSION, RIPPLED_API_V1 } from '../common'
 import { Transaction, TransactionMetadata } from '../transactions'
 
 import { LedgerEntry } from './LedgerEntry'
@@ -92,5 +92,6 @@ export interface LedgerV1 extends BaseLedger {
  *
  * @category Responses
  */
-export type LedgerVersionMap<Version extends APIVersion> =
-  Version extends typeof RIPPLED_API_V1 ? LedgerV1 : Ledger
+export type LedgerVersionMap<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> = Version extends typeof RIPPLED_API_V1 ? LedgerV1 : Ledger

@@ -1,4 +1,4 @@
-import { APIVersion, RIPPLED_API_V1 } from '../common'
+import { APIVersion, DEFAULT_API_VERSION, RIPPLED_API_V1 } from '../common'
 import { AccountRoot, SignerList } from '../ledger'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
@@ -221,7 +221,8 @@ export interface AccountInfoV1Response extends BaseAccountInfoResponse {
  *
  * @category Responses
  */
-export type AccountInfoVersionResponseMap<Version extends APIVersion> =
-  Version extends typeof RIPPLED_API_V1
-    ? AccountInfoV1Response
-    : AccountInfoResponse
+export type AccountInfoVersionResponseMap<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> = Version extends typeof RIPPLED_API_V1
+  ? AccountInfoV1Response
+  : AccountInfoResponse
