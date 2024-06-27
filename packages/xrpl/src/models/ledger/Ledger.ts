@@ -67,7 +67,7 @@ interface BaseLedger {
  */
 export interface Ledger extends BaseLedger {
   /**
-   * The ledger index of the ledger. Represented as a native JSON number.
+   * The ledger index of the ledger. Represented as a number.
    */
   ledger_index: number
 }
@@ -82,7 +82,7 @@ export interface Ledger extends BaseLedger {
 export interface LedgerV1 extends BaseLedger {
   /**
    * The ledger index of the ledger. Some API methods display this as a quoted
-   * integer; some display it as a native JSON number.
+   * integer; some display it as a number.
    */
   ledger_index: string
 }
