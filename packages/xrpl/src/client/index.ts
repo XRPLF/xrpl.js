@@ -1053,13 +1053,9 @@ class Client extends EventEmitter<EventTypes> {
    * ```
    */
   public async getLedgerIndex(): Promise<number> {
-    const ledgerResponse = await this.request<
-      LedgerRequest,
-      typeof this.apiVersion
-    >({
+    const ledgerResponse = await this.request({
       command: 'ledger',
       ledger_index: 'validated',
-      api_version: this.apiVersion,
     })
     return ledgerResponse.result.ledger_index
   }
