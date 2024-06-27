@@ -237,7 +237,7 @@ class Client extends EventEmitter<EventTypes> {
    * const client = new Client('wss://s.altnet.rippletest.net:51233')
    * ```
    */
-  // eslint-disable-next-line max-lines-per-function -- okay because we have to set up all the connection handlers
+  /* eslint-disable max-lines-per-function -- the constructor requires more lines to implement the logic */
   public constructor(server: string, options: ClientOptions = {}) {
     super()
     if (typeof server !== 'string' || !/wss?(?:\+unix)?:\/\//u.exec(server)) {
@@ -301,6 +301,7 @@ class Client extends EventEmitter<EventTypes> {
       this.emit('path_find', path)
     })
   }
+  /* eslint-enable max-lines-per-function */
 
   /**
    * Get the url that the client is connected to.
@@ -653,7 +654,10 @@ class Client extends EventEmitter<EventTypes> {
    * @param signersCount - The expected number of signers for this transaction.
    * Only used for multisigned transactions.
    * @returns The autofilled transaction.
+   * @throws ValidationError If Amount and DeliverMax fields are not identical in a Payment Transaction
    */
+
+  // eslint-disable-next-line complexity -- handling Payment transaction API v2 requires more logic
   public async autofill<T extends SubmittableTransaction>(
     transaction: T,
     signersCount?: number,
@@ -661,7 +665,6 @@ class Client extends EventEmitter<EventTypes> {
     const tx = { ...transaction }
 
     setValidAddresses(tx)
-
     setTransactionFlagsToNumber(tx)
 
     const promises: Array<Promise<void>> = []
@@ -679,6 +682,34 @@ class Client extends EventEmitter<EventTypes> {
     }
     if (tx.TransactionType === 'AccountDelete') {
       promises.push(checkAccountDeleteBlockers(this, tx))
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+    // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+    if (tx.TransactionType === 'Payment' && tx.DeliverMax != null) {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- This is a valid null check for Amount
+      if (tx.Amount == null) {
+        // If only DeliverMax is provided, use it to populate the Amount field
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+        // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- DeliverMax is a known RPC-level property
+        tx.Amount = tx.DeliverMax
+      }
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+      // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- This is a valid null check for Amount
+      if (tx.Amount != null && tx.Amount !== tx.DeliverMax) {
+        return Promise.reject(
+          new ValidationError(
+            'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
+          ),
+        )
+      }
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+      // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+      delete tx.DeliverMax
     }
 
     return Promise.all(promises).then(() => tx)
@@ -924,7 +955,7 @@ class Client extends EventEmitter<EventTypes> {
    * @param options.limit - Limit number of balances to return.
    * @returns An array of XRP/non-XRP balances for the given account.
    */
-  // eslint-disable-next-line max-lines-per-function -- Longer definition is required for end users to see the definition.
+  /* eslint-disable max-lines-per-function -- getBalances requires more lines to implement logic */
   public async getBalances(
     address: string,
     options: {
@@ -972,6 +1003,7 @@ class Client extends EventEmitter<EventTypes> {
     )
     return balances.slice(0, options.limit)
   }
+  /* eslint-enable max-lines-per-function */
 
   /**
    * Fetch orderbook (buy/sell orders) between two currency pairs. This checks both sides of the orderbook
