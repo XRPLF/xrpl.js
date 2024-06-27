@@ -3,6 +3,7 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
+* Remove references to the Hooks testnet faucet in the xrpl.js code repository.
 
 ### Added
 * Add `nfts_by_issuer` clio-only API definition
