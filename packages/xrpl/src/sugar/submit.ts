@@ -153,6 +153,7 @@ export async function waitForFinalTransactionOutcome<
     })
 
   if (txResponse.result.validated) {
+    // TODO: resolve the type assertion below
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- we know that txResponse is of type TxResponse
     return txResponse as TxResponse<T>
   }
