@@ -108,7 +108,7 @@ export interface TxResponse<T extends BaseTransaction = Transaction>
 /**
  * Response expected from a {@link TxRequest} using API version 1.
  *
- * @category Responses
+ * @category ResponsesV1
  */
 export interface TxV1Response<T extends BaseTransaction = Transaction>
   extends BaseResponse {

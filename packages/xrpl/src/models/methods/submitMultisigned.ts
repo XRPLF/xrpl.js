@@ -63,7 +63,7 @@ export interface SubmitMultisignedResponse extends BaseResponse {
 /**
  * Response expected from a {@link SubmitMultisignedRequest} using api_version 1.
  *
- * @category Responses
+ * @category ResponsesV1
  */
 export interface SubmitMultisignedV1Response extends BaseResponse {
   result: BaseSubmitMultisignedResult & {

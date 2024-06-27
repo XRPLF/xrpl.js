@@ -191,7 +191,7 @@ export interface AccountInfoResponse extends BaseAccountInfoResponse {
 /**
  * Response expected from a {@link AccountInfoRequest} using API version 1.
  *
- * @category Responses
+ * @category ResponsesV1
  */
 export interface AccountInfoV1Response extends BaseAccountInfoResponse {
   result: BaseAccountInfoResponse['result'] & {

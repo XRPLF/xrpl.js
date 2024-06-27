@@ -134,7 +134,7 @@ export type AccountTxResponse = AccountTxResponseBase
 /**
  * Expected response from an {@link AccountTxRequest} with `api_version` set to 1.
  *
- * @category Responses
+ * @category ResponsesV1
  */
 export type AccountTxV1Response = AccountTxResponseBase<typeof RIPPLED_API_V1>
 

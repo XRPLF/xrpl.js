@@ -258,7 +258,7 @@ export interface LedgerResponse extends BaseResponse {
  * This is the default request response, triggered when `expand` and `binary` are both false.
  * This is the response for API version 1.
  *
- * @category Responses
+ * @category ResponsesV1
  */
 export interface LedgerV1Response extends BaseResponse {
   result: LedgerV1ResponseResult
