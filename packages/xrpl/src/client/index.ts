@@ -33,7 +33,6 @@ import {
   LedgerDataRequest,
   LedgerDataResponse,
   TxResponse,
-  LedgerRequest,
 } from '../models/methods'
 import type {
   RequestResponseMap,
@@ -337,10 +336,10 @@ class Client extends EventEmitter<EventTypes> {
   >(req: R): Promise<T> {
     const request = {
       ...req,
-      account: req.account
-        ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be string
-          ensureClassicAddress(req.account as string)
-        : undefined,
+      account:
+        typeof req.account === 'string'
+          ? ensureClassicAddress(req.account)
+          : undefined,
       api_version: req.api_version ?? this.apiVersion,
     }
     const response = await this.connection.request<R, T>(request)
