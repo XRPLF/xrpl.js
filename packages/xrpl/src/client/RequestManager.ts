@@ -56,7 +56,10 @@ export default class RequestManager {
    * @param response - Response to return.
    * @throws Error if no existing promise with the given ID.
    */
-  public resolve(id: string | number, response: Response<APIVersion>): void {
+  public resolve(
+    id: string | number,
+    response: Partial<Response<APIVersion>>,
+  ): void {
     const promise = this.promisesAwaitingResponse.get(id)
     if (promise == null) {
       throw new XrplError(`No existing promise with id ${id}`, {
@@ -208,8 +211,7 @@ export default class RequestManager {
     }
     // status no longer needed because error is thrown if status is not "success"
     delete response.status
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be a valid Response here
-    this.resolve(response.id, response as unknown as Response<APIVersion>)
+    this.resolve(response.id, response)
   }
 
   /**
