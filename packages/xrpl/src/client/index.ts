@@ -9,7 +9,12 @@ import {
   ValidationError,
   XrplError,
 } from '../errors'
-import type { LedgerIndex, Balance } from '../models/common'
+import {
+  APIVersion,
+  LedgerIndex,
+  Balance,
+  DEFAULT_API_VERSION,
+} from '../models/common'
 import {
   Request,
   // account methods
@@ -214,6 +219,12 @@ class Client extends EventEmitter<EventTypes> {
   public buildVersion: string | undefined
 
   /**
+   * API Version used by the server this client is connected to
+   *
+   */
+  public apiVersion: APIVersion = DEFAULT_API_VERSION
+
+  /**
    * Creates a new Client with a websocket connection to a rippled server.
    *
    * @param server - URL of the server to connect to.
@@ -307,7 +318,6 @@ class Client extends EventEmitter<EventTypes> {
    * additional request body parameters.
    *
    * @category Network
-   *
    * @param req - Request to send to the server.
    * @returns The response from the server.
    *
@@ -320,16 +330,20 @@ class Client extends EventEmitter<EventTypes> {
    * console.log(response)
    * ```
    */
-  public async request<R extends Request, T = RequestResponseMap<R>>(
-    req: R,
-  ): Promise<T> {
-    const response = await this.connection.request<R, T>({
+  public async request<
+    R extends Request,
+    V extends APIVersion = typeof DEFAULT_API_VERSION,
+    T = RequestResponseMap<R, V>,
+  >(req: R): Promise<T> {
+    const request = {
       ...req,
-      account: req.account
-        ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be string
-          ensureClassicAddress(req.account as string)
-        : undefined,
-    })
+      account:
+        typeof req.account === 'string'
+          ? ensureClassicAddress(req.account)
+          : undefined,
+      api_version: req.api_version ?? this.apiVersion,
+    }
+    const response = await this.connection.request<R, T>(request)
 
     // mutates `response` to add warnings
     handlePartialPayment(req.command, response)
@@ -438,9 +452,10 @@ class Client extends EventEmitter<EventTypes> {
    * const allResponses = await client.requestAll({ command: 'transaction_data' });
    * console.log(allResponses);
    */
+
   public async requestAll<
     T extends MarkerRequest,
-    U = RequestAllResponseMap<T>,
+    U = RequestAllResponseMap<T, APIVersion>,
   >(request: T, collect?: string): Promise<U[]> {
     /*
      * The data under collection is keyed based on the command. Fail if command
@@ -468,7 +483,7 @@ class Client extends EventEmitter<EventTypes> {
       // eslint-disable-next-line no-await-in-loop -- Necessary for this, it really has to wait
       const singleResponse = await this.connection.request(repeatProps)
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
-      const singleResult = (singleResponse as MarkerResponse).result
+      const singleResult = (singleResponse as MarkerResponse<APIVersion>).result
       if (!(collectKey in singleResult)) {
         throw new XrplError(`${collectKey} not in result`)
       }

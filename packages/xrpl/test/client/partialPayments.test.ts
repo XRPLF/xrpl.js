@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- required for formatting transactions */
 import { expect } from 'chai'
 import cloneDeep from 'lodash/cloneDeep'
 
@@ -24,7 +23,7 @@ describe('client handling of tfPartialPayments', function () {
     testContext.mockRippled!.addResponse('tx', rippled.tx.Payment)
     const resp = await testContext.client.request({
       command: 'tx',
-      transaction: rippled.tx.Payment.result.hash,
+      transaction: rippled.tx.Payment.result.tx_json.hash,
     })
 
     expect(resp.warnings).to.equal(undefined)
@@ -35,7 +34,7 @@ describe('client handling of tfPartialPayments', function () {
     testContext.mockRippled!.addResponse('tx', mockResponse)
     const resp = await testContext.client.request({
       command: 'tx',
-      transaction: mockResponse.result.hash,
+      transaction: mockResponse.result.tx_json.hash,
     })
 
     expect(resp.warnings).to.deep.equal([
@@ -51,7 +50,7 @@ describe('client handling of tfPartialPayments', function () {
     testContext.mockRippled!.addResponse('tx', mockResponse)
     const resp = await testContext.client.request({
       command: 'tx',
-      transaction: mockResponse.result.hash,
+      transaction: mockResponse.result.tx_json.hash,
     })
 
     expect(resp.warnings).to.deep.equal([
@@ -82,8 +81,10 @@ describe('client handling of tfPartialPayments', function () {
     }
     const mockResponse = rippled.account_tx.normal
     mockResponse.result.transactions.push({
-      tx: partial.result,
+      tx_json: partial.result.tx_json,
       meta: partial.result.meta,
+      validated: true,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- we are mocking the response
     } as any)
 
     testContext.mockRippled!.addResponse('account_tx', mockResponse)
@@ -105,8 +106,10 @@ describe('client handling of tfPartialPayments', function () {
     const partial = { ...rippled.tx.Payment, result: partialPaymentXRP }
     const mockResponse = rippled.account_tx.normal
     mockResponse.result.transactions.push({
-      tx: partial.result,
+      tx_json: partial.result.tx_json,
       meta: partial.result.meta,
+      validated: true,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- we are mocking the response
     } as any)
 
     testContext.mockRippled!.addResponse('account_tx', mockResponse)
@@ -138,7 +141,7 @@ describe('client handling of tfPartialPayments', function () {
 
   it('transaction_entry with XRP tfPartialPayment', async function () {
     const mockResponse = cloneDeep(rippled.transaction_entry)
-    mockResponse.result.tx_json.Amount = '1000'
+    mockResponse.result.tx_json.DeliverMax = '1000'
     testContext.mockRippled!.addResponse('transaction_entry', mockResponse)
     const resp = await testContext.client.request({
       command: 'transaction_entry',
