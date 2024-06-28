@@ -100,7 +100,7 @@ describe('account_tx', function () {
           responseTx.Flags,
           responseTx.TransactionType,
           responseTx.Account,
-          // @ts-expect-error -- TODO: remove this line after DeliverMax support PR is merged
+          // @ts-expect-error -- DeliverMax is a valid field on Payment response
           responseTx.DeliverMax,
           responseTx.Destination,
         ],
