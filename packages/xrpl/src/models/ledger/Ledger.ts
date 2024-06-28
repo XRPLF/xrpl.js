@@ -62,6 +62,9 @@ export default interface Ledger {
    * as true.
    */
   transactions?: Array<
-    Transaction & { hash: string } & { metaData?: TransactionMetadata }
+    Transaction & { 
+      hash: string
+      metaData?: TransactionMetadata
+    }
   >
 }
