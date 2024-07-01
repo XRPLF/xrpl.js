@@ -66,6 +66,7 @@ import {
   DepositAuthorizedRequest,
   DepositAuthorizedResponse,
 } from './depositAuthorized'
+import { FeatureRequest, FeatureResponse } from './feature'
 import { FeeRequest, FeeResponse } from './fee'
 import {
   GatewayBalance,
@@ -214,6 +215,7 @@ type Request =
   | ServerDefinitionsRequest
   | ServerInfoRequest
   | ServerStateRequest
+  | FeatureRequest
   // utility methods
   | PingRequest
   | RandomRequest
@@ -271,6 +273,7 @@ type Response<Version extends APIVersion = typeof DEFAULT_API_VERSION> =
   | ServerDefinitionsResponse
   | ServerInfoResponse
   | ServerStateResponse
+  | FeatureResponse
   // utility methods
   | PingResponse
   | RandomResponse
@@ -591,6 +594,8 @@ export {
   ServerState,
   StateAccountingFinal,
   StateAccounting,
+  FeatureRequest,
+  FeatureResponse,
   // utility methods
   PingRequest,
   PingResponse,
