@@ -15,13 +15,17 @@ export interface HasPreviousTxnID {
   PreviousTxnLgrSeq: number
 }
 
-export interface MissingPreviousTxnID {
+export interface HasOptionalPreviousTxnID {
   /**
-   * This field is missing on this object but is present on most other returned objects.
+   * The identifying hash of the transaction that most recently modified this
+   * object. This field was added in the `fixPreviousTxnID` amendment, so it
+   * may not be present in every object.
    */
-  PreviousTxnID: never
+  PreviousTxnID?: string
   /**
-   * This field is missing on this object but is present on most other returned objects.
+   * The index of the ledger that contains the transaction that most recently
+   * modified this object. This field was added in the `fixPreviousTxnID`
+   * amendment, so it may not be present in every object.
    */
-  PreviousTxnLgrSeq: never
+  PreviousTxnLgrSeq?: number
 }
