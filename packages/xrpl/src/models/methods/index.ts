@@ -422,6 +422,8 @@ export type RequestResponseMap<
   ? ServerStateResponse
   : T extends ServerDefinitionsRequest
   ? ServerDefinitionsResponse
+  : T extends FeatureRequest
+  ? FeatureResponse
   : T extends PingRequest
   ? PingResponse
   : T extends RandomRequest
