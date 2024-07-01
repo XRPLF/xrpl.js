@@ -36,6 +36,6 @@
   "license": "ISC",
   "prettier": "@xrplf/prettier-config",
   "engines": {
-    "node": ">= 16"
+    "node": ">= 18"
   }
 }
