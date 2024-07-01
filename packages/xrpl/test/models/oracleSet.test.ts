@@ -150,6 +150,22 @@ describe('OracleSet', function () {
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
+  it(`throws w/ missing AssetPrice with Scale present of PriceDataSeries`, function () {
+    delete tx.PriceDataSeries[0].PriceData.AssetPrice
+    const errorMessage =
+      'OracleSet: PriceDataSeries must have both `AssetPrice` and `Scale` if any are present'
+    assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
+    assert.throws(() => validate(tx), ValidationError, errorMessage)
+  })
+
+  it(`throws w/ missing Scale with AssetPrice present of PriceDataSeries`, function () {
+    delete tx.PriceDataSeries[0].PriceData.Scale
+    const errorMessage =
+      'OracleSet: PriceDataSeries must have both `AssetPrice` and `Scale` if any are present'
+    assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
+    assert.throws(() => validate(tx), ValidationError, errorMessage)
+  })
+
   it(`throws w/ invalid AssetPrice of PriceDataSeries`, function () {
     tx.PriceDataSeries[0].PriceData.AssetPrice = '1234'
     const errorMessage = 'OracleSet: invalid field AssetPrice'
