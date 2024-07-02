@@ -18,7 +18,7 @@ Warning: Use at your own risk.
 
 - **[Bitso](https://bitso.com/)**
 
-  Exchange allowing clients to buy and sell XRP, based in Mexico.
+  Exchange allows clients to buy and sell XRP, based in Mexico.
 
 ## Explorers
 
