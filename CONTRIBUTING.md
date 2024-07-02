@@ -85,7 +85,7 @@ One is in the browser - run `npm run build:browserTests` and open `test/localInt
 
 The other is in the command line (this is what we use for CI) -
 
-This should be run from the `xrpl.js` top level folder (one above the `packages` folder).
+This should be run from the `xrpl.js` top-level folder (one above the `packages` folder).
 
 ```bash
 npm run build
@@ -119,7 +119,7 @@ Within the xrpl package, each folder has a specific purpose:
 **Client** - This contains logic for handling the websocket connection to rippled servers.
 **Models** - These types model LedgerObjects, Requests/Methods, and Transactions in order to give type hints and nice errors for users.
 **Sugar** - This is where handy helper functions end up, like `submit`, `autofill`, and `getXRPBalance` amongst others.
-**Utils** - These are shared functions which are useful for conversions, or internal implementation details within the library.
+**Utils** - These are shared functions that are useful for conversions, or internal implementation details within the library.
 **Wallet** - This logic handles managing keys, addresses, and signing within xrpl.js
 
 ### Writing Tests for xrpl.js
