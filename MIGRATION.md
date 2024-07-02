@@ -21,7 +21,7 @@ At a high level:
 3. Increased reliability through more browser testing
 
 <aside>
-💡 Also, with 3.0, the [reference docs](https://js.xrpl.org/) have received a massive update to include examples, more readable type information, and properly display documentation on functions which are part of the `Client` class.
+💡 Also, with 3.0, the [reference docs](https://js.xrpl.org/) have received a massive update to include examples, more readable type information, and properly display documentation on functions that are part of the `Client` class.
 </aside>
 
 ## 1. 60% size reduction
