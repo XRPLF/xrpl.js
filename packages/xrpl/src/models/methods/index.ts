@@ -66,7 +66,14 @@ import {
   DepositAuthorizedRequest,
   DepositAuthorizedResponse,
 } from './depositAuthorized'
-import { FeatureRequest, FeatureResponse } from './feature'
+import {
+  FeatureAllRequest,
+  FeatureAllResponse,
+  FeatureOneRequest,
+  FeatureOneResponse,
+  FeatureRequest,
+  FeatureResponse,
+} from './feature'
 import { FeeRequest, FeeResponse } from './fee'
 import {
   GatewayBalance,
@@ -422,8 +429,10 @@ export type RequestResponseMap<
   ? ServerStateResponse
   : T extends ServerDefinitionsRequest
   ? ServerDefinitionsResponse
-  : T extends FeatureRequest
-  ? FeatureResponse
+  : T extends FeatureAllRequest
+  ? FeatureAllResponse
+  : T extends FeatureOneRequest
+  ? FeatureOneResponse
   : T extends PingRequest
   ? PingResponse
   : T extends RandomRequest

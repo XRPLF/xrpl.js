@@ -22,14 +22,12 @@ describe('feature', function () {
   afterEach(async () => teardownClient(testContext))
 
   it(
-    'base',
+    'all',
     async () => {
       const featureRequest: FeatureRequest = {
         command: 'feature',
       }
-      const featureResponse: FeatureResponse = await testContext.client.request(
-        featureRequest,
-      )
+      const featureResponse = await testContext.client.request(featureRequest)
 
       assert.equal(featureResponse.type, 'response')
       assert.typeOf(featureResponse.result.features, 'object')
@@ -37,7 +35,29 @@ describe('feature', function () {
 
       const amendmentData = featureResponse.result.features[AMENDMENT]
       assert.equal(amendmentData.name, 'AMM')
-      // TODO: fix with actual value
+      // TODO: rippled says "false" for standalone nodes for some reason
+      assert.typeOf(amendmentData.enabled, 'boolean')
+      assert.equal(amendmentData.supported, true)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'all',
+    async () => {
+      const featureRequest: FeatureRequest = {
+        command: 'feature',
+        feature: AMENDMENT,
+      }
+      const featureResponse = await testContext.client.request(featureRequest)
+
+      assert.equal(featureResponse.type, 'response')
+      assert.typeOf(featureResponse.result, 'object')
+      assert.isTrue(AMENDMENT in featureResponse.result)
+
+      const amendmentData = featureResponse.result[AMENDMENT]
+      assert.equal(amendmentData.name, 'AMM')
+      // TODO: rippled says "false" for standalone nodes for some reason
       assert.typeOf(amendmentData.enabled, 'boolean')
       assert.equal(amendmentData.supported, true)
     },
