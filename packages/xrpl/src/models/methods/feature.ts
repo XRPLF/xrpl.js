@@ -3,7 +3,7 @@ import { BaseRequest, BaseResponse } from './baseMethod'
 export interface FeatureAllRequest extends BaseRequest {
   command: 'feature'
 
-  feature: never
+  feature?: never
 }
 
 export interface FeatureOneRequest extends BaseRequest {

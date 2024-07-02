@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { FeatureRequest, FeatureResponse } from '../../../src'
+import { FeatureRequest } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
