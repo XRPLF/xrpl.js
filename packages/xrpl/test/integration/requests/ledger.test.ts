@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 
-import { LedgerRequest, LedgerResponse } from '../../../src'
-import { Ledger } from '../../../src/models/ledger'
+import { LedgerRequest } from '../../../src'
+import { Ledger, LedgerV1 } from '../../../src/models/ledger'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -29,6 +29,7 @@ describe('ledger', function () {
       }
 
       const expected = {
+        api_version: 2,
         id: 0,
         result: {
           ledger: {
@@ -45,7 +46,68 @@ describe('ledger', function () {
         type: 'response',
       }
 
-      const ledgerResponse: LedgerResponse = await testContext.client.request(
+      const ledgerResponse = await testContext.client.request(ledgerRequest)
+
+      assert.equal(ledgerResponse.type, expected.type)
+
+      assert.equal(ledgerResponse.result.validated, expected.result.validated)
+      assert.typeOf(ledgerResponse.result.ledger_hash, 'string')
+      assert.typeOf(ledgerResponse.result.ledger_index, 'number')
+
+      const ledger = ledgerResponse.result.ledger as Ledger & {
+        accepted: boolean
+        hash: string
+        seqNum: string
+      }
+      assert.equal(ledger.closed, true)
+      const stringTypes = [
+        'account_hash',
+        'close_time_human',
+        'ledger_hash',
+        'parent_hash',
+        'total_coins',
+        'transaction_hash',
+      ]
+      stringTypes.forEach((strType) => assert.typeOf(ledger[strType], 'string'))
+      const numTypes = [
+        'close_flags',
+        'close_time',
+        'close_time_resolution',
+        'ledger_index',
+        'parent_close_time',
+      ]
+      numTypes.forEach((numType) => assert.typeOf(ledger[numType], 'number'))
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'uses api_version 1',
+    async () => {
+      const ledgerRequest: LedgerRequest = {
+        command: 'ledger',
+        ledger_index: 'validated',
+        api_version: 1,
+      }
+
+      const expected = {
+        id: 0,
+        result: {
+          ledger: {
+            accepted: true,
+            account_hash: 'string',
+            close_flags: 0,
+            close_time: 0,
+            close_time_human: 'string',
+          },
+          ledger_hash: 'string',
+          ledger_index: 1,
+          validated: true,
+        },
+        type: 'response',
+      }
+
+      const ledgerResponse = await testContext.client.request<LedgerRequest, 1>(
         ledgerRequest,
       )
 
@@ -55,7 +117,7 @@ describe('ledger', function () {
       assert.typeOf(ledgerResponse.result.ledger_hash, 'string')
       assert.typeOf(ledgerResponse.result.ledger_index, 'number')
 
-      const ledger = ledgerResponse.result.ledger as Ledger & {
+      const ledger = ledgerResponse.result.ledger as LedgerV1 & {
         accepted: boolean
         hash: string
         seqNum: string

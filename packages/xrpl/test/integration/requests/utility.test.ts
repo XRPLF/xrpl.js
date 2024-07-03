@@ -26,6 +26,7 @@ describe('Utility method integration tests', function () {
         command: 'ping',
       })
       const expected: unknown = {
+        api_version: 2,
         result: { role: 'admin', unlimited: true },
         type: 'response',
       }
@@ -41,6 +42,7 @@ describe('Utility method integration tests', function () {
         command: 'random',
       })
       const expected = {
+        api_version: 2,
         id: 0,
         result: {
           random: '[random string of 64 bytes]',
