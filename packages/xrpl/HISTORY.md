@@ -10,10 +10,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * Add `nfts_by_issuer` clio-only API definition
-
-### Added
-* Add `nfts_by_issuer` clio-only API definition
 * Add `include_deleted` to ledgerEntry request and `deleted_ledger_index` to ledgerEntry response
+
 ## 3.1.0 (2024-06-03)
 
 ### BREAKING CHANGES
