@@ -35,7 +35,10 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
       issuer?: string
     }
   }
-
+  /**
+   * If true, include latest version of the object that is not deleted in this ledger. The default is false.
+   */
+  include_deleted?: boolean
   /**
    * If true, return the requested ledger object's contents as a hex string in
    * the XRP Ledger's binary format. Otherwise, return data in JSON format. The
@@ -204,5 +207,9 @@ export interface LedgerEntryResponse<T = LedgerEntry> extends BaseResponse {
     /** The binary representation of the ledger object, as hexadecimal. */
     node_binary?: string
     validated?: boolean
+    /**
+     * If the object was deleted in this ledger, this field contains the sequence number of the transaction that deleted it
+     */
+    deleted_ledger_index?: number
   }
 }
