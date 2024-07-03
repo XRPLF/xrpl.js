@@ -10,7 +10,7 @@ import type {
 } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { Signer } from '../models/common'
-import { TxRequest, TxResponse } from '../models/methods'
+import { TxResponse } from '../models/methods'
 import { BaseTransaction } from '../models/transactions/common'
 
 /** Approximate time for a ledger to close, in milliseconds */
@@ -129,7 +129,7 @@ export async function waitForFinalTransactionOutcome<
   }
 
   const txResponse = await client
-    .request<TxRequest, TxResponse<T>>({
+    .request({
       command: 'tx',
       transaction: txHash,
     })
@@ -153,7 +153,9 @@ export async function waitForFinalTransactionOutcome<
     })
 
   if (txResponse.result.validated) {
-    return txResponse
+    // TODO: resolve the type assertion below
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- we know that txResponse is of type TxResponse
+    return txResponse as TxResponse<T>
   }
 
   return waitForFinalTransactionOutcome<T>(
