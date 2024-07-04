@@ -41,6 +41,7 @@ import {
   validateNFTokenCreateOffer,
 } from './NFTokenCreateOffer'
 import { NFTokenMint, validateNFTokenMint } from './NFTokenMint'
+import { NFTokenModify, validateNFTokenModify } from './NFTokenModify'
 import { OfferCancel, validateOfferCancel } from './offerCancel'
 import { OfferCreate, validateOfferCreate } from './offerCreate'
 import { OracleDelete, validateOracleDelete } from './oracleDelete'
@@ -120,6 +121,7 @@ export type SubmittableTransaction =
   | NFTokenCancelOffer
   | NFTokenCreateOffer
   | NFTokenMint
+  | NFTokenModify
   | OfferCancel
   | OfferCreate
   | OracleDelete
@@ -324,6 +326,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'NFTokenMint':
       validateNFTokenMint(tx)
+      break
+
+    case 'NFTokenModify':
+      validateNFTokenModify(tx)
       break
 
     case 'OfferCancel':
