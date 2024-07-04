@@ -10,6 +10,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * Add `nfts_by_issuer` clio-only API definition
+* Add `NFTokenModify` transaction and add `tfMutable` flag in `NFTokenMint`
 
 ## 3.1.0 (2024-06-03)
 
