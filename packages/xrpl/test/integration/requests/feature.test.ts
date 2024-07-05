@@ -54,7 +54,7 @@ describe('feature', function () {
       assert.equal(featureResponse.type, 'response')
       assert.typeOf(featureResponse.result, 'object')
       assert.isTrue(AMENDMENT in featureResponse.result)
-      assert.lengthOf(featureResponse.result, 1)
+      assert.lengthOf(Object.keys(featureResponse.result), 1)
 
       const amendmentData = featureResponse.result[AMENDMENT]
 
