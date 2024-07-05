@@ -29,11 +29,10 @@ describe('NFTokenModify', function () {
   })
   afterEach(async () => teardownClient(testContext))
 
+  // Mint an NFToken with tfMutable flag and modify URI later
   it(
     'modify NFToken URI',
     async function () {
-      // Mint an NFToken with tfMutable flag and modify URI later
-
       const oldUri = convertStringToHex('https://www.google.com')
       const newUri = convertStringToHex('https://www.ripple.com')
 
