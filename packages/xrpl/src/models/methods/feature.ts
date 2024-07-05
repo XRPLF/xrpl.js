@@ -42,9 +42,8 @@ export interface FeatureAllResponse extends BaseResponse {
 }
 
 export interface FeatureOneResponse extends BaseResponse {
-  result: Record<
-    string,
-    {
+  result: {
+    [key: string]: {
       /*
        * Whether this amendment is currently enabled in the latest ledger.
        */
@@ -57,7 +56,7 @@ export interface FeatureOneResponse extends BaseResponse {
 
       supported: boolean
     }
-  >
+  }
 }
 
 /**

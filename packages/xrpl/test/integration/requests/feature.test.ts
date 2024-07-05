@@ -43,7 +43,7 @@ describe('feature', function () {
   )
 
   it(
-    'all',
+    'one',
     async () => {
       const featureRequest: FeatureRequest = {
         command: 'feature',
@@ -54,8 +54,10 @@ describe('feature', function () {
       assert.equal(featureResponse.type, 'response')
       assert.typeOf(featureResponse.result, 'object')
       assert.isTrue(AMENDMENT in featureResponse.result)
+      assert.lengthOf(featureResponse.result, 1)
 
       const amendmentData = featureResponse.result[AMENDMENT]
+
       assert.equal(amendmentData.name, 'AMM')
       // TODO: rippled says "false" for standalone nodes for some reason
       assert.typeOf(amendmentData.enabled, 'boolean')
