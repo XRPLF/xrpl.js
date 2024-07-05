@@ -8,6 +8,7 @@ import {
   isString,
   validateOptionalField,
   Account,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -51,10 +52,7 @@ export interface NFTokenModify extends BaseTransaction {
 export function validateNFTokenModify(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.NFTokenID == null) {
-    throw new ValidationError('NFTokenModify: missing field NFTokenID')
-  }
-
+  validateRequiredField(tx, 'NFTokenID', isString)
   validateOptionalField(tx, 'Owner', isAccount)
   validateOptionalField(tx, 'URI', isString)
 
