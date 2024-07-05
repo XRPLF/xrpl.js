@@ -2974,7 +2974,7 @@
     "DIDDelete": 50,
     "OracleSet": 51,
     "OracleDelete": 52,
-    "NFTokenModify":53,
+    "NFTokenModify": 53,
     "EnableAmendment": 100,
     "SetFee": 101,
     "UNLModify": 102
