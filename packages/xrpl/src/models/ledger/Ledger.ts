@@ -57,7 +57,7 @@ interface BaseLedger {
    * as true.
    */
   transactions?: Array<
-    Transaction & { 
+    Transaction & {
       hash: string
       metaData?: TransactionMetadata
     }
