@@ -1,3 +1,7 @@
+export const RIPPLED_API_V1 = 1
+export const RIPPLED_API_V2 = 2
+export const DEFAULT_API_VERSION = RIPPLED_API_V2
+export type APIVersion = typeof RIPPLED_API_V1 | typeof RIPPLED_API_V2
 export type LedgerIndex = number | ('validated' | 'closed' | 'current')
 
 export interface XRP {
@@ -104,6 +108,10 @@ export interface ResponseOnlyTxInfo {
    * The sequence number of the ledger that included this transaction.
    */
   ledger_index?: number
+  /**
+   * The hash of the ledger included this transaction.
+   */
+  ledger_hash?: string
   /**
    * @deprecated Alias for ledger_index.
    */

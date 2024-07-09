@@ -64,7 +64,7 @@ describe('EscrowFinish', function () {
           command: 'tx',
           transaction: accountObjects[0].PreviousTxnID,
         })
-      ).result.Sequence
+      ).result.tx_json.Sequence
 
       const finishTx: EscrowFinish = {
         TransactionType: 'EscrowFinish',

@@ -7,6 +7,7 @@ import {
   Payment,
   Transaction,
 } from '../../src'
+import { ValidationError } from '../../src/errors'
 import rippled from '../fixtures/rippled'
 import {
   setupClient,
@@ -22,6 +23,8 @@ const LastLedgerSequence = 2908734
 
 describe('client.autofill', function () {
   let testContext: XrplTestContext
+  const AMOUNT = '1234'
+  let paymentTx: Payment
 
   async function setupMockRippledVersionAndID(
     buildVersion: string,
@@ -40,10 +43,68 @@ describe('client.autofill', function () {
     await testContext.client.connect()
   }
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     testContext = await setupClient()
   })
-  afterEach(async () => teardownClient(testContext))
+  afterAll(async () => teardownClient(testContext))
+
+  beforeEach(async () => {
+    paymentTx = {
+      TransactionType: 'Payment',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      Amount: AMOUNT,
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      DestinationTag: 1,
+      Fee: '12',
+      Flags: 2147483648,
+      LastLedgerSequence: 65953073,
+      Sequence: 65923914,
+      SigningPubKey:
+        '02F9E33F16DF9507705EC954E3F94EB5F10D1FC4A354606DBE6297DBB1096FE654',
+      TxnSignature:
+        '3045022100E3FAE0EDEC3D6A8FF6D81BC9CF8288A61B7EEDE8071E90FF9314CB4621058D10022043545CF631706D700CEE65A1DB83EFDD185413808292D9D90F14D87D3DC2D8CB',
+      InvoiceID:
+        '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
+      Paths: [
+        [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
+      ],
+      SendMax: '100000000',
+    }
+  })
+
+  it('Validate Payment transaction API v2: Payment Transaction: Specify Only Amount field', async function () {
+    const txResult = await testContext.client.autofill(paymentTx)
+
+    assert.strictEqual(txResult.Amount, AMOUNT)
+  })
+
+  it('Validate Payment transaction API v2: Payment Transaction: Specify Only DeliverMax field', async function () {
+    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
+    paymentTx.DeliverMax = paymentTx.Amount
+    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
+    delete paymentTx.Amount
+    const txResult = await testContext.client.autofill(paymentTx)
+
+    assert.strictEqual(txResult.Amount, AMOUNT)
+  })
+
+  it('Validate Payment transaction API v2: Payment Transaction: identical DeliverMax and Amount fields', async function () {
+    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
+    paymentTx.DeliverMax = paymentTx.Amount
+
+    const txResult = await testContext.client.autofill(paymentTx)
+
+    assert.strictEqual(txResult.Amount, AMOUNT)
+    assert.strictEqual('DeliverMax' in txResult, false)
+  })
+
+  it('Validate Payment transaction API v2: Payment Transaction: differing DeliverMax and Amount fields', async function () {
+    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
+    paymentTx.DeliverMax = '6789'
+    paymentTx.Amount = '1234'
+
+    await assertRejects(testContext.client.autofill(paymentTx), ValidationError)
+  })
 
   it('should not autofill if fields are present', async function () {
     const tx: Transaction = {

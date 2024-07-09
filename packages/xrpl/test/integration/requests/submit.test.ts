@@ -54,6 +54,7 @@ describe('submit', function () {
       )
 
       const expectedResponse: SubmitResponse = {
+        api_version: 2,
         id: submitResponse.id,
         type: 'response',
         result: {
