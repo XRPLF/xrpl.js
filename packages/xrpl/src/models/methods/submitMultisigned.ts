@@ -1,3 +1,4 @@
+import { APIVersion, DEFAULT_API_VERSION, RIPPLED_API_V1 } from '../common'
 import { Transaction } from '../transactions'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
@@ -25,27 +26,58 @@ export interface SubmitMultisignedRequest extends BaseRequest {
 }
 
 /**
+ * Common properties for multisigned transaction responses.
+ *
+ * @category Responses
+ */
+interface BaseSubmitMultisignedResult {
+  /**
+   * Code indicating the preliminary result of the transaction, for example.
+   * `tesSUCCESS`.
+   */
+  engine_result: string
+  /**
+   * Numeric code indicating the preliminary result of the transaction,
+   * directly correlated to `engine_result`.
+   */
+  engine_result_code: number
+  /** Human-readable explanation of the preliminary transaction result. */
+  engine_result_message: string
+  /** The complete transaction in hex string format. */
+  tx_blob: string
+  /** The complete transaction in JSON format. */
+  tx_json: Transaction
+}
+
+/**
  * Response expected from a {@link SubmitMultisignedRequest}.
  *
  * @category Responses
  */
 export interface SubmitMultisignedResponse extends BaseResponse {
-  result: {
-    /**
-     * Code indicating the preliminary result of the transaction, for example.
-     * `tesSUCCESS` .
-     */
-    engine_result: string
-    /**
-     * Numeric code indicating the preliminary result of the transaction,
-     * directly correlated to `engine_result`.
-     */
-    engine_result_code: number
-    /** Human-readable explanation of the preliminary transaction result. */
-    engine_result_message: string
-    /** The complete transaction in hex string format. */
-    tx_blob: string
-    /** The complete transaction in JSON format. */
+  result: BaseSubmitMultisignedResult & {
+    hash?: string
+  }
+}
+
+/**
+ * Response expected from a {@link SubmitMultisignedRequest} using api_version 1.
+ *
+ * @category ResponsesV1
+ */
+export interface SubmitMultisignedV1Response extends BaseResponse {
+  result: BaseSubmitMultisignedResult & {
     tx_json: Transaction & { hash?: string }
   }
 }
+
+/**
+ * Type to map between the API version and the response type.
+ *
+ * @category Responses
+ */
+export type SubmitMultisignedVersionResponseMap<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> = Version extends typeof RIPPLED_API_V1
+  ? SubmitMultisignedV1Response
+  : SubmitMultisignedResponse

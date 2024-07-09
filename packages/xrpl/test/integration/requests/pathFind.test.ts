@@ -41,6 +41,7 @@ describe('path_find', function () {
       const response = await testContext.client.request(pathFind)
 
       const expectedResponse: PathFindResponse = {
+        api_version: 2,
         id: response.id,
         type: 'response',
         result: {
@@ -98,6 +99,7 @@ describe('path_find', function () {
       const response = await testContext.client.request(pathFind)
 
       const expectedResponse: PathFindResponse = {
+        api_version: 2,
         id: response.id,
         type: 'response',
         result: {

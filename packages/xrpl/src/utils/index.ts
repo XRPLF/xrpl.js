@@ -23,6 +23,7 @@ import {
 } from 'ripple-binary-codec'
 import { verify as verifyKeypairSignature } from 'ripple-keypairs'
 
+import type { APIVersion } from '../models'
 import { LedgerEntry } from '../models/ledger'
 import { Response } from '../models/methods'
 import { PaymentChannelClaim } from '../models/transactions/paymentChannelClaim'
@@ -158,7 +159,7 @@ function isValidAddress(address: string): boolean {
  * @returns Whether the response has more pages of data.
  * @category Utilities
  */
-function hasNextPage(response: Response): boolean {
+function hasNextPage(response: Response<APIVersion>): boolean {
   // eslint-disable-next-line @typescript-eslint/dot-notation -- only checking if it exists
   return Boolean(response.result['marker'])
 }

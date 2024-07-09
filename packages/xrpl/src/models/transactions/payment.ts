@@ -26,7 +26,7 @@ export enum PaymentFlags {
    * This is intended to force the transaction to take arbitrage opportunities.
    * Most clients do not need this.
    */
-  tfNoDirectRipple = 0x00010000,
+  tfNoRippleDirect = 0x00010000,
   /**
    * If the specified Amount cannot be sent without spending more than SendMax,
    * reduce the received amount instead of failing outright. See Partial.
@@ -88,7 +88,7 @@ export interface PaymentFlagsInterface extends GlobalFlags {
    * This is intended to force the transaction to take arbitrage opportunities.
    * Most clients do not need this.
    */
-  tfNoDirectRipple?: boolean
+  tfNoRippleDirect?: boolean
   /**
    * If the specified Amount cannot be sent without spending more than SendMax,
    * reduce the received amount instead of failing outright. See Partial.

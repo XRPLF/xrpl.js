@@ -11,9 +11,9 @@ import { assertRejects } from '../testUtils'
 
 const rippledResponse = function (request: Request): Record<string, unknown> {
   if ('marker' in request) {
-    return rippled.ledger_data.last_page
+    return rippled.ledger_data.lastPage
   }
-  return rippled.ledger_data.first_page
+  return rippled.ledger_data.firstPage
 }
 
 describe('client.requestNextPage', function () {
