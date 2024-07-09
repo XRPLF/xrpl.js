@@ -12,6 +12,10 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add `nfts_by_issuer` clio-only API definition
 * Support for the `fixPreviousTxnID` amendment.
 
+## 1.0.4-mpt-beta (2024-06-09)
+### Fixed
+* Merged latest development from `main`
+
 ## 3.1.0 (2024-06-03)
 
 ### BREAKING CHANGES
