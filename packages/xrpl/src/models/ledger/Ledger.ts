@@ -1,14 +1,14 @@
+import { APIVersion, DEFAULT_API_VERSION, RIPPLED_API_V1 } from '../common'
 import { Transaction, TransactionMetadata } from '../transactions'
 
 import { LedgerEntry } from './LedgerEntry'
 
 /**
- * A ledger is a block of transactions and shared state data. It has a unique
- * header that describes its contents using cryptographic hashes.
+ * Common properties for ledger entries.
  *
  * @category Ledger Entries
  */
-export default interface Ledger {
+interface BaseLedger {
   /** The SHA-512Half of this ledger's state tree information. */
   account_hash: string
   /** All the state information in this ledger. Admin only. */
@@ -38,11 +38,6 @@ export default interface Ledger {
    * for this ledger and all its contents.
    */
   ledger_hash: string
-  /**
-   * The ledger index of the ledger. Some API methods display this as a quoted
-   * integer; some display it as a native JSON number.
-   */
-  ledger_index: string
   /** The approximate time at which the previous ledger was closed. */
   parent_close_time: number
   /**
@@ -63,3 +58,40 @@ export default interface Ledger {
    */
   transactions?: Array<Transaction & { metaData?: TransactionMetadata }>
 }
+
+/**
+ * A ledger is a block of transactions and shared state data. It has a unique
+ * header that describes its contents using cryptographic hashes.
+ *
+ * @category Ledger Entries
+ */
+export interface Ledger extends BaseLedger {
+  /**
+   * The ledger index of the ledger. Represented as a number.
+   */
+  ledger_index: number
+}
+
+/**
+ * A ledger is a block of transactions and shared state data. It has a unique
+ * header that describes its contents using cryptographic hashes. This is used
+ * in api_version 1.
+ *
+ * @category Ledger Entries
+ */
+export interface LedgerV1 extends BaseLedger {
+  /**
+   * The ledger index of the ledger. Some API methods display this as a quoted
+   * integer; some display it as a number.
+   */
+  ledger_index: string
+}
+
+/**
+ * Type to map between the API version and the Ledger type.
+ *
+ * @category Responses
+ */
+export type LedgerVersionMap<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> = Version extends typeof RIPPLED_API_V1 ? LedgerV1 : Ledger
