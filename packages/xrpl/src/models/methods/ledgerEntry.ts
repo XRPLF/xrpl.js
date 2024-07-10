@@ -36,7 +36,11 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
     }
   }
   /**
-   * If true, include latest version of the object that is not deleted in this ledger. The default is false.
+   * (Optional) If set to true and the queried object has been deleted,
+   * return its complete data prior to its deletion.
+   * If set to false or not provided and the queried object has been deleted,
+   * return objectNotFound (current behavior).
+   * This parameter is supported only by Clio servers
    */
   include_deleted?: boolean
   /**
@@ -208,7 +212,7 @@ export interface LedgerEntryResponse<T = LedgerEntry> extends BaseResponse {
     node_binary?: string
     validated?: boolean
     /**
-     * If the object was deleted in this ledger, this field contains the sequence number of the transaction that deleted it
+     * (Optional) Indicates the ledger index at which the object was deleted.
      */
     deleted_ledger_index?: number
   }
