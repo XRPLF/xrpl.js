@@ -90,3 +90,25 @@ function convertFlagsToNumber(flags: GlobalFlags, flagEnum: any): number {
     return flags[flag] ? resultFlags | flagEnum[flag] : resultFlags
   }, 0)
 }
+
+export function parseTransactionFlags(tx: Transaction): any {
+  setTransactionFlagsToNumber(tx)
+  if (typeof tx.Flags !== 'number' || !tx.Flags || tx.Flags == 0) {
+    return {}
+  }
+
+  const flags = tx.Flags
+
+  let flagsMap = {}
+
+  const flagEnum = txToFlag[tx.TransactionType]
+  Object.values(flagEnum).forEach((flag) => {
+    if (isFlagEnabled(flags, flag)) {
+      flagsMap[key] = true
+    } else {
+      flagsMap[key] = false
+    }
+  })
+
+  return flagsMap
+}
