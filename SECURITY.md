@@ -22,7 +22,7 @@ We kindly ask you to refrain from malicious acts that put our users, the project
 
 Security is a top priority. But no matter how much effort we put into security, there can still be vulnerabilities present.
 
-If you discover a security vulnerability, please use the following means of communications to report it to us:
+If you discover a security vulnerability, please use the following means of communication to report it to us:
 
 - Report the security issue to bugs@ripple.com
 - [Ripple Bug Bounty](https://ripple.com/bug-bounty/)
