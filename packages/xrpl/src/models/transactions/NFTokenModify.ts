@@ -23,8 +23,8 @@ export interface NFTokenModify extends BaseTransaction {
    */
   NFTokenID: string
   /**
-   * Indicates the AccountID of the account that owns the
-   * corresponding NFToken.
+   * Indicates the AccountID of the account that owns the corresponding NFToken.
+   * Can be omitted if the owner is the account submitting this transaction
    */
   Owner?: Account
   /**

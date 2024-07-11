@@ -34,7 +34,7 @@ describe('NFTokenModify', function () {
     'modify NFToken URI',
     async function () {
       const oldUri = convertStringToHex('https://www.google.com')
-      const newUri = convertStringToHex('https://www.ripple.com')
+      const newUri = convertStringToHex('https://www.youtube.com')
 
       const mutableMint: NFTokenMint = {
         TransactionType: 'NFTokenMint',
