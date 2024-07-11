@@ -103,10 +103,10 @@ export function parseTransactionFlags(tx: Transaction): any {
 
   const flagEnum = txToFlag[tx.TransactionType]
   Object.values(flagEnum).forEach((flag) => {
-    if (isFlagEnabled(flags, flag)) {
-      flagsMap[key] = true
-    } else {
-      flagsMap[key] = false
+    console.log('hello', flag)
+    console.log('hello val', flagEnum[flag])
+    if (typeof flag === 'string' && isFlagEnabled(flags, flagEnum[flag])) {
+      flagsMap[flag] = true
     }
   })
 

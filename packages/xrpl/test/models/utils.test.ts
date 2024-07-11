@@ -17,6 +17,7 @@ import { isFlagEnabled } from '../../src/models/utils'
 import {
   setTransactionFlagsToNumber,
   parseAccountRootFlags,
+  parseTransactionFlags,
 } from '../../src/models/utils/flags'
 
 /**
