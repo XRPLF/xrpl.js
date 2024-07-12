@@ -12,6 +12,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add `nfts_by_issuer` clio-only API definition
 * Support for the `fixPreviousTxnID` amendment.
 * Support for the user version of the `feature` RPC.
+* Add `hash` field to `ledger` command response
 
 ## 3.1.0 (2024-06-03)
 
