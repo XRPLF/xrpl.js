@@ -107,10 +107,11 @@ export function parseTransactionFlags(tx: Transaction): any {
   const flags = tx.Flags
   const flagsMap = {}
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
   const flagEnum = txToFlag[tx.TransactionType]
   Object.values(flagEnum).forEach((flag) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
     if (typeof flag === 'string' && isFlagEnabled(flags, flagEnum[flag])) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
       flagsMap[flag] = true
     }
   })
