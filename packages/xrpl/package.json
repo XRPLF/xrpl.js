@@ -27,14 +27,13 @@
     "@xrplf/isomorphic": "^1.0.1",
     "@xrplf/secret-numbers": "^1.0.0",
     "bignumber.js": "^9.0.0",
-    "cross-fetch": "^4.0.0",
     "eventemitter3": "^5.0.1",
     "ripple-address-codec": "^5.0.0",
     "ripple-binary-codec": "^2.1.0",
     "ripple-keypairs": "^2.0.0"
   },
   "devDependencies": {
-    "@types/node": "^16.18.38",
+    "@types/node": "^18.18.38",
     "eventemitter3": "^5.0.1",
     "https-proxy-agent": "^7.0.1",
     "karma": "^6.4.1",
@@ -87,6 +86,6 @@
     "xrpl"
   ],
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   }
 }
