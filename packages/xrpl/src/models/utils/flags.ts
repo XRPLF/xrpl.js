@@ -91,21 +91,25 @@ function convertFlagsToNumber(flags: GlobalFlags, flagEnum: any): number {
   }, 0)
 }
 
+/**
+ * Convert a Transaction flags property into an interface for easy interpretation.
+ *
+ * @param tx - A transaction to parse flags for.
+ * @returns An interface with all flags as booleans.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseTransactionFlags(tx: Transaction): any {
   setTransactionFlagsToNumber(tx)
-  if (typeof tx.Flags !== 'number' || !tx.Flags || tx.Flags == 0) {
+  if (typeof tx.Flags !== 'number' || !tx.Flags || tx.Flags === 0) {
     return {}
   }
 
   const flags = tx.Flags
-
-  let flagsMap = {}
-
+  const flagsMap = {}
   const flagEnum = txToFlag[tx.TransactionType]
   Object.values(flagEnum).forEach((flag) => {
-    console.log('hello', flag)
-    console.log('hello val', flagEnum[flag])
     if (typeof flag === 'string' && isFlagEnabled(flags, flagEnum[flag])) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
       flagsMap[flag] = true
     }
   })
