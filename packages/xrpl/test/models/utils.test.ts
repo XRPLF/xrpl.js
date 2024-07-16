@@ -208,5 +208,43 @@ describe('Models Utils', function () {
       assert.isUndefined(parsed.lsfDisallowIncomingTrustline)
       assert.isUndefined(parsed.lsfAllowTrustLineClawback)
     })
+
+    it('parseTransactionFlags all enabled', function () {
+      const tx: PaymentChannelClaim = {
+        Account: 'r...',
+        TransactionType: 'PaymentChannelClaim',
+        Channel:
+          'C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198',
+        Flags: {
+          tfRenew: true,
+          tfClose: false,
+        },
+      }
+
+      const expected = {
+        tfRenew: true,
+      }
+
+      const flagsMap = parseTransactionFlags(tx)
+      assert.strictEqual(flagsMap, expected)
+    })
+
+    it('parseTransactionFlags all false', function () {
+      const tx: PaymentChannelClaim = {
+        Account: 'r...',
+        TransactionType: 'PaymentChannelClaim',
+        Channel:
+          'C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198',
+        Flags: {
+          tfRenew: false,
+          tfClose: false,
+        },
+      }
+
+      const expected = {}
+
+      const flagsMap = parseTransactionFlags(tx)
+      assert.strictEqual(flagsMap, expected)
+    })
   })
 })
