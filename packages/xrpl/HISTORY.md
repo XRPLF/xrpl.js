@@ -2,8 +2,7 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
-## Unreleased
-* Remove references to the Hooks testnet faucet in the xrpl.js code repository.
+## 4.0.0 (2024-07-15)
 
 ### BREAKING CHANGES
 * Use rippled api_version v2 as default while maintaining support for v1.
@@ -13,6 +12,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Support for the `fixPreviousTxnID` amendment.
 * Support for the user version of the `feature` RPC.
 * Add `hash` field to `ledger` command response
+
+### Removed
+* Remove references to the Hooks testnet faucet in the xrpl.js code repository.
 
 ## 3.1.0 (2024-06-03)
 
