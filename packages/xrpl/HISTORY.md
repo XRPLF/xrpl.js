@@ -18,6 +18,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### BREAKING CHANGES
 * Small fix in the API to use a new flag name `tfNoDirectRipple` instead of the existing flag name `tfNoRippleDirect`
+* Node.js has been upgraded to a minimum version of 18
+* `fetch` now relies on the native javascript environment in browsers and Node.js
 
 ### Added
 * Support for the Price Oracles amendment (XLS-47).
