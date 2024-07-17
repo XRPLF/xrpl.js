@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign -- param reassign is safe */
 /* eslint-disable no-bitwise -- flags require bitwise operations */
-
 import { ValidationError } from '../../errors'
 import {
   AccountRootFlagsInterface,
@@ -97,8 +96,7 @@ function convertFlagsToNumber(flags: GlobalFlags, flagEnum: any): number {
  * @param tx - A transaction to parse flags for.
  * @returns An interface with all flags as booleans.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic response object structure
-export function parseTransactionFlags(tx: Transaction): any {
+export function parseTransactionFlags(tx: Transaction): object {
   setTransactionFlagsToNumber(tx)
   if (typeof tx.Flags !== 'number' || !tx.Flags || tx.Flags === 0) {
     return {}
@@ -107,11 +105,11 @@ export function parseTransactionFlags(tx: Transaction): any {
   const flags = tx.Flags
   const flagsMap = {}
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- safe member access
   const flagEnum = txToFlag[tx.TransactionType]
   Object.values(flagEnum).forEach((flag) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
     if (typeof flag === 'string' && isFlagEnabled(flags, flagEnum[flag])) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
       flagsMap[flag] = true
     }
   })
