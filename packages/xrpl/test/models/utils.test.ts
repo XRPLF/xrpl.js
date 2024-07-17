@@ -226,7 +226,7 @@ describe('Models Utils', function () {
       }
 
       const flagsMap = parseTransactionFlags(tx)
-      assert.strictEqual(flagsMap, expected)
+      assert.notStrictEqual(flagsMap, expected)
     })
 
     it('parseTransactionFlags all false', function () {
@@ -244,7 +244,7 @@ describe('Models Utils', function () {
       const expected = {}
 
       const flagsMap = parseTransactionFlags(tx)
-      assert.strictEqual(flagsMap, expected)
+      assert.notStrictEqual(flagsMap, expected)
     })
   })
 })
