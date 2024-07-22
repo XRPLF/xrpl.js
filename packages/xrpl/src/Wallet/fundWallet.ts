@@ -1,4 +1,3 @@
-import fetch from 'cross-fetch'
 import { isValidClassicAddress } from 'ripple-address-codec'
 
 import type { Client } from '../client'
