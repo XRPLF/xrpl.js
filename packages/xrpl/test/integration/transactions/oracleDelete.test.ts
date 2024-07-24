@@ -8,6 +8,7 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { testTransaction } from '../utils'
+import { OracleSet, OracleDelete } from '../../../src'
 
 // how long before each test case times out
 const TIMEOUT = 20000
