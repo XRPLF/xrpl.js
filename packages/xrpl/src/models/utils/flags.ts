@@ -18,6 +18,9 @@ import { PaymentChannelClaimFlags } from '../transactions/paymentChannelClaim'
 import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlags } from '../transactions/trustSet'
 import { XChainModifyBridgeFlags } from '../transactions/XChainModifyBridge'
+import { MPTokenAuthorizeFlags } from '../transactions/MPTokenAuthorize'
+import { MPTokenIssuanceCreateFlags } from '../transactions/MPTokenIssuanceCreate'
+import { MPTokenIssuanceSetFlags } from '../transactions/MPTokenIssuanceSet'
 
 import { isFlagEnabled } from '.'
 
@@ -49,6 +52,9 @@ const txToFlag = {
   AccountSet: AccountSetTfFlags,
   AMMDeposit: AMMDepositFlags,
   AMMWithdraw: AMMWithdrawFlags,
+  MPTokenAuthorize: MPTokenAuthorizeFlags,
+  MPTokenIssuanceCreate: MPTokenIssuanceCreateFlags,
+  MPTokenIssuanceSet: MPTokenIssuanceSetFlags,
   NFTokenCreateOffer: NFTokenCreateOfferFlags,
   NFTokenMint: NFTokenMintFlags,
   OfferCreate: OfferCreateFlags,

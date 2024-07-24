@@ -6,6 +6,10 @@ import {
   TrustSet,
   Payment,
   Clawback,
+  MPTokenIssuanceCreate,
+  MPTokenIssuanceCreateFlags,
+  MPTokenAuthorize,
+  TransactionMetadata,
 } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
@@ -14,6 +18,7 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
+import { LedgerEntryResponse } from '../../../src'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -108,6 +113,94 @@ describe('Clawback', function () {
         '500',
         linesResponse.result.lines[0].balance,
         `Holder balance incorrect after Clawback`,
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'MPToken',
+    async () => {
+      const wallet2 = await generateFundedWallet(testContext.client)
+      const createTx: MPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: testContext.wallet.classicAddress,
+        Flags: MPTokenIssuanceCreateFlags.tfMPTCanClawback,
+      }
+
+      let mptCreateRes = await testTransaction(
+        testContext.client,
+        createTx,
+        testContext.wallet,
+      )
+      const txHash = mptCreateRes.result.tx_json.hash
+
+      let txResponse = await testContext.client.request({
+        command: 'tx',
+        transaction: txHash,
+      })
+
+      const meta = txResponse.result
+        .meta as TransactionMetadata<MPTokenIssuanceCreate>
+
+      const mptID = meta.mpt_issuance_id
+
+      const holderAuthTx: MPTokenAuthorize = {
+        TransactionType: 'MPTokenAuthorize',
+        Account: wallet2.classicAddress,
+        MPTokenIssuanceID: mptID!,
+      }
+
+      await testTransaction(testContext.client, holderAuthTx, wallet2)
+
+      const paymentTx: Payment = {
+        TransactionType: 'Payment',
+        Account: testContext.wallet.classicAddress,
+        Amount: { mpt_issuance_id: mptID!, value: '9223372036854775807' },
+        Destination: wallet2.classicAddress,
+      }
+
+      await testTransaction(testContext.client, paymentTx, testContext.wallet)
+
+      let ledgerEntryResponse: LedgerEntryResponse =
+        await testContext.client.request({
+          command: 'ledger_entry',
+          mptoken: {
+            mpt_issuance_id: mptID!,
+            account: wallet2.classicAddress,
+          },
+        })
+
+      assert.equal(
+        // @ts-ignore
+        ledgerEntryResponse.result.node.MPTAmount,
+        '7fffffffffffffff',
+      )
+
+      // actual test - clawback
+      const clawTx: Clawback = {
+        TransactionType: 'Clawback',
+        Account: testContext.wallet.classicAddress,
+        Amount: {
+          mpt_issuance_id: mptID!,
+          value: '500',
+        },
+        MPTokenHolder: wallet2.classicAddress,
+      }
+      await testTransaction(testContext.client, clawTx, testContext.wallet)
+
+      ledgerEntryResponse = await testContext.client.request({
+        command: 'ledger_entry',
+        mptoken: {
+          mpt_issuance_id: mptID!,
+          account: wallet2.classicAddress,
+        },
+      })
+
+      assert.equal(
+        // @ts-ignore
+        ledgerEntryResponse.result.node.MPTAmount,
+        '7ffffffffffffe0b',
       )
     },
     TIMEOUT,

@@ -33,6 +33,11 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add missing `lsfAMMNode` flag to `RippleState` ledger object
 * Add `PreviousFields` to `DeletedNode` metadata type
 
+## 1.0.0-mpt-beta (2024-04-22)
+### Non-Breaking Changes
+* Added new MPT transaction models
+* New `MPTAmount` type support for `Payment` and `Clawback` transactions
+
 ## 3.0.0 (2024-02-01)
 
 ### BREAKING CHANGES
