@@ -1,6 +1,5 @@
 import { assert } from 'chai'
 
-import { OracleSet, OracleDelete } from '../../../src'
 import { validate, ValidationError } from '../../src'
 import { validateOracleDelete } from '../../src/models/transactions/oracleDelete'
 
