@@ -1,5 +1,6 @@
 import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
+
 import { OracleSet, OracleDelete } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
