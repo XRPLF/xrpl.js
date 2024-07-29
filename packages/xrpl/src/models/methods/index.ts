@@ -148,6 +148,14 @@ import {
   StateAccountingFinal,
 } from './serverInfo'
 import { ServerStateRequest, ServerStateResponse } from './serverState'
+import {
+  SimulateBinaryRequest,
+  SimulateBinaryResponse,
+  SimulateJsonRequest,
+  SimulateJsonResponse,
+  SimulateRequest,
+  SimulateResponse,
+} from './simulate'
 import { SubmitRequest, SubmitResponse } from './submit'
 import {
   SubmitMultisignedRequest,
@@ -398,6 +406,10 @@ export type RequestResponseMap<
   ? LedgerDataResponse
   : T extends LedgerEntryRequest
   ? LedgerEntryResponse
+  : T extends SimulateBinaryRequest
+  ? SimulateBinaryResponse
+  : T extends SimulateJsonRequest
+  ? SimulateJsonResponse
   : T extends SubmitRequest
   ? SubmitResponse
   : T extends SubmitMultisignedRequest
@@ -544,6 +556,8 @@ export {
   LedgerEntryRequest,
   LedgerEntryResponse,
   // transaction methods with types
+  SimulateRequest,
+  SimulateResponse,
   SubmitRequest,
   SubmitResponse,
   SubmitMultisignedRequest,
