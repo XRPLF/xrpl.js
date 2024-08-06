@@ -91,10 +91,10 @@ function convertFlagsToNumber(flags: GlobalFlags, flagEnum: any): number {
 }
 
 /**
- * Convert a Transaction flags property into an interface for easy interpretation.
+ * Convert a Transaction flags property into a map for easy interpretation.
  *
  * @param tx - A transaction to parse flags for.
- * @returns An interface with all flags as booleans.
+ * @returns A map with all flags as booleans.
  */
 export function parseTransactionFlags(tx: Transaction): object {
   setTransactionFlagsToNumber(tx)

@@ -246,5 +246,22 @@ describe('Models Utils', function () {
       const flagsMap = parseTransactionFlags(tx)
       assert.notStrictEqual(flagsMap, expected)
     })
+
+    it('parseTransactionFlags flag is already numeric', function () {
+      const tx: PaymentChannelClaim = {
+        Account: 'r...',
+        TransactionType: 'PaymentChannelClaim',
+        Channel:
+          'C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198',
+        Flags: 65536,
+      }
+
+      const expected = {
+        tfRenew: true,
+      }
+
+      const flagsMap = parseTransactionFlags(tx)
+      assert.notStrictEqual(flagsMap, expected)
+    })
   })
 })
