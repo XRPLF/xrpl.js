@@ -2,6 +2,11 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
+## Unreleased Changes
+
+### Added
+* parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion
+
 ## 4.0.0 (2024-07-15)
 
 ### BREAKING CHANGES
