@@ -398,7 +398,7 @@ export function validate(
       break
 
     default:
-      if (!customDefinition)
+      if (!hasCustomDefinition)
         throw new ValidationError(
           `Invalid field TransactionType: ${tx.TransactionType}`,
         )
