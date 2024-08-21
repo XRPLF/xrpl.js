@@ -2891,7 +2891,6 @@
     "temEMPTY_DID": -253,
     "temARRAY_EMPTY": -252,
     "temARRAY_TOO_LARGE": -251,
-    "temMPT_NOT_SUPPORTED": -250,
 
     "tefFAILURE": -199,
     "tefALREADY": -198,
