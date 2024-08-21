@@ -4,13 +4,22 @@ import { ValidationError } from '../errors'
 const SANITY_CHECK = /^[0-9]+$/u
 
 /**
- * Convert an unsigned 64-bit integer string to hex string. Mostly used for the MaximumAmount field
+ * Convert an unsigned 64-bit decimal string to hex string. Mostly used for the MaximumAmount field
  * in MPTokenIssuanceCreate.
  *
  * @param numberToConvert - Non-negative number string.
  * @returns Amount in hex string.
  * @throws When amount is invalid.
  * @category Utilities
+ *
+ * @example
+ * ```typescript
+ * const decimalString = mptUint64ToHex("1000");
+ * console.log(decimalString); // Output: "3e8"
+ *
+ * const hexString = mptUint64ToHex("0x3e8");
+ * console.log(hexString); // Output: "3e8"
+ * ```
  */
 export function mptUint64ToHex(numberToConvert: string): string {
   // convert to base 10 string first for inputs like scientific notation

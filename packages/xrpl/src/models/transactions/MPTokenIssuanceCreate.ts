@@ -78,6 +78,15 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
    * Specifies the hex-encoded maximum asset amount of this token that should ever be issued.
    * It is a non-negative integer that can store a range of up to 63 bits. If not set, the max
    * amount will default to the largest unsigned 63-bit integer (0x7FFFFFFFFFFFFFFF)
+   *
+   * Helper function `mptUint64ToHex` can be used to help converting from base 10 or 16 string
+   * to a valid value.
+   *
+   * Example:
+   * ```
+   * MaximumAmount: '3e8' // 0x3E8 in hex or 1000 in decimal
+   * MaximumAmount:  mptUint64ToHex('1000') // 1000 in decimal using helper function
+   * ```
    */
   MaximumAmount?: string
   /**

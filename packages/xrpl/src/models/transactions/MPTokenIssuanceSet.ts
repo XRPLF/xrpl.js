@@ -17,13 +17,11 @@ import { ValidationError } from '../../errors'
  */
 export enum MPTokenIssuanceSetFlags {
   /**
-   * If set, indicates that the MPT can be locked both individually and globally.
-   * If not set, the MPT cannot be locked in any way.
+   * If set, indicates that issuer locks the MPT
    */
   tfMPTLock = 0x00000001,
   /**
-   * If set, indicates that the MPT can be locked both individually and globally.
-   * If not set, the MPT cannot be locked in any way.
+   * If set, indicates that issuer unlocks the MPT
    */
   tfMPTUnlock = 0x00000002,
 }
