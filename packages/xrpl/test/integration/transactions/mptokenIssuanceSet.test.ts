@@ -56,6 +56,7 @@ describe('MPTokenIssuanceDestroy', function () {
       let accountObjectsResponse = await testContext.client.request({
         command: 'account_objects',
         account: testContext.wallet.classicAddress,
+        type: 'mpt_issuance',
       })
       assert.lengthOf(
         accountObjectsResponse.result.account_objects!,

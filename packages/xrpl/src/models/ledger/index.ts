@@ -19,6 +19,8 @@ import { Ledger, LedgerV1 } from './Ledger'
 import { LedgerEntry, LedgerEntryFilter } from './LedgerEntry'
 import LedgerHashes from './LedgerHashes'
 import NegativeUNL, { NEGATIVE_UNL_ID } from './NegativeUNL'
+import { MPTokenIssuance } from './MPTokenIssuance'
+import { MPToken } from './MPToken'
 import { NFTokenOffer } from './NFTokenOffer'
 import { NFToken, NFTokenPage } from './NFTokenPage'
 import Offer, { OfferFlags } from './Offer'
@@ -55,6 +57,8 @@ export {
   Majority,
   NEGATIVE_UNL_ID,
   NegativeUNL,
+  MPTokenIssuance,
+  MPToken,
   NFTokenOffer,
   NFTokenPage,
   NFToken,
