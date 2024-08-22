@@ -56,7 +56,12 @@ interface BaseLedger {
    * either JSON or binary depending on whether the request specified binary
    * as true.
    */
-  transactions?: Array<Transaction & { metaData?: TransactionMetadata }>
+  transactions?: Array<
+    Transaction & {
+      hash: string
+      metaData?: TransactionMetadata
+    }
+  >
 }
 
 /**
