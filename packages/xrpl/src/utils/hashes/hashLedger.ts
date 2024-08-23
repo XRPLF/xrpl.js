@@ -64,6 +64,7 @@ function addLengthPrefix(hex: string): string {
  * Hashes the Transaction object as the ledger does. Throws if the transaction is unsigned.
  *
  * @param tx - A transaction to hash. Tx may be in binary blob form. Tx must be signed.
+ * @param definitions - Definitions to use for encoding and decoding.
  * @returns A hash of tx.
  * @throws ValidationError if the Transaction is unsigned.\
  * @category Utilities

@@ -4,10 +4,10 @@ import header from './hashLedger.json'
 import transactions from './hashLedgerTransactions.json'
 import normalSign from './sign.json'
 import signAsSign from './signAs.json'
+import signAsCustomDefinition from './signAsCustomDefinition.json'
 import escrowSign from './signEscrow.json'
 import signPaymentChannelClaim from './signPaymentChannelClaim.json'
 import ticketSign from './signTicket.json'
-import signAsCustomDefinition from './signAsCustomDefinition.json'
 
 const sign = {
   normal: normalSign,
