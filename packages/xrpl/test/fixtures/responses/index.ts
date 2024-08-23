@@ -8,11 +8,11 @@ import withXRPOrderBook from './getOrderbookWithXrp.json'
 import getServerInfo from './getServerInfo.json'
 import normalSign from './sign.json'
 import signAsSign from './signAs.json'
+import signAsCustomDefinition from './signAsCustomDefinition.json'
+import signCustomDefinition from './signCustomDefinition.json'
 import escrowSign from './signEscrow.json'
 import signPaymentChannelClaim from './signPaymentChannelClaim.json'
 import ticketSign from './signTicket.json'
-import signCustomDefinition from './signCustomDefinition.json'
-import signAsCustomDefinition from './signAsCustomDefinition.json'
 
 const getOrderbook = {
   normal: normalOrderBook,

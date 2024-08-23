@@ -166,6 +166,7 @@ export interface TransactionAndMetadata<
  * Encode/decode and individual type validation.
  *
  * @param transaction - A Transaction.
+ * @param hasCustomDefinition - Whether the transaction has a custom definition.
  * @throws ValidationError When the Transaction is malformed.
  * @category Utilities
  */
@@ -398,9 +399,10 @@ export function validate(
       break
 
     default:
-      if (!hasCustomDefinition)
+      if (!hasCustomDefinition) {
         throw new ValidationError(
           `Invalid field TransactionType: ${tx.TransactionType}`,
         )
+      }
   }
 }
