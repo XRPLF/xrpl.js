@@ -409,10 +409,7 @@ export class Wallet {
      * This will throw a more clear error for JS users if the supplied transaction has incorrect formatting
      */
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
-    validate(
-      tx as unknown as Record<string, unknown>,
-      definitions ? true : false,
-    )
+    validate(tx as unknown as Record<string, unknown>, Boolean(definitions))
 
     const txToSignAndEncode = { ...tx }
 

@@ -2,6 +2,7 @@
 
 /* eslint-disable max-lines -- Client is a large file w/ lots of imports/exports */
 import { EventEmitter } from 'eventemitter3'
+import { XrplDefinitionsBase } from 'ripple-binary-codec'
 
 import {
   RippledError,
@@ -212,6 +213,12 @@ class Client extends EventEmitter<EventTypes> {
    *
    */
   public buildVersion: string | undefined
+
+  /**
+   * Custom rippled types to use instead of the default. Used for sidechains and amendments.
+   *
+   */
+  public definitions: XrplDefinitionsBase | undefined
 
   /**
    * Creates a new Client with a websocket connection to a rippled server.
@@ -511,6 +518,33 @@ class Client extends EventEmitter<EventTypes> {
   }
 
   /**
+   * Get Definitions from server_definitions
+   *
+   * @returns void
+   * @example
+   * ```ts
+   * const { Client } = require('xrpl')
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   * await client.getDefinitions()
+   * console.log(client.definitions)
+   * ```
+   */
+  public async getDefinitions(): Promise<void> {
+    try {
+      const response = await this.request({
+        command: 'server_definitions',
+      })
+      this.definitions = new XrplDefinitionsBase(
+        JSON.parse(JSON.stringify(response.result)),
+        {},
+      )
+    } catch (error) {
+      // eslint-disable-next-line no-console -- Print the error to console but allows client to be connected.
+      console.error(error)
+    }
+  }
+
+  /**
    * Tells the Client instance to connect to its rippled server.
    *
    * @example
@@ -714,7 +748,10 @@ class Client extends EventEmitter<EventTypes> {
       wallet?: Wallet
     },
   ): Promise<SubmitResponse> {
-    const signedTx = await getSignedTx(this, transaction, opts)
+    const signedTx = await getSignedTx(this, transaction, {
+      ...opts,
+      definitions: this.definitions,
+    })
     return submitRequest(this, signedTx, opts?.failHard)
   }
 
@@ -788,7 +825,10 @@ class Client extends EventEmitter<EventTypes> {
       wallet?: Wallet
     },
   ): Promise<TxResponse<T>> {
-    const signedTx = await getSignedTx(this, transaction, opts)
+    const signedTx = await getSignedTx(this, transaction, {
+      ...opts,
+      definitions: this.definitions,
+    })
 
     const lastLedger = getLastLedgerSequence(signedTx)
     if (lastLedger == null) {
