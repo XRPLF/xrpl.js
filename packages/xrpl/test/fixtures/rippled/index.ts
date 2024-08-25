@@ -5,6 +5,7 @@ import normalAccountTx from './accountTx.json'
 import fabric from './bookOffers'
 import usd_xrp from './bookOffersUsdXrp.json'
 import xrp_usd from './bookOffersXrpUsd.json'
+import customDefinition from './customDefinition.json'
 import normalLedger from './ledger.json'
 import firstPage from './ledgerDataFirstPage.json'
 import firstPageEmpty from './ledgerDataFirstPageEmpty.json'
@@ -33,7 +34,6 @@ import Payment from './tx/payment.json'
 import XChainCreateClaimID from './tx/XChainCreateClaimID.json'
 import XChainCreateClaimID2 from './tx/XChainCreateClaimID2.json'
 import unsubscribe from './unsubscribe.json'
-import customDefinition from './customDefinition.json'
 
 const submit = {
   success: successSubmit,

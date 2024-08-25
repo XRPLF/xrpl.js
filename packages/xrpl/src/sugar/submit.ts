@@ -1,4 +1,4 @@
-import { decode, encode } from 'ripple-binary-codec'
+import { decode, encode, XrplDefinitionsBase } from 'ripple-binary-codec'
 
 import type {
   Client,
@@ -31,6 +31,7 @@ async function sleep(ms: number): Promise<void> {
  * @param signedTransaction - The signed transaction to submit. It can be either a Transaction object or a
  * string (encode from ripple-binary-codec) representation of the transaction.
  * @param [failHard=false] - Optional. Determines whether the submission should fail hard (true) or not (false). Default is false.
+ * @param definitions - Optional. Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A promise that resolves with the response from the client.
  * @throws {ValidationError} If the signed transaction is not valid (not signed).
  *
@@ -46,12 +47,14 @@ async function sleep(ms: number): Promise<void> {
  * const signedTransactionString = encode(signedTransaction);
  * const response2 = await submitRequest(client, signedTransactionString, true);
  */
+// eslint-disable-next-line max-params -- Needs 4 params
 export async function submitRequest(
   client: Client,
   signedTransaction: SubmittableTransaction | string,
   failHard = false,
+  definitions?: XrplDefinitionsBase,
 ): Promise<SubmitResponse> {
-  if (!isSigned(signedTransaction)) {
+  if (!isSigned(signedTransaction, definitions)) {
     throw new ValidationError('Transaction must be signed')
   }
 
@@ -165,8 +168,14 @@ export async function waitForFinalTransactionOutcome<
 }
 
 // checks if the transaction has been signed
-function isSigned(transaction: SubmittableTransaction | string): boolean {
-  const tx = typeof transaction === 'string' ? decode(transaction) : transaction
+function isSigned(
+  transaction: SubmittableTransaction | string,
+  definitions?: XrplDefinitionsBase,
+): boolean {
+  const tx =
+    typeof transaction === 'string'
+      ? decode(transaction, definitions)
+      : transaction
   if (typeof tx === 'string') {
     return false
   }
@@ -200,6 +209,8 @@ function isSigned(transaction: SubmittableTransaction | string): boolean {
  * or not (false). Default is true.
  * @param [options.wallet] - Optional. A wallet to sign the transaction. It must be provided when submitting
  * an unsigned transaction. Default is undefined.
+ * @param [options.definitions] - Optional. Custom rippled types to use instead of the default.
+ * Used for sidechains and amendments. Default is undefined.
  * @returns A promise that resolves with the signed transaction.
  *
  * @throws {ValidationError} If the transaction is not signed and no wallet is provided.
@@ -228,14 +239,16 @@ export async function getSignedTx(
   {
     autofill = true,
     wallet,
+    definitions,
   }: {
     // If true, autofill a transaction.
     autofill?: boolean
     // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
     wallet?: Wallet
+    definitions?: XrplDefinitionsBase
   } = {},
 ): Promise<SubmittableTransaction | string> {
-  if (isSigned(transaction)) {
+  if (isSigned(transaction, definitions)) {
     return transaction
   }
 
@@ -248,7 +261,7 @@ export async function getSignedTx(
   let tx =
     typeof transaction === 'string'
       ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- converts JsonObject to correct Transaction type
-        (decode(transaction) as unknown as SubmittableTransaction)
+        (decode(transaction, definitions) as unknown as SubmittableTransaction)
       : transaction
 
   if (autofill) {
