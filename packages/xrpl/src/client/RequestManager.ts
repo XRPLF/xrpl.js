@@ -4,6 +4,7 @@ import {
   TimeoutError,
   XrplError,
 } from '../errors'
+import type { APIVersion } from '../models'
 import { Response, RequestResponseMap } from '../models/methods'
 import { BaseRequest, ErrorResponse } from '../models/methods/baseMethod'
 
@@ -35,10 +36,10 @@ export default class RequestManager {
    * @param timer - The timer associated with the promise.
    * @returns A promise that resolves to the specified generic type.
    */
-  public async addPromise<R extends BaseRequest, T = RequestResponseMap<R>>(
-    newId: string | number,
-    timer: ReturnType<typeof setTimeout>,
-  ): Promise<T> {
+  public async addPromise<
+    R extends BaseRequest,
+    T = RequestResponseMap<R, APIVersion>,
+  >(newId: string | number, timer: ReturnType<typeof setTimeout>): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       this.promisesAwaitingResponse.set(newId, {
         resolve,
@@ -55,7 +56,10 @@ export default class RequestManager {
    * @param response - Response to return.
    * @throws Error if no existing promise with the given ID.
    */
-  public resolve(id: string | number, response: Response): void {
+  public resolve(
+    id: string | number,
+    response: Partial<Response<APIVersion>>,
+  ): void {
     const promise = this.promisesAwaitingResponse.get(id)
     if (promise == null) {
       throw new XrplError(`No existing promise with id ${id}`, {
@@ -111,10 +115,10 @@ export default class RequestManager {
    * @returns Request ID, new request form, and the promise for resolving the request.
    * @throws XrplError if request with the same ID is already pending.
    */
-  public createRequest<R extends BaseRequest, T = RequestResponseMap<R>>(
-    request: R,
-    timeout: number,
-  ): [string | number, string, Promise<T>] {
+  public createRequest<
+    R extends BaseRequest,
+    T = RequestResponseMap<R, APIVersion>,
+  >(request: R, timeout: number): [string | number, string, Promise<T>] {
     let newId: string | number
     if (request.id == null) {
       newId = this.nextId
@@ -171,7 +175,9 @@ export default class RequestManager {
    * @param response - The response to handle.
    * @throws ResponseFormatError if the response format is invalid, RippledError if rippled returns an error.
    */
-  public handleResponse(response: Partial<Response | ErrorResponse>): void {
+  public handleResponse(
+    response: Partial<Response<APIVersion> | ErrorResponse>,
+  ): void {
     if (
       response.id == null ||
       !(typeof response.id === 'string' || typeof response.id === 'number')
@@ -205,8 +211,7 @@ export default class RequestManager {
     }
     // status no longer needed because error is thrown if status is not "success"
     delete response.status
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be a valid Response here
-    this.resolve(response.id, response as unknown as Response)
+    this.resolve(response.id, response)
   }
 
   /**

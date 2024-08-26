@@ -23,8 +23,16 @@ describe('utils', function () {
     expect(hexToBytes('DEADBEEF')).toEqual(new Uint8Array([222, 173, 190, 239]))
   })
 
+  it('hexToBytes - DEADBEEF', () => {
+    expect(hexToBytes('DEADBEEF')).toEqual(new Uint8Array([222, 173, 190, 239]))
+  })
+
   it('bytesToHex - DEADBEEF', () => {
     expect(bytesToHex([222, 173, 190, 239])).toEqual('DEADBEEF')
+  })
+
+  it('bytesToHex - bad hex', () => {
+    expect(() => hexToBytes('hello')).toThrow(new Error('Invalid hex string'))
   })
 
   it('bytesToHex - 010203', () => {
@@ -41,6 +49,10 @@ describe('utils', function () {
 
   it('hexToString - deadbeef+infinity symbol (HEX)', () => {
     expect(hexToString('6465616462656566D68D')).toEqual('deadbeef֍')
+  })
+
+  it('hexToString - bad hex', () => {
+    expect(() => hexToString('hello')).toThrow(new Error('Invalid hex string'))
   })
 
   it('stringToHex - deadbeef+infinity symbol (utf8)', () => {

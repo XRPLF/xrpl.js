@@ -1,6 +1,6 @@
 import { AuthAccount, Currency, IssuedCurrencyAmount } from '../common'
 
-import { BaseLedgerEntry, MissingPreviousTxnID } from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasOptionalPreviousTxnID } from './BaseLedgerEntry'
 
 export interface VoteSlot {
   VoteEntry: {
@@ -15,7 +15,7 @@ export interface VoteSlot {
  *
  * @category Ledger Entries
  */
-export default interface AMM extends BaseLedgerEntry, MissingPreviousTxnID {
+export default interface AMM extends BaseLedgerEntry, HasOptionalPreviousTxnID {
   LedgerEntryType: 'AMM'
   /**
    * The address of the special account that holds this AMM's assets.

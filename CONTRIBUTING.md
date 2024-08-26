@@ -12,7 +12,7 @@
 
 ### Requirements
 
-We use Node v16 for development - that is the version that our linters require.
+We use Node v18 for development - that is the version that our linters require.
 You must also use `npm` v7. You can check your `npm` version with:
 
 ```bash
@@ -90,7 +90,7 @@ This should be run from the `xrpl.js` top level folder (one above the `packages`
 ```bash
 npm run build
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/opt/ripple/etc/ --platform linux/amd64 rippleci/rippled:2.0.0-b3 /opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg
+docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/opt/ripple/etc/ --platform linux/amd64 rippleci/rippled:2.2.0-b3 /opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg
 npm run test:browser
 ```
 
@@ -104,6 +104,8 @@ The 4 packages currently here are:
 2. ripple-binary-codec - A library for serializing and deserializing transactions for the ledger.
 3. ripple-keypairs - A library for generating and using cryptographic keypairs.
 4. ripple-address-codec - A library for encoding and decoding XRP Ledger addresses and seeds.
+5. isomorphic - A collection of isomorphic implementations of crypto and utility functions.
+6. secret-numbers - Generate XRPL Accounts with a number-based secret: 8 chunks of 6 digits.
 
 Each package has it's own README which dives deeper into what it's main purpose is, and the core functionality it offers.
 They also run tests independently as they were originally in separate repositories.

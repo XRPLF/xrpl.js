@@ -8,8 +8,9 @@ import BigNumber from 'bignumber.js'
 import { decode, encode, XrplDefinitionsBase } from 'ripple-binary-codec'
 
 import { ValidationError, XrplError } from '../../errors'
-import type { Ledger } from '../../models/ledger'
+import { APIVersion } from '../../models'
 import { LedgerEntry } from '../../models/ledger'
+import { LedgerVersionMap } from '../../models/ledger/Ledger'
 import { Transaction, TransactionMetadata } from '../../models/transactions'
 
 import HashPrefix from './HashPrefix'
@@ -103,7 +104,9 @@ export function hashSignedTx(
  * @returns The hash of the ledger.
  * @category Utilities
  */
-export function hashLedgerHeader(ledgerHeader: Ledger): string {
+export function hashLedgerHeader(
+  ledgerHeader: LedgerVersionMap<APIVersion>,
+): string {
   const prefix = HashPrefix.LEDGER.toString(HEX).toUpperCase()
 
   const ledger =
@@ -162,7 +165,7 @@ export function hashStateTree(entries: LedgerEntry[]): string {
 }
 
 function computeTransactionHash(
-  ledger: Ledger,
+  ledger: LedgerVersionMap<APIVersion>,
   options: HashLedgerHeaderOptions,
 ): string {
   const { transaction_hash } = ledger
@@ -192,7 +195,7 @@ function computeTransactionHash(
 }
 
 function computeStateHash(
-  ledger: Ledger,
+  ledger: LedgerVersionMap<APIVersion>,
   options: HashLedgerHeaderOptions,
 ): string {
   const { account_hash } = ledger
@@ -226,7 +229,7 @@ function computeStateHash(
  * @category Utilities
  */
 function hashLedger(
-  ledger: Ledger,
+  ledger: LedgerVersionMap<APIVersion>,
   options: {
     computeTreeHashes?: boolean
   } = {},

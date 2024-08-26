@@ -50,8 +50,7 @@ describe('SignerListSet', function () {
         account: testContext.wallet.classicAddress,
         signer_lists: true,
       })
-      const signerListInfo =
-        accountInfoResponse.result.account_data.signer_lists?.[0]
+      const signerListInfo = accountInfoResponse.result.signer_lists?.[0]
       assert.deepEqual(
         signerListInfo?.SignerEntries,
         tx.SignerEntries,

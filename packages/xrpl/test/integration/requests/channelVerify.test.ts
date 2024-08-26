@@ -35,6 +35,7 @@ describe('channel_verify', function () {
       const response = await testContext.client.request(channelVerify)
 
       const expectedResponse: ChannelVerifyResponse = {
+        api_version: 2,
         id: response.id,
         type: 'response',
         result: {

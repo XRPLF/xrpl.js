@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 2.1.0 (2024-06-03)
+
+### Added
+* Support for the Price Oracles amendment (XLS-47).
+
+### Fixed
+* Better error handling/error messages for serialization/deserialization errors.
+
 ## 2.0.0 (2024-02-01)
 
 ### BREAKING CHANGES
@@ -18,23 +26,6 @@
   * `SerializedType` constructor allows not passing in a byte array
   * `Comparable` is now a generic type so that it allows `compareTo` methods to take more that the type itself.
 * Eliminates 4 runtime dependencies: `base-x`, `base64-js`, `buffer`, and `ieee754`.
-
-## 2.0.0 Beta 1 (2023-11-30)
-
-### Breaking Changes
-* `Buffer` has been replaced with `UInt8Array` for both params and return values. `Buffer` may continue to work with params since they extend `UInt8Arrays`.
-
-### Changes
-* Eliminates 4 runtime dependencies: `base-x`, `base64-js`, `buffer`, and `ieee754`.
-
-## 2.0.0 Beta 0 (2023-10-19)
-
-### Breaking Changes
-* Bump typescript to 5.x
-* Remove Node 14 support
-* Remove decimal.js and big-integer. Use `BigNumber` from `bignumber.js` instead of `Decimal` and the native `BigInt` instead of `bigInt`.
-* Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`.
-* Remove `create-hash` in favor of `@noble/hashes`
 
 ### Changes
 * Update type definitions which causing errors in tests that the code already supported

@@ -35,6 +35,7 @@ describe('book_offers', function () {
       const response = await testContext.client.request(bookOffer)
 
       const expectedResponse: BookOffersResponse = {
+        api_version: 2,
         id: response.id,
         type: 'response',
         result: {

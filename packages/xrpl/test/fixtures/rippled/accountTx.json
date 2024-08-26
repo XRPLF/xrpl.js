@@ -91,7 +91,7 @@
           "TransactionIndex": 12,
           "TransactionResult": "tesSUCCESS"
         },
-        "tx": {
+        "tx_json": {
           "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
           "Destination": "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
           "DestinationTag": 13,
@@ -169,7 +169,7 @@
           "TransactionIndex": 59,
           "TransactionResult": "tesSUCCESS"
         },
-        "tx": {
+        "tx_json": {
           "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
           "Authorize": "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
           "Fee": "10",

@@ -63,7 +63,7 @@ async function sendEscrow(): Promise<void> {
     TransactionType: 'EscrowFinish',
     Account: wallet1.classicAddress,
     Owner: wallet1.classicAddress,
-    OfferSequence: Number(createEscrowResponse.result.Sequence),
+    OfferSequence: Number(createEscrowResponse.result.tx_json.Sequence),
   }
 
   await client.submit(finishTx, {

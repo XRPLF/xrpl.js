@@ -4868,6 +4868,36 @@
         "TxnSignature": "AACD31A04CAE14670FC483A1382F393AA96B49C84479B58067F049FBD772999325667A6AA2520A63756EE84F3657298815019DD56A1AECE796B08535C4009C08",
         "URI": "6469645F6578616D706C65"
       }
+    },
+    {
+      "binary": "1200332FFFFFFFFF2033000004D2750B6469645F6578616D706C65701C0863757272656E6379701D0870726F7669646572811401476926B590BA3245F63C829116A0A3AF7F382DF018E020301700000000000001E2041003011A0000000000000000000000000000000000000000021A0000000000000000000000005553440000000000E1F1",
+      "json": {
+        "TransactionType": "OracleSet",
+        "Account": "rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8",
+        "OracleDocumentID": 1234,
+        "LastUpdateTime": 4294967295,
+        "PriceDataSeries": [
+          {
+            "PriceData": {
+              "BaseAsset": "XRP",
+              "QuoteAsset": "USD",
+              "AssetPrice": "00000000000001E2",
+              "Scale": 3
+            }
+          }
+        ],
+        "Provider": "70726F7669646572",
+        "URI": "6469645F6578616D706C65",
+        "AssetClass": "63757272656E6379"
+      }
+    },
+    {
+      "binary": "1200342033000004D2811401476926B590BA3245F63C829116A0A3AF7F382D",
+      "json": {
+        "TransactionType": "OracleDelete",
+        "Account": "rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8",
+        "OracleDocumentID": 1234
+      }
     }
   ],
   "ledgerData": [{

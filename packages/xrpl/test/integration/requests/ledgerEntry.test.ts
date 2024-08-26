@@ -40,6 +40,7 @@ describe('ledger_entry', function () {
       )
 
       const expectedResponse: LedgerEntryResponse = {
+        api_version: 2,
         id: ledgerEntryResponse.id,
         type: 'response',
         result: {

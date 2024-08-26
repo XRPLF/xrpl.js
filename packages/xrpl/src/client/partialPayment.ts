@@ -2,13 +2,16 @@ import BigNumber from 'bignumber.js'
 import { decode } from 'ripple-binary-codec'
 
 import type {
-  AccountTxResponse,
   TransactionEntryResponse,
   TransactionStream,
   TxResponse,
 } from '..'
-import type { Amount } from '../models/common'
-import type { RequestResponseMap } from '../models/methods'
+import type { Amount, APIVersion, DEFAULT_API_VERSION } from '../models/common'
+import type {
+  AccountTxTransaction,
+  RequestResponseMap,
+} from '../models/methods'
+import { AccountTxVersionResponseMap } from '../models/methods/accountTx'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 import { PaymentFlags, Transaction } from '../models/transactions'
 import type { TransactionMetadata } from '../models/transactions/metadata'
@@ -63,7 +66,10 @@ function isPartialPayment(
   }
 
   const delivered = meta.delivered_amount
-  const amount = tx.Amount
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- DeliverMax is a valid field on Payment response
+  // @ts-expect-error -- DeliverMax is a valid field on Payment response
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- DeliverMax is a valid field on Payment response
+  const amount = tx.DeliverMax
 
   if (delivered === undefined) {
     return false
@@ -73,23 +79,36 @@ function isPartialPayment(
 }
 
 function txHasPartialPayment(response: TxResponse): boolean {
-  return isPartialPayment(response.result, response.result.meta)
+  return isPartialPayment(response.result.tx_json, response.result.meta)
 }
 
 function txEntryHasPartialPayment(response: TransactionEntryResponse): boolean {
   return isPartialPayment(response.result.tx_json, response.result.metadata)
 }
 
-function accountTxHasPartialPayment(response: AccountTxResponse): boolean {
+function accountTxHasPartialPayment<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+>(response: AccountTxVersionResponseMap<Version>): boolean {
   const { transactions } = response.result
-  const foo = transactions.some((tx) => isPartialPayment(tx.tx, tx.meta))
+  const foo = transactions.some((tx) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- required to check API version model
+    if (tx.tx_json != null) {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- use API v2 model
+      const transaction = tx as AccountTxTransaction
+      return isPartialPayment(transaction.tx_json, transaction.meta)
+    }
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- use API v1 model
+    const transaction = tx as AccountTxTransaction<1>
+    return isPartialPayment(transaction.tx, transaction.meta)
+  })
   return foo
 }
 
-function hasPartialPayment<R extends BaseRequest, T = RequestResponseMap<R>>(
-  command: string,
-  response: T,
-): boolean {
+function hasPartialPayment<
+  R extends BaseRequest,
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+  T = RequestResponseMap<R, V>,
+>(command: string, response: T): boolean {
   /* eslint-disable @typescript-eslint/consistent-type-assertions -- Request type is known at runtime from command */
   switch (command) {
     case 'tx':
@@ -97,7 +116,9 @@ function hasPartialPayment<R extends BaseRequest, T = RequestResponseMap<R>>(
     case 'transaction_entry':
       return txEntryHasPartialPayment(response as TransactionEntryResponse)
     case 'account_tx':
-      return accountTxHasPartialPayment(response as AccountTxResponse)
+      return accountTxHasPartialPayment(
+        response as AccountTxVersionResponseMap<V>,
+      )
     default:
       return false
   }
@@ -112,7 +133,7 @@ function hasPartialPayment<R extends BaseRequest, T = RequestResponseMap<R>>(
  */
 export function handlePartialPayment<
   R extends BaseRequest,
-  T = RequestResponseMap<R>,
+  T = RequestResponseMap<R, APIVersion>,
 >(command: string, response: T): void {
   if (hasPartialPayment(command, response)) {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are checking dynamically and safely.

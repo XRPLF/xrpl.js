@@ -50,7 +50,7 @@
     },
     "tx_json": {
       "Account": "rLSn6Z3T8uCxbcd1oxwfGQN1Fdn5CyGujK",
-      "Amount": "104169972",
+      "DeliverMax": "104169972",
       "Destination": "rEb8TK3gBgk5auZkwc6sHnwrGVJH8DuaLh",
       "DestinationTag": 109735445,
       "Fee": "6000",

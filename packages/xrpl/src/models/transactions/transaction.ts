@@ -49,6 +49,8 @@ import {
 import { NFTokenMint, validateNFTokenMint } from './NFTokenMint'
 import { OfferCancel, validateOfferCancel } from './offerCancel'
 import { OfferCreate, validateOfferCreate } from './offerCreate'
+import { OracleDelete, validateOracleDelete } from './oracleDelete'
+import { OracleSet, validateOracleSet } from './oracleSet'
 import { Payment, validatePayment } from './payment'
 import {
   PaymentChannelClaim,
@@ -126,6 +128,8 @@ export type SubmittableTransaction =
   | NFTokenMint
   | OfferCancel
   | OfferCreate
+  | OracleDelete
+  | OracleSet
   | Payment
   | PaymentChannelClaim
   | PaymentChannelCreate
@@ -338,6 +342,14 @@ export function validate(
 
     case 'OfferCreate':
       validateOfferCreate(tx)
+      break
+
+    case 'OracleDelete':
+      validateOracleDelete(tx)
+      break
+
+    case 'OracleSet':
+      validateOracleSet(tx)
       break
 
     case 'Payment':

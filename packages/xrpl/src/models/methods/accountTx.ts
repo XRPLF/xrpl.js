@@ -1,4 +1,10 @@
-import { ResponseOnlyTxInfo } from '../common'
+import {
+  APIVersion,
+  DEFAULT_API_VERSION,
+  RIPPLED_API_V1,
+  RIPPLED_API_V2,
+  ResponseOnlyTxInfo,
+} from '../common'
 import { Transaction, TransactionMetadata } from '../transactions'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
@@ -49,7 +55,9 @@ export interface AccountTxRequest extends BaseRequest, LookupByLedgerRequest {
   marker?: unknown
 }
 
-export interface AccountTxTransaction {
+export interface AccountTxTransaction<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> {
   /** The ledger index of the ledger version that included this transaction. */
   ledger_index: number
   /**
@@ -58,7 +66,15 @@ export interface AccountTxTransaction {
    */
   meta: string | TransactionMetadata
   /** JSON object defining the transaction. */
-  tx?: Transaction & ResponseOnlyTxInfo
+  tx_json?: Version extends typeof RIPPLED_API_V2
+    ? Transaction & ResponseOnlyTxInfo
+    : never
+  /** JSON object defining the transaction in rippled API v1. */
+  tx?: Version extends typeof RIPPLED_API_V1
+    ? Transaction & ResponseOnlyTxInfo
+    : never
+  /** The hash of the transaction. */
+  hash?: Version extends typeof RIPPLED_API_V2 ? string : never
   /** Unique hashed String representing the transaction. */
   tx_blob?: string
   /**
@@ -69,11 +85,11 @@ export interface AccountTxTransaction {
 }
 
 /**
- * Expected response from an {@link AccountTxRequest}.
- *
- * @category Responses
+ * Base interface for account transaction responses.
  */
-export interface AccountTxResponse extends BaseResponse {
+interface AccountTxResponseBase<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> extends BaseResponse {
   result: {
     /** Unique Address identifying the related account. */
     account: string
@@ -98,7 +114,7 @@ export interface AccountTxResponse extends BaseResponse {
      * Array of transactions matching the request's criteria, as explained
      * below.
      */
-    transactions: AccountTxTransaction[]
+    transactions: Array<AccountTxTransaction<Version>>
     /**
      * If included and set to true, the information in this response comes from
      * a validated ledger version. Otherwise, the information is subject to
@@ -107,3 +123,28 @@ export interface AccountTxResponse extends BaseResponse {
     validated?: boolean
   }
 }
+
+/**
+ * Expected response from an {@link AccountTxRequest}.
+ *
+ * @category Responses
+ */
+export type AccountTxResponse = AccountTxResponseBase
+
+/**
+ * Expected response from an {@link AccountTxRequest} with `api_version` set to 1.
+ *
+ * @category ResponsesV1
+ */
+export type AccountTxV1Response = AccountTxResponseBase<typeof RIPPLED_API_V1>
+
+/**
+ * Type to map between the API version and the response type.
+ *
+ * @category Responses
+ */
+export type AccountTxVersionResponseMap<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> = Version extends typeof RIPPLED_API_V1
+  ? AccountTxV1Response
+  : AccountTxResponse

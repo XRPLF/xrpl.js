@@ -71,7 +71,7 @@ describe('EscrowCancel', function () {
           command: 'tx',
           transaction: accountObjects[0].PreviousTxnID,
         })
-      ).result.Sequence
+      ).result.tx_json.Sequence
 
       if (!sequence) {
         throw new Error('sequence did not exist')

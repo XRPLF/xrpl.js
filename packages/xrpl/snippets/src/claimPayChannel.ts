@@ -56,7 +56,7 @@ async function claimPayChannel(): Promise<void> {
     Channel: hashes.hashPaymentChannel(
       wallet1.classicAddress,
       wallet2.classicAddress,
-      paymentChannelResponse.result.Sequence ?? 0,
+      paymentChannelResponse.result.tx_json.Sequence ?? 0,
     ),
     Amount: '100',
   }

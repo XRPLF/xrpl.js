@@ -85,7 +85,7 @@ describe('NFTokenMint', function () {
 
       assert.equal(
         nftokenID,
-        getNFTokenID(binaryTxResponse.result.meta) ?? 'undefined',
+        getNFTokenID(binaryTxResponse.result.meta_blob) ?? 'undefined',
         `getNFTokenID produced a different outcome when decoding the metadata in binary format.`,
       )
     },

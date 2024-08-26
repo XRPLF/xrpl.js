@@ -191,8 +191,7 @@ describe('XChainCreateBridge', function () {
         account: testContext.wallet.classicAddress,
         signer_lists: true,
       })
-      const signerListInfo =
-        signerAccountInfoResponse.result.account_data.signer_lists?.[0]
+      const signerListInfo = signerAccountInfoResponse.result.signer_lists?.[0]
       assert.deepEqual(
         signerListInfo?.SignerEntries,
         signerTx.SignerEntries,

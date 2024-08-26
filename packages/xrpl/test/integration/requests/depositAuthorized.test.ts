@@ -36,6 +36,7 @@ describe('deposit_authorized', function () {
       const response = await testContext.client.request(depositAuthorized)
 
       const expectedResponse: DepositAuthorizedResponse = {
+        api_version: 2,
         id: response.id,
         type: 'response',
         result: {
