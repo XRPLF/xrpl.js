@@ -1218,6 +1218,34 @@ describe('Wallet', function () {
       })
     })
 
+    it('sign fails when a custom definition is passed and the transaction type is not included in it', async function () {
+      const customDefinition = new XrplDefinitions(
+        rippled.definitions.customDefinition,
+      )
+      const tx = {
+        Account: wallet.address,
+        TransactionType: 'SomeUnknown',
+        Flags: 2147483648,
+        Sequence: 33626,
+        Fee: '10',
+        AccountOther: 'rJyZ28c179hKg7Gwt4P2S8zgzUTmMUMmzs',
+        Expiration: 773819038,
+        Amount: {
+          currency: 'AAA',
+          issuer: 'rDCcTxoALtAryzk4TE3mxU9hpjRm5vQcxT',
+          value: '1',
+        },
+        AmountOther: {
+          currency: 'BBB',
+          issuer: 'rDCcTxoALtAryzk4TE3mxU9hpjRm5vQcxT',
+          value: '1',
+        },
+      }
+      assert.throws(() => {
+        wallet.sign(tx as any, false, customDefinition)
+      }, /^Invalid transaction type: SomeUnknown$/u)
+    })
+
     it('multisign succeeds when a custom definition is passed', async function () {
       const customDefinition = new XrplDefinitions(
         rippled.definitions.customDefinition,

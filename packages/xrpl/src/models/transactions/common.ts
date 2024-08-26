@@ -1,5 +1,5 @@
 import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
-import { TRANSACTION_TYPES } from 'ripple-binary-codec'
+import { TRANSACTION_TYPES, XrplDefinitionsBase } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
 import {
@@ -349,6 +349,24 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
   validateOptionalField(common, 'TxnSignature', isString)
 
   validateOptionalField(common, 'NetworkID', isNumber)
+}
+
+/**
+ * Validate that the passed transaction is a valid type against the types provided by the custom definitions.
+ *
+ * @param tx - A Transaction.
+ * @param definitions - Custom definitions
+ * @throws When the passed transaction type is not found in the definitions.
+ */
+export function validateTxAgainstCustomDefintions(
+  tx: Record<string, unknown>,
+  definitions: XrplDefinitionsBase,
+): void {
+  // Validate just transaction type for now, leaving it open for further validations against the custom definition spec.
+  const txType = <string>tx.TransactionType
+  if (!definitions.transactionType[txType]) {
+    throw new ValidationError(`Invalid transaction type: ${txType}`)
+  }
 }
 
 /**
