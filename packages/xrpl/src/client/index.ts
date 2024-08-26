@@ -10,7 +10,12 @@ import {
   ValidationError,
   XrplError,
 } from '../errors'
-import type { LedgerIndex, Balance } from '../models/common'
+import {
+  APIVersion,
+  LedgerIndex,
+  Balance,
+  DEFAULT_API_VERSION,
+} from '../models/common'
 import {
   Request,
   // account methods
@@ -220,6 +225,11 @@ class Client extends EventEmitter<EventTypes> {
    */
   public definitions: XrplDefinitionsBase | undefined
 
+   * API Version used by the server this client is connected to
+   *
+   */
+  public apiVersion: APIVersion = DEFAULT_API_VERSION
+
   /**
    * Creates a new Client with a websocket connection to a rippled server.
    *
@@ -233,7 +243,7 @@ class Client extends EventEmitter<EventTypes> {
    * const client = new Client('wss://s.altnet.rippletest.net:51233')
    * ```
    */
-  // eslint-disable-next-line max-lines-per-function -- okay because we have to set up all the connection handlers
+  /* eslint-disable max-lines-per-function -- the constructor requires more lines to implement the logic */
   public constructor(server: string, options: ClientOptions = {}) {
     super()
     if (typeof server !== 'string' || !/wss?(?:\+unix)?:\/\//u.exec(server)) {
@@ -297,6 +307,7 @@ class Client extends EventEmitter<EventTypes> {
       this.emit('path_find', path)
     })
   }
+  /* eslint-enable max-lines-per-function */
 
   /**
    * Get the url that the client is connected to.
@@ -313,7 +324,6 @@ class Client extends EventEmitter<EventTypes> {
    * additional request body parameters.
    *
    * @category Network
-   *
    * @param req - Request to send to the server.
    * @returns The response from the server.
    *
@@ -326,16 +336,20 @@ class Client extends EventEmitter<EventTypes> {
    * console.log(response)
    * ```
    */
-  public async request<R extends Request, T = RequestResponseMap<R>>(
-    req: R,
-  ): Promise<T> {
-    const response = await this.connection.request<R, T>({
+  public async request<
+    R extends Request,
+    V extends APIVersion = typeof DEFAULT_API_VERSION,
+    T = RequestResponseMap<R, V>,
+  >(req: R): Promise<T> {
+    const request = {
       ...req,
-      account: req.account
-        ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Must be string
-          ensureClassicAddress(req.account as string)
-        : undefined,
-    })
+      account:
+        typeof req.account === 'string'
+          ? ensureClassicAddress(req.account)
+          : undefined,
+      api_version: req.api_version ?? this.apiVersion,
+    }
+    const response = await this.connection.request<R, T>(request)
 
     // mutates `response` to add warnings
     handlePartialPayment(req.command, response)
@@ -444,9 +458,10 @@ class Client extends EventEmitter<EventTypes> {
    * const allResponses = await client.requestAll({ command: 'transaction_data' });
    * console.log(allResponses);
    */
+
   public async requestAll<
     T extends MarkerRequest,
-    U = RequestAllResponseMap<T>,
+    U = RequestAllResponseMap<T, APIVersion>,
   >(request: T, collect?: string): Promise<U[]> {
     /*
      * The data under collection is keyed based on the command. Fail if command
@@ -474,7 +489,7 @@ class Client extends EventEmitter<EventTypes> {
       // eslint-disable-next-line no-await-in-loop -- Necessary for this, it really has to wait
       const singleResponse = await this.connection.request(repeatProps)
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
-      const singleResult = (singleResponse as MarkerResponse).result
+      const singleResult = (singleResponse as MarkerResponse<APIVersion>).result
       if (!(collectKey in singleResult)) {
         throw new XrplError(`${collectKey} not in result`)
       }
@@ -672,7 +687,10 @@ class Client extends EventEmitter<EventTypes> {
    * @param signersCount - The expected number of signers for this transaction.
    * Only used for multisigned transactions.
    * @returns The autofilled transaction.
+   * @throws ValidationError If Amount and DeliverMax fields are not identical in a Payment Transaction
    */
+
+  // eslint-disable-next-line complexity -- handling Payment transaction API v2 requires more logic
   public async autofill<T extends SubmittableTransaction>(
     transaction: T,
     signersCount?: number,
@@ -680,7 +698,6 @@ class Client extends EventEmitter<EventTypes> {
     const tx = { ...transaction }
 
     setValidAddresses(tx)
-
     setTransactionFlagsToNumber(tx)
 
     const promises: Array<Promise<void>> = []
@@ -698,6 +715,34 @@ class Client extends EventEmitter<EventTypes> {
     }
     if (tx.TransactionType === 'AccountDelete') {
       promises.push(checkAccountDeleteBlockers(this, tx))
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+    // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+    if (tx.TransactionType === 'Payment' && tx.DeliverMax != null) {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- This is a valid null check for Amount
+      if (tx.Amount == null) {
+        // If only DeliverMax is provided, use it to populate the Amount field
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+        // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- DeliverMax is a known RPC-level property
+        tx.Amount = tx.DeliverMax
+      }
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+      // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- This is a valid null check for Amount
+      if (tx.Amount != null && tx.Amount !== tx.DeliverMax) {
+        return Promise.reject(
+          new ValidationError(
+            'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
+          ),
+        )
+      }
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+      // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+      delete tx.DeliverMax
     }
 
     return Promise.all(promises).then(() => tx)
@@ -949,7 +994,7 @@ class Client extends EventEmitter<EventTypes> {
    * @param options.limit - Limit number of balances to return.
    * @returns An array of XRP/non-XRP balances for the given account.
    */
-  // eslint-disable-next-line max-lines-per-function -- Longer definition is required for end users to see the definition.
+  /* eslint-disable max-lines-per-function -- getBalances requires more lines to implement logic */
   public async getBalances(
     address: string,
     options: {
@@ -997,6 +1042,7 @@ class Client extends EventEmitter<EventTypes> {
     )
     return balances.slice(0, options.limit)
   }
+  /* eslint-enable max-lines-per-function */
 
   /**
    * Fetch orderbook (buy/sell orders) between two currency pairs. This checks both sides of the orderbook
