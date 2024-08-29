@@ -4,7 +4,7 @@ import { Client, IssuedCurrencyAmount, AccountSetAsfFlags } from '../../src'
 // rippled C++ codebase (Path_test.cpp)
 // https://github.com/XRPLF/rippled/blob/d9bd75e68326861fb38fd5b27d47da1054a7fc3b/src/test/app/Path_test.cpp#L683
 
-async function runTest() {
+async function runTest(): Promise<void> {
   // Create a client to connect to the test network
   const client = new Client('wss://s.altnet.rippletest.net:51233')
   await client.connect()
@@ -113,6 +113,8 @@ async function runTest() {
   console.log(JSON.stringify(paths, null, 2))
 
   // Check if the path includes bob
+  // the "paths_computed" field uses a 2-D matrix representation as detailed here:
+  // https://xrpl.org/docs/concepts/tokens/fungible-tokens/paths#path-specifications
   const path = paths[0].paths_computed[0][0]
   if (path.account !== bob.classicAddress) {
     throw new Error('Path does not include bob')
@@ -120,13 +122,12 @@ async function runTest() {
 
   // Check the source amount
 
-  // Check if the path includes bob
-  // the "paths_computed" field uses a 2-D matrix representation as detailed here:
-  // https://xrpl.org/docs/concepts/tokens/fungible-tokens/paths#path-specifications
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- result currency will be USD
   const sourceAmount = paths[0].source_amount as IssuedCurrencyAmount
   if (
     sourceAmount.currency !== 'USD' ||
     sourceAmount.issuer !== alice.classicAddress ||
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- 5 is an arbitrarily chosen amount for this test
     parseFloat(sourceAmount.value) !== 5.0
   ) {
     throw new Error('Unexpected source amount')
