@@ -383,6 +383,16 @@
       }
     ],
     [
+      "LedgerFixType",
+      {
+        "nth": 21,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt16"
+      }
+    ],
+    [
       "NetworkID",
       {
         "nth": 1,
@@ -2913,6 +2923,7 @@
     "tefTOO_BIG": -181,
     "tefNO_TICKET": -180,
     "tefNFTOKEN_IS_NOT_TRANSFERABLE": -179,
+    "tefINVALID_LEDGER_FIX_TYPE": -178,
 
     "terRETRY": -99,
     "terFUNDS_SPENT": -98,
@@ -3061,10 +3072,11 @@
     "DIDDelete": 50,
     "OracleSet": 51,
     "OracleDelete": 52,
-    "MPTokenIssuanceCreate": 53,
-    "MPTokenIssuanceDestroy": 54,
-    "MPTokenAuthorize": 55,
-    "MPTokenIssuanceSet": 56,
+    "LedgerStateFix": 53,
+    "MPTokenIssuanceCreate": 54,
+    "MPTokenIssuanceDestroy": 55,
+    "MPTokenAuthorize": 56,
+    "MPTokenIssuanceSet": 57,
     "EnableAmendment": 100,
     "SetFee": 101,
     "UNLModify": 102
