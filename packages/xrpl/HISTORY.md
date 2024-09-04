@@ -7,6 +7,11 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Added
 * parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion
 
+## 4.0.0-mpt-beta (2024-09-04)
+
+### Added
+* Updated `definitions.json`
+
 ## 4.0.0 (2024-07-15)
 
 ### BREAKING CHANGES
