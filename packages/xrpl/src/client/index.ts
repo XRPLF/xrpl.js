@@ -225,6 +225,7 @@ class Client extends EventEmitter<EventTypes> {
    */
   public definitions: XrplDefinitionsBase | undefined
 
+  /**
    * API Version used by the server this client is connected to
    *
    */
