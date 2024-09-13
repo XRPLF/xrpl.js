@@ -1211,6 +1211,7 @@ describe('Wallet', function () {
           value: '1',
         },
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for unknown transaction
       const result = wallet.sign(tx as any, false, customDefinition)
       assert.deepEqual(result, {
         tx_blob: RESPONSE_FIXTURES.signCustomDefinition.signedTransaction,
@@ -1242,6 +1243,7 @@ describe('Wallet', function () {
         },
       }
       assert.throws(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for unknown transaction
         wallet.sign(tx as any, false, customDefinition)
       }, /^Invalid transaction type: SomeUnknown$/u)
     })
@@ -1251,6 +1253,7 @@ describe('Wallet', function () {
         rippled.definitions.customDefinition,
       )
       const result = wallet.sign(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for unknown transaction
         REQUEST_FIXTURES.signAsCustomDefinition as any,
         true,
         customDefinition,
