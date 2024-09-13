@@ -2,7 +2,7 @@ import { UInt } from './uint'
 import { BinaryParser } from '../serdes/binary-parser'
 import { bytesToHex, concat, hexToBytes } from '@xrplf/isomorphic/utils'
 import { readUInt32BE, writeUInt32BE } from '../utils'
-import { XrplDefinitionsBase } from '../enums'
+import { DEFAULT_DEFINITIONS, XrplDefinitionsBase } from '../enums'
 
 const HEX_REGEX = /^[a-fA-F0-9]{1,16}$/
 const BASE10_REGEX = /^[0-9]{1,20}$/
@@ -56,7 +56,12 @@ class UInt64 extends UInt {
     }
 
     if (typeof val === 'string') {
-      if (fieldName == 'MaximumAmount') {
+      if (
+        fieldName == 'MaximumAmount' ||
+        fieldName == 'OutstandingAmount' ||
+        fieldName == 'LockedAmount' ||
+        fieldName == 'MPTAmount'
+      ) {
         if (!BASE10_REGEX.test(val)) {
           throw new Error(`${fieldName} ${val} is not a valid base 10 string`)
         }
@@ -88,12 +93,21 @@ class UInt64 extends UInt {
    *
    * @returns a hex-string
    */
-  toJSON(_definitions?: XrplDefinitionsBase, fieldName: string = ''): string {
-    if (fieldName == 'MaximumAmount') {
-      const buf = Buffer.from(this.bytes)
-      return buf.toString()
+  toJSON(
+    _definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
+    fieldName: string = '',
+  ): string {
+    const hexString = bytesToHex(this.bytes)
+    if (
+      fieldName == 'MaximumAmount' ||
+      fieldName == 'OutstandingAmount' ||
+      fieldName == 'LockedAmount' ||
+      fieldName == 'MPTAmount'
+    ) {
+      return BigInt('0x' + hexString).toString(10)
     }
-    return bytesToHex(this.bytes)
+
+    return hexString
   }
 
   /**

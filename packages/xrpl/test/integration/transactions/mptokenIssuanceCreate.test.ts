@@ -8,7 +8,6 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { testTransaction } from '../utils'
-import { mptUint64ToHex } from '../../../src/utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -27,7 +26,7 @@ describe('MPTokenIssuanceCreate', function () {
       const tx: MPTokenIssuanceCreate = {
         TransactionType: 'MPTokenIssuanceCreate',
         Account: testContext.wallet.classicAddress,
-        MaximumAmount: mptUint64ToHex('9223372036854775807'), // 0x7fffffffffffffff
+        MaximumAmount: '9223372036854775807', // 0x7fffffffffffffff
         AssetScale: 2,
       }
 
@@ -42,6 +41,11 @@ describe('MPTokenIssuanceCreate', function () {
         accountObjectsResponse.result.account_objects!,
         1,
         'Should be exactly one issuance on the ledger',
+      )
+      assert.equal(
+        // @ts-ignore
+        accountObjectsResponse.result.account_objects[0].MaximumAmount,
+        `9223372036854775807`,
       )
     },
     TIMEOUT,
