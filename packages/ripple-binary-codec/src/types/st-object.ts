@@ -10,6 +10,7 @@ import { BinaryParser } from '../serdes/binary-parser'
 import { BinarySerializer, BytesList } from '../serdes/binary-serializer'
 
 import { STArray } from './st-array'
+import { UInt64 } from './uint-64'
 
 const OBJECT_END_MARKER_BYTE = Uint8Array.from([0xe1])
 const OBJECT_END_MARKER = 'ObjectEndMarker'
@@ -137,6 +138,8 @@ class STObject extends SerializedType {
           ? this.from(xAddressDecoded[field.name], undefined, definitions)
           : field.type.name === 'STArray'
           ? STArray.from(xAddressDecoded[field.name], definitions)
+          : field.type.name === 'UInt64'
+          ? UInt64.from(xAddressDecoded[field.name], field.name)
           : field.associatedType.from(xAddressDecoded[field.name])
 
       if (associatedValue == undefined) {
@@ -155,7 +158,11 @@ class STObject extends SerializedType {
       // Account field
       // The Account field must not be a part of the UNLModify pseudotransaction encoding, due to a bug in rippled
       const isUnlModifyWorkaround = field.name == 'Account' && isUnlModify
-      bytes.writeFieldAndValue(field, associatedValue, isUnlModifyWorkaround)
+      bytes.writeFieldAndValue(
+        field,
+        associatedValue as SerializedType,
+        isUnlModifyWorkaround,
+      )
       if (field.type.name === ST_OBJECT) {
         bytes.put(OBJECT_END_MARKER_BYTE)
       }
@@ -182,7 +189,7 @@ class STObject extends SerializedType {
 
       accumulator[field.name] = objectParser
         .readFieldValue(field)
-        .toJSON(definitions)
+        .toJSON(definitions, field.name)
     }
 
     return accumulator
