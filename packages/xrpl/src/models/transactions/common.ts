@@ -363,7 +363,13 @@ export function validateTxAgainstCustomDefintions(
   definitions: XrplDefinitionsBase,
 ): void {
   // Validate just transaction type for now, leaving it open for further validations against the custom definition spec.
-  const txType = <string>tx.TransactionType
+  const txType = tx.TransactionType
+  if (typeof txType !== 'string') {
+    throw new ValidationError(
+      'TransactionType field is not specified or not a string',
+    )
+  }
+
   if (!definitions.transactionType[txType]) {
     throw new ValidationError(`Invalid transaction type: ${txType}`)
   }
