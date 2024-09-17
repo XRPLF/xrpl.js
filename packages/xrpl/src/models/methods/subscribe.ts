@@ -271,6 +271,11 @@ interface TransactionStreamBase<
 > extends BaseStream {
   status: string
   type: 'transaction'
+  /**
+   * The approximate time this ledger was closed, in date time string format.
+   * Always uses the UTC time zone.
+   */
+  close_time_iso: string
   /** String Transaction result code. */
   engine_result: string
   /** Numeric transaction response code, if applicable. */
