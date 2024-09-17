@@ -13,6 +13,7 @@ import type {
 } from '../models/methods'
 import { AccountTxVersionResponseMap } from '../models/methods/accountTx'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
+import { TransactionV1Stream } from '../models/methods/subscribe'
 import { PaymentFlags, Transaction } from '../models/transactions'
 import type { TransactionMetadata } from '../models/transactions/metadata'
 import { isFlagEnabled } from '../models/utils'
@@ -159,10 +160,10 @@ export function handlePartialPayment<
  * @param log - The method used for logging by the connection (to report the partial payment).
  */
 export function handleStreamPartialPayment(
-  stream: TransactionStream,
+  stream: TransactionStream | TransactionV1Stream,
   log: (id: string, message: string) => void,
 ): void {
-  if (isPartialPayment(stream.transaction, stream.meta)) {
+  if (isPartialPayment(stream.transaction ?? stream.tx_json, stream.meta)) {
     const warnings = stream.warnings ?? []
 
     const warning = {
