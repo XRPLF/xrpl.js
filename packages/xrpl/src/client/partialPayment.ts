@@ -4,6 +4,7 @@ import { decode } from 'ripple-binary-codec'
 import type {
   TransactionEntryResponse,
   TransactionStream,
+  TransactionV1Stream,
   TxResponse,
 } from '..'
 import type { Amount, APIVersion, DEFAULT_API_VERSION } from '../models/common'
@@ -13,7 +14,6 @@ import type {
 } from '../models/methods'
 import { AccountTxVersionResponseMap } from '../models/methods/accountTx'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
-import { TransactionV1Stream } from '../models/methods/subscribe'
 import { PaymentFlags, Transaction } from '../models/transactions'
 import type { TransactionMetadata } from '../models/transactions/metadata'
 import { isFlagEnabled } from '../models/utils'
