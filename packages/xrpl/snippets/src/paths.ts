@@ -1,142 +1,51 @@
-import { Client, IssuedCurrencyAmount, AccountSetAsfFlags } from '../../src'
+import { Client, Payment } from '../../src'
 
-// Note: This test is inspired from a unit test titled `indirect_paths_path_find` in the
-// rippled C++ codebase (Path_test.cpp)
-// https://github.com/XRPLF/rippled/blob/d9bd75e68326861fb38fd5b27d47da1054a7fc3b/src/test/app/Path_test.cpp#L683
+// Prerequisites for this snippet. Please verify these conditions after a reset of the
+// test network:
+// - destination_account must have a trust line with the destination_amount.issuer
+// - There must be appropriate DEX Offers or XRP/TST AMM for the cross-currency exchange
 
-async function runTest(): Promise<void> {
-  // Create a client to connect to the test network
-  const client = new Client('wss://s.altnet.rippletest.net:51233')
+// PathFind RPC requires the use of a Websocket client only
+const client = new Client('wss://s.altnet.rippletest.net:51233')
+
+async function createTxWithPaths(): Promise<void> {
   await client.connect()
 
-  // Creating wallets to send money from
-  // these wallets will have 100 testnet XRP
-  const { wallet: alice } = await client.fundWallet()
-  const { wallet: bob } = await client.fundWallet()
-  const { wallet: carol } = await client.fundWallet()
-
-  // send AccountSet transaction with asfDefaultRipple turned on
-  // this enables rippling on all trustlines through these accounts.
-
-  await client.submitAndWait(
-    {
-      TransactionType: 'AccountSet',
-      Account: alice.classicAddress,
-      SetFlag: AccountSetAsfFlags.asfDefaultRipple,
-    },
-    {
-      wallet: alice,
-    },
-  )
-
-  await client.submitAndWait(
-    {
-      TransactionType: 'AccountSet',
-      Account: bob.classicAddress,
-      SetFlag: AccountSetAsfFlags.asfDefaultRipple,
-    },
-    {
-      wallet: bob,
-    },
-  )
-
-  await client.submitAndWait(
-    {
-      TransactionType: 'AccountSet',
-      Account: carol.classicAddress,
-      SetFlag: AccountSetAsfFlags.asfDefaultRipple,
-    },
-    {
-      wallet: carol,
-    },
-  )
-
-  // set up trustlines from bob -> alice, carol -> bob to transfer IssuedCurrency `USD`
-  await client.submitAndWait(
-    {
-      TransactionType: 'TrustSet',
-      Account: bob.classicAddress,
-      LimitAmount: {
-        currency: 'USD',
-        issuer: alice.classicAddress,
-        value: '1000',
-      },
-    },
-    {
-      wallet: bob,
-    },
-  )
-
-  await client.submitAndWait(
-    {
-      TransactionType: 'TrustSet',
-      Account: carol.classicAddress,
-      LimitAmount: {
-        currency: 'USD',
-        issuer: bob.classicAddress,
-        value: '1000',
-      },
-    },
-    {
-      wallet: carol,
-    },
-  )
-
-  // Perform path find
-  // Note: Rippling allows IssuedCurrencies with identical currency-codes,
-  // but different (ex: alice, bob and carol) issuers to settle their transfers.
-  // Docs: https://xrpl.org/docs/concepts/tokens/fungible-tokens/rippling
-  const response = await client.request({
-    command: 'ripple_path_find',
-    source_account: alice.classicAddress,
-    source_currencies: [
-      {
-        currency: 'USD',
-        issuer: alice.classicAddress,
-      },
-    ],
-    destination_account: carol.classicAddress,
-    destination_amount: {
-      currency: 'USD',
-      issuer: carol.classicAddress,
-      value: '5',
-    },
+  const { wallet } = await client.fundWallet(null, {
+    usageContext: 'code snippets',
   })
-
-  // Check the results
-  const paths = response.result.alternatives
-  if (paths.length === 0) {
-    throw new Error('No paths found')
+  const destination_account = 'rJPeZVPty1bXXbDR9oKscg2irqABr7sP3t'
+  const destination_amount = {
+    value: '0.001',
+    currency: 'TST',
+    issuer: 'rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd',
   }
 
-  console.log('Paths discovered by ripple_path_find RPC:')
-  console.log(JSON.stringify(paths, null, 2))
+  const resp = await client.request({
+    command: 'path_find',
+    subcommand: 'create',
+    source_account: wallet.classicAddress,
+    destination_account,
+    destination_amount,
+  })
+  console.log(resp)
 
-  // Check if the path includes bob
-  // the "paths_computed" field uses a 2-D matrix representation as detailed here:
-  // https://xrpl.org/docs/concepts/tokens/fungible-tokens/paths#path-specifications
-  const path = paths[0].paths_computed[0][0]
-  if (path.account !== bob.classicAddress) {
-    throw new Error('Path does not include bob')
+  const paths = resp.result.alternatives[0].paths_computed
+  console.log(paths)
+
+  const tx: Payment = {
+    TransactionType: 'Payment',
+    Account: wallet.classicAddress,
+    Amount: destination_amount,
+    Destination: destination_account,
+    Paths: paths,
   }
 
-  // Check the source amount
+  await client.autofill(tx)
+  const signed = wallet.sign(tx)
+  console.log('signed:', signed)
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- result currency will be USD
-  const sourceAmount = paths[0].source_amount as IssuedCurrencyAmount
-  if (
-    sourceAmount.currency !== 'USD' ||
-    sourceAmount.issuer !== alice.classicAddress ||
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- 5 is an arbitrarily chosen amount for this test
-    parseFloat(sourceAmount.value) !== 5.0
-  ) {
-    throw new Error('Unexpected source amount')
-  }
-
-  console.log('Test passed successfully!')
-
-  // Disconnect from the client
   await client.disconnect()
 }
 
-runTest().catch(console.error)
+void createTxWithPaths()
