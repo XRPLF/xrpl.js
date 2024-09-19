@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "en-US"
+reviews:
+  # Set the profile for reviews. Assertive profile yields more feedback, that may be considered nitpicky.
+  profile: "chill"
+  # Approve the review once CodeRabbit's comments are resolved. Note: In GitLab, all discussions must be resolved.
+  request_changes_workflow: false
+  # Generate a high level summary of the changes in the PR/MR description.
+  high_level_summary: false
+  # Generate a poem in the walkthrough comment.
+  poem: true
+  # Post review details on each review. Additionally, post a review status when a review is skipped in certain cases.
+  review_status: true
+  # Generate walkthrough in a markdown collapsible section.
+  collapse_walkthrough: false
+  # Abort the in-progress review if the pull request is closed or merged.
+  abort_on_close: true
+  auto_review:
+    # Automatic Review | Automatic code review
+    enabled: true
+    # Review draft PRs/MRs.
+    drafts: false
+    # Ignore reviewing if the title of the pull request contains any of these keywords (case-insensitive).
+    ignore_title_keywords:
+      - build(
+chat:
+  # Enable the bot to reply automatically without requiring the user to tag it.
+  auto_reply: true
