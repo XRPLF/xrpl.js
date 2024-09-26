@@ -163,7 +163,7 @@ export function handleStreamPartialPayment(
   stream: TransactionStream | TransactionV1Stream,
   log: (id: string, message: string) => void,
 ): void {
-  if (isPartialPayment(stream.transaction ?? stream.tx_json, stream.meta)) {
+  if (isPartialPayment(stream.tx_json ?? stream.transaction, stream.meta)) {
     const warnings = stream.warnings ?? []
 
     const warning = {
