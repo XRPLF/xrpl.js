@@ -128,9 +128,38 @@ it('compareToTest[7]', () => {
   expect(UInt8.from(124).compareTo(13)).toBe(1)
 })
 
+// comparing large values
+// The current version of the SDK throws the following error:
+// "18446744073709551615 is not a valid hex-string"
+// This is caused due to the HEX_REGEX: ^[a-fA-F0-9]{1,16}$
+it('compareToTest[8]', () => {
+  expect(
+    UInt64.from('18446744073709551615').compareTo(
+      // hexa-decimal representation of this value
+      UInt64.from(BigInt('0xffffffffffffffff')),
+    ),
+  ).toBe(0)
+})
+
 it('UInt64 from string zero', () => {
   expect(UInt64.from('0')).toEqual(UInt64.from(0))
   expect(encode(json)).toEqual(binary)
+})
+
+it('UInt64 from large inputs', () => {
+  expect(UInt64.from('18446744073709551615')).toEqual(
+    UInt64.from(BigInt('18446744073709551615')),
+  )
+
+  expect(UInt64.from('18446744073709551615')).toEqual(
+    UInt64.from(BigInt('0xffffffffffffffff')),
+  )
+
+  // Note: Support multiple representation of BigInt literals. The below line invokes the following error:
+  // error TS2737: BigInt literals are not available when targeting lower than ES2020.
+  expect(UInt64.from('18446744073709551615')).toEqual(
+    UInt64.from(18446744073709551615n),
+  )
 })
 
 it('UInt64 from non 16 length hex', () => {
