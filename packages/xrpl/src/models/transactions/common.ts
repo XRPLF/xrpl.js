@@ -169,25 +169,29 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
 /**
  * Verify the form and type of a required type for a transaction at runtime.
  *
- * @param tx - The transaction input to check the form and type of.
- * @param paramName - The name of the transaction parameter.
+ * @param tx - The object input to check the form and type of.
+ * @param param - The object parameter.
  * @param checkValidity - The function to use to check the type.
+ * @param paramName - The name of the object parameter (if different from the parameter).
  * @throws
  */
+// eslint-disable-next-line max-params -- helper function
 export function validateRequiredField(
   tx: Record<string, unknown>,
-  paramName: string,
+  param: string,
   checkValidity: (inp: unknown) => boolean,
+  paramName: string | undefined = undefined,
 ): void {
-  if (tx[paramName] == null) {
+  const paramNameStr = paramName ?? param
+  if (tx[param] == null) {
     throw new ValidationError(
-      `${tx.TransactionType}: missing field ${paramName}`,
+      `${tx.TransactionType}: missing field ${paramNameStr}`,
     )
   }
 
-  if (!checkValidity(tx[paramName])) {
+  if (!checkValidity(tx[param])) {
     throw new ValidationError(
-      `${tx.TransactionType}: invalid field ${paramName}`,
+      `${tx.TransactionType}: invalid field ${paramNameStr}`,
     )
   }
 }
@@ -196,18 +200,22 @@ export function validateRequiredField(
  * Verify the form and type of an optional type for a transaction at runtime.
  *
  * @param tx - The transaction input to check the form and type of.
- * @param paramName - The name of the transaction parameter.
+ * @param param - The object parameter.
  * @param checkValidity - The function to use to check the type.
+ * @param paramName - The name of the object parameter (if different from the parameter).
  * @throws
  */
+// eslint-disable-next-line max-params -- helper function
 export function validateOptionalField(
   tx: Record<string, unknown>,
-  paramName: string,
+  param: string,
   checkValidity: (inp: unknown) => boolean,
+  paramName: string | undefined = undefined,
 ): void {
-  if (tx[paramName] !== undefined && !checkValidity(tx[paramName])) {
+  const paramNameStr = paramName ?? param
+  if (tx[param] !== undefined && !checkValidity(tx[param])) {
     throw new ValidationError(
-      `${tx.TransactionType}: invalid field ${paramName}`,
+      `${tx.TransactionType}: invalid field ${paramNameStr}`,
     )
   }
 }
