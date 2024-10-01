@@ -272,6 +272,12 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'Batch':
       validateBatch(tx)
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- okay here
+      // @ts-expect-error -- already checked
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- already checked above
+      tx.RawTransactions.forEach((innerTx: Record<string, unknown>) =>
+        validate(innerTx),
+      )
       break
 
     case 'CheckCancel':

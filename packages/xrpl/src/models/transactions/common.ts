@@ -164,6 +164,16 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
   )
 }
 
+/**
+ * Verify the form and type of an Object at runtime.
+ *
+ * @param input - The object to check the form and type of.
+ * @returns Whether the Object is properly formed.
+ */
+export function isObject(input: unknown): input is object {
+  return typeof input === 'object'
+}
+
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
 
 /**

@@ -2,6 +2,7 @@ import { Signer } from '../common'
 
 import {
   BaseTransaction,
+  isObject,
   isString,
   validateBaseTransaction,
   validateOptionalField,
@@ -60,8 +61,11 @@ export interface Batch extends BaseTransaction {
 export function validateBatch(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
+  validateRequiredField(tx, 'RawTransactions', isObject)
+  // Full validation of each `RawTransaction` object is done in `validate` to avoid dependency cycles
+
   validateOptionalField(tx, 'BatchSigners', (field) => {
-    if (!(typeof field === 'object')) {
+    if (!isObject(field)) {
       return false
     }
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
