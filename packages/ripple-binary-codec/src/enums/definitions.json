@@ -261,6 +261,16 @@
       }
     ],
     [
+      "BatchIndex",
+      {
+        "nth": 20,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt8"
+      }
+    ],
+    [
       "LedgerEntryType",
       {
         "nth": 1,
@@ -364,6 +374,16 @@
       "HookApiVersion",
       {
         "nth": 20,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt16"
+      }
+    ],
+    [
+      "LedgerFixType",
+      {
+        "nth": 21,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1981,6 +2001,16 @@
       }
     ],
     [
+      "InnerResult",
+      {
+        "nth": 30,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Blob"
+      }
+    ],
+    [
       "Account",
       {
         "nth": 1,
@@ -2141,6 +2171,16 @@
       }
     ],
     [
+      "OuterAccount",
+      {
+        "nth": 24,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "AccountID"
+      }
+    ],
+    [
       "Indexes",
       {
         "nth": 1,
@@ -2174,6 +2214,16 @@
       "NFTokenOffers",
       {
         "nth": 4,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Vector256"
+      }
+    ],
+    [
+      "TxIDs",
+      {
+        "nth": 5,
         "isVLEncoded": true,
         "isSerialized": true,
         "isSigningField": true,
@@ -2551,6 +2601,46 @@
       }
     ],
     [
+      "RawTransaction",
+      {
+        "nth": 33,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
+      "BatchExecution",
+      {
+        "nth": 34,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
+      "BatchTxn",
+      {
+        "nth": 35,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
+      "BatchSigner",
+      {
+        "nth": 36,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
       "Signers",
       {
         "nth": 3,
@@ -2739,6 +2829,36 @@
         "isSigningField": true,
         "type": "STArray"
       }
+    ],
+    [
+      "BatchExecutions",
+      {
+        "nth": 26,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "RawTransactions",
+      {
+        "nth": 27,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "BatchSigners",
+      {
+        "nth": 28,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": false,
+        "type": "STArray"
+      }
     ]
   ],
   "TRANSACTION_RESULTS": {
@@ -2808,6 +2928,7 @@
     "temEMPTY_DID": -254,
     "temARRAY_EMPTY": -253,
     "temARRAY_TOO_LARGE": -252,
+    "temINVALID_BATCH": -251,
 
     "tefFAILURE": -199,
     "tefALREADY": -198,
@@ -2830,6 +2951,7 @@
     "tefTOO_BIG": -181,
     "tefNO_TICKET": -180,
     "tefNFTOKEN_IS_NOT_TRANSFERABLE": -179,
+    "tefINVALID_LEDGER_FIX_TYPE": -178,
 
     "terRETRY": -99,
     "terFUNDS_SPENT": -98,
@@ -2923,7 +3045,8 @@
     "tecINVALID_UPDATE_TIME": 188,
     "tecTOKEN_PAIR_NOT_FOUND": 189,
     "tecARRAY_EMPTY": 190,
-    "tecARRAY_TOO_LARGE": 191
+    "tecARRAY_TOO_LARGE": 191,
+    "tecBATCH_FAILURE": 192
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
@@ -2974,6 +3097,8 @@
     "DIDDelete": 50,
     "OracleSet": 51,
     "OracleDelete": 52,
+    "LedgerStateFix": 53,
+    "Batch": 54,
     "EnableAmendment": 100,
     "SetFee": 101,
     "UNLModify": 102
