@@ -178,6 +178,17 @@ describe('Payment', function () {
       }
 
       await testTransaction(testContext.client, payTx, testContext.wallet)
+
+      accountObjectsResponse = await testContext.client.request({
+        command: 'account_objects',
+        account: testContext.wallet.classicAddress,
+        type: 'mpt_issuance',
+      })
+      assert.equal(
+        // @ts-ignore
+        accountObjectsResponse.result.account_objects[0].OutstandingAmount,
+        `100`,
+      )
     },
     TIMEOUT,
   )

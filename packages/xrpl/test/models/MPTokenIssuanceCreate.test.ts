@@ -5,7 +5,6 @@ import {
   validate,
   ValidationError,
   MPTokenIssuanceCreateFlags,
-  mptUint64ToHex,
 } from '../../src'
 
 /**
@@ -18,7 +17,7 @@ describe('MPTokenIssuanceCreate', function () {
     const validMPTokenIssuanceCreate = {
       TransactionType: 'MPTokenIssuanceCreate',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MaximumAmount: mptUint64ToHex('9223372036854775807'), // 0x7fffffffffffffff
+      MaximumAmount: '9223372036854775807', // 0x7fffffffffffffff
       AssetScale: 2,
       TransferFee: 1,
       Flags: 2,
@@ -55,6 +54,44 @@ describe('MPTokenIssuanceCreate', function () {
       () => validate(invalid),
       ValidationError,
       'MPTokenIssuanceCreate: MPTokenMetadata must be in hex format',
+    )
+  })
+
+  it(`throws w/ Invalid MaximumAmount`, function () {
+    let invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MaximumAmount: '9223372036854775808',
+    } as any
+
+    assert.throws(
+      () => validate(invalid),
+      ValidationError,
+      'MPTokenIssuanceCreate: MaximumAmount out of range',
+    )
+
+    invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MaximumAmount: '-1',
+    } as any
+
+    assert.throws(
+      () => validate(invalid),
+      ValidationError,
+      'MPTokenIssuanceCreate: Invalid MaximumAmount',
+    )
+
+    invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MaximumAmount: '0x12',
+    } as any
+
+    assert.throws(
+      () => validate(invalid),
+      ValidationError,
+      'MPTokenIssuanceCreate: Invalid MaximumAmount',
     )
   })
 })

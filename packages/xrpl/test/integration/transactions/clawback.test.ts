@@ -174,7 +174,7 @@ describe('Clawback', function () {
       assert.equal(
         // @ts-ignore
         ledgerEntryResponse.result.node.MPTAmount,
-        '7fffffffffffffff',
+        '9223372036854775807',
       )
 
       // actual test - clawback
@@ -200,7 +200,7 @@ describe('Clawback', function () {
       assert.equal(
         // @ts-ignore
         ledgerEntryResponse.result.node.MPTAmount,
-        '7ffffffffffffe0b',
+        '9223372036854775307',
       )
     },
     TIMEOUT,
