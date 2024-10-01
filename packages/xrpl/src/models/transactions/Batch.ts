@@ -9,6 +9,18 @@ import {
 } from './common'
 import type { Transaction } from './transaction'
 
+export type BatchInnerTransaction = Transaction & {
+  BatchTxn?: {
+    OuterAccount: string
+
+    Sequence?: number
+
+    TicketSequence?: number
+
+    BatchIndex: number
+  }
+}
+
 export interface BatchSigner {
   Account: string
 
@@ -27,19 +39,7 @@ export interface Batch extends BaseTransaction {
 
   BatchSigners?: BatchSigner[]
 
-  RawTransactions: Array<
-    Transaction & {
-      BatchTxn: {
-        OuterAccount: string
-
-        Sequence?: number
-
-        TicketSequence?: number
-
-        BatchIndex: number
-      }
-    }
-  >
+  RawTransactions: BatchInnerTransaction[]
 
   TxIDs: string[]
 }

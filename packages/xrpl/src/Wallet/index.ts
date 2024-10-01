@@ -23,7 +23,7 @@ import {
 
 import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
-import { Transaction, validate } from '../models/transactions'
+import { Batch, Transaction, validate } from '../models/transactions'
 import { ensureClassicAddress } from '../sugar/utils'
 import { omitBy } from '../utils/collections'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
@@ -435,6 +435,30 @@ export class Wallet {
       tx_blob: serialized,
       hash: hashSignedTx(serialized),
     }
+  }
+
+  /**
+   * Sign a multi-account Batch transaction.
+   *
+   * @param this - Wallet instance.
+   * @param transaction - The Batch transaction to sign
+   * @returns The signature to include in `BatchSigners`.
+   */
+  public signMultiBatch(
+    this: Wallet,
+    transaction: { Flags: number; TxIDs: string[] } | Batch,
+  ): string {
+    // TODO: add multisign support
+    transaction.TxIDs.forEach((txId, index) => {
+      if (typeof txId !== 'string') {
+        throw new ValidationError(`TxID #${index} is not a string.`)
+      }
+    })
+    const fieldsToSign = {
+      Flags: transaction.Flags,
+      TxIDs: transaction.TxIDs,
+    }
+    return sign(encodeForSigning(fieldsToSign), this.privateKey)
   }
 
   /**
