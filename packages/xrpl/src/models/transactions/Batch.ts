@@ -27,17 +27,19 @@ export interface Batch extends BaseTransaction {
 
   BatchSigners?: BatchSigner[]
 
-  RawTransactions: Transaction & {
-    BatchTxn: {
-      OuterAccount: string
+  RawTransactions: Array<
+    Transaction & {
+      BatchTxn: {
+        OuterAccount: string
 
-      Sequence?: number
+        Sequence?: number
 
-      TicketSequence?: number
+        TicketSequence?: number
 
-      BatchIndex: number
+        BatchIndex: number
+      }
     }
-  }
+  >
 
   TxIDs: string[]
 }
