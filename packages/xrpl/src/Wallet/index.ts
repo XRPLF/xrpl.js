@@ -448,7 +448,6 @@ export class Wallet {
     this: Wallet,
     transaction: { Flags: number; TxIDs: string[] } | Batch,
   ): string {
-    // TODO: add multisign support
     transaction.TxIDs.forEach((txId, index) => {
       if (typeof txId !== 'string') {
         throw new ValidationError(`TxID #${index} is not a string.`)
@@ -458,6 +457,7 @@ export class Wallet {
       Flags: transaction.Flags,
       TxIDs: transaction.TxIDs,
     }
+    // TODO: add multisign support
     return sign(encodeForSigning(fieldsToSign), this.privateKey)
   }
 

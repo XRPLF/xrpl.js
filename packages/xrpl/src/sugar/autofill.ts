@@ -1,4 +1,3 @@
-/* eslint-disable max-lines - lots of helper functions needed for autofill */
 import BigNumber from 'bignumber.js'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
@@ -419,19 +418,30 @@ export async function autofillBatchTxn(
   let batchIndex = 0
 
   for await (const txn of tx.RawTransactions) {
+    if (txn.BatchTxn === undefined) {
+      /* eslint-disable @typescript-eslint/ban-ts-comment -- just for now */
+      // @ts-expect-error -- just for now
+      txn.BatchTxn = {}
+    }
+    // @ts-expect-error -- just for now
     txn.BatchTxn.OuterAccount = tx.Account
+    // @ts-expect-error -- just for now
     if (txn.BatchTxn.TicketSequence != null && txn.BatchTxn.Sequence != null) {
       // eslint-disable-next-line max-depth -- okay here
       if (txn.Account in accountSequences) {
+        // @ts-expect-error -- just for now
         txn.BatchTxn.Sequence = accountSequences[txn.Account]
         accountSequences[txn.Account] += 1
       } else {
         const sequence = await getNextValidSequenceNumber(client, txn.Account)
         accountSequences[txn.Account] = sequence + 1
+        // @ts-expect-error -- just for now
         txn.BatchTxn.Sequence = sequence
       }
     }
+    // @ts-expect-error -- just for now
     txn.BatchTxn.BatchIndex = batchIndex
     batchIndex += 1
+    /* eslint-enable @typescript-eslint/ban-ts-comment -- just for now */
   }
 }

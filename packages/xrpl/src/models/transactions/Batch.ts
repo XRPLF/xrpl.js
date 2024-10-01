@@ -22,13 +22,15 @@ export type BatchInnerTransaction = Transaction & {
 }
 
 export interface BatchSigner {
-  Account: string
+  BatchSigner: {
+    Account: string
 
-  SigningPubKey?: string
+    SigningPubKey?: string
 
-  TxnSignature?: string
+    TxnSignature?: string
 
-  Signers?: Signer[]
+    Signers?: Signer[]
+  }
 }
 
 /**
