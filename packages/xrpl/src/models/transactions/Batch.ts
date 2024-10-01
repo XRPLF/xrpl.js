@@ -8,6 +8,7 @@ import {
   validateOptionalField,
   validateRequiredField,
 } from './common'
+import type { TransactionMetadataBase } from './metadata'
 import type { Transaction } from './transaction'
 
 export interface BatchTxn {
@@ -50,6 +51,16 @@ export interface Batch extends BaseTransaction {
    * Optional because it can be autofilled.
    */
   TxIDs?: string[]
+}
+
+export interface BatchMetadata extends TransactionMetadataBase {
+  BatchExecutions: Array<{
+    TransactionType: string
+
+    InnerResult: string
+
+    TransactionHash: string
+  }>
 }
 
 /**
