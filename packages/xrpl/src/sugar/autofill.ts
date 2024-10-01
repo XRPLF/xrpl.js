@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- lots of helper functions needed for autofill */
 import BigNumber from 'bignumber.js'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
@@ -5,7 +6,9 @@ import { type Client } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
 import { Batch, Payment, Transaction } from '../models/transactions'
+import { BatchTxn } from '../models/transactions/batch'
 import { xrpToDrops } from '../utils'
+import { hashSignedTx } from '../utils/hashes'
 
 import getFeeXrp from './getFeeXrp'
 
@@ -416,32 +419,31 @@ export async function autofillBatchTxn(
 ): Promise<void> {
   const accountSequences: Record<string, number> = {}
   let batchIndex = 0
+  const txIds: string[] = []
 
   for await (const txn of tx.RawTransactions) {
-    if (txn.BatchTxn === undefined) {
-      /* eslint-disable @typescript-eslint/ban-ts-comment -- just for now */
-      // @ts-expect-error -- just for now
-      txn.BatchTxn = {}
+    if (txn.BatchTxn !== undefined) {
+      continue
     }
-    // @ts-expect-error -- just for now
-    txn.BatchTxn.OuterAccount = tx.Account
-    // @ts-expect-error -- just for now
-    if (txn.BatchTxn.TicketSequence != null && txn.BatchTxn.Sequence != null) {
-      // eslint-disable-next-line max-depth -- okay here
-      if (txn.Account in accountSequences) {
-        // @ts-expect-error -- just for now
-        txn.BatchTxn.Sequence = accountSequences[txn.Account]
-        accountSequences[txn.Account] += 1
-      } else {
-        const sequence = await getNextValidSequenceNumber(client, txn.Account)
-        accountSequences[txn.Account] = sequence + 1
-        // @ts-expect-error -- just for now
-        txn.BatchTxn.Sequence = sequence
-      }
+    const batchTxn: Partial<BatchTxn> = {}
+    batchTxn.OuterAccount = tx.Account
+
+    if (txn.Account in accountSequences) {
+      batchTxn.Sequence = accountSequences[txn.Account]
+      accountSequences[txn.Account] += 1
+    } else {
+      const sequence = await getNextValidSequenceNumber(client, txn.Account)
+      accountSequences[txn.Account] = sequence + 1
+      batchTxn.Sequence = sequence
     }
-    // @ts-expect-error -- just for now
-    txn.BatchTxn.BatchIndex = batchIndex
+    batchTxn.BatchIndex = batchIndex
     batchIndex += 1
-    /* eslint-enable @typescript-eslint/ban-ts-comment -- just for now */
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
+    txn.BatchTxn = batchTxn as BatchTxn
+    txIds.push(hashSignedTx(txn))
+  }
+  if (tx.TxIDs != null) {
+    // eslint-disable-next-line no-param-reassign -- okay for autofilling
+    tx.TxIDs = txIds
   }
 }
