@@ -1,3 +1,4 @@
+import { APIVersion, DEFAULT_API_VERSION, RIPPLED_API_V1 } from '../common'
 import { AccountRoot, SignerList } from '../ledger'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
@@ -133,23 +134,13 @@ export interface AccountInfoAccountFlags {
   allowTrustLineClawback: boolean
 }
 
-/**
- * Response expected from an {@link AccountInfoRequest}.
- *
- * @category Responses
- */
-export interface AccountInfoResponse extends BaseResponse {
+interface BaseAccountInfoResponse extends BaseResponse {
   result: {
     /**
      * The AccountRoot ledger object with this account's information, as stored
      * in the ledger.
-     * If requested, also includes Array of SignerList ledger objects
-     * associated with this account for Multi-Signing. Since an account can own
-     * at most one SignerList, this array must have exactly one member if it is
-     * present.
      */
-    account_data: AccountRoot & { signer_lists?: SignerList[] }
-
+    account_data: AccountRoot
     /**
      * A map of account flags parsed out.  This will only be available for rippled nodes 1.11.0 and higher.
      */
@@ -180,3 +171,58 @@ export interface AccountInfoResponse extends BaseResponse {
     validated?: boolean
   }
 }
+
+/**
+ * Response expected from a {@link AccountInfoRequest}.
+ *
+ * @category Responses
+ */
+export interface AccountInfoResponse extends BaseAccountInfoResponse {
+  result: BaseAccountInfoResponse['result'] & {
+    /**
+     * If requested, array of SignerList ledger objects associated with this account for Multi-Signing.
+     * Since an account can own at most one SignerList, this array must have exactly one
+     * member if it is present.
+     */
+    signer_lists?: SignerList[]
+  }
+}
+
+/**
+ * Response expected from a {@link AccountInfoRequest} using API version 1.
+ *
+ * @category ResponsesV1
+ */
+export interface AccountInfoV1Response extends BaseAccountInfoResponse {
+  result: BaseAccountInfoResponse['result'] & {
+    /**
+     * The AccountRoot ledger object with this account's information, as stored
+     * in the ledger.
+     * If requested, also includes Array of SignerList ledger objects
+     * associated with this account for Multi-Signing. Since an account can own
+     * at most one SignerList, this array must have exactly one member if it is
+     * present.
+     */
+    account_data: BaseAccountInfoResponse['result']['account_data'] & {
+      /**
+       * Array of SignerList ledger objects associated with this account for Multi-Signing.
+       * Since an account can own at most one SignerList, this array must have exactly one
+       * member if it is present.
+       * Quirk: In API version 1, this field is nested under account_data. For this method,
+       * Clio implements the API version 2 behavior where is field is not nested under account_data.
+       */
+      signer_lists?: SignerList[]
+    }
+  }
+}
+
+/**
+ * Type to map between the API version and the response type.
+ *
+ * @category Responses
+ */
+export type AccountInfoVersionResponseMap<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> = Version extends typeof RIPPLED_API_V1
+  ? AccountInfoV1Response
+  : AccountInfoResponse
