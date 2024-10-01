@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Lots of helper functions needed for signing */
 import { HDKey } from '@scure/bip32'
 import { mnemonicToSeedSync, validateMnemonic } from '@scure/bip39'
 import { wordlist } from '@scure/bip39/wordlists/english'
@@ -443,11 +444,15 @@ export class Wallet {
    * @param this - Wallet instance.
    * @param transaction - The Batch transaction to sign
    * @returns The signature to include in `BatchSigners`.
+   * @throws ValidationERror if TxIds isn't included.
    */
   public signMultiBatch(
     this: Wallet,
     transaction: { Flags: number; TxIDs: string[] } | Batch,
   ): string {
+    if (transaction.TxIDs == null) {
+      throw new ValidationError('Must include TxIDs to sign.')
+    }
     transaction.TxIDs.forEach((txId, index) => {
       if (typeof txId !== 'string') {
         throw new ValidationError(`TxID #${index} is not a string.`)

@@ -423,6 +423,7 @@ export async function autofillBatchTxn(
 
   for await (const txn of tx.RawTransactions) {
     if (txn.BatchTxn !== undefined) {
+      // eslint-disable-next-line no-continue -- this is fine
       continue
     }
     const batchTxn: Partial<BatchTxn> = {}

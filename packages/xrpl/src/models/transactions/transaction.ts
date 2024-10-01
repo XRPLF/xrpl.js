@@ -272,6 +272,8 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'Batch':
       validateBatch(tx)
+      // This is done here to avoid issues with dependency cycles
+
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- okay here
       // @ts-expect-error -- already checked
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- already checked above
