@@ -15,7 +15,7 @@ let jsTransactionFile
 
 function processRippledSource(folder) {
   const sfieldCpp = readFile(
-    path.join(folder, 'src/ripple/protocol/impl/SField.cpp'),
+    path.join(folder, 'src/libxrpl/protocol/SField.cpp'),
   )
   const sfieldHits = sfieldCpp.match(
     /^ *CONSTRUCT_[^\_]+_SFIELD *\( *[^,\n]*,[ \n]*"([^\"\n ]+)"[ \n]*,[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?(notSigning))?/gm,
@@ -29,7 +29,7 @@ function processRippledSource(folder) {
   }
 
   const txFormatsCpp = readFile(
-    path.join(folder, 'src/ripple/protocol/impl/TxFormats.cpp'),
+    path.join(folder, 'src/libxrpl/protocol/TxFormats.cpp'),
   )
   const txFormatsHits = txFormatsCpp.match(
     /^ *add\(jss::([^\"\n, ]+),[ \n]*tt[A-Z_]+,[ \n]*{[ \n]*(({sf[A-Za-z0-9]+, soe(OPTIONAL|REQUIRED|DEFAULT)},[ \n]+)*)},[ \n]*[pseudocC]+ommonFields\);/gm,
