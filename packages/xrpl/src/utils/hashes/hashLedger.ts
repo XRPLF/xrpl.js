@@ -82,9 +82,10 @@ export function hashSignedTx(tx: Transaction | string): string {
   }
 
   if (
-    txObject.TxnSignature === undefined &&
-    txObject.Signers === undefined &&
-    txObject.SigningPubKey === undefined
+    !('TxnSignature' in txObject) &&
+    !('Signers' in txObject) &&
+    !('SigningPubKey' in txObject) &&
+    !('BatchTxn' in txObject)
   ) {
     throw new ValidationError('The transaction must be signed to hash it.')
   }
