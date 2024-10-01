@@ -90,6 +90,10 @@ import {
   XChainModifyBridge,
   validateXChainModifyBridge,
 } from './XChainModifyBridge'
+import {
+  LedgerStateFix,
+  validateLedgerStateFix,
+} from './LedgerStateFix'
 
 /**
  * Transactions that can be submitted by clients
@@ -115,6 +119,7 @@ export type SubmittableTransaction =
   | EscrowCancel
   | EscrowCreate
   | EscrowFinish
+  | LedgerStateFix
   | NFTokenAcceptOffer
   | NFTokenBurn
   | NFTokenCancelOffer
@@ -304,6 +309,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'EscrowFinish':
       validateEscrowFinish(tx)
+      break
+
+    case 'LedgerStateFix':
+      validateLedgerStateFix(tx)
       break
 
     case 'NFTokenAcceptOffer':
