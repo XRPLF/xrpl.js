@@ -1,7 +1,7 @@
 /* eslint-disable func-style */
 
 import { bytesToHex } from '@xrplf/isomorphic/utils'
-import { coreTypes } from './types'
+import { coreTypes, UInt32 } from './types'
 import { BinaryParser } from './serdes/binary-parser'
 import { AccountID } from './types/account-id'
 import { HashPrefix } from './hash-prefixes'
@@ -177,11 +177,44 @@ function multiSigningData(
   })
 }
 
+/**
+ * Interface describing fields required for a Batch signer
+ */
+interface BatchObject extends JsonObject {
+  flags: number
+  txIDs: string[]
+}
+
+/**
+ * Serialize a signingClaim
+ *
+ * @param batch A Batch object to serialize
+ * @param opts.definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @returns the serialized object with appropriate prefix
+ */
+function signingBatchData(batch: BatchObject): Uint8Array {
+  const prefix = HashPrefix.batch
+  const flags = coreTypes.UInt32.from(batch.flags).toBytes()
+  const txIDsLength = coreTypes.UInt32.from(batch.txIDs.length).toBytes()
+
+  const bytesList = new BytesList()
+
+  bytesList.put(prefix)
+  bytesList.put(flags)
+  bytesList.put(txIDsLength)
+  batch.txIDs.forEach((txID: string) => {
+    bytesList.put(coreTypes.Hash256.from(txID).toBytes())
+  })
+
+  return bytesList.toBytes()
+}
+
 export {
   BinaryParser,
   BinarySerializer,
   BytesList,
   ClaimObject,
+  BatchObject,
   makeParser,
   serializeObject,
   readJSON,
@@ -191,4 +224,5 @@ export {
   binaryToJSON,
   sha512Half,
   transactionID,
+  signingBatchData,
 }

@@ -14,6 +14,7 @@ import {
   encodeForSigning,
   encodeForMultisigning,
   encode,
+  encodeForSigningBatch,
 } from 'ripple-binary-codec'
 import {
   deriveAddress,
@@ -463,7 +464,10 @@ export class Wallet {
       TxIDs: transaction.TxIDs,
     }
     // TODO: add multisign support
-    return sign(encodeForSigning(fieldsToSign), this.privateKey)
+    return sign(
+      encodeForSigningBatch(fieldsToSign, this.address),
+      this.privateKey,
+    )
   }
 
   /**
