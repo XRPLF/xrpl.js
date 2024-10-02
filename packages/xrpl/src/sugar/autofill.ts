@@ -421,7 +421,8 @@ export async function autofillBatchTxn(
   let batchIndex = 0
   const txIds: string[] = []
 
-  for await (const txn of tx.RawTransactions) {
+  for await (const rawTxn of tx.RawTransactions) {
+    const txn = rawTxn.RawTransaction
     if (txn.BatchTxn !== undefined) {
       // eslint-disable-next-line no-continue -- this is fine
       continue

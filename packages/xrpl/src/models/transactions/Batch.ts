@@ -1,7 +1,9 @@
+import { ValidationError } from '../../errors'
 import { Signer } from '../common'
 
 import {
   BaseTransaction,
+  isArray,
   isObject,
   isString,
   validateBaseTransaction,
@@ -45,7 +47,9 @@ export interface Batch extends BaseTransaction {
 
   BatchSigners?: BatchSigner[]
 
-  RawTransactions: BatchInnerTransaction[]
+  RawTransactions: Array<{
+    RawTransaction: BatchInnerTransaction
+  }>
 
   /**
    * Optional because it can be autofilled.
@@ -69,37 +73,64 @@ export interface BatchMetadata extends TransactionMetadataBase {
  * @param tx - A Batch Transaction.
  * @throws When the Batch is malformed.
  */
+// eslint-disable-next-line max-lines-per-function -- needed here due to the complexity
 export function validateBatch(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   validateRequiredField(tx, 'RawTransactions', isObject)
   // Full validation of each `RawTransaction` object is done in `validate` to avoid dependency cycles
-
-  validateOptionalField(tx, 'BatchSigners', (field) => {
+  const rawTransactions = tx.RawTransactions as unknown[]
+  rawTransactions.forEach((field, index) => {
     if (!isObject(field)) {
-      return false
+      throw new ValidationError(`Batch: RawTransactions[${index} is not object`)
     }
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
     const fieldObject = field as Record<string, unknown>
     validateRequiredField(
       fieldObject,
+      'RawTransaction',
+      isObject,
+      `RawTransactions[${index}].RawTransaction`,
+    )
+  })
+
+  validateOptionalField(tx, 'BatchSigners', isArray)
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
+  const batchSigners = tx.BatchSigners as unknown[]
+  batchSigners.forEach((field, index) => {
+    if (!isObject(field)) {
+      throw new ValidationError(`Batch: BatchSigners[${index} is not object`)
+    }
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
+    const fieldObject = field as Record<string, unknown>
+    validateRequiredField(
+      fieldObject,
+      'BatchSigner',
+      isObject,
+      `BatchSigners[${index}].BatchSigner`,
+    )
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
+    const batchSignerObject = fieldObject.BatchSigner as Record<string, unknown>
+    validateRequiredField(
+      batchSignerObject,
       'Account',
       isString,
-      'BatchSigners.Account',
+      `BatchSigners[${index}].Account`,
     )
     validateOptionalField(
-      fieldObject,
+      batchSignerObject,
       'SigningPubKey',
       isString,
-      'BatchSigners.SigningPubKey',
+      `BatchSigners[${index}].SigningPubKey`,
     )
     validateOptionalField(
-      fieldObject,
+      batchSignerObject,
       'TxnSignature',
       isString,
-      'BatchSigners.TxnSignature',
+      `BatchSigners[${index}].TxnSignature`,
     )
-
-    return true
   })
+
+  validateOptionalField(tx, 'TxIDs', isArray)
 }

@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 
 import { validate, ValidationError } from '../../src'
-import { validateLedgerStateFix } from '../../src/models/transactions/LedgerStateFix'
+import { validateLedgerStateFix } from '../../src/models/transactions/ledgerStateFix'
 
 /**
  * LedgerStateFix Transaction Verification Testing.
@@ -13,6 +13,7 @@ describe('LedgerStateFix', function () {
 
   beforeEach(function () {
     tx = {
+      Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
       TransactionType: 'LedgerStateFix',
       LedgerFixType: 1,
       Owner: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',

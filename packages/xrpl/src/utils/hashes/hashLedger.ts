@@ -82,10 +82,12 @@ export function hashSignedTx(tx: Transaction | string): string {
   }
 
   if (
-    !('TxnSignature' in txObject) &&
-    !('Signers' in txObject) &&
-    !('SigningPubKey' in txObject) &&
-    !('BatchTxn' in txObject)
+    txObject.TxnSignature === undefined &&
+    txObject.Signers === undefined &&
+    txObject.SigningPubKey === undefined &&
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- exception needed here
+    // @ts-expect-error -- needed here for Batch transactions
+    txObject.BatchTxn === undefined
   ) {
     throw new ValidationError('The transaction must be signed to hash it.')
   }

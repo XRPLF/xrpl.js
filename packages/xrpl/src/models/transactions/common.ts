@@ -174,6 +174,16 @@ export function isObject(input: unknown): input is object {
   return typeof input === 'object'
 }
 
+/**
+ * Verify the form and type of an Array at runtime.
+ *
+ * @param input - The object to check the form and type of.
+ * @returns Whether the Array is properly formed.
+ */
+export function isArray(input: unknown): boolean {
+  return Array.isArray(input)
+}
+
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
 
 /**

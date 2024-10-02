@@ -18,7 +18,9 @@ export enum FaucetNetwork {
 }
 
 export const FaucetNetworkPaths: Record<string, string> = {
-  // Only need to specify here if not `/accounts`
+  [FaucetNetwork.Testnet]: '/accounts',
+  [FaucetNetwork.Devnet]: '/accounts',
+  [FaucetNetwork.Batchnet]: '/accounts',
 }
 
 /**

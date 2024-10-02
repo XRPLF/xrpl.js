@@ -10,6 +10,7 @@ import {
   Transaction,
   ValidationError,
 } from '../../src'
+import { BatchInnerTransaction } from '../../src/models/transactions/batch'
 import {
   hashStateTree,
   hashTxTree,
@@ -209,6 +210,29 @@ describe('Hashes', function () {
     assert.equal(
       hashSignedTx(transaction),
       'CA4562711E4679FE9317DD767871E90A404C7A8B84FAFD35EC2CF0231F1F6DAF',
+    )
+  })
+
+  it('hashSignedTx - batch transaction', function () {
+    const transaction: BatchInnerTransaction = {
+      Account: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
+      Amount: '1000000',
+      BatchTxn: {
+        BatchIndex: 0,
+        OuterAccount: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
+        Sequence: 470,
+      },
+      Destination: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
+      Fee: '0',
+      NetworkID: 21336,
+      Sequence: 0,
+      SigningPubKey: '',
+      TransactionType: 'Payment',
+    }
+
+    assert.equal(
+      hashSignedTx(transaction),
+      '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
     )
   })
 })

@@ -27,7 +27,7 @@ import { EnableAmendment } from './enableAmendment'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
-import { LedgerStateFix, validateLedgerStateFix } from './LedgerStateFix'
+import { LedgerStateFix, validateLedgerStateFix } from './ledgerStateFix'
 import { TransactionMetadata } from './metadata'
 import {
   NFTokenAcceptOffer,
@@ -277,9 +277,10 @@ export function validate(transaction: Record<string, unknown>): void {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- okay here
       // @ts-expect-error -- already checked
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- already checked above
-      tx.RawTransactions.forEach((innerTx: Record<string, unknown>) =>
-        validate(innerTx),
-      )
+      tx.RawTransactions.forEach((innerTx: Record<string, unknown>) => {
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- already checked above
+        validate(innerTx.RawTransaction as Record<string, unknown>)
+      })
       break
 
     case 'CheckCancel':

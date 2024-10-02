@@ -87,4 +87,4 @@ export {
   XChainModifyBridgeFlagsInterface,
 } from './XChainModifyBridge'
 export { Batch } from './batch'
-export { LedgerStateFix } from './LedgerStateFix'
+export { LedgerStateFix } from './ledgerStateFix'
