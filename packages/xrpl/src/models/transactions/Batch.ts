@@ -77,8 +77,8 @@ export interface BatchMetadata extends TransactionMetadataBase {
 export function validateBatch(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'RawTransactions', isObject)
-  // Full validation of each `RawTransaction` object is done in `validate` to avoid dependency cycles
+  validateRequiredField(tx, 'RawTransactions', isArray)
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
   const rawTransactions = tx.RawTransactions as unknown[]
   rawTransactions.forEach((field, index) => {
     if (!isObject(field)) {
@@ -93,12 +93,13 @@ export function validateBatch(tx: Record<string, unknown>): void {
       `RawTransactions[${index}].RawTransaction`,
     )
   })
+  // Full validation of each `RawTransaction` object is done in `validate` to avoid dependency cycles
 
   validateOptionalField(tx, 'BatchSigners', isArray)
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
-  const batchSigners = tx.BatchSigners as unknown[]
-  batchSigners.forEach((field, index) => {
+  const batchSigners = tx.BatchSigners as unknown[] | undefined
+  batchSigners?.forEach((field, index) => {
     if (!isObject(field)) {
       throw new ValidationError(`Batch: BatchSigners[${index} is not object`)
     }
