@@ -444,7 +444,7 @@ export async function autofillBatchTxn(
     txn.BatchTxn = batchTxn as BatchTxn
     txIds.push(hashSignedTx(txn))
   }
-  if (tx.TxIDs != null) {
+  if (tx.TxIDs == null) {
     // eslint-disable-next-line no-param-reassign -- okay for autofilling
     tx.TxIDs = txIds
   }
