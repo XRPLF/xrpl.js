@@ -93,7 +93,7 @@ export function signMultiBatch(
  * - There were no transactions given to sign
  * @category Signing
  */
-export function combineBatchSignatures(
+export function combineBatchSigners(
   transactions: Array<Batch | string>,
 ): string {
   if (transactions.length === 0) {
@@ -115,16 +115,17 @@ export function combineBatchSignatures(
      */
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
     validateBatch(tx as unknown as Record<string, unknown>)
-    if (tx.Signers == null || tx.Signers.length === 0) {
+    if (tx.BatchSigners == null || tx.BatchSigners.length === 0) {
       throw new ValidationError(
         "For multisigning all transactions must include a Signers field containing an array of signatures. You may have forgotten to pass the 'forMultisign' parameter when signing.",
       )
     }
 
-    if (tx.SigningPubKey !== '') {
-      throw new ValidationError(
-        'SigningPubKey must be an empty string for all transactions when multisigning.',
-      )
+    if (
+      tx.SigningPubKey !== '' &&
+      (tx.TxnSignature != null || tx.Signers != null)
+    ) {
+      throw new ValidationError('Transaction must be unsigned.')
     }
   })
 

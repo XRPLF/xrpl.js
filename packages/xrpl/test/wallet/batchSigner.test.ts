@@ -1,7 +1,20 @@
 import { assert } from 'chai'
 
-import { Batch, ECDSA, Wallet } from '../../src'
-import { signMultiBatch } from '../../src/Wallet/batch'
+import { Batch, decode, ECDSA, encode, Wallet } from '../../src'
+import {
+  combineBatchSigners,
+  signMultiBatch,
+} from '../../src/Wallet/batchSigner'
+
+const secpWallet = Wallet.fromSeed('spkcsko6Ag3RbCSVXV2FJ8Pd4Zac1', {
+  algorithm: ECDSA.secp256k1,
+})
+const edWallet = Wallet.fromSeed('spkcsko6Ag3RbCSVXV2FJ8Pd4Zac1', {
+  algorithm: ECDSA.ed25519,
+})
+// const submitWallet = Wallet.fromSeed('sEd7HmQFsoyj5TAm6d98gytM9LJA1MF', {
+//   algorithm: ECDSA.ed25519,
+// })
 
 describe('Wallet batch operations', function () {
   describe('signMultiBatch', function () {
@@ -55,9 +68,6 @@ describe('Wallet batch operations', function () {
       }
     })
     it('succeeds with secp256k1 seed', function () {
-      const secpWallet = Wallet.fromSeed('spkcsko6Ag3RbCSVXV2FJ8Pd4Zac1', {
-        algorithm: ECDSA.secp256k1,
-      })
       signMultiBatch(secpWallet, transaction)
       const expected = [
         {
@@ -78,9 +88,6 @@ describe('Wallet batch operations', function () {
     })
 
     it('succeeds with ed25519 seed', function () {
-      const edWallet = Wallet.fromSeed('spkcsko6Ag3RbCSVXV2FJ8Pd4Zac1', {
-        algorithm: ECDSA.ed25519,
-      })
       signMultiBatch(edWallet, transaction)
       const expected = [
         {
@@ -98,6 +105,83 @@ describe('Wallet batch operations', function () {
         JSON.stringify(transaction.BatchSigners),
         JSON.stringify(expected),
       )
+    })
+  })
+
+  describe('combineBatchSigners', function () {
+    let tx1: Batch
+    let tx2: Batch
+    const originalTx: Batch = {
+      Account: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
+      Flags: 1,
+      LastLedgerSequence: 14973,
+      NetworkID: 21336,
+      RawTransactions: [
+        {
+          RawTransaction: {
+            Account: 'rJy554HmWFFJQGnRfZuoo8nV97XSMq77h7',
+            Amount: '5000000',
+            BatchTxn: {
+              BatchIndex: 1,
+              OuterAccount: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
+              Sequence: 215,
+            },
+            Destination: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
+            Fee: '0',
+            NetworkID: 21336,
+            Sequence: 0,
+            SigningPubKey: '',
+            TransactionType: 'Payment',
+          },
+        },
+        {
+          RawTransaction: {
+            Account: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
+            Amount: '1000000',
+            BatchTxn: {
+              BatchIndex: 0,
+              OuterAccount: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
+              Sequence: 470,
+            },
+            Destination: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
+            Fee: '0',
+            NetworkID: 21336,
+            Sequence: 0,
+            SigningPubKey: '',
+            TransactionType: 'Payment',
+          },
+        },
+      ],
+      Sequence: 215,
+      TransactionType: 'Batch',
+      TxIDs: [
+        'ABE4871E9083DF66727045D49DEEDD3A6F166EB7F8D1E92FE868F02E76B2C5CA',
+        '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
+      ],
+    }
+    let expectedValid
+
+    beforeEach(() => {
+      tx1 = { ...originalTx }
+      tx2 = { ...originalTx }
+      signMultiBatch(edWallet, tx1)
+      signMultiBatch(secpWallet, tx2)
+      expectedValid = (tx1.BatchSigners ?? []).concat(tx2.BatchSigners ?? [])
+    })
+
+    it('combines valid transactions', function () {
+      const result = combineBatchSigners([tx1, tx2])
+      assert.deepEqual(decode(result).BatchSigners, expectedValid)
+    })
+
+    it('combines valid serialized transactions', function () {
+      const result = combineBatchSigners([encode(tx1), encode(tx2)])
+      assert.deepEqual(decode(result).BatchSigners, expectedValid)
+    })
+
+    it('sorts the signers', function () {
+      const result = combineBatchSigners([tx2, tx1])
+      assert.deepEqual(decode(result).BatchSigners, expectedValid)
     })
   })
 })
