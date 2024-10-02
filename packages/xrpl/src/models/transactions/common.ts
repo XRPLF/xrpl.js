@@ -81,7 +81,7 @@ export function isString(str: unknown): str is string {
  * @returns Whether the number is properly formed.
  */
 export function isNumber(num: unknown): num is number {
-  return typeof num === 'number'
+  return typeof num === 'number' || typeof num === 'bigint'
 }
 
 /**
