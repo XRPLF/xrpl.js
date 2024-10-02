@@ -30,6 +30,14 @@ export function signMultiBatch(
   } else if (multisign) {
     multisignAddress = wallet.classicAddress
   }
+  const involvedAccounts = transaction.RawTransactions.map(
+    (raw) => raw.RawTransaction.Account,
+  )
+  if (!involvedAccounts.includes(multisignAddress || wallet.address)) {
+    throw new ValidationError(
+      'Must be signing for an address included in the Batch.',
+    )
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS
   if (transaction.TransactionType !== 'Batch') {
@@ -75,12 +83,8 @@ export function signMultiBatch(
     }
   }
 
-  if (transaction.BatchSigners == null) {
-    // eslint-disable-next-line no-param-reassign -- okay for signing
-    transaction.BatchSigners = [batchSigner]
-  } else {
-    transaction.BatchSigners.push(batchSigner)
-  }
+  // eslint-disable-next-line no-param-reassign -- okay for signing
+  transaction.BatchSigners = [batchSigner]
 }
 
 /**
@@ -167,6 +171,7 @@ function getTransactionWithAllBatchSigners(transactions: Batch[]): Transaction {
   // Signers must be sorted in the combined transaction - See compareSigners' documentation for more details
   const sortedSigners: BatchSigner[] = transactions
     .flatMap((tx) => tx.BatchSigners ?? [])
+    .filter((signer) => signer.BatchSigner.Account !== transactions[0].Account)
     .sort(compareBatchSigners)
 
   return { ...transactions[0], BatchSigners: sortedSigners }
