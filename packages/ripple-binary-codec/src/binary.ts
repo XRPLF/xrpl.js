@@ -193,6 +193,12 @@ interface BatchObject extends JsonObject {
  * @returns the serialized object with appropriate prefix
  */
 function signingBatchData(batch: BatchObject): Uint8Array {
+  if (batch.flags == null) {
+    throw Error("No field `flags'")
+  }
+  if (batch.txIDs == null) {
+    throw Error('No field `txIDs`')
+  }
   const prefix = HashPrefix.batch
   const flags = coreTypes.UInt32.from(batch.flags).toBytes()
   const txIDsLength = coreTypes.UInt32.from(batch.txIDs.length).toBytes()
