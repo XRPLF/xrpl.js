@@ -7,6 +7,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Added
 * parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion
 
+### Fixed
+* Expanded the supported range of values in `OracleSet` transaction's `AssetPrice` field. The change enables values in range [0, 18446744073709551615], both inclusive.
+
 ## 4.0.0 (2024-07-15)
 
 ### BREAKING CHANGES
