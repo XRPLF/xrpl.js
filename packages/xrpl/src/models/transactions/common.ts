@@ -85,6 +85,16 @@ export function isNumber(num: unknown): num is number {
 }
 
 /**
+ * Verify the form and type of a bigint value at runtime.
+ *
+ * @param val - The object to check the form and type of.
+ * @returns Whether the bigint is properly formed.
+ */
+export function isBigInt(val: unknown): boolean {
+  return typeof val === 'bigint'
+}
+
+/**
  * Verify the form and type of an IssuedCurrency at runtime.
  *
  * @param input - The input to check the form and type of.
