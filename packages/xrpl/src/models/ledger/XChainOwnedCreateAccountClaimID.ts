@@ -26,7 +26,7 @@ export default interface XChainOwnedCreateAccountClaimID
    * cross-chain transfers must be performed. Smaller numbers must execute
    * before larger numbers.
    */
-  XChainAccountCreateCount: number
+  XChainAccountCreateCount: bigint
 
   /**
    * Attestations collected from the witness servers. This includes the parameters

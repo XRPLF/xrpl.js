@@ -5,7 +5,8 @@ import {
   BaseTransaction,
   isAccount,
   isAmount,
-  isNumber,
+  // isNumber,
+  isBigInt,
   isString,
   isXChainBridge,
   validateBaseTransaction,
@@ -72,7 +73,7 @@ export interface XChainAddAccountCreateAttestation extends BaseTransaction {
   /**
    * The counter that represents the order that the claims must be processed in.
    */
-  XChainAccountCreateCount: number | string
+  XChainAccountCreateCount: bigint | string
 
   /**
    * The bridge associated with the attestation.
@@ -116,7 +117,7 @@ export function validateXChainAddAccountCreateAttestation(
   validateRequiredField(
     tx,
     'XChainAccountCreateCount',
-    (inp) => isNumber(inp) || isString(inp),
+    (inp) => isBigInt(inp) || isString(inp),
   )
 
   validateRequiredField(tx, 'XChainBridge', isXChainBridge)
