@@ -407,6 +407,10 @@ export class Wallet {
      */
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
     validate(tx as unknown as Record<string, unknown>)
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed here for JS validation
+    if ((tx as unknown as Record<string, unknown>).BatchTxn != null) {
+      throw new ValidationError('Cannot sign a Batch inner transaction.')
+    }
 
     const txToSignAndEncode = { ...tx }
 
