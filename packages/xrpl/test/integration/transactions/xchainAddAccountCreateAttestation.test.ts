@@ -41,7 +41,7 @@ describe('XChainCreateBridge', function () {
         Amount: xrpToDrops(300),
         AttestationRewardAccount: witness.classicAddress,
         WasLockingChainSend: 0,
-        XChainAccountCreateCount: 1,
+        XChainAccountCreateCount: BigInt(1),
         Destination: destination.classicAddress,
         SignatureReward: signatureReward,
       }
@@ -55,7 +55,7 @@ describe('XChainCreateBridge', function () {
         OtherChainSource: otherChainSource.classicAddress,
         Amount: xrpToDrops(300),
         WasLockingChainSend: 0,
-        XChainAccountCreateCount: 1,
+        XChainAccountCreateCount: BigInt(1),
         Destination: destination.classicAddress,
         SignatureReward: signatureReward,
         PublicKey: witness.publicKey,

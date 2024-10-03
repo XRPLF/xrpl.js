@@ -70,7 +70,7 @@ describe('XChainCreateBridge', function () {
         Amount: amount,
         AttestationRewardAccount: witness.classicAddress,
         WasLockingChainSend: 0,
-        XChainClaimID: 1,
+        XChainClaimID: BigInt(1),
         Destination: testContext.wallet.classicAddress,
       }
       const encodedAttestation = encode(attestationToSign)
@@ -83,7 +83,7 @@ describe('XChainCreateBridge', function () {
         OtherChainSource: otherChainSource.classicAddress,
         Amount: amount,
         WasLockingChainSend: 0,
-        XChainClaimID: 1,
+        XChainClaimID: BigInt(1),
         Destination: testContext.wallet.classicAddress,
         PublicKey: witness.publicKey,
         Signature: attestationSignature,
@@ -233,7 +233,7 @@ describe('XChainCreateBridge', function () {
         Amount: amount,
         AttestationRewardAccount: witness.classicAddress,
         WasLockingChainSend: 1,
-        XChainClaimID: 1,
+        XChainClaimID: BigInt(1),
         Destination: destination.classicAddress,
       }
       const encodedAttestation = encode(attestationToSign)
@@ -246,7 +246,7 @@ describe('XChainCreateBridge', function () {
         OtherChainSource: otherChainSource.classicAddress,
         Amount: amount,
         WasLockingChainSend: 1,
-        XChainClaimID: 1,
+        XChainClaimID: BigInt(1),
         Destination: destination.classicAddress,
         PublicKey: witness.publicKey,
         Signature: attestationSignature,

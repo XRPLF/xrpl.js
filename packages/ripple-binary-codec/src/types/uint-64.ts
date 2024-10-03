@@ -29,26 +29,12 @@ class UInt64 extends UInt {
    * @param val A UInt64, hex-string, bigInt, or number
    * @returns A UInt64 object
    */
-  static from<T extends UInt64 | string | bigint | number>(val: T): UInt64 {
+  static from<T extends UInt64 | string | bigint>(val: T): UInt64 {
     if (val instanceof UInt64) {
       return val
     }
 
     let buf = new Uint8Array(UInt64.width)
-
-    if (typeof val === 'number') {
-      if (val < 0) {
-        throw new Error('value must be an unsigned integer')
-      }
-
-      const number = BigInt(val)
-
-      const intBuf = [new Uint8Array(4), new Uint8Array(4)]
-      writeUInt32BE(intBuf[0], Number(number >> BigInt(32)), 0)
-      writeUInt32BE(intBuf[1], Number(number & BigInt(mask)), 0)
-
-      return new UInt64(concat(intBuf))
-    }
 
     if (typeof val === 'string') {
       if (!HEX_REGEX.test(val)) {
@@ -61,6 +47,10 @@ class UInt64 extends UInt {
     }
 
     if (typeof val === 'bigint') {
+      if (val < 0) {
+        throw new Error('value must be an unsigned integer')
+      }
+
       const intBuf = [new Uint8Array(4), new Uint8Array(4)]
       writeUInt32BE(intBuf[0], Number(Number(val >> BigInt(32))), 0)
       writeUInt32BE(intBuf[1], Number(val & BigInt(mask)), 0)
