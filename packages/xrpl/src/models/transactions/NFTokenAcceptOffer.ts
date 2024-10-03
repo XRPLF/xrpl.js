@@ -71,9 +71,13 @@ export interface NFTokenAcceptOfferMetadata extends TransactionMetadataBase {
 }
 
 function validateNFTokenBrokerFee(tx: Record<string, unknown>): void {
-  const value = parseAmountValue(tx.NFTokenBrokerFee)
-  if (Number.isNaN(value)) {
-    throw new ValidationError('NFTokenAcceptOffer: invalid NFTokenBrokerFee')
+  let value: bigint
+  try {
+    value = parseAmountValue(tx.NFTokenBrokerFee)
+  } catch {
+    throw new ValidationError(
+      'NFTokenAcceptOffer: invalid NFTokenBrokerFee. BigInt constructor could not parse NFTokenBrokerFee',
+    )
   }
 
   if (value <= 0) {

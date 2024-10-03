@@ -356,13 +356,17 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
  *
  * @param amount - An Amount to parse for its value.
  * @returns The parsed amount value, or NaN if the amount count not be parsed.
+ * @throws ValidationError, if the input Amount is invalid
+ * @throws SyntaxError, if Amount cannot be parsed by BigInt constructor
  */
-export function parseAmountValue(amount: unknown): number {
+export function parseAmountValue(amount: unknown): bigint {
   if (!isAmount(amount)) {
-    return NaN
+    throw new ValidationError(
+      'parseAmountValue: Specified input Amount is invalid',
+    )
   }
   if (typeof amount === 'string') {
-    return parseFloat(amount)
+    return BigInt(amount)
   }
-  return parseFloat(amount.value)
+  return BigInt(amount.value)
 }
