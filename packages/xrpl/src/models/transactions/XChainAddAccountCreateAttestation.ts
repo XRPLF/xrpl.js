@@ -5,7 +5,6 @@ import {
   BaseTransaction,
   isAccount,
   isAmount,
-  // isNumber,
   isBigInt,
   isString,
   isXChainBridge,

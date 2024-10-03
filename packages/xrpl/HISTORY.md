@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased Changes
 
+### BREAKING CHANGE
+* Update certain fields in Requests+Transactions to use `bigint` type, instead of Javascript's `number` type. This change accompanies the updates to UINT64 constructor in the ripple-binary-codec package. These updated fields correspond only with `PriceOracle` and the `XChainBridge` amendments.
+
 ### Added
 * parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion
 
