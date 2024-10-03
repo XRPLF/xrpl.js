@@ -5,7 +5,7 @@ import {
   BaseTransaction,
   isAccount,
   isAmount,
-  isNumber,
+  isBigInt,
   isString,
   isXChainBridge,
   validateBaseTransaction,
@@ -35,7 +35,7 @@ export interface XChainCommit extends BaseTransaction {
    * checked from a validated ledger before submitting this transaction. If an
    * incorrect sequence number is specified, the funds will be lost.
    */
-  XChainClaimID: number | string
+  XChainClaimID: bigint | string
 
   /**
    * The destination account on the destination chain. If this is not specified,
@@ -67,7 +67,7 @@ export function validateXChainCommit(tx: Record<string, unknown>): void {
   validateRequiredField(
     tx,
     'XChainClaimID',
-    (inp) => isNumber(inp) || isString(inp),
+    (inp) => isBigInt(inp) || isString(inp),
   )
 
   validateOptionalField(tx, 'OtherChainDestination', isAccount)

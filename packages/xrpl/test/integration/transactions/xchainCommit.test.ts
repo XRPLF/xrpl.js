@@ -37,7 +37,7 @@ describe('XChainCommit', function () {
         TransactionType: 'XChainCommit',
         Account: wallet2.classicAddress,
         XChainBridge: xchainBridge,
-        XChainClaimID: 1,
+        XChainClaimID: BigInt(1),
         Amount: amount.toString(),
       }
 

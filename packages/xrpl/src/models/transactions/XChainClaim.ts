@@ -6,6 +6,7 @@ import {
   isAccount,
   isAmount,
   isNumber,
+  isBigInt,
   isString,
   isXChainBridge,
   validateBaseTransaction,
@@ -32,7 +33,7 @@ export interface XChainClaim extends BaseTransaction {
    * The unique integer ID for the cross-chain transfer that was referenced in the
    * corresponding {@link XChainCommit} transaction.
    */
-  XChainClaimID: number | string
+  XChainClaimID: bigint | string
 
   /**
    * The destination account on the destination chain. It must exist or the
@@ -68,7 +69,7 @@ export function validateXChainClaim(tx: Record<string, unknown>): void {
   validateRequiredField(
     tx,
     'XChainClaimID',
-    (inp) => isNumber(inp) || isString(inp),
+    (inp) => isBigInt(inp) || isString(inp),
   )
 
   validateRequiredField(tx, 'Destination', isAccount)
