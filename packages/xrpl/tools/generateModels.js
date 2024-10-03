@@ -80,7 +80,7 @@ const typeMap = {
   UINT8: 'number',
   UINT16: 'number',
   UINT32: 'number',
-  UINT64: 'number | string',
+  UINT64: 'string',
   UINT128: 'string',
   UINT160: 'string',
   UINT256: 'string',
