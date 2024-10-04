@@ -13,6 +13,7 @@ import {
   encodeForSigning,
   encodeForMultisigning,
   encode,
+  XrplDefinitionsBase,
 } from 'ripple-binary-codec'
 import {
   deriveAddress,
@@ -367,15 +368,17 @@ export class Wallet {
    * @param this - Wallet instance.
    * @param transaction - A transaction to be signed offline.
    * @param multisign - Specify true/false to use multisign or actual address (classic/x-address) to make multisign tx request.
+   * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    * @throws XrplError if the issued currency being signed is XRP ignoring case.
    */
-  // eslint-disable-next-line max-lines-per-function -- introduced more checks to support both string and boolean inputs.
+  // eslint-disable-next-line max-lines-per-function, max-params -- introduced more checks to support string and boolean inputs.
   public sign(
     this: Wallet,
     transaction: Transaction,
     multisign?: boolean | string,
+    definitions?: XrplDefinitionsBase,
   ): {
     tx_blob: string
     hash: string
@@ -406,7 +409,7 @@ export class Wallet {
      * This will throw a more clear error for JS users if the supplied transaction has incorrect formatting
      */
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
-    validate(tx as unknown as Record<string, unknown>)
+    validate(tx as unknown as Record<string, unknown>, definitions)
 
     const txToSignAndEncode = { ...tx }
 
@@ -420,6 +423,7 @@ export class Wallet {
           txToSignAndEncode,
           this.privateKey,
           multisignAddress,
+          definitions,
         ),
       }
       txToSignAndEncode.Signers = [{ Signer: signer }]
@@ -427,13 +431,16 @@ export class Wallet {
       txToSignAndEncode.TxnSignature = computeSignature(
         txToSignAndEncode,
         this.privateKey,
+        undefined,
+        definitions,
       )
     }
 
-    const serialized = encode(txToSignAndEncode)
+    const serialized = encode(txToSignAndEncode, definitions)
+
     return {
       tx_blob: serialized,
-      hash: hashSignedTx(serialized),
+      hash: hashSignedTx(serialized, definitions),
     }
   }
 
@@ -466,22 +473,28 @@ export class Wallet {
  * @param tx - A transaction to sign.
  * @param privateKey - A key to sign the transaction with.
  * @param signAs - Multisign only. An account address to include in the Signer field.
+ * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * Can be either a classic address or an XAddress.
  * @returns A signed transaction in the proper format.
  */
+// eslint-disable-next-line max-params -- Needs 4 params
 function computeSignature(
   tx: Transaction,
   privateKey: string,
   signAs?: string,
+  definitions?: XrplDefinitionsBase,
 ): string {
   if (signAs) {
     const classicAddress = isValidXAddress(signAs)
       ? xAddressToClassicAddress(signAs).classicAddress
       : signAs
 
-    return sign(encodeForMultisigning(tx, classicAddress), privateKey)
+    return sign(
+      encodeForMultisigning(tx, classicAddress, definitions),
+      privateKey,
+    )
   }
-  return sign(encodeForSigning(tx), privateKey)
+  return sign(encodeForSigning(tx, definitions), privateKey)
 }
 
 /**
