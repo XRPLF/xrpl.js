@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Support for the `Batch` amendment (XLS-56).
+
 ## 2.1.0 (2024-06-03)
 
 ### Added
