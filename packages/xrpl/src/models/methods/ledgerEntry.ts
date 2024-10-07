@@ -35,7 +35,14 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
       issuer?: string
     }
   }
-
+  /**
+   * (Optional) If set to true and the queried object has been deleted,
+   * return its complete data prior to its deletion.
+   * If set to false or not provided and the queried object has been deleted,
+   * return objectNotFound (current behavior).
+   * This parameter is supported only by Clio servers
+   */
+  include_deleted?: boolean
   /**
    * If true, return the requested ledger object's contents as a hex string in
    * the XRP Ledger's binary format. Otherwise, return data in JSON format. The
@@ -204,5 +211,9 @@ export interface LedgerEntryResponse<T = LedgerEntry> extends BaseResponse {
     /** The binary representation of the ledger object, as hexadecimal. */
     node_binary?: string
     validated?: boolean
+    /**
+     * (Optional) Indicates the ledger index at which the object was deleted.
+     */
+    deleted_ledger_index?: number
   }
 }
