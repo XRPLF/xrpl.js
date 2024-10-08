@@ -5,6 +5,7 @@
   "close_flags": 0,
   "ledger_index": "15202439",
   "close_time_human": "2015-Aug-12 01:01:10.000000000 UTC",
+  "close_time_iso": "2015-08-12T01:01.10Z",
   "close_time_resolution": 10,
   "closed": true,
   "hash": "F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349",
