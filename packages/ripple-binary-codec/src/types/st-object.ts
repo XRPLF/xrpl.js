@@ -158,11 +158,7 @@ class STObject extends SerializedType {
       // Account field
       // The Account field must not be a part of the UNLModify pseudotransaction encoding, due to a bug in rippled
       const isUnlModifyWorkaround = field.name == 'Account' && isUnlModify
-      bytes.writeFieldAndValue(
-        field,
-        associatedValue as SerializedType,
-        isUnlModifyWorkaround,
-      )
+      bytes.writeFieldAndValue(field, associatedValue, isUnlModifyWorkaround)
       if (field.type.name === ST_OBJECT) {
         bytes.put(OBJECT_END_MARKER_BYTE)
       }

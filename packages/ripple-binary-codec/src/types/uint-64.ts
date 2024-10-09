@@ -41,7 +41,7 @@ class UInt64 extends UInt {
    */
   static from<T extends UInt64 | string | bigint | number>(
     val: T,
-    fieldName: string = '',
+    fieldName = '',
   ): UInt64 {
     if (val instanceof UInt64) {
       return val
@@ -98,7 +98,7 @@ class UInt64 extends UInt {
    */
   toJSON(
     _definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
-    fieldName: string = '',
+    fieldName = '',
   ): string {
     const hexString = bytesToHex(this.bytes)
     if (useBase10(fieldName)) {
