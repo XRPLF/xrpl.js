@@ -25,10 +25,13 @@ import { isFlagEnabled } from '../models/utils'
 
 const WARN_PARTIAL_PAYMENT_CODE = 2001
 
+/* eslint-disable complexity -- check different token types */
+/* eslint-disable @typescript-eslint/consistent-type-assertions -- known currency type */
 function amountsEqual(
   amt1: Amount | MPTAmount,
   amt2: Amount | MPTAmount,
 ): boolean {
+  // Compare XRP
   if (typeof amt1 === 'string' && typeof amt2 === 'string') {
     return amt1 === amt2
   }
@@ -37,6 +40,7 @@ function amountsEqual(
     return false
   }
 
+  // Compare MPTs
   if (isMPTAmount(amt1) && isMPTAmount(amt2)) {
     const aValue = new BigNumber(amt1.value)
     const bValue = new BigNumber(amt2.value)
@@ -50,6 +54,7 @@ function amountsEqual(
     return false
   }
 
+  // Compare issued currency (IOU)
   const aValue = new BigNumber(amt1.value)
   const bValue = new BigNumber(amt2.value)
 
@@ -59,6 +64,8 @@ function amountsEqual(
     aValue.isEqualTo(bValue)
   )
 }
+/* eslint-enable complexity */
+/* eslint-enable @typescript-eslint/consistent-type-assertions */
 
 function isPartialPayment(
   tx?: Transaction,

@@ -26,7 +26,8 @@ describe('MPTokenIssuanceCreate', function () {
       const tx: MPTokenIssuanceCreate = {
         TransactionType: 'MPTokenIssuanceCreate',
         Account: testContext.wallet.classicAddress,
-        MaximumAmount: '9223372036854775807', // 0x7fffffffffffffff
+        // 0x7fffffffffffffff
+        MaximumAmount: '9223372036854775807',
         AssetScale: 2,
       }
 

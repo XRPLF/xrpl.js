@@ -27,7 +27,7 @@ export enum MPTokenIssuanceCreateFlags {
    */
   tfMPTCanEscrow = 0x00000008,
   /**
-   * 	If set, indicates that individual holders can trade their balances
+   * If set, indicates that individual holders can trade their balances
    *  using the XRP Ledger DEX or AMM.
    */
   tfMPTCanTrade = 0x00000010,

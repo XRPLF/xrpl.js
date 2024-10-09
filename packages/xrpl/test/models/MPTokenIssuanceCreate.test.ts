@@ -17,7 +17,8 @@ describe('MPTokenIssuanceCreate', function () {
     const validMPTokenIssuanceCreate = {
       TransactionType: 'MPTokenIssuanceCreate',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MaximumAmount: '9223372036854775807', // 0x7fffffffffffffff
+      // 0x7fffffffffffffff
+      MaximumAmount: '9223372036854775807',
       AssetScale: 2,
       TransferFee: 1,
       Flags: 2,
