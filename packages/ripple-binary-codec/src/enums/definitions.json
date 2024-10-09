@@ -1113,19 +1113,9 @@
       }
     ],
     [
-      "LockedAmount",
-      {
-        "nth": 26,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "UInt64"
-      }
-    ],
-    [
       "MPTAmount",
       {
-        "nth": 27,
+        "nth": 26,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2890,17 +2880,17 @@
     "temUNKNOWN": -264,
     "temSEQ_AND_TICKET": -263,
     "temBAD_NFTOKEN_TRANSFER_FEE": -262,
-    "temBAD_MPTOKEN_TRANSFER_FEE": -261,
-    "temBAD_AMM_TOKENS": -260,
-    "temXCHAIN_EQUAL_DOOR_ACCOUNTS": -259,
-    "temXCHAIN_BAD_PROOF": -258,
-    "temXCHAIN_BRIDGE_BAD_ISSUES": -257,
-    "temXCHAIN_BRIDGE_NONDOOR_OWNER": -256,
-    "temXCHAIN_BRIDGE_BAD_MIN_ACCOUNT_CREATE_AMOUNT": -255,
-    "temXCHAIN_BRIDGE_BAD_REWARD_AMOUNT": -254,
-    "temEMPTY_DID": -253,
-    "temARRAY_EMPTY": -252,
-    "temARRAY_TOO_LARGE": -251,
+    "temBAD_AMM_TOKENS": -261,
+    "temXCHAIN_EQUAL_DOOR_ACCOUNTS": -260,
+    "temXCHAIN_BAD_PROOF": -259,
+    "temXCHAIN_BRIDGE_BAD_ISSUES": -258,
+    "temXCHAIN_BRIDGE_NONDOOR_OWNER": -257,
+    "temXCHAIN_BRIDGE_BAD_MIN_ACCOUNT_CREATE_AMOUNT": -256,
+    "temXCHAIN_BRIDGE_BAD_REWARD_AMOUNT": -255,
+    "temEMPTY_DID": -254,
+    "temARRAY_EMPTY": -253,
+    "temARRAY_TOO_LARGE": -252,
+    "temBAD_TRANSFER_FEE": -251,
 
     "tefFAILURE": -199,
     "tefALREADY": -198,
@@ -3018,10 +3008,7 @@
     "tecTOKEN_PAIR_NOT_FOUND": 189,
     "tecARRAY_EMPTY": 190,
     "tecARRAY_TOO_LARGE": 191,
-    "tecMPTOKEN_EXISTS": 192,
-    "tecMPT_MAX_AMOUNT_EXCEEDED": 193,
-    "tecMPT_LOCKED": 194,
-    "tecMPT_NOT_SUPPORTED": 195
+    "tecLOCKED": 192
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,

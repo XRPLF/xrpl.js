@@ -8,6 +8,14 @@ const HEX_REGEX = /^[a-fA-F0-9]{1,16}$/
 const BASE10_REGEX = /^[0-9]{1,20}$/
 const mask = BigInt(0x00000000ffffffff)
 
+function useBase10(fieldName: string): boolean {
+  return (
+    fieldName === 'MaximumAmount' ||
+    fieldName === 'OutstandingAmount' ||
+    fieldName === 'MPTAmount'
+  )
+}
+
 /**
  * Derived UInt class for serializing/deserializing 64 bit UInt
  */
@@ -56,12 +64,7 @@ class UInt64 extends UInt {
     }
 
     if (typeof val === 'string') {
-      if (
-        fieldName == 'MaximumAmount' ||
-        fieldName == 'OutstandingAmount' ||
-        fieldName == 'LockedAmount' ||
-        fieldName == 'MPTAmount'
-      ) {
+      if (useBase10(fieldName)) {
         if (!BASE10_REGEX.test(val)) {
           throw new Error(`${fieldName} ${val} is not a valid base 10 string`)
         }
@@ -98,12 +101,7 @@ class UInt64 extends UInt {
     fieldName: string = '',
   ): string {
     const hexString = bytesToHex(this.bytes)
-    if (
-      fieldName == 'MaximumAmount' ||
-      fieldName == 'OutstandingAmount' ||
-      fieldName == 'LockedAmount' ||
-      fieldName == 'MPTAmount'
-    ) {
+    if (useBase10(fieldName)) {
       return BigInt('0x' + hexString).toString(10)
     }
 
