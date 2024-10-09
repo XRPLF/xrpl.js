@@ -43,7 +43,7 @@ describe('MPTokenIssuanceDestroy', function () {
 
       const txHash = mptCreateRes.result.tx_json.hash
 
-      let txResponse = await testContext.client.request({
+      const txResponse = await testContext.client.request({
         command: 'tx',
         transaction: txHash,
       })
@@ -53,13 +53,13 @@ describe('MPTokenIssuanceDestroy', function () {
 
       const mptID = meta.mpt_issuance_id
 
-      let accountObjectsResponse = await testContext.client.request({
+      const accountObjectsResponse = await testContext.client.request({
         command: 'account_objects',
         account: testContext.wallet.classicAddress,
         type: 'mpt_issuance',
       })
       assert.lengthOf(
-        accountObjectsResponse.result.account_objects!,
+        accountObjectsResponse.result.account_objects,
         1,
         'Should be exactly one issuance on the ledger',
       )

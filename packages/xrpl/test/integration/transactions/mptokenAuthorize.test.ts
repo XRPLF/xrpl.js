@@ -45,7 +45,7 @@ describe('MPTokenIssuanceDestroy', function () {
 
       const txHash = mptCreateRes.result.tx_json.hash
 
-      let txResponse = await testContext.client.request({
+      const txResponse = await testContext.client.request({
         command: 'tx',
         transaction: txHash,
       })
@@ -61,7 +61,7 @@ describe('MPTokenIssuanceDestroy', function () {
         type: 'mpt_issuance',
       })
       assert.lengthOf(
-        accountObjectsResponse.result.account_objects!,
+        accountObjectsResponse.result.account_objects,
         1,
         'Should be exactly one issuance on the ledger',
       )
@@ -81,7 +81,7 @@ describe('MPTokenIssuanceDestroy', function () {
       })
 
       assert.lengthOf(
-        accountObjectsResponse.result.account_objects!,
+        accountObjectsResponse.result.account_objects,
         1,
         'Holder owns 1 MPToken on the ledger',
       )
@@ -109,7 +109,7 @@ describe('MPTokenIssuanceDestroy', function () {
       })
 
       assert.lengthOf(
-        accountObjectsResponse.result.account_objects!,
+        accountObjectsResponse.result.account_objects,
         0,
         'Holder owns nothing on the ledger',
       )

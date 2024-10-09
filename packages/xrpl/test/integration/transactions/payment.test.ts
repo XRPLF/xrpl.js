@@ -1,6 +1,12 @@
 import { assert } from 'chai'
 
-import { Payment, Wallet } from '../../../src'
+import {
+  Payment,
+  Wallet,
+  MPTokenIssuanceCreate,
+  MPTokenAuthorize,
+  TransactionMetadata,
+} from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -8,11 +14,6 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
-import {
-  MPTokenIssuanceCreate,
-  MPTokenAuthorize,
-  TransactionMetadata,
-} from '../../../src'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -126,7 +127,7 @@ describe('Payment', function () {
 
       const txHash = mptCreateRes.result.tx_json.hash
 
-      let txResponse = await testContext.client.request({
+      const txResponse = await testContext.client.request({
         command: 'tx',
         transaction: txHash,
       })
@@ -142,12 +143,12 @@ describe('Payment', function () {
         type: 'mpt_issuance',
       })
       assert.lengthOf(
-        accountObjectsResponse.result.account_objects!,
+        accountObjectsResponse.result.account_objects,
         1,
         'Should be exactly one issuance on the ledger',
       )
 
-      let authTx: MPTokenAuthorize = {
+      const authTx: MPTokenAuthorize = {
         TransactionType: 'MPTokenAuthorize',
         Account: wallet2.classicAddress,
         MPTokenIssuanceID: mptID!,
@@ -162,12 +163,12 @@ describe('Payment', function () {
       })
 
       assert.lengthOf(
-        accountObjectsResponse.result.account_objects!,
+        accountObjectsResponse.result.account_objects,
         1,
         'Holder owns 1 MPToken on the ledger',
       )
 
-      let payTx: Payment = {
+      const payTx: Payment = {
         TransactionType: 'Payment',
         Account: testContext.wallet.classicAddress,
         Destination: wallet2.classicAddress,
@@ -185,7 +186,7 @@ describe('Payment', function () {
         type: 'mpt_issuance',
       })
       assert.equal(
-        // @ts-ignore
+        // @ts-expect-error -- Object type not known
         accountObjectsResponse.result.account_objects[0].OutstandingAmount,
         `100`,
       )

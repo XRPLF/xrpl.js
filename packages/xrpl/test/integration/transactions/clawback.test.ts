@@ -10,6 +10,7 @@ import {
   MPTokenIssuanceCreateFlags,
   MPTokenAuthorize,
   TransactionMetadata,
+  LedgerEntryResponse,
 } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
@@ -18,7 +19,6 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
-import { LedgerEntryResponse } from '../../../src'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -128,14 +128,14 @@ describe('Clawback', function () {
         Flags: MPTokenIssuanceCreateFlags.tfMPTCanClawback,
       }
 
-      let mptCreateRes = await testTransaction(
+      const mptCreateRes = await testTransaction(
         testContext.client,
         createTx,
         testContext.wallet,
       )
       const txHash = mptCreateRes.result.tx_json.hash
 
-      let txResponse = await testContext.client.request({
+      const txResponse = await testContext.client.request({
         command: 'tx',
         transaction: txHash,
       })
@@ -172,7 +172,7 @@ describe('Clawback', function () {
         })
 
       assert.equal(
-        // @ts-ignore
+        // @ts-expect-error: Known issue with unknown object type
         ledgerEntryResponse.result.node.MPTAmount,
         '9223372036854775807',
       )
@@ -198,7 +198,7 @@ describe('Clawback', function () {
       })
 
       assert.equal(
-        // @ts-ignore
+        // @ts-expect-error: Known issue with unknown object type
         ledgerEntryResponse.result.node.MPTAmount,
         '9223372036854775307',
       )

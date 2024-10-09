@@ -32,18 +32,18 @@ describe('MPTokenIssuanceCreate', function () {
 
       await testTransaction(testContext.client, tx, testContext.wallet)
 
-      let accountObjectsResponse = await testContext.client.request({
+      const accountObjectsResponse = await testContext.client.request({
         command: 'account_objects',
         account: testContext.wallet.classicAddress,
         type: 'mpt_issuance',
       })
       assert.lengthOf(
-        accountObjectsResponse.result.account_objects!,
+        accountObjectsResponse.result.account_objects,
         1,
         'Should be exactly one issuance on the ledger',
       )
       assert.equal(
-        // @ts-ignore
+        // @ts-expect-error: Known issue with unknown object type
         accountObjectsResponse.result.account_objects[0].MaximumAmount,
         `9223372036854775807`,
       )

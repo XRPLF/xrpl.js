@@ -6,7 +6,13 @@ import type {
   TransactionStream,
   TxResponse,
 } from '..'
-import type { Amount, IssuedCurrency,APIVersion, DEFAULT_API_VERSION , MPTAmount } from '../models/common'
+import type {
+  Amount,
+  IssuedCurrency,
+  APIVersion,
+  DEFAULT_API_VERSION,
+  MPTAmount,
+} from '../models/common'
 import type {
   AccountTxTransaction,
   RequestResponseMap,
@@ -36,8 +42,7 @@ function amountsEqual(
     const bValue = new BigNumber(amt2.value)
 
     return (
-      (amt1 as MPTAmount).mpt_issuance_id ===
-        (amt2 as MPTAmount).mpt_issuance_id && aValue.isEqualTo(bValue)
+      amt1.mpt_issuance_id === amt2.mpt_issuance_id && aValue.isEqualTo(bValue)
     )
   }
 

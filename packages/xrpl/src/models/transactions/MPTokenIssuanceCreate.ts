@@ -129,14 +129,15 @@ export function validateMPTokenIssuanceCreate(
   }
 
   if (typeof tx.MaximumAmount === 'string') {
-    if (!SANITY_CHECK.exec(tx.MaximumAmount))
+    if (!SANITY_CHECK.exec(tx.MaximumAmount)) {
       throw new ValidationError('MPTokenIssuanceCreate: Invalid MaximumAmount')
-    else if (
+    } else if (
       BigInt(tx.MaximumAmount) > BigInt(`9223372036854775807`) ||
       BigInt(tx.MaximumAmount) < BigInt(`0`)
-    )
+    ) {
       throw new ValidationError(
         'MPTokenIssuanceCreate: MaximumAmount out of range',
       )
+    }
   }
 }

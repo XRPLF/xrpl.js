@@ -27,6 +27,19 @@ import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
 import { TransactionMetadata } from './metadata'
+import { MPTokenAuthorize, validateMPTokenAuthorize } from './MPTokenAuthorize'
+import {
+  MPTokenIssuanceCreate,
+  validateMPTokenIssuanceCreate,
+} from './MPTokenIssuanceCreate'
+import {
+  MPTokenIssuanceDestroy,
+  validateMPTokenIssuanceDestroy,
+} from './MPTokenIssuanceDestroy'
+import {
+  MPTokenIssuanceSet,
+  validateMPTokenIssuanceSet,
+} from './MPTokenIssuanceSet'
 import {
   NFTokenAcceptOffer,
   validateNFTokenAcceptOffer,
@@ -90,19 +103,6 @@ import {
   XChainModifyBridge,
   validateXChainModifyBridge,
 } from './XChainModifyBridge'
-import { MPTokenAuthorize, validateMPTokenAuthorize } from './MPTokenAuthorize'
-import {
-  MPTokenIssuanceCreate,
-  validateMPTokenIssuanceCreate,
-} from './MPTokenIssuanceCreate'
-import {
-  MPTokenIssuanceDestroy,
-  validateMPTokenIssuanceDestroy,
-} from './MPTokenIssuanceDestroy'
-import {
-  MPTokenIssuanceSet,
-  validateMPTokenIssuanceSet,
-} from './MPTokenIssuanceSet'
 
 /**
  * Transactions that can be submitted by clients

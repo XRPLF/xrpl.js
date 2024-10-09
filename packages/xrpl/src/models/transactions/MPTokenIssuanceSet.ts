@@ -1,3 +1,5 @@
+import { ValidationError } from '../../errors'
+
 import {
   BaseTransaction,
   isString,
@@ -8,7 +10,6 @@ import {
   isAccount,
   GlobalFlags,
 } from './common'
-import { ValidationError } from '../../errors'
 
 /**
  * Transaction Flags for an MPTokenIssuanceSet Transaction.
@@ -67,10 +68,13 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'MPTokenHolder', isAccount)
 
   const flags = tx.Flags as number
+
+  /* eslint-disable no-bitwise -- We need bitwise operations for flag checks here */
   if (
     BigInt(flags) & BigInt(MPTokenIssuanceSetFlags.tfMPTLock) &&
     BigInt(flags) & BigInt(MPTokenIssuanceSetFlags.tfMPTUnlock)
   ) {
     throw new ValidationError('MPTokenIssuanceSet: flag conflict')
   }
+  /* eslint-enable no-bitwise -- Re-enable bitwise rule after this block */
 }
