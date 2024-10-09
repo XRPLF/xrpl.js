@@ -14,6 +14,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * Add `nfts_by_issuer` clio-only API definition
+* Add `include_deleted` to ledgerEntry request and `deleted_ledger_index` to ledgerEntry response
 * Support for the `fixPreviousTxnID` amendment.
 * Support for the user version of the `feature` RPC.
 * Add `hash` field to `ledger` command response
