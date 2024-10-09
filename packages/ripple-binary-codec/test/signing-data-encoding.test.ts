@@ -1,9 +1,9 @@
-import { encodeForSigningBatch } from '../dist'
 import { XrplDefinitions } from '../src/enums/xrpl-definitions'
 const {
   encodeForSigning,
   encodeForSigningClaim,
   encodeForMultisigning,
+  encodeForSigningBatch,
 } = require('../src')
 
 const normalDefinitions = require('../src/enums/definitions.json')
