@@ -1,6 +1,10 @@
-import { Amount } from '../common'
+import { Amount, MPTAmount } from '../common'
 
 import { BaseTransaction } from './common'
+import {
+  MPTokenIssuanceCreate,
+  MPTokenIssuanceCreateMetadata,
+} from './MPTokenIssuanceCreate'
 import {
   NFTokenAcceptOffer,
   NFTokenAcceptOfferMetadata,
@@ -79,9 +83,9 @@ export function isDeletedNode(node: Node): node is DeletedNode {
 
 export interface TransactionMetadataBase {
   AffectedNodes: Node[]
-  DeliveredAmount?: Amount
+  DeliveredAmount?: Amount | MPTAmount
   // "unavailable" possible for transactions before 2014-01-20
-  delivered_amount?: Amount | 'unavailable'
+  delivered_amount?: Amount | MPTAmount | 'unavailable'
   TransactionIndex: number
   TransactionResult: string
 }
@@ -97,4 +101,6 @@ export type TransactionMetadata<T extends BaseTransaction = Transaction> =
     ? NFTokenAcceptOfferMetadata
     : T extends NFTokenCancelOffer
     ? NFTokenCancelOfferMetadata
+    : T extends MPTokenIssuanceCreate
+    ? MPTokenIssuanceCreateMetadata
     : TransactionMetadataBase

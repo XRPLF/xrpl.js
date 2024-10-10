@@ -67,7 +67,7 @@ class SerializedType {
    *                          Can be customized for sidechains and amendments.
    * @returns any type, if not overloaded returns hexString representation of bytes
    */
-  toJSON(_definitions?: XrplDefinitionsBase): JSON {
+  toJSON(_definitions?: XrplDefinitionsBase, _fieldName?: string): JSON {
     return this.toHex()
   }
 
