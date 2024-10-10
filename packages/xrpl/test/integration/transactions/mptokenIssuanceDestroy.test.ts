@@ -50,7 +50,7 @@ describe('MPTokenIssuanceDestroy', function () {
 
       const mptID = meta.mpt_issuance_id
 
-      const accountObjectsResponse = await testContext.client.request({
+      let accountObjectsResponse = await testContext.client.request({
         command: 'account_objects',
         account: testContext.wallet.classicAddress,
         type: 'mpt_issuance',
