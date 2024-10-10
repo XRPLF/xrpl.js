@@ -101,7 +101,7 @@ export function combineBatchSigners(
   transactions: Array<Batch | string>,
 ): string {
   if (transactions.length === 0) {
-    throw new ValidationError('There were 0 transactions to combine')
+    throw new ValidationError('There were 0 transactions to combine.')
   }
 
   const decodedTransactions: Transaction[] = transactions.map(
@@ -121,7 +121,7 @@ export function combineBatchSigners(
     validateBatch(tx as unknown as Record<string, unknown>)
     if (tx.BatchSigners == null || tx.BatchSigners.length === 0) {
       throw new ValidationError(
-        "For multisigning all transactions must include a Signers field containing an array of signatures. You may have forgotten to pass the 'forMultisign' parameter when signing.",
+        'For combining Batch transaction signatures, all transactions must include a BatchSigners field containing an array of signatures.',
       )
     }
 
@@ -162,12 +162,12 @@ function validateBatchTransactionEquivalence(transactions: Batch[]): void {
       )
   ) {
     throw new ValidationError(
-      'Flags and TxIDs is not the same for all provided transactions',
+      'Flags and TxIDs is not the same for all provided transactions.',
     )
   }
 }
 
-function getTransactionWithAllBatchSigners(transactions: Batch[]): Transaction {
+function getTransactionWithAllBatchSigners(transactions: Batch[]): Batch {
   // Signers must be sorted in the combined transaction - See compareSigners' documentation for more details
   const sortedSigners: BatchSigner[] = transactions
     .flatMap((tx) => tx.BatchSigners ?? [])

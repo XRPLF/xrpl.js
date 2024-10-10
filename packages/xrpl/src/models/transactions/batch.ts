@@ -92,6 +92,18 @@ export function validateBatch(tx: Record<string, unknown>): void {
       isObject,
       `RawTransactions[${index}].RawTransaction`,
     )
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- needed here
+    // @ts-expect-error -- checked above
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
+    const rawTx = field.RawTransaction as Record<string, unknown>
+    if (!isObject(rawTx)) {
+      throw new ValidationError(`Batch: RawTransactions[${index} is not object`)
+    }
+    if (rawTx.TransactionType === 'Batch') {
+      throw new ValidationError(
+        `Batch: RawTransactions[${index} is a Batch transaction. Cannot nest Batch transactions.`,
+      )
+    }
   })
   // Full validation of each `RawTransaction` object is done in `validate` to avoid dependency cycles
 
