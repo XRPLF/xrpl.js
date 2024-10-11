@@ -11,7 +11,7 @@ function getTx(txName) {
     .filter((tx) => tx.json.TransactionType === txName)
     .map((tx) => tx.json)
   if (validTxs.length == 0) {
-    throw new Error(`Must have ripple-binary-codec fixture for ${txName}`)
+    return '{ /* TODO: add sample transaction */ }'
   }
   const validTx = validTxs[0]
   delete validTx.TxnSignature
@@ -74,7 +74,7 @@ function getInvalidValue(paramTypes) {
     } else if (paramType == 'XChainBridge') {
       return JSON.stringify({ XChainDoor: 'test' })
     } else {
-      throw Error(`${paramType} not supported yet`)
+      return '/*TODO*/'
     }
   }
 
@@ -86,7 +86,7 @@ function getInvalidValue(paramTypes) {
   } else if (JSON.stringify(simplifiedParamTypes) === '["number","string"]') {
     return JSON.stringify({ currency: 'ETH' })
   } else {
-    throw Error(`${simplifiedParamTypes} not supported yet`)
+    return '/*TODO*/'
   }
 }
 
