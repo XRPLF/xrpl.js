@@ -1,9 +1,58 @@
 import { assert } from 'chai'
 
-import { validate, ValidationError, NFTokenCreateOfferFlags } from '../../src'
+import {
+  validate,
+  ValidationError,
+  NFTokenCreateOfferFlags,
+  IssuedCurrencyAmount,
+} from '../../src'
+import { parseAmountValue } from '../../src/models/transactions/common'
 
 const NFTOKEN_ID =
   '00090032B5F762798A53D543A014CAF8B297CFF8F2F937E844B17C9E00000003'
+
+describe('parseAmountValue', function () {
+  it(`validate large amount values`, function () {
+    // (Upper bound of created XRP tokens) minus 12 drops
+    assert.equal(
+      parseAmountValue('99999999999999988'),
+      BigInt('99999999999999988'),
+    )
+
+    // Token Amounts or Issued Currencies are represented using 54 bits of precision in the XRP Ledger
+    // Docs: https://xrpl.org/docs/references/protocol/binary-format#token-amount-format
+    const highest_iou_amount: IssuedCurrencyAmount = {
+      currency: 'ABC',
+      issuer: 'rIssuerAddress',
+      // 54 bits can be used to safely represent a value of (2**54 - 1)
+      value: '18014398509481983',
+    }
+
+    assert.equal(
+      parseAmountValue(highest_iou_amount),
+      BigInt('18014398509481983'),
+    )
+  })
+
+  it(`validate non-positive amount values`, function () {
+    assert.equal(parseAmountValue('0'), BigInt(0))
+    assert.equal(parseAmountValue('-1234'), BigInt(-1234))
+  })
+
+  it(`validate invalid amount values`, function () {
+    assert.throws(
+      () => parseAmountValue(1234),
+      ValidationError,
+      'parseAmountValue: Specified input Amount is invalid',
+    )
+
+    assert.throws(
+      () => parseAmountValue('abcd'),
+      SyntaxError,
+      'Cannot convert abcd to a BigInt',
+    )
+  })
+})
 
 /**
  * NFTokenCreateOffer Transaction Verification Testing.
