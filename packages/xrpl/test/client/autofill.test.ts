@@ -435,4 +435,112 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.Sequence, 23)
     assert.strictEqual(txResult.LastLedgerSequence, 9038234)
   })
+
+  it('should autofill Batch transaction with single account', async function () {
+    const tx: Transaction = {
+      TransactionType: 'Batch',
+      Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+      RawTransactions: [
+        {
+          RawTransaction: {
+            TransactionType: 'DepositPreauth',
+            Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+            Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+          },
+        },
+        {
+          RawTransaction: {
+            TransactionType: 'DepositPreauth',
+            Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+            Authorize: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+          },
+        },
+      ],
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+    testContext.mockRippled!.addResponse('account_info', {
+      status: 'success',
+      type: 'response',
+      result: {
+        account_data: {
+          Sequence: 23,
+        },
+      },
+    })
+    const txResult = await testContext.client.autofill(tx)
+    txResult.RawTransactions.forEach((rawTxOuter, index) => {
+      const rawTx = rawTxOuter.RawTransaction
+      assert.strictEqual(
+        rawTx.BatchTxn?.OuterAccount,
+        'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+      )
+      assert.strictEqual(rawTx.BatchTxn?.Sequence, 23 + index)
+      assert.strictEqual(rawTx.BatchTxn?.BatchIndex, index)
+    })
+    assert.strictEqual(txResult.TxIDs?.length, 2)
+    assert.strictEqual(
+      txResult.TxIDs?.[0],
+      'A63E4FBFADA7A0504F1307F4ADBEDDE70A81C9EFB21D12B6C2824DF21D08862B',
+    )
+    assert.strictEqual(
+      txResult.TxIDs?.[1],
+      'B2A225765BEA821FC074CA0BB803C3BE7B341F801369CF30806DA8CF5D9C0CAB',
+    )
+  })
+
+  it('should autofill Batch transaction with single account', async function () {
+    const tx: Transaction = {
+      TransactionType: 'Batch',
+      Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+      RawTransactions: [
+        {
+          RawTransaction: {
+            TransactionType: 'DepositPreauth',
+            Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+            Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+          },
+        },
+        {
+          RawTransaction: {
+            TransactionType: 'DepositPreauth',
+            Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+            Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+          },
+        },
+      ],
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+    testContext.mockRippled!.addResponse('account_info', {
+      status: 'success',
+      type: 'response',
+      result: {
+        account_data: {
+          Sequence: 23,
+        },
+      },
+    })
+    const txResult = await testContext.client.autofill(tx)
+    txResult.RawTransactions.forEach((rawTxOuter, index) => {
+      const rawTx = rawTxOuter.RawTransaction
+      assert.strictEqual(
+        rawTx.BatchTxn?.OuterAccount,
+        'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+      )
+      assert.strictEqual(rawTx.BatchTxn?.Sequence, 23)
+      assert.strictEqual(rawTx.BatchTxn?.BatchIndex, index)
+    })
+    assert.strictEqual(txResult.TxIDs?.length, 2)
+    assert.strictEqual(
+      txResult.TxIDs?.[0],
+      'A63E4FBFADA7A0504F1307F4ADBEDDE70A81C9EFB21D12B6C2824DF21D08862B',
+    )
+    assert.strictEqual(
+      txResult.TxIDs?.[1],
+      '8C233D6C1394812AFA969E1B91D02F31F35E0D3D813C1DCAFB955E4957FF22D9',
+    )
+  })
 })
