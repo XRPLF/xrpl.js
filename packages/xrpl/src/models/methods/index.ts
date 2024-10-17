@@ -168,6 +168,7 @@ import {
   SubscribeRequest,
   SubscribeResponse,
   TransactionStream,
+  TransactionV1Stream,
   ValidationStream,
 } from './subscribe'
 import {
@@ -583,6 +584,7 @@ export {
   LedgerStreamResponse,
   ValidationStream,
   TransactionStream,
+  TransactionV1Stream,
   PathFindStream,
   PeerStatusStream,
   OrderBookStream,

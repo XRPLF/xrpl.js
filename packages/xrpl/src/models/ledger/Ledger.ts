@@ -31,6 +31,11 @@ interface BaseLedger {
    * by which the close_time could be rounded.
    */
   close_time_resolution: number
+  /**
+   * The approximate time this ledger was closed, in date time string format.
+   * Always uses the UTC time zone.
+   */
+  close_time_iso: string
   /** Whether or not this ledger has been closed. */
   closed: boolean
   /**
