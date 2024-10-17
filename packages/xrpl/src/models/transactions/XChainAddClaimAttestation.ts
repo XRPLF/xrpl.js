@@ -5,7 +5,7 @@ import {
   BaseTransaction,
   isAccount,
   isAmount,
-  isNumber,
+  isBigInt,
   isString,
   isXChainBridge,
   validateBaseTransaction,
@@ -72,8 +72,10 @@ export interface XChainAddClaimAttestation extends BaseTransaction {
   /**
    * The XChainClaimID associated with the transfer, which was included in the
    * {@link XChainCommit} transaction.
+   * rippled uses UINT64 internal type for this field. Javascript's number type is not compatible with
+   * UINT64's range of values, hence use bigint
    */
-  XChainClaimID: number | string
+  XChainClaimID: bigint | string
 }
 
 /**
@@ -112,6 +114,6 @@ export function validateXChainAddClaimAttestation(
   validateRequiredField(
     tx,
     'XChainClaimID',
-    (inp) => isNumber(inp) || isString(inp),
+    (inp) => isBigInt(inp) || isString(inp),
   )
 }

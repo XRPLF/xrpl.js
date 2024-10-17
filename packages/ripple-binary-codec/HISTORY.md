@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### BREAKING CHANGES
+* Use Javascript's `BigInt` type to hold rippled's UINT64 internal type. Previously, `number` type was used to represent these values, this change enforces the use of `bigint(...)` explicit type-cast for such fields.
+
 ## 2.1.0 (2024-06-03)
 
 ### Added

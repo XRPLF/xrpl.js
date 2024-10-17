@@ -97,15 +97,15 @@ const jsonEntry2 = {
 }
 
 it('compareToTests[0]', () => {
-  expect(UInt8.from(124).compareTo(UInt64.from(124))).toBe(0)
+  expect(UInt8.from(124).compareTo(UInt64.from(BigInt(124)))).toBe(0)
 })
 
 it('compareToTest[1]', () => {
-  expect(UInt64.from(124).compareTo(UInt8.from(124))).toBe(0)
+  expect(UInt64.from(BigInt(124)).compareTo(UInt8.from(124))).toBe(0)
 })
 
 it('compareToTest[2]', () => {
-  expect(UInt64.from(124).compareTo(UInt8.from(123))).toBe(1)
+  expect(UInt64.from(BigInt(124)).compareTo(UInt8.from(123))).toBe(1)
 })
 
 it('compareToTest[3]', () => {
@@ -117,11 +117,11 @@ it('compareToTest[4]', () => {
 })
 
 it('compareToTest[5]', () => {
-  expect(UInt64.from(124).compareTo(124)).toBe(0)
+  expect(UInt64.from(BigInt(124)).compareTo(124)).toBe(0)
 })
 
 it('compareToTest[6]', () => {
-  expect(UInt64.from(124).compareTo(123)).toBe(1)
+  expect(UInt64.from(BigInt(124)).compareTo(123)).toBe(1)
 })
 
 it('compareToTest[7]', () => {
@@ -129,7 +129,7 @@ it('compareToTest[7]', () => {
 })
 
 it('UInt64 from string zero', () => {
-  expect(UInt64.from('0')).toEqual(UInt64.from(0))
+  expect(UInt64.from('0')).toEqual(UInt64.from(BigInt(0)))
   expect(encode(json)).toEqual(binary)
 })
 

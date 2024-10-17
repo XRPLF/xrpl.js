@@ -145,6 +145,12 @@ function check(type, n, expected) {
   it(`Uint${type.width * 8} serializes ${n} as ${expected}`, function () {
     const bl = new BytesList()
     const serializer = new BinarySerializer(bl)
+
+    // UINT64.from function does not accept number type, it accepts only string | bigint types
+    // Other UINT<bits>.from methods accept number type
+    if (type.width == 8) {
+      n = BigInt(n)
+    }
     if (expected === 'throws') {
       expect(() => serializer.writeType(type, n)).toThrow()
       return
@@ -168,12 +174,11 @@ check(UInt32, 5, [0, 0, 0, 5])
 check(UInt32, 0xffffffff, [255, 255, 255, 255])
 check(UInt8, 0xfeffffff, 'throws')
 check(UInt16, 0xfeffffff, 'throws')
-check(UInt16, 0xfeffffff, 'throws')
+check(UInt32, 0xfeffffff, 'throws')
 check(UInt64, 0xfeffffff, [0, 0, 0, 0, 254, 255, 255, 255])
 check(UInt64, -1, 'throws')
 check(UInt64, 0, [0, 0, 0, 0, 0, 0, 0, 0])
 check(UInt64, 1, [0, 0, 0, 0, 0, 0, 0, 1])
-check(UInt64, BigInt(1), [0, 0, 0, 0, 0, 0, 0, 1])
 
 function deliverMinTest() {
   it('can serialize DeliverMin', () => {

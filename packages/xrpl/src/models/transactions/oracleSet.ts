@@ -4,6 +4,7 @@ import { PriceData } from '../common'
 import {
   BaseTransaction,
   isNumber,
+  isBigInt,
   isString,
   validateBaseTransaction,
   validateOptionalField,
@@ -146,11 +147,13 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
         'AssetPrice' in priceData.PriceData &&
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-        !isNumber(priceData.PriceData.AssetPrice)
+        !isBigInt(priceData.PriceData.AssetPrice)
       ) {
         throw new ValidationError('OracleSet: invalid field AssetPrice')
       }
 
+      // Note: Although scale is represented as a UINT64 in the rippled codebase, it has an upper bound value of `10`.
+      // Hence using bigint type for this field might be an overkill
       if (
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
         'Scale' in priceData.PriceData &&

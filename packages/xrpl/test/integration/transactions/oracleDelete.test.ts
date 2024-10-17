@@ -34,7 +34,7 @@ describe('OracleDelete', function () {
             PriceData: {
               BaseAsset: 'XRP',
               QuoteAsset: 'USD',
-              AssetPrice: 740,
+              AssetPrice: BigInt(740),
               Scale: 3,
             },
           },
