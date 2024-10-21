@@ -25,7 +25,7 @@ All of which works in Node.js (tested for v18+) & web browsers (tested for Chrom
 
 ### Requirements
 
-+ **[Node.js v18](https://nodejs.org/)** is recommended. We also support v20. Other versions may work but are not frequently tested.
++ **[Node.js v18](https://nodejs.org/)** is recommended. We also support v20 and v22. Other versions may work but are not frequently tested.
 
 ### Installing xrpl.js
 
