@@ -1,4 +1,11 @@
-import { Hash128, Hash160, Hash256, AccountID, Currency } from '../src/types'
+import {
+  Hash128,
+  Hash160,
+  Hash192,
+  Hash256,
+  AccountID,
+  Currency,
+} from '../src/types'
 
 describe('Hash128', function () {
   it('has a static width member', function () {
@@ -48,6 +55,33 @@ describe('Hash160', function () {
     expect(() =>
       Hash160.from('100000000000000000000000000000000000000000'),
     ).toThrow(new Error('Invalid Hash length 21'))
+  })
+})
+
+describe('Hash192', function () {
+  it('has a static width member', function () {
+    expect(Hash192.width).toBe(24)
+  })
+  it('has a ZERO_192 member', function () {
+    expect(Hash192.ZERO_192.toJSON()).toBe(
+      '000000000000000000000000000000000000000000000000',
+    )
+  })
+  it('can be compared against another', function () {
+    const h1 = Hash192.from('100000000000000000000000000000000000000000000000')
+    const h2 = Hash192.from('200000000000000000000000000000000000000000000000')
+    const h3 = Hash192.from('000000000000000000000000000000000000000000000003')
+    expect(h1.lt(h2)).toBe(true)
+    expect(h3.lt(h2)).toBe(true)
+  })
+
+  it('throws when constructed from invalid hash length', () => {
+    expect(() =>
+      Hash192.from('10000000000000000000000000000000000000000000000'),
+    ).toThrow(new Error('Invalid Hash length 23'))
+    expect(() =>
+      Hash192.from('10000000000000000000000000000000000000000000000000'),
+    ).toThrow(new Error('Invalid Hash length 25'))
   })
 })
 
