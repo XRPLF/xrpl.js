@@ -5,7 +5,7 @@
 
 import { bytesToHex } from '@xrplf/isomorphic/utils'
 import BigNumber from 'bignumber.js'
-import { decode, encode } from 'ripple-binary-codec'
+import { decode, encode, XrplDefinitionsBase } from 'ripple-binary-codec'
 
 import { ValidationError, XrplError } from '../../errors'
 import { APIVersion } from '../../models'
@@ -65,19 +65,23 @@ function addLengthPrefix(hex: string): string {
  * Hashes the Transaction object as the ledger does. Throws if the transaction is unsigned.
  *
  * @param tx - A transaction to hash. Tx may be in binary blob form. Tx must be signed.
+ * @param definitions - Definitions to use for encoding and decoding.
  * @returns A hash of tx.
  * @throws ValidationError if the Transaction is unsigned.\
  * @category Utilities
  */
-export function hashSignedTx(tx: Transaction | string): string {
+export function hashSignedTx(
+  tx: Transaction | string,
+  definitions?: XrplDefinitionsBase,
+): string {
   let txBlob: string
   let txObject: Transaction
   if (typeof tx === 'string') {
     txBlob = tx
     /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required until updated in binary codec. */
-    txObject = decode(tx) as unknown as Transaction
+    txObject = decode(tx, definitions) as unknown as Transaction
   } else {
-    txBlob = encode(tx)
+    txBlob = encode(tx, definitions)
     txObject = tx
   }
 
