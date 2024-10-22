@@ -1,11 +1,14 @@
+/* eslint-disable max-lines -- lots of helper functions needed for autofill */
 import BigNumber from 'bignumber.js'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 import { type Client } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
-import { Transaction } from '../models/transactions'
+import { Batch, Payment, Transaction } from '../models/transactions'
+import { BatchTxn } from '../models/transactions/batch'
 import { xrpToDrops } from '../utils'
+import { hashSignedTx } from '../utils/hashes'
 
 import getFeeXrp from './getFeeXrp'
 
@@ -207,6 +210,20 @@ function convertToClassicAddress(tx: Transaction, fieldName: string): void {
   }
 }
 
+// Helper function to get the next valid sequence number for an account.
+async function getNextValidSequenceNumber(
+  client: Client,
+  account: string,
+): Promise<number> {
+  const request: AccountInfoRequest = {
+    command: 'account_info',
+    account,
+    ledger_index: 'current',
+  }
+  const data = await client.request(request)
+  return data.result.account_data.Sequence
+}
+
 /**
  * Sets the next valid sequence number for a transaction.
  *
@@ -219,14 +236,8 @@ export async function setNextValidSequenceNumber(
   client: Client,
   tx: Transaction,
 ): Promise<void> {
-  const request: AccountInfoRequest = {
-    command: 'account_info',
-    account: tx.Account,
-    ledger_index: 'current',
-  }
-  const data = await client.request(request)
   // eslint-disable-next-line no-param-reassign, require-atomic-updates -- param reassign is safe with no race condition
-  tx.Sequence = data.result.account_data.Sequence
+  tx.Sequence = await getNextValidSequenceNumber(client, tx.Account)
 }
 
 /**
@@ -358,4 +369,83 @@ export async function checkAccountDeleteBlockers(
     }
     resolve()
   })
+}
+/**
+ * Replaces Amount with DeliverMax if needed.
+ *
+ * @param tx - The transaction object.
+ * @throws ValidationError if Amount and DeliverMax are both provided but do not match.
+ */
+export function handleDeliverMax(tx: Payment): void {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+  // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+  if (tx.DeliverMax != null) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
+    if (tx.Amount == null) {
+      // If only DeliverMax is provided, use it to populate the Amount field
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+      // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, no-param-reassign -- known RPC-level property
+      tx.Amount = tx.DeliverMax
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+    // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
+    if (tx.Amount != null && tx.Amount !== tx.DeliverMax) {
+      throw new ValidationError(
+        'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
+      )
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+    // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+    // eslint-disable-next-line no-param-reassign -- needed here
+    delete tx.DeliverMax
+  }
+}
+
+/**
+ * Autofills all the relevant `BatchTxn` fields.
+ *
+ * @param client - The client object.
+ * @param tx - The transaction object.
+ * @returns A promise that resolves with void if there are no blockers, or rejects with an XrplError if there are blockers.
+ */
+export async function autofillBatchTxn(
+  client: Client,
+  tx: Batch,
+): Promise<void> {
+  const accountSequences: Record<string, number> = {}
+  let batchIndex = 0
+  const txIds: string[] = []
+
+  for await (const rawTxn of tx.RawTransactions) {
+    const txn = rawTxn.RawTransaction
+    if (txn.BatchTxn !== undefined) {
+      // eslint-disable-next-line no-continue -- this is fine
+      continue
+    }
+    const batchTxn: Partial<BatchTxn> = {}
+    batchTxn.OuterAccount = tx.Account
+
+    if (txn.Account in accountSequences) {
+      batchTxn.Sequence = accountSequences[txn.Account]
+      accountSequences[txn.Account] += 1
+    } else {
+      const sequence = await getNextValidSequenceNumber(client, txn.Account)
+      accountSequences[txn.Account] = sequence + 1
+      batchTxn.Sequence = sequence
+    }
+    batchTxn.BatchIndex = batchIndex
+    batchIndex += 1
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
+    txn.BatchTxn = batchTxn as BatchTxn
+    txIds.push(hashSignedTx(txn))
+  }
+  if (tx.TxIDs == null) {
+    // eslint-disable-next-line no-param-reassign -- okay for autofilling
+    tx.TxIDs = txIds
+  }
 }
