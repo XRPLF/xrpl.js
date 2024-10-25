@@ -450,7 +450,7 @@ export async function fetchAccountReserveFee(
   client: Client,
 ): Promise<string | null> {
   const response = await client.request({ command: 'server_state' })
-  const fee = response.result.state.validated_ledger?.reserve_inc
+  const fee = response.result.state.validated_ledger?.reserve_base
 
   if (fee == null) {
     return null
