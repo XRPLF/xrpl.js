@@ -52,7 +52,7 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
    * An optional XRPL Address of an individual token holder balance to lock/unlock.
    * If omitted, this transaction will apply to all any accounts holding MPTs.
    */
-  MPTokenHolder?: Account
+  Holder?: Account
   Flags?: number | MPTokenIssuanceSetFlagsInterface
 }
 
@@ -65,7 +65,7 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
 export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
-  validateOptionalField(tx, 'MPTokenHolder', isAccount)
+  validateOptionalField(tx, 'Holder', isAccount)
 
   /* eslint-disable no-bitwise -- We need bitwise operations for flag checks here */
   if (typeof tx.Flags === 'number') {

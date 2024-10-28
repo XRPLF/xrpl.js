@@ -22,7 +22,7 @@ describe('MPTokenAuthorize', function () {
     validMPTokenAuthorize = {
       TransactionType: 'MPTokenAuthorize',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MPTokenHolder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
+      Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
       MPTokenIssuanceID: TOKEN_ID,
     } as any
 
@@ -50,7 +50,7 @@ describe('MPTokenAuthorize', function () {
       TransactionType: 'MPTokenAuthorize',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      MPTokenHolder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
+      Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
       Flags: MPTokenAuthorizeFlags.tfMPTUnauthorize,
     } as any
 

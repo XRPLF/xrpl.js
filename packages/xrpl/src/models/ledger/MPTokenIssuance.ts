@@ -7,7 +7,6 @@ export interface MPTokenIssuance extends BaseLedgerEntry, HasPreviousTxnID {
   AssetScale?: number
   MaximumAmount?: string
   OutstandingAmount: string
-  LockedAmount?: string
   TransferFee?: number
   MPTokenMetadata?: string
   OwnerNode?: string

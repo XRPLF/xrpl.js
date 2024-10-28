@@ -23,7 +23,7 @@ describe('MPTokenIssuanceSet', function () {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      MPTokenHolder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
+      Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
       Flags: MPTokenIssuanceSetFlags.tfMPTLock,
     } as any
 
@@ -34,7 +34,7 @@ describe('MPTokenIssuanceSet', function () {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      MPTokenHolder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
+      Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
     } as any
 
     assert.doesNotThrow(() => validate(validMPTokenIssuanceSet))

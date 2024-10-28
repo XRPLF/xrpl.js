@@ -87,13 +87,13 @@ describe('Clawback', function () {
         value: '10',
       },
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MPTokenHolder: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      Holder: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
     } as any
 
     assert.doesNotThrow(() => validate(validClawback))
   })
 
-  it(`throws w/ invalid MPTokenHolder Account`, function () {
+  it(`throws w/ invalid Holder Account`, function () {
     const invalidAccount = {
       TransactionType: 'Clawback',
       Amount: {
@@ -101,7 +101,7 @@ describe('Clawback', function () {
         value: '10',
       },
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MPTokenHolder: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Holder: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
     assert.throws(
@@ -111,7 +111,7 @@ describe('Clawback', function () {
     )
   })
 
-  it(`throws w/ invalid MPTokenHolder`, function () {
+  it(`throws w/ invalid Holder`, function () {
     const invalidAccount = {
       TransactionType: 'Clawback',
       Amount: {
@@ -124,11 +124,11 @@ describe('Clawback', function () {
     assert.throws(
       () => validate(invalidAccount),
       ValidationError,
-      'Clawback: missing MPTokenHolder',
+      'Clawback: missing Holder',
     )
   })
 
-  it(`throws w/ invalid currency MPTokenHolder`, function () {
+  it(`throws w/ invalid currency Holder`, function () {
     const invalidAccount = {
       TransactionType: 'Clawback',
       Amount: {
@@ -137,13 +137,13 @@ describe('Clawback', function () {
         value: '43.11584856965009',
       },
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MPTokenHolder: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      Holder: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
     } as any
 
     assert.throws(
       () => validate(invalidAccount),
       ValidationError,
-      'Clawback: cannot have MPTokenHolder for currency',
+      'Clawback: cannot have Holder for currency',
     )
   })
 })

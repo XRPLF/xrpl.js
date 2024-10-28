@@ -90,7 +90,7 @@ describe('MPTokenIssuanceDestroy', function () {
         TransactionType: 'MPTokenAuthorize',
         Account: testContext.wallet.classicAddress,
         MPTokenIssuanceID: mptID!,
-        MPTokenHolder: wallet2.classicAddress,
+        Holder: wallet2.classicAddress,
       }
 
       await testTransaction(testContext.client, authTx, testContext.wallet)

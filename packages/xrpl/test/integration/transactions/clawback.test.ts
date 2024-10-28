@@ -185,7 +185,7 @@ describe('Clawback', function () {
           mpt_issuance_id: mptID!,
           value: '500',
         },
-        MPTokenHolder: wallet2.classicAddress,
+        Holder: wallet2.classicAddress,
       }
       await testTransaction(testContext.client, clawTx, testContext.wallet)
 

@@ -50,7 +50,7 @@ export interface MPTokenAuthorize extends BaseTransaction {
    * An optional XRPL Address of an individual token holder balance to lock/unlock.
    * If omitted, this transaction will apply to all any accounts holding MPTs.
    */
-  MPTokenHolder?: Account
+  Holder?: Account
   Flags?: number | MPTokenAuthorizeFlagsInterface
 }
 
@@ -63,5 +63,5 @@ export interface MPTokenAuthorize extends BaseTransaction {
 export function validateMPTokenAuthorize(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
-  validateOptionalField(tx, 'MPTokenHolder', isAccount)
+  validateOptionalField(tx, 'Holder', isAccount)
 }

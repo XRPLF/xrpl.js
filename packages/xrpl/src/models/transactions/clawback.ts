@@ -31,7 +31,7 @@ export interface Clawback extends BaseTransaction {
    * Indicates the AccountID that the issuer wants to clawback. This field is only valid for clawing back
    * MPTs.
    */
-  MPTokenHolder?: string
+  Holder?: string
 }
 
 /**
@@ -42,7 +42,7 @@ export interface Clawback extends BaseTransaction {
  */
 export function validateClawback(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateOptionalField(tx, 'MPTokenHolder', isAccount)
+  validateOptionalField(tx, 'Holder', isAccount)
 
   if (tx.Amount == null) {
     throw new ValidationError('Clawback: missing field Amount')
@@ -56,17 +56,15 @@ export function validateClawback(tx: Record<string, unknown>): void {
     throw new ValidationError('Clawback: invalid holder Account')
   }
 
-  if (isMPTAmount(tx.Amount) && tx.Account === tx.MPTokenHolder) {
+  if (isMPTAmount(tx.Amount) && tx.Account === tx.Holder) {
     throw new ValidationError('Clawback: invalid holder Account')
   }
 
-  if (isIssuedCurrency(tx.Amount) && tx.MPTokenHolder) {
-    throw new ValidationError(
-      'Clawback: cannot have MPTokenHolder for currency',
-    )
+  if (isIssuedCurrency(tx.Amount) && tx.Holder) {
+    throw new ValidationError('Clawback: cannot have Holder for currency')
   }
 
-  if (isMPTAmount(tx.Amount) && !tx.MPTokenHolder) {
-    throw new ValidationError('Clawback: missing MPTokenHolder')
+  if (isMPTAmount(tx.Amount) && !tx.Holder) {
+    throw new ValidationError('Clawback: missing Holder')
   }
 }
