@@ -4,6 +4,7 @@ import { decode } from 'ripple-binary-codec'
 import type {
   TransactionEntryResponse,
   TransactionStream,
+  TransactionV1Stream,
   TxResponse,
 } from '..'
 import type { Amount, APIVersion, DEFAULT_API_VERSION } from '../models/common'
@@ -159,10 +160,10 @@ export function handlePartialPayment<
  * @param log - The method used for logging by the connection (to report the partial payment).
  */
 export function handleStreamPartialPayment(
-  stream: TransactionStream,
+  stream: TransactionStream | TransactionV1Stream,
   log: (id: string, message: string) => void,
 ): void {
-  if (isPartialPayment(stream.transaction, stream.meta)) {
+  if (isPartialPayment(stream.tx_json ?? stream.transaction, stream.meta)) {
     const warnings = stream.warnings ?? []
 
     const warning = {
