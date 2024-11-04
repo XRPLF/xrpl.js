@@ -7,6 +7,11 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Added
 * parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion
 
+### Fixed
+* `TransactionStream` model supports APIv2
+* `TransactionStream` model includes `close_time_iso` field
+* `Ledger` model includes `close_time_iso` field
+
 ## 4.0.0 (2024-07-15)
 
 ### BREAKING CHANGES
@@ -14,6 +19,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * Add `nfts_by_issuer` clio-only API definition
+* Add `include_deleted` to ledgerEntry request and `deleted_ledger_index` to ledgerEntry response
 * Support for the `fixPreviousTxnID` amendment.
 * Support for the user version of the `feature` RPC.
 * Add `hash` field to `ledger` command response
