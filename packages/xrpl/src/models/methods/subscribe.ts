@@ -4,6 +4,10 @@ import type {
   Path,
   StreamType,
   ResponseOnlyTxInfo,
+  APIVersion,
+  DEFAULT_API_VERSION,
+  RIPPLED_API_V1,
+  RIPPLED_API_V2,
 } from '../common'
 import { Offer } from '../ledger'
 import { OfferCreate, Transaction } from '../transactions'
@@ -262,9 +266,16 @@ export interface ValidationStream extends BaseStream {
  *
  * @category Streams
  */
-export interface TransactionStream extends BaseStream {
+interface TransactionStreamBase<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> extends BaseStream {
   status: string
   type: 'transaction'
+  /**
+   * The approximate time this ledger was closed, in date time string format.
+   * Always uses the UTC time zone.
+   */
+  close_time_iso: string
   /** String Transaction result code. */
   engine_result: string
   /** Numeric transaction response code, if applicable. */
@@ -285,8 +296,14 @@ export interface TransactionStream extends BaseStream {
    * in detail.
    */
   meta?: TransactionMetadata
-  /** The definition of the transaction in JSON format. */
-  transaction: Transaction & ResponseOnlyTxInfo
+  /** JSON object defining the transaction. */
+  tx_json?: Version extends typeof RIPPLED_API_V2
+    ? Transaction & ResponseOnlyTxInfo
+    : never
+  /** JSON object defining the transaction in rippled API v1. */
+  transaction?: Version extends typeof RIPPLED_API_V1
+    ? Transaction & ResponseOnlyTxInfo
+    : never
   /**
    * If true, this transaction is included in a validated ledger and its
    * outcome is final. Responses from the transaction stream should always be
@@ -295,6 +312,20 @@ export interface TransactionStream extends BaseStream {
   validated?: boolean
   warnings?: Array<{ id: number; message: string }>
 }
+
+/**
+ * Expected response from an {@link AccountTxRequest}.
+ *
+ * @category Streams
+ */
+export type TransactionStream = TransactionStreamBase
+
+/**
+ * Expected response from an {@link AccountTxRequest} with `api_version` set to 1.
+ *
+ * @category Streams
+ */
+export type TransactionV1Stream = TransactionStreamBase<typeof RIPPLED_API_V1>
 
 /**
  * The admin-only `peer_status` stream reports a large amount of information on
