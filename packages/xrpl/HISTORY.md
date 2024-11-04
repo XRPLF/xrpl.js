@@ -8,6 +8,11 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion
 * Add support for `Batch` amendment
 
+### Fixed
+* `TransactionStream` model supports APIv2
+* `TransactionStream` model includes `close_time_iso` field
+* `Ledger` model includes `close_time_iso` field
+
 ## 4.0.0 (2024-07-15)
 
 ### BREAKING CHANGES
