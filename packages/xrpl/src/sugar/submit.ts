@@ -176,7 +176,6 @@ function isSigned(transaction: SubmittableTransaction | string): boolean {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- we know that tx.Signers is an array of Signers
     const signers = tx.Signers as Signer[]
     for (const signer of signers) {
-      // eslint-disable-next-line max-depth -- necessary for checking if signer is signed
       if (
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- necessary check
         signer.Signer.SigningPubKey == null ||
