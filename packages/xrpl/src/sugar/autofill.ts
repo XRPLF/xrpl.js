@@ -417,10 +417,7 @@ export async function autofillBatchTxn(
   client: Client,
   tx: Batch,
 ): Promise<void> {
-  const accountSequences: Record<string, number> = {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- filled in earlier in autofill
-    [tx.Account]: tx.Sequence as number,
-  }
+  const accountSequences: Record<string, number> = {}
   const txIds: string[] = []
 
   for await (const rawTxn of tx.RawTransactions) {

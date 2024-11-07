@@ -42,16 +42,11 @@ describe('Wallet batch operations', function () {
           {
             RawTransaction: {
               Account: 'rJy554HmWFFJQGnRfZuoo8nV97XSMq77h7',
+              Flags: 0x40000000,
               Amount: '5000000',
-              BatchTxn: {
-                BatchIndex: 1,
-                OuterAccount: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
-                Sequence: 215,
-              },
               Destination: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
               Fee: '0',
-              NetworkID: 21336,
-              Sequence: 0,
+              Sequence: 215,
               SigningPubKey: '',
               TransactionType: 'Payment',
             },
@@ -59,16 +54,11 @@ describe('Wallet batch operations', function () {
           {
             RawTransaction: {
               Account: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
+              Flags: 0x40000000,
               Amount: '1000000',
-              BatchTxn: {
-                BatchIndex: 0,
-                OuterAccount: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
-                Sequence: 470,
-              },
               Destination: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
               Fee: '0',
-              NetworkID: 21336,
-              Sequence: 0,
+              Sequence: 470,
               SigningPubKey: '',
               TransactionType: 'Payment',
             },
@@ -142,16 +132,11 @@ describe('Wallet batch operations', function () {
         {
           RawTransaction: {
             Account: 'rJy554HmWFFJQGnRfZuoo8nV97XSMq77h7',
+            Flags: 0x40000000,
             Amount: '5000000',
-            BatchTxn: {
-              BatchIndex: 1,
-              OuterAccount: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
-              Sequence: 215,
-            },
             Destination: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
             Fee: '0',
-            NetworkID: 21336,
-            Sequence: 0,
+            Sequence: 215,
             SigningPubKey: '',
             TransactionType: 'Payment',
           },
@@ -159,16 +144,11 @@ describe('Wallet batch operations', function () {
         {
           RawTransaction: {
             Account: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
+            Flags: 0x40000000,
             Amount: '1000000',
-            BatchTxn: {
-              BatchIndex: 0,
-              OuterAccount: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
-              Sequence: 470,
-            },
             Destination: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
             Fee: '0',
-            NetworkID: 21336,
-            Sequence: 0,
+            Sequence: 470,
             SigningPubKey: '',
             TransactionType: 'Payment',
           },
@@ -212,15 +192,10 @@ describe('Wallet batch operations', function () {
         RawTransaction: {
           Account: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
           Amount: '1000000',
-          BatchTxn: {
-            BatchIndex: 0,
-            OuterAccount: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
-            Sequence: 470,
-          },
           Destination: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
           Fee: '0',
-          NetworkID: 21336,
-          Sequence: 0,
+          Flags: 0x40000000,
+          Sequence: 470,
           SigningPubKey: '',
           TransactionType: 'Payment',
         },

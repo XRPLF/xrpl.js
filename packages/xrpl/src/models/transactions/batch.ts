@@ -14,7 +14,7 @@ import type { TransactionMetadataBase } from './metadata'
 import type { Transaction } from './transaction'
 
 export type BatchInnerTransaction = Transaction & {
-  Fee: '0'
+  Fee?: '0'
 
   SigningPubKey?: ''
 

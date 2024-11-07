@@ -6,6 +6,7 @@ import {
   EscrowFinish,
   Payment,
   Transaction,
+  Batch,
 } from '../../src'
 import { ValidationError } from '../../src/errors'
 import rippled from '../fixtures/rippled'
@@ -437,13 +438,14 @@ describe('client.autofill', function () {
   })
 
   it('should autofill Batch transaction with single account', async function () {
-    const tx: Transaction = {
+    const tx: Batch = {
       TransactionType: 'Batch',
       Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
       RawTransactions: [
         {
           RawTransaction: {
             TransactionType: 'DepositPreauth',
+            Flags: 0x40000000,
             Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
             Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
           },
@@ -451,6 +453,7 @@ describe('client.autofill', function () {
         {
           RawTransaction: {
             TransactionType: 'DepositPreauth',
+            Flags: 0x40000000,
             Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
             Authorize: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
           },
@@ -472,21 +475,16 @@ describe('client.autofill', function () {
     const txResult = await testContext.client.autofill(tx)
     txResult.RawTransactions.forEach((rawTxOuter, index) => {
       const rawTx = rawTxOuter.RawTransaction
-      assert.strictEqual(
-        rawTx.BatchTxn?.OuterAccount,
-        'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
-      )
-      assert.strictEqual(rawTx.BatchTxn?.Sequence, 23 + index)
-      assert.strictEqual(rawTx.BatchTxn?.BatchIndex, index)
+      assert.strictEqual(rawTx.Sequence, 23 + index)
     })
     assert.strictEqual(txResult.TxIDs?.length, 2)
     assert.strictEqual(
       txResult.TxIDs?.[0],
-      'A63E4FBFADA7A0504F1307F4ADBEDDE70A81C9EFB21D12B6C2824DF21D08862B',
+      'EABF5CC759AECF2AA7E862F884DC119CEBAD1F8083E70DDD20B52F59E0E32E62',
     )
     assert.strictEqual(
       txResult.TxIDs?.[1],
-      'B2A225765BEA821FC074CA0BB803C3BE7B341F801369CF30806DA8CF5D9C0CAB',
+      '79C2CE60E79BDF5C702F9A60B2747699C28D62AED6D0C900765AF2BD1F4BDB3F',
     )
   })
 
@@ -498,6 +496,7 @@ describe('client.autofill', function () {
         {
           RawTransaction: {
             TransactionType: 'DepositPreauth',
+            Flags: 0x40000000,
             Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
             Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
           },
@@ -505,6 +504,7 @@ describe('client.autofill', function () {
         {
           RawTransaction: {
             TransactionType: 'DepositPreauth',
+            Flags: 0x40000000,
             Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
             Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
           },
@@ -524,23 +524,18 @@ describe('client.autofill', function () {
       },
     })
     const txResult = await testContext.client.autofill(tx)
-    txResult.RawTransactions.forEach((rawTxOuter, index) => {
+    txResult.RawTransactions.forEach((rawTxOuter) => {
       const rawTx = rawTxOuter.RawTransaction
-      assert.strictEqual(
-        rawTx.BatchTxn?.OuterAccount,
-        'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
-      )
-      assert.strictEqual(rawTx.BatchTxn?.Sequence, 23)
-      assert.strictEqual(rawTx.BatchTxn?.BatchIndex, index)
+      assert.strictEqual(rawTx.Sequence, 23)
     })
     assert.strictEqual(txResult.TxIDs?.length, 2)
     assert.strictEqual(
       txResult.TxIDs?.[0],
-      'A63E4FBFADA7A0504F1307F4ADBEDDE70A81C9EFB21D12B6C2824DF21D08862B',
+      'EABF5CC759AECF2AA7E862F884DC119CEBAD1F8083E70DDD20B52F59E0E32E62',
     )
     assert.strictEqual(
       txResult.TxIDs?.[1],
-      '8C233D6C1394812AFA969E1B91D02F31F35E0D3D813C1DCAFB955E4957FF22D9',
+      'E2AAB1C1AD462BBC71FBEA4380139D68B5A76C6B30DA7A96C485BBD9931C2F5D',
     )
   })
 })
