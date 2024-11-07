@@ -285,13 +285,16 @@ export async function calculateFeePerTransactionType(
       scaleValue(netFeeDrops, 33 + fulfillmentBytesSize / 16),
     )
     baseFee = product.dp(0, BigNumber.ROUND_CEIL)
-  }
-
-  if (
+  } else if (
     tx.TransactionType === 'AccountDelete' ||
     tx.TransactionType === 'AMMCreate'
   ) {
     baseFee = await fetchAccountDeleteFee(client)
+  } else if (tx.TransactionType === 'Batch') {
+    baseFee = BigNumber.sum(
+      baseFee.times(2),
+      baseFee.times(tx.RawTransactions.length + (tx.BatchSigners?.length ?? 0)),
+    )
   }
 
   /*
@@ -413,6 +416,7 @@ export function handleDeliverMax(tx: Payment): void {
  * @param tx - The transaction object.
  * @returns A promise that resolves with void if there are no blockers, or rejects with an XrplError if there are blockers.
  */
+// eslint-disable-next-line complexity, max-lines-per-function, max-statements -- needed here, lots to check
 export async function autofillBatchTxn(
   client: Client,
   tx: Batch,
@@ -442,10 +446,40 @@ export async function autofillBatchTxn(
         txn.Sequence = accountSequences[txn.Account]
         accountSequences[txn.Account] += 1
       } else {
-        const sequence = await getNextValidSequenceNumber(client, txn.Account)
+        const nextSequence = await getNextValidSequenceNumber(
+          client,
+          txn.Account,
+        )
+        const sequence =
+          txn.Account === tx.Account ? nextSequence + 1 : nextSequence
         accountSequences[txn.Account] = sequence + 1
         txn.Sequence = sequence
       }
+    }
+
+    if (txn.Fee == null) {
+      txn.Fee = '0'
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- JS check
+    } else if (txn.Fee !== '0') {
+      throw new XrplError('Must have fee of `0` in inner Batch transaction.')
+    }
+
+    if (txn.SigningPubKey == null) {
+      txn.SigningPubKey = ''
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- JS check
+    } else if (txn.SigningPubKey !== '') {
+      throw new XrplError('Must have fee of `0` in inner Batch transaction.')
+    }
+
+    // if (txn.TxnSignature == null) {
+    //   txn.TxnSignature = ''
+    //   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- JS check
+    // } else if (txn.TxnSignature !== '') {
+    //   throw new XrplError('Must have fee of `0` in inner Batch transaction.')
+    // }
+
+    if (txn.NetworkID == null) {
+      txn.NetworkID = txNeedsNetworkID(client) ? client.networkID : undefined
     }
 
     txIds.push(hashSignedTx(txn))

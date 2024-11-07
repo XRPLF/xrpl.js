@@ -8,6 +8,7 @@ import {
 import { AccountSetTfFlags } from '../transactions/accountSet'
 import { AMMDepositFlags } from '../transactions/AMMDeposit'
 import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
+import { BatchFlags } from '../transactions/batch'
 import { GlobalFlags, GlobalFlagsInterface } from '../transactions/common'
 import { NFTokenCreateOfferFlags } from '../transactions/NFTokenCreateOffer'
 import { NFTokenMintFlags } from '../transactions/NFTokenMint'
@@ -48,6 +49,7 @@ const txToFlag = {
   AccountSet: AccountSetTfFlags,
   AMMDeposit: AMMDepositFlags,
   AMMWithdraw: AMMWithdrawFlags,
+  Batch: BatchFlags,
   NFTokenCreateOffer: NFTokenCreateOfferFlags,
   NFTokenMint: NFTokenMintFlags,
   OfferCreate: OfferCreateFlags,

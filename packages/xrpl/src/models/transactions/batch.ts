@@ -3,6 +3,7 @@ import { Signer } from '../common'
 
 import {
   BaseTransaction,
+  GlobalFlagsInterface,
   isArray,
   isObject,
   isString,
@@ -12,6 +13,31 @@ import {
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 import type { Transaction } from './transaction'
+
+/**
+ * Enum representing values of {@link Batch} transaction flags.
+ *
+ * @category Transaction Flags
+ */
+export enum BatchFlags {
+  tfAllOrNothing = 0x00010000,
+  tfOnlyOne = 0x00020000,
+  tfUntilFailure = 0x00040000,
+  tfIndependent = 0x00080000,
+}
+
+/**
+ * Map of flags to boolean values representing {@link Batch} transaction
+ * flags.
+ *
+ * @category Transaction Flags
+ */
+export interface BatchFlagsInterface extends GlobalFlagsInterface {
+  tfAllOrNothing?: boolean
+  tfOnlyOne?: boolean
+  tfUntilFailure?: boolean
+  tfIndependent?: boolean
+}
 
 export type BatchInnerTransaction = Transaction & {
   Fee?: '0'
@@ -23,8 +49,6 @@ export type BatchInnerTransaction = Transaction & {
   Signers?: never
 
   LastLedgerSequence?: never
-
-  NetworkID?: never
 }
 
 export interface BatchSigner {
