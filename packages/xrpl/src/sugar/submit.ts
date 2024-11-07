@@ -283,7 +283,7 @@ export function getLastLedgerSequence(
   transaction: Transaction | string,
 ): number | null {
   const tx = typeof transaction === 'string' ? decode(transaction) : transaction
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- converts LastLedgSeq to number if present.
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- converts LastLedgerSeq to number if present.
   return tx.LastLedgerSequence as number | null
 }
 

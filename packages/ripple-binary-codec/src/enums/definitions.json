@@ -261,16 +261,6 @@
       }
     ],
     [
-      "BatchIndex",
-      {
-        "nth": 20,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "UInt8"
-      }
-    ],
-    [
       "LedgerEntryType",
       {
         "nth": 1,
@@ -2003,7 +1993,7 @@
     [
       "InnerResult",
       {
-        "nth": 30,
+        "nth": 32,
         "isVLEncoded": true,
         "isSerialized": true,
         "isSigningField": true,
@@ -2171,16 +2161,6 @@
       }
     ],
     [
-      "OuterAccount",
-      {
-        "nth": 24,
-        "isVLEncoded": true,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "AccountID"
-      }
-    ],
-    [
       "Indexes",
       {
         "nth": 1,
@@ -2223,7 +2203,7 @@
     [
       "TxIDs",
       {
-        "nth": 5,
+        "nth": 6,
         "isVLEncoded": true,
         "isSerialized": true,
         "isSigningField": true,
@@ -2603,7 +2583,7 @@
     [
       "RawTransaction",
       {
-        "nth": 33,
+        "nth": 34,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2613,7 +2593,7 @@
     [
       "BatchExecution",
       {
-        "nth": 34,
+        "nth": 35,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2623,7 +2603,7 @@
     [
       "BatchTxn",
       {
-        "nth": 35,
+        "nth": 36,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2633,7 +2613,7 @@
     [
       "BatchSigner",
       {
-        "nth": 36,
+        "nth": 37,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2833,7 +2813,7 @@
     [
       "BatchExecutions",
       {
-        "nth": 26,
+        "nth": 28,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2843,7 +2823,7 @@
     [
       "RawTransactions",
       {
-        "nth": 27,
+        "nth": 29,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2853,7 +2833,7 @@
     [
       "BatchSigners",
       {
-        "nth": 28,
+        "nth": 30,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": false,
@@ -3098,7 +3078,7 @@
     "OracleSet": 51,
     "OracleDelete": 52,
     "LedgerStateFix": 53,
-    "Batch": 54,
+    "Batch": 61,
     "EnableAmendment": 100,
     "SetFee": 101,
     "UNLModify": 102
