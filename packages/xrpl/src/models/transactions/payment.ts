@@ -5,7 +5,7 @@ import { isFlagEnabled } from '../utils'
 import {
   BaseTransaction,
   isAmount,
-  GlobalFlags,
+  GlobalFlagsInterface,
   validateBaseTransaction,
   isAccount,
   validateRequiredField,
@@ -82,7 +82,7 @@ export enum PaymentFlags {
  * // }
  * ```
  */
-export interface PaymentFlagsInterface extends GlobalFlags {
+export interface PaymentFlagsInterface extends GlobalFlagsInterface {
   /**
    * Do not use the default path; only use paths included in the Paths field.
    * This is intended to force the transaction to take arbitrage opportunities.

@@ -8,7 +8,7 @@ import {
 import { AccountSetTfFlags } from '../transactions/accountSet'
 import { AMMDepositFlags } from '../transactions/AMMDeposit'
 import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
-import { GlobalFlags } from '../transactions/common'
+import { GlobalFlagsInterface } from '../transactions/common'
 import { NFTokenCreateOfferFlags } from '../transactions/NFTokenCreateOffer'
 import { NFTokenMintFlags } from '../transactions/NFTokenMint'
 import { OfferCreateFlags } from '../transactions/offerCreate'
@@ -76,16 +76,17 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
     : 0
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- added ValidationError check for flagEnum
-function convertFlagsToNumber(flags: GlobalFlags, flagEnum: any): number {
+function convertFlagsToNumber(
+  flags: GlobalFlagsInterface,
+  flagEnum: object,
+): number {
   return Object.keys(flags).reduce((resultFlags, flag) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
     if (flagEnum[flag] == null) {
       throw new ValidationError(
         `flag ${flag} doesn't exist in flagEnum: ${JSON.stringify(flagEnum)}`,
       )
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
+
     return flags[flag] ? resultFlags | flagEnum[flag] : resultFlags
   }, 0)
 }

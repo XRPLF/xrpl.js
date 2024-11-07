@@ -242,8 +242,13 @@ export function validateOptionalField(
 
 /* eslint-enable @typescript-eslint/restrict-template-expressions -- checked before */
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface -- no global flags right now, so this is fine
-export interface GlobalFlags {}
+export enum GlobalFlags {
+  tfInnerBatchTxn = 0x40000000,
+}
+
+export interface GlobalFlagsInterface {
+  tfInnerBatchTxn?: boolean
+}
 
 /**
  * Every transaction has the same set of common fields.
@@ -276,7 +281,7 @@ export interface BaseTransaction {
    */
   AccountTxnID?: string
   /** Set of bit-flags for this transaction. */
-  Flags?: number | GlobalFlags
+  Flags?: number | GlobalFlagsInterface
   /**
    * Highest ledger index this transaction can appear in. Specifying this field
    * places a strict upper limit on how long the transaction can wait to be

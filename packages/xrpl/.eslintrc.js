@@ -66,6 +66,7 @@ module.exports = {
     'tsdoc/syntax': 'off',
     'jsdoc/require-description-complete-sentence': 'off',
     'import/prefer-default-export': 'off',
+    'max-depth': ['warn', 3],
   },
   overrides: [
     {
@@ -155,7 +156,6 @@ module.exports = {
         'max-lines-per-function': ['off'],
         'max-statements': ['off'],
         complexity: ['off'],
-        'max-depth': ['warn', 3],
       },
     },
   ],

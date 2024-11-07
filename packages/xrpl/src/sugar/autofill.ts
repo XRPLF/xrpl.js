@@ -6,7 +6,7 @@ import { type Client } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
 import { Batch, Payment, Transaction } from '../models/transactions'
-import { BatchTxn } from '../models/transactions/batch'
+import { GlobalFlags } from '../models/transactions/common'
 import { xrpToDrops } from '../utils'
 import { hashSignedTx } from '../utils/hashes'
 
@@ -407,7 +407,7 @@ export function handleDeliverMax(tx: Payment): void {
 }
 
 /**
- * Autofills all the relevant `BatchTxn` fields.
+ * Autofills all the relevant `x` fields.
  *
  * @param client - The client object.
  * @param tx - The transaction object.
@@ -417,31 +417,40 @@ export async function autofillBatchTxn(
   client: Client,
   tx: Batch,
 ): Promise<void> {
-  const accountSequences: Record<string, number> = {}
-  let batchIndex = 0
+  const accountSequences: Record<string, number> = {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- filled in earlier in autofill
+    [tx.Account]: tx.Sequence as number,
+  }
   const txIds: string[] = []
 
   for await (const rawTxn of tx.RawTransactions) {
     const txn = rawTxn.RawTransaction
-    if (txn.BatchTxn !== undefined) {
-      // eslint-disable-next-line no-continue -- this is fine
-      continue
-    }
-    const batchTxn: Partial<BatchTxn> = {}
-    batchTxn.OuterAccount = tx.Account
 
-    if (txn.Account in accountSequences) {
-      batchTxn.Sequence = accountSequences[txn.Account]
-      accountSequences[txn.Account] += 1
-    } else {
-      const sequence = await getNextValidSequenceNumber(client, txn.Account)
-      accountSequences[txn.Account] = sequence + 1
-      batchTxn.Sequence = sequence
+    // Flag processing
+    /* eslint-disable no-bitwise -- needed here for flag parsing */
+    if (txn.Flags == null) {
+      txn.Flags = GlobalFlags.tfInnerBatchTxn
+    } else if (typeof txn.Flags === 'number') {
+      if (!((txn.Flags & GlobalFlags.tfInnerBatchTxn) === 0)) {
+        txn.Flags |= GlobalFlags.tfInnerBatchTxn
+      }
+    } else if (!txn.Flags.tfInnerBatchTxn) {
+      txn.Flags.tfInnerBatchTxn = true
     }
-    batchTxn.BatchIndex = batchIndex
-    batchIndex += 1
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
-    txn.BatchTxn = batchTxn as BatchTxn
+    /* eslint-enable no-bitwise */
+
+    // Sequence processing
+    if (txn.Sequence == null && txn.TicketSequence == null) {
+      if (txn.Account in accountSequences) {
+        txn.Sequence = accountSequences[txn.Account]
+        accountSequences[txn.Account] += 1
+      } else {
+        const sequence = await getNextValidSequenceNumber(client, txn.Account)
+        accountSequences[txn.Account] = sequence + 1
+        txn.Sequence = sequence
+      }
+    }
+
     txIds.push(hashSignedTx(txn))
   }
   if (tx.TxIDs == null) {

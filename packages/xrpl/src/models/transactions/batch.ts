@@ -13,18 +13,18 @@ import {
 import type { TransactionMetadataBase } from './metadata'
 import type { Transaction } from './transaction'
 
-export interface BatchTxn {
-  OuterAccount: string
-
-  Sequence?: number
-
-  TicketSequence?: number
-
-  BatchIndex: number
-}
-
 export type BatchInnerTransaction = Transaction & {
-  BatchTxn?: BatchTxn
+  Fee: '0'
+
+  SigningPubKey?: ''
+
+  TxnSignature?: ''
+
+  Signers?: never
+
+  LastLedgerSequence?: never
+
+  NetworkID?: never
 }
 
 export interface BatchSigner {
