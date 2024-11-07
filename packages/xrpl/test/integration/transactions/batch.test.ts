@@ -48,7 +48,6 @@ describe('Batch', function () {
         ],
       }
       const autofilled = await testContext.client.autofill(tx)
-      console.log(JSON.stringify(autofilled, null, 4))
       await testTransaction(testContext.client, autofilled, testContext.wallet)
     },
     TIMEOUT,
