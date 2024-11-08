@@ -83,8 +83,6 @@ export interface Batch extends BaseTransaction {
 
 export interface BatchMetadata extends TransactionMetadataBase {
   BatchExecutions: Array<{
-    TransactionType: string
-
     InnerResult: string
 
     TransactionHash: string
