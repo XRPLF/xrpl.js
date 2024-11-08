@@ -461,22 +461,29 @@ export async function autofillBatchTxn(
       txn.Fee = '0'
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- JS check
     } else if (txn.Fee !== '0') {
-      throw new XrplError('Must have fee of `0` in inner Batch transaction.')
+      throw new XrplError('Must have `Fee of "0" in inner Batch transaction.')
     }
 
     if (txn.SigningPubKey == null) {
       txn.SigningPubKey = ''
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- JS check
     } else if (txn.SigningPubKey !== '') {
-      throw new XrplError('Must have fee of `0` in inner Batch transaction.')
+      throw new XrplError(
+        'Must have `SigningPubKey` of "" in inner Batch transaction.',
+      )
     }
 
-    // if (txn.TxnSignature == null) {
-    //   txn.TxnSignature = ''
-    //   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- JS check
-    // } else if (txn.TxnSignature !== '') {
-    //   throw new XrplError('Must have fee of `0` in inner Batch transaction.')
-    // }
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS
+    if (txn.TxnSignature != null) {
+      throw new XrplError(
+        'Must not have `TxnSignature` in inner Batch transaction.',
+      )
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS
+    if (txn.Signers != null) {
+      throw new XrplError('Must not have `Signers` in inner Batch transaction.')
+    }
 
     if (txn.NetworkID == null) {
       txn.NetworkID = txNeedsNetworkID(client) ? client.networkID : undefined

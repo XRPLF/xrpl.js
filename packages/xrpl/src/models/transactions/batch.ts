@@ -44,7 +44,7 @@ export type BatchInnerTransaction = Transaction & {
 
   SigningPubKey?: ''
 
-  TxnSignature?: ''
+  TxnSignature?: never
 
   Signers?: never
 
