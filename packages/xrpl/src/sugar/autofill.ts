@@ -233,8 +233,8 @@ export async function setNextValidSequenceNumber(
  * Fetches the owner reserve fee from the server state using the provided client.
  *
  * @param client - The client object used to make the request.
- * @returns A Promise that resolves to the account deletion fee as a BigNumber.
- * @throws {Error} Throws an error if the account deletion fee cannot be fetched.
+ * @returns A Promise that resolves to the owner reserve fee as a BigNumber.
+ * @throws {Error} Throws an error if the owner reserve fee cannot be fetched.
  */
 async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
   const response = await client.request({ command: 'server_state' })
@@ -275,10 +275,11 @@ export async function calculateFeePerTransactionType(
     baseFee = product.dp(0, BigNumber.ROUND_CEIL)
   }
 
-  if (
-    tx.TransactionType === 'AccountDelete' ||
-    tx.TransactionType === 'AMMCreate'
-  ) {
+  const isSpecialTxCost = ['AccountDelete', 'AMMCreate'].includes(
+    tx.TransactionType,
+  )
+
+  if (isSpecialTxCost) {
     baseFee = await fetchOwnerReserveFee(client)
   }
 
@@ -291,12 +292,12 @@ export async function calculateFeePerTransactionType(
   }
 
   const maxFeeDrops = xrpToDrops(client.maxFeeXRP)
-  const totalFee = ['AccountDelete', 'AMMCreate'].includes(tx.TransactionType)
+  const totalFee = isSpecialTxCost
     ? baseFee
     : BigNumber.min(baseFee, maxFeeDrops)
 
   // Round up baseFee and return it as a string
-  // eslint-disable-next-line no-param-reassign, @typescript-eslint/no-magic-numbers -- param reassign is safe, base 10 magic num
+  // eslint-disable-next-line no-param-reassign, @typescript-eslint/no-magic-numbers, require-atomic-updates -- safe reassignment.
   tx.Fee = totalFee.dp(0, BigNumber.ROUND_CEIL).toString(10)
 }
 
