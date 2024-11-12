@@ -268,11 +268,10 @@ export async function calculateFeePerTransactionType(
   if (tx.TransactionType === 'EscrowFinish' && tx.Fulfillment != null) {
     const fulfillmentBytesSize: number = Math.ceil(tx.Fulfillment.length / 2)
     // BaseFee × (33 + (Fulfillment size in bytes / 16))
-    const product = new BigNumber(
+    baseFee = new BigNumber(
       // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expected use of magic numbers
       scaleValue(netFeeDrops, 33 + fulfillmentBytesSize / 16),
     )
-    baseFee = product.dp(0, BigNumber.ROUND_CEIL)
   }
 
   const isSpecialTxCost = ['AccountDelete', 'AMMCreate'].includes(
