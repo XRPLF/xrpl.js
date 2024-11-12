@@ -8,6 +8,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion
 
 ### Fixed
+* `TransactionStream` model supports APIv2
+* `TransactionStream` model includes `close_time_iso` field
+* `Ledger` model includes `close_time_iso` field
 * Remove hard-coded reference to 10 drops as the reference transaction cost. Ensure tests passed for all transaction fee scenarios and `AMMCreate` transaction fee calculation is correct in case `owner_reserve` increases.
 
 ## 4.0.0 (2024-07-15)
