@@ -56,6 +56,25 @@ const txToFlag = {
 }
 
 /**
+ * Sets a transaction's flags to its numeric representation.
+ *
+ * @deprecated
+ * This utility function is deprecated.
+ * Use convertTxFlagsToNumber() instead and use the returned value to modify the tx.Flags from the caller.
+ *
+ * @param tx - A transaction to set its flags to its numeric representation.
+ */
+export function setTransactionFlagsToNumber(tx: Transaction): void {
+  // eslint-disable-next-line no-console -- intended deprecation warning
+  console.warn(
+    'This function is deprecated. Use convertTxFlagsToNumber() instead and use the returned value to modify the tx.Flags from the caller.',
+  )
+
+  // eslint-disable-next-line no-param-reassign -- intended param reassign in setter
+  tx.Flags = convertTxFlagsToNumber(tx)
+}
+
+/**
  * Returns a transaction's flags as its numeric representation.
  *
  * @param tx - A transaction to parse flags for
