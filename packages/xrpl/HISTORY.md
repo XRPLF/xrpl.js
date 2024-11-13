@@ -4,7 +4,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased Changes
 * Fix for parseTransactionFlags to no longer modify a passed in transaction when returning a parsed mapping
-* Remove setTransactionFlagsToNumber
+* Deprecate setTransactionFlagsToNumber. Should use convertTxFlagsToNumber instead
 * Add convertTxFlagsToNumber as a utility function in xrpl to return the number conversion of a transaction's flags
 
 ### Added
