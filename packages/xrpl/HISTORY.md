@@ -3,6 +3,9 @@
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased Changes
+* Fix for parseTransactionFlags to no longer modify a passed in transaction when returning a parsed mapping
+* Remove setTransactionFlagsToNumber
+* Add convertTxFlagsToNumber as a utility function in xrpl to return the number conversion of a transaction's flags
 
 ### Added
 * parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion

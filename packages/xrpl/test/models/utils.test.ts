@@ -15,7 +15,7 @@ import {
 import { AccountRootFlags } from '../../src/models/ledger'
 import { isFlagEnabled } from '../../src/models/utils'
 import {
-  setTransactionFlagsToNumber,
+  convertTxFlagsToNumber,
   parseAccountRootFlags,
   parseTransactionFlags,
 } from '../../src/models/utils/flags'
@@ -71,8 +71,8 @@ describe('Models Utils', function () {
       const { tfPassive, tfFillOrKill } = OfferCreateFlags
       const expected: number = tfPassive | tfFillOrKill
 
-      setTransactionFlagsToNumber(tx)
-      assert.strictEqual(tx.Flags, expected)
+      const flagNum = convertTxFlagsToNumber(tx)
+      assert.strictEqual(flagNum, expected)
     })
 
     it('sets PaymentChannelClaimFlags to its numeric value', function () {
@@ -90,8 +90,8 @@ describe('Models Utils', function () {
       const { tfRenew } = PaymentChannelClaimFlags
       const expected: number = tfRenew
 
-      setTransactionFlagsToNumber(tx)
-      assert.strictEqual(tx.Flags, expected)
+      const flagNum = convertTxFlagsToNumber(tx)
+      assert.strictEqual(flagNum, expected)
     })
 
     it('sets PaymentTransactionFlags to its numeric value', function () {
@@ -110,8 +110,8 @@ describe('Models Utils', function () {
       const { tfPartialPayment, tfLimitQuality } = PaymentFlags
       const expected: number = tfPartialPayment | tfLimitQuality
 
-      setTransactionFlagsToNumber(tx)
-      assert.strictEqual(tx.Flags, expected)
+      const flagNum = convertTxFlagsToNumber(tx)
+      assert.strictEqual(flagNum, expected)
     })
 
     it('sets TrustSetFlags to its numeric value', function () {
@@ -137,8 +137,8 @@ describe('Models Utils', function () {
       const { tfSetfAuth, tfClearNoRipple, tfClearFreeze } = TrustSetFlags
       const expected: number = tfSetfAuth | tfClearNoRipple | tfClearFreeze
 
-      setTransactionFlagsToNumber(tx)
-      assert.strictEqual(tx.Flags, expected)
+      const flagNum = convertTxFlagsToNumber(tx)
+      assert.strictEqual(flagNum, expected)
     })
 
     it('sets other transaction types flags to its numeric value', function () {
@@ -148,8 +148,8 @@ describe('Models Utils', function () {
         Flags: {},
       }
 
-      setTransactionFlagsToNumber(tx)
-      assert.strictEqual(tx.Flags, 0)
+      const flagNum = convertTxFlagsToNumber(tx)
+      assert.strictEqual(flagNum, 0)
     })
 
     // eslint-disable-next-line complexity -- Simpler to list them all out at once.
