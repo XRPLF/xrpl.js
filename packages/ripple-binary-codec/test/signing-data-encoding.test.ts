@@ -73,6 +73,8 @@ describe('Signing data', function () {
     const customPaymentDefinitions = JSON.parse(
       JSON.stringify(normalDefinitions),
     )
+
+    // custom number would need to updated in case it has been used by an existing transaction type
     customPaymentDefinitions.TRANSACTION_TYPES.Payment = 200
 
     const newDefs = new XrplDefinitions(customPaymentDefinitions)
@@ -176,6 +178,8 @@ describe('Signing data', function () {
     const customPaymentDefinitions = JSON.parse(
       JSON.stringify(normalDefinitions),
     )
+
+    // custom number would need to updated in case it has been used by an existing transaction type
     customPaymentDefinitions.TRANSACTION_TYPES.Payment = 200
 
     const newDefs = new XrplDefinitions(customPaymentDefinitions)
