@@ -46,7 +46,7 @@ describe('Models Utils', function () {
     })
   })
 
-  describe('setTransactionFlagsToNumber', function () {
+  describe('convertTxFlagsToNumber', function () {
     it('sets OfferCreateFlags to its numeric value', function () {
       const tx: OfferCreate = {
         Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
