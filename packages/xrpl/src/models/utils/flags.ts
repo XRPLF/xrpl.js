@@ -70,8 +70,10 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
     'This function is deprecated. Use convertTxFlagsToNumber() instead and use the returned value to modify the tx.Flags from the caller.',
   )
 
-  // eslint-disable-next-line no-param-reassign -- intended param reassign in setter
-  tx.Flags = convertTxFlagsToNumber(tx)
+  if (tx.Flags) {
+    // eslint-disable-next-line no-param-reassign -- intended param reassign in setter
+    tx.Flags = convertTxFlagsToNumber(tx)
+  }
 }
 
 /**
