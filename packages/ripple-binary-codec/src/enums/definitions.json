@@ -1241,6 +1241,16 @@
       }
     ],
     [
+      "index",
+      {
+        "isSerialized": false,
+        "isSigningField": false,
+        "isVLEncoded": false,
+        "nth": 258,
+        "type": "Hash256"
+      }
+    ],
+    [
       "Amount",
       {
         "isSerialized": true,
@@ -3021,6 +3031,7 @@
     "Done": -1,
     "Hash128": 4,
     "Hash160": 17,
+    "Hash192": 21,
     "Hash256": 5,
     "Issue": 24,
     "LedgerEntry": 10002,
@@ -3031,7 +3042,6 @@
     "STObject": 14,
     "Transaction": 10001,
     "UInt16": 1,
-    "Hash192": 21,
     "UInt32": 2,
     "UInt384": 22,
     "UInt512": 23,
