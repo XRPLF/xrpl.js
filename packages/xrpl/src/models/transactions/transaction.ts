@@ -4,10 +4,7 @@
 import { ValidationError } from '../../errors'
 import { IssuedCurrencyAmount, Memo } from '../common'
 import { isHex } from '../utils'
-import {
-  convertTxFlagsToNumber,
-  setTransactionFlagsToNumber,
-} from '../utils/flags'
+import { convertTxFlagsToNumber } from '../utils/flags'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'
 import { AccountSet, validateAccountSet } from './accountSet'
