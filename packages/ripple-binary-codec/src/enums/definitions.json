@@ -2805,7 +2805,6 @@
     "temEMPTY_DID": -254,
     "temARRAY_EMPTY": -253,
     "temARRAY_TOO_LARGE": -252,
-    "temBAD_TRANSFER_FEE": -251,
 
     "tefFAILURE": -199,
     "tefALREADY": -198,
