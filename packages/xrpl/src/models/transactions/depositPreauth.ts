@@ -1,4 +1,5 @@
 import { ValidationError } from '../../errors'
+import { AuthorizeCredential } from '../ledger/DepositPreauth'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
 
@@ -18,6 +19,10 @@ export interface DepositPreauth extends BaseTransaction {
    * revoked.
    */
   Unauthorize?: string
+
+  AuthorizeCredentials?: AuthorizeCredential[]
+
+  UnauthorizeCredentials?: AuthorizeCredential[]
 }
 
 /**
@@ -63,5 +68,24 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
         "DepositPreauth: Account can't unauthorize its own address",
       )
     }
+  }
+}
+
+function validateCredentialsList(credentials: AuthorizeCredential[]): void {
+  if (credentials.length > 8) {
+    throw new ValidationError(
+      'DepositPreauth: Credentials list cannot have more than 8 elements',
+    )
+  } else if (credentials.length === 0) {
+    throw new ValidationError(
+      'DepositPreauth: Credentials list cannot be empty',
+    )
+  }
+
+  const credentialsSet = new Set(credentials)
+  if (credentialsSet.size !== credentials.length) {
+    throw new ValidationError(
+      'DepositPreauth: Credentials list cannot contain duplicates',
+    )
   }
 }

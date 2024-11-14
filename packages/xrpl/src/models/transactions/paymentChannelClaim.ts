@@ -127,6 +127,10 @@ export interface PaymentChannelClaim extends BaseTransaction {
    * field is omitted.
    */
   PublicKey?: string
+  /** Credentials associated with the sender of this transaction.
+   * The credentials included must not be expired.
+   */
+  CredentialIDs?: string[]
 }
 
 /**

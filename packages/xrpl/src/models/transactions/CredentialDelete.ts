@@ -1,5 +1,7 @@
 import { BaseTransaction } from '../../../dist/npm'
 
+import { validateBaseTransaction } from './common'
+
 /**
  * Deletes a Credential object.
  *
@@ -27,4 +29,6 @@ export interface CredentialDelete extends BaseTransaction {
  * @param tx - A CredentialDelete Transaction.
  * @throws When the CredentialDelete is Malformed.
  */
-export function validateCredentialDelete(tx: Record<string, unknown>): void {}
+export function validateCredentialDelete(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
+}
