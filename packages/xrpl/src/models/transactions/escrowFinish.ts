@@ -32,6 +32,10 @@ export interface EscrowFinish extends BaseTransaction {
    * the held payment's Condition.
    */
   Fulfillment?: string
+  /** Credentials associated with the sender of this transaction.
+   * The credentials included must not be expired.
+   */
+  CredentialIDs?: string[]
 }
 
 /**

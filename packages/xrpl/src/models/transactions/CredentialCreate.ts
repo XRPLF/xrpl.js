@@ -1,5 +1,7 @@
 import { BaseTransaction } from '../../../dist/npm'
 
+import { validateBaseTransaction } from './common'
+
 /**
  * Creates a Credential object. It must be sent by the issuer.
  *
@@ -30,4 +32,6 @@ export interface CredentialCreate extends BaseTransaction {
  * @param tx - A CredentialCreate Transaction.
  * @throws When the CredentialCreate is Malformed.
  */
-export function validateCredentialCreate(tx: Record<string, unknown>): void {}
+export function validateCredentialCreate(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
+}
