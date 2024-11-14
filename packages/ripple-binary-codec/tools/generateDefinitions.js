@@ -8,26 +8,41 @@ if (process.argv.length != 3) {
 ////////////////////////////////////////////////////////////////////////
 //  Get all necessary files from rippled
 ////////////////////////////////////////////////////////////////////////
-const sfield_h_fn = process.argv[2] + '/include/xrpl/protocol/SField.h'
-const sfield_macro_fn =
-  process.argv[2] + '/include/xrpl/protocol/detail/sfields.macro'
-const ledgerformats_macro_fn =
-  process.argv[2] + '/include/xrpl/protocol/detail/ledger_entries.macro'
-const ter_h_fn = process.argv[2] + '/include/xrpl/protocol/TER.h'
-const txformats_macro_fn =
-  process.argv[2] + '/include/xrpl/protocol/detail/transactions.macro'
+const path = require('path')
 
 const fs = require('fs')
+function readFile(filename) {
+  try {
+    return fs.readFileSync(filename).toString('utf-8')
+  } catch (err) {
+    console.error(`Error reading file ${filename}:`, err.message)
+    process.exit(1)
+  }
+}
 
-const sfield_h = fs.readFileSync(sfield_h_fn).toString('utf-8')
-const sfield_macro = fs.readFileSync(sfield_macro_fn).toString('utf-8')
-const ledgerformats_macro = fs
-  .readFileSync(ledgerformats_macro_fn)
-  .toString('utf-8')
-const ter_h = fs.readFileSync(ter_h_fn).toString('utf-8')
-const txformats_macro = fs.readFileSync(txformats_macro_fn).toString('utf-8')
+const sfieldHeaderFile = readFile(
+  path.join(process.argv[2], '/include/xrpl/protocol/SField.h'),
+)
+const sfieldMacroFile = readFile(
+  path.join(process.argv[2], '/include/xrpl/protocol/detail/sfields.macro'),
+)
+const ledgerFormatsMacroFile = readFile(
+  path.join(
+    process.argv[2],
+    '/include/xrpl/protocol/detail/ledger_entries.macro',
+  ),
+)
+const terFile = readFile(
+  path.join(process.argv[2], '/include/xrpl/protocol/TER.h'),
+)
+const transactionsMacro = readFile(
+  path.join(
+    process.argv[2],
+    '/include/xrpl/protocol/detail/transactions.macro',
+  ),
+)
 
-const capitalization_exceptions = {
+const capitalizationExceptions = {
   NFTOKEN: 'NFToken',
   URITOKEN: 'URIToken',
   URI: 'URI',
@@ -59,8 +74,8 @@ function translate(inp) {
     const parts = inp.split('_')
     let result = ''
     for (x in parts)
-      if (capitalization_exceptions[parts[x]] != null) {
-        result += capitalization_exceptions[parts[x]]
+      if (capitalizationExceptions[parts[x]] != null) {
+        result += capitalizationExceptions[parts[x]]
       } else
         result +=
           parts[x].substr(0, 1).toUpperCase() + parts[x].substr(1).toLowerCase()
@@ -77,18 +92,22 @@ console.log('{')
 console.log('  "TYPES": {')
 console.log('    "Done": -1,')
 
-let hits = [
-  ...sfield_h.matchAll(/^ *STYPE\(STI_([^ ]*?) *, *([0-9-]+) *\) *\\?$/gm),
+let stypeHits = [
+  ...sfieldHeaderFile.matchAll(
+    /^ *STYPE\(STI_([^ ]*?) *, *([0-9-]+) *\) *\\?$/gm,
+  ),
 ]
-if (hits.length === 0)
-  hits = [...sfield_h.matchAll(/^ *STI_([^ ]*?) *= *([0-9-]+) *,?$/gm)]
-for (let x = 0; x < hits.length; ++x) {
+if (stypeHits.length === 0)
+  stypeHits = [
+    ...sfieldHeaderFile.matchAll(/^ *STI_([^ ]*?) *= *([0-9-]+) *,?$/gm),
+  ]
+for (let x = 0; x < stypeHits.length; ++x) {
   console.log(
     '    "' +
-      translate(hits[x][1]) +
+      translate(stypeHits[x][1]) +
       '": ' +
-      hits[x][2] +
-      (x < hits.length - 1 ? ',' : ''),
+      stypeHits[x][2] +
+      (x < stypeHits.length - 1 ? ',' : ''),
   )
 }
 
@@ -109,7 +128,7 @@ const unhex = (x) => {
   return x
 }
 hits = [
-  ...ledgerformats_macro.matchAll(
+  ...ledgerFormatsMacroFile.matchAll(
     /^ *LEDGER_ENTRY\(lt[A-Z_]+ *, *([x0-9a-f]+) *, *([^,]+), \({$/gm,
   ),
 ]
@@ -238,24 +257,26 @@ const isSigningField = (t, notSigningField) => {
 }
 
 // Parse SField.cpp for all the SFields and their serialization info
-hits = [
-  ...sfield_macro.matchAll(
+let sfieldHits = [
+  ...sfieldMacroFile.matchAll(
     /^ *[A-Z]*TYPED_SFIELD *\( *sf([^,\n]*),[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?(notSigning))?/gm,
   ),
 ]
-for (let x = 0; x < hits.length; ++x) {
+for (let x = 0; x < sfieldHits.length; ++x) {
   console.log('    [')
-  console.log('      "' + hits[x][1] + '",')
+  console.log('      "' + sfieldHits[x][1] + '",')
   console.log('      {')
-  console.log('        "nth": ' + hits[x][3] + ',')
-  console.log('        "isVLEncoded": ' + isVLEncoded(hits[x][2]) + ',')
-  console.log('        "isSerialized": ' + isSerialized(hits[x][2]) + ',')
+  console.log('        "nth": ' + sfieldHits[x][3] + ',')
+  console.log('        "isVLEncoded": ' + isVLEncoded(sfieldHits[x][2]) + ',')
+  console.log('        "isSerialized": ' + isSerialized(sfieldHits[x][2]) + ',')
   console.log(
-    '        "isSigningField": ' + isSigningField(hits[x][2], hits[x][5]) + ',',
+    '        "isSigningField": ' +
+      isSigningField(sfieldHits[x][2], sfieldHits[x][5]) +
+      ',',
   )
-  console.log('        "type": "' + translate(hits[x][2]) + '"')
+  console.log('        "type": "' + translate(sfieldHits[x][2]) + '"')
   console.log('      }')
-  console.log('    ]' + (x < hits.length - 1 ? ',' : ''))
+  console.log('    ]' + (x < sfieldHits.length - 1 ? ',' : ''))
 }
 
 console.log('  ],')
@@ -264,24 +285,28 @@ console.log('  ],')
 //  TER code processing
 ////////////////////////////////////////////////////////////////////////
 console.log('  "TRANSACTION_RESULTS": {')
-const cleaned_ter_h = ('' + ter_h).replace('[[maybe_unused]]', '')
+const cleanedTerFile = ('' + terFile).replace('[[maybe_unused]]', '')
 
-hits = [
-  ...cleaned_ter_h.matchAll(
+let terHits = [
+  ...cleanedTerFile.matchAll(
     /^ *((tel|tem|tef|ter|tes|tec)[A-Z_]+)( *= *([0-9-]+))? *,? *(\/\/[^\n]*)?$/gm,
   ),
 ]
 let upto = -1
 let last = ''
-for (let x = 0; x < hits.length; ++x) {
-  if (hits[x][4] !== undefined) upto = hits[x][4]
+for (let x = 0; x < terHits.length; ++x) {
+  if (terHits[x][4] !== undefined) upto = terHits[x][4]
 
-  let current = hits[x][2]
+  let current = terHits[x][2]
   if (current != last && last != '') console.log('')
   last = current
 
   console.log(
-    '    "' + hits[x][1] + '": ' + upto + (x < hits.length - 1 ? ',' : ''),
+    '    "' +
+      terHits[x][1] +
+      '": ' +
+      upto +
+      (x < terHits.length - 1 ? ',' : ''),
   )
 
   upto++
@@ -295,19 +320,18 @@ console.log('  },')
 console.log('  "TRANSACTION_TYPES": {')
 console.log('    "Invalid": -1,')
 
-hits = [
-  ...txformats_macro.matchAll(
+let txHits = [
+  ...transactionsMacro.matchAll(
     /^ *TRANSACTION\(tt[A-Z_]+ *,* ([0-9]+) *, *([A-Za-z]+).*$/gm,
   ),
 ]
-// console.log(hits)
-for (let x = 0; x < hits.length; ++x) {
+for (let x = 0; x < txHits.length; ++x) {
   console.log(
     '    "' +
-      hits[x][2] +
+      txHits[x][2] +
       '": ' +
-      hits[x][1] +
-      (x < hits.length - 1 ? ',' : ''),
+      txHits[x][1] +
+      (x < txHits.length - 1 ? ',' : ''),
   )
 }
 
