@@ -30,116 +30,113 @@
     "Metadata": 10004
   },
   "LEDGER_ENTRY_TYPES": {
-    "Invalid": -1,
-    "AccountRoot": 97,
-    "DirectoryNode": 100,
-    "RippleState": 114,
-    "Ticket": 84,
-    "SignerList": 83,
-    "Offer": 111,
-    "Bridge": 105,
-    "LedgerHashes": 104,
-    "Amendments": 102,
-    "XChainOwnedClaimID": 113,
-    "XChainOwnedCreateAccountClaimID": 116,
-    "FeeSettings": 115,
-    "Escrow": 117,
-    "PayChannel": 120,
-    "Check": 67,
-    "DepositPreauth": 112,
-    "NegativeUNL": 78,
-    "NFTokenPage": 80,
-    "NFTokenOffer": 55,
-    "AMM": 121,
-    "DID": 73,
-    "Oracle": 128,
     "Any": -3,
     "Child": -2,
-    "Nickname": 110,
-    "Contract": 99,
-    "GeneratorMap": 103
+    "Invalid": -1,
+    "NFTokenOffer": 55,
+    "Check": 67,
+    "DID": 73,
+    "NegativeUNL": 78,
+    "NFTokenPage": 80,
+    "SignerList": 83,
+    "Ticket": 84,
+    "AccountRoot": 97,
+    "DirectoryNode": 100,
+    "Amendments": 102,
+    "LedgerHashes": 104,
+    "Bridge": 105,
+    "Offer": 111,
+    "DepositPreauth": 112,
+    "XChainOwnedClaimID": 113,
+    "RippleState": 114,
+    "FeeSettings": 115,
+    "XChainOwnedCreateAccountClaimID": 116,
+    "Escrow": 117,
+    "PayChannel": 120,
+    "AMM": 121,
+    "Oracle": 128
   },
   "FIELDS": [
     [
-      "Generic",
-      {
-        "nth": 0,
-        "isVLEncoded": false,
-        "isSerialized": false,
-        "isSigningField": false,
-        "type": "Unknown"
-      }
-    ],
-    [
-      "Invalid",
-      {
-        "nth": -1,
-        "isVLEncoded": false,
-        "isSerialized": false,
-        "isSigningField": false,
-        "type": "Unknown"
-      }
-    ],
-    [
-      "ObjectEndMarker",
-      {
-        "nth": 1,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "STObject"
-      }
-    ],
-    [
-      "ArrayEndMarker",
-      {
-        "nth": 1,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "STArray"
-      }
-    ],
-    [
-      "hash",
-      {
-        "nth": 257,
-        "isVLEncoded": false,
-        "isSerialized": false,
-        "isSigningField": false,
-        "type": "Hash256"
-      }
-    ],
-    [
-      "index",
-      {
-        "nth": 258,
-        "isVLEncoded": false,
-        "isSerialized": false,
-        "isSigningField": false,
-        "type": "Hash256"
-      }
-    ],
-    [
-      "taker_gets_funded",
-      {
-        "nth": 258,
-        "isVLEncoded": false,
-        "isSerialized": false,
-        "isSigningField": false,
-        "type": "Amount"
-      }
-    ],
-    [
-      "taker_pays_funded",
-      {
-        "nth": 259,
-        "isVLEncoded": false,
-        "isSerialized": false,
-        "isSigningField": false,
-        "type": "Amount"
-      }
-    ],
+        "Generic",
+        {
+          "nth": 0,
+          "isVLEncoded": false,
+          "isSerialized": false,
+          "isSigningField": false,
+          "type": "Unknown"
+        }
+      ],
+      [
+        "Invalid",
+        {
+          "nth": -1,
+          "isVLEncoded": false,
+          "isSerialized": false,
+          "isSigningField": false,
+          "type": "Unknown"
+        }
+      ],
+      [
+        "ObjectEndMarker",
+        {
+          "nth": 1,
+          "isVLEncoded": false,
+          "isSerialized": true,
+          "isSigningField": true,
+          "type": "STObject"
+        }
+      ],
+      [
+        "ArrayEndMarker",
+        {
+          "nth": 1,
+          "isVLEncoded": false,
+          "isSerialized": true,
+          "isSigningField": true,
+          "type": "STArray"
+        }
+      ],
+      [
+        "hash",
+        {
+          "nth": 257,
+          "isVLEncoded": false,
+          "isSerialized": false,
+          "isSigningField": false,
+          "type": "Hash256"
+        }
+      ],
+      [
+        "index",
+        {
+          "nth": 258,
+          "isVLEncoded": false,
+          "isSerialized": false,
+          "isSigningField": false,
+          "type": "Hash256"
+        }
+      ],
+      [
+        "taker_gets_funded",
+        {
+          "nth": 258,
+          "isVLEncoded": false,
+          "isSerialized": false,
+          "isSigningField": false,
+          "type": "Amount"
+        }
+      ],
+      [
+        "taker_pays_funded",
+        {
+          "nth": 259,
+          "isVLEncoded": false,
+          "isSerialized": false,
+          "isSigningField": false,
+          "type": "Amount"
+        }
+      ],
     [
       "LedgerEntry",
       {
@@ -2933,12 +2930,9 @@
     "AccountSet": 3,
     "EscrowCancel": 4,
     "SetRegularKey": 5,
-    "NickNameSet": 6,
     "OfferCreate": 7,
     "OfferCancel": 8,
-    "Contract": 9,
     "TicketCreate": 10,
-    "TicketCancel": 11,
     "SignerListSet": 12,
     "PaymentChannelCreate": 13,
     "PaymentChannelFund": 14,
@@ -2949,7 +2943,6 @@
     "DepositPreauth": 19,
     "TrustSet": 20,
     "AccountDelete": 21,
-    "SetHook": 22,
     "NFTokenMint": 25,
     "NFTokenBurn": 26,
     "NFTokenCreateOffer": 27,
