@@ -13,7 +13,9 @@ export default interface DepositPreauth
   /** The account that granted the preauthorization. */
   Account: string
   /** The account that received the preauthorization. */
-  Authorize: string
+  Authorize?: string
+  /** */
+  AuthorizeCredentials?: string[]
   /**
    * A bit-map of boolean flags. No flags are defined for DepositPreauth
    * objects, so this value is always 0.
