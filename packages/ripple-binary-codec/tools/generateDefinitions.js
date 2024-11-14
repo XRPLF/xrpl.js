@@ -1,6 +1,10 @@
-if (process.argv.length != 3) {
-  console.log(
-    'Usage: ' + process.argv[0] + ' ' + process.argv[1] + ' path/to/rippled',
+if (process.argv.length != 3 && process.argv.length != 4) {
+  console.error(
+    'Usage: ' +
+      process.argv[0] +
+      ' ' +
+      process.argv[1] +
+      ' path/to/rippled [path/to/pipe/to]',
   )
   process.exit(1)
 }
@@ -81,16 +85,21 @@ function translate(inp) {
           parts[x].substr(0, 1).toUpperCase() + parts[x].substr(1).toLowerCase()
     return result
   } catch (e) {
-    console.log(e, 'inp="' + inp + '"')
+    console.error(e, 'inp="' + inp + '"')
   }
+}
+
+let output = ''
+function addLine(line) {
+  output += line + '\n'
 }
 
 ////////////////////////////////////////////////////////////////////////
 //  Serialized type processing
 ////////////////////////////////////////////////////////////////////////
-console.log('{')
-console.log('  "TYPES": {')
-console.log('    "Done": -1,')
+addLine('{')
+addLine('  "TYPES": {')
+addLine('    "Done": -1,')
 
 let stypeHits = [
   ...sfieldHeaderFile.matchAll(
@@ -102,7 +111,7 @@ if (stypeHits.length === 0)
     ...sfieldHeaderFile.matchAll(/^ *STI_([^ ]*?) *= *([0-9-]+) *,?$/gm),
   ]
 for (let x = 0; x < stypeHits.length; ++x) {
-  console.log(
+  addLine(
     '    "' +
       translate(stypeHits[x][1]) +
       '": ' +
@@ -111,15 +120,15 @@ for (let x = 0; x < stypeHits.length; ++x) {
   )
 }
 
-console.log('  },')
+addLine('  },')
 
 ////////////////////////////////////////////////////////////////////////
 //  Ledger entry type processing
 ////////////////////////////////////////////////////////////////////////
-console.log('  "LEDGER_ENTRY_TYPES": {')
-console.log('    "Any": -3,')
-console.log('    "Child": -2,')
-console.log('    "Invalid": -1,')
+addLine('  "LEDGER_ENTRY_TYPES": {')
+addLine('    "Any": -3,')
+addLine('    "Child": -2,')
+addLine('    "Invalid": -1,')
 
 const unhex = (x) => {
   x = ('' + x).trim()
@@ -133,21 +142,21 @@ hits = [
   ),
 ]
 for (let x = 0; x < hits.length; ++x)
-  console.log(
+  addLine(
     '    "' +
       hits[x][2] +
       '": ' +
       unhex(hits[x][1]) +
       (x < hits.length - 1 ? ',' : ''),
   )
-console.log('  },')
+addLine('  },')
 
 ////////////////////////////////////////////////////////////////////////
 //  SField processing
 ////////////////////////////////////////////////////////////////////////
-console.log('  "FIELDS": [')
+addLine('  "FIELDS": [')
 // The ones that are harder to parse directly from SField.cpp
-console.log(`    [
+addLine(`    [
       "Generic",
       {
         "nth": 0,
@@ -263,28 +272,28 @@ let sfieldHits = [
   ),
 ]
 for (let x = 0; x < sfieldHits.length; ++x) {
-  console.log('    [')
-  console.log('      "' + sfieldHits[x][1] + '",')
-  console.log('      {')
-  console.log('        "nth": ' + sfieldHits[x][3] + ',')
-  console.log('        "isVLEncoded": ' + isVLEncoded(sfieldHits[x][2]) + ',')
-  console.log('        "isSerialized": ' + isSerialized(sfieldHits[x][2]) + ',')
-  console.log(
+  addLine('    [')
+  addLine('      "' + sfieldHits[x][1] + '",')
+  addLine('      {')
+  addLine('        "nth": ' + sfieldHits[x][3] + ',')
+  addLine('        "isVLEncoded": ' + isVLEncoded(sfieldHits[x][2]) + ',')
+  addLine('        "isSerialized": ' + isSerialized(sfieldHits[x][2]) + ',')
+  addLine(
     '        "isSigningField": ' +
       isSigningField(sfieldHits[x][2], sfieldHits[x][5]) +
       ',',
   )
-  console.log('        "type": "' + translate(sfieldHits[x][2]) + '"')
-  console.log('      }')
-  console.log('    ]' + (x < sfieldHits.length - 1 ? ',' : ''))
+  addLine('        "type": "' + translate(sfieldHits[x][2]) + '"')
+  addLine('      }')
+  addLine('    ]' + (x < sfieldHits.length - 1 ? ',' : ''))
 }
 
-console.log('  ],')
+addLine('  ],')
 
 ////////////////////////////////////////////////////////////////////////
 //  TER code processing
 ////////////////////////////////////////////////////////////////////////
-console.log('  "TRANSACTION_RESULTS": {')
+addLine('  "TRANSACTION_RESULTS": {')
 const cleanedTerFile = ('' + terFile).replace('[[maybe_unused]]', '')
 
 let terHits = [
@@ -298,10 +307,10 @@ for (let x = 0; x < terHits.length; ++x) {
   if (terHits[x][4] !== undefined) upto = terHits[x][4]
 
   let current = terHits[x][2]
-  if (current != last && last != '') console.log('')
+  if (current != last && last != '') addLine('')
   last = current
 
-  console.log(
+  addLine(
     '    "' +
       terHits[x][1] +
       '": ' +
@@ -312,13 +321,13 @@ for (let x = 0; x < terHits.length; ++x) {
   upto++
 }
 
-console.log('  },')
+addLine('  },')
 
 ////////////////////////////////////////////////////////////////////////
 //  Transaction type processing
 ////////////////////////////////////////////////////////////////////////
-console.log('  "TRANSACTION_TYPES": {')
-console.log('    "Invalid": -1,')
+addLine('  "TRANSACTION_TYPES": {')
+addLine('    "Invalid": -1,')
 
 let txHits = [
   ...transactionsMacro.matchAll(
@@ -326,7 +335,7 @@ let txHits = [
   ),
 ]
 for (let x = 0; x < txHits.length; ++x) {
-  console.log(
+  addLine(
     '    "' +
       txHits[x][2] +
       '": ' +
@@ -335,5 +344,17 @@ for (let x = 0; x < txHits.length; ++x) {
   )
 }
 
-console.log('  }')
-console.log('}')
+addLine('  }')
+addLine('}')
+
+const outputFile =
+  process.argv.length == 4
+    ? process.argv[3]
+    : path.join(__dirname, '../src/enums/definitions.json')
+fs.writeFile(outputFile, output, 'utf8', (err) => {
+  if (err) {
+    console.error('Error writing to file:', err)
+  } else {
+    console.log('File written successfully to', outputFile)
+  }
+})
