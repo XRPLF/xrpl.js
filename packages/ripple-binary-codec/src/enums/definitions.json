@@ -58,85 +58,85 @@
   },
   "FIELDS": [
     [
-        "Generic",
-        {
-          "nth": 0,
-          "isVLEncoded": false,
-          "isSerialized": false,
-          "isSigningField": false,
-          "type": "Unknown"
-        }
-      ],
-      [
-        "Invalid",
-        {
-          "nth": -1,
-          "isVLEncoded": false,
-          "isSerialized": false,
-          "isSigningField": false,
-          "type": "Unknown"
-        }
-      ],
-      [
-        "ObjectEndMarker",
-        {
-          "nth": 1,
-          "isVLEncoded": false,
-          "isSerialized": true,
-          "isSigningField": true,
-          "type": "STObject"
-        }
-      ],
-      [
-        "ArrayEndMarker",
-        {
-          "nth": 1,
-          "isVLEncoded": false,
-          "isSerialized": true,
-          "isSigningField": true,
-          "type": "STArray"
-        }
-      ],
-      [
-        "hash",
-        {
-          "nth": 257,
-          "isVLEncoded": false,
-          "isSerialized": false,
-          "isSigningField": false,
-          "type": "Hash256"
-        }
-      ],
-      [
-        "index",
-        {
-          "nth": 258,
-          "isVLEncoded": false,
-          "isSerialized": false,
-          "isSigningField": false,
-          "type": "Hash256"
-        }
-      ],
-      [
-        "taker_gets_funded",
-        {
-          "nth": 258,
-          "isVLEncoded": false,
-          "isSerialized": false,
-          "isSigningField": false,
-          "type": "Amount"
-        }
-      ],
-      [
-        "taker_pays_funded",
-        {
-          "nth": 259,
-          "isVLEncoded": false,
-          "isSerialized": false,
-          "isSigningField": false,
-          "type": "Amount"
-        }
-      ],
+      "Generic",
+      {
+        "nth": 0,
+        "isVLEncoded": false,
+        "isSerialized": false,
+        "isSigningField": false,
+        "type": "Unknown"
+      }
+    ],
+    [
+      "Invalid",
+      {
+        "nth": -1,
+        "isVLEncoded": false,
+        "isSerialized": false,
+        "isSigningField": false,
+        "type": "Unknown"
+      }
+    ],
+    [
+      "ObjectEndMarker",
+      {
+        "nth": 1,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
+      "ArrayEndMarker",
+      {
+        "nth": 1,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "hash",
+      {
+        "nth": 257,
+        "isVLEncoded": false,
+        "isSerialized": false,
+        "isSigningField": false,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "index",
+      {
+        "nth": 258,
+        "isVLEncoded": false,
+        "isSerialized": false,
+        "isSigningField": false,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "taker_gets_funded",
+      {
+        "nth": 258,
+        "isVLEncoded": false,
+        "isSerialized": false,
+        "isSigningField": false,
+        "type": "Amount"
+      }
+    ],
+    [
+      "taker_pays_funded",
+      {
+        "nth": 259,
+        "isVLEncoded": false,
+        "isSerialized": false,
+        "isSigningField": false,
+        "type": "Amount"
+      }
+    ],
     [
       "LedgerEntry",
       {
@@ -2805,6 +2805,7 @@
     "temEMPTY_DID": -254,
     "temARRAY_EMPTY": -253,
     "temARRAY_TOO_LARGE": -252,
+    "temBAD_TRANSFER_FEE": -251,
 
     "tefFAILURE": -199,
     "tefALREADY": -198,

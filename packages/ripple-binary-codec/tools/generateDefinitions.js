@@ -129,85 +129,85 @@ console.log('  },')
 console.log('  "FIELDS": [')
 // The ones that are harder to parse directly from SField.cpp
 console.log(`    [
-        "Generic",
-        {
-          "nth": 0,
-          "isVLEncoded": false,
-          "isSerialized": false,
-          "isSigningField": false,
-          "type": "Unknown"
-        }
-      ],
-      [
-        "Invalid",
-        {
-          "nth": -1,
-          "isVLEncoded": false,
-          "isSerialized": false,
-          "isSigningField": false,
-          "type": "Unknown"
-        }
-      ],
-      [
-        "ObjectEndMarker",
-        {
-          "nth": 1,
-          "isVLEncoded": false,
-          "isSerialized": true,
-          "isSigningField": true,
-          "type": "STObject"
-        }
-      ],
-      [
-        "ArrayEndMarker",
-        {
-          "nth": 1,
-          "isVLEncoded": false,
-          "isSerialized": true,
-          "isSigningField": true,
-          "type": "STArray"
-        }
-      ],
-      [
-        "hash",
-        {
-          "nth": 257,
-          "isVLEncoded": false,
-          "isSerialized": false,
-          "isSigningField": false,
-          "type": "Hash256"
-        }
-      ],
-      [
-        "index",
-        {
-          "nth": 258,
-          "isVLEncoded": false,
-          "isSerialized": false,
-          "isSigningField": false,
-          "type": "Hash256"
-        }
-      ],
-      [
-        "taker_gets_funded",
-        {
-          "nth": 258,
-          "isVLEncoded": false,
-          "isSerialized": false,
-          "isSigningField": false,
-          "type": "Amount"
-        }
-      ],
-      [
-        "taker_pays_funded",
-        {
-          "nth": 259,
-          "isVLEncoded": false,
-          "isSerialized": false,
-          "isSigningField": false,
-          "type": "Amount"
-        }
-      ],`)
+      "Generic",
+      {
+        "nth": 0,
+        "isVLEncoded": false,
+        "isSerialized": false,
+        "isSigningField": false,
+        "type": "Unknown"
+      }
+    ],
+    [
+      "Invalid",
+      {
+        "nth": -1,
+        "isVLEncoded": false,
+        "isSerialized": false,
+        "isSigningField": false,
+        "type": "Unknown"
+      }
+    ],
+    [
+      "ObjectEndMarker",
+      {
+        "nth": 1,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
+      "ArrayEndMarker",
+      {
+        "nth": 1,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "hash",
+      {
+        "nth": 257,
+        "isVLEncoded": false,
+        "isSerialized": false,
+        "isSigningField": false,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "index",
+      {
+        "nth": 258,
+        "isVLEncoded": false,
+        "isSerialized": false,
+        "isSigningField": false,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "taker_gets_funded",
+      {
+        "nth": 258,
+        "isVLEncoded": false,
+        "isSerialized": false,
+        "isSigningField": false,
+        "type": "Amount"
+      }
+    ],
+    [
+      "taker_pays_funded",
+      {
+        "nth": 259,
+        "isVLEncoded": false,
+        "isSerialized": false,
+        "isSigningField": false,
+        "type": "Amount"
+      }
+    ],`)
 
 const isVLEncoded = (t) => {
   if (t == 'VL' || t == 'ACCOUNT' || t == 'VECTOR256') return 'true'
