@@ -19,6 +19,9 @@ import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
 import { BaseTransaction, isIssuedCurrency } from './common'
+import { validateCredentialAccept } from './CredentialAccept'
+import { validateCredentialCreate } from './CredentialCreate'
+import { validateCredentialDelete } from './CredentialDelete'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { DIDDelete, validateDIDDelete } from './DIDDelete'
 import { DIDSet, validateDIDSet } from './DIDSet'
@@ -297,6 +300,18 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'Clawback':
       validateClawback(tx)
+      break
+
+    case 'CredentialAccept':
+      validateCredentialAccept(tx)
+      break
+
+    case 'CredentialCreate':
+      validateCredentialCreate(tx)
+      break
+
+    case 'CredentialDelete':
+      validateCredentialDelete(tx)
       break
 
     case 'DIDDelete':
