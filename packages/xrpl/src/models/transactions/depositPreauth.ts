@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { AuthorizeCredential } from '../ledger/DepositPreauth'
+import { AuthorizeCredential } from '../common'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
 

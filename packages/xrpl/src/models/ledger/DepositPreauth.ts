@@ -1,12 +1,6 @@
+import { AuthorizeCredential } from '../common'
+
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
-
-export interface AuthorizeCredential {
-  /** The issuer of the credential. */
-  issuer: string
-
-  /** A (hex-encoded) value to identify the type of credential from the issuer. */
-  CredentialType: string
-}
 
 /**
  * A DepositPreauth object tracks a preauthorization from one account to
