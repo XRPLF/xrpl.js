@@ -1,6 +1,7 @@
 import { BaseTransaction } from '../../../dist/npm'
+import { ValidationError } from '../../errors'
 
-import { validateBaseTransaction } from './common'
+import { validateBaseTransaction, validateCredentialType } from './common'
 
 /**
  * Deletes a Credential object.
@@ -31,4 +32,12 @@ export interface CredentialDelete extends BaseTransaction {
  */
 export function validateCredentialDelete(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-}
+
+  if (!tx.Account && !tx.Issuer) {
+    throw new ValidationError(
+      'CredentialDelete: Neither `issuer` nor `subject` was provided',
+    )
+  }
+
+  validateCredentialType(tx.CredentialType)
+}.

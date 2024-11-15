@@ -1,6 +1,11 @@
 import { BaseTransaction } from '../../../dist/npm'
 
-import { validateBaseTransaction } from './common'
+import { validateBaseTransaction, validateCredentialType } from './common'
+
+/**
+ * Credentials are represented in hex. Whilst they are allowed a maximum length of 64
+ * bytes, every byte requires 2 hex characters for representation
+ */
 
 /**
  * accepts a credential issued to the Account (i.e. the Account is the Subject of the Credential object).
@@ -29,4 +34,6 @@ export interface CredentialAccept extends BaseTransaction {
  */
 export function validateCredentialAccept(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+
+  validateCredentialType(tx.CredentialType)
 }
