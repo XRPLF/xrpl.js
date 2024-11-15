@@ -34,19 +34,19 @@ export interface DepositPreauth extends BaseTransaction {
 export function validateDepositPreauth(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Authorize !== undefined && tx.Unauthorize !== undefined) {
-    throw new ValidationError(
-      "DepositPreauth: can't provide both Authorize and Unauthorize fields",
-    )
-  }
+  // Boolean logic to ensure exactly one of 4 inputs was provided
+  const normalAuthorizeXOR = !tx.Authorize !== !tx.Unauthorize
+  const authorizeCredentialsXOR =
+    !tx.AuthorizeCredentials !== !tx.UnauthorizeCredentials
 
-  if (tx.Authorize === undefined && tx.Unauthorize === undefined) {
+  if (normalAuthorizeXOR === authorizeCredentialsXOR) {
     throw new ValidationError(
-      'DepositPreauth: must provide either Authorize or Unauthorize field',
+      'DepositPreauth txn requires exactly one input amongst authorize, unauthorize, authorize_credentials and unauthorize_credentials.',
     )
   }
 
   if (tx.Authorize !== undefined) {
+    // is this needed
     if (typeof tx.Authorize !== 'string') {
       throw new ValidationError('DepositPreauth: Authorize must be a string')
     }
@@ -56,6 +56,12 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
         "DepositPreauth: Account can't preauthorize its own address",
       )
     }
+  }
+
+  if (tx.AuthorizeCredentials) {
+    validateCredentialsList(tx.AuthorizeCredentials)
+  } else if (tx.UnauthorizeCredentials) {
+    validateCredentialsList(tx.UnauthorizeCredentials)
   }
 
   if (tx.Unauthorize !== undefined) {

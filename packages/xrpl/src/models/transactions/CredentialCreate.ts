@@ -1,6 +1,8 @@
 import { BaseTransaction } from '../../../dist/npm'
 
-import { validateBaseTransaction } from './common'
+import { validateBaseTransaction, validateCredentialType } from './common'
+
+const MAX_URI_LENGTH = 256
 
 /**
  * Creates a Credential object. It must be sent by the issuer.
@@ -34,4 +36,8 @@ export interface CredentialCreate extends BaseTransaction {
  */
 export function validateCredentialCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+
+  validateURI(tx.URI)
+
+  validateCredentialType(tx.CredentialType)
 }

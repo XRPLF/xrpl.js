@@ -1,3 +1,4 @@
+import { HEX_REGEX } from '@xrplf/isomorphic/dist/utils'
 import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
@@ -386,4 +387,29 @@ export function parseAmountValue(amount: unknown): number {
     return parseFloat(amount)
   }
   return parseFloat(amount.value)
+}
+
+const MAX_CREDENTIAL_TYPE_LENGTH = 64 * 2
+/**
+ * Check a CredentialType for formatting errors
+ *
+ * @param credentialType A credential type field to check for errors
+ * @throws Validation Error if the formatting is incorrect
+ */
+export function validateCredentialType(credentialType: string): void {
+  if (credentialType.length === 0) {
+    throw new ValidationError(
+      'CredentialAccept: CredentialType length must be > 0.',
+    )
+  } else if (credentialType.length > MAX_CREDENTIAL_TYPE_LENGTH) {
+    throw new ValidationError(
+      `CredentialAccept: CredentialType length sust be < ${MAX_CREDENTIAL_TYPE_LENGTH}.`,
+    )
+  }
+
+  if (!HEX_REGEX.test(credentialType)) {
+    throw new ValidationError(
+      `CredentialAccept: CredentialType myust be encoded in hex.`,
+    )
+  }
 }
