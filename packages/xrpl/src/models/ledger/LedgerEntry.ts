@@ -45,6 +45,7 @@ type LedgerEntryFilter =
   | 'amm'
   | 'bridge'
   | 'check'
+  | 'credential'
   | 'deposit_preauth'
   | 'did'
   | 'directory'
