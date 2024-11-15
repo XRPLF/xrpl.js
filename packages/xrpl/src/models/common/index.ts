@@ -163,11 +163,13 @@ export interface AuthAccount {
 }
 
 export interface AuthorizeCredential {
-  /** The issuer of the credential. */
-  issuer: string
+  Credential: {
+    /** The issuer of the credential. */
+    issuer: string
 
-  /** A (hex-encoded) value to identify the type of credential from the issuer. */
-  CredentialType: string
+    /** A (hex-encoded) value to identify the type of credential from the issuer. */
+    CredentialType: string
+  }
 }
 
 export interface XChainBridge {
