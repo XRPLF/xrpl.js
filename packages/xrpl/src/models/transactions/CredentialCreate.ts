@@ -1,4 +1,7 @@
+import { HEX_REGEX } from '@xrplf/isomorphic/dist/utils'
+
 import { BaseTransaction } from '../../../dist/npm'
+import { ValidationError } from '../../errors'
 
 import { validateBaseTransaction, validateCredentialType } from './common'
 
@@ -40,4 +43,22 @@ export function validateCredentialCreate(tx: Record<string, unknown>): void {
   validateURI(tx.URI)
 
   validateCredentialType(tx.CredentialType)
+}
+
+function validateURI(uri: string | undefined): void {
+  if (!uri) {
+    return
+  }
+
+  if (uri.length === 0) {
+    throw new ValidationError('CredentialCreate: URI length must be > 0')
+  } else if (uri.length > MAX_URI_LENGTH) {
+    throw new ValidationError(
+      `CredentialCreate: URI length must be <= ${MAX_URI_LENGTH}`,
+    )
+  }
+
+  if (!HEX_REGEX.test(uri)) {
+    throw new ValidationError('CredentialCreate: URI must be hex encoded')
+  }
 }
