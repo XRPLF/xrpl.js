@@ -1,4 +1,4 @@
-import { Currency, XChainBridge } from '../common'
+import { AuthorizeCredential, Currency, XChainBridge } from '../common'
 import { LedgerEntry } from '../ledger'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
@@ -82,6 +82,12 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
 
   /** The object ID of a Check object to retrieve. */
   check?: string
+
+  /* Specify the Credential to retrieve. If a string, must be the ledger entry ID of
+   * the entry, as hexadecimal. If an object, requires subject, issuer, and
+   * credential_type sub-fields.
+   */
+  credential?: AuthorizeCredential | string
 
   /**
    * Specify a DepositPreauth object to retrieve. If a string, must be the
