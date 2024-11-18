@@ -39,7 +39,7 @@ const ledgerFormatsMacroFile = readFile(
 const terFile = readFile(
   path.join(process.argv[2], '/include/xrpl/protocol/TER.h'),
 )
-const transactionsMacro = readFile(
+const transactionsMacroFile = readFile(
   path.join(
     process.argv[2],
     '/include/xrpl/protocol/detail/transactions.macro',
@@ -330,7 +330,7 @@ addLine('  "TRANSACTION_TYPES": {')
 addLine('    "Invalid": -1,')
 
 let txHits = [
-  ...transactionsMacro.matchAll(
+  ...transactionsMacroFile.matchAll(
     /^ *TRANSACTION\(tt[A-Z_]+ *,* ([0-9]+) *, *([A-Za-z]+).*$/gm,
   ),
 ]
