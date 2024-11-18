@@ -15,7 +15,7 @@ let jsTransactionFile
 
 function processRippledSource(folder) {
   const sfieldMacroFile = readFile(
-    path.join(process.argv[2], '/include/xrpl/protocol/detail/sfields.macro'),
+    path.join(folder, '/include/xrpl/protocol/detail/sfields.macro'),
   )
   const sfieldHits = sfieldMacroFile.matchAll(
     /^ *[A-Z]*TYPED_SFIELD *\( *sf([^,\n]*),[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?(notSigning))?/gm,
@@ -162,7 +162,7 @@ export { ${tx} } from './${tx}'`,
 
 function generateParamLine(sfields, param, isRequired) {
   const paramName = param.slice(2)
-  const paramType = sfields[paramName]
+  const paramType = sfields[paramName] ?? 'any'
   const paramTypeOutput = typeMap[paramType]
   return `  ${paramName}${isRequired ? '' : '?'}: ${paramTypeOutput}\n`
 }
