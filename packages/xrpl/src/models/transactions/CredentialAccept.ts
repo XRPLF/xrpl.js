@@ -1,4 +1,5 @@
 import { BaseTransaction } from '../../../dist/npm'
+import { ValidationError } from '../../errors'
 
 import { validateBaseTransaction, validateCredentialType } from './common'
 
@@ -35,5 +36,5 @@ export interface CredentialAccept extends BaseTransaction {
 export function validateCredentialAccept(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateCredentialType(tx.CredentialType)
+  validateCredentialType(tx)
 }

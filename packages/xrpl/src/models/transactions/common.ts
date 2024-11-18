@@ -393,23 +393,40 @@ const MAX_CREDENTIAL_TYPE_LENGTH = 64 * 2
 /**
  * Check a CredentialType for formatting errors
  *
- * @param credentialType A credential type field to check for errors
+ * @param tx A transaction to check the CredentialType for errors
  * @throws Validation Error if the formatting is incorrect
  */
-export function validateCredentialType(credentialType: string): void {
-  if (credentialType.length === 0) {
+export function validateCredentialType(tx: Record<string, unknown>): void {
+  if (tx.credentialType === undefined) {
+    return
+  }
+
+  if (typeof tx.credentialType !== 'string') {
     throw new ValidationError(
-      'CredentialAccept: CredentialType length must be > 0.',
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- base check validates type
+      `${tx.TransactionType}: CredentialType must be a string`,
     )
-  } else if (credentialType.length > MAX_CREDENTIAL_TYPE_LENGTH) {
+  }
+  if (tx.credentialType.length === 0) {
     throw new ValidationError(
-      `CredentialAccept: CredentialType length sust be < ${MAX_CREDENTIAL_TYPE_LENGTH}.`,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- base check validates type
+      `${tx.TransactionType as string}: CredentialType length must be > 0.`,
+    )
+  } else if (tx.credentialType.length > MAX_CREDENTIAL_TYPE_LENGTH) {
+    throw new ValidationError(
+      `${
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- base check validates type
+        tx.TransactionType as string
+      }: CredentialType length sust be < ${MAX_CREDENTIAL_TYPE_LENGTH}.`,
     )
   }
 
-  if (!HEX_REGEX.test(credentialType)) {
+  if (!HEX_REGEX.test(tx.credentialType)) {
     throw new ValidationError(
-      `CredentialAccept: CredentialType myust be encoded in hex.`,
+      `${
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- base check validates type
+        tx.TransactionType as string
+      }: CredentialType myust be encoded in hex.`,
     )
   }
 }

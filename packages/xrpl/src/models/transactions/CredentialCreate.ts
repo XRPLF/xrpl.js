@@ -42,12 +42,16 @@ export function validateCredentialCreate(tx: Record<string, unknown>): void {
 
   validateURI(tx.URI)
 
-  validateCredentialType(tx.CredentialType)
+  validateCredentialType(tx)
 }
 
-function validateURI(uri: string | undefined): void {
-  if (!uri) {
+function validateURI(uri: unknown): void {
+  if (uri === undefined) {
     return
+  }
+
+  if (typeof uri !== 'string') {
+    throw new ValidationError('CredentialCreate: URI must be a string')
   }
 
   if (uri.length === 0) {
