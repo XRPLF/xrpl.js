@@ -39,5 +39,5 @@ export function validateCredentialDelete(tx: Record<string, unknown>): void {
     )
   }
 
-  validateCredentialType(tx.CredentialType)
+  validateCredentialType(tx)
 }

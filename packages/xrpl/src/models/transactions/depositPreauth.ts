@@ -58,7 +58,7 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
     }
   }
 
-  if (tx.AuthorizeCredentials) {
+  if (tx.AuthorizeCredentials !== undefined) {
     validateCredentialsList(tx.AuthorizeCredentials)
   } else if (tx.UnauthorizeCredentials) {
     validateCredentialsList(tx.UnauthorizeCredentials)
@@ -77,7 +77,13 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
   }
 }
 
-function validateCredentialsList(credentials: AuthorizeCredential[]): void {
+function validateCredentialsList(credentials: unknown): void {
+  if (!Array.isArray(credentials)) {
+    throw new ValidationError(
+      'DepositPreauth: Credentials list must be an array',
+    )
+  }
+
   if (credentials.length > 8) {
     throw new ValidationError(
       'DepositPreauth: Credentials list cannot have more than 8 elements',
@@ -86,6 +92,19 @@ function validateCredentialsList(credentials: AuthorizeCredential[]): void {
     throw new ValidationError(
       'DepositPreauth: Credentials list cannot be empty',
     )
+  }
+
+  function isAuthorizeCredential(
+    value: AuthorizeCredential,
+  ): value is AuthorizeCredential {
+    if (value.Credential.CredentialType && value.Credential.issuer) {
+      return true
+    }
+    return false
+  }
+
+  if (!isAuthorizeCredential(credentials[0])) {
+    throw new ValidationError('DepositPreauth: Invalid Credentials list format')
   }
 
   const credentialsSet = new Set(credentials)
