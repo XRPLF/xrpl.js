@@ -6,6 +6,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion
+* Implementation of XLS-80d PermissionedDomain feature.
 
 ### Fixed
 * `TransactionStream` model supports APIv2

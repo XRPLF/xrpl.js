@@ -53,6 +53,8 @@
     "AMM": 121,
     "DID": 73,
     "Oracle": 128,
+    "Credential": 129,
+    "PermissionedDomain": 130,
     "Any": -3,
     "Child": -2,
     "Nickname": 110,
@@ -1071,6 +1073,26 @@
       }
     ],
     [
+      "IssuerNode",
+      {
+        "nth": 27,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt64"
+      }
+    ],
+    [
+      "SubjectNode",
+      {
+        "nth": 28,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt64"
+      }
+    ],
+    [
       "EmailHash",
       {
         "nth": 1,
@@ -1424,6 +1446,16 @@
       "HookSetTxnID",
       {
         "nth": 33,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "DomainID",
+      {
+        "nth": 34,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1981,6 +2013,16 @@
       }
     ],
     [
+      "CredentialType",
+      {
+        "nth": 31,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Blob"
+      }
+    ],
+    [
       "Account",
       {
         "nth": 1,
@@ -2141,6 +2183,16 @@
       }
     ],
     [
+      "Subject",
+      {
+        "nth": 24,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "AccountID"
+      }
+    ],
+    [
       "Indexes",
       {
         "nth": 1,
@@ -2174,6 +2226,16 @@
       "NFTokenOffers",
       {
         "nth": 4,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Vector256"
+      }
+    ],
+    [
+      "CredentialIDs",
+      {
+        "nth": 5,
         "isVLEncoded": true,
         "isSerialized": true,
         "isSigningField": true,
@@ -2551,6 +2613,16 @@
       }
     ],
     [
+      "Credential",
+      {
+        "nth": 33,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
       "Signers",
       {
         "nth": 3,
@@ -2734,6 +2806,35 @@
       "AuthAccounts",
       {
         "nth": 25,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "AuthorizeCredentials",
+      {
+        "nth": 26,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "UnauthorizeCredentials",
+      {
+        "nth": 27,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "AcceptedCredentials", {
+        "nth": 28,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2923,7 +3024,8 @@
     "tecINVALID_UPDATE_TIME": 188,
     "tecTOKEN_PAIR_NOT_FOUND": 189,
     "tecARRAY_EMPTY": 190,
-    "tecARRAY_TOO_LARGE": 191
+    "tecARRAY_TOO_LARGE": 191,
+    "tecBAD_CREDENTIALS": 193
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
@@ -2974,6 +3076,11 @@
     "DIDDelete": 50,
     "OracleSet": 51,
     "OracleDelete": 52,
+    "CredentialCreate": 58,
+    "CredentialAccept": 59,
+    "CredentialDelete": 60,
+    "PermissionedDomainSet": 61,
+    "PermissionedDomainDelete": 62,
     "EnableAmendment": 100,
     "SetFee": 101,
     "UNLModify": 102
