@@ -58,6 +58,8 @@ import {
   PaymentChannelFund,
   validatePaymentChannelFund,
 } from './paymentChannelFund'
+import { PermissionedDomainDelete, validatePermissionedDomainDelete } from './permissionedDomainDelete'
+import { PermissionedDomainSet, validatePermissionedDomainSet } from './permissionedDomainSet'
 import { SetFee } from './setFee'
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
@@ -128,6 +130,8 @@ export type SubmittableTransaction =
   | PaymentChannelClaim
   | PaymentChannelCreate
   | PaymentChannelFund
+  | PermissionedDomainSet
+  | PermissionedDomainDelete
   | SetRegularKey
   | SignerListSet
   | TicketCreate
@@ -356,6 +360,14 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'PaymentChannelFund':
       validatePaymentChannelFund(tx)
+      break
+
+    case 'PermissionedDomainSet':
+      validatePermissionedDomainSet(tx)
+      break
+
+    case 'PermissionedDomainDelete':
+      validatePermissionedDomainDelete(tx)
       break
 
     case 'SetRegularKey':
