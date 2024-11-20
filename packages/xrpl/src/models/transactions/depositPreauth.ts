@@ -3,6 +3,8 @@ import { AuthorizeCredential } from '../common'
 
 import { BaseTransaction, validateBaseTransaction } from './common'
 
+const MAX_CREDENTIALS_LIST_LENGTH = 8
+
 /**
  * A DepositPreauth transaction gives another account pre-approval to deliver
  * payments to the sender of this transaction. This is only useful if the sender
@@ -34,19 +36,9 @@ export interface DepositPreauth extends BaseTransaction {
 export function validateDepositPreauth(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  // Boolean logic to ensure exactly one of 4 inputs was provided
-  const normalAuthorizeXOR = !tx.Authorize !== !tx.Unauthorize
-  const authorizeCredentialsXOR =
-    !tx.AuthorizeCredentials !== !tx.UnauthorizeCredentials
-
-  if (normalAuthorizeXOR === authorizeCredentialsXOR) {
-    throw new ValidationError(
-      'DepositPreauth txn requires exactly one input amongst authorize, unauthorize, authorize_credentials and unauthorize_credentials.',
-    )
-  }
+  validateSingleAuthorizationFieldProvided(tx)
 
   if (tx.Authorize !== undefined) {
-    // is this needed
     if (typeof tx.Authorize !== 'string') {
       throw new ValidationError('DepositPreauth: Authorize must be a string')
     }
@@ -56,12 +48,6 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
         "DepositPreauth: Account can't preauthorize its own address",
       )
     }
-  }
-
-  if (tx.AuthorizeCredentials !== undefined) {
-    validateCredentialsList(tx.AuthorizeCredentials)
-  } else if (tx.UnauthorizeCredentials) {
-    validateCredentialsList(tx.UnauthorizeCredentials)
   }
 
   if (tx.Unauthorize !== undefined) {
@@ -75,6 +61,12 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
       )
     }
   }
+
+  if (tx.AuthorizeCredentials !== undefined) {
+    validateCredentialsList(tx.AuthorizeCredentials)
+  } else if (tx.UnauthorizeCredentials) {
+    validateCredentialsList(tx.UnauthorizeCredentials)
+  }
 }
 
 function validateCredentialsList(credentials: unknown): void {
@@ -84,7 +76,7 @@ function validateCredentialsList(credentials: unknown): void {
     )
   }
 
-  if (credentials.length > 8) {
+  if (credentials.length > MAX_CREDENTIALS_LIST_LENGTH) {
     throw new ValidationError(
       'DepositPreauth: Credentials list cannot have more than 8 elements',
     )
@@ -111,6 +103,21 @@ function validateCredentialsList(credentials: unknown): void {
   if (credentialsSet.size !== credentials.length) {
     throw new ValidationError(
       'DepositPreauth: Credentials list cannot contain duplicates',
+    )
+  }
+}
+
+// Boolean logic to ensure exactly one of 4 inputs was provided
+function validateSingleAuthorizationFieldProvided(
+  tx: Record<string, unknown>,
+): void {
+  const normalAuthorizeXOR = !tx.Authorize !== !tx.Unauthorize
+  const authorizeCredentialsXOR =
+    !tx.AuthorizeCredentials !== !tx.UnauthorizeCredentials
+
+  if (normalAuthorizeXOR === authorizeCredentialsXOR) {
+    throw new ValidationError(
+      'DepositPreauth txn requires exactly one input amongst authorize, unauthorize, authorize_credentials and unauthorize_credentials.',
     )
   }
 }

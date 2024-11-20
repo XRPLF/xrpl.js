@@ -39,5 +39,21 @@ export function validateCredentialDelete(tx: Record<string, unknown>): void {
     )
   }
 
+  if (tx.Account == null) {
+    throw new ValidationError('CredentialDelete: missing field Account')
+  }
+
+  if (typeof tx.Account !== 'string') {
+    throw new ValidationError('CredentialDelete: Account must be a string')
+  }
+
+  if (tx.Subject && typeof tx.Subject !== 'string') {
+    throw new ValidationError('CredentialDelete: Subject must be a string')
+  }
+
+  if (tx.Issuer && typeof tx.Issuer !== 'string') {
+    throw new ValidationError('CredentialDelete: Subject must be a string')
+  }
+
   validateCredentialType(tx)
 }
