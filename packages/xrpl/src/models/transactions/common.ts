@@ -398,7 +398,10 @@ const MAX_CREDENTIAL_TYPE_LENGTH = 64 * 2
  */
 export function validateCredentialType(tx: Record<string, unknown>): void {
   if (tx.credentialType === undefined) {
-    return
+    throw new ValidationError(
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- base check validates type
+      `${tx.TransactionType}: missing field CredentialType`,
+    )
   }
 
   if (typeof tx.credentialType !== 'string') {

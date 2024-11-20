@@ -40,6 +40,26 @@ export interface CredentialCreate extends BaseTransaction {
 export function validateCredentialCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
+  if (tx.Account == null) {
+    throw new ValidationError('CredentialCreate: missing field Account')
+  }
+
+  if (typeof tx.Account !== 'string') {
+    throw new ValidationError('CredentialCreate: Account must be a string')
+  }
+
+  if (tx.Subject == null) {
+    throw new ValidationError('CredentialCreate: missing field Subject')
+  }
+
+  if (typeof tx.Subject !== 'string') {
+    throw new ValidationError('CredentialCreate: Subject must be a string')
+  }
+
+  if (tx.expiration && typeof tx.expiration !== 'number') {
+    throw new ValidationError('expiration must be a number')
+  }
+
   validateURI(tx.URI)
 
   validateCredentialType(tx)

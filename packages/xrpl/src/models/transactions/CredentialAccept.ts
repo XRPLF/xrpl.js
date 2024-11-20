@@ -36,5 +36,13 @@ export interface CredentialAccept extends BaseTransaction {
 export function validateCredentialAccept(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
+  if (tx.Account == null) {
+    throw new ValidationError('CredentialAccept: missing field Account')
+  }
+
+  if (tx.Issuer == null) {
+    throw new ValidationError('CredentialAccept: missing field Issuer')
+  }
+
   validateCredentialType(tx)
 }
