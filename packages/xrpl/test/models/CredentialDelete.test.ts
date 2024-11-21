@@ -9,12 +9,12 @@ import { validateCredentialDelete } from '../../src/models/transactions/Credenti
  *
  * Providing runtime verification testing for each specific transaction type.
  */
-describe('credentialDelete', function () {
+describe('CredentialDelete', function () {
   let credentialDelete
 
   beforeEach(function () {
     credentialDelete = {
-      TransactionType: 'credentialDelete',
+      TransactionType: 'CredentialDelete',
       issuer: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       subject: 'rNdY9XDnQ4Dr1EgefwU3CBRuAjt3sAutGg',
       CredentialType: stringToHex('Passport'),
@@ -24,15 +24,15 @@ describe('credentialDelete', function () {
   })
 
   it(`verifies valid credentialDelete`, function () {
-    assert.doesNotThrow(() => validatecredentialDelete(credentialDelete))
+    assert.doesNotThrow(() => validateCredentialDelete(credentialDelete))
     assert.doesNotThrow(() => validate(credentialDelete))
   })
 
   it(`throws w/ missing field issuer`, function () {
     delete credentialDelete.issuer
-    const errorMessage = 'credentialDelete: missing field Issuer'
+    const errorMessage = 'CredentialDelete: missing field Issuer'
     assert.throws(
-      () => validatecredentialDelete(credentialDelete),
+      () => validateCredentialDelete(credentialDelete),
       ValidationError,
       errorMessage,
     )
@@ -45,9 +45,9 @@ describe('credentialDelete', function () {
 
   it(`throws w/ missing field subject`, function () {
     delete credentialDelete.subject
-    const errorMessage = 'credentialDelete: missing field Subject'
+    const errorMessage = 'CredentialDelete: missing field Subject'
     assert.throws(
-      () => validatecredentialDelete(credentialDelete),
+      () => validateCredentialDelete(credentialDelete),
       ValidationError,
       errorMessage,
     )
@@ -60,9 +60,9 @@ describe('credentialDelete', function () {
 
   it(`throws w/ missing field credential_type`, function () {
     delete credentialDelete.CredentialType
-    const errorMessage = 'credentialDelete: missing field CredentialType'
+    const errorMessage = 'CredentialDelete: missing field CredentialType'
     assert.throws(
-      () => validatecredentialDelete(credentialDelete),
+      () => validateCredentialDelete(credentialDelete),
       ValidationError,
       errorMessage,
     )
@@ -80,7 +80,7 @@ describe('credentialDelete', function () {
     const errorMessage =
       'credentialDelete: CredentialType length must be < 128.'
     assert.throws(
-      () => validatecredentialDelete(credentialDelete),
+      () => validateCredentialDelete(credentialDelete),
       ValidationError,
       errorMessage,
     )
@@ -95,7 +95,7 @@ describe('credentialDelete', function () {
     credentialDelete.CredentialType = ''
     const errorMessage = 'credentialDelete: CredentialType length must be > 0.'
     assert.throws(
-      () => validatecredentialDelete(credentialDelete),
+      () => validateCredentialDelete(credentialDelete),
       ValidationError,
       errorMessage,
     )
@@ -111,7 +111,7 @@ describe('credentialDelete', function () {
     const errorMessage =
       'credentialDelete: CredentialType myust be encoded in hex.'
     assert.throws(
-      () => validatecredentialDelete(credentialDelete),
+      () => validateCredentialDelete(credentialDelete),
       ValidationError,
       errorMessage,
     )
