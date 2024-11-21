@@ -48,9 +48,7 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
         "DepositPreauth: Account can't preauthorize its own address",
       )
     }
-  }
-
-  if (tx.Unauthorize !== undefined) {
+  } else if (tx.Unauthorize !== undefined) {
     if (typeof tx.Unauthorize !== 'string') {
       throw new ValidationError('DepositPreauth: Unauthorize must be a string')
     }
@@ -60,11 +58,9 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
         "DepositPreauth: Account can't unauthorize its own address",
       )
     }
-  }
-
-  if (tx.AuthorizeCredentials !== undefined) {
+  } else if (tx.AuthorizeCredentials !== undefined) {
     validateCredentialsList(tx.AuthorizeCredentials)
-  } else if (tx.UnauthorizeCredentials) {
+  } else if (tx.UnauthorizeCredentials !== undefined) {
     validateCredentialsList(tx.UnauthorizeCredentials)
   }
 }

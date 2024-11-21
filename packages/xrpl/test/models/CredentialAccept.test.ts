@@ -2,7 +2,6 @@ import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 import { assert } from 'chai'
 
 import { validate, ValidationError } from '../../src'
-import { validateAMMDelete } from '../../src/models/transactions/AMMDelete'
 import { validateCredentialAccept } from '../../src/models/transactions/CredentialAccept'
 
 /**
@@ -18,7 +17,7 @@ describe('CredentialAccept', function () {
       TransactionType: 'CredentialAccept',
       issuer: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       subject: 'rNdY9XDnQ4Dr1EgefwU3CBRuAjt3sAutGg',
-      credential_type: stringToHex('Passport'),
+      CredentialType: stringToHex('Passport'),
       Sequence: 1337,
       Flags: 0,
     } as any
@@ -31,7 +30,7 @@ describe('CredentialAccept', function () {
 
   it(`throws w/ missing field issuer`, function () {
     delete credentialAccept.issuer
-    const errorMessage = 'CredentialAccept: CredentialType must be a string'
+    const errorMessage = 'CredentialAccept: missing field Issuer'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),
       ValidationError,
@@ -46,7 +45,7 @@ describe('CredentialAccept', function () {
 
   it(`throws w/ missing field subject`, function () {
     delete credentialAccept.subject
-    const errorMessage = 'CredentialAccept: CredentialType must be a string'
+    const errorMessage = 'CredentialAccept: missing field Subject'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),
       ValidationError,
@@ -60,46 +59,66 @@ describe('CredentialAccept', function () {
   })
 
   it(`throws w/ missing field credential_type`, function () {
-    delete ammDelete.Asset
-    const errorMessage = 'AMMDelete: missing field Asset'
+    delete credentialAccept.CredentialType
+    const errorMessage = 'CredentialAccept: missing field CredentialType'
     assert.throws(
-      () => validateAMMDelete(ammDelete),
+      () => validateCredentialAccept(credentialAccept),
       ValidationError,
       errorMessage,
     )
-    assert.throws(() => validate(ammDelete), ValidationError, errorMessage)
+    assert.throws(
+      () => validate(credentialAccept),
+      ValidationError,
+      errorMessage,
+    )
   })
 
   it(`throws w/ credential type field too long`, function () {
-    delete ammDelete.Asset
-    const errorMessage = 'AMMDelete: missing field Asset'
+    credentialAccept.CredentialType = stringToHex(
+      'PassportPassportPassportPassportPassportPassportPassportPassportPassport',
+    )
+    const errorMessage =
+      'CredentialAccept: CredentialType length must be < 128.'
     assert.throws(
-      () => validateAMMDelete(ammDelete),
+      () => validateCredentialAccept(credentialAccept),
       ValidationError,
       errorMessage,
     )
-    assert.throws(() => validate(ammDelete), ValidationError, errorMessage)
+    assert.throws(
+      () => validate(credentialAccept),
+      ValidationError,
+      errorMessage,
+    )
   })
 
   it(`throws w/ credential type field empty`, function () {
-    delete ammDelete.Asset
-    const errorMessage = 'AMMDelete: missing field Asset'
+    credentialAccept.CredentialType = ''
+    const errorMessage = 'CredentialAccept: CredentialType length must be > 0.'
     assert.throws(
-      () => validateAMMDelete(ammDelete),
+      () => validateCredentialAccept(credentialAccept),
       ValidationError,
       errorMessage,
     )
-    assert.throws(() => validate(ammDelete), ValidationError, errorMessage)
+    assert.throws(
+      () => validate(credentialAccept),
+      ValidationError,
+      errorMessage,
+    )
   })
 
   it(`throws w/ credential type field not hex`, function () {
-    delete ammDelete.Asset
-    const errorMessage = 'AMMDelete: missing field Asset'
+    credentialAccept.CredentialType = 'this is not hex'
+    const errorMessage =
+      'CredentialAccept: CredentialType myust be encoded in hex.'
     assert.throws(
-      () => validateAMMDelete(ammDelete),
+      () => validateCredentialAccept(credentialAccept),
       ValidationError,
       errorMessage,
     )
-    assert.throws(() => validate(ammDelete), ValidationError, errorMessage)
+    assert.throws(
+      () => validate(credentialAccept),
+      ValidationError,
+      errorMessage,
+    )
   })
 })

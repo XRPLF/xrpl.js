@@ -40,8 +40,16 @@ export function validateCredentialAccept(tx: Record<string, unknown>): void {
     throw new ValidationError('CredentialAccept: missing field Account')
   }
 
+  if (typeof tx.Account !== 'string') {
+    throw new ValidationError('CredentialAccept: Account must be a string')
+  }
+
   if (tx.Issuer == null) {
     throw new ValidationError('CredentialAccept: missing field Issuer')
+  }
+
+  if (typeof tx.Issuer !== 'string') {
+    throw new ValidationError('CredentialAccept: Issuer must be a string')
   }
 
   validateCredentialType(tx)
