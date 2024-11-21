@@ -23,7 +23,7 @@ import { Clawback, validateClawback } from './clawback'
 import {
   BaseTransaction,
   isIssuedCurrency,
-  validateTxAgainstCustomDefintions,
+  validateTxAgainstCustomDefinitions,
 } from './common'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { DIDDelete, validateDIDDelete } from './DIDDelete'
@@ -418,7 +418,7 @@ export function validate(
 
     default:
       if (customDefinitions) {
-        validateTxAgainstCustomDefintions(tx, customDefinitions)
+        validateTxAgainstCustomDefinitions(tx, customDefinitions)
       } else {
         throw new ValidationError(
           `Invalid field TransactionType: ${tx.TransactionType}`,
