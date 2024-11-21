@@ -358,7 +358,7 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
  * @param definitions - Custom definitions
  * @throws When the passed transaction type is not found in the definitions.
  */
-export function validateTxAgainstCustomDefintions(
+export function validateTxAgainstCustomDefinitions(
   tx: Record<string, unknown>,
   definitions: XrplDefinitionsBase,
 ): void {
