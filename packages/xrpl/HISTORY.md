@@ -6,6 +6,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion
+* Adds support for Custom Definitions to `client.submit()` and `client.submitAndWait()`
 
 ## 4.0.0 (2024-07-15)
 
