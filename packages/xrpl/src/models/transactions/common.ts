@@ -420,7 +420,7 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
       `${
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- base check validates type
         tx.TransactionType as string
-      }: CredentialType length sust be < ${MAX_CREDENTIAL_TYPE_LENGTH}.`,
+      }: CredentialType length must be < ${MAX_CREDENTIAL_TYPE_LENGTH}.`,
     )
   }
 
