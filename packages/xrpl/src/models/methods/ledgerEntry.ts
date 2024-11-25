@@ -87,7 +87,18 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
    * the entry, as hexadecimal. If an object, requires subject, issuer, and
    * credential_type sub-fields.
    */
-  credential?: AuthorizeCredential | string
+  credential?:
+    | {
+        /** The account that is the subject of the credential. */
+        subject: string
+
+        /** The account that issued the credential. */
+        issuer: string
+
+        /** The type of the credential, as issued. */
+        credentialType: string
+      }
+    | string
 
   /**
    * Specify a DepositPreauth object to retrieve. If a string, must be the
