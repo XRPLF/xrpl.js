@@ -91,9 +91,13 @@ function validateCredentialsList(credentials: unknown): void {
     return false
   }
 
-  if (!isAuthorizeCredential(credentials[0])) {
-    throw new ValidationError('DepositPreauth: Invalid Credentials list format')
-  }
+  credentials.forEach((credential) => {
+    if (!isAuthorizeCredential(credential)) {
+      throw new ValidationError(
+        'DepositPreauth: Invalid Credentials list format',
+      )
+    }
+  })
 
   const credentialsSet = new Set(credentials)
   if (credentialsSet.size !== credentials.length) {
