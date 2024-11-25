@@ -1,9 +1,12 @@
 import { HEX_REGEX } from '@xrplf/isomorphic/dist/utils'
 
-import { BaseTransaction } from '../../../dist/npm'
 import { ValidationError } from '../../errors'
 
-import { validateBaseTransaction, validateCredentialType } from './common'
+import {
+  BaseTransaction,
+  validateBaseTransaction,
+  validateCredentialType,
+} from './common'
 
 const MAX_URI_LENGTH = 256
 

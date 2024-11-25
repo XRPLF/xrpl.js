@@ -1,7 +1,10 @@
-import { BaseTransaction } from '../../../dist/npm'
 import { ValidationError } from '../../errors'
 
-import { validateBaseTransaction, validateCredentialType } from './common'
+import {
+  BaseTransaction,
+  validateBaseTransaction,
+  validateCredentialType,
+} from './common'
 
 /**
  * Credentials are represented in hex. Whilst they are allowed a maximum length of 64

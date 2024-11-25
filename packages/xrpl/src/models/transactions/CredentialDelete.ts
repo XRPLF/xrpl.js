@@ -1,7 +1,10 @@
-import { BaseTransaction } from '../../../dist/npm'
 import { ValidationError } from '../../errors'
 
-import { validateBaseTransaction, validateCredentialType } from './common'
+import {
+  BaseTransaction,
+  validateBaseTransaction,
+  validateCredentialType,
+} from './common'
 
 /**
  * Deletes a Credential object.
