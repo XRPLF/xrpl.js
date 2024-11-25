@@ -2,8 +2,11 @@ import { ValidationError } from '../../errors'
 
 import {
   BaseTransaction,
+  isString,
   validateBaseTransaction,
   validateCredentialType,
+  validateOptionalField,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -42,21 +45,11 @@ export function validateCredentialDelete(tx: Record<string, unknown>): void {
     )
   }
 
-  if (tx.Account == null) {
-    throw new ValidationError('CredentialDelete: missing field Account')
-  }
+  validateRequiredField(tx, 'Account', isString)
 
-  if (typeof tx.Account !== 'string') {
-    throw new ValidationError('CredentialDelete: Account must be a string')
-  }
+  validateOptionalField(tx, 'Subject', isString)
 
-  if (tx.Subject && typeof tx.Subject !== 'string') {
-    throw new ValidationError('CredentialDelete: Subject must be a string')
-  }
-
-  if (tx.Issuer && typeof tx.Issuer !== 'string') {
-    throw new ValidationError('CredentialDelete: Issuer must be a string')
-  }
+  validateOptionalField(tx, 'Issuer', isString)
 
   validateCredentialType(tx)
 }

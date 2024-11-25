@@ -4,8 +4,12 @@ import { ValidationError } from '../../errors'
 
 import {
   BaseTransaction,
+  isNumber,
+  isString,
   validateBaseTransaction,
   validateCredentialType,
+  validateOptionalField,
+  validateRequiredField,
 } from './common'
 
 const MAX_URI_LENGTH = 256
@@ -43,25 +47,11 @@ export interface CredentialCreate extends BaseTransaction {
 export function validateCredentialCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Account == null) {
-    throw new ValidationError('CredentialCreate: missing field Account')
-  }
+  validateRequiredField(tx, 'Account', isString)
 
-  if (typeof tx.Account !== 'string') {
-    throw new ValidationError('CredentialCreate: Account must be a string')
-  }
+  validateRequiredField(tx, 'Subject', isString)
 
-  if (tx.Subject == null) {
-    throw new ValidationError('CredentialCreate: missing field Subject')
-  }
-
-  if (typeof tx.Subject !== 'string') {
-    throw new ValidationError('CredentialCreate: Subject must be a string')
-  }
-
-  if (tx.expiration && typeof tx.expiration !== 'number') {
-    throw new ValidationError('CredentialCreate: Expiration must be a number')
-  }
+  validateOptionalField(tx, 'Expiration', isNumber)
 
   validateURI(tx.URI)
 
@@ -74,7 +64,7 @@ function validateURI(uri: unknown): void {
   }
 
   if (typeof uri !== 'string') {
-    throw new ValidationError('CredentialCreate: URI must be a string')
+    throw new ValidationError('CredentialCreate: invalid field URI')
   }
 
   if (uri.length === 0) {
