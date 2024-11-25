@@ -1,6 +1,11 @@
 import { ValidationError } from '../../errors'
 
-import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  GlobalFlags,
+  validateBaseTransaction,
+  validateCredentialsList,
+} from './common'
 
 /**
  * Enum representing values for PaymentChannelClaim transaction flags.
@@ -141,6 +146,11 @@ export interface PaymentChannelClaim extends BaseTransaction {
  */
 export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+
+  if (tx.CredentialIDs !== undefined) {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
+    validateCredentialsList(tx.CredentialIDs, tx.TransactionType as string)
+  }
 
   if (tx.Channel === undefined) {
     throw new ValidationError('PaymentChannelClaim: missing Channel')

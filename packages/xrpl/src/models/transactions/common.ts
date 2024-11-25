@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- common utility file */
 import { HEX_REGEX } from '@xrplf/isomorphic/dist/utils'
 import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
@@ -5,6 +6,7 @@ import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 import { ValidationError } from '../../errors'
 import {
   Amount,
+  AuthorizeCredential,
   Currency,
   IssuedCurrencyAmount,
   Memo,
@@ -430,6 +432,59 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- base check validates type
         tx.TransactionType as string
       }: CredentialType myust be encoded in hex`,
+    )
+  }
+}
+
+const MAX_CREDENTIALS_LIST_LENGTH = 8
+/**
+ * Check a CredentialAuthorize array for parameter errors
+ *
+ * @param credentials An array of credential IDs to check for errors
+ * @param transactionType The transaction type to include in error messages
+ * @throws Validation Error if the formatting is incorrect
+ */
+export function validateCredentialsList(
+  credentials: unknown,
+  transactionType: string,
+): void {
+  if (!Array.isArray(credentials)) {
+    throw new ValidationError(
+      `${transactionType}: Credentials list must be an array`,
+    )
+  }
+
+  if (credentials.length > MAX_CREDENTIALS_LIST_LENGTH) {
+    throw new ValidationError(
+      `${transactionType}: Credentials list cannot have more than 8 elements`,
+    )
+  } else if (credentials.length === 0) {
+    throw new ValidationError(
+      `${transactionType}: Credentials list cannot be empty`,
+    )
+  }
+
+  function isAuthorizeCredential(
+    value: AuthorizeCredential,
+  ): value is AuthorizeCredential {
+    if (value.Credential.CredentialType && value.Credential.Issuer) {
+      return true
+    }
+    return false
+  }
+
+  credentials.forEach((credential) => {
+    if (!isAuthorizeCredential(credential)) {
+      throw new ValidationError(
+        `${transactionType}: Invalid Credentials list format`,
+      )
+    }
+  })
+
+  const credentialsSet = new Set(credentials)
+  if (credentialsSet.size !== credentials.length) {
+    throw new ValidationError(
+      `${transactionType}: Credentials list cannot contain duplicates`,
     )
   }
 }
