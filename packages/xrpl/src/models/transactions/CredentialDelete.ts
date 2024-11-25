@@ -52,7 +52,7 @@ export function validateCredentialDelete(tx: Record<string, unknown>): void {
   }
 
   if (tx.Issuer && typeof tx.Issuer !== 'string') {
-    throw new ValidationError('CredentialDelete: Subject must be a string')
+    throw new ValidationError('CredentialDelete: Issuer must be a string')
   }
 
   validateCredentialType(tx)
