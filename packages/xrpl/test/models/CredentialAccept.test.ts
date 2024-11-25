@@ -15,8 +15,8 @@ describe('CredentialAccept', function () {
   beforeEach(function () {
     credentialAccept = {
       TransactionType: 'CredentialAccept',
-      issuer: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
-      subject: 'rNdY9XDnQ4Dr1EgefwU3CBRuAjt3sAutGg',
+      Issuer: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
+      Account: 'rNdY9XDnQ4Dr1EgefwU3CBRuAjt3sAutGg',
       CredentialType: stringToHex('Passport'),
       Sequence: 1337,
       Flags: 0,
@@ -28,7 +28,7 @@ describe('CredentialAccept', function () {
     assert.doesNotThrow(() => validate(credentialAccept))
   })
 
-  it(`throws w/ missing field issuer`, function () {
+  it(`throws w/ missing field Account`, function () {
     delete credentialAccept.issuer
     const errorMessage = 'CredentialAccept: missing field Issuer'
     assert.throws(
@@ -43,9 +43,9 @@ describe('CredentialAccept', function () {
     )
   })
 
-  it(`throws w/ missing field subject`, function () {
-    delete credentialAccept.subject
-    const errorMessage = 'CredentialAccept: missing field Subject'
+  it(`throws w/ Account not a string`, function () {
+    credentialAccept.account = 123
+    const errorMessage = 'CredentialAccept: Account must be a string'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),
       ValidationError,
@@ -58,7 +58,37 @@ describe('CredentialAccept', function () {
     )
   })
 
-  it(`throws w/ missing field credential_type`, function () {
+  it(`throws w/ missing field Issuer`, function () {
+    delete credentialAccept.Issuer
+    const errorMessage = 'CredentialAccept: missing field Issuer'
+    assert.throws(
+      () => validateCredentialAccept(credentialAccept),
+      ValidationError,
+      errorMessage,
+    )
+    assert.throws(
+      () => validate(credentialAccept),
+      ValidationError,
+      errorMessage,
+    )
+  })
+
+  it(`throws w/ Issuer not a string`, function () {
+    credentialAccept.Issuer = 123
+    const errorMessage = 'CredentialAccept: Issuer must be a string'
+    assert.throws(
+      () => validateCredentialAccept(credentialAccept),
+      ValidationError,
+      errorMessage,
+    )
+    assert.throws(
+      () => validate(credentialAccept),
+      ValidationError,
+      errorMessage,
+    )
+  })
+
+  it(`throws w/ missing field CredentialType`, function () {
     delete credentialAccept.CredentialType
     const errorMessage = 'CredentialAccept: missing field CredentialType'
     assert.throws(
@@ -75,7 +105,7 @@ describe('CredentialAccept', function () {
 
   it(`throws w/ credential type field too long`, function () {
     credentialAccept.CredentialType = stringToHex(
-      'PassportPassportPassportPassportPassportPassportPassportPassportPassport',
+      'PassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassport',
     )
     const errorMessage =
       'CredentialAccept: CredentialType length must be < 128.'

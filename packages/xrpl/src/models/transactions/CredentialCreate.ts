@@ -57,7 +57,7 @@ export function validateCredentialCreate(tx: Record<string, unknown>): void {
   }
 
   if (tx.expiration && typeof tx.expiration !== 'number') {
-    throw new ValidationError('expiration must be a number')
+    throw new ValidationError('CredentialCreate: Expiration must be a number')
   }
 
   validateURI(tx.URI)

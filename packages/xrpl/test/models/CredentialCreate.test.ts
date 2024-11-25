@@ -58,7 +58,7 @@ describe('credentialCreate', function () {
     )
   })
 
-  it(`throws w/ missing field credential_type`, function () {
+  it(`throws w/ missing field credentialType`, function () {
     delete credentialCreate.CredentialType
     const errorMessage = 'CredentialCreate: missing field CredentialType'
     assert.throws(
@@ -75,7 +75,7 @@ describe('credentialCreate', function () {
 
   it(`throws w/ credential type field too long`, function () {
     credentialCreate.CredentialType = stringToHex(
-      'PassportPassportPassportPassportPassportPassportPassportPassportPassport',
+      'PassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassport',
     )
     const errorMessage =
       'CredentialCreate: CredentialType length must be < 128.'
