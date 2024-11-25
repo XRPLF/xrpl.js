@@ -83,6 +83,6 @@ function validateURI(uri: unknown): void {
   }
 
   if (!HEX_REGEX.test(uri)) {
-    throw new ValidationError('CredentialCreate: URI must be hex encoded')
+    throw new ValidationError('CredentialCreate: URI must be encoded in hex')
   }
 }

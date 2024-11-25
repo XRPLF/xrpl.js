@@ -103,12 +103,11 @@ describe('CredentialAccept', function () {
     )
   })
 
-  it(`throws w/ credential type field too long`, function () {
+  it(`throws w/ credentialType field too long`, function () {
     credentialAccept.CredentialType = stringToHex(
       'PassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassport',
     )
-    const errorMessage =
-      'CredentialAccept: CredentialType length must be < 128.'
+    const errorMessage = 'CredentialAccept: CredentialType length must be < 128'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),
       ValidationError,
@@ -121,9 +120,9 @@ describe('CredentialAccept', function () {
     )
   })
 
-  it(`throws w/ credential type field empty`, function () {
+  it(`throws w/ credentialType field empty`, function () {
     credentialAccept.CredentialType = ''
-    const errorMessage = 'CredentialAccept: CredentialType length must be > 0.'
+    const errorMessage = 'CredentialAccept: CredentialType length must be > 0'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),
       ValidationError,
@@ -136,10 +135,10 @@ describe('CredentialAccept', function () {
     )
   })
 
-  it(`throws w/ credential type field not hex`, function () {
+  it(`throws w/ credentialType field not hex`, function () {
     credentialAccept.CredentialType = 'this is not hex'
     const errorMessage =
-      'CredentialAccept: CredentialType myust be encoded in hex.'
+      'CredentialAccept: CredentialType myust be encoded in hex'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),
       ValidationError,

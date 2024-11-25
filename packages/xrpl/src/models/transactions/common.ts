@@ -413,14 +413,14 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
   if (tx.credentialType.length === 0) {
     throw new ValidationError(
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- base check validates type
-      `${tx.TransactionType as string}: CredentialType length must be > 0.`,
+      `${tx.TransactionType as string}: CredentialType length must be > 0`,
     )
   } else if (tx.credentialType.length > MAX_CREDENTIAL_TYPE_LENGTH) {
     throw new ValidationError(
       `${
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- base check validates type
         tx.TransactionType as string
-      }: CredentialType length must be < ${MAX_CREDENTIAL_TYPE_LENGTH}.`,
+      }: CredentialType length must be < ${MAX_CREDENTIAL_TYPE_LENGTH}`,
     )
   }
 
@@ -429,7 +429,7 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
       `${
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- base check validates type
         tx.TransactionType as string
-      }: CredentialType myust be encoded in hex.`,
+      }: CredentialType myust be encoded in hex`,
     )
   }
 }
