@@ -85,7 +85,7 @@ function validateCredentialsList(credentials: unknown): void {
   function isAuthorizeCredential(
     value: AuthorizeCredential,
   ): value is AuthorizeCredential {
-    if (value.Credential.CredentialType && value.Credential.issuer) {
+    if (value.Credential.CredentialType && value.Credential.Issuer) {
       return true
     }
     return false
@@ -117,7 +117,7 @@ function validateSingleAuthorizationFieldProvided(
 
   if (normalAuthorizeXOR === authorizeCredentialsXOR) {
     throw new ValidationError(
-      'DepositPreauth txn requires exactly one input amongst authorize, unauthorize, authorize_credentials and unauthorize_credentials.',
+      'DepositPreauth: Requires exactly one input amongst Authorize, Unauthorize, AuthorizeCredentials and UnauthorizeCredentials.',
     )
   }
 }
