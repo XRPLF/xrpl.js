@@ -1,4 +1,4 @@
-import { AuthorizeCredential, Currency, XChainBridge } from '../common'
+import { Currency, XChainBridge } from '../common'
 import { LedgerEntry } from '../ledger'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
