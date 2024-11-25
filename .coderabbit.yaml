@@ -13,6 +13,8 @@ reviews:
   review_status: true
   # Generate walkthrough in a markdown collapsible section.
   collapse_walkthrough: false
+  # Generate sequence diagrams in the walkthrough.
+  sequence_diagrams: false
   # Abort the in-progress review if the pull request is closed or merged.
   abort_on_close: true
   auto_review:
