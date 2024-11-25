@@ -1,9 +1,9 @@
-import { ValidationError } from '../../errors'
-
 import {
   BaseTransaction,
+  isString,
   validateBaseTransaction,
   validateCredentialType,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -39,21 +39,9 @@ export interface CredentialAccept extends BaseTransaction {
 export function validateCredentialAccept(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Account == null) {
-    throw new ValidationError('CredentialAccept: missing field Account')
-  }
+  validateRequiredField(tx, 'Account', isString)
 
-  if (typeof tx.Account !== 'string') {
-    throw new ValidationError('CredentialAccept: Account must be a string')
-  }
-
-  if (tx.Issuer == null) {
-    throw new ValidationError('CredentialAccept: missing field Issuer')
-  }
-
-  if (typeof tx.Issuer !== 'string') {
-    throw new ValidationError('CredentialAccept: Issuer must be a string')
-  }
+  validateRequiredField(tx, 'Issuer', isString)
 
   validateCredentialType(tx)
 }
