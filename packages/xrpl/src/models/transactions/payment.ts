@@ -12,6 +12,7 @@ import {
   validateOptionalField,
   isNumber,
   Account,
+  validateCredentialsList,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -180,6 +181,11 @@ export function validatePayment(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
+
+  if (tx.CredentialIDs !== undefined) {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
+    validateCredentialsList(tx.CredentialIDs, tx.TransactionType as string)
+  }
 
   if (tx.InvoiceID !== undefined && typeof tx.InvoiceID !== 'string') {
     throw new ValidationError('PaymentTransaction: InvoiceID must be a string')

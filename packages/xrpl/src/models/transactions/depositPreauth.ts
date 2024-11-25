@@ -1,9 +1,11 @@
 import { ValidationError } from '../../errors'
 import { AuthorizeCredential } from '../common'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
-
-const MAX_CREDENTIALS_LIST_LENGTH = 8
+import {
+  BaseTransaction,
+  validateBaseTransaction,
+  validateCredentialsList,
+} from './common'
 
 /**
  * A DepositPreauth transaction gives another account pre-approval to deliver
@@ -59,50 +61,16 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
       )
     }
   } else if (tx.AuthorizeCredentials !== undefined) {
-    validateCredentialsList(tx.AuthorizeCredentials)
+    validateCredentialsList(
+      tx.AuthorizeCredentials,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- confirmed in base transaction check
+      tx.TransactionType as string,
+    )
   } else if (tx.UnauthorizeCredentials !== undefined) {
-    validateCredentialsList(tx.UnauthorizeCredentials)
-  }
-}
-
-function validateCredentialsList(credentials: unknown): void {
-  if (!Array.isArray(credentials)) {
-    throw new ValidationError(
-      'DepositPreauth: Credentials list must be an array',
-    )
-  }
-
-  if (credentials.length > MAX_CREDENTIALS_LIST_LENGTH) {
-    throw new ValidationError(
-      'DepositPreauth: Credentials list cannot have more than 8 elements',
-    )
-  } else if (credentials.length === 0) {
-    throw new ValidationError(
-      'DepositPreauth: Credentials list cannot be empty',
-    )
-  }
-
-  function isAuthorizeCredential(
-    value: AuthorizeCredential,
-  ): value is AuthorizeCredential {
-    if (value.Credential.CredentialType && value.Credential.Issuer) {
-      return true
-    }
-    return false
-  }
-
-  credentials.forEach((credential) => {
-    if (!isAuthorizeCredential(credential)) {
-      throw new ValidationError(
-        'DepositPreauth: Invalid Credentials list format',
-      )
-    }
-  })
-
-  const credentialsSet = new Set(credentials)
-  if (credentialsSet.size !== credentials.length) {
-    throw new ValidationError(
-      'DepositPreauth: Credentials list cannot contain duplicates',
+    validateCredentialsList(
+      tx.UnauthorizeCredentials,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- confirmed in base transaction check
+      tx.TransactionType as string,
     )
   }
 }
