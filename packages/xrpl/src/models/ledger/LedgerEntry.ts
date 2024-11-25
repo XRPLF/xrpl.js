@@ -24,6 +24,7 @@ type LedgerEntry =
   | AMM
   | Bridge
   | Check
+  | Credential
   | DepositPreauth
   | DirectoryNode
   | Escrow
