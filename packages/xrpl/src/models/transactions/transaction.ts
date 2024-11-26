@@ -19,9 +19,9 @@ import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
 import { BaseTransaction, isIssuedCurrency } from './common'
-import { validateCredentialAccept } from './CredentialAccept'
-import { validateCredentialCreate } from './CredentialCreate'
-import { validateCredentialDelete } from './CredentialDelete'
+import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
+import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
+import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { DIDDelete, validateDIDDelete } from './DIDDelete'
 import { DIDSet, validateDIDSet } from './DIDSet'
@@ -125,6 +125,9 @@ export type SubmittableTransaction =
   | CheckCash
   | CheckCreate
   | Clawback
+  | CredentialAccept
+  | CredentialCreate
+  | CredentialDelete
   | DIDDelete
   | DIDSet
   | DepositPreauth
