@@ -79,11 +79,13 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
 function validateSingleAuthorizationFieldProvided(
   tx: Record<string, unknown>,
 ): void {
-  const normalAuthorizeXOR = !tx.Authorize !== !tx.Unauthorize
-  const authorizeCredentialsXOR =
-    !tx.AuthorizeCredentials !== !tx.UnauthorizeCredentials
+  const countProvided =
+    Number(tx.Authorize !== undefined) +
+    Number(tx.Unauthorize !== undefined) +
+    Number(tx.AuthorizeCredentials !== undefined) +
+    Number(tx.UnauthorizeCredentials !== undefined)
 
-  if (normalAuthorizeXOR === authorizeCredentialsXOR) {
+  if (countProvided !== 1) {
     throw new ValidationError(
       'DepositPreauth: Requires exactly one input amongst Authorize, Unauthorize, AuthorizeCredentials and UnauthorizeCredentials.',
     )

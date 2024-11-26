@@ -47,7 +47,7 @@ describe('credentialCreate', function () {
 
   it(`throws w/ Account not string`, function () {
     credentialCreate.Account = 123
-    const errorMessage = 'CredentialCreate: Account must be a string'
+    const errorMessage = 'CredentialCreate: invalid field Account'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
       ValidationError,
@@ -77,7 +77,7 @@ describe('credentialCreate', function () {
 
   it(`throws w/ Subject not string`, function () {
     credentialCreate.Subject = 123
-    const errorMessage = 'CredentialCreate: Subject must be a string'
+    const errorMessage = 'CredentialCreate: invalid field Subject'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
       ValidationError,
@@ -109,8 +109,7 @@ describe('credentialCreate', function () {
     credentialCreate.CredentialType = stringToHex(
       'PassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassport',
     )
-    const errorMessage =
-      'CredentialCreate: CredentialType length must be < 128.'
+    const errorMessage = 'CredentialCreate: CredentialType length must be < 128'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
       ValidationError,
@@ -125,7 +124,7 @@ describe('credentialCreate', function () {
 
   it(`throws w/ credentialType field empty`, function () {
     credentialCreate.CredentialType = ''
-    const errorMessage = 'CredentialCreate: CredentialType length must be > 0.'
+    const errorMessage = 'CredentialCreate: CredentialType length must be > 0'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
       ValidationError,
@@ -141,7 +140,7 @@ describe('credentialCreate', function () {
   it(`throws w/ credentialType field not hex`, function () {
     credentialCreate.CredentialType = 'this is not hex'
     const errorMessage =
-      'CredentialCreate: CredentialType myust be encoded in hex'
+      'CredentialCreate: CredentialType must be encoded in hex'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
       ValidationError,
@@ -156,7 +155,7 @@ describe('credentialCreate', function () {
 
   it(`throws w/ Expiration field not number`, function () {
     credentialCreate.Expiration = 'this is not a number'
-    const errorMessage = 'CredentialCreate: Expiration must be a number'
+    const errorMessage = 'CredentialCreate: invalid field Expiration'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
       ValidationError,
@@ -171,7 +170,7 @@ describe('credentialCreate', function () {
 
   it(`throws w/ URI field not a string`, function () {
     credentialCreate.URI = 123
-    const errorMessage = 'CredentialCreate: URI must be a string'
+    const errorMessage = 'CredentialCreate: invalid field URI'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
       ValidationError,
@@ -201,7 +200,7 @@ describe('credentialCreate', function () {
 
   it(`throws w/ URI field too long`, function () {
     credentialCreate.URI = stringToHex(
-      'This is beyond the character limit This is beyond the character limit This is beyond the character limit',
+      'This is beyond the character limit This is beyond the character limit This is beyond the character limitThis is beyond the character limit This is beyond the character limit This is beyond the character limitThis is beyond the character limit This is beyond the character limit This is beyond the character limit',
     )
     const errorMessage = 'CredentialCreate: URI length must be <= 256'
     assert.throws(
@@ -217,7 +216,7 @@ describe('credentialCreate', function () {
   })
 
   it(`throws w/ URI field not hex`, function () {
-    credentialCreate.CredentialType = 'this is not hex'
+    credentialCreate.URI = 'this is not hex'
     const errorMessage = 'CredentialCreate: URI must be encoded in hex'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
