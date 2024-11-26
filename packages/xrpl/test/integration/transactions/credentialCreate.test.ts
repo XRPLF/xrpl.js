@@ -1,8 +1,7 @@
 import { hexToString } from '@xrplf/isomorphic/dist/utils'
 import { assert } from 'chai'
-import { isValidClassicAddress } from 'xrpl'
 
-import { AccountObjectsResponse, AMMInfoResponse } from '../../../src'
+import { AccountObjectsResponse } from '../../../src'
 import { CredentialCreate } from '../../../src/models/transactions/CredentialCreate'
 import serverUrl from '../serverUrl'
 import {
@@ -10,7 +9,7 @@ import {
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import { createAMMPool, generateFundedWallet, testTransaction } from '../utils'
+import { generateFundedWallet, testTransaction } from '../utils'
 
 describe('CredentialCreate', function () {
   let testContext: XrplIntegrationTestContext
