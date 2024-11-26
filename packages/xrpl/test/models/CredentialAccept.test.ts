@@ -29,7 +29,7 @@ describe('CredentialAccept', function () {
   })
 
   it(`throws w/ missing field Account`, function () {
-    delete credentialAccept.issuer
+    delete credentialAccept.Issuer
     const errorMessage = 'CredentialAccept: missing field Issuer'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),
@@ -44,8 +44,8 @@ describe('CredentialAccept', function () {
   })
 
   it(`throws w/ Account not a string`, function () {
-    credentialAccept.account = 123
-    const errorMessage = 'CredentialAccept: Account must be a string'
+    credentialAccept.Account = 123
+    const errorMessage = 'CredentialAccept: invalid field Account'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),
       ValidationError,
@@ -75,7 +75,7 @@ describe('CredentialAccept', function () {
 
   it(`throws w/ Issuer not a string`, function () {
     credentialAccept.Issuer = 123
-    const errorMessage = 'CredentialAccept: Issuer must be a string'
+    const errorMessage = 'CredentialAccept: invalid field Issuer'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),
       ValidationError,
@@ -138,7 +138,7 @@ describe('CredentialAccept', function () {
   it(`throws w/ credentialType field not hex`, function () {
     credentialAccept.CredentialType = 'this is not hex'
     const errorMessage =
-      'CredentialAccept: CredentialType myust be encoded in hex'
+      'CredentialAccept: CredentialType must be encoded in hex'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),
       ValidationError,

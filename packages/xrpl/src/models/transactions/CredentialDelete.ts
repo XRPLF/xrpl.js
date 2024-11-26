@@ -39,9 +39,9 @@ export interface CredentialDelete extends BaseTransaction {
 export function validateCredentialDelete(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (!tx.Account && !tx.Issuer) {
+  if (!tx.Subject && !tx.Issuer) {
     throw new ValidationError(
-      'CredentialDelete: Neither `issuer` nor `subject` was provided',
+      'CredentialDelete: Neither `Issuer` nor `Subject` was provided',
     )
   }
 

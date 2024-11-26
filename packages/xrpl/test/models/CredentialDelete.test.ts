@@ -46,7 +46,7 @@ describe('CredentialDelete', function () {
 
   it(`throws w/ Account not string`, function () {
     credentialDelete.Account = 123
-    const errorMessage = 'CredentialDelete: Account must be a string'
+    const errorMessage = 'CredentialDelete: invalid field Account'
     assert.throws(
       () => validateCredentialDelete(credentialDelete),
       ValidationError,
@@ -61,7 +61,7 @@ describe('CredentialDelete', function () {
 
   it(`throws w/ Subject not string`, function () {
     credentialDelete.Subject = 123
-    const errorMessage = 'CredentialDelete: Subject must be a string'
+    const errorMessage = 'CredentialDelete: invalid field Subject'
     assert.throws(
       () => validateCredentialDelete(credentialDelete),
       ValidationError,
@@ -76,7 +76,7 @@ describe('CredentialDelete', function () {
 
   it(`throws w/ Issuer not string`, function () {
     credentialDelete.Issuer = 123
-    const errorMessage = 'CredentialDelete: Issuer must be a string'
+    const errorMessage = 'CredentialDelete: invalid field Issuer'
     assert.throws(
       () => validateCredentialDelete(credentialDelete),
       ValidationError,
@@ -93,7 +93,7 @@ describe('CredentialDelete', function () {
     delete credentialDelete.Subject
     delete credentialDelete.Issuer
     const errorMessage =
-      'CredentialDelete: Neither `issuer` nor `subject` was provided'
+      'CredentialDelete: Neither `Issuer` nor `Subject` was provided'
     assert.throws(
       () => validateCredentialDelete(credentialDelete),
       ValidationError,
@@ -125,8 +125,7 @@ describe('CredentialDelete', function () {
     credentialDelete.CredentialType = stringToHex(
       'PassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassport',
     )
-    const errorMessage =
-      'credentialDelete: CredentialType length must be < 128.'
+    const errorMessage = 'CredentialDelete: CredentialType length must be < 128'
     assert.throws(
       () => validateCredentialDelete(credentialDelete),
       ValidationError,
@@ -141,7 +140,7 @@ describe('CredentialDelete', function () {
 
   it(`throws w/ credentialType field empty`, function () {
     credentialDelete.CredentialType = ''
-    const errorMessage = 'CredentialDelete: CredentialType length must be > 0.'
+    const errorMessage = 'CredentialDelete: CredentialType length must be > 0'
     assert.throws(
       () => validateCredentialDelete(credentialDelete),
       ValidationError,
@@ -157,7 +156,7 @@ describe('CredentialDelete', function () {
   it(`throws w/ credentialType field not hex`, function () {
     credentialDelete.CredentialType = 'this is not hex'
     const errorMessage =
-      'CredentialDelete: CredentialType myust be encoded in hex.'
+      'CredentialDelete: CredentialType must be encoded in hex'
     assert.throws(
       () => validateCredentialDelete(credentialDelete),
       ValidationError,

@@ -399,25 +399,25 @@ const MAX_CREDENTIAL_TYPE_LENGTH = 64 * 2
  * @throws Validation Error if the formatting is incorrect
  */
 export function validateCredentialType(tx: Record<string, unknown>): void {
-  if (tx.credentialType === undefined) {
+  if (tx.CredentialType === undefined) {
     throw new ValidationError(
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- base check validates type
       `${tx.TransactionType}: missing field CredentialType`,
     )
   }
 
-  if (typeof tx.credentialType !== 'string') {
+  if (typeof tx.CredentialType !== 'string') {
     throw new ValidationError(
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- base check validates type
       `${tx.TransactionType}: CredentialType must be a string`,
     )
   }
-  if (tx.credentialType.length === 0) {
+  if (tx.CredentialType.length === 0) {
     throw new ValidationError(
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- base check validates type
       `${tx.TransactionType as string}: CredentialType length must be > 0`,
     )
-  } else if (tx.credentialType.length > MAX_CREDENTIAL_TYPE_LENGTH) {
+  } else if (tx.CredentialType.length > MAX_CREDENTIAL_TYPE_LENGTH) {
     throw new ValidationError(
       `${
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- base check validates type
@@ -426,12 +426,12 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
     )
   }
 
-  if (!HEX_REGEX.test(tx.credentialType)) {
+  if (!HEX_REGEX.test(tx.CredentialType)) {
     throw new ValidationError(
       `${
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- base check validates type
         tx.TransactionType as string
-      }: CredentialType myust be encoded in hex`,
+      }: CredentialType must be encoded in hex`,
     )
   }
 }
