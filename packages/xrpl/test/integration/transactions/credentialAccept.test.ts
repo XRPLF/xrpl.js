@@ -1,16 +1,18 @@
+import { hexToString } from '@xrplf/isomorphic/dist/utils'
 import { assert } from 'chai'
-import { isValidClassicAddress } from 'xrpl'
 
-import { AMMInfoResponse } from '../../../src'
+import { AccountObjectsResponse } from '../../../src'
+import { CredentialCreate } from '../../../src/models/transactions/CredentialCreate'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import { createAMMPool } from '../utils'
+import { generateFundedWallet, testTransaction } from '../utils'
+import { CredentialAccept } from '../../../src/models/transactions/CredentialAccept'
 
-describe('CredentialAccept', function () {
+describe('CredentialCreate', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeAll(async () => {
@@ -19,27 +21,45 @@ describe('CredentialAccept', function () {
   afterAll(async () => teardownClient(testContext))
 
   it('base', async function () {
-    const ammPool = await createAMMPool(testContext.client)
+    const subjectWallet = await generateFundedWallet(testContext.client)
 
-    const { asset, asset2 } = ammPool
+    const credentialCreateTx: CredentialCreate = {
+      TransactionType: 'CredentialCreate',
+      Account: testContext.wallet.classicAddress,
+      Subject: subjectWallet.classicAddress,
+      CredentialType: hexToString('Test Credential Type'),
+    }
 
-    const ammInfoRes: AMMInfoResponse = await testContext.client.request({
-      command: 'amm_info',
-      asset,
-      asset2,
-    })
-    const { amm } = ammInfoRes.result
+    const credentialCreateResponse = await testTransaction(
+      testContext.client,
+      credentialCreateTx,
+      testContext.wallet,
+    )
 
-    assert.ok(asset2.issuer)
+    console.log('credentialCreateResponse', credentialCreateResponse)
 
-    assert.isTrue(isValidClassicAddress(amm.account))
-    assert.equal(amm.amount, '250')
-    assert.deepEqual(amm.amount2, {
-      currency: asset2.currency,
-      // @ts-expect-error: asset2.issuer should be defined at this point
-      issuer: asset2.issuer,
-      value: '250',
-    })
-    assert.equal(amm.trading_fee, 12)
+    const credentialAcceptTx: CredentialAccept = {
+      TransactionType: 'CredentialAccept',
+      Account: subjectWallet.classicAddress,
+      Issuer: testContext.wallet.classicAddress,
+      CredentialType: hexToString('Test Credential Type'),
+    }
+
+    const credentialAcceptResponse = await testTransaction(
+      testContext.client,
+      credentialAcceptTx,
+      subjectWallet,
+    )
+
+    console.log('credentialAcceptResponse', credentialAcceptResponse)
+
+    const accountObjectsResponse: AccountObjectsResponse =
+      await testContext.client.request({
+        command: 'account_objects',
+        account: subjectWallet.classicAddress,
+      })
+    const { account_objects } = accountObjectsResponse.result
+
+    assert.equal(account_objects.length, 1)
   })
 })
