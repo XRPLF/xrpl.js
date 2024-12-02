@@ -2,6 +2,7 @@ import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
 import { AccountObjectsResponse } from '../../../src'
+import { CredentialAccept } from '../../../src/models/transactions/CredentialAccept'
 import { CredentialCreate } from '../../../src/models/transactions/CredentialCreate'
 import serverUrl from '../serverUrl'
 import {
@@ -10,9 +11,9 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
-import { CredentialAccept } from '../../../src/models/transactions/CredentialAccept'
 
 describe('CredentialCreate', function () {
+  // testContext wallet acts as issuer in this test
   let testContext: XrplIntegrationTestContext
 
   beforeAll(async () => {
@@ -30,13 +31,11 @@ describe('CredentialCreate', function () {
       CredentialType: stringToHex('Test Credential Type'),
     }
 
-    const credentialCreateResponse = await testTransaction(
+    await testTransaction(
       testContext.client,
       credentialCreateTx,
       testContext.wallet,
     )
-
-    console.log('credentialCreateResponse', credentialCreateResponse)
 
     const credentialAcceptTx: CredentialAccept = {
       TransactionType: 'CredentialAccept',
@@ -45,14 +44,9 @@ describe('CredentialCreate', function () {
       CredentialType: stringToHex('Test Credential Type'),
     }
 
-    const credentialAcceptResponse = await testTransaction(
-      testContext.client,
-      credentialAcceptTx,
-      subjectWallet,
-    )
+    await testTransaction(testContext.client, credentialAcceptTx, subjectWallet)
 
-    console.log('credentialAcceptResponse', credentialAcceptResponse)
-
+    // Credential is now an object in recipient's wallet after accept
     const accountObjectsResponse: AccountObjectsResponse =
       await testContext.client.request({
         command: 'account_objects',

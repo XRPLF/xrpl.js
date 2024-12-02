@@ -391,7 +391,8 @@ export function parseAmountValue(amount: unknown): number {
   return parseFloat(amount.value)
 }
 
-const MAX_CREDENTIAL_TYPE_LENGTH = 64 * 2
+// 64 * 2
+const MAX_CREDENTIAL_TYPE_LENGTH = 128
 /**
  * Check a CredentialType for formatting errors
  *
