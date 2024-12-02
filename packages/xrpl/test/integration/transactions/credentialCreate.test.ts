@@ -12,6 +12,7 @@ import {
 import { generateFundedWallet, testTransaction } from '../utils'
 
 describe('CredentialCreate', function () {
+  // testContext wallet acts as issuer in this test
   let testContext: XrplIntegrationTestContext
 
   beforeAll(async () => {
@@ -29,14 +30,13 @@ describe('CredentialCreate', function () {
       CredentialType: stringToHex('Test Credential Type'),
     }
 
-    const credentialCreateResponse = await testTransaction(
+    await testTransaction(
       testContext.client,
       credentialCreateTx,
       testContext.wallet,
     )
 
-    console.log('credentialCreateResponse', credentialCreateResponse)
-
+    // Unaccepted credential still belongs to issuer's account
     const accountObjectsResponse: AccountObjectsResponse =
       await testContext.client.request({
         command: 'account_objects',

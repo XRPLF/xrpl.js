@@ -2,7 +2,9 @@ import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
 import { AccountObjectsResponse } from '../../../src'
+import { CredentialAccept } from '../../../src/models/transactions/CredentialAccept'
 import { CredentialCreate } from '../../../src/models/transactions/CredentialCreate'
+import { CredentialDelete } from '../../../src/models/transactions/CredentialDelete'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -10,10 +12,9 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
-import { CredentialAccept } from '../../../src/models/transactions/CredentialAccept'
-import { CredentialDelete } from '../../../src/models/transactions/CredentialDelete'
 
 describe('CredentialDelete', function () {
+  // testContext wallet acts as issuer in this test
   let testContext: XrplIntegrationTestContext
 
   beforeAll(async () => {
@@ -31,13 +32,11 @@ describe('CredentialDelete', function () {
       CredentialType: stringToHex('Test Credential Type'),
     }
 
-    const credentialCreateResponse = await testTransaction(
+    await testTransaction(
       testContext.client,
       credentialCreateTx,
       testContext.wallet,
     )
-
-    console.log('credentialCreateResponse', credentialCreateResponse)
 
     const credentialAcceptTx: CredentialAccept = {
       TransactionType: 'CredentialAccept',
@@ -46,22 +45,7 @@ describe('CredentialDelete', function () {
       CredentialType: stringToHex('Test Credential Type'),
     }
 
-    const credentialAcceptResponse = await testTransaction(
-      testContext.client,
-      credentialAcceptTx,
-      subjectWallet,
-    )
-
-    console.log('credentialAcceptResponse', credentialAcceptResponse)
-
-    const accountObjectsAcceptResponse: AccountObjectsResponse =
-      await testContext.client.request({
-        command: 'account_objects',
-        account: subjectWallet.classicAddress,
-      })
-    const { account_objects } = accountObjectsAcceptResponse.result
-
-    assert.equal(account_objects.length, 1)
+    await testTransaction(testContext.client, credentialAcceptTx, subjectWallet)
 
     const credentialDeleteTx: CredentialDelete = {
       TransactionType: 'CredentialDelete',
@@ -70,20 +54,29 @@ describe('CredentialDelete', function () {
       CredentialType: stringToHex('Test Credential Type'),
     }
 
-    const credentialDeleteResponse = await testTransaction(
-      testContext.client,
-      credentialDeleteTx,
-      subjectWallet,
-    )
+    await testTransaction(testContext.client, credentialDeleteTx, subjectWallet)
 
-    console.log('credentialDeleteResponse', credentialDeleteResponse)
-
-    const accountObjectsDeleteResponse: AccountObjectsResponse =
+    // Check both issuer and subject no longer have a credential tied to the account
+    const SubjectAccountObjectsDeleteResponse: AccountObjectsResponse =
       await testContext.client.request({
         command: 'account_objects',
         account: subjectWallet.classicAddress,
       })
 
-    assert.equal(accountObjectsDeleteResponse.result.account_objects.length, 0)
+    assert.equal(
+      SubjectAccountObjectsDeleteResponse.result.account_objects.length,
+      0,
+    )
+
+    const IssuerAccountObjectsDeleteResponse: AccountObjectsResponse =
+      await testContext.client.request({
+        command: 'account_objects',
+        account: testContext.wallet.classicAddress,
+      })
+
+    assert.equal(
+      IssuerAccountObjectsDeleteResponse.result.account_objects.length,
+      0,
+    )
   })
 })
