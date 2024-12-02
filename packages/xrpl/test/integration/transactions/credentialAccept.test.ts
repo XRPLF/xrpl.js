@@ -1,4 +1,4 @@
-import { hexToString } from '@xrplf/isomorphic/dist/utils'
+import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
 import { AccountObjectsResponse } from '../../../src'
@@ -27,7 +27,7 @@ describe('CredentialCreate', function () {
       TransactionType: 'CredentialCreate',
       Account: testContext.wallet.classicAddress,
       Subject: subjectWallet.classicAddress,
-      CredentialType: hexToString('Test Credential Type'),
+      CredentialType: stringToHex('Test Credential Type'),
     }
 
     const credentialCreateResponse = await testTransaction(
@@ -42,7 +42,7 @@ describe('CredentialCreate', function () {
       TransactionType: 'CredentialAccept',
       Account: subjectWallet.classicAddress,
       Issuer: testContext.wallet.classicAddress,
-      CredentialType: hexToString('Test Credential Type'),
+      CredentialType: stringToHex('Test Credential Type'),
     }
 
     const credentialAcceptResponse = await testTransaction(
