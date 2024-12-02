@@ -5,7 +5,11 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased Changes
 
 ### Added
-* parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion
+* `parseTransactionFlags` as a utility function in the xrpl package to streamline transactions flags-to-map conversion
+* Support for XLS-70d Verifiable Credentials
+  * New transactions CredentialCreate, CredentialAccept, CredentialDelete
+  * new `Credential` ledger object
+  * Update `DepositePreauth` ledger object and transactions with Credential support
 
 ### Fixed
 * `TransactionStream` model supports APIv2
