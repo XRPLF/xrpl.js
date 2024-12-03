@@ -400,39 +400,33 @@ const MAX_CREDENTIAL_TYPE_LENGTH = 128
  * @throws Validation Error if the formatting is incorrect
  */
 export function validateCredentialType(tx: Record<string, unknown>): void {
+  if (typeof tx.TransactionType !== 'string') {
+    throw new ValidationError('Invalid TransactionType')
+  }
   if (tx.CredentialType === undefined) {
     throw new ValidationError(
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- base check validates type
       `${tx.TransactionType}: missing field CredentialType`,
     )
   }
 
   if (typeof tx.CredentialType !== 'string') {
     throw new ValidationError(
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- base check validates type
       `${tx.TransactionType}: CredentialType must be a string`,
     )
   }
   if (tx.CredentialType.length === 0) {
     throw new ValidationError(
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- base check validates type
-      `${tx.TransactionType as string}: CredentialType length must be > 0`,
+      `${tx.TransactionType}: CredentialType length must be > 0`,
     )
   } else if (tx.CredentialType.length > MAX_CREDENTIAL_TYPE_LENGTH) {
     throw new ValidationError(
-      `${
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- base check validates type
-        tx.TransactionType as string
-      }: CredentialType length must be < ${MAX_CREDENTIAL_TYPE_LENGTH}`,
+      `${tx.TransactionType}: CredentialType length must be < ${MAX_CREDENTIAL_TYPE_LENGTH}`,
     )
   }
 
   if (!HEX_REGEX.test(tx.CredentialType)) {
     throw new ValidationError(
-      `${
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- base check validates type
-        tx.TransactionType as string
-      }: CredentialType must be encoded in hex`,
+      `${tx.TransactionType}: CredentialType must be encoded in hex`,
     )
   }
 }
@@ -443,11 +437,13 @@ const MAX_CREDENTIALS_LIST_LENGTH = 8
  *
  * @param credentials An array of credential IDs to check for errors
  * @param transactionType The transaction type to include in error messages
+ * @param isStringID Toggle for if array contains IDs instead of AuthorizeCredential objects
  * @throws Validation Error if the formatting is incorrect
  */
 export function validateCredentialsList(
   credentials: unknown,
   transactionType: string,
+  isStringID: boolean,
 ): void {
   if (!Array.isArray(credentials)) {
     throw new ValidationError(
@@ -465,17 +461,14 @@ export function validateCredentialsList(
     )
   }
 
-  function isAuthorizeCredential(
-    value: AuthorizeCredential,
-  ): value is AuthorizeCredential {
-    if (value.Credential.CredentialType && value.Credential.Issuer) {
-      return true
-    }
-    return false
-  }
-
   credentials.forEach((credential) => {
-    if (!isAuthorizeCredential(credential)) {
+    if (isStringID) {
+      if (!isString(credential)) {
+        throw new ValidationError(
+          `${transactionType}: Invalid Credentials ID list format`,
+        )
+      }
+    } else if (!isAuthorizeCredential(credential)) {
       throw new ValidationError(
         `${transactionType}: Invalid Credentials list format`,
       )
@@ -488,4 +481,13 @@ export function validateCredentialsList(
       `${transactionType}: Credentials list cannot contain duplicates`,
     )
   }
+}
+
+function isAuthorizeCredential(
+  value: AuthorizeCredential,
+): value is AuthorizeCredential {
+  if (value.Credential.CredentialType && value.Credential.Issuer) {
+    return true
+  }
+  return false
 }

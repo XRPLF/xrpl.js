@@ -52,7 +52,11 @@ export function validateEscrowFinish(tx: Record<string, unknown>): void {
 
   if (tx.CredentialIDs !== undefined) {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
-    validateCredentialsList(tx.CredentialIDs, tx.TransactionType as string)
+    validateCredentialsList(
+      tx.CredentialIDs,
+      tx.TransactionType as string,
+      true,
+    )
   }
 
   if (tx.OfferSequence == null) {
