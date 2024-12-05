@@ -1,4 +1,9 @@
+import { GlobalFlags } from '../transactions/common'
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
+
+export interface CredentialFlags extends GlobalFlags {
+  lsfAccepted?: boolean
+}
 
 /**
  *
@@ -10,10 +15,9 @@ import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 export default interface Credential extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'Credential'
   /**
-   * A bit-map of boolean flags. No flags are defined for Credentials, so this value
-   * is always 0.
+   * A bit-map of boolean flags
    */
-  Flags: number
+  Flags: number | CredentialFlags
 
   /** The account that the credential is for. */
   Subject: string
