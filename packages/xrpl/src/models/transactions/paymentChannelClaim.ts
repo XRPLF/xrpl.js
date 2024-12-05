@@ -1,6 +1,10 @@
 import { ValidationError } from '../../errors'
 
-import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  GlobalFlagsInterface,
+  validateBaseTransaction,
+} from './common'
 
 /**
  * Enum representing values for PaymentChannelClaim transaction flags.
@@ -67,7 +71,8 @@ export enum PaymentChannelClaimFlags {
  * // }
  * ```
  */
-export interface PaymentChannelClaimFlagsInterface extends GlobalFlags {
+export interface PaymentChannelClaimFlagsInterface
+  extends GlobalFlagsInterface {
   /**
    * Clear the channel's Expiration time. (Expiration is different from the
    * channel's immutable CancelAfter time.) Only the source address of the

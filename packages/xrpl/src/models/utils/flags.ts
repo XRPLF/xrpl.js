@@ -8,7 +8,8 @@ import {
 import { AccountSetTfFlags } from '../transactions/accountSet'
 import { AMMDepositFlags } from '../transactions/AMMDeposit'
 import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
-import { GlobalFlags } from '../transactions/common'
+import { BatchFlags } from '../transactions/batch'
+import { GlobalFlags, GlobalFlagsInterface } from '../transactions/common'
 import { NFTokenCreateOfferFlags } from '../transactions/NFTokenCreateOffer'
 import { NFTokenMintFlags } from '../transactions/NFTokenMint'
 import { OfferCreateFlags } from '../transactions/offerCreate'
@@ -48,6 +49,7 @@ const txToFlag = {
   AccountSet: AccountSetTfFlags,
   AMMDeposit: AMMDepositFlags,
   AMMWithdraw: AMMWithdrawFlags,
+  Batch: BatchFlags,
   NFTokenCreateOffer: NFTokenCreateOfferFlags,
   NFTokenMint: NFTokenMintFlags,
   OfferCreate: OfferCreateFlags,
@@ -76,16 +78,17 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
     : 0
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- added ValidationError check for flagEnum
-function convertFlagsToNumber(flags: GlobalFlags, flagEnum: any): number {
+function convertFlagsToNumber(
+  flags: GlobalFlagsInterface,
+  flagEnum: object,
+): number {
   return Object.keys(flags).reduce((resultFlags, flag) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
     if (flagEnum[flag] == null) {
       throw new ValidationError(
         `flag ${flag} doesn't exist in flagEnum: ${JSON.stringify(flagEnum)}`,
       )
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
+
     return flags[flag] ? resultFlags | flagEnum[flag] : resultFlags
   }, 0)
 }
@@ -115,4 +118,25 @@ export function parseTransactionFlags(tx: Transaction): object {
   })
 
   return flagsMap
+}
+
+/**
+ * Determines whether a transaction has a certain flag enabled.
+ *
+ * @param tx The transaction.
+ * @param flag The flag to check.
+ * @returns Whether `flag` is enabled on `tx`.
+ */
+export function hasFlag(tx: Transaction, flag: number): boolean {
+  if (tx.Flags == null) {
+    return false
+  }
+  if (typeof tx.Flags === 'number') {
+    return isFlagEnabled(tx.Flags, flag)
+  }
+  const txFlagNum = convertFlagsToNumber(
+    tx.Flags,
+    txToFlag[tx.TransactionType] ?? GlobalFlags,
+  )
+  return isFlagEnabled(txFlagNum, flag)
 }

@@ -177,11 +177,50 @@ function multiSigningData(
   })
 }
 
+/**
+ * Interface describing fields required for a Batch signer
+ */
+interface BatchObject extends JsonObject {
+  flags: number
+  txIDs: string[]
+}
+
+/**
+ * Serialize a signingClaim
+ *
+ * @param batch A Batch object to serialize
+ * @param opts.definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @returns the serialized object with appropriate prefix
+ */
+function signingBatchData(batch: BatchObject): Uint8Array {
+  if (batch.flags == null) {
+    throw Error("No field `flags'")
+  }
+  if (batch.txIDs == null) {
+    throw Error('No field `txIDs`')
+  }
+  const prefix = HashPrefix.batch
+  const flags = coreTypes.UInt32.from(batch.flags).toBytes()
+  const txIDsLength = coreTypes.UInt32.from(batch.txIDs.length).toBytes()
+
+  const bytesList = new BytesList()
+
+  bytesList.put(prefix)
+  bytesList.put(flags)
+  bytesList.put(txIDsLength)
+  batch.txIDs.forEach((txID: string) => {
+    bytesList.put(coreTypes.Hash256.from(txID).toBytes())
+  })
+
+  return bytesList.toBytes()
+}
+
 export {
   BinaryParser,
   BinarySerializer,
   BytesList,
   ClaimObject,
+  BatchObject,
   makeParser,
   serializeObject,
   readJSON,
@@ -191,4 +230,5 @@ export {
   binaryToJSON,
   sha512Half,
   transactionID,
+  signingBatchData,
 }

@@ -1,5 +1,6 @@
 import { Amount } from '../common'
 
+import { Batch, BatchMetadata } from './batch'
 import { BaseTransaction } from './common'
 import {
   NFTokenAcceptOffer,
@@ -97,4 +98,6 @@ export type TransactionMetadata<T extends BaseTransaction = Transaction> =
     ? NFTokenAcceptOfferMetadata
     : T extends NFTokenCancelOffer
     ? NFTokenCancelOfferMetadata
+    : T extends Batch
+    ? BatchMetadata
     : TransactionMetadataBase
