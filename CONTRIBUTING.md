@@ -130,13 +130,13 @@ For every file in `src`, we try to have a corresponding file in `test` with unit
 
 The goal is to maintain above 80% code coverage, and generally any new feature or bug fix should be accompanied by unit tests, and integration tests if applicable.
 
-For an example of a unit test, check out the [autofill tests here](./packages/xrpl/test/client/autofill.ts).
+For an example of a unit test, check out the [autofill tests here](./packages/xrpl/test/client/autofill.test.ts).
 
 If your code connects to the ledger (ex. Adding a new transaction type) it's handy to write integration tests to ensure that you can successfully interact with the ledger. Integration tests are generally run against a docker instance of rippled which contains the latest updates. Since standalone mode allows us to manually close ledgers, this allows us to run integration tests at a much faster rate than if we had to wait 4-5 seconds per transaction for the ledger to validate the transaction. [See above](#running-tests) for how to start up the docker container to run integration tests.
 
 All integration tests should be written in the `test/integration` folder, with new `Requests` and `Transactions` tests being in their respective folders.
 
-For an example of how to write an integration test for `xrpl.js`, you can look at the [Payment integration test](./packages/xrpl/test/integration/transactions/payment.ts).
+For an example of how to write an integration test for `xrpl.js`, you can look at the [Payment integration test](./packages/xrpl/test/integration/transactions/payment.test.ts).
 
 ## Generate reference docs
 
