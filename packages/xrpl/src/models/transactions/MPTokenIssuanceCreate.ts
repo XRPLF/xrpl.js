@@ -142,8 +142,9 @@ export function validateMPTokenIssuanceCreate(
     }
   }
 
+  const MAX_TRANSFER_FEE = 50000
   if (typeof tx.TransferFee === 'number') {
-    if (tx.TransferFee < 0 || tx.TransferFee > 50000) {
+    if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
       throw new ValidationError(
         'MPTokenIssuanceCreate: TransferFee out of range',
       )
