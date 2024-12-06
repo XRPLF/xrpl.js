@@ -51,6 +51,8 @@ type LedgerEntryFilter =
   | 'escrow'
   | 'fee'
   | 'hashes'
+  | 'mpt_issuance'
+  | 'mptoken'
   | 'nft_offer'
   | 'nft_page'
   | 'offer'

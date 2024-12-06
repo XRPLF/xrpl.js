@@ -1,6 +1,12 @@
 import { assert } from 'chai'
 
-import { Payment, Wallet } from '../../../src'
+import {
+  Payment,
+  Wallet,
+  MPTokenIssuanceCreate,
+  MPTokenAuthorize,
+  TransactionMetadata,
+} from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -99,6 +105,91 @@ describe('Payment', function () {
 
       assert.equal(result.result.engine_result_code, 0)
       assert.equal((result.result.tx_json as Payment).Amount, AMOUNT)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'Validate MPT Payment ',
+    async () => {
+      const wallet2 = await generateFundedWallet(testContext.client)
+
+      const createTx: MPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: testContext.wallet.classicAddress,
+      }
+
+      const mptCreateRes = await testTransaction(
+        testContext.client,
+        createTx,
+        testContext.wallet,
+      )
+
+      const txHash = mptCreateRes.result.tx_json.hash
+
+      const txResponse = await testContext.client.request({
+        command: 'tx',
+        transaction: txHash,
+      })
+
+      const meta = txResponse.result
+        .meta as TransactionMetadata<MPTokenIssuanceCreate>
+
+      const mptID = meta.mpt_issuance_id
+
+      let accountObjectsResponse = await testContext.client.request({
+        command: 'account_objects',
+        account: testContext.wallet.classicAddress,
+        type: 'mpt_issuance',
+      })
+      assert.lengthOf(
+        accountObjectsResponse.result.account_objects,
+        1,
+        'Should be exactly one issuance on the ledger',
+      )
+
+      const authTx: MPTokenAuthorize = {
+        TransactionType: 'MPTokenAuthorize',
+        Account: wallet2.classicAddress,
+        MPTokenIssuanceID: mptID!,
+      }
+
+      await testTransaction(testContext.client, authTx, wallet2)
+
+      accountObjectsResponse = await testContext.client.request({
+        command: 'account_objects',
+        account: wallet2.classicAddress,
+        type: 'mptoken',
+      })
+
+      assert.lengthOf(
+        accountObjectsResponse.result.account_objects,
+        1,
+        'Holder owns 1 MPToken on the ledger',
+      )
+
+      const payTx: Payment = {
+        TransactionType: 'Payment',
+        Account: testContext.wallet.classicAddress,
+        Destination: wallet2.classicAddress,
+        Amount: {
+          mpt_issuance_id: mptID!,
+          value: '100',
+        },
+      }
+
+      await testTransaction(testContext.client, payTx, testContext.wallet)
+
+      accountObjectsResponse = await testContext.client.request({
+        command: 'account_objects',
+        account: testContext.wallet.classicAddress,
+        type: 'mpt_issuance',
+      })
+      assert.equal(
+        // @ts-expect-error -- Object type not known
+        accountObjectsResponse.result.account_objects[0].OutstandingAmount,
+        `100`,
+      )
     },
     TIMEOUT,
   )

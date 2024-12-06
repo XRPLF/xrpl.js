@@ -21,6 +21,22 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  */
 export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'ledger_entry'
+
+  /**
+   * Retrieve a MPTokenIssuance object from the ledger.
+   */
+  mpt_issuance?: string
+
+  /**
+   * Retrieve a MPToken object from the ledger.
+   */
+  mptoken?:
+    | {
+        mpt_issuance_id: string
+        account: string
+      }
+    | string
+
   /**
    * Retrieve an Automated Market Maker (AMM) object from the ledger.
    * This is similar to amm_info method, but the ledger_entry version returns only the ledger entry as stored.
