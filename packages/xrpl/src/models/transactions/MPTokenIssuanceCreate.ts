@@ -1,9 +1,8 @@
 import { ValidationError } from '../../errors'
-import { isHex } from '../utils'
+import { isHex, INTEGER_SANITY_CHECK } from '../utils'
 
 import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
 import type { TransactionMetadataBase } from './metadata'
-import { INTEGER_SANITY_CHECK } from '../utils'
 
 const MAX_AMT = '9223372036854775807' // 2^63 - 1
 /**
