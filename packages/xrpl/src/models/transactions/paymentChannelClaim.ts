@@ -148,9 +148,9 @@ export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   if (tx.CredentialIDs !== undefined) {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
     validateCredentialsList(
       tx.CredentialIDs,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
       tx.TransactionType as string,
       true,
     )
