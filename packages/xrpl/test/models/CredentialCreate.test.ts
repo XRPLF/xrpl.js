@@ -106,9 +106,7 @@ describe('credentialCreate', function () {
   })
 
   it(`throws w/ credentialType field too long`, function () {
-    credentialCreate.CredentialType = stringToHex(
-      'PassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassport',
-    )
+    credentialCreate.CredentialType = stringToHex('A'.repeat(33))
     const errorMessage = 'CredentialCreate: CredentialType length must be < 128'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
