@@ -14,32 +14,26 @@ function readFile(filename) {
 let jsTransactionFile
 
 function processRippledSource(folder) {
-  const sfieldCpp = readFile(
-    path.join(folder, 'src/libxrpl/protocol/SField.cpp'),
+  const sfieldMacroFile = readFile(
+    path.join(folder, '/include/xrpl/protocol/detail/sfields.macro'),
   )
-  const sfieldHits = sfieldCpp.match(
-    /^ *CONSTRUCT_[^\_]+_SFIELD *\( *[^,\n]*,[ \n]*"([^\"\n ]+)"[ \n]*,[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?(notSigning))?/gm,
+  const sfieldHits = sfieldMacroFile.matchAll(
+    /^ *[A-Z]*TYPED_SFIELD *\( *sf([^,\n]*),[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?(notSigning))?/gm,
   )
   const sfields = {}
   for (const hit of sfieldHits) {
-    const matches = hit.match(
-      /^ *CONSTRUCT_[^\_]+_SFIELD *\( *[^,\n]*,[ \n]*"([^\"\n ]+)"[ \n]*,[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?(notSigning))?/,
-    )
-    sfields[matches[1]] = matches.slice(2)
+    sfields[hit[1]] = hit[2]
   }
 
-  const txFormatsCpp = readFile(
-    path.join(folder, 'src/libxrpl/protocol/TxFormats.cpp'),
+  const transactionsMacroFile = readFile(
+    path.join(folder, '/include/xrpl/protocol/detail/transactions.macro'),
   )
-  const txFormatsHits = txFormatsCpp.match(
-    /^ *add\(jss::([^\"\n, ]+),[ \n]*tt[A-Z_]+,[ \n]*{[ \n]*(({sf[A-Za-z0-9]+, soe(OPTIONAL|REQUIRED|DEFAULT)},[ \n]+)*)},[ \n]*[pseudocC]+ommonFields\);/gm,
+  const txFormatsHits = transactionsMacroFile.matchAll(
+    /^ *TRANSACTION\(tt[A-Z_]+ *,* [0-9]+ *, *([A-Za-z]+)[ \n]*,[ \n]*\({[ \n]*(({sf[A-Za-z0-9]+, soe(OPTIONAL|REQUIRED|DEFAULT)(, soeMPT(None|Supported|NotSupported))?},[ \n]+)*)}\)\)$/gm,
   )
   const txFormats = {}
   for (const hit of txFormatsHits) {
-    const matches = hit.match(
-      /^ *add\(jss::([^\"\n, ]+),[ \n]*tt[A-Z_]+,[ \n]*{[ \n]*(({sf[A-Za-z0-9]+, soe(OPTIONAL|REQUIRED|DEFAULT)},[ \n]+)*)},[ \n]*[pseudocC]+ommonFields\);/,
-    )
-    txFormats[matches[1]] = formatTxFormat(matches[2])
+    txFormats[hit[1]] = formatTxFormat(hit[2])
   }
 
   jsTransactionFile = readFile(
@@ -168,7 +162,7 @@ export { ${tx} } from './${tx}'`,
 
 function generateParamLine(sfields, param, isRequired) {
   const paramName = param.slice(2)
-  const paramType = sfields[paramName][0]
+  const paramType = sfields[paramName] ?? 'any'
   const paramTypeOutput = typeMap[paramType]
   return `  ${paramName}${isRequired ? '' : '?'}: ${paramTypeOutput}\n`
 }
