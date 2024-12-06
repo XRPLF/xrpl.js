@@ -6,6 +6,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion
+* Added new MPT transaction definitions (XLS-33)
+* New `MPTAmount` type support for `Payment` and `Clawback` transactions
 
 ### Fixed
 * `TransactionStream` model supports APIv2
@@ -43,11 +45,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add the missing `AMMDeposit` flag `tfTwoAssetIfEmpty`
 * Add missing `lsfAMMNode` flag to `RippleState` ledger object
 * Add `PreviousFields` to `DeletedNode` metadata type
-
-## 1.0.0-mpt-beta (2024-04-22)
-### Non-Breaking Changes
-* Added new MPT transaction models
-* New `MPTAmount` type support for `Payment` and `Clawback` transactions
 
 ## 3.0.0 (2024-02-01)
 

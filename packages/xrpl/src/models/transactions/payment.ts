@@ -142,13 +142,13 @@ export interface Payment extends BaseTransaction {
    * cross-currency/cross-issue payments. Must be omitted for XRP-to-XRP
    * Payments.
    */
-  SendMax?: Amount
+  SendMax?: Amount | MPTAmount
   /**
    * Minimum amount of destination currency this transaction should deliver.
    * Only valid if this is a partial payment. For non-XRP amounts, the nested
    * field names are lower-case.
    */
-  DeliverMin?: Amount
+  DeliverMin?: Amount | MPTAmount
   Flags?: number | PaymentFlagsInterface
 }
 

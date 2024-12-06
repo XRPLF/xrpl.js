@@ -3,9 +3,9 @@ import { isHex } from '../utils'
 
 import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
 import type { TransactionMetadataBase } from './metadata'
+import { INTEGER_SANITY_CHECK } from '../utils'
 
-const SANITY_CHECK = /^[0-9]+$/u
-
+const MAX_AMT = '9223372036854775807' // 2^63 - 1
 /**
  * Transaction Flags for an MPTokenIssuanceCreate Transaction.
  *
@@ -129,10 +129,10 @@ export function validateMPTokenIssuanceCreate(
   }
 
   if (typeof tx.MaximumAmount === 'string') {
-    if (!SANITY_CHECK.exec(tx.MaximumAmount)) {
+    if (!INTEGER_SANITY_CHECK.exec(tx.MaximumAmount)) {
       throw new ValidationError('MPTokenIssuanceCreate: Invalid MaximumAmount')
     } else if (
-      BigInt(tx.MaximumAmount) > BigInt(`9223372036854775807`) ||
+      BigInt(tx.MaximumAmount) > BigInt(MAX_AMT) ||
       BigInt(tx.MaximumAmount) < BigInt(`0`)
     ) {
       throw new ValidationError(

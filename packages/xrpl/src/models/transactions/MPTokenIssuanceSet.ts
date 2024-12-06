@@ -1,4 +1,5 @@
 import { ValidationError } from '../../errors'
+import { isFlagEnabled } from '../utils'
 
 import {
   BaseTransaction,
@@ -67,17 +68,15 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
   validateOptionalField(tx, 'Holder', isAccount)
 
-  /* eslint-disable no-bitwise -- We need bitwise operations for flag checks here */
   if (typeof tx.Flags === 'number') {
     const flags = tx.Flags
     if (
-      BigInt(flags) & BigInt(MPTokenIssuanceSetFlags.tfMPTLock) &&
-      BigInt(flags) & BigInt(MPTokenIssuanceSetFlags.tfMPTUnlock)
+      isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTLock) &&
+      isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTUnlock)
     ) {
       throw new ValidationError('MPTokenIssuanceSet: flag conflict')
     }
   } else {
     throw new Error('tx.Flags is not a number')
   }
-  /* eslint-enable no-bitwise -- Re-enable bitwise rule after this block */
 }
