@@ -183,9 +183,9 @@ export function validatePayment(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'DestinationTag', isNumber)
 
   if (tx.CredentialIDs !== undefined) {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
     validateCredentialsList(
       tx.CredentialIDs,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
       tx.TransactionType as string,
       true,
     )

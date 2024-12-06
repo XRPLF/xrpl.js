@@ -1,4 +1,5 @@
 import { GlobalFlags } from '../transactions/common'
+
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 export interface CredentialFlags extends GlobalFlags {
