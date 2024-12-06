@@ -106,7 +106,7 @@ describe('credentialCreate', function () {
   })
 
   it(`throws w/ credentialType field too long`, function () {
-    credentialCreate.CredentialType = stringToHex('A'.repeat(33))
+    credentialCreate.CredentialType = stringToHex('A'.repeat(129))
     const errorMessage = 'CredentialCreate: CredentialType length must be < 128'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
