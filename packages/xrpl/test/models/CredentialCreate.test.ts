@@ -5,7 +5,7 @@ import { validate, ValidationError } from '../../src'
 import { validateCredentialCreate } from '../../src/models/transactions/CredentialCreate'
 
 /**
- * AMMDelete Transaction Verification Testing.
+ * CredentialCreate Transaction Verification Testing.
  *
  * Providing runtime verification testing for each specific transaction type.
  */
