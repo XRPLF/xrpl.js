@@ -4,7 +4,9 @@ import { isHex, INTEGER_SANITY_CHECK } from '../utils'
 import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
-const MAX_AMT = '9223372036854775807' // 2^63 - 1
+// 2^63 - 1
+const MAX_AMT = '9223372036854775807'
+
 /**
  * Transaction Flags for an MPTokenIssuanceCreate Transaction.
  *
