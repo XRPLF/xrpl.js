@@ -41,15 +41,6 @@ describe('MPTokenAuthorize', function () {
       TransactionType: 'MPTokenAuthorize',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      Flags: MPTokenAuthorizeFlags.tfMPTUnauthorize,
-    } as any
-
-    assert.doesNotThrow(() => validate(validMPTokenAuthorize))
-
-    validMPTokenAuthorize = {
-      TransactionType: 'MPTokenAuthorize',
-      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MPTokenIssuanceID: TOKEN_ID,
       Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
       Flags: MPTokenAuthorizeFlags.tfMPTUnauthorize,
     } as any

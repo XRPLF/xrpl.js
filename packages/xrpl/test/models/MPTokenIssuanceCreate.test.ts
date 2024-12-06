@@ -95,4 +95,30 @@ describe('MPTokenIssuanceCreate', function () {
       'MPTokenIssuanceCreate: Invalid MaximumAmount',
     )
   })
+
+  it(`throws w/ Invalid TransferFee`, function () {
+    let invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      TransferFee: -1,
+    } as any
+
+    assert.throws(
+      () => validate(invalid),
+      ValidationError,
+      'MPTokenIssuanceCreate: TransferFee out of range',
+    )
+
+    invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      TransferFee: 50001,
+    } as any
+
+    assert.throws(
+      () => validate(invalid),
+      ValidationError,
+      'MPTokenIssuanceCreate: TransferFee out of range',
+    )
+  })
 })

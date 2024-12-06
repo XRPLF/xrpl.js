@@ -185,4 +185,13 @@ it('UInt64 is parsed as base 10 for MPT amounts', () => {
 
   expect(encode(mptokenEntryJson)).toEqual(mptokenEntryBinary)
   expect(decode(mptokenEntryBinary)).toEqual(mptokenEntryJson)
+
+  const decodedIssuance = decode(mptIssuanceEntryBinary)
+  expect(typeof decodedIssuance.MaximumAmount).toBe('string')
+  expect(decodedIssuance.MaximumAmount).toBe('9223372036854775807')
+  expect(decodedIssuance.OutstandingAmount).toBe('100')
+
+  const decodedToken = decode(mptokenEntryBinary)
+  expect(typeof decodedToken.MPTAmount).toBe('string')
+  expect(decodedToken.MPTAmount).toBe('100')
 })
