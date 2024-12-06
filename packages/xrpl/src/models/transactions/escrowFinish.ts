@@ -5,6 +5,7 @@ import {
   BaseTransaction,
   isAccount,
   validateBaseTransaction,
+  validateCredentialsList,
   validateRequiredField,
 } from './common'
 
@@ -32,6 +33,10 @@ export interface EscrowFinish extends BaseTransaction {
    * the held payment's Condition.
    */
   Fulfillment?: string
+  /** Credentials associated with the sender of this transaction.
+   * The credentials included must not be expired.
+   */
+  CredentialIDs?: string[]
 }
 
 /**
@@ -44,6 +49,15 @@ export function validateEscrowFinish(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   validateRequiredField(tx, 'Owner', isAccount)
+
+  if (tx.CredentialIDs !== undefined) {
+    validateCredentialsList(
+      tx.CredentialIDs,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
+      tx.TransactionType as string,
+      true,
+    )
+  }
 
   if (tx.OfferSequence == null) {
     throw new ValidationError('EscrowFinish: missing field OfferSequence')
