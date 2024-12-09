@@ -1,9 +1,7 @@
-import { stringToHex } from '@xrplf/isomorphic/utils'
+import { stringToHex, hexToString } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
-import { convertHexToString } from '../../src/utils'
-
-describe('convertHexToString and stringToHex', function () {
+describe('hexToString and stringToHex', function () {
   it('converts "example.com"', function () {
     const str = 'example.com'
     const hex = stringToHex(str)
@@ -12,7 +10,7 @@ describe('convertHexToString and stringToHex', function () {
       '6578616D706C652E636F6D',
       'should convert to hex equivalent',
     )
-    const result = convertHexToString(hex)
+    const result = hexToString(hex)
     assert.strictEqual(
       result,
       'example.com',
@@ -24,7 +22,7 @@ describe('convertHexToString and stringToHex', function () {
     const str = '你好'
     const hex = stringToHex(str)
     assert.strictEqual(hex, 'E4BDA0E5A5BD', 'should convert to hex equivalent')
-    const result = convertHexToString(hex)
+    const result = hexToString(hex)
     assert.strictEqual(result, '你好', 'should convert back to 你好')
   })
 })
