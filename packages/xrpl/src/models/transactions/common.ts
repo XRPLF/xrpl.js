@@ -9,6 +9,7 @@ import {
   Memo,
   Signer,
   XChainBridge,
+  MPTAmount,
 } from '../common'
 import { onlyHasFields } from '../utils'
 
@@ -59,6 +60,7 @@ const XRP_CURRENCY_SIZE = 1
 const ISSUE_SIZE = 2
 const ISSUED_CURRENCY_SIZE = 3
 const XCHAIN_BRIDGE_SIZE = 4
+const MPTOKEN_SIZE = 2
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object'
@@ -120,6 +122,21 @@ export function isIssuedCurrency(
 }
 
 /**
+ * Verify the form and type of an MPT at runtime.
+ *
+ * @param input - The input to check the form and type of.
+ * @returns Whether the MPTAmount is properly formed.
+ */
+export function isMPTAmount(input: unknown): input is MPTAmount {
+  return (
+    isRecord(input) &&
+    Object.keys(input).length === MPTOKEN_SIZE &&
+    typeof input.value === 'string' &&
+    typeof input.mpt_issuance_id === 'string'
+  )
+}
+
+/**
  * Must be a valid account address
  */
 export type Account = string
@@ -144,7 +161,11 @@ export function isAccount(account: unknown): account is Account {
  * @returns Whether the Amount is properly formed.
  */
 export function isAmount(amount: unknown): amount is Amount {
-  return typeof amount === 'string' || isIssuedCurrency(amount)
+  return (
+    typeof amount === 'string' ||
+    isIssuedCurrency(amount) ||
+    isMPTAmount(amount)
+  )
 }
 
 /**
