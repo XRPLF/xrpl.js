@@ -92,7 +92,7 @@ export interface NFTokenMint extends BaseTransaction {
    * opaque issuer-specific encoding. The URI is NOT checked for validity, but
    * the field is limited to a maximum length of 256 bytes.
    *
-   * This field must be hex-encoded. You can use `convertStringToHex` to
+   * This field must be hex-encoded. You can use `@xrplf/isomorphic/utils`'s `stringToHex` to
    * convert this field to the proper encoding.
    *
    * This field must not be an empty string. Omit it from the transaction or

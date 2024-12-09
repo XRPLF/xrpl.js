@@ -1,6 +1,7 @@
+import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
-import { AccountSet, convertStringToHex, ValidationError } from '../../src'
+import { AccountSet, ValidationError } from '../../src'
 import { assertRejects } from '../testUtils'
 
 import serverUrl from './serverUrl'
@@ -35,7 +36,7 @@ describe('client.submitAndWait', function () {
       const accountSet: AccountSet = {
         TransactionType: 'AccountSet',
         Account: testContext.wallet.classicAddress,
-        Domain: convertStringToHex('example.com'),
+        Domain: stringToHex('example.com'),
       }
 
       let retries = 10
@@ -89,7 +90,7 @@ describe('client.submitAndWait', function () {
       const accountSet: AccountSet = {
         TransactionType: 'AccountSet',
         Account: testContext.wallet.classicAddress,
-        Domain: convertStringToHex('example.com'),
+        Domain: stringToHex('example.com'),
       }
 
       await assertRejects(
@@ -107,7 +108,7 @@ describe('client.submitAndWait', function () {
       const accountSet: AccountSet = {
         TransactionType: 'AccountSet',
         Account: testContext.wallet.classicAddress,
-        Domain: convertStringToHex('example.com'),
+        Domain: stringToHex('example.com'),
       }
       const { tx_blob: signedAccountSet } = testContext.wallet.sign(
         await testContext.client.autofill(accountSet),
@@ -130,7 +131,7 @@ describe('client.submitAndWait', function () {
       const accountSet: AccountSet = {
         TransactionType: 'AccountSet',
         Account: testContext.wallet.classicAddress,
-        Domain: convertStringToHex('example.com'),
+        Domain: stringToHex('example.com'),
       }
       const { tx_blob: signedAccountSet } = testContext.wallet.sign(
         await testContext.client.autofill(accountSet),

@@ -1,7 +1,7 @@
+import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
 import {
-  convertStringToHex,
   getNFTokenID,
   NFTokenMint,
   TransactionMetadata,
@@ -33,7 +33,7 @@ describe('NFTokenMint', function () {
       const tx: NFTokenMint = {
         TransactionType: 'NFTokenMint',
         Account: testContext.wallet.address,
-        URI: convertStringToHex('https://www.google.com'),
+        URI: stringToHex('https://www.google.com'),
         NFTokenTaxon: 0,
       }
       const response = await testTransaction(
