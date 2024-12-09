@@ -5,6 +5,7 @@ import normalAccountTx from './accountTx.json'
 import fabric from './bookOffers'
 import usd_xrp from './bookOffersUsdXrp.json'
 import xrp_usd from './bookOffersXrpUsd.json'
+import customDefinition from './customDefinition.json'
 import normalLedger from './ledger.json'
 import firstPage from './ledgerDataFirstPage.json'
 import firstPageEmpty from './ledgerDataFirstPageEmpty.json'
@@ -94,6 +95,10 @@ const server_info = {
   withNetworkId: withNetworkIDServerInfo,
 }
 
+const definitions = {
+  customDefinition,
+}
+
 const tx = {
   NFTokenMint,
   NFTokenMint2,
@@ -118,6 +123,7 @@ const rippled = {
   transaction_entry,
   tx,
   unsubscribe,
+  definitions,
 }
 
 export default rippled

@@ -6,6 +6,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion
+* Adds support for Custom Definitions to `client.submit()` and `client.submitAndWait()`
 
 ### Fixed
 * `TransactionStream` model supports APIv2
@@ -43,6 +44,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add the missing `AMMDeposit` flag `tfTwoAssetIfEmpty`
 * Add missing `lsfAMMNode` flag to `RippleState` ledger object
 * Add `PreviousFields` to `DeletedNode` metadata type
+
+### Added
+* Custom definitions support for `util.encode`, `util.decode`, `util.encodeForSignning` and `Wallet.sign`.
 
 ## 3.0.0 (2024-02-01)
 

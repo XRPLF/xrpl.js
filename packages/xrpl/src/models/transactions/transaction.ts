@@ -1,6 +1,8 @@
 /* eslint-disable max-lines -- need to work with a lot of transactions in a switch statement */
 /* eslint-disable max-lines-per-function -- need to work with a lot of Tx verifications */
 
+import { XrplDefinitionsBase } from 'ripple-binary-codec'
+
 import { ValidationError } from '../../errors'
 import { IssuedCurrencyAmount, Memo } from '../common'
 import { isHex } from '../utils'
@@ -18,7 +20,11 @@ import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
-import { BaseTransaction, isIssuedCurrency } from './common'
+import {
+  BaseTransaction,
+  isIssuedCurrency,
+  validateTxAgainstCustomDefinitions,
+} from './common'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { DIDDelete, validateDIDDelete } from './DIDDelete'
 import { DIDSet, validateDIDSet } from './DIDSet'
@@ -170,10 +176,14 @@ export interface TransactionAndMetadata<
  * Encode/decode and individual type validation.
  *
  * @param transaction - A Transaction.
+ * @param customDefinitions - Optional parameter to validate against a custom definition.
  * @throws ValidationError When the Transaction is malformed.
  * @category Utilities
  */
-export function validate(transaction: Record<string, unknown>): void {
+export function validate(
+  transaction: Record<string, unknown>,
+  customDefinitions?: XrplDefinitionsBase,
+): void {
   const tx = { ...transaction }
   if (tx.TransactionType == null) {
     throw new ValidationError('Object does not have a `TransactionType`')
@@ -407,8 +417,12 @@ export function validate(transaction: Record<string, unknown>): void {
       break
 
     default:
-      throw new ValidationError(
-        `Invalid field TransactionType: ${tx.TransactionType}`,
-      )
+      if (customDefinitions) {
+        validateTxAgainstCustomDefinitions(tx, customDefinitions)
+      } else {
+        throw new ValidationError(
+          `Invalid field TransactionType: ${tx.TransactionType}`,
+        )
+      }
   }
 }

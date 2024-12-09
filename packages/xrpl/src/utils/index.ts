@@ -20,6 +20,7 @@ import {
   encodeForMultisigning as rbcEncodeForMultisigning,
   encodeForSigning as rbcEncodeForSigning,
   encodeForSigningClaim as rbcEncodeForSigningClaim,
+  XrplDefinitionsBase,
 } from 'ripple-binary-codec'
 import { verify as verifyKeypairSignature } from 'ripple-keypairs'
 
@@ -87,20 +88,28 @@ function isValidSecret(secret: string): boolean {
  * Encodes a LedgerEntry or Transaction into a hex string
  *
  * @param object - LedgerEntry or Transaction in JSON format.
+ * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A hex string representing the encoded object.
  */
-function encode(object: Transaction | LedgerEntry): string {
-  return rbcEncode(object)
+function encode(
+  object: Transaction | LedgerEntry,
+  definitions?: XrplDefinitionsBase,
+): string {
+  return rbcEncode(object, definitions)
 }
 
 /**
  * Encodes a Transaction for signing
  *
  * @param object - LedgerEntry in JSON or Transaction format.
+ * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A hex string representing the encoded object.
  */
-function encodeForSigning(object: Transaction): string {
-  return rbcEncodeForSigning(object)
+function encodeForSigning(
+  object: Transaction,
+  definitions?: XrplDefinitionsBase,
+): string {
+  return rbcEncodeForSigning(object, definitions)
 }
 
 /**
@@ -118,20 +127,29 @@ function encodeForSigningClaim(object: PaymentChannelClaim): string {
  *
  * @param object - Transaction in JSON format.
  * @param signer - The address of the account signing this transaction
+ * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A hex string representing the encoded object.
  */
-function encodeForMultiSigning(object: Transaction, signer: string): string {
-  return rbcEncodeForMultisigning(object, signer)
+function encodeForMultiSigning(
+  object: Transaction,
+  signer: string,
+  definitions?: XrplDefinitionsBase,
+): string {
+  return rbcEncodeForMultisigning(object, signer, definitions)
 }
 
 /**
  * Decodes a hex string into a transaction | ledger entry
  *
  * @param hex - hex string in the XRPL serialization format.
+ * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns The hex string decoded according to XRPL serialization format.
  */
-function decode(hex: string): Record<string, unknown> {
-  return rbcDecode(hex)
+function decode(
+  hex: string,
+  definitions?: XrplDefinitionsBase,
+): Record<string, unknown> {
+  return rbcDecode(hex, definitions)
 }
 
 /**
