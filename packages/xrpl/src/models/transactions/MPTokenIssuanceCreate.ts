@@ -1,7 +1,13 @@
 import { ValidationError } from '../../errors'
 import { isHex, INTEGER_SANITY_CHECK } from '../utils'
 
-import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  GlobalFlags,
+  validateBaseTransaction,
+  validateOptionalField,
+  isString,
+} from './common'
 import type { TransactionMetadataBase } from './metadata'
 
 // 2^63 - 1
@@ -116,6 +122,8 @@ export function validateMPTokenIssuanceCreate(
   tx: Record<string, unknown>,
 ): void {
   validateBaseTransaction(tx)
+  validateOptionalField(tx, 'MaximumAmount', isString)
+  validateOptionalField(tx, 'MPTokenMetadata', isString)
 
   if (typeof tx.MPTokenMetadata === 'string' && tx.MPTokenMetadata === '') {
     throw new ValidationError(
