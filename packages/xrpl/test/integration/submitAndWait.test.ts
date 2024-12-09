@@ -59,7 +59,6 @@ describe('client.submitAndWait', function () {
           retries = 0
           break
         } catch (err) {
-          // eslint-disable-next-line max-depth -- Necessary
           if (!(err instanceof Error)) {
             throw err
           }
@@ -69,7 +68,7 @@ describe('client.submitAndWait', function () {
           const errorCode = matches?.groups?.errorCode
 
           // Retry if another transaction finished before this one
-          // eslint-disable-next-line max-depth -- Testing
+
           if (['tefPAST_SEQ', 'tefMAX_LEDGER'].includes(errorCode || '')) {
             // eslint-disable-next-line no-await-in-loop, no-promise-executor-return -- We are waiting on retries
             await new Promise((resolve) => setTimeout(resolve, 1000))

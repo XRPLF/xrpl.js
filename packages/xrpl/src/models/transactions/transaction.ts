@@ -14,6 +14,7 @@ import { AMMDelete, validateAMMDelete } from './AMMDelete'
 import { AMMDeposit, validateAMMDeposit } from './AMMDeposit'
 import { AMMVote, validateAMMVote } from './AMMVote'
 import { AMMWithdraw, validateAMMWithdraw } from './AMMWithdraw'
+import { Batch, validateBatch } from './batch'
 import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
@@ -26,6 +27,7 @@ import { EnableAmendment } from './enableAmendment'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
+import { LedgerStateFix, validateLedgerStateFix } from './ledgerStateFix'
 import { TransactionMetadata } from './metadata'
 import {
   NFTokenAcceptOffer,
@@ -105,6 +107,7 @@ export type SubmittableTransaction =
   | AMMWithdraw
   | AccountDelete
   | AccountSet
+  | Batch
   | CheckCancel
   | CheckCash
   | CheckCreate
@@ -115,6 +118,7 @@ export type SubmittableTransaction =
   | EscrowCancel
   | EscrowCreate
   | EscrowFinish
+  | LedgerStateFix
   | NFTokenAcceptOffer
   | NFTokenBurn
   | NFTokenCancelOffer
@@ -266,6 +270,19 @@ export function validate(transaction: Record<string, unknown>): void {
       validateAccountSet(tx)
       break
 
+    case 'Batch':
+      validateBatch(tx)
+      // This is done here to avoid issues with dependency cycles
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- okay here
+      // @ts-expect-error -- already checked
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- already checked above
+      tx.RawTransactions.forEach((innerTx: Record<string, unknown>) => {
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- already checked above
+        validate(innerTx.RawTransaction as Record<string, unknown>)
+      })
+      break
+
     case 'CheckCancel':
       validateCheckCancel(tx)
       break
@@ -304,6 +321,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'EscrowFinish':
       validateEscrowFinish(tx)
+      break
+
+    case 'LedgerStateFix':
+      validateLedgerStateFix(tx)
       break
 
     case 'NFTokenAcceptOffer':
