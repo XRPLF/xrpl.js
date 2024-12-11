@@ -85,7 +85,7 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
   AssetScale?: number
   /**
    * Specifies the maximum asset amount of this token that should ever be issued.
-   * It is a non-negative integer that can store a range of up to 63 bits. If not set, the max
+   * It is a non-negative integer string that can store a range of up to 63 bits. If not set, the max
    * amount will default to the largest unsigned 63-bit integer (0x7FFFFFFFFFFFFFFF or 9223372036854775807)
    *
    * Example:
