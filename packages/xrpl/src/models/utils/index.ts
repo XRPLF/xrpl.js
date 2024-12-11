@@ -1,4 +1,5 @@
 const HEX_REGEX = /^[0-9A-Fa-f]+$/u
+export const INTEGER_SANITY_CHECK = /^[0-9]+$/u
 
 /**
  * Verify that all fields of an object are in fields.
