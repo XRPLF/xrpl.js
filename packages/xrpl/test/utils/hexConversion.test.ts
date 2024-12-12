@@ -1,7 +1,7 @@
-import { convertHexToString, convertStringToHex } from '../../src/utils'
 import { assert } from 'chai'
+import { convertHexToString, convertStringToHex } from '../../src/utils'
 
-describe('hexToString and stringToHex', function () {
+describe('convertHexToString and convertStringToHex', function () {
   it('converts "example.com"', function () {
     const str = 'example.com'
     const hex = convertStringToHex(str)
