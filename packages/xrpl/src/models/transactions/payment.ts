@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { Amount, Path } from '../common'
+import { Amount, Path, MPTAmount } from '../common'
 import { isFlagEnabled } from '../utils'
 
 import {
@@ -116,7 +116,7 @@ export interface Payment extends BaseTransaction {
    * names MUST be lower-case. If the tfPartialPayment flag is set, deliver up
    * to this amount instead.
    */
-  Amount: Amount
+  Amount: Amount | MPTAmount
   /** The unique address of the account receiving the payment. */
   Destination: Account
   /**
@@ -142,19 +142,19 @@ export interface Payment extends BaseTransaction {
    * cross-currency/cross-issue payments. Must be omitted for XRP-to-XRP
    * Payments.
    */
-  SendMax?: Amount
+  SendMax?: Amount | MPTAmount
   /**
    * Minimum amount of destination currency this transaction should deliver.
    * Only valid if this is a partial payment. For non-XRP amounts, the nested
    * field names are lower-case.
    */
-  DeliverMin?: Amount
+  DeliverMin?: Amount | MPTAmount
   Flags?: number | PaymentFlagsInterface
 }
 
 export interface PaymentMetadata extends TransactionMetadataBase {
-  DeliveredAmount?: Amount
-  delivered_amount?: Amount | 'unavailable'
+  DeliveredAmount?: Amount | MPTAmount
+  delivered_amount?: Amount | MPTAmount | 'unavailable'
 }
 
 /**

@@ -4,7 +4,7 @@
 name: Node.js CI
 
 env:
-  RIPPLED_DOCKER_IMAGE: rippleci/rippled:2.2.0-b3
+  RIPPLED_DOCKER_IMAGE: rippleci/rippled:2.3.0-rc1
 
 on:
   push:
@@ -28,9 +28,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Setup npm version 9
+      - name: Setup npm version 10
         run: |
-          npm i -g npm@9 --registry=https://registry.npmjs.org
+          npm i -g npm@10 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
@@ -45,7 +45,6 @@ jobs:
           key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-deps-${{ matrix.node-version }}-
-            ${{ runner.os }}-deps-
 
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
@@ -60,7 +59,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [18.x, 20.x, 22.x]
 
     steps:
       - uses: actions/checkout@v4
@@ -69,9 +68,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Setup npm version 9
+      - name: Setup npm version 10
         run: |
-          npm i -g npm@9 --registry=https://registry.npmjs.org
+          npm i -g npm@10 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
@@ -86,7 +85,6 @@ jobs:
           key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-deps-${{ matrix.node-version }}-
-            ${{ runner.os }}-deps-
 
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
@@ -101,23 +99,23 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [18.x, 20.x, 22.x]
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Run docker in background
         run: |
-          docker run --detach --rm --name rippled-service -p 6006:6006 --volume "${{ github.workspace }}/.ci-config/":"/opt/ripple/etc/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s --env GITHUB_ACTIONS=true --env CI=true ${{ env.RIPPLED_DOCKER_IMAGE }} /opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg
+          docker run --detach --rm -p 6006:6006 --volume "${{ github.workspace }}/.ci-config/":"/etc/opt/ripple/" --name rippled-service --health-cmd="rippled server_nfo || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s --env GITHUB_ACTIONS=true --env CI=true --entrypoint bash ${{ env.RIPPLED_DOCKER_IMAGE }} -c "rippled -a"
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Setup npm version 9
+      - name: Setup npm version 10
         run: |
-          npm i -g npm@9 --registry=https://registry.npmjs.org
+          npm i -g npm@10 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
@@ -132,7 +130,6 @@ jobs:
           key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-deps-${{ matrix.node-version }}-
-            ${{ runner.os }}-deps-
 
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
@@ -165,11 +162,11 @@ jobs:
 
       - name: Run docker in background
         run: |
-          docker run --detach --rm --name rippled-service -p 6006:6006 --volume "${{ github.workspace }}/.ci-config/":"/opt/ripple/etc/" --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s --env GITHUB_ACTIONS=true --env CI=true ${{ env.RIPPLED_DOCKER_IMAGE }} /opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg
+          docker run --detach --rm -p 6006:6006 --volume "${{ github.workspace }}/.ci-config/":"/etc/opt/ripple/" --name rippled-service --health-cmd="rippled server_nfo || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s --env GITHUB_ACTIONS=true --env CI=true --entrypoint bash ${{ env.RIPPLED_DOCKER_IMAGE }} -c "rippled -a"
 
-      - name: Setup npm version 9
+      - name: Setup npm version 10
         run: |
-          npm i -g npm@9 --registry=https://registry.npmjs.org
+          npm i -g npm@10 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
@@ -184,7 +181,6 @@ jobs:
           key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-deps-${{ matrix.node-version }}-
-            ${{ runner.os }}-deps-
 
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
@@ -205,7 +201,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [18.x, 20.x, 22.x]
 
     steps:
       - uses: actions/checkout@v4
@@ -214,9 +210,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Setup npm version 9
+      - name: Setup npm version 10
         run: |
-          npm i -g npm@9 --registry=https://registry.npmjs.org
+          npm i -g npm@10 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
@@ -231,7 +227,6 @@ jobs:
           key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-deps-${{ matrix.node-version }}-
-            ${{ runner.os }}-deps-
 
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
