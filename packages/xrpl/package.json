@@ -41,7 +41,7 @@
     "karma-jasmine": "^5.1.0",
     "karma-webpack": "^5.0.0",
     "lodash": "^4.17.4",
-    "react": "^18.2.0",
+    "react": "^19.0.0",
     "run-s": "^0.0.0",
     "typedoc": "0.26.11",
     "ws": "^8.14.2"
