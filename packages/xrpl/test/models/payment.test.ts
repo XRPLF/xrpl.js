@@ -258,4 +258,18 @@ describe('Payment', function () {
       'PaymentTransaction: tfPartialPayment flag required with DeliverMin',
     )
   })
+
+  it(`verifies valid MPT PaymentTransaction`, function () {
+    const mptPaymentTransaction = {
+      TransactionType: 'Payment',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      Amount: {
+        mpt_issuance_id: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
+        value: '10',
+      },
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+    } as any
+    assert.doesNotThrow(() => validatePayment(mptPaymentTransaction))
+    assert.doesNotThrow(() => validate(mptPaymentTransaction))
+  })
 })
