@@ -22,6 +22,7 @@ function assertEqualAmountJSON(actual, expected) {
   }
   expect(actual.currency).toEqual(expected.currency)
   expect(actual.issuer).toEqual(expected.issuer)
+  expect(actual.mpt_issuance_id).toEqual(expected.mpt_issuance_id)
   expect(
     actual.value === expected.value ||
       new BigNumber(actual.value).eq(new BigNumber(expected.value)),
@@ -207,12 +208,12 @@ function amountParsingTests() {
         return
       }
       const parser = makeParser(f.expected_hex)
-      const testName = `values_tests[${i}] parses ${f.expected_hex.slice(
+      const hexToJsonTestName = `values_tests[${i}] parses ${f.expected_hex.slice(
         0,
         16,
       )}...
           as ${JSON.stringify(f.test_json)}`
-      it(testName, () => {
+      it(hexToJsonTestName, () => {
         const value = parser.readType(Amount)
         // May not actually be in canonical form. The fixtures are to be used
         // also for json -> binary;
@@ -222,6 +223,15 @@ function amountParsingTests() {
           const exponent = new BigNumber(json.value)
           expect((exponent.e ?? 0) - 15).toEqual(f?.exponent)
         }
+      })
+
+      const jsonToHexTestName = `values_tests[${i}] parses ${JSON.stringify(
+        f.test_json,
+      )}...
+          as ${f.expected_hex.slice(0, 16)}`
+      it(jsonToHexTestName, () => {
+        const amt = Amount.from(f.test_json)
+        expect(amt.toHex()).toEqual(f.expected_hex)
       })
     })
 }
