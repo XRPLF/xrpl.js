@@ -30,34 +30,34 @@
     "Metadata": 10004
   },
   "LEDGER_ENTRY_TYPES": {
-    "Invalid": -1,
-    "AccountRoot": 97,
-    "DirectoryNode": 100,
-    "RippleState": 114,
-    "Ticket": 84,
-    "SignerList": 83,
-    "Offer": 111,
-    "Bridge": 105,
-    "LedgerHashes": 104,
-    "Amendments": 102,
-    "XChainOwnedClaimID": 113,
-    "XChainOwnedCreateAccountClaimID": 116,
-    "FeeSettings": 115,
-    "Escrow": 117,
-    "PayChannel": 120,
-    "Check": 67,
-    "DepositPreauth": 112,
-    "NegativeUNL": 78,
-    "NFTokenPage": 80,
-    "NFTokenOffer": 55,
-    "AMM": 121,
-    "DID": 73,
-    "Oracle": 128,
     "Any": -3,
     "Child": -2,
-    "Nickname": 110,
-    "Contract": 99,
-    "GeneratorMap": 103
+    "Invalid": -1,
+    "NFTokenOffer": 55,
+    "Check": 67,
+    "DID": 73,
+    "NegativeUNL": 78,
+    "NFTokenPage": 80,
+    "SignerList": 83,
+    "Ticket": 84,
+    "AccountRoot": 97,
+    "DirectoryNode": 100,
+    "Amendments": 102,
+    "LedgerHashes": 104,
+    "Bridge": 105,
+    "Offer": 111,
+    "DepositPreauth": 112,
+    "XChainOwnedClaimID": 113,
+    "RippleState": 114,
+    "FeeSettings": 115,
+    "XChainOwnedCreateAccountClaimID": 116,
+    "Escrow": 117,
+    "PayChannel": 120,
+    "AMM": 121,
+    "Oracle": 128,
+    "MPTokenIssuance": 126,
+    "MPToken": 127,
+    "Credential": 129
   },
   "FIELDS": [
     [
@@ -214,6 +214,16 @@
       "Scale",
       {
         "nth": 4,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt8"
+      }
+    ],
+    [
+      "AssetScale",
+      {
+        "nth": 5,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1081,6 +1091,56 @@
       }
     ],
     [
+      "MaximumAmount",
+      {
+        "nth": 24,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt64"
+      }
+    ],
+    [
+      "OutstandingAmount",
+      {
+        "nth": 25,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt64"
+      }
+    ],
+    [
+      "MPTAmount",
+      {
+        "nth": 26,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt64"
+      }
+    ],
+    [
+      "IssuerNode",
+      {
+        "nth": 27,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt64"
+      }
+    ],
+    [
+      "SubjectNode",
+      {
+        "nth": 28,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt64"
+      }
+    ],
+    [
       "EmailHash",
       {
         "nth": 1,
@@ -1128,6 +1188,16 @@
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash160"
+      }
+    ],
+    [
+      "MPTokenIssuanceID",
+      {
+        "nth": 1,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt192"
       }
     ],
     [
@@ -1991,6 +2061,26 @@
       }
     ],
     [
+      "MPTokenMetadata",
+      {
+        "nth": 30,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Blob"
+      }
+    ],
+    [
+      "CredentialType",
+      {
+        "nth": 31,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Blob"
+      }
+    ],
+    [
       "InnerResult",
       {
         "nth": 32,
@@ -2091,6 +2181,16 @@
       }
     ],
     [
+      "Holder",
+      {
+        "nth": 11,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "AccountID"
+      }
+    ],
+    [
       "HookAccount",
       {
         "nth": 16,
@@ -2161,6 +2261,16 @@
       }
     ],
     [
+      "Subject",
+      {
+        "nth": 24,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "AccountID"
+      }
+    ],
+    [
       "Indexes",
       {
         "nth": 1,
@@ -2194,6 +2304,16 @@
       "NFTokenOffers",
       {
         "nth": 4,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Vector256"
+      }
+    ],
+    [
+      "CredentialIDs",
+      {
+        "nth": 5,
         "isVLEncoded": true,
         "isSerialized": true,
         "isSigningField": true,
@@ -2581,6 +2701,16 @@
       }
     ],
     [
+      "Credential",
+      {
+        "nth": 33,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
       "RawTransaction",
       {
         "nth": 34,
@@ -2601,19 +2731,9 @@
       }
     ],
     [
-      "BatchTxn",
-      {
-        "nth": 36,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "STObject"
-      }
-    ],
-    [
       "BatchSigner",
       {
-        "nth": 37,
+        "nth": 36,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2811,6 +2931,26 @@
       }
     ],
     [
+      "AuthorizeCredentials",
+      {
+        "nth": 26,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "UnauthorizeCredentials",
+      {
+        "nth": 27,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
       "BatchExecutions",
       {
         "nth": 28,
@@ -2836,7 +2976,7 @@
         "nth": 30,
         "isVLEncoded": false,
         "isSerialized": true,
-        "isSigningField": false,
+        "isSigningField": true,
         "type": "STArray"
       }
     ]
@@ -2908,7 +3048,8 @@
     "temEMPTY_DID": -254,
     "temARRAY_EMPTY": -253,
     "temARRAY_TOO_LARGE": -252,
-    "temINVALID_BATCH": -251,
+    "temBAD_TRANSFER_FEE": -251,
+    "temINVALID_BATCH": -250,
 
     "tefFAILURE": -199,
     "tefALREADY": -198,
@@ -3026,7 +3167,9 @@
     "tecTOKEN_PAIR_NOT_FOUND": 189,
     "tecARRAY_EMPTY": 190,
     "tecARRAY_TOO_LARGE": 191,
-    "tecBATCH_FAILURE": 192
+    "tecLOCKED": 192,
+    "tecBAD_CREDENTIALS": 193,
+    "tecBATCH_FAILURE": 194
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
@@ -3036,12 +3179,9 @@
     "AccountSet": 3,
     "EscrowCancel": 4,
     "SetRegularKey": 5,
-    "NickNameSet": 6,
     "OfferCreate": 7,
     "OfferCancel": 8,
-    "Contract": 9,
     "TicketCreate": 10,
-    "TicketCancel": 11,
     "SignerListSet": 12,
     "PaymentChannelCreate": 13,
     "PaymentChannelFund": 14,
@@ -3052,13 +3192,13 @@
     "DepositPreauth": 19,
     "TrustSet": 20,
     "AccountDelete": 21,
-    "SetHook": 22,
     "NFTokenMint": 25,
     "NFTokenBurn": 26,
     "NFTokenCreateOffer": 27,
     "NFTokenCancelOffer": 28,
     "NFTokenAcceptOffer": 29,
     "Clawback": 30,
+    "AMMClawback": 31,
     "AMMCreate": 35,
     "AMMDeposit": 36,
     "AMMWithdraw": 37,
@@ -3078,6 +3218,13 @@
     "OracleSet": 51,
     "OracleDelete": 52,
     "LedgerStateFix": 53,
+    "MPTokenIssuanceCreate": 54,
+    "MPTokenIssuanceDestroy": 55,
+    "MPTokenIssuanceSet": 56,
+    "MPTokenAuthorize": 57,
+    "CredentialCreate": 58,
+    "CredentialAccept": 59,
+    "CredentialDelete": 60,
     "Batch": 61,
     "EnableAmendment": 100,
     "SetFee": 101,

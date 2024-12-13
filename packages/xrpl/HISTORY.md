@@ -6,7 +6,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion
-* Add support for `Batch` amendment
+* Added new MPT transaction definitions (XLS-33).
+  * New `MPTAmount` type support for `Payment` and `Clawback` transactions
+* Add support for `Batch` amendment (XLS-56).
 
 ### Fixed
 * `TransactionStream` model supports APIv2
@@ -48,6 +50,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## 3.0.0 (2024-02-01)
 
 ### BREAKING CHANGES
+* The default signing algorithm in the `Wallet` was changed from secp256k1 to ed25519
 * Bump typescript to 5.x
 * Remove Node 14 support
 * Remove `crypto` polyfills, `create-hash`, `elliptic`, `hash.js`, and their many dependencies in favor of `@noble/hashes` and `@nobel/curves`

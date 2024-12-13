@@ -74,7 +74,9 @@ describe('Signing data', function () {
     const customPaymentDefinitions = JSON.parse(
       JSON.stringify(normalDefinitions),
     )
-    customPaymentDefinitions.TRANSACTION_TYPES.Payment = 31
+
+    // custom number would need to updated in case it has been used by an existing transaction type
+    customPaymentDefinitions.TRANSACTION_TYPES.Payment = 200
 
     const newDefs = new XrplDefinitions(customPaymentDefinitions)
     const actual = encodeForSigning(tx_json, newDefs)
@@ -83,7 +85,7 @@ describe('Signing data', function () {
         '53545800', // signingPrefix
         // TransactionType
         '12',
-        '001F',
+        '00C8',
         // Flags
         '22',
         '80000000',
@@ -177,7 +179,9 @@ describe('Signing data', function () {
     const customPaymentDefinitions = JSON.parse(
       JSON.stringify(normalDefinitions),
     )
-    customPaymentDefinitions.TRANSACTION_TYPES.Payment = 31
+
+    // custom number would need to updated in case it has been used by an existing transaction type
+    customPaymentDefinitions.TRANSACTION_TYPES.Payment = 200
 
     const newDefs = new XrplDefinitions(customPaymentDefinitions)
     const signingAccount = 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN'
@@ -188,7 +192,7 @@ describe('Signing data', function () {
         '534D5400', // signingPrefix
         // TransactionType
         '12',
-        '001F',
+        '00C8',
         // Flags
         '22',
         '80000000',

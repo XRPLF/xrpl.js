@@ -29,6 +29,19 @@ import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
 import { LedgerStateFix, validateLedgerStateFix } from './ledgerStateFix'
 import { TransactionMetadata } from './metadata'
+import { MPTokenAuthorize, validateMPTokenAuthorize } from './MPTokenAuthorize'
+import {
+  MPTokenIssuanceCreate,
+  validateMPTokenIssuanceCreate,
+} from './MPTokenIssuanceCreate'
+import {
+  MPTokenIssuanceDestroy,
+  validateMPTokenIssuanceDestroy,
+} from './MPTokenIssuanceDestroy'
+import {
+  MPTokenIssuanceSet,
+  validateMPTokenIssuanceSet,
+} from './MPTokenIssuanceSet'
 import {
   NFTokenAcceptOffer,
   validateNFTokenAcceptOffer,
@@ -119,6 +132,10 @@ export type SubmittableTransaction =
   | EscrowCreate
   | EscrowFinish
   | LedgerStateFix
+  | MPTokenAuthorize
+  | MPTokenIssuanceCreate
+  | MPTokenIssuanceDestroy
+  | MPTokenIssuanceSet
   | NFTokenAcceptOffer
   | NFTokenBurn
   | NFTokenCancelOffer
@@ -325,6 +342,22 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'LedgerStateFix':
       validateLedgerStateFix(tx)
+      break
+
+    case 'MPTokenAuthorize':
+      validateMPTokenAuthorize(tx)
+      break
+
+    case 'MPTokenIssuanceCreate':
+      validateMPTokenIssuanceCreate(tx)
+      break
+
+    case 'MPTokenIssuanceDestroy':
+      validateMPTokenIssuanceDestroy(tx)
+      break
+
+    case 'MPTokenIssuanceSet':
+      validateMPTokenIssuanceSet(tx)
       break
 
     case 'NFTokenAcceptOffer':

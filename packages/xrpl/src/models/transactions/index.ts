@@ -1,4 +1,4 @@
-export { BaseTransaction } from './common'
+export { BaseTransaction, isMPTAmount } from './common'
 export {
   validate,
   PseudoTransaction,
@@ -39,6 +39,22 @@ export { EscrowCancel } from './escrowCancel'
 export { EscrowCreate } from './escrowCreate'
 export { EscrowFinish } from './escrowFinish'
 export { EnableAmendment, EnableAmendmentFlags } from './enableAmendment'
+export {
+  MPTokenAuthorize,
+  MPTokenAuthorizeFlags,
+  MPTokenAuthorizeFlagsInterface,
+} from './MPTokenAuthorize'
+export {
+  MPTokenIssuanceCreate,
+  MPTokenIssuanceCreateFlags,
+  MPTokenIssuanceCreateFlagsInterface,
+} from './MPTokenIssuanceCreate'
+export { MPTokenIssuanceDestroy } from './MPTokenIssuanceDestroy'
+export {
+  MPTokenIssuanceSet,
+  MPTokenIssuanceSetFlags,
+  MPTokenIssuanceSetFlagsInterface,
+} from './MPTokenIssuanceSet'
 export { NFTokenAcceptOffer } from './NFTokenAcceptOffer'
 export { NFTokenBurn } from './NFTokenBurn'
 export { NFTokenCancelOffer } from './NFTokenCancelOffer'
