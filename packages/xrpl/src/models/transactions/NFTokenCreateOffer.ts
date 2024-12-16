@@ -107,7 +107,16 @@ function validateNFTokenBuyOfferCases(tx: Record<string, unknown>): void {
     )
   }
 
-  if (parseAmountValue(tx.Amount) <= 0) {
+  let parsedAmount: bigint
+  try {
+    parsedAmount = parseAmountValue(tx.Amount)
+  } catch {
+    throw new ValidationError(
+      'NFTokenCreateOffer: Invalid Amount, Amount field could not be parsed by BigInt constructor',
+    )
+  }
+
+  if (parsedAmount <= 0) {
     throw new ValidationError(
       'NFTokenCreateOffer: Amount must be greater than 0 for buy offers',
     )

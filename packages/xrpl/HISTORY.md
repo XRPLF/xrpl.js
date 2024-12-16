@@ -14,6 +14,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * `TransactionStream` model includes `close_time_iso` field
 * `Ledger` model includes `close_time_iso` field
 
+### Fixed
+* Expanded the supported range of values in `OracleSet` transaction's `AssetPrice` field. The change enables values in range [0, 18446744073709551615], both inclusive.
+
 ## 4.0.0 (2024-07-15)
 
 ### BREAKING CHANGES
