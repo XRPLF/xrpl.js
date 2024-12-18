@@ -93,7 +93,7 @@ describe('CredentialDelete', function () {
     delete credentialDelete.Subject
     delete credentialDelete.Issuer
     const errorMessage =
-      'CredentialDelete: Neither `Issuer` nor `Subject` was provided'
+      'CredentialDelete:  Either `Issuer` or `Subject` must be provided'
     assert.throws(
       () => validateCredentialDelete(credentialDelete),
       ValidationError,
@@ -122,9 +122,7 @@ describe('CredentialDelete', function () {
   })
 
   it(`throws w/ credentialType field too long`, function () {
-    credentialDelete.CredentialType = stringToHex(
-      'PassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassport',
-    )
+    credentialDelete.CredentialType = stringToHex('A'.repeat(129))
     const errorMessage = 'CredentialDelete: CredentialType length must be < 128'
     assert.throws(
       () => validateCredentialDelete(credentialDelete),
@@ -140,7 +138,7 @@ describe('CredentialDelete', function () {
 
   it(`throws w/ credentialType field empty`, function () {
     credentialDelete.CredentialType = ''
-    const errorMessage = 'CredentialDelete: CredentialType length must be > 0'
+    const errorMessage = 'CredentialDelete: CredentialType cannot be an empty string'
     assert.throws(
       () => validateCredentialDelete(credentialDelete),
       ValidationError,

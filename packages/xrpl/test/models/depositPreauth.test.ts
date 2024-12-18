@@ -1,8 +1,7 @@
 import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 import { assert } from 'chai'
 
-import { AuthorizeCredential, validate, ValidationError } from '../../src'
-import { validateDepositPreauth } from '../../src/models/transactions/depositPreauth'
+import { AuthorizeCredential, validate, validateDepositPreauth, ValidationError } from '../../src'
 
 /**
  * DepositPreauth Transaction Verification Testing.
@@ -183,7 +182,7 @@ describe('DepositPreauth', function () {
   })
 
   it('throws when AuthorizeCredentials is empty array', function () {
-    const errorMessage = 'DepositPreauth: Credentials list cannot be empty'
+    const errorMessage = 'DepositPreauth: Credentials cannot be an empty array'
     depositPreauth.AuthorizeCredentials = []
 
     assert.throws(
@@ -195,7 +194,7 @@ describe('DepositPreauth', function () {
   })
 
   it('throws when UnauthorizeCredentials is empty array', function () {
-    const errorMessage = 'DepositPreauth: Credentials list cannot be empty'
+    const errorMessage = 'DepositPreauth: Credentials cannot be an empty array'
     depositPreauth.UnauthorizeCredentials = []
 
     assert.throws(
@@ -209,7 +208,7 @@ describe('DepositPreauth', function () {
   it('throws when AuthorizeCredentials is too long', function () {
     const sampleCredentials: AuthorizeCredential[] = []
     const errorMessage =
-      'DepositPreauth: Credentials list cannot have more than 8 elements'
+      'DepositPreauth: Credentials length cannot exceed 8 elements'
     for (let index = 0; index < 9; index++) {
       sampleCredentials.push({
         Credential: {
@@ -230,7 +229,7 @@ describe('DepositPreauth', function () {
   it('throws when UnauthorizeCredentials is too long', function () {
     const sampleCredentials: AuthorizeCredential[] = []
     const errorMessage =
-      'DepositPreauth: Credentials list cannot have more than 8 elements'
+      'DepositPreauth: Credentials length cannot exceed 8 elements'
     for (let index = 0; index < 9; index++) {
       sampleCredentials.push({
         Credential: {
@@ -283,7 +282,7 @@ describe('DepositPreauth', function () {
   it('throws when AuthorizeCredentials has duplicates', function () {
     const invalidCredentials = [validCredential, validCredential]
     const errorMessage =
-      'DepositPreauth: Credentials list cannot contain duplicates'
+      'DepositPreauth: Credentials cannot contain duplicate elements'
 
     depositPreauth.AuthorizeCredentials = invalidCredentials
     assert.throws(
@@ -297,7 +296,7 @@ describe('DepositPreauth', function () {
   it('throws when UnauthorizeCredentials has duplicates', function () {
     const invalidCredentials = [validCredential, validCredential]
     const errorMessage =
-      'DepositPreauth: Credentials list cannot contain duplicates'
+      'DepositPreauth: Credentials cannot contain duplicate elements'
 
     depositPreauth.UnauthorizeCredentials = invalidCredentials
     assert.throws(
