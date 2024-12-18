@@ -17,6 +17,7 @@ import {
 import { onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
+const MAX_CREDENTIALS_LIST_LENGTH = 8
 
 function isMemo(obj: { Memo?: unknown }): boolean {
   if (obj.Memo == null) {
@@ -430,7 +431,6 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
   }
 }
 
-const MAX_CREDENTIALS_LIST_LENGTH = 8
 /**
  * Check a CredentialAuthorize array for parameter errors
  *
@@ -439,17 +439,20 @@ const MAX_CREDENTIALS_LIST_LENGTH = 8
  * @param isStringID Toggle for if array contains IDs instead of AuthorizeCredential objects
  * @throws Validation Error if the formatting is incorrect
  */
+// eslint-disable-next-line max-lines-per-function -- breaking down logic further adds unnecerssary complexity
 export function validateCredentialsList(
   credentials: unknown,
   transactionType: string,
   isStringID: boolean,
 ): void {
+  if (credentials == null) {
+    return
+  }
   if (!Array.isArray(credentials)) {
     throw new ValidationError(
       `${transactionType}: Credentials list must be an array`,
     )
   }
-
   if (credentials.length > MAX_CREDENTIALS_LIST_LENGTH) {
     throw new ValidationError(
       `${transactionType}: Credentials list cannot have more than ${MAX_CREDENTIALS_LIST_LENGTH} elements`,
@@ -459,7 +462,6 @@ export function validateCredentialsList(
       `${transactionType}: Credentials list cannot be empty`,
     )
   }
-
   credentials.forEach((credential) => {
     if (isStringID) {
       if (!isString(credential)) {
@@ -473,9 +475,7 @@ export function validateCredentialsList(
       )
     }
   })
-
-  const credentialsSet = new Set(credentials)
-  if (credentialsSet.size !== credentials.length) {
+  if (containsDuplicates(credentials)) {
     throw new ValidationError(
       `${transactionType}: Credentials list cannot contain duplicates`,
     )
@@ -488,5 +488,14 @@ function isAuthorizeCredential(
   if (value.Credential.CredentialType && value.Credential.Issuer) {
     return true
   }
+  return false
+}
+
+function containsDuplicates(objectList: object[]): boolean {
+  const objSet = new Set(objectList.map((obj) => JSON.stringify(obj)))
+  if (objSet.size !== objectList.length) {
+    return true
+  }
+
   return false
 }
