@@ -40,6 +40,7 @@ describe('CredentialCreate', function () {
       await testContext.client.request({
         command: 'account_objects',
         account: testContext.wallet.classicAddress,
+        type: 'credential',
       })
     const { account_objects } = accountObjectsResponse.result
 

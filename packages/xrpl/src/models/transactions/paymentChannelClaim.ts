@@ -132,7 +132,8 @@ export interface PaymentChannelClaim extends BaseTransaction {
    * field is omitted.
    */
   PublicKey?: string
-  /** Credentials associated with the sender of this transaction.
+  /**
+   * Credentials associated with the sender of this transaction.
    * The credentials included must not be expired.
    */
   CredentialIDs?: string[]
@@ -147,7 +148,7 @@ export interface PaymentChannelClaim extends BaseTransaction {
 export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.CredentialIDs !== undefined) {
+  if (tx.CredentialIDs != null) {
     validateCredentialsList(
       tx.CredentialIDs,
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check

@@ -391,8 +391,7 @@ export function parseAmountValue(amount: unknown): number {
   return parseFloat(amount.value)
 }
 
-// 64 * 2
-const MAX_CREDENTIAL_TYPE_LENGTH = 128
+const MAX_CREDENTIAL_TYPE_LENGTH = 64 * 2 // 64 bytes
 /**
  * Check a CredentialType for formatting errors
  *
@@ -420,7 +419,7 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
     )
   } else if (tx.CredentialType.length > MAX_CREDENTIAL_TYPE_LENGTH) {
     throw new ValidationError(
-      `${tx.TransactionType}: CredentialType length must be < ${MAX_CREDENTIAL_TYPE_LENGTH}`,
+      `${tx.TransactionType}: CredentialType length cannot be > ${MAX_CREDENTIAL_TYPE_LENGTH}`,
     )
   }
 
@@ -453,7 +452,7 @@ export function validateCredentialsList(
 
   if (credentials.length > MAX_CREDENTIALS_LIST_LENGTH) {
     throw new ValidationError(
-      `${transactionType}: Credentials list cannot have more than 8 elements`,
+      `${transactionType}: Credentials list cannot have more than ${MAX_CREDENTIALS_LIST_LENGTH} elements`,
     )
   } else if (credentials.length === 0) {
     throw new ValidationError(

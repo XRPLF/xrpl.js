@@ -20,14 +20,14 @@ export interface CredentialDelete extends BaseTransaction {
   /** The transaction submitter. */
   Account: string
 
+  /** A hex-encoded value to identify the type of credential from the issuer. */
+  CredentialType: string
+
   /** The person that the credential is for. If omitted, Account is assumed to be the subject. */
   Subject?: string
 
   /** The issuer of the credential. If omitted, Account is assumed to be the issuer. */
   Issuer?: string
-
-  /** A (hex-encoded) value to identify the type of credential from the issuer. */
-  CredentialType: string
 }
 
 /**
@@ -47,9 +47,9 @@ export function validateCredentialDelete(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'Account', isString)
 
+  validateCredentialType(tx)
+
   validateOptionalField(tx, 'Subject', isString)
 
   validateOptionalField(tx, 'Issuer', isString)
-
-  validateCredentialType(tx)
 }

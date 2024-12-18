@@ -28,7 +28,7 @@ export interface CredentialCreate extends BaseTransaction {
   /** The subject of the credential. */
   Subject: string
 
-  /** A (hex-encoded) value to identify the type of credential from the issuer. */
+  /** A hex-encoded value to identify the type of credential from the issuer. */
   CredentialType: string
 
   /** Optional credential expiration. */
@@ -51,14 +51,14 @@ export function validateCredentialCreate(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'Subject', isString)
 
+  validateCredentialType(tx)
+
   validateOptionalField(tx, 'Expiration', isNumber)
 
   validateURI(tx.URI)
-
-  validateCredentialType(tx)
 }
 
-function validateURI(uri: unknown): void {
+function validateURI(URI: unknown): void {
   if (uri === undefined) {
     return
   }

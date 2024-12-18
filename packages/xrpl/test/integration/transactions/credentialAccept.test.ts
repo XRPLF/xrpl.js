@@ -14,7 +14,7 @@ import {
 } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
 
-describe('CredentialCreate', function () {
+describe('CredentialAccept', function () {
   // testContext wallet acts as issuer in this test
   let testContext: XrplIntegrationTestContext
 
@@ -53,6 +53,7 @@ describe('CredentialCreate', function () {
       await testContext.client.request({
         command: 'account_objects',
         account: subjectWallet.classicAddress,
+        type: 'credential',
       })
     const { account_objects } = accountObjectsResponse.result
 

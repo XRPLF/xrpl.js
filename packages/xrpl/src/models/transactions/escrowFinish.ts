@@ -50,7 +50,7 @@ export function validateEscrowFinish(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'Owner', isAccount)
 
-  if (tx.CredentialIDs !== undefined) {
+  if (tx.CredentialIDs != null) {
     validateCredentialsList(
       tx.CredentialIDs,
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check

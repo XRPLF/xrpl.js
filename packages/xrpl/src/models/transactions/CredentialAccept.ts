@@ -26,7 +26,7 @@ export interface CredentialAccept extends BaseTransaction {
   /** The issuer of the credential. */
   Issuer: string
 
-  /** A (hex-encoded) value to identify the type of credential from the issuer. */
+  /** A hex-encoded value to identify the type of credential from the issuer. */
   CredentialType: string
 }
 

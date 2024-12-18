@@ -1,8 +1,7 @@
 import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 import { assert } from 'chai'
 
-import { validate, ValidationError } from '../../src'
-import { validateCredentialAccept } from '../../src/models/transactions/CredentialAccept'
+import { validate, validateCredentialAccept, ValidationError } from '../../src'
 
 /**
  * CredentialAccept Transaction Verification Testing.
@@ -104,9 +103,7 @@ describe('CredentialAccept', function () {
   })
 
   it(`throws w/ credentialType field too long`, function () {
-    credentialAccept.CredentialType = stringToHex(
-      'PassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassportPassport',
-    )
+    credentialAccept.CredentialType = stringToHex('A'.repeat(129))
     const errorMessage = 'CredentialAccept: CredentialType length must be < 128'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),

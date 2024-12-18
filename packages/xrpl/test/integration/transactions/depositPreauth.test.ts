@@ -1,8 +1,6 @@
 import { stringToHex } from '@xrplf/isomorphic/utils'
 
-import { AuthorizeCredential, DepositPreauth, Wallet } from '../../../src'
-import { CredentialAccept } from '../../../src/models/transactions/CredentialAccept'
-import { CredentialCreate } from '../../../src/models/transactions/CredentialCreate'
+import { AuthorizeCredential, CredentialAccept, CredentialCreate, DepositPreauth, Wallet } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

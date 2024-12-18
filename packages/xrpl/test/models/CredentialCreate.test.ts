@@ -1,8 +1,7 @@
 import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 import { assert } from 'chai'
 
-import { validate, ValidationError } from '../../src'
-import { validateCredentialCreate } from '../../src/models/transactions/CredentialCreate'
+import { validate, validateCredentialCreate, ValidationError } from '../../src'
 
 /**
  * CredentialCreate Transaction Verification Testing.
