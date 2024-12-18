@@ -76,7 +76,5 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
     ) {
       throw new ValidationError('MPTokenIssuanceSet: flag conflict')
     }
-  } else {
-    throw new Error('tx.Flags is not a number')
   }
 }
