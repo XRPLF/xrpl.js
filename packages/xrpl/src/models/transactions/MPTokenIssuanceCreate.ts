@@ -112,6 +112,8 @@ export interface MPTokenIssuanceCreateMetadata extends TransactionMetadataBase {
   mpt_issuance_id?: string
 }
 
+/* eslint-disable max-lines-per-function -- Not needed to reduce function */
+
 /**
  * Verify the form and type of an MPTokenIssuanceCreate at runtime.
  *
@@ -150,6 +152,7 @@ export function validateMPTokenIssuanceCreate(
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
   const flags = tx.Flags as number | MPTokenIssuanceCreateFlagsInterface
   const isTfMPTCanTransfer =
     typeof flags === 'number'
@@ -171,3 +174,4 @@ export function validateMPTokenIssuanceCreate(
     }
   }
 }
+/* eslint-enable max-lines-per-function */
