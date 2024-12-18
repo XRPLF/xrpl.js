@@ -182,14 +182,12 @@ export function validatePayment(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
 
-  if (tx.CredentialIDs != null) {
-    validateCredentialsList(
-      tx.CredentialIDs,
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
-      tx.TransactionType as string,
-      true,
-    )
-  }
+  validateCredentialsList(
+    tx.CredentialIDs,
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
+    tx.TransactionType as string,
+    true,
+  )
 
   if (tx.InvoiceID !== undefined && typeof tx.InvoiceID !== 'string') {
     throw new ValidationError('PaymentTransaction: InvoiceID must be a string')

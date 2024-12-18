@@ -1,7 +1,8 @@
 import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 import { assert } from 'chai'
 
-import { AuthorizeCredential, validate, validateDepositPreauth, ValidationError } from '../../src'
+import { AuthorizeCredential, validate, ValidationError } from '../../src'
+import { validateDepositPreauth } from '../../src/models/transactions/depositPreauth'
 
 /**
  * DepositPreauth Transaction Verification Testing.
@@ -158,7 +159,7 @@ describe('DepositPreauth', function () {
   })
 
   it('throws when AuthorizeCredentials is not an array', function () {
-    const errorMessage = 'DepositPreauth: Credentials list must be an array'
+    const errorMessage = 'DepositPreauth: Credentials must be an array'
     depositPreauth.AuthorizeCredentials = validCredential
 
     assert.throws(
@@ -170,7 +171,7 @@ describe('DepositPreauth', function () {
   })
 
   it('throws when UnauthorizeCredentials is not an array', function () {
-    const errorMessage = 'DepositPreauth: Credentials list must be an array'
+    const errorMessage = 'DepositPreauth: Credentials must be an array'
     depositPreauth.UnauthorizeCredentials = validCredential
 
     assert.throws(
@@ -252,7 +253,7 @@ describe('DepositPreauth', function () {
       { Credential: 'Invalid Shape' },
       { Credential: 'Another Invalid Shape' },
     ]
-    const errorMessage = 'DepositPreauth: Invalid Credentials list format'
+    const errorMessage = 'DepositPreauth: Invalid Credentials format'
 
     depositPreauth.AuthorizeCredentials = invalidCredentials
     assert.throws(
@@ -268,7 +269,7 @@ describe('DepositPreauth', function () {
       { Credential: 'Invalid Shape' },
       { Credential: 'Another Invalid Shape' },
     ]
-    const errorMessage = 'DepositPreauth: Invalid Credentials list format'
+    const errorMessage = 'DepositPreauth: Invalid Credentials format'
 
     depositPreauth.UnauthorizeCredentials = invalidCredentials
     assert.throws(

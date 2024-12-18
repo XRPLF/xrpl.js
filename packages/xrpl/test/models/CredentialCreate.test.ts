@@ -1,7 +1,8 @@
 import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 import { assert } from 'chai'
 
-import { validate, validateCredentialCreate, ValidationError } from '../../src'
+import { validate, ValidationError } from '../../src'
+import { validateCredentialCreate } from '../../src/models/transactions/CredentialCreate'
 
 /**
  * CredentialCreate Transaction Verification Testing.
@@ -106,7 +107,8 @@ describe('credentialCreate', function () {
 
   it(`throws w/ credentialType field too long`, function () {
     credentialCreate.CredentialType = stringToHex('A'.repeat(129))
-    const errorMessage = 'CredentialCreate: CredentialType length must be < 128'
+    const errorMessage =
+      'CredentialCreate: CredentialType length cannot be > 128'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
       ValidationError,
@@ -121,7 +123,8 @@ describe('credentialCreate', function () {
 
   it(`throws w/ credentialType field empty`, function () {
     credentialCreate.CredentialType = ''
-    const errorMessage = 'CredentialCreate: CredentialType cannot be an empty string'
+    const errorMessage =
+      'CredentialCreate: CredentialType cannot be an empty string'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
       ValidationError,

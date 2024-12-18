@@ -41,7 +41,6 @@ describe('CredentialCreate', function () {
         command: 'account_objects',
         account: testContext.wallet.classicAddress,
         type: 'credential',
-        type: 'credential',
       })
     const { account_objects } = accountObjectsResponse.result
 

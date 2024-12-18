@@ -64,7 +64,6 @@ describe('CredentialDelete', function () {
         command: 'account_objects',
         account: subjectWallet.classicAddress,
         type: 'credential',
-        type: 'credential',
       })
 
     assert.equal(
@@ -76,7 +75,6 @@ describe('CredentialDelete', function () {
       await testContext.client.request({
         command: 'account_objects',
         account: testContext.wallet.classicAddress,
-        type: 'credential',
         type: 'credential',
       })
 

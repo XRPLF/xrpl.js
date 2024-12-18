@@ -48,12 +48,10 @@ export function validateAccountDelete(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
 
-  if (tx.CredentialIDs !== undefined) {
-    validateCredentialsList(
-      tx.CredentialIDs,
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
-      tx.TransactionType as string,
-      true,
-    )
-  }
+  validateCredentialsList(
+    tx.CredentialIDs,
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
+    tx.TransactionType as string,
+    true,
+  )
 }

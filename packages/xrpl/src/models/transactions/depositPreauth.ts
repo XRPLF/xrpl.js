@@ -24,8 +24,14 @@ export interface DepositPreauth extends BaseTransaction {
    */
   Unauthorize?: string
 
+  /**
+   * The credential(s) to preauthorize.
+   */
   AuthorizeCredentials?: AuthorizeCredential[]
 
+  /**
+   * The credential(s) whose preauthorization should be revoked.
+   */
   UnauthorizeCredentials?: AuthorizeCredential[]
 }
 
@@ -81,8 +87,13 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
 function validateSingleAuthorizationFieldProvided(
   tx: Record<string, unknown>,
 ): void {
-const fields = ['Authorize', 'Unauthorize', 'AuthorizeCredentials', 'UnauthorizeCredentials']
-const countProvided =(fields.filter(key => tx[key] !== undefined)).length;
+  const fields = [
+    'Authorize',
+    'Unauthorize',
+    'AuthorizeCredentials',
+    'UnauthorizeCredentials',
+  ]
+  const countProvided = fields.filter((key) => tx[key] !== undefined).length
 
   if (countProvided !== 1) {
     throw new ValidationError(

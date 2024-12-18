@@ -50,14 +50,12 @@ export function validateEscrowFinish(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'Owner', isAccount)
 
-  if (tx.CredentialIDs != null) {
-    validateCredentialsList(
-      tx.CredentialIDs,
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
-      tx.TransactionType as string,
-      true,
-    )
-  }
+  validateCredentialsList(
+    tx.CredentialIDs,
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
+    tx.TransactionType as string,
+    true,
+  )
 
   if (tx.OfferSequence == null) {
     throw new ValidationError('EscrowFinish: missing field OfferSequence')

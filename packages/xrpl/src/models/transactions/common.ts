@@ -409,14 +409,14 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
     )
   }
 
-  if (typeof tx.CredentialType !== 'string') {
+  if (!isString(tx.CredentialType)) {
     throw new ValidationError(
       `${tx.TransactionType}: CredentialType must be a string`,
     )
   }
   if (tx.CredentialType.length === 0) {
     throw new ValidationError(
-      `${tx.TransactionType}: CredentialType length must be > 0`,
+      `${tx.TransactionType}: CredentialType cannot be an empty string`,
     )
   } else if (tx.CredentialType.length > MAX_CREDENTIAL_TYPE_LENGTH) {
     throw new ValidationError(
@@ -439,7 +439,7 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
  * @param isStringID Toggle for if array contains IDs instead of AuthorizeCredential objects
  * @throws Validation Error if the formatting is incorrect
  */
-// eslint-disable-next-line max-lines-per-function -- breaking down logic further adds unnecerssary complexity
+// eslint-disable-next-line max-lines-per-function -- dumb
 export function validateCredentialsList(
   credentials: unknown,
   transactionType: string,
@@ -450,16 +450,16 @@ export function validateCredentialsList(
   }
   if (!Array.isArray(credentials)) {
     throw new ValidationError(
-      `${transactionType}: Credentials list must be an array`,
+      `${transactionType}: Credentials must be an array`,
     )
   }
   if (credentials.length > MAX_CREDENTIALS_LIST_LENGTH) {
     throw new ValidationError(
-      `${transactionType}: Credentials list cannot have more than ${MAX_CREDENTIALS_LIST_LENGTH} elements`,
+      `${transactionType}: Credentials length cannot exceed ${MAX_CREDENTIALS_LIST_LENGTH} elements`,
     )
   } else if (credentials.length === 0) {
     throw new ValidationError(
-      `${transactionType}: Credentials list cannot be empty`,
+      `${transactionType}: Credentials cannot be an empty array`,
     )
   }
   credentials.forEach((credential) => {
@@ -471,13 +471,13 @@ export function validateCredentialsList(
       }
     } else if (!isAuthorizeCredential(credential)) {
       throw new ValidationError(
-        `${transactionType}: Invalid Credentials list format`,
+        `${transactionType}: Invalid Credentials format`,
       )
     }
   })
   if (containsDuplicates(credentials)) {
     throw new ValidationError(
-      `${transactionType}: Credentials list cannot contain duplicates`,
+      `${transactionType}: Credentials cannot contain duplicate elements`,
     )
   }
 }

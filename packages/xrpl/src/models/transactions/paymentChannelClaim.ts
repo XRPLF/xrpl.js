@@ -148,14 +148,12 @@ export interface PaymentChannelClaim extends BaseTransaction {
 export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.CredentialIDs != null) {
-    validateCredentialsList(
-      tx.CredentialIDs,
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
-      tx.TransactionType as string,
-      true,
-    )
-  }
+  validateCredentialsList(
+    tx.CredentialIDs,
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
+    tx.TransactionType as string,
+    true,
+  )
 
   if (tx.Channel === undefined) {
     throw new ValidationError('PaymentChannelClaim: missing Channel')

@@ -41,7 +41,7 @@ export function validateCredentialDelete(tx: Record<string, unknown>): void {
 
   if (!tx.Subject && !tx.Issuer) {
     throw new ValidationError(
-      'CredentialDelete: Neither `Issuer` nor `Subject` was provided',
+      'CredentialDelete: Either `Issuer` or `Subject` must be provided',
     )
   }
 

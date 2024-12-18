@@ -1,7 +1,8 @@
 import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 import { assert } from 'chai'
 
-import { validate, validateCredentialDelete, ValidationError } from '../../src'
+import { validate, ValidationError } from '../../src'
+import { validateCredentialDelete } from '../../src/models/transactions/CredentialDelete'
 
 /**
  * CredentialDelete Transaction Verification Testing.
@@ -92,7 +93,7 @@ describe('CredentialDelete', function () {
     delete credentialDelete.Subject
     delete credentialDelete.Issuer
     const errorMessage =
-      'CredentialDelete:  Either `Issuer` or `Subject` must be provided'
+      'CredentialDelete: Either `Issuer` or `Subject` must be provided'
     assert.throws(
       () => validateCredentialDelete(credentialDelete),
       ValidationError,
@@ -122,7 +123,8 @@ describe('CredentialDelete', function () {
 
   it(`throws w/ credentialType field too long`, function () {
     credentialDelete.CredentialType = stringToHex('A'.repeat(129))
-    const errorMessage = 'CredentialDelete: CredentialType length must be < 128'
+    const errorMessage =
+      'CredentialDelete: CredentialType length cannot be > 128'
     assert.throws(
       () => validateCredentialDelete(credentialDelete),
       ValidationError,
@@ -137,7 +139,8 @@ describe('CredentialDelete', function () {
 
   it(`throws w/ credentialType field empty`, function () {
     credentialDelete.CredentialType = ''
-    const errorMessage = 'CredentialDelete: CredentialType cannot be an empty string'
+    const errorMessage =
+      'CredentialDelete: CredentialType cannot be an empty string'
     assert.throws(
       () => validateCredentialDelete(credentialDelete),
       ValidationError,

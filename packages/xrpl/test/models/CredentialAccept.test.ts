@@ -1,7 +1,8 @@
 import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 import { assert } from 'chai'
 
-import { validate, validateCredentialAccept, ValidationError } from '../../src'
+import { validate, ValidationError } from '../../src'
+import { validateCredentialAccept } from '../../src/models/transactions/CredentialAccept'
 
 /**
  * CredentialAccept Transaction Verification Testing.
@@ -28,8 +29,8 @@ describe('CredentialAccept', function () {
   })
 
   it(`throws w/ missing field Account`, function () {
-    delete credentialAccept.Issuer
-    const errorMessage = 'CredentialAccept: missing field Issuer'
+    delete credentialAccept.Account
+    const errorMessage = 'CredentialAccept: missing field Account'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),
       ValidationError,
@@ -104,7 +105,8 @@ describe('CredentialAccept', function () {
 
   it(`throws w/ credentialType field too long`, function () {
     credentialAccept.CredentialType = stringToHex('A'.repeat(129))
-    const errorMessage = 'CredentialAccept: CredentialType length must be < 128'
+    const errorMessage =
+      'CredentialAccept: CredentialType length cannot be > 128'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),
       ValidationError,
@@ -119,7 +121,8 @@ describe('CredentialAccept', function () {
 
   it(`throws w/ credentialType field empty`, function () {
     credentialAccept.CredentialType = ''
-    const errorMessage = 'CredentialAccept: CredentialType length must be > 0'
+    const errorMessage =
+      'CredentialAccept: CredentialType cannot be an empty string'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),
       ValidationError,

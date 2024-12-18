@@ -59,23 +59,23 @@ export function validateCredentialCreate(tx: Record<string, unknown>): void {
 }
 
 function validateURI(URI: unknown): void {
-  if (uri === undefined) {
+  if (URI === undefined) {
     return
   }
 
-  if (typeof uri !== 'string') {
+  if (typeof URI !== 'string') {
     throw new ValidationError('CredentialCreate: invalid field URI')
   }
 
-  if (uri.length === 0) {
+  if (URI.length === 0) {
     throw new ValidationError('CredentialCreate: URI length must be > 0')
-  } else if (uri.length > MAX_URI_LENGTH) {
+  } else if (URI.length > MAX_URI_LENGTH) {
     throw new ValidationError(
       `CredentialCreate: URI length must be <= ${MAX_URI_LENGTH}`,
     )
   }
 
-  if (!HEX_REGEX.test(uri)) {
+  if (!HEX_REGEX.test(URI)) {
     throw new ValidationError('CredentialCreate: URI must be encoded in hex')
   }
 }
