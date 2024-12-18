@@ -151,6 +151,12 @@ export function validateMPTokenIssuanceCreate(
     }
   }
 
+  const flags = tx.Flags as number | MPTokenIssuanceCreateFlagsInterface
+  const isTfMPTCanTransfer =
+    typeof flags === 'number'
+      ? isFlagEnabled(flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer)
+      : flags.tfMPTCanTransfer ?? false
+
   const MAX_TRANSFER_FEE = 50000
   if (typeof tx.TransferFee === 'number') {
     if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
@@ -158,16 +164,11 @@ export function validateMPTokenIssuanceCreate(
         'MPTokenIssuanceCreate: TransferFee out of range',
       )
     }
-  }
 
-  if (
-    typeof tx.Flags === 'number' &&
-    typeof tx.TransferFee === 'number' &&
-    !isFlagEnabled(tx.Flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer) &&
-    tx.TransferFee != 0
-  ) {
-    throw new ValidationError(
-      'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
-    )
+    if (tx.TransferFee != 0 && !isTfMPTCanTransfer) {
+      throw new ValidationError(
+        'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
+      )
+    }
   }
 }

@@ -132,5 +132,18 @@ describe('MPTokenIssuanceCreate', function () {
       ValidationError,
       'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
     )
+
+    invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      TransferFee: 100,
+      Flags: { tfMPTCanClawback: true },
+    } as any
+
+    assert.throws(
+      () => validate(invalid),
+      ValidationError,
+      'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
+    )
   })
 })
