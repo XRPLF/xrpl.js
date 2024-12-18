@@ -1,9 +1,11 @@
 import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
-import { AccountObjectsResponse } from '../../../src'
-import { CredentialAccept } from '../../../src/models/transactions/CredentialAccept'
-import { CredentialCreate } from '../../../src/models/transactions/CredentialCreate'
+import {
+  AccountObjectsResponse,
+  CredentialAccept,
+  CredentialCreate,
+} from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

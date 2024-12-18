@@ -33,7 +33,7 @@ export default interface Credential extends BaseLedgerEntry, HasPreviousTxnID {
   Expiration?: number
 
   /** Optional additional data about the credential (such as a link to the VC document). */
-  URI: string
+  URI?: string
 
   /** A hint indicating which page of the subject's owner directory links to this object,
    * in case the directory consists of multiple pages.

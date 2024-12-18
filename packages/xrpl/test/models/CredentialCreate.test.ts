@@ -197,9 +197,7 @@ describe('credentialCreate', function () {
   })
 
   it(`throws w/ URI field too long`, function () {
-    credentialCreate.URI = stringToHex(
-      'This is beyond the character limit This is beyond the character limit This is beyond the character limitThis is beyond the character limit This is beyond the character limit This is beyond the character limitThis is beyond the character limit This is beyond the character limit This is beyond the character limit',
-    )
+    credentialCreate.URI = stringToHex('A'.repeat(129))
     const errorMessage = 'CredentialCreate: URI length must be <= 256'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
