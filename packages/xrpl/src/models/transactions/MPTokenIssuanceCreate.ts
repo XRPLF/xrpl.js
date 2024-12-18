@@ -1,5 +1,6 @@
 import { ValidationError } from '../../errors'
 import { isHex, INTEGER_SANITY_CHECK } from '../utils'
+import { isFlagEnabled } from '../utils'
 
 import {
   BaseTransaction,
@@ -157,5 +158,16 @@ export function validateMPTokenIssuanceCreate(
         'MPTokenIssuanceCreate: TransferFee out of range',
       )
     }
+  }
+
+  if (
+    typeof tx.Flags === 'number' &&
+    typeof tx.TransferFee === 'number' &&
+    !isFlagEnabled(tx.Flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer) &&
+    tx.TransferFee != 0
+  ) {
+    throw new ValidationError(
+      'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
+    )
   }
 }
