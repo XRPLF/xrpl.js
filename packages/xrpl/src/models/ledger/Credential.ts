@@ -44,10 +44,4 @@ export default interface Credential extends BaseLedgerEntry, HasPreviousTxnID {
    * in case the directory consists of multiple pages.
    */
   IssuerNode: string
-
-  /** The identifying hash of the transaction that most recently modified this object. */
-  PreviousTxnID: string
-
-  /** The index of the ledger that contains the transaction that most recently modified this object. */
-  PreviousTxnLgrSeqNumber: number
 }
