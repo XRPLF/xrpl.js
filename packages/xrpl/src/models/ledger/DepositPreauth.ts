@@ -1,3 +1,5 @@
+import { AuthorizeCredential } from '../common'
+
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
@@ -13,7 +15,9 @@ export default interface DepositPreauth
   /** The account that granted the preauthorization. */
   Account: string
   /** The account that received the preauthorization. */
-  Authorize: string
+  Authorize?: string
+  /** The credential(s) that received the preauthorization. */
+  AuthorizeCredentials?: AuthorizeCredential[]
   /**
    * A bit-map of boolean flags. No flags are defined for DepositPreauth
    * objects, so this value is always 0.
