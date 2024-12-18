@@ -81,11 +81,8 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
 function validateSingleAuthorizationFieldProvided(
   tx: Record<string, unknown>,
 ): void {
-  const countProvided =
-    Number(tx.Authorize !== undefined) +
-    Number(tx.Unauthorize !== undefined) +
-    Number(tx.AuthorizeCredentials !== undefined) +
-    Number(tx.UnauthorizeCredentials !== undefined)
+const fields = ['Authorize', 'Unauthorize', 'AuthorizeCredentials', 'UnauthorizeCredentials']
+const countProvided =(fields.filter(key => tx[key] !== undefined)).length;
 
   if (countProvided !== 1) {
     throw new ValidationError(

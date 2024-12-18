@@ -121,7 +121,7 @@ describe('credentialCreate', function () {
 
   it(`throws w/ credentialType field empty`, function () {
     credentialCreate.CredentialType = ''
-    const errorMessage = 'CredentialCreate: CredentialType length must be > 0'
+    const errorMessage = 'CredentialCreate: CredentialType cannot be an empty string'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
       ValidationError,

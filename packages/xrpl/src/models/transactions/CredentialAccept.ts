@@ -7,12 +7,9 @@ import {
 } from './common'
 
 /**
+ * Accepts a credential issued to the Account (i.e. the Account is the Subject of the Credential object).
  * Credentials are represented in hex. Whilst they are allowed a maximum length of 64
- * bytes, every byte requires 2 hex characters for representation
- */
-
-/**
- * accepts a credential issued to the Account (i.e. the Account is the Subject of the Credential object).
+ * bytes, every byte requires 2 hex characters for representation.
  * The credential is not considered valid until it has been transferred/accepted.
  *
  * @category Transaction Models
