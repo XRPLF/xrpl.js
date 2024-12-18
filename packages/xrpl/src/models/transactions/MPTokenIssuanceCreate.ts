@@ -1,6 +1,5 @@
 import { ValidationError } from '../../errors'
-import { isHex, INTEGER_SANITY_CHECK } from '../utils'
-import { isFlagEnabled } from '../utils'
+import { isHex, INTEGER_SANITY_CHECK, isFlagEnabled } from '../utils'
 
 import {
   BaseTransaction,
@@ -165,7 +164,7 @@ export function validateMPTokenIssuanceCreate(
       )
     }
 
-    if (tx.TransferFee != 0 && !isTfMPTCanTransfer) {
+    if (tx.TransferFee && !isTfMPTCanTransfer) {
       throw new ValidationError(
         'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
       )
