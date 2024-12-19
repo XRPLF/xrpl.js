@@ -150,11 +150,12 @@ export interface Payment extends BaseTransaction {
    * field names are lower-case.
    */
   DeliverMin?: Amount | MPTAmount
-  Flags?: number | PaymentFlagsInterface
-  /** Credentials associated with the sender of this transaction.
+  /**
+   * Credentials associated with the sender of this transaction.
    * The credentials included must not be expired.
    */
   CredentialIDs?: string[]
+  Flags?: number | PaymentFlagsInterface
 }
 
 export interface PaymentMetadata extends TransactionMetadataBase {
