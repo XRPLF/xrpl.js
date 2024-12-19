@@ -31,10 +31,10 @@ export interface CredentialCreate extends BaseTransaction {
   /** A hex-encoded value to identify the type of credential from the issuer. */
   CredentialType: string
 
-  /** Optional credential expiration. */
+  /** Credential expiration. */
   Expiration?: number
 
-  /** Optional additional data about the credential (such as a link to the VC document). */
+  /** Additional data about the credential (such as a link to the VC document). */
   URI?: string
 }
 
