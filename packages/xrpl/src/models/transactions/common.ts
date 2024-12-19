@@ -18,7 +18,6 @@ import { onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
 const MAX_CREDENTIALS_LIST_LENGTH = 8
-
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
 
@@ -413,10 +412,10 @@ export function parseAmountValue(amount: unknown): number {
 }
 
 /**
- * Check a CredentialType for formatting errors
+ * Verify the form and type of a CredentialType at runtime.
  *
- * @param tx A transaction to check the CredentialType for errors
- * @throws Validation Error if the formatting is incorrect
+ * @param tx A CredentialType Transaction.
+ * @throws when the CredentialType is malformed.
  */
 export function validateCredentialType(tx: Record<string, unknown>): void {
   if (typeof tx.TransactionType !== 'string') {
