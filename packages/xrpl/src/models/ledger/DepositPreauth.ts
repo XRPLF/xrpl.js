@@ -14,10 +14,6 @@ export default interface DepositPreauth
   LedgerEntryType: 'DepositPreauth'
   /** The account that granted the preauthorization. */
   Account: string
-  /** The account that received the preauthorization. */
-  Authorize?: string
-  /** The credential(s) that received the preauthorization. */
-  AuthorizeCredentials?: AuthorizeCredential[]
   /**
    * A bit-map of boolean flags. No flags are defined for DepositPreauth
    * objects, so this value is always 0.
@@ -28,4 +24,8 @@ export default interface DepositPreauth
    * object, in case the directory consists of multiple pages.
    */
   OwnerNode: string
+  /** The account that received the preauthorization. */
+  Authorize?: string
+  /** The credential(s) that received the preauthorization. */
+  AuthorizeCredentials?: AuthorizeCredential[]
 }

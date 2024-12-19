@@ -29,12 +29,6 @@ export default interface Credential extends BaseLedgerEntry, HasPreviousTxnID {
   /** A hex-encoded value to identify the type of credential from the issuer. */
   CredentialType: string
 
-  /** Optional credential expiration. */
-  Expiration?: number
-
-  /** Optional additional data about the credential (such as a link to the VC document). */
-  URI?: string
-
   /** A hint indicating which page of the subject's owner directory links to this object,
    * in case the directory consists of multiple pages.
    */
@@ -44,4 +38,10 @@ export default interface Credential extends BaseLedgerEntry, HasPreviousTxnID {
    * in case the directory consists of multiple pages.
    */
   IssuerNode: string
+
+  /** Credential expiration. */
+  Expiration?: number
+
+  /** Additional data about the credential (such as a link to the VC document). */
+  URI?: string
 }
