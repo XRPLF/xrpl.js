@@ -12,6 +12,7 @@ import type { TransactionMetadataBase } from './metadata'
 
 // 2^63 - 1
 const MAX_AMT = '9223372036854775807'
+const MAX_TRANSFER_FEE = 50000
 
 /**
  * Transaction Flags for an MPTokenIssuanceCreate Transaction.
@@ -159,11 +160,11 @@ export function validateMPTokenIssuanceCreate(
       ? isFlagEnabled(flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer)
       : flags.tfMPTCanTransfer ?? false
 
-  const MAX_TRANSFER_FEE = 50000
   if (typeof tx.TransferFee === 'number') {
     if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
       throw new ValidationError(
-        'MPTokenIssuanceCreate: TransferFee out of range',
+        'MPTokenIssuanceCreate: TransferFee must be between 0 and ' +
+          MAX_TRANSFER_FEE,
       )
     }
 

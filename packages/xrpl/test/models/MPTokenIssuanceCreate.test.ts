@@ -106,7 +106,7 @@ describe('MPTokenIssuanceCreate', function () {
     assert.throws(
       () => validate(invalid),
       ValidationError,
-      'MPTokenIssuanceCreate: TransferFee out of range',
+      'MPTokenIssuanceCreate: TransferFee must be between 0 and 50000',
     )
 
     invalid = {
@@ -118,7 +118,7 @@ describe('MPTokenIssuanceCreate', function () {
     assert.throws(
       () => validate(invalid),
       ValidationError,
-      'MPTokenIssuanceCreate: TransferFee out of range',
+      'MPTokenIssuanceCreate: TransferFee must be between 0 and 50000',
     )
 
     invalid = {
