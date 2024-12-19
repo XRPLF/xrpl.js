@@ -93,7 +93,7 @@ describe('CredentialDelete', function () {
     credentialDelete.Subject = undefined
     credentialDelete.Issuer = undefined
     const errorMessage =
-      'CredentialDelete: Either `Issuer` or `Subject` must be provided'
+      'CredentialDelete: either `Issuer` or `Subject` must be provided'
     assert.throws(
       () => validateCredentialDelete(credentialDelete),
       ValidationError,
